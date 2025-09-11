@@ -20,28 +20,38 @@ def test_units__query(graphql):
             node(id: $id) {
                 ... on UnitNode {
                     pk
-                    nameFi
-                    nameEn
-                    nameSv
-                    descriptionFi
-                    descriptionEn
-                    descriptionSv
-                    shortDescriptionFi
-                    shortDescriptionEn
-                    shortDescriptionSv
+                    name {
+                        fi
+                        sv
+                        en
+                    }
+                    description {
+                        fi
+                        sv
+                        en
+                    }
+                    shortDescription {
+                        fi
+                        sv
+                        en
+                     }
                     webPage
                     email
                     phone
-                    addressStreetFi
-                    addressStreetEn
-                    addressStreetSv
+                    addressStreet {
+                        fi
+                        sv
+                        en
+                     }
                     addressZip
-                    addressCityFi
-                    addressCityEn
-                    addressCitySv
-                    reservationUnits { nameFi }
-                    spaces { nameFi }
-                    unitGroups { nameFi }
+                    addressCity {
+                        fi
+                        sv
+                        en
+                     }
+                    reservationUnits { name { fi } }
+                    spaces { name { fi } }
+                    unitGroups { name { fi } }
                     paymentMerchant { name }
                 }
             }
@@ -55,25 +65,35 @@ def test_units__query(graphql):
 
     assert response.results == {
         "pk": unit.pk,
-        "nameFi": unit.name_fi,
-        "nameEn": unit.name_en,
-        "nameSv": unit.name_sv,
-        "descriptionFi": unit.description_fi,
-        "descriptionEn": unit.description_en,
-        "descriptionSv": unit.description_sv,
-        "shortDescriptionFi": unit.short_description_fi,
-        "shortDescriptionEn": unit.short_description_en,
-        "shortDescriptionSv": unit.short_description_sv,
+        "name": {
+            "fi": unit.name_fi,
+            "sv": unit.name_sv,
+            "en": unit.name_en,
+        },
+        "description": {
+            "fi": unit.description_fi,
+            "sv": unit.description_sv,
+            "en": unit.description_en,
+        },
+        "shortDescription": {
+            "fi": unit.short_description_fi,
+            "sv": unit.short_description_sv,
+            "en": unit.short_description_en,
+        },
         "webPage": unit.web_page,
         "email": unit.email,
         "phone": unit.phone,
-        "addressStreetFi": unit.address_street_fi,
-        "addressStreetEn": unit.address_street_en,
-        "addressStreetSv": unit.address_street_sv,
+        "addressStreet": {
+            "fi": unit.address_street_fi,
+            "sv": unit.address_street_sv,
+            "en": unit.address_street_en,
+        },
         "addressZip": unit.address_zip,
-        "addressCityFi": unit.address_city_fi,
-        "addressCityEn": unit.address_city_en,
-        "addressCitySv": unit.address_city_sv,
+        "addressCity": {
+            "fi": unit.address_city_fi,
+            "sv": unit.address_city_sv,
+            "en": unit.address_city_en,
+        },
         "reservationUnits": [],
         "unitGroups": [],
         "spaces": [],
@@ -94,7 +114,7 @@ def test_units__query__unit_groups_alphabetical_order(graphql):
             node(id: $id) {
                 ... on UnitNode {
                     pk
-                    unitGroups { nameFi }
+                    unitGroups { name { fi } }
                 }
             }
         }
@@ -108,9 +128,9 @@ def test_units__query__unit_groups_alphabetical_order(graphql):
     assert response.results == {
         "pk": unit.pk,
         "unitGroups": [
-            {"nameFi": unit_group_1.name_fi},
-            {"nameFi": unit_group_3.name_fi},
-            {"nameFi": unit_group_2.name_fi},
+            {"name": {"fi": unit_group_1.name_fi}},
+            {"name": {"fi": unit_group_3.name_fi}},
+            {"name": {"fi": unit_group_2.name_fi}},
         ],
     }
 
@@ -126,7 +146,7 @@ def test_units__query__unit_groups__no_permissions(graphql):
             node(id: $id) {
                 ... on UnitNode {
                     pk
-                    unitGroups { nameFi }
+                    unitGroups { name { fi } }
                 }
             }
         }

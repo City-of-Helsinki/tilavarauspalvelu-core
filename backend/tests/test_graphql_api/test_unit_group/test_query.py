@@ -24,10 +24,14 @@ def test_unit_groups__query(graphql):
 
     fields = """
         pk
-        nameFi
+        name {
+            fi
+        }
         units {
             pk
-            nameFi
+            name {
+                fi
+            }
         }
     """
     query = unit_groups_query(fields=fields)
@@ -38,10 +42,12 @@ def test_unit_groups__query(graphql):
     assert response.results == [
         {
             "pk": unit_group.pk,
-            "nameFi": unit_group.name_fi,
+            "name": {
+                "fi": unit_group.name_fi,
+            },
             "units": [
-                {"pk": unit_1.pk, "nameFi": unit_1.name_fi},
-                {"pk": unit_2.pk, "nameFi": unit_2.name_fi},
+                {"pk": unit_1.pk, "name": {"fi": unit_1.name_fi}},
+                {"pk": unit_2.pk, "name": {"fi": unit_2.name_fi}},
             ],
         }
     ]
