@@ -4,7 +4,7 @@ import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
 import { AuthenticationType, ReservationTypeChoice, type ReservationTypeFormFieldsFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { type ReservationFormType, ReservationTypes } from "@/schemas";
+import { type CreateReservationFormType, ReservationTypes } from "common/src/schemas";
 import { ShowAllContainer } from "common/src/components";
 import { ReservationMetadataSetForm, ReserverMetadataSetForm } from "./MetadataSetForm";
 import { BufferToggles } from "./BufferToggles";
@@ -29,7 +29,7 @@ function TypeSelect({ isDisabled }: { isDisabled?: boolean }) {
     watch,
     control,
     formState: { errors },
-  } = useFormContext<ReservationFormType>();
+  } = useFormContext<CreateReservationFormType>();
   const { t } = useTranslation();
 
   const type = watch("type");
@@ -85,7 +85,7 @@ export function ReservationTypeForm({
 }: ReservationTypeFormProps): JSX.Element | null {
   const { t } = useTranslation();
 
-  const { watch, register } = useFormContext<ReservationFormType>();
+  const { watch, register } = useFormContext<CreateReservationFormType>();
   const type = watch("type");
 
   if (reservationUnit == null) {

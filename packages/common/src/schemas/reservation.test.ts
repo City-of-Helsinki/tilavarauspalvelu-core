@@ -1,7 +1,7 @@
-import { ReservationStartInterval } from "@gql/gql-types";
 import { addDays, addHours, format, setMinutes, subDays } from "date-fns";
-import { ReservationFormSchema } from "./reservation";
+import { CreateStaffReservationFormSchema } from "./reservation";
 import { describe, test, expect } from "vitest";
+import { ReservationStartInterval } from "../../gql/gql-types";
 
 const TIME_FORMAT = "HH:mm";
 const DATE_FORMAT = "dd.MM.yyyy";
@@ -21,7 +21,7 @@ describe("with schema", () => {
       endTime: futureEndTime,
     };
 
-    const res = ReservationFormSchema(ReservationStartInterval.Interval_15Mins).safeParse(reservation);
+    const res = CreateStaffReservationFormSchema(ReservationStartInterval.Interval_15Mins).safeParse(reservation);
     expect(res.success).toBeTruthy();
   });
 
@@ -37,7 +37,7 @@ describe("with schema", () => {
       endTime: futureEndTime,
     };
 
-    const res = ReservationFormSchema(ReservationStartInterval.Interval_15Mins).safeParse(reservation);
+    const res = CreateStaffReservationFormSchema(ReservationStartInterval.Interval_15Mins).safeParse(reservation);
     expect(res.success).toBeFalsy();
     if (!res.success) {
       expect(res.error.issues.filter((x) => x.path.includes("date"))).toHaveLength(1);
@@ -56,7 +56,7 @@ describe("with schema", () => {
       endTime: futureEndTime,
     };
 
-    const res = ReservationFormSchema(ReservationStartInterval.Interval_30Mins).safeParse(reservation);
+    const res = CreateStaffReservationFormSchema(ReservationStartInterval.Interval_30Mins).safeParse(reservation);
     expect(res.success).toBeTruthy();
   });
 
@@ -70,7 +70,7 @@ describe("with schema", () => {
       endTime: futureEndTime,
     };
 
-    const res = ReservationFormSchema(ReservationStartInterval.Interval_30Mins).safeParse(reservation);
+    const res = CreateStaffReservationFormSchema(ReservationStartInterval.Interval_30Mins).safeParse(reservation);
     expect(res.success).toBeFalsy();
     if (!res.success) {
       expect(res.error.issues.filter((x) => x.path.includes("startTime"))).toHaveLength(1);
