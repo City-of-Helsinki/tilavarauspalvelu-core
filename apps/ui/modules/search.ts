@@ -23,8 +23,8 @@ import {
   SearchReservationUnitsQueryVariables,
   UnitOrderSet,
 } from "@gql/gql-types";
-import { convertLanguageCode, getTranslationSafe, toApiDate } from "common/src/common/util";
-import { fromUIDate } from "./util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { fromUIDate, toApiDate } from "common/src/date-utils";
 import { startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "./const";
 import { type ApolloClient, gql } from "@apollo/client";

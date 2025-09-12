@@ -12,7 +12,7 @@ import {
   MunicipalityChoice,
 } from "@gql/gql-types";
 import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { toApiDate } from "common/src/common/util";
+import { toApiDate } from "common/src/date-utils";
 import { addYears } from "date-fns";
 import { breakpoints } from "common/src/const";
 import { H1 } from "common/styled";
@@ -44,6 +44,7 @@ const StepperWrapper = styled.div`
 function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   const { t, i18n } = useTranslation();
   const { reservation } = props;
+
   const options = {
     ...props.options,
     municipalities: Object.values(MunicipalityChoice).map((value) => ({

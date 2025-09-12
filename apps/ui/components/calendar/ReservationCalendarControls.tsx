@@ -3,20 +3,19 @@ import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Button, ButtonVariant, IconAngleDown, IconAngleUp, IconCross, IconSize } from "hds-react";
 import { maxBy } from "lodash-es";
-import { fromUIDate } from "common/src/common/util";
+import { fromUIDate, formatDateTimeRange } from "common/src/date-utils";
 import { Transition } from "react-transition-group";
 import { Flex, fontBold, fontMedium, fontRegular, SemiBold } from "common/styled";
 import { breakpoints } from "common/src/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
-import { formatDateTimeRange } from "@/modules/util";
 import { type Control, type FieldValues, type SubmitHandler, useController, type UseFormReturn } from "react-hook-form";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { useMedia } from "react-use";
 import { type FocusTimeSlot } from "@/modules/reservation";
 import { ControlledDateInput } from "common/src/components/form";
-import { capitalize } from "common/src/helpers";
+import { capitalize, getLocalizationLang } from "common/src/helpers";
 
 type CommonProps = {
   reservationUnit: ReservationTimePickerFieldsFragment;
@@ -237,7 +236,7 @@ function ControlledToggler({
   price: string | null;
   durationOptions: { label: string; value: number }[];
 }): JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { control, watch } = form;
 
   const duration = watch("duration");
@@ -246,7 +245,9 @@ function ControlledToggler({
     if (!focusSlot.isReservable) {
       return t("reservationCalendar:selectTime");
     }
-    const dateStr = capitalize(formatDateTimeRange(t, focusSlot.start, focusSlot.end));
+    const dateStr = capitalize(
+      formatDateTimeRange(focusSlot.start, focusSlot.end, { locale: getLocalizationLang(i18n.language) })
+    );
     const selected = durationOptions.find((opt) => opt.value === duration);
     const durationStr = selected?.label ?? "";
 

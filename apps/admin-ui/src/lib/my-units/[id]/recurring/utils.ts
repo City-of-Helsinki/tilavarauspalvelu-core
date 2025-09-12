@@ -1,3 +1,4 @@
+import { UI_TIME_FORMAT } from "common/src/date-utils";
 import { parse } from "date-fns";
 
 type DateRange = {
@@ -19,6 +20,6 @@ export function convertToDate(d: Date, time: string) {
   if (!d || Number.isNaN(d.getTime())) {
     return undefined;
   }
-  const res = parse(time, "HH:mm", d);
+  const res = parse(time, UI_TIME_FORMAT, d);
   return !Number.isNaN(res.getTime()) ? res : undefined;
 }

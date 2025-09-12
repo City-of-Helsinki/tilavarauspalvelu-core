@@ -7,7 +7,7 @@ import {
   type ReservationSeriesReservationCreateInput,
 } from "@gql/gql-types";
 import type { ReservationSeriesForm, ReservationFormMeta } from "@/schemas";
-import { fromUIDateUnsafe, toApiDateUnsafe } from "common/src/common/util";
+import { fromUIDateUnsafe, toApiDateUnsafe } from "common/src/date-utils";
 import { gql } from "@apollo/client";
 
 // Not all choices are valid for reservation series (the ui should not allow these)
