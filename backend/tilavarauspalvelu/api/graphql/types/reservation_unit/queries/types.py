@@ -10,6 +10,7 @@ from undine.optimizer import OptimizationData
 from undine.relay import Node
 from undine.utils.graphql.utils import get_arguments
 
+from tilavarauspalvelu.api.graphql.extensions.utils import TranslatedField
 from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
 from tilavarauspalvelu.models import PaymentMerchant, Reservation, ReservationUnit, User
@@ -52,24 +53,42 @@ class ReservationUnitNode(
     rank = Field()
 
     # Strings
-    name_fi = Field()
-    name_sv = Field()
-    name_en = Field()
-    description_fi = Field()
-    description_sv = Field()
-    description_en = Field()
-    notes_when_applying_fi = Field()
-    notes_when_applying_sv = Field()
-    notes_when_applying_en = Field()
-    reservation_pending_instructions_fi = Field()
-    reservation_pending_instructions_sv = Field()
-    reservation_pending_instructions_en = Field()
-    reservation_confirmed_instructions_fi = Field()
-    reservation_confirmed_instructions_sv = Field()
-    reservation_confirmed_instructions_en = Field()
-    reservation_cancelled_instructions_fi = Field()
-    reservation_cancelled_instructions_sv = Field()
-    reservation_cancelled_instructions_en = Field()
+    name = Field(TranslatedField)
+    name_fi = Field(deprecation_reason="Use 'name' instead.")
+    name_sv = Field(deprecation_reason="Use 'name' instead.")
+    name_en = Field(deprecation_reason="Use 'name' instead.")
+    description = Field(TranslatedField)
+    description_fi = Field(deprecation_reason="Use 'description' instead.")
+    description_sv = Field(deprecation_reason="Use 'description' instead.")
+    description_en = Field(deprecation_reason="Use 'description' instead.")
+    notes_when_applying = Field(TranslatedField)
+    notes_when_applying_fi = Field(deprecation_reason="Use 'notes_when_applying' instead.")
+    notes_when_applying_sv = Field(deprecation_reason="Use 'notes_when_applying' instead.")
+    notes_when_applying_en = Field(deprecation_reason="Use 'notes_when_applying' instead.")
+    reservation_pending_instructions = Field(TranslatedField)
+    reservation_pending_instructions_fi = Field(deprecation_reason="Use 'reservation_pending_instructions' instead.")
+    reservation_pending_instructions_sv = Field(deprecation_reason="Use 'reservation_pending_instructions' instead.")
+    reservation_pending_instructions_en = Field(deprecation_reason="Use 'reservation_pending_instructions' instead.")
+    reservation_confirmed_instructions = Field(TranslatedField)
+    reservation_confirmed_instructions_fi = Field(
+        deprecation_reason="Use 'reservation_confirmed_instructions' instead.",
+    )
+    reservation_confirmed_instructions_sv = Field(
+        deprecation_reason="Use 'reservation_confirmed_instructions' instead.",
+    )
+    reservation_confirmed_instructions_en = Field(
+        deprecation_reason="Use 'reservation_confirmed_instructions' instead.",
+    )
+    reservation_cancelled_instructions = Field(TranslatedField)
+    reservation_cancelled_instructions_fi = Field(
+        deprecation_reason="Use 'reservation_cancelled_instructions' instead."
+    )
+    reservation_cancelled_instructions_sv = Field(
+        deprecation_reason="Use 'reservation_cancelled_instructions' instead."
+    )
+    reservation_cancelled_instructions_en = Field(
+        deprecation_reason="Use 'reservation_cancelled_instructions' instead."
+    )
     contact_information = Field()
 
     # Integers
@@ -306,9 +325,10 @@ class ReservationUnitAllNode(
 
     pk = Field()
 
-    name_fi = Field()
-    name_sv = Field()
-    name_en = Field()
+    name = Field(TranslatedField)
+    name_fi = Field(deprecation_reason="Use 'name' instead.")
+    name_sv = Field(deprecation_reason="Use 'name' instead.")
+    name_en = Field(deprecation_reason="Use 'name' instead.")
 
     @classmethod
     def __filter_queryset__(cls, queryset: ReservationUnitQuerySet, info: GQLInfo[User]) -> models.QuerySet:

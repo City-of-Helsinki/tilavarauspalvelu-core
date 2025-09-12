@@ -145,6 +145,7 @@ jobs:
         with:
           workflow: update_test_durations.yml
           name: test_durations
+          path: backend
 
       - name: "Run pytest with coverage"
         working-directory: backend

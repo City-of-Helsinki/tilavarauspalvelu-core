@@ -16,13 +16,13 @@ def test_equipment__query(graphql):
     equipment = EquipmentFactory.create(name="foo")
 
     graphql.login_with_superuser()
-    query = equipments_query(fields="nameFi")
+    query = equipments_query(fields="name { fi en sv }")
     response = graphql(query)
 
     assert response.has_errors is False
     assert response.results == [
         {
-            "nameFi": equipment.name_fi,
+            "name": {"fi": equipment.name_fi, "en": equipment.name_en, "sv": equipment.name_sv},
         },
     ]
 
@@ -33,22 +33,52 @@ def test_equipment__order__by_category_rank(graphql):
     equipment_3 = EquipmentFactory.create(name="baz", category__rank=1)
 
     graphql.login_with_superuser()
-    query = equipments_query(fields="nameFi category { nameFi }", order_by="categoryRankAsc")
+    query = equipments_query(fields="name { fi en sv } category { name { fi en sv } }", order_by="categoryRankAsc")
     response = graphql(query)
 
     assert response.has_errors is False
     assert response.results == [
         {
-            "nameFi": equipment_3.name_fi,
-            "category": {"nameFi": equipment_3.category.name_fi},
+            "name": {
+                "fi": equipment_3.name_fi,
+                "en": equipment_3.name_en,
+                "sv": equipment_3.name_sv,
+            },
+            "category": {
+                "name": {
+                    "fi": equipment_3.category.name_fi,
+                    "en": equipment_3.category.name_en,
+                    "sv": equipment_3.category.name_sv,
+                }
+            },
         },
         {
-            "nameFi": equipment_1.name_fi,
-            "category": {"nameFi": equipment_1.category.name_fi},
+            "name": {
+                "fi": equipment_1.name_fi,
+                "en": equipment_1.name_en,
+                "sv": equipment_1.name_sv,
+            },
+            "category": {
+                "name": {
+                    "fi": equipment_1.category.name_fi,
+                    "en": equipment_1.category.name_en,
+                    "sv": equipment_1.category.name_sv,
+                }
+            },
         },
         {
-            "nameFi": equipment_2.name_fi,
-            "category": {"nameFi": equipment_2.category.name_fi},
+            "name": {
+                "fi": equipment_2.name_fi,
+                "en": equipment_2.name_en,
+                "sv": equipment_2.name_sv,
+            },
+            "category": {
+                "name": {
+                    "fi": equipment_2.category.name_fi,
+                    "en": equipment_2.category.name_en,
+                    "sv": equipment_2.category.name_sv,
+                }
+            },
         },
     ]
 

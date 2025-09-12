@@ -2,6 +2,7 @@ from undine import Field, GQLInfo, QueryType
 from undine.optimizer import OptimizationData
 from undine.relay import Node
 
+from tilavarauspalvelu.api.graphql.extensions.utils import TranslatedField
 from tilavarauspalvelu.models import Purpose, User
 
 from .filtersets import PurposeFilterSet
@@ -21,9 +22,10 @@ class PurposeNode(
     pk = Field()
     rank = Field()
 
-    name_fi = Field()
-    name_sv = Field()
-    name_en = Field()
+    name = Field(TranslatedField)
+    name_fi = Field(deprecation_reason="Use 'name' instead.")
+    name_sv = Field(deprecation_reason="Use 'name' instead.")
+    name_en = Field(deprecation_reason="Use 'name' instead.")
 
     @Field
     def image_url(root: Purpose, info: GQLInfo[User]) -> str | None:

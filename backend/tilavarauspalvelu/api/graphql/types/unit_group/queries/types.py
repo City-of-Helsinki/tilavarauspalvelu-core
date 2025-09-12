@@ -3,6 +3,7 @@ from undine import Field, GQLInfo, QueryType
 from undine.exceptions import GraphQLPermissionError
 from undine.relay import Node
 
+from tilavarauspalvelu.api.graphql.extensions.utils import TranslatedField
 from tilavarauspalvelu.models import UnitGroup, User
 from tilavarauspalvelu.models.unit_group.queryset import UnitGroupQuerySet
 
@@ -22,9 +23,10 @@ class UnitGroupNode(
 ):
     pk = Field()
 
-    name_fi = Field()
-    name_en = Field()
-    name_sv = Field()
+    name = Field(TranslatedField)
+    name_fi = Field(deprecation_reason="Use 'name' instead.")
+    name_en = Field(deprecation_reason="Use 'name' instead.")
+    name_sv = Field(deprecation_reason="Use 'name' instead.")
 
     units = Field()
 

@@ -1,7 +1,7 @@
 import datetime
 import uuid
 from inspect import cleandoc
-from typing import Any, TypedDict
+from typing import Any
 
 from django.contrib.auth import logout
 from undine import Entrypoint, GQLInfo, RootType, create_schema
@@ -9,11 +9,10 @@ from undine.exceptions import GraphQLModelNotFoundError
 from undine.optimizer.optimizer import optimize_sync
 from undine.relay import Connection, Node
 
-from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReservationStateChoice, UserPermissionChoice
+from tilavarauspalvelu.enums import ReservationStateChoice, UserPermissionChoice
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.helsinki_profile.typing import PermissionCheckResult, UserProfileInfo
 from tilavarauspalvelu.models import AllocatedTimeSlot, PaymentOrder, Reservation, User
-from tilavarauspalvelu.translation import translated
 from utils.date_utils import local_end_of_day, local_start_of_day
 
 from .types import (
@@ -98,13 +97,6 @@ from .types import (
 )
 from .types.helsinki_profile.queries import HelsinkiProfileResolver
 from .types.reservation_unit.queries.pagination import ReservationConnection
-
-
-class ReservationCancelReasonType(TypedDict):
-    value: ReservationCancelReasonChoice
-    reason_fi: str
-    reason_en: str
-    reason_sv: str
 
 
 class Query(RootType):
@@ -230,18 +222,6 @@ class Query(RootType):
     all_reservation_deny_reasons = Entrypoint(ReservationDenyReasonNode, many=True)
     all_reservation_purposes = Entrypoint(ReservationPurposeNode, many=True)
     all_terms_of_use = Entrypoint(TermsOfUseNode, many=True)
-
-    @Entrypoint
-    def all_reservation_cancel_reasons(self) -> list[ReservationCancelReasonType]:
-        return [
-            ReservationCancelReasonType(
-                value=reason.value,
-                reason_fi=translated(reason.label, "fi"),
-                reason_en=translated(reason.label, "en"),
-                reason_sv=translated(reason.label, "sv"),
-            )
-            for reason in ReservationCancelReasonChoice.user_selectable
-        ]
 
     # --------------------------------------------------------------------------------
     # User
