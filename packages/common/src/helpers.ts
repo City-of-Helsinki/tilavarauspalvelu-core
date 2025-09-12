@@ -343,6 +343,6 @@ export function filterEmptyArray<T>(param: T[]): T[] | undefined {
 }
 
 // oxlint-disable-next-line typescript/no-empty-object-type
-export function getNode<T extends { id: string }>(data: { node?: T | {} } | undefined | null): T | null {
+export function getNode<T extends { id: string }>(data: { node?: T | null | {} } | undefined | null): T | null {
   return data?.node != null && "id" in data.node ? data.node : null;
 }

@@ -112,7 +112,7 @@ class Query(RootType):
     # Node interface
     # --------------------------------------------------------------------------------
 
-    node = Entrypoint(Node)
+    node = Entrypoint(Node, nullable=True)
 
     # --------------------------------------------------------------------------------
     # Seasonal booking
