@@ -44,7 +44,7 @@
     "APPLICATION_ADULT_RESERVEE_REQUIRED": "Hakijan on oltava täysi-ikäinen.",
     "CHANGES_NOT_ALLOWED": "Muutoksia ei sallita.",
     "CREATE_PERMISSION_DENIED": "Ei lupaa luoda.",
-    "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Varausten enimmäismäärä on ylittynyt.",
+    "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "Varausten enimmäismäärä on ylittynyt.",
     "NOT_FOUND": "Varaus on vanhentunut.",
     "MODEL_INSTANCE_NOT_FOUND": "Ei löytynyt.",
     "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",
