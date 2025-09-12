@@ -43,7 +43,7 @@
   "api": {
     "CHANGES_NOT_ALLOWED": "You cannot make changes to the booking.",
     "CREATE_PERMISSION_DENIED": "No permission to create.",
-    "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "You have exceeded the maximum number of bookings.",
+    "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "You have exceeded the maximum number of bookings.",
     "NOT_FOUND": "Booking expired.",
     "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",
     "REQUIRED_FIELD_MISSING": "Required field missing.",
