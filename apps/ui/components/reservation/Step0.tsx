@@ -3,7 +3,7 @@
  *  This component needs to be wrapped inside a Form context
  */
 import { Button, ButtonVariant, IconArrowRight, IconCross, LoadingSpinner, Notification } from "hds-react";
-import { useFormContext, UseFormReturn } from "react-hook-form";
+import { useForm, FormProvider, type UseFormReturn, FieldValues } from "react-hook-form";
 import React, { useState } from "react";
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -21,12 +21,14 @@ import {
 import {
   getFilteredGeneralFields,
   getFilteredReserveeFields,
-  formContainsField,
   getFormFields,
   type FormFieldArray,
   type ExtendedFormFieldArray,
 } from "common/src/reservation-form/util";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { LinkLikeButton } from "common/src/styled";
+import { getReservationFormSchema, type ReservationFormValueT } from "common/src/schemas";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { type OptionsRecord } from "common";
 import { NewReservationForm } from "@/styled/reservation";
@@ -34,7 +36,6 @@ import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
 import { getReservationInProgressPath, getReservationUnitPath } from "@/modules/urls";
 import { gql } from "@apollo/client";
-import { type ReservationFormValueT } from "common/src/schemas";
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
@@ -49,7 +50,36 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const form = useFormContext<ReservationFormValueT>();
+  // Get prefilled profile user fields from the reservation (backend fills them when created).
+  // NOTE this is only updated on load (not after mutation or refetch)
+  const defaultValues: ReservationFormValueT = {
+    pk: reservation.pk ?? 0,
+    name: reservation.name ?? "",
+    description: reservation.description ?? "",
+    reserveeFirstName: reservation.reserveeFirstName ?? "",
+    reserveeLastName: reservation.reserveeLastName ?? "",
+    reserveePhone: reservation.reserveePhone ?? "",
+    reserveeEmail: reservation.reserveeEmail ?? "",
+    reserveeIdentifier: reservation.reserveeIdentifier ?? "",
+    reserveeOrganisationName: reservation.reserveeOrganisationName ?? "",
+    municipality: reservation.municipality ?? undefined,
+    reserveeType: reservation.reserveeType ?? undefined,
+    applyingForFreeOfCharge: reservation.applyingForFreeOfCharge ?? false,
+    freeOfChargeReason: reservation.freeOfChargeReason ?? "",
+    purpose: reservation.purpose?.pk ?? undefined,
+    numPersons: reservation.numPersons ?? undefined,
+    ageGroup: reservation.ageGroup?.pk ?? undefined,
+    reserveeIsUnregisteredAssociation: false,
+  };
+  const formSchema = getReservationFormSchema(reservation.reservationUnit.reservationForm);
+  // NOTE infered type is not exactly correct it doesn't create all four discrimating unions
+  type FT = z.infer<typeof formSchema>;
+
+  const form = useForm<FT>({
+    defaultValues,
+    mode: "onChange",
+    resolver: zodResolver(formSchema),
+  });
   const {
     watch,
     formState: { isSubmitting },
@@ -61,34 +91,63 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
   const [updateReservation] = useUpdateReservationMutation();
 
   const formType = reservation.reservationUnit.reservationForm;
-  const onSubmit = async (payload: ReservationFormValueT): Promise<void> => {
+
+  // TODO move to free function but requires us to type the FT (using ReturnValue + infer probably)
+  function transformReservationFom(values: FT): ReservationUpdateMutationInput {
     const {
+      reserveeFirstName,
+      reserveeLastName,
+      reserveePhone,
+      reserveeEmail,
       // boolean toggles
       applyingForFreeOfCharge,
       freeOfChargeReason,
-      reserveeIsUnregisteredAssociation,
-      reserveeIdentifier,
       ...rest
-    } = payload;
-    const hasReserveeTypeField = formContainsField(formType, "reserveeType");
-    if (hasReserveeTypeField && !reserveeType) {
-      throw new Error("Reservee type is required");
-    }
-    if (reservationPk == null) {
-      throw new Error("Reservation pk is required");
-    }
+    } = values;
 
-    const input: ReservationUpdateMutationInput = {
-      // TODO don't use spread it breaks type checking for unknown fields
-      ...rest,
+    if (reservationPk == null) {
+      throw new Error("Reservation pk should never be null");
+    }
+    // TODO move to ts utilities
+    type Writable<T> = {
+      -readonly [K in keyof T]: T[K];
+    };
+    // Use explicit copying of attributes instead of spread so we don't pass unknown fields to the mutation
+    // typescript catches invalid fields when they are explicit but not for spread
+    const input: Writable<ReservationUpdateMutationInput> = {
+      pk: reservationPk,
+      reserveeFirstName,
+      reserveeLastName,
+      reserveePhone,
+      reserveeEmail,
       // force update to empty -> NA
-      reserveeIdentifier:
-        reserveeType !== ReserveeType.Individual && !reserveeIsUnregisteredAssociation ? reserveeIdentifier : "",
       applyingForFreeOfCharge,
       freeOfChargeReason: applyingForFreeOfCharge ? freeOfChargeReason : "",
-      pk: reservationPk,
     };
 
+    if ("reserveeIdentifier" in rest) {
+      const { reserveeIsUnregisteredAssociation, reserveeIdentifier, ...d } = rest;
+      input.reserveeIdentifier =
+        reserveeType !== ReserveeType.Individual && !reserveeIsUnregisteredAssociation ? reserveeIdentifier : "";
+      input.name = d.name;
+      input.description = d.description;
+      input.numPersons = d.numPersons;
+      input.reserveeOrganisationName = d.reserveeOrganisationName;
+      input.municipality = d.municipality;
+      input.reserveeType = d.reserveeType;
+    }
+    if ("ageGroup" in rest && typeof rest.ageGroup === "number") {
+      input.ageGroup = rest.ageGroup;
+    }
+    if ("purpose" in rest && typeof rest.purpose === "number") {
+      input.purpose = rest.purpose;
+    }
+
+    return input;
+  }
+
+  const onSubmit = async (payload: FT): Promise<void> => {
+    const input = transformReservationFom(payload);
     try {
       const { data } = await updateReservation({
         variables: {
@@ -128,6 +187,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
         options={options}
         generalFields={generalFields}
         reservationApplicationFields={reserveeFields}
+        form={form}
         data={{
           enableSubvention,
           termsForDiscount: (
@@ -192,19 +252,19 @@ const ErrorAnchor = styled.a`
 `;
 
 // TODO this should be a general component -> or at least the error display part should be
-function FormErrors({
+function FormErrors<T extends FieldValues>({
   form,
   formType,
   generalFields,
 }: {
-  form: UseFormReturn<ReservationFormValueT>;
+  form: UseFormReturn<T>;
   formType: ReservationFormType;
   generalFields: FormFieldArray;
 }) {
   const { t } = useTranslation();
 
-  const { formState, watch } = form;
-  const { errors, isSubmitted } = formState;
+  const { formState } = form;
+  const { errors } = formState;
   // TODO clean this up (wrap it into a function that clearly tells what it's doing)
   const errorKeys =
     Object.keys(errors).sort((a, b) => {
@@ -213,11 +273,8 @@ function FormErrors({
       return fields.indexOf(a) - fields.indexOf(b);
     }) ?? [];
 
-  const reserveeType = watch("reserveeType");
-  const includesReserveeType = formContainsField(formType, "reserveeType");
-  if (includesReserveeType && isSubmitted && !reserveeType) {
-    errorKeys.push("reserveeType");
-  }
+  // FIXME need to drill this if we need different translations
+  const reserveeType = ReserveeType.Individual;
 
   if (errorKeys.length === 0) {
     return null;
@@ -271,27 +328,29 @@ const MandatoryFieldsInfoText = styled.p`
   }
 `;
 
-interface ReservationFormProps {
+interface ReservationFormProps<T extends FieldValues> {
   reservationUnit: MetadataSetsFragment;
   generalFields: FormFieldArray;
   reservationApplicationFields: ExtendedFormFieldArray;
   options: Readonly<Omit<OptionsRecord, "municipality">>;
+  form: UseFormReturn<T>;
   data?: {
     termsForDiscount?: JSX.Element | string;
     enableSubvention?: boolean;
   };
 }
 
-function ReservationForm({
+function ReservationForm<T extends FieldValues>({
   reservationUnit,
   generalFields,
   reservationApplicationFields,
   options,
   data,
-}: ReservationFormProps) {
+  form,
+}: ReservationFormProps<T>) {
   const { t } = useTranslation();
   return (
-    <>
+    <FormProvider {...form}>
       <MandatoryFieldsInfoText>{t("forms:mandatoryFieldsText")}</MandatoryFieldsInfoText>
       <ReservationFormGeneralSection
         fields={generalFields}
@@ -307,7 +366,7 @@ function ReservationForm({
         // inconsistency between admin and customer ui (could handle by refactoring customer to have gap on the parent)
         style={{ marginTop: "var(--spacing-xl)" }}
       />
-    </>
+    </FormProvider>
   );
 }
 
