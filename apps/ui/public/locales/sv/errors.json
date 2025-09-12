@@ -47,6 +47,7 @@
     "NOT_FOUND": "Bokningen hittades inte.",
     "MODEL_INSTANCE_NOT_FOUND": "Hittades inte.",
     "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
+    "REQUIRED_FIELD_MISSING": "Obligatoriskt fält saknas.",
     "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Kontrollera bokningstiden.",
     "RESERVATION_OVERLAP": "Överlappande bokningar.",
     "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Kontrollera bokningstiden.",
