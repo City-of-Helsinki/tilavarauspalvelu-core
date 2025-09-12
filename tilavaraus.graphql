@@ -3294,7 +3294,7 @@ type Query {
   node(
     """The Global ID of an object."""
     id: ID!
-  ): Node!
+  ): Node
   order(
     orderUuid: UUID!
   ): PaymentOrderNode!
