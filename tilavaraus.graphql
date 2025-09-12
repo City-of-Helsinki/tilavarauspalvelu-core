@@ -1330,13 +1330,6 @@ type ReservableTimeSpanType {
   endDatetime: DateTime!
 }
 
-type ReservationCancelReasonType {
-  value: ReservationCancelReasonChoice!
-  reasonFi: String!
-  reasonEn: String!
-  reasonSv: String!
-}
-
 type ReservationDeleteTentativeMutationOutput {
   pk: Int!
 }
@@ -3212,7 +3205,6 @@ type Query {
     filter: PurposeFilterSet
     orderBy: [PurposeOrderSet!]
   ): [PurposeNode!]!
-  allReservationCancelReasons: [ReservationCancelReasonType!]!
   allReservationDenyReasons(
     filter: ReservationDenyReasonFilterSet
     orderBy: [ReservationDenyReasonOrderSet!]
