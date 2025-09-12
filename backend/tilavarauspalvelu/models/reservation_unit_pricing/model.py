@@ -39,6 +39,8 @@ class ReservationUnitPricing(models.Model):
     lowest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     highest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
+    material_price_description: str = models.CharField(max_length=100, blank=True, default="")
+
     tax_percentage: TaxPercentage = models.ForeignKey(
         "tilavarauspalvelu.TaxPercentage",
         related_name="reservation_unit_pricings",
@@ -50,6 +52,11 @@ class ReservationUnitPricing(models.Model):
         related_name="pricings",
         on_delete=models.CASCADE,
     )
+
+    # Translated field hints
+    material_price_description_fi: str | None
+    material_price_description_en: str | None
+    material_price_description_sv: str | None
 
     objects: ClassVar[ReservationUnitPricingManager] = LazyModelManager.new()
     actions: ReservationUnitPricingActions = LazyModelAttribute.new()

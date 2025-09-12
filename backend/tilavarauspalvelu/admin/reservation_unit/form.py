@@ -5,12 +5,12 @@ import json
 from typing import Any
 
 from django import forms
-from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms.formsets import DELETION_FIELD_NAME
 from django.forms.models import BaseInlineFormSet
 from django.utils.translation import gettext_lazy as _
+from modeltranslation.admin import TranslationStackedInline
 from subforms.fields import DynamicArrayField
 from tinymce.widgets import TinyMCE
 
@@ -320,7 +320,17 @@ class ReservationUnitAdminForm(forms.ModelForm):
         return json.dumps(response, default=str, indent=2)
 
 
-class ReservationUnitPricingInline(admin.TabularInline):
+class ReservationUnitPricingInline(TranslationStackedInline):
     model = ReservationUnitPricing
+    fields = [
+        "begins",
+        "is_activated_on_begins",
+        "lowest_price",
+        "highest_price",
+        "price_unit",
+        "payment_type",
+        "tax_percentage",
+        "material_price_description",
+    ]
     show_change_link = True
     extra = 0

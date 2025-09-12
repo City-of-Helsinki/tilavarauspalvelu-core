@@ -61,6 +61,7 @@ from .utils import (
     DurationInfo,
     FreeReservationUnitData,
     HandlingInfo,
+    MaterialPriceInfo,
     PaidReservationUnitData,
     PaymentTypeInfo,
     PriceInfo,
@@ -234,7 +235,6 @@ def _create_free_reservation_units(
     start_interval_choices: list[StartIntervalInfo] = [
         StartIntervalInfo(name="15", value=ReservationStartInterval.INTERVAL_15_MINUTES),
         StartIntervalInfo(name="30", value=ReservationStartInterval.INTERVAL_30_MINUTES),
-        StartIntervalInfo(name="90", value=ReservationStartInterval.INTERVAL_90_MINUTES),
     ]
     cancellation_rule_choices: list[CancelInfo] = [
         CancelInfo(name="cannot", value=[None]),
@@ -247,6 +247,15 @@ def _create_free_reservation_units(
     access_type_choices: list[AccessTypeInfo] = [
         AccessTypeInfo(name="unrestricted", value=AccessType.UNRESTRICTED),
         AccessTypeInfo(name="access type", value=AccessType.ACCESS_CODE),
+    ]
+    material_price_choices: list[MaterialPriceInfo] = [
+        MaterialPriceInfo(name="none", fi="", en="", sv=""),
+        MaterialPriceInfo(
+            name="per piece",
+            fi="Materiaali maksaa 1€ kappale",
+            en="Material costs 1€ per piece",
+            sv="Materialkostnader 1€ per stycke",
+        ),
     ]
 
     # These are pre-set in Pindora ("Varaamon lokaali testidata #1 - #5")
@@ -295,8 +304,10 @@ def _create_free_reservation_units(
             cancellation_rule_choices,
             handling_info_choices,
             access_type_choices,
+            material_price_choices,
         ],
         output_type=FreeReservationUnitData,
+        limit=400,
     ):
         set_name: SetName = random.choice(SetName.non_free_of_charge_applying())
         reservation_kind = ReservationKind.DIRECT
@@ -396,6 +407,9 @@ def _create_free_reservation_units(
             highest_price=Decimal(0),
             reservation_unit=reservation_unit,
             tax_percentage=tax_percentages["0"],
+            material_price_description=data.material_price_info.fi,
+            material_price_description_en=data.material_price_info.en,
+            material_price_description_sv=data.material_price_info.sv,
         )
         pricings.append(pricing)
 
@@ -625,6 +639,7 @@ def _create_paid_reservation_units(
             reservation_unit=reservation_unit,
             tax_percentage=tax_percentages[data.tax_percentage_info.value],
             payment_type=data.payment_type_info.payment_type,
+            material_price_description="",
         )
         pricings.append(pricing)
 
@@ -832,6 +847,7 @@ def _create_seasonal_bookable_reservation_units(
             highest_price=Decimal(0),
             reservation_unit=reservation_unit,
             tax_percentage=tax_percentages["0"],
+            material_price_description="",
         )
         pricings.append(pricing)
 
@@ -898,6 +914,7 @@ def _create_empty_reservation_units(
         highest_price=Decimal(0),
         reservation_unit=reservation_unit,
         tax_percentage=tax_percentages["0"],
+        material_price_description="",
     )
 
     ReservationUnitAccessTypeFactory.create(
@@ -969,6 +986,7 @@ def _create_archived_reservation_units(
         highest_price=Decimal(0),
         reservation_unit=reservation_unit,
         tax_percentage=tax_percentages["0"],
+        material_price_description="",
     )
 
     ReservationUnitAccessTypeFactory.create(
@@ -1032,6 +1050,7 @@ def _create_single_reservation_per_user_reservation_units(
         highest_price=Decimal(0),
         reservation_unit=reservation_unit,
         tax_percentage=tax_percentages["0"],
+        material_price_description="",
     )
 
     ReservationUnitAccessTypeFactory.create(
@@ -1122,6 +1141,7 @@ def _create_full_day_reservation_units(
             highest_price=Decimal(0),
             reservation_unit=reservation_unit,
             tax_percentage=tax_percentages["0"],
+            material_price_description="",
         )
         pricings.append(pricing)
 
@@ -1790,6 +1810,7 @@ def _create_reservation_unit_for_reservation_series(
         highest_price=Decimal(0),
         reservation_unit=reservation_unit,
         tax_percentage=tax_percentage,
+        material_price_description="",
     )
 
     ReservationUnitAccessTypeFactory.create(
