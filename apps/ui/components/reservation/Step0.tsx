@@ -26,7 +26,6 @@ import {
   type FormFieldArray,
   type ExtendedFormFieldArray,
 } from "common/src/reservation-form/util";
-import { type ReservationFormT } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/src/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { type OptionsRecord } from "common";
@@ -35,6 +34,7 @@ import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
 import { getReservationInProgressPath, getReservationUnitPath } from "@/modules/urls";
 import { gql } from "@apollo/client";
+import { type ReservationFormValueT } from "common/src/schemas";
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
@@ -49,10 +49,10 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const form = useFormContext<ReservationFormT>();
+  const form = useFormContext<ReservationFormValueT>();
   const {
     watch,
-    formState: { isSubmitting, isValid },
+    formState: { isSubmitting },
     handleSubmit,
   } = form;
 
@@ -60,7 +60,8 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
   const displayError = useDisplayError();
   const [updateReservation] = useUpdateReservationMutation();
 
-  const onSubmit = async (payload: ReservationFormT): Promise<void> => {
+  const formType = reservation.reservationUnit.reservationForm;
+  const onSubmit = async (payload: ReservationFormValueT): Promise<void> => {
     const {
       // boolean toggles
       applyingForFreeOfCharge,
@@ -105,22 +106,13 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
     }
   };
 
-  const reserveeType = watch("reserveeType");
-  const municipality = watch("municipality");
-  const formType = reservation.reservationUnit.reservationForm;
-  const includesHomeCity = formContainsField(formType, "municipality");
-  const includesReserveeType = formContainsField(formType, "reserveeType");
-
   const generalFields = getFilteredGeneralFields(formType);
-  const reservationApplicationFields = getFilteredReserveeFields({
+  const reserveeType = watch("reserveeType");
+  const reserveeFields = getFilteredReserveeFields({
     formType,
     reservation,
     reserveeType: reserveeType ?? ReserveeType.Individual,
   });
-
-  const isHomeCityValid = !includesHomeCity || Boolean(municipality);
-  const isReserveeTypeValid = !includesReserveeType || Boolean(reserveeType);
-  const submitDisabled = !isValid || !isReserveeTypeValid || !isHomeCityValid;
 
   const lang = convertLanguageCode(i18n.language);
   const pricingTerms = reservation.reservationUnit.pricingTerms
@@ -135,7 +127,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
         reservationUnit={reservation.reservationUnit}
         options={options}
         generalFields={generalFields}
-        reservationApplicationFields={reservationApplicationFields}
+        reservationApplicationFields={reserveeFields}
         data={{
           enableSubvention,
           termsForDiscount: (
@@ -162,7 +154,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
           type="submit"
           variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
           iconEnd={isSubmitting ? <LoadingSpinner small /> : <IconArrowRight />}
-          disabled={submitDisabled || isSubmitting}
+          disabled={isSubmitting}
           data-testid="reservation__button--continue"
         >
           {t("common:next")}
@@ -205,7 +197,7 @@ function FormErrors({
   formType,
   generalFields,
 }: {
-  form: UseFormReturn<ReservationFormT>;
+  form: UseFormReturn<ReservationFormValueT>;
   formType: ReservationFormType;
   generalFields: FormFieldArray;
 }) {

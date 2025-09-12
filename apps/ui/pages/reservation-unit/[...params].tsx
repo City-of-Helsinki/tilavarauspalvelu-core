@@ -15,7 +15,6 @@ import {
   ReservationStateChoice,
   useDeleteReservationMutation,
 } from "@gql/gql-types";
-import { type ReservationFormT } from "common/src/reservation-form/types";
 import { createApolloClient } from "@/modules/apolloClient";
 import { default as NextError } from "next/error";
 import {
@@ -40,6 +39,9 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ReservationPageWrapper, ReservationStepper, ReservationTitleSection } from "@/styled/reservation";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
 import { useSearchParams } from "next/navigation";
+import { getReservationFormSchema, type ReservationFormValueT } from "common/src/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
   grid-column: 1 / -1;
@@ -90,7 +92,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   // Get prefilled profile user fields from the reservation (backend fills them when created).
   // NOTE this is only updated on load (not after mutation or refetch)
-  const defaultValues: ReservationFormT = {
+  const defaultValues: ReservationFormValueT = {
     // NOTE never undefined (this page is not accessible without reservation)
     pk: reservation.pk ?? 0,
     name: reservation.name ?? "",
@@ -110,10 +112,16 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     ageGroup: reservation.ageGroup?.pk ?? undefined,
     reserveeIsUnregisteredAssociation: false,
   };
-  // TODO is defaultValues correct? it's prefilled from the profile data and we are not refetching at any point.
-  // If we would refetch values would be more correct with reset hook.
-  // Also if this is ever initialised without the data it will not prefill the form.
-  const form = useForm<ReservationFormT>({ defaultValues, mode: "onChange" });
+  const formSchema = getReservationFormSchema(reservationUnit.reservationForm);
+  // NOTE infered type is not exactly correct it doesn't create discriminating union
+  type FT = z.infer<typeof formSchema>;
+
+  // TODO move down to Step0 (Step1 doesn't need this? assuming Summary doesn't use formContext)
+  const form = useForm<FT>({
+    defaultValues,
+    mode: "onChange",
+    resolver: zodResolver(formSchema),
+  });
 
   const requireHandling = reservationUnit.requireReservationHandling || reservation?.applyingForFreeOfCharge;
 
@@ -302,8 +310,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const { reservation } = resData;
 
-  // Valid path but no reservation found -> redirect to reservation unit page
   if (reservation?.pk == null) {
+    // Valid path but no reservation found -> redirect to reservation unit page
     const params = new URLSearchParams();
     params.set("invalidReservation", reservationPk.toString());
     return {
@@ -315,9 +323,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         notFound: true, // for prop narrowing
       },
     };
-  }
-  // Valid reservation that is not in progress -> redirect to reservation page
-  else if (reservation.state !== ReservationStateChoice.Created) {
+  } else if (reservation.state !== ReservationStateChoice.Created) {
+    // Valid reservation that is not in progress -> redirect to reservation page
     return {
       redirect: {
         permanent: false,

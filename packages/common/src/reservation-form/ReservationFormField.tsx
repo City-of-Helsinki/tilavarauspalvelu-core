@@ -6,12 +6,12 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontMedium, Strongish } from "../styled";
 import { ReserveeType } from "../../gql/gql-types";
-import { type ReservationFormT } from "./types";
 import { type OptionsRecord } from "../../types/common";
 import { ControlledCheckbox, ControlledSelect } from "../components/form";
+import { type ReservationFormValueT } from "../schemas";
 
 type Props = {
-  field: keyof ReservationFormT;
+  field: keyof ReservationFormValueT;
   options: OptionsRecord;
   translationKey?: ReserveeType | "COMMON";
   required: boolean;
@@ -38,7 +38,7 @@ const Subheading = styled(Strongish)`
   margin-bottom: var(--spacing-s);
 `;
 
-const StyledControlledSelect = styled(ControlledSelect<ReservationFormT>)<{ $isWide?: boolean }>`
+const StyledControlledSelect = styled(ControlledSelect<ReservationFormValueT>)<{ $isWide?: boolean }>`
   ${({ $isWide }) => $isWide && "grid-column: 1 / -1"};
 `;
 
@@ -83,11 +83,9 @@ export function ReservationFormField({ field, options, translationKey, required,
     control,
     formState: { errors },
     trigger,
-  } = useFormContext<ReservationFormT>();
+  } = useFormContext<ReservationFormValueT>();
 
   const isSelectField = Object.keys(options).includes(field);
-
-  const isReserveeIdRequired = watch("reserveeIsUnregisteredAssociation") === true;
 
   const isFreeOfChargeReasonRequired = field === "freeOfChargeReason" && watch("applyingForFreeOfCharge") === true;
 
@@ -170,10 +168,13 @@ export function ReservationFormField({ field, options, translationKey, required,
         label={label}
         id={id}
         {...register(field, {
+          // TODO use a Controlled component that doesn't return NaNs (null instead for empty)
           valueAsNumber: true,
+          /* TODO move to schema validation
           required,
           min: minValue,
           max: maxValue,
+          */
         })}
         key={field}
         errorText={errorText}
@@ -230,6 +231,7 @@ export function ReservationFormField({ field, options, translationKey, required,
           label={label}
           id={id}
           key={field}
+          // TODO move to schema validation
           {...register(field, { required: isFreeOfChargeReasonRequired })}
           errorText={errorText}
           invalid={!!error}
@@ -245,10 +247,7 @@ export function ReservationFormField({ field, options, translationKey, required,
         <StyledTextInput
           label={label}
           id={id}
-          {...register(field, {
-            required: isReserveeIdRequired,
-            minLength: 3,
-          })}
+          {...register(field)}
           key={field}
           type="text"
           errorText={errorText}
@@ -266,7 +265,7 @@ export function ReservationFormField({ field, options, translationKey, required,
         <StyledTextInput
           label={label}
           id={id}
-          {...register(field, { required })}
+          {...register(field)}
           key={field}
           type="text"
           errorText={errorText}
@@ -288,16 +287,15 @@ function DescriptionField({
 }: {
   id: string;
   label: string;
-  field: keyof ReservationFormT;
-  register: UseFormRegister<ReservationFormT>;
+  field: keyof ReservationFormValueT;
+  register: UseFormRegister<ReservationFormValueT>;
   errorText: string;
 }): React.ReactElement {
-  const required = true;
   return (
     <StyledTextArea
       label={label}
       id={id}
-      {...register(field, { required })}
+      {...register(field)}
       key={field}
       errorText={errorText}
       invalid={errorText !== ""}
@@ -318,33 +316,21 @@ function EmailInput({
 }: {
   id: string;
   label: string;
-  field: keyof ReservationFormT;
-  register: UseFormRegister<ReservationFormT>;
+  field: keyof ReservationFormValueT;
+  register: UseFormRegister<ReservationFormValueT>;
   errorText: string;
 }): React.ReactElement {
   const isEmailField = true;
-  const required = true;
-
-  const emailPattern = {
-    value: /^[A-ZÖÄÅ0-9._%+-]+@[A-ZÖÄÅ0-9.-]+\.[A-ZÖÄÅ]{2,}$/i,
-    message: "email",
-  };
-
   return (
     <StyledTextInput
       label={label}
       id={id}
-      {...register(field, {
-        required,
-        ...(isEmailField && {
-          pattern: emailPattern,
-        }),
-      })}
+      {...register(field)}
       key={field}
       type="text"
       errorText={errorText}
       invalid={errorText !== ""}
-      required={required}
+      required
       // email field is special and has one less character than the rest
       maxLength={MAX_TEXT_LENGTH - (isEmailField ? 1 : 0)}
     />

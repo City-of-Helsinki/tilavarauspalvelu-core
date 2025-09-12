@@ -46,6 +46,7 @@
     "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "You have exceeded the maximum number of bookings.",
     "NOT_FOUND": "Booking expired.",
     "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",
+    "REQUIRED_FIELD_MISSING": "Required field missing.",
     "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Please check the booking time.",
     "RESERVATION_OVERLAP": "There are duplicate bookings.",
     "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Please check the booking time.",

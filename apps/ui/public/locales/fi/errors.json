@@ -46,6 +46,7 @@
     "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Varausten enimmäismäärä on ylittynyt.",
     "NOT_FOUND": "Varaus on vanhentunut.",
     "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",
+    "REQUIRED_FIELD_MISSING": "Pakollinen kenttä puuttuu.",
     "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Tarkista varausaika.",
     "RESERVATION_OVERLAP": "Päällekkäisiä varauksia.",
     "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Tarkista varausaika.",
