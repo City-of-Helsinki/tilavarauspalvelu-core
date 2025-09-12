@@ -3,7 +3,6 @@ import TimeZoneNotification from "common/src/components/TimeZoneNotification";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
-import { FormProvider, useForm } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { H1, H4 } from "common/src/styled";
@@ -39,9 +38,6 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ReservationPageWrapper, ReservationStepper, ReservationTitleSection } from "@/styled/reservation";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
 import { useSearchParams } from "next/navigation";
-import { getReservationFormSchema, type ReservationFormValueT } from "common/src/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
   grid-column: 1 / -1;
@@ -89,39 +85,6 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   const params = useSearchParams();
   const step = filterStep(toNumber(params.get("step")));
-
-  // Get prefilled profile user fields from the reservation (backend fills them when created).
-  // NOTE this is only updated on load (not after mutation or refetch)
-  const defaultValues: ReservationFormValueT = {
-    // NOTE never undefined (this page is not accessible without reservation)
-    pk: reservation.pk ?? 0,
-    name: reservation.name ?? "",
-    description: reservation.description ?? "",
-    reserveeFirstName: reservation.reserveeFirstName ?? "",
-    reserveeLastName: reservation.reserveeLastName ?? "",
-    reserveePhone: reservation.reserveePhone ?? "",
-    reserveeEmail: reservation.reserveeEmail ?? "",
-    reserveeIdentifier: reservation.reserveeIdentifier ?? "",
-    reserveeOrganisationName: reservation.reserveeOrganisationName ?? "",
-    municipality: reservation.municipality ?? undefined,
-    reserveeType: reservation.reserveeType ?? undefined,
-    applyingForFreeOfCharge: reservation.applyingForFreeOfCharge ?? false,
-    freeOfChargeReason: reservation.freeOfChargeReason ?? "",
-    purpose: reservation.purpose?.pk ?? undefined,
-    numPersons: reservation.numPersons ?? undefined,
-    ageGroup: reservation.ageGroup?.pk ?? undefined,
-    reserveeIsUnregisteredAssociation: false,
-  };
-  const formSchema = getReservationFormSchema(reservationUnit.reservationForm);
-  // NOTE infered type is not exactly correct it doesn't create discriminating union
-  type FT = z.infer<typeof formSchema>;
-
-  // TODO move down to Step0 (Step1 doesn't need this? assuming Summary doesn't use formContext)
-  const form = useForm<FT>({
-    defaultValues,
-    mode: "onChange",
-    resolver: zodResolver(formSchema),
-  });
 
   const requireHandling = reservationUnit.requireReservationHandling || reservation?.applyingForFreeOfCharge;
 
@@ -205,45 +168,41 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   }
 
   return (
-    <FormProvider {...form}>
+    <ReservationPageWrapper>
       <TimeZoneNotification />
-      <ReservationPageWrapper>
-        <StyledReservationInfoCard
-          reservation={reservation}
-          bgColor="gold"
-          shouldDisplayReservationUnitPrice={shouldDisplayReservationUnitPrice}
-        />
-        {notesWhenReserving && (
-          <PinkBox>
-            <H4 as="h2" $marginTop="none">
-              {t("reservations:reservationInfoBoxHeading")}
-            </H4>
-            <Sanitize html={notesWhenReserving} />
-          </PinkBox>
+      <StyledReservationInfoCard
+        reservation={reservation}
+        bgColor="gold"
+        shouldDisplayReservationUnitPrice={shouldDisplayReservationUnitPrice}
+      />
+      {notesWhenReserving && (
+        <PinkBox>
+          <H4 as="h2" $marginTop="none">
+            {t("reservations:reservationInfoBoxHeading")}
+          </H4>
+          <Sanitize html={notesWhenReserving} />
+        </PinkBox>
+      )}
+      <ReservationTitleSection>
+        <H1 $noMargin>{pageTitle}</H1>
+        {/* TODO what's the logic here?
+         * in what case are there more than 2 steps?
+         * why do we not show that?
+         * TODO why isn't this shown when creating a paid version? I think there was on purpose reason for that? maybe?
+         */}
+        {steps.length <= 2 && (
+          <ReservationStepper
+            language={i18n.language}
+            selectedStep={step}
+            style={{ width: "100%" }}
+            onStepClick={handleStepClick}
+            steps={steps}
+          />
         )}
-        <ReservationTitleSection>
-          <H1 $noMargin>{pageTitle}</H1>
-          {/* TODO what's the logic here?
-           * in what case are there more than 2 steps?
-           * why do we not show that?
-           * TODO why isn't this shown when creating a paid version? I think there was on purpose reason for that? maybe?
-           */}
-          {steps.length <= 2 && (
-            <ReservationStepper
-              language={i18n.language}
-              selectedStep={step}
-              style={{ width: "100%" }}
-              onStepClick={handleStepClick}
-              steps={steps}
-            />
-          )}
-        </ReservationTitleSection>
-        {step === 0 && (
-          <Step0 reservation={reservation} cancelReservation={cancelReservation} options={props.options} />
-        )}
-        {step === 1 && <Step1 reservation={reservation} options={props.options} requiresPayment={steps.length > 2} />}
-      </ReservationPageWrapper>
-    </FormProvider>
+      </ReservationTitleSection>
+      {step === 0 && <Step0 reservation={reservation} cancelReservation={cancelReservation} options={props.options} />}
+      {step === 1 && <Step1 reservation={reservation} options={props.options} requiresPayment={steps.length > 2} />}
+    </ReservationPageWrapper>
   );
 }
 
