@@ -46,6 +46,7 @@
     "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Det maximala antalet bokningar har överskridits.",
     "NOT_FOUND": "Bokningen hittades inte.",
     "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
+    "REQUIRED_FIELD_MISSING": "Obligatoriskt fält saknas.",
     "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Kontrollera bokningstiden.",
     "RESERVATION_OVERLAP": "Överlappande bokningar.",
     "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Kontrollera bokningstiden.",

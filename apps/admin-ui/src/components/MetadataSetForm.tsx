@@ -1,10 +1,10 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import type { ReservationFormT } from "common/src/reservation-form/types";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "common/src/reservation-form/MetaFields";
 import { ReserveeType, type MetadataSetsFragment } from "@gql/gql-types";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { formContainsField, getReservationFormFields } from "common/src/reservation-form/util";
+import { type ReservationFormValueT } from "common/src/schemas";
 
 type Props = {
   reservationUnit: MetadataSetsFragment;
@@ -27,7 +27,7 @@ export function ReservationMetadataSetForm({ reservationUnit }: Props): JSX.Elem
 
 // TODO this component can be wholly deprecated maybe? translations / options?
 export function ReserverMetadataSetForm({ reservationUnit }: Props): JSX.Element {
-  const { watch } = useFormContext<ReservationFormT>();
+  const { watch } = useFormContext<ReservationFormValueT>();
   const { ageGroups, reservationPurposes } = useFilterOptions();
   const options = {
     ageGroup: ageGroups,

@@ -10,11 +10,11 @@ import {
   ReserveeType,
 } from "../../gql/gql-types";
 import { ReservationFormField } from "./ReservationFormField";
-import { type ReservationFormT } from "./types";
 import { AutoGrid, H4, H5 } from "../styled";
 import type { OptionsRecord } from "../../types/common";
 import { type ExtendedFormFieldArray, extendMetaFieldOptions, formContainsField } from "./util";
 import { CustomerTypeSelector } from "./CustomerTypeSelector";
+import { type ReservationFormValueT } from "../schemas";
 
 interface CommonProps {
   options: Readonly<Omit<OptionsRecord, "municipality">>;
@@ -203,7 +203,7 @@ export function ReservationFormReserveeSection({
   style,
   className,
 }: ReservationFormReserveeSectionProps) {
-  const { watch } = useFormContext<ReservationFormT>();
+  const { watch } = useFormContext<ReservationFormValueT>();
   const { t } = useTranslation();
 
   const isTypeSelectable = formContainsField(reservationUnit.reservationForm, "reserveeType");
