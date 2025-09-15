@@ -25,6 +25,7 @@ from tilavarauspalvelu.enums import (
     ReservationStartInterval,
     ReservationStateChoice,
     ReservationTypeChoice,
+    TermsOfUseTypeChoices,
     Weekday,
 )
 from tilavarauspalvelu.models import (
@@ -32,12 +33,14 @@ from tilavarauspalvelu.models import (
     ApplicationRound,
     ApplicationRoundTimeSlot,
     Equipment,
+    EquipmentCategory,
     OriginHaukiResource,
     PaymentAccounting,
     PaymentMerchant,
     PaymentProduct,
     Purpose,
     Reservation,
+    ReservationMetadataField,
     ReservationMetadataSet,
     ReservationPurpose,
     ReservationSeries,
@@ -133,95 +136,933 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     # Fetch existing objects
     # ------------------------------------------------------------------------------------------------------------
 
-    kokoustila = ReservationUnitType.objects.get(name="Kokoustila")
+    kokoustila, _ = ReservationUnitType.objects.get_or_create(
+        name="Kokoustila",
+        defaults={
+            "name_fi": "Kokoustila",
+            "name_sv": "Meeting room",
+            "name_en": "Möteslokal",
+        },
+    )
 
-    lomake_1 = ReservationMetadataSet.objects.get(name="Lomake 1")
-    lomake_2 = ReservationMetadataSet.objects.get(name="Lomake 2")
-    lomake_3 = ReservationMetadataSet.objects.get(name="Lomake 3")
-    lomake_3_maksuttomuus = ReservationMetadataSet.objects.get(name="Lomake 3 - maksuttomuuspyyntö sallittu")
-    lomake_4_maksuttomuus = ReservationMetadataSet.objects.get(name="Lomake 4 - maksuttomuuspyyntö sallittu")
+    metadata_fields = [
+        ReservationMetadataField(field_name=field_name)
+        for field_name in [
+            "reservee_type",
+            "reservee_first_name",
+            "reservee_last_name",
+            "reservee_organisation_name",
+            "reservee_is_unregistered_association",
+            "reservee_phone",
+            "reservee_email",
+            "reservee_identifier",
+            "reservee_address_street",
+            "reservee_address_city",
+            "reservee_address_zip",
+            "age_group",
+            "applying_for_free_of_charge",
+            "free_of_charge_reason",
+            "name",
+            "description",
+            "num_persons",
+            "purpose",
+            "municipality",
+        ]
+    ]
+    fields = ReservationMetadataField.objects.bulk_create(
+        metadata_fields,
+        update_conflicts=True,
+        update_fields=["field_name"],
+        unique_fields=["field_name"],
+    )
+    fields_by_name = {field.field_name: field for field in fields}
 
-    peruutus_alkuun_asti = ReservationUnitCancellationRule.objects.get(name="Varauksen alkuun asti")
-    peruutus_kaksi_viikkoa = ReservationUnitCancellationRule.objects.get(name="14 vrk ennen alkamista")
+    lomake_1, _ = ReservationMetadataSet.objects.get_or_create(name="Lomake 1")
+    lomake_2, _ = ReservationMetadataSet.objects.get_or_create(name="Lomake 2")
+    lomake_3, _ = ReservationMetadataSet.objects.get_or_create(name="Lomake 3")
+    lomake_3_sub, _ = ReservationMetadataSet.objects.get_or_create(name="Lomake 3 - maksuttomuuspyyntö sallittu")
+    lomake_4_sub, _ = ReservationMetadataSet.objects.get_or_create(name="Lomake 4 - maksuttomuuspyyntö sallittu")
 
-    maksuton_maksuehto = TermsOfUse.objects.get(id="pay0")
-    verkkokauppa_vain_maksuehto = TermsOfUse.objects.get(id="pay1")
-    verkkokauppa_alennus_maksuehto = TermsOfUse.objects.get(id="pay3")
-    verkkokauppa_kasittely_maksuehto = TermsOfUse.objects.get(id="pay4")
-    varauksen_alkuun_asti_peruutusehto = TermsOfUse.objects.get(id="cancel0days")
-    alkuun_asti_ei_peruutusta_peruutusehto = TermsOfUse.objects.get(id="cancel0days_delayok")
-    kaksi_viikkoa_peruutusehto = TermsOfUse.objects.get(id="cancel2weeks")
-    laitteet_palveluehto = TermsOfUse.objects.get(id="KUVAlaite")
-    maksulliset_palveluehto = TermsOfUse.objects.get(id="KUVA_oodi")
-    nupa_palveluehto = TermsOfUse.objects.get(id="KUVA_nupa")
-    maksuton_palveluehto = TermsOfUse.objects.get(id="KUVA_oodi_maksuton")
-    kausi_palveluehto = TermsOfUse.objects.get(id="KUVA_nupakausi")
-    nupa_hinnoitteluehto = TermsOfUse.objects.get(id="pricing_nupa")
+    lomake_1.supported_fields.set([
+        fields_by_name["reservee_first_name"],
+        fields_by_name["reservee_last_name"],
+        fields_by_name["reservee_email"],
+        fields_by_name["reservee_phone"],
+    ])
+    lomake_1.required_fields.set([
+        fields_by_name["reservee_first_name"],
+        fields_by_name["reservee_last_name"],
+        fields_by_name["reservee_email"],
+        fields_by_name["reservee_phone"],
+    ])
+    lomake_2.supported_fields.set([
+        fields_by_name["description"],
+        fields_by_name["num_persons"],
+        fields_by_name["reservee_email"],
+        fields_by_name["reservee_first_name"],
+        fields_by_name["reservee_identifier"],
+        fields_by_name["reservee_is_unregistered_association"],
+        fields_by_name["reservee_last_name"],
+        fields_by_name["reservee_organisation_name"],
+        fields_by_name["reservee_phone"],
+        fields_by_name["reservee_type"],
+    ])
+    lomake_2.required_fields.set([
+        fields_by_name["description"],
+        fields_by_name["reservee_email"],
+        fields_by_name["reservee_first_name"],
+        fields_by_name["reservee_identifier"],
+        fields_by_name["reservee_last_name"],
+        fields_by_name["reservee_organisation_name"],
+        fields_by_name["reservee_phone"],
+        fields_by_name["reservee_type"],
+    ])
+    lomake_3.supported_fields.set([
+        fields_by_name["description"],
+        fields_by_name["municipality"],
+        fields_by_name["name"],
+        fields_by_name["num_persons"],
+        fields_by_name["purpose"],
+        fields_by_name["reservee_email"],
+        fields_by_name["reservee_first_name"],
+        fields_by_name["reservee_identifier"],
+        fields_by_name["reservee_is_unregistered_association"],
+        fields_by_name["reservee_last_name"],
+        fields_by_name["reservee_organisation_name"],
+        fields_by_name["reservee_phone"],
+        fields_by_name["reservee_type"],
+    ])
+    lomake_3.required_fields.set([
+        fields_by_name["description"],
+        fields_by_name["municipality"],
+        fields_by_name["num_persons"],
+        fields_by_name["purpose"],
+        fields_by_name["reservee_email"],
+        fields_by_name["reservee_first_name"],
+        fields_by_name["reservee_identifier"],
+        fields_by_name["reservee_last_name"],
+        fields_by_name["reservee_organisation_name"],
+        fields_by_name["reservee_phone"],
+        fields_by_name["reservee_type"],
+    ])
+    lomake_3_sub.supported_fields.set([
+        fields_by_name["applying_for_free_of_charge"],
+        fields_by_name["description"],
+        fields_by_name["municipality"],
+        fields_by_name["name"],
+        fields_by_name["num_persons"],
+        fields_by_name["purpose"],
+        fields_by_name["reservee_email"],
+        fields_by_name["reservee_first_name"],
+        fields_by_name["reservee_identifier"],
+        fields_by_name["reservee_last_name"],
+        fields_by_name["reservee_organisation_name"],
+        fields_by_name["reservee_phone"],
+        fields_by_name["reservee_type"],
+    ])
+    lomake_3_sub.required_fields.set([
+        fields_by_name["description"],
+        fields_by_name["municipality"],
+        fields_by_name["num_persons"],
+        fields_by_name["purpose"],
+        fields_by_name["reservee_email"],
+        fields_by_name["reservee_first_name"],
+        fields_by_name["reservee_identifier"],
+        fields_by_name["reservee_last_name"],
+        fields_by_name["reservee_organisation_name"],
+        fields_by_name["reservee_phone"],
+        fields_by_name["reservee_type"],
+    ])
+    lomake_4_sub.required_fields.set([
+        fields_by_name["age_group"],
+        fields_by_name["applying_for_free_of_charge"],
+        fields_by_name["description"],
+        fields_by_name["municipality"],
+        fields_by_name["name"],
+        fields_by_name["num_persons"],
+        fields_by_name["purpose"],
+        fields_by_name["reservee_email"],
+        fields_by_name["reservee_first_name"],
+        fields_by_name["reservee_identifier"],
+        fields_by_name["reservee_last_name"],
+        fields_by_name["reservee_organisation_name"],
+        fields_by_name["reservee_phone"],
+        fields_by_name["reservee_type"],
+    ])
+    lomake_4_sub.supported_fields.set([
+        fields_by_name["age_group"],
+        fields_by_name["description"],
+        fields_by_name["municipality"],
+        fields_by_name["num_persons"],
+        fields_by_name["purpose"],
+        fields_by_name["reservee_email"],
+        fields_by_name["reservee_first_name"],
+        fields_by_name["reservee_identifier"],
+        fields_by_name["reservee_last_name"],
+        fields_by_name["reservee_organisation_name"],
+        fields_by_name["reservee_phone"],
+        fields_by_name["reservee_type"],
+    ])
 
-    harrasta_yhdessa_tarkoitus = Purpose.objects.get(name="Harrasta yhdessä")
-    jarjesta_tapahtuma_tarkoitus = Purpose.objects.get(name="Järjestä tapahtuma")
-    kauta_laitteita_tarkoitus = Purpose.objects.get(name="Käytä laitteita")
-    liiku_ja_rentoudu_tarkoitus = Purpose.objects.get(name="Liiku ja rentoudu")
-    loyda_juhlatila_tarkoitus = Purpose.objects.get(name="Löydä juhlatila")
-    pida_kokous_tarkoitus = Purpose.objects.get(name="Pidä kokous")
-    tee_musiikkia_tarkoitus = Purpose.objects.get(name="Tee musiikkia tai äänitä")
-    yksin_tai_ryhma_tarkoitus = Purpose.objects.get(name="Työskentele yksin tai ryhmässä")
+    peruutus_alkuun_asti, _ = ReservationUnitCancellationRule.objects.get_or_create(
+        name="Varauksen alkuun asti",
+        defaults={
+            "name_fi": "Varauksen alkuun asti",
+            "name_en": "Varauksen alkuun asti",
+            "name_sv": "Varauksen alkuun asti",
+            "can_be_cancelled_time_before": datetime.timedelta(seconds=1),
+        },
+    )
+    peruutus_kaksi_viikkoa, _ = ReservationUnitCancellationRule.objects.get_or_create(
+        name="14 vrk ennen alkamista",
+        defaults={
+            "name_fi": "14 vrk ennen alkamista",
+            "name_en": "14 vrk ennen alkamista",
+            "name_sv": "14 vrk ennen alkamista",
+            "can_be_cancelled_time_before": datetime.timedelta(days=14),
+        },
+    )
 
-    aani_laite = Equipment.objects.get(name="Äänitekniikka")
-    astianpesukone_laite = Equipment.objects.get(name="Astianpesukone")
-    astiasto_laite = Equipment.objects.get(name="Perusastiasto ja -keittiövälineet")
-    biljardi_laite = Equipment.objects.get(name="Biljardipöytä")
-    click_share_laite = Equipment.objects.get(name="ClickShare")
-    esiintymislava_laite = Equipment.objects.get(name="Esiintymislava")
-    hdmi_laite = Equipment.objects.get(name="HDMI")
-    internet_laite = Equipment.objects.get(name="Muu internet-yhteys")
-    istumapaikka_laite = Equipment.objects.get(name="Istumapaikkoja")
-    jaakaappi_laite = Equipment.objects.get(name="Jääkaappi")
-    jatkojohto_laite = Equipment.objects.get(name="Jatkojohto")
-    kahvinkeitin_laite = Equipment.objects.get(name="Kahvinkeitin")
-    liesi_laite = Equipment.objects.get(name="Liesi")
-    liikuntavaline_laite = Equipment.objects.get(name="Liikuntavälineitä")
-    mikro_laite = Equipment.objects.get(name="Mikroaaltouuni")
-    naytto_laite = Equipment.objects.get(name="Näyttö")
-    pakastin_laite = Equipment.objects.get(name="Pakastin")
-    peiliseina_laite = Equipment.objects.get(name="Peiliseinä")
-    piano_laite = Equipment.objects.get(name="Piano")
-    poyta_laite = Equipment.objects.get(name="Pöytä tai pöytiä")
-    rummut_laite = Equipment.objects.get(name="Sähkörummut")
-    scart_laite = Equipment.objects.get(name="SCART")
-    sohva_laite = Equipment.objects.get(name="Sohvaryhmä")
-    studio_laite = Equipment.objects.get(name="Studiolaitteisto")
-    tietokone_laite = Equipment.objects.get(name="Tietokone")
-    uuni_laite = Equipment.objects.get(name="Uuni")
-    valkotaulu_laite = Equipment.objects.get(name="Valkotaulu, tussitaulu")
-    vedenkeitin_laite = Equipment.objects.get(name="Vedenkeitin")
-    vesipiste_laite = Equipment.objects.get(name="Vesipiste")
+    maksuton_maksuehto, _ = TermsOfUse.objects.get_or_create(
+        id="pay0",
+        defaults={
+            "name_fi": "Maksuehto - maksuton",
+            "name_en": "Maksuehto - maksuton",
+            "name_sv": "Maksuehto - maksuton",
+            "text_fi": "",
+            "text_en": "",
+            "text_sv": "",
+            "terms_type": TermsOfUseTypeChoices.PAYMENT,
+        },
+    )
+    verkkokauppa_vain_maksuehto, _ = TermsOfUse.objects.get_or_create(
+        id="pay1",
+        defaults={
+            "name_fi": "Maksuehto 1 - vain verkkomaksaminen",
+            "name_en": "Term of payment 1: online payment only",
+            "name_sv": "Betalningsvillkor 1 - endast onlinebetalning",
+            "text_fi": (
+                "Varaus maksetaan kokonaisuudessaan etukäteen varauksenteon yhteydessä. "
+                "Palvelussa ilmoitetut hinnat sisältävät arvolisäveron. "
+                "Mahdolliset lisäpalvelut eivät sisälly hintaan."
+            ),
+            "text_en": (
+                "The reservation is paid in full in advance in connection with booking. "
+                "The prices indicated in the service include VAT. "
+                "Any additional services are not included in the price."
+            ),
+            "text_sv": (
+                "Bokningen betalas till fullt belopp när den görs. "
+                "Priserna som anges i tjänsten innehåller moms. "
+                "Eventuella tilläggsavgifter ingår inte i priset."
+            ),
+            "terms_type": TermsOfUseTypeChoices.PAYMENT,
+        },
+    )
+    verkkokauppa_alennus_maksuehto, _ = TermsOfUse.objects.get_or_create(
+        id="pay3",
+        defaults={
+            "name_fi": "Maksuehto 2 - verkkomaksu + lasku, kiinteä hinta",
+            "name_en": "Term of payment 2: online payment + invoice, fixed price",
+            "name_sv": "Betalningsvillkor 2 - onlinebetalning + faktura, fast pris",
+            "text_fi": (
+                "Varaus maksetaan kokonaisuudessaan etukäteen varauksenteon yhteydessä. "
+                "Jos valitset maksutavaksi laskun, varaus tulee maksaa eräpäivään mennessä. "
+                "Lasku maksutapana edellyttää vähintään 18 vuoden ikää. "
+                "Palvelussa ilmoitetut hinnat sisältävät arvolisäveron. "
+                "Mahdolliset lisäpalvelut eivät sisälly hintaan."
+            ),
+            "text_en": (
+                "The reservation is paid in full in advance in connection with booking. "
+                "If you choose the invoice payment method, the reservation must be paid by the due date. "
+                "The invoice payment method is only available to those who are 18 or older. "
+                "The prices indicated in the service include VAT. "
+                "Any additional services are not included in the price."
+            ),
+            "text_sv": (
+                "Bokningen betalas till fullt belopp när den görs. "
+                "Om du väljer faktura som betalmetod ska bokningen betalas senast på förfallodagen. "
+                "För att välja faktura som betalmetod ska man vara minst 18 år. "
+                "Priserna som anges i tjänsten innehåller moms. "
+                "Eventuella tilläggsavgifter ingår inte i priset."
+            ),
+            "terms_type": TermsOfUseTypeChoices.PAYMENT,
+        },
+    )
+    verkkokauppa_kasittely_maksuehto, _ = TermsOfUse.objects.get_or_create(
+        id="pay4",
+        defaults={
+            "name_fi": "Maksuehto 3 - verkkomaksu + lasku, alennus",
+            "name_en": "Term of payment 3: online payment + invoice, discount",
+            "name_sv": "Betalningsvillkor 3 - onlinebetalning + faktura, rabatt",
+            "text_fi": (
+                "Varaus maksetaan kokonaisuudessaan etukäteen varauksenteon yhteydessä. "
+                "Maksutonta käyttöä tai alennusta on haettava varaamisen yhteydessä. "
+                "Jälkikäteen tehtyjä alennus- tai maksuttomuuspyyntöjä ei käsitellä. "
+                "Jos haet maksutonta tai alennettua käyttöä, varauksesi siirtyy käsittelyyn. "
+                "Palvelussa ilmoitetut hinnat sisältävät arvolisäveron. "
+                "Mahdolliset lisäpalvelut eivät sisälly hintaan."
+            ),
+            "text_en": (
+                "The reservation is paid in full in advance in connection with booking. "
+                "You must apply for free use or discount in connection with booking. "
+                "Requests for free use or discount submitted later will not be processed. "
+                "If you apply for free use or discount, your reservation will be transferred to processing. "
+                "The prices indicated in the service include VAT. "
+                "Any additional services are not included in the price."
+            ),
+            "text_sv": (
+                "Bokningen betalas till fullt belopp när den görs. "
+                "Avgiftsfri användning eller rabatt ska ansökas i samband med bokningen. "
+                "Begäran om rabatt eller avgiftsfrihet som ställs i efterhand behandlas inte. "
+                "Om du ansöker om avgiftsfri användning eller rabatt förflyttas din bokning till handläggning. "
+                "Priserna som anges i tjänsten innehåller moms. "
+                "Eventuella tilläggsavgifter ingår inte i priset."
+            ),
+            "terms_type": TermsOfUseTypeChoices.PAYMENT,
+        },
+    )
+    varauksen_alkuun_asti_peruutusehto, _ = TermsOfUse.objects.get_or_create(
+        id="cancel0days",
+        defaults={
+            "name_fi": "Peruttavissa alkamiseen asti",
+            "name_en": "Cancellable until reservation starts",
+            "name_sv": "Kan avbokas fram till bokningens starttid",
+            "text_fi": (
+                "Varauksen voi perua Varaamossa veloituksetta ennen varauksen alkamista. "
+                "Myöhästyessäsi yli 15 minuuttia varaus vapautetaan muiden käyttöön."
+            ),
+            "text_en": (
+                "The reservation can be cancelled free of charge in Varaamo before the reservation starts. "
+                "If you are more than 15 minutes late for your reservation, "
+                "it will be cancelled and made available to others."
+            ),
+            "text_sv": (
+                "Bokningen kan avbokas vid Varaamo utan kostnad före bokningens starttid. "
+                "Vid en försening på över 15 minuter släpps bokningen och passet kan nyttjas av andra."
+            ),
+            "terms_type": TermsOfUseTypeChoices.CANCELLATION,
+        },
+    )
+    alkuun_asti_ei_peruutusta_peruutusehto, _ = TermsOfUse.objects.get_or_create(
+        id="cancel0days_delayok",
+        defaults={
+            "name_fi": "Peruttavissa alkamiseen asti (ei vapauteta)",
+            "name_en": "Cancellable until reservation starts (ei vapauteta)",
+            "name_sv": "Kan avbokas fram till bokningens starttid (ei vapauteta)",
+            "text_fi": "Varauksen voi perua Varaamossa veloituksetta ennen varauksen alkamista.",
+            "text_en": "The reservation can be cancelled free of charge in Varaamo before the reservation starts.",
+            "text_sv": "Bokningen kan avbokas vid Varaamo utan kostnad före bokningens starttid.",
+            "terms_type": TermsOfUseTypeChoices.CANCELLATION,
+        },
+    )
+    kaksi_viikkoa_peruutusehto, _ = TermsOfUse.objects.get_or_create(
+        id="cancel2weeks",
+        defaults={
+            "name_fi": "Peruutusehto 2 vko (14vrk)",
+            "name_en": "cancellation policy Two-weeks",
+            "name_sv": "Avbokningsvillkor 2 veckor",
+            "text_fi": (
+                "Varauksen voi perua veloituksetta kaksi viikkoa (14 vrk) ennen varauksen alkamista. "
+                "Myöhemmin tehdyistä peruutuksista peritään täysi hinta."
+            ),
+            "text_en": (
+                "A reservation can be cancelled free of charge two weeks (14 days) before the reservation starts. "
+                "A full fee will be charged of cancellations made after that time."
+            ),
+            "text_sv": (
+                "Bokningen kan avbokas utan kostnad fram till två veckor (14 dagar) före bokningens starttid. "
+                "Senare avbokningar debiteras till fullt belopp."
+            ),
+            "terms_type": TermsOfUseTypeChoices.CANCELLATION,
+        },
+    )
+    laitteet_palveluehto, _ = TermsOfUse.objects.get_or_create(
+        id="KUVAlaite",
+        defaults={
+            "name_fi": "Laitteet ja soittimet",
+            "name_en": "Devices and musical instruments",
+            "name_sv": "Utrustning och instrument",
+            "text_fi": (
+                "Mikäli työsi ei valmistu varaamasi ajan sisällä, työ keskeytetään seuraavan varauksen alkaessa. "
+                "Laite tai soitin on tarkoitettu omaan luovaan toimintaan. "
+                "Tilaustöiden tekeminen korvausta vastaan tai ammattimainen tulonhankinta ei ole sallittua."
+            ),
+            "text_en": (
+                "If your work is not completed within the reserved time, "
+                "the work will be discontinued when the following reservation starts. "
+                "A device or musical instrument is intended for your own creative activities only. "
+                "You are not allowed to make bespoke work for compensation or to earn a professional income."
+            ),
+            "text_sv": (
+                "Om ditt arbete inte blir färdigt inom den tid som du har "
+                "bokat avbryts ditt arbete när nästa bokning börjar. "
+                "Utrustning och instrument är avsedda för egen kreativ verksamhet. "
+                "Det är inte tillåtet att producera beställningsmaterial mot "
+                "betalning eller att utöva yrkesverksamhet i inkomstsyfte."
+            ),
+            "terms_type": TermsOfUseTypeChoices.SERVICE,
+        },
+    )
+    maksulliset_palveluehto, _ = TermsOfUse.objects.get_or_create(
+        id="KUVA_oodi",
+        defaults={
+            "name_fi": "KUVA - Oodi, maksulliset",
+            "name_en": "KUVA - Oodi, maksulliset",
+            "name_sv": "KUVA - Oodi, maksulliset",
+            "text_fi": (
+                "Varaajan tulee olla täysi-ikäinen. "
+                "Tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä."
+            ),
+            "text_en": (
+                "The lessee must be 18 or older. "
+                "Events held in the rented facilities must not disrupt the other "
+                "library operations or disturb the library's customers and users."
+            ),
+            "text_sv": (
+                "Hyrestagaren ska vara myndig. Ett evenemang som arrangeras i en hyrd lokal "
+                "får inte störa den övriga verksamheten på biblioteket eller bibliotekets kunder eller användare."
+            ),
+            "terms_type": TermsOfUseTypeChoices.SERVICE,
+        },
+    )
+    nupa_palveluehto, _ = TermsOfUse.objects.get_or_create(
+        id="KUVA_nupa",
+        defaults={
+            "name_fi": "KUVA - Nuorisopalvelut",
+            "name_en": "KUVA - Nuorisopalvelut",
+            "name_sv": "KUVA - Nuorisopalvelut",
+            "text_fi": (
+                "TÄYDENTÄVÄT SOPIMUSEHDOT Nuorisotilat ovat päihteettömiä. "
+                "Nuorisotiloja ei luovuteta yksittäisen puolueen, "
+                "ehdokkaan tai valitsijayhdistyksen vaalitilaisuuksia varten. "
+                "Yöpyminen on sallittu vain nuorisopalveluiden leirikeskuksissa tai vastaavissa tiloissa, "
+                "jotka on tarkoitettu yöpymiseen."
+            ),
+            "text_en": (
+                "Youth spaces are intoxicant-free. "
+                "Election rallies of individual parties, candidates or "
+                "constituency associations are not allowed in youth spaces. "
+                "Overnight stays are only allowed in Youth Services' "
+                "camp centres or similar premises intended for overnight stays."
+            ),
+            "text_sv": (
+                "KOMPLETTERANDE AVTALSVILLKOR Ungdomsgårdarna är rusmedelsfria. "
+                "Ungdomsgårdar överlåts inte för ett enskilt partis, "
+                "en enskild kandidats eller en enskild valmansförenings valmöten. "
+                "Övernattning är endast tillåten i ungdomstjänsternas lägercenter "
+                "eller liknande lokaler som är avsedda för övernattning."
+            ),
+            "terms_type": TermsOfUseTypeChoices.SERVICE,
+        },
+    )
+    maksuton_palveluehto, _ = TermsOfUse.objects.get_or_create(
+        id="KUVA_oodi_maksuton",
+        defaults={
+            "name_fi": "KUVA - Oodi, maksuton",
+            "name_en": "KUVA - Oodi, maksuton",
+            "name_sv": "KUVA - Oodi, maksuton",
+            "text_fi": (
+                "Tila on tarkoitettu ei-kaupalliseen toimintaan. "
+                "Sitä ei ole tarkoitettu pääsy- tai osallistumismaksullisiin kursseihin tai tilaisuuksiin. "
+                "Tilassa järjestettävä tilaisuus ei saa häiritä muuta kirjaston toimintaa, "
+                "asiakkaita tai käyttäjiä. Huom! Asiakastiloja ei ole tarkoitettu kaupungin sisäisiin kokouksiin."
+            ),
+            "text_en": (
+                "The facility is intended for non-commercial activity. "
+                "It is not intended for courses or events that charge an entrance or a participation fee. "
+                "Events held in the facility must not disrupt the other library operations or "
+                "disturb the library's customers and users. "
+                "Huom! Asiakastiloja ei ole tarkoitettu kaupungin sisäisiin kokouksiin."
+            ),
+            "text_sv": (
+                "Lokalen är avsedd för icke-kommersiell verksamhet. "
+                "Den är inte avsedd för kurser eller evenemang för vilka inträdes- eller deltagaravgifter tas ut. "
+                "Ett evenemang som arrangeras i en hyrd lokal får inte störa den "
+                "övriga verksamheten på biblioteket eller bibliotekets kunder eller användare. "
+                "Huom! Asiakastiloja ei ole tarkoitettu kaupungin sisäisiin kokouksiin."
+            ),
+            "terms_type": TermsOfUseTypeChoices.SERVICE,
+        },
+    )
+    kausi_palveluehto, _ = TermsOfUse.objects.get_or_create(
+        id="KUVA_nupakausi",
+        defaults={
+            "name_fi": "KUVA - Nuorisopalvelut, kausi",
+            "name_en": "KUVA - Youth Services' conditions, kausi",
+            "name_sv": "KUVA - Ungdomstjänsternas betingelser, kausi",
+            "text_fi": "",
+            "text_en": "",
+            "text_sv": "",
+            "terms_type": TermsOfUseTypeChoices.SERVICE,
+        },
+    )
+    nupa_hinnoitteluehto, _ = TermsOfUse.objects.get_or_create(
+        id="pricing_nupa",
+        defaults={
+            "name_fi": "KUVA - Nuorisopalveluiden alennusperusteet",
+            "name_en": "KUVA - Nuorisopalveluiden alennusperusteet",
+            "name_sv": "KUVA - Nuorisopalveluiden alennusperusteet",
+            "text_fi": "",
+            "text_en": "",
+            "text_sv": "",
+            "terms_type": TermsOfUseTypeChoices.PRICING,
+        },
+    )
 
-    nolla_veroprosentti = TaxPercentage.objects.get(value=Decimal("0.0"))
-    uusi_veroprosentti = TaxPercentage.objects.get(value=Decimal("25.5"))
+    harrasta_yhdessa_tarkoitus, _ = Purpose.objects.get_or_create(
+        name="Harrasta yhdessä",
+        defaults={
+            "name_fi": "Harrasta yhdessä",
+            "name_en": "Engage in hobbies together",
+            "name_sv": "Utöva hobbyer tillsammans",
+        },
+    )
+    jarjesta_tapahtuma_tarkoitus, _ = Purpose.objects.get_or_create(
+        name="Järjestä tapahtuma",
+        defaults={
+            "name_fi": "Järjestä tapahtuma",
+            "name_en": "Organise an event",
+            "name_sv": "Arrangera evenemang",
+        },
+    )
+    kauta_laitteita_tarkoitus, _ = Purpose.objects.get_or_create(
+        name="Käytä laitteita",
+        defaults={
+            "name_fi": "Käytä laitteita",
+            "name_en": "Use equipment",
+            "name_sv": "Använd utrustning",
+        },
+    )
+    liiku_ja_rentoudu_tarkoitus, _ = Purpose.objects.get_or_create(
+        name="Liiku ja rentoudu",
+        defaults={
+            "name_fi": "Liiku ja rentoudu",
+            "name_en": "Exercise and relax",
+            "name_sv": "Motionera och koppla av",
+        },
+    )
+    loyda_juhlatila_tarkoitus, _ = Purpose.objects.get_or_create(
+        name="Löydä juhlatila",
+        defaults={
+            "name_fi": "Löydä juhlatila",
+            "name_en": "Find a party venue",
+            "name_sv": "Hitta festlokal",
+        },
+    )
+    pida_kokous_tarkoitus, _ = Purpose.objects.get_or_create(
+        name="Pidä kokous",
+        defaults={
+            "name_fi": "Pidä kokous",
+            "name_en": "Hold a meeting",
+            "name_sv": "Håll möte",
+        },
+    )
+    tee_musiikkia_tarkoitus, _ = Purpose.objects.get_or_create(
+        name="Tee musiikkia tai äänitä",
+        defaults={
+            "name_fi": "Tee musiikkia tai äänitä",
+            "name_en": "Make music or record",
+            "name_sv": "Gör musik eller spela in",
+        },
+    )
+    yksin_tai_ryhma_tarkoitus, _ = Purpose.objects.get_or_create(
+        name="Työskentele yksin tai ryhmässä",
+        defaults={
+            "name_fi": "Työskentele yksin tai ryhmässä",
+            "name_en": "Work alone or in a group",
+            "name_sv": "Arbeta enskilt eller i grupp",
+        },
+    )
 
-    harakka_hauki_resource = OriginHaukiResource.objects.get(id="2952865")
-    mankeli_hauki_resource = OriginHaukiResource.objects.get(id="2956668")
-    aitio_hauki_resource = OriginHaukiResource.objects.get(id="2958620")
-    kellarikerros_hauki_resource = OriginHaukiResource.objects.get(id="2956344")
-    aula_hauki_resource = OriginHaukiResource.objects.get(id="2959295")
-    parveke_hauki_resource = OriginHaukiResource.objects.get(id="2959623")
-    malmi_hauki_resource = OriginHaukiResource.objects.get(id="2964786")
-    keskusta_hauki_resource = OriginHaukiResource.objects.get(id="2964787")
-    yrjo_hauki_resource = OriginHaukiResource.objects.get(id="2959579")
-    kalevi_hauki_resource = OriginHaukiResource.objects.get(id="2959580")
-    piitu_hauki_resource = OriginHaukiResource.objects.get(id="2959581")
+    esitystekniikka_category, _ = EquipmentCategory.objects.get_or_create(
+        name="Esitystekniikka ja AV-laitteet",
+        defaults={
+            "name_fi": "Esitystekniikka ja AV-laitteet",
+            "name_en": "",
+            "name_sv": "",
+        },
+    )
+    keittiovalineet_category, _ = EquipmentCategory.objects.get_or_create(
+        name="Keittiövälineet",
+        defaults={
+            "name_fi": "Keittiövälineet",
+            "name_en": "",
+            "name_sv": "",
+        },
+    )
+    liikuntavalineet_category, _ = EquipmentCategory.objects.get_or_create(
+        name="Liikuntavälineet",
+        defaults={
+            "name_fi": "Liikuntavälineet",
+            "name_en": "",
+            "name_sv": "",
+        },
+    )
+    kaluesteet_category, _ = EquipmentCategory.objects.get_or_create(
+        name="Kalusteet",
+        defaults={
+            "name_fi": "Kalusteet",
+            "name_en": "",
+            "name_sv": "",
+        },
+    )
+    liittimet_category, _ = EquipmentCategory.objects.get_or_create(
+        name="Liittimet",
+        defaults={
+            "name_fi": "Liittimet",
+            "name_en": "",
+            "name_sv": "",
+        },
+    )
+    soittimet_category, _ = EquipmentCategory.objects.get_or_create(
+        name="Soittimet",
+        defaults={
+            "name_fi": "Soittimet",
+            "name_en": "",
+            "name_sv": "",
+        },
+    )
 
-    harakka_merchant = PaymentMerchant.objects.get(id="c9acaa73-b582-471c-b002-b038a8c00fb1")
-    kellarikerros_payment_merchant = PaymentMerchant.objects.get(id="9be158db-8e3a-4560-8e68-f3214b207d6c")
+    # TODO: Categories?
+    aani_laite, _ = Equipment.objects.get_or_create(
+        name="Äänitekniikka",
+        defaults={
+            "name_fi": "Äänitekniikka",
+            "name_en": "Sound system",
+            "name_sv": "Ljudteknik",
+            "category": esitystekniikka_category,
+        },
+    )
+    astianpesukone_laite, _ = Equipment.objects.get_or_create(
+        name="Astianpesukone",
+        defaults={
+            "name_fi": "Astianpesukone",
+            "name_en": "Dishwasher",
+            "name_sv": "Diskmaskin",
+            "category": keittiovalineet_category,
+        },
+    )
+    astiasto_laite, _ = Equipment.objects.get_or_create(
+        name="Perusastiasto ja -keittiövälineet",
+        defaults={
+            "name_fi": "Perusastiasto ja -keittiövälineet",
+            "name_en": "Basic set of dishes and kitchen equipment",
+            "name_sv": "Standardservis och -köksredskap",
+            "category": keittiovalineet_category,
+        },
+    )
+    biljardi_laite, _ = Equipment.objects.get_or_create(
+        name="Biljardipöytä",
+        defaults={
+            "name_fi": "Biljardipöytä",
+            "name_en": "Billiard",
+            "name_sv": "Biljard",
+            "category": liikuntavalineet_category,
+        },
+    )
+    click_share_laite, _ = Equipment.objects.get_or_create(
+        name="ClickShare",
+        defaults={
+            "name_fi": "ClickShare",
+            "name_en": "ClickShare",
+            "name_sv": "ClickShare",
+            "category": esitystekniikka_category,
+        },
+    )
+    esiintymislava_laite, _ = Equipment.objects.get_or_create(
+        name="Esiintymislava",
+        defaults={
+            "name_fi": "Esiintymislava",
+            "name_en": "Stage",
+            "name_sv": "Scen",
+            "category": kaluesteet_category,
+        },
+    )
+    hdmi_laite, _ = Equipment.objects.get_or_create(
+        name="HDMI",
+        defaults={
+            "name_fi": "HDMI",
+            "name_en": "HDMI",
+            "name_sv": "HDMI",
+            "category": liittimet_category,
+        },
+    )
+    internet_laite, _ = Equipment.objects.get_or_create(
+        name="Muu internet-yhteys",
+        defaults={
+            "name_fi": "Muu internet-yhteys",
+            "name_en": "Other internet connection",
+            "name_sv": "Annan internetuppkoppling",
+            "category": esitystekniikka_category,
+        },
+    )
+    istumapaikka_laite, _ = Equipment.objects.get_or_create(
+        name="Istumapaikkoja",
+        defaults={
+            "name_fi": "Istumapaikkoja",
+            "name_en": "Seats",
+            "name_sv": "Sittplatser",
+            "category": kaluesteet_category,
+        },
+    )
+    jaakaappi_laite, _ = Equipment.objects.get_or_create(
+        name="Jääkaappi",
+        defaults={
+            "name_fi": "Jääkaappi",
+            "name_en": "Fridge",
+            "name_sv": "Kylskåp",
+            "category": keittiovalineet_category,
+        },
+    )
+    jatkojohto_laite, _ = Equipment.objects.get_or_create(
+        name="Jatkojohto",
+        defaults={
+            "name_fi": "Jatkojohto",
+            "name_en": "Extension cord",
+            "name_sv": "Kkarvsladd",
+            "category": liittimet_category,
+        },
+    )
+    kahvinkeitin_laite, _ = Equipment.objects.get_or_create(
+        name="Kahvinkeitin",
+        defaults={
+            "name_fi": "Kahvinkeitin",
+            "name_en": "Coffee maker",
+            "name_sv": "Kaffekokare",
+            "category": keittiovalineet_category,
+        },
+    )
+    liesi_laite, _ = Equipment.objects.get_or_create(
+        name="Liesi",
+        defaults={
+            "name_fi": "Liesi",
+            "name_en": "Stove",
+            "name_sv": "Spis",
+            "category": keittiovalineet_category,
+        },
+    )
+    liikuntavaline_laite, _ = Equipment.objects.get_or_create(
+        name="Liikuntavälineitä",
+        defaults={
+            "name_fi": "Liikuntavälineitä",
+            "name_en": "Exercise equipment",
+            "name_sv": "Motionsredskap",
+            "category": liikuntavalineet_category,
+        },
+    )
+    mikro_laite, _ = Equipment.objects.get_or_create(
+        name="Mikroaaltouuni",
+        defaults={
+            "name_fi": "Mikroaaltouuni",
+            "name_en": "Microwave oven",
+            "name_sv": "Mikrovågsugn",
+            "category": keittiovalineet_category,
+        },
+    )
+    naytto_laite, _ = Equipment.objects.get_or_create(
+        name="Näyttö",
+        defaults={
+            "name_fi": "Näyttö",
+            "name_en": "Display",
+            "name_sv": "Skärm",
+            "category": esitystekniikka_category,
+        },
+    )
+    pakastin_laite, _ = Equipment.objects.get_or_create(
+        name="Pakastin",
+        defaults={
+            "name_fi": "Pakastin",
+            "name_en": "Freezer",
+            "name_sv": "Frys",
+            "category": keittiovalineet_category,
+        },
+    )
+    peiliseina_laite, _ = Equipment.objects.get_or_create(
+        name="Peiliseinä",
+        defaults={
+            "name_fi": "Peiliseinä",
+            "name_en": "Mirror wall",
+            "name_sv": "Spegelvägg",
+            "category": kaluesteet_category,
+        },
+    )
+    piano_laite, _ = Equipment.objects.get_or_create(
+        name="Piano",
+        defaults={
+            "name_fi": "Piano",
+            "name_en": "Piano",
+            "name_sv": "Piano",
+            "category": soittimet_category,
+        },
+    )
+    poyta_laite, _ = Equipment.objects.get_or_create(
+        name="Pöytä tai pöytiä",
+        defaults={
+            "name_fi": "Pöytä tai pöytiä",
+            "name_en": "Table or tables",
+            "name_sv": "Ett eller flera bord",
+            "category": kaluesteet_category,
+        },
+    )
+    rummut_laite, _ = Equipment.objects.get_or_create(
+        name="Sähkörummut",
+        defaults={
+            "name_fi": "Sähkörummut",
+            "name_en": "Electric drums",
+            "name_sv": "e-trummor",
+            "category": soittimet_category,
+        },
+    )
+    scart_laite, _ = Equipment.objects.get_or_create(
+        name="SCART",
+        defaults={
+            "name_fi": "SCART",
+            "name_en": "SCART",
+            "name_sv": "SCART",
+            "category": liittimet_category,
+        },
+    )
+    sohva_laite, _ = Equipment.objects.get_or_create(
+        name="Sohvaryhmä",
+        defaults={
+            "name_fi": "Sohvaryhmä",
+            "name_en": "Sofa set",
+            "name_sv": "Soffgrupp",
+            "category": kaluesteet_category,
+        },
+    )
+    studio_laite, _ = Equipment.objects.get_or_create(
+        name="Studiolaitteisto",
+        defaults={
+            "name_fi": "Studiolaitteisto",
+            "name_en": "Studio equipment",
+            "name_sv": "Studioutrustning",
+            "category": esitystekniikka_category,
+        },
+    )
+    tietokone_laite, _ = Equipment.objects.get_or_create(
+        name="Tietokone",
+        defaults={
+            "name_fi": "Tietokone",
+            "name_en": "Computer",
+            "name_sv": "Dator",
+            "category": esitystekniikka_category,
+        },
+    )
+    uuni_laite, _ = Equipment.objects.get_or_create(
+        name="Uuni",
+        defaults={
+            "name_fi": "Uuni",
+            "name_en": "Oven",
+            "name_sv": "Ugn",
+            "category": keittiovalineet_category,
+        },
+    )
+    valkotaulu_laite, _ = Equipment.objects.get_or_create(
+        name="Valkotaulu, tussitaulu",
+        defaults={
+            "name_fi": "Valkotaulu, tussitaulu",
+            "name_en": "Whiteboard",
+            "name_sv": "Skrivtavla, tuschtavla",
+            "category": esitystekniikka_category,
+        },
+    )
+    vedenkeitin_laite, _ = Equipment.objects.get_or_create(
+        name="Vedenkeitin",
+        defaults={
+            "name_fi": "Vedenkeitin",
+            "name_en": "Electric kettle",
+            "name_sv": "Vattenkokare",
+            "category": keittiovalineet_category,
+        },
+    )
+    vesipiste_laite, _ = Equipment.objects.get_or_create(
+        name="Vesipiste",
+        defaults={
+            "name_fi": "Vesipiste",
+            "name_en": "Water point",
+            "name_sv": "Tappställe",
+            "category": keittiovalineet_category,
+        },
+    )
 
-    kellarikerros_payment_product = PaymentProduct.objects.get(id="630dcc27-1ff1-3e12-b1ea-9df2571a36bc")
-    aitio_payment_product = PaymentProduct.objects.get(id="eee7a1a4-b309-3919-aa7b-6d7eb675f9f4")
-    aula_payment_product = PaymentProduct.objects.get(id="19161df6-9f1c-3a0f-a953-d013ca2e3c0c")
-    kalevi_payment_product = PaymentProduct.objects.get(id="3cc8c05f-78cc-391c-b442-4f1b251697d3")
-    piitu_payment_product = PaymentProduct.objects.get(id="db9cb2d4-0a72-3e5e-a5b6-9479ef59e256")
+    nolla_veroprosentti, _ = TaxPercentage.objects.get_or_create(value=Decimal("0.0"))
+    uusi_veroprosentti, _ = TaxPercentage.objects.get_or_create(value=Decimal("25.5"))
 
-    pihlajasarten_accounting = PaymentAccounting.objects.get(name="Pihlajasaarten testikirjasto")
+    harakka_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2952865")
+    mankeli_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2956668")
+    aitio_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2958620")
+    kellarikerros_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2956344")
+    aula_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2959295")
+    parveke_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2959623")
+    malmi_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2964786")
+    keskusta_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2964787")
+    yrjo_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2959579")
+    kalevi_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2959580")
+    piitu_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2959581")
+
+    harakka_merchant, _ = PaymentMerchant.objects.get_or_create(
+        id="c9acaa73-b582-471c-b002-b038a8c00fb1",
+        defaults={
+            "name": "Pihlajasaarten testikirjasto",
+        },
+    )
+    kellarikerros_payment_merchant, _ = PaymentMerchant.objects.get_or_create(
+        id="9be158db-8e3a-4560-8e68-f3214b207d6c",
+        defaults={
+            "name": "Esimerkki Merchant",
+        },
+    )
+
+    kellarikerros_payment_product, _ = PaymentProduct.objects.get_or_create(
+        id="630dcc27-1ff1-3e12-b1ea-9df2571a36bc",
+        defaults={
+            "merchant": kellarikerros_payment_merchant,
+        },
+    )
+    aitio_payment_product, _ = PaymentProduct.objects.get_or_create(
+        id="eee7a1a4-b309-3919-aa7b-6d7eb675f9f4",
+        defaults={
+            "merchant": harakka_merchant,
+        },
+    )
+    aula_payment_product, _ = PaymentProduct.objects.get_or_create(
+        id="19161df6-9f1c-3a0f-a953-d013ca2e3c0c",
+        defaults={
+            "merchant": harakka_merchant,
+        },
+    )
+    kalevi_payment_product, _ = PaymentProduct.objects.get_or_create(
+        id="3cc8c05f-78cc-391c-b442-4f1b251697d3",
+        defaults={
+            "merchant": harakka_merchant,
+        },
+    )
+    piitu_payment_product, _ = PaymentProduct.objects.get_or_create(
+        id="db9cb2d4-0a72-3e5e-a5b6-9479ef59e256",
+        defaults={
+            "merchant": harakka_merchant,
+        },
+    )
+
+    pihlajasarten_accounting, _ = PaymentAccounting.objects.get_or_create(
+        name="Pihlajasaarten testikirjasto",
+        defaults={
+            "company_code": "2900",
+            "main_ledger_account": "340025",
+            "vat_code": "44",
+            "internal_order": "2941505900",
+            "profit_center": "",
+            "project": "",
+            "operation_area": "290017",
+            "balance_profit_center": "2983300",
+            "product_invoicing_sales_org": "2900",
+            "product_invoicing_sales_office": "2911",
+            "product_invoicing_material": "10003360",
+            "product_invoicing_order_type": "ZTY1",
+        },
+    )
 
     # ------------------------------------------------------------------------------------------------------------
     # HARAKKA
@@ -735,7 +1576,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         origin_hauki_resource=kellarikerros_hauki_resource,
         reservation_unit_type=kokoustila,
         cancellation_rule=peruutus_alkuun_asti,
-        metadata_set=lomake_3_maksuttomuus,
+        metadata_set=lomake_3_sub,
         cancellation_terms=kaksi_viikkoa_peruutusehto,
         service_specific_terms=nupa_palveluehto,
         pricing_terms=nupa_hinnoitteluehto,
@@ -923,7 +1764,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         origin_hauki_resource=aula_hauki_resource,
         reservation_unit_type=kokoustila,
         cancellation_rule=peruutus_kaksi_viikkoa,
-        metadata_set=lomake_4_maksuttomuus,
+        metadata_set=lomake_4_sub,
         cancellation_terms=kaksi_viikkoa_peruutusehto,
         service_specific_terms=nupa_palveluehto,
         pricing_terms=nupa_hinnoitteluehto,
@@ -1387,7 +2228,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         origin_hauki_resource=yrjo_hauki_resource,
         reservation_unit_type=kokoustila,
         cancellation_rule=peruutus_alkuun_asti,
-        metadata_set=lomake_4_maksuttomuus,
+        metadata_set=lomake_4_sub,
         cancellation_terms=varauksen_alkuun_asti_peruutusehto,
         service_specific_terms=maksuton_palveluehto,
         pricing_terms=nupa_hinnoitteluehto,
@@ -1543,7 +2384,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         origin_hauki_resource=kalevi_hauki_resource,
         reservation_unit_type=kokoustila,
         cancellation_rule=peruutus_alkuun_asti,
-        metadata_set=lomake_3_maksuttomuus,
+        metadata_set=lomake_3_sub,
         cancellation_terms=alkuun_asti_ei_peruutusta_peruutusehto,
         service_specific_terms=kausi_palveluehto,
         pricing_terms=nupa_hinnoitteluehto,
@@ -1698,7 +2539,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         origin_hauki_resource=piitu_hauki_resource,
         reservation_unit_type=kokoustila,
         cancellation_rule=peruutus_alkuun_asti,
-        metadata_set=lomake_4_maksuttomuus,
+        metadata_set=lomake_4_sub,
         cancellation_terms=alkuun_asti_ei_peruutusta_peruutusehto,
         service_specific_terms=kausi_palveluehto,
         pricing_terms=nupa_hinnoitteluehto,
@@ -2472,9 +3313,27 @@ def create_users() -> None:
 
 
 def create_application_rounds() -> None:
-    nupa_kausivarausehto = TermsOfUse.objects.get(id="KUVAnupa")
+    nupa_kausivarausehto, _ = TermsOfUse.objects.get_or_create(
+        id="KUVAnupa",
+        defaults={
+            "name_fi": "(vakio_id) KAUSIVARAUS - Ei käytössä",
+            "name_en": "(vakio_id) KAUSIVARAUS - Ei käytössä",
+            "name_sv": "(vakio_id) KAUSIVARAUS - Ei käytössä",
+            "text_fi": "",
+            "text_en": "",
+            "text_sv": "",
+            "terms_type": TermsOfUseTypeChoices.RECURRING,
+        },
+    )
 
-    harrastustoiminta = ReservationPurpose.objects.get(name="Harrastustoiminta, muu")
+    harrastustoiminta, _ = ReservationPurpose.objects.get_or_create(
+        name="Harrastustoiminta, muu",
+        defaults={
+            "name_fi": "Harrastustoiminta, muu",
+            "name_en": "Hobby or leisure activities, other",
+            "name_sv": "Hobby, annat",
+        },
+    )
 
     kausivarausyksikko_malmi = ReservationUnit.objects.get(ext_uuid="52f16e97-4986-4c4e-8fc5-8fab4ab66933")
     kausivarausyksikko_keskusta = ReservationUnit.objects.get(ext_uuid="99c2f30e-40ad-4aca-aa78-01ac92a0b1ff")
