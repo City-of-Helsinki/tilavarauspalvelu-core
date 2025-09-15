@@ -44,7 +44,7 @@ export function getDurationOptions(t: TFunction): DurationOption[] {
   }
 
   // we need to add the minute times to the beginning of the duration options
-  return durationMinuteOptions(t).concat(times);
+  return [...durationMinuteOptions(t), ...times];
 }
 
 // TODO the validation needs to go to env.mjs because this reloads the page constantly

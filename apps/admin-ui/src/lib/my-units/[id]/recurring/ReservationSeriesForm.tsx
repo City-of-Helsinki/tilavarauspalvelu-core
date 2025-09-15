@@ -166,9 +166,9 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
   const onSubmit = async ({ enableBufferTimeBefore, enableBufferTimeAfter, ...data }: FormValues) => {
     setLocalError(null);
 
-    const skipDates = removedReservations
-      .concat(checkedReservations.reservations.filter((x) => x.isOverlapping))
-      .map((x) => x.date);
+    const skipDates = [...removedReservations, ...checkedReservations.reservations.filter((x) => x.isOverlapping)].map(
+      (x) => x.date
+    );
 
     if (checkedReservations.reservations.length - skipDates.length === 0) {
       errorToast({ text: t(translateError("noReservations")) });

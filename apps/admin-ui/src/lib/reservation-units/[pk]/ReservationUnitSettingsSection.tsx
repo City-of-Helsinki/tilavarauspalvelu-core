@@ -111,16 +111,17 @@ export function ReservationUnitSettingsSection({
     errors.maxReservationDuration != null ||
     errors.minReservationDuration != null;
 
-  const durationOptions = bufferTimeOptions.concat(
-    Array.from({ length: (23 - 2) * 2 + 1 })
+  const durationOptions = [
+    ...bufferTimeOptions,
+    ...Array.from({ length: (23 - 2) * 2 + 1 })
       .map((_v, i) => 3600 * 2 + i * 1800)
       .map((v) => ({
         value: v,
         label: t("reservationUnitEditor:durationHours", {
           hours: (v / 3600).toLocaleString("fi"),
         }),
-      }))
-  );
+      })),
+  ];
 
   return (
     <EditAccordion open={hasErrors} heading={t("reservationUnitEditor:settings")}>
