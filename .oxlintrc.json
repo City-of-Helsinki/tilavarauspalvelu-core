@@ -361,6 +361,7 @@
     "typescript/related-getter-setter-pairs": "error",
     "typescript/require-array-sort-compare": "error",
     "typescript/restrict-plus-operands": "error",
+    "typescript/return-await": "error",
     "typescript/triple-slash-reference": "error",
     "typescript/unbound-method": "error",
     "typescript/use-unknown-in-catch-callback-variable": "error",
