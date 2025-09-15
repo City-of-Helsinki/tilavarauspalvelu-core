@@ -60,18 +60,18 @@ __all__ = [
 class ReservationNotification(models.TextChoices):
     """When user wants to receive reservation notification emails."""
 
-    ALL = "all"
-    ONLY_HANDLING_REQUIRED = "only_handling_required"
-    NONE = "none"
+    ALL = "ALL"
+    ONLY_HANDLING_REQUIRED = "ONLY_HANDLING_REQUIRED"
+    NONE = "NONE"
 
 
 class TermsOfUseTypeChoices(models.TextChoices):
-    GENERIC = "generic_terms", _("Generic terms")
-    PAYMENT = "payment_terms", _("Payment terms")
-    CANCELLATION = "cancellation_terms", _("Cancellation terms")
-    RECURRING = "recurring_terms", _("Reservation series terms")
-    SERVICE = "service_terms", _("Service-specific terms")
-    PRICING = "pricing_terms", _("Pricing terms")
+    GENERIC = "GENERIC", _("Generic terms")
+    PAYMENT = "PAYMENT", _("Payment terms")
+    CANCELLATION = "CANCELLATION", _("Cancellation terms")
+    RECURRING = "RECURRING", _("Reservation series terms")
+    SERVICE = "SERVICE", _("Service-specific terms")
+    PRICING = "PRICING", _("Pricing terms")
 
     @classmethod
     def specific_terms(cls) -> list[TermsOfUseTypeChoices]:
@@ -170,8 +170,8 @@ class OrderStatusWithFree(models.TextChoices):
 
 
 class ResourceLocationType(models.TextChoices):
-    FIXED = "fixed", pgettext_lazy("ResourceLocationType", "Fixed")
-    MOVABLE = "movable", pgettext_lazy("ResourceLocationType", "Movable")
+    FIXED = "FIXED", pgettext_lazy("ResourceLocationType", "Fixed")
+    MOVABLE = "MOVABLE", pgettext_lazy("ResourceLocationType", "Movable")
 
 
 class UserRoleChoice(models.TextChoices):
@@ -683,16 +683,16 @@ class ReservationUnitReservationState(models.TextChoices):
 
 
 class ReservationStartInterval(models.TextChoices):
-    INTERVAL_15_MINUTES = "interval_15_mins", _("15 minutes")
-    INTERVAL_30_MINUTES = "interval_30_mins", _("30 minutes")
-    INTERVAL_60_MINUTES = "interval_60_mins", _("60 minutes")
-    INTERVAL_90_MINUTES = "interval_90_mins", _("90 minutes")
-    INTERVAL_120_MINUTES = "interval_120_mins", _("2 hours")
-    INTERVAL_180_MINUTES = "interval_180_mins", _("3 hours")
-    INTERVAL_240_MINUTES = "interval_240_mins", _("4 hours")
-    INTERVAL_300_MINUTES = "interval_300_mins", _("5 hours")
-    INTERVAL_360_MINUTES = "interval_360_mins", _("6 hours")
-    INTERVAL_420_MINUTES = "interval_420_mins", _("7 hours")
+    INTERVAL_15_MINUTES = "INTERVAL_15_MINUTES", _("15 minutes")
+    INTERVAL_30_MINUTES = "INTERVAL_30_MINUTES", _("30 minutes")
+    INTERVAL_60_MINUTES = "INTERVAL_60_MINUTES", _("60 minutes")
+    INTERVAL_90_MINUTES = "INTERVAL_90_MINUTES", _("90 minutes")
+    INTERVAL_120_MINUTES = "INTERVAL_120_MINUTES", _("2 hours")
+    INTERVAL_180_MINUTES = "INTERVAL_180_MINUTES", _("3 hours")
+    INTERVAL_240_MINUTES = "INTERVAL_240_MINUTES", _("4 hours")
+    INTERVAL_300_MINUTES = "INTERVAL_300_MINUTES", _("5 hours")
+    INTERVAL_360_MINUTES = "INTERVAL_360_MINUTES", _("6 hours")
+    INTERVAL_420_MINUTES = "INTERVAL_420_MINUTES", _("7 hours")
 
     @enum.property
     def as_number(self) -> int:
@@ -799,8 +799,8 @@ class ReservationFormType(models.TextChoices):
 
 
 class PricingType(models.TextChoices):
-    PAID = "paid", pgettext_lazy("PricingType", "Paid")
-    FREE = "free", pgettext_lazy("PricingType", "Free")
+    PAID = "PAID", pgettext_lazy("PricingType", "Paid")
+    FREE = "FREE", pgettext_lazy("PricingType", "Free")
 
 
 class PaymentType(models.TextChoices):
@@ -824,13 +824,13 @@ class PaymentType(models.TextChoices):
 
 
 class PriceUnit(models.TextChoices):
-    PER_15_MINS = "per_15_mins", pgettext_lazy("PriceUnit", "per 15 minutes")
-    PER_30_MINS = "per_30_mins", pgettext_lazy("PriceUnit", "per 30 minutes")
-    PER_HOUR = "per_hour", pgettext_lazy("PriceUnit", "per hour")
-    PER_HALF_DAY = "per_half_day", pgettext_lazy("PriceUnit", "per half a day")
-    PER_DAY = "per_day", pgettext_lazy("PriceUnit", "per day")
-    PER_WEEK = "per_week", pgettext_lazy("PriceUnit", "per week")
-    FIXED = "fixed", pgettext_lazy("PriceUnit", "fixed")
+    PER_15_MINS = "PER_15_MINS", pgettext_lazy("PriceUnit", "per 15 minutes")
+    PER_30_MINS = "PER_30_MINS", pgettext_lazy("PriceUnit", "per 30 minutes")
+    PER_HOUR = "PER_HOUR", pgettext_lazy("PriceUnit", "per hour")
+    PER_HALF_DAY = "PER_HALF_DAY", pgettext_lazy("PriceUnit", "per half a day")
+    PER_DAY = "PER_DAY", pgettext_lazy("PriceUnit", "per day")
+    PER_WEEK = "PER_WEEK", pgettext_lazy("PriceUnit", "per week")
+    FIXED = "FIXED", pgettext_lazy("PriceUnit", "fixed")
 
     @enum.property
     def is_fixed(self) -> bool:
@@ -868,13 +868,13 @@ class PricingStatus(models.TextChoices):
 
 
 class AuthenticationType(models.TextChoices):
-    WEAK = "weak", pgettext_lazy("AuthenticationType", "Weak")
-    STRONG = "strong", pgettext_lazy("AuthenticationType", "Strong")
+    WEAK = "WEAK", pgettext_lazy("AuthenticationType", "Weak")
+    STRONG = "STRONG", pgettext_lazy("AuthenticationType", "Strong")
 
 
 class ReservationUnitImageType(models.TextChoices):
-    MAIN = "main", pgettext_lazy("ReservationUnitImageType", "Main image")
-    OTHER = "other", pgettext_lazy("ReservationUnitImageType", "Other")
+    MAIN = "MAIN", pgettext_lazy("ReservationUnitImageType", "Main image")
+    OTHER = "OTHER", pgettext_lazy("ReservationUnitImageType", "Other")
 
 
 class Weekday(models.TextChoices):
@@ -1009,7 +1009,7 @@ class ApplicationRoundStatusChoice(models.TextChoices):
     HANDLED = "HANDLED", pgettext_lazy("ApplicationRoundStatus", "Handled")
     """All application have been allocated"""
 
-    RESULTS_SENT = "SENT", pgettext_lazy("ApplicationRoundStatus", "Results Sent")
+    RESULTS_SENT = "RESULTS_SENT", pgettext_lazy("ApplicationRoundStatus", "Results Sent")
     """All application results have been sent to users"""
 
     @enum.property
