@@ -319,7 +319,7 @@ export function formatListToCSV(t: TFunction, list: Readonly<Readonly<string>[]>
     return list[0];
   }
   const lastItem = list[list.length - 1];
-  return list.slice(0, -1).join(", ") + ` ${t("common:and")} ${lastItem}`;
+  return `${list.slice(0, -1).join(", ")} ${t("common:and")} ${lastItem}`;
 }
 
 /// @description Converts time struct to string

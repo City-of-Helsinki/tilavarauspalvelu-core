@@ -48,7 +48,7 @@ function timeSlotMapper(t: TFunction, slot: AllocatedSectionsTableElementFragmen
 
   const day = convertWeekday(slot.dayOfTheWeek);
   const timeRange = formatTimeRange(timeToMinutes(slot.beginTime), timeToMinutes(slot.endTime));
-  const timeString = isAllocated ? `${t("translation:dayShort." + day)} ${timeRange}` : "-";
+  const timeString = isAllocated ? `${t(`translation:dayShort.${day}`)} ${timeRange}` : "-";
   const name = slot.reservationUnitOption.applicationSection.name;
 
   const applicationPk = application.pk ?? 0;

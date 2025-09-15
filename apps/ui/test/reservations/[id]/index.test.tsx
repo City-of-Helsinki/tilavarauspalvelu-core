@@ -117,7 +117,7 @@ describe("Page: View reservation", () => {
       await waitForAddressSection(view);
 
       const headingSection = view.getByTestId("reservation__content").childNodes[0] as HTMLElement;
-      const statusText = "reservations:status." + camelCase(state);
+      const statusText = `reservations:status.${camelCase(state)}`;
       expect(within(headingSection).getByText(statusText)).toBeInTheDocument();
     });
   });

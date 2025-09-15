@@ -93,7 +93,7 @@ function ApplicationSectionTimePicker({
     .map((n) => n.reservationUnit)
     .map((n) => ({
       value: n?.pk ?? 0,
-      label: `${n.unit && getTranslationSafe(n.unit, "name", language) + ": "}${getTranslationSafe(n, "name", language)}`,
+      label: `${n.unit && `${getTranslationSafe(n.unit, "name", language)}: `}${getTranslationSafe(n, "name", language)}`,
     }));
 
   const aes = watch(`applicationSections.${sectionIndex}`);
