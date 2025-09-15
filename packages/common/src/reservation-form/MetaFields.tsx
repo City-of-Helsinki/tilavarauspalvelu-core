@@ -7,22 +7,23 @@ import { ReservationFormField } from "./ReservationFormField";
 import { ReservationSubventionSection } from "./ReservationSubventionSection";
 import { AutoGrid, H4, H5 } from "../../styled";
 import { type OptionsRecord } from "../../types/common";
-import { type ExtendedFormFieldArray, extendMetaFieldOptions, formContainsField } from "./util";
+import {
+  constructReservationFieldId,
+  constructReservationFieldLabel,
+  type ExtendedFormFieldArray,
+  extendMetaFieldOptions,
+  formContainsField,
+  RESERVATION_FIELD_MAX_TEXT_LENGTH,
+  translateReserveeFormError,
+} from "./util";
 import { CustomerTypeSelector } from "./CustomerTypeSelector";
 import { type ReservationFormValueT } from "../schemas";
+import { ControlledNumberInput, ControlledSelect } from "../components/form";
+import { StyledTextArea, StyledTextInput } from "./styled";
 
-interface CommonProps {
-  options: Readonly<Omit<OptionsRecord, "municipalities">>;
-}
-
-interface CommonWithFields extends CommonProps {
+interface CommonWithFields {
   fields: ExtendedFormFieldArray;
-}
-
-interface ReservationFormFieldsProps extends CommonWithFields {
-  headingKey?: ReserveeType | "COMMON";
-  hasSubheading?: boolean;
-  params?: { numPersons: { min?: number; max?: number } };
+  options: Readonly<Omit<OptionsRecord, "municipalities">>;
 }
 
 interface ReservationFormGeneralSectionProps extends CommonWithFields {
@@ -98,50 +99,104 @@ function SubheadingByType({
   return null;
 }
 
-function ReservationFormFields({
+export function ReservationFormGeneralSection({
   fields,
-  options,
-  // subheading is needed because application form uses it and requires index / field data to render it
-  headingKey,
-  hasSubheading,
-}: ReservationFormFieldsProps) {
-  const { t } = useTranslation();
-
-  // TODO the subheading logic is weird / inefficient
-  // instead of adding it to sections (or dividing the fields array into sections with headings)
-  // we check for index === 0 inside a loop invariant
-  return (
-    <>
-      {fields.map((field, index) => (
-        <Fragment key={`key-${field}-container`}>
-          {hasSubheading && headingKey != null && headingKey !== "COMMON" && (
-            <SubheadingByType reserveeType={headingKey} index={index} field={field} key={`key-${field}-subheading`} />
-          )}
-          <ReservationFormField
-            key={`key-${field}`}
-            field={field}
-            options={extendMetaFieldOptions(options, t)}
-            translationKey={headingKey}
-          />
-        </Fragment>
-      ))}
-    </>
-  );
-}
-
-// TODO reduce prop drilling / remove unused props
-export function ReservationFormGeneralSection({ fields, options, data }: ReservationFormGeneralSectionProps) {
+  options: originalOptions,
+  data,
+}: ReservationFormGeneralSectionProps) {
   const { t } = useTranslation();
   const form = useFormContext<ReservationFormValueT>();
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = form;
 
   if (fields.length === 0) {
     return null;
   }
 
+  const createLabel = (field: keyof ReservationFormValueT): string => {
+    return constructReservationFieldLabel(t, "COMMON", field);
+  };
+
+  const getFieldError = (field: keyof ReservationFormValueT): string | undefined => {
+    return translateReserveeFormError(t, createLabel(field), errors[field]);
+  };
+
+  const options = extendMetaFieldOptions(originalOptions, t);
+
+  const hasPurpose = fields.find((x) => x === "purpose") != null;
+  const hasAgeGroup = fields.find((x) => x === "ageGroup") != null;
+  const hasName = fields.find((x) => x === "name") != null;
+  const hasDescription = fields.find((x) => x === "description") != null;
+  const hasNumPersons = fields.find((x) => x === "numPersons") != null;
+
   return (
     <AutoGrid>
       <Subheading>{t("reservationCalendar:reservationInfo")}</Subheading>
-      <ReservationFormFields options={extendMetaFieldOptions(options, t)} fields={fields} headingKey="COMMON" />
+      {hasName && (
+        <StyledTextInput
+          id={constructReservationFieldId("purpose")}
+          label={createLabel("name")}
+          {...register("name")}
+          type="text"
+          errorText={getFieldError("name")}
+          invalid={getFieldError("name") != null}
+          required
+          maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
+          $isWide
+        />
+      )}
+      {hasPurpose && (
+        <ControlledSelect
+          id={constructReservationFieldId("purpose")}
+          name="purpose"
+          label={createLabel("purpose")}
+          control={control}
+          required
+          options={options.reservationPurposes}
+          error={getFieldError("purpose")}
+          style={{ gridColumn: "1 / -1" }}
+          strongLabel
+        />
+      )}
+      {hasNumPersons && (
+        <ControlledNumberInput<ReservationFormValueT>
+          name="numPersons"
+          control={control}
+          label={createLabel("numPersons")}
+          errorText={getFieldError("numPersons")}
+          required
+          min={1} //minValue}
+          // max={maxValue}
+        />
+      )}
+      {hasAgeGroup && (
+        <ControlledSelect
+          id={constructReservationFieldId("ageGroup")}
+          name="ageGroup"
+          label={createLabel("ageGroup")}
+          control={control}
+          required
+          options={options.ageGroups}
+          error={getFieldError("ageGroup")}
+          strongLabel
+        />
+      )}
+      {hasDescription && (
+        <StyledTextArea
+          id={constructReservationFieldId("description")}
+          label={createLabel("description")}
+          {...register("description")}
+          errorText={getFieldError("description")}
+          invalid={getFieldError("description") != null}
+          required
+          maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
+          $isWide
+          $height="119px"
+        />
+      )}
       {data?.enableSubvention && <ReservationSubventionSection termsForDiscount={data.termsForDiscount} form={form} />}
     </AutoGrid>
   );
@@ -173,12 +228,21 @@ export function ReservationFormReserveeSection({
     <AutoGrid data-testid="reservation__form--reservee-info" className={className} style={style}>
       <Subheading>{t("reservationCalendar:reserverInfo")}</Subheading>
       {isTypeSelectable && <CustomerTypeSelector name="reserveeType" control={control} required error={error} />}
-      <ReservationFormFields
-        fields={fields}
-        options={extendMetaFieldOptions(options, t)}
-        hasSubheading
-        headingKey={reserveeType}
-      />
+      {fields.map((field, index) => (
+        <Fragment key={`key-${field}-container`}>
+          {reserveeType != null && (
+            // TODO the logic inside this component is really weird
+            // move the logic here instead (or properly refactor)
+            <SubheadingByType reserveeType={reserveeType} index={index} field={field} key={`key-${field}-subheading`} />
+          )}
+          <ReservationFormField
+            key={`key-${field}`}
+            field={field}
+            options={extendMetaFieldOptions(options, t)}
+            reserveeType={reserveeType}
+          />
+        </Fragment>
+      ))}
     </AutoGrid>
   );
 }

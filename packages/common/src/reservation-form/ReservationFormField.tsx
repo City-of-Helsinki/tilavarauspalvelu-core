@@ -3,16 +3,13 @@ import { useFormContext, type UseFormRegister } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { ReserveeType } from "../../gql/gql-types";
 import { type OptionsRecord } from "../../types/common";
-import { ControlledCheckbox, ControlledNumberInput, ControlledSelect } from "../components/form";
+import { ControlledCheckbox, ControlledSelect } from "../components/form";
 import { type ReservationFormValueT } from "../schemas";
 import { filterEmptyString } from "../helpers";
-import { StyledCheckboxWrapper, StyledTextArea, StyledTextInput } from "./styled";
+import { StyledCheckboxWrapper, StyledTextInput } from "./styled";
 import {
   constructReservationFieldId,
   constructReservationFieldLabel,
-  convertOptionsToField,
-  type ExtendedReserveeType,
-  type FieldOptions,
   translateReserveeFormError,
   RESERVATION_FIELD_MAX_TEXT_LENGTH,
 } from "./util";
@@ -20,12 +17,15 @@ import {
 type Props = {
   field: keyof ReservationFormValueT;
   options: OptionsRecord;
-  translationKey?: ExtendedReserveeType;
+  reserveeType?: ReserveeType;
 };
 
-export function ReservationFormField({ field, options: originalOptions, translationKey }: Props) {
+export function ReservationFormField({
+  field,
+  options: originalOptions,
+  reserveeType,
+}: Props): React.ReactElement | null {
   const { t } = useTranslation();
-  const options = convertOptionsToField(originalOptions);
 
   const {
     watch,
@@ -34,42 +34,26 @@ export function ReservationFormField({ field, options: originalOptions, translat
     formState: { errors },
   } = useFormContext<ReservationFormValueT>();
 
-  const label = constructReservationFieldLabel(t, translationKey, field);
-  const errorText = translateReserveeFormError(t, label, errors[`${field}`]);
-
+  const label = constructReservationFieldLabel(t, reserveeType, field);
+  const errorText = filterEmptyString(translateReserveeFormError(t, label, errors[`${field}`]));
   const id = constructReservationFieldId(field);
 
-  const isSelectField = Object.keys(options).includes(field);
-
-  if (isSelectField) {
-    const optionsNarrowed = Object.keys(options).includes(field) ? options[field as keyof FieldOptions] : [];
-    return (
-      <ControlledSelect
-        id={id}
-        name={field}
-        label={label}
-        control={control}
-        required
-        options={optionsNarrowed}
-        error={filterEmptyString(errorText)}
-        style={{
-          gridColumn: field === "purpose" ? "1 / -1" : undefined,
-        }}
-        strongLabel
-        key={field}
-      />
-    );
-  }
-
-  const checkParams = {
-    id,
-    name: field,
-    control,
-    label,
-    errorText,
-  };
-
   switch (field) {
+    case "municipality": {
+      return (
+        <ControlledSelect
+          id={id}
+          name={field}
+          label={label}
+          control={control}
+          required
+          options={originalOptions.municipalities}
+          error={errorText}
+          strongLabel
+          key={field}
+        />
+      );
+    }
     case "numPersons": {
       /*
       const minValue =
@@ -81,24 +65,15 @@ export function ReservationFormField({ field, options: originalOptions, translat
             : 200
           : undefined;
       */
-
-      return (
-        <ControlledNumberInput<ReservationFormValueT>
-          name={field}
-          control={control}
-          label={label}
-          key={field}
-          errorText={errorText}
-          required
-          min={1} //minValue}
-          // max={maxValue}
-        />
-      );
+      return null;
     }
     case "description":
-      return <DescriptionField field={field} label={label} errorText={errorText} register={register} id={id} />;
+      return null;
     // TODO remove
     case "applyingForFreeOfCharge":
+      return null;
+    // TODO remove
+    case "freeOfChargeReason":
       return null;
     case "reserveeIsUnregisteredAssociation":
       if (watch("reserveeType") !== ReserveeType.Nonprofit) {
@@ -106,12 +81,9 @@ export function ReservationFormField({ field, options: originalOptions, translat
       }
       return (
         <StyledCheckboxWrapper key={field}>
-          <ControlledCheckbox {...checkParams} />
+          <ControlledCheckbox id={id} name={field} control={control} label={label} error={errorText} />
         </StyledCheckboxWrapper>
       );
-    // TODO remove
-    case "freeOfChargeReason":
-      return null;
     case "reserveeIdentifier": {
       const shouldHideOrganisationIdentifier =
         watch("reserveeType") === ReserveeType.Nonprofit && watch("reserveeIsUnregisteredAssociation") === true;
@@ -124,7 +96,7 @@ export function ReservationFormField({ field, options: originalOptions, translat
           key={field}
           type="text"
           errorText={errorText}
-          invalid={filterEmptyString(errorText) != null}
+          invalid={errorText != null}
           required={!shouldHideOrganisationIdentifier}
           maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
           disabled={shouldHideOrganisationIdentifier}
@@ -133,7 +105,20 @@ export function ReservationFormField({ field, options: originalOptions, translat
     }
     case "reserveeEmail":
       return <EmailInput label={label} field={field} register={register} errorText={errorText} id={id} />;
-    default: {
+    case "name":
+      return null;
+    case "ageGroup":
+      return null;
+    case "purpose":
+      return null;
+    case "pk":
+      return null;
+    case "reserveeType":
+      return null;
+    case "reserveePhone":
+    case "reserveeLastName":
+    case "reserveeFirstName":
+    case "reserveeOrganisationName": {
       return (
         <StyledTextInput
           label={label}
@@ -141,44 +126,14 @@ export function ReservationFormField({ field, options: originalOptions, translat
           {...register(field)}
           key={field}
           type="text"
-          errorText={filterEmptyString(errorText)}
-          invalid={filterEmptyString(errorText) != null}
+          errorText={errorText}
+          invalid={errorText != null}
           required
           maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
-          $isWide={field === "name"}
         />
       );
     }
   }
-}
-
-function DescriptionField({
-  id,
-  label,
-  field,
-  register,
-  errorText,
-}: {
-  id: string;
-  label: string;
-  field: keyof ReservationFormValueT;
-  register: UseFormRegister<ReservationFormValueT>;
-  errorText?: string;
-}): React.ReactElement {
-  return (
-    <StyledTextArea
-      label={label}
-      id={id}
-      {...register(field)}
-      key={field}
-      errorText={filterEmptyString(errorText)}
-      invalid={filterEmptyString(errorText) != null}
-      required
-      maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
-      $isWide
-      $height="119px"
-    />
-  );
 }
 
 function EmailInput({
@@ -202,8 +157,8 @@ function EmailInput({
       {...register(field)}
       key={field}
       type="text"
-      errorText={filterEmptyString(errorText)}
-      invalid={filterEmptyString(errorText) != null}
+      errorText={errorText}
+      invalid={errorText != null}
       required
       // email field is special and has one less character than the rest
       maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH - (isEmailField ? 1 : 0)}
