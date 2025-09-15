@@ -193,17 +193,13 @@ export const chunkArray = <T>(array: T[], size: number): T[][] => {
 // gather all used keys and make a string literal for them (typically it's just name)
 export function getTranslationSafe(parent: Record<string, unknown>, key: string, lang: "fi" | "sv" | "en"): string {
   const keyString = `${key}${capitalize(lang)}`;
-  if (parent && parent[keyString]) {
-    if (typeof parent[keyString] === "string") {
-      return String(parent[keyString]);
-    }
+  if (parent && parent[keyString] && typeof parent[keyString] === "string") {
+    return String(parent[keyString]);
   }
   const fallback = "fi";
   const fallbackKeyString = `${key}${capitalize(fallback)}`;
-  if (parent && parent[fallbackKeyString]) {
-    if (typeof parent[fallbackKeyString] === "string") {
-      return String(parent[fallbackKeyString]);
-    }
+  if (parent && parent[fallbackKeyString] && typeof parent[fallbackKeyString] === "string") {
+    return String(parent[fallbackKeyString]);
   }
 
   return "";

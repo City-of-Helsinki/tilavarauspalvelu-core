@@ -369,14 +369,12 @@ export const ApplicationPage3Schema = z
         });
       }
     }
-    if (val.applicantType === ReserveeType.Nonprofit) {
-      if (!val.municipality) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["municipality"],
-          message: "Required",
-        });
-      }
+    if (val.applicantType === ReserveeType.Nonprofit && !val.municipality) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["municipality"],
+        message: "Required",
+      });
     }
   });
 
