@@ -22,7 +22,7 @@ const config = {
   // in development and sample at a lower rate in production
   replaysSessionSampleRate: 0.1,
   // Define how likely Replay events are sampled when an error occurs.
-  replaysOnErrorSampleRate: 1.0,
+  replaysOnErrorSampleRate: 1,
 };
 
 Sentry.init({
