@@ -3,7 +3,7 @@ import React from "react";
 import { NumberInput } from "hds-react";
 import { type FieldValues, useController, UseControllerProps } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { toNumber } from "../../modules/helpers";
+import { filterEmpty, toNumber } from "../../modules/helpers";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   min?: number;
@@ -59,8 +59,8 @@ export function ControlledNumberInput<T extends FieldValues>({
       min={min}
       max={max}
       helperText={helperText}
-      errorText={errorText}
-      invalid={errorText != null}
+      errorText={filterEmpty(errorText) ?? undefined}
+      invalid={filterEmpty(errorText) != null}
       tooltipText={tooltipText}
       style={style}
       className={className}

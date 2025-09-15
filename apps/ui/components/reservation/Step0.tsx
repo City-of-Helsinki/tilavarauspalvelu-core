@@ -13,17 +13,14 @@ import InfoDialog from "../common/InfoDialog";
 import {
   type ReservationQuery,
   type ReservationUpdateMutationInput,
-  type MetadataSetsFragment,
-  ReservationFormType,
   ReserveeType,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
 import {
+  FormFieldArray,
   getFilteredGeneralFields,
   getFilteredReserveeFields,
-  getFormFields,
-  type FormFieldArray,
-  type ExtendedFormFieldArray,
+  getReservationFormGeneralFields,
 } from "common/src/reservation-form/util";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -166,7 +163,6 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
     }
   };
 
-  const generalFields = getFilteredGeneralFields(formType);
   const reserveeType = watch("reserveeType");
   const reserveeFields = getFilteredReserveeFields({
     formType,
@@ -179,28 +175,14 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
     ? getTranslationSafe(reservation.reservationUnit.pricingTerms, "text", lang)
     : "";
 
-  const enableSubvention = reservation.reservationUnit.canApplyFreeOfCharge;
-
   return (
     <NewReservationForm onSubmit={handleSubmit(onSubmit)} noValidate>
       <ReservationForm
-        reservationUnit={reservation.reservationUnit}
+        reservation={reservation}
         options={options}
-        generalFields={generalFields}
-        reservationApplicationFields={reserveeFields}
+        reserveeFields={reserveeFields}
         form={form}
-        data={{
-          enableSubvention,
-          termsForDiscount: (
-            <Trans
-              i18nKey="reservationApplication:label.common.applyingForFreeOfChargeButton"
-              defaults="Lue lisää <button>alennusperiaatteista</button>"
-              components={{
-                button: <LinkLikeButton type="button" onClick={() => setIsDialogOpen(true)} />,
-              }}
-            />
-          ),
-        }}
+        onSubventionButtonClick={() => setIsDialogOpen(true)}
       />
       <InfoDialog
         id="pricing-terms"
@@ -209,7 +191,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
       />
-      <FormErrors form={form} formType={formType} generalFields={generalFields} />
+      <FormErrors form={form} /*formType={formType}*/ reserveeType={reserveeType} />
       <ActionContainer>
         <Button
           type="submit"
@@ -237,33 +219,35 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
 
 function FormErrors<T extends FieldValues>({
   form,
-  formType,
-  generalFields,
+  reserveeType,
 }: {
   form: UseFormReturn<T>;
-  formType: ReservationFormType;
-  generalFields: FormFieldArray;
+  reserveeType: ReserveeType;
 }) {
   const { t } = useTranslation();
 
-  const { formState } = form;
-  const { errors } = formState;
+  const {
+    formState: { errors },
+  } = form;
   // TODO clean this up (wrap it into a function that clearly tells what it's doing)
+  /*
   const errorKeys =
     Object.keys(errors).sort((a, b) => {
       const fields = getFormFields(formType).map((x) => x.toString());
       // Why?
       return fields.indexOf(a) - fields.indexOf(b);
     }) ?? [];
+  */
 
+  // Doesn't require filtering since we can't get errors if the field doesn't exist
+  const generalFields = getReservationFormGeneralFields();
   // FIXME need to drill this if we need different translations
-  const reserveeType = ReserveeType.Individual;
 
-  if (errorKeys.length === 0) {
+  if (Object.keys(errors).length === 0) {
     return null;
   }
 
-  const errorList = errorKeys.map((key) => {
+  const errorList = Object.keys(errors).map((key) => {
     // TODO why?
     const parentTrKey =
       generalFields.find((x) => x === key) != null || key === "reserveeType"
@@ -288,26 +272,27 @@ const MandatoryFieldsInfoText = styled.p`
 `;
 
 interface ReservationFormProps<T extends FieldValues> {
-  reservationUnit: MetadataSetsFragment;
-  generalFields: FormFieldArray;
-  reservationApplicationFields: ExtendedFormFieldArray;
+  reservation: NonNullable<ReservationQuery["reservation"]>;
+  reserveeFields: FormFieldArray;
   options: Readonly<Omit<OptionsRecord, "municipality">>;
   form: UseFormReturn<T>;
-  data?: {
-    termsForDiscount?: JSX.Element | string;
-    enableSubvention?: boolean;
-  };
+  onSubventionButtonClick: () => void;
 }
 
 function ReservationForm<T extends FieldValues>({
-  reservationUnit,
-  generalFields,
-  reservationApplicationFields,
+  reservation,
+  reserveeFields,
   options,
-  data,
+  onSubventionButtonClick,
   form,
 }: ReservationFormProps<T>) {
   const { t } = useTranslation();
+
+  const { reservationUnit } = reservation;
+  const formType = reservationUnit.reservationForm;
+  const generalFields = getFilteredGeneralFields(formType);
+  const enableSubvention = reservation.reservationUnit.canApplyFreeOfCharge;
+
   return (
     <FormProvider {...form}>
       <MandatoryFieldsInfoText>{t("forms:mandatoryFieldsText")}</MandatoryFieldsInfoText>
@@ -315,14 +300,20 @@ function ReservationForm<T extends FieldValues>({
         fields={generalFields}
         options={options}
         reservationUnit={reservationUnit}
-        data={data}
+        data={{
+          enableSubvention,
+          termsForDiscount: (
+            <Trans
+              i18nKey="reservationApplication:label.common.applyingForFreeOfChargeButton"
+              defaults="Lue lisää <button>alennusperiaatteista</button>"
+              components={{
+                button: <LinkLikeButton type="button" onClick={onSubventionButtonClick} />,
+              }}
+            />
+          ),
+        }}
       />
-      <ReservationFormReserveeSection
-        fields={reservationApplicationFields}
-        options={options}
-        reservationUnit={reservationUnit}
-        data={data}
-      />
+      <ReservationFormReserveeSection fields={reserveeFields} options={options} reservationUnit={reservationUnit} />
     </FormProvider>
   );
 }

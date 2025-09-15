@@ -3,6 +3,7 @@ import { Checkbox } from "hds-react";
 import styled from "styled-components";
 import { fontRegular } from "../../styled";
 import { Control, FieldValues, Path, PathValue, useController, UseControllerProps } from "react-hook-form";
+import { filterEmpty } from "../../modules/helpers";
 
 const StyledCheckbox = styled(Checkbox)`
   && {
@@ -61,7 +62,7 @@ export function ControlledCheckbox<T extends FieldValues>({
       checked={inverted ? !value : value}
       defaultChecked={typeof defaultValue === "boolean" ? defaultValue : undefined}
       label={label}
-      errorText={error}
+      errorText={filterEmpty(error) ?? undefined}
       tooltipText={tooltip}
     />
   );

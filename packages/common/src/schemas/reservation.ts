@@ -162,11 +162,11 @@ export type ReservationFormMeta = z.infer<typeof ReservationFormMetaSchema>;
 const ContactInfoFormSchema = z.object({
   // TODO could use transform / preprocessor to remove / flag empty strings
   // the problem with setting min is that we can't disable it for admin
-  reserveeFirstName: z.string().min(2),
-  reserveeLastName: z.string().min(2),
+  reserveeFirstName: z.string().min(2, "Required"),
+  reserveeLastName: z.string().min(2, "Required"),
   // TODO check for valid characters (not regex, simpler)
-  reserveePhone: z.string().min(3),
-  reserveeEmail: z.string().email(),
+  reserveePhone: z.string().min(3, "Required"),
+  reserveeEmail: z.string().min(1, "Required").email(),
   // Optional for all forms based on the reservationUnit settings (could be added dynamically)
   applyingForFreeOfCharge: z.boolean().optional(),
   freeOfChargeReason: z.string().optional(),
@@ -175,8 +175,8 @@ const ContactInfoFormSchema = z.object({
 const ReserveeInfoFormSchema = z
   .object({
     reserveeType: z.enum([ReserveeType.Individual, ReserveeType.Nonprofit, ReserveeType.Company]),
-    name: z.string().min(3),
-    description: z.string().min(3),
+    name: z.string().min(3, "Required"),
+    description: z.string().min(3, "Required"),
     municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]),
     // TODO add max to this (or no?), no backend error for it but it should be clamped
     numPersons: z.number().min(1),
@@ -249,7 +249,7 @@ export function getReservationFormSchema(formType: ReservationFormType) {
     .refine(
       (val) =>
         val.reserveeType === ReserveeType.Individual ||
-        val.reserveeIsUnregisteredAssociation ||
+        (val.reserveeIsUnregisteredAssociation && val.reserveeType === ReserveeType.Nonprofit) ||
         val.reserveeIdentifier.length > 0,
       {
         path: ["reserveeIdentifier"],

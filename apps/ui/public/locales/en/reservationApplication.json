@@ -3,11 +3,12 @@
   "titleSent": "Your booking is now being processed",
   "applicationInfo": "Booking details",
   "summaryIngress": "Your booking is being processed. Please see the booking summary.",
-  "reserveeTypePrefix": "I am creating the application...",
+  "reserveeTypePrefix": "I am making the booking...",
+  "reserveeType": "Reservee type",
   "reserveeTypes": {
     "labels": {
       "NONPROFIT": "On behalf of an association or community",
-      "COMPANY": "On behalf of the company",
+      "COMPANY": "On behalf of a company",
       "INDIVIDUAL": "As a private person"
     }
   },

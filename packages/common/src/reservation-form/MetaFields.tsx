@@ -3,41 +3,40 @@ import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
-import {
-  type MetadataSetsFragment,
-  ReservationFormType,
-  type ReservationUnitNode,
-  ReserveeType,
-} from "../../gql/gql-types";
+import { type MetadataSetsFragment, type ReservationUnitNode, ReserveeType } from "../../gql/gql-types";
 import { ReservationFormField } from "./ReservationFormField";
 import { AutoGrid, H4, H5 } from "../styled";
 import type { OptionsRecord } from "../../types/common";
-import { type ExtendedFormFieldArray, extendMetaFieldOptions, formContainsField } from "./util";
+import { ReservationSubventionSection } from "./ReservationSubventionSection";
+import {
+  constructReservationFieldId,
+  constructReservationFieldLabel,
+  type FormFieldArray,
+  extendMetaFieldOptions,
+  formContainsField,
+  RESERVATION_FIELD_MAX_TEXT_LENGTH,
+  translateReserveeFormError,
+} from "./util";
 import { CustomerTypeSelector } from "./CustomerTypeSelector";
 import { type ReservationFormValueT } from "../schemas";
+import { ControlledCheckbox, ControlledNumberInput, ControlledSelect } from "../components/form";
+import { StyledCheckboxWrapper, StyledTextArea, StyledTextInput } from "./styled";
 
-interface CommonProps {
+interface CommonWithFields {
+  fields: FormFieldArray;
   options: Readonly<Omit<OptionsRecord, "municipality">>;
-  data?: {
-    termsForDiscount?: JSX.Element | string;
-    enableSubvention?: boolean;
-  };
-}
-
-interface CommonWithFields extends CommonProps {
-  fields: ExtendedFormFieldArray;
-}
-
-interface ReservationFormFieldsProps extends CommonWithFields {
-  headingKey?: ReserveeType | "COMMON";
-  hasSubheading?: boolean;
-  params?: { numPersons: { min?: number; max?: number } };
-  formType: ReservationFormType;
-  section: "general" | "reservee";
 }
 
 interface ReservationFormGeneralSectionProps extends CommonWithFields {
   reservationUnit: MetadataSetsFragment;
+  data?:
+    | {
+        enableSubvention: false;
+      }
+    | {
+        termsForDiscount: JSX.Element | string;
+        enableSubvention: true;
+      };
 }
 
 interface ReservationFormReserveeSectionProps extends CommonWithFields {
@@ -57,139 +56,105 @@ const Subheading = styled(H4).attrs({ as: "h2" })`
   margin: 0;
 `;
 
-// TODO this is used in a silly way, it should be before we iterate over the form fields
-// the heading label should be picked based on possible fields and selected type, not position etc.
-function SubheadingByType({
-  reserveeType,
-  index,
-  field,
-}: {
-  reserveeType: ReserveeType;
-  index: number;
-  field: string;
-}): React.ReactElement | null {
-  const { t } = useTranslation();
-
-  if (reserveeType === ReserveeType.Individual) {
-    return null;
-  }
-
-  if (reserveeType === ReserveeType.Nonprofit) {
-    const headingForNonProfit = index === 0;
-
-    if (headingForNonProfit) {
-      return <GroupHeading>{t("reservationApplication:label.headings.nonprofitInfo")}</GroupHeading>;
-    }
-  }
-  if (reserveeType === ReserveeType.Company) {
-    const headingForCompanyInfo = index === 0;
-
-    if (headingForCompanyInfo) {
-      return <GroupHeading>{t("reservationApplication:label.headings.companyInfo")}</GroupHeading>;
-    }
-  }
-
-  // TODO in what case does the above checks fall to here?
-  if (field === "reserveeFirstName") {
-    return <GroupHeading>{t("reservationApplication:label.headings.contactInfo")}</GroupHeading>;
-  }
-  return null;
-}
-
-function ReservationFormFields({
-  fields,
-  options,
-  // subheading is needed because application form uses it and requires index / field data to render it
-  headingKey,
-  hasSubheading,
-  params,
-  data,
-  section,
-  // TODO need to add usage for this to get required field (unless we hard code it in the Form itself?)
-  formType: _,
-}: ReservationFormFieldsProps) {
-  const { t } = useTranslation();
-
-  const fieldsExtended = fields.map((field) => ({
-    field,
-    // TODO should have a separate function to check against formType
-    // there are very few fields that are required and some have interlinks
-    // required here only matters for the label rendering (we should check against a schema for validation)
-    required: true,
-  }));
-
-  if (section === "general" && data?.enableSubvention) {
-    fieldsExtended.push(
-      {
-        field: "applyingForFreeOfCharge",
-        required: false,
-      },
-      {
-        field: "freeOfChargeReason",
-        required: true,
-      }
-    );
-  }
-
-  // TODO the subheading logic is weird / inefficient
-  // instead of adding it to sections (or dividing the fields array into sections with headings)
-  // we check for index === 0 inside a loop invariant
-  return (
-    <>
-      {fieldsExtended.map(({ field, required }, index) => (
-        <Fragment key={`key-${field}-container`}>
-          {hasSubheading && headingKey != null && headingKey !== "COMMON" && (
-            <SubheadingByType reserveeType={headingKey} index={index} field={field} key={`key-${field}-subheading`} />
-          )}
-          <ReservationFormField
-            key={`key-${field}`}
-            field={field}
-            options={extendMetaFieldOptions(options, t)}
-            required={required}
-            translationKey={headingKey}
-            params={params}
-            data={data}
-          />
-        </Fragment>
-      ))}
-    </>
-  );
-}
-
-// TODO reduce prop drilling / remove unused props
 export function ReservationFormGeneralSection({
   fields,
-  reservationUnit,
-  options,
+  options: originalOptions,
   data,
 }: ReservationFormGeneralSectionProps) {
   const { t } = useTranslation();
+  const form = useFormContext<ReservationFormValueT>();
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = form;
 
   if (fields.length === 0) {
     return null;
   }
+
+  const createLabel = (field: keyof ReservationFormValueT): string => {
+    return constructReservationFieldLabel(t, "COMMON", field);
+  };
+
+  const getFieldError = (field: keyof ReservationFormValueT): string | undefined => {
+    return translateReserveeFormError(t, createLabel(field), errors[field]);
+  };
+
+  const options = extendMetaFieldOptions(originalOptions, t);
+
+  const hasPurpose = fields.find((x) => x === "purpose") != null;
+  const hasAgeGroup = fields.find((x) => x === "ageGroup") != null;
+  const hasName = fields.find((x) => x === "name") != null;
+  const hasDescription = fields.find((x) => x === "description") != null;
+  const hasNumPersons = fields.find((x) => x === "numPersons") != null;
+
   return (
     <AutoGrid>
       <Subheading>{t("reservationCalendar:reservationInfo")}</Subheading>
-      <ReservationFormFields
-        options={extendMetaFieldOptions(options, t)}
-        fields={fields}
-        formType={reservationUnit.reservationForm}
-        headingKey="COMMON"
-        section="general"
-        params={{
-          numPersons: {
-            min: !reservationUnit.minPersons || reservationUnit.minPersons === 0 ? 1 : reservationUnit.minPersons,
-            max:
-              reservationUnit.maxPersons != null &&
-              !Number.isNaN(reservationUnit.maxPersons) &&
-              reservationUnit.maxPersons > 0
-                ? reservationUnit.maxPersons
-                : undefined,
-          },
-        }}
-        data={data}
-      />
+      {hasName && (
+        <StyledTextInput
+          id={constructReservationFieldId("name")}
+          label={createLabel("name")}
+          {...register("name")}
+          type="text"
+          errorText={getFieldError("name")}
+          invalid={getFieldError("name") != null}
+          required
+          maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
+          $isWide
+        />
+      )}
+      {hasPurpose && (
+        <ControlledSelect
+          id={constructReservationFieldId("purpose")}
+          name="purpose"
+          label={createLabel("purpose")}
+          control={control}
+          required
+          options={options.purpose}
+          error={getFieldError("purpose")}
+          style={{ gridColumn: "1 / -1" }}
+          strongLabel
+        />
+      )}
+      {hasNumPersons && (
+        <ControlledNumberInput<ReservationFormValueT>
+          name="numPersons"
+          control={control}
+          label={createLabel("numPersons")}
+          errorText={getFieldError("numPersons")}
+          required
+          min={1} //minValue}
+          // max={maxValue}
+        />
+      )}
+      {hasAgeGroup && (
+        <ControlledSelect
+          id={constructReservationFieldId("ageGroup")}
+          name="ageGroup"
+          label={createLabel("ageGroup")}
+          control={control}
+          required
+          options={options.ageGroup}
+          error={getFieldError("ageGroup")}
+          strongLabel
+        />
+      )}
+      {hasDescription && (
+        <StyledTextArea
+          id={constructReservationFieldId("description")}
+          label={createLabel("description")}
+          {...register("description")}
+          errorText={getFieldError("description")}
+          invalid={getFieldError("description") != null}
+          required
+          maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
+          $isWide
+          $height="119px"
+        />
+      )}
+      {data?.enableSubvention && <ReservationSubventionSection termsForDiscount={data.termsForDiscount} form={form} />}
     </AutoGrid>
   );
 }
@@ -198,8 +163,7 @@ export function ReservationFormGeneralSection({
 export function ReservationFormReserveeSection({
   fields,
   reservationUnit,
-  options,
-  data,
+  options: originalOptions,
   style,
   className,
 }: ReservationFormReserveeSectionProps) {
@@ -214,23 +178,85 @@ export function ReservationFormReserveeSection({
 
   const reserveeType = watch("reserveeType");
 
-  // TODO fix the key so we don't need toLowerCase
-  const errorTrKey = errors.reserveeType?.message ? `forms:${errors.reserveeType.message.toLowerCase()}` : undefined;
-  const error = errorTrKey ? t(errorTrKey) : undefined;
+  const reserveeTypeErrorTr = errors.reserveeType?.message ? `forms:${errors.reserveeType.message}` : undefined;
+  const reserveeTypeError = reserveeTypeErrorTr
+    ? t(reserveeTypeErrorTr, { fieldName: t("reservationApplication:reserveeType") })
+    : undefined;
+
+  const createLabel = (field: keyof ReservationFormValueT): string => {
+    return constructReservationFieldLabel(t, reserveeType ?? ReserveeType.Individual, field);
+  };
+
+  const getFieldError = (field: keyof ReservationFormValueT): string | undefined => {
+    return translateReserveeFormError(t, createLabel(field), errors[field]);
+  };
+
+  const options = extendMetaFieldOptions(originalOptions, t);
+
+  const organisationFields = fields.filter((x) => x === "reserveeOrganisationName" || x === "reserveeIdentifier");
+  const otherFields = fields.filter((x) => organisationFields.find((b) => b === x) == null);
 
   return (
     <AutoGrid data-testid="reservation__form--reservee-info" className={className} style={style}>
       <Subheading>{t("reservationCalendar:reserverInfo")}</Subheading>
-      {isTypeSelectable && <CustomerTypeSelector name="reserveeType" control={control} required error={error} />}
-      <ReservationFormFields
-        fields={fields}
-        formType={reservationUnit.reservationForm}
-        options={extendMetaFieldOptions(options, t)}
-        hasSubheading
-        headingKey={reserveeType}
-        data={data}
-        section="reservee"
-      />
+      {isTypeSelectable && (
+        <CustomerTypeSelector name="reserveeType" control={control} required error={reserveeTypeError} />
+      )}
+      {reserveeType === ReserveeType.Nonprofit ? (
+        <GroupHeading>{t("reservationApplication:label.headings.nonprofitInfo")}</GroupHeading>
+      ) : reserveeType === ReserveeType.Company ? (
+        <GroupHeading>{t("reservationApplication:label.headings.companyInfo")}</GroupHeading>
+      ) : null}
+      {/* TODO should have the organisation name on the first line */}
+      {/* TODO propably best to separate the organisation part of the form to it's own section */}
+      {reserveeType != null && reserveeType !== ReserveeType.Individual ? (
+        <>
+          <ControlledSelect
+            name="municipality"
+            id={constructReservationFieldId("municipality")}
+            label={createLabel("municipality")}
+            error={getFieldError("municipality")}
+            control={control}
+            required
+            options={options.municipality}
+            strongLabel
+          />
+          {organisationFields.map((field) => (
+            <Fragment key={`key-${field}-container`}>
+              <ReservationFormField field={field} reserveeType={reserveeType} />
+            </Fragment>
+          ))}
+          {reserveeType === ReserveeType.Nonprofit && (
+            <StyledCheckboxWrapper>
+              <ControlledCheckbox
+                name="reserveeIsUnregisteredAssociation"
+                id={constructReservationFieldId("reserveeIsUnregisteredAssociation")}
+                control={control}
+                label={createLabel("reserveeIsUnregisteredAssociation")}
+                error={getFieldError("reserveeIsUnregisteredAssociation")}
+              />
+            </StyledCheckboxWrapper>
+          )}
+          <GroupHeading>{t("reservationApplication:label.headings.contactInfo")}</GroupHeading>
+        </>
+      ) : null}
+      {otherFields.map((field) => (
+        <Fragment key={`key-${field}-container`}>
+          <ReservationFormField field={field} reserveeType={reserveeType} />
+        </Fragment>
+      ))}
+      {reserveeType === ReserveeType.Individual && (
+        <ControlledSelect
+          name="municipality"
+          id={constructReservationFieldId("municipality")}
+          label={createLabel("municipality")}
+          error={getFieldError("municipality")}
+          control={control}
+          required
+          options={options.municipality}
+          strongLabel
+        />
+      )}
     </AutoGrid>
   );
 }
