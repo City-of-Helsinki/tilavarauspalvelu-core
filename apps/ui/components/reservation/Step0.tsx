@@ -2,7 +2,7 @@
  *  First part of the Reservation process form
  *  This component needs to be wrapped inside a Form context
  */
-import { Button, ButtonVariant, IconArrowRight, IconCross, LoadingSpinner, Notification } from "hds-react";
+import { Button, ButtonVariant, IconArrowRight, IconCross, LoadingSpinner } from "hds-react";
 import { useForm, FormProvider, type UseFormReturn, FieldValues } from "react-hook-form";
 import React, { useState } from "react";
 import { Trans, useTranslation } from "next-i18next";
@@ -36,6 +36,7 @@ import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
 import { getReservationInProgressPath, getReservationUnitPath } from "@/modules/urls";
 import { gql } from "@apollo/client";
+import { ErrorListBox } from "common/src/components/ErrorListBox";
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
@@ -234,24 +235,6 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
   );
 }
 
-const ErrorBox = styled(Notification)`
-  margin: var(--spacing-m) 0;
-`;
-
-const ErrorList = styled.ul`
-  margin-top: var(--spacing-2-xs);
-`;
-
-const ErrorAnchor = styled.a`
-  &,
-  &:visited {
-    color: var(--color-black) !important;
-    text-decoration: underline;
-    line-height: var(--lineheight-xl);
-  }
-`;
-
-// TODO this should be a general component -> or at least the error display part should be
 function FormErrors<T extends FieldValues>({
   form,
   formType,
@@ -280,44 +263,20 @@ function FormErrors<T extends FieldValues>({
     return null;
   }
 
-  return (
-    <ErrorBox label={t("forms:heading.errorsTitle")} type="error" position="inline">
-      <div>{t("forms:heading.errorsSubtitle")}</div>
-      <ErrorList>
-        {errorKeys.map((key) => {
-          // TODO why?
-          const parentTrKey =
-            generalFields.find((x) => x === key) != null || key === "reserveeType"
-              ? "common"
-              : reserveeType?.toLocaleLowerCase() || "individual";
-          const label = t(`reservationApplication:label.${parentTrKey}.${key}`);
-          return (
-            <li key={key}>
-              <ErrorAnchor
-                href="#!"
-                onClick={(e) => {
-                  // TODO this is awful -> move to handler func and refactor
-                  e.preventDefault();
-                  const element = document.getElementById(key) || document.getElementById(`${key}-label`);
-                  const top = element?.getBoundingClientRect()?.y || 0;
-                  window.scroll({
-                    top: window.scrollY + top - 28,
-                    left: 0,
-                    behavior: "smooth",
-                  });
-                  setTimeout(() => {
-                    element?.focus();
-                  }, 500);
-                }}
-              >
-                {label}
-              </ErrorAnchor>
-            </li>
-          );
-        })}
-      </ErrorList>
-    </ErrorBox>
-  );
+  const errorList = errorKeys.map((key) => {
+    // TODO why?
+    const parentTrKey =
+      generalFields.find((x) => x === key) != null || key === "reserveeType"
+        ? "common"
+        : reserveeType?.toLocaleLowerCase() || "individual";
+    const label = t(`reservationApplication:label.${parentTrKey}.${key}`);
+    return {
+      key,
+      label,
+    };
+  });
+
+  return <ErrorListBox errors={errorList} label={t("forms:heading.errorsTitle")} />;
 }
 
 const MandatoryFieldsInfoText = styled.p`
@@ -363,8 +322,6 @@ function ReservationForm<T extends FieldValues>({
         options={options}
         reservationUnit={reservationUnit}
         data={data}
-        // inconsistency between admin and customer ui (could handle by refactoring customer to have gap on the parent)
-        style={{ marginTop: "var(--spacing-xl)" }}
       />
     </FormProvider>
   );
