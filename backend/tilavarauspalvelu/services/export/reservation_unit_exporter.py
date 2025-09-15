@@ -237,6 +237,7 @@ class ReservationUnitExporter(BaseCSVExporter):
                 equipments="Equipments",
                 state="State",
                 reservation_state="Reservation state",
+                updated_at="Updated at",
             ),
         ]
 
