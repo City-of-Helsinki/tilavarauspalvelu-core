@@ -13,7 +13,7 @@ _TModel = TypeVar("_TModel", bound=Model)
 _TMPTTModel = TypeVar("_TMPTTModel", bound=MPTTModel)
 _TQuerySet = TypeVar("_TQuerySet", bound=QuerySet)
 
-class ModelQuerySet(Generic[_TModel], QuerySet[_TModel]):  # noqa: UP046
+class ModelQuerySet(QuerySet[_TModel], Generic[_TModel]):  # noqa: UP046
     model: type[_TModel]
     query: Query
     _hints: dict[str, Any]
@@ -102,7 +102,7 @@ class ModelQuerySet(Generic[_TModel], QuerySet[_TModel]):  # noqa: UP046
     def only(self, *fields: Any) -> Self: ...
     def using(self, alias: str | None) -> Self: ...
 
-class ModelManager(Generic[_TModel, _TQuerySet], BaseManager[_TModel]):  # noqa: UP046
+class ModelManager(BaseManager[_TModel], Generic[_TModel, _TQuerySet]):  # noqa: UP046
     model: type[_TModel]
     name: str
     creation_counter: int
@@ -237,15 +237,14 @@ class ManyToManyRelatedManager(ModelManager[_TModel, _TQuerySet]):
 
 type TreePos = Literal["first-child", "last-child", "left", "right"]
 
-class ModelTreeQuerySet(Generic[_TMPTTModel], ModelQuerySet[_TMPTTModel], TreeQuerySet[_TMPTTModel]):  # noqa: UP046
+class ModelTreeQuerySet(ModelQuerySet[_TMPTTModel], TreeQuerySet[_TMPTTModel], Generic[_TMPTTModel]):  # noqa: UP046
     def get_descendants(self, *args: Any, **kwargs: Any) -> Self: ...
     def get_ancestors(self, *args: Any, **kwargs: Any) -> Self: ...
     def get_cached_trees(self) -> list[_TMPTTModel]: ...
 
-class ModelTreeManager(
-    Generic[_TMPTTModel, _TQuerySet],  # noqa: UP046
-    ModelManager[_TMPTTModel, _TQuerySet],
-    TreeManager[_TMPTTModel],
+class ModelTreeManager[TMPTTModel: MPTTModel, TQuerySet: QuerySet](
+    ModelManager[TMPTTModel, TQuerySet],
+    TreeManager[TMPTTModel],
 ):
     def get_queryset_descendants(self, queryset: _TQuerySet, include_self: bool = False) -> _TQuerySet: ...
     def get_queryset_ancestors(self, queryset: _TQuerySet, include_self: bool = False) -> _TQuerySet: ...
