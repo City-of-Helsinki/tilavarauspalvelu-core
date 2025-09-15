@@ -26,6 +26,9 @@ class Command(BaseCommand):
         filepath = settings.BASE_DIR.parent / "tilavaraus.graphql"
         new_schema = undine_settings.SDL_PRINTER.print_schema(schema)
 
+        # Remove trailing whitespace for linting, add trailing newline
+        new_schema = "\n".join(line.rstrip() for line in new_schema.splitlines()) + "\n"
+
         old_schema = Path(filepath).read_text(encoding="utf-8")
 
         if os.getenv("CI") == "true" and old_schema != new_schema:
