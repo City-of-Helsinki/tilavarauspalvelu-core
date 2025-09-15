@@ -224,7 +224,7 @@ export function getRelatedTimeSlots(
   // run reduce to get contiguous time slots (and remove extras)
   // we should end up with 7 arrays (one for each day), each having a list of time slots (beginTime, endTime)
   // then we can use that data to draw the calendar
-  const dayArray = Array.from(Array(7)).map(() => []);
+  const dayArray = [...Array(7)].map(() => []);
   const relatedSpacesTimeSlotsByDay = relatedSpacesTimeSlots.reduce<RelatedSlot[][]>((acc, ts) => {
     const day = convertWeekday(ts.dayOfTheWeek);
     const arr = acc[day];

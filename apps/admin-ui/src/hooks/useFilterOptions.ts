@@ -76,17 +76,18 @@ export function getFilterOptions(
     label: t(`applicationSection:priority.${n}`),
   }));
 
-  const orderOptions = Array.from(Array(10).keys())
-    .map((n) => ({
-      value: n,
-      label: `${n + 1}. ${t("filters:reservationUnitApplication")}`,
-    }))
-    .concat([
-      {
-        value: 11,
-        label: t("filters:reservationUnitApplicationOthers"),
-      },
-    ]);
+  const orderOptions = [
+    ...Array(10)
+      .keys()
+      .map((n) => ({
+        value: n,
+        label: `${n + 1}. ${t("filters:reservationUnitApplication")}`,
+      })),
+    {
+      value: 11,
+      label: t("filters:reservationUnitApplicationOthers"),
+    },
+  ];
 
   const recurring = [
     { value: "only", label: t("filters:label.onlyRecurring") },

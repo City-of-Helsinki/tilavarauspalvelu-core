@@ -27,7 +27,7 @@ describe("ReservationsList", () => {
 
   test("Render reservations list", async () => {
     const N_DAYS = 5;
-    const items = Array.from(Array(N_DAYS)).map((_, i) => ({
+    const items = [...Array(N_DAYS)].map((_, i) => ({
       date: addDays(new Date(), i),
       startTime: "19:00",
       endTime: "20:00",

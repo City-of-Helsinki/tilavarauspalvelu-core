@@ -394,7 +394,7 @@ export function isReservationUnitPaid(pricings: Readonly<PricingFieldsFragment[]
   const d =
     date == null
       ? active
-      : active.concat(future).filter((p) => {
+      : [...active, ...future].filter((p) => {
           const start = new Date(p.begins);
           return start <= date;
         });
