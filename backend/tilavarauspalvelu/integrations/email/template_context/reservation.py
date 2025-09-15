@@ -207,6 +207,10 @@ def get_context_for_reservation_cancelled(
         data["cancel_reason"] = str(cancel_reason.label)
         data["instructions_cancelled"] = reservation.actions.get_instructions(kind="cancelled", language=language)
 
+        data["handled_payment_due_by"] = None
+        if hasattr(reservation, "payment_order"):
+            data["handled_payment_due_by"] = reservation.payment_order.handled_payment_due_by
+
         data |= params_for_base_info(reservation=reservation, language=language)
         data |= params_for_price_info(reservation=reservation)
 
@@ -215,6 +219,12 @@ def get_context_for_reservation_cancelled(
         "cancel_reason": data["cancel_reason"],
         "instructions_cancelled_html": data["instructions_cancelled"],
         "instructions_cancelled_text": convert_html_to_text(data["instructions_cancelled"]),
+        "handled_payment_due_by_label": pgettext("Email", "Deadline"),
+        "handled_payment_due_by": (
+            local_datetime_string(data["handled_payment_due_by"])
+            if data["handled_payment_due_by"] is not None
+            else None
+        ),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],

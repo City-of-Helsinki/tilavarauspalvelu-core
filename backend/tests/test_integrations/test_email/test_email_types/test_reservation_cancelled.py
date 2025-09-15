@@ -16,8 +16,9 @@ from tilavarauspalvelu.integrations.email.rendering import render_html, render_t
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_cancelled
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from utils.date_utils import local_datetime
 
-from tests.factories import ReservationFactory
+from tests.factories import PaymentOrderFactory, ReservationFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
@@ -51,6 +52,8 @@ LANGUAGE_CONTEXT = {
     "en": {
         "title": "Your booking has been cancelled",
         "cancel_reason": "My plans have changed",
+        "handled_payment_due_by": "1.1.2024 11:00",
+        "handled_payment_due_by_label": "Deadline",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
@@ -59,6 +62,8 @@ LANGUAGE_CONTEXT = {
     "fi": {
         "title": "Varauksesi on peruttu",
         "cancel_reason": "Suunnitelmiini tuli muutos",
+        "handled_payment_due_by": "1.1.2024 11:00",
+        "handled_payment_due_by_label": "Määräaika",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
         **RESERVATION_PRICE_INFO_CONTEXT_FI,
@@ -67,6 +72,8 @@ LANGUAGE_CONTEXT = {
     "sv": {
         "title": "Din bokning har avbokats",
         "cancel_reason": "Mina planer har ändrats",
+        "handled_payment_due_by": "1.1.2024 11:00",
+        "handled_payment_due_by_label": "Tidsfrist",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **RESERVATION_PRICE_INFO_CONTEXT_SV,
@@ -106,6 +113,32 @@ def test_reservation_cancelled__get_context__instance(email_reservation):
     expected = {
         **LANGUAGE_CONTEXT["en"],
         "reservation_id": f"{email_reservation.id}",
+        "handled_payment_due_by": None,
+    }
+
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_cancelled(reservation=email_reservation, language="en")
+
+    assert context == expected
+
+
+@pytest.mark.django_db
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_reservation_cancelled__get_context__instance__handled_payment(email_reservation):
+    email_reservation.cancel_reason = ReservationCancelReasonChoice.NOT_PAID
+    email_reservation.save()
+
+    PaymentOrderFactory.create(
+        reservation=email_reservation,
+        handled_payment_due_by=local_datetime(2024, 1, 1, 11, 0),
+    )
+
+    expected = {
+        **LANGUAGE_CONTEXT["en"],
+        "reservation_id": f"{email_reservation.id}",
+        "cancel_reason": (
+            "The booking was not paid for or invoice was not selected as the payment method by the deadline."
+        ),
     }
 
     with TranslationsFromPOFiles():
@@ -120,6 +153,7 @@ def test_reservation_cancelled__get_context__instance(email_reservation):
 @freeze_time("2024-01-01 12:00:00+02:00")
 def test_reservation_cancelled__render__text():
     context = get_mock_data(email_type=EmailType.RESERVATION_CANCELLED, language="en")
+    context["handled_payment_due_by"] = None
     text_content = render_text(email_type=EmailType.RESERVATION_CANCELLED, context=context)
 
     assert text_content == cleandoc(
@@ -147,12 +181,49 @@ def test_reservation_cancelled__render__text():
     )
 
 
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_reservation_cancelled__render__text__handled_payment():
+    context = get_mock_data(email_type=EmailType.RESERVATION_CANCELLED, language="en")
+    context["handled_payment_due_by"] = "1.1.2024 11:00"
+    context["cancel_reason"] = str(ReservationCancelReasonChoice.NOT_PAID.label)
+
+    text_content = render_text(email_type=EmailType.RESERVATION_CANCELLED, context=context)
+
+    reason = "The booking was not paid for or invoice was not selected as the payment method by the deadline."
+
+    assert text_content == cleandoc(
+        f"""
+        Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
+
+        Your booking has been cancelled.
+        Your reason for cancellation: {reason}
+        Deadline: 1.1.2024 11:00
+
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
+
+        From: 1.1.2024 at 12:00
+        To: 1.1.2024 at 15:00
+
+        Price: 12,30 € (incl. VAT 25.5 %)
+        Booking number: 1234
+
+        Additional information about cancellation:
+        [PERUUTETUN VARAUKSEN OHJEET]
+
+        {EMAIL_CLOSING_TEXT_EN}
+        """
+    )
+
+
 # RENDER HTML ##########################################################################################################
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
 def test_reservation_cancelled__render__html():
     context = get_mock_data(email_type=EmailType.RESERVATION_CANCELLED, language="en")
+    context["handled_payment_due_by"] = None
 
     html_content = render_html(email_type=EmailType.RESERVATION_CANCELLED, context=context)
     text_content = html_email_to_text(html_content)
@@ -166,6 +237,44 @@ def test_reservation_cancelled__render__html():
         Your booking has been cancelled.
 
         Your reason for cancellation: My plans have changed
+        **[VARAUSYKSIKÖN NIMI]**
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
+        From: **1.1.2024** at **12:00**
+        To: **1.1.2024** at **15:00**
+        Price: **12,30 €** (incl. VAT 25.5 %)
+        Booking number: 1234
+
+        ## Additional information about cancellation
+
+        [PERUUTETUN VARAUKSEN OHJEET]
+
+        {EMAIL_CLOSING_HTML_EN}
+        """
+    )
+
+
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_reservation_cancelled__render__html__handled_payment():
+    context = get_mock_data(email_type=EmailType.RESERVATION_CANCELLED, language="en")
+    context["handled_payment_due_by"] = "1.1.2024 11:00"
+    context["cancel_reason"] = str(ReservationCancelReasonChoice.NOT_PAID.label)
+
+    html_content = render_html(email_type=EmailType.RESERVATION_CANCELLED, context=context)
+    text_content = html_email_to_text(html_content)
+
+    reason = "The booking was not paid for or invoice was not selected as the payment method by the deadline."
+
+    assert text_content == cleandoc(
+        f"""
+        {EMAIL_LOGO_HTML}
+
+        **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
+
+        Your booking has been cancelled.
+
+        Your reason for cancellation: {reason}
+        Deadline: 1.1.2024 11:00
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
         [TOIMIPISTEEN OSOITE], [KAUPUNKI]

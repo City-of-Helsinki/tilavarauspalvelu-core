@@ -174,6 +174,7 @@ class ReservationCancelledContext(TypedDict, total=False):
     tax_percentage: Decimal
     reservation_id: int
     instructions_cancelled: str
+    handled_payment_due_by: datetime.datetime | None
 
 
 class ReservationConfirmedContext(TypedDict, total=False):
