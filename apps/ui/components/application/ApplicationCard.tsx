@@ -78,7 +78,7 @@ export function ApplicationCard({ application, actionCallback }: Props): JSX.Ele
       await mutation();
       setIsWaitingForDelete(false);
       actionCallback("cancel");
-    } catch (_) {
+    } catch {
       actionCallback("error");
     }
   };

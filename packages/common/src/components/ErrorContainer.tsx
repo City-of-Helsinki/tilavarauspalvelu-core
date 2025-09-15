@@ -74,7 +74,7 @@ function constructFeedbackUrl(i18n: { language: string }, feedbackUrl?: string |
     const url = new URL(feedbackUrl);
     url.searchParams.set("lang", i18n.language);
     return url.toString();
-  } catch (_) {
+  } catch {
     return null;
   }
 }

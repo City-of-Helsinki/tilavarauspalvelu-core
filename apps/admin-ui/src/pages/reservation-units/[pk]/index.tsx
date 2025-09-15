@@ -102,7 +102,7 @@ function useImageMutations() {
         .filter((image) => image.pk && image.pk > 0)
         .map((image) => delImage({ variables: { pk: image.pk ?? 0 } }));
       await Promise.all(deletePromises);
-    } catch (_) {
+    } catch {
       return false;
     }
 
@@ -121,7 +121,7 @@ function useImageMutations() {
         );
 
       await Promise.all(addPromises);
-    } catch (_) {
+    } catch {
       return false;
     }
 
@@ -141,7 +141,7 @@ function useImageMutations() {
         });
 
       await Promise.all(changeTypePromises);
-    } catch (_) {
+    } catch {
       return false;
     }
 

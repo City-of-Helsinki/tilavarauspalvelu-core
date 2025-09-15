@@ -29,7 +29,7 @@ export function constructDateTimeUnsafe(date: string, time: string): Date {
 export function constructDateTimeSafe(date: string, time: string): Date | null {
   try {
     return constructDateTimeUnsafe(date, time);
-  } catch (_) {
+  } catch {
     return null;
   }
 }
@@ -45,7 +45,7 @@ export function fromAPIDateTime(d: Maybe<string> | undefined, time: Maybe<string
       return null;
     }
     return set(d, duration);
-  } catch (_) {
+  } catch {
     return null;
   }
 }
@@ -53,7 +53,7 @@ export function fromAPIDateTime(d: Maybe<string> | undefined, time: Maybe<string
 export function fromUIDateTime(date: string, time: string): Date | null {
   try {
     return fromUIDateTimeUnsafe(date, time);
-  } catch (_) {
+  } catch {
     return null;
   }
 }
