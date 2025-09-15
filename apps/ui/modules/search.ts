@@ -184,6 +184,17 @@ export function translateOption(
   };
 }
 
+function getUnitsOrderBy(lang: LocalizationLanguages) {
+  switch (lang) {
+    case "sv":
+      return UnitOrderSet.NameSvAsc;
+    case "en":
+      return UnitOrderSet.NameEnAsc;
+    default:
+      return UnitOrderSet.NameFiAsc;
+  }
+}
+
 export async function getSearchOptions(
   apolloClient: ApolloClient<unknown>,
   page: "seasonal" | "direct",
@@ -195,7 +206,7 @@ export async function getSearchOptions(
     variables: {
       reservationUnitTypesOrderBy: ReservationUnitTypeOrderSet.RankAsc,
       purposesOrderBy: PurposeOrderSet.RankAsc,
-      unitsOrderBy: UnitOrderSet.NameFiAsc,
+      unitsOrderBy: getUnitsOrderBy(lang),
       equipmentsOrderBy: EquipmentOrderSet.CategoryRankAsc,
       onlyDirectBookable: page === "direct",
       onlySeasonalBookable: page === "seasonal",
