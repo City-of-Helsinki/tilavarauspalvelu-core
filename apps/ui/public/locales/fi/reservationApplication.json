@@ -3,7 +3,8 @@
   "titleSent": "Varauksesi on nyt käsiteltävänä",
   "applicationInfo": "Varauksen tiedot",
   "summaryIngress": "Varaksesi on käsiteltävänä. Tutustu varauksen yhteenvetoon.",
-  "reserveeTypePrefix": "Varaan",
+  "reserveeTypePrefix": "Teen varauksen...",
+  "reserveeType": "Varaajan tyyppi",
   "reserveeTypes": {
     "labels": {
       "NONPROFIT": "Järjestön tai muun yhteisön puolesta",
@@ -21,7 +22,7 @@
       "applyingForFreeOfChargeButton": "Tarkista alennusryhmät <button>tästä</button>.",
       "applyingForFreeOfCharge": "Haen maksutonta käyttöä tai hinnan alennusta ja olen tutustunut alennusryhmiin.",
       "freeOfChargeReason": "Perustelut maksuttomaan varaukseen",
-      "reserveeType": "Hakijan tyyppi"
+      "reserveeType": "Varaajan tyyppi"
     },
     "nonprofit": {
       "reserveeFirstName": "Yhteyshenkilön etunimi",

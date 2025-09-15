@@ -5,11 +5,15 @@ import { type Control, type FieldValues, type Path, useController, type UseContr
 import { convertOptionToHDS, filterNonNullable, toNumber } from "../../modules/helpers";
 import { convertLanguageCode } from "../../modules/util";
 import styled from "styled-components";
+import { fontMedium } from "../../styled";
 
-const StyledControlledSelect = styled(Select)`
+const StyledControlledSelect = styled(Select)<{ $strongLabel?: boolean }>`
   /* Used to override the default max-width of HDS Select component, which causes different width fields in the form */
   && {
     max-width: none;
+    > label {
+      ${({ $strongLabel }) => $strongLabel && fontMedium};
+    }
   }
 `;
 
@@ -32,6 +36,7 @@ interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
   enableSearch?: boolean;
   afterChange?: (value: string | number | Array<string | number> | undefined) => void;
   id?: string;
+  strongLabel?: boolean;
 }
 
 export function ControlledSelect<T extends FieldValues>({
@@ -52,6 +57,7 @@ export function ControlledSelect<T extends FieldValues>({
   disabled,
   afterChange,
   enableSearch,
+  strongLabel,
   ...rest
 }: SelectProps<T>): JSX.Element {
   const { t, i18n } = useTranslation(["common"]);
@@ -125,6 +131,7 @@ export function ControlledSelect<T extends FieldValues>({
       onChange={handleChange}
       invalid={Boolean(error)}
       disabled={disabled ?? options.length === 0}
+      $strongLabel={strongLabel}
     />
   );
 }

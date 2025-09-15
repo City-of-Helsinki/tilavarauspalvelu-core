@@ -2,6 +2,7 @@ import React from "react";
 import { useController, UseControllerProps, FieldValues } from "react-hook-form";
 import { TimeInput } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { filterEmpty } from "common/src/modules/helpers";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   error?: string;
@@ -33,7 +34,8 @@ export function ControlledTimeInput<T extends FieldValues>({
       minutesLabel={t("common:minutesLabel")}
       required={required}
       disabled={disabled}
-      errorText={error}
+      errorText={filterEmpty(error) ?? undefined}
+      invalid={filterEmpty(error) != null}
       onChange={field.onChange}
       value={field.value}
       data-testid={testId}

@@ -6,6 +6,14 @@ import {
 } from "../../gql/gql-types";
 import { type TFunction } from "next-i18next";
 import { type OptionsRecord } from "../../types/common";
+import { ReservationFormValueT } from "../schemas";
+import { FieldError } from "react-hook-form";
+import { filterEmpty } from "../modules/helpers";
+
+/* NOTE: backend returns validation errors if text fields are too long
+ * remove maxlength after adding proper schema validation
+ */
+export const RESERVATION_FIELD_MAX_TEXT_LENGTH = 255;
 
 const COMMON_RESERVEE_FIELDS = [
   "reserveeFirstName",
@@ -91,26 +99,6 @@ export function extendMetaFieldOptions(options: Omit<OptionsRecord, "municipalit
 // used to inject frontend only boolean toggle into the FormFields
 export type FormField = keyof Omit<ReservationFormFieldsFragment, "id" | "reservationUnit">;
 export type FormFieldArray = ReadonlyArray<FormField>;
-export type ExtendedFormField = FormField | "reserveeIsUnregisteredAssociation";
-export type ExtendedFormFieldArray = ReadonlyArray<ExtendedFormField>;
-
-function extendReserverFields(fields: FormFieldArray): ExtendedFormField[] {
-  const key = "reserveeIdentifier" as const;
-  const identifierIndex = fields.findIndex((k) => k === key);
-  if (identifierIndex > 0) {
-    const afterIdentifier = identifierIndex + 1;
-    const shouldInsertMiddle = afterIdentifier < fields.length;
-    if (shouldInsertMiddle) {
-      return [
-        ...fields.slice(0, afterIdentifier),
-        "reserveeIsUnregisteredAssociation",
-        ...fields.slice(afterIdentifier),
-      ];
-    }
-    return [...fields, "reserveeIsUnregisteredAssociation"];
-  }
-  return [...fields];
-}
 
 export function getReservationFormReserveeFields({ reserveeType }: { reserveeType: ReserveeType }) {
   return RESERVATION_FIELDS[convertTypeToKey(reserveeType)];
@@ -127,14 +115,14 @@ export function getFilteredReserveeFields({
   formType: ReservationFormType;
   reservation: ReservationFormFieldsFragment;
   reserveeType: ReserveeType;
-}>): ExtendedFormFieldArray {
+}>): FormFieldArray {
   const fields = getReservationFormFields({
     formType,
     reserveeType,
   });
 
   const baseFields = fields.filter((key): key is FormField => key in reservation);
-  return extendReserverFields(baseFields);
+  return baseFields;
 }
 
 /// Helper function to type safely pick the general fields from the reservation
@@ -188,4 +176,51 @@ export function getFormFields(type: ReservationFormType): ReadonlyArray<keyof Re
 export function formContainsField(type: ReservationFormType, fieldName: keyof ReservationFormFieldsFragment): boolean {
   const fields = getFormFields(type);
   return fields.find((k) => k === fieldName) != null;
+}
+
+// TODO refactor so the fieldLabel is not already translated
+export function translateReserveeFormError(
+  t: TFunction,
+  fieldLabel: string,
+  error: FieldError | undefined
+): string | undefined {
+  if (error == null) {
+    return undefined;
+  }
+
+  // custom error message can be set, but not type
+  if (error.message === "Required" || error.type === "invalid_type") {
+    return t("forms:Required", { fieldName: fieldLabel });
+  } else if (error.message === "Invalid email") {
+    return t("forms:invalidEmail");
+  }
+
+  /* TODO do we need this still? and how we manipulate it
+  switch (error.type) {
+    case "min":
+      if (field === "numPersons") return t("forms:minNumPersons", { minValue });
+      break;
+    case "max":
+      if (field === "numPersons") return t("forms:maxNumPersons", { maxValue });
+      break;
+  }
+  */
+
+  return filterEmpty(error.message) ?? undefined;
+}
+
+export function constructReservationFieldId(field: keyof ReservationFormValueT) {
+  return `reservation-form-field__${field}`;
+}
+
+export type ExtendedReserveeType = ReserveeType | "COMMON";
+
+export function constructReservationFieldLabel(
+  t: TFunction,
+  type: ExtendedReserveeType | undefined,
+  field: keyof ReservationFormValueT
+): string {
+  const trKey = type?.toLocaleLowerCase() || "individual";
+  const label = t(`reservationApplication:label.${trKey}.${field}`);
+  return label;
 }
