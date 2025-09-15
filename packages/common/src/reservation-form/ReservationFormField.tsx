@@ -1,8 +1,7 @@
+import React from "react";
 import { TextArea, TextInput } from "hds-react";
-import { get } from "lodash-es";
-import React, { useMemo } from "react";
-import { useFormContext, type UseFormRegister } from "react-hook-form";
-import { useTranslation } from "next-i18next";
+import { FieldError, useFormContext, type UseFormRegister } from "react-hook-form";
+import { TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontMedium, Strongish } from "../../styled";
 import { ReserveeType } from "../../gql/gql-types";
@@ -15,8 +14,6 @@ type Props = {
   field: keyof ReservationFormValueT;
   options: OptionsRecord;
   translationKey?: ReserveeType | "COMMON";
-  required: boolean;
-  params?: Record<string, Record<string, string | number>>;
   data?: {
     termsForDiscount?: JSX.Element | string;
   };
@@ -90,14 +87,42 @@ export function convertOptionsToField(options: OptionsRecord): FieldOptions {
   };
 }
 
-export function ReservationFormField({
-  field,
-  options: originalOptions,
-  translationKey,
-  required,
-  params = {},
-  data = {},
-}: Props) {
+// TODO refactor so the fieldLabel is not already translated
+export function translateReserveeFormError(
+  t: TFunction,
+  fieldLabel: string,
+  error: FieldError | undefined
+): string | undefined {
+  if (error == null) {
+    return undefined;
+  }
+
+  // custom error message can be set, but not type
+  if (error.message === "Required" || error.type === "invalid_type") {
+    return t("forms:Required", { fieldName: fieldLabel });
+  } else if (error.message === "Invalid email") {
+    return t("forms:invalidEmail");
+  }
+
+  /* TODO do we need this still? and how we manipulate it
+  switch (error.type) {
+    case "min":
+      if (field === "numPersons") return t("forms:minNumPersons", { minValue });
+      break;
+    case "max":
+      if (field === "numPersons") return t("forms:maxNumPersons", { maxValue });
+      break;
+  }
+  */
+
+  return error.message;
+}
+
+export function constructReservationFieldId(field: keyof ReservationFormValueT) {
+  return `reservation-form-field__${field}`;
+}
+
+export function ReservationFormField({ field, options: originalOptions, translationKey, data = {} }: Props) {
   const { t } = useTranslation();
   const options = convertOptionsToField(originalOptions);
 
@@ -106,43 +131,17 @@ export function ReservationFormField({
     register,
     control,
     formState: { errors },
-    trigger,
   } = useFormContext<ReservationFormValueT>();
 
   const lowerCaseTranslationKey = translationKey?.toLocaleLowerCase() || "individual";
   const label = t(`reservationApplication:label.${lowerCaseTranslationKey}.${field}`);
 
+  const errorText = translateReserveeFormError(t, label, errors[`${field}`]);
+
+  const id = constructReservationFieldId(field);
+
   const isSelectField = Object.keys(options).includes(field);
 
-  const errorText = useMemo(() => {
-    const error = errors[`${field}`];
-
-    if (!error || !field) {
-      return undefined;
-    }
-
-    // custom error message can be set, but not type
-    if (error.message === "Required" || error.type === "invalid_type") {
-      return t("forms:Required", { fieldName: label });
-    } else if (error.message === "Invalid email") {
-      return t("forms:invalidEmail");
-    }
-
-    /* TODO do we need this still? and how we manipulate it
-    switch (error.type) {
-      case "min":
-        if (field === "numPersons") return t("forms:minNumPersons", { minValue });
-        break;
-      case "max":
-        if (field === "numPersons") return t("forms:maxNumPersons", { maxValue });
-        break;
-    }
-    */
-
-    return error.message;
-  }, [errors, field, label, t]);
-
-  const id = `reservation-form-field__${field}`;
   if (isSelectField) {
     const optionsNarrowed = Object.keys(options).includes(field) ? options[field as keyof FieldOptions] : [];
     return (
@@ -151,31 +150,26 @@ export function ReservationFormField({
         name={field}
         label={label}
         control={control}
-        required={required}
+        required
         options={optionsNarrowed}
-        error={errorText}
-        placeholder={t("common:select")}
-        afterChange={() => trigger(field)}
+        error={filterEmptyString(errorText)}
         $isWide={field === "purpose"}
         key={field}
       />
     );
   }
 
-  const shouldHideOrganisationIdentifier =
-    watch("reserveeType") === ReserveeType.Nonprofit && watch("reserveeIsUnregisteredAssociation") === true;
-
   const checkParams = {
     id,
     name: field,
     control,
     label,
-    required,
     errorText,
   };
 
   switch (field) {
     case "numPersons": {
+      /*
       const minValue =
         get(params, field)?.min != null && !Number.isNaN(get(params, field).min) ? Number(get(params, field)?.min) : 1;
       const maxValue =
@@ -184,6 +178,7 @@ export function ReservationFormField({
             ? Number(get(params, field)?.max)
             : 200
           : undefined;
+      */
 
       return (
         <ControlledNumberInput<ReservationFormValueT>
@@ -193,8 +188,8 @@ export function ReservationFormField({
           key={field}
           errorText={errorText}
           required
-          min={minValue}
-          max={maxValue}
+          min={1} //minValue}
+          // max={maxValue}
         />
       );
     }
@@ -233,7 +228,10 @@ export function ReservationFormField({
           $height="92px"
         />
       );
-    case "reserveeIdentifier":
+    case "reserveeIdentifier": {
+      const shouldHideOrganisationIdentifier =
+        watch("reserveeType") === ReserveeType.Nonprofit && watch("reserveeIsUnregisteredAssociation") === true;
+
       return (
         <StyledTextInput
           label={label}
@@ -243,11 +241,12 @@ export function ReservationFormField({
           type="text"
           errorText={errorText}
           invalid={filterEmptyString(errorText) != null}
-          required={required}
+          required={!shouldHideOrganisationIdentifier}
           maxLength={MAX_TEXT_LENGTH}
           disabled={shouldHideOrganisationIdentifier}
         />
       );
+    }
     case "reserveeEmail":
       return <EmailInput label={label} field={field} register={register} errorText={errorText} id={id} />;
     default: {
@@ -260,7 +259,7 @@ export function ReservationFormField({
           type="text"
           errorText={filterEmptyString(errorText)}
           invalid={filterEmptyString(errorText) != null}
-          required={required}
+          required
           maxLength={MAX_TEXT_LENGTH}
           $isWide={field === "name"}
         />

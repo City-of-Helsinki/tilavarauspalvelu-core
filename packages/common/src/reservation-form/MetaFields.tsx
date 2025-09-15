@@ -2,12 +2,7 @@ import React, { Fragment } from "react";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import {
-  type MetadataSetsFragment,
-  ReservationFormType,
-  type ReservationUnitNode,
-  ReserveeType,
-} from "../../gql/gql-types";
+import { type MetadataSetsFragment, type ReservationUnitNode, ReserveeType } from "../../gql/gql-types";
 import { ReservationFormField } from "./ReservationFormField";
 import { AutoGrid, H4, H5 } from "../../styled";
 import { type OptionsRecord } from "../../types/common";
@@ -17,10 +12,6 @@ import { type ReservationFormValueT } from "../schemas";
 
 interface CommonProps {
   options: Readonly<Omit<OptionsRecord, "municipalities">>;
-  data?: {
-    termsForDiscount?: JSX.Element | string;
-    enableSubvention?: boolean;
-  };
 }
 
 interface CommonWithFields extends CommonProps {
@@ -31,12 +22,18 @@ interface ReservationFormFieldsProps extends CommonWithFields {
   headingKey?: ReserveeType | "COMMON";
   hasSubheading?: boolean;
   params?: { numPersons: { min?: number; max?: number } };
-  formType: ReservationFormType;
-  section: "general" | "reservee";
+  data?: {
+    termsForDiscount?: JSX.Element | string;
+    enableSubvention?: boolean;
+  };
 }
 
 interface ReservationFormGeneralSectionProps extends CommonWithFields {
   reservationUnit: MetadataSetsFragment;
+  data?: {
+    termsForDiscount?: JSX.Element | string;
+    enableSubvention?: boolean;
+  };
 }
 
 interface ReservationFormReserveeSectionProps extends CommonWithFields {
@@ -58,6 +55,11 @@ const Subheading = styled(H4).attrs({ as: "h2" })`
 
 // TODO this is used in a silly way, it should be before we iterate over the form fields
 // the heading label should be picked based on possible fields and selected type, not position etc.
+// so
+// Individual -> no subheadings
+// Organisation -> two subheadings
+// - one for organisation info
+// - one for contact info
 function SubheadingByType({
   reserveeType,
   index,
@@ -101,41 +103,16 @@ function ReservationFormFields({
   // subheading is needed because application form uses it and requires index / field data to render it
   headingKey,
   hasSubheading,
-  params,
   data,
-  section,
-  // TODO need to add usage for this to get required field (unless we hard code it in the Form itself?)
-  formType: _,
 }: ReservationFormFieldsProps) {
   const { t } = useTranslation();
-
-  const fieldsExtended = fields.map((field) => ({
-    field,
-    // TODO should have a separate function to check against formType
-    // there are very few fields that are required and some have interlinks
-    // required here only matters for the label rendering (we should check against a schema for validation)
-    required: true,
-  }));
-
-  if (section === "general" && data?.enableSubvention) {
-    fieldsExtended.push(
-      {
-        field: "applyingForFreeOfCharge",
-        required: false,
-      },
-      {
-        field: "freeOfChargeReason",
-        required: true,
-      }
-    );
-  }
 
   // TODO the subheading logic is weird / inefficient
   // instead of adding it to sections (or dividing the fields array into sections with headings)
   // we check for index === 0 inside a loop invariant
   return (
     <>
-      {fieldsExtended.map(({ field, required }, index) => (
+      {fields.map((field, index) => (
         <Fragment key={`key-${field}-container`}>
           {hasSubheading && headingKey != null && headingKey !== "COMMON" && (
             <SubheadingByType reserveeType={headingKey} index={index} field={field} key={`key-${field}-subheading`} />
@@ -144,9 +121,7 @@ function ReservationFormFields({
             key={`key-${field}`}
             field={field}
             options={extendMetaFieldOptions(options, t)}
-            required={required}
             translationKey={headingKey}
-            params={params}
             data={data}
           />
         </Fragment>
@@ -156,37 +131,25 @@ function ReservationFormFields({
 }
 
 // TODO reduce prop drilling / remove unused props
-export function ReservationFormGeneralSection({
-  fields,
-  reservationUnit,
-  options,
-  data,
-}: ReservationFormGeneralSectionProps) {
+export function ReservationFormGeneralSection({ fields, options, data }: ReservationFormGeneralSectionProps) {
   const { t } = useTranslation();
 
   if (fields.length === 0) {
     return null;
+  }
+
+  const fieldsExtended = [...fields];
+
+  if (data?.enableSubvention) {
+    fieldsExtended.push("applyingForFreeOfCharge", "freeOfChargeReason");
   }
   return (
     <AutoGrid>
       <Subheading>{t("reservationCalendar:reservationInfo")}</Subheading>
       <ReservationFormFields
         options={extendMetaFieldOptions(options, t)}
-        fields={fields}
-        formType={reservationUnit.reservationForm}
+        fields={fieldsExtended}
         headingKey="COMMON"
-        section="general"
-        params={{
-          numPersons: {
-            min: !reservationUnit.minPersons || reservationUnit.minPersons === 0 ? 1 : reservationUnit.minPersons,
-            max:
-              reservationUnit.maxPersons != null &&
-              !Number.isNaN(reservationUnit.maxPersons) &&
-              reservationUnit.maxPersons > 0
-                ? reservationUnit.maxPersons
-                : undefined,
-          },
-        }}
         data={data}
       />
     </AutoGrid>
@@ -198,7 +161,6 @@ export function ReservationFormReserveeSection({
   fields,
   reservationUnit,
   options,
-  data,
   style,
   className,
 }: ReservationFormReserveeSectionProps) {
@@ -222,12 +184,9 @@ export function ReservationFormReserveeSection({
       {isTypeSelectable && <CustomerTypeSelector name="reserveeType" control={control} required error={error} />}
       <ReservationFormFields
         fields={fields}
-        formType={reservationUnit.reservationForm}
         options={extendMetaFieldOptions(options, t)}
         hasSubheading
         headingKey={reserveeType}
-        data={data}
-        section="reservee"
       />
     </AutoGrid>
   );

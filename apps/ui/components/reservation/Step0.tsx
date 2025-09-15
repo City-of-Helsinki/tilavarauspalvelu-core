@@ -11,7 +11,6 @@ import { ReservationFormReserveeSection, ReservationFormGeneralSection } from "c
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
 import {
-  type MetadataSetsFragment,
   ReservationFormType,
   type ReservationInProgressFragment,
   type ReservationUpdateMutation,
@@ -22,8 +21,8 @@ import {
   getFilteredGeneralFields,
   getFilteredReserveeFields,
   getFormFields,
-  type FormFieldArray,
   type ExtendedFormFieldArray,
+  getReservationFormGeneralFields,
 } from "common/src/reservation-form/util";
 import { getReservationFormSchema, type ReservationFormValueT } from "common/src/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -162,7 +161,6 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
     }
   };
 
-  const generalFields = getFilteredGeneralFields(formType);
   const reserveeType = watch("reserveeType");
   const reserveeFields = getFilteredReserveeFields({
     formType,
@@ -175,28 +173,14 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
     ? getTranslationSafe(reservation.reservationUnit.pricingTerms, "text", lang)
     : "";
 
-  const enableSubvention = reservation.reservationUnit.canApplyFreeOfCharge;
-
   return (
     <NewReservationForm onSubmit={handleSubmit(onSubmit)} noValidate>
       <ReservationForm
-        reservationUnit={reservation.reservationUnit}
+        reservation={reservation}
         options={options}
-        generalFields={generalFields}
-        reservationApplicationFields={reserveeFields}
+        reserveeFields={reserveeFields}
         form={form}
-        data={{
-          enableSubvention,
-          termsForDiscount: (
-            <Trans
-              i18nKey="reservationApplication:label.common.applyingForFreeOfChargeButton"
-              defaults="Lue lisää <button>alennusperiaatteista</button>"
-              components={{
-                button: <LinkLikeButton type="button" onClick={() => setIsDialogOpen(true)} />,
-              }}
-            />
-          ),
-        }}
+        onSubventionButtonClick={() => setIsDialogOpen(true)}
       />
       <InfoDialog
         id="pricing-terms"
@@ -205,7 +189,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
       />
-      <FormErrors form={form} formType={formType} generalFields={generalFields} />
+      <FormErrors form={form} formType={formType} />
       <ActionContainer>
         <Button
           type="submit"
@@ -234,11 +218,9 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
 function FormErrors<T extends FieldValues>({
   form,
   formType,
-  generalFields,
 }: {
   form: UseFormReturn<T>;
   formType: ReservationFormType;
-  generalFields: FormFieldArray;
 }) {
   const { t } = useTranslation();
 
@@ -252,6 +234,8 @@ function FormErrors<T extends FieldValues>({
       return fields.indexOf(a) - fields.indexOf(b);
     }) ?? [];
 
+  // Doesn't require filtering since we can't get errors if the field doesn't exist
+  const generalFields = getReservationFormGeneralFields();
   // FIXME need to drill this if we need different translations
   const reserveeType = ReserveeType.Individual;
 
@@ -284,26 +268,27 @@ const MandatoryFieldsInfoText = styled.p`
 `;
 
 interface ReservationFormProps<T extends FieldValues> {
-  reservationUnit: MetadataSetsFragment;
-  generalFields: FormFieldArray;
-  reservationApplicationFields: ExtendedFormFieldArray;
+  reservation: ReservationInProgressFragment;
+  reserveeFields: ExtendedFormFieldArray;
   options: Readonly<Omit<OptionsRecord, "municipalities">>;
   form: UseFormReturn<T>;
-  data?: {
-    termsForDiscount?: JSX.Element | string;
-    enableSubvention?: boolean;
-  };
+  onSubventionButtonClick: () => void;
 }
 
 function ReservationForm<T extends FieldValues>({
-  reservationUnit,
-  generalFields,
-  reservationApplicationFields,
+  reservation,
+  reserveeFields,
   options,
-  data,
+  onSubventionButtonClick,
   form,
 }: ReservationFormProps<T>) {
   const { t } = useTranslation();
+
+  const { reservationUnit } = reservation;
+  const formType = reservationUnit.reservationForm;
+  const generalFields = getFilteredGeneralFields(formType);
+  const enableSubvention = reservation.reservationUnit.canApplyFreeOfCharge;
+
   return (
     <FormProvider {...form}>
       <MandatoryFieldsInfoText>{t("forms:mandatoryFieldsText")}</MandatoryFieldsInfoText>
@@ -311,14 +296,20 @@ function ReservationForm<T extends FieldValues>({
         fields={generalFields}
         options={options}
         reservationUnit={reservationUnit}
-        data={data}
+        data={{
+          enableSubvention,
+          termsForDiscount: (
+            <Trans
+              i18nKey="reservationApplication:label.common.applyingForFreeOfChargeButton"
+              defaults="Lue lisää <button>alennusperiaatteista</button>"
+              components={{
+                button: <LinkLikeButton type="button" onClick={onSubventionButtonClick} />,
+              }}
+            />
+          ),
+        }}
       />
-      <ReservationFormReserveeSection
-        fields={reservationApplicationFields}
-        options={options}
-        reservationUnit={reservationUnit}
-        data={data}
-      />
+      <ReservationFormReserveeSection fields={reserveeFields} options={options} reservationUnit={reservationUnit} />
     </FormProvider>
   );
 }
