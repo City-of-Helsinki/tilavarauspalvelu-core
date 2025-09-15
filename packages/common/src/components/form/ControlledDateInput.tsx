@@ -4,6 +4,7 @@ import { DateInput } from "hds-react";
 import { type FieldValues, useController, type UseControllerProps } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { startOfDay } from "date-fns/startOfDay";
+import { filterEmptyString } from "../../helpers";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   error?: string;
@@ -48,7 +49,8 @@ export function ControlledDateInput<T extends FieldValues>({
       disableConfirmation={disableConfirmation ?? false}
       language="fi"
       value={value}
-      errorText={error}
+      errorText={filterEmptyString(error)}
+      invalid={filterEmptyString(error) != null}
       onChange={(text) => onChange(text)}
       required={required}
       disabled={disabled}

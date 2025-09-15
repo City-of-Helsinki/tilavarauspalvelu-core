@@ -213,9 +213,8 @@ export function ReservationFormReserveeSection({
 
   const reserveeType = watch("reserveeType");
 
-  // TODO fix the key so we don't need toLowerCase
-  const errorTrKey = errors.reserveeType?.message ? `forms:${errors.reserveeType.message.toLowerCase()}` : undefined;
-  const error = errorTrKey ? t(errorTrKey) : undefined;
+  const errorTrKey = errors.reserveeType?.message ? `forms:${errors.reserveeType.message}` : undefined;
+  const error = errorTrKey ? t(errorTrKey, { fieldName: t("reservationApplication:reserveeType") }) : undefined;
 
   return (
     <AutoGrid data-testid="reservation__form--reservee-info" className={className} style={style}>
