@@ -144,7 +144,7 @@ function AccessTypeTooltip({ accessTypes }: Pick<ReservationUnitHeadFragment, "a
             <span>
               {accessTypeDuration.endDate != null
                 ? formatDateRange(accessTypeDuration.beginDate, accessTypeDuration.endDate)
-                : `${t("common:dateGte", { value: toUIDate(accessTypeDuration.beginDate) })}`}
+                : t("common:dateGte", { value: toUIDate(accessTypeDuration.beginDate) })}
             </span>
           </li>
         ))}

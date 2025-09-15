@@ -336,7 +336,7 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
           <Flex $direction="row" $justifyContent="flex-end" style={{ gridColumn: "1 / -1" }}>
             {/* cancel is disabled while sending because we have no rollback */}
             <ButtonLikeLink
-              href={`${getMyUnitUrl(unitPk)}`}
+              href={getMyUnitUrl(unitPk)}
               disabled={isSubmitting}
               data-testid="recurring-reservation-form__cancel-button"
             >

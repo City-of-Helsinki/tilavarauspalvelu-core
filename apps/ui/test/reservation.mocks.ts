@@ -110,7 +110,7 @@ export function createMockReservation(props: MockReservationProps): Readonly<Res
     isHandled = true,
     paymentOrder = {
       id: "1",
-      reservationPk: `${1}`,
+      reservationPk: 1,
       status: OrderStatus.PaidManually,
       paymentType: PaymentType.OnSite,
       receiptUrl: "https://example.com/receipt",

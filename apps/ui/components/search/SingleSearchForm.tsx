@@ -228,8 +228,8 @@ export function SingleSearchForm({
           <TimeRangePicker
             names={{ begin: "timeBegin", end: "timeEnd" }}
             labels={{
-              begin: `${t("common:timeLabelBegin")}`,
-              end: `${t("common:timeLabelEnd")}`,
+              begin: t("common:timeLabelBegin"),
+              end: t("common:timeLabelEnd"),
             }}
             placeholders={{
               begin: t("common:beginLabel"),

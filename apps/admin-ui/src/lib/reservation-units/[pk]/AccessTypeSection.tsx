@@ -163,7 +163,7 @@ export function AccessTypeSection({
         )}
 
         {fields.map((accessType, index) => (
-          <AccessTypePart key={`${accessType.id}`} form={form} index={index} removeSelf={() => remove(index)} />
+          <AccessTypePart key={accessType.id} form={form} index={index} removeSelf={() => remove(index)} />
         ))}
 
         <div style={{ marginTop: "var(--spacing-s)" }}>
