@@ -684,9 +684,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
             notFound: true, // required for type narrowing
           },
         };
-      } catch (error) {
+      } catch (err) {
         // Format errors so we can JSON.stringify them and toast them on client
-        mutationErrors = getApiErrors(error);
+        mutationErrors = getApiErrors(err);
       }
     }
   }

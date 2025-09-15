@@ -78,9 +78,9 @@ export function generateReservations(props: TimeSelectionForm) {
         endTime,
       }))
       .sort((a, b) => a.date.getTime() - b.date.getTime());
-  } catch (e) {
+  } catch (err) {
     // eslint-disable-next-line no-console
-    console.warn("exception: ", e);
+    console.warn("exception: ", err);
     // Date throws => don't crash
   }
 

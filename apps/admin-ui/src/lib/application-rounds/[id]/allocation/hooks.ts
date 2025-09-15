@@ -237,8 +237,8 @@ export function useAcceptSlotMutation({
       const msg = t("allocation:acceptingSuccess", { name });
       successToast({ text: msg });
       refresh();
-    } catch (e) {
-      displayError(e);
+    } catch (err) {
+      displayError(err);
     }
   };
 
@@ -287,8 +287,8 @@ export function useRemoveAllocation({
         successToast({ text: msg });
         refresh();
       }
-    } catch (e) {
-      displayError(e);
+    } catch (err) {
+      displayError(err);
     }
   };
   return [handleRemoveAllocation, { isLoading }];
