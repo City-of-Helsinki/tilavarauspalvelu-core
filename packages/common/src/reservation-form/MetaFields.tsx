@@ -4,6 +4,7 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { type MetadataSetsFragment, type ReservationUnitNode, ReserveeType } from "../../gql/gql-types";
 import { ReservationFormField } from "./ReservationFormField";
+import { ReservationSubventionSection } from "./ReservationSubventionSection";
 import { AutoGrid, H4, H5 } from "../../styled";
 import { type OptionsRecord } from "../../types/common";
 import { type ExtendedFormFieldArray, extendMetaFieldOptions, formContainsField } from "./util";
@@ -22,18 +23,18 @@ interface ReservationFormFieldsProps extends CommonWithFields {
   headingKey?: ReserveeType | "COMMON";
   hasSubheading?: boolean;
   params?: { numPersons: { min?: number; max?: number } };
-  data?: {
-    termsForDiscount?: JSX.Element | string;
-    enableSubvention?: boolean;
-  };
 }
 
 interface ReservationFormGeneralSectionProps extends CommonWithFields {
   reservationUnit: MetadataSetsFragment;
-  data?: {
-    termsForDiscount?: JSX.Element | string;
-    enableSubvention?: boolean;
-  };
+  data?:
+    | {
+        enableSubvention: false;
+      }
+    | {
+        termsForDiscount: JSX.Element | string;
+        enableSubvention: true;
+      };
 }
 
 interface ReservationFormReserveeSectionProps extends CommonWithFields {
@@ -103,7 +104,6 @@ function ReservationFormFields({
   // subheading is needed because application form uses it and requires index / field data to render it
   headingKey,
   hasSubheading,
-  data,
 }: ReservationFormFieldsProps) {
   const { t } = useTranslation();
 
@@ -122,7 +122,6 @@ function ReservationFormFields({
             field={field}
             options={extendMetaFieldOptions(options, t)}
             translationKey={headingKey}
-            data={data}
           />
         </Fragment>
       ))}
@@ -133,25 +132,17 @@ function ReservationFormFields({
 // TODO reduce prop drilling / remove unused props
 export function ReservationFormGeneralSection({ fields, options, data }: ReservationFormGeneralSectionProps) {
   const { t } = useTranslation();
+  const form = useFormContext<ReservationFormValueT>();
 
   if (fields.length === 0) {
     return null;
   }
 
-  const fieldsExtended = [...fields];
-
-  if (data?.enableSubvention) {
-    fieldsExtended.push("applyingForFreeOfCharge", "freeOfChargeReason");
-  }
   return (
     <AutoGrid>
       <Subheading>{t("reservationCalendar:reservationInfo")}</Subheading>
-      <ReservationFormFields
-        options={extendMetaFieldOptions(options, t)}
-        fields={fieldsExtended}
-        headingKey="COMMON"
-        data={data}
-      />
+      <ReservationFormFields options={extendMetaFieldOptions(options, t)} fields={fields} headingKey="COMMON" />
+      {data?.enableSubvention && <ReservationSubventionSection termsForDiscount={data.termsForDiscount} form={form} />}
     </AutoGrid>
   );
 }

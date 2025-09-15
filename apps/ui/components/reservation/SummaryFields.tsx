@@ -4,8 +4,8 @@ import { AutoGrid, H4 } from "common/styled";
 import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
 import { LabelValuePair } from "./LabelValuePair";
 import { type OptionsRecord } from "common";
-import { convertOptionsToField } from "common/src/reservation-form/ReservationFormField";
 import {
+  convertOptionsToField,
   extendMetaFieldOptions,
   getReservationFormGeneralFields,
   getReservationFormReserveeFields,

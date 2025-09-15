@@ -6,6 +6,13 @@ import {
 } from "../../gql/gql-types";
 import { type TFunction } from "next-i18next";
 import { type OptionsRecord } from "../../types/common";
+import { ReservationFormValueT } from "../schemas";
+import { FieldError } from "react-hook-form";
+
+/* NOTE: backend returns validation errors if text fields are too long
+ * remove maxlength after adding proper schema validation
+ */
+export const RESERVATION_FIELD_MAX_TEXT_LENGTH = 255;
 
 const COMMON_RESERVEE_FIELDS = [
   "reserveeFirstName",
@@ -188,4 +195,66 @@ export function getFormFields(type: ReservationFormType): ReadonlyArray<keyof Re
 export function formContainsField(type: ReservationFormType, fieldName: keyof ReservationFormFieldsFragment): boolean {
   const fields = getFormFields(type);
   return fields.find((k) => k === fieldName) != null;
+}
+
+export type FieldOptions = {
+  ageGroup: OptionsRecord["ageGroups"];
+  purpose: OptionsRecord["reservationPurposes"];
+  municipality: OptionsRecord["municipalities"];
+};
+
+// Fix to match the Field required options
+export function convertOptionsToField(options: OptionsRecord): FieldOptions {
+  return {
+    ageGroup: options.ageGroups,
+    purpose: options.reservationPurposes,
+    municipality: options.municipalities,
+  };
+}
+
+// TODO refactor so the fieldLabel is not already translated
+export function translateReserveeFormError(
+  t: TFunction,
+  fieldLabel: string,
+  error: FieldError | undefined
+): string | undefined {
+  if (error == null) {
+    return undefined;
+  }
+
+  // custom error message can be set, but not type
+  if (error.message === "Required" || error.type === "invalid_type") {
+    return t("forms:Required", { fieldName: fieldLabel });
+  } else if (error.message === "Invalid email") {
+    return t("forms:invalidEmail");
+  }
+
+  /* TODO do we need this still? and how we manipulate it
+  switch (error.type) {
+    case "min":
+      if (field === "numPersons") return t("forms:minNumPersons", { minValue });
+      break;
+    case "max":
+      if (field === "numPersons") return t("forms:maxNumPersons", { maxValue });
+      break;
+  }
+  */
+
+  return error.message;
+}
+
+export function constructReservationFieldId(field: keyof ReservationFormValueT) {
+  return `reservation-form-field__${field}`;
+}
+
+export type ExtendedReserveeType = ReserveeType | "COMMON";
+
+export function constructReservationFieldLabel(
+  t: TFunction,
+  type: ExtendedReserveeType | undefined,
+  field: keyof ReservationFormValueT
+): string {
+  const trKey = type?.toLocaleLowerCase() || "individual";
+  const label = t(`reservationApplication:label.${trKey}.${field}`);
+  return label;
 }

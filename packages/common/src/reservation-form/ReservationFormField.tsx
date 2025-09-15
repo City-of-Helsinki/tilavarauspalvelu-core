@@ -1,128 +1,29 @@
 import React from "react";
-import { TextArea, TextInput } from "hds-react";
-import { FieldError, useFormContext, type UseFormRegister } from "react-hook-form";
-import { TFunction, useTranslation } from "next-i18next";
-import styled from "styled-components";
-import { fontMedium, Strongish } from "../../styled";
+import { useFormContext, type UseFormRegister } from "react-hook-form";
+import { useTranslation } from "next-i18next";
 import { ReserveeType } from "../../gql/gql-types";
 import { type OptionsRecord } from "../../types/common";
 import { ControlledCheckbox, ControlledNumberInput, ControlledSelect } from "../components/form";
 import { type ReservationFormValueT } from "../schemas";
 import { filterEmptyString } from "../helpers";
+import { StyledCheckboxWrapper, StyledTextArea, StyledTextInput } from "./styled";
+import {
+  constructReservationFieldId,
+  constructReservationFieldLabel,
+  convertOptionsToField,
+  type ExtendedReserveeType,
+  type FieldOptions,
+  translateReserveeFormError,
+  RESERVATION_FIELD_MAX_TEXT_LENGTH,
+} from "./util";
 
 type Props = {
   field: keyof ReservationFormValueT;
   options: OptionsRecord;
-  translationKey?: ReserveeType | "COMMON";
-  data?: {
-    termsForDiscount?: JSX.Element | string;
-  };
+  translationKey?: ExtendedReserveeType;
 };
 
-const StyledCheckboxWrapper = styled.div<{
-  $isWide?: boolean;
-}>`
-  ${({ $isWide }) => $isWide && "grid-column: 1 / -1"};
-`;
-
-type TextAreaProps = {
-  $isWide?: boolean;
-  $hidden?: boolean;
-  $height?: string;
-};
-
-const Subheading = styled(Strongish)`
-  display: block;
-  margin-bottom: var(--spacing-s);
-`;
-
-const StyledControlledSelect = styled(ControlledSelect<ReservationFormValueT>)<{ $isWide?: boolean }>`
-  ${({ $isWide }) => $isWide && "grid-column: 1 / -1"};
-
-  label {
-    ${fontMedium};
-  }
-`;
-
-const StyledTextInput = styled(TextInput)<{
-  $isWide?: boolean;
-}>`
-  ${({ $isWide }) => $isWide && "grid-column: 1 / -1"};
-
-  label {
-    ${fontMedium};
-  }
-`;
-
-const StyledTextArea = styled(TextArea)<TextAreaProps>`
-  ${({ $isWide }) => $isWide && "grid-column: 1 / -1"};
-  ${({ $hidden }) => $hidden && "display: none"};
-
-  && {
-    ${({ $height }) => ($height != null ? `--textarea-height: ${$height}` : "")};
-  }
-
-  label {
-    ${fontMedium};
-  }
-`;
-
-/* NOTE: backend returns validation errors if text fields are too long
- * remove maxlength after adding proper schema validation
- */
-const MAX_TEXT_LENGTH = 255;
-
-type FieldOptions = {
-  ageGroup: OptionsRecord["ageGroups"];
-  purpose: OptionsRecord["reservationPurposes"];
-  municipality: OptionsRecord["municipalities"];
-};
-
-// Fix to match the Field required options
-export function convertOptionsToField(options: OptionsRecord): FieldOptions {
-  return {
-    ageGroup: options.ageGroups,
-    purpose: options.reservationPurposes,
-    municipality: options.municipalities,
-  };
-}
-
-// TODO refactor so the fieldLabel is not already translated
-export function translateReserveeFormError(
-  t: TFunction,
-  fieldLabel: string,
-  error: FieldError | undefined
-): string | undefined {
-  if (error == null) {
-    return undefined;
-  }
-
-  // custom error message can be set, but not type
-  if (error.message === "Required" || error.type === "invalid_type") {
-    return t("forms:Required", { fieldName: fieldLabel });
-  } else if (error.message === "Invalid email") {
-    return t("forms:invalidEmail");
-  }
-
-  /* TODO do we need this still? and how we manipulate it
-  switch (error.type) {
-    case "min":
-      if (field === "numPersons") return t("forms:minNumPersons", { minValue });
-      break;
-    case "max":
-      if (field === "numPersons") return t("forms:maxNumPersons", { maxValue });
-      break;
-  }
-  */
-
-  return error.message;
-}
-
-export function constructReservationFieldId(field: keyof ReservationFormValueT) {
-  return `reservation-form-field__${field}`;
-}
-
-export function ReservationFormField({ field, options: originalOptions, translationKey, data = {} }: Props) {
+export function ReservationFormField({ field, options: originalOptions, translationKey }: Props) {
   const { t } = useTranslation();
   const options = convertOptionsToField(originalOptions);
 
@@ -133,9 +34,7 @@ export function ReservationFormField({ field, options: originalOptions, translat
     formState: { errors },
   } = useFormContext<ReservationFormValueT>();
 
-  const lowerCaseTranslationKey = translationKey?.toLocaleLowerCase() || "individual";
-  const label = t(`reservationApplication:label.${lowerCaseTranslationKey}.${field}`);
-
+  const label = constructReservationFieldLabel(t, translationKey, field);
   const errorText = translateReserveeFormError(t, label, errors[`${field}`]);
 
   const id = constructReservationFieldId(field);
@@ -145,7 +44,7 @@ export function ReservationFormField({ field, options: originalOptions, translat
   if (isSelectField) {
     const optionsNarrowed = Object.keys(options).includes(field) ? options[field as keyof FieldOptions] : [];
     return (
-      <StyledControlledSelect
+      <ControlledSelect
         id={id}
         name={field}
         label={label}
@@ -153,7 +52,10 @@ export function ReservationFormField({ field, options: originalOptions, translat
         required
         options={optionsNarrowed}
         error={filterEmptyString(errorText)}
-        $isWide={field === "purpose"}
+        style={{
+          gridColumn: field === "purpose" ? "1 / -1" : undefined,
+        }}
+        strongLabel
         key={field}
       />
     );
@@ -195,14 +97,9 @@ export function ReservationFormField({ field, options: originalOptions, translat
     }
     case "description":
       return <DescriptionField field={field} label={label} errorText={errorText} register={register} id={id} />;
+    // TODO remove
     case "applyingForFreeOfCharge":
-      return (
-        <StyledCheckboxWrapper key={field} $isWide>
-          <Subheading>{t("reservationApplication:label.subHeadings.subvention")}</Subheading>{" "}
-          <ControlledCheckbox {...checkParams} />
-          {data.termsForDiscount && <div style={{ marginTop: "0.5rem" }}>{data.termsForDiscount}</div>}
-        </StyledCheckboxWrapper>
-      );
+      return null;
     case "reserveeIsUnregisteredAssociation":
       if (watch("reserveeType") !== ReserveeType.Nonprofit) {
         return null;
@@ -212,22 +109,9 @@ export function ReservationFormField({ field, options: originalOptions, translat
           <ControlledCheckbox {...checkParams} />
         </StyledCheckboxWrapper>
       );
+    // TODO remove
     case "freeOfChargeReason":
-      return (
-        <StyledTextArea
-          label={label}
-          id={id}
-          key={field}
-          {...register(field)}
-          errorText={errorText}
-          invalid={filterEmptyString(errorText) != null}
-          required
-          maxLength={MAX_TEXT_LENGTH}
-          $hidden={!watch("applyingForFreeOfCharge")}
-          $isWide
-          $height="92px"
-        />
-      );
+      return null;
     case "reserveeIdentifier": {
       const shouldHideOrganisationIdentifier =
         watch("reserveeType") === ReserveeType.Nonprofit && watch("reserveeIsUnregisteredAssociation") === true;
@@ -242,7 +126,7 @@ export function ReservationFormField({ field, options: originalOptions, translat
           errorText={errorText}
           invalid={filterEmptyString(errorText) != null}
           required={!shouldHideOrganisationIdentifier}
-          maxLength={MAX_TEXT_LENGTH}
+          maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
           disabled={shouldHideOrganisationIdentifier}
         />
       );
@@ -260,7 +144,7 @@ export function ReservationFormField({ field, options: originalOptions, translat
           errorText={filterEmptyString(errorText)}
           invalid={filterEmptyString(errorText) != null}
           required
-          maxLength={MAX_TEXT_LENGTH}
+          maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
           $isWide={field === "name"}
         />
       );
@@ -290,7 +174,7 @@ function DescriptionField({
       errorText={filterEmptyString(errorText)}
       invalid={filterEmptyString(errorText) != null}
       required
-      maxLength={MAX_TEXT_LENGTH}
+      maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
       $isWide
       $height="119px"
     />
@@ -322,7 +206,7 @@ function EmailInput({
       invalid={filterEmptyString(errorText) != null}
       required
       // email field is special and has one less character than the rest
-      maxLength={MAX_TEXT_LENGTH - (isEmailField ? 1 : 0)}
+      maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH - (isEmailField ? 1 : 0)}
     />
   );
 }
