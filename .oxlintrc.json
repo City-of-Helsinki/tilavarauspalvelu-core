@@ -408,6 +408,7 @@
     "unicorn/prefer-dom-node-text-content": "error",
     "unicorn/prefer-event-target": "error",
     "unicorn/prefer-includes": "error",
+    "unicorn/prefer-logical-operator-over-ternary": "error",
     "unicorn/prefer-math-min-max": "error",
     "unicorn/prefer-math-trunc": "error",
     "unicorn/prefer-modern-dom-apis": "error",
