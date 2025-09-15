@@ -6,6 +6,7 @@ import uuid
 from functools import cache, wraps
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Any
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -91,6 +92,12 @@ def redirect_back_on_error[R, **P](func: Callable[P, R]) -> Callable[P, R]:
         if not is_valid_url(redirect_on_error):
             msg = "The 'redirect_on_error' parameter should be a valid URL."
             return JsonResponse({"detail": msg, "code": "REDIRECT_ON_ERROR_INVALID"}, status=400)
+
+        parsed_uri = urlparse(redirect_on_error)
+        origin = f"{parsed_uri.scheme}://{parsed_uri.netloc}".removesuffix("/")
+        if origin not in settings.CORS_ALLOWED_ORIGINS:
+            msg = "The 'redirect_on_error' parameter points to an origin that is not allowed."
+            return JsonResponse({"detail": msg, "code": "REDIRECT_ON_ERROR_ORIGIN_NOT_ALLOWED"}, status=400)
 
         try:
             return func(*args, **kwargs)
