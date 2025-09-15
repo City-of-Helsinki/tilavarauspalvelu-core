@@ -3,12 +3,13 @@
   "titleSent": "Din bokning behandlas",
   "applicationInfo": "Uppgifter om bokningen",
   "summaryIngress": "Din bokning behandlas. Se bokningsöversikten.",
-  "reserveeTypePrefix": "Skapa ansökan…",
+  "reserveeTypePrefix": "Jag gör bokningen...",
+  "reserveeType": "Varaajan tyyppi",
   "reserveeTypes": {
     "labels": {
       "NONPROFIT": "För en organisation, grupp eller samfund",
       "COMPANY": "För ett företag",
-      "INDIVIDUAL": "Som privatkund"
+      "INDIVIDUAL": "Som privatperson"
     }
   },
   "label": {
