@@ -231,7 +231,7 @@ describe("getPriceString", () => {
 
   test("price range with no min", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 50.5,
       priceUnit: PriceUnit.Per_15Mins,
     });
@@ -240,7 +240,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 60.5,
       minutes: 60,
     });
@@ -249,7 +249,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 60.5,
       minutes: 61,
     });
@@ -258,7 +258,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 100,
       minutes: 61,
     });
@@ -267,7 +267,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 100,
       minutes: 90,
     });
@@ -276,7 +276,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 100,
       minutes: 91,
     });
@@ -285,7 +285,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 30,
       minutes: 60,
       priceUnit: PriceUnit.Per_15Mins,
@@ -295,7 +295,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 30,
       minutes: 60,
       priceUnit: PriceUnit.Per_30Mins,
@@ -305,7 +305,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 30,
       minutes: 61,
       priceUnit: PriceUnit.Per_30Mins,
