@@ -7,6 +7,7 @@ from django.test import RequestFactory
 from tilavarauspalvelu.admin.reservation_unit.admin import ReservationUnitAdmin
 from tilavarauspalvelu.enums import (
     AccessType,
+    AuthenticationType,
     ReservationFormType,
     ReservationKind,
     ReservationStartInterval,
@@ -27,8 +28,8 @@ def get_valid_data(reservation_unit: ReservationUnit):
         "unit": reservation_unit.unit.pk,
         "name_fi": reservation_unit.name_fi,
         "description": reservation_unit.description,
-        "reservation_start_interval": ReservationStartInterval.INTERVAL_15_MINUTES.value,
-        "authentication": "weak",
+        "reservation_start_interval": ReservationStartInterval.INTERVAL_15_MINUTES,
+        "authentication": AuthenticationType.WEAK,
         "reservation_kind": ReservationKind.DIRECT_AND_SEASON,
         "access_type": AccessType.UNRESTRICTED,
         "reservation_form": ReservationFormType.CONTACT_INFO_FORM,
