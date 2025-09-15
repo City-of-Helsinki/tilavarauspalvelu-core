@@ -23,7 +23,7 @@ django-helusers = "0.13.3"
 django-jinja = "2.11.0"
 django-lazy-managers = "0.0.1"
 django-lookup-property = "0.2.0"
-django-modeltranslation = "0.19.16"
+django-modeltranslation = "0.19.17"
 django-mptt = "0.18.0"
 django-redis = "6.0.0"
 djangorestframework = "3.16.1"
@@ -35,13 +35,13 @@ mjml-python = "1.3.5"
 psycopg2-binary = "2.9.10"
 python-dateutil = "2.9.0.post0"
 redis = { version = "5.2.1", extras = ["hiredis"] }
-sentry-sdk = "2.37.0"
+sentry-sdk = "2.38.0"
 social-auth-app-django = "5.5.1"
 stamina = "25.1.0"
-undine = "0.0.35"
+undine = "0.1.0"
 # Skip installation on Windows as uWSGI does not support it without Cygwin.
 uWSGI = { version = "2.0.30", markers = "sys_platform != 'win32'" }
-whitenoise = "6.9.0"
+whitenoise = "6.10.0"
 xhtml2pdf = "0.2.17"
 
 [tool.poetry.group.admin.dependencies]
@@ -71,7 +71,7 @@ polib = "1.2.0"
 pyinstrument = "5.1.1"
 pypdf2 = "3.0.1"
 pytest = "8.4.2"
-pytest-cov = "6.3.0"
+pytest-cov = "7.0.0"
 pytest-django = "4.11.1"
 pytest-split = "0.10.0"
 pytest-xdist = "3.8.0"
@@ -79,9 +79,9 @@ pytest-xdist = "3.8.0"
 [tool.poetry.group.lint.dependencies]
 # Dependencies only required for linting.
 pre-commit = "4.3.0"
-ruff = "0.12.12"
+ruff = "0.13.0"
 mypy = "1.17.1"
-django-stubs = { version = "5.2.2", extras = ["compatible-mypy"] }
+django-stubs = { version = "5.2.5", extras = ["compatible-mypy"] }
 
 [project.entry-points.pytest11]
 tilavarauspalvelu = "tests.plugins"
