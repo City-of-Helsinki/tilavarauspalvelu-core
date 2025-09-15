@@ -3,7 +3,6 @@ import TermsBox from "common/src/components/TermsBox";
 import { useTranslation } from "next-i18next";
 import { Sanitize } from "common/src/components/Sanitize";
 import { type TermsOfUseTextFieldsFragment, type Maybe, type TermsOfUseFragment } from "@/gql/gql-types";
-import { Flex } from "common/src/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 
 export function AcceptTerms({
@@ -42,7 +41,7 @@ export function AcceptTerms({
   );
 
   return (
-    <Flex>
+    <>
       <TermsBox
         id="cancellation-and-payment-terms"
         heading={paymentTermsHeading}
@@ -71,7 +70,7 @@ export function AcceptTerms({
         accepted={isTermsAccepted.space}
         setAccepted={(val) => setIsTermsAccepted("space", val)}
       />
-    </Flex>
+    </>
   );
 }
 

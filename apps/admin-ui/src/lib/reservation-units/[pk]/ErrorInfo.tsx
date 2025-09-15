@@ -1,11 +1,11 @@
+import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import type { ReservationUnitEditFormValues } from "./form";
+import { type ReservationUnitEditFormValues } from "./form";
 import { useTranslation } from "next-i18next";
 import { getTranslatedError } from "@/modules/util";
-import { Notification } from "hds-react";
-import React from "react";
+import { ErrorListBox } from "common/src/components/ErrorListBox";
 
-export function ErrorInfo({ form }: { form: UseFormReturn<ReservationUnitEditFormValues> }): JSX.Element | null {
+export function ErrorInfo({ form }: { form: UseFormReturn<ReservationUnitEditFormValues> }): React.ReactElement | null {
   const { t } = useTranslation();
 
   const {
@@ -66,22 +66,20 @@ export function ErrorInfo({ form }: { form: UseFormReturn<ReservationUnitEditFor
       .filter((x): x is string => x != null)
   );
 
-  // TODO errors should be sorted based on the order of the form fields
-  return (
-    <Notification label={t("forms:ErrorSummary.label")} type="error">
-      <ol>
-        {Object.entries(otherErrors).map(([key, value]) => (
-          <li key={key}>
-            {t(`reservationUnitEditor:label.${key}`)}: {getTranslatedError(t, value?.message)}
-          </li>
-        ))}
-        {pricingErrors.map((error) => (
-          <li key={error}>{error}</li>
-        ))}
-        {accessTypeErrors.map((error) => (
-          <li key={error}>{error}</li>
-        ))}
-      </ol>
-    </Notification>
-  );
+  const errorsToPrint: Array<{ key: string; label: string }> = [
+    ...Object.entries(otherErrors).map(([key, value]) => ({
+      key,
+      label: `${t(`reservationUnitEditor:label.${key}`)}: ${getTranslatedError(t, value?.message)}`,
+    })),
+    ...pricingErrors.map((error) => ({
+      key: error,
+      label: error,
+    })),
+    ...accessTypeErrors.map((error) => ({
+      key: error,
+      label: error,
+    })),
+  ];
+
+  return <ErrorListBox errors={errorsToPrint} label={t("forms:ErrorSummary.label")} />;
 }
