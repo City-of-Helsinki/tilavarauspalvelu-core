@@ -160,7 +160,7 @@ export const TimeInput = forwardRef(function TimeInput(
         onKeyDown={handleKeyDown}
         onChange={handleOnChange}
       />
-      {error && <ErrorText>{error}</ErrorText>}
+      {error && <FormErrorText>{error}</FormErrorText>}
     </TimeInputContainer>
   );
 });
@@ -175,7 +175,8 @@ const ErrorWrapper = styled.div`
   margin-right: var(--spacing-3-xs);
 `;
 
-function ErrorText({ children }: { children: string }): JSX.Element {
+// Smaller version of Error for this component (the standard HDS doubles the size of this component for no reason)
+function FormErrorText({ children }: { children: string }): JSX.Element {
   return (
     <ErrorWrapper>
       <div>
