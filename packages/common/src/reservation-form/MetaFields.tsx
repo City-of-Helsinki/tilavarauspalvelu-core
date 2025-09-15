@@ -203,17 +203,25 @@ export function ReservationFormReserveeSection({
   style,
   className,
 }: ReservationFormReserveeSectionProps) {
-  const { watch } = useFormContext<ReservationFormValueT>();
+  const {
+    watch,
+    control,
+    formState: { errors },
+  } = useFormContext<ReservationFormValueT>();
   const { t } = useTranslation();
 
   const isTypeSelectable = formContainsField(reservationUnit.reservationForm, "reserveeType");
 
   const reserveeType = watch("reserveeType");
 
+  // TODO fix the key so we don't need toLowerCase
+  const errorTrKey = errors.reserveeType?.message ? `forms:${errors.reserveeType.message.toLowerCase()}` : undefined;
+  const error = errorTrKey ? t(errorTrKey) : undefined;
+
   return (
     <AutoGrid data-testid="reservation__form--reservee-info" className={className} style={style}>
       <Subheading>{t("reservationCalendar:reserverInfo")}</Subheading>
-      {isTypeSelectable && <CustomerTypeSelector />}
+      {isTypeSelectable && <CustomerTypeSelector name="reserveeType" control={control} required error={error} />}
       <ReservationFormFields
         fields={fields}
         formType={reservationUnit.reservationForm}
