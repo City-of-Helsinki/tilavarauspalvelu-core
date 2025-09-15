@@ -200,10 +200,10 @@ export function InProgressReservationNotification() {
             text: t("notification:waitingForPayment.reservationCancelledTitle"),
           });
         }
-      } catch (e) {
+      } catch (err) {
         // silently ignore NOT_FOUND (just refresh query cache)
-        if (!isNotFoundError(e)) {
-          throw e;
+        if (!isNotFoundError(err)) {
+          throw err;
         }
       }
       if (shouldRedirectAfterDelete(reservation.pk, router.pathname, router.query)) {

@@ -122,9 +122,9 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
     });
 
     return { ...ctx, currentUser: data.currentUser, handlingData, notificationsData: notificationsData };
-  } catch (error) {
+  } catch (err) {
     // eslint-disable-next-line no-console
-    console.error("Error fetching current user:", error);
+    console.error("Error fetching current user:", err);
   }
 
   return { ...ctx, currentUser: null, handlingData: null, notificationsData: null };
