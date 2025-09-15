@@ -187,7 +187,7 @@ export function useAcceptSlotMutation({
 
   if (!reservationUnitOptionPk) {
     // eslint-disable-next-line no-console
-    console.error("Invalid reservationUnitOptionPk: ", reservationUnitOptionPk);
+    console.error("Invalid reservationUnitOptionPk:", reservationUnitOptionPk);
   }
 
   const handleAcceptSlot = async () => {
@@ -197,7 +197,7 @@ export function useAcceptSlotMutation({
     }
     if (timeRange == null) {
       // eslint-disable-next-line no-console
-      console.error("Invalid timeRange for section: ", applicationSection);
+      console.error("Invalid timeRange for section:", applicationSection);
     }
     if (selection.length === 0 || timeRange == null) {
       errorToast({ text: t("allocation:errors.accepting.generic") });
