@@ -948,34 +948,34 @@ enum AuthenticationType {
 """An enumeration."""
 enum ReservationStartInterval {
   """15 minutes"""
-  INTERVAL_15_MINS
+  INTERVAL_15_MINUTES
 
   """30 minutes"""
-  INTERVAL_30_MINS
+  INTERVAL_30_MINUTES
 
   """60 minutes"""
-  INTERVAL_60_MINS
+  INTERVAL_60_MINUTES
 
   """90 minutes"""
-  INTERVAL_90_MINS
+  INTERVAL_90_MINUTES
 
   """2 hours"""
-  INTERVAL_120_MINS
+  INTERVAL_120_MINUTES
 
   """3 hours"""
-  INTERVAL_180_MINS
+  INTERVAL_180_MINUTES
 
   """4 hours"""
-  INTERVAL_240_MINS
+  INTERVAL_240_MINUTES
 
   """5 hours"""
-  INTERVAL_300_MINS
+  INTERVAL_300_MINUTES
 
   """6 hours"""
-  INTERVAL_360_MINS
+  INTERVAL_360_MINUTES
 
   """7 hours"""
-  INTERVAL_420_MINS
+  INTERVAL_420_MINUTES
 }
 
 """An enumeration."""
@@ -1386,22 +1386,22 @@ type TermsOfUseNode implements Node {
 """An enumeration."""
 enum TermsOfUseTypeChoices {
   """Generic terms"""
-  GENERIC_TERMS
+  GENERIC
 
   """Payment terms"""
-  PAYMENT_TERMS
+  PAYMENT
 
   """Cancellation terms"""
-  CANCELLATION_TERMS
+  CANCELLATION
 
   """Reservation series terms"""
-  RECURRING_TERMS
+  RECURRING
 
   """Service-specific terms"""
-  SERVICE_TERMS
+  SERVICE
 
   """Pricing terms"""
-  PRICING_TERMS
+  PRICING
 }
 
 type PaymentProductNode implements Node {
