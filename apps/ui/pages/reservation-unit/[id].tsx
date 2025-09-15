@@ -312,7 +312,8 @@ function ReservationUnit({
       endsAt: end.toISOString(),
       reservationUnit: reservationUnit.pk,
     };
-    return await createReservation(input);
+    const response = await createReservation(input);
+    return response;
   };
 
   const reservableTimes = useReservableTimes(reservationUnit);
