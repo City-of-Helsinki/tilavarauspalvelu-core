@@ -54,27 +54,6 @@ export function ReservationFormField({
         />
       );
     }
-    case "numPersons": {
-      /*
-      const minValue =
-        get(params, field)?.min != null && !Number.isNaN(get(params, field).min) ? Number(get(params, field)?.min) : 1;
-      const maxValue =
-        get(params, field)?.max != null && !Number.isNaN(get(params, field).max)
-          ? Number(get(params, field)?.max) < 200
-            ? Number(get(params, field)?.max)
-            : 200
-          : undefined;
-      */
-      return null;
-    }
-    case "description":
-      return null;
-    // TODO remove
-    case "applyingForFreeOfCharge":
-      return null;
-    // TODO remove
-    case "freeOfChargeReason":
-      return null;
     case "reserveeIsUnregisteredAssociation":
       if (watch("reserveeType") !== ReserveeType.Nonprofit) {
         return null;
@@ -103,18 +82,18 @@ export function ReservationFormField({
         />
       );
     }
-    case "reserveeEmail":
-      return <EmailInput label={label} field={field} register={register} errorText={errorText} id={id} />;
+    case "numPersons":
+    case "description":
+    case "applyingForFreeOfCharge":
+    case "freeOfChargeReason":
     case "name":
-      return null;
     case "ageGroup":
-      return null;
     case "purpose":
-      return null;
     case "pk":
-      return null;
     case "reserveeType":
       return null;
+    case "reserveeEmail":
+      return <EmailInput label={label} field={field} register={register} errorText={errorText} id={id} />;
     case "reserveePhone":
     case "reserveeLastName":
     case "reserveeFirstName":

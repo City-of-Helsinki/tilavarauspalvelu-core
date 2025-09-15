@@ -55,50 +55,6 @@ const Subheading = styled(H4).attrs({ as: "h2" })`
   margin: 0;
 `;
 
-// TODO this is used in a silly way, it should be before we iterate over the form fields
-// the heading label should be picked based on possible fields and selected type, not position etc.
-// so
-// Individual -> no subheadings
-// Organisation -> two subheadings
-// - one for organisation info
-// - one for contact info
-function SubheadingByType({
-  reserveeType,
-  index,
-  field,
-}: {
-  reserveeType: ReserveeType;
-  index: number;
-  field: string;
-}): React.ReactElement | null {
-  const { t } = useTranslation();
-
-  if (reserveeType === ReserveeType.Individual) {
-    return null;
-  }
-
-  if (reserveeType === ReserveeType.Nonprofit) {
-    const headingForNonProfit = index === 0;
-
-    if (headingForNonProfit) {
-      return <GroupHeading>{t("reservationApplication:label.headings.nonprofitInfo")}</GroupHeading>;
-    }
-  }
-  if (reserveeType === ReserveeType.Company) {
-    const headingForCompanyInfo = index === 0;
-
-    if (headingForCompanyInfo) {
-      return <GroupHeading>{t("reservationApplication:label.headings.companyInfo")}</GroupHeading>;
-    }
-  }
-
-  // TODO in what case does the above checks fall to here?
-  if (field === "reserveeFirstName") {
-    return <GroupHeading>{t("reservationApplication:label.headings.contactInfo")}</GroupHeading>;
-  }
-  return null;
-}
-
 export function ReservationFormGeneralSection({
   fields,
   options: originalOptions,
@@ -221,22 +177,49 @@ export function ReservationFormReserveeSection({
 
   const reserveeType = watch("reserveeType");
 
-  const errorTrKey = errors.reserveeType?.message ? `forms:${errors.reserveeType.message}` : undefined;
-  const error = errorTrKey ? t(errorTrKey, { fieldName: t("reservationApplication:reserveeType") }) : undefined;
+  const reserveeTypeErrorTr = errors.reserveeType?.message ? `forms:${errors.reserveeType.message}` : undefined;
+  const reserveeTypeError = reserveeTypeErrorTr
+    ? t(reserveeTypeErrorTr, { fieldName: t("reservationApplication:reserveeType") })
+    : undefined;
 
+  const organisationFields = fields.filter(
+    (x) =>
+      x === "reserveeOrganisationName" ||
+      x === "reserveeIdentifier" ||
+      x === "reserveeIsUnregisteredAssociation" ||
+      x === "municipality"
+  );
+  const otherFields = fields.filter((x) => organisationFields.find((b) => b === x) == null);
+  if (reserveeType === ReserveeType.Individual) {
+    otherFields.push("municipality");
+  }
   return (
     <AutoGrid data-testid="reservation__form--reservee-info" className={className} style={style}>
       <Subheading>{t("reservationCalendar:reserverInfo")}</Subheading>
-      {isTypeSelectable && <CustomerTypeSelector name="reserveeType" control={control} required error={error} />}
-      {fields.map((field, index) => (
+      {isTypeSelectable && (
+        <CustomerTypeSelector name="reserveeType" control={control} required error={reserveeTypeError} />
+      )}
+      {reserveeType === ReserveeType.Nonprofit ? (
+        <GroupHeading>{t("reservationApplication:label.headings.nonprofitInfo")}</GroupHeading>
+      ) : reserveeType === ReserveeType.Company ? (
+        <GroupHeading>{t("reservationApplication:label.headings.companyInfo")}</GroupHeading>
+      ) : null}
+      {reserveeType !== ReserveeType.Individual &&
+        organisationFields.map((field) => (
+          <Fragment key={`key-${field}-container`}>
+            <ReservationFormField
+              field={field}
+              options={extendMetaFieldOptions(options, t)}
+              reserveeType={reserveeType}
+            />
+          </Fragment>
+        ))}
+      {reserveeType !== ReserveeType.Individual && (
+        <GroupHeading>{t("reservationApplication:label.headings.contactInfo")}</GroupHeading>
+      )}
+      {otherFields.map((field) => (
         <Fragment key={`key-${field}-container`}>
-          {reserveeType != null && (
-            // TODO the logic inside this component is really weird
-            // move the logic here instead (or properly refactor)
-            <SubheadingByType reserveeType={reserveeType} index={index} field={field} key={`key-${field}-subheading`} />
-          )}
           <ReservationFormField
-            key={`key-${field}`}
             field={field}
             options={extendMetaFieldOptions(options, t)}
             reserveeType={reserveeType}
