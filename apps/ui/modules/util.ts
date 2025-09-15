@@ -79,7 +79,7 @@ export function formatDateRange(begin: Date, end: Date): string {
   const beginDate = toUIDate(begin);
   const endDate = toUIDate(end);
 
-  return `${beginDate}${!isSameDay(begin, end) ? " – " + endDate : ""}`.trim();
+  return `${beginDate}${!isSameDay(begin, end) ? ` – ${endDate}` : ""}`.trim();
 }
 
 function formatDay(t: TFunction, date: Date): string {

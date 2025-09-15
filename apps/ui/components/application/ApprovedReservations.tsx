@@ -589,14 +589,14 @@ function getReservationSeriesAccessText(reservationUnit: ReservationSeriesTableE
   switch (accessType) {
     case AccessTypeWithMultivalued.Multivalued:
       if (usedAccessTypes.includes(AccessType.AccessCode)) {
-        return `${t("reservationUnit:accessTypes." + AccessType.AccessCode)}: ${accessCodeSafe(pindoraInfo, t)}`;
+        return `${t(`reservationUnit:accessTypes.${AccessType.AccessCode}`)}: ${accessCodeSafe(pindoraInfo, t)}`;
       }
       return usedAccessTypes
         .filter((aT) => aT != null && aT !== AccessType.Unrestricted)
         .map((aT) => t(`reservationUnit:accessTypes.${aT}`))
         .join(" / ");
     case AccessTypeWithMultivalued.AccessCode:
-      return `${t("reservationUnit:accessTypes." + accessType)}: ${accessCodeSafe(pindoraInfo, t)}`;
+      return `${t(`reservationUnit:accessTypes.${accessType}`)}: ${accessCodeSafe(pindoraInfo, t)}`;
     default:
       return t(`reservationUnit:accessTypes.${accessType}`);
   }

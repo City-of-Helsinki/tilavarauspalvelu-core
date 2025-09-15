@@ -23,7 +23,7 @@ describe("Component: Payment Notification", () => {
     if (!appliedPricingMock) {
       throw new Error("Applied pricing mock is undefined");
     }
-    const formattedPrice = appliedPricingMock.highestPrice.split(".").join(",") + "0";
+    const formattedPrice = `${appliedPricingMock.highestPrice.split(".").join(",")}0`;
     // eslint-disable-next-line no-irregular-whitespace
     const priceText = `common:price: ${formattedPrice} € (common:inclTax {"taxPercentage":"24,5"})`;
     const priceElement = screen.getByTestId("reservation__payment-notification__price");

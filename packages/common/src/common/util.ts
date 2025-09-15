@@ -83,7 +83,7 @@ export function toApiTime({ hours, minutes = 0 }: TimeStruct): string | null {
 export function toApiTimeUnsafe({ hours, minutes = 0 }: TimeStruct): string {
   const time = toApiTime({ hours, minutes });
   if (time == null) {
-    throw new Error("Invalid time: " + JSON.stringify({ hours, minutes }));
+    throw new Error(`Invalid time: ${JSON.stringify({ hours, minutes })}`);
   }
   return time;
 }
