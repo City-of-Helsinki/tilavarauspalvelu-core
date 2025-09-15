@@ -5,7 +5,7 @@ import { onError } from "@apollo/client/link/error";
 import toast from "./components/toast";
 import { isBrowser } from "./helpers";
 import type { IncomingMessage, IncomingHttpHeaders } from "node:http";
-import qs from "node:querystring";
+import qs from "querystring";
 import { getCookie } from "typescript-cookie";
 
 // TODO narrow down the error codes and transform unknowns to catch all
