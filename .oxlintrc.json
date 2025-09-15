@@ -341,6 +341,7 @@
     "typescript/no-unnecessary-boolean-literal-compare": "error",
     "typescript/no-unnecessary-parameter-property-assignment": "error",
     "typescript/no-unnecessary-template-expression": "error",
+    "typescript/no-unnecessary-type-arguments": "error",
     "typescript/no-unnecessary-type-assertion": "error",
     "typescript/no-unnecessary-type-constraint": "error",
     "typescript/no-unsafe-declaration-merging": "error",
