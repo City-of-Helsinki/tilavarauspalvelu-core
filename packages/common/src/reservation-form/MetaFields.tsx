@@ -162,7 +162,7 @@ export function ReservationFormGeneralSection({
 export function ReservationFormReserveeSection({
   fields,
   reservationUnit,
-  options,
+  options: originalOptions,
   style,
   className,
 }: ReservationFormReserveeSectionProps) {
@@ -182,17 +182,21 @@ export function ReservationFormReserveeSection({
     ? t(reserveeTypeErrorTr, { fieldName: t("reservationApplication:reserveeType") })
     : undefined;
 
+  const createLabel = (field: keyof ReservationFormValueT): string => {
+    return constructReservationFieldLabel(t, reserveeType ?? ReserveeType.Individual, field);
+  };
+
+  const getFieldError = (field: keyof ReservationFormValueT): string | undefined => {
+    return translateReserveeFormError(t, createLabel(field), errors[field]);
+  };
+
+  const options = extendMetaFieldOptions(originalOptions, t);
+
   const organisationFields = fields.filter(
-    (x) =>
-      x === "reserveeOrganisationName" ||
-      x === "reserveeIdentifier" ||
-      x === "reserveeIsUnregisteredAssociation" ||
-      x === "municipality"
+    (x) => x === "reserveeOrganisationName" || x === "reserveeIdentifier" || x === "reserveeIsUnregisteredAssociation"
   );
   const otherFields = fields.filter((x) => organisationFields.find((b) => b === x) == null);
-  if (reserveeType === ReserveeType.Individual) {
-    otherFields.push("municipality");
-  }
+
   return (
     <AutoGrid data-testid="reservation__form--reservee-info" className={className} style={style}>
       <Subheading>{t("reservationCalendar:reserverInfo")}</Subheading>
@@ -204,14 +208,24 @@ export function ReservationFormReserveeSection({
       ) : reserveeType === ReserveeType.Company ? (
         <GroupHeading>{t("reservationApplication:label.headings.companyInfo")}</GroupHeading>
       ) : null}
+      {/* TODO should have the organisation name on the first line */}
+      {/* TODO propably best to separate the organisation part of the form to it's own section */}
+      {reserveeType !== ReserveeType.Individual && (
+        <ControlledSelect
+          name="municipality"
+          id={constructReservationFieldId("municipality")}
+          label={createLabel("municipality")}
+          error={getFieldError("municipality")}
+          control={control}
+          required
+          options={options.municipalities}
+          strongLabel
+        />
+      )}
       {reserveeType !== ReserveeType.Individual &&
         organisationFields.map((field) => (
           <Fragment key={`key-${field}-container`}>
-            <ReservationFormField
-              field={field}
-              options={extendMetaFieldOptions(options, t)}
-              reserveeType={reserveeType}
-            />
+            <ReservationFormField field={field} reserveeType={reserveeType} />
           </Fragment>
         ))}
       {reserveeType !== ReserveeType.Individual && (
@@ -219,13 +233,21 @@ export function ReservationFormReserveeSection({
       )}
       {otherFields.map((field) => (
         <Fragment key={`key-${field}-container`}>
-          <ReservationFormField
-            field={field}
-            options={extendMetaFieldOptions(options, t)}
-            reserveeType={reserveeType}
-          />
+          <ReservationFormField field={field} reserveeType={reserveeType} />
         </Fragment>
       ))}
+      {reserveeType === ReserveeType.Individual && (
+        <ControlledSelect
+          name="municipality"
+          id={constructReservationFieldId("municipality")}
+          label={createLabel("municipality")}
+          error={getFieldError("municipality")}
+          control={control}
+          required
+          options={options.municipalities}
+          strongLabel
+        />
+      )}
     </AutoGrid>
   );
 }

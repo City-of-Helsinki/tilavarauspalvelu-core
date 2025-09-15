@@ -2,8 +2,7 @@ import React from "react";
 import { useFormContext, type UseFormRegister } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { ReserveeType } from "../../gql/gql-types";
-import { type OptionsRecord } from "../../types/common";
-import { ControlledCheckbox, ControlledSelect } from "../components/form";
+import { ControlledCheckbox } from "../components/form";
 import { type ReservationFormValueT } from "../schemas";
 import { filterEmptyString } from "../helpers";
 import { StyledCheckboxWrapper, StyledTextInput } from "./styled";
@@ -16,15 +15,11 @@ import {
 
 type Props = {
   field: keyof ReservationFormValueT;
-  options: OptionsRecord;
   reserveeType?: ReserveeType;
 };
 
-export function ReservationFormField({
-  field,
-  options: originalOptions,
-  reserveeType,
-}: Props): React.ReactElement | null {
+// TODO turn this into TextFields only now?
+export function ReservationFormField({ field, reserveeType }: Props): React.ReactElement | null {
   const { t } = useTranslation();
 
   const {
@@ -39,21 +34,6 @@ export function ReservationFormField({
   const id = constructReservationFieldId(field);
 
   switch (field) {
-    case "municipality": {
-      return (
-        <ControlledSelect
-          id={id}
-          name={field}
-          label={label}
-          control={control}
-          required
-          options={originalOptions.municipalities}
-          error={errorText}
-          strongLabel
-          key={field}
-        />
-      );
-    }
     case "reserveeIsUnregisteredAssociation":
       if (watch("reserveeType") !== ReserveeType.Nonprofit) {
         return null;
@@ -82,6 +62,7 @@ export function ReservationFormField({
         />
       );
     }
+    case "municipality":
     case "numPersons":
     case "description":
     case "applyingForFreeOfCharge":
