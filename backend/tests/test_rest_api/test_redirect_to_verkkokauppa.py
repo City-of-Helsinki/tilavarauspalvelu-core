@@ -23,7 +23,9 @@ pytestmark = [
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_redirect_to_verkkokauppa__success(api_client):
+def test_redirect_to_verkkokauppa__success(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     order = OrderFactory.create()
     VerkkokauppaAPIClient.create_order.return_value = order
 
@@ -43,7 +45,9 @@ def test_redirect_to_verkkokauppa__success(api_client):
     assert reservation.tax_percentage_value == Decimal("25.5")
 
 
-def test_redirect_to_verkkokauppa__no_redirect_on_error(api_client):
+def test_redirect_to_verkkokauppa__no_redirect_on_error(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     reservation = ReservationFactory.create_with_pending_payment()
 
     url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
@@ -58,7 +62,27 @@ def test_redirect_to_verkkokauppa__no_redirect_on_error(api_client):
     }
 
 
-def test_redirect_to_verkkokauppa__redirect_on_error_not_url(api_client):
+def test_redirect_to_verkkokauppa__not_allowed_redirect_on_error(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://real.varaamo.hel.fi"]
+
+    reservation = ReservationFactory.create_with_pending_payment()
+
+    url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
+    url = update_query_params(url, redirect_on_error="https://fake.varaamo.hel.fi", lang="en")
+
+    api_client.force_login(reservation.user)
+    response = api_client.get(url)
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "The 'redirect_on_error' parameter points to an origin that is not allowed.",
+        "code": "REDIRECT_ON_ERROR_ORIGIN_NOT_ALLOWED",
+    }
+
+
+def test_redirect_to_verkkokauppa__redirect_on_error_not_url(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     reservation = ReservationFactory.create_with_pending_payment()
 
     url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
@@ -75,7 +99,9 @@ def test_redirect_to_verkkokauppa__redirect_on_error_not_url(api_client):
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_redirect_to_verkkokauppa__redirect_on_error_from_referer(api_client):
+def test_redirect_to_verkkokauppa__redirect_on_error_from_referer(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     order = OrderFactory.create()
     VerkkokauppaAPIClient.create_order.return_value = order
 
@@ -90,7 +116,9 @@ def test_redirect_to_verkkokauppa__redirect_on_error_from_referer(api_client):
     assert response.url == "https://checkout.url/paymentmethod"
 
 
-def test_redirect_to_verkkokauppa__reservation_not_found(api_client):
+def test_redirect_to_verkkokauppa__reservation_not_found(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": 0})
     url = update_query_params(url, redirect_on_error="https://fake.varaamo.hel.fi")
 
@@ -105,7 +133,9 @@ def test_redirect_to_verkkokauppa__reservation_not_found(api_client):
     }
 
 
-def test_redirect_to_verkkokauppa__reservation_user_not_request_user(api_client):
+def test_redirect_to_verkkokauppa__reservation_user_not_request_user(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     reservation = ReservationFactory.create_with_pending_payment()
 
     url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
@@ -122,7 +152,9 @@ def test_redirect_to_verkkokauppa__reservation_user_not_request_user(api_client)
     }
 
 
-def test_redirect_to_verkkokauppa__reservation_not_confirmed(api_client):
+def test_redirect_to_verkkokauppa__reservation_not_confirmed(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     reservation = ReservationFactory.create_with_pending_payment(
         state=ReservationStateChoice.REQUIRES_HANDLING,
     )
@@ -142,7 +174,9 @@ def test_redirect_to_verkkokauppa__reservation_not_confirmed(api_client):
     }
 
 
-def test_redirect_to_verkkokauppa__reservation_no_payment_order(api_client):
+def test_redirect_to_verkkokauppa__reservation_no_payment_order(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     begin = next_hour(plus_hours=1)
 
     reservation_unit = ReservationUnitFactory.create()
@@ -170,7 +204,9 @@ def test_redirect_to_verkkokauppa__reservation_no_payment_order(api_client):
     }
 
 
-def test_redirect_to_verkkokauppa__reservation_payment_not_in_verkkokauppa(api_client):
+def test_redirect_to_verkkokauppa__reservation_payment_not_in_verkkokauppa(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     reservation = ReservationFactory.create_with_pending_payment(
         payment_order__payment_type=PaymentType.ON_SITE,
     )
@@ -190,7 +226,9 @@ def test_redirect_to_verkkokauppa__reservation_payment_not_in_verkkokauppa(api_c
     }
 
 
-def test_redirect_to_verkkokauppa__reservation_payment_not_pending(api_client):
+def test_redirect_to_verkkokauppa__reservation_payment_not_pending(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     reservation = ReservationFactory.create_with_pending_payment(
         payment_order__status=OrderStatus.PAID,
     )
@@ -210,7 +248,9 @@ def test_redirect_to_verkkokauppa__reservation_payment_not_pending(api_client):
     }
 
 
-def test_redirect_to_verkkokauppa__reservation_handled_payment_due_by_in_past(api_client):
+def test_redirect_to_verkkokauppa__reservation_handled_payment_due_by_in_past(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     reservation = ReservationFactory.create_with_pending_payment(
         payment_order__handled_payment_due_by=next_hour(plus_hours=-2),
     )
@@ -230,7 +270,9 @@ def test_redirect_to_verkkokauppa__reservation_handled_payment_due_by_in_past(ap
     }
 
 
-def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order(api_client):
+def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     reservation = ReservationFactory.create_with_pending_payment(
         payment_order__remote_id=uuid.uuid4(),
         payment_order__checkout_url="https://fake.varaamo.hel.fi/checkout",
@@ -248,7 +290,9 @@ def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order(ap
 
 
 @patch_method(VerkkokauppaAPIClient.create_order)
-def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order__expired(api_client):
+def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order__expired(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     order = OrderFactory.create()
     VerkkokauppaAPIClient.create_order.return_value = order
 
@@ -272,7 +316,9 @@ def test_redirect_to_verkkokauppa__reservation_already_has_verkkokauppa_order__e
     assert response.url == "https://checkout.url/paymentmethod"
 
 
-def test_redirect_to_verkkokauppa__reservation_unit_has_no_active_pricing(api_client):
+def test_redirect_to_verkkokauppa__reservation_unit_has_no_active_pricing(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     reservation = ReservationFactory.create_with_pending_payment()
     reservation.reservation_unit.pricings.all().delete()
 
@@ -292,7 +338,9 @@ def test_redirect_to_verkkokauppa__reservation_unit_has_no_active_pricing(api_cl
 
 
 @patch_method(ReservationActions.create_order_in_verkkokauppa, side_effect=ValidationError("Error"))
-def test_redirect_to_verkkokauppa__verkkokauppa_order_creation_failed(api_client):
+def test_redirect_to_verkkokauppa__verkkokauppa_order_creation_failed(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     reservation = ReservationFactory.create_with_pending_payment()
 
     url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
