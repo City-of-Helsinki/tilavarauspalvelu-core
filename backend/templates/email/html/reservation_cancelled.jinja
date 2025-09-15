@@ -3,6 +3,7 @@
 {% block content_main %}
     <mj-text>{{ text_reservation_cancelled | sentence | safe }}</mj-text>
     <mj-text>{{ reason_cancel_label | safe }}: {{ cancel_reason | safe }}</mj-text>
+    {% if handled_payment_due_by is not none %}<mj-text>{{ handled_payment_due_by_label | safe }}: {{ handled_payment_due_by }}</mj-text>{% endif %}
     {% include "email/html/partials/reservation_basic_info.jinja" %}
     {% include "email/html/partials/reservation_price.jinja" %}
 {% endblock %}
