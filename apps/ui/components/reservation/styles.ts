@@ -4,12 +4,7 @@ import { breakpoints } from "common/src/modules/const";
 export const ActionContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  margin-top: var(--spacing-layout-m);
-  margin-bottom: var(--spacing-layout-m);
-
-  button {
-    margin-bottom: var(--spacing-m);
-  }
+  gap: var(--spacing-m);
 
   @media (min-width: ${breakpoints.s}) {
     & > button:first-of-type {
@@ -19,7 +14,6 @@ export const ActionContainer = styled.div`
     }
 
     display: flex;
-    gap: var(--spacing-m);
     justify-content: flex-end;
   }
 `;

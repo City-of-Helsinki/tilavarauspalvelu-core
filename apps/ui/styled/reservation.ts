@@ -39,10 +39,9 @@ export const NewReservationForm = styled.form`
 `;
 
 export const ReservationTitleSection = styled(Flex)`
-  grid-column: 1 / -1;
-  @media (min-width: ${breakpoints.m}) {
-    grid-column: span 1;
-  }
+  display: flex;
+  gap: var(--spacing-m);
+  flex-direction: column;
 `;
 
 // HDS uses fixed width for the stepper content, make sure it's long enough for all variations (single line).
