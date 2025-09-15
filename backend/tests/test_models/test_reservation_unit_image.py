@@ -23,7 +23,7 @@ def test_reservation_unit_image__save__update_urls_called_on_save(mock_update_ur
     settings.UPDATE_RESERVATION_UNIT_THUMBNAILS = True
 
     reservation_unit = ReservationUnitFactory.create()
-    image = ReservationUnitImage(reservation_unit=reservation_unit, image_type="main")
+    image = ReservationUnitImage(reservation_unit=reservation_unit, image_type=ReservationUnitImageType.MAIN)
     image.save()
 
     assert mock_update_urls.call_count == 1
