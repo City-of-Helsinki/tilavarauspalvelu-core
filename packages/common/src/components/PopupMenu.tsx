@@ -58,7 +58,7 @@ const ToggleButton = styled.button`
 interface Item {
   name: string;
   disabled?: boolean;
-  onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 interface PopupMenuProps {

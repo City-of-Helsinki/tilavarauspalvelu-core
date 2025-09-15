@@ -1,11 +1,10 @@
-import { ApolloClient, HttpLink, InMemoryCache, from, disableFragmentWarnings } from "@apollo/client";
+import { ApolloClient, disableFragmentWarnings, from, HttpLink, InMemoryCache } from "@apollo/client";
 import { relayStylePagination } from "@apollo/client/utilities";
-import type { ParsedUrlQuery } from "node:querystring";
-import type { GetServerSidePropsContext, PreviewData } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { buildGraphQLUrl } from "common/src/urlBuilder";
 import { env } from "@/env.mjs";
 import { isBrowser } from "./const";
-import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
+import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { enchancedFetch, errorLink } from "common/src/apolloUtils";
 
 // graphql-codegen does not allow fragments with non unique names
@@ -18,7 +17,7 @@ if (process.env.NODE_ENV === "development") {
   loadErrorMessages();
 }
 
-export function createApolloClient(hostUrl: string, ctx?: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>) {
+export function createApolloClient(hostUrl: string, ctx?: GetServerSidePropsContext) {
   const isServer = typeof window === "undefined";
   const uri = buildGraphQLUrl(hostUrl, env.ENABLE_FETCH_HACK);
   const httpLink = new HttpLink({
