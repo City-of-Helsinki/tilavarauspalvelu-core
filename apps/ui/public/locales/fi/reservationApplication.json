@@ -3,7 +3,7 @@
   "titleSent": "Varauksesi on nyt käsiteltävänä",
   "applicationInfo": "Varauksen tiedot",
   "summaryIngress": "Varaksesi on käsiteltävänä. Tutustu varauksen yhteenvetoon.",
-  "reserveeTypePrefix": "Varaan",
+  "reserveeTypePrefix": "Teen varauksen...",
   "reserveeType": "Varaajan tyyppi",
   "reserveeTypes": {
     "labels": {
