@@ -29,6 +29,7 @@ from tilavarauspalvelu.enums import (
     Weekday,
 )
 from tilavarauspalvelu.models import (
+    AllocatedTimeSlot,
     Application,
     ApplicationRound,
     ApplicationRoundTimeSlot,
@@ -47,6 +48,7 @@ from tilavarauspalvelu.models import (
     ReservationUnit,
     ReservationUnitAccessType,
     ReservationUnitCancellationRule,
+    ReservationUnitOption,
     ReservationUnitPricing,
     ReservationUnitType,
     Space,
@@ -117,6 +119,8 @@ def remove_existing_data() -> None:
     sq = Subquery(reservation_units.values("id"))
     reservations = Reservation.objects.filter(reservation_unit__in=sq)
     series = ReservationSeries.objects.filter(reservation_unit__in=sq)
+    allocation = AllocatedTimeSlot.objects.filter(reservation_unit_option__reservation_unit__in=sq)
+    options = ReservationUnitOption.objects.filter(reservation_unit__in=sq)
     applications = Application.objects.filter(
         models.Q(application_round__reservation_units__in=sq)
         | models.Q(application_round__name="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA)")
@@ -125,6 +129,8 @@ def remove_existing_data() -> None:
     spaces.delete()
     reservations.delete()
     series.delete()
+    allocation.delete()
+    options.delete()
     applications.delete()
     application_round.delete()
     reservation_units.delete()
@@ -724,7 +730,6 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         },
     )
 
-    # TODO: Categories?
     aani_laite, _ = Equipment.objects.get_or_create(
         name="Äänitekniikka",
         defaults={
@@ -3368,7 +3373,7 @@ def create_application_rounds() -> None:
 
 
 def create_past_reservations() -> None:
-    user = User.objects.get(email="qfaksi+paivi@gmail.com")
+    user = User.objects.get(username="u-uslsa3ewcvcmbcfyub5b26lfmu")
 
     maksuton_mankeli = ReservationUnit.objects.get(ext_uuid="7bbd9b47-ad06-495a-a530-b094574208d6")
 
