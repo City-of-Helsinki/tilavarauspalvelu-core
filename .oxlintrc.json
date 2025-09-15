@@ -314,6 +314,7 @@
     "typescript/explicit-function-return-type": "off",
     "typescript/explicit-module-boundary-types": "off",
     "typescript/no-array-delete": "error",
+    "typescript/no-base-to-string": "error",
     "typescript/no-confusing-non-null-assertion": "error",
     "typescript/no-duplicate-enum-values": "error",
     "typescript/no-dynamic-delete": "error",
