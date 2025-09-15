@@ -384,7 +384,7 @@ function ReservationUnit({
   const { isReservable: reservationUnitIsReservable, reason } = isReservationUnitReservable(reservationUnit);
   if (!reservationUnitIsReservable) {
     // eslint-disable-next-line no-console
-    console.warn("not reservable because: ", reason);
+    console.warn("not reservable because:", reason);
   }
 
   const shouldDisplayBottomWrapper = relatedReservationUnits?.length > 0;

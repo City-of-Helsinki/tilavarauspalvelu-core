@@ -175,14 +175,14 @@ function convertMaybeOptionValue(
     const optionsKey = key as keyof typeof fieldOptions;
     if (rawValue == null) {
       // eslint-disable-next-line no-console
-      console.warn("convertMaybeOptionValue: rawValue is not object: ", rawValue);
+      console.warn("convertMaybeOptionValue: rawValue is not object:", rawValue);
     } else if (typeof rawValue === "object" && "pk" in rawValue && typeof rawValue.pk === "number") {
       return fieldOptions[optionsKey].find((option) => option.value === rawValue.pk)?.label ?? "";
     } else if (typeof rawValue === "string" && rawValue !== "") {
       return fieldOptions[optionsKey].find((option) => option.value === rawValue)?.label ?? "";
     }
     // eslint-disable-next-line no-console
-    console.warn("convertMaybeOptionValue: rawValue is not pk, but object: ", rawValue);
+    console.warn("convertMaybeOptionValue: rawValue is not pk, but object:", rawValue);
     return "unknown";
   }
   if (typeof rawValue === "boolean") {
