@@ -87,7 +87,7 @@ const getStatusProps = (status?: ApplicationSectionStatusChoice): { type: Status
       return { type: "success", icon: <IconCheck /> };
     case ApplicationSectionStatusChoice.Rejected:
       return { type: "error", icon: <IconCross /> };
-    default:
+    case undefined:
       return {
         type: "neutral",
         icon: <IconQuestionCircle />,

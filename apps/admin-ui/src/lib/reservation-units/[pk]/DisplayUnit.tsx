@@ -44,7 +44,7 @@ const getReservationStateProps = (state?: ReservationUnitReservationState): Stat
         type: "success",
         icon: <IconEye />,
       };
-    default:
+    case undefined:
       return {
         type: "neutral",
         icon: <IconQuestionCircle />,
@@ -91,7 +91,8 @@ const getPublishingStateProps = (state?: ReservationUnitPublishingState): StateP
         type: "info",
         icon: <IconClock />,
       };
-    default:
+    case ReservationUnitPublishingState.Archived:
+    case undefined:
       return {
         type: "neutral",
         icon: <IconQuestionCircle />,

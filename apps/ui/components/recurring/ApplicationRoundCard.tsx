@@ -31,6 +31,9 @@ function translateRoundDate(
       });
     case ApplicationRoundStatusChoice.Open:
       return t("applicationRound:card.open", { until: formatDateTime(t, end) });
+    case ApplicationRoundStatusChoice.Handled:
+    case ApplicationRoundStatusChoice.InAllocation:
+    case ApplicationRoundStatusChoice.Sent:
     default:
       return t("applicationRound:card.past", {
         closing: formatDateTime(t, end),

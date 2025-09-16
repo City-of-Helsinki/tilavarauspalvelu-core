@@ -29,7 +29,9 @@ function getStatusLabelType(s?: Maybe<OrderStatus>): StatusLabelType {
     case OrderStatus.Draft:
       return "alert";
     case OrderStatus.Cancelled:
-    default:
+    case OrderStatus.Pending:
+    case null:
+    case undefined:
       return "neutral";
   }
 }
@@ -51,7 +53,8 @@ function getReservationStateLabelProps(s?: Maybe<ReservationStateChoice>): {
       return { type: "error", icon: <IconCross aria-hidden="true" /> };
     case ReservationStateChoice.Cancelled:
       return { type: "neutral", icon: <IconCross aria-hidden="true" /> };
-    default:
+    case null:
+    case undefined:
       return {
         type: "neutral",
         icon: <IconQuestionCircle aria-hidden="true" />,

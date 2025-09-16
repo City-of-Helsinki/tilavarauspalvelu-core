@@ -19,6 +19,8 @@ function transformReservationTypeStaffChoice(t: ReservationTypeChoice): Reservat
       return ReservationTypeStaffChoice.Behalf;
     case ReservationTypeChoice.Blocked:
       return ReservationTypeStaffChoice.Blocked;
+    case ReservationTypeChoice.Normal:
+    case ReservationTypeChoice.Seasonal:
     default:
       throw new Error("Invalid reservation type");
   }

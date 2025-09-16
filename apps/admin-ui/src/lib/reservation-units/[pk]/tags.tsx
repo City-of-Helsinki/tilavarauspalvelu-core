@@ -31,7 +31,7 @@ export function ReservationStateTag({ state }: { state?: ReservationUnitReservat
           type: "success",
           icon: <IconEye aria-hidden="true" />,
         };
-      default:
+      case undefined:
         return {
           type: "neutral",
           icon: <IconQuestionCircle aria-hidden="true" />,
@@ -79,7 +79,8 @@ const statusProps = (state?: ReservationUnitPublishingState): StatusPropsType =>
         type: "info",
         icon: <IconClock />,
       };
-    default:
+    case ReservationUnitPublishingState.Archived:
+    case undefined:
       return {
         type: "neutral",
         icon: <IconQuestionCircle />,

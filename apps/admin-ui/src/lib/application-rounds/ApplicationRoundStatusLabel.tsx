@@ -49,7 +49,8 @@ export function getApplicationRoundStatus(status: Maybe<ApplicationRoundStatusCh
         icon: <IconArrowTopRight />,
         label: status,
       };
-    default:
+    case null:
+    case undefined:
       return {
         group: "g5",
         type: "neutral",

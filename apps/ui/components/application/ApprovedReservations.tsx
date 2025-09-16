@@ -597,7 +597,10 @@ function getReservationSeriesAccessText(reservationUnit: ReservationSeriesTableE
         .join(" / ");
     case AccessTypeWithMultivalued.AccessCode:
       return `${t(`reservationUnit:accessTypes.${accessType}`)}: ${accessCodeSafe(pindoraInfo, t)}`;
-    default:
+    case AccessTypeWithMultivalued.OpenedByStaff:
+    case AccessTypeWithMultivalued.PhysicalKey:
+    case AccessTypeWithMultivalued.Unrestricted:
+    case null:
       return t(`reservationUnit:accessTypes.${accessType}`);
   }
 }
@@ -860,7 +863,12 @@ function getReservationStatusChoice(
       return "rejected";
     case ReservationStateChoice.Cancelled:
       return "cancelled";
-    default:
+    case ReservationStateChoice.Confirmed:
+    case ReservationStateChoice.Created:
+    case ReservationStateChoice.RequiresHandling:
+    case ReservationStateChoice.WaitingForPayment:
+    case null:
+    case undefined:
       return isModified ? "modified" : "";
   }
 }

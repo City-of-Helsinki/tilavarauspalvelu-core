@@ -103,7 +103,7 @@ function transformCellType(cellType: CellState): Priority {
       return Priority.Primary;
     case "secondary":
       return Priority.Secondary;
-    default:
+    case "none":
       throw new Error(`Unknown cell type: ${cellType}`);
   }
 }

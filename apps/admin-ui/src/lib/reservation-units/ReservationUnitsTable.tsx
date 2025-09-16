@@ -54,7 +54,8 @@ const getStatusLabelProps = (
     case ReservationUnitReservationState.ScheduledClosing:
     case ReservationUnitReservationState.ScheduledPeriod:
       return { type: "info", icon: <IconClock /> };
-    default:
+    case null:
+    case undefined:
       return { type: "info", icon: <IconQuestionCircleFill /> };
   }
 };
@@ -73,7 +74,9 @@ const getPublishingStateProps = (
       return { type: "draft", icon: <IconPen aria-hidden="true" /> };
     case ReservationUnitPublishingState.Hidden:
       return { type: "neutral", icon: <IconEyeCrossed aria-hidden="true" /> };
-    default:
+    case ReservationUnitPublishingState.Archived:
+    case null:
+    case undefined:
       return {
         type: "neutral",
         icon: <IconQuestionCircleFill aria-hidden="true" />,

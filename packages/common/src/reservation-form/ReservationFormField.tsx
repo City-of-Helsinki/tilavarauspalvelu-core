@@ -153,38 +153,38 @@ export function ReservationFormField({
   const errorText = useMemo(() => {
     if (!error || !field) return "";
 
-    switch (error.type) {
-      case "min":
-        if (field === "numPersons") return t("forms:minNumPersons", { minValue });
-        break;
-      case "max":
-        if (field === "numPersons") return t("forms:maxNumPersons", { maxValue });
-        break;
-      case "minLength":
-        if (field === "reserveeIdentifier") return t("forms:invalidReserveeId");
-        return t("forms:minLength");
-      case "maxLength":
-        return t("forms:maxLength");
-      // duplicated email errror messages because they can be added by zod schema or register pattern validators
-      case "invalid_string":
-        if (error.message === "Invalid email") {
-          return t("forms:invalidEmail");
-        }
-        break;
-      case "pattern":
-        if (error.message === "email") {
-          return t("forms:invalidEmail");
-        }
-        break;
-      case "required":
-      default:
-        return t("forms:requiredField", {
-          prefix: errorPrefix,
-          fieldName: label.toLocaleLowerCase(),
-        });
+    if (error.type === "min") {
+      if (field === "numPersons") return t("forms:minNumPersons", { minValue });
+      return "";
+    }
+    if (error.type === "max") {
+      if (field === "numPersons") return t("forms:maxNumPersons", { maxValue });
+      return "";
     }
 
-    return "";
+    if (error.type === "minLength") {
+      if (field === "reserveeIdentifier") return t("forms:invalidReserveeId");
+      return t("forms:minLength");
+    }
+    if (error.type === "maxLength") {
+      return t("forms:maxLength");
+    }
+
+    // duplicated email error messages because they can be added by zod schema or register pattern validators
+    if (error.type === "invalid_string") {
+      if (error.message === "Invalid email") return t("forms:invalidEmail");
+      return "";
+    }
+
+    if (error.type === "pattern") {
+      if (error.message === "email") return t("forms:invalidEmail");
+      return "";
+    }
+
+    return t("forms:requiredField", {
+      prefix: errorPrefix,
+      fieldName: label.toLocaleLowerCase(),
+    });
   }, [error, field, label, t, minValue, maxValue, errorPrefix]);
 
   const defaultValue = get(reservation, field);
@@ -329,7 +329,25 @@ export function ReservationFormField({
           }
         />
       );
-    default:
+    case "pk":
+    case "showBillingAddress":
+    case "reserveeFirstName":
+    case "reserveeLastName":
+    case "reserveePhone":
+    case "reserveeAddressStreet":
+    case "reserveeAddressZip":
+    case "reserveeAddressCity":
+    case "reserveeEmail":
+    case "reserveeOrganisationName":
+    case "name":
+    case "description":
+    case "municipality":
+    case "spaceTerms":
+    case "resourceTerms":
+    case "purpose":
+    case "numPersons":
+    case "ageGroup":
+    case "reserveeType":
       return (
         <StyledTextInput
           key={field}

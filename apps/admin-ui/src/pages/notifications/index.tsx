@@ -39,7 +39,8 @@ const getStatusLabelProps = (
       return { type: "info", icon: <IconClock /> };
     case BannerNotificationState.Active:
       return { type: "success", icon: <IconCheck /> };
-    default:
+    case null:
+    case undefined:
       return {
         type: "info",
         icon: <IconQuestionCircleFill />,

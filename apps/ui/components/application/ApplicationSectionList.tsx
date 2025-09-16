@@ -42,7 +42,10 @@ function getLabelProps(status: ApplicationSectionStatusChoice | undefined | null
       return { type: "success", icon: <IconCheck /> };
     case ApplicationSectionStatusChoice.Rejected:
       return { type: "error", icon: <IconCross /> };
-    default:
+    case ApplicationSectionStatusChoice.InAllocation:
+    case ApplicationSectionStatusChoice.Unallocated:
+    case undefined:
+    case null:
       return { type: "info", icon: <IconQuestionCircleFill /> };
   }
 }

@@ -47,7 +47,9 @@ export function getReservationUnitInstructionsKey(
     case ReservationStateChoice.Confirmed:
       return "reservationConfirmedInstructions";
     case ReservationStateChoice.Denied:
-    default:
+    case ReservationStateChoice.WaitingForPayment:
+    case null:
+    case undefined:
       return null;
   }
 }

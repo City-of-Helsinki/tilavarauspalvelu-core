@@ -13,7 +13,7 @@ function getPriceUnitMinutes(unit: PriceUnit): number {
     case PriceUnit.PerHalfDay:
     case PriceUnit.PerDay:
     case PriceUnit.PerWeek:
-    default:
+    case PriceUnit.Fixed:
       return 1;
   }
 }
@@ -24,7 +24,10 @@ function getPriceFractionMinutes(unit: PriceUnit): number {
     case PriceUnit.Per_30Mins:
     case PriceUnit.PerHour:
       return 15;
-    default:
+    case PriceUnit.Fixed:
+    case PriceUnit.PerDay:
+    case PriceUnit.PerHalfDay:
+    case PriceUnit.PerWeek:
       return 1;
   }
 }

@@ -135,7 +135,8 @@ export default function toast({
     case "success":
       toastOptions.icon = <IconCheckCircleFill />;
       break;
-    default:
+    case "alert":
+    case "info":
       toastOptions.icon = <IconInfoCircleFill />;
   }
   return toastFn(

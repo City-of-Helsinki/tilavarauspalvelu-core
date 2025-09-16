@@ -75,7 +75,11 @@ export function isReservationUnitPublished(reservationUnit: Pick<ReservationUnit
     case ReservationUnitPublishingState.Published:
     case ReservationUnitPublishingState.ScheduledHiding:
       return true;
-    default:
+    case ReservationUnitPublishingState.Archived:
+    case ReservationUnitPublishingState.Draft:
+    case ReservationUnitPublishingState.Hidden:
+    case ReservationUnitPublishingState.ScheduledPeriod:
+    case ReservationUnitPublishingState.ScheduledPublishing:
       return false;
   }
 }

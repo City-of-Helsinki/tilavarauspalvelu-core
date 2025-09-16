@@ -44,7 +44,8 @@ const getStatusLabelProps = (
       return { type: "success", icon: <IconCheck /> };
     case ReservationStateChoice.RequiresHandling:
       return { type: "info", icon: <IconCogwheel /> };
-    default:
+    case null:
+    case undefined:
       return {
         type: "info",
         icon: <IconQuestionCircleFill />,
@@ -65,7 +66,8 @@ const getPaymentStatusLabelType = (status: OrderStatus | null | undefined): Stat
     case OrderStatus.Pending:
       return "alert";
     case OrderStatus.Cancelled:
-    default:
+    case null:
+    case undefined:
       return "neutral";
   }
 };
