@@ -170,7 +170,7 @@ export function ReservationUnitModalContent({
           <ReservationUnitCard
             handleAdd={(pk) => handleAdd({ pk })}
             handleRemove={(pk) => handleRemove({ pk })}
-            isSelected={currentReservationUnits.some((i) => i.pk === ru.pk) !== undefined}
+            isSelected={currentReservationUnits.some((i) => i.pk === ru.pk)}
             reservationUnit={ru}
             key={ru.pk}
           />

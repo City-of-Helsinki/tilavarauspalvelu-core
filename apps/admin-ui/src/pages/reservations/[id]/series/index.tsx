@@ -192,7 +192,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
       .map((x) => x.date)
       // NOTE the data includes the same date multiple times (for some reason)
       .reduce<Date[]>((acc, x) => {
-        if (acc.some((y) => isSameDay(y, x)) == null) {
+        if (!acc.some((y) => isSameDay(y, x))) {
           return [...acc, x];
         }
         return acc;

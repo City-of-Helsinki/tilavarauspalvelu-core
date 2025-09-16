@@ -33,7 +33,7 @@ export function SearchTags({
     const vals = new URLSearchParams(params);
     vals.delete(tag.key, tag.value);
     // Use an empty proxy so default values don't override user choices
-    if (!vals.has(tag.key) && defaultTags.some((d) => d.key === tag.key) != null) {
+    if (!vals.has(tag.key) && defaultTags.some((d) => d.key === tag.key)) {
       vals.set(tag.key, "");
     }
     setParams(vals);

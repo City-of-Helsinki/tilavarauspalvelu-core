@@ -158,7 +158,7 @@ function ReservationFormFields({
     .map(camelCase);
   const fieldsExtended = fields.map((field) => ({
     field,
-    required: requiredFields.some((x) => x === field) != null,
+    required: requiredFields.some((x) => x === field),
   }));
 
   // TODO the subheading logic is weird / inefficient

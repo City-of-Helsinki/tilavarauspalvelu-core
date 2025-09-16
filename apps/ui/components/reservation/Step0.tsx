@@ -165,7 +165,7 @@ function Errors({
       <ErrorList>
         {errorKeys.map((key: string) => {
           const fieldType =
-            generalFields.some((x) => x === key) != null || key === "reserveeType"
+            key === "reserveeType" || generalFields.some((x) => x === key)
               ? "common"
               : reserveeType?.toLocaleLowerCase() || "individual";
           return (
