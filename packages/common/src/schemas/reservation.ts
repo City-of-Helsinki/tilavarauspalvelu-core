@@ -27,107 +27,18 @@ export const TimeFormSchema = z.object({
 });
 
 const CreateStaffReservationFormSchema = z
+  // TODO this is bad, use form schema instead
   .object({
     comments: z.string().optional(),
     // backend doesn't accept bad emails (empty is fine)
     reserveeEmail: z.union([z.string().email(), z.string().length(0)]).optional(),
   })
-  .merge(TimeFormSchema)
-  // passthrough since this is combined to the metafields
-  .passthrough();
-
-// partial because of how Zod works
-// refinements are only ran if the required fields are set
-// this shows refinement errors before required of course we need to either do a second
-// pass or add custom Required refinements
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CreateStaffReservationFormSchemaPartial = CreateStaffReservationFormSchema.partial();
-type CreateStaffReservationFormSchemaPartialType = z.infer<typeof CreateStaffReservationFormSchemaPartial>;
-
-export const checkStartEndTime = (
-  data: Pick<CreateStaffReservationFormSchemaPartialType, "startTime" | "endTime">,
-  ctx: z.RefinementCtx
-) => {
-  if (
-    data.startTime &&
-    data.endTime &&
-    Number(data.startTime.replace(":", ".")) >= Number(data.endTime.replace(":", "."))
-  ) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ["endTime"],
-      message: "End time needs to be after start time.",
-    });
-  }
-};
-
-export const checkReservationInterval = (
-  time: string | undefined,
-  ctx: z.RefinementCtx,
-  path: string,
-  interval: number
-) => {
-  if (time && Number(time.substring(3)) % interval !== 0) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: [path],
-      message: `${path} has to be in ${interval} minutes increments.`,
-    });
-  }
-};
-
-// Date can't be in past
-// Time is allowed to be in the past on purpose so it's not validated
-// i.e. you can make a reservation for today 10:00 even if it's 10:30
-const CreateStaffReservationFormSchemaRefined = (interval: ReservationStartInterval) =>
-  CreateStaffReservationFormSchema.partial()
-    .superRefine((val, ctx) => {
-      if (val.date) {
-        checkValidFutureDate(parseUIDate(val.date), ctx, "date");
-      }
-    })
-    .superRefine((val, ctx) => checkTimeStringFormat(val.startTime, ctx, "startTime"))
-    .superRefine((val, ctx) => checkTimeStringFormat(val.endTime, ctx, "endTime"))
-    .superRefine((val, ctx) => checkStartEndTime(val, ctx))
-    .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", getIntervalMinutes(interval)))
-    .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15))
-    .refine((s) => s.type, {
-      path: ["type"],
-      message: "Required",
-    });
-
-// NOTE duplicated schema because schemas need to be refined after merge (only times in this case)
-export const TimeChangeFormSchemaRefined = (interval: ReservationStartInterval) =>
-  TimeFormSchema.partial()
-    .superRefine((val, ctx) => {
-      const d = val.date ? parseUIDate(val.date) : null;
-      checkValidFutureDate(d, ctx, "date");
-    })
-    .superRefine((val, ctx) => checkTimeStringFormat(val.startTime, ctx, "startTime"))
-    .superRefine((val, ctx) => checkTimeStringFormat(val.endTime, ctx, "endTime"))
-    .superRefine((val, ctx) => checkStartEndTime(val, ctx))
-    .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", getIntervalMinutes(interval)))
-    .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15))
-    .refine((s) => s.type, {
-      path: ["type"],
-      message: "Required",
-    });
-
-export { CreateStaffReservationFormSchemaRefined as CreateStaffReservationFormSchema };
+  .extend(TimeFormSchema.shape);
 
 export type CreateReservationFormType = z.infer<typeof CreateStaffReservationFormSchema>;
 
-// TODO what is this for?
-export const ReservationChangeFormSchema = z
-  .object({
-    type: ReservationTypeSchema,
-    seriesName: z.string().optional(),
-    comments: z.string(),
-  })
-  // passthrough since this is combined to the metafields
-  .passthrough();
-
-export type ReservationChangeFormType = z.infer<typeof ReservationChangeFormSchema>;
+type CreateStaffReservationFormSchema = z.infer<typeof CreateStaffReservationFormSchema>;
+type TimeFormValuesT = z.infer<typeof TimeFormSchema>;
 
 // Only used for admin forms
 // TODO should be combined with the new schemas, but should have partial
@@ -149,13 +60,96 @@ export const ReservationFormMetaSchema = z.object({
   reserveeLastName: z.string().optional(),
   reserveeOrganisationName: z.string().optional(),
   reserveePhone: z.string().optional(),
-  // TODO the reserveeType is problematic
-  // radio buttons should have a default value and form inputs don't like null (uncontrolled input)
-  // TODO test what happens if the user submits a form with a null value?
-  reserveeType: z.enum([ReserveeType.Individual, ReserveeType.Nonprofit, ReserveeType.Company]).nullable(),
+  reserveeType: z.enum([ReserveeType.Individual, ReserveeType.Nonprofit, ReserveeType.Company]).optional(),
 });
 
-export type ReservationFormMeta = z.infer<typeof ReservationFormMetaSchema>;
+export function checkStartEndTime(
+  data: Pick<TimeFormValuesT, "startTime" | "endTime">,
+  ctx: z.RefinementCtx
+): undefined {
+  if (
+    data.startTime &&
+    data.endTime &&
+    Number(data.startTime.replace(":", ".")) >= Number(data.endTime.replace(":", "."))
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["endTime"],
+      message: "End time needs to be after start time.",
+    });
+  }
+}
+
+export function checkReservationInterval(
+  time: string | undefined,
+  ctx: z.RefinementCtx,
+  path: string,
+  interval: number
+): undefined {
+  if (time && Number(time.substring(3)) % interval !== 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: [path],
+      message: `${path} has to be in ${interval} minutes increments.`,
+    });
+  }
+}
+
+// Date can't be in past
+// Time is allowed to be in the past on purpose so it's not validated
+// i.e. you can make a reservation for today 10:00 even if it's 10:30
+function getCreateStaffReservationFormSchema(interval: ReservationStartInterval) {
+  return CreateStaffReservationFormSchema.extend(ReservationFormMetaSchema.shape)
+    .superRefine((val, ctx) => {
+      if (val.date) {
+        checkValidFutureDate(parseUIDate(val.date), ctx, "date");
+      }
+    })
+    .superRefine((val, ctx) => checkTimeStringFormat(val.startTime, ctx, "startTime"))
+    .superRefine((val, ctx) => checkTimeStringFormat(val.endTime, ctx, "endTime"))
+    .superRefine((val, ctx) => checkStartEndTime(val, ctx))
+    .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", getIntervalMinutes(interval)))
+    .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15))
+    .refine((s) => s.type, {
+      path: ["type"],
+      message: "Required",
+    });
+}
+
+// NOTE duplicated schema because schemas need to be refined after merge (only times in this case)
+export function getTimeChangeFormSchemaRefined(interval: ReservationStartInterval) {
+  return TimeFormSchema.superRefine((val, ctx) => {
+    const d = val.date ? parseUIDate(val.date) : null;
+    checkValidFutureDate(d, ctx, "date");
+  })
+    .superRefine((val, ctx) => checkTimeStringFormat(val.startTime, ctx, "startTime"))
+    .superRefine((val, ctx) => checkTimeStringFormat(val.endTime, ctx, "endTime"))
+    .superRefine((val, ctx) => checkStartEndTime(val, ctx))
+    .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", getIntervalMinutes(interval)))
+    .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15))
+    .refine((s) => s.type, {
+      path: ["type"],
+      message: "Required",
+    });
+}
+
+export { getCreateStaffReservationFormSchema };
+
+export type CreateStaffReservationFormValues = z.infer<ReturnType<typeof getCreateStaffReservationFormSchema>>;
+
+export const ReservationChangeFormSchema = z
+  .object({
+    type: ReservationTypeSchema,
+    seriesName: z.string(),
+    comments: z.string(),
+  })
+  .extend(ReservationFormMetaSchema.shape)
+  .refine((val) => val.type === ReservationTypeChoice.Blocked || val.seriesName.length > 0, {
+    path: ["seriesName"],
+    message: "Required",
+  });
+
+export type ReservationChangeFormType = z.infer<typeof ReservationChangeFormSchema>;
 
 // TODO combine with ReservationFormMetaSchema
 // but requires refactoring CreateStaff schemas
@@ -223,25 +217,11 @@ function internalGetSchema(formType: ReservationFormType) {
   }
 }
 
-/// Get the schema that matches the selected FormType
-export function getReservationFormSchema(formType: ReservationFormType) {
+function getReservationFormSchemaImpl(formType: ReservationFormType) {
   if (formType === ReservationFormType.ContactInfoForm) {
-    return ContactInfoFormSchema.refine(
-      (val) => !val.applyingForFreeOfCharge || (val.freeOfChargeReason != null && val.freeOfChargeReason.length > 0),
-      {
-        path: ["freeOfChargeReason"],
-        message: "Required",
-      }
-    );
+    return ContactInfoFormSchema;
   }
   return internalGetSchema(formType)
-    .refine(
-      (val) => !val.applyingForFreeOfCharge || (val.freeOfChargeReason != null && val.freeOfChargeReason.length > 0),
-      {
-        path: ["freeOfChargeReason"],
-        message: "Required",
-      }
-    )
     .refine((val) => val.reserveeType === ReserveeType.Individual || val.reserveeOrganisationName.length > 0, {
       path: ["reserveeOrganisationName"],
       message: "Required",
@@ -256,4 +236,15 @@ export function getReservationFormSchema(formType: ReservationFormType) {
         message: "Required",
       }
     );
+}
+
+/// Get the schema that matches the selected FormType
+export function getReservationFormSchema(formType: ReservationFormType) {
+  return getReservationFormSchemaImpl(formType).refine(
+    (val) => !val.applyingForFreeOfCharge || (val.freeOfChargeReason != null && val.freeOfChargeReason.length > 0),
+    {
+      path: ["freeOfChargeReason"],
+      message: "Required",
+    }
+  );
 }

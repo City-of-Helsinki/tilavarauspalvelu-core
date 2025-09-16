@@ -21,11 +21,7 @@ import {
 import styled from "styled-components";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";
-import {
-  CreateStaffReservationFormSchema,
-  type CreateReservationFormType,
-  type ReservationFormMeta,
-} from "common/src/schemas";
+import { type CreateStaffReservationFormValues, getCreateStaffReservationFormSchema } from "common/src/schemas";
 import { CenterSpinner, Flex } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { useCheckCollisions } from "@/hooks";
@@ -64,7 +60,7 @@ const MandatoryFieldsText = styled.div`
   font-size: var(--fontsize-body-s);
 `;
 
-type FormValueType = CreateReservationFormType & ReservationFormMeta;
+type FormValueType = CreateStaffReservationFormValues;
 
 const Form = styled.form`
   display: grid;
@@ -109,8 +105,7 @@ export function CreateReservationModal({
   const interval = getNormalizedInterval(reservationUnit?.reservationStartInterval);
   const startDate = start ?? new Date();
   const form = useForm<FormValueType>({
-    // @ts-expect-error -- schema refinement breaks typing
-    resolver: zodResolver(CreateStaffReservationFormSchema(interval)),
+    resolver: zodResolver(getCreateStaffReservationFormSchema(interval)),
     // TODO onBlur or onChange? onChange is anoying because it highlights even untouched fields
     // onBlur on the other hand does no validation on the focused field till it's blurred
 

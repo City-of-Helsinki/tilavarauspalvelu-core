@@ -9,7 +9,11 @@ import {
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { type CreateReservationFormType, type ReservationFormValueT, ReservationTypes } from "common/src/schemas";
+import {
+  type CreateStaffReservationFormValues,
+  type ReservationFormValueT,
+  ReservationTypes,
+} from "common/src/schemas";
 import { ShowAllContainer } from "common/src/components";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "common/src/reservation-form/MetaFields";
 import { getReservationFormFields, formContainsField } from "common/src/reservation-form/util";
@@ -37,7 +41,7 @@ function TypeSelect({ isDisabled }: { isDisabled?: boolean }) {
     watch,
     control,
     formState: { errors },
-  } = useFormContext<CreateReservationFormType>();
+  } = useFormContext<CreateStaffReservationFormValues>();
   const { t } = useTranslation();
 
   const type = watch("type");
@@ -93,7 +97,7 @@ export function ReservationTypeForm({
 }: ReservationTypeFormProps): JSX.Element | null {
   const { t } = useTranslation();
 
-  const { watch, register } = useFormContext<CreateReservationFormType>();
+  const { watch, register } = useFormContext<CreateStaffReservationFormValues>();
   const type = watch("type");
 
   const { ageGroups, reservationPurposes } = useFilterOptions();
@@ -147,7 +151,7 @@ export function ReservationTypeForm({
           <HR style={{ gridColumn: "1 / -1" }} />
           <Element $wide>
             <div style={{ marginBottom: 48 }}>
-              <ReservationFormGeneralSection fields={fields} reservationUnit={reservationUnit} options={options} />;
+              <ReservationFormGeneralSection fields={fields} reservationUnit={reservationUnit} options={options} />
             </div>
             {type === ReservationTypeChoice.Staff ? (
               <StyledShowAllContainer showAllLabel={t("myUnits:ReservationForm.showReserver")} maximumNumber={0}>
