@@ -1,17 +1,25 @@
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
-import { AuthenticationType, ReservationTypeChoice, type ReservationTypeFormFieldsFragment } from "@gql/gql-types";
+import {
+  AuthenticationType,
+  ReservationTypeChoice,
+  ReserveeType,
+  type ReservationTypeFormFieldsFragment,
+} from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { type CreateReservationFormType, ReservationTypes } from "common/src/schemas";
+import { type CreateReservationFormType, type ReservationFormValueT, ReservationTypes } from "common/src/schemas";
 import { ShowAllContainer } from "common/src/components";
-import { ReservationMetadataSetForm, ReserverMetadataSetForm } from "./MetadataSetForm";
+import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "common/src/reservation-form/MetaFields";
+import { getReservationFormFields, formContainsField } from "common/src/reservation-form/util";
 import { BufferToggles } from "./BufferToggles";
 import ShowTOS from "./ShowTOS";
 import { Element } from "@/styled";
 import { gql } from "@apollo/client";
 import { HR } from "common/src/styled";
+import type { OptionsRecord } from "common";
+import { useFilterOptions } from "@/hooks/useFilterOptions";
 
 const CommentsTextArea = styled(TextArea)`
   grid-column: 1 / -1;
@@ -88,6 +96,18 @@ export function ReservationTypeForm({
   const { watch, register } = useFormContext<CreateReservationFormType>();
   const type = watch("type");
 
+  const { ageGroups, reservationPurposes } = useFilterOptions();
+
+  const options: Omit<OptionsRecord, "municipality"> = {
+    ageGroup: ageGroups,
+    purpose: reservationPurposes,
+  };
+
+  const fields = getReservationFormFields({
+    formType: reservationUnit.reservationForm,
+    reserveeType: "common",
+  }).filter((n) => n !== "reserveeType");
+
   if (reservationUnit == null) {
     return null;
   }
@@ -127,7 +147,7 @@ export function ReservationTypeForm({
           <HR style={{ gridColumn: "1 / -1" }} />
           <Element $wide>
             <div style={{ marginBottom: 48 }}>
-              <ReservationMetadataSetForm reservationUnit={reservationUnit} />
+              <ReservationFormGeneralSection fields={fields} reservationUnit={reservationUnit} options={options} />;
             </div>
             {type === ReservationTypeChoice.Staff ? (
               <StyledShowAllContainer showAllLabel={t("myUnits:ReservationForm.showReserver")} maximumNumber={0}>
@@ -146,9 +166,26 @@ export function ReservationTypeForm({
 function ReservationFormInner({
   reservationUnit,
 }: Pick<ReservationTypeFormProps, "reservationUnit">): React.ReactElement {
+  const { watch } = useFormContext<ReservationFormValueT>();
+  const { ageGroups, reservationPurposes } = useFilterOptions();
+  const options: Omit<OptionsRecord, "municipality"> = {
+    ageGroup: ageGroups,
+    purpose: reservationPurposes,
+  };
+
+  const formType = reservationUnit.reservationForm;
+
+  const reserveeType = watch("reserveeType");
+  const type =
+    reserveeType != null && formContainsField(formType, "reserveeType") ? reserveeType : ReserveeType.Individual;
+  const fields = getReservationFormFields({
+    formType,
+    reserveeType: type,
+  });
+
   return (
     <>
-      <ReserverMetadataSetForm reservationUnit={reservationUnit} />
+      <ReservationFormReserveeSection fields={fields} reservationUnit={reservationUnit} options={options} />
       <HR style={{ gridColumn: "1 / -1" }} />
       <ShowTOS reservationUnit={reservationUnit} />
     </>
