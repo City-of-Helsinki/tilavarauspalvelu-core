@@ -27,6 +27,9 @@ export const TimeFormSchema = z.object({
 });
 
 const CreateStaffReservationFormSchema = z
+  // FIXME replace this with using the actual form schema
+  // problem there is that the schema changes based on formType so we have to
+  // have a function for it + a merge, and the type inferance gets iffy
   .object({
     comments: z.string().optional(),
     // backend doesn't accept bad emails (empty is fine)
@@ -41,11 +44,10 @@ const CreateStaffReservationFormSchema = z
 // this shows refinement errors before required of course we need to either do a second
 // pass or add custom Required refinements
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CreateStaffReservationFormSchemaPartial = CreateStaffReservationFormSchema.partial();
-type CreateStaffReservationFormSchemaPartialType = z.infer<typeof CreateStaffReservationFormSchemaPartial>;
+type CreateStaffReservationFormSchema = z.infer<typeof CreateStaffReservationFormSchema>;
 
 export const checkStartEndTime = (
-  data: Pick<CreateStaffReservationFormSchemaPartialType, "startTime" | "endTime">,
+  data: Pick<CreateStaffReservationFormSchema, "startTime" | "endTime">,
   ctx: z.RefinementCtx
 ) => {
   if (
@@ -79,8 +81,8 @@ export const checkReservationInterval = (
 // Date can't be in past
 // Time is allowed to be in the past on purpose so it's not validated
 // i.e. you can make a reservation for today 10:00 even if it's 10:30
-const CreateStaffReservationFormSchemaRefined = (interval: ReservationStartInterval) =>
-  CreateStaffReservationFormSchema.partial()
+function getCreateStaffReservationFormSchema(interval: ReservationStartInterval) {
+  return CreateStaffReservationFormSchema.extend(ReservationFormMetaSchema.shape)
     .superRefine((val, ctx) => {
       if (val.date) {
         checkValidFutureDate(fromUIDate(val.date), ctx, "date");
@@ -95,14 +97,13 @@ const CreateStaffReservationFormSchemaRefined = (interval: ReservationStartInter
       path: ["type"],
       message: "Required",
     });
-
+}
 // NOTE duplicated schema because schemas need to be refined after merge (only times in this case)
 export const TimeChangeFormSchemaRefined = (interval: ReservationStartInterval) =>
-  TimeFormSchema.partial()
-    .superRefine((val, ctx) => {
-      const d = val.date ? fromUIDate(val.date) : null;
-      checkValidFutureDate(d, ctx, "date");
-    })
+  TimeFormSchema.superRefine((val, ctx) => {
+    const d = val.date ? fromUIDate(val.date) : null;
+    checkValidFutureDate(d, ctx, "date");
+  })
     .superRefine((val, ctx) => checkTimeStringFormat(val.startTime, ctx, "startTime"))
     .superRefine((val, ctx) => checkTimeStringFormat(val.endTime, ctx, "endTime"))
     .superRefine((val, ctx) => checkStartEndTime(val, ctx))
@@ -113,9 +114,9 @@ export const TimeChangeFormSchemaRefined = (interval: ReservationStartInterval) 
       message: "Required",
     });
 
-export { CreateStaffReservationFormSchemaRefined as CreateStaffReservationFormSchema };
+export { getCreateStaffReservationFormSchema };
 
-export type CreateReservationFormType = z.infer<typeof CreateStaffReservationFormSchema>;
+export type CreateStaffReservationFormValues = z.infer<typeof CreateStaffReservationFormSchema>;
 
 // TODO what is this for?
 export const ReservationChangeFormSchema = z

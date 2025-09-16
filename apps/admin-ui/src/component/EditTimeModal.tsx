@@ -250,7 +250,6 @@ export function NewReservationModal({ reservationToCopy, onAccept, onClose }: Ne
   const interval = getNormalizedInterval(reservationUnit.reservationStartInterval);
 
   const form = useForm<EditFormValueType>({
-    // @ts-expect-error -- schema refinement breaks typing
     resolver: zodResolver(TimeChangeFormSchemaRefined(interval)),
     mode: "onChange",
     defaultValues: {
@@ -340,7 +339,6 @@ export function EditTimeModal({
   }
 
   const form = useForm<EditFormValueType>({
-    // @ts-expect-error -- schema refinement breaks typing
     resolver: zodResolver(TimeChangeFormSchemaRefined(interval)),
     mode: "onChange",
     defaultValues: {
