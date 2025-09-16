@@ -4,6 +4,7 @@ import datetime
 from typing import TYPE_CHECKING
 
 import graphene
+from django.conf import settings
 from django.db import models
 from django.db.models import OuterRef
 from django.db.models.functions import JSONObject
@@ -118,6 +119,7 @@ class ReservationNode(DjangoNode):
     )
 
     calendar_url = graphene.String()
+    draft_expires_at = graphene.DateTime()
 
     affected_reservation_units = AnnotatedField(
         graphene.List(graphene.Int, required=True),
@@ -365,3 +367,8 @@ class ReservationNode(DjangoNode):
         )
 
         return queryset
+
+    def resolve_draft_expires_at(root: Reservation, info: GQLInfo) -> datetime.datetime | None:
+        if root.state != ReservationStateChoice.CREATED:
+            return None
+        return root.created_at + datetime.timedelta(minutes=settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES)
