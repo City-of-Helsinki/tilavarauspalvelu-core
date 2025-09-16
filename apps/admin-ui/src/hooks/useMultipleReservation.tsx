@@ -1,6 +1,6 @@
 import { generateReservations } from "@/modules/generateReservations";
-import { ReservationTypeChoice, type Maybe } from "@gql/gql-types";
-import type { TimeSelectionForm } from "@/schemas";
+import type { Maybe } from "@gql/gql-types";
+import type { RescheduleReservationSeriesForm } from "@/schemas";
 import { getBufferTime } from "@/modules/helpers";
 
 type ReservationUnitBufferType = {
@@ -8,19 +8,14 @@ type ReservationUnitBufferType = {
   bufferTimeAfter: number;
 };
 
+interface GenerateReservationsProps {
+  values: RescheduleReservationSeriesForm;
+  reservationUnit: Maybe<ReservationUnitBufferType>;
+}
+
 // This is only used in recurring form so we can rework it
 // we want to remove the early generation of reservations
-export function useMultipleReservation({
-  values,
-  reservationUnit,
-}: {
-  values: TimeSelectionForm & {
-    type: ReservationTypeChoice;
-    bufferTimeBefore?: boolean;
-    bufferTimeAfter?: boolean;
-  };
-  reservationUnit: Maybe<ReservationUnitBufferType>;
-}) {
+function useGenerateReservations({ values, reservationUnit }: GenerateReservationsProps) {
   // NOTE useMemo is useless here, watcher already filters out unnecessary runs
   const result = generateReservations({
     startingDate: values.startingDate,
@@ -34,8 +29,10 @@ export function useMultipleReservation({
   return result.map((item) => ({
     ...item,
     buffers: {
-      before: getBufferTime(reservationUnit?.bufferTimeBefore, values.type, values.bufferTimeBefore),
-      after: getBufferTime(reservationUnit?.bufferTimeBefore, values.type, values.bufferTimeAfter),
+      before: getBufferTime(reservationUnit?.bufferTimeBefore, values.type, values.enableBufferTimeBefore),
+      after: getBufferTime(reservationUnit?.bufferTimeBefore, values.type, values.enableBufferTimeAfter),
     },
   }));
 }
+
+export { useGenerateReservations as useMultipleReservation };

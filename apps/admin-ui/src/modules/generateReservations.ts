@@ -1,8 +1,8 @@
 import { parseUIDateUnsafe, timeToMinutes, setMondayFirst } from "common/src/modules/date-utils";
-import { TimeSelectionForm } from "@/schemas";
 import { Weekday } from "@gql/gql-types";
 import { transformWeekday } from "common/src/modules/conversion";
-import { DayT } from "common/src/modules/const";
+import type { DayT } from "common/src/modules/const";
+import type { TimeSelectionFormValues } from "@/schemas";
 
 // NOTE Custom UTC date code because taking only the date part of Date results
 // in the previous date in UTC+2 timezone
@@ -23,7 +23,7 @@ function dayOfWeek(time: number): Weekday {
   return transformWeekday(setMondayFirst(weekdayNumber));
 }
 
-export function generateReservations(props: TimeSelectionForm) {
+export function generateReservations(props: TimeSelectionFormValues) {
   const vals = props;
 
   if (
