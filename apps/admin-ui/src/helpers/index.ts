@@ -13,7 +13,7 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { addSeconds } from "date-fns";
-import { type TFunction } from "next-i18next";
+import type { TFunction } from "next-i18next";
 
 export { truncate } from "common/src/helpers";
 
@@ -114,7 +114,7 @@ export function combineAffectingReservations<T extends AffectedReservations>(
   const affectingReservations = filterNonNullable(data.affectingReservations).filter((y) =>
     isAffecting(y, reservationUnitPk)
   );
-  const reservationSet = filterNonNullable(data?.node?.reservations).concat(affectingReservations);
+  const reservationSet = [...filterNonNullable(data?.node?.reservations), ...affectingReservations];
   return filterNonNullable(reservationSet);
 }
 

@@ -9,7 +9,7 @@ import { convertLanguageCode, getTranslationSafe } from "common/src/common/util"
 import { ButtonContainer } from "common/styled";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { getApplicationPath } from "@/modules/urls";
-import { type ApplicationPage2FormValues } from "./form";
+import type { ApplicationPage2FormValues } from "./form";
 import { TimeSelectorForm } from ".";
 import { gql } from "@apollo/client";
 
@@ -93,7 +93,7 @@ function ApplicationSectionTimePicker({
     .map((n) => n.reservationUnit)
     .map((n) => ({
       value: n?.pk ?? 0,
-      label: `${n.unit && getTranslationSafe(n.unit, "name", language) + ": "}${getTranslationSafe(n, "name", language)}`,
+      label: `${n.unit && `${getTranslationSafe(n.unit, "name", language)}: `}${getTranslationSafe(n, "name", language)}`,
     }));
 
   const aes = watch(`applicationSections.${sectionIndex}`);

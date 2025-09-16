@@ -17,7 +17,7 @@ import {
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { useMedia } from "react-use";
 import { useRouter } from "next/router";
 import { isBefore } from "date-fns";
@@ -202,8 +202,7 @@ function getAesReservationUnits(aes: ApplicationSectionT) {
   return filterNonNullable(
     aes.reservationUnitOptions
       .map((x) => x.allocatedTimeSlots)
-      .map((x) => x.map((y) => y.reservationSeries?.reservationUnit))
-      .flat()
+      .flatMap((x) => x.map((y) => y.reservationSeries?.reservationUnit))
   );
 }
 
@@ -257,9 +256,8 @@ function formatReservationTimes(t: TFunction, aes: ApplicationSectionReservation
 function accessCodeSafe(pindoraInfo: PindoraSectionFragment | null, t: TFunction) {
   if (!pindoraInfo?.accessCode) {
     return t("reservations:contactSupport");
-  } else {
-    return pindoraInfo.accessCode;
   }
+  return pindoraInfo.accessCode;
 }
 
 export function ApprovedReservations({ application, applicationRound }: Readonly<Props>) {
@@ -591,14 +589,14 @@ function getReservationSeriesAccessText(reservationUnit: ReservationSeriesTableE
   switch (accessType) {
     case AccessTypeWithMultivalued.Multivalued:
       if (usedAccessTypes.includes(AccessType.AccessCode)) {
-        return `${t("reservationUnit:accessTypes." + AccessType.AccessCode)}: ${accessCodeSafe(pindoraInfo, t)}`;
-      } else
-        return usedAccessTypes
-          .filter((aT) => aT != null && aT !== AccessType.Unrestricted)
-          .map((aT) => t(`reservationUnit:accessTypes.${aT}`))
-          .join(" / ");
+        return `${t(`reservationUnit:accessTypes.${AccessType.AccessCode}`)}: ${accessCodeSafe(pindoraInfo, t)}`;
+      }
+      return usedAccessTypes
+        .filter((aT) => aT != null && aT !== AccessType.Unrestricted)
+        .map((aT) => t(`reservationUnit:accessTypes.${aT}`))
+        .join(" / ");
     case AccessTypeWithMultivalued.AccessCode:
-      return `${t("reservationUnit:accessTypes." + accessType)}: ${accessCodeSafe(pindoraInfo, t)}`;
+      return `${t(`reservationUnit:accessTypes.${accessType}`)}: ${accessCodeSafe(pindoraInfo, t)}`;
     default:
       return t(`reservationUnit:accessTypes.${accessType}`);
   }
@@ -945,8 +943,7 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
 function sectionToReservationUnits(t: TFunction, section: ApplicationSectionT): ReservationSeriesTableElem[] {
   const reservationUnitsByDay = filterNonNullable(
     section.reservationUnitOptions
-      .map((ruo) => ruo.allocatedTimeSlots.map((ats) => ats))
-      .flat()
+      .flatMap((ruo) => ruo.allocatedTimeSlots.map((ats) => ats))
       .map((ats) => {
         const { reservationSeries: r, dayOfTheWeek } = ats;
         if (r == null) {

@@ -51,7 +51,7 @@ import { Error403 } from "@/component/Error403";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { createClient } from "@/common/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";
@@ -188,13 +188,12 @@ function SeriesPageInner({ pk }: { pk: number }) {
 
   const onSubmit = async (values: RescheduleReservationSeriesForm) => {
     setLocalError(null);
-    const skipDates = removedReservations
-      .concat(checkedReservations.reservations.filter((x) => x.isOverlapping))
+    const skipDates = [...removedReservations, ...checkedReservations.reservations.filter((x) => x.isOverlapping)]
       .map((x) => x.date)
       // NOTE the data includes the same date multiple times (for some reason)
       .reduce<Date[]>((acc, x) => {
-        if (acc.find((y) => isSameDay(y, x)) == null) {
-          return acc.concat(x);
+        if (acc.some((y) => isSameDay(y, x)) == null) {
+          return [...acc, x];
         }
         return acc;
       }, []);

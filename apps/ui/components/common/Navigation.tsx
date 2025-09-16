@@ -12,7 +12,7 @@ import {
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { useSession } from "@/hooks";
-import { type CurrentUserQuery } from "@gql/gql-types";
+import type { CurrentUserQuery } from "@gql/gql-types";
 import Logo from "common/src/components/Logo";
 import { useRouter } from "next/router";
 import { breakpoints } from "common/src/const";
@@ -28,6 +28,7 @@ import {
   singleSearchPrefix,
 } from "@/modules/urls";
 import { fontBold, fontMedium } from "common/styled";
+import Link from "next/link";
 
 type HeaderProps = {
   apiBaseUrl: string;
@@ -208,7 +209,7 @@ function NavigationMenu({ user }: { user: CurrentUserQuery["currentUser"] }) {
           return null;
         }
         if (!pathname) {
-          return;
+          return undefined;
         }
         const localisationString = i18n.language === "fi" ? "" : getLocalizationLang(i18n.language);
 
@@ -253,10 +254,10 @@ function ActionBar({ apiBaseUrl, profileLink, languageOptions }: Readonly<Header
       {isAuthenticated ? (
         <Header.ActionBarItem fixedRightPosition id="user-menu" label={userName} avatar={userInitials ?? <IconUser />}>
           {!user?.isAdAuthenticated && (
-            <a href={profileLink} target="_blank" rel="noopener noreferrer">
+            <Link href={profileLink} target="_blank" rel="noopener noreferrer">
               {t("navigation:profileLinkLabel")}
               <IconLinkExternal />
-            </a>
+            </Link>
           )}
           <button type="button" aria-label={t("common:logout")} onClick={() => signOut(apiBaseUrl)}>
             {t("common:logout")}

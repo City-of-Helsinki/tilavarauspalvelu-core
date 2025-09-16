@@ -2,8 +2,8 @@ import React from "react";
 import { Button, ButtonSize, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { type UseFormReturn } from "react-hook-form";
-import { type ReservationUnitEditFormValues } from "./form";
+import type { UseFormReturn } from "react-hook-form";
+import type { ReservationUnitEditFormValues } from "./form";
 import { getUnitUrl } from "@/common/urls";
 import { successToast } from "common/src/components/toast";
 import { useArchiveReservationUnitMutation, type Maybe, type ReservationUnitEditPageFragment } from "@gql/gql-types";
@@ -183,8 +183,8 @@ export function BottomButtonsStripe({
     setValue("isDraft", false);
     try {
       await handleSubmit(onSubmit)();
-    } catch (error) {
-      displayError(error);
+    } catch (err) {
+      displayError(err);
     }
   };
 
@@ -192,8 +192,8 @@ export function BottomButtonsStripe({
     setValue("isDraft", true);
     try {
       await handleSubmit(onSubmit)();
-    } catch (error) {
-      displayError(error);
+    } catch (err) {
+      displayError(err);
     }
   };
 
@@ -207,8 +207,8 @@ export function BottomButtonsStripe({
       await archiveMutation({ variables: { input: { pk } } });
       successToast({ text: t("reservationUnitEditor:ArchiveDialog.success") });
       router.push(getUnitUrl(unit.pk));
-    } catch (e) {
-      displayError(e);
+    } catch (err) {
+      displayError(err);
     }
   };
 

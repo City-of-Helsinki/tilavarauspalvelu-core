@@ -20,7 +20,7 @@ import { checkLengthWithoutHtml, checkTimeStringFormat } from "common/src/schema
 import { fromUIDateTime } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
 import { WEEKDAYS_SORTED } from "common/src/const";
-import { type TaxOption } from "./PricingSection";
+import type { TaxOption } from "./PricingSection";
 import sanitizeHtml from "sanitize-html";
 
 export const AccessTypes = ["ACCESS_CODE", "OPENED_BY_STAFF", "PHYSICAL_KEY", "UNRESTRICTED"] as const;
@@ -463,14 +463,16 @@ export const ReservationUnitEditSchema = z
 
     // Drafts require this validation, but only if it's directly bookable
     if (v.reservationKind !== ReservationKind.Season) {
-      if (v.minReservationDuration != null && v.maxReservationDuration != null) {
-        if (v.minReservationDuration > v.maxReservationDuration) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Min reservation duration must be less than max duration",
-            path: ["maxReservationDuration"],
-          });
-        }
+      if (
+        v.minReservationDuration != null &&
+        v.maxReservationDuration != null &&
+        v.minReservationDuration > v.maxReservationDuration
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Min reservation duration must be less than max duration",
+          path: ["maxReservationDuration"],
+        });
       }
 
       if (v.minReservationDuration != null) {
@@ -510,7 +512,7 @@ export const ReservationUnitEditSchema = z
       }
     }
 
-    if (!v.isDraft || v.pricings.length) {
+    if (!v.isDraft || v.pricings.length > 0) {
       for (let i = 0; i < v.pricings.length; i++) {
         refinePricing(v.pricings[i], ctx, `pricings.${i}`);
       }
@@ -644,14 +646,12 @@ export const ReservationUnitEditSchema = z
     checkLengthWithoutHtml(v.descriptionFi, ctx, "descriptionFi", 1, undefined, "description");
     checkLengthWithoutHtml(v.descriptionSv, ctx, "descriptionSv", 1, undefined, "description");
 
-    if (v.maxPersons && v.minPersons) {
-      if (v.maxPersons < v.minPersons) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Max persons must be greater than min persons",
-          path: ["maxPersons"],
-        });
-      }
+    if (v.maxPersons && v.minPersons && v.maxPersons < v.minPersons) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Max persons must be greater than min persons",
+        path: ["maxPersons"],
+      });
     }
 
     // TODO if it includes futurePricing check that the futurePrice date is in the future (is today ok?)
@@ -899,7 +899,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
   const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) => t && t.begin && t.end;
   // NOTE mutation doesn't support pks (even if changing not adding) unlike other mutations
   const applicationRoundTimeSlots: ApplicationRoundTimeSlotCreateInput[] = seasons
-    .filter((s) => s.reservableTimes.filter(isReservableTime).length > 0 || s.closed)
+    .filter((s) => s.reservableTimes.some(isReservableTime) || s.closed)
     .map((s) => ({
       weekday: s.weekday,
       isClosed: s.closed,

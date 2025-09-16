@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { FileInput } from "hds-react";
 import { ReservationUnitImageType } from "@gql/gql-types";
-import { type ImageFormType } from "./form";
+import type { ImageFormType } from "./form";
 import { AutoGrid, Flex, focusStyles, removeButtonStyles } from "common/styled";
 
 const StyledImage = styled.img`
@@ -124,7 +124,7 @@ export function ImageEditor({ images, setImages, style, className }: Props): JSX
       bytes: files[0],
     };
     fakePk -= 1;
-    setImages([newImage].concat(images));
+    setImages([newImage, ...images]);
   };
 
   const deleteImage = (pk: number) => {

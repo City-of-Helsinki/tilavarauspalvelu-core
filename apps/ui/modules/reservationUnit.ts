@@ -52,8 +52,8 @@ import {
   type ReadonlyDeep,
   timeToMinutes,
 } from "common/src/helpers";
-import { type LocalizationLanguages } from "common/src/urlBuilder";
-import { type TFunction } from "i18next";
+import type { LocalizationLanguages } from "common/src/urlBuilder";
+import type { TFunction } from "i18next";
 
 function formatTimeObject(time: { h: number; m: number }): string {
   return `${time.h.toString().padStart(2, "0")}:${time.m.toString().padStart(2, "0")}`;
@@ -94,7 +94,7 @@ export function getEquipmentCategories(equipment: Readonly<Pick<EquipmentFieldsF
   if (!equipment || equipment.length === 0) {
     return [];
   }
-  const categories: Array<(typeof equipmentCategoryOrder)[number]> = filterNonNullable(
+  const categories: (typeof equipmentCategoryOrder)[number][] = filterNonNullable(
     equipment.map((n) => {
       const index = equipmentCategoryOrder.findIndex((order) => order === n.category?.nameFi);
       if (index === -1) {
@@ -131,7 +131,7 @@ export function getEquipmentList(
           n.category?.nameFi === category ||
           (category === "Muu" &&
             n.category?.nameFi &&
-            !equipmentCategoryOrder.find((order) => order === n.category.nameFi))
+            !equipmentCategoryOrder.some((order) => order === n.category.nameFi))
       )
       .sort((a, b) => (a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0))
   );
@@ -279,8 +279,8 @@ export function getPriceString(props: GetPriceType): string {
   }
 
   const volume = getReservationVolume(minutes, pricing.priceUnit);
-  const highestPrice = parseFloat(pricing.highestPrice) * volume;
-  const lowestPrice = parseFloat(pricing.lowestPrice) * volume;
+  const highestPrice = Number.parseFloat(pricing.highestPrice) * volume;
+  const lowestPrice = Number.parseFloat(pricing.lowestPrice) * volume;
   const priceString =
     lowestPrice === highestPrice
       ? formatPrice(lowestPrice, true)
@@ -394,11 +394,11 @@ export function isReservationUnitPaid(pricings: Readonly<PricingFieldsFragment[]
   const d =
     date == null
       ? active
-      : active.concat(future).filter((p) => {
+      : [...active, ...future].filter((p) => {
           const start = new Date(p.begins);
           return start <= date;
         });
-  return d.filter((p) => !isPriceFree(p)).length > 0;
+  return d.some((p) => !isPriceFree(p));
 }
 
 /// Returns true if the given time is 'inside' the time span
@@ -435,7 +435,7 @@ export function getDayIntervals(
   const startMins = start.h * 60 + start.m;
   const endMins = end.h * 60 + end.m;
 
-  const intervals: Array<{ h: number; m: number }> = [];
+  const intervals: { h: number; m: number }[] = [];
   for (let i = startMins; i < endMins; i += iMins) {
     // don't allow interval overflow but handle 0:00 as 23:59
     if (i + iMins > endMins + 1) {
@@ -470,7 +470,7 @@ export function getPossibleTimesForDay({
   blockingReservations,
 }: GetPossibleTimesForDayProps): { label: string; value: string }[] {
   const interval = reservationUnit.reservationStartInterval;
-  const allTimes: Array<{ h: number; m: number }> = [];
+  const allTimes: { h: number; m: number }[] = [];
   const slotsForDay = reservableTimes.get(dateToKey(date)) ?? [];
   for (const slot of slotsForDay) {
     const startDate = slot.start;
@@ -576,7 +576,7 @@ function getAvailableTimesForDay({
   }
   const [timeHours, timeMinutesRaw] = [0, 0];
 
-  const timeMinutes = timeMinutesRaw > 59 ? 59 : timeMinutesRaw;
+  const timeMinutes = Math.min(59, timeMinutesRaw);
   return getPossibleTimesForDay({
     reservableTimes,
     date: start,

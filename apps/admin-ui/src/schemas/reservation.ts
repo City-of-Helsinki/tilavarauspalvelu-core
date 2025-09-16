@@ -61,7 +61,7 @@ export const checkReservationInterval = (
   path: string,
   interval: number
 ) => {
-  if (time && Number(time.substring(3)) % interval !== 0) {
+  if (time && Number(time.slice(3)) % interval !== 0) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: [path],

@@ -1,6 +1,6 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { type ReservationInfoSectionFragment } from "@gql/gql-types";
+import type { ReservationInfoSectionFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { H4, Strong } from "common/styled";
 import styled from "styled-components";

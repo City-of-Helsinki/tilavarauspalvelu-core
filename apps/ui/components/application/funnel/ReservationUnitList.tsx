@@ -20,7 +20,7 @@ import { ErrorText } from "common/src/components/ErrorText";
 import { OrderedReservationUnitCard, ReservationUnitModalContent } from ".";
 import { useSearchParams } from "next/navigation";
 import { useSearchModify } from "@/hooks/useSearchValues";
-import { type OptionsListT } from "common/src/modules/search";
+import type { OptionsListT } from "common/src/modules/search";
 import { FixedDialog } from "@/styled/FixedDialog";
 
 type ReservationUnitType = Pick<OrderedReservationUnitCardFragment, "pk">;
@@ -85,7 +85,7 @@ export function ReservationUnitList<T extends FieldValues>({
   };
 
   const handleRemove = (ru: ReservationUnitType) => {
-    onChange([...value.filter((pk: T) => Number(pk) !== ru.pk)]);
+    onChange(value.filter((pk: T) => Number(pk) !== ru.pk));
   };
 
   const moveUp = (reservationUnit: ReservationUnitType) => {

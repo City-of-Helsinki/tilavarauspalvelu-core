@@ -1,4 +1,4 @@
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { formatApiTimeInterval, formatListToCSV, formatMinutes } from "./helpers";
 import { describe, test, expect } from "vitest";
 
@@ -87,7 +87,7 @@ describe("formatListToCSV", () => {
   test("should return comma seperated when given ten items", () => {
     const list = Array.from({ length: 10 }, (_, i) => `item${i + 1}`);
     const result = formatListToCSV(mockT, list);
-    const res = list.slice(0, 9).join(", ") + ` common:and item10`;
+    const res = `${list.slice(0, 9).join(", ")} common:and item10`;
     expect(result).toBe(res);
   });
 });

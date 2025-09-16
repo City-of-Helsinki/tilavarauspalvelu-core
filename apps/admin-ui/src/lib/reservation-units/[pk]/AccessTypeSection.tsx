@@ -40,7 +40,7 @@ function CurrentAccessType({
 
   return (
     <div>
-      <H6 $marginBottom={"s"}>{t("accessType:validity.currentlyActive")}</H6>
+      <H6 $marginBottom="s">{t("accessType:validity.currentlyActive")}</H6>
       <CurrentAccessTypeContainer>
         <KVWrapper>
           <Label>{t("accessType:accessTypeLabel")}:</Label>
@@ -163,7 +163,7 @@ export function AccessTypeSection({
         )}
 
         {fields.map((accessType, index) => (
-          <AccessTypePart key={`${accessType.id}`} form={form} index={index} removeSelf={() => remove(index)} />
+          <AccessTypePart key={accessType.id} form={form} index={index} removeSelf={() => remove(index)} />
         ))}
 
         <div style={{ marginTop: "var(--spacing-s)" }}>

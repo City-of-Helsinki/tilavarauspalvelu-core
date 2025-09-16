@@ -1,5 +1,5 @@
 import { isSameDay } from "date-fns";
-import { type TFunction } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { toUIDate, fromApiDate as fromAPIDate, fromUIDate } from "common/src/common/util";
 import { isBrowser } from "./const";
 import { formatMinutes, timeToMinutes } from "common/src/helpers";
@@ -79,7 +79,7 @@ export function formatDateRange(begin: Date, end: Date): string {
   const beginDate = toUIDate(begin);
   const endDate = toUIDate(end);
 
-  return `${beginDate}${!isSameDay(begin, end) ? " – " + endDate : ""}`.trim();
+  return `${beginDate}${!isSameDay(begin, end) ? ` – ${endDate}` : ""}`.trim();
 }
 
 function formatDay(t: TFunction, date: Date): string {

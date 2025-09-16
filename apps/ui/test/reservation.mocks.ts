@@ -110,7 +110,7 @@ export function createMockReservation(props: MockReservationProps): Readonly<Res
     isHandled = true,
     paymentOrder = {
       id: "1",
-      reservationPk: `${1}`,
+      reservationPk: 1,
       status: OrderStatus.PaidManually,
       paymentType: PaymentType.OnSite,
       receiptUrl: "https://example.com/receipt",
@@ -272,9 +272,9 @@ export function createMockReservation(props: MockReservationProps): Readonly<Res
   } as const;
 }
 
-export function createTermsOfUseMock(empty: boolean = false) {
+export function createTermsOfUseMock(isEmpty = false) {
   return {
-    genericTerms: empty
+    genericTerms: isEmpty
       ? null
       : {
           id: createNodeId("TermsOfUseNode", 1),

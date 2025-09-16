@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { ControlledCheckbox } from "common/src/components/form";
 import { FormSubHeading } from "./styled";
-import { type ApplicationPage3FormValues } from "./form";
+import type { ApplicationPage3FormValues } from "./form";
 import { ApplicationFormTextInput, BillingAddress } from ".";
 
 export function CompanyForm(): JSX.Element {

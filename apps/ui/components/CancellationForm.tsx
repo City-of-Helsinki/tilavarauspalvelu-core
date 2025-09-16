@@ -47,7 +47,7 @@ export function CancellationForm(props: Readonly<CancellationFormProps>): JSX.El
   const { onNext, isLoading, isDisabled, cancellationTerms, backLink } = props;
   const { t } = useTranslation();
 
-  const reasons = (Object.keys(ReservationCancelReasonChoice) as Array<keyof typeof ReservationCancelReasonChoice>)
+  const reasons = (Object.keys(ReservationCancelReasonChoice) as (keyof typeof ReservationCancelReasonChoice)[])
     .map((r) => ({
       label: t(`reservations:cancel.reasons.${ReservationCancelReasonChoice[r]}`),
       value: ReservationCancelReasonChoice[r],

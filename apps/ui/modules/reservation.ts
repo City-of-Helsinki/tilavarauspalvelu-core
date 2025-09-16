@@ -19,14 +19,14 @@ import {
 } from "@gql/gql-types";
 import { getIntervalMinutes } from "common/src/conversion";
 import { fromUIDate } from "./util";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { type ReservableMap, type RoundPeriod, isRangeReservable } from "./reservable";
-import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
+import type { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { isValidDate, toUIDate } from "common/src/common/util";
 import { getTimeString } from "./reservationUnit";
 import { timeToMinutes } from "common/src/helpers";
 import { gql } from "@apollo/client";
-import { type LocalizationLanguages } from "common/src/urlBuilder";
+import type { LocalizationLanguages } from "common/src/urlBuilder";
 
 // TimeSlots change the Calendar view. How many intervals are shown i.e. every half an hour, every hour
 // we use every hour only => 2
@@ -348,7 +348,7 @@ export function convertFormToFocustimeSlot({
   activeApplicationRounds: readonly RoundPeriod[];
   blockingReservations: readonly BlockingReservationFieldsFragment[];
 }): FocusTimeSlot | { isReservable: false } {
-  const [hours, minutes]: Array<number | undefined> = data.time
+  const [hours, minutes]: (number | undefined)[] = data.time
     .split(":")
     .map(Number)
     .filter((n) => Number.isFinite(n));
@@ -490,9 +490,9 @@ function getCheckoutRedirectUrl(pk: number, lang: LocalizationLanguages, apiBase
     searchParams.set("lang", lang);
     searchParams.set("redirect_on_error", errorUrl.toString());
     return url.toString();
-  } catch (e) {
+  } catch (err) {
     // eslint-disable-next-line no-console
-    console.error(e);
+    console.error(err);
   }
   return "";
 }
@@ -515,9 +515,9 @@ export function getCheckoutUrl(
     const baseUrl = `${origin}${pathname}`;
     searchParams.set("lang", lang);
     return `${baseUrl}${baseUrl.endsWith("/") ? "" : "/"}paymentmethod?${searchParams.toString()}`;
-  } catch (e) {
+  } catch (err) {
     // eslint-disable-next-line no-console
-    console.error(e);
+    console.error(err);
   }
   return undefined;
 }

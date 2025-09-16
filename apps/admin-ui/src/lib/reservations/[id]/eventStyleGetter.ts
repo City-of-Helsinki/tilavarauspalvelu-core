@@ -3,7 +3,7 @@ import {
   ReservationStateChoice,
   ReservationTypeChoice,
 } from "@gql/gql-types";
-import { type CalendarEventType, type EventType } from "@/modules/reservation";
+import type { CalendarEventType, EventType } from "@/modules/reservation";
 import {
   COMMON_LEGEND,
   CONFIRMED,

@@ -4,11 +4,11 @@ import { getReservationApplicationFields } from "common/src/reservation-form/uti
 import { type ReservationNode, ReserveeType } from "@/gql/gql-types";
 import { containsField, type FieldName } from "common/src/metaFieldsHelpers";
 import { AutoGrid, H4 } from "common/styled";
-import { type MetaFieldsFragment } from "common/gql/gql-types";
+import type { MetaFieldsFragment } from "common/gql/gql-types";
 import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
 import { LabelValuePair } from "./LabelValuePair";
 import { extendMetaFieldOptions } from "common/src/reservation-form/MetaFields";
-import { type OptionsRecord } from "common";
+import type { OptionsRecord } from "common";
 import { convertOptionsToField } from "common/src/reservation-form/ReservationFormField";
 
 const Container = styled(AutoGrid)`
@@ -93,7 +93,7 @@ export function ApplicationFields({
     reserveeType,
   }).filter((key) => isNotEmpty(key, reservation));
 
-  const hasReserveeType = filteredApplicationFields.find((x) => x === "reserveeType") != null;
+  const hasReserveeType = filteredApplicationFields.some((x) => x === "reserveeType") != null;
 
   return (
     <>
@@ -149,7 +149,7 @@ export function GeneralFields({
         <>
           {filteredGeneralFields.map((key) => {
             const value = convertMaybeOptionValue(key, reservation, extendMetaFieldOptions(options, t), t);
-            const isWide = ["name", "description", "freeOfChargeReason"].find((x) => x === key) != null;
+            const isWide = ["name", "description", "freeOfChargeReason"].some((x) => x === key) != null;
             const label = t(`reservationApplication:label.common.${key}`);
             const testId = `reservation__${key}`;
             return <LabelValuePair key={key} label={label} value={value} testId={testId} isWide={isWide} />;
@@ -175,14 +175,14 @@ function convertMaybeOptionValue(
     const optionsKey = key as keyof typeof fieldOptions;
     if (rawValue == null) {
       // eslint-disable-next-line no-console
-      console.warn("convertMaybeOptionValue: rawValue is not object: ", rawValue);
+      console.warn("convertMaybeOptionValue: rawValue is not object:", rawValue);
     } else if (typeof rawValue === "object" && "pk" in rawValue && typeof rawValue.pk === "number") {
       return fieldOptions[optionsKey].find((option) => option.value === rawValue.pk)?.label ?? "";
     } else if (typeof rawValue === "string" && rawValue !== "") {
       return fieldOptions[optionsKey].find((option) => option.value === rawValue)?.label ?? "";
     }
     // eslint-disable-next-line no-console
-    console.warn("convertMaybeOptionValue: rawValue is not pk, but object: ", rawValue);
+    console.warn("convertMaybeOptionValue: rawValue is not pk, but object:", rawValue);
     return "unknown";
   }
   if (typeof rawValue === "boolean") {

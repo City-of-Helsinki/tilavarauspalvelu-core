@@ -8,7 +8,7 @@ import {
   doesIntervalCollide,
   reservationToInterval,
 } from "@/helpers";
-import { type NewReservationListItem } from "@/component/ReservationsList";
+import type { NewReservationListItem } from "@/component/ReservationsList";
 import { createNodeId, timeToMinutes } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/components/toast";
@@ -110,7 +110,7 @@ export function useFilteredReservationList({
     };
 
     return items.map((x) =>
-      reservations.find((y) => {
+      reservations.some((y) => {
         if (existingReservationSeriesPk != null && y.reservationSeriesPk === existingReservationSeriesPk) {
           return false;
         }

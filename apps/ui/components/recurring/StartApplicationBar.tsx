@@ -93,8 +93,8 @@ export function StartApplicationBar({ apiBaseUrl, applicationRound }: Readonly<P
       } else {
         throw new Error("create application mutation failed");
       }
-    } catch (e) {
-      displayError(e);
+    } catch (err) {
+      displayError(err);
     }
   };
 
@@ -112,7 +112,7 @@ export function StartApplicationBar({ apiBaseUrl, applicationRound }: Readonly<P
   return (
     <SpaceWrapper aria-live="polite">
       {count > 0 && (
-        <InnerContainer style={{ bottom: bottomOffset + "px" }}>
+        <InnerContainer style={{ bottom: `${bottomOffset}px` }}>
           <NoWrap id="reservationUnitCount">
             {isMobile ? t("shoppingCart:countShort", { count }) : t("shoppingCart:count", { count })}
           </NoWrap>

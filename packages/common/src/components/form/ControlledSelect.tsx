@@ -17,7 +17,7 @@ interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
   name: Path<T>;
   control: Control<T>;
   label: string;
-  options: Readonly<Array<{ label: string; value: string | number }>>;
+  options: Readonly<{ label: string; value: string | number }[]>;
   required?: boolean;
   placeholder?: string;
   error?: string;
@@ -84,12 +84,12 @@ export function ControlledSelect<T extends FieldValues>({
       onChange(v);
       afterChange?.(v ?? undefined);
     } else {
-      throw new Error("Invalid selection");
+      throw new TypeError("Invalid selection");
     }
   };
 
   function toHDSValue(
-    opts: Readonly<Array<{ label: string; value: string | number }>>,
+    opts: Readonly<{ label: string; value: string | number }[]>,
     val: string | number | Array<string | number> | undefined
   ): Partial<Option>[] {
     if (val == null) {

@@ -10,11 +10,11 @@ type Props = {
   headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   initiallyOpen?: boolean;
   children: React.ReactNode;
-  icons?: Array<{
+  icons?: {
     text: string;
     textPostfix?: string;
     icon: React.ReactNode;
-  }>;
+  }[];
   id?: string;
   shouldScrollIntoView?: boolean;
 };

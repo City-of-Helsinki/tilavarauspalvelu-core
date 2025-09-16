@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { IconCross, Option, Select } from "hds-react";
 import { useTranslation, type TFunction } from "next-i18next";
 import { fontMedium } from "common/styled";
-import { type ApolloQueryResult } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import styled from "styled-components";
 import {
   ApplicationRoundStatusChoice,
@@ -13,7 +13,7 @@ import {
 } from "@gql/gql-types";
 import { ShowAllContainer } from "common/src/components";
 import { transformWeekday } from "common/src/conversion";
-import { type DayT } from "common/src/const";
+import type { DayT } from "common/src/const";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
 import {
   type RelatedSlot,
@@ -103,7 +103,7 @@ function getTimeLabel(selection: string[], t: TFunction): string {
     return "";
   }
 
-  const dayString = `${t(`translation:dayLong.${day}`)}`;
+  const dayString = t(`translation:dayLong.${day}`);
 
   const beginMinutes = startHour * 60 + startMinute;
   // since all slots are 30 minutes, we add 30 minutes to the end time
@@ -397,12 +397,19 @@ export function AllocationColumn({
         <TimeSelection />
       </StyledShowAllContainer>
       {allocatedData.map((props) => (
-        <AllocatedCard {...props} key={props.key} refetchApplicationEvents={refetchApplicationEvents} />
+        <AllocatedCard
+          key={props.key}
+          applicationSection={props.applicationSection}
+          allocatedTimeSlot={props.allocatedTimeSlot}
+          refetchApplicationEvents={refetchApplicationEvents}
+        />
       ))}
       {suitableData.map((props) => (
         <SuitableTimeCard
-          {...props}
           key={props.key}
+          applicationSection={props.applicationSection}
+          timeSlot={props.timeSlot}
+          reservationUnitOptionPk={props.reservationUnitOptionPk}
           selection={selection ?? []}
           isAllocationEnabled={canAllocate}
           refetchApplicationEvents={refetchApplicationEvents}

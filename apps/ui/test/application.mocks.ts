@@ -64,11 +64,7 @@ export function createApplicationMutationMocks(): CreateGraphQLMocksReturn {
   ];
 }
 
-function createMockReservationUnits({
-  nReservationUnits = 1,
-}: {
-  nReservationUnits?: number;
-}): Array<ReservationUnitNode> {
+function createMockReservationUnits({ nReservationUnits = 1 }: { nReservationUnits?: number }): ReservationUnitNode[] {
   return Array.from({ length: nReservationUnits }, (_, i) => createMockReservationUnit({ pk: i + 1 }));
 }
 
@@ -108,10 +104,8 @@ function createMockApplicationSection({
           ],
   };
 
-  if (page !== "page0" && page !== "page1") {
-    if (page2Data.suitableTimeRanges.length === 0) {
-      throw new Error("SuitableTimeRanges must be filled for page2");
-    }
+  if (page !== "page0" && page !== "page1" && page2Data.suitableTimeRanges.length === 0) {
+    throw new Error("SuitableTimeRanges must be filled for page2");
   }
 
   return {

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { type CreateGraphQLMockProps } from "@/test/test.gql.utils";
+import type { CreateGraphQLMockProps } from "@/test/test.gql.utils";
 import { render, screen, within } from "@testing-library/react";
 import Reservation from "@/pages/reservations/[id]";
 import { OrderStatus, ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
@@ -95,7 +95,7 @@ function customRender(
         reservation={reservation}
         feedbackUrl=""
         options={createOptionsMock()}
-        apiBaseUrl={"http://localhost:8000"}
+        apiBaseUrl="http://localhost:8000"
       />
     </MockedGraphQLProvider>
   );
@@ -117,7 +117,7 @@ describe("Page: View reservation", () => {
       await waitForAddressSection(view);
 
       const headingSection = view.getByTestId("reservation__content").childNodes[0] as HTMLElement;
-      const statusText = "reservations:status." + camelCase(state);
+      const statusText = `reservations:status.${camelCase(state)}`;
       expect(within(headingSection).getByText(statusText)).toBeInTheDocument();
     });
   });
@@ -171,7 +171,7 @@ describe("Page: View reservation", () => {
     });
   });
 
-  const shouldHaveReceiptButton = [OrderStatus.Paid, OrderStatus.PaidByInvoice, OrderStatus.Refunded];
+  const shouldHaveReceiptButton = new Set([OrderStatus.Paid, OrderStatus.PaidByInvoice, OrderStatus.Refunded]);
 
   describe("Sidebar", () => {
     it("should render a 'Save to calendar'-button when the reservation state is CONFIRMED", () => {
@@ -179,7 +179,7 @@ describe("Page: View reservation", () => {
       expect(view.getByTestId("reservation__button--calendar-link")).toBeInTheDocument();
     });
 
-    it.for(Object.entries(OrderStatus).filter((status, _idx) => shouldHaveReceiptButton.includes(status[1])))(
+    it.for(Object.entries(OrderStatus).filter((status, _idx) => shouldHaveReceiptButton.has(status[1])))(
       "should show a receipt button for a %s payment order",
       ([_, status]) => {
         customRender(reservationRenderProps("default", status));
@@ -187,7 +187,7 @@ describe("Page: View reservation", () => {
       }
     );
 
-    it.for(Object.entries(OrderStatus).filter((status) => !shouldHaveReceiptButton.includes(status[1])))(
+    it.for(Object.entries(OrderStatus).filter((status) => !shouldHaveReceiptButton.has(status[1])))(
       "should not show a receipt button for a %s payment order",
       ([_, status]) => {
         customRender(reservationRenderProps("default", status));

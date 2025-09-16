@@ -8,7 +8,7 @@ import {
   parse,
 } from "date-fns";
 import { fi } from "date-fns/locale";
-import { type TFunction } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { capitalize } from "../helpers";
 
 export const parseDate = (date: string): Date => parseISO(date);
@@ -83,7 +83,7 @@ export function toApiTime({ hours, minutes = 0 }: TimeStruct): string | null {
 export function toApiTimeUnsafe({ hours, minutes = 0 }: TimeStruct): string {
   const time = toApiTime({ hours, minutes });
   if (time == null) {
-    throw new Error("Invalid time: " + JSON.stringify({ hours, minutes }));
+    throw new Error(`Invalid time: ${JSON.stringify({ hours, minutes })}`);
   }
   return time;
 }
@@ -98,7 +98,7 @@ export function toApiDate(date: Date): string | null {
   }
   try {
     return format(date, formatStr);
-  } catch (_) {
+  } catch {
     return null;
   }
 }
@@ -119,7 +119,7 @@ export function fromApiDate(date: string): Date | null {
       return null;
     }
     return d;
-  } catch (_) {
+  } catch {
     return null;
   }
 }
@@ -134,7 +134,7 @@ export function fromUIDate(date: string): Date | null {
   try {
     const d = parse(date, "d.M.yyyy", new Date());
     return isValidDate(d) ? d : null;
-  } catch (_) {
+  } catch {
     return null;
   }
 }
@@ -152,7 +152,7 @@ export function toUIDate(date: Date | null, formatStr = "d.M.yyyy"): string {
   }
   try {
     return format(date, formatStr, { locale: fi });
-  } catch (_) {
+  } catch {
     return "";
   }
 }
@@ -168,7 +168,7 @@ export function toUIDateTime(date: Date | null, timePrefix: string): string {
   }
   try {
     return `${format(date, formatStr, { locale: fi })}${timePrefix} ${format(date, "HH:mm", { locale: fi })}`;
-  } catch (_) {
+  } catch {
     return "";
   }
 }
@@ -193,17 +193,13 @@ export const chunkArray = <T>(array: T[], size: number): T[][] => {
 // gather all used keys and make a string literal for them (typically it's just name)
 export function getTranslationSafe(parent: Record<string, unknown>, key: string, lang: "fi" | "sv" | "en"): string {
   const keyString = `${key}${capitalize(lang)}`;
-  if (parent && parent[keyString]) {
-    if (typeof parent[keyString] === "string") {
-      return String(parent[keyString]);
-    }
+  if (parent && parent[keyString] && typeof parent[keyString] === "string") {
+    return String(parent[keyString]);
   }
   const fallback = "fi";
   const fallbackKeyString = `${key}${capitalize(fallback)}`;
-  if (parent && parent[fallbackKeyString]) {
-    if (typeof parent[fallbackKeyString] === "string") {
-      return String(parent[fallbackKeyString]);
-    }
+  if (parent && parent[fallbackKeyString] && typeof parent[fallbackKeyString] === "string") {
+    return String(parent[fallbackKeyString]);
   }
 
   return "";

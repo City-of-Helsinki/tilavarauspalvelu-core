@@ -29,8 +29,8 @@ import {
   addMilliseconds,
   differenceInMinutes,
 } from "date-fns";
-import { type SlotProps } from "common/src/calendar/Calendar";
-import { type ReservationUnitNode } from "common/gql/gql-types";
+import type { SlotProps } from "common/src/calendar/Calendar";
+import type { ReservationUnitNode } from "common/gql/gql-types";
 import { getIntervalMinutes } from "common/src/conversion";
 import { gql } from "@apollo/client";
 
@@ -52,7 +52,7 @@ type BufferCollideCheckReservation = Pick<
 // TODO values should be { hour, minute } not Date objects
 // TODO provide serialization and deserialization functions (that have format checkers)
 export type ReservableMapKey = string; // format: "yyyy-mm-dd"
-export type ReservableMap = Map<ReservableMapKey, Array<{ start: Date; end: Date }>>;
+export type ReservableMap = Map<ReservableMapKey, { start: Date; end: Date }[]>;
 
 export function dateToKey(date: Date): ReservableMapKey {
   return format(date, "yyyy-MM-dd");
@@ -325,7 +325,7 @@ function isRangeReservable_({
   const slots = generateSlots(start, end, ReservationStartInterval.Interval_15Mins);
 
   const res = slots.map((slot) => areReservableTimesAvailable(reservableTimes, slot));
-  if (!res.every((val) => val)) {
+  if (!res.every(Boolean)) {
     return false;
   }
 
@@ -440,7 +440,7 @@ function isSlotWithinTimeframe(
 }
 
 function doesSlotCollideWithApplicationRounds(slot: Date, rounds: readonly RoundPeriod[]): boolean {
-  if (rounds.length < 1) return false;
+  if (rounds.length === 0) return false;
 
   return rounds.some((round) =>
     isWithinInterval(slot, {

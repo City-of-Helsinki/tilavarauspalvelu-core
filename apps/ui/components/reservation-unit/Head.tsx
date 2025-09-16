@@ -144,7 +144,7 @@ function AccessTypeTooltip({ accessTypes }: Pick<ReservationUnitHeadFragment, "a
             <span>
               {accessTypeDuration.endDate != null
                 ? formatDateRange(accessTypeDuration.beginDate, accessTypeDuration.endDate)
-                : `${t("common:dateGte", { value: toUIDate(accessTypeDuration.beginDate) })}`}
+                : t("common:dateGte", { value: toUIDate(accessTypeDuration.beginDate) })}
             </span>
           </li>
         ))}
@@ -168,11 +168,11 @@ function IconList({
   const unitPrice = pricing ? getPriceString({ t, pricing }) : undefined;
   const hasSubventionSuffix = pricing && isPaid && subventionSuffix != null;
 
-  type IconTextType = ReadonlyArray<{
+  type IconTextType = readonly {
     key: string;
     icon: Readonly<JSX.Element>;
     text: Readonly<string | JSX.Element>;
-  }>;
+  }[];
 
   const iconsTexts: IconTextType = filterNonNullable([
     reservationUnit.reservationUnitType != null

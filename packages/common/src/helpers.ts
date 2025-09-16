@@ -6,10 +6,10 @@ import {
   type Maybe,
   type SuitableTimeFieldsFragment,
 } from "../gql/gql-types";
-import { type OptionInProps } from "hds-react";
+import type { OptionInProps } from "hds-react";
 import { type DayT, pixel } from "./const";
-import { type TFunction } from "i18next";
-import { type LocalizationLanguages } from "./urlBuilder";
+import type { TFunction } from "i18next";
+import type { LocalizationLanguages } from "./urlBuilder";
 import { convertWeekday } from "./conversion";
 
 /// Enforce readonly on all nested properties
@@ -18,7 +18,7 @@ export type ReadonlyDeep<T> = {
   readonly [P in keyof T]: ReadonlyDeep<T[P]>;
 };
 
-export function filterNonNullable<T>(arr: Maybe<Readonly<Array<Maybe<T | undefined>>>> | undefined): NonNullable<T>[] {
+export function filterNonNullable<T>(arr: Maybe<Readonly<Maybe<T | undefined>[]>> | undefined): NonNullable<T>[] {
   return arr?.filter((n): n is NonNullable<T> => n != null) ?? [];
 }
 
@@ -59,7 +59,7 @@ export function toInteger(filter: Maybe<string> | undefined): number | null {
   return Math.floor(val);
 }
 
-export function pick<T, K extends keyof T>(reservation: T, keys: ReadonlyArray<K>): Pick<T, K> {
+export function pick<T, K extends keyof T>(reservation: T, keys: readonly K[]): Pick<T, K> {
   return keys.reduce<Pick<T, K>>(
     (acc, key) => {
       if (reservation[key] != null) {
@@ -133,7 +133,7 @@ export async function hash(val: string): Promise<string> {
 }
 
 export function truncate(val: string, maxLen: number): string {
-  return val.length > maxLen ? `${val.substring(0, maxLen - 1)}…` : val;
+  return val.length > maxLen ? `${val.slice(0, maxLen - 1)}…` : val;
 }
 
 /// Always return an image because the Design and process should not allow imageless reservation units
@@ -197,13 +197,13 @@ function pickMaybeDay(
 }
 
 // Returns a Date object with the first day of the given array of Dates
-export function dayMin(days: Readonly<Array<Readonly<Date | undefined>>>): Date | undefined {
+export function dayMin(days: Readonly<Readonly<Date | undefined>[]>): Date | undefined {
   return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
     return pickMaybeDay(acc, day, isBefore);
   }, undefined);
 }
 
-export function dayMax(days: Array<Date | undefined>): Date | undefined {
+export function dayMax(days: (Date | undefined)[]): Date | undefined {
   return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
     return pickMaybeDay(acc, day, isAfter);
   }, undefined);
@@ -215,7 +215,7 @@ export function dayMax(days: Array<Date | undefined>): Date | undefined {
 /// @return 0 if time is invalid otherwise the time in minutes
 export function timeToMinutes(time: string): number {
   const [hours, minutes] = time.split(":").map(Number);
-  if (hours != null && minutes != null && isFinite(hours) && isFinite(minutes)) {
+  if (hours != null && minutes != null && Number.isFinite(hours) && Number.isFinite(minutes)) {
     return hours * 60 + minutes;
   }
   return 0;
@@ -273,7 +273,7 @@ export function convertTime(t: Maybe<string> | undefined): string {
     return "";
   }
   // NOTE split has incorrect typing
-  const [h, m, _]: Array<string | undefined> = t.split(":");
+  const [h, m, _]: (string | undefined)[] = t.split(":");
   return `${h ?? "00"}:${m ?? "00"}`;
 }
 
@@ -311,7 +311,7 @@ export function convertOptionToHDS(option: { label: string; value: string | numb
 }
 
 /// @description Convert a list of strings to a comma separated string
-export function formatListToCSV(t: TFunction, list: Readonly<Array<Readonly<string>>>): string {
+export function formatListToCSV(t: TFunction, list: Readonly<Readonly<string>[]>): string {
   if (list.length === 0) {
     return "";
   }
@@ -319,7 +319,7 @@ export function formatListToCSV(t: TFunction, list: Readonly<Array<Readonly<stri
     return list[0];
   }
   const lastItem = list[list.length - 1];
-  return list.slice(0, list.length - 1).join(", ") + ` ${t("common:and")} ${lastItem}`;
+  return `${list.slice(0, -1).join(", ")} ${t("common:and")} ${lastItem}`;
 }
 
 /// @description Converts time struct to string

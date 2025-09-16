@@ -11,9 +11,9 @@ const IMAGE_WIDTH = "418";
 const IMAGE_HEIGHT = "350";
 const BREAKPOINT = breakpoints.m;
 
-const STATUS_CODES_WITH_SECOND_PARAGRAPH = [403];
-const STATUS_CODES_WITH_FRONTPAGE_LINK = [403, 404, 500];
-const STATUS_CODES_WITH_NONGENERIC_CONTENT = [403, 404, 500, 503];
+const STATUS_CODES_WITH_SECOND_PARAGRAPH = new Set([403]);
+const STATUS_CODES_WITH_FRONTPAGE_LINK = new Set([403, 404, 500]);
+const STATUS_CODES_WITH_NONGENERIC_CONTENT = new Set([403, 404, 500, 503]);
 
 type ErrorPageProps = {
   statusCode?: number;
@@ -74,7 +74,7 @@ function constructFeedbackUrl(i18n: { language: string }, feedbackUrl?: string |
     const url = new URL(feedbackUrl);
     url.searchParams.set("lang", i18n.language);
     return url.toString();
-  } catch (_) {
+  } catch {
     return null;
   }
 }
@@ -90,7 +90,7 @@ function statusCodeText({
   body?: string;
   t: TFunction;
 }>) {
-  const statusCodeString = STATUS_CODES_WITH_NONGENERIC_CONTENT.includes(statusCode ?? 0)
+  const statusCodeString = STATUS_CODES_WITH_NONGENERIC_CONTENT.has(statusCode ?? 0)
     ? statusCode?.toString()
     : "generic";
   return (
@@ -100,7 +100,7 @@ function statusCodeText({
         {title ?? t(`${statusCodeString}.heading`)}
       </H1>
       <Body data-testid={`error__${statusCode}--body`}>{body ?? t(`${statusCodeString}.body`)}</Body>
-      {STATUS_CODES_WITH_SECOND_PARAGRAPH.includes(statusCode ?? 0) && (
+      {STATUS_CODES_WITH_SECOND_PARAGRAPH.has(statusCode ?? 0) && (
         <Body data-testid={`error__${statusCode}--body2`}>{t(`${statusCodeString}.body2`)}</Body>
       )}
     </>
@@ -123,7 +123,7 @@ export function ErrorContainer({
       <Img
         src={
           imgSrc ??
-          (STATUS_CODES_WITH_NONGENERIC_CONTENT.includes(statusCode ?? 0)
+          (STATUS_CODES_WITH_NONGENERIC_CONTENT.has(statusCode ?? 0)
             ? `/images/${statusCode}-error.png`
             : "/images/generic-error.png")
         }
@@ -134,7 +134,7 @@ export function ErrorContainer({
       />
       <TextContent>
         {children || statusCodeText({ statusCode, title, body, t })}
-        <Flex $direction={"column"} $gap="xs">
+        <Flex $direction="column" $gap="xs">
           <IconButton
             label={t("buttons.contact")}
             icon={<IconArrowRight />}
@@ -142,7 +142,7 @@ export function ErrorContainer({
             rel="noopener noreferrer"
             data-testid="error__contact-button"
           />
-          {STATUS_CODES_WITH_FRONTPAGE_LINK.includes(statusCode ?? 0) && (
+          {STATUS_CODES_WITH_FRONTPAGE_LINK.has(statusCode ?? 0) && (
             <IconButton
               label={t("buttons.backToHome")}
               icon={<IconArrowRight />}

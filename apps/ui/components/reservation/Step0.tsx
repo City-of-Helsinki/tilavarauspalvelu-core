@@ -14,10 +14,10 @@ import { type ReservationInProgressFragment, ReserveeType } from "@gql/gql-types
 import { filterNonNullable } from "common/src/helpers";
 import { containsField, FieldName } from "common/src/metaFieldsHelpers";
 import { getApplicationFields, getGeneralFields } from "./SummaryFields";
-import { type Inputs } from "common/src/reservation-form/types";
+import type { Inputs } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
-import { type OptionsRecord } from "common";
+import type { OptionsRecord } from "common";
 
 type Props = {
   cancelReservation: () => void;
@@ -144,7 +144,7 @@ function Errors({
   // TODO clean this up
   const errorKeys =
     Object.keys(errors).sort((a, b) => {
-      const fields = [...supportedFields.map((x) => x.fieldName)];
+      const fields = supportedFields.map((x) => x.fieldName);
       // Why?
       return fields.indexOf(a) - fields.indexOf(b);
     }) ?? [];
@@ -165,7 +165,7 @@ function Errors({
       <ErrorList>
         {errorKeys.map((key: string) => {
           const fieldType =
-            generalFields.find((x) => x === key) != null || key === "reserveeType"
+            generalFields.some((x) => x === key) != null || key === "reserveeType"
               ? "common"
               : reserveeType?.toLocaleLowerCase() || "individual";
           return (

@@ -13,7 +13,7 @@ import { Accordion } from "@/component/Accordion";
 import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";
 import { type AllocationApplicationSectionCardType, ApplicationSectionCard } from "./ApplicationEventCard";
-import { type ApolloQueryResult } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
 import {
   type AllocatedTimeSlotNodeT,
@@ -70,7 +70,7 @@ function EventGroupList({
   type: AllocationApplicationSectionCardType;
   refetch: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
 }): JSX.Element {
-  if (applicationSections.length < 1) {
+  if (applicationSections.length === 0) {
     return <div>-</div>;
   }
 
@@ -216,7 +216,7 @@ function ApplicationSectionColumn({
 
   // locked or rejected but not in the allocated list
   const locked = sections
-    .filter((x) => allocated.find((y) => x.pk === y.pk) == null)
+    .filter((x) => allocated.some((y) => x.pk === y.pk) == null)
     .filter((as) => isLocked(as) || isRejected(as));
 
   // take certain states and omit colliding application events

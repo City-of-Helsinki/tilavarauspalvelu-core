@@ -13,7 +13,7 @@ import { FilterTagList } from "../FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { type OptionsListT } from "common/src/modules/search";
+import type { OptionsListT } from "common/src/modules/search";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
@@ -150,11 +150,11 @@ export function SingleSearchForm({
     formValues.timeBegin ||
     formValues.timeEnd ||
     formValues.duration ||
-    formValues.units.length ||
+    formValues.units.length > 0 ||
     formValues.personsAllowed ||
-    formValues.purposes.length ||
-    formValues.equipments.length ||
-    formValues.accessTypes.length
+    formValues.purposes.length > 0 ||
+    formValues.equipments.length > 0 ||
+    formValues.accessTypes.length > 0
   );
 
   return (
@@ -228,8 +228,8 @@ export function SingleSearchForm({
           <TimeRangePicker
             names={{ begin: "timeBegin", end: "timeEnd" }}
             labels={{
-              begin: `${t("common:timeLabelBegin")}`,
-              end: `${t("common:timeLabelEnd")}`,
+              begin: t("common:timeLabelBegin"),
+              end: t("common:timeLabelEnd"),
             }}
             placeholders={{
               begin: t("common:beginLabel"),

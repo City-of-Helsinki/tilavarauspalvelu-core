@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { ApplicationFields, GeneralFields } from "@/components/reservation/SummaryFields";
 import { MetaFieldsFragment, ReserveeType } from "@gql/gql-types";
 import { createMetaFieldsFragment, createOptionsMock, createSupportedFieldsMock } from "@test/reservation.mocks";
-import { type FieldName } from "common/src/metaFieldsHelpers";
+import type { FieldName } from "common/src/metaFieldsHelpers";
 import { describe, expect, it } from "vitest";
 
 function renderGeneralFields(): ReturnType<typeof render> {
@@ -163,7 +163,7 @@ function getFieldValue(fieldObject: any): string {
   if (!fieldObject) return "";
   switch (fieldObject[0]) {
     case "purpose":
-      return `${(fieldObject[1] as { nameFi: string })?.nameFi}`;
+      return (fieldObject[1] as { nameFi: string })?.nameFi;
     case "ageGroup":
       return `${fieldObject[1]?.minimum} - ${fieldObject[1]?.maximum}`;
     default:

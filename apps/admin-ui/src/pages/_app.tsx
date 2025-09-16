@@ -5,7 +5,7 @@ import "../styles/global.scss";
 import { ApolloProvider } from "@apollo/client";
 import { createClient } from "@/common/apolloClient";
 import { updateSentryConfig } from "../../sentry.client.config";
-import { type PageProps } from ".";
+import type { PageProps } from ".";
 import { appWithTranslation } from "next-i18next";
 import Layout from "./layout";
 import PageWrapper from "@/component/PageWrapper";
@@ -122,9 +122,9 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
     });
 
     return { ...ctx, currentUser: data.currentUser, handlingData, notificationsData: notificationsData };
-  } catch (error) {
+  } catch (err) {
     // eslint-disable-next-line no-console
-    console.error("Error fetching current user:", error);
+    console.error("Error fetching current user:", err);
   }
 
   return { ...ctx, currentUser: null, handlingData: null, notificationsData: null };

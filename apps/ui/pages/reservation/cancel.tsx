@@ -92,7 +92,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   if (errors != null) {
     // eslint-disable-next-line no-console
-    console.error("Delete mutation failed with: ", errors);
+    console.error("Delete mutation failed with:", errors);
     // TODO improve the error page (or redirect to home page alternatvely or to users own reservations or this reservation?)
     // if the reservation is deleted it will not show up anywhere (it's deleted from the database also)
     return {

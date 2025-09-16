@@ -1,8 +1,8 @@
 import { MunicipalityChoice, ReservationKind, type OptionsQuery, type ReservationUnitTypeNode } from "@/gql/gql-types";
 import { createNodeId } from "common/src/helpers";
-import { type DocumentNode } from "graphql";
+import type { DocumentNode } from "graphql";
 import { translateOption } from "@/modules/search";
-import { type OptionsListT } from "common/src/modules/search";
+import type { OptionsListT } from "common/src/modules/search";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ICreateGraphQLMock {}
@@ -14,7 +14,7 @@ export interface CreateGraphQLMockProps extends ICreateGraphQLMock {
   reservationKind?: ReservationKind;
 }
 
-export type CreateGraphQLMocksReturn = Array<{
+export type CreateGraphQLMocksReturn = {
   request: {
     query: DocumentNode;
     variables?: Record<string, unknown>;
@@ -24,7 +24,7 @@ export type CreateGraphQLMocksReturn = Array<{
     data: Record<string, unknown>;
   };
   error?: Error | undefined;
-}>;
+}[];
 
 export function createOptionMock(
   props: {

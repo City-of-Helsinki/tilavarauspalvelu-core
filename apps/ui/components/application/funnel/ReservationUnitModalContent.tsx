@@ -30,7 +30,7 @@ import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { SearchFormValues, SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { processVariables } from "@/modules/search";
-import { type OptionsListT } from "common/src/modules/search";
+import type { OptionsListT } from "common/src/modules/search";
 import { useSearchParams } from "next/navigation";
 import { useSearchQuery } from "@/hooks";
 
@@ -170,7 +170,7 @@ export function ReservationUnitModalContent({
           <ReservationUnitCard
             handleAdd={(pk) => handleAdd({ pk })}
             handleRemove={(pk) => handleRemove({ pk })}
-            isSelected={currentReservationUnits.find((i) => i.pk === ru.pk) !== undefined}
+            isSelected={currentReservationUnits.some((i) => i.pk === ru.pk) !== undefined}
             reservationUnit={ru}
             key={ru.pk}
           />

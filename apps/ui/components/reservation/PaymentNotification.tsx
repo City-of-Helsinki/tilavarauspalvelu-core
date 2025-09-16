@@ -34,8 +34,9 @@ export function PaymentNotification({ reservation, apiBaseUrl }: PaymentNotifica
   const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
   const formatter = formatters["currencyWithDecimals"];
   const { appliedPricing, paymentOrder } = reservation;
-  const price = formatter?.format(parseFloat(appliedPricing?.highestPrice ?? "") ?? 0);
-  const taxPercentage = formatters.strippedDecimal?.format(parseFloat(appliedPricing?.taxPercentage ?? "")) ?? "0";
+  const price = formatter?.format(Number.parseFloat(appliedPricing?.highestPrice ?? "") ?? 0);
+  const taxPercentage =
+    formatters.strippedDecimal?.format(Number.parseFloat(appliedPricing?.taxPercentage ?? "")) ?? "0";
 
   const deadline =
     paymentOrder?.handledPaymentDueBy != null
@@ -49,7 +50,7 @@ export function PaymentNotification({ reservation, apiBaseUrl }: PaymentNotifica
   const paymentUrl = getPaymentUrl(reservation, lang, apiBaseUrl);
   return (
     <Notification data-testid="reservation__payment-notification" type="alert" label={t(`${translationPath}.title`)}>
-      <Flex $direction={"column"} $gap={"2-xs"}>
+      <Flex $direction="column" $gap="2-xs">
         {t(`${translationPath}.description`)}
         <PriceDetails>
           <div data-testid="reservation__payment-notification__price">

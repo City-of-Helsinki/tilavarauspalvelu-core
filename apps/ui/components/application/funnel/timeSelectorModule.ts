@@ -1,6 +1,6 @@
-import { type SuitableTimeRangeFormValues } from "./form";
+import type { SuitableTimeRangeFormValues } from "./form";
 import { type ApplicationRoundTimeSlotNode, Priority, SuitableTimeFieldsFragment, Weekday } from "@/gql/gql-types";
-import { type Cell, type CellState } from "common/src/components/ApplicationTimeSelector";
+import type { Cell, CellState } from "common/src/components/ApplicationTimeSelector";
 import { DayT, WEEKDAYS, WEEKDAYS_SORTED } from "common/src/const";
 import { convertWeekday, transformWeekday } from "common/src/conversion";
 import { filterNonNullable, formatTimeStruct, timeToMinutes } from "common/src/helpers";
@@ -119,7 +119,7 @@ interface AesType extends TimeSpan {
 }
 
 function combineTimespans(prev: TimeSpan[], current: TimeSpan): TimeSpan[] {
-  if (!prev.length) {
+  if (prev.length === 0) {
     return [current];
   }
   const prevCell = prev[prev.length - 1];
@@ -128,7 +128,7 @@ function combineTimespans(prev: TimeSpan[], current: TimeSpan): TimeSpan[] {
   }
   if (prevCell.end === current.begin && prevCell.priority === current.priority) {
     return [
-      ...prev.slice(0, prev.length - 1),
+      ...prev.slice(0, -1),
       {
         begin: prevCell.begin,
         end: prevCell.end + 1,

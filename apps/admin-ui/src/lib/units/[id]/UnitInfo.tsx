@@ -4,7 +4,7 @@ import { fontMedium, Flex } from "common/styled";
 import { formatAddress } from "@/common/util";
 import { IconCheck } from "hds-react";
 import { gql } from "@apollo/client";
-import { type UnitResourceInfoFieldsFragment } from "@gql/gql-types";
+import type { UnitResourceInfoFieldsFragment } from "@gql/gql-types";
 
 const UnitInfoWrapper = styled(Flex).attrs({
   $gap: "2-xs",

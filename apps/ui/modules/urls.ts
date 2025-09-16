@@ -1,4 +1,4 @@
-import { type Maybe } from "@/gql/gql-types";
+import type { Maybe } from "@/gql/gql-types";
 
 export const reservationUnitPrefix = "/reservation-unit";
 export const singleSearchPrefix = "/search";
@@ -97,7 +97,7 @@ export function getFeedbackUrl(feedbackUrl: string, i18n: { language: string }) 
     const url = new URL(feedbackUrl);
     url.searchParams.set("lang", i18n.language);
     return url.toString();
-  } catch (_) {
+  } catch {
     return null;
   }
 }

@@ -20,7 +20,7 @@ import {
   useReservationLazyQuery,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
-import { type Inputs } from "common/src/reservation-form/types";
+import type { Inputs } from "common/src/reservation-form/types";
 import { createApolloClient } from "@/modules/apolloClient";
 import { default as NextError } from "next/error";
 import { getReservationPath, getReservationUnitPath, getSingleSearchPath } from "@/modules/urls";
@@ -151,7 +151,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
     const stepLength = isUnitFreeOfCharge || requireHandling ? 2 : 5;
 
-    return Array.from(Array(stepLength)).map((_n, i) => {
+    return [...Array(stepLength)].map((_n, i) => {
       const state = i === step ? 0 : i < step ? 1 : 2;
 
       return {

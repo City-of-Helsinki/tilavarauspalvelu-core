@@ -14,7 +14,7 @@ import { FixedDialog } from "@/styled/FixedDialog";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { ResourcesTable, SubPageHead, SpacesTable, NewSpaceModal, NewResourceModal } from "@lib/units/[id]/";
 

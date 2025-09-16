@@ -22,7 +22,7 @@ import { getReservationInProgressPath } from "@/modules/urls";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { Flex } from "common/styled";
 import { getApiErrors } from "common/src/apolloUtils";
-import { type ParsedUrlQuery } from "querystring";
+import type { ParsedUrlQuery } from "node:querystring";
 
 const BodyText = styled.p`
   margin: 0;
@@ -200,10 +200,10 @@ export function InProgressReservationNotification() {
             text: t("notification:waitingForPayment.reservationCancelledTitle"),
           });
         }
-      } catch (e) {
+      } catch (err) {
         // silently ignore NOT_FOUND (just refresh query cache)
-        if (!isNotFoundError(e)) {
-          throw e;
+        if (!isNotFoundError(err)) {
+          throw err;
         }
       }
       if (shouldRedirectAfterDelete(reservation.pk, router.pathname, router.query)) {

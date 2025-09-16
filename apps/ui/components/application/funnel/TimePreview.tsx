@@ -1,5 +1,5 @@
 import React from "react";
-import { type ApplicationPage2FormValues } from "./form";
+import type { ApplicationPage2FormValues } from "./form";
 import { useFormContext } from "react-hook-form";
 import { ApplicationTimePreview } from "common/src/components/ApplicationTimePreview";
 
