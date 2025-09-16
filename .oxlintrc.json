@@ -45,6 +45,7 @@
     "eslint/max-lines-per-function": "off",
     "eslint/max-nested-callbacks": "error",
     "eslint/new-cap": "off",
+    "eslint/no-alert": "error",
     "eslint/no-array-constructor": "error",
     "eslint/no-async-promise-executor": "error",
     "eslint/no-bitwise": "error",
