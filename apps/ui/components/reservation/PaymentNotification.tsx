@@ -3,7 +3,8 @@ import { Notification } from "hds-react";
 import { ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { convertLanguageCode, toUIDateTime } from "common/src/common/util";
+import { convertLanguageCode } from "common/src/common/util";
+import { formatDateTime, toValidDateObject } from "common/src/date-utils";
 import { Flex, fontMedium } from "common/styled";
 import { formatters as getFormatters } from "common";
 import React, { useMemo } from "react";
@@ -39,7 +40,10 @@ export function PaymentNotification({ reservation, apiBaseUrl }: PaymentNotifica
 
   const deadline =
     paymentOrder?.handledPaymentDueBy != null
-      ? toUIDateTime(new Date(paymentOrder.handledPaymentDueBy), t("common:dayTimeSeparator"))
+      ? formatDateTime(toValidDateObject(paymentOrder.handledPaymentDueBy), {
+          t,
+          includeWeekday: false,
+        })
       : "-";
   const lang = convertLanguageCode(i18n.language);
   const isExpired =

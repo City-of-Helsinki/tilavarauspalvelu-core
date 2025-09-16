@@ -24,7 +24,7 @@ import {
   ignoreMaybeArray,
   toNumber,
 } from "common/src/helpers";
-import { format, isSameDay } from "date-fns";
+import { isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Element } from "@/styled";
 import { AutoGrid, ButtonContainer, CenterSpinner, H1, Strong } from "common/styled";
@@ -32,14 +32,22 @@ import { LinkPrev } from "@/component/LinkPrev";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonSize, Notification } from "hds-react";
-import { fromApiDate, fromUIDate, fromUIDateUnsafe, toApiDateUnsafe, toUIDate } from "common/src/common/util";
+import {
+  fromApiDate,
+  fromApiDateTime,
+  fromUIDate,
+  formatDate,
+  fromUIDateUnsafe,
+  toApiDateUnsafe,
+  formatTime,
+} from "common/src/date-utils";
 import { ControlledDateInput, TimeInput } from "common/src/components/form";
 import { WeekdaysSelector } from "@/component/WeekdaysSelector";
 import { ReservationListEditor } from "@/component/ReservationListEditor";
 import { useFilteredReservationList, useMultipleReservation, useSession } from "@/hooks";
 import { RescheduleReservationSeriesForm, RescheduleReservationSeriesFormSchema } from "@/schemas";
 import { errorToast, successToast } from "common/src/components/toast";
-import { fromAPIDateTime, getBufferTime } from "@/helpers";
+import { getBufferTime } from "@/helpers";
 import { BufferToggles } from "@/component/BufferToggles";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { getReservationUrl } from "@/common/urls";
@@ -62,13 +70,14 @@ function convertToForm(value: ReservationSeriesPageFragment["reservationSeries"]
   const reservations = filterNonNullable(value?.reservations).filter((x) => new Date(x.beginsAt) >= new Date());
   const bufferTimeBefore = calculateMedian(reservations.map((x) => x.bufferTimeBefore));
   const bufferTimeAfter = calculateMedian(reservations.map((x) => x.bufferTimeAfter));
-  const begin = fromAPIDateTime(value?.beginDate, value?.beginTime);
-  const end = fromAPIDateTime(value?.endDate, value?.endTime);
+  const begin = fromApiDateTime(value?.beginDate, value?.beginTime);
+  const end = fromApiDateTime(value?.endDate, value?.endTime);
+
   return {
-    startingDate: value?.beginDate != null ? toUIDate(fromApiDate(value.beginDate)) : "",
-    endingDate: value?.endDate != null ? toUIDate(fromApiDate(value.endDate)) : "",
-    startTime: begin ? format(begin, "HH:mm") : "",
-    endTime: end ? format(end, "HH:mm") : "",
+    startingDate: value?.beginDate != null ? formatDate(fromApiDate(value.beginDate)) : "",
+    endingDate: value?.endDate != null ? formatDate(fromApiDate(value.endDate)) : "",
+    startTime: begin ? formatTime(begin) : "",
+    endTime: end ? formatTime(end) : "",
     repeatOnDays: filterNonNullable(value?.weekdays),
     bufferTimeBefore: bufferTimeBefore > 0,
     bufferTimeAfter: bufferTimeAfter > 0,

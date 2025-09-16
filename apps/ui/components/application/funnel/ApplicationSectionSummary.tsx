@@ -4,7 +4,7 @@ import { IconCalendar, IconClock, IconGroup } from "hds-react";
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Flex, H4 } from "common/styled";
-import { formatDuration, fromUIDate } from "common/src/common/util";
+import { formatDuration, fromUIDate } from "common/src/date-utils";
 import { type ApplicationSectionPage1FormValues } from "./form";
 import { IconWithText } from "@/components/common/IconWithText";
 

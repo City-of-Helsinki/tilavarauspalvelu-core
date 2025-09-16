@@ -4,8 +4,8 @@ import {
   type ReservationUnitsByUnitFieldsFragment,
   useReservationUnitsByUnitQuery,
 } from "@gql/gql-types";
-import { toApiDate } from "common/src/common/util";
 import { createNodeId, getNode } from "common/src/helpers";
+import { toApiDate } from "common/src/date-utils";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/components/toast";
 import { gql } from "@apollo/client";
