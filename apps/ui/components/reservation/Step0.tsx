@@ -11,7 +11,6 @@ import { ReservationFormReserveeSection, ReservationFormGeneralSection } from "c
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
 import {
-  ReservationFormType,
   type ReservationInProgressFragment,
   type ReservationUpdateMutation,
   ReserveeType,
@@ -20,7 +19,6 @@ import {
 import {
   getFilteredGeneralFields,
   getFilteredReserveeFields,
-  getFormFields,
   type ExtendedFormFieldArray,
   getReservationFormGeneralFields,
 } from "common/src/reservation-form/util";
@@ -189,7 +187,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
       />
-      <FormErrors form={form} formType={formType} />
+      <FormErrors form={form} /*formType={formType}*/ reserveeType={reserveeType} />
       <ActionContainer>
         <Button
           type="submit"
@@ -217,33 +215,35 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
 
 function FormErrors<T extends FieldValues>({
   form,
-  formType,
+  reserveeType,
 }: {
   form: UseFormReturn<T>;
-  formType: ReservationFormType;
+  reserveeType: ReserveeType;
 }) {
   const { t } = useTranslation();
 
-  const { formState } = form;
-  const { errors } = formState;
+  const {
+    formState: { errors },
+  } = form;
   // TODO clean this up (wrap it into a function that clearly tells what it's doing)
+  /*
   const errorKeys =
     Object.keys(errors).sort((a, b) => {
       const fields = getFormFields(formType).map((x) => x.toString());
       // Why?
       return fields.indexOf(a) - fields.indexOf(b);
     }) ?? [];
+  */
 
   // Doesn't require filtering since we can't get errors if the field doesn't exist
   const generalFields = getReservationFormGeneralFields();
   // FIXME need to drill this if we need different translations
-  const reserveeType = ReserveeType.Individual;
 
-  if (errorKeys.length === 0) {
+  if (Object.keys(errors).length === 0) {
     return null;
   }
 
-  const errorList = errorKeys.map((key) => {
+  const errorList = Object.keys(errors).map((key) => {
     // TODO why?
     const parentTrKey =
       generalFields.find((x) => x === key) != null || key === "reserveeType"

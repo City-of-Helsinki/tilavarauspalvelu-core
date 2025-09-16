@@ -249,7 +249,7 @@ export function getReservationFormSchema(formType: ReservationFormType) {
     .refine(
       (val) =>
         val.reserveeType === ReserveeType.Individual ||
-        val.reserveeIsUnregisteredAssociation ||
+        (val.reserveeIsUnregisteredAssociation && val.reserveeType === ReserveeType.Nonprofit) ||
         val.reserveeIdentifier.length > 0,
       {
         path: ["reserveeIdentifier"],

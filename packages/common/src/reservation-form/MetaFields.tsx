@@ -210,7 +210,7 @@ export function ReservationFormReserveeSection({
       ) : null}
       {/* TODO should have the organisation name on the first line */}
       {/* TODO propably best to separate the organisation part of the form to it's own section */}
-      {reserveeType !== ReserveeType.Individual && (
+      {reserveeType != null && reserveeType !== ReserveeType.Individual && (
         <ControlledSelect
           name="municipality"
           id={constructReservationFieldId("municipality")}
