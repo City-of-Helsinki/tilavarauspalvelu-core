@@ -173,6 +173,7 @@
     "import/no-amd": "error",
     "import/no-anonymous-default-export": "error",
     "import/no-commonjs": "error",
+    "import/no-cycle": "error",
     "import/no-default-export": "off",
     "import/no-duplicates": "error",
     "import/no-dynamic-require": "error",

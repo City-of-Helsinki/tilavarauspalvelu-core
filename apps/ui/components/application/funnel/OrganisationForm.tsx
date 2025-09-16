@@ -3,9 +3,11 @@ import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { MunicipalityChoice } from "@gql/gql-types";
 import { ControlledCheckbox, ControlledSelect } from "common/src/components/form";
-import { ApplicationFormTextInput, BillingAddress, ContactPersonSection } from ".";
 import type { ApplicationPage3FormValues } from "./form";
 import { FormSubHeading } from "./styled";
+import { ApplicationFormTextInput } from "./ApplicationFormTextInput";
+import { BillingAddress } from "./BillingAddress";
+import { ContactPersonSection } from "./CompanyForm";
 
 export function OrganisationForm(): JSX.Element {
   const { t } = useTranslation();

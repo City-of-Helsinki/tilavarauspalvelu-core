@@ -17,11 +17,12 @@ import type { ApplicationReservationUnitListFragment, OrderedReservationUnitCard
 import { filterNonNullable } from "common/src/helpers";
 import { Flex } from "common/styled";
 import { ErrorText } from "common/src/components/ErrorText";
-import { OrderedReservationUnitCard, ReservationUnitModalContent } from ".";
 import { useSearchParams } from "next/navigation";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import type { OptionsListT } from "common/src/modules/search";
 import { FixedDialog } from "@/styled/FixedDialog";
+import { OrderedReservationUnitCard } from "./OrderedReservationUnitCard";
+import { ReservationUnitModalContent } from "./ReservationUnitModalContent";
 
 type ReservationUnitType = Pick<OrderedReservationUnitCardFragment, "pk">;
 

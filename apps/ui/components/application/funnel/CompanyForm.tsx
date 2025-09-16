@@ -4,7 +4,8 @@ import { useFormContext } from "react-hook-form";
 import { ControlledCheckbox } from "common/src/components/form";
 import { FormSubHeading } from "./styled";
 import type { ApplicationPage3FormValues } from "./form";
-import { ApplicationFormTextInput, BillingAddress } from ".";
+import { ApplicationFormTextInput } from "./ApplicationFormTextInput";
+import { BillingAddress } from "./BillingAddress";
 
 export function CompanyForm(): JSX.Element {
   const { t } = useTranslation();

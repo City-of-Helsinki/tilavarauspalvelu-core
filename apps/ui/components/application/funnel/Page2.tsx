@@ -10,7 +10,7 @@ import { ButtonContainer } from "common/styled";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { getApplicationPath } from "@/modules/urls";
 import type { ApplicationPage2FormValues } from "./form";
-import { TimeSelectorForm } from ".";
+import { TimeSelectorForm } from "./TimeSelector";
 import { gql } from "@apollo/client";
 
 type Props = {

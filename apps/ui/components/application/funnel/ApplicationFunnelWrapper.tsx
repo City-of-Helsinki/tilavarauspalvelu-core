@@ -8,7 +8,7 @@ import type { ApplicationFormFragment } from "@gql/gql-types";
 import { applicationsPrefix } from "@/modules/urls";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ApplicationHead } from "..";
-import { ApplicationStepper } from ".";
+import { ApplicationStepper } from "./ApplicationStepper";
 import { NotesWhenApplying } from "../NotesWhenApplying";
 
 const InnerContainer = styled.div`

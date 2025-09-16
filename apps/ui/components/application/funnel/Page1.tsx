@@ -6,7 +6,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { ButtonContainer } from "common/styled";
 import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { useReservationUnitList } from "@/hooks";
-import { ApplicationSectionPage1 } from ".";
+import { ApplicationSectionPage1 } from "./ApplicationSectionPage1";
 import { type ApplicationPage1FormValues, createDefaultPage1Section } from "./form";
 import type { OptionsListT } from "common/src/modules/search";
 

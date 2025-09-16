@@ -17,7 +17,7 @@ import type { TimeSelectorFragment } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
 import { aesToCells, covertCellsToTimeRange } from "./timeSelectorModule";
 import type { ApplicationPage2FormValues } from "./form";
-import { TimePreview } from ".";
+import { TimePreview } from "./TimePreview";
 import { convertWeekday } from "common/src/conversion";
 
 export type TimeSelectorProps = {
