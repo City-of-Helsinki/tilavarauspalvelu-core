@@ -183,7 +183,8 @@ export type AccessTypesFormType = z.infer<typeof AccessTypesFormSchema>;
 function validateAccessTypes(accessTypes: AccessTypesFormType[], ctx: z.RefinementCtx): void {
   const seenDates: string[] = [];
 
-  accessTypes.forEach((at, index) => {
+  for (const at of accessTypes) {
+    const index = accessTypes.indexOf(at);
     if (fromUIDate(at.beginDate) == null) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -200,27 +201,29 @@ function validateAccessTypes(accessTypes: AccessTypesFormType[], ctx: z.Refineme
       });
     }
     seenDates.push(at.beginDate);
-  });
+  }
 }
 
 function validateSeasonalTimes(data: SeasonalFormType[], ctx: z.RefinementCtx): void {
-  data.forEach((season, index) => {
+  for (const season of data) {
+    const index = data.indexOf(season);
     // closed don't need validation (time is not saved)
     if (season.closed) {
-      return;
+      continue;
     }
     // pass empties and "" because they are never sent
     let lastEnd: number | null = null;
-    season.reservableTimes.forEach((reservableTime, i) => {
+    for (const reservableTime of season.reservableTimes) {
+      const i = season.reservableTimes.indexOf(reservableTime);
       if (reservableTime == null) {
-        return;
+        continue;
       }
       // check both begin and end
       if (reservableTime.begin == null && reservableTime.end == null) {
-        return;
+        continue;
       }
       if (reservableTime.begin === "" && reservableTime.end === "") {
-        return;
+        continue;
       }
       const path = `seasons[${index}].reservableTimes[${i}]`;
       checkTimeStringFormat(reservableTime?.begin, ctx, `${path}.begin`, "time");
@@ -285,8 +288,8 @@ function validateSeasonalTimes(data: SeasonalFormType[], ctx: z.RefinementCtx): 
       }
 
       lastEnd = endTimeMinutes;
-    });
-  });
+    }
+  }
 }
 
 function validateDateTimeInterval({

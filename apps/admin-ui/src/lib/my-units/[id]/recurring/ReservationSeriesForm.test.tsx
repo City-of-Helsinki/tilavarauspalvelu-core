@@ -428,9 +428,9 @@ describe("Filling the form", () => {
 
     const removeButtons = within(list).queryAllByRole("button");
     expect(removeButtons).toHaveLength(4);
-    removeButtons.forEach((x) => {
+    for (const x of removeButtons) {
       expect(x).toHaveTextContent(/common:remove/);
-    });
+    }
 
     const testButton = removeButtons[0];
     if (testButton == null) {
