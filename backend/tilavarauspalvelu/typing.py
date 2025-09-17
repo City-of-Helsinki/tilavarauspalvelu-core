@@ -101,6 +101,11 @@ class TimeSlot(TypedDict):
     end: datetime.time
 
 
+class CeleryAutoCreateTaskSchedule(TypedDict):
+    hour: str
+    minute: str
+
+
 class TimeSlotDB(TypedDict):
     """
     Timeslots must be stored as string in HSField,
