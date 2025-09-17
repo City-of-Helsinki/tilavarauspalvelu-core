@@ -37,7 +37,7 @@ import { ControlledDateInput, TimeInput } from "common/src/components/form";
 import { WeekdaysSelector } from "@/component/WeekdaysSelector";
 import { ReservationListEditor } from "@/component/ReservationListEditor";
 import { useFilteredReservationList, useMultipleReservation, useSession } from "@/hooks";
-import { RescheduleReservationSeriesForm, RescheduleReservationSeriesFormSchema } from "@/schemas";
+import { getRescheduleReservationSeriesSchema, RescheduleReservationSeriesForm } from "@/schemas";
 import { errorToast, successToast } from "common/src/components/toast";
 import { fromAPIDateTime, getBufferTime } from "@/helpers";
 import { BufferToggles } from "@/component/BufferToggles";
@@ -70,8 +70,8 @@ function convertToForm(value: ReservationSeriesPageFragment["reservationSeries"]
     startTime: begin ? format(begin, "HH:mm") : "",
     endTime: end ? format(end, "HH:mm") : "",
     repeatOnDays: filterNonNullable(value?.weekdays),
-    bufferTimeBefore: bufferTimeBefore > 0,
-    bufferTimeAfter: bufferTimeAfter > 0,
+    enableBufferTimeBefore: bufferTimeBefore > 0,
+    enableBufferTimeAfter: bufferTimeAfter > 0,
     type: reservations[0]?.type ?? ReservationTypeChoice.Staff,
     repeatPattern: value?.recurrenceInDays === 14 ? "biweekly" : "weekly",
   };
@@ -133,7 +133,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
 
   const form = useForm<RescheduleReservationSeriesForm>({
     // FIXME there is no validation here (schema is incomplete, need to run the same refinements as in the create form)
-    resolver: zodResolver(RescheduleReservationSeriesFormSchema(interval)),
+    resolver: zodResolver(getRescheduleReservationSeriesSchema(interval)),
     values: convertToForm(reservationSeries),
   });
 
@@ -212,8 +212,12 @@ function SeriesPageInner({ pk }: { pk: number }) {
       return;
     }
 
-    const bufferTimeBefore = getBufferTime(reservationUnit.bufferTimeBefore, values.type, values.bufferTimeBefore);
-    const bufferTimeAfter = getBufferTime(reservationUnit.bufferTimeAfter, values.type, values.bufferTimeAfter);
+    const bufferTimeBefore = getBufferTime(
+      reservationUnit.bufferTimeBefore,
+      values.type,
+      values.enableBufferTimeBefore
+    );
+    const bufferTimeAfter = getBufferTime(reservationUnit.bufferTimeAfter, values.type, values.enableBufferTimeAfter);
 
     try {
       const input: ReservationSeriesRescheduleMutation = {

@@ -14,15 +14,9 @@ import {
 import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ErrorBoundary } from "react-error-boundary";
-import {
-  ReservationChangeFormSchema,
-  type ReservationChangeFormType,
-  type ReservationFormMeta,
-  ReservationTypeSchema,
-} from "common/src/schemas";
+import { ReservationChangeFormSchema, type ReservationChangeFormType } from "common/src/schemas";
 import { ReservationTypeForm } from "@/component/ReservationTypeForm";
 import { useStaffReservationMutation, useReservationEditData, useSession } from "@/hooks";
-import { errorToast } from "common/src/components/toast";
 import { ButtonContainer, CenterSpinner, Flex, HR } from "common/styled";
 import { createTagString } from "@/modules/reservation";
 import { ReservationTitleSection } from "@lib/reservations/[id]";
@@ -38,9 +32,6 @@ import { Error403 } from "@/component/Error403";
 import { createClient } from "@/common/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";
 
-type ReservationType = ReservationEditPageFragment;
-type FormValueType = ReservationChangeFormType & ReservationFormMeta;
-
 const InnerTextInput = styled(TextInput)`
   grid-column: 1 / -1;
   max-width: var(--prose-width);
@@ -52,7 +43,7 @@ function EditReservation({
   onSuccess,
 }: {
   onCancel: () => void;
-  reservation: ReservationType;
+  reservation: ReservationEditPageFragment;
   onSuccess: () => void;
 }) {
   const { t } = useTranslation();
@@ -60,22 +51,16 @@ function EditReservation({
   const reservationUnit = reservation.reservationUnit;
 
   // TODO recurring requires a description and a name box
-  const form = useForm<FormValueType>({
-    // @ts-expect-error -- schema refinement breaks typing
-    resolver: zodResolver(
-      ReservationChangeFormSchema.refine((x) => x.seriesName || !reservation.reservationSeries, {
-        path: ["seriesName"],
-        message: "Required",
-      })
-    ),
+  const form = useForm<ReservationChangeFormType>({
+    resolver: zodResolver(ReservationChangeFormSchema),
     mode: "onChange",
     defaultValues: {
       seriesName: reservation.reservationSeries?.name ?? "",
       comments: reservation.workingMemo ?? "",
-      type: ReservationTypeSchema.optional().parse(reservation.type?.toUpperCase()),
+      type: reservation.type ?? undefined,
       name: reservation.name ?? "",
       description: reservation.description ?? "",
-      ageGroup: reservation.ageGroup?.pk ?? undefined,
+      ageGroup: reservation.ageGroup?.pk,
       applyingForFreeOfCharge: reservation.applyingForFreeOfCharge ?? undefined,
       reserveeIsUnregisteredAssociation:
         reservation.reserveeType === ReserveeType.Nonprofit && reservation.reserveeIdentifier === "",
@@ -98,22 +83,13 @@ function EditReservation({
     onSuccess,
   });
 
-  const onSubmit = (values: FormValueType) => {
-    if (!reservationUnit.pk) {
-      errorToast({ text: "ERROR: Can't update without reservation unit" });
-      return;
-    }
-    if (!reservation.pk) {
-      errorToast({ text: "ERROR: Can't update without reservation" });
-      return;
-    }
-
+  const onSubmit = (values: ReservationChangeFormType) => {
     const { seriesName, comments, reserveeIsUnregisteredAssociation, reserveeIdentifier, ...rest } = values;
 
     const toSubmit = {
       // TODO don't use spread it breaks type checking for unknown fields
       ...rest,
-      seriesName: seriesName !== "" ? seriesName : undefined,
+      seriesName,
       // force update to empty -> NA
       reserveeIdentifier: !reserveeIsUnregisteredAssociation ? reserveeIdentifier : "",
       workingMemo: comments,
@@ -247,7 +223,7 @@ function Wrapper({
   title,
 }: {
   title: string;
-  reservation: Maybe<ReservationType> | undefined;
+  reservation: Maybe<ReservationEditPageFragment> | undefined;
   children: React.ReactNode;
 }) {
   const { t } = useTranslation();

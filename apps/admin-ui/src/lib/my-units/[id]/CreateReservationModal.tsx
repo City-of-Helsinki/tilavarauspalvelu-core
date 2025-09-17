@@ -26,7 +26,6 @@ import { ErrorBoundary } from "react-error-boundary";
 import {
   type CreateStaffReservationFormValues,
   getCreateStaffReservationFormSchema,
-  type ReservationFormMeta,
 } from "common/src/schemas";
 import { CenterSpinner, Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
@@ -65,7 +64,7 @@ const MandatoryFieldsText = styled.div`
   font-size: var(--fontsize-body-s);
 `;
 
-type FormValueType = CreateStaffReservationFormValues & ReservationFormMeta;
+type FormValueType = CreateStaffReservationFormValues;
 
 const Form = styled.form`
   display: grid;

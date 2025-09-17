@@ -151,7 +151,7 @@ export function ReservationTypeForm({
           <HR style={{ gridColumn: "1 / -1" }} />
           <Element $wide>
             <div style={{ marginBottom: 48 }}>
-              <ReservationFormGeneralSection fields={fields} reservationUnit={reservationUnit} options={options} />;
+              <ReservationFormGeneralSection fields={fields} reservationUnit={reservationUnit} options={options} />
             </div>
             {type === ReservationTypeChoice.Staff ? (
               <StyledShowAllContainer showAllLabel={t("myUnits:ReservationForm.showReserver")} maximumNumber={0}>
