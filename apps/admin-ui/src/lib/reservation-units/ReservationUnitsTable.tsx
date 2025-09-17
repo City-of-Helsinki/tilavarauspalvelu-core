@@ -187,9 +187,7 @@ export function ReservationUnitsTable({
       selectAllRowsText={t("common:selectAllRows")}
       clearSelectionsText={t("common:clearAllSelections")}
       setSelectedRows={setSelectedRows}
-      customActionButtons={[
-        <ActionButtons key="1" t={t} selectedRows={selectedRows} apiBaseUrl={apiBaseUrl}></ActionButtons>,
-      ]}
+      customActionButtons={[<ActionButtons key="1" t={t} selectedRows={selectedRows} apiBaseUrl={apiBaseUrl} />]}
     />
   );
 }
@@ -210,7 +208,7 @@ function ActionButtons({
   selectedRows: SelectedRow[];
   apiBaseUrl: string;
 }): JSX.Element {
-  const selectedPks = selectedRows.map((id) => Number(id)).filter((id) => !Number.isNaN(id));
+  const selectedPks = selectedRows.map(Number).filter((id) => !Number.isNaN(id));
   const redirectOnErrorUrl = isBrowser ? window.location.href : undefined;
   const editLink =
     getOpeningHoursUrl(apiBaseUrl, selectedPks, redirectOnErrorUrl) !== ""
@@ -218,17 +216,17 @@ function ActionButtons({
       : undefined;
   return (
     <Spacer>
-      <Flex $gap={"xs"} $direction={"row"} $wrap={"wrap"}>
+      <Flex $gap="xs" $direction="row" $wrap="wrap">
         <Flex
-          $gap={"xs"}
-          $direction={"row"}
-          $alignItems={"center"}
+          $gap="xs"
+          $direction="row"
+          $alignItems="center"
           style={{ flexShrink: "1", maxWidth: "490px", marginRight: "auto" }}
         >
           <IconInfoCircle size={IconSize.Medium} />
           <div>{t("reservationUnit:editInfoText")}</div>
         </Flex>
-        <ButtonLikeExternalLink disabled={!editLink} href={editLink} target={"_blank"}>
+        <ButtonLikeExternalLink disabled={!editLink} href={editLink} target="_blank">
           {t("reservationUnit:goToMassEdit")}
           <IconLinkExternal />
         </ButtonLikeExternalLink>
