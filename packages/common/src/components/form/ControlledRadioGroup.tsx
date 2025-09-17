@@ -6,7 +6,7 @@ import { RadioButton, SelectionGroup } from "hds-react";
 interface RadioGroupProps<T extends FieldValues> extends UseControllerProps<T> {
   name: Path<T>;
   control: Control<T>;
-  options: { label: string; value: string | number }[];
+  options: Array<{ label: string; value: string | number }>;
   direction?: "horizontal" | "vertical";
   required?: boolean;
   tooltip?: string;

@@ -31,7 +31,7 @@ const LegendContainer = styled.div`
 
 interface UnitReservationsProps {
   unitPk: number;
-  reservationUnitOptions: readonly ReservationUnitOption[];
+  reservationUnitOptions: ReadonlyArray<ReservationUnitOption>;
   canCreateReservations: boolean;
 }
 

@@ -2,13 +2,13 @@ import { MunicipalityChoice } from "../../gql/gql-types";
 
 export type OptionT = Readonly<{ value: number; label: string }>;
 export type OptionsListT = Readonly<{
-  units: Readonly<OptionT[]>;
-  equipments: Readonly<OptionT[]>;
-  purposes: Readonly<OptionT[]>;
-  reservationPurposes: Readonly<OptionT[]>;
-  reservationUnitTypes: Readonly<OptionT[]>;
-  ageGroups: Readonly<OptionT[]>;
-  municipalities: Readonly<{ value: MunicipalityChoice; label: string }[]>;
+  units: ReadonlyArray<OptionT>;
+  equipments: ReadonlyArray<OptionT>;
+  purposes: ReadonlyArray<OptionT>;
+  reservationPurposes: ReadonlyArray<OptionT>;
+  reservationUnitTypes: ReadonlyArray<OptionT>;
+  ageGroups: ReadonlyArray<OptionT>;
+  municipalities: ReadonlyArray<{ value: MunicipalityChoice; label: string }>;
 }>;
 
 export function mapFormToSearchParams<T extends object>(data: T): URLSearchParams {

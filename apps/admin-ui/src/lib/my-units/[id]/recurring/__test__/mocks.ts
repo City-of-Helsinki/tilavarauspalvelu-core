@@ -126,7 +126,7 @@ export const mondayMorningReservations = [...Array(12).keys()].map((x) => {
 
 // Every day has 5 x 1 hour reservations from 15 - 21
 const firstDay = new Date(YEAR, 1, 1);
-const everydayReservations = [...Array(365).keys()].reduce((agv: { begin: Date; end: Date }[], i) => {
+const everydayReservations = [...Array(365).keys()].reduce((agv: Array<{ begin: Date; end: Date }>, i) => {
   const begin = set(firstDay, {
     date: i,
     hours: 15,

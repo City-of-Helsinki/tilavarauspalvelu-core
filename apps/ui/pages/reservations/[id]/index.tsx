@@ -490,7 +490,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         municipalities: Object.values(MunicipalityChoice).map((value) => ({
           label: value.toString(),
           value: value,
-        })) as readonly Readonly<{ label: string; value: MunicipalityChoice }>[],
+        })) as ReadonlyArray<Readonly<{ label: string; value: MunicipalityChoice }>>,
       };
       return {
         props: {

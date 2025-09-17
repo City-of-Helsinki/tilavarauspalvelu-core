@@ -8,7 +8,7 @@ import { type Control, type FieldValues, type Path, useController, type UseContr
 
 interface MultiSelectFilterProps {
   name: string;
-  options: Readonly<{ label: string; value: string | number }[]>;
+  options: ReadonlyArray<{ label: string; value: string | number }>;
   style?: React.CSSProperties;
   className?: string;
 }

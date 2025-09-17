@@ -22,8 +22,8 @@ import { convertWeekday } from "common/src/conversion";
 
 export type TimeSelectorProps = {
   index: number;
-  reservationUnitOptions: { label: string; value: number }[];
-  reservationUnitOpeningHours: Readonly<TimeSelectorFragment[]>;
+  reservationUnitOptions: Array<{ label: string; value: number }>;
+  reservationUnitOpeningHours: ReadonlyArray<TimeSelectorFragment>;
 };
 
 export function TimeSelectorForm({
@@ -34,7 +34,7 @@ export function TimeSelectorForm({
   const { t } = useTranslation();
   const { setValue, watch } = useFormContext<ApplicationPage2FormValues>();
 
-  const setSelectorData = (index: number, selected: Readonly<Readonly<Cell[]>[]>) => {
+  const setSelectorData = (index: number, selected: ReadonlyArray<ReadonlyArray<Cell>>) => {
     const formVals = covertCellsToTimeRange(selected);
     setValue(`applicationSections.${index}.suitableTimeRanges`, formVals, {
       shouldDirty: true,

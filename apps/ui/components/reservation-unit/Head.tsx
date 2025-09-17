@@ -168,11 +168,11 @@ function IconList({
   const unitPrice = pricing ? getPriceString({ t, pricing }) : undefined;
   const hasSubventionSuffix = pricing && isPaid && subventionSuffix != null;
 
-  type IconTextType = readonly {
+  type IconTextType = ReadonlyArray<{
     key: string;
     icon: Readonly<JSX.Element>;
     text: Readonly<string | JSX.Element>;
-  }[];
+  }>;
 
   const iconsTexts: IconTextType = filterNonNullable([
     reservationUnit.reservationUnitType != null

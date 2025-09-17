@@ -48,7 +48,7 @@ const InnerContainer = styled(Flex).attrs({
   }
 `;
 
-type NodeList = Pick<ReservationUnitNode, "pk">[];
+type NodeList = Array<Pick<ReservationUnitNode, "pk">>;
 type Props = {
   applicationRound: {
     reservationUnits: Readonly<NodeList>;

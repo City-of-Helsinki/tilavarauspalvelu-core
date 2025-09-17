@@ -18,7 +18,7 @@ export function SpecializedRadioGroup({
   noTranslation,
 }: {
   name: "reservationKind" | "bufferType" | "cancellationRule";
-  options: readonly string[] | readonly { label: string; value: number }[];
+  options: ReadonlyArray<string> | readonly { label: string; value: number }[];
   control: Control<ReservationUnitEditFormValues>;
   direction?: "horizontal" | "vertical";
   required?: boolean;

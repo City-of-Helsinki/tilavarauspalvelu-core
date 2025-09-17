@@ -16,7 +16,7 @@ export function ReservationUnitCalendarView({
   reservationUnitOptions,
   unitPk,
 }: {
-  reservationUnitOptions: { label: string; value: number }[];
+  reservationUnitOptions: Array<{ label: string; value: number }>;
   unitPk: number;
 }): JSX.Element {
   const params = useSearchParams();

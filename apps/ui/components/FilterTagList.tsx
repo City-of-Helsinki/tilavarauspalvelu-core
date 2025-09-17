@@ -6,9 +6,9 @@ import type { TFunction } from "i18next";
 import { useSearchParams } from "next/navigation";
 
 type FilterTagProps = {
-  filters: readonly string[];
-  multiSelectFilters: readonly string[];
-  hideList: readonly string[];
+  filters: ReadonlyArray<string>;
+  multiSelectFilters: ReadonlyArray<string>;
+  hideList: ReadonlyArray<string>;
   translateTag: (key: string, value: string) => string | undefined;
 };
 

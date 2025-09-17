@@ -310,7 +310,7 @@ function getRoundUnitOptions(reservationUnits: ApplicationRoundAdminFragment["re
 function getUserPermissionFilteredUnits(
   applicationRound: Maybe<ApplicationRoundAdminFragment> | undefined,
   user: CurrentUserQuery["currentUser"]
-): { label: string; value: number }[] {
+): Array<{ label: string; value: number }> {
   // Return all units that the user has permission to view or manage in the application round
   const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
   const unitOptions = getRoundUnitOptions(reservationUnits).filter(

@@ -76,7 +76,7 @@ export function getTimeSlotOptions(
   startMinutes: number,
   endHours: number,
   endOptions?: boolean
-): { label: string; value: string }[] {
+): Array<{ label: string; value: string }> {
   const timeSlots = [];
   for (let i = startHours; i <= endHours; i += 1) {
     if (endOptions) {
@@ -158,7 +158,7 @@ export function formatSuitableTimeRange(
 
 export function formatTimeRangeList(
   t: TFunction,
-  aes: Pick<SuitableTimeRangeNode, "dayOfTheWeek" | "beginTime" | "endTime" | "priority">[],
+  aes: Array<Pick<SuitableTimeRangeNode, "dayOfTheWeek" | "beginTime" | "endTime" | "priority">>,
   priority: Priority
 ): string {
   const schedules = sort(
@@ -215,7 +215,7 @@ export function createDurationString(
 export type AllocatedTimeSlotNodeT = SectionNodeT["reservationUnitOptions"][0]["allocatedTimeSlots"][0];
 
 export function getRelatedTimeSlots(
-  allocations: Pick<AllocatedTimeSlotNodeT, "endTime" | "beginTime" | "dayOfTheWeek">[]
+  allocations: Array<Pick<AllocatedTimeSlotNodeT, "endTime" | "beginTime" | "dayOfTheWeek">>
 ): RelatedSlot[][] {
   const relatedSpacesTimeSlots = allocations;
 

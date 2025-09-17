@@ -116,7 +116,7 @@ function useQueryVariables(
   };
 }
 
-function mapOrderFilter(val: readonly number[] | null | undefined): number[] {
+function mapOrderFilter(val: ReadonlyArray<number> | number | null | undefined): number[] {
   if (val == null) {
     return [];
   }

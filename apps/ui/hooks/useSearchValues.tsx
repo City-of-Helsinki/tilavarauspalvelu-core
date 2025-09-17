@@ -50,7 +50,7 @@ export function useSearchModify() {
   };
 
   /// @param hideList - list of keys to ignore when resetting the query
-  const handleResetTags = (hideList: readonly string[]) => {
+  const handleResetTags = (hideList: ReadonlyArray<string>) => {
     const params = new URLSearchParams();
     for (const key of hideList) {
       const values = searchValues.getAll(key);

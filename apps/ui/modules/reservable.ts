@@ -52,7 +52,7 @@ type BufferCollideCheckReservation = Pick<
 // TODO values should be { hour, minute } not Date objects
 // TODO provide serialization and deserialization functions (that have format checkers)
 export type ReservableMapKey = string; // format: "yyyy-mm-dd"
-export type ReservableMap = Map<ReservableMapKey, { start: Date; end: Date }[]>;
+export type ReservableMap = Map<ReservableMapKey, Array<{ start: Date; end: Date }>>;
 
 export function dateToKey(date: Date): ReservableMapKey {
   return format(date, "yyyy-MM-dd");
@@ -69,7 +69,7 @@ export function dateToKey(date: Date): ReservableMapKey {
 // TODO splitting Date into actual Date and Time would make this a lot easier
 // because the key should only care about the Date part and we don't want
 // make stupid mistakes by using Map.get(new Date()) instead of Map.get(startOfDay(new Date()))
-export function generateReservableMap(reservableTimeSpans: readonly ReservableTimeSpanType[]): ReservableMap {
+export function generateReservableMap(reservableTimeSpans: ReadonlyArray<ReservableTimeSpanType>): ReservableMap {
   const converted = reservableTimeSpans
     .map((n) => {
       if (n.startDatetime == null || n.endDatetime == null) {
@@ -157,8 +157,8 @@ export type ReservationUnitReservableProps = {
   };
   reservationUnit: Omit<IsReservableFieldsFragment, "reservableTimeSpans">;
   reservableTimes: ReservableMap;
-  blockingReservations: readonly BlockingReservationFieldsFragment[];
-  activeApplicationRounds: readonly RoundPeriod[];
+  blockingReservations: ReadonlyArray<BlockingReservationFieldsFragment>;
+  activeApplicationRounds: ReadonlyArray<RoundPeriod>;
 };
 
 export const IS_RESERVABLE_FRAGMENT = gql`
@@ -314,7 +314,7 @@ function isRangeReservable_({
   reservationsMaxDaysBefore: number;
   reservationBeginsAt?: Date;
   reservationEndsAt?: Date;
-  activeApplicationRounds: readonly RoundPeriod[];
+  activeApplicationRounds: ReadonlyArray<RoundPeriod>;
 }): boolean {
   const start = range[0];
   const end = range[1];
@@ -439,7 +439,7 @@ function isSlotWithinTimeframe(
   return isLegalTimeframe && isAfterMinDaysBefore && isBeforeMaxDaysBefore;
 }
 
-function doesSlotCollideWithApplicationRounds(slot: Date, rounds: readonly RoundPeriod[]): boolean {
+function doesSlotCollideWithApplicationRounds(slot: Date, rounds: ReadonlyArray<RoundPeriod>): boolean {
   if (rounds.length === 0) return false;
 
   return rounds.some((round) =>
@@ -457,7 +457,7 @@ function areSlotsReservable(
   reservationsMaxDaysBefore: number,
   reservationBeginsAt?: Date,
   reservationEndsAt?: Date,
-  activeApplicationRounds: readonly RoundPeriod[] = []
+  activeApplicationRounds: ReadonlyArray<RoundPeriod> = []
 ): boolean {
   return slots.every(
     (slotDate) =>
@@ -476,7 +476,7 @@ function areSlotsReservable(
 
 type PropGetterProps = {
   reservableTimes: ReservableMap;
-  activeApplicationRounds: readonly RoundPeriod[];
+  activeApplicationRounds: ReadonlyArray<RoundPeriod>;
   reservationsMinDaysBefore: number;
   reservationsMaxDaysBefore: number;
   customValidation?: (arg: Date) => boolean;
@@ -528,7 +528,7 @@ export function getBoundCheckedReservation({
     ReservationUnitNode,
     "minReservationDuration" | "maxReservationDuration" | "reservationStartInterval"
   >;
-  durationOptions: { label: string; value: number }[];
+  durationOptions: Array<{ label: string; value: number }>;
 }): { start: Date; end: Date } | null {
   // the next check is going to systematically fail unless the times are at least minReservationDuration apart
   const { minReservationDuration, reservationStartInterval } = reservationUnit;
@@ -582,7 +582,7 @@ export function clampDuration(
   duration: number,
   minReservationDurationMinutes: number,
   maxReservationDurationMinutes: number,
-  durationOptions: { label: string; value: number }[]
+  durationOptions: Array<{ label: string; value: number }>
 ): number {
   const initialDuration = Math.max(minReservationDurationMinutes, durationOptions[0]?.value ?? 0);
   return Math.min(Math.max(duration, initialDuration), maxReservationDurationMinutes);

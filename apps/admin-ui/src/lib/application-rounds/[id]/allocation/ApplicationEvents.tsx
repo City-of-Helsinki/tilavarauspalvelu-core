@@ -95,7 +95,7 @@ type ApplicationEventsProps = {
   reservationUnit: Pick<ReservationUnitNode, "pk">;
   refetchApplicationEvents: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
   applicationRoundStatus: ApplicationRoundStatusChoice;
-  relatedAllocations: Pick<AllocatedTimeSlotNodeT, "dayOfTheWeek" | "beginTime" | "endTime">[];
+  relatedAllocations: Array<Pick<AllocatedTimeSlotNodeT, "dayOfTheWeek" | "beginTime" | "endTime">>;
 };
 
 /// TODO rename to something more descriptive

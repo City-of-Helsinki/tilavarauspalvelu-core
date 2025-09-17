@@ -34,7 +34,7 @@ function DayColumn({
   selectedPriority,
 }: Readonly<{
   day: Weekday;
-  cells: Readonly<Cell[]>;
+  cells: ReadonlyArray<Cell>;
   // use undefined to disable painting
   updateCell?: (cell: Cell, value: CellState) => void;
   selectedPriority?: CellState;
@@ -157,7 +157,7 @@ function formatButtonAriaLabel(t: TFunction, cell: Cell, weekday: string): strin
 }
 
 interface ApplicationTimeSelectorProps extends HTMLAttributes<HTMLDivElement> {
-  cells: Readonly<Readonly<Cell[]>[]>;
+  cells: ReadonlyArray<ReadonlyArray<Cell>>;
   onCellUpdate?: (selection: Cell, value: CellState) => void;
   selectedPriority?: CellState;
 }

@@ -279,7 +279,7 @@ export function PricingSection({
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
   taxPercentageOptions: TaxOption[];
-  pricingTermsOptions: { value: string; label: string }[];
+  pricingTermsOptions: Array<{ value: string; label: string }>;
 }) {
   const { t } = useTranslation("reservationUnitEditor");
   const { control, watch, formState } = form;

@@ -16,7 +16,7 @@ import { gql } from "@apollo/client";
 type Props = {
   application: Readonly<{
     pk: number;
-    applicationSections: Readonly<ApplicationSectionTimePickerFragment[]>;
+    applicationSections: ReadonlyArray<ApplicationSectionTimePickerFragment>;
   }>;
 
   onNext: (appToSave: ApplicationPage2FormValues) => void;

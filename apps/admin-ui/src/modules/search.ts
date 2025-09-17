@@ -12,16 +12,16 @@ import type { OptionsListT, OptionT } from "common/src/modules/search";
 import type { TFunction } from "next-i18next";
 
 export interface TagOptionsList extends OptionsListT {
-  stateChoices: Readonly<{ value: ReservationStateChoice; label: string }[]>;
-  reservationUnits: Readonly<OptionT[]>;
-  unitGroups: Readonly<OptionT[]>;
-  reservationUnitStates: Readonly<{ value: ReservationUnitPublishingState; label: string }[]>;
-  priorityChoices: Readonly<{ value: Priority; label: string }[]>;
-  orderChoices: Readonly<OptionT[]>;
-  orderStatus: Readonly<{ value: OrderStatusWithFree; label: string }[]>;
-  reservationTypeChoices: Readonly<{ value: ReservationTypeChoice; label: string }[]>;
-  recurringChoices: Readonly<{ value: "only" | "onlyNot"; label: string }[]>;
-  reserveeTypes: Readonly<{ value: ReserveeType; label: string }[]>;
+  stateChoices: ReadonlyArray<{ value: ReservationStateChoice; label: string }>;
+  reservationUnits: ReadonlyArray<OptionT>;
+  unitGroups: ReadonlyArray<OptionT>;
+  reservationUnitStates: ReadonlyArray<{ value: ReservationUnitPublishingState; label: string }>;
+  priorityChoices: ReadonlyArray<{ value: Priority; label: string }>;
+  orderChoices: ReadonlyArray<OptionT>;
+  orderStatus: ReadonlyArray<{ value: OrderStatusWithFree; label: string }>;
+  reservationTypeChoices: ReadonlyArray<{ value: ReservationTypeChoice; label: string }>;
+  recurringChoices: ReadonlyArray<{ value: "only" | "onlyNot"; label: string }>;
+  reserveeTypes: ReadonlyArray<{ value: ReserveeType; label: string }>;
 }
 
 export function translateTag(t: TFunction, options: Readonly<TagOptionsList>) {

@@ -17,13 +17,13 @@ import { EditAccordion } from "./styled";
 import { AutoGrid, FullRow } from "common/styled";
 
 // default is 20 if no spaces selected
-function getMaxPersons(spaceList: Pick<ReservationUnitEditPageFragment, "maxPersons">[]) {
+function getMaxPersons(spaceList: Array<Pick<ReservationUnitEditPageFragment, "maxPersons">>) {
   const persons = spaceList.map((s) => s.maxPersons ?? 0).reduce((a, x) => a + x, 0) || 20;
   return Math.floor(persons);
 }
 
 // default is 1 if no spaces selected
-function getMinSurfaceArea(spaceList: Pick<ReservationUnitEditPageFragment, "surfaceArea">[]) {
+function getMinSurfaceArea(spaceList: Array<Pick<ReservationUnitEditPageFragment, "surfaceArea">>) {
   const area = spaceList.map((s) => s.surfaceArea ?? 0).reduce((a, x) => a + x, 0) || 1;
   return Math.floor(area);
 }

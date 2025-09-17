@@ -48,7 +48,7 @@ const UnitItemLink = styled(Link)`
 `;
 
 type Props = {
-  units: Readonly<UnitListFieldsFragment[]>;
+  units: ReadonlyArray<UnitListFieldsFragment>;
 };
 
 export function Units({ units }: Props): JSX.Element | null {

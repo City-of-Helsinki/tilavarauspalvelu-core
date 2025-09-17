@@ -86,7 +86,7 @@ function mapParamsToForm(searchParams: ReadonlyURLSearchParams): SearchFormValue
 }
 
 interface FilterProps {
-  defaultFilters?: Readonly<{ key: string; value: string | string[] }[]>;
+  defaultFilters?: ReadonlyArray<{ key: string; value: string | string[] }>;
   clearButtonLabel?: string;
   clearButtonAriaLabel?: string;
 }

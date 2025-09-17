@@ -14,7 +14,7 @@ import { CenterSpinner } from "common/styled";
 
 type Props = {
   applicationRoundPk: number;
-  unitOptions: { label: string; value: number }[];
+  unitOptions: Array<{ label: string; value: number }>;
 };
 
 export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): JSX.Element {

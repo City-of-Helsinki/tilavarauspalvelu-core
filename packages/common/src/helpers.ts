@@ -18,12 +18,14 @@ export type ReadonlyDeep<T> = {
   readonly [P in keyof T]: ReadonlyDeep<T[P]>;
 };
 
-export function filterNonNullable<T>(arr: Maybe<Readonly<Maybe<T | undefined>[]>> | undefined): NonNullable<T>[] {
+export function filterNonNullable<T>(
+  arr: Maybe<ReadonlyArray<Maybe<T | undefined>>> | undefined
+): Array<NonNullable<T>> {
   return arr?.filter((n): n is NonNullable<T> => n != null) ?? [];
 }
 
 type SortFunc<T> = (a: T, b: T) => number;
-export function sort<T>(arr: Readonly<T[]>, func: SortFunc<T>): T[] {
+export function sort<T>(arr: ReadonlyArray<T>, func: SortFunc<T>): T[] {
   return [...arr].sort((a, b) => func(a, b));
 }
 
@@ -59,7 +61,7 @@ export function toInteger(filter: Maybe<string> | undefined): number | null {
   return Math.floor(val);
 }
 
-export function pick<T, K extends keyof T>(reservation: T, keys: readonly K[]): Pick<T, K> {
+export function pick<T, K extends keyof T>(reservation: T, keys: ReadonlyArray<K>): Pick<T, K> {
   return keys.reduce<Pick<T, K>>(
     (acc, key) => {
       if (reservation[key] != null) {
@@ -168,7 +170,7 @@ function getImageSourceWithoutDefault(
   }
 }
 
-export function getMainImage(ru?: { images: Readonly<ImageFragment[]> }): ImageFragment | null {
+export function getMainImage(ru?: { images: ReadonlyArray<ImageFragment> }): ImageFragment | null {
   return ru?.images.find((img) => img.imageType === ReservationUnitImageType.Main) ?? null;
 }
 
@@ -197,13 +199,13 @@ function pickMaybeDay(
 }
 
 // Returns a Date object with the first day of the given array of Dates
-export function dayMin(days: Readonly<Readonly<Date | undefined>[]>): Date | undefined {
+export function dayMin(days: ReadonlyArray<Readonly<Date | undefined>>): Date | undefined {
   return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
     return pickMaybeDay(acc, day, isBefore);
   }, undefined);
 }
 
-export function dayMax(days: (Date | undefined)[]): Date | undefined {
+export function dayMax(days: Array<Date | undefined>): Date | undefined {
   return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
     return pickMaybeDay(acc, day, isAfter);
   }, undefined);
@@ -255,7 +257,7 @@ export function formatApiTimeInterval({
 }
 
 export function formatDayTimes(
-  schedule: Omit<SuitableTimeFieldsFragment, "pk" | "id" | "priority">[],
+  schedule: Array<Omit<SuitableTimeFieldsFragment, "pk" | "id" | "priority">>,
   day: number
 ): string {
   return schedule
@@ -273,7 +275,7 @@ export function convertTime(t: Maybe<string> | undefined): string {
     return "";
   }
   // NOTE split has incorrect typing
-  const [h, m, _]: (string | undefined)[] = t.split(":");
+  const [h, m, _]: Array<string | undefined> = t.split(":");
   return `${h ?? "00"}:${m ?? "00"}`;
 }
 
@@ -311,7 +313,7 @@ export function convertOptionToHDS(option: { label: string; value: string | numb
 }
 
 /// @description Convert a list of strings to a comma separated string
-export function formatListToCSV(t: TFunction, list: Readonly<Readonly<string>[]>): string {
+export function formatListToCSV(t: TFunction, list: ReadonlyArray<Readonly<string>>): string {
   if (list.length === 0) {
     return "";
   }

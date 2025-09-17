@@ -81,9 +81,9 @@ export function reservationToInterval(
 // this is type safe because this is gonna type error if the endpoints change
 type AffectedReservations = {
   node: Readonly<{
-    reservations: readonly CombineAffectedReservationsFragment[] | null;
+    reservations: ReadonlyArray<CombineAffectedReservationsFragment> | null;
   }> | null;
-  affectingReservations: readonly CombineAffectedReservationsFragment[] | null;
+  affectingReservations: ReadonlyArray<CombineAffectedReservationsFragment> | null;
 };
 
 /// Minimal fragment for combining affected reservations (inherit this for any queries using affectedReservations)

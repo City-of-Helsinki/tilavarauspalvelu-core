@@ -10,7 +10,7 @@ import { focusStyles, removeButtonStyles } from "common/styled";
 import { FixedDialog } from "@/styled/FixedDialog";
 
 type Props = {
-  images: Readonly<ImageFragment[]>;
+  images: ReadonlyArray<ImageFragment>;
   contextName?: string;
 };
 

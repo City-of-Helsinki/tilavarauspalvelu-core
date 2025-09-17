@@ -306,7 +306,13 @@
     "react/style-prop-object": "error",
     "react/void-dom-elements-no-children": "error",
     "typescript/adjacent-overload-signatures": "error",
-    "typescript/array-type": "error",
+    "typescript/array-type": [
+      "error",
+      {
+        "default": "array-simple",
+        "readonly": "generic"
+      }
+    ],
     "typescript/await-thenable": "error",
     "typescript/ban-ts-comment": "error",
     "typescript/consistent-generic-constructors": "error",

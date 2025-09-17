@@ -6,13 +6,13 @@ import { convertWeekday, transformWeekday } from "common/src/conversion";
 import { filterNonNullable, formatTimeStruct, timeToMinutes } from "common/src/helpers";
 
 export type DailyOpeningHours = Readonly<
-  Pick<ApplicationRoundTimeSlotNode, "weekday" | "isClosed" | "reservableTimes">[]
+  Array<Pick<ApplicationRoundTimeSlotNode, "weekday" | "isClosed" | "reservableTimes">>
 >;
 
 type SchedulesT = Omit<SuitableTimeFieldsFragment, "pk" | "id">;
 
-type DayCells = Readonly<Cell[]>;
-type WeekCells = Readonly<DayCells[]>;
+type DayCells = ReadonlyArray<Cell>;
+type WeekCells = ReadonlyArray<DayCells>;
 
 const FIRST_SLOT_START = 7;
 const LAST_SLOT_START = 23;
@@ -46,7 +46,7 @@ export function createCells(openingHours: DailyOpeningHours): WeekCells {
   return cells;
 }
 
-export function aesToCells(schedule: Readonly<SchedulesT[]>, openingHours: DailyOpeningHours): WeekCells {
+export function aesToCells(schedule: ReadonlyArray<SchedulesT>, openingHours: DailyOpeningHours): WeekCells {
   const cells = createCells(openingHours);
 
   for (const aes of schedule) {
@@ -71,7 +71,7 @@ type OpeningHourPeriod = {
   end: string;
 };
 
-function getOpeningHours(day: Weekday, openingHours?: DailyOpeningHours): Readonly<OpeningHourPeriod[]> {
+function getOpeningHours(day: Weekday, openingHours?: DailyOpeningHours): ReadonlyArray<OpeningHourPeriod> {
   if (!openingHours) {
     return [];
   }

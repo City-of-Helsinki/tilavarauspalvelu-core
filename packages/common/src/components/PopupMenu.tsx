@@ -62,7 +62,7 @@ interface Item {
 }
 
 interface PopupMenuProps {
-  items: Readonly<Item[]>;
+  items: ReadonlyArray<Item>;
   style?: React.CSSProperties;
   className?: string;
 }

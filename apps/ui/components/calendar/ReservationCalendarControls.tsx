@@ -21,8 +21,8 @@ import { capitalize } from "common/src/helpers";
 type CommonProps = {
   reservationUnit: ReservationTimePickerFieldsFragment;
   reservationForm: UseFormReturn<PendingReservationFormType>;
-  durationOptions: { label: string; value: number }[];
-  startingTimeOptions: { label: string; value: string }[];
+  durationOptions: Array<{ label: string; value: number }>;
+  startingTimeOptions: Array<{ label: string; value: string }>;
   focusSlot: FocusTimeSlot;
   submitReservation: SubmitHandler<PendingReservationFormType>;
 };
@@ -235,7 +235,7 @@ function ControlledToggler({
   form: UseFormReturn<PendingReservationFormType>;
   focusSlot: FocusTimeSlot;
   price: string | null;
-  durationOptions: { label: string; value: number }[];
+  durationOptions: Array<{ label: string; value: number }>;
 }): JSX.Element {
   const { t } = useTranslation();
   const { control, watch } = form;

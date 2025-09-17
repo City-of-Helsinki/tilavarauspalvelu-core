@@ -73,13 +73,13 @@ const CalendarFooter = styled.div`
 export type ReservationTimePickerProps = Readonly<{
   reservationUnit: ReservationTimePickerFieldsFragment;
   reservableTimes: ReservableMap;
-  blockingReservations: readonly BlockingReservationFieldsFragment[];
+  blockingReservations: ReadonlyArray<BlockingReservationFieldsFragment>;
   reservationForm: UseFormReturn<PendingReservationFormType>;
   isReservationQuotaReached: boolean;
   submitReservation: (d: PendingReservationFormType) => void;
   // TODO replace with mode selector
   loginAndSubmitButton?: JSX.Element;
-  startingTimeOptions: { value: string; label: string }[];
+  startingTimeOptions: Array<{ value: string; label: string }>;
 }>;
 
 function useSlotPropGetter({
@@ -114,12 +114,12 @@ function useCalendarEventChange({
   blockingReservations,
 }: Pick<ReservationTimePickerProps, "reservationUnit"> & {
   focusSlot: ReturnType<typeof convertFormToFocustimeSlot>;
-  blockingReservations: readonly BlockingReservationFieldsFragment[];
-}): (CalendarEventBuffer | CalendarEvent<ReservationNode>)[] {
+  blockingReservations: ReadonlyArray<BlockingReservationFieldsFragment>;
+}): Array<CalendarEventBuffer | CalendarEvent<ReservationNode>> {
   const { t } = useTranslation();
   // TODO this doesn't optimize anything
   // any change in the event will cause a full recalculation
-  const calendarEvents: (CalendarEventBuffer | CalendarEvent<ReservationNode>)[] = useMemo(() => {
+  const calendarEvents: Array<CalendarEventBuffer | CalendarEvent<ReservationNode>> = useMemo(() => {
     const shouldDisplayFocusSlot = focusSlot.isReservable;
 
     let focusEvent = null;

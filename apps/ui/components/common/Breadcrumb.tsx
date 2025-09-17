@@ -13,7 +13,7 @@ export type RouteItem = {
 };
 
 type Props = {
-  routes: Readonly<RouteItem[]>;
+  routes: ReadonlyArray<RouteItem>;
 };
 
 const Nav = styled.nav<{ $isMobile?: boolean }>`

@@ -3,7 +3,7 @@ import type { ReservationUnitCardFragment } from "@gql/gql-types";
 import { ReservationUnitCard } from "./ReservationUnitCard";
 
 interface IProps {
-  reservationUnits: Readonly<ReservationUnitCardFragment[]>;
+  reservationUnits: ReadonlyArray<ReservationUnitCardFragment>;
   unitPk: number;
 }
 

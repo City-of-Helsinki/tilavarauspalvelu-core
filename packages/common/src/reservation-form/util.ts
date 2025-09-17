@@ -7,7 +7,7 @@ export function getReservationApplicationFields({
   supportedFields,
   reserveeType,
 }: {
-  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
+  supportedFields: Array<Pick<ReservationMetadataFieldNode, "fieldName">>;
   reserveeType: ReserveeType | "common";
 }): string[] {
   if (!supportedFields || supportedFields?.length === 0) {

@@ -20,7 +20,7 @@ const Label = styled.div`
 
 type SchedulesT = Omit<SuitableTimeFieldsFragment, "pk" | "id">;
 
-function Weekdays({ schedules }: { schedules: Omit<SchedulesT, "priority">[] }) {
+function Weekdays({ schedules }: { schedules: Array<Omit<SchedulesT, "priority">> }) {
   const { t } = useTranslation();
   return (
     <>
@@ -50,7 +50,7 @@ const Heading = styled.p.attrs({ as: "h4" })`
   margin: 0 0 var(--spacing-xs);
 `;
 
-export function ApplicationTimePreview({ schedules }: { schedules: readonly SchedulesT[] }): JSX.Element {
+export function ApplicationTimePreview({ schedules }: { schedules: ReadonlyArray<SchedulesT> }): JSX.Element {
   const { t } = useTranslation();
 
   const primary = schedules.filter((n) => n.priority === Priority.Primary);

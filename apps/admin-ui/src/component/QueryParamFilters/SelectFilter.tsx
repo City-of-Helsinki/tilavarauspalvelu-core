@@ -8,7 +8,7 @@ import { type Control, type FieldValues, type Path, useController, type UseContr
 
 type SelectFilterProps = {
   name: string;
-  options: Readonly<{ label: string; value: string | number }[]>;
+  options: ReadonlyArray<{ label: string; value: string | number }>;
   sort?: boolean;
   clearable?: boolean;
 };

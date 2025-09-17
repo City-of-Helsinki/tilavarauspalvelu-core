@@ -357,7 +357,7 @@ type ReservationSeriesTableElem = {
   // same for this actual end / start times or a combined string
   time: string;
   accessType: AccessTypeWithMultivalued | null;
-  usedAccessTypes: Readonly<AccessType[]> | null;
+  usedAccessTypes: ReadonlyArray<AccessType> | null;
   pindoraInfo: PindoraSectionFragment | null;
 };
 
@@ -529,7 +529,7 @@ function ReservationUnitAccessTypeList({
   roundReservationBegin,
   roundReservationEnd,
 }: Readonly<{
-  accessTypes: Readonly<Pick<ReservationUnitAccessTypeNode, "pk" | "beginDate" | "accessType">[]>;
+  accessTypes: ReadonlyArray<Pick<ReservationUnitAccessTypeNode, "pk" | "beginDate" | "accessType">>;
   reservationUnits: ReservationSeriesTableElem[];
   pk: number | null | undefined;
   roundReservationBegin: Date;

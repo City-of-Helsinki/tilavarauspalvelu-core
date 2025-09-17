@@ -38,7 +38,7 @@ export const SLOTS_EVERY_HOUR = 2;
 export function getDurationOptions(
   opts: Pick<ReservationUnitNode, "minReservationDuration" | "maxReservationDuration" | "reservationStartInterval">,
   t: TFunction
-): { label: string; value: number }[] {
+): Array<{ label: string; value: number }> {
   if (opts.minReservationDuration == null || opts.maxReservationDuration == null) {
     return [];
   }
@@ -57,7 +57,7 @@ export function getDurationOptions(
     return "";
   };
 
-  const durationOptions: { label: string; value: number }[] = [];
+  const durationOptions: Array<{ label: string; value: number }> = [];
   const minReservationDurationMinutes = opts.minReservationDuration / 60;
   const maxReservationDurationMinutes = opts.maxReservationDuration / 60;
   const start = minReservationDurationMinutes > intervalMinutes ? minReservationDurationMinutes : intervalMinutes;
@@ -210,8 +210,8 @@ export type CanReservationBeChangedProps = {
   reservation: CanReservationBeChangedFragment;
   reservableTimes: ReservableMap;
   reservationUnit: IsReservableFieldsFragment;
-  activeApplicationRounds: readonly RoundPeriod[];
-  blockingReservations: readonly BlockingReservationFieldsFragment[];
+  activeApplicationRounds: ReadonlyArray<RoundPeriod>;
+  blockingReservations: ReadonlyArray<BlockingReservationFieldsFragment>;
 };
 
 export function getWhyReservationCantBeChanged(reservation: CanReservationBeChangedFragment): string | null {
@@ -345,10 +345,10 @@ export function convertFormToFocustimeSlot({
   data: PendingReservationFormType;
   reservationUnit: Omit<IsReservableFieldsFragment, "reservableTimeSpans">;
   reservableTimes: ReservableMap;
-  activeApplicationRounds: readonly RoundPeriod[];
-  blockingReservations: readonly BlockingReservationFieldsFragment[];
+  activeApplicationRounds: ReadonlyArray<RoundPeriod>;
+  blockingReservations: ReadonlyArray<BlockingReservationFieldsFragment>;
 }): FocusTimeSlot | { isReservable: false } {
-  const [hours, minutes]: (number | undefined)[] = data.time
+  const [hours, minutes]: Array<number | undefined> = data.time
     .split(":")
     .map(Number)
     .filter((n) => Number.isFinite(n));
