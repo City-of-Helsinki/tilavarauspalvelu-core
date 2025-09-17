@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { OrderStatus } from "@/gql/gql-types";
 import { IconEuroSign } from "hds-react";
 import StatusLabel from "common/src/components/StatusLabel";
-import { type StatusLabelType } from "common/src/tags";
+import type { StatusLabelType } from "common/src/tags";
 
 export type Props = {
   orderStatus: OrderStatus;

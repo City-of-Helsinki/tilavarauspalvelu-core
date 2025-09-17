@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { IconCross, Option, Select } from "hds-react";
 import { useTranslation, type TFunction } from "next-i18next";
 import { fontMedium } from "common/styled";
-import { type ApolloQueryResult } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import styled from "styled-components";
 import {
   ApplicationRoundStatusChoice,
@@ -13,7 +13,7 @@ import {
 } from "@gql/gql-types";
 import { ShowAllContainer } from "common/src/components";
 import { transformWeekday } from "common/src/conversion";
-import { type DayT } from "common/src/const";
+import type { DayT } from "common/src/const";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
 import {
   type RelatedSlot,

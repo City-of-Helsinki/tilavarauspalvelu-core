@@ -13,8 +13,8 @@ import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/mo
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
-import { type TFunction } from "i18next";
-import { type GetServerSidePropsContext } from "next";
+import type { TFunction } from "i18next";
+import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

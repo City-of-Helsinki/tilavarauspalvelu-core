@@ -1,6 +1,6 @@
 import React from "react";
 import { Flex, H2 } from "common/styled";
-import { type ApplicationsGroupFragment } from "@gql/gql-types";
+import type { ApplicationsGroupFragment } from "@gql/gql-types";
 import { ApplicationCard } from "./ApplicationCard";
 import { gql } from "@apollo/client";
 

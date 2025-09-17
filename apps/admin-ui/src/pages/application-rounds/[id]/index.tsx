@@ -45,7 +45,7 @@ import {
   TimeSlotDataLoader,
   RejectedOccurrencesDataLoader,
 } from "@lib/application-rounds/[id]";
-import { type TagOptionsList } from "@/modules/search";
+import type { TagOptionsList } from "@/modules/search";
 import { getFilterOptions } from "@/hooks/useFilterOptions";
 import { getApplicationRoundUrl } from "@/common/urls";
 

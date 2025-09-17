@@ -13,7 +13,7 @@ import { Accordion } from "@/component/Accordion";
 import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";
 import { type AllocationApplicationSectionCardType, ApplicationSectionCard } from "./ApplicationEventCard";
-import { type ApolloQueryResult } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
 import {
   type AllocatedTimeSlotNodeT,

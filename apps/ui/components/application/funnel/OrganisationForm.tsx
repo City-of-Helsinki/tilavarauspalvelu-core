@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 import { MunicipalityChoice } from "@gql/gql-types";
 import { ControlledCheckbox, ControlledSelect } from "common/src/components/form";
 import { ApplicationFormTextInput, BillingAddress, ContactPersonSection } from ".";
-import { type ApplicationPage3FormValues } from "./form";
+import type { ApplicationPage3FormValues } from "./form";
 import { FormSubHeading } from "./styled";
 
 export function OrganisationForm(): JSX.Element {

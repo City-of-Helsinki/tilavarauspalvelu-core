@@ -9,7 +9,7 @@ import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
 import { MockedGraphQLProvider } from "@/test/test.react.utils";
-import { type OptionsListT } from "common/src/modules/search";
+import type { OptionsListT } from "common/src/modules/search";
 import { ReservationKind } from "@/gql/gql-types";
 
 const { mockedRouterReplace, useRouter } = vi.hoisted(() => {

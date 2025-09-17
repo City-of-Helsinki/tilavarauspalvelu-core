@@ -22,7 +22,7 @@ import { getReservationInProgressPath } from "@/modules/urls";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { Flex } from "common/styled";
 import { getApiErrors } from "common/src/apolloUtils";
-import { type ParsedUrlQuery } from "node:querystring";
+import type { ParsedUrlQuery } from "node:querystring";
 
 const BodyText = styled.p`
   margin: 0;

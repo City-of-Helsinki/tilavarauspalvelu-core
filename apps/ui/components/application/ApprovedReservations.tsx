@@ -17,7 +17,7 @@ import {
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { useMedia } from "react-use";
 import { useRouter } from "next/router";
 import { isBefore } from "date-fns";

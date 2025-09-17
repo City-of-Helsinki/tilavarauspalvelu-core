@@ -1,6 +1,6 @@
-import { type SuitableTimeRangeFormValues } from "./form";
+import type { SuitableTimeRangeFormValues } from "./form";
 import { type ApplicationRoundTimeSlotNode, Priority, SuitableTimeFieldsFragment, Weekday } from "@/gql/gql-types";
-import { type Cell, type CellState } from "common/src/components/ApplicationTimeSelector";
+import type { Cell, CellState } from "common/src/components/ApplicationTimeSelector";
 import { DayT, WEEKDAYS, WEEKDAYS_SORTED } from "common/src/const";
 import { convertWeekday, transformWeekday } from "common/src/conversion";
 import { filterNonNullable, formatTimeStruct, timeToMinutes } from "common/src/helpers";

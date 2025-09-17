@@ -5,9 +5,9 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontMedium, Strongish } from "../../styled";
-import { type ReserveeType } from "../../gql/gql-types";
-import { type Inputs, type Reservation } from "./types";
-import { type OptionsRecord } from "../../types/common";
+import type { ReserveeType } from "../../gql/gql-types";
+import type { Inputs, Reservation } from "./types";
+import type { OptionsRecord } from "../../types/common";
 import { ControlledCheckbox, ControlledSelect } from "../components/form";
 
 type Props = {

@@ -37,8 +37,8 @@ import { formatDuration, fromUIDate, toApiDate, toUIDate } from "common/src/comm
 import { useTranslation } from "next-i18next";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
 import { getTimeString } from "@/modules/reservationUnit";
-import { type UseFormReturn } from "react-hook-form";
-import { type PendingReservationFormType } from "../reservation-unit/schema";
+import type { UseFormReturn } from "react-hook-form";
+import type { PendingReservationFormType } from "../reservation-unit/schema";
 import { useCurrentUser } from "@/hooks";
 import { gql } from "@apollo/client";
 

@@ -14,10 +14,10 @@ import { type ReservationInProgressFragment, ReserveeType } from "@gql/gql-types
 import { filterNonNullable } from "common/src/helpers";
 import { containsField, FieldName } from "common/src/metaFieldsHelpers";
 import { getApplicationFields, getGeneralFields } from "./SummaryFields";
-import { type Inputs } from "common/src/reservation-form/types";
+import type { Inputs } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
-import { type OptionsRecord } from "common";
+import type { OptionsRecord } from "common";
 
 type Props = {
   cancelReservation: () => void;

@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { type Maybe, type TermsOfUseTextFieldsFragment } from "@/gql/gql-types";
+import type { Maybe, TermsOfUseTextFieldsFragment } from "@/gql/gql-types";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { Sanitize } from "common/src/components/Sanitize";
 import TermsBox from "common/src/termsbox/TermsBox";

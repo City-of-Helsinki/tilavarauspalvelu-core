@@ -19,7 +19,7 @@ import { fromAPIDateTime, getReserveeTypeTranslationKey } from "@/helpers";
 import { filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 import { convertWeekday } from "common/src/conversion";
-import { type CalendarEvent } from "common/src/calendar/Calendar";
+import type { CalendarEvent } from "common/src/calendar/Calendar";
 
 export type EventType = EventStyleReservationFieldsFragment;
 export type CalendarEventType = CalendarEvent<EventType>;

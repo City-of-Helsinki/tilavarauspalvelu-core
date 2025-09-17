@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useGenericTermsOfUse } from "common/src/hooks/useGenericTermsOfUse";
-import { type Maybe, type TermsOfUseTextFieldsFragment } from "@gql/gql-types";
+import type { Maybe, TermsOfUseTextFieldsFragment } from "@gql/gql-types";
 import { Sanitize } from "common/src/components/Sanitize";
 
 // NOTE This is partial duplicate from ui/application/Preview.tsx

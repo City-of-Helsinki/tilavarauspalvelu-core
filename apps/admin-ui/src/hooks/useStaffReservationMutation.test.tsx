@@ -2,7 +2,7 @@ import React from "react";
 import { MockedProvider } from "@apollo/client/testing";
 import { render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { type UseStaffReservationFragment } from "@gql/gql-types";
+import type { UseStaffReservationFragment } from "@gql/gql-types";
 import { type MutationParams, useStaffReservationMutation } from "./useStaffReservationMutation";
 import { vi, describe, test, expect, beforeEach } from "vitest";
 import { MUTATION_DATA, createMocks } from "./__test__/mocks";

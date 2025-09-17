@@ -6,7 +6,7 @@ import { ReservationFormField } from "./ReservationFormField";
 import type { Inputs, Reservation } from "./types";
 import { test, expect } from "vitest";
 import { MunicipalityChoice } from "../../gql/gql-types";
-import { type OptionsRecord } from "../../types/common";
+import type { OptionsRecord } from "../../types/common";
 
 function Wrapper({ children }: { children: React.ReactNode }): JSX.Element {
   const formMethods = useForm<Reservation>();

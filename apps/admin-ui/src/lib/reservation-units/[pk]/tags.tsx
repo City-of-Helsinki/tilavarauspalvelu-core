@@ -3,7 +3,7 @@ import { ReservationUnitPublishingState, ReservationUnitReservationState } from 
 import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQuestionCircle } from "hds-react";
 import { useTranslation } from "next-i18next";
 import StatusLabel from "common/src/components/StatusLabel";
-import { type StatusLabelType } from "common/src/tags";
+import type { StatusLabelType } from "common/src/tags";
 import { NoWrap } from "common/styled";
 
 type StatusPropsType = {

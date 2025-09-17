@@ -18,7 +18,7 @@ import {
 } from "./reservation";
 import { isSlotWithinReservationTime } from "./reservable";
 import { toApiDate } from "common/src/common/util";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
 import { createNodeId } from "common/src/helpers";
 

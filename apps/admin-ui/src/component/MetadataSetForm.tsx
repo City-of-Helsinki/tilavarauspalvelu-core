@@ -3,9 +3,9 @@ import { useFormContext } from "react-hook-form";
 import type { Reservation } from "common/src/reservation-form/types";
 import { ReserverMetaFields, ReservationMetaFields } from "common/src/reservation-form/MetaFields";
 import { useGeneralFields, useApplicationFields } from "common/src/hooks";
-import { type MetadataSetsFragment } from "@gql/gql-types";
+import type { MetadataSetsFragment } from "@gql/gql-types";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
-import { type OptionsRecord } from "common";
+import type { OptionsRecord } from "common";
 
 type Props = {
   reservationUnit: MetadataSetsFragment;

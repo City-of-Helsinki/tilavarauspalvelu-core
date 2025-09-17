@@ -20,7 +20,7 @@ import { toNumber } from "common/src/helpers";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
 import { type TimeSlotRange, useSelectedSlots } from "./SelectedSlotsContext";
-import { type DayT } from "common/src/const";
+import type { DayT } from "common/src/const";
 
 export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT) => void] {
   const params = useSearchParams();

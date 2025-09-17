@@ -23,7 +23,7 @@ import { CenterSpinner, Flex, H1 } from "common/styled";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 
 const AccordionWithoutTopPadding = styled(Accordion).attrs({
   closeButton: false,

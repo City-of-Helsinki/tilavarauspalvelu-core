@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
-import { type ReservationInProgressFragment } from "@gql/gql-types";
+import type { ReservationInProgressFragment } from "@gql/gql-types";
 import { Button, ButtonVariant, IconArrowLeft, LoadingSpinner, Notification } from "hds-react";
 import { useFormContext } from "react-hook-form";
-import { type OptionsRecord } from "common";
-import { type FieldName } from "common/src/metaFieldsHelpers";
+import type { OptionsRecord } from "common";
+import type { FieldName } from "common/src/metaFieldsHelpers";
 import { ActionContainer } from "./styles";
 import { ApplicationFields, GeneralFields } from "./SummaryFields";
 import { AcceptTerms } from "./AcceptTerms";

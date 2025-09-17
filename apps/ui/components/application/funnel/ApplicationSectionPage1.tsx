@@ -11,9 +11,9 @@ import { ControlledNumberInput, ControlledSelect } from "common/src/components/f
 import { toUIDate } from "common/src/common/util";
 import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
-import { type ApplicationPage1FormValues } from "./form";
+import type { ApplicationPage1FormValues } from "./form";
 import { ApplicationSectionSummary, ReservationUnitList } from ".";
-import { type OptionsListT } from "common/src/modules/search";
+import type { OptionsListT } from "common/src/modules/search";
 import { startOfDay } from "date-fns/startOfDay";
 
 type Props = Readonly<{

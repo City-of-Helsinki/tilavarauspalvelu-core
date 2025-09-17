@@ -2,7 +2,7 @@ import React from "react";
 import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
-import { type ApplicationPage3FormValues } from "./form";
+import type { ApplicationPage3FormValues } from "./form";
 
 type TextFields =
   | "organisationName"

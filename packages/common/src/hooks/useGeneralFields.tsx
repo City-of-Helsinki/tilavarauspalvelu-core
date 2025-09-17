@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { type MetadataSetsFragment } from "../../gql/gql-types";
+import type { MetadataSetsFragment } from "../../gql/gql-types";
 import { filterNonNullable } from "../helpers";
 import { getReservationApplicationFields } from "../reservation-form/util";
 

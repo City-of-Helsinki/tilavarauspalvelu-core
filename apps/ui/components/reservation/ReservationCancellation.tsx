@@ -12,7 +12,7 @@ import { useDisplayError } from "common/src/hooks";
 import { getApplicationPath, getReservationPath } from "@/modules/urls";
 import { getPrice } from "@/modules/reservationUnit";
 import { formatDateTimeStrings } from "@/modules/util";
-import { type LocalizationLanguages } from "common/src/urlBuilder";
+import type { LocalizationLanguages } from "common/src/urlBuilder";
 import { useRouter } from "next/router";
 import { type CancelFormValues, CancellationForm } from "../CancellationForm";
 import { Card } from "common/src/components";

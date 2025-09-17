@@ -13,10 +13,10 @@ import {
 } from "common/src/components/ApplicationTimeSelector";
 import { successToast } from "common/src/components/toast";
 import { ErrorText } from "common/src/components/ErrorText";
-import { type TimeSelectorFragment } from "@/gql/gql-types";
+import type { TimeSelectorFragment } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
 import { aesToCells, covertCellsToTimeRange } from "./timeSelectorModule";
-import { type ApplicationPage2FormValues } from "./form";
+import type { ApplicationPage2FormValues } from "./form";
 import { TimePreview } from ".";
 import { convertWeekday } from "common/src/conversion";
 

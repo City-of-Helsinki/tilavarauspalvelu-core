@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { type ReservationSeriesNode } from "@gql/gql-types";
+import type { ReservationSeriesNode } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";

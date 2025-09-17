@@ -8,7 +8,7 @@ import {
   parse,
 } from "date-fns";
 import { fi } from "date-fns/locale";
-import { type TFunction } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { capitalize } from "../helpers";
 
 export const parseDate = (date: string): Date => parseISO(date);

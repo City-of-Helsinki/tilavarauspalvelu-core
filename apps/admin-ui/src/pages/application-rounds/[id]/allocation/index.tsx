@@ -28,7 +28,7 @@ import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { Error403 } from "@/component/Error403";
 import { createClient } from "@/common/apolloClient";
 import { Filters } from "@/lib/application-rounds/[id]/allocation/Filters";

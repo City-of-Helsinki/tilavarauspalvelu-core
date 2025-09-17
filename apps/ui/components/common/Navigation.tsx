@@ -12,7 +12,7 @@ import {
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { useSession } from "@/hooks";
-import { type CurrentUserQuery } from "@gql/gql-types";
+import type { CurrentUserQuery } from "@gql/gql-types";
 import Logo from "common/src/components/Logo";
 import { useRouter } from "next/router";
 import { breakpoints } from "common/src/const";

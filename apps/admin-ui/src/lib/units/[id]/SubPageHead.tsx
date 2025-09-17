@@ -2,7 +2,7 @@ import React from "react";
 import { IconLocation } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { type UnitSubpageHeadFragment } from "@gql/gql-types";
+import type { UnitSubpageHeadFragment } from "@gql/gql-types";
 import { formatAddress } from "@/common/util";
 import { Flex, H1, fontMedium } from "common/styled";
 import { gql } from "@apollo/client";

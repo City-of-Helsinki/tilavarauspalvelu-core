@@ -3,7 +3,7 @@ import { breakpoints } from "common/src/const";
 import { Flex } from "common/styled";
 import React, { type Dispatch, type SetStateAction } from "react";
 import { useTranslation } from "next-i18next";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import {
   ReservationUnitPublishingState,
   ReservationUnitReservationState,
@@ -187,7 +187,9 @@ export function ReservationUnitsTable({
       selectAllRowsText={t("common:selectAllRows")}
       clearSelectionsText={t("common:clearAllSelections")}
       setSelectedRows={setSelectedRows}
-      customActionButtons={[<ActionButtons t={t} selectedRows={selectedRows} apiBaseUrl={apiBaseUrl}></ActionButtons>]}
+      customActionButtons={[
+        <ActionButtons key="1" t={t} selectedRows={selectedRows} apiBaseUrl={apiBaseUrl}></ActionButtons>,
+      ]}
     />
   );
 }
@@ -208,7 +210,7 @@ function ActionButtons({
   selectedRows: SelectedRow[];
   apiBaseUrl: string;
 }): JSX.Element {
-  const selectedPks = selectedRows.map((id) => Number(id)).filter((id) => !isNaN(id));
+  const selectedPks = selectedRows.map((id) => Number(id)).filter((id) => !Number.isNaN(id));
   const redirectOnErrorUrl = isBrowser ? window.location.href : undefined;
   const editLink =
     getOpeningHoursUrl(apiBaseUrl, selectedPks, redirectOnErrorUrl) !== ""

@@ -8,7 +8,7 @@ import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { transformWeekday } from "common/src/conversion";
 import { createNodeId, formatTimeStruct } from "common/src/helpers";
-import { type OpenHoursState } from "common/src/components/ApplicationTimeSelector";
+import type { OpenHoursState } from "common/src/components/ApplicationTimeSelector";
 import { selectOption } from "@/test/test.utils";
 import { toApiTime } from "common/src/common/util";
 import { type DayT, WEEKDAYS_SORTED } from "common/src/const";

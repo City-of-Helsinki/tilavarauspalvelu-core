@@ -4,7 +4,7 @@ import { createMockReservationUnit } from "@test/reservation-unit.mocks";
 import { render, within } from "@testing-library/react";
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { ReservationUnitList } from "./ReservationUnitList";
-import { type ApplicationReservationUnitListFragment } from "@/gql/gql-types";
+import type { ApplicationReservationUnitListFragment } from "@/gql/gql-types";
 import { createNodeId } from "common/src/helpers";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { type SubmitHandler, useForm } from "react-hook-form";

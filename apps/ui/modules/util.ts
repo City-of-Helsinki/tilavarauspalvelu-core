@@ -1,5 +1,5 @@
 import { isSameDay } from "date-fns";
-import { type TFunction } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { toUIDate, fromApiDate as fromAPIDate, fromUIDate } from "common/src/common/util";
 import { isBrowser } from "./const";
 import { formatMinutes, timeToMinutes } from "common/src/helpers";

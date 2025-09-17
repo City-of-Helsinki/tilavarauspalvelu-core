@@ -10,7 +10,7 @@ import { ApplicationFields, GeneralFields } from "./SummaryFields";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { PendingReservationFormType } from "../reservation-unit/schema";
-import { type UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { convertReservationFormToApi } from "@/modules/reservation";
 import { AcceptTerms } from "./AcceptTerms";
 import { getReservationPath } from "@/modules/urls";
@@ -18,7 +18,7 @@ import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
 import ErrorComponent from "next/error";
 import { gql } from "@apollo/client";
-import { type OptionsRecord } from "common";
+import type { OptionsRecord } from "common";
 
 type Props = {
   reservation: EditPageReservationFragment;

@@ -2,7 +2,7 @@ import React from "react";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { type ApolloQueryResult } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import { type ApplicationSectionAllocationsQuery, Priority } from "@gql/gql-types";
 import { filterNonNullable, timeToMinutes } from "common/src/helpers";
 import { Flex, fontMedium, H5, SemiBold, Strong } from "common/styled";
