@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.utils import translation
+from lazy_managers import LazyModelManager
 from modeltranslation.decorators import register
 from modeltranslation.translator import TranslationOptions
 
@@ -45,27 +46,37 @@ __all__ = [
 ]
 
 
-@register(TermsOfUse)
+def register_lazy[TOpt: type[TranslationOptions]](model: type[models.Model]) -> Callable[[TOpt], TOpt]:
+    """Load lazy loaded managers before patching them for django-modeltranslation."""
+    for manager in model._meta.managers:
+        if isinstance(manager, LazyModelManager):
+            real_manager = manager._load_manager()  # noqa: SLF001
+            manager._replace_manager(real_manager, manager.model, manager.name)  # noqa: SLF001
+
+    return register(model)
+
+
+@register_lazy(TermsOfUse)
 class TermsOfUseTranslationOptions(TranslationOptions):
     fields = ["name", "text"]
 
 
-@register(Resource)
+@register_lazy(Resource)
 class ResourceTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-@register(Space)
+@register_lazy(Space)
 class SpaceTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-@register(UnitGroup)
+@register_lazy(UnitGroup)
 class UnitGroupTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-@register(Unit)
+@register_lazy(Unit)
 class UnitTranslationOptions(TranslationOptions):
     fields = [
         "name",
@@ -76,17 +87,17 @@ class UnitTranslationOptions(TranslationOptions):
     ]
 
 
-@register(ReservationPurpose)
+@register_lazy(ReservationPurpose)
 class ReservationPurposeTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-@register(ReservationDenyReason)
+@register_lazy(ReservationDenyReason)
 class ReservationDenyReasonTranslationOptions(TranslationOptions):
     fields = ["reason"]
 
 
-@register(ReservationUnit)
+@register_lazy(ReservationUnit)
 class ReservationUnitTranslationOptions(TranslationOptions):
     fields = [
         "name",
@@ -98,42 +109,42 @@ class ReservationUnitTranslationOptions(TranslationOptions):
     ]
 
 
-@register(ReservationUnitType)
+@register_lazy(ReservationUnitType)
 class ReservationUnitTypeTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-@register(Purpose)
+@register_lazy(Purpose)
 class PurposeTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-@register(Equipment)
+@register_lazy(Equipment)
 class EquipmentTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-@register(EquipmentCategory)
+@register_lazy(EquipmentCategory)
 class EquipmentCategoryTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-@register(ReservationUnitCancellationRule)
+@register_lazy(ReservationUnitCancellationRule)
 class ReservationUnitCancellationRuleTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-@register(ApplicationRound)
+@register_lazy(ApplicationRound)
 class ApplicationRoundTranslationOptions(TranslationOptions):
     fields = ["name", "criteria", "notes_when_applying"]
 
 
-@register(BannerNotification)
+@register_lazy(BannerNotification)
 class BannerNotificationTranslationOptions(TranslationOptions):
     fields = ["message"]
 
 
-@register(ReservationUnitPricing)
+@register_lazy(ReservationUnitPricing)
 class ReservationUnitPricingTranslationOptions(TranslationOptions):
     fields = ["material_price_description"]
 
