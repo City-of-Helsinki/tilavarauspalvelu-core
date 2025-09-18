@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { AutoGrid, fontBold } from "../../styled";
 import { WEEKDAYS } from "../const";
-import { fromMondayFirst } from "../date-utils";
+import { setSundayFirst } from "../date-utils";
 import { formatDayTimes } from "../helpers";
 import { Priority, SuitableTimeFragment } from "../../gql/gql-types";
 
@@ -29,7 +29,7 @@ function Weekdays({ schedules }: { schedules: Omit<SchedulesT, "priority">[] }) 
       })).map(({ day, times }) => (
         <WeekWrapper key={day}>
           <Label>
-            {t(`common:weekDay.${fromMondayFirst(day)}`)}
+            {t(`common:weekDay.${setSundayFirst(day)}`)}
             {times && ":"}
           </Label>
           <div>{times}</div>

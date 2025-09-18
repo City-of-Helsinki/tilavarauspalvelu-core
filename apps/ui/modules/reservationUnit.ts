@@ -44,7 +44,7 @@ import {
 import { gql } from "@apollo/client";
 import { getIntervalMinutes } from "common/src/conversion";
 import { capitalize, dayMax, dayMin, filterNonNullable, isPriceFree, type ReadonlyDeep } from "common/src/helpers";
-import { timeToMinutes, toApiDate } from "common/src/date-utils";
+import { timeToMinutes, formatApiDate } from "common/src/date-utils";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
 import { type TFunction } from "i18next";
 
@@ -221,7 +221,7 @@ export function getFuturePricing(
 
   return reservationDate
     ? (futurePricings.reverse().find((n) => {
-        const apiDate = toApiDate(new Date(reservationDate));
+        const apiDate = formatApiDate(new Date(reservationDate));
         return apiDate ? n.begins <= apiDate : false;
       }) ?? null)
     : (futurePricings[0] ?? null);

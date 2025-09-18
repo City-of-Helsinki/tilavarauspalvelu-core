@@ -14,7 +14,7 @@ import {
 } from "@/gql/gql-types";
 import { ReservableMap, type RoundPeriod } from "@/modules/reservable";
 import { createNodeId } from "common/src/helpers";
-import { toApiDateUnsafe } from "common/src/date-utils";
+import { formatApiDateUnsafe } from "common/src/date-utils";
 import { addDays, addYears, endOfDay, startOfDay, startOfToday } from "date-fns";
 import { createMockReservationUnitType, generateDescriptionFragment, generateNameFragment } from "./test.gql.utils";
 
@@ -35,7 +35,7 @@ export function createMockReservableTimes(): ReservableMap {
   const map: ReservableMap = new Map();
   for (let i = 0; i < 30; i++) {
     const date = addDays(startOfToday(), i);
-    const key = toApiDateUnsafe(date);
+    const key = formatApiDateUnsafe(date);
     // TODO need to have holes in this
     const value = [{ start: startOfDay(date), end: endOfDay(date) }];
     map.set(key, value);

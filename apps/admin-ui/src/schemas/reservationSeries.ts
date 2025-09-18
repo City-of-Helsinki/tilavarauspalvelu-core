@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ReservationStartInterval, ReservationTypeChoice, Weekday } from "@gql/gql-types";
-import { fromUIDate } from "common/src/date-utils";
+import { parseUIDate } from "common/src/date-utils";
 import { checkReservationInterval, checkStartEndTime, ReservationTypeSchema } from "./reservation";
 import { checkDateNotInPast, checkTimeStringFormat } from "common/src/schemas/schemaCommon";
 import { intervalToNumber } from "./utils";
@@ -37,7 +37,7 @@ const ReservationSeriesFormSchema = z
   })
   .merge(timeSelectionSchemaBase);
 
-const convertToDate = (date?: string): Date | null => (date ? fromUIDate(date) : null);
+const convertToDate = (date?: string): Date | null => (date ? parseUIDate(date) : null);
 
 const dateIsBefore = (date: Date | null, other: Date | null) => date && other && date.getTime() < other.getTime();
 

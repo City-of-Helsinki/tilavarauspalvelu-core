@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useReservationDateOfBirthQuery, useApplicationDateOfBirthQuery } from "@gql/gql-types";
-import { formatDate, toValidDateObject } from "common/src/date-utils";
+import { formatDate, parseValidDateObject } from "common/src/date-utils";
 import { Flex } from "common/styled";
 import { createNodeId } from "common/src/helpers";
 
@@ -108,7 +108,7 @@ export function BirthDate(props: Props): JSX.Element {
       ) : (
         <>
           {visible ? (
-            <span>{dateOfBirth ? formatDate(toValidDateObject(dateOfBirth)) : "-"}</span>
+            <span>{dateOfBirth ? formatDate(parseValidDateObject(dateOfBirth)) : "-"}</span>
           ) : (
             <span>XX.XX.XXXX</span>
           )}

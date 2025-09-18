@@ -28,7 +28,7 @@ import { type GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { CreateReservationModal, ReservationUnitCalendarView, UnitReservations } from "@lib/my-units/[id]/";
-import { fromUIDate } from "common/src/date-utils";
+import { parseUIDate } from "common/src/date-utils";
 import { addMinutes } from "date-fns";
 import { createClient } from "@/common/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";
@@ -112,7 +112,7 @@ export default function MyUnitsPage({ unit, optionsData }: Pick<PropsNarrowed, "
   };
 
   const isModalOpen = searchParams.get("isModalOpen") === "true";
-  const selectedDate = fromUIDate(searchParams.get("date") ?? "") ?? new Date();
+  const selectedDate = parseUIDate(searchParams.get("date") ?? "") ?? new Date();
   const timeOffset = toNumber(searchParams.get("timeOffset")) ?? 0;
 
   const title = unit.nameFi ?? "-";

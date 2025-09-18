@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  toValidDateObject,
+  parseValidDateObject,
   formatTime,
   formatDate,
   formatDateTime,
@@ -10,6 +10,10 @@ import {
   formatDateTimeRange,
   formatDuration,
   formatDurationRange,
+  formatApiDate,
+  formatApiDateUnsafe,
+  formatApiTime,
+  formatApiTimeUnsafe,
 } from "./formatting";
 import type { TFunction } from "next-i18next";
 
@@ -17,27 +21,27 @@ import type { TFunction } from "next-i18next";
 const mockT = ((key: string) => key) as TFunction;
 
 describe("formatting", () => {
-  describe("toValidDateObject", () => {
+  describe("parseValidDateObject", () => {
     it("validates and returns valid Date object", () => {
       const date = new Date("2023-12-25");
-      const result = toValidDateObject(date);
+      const result = parseValidDateObject(date);
       expect(result).toBe(date);
     });
 
     it("returns null for invalid Date object", () => {
       const invalidDate = new Date("invalid");
-      const result = toValidDateObject(invalidDate);
+      const result = parseValidDateObject(invalidDate);
       expect(result).toBeNull();
     });
 
     it("parses and validates string input", () => {
-      const result = toValidDateObject("2023-12-25");
+      const result = parseValidDateObject("2023-12-25");
       expect(result).toBeInstanceOf(Date);
       expect(result?.getFullYear()).toBe(2023);
     });
 
     it("returns null for invalid string", () => {
-      const result = toValidDateObject("invalid");
+      const result = parseValidDateObject("invalid");
       expect(result).toBeNull();
     });
   });
@@ -373,6 +377,81 @@ describe("formatting", () => {
         abbreviated: false,
       });
       expect(result).toBe("common:hour–common:hour");
+    });
+  });
+
+  describe("formatApiDate", () => {
+    it("converts valid Date to API format", () => {
+      const date = new Date("2023-12-25T15:30:00");
+      expect(formatApiDate(date)).toBe("2023-12-25");
+    });
+
+    it("handles null date", () => {
+      expect(formatApiDate(null as unknown as Date)).toBeNull();
+    });
+
+    it("handles invalid date", () => {
+      const invalidDate = new Date("invalid");
+      expect(formatApiDate(invalidDate)).toBeNull();
+    });
+
+    it("handles very old dates", () => {
+      const oldDate = new Date("999-01-01");
+      expect(formatApiDate(oldDate)).toBeNull();
+    });
+  });
+
+  describe("formatApiDateUnsafe", () => {
+    it("converts valid Date to API format", () => {
+      const date = new Date("2023-12-25T15:30:00");
+      expect(formatApiDateUnsafe(date)).toBe("2023-12-25");
+    });
+
+    it("throws on invalid date", () => {
+      const invalidDate = new Date("invalid");
+      expect(() => formatApiDateUnsafe(invalidDate)).toThrow("Invalid date:");
+    });
+  });
+
+  describe("formatApiTime", () => {
+    it("converts valid time to API format", () => {
+      expect(formatApiTime(15, 30)).toBe("15:30");
+    });
+
+    it("pads single digits", () => {
+      expect(formatApiTime(9, 5)).toBe("09:05");
+    });
+
+    it("defaults minutes to 0", () => {
+      expect(formatApiTime(15)).toBe("15:00");
+    });
+
+    it("handles 24:00 as 00:00", () => {
+      expect(formatApiTime(24, 0)).toBe("00:00");
+    });
+
+    it("rejects invalid hours", () => {
+      expect(formatApiTime(-1)).toBeNull();
+      expect(formatApiTime(25)).toBeNull();
+    });
+
+    it("rejects invalid minutes", () => {
+      expect(formatApiTime(15, -1)).toBeNull();
+      expect(formatApiTime(15, 60)).toBeNull();
+    });
+
+    it("rejects 24:xx with minutes", () => {
+      expect(formatApiTime(24, 30)).toBeNull();
+    });
+  });
+
+  describe("formatApiTimeUnsafe", () => {
+    it("converts valid time to API format", () => {
+      expect(formatApiTimeUnsafe(15, 30)).toBe("15:30");
+    });
+
+    it("throws on invalid time", () => {
+      expect(() => formatApiTimeUnsafe(-1)).toThrow("Invalid time:");
     });
   });
 });

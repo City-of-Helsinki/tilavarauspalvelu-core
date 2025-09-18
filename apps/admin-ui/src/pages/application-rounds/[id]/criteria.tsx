@@ -6,7 +6,6 @@ import { H1, H3, SemiBold, Strong, CenterSpinner, Flex, TitleSection } from "com
 import { breakpoints } from "common/src/const";
 import { useApplicationRoundCriteriaQuery, UserPermissionChoice } from "@gql/gql-types";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { formatDate, toValidDateObject } from "common/src/date-utils";
 import { errorToast } from "common/src/components/toast";
 import { Accordion as AccordionBase } from "@/component/Accordion";
 import { TimeframeStatus } from "@lib/application-rounds";
@@ -15,6 +14,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { formatDate, parseValidDateObject } from "common/src/date-utils";
 
 const Accordion = styled(AccordionBase)`
   && > div > h2 {
@@ -80,19 +80,19 @@ function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): JSX.E
         <div>
           <H3>{t("applicationRound:applicationPeriodTitle")}</H3>
           <div>
-            {t("common:begins")} {formatDate(toValidDateObject(applicationRound.applicationPeriodBeginsAt))}
+            {t("common:begins")} {formatDate(parseValidDateObject(applicationRound.applicationPeriodBeginsAt))}
           </div>
           <div>
-            {t("common:ends")} {formatDate(toValidDateObject(applicationRound.applicationPeriodEndsAt))}
+            {t("common:ends")} {formatDate(parseValidDateObject(applicationRound.applicationPeriodEndsAt))}
           </div>
         </div>
         <div>
           <H3>{t("applicationRound:reservationPeriodTitle")}</H3>
           <div>
-            {t("common:begins")} {formatDate(toValidDateObject(applicationRound.reservationPeriodBeginDate))}
+            {t("common:begins")} {formatDate(parseValidDateObject(applicationRound.reservationPeriodBeginDate))}
           </div>
           <div>
-            {t("common:ends")} {formatDate(toValidDateObject(applicationRound.reservationPeriodEndDate))}
+            {t("common:ends")} {formatDate(parseValidDateObject(applicationRound.reservationPeriodEndDate))}
           </div>
         </div>
       </Accordion>

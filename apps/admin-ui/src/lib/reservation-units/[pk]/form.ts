@@ -1,10 +1,10 @@
 import { convertTime, filterNonNullable, toNumber } from "common/src/helpers";
 import {
-  fromApiDate,
-  fromUIDate,
+  parseApiDate,
+  parseUIDate,
   fromUIDateTime,
   timeToMinutes,
-  toApiDate,
+  formatApiDate,
   formatDate,
   formatTime,
 } from "common/src/date-utils";
@@ -38,7 +38,7 @@ type Node = NonNullable<QueryData>;
 /// @param date string in UI format
 /// @returns true if date is in the future
 function isAfterToday(date: string) {
-  const d = fromUIDate(date);
+  const d = parseUIDate(date);
   if (d == null) {
     return false;
   }
@@ -83,7 +83,7 @@ function refinePricing(data: PricingFormValues | undefined, ctx: z.RefinementCtx
       code: z.ZodIssueCode.custom,
     });
   }
-  const date = fromUIDate(data.begins);
+  const date = parseUIDate(data.begins);
   if (date == null || Number.isNaN(date.getTime())) {
     ctx.addIssue({
       message: "Invalid date",
@@ -196,7 +196,7 @@ function validateAccessTypes(accessTypes: AccessTypesFormType[], ctx: z.Refineme
   const seenDates: string[] = [];
 
   accessTypes.forEach((at, index) => {
-    if (fromUIDate(at.beginDate) == null) {
+    if (parseUIDate(at.beginDate) == null) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "access type invalid beginDate",
@@ -685,7 +685,7 @@ export const ReservationUnitEditSchema = z
 export type ReservationUnitEditFormValues = z.infer<typeof ReservationUnitEditSchema>;
 
 function convertBegins(begins?: string) {
-  const d = begins != null && begins !== "" ? fromApiDate(begins) : undefined;
+  const d = begins != null && begins !== "" ? parseApiDate(begins) : undefined;
   const today = new Date();
   if (d != null) {
     return formatDate(d);
@@ -938,7 +938,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     accessTypesForm.map((at) => ({
       pk: at.pk,
       accessType: at.accessType,
-      beginDate: toApiDate(fromUIDate(at.beginDate) || new Date()) || "",
+      beginDate: formatApiDate(parseUIDate(at.beginDate) || new Date()) || "",
     }))
   );
 
@@ -990,10 +990,10 @@ function transformPricing(
     throw new Error("Tax percentage is required for pricing");
   }
 
-  const begins = fromUIDate(values.begins) ?? new Date();
+  const begins = parseUIDate(values.begins) ?? new Date();
   return {
     taxPercentage,
-    begins: toApiDate(begins) ?? "",
+    begins: formatApiDate(begins) ?? "",
     highestPrice: values.isPaid ? values.highestPrice.toString() : "0",
     lowestPrice: values.isPaid ? values.lowestPrice.toString() : "0",
     ...(values.pk > 0 ? { pk: values.pk } : {}),

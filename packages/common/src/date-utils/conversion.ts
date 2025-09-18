@@ -1,4 +1,4 @@
-import { format, isValid, isAfter, parse } from "date-fns";
+import { isValid, isAfter, parse } from "date-fns";
 import type { DayT } from "../const";
 import { formatDate, formatTime } from "./formatting";
 import { UI_DATE_FORMAT, API_DATE_FORMAT } from "./";
@@ -8,44 +8,12 @@ import { UI_DATE_FORMAT, API_DATE_FORMAT } from "./";
  */
 
 /**
- * Converts a Date object to API date format (yyyy-MM-dd)
- * @param date - Date object to convert
- * @returns API date string or null if invalid
- * @example toApiDate(new Date("2023-12-25")) // "2023-12-25"
- */
-export function toApiDate(date: Date): string | null {
-  if (!date || !isValidDate(date)) {
-    return null;
-  }
-  try {
-    return format(date, API_DATE_FORMAT);
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Converts Date to API date format (yyyy-MM-dd) - throws on invalid input
- * @param date - Date object to convert
- * @returns API date string
- * @throws Error if date is invalid
- * @example toApiDateUnsafe(new Date("2023-12-25")) // "2023-12-25"
- */
-export function toApiDateUnsafe(date: Date): string {
-  const apiDate = toApiDate(date);
-  if (apiDate == null) {
-    throw new Error("Invalid date: " + date);
-  }
-  return apiDate;
-}
-
-/**
  * Converts an API date string (yyyy-MM-dd) to Date object
  * @param date - API date string
  * @returns Date object or null if invalid
- * @example fromApiDate("2023-12-25") // Date object for Dec 25, 2023
+ * @example parseApiDate("2023-12-25") // Date object for Dec 25, 2023
  */
-export function fromApiDate(date: string): Date | null {
+export function parseApiDate(date: string): Date | null {
   if (!date) return null;
 
   try {
@@ -60,9 +28,9 @@ export function fromApiDate(date: string): Date | null {
  * Converts a UI date string (d.M.yyyy) to Date object
  * @param date - UI date string
  * @returns Date object or null if invalid
- * @example fromUIDate("25.12.2023") // Date object for Dec 25, 2023
+ * @example parseUIDate("25.12.2023") // Date object for Dec 25, 2023
  */
-export function fromUIDate(date: string): Date | null {
+export function parseUIDate(date: string): Date | null {
   if (!date) return null;
 
   try {
@@ -80,43 +48,12 @@ export function fromUIDate(date: string): Date | null {
  * @throws Error if date is invalid
  * @example fromUIDateUnsafe("25.12.2023") // Date object for Dec 25, 2023
  */
-export function fromUIDateUnsafe(date: string): Date {
-  const uiDate = fromUIDate(date);
+export function parseUIDateUnsafe(date: string): Date {
+  const uiDate = parseUIDate(date);
   if (uiDate == null) {
     throw new Error("Invalid date: " + date);
   }
   return uiDate;
-}
-
-/**
- * Converts time struct to API time format (HH:mm)
- * @param hours - Hours (0-23)
- * @param minutes - Minutes (0-59, defaults to 0)
- * @returns API time string or null if invalid
- * @example toApiTime(15, 30) // "15:30"
- */
-export function toApiTime(hours: number, minutes: number = 0): string | null {
-  if ((hours === 24 && minutes !== 0) || hours < 0 || hours > 24 || minutes < 0 || minutes > 59) {
-    return null;
-  }
-  const normalizedHours = hours === 24 ? 0 : hours;
-  return `${String(normalizedHours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
-}
-
-/**
- * Converts time struct to API time format (HH:mm) - throws on invalid input
- * @param hours - Hours (0-23)
- * @param minutes - Minutes (0-59, defaults to 0)
- * @returns API time string
- * @throws Error if time is invalid
- * @example toApiTimeUnsafe(15, 30) // "15:30"
- */
-export function toApiTimeUnsafe(hours: number, minutes: number = 0): string {
-  const time = toApiTime(hours, minutes);
-  if (time == null) {
-    throw new Error("Invalid time: " + JSON.stringify({ hours, minutes }));
-  }
-  return time;
 }
 
 /**
@@ -133,12 +70,12 @@ export function dateForInput(date: Date | string): string {
     return formatted || "";
   }
   // Try to parse as API date first, then as UI date
-  const apiDate = fromApiDate(date);
+  const apiDate = parseApiDate(date);
   if (apiDate) {
     const formatted = formatDate(apiDate);
     return formatted || "";
   }
-  const uiDate = fromUIDate(date);
+  const uiDate = parseUIDate(date);
   if (uiDate) {
     const formatted = formatDate(uiDate);
     return formatted || "";
@@ -245,7 +182,7 @@ export function timeToMinutes(time: string): number {
  *   toMondayFirst(1) // 0 (Monday to Monday)
  *   toMondayFirst(6) // 5 (Saturday to Saturday)
  */
-export function toMondayFirst(day: number): DayT {
+export function setMondayFirst(day: number): DayT {
   if (day < 0 || day > 6) {
     throw new Error(`Invalid day ${day}`);
   }
@@ -257,11 +194,11 @@ export function toMondayFirst(day: number): DayT {
  * @param {DayT} day - Day of week from Date.getDay()
  * @returns {DayT} Converted day of week
  * @example
- *   fromMondayFirst(0) // 1 (Monday to Monday)
- *   fromMondayFirst(3) // 4 (Wednesday to Wednesday)
- *   fromMondayFirst(6) // 0 (Sunday to Sunday)
+ *   setMondayFirst(0) // 1 (Monday to Monday)
+ *   setMondayFirst(3) // 4 (Wednesday to Wednesday)
+ *   setMondayFirst(6) // 0 (Sunday to Sunday)
  */
-export function fromMondayFirst(day: number): DayT {
+export function setSundayFirst(day: number): DayT {
   if (day < 0) {
     throw new Error(`Invalid day ${day}`);
   }
