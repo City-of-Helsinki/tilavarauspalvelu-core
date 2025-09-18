@@ -24,8 +24,11 @@ RUN echo "Install common dependencies" \
       libpq5 \
       postgresql-client \
       make \
+      locales \
       rsync \
     && apt-get clean \
+    && echo "Generate locale for Finnish" \
+    && locale-gen fi_FI.UTF-8 \
     && echo "Create project directory" \
     && mkdir -p "$PROJECT_ROOT" \
     && chmod g=u "$PROJECT_ROOT" \
@@ -133,8 +136,11 @@ COPY --chown=root:root --chmod=774 --from=builder $VENV_ROOT $VENV_ROOT
 COPY --chown=root:root --chmod=774 --from=build-static $STATIC_ROOT $STATIC_ROOT
 
 # Activate virtualenv by setting some environment variables.
+# Set locale to Finnish.
 ENV PATH=$VENV_ROOT/bin:$PATH \
-    VIRTUAL_ENV=$VENV_ROOT
+    VIRTUAL_ENV=$VENV_ROOT \
+    LC_ALL=fi_FI.UTF-8 \
+    LANG=fi_FI.UTF-8
 
 # Compile translations.
 RUN \
