@@ -1,4 +1,4 @@
-import { fromUIDateUnsafe, timeToMinutes, toMondayFirst } from "common/src/date-utils";
+import { parseUIDateUnsafe, timeToMinutes, setMondayFirst } from "common/src/date-utils";
 import { TimeSelectionForm } from "@/schemas";
 import { Weekday } from "@gql/gql-types";
 import { transformWeekday } from "common/src/conversion";
@@ -20,7 +20,7 @@ function eachDayOfInterval(start: number, end: number, stepDays = 1) {
 // epoch is Thue (4)
 function dayOfWeek(time: number): Weekday {
   const weekdayNumber = ((Math.floor(time / MILLISECONDS_IN_DAY) + 4) % 7) as DayT;
-  return transformWeekday(toMondayFirst(weekdayNumber));
+  return transformWeekday(setMondayFirst(weekdayNumber));
 }
 
 export function generateReservations(props: TimeSelectionForm) {
@@ -48,8 +48,8 @@ export function generateReservations(props: TimeSelectionForm) {
   const max = (a: number, b: number) => (a > b ? a : b);
 
   try {
-    const rawStartingDate = fromUIDateUnsafe(startingDate);
-    const rawEndingDate = fromUIDateUnsafe(endingDate);
+    const rawStartingDate = parseUIDateUnsafe(startingDate);
+    const rawEndingDate = parseUIDateUnsafe(endingDate);
     if (Number.isNaN(rawStartingDate) || Number.isNaN(rawEndingDate)) {
       return [];
     }
@@ -62,10 +62,10 @@ export function generateReservations(props: TimeSelectionForm) {
       return [];
     }
 
-    const sDay = max(utcDate(new Date()), utcDate(fromUIDateUnsafe(startingDate)));
+    const sDay = max(utcDate(new Date()), utcDate(parseUIDateUnsafe(startingDate)));
 
     // end date with time 23:59:59
-    const eDay = utcDate(fromUIDateUnsafe(endingDate)) + (MILLISECONDS_IN_DAY - 1);
+    const eDay = utcDate(parseUIDateUnsafe(endingDate)) + (MILLISECONDS_IN_DAY - 1);
     const firstWeek = eachDayOfInterval(sDay, min(sDay + MILLISECONDS_IN_DAY * 7, eDay));
 
     return firstWeek

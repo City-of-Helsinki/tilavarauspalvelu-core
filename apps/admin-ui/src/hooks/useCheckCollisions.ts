@@ -2,7 +2,7 @@ import { ReservationTypeChoice, useReservationsByReservationUnitQuery } from "@g
 import { errorToast } from "common/src/components/toast";
 import { combineAffectingReservations, doesIntervalCollide, reservationToInterval } from "@/helpers";
 import { createNodeId } from "common/src/helpers";
-import { toApiDate } from "common/src/date-utils";
+import { formatApiDate } from "common/src/date-utils";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
@@ -34,8 +34,8 @@ export function useCheckCollisions({
     variables: {
       id: createNodeId("ReservationUnitNode", reservationUnitPk),
       pk: reservationUnitPk,
-      beginDate: toApiDate(start ?? today) ?? "",
-      endDate: toApiDate(end ?? today) ?? "",
+      beginDate: formatApiDate(start ?? today) ?? "",
+      endDate: formatApiDate(end ?? today) ?? "",
       state: RELATED_RESERVATION_STATES,
     },
     onError: () => {

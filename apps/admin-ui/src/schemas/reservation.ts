@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { fromUIDate } from "common/src/date-utils";
+import { parseUIDate } from "common/src/date-utils";
 import { ReservationStartInterval, ReservationTypeChoice } from "@gql/gql-types";
 import { intervalToNumber } from "./utils";
 import { checkTimeStringFormat, checkValidFutureDate } from "common/src/schemas/schemaCommon";
@@ -77,7 +77,7 @@ const ReservationFormSchemaRefined = (interval: ReservationStartInterval) =>
   ReservationFormSchema.partial()
     .superRefine((val, ctx) => {
       if (val.date) {
-        checkValidFutureDate(fromUIDate(val.date), ctx, "date");
+        checkValidFutureDate(parseUIDate(val.date), ctx, "date");
       }
     })
     .superRefine((val, ctx) => checkTimeStringFormat(val.startTime, ctx, "startTime"))
@@ -94,7 +94,7 @@ const ReservationFormSchemaRefined = (interval: ReservationStartInterval) =>
 export const TimeChangeFormSchemaRefined = (interval: ReservationStartInterval) =>
   TimeFormSchema.partial()
     .superRefine((val, ctx) => {
-      const d = val.date ? fromUIDate(val.date) : null;
+      const d = val.date ? parseUIDate(val.date) : null;
       checkValidFutureDate(d, ctx, "date");
     })
     .superRefine((val, ctx) => checkTimeStringFormat(val.startTime, ctx, "startTime"))

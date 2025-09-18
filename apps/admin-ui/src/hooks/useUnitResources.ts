@@ -1,6 +1,10 @@
-import { AuthenticationType, type ReservationUnitsByUnitQuery, useReservationUnitsByUnitQuery } from "@gql/gql-types";
-import { toApiDate } from "common/src/common/util";
+import {
+  AuthenticationType,
+  type ReservationUnitsByUnitQuery,
+  useReservationUnitsByUnitQuery,
+} from "@gql/gql-types";
 import { createNodeId, filterNonNullable } from "common/src/helpers";
+import { formatApiDate } from "common/src/date-utils";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/components/toast";
 import { gql } from "@apollo/client";
@@ -48,8 +52,8 @@ export function useUnitResources({
     variables: {
       id: createNodeId("UnitNode", unitPk),
       pk: Number(unitPk),
-      beginDate: toApiDate(begin) ?? "",
-      endDate: toApiDate(begin) ?? "",
+      beginDate: formatApiDate(begin) ?? "",
+      endDate: formatApiDate(begin) ?? "",
       state: RELATED_RESERVATION_STATES,
     },
     onError: () => {

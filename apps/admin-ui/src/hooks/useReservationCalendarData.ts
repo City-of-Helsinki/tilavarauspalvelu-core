@@ -6,7 +6,7 @@ import {
   useReservationsByReservationUnitQuery,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { toApiDate } from "common/src/date-utils";
+import { formatApiDate } from "common/src/date-utils";
 import { errorToast } from "common/src/components/toast";
 import { createNodeId } from "common/src/helpers";
 import { type CalendarEventType } from "@/modules/reservation";
@@ -36,8 +36,8 @@ export function useReservationCalendarData({
     variables: {
       id: createNodeId("ReservationUnitNode", reservationUnitPk ?? 0),
       pk: reservationUnitPk ?? 0,
-      beginDate: toApiDate(begin ?? today) ?? "",
-      endDate: toApiDate(end ?? today) ?? "",
+      beginDate: formatApiDate(begin ?? today) ?? "",
+      endDate: formatApiDate(end ?? today) ?? "",
       // NOTE we need denied to show the past reservations
       state: [
         ReservationStateChoice.Confirmed,

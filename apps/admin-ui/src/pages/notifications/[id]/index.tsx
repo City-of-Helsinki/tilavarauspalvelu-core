@@ -27,7 +27,7 @@ import {
   type BannerNotificationPageQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { fromUIDate, fromUIDateTime, dateForInput, timeForInput, fromUIDateTimeUnsafe } from "common/src/date-utils";
+import { parseUIDate, fromUIDateTime, dateForInput, timeForInput, fromUIDateTimeUnsafe } from "common/src/date-utils";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import {
   checkValidDate,
@@ -203,7 +203,7 @@ const NotificationFormSchema = z
   .superRefine((x, ctx) => {
     if (!x.isDraft || x.activeFrom !== "" || x.activeFromTime !== "") {
       checkTimeStringFormat(x.activeFromTime, ctx, "activeFromTime");
-      checkValidDate(fromUIDate(x.activeFrom), ctx, "activeFrom");
+      checkValidDate(parseUIDate(x.activeFrom), ctx, "activeFrom");
     }
   })
   // End time can't be in the past unless it's a draft
@@ -212,9 +212,9 @@ const NotificationFormSchema = z
     if (!x.isDraft || x.activeUntil !== "" || x.activeUntilTime !== "") {
       checkTimeStringFormat(x.activeUntilTime, ctx, "activeUntilTime");
       if (!x.isDraft) {
-        checkValidFutureDate(fromUIDate(x.activeUntil), ctx, "activeUntil");
+        checkValidFutureDate(parseUIDate(x.activeUntil), ctx, "activeUntil");
       } else {
-        checkValidDate(fromUIDate(x.activeUntil), ctx, "activeUntil");
+        checkValidDate(parseUIDate(x.activeUntil), ctx, "activeUntil");
       }
     }
   })

@@ -11,10 +11,10 @@ import {
   formatDate,
   formatTime,
   formatTimeRange,
-  fromUIDate,
+  parseUIDate,
   isValidDate,
   timeToMinutes,
-  toApiDate,
+  formatApiDate,
 } from "common/src/date-utils";
 import { formatters as getFormatters } from "common";
 import { Flex, H4 } from "common/styled";
@@ -167,7 +167,7 @@ function ReservationUnit({
   const minReservationDurationMinutes = getMinReservationDuration(reservationUnit);
   const maxReservationDurationMinutes = getMaxReservationDuration(reservationUnit);
 
-  const searchUIDate = fromUIDate(searchDate ?? "");
+  const searchUIDate = parseUIDate(searchDate ?? "");
   // TODO should be the first reservable day (the reservableTimeSpans logic is too complex and needs refactoring)
   // i.e. using a naive approach will return empty timespsans either reuse the logic for QuickReservation or refactor
   const defaultDate = new Date();
@@ -491,8 +491,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       query: ReservationUnitPageDocument,
       variables: {
         id: createNodeId("ReservationUnitNode", pk),
-        beginDate: toApiDate(startDate) ?? "",
-        endDate: toApiDate(endDate) ?? "",
+        beginDate: formatApiDate(startDate) ?? "",
+        endDate: formatApiDate(endDate) ?? "",
       },
     });
     let innerEndTime = performance.now();

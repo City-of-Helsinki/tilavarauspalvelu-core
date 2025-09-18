@@ -18,7 +18,7 @@ import { ApolloError, gql } from "@apollo/client";
 import { H1 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
-import { fromApiDate, formatDate } from "common/src/date-utils";
+import { parseApiDate, formatDate } from "common/src/date-utils";
 import { useRouter } from "next/router";
 import { IconCalendarEvent, IconClock, IconLocation, IconTrash } from "hds-react";
 import { Card } from "common/src/components";
@@ -204,8 +204,8 @@ function ApplicationSectionInfoCard({
 
   const { reservationsBeginDate, reservationsEndDate } = applicationSection ?? {};
   const dateLabel = t("reservations:cancelSection.dateLabel");
-  const begin = formatDate(fromApiDate(reservationsBeginDate ?? ""));
-  const end = formatDate(fromApiDate(reservationsEndDate ?? ""));
+  const begin = formatDate(parseApiDate(reservationsBeginDate ?? ""));
+  const end = formatDate(parseApiDate(reservationsEndDate ?? ""));
   const text = `${dateLabel} ${begin} - ${end}`;
   return <ApplicationInfo heading={name ?? ""} text={text} variant="vertical" infos={icons} />;
 }

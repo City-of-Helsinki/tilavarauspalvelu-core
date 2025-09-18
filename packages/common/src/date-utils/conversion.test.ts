@@ -1,59 +1,22 @@
 import { describe, expect, it, test } from "vitest";
 import {
-  toApiDate,
-  toApiDateUnsafe,
-  fromApiDate,
-  fromUIDate,
-  fromUIDateUnsafe,
-  toApiTime,
-  toApiTimeUnsafe,
+  parseApiDate,
+  parseUIDate,
+  parseUIDateUnsafe,
   dateForInput,
   timeForInput,
   isValidDate,
   dateToMinutes,
   minutesToHoursString,
   timeToMinutes,
-  toMondayFirst,
-  fromMondayFirst,
+  setMondayFirst,
+  setSundayFirst,
 } from "./conversion";
 
 describe("conversion", () => {
-  describe("toApiDate", () => {
-    it("converts valid Date to API format", () => {
-      const date = new Date("2023-12-25T15:30:00");
-      expect(toApiDate(date)).toBe("2023-12-25");
-    });
-
-    it("handles null date", () => {
-      expect(toApiDate(null as unknown as Date)).toBeNull();
-    });
-
-    it("handles invalid date", () => {
-      const invalidDate = new Date("invalid");
-      expect(toApiDate(invalidDate)).toBeNull();
-    });
-
-    it("handles very old dates", () => {
-      const oldDate = new Date("999-01-01");
-      expect(toApiDate(oldDate)).toBeNull();
-    });
-  });
-
-  describe("toApiDateUnsafe", () => {
-    it("converts valid Date to API format", () => {
-      const date = new Date("2023-12-25T15:30:00");
-      expect(toApiDateUnsafe(date)).toBe("2023-12-25");
-    });
-
-    it("throws on invalid date", () => {
-      const invalidDate = new Date("invalid");
-      expect(() => toApiDateUnsafe(invalidDate)).toThrow("Invalid date:");
-    });
-  });
-
   describe("fromApiDate", () => {
     it("parses valid API date string", () => {
-      const result = fromApiDate("2023-12-25");
+      const result = parseApiDate("2023-12-25");
       expect(result).toBeInstanceOf(Date);
       expect(result?.getFullYear()).toBe(2023);
       expect(result?.getMonth()).toBe(11); // December is month 11
@@ -61,21 +24,21 @@ describe("conversion", () => {
     });
 
     it("handles empty string", () => {
-      expect(fromApiDate("")).toBeNull();
+      expect(parseApiDate("")).toBeNull();
     });
 
     it("handles invalid date string", () => {
-      expect(fromApiDate("invalid-date")).toBeNull();
+      expect(parseApiDate("invalid-date")).toBeNull();
     });
 
     it("handles malformed date string", () => {
-      expect(fromApiDate("2023-13-45")).toBeNull();
+      expect(parseApiDate("2023-13-45")).toBeNull();
     });
   });
 
   describe("fromUIDate", () => {
     it("parses valid UI date string", () => {
-      const result = fromUIDate("25.12.2023");
+      const result = parseUIDate("25.12.2023");
       expect(result).toBeInstanceOf(Date);
       expect(result?.getFullYear()).toBe(2023);
       expect(result?.getMonth()).toBe(11);
@@ -83,69 +46,27 @@ describe("conversion", () => {
     });
 
     it("handles empty string", () => {
-      expect(fromUIDate("")).toBeNull();
+      expect(parseUIDate("")).toBeNull();
     });
 
     it("handles invalid date string", () => {
-      expect(fromUIDate("invalid-date")).toBeNull();
+      expect(parseUIDate("invalid-date")).toBeNull();
     });
 
     it("handles malformed date string", () => {
-      expect(fromUIDate("45.13.2023")).toBeNull();
+      expect(parseUIDate("45.13.2023")).toBeNull();
     });
   });
 
   describe("fromUIDateUnsafe", () => {
     it("parses valid UI date string", () => {
-      const result = fromUIDateUnsafe("25.12.2023");
+      const result = parseUIDateUnsafe("25.12.2023");
       expect(result).toBeInstanceOf(Date);
       expect(result.getFullYear()).toBe(2023);
     });
 
     it("throws on invalid date", () => {
-      expect(() => fromUIDateUnsafe("invalid")).toThrow("Invalid date:");
-    });
-  });
-
-  describe("toApiTime", () => {
-    it("converts valid time to API format", () => {
-      expect(toApiTime(15, 30)).toBe("15:30");
-    });
-
-    it("pads single digits", () => {
-      expect(toApiTime(9, 5)).toBe("09:05");
-    });
-
-    it("defaults minutes to 0", () => {
-      expect(toApiTime(15)).toBe("15:00");
-    });
-
-    it("handles 24:00 as 00:00", () => {
-      expect(toApiTime(24, 0)).toBe("00:00");
-    });
-
-    it("rejects invalid hours", () => {
-      expect(toApiTime(-1)).toBeNull();
-      expect(toApiTime(25)).toBeNull();
-    });
-
-    it("rejects invalid minutes", () => {
-      expect(toApiTime(15, -1)).toBeNull();
-      expect(toApiTime(15, 60)).toBeNull();
-    });
-
-    it("rejects 24:xx with minutes", () => {
-      expect(toApiTime(24, 30)).toBeNull();
-    });
-  });
-
-  describe("toApiTimeUnsafe", () => {
-    it("converts valid time to API format", () => {
-      expect(toApiTimeUnsafe(15, 30)).toBe("15:30");
-    });
-
-    it("throws on invalid time", () => {
-      expect(() => toApiTimeUnsafe(-1)).toThrow("Invalid time:");
+      expect(() => parseUIDateUnsafe("invalid")).toThrow("Invalid date:");
     });
   });
 
@@ -297,25 +218,25 @@ describe("conversion", () => {
 
   describe("Start of week conversions", () => {
     it("handles input 0 correctly to Monday first", () => {
-      expect(toMondayFirst(0)).toBe(6);
+      expect(setMondayFirst(0)).toBe(6);
     });
     it("handles input 0 correctly to Sunday first", () => {
-      expect(fromMondayFirst(0)).toBe(1);
+      expect(setSundayFirst(0)).toBe(1);
     });
 
     it("handles input 3 correctly to Monday first", () => {
-      expect(toMondayFirst(3)).toBe(2);
+      expect(setMondayFirst(3)).toBe(2);
     });
     it("handles input 0 correctly to Sunday first", () => {
-      expect(fromMondayFirst(3)).toBe(4);
+      expect(setSundayFirst(3)).toBe(4);
     });
 
     it("handles input 6 correctly to Monday first", () => {
-      expect(toMondayFirst(6)).toBe(5);
+      expect(setMondayFirst(6)).toBe(5);
     });
 
     it("handles input 0 correctly to Sunday first", () => {
-      expect(fromMondayFirst(6)).toBe(0);
+      expect(setSundayFirst(6)).toBe(0);
     });
   });
 });

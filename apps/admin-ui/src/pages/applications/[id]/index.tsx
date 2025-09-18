@@ -23,7 +23,7 @@ import {
   useRestoreAllSectionOptionsMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { formatDateRange, formatDateTime, formatDuration, toValidDateObject } from "common/src/date-utils";
+import { formatDateRange, formatDateTime, formatDuration, parseValidDateObject } from "common/src/date-utils";
 import { ApplicationTimePreview } from "common/src/components/ApplicationTimePreview";
 import { formatAgeGroups, formatNumber } from "@/common/util";
 import { ScrollIntoView } from "@/component/ScrollIntoView";
@@ -395,8 +395,8 @@ function ApplicationSectionDetails({
   const hash = section.pk?.toString() ?? "";
   const heading = `${application.pk ?? "-"}-${section.pk ?? "-"} ${section.name}`;
 
-  const beginDate = toValidDateObject(section.reservationsBeginDate);
-  const endDate = toValidDateObject(section.reservationsEndDate);
+  const beginDate = parseValidDateObject(section.reservationsBeginDate);
+  const endDate = parseValidDateObject(section.reservationsEndDate);
   const dates = formatDateRange(beginDate, endDate);
 
   return (
@@ -624,7 +624,7 @@ export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | nu
         </TitleSection>
         <PreCard>
           {t("application:applicationReceivedTime")},{" "}
-          {formatDateTime(toValidDateObject(application?.updatedAt), {
+          {formatDateTime(parseValidDateObject(application?.updatedAt), {
             includeWeekday: false,
             includeTimeSeparator: false,
           })}

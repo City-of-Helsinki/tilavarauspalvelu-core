@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { IconClock, IconSize } from "hds-react";
 import { isPast, isFuture, isToday } from "date-fns";
 import { useTranslation } from "next-i18next";
-import { formatDate, toValidDateObject } from "common/src/date-utils";
+import { formatDate, parseValidDateObject } from "common/src/date-utils";
 
 interface IProps {
   applicationPeriodBeginsAt?: string;
@@ -32,23 +32,23 @@ export function TimeframeStatus({
   let message = "";
   if (isResolved) {
     message = t("applicationRound:resolutionDate", {
-      date: resolutionDate ? formatDate(toValidDateObject(resolutionDate)) : "",
+      date: resolutionDate ? formatDate(parseValidDateObject(resolutionDate)) : "",
     });
   } else if (isPast(dateBegin) && isFuture(dateEnd)) {
     message = t("application:timeframeCurrent", {
-      date: formatDate(toValidDateObject(applicationPeriodEndsAt)),
+      date: formatDate(parseValidDateObject(applicationPeriodEndsAt)),
     });
   } else if (isToday(dateEnd)) {
     message = `${t("application:timeframePast", {
-      date: formatDate(toValidDateObject(applicationPeriodEndsAt)),
+      date: formatDate(parseValidDateObject(applicationPeriodEndsAt)),
     })} (${t("common:today")})`;
   } else if (isPast(dateEnd)) {
     message = t("application:timeframePast", {
-      date: formatDate(toValidDateObject(applicationPeriodEndsAt)),
+      date: formatDate(parseValidDateObject(applicationPeriodEndsAt)),
     });
   } else if (isFuture(dateBegin)) {
     message = t("application:timeframeFuture", {
-      date: formatDate(toValidDateObject(applicationPeriodBeginsAt)),
+      date: formatDate(parseValidDateObject(applicationPeriodBeginsAt)),
     });
   }
 

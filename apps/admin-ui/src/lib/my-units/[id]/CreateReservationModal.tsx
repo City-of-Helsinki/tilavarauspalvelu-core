@@ -26,7 +26,7 @@ import { CenterSpinner, Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useCheckCollisions } from "@/hooks";
 import { getBufferTime, getNormalizedInterval } from "@/helpers";
-import { dateTimeToISOString, fromUIDateTimeUnsafe, formatDate, formatTime } from "common/src/date-utils";
+import { parseISODateTime, fromUIDateTimeUnsafe, formatDate, formatTime } from "common/src/date-utils";
 import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
@@ -140,8 +140,8 @@ export function CreateReservationModal({
         ...rest,
         reservationUnit: reservationUnit.pk,
         type,
-        beginsAt: dateTimeToISOString(date, startTime) || new Date().toISOString(),
-        endsAt: dateTimeToISOString(date, endTime) || new Date().toISOString(),
+        beginsAt: parseISODateTime(date, startTime) || new Date().toISOString(),
+        endsAt: parseISODateTime(date, endTime) || new Date().toISOString(),
         bufferTimeBefore: bufferBefore,
         bufferTimeAfter: bufferAfter,
         workingMemo: comments,
