@@ -17,9 +17,9 @@ import {
   useUpdateReservationMutation,
 } from "@gql/gql-types";
 import {
+  FormFieldArray,
   getFilteredGeneralFields,
   getFilteredReserveeFields,
-  type ExtendedFormFieldArray,
   getReservationFormGeneralFields,
 } from "common/src/reservation-form/util";
 import { getReservationFormSchema, type ReservationFormValueT } from "common/src/schemas";
@@ -269,7 +269,7 @@ const MandatoryFieldsInfoText = styled.p`
 
 interface ReservationFormProps<T extends FieldValues> {
   reservation: ReservationInProgressFragment;
-  reserveeFields: ExtendedFormFieldArray;
+  reserveeFields: FormFieldArray;
   options: Readonly<Omit<OptionsRecord, "municipalities">>;
   form: UseFormReturn<T>;
   onSubventionButtonClick: () => void;

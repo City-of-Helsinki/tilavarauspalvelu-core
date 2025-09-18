@@ -8,6 +8,7 @@ import { type TFunction } from "next-i18next";
 import { type OptionsRecord } from "../../types/common";
 import { ReservationFormValueT } from "../schemas";
 import { FieldError } from "react-hook-form";
+import { filterEmptyString } from "../helpers";
 
 /* NOTE: backend returns validation errors if text fields are too long
  * remove maxlength after adding proper schema validation
@@ -98,26 +99,6 @@ export function extendMetaFieldOptions(options: Omit<OptionsRecord, "municipalit
 // used to inject frontend only boolean toggle into the FormFields
 export type FormField = keyof Omit<ReservationFormFieldsFragment, "id" | "reservationUnit">;
 export type FormFieldArray = ReadonlyArray<FormField>;
-export type ExtendedFormField = FormField | "reserveeIsUnregisteredAssociation";
-export type ExtendedFormFieldArray = ReadonlyArray<ExtendedFormField>;
-
-function extendReserverFields(fields: FormFieldArray): ExtendedFormField[] {
-  const key = "reserveeIdentifier" as const;
-  const identifierIndex = fields.findIndex((k) => k === key);
-  if (identifierIndex > 0) {
-    const afterIdentifier = identifierIndex + 1;
-    const shouldInsertMiddle = afterIdentifier < fields.length;
-    if (shouldInsertMiddle) {
-      return [
-        ...fields.slice(0, afterIdentifier),
-        "reserveeIsUnregisteredAssociation",
-        ...fields.slice(afterIdentifier),
-      ];
-    }
-    return [...fields, "reserveeIsUnregisteredAssociation"];
-  }
-  return [...fields];
-}
 
 export function getReservationFormReserveeFields({ reserveeType }: { reserveeType: ReserveeType }) {
   return RESERVATION_FIELDS[convertTypeToKey(reserveeType)];
@@ -134,14 +115,14 @@ export function getFilteredReserveeFields({
   formType: ReservationFormType;
   reservation: ReservationFormFieldsFragment;
   reserveeType: ReserveeType;
-}>): ExtendedFormFieldArray {
+}>): FormFieldArray {
   const fields = getReservationFormFields({
     formType,
     reserveeType,
   });
 
   const baseFields = fields.filter((key): key is FormField => key in reservation);
-  return extendReserverFields(baseFields);
+  return baseFields;
 }
 
 /// Helper function to type safely pick the general fields from the reservation
@@ -240,7 +221,7 @@ export function translateReserveeFormError(
   }
   */
 
-  return error.message;
+  return filterEmptyString(error.message);
 }
 
 export function constructReservationFieldId(field: keyof ReservationFormValueT) {

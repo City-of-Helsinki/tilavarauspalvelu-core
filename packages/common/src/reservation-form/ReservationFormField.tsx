@@ -2,10 +2,8 @@ import React from "react";
 import { useFormContext, type UseFormRegister } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { ReserveeType } from "../../gql/gql-types";
-import { ControlledCheckbox } from "../components/form";
 import { type ReservationFormValueT } from "../schemas";
-import { filterEmptyString } from "../helpers";
-import { StyledCheckboxWrapper, StyledTextInput } from "./styled";
+import { StyledTextInput } from "./styled";
 import {
   constructReservationFieldId,
   constructReservationFieldLabel,
@@ -25,43 +23,28 @@ export function ReservationFormField({ field, reserveeType }: Props): React.Reac
   const {
     watch,
     register,
-    control,
     formState: { errors },
   } = useFormContext<ReservationFormValueT>();
 
   const label = constructReservationFieldLabel(t, reserveeType, field);
-  const errorText = filterEmptyString(translateReserveeFormError(t, label, errors[`${field}`]));
-  const id = constructReservationFieldId(field);
+  const errorText = translateReserveeFormError(t, label, errors[`${field}`]);
 
   switch (field) {
-    case "reserveeIsUnregisteredAssociation":
-      if (watch("reserveeType") !== ReserveeType.Nonprofit) {
-        return null;
-      }
-      return (
-        <StyledCheckboxWrapper key={field}>
-          <ControlledCheckbox id={id} name={field} control={control} label={label} error={errorText} />
-        </StyledCheckboxWrapper>
-      );
     case "reserveeIdentifier": {
-      const shouldHideOrganisationIdentifier =
+      const disabled =
         watch("reserveeType") === ReserveeType.Nonprofit && watch("reserveeIsUnregisteredAssociation") === true;
 
       return (
-        <StyledTextInput
+        <ReservationTextInput
           label={label}
-          id={id}
-          {...register(field)}
-          key={field}
-          type="text"
+          name={field}
+          register={register}
           errorText={errorText}
-          invalid={errorText != null}
-          required={!shouldHideOrganisationIdentifier}
-          maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
-          disabled={shouldHideOrganisationIdentifier}
+          disabled={disabled}
         />
       );
     }
+    case "reserveeIsUnregisteredAssociation":
     case "municipality":
     case "numPersons":
     case "description":
@@ -74,54 +57,44 @@ export function ReservationFormField({ field, reserveeType }: Props): React.Reac
     case "reserveeType":
       return null;
     case "reserveeEmail":
-      return <EmailInput label={label} field={field} register={register} errorText={errorText} id={id} />;
+      return <ReservationTextInput label={label} name={field} register={register} errorText={errorText} isEmail />;
     case "reserveePhone":
     case "reserveeLastName":
     case "reserveeFirstName":
     case "reserveeOrganisationName": {
-      return (
-        <StyledTextInput
-          label={label}
-          id={id}
-          {...register(field)}
-          key={field}
-          type="text"
-          errorText={errorText}
-          invalid={errorText != null}
-          required
-          maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
-        />
-      );
+      return <ReservationTextInput label={label} name={field} register={register} errorText={errorText} />;
     }
   }
 }
 
-function EmailInput({
-  id,
+function ReservationTextInput({
   label,
-  field,
+  name,
   register,
   errorText,
+  isEmail,
+  disabled,
 }: {
-  id: string;
   label: string;
-  field: keyof ReservationFormValueT;
+  name: keyof ReservationFormValueT;
   register: UseFormRegister<ReservationFormValueT>;
   errorText?: string;
+  isEmail?: boolean;
+  disabled?: boolean;
 }): React.ReactElement {
-  const isEmailField = true;
+  const id = constructReservationFieldId(name);
   return (
     <StyledTextInput
       label={label}
       id={id}
-      {...register(field)}
-      key={field}
+      {...register(name)}
       type="text"
       errorText={errorText}
       invalid={errorText != null}
-      required
+      required={!disabled}
+      disabled={disabled}
       // email field is special and has one less character than the rest
-      maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH - (isEmailField ? 1 : 0)}
+      maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH - (isEmail ? 1 : 0)}
     />
   );
 }

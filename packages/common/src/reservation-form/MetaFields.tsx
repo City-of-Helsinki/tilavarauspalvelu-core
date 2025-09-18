@@ -10,7 +10,7 @@ import { type OptionsRecord } from "../../types/common";
 import {
   constructReservationFieldId,
   constructReservationFieldLabel,
-  type ExtendedFormFieldArray,
+  type FormFieldArray,
   extendMetaFieldOptions,
   formContainsField,
   RESERVATION_FIELD_MAX_TEXT_LENGTH,
@@ -18,11 +18,11 @@ import {
 } from "./util";
 import { CustomerTypeSelector } from "./CustomerTypeSelector";
 import { type ReservationFormValueT } from "../schemas";
-import { ControlledNumberInput, ControlledSelect } from "../components/form";
-import { StyledTextArea, StyledTextInput } from "./styled";
+import { ControlledCheckbox, ControlledNumberInput, ControlledSelect } from "../components/form";
+import { StyledCheckboxWrapper, StyledTextArea, StyledTextInput } from "./styled";
 
 interface CommonWithFields {
-  fields: ExtendedFormFieldArray;
+  fields: FormFieldArray;
   options: Readonly<Omit<OptionsRecord, "municipalities">>;
 }
 
@@ -93,7 +93,7 @@ export function ReservationFormGeneralSection({
       <Subheading>{t("reservationCalendar:reservationInfo")}</Subheading>
       {hasName && (
         <StyledTextInput
-          id={constructReservationFieldId("purpose")}
+          id={constructReservationFieldId("name")}
           label={createLabel("name")}
           {...register("name")}
           type="text"
@@ -192,9 +192,7 @@ export function ReservationFormReserveeSection({
 
   const options = extendMetaFieldOptions(originalOptions, t);
 
-  const organisationFields = fields.filter(
-    (x) => x === "reserveeOrganisationName" || x === "reserveeIdentifier" || x === "reserveeIsUnregisteredAssociation"
-  );
+  const organisationFields = fields.filter((x) => x === "reserveeOrganisationName" || x === "reserveeIdentifier");
   const otherFields = fields.filter((x) => organisationFields.find((b) => b === x) == null);
 
   return (
@@ -210,27 +208,37 @@ export function ReservationFormReserveeSection({
       ) : null}
       {/* TODO should have the organisation name on the first line */}
       {/* TODO propably best to separate the organisation part of the form to it's own section */}
-      {reserveeType != null && reserveeType !== ReserveeType.Individual && (
-        <ControlledSelect
-          name="municipality"
-          id={constructReservationFieldId("municipality")}
-          label={createLabel("municipality")}
-          error={getFieldError("municipality")}
-          control={control}
-          required
-          options={options.municipalities}
-          strongLabel
-        />
-      )}
-      {reserveeType !== ReserveeType.Individual &&
-        organisationFields.map((field) => (
-          <Fragment key={`key-${field}-container`}>
-            <ReservationFormField field={field} reserveeType={reserveeType} />
-          </Fragment>
-        ))}
-      {reserveeType !== ReserveeType.Individual && (
-        <GroupHeading>{t("reservationApplication:label.headings.contactInfo")}</GroupHeading>
-      )}
+      {reserveeType != null && reserveeType !== ReserveeType.Individual ? (
+        <>
+          <ControlledSelect
+            name="municipality"
+            id={constructReservationFieldId("municipality")}
+            label={createLabel("municipality")}
+            error={getFieldError("municipality")}
+            control={control}
+            required
+            options={options.municipalities}
+            strongLabel
+          />
+          {organisationFields.map((field) => (
+            <Fragment key={`key-${field}-container`}>
+              <ReservationFormField field={field} reserveeType={reserveeType} />
+            </Fragment>
+          ))}
+          {reserveeType === ReserveeType.Nonprofit && (
+            <StyledCheckboxWrapper>
+              <ControlledCheckbox
+                name="reserveeIsUnregisteredAssociation"
+                id={constructReservationFieldId("reserveeIsUnregisteredAssociation")}
+                control={control}
+                label={createLabel("reserveeIsUnregisteredAssociation")}
+                error={getFieldError("reserveeIsUnregisteredAssociation")}
+              />
+            </StyledCheckboxWrapper>
+          )}
+          <GroupHeading>{t("reservationApplication:label.headings.contactInfo")}</GroupHeading>
+        </>
+      ) : null}
       {otherFields.map((field) => (
         <Fragment key={`key-${field}-container`}>
           <ReservationFormField field={field} reserveeType={reserveeType} />
