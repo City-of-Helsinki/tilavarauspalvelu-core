@@ -1638,9 +1638,9 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         ext_uuid="d2c6c5c3-6024-4ff1-9275-73a4025501e9",
         #
         # Strings
-        name="Alennuskelpoinen aula (AUTOMAATIOTESTI  ÄLÄ POISTA)",
-        name_en="Alennuskelpoinen aula (AUTOMAATIOTESTI  ÄLÄ POISTA) en",
-        name_sv="Alennuskelpoinen aula (AUTOMAATIOTESTI  ÄLÄ POISTA) sv",
+        name="Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA) en",
+        name_sv="Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
         description=(
             "Käytä tätä varausyksikköä, kun haluan varata joko maksullisen tilan tai hakea hinnan alennusta. "
             "Alennusta haettaessa varaus siirtyy aina käsittelyyn. "
