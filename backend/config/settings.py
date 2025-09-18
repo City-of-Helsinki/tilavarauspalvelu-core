@@ -506,7 +506,6 @@ class Common(Environment):
     UNSAFE_SKIP_IAT_CLAIM_VALIDATION = False
     UPDATE_RESERVATION_UNIT_THUMBNAILS = True
     DOWNLOAD_IMAGES_FOR_TEST_DATA = True
-    FRONTEND_TESTING_API_ENABLED = False
     PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED = values.BooleanValue(default=False)
 
     PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
@@ -674,7 +673,6 @@ class Local(Common, overrides_from=LocalMixin):
     SAVE_RESERVATION_STATISTICS = values.BooleanValue(default=True)
     REBUILD_SPACE_HIERARCHY = values.BooleanValue(default=True)
     RAISE_ERROR_ON_REFRESH_FAILURE = True
-    FRONTEND_TESTING_API_ENABLED = values.BooleanValue(default=True)
 
     EMAIL_VARAAMO_EXT_LINK = "https://fake.local.varaamo.hel.fi"
     EMAIL_FEEDBACK_EXT_LINK = "https://fake.local.varaamo.hel.fi/feedback"
@@ -729,7 +727,6 @@ class Docker(Common, overrides_from=DockerMixin):
     EXPORT_AUTHORIZATION_TOKEN = values.StringValue(default="")  # nosec # NOSONAR
     ROBOT_TEST_DATA_TOKEN = values.StringValue(default="")  # nosec # NOSONAR
     RAISE_ERROR_ON_REFRESH_FAILURE = True
-    FRONTEND_TESTING_API_ENABLED = values.BooleanValue(default=True)
 
     EMAIL_VARAAMO_EXT_LINK = "https://fake.local.varaamo.hel.fi"
     EMAIL_FEEDBACK_EXT_LINK = "https://fake.local.varaamo.hel.fi/feedback"
@@ -873,8 +870,6 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     SAVE_RESERVATION_STATISTICS = False
     # Always re-raise silenced Sentry errors during testing for better debugging
     SENTRY_LOGGER_ALWAYS_RE_RAISE = True
-    # Enable frontend testing API for testing
-    FRONTEND_TESTING_API_ENABLED = True
     # Enable feature flag for testing
     PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED = True
     # Enable NowTT for testing
