@@ -1137,14 +1137,14 @@ typing-extensions = "*"
 
 [[package]]
 name = "django-subforms"
-version = "0.4.0"
+version = "0.4.1"
 description = "Wrap django forms as fields and fields as dynamic arrays."
 optional = false
 python-versions = "<4,>=3.11"
 groups = ["admin"]
 files = [
-    {file = "django_subforms-0.4.0-py3-none-any.whl", hash = "sha256:6eada7902916c5ee806a1cc3c98eea72d6188b64eb69496e12ff5c3d2b3f9f83"},
-    {file = "django_subforms-0.4.0.tar.gz", hash = "sha256:7fda1ab49d824c6ffd51703f7146dbc48eb0279521192463637d3b558182f634"},
+    {file = "django_subforms-0.4.1-py3-none-any.whl", hash = "sha256:8f36a0e7f093fd65c40098f6de79e57fdea1b922995fcb8845b2e88e8c077492"},
+    {file = "django_subforms-0.4.1.tar.gz", hash = "sha256:7eda9bb0f150f9148e016b8268bb46df87b9941d8c8e5922cbb76352d5b9866d"},
 ]
 
 [package.dependencies]
@@ -3451,4 +3451,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "2a9af9048061c2c90c467bb489b7ab400c64561cdde4b3b5feaf76e2e559b229"
+content-hash = "b0ac5b359ef22c77c27003d3216984d32e6df2f63129de49270eb760e230974a"
