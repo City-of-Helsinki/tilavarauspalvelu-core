@@ -33,7 +33,7 @@ import {
   getSlotPropGetter,
   isRangeReservable,
 } from "@/modules/reservable";
-import { formatDuration, formatTime, fromUIDate, toApiDate, formatDate } from "common/src/date-utils";
+import { formatDuration, formatTime, parseUIDate, formatApiDate, formatDate } from "common/src/date-utils";
 import { useTranslation } from "next-i18next";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
 import { type UseFormReturn } from "react-hook-form";
@@ -191,7 +191,7 @@ export function ReservationTimePicker({
   const dateValue = watch("date");
 
   const now = useMemo(() => new Date(), []);
-  const focusDate = fromUIDate(dateValue) ?? new Date();
+  const focusDate = parseUIDate(dateValue) ?? new Date();
 
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   useEffect(() => {
@@ -333,7 +333,7 @@ export function ReservationTimePicker({
     fetchPolicy: "no-cache",
     skip: !currentUser || !reservationUnit.pk,
     variables: {
-      beginDate: toApiDate(now),
+      beginDate: formatApiDate(now),
       user: currentUser?.pk ?? 0,
       reservationUnits: [reservationUnit.pk ?? 0],
       state: RELATED_RESERVATION_STATES,

@@ -8,7 +8,7 @@ import {
 import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { ReservationsTable } from "./ReservationsTable";
-import { fromUIDate, toApiDate } from "common/src/date-utils";
+import { parseUIDate, formatApiDate } from "common/src/date-utils";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { CenterSpinner } from "common/styled";
@@ -36,20 +36,20 @@ function mapFilterParams(searchParams: ReadonlyURLSearchParams): ReservationList
   } = getFilterSearchParams({ searchParams });
 
   const uiDateBegin = dateGteFilter;
-  const dateBegin = uiDateBegin ? (fromUIDate(uiDateBegin) ?? undefined) : undefined;
-  const beginDate = dateBegin ? (toApiDate(dateBegin) ?? undefined) : undefined;
+  const dateBegin = uiDateBegin ? (parseUIDate(uiDateBegin) ?? undefined) : undefined;
+  const beginDate = dateBegin ? (formatApiDate(dateBegin) ?? undefined) : undefined;
 
   const uiDateEnd = dateLteFilter;
-  const dateEnd = uiDateEnd ? (fromUIDate(uiDateEnd) ?? undefined) : undefined;
-  const endDate = dateEnd ? (toApiDate(dateEnd) ?? undefined) : undefined;
+  const dateEnd = uiDateEnd ? (parseUIDate(uiDateEnd) ?? undefined) : undefined;
+  const endDate = dateEnd ? (formatApiDate(dateEnd) ?? undefined) : undefined;
 
   const uiCreatedBegin = createdAtGteFilter;
-  const createdBegin = uiCreatedBegin ? (fromUIDate(uiCreatedBegin) ?? undefined) : undefined;
-  const createdAtGte = createdBegin ? (toApiDate(createdBegin) ?? undefined) : undefined;
+  const createdBegin = uiCreatedBegin ? (parseUIDate(uiCreatedBegin) ?? undefined) : undefined;
+  const createdAtGte = createdBegin ? (formatApiDate(createdBegin) ?? undefined) : undefined;
 
   const uiCreatedEnd = createdAtLteFilter;
-  const createdEnd = uiCreatedEnd ? (fromUIDate(uiCreatedEnd) ?? undefined) : undefined;
-  const createdAtLte = createdEnd ? (toApiDate(createdEnd) ?? undefined) : undefined;
+  const createdEnd = uiCreatedEnd ? (parseUIDate(uiCreatedEnd) ?? undefined) : undefined;
+  const createdAtLte = createdEnd ? (formatApiDate(createdEnd) ?? undefined) : undefined;
 
   let isRecurring: boolean | undefined = undefined;
   if (recurringFilter === "only") {

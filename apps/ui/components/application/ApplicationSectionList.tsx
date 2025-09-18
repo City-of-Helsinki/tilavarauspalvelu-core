@@ -15,7 +15,7 @@ import StatusLabel from "common/src/components/StatusLabel";
 import type { StatusLabelType } from "common/src/tags";
 import { NoWrap } from "common/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
-import { formatDurationRange, formatDate, fromMondayFirst } from "common/src/date-utils";
+import { formatDurationRange, formatDate, setMondayFirst } from "common/src/date-utils";
 import {
   ApplicationInfoContainer,
   ApplicationSection,
@@ -202,7 +202,7 @@ function Weekdays({ primary, secondary }: { primary: SchedulesT[]; secondary: Sc
     <>
       {WEEKDAYS.map((day) => (
         <ScheduleDay key={day}>
-          <span>{t(`common:weekDay.${fromMondayFirst(day)}`)}</span>
+          <span>{t(`common:weekDay.${setMondayFirst(day)}`)}</span>
           <span>{formatDayTimes(primary, day) || "-"}</span>
           <span>{formatDayTimes(secondary, day) ? `(${formatDayTimes(secondary, day)})` : "-"}</span>
         </ScheduleDay>

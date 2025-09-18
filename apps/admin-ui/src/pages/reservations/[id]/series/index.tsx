@@ -32,12 +32,12 @@ import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonSize, Notification } from "hds-react";
 import {
-  fromApiDate,
+  parseApiDate,
   fromApiDateTime,
-  fromUIDate,
+  parseUIDate,
   formatDate,
-  fromUIDateUnsafe,
-  toApiDateUnsafe,
+  parseUIDateUnsafe,
+  formatApiDateUnsafe,
   formatTime,
 } from "common/src/date-utils";
 import { ControlledDateInput, TimeInput } from "common/src/components/form";
@@ -75,8 +75,8 @@ function convertToForm(value: NodeT): RescheduleReservationSeriesForm {
   const end = fromApiDateTime(value?.endDate, value?.endTime);
 
   return {
-    startingDate: value?.beginDate != null ? formatDate(fromApiDate(value.beginDate)) : "",
-    endingDate: value?.endDate != null ? formatDate(fromApiDate(value.endDate)) : "",
+    startingDate: value?.beginDate != null ? formatDate(parseApiDate(value.beginDate)) : "",
+    endingDate: value?.endDate != null ? formatDate(parseApiDate(value.endDate)) : "",
     startTime: begin ? formatTime(begin) : "",
     endTime: end ? formatTime(end) : "",
     repeatOnDays: filterNonNullable(value?.weekdays),
@@ -183,8 +183,8 @@ function SeriesPageInner({ pk }: { pk: number }) {
   const checkedReservations = useFilteredReservationList({
     items: newReservations,
     reservationUnitPk: reservationUnit?.pk ?? 0,
-    begin: fromUIDate(watch("startingDate")) ?? new Date(),
-    end: fromUIDate(watch("endingDate")) ?? new Date(),
+    begin: parseUIDate(watch("startingDate")) ?? new Date(),
+    end: parseUIDate(watch("endingDate")) ?? new Date(),
     startTime: watch("startTime"),
     endTime: watch("endTime"),
     reservationType: reservation?.type ?? ReservationTypeChoice.Staff,
@@ -227,14 +227,14 @@ function SeriesPageInner({ pk }: { pk: number }) {
     try {
       const input: ReservationSeriesRescheduleMutationInput = {
         pk: reservationSeries.pk,
-        beginDate: toApiDateUnsafe(fromUIDateUnsafe(values.startingDate)),
+        beginDate: formatApiDateUnsafe(parseUIDateUnsafe(values.startingDate)),
         beginTime: values.startTime,
-        endDate: toApiDateUnsafe(fromUIDateUnsafe(values.endingDate)),
+        endDate: formatApiDateUnsafe(parseUIDateUnsafe(values.endingDate)),
         endTime: values.endTime,
         weekdays: values.repeatOnDays,
         bufferTimeBefore: bufferTimeBefore.toString(),
         bufferTimeAfter: bufferTimeAfter.toString(),
-        skipDates: skipDates.map((x) => toApiDateUnsafe(x)),
+        skipDates: skipDates.map((x) => formatApiDateUnsafe(x)),
       };
       const mutRes = await mutate({ variables: { input } });
       if (mutRes.data?.rescheduleReservationSeries?.pk == null) {

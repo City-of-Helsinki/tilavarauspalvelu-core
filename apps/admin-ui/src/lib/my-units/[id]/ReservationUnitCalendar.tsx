@@ -1,5 +1,5 @@
 import React from "react";
-import { toApiDate } from "common/src/date-utils";
+import { formatApiDate } from "common/src/date-utils";
 import CommonCalendar from "common/src/calendar/Calendar";
 import { get } from "lodash-es";
 import { addDays, endOfISOWeek, startOfISOWeek } from "date-fns";
@@ -87,8 +87,8 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
       id: createNodeId("ReservationUnitNode", reservationUnitPk),
       pk: reservationUnitPk,
       state: RELATED_RESERVATION_STATES,
-      beginDate: toApiDate(startOfISOWeek(beginDate)) ?? "",
-      endDate: toApiDate(addDays(endOfISOWeek(beginDate), 1)) ?? "",
+      beginDate: formatApiDate(startOfISOWeek(beginDate)) ?? "",
+      endDate: formatApiDate(addDays(endOfISOWeek(beginDate), 1)) ?? "",
     },
     onError: () => {
       errorToast({

@@ -3,7 +3,7 @@ import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Button, ButtonVariant, IconAngleDown, IconAngleUp, IconCross, IconSize } from "hds-react";
 import { maxBy } from "lodash-es";
-import { fromUIDate, formatDateTimeRange } from "common/src/date-utils";
+import { parseUIDate, formatDateTimeRange } from "common/src/date-utils";
 import { Transition } from "react-transition-group";
 import { Flex, fontBold, fontMedium, fontRegular, SemiBold } from "common/styled";
 import { breakpoints } from "common/src/const";
@@ -133,7 +133,7 @@ export function ReservationCalendarControls({
   const { control, watch, handleSubmit } = reservationForm;
   const formDate = watch("date");
   const formDuration = watch("duration");
-  const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
+  const dateValue = useMemo(() => parseUIDate(formDate ?? ""), [formDate]);
 
   const duration = !Number.isNaN(Number(formDuration)) ? formDuration : (reservationUnit.minReservationDuration ?? 0);
 

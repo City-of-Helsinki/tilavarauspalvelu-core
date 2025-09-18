@@ -21,7 +21,7 @@ import { getIntervalMinutes } from "common/src/conversion";
 import { type TFunction } from "i18next";
 import { type ReservableMap, type RoundPeriod, isRangeReservable } from "./reservable";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
-import { formatTime, fromUIDate, isValidDate, timeToMinutes, formatDate } from "common/src/date-utils";
+import { formatTime, parseUIDate, isValidDate, timeToMinutes, formatDate } from "common/src/date-utils";
 import { gql } from "@apollo/client";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
 
@@ -349,7 +349,7 @@ export function convertFormToFocustimeSlot({
     .split(":")
     .map(Number)
     .filter((n) => Number.isFinite(n));
-  const maybeDate = fromUIDate(data.date);
+  const maybeDate = parseUIDate(data.date);
   let start: Date | null = null;
   if (maybeDate != null && isValidDate(maybeDate)) {
     start = set(maybeDate, { hours, minutes });
@@ -382,7 +382,7 @@ export function convertFormToFocustimeSlot({
 
 export function createDateTime(date: string, time: string): Date {
   const minutes = timeToMinutes(time);
-  const maybeDate = fromUIDate(date);
+  const maybeDate = parseUIDate(date);
   if (maybeDate != null && isValidDate(maybeDate)) {
     return set(maybeDate, { minutes });
   }
@@ -394,7 +394,7 @@ export function convertReservationFormToApi(
   formValues: PendingReservationFormType
 ): { beginsAt: string; endsAt: string } | null {
   const time = formValues.time;
-  const date = fromUIDate(formValues.date);
+  const date = parseUIDate(formValues.date);
   const duration = formValues.duration;
   if (date == null || time === "" || duration === 0) {
     return null;

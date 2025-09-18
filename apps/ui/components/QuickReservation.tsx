@@ -3,7 +3,7 @@ import { Button } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { chunkArray } from "common/src/common/util";
-import { fromUIDate, formatDate } from "common/src/date-utils";
+import { parseUIDate, formatDate } from "common/src/date-utils";
 import { Flex, fontMedium, H4, NoWrap } from "common/styled";
 import { breakpoints } from "common/src/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
@@ -135,7 +135,7 @@ export function QuickReservation({
   const { t } = useTranslation();
   const { control, watch, handleSubmit } = reservationForm;
   const formDate = watch("date");
-  const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
+  const dateValue = useMemo(() => parseUIDate(formDate ?? ""), [formDate]);
   const duration = watch("duration");
 
   const isFreeOfCharge = isReservationUnitFreeOfCharge(reservationUnit?.pricings ?? [], dateValue ?? new Date());

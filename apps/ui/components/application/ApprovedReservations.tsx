@@ -59,7 +59,13 @@ import { getApplicationReservationPath, getApplicationSectionPath, getReservatio
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { AccordionWithIcons } from "@/components/AccordionWithIcons";
 import { isReservationCancellableReason, ReservationCancellableReason } from "@/modules/reservation";
-import { formatDate, formatDateRange, formatDateTimeStrings, fromMondayFirst, toApiDate } from "common/src/date-utils";
+import {
+  formatDate,
+  formatDateRange,
+  formatDateTimeStrings,
+  setMondayFirst,
+  formatApiDate,
+} from "common/src/date-utils";
 import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 
 const N_RESERVATIONS_TO_SHOW = 20;
@@ -225,7 +231,7 @@ function formatReservationTimes(t: TFunction, aes: ApplicationSectionReservation
     const time = formatApiTimeInterval(ats.reservationSeries);
     // NOTE our translations are sunday first
     // using enum translations is bad because we need to sort by day of the week
-    const tday = t(`weekDay.${fromMondayFirst(day)}`);
+    const tday = t(`weekDay.${setMondayFirst(day)}`);
     return [...acc, { day, label: `${tday} ${time}` }];
   }, []);
   times.sort((a, b) => a.day - b.day);
@@ -247,7 +253,7 @@ export function ApprovedReservations({ application, applicationRound }: Readonly
   const { data, loading } = useApplicationReservationsQuery({
     variables: {
       id: application.id,
-      beginDate: toApiDate(new Date()) ?? "",
+      beginDate: formatApiDate(new Date()) ?? "",
     },
   });
   const { application: app } = data || {};
@@ -942,7 +948,7 @@ function sectionToReservationUnits(t: TFunction, section: ApplicationSectionT): 
     return {
       reservationUnit,
       // NOTE our translations are sunday first
-      dateOfWeek: t(`weekDayLong.${fromMondayFirst(day)}`),
+      dateOfWeek: t(`weekDayLong.${setMondayFirst(day)}`),
       time,
       accessType: reservationSeries.accessType,
       usedAccessTypes: filterNonNullable(reservationSeries.usedAccessTypes),

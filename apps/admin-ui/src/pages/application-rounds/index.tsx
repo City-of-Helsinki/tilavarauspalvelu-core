@@ -23,7 +23,7 @@ import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
-import { formatDate, toValidDateObject } from "common/src/date-utils";
+import { formatDate, parseValidDateObject } from "common/src/date-utils";
 
 const AccordionWithoutTopPadding = styled(Accordion).attrs({
   closeButton: false,
@@ -137,7 +137,7 @@ function AllApplicationRounds(): JSX.Element | null {
       isSortable: true,
       headerName: t("applicationRound:headings.sent"),
       transform: (applicationRound: ApplicationRoundNode) =>
-        applicationRound.statusTimestamp ? formatDate(toValidDateObject(applicationRound.statusTimestamp)) : "-",
+        applicationRound.statusTimestamp ? formatDate(parseValidDateObject(applicationRound.statusTimestamp)) : "-",
       key: "statusTimestampSort",
     },
   ];
