@@ -7,7 +7,7 @@ import { IconLinkExternal, IconSize } from "hds-react";
 import { memoize } from "lodash-es";
 import { useTranslation, type TFunction } from "next-i18next";
 import { getApplicantName } from "@/helpers";
-import { formatDate, formatTime, toValidDateObject } from "common/src/date-utils";
+import { formatDate, formatTime, parseValidDateObject } from "common/src/date-utils";
 import { ExternalTableLink } from "@/styled";
 import { gql } from "@apollo/client";
 
@@ -43,9 +43,9 @@ function timeSlotMapper(t: TFunction, slot: RejectedOccurrencesTableElementFragm
   const application = allocatedSlot?.reservationUnitOption.applicationSection?.application;
   const applicantName = application != null ? getApplicantName(application) : "-";
 
-  const date = formatDate(toValidDateObject(slot?.beginDatetime));
-  const begin = formatTime(toValidDateObject(slot?.beginDatetime));
-  const end = formatTime(toValidDateObject(slot?.endDatetime));
+  const date = formatDate(parseValidDateObject(slot?.beginDatetime));
+  const begin = formatTime(parseValidDateObject(slot?.beginDatetime));
+  const end = formatTime(parseValidDateObject(slot?.endDatetime));
   const timeString = `${date} ${begin}–${end}`;
   const name = allocatedSlot?.reservationUnitOption.applicationSection.name ?? "-";
 

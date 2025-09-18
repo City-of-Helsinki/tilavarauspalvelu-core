@@ -7,7 +7,7 @@ import {
   type ReservationSeriesReservationCreateInput,
 } from "@gql/gql-types";
 import type { ReservationSeriesForm, ReservationFormMeta } from "@/schemas";
-import { fromUIDateUnsafe, toApiDateUnsafe } from "common/src/date-utils";
+import { parseUIDateUnsafe, formatApiDateUnsafe } from "common/src/date-utils";
 import { gql } from "@apollo/client";
 
 // Not all choices are valid for reservation series (the ui should not allow these)
@@ -72,16 +72,16 @@ export function useCreateReservationSeries() {
       state: ReservationStateChoice.Confirmed,
     };
 
-    const skipDates: string[] = props.skipDates.map((d) => toApiDateUnsafe(d));
+    const skipDates: string[] = props.skipDates.map((d) => formatApiDateUnsafe(d));
     const input: ReservationSeriesCreateMutation = {
       reservationDetails,
       skipDates,
       // checkOpeningHours: true,
       ageGroup: !Number.isNaN(ageGroup) ? ageGroup : undefined,
       reservationUnit: reservationUnitPk,
-      beginDate: toApiDateUnsafe(fromUIDateUnsafe(startingDate)),
+      beginDate: formatApiDateUnsafe(parseUIDateUnsafe(startingDate)),
       beginTime: startTime,
-      endDate: toApiDateUnsafe(fromUIDateUnsafe(endingDate)),
+      endDate: formatApiDateUnsafe(parseUIDateUnsafe(endingDate)),
       endTime,
       weekdays: repeatOnDays,
       recurrenceInDays: repeatPattern === "weekly" ? 7 : 14,

@@ -24,7 +24,7 @@ import {
   UnitOrderSet,
 } from "@gql/gql-types";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
-import { fromUIDate, toApiDate } from "common/src/date-utils";
+import { parseUIDate, formatApiDate } from "common/src/date-utils";
 import { startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "./const";
 import { type ApolloClient, gql } from "@apollo/client";
@@ -135,10 +135,10 @@ export function processVariables({
   const reservationUnitTypes = filterEmptyArray(mapParamToInteger(values.getAll("reservationUnitTypes"), 1));
   const equipments = filterEmptyArray(mapParamToInteger(values.getAll("equipments"), 1));
 
-  const startDate = fromUIDate(ignoreMaybeArray(values.getAll("startDate")) ?? "");
-  const endDate = fromUIDate(ignoreMaybeArray(values.getAll("endDate")) ?? "");
-  const reservableDateStartCleaned = startDate && startDate >= today ? toApiDate(startDate) : undefined;
-  const reservableDateEndCleaned = endDate && endDate >= today ? toApiDate(endDate) : undefined;
+  const startDate = parseUIDate(ignoreMaybeArray(values.getAll("startDate")) ?? "");
+  const endDate = parseUIDate(ignoreMaybeArray(values.getAll("endDate")) ?? "");
+  const reservableDateStartCleaned = startDate && startDate >= today ? formatApiDate(startDate) : undefined;
+  const reservableDateEndCleaned = endDate && endDate >= today ? formatApiDate(endDate) : undefined;
   const reservationPeriodBeginDate = "reservationPeriodBeginDate" in rest ? rest.reservationPeriodBeginDate : undefined;
   const reservationPeriodEndDate = "reservationPeriodEndDate" in rest ? rest.reservationPeriodEndDate : undefined;
 

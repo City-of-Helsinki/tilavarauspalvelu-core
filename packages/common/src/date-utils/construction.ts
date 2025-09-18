@@ -1,6 +1,6 @@
 import { parse, set } from "date-fns";
 import { toNumber } from "../helpers";
-import { fromUIDate, fromApiDate, isValidDate } from "./conversion";
+import { parseUIDate, parseApiDate, isValidDate } from "./conversion";
 import { UI_DATE_FORMAT, UI_TIME_FORMAT } from "./index";
 import type { TimeStruct } from "./types";
 
@@ -23,7 +23,7 @@ export function fromUIDateTime(date: string, time: string): Date | null {
   }
 
   try {
-    const baseDate = fromUIDate(date);
+    const baseDate = parseUIDate(date);
 
     if (!baseDate || !parseStringTimeStruct(time)) {
       return null;
@@ -68,7 +68,7 @@ export function fromApiDateTime(date: string | null | undefined, time: string | 
   }
 
   try {
-    const baseDate = fromApiDate(date);
+    const baseDate = parseApiDate(date);
 
     if (!baseDate || !parseStringTimeStruct(time)) {
       return null;
@@ -86,10 +86,10 @@ export function fromApiDateTime(date: string | null | undefined, time: string | 
  * @param time - Time string in HH:mm format
  * @returns ISO string or null if invalid
  * @example
- *   dateTimeToISOString("25.12.2023", "15:30") // "2023-12-25T15:30:00.000Z"
- *   dateTimeToISOString("invalid"", "values" }) // null
+ *   parseISODateTime("25.12.2023", "15:30") // "2023-12-25T15:30:00.000Z"
+ *   parseISODateTime("invalid"", "values" }) // null
  */
-export function dateTimeToISOString(date: string, time: string): string | null {
+export function parseISODateTime(date: string, time: string): string | null {
   const dateTime = fromUIDateTime(date, time);
   return dateTime ? dateTime.toISOString() : null;
 }

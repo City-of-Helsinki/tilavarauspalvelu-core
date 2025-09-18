@@ -10,7 +10,7 @@ import { transformWeekday } from "common/src/conversion";
 import { createNodeId, formatTimeStruct } from "common/src/helpers";
 import { type OpenHoursState } from "common/src/components/ApplicationTimeSelector";
 import { selectOption } from "@/test/test.utils";
-import { toApiTime } from "common/src/date-utils";
+import { formatApiTime } from "common/src/date-utils";
 import { type DayT, WEEKDAYS_SORTED } from "common/src/const";
 
 interface TimeSelectorMockProps extends CreateMockApplicationFragmentProps {
@@ -226,8 +226,8 @@ describe("TimeSelector render single section", () => {
       weekday: day.day,
       isClosed: false,
       reservableTimes: day.times.map((time) => ({
-        begin: toApiTime(time.start) ?? "",
-        end: toApiTime(time.end) ?? "",
+        begin: formatApiTime(time.start) ?? "",
+        end: formatApiTime(time.end) ?? "",
       })),
     }));
     const view = customRender({ reservationUnitOpeningHours: openTimes });

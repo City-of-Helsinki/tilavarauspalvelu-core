@@ -6,7 +6,7 @@ import {
   ReservationUnitPublishingState,
   ReserveeType,
 } from "@gql/gql-types";
-import { fromUIDate, isValidDate } from "common/src/date-utils";
+import { parseUIDate, isValidDate } from "common/src/date-utils";
 import { toNumber } from "common/src/helpers";
 import { type OptionsListT, type OptionT } from "common/src/modules/search";
 import { type TFunction } from "next-i18next";
@@ -94,28 +94,28 @@ export function translateTag(t: TFunction, options: Readonly<TagOptionsList>) {
       case "maxPrice":
         return t("filters:tag.maxPrice", { price: value });
       case "dateGte": {
-        const d = fromUIDate(value);
+        const d = parseUIDate(value);
         if (d == null || !isValidDate(d)) {
           return "";
         }
         return t("filters:tag.dateGte", { date: value });
       }
       case "dateLte": {
-        const d = fromUIDate(value);
+        const d = parseUIDate(value);
         if (d == null || !isValidDate(d)) {
           return "";
         }
         return t("filters:tag.dateLte", { date: value });
       }
       case "createdAtGte": {
-        const d = fromUIDate(value);
+        const d = parseUIDate(value);
         if (d == null || !isValidDate(d)) {
           return "";
         }
         return t("filters:tag.createdAtGte", { date: value });
       }
       case "createdAtLte": {
-        const d = fromUIDate(value);
+        const d = parseUIDate(value);
         if (d == null || !isValidDate(d)) {
           return "";
         }

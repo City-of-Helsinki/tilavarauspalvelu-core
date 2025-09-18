@@ -16,7 +16,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks";
 import { ReservationCard } from "@/components/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { toApiDate } from "common/src/date-utils";
+import { formatApiDate } from "common/src/date-utils";
 import { addDays } from "date-fns";
 import { errorToast } from "common/src/components/toast";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
@@ -61,8 +61,8 @@ function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
       orderBy: tab === "upcoming" ? [ReservationOrderSet.BeginsAtAsc] : [ReservationOrderSet.BeginsAtDesc],
       user: currentUser?.pk ?? 0,
       // NOTE today's reservations are always shown in upcoming (even when they are in the past)
-      beginDate: tab === "upcoming" ? toApiDate(today) : undefined,
-      endDate: tab === "past" ? toApiDate(addDays(today, -1)) : undefined,
+      beginDate: tab === "upcoming" ? formatApiDate(today) : undefined,
+      endDate: tab === "past" ? formatApiDate(addDays(today, -1)) : undefined,
       reservationType: ReservationTypeChoice.Normal,
     },
     onError: () => {

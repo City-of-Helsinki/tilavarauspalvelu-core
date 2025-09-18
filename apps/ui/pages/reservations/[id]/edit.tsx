@@ -12,7 +12,7 @@ import {
   MunicipalityChoice,
 } from "@gql/gql-types";
 import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { toApiDate } from "common/src/date-utils";
+import { formatApiDate } from "common/src/date-utils";
 import { addYears } from "date-fns";
 import { breakpoints } from "common/src/const";
 import { H1 } from "common/styled";
@@ -154,8 +154,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       query: ReservationEditPageDocument,
       variables: {
         id: createNodeId("ReservationNode", pk),
-        beginDate: toApiDate(new Date()) ?? "",
-        endDate: toApiDate(addYears(new Date(), 2)) ?? "",
+        beginDate: formatApiDate(new Date()) ?? "",
+        endDate: formatApiDate(addYears(new Date(), 2)) ?? "",
       },
     });
     const reservation = getNode(data);

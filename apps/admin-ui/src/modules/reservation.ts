@@ -20,9 +20,9 @@ import {
   formatDateTimeRange,
   formatDuration,
   formatTimeRange,
-  fromApiDate,
+  parseApiDate,
   fromApiDateTime,
-  toValidDateObject,
+  parseValidDateObject,
 } from "common/src/date-utils";
 import { getReserveeName } from "@/common/util";
 import { getReserveeTypeTranslationKey } from "@/helpers";
@@ -43,7 +43,7 @@ export function reservationPrice(reservation: Pick<ReservationNode, "price">, t:
 }
 
 function getBeginTime(p: PricingFieldsFragment): number {
-  return fromApiDate(p.begins)?.getTime() ?? 0;
+  return parseApiDate(p.begins)?.getTime() ?? 0;
 }
 
 /** returns reservation unit pricing at given date */
@@ -60,7 +60,7 @@ export function getReservationUnitPricing(
   // Find the first pricing that is valid at the given date
   // requires using reduce because we have no end dates => the last begin should be used
   return pricings.reduce<(typeof pricings)[0] | null>((prev, current) => {
-    const begin = fromApiDate(current.begins);
+    const begin = parseApiDate(current.begins);
     if (begin != null && begin.getTime() <= from.getTime()) {
       return current;
     }
@@ -209,7 +209,7 @@ function createRecurringTagString(reservation: CreateTagStringFragment, t: TFunc
     return "";
   }
 
-  const recurringTag = `${formatDateRange(toValidDateObject(beginDate), toValidDateObject(endDate), { includeWeekday: false })}`;
+  const recurringTag = `${formatDateRange(parseValidDateObject(beginDate), parseValidDateObject(endDate), { includeWeekday: false })}`;
   const unitTag = reservationUnitName(reservation.reservationUnit);
 
   const begin = fromApiDateTime(beginDate, beginTime);

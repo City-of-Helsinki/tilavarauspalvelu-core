@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { PaymentNotification } from "@/components/reservation/PaymentNotification";
 import type { TFunction } from "i18next";
 import { describe, it, expect } from "vitest";
-import { formatDateTime, toValidDateObject } from "common/src/date-utils";
+import { formatDateTime, parseValidDateObject } from "common/src/date-utils";
 
 function customRender() {
   const reservation = createReservationPageMock({});
@@ -41,7 +41,7 @@ describe("Component: Payment Notification", () => {
       throw new Error("Payment order mock is undefined");
     }
     const deadlineText = `common:deadline: ${formatDateTime(
-      toValidDateObject(paymentOrderMock.handledPaymentDueBy ?? ""),
+      parseValidDateObject(paymentOrderMock.handledPaymentDueBy ?? ""),
       { t: ((key: string) => key) as TFunction, includeWeekday: false, locale: "fi" }
     )}`;
     expect(screen.getByText(deadlineText)).toBeInTheDocument();

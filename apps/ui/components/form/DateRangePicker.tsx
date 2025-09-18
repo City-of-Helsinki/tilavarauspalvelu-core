@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { isBefore } from "date-fns";
 import { DateInput } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { fromUIDate, isValidDate, formatDate } from "common/src/date-utils";
+import { parseUIDate, isValidDate, formatDate } from "common/src/date-utils";
 import { getLocalizationLang } from "common/src/helpers";
 import { startOfDay } from "date-fns/startOfDay";
 
@@ -50,8 +50,8 @@ export function DateRangePicker({
 
   // Pass params instead of state because React state updates are async
   const validateAndUpdateUpstream = ({ start, end }: { start: string; end: string }) => {
-    const sd = fromUIDate(start);
-    const ed = fromUIDate(end);
+    const sd = parseUIDate(start);
+    const ed = parseUIDate(end);
 
     const isStartDateEmpty = start === "";
     if (!isStartDateEmpty) {
@@ -152,7 +152,7 @@ export function DateRangePicker({
   };
 
   const helperText = t("dateSelector:infoDate");
-  const internalStartDate = fromUIDate(internalStartDateString);
+  const internalStartDate = parseUIDate(internalStartDateString);
 
   return (
     <>

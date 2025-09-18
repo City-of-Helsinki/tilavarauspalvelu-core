@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { type ReservationUnitReservationsFragment, UserPermissionChoice } from "@gql/gql-types";
 import { getReservationUrl } from "@/common/urls";
-import { formatDurationFromDates, toValidDateObject } from "common/src/date-utils";
+import { formatDurationFromDates, parseValidDateObject } from "common/src/date-utils";
 import { getReserveeName } from "@/common/util";
 import { truncate } from "@/helpers";
 import { Flex } from "common/styled";
@@ -43,8 +43,8 @@ export function ReservationPopupContent({
 }): JSX.Element {
   const { t } = useTranslation();
 
-  const reservationStart = toValidDateObject(reservation.beginsAt);
-  const reservationEnd = toValidDateObject(reservation.endsAt);
+  const reservationStart = parseValidDateObject(reservation.beginsAt);
+  const reservationEnd = parseValidDateObject(reservation.endsAt);
   const eventName = getReserveeName(reservation, t, 22) || "-";
   return (
     <PopupContent>

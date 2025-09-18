@@ -2,7 +2,7 @@ import { format, isBefore, isSameDay, type Locale } from "date-fns";
 import { fi, sv, enGB } from "date-fns/locale";
 import { type TFunction } from "next-i18next";
 import type { LocalizationLanguages } from "../urlBuilder";
-import { dateToMinutes, isValidDate, minutesToHoursString, timeToMinutes, toMondayFirst } from "./conversion";
+import { dateToMinutes, isValidDate, minutesToHoursString, timeToMinutes, setMondayFirst } from "./conversion";
 import type {
   FormatDateOptions,
   FormatDateTimeOptions,
@@ -52,7 +52,7 @@ function getFormatLocaleObject(locale?: LocalizationLanguages): { locale: Locale
  *   toDateObject(new Date()) // Date object for current date and time
  *   toDateObject("invalid date") // null
  */
-export function toValidDateObject(date: Date | string): Date | null {
+export function parseValidDateObject(date: Date | string): Date | null {
   if (date instanceof Date) {
     return isValidDate(date) ? date : null;
   }
@@ -134,7 +134,7 @@ export function formatDateTime(date: Date | null, options?: FormatDateTimeOption
   const separator = includeTimeSeparator ? (t ? t("common:dayTimeSeparator") : " @ ") : " ";
 
   if (t) {
-    return `${t("common:dayShort." + toMondayFirst(date.getDay()))} ${format(date, UI_DATE_FORMAT)}${separator} ${format(date, UI_TIME_FORMAT)}`.trim();
+    return `${t("common:dayShort." + setMondayFirst(date.getDay()))} ${format(date, UI_DATE_FORMAT)}${separator} ${format(date, UI_TIME_FORMAT)}`.trim();
   }
   return format(
     date,
@@ -388,4 +388,67 @@ export function formatDurationFromDates(
     { hours: Math.floor((endMins - beginMins) / 60), minutes: (endMins - beginMins) % 60 },
     abbreviated
   );
+}
+
+/**
+ * Converts a Date object to API date format (yyyy-MM-dd)
+ * @param date - Date object to convert
+ * @returns API date string or null if invalid
+ * @example formatApiDate(new Date("2023-12-25")) // "2023-12-25"
+ */
+export function formatApiDate(date: Date): string | null {
+  if (!date || !isValidDate(date)) {
+    return null;
+  }
+  try {
+    return format(date, API_DATE_FORMAT);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Converts Date to API date format (yyyy-MM-dd) - throws on invalid input
+ * @param date - Date object to convert
+ * @returns API date string
+ * @throws Error if date is invalid
+ * @example formatApiDateUnsafe(new Date("2023-12-25")) // "2023-12-25"
+ */
+export function formatApiDateUnsafe(date: Date): string {
+  const apiDate = formatApiDate(date);
+  if (apiDate == null) {
+    throw new Error("Invalid date: " + date);
+  }
+  return apiDate;
+}
+
+/**
+ * Converts time struct to API time format (HH:mm)
+ * @param hours - Hours (0-23)
+ * @param minutes - Minutes (0-59, defaults to 0)
+ * @returns API time string or null if invalid
+ * @example formatApiTime(15, 30) // "15:30"
+ */
+export function formatApiTime(hours: number, minutes: number = 0): string | null {
+  if ((hours === 24 && minutes !== 0) || hours < 0 || hours > 24 || minutes < 0 || minutes > 59) {
+    return null;
+  }
+  const normalizedHours = hours === 24 ? 0 : hours;
+  return `${String(normalizedHours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
+/**
+ * Converts time struct to API time format (HH:mm) - throws on invalid input
+ * @param hours - Hours (0-23)
+ * @param minutes - Minutes (0-59, defaults to 0)
+ * @returns API time string
+ * @throws Error if time is invalid
+ * @example formatApiTimeUnsafe(15, 30) // "15:30"
+ */
+export function formatApiTimeUnsafe(hours: number, minutes: number = 0): string {
+  const time = formatApiTime(hours, minutes);
+  if (time == null) {
+    throw new Error("Invalid time: " + JSON.stringify({ hours, minutes }));
+  }
+  return time;
 }

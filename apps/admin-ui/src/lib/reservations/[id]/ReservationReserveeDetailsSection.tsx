@@ -27,7 +27,7 @@ import { getName as getCountryName, registerLocale as registerCountryLocale } fr
 import countriesJson from "i18n-iso-countries/langs/fi.json";
 import { getApiErrors } from "common/src/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
-import { formatDate, toValidDateObject } from "common/src/date-utils";
+import { formatDate, parseValidDateObject } from "common/src/date-utils";
 
 registerCountryLocale(countriesJson);
 
@@ -150,7 +150,7 @@ export function ReservationReserveeDetailsSection({
         {isBirthDateVisible && (
           <DataWrapper label={t("reservation:birthDate")} isLoading={isDateOfBirthLoading}>
             {dateOfBirthNode?.user?.dateOfBirth
-              ? formatDate(toValidDateObject(dateOfBirthNode?.user?.dateOfBirth))
+              ? formatDate(parseValidDateObject(dateOfBirthNode?.user?.dateOfBirth))
               : "-"}
           </DataWrapper>
         )}

@@ -5,7 +5,7 @@ import {
   useReservationUnitsByUnitQuery,
 } from "@gql/gql-types";
 import { createNodeId, getNode } from "common/src/helpers";
-import { toApiDate } from "common/src/date-utils";
+import { formatApiDate } from "common/src/date-utils";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/components/toast";
 import { gql } from "@apollo/client";
@@ -52,8 +52,8 @@ export function useUnitResources({
     variables: {
       id: createNodeId("UnitNode", unitPk),
       pk: unitPk,
-      beginDate: toApiDate(begin) ?? "",
-      endDate: toApiDate(begin) ?? "",
+      beginDate: formatApiDate(begin) ?? "",
+      endDate: formatApiDate(begin) ?? "",
       state: RELATED_RESERVATION_STATES,
     },
     onError: () => {
