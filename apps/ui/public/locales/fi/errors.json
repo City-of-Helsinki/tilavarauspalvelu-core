@@ -41,6 +41,7 @@
   },
   "general_error": "Tapahtui määrittämätön virhe.",
   "api": {
+    "APPLICATION_ADULT_RESERVEE_REQUIRED": "Hakijan on oltava täysi-ikäinen.",
     "CHANGES_NOT_ALLOWED": "Muutoksia ei sallita.",
     "CREATE_PERMISSION_DENIED": "Ei lupaa luoda.",
     "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Varausten enimmäismäärä on ylittynyt.",
@@ -49,6 +50,7 @@
     "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Tarkista varausaika.",
     "RESERVATION_OVERLAP": "Päällekkäisiä varauksia.",
     "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Tarkista varausaika.",
+    "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "Varaajan on oltava täysi-ikäinen.",
     "RESERVATION_UNIT_MAX_DURATION_EXCEEDED": "Lyhennä varausaikaa.",
     "RESERVATION_UNIT_IN_OPEN_ROUND": "Voit tehdä kausivaraushakemuksen tähän kohteeseen.",
     "RESERVATION_UNIT_IS_NOT_OPEN": "Kohde on tällä hetkellä suljettu.",
@@ -57,7 +59,6 @@
     "RESERVATION_UNIT_TYPE_IS_SEASON": "Tähän kohteeseen voit tehdä vain kausivaraushakemuksen.",
     "UNKNOWN": "Tapahtui virhe.",
     "validation": {
-      "APPLICATION_ADULT_RESERVEE_REQUIRED": "Hakijan on oltava täysi-ikäinen.",
       "APPLICATION_APPLICANT_TYPE_MISSING": "Hakijan tyyppi puuttuu.",
       "APPLICATION_BILLING_ADDRESS_MISSING": "Laskutusosoite puuttuu.",
       "APPLICATION_CONTACT_PERSON_MISSING": "Yhteyshenkilö puuttuu.",
@@ -71,7 +72,6 @@
       "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",
       "RESERVATION_CANCELLATION_NOT_ALLOWED": "Peruutus ei ole sallittu.",
       "RESERVATION_UNIT_MAX_DURATION_EXCEEDED": "Liian pitkä varausaika.",
-      "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "Varaajan on oltava täysi-ikäinen.",
       "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "Sinulla on maksimi määrä varauksia tässä kohteessa.",
       "USER_NOT_INTERNAL_USER": "Varauksen tekeminen ei ole sallittu.",
       "generic_validation_error": "Tapahtui virhe.",

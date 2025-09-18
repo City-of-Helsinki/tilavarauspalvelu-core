@@ -41,6 +41,7 @@
   },
   "general_error": "Undefined error.",
   "api": {
+    "APPLICATION_ADULT_RESERVEE_REQUIRED": "The applicant must be 18 years old.",
     "CHANGES_NOT_ALLOWED": "You cannot make changes to the booking.",
     "CREATE_PERMISSION_DENIED": "No permission to create.",
     "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "You have exceeded the maximum number of bookings.",
@@ -49,6 +50,7 @@
     "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Please check the booking time.",
     "RESERVATION_OVERLAP": "There are duplicate bookings.",
     "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Please check the booking time.",
+    "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "The person making the reservation must be 18 years old",
     "RESERVATION_UNIT_IN_OPEN_ROUND": "You can make a seasonal booking application for this item.",
     "RESERVATION_UNIT_IS_NOT_OPEN": "The item is closed at the moment.",
     "RESERVATION_UNIT_MAX_DURATION_EXCEEDED": "Please shorten the booking time.",
@@ -57,7 +59,6 @@
     "RESERVATION_UNIT_TYPE_IS_SEASON": "You can only make a seasonal booking application for this item.",
     "UNKNOWN": "An error occurred.",
     "validation": {
-      "APPLICATION_ADULT_RESERVEE_REQUIRED": "The applicant must be 18 years old.",
       "APPLICATION_APPLICANT_TYPE_MISSING": "Applicant type is missing.",
       "APPLICATION_BILLING_ADDRESS_MISSING": "Billing address is missing.",
       "APPLICATION_CONTACT_PERSON_MISSING": "Contact person is missing.",
@@ -70,7 +71,6 @@
       "CANCEL_REASON_DOES_NOT_EXIST": "Cancel reason does not exist",
       "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",
       "RESERVATION_CANCELLATION_NOT_ALLOWED": "Cancellation is not allowed.",
-      "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "The person making the reservation must be 18 years old",
       "RESERVATION_UNIT_MAX_DURATION_EXCEEDED": "The booking time is too long.",
       "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "You have the maximum number of bookings for this space.",
       "USER_NOT_INTERNAL_USER": "Making a booking is not allowed.",
