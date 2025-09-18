@@ -41,6 +41,7 @@
   },
   "general_error": "Odefinierat fel.",
   "api": {
+    "APPLICATION_ADULT_RESERVEE_REQUIRED": "Sökanden måste vara myndig.",
     "CHANGES_NOT_ALLOWED": "Du kan inte göra ändringar.",
     "CREATE_PERMISSION_DENIED": "Ingen behörighet att skapa.",
     "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Det maximala antalet bokningar har överskridits.",
@@ -49,6 +50,7 @@
     "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Kontrollera bokningstiden.",
     "RESERVATION_OVERLAP": "Överlappande bokningar.",
     "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Kontrollera bokningstiden.",
+    "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "Personen som gör bokningen måste vara myndig.",
     "RESERVATION_UNIT_MAX_DURATION_EXCEEDED": "Förkorta bokningstiden.",
     "RESERVATION_UNIT_IN_OPEN_ROUND": "Du kan ansöka om en säsongsbokning för detta objekt.",
     "RESERVATION_UNIT_IS_NOT_OPEN": "Objektet är för närvarande stängt.",
@@ -57,7 +59,6 @@
     "RESERVATION_UNIT_TYPE_IS_SEASON": "Du kan bara göra en ansökan om säsongsbokning för detta objekt.",
     "UNKNOWN": "Ett fel uppstod.",
     "validation": {
-      "APPLICATION_ADULT_RESERVEE_REQUIRED": "Sökanden måste vara myndig.",
       "APPLICATION_APPLICANT_TYPE_MISSING": "Sökandens typ saknas.",
       "APPLICATION_BILLING_ADDRESS_MISSING": "Faktureringsadress saknas.",
       "APPLICATION_CONTACT_PERSON_MISSING": "Kontaktperson saknas.",
@@ -71,7 +72,6 @@
       "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
       "RESERVATION_CANCELLATION_NOT_ALLOWED": "Avbokning är inte tillåten.",
       "RESERVATION_UNIT_MAX_DURATION_EXCEEDED": "För lång bokningstid.",
-      "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "Personen som gör bokningen måste vara myndig.",
       "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "Du har det maximala antalet bokningar för detta objekt.",
       "USER_NOT_INTERNAL_USER": "Det är inte tillåtet att göra en bokning.",
       "generic_validation_error": "Ett fel uppstod.",
