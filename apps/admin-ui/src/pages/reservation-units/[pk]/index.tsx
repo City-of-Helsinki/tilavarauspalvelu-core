@@ -221,10 +221,6 @@ function ReservationUnitEditor({
   const paymentTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.PaymentTerms);
   const cancellationTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.CancellationTerms);
 
-  const metadataOptions = filterNonNullable(parametersData?.allMetadataSets).map((n) => ({
-    value: n.pk,
-    label: n?.name ?? "no-name",
-  }));
   const cancellationRuleOptions = filterNonNullable(
     parametersData?.reservationUnitCancellationRules.edges?.map((e) => e?.node)
   ).map((n) => ({
@@ -315,11 +311,7 @@ function ReservationUnitEditor({
           purposes={parametersData?.allPurposes}
           reservationUnitTypes={parametersData?.allReservationUnitTypes}
         />
-        <ReservationUnitSettingsSection
-          form={form}
-          metadataOptions={metadataOptions}
-          cancellationRuleOptions={cancellationRuleOptions}
-        />
+        <ReservationUnitSettingsSection form={form} cancellationRuleOptions={cancellationRuleOptions} />
         <PricingSection
           form={form}
           taxPercentageOptions={taxPercentageOptions}
@@ -462,6 +454,7 @@ export const RESERVATION_UNIT_EDIT_PAGE_FRAGMENT = gql`
     pk
     publishingState
     reservationState
+    reservationForm
     images {
       pk
       ...Image
@@ -557,10 +550,6 @@ export const RESERVATION_UNIT_EDIT_PAGE_FRAGMENT = gql`
     publishBeginsAt
     publishEndsAt
     maxReservationsPerUser
-    metadataSet {
-      id
-      pk
-    }
     pricings {
       pk
       ...PricingFields
@@ -666,11 +655,6 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
           pk
         }
       }
-    }
-    allMetadataSets {
-      id
-      name
-      pk
     }
   }
 `;

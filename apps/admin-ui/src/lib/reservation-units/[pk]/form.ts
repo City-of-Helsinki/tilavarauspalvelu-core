@@ -6,6 +6,7 @@ import {
   AuthenticationType,
   PaymentType,
   PriceUnit,
+  ReservationFormType,
   ReservationKind,
   ReservationStartInterval,
   type ReservationUnitAccessTypeCreateInput,
@@ -435,7 +436,7 @@ export const ReservationUnitEditSchema = z
     pricingTerms: z.string().nullable(),
     cancellationTerms: z.string().nullable(),
     serviceSpecificTerms: z.string().nullable(),
-    metadataSet: z.number().nullable(),
+    reservationForm: z.nativeEnum(ReservationFormType).optional(),
     surfaceArea: z.number(),
     images: z.array(ImageFormSchema),
     // internal values
@@ -571,11 +572,11 @@ export const ReservationUnitEditSchema = z
           path: ["authentication"],
         });
       }
-      if (v.metadataSet == null) {
+      if (v.reservationForm == null) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Required",
-          path: ["metadataSet"],
+          path: ["reservationForm"],
         });
       }
     }
@@ -830,7 +831,7 @@ export function convertReservationUnit(data?: Node | null): ReservationUnitEditF
     surfaceArea: data?.surfaceArea ?? 0,
     authentication: data?.authentication ?? AuthenticationType.Weak,
     reservationUnitType: data?.reservationUnitType?.pk ?? null,
-    metadataSet: data?.metadataSet?.pk ?? null,
+    reservationForm: data?.reservationForm,
     paymentTerms: data?.paymentTerms?.pk ?? null,
     pricingTerms: data?.pricingTerms?.pk ?? null,
     serviceSpecificTerms: data?.serviceSpecificTerms?.pk ?? null,
