@@ -95,8 +95,6 @@ class UserActions:
             reservation.reservee_email = self.user.email
             reservation.reservee_phone = ""
             reservation.reservee_address_zip = "99999"
-            reservation.reservee_address_city = ANONYMIZED
-            reservation.reservee_address_street = ANONYMIZED
             reservation.working_memo = ""
             reservation.free_of_charge_reason = SENSITIVE_RESERVATION
             reservation.cancel_details = SENSITIVE_RESERVATION
@@ -116,8 +114,6 @@ class UserActions:
                 "reservee_email",
                 "reservee_phone",
                 "reservee_address_zip",
-                "reservee_address_city",
-                "reservee_address_street",
                 "working_memo",
                 "free_of_charge_reason",
                 "cancel_details",

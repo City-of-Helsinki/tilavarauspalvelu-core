@@ -54,8 +54,6 @@ def test_reservation_series__update_series(graphql):
             "reserveeEmail": "user@admin.com",
             "reserveePhone": "0123456789",
             "reserveeOrganisationName": "org",
-            "reserveeAddressStreet": "street",
-            "reserveeAddressCity": "city",
             "reserveeAddressZip": "cip",
             "reserveeType": ReserveeType.COMPANY.value,
             "purpose": purpose_2.pk,
@@ -87,8 +85,6 @@ def test_reservation_series__update_series(graphql):
     assert reservation.reservee_email == "user@admin.com"
     assert reservation.reservee_phone == "0123456789"
     assert reservation.reservee_organisation_name == "org"
-    assert reservation.reservee_address_street == "street"
-    assert reservation.reservee_address_city == "city"
     assert reservation.reservee_address_zip == "cip"
     assert reservation.reservee_type == ReserveeType.COMPANY.value
     assert reservation.age_group == age_group_2

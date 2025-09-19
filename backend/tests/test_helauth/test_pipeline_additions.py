@@ -78,8 +78,6 @@ def test_update_user_from_profile__prefill_info_not_available_in_response():
     assert session_call[0] == "reservation_prefill_info"
     assert session_call[1] == {
         "municipality": None,
-        "reservee_address_city": None,
-        "reservee_address_street": None,
         "reservee_address_zip": None,
         "reservee_email": None,
         "reservee_first_name": None,
@@ -117,8 +115,6 @@ def test_update_user_from_profile__store_prefill_info_in_session_storage():
     assert session_call[0] == "reservation_prefill_info"
     assert session_call[1] == {
         "municipality": MunicipalityChoice.HELSINKI.value,
-        "reservee_address_city": "Helsinki",
-        "reservee_address_street": "Example street 1",
         "reservee_address_zip": "00100",
         "reservee_email": "user@example.com",
         "reservee_first_name": "Example",

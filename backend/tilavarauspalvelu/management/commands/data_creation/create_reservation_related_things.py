@@ -505,8 +505,6 @@ def _create_metadata_fields() -> list[ReservationMetadataField]:
         "reservee_phone",
         "reservee_email",
         "reservee_identifier",
-        "reservee_address_street",
-        "reservee_address_city",
         "reservee_address_zip",
         "age_group",
         "applying_for_free_of_charge",
