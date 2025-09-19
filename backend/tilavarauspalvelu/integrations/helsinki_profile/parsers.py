@@ -46,9 +46,7 @@ class ProfileDataParser:
             reservee_last_name=self.get_last_name(),
             reservee_email=self.get_email(),
             reservee_phone=self.get_phone(),
-            reservee_address_street=address.get("address"),
             reservee_address_zip=address.get("postalCode"),
-            reservee_address_city=address.get("city"),
             municipality=self.get_user_municipality(),
         )
 
