@@ -100,15 +100,14 @@ def refresh_materialized_views_at_the_end[**P](func: Callable[P, None]) -> Calla
             SAVE_RESERVATION_STATISTICS=False,
             UPDATE_SEARCH_VECTORS=False,
         ):
-            try:
-                func(*args, **kwargs)
-            finally:
-                print("Refreshing reservation unit hierarchy...")  # noqa: T201, RUF100
-                ReservationUnitHierarchy.refresh()
-                print("Refreshing affecting time spans...")  # noqa: T201, RUF100
-                AffectingTimeSpan.refresh()
-                print("Refreshing search vectors...")  # noqa: T201, RUF100
-                ReservationUnit.objects.update_search_vectors()
+            func(*args, **kwargs)
+
+            print("Refreshing reservation unit hierarchy...")  # noqa: T201, RUF100
+            ReservationUnitHierarchy.refresh()
+            print("Refreshing affecting time spans...")  # noqa: T201, RUF100
+            AffectingTimeSpan.refresh()
+            print("Refreshing search vectors...")  # noqa: T201, RUF100
+            ReservationUnit.objects.all().update_search_vectors()
 
     return wrapper
 
