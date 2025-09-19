@@ -15,17 +15,17 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
 
-    from .actions import PurposeActions
-    from .queryset import PurposeManager
-    from .validators import PurposeValidator
+    from .actions import IntendedUseActions
+    from .queryset import IntendedUseManager
+    from .validators import IntendedUseValidator
 
 
 __all__ = [
-    "Purpose",
+    "IntendedUse",
 ]
 
 
-class Purpose(models.Model):
+class IntendedUse(models.Model):
     rank: int = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
 
     name: str = models.CharField(max_length=200)
@@ -38,17 +38,17 @@ class Purpose(models.Model):
     name_en: str | None
     name_sv: str | None
 
-    objects: ClassVar[PurposeManager] = LazyModelManager.new()
-    actions: PurposeActions = LazyModelAttribute.new()
-    validators: PurposeValidator = LazyModelAttribute.new()
+    objects: ClassVar[IntendedUseManager] = LazyModelManager.new()
+    actions: IntendedUseActions = LazyModelAttribute.new()
+    validators: IntendedUseValidator = LazyModelAttribute.new()
 
     reservation_units: ManyToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
 
     class Meta:
-        db_table = "purpose"
+        db_table = "intended_use"
         base_manager_name = "objects"
-        verbose_name = _("purpose")
-        verbose_name_plural = _("purposes")
+        verbose_name = _("intended use")
+        verbose_name_plural = _("intended uses")
         ordering = ["rank"]
 
     def __str__(self) -> str:

@@ -80,7 +80,7 @@ class ReservationUnitFilterSet(FilterSet[ReservationUnit]):
             case _:  # English and default
                 return models.Q(search_vector_en=query) | models.Q(name_en__icontains=value)
 
-    purposes = Filter(lookup="in")
+    intended_uses = Filter(lookup="in")
 
     @Filter
     def equipments(self, info: GQLInfo[User], *, value: list[int]) -> models.Q:

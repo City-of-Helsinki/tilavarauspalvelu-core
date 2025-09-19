@@ -14,7 +14,7 @@ from .models import (
     BannerNotification,
     Equipment,
     EquipmentCategory,
-    Purpose,
+    IntendedUse,
     ReservationDenyReason,
     ReservationPurpose,
     ReservationUnit,
@@ -114,7 +114,7 @@ class ReservationUnitTypeTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-@register_lazy(Purpose)
+@register_lazy(IntendedUse)
 class PurposeTranslationOptions(TranslationOptions):
     fields = ["name"]
 

@@ -296,6 +296,19 @@ enum EquipmentOrderSet {
   nameSvDesc
 }
 
+enum IntendedUseOrderSet {
+  nameEnAsc
+  nameEnDesc
+  nameFiAsc
+  nameFiDesc
+  nameSvAsc
+  nameSvDesc
+  pkAsc
+  pkDesc
+  rankAsc
+  rankDesc
+}
+
 enum LoginMethod {
   """PROFILE"""
   PROFILE
@@ -387,19 +400,6 @@ enum Priority {
   PRIMARY
   """Secondary"""
   SECONDARY
-}
-
-enum PurposeOrderSet {
-  nameEnAsc
-  nameEnDesc
-  nameFiAsc
-  nameFiDesc
-  nameSvAsc
-  nameSvDesc
-  pkAsc
-  pkDesc
-  rankAsc
-  rankDesc
 }
 
 enum RejectedOccurrenceOrderSet {
@@ -1182,6 +1182,18 @@ type GeneralRoleNode implements Node {
   user: UserNode! @complexity(value: 1)
 }
 
+type IntendedUseNode implements Node {
+  """The Global ID of an object."""
+  id: ID!
+  imageUrl: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int!
+  rank: Int!
+  smallUrl: String
+}
+
 """Information about the current state of the pagination."""
 type PageInfo {
   """Are there more items after the current page?"""
@@ -1278,18 +1290,6 @@ type PindoraValidityInfoDataType {
   reservationSeriesId: Int!
   accessCodeBeginsAt: DateTime!
   accessCodeEndsAt: DateTime!
-}
-
-type PurposeNode implements Node {
-  """The Global ID of an object."""
-  id: ID!
-  imageUrl: String
-  nameEn: String
-  nameFi: String
-  nameSv: String
-  pk: Int!
-  rank: Int!
-  smallUrl: String
 }
 
 type RejectedOccurrenceNode implements Node {
@@ -1608,6 +1608,10 @@ type ReservationUnitNode implements Node {
   """The Global ID of an object."""
   id: ID!
   images: [ReservationUnitImageNode!]! @complexity(value: 1)
+  intendedUses(
+    filter: IntendedUseFilterSet
+    orderBy: [IntendedUseOrderSet!]
+  ): [IntendedUseNode!]! @complexity(value: 1)
   isArchived: Boolean!
   isClosed: Boolean!
   isDraft: Boolean!
@@ -1637,10 +1641,6 @@ type ReservationUnitNode implements Node {
   publishBeginsAt: DateTime
   publishEndsAt: DateTime
   publishingState: ReservationUnitPublishingState!
-  purposes(
-    filter: PurposeFilterSet
-    orderBy: [PurposeOrderSet!]
-  ): [PurposeNode!]! @complexity(value: 1)
   rank: Int!
   requireAdultReservee: Boolean!
   requireReservationHandling: Boolean!
@@ -2239,20 +2239,20 @@ input EquipmentFilterSet {
   XOR: EquipmentFilterSet
 }
 
-input PreferredOrderFilterInput {
-  values: [Int!]!
-  allHigherThan10: Boolean!
-}
-
-input PurposeFilterSet {
+input IntendedUseFilterSet {
   nameEn: String
   nameFi: String
   nameSv: String
   pk: [Int!]
-  NOT: PurposeFilterSet
-  AND: PurposeFilterSet
-  OR: PurposeFilterSet
-  XOR: PurposeFilterSet
+  NOT: IntendedUseFilterSet
+  AND: IntendedUseFilterSet
+  OR: IntendedUseFilterSet
+  XOR: IntendedUseFilterSet
+}
+
+input PreferredOrderFilterInput {
+  values: [Int!]!
+  allHigherThan10: Boolean!
 }
 
 input RejectAllApplicationOptionsMutation {
@@ -2659,6 +2659,7 @@ input ReservationUnitCreateMutation {
   descriptionSv: String
   equipments: [Int!]
   images: [ReservationUnitImageCreateInput!]
+  intendedUses: [Int!]
   isDraft: Boolean! = false
   maxPersons: Int = null
   maxReservationDuration: Duration = null
@@ -2677,7 +2678,6 @@ input ReservationUnitCreateMutation {
   pricings: [ReservationUnitPricingCreateInput!]
   publishBeginsAt: DateTime = null
   publishEndsAt: DateTime = null
-  purposes: [Int!]
   requireAdultReservee: Boolean! = false
   requireReservationHandling: Boolean! = false
   reservationBeginsAt: DateTime = null
@@ -2728,6 +2728,7 @@ input ReservationUnitFilterSet {
   descriptionSvContains: String
   descriptionSvStartswith: String
   equipments: [Int!]
+  intendedUses: [Int!]
   isDraft: Boolean
   isVisible: Boolean
   maxPersonsGte: Int
@@ -2754,7 +2755,6 @@ input ReservationUnitFilterSet {
   personsAllowed: Int
   pk: [Int!]
   publishingState: [ReservationUnitPublishingState!]
-  purposes: [Int!]
   rankGte: Int
   rankLte: Int
   reservationForm: [ReservationFormType!]
@@ -2891,6 +2891,7 @@ input ReservationUnitUpdateMutation {
   descriptionSv: String
   equipments: [Int!]
   images: [ReservationUnitImageUpdateInput!]
+  intendedUses: [Int!]
   isDraft: Boolean
   maxPersons: Int
   maxReservationDuration: Duration
@@ -2910,7 +2911,6 @@ input ReservationUnitUpdateMutation {
   pricings: [ReservationUnitPricingUpdateInput!]
   publishBeginsAt: DateTime
   publishEndsAt: DateTime
-  purposes: [Int!]
   requireAdultReservee: Boolean
   requireReservationHandling: Boolean
   reservationBeginsAt: DateTime
@@ -3191,11 +3191,11 @@ type Query {
     filter: EquipmentFilterSet
     orderBy: [EquipmentOrderSet!]
   ): [EquipmentNode!]!
+  allIntendedUses(
+    filter: IntendedUseFilterSet
+    orderBy: [IntendedUseOrderSet!]
+  ): [IntendedUseNode!]!
   allMetadataSets: [ReservationMetadataSetNode!]!
-  allPurposes(
-    filter: PurposeFilterSet
-    orderBy: [PurposeOrderSet!]
-  ): [PurposeNode!]!
   allReservationCancelReasons: [ReservationCancelReasonType!]!
   allReservationDenyReasons(
     filter: ReservationDenyReasonFilterSet

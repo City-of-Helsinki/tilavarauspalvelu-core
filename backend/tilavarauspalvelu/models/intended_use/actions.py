@@ -4,14 +4,14 @@ import dataclasses
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .model import Purpose
+    from .model import IntendedUse
 
 
 __all__ = [
-    "PurposeActions",
+    "IntendedUseActions",
 ]
 
 
 @dataclasses.dataclass(slots=True, frozen=True)
-class PurposeActions:
-    purpose: Purpose
+class IntendedUseActions:
+    intended_use: IntendedUse

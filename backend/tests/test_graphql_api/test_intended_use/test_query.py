@@ -4,7 +4,7 @@ from inspect import cleandoc
 
 import pytest
 
-from tests.factories import PurposeFactory
+from tests.factories import IntendedUseFactory
 
 # Applied to all tests
 pytestmark = [
@@ -12,15 +12,15 @@ pytestmark = [
 ]
 
 
-def test_purpose__query(graphql):
-    purpose = PurposeFactory.create()
+def test_intended_use__query(graphql):
+    intended_use = IntendedUseFactory.create()
 
     graphql.login_with_superuser()
 
     query = cleandoc(
         """
         query {
-            allPurposes {
+            allIntendedUses {
                 pk
                 nameFi
                 nameEn
@@ -38,28 +38,28 @@ def test_purpose__query(graphql):
 
     assert response.results == [
         {
-            "pk": purpose.pk,
-            "nameFi": purpose.name_fi,
-            "nameEn": purpose.name_en,
-            "nameSv": purpose.name_sv,
+            "pk": intended_use.pk,
+            "nameFi": intended_use.name_fi,
+            "nameEn": intended_use.name_en,
+            "nameSv": intended_use.name_sv,
             "imageUrl": None,
             "smallUrl": None,
-            "rank": purpose.rank,
+            "rank": intended_use.rank,
         }
     ]
 
 
-def test_purpose__order__by_rank(graphql):
-    purpose_1 = PurposeFactory.create(rank=1)
-    purpose_2 = PurposeFactory.create(rank=3)
-    purpose_3 = PurposeFactory.create(rank=2)
+def test_intended_use__order__by_rank(graphql):
+    intended_use_1 = IntendedUseFactory.create(rank=1)
+    intended_use_2 = IntendedUseFactory.create(rank=3)
+    intended_use_3 = IntendedUseFactory.create(rank=2)
 
     graphql.login_with_superuser()
 
     query = cleandoc(
         """
         query {
-            allPurposes(orderBy: rankDesc) {
+            allIntendedUses(orderBy: rankDesc) {
                 pk
             }
         }
@@ -71,6 +71,6 @@ def test_purpose__order__by_rank(graphql):
     assert response.has_errors is False
 
     assert len(response.results) == 3
-    assert response.results[0] == {"pk": purpose_2.pk}
-    assert response.results[1] == {"pk": purpose_3.pk}
-    assert response.results[2] == {"pk": purpose_1.pk}
+    assert response.results[0] == {"pk": intended_use_2.pk}
+    assert response.results[1] == {"pk": intended_use_3.pk}
+    assert response.results[2] == {"pk": intended_use_1.pk}

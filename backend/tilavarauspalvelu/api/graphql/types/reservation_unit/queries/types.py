@@ -163,7 +163,7 @@ class ReservationUnitNode(
     # Forward many-to-many related
     spaces = Field()
     resources = Field()
-    purposes = Field()
+    intended_uses = Field()
     equipments = Field()
 
     # Reverse many-to-many related

@@ -29,10 +29,10 @@ from .banner_notification.queries import BannerNotificationNode
 from .equipment.queries import EquipmentNode
 from .equipment_category.queries import EquipmentCategoryNode
 from .general_role.queries import GeneralRoleNode
+from .intended_use.queries import IntendedUseNode
 from .payment_merchant.queries import PaymentMerchantNode
 from .payment_order.queries import PaymentOrderNode
 from .payment_product.queries import PaymentProductNode
-from .purpose.queries import PurposeNode
 from .rejected_occurrence.queries import RejectedOccurrenceNode
 from .reservation.mutations import (
     ReservationAdjustTimeMutation,
@@ -118,10 +118,10 @@ __all__ = [
     "EquipmentCategoryNode",
     "EquipmentNode",
     "GeneralRoleNode",
+    "IntendedUseNode",
     "PaymentMerchantNode",
     "PaymentOrderNode",
     "PaymentProductNode",
-    "PurposeNode",
     "RejectAllApplicationOptionsMutation",
     "RejectAllSectionOptionsMutation",
     "RejectedOccurrenceNode",
