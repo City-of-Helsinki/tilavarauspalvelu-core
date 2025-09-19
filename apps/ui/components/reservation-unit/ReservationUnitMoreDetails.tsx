@@ -4,7 +4,6 @@ import {
   type ApplicationRoundTimeSlotFieldsFragment,
   type NoticeWhenReservingFragment,
   type ReservationUnitMoreDetailsFragment,
-  type TermsOfUseFieldsFragment,
   TimeSlotType,
   type PricingFieldsFragment,
 } from "@gql/gql-types";
@@ -28,20 +27,21 @@ import styled from "styled-components";
 import { formatters as getFormatters } from "common";
 import { breakpoints } from "common/src/const";
 import { AddressSection } from "./AddressSection";
+import { useGenericTerms } from "common/src/hooks";
 
 /// Below the fold content
 /// TODO use a client side fetch instead of passing data from SSR (requires more refactors)
 export function ReservationUnitMoreDetails({
   reservationUnit,
-  termsOfUse,
   isReservable,
 }: Readonly<{
   reservationUnit: ReservationUnitMoreDetailsFragment;
-  termsOfUse: TermsOfUseFieldsFragment | null;
   isReservable: boolean;
 }>) {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
+
+  const termsOfUse = useGenericTerms();
 
   const activeApplicationRounds = reservationUnit.applicationRounds;
   const showApplicationRoundTimeSlots = activeApplicationRounds.length > 0;
