@@ -861,7 +861,7 @@ def test_frontend_queries__admin_ui__ReservationUnitEditorParameters(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["ReservationUnitEditorParameters"]
 
-    assert len(factories) == 7
+    assert len(factories) == 6
 
     for query_info in factories:
         factory_args = deepcopy(query_info.factory_args)

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { type FieldValues, useController, type UseControllerProps, UseFormReturn } from "react-hook-form";
-import { AuthenticationType, ReservationStartInterval } from "@gql/gql-types";
+import { AuthenticationType, ReservationFormType, ReservationStartInterval } from "@gql/gql-types";
 import { AutoGrid, Flex } from "common/src/styled";
 import { ControlledSelect, ControlledCheckbox, DateTimeInput } from "common/src/components/form";
 import { getTranslatedError } from "@/modules/util";
@@ -12,6 +12,7 @@ import { EditAccordion } from "./styled";
 import { FieldGroup } from "./FieldGroup";
 import { CustomNumberInput } from "./CustomNumberInput";
 import { SpecializedRadioGroup } from "./SpecializedRadioGroup";
+import { sort } from "common/src/modules/helpers";
 
 const Indent = styled.div<{ $noIndent: boolean }>`
   ${({ $noIndent }) => ($noIndent ? null : `margin-left: var(--spacing-l);`)}
@@ -75,11 +76,9 @@ const reservationsMaxDaysBeforeOptions = [
 
 export function ReservationUnitSettingsSection({
   form,
-  metadataOptions,
   cancellationRuleOptions,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  metadataOptions: Array<{ value: number; label: string }>;
   cancellationRuleOptions: Array<{ value: number; label: string }>;
 }) {
   const { t } = useTranslation();
@@ -98,12 +97,26 @@ export function ReservationUnitSettingsSection({
 
   const isDirect = watch("reservationKind") === "DIRECT" || watch("reservationKind") === "DIRECT_AND_SEASON";
 
+  // waiting for backend to remove these keys (they are unused)
+  const hiddenFormOptions = new Set([
+    ReservationFormType.PurposeSubventionForm,
+    ReservationFormType.AgeGroupSubventionForm,
+  ]);
+  const formOptions = sort(
+    Object.values(ReservationFormType)
+      .filter((choice) => !hiddenFormOptions.has(choice))
+      .map((choice) => ({
+        value: choice,
+        label: t(`translation:reservationForm.${choice}`),
+      })),
+    (a, b) => a.label.localeCompare(b.label)
+  );
   const hasErrors =
     errors.reservationBeginsDate != null ||
     errors.reservationEndsDate != null ||
     errors.reservationBeginsTime != null ||
     errors.reservationEndsTime != null ||
-    errors.metadataSet != null ||
+    errors.reservationForm != null ||
     errors.cancellationRule != null ||
     errors.reservationStartInterval != null ||
     errors.reservationsMinDaysBefore != null ||
@@ -335,12 +348,12 @@ export function ReservationUnitSettingsSection({
           <>
             <ControlledSelect
               control={control}
-              name="metadataSet"
+              name="reservationForm"
               required
-              options={metadataOptions}
-              label={t("reservationUnitEditor:label.metadataSet")}
-              error={getTranslatedError(t, errors.metadataSet?.message)}
-              tooltip={t("reservationUnitEditor:tooltip.metadataSet")}
+              options={formOptions}
+              label={t("reservationUnitEditor:label.reservationForm")}
+              error={getTranslatedError(t, errors.reservationForm?.message)}
+              tooltip={t("reservationUnitEditor:tooltip.reservationForm")}
             />
             <ControlledSelect
               control={control}
