@@ -30,9 +30,11 @@ def test_application_round_query__all_fields(graphql):
     graphql.login_with_superuser()
 
     fields = """
-        nameFi
-        nameEn
-        nameSv
+        name {
+            fi
+            en
+            sv
+        }
         criteriaFi
         criteriaEn
         criteriaSv
@@ -71,9 +73,11 @@ def test_application_round_query__all_fields(graphql):
     # - The response contains the selected fields from both application rounds
     assert len(response.edges) == 2, response
     assert response.node(0) == {
-        "nameFi": application_round.name_fi,
-        "nameEn": application_round.name_en,
-        "nameSv": application_round.name_sv,
+        "name": {
+            "fi": application_round.name_fi,
+            "en": application_round.name_en,
+            "sv": application_round.name_sv,
+        },
         "criteriaFi": application_round.criteria_fi,
         "criteriaEn": application_round.criteria_en,
         "criteriaSv": application_round.criteria_sv,

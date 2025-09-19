@@ -18,9 +18,11 @@ def test_reservation_unit_type__query(graphql):
 
     fields = """
         pk
-        nameFi
-        nameSv
-        nameEn
+        name {
+            fi
+            sv
+            en
+        }
         rank
     """
     query = build_query("allReservationUnitTypes", fields=fields)
@@ -31,9 +33,11 @@ def test_reservation_unit_type__query(graphql):
     assert len(response.results) == 1
     assert response.results[0] == {
         "pk": res_unit_type.pk,
-        "nameFi": res_unit_type.name_fi,
-        "nameSv": res_unit_type.name_sv,
-        "nameEn": res_unit_type.name_en,
+        "name": {
+            "fi": res_unit_type.name_fi,
+            "sv": res_unit_type.name_sv,
+            "en": res_unit_type.name_en,
+        },
         "rank": res_unit_type.rank,
     }
 

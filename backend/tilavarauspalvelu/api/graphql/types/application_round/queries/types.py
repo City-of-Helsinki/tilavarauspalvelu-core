@@ -4,6 +4,7 @@ from undine import Field, GQLInfo, QueryType
 from undine.optimizer import OptimizationData
 from undine.relay import Node
 
+from tilavarauspalvelu.api.graphql.extensions.utils import TranslatedField
 from tilavarauspalvelu.models import Application, ApplicationRound, ReservationUnit, User
 from utils.db import SubqueryCount
 
@@ -23,19 +24,22 @@ class ApplicationRoundNode(
 ):
     pk = Field()
 
-    name_fi = Field()
-    name_sv = Field()
-    name_en = Field()
+    name = Field(TranslatedField)
+    name_fi = Field(deprecation_reason="Use 'name' instead.")
+    name_sv = Field(deprecation_reason="Use 'name' instead.")
+    name_en = Field(deprecation_reason="Use 'name' instead.")
 
     terms_of_use = Field()
 
-    criteria_fi = Field()
-    criteria_sv = Field()
-    criteria_en = Field()
+    criteria = Field(TranslatedField)
+    criteria_fi = Field(deprecation_reason="Use 'criteria' instead.")
+    criteria_sv = Field(deprecation_reason="Use 'criteria' instead.")
+    criteria_en = Field(deprecation_reason="Use 'criteria' instead.")
 
-    notes_when_applying_fi = Field()
-    notes_when_applying_sv = Field()
-    notes_when_applying_en = Field()
+    notes_when_applying = Field(TranslatedField)
+    notes_when_applying_fi = Field(deprecation_reason="Use 'notes_when_applying' instead.")
+    notes_when_applying_sv = Field(deprecation_reason="Use 'notes_when_applying' instead.")
+    notes_when_applying_en = Field(deprecation_reason="Use 'notes_when_applying' instead.")
 
     application_period_begins_at = Field()
     application_period_ends_at = Field()

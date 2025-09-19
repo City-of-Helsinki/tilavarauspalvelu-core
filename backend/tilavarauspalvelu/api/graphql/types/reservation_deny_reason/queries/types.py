@@ -2,6 +2,7 @@ from undine import Field, GQLInfo, QueryType
 from undine.exceptions import GraphQLPermissionError
 from undine.relay import Node
 
+from tilavarauspalvelu.api.graphql.extensions.utils import TranslatedField
 from tilavarauspalvelu.models import ReservationDenyReason, User
 
 from .filtersets import ReservationDenyReasonFilterSet
@@ -20,9 +21,10 @@ class ReservationDenyReasonNode(
 ):
     pk = Field()
 
-    reason_fi = Field()
-    reason_sv = Field()
-    reason_en = Field()
+    reason = Field(TranslatedField)
+    reason_fi = Field(deprecation_reason="Use 'reason' instead.")
+    reason_sv = Field(deprecation_reason="Use 'reason' instead.")
+    reason_en = Field(deprecation_reason="Use 'reason' instead.")
 
     @classmethod
     def __permissions__(cls, instance: ReservationDenyReason, info: GQLInfo[User]) -> None:
