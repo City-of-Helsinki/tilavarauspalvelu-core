@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
-import { type MetadataSetsFragment, type ReservationUnitNode, ReserveeType } from "../../gql/gql-types";
+import { type ReservationUnitNode, ReserveeType } from "../../gql/gql-types";
 import { ReservationFormField } from "./ReservationFormField";
 import { AutoGrid, H4, H5 } from "../styled";
 import type { OptionsRecord } from "../../types/common";
@@ -28,7 +28,6 @@ interface CommonWithFields {
 }
 
 interface ReservationFormGeneralSectionProps extends CommonWithFields {
-  reservationUnit: MetadataSetsFragment;
   data?:
     | {
         enableSubvention: false;

@@ -537,10 +537,10 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
       nameFi
       nameEn
       nameSv
+      reservationForm
       ...AvailableTimesReservationUnitFields
       ...NotReservableFields
       ...ReservationTimePickerFields
-      ...MetadataSets
       ...ReservationUnitHead
       ...ReservationUnitMoreDetails
       extUuid
