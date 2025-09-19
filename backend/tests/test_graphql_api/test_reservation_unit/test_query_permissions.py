@@ -62,8 +62,6 @@ SENSITIVE_FIELDS = """
         workingMemo
         handlingDetails
         reserveeEmail
-        reserveeAddressStreet
-        reserveeAddressCity
         reserveeAddressZip
         reserveeOrganisationName
         freeOfChargeReason
@@ -90,8 +88,6 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
         free_of_charge_reason="Free of Charge Reason",
         handling_details="Handling Details",
         reservation_unit=reservation_unit,
-        reservee_address_city="City",
-        reservee_address_street="Address",
         reservee_address_zip="Zip",
         reservee_email="admin@localhost",
         reservee_first_name="General",
@@ -118,8 +114,6 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
                 "description": None,
                 "freeOfChargeReason": None,
                 "handlingDetails": None,
-                "reserveeAddressCity": None,
-                "reserveeAddressStreet": None,
                 "reserveeAddressZip": None,
                 "reserveeEmail": None,
                 "reserveeFirstName": None,
@@ -146,8 +140,6 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
         free_of_charge_reason="Free of Charge Reason",
         handling_details="Handling Details",
         reservation_unit=reservation_unit,
-        reservee_address_city="City",
-        reservee_address_street="Address",
         reservee_address_zip="Zip",
         reservee_email="admin@localhost",
         reservee_first_name="General",
@@ -176,8 +168,6 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
                 "description": "Description",
                 "freeOfChargeReason": "Free of Charge Reason",
                 "handlingDetails": "Handling Details",
-                "reserveeAddressCity": "City",
-                "reserveeAddressStreet": "Address",
                 "reserveeAddressZip": "Zip",
                 "reserveeEmail": "admin@localhost",
                 "reserveeFirstName": "General",

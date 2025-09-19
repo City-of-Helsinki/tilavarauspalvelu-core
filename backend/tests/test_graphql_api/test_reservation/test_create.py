@@ -817,9 +817,7 @@ def test_reservation__create__prefill_profile_data(graphql, settings, arm):
     assert reservation.reservee_last_name == "User"
     assert reservation.reservee_email == "user@example.com"
     assert reservation.reservee_phone == "0123456789"
-    assert reservation.reservee_address_street == "Example street 1"
     assert reservation.reservee_address_zip == "00100"
-    assert reservation.reservee_address_city == "Helsinki"
     assert reservation.municipality == MunicipalityChoice.HELSINKI
 
 
@@ -862,9 +860,7 @@ def test_reservation__create__prefill_profile_data__null_values(graphql, setting
     assert reservation.reservee_last_name == ""
     assert reservation.reservee_email is None
     assert reservation.reservee_phone == ""
-    assert reservation.reservee_address_street == ""
     assert reservation.reservee_address_zip == ""
-    assert reservation.reservee_address_city == ""
     assert reservation.municipality is None
 
 
@@ -896,8 +892,6 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails(graphq
     reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
     assert reservation.reservee_first_name == ""
     assert reservation.reservee_last_name == ""
-    assert reservation.reservee_address_city == ""
-    assert reservation.reservee_address_street == ""
     assert reservation.reservee_address_zip == ""
     assert reservation.municipality is None
 
@@ -929,9 +923,7 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails__use_d
             reservee_last_name="User",
             reservee_email="user@example.com",
             reservee_phone="0123456789",
-            reservee_address_street="Example street 1",
             reservee_address_zip="00100",
-            reservee_address_city="Helsinki",
             municipality=MunicipalityChoice.HELSINKI.value,
         )
         return "foo"
@@ -950,9 +942,7 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails__use_d
     assert reservation.reservee_last_name == "User"
     assert reservation.reservee_email == "user@example.com"
     assert reservation.reservee_phone == "0123456789"
-    assert reservation.reservee_address_street == "Example street 1"
     assert reservation.reservee_address_zip == "00100"
-    assert reservation.reservee_address_city == "Helsinki"
     assert reservation.municipality == MunicipalityChoice.HELSINKI
 
 
@@ -983,8 +973,6 @@ def test_reservation__create__prefilled_with_profile_data__ad_login(graphql, set
     reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
     assert reservation.reservee_first_name == ""
     assert reservation.reservee_last_name == ""
-    assert reservation.reservee_address_city == ""
-    assert reservation.reservee_address_street == ""
     assert reservation.reservee_address_zip == ""
     assert reservation.municipality is None
 

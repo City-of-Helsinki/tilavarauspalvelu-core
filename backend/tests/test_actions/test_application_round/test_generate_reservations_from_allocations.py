@@ -179,8 +179,6 @@ def test_generate_reservation_series_from_allocations__company():
     assert reservations[0].reservee_type == ReserveeType.COMPANY
     assert reservations[0].reservee_organisation_name == application.organisation_name
     assert reservations[0].reservee_identifier == application.organisation_identifier
-    assert reservations[0].reservee_address_street == application.organisation_street_address
-    assert reservations[0].reservee_address_city == application.organisation_city
     assert reservations[0].reservee_address_zip == application.organisation_post_code
 
 
@@ -219,8 +217,6 @@ def test_generate_reservation_series_from_allocations__association():
     assert reservations[0].reservee_type == ReserveeType.NONPROFIT
     assert reservations[0].reservee_organisation_name == application.organisation_name
     assert reservations[0].reservee_identifier == application.organisation_identifier
-    assert reservations[0].reservee_address_street == application.organisation_street_address
-    assert reservations[0].reservee_address_city == application.organisation_city
     assert reservations[0].reservee_address_zip == application.organisation_post_code
 
 
@@ -258,8 +254,6 @@ def test_generate_reservation_series_from_allocations__community():
     assert reservations[0].reservee_type == ReserveeType.NONPROFIT
     assert reservations[0].reservee_organisation_name == application.organisation_name
     assert reservations[0].reservee_identifier == application.organisation_identifier
-    assert reservations[0].reservee_address_street == application.organisation_street_address
-    assert reservations[0].reservee_address_city == application.organisation_city
     assert reservations[0].reservee_address_zip == application.organisation_post_code
 
 

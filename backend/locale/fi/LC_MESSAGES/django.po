@@ -1295,14 +1295,6 @@ msgid "Reservee organisation name"
 msgstr "Varaajan organisaation nimi"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee address street"
-msgstr "Varaajan katuosoite"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee address city"
-msgstr "Varaajan kaupunki"
-
-#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee address zip code"
 msgstr "Varaajan postinumero"
 
@@ -1448,14 +1440,6 @@ msgstr "Varaajan puhelinnumero"
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee's organisation name"
 msgstr "Varaajan organisaation nimi"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee's street address"
-msgstr "Varaajan katuosoite"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee's city"
-msgstr "Varaajan kaupunki"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee's zip code"
