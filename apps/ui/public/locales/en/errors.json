@@ -55,6 +55,7 @@
     "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Please extend the booking time.",
     "RESERVATION_UNIT_NOT_RESERVABLE": "The item cannot be booked.",
     "RESERVATION_UNIT_TYPE_IS_SEASON": "You can only make a seasonal booking application for this item.",
+    "PERMISSION_DENIED": "Permission denied.",
     "UNKNOWN": "An error occurred.",
     "validation": {
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "The applicant must be 18 years old.",
