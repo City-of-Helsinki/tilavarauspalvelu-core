@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar
 
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django_nh3.models import Nh3Field
 from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 from undine.utils.model_fields import TextChoicesField
@@ -26,7 +28,13 @@ __all__ = [
 
 class BannerNotification(models.Model):
     name: str = models.CharField(max_length=100, unique=True)
-    message: str = models.TextField(max_length=1_000, blank=True, default="")
+    message: str = Nh3Field(
+        max_length=1_000,
+        blank=True,
+        default="",
+        tags=settings.NH3_ALLOWED_TAGS,
+        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+    )
     draft: bool = models.BooleanField(default=True)
     level: BannerNotificationLevel = TextChoicesField(choices_enum=BannerNotificationLevel)
     target: BannerNotificationTarget = TextChoicesField(choices_enum=BannerNotificationTarget)
