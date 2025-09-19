@@ -1,7 +1,7 @@
 import TimeZoneNotification from "common/src/components/TimeZoneNotification";
 import React, { useEffect, useMemo, useState } from "react";
 import type { GetServerSidePropsContext } from "next";
-import { Trans, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
@@ -14,47 +14,31 @@ import {
   toApiDate,
   toUIDate,
 } from "common/src/common/util";
-import { formatters as getFormatters } from "common";
 import { Flex, H4 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
-  type ApplicationRoundTimeSlotFieldsFragment,
   CreateReservationDocument,
   type CreateReservationMutation,
   type CreateReservationMutationVariables,
   CurrentUserDocument,
   type CurrentUserQuery,
-  type PricingFieldsFragment,
   type ReservationCreateMutationInput,
   ReservationUnitPageDocument,
   type ReservationUnitPageQuery,
   type ReservationUnitPageQueryVariables,
-  type TimeSlotType,
   useCreateReservationMutation,
 } from "@gql/gql-types";
-import {
-  createNodeId,
-  filterNonNullable,
-  formatListToCSV,
-  formatTimeRange,
-  ignoreMaybeArray,
-  isPriceFree,
-  timeToMinutes,
-  toNumber,
-} from "common/src/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { Sanitize } from "common/src/components/Sanitize";
 import { createApolloClient } from "@/modules/apolloClient";
-import { Map as MapComponent } from "@/components/Map";
 import { getPostLoginUrl } from "@/modules/util";
 import {
-  getFuturePricing,
-  getPriceString,
   getReservationUnitName,
   getTimeString,
   isReservationUnitPublished,
   isReservationUnitReservable,
 } from "@/modules/reservationUnit";
-import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
+import { JustForDesktop } from "@/modules/style/layout";
 import {
   convertFormToFocustimeSlot,
   createDateTime,
@@ -69,7 +53,6 @@ import {
   EquipmentList,
   Head,
   RelatedUnits,
-  ReservationInfoSection,
   ReservationUnitCalendarSection,
 } from "@/components/reservation-unit";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
@@ -80,7 +63,7 @@ import { LoginFragment } from "@/components/LoginFragment";
 import { SubmitButton } from "@/styled/util";
 import { ReservationUnitPageWrapper } from "@/styled/reservation";
 import { getReservationInProgressPath, getSingleSearchPath } from "@/modules/urls";
-import { Accordion, ButtonVariant, LoadingSpinner } from "hds-react";
+import { ButtonVariant, LoadingSpinner } from "hds-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useDisplayError } from "common/src/hooks";
 import {
@@ -95,63 +78,7 @@ import { type ApiError, getApiErrors } from "common/src/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
 import { errorToast } from "common/src/components/toast";
 import { QuickReservation } from "@/components/QuickReservation";
-
-const StyledApplicationRoundScheduleDay = styled.p`
-  span:first-child {
-    display: inline-block;
-    font-weight: bold;
-    width: 9ch;
-    margin-right: var(--spacing-s);
-  }
-`;
-
-function formatTimeSlot(slot: TimeSlotType): string {
-  const { begin, end } = slot;
-  if (!begin || !end) {
-    return "";
-  }
-  const beginTime = timeToMinutes(begin);
-  const endTime = timeToMinutes(end);
-  const endTimeChecked = endTime === 0 ? 24 * 60 : endTime;
-  return formatTimeRange(beginTime, endTimeChecked, true);
-}
-
-export const APPLICATION_ROUND_TIME_SLOT_FRAGMENT = gql`
-  fragment ApplicationRoundTimeSlotFields on ApplicationRoundTimeSlotNode {
-    id
-    weekday
-    isClosed
-    reservableTimes {
-      begin
-      end
-    }
-  }
-`;
-
-// Returns an element for a weekday in the application round timetable, with up to two timespans
-function ApplicationRoundScheduleDay(props: ApplicationRoundTimeSlotFieldsFragment) {
-  const { t } = useTranslation();
-  const { weekday, isClosed } = props;
-  const reservableTimes = filterNonNullable(props.reservableTimes);
-  return (
-    <StyledApplicationRoundScheduleDay>
-      <span data-testid="application-round-time-slot__weekday">{t(`common:weekdayLongEnum.${weekday}`)}</span>{" "}
-      {isClosed ? (
-        <span data-testid="application-round-time-slot__value">-</span>
-      ) : (
-        reservableTimes.length > 0 && (
-          <span data-testid="application-round-time-slot__value">
-            {formatListToCSV(
-              t,
-              reservableTimes.map((slot) => formatTimeSlot(slot))
-            )}
-          </span>
-        )
-      )}
-    </StyledApplicationRoundScheduleDay>
-  );
-}
-
+import { ReservationUnitMoreDetails } from "@/components/reservation-unit/ReservationUnitMoreDetails";
 function SubmitFragment({
   apiBaseUrl,
   focusSlot,
@@ -338,19 +265,6 @@ function ReservationUnit({
     blockingReservations,
   ]);
 
-  const showApplicationRoundTimeSlots = activeApplicationRounds.length > 0;
-
-  const { applicationRoundTimeSlots } = reservationUnit;
-
-  const shouldDisplayPricingTerms = useMemo(() => {
-    const pricings = filterNonNullable(reservationUnit.pricings);
-    if (pricings.length === 0) {
-      return false;
-    }
-    const isPaid = pricings.some((pricing) => !isPriceFree(pricing));
-    return reservationUnit.canApplyFreeOfCharge && isPaid;
-  }, [reservationUnit.canApplyFreeOfCharge, reservationUnit.pricings]);
-
   const [createReservationMutation] = useCreateReservationMutation();
 
   const createReservation = async (input: ReservationCreateMutationInput): Promise<void> => {
@@ -379,19 +293,6 @@ function ReservationUnit({
     // eslint-disable-next-line no-console
     console.warn("not reservable because: ", reason);
   }
-
-  const paymentTermsContent = reservationUnit.paymentTerms
-    ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang)
-    : undefined;
-  const cancellationTermsContent = reservationUnit.cancellationTerms
-    ? getTranslationSafe(reservationUnit.cancellationTerms, "text", lang)
-    : undefined;
-  const pricingTermsContent = reservationUnit.pricingTerms
-    ? getTranslationSafe(reservationUnit.pricingTerms, "text", lang)
-    : undefined;
-  const serviceSpecificTermsContent = reservationUnit.serviceSpecificTerms
-    ? getTranslationSafe(reservationUnit.serviceSpecificTerms, "text", lang)
-    : undefined;
 
   const equipment = filterNonNullable(reservationUnit.equipments);
 
@@ -430,6 +331,10 @@ function ReservationUnit({
       ) : undefined,
     [reservationUnit.canApplyFreeOfCharge]
   );
+
+  const pricingTermsContent = reservationUnit.pricingTerms
+    ? getTranslationSafe(reservationUnit.pricingTerms, "text", lang)
+    : undefined;
 
   return (
     <>
@@ -479,56 +384,11 @@ function ReservationUnit({
               submitReservation={submitReservation}
             />
           )}
-          <ReservationInfoSection
+          <ReservationUnitMoreDetails
             reservationUnit={reservationUnit}
-            reservationUnitIsReservable={reservationUnitIsReservable}
+            termsOfUse={termsOfUse.genericTerms}
+            isReservable={reservationUnitIsReservable}
           />
-          <NoticeWhenReservingSection reservationUnit={reservationUnit} />
-          {showApplicationRoundTimeSlots && (
-            <Accordion headingLevel={2} heading={t("reservationUnit:recurringHeading")} closeButton={false}>
-              <p>{t("reservationUnit:recurringBody")}</p>
-              {applicationRoundTimeSlots.map((day) => (
-                <ApplicationRoundScheduleDay key={day.weekday} {...day} />
-              ))}
-            </Accordion>
-          )}
-          {reservationUnit.unit?.tprekId && (
-            <Accordion closeButton={false} heading={t("common:location")} initiallyOpen>
-              <JustForMobile customBreakpoint={breakpoints.l}>
-                <AddressSection unit={reservationUnit.unit} title={getReservationUnitName(reservationUnit) ?? "-"} />
-              </JustForMobile>
-              <MapComponent tprekId={reservationUnit.unit?.tprekId ?? ""} />
-            </Accordion>
-          )}
-          {(paymentTermsContent || cancellationTermsContent) && (
-            <Accordion
-              heading={t(
-                `reservationUnit:${paymentTermsContent ? "paymentAndCancellationTerms" : "cancellationTerms"}`
-              )}
-              closeButton={false}
-              data-testid="reservation-unit__payment-and-cancellation-terms"
-            >
-              {paymentTermsContent && <Sanitize html={paymentTermsContent} />}
-              <Sanitize html={cancellationTermsContent ?? ""} />
-            </Accordion>
-          )}
-          {shouldDisplayPricingTerms && pricingTermsContent && (
-            <Accordion
-              heading={t("reservationUnit:pricingTerms")}
-              closeButton={false}
-              data-testid="reservation-unit__pricing-terms"
-            >
-              <Sanitize html={pricingTermsContent} />
-            </Accordion>
-          )}
-          <Accordion
-            heading={t("reservationUnit:termsOfUse")}
-            closeButton={false}
-            data-testid="reservation-unit__terms-of-use"
-          >
-            {serviceSpecificTermsContent && <Sanitize html={serviceSpecificTermsContent} />}
-            <Sanitize html={getTranslationSafe(termsOfUse.genericTerms ?? {}, "text", lang)} />
-          </Accordion>
         </PageContentWrapper>
         <InfoDialog
           id="pricing-terms"
@@ -558,70 +418,6 @@ function ReservationUnitWrapped(props: PropsNarrowed) {
       <Breadcrumb routes={routes} />
       <ReservationUnit {...props} />
     </>
-  );
-}
-
-function NoticeWhenReservingSection({
-  reservationUnit,
-}: {
-  reservationUnit: PropsNarrowed["reservationUnit"];
-}): JSX.Element | null {
-  const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
-  const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);
-
-  const appRounds = reservationUnit.applicationRounds;
-  const futurePricing = getFuturePricing(reservationUnit, appRounds);
-
-  if (!futurePricing && !notesWhenReserving) {
-    return null;
-  }
-  return (
-    <Accordion
-      heading={t("reservationUnit:terms")}
-      headingLevel={2}
-      closeButton={false}
-      data-testid="reservation-unit__reservation-notice"
-    >
-      {futurePricing && <PriceChangeNotice futurePricing={futurePricing} />}
-      {notesWhenReserving && <Sanitize html={notesWhenReserving} />}
-    </Accordion>
-  );
-}
-
-function PriceChangeNotice({ futurePricing }: { futurePricing: PricingFieldsFragment }): JSX.Element {
-  const { t, i18n } = useTranslation();
-
-  const isPaid = !isPriceFree(futurePricing);
-  const taxPercentage = toNumber(futurePricing.taxPercentage.value) ?? 0;
-  const begins = new Date(futurePricing.begins);
-  const priceString = getPriceString({
-    t,
-    pricing: futurePricing,
-  }).toLocaleLowerCase();
-  const showTaxNotice = isPaid && taxPercentage > 0;
-  const formatters = getFormatters(i18n.language);
-
-  return (
-    <p style={{ marginTop: 0 }}>
-      <Trans
-        i18nKey="reservationUnit:futurePricingNotice"
-        defaults="Huomioi <bold>hinnoittelumuutos {{date}} alkaen. Uusi hinta on {{price}}</bold>."
-        values={{
-          date: toUIDate(begins),
-          price: priceString,
-        }}
-        components={{ bold: <strong /> }}
-      />
-      {showTaxNotice && (
-        <strong>
-          {t("reservationUnit:futurePriceNoticeTax", {
-            tax: formatters.strippedDecimal?.format(taxPercentage),
-          })}
-        </strong>
-      )}
-      .
-    </p>
   );
 }
 
@@ -778,15 +574,9 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
       ...ReservationTimePickerFields
       ...MetadataSets
       ...ReservationUnitHead
-      unit {
-        ...AddressFields
-      }
+      ...ReservationUnitMoreDetails
       extUuid
-      ...TermsOfUse
       isDraft
-      applicationRoundTimeSlots {
-        ...ApplicationRoundTimeSlotFields
-      }
       descriptionFi
       descriptionEn
       descriptionSv
