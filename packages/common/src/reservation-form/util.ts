@@ -69,10 +69,10 @@ export function getReservationFormGeneralFields() {
 
 export function getReservationFormFields({
   formType,
-  reserveeType,
+  reserveeType = ReserveeType.Individual,
 }: Readonly<{
   formType: ReservationFormType;
-  reserveeType: ReserveeType | "common";
+  reserveeType: ReserveeType | "common" | undefined;
 }>): FormFieldArray {
   const type = convertTypeToKey(reserveeType);
   return RESERVATION_FIELDS[type].filter((field) => formContainsField(formType, field));
@@ -102,27 +102,6 @@ export type FormFieldArray = ReadonlyArray<FormField>;
 
 export function getReservationFormReserveeFields({ reserveeType }: { reserveeType: ReserveeType }) {
   return RESERVATION_FIELDS[convertTypeToKey(reserveeType)];
-}
-
-/// Helper function to type safely pick the application fields from the reservation
-/// filters based on supportedFields so it's safe to use for form construction
-/// TODO clean (if possible) so that we can just chain the base and a filter
-export function getFilteredReserveeFields({
-  formType,
-  reservation,
-  reserveeType,
-}: Readonly<{
-  formType: ReservationFormType;
-  reservation: ReservationFormFieldsFragment;
-  reserveeType: ReserveeType;
-}>): FormFieldArray {
-  const fields = getReservationFormFields({
-    formType,
-    reserveeType,
-  });
-
-  const baseFields = fields.filter((key): key is FormField => key in reservation);
-  return baseFields;
 }
 
 /// Helper function to type safely pick the general fields from the reservation

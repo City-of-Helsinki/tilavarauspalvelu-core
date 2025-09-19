@@ -10,11 +10,12 @@ import { type OptionsRecord } from "../../types/common";
 import {
   constructReservationFieldId,
   constructReservationFieldLabel,
-  type FormFieldArray,
   extendMetaFieldOptions,
   formContainsField,
   RESERVATION_FIELD_MAX_TEXT_LENGTH,
   translateReserveeFormError,
+  getReservationFormFields,
+  getFilteredGeneralFields,
 } from "./util";
 import { CustomerTypeSelector } from "./CustomerTypeSelector";
 import { type ReservationFormValueT } from "../schemas";
@@ -22,8 +23,8 @@ import { ControlledCheckbox, ControlledNumberInput, ControlledSelect } from "../
 import { StyledCheckboxWrapper, StyledTextArea, StyledTextInput } from "./styled";
 
 interface CommonWithFields {
-  fields: FormFieldArray;
   options: Readonly<Omit<OptionsRecord, "municipalities">>;
+  reservationUnit: Pick<ReservationUnitNode, "reservationForm">;
 }
 
 interface ReservationFormGeneralSectionProps extends CommonWithFields {
@@ -38,7 +39,6 @@ interface ReservationFormGeneralSectionProps extends CommonWithFields {
 }
 
 interface ReservationFormReserveeSectionProps extends CommonWithFields {
-  reservationUnit: Pick<ReservationUnitNode, "reservationForm">;
   style?: React.CSSProperties;
   className?: string;
 }
@@ -55,7 +55,7 @@ const Subheading = styled(H4).attrs({ as: "h2" })`
 `;
 
 export function ReservationFormGeneralSection({
-  fields,
+  reservationUnit,
   options: originalOptions,
   data,
 }: ReservationFormGeneralSectionProps) {
@@ -66,6 +66,8 @@ export function ReservationFormGeneralSection({
     register,
     formState: { errors },
   } = form;
+
+  const fields = getFilteredGeneralFields(reservationUnit.reservationForm);
 
   if (fields.length === 0) {
     return null;
@@ -157,9 +159,7 @@ export function ReservationFormGeneralSection({
   );
 }
 
-// TODO reduce prop drilling / remove unused props
 export function ReservationFormReserveeSection({
-  fields,
   reservationUnit,
   options: originalOptions,
   style,
@@ -191,8 +191,13 @@ export function ReservationFormReserveeSection({
 
   const options = extendMetaFieldOptions(originalOptions, t);
 
-  const organisationFields = fields.filter((x) => x === "reserveeOrganisationName" || x === "reserveeIdentifier");
-  const otherFields = fields.filter((x) => organisationFields.find((b) => b === x) == null);
+  const fields = getReservationFormFields({
+    formType: reservationUnit.reservationForm,
+    reserveeType: watch("reserveeType"),
+  });
+  const organisationOnlySet = new Set(["reserveeIdentifier", "reserveeOrganisationName"]);
+  const organisationFields = fields.filter((x) => organisationOnlySet.has(x));
+  const otherFields = fields.filter((x) => !organisationOnlySet.has(x));
 
   return (
     <AutoGrid data-testid="reservation__form--reservee-info" className={className} style={style}>

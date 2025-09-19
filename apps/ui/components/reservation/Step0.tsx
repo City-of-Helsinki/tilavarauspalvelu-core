@@ -16,12 +16,7 @@ import {
   ReserveeType,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
-import {
-  FormFieldArray,
-  getFilteredGeneralFields,
-  getFilteredReserveeFields,
-  getReservationFormGeneralFields,
-} from "common/src/reservation-form/util";
+import { getReservationFormGeneralFields } from "common/src/reservation-form/util";
 import { getReservationFormSchema, type ReservationFormValueT } from "common/src/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -70,7 +65,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
   };
   const formSchema = getReservationFormSchema(reservation.reservationUnit.reservationForm);
   // NOTE infered type is not exactly correct it doesn't create all four discrimating unions
-  type FT = z.infer<typeof formSchema>;
+  type FT = z.infer<ReturnType<typeof getReservationFormSchema>>;
 
   const form = useForm<FT>({
     defaultValues,
@@ -86,8 +81,6 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
   const { pk: reservationPk } = reservation || {};
   const displayError = useDisplayError();
   const [updateReservation] = useUpdateReservationMutation();
-
-  const formType = reservation.reservationUnit.reservationForm;
 
   // TODO move to free function but requires us to type the FT (using ReturnValue + infer probably)
   function transformReservationFom(values: FT): ReservationUpdateMutation {
@@ -160,11 +153,6 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
   };
 
   const reserveeType = watch("reserveeType");
-  const reserveeFields = getFilteredReserveeFields({
-    formType,
-    reservation,
-    reserveeType: reserveeType ?? ReserveeType.Individual,
-  });
 
   const lang = convertLanguageCode(i18n.language);
   const pricingTerms = reservation.reservationUnit.pricingTerms
@@ -176,7 +164,6 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
       <ReservationForm
         reservation={reservation}
         options={options}
-        reserveeFields={reserveeFields}
         form={form}
         onSubventionButtonClick={() => setIsDialogOpen(true)}
       />
@@ -269,7 +256,6 @@ const MandatoryFieldsInfoText = styled.p`
 
 interface ReservationFormProps<T extends FieldValues> {
   reservation: ReservationInProgressFragment;
-  reserveeFields: FormFieldArray;
   options: Readonly<Omit<OptionsRecord, "municipalities">>;
   form: UseFormReturn<T>;
   onSubventionButtonClick: () => void;
@@ -277,7 +263,6 @@ interface ReservationFormProps<T extends FieldValues> {
 
 function ReservationForm<T extends FieldValues>({
   reservation,
-  reserveeFields,
   options,
   onSubventionButtonClick,
   form,
@@ -285,15 +270,13 @@ function ReservationForm<T extends FieldValues>({
   const { t } = useTranslation();
 
   const { reservationUnit } = reservation;
-  const formType = reservationUnit.reservationForm;
-  const generalFields = getFilteredGeneralFields(formType);
   const enableSubvention = reservation.reservationUnit.canApplyFreeOfCharge;
 
   return (
     <FormProvider {...form}>
       <MandatoryFieldsInfoText>{t("forms:mandatoryFieldsText")}</MandatoryFieldsInfoText>
       <ReservationFormGeneralSection
-        fields={generalFields}
+        reservationUnit={reservationUnit}
         options={options}
         data={{
           enableSubvention,
@@ -308,7 +291,7 @@ function ReservationForm<T extends FieldValues>({
           ),
         }}
       />
-      <ReservationFormReserveeSection fields={reserveeFields} options={options} reservationUnit={reservationUnit} />
+      <ReservationFormReserveeSection options={options} reservationUnit={reservationUnit} />
     </FormProvider>
   );
 }
