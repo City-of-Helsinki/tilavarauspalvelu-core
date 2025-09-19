@@ -400,6 +400,7 @@ export const RESERVATION_UNIT_QUERY = gql`
 
 export const CREATE_STAFF_RESERVATION_FRAGMENT = gql`
   fragment CreateStaffReservation on ReservationUnitNode {
+    id
     pk
     nameFi
     reservationStartInterval

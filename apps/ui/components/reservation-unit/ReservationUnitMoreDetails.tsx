@@ -254,7 +254,6 @@ export const RESERVATION_UNIT_MODE_DETAILS_FRAGMENT = gql`
     applicationRoundTimeSlots {
       ...ApplicationRoundTimeSlotFields
     }
-    ...MetadataSets
     ...TermsOfUse
     ...ReservationQuotaReached
     canApplyFreeOfCharge
