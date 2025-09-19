@@ -18,7 +18,7 @@ export const genericTermsVariant = {
   SERVICE: "service",
   PRIVACY: "privacy",
   ACCESSIBILITY: "accessibility",
-};
+} as const;
 
 export const RELATED_RESERVATION_STATES: ReservationStateChoice[] = [
   ReservationStateChoice.Created,

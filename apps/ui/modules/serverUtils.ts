@@ -45,12 +45,11 @@ export async function getGenericTerms(apolloClient: ApolloClient<unknown>): Prom
     query: TermsOfUseDocument,
     variables: {
       termsType: TermsOfUseTypeChoices.GenericTerms,
+      pk: genericTermsVariant.BOOKING,
     },
   });
 
-  // TODO missing backend filtering
-  const tos =
-    tosData?.termsOfUse?.edges?.map((e) => e?.node).find((node) => node?.pk === genericTermsVariant.BOOKING) ?? null;
+  const tos = tosData?.termsOfUse?.edges?.map((e) => e?.node).find(() => true) ?? null;
 
   // NOTE there is no error reporting in the Pages even though this is required data
   // so Pages / Components might return null if tos is missing
