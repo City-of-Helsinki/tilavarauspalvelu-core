@@ -254,7 +254,7 @@ export const EDIT_PAGE_RESERVATION_UNIT_FRAGMENT = gql`
     }
     ...TermsOfUse
     ...ReservationTimePickerFields
-    ...MetadataSets
+    reservationForm
     applicationRounds(ongoing: true) {
       id
       reservationPeriodBeginDate

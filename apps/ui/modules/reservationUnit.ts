@@ -737,7 +737,6 @@ export const NOT_RESERVABLE_FIELDS_FRAGMENT = gql`
     ...IsReservableFields
     reservationState
     reservationKind
-    ...MetadataSets
   }
 `;
 
