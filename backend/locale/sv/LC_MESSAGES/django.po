@@ -538,7 +538,6 @@ msgid "Handled date"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_round/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Purposes"
 msgstr ""
 
@@ -1629,6 +1628,10 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Resources"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Intended uses"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
@@ -3621,6 +3624,14 @@ msgstr ""
 msgid "general roles"
 msgstr ""
 
+#: tilavarauspalvelu/models/intended_use/model.py
+msgid "intended use"
+msgstr ""
+
+#: tilavarauspalvelu/models/intended_use/model.py
+msgid "intended uses"
+msgstr ""
+
 #: tilavarauspalvelu/models/origin_hauki_resource/model.py
 msgid "origin hauki resource"
 msgstr ""
@@ -3679,14 +3690,6 @@ msgstr ""
 
 #: tilavarauspalvelu/models/personal_info_view_log/model.py
 msgid "personal info view logs"
-msgstr ""
-
-#: tilavarauspalvelu/models/purpose/model.py
-msgid "purpose"
-msgstr ""
-
-#: tilavarauspalvelu/models/purpose/model.py
-msgid "purposes"
 msgstr ""
 
 #: tilavarauspalvelu/models/rejected_occurrence/model.py

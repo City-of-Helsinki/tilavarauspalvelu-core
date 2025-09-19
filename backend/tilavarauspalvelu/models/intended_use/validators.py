@@ -4,14 +4,14 @@ import dataclasses
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Purpose
+    from tilavarauspalvelu.models import IntendedUse
 
 
 __all__ = [
-    "PurposeValidator",
+    "IntendedUseValidator",
 ]
 
 
 @dataclasses.dataclass
-class PurposeValidator:
-    purpose: Purpose
+class IntendedUseValidator:
+    intended_use: IntendedUse

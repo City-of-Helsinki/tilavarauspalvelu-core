@@ -4,11 +4,11 @@ from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin
 from modeltranslation.admin import TranslationAdmin
 
-from tilavarauspalvelu.models import Purpose
+from tilavarauspalvelu.models import IntendedUse
 
 
-@admin.register(Purpose)
-class PurposeAdmin(SortableAdminMixin, TranslationAdmin):
+@admin.register(IntendedUse)
+class IntendedUseAdmin(SortableAdminMixin, TranslationAdmin):
     # List
     list_display = [
         "rank",
