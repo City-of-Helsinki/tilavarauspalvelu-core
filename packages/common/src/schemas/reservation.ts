@@ -98,7 +98,7 @@ export function checkReservationInterval(
 // Date can't be in past
 // Time is allowed to be in the past on purpose so it's not validated
 // i.e. you can make a reservation for today 10:00 even if it's 10:30
-function getCreateStaffReservationFormSchema(interval: ReservationStartInterval) {
+export function getCreateStaffReservationFormSchema(interval: ReservationStartInterval) {
   return CreateStaffReservationFormSchema.extend(ReservationFormMetaSchema.shape)
     .superRefine((val, ctx) => {
       if (val.date) {
@@ -132,8 +132,6 @@ export function getTimeChangeFormSchemaRefined(interval: ReservationStartInterva
       message: "Required",
     });
 }
-
-export { getCreateStaffReservationFormSchema };
 
 export type CreateStaffReservationFormValues = z.infer<ReturnType<typeof getCreateStaffReservationFormSchema>>;
 
@@ -201,9 +199,25 @@ const PkSchema = z.object({
 const PartialFormSchema = AgeGroupFormSchema.partial().extend(PkSchema.shape);
 export type ReservationFormValueT = z.infer<typeof PartialFormSchema>;
 
+export function getReservationSchemaBase(formType: ReservationFormType) {
+  switch (formType) {
+    case ReservationFormType.ContactInfoForm:
+      return ContactInfoFormSchema;
+    case ReservationFormType.ReserveeInfoForm:
+      return ReserveeInfoFormSchema;
+    case ReservationFormType.PurposeForm:
+    case ReservationFormType.PurposeSubventionForm:
+      return PurposeFormSchema;
+    case ReservationFormType.AgeGroupForm:
+    case ReservationFormType.AgeGroupSubventionForm:
+      return AgeGroupFormSchema;
+  }
+}
+
+/// The single source of truth for the form fields used by a form type.
 /// only for internal use (type / refinements)
 /// this returns incorrect schema for ContactInfo, but makes schema refinement possible
-function internalGetSchema(formType: ReservationFormType) {
+function getReservationSchemaNarrow(formType: ReservationFormType) {
   switch (formType) {
     case ReservationFormType.ContactInfoForm:
     case ReservationFormType.ReserveeInfoForm:
@@ -217,11 +231,13 @@ function internalGetSchema(formType: ReservationFormType) {
   }
 }
 
+/// TODO this could use formContainsField helper to automatically construct the schema
+/// issue with this is that it removes the type narrowing provided by a switch.
 function getReservationFormSchemaImpl(formType: ReservationFormType) {
   if (formType === ReservationFormType.ContactInfoForm) {
     return ContactInfoFormSchema;
   }
-  return internalGetSchema(formType)
+  return getReservationSchemaNarrow(formType)
     .refine((val) => val.reserveeType === ReserveeType.Individual || val.reserveeOrganisationName.length > 0, {
       path: ["reserveeOrganisationName"],
       message: "Required",

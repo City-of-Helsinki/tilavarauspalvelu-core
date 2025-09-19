@@ -1,22 +1,12 @@
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
-import {
-  AuthenticationType,
-  ReservationTypeChoice,
-  ReserveeType,
-  type ReservationTypeFormFieldsFragment,
-} from "@gql/gql-types";
+import { AuthenticationType, ReservationTypeChoice, type ReservationTypeFormFieldsFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import {
-  type CreateStaffReservationFormValues,
-  type ReservationFormValueT,
-  ReservationTypes,
-} from "common/src/schemas";
+import { type CreateStaffReservationFormValues, ReservationTypes } from "common/src/schemas";
 import { ShowAllContainer } from "common/src/components";
-import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "common/src/reservation-form/MetaFields";
-import { getReservationFormFields, formContainsField } from "common/src/reservation-form/util";
+import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "common/src/reservation-form";
 import { BufferToggles } from "./BufferToggles";
 import ShowTOS from "./ShowTOS";
 import { Element } from "@/styled";
@@ -102,19 +92,10 @@ export function ReservationTypeForm({
 
   const { ageGroups, reservationPurposes } = useFilterOptions();
 
-  const options: Omit<OptionsRecord, "municipality"> = {
+  const options: OptionsRecord = {
     ageGroup: ageGroups,
     purpose: reservationPurposes,
   };
-
-  const fields = getReservationFormFields({
-    formType: reservationUnit.reservationForm,
-    reserveeType: "common",
-  }).filter((n) => n !== "reserveeType");
-
-  if (reservationUnit == null) {
-    return null;
-  }
 
   const showAuthWarning =
     type === ReservationTypeChoice.Behalf && reservationUnit.authentication === AuthenticationType.Strong;
@@ -151,14 +132,14 @@ export function ReservationTypeForm({
           <HR style={{ gridColumn: "1 / -1" }} />
           <Element $wide>
             <div style={{ marginBottom: 48 }}>
-              <ReservationFormGeneralSection fields={fields} options={options} />
+              <ReservationFormGeneralSection reservationUnit={reservationUnit} options={options} />
             </div>
             {type === ReservationTypeChoice.Staff ? (
               <StyledShowAllContainer showAllLabel={t("myUnits:ReservationForm.showReserver")} maximumNumber={0}>
-                <ReservationFormInner reservationUnit={reservationUnit} />
+                <ReserveeFormPart reservationUnit={reservationUnit} />
               </StyledShowAllContainer>
             ) : (
-              <ReservationFormInner reservationUnit={reservationUnit} />
+              <ReserveeFormPart reservationUnit={reservationUnit} />
             )}
           </Element>
         </>
@@ -167,29 +148,10 @@ export function ReservationTypeForm({
   );
 }
 
-function ReservationFormInner({
-  reservationUnit,
-}: Pick<ReservationTypeFormProps, "reservationUnit">): React.ReactElement {
-  const { watch } = useFormContext<ReservationFormValueT>();
-  const { ageGroups, reservationPurposes } = useFilterOptions();
-  const options: Omit<OptionsRecord, "municipality"> = {
-    ageGroup: ageGroups,
-    purpose: reservationPurposes,
-  };
-
-  const formType = reservationUnit.reservationForm;
-
-  const reserveeType = watch("reserveeType");
-  const type =
-    reserveeType != null && formContainsField(formType, "reserveeType") ? reserveeType : ReserveeType.Individual;
-  const fields = getReservationFormFields({
-    formType,
-    reserveeType: type,
-  });
-
+function ReserveeFormPart({ reservationUnit }: Pick<ReservationTypeFormProps, "reservationUnit">): React.ReactElement {
   return (
     <>
-      <ReservationFormReserveeSection fields={fields} reservationUnit={reservationUnit} options={options} />
+      <ReservationFormReserveeSection reservationUnit={reservationUnit} />
       <HR style={{ gridColumn: "1 / -1" }} />
       <ShowTOS reservationUnit={reservationUnit} />
     </>
