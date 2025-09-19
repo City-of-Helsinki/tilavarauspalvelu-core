@@ -47,7 +47,7 @@ from .types.equipment_category.mutations import (
     EquipmentCategoryDeleteMutation,
     EquipmentCategoryUpdateMutation,
 )
-from .types.purpose.mutations import PurposeCreateMutation, PurposeUpdateMutation
+from .types.intended_use.mutations import IntendedUseCreateMutation, IntendedUseUpdateMutation
 from .types.reservation.mutations import (
     ReservationAdjustTimeMutation,
     ReservationApproveMutation,
@@ -110,8 +110,8 @@ __all__ = [
     "EquipmentCreateMutation",
     "EquipmentDeleteMutation",
     "EquipmentUpdateMutation",
-    "PurposeCreateMutation",
-    "PurposeUpdateMutation",
+    "IntendedUseCreateMutation",
+    "IntendedUseUpdateMutation",
     "RejectAllApplicationOptionsMutation",
     "RejectAllSectionOptionsMutation",
     "ReservationAdjustTimeMutation",

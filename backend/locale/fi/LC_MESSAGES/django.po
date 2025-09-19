@@ -549,9 +549,8 @@ msgid "Handled date"
 msgstr "Käsittelyn valmistumispäivä ja -aika"
 
 #: tilavarauspalvelu/admin/application_round/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Purposes"
-msgstr "Käyttötarkoitukset"
+msgstr "Varaustarkoitukset"
 
 #: tilavarauspalvelu/admin/application_round/form.py
 msgctxt "ApplicationRound"
@@ -1689,6 +1688,10 @@ msgstr "Tilat"
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Resources"
 msgstr "Resurssit"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Intended uses"
+msgstr "Käyttotarkoitukset"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Reservation unit type"
@@ -3220,6 +3223,11 @@ msgstr "Varauksesi on vahvistettu"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
+msgid "Deadline"
+msgstr "Määräaika"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
 msgid "Thank you for your booking at Varaamo"
 msgstr "Kiitos varauksestasi Varaamossa"
 
@@ -3303,11 +3311,6 @@ msgstr ""
 msgctxt "Email"
 msgid "Pay the booking at Varaamo"
 msgstr "Maksa varaus Varaamossa"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Deadline"
-msgstr "Määräaika"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
@@ -3716,6 +3719,14 @@ msgstr "yleinen rooli"
 msgid "general roles"
 msgstr "yleiset roolit"
 
+#: tilavarauspalvelu/models/intended_use/model.py
+msgid "intended use"
+msgstr "käyttötarkoitus"
+
+#: tilavarauspalvelu/models/intended_use/model.py
+msgid "intended uses"
+msgstr "käyttötarkoitukset"
+
 #: tilavarauspalvelu/models/origin_hauki_resource/model.py
 msgid "origin hauki resource"
 msgstr "aukiolosovelluksen resurssi"
@@ -3775,14 +3786,6 @@ msgstr "henkilötietojen näyttöloki"
 #: tilavarauspalvelu/models/personal_info_view_log/model.py
 msgid "personal info view logs"
 msgstr "henkilötietojen näyttölokit"
-
-#: tilavarauspalvelu/models/purpose/model.py
-msgid "purpose"
-msgstr "käyttötarkoitus"
-
-#: tilavarauspalvelu/models/purpose/model.py
-msgid "purposes"
-msgstr "käyttötarkoitukset"
 
 #: tilavarauspalvelu/models/rejected_occurrence/model.py
 msgid "rejected occurrence"
