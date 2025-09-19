@@ -55,6 +55,7 @@
     "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Förläng bokningstiden.",
     "RESERVATION_UNIT_NOT_RESERVABLE": "Objektet går inte att boka.",
     "RESERVATION_UNIT_TYPE_IS_SEASON": "Du kan bara göra en ansökan om säsongsbokning för detta objekt.",
+    "PERMISSION_DENIED": "Tillstånd nekad.",
     "UNKNOWN": "Ett fel uppstod.",
     "validation": {
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "Sökanden måste vara myndig.",
