@@ -144,8 +144,6 @@ class ReservationAdmin(admin.ModelAdmin):
                     "reservee_email",
                     "reservee_phone",
                     "reservee_organisation_name",
-                    "reservee_address_street",
-                    "reservee_address_city",
                     "reservee_address_zip",
                     "reservee_type",
                 ],

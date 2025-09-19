@@ -70,8 +70,6 @@ class ReservationAdminForm(forms.ModelForm):
             "reservee_email": _("Reservee email"),
             "reservee_phone": _("Reservee phone"),
             "reservee_organisation_name": _("Reservee organisation name"),
-            "reservee_address_street": _("Reservee address street"),
-            "reservee_address_city": _("Reservee address city"),
             "reservee_address_zip": _("Reservee address zip code"),
             "reservee_type": _("Type of reservee"),
             #
@@ -125,8 +123,6 @@ class ReservationAdminForm(forms.ModelForm):
             "reservee_email": _("Reservee's email address"),
             "reservee_phone": _("Reservee's phone number"),
             "reservee_organisation_name": _("Reservee's organisation name"),
-            "reservee_address_street": _("Reservee's street address"),
-            "reservee_address_city": _("Reservee's city"),
             "reservee_address_zip": _("Reservee's zip code"),
             "reservee_type": _("Type of reservee"),
             #

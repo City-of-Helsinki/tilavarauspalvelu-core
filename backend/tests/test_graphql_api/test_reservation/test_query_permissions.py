@@ -105,8 +105,6 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         reserveeLastName
         reserveePhone
         reserveeEmail
-        reserveeAddressStreet
-        reserveeAddressCity
         reserveeAddressZip
         reserveeOrganisationName
         reserveeName
@@ -146,8 +144,6 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         "price": None,
         "priceNet": None,
         "purpose": None,
-        "reserveeAddressCity": None,
-        "reserveeAddressStreet": None,
         "reserveeAddressZip": None,
         "reserveeEmail": None,
         "reserveeFirstName": None,
@@ -235,8 +231,6 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         num_persons=1,
         price=123,
         purpose=ReservationPurposeFactory.create(),
-        reservee_address_city="city",
-        reservee_address_street="street",
         reservee_address_zip="123",
         reservee_email="foo@email.com",
         reservee_first_name="John",
@@ -271,8 +265,6 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         price
         priceNet
         purpose { nameFi }
-        reserveeAddressCity
-        reserveeAddressStreet
         reserveeAddressZip
         reserveeEmail
         reserveeFirstName
@@ -306,8 +298,6 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
     assert response.node(0)["price"] is not None, "field not found"
     assert response.node(0)["priceNet"] is not None, "field not found"
     assert response.node(0)["purpose"] is not None, "field not found"
-    assert response.node(0)["reserveeAddressCity"] is not None, "field not found"
-    assert response.node(0)["reserveeAddressStreet"] is not None, "field not found"
     assert response.node(0)["reserveeAddressZip"] is not None, "field not found"
     assert response.node(0)["reserveeEmail"] is not None, "field not found"
     assert response.node(0)["reserveeFirstName"] is not None, "field not found"
