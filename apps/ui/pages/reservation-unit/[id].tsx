@@ -656,10 +656,14 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const isPostLogin = query.isPostLogin === "true";
 
+  const startTime = performance.now();
   // recheck login status in case user cancelled the login
   const { data: userData } = await apolloClient.query<CurrentUserQuery>({
     query: CurrentUserDocument,
   });
+  let innerEndTime = performance.now();
+  // oxlint-disable-next-line no-console
+  console.log("Fetch Current user took:", innerEndTime - startTime, "ms");
   let mutationErrors: ApiError[] | null = null;
   if (pk != null && pk > 0 && isPostLogin && userData?.currentUser != null) {
     const beginsAt = ignoreMaybeArray(query.begin);
@@ -701,6 +705,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const startDate = today;
     const endDate = addYears(today, 2);
 
+    let innerStartTime = performance.now();
+    // This takes 400ms+ on local server
     const { data: reservationUnitData } = await apolloClient.query<
       ReservationUnitPageQuery,
       ReservationUnitPageQueryVariables
@@ -712,6 +718,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         endDate: toApiDate(endDate) ?? "",
       },
     });
+    innerEndTime = performance.now();
+    // oxlint-disable-next-line no-console
+    console.log("Fetch reservationUnit took:", innerEndTime - innerStartTime, "ms");
 
     const { reservationUnit } = reservationUnitData;
 
@@ -729,8 +738,14 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       return notFound;
     }
 
+    innerStartTime = performance.now();
+    // This takes 50-60 ms on local server
     const bookingTerms = await getGenericTerms(apolloClient);
+    innerEndTime = performance.now();
+    // oxlint-disable-next-line no-console
+    console.log("Fetch terms took:", innerEndTime - innerStartTime, "ms");
 
+    innerStartTime = performance.now();
     let relatedReservationUnits: RelatedUnitCardFieldsFragment[] = [];
     if (reservationUnit?.unit?.pk) {
       const { data: relatedData } = await apolloClient.query<
@@ -746,11 +761,18 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         (n) => n?.pk !== reservationUnitData.reservationUnit?.pk
       );
     }
+    innerEndTime = performance.now();
+    // oxlint-disable-next-line no-console
+    console.log("Fetch related units took:", innerEndTime - innerStartTime, "ms");
 
     const queryParams = new URLSearchParams(query as Record<string, string>);
     const searchDate = queryParams.get("date") ?? null;
     const searchTime = queryParams.get("time") ?? null;
     const searchDuration = toNumber(ignoreMaybeArray(queryParams.get("duration")));
+
+    const endTime = performance.now();
+    // oxlint-disable-next-line no-console
+    console.log("SSR fetches took in total:", endTime - startTime, "ms");
 
     return {
       props: {
