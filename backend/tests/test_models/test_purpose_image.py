@@ -8,7 +8,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from PIL import Image
 
-from tilavarauspalvelu.models import Purpose
+from tilavarauspalvelu.models import IntendedUse
 
 # Applied to all tests
 pytestmark = [
@@ -24,7 +24,7 @@ def test_purpose__image_purge_on_save(mock_purge_image_cache, settings):
     mock_image.save(fp=mock_image_data, format="PNG")
     mock_file = SimpleUploadedFile("image.png", mock_image_data.getvalue(), content_type="image/png")
 
-    purpose = Purpose(name="test purpose", image=mock_file)
+    purpose = IntendedUse(name="test purpose", image=mock_file)
     purpose.save()
 
     settings.IMAGE_CACHE_ENABLED = True

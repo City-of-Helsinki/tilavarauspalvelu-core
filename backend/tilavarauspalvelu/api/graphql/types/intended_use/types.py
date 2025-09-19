@@ -8,25 +8,25 @@ from easy_thumbnails.files import get_thumbnailer
 from graphene_django_extensions import DjangoNode
 from query_optimizer import AnnotatedField
 
-from tilavarauspalvelu.models import Purpose
+from tilavarauspalvelu.models import IntendedUse
 
-from .filtersets import PurposeFilterSet
-from .permissions import PurposePermission
+from .filtersets import IntendedUseFilterSet
+from .permissions import IntendedUsePermission
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
-    "PurposeNode",
+    "IntendedUseNode",
 ]
 
 
-class PurposeNode(DjangoNode):
+class IntendedUseNode(DjangoNode):
     image_url = AnnotatedField(graphene.String, expression=models.F("image"))
     small_url = AnnotatedField(graphene.String, expression=models.F("image"))
 
     class Meta:
-        model = Purpose
+        model = IntendedUse
         fields = [
             "pk",
             "rank",
@@ -34,10 +34,10 @@ class PurposeNode(DjangoNode):
             "image_url",
             "small_url",
         ]
-        filterset_class = PurposeFilterSet
-        permission_classes = [PurposePermission]
+        filterset_class = IntendedUseFilterSet
+        permission_classes = [IntendedUsePermission]
 
-    def resolve_image_url(root: Purpose, info: GQLInfo) -> str | None:
+    def resolve_image_url(root: IntendedUse, info: GQLInfo) -> str | None:
         # Annotating a ThumbnailerImageField annotates the name of the file (if it exists).
         image_name: str | None = getattr(root, "image_url", None)
         if not image_name:
@@ -47,7 +47,7 @@ class PurposeNode(DjangoNode):
         url = root.image.storage.url(image_name)
         return info.context.build_absolute_uri(url)
 
-    def resolve_small_url(root: Purpose, info: GQLInfo) -> str | None:
+    def resolve_small_url(root: IntendedUse, info: GQLInfo) -> str | None:
         small_url: str | None = getattr(root, "small_url", None)
         if not small_url:
             return None
