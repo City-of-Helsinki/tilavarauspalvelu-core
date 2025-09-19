@@ -465,11 +465,6 @@ class Common(Environment):
     ADMIN_DATA_VIEWS = {
         "URLS": [
             {
-                "route": "text-searches/",
-                "view": "tilavarauspalvelu.admin.text_search_view.text_search_list_view",
-                "name": "text_searches",
-            },
-            {
                 "route": "email-templates/",
                 "view": "tilavarauspalvelu.admin.email_template.view.email_templates_admin_list_view",
                 "name": "email_templates",
