@@ -23,8 +23,6 @@ import { WEEKDAYS_SORTED } from "common/src/const";
 import { type TaxOption } from "./PricingSection";
 import sanitizeHtml from "sanitize-html";
 
-export const AccessTypes = ["ACCESS_CODE", "OPENED_BY_STAFF", "PHYSICAL_KEY", "UNRESTRICTED"] as const;
-
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
 
