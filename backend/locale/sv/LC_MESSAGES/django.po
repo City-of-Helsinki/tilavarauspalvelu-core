@@ -1251,14 +1251,6 @@ msgid "Reservee organisation name"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee address street"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee address city"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee address zip code"
 msgstr ""
 
@@ -1403,14 +1395,6 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee's organisation name"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee's street address"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee's city"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -3140,6 +3124,11 @@ msgstr "Din bokning är bekräftad"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
+msgid "Deadline"
+msgstr "Tidsfrist"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
 msgid "Thank you for your booking at Varaamo"
 msgstr "Tack för din bokning på Varaamo"
 
@@ -3222,11 +3211,6 @@ msgstr ""
 msgctxt "Email"
 msgid "Pay the booking at Varaamo"
 msgstr "Betala bokningen på Varaamo"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Deadline"
-msgstr "Tidsfrist"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"

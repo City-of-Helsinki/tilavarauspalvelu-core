@@ -28,8 +28,6 @@ class ReservationUpdateMutation(MutationType[Reservation]):
     reservee_email = Input()
     reservee_phone = Input()
     reservee_organisation_name = Input()
-    reservee_address_street = Input()
-    reservee_address_city = Input()
     reservee_address_zip = Input()
     reservee_type = Input()
 

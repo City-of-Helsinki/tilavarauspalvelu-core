@@ -330,8 +330,6 @@ class ReservationUpdateData(TypedDict):
     reservee_email: NotRequired[str | None]
     reservee_phone: NotRequired[str]
     reservee_organisation_name: NotRequired[str]
-    reservee_address_street: NotRequired[str]
-    reservee_address_city: NotRequired[str]
     reservee_address_zip: NotRequired[str]
     reservee_type: NotRequired[ReserveeType]
 
@@ -392,8 +390,6 @@ class StaffCreateReservationData(TypedDict):
     reservee_email: NotRequired[str | None]
     reservee_phone: NotRequired[str]
     reservee_organisation_name: NotRequired[str]
-    reservee_address_street: NotRequired[str]
-    reservee_address_city: NotRequired[str]
     reservee_address_zip: NotRequired[str]
     reservee_type: NotRequired[ReserveeType]
 
@@ -546,8 +542,6 @@ class ReservationDetails(TypedDict, total=False):
     reservee_email: str | None
     reservee_phone: str
     reservee_organisation_name: str
-    reservee_address_street: str
-    reservee_address_city: str
     reservee_address_zip: str
     reservee_type: ReserveeType
 

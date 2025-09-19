@@ -173,8 +173,6 @@ class ReservationSeriesRescheduleMutation(MutationType[ReservationSeries], kind=
             reservee_email=reservation.reservee_email,
             reservee_phone=reservation.reservee_phone,
             reservee_organisation_name=reservation.reservee_organisation_name,
-            reservee_address_street=reservation.reservee_address_street,
-            reservee_address_city=reservation.reservee_address_city,
             reservee_address_zip=reservation.reservee_address_zip,
             reservee_type=reservation.reservee_type,
             #
