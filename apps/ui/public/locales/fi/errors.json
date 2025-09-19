@@ -55,6 +55,7 @@
     "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Pidennä varausaikaa.",
     "RESERVATION_UNIT_NOT_RESERVABLE": "Kohde ei ole varattavissa.",
     "RESERVATION_UNIT_TYPE_IS_SEASON": "Tähän kohteeseen voit tehdä vain kausivaraushakemuksen.",
+    "PERMISSION_DENIED": "Ei oikeuksia.",
     "UNKNOWN": "Tapahtui virhe.",
     "validation": {
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "Hakijan on oltava täysi-ikäinen.",
