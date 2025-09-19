@@ -171,7 +171,7 @@ enum ApplicationRoundStatusChoice {
   """Handled"""
   HANDLED
   """Results Sent"""
-  SENT
+  RESULTS_SENT
 }
 
 enum ApplicationSectionOrderSet {
@@ -229,9 +229,9 @@ enum ApplicationStatusChoice {
 
 enum AuthenticationType {
   """Weak"""
-  weak
+  WEAK
   """Strong"""
-  strong
+  STRONG
 }
 
 enum BannerNotificationLevel {
@@ -367,19 +367,19 @@ enum PaymentType {
 
 enum PriceUnit {
   """per 15 minutes"""
-  per_15_mins
+  PER_15_MINS
   """per 30 minutes"""
-  per_30_mins
+  PER_30_MINS
   """per hour"""
-  per_hour
+  PER_HOUR
   """per half a day"""
-  per_half_day
+  PER_HALF_DAY
   """per day"""
-  per_day
+  PER_DAY
   """per week"""
-  per_week
+  PER_WEEK
   """fixed"""
-  fixed
+  FIXED
 }
 
 enum Priority {
@@ -495,11 +495,11 @@ enum ReservationKind {
 """When user wants to receive reservation notification emails."""
 enum ReservationNotification {
   """All"""
-  all
+  ALL
   """Only Handling Required"""
-  only_handling_required
+  ONLY_HANDLING_REQUIRED
   """None"""
-  none
+  NONE
 }
 
 enum ReservationOrderSet {
@@ -550,25 +550,25 @@ enum ReservationPurposeOrderSet {
 
 enum ReservationStartInterval {
   """15 minutes"""
-  interval_15_mins
+  INTERVAL_15_MINUTES
   """30 minutes"""
-  interval_30_mins
+  INTERVAL_30_MINUTES
   """60 minutes"""
-  interval_60_mins
+  INTERVAL_60_MINUTES
   """90 minutes"""
-  interval_90_mins
+  INTERVAL_90_MINUTES
   """2 hours"""
-  interval_120_mins
+  INTERVAL_120_MINUTES
   """3 hours"""
-  interval_180_mins
+  INTERVAL_180_MINUTES
   """4 hours"""
-  interval_240_mins
+  INTERVAL_240_MINUTES
   """5 hours"""
-  interval_300_mins
+  INTERVAL_300_MINUTES
   """6 hours"""
-  interval_360_mins
+  INTERVAL_360_MINUTES
   """7 hours"""
-  interval_420_mins
+  INTERVAL_420_MINUTES
 }
 
 enum ReservationStateChoice {
@@ -635,9 +635,9 @@ enum ReservationUnitCancellationRuleOrderSet {
 
 enum ReservationUnitImageType {
   """Main image"""
-  main
+  MAIN
   """Other"""
-  other
+  OTHER
 }
 
 enum ReservationUnitOptionOrderSet {
@@ -730,9 +730,9 @@ enum ReserveeType {
 
 enum ResourceLocationType {
   """Fixed"""
-  fixed
+  FIXED
   """Movable"""
-  movable
+  MOVABLE
 }
 
 enum ResourceOrderSet {
@@ -768,17 +768,17 @@ enum TermsOfUseOrderSet {
 
 enum TermsOfUseTypeChoices {
   """Generic terms"""
-  generic_terms
+  GENERIC
   """Payment terms"""
-  payment_terms
+  PAYMENT
   """Cancellation terms"""
-  cancellation_terms
+  CANCELLATION
   """Reservation series terms"""
-  recurring_terms
+  RECURRING
   """Service-specific terms"""
-  service_terms
+  SERVICE
   """Pricing terms"""
-  pricing_terms
+  PRICING
 }
 
 enum UnitOrderSet {
@@ -2647,7 +2647,7 @@ input ReservationUnitCreateMutation {
   accessTypes: [ReservationUnitAccessTypeCreateInput!]
   allowReservationsWithoutOpeningHours: Boolean! = false
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotCreateInput!]
-  authentication: AuthenticationType! = weak
+  authentication: AuthenticationType! = WEAK
   bufferTimeAfter: Duration! = 0
   bufferTimeBefore: Duration! = 0
   canApplyFreeOfCharge: Boolean! = false
@@ -2694,7 +2694,7 @@ input ReservationUnitCreateMutation {
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsSv: String
-  reservationStartInterval: ReservationStartInterval! = interval_15_mins
+  reservationStartInterval: ReservationStartInterval! = INTERVAL_15_MINUTES
   reservationUnitType: Int = null
   reservationsMaxDaysBefore: Int = null
   reservationsMinDaysBefore: Int = null
@@ -2839,7 +2839,7 @@ input ReservationUnitPricingCreateInput {
   materialPriceDescriptionFi: String
   materialPriceDescriptionSv: String
   paymentType: PaymentType!
-  priceUnit: PriceUnit! = per_hour
+  priceUnit: PriceUnit! = PER_HOUR
   taxPercentage: Int!
 }
 
@@ -2968,7 +2968,7 @@ input ReservationWorkingMemoMutation {
 }
 
 input ResourceCreateMutation {
-  locationType: ResourceLocationType! = fixed
+  locationType: ResourceLocationType! = FIXED
   nameEn: String = null
   nameFi: String!
   nameSv: String = null
