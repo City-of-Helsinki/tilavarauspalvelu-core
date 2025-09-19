@@ -37,7 +37,7 @@ def test_reservation_unit_export_multiple():
         reservation_ends_at=datetime.datetime(2022, 2, 1, tzinfo=DEFAULT_TIMEZONE),
         spaces__name="Space",
         resources__name="Resource",
-        purposes__name="Purpose",
+        intended_uses__name="Purpose",
         equipments__name="Equipment",
         payment_terms__name="Payment terms",
         cancellation_terms__name="Cancellation terms",
@@ -135,7 +135,7 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.max_reservations_per_user
     assert row_2[next(index)] == reservation_unit_1.allow_reservations_without_opening_hours
     assert row_2[next(index)] == reservation_unit_1.is_archived
-    assert row_2[next(index)] == reservation_unit_1.purposes.first().name_fi
+    assert row_2[next(index)] == reservation_unit_1.intended_uses.first().name_fi
     assert row_2[next(index)] == reservation_unit_1.equipments.first().name_fi
     assert row_2[next(index)] == reservation_unit_1.publishing_state
     assert row_2[next(index)] == reservation_unit_1.reservation_state
@@ -156,9 +156,9 @@ def test_reservation_unit_export_multiple():
                 missing=Missing(deleted=["resources__name"]),
                 column_value_mapping={"Resources": ""},
             ),
-            "Missing Purposes": MissingParams(
-                missing=Missing(deleted=["purposes__name"]),
-                column_value_mapping={"Purposes": ""},
+            "Missing Intended Uses": MissingParams(
+                missing=Missing(deleted=["intended_uses__name"]),
+                column_value_mapping={"Intended Uses": ""},
             ),
             "Missing Equipments": MissingParams(
                 missing=Missing(deleted=["equipments__name"]),
@@ -224,7 +224,7 @@ def test_reservation_unit_export_missing_relations(column_value_mapping, missing
         "reservation_ends_at": datetime.datetime(2022, 2, 1, tzinfo=DEFAULT_TIMEZONE),
         "spaces__name": "Space",
         "resources__name": "Resource",
-        "purposes__name": "Purpose",
+        "intended_uses__name": "Intended use",
         "equipments__name": "Equipment",
         "payment_terms__name": "Payment terms",
         "cancellation_terms__name": "Cancellation terms",

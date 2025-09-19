@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.models import Purpose
+from tilavarauspalvelu.models import IntendedUse
 
 from .helpers import CREATE_MUTATION
 
@@ -12,7 +12,7 @@ pytestmark = [
 ]
 
 
-def test_purpose__create(graphql):
+def test_intended_use__create(graphql):
     data = {"name": "foo"}
 
     graphql.login_with_superuser()
@@ -20,5 +20,5 @@ def test_purpose__create(graphql):
 
     assert response.has_errors is False
 
-    purpose = Purpose.objects.get(pk=response.first_query_object["pk"])
-    assert purpose.name_fi == "foo"
+    intended_use = IntendedUse.objects.get(pk=response.first_query_object["pk"])
+    assert intended_use.name_fi == "foo"

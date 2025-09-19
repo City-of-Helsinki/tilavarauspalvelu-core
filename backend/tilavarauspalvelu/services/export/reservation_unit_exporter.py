@@ -93,7 +93,7 @@ class ReservationUnitExportRow(BaseExportRow):
     maximum_number_of_active_reservations_per_user: str | int = ""
     allow_reservations_without_opening_hours: str | bool = ""
     is_reservation_unit_archived: str | bool = ""
-    purposes: str = ""
+    intended_uses: str = ""
     equipments: str = ""
     state: str = ""
     reservation_state: str = ""
@@ -132,7 +132,7 @@ class ReservationUnitExporter(BaseCSVExporter):
             .prefetch_related(
                 "spaces",
                 "resources",
-                "purposes",
+                "intended_uses",
                 "equipments",
                 models.Prefetch("pricings", ReservationUnitPricing.objects.active()),
             )
@@ -233,7 +233,7 @@ class ReservationUnitExporter(BaseCSVExporter):
                 maximum_number_of_active_reservations_per_user="Maximum number of active reservations per user",
                 allow_reservations_without_opening_hours="Allow reservations without opening hours",
                 is_reservation_unit_archived="Is reservation unit archived",
-                purposes="Purposes",
+                intended_uses="Intended Uses",
                 equipments="Equipments",
                 state="State",
                 reservation_state="Reservation state",
@@ -311,7 +311,7 @@ class ReservationUnitExporter(BaseCSVExporter):
                 maximum_number_of_active_reservations_per_user=instance.max_reservations_per_user,
                 allow_reservations_without_opening_hours=instance.allow_reservations_without_opening_hours,
                 is_reservation_unit_archived=instance.is_archived,
-                purposes=", ".join(purpose.name_fi for purpose in instance.purposes.all()),
+                intended_uses=", ".join(intended_use.name_fi for intended_use in instance.intended_uses.all()),
                 equipments=", ".join(equipment.name_fi for equipment in instance.equipments.all()),
                 state=instance.publishing_state,
                 reservation_state=instance.reservation_state,

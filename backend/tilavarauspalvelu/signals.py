@@ -34,8 +34,8 @@ from social_core.exceptions import AuthCanceled, AuthFailed, AuthStateForbidden,
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import (
+    IntendedUse,
     PaymentAccounting,
-    Purpose,
     Reservation,
     ReservationUnit,
     ReservationUnitImage,
@@ -61,12 +61,12 @@ if TYPE_CHECKING:
 # --- Pre save signals --------------------------------------------------------------------------------------------
 
 
-@receiver(pre_save, sender=Purpose, dispatch_uid="purpose_pre_save")
-def _purpose_pre_save(sender: Any, **kwargs: Unpack[PreSaveKwargs[Purpose]]) -> None:
+@receiver(pre_save, sender=IntendedUse, dispatch_uid="intended_uses_pre_save")
+def _intended_uses_pre_save(sender: Any, **kwargs: Unpack[PreSaveKwargs[IntendedUse]]) -> None:
     instance = kwargs["instance"]
 
     if settings.IMAGE_CACHE_ENABLED and instance.pk is not None:
-        previous: Purpose | None = Purpose.objects.filter(pk=instance.pk).first()
+        previous: IntendedUse | None = IntendedUse.objects.filter(pk=instance.pk).first()
         if previous is not None and previous.image is not None:
             aliases = settings.THUMBNAIL_ALIASES[""]
             for conf_key in list(aliases.keys()):
@@ -224,8 +224,8 @@ def _reservation_unit_resources_m2m(sender: Any, **kwargs: Unpack[M2MChangedKwar
         update_reservation_unit_search_vectors_task.delay(pks=[instance.pk])
 
 
-@receiver(m2m_changed, sender=ReservationUnit.purposes.through, dispatch_uid="reservation_unit_purposes_m2m")
-def _reservation_unit_purposes_m2m(sender: Any, **kwargs: Unpack[M2MChangedKwargs[ReservationUnit]]) -> None:
+@receiver(m2m_changed, sender=ReservationUnit.intended_uses.through, dispatch_uid="reservation_unit_intended_uses_m2m")
+def _reservation_unit_intended_uses_m2m(sender: Any, **kwargs: Unpack[M2MChangedKwargs[ReservationUnit]]) -> None:
     action = kwargs["action"]
     instance = kwargs["instance"]
 
