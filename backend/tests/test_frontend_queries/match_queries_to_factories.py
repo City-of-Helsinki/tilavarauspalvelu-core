@@ -352,6 +352,12 @@ def determine_value_for_field(field: ModelField) -> Any:  # noqa: PLR0911, PLR09
         return field.default
 
     match field:
+        case models.EmailField():
+            return "admin@example.com"
+
+        case models.URLField():
+            return "https://www.example.com"
+
         case models.CharField():
             if field.choices:
                 return field.choices[0][0]
@@ -382,12 +388,6 @@ def determine_value_for_field(field: ModelField) -> Any:  # noqa: PLR0911, PLR09
 
         case models.DurationField():
             return datetime.timedelta()
-
-        case models.EmailField():
-            return "admin@example.com"
-
-        case models.URLField():
-            return "https://www.example.com"
 
         case models.UUIDField():
             return uuid.uuid4()
