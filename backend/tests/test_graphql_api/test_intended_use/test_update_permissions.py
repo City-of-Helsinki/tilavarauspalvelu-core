@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from tests.factories import PurposeFactory
+from tests.factories import IntendedUseFactory
 
 from .helpers import UPDATE_MUTATION
 
@@ -12,9 +12,9 @@ pytestmark = [
 ]
 
 
-def test_purpose__update__regular_user(graphql):
-    purpose = PurposeFactory.create(name="foo")
-    data = {"pk": purpose.pk, "name": "bar"}
+def test_intended_use__update__regular_user(graphql):
+    intended_use = IntendedUseFactory.create(name="foo")
+    data = {"pk": intended_use.pk, "name": "bar"}
 
     graphql.login_with_regular_user()
     response = graphql(UPDATE_MUTATION, input_data=data)

@@ -10,11 +10,11 @@ from .email_message.admin import EmailMessageAdmin
 from .equipment.admin import EquipmentAdmin
 from .equipment_category.admin import EquipmentCategoryAdmin
 from .general_role.admin import GeneralRoleAdmin
+from .intended_use.admin import IntendedUseAdmin
 from .origin_hauki_resource.admin import OriginHaukiResourceAdmin
 from .payment_accounting.admin import PaymentAccountingAdmin
 from .payment_merchant.admin import PaymentMerchantAdmin
 from .payment_order.admin import PaymentOrderAdmin
-from .purpose.admin import PurposeAdmin
 from .rejected_occurrence.admin import RejectedOccurrenceAdmin
 from .reservation.admin import ReservationAdmin
 from .reservation_deny_reason.admin import ReservationDenyReasonAdmin
@@ -50,11 +50,11 @@ __all__ = [
     "EquipmentAdmin",
     "EquipmentCategoryAdmin",
     "GeneralRoleAdmin",
+    "IntendedUseAdmin",
     "OriginHaukiResourceAdmin",
     "PaymentAccountingAdmin",
     "PaymentMerchantAdmin",
     "PaymentOrderAdmin",
-    "PurposeAdmin",
     "RejectedOccurrenceAdmin",
     "ReservationAdmin",
     "ReservationDenyReasonAdmin",

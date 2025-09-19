@@ -48,9 +48,9 @@ from tests.factories.reservation_unit_pricing import ReservationUnitPricingBuild
 
 from .create_reservation_related_things import (
     _create_equipments,
+    _create_intended_uses,
     _create_payment_accountings,
     _create_payment_merchants,
-    _create_purposes,
     _fetch_and_build_reservation_unit_image,
 )
 from .create_seasonal_booking import _create_application_round_time_slots
@@ -187,12 +187,12 @@ def _create_reservation_units(
     # --- Add reservables ------------------------------------------------------------------------------------------
 
     equipments = _create_equipments()
-    purposes = _create_purposes()
+    purposes = _create_intended_uses()
 
     reservation_units = list(ReservationUnit.objects.all())
     for reservation_unit in reservation_units:
         reservation_unit.equipments.add(*random_subset(equipments))
-        reservation_unit.purposes.add(*random_subset(purposes))
+        reservation_unit.intended_uses.add(*random_subset(purposes))
 
     return reservation_units
 

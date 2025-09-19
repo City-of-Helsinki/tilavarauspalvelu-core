@@ -3,18 +3,18 @@ from __future__ import annotations
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
-from tilavarauspalvelu.models import Purpose
+from tilavarauspalvelu.models import IntendedUse
 
 __all__ = [
-    "PurposeFilterSet",
+    "IntendedUseFilterSet",
 ]
 
 
-class PurposeFilterSet(ModelFilterSet):
+class IntendedUseFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
 
     class Meta:
-        model = Purpose
+        model = IntendedUse
         fields = [
             "name_fi",
             "name_en",
