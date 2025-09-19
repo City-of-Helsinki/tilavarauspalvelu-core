@@ -21,15 +21,21 @@ export function useCurrentUser(): {
   };
 }
 
-export const CURRENT_USER = gql`
+export const CURRENT_USER_FRAGMENT = gql`
+  fragment CurrentUserFields on UserNode {
+    id
+    pk
+    firstName
+    lastName
+    email
+    isAdAuthenticated
+  }
+`;
+
+export const CURRENT_USER_QUERY = gql`
   query CurrentUser {
     currentUser {
-      id
-      pk
-      firstName
-      lastName
-      email
-      isAdAuthenticated
+      ...CurrentUserFields
     }
   }
 `;

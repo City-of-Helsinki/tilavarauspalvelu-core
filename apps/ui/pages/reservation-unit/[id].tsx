@@ -435,53 +435,55 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     notFound: true,
   };
 
+  const startTime = performance.now();
+
   const isPostLogin = query.isPostLogin === "true";
 
-  const startTime = performance.now();
-  // recheck login status in case user cancelled the login
-  const { data: userData } = await apolloClient.query<CurrentUserQuery>({
-    query: CurrentUserDocument,
-  });
-  let innerEndTime = performance.now();
-  // oxlint-disable-next-line no-console
-  console.log("Fetch Current user took:", innerEndTime - startTime, "ms");
   let mutationErrors: ApiError[] | null = null;
-  if (pk != null && pk > 0 && isPostLogin && userData?.currentUser != null) {
+  if (pk != null && pk > 0) {
     const beginsAt = ignoreMaybeArray(query.begin);
     const endsAt = ignoreMaybeArray(query.end);
+    if (isPostLogin && beginsAt != null && endsAt != null) {
+      // recheck login status in case user cancelled the login
+      // TODO this might be superflous, we could just catch API errors instead
+      const { data: userData } = await apolloClient.query<CurrentUserQuery>({
+        query: CurrentUserDocument,
+      });
+      let innerEndTime = performance.now();
+      // oxlint-disable-next-line no-console
+      console.log("Fetch Current user took:", innerEndTime - startTime, "ms");
 
-    if (beginsAt != null && endsAt != null) {
-      const input: ReservationCreateMutationInput = {
-        beginsAt,
-        endsAt,
-        reservationUnit: pk,
-      };
-
-      try {
-        const res = await apolloClient.mutate<CreateReservationMutation, CreateReservationMutationVariables>({
-          mutation: CreateReservationDocument,
-          variables: {
-            input,
-          },
-        });
-        const { pk: reservationPk } = res.data?.createReservation ?? {};
-        return {
-          redirect: {
-            destination: getReservationInProgressPath(pk, reservationPk),
-            permanent: false,
-          },
-          props: {
-            notFound: true, // required for type narrowing
-          },
+      if (userData.currentUser != null) {
+        const input: ReservationCreateMutationInput = {
+          beginsAt,
+          endsAt,
+          reservationUnit: pk,
         };
-      } catch (error) {
-        // Format errors so we can JSON.stringify them and toast them on client
-        mutationErrors = getApiErrors(error);
+
+        try {
+          const res = await apolloClient.mutate<CreateReservationMutation, CreateReservationMutationVariables>({
+            mutation: CreateReservationDocument,
+            variables: {
+              input,
+            },
+          });
+          const { pk: reservationPk } = res.data?.createReservation ?? {};
+          return {
+            redirect: {
+              destination: getReservationInProgressPath(pk, reservationPk),
+              permanent: false,
+            },
+            props: {
+              notFound: true, // required for type narrowing
+            },
+          };
+        } catch (error) {
+          // Format errors so we can JSON.stringify them and toast them on client
+          mutationErrors = getApiErrors(error);
+        }
       }
     }
-  }
 
-  if (pk != null && pk > 0) {
     const today = new Date();
     const startDate = today;
     const endDate = addYears(today, 2);
@@ -499,7 +501,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         endDate: toApiDate(endDate) ?? "",
       },
     });
-    innerEndTime = performance.now();
+    let innerEndTime = performance.now();
     // oxlint-disable-next-line no-console
     console.log("Fetch reservationUnit took:", innerEndTime - innerStartTime, "ms");
 
