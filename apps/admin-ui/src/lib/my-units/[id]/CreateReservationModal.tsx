@@ -22,10 +22,7 @@ import styled from "styled-components";
 import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";
-import {
-  type CreateStaffReservationFormValues,
-  getCreateStaffReservationFormSchema,
-} from "common/src/schemas";
+import { type CreateStaffReservationFormValues, getCreateStaffReservationFormSchema } from "common/src/schemas";
 import { CenterSpinner, Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useCheckCollisions } from "@/hooks";
@@ -403,6 +400,7 @@ export const RESERVATION_UNIT_QUERY = gql`
 
 export const CREATE_STAFF_RESERVATION_FRAGMENT = gql`
   fragment CreateStaffReservation on ReservationUnitNode {
+    id
     pk
     nameFi
     reservationStartInterval
