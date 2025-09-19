@@ -308,7 +308,7 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
             input_data.pop(key, None)
 
     @classmethod
-    def _validate_pricings(
+    def _validate_pricings(  # noqa: PLR0912
         cls,
         instance: ReservationUnit,
         input_data: ReservationUnitUpdateData,
@@ -320,19 +320,29 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
         has_active_pricing = instance.pricings.filter(begins__lte=today).exists()
         dates_seen: set[datetime.date] = set()
 
-        existing = {pricing.pk: pricing for pricing in instance.pricings.all()}
-        dates_seen.update(pricing.begins for pricing in existing.values() if pricing.begins <= today)
+        existing_by_pk = {pricing.pk: pricing for pricing in instance.pricings.all()}
+        existing_by_date = {pricing.begins: pricing for pricing in existing_by_pk.values()}
+        dates_seen.update(pricing.begins for pricing in existing_by_pk.values() if pricing.begins <= today)
 
         for pricing_data in pricings:
             pk = pricing_data.get("pk")
+            begins = pricing_data.get("begins")
 
-            # Modifying or picking an existing pricing
+            existing_pricing: ReservationUnitPricing | None = None
+
             if pk is not None:
-                existing_pricing = existing.get(pk)
+                existing_pricing = existing_by_pk.get(pk)
                 if existing_pricing is None:
                     msg = f"Pricing with primary key {pk!r} doesn't belong to this reservation unit"
                     raise GraphQLValidationError(msg)
 
+            if existing_pricing is None and begins is not None:
+                existing_pricing = existing_by_date.get(begins)
+                if existing_pricing is not None:
+                    pricing_data["pk"] = existing_pricing.pk
+
+            # Modifying or picking an existing pricing
+            if existing_pricing is not None:
                 # Date might have been changed, we'll add the new date back.
                 dates_seen.discard(existing_pricing.begins)
 
@@ -384,19 +394,30 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
         has_active_access_type = instance.access_types.filter(begin_date__lte=today).exists()
         dates_seen: set[datetime.date] = set()
 
-        existing = {access_type.pk: access_type for access_type in instance.access_types.all()}
-        dates_seen.update(ac.begin_date for ac in existing.values() if ac.begin_date <= today)
+        existing_by_pk = {access_type.pk: access_type for access_type in instance.access_types.all()}
+        existing_by_date = {access_type.begin_date: access_type for access_type in existing_by_pk.values()}
+        dates_seen.update(ac.begin_date for ac in existing_by_pk.values() if ac.begin_date <= today)
 
         for access_type_data in access_types:
             pk = access_type_data.get("pk")
+            access_type = access_type_data.get("access_type")
+            begin_date = access_type_data.get("begin_date")
 
-            # Modifying or picking an existing access type
+            existing_access_type: ReservationUnitAccessType | None = None
+
             if pk is not None:
-                existing_access_type = existing.get(pk)
+                existing_access_type = existing_by_pk.get(pk)
                 if existing_access_type is None:
                     msg = f"Access type with primary key {pk!r} doesn't belong to this reservation unit"
                     raise GraphQLValidationError(msg)
 
+            if existing_access_type is None and begin_date is not None:
+                existing_access_type = existing_by_date.get(begin_date)
+                if existing_access_type is not None:
+                    access_type_data["pk"] = existing_access_type.pk
+
+            # Modifying or picking an existing access type
+            if existing_access_type is not None:
                 # Date might have been changed, we'll add the new date back.
                 dates_seen.discard(existing_access_type.begin_date)
 
@@ -423,12 +444,10 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
 
             # Create new access type
             else:
-                access_type = access_type_data.get("access_type")
                 if access_type is None:
                     msg = "'accessType' is required for new access types."
                     raise GraphQLValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_ACCESS_TYPE)
 
-                begin_date = access_type_data.get("begin_date")
                 if begin_date is None:
                     msg = "'beginDate' is required for new access types."
                     raise GraphQLValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_BEGIN_DATE)
@@ -472,20 +491,30 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
     ) -> None:
         time_slots = input_data.get("application_round_time_slots", [])
 
-        existing_time_slots = {slot.pk: slot for slot in instance.application_round_time_slots.all()}
+        existing_by_pk = {slot.pk: slot for slot in instance.application_round_time_slots.all()}
+        existing_by_weekday = {slot.weekday: slot for slot in existing_by_pk.values()}
 
         weekdays_seen: set[Weekday] = set()
 
         for timeslot in time_slots:
             pk = timeslot.get("pk")
+            weekday = timeslot.get("weekday")
 
-            # Modifying or picking an existing time slot
+            existing_time_slot: ApplicationRoundTimeSlot | None = None
+
             if pk is not None:
-                existing_time_slot = existing_time_slots.get(pk)
+                existing_time_slot = existing_by_pk.get(pk)
                 if existing_time_slot is None:
                     msg = f"Time slot with primary key {pk!r} doesn't belong to this reservation unit"
                     raise GraphQLValidationError(msg)
 
+            if existing_time_slot is None and weekday is not None:
+                existing_time_slot = existing_by_weekday.get(weekday)
+                if existing_time_slot is not None:
+                    timeslot["pk"] = existing_time_slot.pk
+
+            # Modifying or picking an existing time slot
+            if existing_time_slot is not None:
                 weekday = timeslot.get("weekday", existing_time_slot.weekday)
                 closed = timeslot.get("is_closed", existing_time_slot.is_closed)
 
@@ -501,7 +530,6 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
 
             # Create new time slot
             else:
-                weekday = timeslot.get("weekday")
                 if weekday is None:
                     msg = "'weekday' is required for new timeslots."
                     raise GraphQLValidationError(msg, code=error_codes.APPLICATION_ROUND_TIME_SLOTS_MISSING_WEEKDAY)
@@ -534,13 +562,14 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
         fields.add("reservation_unit")
 
         for data in images_data:
+            image = ReservationUnitImage(reservation_unit=instance, **data)
             if "pk" in data:
                 pks.append(data["pk"])
-                # If only pk selected, leave as is
-                if len(data) == 1:
-                    continue
+                image = ReservationUnitImage.objects.get(pk=data["pk"])
+                for key, value in data.items():
+                    setattr(image, key, value)
 
-            images.append(ReservationUnitImage(reservation_unit=instance, **data))
+            images.append(image)
 
         qs = instance.images.all().exclude(pk__in=pks)
         instances = list(qs)
@@ -559,13 +588,14 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
         fields.add("reservation_unit")
 
         for data in pricings_data:
+            pricing = ReservationUnitPricing(reservation_unit=instance, **data)
             if "pk" in data:
                 pks.append(data["pk"])
-                # If only pk selected, leave as is
-                if len(data) == 1:
-                    continue
+                pricing = ReservationUnitPricing.objects.get(pk=data["pk"])
+                for key, value in data.items():
+                    setattr(pricing, key, value)
 
-            pricings.append(ReservationUnitPricing(reservation_unit=instance, **data))
+            pricings.append(pricing)
 
         # Delete future pricings that are not in the payload.
         # Past or Active pricings can not be deleted.
@@ -590,13 +620,14 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
         fields.add("reservation_unit")
 
         for data in access_types_data:
+            access_type = ReservationUnitAccessType(reservation_unit=instance, **data)
             if "pk" in data:
                 pks.append(data["pk"])
-                # If only pk selected, leave as is
-                if len(data) == 1:
-                    continue
+                access_type = ReservationUnitAccessType.objects.get(pk=data["pk"])
+                for key, value in data.items():
+                    setattr(access_type, key, value)
 
-            access_types.append(ReservationUnitAccessType(reservation_unit=instance, **data))
+            access_types.append(access_type)
 
         # Delete future access types that are not in the payload.
         # Past or active access types should not be deleted.
@@ -621,13 +652,14 @@ class ReservationUnitUpdateMutation(MutationType[ReservationUnit], kind="update"
         fields.add("reservation_unit")
 
         for data in application_round_time_slots_data:
+            time_slot = ApplicationRoundTimeSlot(reservation_unit=instance, **data)
             if "pk" in data:
                 pks.append(data["pk"])
-                # If only pk selected, leave as is
-                if len(data) == 1:
-                    continue
+                time_slot = ApplicationRoundTimeSlot.objects.get(pk=data["pk"])
+                for key, value in data.items():
+                    setattr(time_slot, key, value)
 
-            time_slots.append(ApplicationRoundTimeSlot(reservation_unit=instance, **data))
+            time_slots.append(time_slot)
 
         qs = instance.application_round_time_slots.all().exclude(pk__in=pks)
         instances = list(qs)

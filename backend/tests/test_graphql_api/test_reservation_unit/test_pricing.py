@@ -4,10 +4,11 @@ import datetime
 from decimal import Decimal
 
 import pytest
+from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import PaymentType
 from tilavarauspalvelu.models import ReservationUnit
-from utils.date_utils import local_date
+from utils.date_utils import local_date, local_datetime
 
 from tests.factories import (
     ReservationUnitAccessTypeFactory,
@@ -250,6 +251,37 @@ def test_reservation_unit__update__pricing__active_pricing_can_be_created_on_upd
         "pk": reservation_unit.pk,
         "isDraft": False,
         "pricings": [get_pricing_data()],
+    }
+
+    graphql.login_with_superuser()
+    response = graphql(UPDATE_MUTATION, variables={"input": update_data})
+
+    assert response.has_errors is False, response
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.pricings.count() == 1
+
+
+@freeze_time(local_datetime(2022, 1, 1, 12))
+def test_reservation_unit__update__pricing__readd_current_date_price(graphql):
+    space = SpaceFactory.create()
+    reservation_unit = ReservationUnitFactory.create(spaces=[space])
+    ReservationUnitAccessTypeFactory.create(reservation_unit=reservation_unit)
+    pricing = ReservationUnitPricingFactory.create(reservation_unit=reservation_unit, begins=local_date(2022, 1, 1))
+
+    update_data = {
+        "pk": reservation_unit.pk,
+        "isDraft": False,
+        "pricings": [
+            {
+                "begins": pricing.begins.isoformat(),
+                "priceUnit": pricing.price_unit.value,
+                "lowestPrice": str(pricing.lowest_price),
+                "highestPrice": str(pricing.highest_price),
+                "taxPercentage": pricing.tax_percentage.pk,
+                "paymentType": pricing.payment_type.value,
+            }
+        ],
     }
 
     graphql.login_with_superuser()
