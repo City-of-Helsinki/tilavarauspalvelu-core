@@ -148,7 +148,7 @@ class ReservationUnitNode(DjangoNode):
             # Forward many-to-many related
             "spaces",
             "resources",
-            "purposes",
+            "intended_uses",
             "equipments",
             #
             # Reverse many-to-many related

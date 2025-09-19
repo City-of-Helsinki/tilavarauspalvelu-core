@@ -137,7 +137,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     # Forward many-to-many
     spaces = ManyToManyFactory("tests.factories.SpaceFactory")
     resources = ManyToManyFactory("tests.factories.ResourceFactory")
-    purposes = ManyToManyFactory("tests.factories.PurposeFactory")
+    intended_uses = ManyToManyFactory("tests.factories.IntendedUseFactory")
     equipments = ManyToManyFactory("tests.factories.EquipmentFactory")
 
     # Reverse many-to-many

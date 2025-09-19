@@ -33,11 +33,11 @@ if TYPE_CHECKING:
         ApplicationRound,
         ApplicationRoundTimeSlot,
         Equipment,
+        IntendedUse,
         OriginHaukiResource,
         PaymentAccounting,
         PaymentMerchant,
         PaymentProduct,
-        Purpose,
         Reservation,
         ReservationMetadataSet,
         ReservationSeries,
@@ -57,7 +57,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models.application_round.queryset import ApplicationRoundQuerySet
     from tilavarauspalvelu.models.application_round_time_slot.queryset import ApplicationRoundTimeSlotQuerySet
     from tilavarauspalvelu.models.equipment.queryset import EquipmentQuerySet
-    from tilavarauspalvelu.models.purpose.queryset import PurposeQuerySet
+    from tilavarauspalvelu.models.intended_use.queryset import IntendedUseQuerySet
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
     from tilavarauspalvelu.models.reservation_series.queryset import ReservationSeriesQuerySet
     from tilavarauspalvelu.models.reservation_unit_access_type.queryset import ReservationUnitAccessTypeQuerySet
@@ -251,8 +251,8 @@ class ReservationUnit(models.Model):
         related_name="reservation_units",
         blank=True,
     )
-    purposes: ManyToManyRelatedManager[Purpose, PurposeQuerySet] = models.ManyToManyField(
-        "tilavarauspalvelu.Purpose",
+    intended_uses: ManyToManyRelatedManager[IntendedUse, IntendedUseQuerySet] = models.ManyToManyField(
+        "tilavarauspalvelu.IntendedUse",
         related_name="reservation_units",
         blank=True,
     )

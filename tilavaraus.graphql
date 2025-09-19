@@ -286,7 +286,7 @@ type Query {
     maxPersonsLte: Int
     personsAllowed: Int
     textSearch: String
-    purposes: [Int]
+    intendedUses: [Int]
     equipments: [Int]
     isDraft: Boolean
     isVisible: Boolean
@@ -379,7 +379,7 @@ type Query {
     orderBy: [TaxPercentageOrderingChoices]
   ): TaxPercentageNodeConnection
   metadataSets(first: Int, last: Int, offset: Int, after: String, before: String): ReservationMetadataSetNodeConnection
-  purposes(
+  intendedUses(
     first: Int
     last: Int
     offset: Int
@@ -391,8 +391,8 @@ type Query {
     pk: [Int]
 
     """Ordering"""
-    orderBy: [PurposeOrderingChoices]
-  ): PurposeNodeConnection
+    orderBy: [IntendedUseOrderingChoices]
+  ): IntendedUseNodeConnection
   reservation(
     """The ID of the object"""
     id: ID!
@@ -669,7 +669,7 @@ type ApplicationRoundNode implements Node {
     maxPersonsLte: Int
     personsAllowed: Int
     textSearch: String
-    purposes: [Int]
+    intendedUses: [Int]
     equipments: [Int]
     isDraft: Boolean
     isVisible: Boolean
@@ -832,15 +832,15 @@ type ReservationUnitNode implements Node {
     """Ordering"""
     orderBy: [ResourceOrderingChoices]
   ): [ResourceNode!]!
-  purposes(
+  intendedUses(
     nameFi: String
     nameEn: String
     nameSv: String
     pk: [Int]
 
     """Ordering"""
-    orderBy: [PurposeOrderingChoices]
-  ): [PurposeNode!]!
+    orderBy: [IntendedUseOrderingChoices]
+  ): [IntendedUseNode!]!
   equipments(
     name: String
     name_Icontains: String
@@ -1044,7 +1044,7 @@ type UnitNode implements Node {
     maxPersonsLte: Int
     personsAllowed: Int
     textSearch: String
-    purposes: [Int]
+    intendedUses: [Int]
     equipments: [Int]
     isDraft: Boolean
     isVisible: Boolean
@@ -1412,7 +1412,7 @@ type PaymentProductNode implements Node {
   pk: UUID!
 }
 
-type PurposeNode implements Node {
+type IntendedUseNode implements Node {
   rank: Int!
   nameFi: String
   nameEn: String
@@ -1425,8 +1425,8 @@ type PurposeNode implements Node {
   pk: Int
 }
 
-"""Ordering fields for the 'Purpose' model."""
-enum PurposeOrderingChoices {
+"""Ordering fields for the 'IntendedUse' model."""
+enum IntendedUseOrderingChoices {
   rankAsc
   rankDesc
   nameFiAsc
@@ -2822,19 +2822,19 @@ type ReservationMetadataSetNodeEdge {
   cursor: String!
 }
 
-type PurposeNodeConnection {
+type IntendedUseNodeConnection {
   """Pagination data for this connection."""
   pageInfo: PageInfo!
 
   """Contains the nodes in this connection."""
-  edges: [PurposeNodeEdge]!
+  edges: [IntendedUseNodeEdge]!
   totalCount: Int
 }
 
-"""A Relay edge containing a `PurposeNode` and its cursor."""
-type PurposeNodeEdge {
+"""A Relay edge containing a `IntendedUseNode` and its cursor."""
+type IntendedUseNodeEdge {
   """The item at the end of the edge"""
-  node: PurposeNode
+  node: IntendedUseNode
 
   """A cursor for use in pagination"""
   cursor: String!
@@ -3188,8 +3188,8 @@ type Mutation {
   createReservationUnitImage(input: ReservationUnitImageCreateMutationInput!): ReservationUnitImageCreateMutationPayload
   updateReservationUnitImage(input: ReservationUnitImageUpdateMutationInput!): ReservationUnitImageUpdateMutationPayload
   deleteReservationUnitImage(input: ReservationUnitImageDeleteMutationInput!): ReservationUnitImageDeleteMutationPayload
-  createPurpose(input: PurposeCreateMutationInput!): PurposeCreateMutationPayload
-  updatePurpose(input: PurposeUpdateMutationInput!): PurposeUpdateMutationPayload
+  createIntendedUse(input: IntendedUseCreateMutationInput!): IntendedUseCreateMutationPayload
+  updateIntendedUse(input: IntendedUseUpdateMutationInput!): IntendedUseUpdateMutationPayload
   createReservation(input: ReservationCreateMutationInput!): ReservationCreateMutationPayload
   createStaffReservation(input: ReservationStaffCreateMutationInput!): ReservationStaffCreateMutationPayload
   updateReservation(input: ReservationUpdateMutationInput!): ReservationUpdateMutationPayload
@@ -3909,7 +3909,7 @@ type ReservationUnitCreateMutationPayload {
   paymentTerms: String
   spaces: [Int]
   resources: [Int]
-  purposes: [Int]
+  intendedUses: [Int]
   equipments: [Int]
   images: [ReservationUnitImageNode]
   pricings: [ReservationUnitPricingNode]
@@ -3980,7 +3980,7 @@ input ReservationUnitCreateMutationInput {
   paymentTerms: String
   spaces: [Int]
   resources: [Int]
-  purposes: [Int]
+  intendedUses: [Int]
   equipments: [Int]
   images: [ReservationUnitImageFieldSerializerInput]
   pricings: [ReservationUnitPricingSerializerInput]
@@ -4097,7 +4097,7 @@ type ReservationUnitUpdateMutationPayload {
   paymentTerms: String
   spaces: [Int]
   resources: [Int]
-  purposes: [Int]
+  intendedUses: [Int]
   equipments: [Int]
   images: [ReservationUnitImageNode]
   pricings: [ReservationUnitPricingNode]
@@ -4168,7 +4168,7 @@ input ReservationUnitUpdateMutationInput {
   paymentTerms: String
   spaces: [Int]
   resources: [Int]
-  purposes: [Int]
+  intendedUses: [Int]
   equipments: [Int]
   images: [UpdateReservationUnitImageFieldSerializerInput]
   pricings: [UpdateReservationUnitPricingSerializerInput]
@@ -4243,7 +4243,7 @@ input ReservationUnitImageDeleteMutationInput {
   pk: ID!
 }
 
-type PurposeCreateMutationPayload {
+type IntendedUseCreateMutationPayload {
   pk: Int
   name: String
   nameFi: String
@@ -4251,7 +4251,7 @@ type PurposeCreateMutationPayload {
   nameSv: String
 }
 
-input PurposeCreateMutationInput {
+input IntendedUseCreateMutationInput {
   pk: Int
   name: String!
   nameFi: String
@@ -4259,7 +4259,7 @@ input PurposeCreateMutationInput {
   nameSv: String
 }
 
-type PurposeUpdateMutationPayload {
+type IntendedUseUpdateMutationPayload {
   pk: Int
   name: String
   nameFi: String
@@ -4267,7 +4267,7 @@ type PurposeUpdateMutationPayload {
   nameSv: String
 }
 
-input PurposeUpdateMutationInput {
+input IntendedUseUpdateMutationInput {
   pk: Int!
   name: String
   nameFi: String

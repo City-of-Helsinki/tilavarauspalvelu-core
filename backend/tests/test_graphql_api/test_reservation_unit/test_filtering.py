@@ -237,11 +237,11 @@ def test_reservation_unit__filter__by_reservation_unit_type__multiple(graphql):
     assert response.node(1) == {"pk": reservation_unit_2.pk}
 
 
-def test_reservation_unit__filter__by_purpose(graphql):
-    reservation_unit = ReservationUnitFactory.create(purposes__name="foo")
-    ReservationUnitFactory.create(purposes__name="bar")
+def test_reservation_unit__filter__by_intended_uses(graphql):
+    reservation_unit = ReservationUnitFactory.create(intended_uses__name="foo")
+    ReservationUnitFactory.create(intended_uses__name="bar")
 
-    query = reservation_units_query(purposes=reservation_unit.purposes.first().pk)
+    query = reservation_units_query(intended_uses=reservation_unit.intended_uses.first().pk)
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
@@ -249,15 +249,15 @@ def test_reservation_unit__filter__by_purpose(graphql):
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__by_multiple_purposes(graphql):
-    reservation_unit_1 = ReservationUnitFactory.create(purposes__name="foo")
-    reservation_unit_2 = ReservationUnitFactory.create(purposes__name="bar")
-    ReservationUnitFactory.create(purposes__name="baz")
+def test_reservation_unit__filter__by_multiple_intended_uses(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create(intended_uses__name="foo")
+    reservation_unit_2 = ReservationUnitFactory.create(intended_uses__name="bar")
+    ReservationUnitFactory.create(intended_uses__name="baz")
 
     query = reservation_units_query(
-        purposes=[
-            reservation_unit_1.purposes.first().pk,
-            reservation_unit_2.purposes.first().pk,
+        intended_uses=[
+            reservation_unit_1.intended_uses.first().pk,
+            reservation_unit_2.intended_uses.first().pk,
         ]
     )
     response = graphql(query)

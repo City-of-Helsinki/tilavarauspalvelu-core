@@ -15,10 +15,10 @@ from tilavarauspalvelu.models import (
     AgeGroup,
     Equipment,
     EquipmentCategory,
+    IntendedUse,
     OriginHaukiResource,
     PaymentAccounting,
     PaymentMerchant,
-    Purpose,
     ReservableTimeSpan,
     ReservationDenyReason,
     ReservationMetadataField,
@@ -34,10 +34,10 @@ from tests.factories import (
     AgeGroupFactory,
     EquipmentCategoryFactory,
     EquipmentFactory,
+    IntendedUseFactory,
     OriginHaukiResourceFactory,
     PaymentAccountingFactory,
     PaymentMerchantFactory,
-    PurposeFactory,
     ReservableTimeSpanFactory,
     ReservationDenyReasonFactory,
     ReservationMetadataFieldFactory,
@@ -49,7 +49,7 @@ from tests.factories import (
     TermsOfUseFactory,
 )
 
-from .utils import FieldCombination, PurposeData, SetName, with_logs
+from .utils import FieldCombination, IntendedUseData, SetName, with_logs
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit, ReservationUnitImage
@@ -66,9 +66,9 @@ def _create_equipments() -> list[Equipment]:
 
 
 @with_logs
-def _create_purposes() -> list[Purpose]:
-    purpose_data: list[PurposeData] = [
-        PurposeData(
+def _create_intended_uses() -> list[IntendedUse]:
+    intended_use_data: list[IntendedUseData] = [
+        IntendedUseData(
             name_fi="Pidä kokous",
             name_en="Hold a meeting",
             name_sv="Håll möte",
@@ -78,7 +78,7 @@ def _create_purposes() -> list[Purpose]:
             ),
             image_filename="Varaamo_Pida_kokous_Maija_Astikainen",
         ),
-        PurposeData(
+        IntendedUseData(
             name_fi="Löydä juhlatila",
             name_en="Find a party venue",
             name_sv="Hitta festlokal",
@@ -88,7 +88,7 @@ def _create_purposes() -> list[Purpose]:
             ),
             image_filename="Varaamo_Loyda_juhlatila_Maija_Astikainen",
         ),
-        PurposeData(
+        IntendedUseData(
             name_fi="Järjestä tapahtuma",
             name_en="Organise an event",
             name_sv="Arrangera evenemang",
@@ -98,7 +98,7 @@ def _create_purposes() -> list[Purpose]:
             ),
             image_filename="Varaamo_Jarjesta_tapahtuma_Vesa_Laitinen",
         ),
-        PurposeData(
+        IntendedUseData(
             name_fi="Harrasta yhdessä",
             name_en="Engage in hobbies together",
             name_sv="Utöva hobbyer tillsammans",
@@ -108,7 +108,7 @@ def _create_purposes() -> list[Purpose]:
             ),
             image_filename="Varaamo_Harrasta_yhdessa_Maija_Astikainen",
         ),
-        PurposeData(
+        IntendedUseData(
             name_fi="Liiku ja rentoudu",
             name_en="Exercise and relax",
             name_sv="Motionera och koppla av",
@@ -118,7 +118,7 @@ def _create_purposes() -> list[Purpose]:
             ),
             image_filename="Varaamo_Liiku_Maija_Astikainen",
         ),
-        PurposeData(
+        IntendedUseData(
             name_fi="Pelaa digitaalisesti",
             name_en="Exercise and relax",
             name_sv="Motionera och koppla av",
@@ -128,7 +128,7 @@ def _create_purposes() -> list[Purpose]:
             ),
             image_filename="Varaamo_Pelaa_digitaalisesti_Maija_Astikainen_FmzBTxt",
         ),
-        PurposeData(
+        IntendedUseData(
             name_fi="Työskentele yksin tai ryhmässä",
             name_en="Work alone or in a group",
             name_sv="Arbeta enskilt eller i grupp",
@@ -138,7 +138,7 @@ def _create_purposes() -> list[Purpose]:
             ),
             image_filename="Varaamo_Tyoskentele_yksin_tai_ryhmassa_Maija_Astikainen",
         ),
-        PurposeData(
+        IntendedUseData(
             name_fi="Tee musiikkia tai äänitä",
             name_en="Make music or record",
             name_sv="Gör musik eller spela in",
@@ -148,7 +148,7 @@ def _create_purposes() -> list[Purpose]:
             ),
             image_filename="Varaamo_Tee_musiikkia_ja_aanita_Maija_Astikainen",
         ),
-        PurposeData(
+        IntendedUseData(
             name_fi="Käytä laitteita",
             name_en="Use equipment",
             name_sv="Använd utrustning",
@@ -158,7 +158,7 @@ def _create_purposes() -> list[Purpose]:
             ),
             image_filename="Varaamo_Kayta_laitteita2_Maija_Astikainen",
         ),
-        PurposeData(
+        IntendedUseData(
             name_fi="Sauno tai mökkeile",
             name_en="Take a sauna or stay in a cabin",
             name_sv="Bada bastu eller bo i stuga",
@@ -168,7 +168,7 @@ def _create_purposes() -> list[Purpose]:
             image_filename="Varaamo_sauna_maarit_hohteri",
             extension=".png",
         ),
-        PurposeData(
+        IntendedUseData(
             name_fi="Järjestä näyttely",
             name_en="Organize an exhibition",
             name_sv="Organisera en utställning",
@@ -180,11 +180,11 @@ def _create_purposes() -> list[Purpose]:
         ),
     ]
 
-    purposes: list[Purpose] = []
+    intended_uses: list[IntendedUse] = []
 
     add_images = settings.MEDIA_ROOT and settings.DOWNLOAD_IMAGES_FOR_TEST_DATA
 
-    for data in purpose_data:
+    for data in intended_use_data:
         image: str | None = None
         if add_images:
             path = Path(settings.MEDIA_ROOT) / settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT / data.image_filename
@@ -194,16 +194,16 @@ def _create_purposes() -> list[Purpose]:
 
             image = f"{settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT}/{data.image_filename}{data.extension}"
 
-        purpose = PurposeFactory.build(
+        intended_use = IntendedUseFactory.build(
             name=data.name_fi,
             name_fi=data.name_fi,
             name_en=data.name_en,
             name_sv=data.name_sv,
             image=image,
         )
-        purposes.append(purpose)
+        intended_uses.append(intended_use)
 
-    return Purpose.objects.bulk_create(purposes)
+    return IntendedUse.objects.bulk_create(intended_uses)
 
 
 @with_logs
