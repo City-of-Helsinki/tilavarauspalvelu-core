@@ -785,7 +785,6 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
         ...AvailableTimesReservationUnitFields
         ...NotReservableFields
         ...ReservationTimePickerFields
-        ...MetadataSets
         ...ReservationUnitHead
         unit {
           ...AddressFields

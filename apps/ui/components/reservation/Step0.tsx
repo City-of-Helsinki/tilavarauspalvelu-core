@@ -295,7 +295,6 @@ function ReservationForm<T extends FieldValues>({
       <ReservationFormGeneralSection
         fields={generalFields}
         options={options}
-        reservationUnit={reservationUnit}
         data={{
           enableSubvention,
           termsForDiscount: (

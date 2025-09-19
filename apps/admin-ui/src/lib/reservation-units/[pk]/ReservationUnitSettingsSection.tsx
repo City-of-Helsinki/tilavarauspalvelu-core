@@ -333,6 +333,7 @@ export function ReservationUnitSettingsSection({
         </FieldGroup>
         {isDirect && (
           <>
+            {/* TODO replace with reserveeType selector */}
             <ControlledSelect
               control={control}
               name="metadataSet"

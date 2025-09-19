@@ -199,8 +199,6 @@ export function createMockReservation(props: MockReservationProps): Readonly<Res
         ...generateNameFragment("Test Unit"),
       },
       canApplyFreeOfCharge: canApplyFreeOfCharge,
-      minPersons: 1,
-      maxPersons: 100,
       reservationForm: ReservationFormType.PurposeForm,
       reservationPendingInstructionsFi: "Test pending instructions FI",
       reservationPendingInstructionsEn: "Test pending instructions EN",

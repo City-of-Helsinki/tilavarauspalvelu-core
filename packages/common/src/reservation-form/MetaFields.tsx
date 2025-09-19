@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { type MetadataSetsFragment, type ReservationUnitNode, ReserveeType } from "../../gql/gql-types";
+import { type ReservationUnitNode, ReserveeType } from "../../gql/gql-types";
 import { ReservationFormField } from "./ReservationFormField";
 import { ReservationSubventionSection } from "./ReservationSubventionSection";
 import { AutoGrid, H4, H5 } from "../../styled";
@@ -27,7 +27,6 @@ interface CommonWithFields {
 }
 
 interface ReservationFormGeneralSectionProps extends CommonWithFields {
-  reservationUnit: MetadataSetsFragment;
   data?:
     | {
         enableSubvention: false;
