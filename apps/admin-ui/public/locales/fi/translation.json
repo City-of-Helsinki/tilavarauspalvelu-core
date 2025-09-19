@@ -108,6 +108,12 @@
     "CANCELLED": "Peruutettu",
     "FREE": "Maksuton"
   },
+  "reservationForm": {
+    "AGE_GROUP_FORM": "Lomake 3",
+    "CONTACT_INFO_FORM": "Lomake 1",
+    "PURPOSE_FORM": "Lomake 4",
+    "RESERVEE_INFO_FORM": "Lomake 2"
+  },
   "reservationStartInterval": {
     "INTERVAL_15_MINS": "15 min välein",
     "INTERVAL_30_MINS": "30 min välein",
