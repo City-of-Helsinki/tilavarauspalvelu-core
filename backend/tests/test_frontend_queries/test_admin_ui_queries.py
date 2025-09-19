@@ -26,6 +26,7 @@ if TYPE_CHECKING:
         Reservation,
         ReservationUnit,
         Resource,
+        TermsOfUse,
         Unit,
         User,
     )
@@ -1057,9 +1058,10 @@ def test_frontend_queries__admin_ui__TermsOfUse(graphql):
     query_info = factories[0]
 
     factory_args = deepcopy(query_info.factory_args)
-    query_info.factory.create(**factory_args)
+    obj: TermsOfUse = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
+    variables["pk"] = obj.pk
     assert_no_undefined_variables(variables)
 
     query = query_info.query

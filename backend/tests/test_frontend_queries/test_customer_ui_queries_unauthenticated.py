@@ -422,6 +422,7 @@ def test_frontend_queries__customer_ui__TermsOfUse__unauthenticated(graphql):
 
     variables = deepcopy(query_info.variables)
     variables["termsType"] = obj.terms_type.upper()
+    variables["pk"] = obj.pk
     assert_no_undefined_variables(variables)
 
     query = query_info.query
