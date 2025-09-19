@@ -1,5 +1,5 @@
 import React from "react";
-import { useFormContext, type UseFormRegister } from "react-hook-form";
+import { type UseFormReturn, type UseFormRegister } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { ReserveeType } from "../../gql/gql-types";
 import { type ReservationFormValueT } from "../schemas";
@@ -14,17 +14,18 @@ import {
 type Props = {
   field: keyof ReservationFormValueT;
   reserveeType?: ReserveeType;
+  form: UseFormReturn<ReservationFormValueT>;
 };
 
 // TODO turn this into TextFields only now?
-export function ReservationFormField({ field, reserveeType }: Props): React.ReactElement | null {
+export function ReservationFormField({ field, reserveeType, form }: Props): React.ReactElement | null {
   const { t } = useTranslation();
 
   const {
     watch,
     register,
     formState: { errors },
-  } = useFormContext<ReservationFormValueT>();
+  } = form;
 
   const label = constructReservationFieldLabel(t, reserveeType, field);
   const errorText = translateReserveeFormError(t, label, errors[`${field}`]);

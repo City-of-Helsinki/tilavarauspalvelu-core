@@ -1,16 +1,20 @@
 import { type ApolloClient } from "@apollo/client";
 import { OptionsDocument, type OptionsQueryVariables, type OptionsQuery } from "@gql/gql-types";
+import { type OptionsRecord } from "common";
 import { getTranslationSafe } from "common/src/common/util";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 
-export async function queryOptions(apolloClient: ApolloClient<unknown>, locale: string) {
-  const { data: paramsData } = await apolloClient.query<OptionsQuery, OptionsQueryVariables>({
+export async function queryOptions(
+  apolloClient: ApolloClient<unknown>,
+  locale: string
+): Promise<Readonly<OptionsRecord>> {
+  const { data } = await apolloClient.query<OptionsQuery, OptionsQueryVariables>({
     query: OptionsDocument,
     fetchPolicy: "no-cache",
   });
 
-  const reservationPurposes = filterNonNullable(paramsData.reservationPurposes?.edges?.map((e) => e?.node));
-  const ageGroups = filterNonNullable(paramsData.ageGroups?.edges?.map((e) => e?.node));
+  const reservationPurposes = filterNonNullable(data.reservationPurposes?.edges?.map((e) => e?.node));
+  const ageGroups = filterNonNullable(data.ageGroups?.edges?.map((e) => e?.node));
   if (!ageGroups || ageGroups.length < 1) {
     // eslint-disable-next-line no-console
     console.warn("No ageGroups received!");
@@ -35,5 +39,5 @@ export async function queryOptions(apolloClient: ApolloClient<unknown>, locale: 
   return {
     purpose: purposeOptions,
     ageGroup: ageGroupOptions,
-  };
+  } as const;
 }
