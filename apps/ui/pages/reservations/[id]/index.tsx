@@ -8,12 +8,12 @@ import { Flex, fontRegular, H1, H4, NoWrap } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import {
   type AccessCodeQuery,
-  AccessType,
   ApplicationReservationSeriesDocument,
   type ApplicationReservationSeriesQuery,
   type ApplicationReservationSeriesQueryVariables,
   MunicipalityChoice,
   OrderStatus,
+  AccessType,
   ReservationCancelReasonChoice,
   ReservationPageDocument,
   type ReservationPageQuery,

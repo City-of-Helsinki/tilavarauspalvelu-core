@@ -1,21 +1,18 @@
-import {
-  ReserveeType,
-  MunicipalityChoice,
-  type ReservationFormFieldsFragment,
-  ReservationFormType,
-} from "../../gql/gql-types";
+import { ReserveeType, type ReservationFormFieldsFragment, ReservationFormType } from "../../gql/gql-types";
 import { type TFunction } from "next-i18next";
+import type { FieldError } from "react-hook-form";
 import { type OptionsRecord } from "../../types/common";
-import { ReservationFormValueT } from "../schemas";
-import { FieldError } from "react-hook-form";
 import { filterEmpty } from "../modules/helpers";
+import { getReservationSchemaBase, type ReservationFormValueT } from "../schemas";
 
 /* NOTE: backend returns validation errors if text fields are too long
  * remove maxlength after adding proper schema validation
  */
 export const RESERVATION_FIELD_MAX_TEXT_LENGTH = 255;
 
+/// These match the keys of both GraphQL fragment and the form schema
 const COMMON_RESERVEE_FIELDS = [
+  "reserveeType",
   "reserveeFirstName",
   "reserveeLastName",
   "reserveeEmail",
@@ -29,14 +26,11 @@ const ORGANISATION_FIELDS = [...COMMON_RESERVEE_FIELDS, "reserveeOrganisationNam
 // reserver is shown after it
 const RESERVATION_FIELDS = {
   // reserver : Varaajan tiedot
-  // also known as applicationFields in the code
   individual: COMMON_RESERVEE_FIELDS,
   nonprofit: ORGANISATION_FIELDS,
   company: ORGANISATION_FIELDS,
-  // reservation : Varauksen tiedot
-  // also known as generalFields in the code
+  // reservation : Varauksen tiedot (aka generalFields)
   general: [
-    "reserveeType",
     "name",
     "purpose",
     "numPersons",
@@ -47,7 +41,7 @@ const RESERVATION_FIELDS = {
   ] as const,
 } as const;
 
-function convertTypeToKey(t: ReserveeType | "common"): keyof typeof RESERVATION_FIELDS {
+function convertTypeToKey(t: ReserveeType | "general"): keyof typeof RESERVATION_FIELDS {
   switch (t) {
     case ReserveeType.Company:
       return "company";
@@ -55,7 +49,7 @@ function convertTypeToKey(t: ReserveeType | "common"): keyof typeof RESERVATION_
       return "individual";
     case ReserveeType.Nonprofit:
       return "nonprofit";
-    case "common":
+    case "general":
       return "general";
   }
 }
@@ -69,108 +63,36 @@ export function getReservationFormGeneralFields() {
 
 export function getReservationFormFields({
   formType,
-  reserveeType,
+  reserveeType = ReserveeType.Individual,
 }: Readonly<{
   formType: ReservationFormType;
-  reserveeType: ReserveeType | "common";
+  reserveeType: ReserveeType | undefined;
 }>): FormFieldArray {
   const type = convertTypeToKey(reserveeType);
   return RESERVATION_FIELDS[type].filter((field) => formContainsField(formType, field));
 }
 
-export function removeRefParam<Type>(params: Type & { ref: unknown }): Omit<Type, "ref"> {
-  const { ref, ...rest } = params;
-  return rest;
-}
-
-// Modify options to include static enums
-// the options Record (and down stream components don't narrow types properly)
-// so missing keys are not type errors but instead turn Select components -> TextFields
-export function extendMetaFieldOptions(options: Omit<OptionsRecord, "municipality">, t: TFunction): OptionsRecord {
-  return {
-    ...options,
-    municipality: Object.values(MunicipalityChoice).map((value) => ({
-      label: t(`common:municipalities.${value.toUpperCase()}`),
-      value: value,
-    })),
-  };
-}
-
-// used to inject frontend only boolean toggle into the FormFields
+// TODO rename these fields they are the ReservationNode fields that store form input data
+// not form fields (they map to backend / query types, not frontend form)
 export type FormField = keyof Omit<ReservationFormFieldsFragment, "id" | "reservationUnit">;
 export type FormFieldArray = ReadonlyArray<FormField>;
 
-export function getReservationFormReserveeFields({ reserveeType }: { reserveeType: ReserveeType }) {
-  return RESERVATION_FIELDS[convertTypeToKey(reserveeType)];
-}
-
-/// Helper function to type safely pick the application fields from the reservation
-/// filters based on supportedFields so it's safe to use for form construction
-/// TODO clean (if possible) so that we can just chain the base and a filter
-export function getFilteredReserveeFields({
-  formType,
-  reservation,
-  reserveeType,
-}: Readonly<{
-  formType: ReservationFormType;
-  reservation: ReservationFormFieldsFragment;
-  reserveeType: ReserveeType;
-}>): FormFieldArray {
-  const fields = getReservationFormFields({
-    formType,
-    reserveeType,
-  });
-
-  const baseFields = fields.filter((key): key is FormField => key in reservation);
-  return baseFields;
+export function getReservationFormReserveeFields({ reserveeType }: { reserveeType: ReserveeType | null }) {
+  const baseFields = RESERVATION_FIELDS[convertTypeToKey(reserveeType ?? ReserveeType.Individual)];
+  return baseFields.filter((n) => n !== "reserveeType");
 }
 
 /// Helper function to type safely pick the general fields from the reservation
 export function getFilteredGeneralFields(formType: ReservationFormType): FormFieldArray {
-  const generalFields = getReservationFormFields({
-    formType,
-    reserveeType: "common",
-  }).filter((n) => n !== "reserveeType");
-
-  return generalFields;
+  return RESERVATION_FIELDS["general"].filter((field) => formContainsField(formType, field));
 }
 
-export function getFormFields(type: ReservationFormType): ReadonlyArray<keyof ReservationFormFieldsFragment> {
-  const base = ["reserveeFirstName", "reserveeLastName", "reserveeEmail", "reserveePhone"] as const;
-  // TODO order matters or no but we are getting the fields in wrong order in the Form
-  const info = [
-    ...base,
-    "numPersons", // optional (but required in purposeForm?)
-    "description",
-    "reserveeType",
-    "reserveeOrganisationName",
-    "reserveeIdentifier",
-  ] as const;
-
-  const purposeForm = [
-    ...info,
-    "name", // name is optional currently
-    "municipality",
-    "purpose",
-  ] as const;
-
-  // subbention (free of charge) is moved to reservationUnit toggle only
-  switch (type) {
-    /** Contact information only */
-    case ReservationFormType.ContactInfoForm:
-      return base;
-    /** Contact information and event description */
-    case ReservationFormType.ReserveeInfoForm:
-      return info;
-    /** Purpose of use : Lomake 3 */
-    case ReservationFormType.PurposeForm:
-    case ReservationFormType.PurposeSubventionForm:
-      return purposeForm;
-    /** Age group : Lomake 4 */
-    case ReservationFormType.AgeGroupForm:
-    case ReservationFormType.AgeGroupSubventionForm:
-      return [...purposeForm, "ageGroup"] as const;
-  }
+/// Get stored reservation fields (graphql) based on form type.
+function getFormFields(type: ReservationFormType): FormFieldArray {
+  const schema = getReservationSchemaBase(type);
+  const keys = schema.keyof().options;
+  // @ts-expect-error -- keyof returns incorrect type (picking the first option from discriminating union)
+  return keys.filter((x) => x !== ("reserveeIsUnregisteredAssociation" as const)) satisfies FormFieldArray;
 }
 
 export function formContainsField(type: ReservationFormType, fieldName: keyof ReservationFormFieldsFragment): boolean {
@@ -221,6 +143,5 @@ export function constructReservationFieldLabel(
   field: keyof ReservationFormValueT
 ): string {
   const trKey = type?.toLocaleLowerCase() || "individual";
-  const label = t(`reservationApplication:label.${trKey}.${field}`);
-  return label;
+  return t(`reservationApplication:label.${trKey}.${field}`);
 }
