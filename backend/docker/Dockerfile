@@ -24,11 +24,8 @@ RUN echo "Install common dependencies" \
       libpq5 \
       postgresql-client \
       make \
-      locales \
       rsync \
     && apt-get clean \
-    && echo "Generate locale for Finnish" \
-    && locale-gen fi_FI.UTF-8 \
     && echo "Create project directory" \
     && mkdir -p "$PROJECT_ROOT" \
     && chmod g=u "$PROJECT_ROOT" \
@@ -77,7 +74,7 @@ ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 ENV POETRY_INSTALLER_PARALLEL=false
 
 # Install poetry.
-RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=2.0.0 python -
+RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=2.2.0 python -
 
 # Copy poetry files.
 COPY poetry.lock pyproject.toml /
@@ -136,11 +133,8 @@ COPY --chown=root:root --chmod=774 --from=builder $VENV_ROOT $VENV_ROOT
 COPY --chown=root:root --chmod=774 --from=build-static $STATIC_ROOT $STATIC_ROOT
 
 # Activate virtualenv by setting some environment variables.
-# Set locale to Finnish.
 ENV PATH=$VENV_ROOT/bin:$PATH \
-    VIRTUAL_ENV=$VENV_ROOT \
-    LC_ALL=fi_FI.UTF-8 \
-    LANG=fi_FI.UTF-8
+    VIRTUAL_ENV=$VENV_ROOT
 
 # Compile translations.
 RUN \
