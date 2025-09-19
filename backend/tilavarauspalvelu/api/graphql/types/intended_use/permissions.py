@@ -8,11 +8,11 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
-    "PurposePermission",
+    "IntendedUsePermission",
 ]
 
 
-class PurposePermission(BasePermission):
+class IntendedUsePermission(BasePermission):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return True

@@ -39,9 +39,9 @@ class SearchableData:
     resources__name: str = "-"
     resources__name_en: str = "-"
     resources__name_sv: str = "-"
-    purposes__name: str = "-"
-    purposes__name_en: str = "-"
-    purposes__name_sv: str = "-"
+    intended_uses__name: str = "-"
+    intended_uses__name_en: str = "-"
+    intended_uses__name_sv: str = "-"
     equipments__name: str = "-"
     equipments__name_en: str = "-"
     equipments__name_sv: str = "-"
@@ -168,18 +168,18 @@ class Params(NamedTuple):
             reservation_unit_data=SearchableData(resources__name_sv="foo"),
             language="sv",
         ),
-        "match purpose name fi": Params(
+        "match intended use name fi": Params(
             text_search="foo",
-            reservation_unit_data=SearchableData(purposes__name="foo"),
+            reservation_unit_data=SearchableData(intended_uses__name="foo"),
         ),
-        "match purpose name en": Params(
+        "match intended use name en": Params(
             text_search="foo",
-            reservation_unit_data=SearchableData(purposes__name_en="foo"),
+            reservation_unit_data=SearchableData(intended_uses__name_en="foo"),
             language="en",
         ),
-        "match purpose name sv": Params(
+        "match intended use name sv": Params(
             text_search="foo",
-            reservation_unit_data=SearchableData(purposes__name_sv="foo"),
+            reservation_unit_data=SearchableData(intended_uses__name_sv="foo"),
             language="sv",
         ),
         "match equipment name fi": Params(

@@ -3,18 +3,18 @@ from __future__ import annotations
 import factory
 from factory import LazyAttribute
 
-from tilavarauspalvelu.models import Purpose
+from tilavarauspalvelu.models import IntendedUse
 
 from ._base import FakerEN, FakerFI, FakerSV, GenericDjangoModelFactory, ManyToManyFactory
 
 __all__ = [
-    "PurposeFactory",
+    "IntendedUseFactory",
 ]
 
 
-class PurposeFactory(GenericDjangoModelFactory[Purpose]):
+class IntendedUseFactory(GenericDjangoModelFactory[IntendedUse]):
     class Meta:
-        model = Purpose
+        model = IntendedUse
 
     name = FakerFI("word")
     name_fi = LazyAttribute(lambda i: i.name)

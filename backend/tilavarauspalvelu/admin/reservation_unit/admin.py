@@ -148,7 +148,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
                     "spaces",
                     "resources",
                     "equipments",
-                    "purposes",
+                    "intended_uses",
                 ],
             },
         ],
@@ -204,7 +204,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
     ]
     filter_horizontal = [
         "spaces",
-        "purposes",
+        "intended_uses",
         "resources",
         "equipments",
     ]

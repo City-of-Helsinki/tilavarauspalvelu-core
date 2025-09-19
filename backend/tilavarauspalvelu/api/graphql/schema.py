@@ -37,8 +37,8 @@ from .mutations import (
     EquipmentCreateMutation,
     EquipmentDeleteMutation,
     EquipmentUpdateMutation,
-    PurposeCreateMutation,
-    PurposeUpdateMutation,
+    IntendedUseCreateMutation,
+    IntendedUseUpdateMutation,
     RejectAllApplicationOptionsMutation,
     RejectAllSectionOptionsMutation,
     ReservationAdjustTimeMutation,
@@ -95,9 +95,9 @@ from .queries import (
     EquipmentCategoryNode,
     EquipmentNode,
     HelsinkiProfileDataNode,
+    IntendedUseNode,
     PaymentOrderNode,
     PermissionCheckerType,
-    PurposeNode,
     RejectedOccurrenceNode,
     ReservationCancelReasonType,
     ReservationDenyReasonNode,
@@ -174,7 +174,7 @@ class Query(graphene.ObjectType):
     reservation_unit_cancellation_rules = ReservationUnitCancellationRuleNode.Connection()
     tax_percentages = TaxPercentageNode.Connection()
     metadata_sets = ReservationMetadataSetNode.Connection()
-    purposes = PurposeNode.Connection()
+    intended_uses = IntendedUseNode.Connection()
     #
     # Reservations
     reservation = ReservationNode.Node()
@@ -348,8 +348,8 @@ class Mutation(graphene.ObjectType):
     create_reservation_unit_image = ReservationUnitImageCreateMutation.Field()
     update_reservation_unit_image = ReservationUnitImageUpdateMutation.Field()
     delete_reservation_unit_image = ReservationUnitImageDeleteMutation.Field()
-    create_purpose = PurposeCreateMutation.Field()
-    update_purpose = PurposeUpdateMutation.Field()
+    create_intended_use = IntendedUseCreateMutation.Field()
+    update_intended_use = IntendedUseUpdateMutation.Field()
     #
     # Reservations
     create_reservation = ReservationCreateMutation.Field()
