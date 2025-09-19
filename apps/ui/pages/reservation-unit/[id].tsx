@@ -54,7 +54,7 @@ import {
   RelatedUnits,
   ReservationUnitCalendarSection,
 } from "@/components/reservation-unit";
-import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useForm, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PendingReservationFormSchema, type PendingReservationFormType } from "@/components/reservation-unit/schema";
@@ -145,7 +145,6 @@ const StyledRelatedUnits = styled(RelatedUnits)`
 
 function ReservationUnit({
   reservationUnit,
-  termsOfUse,
   apiBaseUrl,
   queryParams: { searchDuration, searchDate, searchTime },
   mutationErrors,
@@ -381,11 +380,7 @@ function ReservationUnit({
             submitReservation={submitReservation}
           />
         )}
-        <ReservationUnitMoreDetails
-          reservationUnit={reservationUnit}
-          termsOfUse={termsOfUse.genericTerms}
-          isReservable={reservationUnitIsReservable}
-        />
+        <ReservationUnitMoreDetails reservationUnit={reservationUnit} isReservable={reservationUnitIsReservable} />
       </PageContentWrapper>
       <InfoDialog
         id="pricing-terms"
@@ -520,13 +515,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       return notFound;
     }
 
-    innerStartTime = performance.now();
-    // This takes 50-60 ms on local server
-    const bookingTerms = await getGenericTerms(apolloClient);
-    innerEndTime = performance.now();
-    // oxlint-disable-next-line no-console
-    console.log("Fetch terms took:", innerEndTime - innerStartTime, "ms");
-
     const queryParams = new URLSearchParams(query as Record<string, string>);
     const searchDate = queryParams.get("date") ?? null;
     const searchTime = queryParams.get("time") ?? null;
@@ -541,7 +529,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         ...commonProps,
         ...(await serverSideTranslations(locale ?? "fi")),
         reservationUnit,
-        termsOfUse: { genericTerms: bookingTerms },
         queryParams: {
           searchDuration,
           searchDate,
