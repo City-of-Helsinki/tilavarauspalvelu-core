@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
-import { AccessTypes, type ReservationUnitEditFormValues } from "./form";
+import { type ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 import { ControlledDateInput, ControlledSelect } from "common/src/components/form";
 import { fromUIDate } from "common/src/common/util";
@@ -76,14 +76,14 @@ function AccessTypePart({
 
   // Remove ACCESS_CODE option when creating a new reservation unit
   const reservationUnitPk = getValues("pk");
-  const accessTypeOptions = AccessTypes.filter(
-    (option) => !(reservationUnitPk === 0 && option === AccessType.AccessCode)
-  ).map((option) => {
-    return {
-      value: option,
-      label: t(`accessType:type.${option}`),
-    };
-  });
+  const accessTypeOptions = Object.values(AccessType)
+    .filter((option) => !(reservationUnitPk === 0 && option === AccessType.AccessCode))
+    .map((option) => {
+      return {
+        value: option,
+        label: t(`accessType:type.${option}`),
+      };
+    });
 
   const firstAccessType = getValues("accessTypes")[0];
   // Access Type exists and has already begun

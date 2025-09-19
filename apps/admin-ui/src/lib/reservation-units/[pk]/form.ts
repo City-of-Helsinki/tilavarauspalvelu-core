@@ -24,8 +24,6 @@ import { type TaxOption } from "./PricingSection";
 import sanitizeHtml from "sanitize-html";
 import { getIntervalMinutes } from "common/src/conversion";
 
-export const AccessTypes = ["ACCESS_CODE", "OPENED_BY_STAFF", "PHYSICAL_KEY", "UNRESTRICTED"] as const;
-
 type Node = ReservationUnitEditPageFragment;
 
 /// @param date string in UI format
