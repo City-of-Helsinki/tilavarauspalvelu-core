@@ -11,7 +11,6 @@ import {
   type PriceReservationUnitFieldsFragment,
   type EquipmentFieldsFragment,
   PaymentType,
-  ReservationFormType,
 } from "@gql/gql-types";
 import {
   type GetReservationUnitPriceProps,
@@ -756,7 +755,6 @@ describe("isReservationUnitReservable", () => {
       minReservationDuration,
       maxReservationDuration,
       reservationBeginsAt: reservationBeginsAt?.toISOString() ?? null,
-      reservationForm: ReservationFormType.PurposeForm,
       reservationState,
       reservableTimeSpans,
     };
