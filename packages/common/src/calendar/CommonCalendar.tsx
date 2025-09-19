@@ -467,7 +467,7 @@ const localizer = (locale: LocalizationLanguages) =>
     locales,
   });
 
-function Calendar<T extends Record<string, unknown>>({
+export function CommonCalendar<T extends Record<string, unknown>>({
   events,
   begin,
   eventStyleGetter,
@@ -547,5 +547,3 @@ function Calendar<T extends Record<string, unknown>>({
     />
   );
 }
-
-export default Calendar;

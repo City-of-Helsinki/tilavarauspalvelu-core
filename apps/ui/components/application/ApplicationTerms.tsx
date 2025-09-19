@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import type { Maybe, TermsOfUseTextFieldsFragment } from "@/gql/gql-types";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { Sanitize } from "common/src/components/Sanitize";
-import TermsBox from "common/src/termsbox/TermsBox";
+import { TermsBox } from "common/src/termsbox/TermsBox";
 
 type ApplicationTermsProps = {
   generalTos: Maybe<TermsOfUseTextFieldsFragment>;

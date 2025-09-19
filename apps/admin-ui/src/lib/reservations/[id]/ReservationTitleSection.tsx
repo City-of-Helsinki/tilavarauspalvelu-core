@@ -14,7 +14,7 @@ import { formatDateTime } from "@/common/util";
 import { getApplicationUrl } from "@/common/urls";
 import { gql } from "@apollo/client";
 import { ExternalLink } from "@/component/ExternalLink";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import type { StatusLabelType } from "common/src/tags";
 
 function getStatusLabelType(s?: Maybe<OrderStatus>): StatusLabelType {

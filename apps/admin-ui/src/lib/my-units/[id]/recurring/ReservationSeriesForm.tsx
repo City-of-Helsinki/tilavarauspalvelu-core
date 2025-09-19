@@ -19,7 +19,7 @@ import {
 import type { NewReservationListItem } from "@/component/ReservationsList";
 import { WeekdaysSelector } from "@/component/WeekdaysSelector";
 import { useCreateReservationSeries, useFilteredReservationList, useMultipleReservation } from "@/hooks";
-import ReservationTypeForm from "@/component/ReservationTypeForm";
+import { ReservationTypeForm } from "@/component/ReservationTypeForm";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { createNodeId, getNode, toNumber } from "common/src/helpers";

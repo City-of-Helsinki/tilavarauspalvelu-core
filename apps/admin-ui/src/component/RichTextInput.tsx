@@ -67,7 +67,7 @@ type Props = {
   tooltipText?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-function RichTextInput({
+export default function RichTextInput({
   value,
   required = false,
   disabled = false,
@@ -105,5 +105,3 @@ function RichTextInput({
     </Container>
   );
 }
-
-export default RichTextInput;

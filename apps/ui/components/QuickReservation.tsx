@@ -11,7 +11,7 @@ import {
   getReservationUnitPrice,
   isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
-import Carousel from "@/components/Carousel";
+import { Carousel } from "@/components/Carousel";
 import type { Control, SubmitHandler, UseFormReturn } from "react-hook-form";
 import { ControlledDateInput } from "common/src/components/form";
 import type { PendingReservationFormType } from "@/components/reservation-unit/schema";

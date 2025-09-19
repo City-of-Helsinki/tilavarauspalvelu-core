@@ -30,7 +30,7 @@ import { constructDateTimeSafe, dateTime, getBufferTime, getNormalizedInterval }
 import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
-import ReservationTypeForm from "@/component/ReservationTypeForm";
+import { ReservationTypeForm } from "@/component/ReservationTypeForm";
 import { createNodeId, getNode, toNumber } from "common/src/helpers";
 import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";

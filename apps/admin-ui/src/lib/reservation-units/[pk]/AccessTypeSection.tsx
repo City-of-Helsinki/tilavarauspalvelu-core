@@ -6,7 +6,7 @@ import { AccessTypes, type ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 import { ControlledDateInput, ControlledSelect } from "common/src/components/form";
 import { fromUIDate } from "common/src/common/util";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import { AutoGrid, Flex, H6 } from "common/styled";
 import { KVWrapper, Label, Value } from "@/styled";
 import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";

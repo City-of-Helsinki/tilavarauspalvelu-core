@@ -13,7 +13,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { useSession } from "@/hooks";
 import type { CurrentUserQuery } from "@gql/gql-types";
-import Logo from "common/src/components/Logo";
+import { Logo } from "common/src/components/Logo";
 import { useRouter } from "next/router";
 import { breakpoints } from "common/src/const";
 import { useLocation } from "react-use";
@@ -284,7 +284,7 @@ function ActionBar({ apiBaseUrl, profileLink, languageOptions }: Readonly<Header
   );
 }
 
-function Navigation({ apiBaseUrl, profileLink }: HeaderProps) {
+export function Navigation({ apiBaseUrl, profileLink }: HeaderProps) {
   const { t, i18n } = useTranslation();
   const { user } = useSession();
   const router = useRouter();
@@ -309,5 +309,3 @@ function Navigation({ apiBaseUrl, profileLink }: HeaderProps) {
     </Wrapper>
   );
 }
-
-export default Navigation;

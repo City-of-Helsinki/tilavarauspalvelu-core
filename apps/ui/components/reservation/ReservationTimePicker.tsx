@@ -7,12 +7,13 @@ import {
   useListReservationsQuery,
 } from "@/gql/gql-types";
 import styled from "styled-components";
-import Calendar, {
+import {
+  CommonCalendar,
   type SlotClickProps,
   type CalendarEvent,
   SlotProps,
   type CalendarEventBuffer,
-} from "common/src/calendar/Calendar";
+} from "common/src/calendar/CommonCalendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import { addMinutes, differenceInMinutes } from "date-fns";
 import { eventStyleGetter } from "@/components/common/calendarUtils";
@@ -360,7 +361,7 @@ export function ReservationTimePicker({
     <>
       {/* TODO is calendar ref necessary? */}
       <div aria-hidden /* ref={calendarRef} */>
-        <Calendar<ReservationNode>
+        <CommonCalendar<ReservationNode>
           events={calendarEvents}
           begin={focusDate}
           onNavigate={(d: Date) => setValue("date", toUIDate(d))}

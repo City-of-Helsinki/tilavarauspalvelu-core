@@ -20,12 +20,10 @@ const ColoredTag = styled(StyledTag)<{ $type: StatusLabelType }>`
   }
 `;
 
-function Tag({ ariaLabel, type = "neutral", children, onClick }: TagPropsType): JSX.Element {
+export function Tag({ ariaLabel, type = "neutral", children, onClick }: TagPropsType): JSX.Element {
   return (
     <ColoredTag $type={type} aria-label={ariaLabel} onClick={onClick}>
       {children}
     </ColoredTag>
   );
 }
-
-export default Tag;

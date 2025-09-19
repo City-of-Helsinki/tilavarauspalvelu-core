@@ -208,7 +208,7 @@ function WrapWithLink({
  *
  * @returns {JSX.Element} The rendered Card component.
  */
-export default function Card({
+export function Card({
   heading,
   headingTestId,
   headingLevel = 3,

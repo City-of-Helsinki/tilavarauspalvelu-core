@@ -10,7 +10,7 @@ import { CustomTable } from "@/component/Table";
 import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircleFill } from "hds-react";
 import { gql } from "@apollo/client";
 

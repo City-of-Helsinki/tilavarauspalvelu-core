@@ -184,7 +184,7 @@
     "import/no-anonymous-default-export": "error",
     "import/no-commonjs": "error",
     "import/no-cycle": "error",
-    "import/no-default-export": "off",
+    "import/no-default-export": "error",
     "import/no-duplicates": "error",
     "import/no-dynamic-require": "error",
     "import/no-empty-named-blocks": "error",
@@ -576,25 +576,35 @@
     },
     {
       "files": [
-        "**/sentry.*.config.ts",
+        "**/*.config.*",
         "**/apolloClient.ts"
       ],
       "rules": {
         "typescript/no-unsafe-call": "off",
-        "typescript/no-unsafe-member-access": "off"
+        "typescript/no-unsafe-member-access": "off",
+        "import/no-default-export": "off"
       }
     },
     {
       "files": [
-        "**/pages/**.tsx"
+        "**/pages/**"
       ],
       "rules": {
+        "import/no-default-export": "off",
         "unicorn/filename-case": [
           "error",
           {
             "case": "kebabCase"
           }
         ]
+      }
+    },
+    {
+      "files": [
+        "**/RichTextInput.tsx"
+      ],
+      "rules": {
+        "import/no-default-export": "off"
       }
     }
   ]

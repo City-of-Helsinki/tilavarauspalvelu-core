@@ -4,7 +4,7 @@ import { type TFunction, useTranslation } from "next-i18next";
 import { type ApplicationRoundCardFragment, ApplicationRoundStatusChoice } from "@gql/gql-types";
 import { formatDateTime } from "@/modules/util";
 import { isValid } from "date-fns";
-import Card from "common/src/components/Card";
+import { Card } from "common/src/components/Card";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { getApplicationRoundPath } from "@/modules/urls";
 import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";

@@ -2,7 +2,7 @@ import React from "react";
 import { ReservationUnitPublishingState, ReservationUnitReservationState } from "@gql/gql-types";
 import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQuestionCircle } from "hds-react";
 import { useTranslation } from "next-i18next";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import type { StatusLabelType } from "common/src/tags";
 import { NoWrap } from "common/styled";
 

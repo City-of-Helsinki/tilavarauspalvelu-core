@@ -4,14 +4,14 @@ import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
 import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { useTranslation, type TFunction } from "next-i18next";
-import { CalendarEvent } from "common/src/calendar/Calendar";
+import { CalendarEvent } from "common/src/calendar/CommonCalendar";
 import { focusStyles } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { POST_PAUSE, PRE_PAUSE } from "@/common/calendarStyling";
 import { getReserveeName } from "@/common/util";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
 import { ReservationPopupContent } from "./ReservationPopupContent";
-import eventStyleGetter from "./eventStyleGetter";
+import { eventStyleGetter } from "./eventStyleGetter";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 

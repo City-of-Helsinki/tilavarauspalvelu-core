@@ -28,7 +28,7 @@ import {
 } from "hds-react";
 import { ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
 import type { StatusLabelType } from "common/src/tags";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import { gql } from "@apollo/client";
 import styled from "styled-components";
 

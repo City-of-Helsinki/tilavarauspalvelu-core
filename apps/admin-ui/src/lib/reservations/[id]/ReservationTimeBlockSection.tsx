@@ -1,5 +1,5 @@
 import React, { forwardRef, type Ref, useEffect, useRef, useState } from "react";
-import CommonCalendar from "common/src/calendar/Calendar";
+import { CommonCalendar } from "common/src/calendar/CommonCalendar";
 import { Toolbar, ToolbarBtn } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
@@ -17,7 +17,7 @@ import { EditTimeModal } from "@/component/EditTimeModal";
 import { isPossibleToEdit } from "@/modules/reservationModificationRules";
 import { getEventBuffers } from "common/src/calendar/util";
 import { filterNonNullable, toNumber } from "common/src/helpers";
-import VisibleIfPermission from "@/component/VisibleIfPermission";
+import { VisibleIfPermission } from "@/component/VisibleIfPermission";
 import { useReservationCalendarData, useReservationSeries } from "@/hooks";
 import { add, startOfISOWeek } from "date-fns";
 import { ReservationSeriesView } from "@/component/ReservationSeriesView";

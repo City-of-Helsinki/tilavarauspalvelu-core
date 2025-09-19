@@ -1,6 +1,6 @@
 import React from "react";
 import { toApiDate } from "common/src/common/util";
-import CommonCalendar from "common/src/calendar/Calendar";
+import { CommonCalendar } from "common/src/calendar/CommonCalendar";
 import { get } from "lodash-es";
 import { addDays, endOfISOWeek, startOfISOWeek } from "date-fns";
 import styled from "styled-components";
@@ -14,7 +14,7 @@ import {
 import { getEventBuffers } from "common/src/calendar/util";
 import { getReservationUrl } from "@/common/urls";
 import { Legend, LegendsWrapper } from "@/component/Legend";
-import eventStyleGetter, { legend } from "./eventStyleGetter";
+import { eventStyleGetter, legend } from "./eventStyleGetter";
 import { createNodeId, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { getReserveeName } from "@/common/util";

@@ -3,8 +3,8 @@ import Head from "next/head";
 import styled from "styled-components";
 import { BannerNotificationsList } from "common/src/components";
 import { BannerNotificationTarget } from "@gql/gql-types";
-import Footer from "./Footer";
-import Navigation from "./Navigation";
+import { Footer } from "./Footer";
+import { Navigation } from "./Navigation";
 import { InProgressReservationNotification } from "@/components/UnpaidReservationNotification";
 import { mainStyles } from "common/styled";
 
@@ -21,7 +21,7 @@ const Main = styled.main`
   ${mainStyles}
 `;
 
-function PageWrapper({ apiBaseUrl, profileLink, feedbackUrl, children, version }: PageProps): JSX.Element {
+export function PageWrapper({ apiBaseUrl, profileLink, feedbackUrl, children, version }: PageProps): JSX.Element {
   return (
     <>
       <Head>
@@ -37,5 +37,3 @@ function PageWrapper({ apiBaseUrl, profileLink, feedbackUrl, children, version }
     </>
   );
 }
-
-export default PageWrapper;

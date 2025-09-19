@@ -40,7 +40,7 @@ type Node = {
   cancellationTerms: Maybe<TOSNode>;
 };
 
-function ShowTOS({ reservationUnit }: { reservationUnit: Node }) {
+export function ShowTOS({ reservationUnit }: { reservationUnit: Node }) {
   const { t } = useTranslation();
 
   const serviceTerms = reservationUnit.serviceSpecificTerms;
@@ -62,5 +62,3 @@ function ShowTOS({ reservationUnit }: { reservationUnit: Node }) {
     </div>
   );
 }
-
-export default ShowTOS;

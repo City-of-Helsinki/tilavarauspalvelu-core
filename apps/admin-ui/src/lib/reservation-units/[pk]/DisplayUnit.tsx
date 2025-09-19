@@ -9,7 +9,7 @@ import styled from "styled-components";
 import { Flex, fontBold, H1, NoWrap, TitleSection } from "common/styled";
 import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQuestionCircle } from "hds-react";
 import { useTranslation } from "next-i18next";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import type { StatusLabelType } from "common/src/tags";
 
 const UnitInformationWrapper = styled.div`

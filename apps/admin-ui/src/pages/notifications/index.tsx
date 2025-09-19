@@ -18,7 +18,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { More } from "@/component/More";
 import { TableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import { IconCheck, IconClock, IconPen, IconQuestionCircleFill } from "hds-react";
 import { getNotificationListUrl, getNotificationUrl } from "@/common/urls";
 import { CenterSpinner, TitleSection, H1 } from "common/styled";

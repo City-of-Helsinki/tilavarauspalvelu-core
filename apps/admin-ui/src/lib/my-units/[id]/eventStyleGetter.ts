@@ -1,4 +1,4 @@
-import type { CalendarEvent } from "common/src/calendar/Calendar";
+import type { CalendarEvent } from "common/src/calendar/CommonCalendar";
 import {
   ReservationStateChoice,
   ReservationTypeChoice,
@@ -65,7 +65,7 @@ export const legend: EventStyle[] = [
 ];
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
-const eventStyleGetter =
+export const eventStyleGetter =
   (currentReservationUnitPk: number) =>
   ({
     event,
@@ -109,5 +109,3 @@ const eventStyleGetter =
       style,
     };
   };
-
-export default eventStyleGetter;

@@ -18,7 +18,7 @@ import { CustomTable } from "@/component/Table";
 import { calculateAppliedReservationTime, formatAppliedReservationTime } from "./utils";
 import { ExternalTableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import { gql } from "@apollo/client";
 
 const unitsTruncateLen = 23;

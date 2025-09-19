@@ -2,7 +2,7 @@ import React from "react";
 import { IconArrowTopRight, IconCheck, IconClock, IconCogwheel, IconEnvelope, IconQuestionCircle } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { ApplicationRoundStatusChoice, type Maybe } from "@gql/gql-types";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import type { StatusLabelType } from "common/src/tags";
 
 type RoundStatus = {

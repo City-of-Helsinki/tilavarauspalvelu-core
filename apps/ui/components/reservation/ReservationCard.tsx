@@ -11,7 +11,7 @@ import { ReservationOrderStatus } from "./ReservationOrderStatus";
 import { ReservationStatus } from "./ReservationStatus";
 import { ButtonLikeExternalLink, ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { capitalize, getImageSource, getMainImage } from "common/src/helpers";
-import Card from "common/src/components/Card";
+import { Card } from "common/src/components/Card";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
 

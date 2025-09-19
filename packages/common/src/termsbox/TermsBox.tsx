@@ -80,7 +80,7 @@ export interface TermBoxProps extends HTMLAttributes<HTMLDivElement> {
   setAccepted?: (accepted: boolean) => void;
 }
 
-function TermsBox({
+export function TermsBox({
   id,
   heading,
   body,
@@ -129,5 +129,3 @@ function TermsBox({
     </Wrapper>
   );
 }
-
-export default TermsBox;

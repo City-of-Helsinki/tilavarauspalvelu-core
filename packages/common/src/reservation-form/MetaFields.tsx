@@ -20,7 +20,7 @@ import { Inputs, type Reservation } from "./types";
 import { RadioButtonWithImage } from "./RadioButtonWithImage";
 import { AutoGrid, fontMedium, fontRegular, H4, H5 } from "../../styled";
 import type { OptionsRecord } from "../../types/common";
-import IconPremises from "../icons/IconPremises";
+import { SvgComponent } from "../icons/IconPremises";
 import { containsField } from "../metaFieldsHelpers";
 import { filterNonNullable } from "../helpers";
 
@@ -100,7 +100,7 @@ const reserveeOptions = [
   },
   {
     id: ReserveeType.Company,
-    icon: <IconPremises width="24" height="24" aria-hidden />,
+    icon: <SvgComponent width="24" height="24" aria-hidden />,
   },
 ];
 
@@ -330,7 +330,7 @@ export function extendMetaFieldOptions(options: Omit<OptionsRecord, "municipalit
 // because we need the individual components for admin-ui (placement in dom changes)
 // and this component has more props than dom nodes.
 // Not removed yet since requires ui/ refactoring.
-function MetaFields({ reservationUnit, generalFields, reservationApplicationFields, options, data }: Props) {
+export function MetaFields({ reservationUnit, generalFields, reservationApplicationFields, options, data }: Props) {
   if (!reservationUnit.metadataSet) {
     return null;
   }
@@ -347,5 +347,3 @@ function MetaFields({ reservationUnit, generalFields, reservationApplicationFiel
     </Container>
   );
 }
-
-export default MetaFields;

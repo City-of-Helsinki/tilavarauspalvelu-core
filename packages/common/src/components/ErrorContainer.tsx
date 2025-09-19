@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import Image from "next/image";
 import { TFunction, useTranslation } from "next-i18next";
-import IconButton from "./IconButton";
+import { IconButton } from "./IconButton";
 import { IconArrowRight } from "hds-react";
 import React from "react";
 import { Flex, H1 } from "../../styled";

@@ -4,7 +4,7 @@ import { appWithTranslation, useTranslation } from "next-i18next";
 import type { AppProps } from "next/app";
 import { ThemeProvider } from "styled-components";
 import { theme } from "common";
-import PageWrapper from "../components/common/PageWrapper";
+import { PageWrapper } from "@/components/common/PageWrapper";
 import { ExternalScripts } from "@/components/ExternalScripts";
 import { createApolloClient } from "@/modules/apolloClient";
 import { TrackingWrapper } from "@/modules/tracking";

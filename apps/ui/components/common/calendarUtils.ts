@@ -1,4 +1,4 @@
-import type { CalendarEvent } from "common/src/calendar/Calendar";
+import type { CalendarEvent } from "common/src/calendar/CommonCalendar";
 import type { ReservationNode } from "@gql/gql-types";
 import React from "react";
 

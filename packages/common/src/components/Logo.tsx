@@ -9,7 +9,7 @@ function logoSrcFromLanguage(language: string) {
   return logoFi;
 }
 
-export default function Logo({
+export function Logo({
   size = LogoSize.Medium,
   style,
 }: Pick<LogoProps, "size"> & { style?: React.CSSProperties }): JSX.Element {

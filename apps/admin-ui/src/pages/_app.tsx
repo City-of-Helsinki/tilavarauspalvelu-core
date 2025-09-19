@@ -8,7 +8,7 @@ import { updateSentryConfig } from "../../sentry.client.config";
 import type { PageProps } from ".";
 import { appWithTranslation } from "next-i18next";
 import Layout from "./layout";
-import PageWrapper from "@/component/PageWrapper";
+import { PageWrapper } from "@/component/PageWrapper";
 import { ModalContextProvider } from "@/context/ModalContext";
 import {
   BannerNotificationTarget,

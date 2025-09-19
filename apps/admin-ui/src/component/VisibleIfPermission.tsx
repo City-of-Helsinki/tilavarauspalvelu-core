@@ -3,7 +3,7 @@ import { useCheckPermission, useSession } from "@/hooks";
 import { UserPermissionChoice, type VisibleIfPermissionFieldsFragment } from "@gql/gql-types";
 import { gql } from "@apollo/client";
 
-function VisibleIfPermission({
+export function VisibleIfPermission({
   reservation,
   permission,
   children,
@@ -28,8 +28,6 @@ function VisibleIfPermission({
   // eslint-disable-next-line react/jsx-no-useless-fragment -- return type issues
   return <>{children}</>;
 }
-
-export default VisibleIfPermission;
 
 export const VISIBLE_IF_PERMISSION_FRAGMENT = gql`
   fragment VisibleIfPermissionFields on ReservationNode {

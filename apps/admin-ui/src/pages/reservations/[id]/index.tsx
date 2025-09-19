@@ -22,7 +22,7 @@ import {
   reservationPrice,
   translateReservationCustomerType,
 } from "@/modules/reservation";
-import VisibleIfPermission from "@/component/VisibleIfPermission";
+import { VisibleIfPermission } from "@/component/VisibleIfPermission";
 import {
   ApprovalButtons,
   ApprovalButtonsRecurring,

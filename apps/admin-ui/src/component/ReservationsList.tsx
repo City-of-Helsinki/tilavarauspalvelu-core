@@ -9,7 +9,7 @@ import { useCheckPermission } from "@/hooks";
 import { NewReservationModal } from "@/component/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
 import { H6 } from "common/styled";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import { gql } from "@apollo/client";
 
 export type NewReservationListItem = {

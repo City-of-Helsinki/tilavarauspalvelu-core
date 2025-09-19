@@ -1,5 +1,5 @@
 import React from "react";
-import TermsBox from "common/src/termsbox/TermsBox";
+import { TermsBox } from "common/src/termsbox/TermsBox";
 import { useTranslation } from "next-i18next";
 import { Sanitize } from "common/src/components/Sanitize";
 import type { TermsOfUseTextFieldsFragment, Maybe, TermsOfUseFragment } from "@/gql/gql-types";

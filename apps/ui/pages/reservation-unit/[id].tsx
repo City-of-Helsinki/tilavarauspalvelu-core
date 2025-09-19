@@ -67,7 +67,7 @@ import {
 } from "@/modules/reservation";
 import { clampDuration, getMaxReservationDuration, getMinReservationDuration } from "@/modules/reservable";
 import { SubventionSuffix } from "@/components/reservation";
-import InfoDialog from "@/components/common/InfoDialog";
+import { InfoDialog } from "@/components/common/InfoDialog";
 import {
   AddressSection,
   EquipmentList,

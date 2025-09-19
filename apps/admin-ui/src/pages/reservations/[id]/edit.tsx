@@ -19,7 +19,7 @@ import {
   type ReservationFormMeta,
   ReservationTypeSchema,
 } from "@/schemas";
-import ReservationTypeForm from "@/component/ReservationTypeForm";
+import { ReservationTypeForm } from "@/component/ReservationTypeForm";
 import { useStaffReservationMutation, useReservationEditData, useSession } from "@/hooks";
 import { errorToast } from "common/src/components/toast";
 import { ButtonContainer, CenterSpinner, Flex, HR } from "common/styled";

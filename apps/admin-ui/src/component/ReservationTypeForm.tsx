@@ -13,7 +13,7 @@ import { type ReservationFormType, ReservationTypes } from "@/schemas";
 import { ShowAllContainer } from "common/src/components";
 import { ReservationMetadataSetForm, ReserverMetadataSetForm } from "./MetadataSetForm";
 import { BufferToggles } from "./BufferToggles";
-import ShowTOS from "./ShowTOS";
+import { ShowTOS } from "./ShowTOS";
 import { Element } from "@/styled";
 import { gql } from "@apollo/client";
 import { HR } from "common/styled";
@@ -75,7 +75,7 @@ function TypeSelect({ isDisabled }: { isDisabled?: boolean }) {
 }
 
 // TODO are buffers in different places for Recurring and Single reservations? Check the UI spec
-function ReservationTypeForm({
+export function ReservationTypeForm({
   reservationUnit,
   children,
   disableBufferToggle,
@@ -157,8 +157,6 @@ function ReservationTypeForm({
     </>
   );
 }
-
-export default ReservationTypeForm;
 
 export const RESERVATION_TYPE_FORM_FRAGMENT = gql`
   fragment ReservationTypeFormFields on ReservationUnitNode {

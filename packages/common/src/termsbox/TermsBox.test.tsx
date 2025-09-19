@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import TermsBox, { type TermBoxProps } from "./TermsBox";
+import { TermsBox, type TermBoxProps } from "./TermsBox";
 import { vi, describe, test, expect } from "vitest";
 import userEvent from "@testing-library/user-event";
 

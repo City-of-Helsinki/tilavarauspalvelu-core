@@ -5,7 +5,7 @@ import { Header, IconLinkExternal, IconSignout, IconStar, IconUser, LogoSize, Ti
 import React from "react";
 import styled from "styled-components";
 import { useLocation } from "react-use";
-import Logo from "common/src/components/Logo";
+import { Logo } from "common/src/components/Logo";
 import { hasSomePermission } from "@/modules/permissionHelper";
 import { env } from "@/env.mjs";
 import {

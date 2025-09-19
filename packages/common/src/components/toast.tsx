@@ -113,7 +113,7 @@ const HDSNotification = styled(Notification)`
 `;
 
 // any component can use this function to show a toast, as long as <ToastContainer /> is rendered somewhere in the app
-export default function toast({
+export function toast({
   label,
   text,
   type = "info",

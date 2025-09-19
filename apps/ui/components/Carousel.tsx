@@ -80,7 +80,7 @@ const CustomBottomControls = styled.div`
   }
 `;
 
-const Carousel = forwardRef(function Carousel(
+export const Carousel = forwardRef(function Carousel(
   {
     children,
     slidesToShow = 1,
@@ -153,5 +153,3 @@ const Carousel = forwardRef(function Carousel(
     </StyledCarousel>
   );
 });
-
-export default Carousel;

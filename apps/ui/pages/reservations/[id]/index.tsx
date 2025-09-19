@@ -49,8 +49,8 @@ import {
 import { useToastIfQueryParam } from "@/hooks";
 import { convertLanguageCode } from "common/src/common/util";
 import { gql } from "@apollo/client";
-import StatusLabel from "common/src/components/StatusLabel";
-import IconButton from "common/src/components/IconButton";
+import { StatusLabel } from "common/src/components/StatusLabel";
+import { IconButton } from "common/src/components/IconButton";
 import {
   NotModifiableReason,
   Instructions,

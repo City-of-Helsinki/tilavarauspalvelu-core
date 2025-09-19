@@ -2,7 +2,7 @@ import React, { SVGProps } from "react";
 
 // generated with SVGR from svg but the viewBox needs to be added manually
 // Use this instead of the svg in common components since NextJS doesn't include SVGR
-const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
+export const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
   <svg width={18} height={17} viewBox="0 0 18 17" xmlns="http://www.w3.org/2000/svg" {...props}>
     <g transform="translate(1 1)" fill="none" fillRule="evenodd">
       <path stroke="currentColor" strokeWidth={1.5} d="M7.718 0 0 4.41v9.922h15.435V4.41zM4.41 7.718v6.614" />
@@ -11,5 +11,3 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
     </g>
   </svg>
 );
-
-export default SvgComponent;

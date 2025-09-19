@@ -1,5 +1,5 @@
 import { getAccessibilityTermsUrl } from "@/common/urls";
-import IconButton from "common/src/components/IconButton";
+import { IconButton } from "common/src/components/IconButton";
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";

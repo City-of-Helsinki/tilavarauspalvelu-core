@@ -41,7 +41,7 @@ import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/he
 import { ControlledDateInput } from "common/src/components/form";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { successToast } from "common/src/components/toast";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import type { StatusLabelType } from "common/src/tags";
 import { CenterSpinner, Flex, TitleSection, H1 } from "common/styled";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";

@@ -15,7 +15,7 @@ import { useTranslation } from "next-i18next";
 import type { RecurringCardFragment } from "@gql/gql-types";
 import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource, getMainImage } from "common/src/helpers";
-import Card, { CardInfoItem } from "common/src/components/Card";
+import { Card, CardInfoItem } from "common/src/components/Card";
 import { getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
