@@ -186,6 +186,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     lomake_1, _ = ReservationMetadataSet.objects.get_or_create(name="Lomake 1")
     lomake_2, _ = ReservationMetadataSet.objects.get_or_create(name="Lomake 2")
     lomake_3, _ = ReservationMetadataSet.objects.get_or_create(name="Lomake 3")
+    lomake_4, _ = ReservationMetadataSet.objects.get_or_create(name="Lomake 4")
     lomake_3_sub, _ = ReservationMetadataSet.objects.get_or_create(name="Lomake 3 - maksuttomuuspyyntö sallittu")
     lomake_4_sub, _ = ReservationMetadataSet.objects.get_or_create(name="Lomake 4 - maksuttomuuspyyntö sallittu")
 
@@ -251,6 +252,36 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         fields_by_name["reservee_phone"],
         fields_by_name["reservee_type"],
     ])
+    lomake_4.supported_fields.set([
+        fields_by_name["age_group"],
+        fields_by_name["description"],
+        fields_by_name["municipality"],
+        fields_by_name["name"],
+        fields_by_name["num_persons"],
+        fields_by_name["purpose"],
+        fields_by_name["reservee_email"],
+        fields_by_name["reservee_first_name"],
+        fields_by_name["reservee_identifier"],
+        fields_by_name["reservee_is_unregistered_association"],
+        fields_by_name["reservee_last_name"],
+        fields_by_name["reservee_organisation_name"],
+        fields_by_name["reservee_phone"],
+        fields_by_name["reservee_type"],
+    ])
+    lomake_4.required_fields.set([
+        fields_by_name["age_group"],
+        fields_by_name["description"],
+        fields_by_name["municipality"],
+        fields_by_name["num_persons"],
+        fields_by_name["purpose"],
+        fields_by_name["reservee_email"],
+        fields_by_name["reservee_first_name"],
+        fields_by_name["reservee_identifier"],
+        fields_by_name["reservee_last_name"],
+        fields_by_name["reservee_organisation_name"],
+        fields_by_name["reservee_phone"],
+        fields_by_name["reservee_type"],
+    ])
     lomake_3_sub.supported_fields.set([
         fields_by_name["applying_for_free_of_charge"],
         fields_by_name["description"],
@@ -261,6 +292,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         fields_by_name["reservee_email"],
         fields_by_name["reservee_first_name"],
         fields_by_name["reservee_identifier"],
+        fields_by_name["reservee_is_unregistered_association"],
         fields_by_name["reservee_last_name"],
         fields_by_name["reservee_organisation_name"],
         fields_by_name["reservee_phone"],
@@ -290,6 +322,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         fields_by_name["reservee_email"],
         fields_by_name["reservee_first_name"],
         fields_by_name["reservee_identifier"],
+        fields_by_name["reservee_is_unregistered_association"],
         fields_by_name["reservee_last_name"],
         fields_by_name["reservee_organisation_name"],
         fields_by_name["reservee_phone"],
@@ -1000,6 +1033,9 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     aitio_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2958620")
     kellarikerros_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2956344")
     aula_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2959295")
+    aina_varattu_resource, _ = OriginHaukiResource.objects.get_or_create(id="2965986")
+    ovikoodi_kasiteltava_resource, _ = OriginHaukiResource.objects.get_or_create(id="2965985")
+    tuple_resource, _ = OriginHaukiResource.objects.get_or_create(id="2965987")
     parveke_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2959623")
     malmi_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2964786")
     keskusta_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id="2964787")
@@ -1125,26 +1161,6 @@ def create_reservation_units() -> None:  # noqa: PLR0915
             "Tilaustöiden tekeminen korvausta vastaan tai ammattimainen tulonhankinta esimerkiksi "
             "myymällä kirjastossa tuotettuja tuotteita ei ole sallittua."
         ),
-        description_sv=(
-            "Käytä tätä varausyksikköä, kun haluan varata suorimman ja yksinkertaisimman prosessin mukaan. "
-            "Varaaminen on maksutonta ja kaikki varaukset hyväksytään. "
-            "Varauksen voi tehdä 30 min välein, aikaslotti 0vrk-3kk. "
-            "Peruutusaikaa ei ole, joten varauksen voi perua sen alkuun asti. "
-            "Käytössä yksinkertaisin lomake 1. "
-            "Tämä varausyksikkö vastaa kirjaston laitteita."
-            "\n"
-            "Detta är en exempeltext och är inte relaterad till reservationen. "
-            "Mankeli Bernina 1008 ligger i bibliotekets stadsverkstad på entréplan."
-            "\n"
-            "Biblioteket har svartvit tråd, knappnålar, saxar och andra grundläggande sömnadstillbehör. "
-            "Maskinen kan inte sy läder eller mycket tjocka tyger. "
-            "Rapportera till personalen innan din bokningstid börjar. "
-            "Innan du kan använda enheten måste du visa upp ett lånekort med giltig lånerätt."
-            "\n"
-            "Du kan använda enheten för dina egna kreativa aktiviteter. "
-            "Att göra beställningsverk mot ersättning eller yrkesmässig inkomstgenerering, "
-            "till exempel genom att sälja produkter producerade i biblioteket, är inte tillåtet."
-        ),
         description_en=(
             "Käytä tätä varausyksikköä, kun haluan varata suorimman ja yksinkertaisimman prosessin mukaan. "
             "Varaaminen on maksutonta ja kaikki varaukset hyväksytään. "
@@ -1164,6 +1180,26 @@ def create_reservation_units() -> None:  # noqa: PLR0915
             "You can use the device for your own creative activities. "
             "Making commissioned works for compensation or professional income generation, "
             "for example by selling products produced in the library, is not allowed."
+        ),
+        description_sv=(
+            "Käytä tätä varausyksikköä, kun haluan varata suorimman ja yksinkertaisimman prosessin mukaan. "
+            "Varaaminen on maksutonta ja kaikki varaukset hyväksytään. "
+            "Varauksen voi tehdä 30 min välein, aikaslotti 0vrk-3kk. "
+            "Peruutusaikaa ei ole, joten varauksen voi perua sen alkuun asti. "
+            "Käytössä yksinkertaisin lomake 1. "
+            "Tämä varausyksikkö vastaa kirjaston laitteita."
+            "\n"
+            "Detta är en exempeltext och är inte relaterad till reservationen. "
+            "Mankeli Bernina 1008 ligger i bibliotekets stadsverkstad på entréplan."
+            "\n"
+            "Biblioteket har svartvit tråd, knappnålar, saxar och andra grundläggande sömnadstillbehör. "
+            "Maskinen kan inte sy läder eller mycket tjocka tyger. "
+            "Rapportera till personalen innan din bokningstid börjar. "
+            "Innan du kan använda enheten måste du visa upp ett lånekort med giltig lånerätt."
+            "\n"
+            "Du kan använda enheten för dina egna kreativa aktiviteter. "
+            "Att göra beställningsverk mot ersättning eller yrkesmässig inkomstgenerering, "
+            "till exempel genom att sälja produkter producerade i biblioteket, är inte tillåtet."
         ),
         contact_information="",
         notes_when_applying="lisätiedot fi 123",
@@ -1295,29 +1331,6 @@ def create_reservation_units() -> None:  # noqa: PLR0915
             "Tilaustöiden tekeminen korvausta vastaan tai ammattimainen tulonhankinta esimerkiksi"
             "myymällä kirjastossa tuotettuja tuotteita ei ole sallittua."
         ),
-        description_sv=(
-            "Käytä tätä varausyksikköä, kun haluan varata maksullisen tilan suorimman prosessin mukaan. "
-            "Varaaja voi olla yhdistys, yritys tai yksityishenkilö. "
-            "Varaaminen on maksullista ja varaus tulee maksaa verkkokaupassa. "
-            "Kaikki maksetut varaukset hyväksytään. "
-            "Varauksen voi tehdä 30 min välein, aikaslotti 0vrk-3kk. "
-            "Peruutusaika on varauksen alkuun asti. "
-            "Kun perut varauksen ennen sen alkamista, maksu tulisi hyvittää automaattisesti. "
-            "Käytössä lomake 3. "
-            "Tämä varausyksikkö vastaa asetuksiltaan esim. Oodin keittiötä, mutta peruutusaika on joustavampi."
-            "\n"
-            "Detta är en exempeltext och är inte relaterad till reservationen."
-            "Mankeli Bernina 1008 ligger i bibliotekets stadsverkstad på entréplan."
-            "\n"
-            "Biblioteket har svartvit tråd, knappnålar, saxar och andra grundläggande sömnadstillbehör."
-            "Maskinen kan inte sy läder eller mycket tjocka tyger."
-            "Rapportera till personalen innan din bokningstid börjar."
-            "Innan du kan använda enheten måste du visa upp ett lånekort med giltig lånerätt."
-            "\n"
-            "Du kan använda enheten för dina egna kreativa aktiviteter."
-            "Att göra beställningsverk mot ersättning eller yrkesmässig inkomstgenerering,"
-            "till exempel genom att sälja produkter producerade i biblioteket, är inte tillåtet."
-        ),
         description_en=(
             "Käytä tätä varausyksikköä, kun haluan varata maksullisen tilan suorimman prosessin mukaan. "
             "Varaaja voi olla yhdistys, yritys tai yksityishenkilö. "
@@ -1340,6 +1353,29 @@ def create_reservation_units() -> None:  # noqa: PLR0915
             "You can use the device for your own creative activities."
             "Making commissioned works for compensation or professional income generation,"
             "for example by selling products produced in the library, is not allowed."
+        ),
+        description_sv=(
+            "Käytä tätä varausyksikköä, kun haluan varata maksullisen tilan suorimman prosessin mukaan. "
+            "Varaaja voi olla yhdistys, yritys tai yksityishenkilö. "
+            "Varaaminen on maksullista ja varaus tulee maksaa verkkokaupassa. "
+            "Kaikki maksetut varaukset hyväksytään. "
+            "Varauksen voi tehdä 30 min välein, aikaslotti 0vrk-3kk. "
+            "Peruutusaika on varauksen alkuun asti. "
+            "Kun perut varauksen ennen sen alkamista, maksu tulisi hyvittää automaattisesti. "
+            "Käytössä lomake 3. "
+            "Tämä varausyksikkö vastaa asetuksiltaan esim. Oodin keittiötä, mutta peruutusaika on joustavampi."
+            "\n"
+            "Detta är en exempeltext och är inte relaterad till reservationen."
+            "Mankeli Bernina 1008 ligger i bibliotekets stadsverkstad på entréplan."
+            "\n"
+            "Biblioteket har svartvit tråd, knappnålar, saxar och andra grundläggande sömnadstillbehör."
+            "Maskinen kan inte sy läder eller mycket tjocka tyger."
+            "Rapportera till personalen innan din bokningstid börjar."
+            "Innan du kan använda enheten måste du visa upp ett lånekort med giltig lånerätt."
+            "\n"
+            "Du kan använda enheten för dina egna kreativa aktiviteter."
+            "Att göra beställningsverk mot ersättning eller yrkesmässig inkomstgenerering,"
+            "till exempel genom att sälja produkter producerade i biblioteket, är inte tillåtet."
         ),
         contact_information="",
         notes_when_applying="Varaus tulee maksaa verkkokaupassa.",
@@ -1475,27 +1511,6 @@ def create_reservation_units() -> None:  # noqa: PLR0915
             "Tilaustöiden tekeminen korvausta vastaan tai ammattimainen tulonhankinta esimerkiksi"
             "myymällä kirjastossa tuotettuja tuotteita ei ole sallittua."
         ),
-        description_sv=(
-            "Käytä tätä varausyksikköä, kun haluan varata varausyksikön, "
-            "jonka kaikki varaukset siirtyvät käsittelyyn. "
-            "Varaus tulee hyväksyä tai hyläytä käsittelijän puolelta. "
-            "Varauksen voi tehdä 30 min välein, aikaslotti 3vrk-3kk. "
-            "Peruutusaika on 14 vrk, tämän jälkeen varausta ei voi perua. "
-            "Käytössä lomake 3 maksuttomuuspyyntösallittu. "
-            "Tämä varausyksikkö vastaa nuorisopalvelun tiloja."
-            "\n"
-            "Detta är en exempeltext och är inte relaterad till reservationen."
-            "Mankeli Bernina 1008 ligger i bibliotekets stadsverkstad på entréplan."
-            "\n"
-            "Biblioteket har svartvit tråd, knappnålar, saxar och andra grundläggande sömnadstillbehör."
-            "Maskinen kan inte sy läder eller mycket tjocka tyger."
-            "Rapportera till personalen innan din bokningstid börjar."
-            "Innan du kan använda enheten måste du visa upp ett lånekort med giltig lånerätt."
-            "\n"
-            "Du kan använda enheten för dina egna kreativa aktiviteter."
-            "Att göra beställningsverk mot ersättning eller yrkesmässig inkomstgenerering,"
-            "till exempel genom att sälja produkter producerade i biblioteket, är inte tillåtet."
-        ),
         description_en=(
             "Käytä tätä varausyksikköä, kun haluan varata varausyksikön, "
             "jonka kaikki varaukset siirtyvät käsittelyyn. "
@@ -1516,6 +1531,27 @@ def create_reservation_units() -> None:  # noqa: PLR0915
             "You can use the device for your own creative activities."
             "Making commissioned works for compensation or professional income generation,"
             "for example by selling products produced in the library, is not allowed."
+        ),
+        description_sv=(
+            "Käytä tätä varausyksikköä, kun haluan varata varausyksikön, "
+            "jonka kaikki varaukset siirtyvät käsittelyyn. "
+            "Varaus tulee hyväksyä tai hyläytä käsittelijän puolelta. "
+            "Varauksen voi tehdä 30 min välein, aikaslotti 3vrk-3kk. "
+            "Peruutusaika on 14 vrk, tämän jälkeen varausta ei voi perua. "
+            "Käytössä lomake 3 maksuttomuuspyyntösallittu. "
+            "Tämä varausyksikkö vastaa nuorisopalvelun tiloja."
+            "\n"
+            "Detta är en exempeltext och är inte relaterad till reservationen."
+            "Mankeli Bernina 1008 ligger i bibliotekets stadsverkstad på entréplan."
+            "\n"
+            "Biblioteket har svartvit tråd, knappnålar, saxar och andra grundläggande sömnadstillbehör."
+            "Maskinen kan inte sy läder eller mycket tjocka tyger."
+            "Rapportera till personalen innan din bokningstid börjar."
+            "Innan du kan använda enheten måste du visa upp ett lånekort med giltig lånerätt."
+            "\n"
+            "Du kan använda enheten för dina egna kreativa aktiviteter."
+            "Att göra beställningsverk mot ersättning eller yrkesmässig inkomstgenerering,"
+            "till exempel genom att sälja produkter producerade i biblioteket, är inte tillåtet."
         ),
         contact_information="",
         notes_when_applying=(
@@ -1666,30 +1702,6 @@ def create_reservation_units() -> None:  # noqa: PLR0915
             "Tilaustöiden tekeminen korvausta vastaan tai ammattimainen tulonhankinta esimerkiksi"
             "myymällä kirjastossa tuotettuja tuotteita ei ole sallittua."
         ),
-        description_sv=(
-            "Käytä tätä varausyksikköä, kun haluan varata joko maksullisen tilan tai hakea hinnan alennusta. "
-            "Alennusta haettaessa varaus siirtyy aina käsittelyyn. "
-            "Varaaja voi olla yhdistys, yritys tai yksityishenkilö. "
-            "Jos et hae alennusta, varaaminen on maksullista ja varaus tulee maksaa verkkokaupassa. "
-            "Kaikki maksetut varaukset hyväksytään. "
-            "Varauksen voi tehdä 30 min välein, aikaslotti 0vrk-3kk. "
-            "Peruutusaika on 14 vrk ennen varausta. "
-            "Kun perut varauksen ennen sen alkamista, maksu tulisi hyvittää automaattisesti. "
-            "Käytössä lomake 4 maksullisuuspyyntö sallittu. "
-            "Tämä varausyksikkö vastaa asetuksiltaan esim. nuorisopalvelun tiloja."
-            "\n"
-            "Detta är en exempeltext och är inte relaterad till reservationen."
-            "Mankeli Bernina 1008 ligger i bibliotekets stadsverkstad på entréplan."
-            "\n"
-            "Biblioteket har svartvit tråd, knappnålar, saxar och andra grundläggande sömnadstillbehör."
-            "Maskinen kan inte sy läder eller mycket tjocka tyger."
-            "Rapportera till personalen innan din bokningstid börjar."
-            "Innan du kan använda enheten måste du visa upp ett lånekort med giltig lånerätt."
-            "\n"
-            "Du kan använda enheten för dina egna kreativa aktiviteter."
-            "Att göra beställningsverk mot ersättning eller yrkesmässig inkomstgenerering,"
-            "till exempel genom att sälja produkter producerade i biblioteket, är inte tillåtet."
-        ),
         description_en=(
             "Käytä tätä varausyksikköä, kun haluan varata joko maksullisen tilan tai hakea hinnan alennusta. "
             "Alennusta haettaessa varaus siirtyy aina käsittelyyn. "
@@ -1713,6 +1725,30 @@ def create_reservation_units() -> None:  # noqa: PLR0915
             "You can use the device for your own creative activities."
             "Making commissioned works for compensation or professional income generation,"
             "for example by selling products produced in the library, is not allowed."
+        ),
+        description_sv=(
+            "Käytä tätä varausyksikköä, kun haluan varata joko maksullisen tilan tai hakea hinnan alennusta. "
+            "Alennusta haettaessa varaus siirtyy aina käsittelyyn. "
+            "Varaaja voi olla yhdistys, yritys tai yksityishenkilö. "
+            "Jos et hae alennusta, varaaminen on maksullista ja varaus tulee maksaa verkkokaupassa. "
+            "Kaikki maksetut varaukset hyväksytään. "
+            "Varauksen voi tehdä 30 min välein, aikaslotti 0vrk-3kk. "
+            "Peruutusaika on 14 vrk ennen varausta. "
+            "Kun perut varauksen ennen sen alkamista, maksu tulisi hyvittää automaattisesti. "
+            "Käytössä lomake 4 maksullisuuspyyntö sallittu. "
+            "Tämä varausyksikkö vastaa asetuksiltaan esim. nuorisopalvelun tiloja."
+            "\n"
+            "Detta är en exempeltext och är inte relaterad till reservationen."
+            "Mankeli Bernina 1008 ligger i bibliotekets stadsverkstad på entréplan."
+            "\n"
+            "Biblioteket har svartvit tråd, knappnålar, saxar och andra grundläggande sömnadstillbehör."
+            "Maskinen kan inte sy läder eller mycket tjocka tyger."
+            "Rapportera till personalen innan din bokningstid börjar."
+            "Innan du kan använda enheten måste du visa upp ett lånekort med giltig lånerätt."
+            "\n"
+            "Du kan använda enheten för dina egna kreativa aktiviteter."
+            "Att göra beställningsverk mot ersättning eller yrkesmässig inkomstgenerering,"
+            "till exempel genom att sälja produkter producerade i biblioteket, är inte tillåtet."
         ),
         contact_information="",
         notes_when_applying="",
@@ -1825,8 +1861,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         name_en="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA) en",
         name_sv="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
         description="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        description_sv="Perumiskelvoton parveke, maksuton EN (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        description_en="Perumiskelvoton parveke, maksuton SV (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        description_en="Perumiskelvoton parveke, maksuton EN (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        description_sv="Perumiskelvoton parveke, maksuton SV (AUTOMAATIOTESTI ÄLÄ POISTA)",
         contact_information="",
         notes_when_applying="Varausyksikkökohtaiset lisätiedot fi",
         notes_when_applying_en="Varausyksikkökohtaiset lisätiedot en",
@@ -1905,6 +1941,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     _perumiskelvoton_parveke.purposes.set([
         pida_kokous_tarkoitus,
     ])
+    _perumiskelvoton_parveke.equipments.set([])
     _perumiskelvoton_parveke_pricing = ReservationUnitPricing.objects.create(
         reservation_unit=_perumiskelvoton_parveke,
         begins=local_date(2024, 3, 1),
@@ -1917,6 +1954,447 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     )
     _perumiskelvoton_parveke_access_type = ReservationUnitAccessType.objects.create(
         reservation_unit=_perumiskelvoton_parveke,
+        begin_date=local_date(2025, 7, 15),
+        access_type=AccessType.UNRESTRICTED,
+    )
+
+    _aina_varattu_yksikko = ReservationUnit.objects.create(
+        #
+        # IDs
+        ext_uuid="c7d460b3-4157-44d7-a324-81d789c7b9b0",
+        #
+        # Strings
+        name="Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA) ENG",
+        name_sv="Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
+        description="admin test",
+        description_en="admin test eng",
+        description_sv="admin test sv",
+        contact_information="",
+        notes_when_applying="admin test",
+        notes_when_applying_en="admin test eng",
+        notes_when_applying_sv="admin test sv",
+        reservation_pending_instructions="",
+        reservation_pending_instructions_en="",
+        reservation_pending_instructions_sv="",
+        reservation_confirmed_instructions="",
+        reservation_confirmed_instructions_en="",
+        reservation_confirmed_instructions_sv="",
+        reservation_cancelled_instructions="",
+        reservation_cancelled_instructions_en="",
+        reservation_cancelled_instructions_sv="",
+        #
+        # Integers
+        surface_area=40,
+        min_persons=None,
+        max_persons=20,
+        max_reservations_per_user=None,
+        reservations_min_days_before=0,
+        reservations_max_days_before=182,
+        #
+        # Datetime
+        reservation_begins_at=None,
+        reservation_ends_at=None,
+        publish_begins_at=None,
+        publish_ends_at=None,
+        min_reservation_duration=datetime.timedelta(minutes=15),
+        max_reservation_duration=datetime.timedelta(hours=2),
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=datetime.timedelta(),
+        #
+        # Booleans
+        is_draft=False,
+        is_archived=False,
+        require_adult_reservee=False,
+        require_reservation_handling=False,
+        reservation_block_whole_day=False,
+        can_apply_free_of_charge=False,
+        allow_reservations_without_opening_hours=False,
+        #
+        # Enums
+        authentication=AuthenticationType.WEAK,
+        reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES,
+        reservation_kind=ReservationKind.DIRECT,
+        reservation_form=ReservationFormType.CONTACT_INFO_FORM,
+        #
+        # Lists
+        search_terms=[],
+        #
+        # Many-to-One related
+        unit=harakka,
+        origin_hauki_resource=aina_varattu_resource,
+        reservation_unit_type=kokoustila,
+        cancellation_rule=peruutus_alkuun_asti,
+        metadata_set=lomake_1,
+        cancellation_terms=varauksen_alkuun_asti_peruutusehto,
+        service_specific_terms=nupa_palveluehto,
+        pricing_terms=None,
+        payment_terms=maksuton_maksuehto,
+        payment_product=None,
+        payment_merchant=None,
+        payment_accounting=None,
+    )
+    _aina_varattu_yksikko_space = Space.objects.create(
+        name="Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA) ENG",
+        name_sv="Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
+        surface_area=40,
+        max_persons=20,
+        unit=harakka,
+    )
+    _aina_varattu_yksikko.spaces.set([
+        _aina_varattu_yksikko_space,
+    ])
+    _aina_varattu_yksikko.purposes.set([
+        loyda_juhlatila_tarkoitus,
+    ])
+    _aina_varattu_yksikko.equipments.set([
+        rummut_laite,
+    ])
+    _aina_varattu_yksikko_pricing = ReservationUnitPricing.objects.create(
+        reservation_unit=_aina_varattu_yksikko,
+        begins=local_date(2024, 3, 1),
+        price_unit=PriceUnit.PER_HOUR,
+        payment_type=PaymentType.ONLINE,
+        is_activated_on_begins=False,
+        lowest_price=0,
+        highest_price=0,
+        tax_percentage=nolla_veroprosentti,
+    )
+    _aina_varattu_yksikko_access_type = ReservationUnitAccessType.objects.create(
+        reservation_unit=_aina_varattu_yksikko,
+        begin_date=local_date(2025, 7, 15),
+        access_type=AccessType.UNRESTRICTED,
+    )
+
+    _ovikoodi_maksuton_kasiteltava_yksikko = ReservationUnit.objects.create(
+        #
+        # IDs
+        ext_uuid="307e84e4-b226-480d-bc3a-57d67c884048",
+        #
+        # Strings
+        name="Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA) ENG",
+        name_sv="Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
+        description=(
+            "Tällä varausyksiköllä testataan avaimetonta kulkua."
+            "\n"
+            "Tervetuloa viihtyisään olohuoneeseemme, joka tarjoaa täydellisen paikan rentoutumiseen ja ajanviettoon. "
+            "Tilaan pääsee kätevästi ovikoodilla, joka takaa yksityisyyden ja turvallisuuden. "
+            "Olohuoneessa on mukavat istuimet, moderni sisustus ja runsaasti luonnonvaloa. "
+            "Varustukseen kuuluu myös suuri televisio, äänentoistojärjestelmä ja nopea Wi-Fi-yhteys. "
+            "Tämä tila sopii erinomaisesti niin rentoutumiseen kuin pienten kokousten "
+            "tai illanviettojen järjestämiseen."
+            "\n"
+            "Katso tilojen käytön perehdytysvideo ja tutustu asukaskäytön turvallisuusohjeisiin "
+            "ennen kun varaat tilan. "
+            "Varatessasi tilan vastaat itse tilan valvonnasta. Tilan henkilökunta ei ole paikalla. "
+            "Ota yhteys toimipisteeseen (puh. 09 310 41613) ja sovi avaimen noudosta."
+            "Luovutamme sinulle tilan avaimet tai kulkutunnisteen varausta edeltävänä arkipäivänä klo 9-16."
+            "\n"
+            "Kehitämme tässä kohteessa tilojen sujuvaa asukaskäyttöä ja saatamme olla varauksen "
+            "jälkeen yhteydessä tilankäyttäjään palautteen keräämiseksi."
+        ),
+        description_en=(
+            "This reservation unit is meant for testing keyless entry."
+            "\n"
+            "Welcome to our cozy living room, the perfect place for relaxation and socializing. "
+            "Access to the room is conveniently secured with a door code, ensuring privacy and safety. "
+            "The living room features comfortable seating, modern decor, and plenty of natural light. "
+            "It is equipped with a large TV, sound system, and high-speed Wi-Fi. "
+            "This space is ideal for both unwinding and hosting small meetings or gatherings."
+            "\n"
+            "Watch the introductory video on the use of the spaces (select the subtitle language from the settings) "
+            "and familiarize yourself with the safety instructions for resident use before you reserve a space. "
+            "When you reserve the space, you are responsible for monitoring it yourself. "
+            "The staff of the space is not present. "
+            "Please contact the staff (p. 09 310 41613) and arrange to pick up the key. "
+            "We will hand over the keys or access pass to the space to you on the weekday "
+            "before the reservation from 9 am to 4 pm."
+            "\n"
+            "We are developing the resident use of this space and in order to collect feedback, "
+            "we may be in contact with the user after the reservation."
+            "\n"
+            "Kehitämme tässä kohteessa tilojen sujuvaa asukaskäyttöä ja saatamme olla "
+            "varauksen jälkeen yhteydessä tilankäyttäjään palautteen keräämiseksi."
+        ),
+        description_sv=(
+            "Denna bokningsenhet testar nyckelfri åtkomst."
+            "\n"
+            "Välkommen till vårt mysiga vardagsrum, den perfekta platsen för avkoppling och umgänge. "
+            "Tillträde till rummet sker smidigt med en dörrkod, vilket garanterar integritet och säkerhet. "
+            "Vardagsrummet har bekväma sittplatser, modern inredning och gott om naturligt ljus. "
+            "Det är utrustat med en stor TV, ljudsystem och snabb Wi-Fi. "
+            "Detta utrymme är idealiskt för både avkoppling och för att hålla små möten eller sammankomster."
+            "\n"
+            "Se introduktionsfilmen om användningen av lokaler (välj undertextspråk från inställningarna) "
+            "och bekanta dig med säkerhetsanvisningar för invånarandvändningen innan du boka lokalen. "
+            "När du bokar lokalen ansvarar du själv för övervakning av den. Personalen är inte på plats. "
+            "Kontakta personalen (tel. 09 310 41613) och ordna med att hämta nyckeln. "
+            "Vi kommer att överlämna nycklarna eller tillträdespasset till dig på arbetsdagen "
+            "före bokningen, mellan kl. 9 och 16."
+            "\n"
+            "Vi utvecklar en smidig användning av anläggningarna på denna destination och vi kan vara "
+            "i kontakt med anläggningens användare efter bokning för att samla in feedback."
+        ),
+        contact_information="",
+        notes_when_applying=(
+            "Perusteet maksuttomalle käytölle tai hinnan alennukselle on ilmoitettava varausta tehtäessä. "
+            "Jälkikäteen ilmoitettuja hinnoitteluperusteisiin liittyviä tietoja ei käsitellä eikä maksua hyvitetä."
+            "\n"
+            "Katso tilojen käytön perehdytysvideo ja tutustu asukaskäytön turvallisuusohjeisiin ennen kun varaat tilan."
+            "\n"
+            "Tilan loppusiivous on varaajan vastuulla. Alkuvalmistelut ja loppusiivous sisältyvät varausaikaan."
+        ),
+        notes_when_applying_en=(
+            "Justifications for free-of-charge use or a price reduction must be indicated when "
+            "making the reservation. Any details related to the pricing basis provided afterwards "
+            "will not be processed and the payment will not be refunded."
+            "\n"
+            "Watch the introductory video on the use of the spaces (select the subtitle language from the settings) "
+            "and familiarize yourself with the safety instructions for resident use before you reserve a space."
+            "\n"
+            "Final cleaning of the space is the responsibility of the person who made the reservation. "
+            "Initial preparations and the final cleaning are included in the reserved time."
+        ),
+        notes_when_applying_sv=(
+            "Motiveringar för kostnadsfri användning eller en prissänkning måste anges vid bokningen. "
+            "Detaljer relaterade till prissättningen som tillhandahålls efteråt kommer inte att "
+            "behandlas och betalningen återbetalas inte."
+            "\n"
+            "Se introduktionsfilmen om användningen av lokaler (välj undertextspråk från inställningarna) "
+            "och bekanta dig med säkerhetsanvisningar för invånarandvändningen innan du boka lokalen."
+            "\n"
+            "Personen som har gjort bokningen ansvarar för slutstädning av lokalen. "
+            "Förberedelser och slutstädning ingår i bokningstiden."
+        ),
+        reservation_pending_instructions="Käsittelemme varauksen pääsääntöisesti kolmen arkipäivän kuluessa.",
+        reservation_pending_instructions_en="We generally process your reservation within three working days.",
+        reservation_pending_instructions_sv="Vi behandlar i allmänhet bokningen inom tre arbetsdagar.",
+        reservation_confirmed_instructions=(
+            "Varatessasi tilan vastaat itse tilan valvonnasta. Tilan henkilökunta ei ole paikalla."
+            "\n"
+            "Katso tilojen käytön perehdytysvideo ja tutustu asukaskäytön turvallisuusohjeisiin "
+            "ennen kun varaat tilan. Varatessasi tilan vastaat itse tilan valvonnasta. "
+            "Tilan henkilökunta ei ole paikalla."
+            "\n"
+            "Kehitämme tässä kohteessa tilojen sujuvaa asukaskäyttöä ja saatamme olla varauksen "
+            "jälkeen yhteydessä tilankäyttäjään palautteen keräämiseksi."
+            "\n"
+            "Tilan loppusiivous on varaajan vastuulla. Alkuvalmistelut ja loppusiivous sisältyvät varausaikaan."
+        ),
+        reservation_confirmed_instructions_en=(
+            "When you reserve the space, you are responsible for monitoring it yourself. "
+            "The staff of the space is not present."
+            "\n"
+            "Watch the introductory video on the use of the spaces and familiarize yourself with "
+            "the safety instructions for resident use before you reserve a space. "
+            "When you reserve the space, you are responsible for monitoring it yourself. "
+            "The staff of the space is not present."
+            "\n"
+            "We are developing the resident use of this space and in order to collect feedback, "
+            "we may be in contact with the user after the reservation."
+        ),
+        reservation_confirmed_instructions_sv=(
+            "När du bokar lokalen ansvarar du själv för övervakning av den. I princip är ingen personal på plats."
+            "\n"
+            "Se introduktionsfilmen om användningen av lokaler och bekanta dig med säkerhetsanvisningar "
+            "för invånarandvändningen innan du boka lokalen. När du bokar lokalen ansvarar du själv för "
+            "övervakning av den. Personalen är inte på plats."
+            "\n"
+            "Vi utvecklar en smidig användning av anläggningarna på denna destination och vi kan vara "
+            "i kontakt med anläggningens användare efter bokning för att samla in feedback."
+        ),
+        reservation_cancelled_instructions="",
+        reservation_cancelled_instructions_en="",
+        reservation_cancelled_instructions_sv="",
+        #
+        # Integers
+        surface_area=40,
+        min_persons=None,
+        max_persons=20,
+        max_reservations_per_user=None,
+        reservations_min_days_before=0,
+        reservations_max_days_before=30,
+        #
+        # Datetime
+        reservation_begins_at=None,
+        reservation_ends_at=None,
+        publish_begins_at=None,
+        publish_ends_at=None,
+        min_reservation_duration=datetime.timedelta(minutes=15),
+        max_reservation_duration=datetime.timedelta(hours=2),
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=datetime.timedelta(),
+        #
+        # Booleans
+        is_draft=False,
+        is_archived=False,
+        require_adult_reservee=False,
+        require_reservation_handling=False,
+        reservation_block_whole_day=False,
+        can_apply_free_of_charge=False,
+        allow_reservations_without_opening_hours=False,
+        #
+        # Enums
+        authentication=AuthenticationType.WEAK,
+        reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES,
+        reservation_kind=ReservationKind.DIRECT,
+        reservation_form=ReservationFormType.AGE_GROUP_FORM,
+        #
+        # Lists
+        search_terms=["ovikoodi"],
+        #
+        # Many-to-One related
+        unit=harakka,
+        origin_hauki_resource=ovikoodi_kasiteltava_resource,
+        reservation_unit_type=kokoustila,
+        cancellation_rule=peruutus_alkuun_asti,
+        metadata_set=lomake_4,
+        cancellation_terms=varauksen_alkuun_asti_peruutusehto,
+        service_specific_terms=nupa_palveluehto,
+        pricing_terms=None,
+        payment_terms=maksuton_maksuehto,
+        payment_product=None,
+        payment_merchant=None,
+        payment_accounting=None,
+    )
+    _ovikoodi_maksuton_kasiteltava_yksikko_space = Space.objects.create(
+        name="Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA) ENG",
+        name_sv="Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
+        surface_area=40,
+        max_persons=20,
+        unit=harakka,
+    )
+    _ovikoodi_maksuton_kasiteltava_yksikko.spaces.set([
+        _ovikoodi_maksuton_kasiteltava_yksikko_space,
+    ])
+    _ovikoodi_maksuton_kasiteltava_yksikko.purposes.set([
+        loyda_juhlatila_tarkoitus,
+    ])
+    _ovikoodi_maksuton_kasiteltava_yksikko.equipments.set([])
+    _ovikoodi_maksuton_kasiteltava_yksikko_pricing = ReservationUnitPricing.objects.create(
+        reservation_unit=_ovikoodi_maksuton_kasiteltava_yksikko,
+        begins=local_date(2024, 3, 1),
+        price_unit=PriceUnit.PER_HOUR,
+        payment_type=PaymentType.ONLINE,
+        is_activated_on_begins=False,
+        lowest_price=0,
+        highest_price=0,
+        tax_percentage=nolla_veroprosentti,
+    )
+    _ovikoodi_maksuton_kasiteltava_yksikko_access_type = ReservationUnitAccessType.objects.create(
+        reservation_unit=_ovikoodi_maksuton_kasiteltava_yksikko,
+        begin_date=local_date(2025, 7, 15),
+        access_type=AccessType.ACCESS_CODE,
+    )
+
+    _tuplabuukattu_tupla = ReservationUnit.objects.create(
+        #
+        # IDs
+        ext_uuid="c30a8f17-f675-4a21-8fc3-b8c7afffa96e",
+        #
+        # Strings
+        name="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA) eng",
+        name_sv="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
+        description="tuplabuukkaus",
+        description_en="tuplabuukkaus eng",
+        description_sv="tuplabuukkaus sv",
+        contact_information="",
+        notes_when_applying="",
+        notes_when_applying_en="",
+        notes_when_applying_sv="",
+        reservation_pending_instructions="",
+        reservation_pending_instructions_en="",
+        reservation_pending_instructions_sv="",
+        reservation_confirmed_instructions="",
+        reservation_confirmed_instructions_en="",
+        reservation_confirmed_instructions_sv="",
+        reservation_cancelled_instructions="",
+        reservation_cancelled_instructions_en="",
+        reservation_cancelled_instructions_sv="",
+        #
+        # Integers
+        surface_area=40,
+        min_persons=None,
+        max_persons=60,
+        max_reservations_per_user=None,
+        reservations_min_days_before=0,
+        reservations_max_days_before=182,
+        #
+        # Datetime
+        reservation_begins_at=None,
+        reservation_ends_at=None,
+        publish_begins_at=None,
+        publish_ends_at=None,
+        min_reservation_duration=datetime.timedelta(minutes=15),
+        max_reservation_duration=datetime.timedelta(hours=2),
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=datetime.timedelta(),
+        #
+        # Booleans
+        is_draft=False,
+        is_archived=False,
+        require_adult_reservee=False,
+        require_reservation_handling=False,
+        reservation_block_whole_day=False,
+        can_apply_free_of_charge=False,
+        allow_reservations_without_opening_hours=False,
+        #
+        # Enums
+        authentication=AuthenticationType.WEAK,
+        reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES,
+        reservation_kind=ReservationKind.DIRECT,
+        reservation_form=ReservationFormType.CONTACT_INFO_FORM,
+        #
+        # Lists
+        search_terms=[],
+        #
+        # Many-to-One related
+        unit=harakka,
+        origin_hauki_resource=tuple_resource,
+        reservation_unit_type=kokoustila,
+        cancellation_rule=peruutus_alkuun_asti,
+        metadata_set=lomake_1,
+        cancellation_terms=varauksen_alkuun_asti_peruutusehto,
+        service_specific_terms=nupa_palveluehto,
+        pricing_terms=None,
+        payment_terms=maksuton_maksuehto,
+        payment_product=None,
+        payment_merchant=None,
+        payment_accounting=None,
+    )
+    _tuplabuukattu_tupla_space = Space.objects.create(
+        name="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA) eng",
+        name_sv="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
+        surface_area=60,
+        max_persons=40,
+        unit=harakka,
+    )
+    _tuplabuukattu_tupla.spaces.set([
+        _tuplabuukattu_tupla_space,
+    ])
+    _tuplabuukattu_tupla.purposes.set([
+        loyda_juhlatila_tarkoitus,
+    ])
+    _tuplabuukattu_tupla.equipments.set([
+        rummut_laite,
+    ])
+    _tuplabuukattu_tupla_pricing = ReservationUnitPricing.objects.create(
+        reservation_unit=_tuplabuukattu_tupla,
+        begins=local_date(2024, 3, 1),
+        price_unit=PriceUnit.PER_HOUR,
+        payment_type=PaymentType.ONLINE,
+        is_activated_on_begins=False,
+        lowest_price=0,
+        highest_price=0,
+        tax_percentage=nolla_veroprosentti,
+    )
+    _tuplabuukattu_tupla_access_type = ReservationUnitAccessType.objects.create(
+        reservation_unit=_tuplabuukattu_tupla,
         begin_date=local_date(2025, 7, 15),
         access_type=AccessType.UNRESTRICTED,
     )
@@ -1935,8 +2413,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         name_en="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA) en",
         name_sv="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
         description="Kuvaus fi",
-        description_sv="Kuvaus en",
-        description_en="Kuvaus sv",
+        description_en="Kuvaus en",
+        description_sv="Kuvaus sv",
         contact_information="",
         notes_when_applying="",
         notes_when_applying_en="",
@@ -2055,8 +2533,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         name_en="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA) en",
         name_sv="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
         description="Kuvaus fi",
-        description_sv="Kuvaus en",
-        description_en="Kuvaus sv",
+        description_en="Kuvaus en",
+        description_sv="Kuvaus sv",
         contact_information="",
         notes_when_applying="",
         notes_when_applying_en="",
@@ -2176,8 +2654,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         name_en="KAUSIVARAUS yksikkö OVIKOODI Yrjö en (Manuaalitestaus)",
         name_sv="KAUSIVARAUS yksikkö OVIKOODI Yrjö sv (Manuaalitestaus)",
         description="Kausivaraus yksikkö Yrjö \nAukiolo \nMa - pe 10:00-22:00 Varauksella \n12:00-13:00 Suljettu",
-        description_sv="Kuvaus en",
-        description_en="Kuvaus sv",
+        description_en="Kuvaus en",
+        description_sv="Kuvaus sv",
         contact_information="",
         notes_when_applying="",
         notes_when_applying_en="",
@@ -2332,8 +2810,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         name_en="KAUSIVARAUS yksikkö Kalevi en (AUTOMAATIOTESTI ÄLÄ POISTA)",
         name_sv="KAUSIVARAUS yksikkö Kalevi sv (AUTOMAATIOTESTI ÄLÄ POISTA)",
         description="Kuvaus fi\nAukioloaika\nMa - pe 10:00-22:00 Varauksella\n13:00 - 14:00 Suljettu",
-        description_sv="Kuvaus en",
-        description_en="Kuvaus sv",
+        description_en="Kuvaus en",
+        description_sv="Kuvaus sv",
         contact_information="",
         notes_when_applying="",
         notes_when_applying_en="",
@@ -2487,8 +2965,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         name_en="KAUSIVARAUS yksikkö Piitu en (AUTOMAATIOTESTI ÄLÄ POISTA)",
         name_sv="KAUSIVARAUS yksikkö Piitu sv (AUTOMAATIOTESTI ÄLÄ POISTA)",
         description="Kuvaus fi\nAukioloaika\nMa - pe 10:00-22:00 Varauksella\n14:00 - 15:00 Suljettu",
-        description_sv="Kuvaus en",
-        description_en="Kuvaus sv",
+        description_en="Kuvaus en",
+        description_sv="Kuvaus sv",
         contact_information="Vastuuhenkilön yhteystiedot",
         notes_when_applying="",
         notes_when_applying_en="",

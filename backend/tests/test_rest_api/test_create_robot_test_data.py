@@ -166,10 +166,10 @@ def test_create_robot_test_data():
     create_robot_test_data()
 
     assert Unit.objects.count() == 1
-    assert ReservationUnit.objects.count() == 20
-    assert Space.objects.count() == 20
-    assert ReservationUnitPricing.objects.count() == 20
-    assert ReservationUnitAccessType.objects.count() == 20
+    assert ReservationUnit.objects.count() == 23
+    assert Space.objects.count() == 23
+    assert ReservationUnitPricing.objects.count() == 23
+    assert ReservationUnitAccessType.objects.count() == 23
     assert User.objects.count() == 29
     assert ApplicationRound.objects.count() == 1
     assert Reservation.objects.count() == 1
@@ -201,10 +201,10 @@ def test_create_robot_test_data__remove_existing_data_between_runs():
     create_robot_test_data()
 
     assert Unit.objects.count() == 1 + 1  # +1 unit for 'other_reservation'
-    assert ReservationUnit.objects.count() == 20 + 1  # +1 reservation unit for 'other_reservation'
-    assert Space.objects.count() == 20
-    assert ReservationUnitPricing.objects.count() == 20
-    assert ReservationUnitAccessType.objects.count() == 20
+    assert ReservationUnit.objects.count() == 23 + 1  # +1 reservation unit for 'other_reservation'
+    assert Space.objects.count() == 23
+    assert ReservationUnitPricing.objects.count() == 23
+    assert ReservationUnitAccessType.objects.count() == 23
     assert User.objects.count() == 29 + 1  # +1 user for other entities
     assert ApplicationRound.objects.count() == 1 + 1  # +1 application round for 'other_application'
     assert Reservation.objects.count() == 1 + 1  # +1 reservation for 'other_reservation'
