@@ -103,10 +103,19 @@ def csrf_view(request: WSGIRequest) -> HttpResponseRedirect | JsonResponse:  # N
     # > the CSRF token on a traditional Django website. The browser's same-origin policy
     # > prevents an attacker from getting access to the token with a cross-origin request.
     # Additionally, our backend's CORS policy only allows cross-origin requests from the frontend.
+
     redirect_to: str | None = request.GET.get("redirect_to", None)  # NOSONAR
+    if redirect_to is not None:
+        parsed_uri = urlparse(redirect_to)
+        origin = f"{parsed_uri.scheme}://{parsed_uri.netloc}".removesuffix("/")
+        if origin not in settings.CORS_ALLOWED_ORIGINS:
+            msg = "The 'redirect_to' parameter points to an origin that is not allowed."
+            return JsonResponse({"detail": msg, "code": "REDIRECT_TO_ORIGIN_NOT_ALLOWED"}, status=400)
+
     # Set these META-flags to force `django.middleware.csrf.CsrfViewMiddleware` to update the CSRF cookie.
     request.META["CSRF_COOKIE_NEEDS_UPDATE"] = True
     request.META["CSRF_COOKIE"] = get_token(request)
+
     # Add the new CSRF token to the response headers also, so that the frontend can update
     # the CSRF token during local development. This is because frontend is running in a different port
     # during local development, which is considered a different origin, and thus the CSRF cookie is not
