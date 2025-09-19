@@ -4,30 +4,48 @@ import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import { H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
-import type { RelatedUnitCardFieldsFragment } from "@gql/gql-types";
+import { Maybe, useRelatedReservationUnitsQuery, type RelatedUnitCardFieldsFragment } from "@gql/gql-types";
 import Carousel from "../Carousel";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
-import { getImageSource, getMainImage } from "common/src/helpers";
+import { filterNonNullable, getImageSource, getMainImage } from "common/src/helpers";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { getReservationUnitPath } from "@/modules/urls";
 import { gql } from "@apollo/client";
 
 type RelatedUnitsProps = {
-  units: RelatedUnitCardFieldsFragment[];
+  thisReservationUnitPk: Maybe<number>;
+  unitPk: Maybe<number>;
   className?: string;
   style?: React.CSSProperties;
 };
 
-export function RelatedUnits({ units, style, className }: RelatedUnitsProps): JSX.Element | null {
+/// Below the fold content so use a fetch inside this
+export function RelatedUnits({
+  thisReservationUnitPk,
+  unitPk,
+  style,
+  className,
+}: RelatedUnitsProps): JSX.Element | null {
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   const isWideMobile = useMedia(`(max-width: ${breakpoints.l})`, false);
 
-  if (units.length === 0) {
+  const { data } = useRelatedReservationUnitsQuery({
+    variables: {
+      unit: [unitPk],
+    },
+    skip: unitPk === 0,
+  });
+  const relatedReservationUnits: RelatedUnitCardFieldsFragment[] = filterNonNullable(
+    data?.reservationUnits?.edges?.map((n) => n?.node)
+  ).filter((n) => n?.pk !== thisReservationUnitPk);
+
+  if (relatedReservationUnits.length === 0) {
     return null;
   }
+
   return (
     <div style={style} className={className}>
       <H3 as="h2" id="related-reservation-units">
@@ -41,7 +59,7 @@ export function RelatedUnits({ units, style, className }: RelatedUnitsProps): JS
         cellSpacing={24}
         frameAriaLabel={t("reservationUnit:relatedReservationUnits")}
       >
-        {units.map((ru) => (
+        {relatedReservationUnits.map((ru) => (
           <RelatedUnitCard key={ru.pk} reservationUnit={ru} />
         ))}
       </Carousel>

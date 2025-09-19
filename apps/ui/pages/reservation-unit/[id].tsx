@@ -25,10 +25,6 @@ import {
   CurrentUserDocument,
   type CurrentUserQuery,
   type PricingFieldsFragment,
-  RelatedReservationUnitsDocument,
-  type RelatedReservationUnitsQuery,
-  type RelatedReservationUnitsQueryVariables,
-  type RelatedUnitCardFieldsFragment,
   type ReservationCreateMutationInput,
   ReservationUnitPageDocument,
   type ReservationUnitPageQuery,
@@ -223,12 +219,9 @@ const StyledRelatedUnits = styled(RelatedUnits)`
 
 function ReservationUnit({
   reservationUnit,
-  relatedReservationUnits,
   termsOfUse,
   apiBaseUrl,
-  searchDuration,
-  searchDate,
-  searchTime,
+  queryParams: { searchDuration, searchDate, searchTime },
   mutationErrors,
 }: Readonly<PropsNarrowed>): JSX.Element | null {
   const { t, i18n } = useTranslation();
@@ -387,8 +380,6 @@ function ReservationUnit({
     console.warn("not reservable because: ", reason);
   }
 
-  const shouldDisplayBottomWrapper = relatedReservationUnits?.length > 0;
-
   const paymentTermsContent = reservationUnit.paymentTerms
     ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang)
     : undefined;
@@ -546,8 +537,7 @@ function ReservationUnit({
           isOpen={isPricingTermsDialogOpen}
           onClose={() => setIsPricingTermsDialogOpen(false)}
         />
-        {/* TODO this breaks the layout when inside a grid (the RelatedUnits) */}
-        {shouldDisplayBottomWrapper && <StyledRelatedUnits units={relatedReservationUnits} />}
+        <StyledRelatedUnits thisReservationUnitPk={reservationUnit.pk} unitPk={reservationUnit.unit.pk} />
       </ReservationUnitPageWrapper>
     </>
   );
@@ -745,26 +735,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     // oxlint-disable-next-line no-console
     console.log("Fetch terms took:", innerEndTime - innerStartTime, "ms");
 
-    innerStartTime = performance.now();
-    let relatedReservationUnits: RelatedUnitCardFieldsFragment[] = [];
-    if (reservationUnit?.unit?.pk) {
-      const { data: relatedData } = await apolloClient.query<
-        RelatedReservationUnitsQuery,
-        RelatedReservationUnitsQueryVariables
-      >({
-        query: RelatedReservationUnitsDocument,
-        variables: {
-          unit: [reservationUnit.unit.pk],
-        },
-      });
-      relatedReservationUnits = filterNonNullable(relatedData?.reservationUnits?.edges?.map((n) => n?.node)).filter(
-        (n) => n?.pk !== reservationUnitData.reservationUnit?.pk
-      );
-    }
-    innerEndTime = performance.now();
-    // oxlint-disable-next-line no-console
-    console.log("Fetch related units took:", innerEndTime - innerStartTime, "ms");
-
     const queryParams = new URLSearchParams(query as Record<string, string>);
     const searchDate = queryParams.get("date") ?? null;
     const searchTime = queryParams.get("time") ?? null;
@@ -779,11 +749,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         ...commonProps,
         ...(await serverSideTranslations(locale ?? "fi")),
         reservationUnit,
-        relatedReservationUnits,
         termsOfUse: { genericTerms: bookingTerms },
-        searchDuration,
-        searchDate,
-        searchTime,
+        queryParams: {
+          searchDuration,
+          searchDate,
+          searchTime,
+        },
         mutationErrors,
       },
     };
