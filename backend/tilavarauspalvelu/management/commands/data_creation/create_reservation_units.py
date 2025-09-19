@@ -192,7 +192,7 @@ def _create_reservation_units(
     reservation_units = list(ReservationUnit.objects.all())
     for reservation_unit in reservation_units:
         reservation_unit.equipments.add(*random_subset(equipments))
-        reservation_unit.purposes.add(*random_subset(purposes))
+        reservation_unit.intended_uses.add(*random_subset(purposes))
 
     return reservation_units
 

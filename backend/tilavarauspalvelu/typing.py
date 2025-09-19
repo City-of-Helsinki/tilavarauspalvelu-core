@@ -37,7 +37,7 @@ if TYPE_CHECKING:
         AgeGroup,
         ApplicationRound,
         Equipment,
-        Purpose,
+        IntendedUse,
         ReservationDenyReason,
         ReservationMetadataSet,
         ReservationPurpose,
@@ -667,7 +667,7 @@ class ReservationUnitData(TypedDict, total=False):
 
     spaces: list[Space]
     resources: list[Resource]
-    purposes: list[Purpose]
+    purposes: list[IntendedUse]
     equipments: list[Equipment]
 
 

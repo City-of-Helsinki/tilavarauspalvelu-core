@@ -25,7 +25,7 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.models import (
     ApplicationRoundTimeSlot,
     Equipment,
-    Purpose,
+    IntendedUse,
     ReservationMetadataSet,
     ReservationUnit,
     ReservationUnitAccessType,
@@ -158,7 +158,7 @@ class ReservationUnitCreateMutation(MutationType[ReservationUnit], kind="create"
     # Forward many-to-many related
     spaces = Input(Space)
     resources = Input(Resource)
-    purposes = Input(Purpose)
+    intended_uses = Input(IntendedUse)
     equipments = Input(Equipment)
 
     # Reverse one-to-many related
@@ -192,12 +192,12 @@ class ReservationUnitCreateMutation(MutationType[ReservationUnit], kind="create"
 
         has_spaces = "spaces" in input_data
         has_resources = "resources" in input_data
-        has_purposes = "purposes" in input_data
+        has_intended_uses = "intended_uses" in input_data
         has_equipments = "equipments" in input_data
 
         spaces = input_data.get("spaces") or []
         resources = input_data.get("resources") or []
-        purposes = input_data.get("purposes") or []
+        intended_uses = input_data.get("intended_uses") or []
         equipments = input_data.get("equipments") or []
 
         has_images = "images" in input_data
@@ -263,8 +263,8 @@ class ReservationUnitCreateMutation(MutationType[ReservationUnit], kind="create"
                 instance.spaces.set(spaces)
             if has_resources:
                 instance.resources.set(resources)
-            if has_purposes:
-                instance.purposes.set(purposes)
+            if has_intended_uses:
+                instance.intended_uses.set(intended_uses)
             if has_equipments:
                 instance.equipments.set(equipments)
 
@@ -286,7 +286,7 @@ class ReservationUnitCreateMutation(MutationType[ReservationUnit], kind="create"
         to_many_fields = [
             "spaces",
             "resources",
-            "purposes",
+            "intended_uses",
             "equipments",
             "images",
             "pricings",

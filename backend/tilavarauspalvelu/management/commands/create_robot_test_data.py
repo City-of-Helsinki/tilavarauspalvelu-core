@@ -35,11 +35,11 @@ from tilavarauspalvelu.models import (
     ApplicationRoundTimeSlot,
     Equipment,
     EquipmentCategory,
+    IntendedUse,
     OriginHaukiResource,
     PaymentAccounting,
     PaymentMerchant,
     PaymentProduct,
-    Purpose,
     Reservation,
     ReservationMetadataField,
     ReservationMetadataSet,
@@ -616,7 +616,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         },
     )
 
-    harrasta_yhdessa_tarkoitus, _ = Purpose.objects.get_or_create(
+    harrasta_yhdessa_tarkoitus, _ = IntendedUse.objects.get_or_create(
         name="Harrasta yhdessä",
         defaults={
             "name_fi": "Harrasta yhdessä",
@@ -624,7 +624,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
             "name_sv": "Utöva hobbyer tillsammans",
         },
     )
-    jarjesta_tapahtuma_tarkoitus, _ = Purpose.objects.get_or_create(
+    jarjesta_tapahtuma_tarkoitus, _ = IntendedUse.objects.get_or_create(
         name="Järjestä tapahtuma",
         defaults={
             "name_fi": "Järjestä tapahtuma",
@@ -632,7 +632,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
             "name_sv": "Arrangera evenemang",
         },
     )
-    kauta_laitteita_tarkoitus, _ = Purpose.objects.get_or_create(
+    kauta_laitteita_tarkoitus, _ = IntendedUse.objects.get_or_create(
         name="Käytä laitteita",
         defaults={
             "name_fi": "Käytä laitteita",
@@ -640,7 +640,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
             "name_sv": "Använd utrustning",
         },
     )
-    liiku_ja_rentoudu_tarkoitus, _ = Purpose.objects.get_or_create(
+    liiku_ja_rentoudu_tarkoitus, _ = IntendedUse.objects.get_or_create(
         name="Liiku ja rentoudu",
         defaults={
             "name_fi": "Liiku ja rentoudu",
@@ -648,7 +648,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
             "name_sv": "Motionera och koppla av",
         },
     )
-    loyda_juhlatila_tarkoitus, _ = Purpose.objects.get_or_create(
+    loyda_juhlatila_tarkoitus, _ = IntendedUse.objects.get_or_create(
         name="Löydä juhlatila",
         defaults={
             "name_fi": "Löydä juhlatila",
@@ -656,7 +656,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
             "name_sv": "Hitta festlokal",
         },
     )
-    pida_kokous_tarkoitus, _ = Purpose.objects.get_or_create(
+    pida_kokous_tarkoitus, _ = IntendedUse.objects.get_or_create(
         name="Pidä kokous",
         defaults={
             "name_fi": "Pidä kokous",
@@ -664,7 +664,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
             "name_sv": "Håll möte",
         },
     )
-    tee_musiikkia_tarkoitus, _ = Purpose.objects.get_or_create(
+    tee_musiikkia_tarkoitus, _ = IntendedUse.objects.get_or_create(
         name="Tee musiikkia tai äänitä",
         defaults={
             "name_fi": "Tee musiikkia tai äänitä",
@@ -672,7 +672,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
             "name_sv": "Gör musik eller spela in",
         },
     )
-    yksin_tai_ryhma_tarkoitus, _ = Purpose.objects.get_or_create(
+    yksin_tai_ryhma_tarkoitus, _ = IntendedUse.objects.get_or_create(
         name="Työskentele yksin tai ryhmässä",
         defaults={
             "name_fi": "Työskentele yksin tai ryhmässä",
@@ -1240,7 +1240,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     _maksuton_mankeli.spaces.set([
         _maksuton_mankeli_space,
     ])
-    _maksuton_mankeli.purposes.set([
+    _maksuton_mankeli.intended_uses.set([
         kauta_laitteita_tarkoitus,
     ])
     _maksuton_mankeli.equipments.set([
@@ -1416,7 +1416,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     _aina_maksullinen_aitio.spaces.set([
         _aina_maksullinen_aitio_space,
     ])
-    _aina_maksullinen_aitio.purposes.set([
+    _aina_maksullinen_aitio.intended_uses.set([
         pida_kokous_tarkoitus,
         loyda_juhlatila_tarkoitus,
         yksin_tai_ryhma_tarkoitus,
@@ -1601,7 +1601,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     _aina_kasiteltava_kellarikerros.spaces.set([
         _aina_kasiteltava_kellarikerros_space,
     ])
-    _aina_kasiteltava_kellarikerros.purposes.set([
+    _aina_kasiteltava_kellarikerros.intended_uses.set([
         loyda_juhlatila_tarkoitus,
         jarjesta_tapahtuma_tarkoitus,
         harrasta_yhdessa_tarkoitus,
@@ -1789,7 +1789,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     _alennuskelpoinen_aula.spaces.set([
         _alennuskelpoinen_aula_space,
     ])
-    _alennuskelpoinen_aula.purposes.set([
+    _alennuskelpoinen_aula.intended_uses.set([
         jarjesta_tapahtuma_tarkoitus,
         harrasta_yhdessa_tarkoitus,
         yksin_tai_ryhma_tarkoitus,
@@ -1902,7 +1902,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     _perumiskelvoton_parveke.spaces.set([
         _perumiskelvoton_parveke_space,
     ])
-    _perumiskelvoton_parveke.purposes.set([
+    _perumiskelvoton_parveke.intended_uses.set([
         pida_kokous_tarkoitus,
     ])
     _perumiskelvoton_parveke_pricing = ReservationUnitPricing.objects.create(
@@ -2012,7 +2012,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     _kausivarausyksikko_malmi.spaces.set([
         _kausivarausyksikko_malmi_space,
     ])
-    _kausivarausyksikko_malmi.purposes.set([
+    _kausivarausyksikko_malmi.intended_uses.set([
         jarjesta_tapahtuma_tarkoitus,
         harrasta_yhdessa_tarkoitus,
         liiku_ja_rentoudu_tarkoitus,
@@ -2132,7 +2132,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     _kausivarausyksikko_keskusta.spaces.set([
         _kausivarausyksikko_keskusta_space,
     ])
-    _kausivarausyksikko_keskusta.purposes.set([
+    _kausivarausyksikko_keskusta.intended_uses.set([
         loyda_juhlatila_tarkoitus,
         jarjesta_tapahtuma_tarkoitus,
         harrasta_yhdessa_tarkoitus,
@@ -2253,7 +2253,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     _kausivarausyksikko_yrjo.spaces.set([
         _kausivarausyksikko_yrjo_space,
     ])
-    _kausivarausyksikko_yrjo.purposes.set([
+    _kausivarausyksikko_yrjo.intended_uses.set([
         harrasta_yhdessa_tarkoitus,
         liiku_ja_rentoudu_tarkoitus,
     ])
@@ -2409,7 +2409,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     _kausivarausyksikko_kalevi.spaces.set([
         _kausivarausyksikko_kalevi_space,
     ])
-    _kausivarausyksikko_kalevi.purposes.set([
+    _kausivarausyksikko_kalevi.intended_uses.set([
         pida_kokous_tarkoitus,
         jarjesta_tapahtuma_tarkoitus,
         harrasta_yhdessa_tarkoitus,
@@ -2564,7 +2564,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     _kausivarausyksikko_piitu.spaces.set([
         _kausivarausyksikko_piitu_space,
     ])
-    _kausivarausyksikko_piitu.purposes.set([
+    _kausivarausyksikko_piitu.intended_uses.set([
         pida_kokous_tarkoitus,
         yksin_tai_ryhma_tarkoitus,
     ])
@@ -2671,7 +2671,7 @@ def copy_reservation_unit(original: ReservationUnit, *, kind: Literal["android",
     android_version.save()
 
     android_version.resources.set(original.resources.all())
-    android_version.purposes.set(original.purposes.all())
+    android_version.intended_uses.set(original.intended_uses.all())
     android_version.equipments.set(original.equipments.all())
 
     new_spaces: list[Space] = []

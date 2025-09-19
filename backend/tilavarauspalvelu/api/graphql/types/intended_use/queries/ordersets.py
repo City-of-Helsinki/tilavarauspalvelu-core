@@ -1,13 +1,13 @@
 from undine import Order, OrderSet
 
-from tilavarauspalvelu.models import Purpose
+from tilavarauspalvelu.models import IntendedUse
 
 __all__ = [
-    "PurposeOrderSet",
+    "IntendedUseOrderSet",
 ]
 
 
-class PurposeOrderSet(OrderSet[Purpose]):
+class IntendedUseOrderSet(OrderSet[IntendedUse]):
     pk = Order()
     rank = Order()
     name_fi = Order()

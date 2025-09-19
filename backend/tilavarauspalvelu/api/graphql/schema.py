@@ -36,8 +36,8 @@ from .types import (
     BannerNotificationUpdateMutation,
     EquipmentCategoryNode,
     EquipmentNode,
+    IntendedUseNode,
     PaymentOrderNode,
-    PurposeNode,
     RejectAllApplicationOptionsMutation,
     RejectAllSectionOptionsMutation,
     RejectedOccurrenceNode,
@@ -223,7 +223,7 @@ class Query(RootType):
     all_equipment_categories = Entrypoint(EquipmentCategoryNode, many=True)
     all_reservation_units = Entrypoint(ReservationUnitAllNode, many=True)
     all_tax_percentages = Entrypoint(TaxPercentageNode, many=True)
-    all_purposes = Entrypoint(PurposeNode, many=True)
+    all_intended_uses = Entrypoint(IntendedUseNode, many=True)
     all_metadata_sets = Entrypoint(ReservationMetadataSetNode, many=True)
     all_reservation_unit_types = Entrypoint(ReservationUnitTypeNode, many=True)
     all_age_groups = Entrypoint(AgeGroupNode, many=True)

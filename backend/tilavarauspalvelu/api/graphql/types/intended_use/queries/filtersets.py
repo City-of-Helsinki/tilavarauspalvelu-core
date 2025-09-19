@@ -1,13 +1,13 @@
 from undine import Filter, FilterSet
 
-from tilavarauspalvelu.models import Purpose
+from tilavarauspalvelu.models import IntendedUse
 
 __all__ = [
-    "PurposeFilterSet",
+    "IntendedUseFilterSet",
 ]
 
 
-class PurposeFilterSet(FilterSet[Purpose]):
+class IntendedUseFilterSet(FilterSet[IntendedUse]):
     pk = Filter(lookup="in")
     name_fi = Filter()
     name_en = Filter()
