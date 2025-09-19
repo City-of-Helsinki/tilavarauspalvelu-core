@@ -107,8 +107,6 @@ def test_reservation_series__create_series__reservation_details(graphql):
     data["reservationDetails"]["reserveeEmail"] = "user@admin.com"
     data["reservationDetails"]["reserveePhone"] = "0123456789"
     data["reservationDetails"]["reserveeOrganisationName"] = "org"
-    data["reservationDetails"]["reserveeAddressStreet"] = "street"
-    data["reservationDetails"]["reserveeAddressCity"] = "city"
     data["reservationDetails"]["reserveeAddressZip"] = "cip"
     data["reservationDetails"]["reserveeType"] = ReserveeType.COMPANY.value
     data["reservationDetails"]["purpose"] = purpose.pk
@@ -145,8 +143,6 @@ def test_reservation_series__create_series__reservation_details(graphql):
     assert reservations[0].reservee_email == "user@admin.com"
     assert reservations[0].reservee_phone == "0123456789"
     assert reservations[0].reservee_organisation_name == "org"
-    assert reservations[0].reservee_address_street == "street"
-    assert reservations[0].reservee_address_city == "city"
     assert reservations[0].reservee_address_zip == "cip"
     assert reservations[0].reservee_type == ReserveeType.COMPANY
     assert reservations[0].purpose == purpose

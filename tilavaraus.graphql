@@ -1411,8 +1411,6 @@ type ReservationNode implements Node {
   purpose: ReservationPurposeNode @complexity(value: 1)
   reservationSeries: ReservationSeriesNode @complexity(value: 1)
   reservationUnit: ReservationUnitNode! @complexity(value: 1)
-  reserveeAddressCity: String
-  reserveeAddressStreet: String
   reserveeAddressZip: String
   reserveeEmail: Email
   reserveeFirstName: String
@@ -2461,8 +2459,6 @@ input ReservationSeriesReservationCreateInput {
   name: String! = ""
   numPersons: Int = null
   purpose: Int
-  reserveeAddressCity: String! = ""
-  reserveeAddressStreet: String! = ""
   reserveeAddressZip: String! = ""
   reserveeEmail: Email = null
   reserveeFirstName: String! = ""
@@ -2485,8 +2481,6 @@ input ReservationSeriesReservationUpdateInput {
   name: String
   numPersons: Int
   purpose: Int
-  reserveeAddressCity: String
-  reserveeAddressStreet: String
   reserveeAddressZip: String
   reserveeEmail: Email
   reserveeFirstName: String
@@ -2537,8 +2531,6 @@ input ReservationStaffCreateMutation {
   numPersons: Int = null
   purpose: Int = null
   reservationUnit: Int!
-  reserveeAddressCity: String! = ""
-  reserveeAddressStreet: String! = ""
   reserveeAddressZip: String! = ""
   reserveeEmail: Email = null
   reserveeFirstName: String! = ""
@@ -2562,8 +2554,6 @@ input ReservationStaffModifyMutation {
   numPersons: Int
   pk: Int!
   purpose: Int
-  reserveeAddressCity: String
-  reserveeAddressStreet: String
   reserveeAddressZip: String
   reserveeEmail: Email
   reserveeFirstName: String
@@ -2949,8 +2939,6 @@ input ReservationUpdateMutation {
   numPersons: Int
   pk: Int!
   purpose: Int
-  reserveeAddressCity: String
-  reserveeAddressStreet: String
   reserveeAddressZip: String
   reserveeEmail: Email
   reserveeFirstName: String

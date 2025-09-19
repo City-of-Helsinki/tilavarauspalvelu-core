@@ -31,8 +31,6 @@ class ReservationSeriesReservationUpdateInput(MutationType[Reservation], kind="r
     reservee_email = Input(required=False)
     reservee_phone = Input(required=False)
     reservee_organisation_name = Input(required=False)
-    reservee_address_street = Input(required=False)
-    reservee_address_city = Input(required=False)
     reservee_address_zip = Input(required=False)
     reservee_type = Input(required=False)
 

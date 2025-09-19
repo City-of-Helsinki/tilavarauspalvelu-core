@@ -262,8 +262,6 @@ def test_reservation__staff_create__optional_fields(graphql):
         name="Test reservation",
         numPersons=1,
         purpose=purpose.pk,
-        reserveeAddressCity="Helsinki",
-        reserveeAddressStreet="Mannerheimintie 2",
         reserveeAddressZip="00100",
         reserveeEmail="john.doe@example.com",
         reserveeFirstName="John",
@@ -293,8 +291,6 @@ def test_reservation__staff_create__optional_fields(graphql):
     assert reservation.name == "Test reservation"
     assert reservation.num_persons == 1
     assert reservation.purpose.name == "purpose"
-    assert reservation.reservee_address_city == "Helsinki"
-    assert reservation.reservee_address_street == "Mannerheimintie 2"
     assert reservation.reservee_address_zip == "00100"
     assert reservation.reservee_email == "john.doe@example.com"
     assert reservation.reservee_first_name == "John"

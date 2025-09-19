@@ -44,8 +44,6 @@ class ReservationStaffCreateMutation(MutationType[Reservation], kind="create"):
     reservee_email = Input()
     reservee_phone = Input(required=True, default_value="")
     reservee_organisation_name = Input(required=True, default_value="")
-    reservee_address_street = Input(required=True, default_value="")
-    reservee_address_city = Input(required=True, default_value="")
     reservee_address_zip = Input(required=True, default_value="")
     reservee_type = Input()
 

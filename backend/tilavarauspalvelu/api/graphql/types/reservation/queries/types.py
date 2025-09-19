@@ -111,8 +111,6 @@ class ReservationNode(
     reservee_last_name = Field() | private
     reservee_email = Field() | private
     reservee_phone = Field() | private
-    reservee_address_street = Field() | private
-    reservee_address_city = Field() | private
     reservee_address_zip = Field() | private
     reservee_organisation_name = Field() | private
     reservee_type = Field() | private
