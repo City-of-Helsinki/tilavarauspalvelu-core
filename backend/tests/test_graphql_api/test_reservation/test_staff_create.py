@@ -249,10 +249,12 @@ def test_reservation__staff_create__begin_date_in_the_past__move_to_yesterday_on
 
 def test_reservation__staff_create__optional_fields(graphql):
     reservation_unit = ReservationUnitFactory.create()
+    purpose = ReservationPurposeFactory.create(name="purpose")
+    age_group = AgeGroupFactory.create(minimum=18, maximum=30)
 
     data = get_staff_create_data(
         reservation_unit,
-        ageGroup=AgeGroupFactory.create(minimum=18, maximum=30).pk,
+        ageGroup=age_group.pk,
         applyingForFreeOfCharge=True,
         bufferTimeAfter=int(datetime.timedelta(minutes=30).total_seconds()),
         bufferTimeBefore=int(datetime.timedelta(minutes=30).total_seconds()),
@@ -261,9 +263,7 @@ def test_reservation__staff_create__optional_fields(graphql):
         municipality=MunicipalityChoice.HELSINKI.value,
         name="Test reservation",
         numPersons=1,
-        purpose=ReservationPurposeFactory.create(name="purpose").pk,
-        reserveeAddressCity="Helsinki",
-        reserveeAddressStreet="Mannerheimintie 2",
+        purpose=purpose.pk,
         reserveeAddressZip="00100",
         reserveeEmail="john.doe@example.com",
         reserveeFirstName="John",
@@ -293,8 +293,6 @@ def test_reservation__staff_create__optional_fields(graphql):
     assert reservation.name == "Test reservation"
     assert reservation.num_persons == 1
     assert reservation.purpose.name == "purpose"
-    assert reservation.reservee_address_city == "Helsinki"
-    assert reservation.reservee_address_street == "Mannerheimintie 2"
     assert reservation.reservee_address_zip == "00100"
     assert reservation.reservee_email == "john.doe@example.com"
     assert reservation.reservee_first_name == "John"

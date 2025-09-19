@@ -93,9 +93,7 @@ class ReservationPrefillInfo(TypedDict):
     reservee_last_name: str | None
     reservee_email: str | None
     reservee_phone: str | None
-    reservee_address_street: str | None
     reservee_address_zip: str | None
-    reservee_address_city: str | None
     municipality: str | None  # MunicipalityChoice
 
 
