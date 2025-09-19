@@ -2,6 +2,7 @@ import datetime
 from decimal import Decimal
 from typing import Any, TypedDict
 
+from django.conf import settings
 from django.db import models
 from django.db.models import OuterRef
 from django.db.models.functions import JSONObject
@@ -136,6 +137,12 @@ class ReservationNode(
     # Custom fields
     is_blocked = Field(models.Q(type=ReservationTypeChoice.BLOCKED))
     is_handled = Field(models.Q(handled_at__isnull=False)) | private
+
+    @Field
+    def draft_expires_at(root: Reservation, info: GQLInfo[User]) -> datetime.datetime | None:
+        if root.state != ReservationStateChoice.CREATED:
+            return None
+        return root.created_at + datetime.timedelta(minutes=settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES)
 
     @Field
     def affected_reservation_units(root: Reservation, info: GQLInfo[User]) -> list[int]:

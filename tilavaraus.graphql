@@ -1386,6 +1386,7 @@ type ReservationNode implements Node {
   createdAt: DateTime
   denyReason: ReservationDenyReasonNode @complexity(value: 1)
   description: String
+  draftExpiresAt: DateTime
   endsAt: DateTime!
   extUuid: UUID!
   freeOfChargeReason: String
