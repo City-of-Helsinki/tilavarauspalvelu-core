@@ -551,7 +551,6 @@ export const RESERVATION_PAGE_QUERY = gql`
           ...AddressFields
         }
         canApplyFreeOfCharge
-        ...MetadataSets
         ...TermsOfUse
       }
     }

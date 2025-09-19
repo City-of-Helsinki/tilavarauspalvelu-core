@@ -51,8 +51,6 @@ function createReservationUnitFragment({ pk, nameFi }: { pk: number; nameFi: str
     nameFi,
     pk,
     id: createNodeId("ReservationUnitNode", pk),
-    minPersons: null,
-    maxPersons: null,
     bufferTimeBefore: 0,
     bufferTimeAfter: 0,
     reservationStartInterval: ReservationStartInterval.Interval_15Mins,

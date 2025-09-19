@@ -329,7 +329,6 @@ export const RESERVATION_IN_PROGRESS_QUERY = gql`
         canApplyFreeOfCharge
         reservationForm
         ...CancellationRuleFields
-        ...MetadataSets
         ...TermsOfUse
         requireReservationHandling
       }
