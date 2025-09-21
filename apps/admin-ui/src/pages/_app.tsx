@@ -1,5 +1,7 @@
-import React, { useEffect, type FC } from "react";
-import App, { type AppContext, type AppInitialProps, type AppProps } from "next/app";
+import React, { useEffect } from "react";
+import type { FC } from "react";
+import App from "next/app";
+import type { AppContext, AppInitialProps, AppProps } from "next/app";
 import "common/styles/global.scss";
 import "../styles/global.scss";
 import { ApolloProvider } from "@apollo/client";
@@ -13,15 +15,17 @@ import { ModalContextProvider } from "@/context/ModalContext";
 import {
   BannerNotificationTarget,
   CurrentUserDocument,
-  type CurrentUserQuery,
-  type CurrentUserQueryVariables,
   HandlingDataDocument,
-  type HandlingDataQuery,
-  type HandlingDataQueryVariables,
   ReservationStateChoice,
   ShowNotificationsListDocument,
-  type ShowNotificationsListQuery,
-  type ShowNotificationsListQueryVariables,
+} from "@gql/gql-types";
+import type {
+  CurrentUserQuery,
+  CurrentUserQueryVariables,
+  HandlingDataQuery,
+  HandlingDataQueryVariables,
+  ShowNotificationsListQuery,
+  ShowNotificationsListQueryVariables,
 } from "@gql/gql-types";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { toApiDate } from "common/src/common/util";

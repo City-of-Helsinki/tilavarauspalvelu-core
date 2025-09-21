@@ -8,11 +8,7 @@ import { Flex, NoWrap, H1, H4, fontRegular } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
   ReservationStateChoice,
-  type ReservationPageQuery,
-  type ReservationPageQueryVariables,
   ReservationPageDocument,
-  type ApplicationReservationSeriesQuery,
-  type ApplicationReservationSeriesQueryVariables,
   ApplicationReservationSeriesDocument,
   OrderStatus,
   useAccessCodeQuery,
@@ -20,6 +16,12 @@ import {
   MunicipalityChoice,
   ReservationCancelReasonChoice,
   PindoraReservationFragment,
+} from "@gql/gql-types";
+import type {
+  ReservationPageQuery,
+  ReservationPageQueryVariables,
+  ApplicationReservationSeriesQuery,
+  ApplicationReservationSeriesQueryVariables,
 } from "@gql/gql-types";
 import Link from "next/link";
 import { isBefore, sub } from "date-fns";
@@ -43,9 +45,9 @@ import {
   getFeedbackUrl,
   getReservationPath,
   getReservationUnitPath,
-  type ReservationNotifications,
   reservationsPrefix,
 } from "@/modules/urls";
+import type { ReservationNotifications } from "@/modules/urls";
 import { useToastIfQueryParam } from "@/hooks";
 import { convertLanguageCode } from "common/src/common/util";
 import { gql } from "@apollo/client";

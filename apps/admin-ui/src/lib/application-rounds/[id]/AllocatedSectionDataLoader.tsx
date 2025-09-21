@@ -1,5 +1,6 @@
 import React from "react";
-import { type ApolloError, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
+import type { ApolloError } from "@apollo/client";
 import { AllocatedTimeSlotOrderSet, ApplicationSectionStatusChoice, useAllocatedTimeSlotsQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";

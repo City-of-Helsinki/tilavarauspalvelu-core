@@ -1,21 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type CreateStaffReservationFragment,
-  type Maybe,
-  ReservationTypeChoice,
-  useReservationUnitQuery,
-} from "@gql/gql-types";
+import { ReservationTypeChoice, useReservationUnitQuery } from "@gql/gql-types";
+import type { CreateStaffReservationFragment, Maybe } from "@gql/gql-types";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, LoadingSpinner, Notification, TextInput } from "hds-react";
 import styled from "styled-components";
 import { fromUIDate } from "common/src/common/util";
-import {
-  type ReservationFormMeta,
-  type ReservationSeriesForm as ReservationSeriesFormT,
-  ReservationSeriesFormSchema,
-} from "@/schemas";
+import { ReservationSeriesFormSchema } from "@/schemas";
+import type { ReservationFormMeta, ReservationSeriesForm as ReservationSeriesFormT } from "@/schemas";
 import type { NewReservationListItem } from "@/component/ReservationsList";
 import { WeekdaysSelector } from "@/component/WeekdaysSelector";
 import { useCreateReservationSeries, useFilteredReservationList, useMultipleReservation } from "@/hooks";

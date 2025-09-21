@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
-import { ReservationOrderSet, useReservationListQuery, type ReservationListQueryVariables } from "@gql/gql-types";
+import { ReservationOrderSet, useReservationListQuery } from "@gql/gql-types";
+import type { ReservationListQueryVariables } from "@gql/gql-types";
 import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { ReservationsTable } from "./ReservationsTable";
@@ -9,7 +10,8 @@ import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { CenterSpinner } from "common/styled";
 import { useTranslation } from "next-i18next";
-import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 
 function mapFilterParams(searchParams: ReadonlyURLSearchParams): ReservationListQueryVariables {

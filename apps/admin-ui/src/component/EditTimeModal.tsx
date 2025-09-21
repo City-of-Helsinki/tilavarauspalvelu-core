@@ -1,16 +1,16 @@
 import React from "react";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import styled from "styled-components";
 import { Button, ButtonSize, ButtonVariant, Dialog, Notification, NotificationSize } from "hds-react";
 import { z } from "zod";
 import {
-  type ChangeReservationTimeFragment,
-  type ReservationSeriesAddMutation,
   ReservationTypeChoice,
   useAddReservationToSeriesMutation,
   useStaffAdjustReservationTimeMutation,
   Weekday,
 } from "@gql/gql-types";
+import type { ChangeReservationTimeFragment, ReservationSeriesAddMutation } from "@gql/gql-types";
 import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { differenceInMinutes, format } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";

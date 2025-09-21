@@ -5,7 +5,7 @@ import { convertLanguageCode, getTranslationSafe } from "common/src/common/util"
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { Sanitize } from "common/src/components/Sanitize";
 import type { TermsInfoSectionFragment } from "@gql/gql-types";
-import { getServerSideProps } from "@/pages/reservations/[id]";
+import type { getServerSideProps } from "@/pages/reservations/[id]";
 import { gql } from "@apollo/client";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];

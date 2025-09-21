@@ -1,17 +1,15 @@
 import { differenceInMinutes, format } from "date-fns";
 import type { TFunction } from "i18next";
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "common";
-import {
-  type CreateTagStringFragment,
-  ReserveeType,
-  type Maybe,
-  PriceUnit,
-  type PricingFieldsFragment,
-  type ReservationNode,
-  type ReservationPriceDetailsFieldsFragment,
-  ReservationTypeChoice,
-  type ReservationUnitPricingFieldsFragment,
-  type EventStyleReservationFieldsFragment,
+import { ReserveeType, PriceUnit, ReservationTypeChoice } from "@gql/gql-types";
+import type {
+  CreateTagStringFragment,
+  Maybe,
+  PricingFieldsFragment,
+  ReservationNode,
+  ReservationPriceDetailsFieldsFragment,
+  ReservationUnitPricingFieldsFragment,
+  EventStyleReservationFieldsFragment,
 } from "@gql/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
 import { formatDate, formatDateTimeRange, getReserveeName } from "@/common/util";

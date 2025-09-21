@@ -1,4 +1,5 @@
-import React, { type RefObject, useEffect } from "react";
+import React, { useEffect } from "react";
+import type { RefObject } from "react";
 import { gql } from "@apollo/client";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
 import {
@@ -12,17 +13,14 @@ import {
   NotificationSize,
 } from "hds-react";
 import { useTranslation } from "next-i18next";
-import {
-  type CreateStaffReservationFragment,
-  type ReservationStaffCreateMutation,
-  useCreateStaffReservationMutation,
-  useReservationUnitQuery,
-} from "@gql/gql-types";
+import { useCreateStaffReservationMutation, useReservationUnitQuery } from "@gql/gql-types";
+import type { CreateStaffReservationFragment, ReservationStaffCreateMutation } from "@gql/gql-types";
 import styled from "styled-components";
 import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";
-import { ReservationFormSchema, type ReservationFormType, type ReservationFormMeta } from "@/schemas";
+import { ReservationFormSchema } from "@/schemas";
+import type { ReservationFormType, ReservationFormMeta } from "@/schemas";
 import { CenterSpinner, Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useCheckCollisions } from "@/hooks";

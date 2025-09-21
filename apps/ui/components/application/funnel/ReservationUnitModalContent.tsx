@@ -12,11 +12,8 @@ import {
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import {
-  type ApplicationReservationUnitListFragment,
-  type RecurringCardFragment,
-  ReservationKind,
-} from "@gql/gql-types";
+import { ReservationKind } from "@gql/gql-types";
+import type { ApplicationReservationUnitListFragment, RecurringCardFragment } from "@gql/gql-types";
 import { filterNonNullable, getImageSource, getMainImage } from "common/src/helpers";
 import { CenterSpinner, Flex, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";

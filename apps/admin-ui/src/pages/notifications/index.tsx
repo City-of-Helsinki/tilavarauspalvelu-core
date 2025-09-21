@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { type TFunction, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import {
   BannerNotificationOrderSet,
-  type BannerNotificationTableElementFragment,
   BannerNotificationState,
   UserPermissionChoice,
   BannerNotificationsListDocument,
-  type BannerNotificationsListQueryVariables,
-  type BannerNotificationsListQuery,
   useBannerNotificationsListQuery,
+} from "@gql/gql-types";
+import type {
+  BannerNotificationTableElementFragment,
+  BannerNotificationsListQueryVariables,
+  BannerNotificationsListQuery,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { valueForDateInput, valueForTimeInput } from "@/helpers";

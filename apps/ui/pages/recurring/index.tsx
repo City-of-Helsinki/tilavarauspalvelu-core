@@ -3,13 +3,11 @@ import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Flex, H1, H2 } from "common/styled";
-import {
-  type ApplicationRoundFieldsFragment,
-  ApplicationRoundOrderSet,
-  ApplicationRoundStatusChoice,
-  ApplicationRoundsUiDocument,
-  type ApplicationRoundsUiQuery,
-  type ApplicationRoundsUiQueryVariables,
+import { ApplicationRoundOrderSet, ApplicationRoundStatusChoice, ApplicationRoundsUiDocument } from "@gql/gql-types";
+import type {
+  ApplicationRoundFieldsFragment,
+  ApplicationRoundsUiQuery,
+  ApplicationRoundsUiQueryVariables,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { ApplicationRoundCard } from "@/components/recurring/ApplicationRoundCard";

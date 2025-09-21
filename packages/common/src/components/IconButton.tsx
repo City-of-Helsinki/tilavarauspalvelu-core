@@ -1,4 +1,5 @@
-import React, { type HTMLAttributes } from "react";
+import React from "react";
+import type { HTMLAttributes } from "react";
 import Link from "next/link";
 import styled, { css } from "styled-components";
 import { anchorStyles, focusStyles, fontMedium, visitedStyles, Flex } from "../../styled";

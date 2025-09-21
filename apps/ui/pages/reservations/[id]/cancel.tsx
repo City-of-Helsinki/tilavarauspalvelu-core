@@ -1,9 +1,6 @@
 import React from "react";
-import {
-  ReservationCancelPageDocument,
-  type ReservationCancelPageQuery,
-  type ReservationCancelPageQueryVariables,
-} from "@gql/gql-types";
+import { ReservationCancelPageDocument } from "@gql/gql-types";
+import type { ReservationCancelPageQuery, ReservationCancelPageQueryVariables } from "@gql/gql-types";
 import { ReservationCancellation } from "@/components/reservation/ReservationCancellation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";

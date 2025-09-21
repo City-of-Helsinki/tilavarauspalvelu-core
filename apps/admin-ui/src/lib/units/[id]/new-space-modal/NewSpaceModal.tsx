@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { type NewResourceUnitFieldsFragment, useCreateSpaceMutation, type SpaceCreateMutation } from "@gql/gql-types";
+import { useCreateSpaceMutation } from "@gql/gql-types";
+import type { NewResourceUnitFieldsFragment, SpaceCreateMutation } from "@gql/gql-types";
 import { Page1 } from "./Page1";
 import { Page2 } from "./Page2";
 import { useForm } from "react-hook-form";

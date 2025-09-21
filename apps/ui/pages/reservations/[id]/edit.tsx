@@ -5,12 +5,8 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import {
-  type ReservationEditPageQuery,
-  type ReservationEditPageQueryVariables,
-  ReservationEditPageDocument,
-  MunicipalityChoice,
-} from "@gql/gql-types";
+import { ReservationEditPageDocument, MunicipalityChoice } from "@gql/gql-types";
+import type { ReservationEditPageQuery, ReservationEditPageQueryVariables } from "@gql/gql-types";
 import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { addYears } from "date-fns";
@@ -22,7 +18,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { EditStep0 } from "@/components/reservation/EditStep0";
 import { EditStep1 } from "@/components/reservation/EditStep1";
-import { PendingReservationFormSchema, type PendingReservationFormType } from "@/components/reservation-unit/schema";
+import { PendingReservationFormSchema } from "@/components/reservation-unit/schema";
+import type { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { queryOptions } from "@/modules/queryOptions";
 import { isReservationEditable, transformReservation } from "@/modules/reservation";

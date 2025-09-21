@@ -1,5 +1,6 @@
 import type { ApolloClient } from "@apollo/client";
-import { OptionsDocument, type OptionsQueryVariables, type OptionsQuery } from "@gql/gql-types";
+import { OptionsDocument } from "@gql/gql-types";
+import type { OptionsQueryVariables, OptionsQuery } from "@gql/gql-types";
 import { getTranslationSafe } from "common/src/common/util";
 import { filterNonNullable, getLocalizationLang, sort } from "common/src/helpers";
 

@@ -4,7 +4,8 @@ import { toUIDate, fromApiDate as fromAPIDate, fromUIDate } from "common/src/com
 import { isBrowser } from "./const";
 import { formatMinutes, timeToMinutes } from "common/src/helpers";
 import { ReadonlyURLSearchParams } from "next/navigation";
-import { type Maybe, ApplicationStatusChoice } from "@/gql/gql-types";
+import { ApplicationStatusChoice } from "@/gql/gql-types";
+import type { Maybe } from "@/gql/gql-types";
 
 export { formatDuration } from "common/src/common/util";
 export { fromAPIDate, fromUIDate };

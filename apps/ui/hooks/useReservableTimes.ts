@@ -1,5 +1,6 @@
 import { ReservationUnitNode } from "@/gql/gql-types";
-import { generateReservableMap, type ReservableMap } from "@/modules/reservable";
+import { generateReservableMap } from "@/modules/reservable";
+import type { ReservableMap } from "@/modules/reservable";
 import { filterNonNullable } from "common/src/helpers";
 import { useMemo } from "react";
 

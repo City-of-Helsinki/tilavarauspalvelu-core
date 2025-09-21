@@ -7,14 +7,16 @@ import { CenterSpinner, fontMedium, H1, Strong, TabWrapper } from "common/styled
 import { hasPermission as hasUnitPermission } from "@/modules/permissionHelper";
 import {
   ApplicationRoundFilterDocument,
-  type ApplicationRoundFilterFragment,
-  type ApplicationRoundFilterQuery,
-  type ApplicationRoundFilterQueryVariables,
-  type ApplicationRoundFilterUnitFragment,
-  type ApplicationSectionAllocationsQueryVariables,
   useAllApplicationEventsQuery,
   useApplicationSectionAllocationsQuery,
   UserPermissionChoice,
+} from "@gql/gql-types";
+import type {
+  ApplicationRoundFilterFragment,
+  ApplicationRoundFilterQuery,
+  ApplicationRoundFilterQueryVariables,
+  ApplicationRoundFilterUnitFragment,
+  ApplicationSectionAllocationsQueryVariables,
 } from "@gql/gql-types";
 import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, sort, toNumber } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";

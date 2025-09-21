@@ -1,4 +1,5 @@
-import React, { forwardRef, type Ref } from "react";
+import React, { forwardRef } from "react";
+import type { Ref } from "react";
 import NukaCarousel from "nuka-carousel";
 import { IconAngleLeft, IconAngleRight, IconSize } from "hds-react";
 import styled from "styled-components";

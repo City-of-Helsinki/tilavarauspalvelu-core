@@ -1,9 +1,12 @@
-import React, { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { differenceInMinutes, isToday, setHours, startOfDay } from "date-fns";
 import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
-import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
-import { useTranslation, type TFunction } from "next-i18next";
+import { ReservationTypeChoice } from "@gql/gql-types";
+import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { CalendarEvent } from "common/src/calendar/CommonCalendar";
 import { focusStyles } from "common/styled";
 import { breakpoints } from "common/src/const";

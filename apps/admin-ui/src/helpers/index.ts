@@ -1,15 +1,17 @@
 import { gql } from "@apollo/client";
 import {
-  type ApplicantNameFieldsFragment,
-  type ApplicationRoundNode,
   ApplicationRoundReservationCreationStatusChoice,
   ApplicationRoundStatusChoice,
-  type CalendarReservationFragment,
-  type CombineAffectedReservationsFragment,
-  type Maybe,
   ReservationStartInterval,
   ReservationTypeChoice,
   ReserveeType,
+} from "@gql/gql-types";
+import type {
+  ApplicantNameFieldsFragment,
+  ApplicationRoundNode,
+  CalendarReservationFragment,
+  CombineAffectedReservationsFragment,
+  Maybe,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { addSeconds } from "date-fns";

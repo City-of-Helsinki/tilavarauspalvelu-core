@@ -1,4 +1,5 @@
-import React, { useEffect, useState, type FC } from "react";
+import React, { useEffect, useState } from "react";
+import type { FC } from "react";
 import { ApolloProvider } from "@apollo/client";
 import { appWithTranslation, useTranslation } from "next-i18next";
 import type { AppProps } from "next/app";

@@ -2,15 +2,14 @@ import { useToastIfQueryParam } from "common/src/hooks/useToastIfQueryParam";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
 import styled from "styled-components";
-import { useForm, type UseFormReturn } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   EquipmentOrderSet,
   ReservationUnitImageType,
   ReservationKind,
-  type ReservationUnitEditorParametersQuery,
-  type ReservationUnitEditPageFragment,
   TermsOfUseTypeChoices,
   useCreateImageMutation,
   useCreateReservationUnitMutation,
@@ -22,6 +21,7 @@ import {
   useUpdateReservationUnitMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
+import type { ReservationUnitEditorParametersQuery, ReservationUnitEditPageFragment } from "@gql/gql-types";
 import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { Flex } from "common/styled";
 
@@ -39,8 +39,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
 import {
   convertReservationUnit,
-  type ImageFormType,
-  type ReservationUnitEditFormValues,
   ReservationUnitEditSchema,
   transformReservationUnit,
   SeasonalSection,
@@ -56,6 +54,7 @@ import {
   PricingSection,
   ErrorInfo,
 } from "@lib/reservation-units/[pk]/";
+import type { ImageFormType, ReservationUnitEditFormValues } from "@lib/reservation-units/[pk]/";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 
 // Override the Accordion style: force border even if the accordion is open

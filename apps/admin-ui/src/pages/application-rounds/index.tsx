@@ -3,13 +3,8 @@ import { gql } from "@apollo/client";
 import { orderBy } from "lodash-es";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import {
-  ApplicationRoundStatusChoice,
-  type ApplicationRoundNode,
-  useApplicationRoundListQuery,
-  type ApplicationRoundListElementFragment,
-  UserPermissionChoice,
-} from "@gql/gql-types";
+import { ApplicationRoundStatusChoice, useApplicationRoundListQuery, UserPermissionChoice } from "@gql/gql-types";
+import type { ApplicationRoundNode, ApplicationRoundListElementFragment } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { getApplicationRoundUrl } from "@/common/urls";
 import { formatDate } from "@/common/util";

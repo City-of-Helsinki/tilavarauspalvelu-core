@@ -1,4 +1,5 @@
-import { ApplicationRoundStatusChoice, type ApplicationRoundCardFragment } from "@/gql/gql-types";
+import { ApplicationRoundStatusChoice } from "@/gql/gql-types";
+import type { ApplicationRoundCardFragment } from "@/gql/gql-types";
 import { render } from "@testing-library/react";
 import { ApplicationRoundCard } from "./ApplicationRoundCard";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";

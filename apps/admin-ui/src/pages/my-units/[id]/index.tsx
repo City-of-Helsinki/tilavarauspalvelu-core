@@ -7,12 +7,8 @@ import { breakpoints } from "common/src/const";
 import { formatAddress } from "@/common/util";
 import { getReservationSeriesUrl } from "@/common/urls";
 import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import {
-  UnitViewDocument,
-  type UnitViewQuery,
-  type UnitViewQueryVariables,
-  UserPermissionChoice,
-} from "@gql/gql-types";
+import { UnitViewDocument, UserPermissionChoice } from "@gql/gql-types";
+import type { UnitViewQuery, UnitViewQueryVariables } from "@gql/gql-types";
 import { useSession } from "@/hooks";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { gql } from "@apollo/client";

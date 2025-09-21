@@ -1,4 +1,5 @@
-import { type Maybe, PriceUnit } from "../gql/gql-types";
+import { PriceUnit } from "../gql/gql-types";
+import type { Maybe } from "../gql/gql-types";
 import { toNumber } from "./helpers";
 import { formatters } from "./number-formatters";
 

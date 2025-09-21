@@ -50,9 +50,7 @@ import { Sanitize } from "common/src/components/Sanitize";
 import {
   AccessType,
   AccessTypeWithMultivalued,
-  type ApplicationNode,
   ApplicationRoundNode,
-  type ApplicationSectionReservationFragment,
   ApplicationSectionReservationUnitFragment,
   Maybe,
   PindoraReservationFragment,
@@ -61,6 +59,7 @@ import {
   ReservationUnitAccessTypeNode,
   useApplicationReservationsQuery,
 } from "@/gql/gql-types";
+import type { ApplicationNode, ApplicationSectionReservationFragment } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
 import { getApplicationReservationPath, getApplicationSectionPath, getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";

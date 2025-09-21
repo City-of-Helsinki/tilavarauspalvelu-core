@@ -1,15 +1,11 @@
 import { describe, expect, test } from "vitest";
-import {
-  aesToCells,
-  covertCellsToTimeRange,
-  createCells,
-  type DailyOpeningHours,
-  type TimeSpan,
-} from "./timeSelectorModule";
+import { aesToCells, covertCellsToTimeRange, createCells } from "./timeSelectorModule";
+import type { DailyOpeningHours, TimeSpan } from "./timeSelectorModule";
 import type { SuitableTimeRangeFormValues } from "./form";
 import { Priority, Weekday } from "@/gql/gql-types";
 import type { Cell } from "common/src/components/ApplicationTimeSelector";
-import { type DayT, WEEKDAYS_SORTED } from "common/src/const";
+import { WEEKDAYS_SORTED } from "common/src/const";
+import type { DayT } from "common/src/const";
 import { toApiTimeUnsafe } from "common/src/common/util";
 import { transformWeekday } from "common/src/conversion";
 

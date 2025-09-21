@@ -12,7 +12,8 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { ReservationUnitsDataReader, Filters, type SelectedRow } from "@lib/reservation-units/";
+import { ReservationUnitsDataReader, Filters } from "@lib/reservation-units/";
+import type { SelectedRow } from "@lib/reservation-units/";
 import type { GetServerSidePropsContext } from "next";
 import { createClient } from "@/common/apolloClient";
 import { getFilterOptions } from "@/hooks/useFilterOptions";

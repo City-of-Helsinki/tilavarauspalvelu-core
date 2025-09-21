@@ -3,23 +3,21 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Flex, H4, fontMedium } from "common/styled";
 import { breakpoints } from "common/src/const";
-import {
-  type ApplicationRoundStatusChoice,
-  ApplicationSectionStatusChoice,
-  type ApplicationSectionAllocationsQuery,
-  type ReservationUnitNode,
+import { ApplicationSectionStatusChoice } from "@gql/gql-types";
+import type {
+  ApplicationRoundStatusChoice,
+  ApplicationSectionAllocationsQuery,
+  ReservationUnitNode,
 } from "@gql/gql-types";
 import { Accordion } from "@/component/Accordion";
 import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";
-import { type AllocationApplicationSectionCardType, ApplicationSectionCard } from "./ApplicationEventCard";
+import { ApplicationSectionCard } from "./ApplicationEventCard";
+import type { AllocationApplicationSectionCardType } from "./ApplicationEventCard";
 import type { ApolloQueryResult } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
-import {
-  type AllocatedTimeSlotNodeT,
-  getRelatedTimeSlots,
-  type SectionNodeT,
-} from "./modules/applicationRoundAllocation";
+import { getRelatedTimeSlots } from "./modules/applicationRoundAllocation";
+import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
 import { SelectedSlotsContextProvider } from "./SelectedSlotsContext";
 
 // TODO max-width for the grid columns (315px, 480px, 332px)

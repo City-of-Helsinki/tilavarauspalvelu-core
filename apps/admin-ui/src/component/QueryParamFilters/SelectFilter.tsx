@@ -4,7 +4,8 @@ import { useTranslation } from "next-i18next";
 import { convertOptionToHDS, toNumber } from "common/src/helpers";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
+import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
 
 type SelectFilterProps = {
   name: string;

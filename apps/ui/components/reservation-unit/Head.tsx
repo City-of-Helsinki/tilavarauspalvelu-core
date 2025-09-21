@@ -1,9 +1,11 @@
 import { IconClock, IconGroup, IconEuroSign, IconHome, IconSize, IconLock, Tooltip } from "hds-react";
 import React from "react";
-import { type TFunction, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import styled from "styled-components";
 import { convertLanguageCode, formatDuration, getTranslationSafe, toUIDate } from "common/src/common/util";
-import { ReservationKind, type ReservationUnitHeadFragment } from "@gql/gql-types";
+import { ReservationKind } from "@gql/gql-types";
+import type { ReservationUnitHeadFragment } from "@gql/gql-types";
 import { Flex, H1, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { formatDateRange, formatDateTime } from "@/modules/util";

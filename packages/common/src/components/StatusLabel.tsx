@@ -1,7 +1,8 @@
 import React from "react";
 import { StatusLabel as HDSStatusLabel } from "hds-react";
 import styled from "styled-components";
-import { type StatusLabelType, getStatusBorderColor, getStatusBackgroundColor } from "../tags";
+import { getStatusBorderColor, getStatusBackgroundColor } from "../tags";
+import type { StatusLabelType } from "../tags";
 
 type StatusLabelProps = {
   type: StatusLabelType;

@@ -1,14 +1,12 @@
 import type { SelectedRow } from "@/lib/reservation-units";
 import { breakpoints } from "common/src/const";
 import { Flex } from "common/styled";
-import React, { type Dispatch, type SetStateAction } from "react";
+import React from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "i18next";
-import {
-  ReservationUnitPublishingState,
-  ReservationUnitReservationState,
-  type ReservationUnitTableElementFragment,
-} from "@gql/gql-types";
+import { ReservationUnitPublishingState, ReservationUnitReservationState } from "@gql/gql-types";
+import type { ReservationUnitTableElementFragment } from "@gql/gql-types";
 import { truncate } from "@/helpers";
 import { getOpeningHoursUrl, getReservationUnitUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";

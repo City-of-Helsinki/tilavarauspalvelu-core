@@ -8,9 +8,9 @@ import {
   createOptionsMock,
   createReservationPageMock,
   createTermsOfUseMock,
-  type ReservationPaymentOrderFragment,
   reservationRenderProps,
 } from "@test/reservation.mocks";
+import type { ReservationPaymentOrderFragment } from "@test/reservation.mocks";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 

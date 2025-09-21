@@ -1,13 +1,13 @@
 import { useTranslation } from "next-i18next";
 import {
   AccessType,
-  type ReservationKeylessEntryFragment,
   useChangeReservationAccessCodeSeriesMutation,
   useChangeReservationAccessCodeSingleMutation,
   useRepairReservationAccessCodeSeriesMutation,
   useRepairReservationAccessCodeSingleMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
+import type { ReservationKeylessEntryFragment } from "@gql/gql-types";
 import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { Button, ButtonSize, IconAlertCircleFill, IconRefresh, Tooltip } from "hds-react";

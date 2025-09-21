@@ -1,5 +1,6 @@
 import React from "react";
-import { type TFunction, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { Select } from "hds-react";
 import { UnitSpacesHierarchyFieldsFragment, useUnitSpacesHierarchyQuery } from "@gql/gql-types";
 import { convertOptionToHDS, createNodeId, filterNonNullable, getNode, toNumber } from "common/src/helpers";

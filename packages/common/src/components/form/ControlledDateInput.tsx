@@ -1,7 +1,8 @@
 import React from "react";
 import { addYears } from "date-fns";
 import { DateInput } from "hds-react";
-import { type FieldValues, useController, type UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
+import type { FieldValues, UseControllerProps } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { startOfDay } from "date-fns/startOfDay";
 

@@ -10,11 +10,13 @@ import {
 } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
 import { Flex } from "common/styled";
-import { type TagOptionsList, translateTag } from "@/modules/search";
+import { translateTag } from "@/modules/search";
+import type { TagOptionsList } from "@/modules/search";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useForm } from "react-hook-form";
-import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import { mapFormToSearchParams } from "common/src/modules/search";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 

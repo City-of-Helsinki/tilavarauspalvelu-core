@@ -1,7 +1,8 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { format } from "date-fns";
-import { ReservationStateChoice, type ReservationToCopyFragment, UserPermissionChoice } from "@gql/gql-types";
+import { ReservationStateChoice, UserPermissionChoice } from "@gql/gql-types";
+import type { ReservationToCopyFragment } from "@gql/gql-types";
 import { NewReservationListItem, ReservationList } from "@/component/ReservationsList";
 import { ReservationListButton } from "@/component/ReservationListButton";
 import { DenyDialog } from "@/component/DenyDialog";

@@ -8,23 +8,25 @@ import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "common/styled";
 import { Button, Tabs } from "hds-react";
 import { uniqBy } from "lodash-es";
 import styled from "styled-components";
+import type {
+  ApplicationRoundAdminFragment,
+  FilterOptionsQuery,
+  FilterOptionsQueryVariables,
+  Maybe,
+} from "@gql/gql-types";
 import {
-  type ApplicationRoundAdminFragment,
-  ApplicationRoundStatusChoice,
-  CurrentUserQuery,
-  type Maybe,
-  useApplicationRoundQuery,
-  UserPermissionChoice,
+  ApplicationRoundDocument,
   ApplicationRoundQuery,
   ApplicationRoundQueryVariables,
-  ApplicationRoundDocument,
+  ApplicationRoundStatusChoice,
+  CheckPermissionsDocument,
   CheckPermissionsQuery,
   CheckPermissionsQueryVariables,
-  CheckPermissionsDocument,
-  FilterOptionsDocument,
-  type FilterOptionsQuery,
-  type FilterOptionsQueryVariables,
   CurrentUserDocument,
+  CurrentUserQuery,
+  FilterOptionsDocument,
+  useApplicationRoundQuery,
+  UserPermissionChoice,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { hasPermission } from "@/modules/permissionHelper";
@@ -36,14 +38,14 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { createClient } from "@/common/apolloClient";
-import { TimeframeStatus, ApplicationRoundStatusLabel } from "@lib/application-rounds";
+import { ApplicationRoundStatusLabel, TimeframeStatus } from "@lib/application-rounds";
 import {
-  ReviewEndAllocation,
   ApplicationDataLoader,
-  Filters,
   ApplicationSectionDataLoader,
-  TimeSlotDataLoader,
+  Filters,
   RejectedOccurrencesDataLoader,
+  ReviewEndAllocation,
+  TimeSlotDataLoader,
 } from "@lib/application-rounds/[id]";
 import type { TagOptionsList } from "@/modules/search";
 import { getFilterOptions } from "@/hooks/useFilterOptions";

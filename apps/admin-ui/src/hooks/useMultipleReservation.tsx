@@ -1,5 +1,6 @@
 import { generateReservations } from "@/modules/generateReservations";
-import { ReservationTypeChoice, type Maybe } from "@gql/gql-types";
+import { ReservationTypeChoice } from "@gql/gql-types";
+import type { Maybe } from "@gql/gql-types";
 import type { TimeSelectionForm } from "@/schemas";
 import { getBufferTime } from "@/helpers";
 

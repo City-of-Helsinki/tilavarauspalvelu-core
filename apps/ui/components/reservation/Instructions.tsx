@@ -1,4 +1,5 @@
-import { type InstructionsFragment, type Maybe, ReservationStateChoice } from "@/gql/gql-types";
+import { ReservationStateChoice } from "@/gql/gql-types";
+import type { InstructionsFragment, Maybe } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
 import { H4 } from "common/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";

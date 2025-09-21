@@ -4,13 +4,8 @@ import { useTranslation } from "next-i18next";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import {
-  ApplicationPage3Document,
-  type ApplicationPage3Query,
-  type ApplicationPage3QueryVariables,
-  ReserveeType,
-  useUpdateApplicationMutation,
-} from "@gql/gql-types";
+import { ApplicationPage3Document, ReserveeType, useUpdateApplicationMutation } from "@gql/gql-types";
+import type { ApplicationPage3Query, ApplicationPage3QueryVariables } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { gql } from "@apollo/client";
@@ -18,11 +13,11 @@ import { AutoGrid, ButtonContainer, Flex } from "common/styled";
 import { useDisplayError } from "common/src/hooks";
 import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
-  type ApplicationPage3FormValues,
   ApplicationPage3Schema,
   convertApplicationPage3,
   transformPage3Application,
 } from "@/components/application/funnel/form";
+import type { ApplicationPage3FormValues } from "@/components/application/funnel/form";
 import {
   ApplicantTypeSelector,
   ApplicationFunnelWrapper,

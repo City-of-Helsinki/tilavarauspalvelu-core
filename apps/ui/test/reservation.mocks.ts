@@ -1,18 +1,17 @@
 import {
   AccessType,
   ReservationUnitImageType,
-  type MetaFieldsFragment,
   MunicipalityChoice,
   OrderStatus,
   PaymentType,
   PriceUnit,
   ReservationCancelReasonChoice,
-  type ReservationPageFragment,
   ReservationStateChoice,
   ReservationTypeChoice,
   ReserveeType,
   TermsOfUseTypeChoices,
 } from "@gql/gql-types";
+import type { MetaFieldsFragment, ReservationPageFragment } from "@gql/gql-types";
 import { createNodeId } from "common/src/helpers";
 import type { FieldName } from "common/src/metaFieldsHelpers";
 import { generateNameFragment } from "@/test/test.gql.utils";

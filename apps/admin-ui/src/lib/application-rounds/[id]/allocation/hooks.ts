@@ -1,25 +1,22 @@
-import { ApolloError, gql, type ApolloQueryResult } from "@apollo/client";
+import { ApolloError, gql } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "next-i18next";
-import {
-  type AllocatedTimeSlotCreateMutation,
-  useCreateAllocatedTimeSlotMutation,
-  useDeleteAllocatedTimeSlotMutation,
-  type ApplicationSectionAllocationsQuery,
-} from "@gql/gql-types";
+import { useCreateAllocatedTimeSlotMutation, useDeleteAllocatedTimeSlotMutation } from "@gql/gql-types";
+import type { AllocatedTimeSlotCreateMutation, ApplicationSectionAllocationsQuery } from "@gql/gql-types";
 import { useState } from "react";
-import {
-  type AllocatedTimeSlotNodeT,
-  decodeTimeSlot,
-  type SectionNodeT,
-  type SuitableTimeRangeNodeT,
-  timeSlotKeyToScheduleTime,
+import { decodeTimeSlot, timeSlotKeyToScheduleTime } from "./modules/applicationRoundAllocation";
+import type {
+  AllocatedTimeSlotNodeT,
+  SectionNodeT,
+  SuitableTimeRangeNodeT,
 } from "./modules/applicationRoundAllocation";
 import { errorToast, successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { toNumber } from "common/src/helpers";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
-import { type TimeSlotRange, useSelectedSlots } from "./SelectedSlotsContext";
+import { useSelectedSlots } from "./SelectedSlotsContext";
+import type { TimeSlotRange } from "./SelectedSlotsContext";
 import type { DayT } from "common/src/const";
 
 export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT) => void] {

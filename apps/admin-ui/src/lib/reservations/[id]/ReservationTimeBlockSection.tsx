@@ -1,14 +1,11 @@
-import React, { forwardRef, type Ref, useEffect, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
+import type { Ref } from "react";
 import { CommonCalendar } from "common/src/calendar/CommonCalendar";
 import { Toolbar, ToolbarBtn } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import {
-  ReservationStateChoice,
-  ReservationTypeChoice,
-  type TimeBlockSectionFragment,
-  UserPermissionChoice,
-} from "@gql/gql-types";
+import { ReservationStateChoice, ReservationTypeChoice, UserPermissionChoice } from "@gql/gql-types";
+import type { TimeBlockSectionFragment } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import type { CalendarEventType, EventType } from "@/modules/reservation";
 import { eventStyleGetter, legend } from "./eventStyleGetter";

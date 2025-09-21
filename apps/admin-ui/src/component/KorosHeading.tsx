@@ -1,4 +1,5 @@
-import React, { type CSSProperties, type ReactNode } from "react";
+import React from "react";
+import type { CSSProperties, ReactNode } from "react";
 import styled, { css } from "styled-components";
 import { Koros } from "hds-react";
 import { Flex, H1 } from "common/styled";

@@ -2,7 +2,6 @@ import { GraphQLError } from "graphql";
 import { addDays, addHours, startOfDay } from "date-fns";
 import {
   ReservationSeriesDocument,
-  type ReservationSeriesPageFragment,
   ReservationStartInterval,
   ReservationStateChoice,
   ReservationTypeChoice,
@@ -10,6 +9,7 @@ import {
   UpdateReservationSeriesDocument,
   UpdateStaffReservationDocument,
 } from "@gql/gql-types";
+import type { ReservationSeriesPageFragment } from "@gql/gql-types";
 import { createNodeId } from "common/src/helpers";
 import { toApiDateUnsafe } from "common/src/common/util";
 

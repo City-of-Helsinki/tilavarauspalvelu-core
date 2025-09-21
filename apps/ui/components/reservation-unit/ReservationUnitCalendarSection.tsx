@@ -1,10 +1,7 @@
 import React from "react";
-import {
-  type ReservationQuotaReachedFragment,
-  type ReservationTimePickerFieldsFragment,
-  useReservationQuotaReachedQuery,
-} from "@gql/gql-types";
-import { ReservationTimePicker } from "@/components/reservation";
+import { useReservationQuotaReachedQuery } from "@gql/gql-types";
+import type { ReservationQuotaReachedFragment, ReservationTimePickerFieldsFragment } from "@gql/gql-types";
+import { ReservationTimePicker } from "../reservation";
 import { Notification } from "hds-react";
 import type { ReservationTimePickerProps } from "@/components/reservation/ReservationTimePicker";
 import { useTranslation } from "next-i18next";

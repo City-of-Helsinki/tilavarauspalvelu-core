@@ -9,12 +9,8 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
-import {
-  SeriesReservationUnitDocument,
-  UserPermissionChoice,
-  type SeriesReservationUnitQuery,
-  type SeriesReservationUnitQueryVariables,
-} from "@gql/gql-types";
+import { SeriesReservationUnitDocument, UserPermissionChoice } from "@gql/gql-types";
+import type { SeriesReservationUnitQuery, SeriesReservationUnitQueryVariables } from "@gql/gql-types";
 import { createClient } from "@/common/apolloClient";
 import { gql } from "@apollo/client";
 

@@ -1,19 +1,17 @@
-import React, { type ReactNode, useRef } from "react";
+import React, { useRef } from "react";
+import type { ReactNode } from "react";
 import styled from "styled-components";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant, IconArrowRedo, IconCross, LoadingSpinner, Tag } from "hds-react";
 import { isEqual, trim } from "lodash-es";
-import { type ApolloQueryResult, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import { CenterSpinner, Flex, fontMedium, H1, H3, H4, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
-  type ApplicationAdminQuery,
-  type ApplicationPageFieldsFragment,
-  type ApplicationPageSectionFragment,
   ApplicationStatusChoice,
-  type Maybe,
-  type ReservationUnitOptionFieldsFragment,
   ReserveeType,
   useApplicationAdminQuery,
   useRejectAllApplicationsMutation,
@@ -22,6 +20,13 @@ import {
   useRestoreAllApplicationsMutation,
   useRestoreAllSectionsMutation,
   UserPermissionChoice,
+} from "@gql/gql-types";
+import type {
+  ApplicationAdminQuery,
+  ApplicationPageFieldsFragment,
+  ApplicationPageSectionFragment,
+  Maybe,
+  ReservationUnitOptionFieldsFragment,
 } from "@gql/gql-types";
 import { formatDuration } from "common/src/common/util";
 import { ApplicationTimePreview } from "common/src/components/ApplicationTimePreview";

@@ -10,16 +10,14 @@ import { Flex, H1, H4 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
   ReservationDocument,
-  type ReservationQuery,
-  type ReservationQueryVariables,
   ReservationStateChoice,
-  type ReservationUpdateMutation,
   ReserveeType,
   useConfirmReservationMutation,
   useDeleteReservationMutation,
   useReservationLazyQuery,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
+import type { ReservationQuery, ReservationQueryVariables, ReservationUpdateMutation } from "@gql/gql-types";
 import type { Inputs } from "common/src/reservation-form/types";
 import { createApolloClient } from "@/modules/apolloClient";
 import NextError from "next/error";

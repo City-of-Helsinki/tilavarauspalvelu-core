@@ -5,27 +5,24 @@ import { Notification, NotificationSize } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H1 } from "common/styled";
 import {
-  type ApplicationCreateMutation,
   ApplicationRoundDocument,
-  type ApplicationRoundQuery,
-  type ApplicationRoundQueryVariables,
   ApplicationRoundStatusChoice,
   CreateApplicationDocument,
-  type CreateApplicationMutation,
-  type CreateApplicationMutationVariables,
   CurrentUserDocument,
-  type CurrentUserQuery,
   ReservationKind,
 } from "@gql/gql-types";
-import {
-  createNodeId,
-  filterNonNullable,
-  getNode,
-  ignoreMaybeArray,
-  type ReadonlyDeep,
-  toNumber,
-} from "common/src/helpers";
-import { type SearchFormValues, SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
+import type {
+  ApplicationCreateMutation,
+  ApplicationRoundQuery,
+  ApplicationRoundQueryVariables,
+  CreateApplicationMutation,
+  CreateApplicationMutationVariables,
+  CurrentUserQuery,
+} from "@gql/gql-types";
+import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import type { ReadonlyDeep } from "common/src/helpers";
+import { SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
+import type { SearchFormValues } from "@/components/recurring/SeasonalSearchForm";
 import { createApolloClient } from "@/modules/apolloClient";
 import { RecurringCard } from "@/components/recurring/RecurringCard";
 import { useReservationUnitList } from "@/hooks";

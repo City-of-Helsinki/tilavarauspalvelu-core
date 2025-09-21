@@ -1,14 +1,6 @@
 import React from "react";
-import {
-  Header,
-  IconKey,
-  IconLinkExternal,
-  IconSignout,
-  IconUser,
-  type LanguageOption,
-  LogoSize,
-  TitleStyleType,
-} from "hds-react";
+import { Header, IconKey, IconLinkExternal, IconSignout, IconUser, LogoSize, TitleStyleType } from "hds-react";
+import type { LanguageOption } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { useSession } from "@/hooks";

@@ -1,8 +1,10 @@
 import React from "react";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { memoize, orderBy, uniqBy } from "lodash-es";
 import { IconLinkExternal, IconSize } from "hds-react";
-import { type ApplicationsTableElementFragment, ApplicationStatusChoice } from "@gql/gql-types";
+import { ApplicationStatusChoice } from "@gql/gql-types";
+import type { ApplicationsTableElementFragment } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { getApplicantName, translateReserveeType, truncate } from "@/helpers";
 import { CustomTable } from "@/component/Table";

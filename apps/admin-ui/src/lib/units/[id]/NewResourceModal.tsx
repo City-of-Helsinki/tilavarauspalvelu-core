@@ -1,12 +1,8 @@
 import React from "react";
 import { Button, ButtonVariant, Dialog } from "hds-react";
 import { useTranslation } from "next-i18next";
-import {
-  ResourceLocationType,
-  type ResourceCreateMutation,
-  type NewResourceUnitFieldsFragment,
-  useCreateResourceMutation,
-} from "@gql/gql-types";
+import { ResourceLocationType, useCreateResourceMutation } from "@gql/gql-types";
+import type { ResourceCreateMutation, NewResourceUnitFieldsFragment } from "@gql/gql-types";
 import { Editor, ResourceUpdateForm, ResourceUpdateSchema } from "./modules/resourceEditor";
 import { FormErrorSummary } from "@/component/FormErrorSummary";
 import { useForm } from "react-hook-form";

@@ -3,11 +3,11 @@ import { Accordion, ApplicationDatas } from "@/styled";
 import { DataWrapper } from "./DataWrapper";
 import React, { useState } from "react";
 import {
-  type ReservationPageFragment,
   useReservationDateOfBirthQuery,
   useReservationProfileDataContactInfoQuery,
   useReservationProfileDataSsnQuery,
 } from "@gql/gql-types";
+import type { ReservationPageFragment } from "@gql/gql-types";
 import {
   Button,
   ButtonVariant,

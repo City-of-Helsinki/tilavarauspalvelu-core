@@ -2,7 +2,8 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconAlertCircleFill } from "hds-react";
-import { type FieldValues, Path, useController, UseControllerProps } from "react-hook-form";
+import { Path, useController, UseControllerProps } from "react-hook-form";
+import type { FieldValues } from "react-hook-form";
 import { ControlledSelect } from "./ControlledSelect";
 import { timeToMinutes } from "../../helpers";
 

@@ -4,12 +4,8 @@ import styled from "styled-components";
 import { useLocalStorage } from "react-use";
 import { NotificationWrapper } from "./NotificationWrapper";
 import { breakpoints } from "../const";
-import {
-  BannerNotificationLevel,
-  BannerNotificationTarget,
-  useShowNotificationsListQuery,
-  type ShowNotificationFieldsFragment,
-} from "../../gql/gql-types";
+import { BannerNotificationLevel, BannerNotificationTarget, useShowNotificationsListQuery } from "../../gql/gql-types";
+import type { ShowNotificationFieldsFragment } from "../../gql/gql-types";
 import { filterNonNullable } from "../helpers";
 import { useTranslation } from "next-i18next";
 import { convertLanguageCode, getTranslationSafe } from "../common/util";

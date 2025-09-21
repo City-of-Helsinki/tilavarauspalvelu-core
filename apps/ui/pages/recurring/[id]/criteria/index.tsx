@@ -3,11 +3,8 @@ import { useTranslation } from "next-i18next";
 import type { GetServerSidePropsContext } from "next";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import {
-  ApplicationRoundCriteriaDocument,
-  type ApplicationRoundCriteriaQuery,
-  type ApplicationRoundCriteriaQueryVariables,
-} from "@gql/gql-types";
+import { ApplicationRoundCriteriaDocument } from "@gql/gql-types";
+import type { ApplicationRoundCriteriaQuery, ApplicationRoundCriteriaQueryVariables } from "@gql/gql-types";
 import { Flex, H1 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { Sanitize } from "common/src/components/Sanitize";

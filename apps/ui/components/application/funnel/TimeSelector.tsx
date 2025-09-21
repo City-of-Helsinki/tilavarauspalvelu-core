@@ -5,12 +5,8 @@ import { useFormContext } from "react-hook-form";
 import { AutoGrid, Flex } from "common/styled";
 import { filterNonNullable } from "common/src/helpers";
 import { ControlledSelect } from "common/src/components/form";
-import {
-  ApplicationTimeSelector,
-  type Cell,
-  type CellState,
-  isCellEqual,
-} from "common/src/components/ApplicationTimeSelector";
+import { ApplicationTimeSelector, isCellEqual } from "common/src/components/ApplicationTimeSelector";
+import type { Cell, CellState } from "common/src/components/ApplicationTimeSelector";
 import { successToast } from "common/src/components/toast";
 import { ErrorText } from "common/src/components/ErrorText";
 import type { TimeSelectorFragment } from "@/gql/gql-types";

@@ -4,13 +4,10 @@ import { CommonCalendar } from "common/src/calendar/CommonCalendar";
 import { get } from "lodash-es";
 import { addDays, endOfISOWeek, startOfISOWeek } from "date-fns";
 import styled from "styled-components";
-import { type TFunction, useTranslation } from "next-i18next";
-import {
-  ReservationTypeChoice,
-  type CalendarReservationNameFragment,
-  useReservationUnitCalendarQuery,
-  UserPermissionChoice,
-} from "@gql/gql-types";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
+import { ReservationTypeChoice, useReservationUnitCalendarQuery, UserPermissionChoice } from "@gql/gql-types";
+import type { CalendarReservationNameFragment } from "@gql/gql-types";
 import { getEventBuffers } from "common/src/calendar/util";
 import { getReservationUrl } from "@/common/urls";
 import { Legend, LegendsWrapper } from "@/component/Legend";

@@ -1,7 +1,9 @@
-import React, { type ReactNode } from "react";
+import React from "react";
+import type { ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { ApolloError, gql } from "@apollo/client";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import styled from "styled-components";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,12 +24,11 @@ import {
   BannerNotificationTarget,
   useDeleteBannerNotificationMutation,
   useBannerNotificationPageQuery,
-  type BannerNotificationPageFragment,
   UserPermissionChoice,
   useUpdateBannerNotificationMutation,
   useCreateBannerNotificationMutation,
-  type BannerNotificationCreateMutation,
 } from "@gql/gql-types";
+import type { BannerNotificationPageFragment, BannerNotificationCreateMutation } from "@gql/gql-types";
 import { fromUIDate } from "common/src/common/util";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import {

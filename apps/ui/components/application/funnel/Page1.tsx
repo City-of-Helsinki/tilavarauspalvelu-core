@@ -7,7 +7,8 @@ import { ButtonContainer } from "common/styled";
 import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { useReservationUnitList } from "@/hooks";
 import { ApplicationSectionPage1 } from "./ApplicationSectionPage1";
-import { type ApplicationPage1FormValues, createDefaultPage1Section } from "./form";
+import { createDefaultPage1Section } from "./form";
+import type { ApplicationPage1FormValues } from "./form";
 import type { OptionsListT } from "common/src/modules/search";
 
 type Page1Props = Readonly<{

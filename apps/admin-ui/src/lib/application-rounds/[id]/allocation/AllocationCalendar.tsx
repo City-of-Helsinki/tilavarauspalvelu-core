@@ -3,22 +3,22 @@ import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled, { css } from "styled-components";
 import { filterNonNullable, timeToMinutes } from "common/src/helpers";
-import { ApplicationSectionStatusChoice, type SuitableTimeRangeNode } from "@gql/gql-types";
+import { ApplicationSectionStatusChoice } from "@gql/gql-types";
+import type { SuitableTimeRangeNode } from "@gql/gql-types";
 import { fontMedium } from "common/styled";
-import { breakpoints, type DayT, WEEKDAYS } from "common/src/const";
+import { breakpoints, WEEKDAYS } from "common/src/const";
+import type { DayT } from "common/src/const";
 import { transformWeekday } from "common/src/conversion";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
 import {
   applicationEventSchedulesToCells,
   getTimeSeries,
   timeSlotKeyToTime,
-  type Cell,
   encodeTimeSlot,
-  type RelatedSlot,
   isInsideCell,
-  type SectionNodeT,
   ReservationUnitOptionNodeT,
 } from "./modules/applicationRoundAllocation";
+import type { Cell, RelatedSlot, SectionNodeT } from "./modules/applicationRoundAllocation";
 import { useFocusAllocatedSlot, useFocusApplicationEvent, useSlotSelection } from "./hooks";
 import { useGetFilterSearchParams } from "@/hooks";
 

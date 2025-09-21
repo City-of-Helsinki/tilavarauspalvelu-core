@@ -1,9 +1,5 @@
-import {
-  AuthenticationType,
-  type ReservationUnitReservationsFragment,
-  type ReservationUnitsByUnitFieldsFragment,
-  useReservationUnitsByUnitQuery,
-} from "@gql/gql-types";
+import { AuthenticationType, useReservationUnitsByUnitQuery } from "@gql/gql-types";
+import type { ReservationUnitReservationsFragment, ReservationUnitsByUnitFieldsFragment } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { createNodeId, getNode } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";

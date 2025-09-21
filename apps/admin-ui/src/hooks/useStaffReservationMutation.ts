@@ -1,12 +1,10 @@
 import { useTranslation } from "next-i18next";
-import {
-  type Maybe,
-  type ReservationSeriesUpdateMutation,
-  ReserveeType,
-  type UpdateStaffReservationMutationVariables,
-  type UseStaffReservationFragment,
-  useUpdateReservationSeriesMutation,
-  useUpdateStaffReservationMutation,
+import { ReserveeType, useUpdateReservationSeriesMutation, useUpdateStaffReservationMutation } from "@gql/gql-types";
+import type {
+  Maybe,
+  ReservationSeriesUpdateMutation,
+  UpdateStaffReservationMutationVariables,
+  UseStaffReservationFragment,
 } from "@gql/gql-types";
 import { successToast } from "common/src/components/toast";
 import { ApolloError, gql } from "@apollo/client";

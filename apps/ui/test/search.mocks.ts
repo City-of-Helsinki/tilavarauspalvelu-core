@@ -1,11 +1,5 @@
-import {
-  AccessType,
-  ReservationKind,
-  ReservationUnitOrderSet,
-  SearchReservationUnitsDocument,
-  type SearchReservationUnitsQuery,
-  type SearchReservationUnitsQueryVariables,
-} from "@/gql/gql-types";
+import { AccessType, ReservationKind, ReservationUnitOrderSet, SearchReservationUnitsDocument } from "@/gql/gql-types";
+import type { SearchReservationUnitsQuery, SearchReservationUnitsQueryVariables } from "@/gql/gql-types";
 import { CreateGraphQLMocksReturn, ICreateGraphQLMock } from "./test.gql.utils";
 import { createMockReservationUnit } from "./reservation-unit.mocks";
 import { endOfYear, startOfDay } from "date-fns";

@@ -1,8 +1,10 @@
-import React, { type ReactElement } from "react";
+import React from "react";
+import type { ReactElement } from "react";
 import { useTranslation } from "next-i18next";
 import { DateInput } from "hds-react";
 import styled from "styled-components";
-import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
+import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
 
 const DateRangeFilterWrapper = styled.div`
   display: grid;

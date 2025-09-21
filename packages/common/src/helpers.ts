@@ -1,13 +1,9 @@
 import { isAfter, isBefore } from "date-fns";
-import {
-  ReservationUnitImageType,
-  type PricingFieldsFragment,
-  type ImageFragment,
-  type Maybe,
-  type SuitableTimeFieldsFragment,
-} from "../gql/gql-types";
+import { ReservationUnitImageType } from "../gql/gql-types";
+import type { PricingFieldsFragment, ImageFragment, Maybe, SuitableTimeFieldsFragment } from "../gql/gql-types";
 import type { OptionInProps } from "hds-react";
-import { type DayT, pixel } from "./const";
+import { pixel } from "./const";
+import type { DayT } from "./const";
 import type { TFunction } from "i18next";
 import type { LocalizationLanguages } from "./urlBuilder";
 import { convertWeekday } from "./conversion";

@@ -2,10 +2,9 @@ import {
   ReservationStateChoice,
   ReservationTypeChoice,
   ReservationTypeStaffChoice,
-  type ReservationSeriesCreateMutation,
   useCreateReservationSeriesMutation,
-  type ReservationSeriesReservationCreateInput,
 } from "@gql/gql-types";
+import type { ReservationSeriesCreateMutation, ReservationSeriesReservationCreateInput } from "@gql/gql-types";
 import type { ReservationSeriesForm, ReservationFormMeta } from "@/schemas";
 import { fromUIDateUnsafe, toApiDateUnsafe } from "common/src/common/util";
 import { gql } from "@apollo/client";

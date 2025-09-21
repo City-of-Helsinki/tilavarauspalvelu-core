@@ -1,11 +1,7 @@
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { CancelledLinkSet } from "@/components/reservation/CancelledLinkSet";
-import {
-  DeleteReservationDocument,
-  type DeleteReservationMutation,
-  type DeleteReservationMutationVariables,
-  ReservationStateChoice,
-} from "@/gql/gql-types";
+import { DeleteReservationDocument, ReservationStateChoice } from "@/gql/gql-types";
+import type { DeleteReservationMutation, DeleteReservationMutationVariables } from "@/gql/gql-types";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";

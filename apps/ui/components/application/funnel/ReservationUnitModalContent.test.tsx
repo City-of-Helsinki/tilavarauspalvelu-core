@@ -4,7 +4,8 @@ import { createGraphQLMocks } from "@test/gql.mocks";
 import { createMockApplicationRound } from "@test/application.mocks";
 import type { CreateGraphQLMockProps } from "@test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
-import { ReservationUnitModalContent, type ReservationUnitModalProps } from "./ReservationUnitModalContent";
+import { ReservationUnitModalContent } from "./ReservationUnitModalContent";
+import type { ReservationUnitModalProps } from "./ReservationUnitModalContent";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { ReservationKind } from "@/gql/gql-types";
 

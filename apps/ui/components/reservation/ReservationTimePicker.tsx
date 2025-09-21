@@ -1,19 +1,9 @@
 import React, { Children, cloneElement, useEffect, useMemo, useState } from "react";
-import {
-  type BlockingReservationFieldsFragment,
-  ReservationNode,
-  type ReservationTimePickerFieldsFragment,
-  ReservationTypeChoice,
-  useListReservationsQuery,
-} from "@/gql/gql-types";
+import { ReservationNode, ReservationTypeChoice, useListReservationsQuery } from "@/gql/gql-types";
+import type { BlockingReservationFieldsFragment, ReservationTimePickerFieldsFragment } from "@/gql/gql-types";
 import styled from "styled-components";
-import {
-  CommonCalendar,
-  type SlotClickProps,
-  type CalendarEvent,
-  SlotProps,
-  type CalendarEventBuffer,
-} from "common/src/calendar/CommonCalendar";
+import { CommonCalendar, SlotProps } from "common/src/calendar/CommonCalendar";
+import type { SlotClickProps, CalendarEvent, CalendarEventBuffer } from "common/src/calendar/CommonCalendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import { addMinutes, differenceInMinutes } from "date-fns";
 import { eventStyleGetter } from "@/components/common/calendarUtils";
@@ -28,12 +18,8 @@ import {
   getDurationOptions,
   getNewReservation,
 } from "@/modules/reservation";
-import {
-  type ReservableMap,
-  getBoundCheckedReservation,
-  getSlotPropGetter,
-  isRangeReservable,
-} from "@/modules/reservable";
+import { getBoundCheckedReservation, getSlotPropGetter, isRangeReservable } from "@/modules/reservable";
+import type { ReservableMap } from "@/modules/reservable";
 import { formatDuration, fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
 import { useTranslation } from "next-i18next";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";

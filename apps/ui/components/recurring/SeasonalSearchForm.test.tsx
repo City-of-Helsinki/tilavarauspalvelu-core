@@ -1,5 +1,6 @@
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
-import { type SearchFormProps, SeasonalSearchForm } from "./SeasonalSearchForm";
+import { SeasonalSearchForm } from "./SeasonalSearchForm";
+import type { SearchFormProps } from "./SeasonalSearchForm";
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { selectOption } from "@/test/test.utils";

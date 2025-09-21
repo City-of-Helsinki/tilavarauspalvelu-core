@@ -1,7 +1,9 @@
 import React from "react";
 import { IconArrowRight, IconLinkExternal } from "hds-react";
-import { type TFunction, useTranslation } from "next-i18next";
-import { type ApplicationRoundCardFragment, ApplicationRoundStatusChoice } from "@gql/gql-types";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
+import { ApplicationRoundStatusChoice } from "@gql/gql-types";
+import type { ApplicationRoundCardFragment } from "@gql/gql-types";
 import { formatDateTime } from "@/modules/util";
 import { isValid } from "date-fns";
 import { Card } from "common/src/components/Card";

@@ -1,10 +1,6 @@
 import type { GetServerSidePropsContext } from "next";
-import {
-  OrderStatus,
-  ReservationStateChoice,
-  type SuccessRedirectFragment,
-  useReservationStateQuery,
-} from "@gql/gql-types";
+import { OrderStatus, ReservationStateChoice, useReservationStateQuery } from "@gql/gql-types";
+import type { SuccessRedirectFragment } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath } from "@/modules/urls";

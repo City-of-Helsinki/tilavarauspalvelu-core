@@ -16,42 +16,32 @@ import {
 import { i18n } from "next-i18next";
 import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
 import {
-  type AvailableTimesReservationUnitFieldsFragment,
-  type BlockingReservationFieldsFragment,
-  type EquipmentFieldsFragment,
-  type IsReservableFieldsFragment,
-  type NotReservableFieldsFragment,
-  type PriceReservationUnitFieldsFragment,
   PriceUnit,
-  type PricingFieldsFragment,
   ReservationKind,
-  type ReservationPriceFieldsFragment,
   ReservationStartInterval,
   ReservationStateChoice,
-  type ReservationUnitAccessTypeNode,
-  type ReservationUnitNode,
   ReservationUnitPublishingState,
   ReservationUnitReservationState,
-  type UnitNode,
 } from "@gql/gql-types";
-import {
-  dateToKey,
-  isRangeReservable,
-  isSlotWithinReservationTime,
-  type ReservableMap,
-  type RoundPeriod,
-} from "@/modules/reservable";
+import type {
+  AvailableTimesReservationUnitFieldsFragment,
+  BlockingReservationFieldsFragment,
+  EquipmentFieldsFragment,
+  IsReservableFieldsFragment,
+  NotReservableFieldsFragment,
+  PriceReservationUnitFieldsFragment,
+  PricingFieldsFragment,
+  ReservationPriceFieldsFragment,
+  ReservationUnitAccessTypeNode,
+  ReservationUnitNode,
+  UnitNode,
+} from "@gql/gql-types";
+import { dateToKey, isRangeReservable, isSlotWithinReservationTime } from "@/modules/reservable";
+import type { ReservableMap, RoundPeriod } from "@/modules/reservable";
 import { gql } from "@apollo/client";
 import { getIntervalMinutes } from "common/src/conversion";
-import {
-  capitalize,
-  dayMax,
-  dayMin,
-  filterNonNullable,
-  isPriceFree,
-  type ReadonlyDeep,
-  timeToMinutes,
-} from "common/src/helpers";
+import { capitalize, dayMax, dayMin, filterNonNullable, isPriceFree, timeToMinutes } from "common/src/helpers";
+import type { ReadonlyDeep } from "common/src/helpers";
 import type { LocalizationLanguages } from "common/src/urlBuilder";
 import type { TFunction } from "i18next";
 

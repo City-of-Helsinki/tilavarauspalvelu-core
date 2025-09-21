@@ -1,4 +1,5 @@
-import { type ReservationNode, ReservationStartInterval } from "./../../gql/gql-types";
+import { ReservationStartInterval } from "./../../gql/gql-types";
+import type { ReservationNode } from "./../../gql/gql-types";
 import { getEventBuffers } from "./../calendar/util";
 import { getIntervalMinutes } from "./../conversion";
 import { vi, describe, test, expect } from "vitest";

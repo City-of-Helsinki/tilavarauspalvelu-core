@@ -4,16 +4,13 @@ import { toApiDateUnsafe } from "common/src/common/util";
 import {
   PriceUnit,
   ReservationUnitPublishingState,
-  type ReservationUnitNode,
   ReservationKind,
   ReservationStartInterval,
   ReservationUnitReservationState,
-  type PriceReservationUnitFieldsFragment,
-  type EquipmentFieldsFragment,
   PaymentType,
 } from "@gql/gql-types";
+import type { ReservationUnitNode, PriceReservationUnitFieldsFragment, EquipmentFieldsFragment } from "@gql/gql-types";
 import {
-  type GetReservationUnitPriceProps,
   getDayIntervals,
   getEquipmentCategories,
   getEquipmentList,
@@ -24,17 +21,21 @@ import {
   getReservationUnitPrice,
   isReservationUnitPublished,
   isReservationUnitReservable,
-  type GetPriceType,
-  type NotReservableFieldsFragmentNarrow,
-  type GetPossibleTimesForDayProps,
-  type LastPossibleReservationDateProps,
   getLastPossibleReservationDate,
-  type AvailableTimesProps,
   getNextAvailableTime,
   formatNDays,
 } from "./reservationUnit";
+import type {
+  GetReservationUnitPriceProps,
+  GetPriceType,
+  NotReservableFieldsFragmentNarrow,
+  GetPossibleTimesForDayProps,
+  LastPossibleReservationDateProps,
+  AvailableTimesProps,
+} from "./reservationUnit";
 import mockTranslations from "./../public/locales/fi/prices.json";
-import { type ReservableMap, dateToKey, type RoundPeriod } from "./reservable";
+import { dateToKey } from "./reservable";
+import type { ReservableMap, RoundPeriod } from "./reservable";
 import { generateNameFragment } from "@/test/test.gql.utils";
 import { TIMERS_TO_FAKE } from "@/test/test.utils";
 import { createNodeId, ReadonlyDeep } from "common/src/helpers";

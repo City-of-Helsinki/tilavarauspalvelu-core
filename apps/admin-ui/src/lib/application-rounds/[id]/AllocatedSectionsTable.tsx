@@ -1,5 +1,6 @@
 import React from "react";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { memoize } from "lodash-es";
 import { IconLinkExternal, IconSize, Tooltip } from "hds-react";
 import type { AllocatedSectionsTableElementFragment } from "@gql/gql-types";

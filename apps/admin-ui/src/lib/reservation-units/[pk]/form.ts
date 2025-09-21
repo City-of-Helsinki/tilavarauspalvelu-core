@@ -2,17 +2,19 @@ import { convertTime, filterNonNullable, timeToMinutes, toNumber } from "common/
 import { fromApiDate, fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
 import {
   AccessType,
-  type ApplicationRoundTimeSlotCreateInput,
   AuthenticationType,
   PaymentType,
   PriceUnit,
   ReservationKind,
   ReservationStartInterval,
-  type ReservationUnitAccessTypeCreateInput,
-  type ReservationUnitEditPageFragment,
   ReservationUnitImageType,
-  type ReservationUnitPricingCreateInput,
   Weekday,
+} from "@gql/gql-types";
+import type {
+  ApplicationRoundTimeSlotCreateInput,
+  ReservationUnitAccessTypeCreateInput,
+  ReservationUnitEditPageFragment,
+  ReservationUnitPricingCreateInput,
 } from "@gql/gql-types";
 import { addDays, endOfDay, format } from "date-fns";
 import { z } from "zod";

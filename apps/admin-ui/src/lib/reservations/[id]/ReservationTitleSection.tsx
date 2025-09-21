@@ -2,13 +2,8 @@ import React, { forwardRef } from "react";
 import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircle, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { Flex, TitleSection, H1 } from "common/styled";
-import {
-  type Maybe,
-  OrderStatus,
-  ReservationStateChoice,
-  type ReservationTitleSectionFieldsFragment,
-  useReservationApplicationLinkQuery,
-} from "@gql/gql-types";
+import { OrderStatus, ReservationStateChoice, useReservationApplicationLinkQuery } from "@gql/gql-types";
+import type { Maybe, ReservationTitleSectionFieldsFragment } from "@gql/gql-types";
 import { getName } from "@/modules/reservation";
 import { formatDateTime } from "@/common/util";
 import { getApplicationUrl } from "@/common/urls";

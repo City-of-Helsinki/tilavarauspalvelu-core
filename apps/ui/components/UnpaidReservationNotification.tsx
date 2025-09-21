@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
-  type ReservationNotificationFragment,
   ReservationOrderSet,
   ReservationStateChoice,
   ReservationTypeChoice,
@@ -11,6 +10,7 @@ import {
   useListInProgressReservationsQuery,
   useReservationStateLazyQuery,
 } from "@gql/gql-types";
+import type { ReservationNotificationFragment } from "@gql/gql-types";
 import { NotificationWrapper } from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks";
 import { getCheckoutUrl } from "@/modules/reservation";

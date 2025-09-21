@@ -1,12 +1,10 @@
 import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
-import {
-  ReservationStateChoice,
-  ReservationStartInterval,
-  OrderStatus,
-  type ReservationOrderStatusFragment,
-  type CanUserCancelReservationFragment,
-  type PaymentOrderNode,
-  type CanReservationBeChangedFragment,
+import { ReservationStateChoice, ReservationStartInterval, OrderStatus } from "@gql/gql-types";
+import type {
+  ReservationOrderStatusFragment,
+  CanUserCancelReservationFragment,
+  PaymentOrderNode,
+  CanReservationBeChangedFragment,
 } from "@gql/gql-types";
 import {
   isReservationCancellable,
@@ -14,8 +12,8 @@ import {
   getDurationOptions,
   getNormalizedReservationOrderStatus,
   isReservationEditable,
-  type CanReservationBeChangedProps,
 } from "./reservation";
+import type { CanReservationBeChangedProps } from "./reservation";
 import { isSlotWithinReservationTime } from "./reservable";
 import { toApiDate } from "common/src/common/util";
 import type { TFunction } from "i18next";

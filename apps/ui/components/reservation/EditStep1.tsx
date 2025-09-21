@@ -1,4 +1,5 @@
-import { type EditPageReservationFragment, useAdjustReservationTimeMutation } from "@gql/gql-types";
+import { useAdjustReservationTimeMutation } from "@gql/gql-types";
+import type { EditPageReservationFragment } from "@gql/gql-types";
 import { Button, ButtonVariant, IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
 import { breakpoints } from "common/src/const";
 import React, { useState } from "react";

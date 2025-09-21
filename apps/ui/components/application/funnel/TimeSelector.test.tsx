@@ -1,9 +1,13 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { describe, expect, test, vi } from "vitest";
-import { type ApplicationPage2FormValues, convertApplicationPage2 } from "./form";
-import { TimeSelectorForm, type TimeSelectorProps } from "./TimeSelector";
-import { createMockApplicationFragment, type CreateMockApplicationFragmentProps } from "@test/application.mocks";
-import { type ApplicationPage2Fragment, Priority, type TimeSelectorFragment, Weekday } from "@/gql/gql-types";
+import { convertApplicationPage2 } from "./form";
+import type { ApplicationPage2FormValues } from "./form";
+import { TimeSelectorForm } from "./TimeSelector";
+import type { TimeSelectorProps } from "./TimeSelector";
+import { createMockApplicationFragment } from "@test/application.mocks";
+import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
+import { Priority, Weekday } from "@/gql/gql-types";
+import type { ApplicationPage2Fragment, TimeSelectorFragment } from "@/gql/gql-types";
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { transformWeekday } from "common/src/conversion";
@@ -11,7 +15,8 @@ import { createNodeId, formatTimeStruct } from "common/src/helpers";
 import type { OpenHoursState } from "common/src/components/ApplicationTimeSelector";
 import { selectOption } from "@/test/test.utils";
 import { toApiTime } from "common/src/common/util";
-import { type DayT, WEEKDAYS_SORTED } from "common/src/const";
+import { WEEKDAYS_SORTED } from "common/src/const";
+import type { DayT } from "common/src/const";
 
 interface TimeSelectorMockProps extends CreateMockApplicationFragmentProps {
   onSubmit?: (appToSave: ApplicationPage2FormValues) => Promise<void>;

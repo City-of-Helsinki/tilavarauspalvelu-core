@@ -1,9 +1,6 @@
 import type { CalendarEvent } from "common/src/calendar/CommonCalendar";
-import {
-  ReservationStateChoice,
-  ReservationTypeChoice,
-  type ReservationUnitReservationsFragment,
-} from "@gql/gql-types";
+import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
+import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
 import {
   CLOSED,
   COMMON_LEGEND,

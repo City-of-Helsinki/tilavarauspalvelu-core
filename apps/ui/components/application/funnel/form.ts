@@ -1,17 +1,15 @@
 import { startOfDay } from "date-fns";
-import { filterNonNullable, type ReadonlyDeep, timeToMinutes } from "common/src/helpers";
-import {
-  type ApplicantFieldsFragment,
-  type ApplicationFormFragment,
-  type ApplicationUpdateMutation,
-  type ApplicationPage2Fragment,
-  type Maybe,
-  MunicipalityChoice,
-  Priority,
-  ReserveeType,
-  type SuitableTimeRangeCreateInput,
-  type ApplicationSectionUpdateInput,
-  Weekday,
+import { filterNonNullable, timeToMinutes } from "common/src/helpers";
+import type { ReadonlyDeep } from "common/src/helpers";
+import { MunicipalityChoice, Priority, ReserveeType, Weekday } from "@gql/gql-types";
+import type {
+  ApplicantFieldsFragment,
+  ApplicationFormFragment,
+  ApplicationUpdateMutation,
+  ApplicationPage2Fragment,
+  Maybe,
+  SuitableTimeRangeCreateInput,
+  ApplicationSectionUpdateInput,
 } from "@gql/gql-types";
 import { z } from "zod";
 import { toApiDate, toUIDate } from "common/src/common/util";

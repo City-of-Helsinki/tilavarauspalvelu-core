@@ -6,12 +6,8 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { formatters as getFormatters } from "common";
 import { Flex, H4, Strong } from "common/styled";
-import {
-  AccessType,
-  type ReservationInfoCardFragment,
-  ReservationStateChoice,
-  useAccessCodeQuery,
-} from "@gql/gql-types";
+import { AccessType, ReservationStateChoice, useAccessCodeQuery } from "@gql/gql-types";
+import type { ReservationInfoCardFragment } from "@gql/gql-types";
 import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
 import { formatDateTimeRange, formatDuration } from "@/modules/util";
 import { createNodeId, capitalize, getImageSource, getMainImage, getNode } from "common/src/helpers";

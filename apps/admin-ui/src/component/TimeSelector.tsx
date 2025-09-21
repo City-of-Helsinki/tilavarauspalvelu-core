@@ -1,9 +1,11 @@
 import React from "react";
-import { type ApplicationPageFieldsFragment, Priority } from "@gql/gql-types";
+import { Priority } from "@gql/gql-types";
+import type { ApplicationPageFieldsFragment } from "@gql/gql-types";
 import { convertWeekday, transformWeekday } from "common/src/conversion";
 import { filterNonNullable } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
-import { ApplicationTimeSelector, type Cell } from "common/src/components/ApplicationTimeSelector";
+import { ApplicationTimeSelector } from "common/src/components/ApplicationTimeSelector";
+import type { Cell } from "common/src/components/ApplicationTimeSelector";
 import { useTranslation } from "next-i18next";
 
 type ApplicationSectionType = NonNullable<ApplicationPageFieldsFragment["applicationSections"]>[0];

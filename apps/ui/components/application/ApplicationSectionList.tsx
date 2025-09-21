@@ -1,14 +1,8 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { IconCheck, IconCross, IconQuestionCircleFill, Tooltip } from "hds-react";
-import {
-  type AgeGroupNode,
-  type Maybe,
-  Priority,
-  ApplicationSectionStatusChoice,
-  type ApplicationViewFragment,
-  type SuitableTimeFieldsFragment,
-} from "@gql/gql-types";
+import { Priority, ApplicationSectionStatusChoice } from "@gql/gql-types";
+import type { AgeGroupNode, Maybe, ApplicationViewFragment, SuitableTimeFieldsFragment } from "@gql/gql-types";
 import { WEEKDAYS } from "common/src/const";
 import { filterNonNullable, formatDayTimes, fromMondayFirstUnsafe } from "common/src/helpers";
 import { StatusLabel } from "common/src/components/StatusLabel";

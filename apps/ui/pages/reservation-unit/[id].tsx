@@ -17,23 +17,25 @@ import { formatters as getFormatters } from "common";
 import { Flex, H4 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
-  type ApplicationRoundTimeSlotFieldsFragment,
   CreateReservationDocument,
-  type CreateReservationMutation,
-  type CreateReservationMutationVariables,
   CurrentUserDocument,
-  type CurrentUserQuery,
-  type PricingFieldsFragment,
   RelatedReservationUnitsDocument,
-  type RelatedReservationUnitsQuery,
-  type RelatedReservationUnitsQueryVariables,
-  type RelatedUnitCardFieldsFragment,
-  type ReservationCreateMutation,
   ReservationUnitPageDocument,
-  type ReservationUnitPageQuery,
-  type ReservationUnitPageQueryVariables,
-  type TimeSlotType,
   useCreateReservationMutation,
+} from "@gql/gql-types";
+import type {
+  ApplicationRoundTimeSlotFieldsFragment,
+  CreateReservationMutation,
+  CreateReservationMutationVariables,
+  CurrentUserQuery,
+  PricingFieldsFragment,
+  RelatedReservationUnitsQuery,
+  RelatedReservationUnitsQueryVariables,
+  RelatedUnitCardFieldsFragment,
+  ReservationCreateMutation,
+  ReservationUnitPageQuery,
+  ReservationUnitPageQueryVariables,
+  TimeSlotType,
 } from "@gql/gql-types";
 import {
   createNodeId,
@@ -59,12 +61,8 @@ import {
   isReservationUnitReservable,
 } from "@/modules/reservationUnit";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
-import {
-  convertFormToFocustimeSlot,
-  createDateTime,
-  type FocusTimeSlot,
-  getDurationOptions,
-} from "@/modules/reservation";
+import { convertFormToFocustimeSlot, createDateTime, getDurationOptions } from "@/modules/reservation";
+import type { FocusTimeSlot } from "@/modules/reservation";
 import { clampDuration, getMaxReservationDuration, getMinReservationDuration } from "@/modules/reservable";
 import { SubventionSuffix } from "@/components/reservation";
 import { InfoDialog } from "@/components/common/InfoDialog";
@@ -77,9 +75,11 @@ import {
   ReservationUnitCalendarSection,
 } from "@/components/reservation-unit";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { useForm, type UseFormReturn } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PendingReservationFormSchema, type PendingReservationFormType } from "@/components/reservation-unit/schema";
+import { PendingReservationFormSchema } from "@/components/reservation-unit/schema";
+import type { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { LoginFragment } from "@/components/LoginFragment";
 import { SubmitButton } from "@/styled/util";
 import { ReservationUnitPageWrapper } from "@/styled/reservation";
@@ -95,7 +95,8 @@ import {
   useReservableTimes,
 } from "@/hooks";
 import { gql } from "@apollo/client";
-import { type ApiError, getApiErrors } from "common/src/apolloUtils";
+import { getApiErrors } from "common/src/apolloUtils";
+import type { ApiError } from "common/src/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
 import { errorToast } from "common/src/components/toast";
 import { QuickReservation } from "@/components/QuickReservation";

@@ -1,28 +1,31 @@
 import {
-  type AgeGroupNode,
-  type ApplicationPage2Fragment,
-  type ApplicationRoundNode,
   ApplicationRoundReservationCreationStatusChoice,
   ApplicationRoundStatusChoice,
   ApplicationSectionStatusChoice,
   ApplicationStatusChoice,
-  type ApplicationViewFragment,
   CreateApplicationDocument,
-  type CreateApplicationMutation,
-  type CreateApplicationMutationVariables,
   MunicipalityChoice,
   Priority,
-  type PurposeNode,
-  type ReservationUnitNode,
   ReserveeType,
   TermsOfUseTypeChoices,
   UpdateApplicationDocument,
-  type UpdateApplicationMutation,
   Weekday,
+} from "@/gql/gql-types";
+import type {
+  AgeGroupNode,
+  ApplicationPage2Fragment,
+  ApplicationRoundNode,
+  ApplicationViewFragment,
+  CreateApplicationMutation,
+  CreateApplicationMutationVariables,
+  PurposeNode,
+  ReservationUnitNode,
+  UpdateApplicationMutation,
 } from "@/gql/gql-types";
 import { createNodeId } from "common/src/helpers";
 import { addDays, addMonths, addYears, endOfYear, startOfDay } from "date-fns";
-import { type CreateGraphQLMocksReturn, generateNameFragment, generateTextFragment } from "./test.gql.utils";
+import { generateNameFragment, generateTextFragment } from "./test.gql.utils";
+import type { CreateGraphQLMocksReturn } from "./test.gql.utils";
 import { createMockReservationUnit } from "./reservation-unit.mocks";
 
 export function createApplicationMutationMocks(): CreateGraphQLMocksReturn {

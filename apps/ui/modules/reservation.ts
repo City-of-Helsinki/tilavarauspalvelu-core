@@ -1,26 +1,29 @@
 import { addMinutes, addSeconds, isAfter, roundToNearestMinutes, differenceInMinutes, set } from "date-fns";
 import {
-  type ReservationNode,
   ReservationStartInterval,
-  type Maybe,
-  type ListReservationsQuery,
-  type IsReservableFieldsFragment,
   ReservationStateChoice,
-  type ReservationUnitNode,
   OrderStatus,
-  type ReservationOrderStatusFragment,
-  type CancellationRuleFieldsFragment,
-  type BlockingReservationFieldsFragment,
-  type CanUserCancelReservationFragment,
-  type CanReservationBeChangedFragment,
-  type PaymentOrderNode,
   ReservationCancelReasonChoice,
-  type ReservationPaymentUrlFragment,
+} from "@gql/gql-types";
+import type {
+  ReservationNode,
+  Maybe,
+  ListReservationsQuery,
+  IsReservableFieldsFragment,
+  ReservationUnitNode,
+  ReservationOrderStatusFragment,
+  CancellationRuleFieldsFragment,
+  BlockingReservationFieldsFragment,
+  CanUserCancelReservationFragment,
+  CanReservationBeChangedFragment,
+  PaymentOrderNode,
+  ReservationPaymentUrlFragment,
 } from "@gql/gql-types";
 import { getIntervalMinutes } from "common/src/conversion";
 import { fromUIDate } from "./util";
 import type { TFunction } from "i18next";
-import { type ReservableMap, type RoundPeriod, isRangeReservable } from "./reservable";
+import { isRangeReservable } from "./reservable";
+import type { ReservableMap, RoundPeriod } from "./reservable";
 import type { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { isValidDate, toUIDate } from "common/src/common/util";
 import { getTimeString } from "./reservationUnit";

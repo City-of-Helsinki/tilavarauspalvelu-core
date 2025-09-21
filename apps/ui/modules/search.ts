@@ -11,11 +11,8 @@ import {
 import type { LocalizationLanguages } from "common/src/urlBuilder";
 import {
   EquipmentOrderSet,
-  type Maybe,
   MunicipalityChoice,
   OptionsDocument,
-  type OptionsQuery,
-  type OptionsQueryVariables,
   PurposeOrderSet,
   ReservationKind,
   ReservationUnitOrderSet,
@@ -23,11 +20,13 @@ import {
   SearchReservationUnitsQueryVariables,
   UnitOrderSet,
 } from "@gql/gql-types";
+import type { Maybe, OptionsQuery, OptionsQueryVariables } from "@gql/gql-types";
 import { convertLanguageCode, getTranslationSafe, toApiDate } from "common/src/common/util";
 import { fromUIDate } from "./util";
 import { startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "./const";
-import { type ApolloClient, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
+import type { ApolloClient } from "@apollo/client";
 import type { ReadonlyURLSearchParams } from "next/navigation";
 import { transformAccessTypeSafe } from "common/src/conversion";
 import type { OptionsListT, OptionT } from "common/src/modules/search";

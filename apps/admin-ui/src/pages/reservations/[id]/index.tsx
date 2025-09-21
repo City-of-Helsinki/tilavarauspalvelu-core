@@ -1,15 +1,16 @@
 import React, { useRef } from "react";
-import { type ApolloQueryResult, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import {
   ReserveeType,
-  type ReservationPageQuery,
   ReservationStateChoice,
   UserPermissionChoice,
   ReservationPageDocument,
   useReservationPageLazyQuery,
   ReservationPageFragment,
 } from "@gql/gql-types";
+import type { ReservationPageQuery } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { ButtonContainer } from "common/styled";
 import { ShowWhenTargetInvisible } from "@/component/ShowWhenTargetInvisible";
