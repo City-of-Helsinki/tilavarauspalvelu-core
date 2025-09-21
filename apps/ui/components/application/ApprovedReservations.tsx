@@ -47,6 +47,7 @@ import { PopupMenu } from "common/src/components/PopupMenu";
 import { IconButton, StatusLabel } from "common/src/components";
 import type { StatusLabelType } from "common/src/tags";
 import { Sanitize } from "common/src/components/Sanitize";
+import type { ApplicationNode, ApplicationSectionReservationFragment } from "@/gql/gql-types";
 import {
   AccessType,
   AccessTypeWithMultivalued,
@@ -59,7 +60,6 @@ import {
   ReservationUnitAccessTypeNode,
   useApplicationReservationsQuery,
 } from "@/gql/gql-types";
-import type { ApplicationNode, ApplicationSectionReservationFragment } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
 import { getApplicationReservationPath, getApplicationSectionPath, getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
@@ -235,20 +235,18 @@ function formatReservationTimes(t: TFunction, aes: ApplicationSectionReservation
     day: number;
     label: string;
   };
-  const times: TimeLabel[] = atsList.reduce<TimeLabel[]>((acc, ats) => {
+  const times: TimeLabel[] = [];
+  for (const ats of atsList) {
     if (ats.reservationSeries == null) {
-      return acc;
+      continue;
     }
     const { dayOfTheWeek } = ats;
     const day = convertWeekday(dayOfTheWeek);
     const time = formatApiTimeInterval(ats.reservationSeries);
-    // NOTE our translations are sunday first
-    // using enum translations is bad because we need to sort by day of the week
     const tday = t(`weekDay.${fromMondayFirst(day)}`);
-    return [...acc, { day, label: `${tday} ${time}` }];
-  }, []);
+    times.push({ day, label: `${tday} ${time}` });
+  }
   times.sort((a, b) => a.day - b.day);
-
   return times.map((x) => x.label).join(" / ") || "-";
 }
 
@@ -935,16 +933,14 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
     }, []);
   }
 
-  return (
-    reservationSeries
-      .reduce<ReservationsTableElem[]>((acc, r) => {
-        const rejected = getRejected(r);
-        const expanded: ReservationsTableElem[] = getReservations(r);
-        return [...acc, ...expanded, ...rejected];
-      }, [])
-      // NOTE have to sort here because we are combining two lists
-      .sort((a, b) => a.date.getTime() - b.date.getTime())
-  );
+  const combinedReservations: ReservationsTableElem[] = [];
+  for (const r of reservationSeries) {
+    const rejected = getRejected(r);
+    const expanded: ReservationsTableElem[] = getReservations(r);
+    combinedReservations.push(...expanded, ...rejected);
+  }
+  // NOTE have to sort here because we are combining two lists
+  return combinedReservations.sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 
 function sectionToReservationUnits(t: TFunction, section: ApplicationSectionT): ReservationSeriesTableElem[] {

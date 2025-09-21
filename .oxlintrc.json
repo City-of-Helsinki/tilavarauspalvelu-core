@@ -268,6 +268,7 @@
     "oxc/erasing-op": "error",
     "oxc/misrefactored-assign-op": "error",
     "oxc/missing-throw": "error",
+    "oxc/no-accumulating-spread": "error",
     "oxc/no-async-await": "off",
     "oxc/no-async-endpoint-handlers": "error",
     "oxc/no-barrel-file": "off",
@@ -565,14 +566,16 @@
     {
       "files": [
         "**/*.test.ts*",
-        "**/vitest.setup.ts"
+        "**/vitest.setup.ts",
+        "**/mocks.ts"
       ],
       "rules": {
         "promise/avoid-new": "off",
         "unicorn/error-message": "off",
         "typescript/no-unsafe-member-access": "off",
         "typescript/no-unsafe-type-assertion": "off",
-        "typescript/restrict-template-expressions": "off"
+        "typescript/restrict-template-expressions": "off",
+        "oxc/no-accumulating-spread": "off"
       }
     },
     {

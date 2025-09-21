@@ -124,15 +124,14 @@ const ApplicationSectionPage2Schema = z
     }
   })
   .superRefine((s, ctx) => {
-    const rangesPerWeek = s.suitableTimeRanges.reduce<typeof s.suitableTimeRanges>((acc, tr) => {
-      if (acc.some((x) => x.dayOfTheWeek === tr.dayOfTheWeek)) {
-        return acc;
+    const rangesPerWeek: typeof s.suitableTimeRanges = [];
+    for (const tr of s.suitableTimeRanges) {
+      if (!rangesPerWeek.some((x) => x.dayOfTheWeek === tr.dayOfTheWeek)) {
+        rangesPerWeek.push(tr);
       }
-      return [...acc, tr];
-    }, []);
+    }
 
     const isValid = rangesPerWeek.length >= s.appliedReservationsPerWeek;
-
     if (!isValid) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -151,6 +150,7 @@ function transformApplicationSectionPage2(values: ApplicationSectionPage2FormVal
 }
 
 type SectionTypePage2 = NonNullable<ApplicationPage2Fragment["applicationSections"]>[0];
+
 function convertApplicationSectionPage2(section: ReadonlyDeep<SectionTypePage2>): ApplicationSectionPage2FormValues {
   const reservationUnitPk = section.reservationUnitOptions.find(() => true)?.reservationUnit.pk ?? 0;
   const { name, appliedReservationsPerWeek } = section;
