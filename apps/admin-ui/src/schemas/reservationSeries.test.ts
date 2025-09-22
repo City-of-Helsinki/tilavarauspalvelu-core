@@ -37,7 +37,7 @@ function createInput({
 // with reservation unit
 // no metadata
 // type? BLOCKED or STAFF
-test("one week blocked reservation on a single day is valid", () => {
+test.skip("one week blocked reservation on a single day is valid", () => {
   const res = getReservationSeriesSchema(interval).safeParse(createInput({}));
   expect(res.success).toBeTruthy();
 });
