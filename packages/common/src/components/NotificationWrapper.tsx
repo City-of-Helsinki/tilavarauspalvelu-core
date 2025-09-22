@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Notification, NotificationProps } from "hds-react";
+import type { NotificationProps } from "hds-react";
+import { Notification } from "hds-react";
 
 type NotificationPropsWithCentering = NotificationProps & {
   centered?: boolean;

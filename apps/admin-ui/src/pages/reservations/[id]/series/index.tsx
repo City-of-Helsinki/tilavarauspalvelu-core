@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NewReservationListItem } from "@/component/ReservationsList";
+import type { NewReservationListItem } from "@/component/ReservationsList";
 import { ApolloError, gql, useApolloClient } from "@apollo/client";
 import type {
   ReservationPermissionsQuery,
@@ -39,7 +39,8 @@ import { ControlledDateInput, TimeInput } from "common/src/components/form";
 import { WeekdaysSelector } from "@/component/WeekdaysSelector";
 import { ReservationListEditor } from "@/component/ReservationListEditor";
 import { useFilteredReservationList, useMultipleReservation, useSession } from "@/hooks";
-import { RescheduleReservationSeriesForm, RescheduleReservationSeriesFormSchema } from "@/schemas";
+import type { RescheduleReservationSeriesForm } from "@/schemas";
+import { RescheduleReservationSeriesFormSchema } from "@/schemas";
 import { errorToast, successToast } from "common/src/components/toast";
 import { fromAPIDateTime, getBufferTime } from "@/helpers";
 import { BufferToggles } from "@/component/BufferToggles";

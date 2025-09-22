@@ -1,10 +1,5 @@
 import { addMinutes, addSeconds, isAfter, roundToNearestMinutes, differenceInMinutes, set } from "date-fns";
-import {
-  ReservationStartInterval,
-  ReservationStateChoice,
-  OrderStatus,
-  ReservationCancelReasonChoice,
-} from "@gql/gql-types";
+import { ReservationStateChoice, OrderStatus, ReservationCancelReasonChoice } from "@gql/gql-types";
 import type {
   ReservationNode,
   Maybe,
@@ -18,6 +13,7 @@ import type {
   CanReservationBeChangedFragment,
   PaymentOrderNode,
   ReservationPaymentUrlFragment,
+  ReservationStartInterval,
 } from "@gql/gql-types";
 import { getIntervalMinutes } from "common/src/conversion";
 import { fromUIDate } from "./util";

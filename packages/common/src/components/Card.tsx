@@ -1,4 +1,5 @@
-import React, { ElementType } from "react";
+import type { ElementType } from "react";
+import React from "react";
 import styled from "styled-components";
 import Link from "next/link";
 import { Flex, fontMedium } from "../../styled";

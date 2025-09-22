@@ -15,13 +15,13 @@ import {
   AccessType,
   MunicipalityChoice,
   ReservationCancelReasonChoice,
-  PindoraReservationFragment,
 } from "@gql/gql-types";
 import type {
   ReservationPageQuery,
   ReservationPageQueryVariables,
   ApplicationReservationSeriesQuery,
   ApplicationReservationSeriesQueryVariables,
+  PindoraReservationFragment,
 } from "@gql/gql-types";
 import Link from "next/link";
 import { isBefore, sub } from "date-fns";
@@ -67,7 +67,7 @@ import {
 } from "@/components/reservation";
 import { useSearchParams } from "next/navigation";
 import { queryOptions } from "@/modules/queryOptions";
-import { OptionsRecord } from "common";
+import type { OptionsRecord } from "common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

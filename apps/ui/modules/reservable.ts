@@ -2,8 +2,14 @@
  *  If it can be made, or if it can be changed
  *  Used by both new reservations and editing existing ones.
  */
-import { ReservationStartInterval, ReservationStateChoice, BlockingReservationFieldsFragment } from "@/gql/gql-types";
-import type { ReservationNode, IsReservableFieldsFragment, ReservableTimeSpanType, Maybe } from "@/gql/gql-types";
+import { ReservationStartInterval, ReservationStateChoice } from "@/gql/gql-types";
+import type {
+  ReservationNode,
+  IsReservableFieldsFragment,
+  ReservableTimeSpanType,
+  Maybe,
+  BlockingReservationFieldsFragment,
+} from "@/gql/gql-types";
 import { dayMax, dayMin } from "common/src/helpers";
 import {
   differenceInSeconds,

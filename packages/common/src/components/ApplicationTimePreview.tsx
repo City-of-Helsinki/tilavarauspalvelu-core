@@ -4,7 +4,8 @@ import styled from "styled-components";
 import { AutoGrid, fontBold } from "../../styled";
 import { WEEKDAYS } from "../const";
 import { fromMondayFirstUnsafe, formatDayTimes } from "../helpers";
-import { Priority, SuitableTimeFieldsFragment } from "../../gql/gql-types";
+import type { SuitableTimeFieldsFragment } from "../../gql/gql-types";
+import { Priority } from "../../gql/gql-types";
 
 const WeekWrapper = styled.div`
   display: flex;

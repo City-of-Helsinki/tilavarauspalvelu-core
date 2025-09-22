@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/const";
 import { z } from "zod";
-import { UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { ControlledNumberInput } from "common/src/components/form/ControlledNumberInput";
 import { getTranslatedError } from "@/common/util";
 

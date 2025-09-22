@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { ApplicationFields, GeneralFields } from "@/components/reservation/SummaryFields";
-import { MetaFieldsFragment, ReserveeType } from "@gql/gql-types";
+import type { MetaFieldsFragment } from "@gql/gql-types";
+import { ReserveeType } from "@gql/gql-types";
 import { createMetaFieldsFragment, createOptionsMock, createSupportedFieldsMock } from "@test/reservation.mocks";
 import type { FieldName } from "common/src/metaFieldsHelpers";
 import { describe, expect, it } from "vitest";

@@ -1,8 +1,5 @@
-import {
-  ReservationUnitPublishingState,
-  ReservationUnitReservationState,
-  UnitSubpageHeadFragment,
-} from "@gql/gql-types";
+import type { UnitSubpageHeadFragment } from "@gql/gql-types";
+import { ReservationUnitPublishingState, ReservationUnitReservationState } from "@gql/gql-types";
 import { formatAddress } from "@/common/util";
 import React from "react";
 import styled from "styled-components";

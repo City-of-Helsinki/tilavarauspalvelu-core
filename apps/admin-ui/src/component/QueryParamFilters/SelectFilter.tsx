@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
-import { Option, Select } from "hds-react";
+import type { Option } from "hds-react";
+import { Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { convertOptionToHDS, toNumber } from "common/src/helpers";
 import { useSearchParams } from "next/navigation";

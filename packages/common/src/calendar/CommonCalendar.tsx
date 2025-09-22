@@ -4,7 +4,8 @@ import { addHours, endOfMonth, format, startOfWeek, getDay, startOfDay } from "d
 import { fi } from "date-fns/locale/fi";
 import { enGB } from "date-fns/locale/en-GB";
 import { sv } from "date-fns/locale/sv";
-import { Calendar as BigCalendar, dateFnsLocalizer, ToolbarProps } from "react-big-calendar";
+import type { ToolbarProps } from "react-big-calendar";
+import { Calendar as BigCalendar, dateFnsLocalizer } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";

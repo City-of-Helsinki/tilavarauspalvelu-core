@@ -7,7 +7,7 @@ import { ReservationTypeChoice } from "@gql/gql-types";
 import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
-import { CalendarEvent } from "common/src/calendar/CommonCalendar";
+import type { CalendarEvent } from "common/src/calendar/CommonCalendar";
 import { focusStyles } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { POST_PAUSE, PRE_PAUSE } from "@/common/calendarStyling";

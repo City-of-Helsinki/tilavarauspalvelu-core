@@ -8,9 +8,13 @@ import {
   ApplicationsDocument,
   CurrentUserDocument,
   ApplicationOrderSet,
+} from "@gql/gql-types";
+import type {
+  ApplicationsQuery,
+  ApplicationsQueryVariables,
+  CurrentUserQuery,
   ApplicationsGroupFragment,
 } from "@gql/gql-types";
-import type { ApplicationsQuery, ApplicationsQueryVariables, CurrentUserQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { ApplicationsGroup } from "@/components/application";
 import { getCommonServerSideProps } from "@/modules/serverUtils";

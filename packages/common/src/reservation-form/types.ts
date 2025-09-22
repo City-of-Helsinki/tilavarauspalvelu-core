@@ -1,5 +1,4 @@
-import { MunicipalityChoice } from "../../gql/gql-types";
-import type { ReserveeType } from "../../gql/gql-types";
+import type { ReserveeType, MunicipalityChoice } from "../../gql/gql-types";
 
 type Reservee = {
   reserveeFirstName: string;

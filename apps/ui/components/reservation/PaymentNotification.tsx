@@ -1,4 +1,5 @@
-import { PaymentNotificationFragment, ReservationCancelReasonChoice, ReservationStateChoice } from "@gql/gql-types";
+import type { PaymentNotificationFragment } from "@gql/gql-types";
+import { ReservationCancelReasonChoice, ReservationStateChoice } from "@gql/gql-types";
 import { Notification } from "hds-react";
 import { ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
 import { useTranslation } from "next-i18next";

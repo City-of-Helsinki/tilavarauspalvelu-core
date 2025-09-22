@@ -1,4 +1,4 @@
-import { MunicipalityChoice } from "../gql/gql-types";
+import type { MunicipalityChoice } from "../gql/gql-types";
 
 export type DAY = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 

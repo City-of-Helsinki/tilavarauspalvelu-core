@@ -2,7 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CreateGraphQLMockProps } from "@/test/test.gql.utils";
 import { render, screen, within } from "@testing-library/react";
 import Reservation from "@/pages/reservations/[id]";
-import { OrderStatus, ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
+import type { ReservationTypeChoice } from "@gql/gql-types";
+import { OrderStatus, ReservationStateChoice } from "@gql/gql-types";
 import { camelCase } from "lodash-es";
 import {
   createOptionsMock,

@@ -1,4 +1,4 @@
-import { ApplicationStatusChoice, Maybe } from "@/gql/gql-types";
+import type { ApplicationStatusChoice, Maybe } from "@/gql/gql-types";
 import { Flex, H1 } from "common/styled";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
 

@@ -1,6 +1,5 @@
 import { camelCase, get, uniq } from "lodash-es";
-import { ReserveeType } from "../../gql/gql-types";
-import type { ReservationMetadataFieldNode } from "../../gql/gql-types";
+import type { ReservationMetadataFieldNode, ReserveeType } from "../../gql/gql-types";
 import { reservationApplicationFields } from "./types";
 import { containsField } from "../metaFieldsHelpers";
 

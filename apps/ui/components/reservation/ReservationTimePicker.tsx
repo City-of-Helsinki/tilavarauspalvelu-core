@@ -1,9 +1,13 @@
 import React, { Children, cloneElement, useEffect, useMemo, useState } from "react";
-import { ReservationNode, ReservationTypeChoice, useListReservationsQuery } from "@/gql/gql-types";
-import type { BlockingReservationFieldsFragment, ReservationTimePickerFieldsFragment } from "@/gql/gql-types";
+import { ReservationTypeChoice, useListReservationsQuery } from "@/gql/gql-types";
+import type {
+  BlockingReservationFieldsFragment,
+  ReservationTimePickerFieldsFragment,
+  ReservationNode,
+} from "@/gql/gql-types";
 import styled from "styled-components";
-import { CommonCalendar, SlotProps } from "common/src/calendar/CommonCalendar";
-import type { SlotClickProps, CalendarEvent, CalendarEventBuffer } from "common/src/calendar/CommonCalendar";
+import { CommonCalendar } from "common/src/calendar/CommonCalendar";
+import type { SlotClickProps, CalendarEvent, CalendarEventBuffer, SlotProps } from "common/src/calendar/CommonCalendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import { addMinutes, differenceInMinutes } from "date-fns";
 import { eventStyleGetter } from "@/components/common/calendarUtils";

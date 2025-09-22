@@ -8,9 +8,8 @@ import {
   UserPermissionChoice,
   ReservationPageDocument,
   useReservationPageLazyQuery,
-  ReservationPageFragment,
 } from "@gql/gql-types";
-import type { ReservationPageQuery } from "@gql/gql-types";
+import type { ReservationPageQuery, ReservationPageFragment } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { ButtonContainer } from "common/styled";
 import { ShowWhenTargetInvisible } from "@/component/ShowWhenTargetInvisible";

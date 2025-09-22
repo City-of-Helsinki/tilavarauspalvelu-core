@@ -1,7 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { useFieldArray, UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
+import { useFieldArray } from "react-hook-form";
 import { AccessTypes } from "./form";
 import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";

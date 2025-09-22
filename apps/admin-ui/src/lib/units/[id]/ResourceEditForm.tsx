@@ -1,4 +1,5 @@
-import { UseFormReturn, Controller } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { EditorColumns } from "./modules/resourceEditor";
 import type { ResourceUpdateForm } from "./modules/resourceEditor";
 import { TextInput } from "hds-react";

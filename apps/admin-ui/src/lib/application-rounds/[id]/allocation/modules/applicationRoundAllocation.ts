@@ -1,9 +1,10 @@
 import { padStart } from "lodash-es";
-import { Priority, Weekday } from "@gql/gql-types";
+import { Priority } from "@gql/gql-types";
 import type {
   SuitableTimeRangeNode,
   ApplicationSectionNode,
   ApplicationSectionAllocationFragment,
+  Weekday,
 } from "@gql/gql-types";
 import type { TFunction } from "next-i18next";
 import { filterNonNullable, formatTimeRange, sort, timeToMinutes, toNumber } from "common/src/helpers";

@@ -1,5 +1,6 @@
 import React from "react";
-import { IconLinkExternal, IconSize } from "hds-react";
+import type { IconSize } from "hds-react";
+import { IconLinkExternal } from "hds-react";
 import styled from "styled-components";
 import { fontMedium } from "common/styled";
 import Link from "next/link";

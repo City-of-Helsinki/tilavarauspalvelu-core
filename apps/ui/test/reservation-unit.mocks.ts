@@ -14,8 +14,7 @@ import type {
   ReservationUnitNode,
   UnitNode,
 } from "@/gql/gql-types";
-import { ReservableMap } from "@/modules/reservable";
-import type { RoundPeriod } from "@/modules/reservable";
+import type { ReservableMap, RoundPeriod } from "@/modules/reservable";
 import { createNodeId } from "common/src/helpers";
 import { addDays, addYears, endOfDay, format, startOfDay, startOfToday } from "date-fns";
 import { createMockReservationUnitType, generateDescriptionFragment, generateNameFragment } from "./test.gql.utils";

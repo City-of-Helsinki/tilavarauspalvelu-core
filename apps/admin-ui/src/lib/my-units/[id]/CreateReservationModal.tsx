@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import type { RefObject } from "react";
 import { gql } from "@apollo/client";
-import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import {
   Button,
   ButtonSize,

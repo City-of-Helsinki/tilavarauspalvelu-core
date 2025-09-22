@@ -356,6 +356,7 @@
     "typescript/consistent-generic-constructors": "error",
     "typescript/consistent-indexed-object-style": "error",
     "typescript/consistent-type-definitions": "off",
+    "typescript/consistent-type-imports": "error",
     "typescript/explicit-function-return-type": "off",
     "typescript/explicit-module-boundary-types": "off",
     "typescript/no-array-delete": "error",

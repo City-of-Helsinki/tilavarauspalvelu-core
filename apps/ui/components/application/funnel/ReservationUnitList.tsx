@@ -10,7 +10,8 @@ import {
   Notification,
   NotificationSize,
 } from "hds-react";
-import { Control, FieldValues, Path, useController, UseControllerProps } from "react-hook-form";
+import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import type { ApplicationReservationUnitListFragment, OrderedReservationUnitCardFragment } from "@gql/gql-types";

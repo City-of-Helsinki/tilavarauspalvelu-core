@@ -1,4 +1,5 @@
-import { ApplicationStatusChoice, Priority } from "@gql/gql-types";
+import type { ApplicationStatusChoice } from "@gql/gql-types";
+import { Priority } from "@gql/gql-types";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { useSearchParams } from "next/navigation";
 import type { ReadonlyURLSearchParams } from "next/navigation";

@@ -1,4 +1,4 @@
-import { MunicipalityChoice } from "../../gql/gql-types";
+import type { MunicipalityChoice } from "../../gql/gql-types";
 
 export type OptionT = Readonly<{ value: number; label: string }>;
 export type OptionsListT = Readonly<{

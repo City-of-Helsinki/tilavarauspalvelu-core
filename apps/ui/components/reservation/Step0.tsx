@@ -3,7 +3,8 @@
  *  This component needs to be wrapped inside a Form context
  */
 import { Button, ButtonVariant, IconArrowRight, IconCross, LoadingSpinner, Notification } from "hds-react";
-import { useFormContext, UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import React, { useState } from "react";
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -13,7 +14,8 @@ import { InfoDialog } from "../common/InfoDialog";
 import { ReserveeType } from "@gql/gql-types";
 import type { ReservationInProgressFragment } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { containsField, FieldName } from "common/src/metaFieldsHelpers";
+import type { FieldName } from "common/src/metaFieldsHelpers";
+import { containsField } from "common/src/metaFieldsHelpers";
 import { getApplicationFields, getGeneralFields } from "./SummaryFields";
 import type { Inputs } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";

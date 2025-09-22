@@ -47,24 +47,28 @@ import { PopupMenu } from "common/src/components/PopupMenu";
 import { IconButton, StatusLabel } from "common/src/components";
 import type { StatusLabelType } from "common/src/tags";
 import { Sanitize } from "common/src/components/Sanitize";
-import type { ApplicationNode, ApplicationSectionReservationFragment } from "@/gql/gql-types";
-import {
-  AccessType,
-  AccessTypeWithMultivalued,
+import type {
+  ApplicationNode,
+  ApplicationSectionReservationFragment,
   ApplicationRoundNode,
   ApplicationSectionReservationUnitFragment,
   Maybe,
   PindoraReservationFragment,
   PindoraSectionFragment,
-  ReservationStateChoice,
   ReservationUnitAccessTypeNode,
+} from "@/gql/gql-types";
+import {
+  AccessType,
+  AccessTypeWithMultivalued,
+  ReservationStateChoice,
   useApplicationReservationsQuery,
 } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
 import { getApplicationReservationPath, getApplicationSectionPath, getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { AccordionWithIcons } from "@/components/AccordionWithIcons";
-import { isReservationCancellableReason, ReservationCancellableReason } from "@/modules/reservation";
+import type { ReservationCancellableReason } from "@/modules/reservation";
+import { isReservationCancellableReason } from "@/modules/reservation";
 import { formatDateRange, formatDateTimeStrings } from "@/modules/util";
 import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 

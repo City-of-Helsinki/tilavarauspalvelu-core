@@ -18,7 +18,6 @@ import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/co
 import {
   PriceUnit,
   ReservationKind,
-  ReservationStartInterval,
   ReservationStateChoice,
   ReservationUnitPublishingState,
   ReservationUnitReservationState,
@@ -35,6 +34,7 @@ import type {
   ReservationUnitAccessTypeNode,
   ReservationUnitNode,
   UnitNode,
+  ReservationStartInterval,
 } from "@gql/gql-types";
 import { dateToKey, isRangeReservable, isSlotWithinReservationTime } from "@/modules/reservable";
 import type { ReservableMap, RoundPeriod } from "@/modules/reservable";

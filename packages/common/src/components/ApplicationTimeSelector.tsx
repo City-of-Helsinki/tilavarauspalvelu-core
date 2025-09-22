@@ -7,7 +7,7 @@ import type { TFunction } from "next-i18next";
 import { AutoGrid, Flex, fontMedium, NoWrap } from "../../styled";
 import { WEEKDAYS_SORTED } from "../const";
 import { isTouchDevice } from "../browserHelpers";
-import { Weekday } from "../../gql/gql-types";
+import type { Weekday } from "../../gql/gql-types";
 import { convertWeekday } from "../conversion";
 
 export const CELL_STATES = ["none", "secondary", "primary"] as const;

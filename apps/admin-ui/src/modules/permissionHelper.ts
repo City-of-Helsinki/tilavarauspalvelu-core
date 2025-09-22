@@ -1,6 +1,5 @@
 import { filterNonNullable } from "common/src/helpers";
-import { UserPermissionChoice } from "@gql/gql-types";
-import type { CurrentUserQuery } from "@gql/gql-types";
+import type { UserPermissionChoice, CurrentUserQuery } from "@gql/gql-types";
 import { gql } from "@apollo/client";
 
 export const CURRENT_USER = gql`

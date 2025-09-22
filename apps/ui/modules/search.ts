@@ -17,10 +17,9 @@ import {
   ReservationKind,
   ReservationUnitOrderSet,
   ReservationUnitTypeOrderSet,
-  SearchReservationUnitsQueryVariables,
   UnitOrderSet,
 } from "@gql/gql-types";
-import type { Maybe, OptionsQuery, OptionsQueryVariables } from "@gql/gql-types";
+import type { Maybe, OptionsQuery, OptionsQueryVariables, SearchReservationUnitsQueryVariables } from "@gql/gql-types";
 import { convertLanguageCode, getTranslationSafe, toApiDate } from "common/src/common/util";
 import { fromUIDate } from "./util";
 import { startOfDay } from "date-fns";

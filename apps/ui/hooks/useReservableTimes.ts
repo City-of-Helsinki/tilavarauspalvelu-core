@@ -1,4 +1,4 @@
-import { ReservationUnitNode } from "@/gql/gql-types";
+import type { ReservationUnitNode } from "@/gql/gql-types";
 import { generateReservableMap } from "@/modules/reservable";
 import type { ReservableMap } from "@/modules/reservable";
 import { filterNonNullable } from "common/src/helpers";

@@ -15,7 +15,7 @@ import type { MetaFieldsFragment, ReservationPageFragment } from "@gql/gql-types
 import { createNodeId } from "common/src/helpers";
 import type { FieldName } from "common/src/metaFieldsHelpers";
 import { generateNameFragment } from "@/test/test.gql.utils";
-import { OptionsRecord } from "common";
+import type { OptionsRecord } from "common";
 
 export function generateTextFragment(text: string) {
   return {

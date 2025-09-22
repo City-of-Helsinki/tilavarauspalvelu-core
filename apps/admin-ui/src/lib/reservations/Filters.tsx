@@ -12,7 +12,7 @@ import {
   ControlledRangeNumberFilter,
 } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
-import { OrderStatusWithFree, ReservationTypeChoice, ReservationStateChoice } from "@gql/gql-types";
+import type { OrderStatusWithFree, ReservationTypeChoice, ReservationStateChoice } from "@gql/gql-types";
 import { translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";

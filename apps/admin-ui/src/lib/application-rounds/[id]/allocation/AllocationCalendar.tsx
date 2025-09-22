@@ -16,9 +16,8 @@ import {
   timeSlotKeyToTime,
   encodeTimeSlot,
   isInsideCell,
-  ReservationUnitOptionNodeT,
 } from "./modules/applicationRoundAllocation";
-import type { Cell, RelatedSlot, SectionNodeT } from "./modules/applicationRoundAllocation";
+import type { Cell, RelatedSlot, SectionNodeT, ReservationUnitOptionNodeT } from "./modules/applicationRoundAllocation";
 import { useFocusAllocatedSlot, useFocusApplicationEvent, useSlotSelection } from "./hooks";
 import { useGetFilterSearchParams } from "@/hooks";
 

@@ -24,7 +24,7 @@ import { LinkPrev } from "@/component/LinkPrev";
 import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";

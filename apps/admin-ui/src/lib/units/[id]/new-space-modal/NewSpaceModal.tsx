@@ -4,7 +4,8 @@ import type { NewResourceUnitFieldsFragment, SpaceCreateMutation } from "@gql/gq
 import { Page1 } from "./Page1";
 import { Page2 } from "./Page2";
 import { useForm } from "react-hook-form";
-import { SpaceUpdateSchema, SpaceUpdateForm } from "../SpaceForm";
+import type { SpaceUpdateForm } from "../SpaceForm";
+import { SpaceUpdateSchema } from "../SpaceForm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { gql } from "@apollo/client";
 import { UnitInfo } from "../UnitInfo";

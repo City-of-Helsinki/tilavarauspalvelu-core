@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { AddressFieldsFragment } from "@gql/gql-types";
+import type { AddressFieldsFragment } from "@gql/gql-types";
 import {
   AddressSection,
   createAccessibilityUrl,

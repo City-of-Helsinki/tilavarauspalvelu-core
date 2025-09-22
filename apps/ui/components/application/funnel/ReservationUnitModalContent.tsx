@@ -24,7 +24,8 @@ import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 // TODO this is weird import path
-import { SearchFormValues, SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
+import type { SearchFormValues } from "@/components/recurring/SeasonalSearchForm";
+import { SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { processVariables } from "@/modules/search";
 import type { OptionsListT } from "common/src/modules/search";

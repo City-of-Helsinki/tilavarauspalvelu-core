@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import {
-  ApplicationSectionCancelDocument,
+import { ApplicationSectionCancelDocument, useCancelApplicationSectionMutation } from "@gql/gql-types";
+import type {
+  ApplicationSectionCancelQuery,
+  ApplicationSectionCancelQueryVariables,
   ApplicationSectionCancelPageFragment,
-  useCancelApplicationSectionMutation,
 } from "@gql/gql-types";
-import type { ApplicationSectionCancelQuery, ApplicationSectionCancelQueryVariables } from "@gql/gql-types";
 import { CancellationForm } from "@/components/CancellationForm";
 import type { CancelFormValues } from "@/components/CancellationForm";
 import { ReservationPageWrapper } from "@/styled/reservation";

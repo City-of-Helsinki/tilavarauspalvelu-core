@@ -1,7 +1,8 @@
 import { get } from "lodash-es";
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Table, TableProps } from "hds-react";
+import type { TableProps } from "hds-react";
+import { Table } from "hds-react";
 import { fontBold } from "common/styled";
 
 type TableWrapperProps = {

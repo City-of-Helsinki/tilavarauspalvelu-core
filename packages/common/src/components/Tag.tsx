@@ -1,5 +1,6 @@
 import React from "react";
-import { getStatusBackgroundColor, getStatusBorderColor, StatusLabelType, StyledTag } from "../tags";
+import type { StatusLabelType } from "../tags";
+import { getStatusBackgroundColor, getStatusBorderColor, StyledTag } from "../tags";
 import styled from "styled-components";
 
 type TagPropsType = {

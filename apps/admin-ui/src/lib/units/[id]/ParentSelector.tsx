@@ -2,7 +2,8 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
 import { Select } from "hds-react";
-import { UnitSpacesHierarchyFieldsFragment, useUnitSpacesHierarchyQuery } from "@gql/gql-types";
+import type { UnitSpacesHierarchyFieldsFragment } from "@gql/gql-types";
+import { useUnitSpacesHierarchyQuery } from "@gql/gql-types";
 import { convertOptionToHDS, createNodeId, filterNonNullable, getNode, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 

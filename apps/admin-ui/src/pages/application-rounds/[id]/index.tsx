@@ -13,17 +13,17 @@ import type {
   FilterOptionsQuery,
   FilterOptionsQueryVariables,
   Maybe,
+  ApplicationRoundQuery,
+  ApplicationRoundQueryVariables,
+  CheckPermissionsQuery,
+  CheckPermissionsQueryVariables,
+  CurrentUserQuery,
 } from "@gql/gql-types";
 import {
   ApplicationRoundDocument,
-  ApplicationRoundQuery,
-  ApplicationRoundQueryVariables,
   ApplicationRoundStatusChoice,
   CheckPermissionsDocument,
-  CheckPermissionsQuery,
-  CheckPermissionsQueryVariables,
   CurrentUserDocument,
-  CurrentUserQuery,
   FilterOptionsDocument,
   useApplicationRoundQuery,
   UserPermissionChoice,
@@ -35,7 +35,7 @@ import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import Link from "next/link";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { createClient } from "@/common/apolloClient";
 import { ApplicationRoundStatusLabel, TimeframeStatus } from "@lib/application-rounds";

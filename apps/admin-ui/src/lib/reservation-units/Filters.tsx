@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ShowAllContainer } from "common/src/components";
-import { ReservationUnitPublishingState } from "@gql/gql-types";
+import type { ReservationUnitPublishingState } from "@gql/gql-types";
 import {
   ControlledSearchFilter,
   ControlledMultiSelectFilter,

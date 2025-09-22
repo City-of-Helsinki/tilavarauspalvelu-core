@@ -5,7 +5,7 @@ import { StyledTag } from "./modules/newSpaceModal";
 import { SpaceForm } from "../SpaceForm";
 import type { SpaceUpdateForm } from "../SpaceForm";
 import { FormErrorSummary } from "@/component/FormErrorSummary";
-import { UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { DialogActionsButtons } from "@/styled";
 
 type Props = {

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type SingleLabelRangeInputProps = {
   label: string;

@@ -3,7 +3,7 @@ import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { useFormContext } from "react-hook-form";
-import { ApplicationSectionTimePickerFragment } from "@gql/gql-types";
+import type { ApplicationSectionTimePickerFragment } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { ButtonContainer } from "common/styled";

@@ -13,7 +13,7 @@ import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import { formatDateTimeRange } from "@/modules/util";
 import { useController } from "react-hook-form";
 import type { Control, SubmitHandler, UseFormReturn } from "react-hook-form";
-import { PendingReservationFormType } from "@/components/reservation-unit/schema";
+import type { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { useMedia } from "react-use";
 import type { FocusTimeSlot } from "@/modules/reservation";

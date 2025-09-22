@@ -1,5 +1,6 @@
 import React from "react";
-import { IconAlertCircleFill, IconErrorFill, IconSize, Notification, NotificationProps } from "hds-react";
+import type { NotificationProps } from "hds-react";
+import { IconAlertCircleFill, IconErrorFill, IconSize, Notification } from "hds-react";
 import styled from "styled-components";
 
 type Props = {

@@ -1,4 +1,4 @@
-import { UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import type { ReservationUnitEditFormValues } from "./form";
 import { ReservationKind } from "@gql/gql-types";
 import type { ReservationUnitEditPageFragment, ReservationUnitEditUnitFragment } from "@gql/gql-types";

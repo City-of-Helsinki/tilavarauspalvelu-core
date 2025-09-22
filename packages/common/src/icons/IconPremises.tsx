@@ -1,4 +1,5 @@
-import React, { SVGProps } from "react";
+import type { SVGProps } from "react";
+import React from "react";
 
 // generated with SVGR from svg but the viewBox needs to be added manually
 // Use this instead of the svg in common components since NextJS doesn't include SVGR
