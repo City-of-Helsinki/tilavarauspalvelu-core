@@ -9,7 +9,7 @@ import {
 } from "@gql/gql-types";
 import { createTagString, getReservationUnitPricing } from "./reservation";
 import { addHours, addMonths } from "date-fns";
-import { formatApiDate, formatApiDateUnsafe } from "common/src/date-utils";
+import { formatApiDateUnsafe } from "common/src/date-utils";
 import { describe, expect, test } from "vitest";
 import { createNodeId } from "common/src/helpers";
 
@@ -76,8 +76,8 @@ function constructReservation({
           id: createNodeId("ReservationSeriesNode", 1),
           beginTime: "12:00",
           endTime: "14:00",
-          beginDate: formatApiDate(beginsAt) ?? "",
-          endDate: formatApiDate(addMonths(endsAt, 3)) ?? "",
+          beginDate: formatApiDateUnsafe(beginsAt),
+          endDate: formatApiDateUnsafe(addMonths(endsAt, 3)),
           weekdays: [Weekday.Monday, Weekday.Tuesday, Weekday.Thursday],
         }
       : null,
@@ -112,7 +112,7 @@ describe("createTag", () => {
     const endsAt = addHours(beginsAt, 2);
     const input = constructReservation({ beginsAt, endsAt, enableRecurrence: true });
 
-    const tag = createTagString(input, mockT, "fi");
+    const tag = createTagString(input, mockT);
     expect(tag).toContain(
       "translation:dayShort.MONDAY, translation:dayShort.TUESDAY, translation:dayShort.THURSDAY 12:00–14:00, common:abbreviations:hour"
     );
@@ -126,7 +126,7 @@ describe("createTag", () => {
       endsAt: new Date("2023-04-01T11:00:00Z"),
     });
 
-    const tag = createTagString(input, mockT, "fi");
+    const tag = createTagString(input, mockT);
     expect(tag).not.toContain("dayShort.MONDAY, dayShort.TUESDAY, dayShort.THURSDAY");
     expect(tag).toContain("1.4.2023");
     expect(tag).toContain("12:00–14:00, common:abbreviations:hour");

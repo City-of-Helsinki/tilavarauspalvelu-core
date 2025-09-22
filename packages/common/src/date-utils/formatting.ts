@@ -52,7 +52,10 @@ function getFormatLocaleObject(locale?: LocalizationLanguages): { locale: Locale
  *   toDateObject(new Date()) // Date object for current date and time
  *   toDateObject("invalid date") // null
  */
-export function parseValidDateObject(date: Date | string): Date | null {
+export function parseValidDateObject(date?: Date | string | null): Date | null {
+  if (!date) {
+    return null;
+  }
   if (date instanceof Date) {
     return isValidDate(date) ? date : null;
   }

@@ -249,8 +249,8 @@ function Wrapper({
   reservation: Maybe<ReservationType> | undefined;
   children: React.ReactNode;
 }) {
-  const { t, i18n } = useTranslation();
-  const tagline = reservation ? createTagString(reservation, t, getLocalizationLang(i18n.language)) : "";
+  const { t } = useTranslation();
+  const tagline = reservation ? createTagString(reservation, t) : "";
 
   return (
     <>

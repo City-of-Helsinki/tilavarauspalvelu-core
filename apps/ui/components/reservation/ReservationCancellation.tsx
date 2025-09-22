@@ -115,7 +115,7 @@ function ApplicationInfoCard({ reservation }: { reservation: CancellationProps["
   const reservationUnitName = getTranslationSafe(reservation.reservationUnit, "name", lang);
   const price = getPrice(t, reservation, lang);
 
-  const { dayOfWeek, time, date } = formatDateTimeStrings({ t, reservation, orig: undefined, trailingMinutes: true });
+  const { dayOfWeek, time, date } = formatDateTimeStrings({ t, reservation, trailingMinutes: true });
 
   const icons = [
     {

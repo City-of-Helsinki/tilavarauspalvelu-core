@@ -81,20 +81,6 @@ export function fromApiDateTime(date: string | null | undefined, time: string | 
 }
 
 /**
- * Constructs a datetime ISO string from UI date and time strings
- * @param date - Date string in UI format (d.M.yyyy)
- * @param time - Time string in HH:mm format
- * @returns ISO string or null if invalid
- * @example
- *   parseISODateTime("25.12.2023", "15:30") // "2023-12-25T15:30:00.000Z"
- *   parseISODateTime("invalid"", "values" }) // null
- */
-export function parseISODateTime(date: string, time: string): string | null {
-  const dateTime = fromUIDateTime(date, time);
-  return dateTime ? dateTime.toISOString() : null;
-}
-
-/**
  * Sets time on an existing Date object
  * @param date - Base date object
  * @param {string | TimeStruct} time - Time in HH:mm format or TimeStruct

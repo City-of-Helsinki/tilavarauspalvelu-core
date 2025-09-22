@@ -26,7 +26,7 @@ import { CenterSpinner, Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useCheckCollisions } from "@/hooks";
 import { getBufferTime, getNormalizedInterval } from "@/helpers";
-import { parseISODateTime, fromUIDateTimeUnsafe, formatDate, formatTime } from "common/src/date-utils";
+import { fromUIDateTimeUnsafe, formatDate, formatTime } from "common/src/date-utils";
 import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
@@ -90,11 +90,10 @@ export function CreateReservationModal({
   onClose,
   focusAfterCloseRef,
 }: CreateReservationModalProps): JSX.Element {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { isOpen } = useModal();
   const params = useSearchParams();
   const reservationUnitPk = toNumber(params.get("reservationUnit")) ?? reservationUnitOptions[0]?.value;
-  const locale = getLocalizationLang(i18n.language);
 
   const { data, loading } = useReservationUnitQuery({
     variables: { id: createNodeId("ReservationUnitNode", reservationUnitPk ?? 0) },
@@ -116,7 +115,7 @@ export function CreateReservationModal({
 
     mode: "onChange",
     defaultValues: {
-      date: formatDate(startDate, { locale }),
+      date: formatDate(startDate),
       startTime: formatTime(startDate),
       enableBufferTimeBefore: false,
       enableBufferTimeAfter: false,
@@ -140,8 +139,8 @@ export function CreateReservationModal({
         ...rest,
         reservationUnit: reservationUnit.pk,
         type,
-        beginsAt: parseISODateTime(date, startTime) || new Date().toISOString(),
-        endsAt: parseISODateTime(date, endTime) || new Date().toISOString(),
+        beginsAt: fromUIDateTimeUnsafe(date, startTime).toISOString(),
+        endsAt: fromUIDateTimeUnsafe(date, endTime).toISOString(),
         bufferTimeBefore: bufferBefore,
         bufferTimeAfter: bufferAfter,
         workingMemo: comments,

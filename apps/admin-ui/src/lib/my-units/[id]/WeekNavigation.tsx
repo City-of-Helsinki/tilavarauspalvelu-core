@@ -2,7 +2,7 @@ import { endOfISOWeek, getISOWeek, startOfISOWeek } from "date-fns";
 import { Button, ButtonSize, ButtonVariant, IconAngleLeft, IconAngleRight } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { formatDate, UI_DATE_FORMAT_SHORT } from "common/src/date-utils";
+import { formatDateRange, UI_DATE_FORMAT_SHORT } from "common/src/date-utils";
 import { Flex } from "common/styled";
 import styled from "styled-components";
 
@@ -35,8 +35,8 @@ function WeekNavigation({ date, onNext, onPrev }: Props): JSX.Element {
         {" "}
       </Btn>
       <div style={{ minWidth: "10em", textAlign: "center" }}>
-        {t("common:week")} {week} / {formatDate(startOfISOWeek(d), { formatString: UI_DATE_FORMAT_SHORT })} -{" "}
-        {formatDate(endOfISOWeek(d))}
+        {t("common:week")} {week} /{" "}
+        {formatDateRange(startOfISOWeek(d), endOfISOWeek(d), { formatString: UI_DATE_FORMAT_SHORT })}
       </div>
       <Btn
         aria-label={t("common:next")}

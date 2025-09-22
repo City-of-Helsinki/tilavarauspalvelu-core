@@ -34,7 +34,6 @@ import {
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
 import {
   createNodeId,
-  getLocalizationLang,
   ignoreMaybeArray,
   isPriceFree,
   toNumber,
@@ -286,7 +285,7 @@ function RequestedReservation({
   reservation: ReservationType;
   refetch: () => Promise<ApolloQueryResult<ReservationPageQuery>>;
 }): JSX.Element | null {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const ref = useRef<HTMLHeadingElement>(null);
 
@@ -294,7 +293,7 @@ function RequestedReservation({
 
   const isNonFree = pricing != null ? !isPriceFree(pricing) : false;
 
-  const reservationTagline = createTagString(reservation, t, getLocalizationLang(i18n.language));
+  const reservationTagline = createTagString(reservation, t);
 
   return (
     <>

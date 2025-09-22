@@ -1,5 +1,5 @@
 import { set } from "date-fns";
-import { convertToDate, isOverlapping } from "./utils";
+import { isOverlapping } from "./utils";
 import { describe, test, expect } from "vitest";
 
 describe("isOverlapping", () => {
@@ -59,43 +59,5 @@ describe("isOverlapping", () => {
     };
     expect(isOverlapping(r1, r2)).toBeFalsy();
     expect(isOverlapping(r2, r1)).toBeFalsy();
-  });
-});
-
-describe("convertToDate", () => {
-  test("return undefined, don't throw on invalid date", () => {
-    const invalidDate: Date = new Date(undefined as unknown as number);
-    expect(() => convertToDate(invalidDate, "10:00")).not.toThrow();
-    expect(convertToDate(invalidDate, "10:00")).toBe(undefined);
-  });
-
-  test("return undefined, don't throw on invalid string", () => {
-    const validDate = new Date();
-    expect(validDate).not.toBe(Number.NaN);
-    expect(() => convertToDate(validDate, "random stuff here")).not.toThrow();
-    expect(convertToDate(validDate, "random stuff here")).toBe(undefined);
-  });
-
-  test("return undefined, don't throw on empty string", () => {
-    const validDate = new Date();
-    expect(validDate).not.toBe(Number.NaN);
-    expect(() => convertToDate(validDate, "")).not.toThrow();
-    expect(convertToDate(validDate, "")).toBe(undefined);
-  });
-
-  test("partial matches return undefined, don't throw", () => {
-    const d = new Date(2023, 9, 1, 23, 11);
-    expect(d).not.toBe(Number.NaN);
-    expect(() => convertToDate(d, "10:")).not.toThrow();
-    expect(convertToDate(d, "10:")).toBe(undefined);
-
-    expect(() => convertToDate(d, "10:99")).not.toThrow();
-    expect(convertToDate(d, "10:99")).toBe(undefined);
-  });
-
-  test("sets time properly", () => {
-    const d = new Date(2023, 9, 1, 23, 11);
-    expect(convertToDate(d, "10:00")).toStrictEqual(new Date(2023, 9, 1, 10, 0));
-    expect(convertToDate(d, "10:15")).toStrictEqual(new Date(2023, 9, 1, 10, 15));
   });
 });

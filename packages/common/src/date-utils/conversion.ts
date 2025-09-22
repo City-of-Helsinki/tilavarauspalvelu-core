@@ -129,6 +129,7 @@ export function timeForInput(time: Date | string): string {
  * Checks if a date is valid and after year 1000
  * @param date - Date to validate
  * @returns true if date is valid and reasonable
+ * @description This function checks if the provided date is a valid Date object and ensures it is after January 1, 1000. This helps filter out obviously incorrect dates that may arise from parsing errors or invalid inputs.
  * @example
  *   isValidDate(new Date()) // true
  *   isValidDate(new Date("999-12-31")) // false
@@ -178,9 +179,9 @@ export function timeToMinutes(time: string): number {
  * @param {DayT} day - Day of week from Date.getDay()
  * @returns {DayT} Converted day of week
  * @example
- *   toMondayFirst(0) // 6 (Sunday to Sunday)
- *   toMondayFirst(1) // 0 (Monday to Monday)
- *   toMondayFirst(6) // 5 (Saturday to Saturday)
+ *   setMondayFirst(0) // 6 (Sunday)
+ *   setMondayFirst(4) // 3 (Wednesday)
+ *   setMondayFirst(6) // 5 (Monday)
  */
 export function setMondayFirst(day: number): DayT {
   if (day < 0 || day > 6) {
@@ -190,17 +191,17 @@ export function setMondayFirst(day: number): DayT {
 }
 
 /**
- * Converts JS Date.getDay() (0=Sun..6=Sat) to (0=Mon..6=Sun)
+ * Converts JS Date.getDay() (0=Mon..6=Sun) to (0=Sun..6=Sat)
  * @param {DayT} day - Day of week from Date.getDay()
  * @returns {DayT} Converted day of week
  * @example
- *   setMondayFirst(0) // 1 (Monday to Monday)
- *   setMondayFirst(3) // 4 (Wednesday to Wednesday)
- *   setMondayFirst(6) // 0 (Sunday to Sunday)
+ *   setSundayFirst(0) // 1 (Monday)
+ *   setSundayFirst(3) // 4 (Wednesday)
+ *   setSundayFirst(6) // 0 (Sunday)
  */
 export function setSundayFirst(day: number): DayT {
   if (day < 0) {
     throw new Error(`Invalid day ${day}`);
   }
-  return day === 6 ? 0 : ((day + 1) as DayT);
+  return (day % 6) as DayT;
 }

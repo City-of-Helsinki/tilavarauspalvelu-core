@@ -43,7 +43,15 @@ import {
 } from "@/modules/reservable";
 import { gql } from "@apollo/client";
 import { getIntervalMinutes } from "common/src/conversion";
-import { capitalize, dayMax, dayMin, filterNonNullable, isPriceFree, type ReadonlyDeep } from "common/src/helpers";
+import {
+  capitalize,
+  dayMax,
+  dayMin,
+  filterNonNullable,
+  formatTimeStruct,
+  isPriceFree,
+  type ReadonlyDeep,
+} from "common/src/helpers";
 import { timeToMinutes, formatApiDate } from "common/src/date-utils";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
 import { type TFunction } from "i18next";
@@ -508,7 +516,7 @@ function convertTimeToOptions(time: { h: number; m: number }): { label: string; 
   if (h < 0 || m < 0) {
     return null;
   }
-  const label = `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+  const label = formatTimeStruct({ hour: h, minute: m });
   return { label, value: label };
 }
 
