@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
-  type ReservationNotificationFragment,
   ReservationOrderSet,
   ReservationStateChoice,
   ReservationTypeChoice,
@@ -11,7 +10,8 @@ import {
   useListInProgressReservationsQuery,
   useReservationStateLazyQuery,
 } from "@gql/gql-types";
-import NotificationWrapper from "common/src/components/NotificationWrapper";
+import type { ReservationNotificationFragment } from "@gql/gql-types";
+import { NotificationWrapper } from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks";
 import { getCheckoutUrl } from "@/modules/reservation";
 import { createNodeId, filterNonNullable } from "common/src/helpers";
@@ -22,7 +22,7 @@ import { getReservationInProgressPath } from "@/modules/urls";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { Flex } from "common/styled";
 import { getApiErrors } from "common/src/apolloUtils";
-import { type ParsedUrlQuery } from "querystring";
+import type { ParsedUrlQuery } from "node:querystring";
 
 const BodyText = styled.p`
   margin: 0;
@@ -62,18 +62,11 @@ function ReservationNotification({
     time: remainingMinutes,
   });
 
-  function countdownMinute(minutes: number) {
-    if (minutes === 0) {
-      return 0;
-    }
-    return minutes - 1;
-  }
-
   useEffect(() => {
     const paymentTimeout = setTimeout(() => {
       const minutes = remainingMinutes ?? 0;
-      setRemainingMinutes(countdownMinute(minutes));
-    }, 60000);
+      setRemainingMinutes(Math.max(0, minutes - 1));
+    }, 60_000);
     if (remainingMinutes === 0 || isCreated) {
       return clearTimeout(paymentTimeout);
     }
@@ -200,10 +193,10 @@ export function InProgressReservationNotification() {
             text: t("notification:waitingForPayment.reservationCancelledTitle"),
           });
         }
-      } catch (e) {
+      } catch (err) {
         // silently ignore NOT_FOUND (just refresh query cache)
-        if (!isNotFoundError(e)) {
-          throw e;
+        if (!isNotFoundError(err)) {
+          throw err;
         }
       }
       if (shouldRedirectAfterDelete(reservation.pk, router.pathname, router.query)) {

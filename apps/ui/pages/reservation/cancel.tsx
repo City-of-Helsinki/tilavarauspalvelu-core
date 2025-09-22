@@ -1,11 +1,7 @@
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { CancelledLinkSet } from "@/components/reservation/CancelledLinkSet";
-import {
-  DeleteReservationDocument,
-  type DeleteReservationMutation,
-  type DeleteReservationMutationVariables,
-  ReservationStateChoice,
-} from "@/gql/gql-types";
+import { DeleteReservationDocument, ReservationStateChoice } from "@/gql/gql-types";
+import type { DeleteReservationMutation, DeleteReservationMutationVariables } from "@/gql/gql-types";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
@@ -92,7 +88,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   if (errors != null) {
     // eslint-disable-next-line no-console
-    console.error("Delete mutation failed with: ", errors);
+    console.error("Delete mutation failed with:", errors);
     // TODO improve the error page (or redirect to home page alternatvely or to users own reservations or this reservation?)
     // if the reservation is deleted it will not show up anywhere (it's deleted from the database also)
     return {

@@ -1,7 +1,8 @@
 import { get } from "lodash-es";
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Table, TableProps } from "hds-react";
+import type { TableProps } from "hds-react";
+import { Table } from "hds-react";
 import { fontBold } from "common/styled";
 
 type TableWrapperProps = {
@@ -67,13 +68,13 @@ export function CustomTable({ isLoading, setSort, enableFrontendSorting, ...prop
   return (
     <Wrapper>
       <StyledTable
+        key={`custom-table-${keyOverride}`}
         {...props}
         variant="light"
         onSort={!enableFrontendSorting ? onSort : undefined}
         // NOTE when using backend sorting we need to unmount the table
         // otherwise the table header is not updated
         // unmounting on other data changes is not necessary and causes other bugs like automatic scrolling.
-        key={`custom-table-${keyOverride}`}
         $tableBackground={isLoading ? "var(--color-black-10)" : "transparent"}
         $colWidths={props?.cols ? props.cols.map((col) => get(col, "width", "auto")) : []}
       />

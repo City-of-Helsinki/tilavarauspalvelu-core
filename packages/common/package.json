@@ -64,6 +64,7 @@
     "next": "15.5.3",
     "next-i18next": "^15.4.2",
     "oxlint": "^1.14.0",
+    "oxlint-tsgolint": "^0.2.0",
     "postcss-styled-syntax": "^0.7.1",
     "prettier": "^3.6.2",
     "stylelint": "^16.23.1",

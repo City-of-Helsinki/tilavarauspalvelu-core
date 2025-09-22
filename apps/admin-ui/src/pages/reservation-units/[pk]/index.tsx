@@ -2,15 +2,14 @@ import { useToastIfQueryParam } from "common/src/hooks/useToastIfQueryParam";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
 import styled from "styled-components";
-import { useForm, type UseFormReturn } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   EquipmentOrderSet,
   ReservationUnitImageType,
   ReservationKind,
-  type ReservationUnitEditorParametersQuery,
-  type ReservationUnitEditPageFragment,
   TermsOfUseTypeChoices,
   useCreateImageMutation,
   useCreateReservationUnitMutation,
@@ -22,6 +21,7 @@ import {
   useUpdateReservationUnitMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
+import type { ReservationUnitEditorParametersQuery, ReservationUnitEditPageFragment } from "@gql/gql-types";
 import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { Flex } from "common/styled";
 
@@ -36,11 +36,9 @@ import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import {
   convertReservationUnit,
-  type ImageFormType,
-  type ReservationUnitEditFormValues,
   ReservationUnitEditSchema,
   transformReservationUnit,
   SeasonalSection,
@@ -56,6 +54,7 @@ import {
   PricingSection,
   ErrorInfo,
 } from "@lib/reservation-units/[pk]/";
+import type { ImageFormType, ReservationUnitEditFormValues } from "@lib/reservation-units/[pk]/";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 
 // Override the Accordion style: force border even if the accordion is open
@@ -102,7 +101,7 @@ function useImageMutations() {
         .filter((image) => image.pk && image.pk > 0)
         .map((image) => delImage({ variables: { pk: image.pk ?? 0 } }));
       await Promise.all(deletePromises);
-    } catch (_) {
+    } catch {
       return false;
     }
 
@@ -121,7 +120,7 @@ function useImageMutations() {
         );
 
       await Promise.all(addPromises);
-    } catch (_) {
+    } catch {
       return false;
     }
 
@@ -141,7 +140,7 @@ function useImageMutations() {
         });
 
       await Promise.all(changeTypePromises);
-    } catch (_) {
+    } catch {
       return false;
     }
 
@@ -256,19 +255,14 @@ function ReservationUnitEditor({
       });
     }
 
-    const getPk = (d: typeof data) => {
-      if (d == null) {
-        return null;
+    let upPk = null;
+    if (data != null) {
+      if ("updateReservationUnit" in data) {
+        upPk = data.updateReservationUnit?.pk ?? null;
+      } else if ("createReservationUnit" in data) {
+        upPk = data.createReservationUnit?.pk ?? null;
       }
-      if ("updateReservationUnit" in d) {
-        return d.updateReservationUnit?.pk ?? null;
-      }
-      if ("createReservationUnit" in d) {
-        return d.createReservationUnit?.pk ?? null;
-      }
-      return null;
-    };
-    const upPk = getPk(data);
+    }
 
     // crude way to handle different logic for archive vs save (avoids double toast)
     if (upPk) {

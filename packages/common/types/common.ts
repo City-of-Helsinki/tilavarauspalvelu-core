@@ -1,4 +1,4 @@
-import { MunicipalityChoice } from "../gql/gql-types";
+import type { MunicipalityChoice } from "../gql/gql-types";
 
 export type DAY = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -7,6 +7,6 @@ type OptionType = {
   value: number;
 };
 
-export type OptionsRecord = Record<"reservationPurposes" | "ageGroups", Readonly<OptionType[]>> & {
-  municipalities: Readonly<Array<{ label: string; value: MunicipalityChoice }>>;
+export type OptionsRecord = Record<"reservationPurposes" | "ageGroups", ReadonlyArray<OptionType>> & {
+  municipalities: ReadonlyArray<{ label: string; value: MunicipalityChoice }>;
 };

@@ -17,7 +17,7 @@ import {
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { useMedia } from "react-use";
 import { useRouter } from "next/router";
 import { isBefore } from "date-fns";
@@ -47,25 +47,28 @@ import { PopupMenu } from "common/src/components/PopupMenu";
 import { IconButton, StatusLabel } from "common/src/components";
 import type { StatusLabelType } from "common/src/tags";
 import { Sanitize } from "common/src/components/Sanitize";
-import {
-  AccessType,
-  AccessTypeWithMultivalued,
-  type ApplicationNode,
+import type {
+  ApplicationNode,
+  ApplicationSectionReservationFragment,
   ApplicationRoundNode,
-  type ApplicationSectionReservationFragment,
   ApplicationSectionReservationUnitFragment,
   Maybe,
   PindoraReservationFragment,
   PindoraSectionFragment,
-  ReservationStateChoice,
   ReservationUnitAccessTypeNode,
+} from "@/gql/gql-types";
+import {
+  AccessType,
+  AccessTypeWithMultivalued,
+  ReservationStateChoice,
   useApplicationReservationsQuery,
 } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
 import { getApplicationReservationPath, getApplicationSectionPath, getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { AccordionWithIcons } from "@/components/AccordionWithIcons";
-import { isReservationCancellableReason, ReservationCancellableReason } from "@/modules/reservation";
+import type { ReservationCancellableReason } from "@/modules/reservation";
+import { isReservationCancellableReason } from "@/modules/reservation";
 import { formatDateRange, formatDateTimeStrings } from "@/modules/util";
 import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 
@@ -202,8 +205,7 @@ function getAesReservationUnits(aes: ApplicationSectionT) {
   return filterNonNullable(
     aes.reservationUnitOptions
       .map((x) => x.allocatedTimeSlots)
-      .map((x) => x.map((y) => y.reservationSeries?.reservationUnit))
-      .flat()
+      .flatMap((x) => x.map((y) => y.reservationSeries?.reservationUnit))
   );
 }
 
@@ -237,29 +239,26 @@ function formatReservationTimes(t: TFunction, aes: ApplicationSectionReservation
     day: number;
     label: string;
   };
-  const times: TimeLabel[] = atsList.reduce<TimeLabel[]>((acc, ats) => {
+  const times: TimeLabel[] = [];
+  for (const ats of atsList) {
     if (ats.reservationSeries == null) {
-      return acc;
+      continue;
     }
     const { dayOfTheWeek } = ats;
     const day = convertWeekday(dayOfTheWeek);
     const time = formatApiTimeInterval(ats.reservationSeries);
-    // NOTE our translations are sunday first
-    // using enum translations is bad because we need to sort by day of the week
     const tday = t(`weekDay.${fromMondayFirst(day)}`);
-    return [...acc, { day, label: `${tday} ${time}` }];
-  }, []);
+    times.push({ day, label: `${tday} ${time}` });
+  }
   times.sort((a, b) => a.day - b.day);
-
   return times.map((x) => x.label).join(" / ") || "-";
 }
 
 function accessCodeSafe(pindoraInfo: PindoraSectionFragment | null, t: TFunction) {
   if (!pindoraInfo?.accessCode) {
     return t("reservations:contactSupport");
-  } else {
-    return pindoraInfo.accessCode;
   }
+  return pindoraInfo.accessCode;
 }
 
 export function ApprovedReservations({ application, applicationRound }: Readonly<Props>) {
@@ -359,7 +358,7 @@ type ReservationSeriesTableElem = {
   // same for this actual end / start times or a combined string
   time: string;
   accessType: AccessTypeWithMultivalued | null;
-  usedAccessTypes: Readonly<AccessType[]> | null;
+  usedAccessTypes: ReadonlyArray<AccessType> | null;
   pindoraInfo: PindoraSectionFragment | null;
 };
 
@@ -531,7 +530,7 @@ function ReservationUnitAccessTypeList({
   roundReservationBegin,
   roundReservationEnd,
 }: Readonly<{
-  accessTypes: Readonly<Pick<ReservationUnitAccessTypeNode, "pk" | "beginDate" | "accessType">[]>;
+  accessTypes: ReadonlyArray<Pick<ReservationUnitAccessTypeNode, "pk" | "beginDate" | "accessType">>;
   reservationUnits: ReservationSeriesTableElem[];
   pk: number | null | undefined;
   roundReservationBegin: Date;
@@ -591,15 +590,18 @@ function getReservationSeriesAccessText(reservationUnit: ReservationSeriesTableE
   switch (accessType) {
     case AccessTypeWithMultivalued.Multivalued:
       if (usedAccessTypes.includes(AccessType.AccessCode)) {
-        return `${t("reservationUnit:accessTypes." + AccessType.AccessCode)}: ${accessCodeSafe(pindoraInfo, t)}`;
-      } else
-        return usedAccessTypes
-          .filter((aT) => aT != null && aT !== AccessType.Unrestricted)
-          .map((aT) => t(`reservationUnit:accessTypes.${aT}`))
-          .join(" / ");
+        return `${t(`reservationUnit:accessTypes.${AccessType.AccessCode}`)}: ${accessCodeSafe(pindoraInfo, t)}`;
+      }
+      return usedAccessTypes
+        .filter((aT) => aT != null && aT !== AccessType.Unrestricted)
+        .map((aT) => t(`reservationUnit:accessTypes.${aT}`))
+        .join(" / ");
     case AccessTypeWithMultivalued.AccessCode:
-      return `${t("reservationUnit:accessTypes." + accessType)}: ${accessCodeSafe(pindoraInfo, t)}`;
-    default:
+      return `${t(`reservationUnit:accessTypes.${accessType}`)}: ${accessCodeSafe(pindoraInfo, t)}`;
+    case AccessTypeWithMultivalued.OpenedByStaff:
+    case AccessTypeWithMultivalued.PhysicalKey:
+    case AccessTypeWithMultivalued.Unrestricted:
+    case null:
       return t(`reservationUnit:accessTypes.${accessType}`);
   }
 }
@@ -677,7 +679,7 @@ const StyledStatusLabel = styled(StatusLabel)`
   }
 `;
 
-function getStatusLabelProps(status: string): {
+function getStatusLabelProps(status: ReservationsTableElem["status"]): {
   icon: JSX.Element;
   type: StatusLabelType;
 } {
@@ -692,8 +694,8 @@ function getStatusLabelProps(status: string): {
         icon: <IconPen />,
         type: "neutral",
       };
-    case "denied":
-    default:
+    case "rejected":
+    case "":
       return {
         icon: <IconCross />,
         type: "error",
@@ -862,12 +864,26 @@ function getReservationStatusChoice(
       return "rejected";
     case ReservationStateChoice.Cancelled:
       return "cancelled";
-    default:
+    case ReservationStateChoice.Confirmed:
+    case ReservationStateChoice.Created:
+    case ReservationStateChoice.RequiresHandling:
+    case ReservationStateChoice.WaitingForPayment:
+    case null:
+    case undefined:
       return isModified ? "modified" : "";
   }
 }
 
-function sectionToreservations(t: TFunction, section: ApplicationSectionReservationFragment): ReservationsTableElem[] {
+function getAccessCodeValidThru(pindoraInfo: PindoraReservationFragment | undefined | null) {
+  if (!pindoraInfo) {
+    return null;
+  }
+  return {
+    beginsAt: pindoraInfo.accessCodeBeginsAt,
+    endsAt: pindoraInfo.accessCodeEndsAt,
+  };
+}
+function sectionToReservations(t: TFunction, section: ApplicationSectionReservationFragment): ReservationsTableElem[] {
   const reservationSeries = filterNonNullable(
     section.reservationUnitOptions.flatMap((ruo) =>
       ruo.allocatedTimeSlots.map((ats) =>
@@ -899,16 +915,6 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
     });
   }
 
-  function getAccessCodeValidThru(pindoraInfo: PindoraReservationFragment | undefined | null) {
-    if (!pindoraInfo) {
-      return null;
-    }
-    return {
-      beginsAt: pindoraInfo.accessCodeBeginsAt,
-      endsAt: pindoraInfo.accessCodeEndsAt,
-    };
-  }
-
   function getReservations(r: (typeof reservationSeries)[0]): ReservationsTableElem[] {
     return r.reservations.reduce<ReservationsTableElem[]>((acc, res, idx, ar) => {
       const { isModified, ...rest } = formatDateTimeStrings(t, res, r.allocatedTimeSlot);
@@ -930,23 +936,20 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
     }, []);
   }
 
-  return (
-    reservationSeries
-      .reduce<ReservationsTableElem[]>((acc, r) => {
-        const rejected = getRejected(r);
-        const expanded: ReservationsTableElem[] = getReservations(r);
-        return [...acc, ...expanded, ...rejected];
-      }, [])
-      // NOTE have to sort here because we are combining two lists
-      .sort((a, b) => a.date.getTime() - b.date.getTime())
-  );
+  const combinedReservations: ReservationsTableElem[] = [];
+  for (const r of reservationSeries) {
+    const rejected = getRejected(r);
+    const expanded: ReservationsTableElem[] = getReservations(r);
+    combinedReservations.push(...expanded, ...rejected);
+  }
+  // NOTE have to sort here because we are combining two lists
+  return combinedReservations.sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 
 function sectionToReservationUnits(t: TFunction, section: ApplicationSectionT): ReservationSeriesTableElem[] {
   const reservationUnitsByDay = filterNonNullable(
     section.reservationUnitOptions
-      .map((ruo) => ruo.allocatedTimeSlots.map((ats) => ats))
-      .flat()
+      .flatMap((ruo) => ruo.allocatedTimeSlots.map((ats) => ats))
       .map((ats) => {
         const { reservationSeries: r, dayOfTheWeek } = ats;
         if (r == null) {
@@ -985,7 +988,7 @@ export function AllReservations({
   application: Pick<ApplicationT, "pk">;
 }>) {
   const { t } = useTranslation();
-  const reservations = sectionToreservations(t, applicationSection);
+  const reservations = sectionToReservations(t, applicationSection);
   return (
     <>
       <H3 $noMargin>{t("application:view.reservationsTab.reservationsTitle")}</H3>
@@ -1006,7 +1009,7 @@ export function ApplicationSection({
   const { t } = useTranslation();
 
   const reservationUnits: ReservationSeriesTableElem[] = sectionToReservationUnits(t, applicationSection);
-  const reservations = sectionToreservations(t, applicationSection)
+  const reservations = sectionToReservations(t, applicationSection)
     // NOTE we need to slice even if backend returns only 20 of each
     // because we want to keep the total at 20
     .slice(0, N_RESERVATIONS_TO_SHOW);

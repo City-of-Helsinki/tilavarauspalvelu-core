@@ -1,5 +1,5 @@
 import styled, { css } from "styled-components";
-import { type SpacingSize } from "./util";
+import type { SpacingSize } from "./util";
 import { breakpoints } from "../src/const";
 
 export const fontRegular = css`

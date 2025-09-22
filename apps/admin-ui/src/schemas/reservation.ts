@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { fromUIDate } from "common/src/common/util";
-import { ReservationStartInterval, ReservationTypeChoice } from "@gql/gql-types";
+import type { ReservationStartInterval } from "@gql/gql-types";
+import { ReservationTypeChoice } from "@gql/gql-types";
 import { intervalToNumber } from "./utils";
 import { checkTimeStringFormat, checkValidFutureDate } from "common/src/schemas/schemaCommon";
 
@@ -61,7 +62,7 @@ export const checkReservationInterval = (
   path: string,
   interval: number
 ) => {
-  if (time && Number(time.substring(3)) % interval !== 0) {
+  if (time && Number(time.slice(3)) % interval !== 0) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: [path],

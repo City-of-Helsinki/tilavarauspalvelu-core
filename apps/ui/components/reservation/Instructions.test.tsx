@@ -1,6 +1,7 @@
 import { render } from "@testing-library/react";
 import { getReservationUnitInstructionsKey, Instructions } from "./Instructions";
-import { type InstructionsFragment, ReservationStateChoice } from "@gql/gql-types";
+import { ReservationStateChoice } from "@gql/gql-types";
+import type { InstructionsFragment } from "@gql/gql-types";
 import { describe, expect, it } from "vitest";
 import { createMockReservation } from "@test/reservation.mocks";
 import { getTranslationSafe } from "common/src/common/util";

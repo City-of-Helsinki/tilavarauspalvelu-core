@@ -1,8 +1,8 @@
 import React from "react";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import DeactivatedAccount from "common/src/components/DeactivatedAccount";
+import { DeactivatedAccount } from "common/src/components/DeactivatedAccount";
 
 export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
   return {

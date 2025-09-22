@@ -11,7 +11,8 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
-import { ApplicationSentPageDocument, type ApplicationSentPageQuery } from "@/gql/gql-types";
+import { ApplicationSentPageDocument } from "@/gql/gql-types";
+import type { ApplicationSentPageQuery } from "@/gql/gql-types";
 import { createApolloClient } from "@/modules/apolloClient";
 import { isSent } from "@/modules/util";
 

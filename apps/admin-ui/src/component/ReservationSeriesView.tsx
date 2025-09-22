@@ -1,8 +1,10 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { format } from "date-fns";
-import { ReservationStateChoice, type ReservationToCopyFragment, UserPermissionChoice } from "@gql/gql-types";
-import { NewReservationListItem, ReservationList } from "@/component/ReservationsList";
+import { ReservationStateChoice, UserPermissionChoice } from "@gql/gql-types";
+import type { ReservationToCopyFragment } from "@gql/gql-types";
+import type { NewReservationListItem } from "@/component/ReservationsList";
+import { ReservationList } from "@/component/ReservationsList";
 import { ReservationListButton } from "@/component/ReservationListButton";
 import { DenyDialog } from "@/component/DenyDialog";
 import { useModal } from "@/context/ModalContext";
@@ -123,7 +125,7 @@ export function ReservationSeriesView({
     };
   });
 
-  const items = forDisplay.concat(rejected).sort((a, b) => a.date.getTime() - b.date.getTime());
+  const items = [...forDisplay, ...rejected].sort((a, b) => a.date.getTime() - b.date.getTime());
 
   return (
     <ReservationList

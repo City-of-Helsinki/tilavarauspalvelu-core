@@ -8,29 +8,27 @@ import {
   mapParamToInteger,
   toNumber,
 } from "common/src/helpers";
-import { type LocalizationLanguages } from "common/src/urlBuilder";
+import type { LocalizationLanguages } from "common/src/urlBuilder";
 import {
   EquipmentOrderSet,
-  type Maybe,
   MunicipalityChoice,
   OptionsDocument,
-  type OptionsQuery,
-  type OptionsQueryVariables,
   PurposeOrderSet,
   ReservationKind,
   ReservationUnitOrderSet,
   ReservationUnitTypeOrderSet,
-  SearchReservationUnitsQueryVariables,
   UnitOrderSet,
 } from "@gql/gql-types";
+import type { Maybe, OptionsQuery, OptionsQueryVariables, SearchReservationUnitsQueryVariables } from "@gql/gql-types";
 import { convertLanguageCode, getTranslationSafe, toApiDate } from "common/src/common/util";
 import { fromUIDate } from "./util";
 import { startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "./const";
-import { type ApolloClient, gql } from "@apollo/client";
-import { type ReadonlyURLSearchParams } from "next/navigation";
+import { gql } from "@apollo/client";
+import type { ApolloClient } from "@apollo/client";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import { transformAccessTypeSafe } from "common/src/conversion";
-import { type OptionsListT, type OptionT } from "common/src/modules/search";
+import type { OptionsListT, OptionT } from "common/src/modules/search";
 
 function transformOrderByName(desc: boolean, language: LocalizationLanguages) {
   if (language === "fi") {
@@ -61,16 +59,11 @@ function transformOrderBy(
   desc: boolean,
   language: LocalizationLanguages
 ): ReservationUnitOrderSet | null {
-  switch (orderBy) {
-    case "name":
-      return transformOrderByName(desc, language);
-    case "unitName":
-      return transformOrderByUnitName(desc, language);
-    case "typeRank":
-      return transformOrderByTypeRank(desc, language);
-    default:
-      return null;
-  }
+  if (orderBy === "name") return transformOrderByName(desc, language);
+  if (orderBy === "unitName") return transformOrderByUnitName(desc, language);
+  if (orderBy === "typeRank") return transformOrderByTypeRank(desc, language);
+
+  return null;
 }
 
 /// Defaults to name sorting
@@ -186,12 +179,12 @@ export function translateOption(
 
 function getUnitsOrderBy(lang: LocalizationLanguages) {
   switch (lang) {
+    case "fi":
+      return UnitOrderSet.NameFiAsc;
     case "sv":
       return UnitOrderSet.NameSvAsc;
     case "en":
       return UnitOrderSet.NameEnAsc;
-    default:
-      return UnitOrderSet.NameFiAsc;
   }
 }
 
@@ -245,7 +238,7 @@ export async function getSearchOptions(
 
 type AgeGroup = NonNullable<NonNullable<OptionsQuery["allAgeGroups"]>[0]>;
 
-function sortAgeGroups(ageGroups: AgeGroup[]): NonNullable<AgeGroup>[] {
+function sortAgeGroups(ageGroups: AgeGroup[]): Array<NonNullable<AgeGroup>> {
   return filterNonNullable(ageGroups).sort((a, b) => {
     const order = ["1-99"];
     const strA = `${a.minimum || ""}-${a.maximum || ""}`;

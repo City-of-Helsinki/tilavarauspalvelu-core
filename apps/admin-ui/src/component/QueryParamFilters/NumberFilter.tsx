@@ -1,6 +1,7 @@
 import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
+import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
 
 interface ControlledNumberFilterProps<T extends FieldValues> extends UseControllerProps<T> {
   name: Path<T>;

@@ -64,6 +64,7 @@
     "@vitejs/plugin-react": "^4.5.2",
     "happy-dom": "^18.0.1",
     "oxlint": "^1.14.0",
+    "oxlint-tsgolint": "^0.2.0",
     "postcss-styled-syntax": "^0.7.1",
     "prettier": "^3.6.2",
     "stylelint": "^16.23.1",

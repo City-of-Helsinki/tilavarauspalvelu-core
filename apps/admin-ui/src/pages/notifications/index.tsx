@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { type TFunction, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import {
   BannerNotificationOrderSet,
-  type BannerNotificationTableElementFragment,
   BannerNotificationState,
   UserPermissionChoice,
   BannerNotificationsListDocument,
-  type BannerNotificationsListQueryVariables,
-  type BannerNotificationsListQuery,
   useBannerNotificationsListQuery,
+} from "@gql/gql-types";
+import type {
+  BannerNotificationTableElementFragment,
+  BannerNotificationsListQueryVariables,
+  BannerNotificationsListQuery,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { valueForDateInput, valueForTimeInput } from "@/helpers";
@@ -18,7 +21,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { More } from "@/component/More";
 import { TableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import { IconCheck, IconClock, IconPen, IconQuestionCircleFill } from "hds-react";
 import { getNotificationListUrl, getNotificationUrl } from "@/common/urls";
 import { CenterSpinner, TitleSection, H1 } from "common/styled";
@@ -26,7 +29,7 @@ import { gql, useApolloClient } from "@apollo/client";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { createClient } from "@/common/apolloClient";
 
 const getStatusLabelProps = (
@@ -39,7 +42,8 @@ const getStatusLabelProps = (
       return { type: "info", icon: <IconClock /> };
     case BannerNotificationState.Active:
       return { type: "success", icon: <IconCheck /> };
-    default:
+    case null:
+    case undefined:
       return {
         type: "info",
         icon: <IconQuestionCircleFill />,

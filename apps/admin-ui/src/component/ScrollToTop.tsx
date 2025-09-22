@@ -53,15 +53,16 @@ export function ScrollToTop(): JSX.Element | null {
     300
   );
 
-  const handleClick = () => {
-    window.scroll({ top: 0, left: 0, behavior: "smooth" });
-  };
-
   if (!isMobile || !isVisible) {
     return null;
   }
   return (
-    <Btn aria-label={t("common:scrollToTop")} onClick={handleClick}>
+    <Btn
+      aria-label={t("common:scrollToTop")}
+      onClick={() => {
+        window.scroll({ top: 0, left: 0, behavior: "smooth" });
+      }}
+    >
       <IconAngleUp />
     </Btn>
   );

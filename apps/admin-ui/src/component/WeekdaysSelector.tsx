@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { WEEKDAYS_SORTED } from "common/src/const";
 import { Flex } from "common/styled";
-import { Weekday } from "@gql/gql-types";
+import type { Weekday } from "@gql/gql-types";
 
 const Day = styled.button`
   background-color: var(--color-black-5);

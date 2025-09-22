@@ -3,13 +3,14 @@ import { toUIDate } from "common/src/common/util";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { startOfDay } from "date-fns";
-import { RejectionReadinessChoice, type ReservationToCopyFragment, UserPermissionChoice } from "@gql/gql-types";
+import { UserPermissionChoice } from "@gql/gql-types";
+import type { ReservationToCopyFragment, RejectionReadinessChoice } from "@gql/gql-types";
 import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
 import { useCheckPermission } from "@/hooks";
 import { NewReservationModal } from "@/component/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
 import { H6 } from "common/styled";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import { gql } from "@apollo/client";
 
 export type NewReservationListItem = {
@@ -72,7 +73,7 @@ const ErrorLabel = styled(StatusLabel)`
   margin-inline: -8px;
 `;
 
-const stripTimeZeros = (time: string) => (time.startsWith("0") ? time.substring(1) : time);
+const stripTimeZeros = (time: string) => (time.startsWith("0") ? time.slice(1) : time);
 
 // TODO this function should be refactored
 // all the messages and label types should be enum -> object mapping (or similar)
@@ -113,11 +114,11 @@ function getStatus(x: NewReservationListItem) {
     const overlapErrorMsg = /Overlapping reservations are not allowed/;
     const reservationInPastErrorMsg = /ApolloError: Reservation new begin cannot be in the past/;
     let errorCode = "default";
-    if (x.error.match(intervalErrorMsg)) {
+    if (intervalErrorMsg.test(x.error)) {
       errorCode = "interval";
-    } else if (x.error.match(overlapErrorMsg)) {
+    } else if (overlapErrorMsg.test(x.error)) {
       errorCode = "overlap";
-    } else if (x.error.match(reservationInPastErrorMsg)) {
+    } else if (reservationInPastErrorMsg.test(x.error)) {
       errorCode = "reservationInPast";
     }
 

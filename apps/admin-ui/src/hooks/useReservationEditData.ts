@@ -1,11 +1,7 @@
-import {
-  type Maybe,
-  type ReservationEditPageFragment,
-  ReservationStateChoice,
-  useReservationEditPageQuery,
-} from "@gql/gql-types";
+import { ReservationStateChoice, useReservationEditPageQuery } from "@gql/gql-types";
+import type { Maybe, ReservationEditPageFragment } from "@gql/gql-types";
 import { createNodeId, getNode } from "common/src/helpers";
-import { useReservationSeries } from "@/hooks";
+import { useReservationSeries } from "./useReservationSeries";
 
 type ReturnValue = {
   reservation: Maybe<ReservationEditPageFragment>;

@@ -3,8 +3,8 @@ import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import { OrderStatus } from "@/gql/gql-types";
 import { IconEuroSign } from "hds-react";
-import StatusLabel from "common/src/components/StatusLabel";
-import { type StatusLabelType } from "common/src/tags";
+import { StatusLabel } from "common/src/components/StatusLabel";
+import type { StatusLabelType } from "common/src/tags";
 
 export type Props = {
   orderStatus: OrderStatus;
@@ -27,7 +27,6 @@ export function ReservationOrderStatus({ orderStatus, testId }: Props): JSX.Elem
       case OrderStatus.Expired:
         return "error";
       case OrderStatus.Cancelled:
-      default:
         return "neutral";
     }
   }, [orderStatus]);

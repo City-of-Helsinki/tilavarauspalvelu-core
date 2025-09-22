@@ -3,7 +3,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { useSearchParams } from "next/navigation";
 import { useSearchModify } from "./useSearchValues";
 
-type NodeList = Pick<ReservationUnitNode, "pk">[];
+type NodeList = Array<Pick<ReservationUnitNode, "pk">>;
 type Node = NonNullable<NodeList>[0];
 type ReservationUnitList = {
   getReservationUnits: () => number[];

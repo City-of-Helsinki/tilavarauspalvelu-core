@@ -8,17 +8,19 @@ import { Flex, NoWrap, H1, H4, fontRegular } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
   ReservationStateChoice,
-  type ReservationPageQuery,
-  type ReservationPageQueryVariables,
   ReservationPageDocument,
-  type ApplicationReservationSeriesQuery,
-  type ApplicationReservationSeriesQueryVariables,
   ApplicationReservationSeriesDocument,
   OrderStatus,
   useAccessCodeQuery,
   AccessType,
   MunicipalityChoice,
   ReservationCancelReasonChoice,
+} from "@gql/gql-types";
+import type {
+  ReservationPageQuery,
+  ReservationPageQueryVariables,
+  ApplicationReservationSeriesQuery,
+  ApplicationReservationSeriesQueryVariables,
   PindoraReservationFragment,
 } from "@gql/gql-types";
 import Link from "next/link";
@@ -43,14 +45,14 @@ import {
   getFeedbackUrl,
   getReservationPath,
   getReservationUnitPath,
-  type ReservationNotifications,
   reservationsPrefix,
 } from "@/modules/urls";
+import type { ReservationNotifications } from "@/modules/urls";
 import { useToastIfQueryParam } from "@/hooks";
 import { convertLanguageCode } from "common/src/common/util";
 import { gql } from "@apollo/client";
-import StatusLabel from "common/src/components/StatusLabel";
-import IconButton from "common/src/components/IconButton";
+import { StatusLabel } from "common/src/components/StatusLabel";
+import { IconButton } from "common/src/components/IconButton";
 import {
   NotModifiableReason,
   Instructions,
@@ -65,7 +67,7 @@ import {
 } from "@/components/reservation";
 import { useSearchParams } from "next/navigation";
 import { queryOptions } from "@/modules/queryOptions";
-import { OptionsRecord } from "common";
+import type { OptionsRecord } from "common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -134,7 +136,8 @@ function shouldShowStatusNotification(
         (reservation.paymentOrder?.status === OrderStatus.Paid ||
           reservation.paymentOrder?.status === OrderStatus.PaidByInvoice)
       );
-    default:
+    case "polling_timeout":
+    case null:
       return false;
   }
 }
@@ -150,14 +153,16 @@ function shouldShowPaymentNotification(reservation: Pick<PropsNarrowed, "reserva
 
 /// Type safe "notify" query param converter
 function convertNotify(str: string | null): ReservationNotifications | null {
-  switch (str) {
-    case "requires_handling":
-    case "confirmed":
-    case "paid":
-      return str;
-    default:
-      return null;
+  if (str == null) {
+    return null;
   }
+
+  const allowedNotifications = ["requires_handling", "confirmed", "paid"];
+  if (allowedNotifications.includes(str)) {
+    return str as ReservationNotifications;
+  }
+
+  return null;
 }
 
 // TODO add a state check => if state is Created redirect to the reservation funnel

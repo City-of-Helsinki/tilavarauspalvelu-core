@@ -1,14 +1,12 @@
 import type { SelectedRow } from "@/lib/reservation-units";
 import { breakpoints } from "common/src/const";
 import { Flex } from "common/styled";
-import React, { type Dispatch, type SetStateAction } from "react";
+import React from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "next-i18next";
-import { type TFunction } from "i18next";
-import {
-  ReservationUnitPublishingState,
-  ReservationUnitReservationState,
-  type ReservationUnitTableElementFragment,
-} from "@gql/gql-types";
+import type { TFunction } from "i18next";
+import { ReservationUnitPublishingState, ReservationUnitReservationState } from "@gql/gql-types";
+import type { ReservationUnitTableElementFragment } from "@gql/gql-types";
 import { truncate } from "@/helpers";
 import { getOpeningHoursUrl, getReservationUnitUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
@@ -28,7 +26,7 @@ import {
 } from "hds-react";
 import { ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
 import type { StatusLabelType } from "common/src/tags";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import { gql } from "@apollo/client";
 import styled from "styled-components";
 
@@ -54,7 +52,8 @@ const getStatusLabelProps = (
     case ReservationUnitReservationState.ScheduledClosing:
     case ReservationUnitReservationState.ScheduledPeriod:
       return { type: "info", icon: <IconClock /> };
-    default:
+    case null:
+    case undefined:
       return { type: "info", icon: <IconQuestionCircleFill /> };
   }
 };
@@ -73,7 +72,9 @@ const getPublishingStateProps = (
       return { type: "draft", icon: <IconPen aria-hidden="true" /> };
     case ReservationUnitPublishingState.Hidden:
       return { type: "neutral", icon: <IconEyeCrossed aria-hidden="true" /> };
-    default:
+    case ReservationUnitPublishingState.Archived:
+    case null:
+    case undefined:
       return {
         type: "neutral",
         icon: <IconQuestionCircleFill aria-hidden="true" />,
@@ -187,7 +188,7 @@ export function ReservationUnitsTable({
       selectAllRowsText={t("common:selectAllRows")}
       clearSelectionsText={t("common:clearAllSelections")}
       setSelectedRows={setSelectedRows}
-      customActionButtons={[<ActionButtons t={t} selectedRows={selectedRows} apiBaseUrl={apiBaseUrl}></ActionButtons>]}
+      customActionButtons={[<ActionButtons key="1" t={t} selectedRows={selectedRows} apiBaseUrl={apiBaseUrl} />]}
     />
   );
 }
@@ -208,7 +209,7 @@ function ActionButtons({
   selectedRows: SelectedRow[];
   apiBaseUrl: string;
 }): JSX.Element {
-  const selectedPks = selectedRows.map((id) => Number(id)).filter((id) => !isNaN(id));
+  const selectedPks = selectedRows.map(Number).filter((id) => !Number.isNaN(id));
   const redirectOnErrorUrl = isBrowser ? window.location.href : undefined;
   const editLink =
     getOpeningHoursUrl(apiBaseUrl, selectedPks, redirectOnErrorUrl) !== ""
@@ -216,17 +217,17 @@ function ActionButtons({
       : undefined;
   return (
     <Spacer>
-      <Flex $gap={"xs"} $direction={"row"} $wrap={"wrap"}>
+      <Flex $gap="xs" $direction="row" $wrap="wrap">
         <Flex
-          $gap={"xs"}
-          $direction={"row"}
-          $alignItems={"center"}
+          $gap="xs"
+          $direction="row"
+          $alignItems="center"
           style={{ flexShrink: "1", maxWidth: "490px", marginRight: "auto" }}
         >
           <IconInfoCircle size={IconSize.Medium} />
           <div>{t("reservationUnit:editInfoText")}</div>
         </Flex>
-        <ButtonLikeExternalLink disabled={!editLink} href={editLink} target={"_blank"}>
+        <ButtonLikeExternalLink disabled={!editLink} href={editLink} target="_blank">
           {t("reservationUnit:goToMassEdit")}
           <IconLinkExternal />
         </ButtonLikeExternalLink>

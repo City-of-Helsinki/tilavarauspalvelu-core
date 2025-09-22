@@ -1,16 +1,9 @@
-import {
-  ApolloClient,
-  ApolloLink,
-  HttpLink,
-  InMemoryCache,
-  NormalizedCacheObject,
-  from,
-  disableFragmentWarnings,
-} from "@apollo/client";
+import type { ApolloLink, NormalizedCacheObject } from "@apollo/client";
+import { ApolloClient, HttpLink, InMemoryCache, from, disableFragmentWarnings } from "@apollo/client";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore -- types require nodenext which breaks bundler option that breaks the build
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
-import { type IncomingMessage } from "http";
+import type { IncomingMessage } from "node:http";
 import { buildGraphQLUrl } from "common/src/urlBuilder";
 import { env } from "@/env.mjs";
 import { isBrowser } from "./const";

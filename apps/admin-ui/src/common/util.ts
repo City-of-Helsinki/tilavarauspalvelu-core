@@ -1,12 +1,7 @@
 import { format, getDay, isSameDay, parseISO } from "date-fns";
 import { trim } from "lodash-es";
-import {
-  type Maybe,
-  type ReservationNode,
-  ReservationTypeChoice,
-  type LocationFieldsFragment,
-  type CalendarReservationNameFragment,
-} from "@gql/gql-types";
+import { ReservationTypeChoice } from "@gql/gql-types";
+import type { Maybe, ReservationNode, LocationFieldsFragment, CalendarReservationNameFragment } from "@gql/gql-types";
 import type { TFunction } from "next-i18next";
 import { toMondayFirstUnsafe, truncate } from "common/src/helpers";
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import { type ApprovalButtonsFragment, ReservationStateChoice } from "@gql/gql-types";
+import { ReservationStateChoice } from "@gql/gql-types";
+import type { ApprovalButtonsFragment } from "@gql/gql-types";
 import { addDays, addMinutes } from "date-fns";
 import { ApprovalButtons } from "./ApprovalButtons";
 import { describe, expect, test, vi } from "vitest";

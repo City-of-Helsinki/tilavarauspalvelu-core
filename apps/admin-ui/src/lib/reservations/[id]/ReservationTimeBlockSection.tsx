@@ -1,23 +1,20 @@
-import React, { forwardRef, type Ref, useEffect, useRef, useState } from "react";
-import CommonCalendar from "common/src/calendar/Calendar";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
+import type { Ref } from "react";
+import { CommonCalendar } from "common/src/calendar/CommonCalendar";
 import { Toolbar, ToolbarBtn } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import {
-  ReservationStateChoice,
-  ReservationTypeChoice,
-  type TimeBlockSectionFragment,
-  UserPermissionChoice,
-} from "@gql/gql-types";
+import { ReservationStateChoice, ReservationTypeChoice, UserPermissionChoice } from "@gql/gql-types";
+import type { TimeBlockSectionFragment } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { type CalendarEventType, type EventType } from "@/modules/reservation";
+import type { CalendarEventType, EventType } from "@/modules/reservation";
 import { eventStyleGetter, legend } from "./eventStyleGetter";
 import { Legend, LegendsWrapper } from "@/component/Legend";
 import { EditTimeModal } from "@/component/EditTimeModal";
 import { isPossibleToEdit } from "@/modules/reservationModificationRules";
 import { getEventBuffers } from "common/src/calendar/util";
 import { filterNonNullable, toNumber } from "common/src/helpers";
-import VisibleIfPermission from "@/component/VisibleIfPermission";
+import { VisibleIfPermission } from "@/component/VisibleIfPermission";
 import { useReservationCalendarData, useReservationSeries } from "@/hooks";
 import { add, startOfISOWeek } from "date-fns";
 import { ReservationSeriesView } from "@/component/ReservationSeriesView";
@@ -42,7 +39,7 @@ type CalendarProps = {
   reservation: TimeBlockSectionFragment;
   refetch: (focusDate?: Date) => void;
   focusDate: Date;
-  events: Array<CalendarEventType>;
+  events: CalendarEventType[];
 };
 
 /// @param reservation the current reservation to show in calendar
@@ -62,8 +59,8 @@ const Calendar = forwardRef(function Calendar(
   const selectedEvent = eventsAll.find((e) => e.event?.pk === selected);
 
   // Because the calendar is fixed to 6 - 24 interval anything outside it causes rendering artefacts.
-  const isInsideCalendarRange = (x: { start: Date; end: Date }) => x.end.getHours() > 6;
-  const events = eventsAll.filter(isInsideCalendarRange);
+  // Filter events to only include what's visible on the calendar.
+  const events = eventsAll.filter((x: { start: Date; end: Date }) => x.end.getHours() > 6);
 
   const handleEditAccept = () => {
     refetch();

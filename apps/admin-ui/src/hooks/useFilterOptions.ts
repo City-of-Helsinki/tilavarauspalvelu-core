@@ -8,8 +8,9 @@ import {
   ReserveeType,
   useFilterOptionsQuery,
 } from "@gql/gql-types";
-import { type TFunction, useTranslation } from "next-i18next";
-import { type TagOptionsList } from "@/modules/search";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
+import type { TagOptionsList } from "@/modules/search";
 import { gql } from "@apollo/client";
 import { filterNonNullable, sort } from "common/src/helpers";
 
@@ -76,17 +77,18 @@ export function getFilterOptions(
     label: t(`applicationSection:priority.${n}`),
   }));
 
-  const orderOptions = Array.from(Array(10).keys())
-    .map((n) => ({
-      value: n,
-      label: `${n + 1}. ${t("filters:reservationUnitApplication")}`,
-    }))
-    .concat([
-      {
-        value: 11,
-        label: t("filters:reservationUnitApplicationOthers"),
-      },
-    ]);
+  const orderOptions = [
+    ...Array.from({ length: 10 })
+      .keys()
+      .map((n) => ({
+        value: n,
+        label: `${n + 1}. ${t("filters:reservationUnitApplication")}`,
+      })),
+    {
+      value: 11,
+      label: t("filters:reservationUnitApplicationOthers"),
+    },
+  ];
 
   const recurring = [
     { value: "only", label: t("filters:label.onlyRecurring") },

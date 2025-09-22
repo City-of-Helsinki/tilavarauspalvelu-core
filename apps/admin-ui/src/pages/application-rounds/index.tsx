@@ -3,13 +3,8 @@ import { gql } from "@apollo/client";
 import { orderBy } from "lodash-es";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import {
-  ApplicationRoundStatusChoice,
-  type ApplicationRoundNode,
-  useApplicationRoundListQuery,
-  type ApplicationRoundListElementFragment,
-  UserPermissionChoice,
-} from "@gql/gql-types";
+import { ApplicationRoundStatusChoice, useApplicationRoundListQuery, UserPermissionChoice } from "@gql/gql-types";
+import type { ApplicationRoundNode, ApplicationRoundListElementFragment } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { getApplicationRoundUrl } from "@/common/urls";
 import { formatDate } from "@/common/util";
@@ -23,7 +18,7 @@ import { CenterSpinner, Flex, H1 } from "common/styled";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 
 const AccordionWithoutTopPadding = styled(Accordion).attrs({
   closeButton: false,

@@ -3,7 +3,7 @@ import { render, within } from "@testing-library/react";
 import SearchSingle from "@/pages/search";
 import { createOptionMock } from "@/test/test.gql.utils";
 import { AccessType, ReservationKind } from "@gql/gql-types";
-import { type OptionsListT } from "common/src/modules/search";
+import type { OptionsListT } from "common/src/modules/search";
 import { MockedGraphQLProvider } from "../test.react.utils";
 import { createGraphQLMocks } from "../gql.mocks";
 
@@ -48,12 +48,12 @@ function customRender(): ReturnType<typeof render> {
         options={options}
         matomoEnabled={false}
         hotjarEnabled={false}
-        profileLink={""}
-        apiBaseUrl={"http://localhost:8000"}
-        feedbackUrl={"http://localhost:8000"}
-        sentryDsn={""}
-        sentryEnvironment={"CI"}
-        version={""}
+        profileLink=""
+        apiBaseUrl="http://localhost:8000"
+        feedbackUrl="http://localhost:8000"
+        sentryDsn=""
+        sentryEnvironment="CI"
+        version=""
       />
     </MockedGraphQLProvider>
   );
@@ -61,7 +61,7 @@ function customRender(): ReturnType<typeof render> {
 
 describe("SearchSingle read query params", () => {
   function selectFilterParamsForTest(
-    keys: (
+    keys: Array<
       | "textSearch"
       | "startDate"
       | "endDate"
@@ -74,7 +74,7 @@ describe("SearchSingle read query params", () => {
       | "duration"
       | "personsAllowed"
       | "accessTypes"
-    )[]
+    >
   ) {
     // Helper to return a list of objects to be used in "test.for([...])"
     const filterParams = {
@@ -228,7 +228,7 @@ describe("SearchSingle read query params", () => {
       if (field instanceof HTMLInputElement) {
         expect(field.value).toBe(formFieldText ?? "");
       } else {
-        throw new Error();
+        throw new TypeError();
       }
     }
   );
@@ -259,7 +259,7 @@ describe("SearchSingle read query params", () => {
       if (field instanceof HTMLInputElement) {
         expect(field.value).toBe(formFieldText ?? "");
       } else {
-        throw new Error();
+        throw new TypeError();
       }
     }
   );

@@ -11,19 +11,15 @@ import { useDisplayError } from "common/src/hooks";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getApplicationPath } from "@/modules/urls";
-import {
-  ApplicationPage2Document,
-  useUpdateApplicationMutation,
-  type ApplicationPage2Query,
-  type ApplicationPage2QueryVariables,
-} from "@/gql/gql-types";
+import { ApplicationPage2Document, useUpdateApplicationMutation } from "@/gql/gql-types";
+import type { ApplicationPage2Query, ApplicationPage2QueryVariables } from "@/gql/gql-types";
 import { ApplicationFunnelWrapper, Page2 as Page2Impl } from "@/components/application/funnel";
 import {
-  type ApplicationPage2FormValues,
   transformApplicationPage2,
   convertApplicationPage2,
   ApplicationPage2Schema,
 } from "@/components/application/funnel/form";
+import type { ApplicationPage2FormValues } from "@/components/application/funnel/form";
 
 function Page2({ application }: Pick<PropsNarrowed, "application">): JSX.Element {
   const router = useRouter();
@@ -32,7 +28,8 @@ function Page2({ application }: Pick<PropsNarrowed, "application">): JSX.Element
 
   const saveAndNavigate = async (values: ApplicationPage2FormValues) => {
     try {
-      const isInvalidPk = values.applicationSections.some((section) => typeof section.pk !== "number");
+      // Log to Sentry if not number (should not happen but has happened)
+      const isInvalidPk = values.applicationSections.some((section) => typeof (section.pk as unknown) !== "number");
       if (isInvalidPk) {
         const context = {
           level: "error" as const,

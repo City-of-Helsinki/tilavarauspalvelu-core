@@ -1,7 +1,8 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { Checkbox, TextInput } from "hds-react";
-import { type SubmitHandler, useForm, Controller } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import type { SubmitHandler } from "react-hook-form";
 import styled from "styled-components";
 import { addYears, startOfDay } from "date-fns";
 import { ControlledNumberInput, TimeRangePicker } from "common/src/components/form";
@@ -10,12 +11,13 @@ import { fromUIDate } from "@/modules/util";
 import { getDurationOptions } from "@/modules/const";
 import { DateRangePicker } from "@/components/form";
 import { FilterTagList } from "../FilterTagList";
-import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
+import { SingleLabelInputGroup } from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { type OptionsListT } from "common/src/modules/search";
+import type { OptionsListT } from "common/src/modules/search";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
-import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
 import { ignoreMaybeArray, mapParamToInteger, toNumber } from "common/src/helpers";
 import { Flex } from "common/styled";
@@ -89,6 +91,9 @@ type SingleSearchFormProps = {
   isLoading: boolean;
 };
 
+// Handle possible number / string comparison
+const compFn = (a: { value: unknown }, b: string) => a != null && String(a.value) === b;
+
 // TODO rewrite this without the form state (use query params directly, but don't refresh the page)
 export function SingleSearchForm({
   options: { reservationUnitTypes, purposes, units, equipments },
@@ -111,9 +116,6 @@ export function SingleSearchForm({
   }));
 
   const translateTag = (key: string, value: string): string | undefined => {
-    // Handle possible number / string comparison
-    const compFn = (a: { value: unknown }, b: string) => a != null && String(a.value) === b;
-
     // TODO should rework the find matcher (typing issues) (it works but it's confusing)
     switch (key) {
       case "units":
@@ -150,11 +152,11 @@ export function SingleSearchForm({
     formValues.timeBegin ||
     formValues.timeEnd ||
     formValues.duration ||
-    formValues.units.length ||
+    formValues.units.length > 0 ||
     formValues.personsAllowed ||
-    formValues.purposes.length ||
-    formValues.equipments.length ||
-    formValues.accessTypes.length
+    formValues.purposes.length > 0 ||
+    formValues.equipments.length > 0 ||
+    formValues.accessTypes.length > 0
   );
 
   return (
@@ -228,8 +230,8 @@ export function SingleSearchForm({
           <TimeRangePicker
             names={{ begin: "timeBegin", end: "timeEnd" }}
             labels={{
-              begin: `${t("common:timeLabelBegin")}`,
-              end: `${t("common:timeLabelEnd")}`,
+              begin: t("common:timeLabelBegin"),
+              end: t("common:timeLabelEnd"),
             }}
             placeholders={{
               begin: t("common:beginLabel"),

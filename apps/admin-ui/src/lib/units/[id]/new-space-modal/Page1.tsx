@@ -3,8 +3,9 @@ import { Button, ButtonVariant, Dialog, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { ParentSelector } from "../ParentSelector";
 import { StyledTag } from "./modules/newSpaceModal";
-import { Controller, UseFormReturn } from "react-hook-form";
-import { SpaceUpdateForm } from "../SpaceForm";
+import type { UseFormReturn } from "react-hook-form";
+import { Controller } from "react-hook-form";
+import type { SpaceUpdateForm } from "../SpaceForm";
 import { DialogActionsButtons } from "@/styled";
 import { H4 } from "common/styled";
 

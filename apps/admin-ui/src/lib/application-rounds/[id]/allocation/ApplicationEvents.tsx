@@ -3,23 +3,21 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Flex, H4, fontMedium } from "common/styled";
 import { breakpoints } from "common/src/const";
-import {
-  type ApplicationRoundStatusChoice,
-  ApplicationSectionStatusChoice,
-  type ApplicationSectionAllocationsQuery,
-  type ReservationUnitNode,
+import { ApplicationSectionStatusChoice } from "@gql/gql-types";
+import type {
+  ApplicationRoundStatusChoice,
+  ApplicationSectionAllocationsQuery,
+  ReservationUnitNode,
 } from "@gql/gql-types";
 import { Accordion } from "@/component/Accordion";
 import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";
-import { type AllocationApplicationSectionCardType, ApplicationSectionCard } from "./ApplicationEventCard";
-import { type ApolloQueryResult } from "@apollo/client";
+import { ApplicationSectionCard } from "./ApplicationEventCard";
+import type { AllocationApplicationSectionCardType } from "./ApplicationEventCard";
+import type { ApolloQueryResult } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
-import {
-  type AllocatedTimeSlotNodeT,
-  getRelatedTimeSlots,
-  type SectionNodeT,
-} from "./modules/applicationRoundAllocation";
+import { getRelatedTimeSlots } from "./modules/applicationRoundAllocation";
+import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
 import { SelectedSlotsContextProvider } from "./SelectedSlotsContext";
 
 // TODO max-width for the grid columns (315px, 480px, 332px)
@@ -70,7 +68,7 @@ function EventGroupList({
   type: AllocationApplicationSectionCardType;
   refetch: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
 }): JSX.Element {
-  if (applicationSections.length < 1) {
+  if (applicationSections.length === 0) {
     return <div>-</div>;
   }
 
@@ -95,7 +93,7 @@ type ApplicationEventsProps = {
   reservationUnit: Pick<ReservationUnitNode, "pk">;
   refetchApplicationEvents: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
   applicationRoundStatus: ApplicationRoundStatusChoice;
-  relatedAllocations: Pick<AllocatedTimeSlotNodeT, "dayOfTheWeek" | "beginTime" | "endTime">[];
+  relatedAllocations: Array<Pick<AllocatedTimeSlotNodeT, "dayOfTheWeek" | "beginTime" | "endTime">>;
 };
 
 /// TODO rename to something more descriptive
@@ -169,6 +167,11 @@ export function AllocationPageContent({
   );
 }
 
+// allocations are not specific to the reservation unit
+const isAllocated = (section: ApplicationEventsProps["applicationSections"][0]) => {
+  return section.allocations != null && section.allocations > 0;
+};
+
 function ApplicationSectionColumn({
   applicationSections,
   reservationUnit,
@@ -179,23 +182,20 @@ function ApplicationSectionColumn({
 
   const sections = filterNonNullable(applicationSections);
 
-  // allocations are not specific to the reservation unit
-  const isAllocated = (as: (typeof sections)[0]) => as.allocations != null && as.allocations > 0;
-
-  const isAllocatedToThisUnit = (as: (typeof sections)[0]) =>
-    as.reservationUnitOptions
+  const isAllocatedToThisUnit = (section: (typeof sections)[0]) =>
+    section.reservationUnitOptions
       .filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk)
       ?.map((ruo) => ruo.allocatedTimeSlots.length > 0)
       .some(Boolean);
 
   // Locked is specific to this reservation unit
-  const isLocked = (as: (typeof sections)[0]) =>
-    as.reservationUnitOptions
+  const isLocked = (section: (typeof sections)[0]) =>
+    section.reservationUnitOptions
       .filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk)
       ?.map((ruo) => ruo.isLocked)
       .some(Boolean);
-  const isRejected = (as: (typeof sections)[0]) =>
-    as.reservationUnitOptions
+  const isRejected = (section: (typeof sections)[0]) =>
+    section.reservationUnitOptions
       .filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk)
       ?.map((ruo) => ruo.isRejected)
       .some(Boolean);
@@ -216,7 +216,7 @@ function ApplicationSectionColumn({
 
   // locked or rejected but not in the allocated list
   const locked = sections
-    .filter((x) => allocated.find((y) => x.pk === y.pk) == null)
+    .filter((x) => allocated.some((y) => x.pk === y.pk))
     .filter((as) => isLocked(as) || isRejected(as));
 
   // take certain states and omit colliding application events

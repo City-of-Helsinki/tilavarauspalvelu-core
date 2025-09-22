@@ -1,4 +1,5 @@
-import React, { forwardRef, type Ref } from "react";
+import React, { forwardRef } from "react";
+import type { Ref } from "react";
 import NukaCarousel from "nuka-carousel";
 import { IconAngleLeft, IconAngleRight, IconSize } from "hds-react";
 import styled from "styled-components";
@@ -80,7 +81,7 @@ const CustomBottomControls = styled.div`
   }
 `;
 
-const Carousel = forwardRef(function Carousel(
+export const Carousel = forwardRef(function Carousel(
   {
     children,
     slidesToShow = 1,
@@ -153,5 +154,3 @@ const Carousel = forwardRef(function Carousel(
     </StyledCarousel>
   );
 });
-
-export default Carousel;

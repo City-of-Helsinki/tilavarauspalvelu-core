@@ -1,18 +1,13 @@
 import React, { Children, cloneElement, useEffect, useMemo, useState } from "react";
-import {
-  type BlockingReservationFieldsFragment,
+import { ReservationTypeChoice, useListReservationsQuery } from "@/gql/gql-types";
+import type {
+  BlockingReservationFieldsFragment,
+  ReservationTimePickerFieldsFragment,
   ReservationNode,
-  type ReservationTimePickerFieldsFragment,
-  ReservationTypeChoice,
-  useListReservationsQuery,
 } from "@/gql/gql-types";
 import styled from "styled-components";
-import Calendar, {
-  type SlotClickProps,
-  type CalendarEvent,
-  SlotProps,
-  type CalendarEventBuffer,
-} from "common/src/calendar/Calendar";
+import { CommonCalendar } from "common/src/calendar/CommonCalendar";
+import type { SlotClickProps, CalendarEvent, CalendarEventBuffer, SlotProps } from "common/src/calendar/CommonCalendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import { addMinutes, differenceInMinutes } from "date-fns";
 import { eventStyleGetter } from "@/components/common/calendarUtils";
@@ -27,18 +22,14 @@ import {
   getDurationOptions,
   getNewReservation,
 } from "@/modules/reservation";
-import {
-  type ReservableMap,
-  getBoundCheckedReservation,
-  getSlotPropGetter,
-  isRangeReservable,
-} from "@/modules/reservable";
+import { getBoundCheckedReservation, getSlotPropGetter, isRangeReservable } from "@/modules/reservable";
+import type { ReservableMap } from "@/modules/reservable";
 import { formatDuration, fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
 import { useTranslation } from "next-i18next";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
 import { getTimeString } from "@/modules/reservationUnit";
-import { type UseFormReturn } from "react-hook-form";
-import { type PendingReservationFormType } from "../reservation-unit/schema";
+import type { UseFormReturn } from "react-hook-form";
+import type { PendingReservationFormType } from "../reservation-unit/schema";
 import { useCurrentUser } from "@/hooks";
 import { gql } from "@apollo/client";
 
@@ -73,7 +64,7 @@ const CalendarFooter = styled.div`
 export type ReservationTimePickerProps = Readonly<{
   reservationUnit: ReservationTimePickerFieldsFragment;
   reservableTimes: ReservableMap;
-  blockingReservations: readonly BlockingReservationFieldsFragment[];
+  blockingReservations: ReadonlyArray<BlockingReservationFieldsFragment>;
   reservationForm: UseFormReturn<PendingReservationFormType>;
   isReservationQuotaReached: boolean;
   submitReservation: (d: PendingReservationFormType) => void;
@@ -114,7 +105,7 @@ function useCalendarEventChange({
   blockingReservations,
 }: Pick<ReservationTimePickerProps, "reservationUnit"> & {
   focusSlot: ReturnType<typeof convertFormToFocustimeSlot>;
-  blockingReservations: readonly BlockingReservationFieldsFragment[];
+  blockingReservations: ReadonlyArray<BlockingReservationFieldsFragment>;
 }): Array<CalendarEventBuffer | CalendarEvent<ReservationNode>> {
   const { t } = useTranslation();
   // TODO this doesn't optimize anything
@@ -360,7 +351,7 @@ export function ReservationTimePicker({
     <>
       {/* TODO is calendar ref necessary? */}
       <div aria-hidden /* ref={calendarRef} */>
-        <Calendar<ReservationNode>
+        <CommonCalendar<ReservationNode>
           events={calendarEvents}
           begin={focusDate}
           onNavigate={(d: Date) => setValue("date", toUIDate(d))}

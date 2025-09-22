@@ -1,5 +1,7 @@
-import { UseFormReturn, Controller } from "react-hook-form";
-import { EditorColumns, type ResourceUpdateForm } from "./modules/resourceEditor";
+import type { UseFormReturn } from "react-hook-form";
+import { Controller } from "react-hook-form";
+import { EditorColumns } from "./modules/resourceEditor";
+import type { ResourceUpdateForm } from "./modules/resourceEditor";
 import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { ParentSelector } from "./ParentSelector";
@@ -35,8 +37,8 @@ export function ResourceEditorFields({
       />
       {(["nameFi", "nameEn", "nameSv"] as const).map((fieldName) => (
         <TextInput
-          {...register(fieldName)}
           key={fieldName}
+          {...register(fieldName)}
           required={fieldName === "nameFi"}
           id={fieldName}
           maxLength={80}

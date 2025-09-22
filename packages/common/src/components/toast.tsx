@@ -1,5 +1,6 @@
 import React from "react";
-import { ToastContainer as TC, toast as toastFn, ToastOptions, type Id } from "react-toastify";
+import { ToastContainer as TC, toast as toastFn } from "react-toastify";
+import type { Id, ToastOptions } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { IconCheckCircleFill, IconErrorFill, IconInfoCircleFill, Notification } from "hds-react";
 import styled from "styled-components";
@@ -113,7 +114,7 @@ const HDSNotification = styled(Notification)`
 `;
 
 // any component can use this function to show a toast, as long as <ToastContainer /> is rendered somewhere in the app
-export default function toast({
+export function toast({
   label,
   text,
   type = "info",
@@ -135,7 +136,8 @@ export default function toast({
     case "success":
       toastOptions.icon = <IconCheckCircleFill />;
       break;
-    default:
+    case "alert":
+    case "info":
       toastOptions.icon = <IconInfoCircleFill />;
   }
   return toastFn(

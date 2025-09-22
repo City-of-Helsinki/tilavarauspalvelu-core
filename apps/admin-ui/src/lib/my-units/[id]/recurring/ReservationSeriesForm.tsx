@@ -1,25 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type CreateStaffReservationFragment,
-  type Maybe,
-  ReservationTypeChoice,
-  useReservationUnitQuery,
-} from "@gql/gql-types";
+import { ReservationTypeChoice, useReservationUnitQuery } from "@gql/gql-types";
+import type { CreateStaffReservationFragment, Maybe } from "@gql/gql-types";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, LoadingSpinner, Notification, TextInput } from "hds-react";
 import styled from "styled-components";
 import { fromUIDate } from "common/src/common/util";
-import {
-  type ReservationFormMeta,
-  type ReservationSeriesForm as ReservationSeriesFormT,
-  ReservationSeriesFormSchema,
-} from "@/schemas";
-import { type NewReservationListItem } from "@/component/ReservationsList";
+import { ReservationSeriesFormSchema } from "@/schemas";
+import type { ReservationFormMeta, ReservationSeriesForm as ReservationSeriesFormT } from "@/schemas";
+import type { NewReservationListItem } from "@/component/ReservationsList";
 import { WeekdaysSelector } from "@/component/WeekdaysSelector";
 import { useCreateReservationSeries, useFilteredReservationList, useMultipleReservation } from "@/hooks";
-import ReservationTypeForm from "@/component/ReservationTypeForm";
+import { ReservationTypeForm } from "@/component/ReservationTypeForm";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { createNodeId, getNode, toNumber } from "common/src/helpers";
@@ -36,7 +29,7 @@ import { SelectFilter } from "@/component/QueryParamFilters";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { getMyUnitUrl, getReservationSeriesUrl } from "@/common/urls";
-import { type OptionT } from "common/src/modules/search";
+import type { OptionT } from "common/src/modules/search";
 
 const InnerTextInput = styled(TextInput)`
   grid-column: 1 / -1;
@@ -46,7 +39,7 @@ const InnerTextInput = styled(TextInput)`
 const TRANS_PREFIX = "myUnits:ReservationSeriesForm";
 
 function filterOutRemovedReservations(items: NewReservationListItem[], removedReservations: NewReservationListItem[]) {
-  return items.filter((x) => !removedReservations.find((y) => isReservationEq(x, y)));
+  return items.filter((x) => !removedReservations.some((y) => isReservationEq(x, y)));
 }
 
 interface SeriesProps {
@@ -166,9 +159,9 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
   const onSubmit = async ({ enableBufferTimeBefore, enableBufferTimeAfter, ...data }: FormValues) => {
     setLocalError(null);
 
-    const skipDates = removedReservations
-      .concat(checkedReservations.reservations.filter((x) => x.isOverlapping))
-      .map((x) => x.date);
+    const skipDates = [...removedReservations, ...checkedReservations.reservations.filter((x) => x.isOverlapping)].map(
+      (x) => x.date
+    );
 
     if (checkedReservations.reservations.length - skipDates.length === 0) {
       errorToast({ text: t(translateError("noReservations")) });
@@ -194,8 +187,8 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
       });
 
       router.push(getReservationSeriesUrl(unitPk, recurringPk, "completed"));
-    } catch (e) {
-      const errs = getSeriesOverlapErrors(e);
+    } catch (err) {
+      const errs = getSeriesOverlapErrors(err);
       if (errs.length > 0) {
         const overlaps = errs.flatMap((x) => x.overlapping);
         // TODO would be better if we highlighted the new ones in the list (different style)
@@ -204,9 +197,9 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
         // or maybe we can just retry the mutation without the collisions and show them on the next page?
         const count = overlaps.length;
         setLocalError(t("myUnits:ReservationSeriesForm.newOverlapError", { count }));
-        document.getElementById("create-recurring__reservations-list")?.scrollIntoView();
+        document.querySelector("#create-recurring__reservations-list")?.scrollIntoView();
       } else {
-        displayError(e);
+        displayError(err);
         // on exception in ReservationSeries (because we are catching the individual errors)
         // We don't need to cleanup the ReservationSeries that has zero connections.
         // Based on documentation backend will do this for us.
@@ -336,7 +329,7 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
           <Flex $direction="row" $justifyContent="flex-end" style={{ gridColumn: "1 / -1" }}>
             {/* cancel is disabled while sending because we have no rollback */}
             <ButtonLikeLink
-              href={`${getMyUnitUrl(unitPk)}`}
+              href={getMyUnitUrl(unitPk)}
               disabled={isSubmitting}
               data-testid="recurring-reservation-form__cancel-button"
             >

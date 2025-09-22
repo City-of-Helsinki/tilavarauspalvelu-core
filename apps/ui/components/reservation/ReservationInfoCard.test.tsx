@@ -2,15 +2,10 @@ import { ReservationInfoCard } from "./";
 import { render, screen } from "@testing-library/react";
 import { future1hReservation } from "@test/reservation.mocks";
 import { describe, expect, it } from "vitest";
-import {
-  AccessType,
-  ReservationUnitImageType,
-  PaymentType,
-  PriceUnit,
-  type ReservationInfoCardFragment,
-  ReservationStateChoice,
-} from "@gql/gql-types";
-import { type CreateGraphQLMockProps, generateNameFragment } from "@/test/test.gql.utils";
+import { AccessType, ReservationUnitImageType, PaymentType, PriceUnit, ReservationStateChoice } from "@gql/gql-types";
+import type { ReservationInfoCardFragment } from "@gql/gql-types";
+import { generateNameFragment } from "@/test/test.gql.utils";
+import type { CreateGraphQLMockProps } from "@/test/test.gql.utils";
 import { createNodeId } from "common/src/helpers";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { MockedGraphQLProvider } from "@test/test.react.utils";

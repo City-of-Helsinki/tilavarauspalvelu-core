@@ -5,7 +5,7 @@ import { Header, IconLinkExternal, IconSignout, IconStar, IconUser, LogoSize, Ti
 import React from "react";
 import styled from "styled-components";
 import { useLocation } from "react-use";
-import Logo from "common/src/components/Logo";
+import { Logo } from "common/src/components/Logo";
 import { hasSomePermission } from "@/modules/permissionHelper";
 import { env } from "@/env.mjs";
 import {
@@ -238,7 +238,7 @@ function NavigationLink({
     if (route != null) {
       // NOTE: this is a workaround for the HDS Header component not closing the mobile menu on navigation, if there isn't a page reload
       // TODO: remove this when HDS Header is fixed
-      document.getElementById("Menu")?.querySelector("button")?.click();
+      document.querySelector("#Menu")?.querySelector("button")?.click();
       router.push(route);
     }
   };

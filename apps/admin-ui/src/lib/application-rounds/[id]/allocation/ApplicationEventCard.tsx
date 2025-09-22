@@ -2,24 +2,17 @@ import React, { useState } from "react";
 import { IconAngleDown, IconAngleUp, IconLinkExternal, IconSize, RadioButton } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled, { css } from "styled-components";
-import {
-  type ApplicationSectionAllocationsQuery,
-  type Maybe,
-  type ReservationUnitNode,
-  useRejectRestMutation,
-} from "@gql/gql-types";
+import { useRejectRestMutation } from "@gql/gql-types";
+import type { ApplicationSectionAllocationsQuery, Maybe, ReservationUnitNode } from "@gql/gql-types";
 import { fontMedium, SemiBold } from "common/styled";
 import { filterNonNullable, truncate } from "common/src/helpers";
 import { convertWeekday } from "common/src/conversion";
-import {
-  type AllocatedTimeSlotNodeT,
-  createDurationString,
-  formatSuitableTimeRange,
-  type SectionNodeT,
-} from "./modules/applicationRoundAllocation";
+import { createDurationString, formatSuitableTimeRange } from "./modules/applicationRoundAllocation";
+import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
 import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
 import { PopupMenu } from "common/src/components/PopupMenu";
-import { type ApolloQueryResult, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import { getApplicationUrl } from "@/common/urls";
 import { getApplicantName } from "@/helpers";
 import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/common/const";
@@ -48,7 +41,7 @@ const borderCss = css<{ $type: AllocationApplicationSectionCardType }>`
         return "4px solid var(--color-success)";
       case "partial":
         return "4px solid var(--color-alert-dark)";
-      default:
+      case "unallocated":
         return "1px solid var(--color-black-10)";
     }
   }};
@@ -278,12 +271,10 @@ function SchedulesList({
       if (ruo.allocatedTimeSlots == null) {
         return null;
       }
-      return [
-        ...ruo.allocatedTimeSlots.map((ats) => ({
-          ...ats,
-          reservationUnitOption: ruo,
-        })),
-      ];
+      return ruo.allocatedTimeSlots.map((ats) => ({
+        ...ats,
+        reservationUnitOption: ruo,
+      }));
     })
   ).sort((a, b) => convertWeekday(a.dayOfTheWeek) - convertWeekday(b.dayOfTheWeek));
 

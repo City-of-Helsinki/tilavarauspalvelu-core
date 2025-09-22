@@ -12,25 +12,23 @@ import {
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import {
-  type ApplicationReservationUnitListFragment,
-  type RecurringCardFragment,
-  ReservationKind,
-} from "@gql/gql-types";
+import { ReservationKind } from "@gql/gql-types";
+import type { ApplicationReservationUnitListFragment, RecurringCardFragment } from "@gql/gql-types";
 import { filterNonNullable, getImageSource, getMainImage } from "common/src/helpers";
 import { CenterSpinner, Flex, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
-import Card from "common/src/components/Card";
+import { Card } from "common/src/components/Card";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 // TODO this is weird import path
-import { SearchFormValues, SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
+import type { SearchFormValues } from "@/components/recurring/SeasonalSearchForm";
+import { SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { processVariables } from "@/modules/search";
-import { type OptionsListT } from "common/src/modules/search";
+import type { OptionsListT } from "common/src/modules/search";
 import { useSearchParams } from "next/navigation";
 import { useSearchQuery } from "@/hooks";
 
@@ -122,7 +120,7 @@ export type ReservationUnitModalProps = Readonly<{
   applicationRound: AppRoundNode;
   handleAdd: (ru: Pick<RecurringCardFragment, "pk">) => void;
   handleRemove: (ru: Pick<RecurringCardFragment, "pk">) => void;
-  currentReservationUnits: Pick<RecurringCardFragment, "pk">[];
+  currentReservationUnits: Array<Pick<RecurringCardFragment, "pk">>;
   options: Pick<OptionsListT, "purposes" | "reservationUnitTypes" | "units">;
 }>;
 
@@ -170,7 +168,7 @@ export function ReservationUnitModalContent({
           <ReservationUnitCard
             handleAdd={(pk) => handleAdd({ pk })}
             handleRemove={(pk) => handleRemove({ pk })}
-            isSelected={currentReservationUnits.find((i) => i.pk === ru.pk) !== undefined}
+            isSelected={currentReservationUnits.some((i) => i.pk === ru.pk)}
             reservationUnit={ru}
             key={ru.pk}
           />

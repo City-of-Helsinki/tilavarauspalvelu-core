@@ -2,13 +2,14 @@ import Page1 from "@/pages/applications/[id]/page1";
 import { render, screen, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import { createGraphQLMocks } from "@test/gql.mocks";
-import { createMockApplicationFragment, type CreateMockApplicationFragmentProps } from "@test/application.mocks";
+import { createMockApplicationFragment } from "@test/application.mocks";
+import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
 import { createOptionMock } from "@test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
 import { selectFirstOption } from "@test/test.utils";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
-import { type OptionsListT } from "common/src/modules/search";
+import type { OptionsListT } from "common/src/modules/search";
 
 const { mockedRouterPush, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -168,7 +169,7 @@ describe("Page1", () => {
     await user.click(submitBtn);
     expect(view.queryAllByText(/application:validation/)).toStrictEqual([]);
     expect(mockedRouterPush).toHaveBeenCalled();
-  }, 10000);
+  }, 10_000);
 
   test("applied events over 7 should be invalid", async () => {
     const view = customRender();

@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { vi, expect, afterEach, afterAll, beforeAll, type Mock } from "vitest";
+import { vi, expect, afterEach, afterAll, beforeAll } from "vitest";
+import type { Mock } from "vitest";
 // TODO add vitest-axe
 
 beforeAll(() => {
@@ -23,13 +24,13 @@ vi.mock("next-i18next", async (importOriginal) => {
     ...(await importOriginal()),
     useTranslation: () => {
       return {
-        t: (str: string, args: unknown) => `${str}${args ? " " + JSON.stringify(args) : ""}`,
+        t: (str: string, args: unknown) => `${str}${args ? ` ${JSON.stringify(args)}` : ""}`,
         // t: (str: string) => str,
         i18n: {
           changeLanguage: () => new Promise(() => {}),
           language: "fi",
           exists: (str: string) => {
-            return !str.match(/failExistsOnPurpose/i);
+            return !/failExistsOnPurpose/i.test(str);
           },
         },
       };

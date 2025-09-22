@@ -3,21 +3,24 @@
  *  This component needs to be wrapped inside a Form context
  */
 import { Button, ButtonVariant, IconArrowRight, IconCross, LoadingSpinner, Notification } from "hds-react";
-import { useFormContext, UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import React, { useState } from "react";
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import MetaFields from "common/src/reservation-form/MetaFields";
+import { MetaFields } from "common/src/reservation-form/MetaFields";
 import { ActionContainer } from "./styles";
-import InfoDialog from "../common/InfoDialog";
-import { type ReservationInProgressFragment, ReserveeType } from "@gql/gql-types";
+import { InfoDialog } from "../common/InfoDialog";
+import { ReserveeType } from "@gql/gql-types";
+import type { ReservationInProgressFragment } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { containsField, FieldName } from "common/src/metaFieldsHelpers";
+import type { FieldName } from "common/src/metaFieldsHelpers";
+import { containsField } from "common/src/metaFieldsHelpers";
 import { getApplicationFields, getGeneralFields } from "./SummaryFields";
-import { type Inputs } from "common/src/reservation-form/types";
+import type { Inputs } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
-import { type OptionsRecord } from "common";
+import type { OptionsRecord } from "common";
 
 type Props = {
   cancelReservation: () => void;
@@ -144,7 +147,7 @@ function Errors({
   // TODO clean this up
   const errorKeys =
     Object.keys(errors).sort((a, b) => {
-      const fields = [...supportedFields.map((x) => x.fieldName)];
+      const fields = supportedFields.map((x) => x.fieldName);
       // Why?
       return fields.indexOf(a) - fields.indexOf(b);
     }) ?? [];
@@ -165,7 +168,7 @@ function Errors({
       <ErrorList>
         {errorKeys.map((key: string) => {
           const fieldType =
-            generalFields.find((x) => x === key) != null || key === "reserveeType"
+            key === "reserveeType" || generalFields.some((x) => x === key)
               ? "common"
               : reserveeType?.toLocaleLowerCase() || "individual";
           return (
@@ -174,6 +177,7 @@ function Errors({
                 href="#!"
                 onClick={(e) => {
                   e.preventDefault();
+                  // oxlint-disable-next-line prefer-query-selector
                   const element = document.getElementById(key) || document.getElementById(`${key}-label`);
                   const top = element?.getBoundingClientRect()?.y || 0;
                   window.scroll({

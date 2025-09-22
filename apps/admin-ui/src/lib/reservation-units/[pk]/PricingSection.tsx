@@ -3,7 +3,8 @@ import styled from "styled-components";
 import { addDays, startOfDay } from "date-fns";
 import { IconAlertCircleFill, RadioButton } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { Controller, UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { AutoGrid } from "common/styled";
 import {
   ControlledDateInput,
@@ -14,7 +15,7 @@ import {
 import { PaymentType, PriceUnit } from "@gql/gql-types";
 import { getTranslatedError } from "@/common/util";
 import { FieldGroup } from "./FieldGroup";
-import { ReservationUnitEditFormValues } from "./form";
+import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 
 const Error = styled.div`
@@ -279,14 +280,14 @@ export function PricingSection({
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
   taxPercentageOptions: TaxOption[];
-  pricingTermsOptions: { value: string; label: string }[];
+  pricingTermsOptions: Array<{ value: string; label: string }>;
 }) {
   const { t } = useTranslation("reservationUnitEditor");
   const { control, watch, formState } = form;
   const { errors } = formState;
 
   const pricings = watch("pricings");
-  const isPaid = pricings.filter((p) => p.isPaid).length > 0;
+  const isPaid = pricings.some((p) => p.isPaid);
   const hasErrors = errors.pricings != null;
 
   return (

@@ -3,16 +3,19 @@ import { useTranslation } from "next-i18next";
 import { AutoGrid, Flex, HR } from "common/styled";
 import { SearchTags } from "@/component/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
-import { AccessCodeState, ApplicationSectionStatusChoice, ApplicationStatusChoice, ReserveeType } from "@gql/gql-types";
+import type { ApplicationStatusChoice } from "@gql/gql-types";
+import { AccessCodeState, ApplicationSectionStatusChoice, ReserveeType } from "@gql/gql-types";
 import { ControlledMultiSelectFilter, ControlledSearchFilter } from "@/component/QueryParamFilters";
-import { type TagOptionsList, translateTag } from "@/modules/search";
+import { translateTag } from "@/modules/search";
+import type { TagOptionsList } from "@/modules/search";
 import { useForm } from "react-hook-form";
-import { DayT } from "common/src/const";
+import type { DayT } from "common/src/const";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { mapFormToSearchParams } from "common/src/modules/search";
 import { convertWeekday } from "common/src/conversion";
-import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 
 interface FilterProps {
@@ -101,7 +104,7 @@ export function Filters({
     value: s,
   }));
 
-  const weekdayOptions = Array.from(Array(7)).map((_, i) => ({
+  const weekdayOptions = Array.from({ length: 7 }).map((_, i) => ({
     label: t(`translation:dayLong.${i}`),
     value: i,
   }));

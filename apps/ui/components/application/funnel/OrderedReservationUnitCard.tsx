@@ -1,4 +1,5 @@
-import React, { type HTMLAttributes } from "react";
+import React from "react";
+import type { HTMLAttributes } from "react";
 import { IconArrowDown, IconArrowUp, ButtonSize, ButtonVariant, Button, ButtonPresetTheme } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -7,7 +8,7 @@ import { breakpoints } from "common/src/const";
 import type { OrderedReservationUnitCardFragment } from "@gql/gql-types";
 import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource, getMainImage } from "common/src/helpers";
-import Card from "common/src/components/Card";
+import { Card } from "common/src/components/Card";
 import { ErrorText } from "common/src/components/ErrorText";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { gql } from "@apollo/client";

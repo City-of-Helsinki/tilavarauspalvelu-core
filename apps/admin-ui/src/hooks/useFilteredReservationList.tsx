@@ -1,14 +1,11 @@
 import { useMemo } from "react";
-import { ReservationTypeChoice, type Maybe, useReservationsByReservationUnitQuery } from "@gql/gql-types";
+import { ReservationTypeChoice, useReservationsByReservationUnitQuery } from "@gql/gql-types";
+import type { Maybe } from "@gql/gql-types";
 import { isValidDate, toApiDate } from "common/src/common/util";
 import { addDays, addMinutes, startOfDay } from "date-fns";
-import {
-  type CollisionInterval,
-  combineAffectingReservations,
-  doesIntervalCollide,
-  reservationToInterval,
-} from "@/helpers";
-import { type NewReservationListItem } from "@/component/ReservationsList";
+import { combineAffectingReservations, doesIntervalCollide, reservationToInterval } from "@/helpers";
+import type { CollisionInterval } from "@/helpers";
+import type { NewReservationListItem } from "@/component/ReservationsList";
 import { createNodeId, timeToMinutes } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/components/toast";
@@ -110,7 +107,7 @@ export function useFilteredReservationList({
     };
 
     return items.map((x) =>
-      reservations.find((y) => {
+      reservations.some((y) => {
         if (existingReservationSeriesPk != null && y.reservationSeriesPk === existingReservationSeriesPk) {
           return false;
         }

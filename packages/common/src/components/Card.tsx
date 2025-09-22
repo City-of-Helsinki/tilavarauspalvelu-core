@@ -1,4 +1,5 @@
-import React, { ElementType } from "react";
+import type { ElementType } from "react";
+import React from "react";
 import styled from "styled-components";
 import Link from "next/link";
 import { Flex, fontMedium } from "../../styled";
@@ -208,7 +209,7 @@ function WrapWithLink({
  *
  * @returns {JSX.Element} The rendered Card component.
  */
-export default function Card({
+export function Card({
   heading,
   headingTestId,
   headingLevel = 3,
@@ -442,7 +443,7 @@ const InfoItem = styled(Flex).attrs({
 function Infos({
   infos,
 }: Readonly<{
-  infos?: { value: string; icon?: JSX.Element; testId?: string }[];
+  infos?: Array<{ value: string; icon?: JSX.Element; testId?: string }>;
 }>) {
   if (!infos) return null;
   return (

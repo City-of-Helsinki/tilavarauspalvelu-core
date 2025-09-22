@@ -1,5 +1,6 @@
 import React from "react";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { memoize, orderBy, uniqBy } from "lodash-es";
 import {
   IconArrowBottomRight,
@@ -10,7 +11,8 @@ import {
   IconQuestionCircle,
   IconSize,
 } from "hds-react";
-import { type ApplicationSectionTableElementFragment, ApplicationSectionStatusChoice } from "@gql/gql-types";
+import { ApplicationSectionStatusChoice } from "@gql/gql-types";
+import type { ApplicationSectionTableElementFragment } from "@gql/gql-types";
 import { MAX_APPLICATION_ROUND_NAME_LENGTH } from "@/common/const";
 import { getApplicantName, truncate } from "@/helpers";
 import { getApplicationUrl } from "@/common/urls";
@@ -18,7 +20,7 @@ import { CustomTable } from "@/component/Table";
 import { calculateAppliedReservationTime, formatAppliedReservationTime } from "./utils";
 import { ExternalTableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import { gql } from "@apollo/client";
 
 const unitsTruncateLen = 23;
@@ -87,7 +89,7 @@ const getStatusProps = (status?: ApplicationSectionStatusChoice): { type: Status
       return { type: "success", icon: <IconCheck /> };
     case ApplicationSectionStatusChoice.Rejected:
       return { type: "error", icon: <IconCross /> };
-    default:
+    case undefined:
       return {
         type: "neutral",
         icon: <IconQuestionCircle />,

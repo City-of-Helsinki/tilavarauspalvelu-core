@@ -12,12 +12,13 @@ import {
   ControlledRangeNumberFilter,
 } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
-import { OrderStatusWithFree, ReservationTypeChoice, ReservationStateChoice } from "@gql/gql-types";
+import type { OrderStatusWithFree, ReservationTypeChoice, ReservationStateChoice } from "@gql/gql-types";
 import { translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
-import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import { mapParamToInteger } from "common/src/helpers";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { mapFormToSearchParams } from "common/src/modules/search";
@@ -86,7 +87,7 @@ function mapParamsToForm(searchParams: ReadonlyURLSearchParams): SearchFormValue
 }
 
 interface FilterProps {
-  defaultFilters?: Readonly<Array<{ key: string; value: string | string[] }>>;
+  defaultFilters?: ReadonlyArray<{ key: string; value: string | string[] }>;
   clearButtonLabel?: string;
   clearButtonAriaLabel?: string;
 }

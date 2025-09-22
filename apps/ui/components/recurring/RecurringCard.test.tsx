@@ -1,6 +1,7 @@
 import { render } from "@testing-library/react";
 import { RecurringCard } from "./RecurringCard";
-import { AccessType, type RecurringCardFragment } from "@/gql/gql-types";
+import { AccessType } from "@/gql/gql-types";
+import type { RecurringCardFragment } from "@/gql/gql-types";
 import { vi, describe, test, expect } from "vitest";
 import { getReservationUnitPath } from "@/modules/urls";
 import { createMockReservationUnitType, generateNameFragment } from "@/test/test.gql.utils";

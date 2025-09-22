@@ -1,5 +1,6 @@
 import React from "react";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { memoize } from "lodash-es";
 import { IconLinkExternal, IconSize, Tooltip } from "hds-react";
 import type { AllocatedSectionsTableElementFragment } from "@gql/gql-types";
@@ -48,7 +49,7 @@ function timeSlotMapper(t: TFunction, slot: AllocatedSectionsTableElementFragmen
 
   const day = convertWeekday(slot.dayOfTheWeek);
   const timeRange = formatTimeRange(timeToMinutes(slot.beginTime), timeToMinutes(slot.endTime));
-  const timeString = isAllocated ? `${t("translation:dayShort." + day)} ${timeRange}` : "-";
+  const timeString = isAllocated ? `${t(`translation:dayShort.${day}`)} ${timeRange}` : "-";
   const name = slot.reservationUnitOption.applicationSection.name;
 
   const applicationPk = application.pk ?? 0;

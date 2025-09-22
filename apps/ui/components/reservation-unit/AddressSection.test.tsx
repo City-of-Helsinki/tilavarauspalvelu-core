@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { AddressFieldsFragment } from "@gql/gql-types";
+import type { AddressFieldsFragment } from "@gql/gql-types";
 import {
   AddressSection,
   createAccessibilityUrl,
@@ -27,7 +27,7 @@ const createAddressSectionMock = (proper = true): AddressFieldsFragment => ({
 const fi = getLocalizationLang("fi");
 
 const customRender = (proper = true): ReturnType<typeof render> => {
-  return render(<AddressSection title={"Test unit 1"} unit={createAddressSectionMock(proper)} />);
+  return render(<AddressSection title="Test unit 1" unit={createAddressSectionMock(proper)} />);
 };
 
 describe("Component: AddressSection | Test create url functions", () => {

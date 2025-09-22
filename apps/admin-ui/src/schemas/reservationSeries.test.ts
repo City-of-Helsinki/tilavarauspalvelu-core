@@ -1,6 +1,7 @@
 import { addDays } from "date-fns";
 import { ReservationStartInterval, ReservationTypeChoice, Weekday } from "@gql/gql-types";
-import { ReservationSeriesForm, ReservationSeriesFormSchema } from "./reservationSeries";
+import type { ReservationSeriesForm } from "./reservationSeries";
+import { ReservationSeriesFormSchema } from "./reservationSeries";
 import { toUIDate } from "common/src/common/util";
 import { expect, test } from "vitest";
 

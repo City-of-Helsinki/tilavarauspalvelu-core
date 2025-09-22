@@ -1,9 +1,10 @@
-import { type ApplicationFormFragment } from "@/gql/gql-types";
+import type { ApplicationFormFragment } from "@/gql/gql-types";
 import Page3 from "@/pages/applications/[id]/page3";
 import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import { createGraphQLMocks } from "@test/gql.mocks";
-import { createMockApplicationFragment, type CreateMockApplicationFragmentProps } from "@test/application.mocks";
+import { createMockApplicationFragment } from "@test/application.mocks";
+import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
 import { MockedGraphQLProvider } from "@test/test.react.utils";

@@ -1,9 +1,11 @@
 import React from "react";
-import { type ApplicationPageFieldsFragment, Priority } from "@gql/gql-types";
+import { Priority } from "@gql/gql-types";
+import type { ApplicationPageFieldsFragment } from "@gql/gql-types";
 import { convertWeekday, transformWeekday } from "common/src/conversion";
 import { filterNonNullable } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
-import { ApplicationTimeSelector, type Cell } from "common/src/components/ApplicationTimeSelector";
+import { ApplicationTimeSelector } from "common/src/components/ApplicationTimeSelector";
+import type { Cell } from "common/src/components/ApplicationTimeSelector";
 import { useTranslation } from "next-i18next";
 
 type ApplicationSectionType = NonNullable<ApplicationPageFieldsFragment["applicationSections"]>[0];
@@ -37,8 +39,8 @@ function timeRangeToCell(timeRanges: SuitableTimeRangeType[]): Cell[][] {
   for (const timeRange of timeRanges) {
     const { dayOfTheWeek, beginTime, endTime, priority } = timeRange;
     // TODO conversion functions from API time to frontend format
-    const hourBegin = Number(beginTime.substring(0, 2)) - firstSlotStart;
-    const hourEnd = (Number(endTime.substring(0, 2)) || 24) - firstSlotStart;
+    const hourBegin = Number(beginTime.slice(0, 2)) - firstSlotStart;
+    const hourEnd = (Number(endTime.slice(0, 2)) || 24) - firstSlotStart;
 
     const day = convertWeekday(dayOfTheWeek);
     for (let h = hourBegin; h < hourEnd; h += 1) {

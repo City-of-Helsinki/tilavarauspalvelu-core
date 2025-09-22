@@ -3,7 +3,8 @@ import { trim } from "lodash-es";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
-import { useDeleteResourceMutation, type Maybe, type ResourceTableFragment } from "@gql/gql-types";
+import { useDeleteResourceMutation } from "@gql/gql-types";
+import type { Maybe, ResourceTableFragment } from "@gql/gql-types";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { getResourceUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
@@ -12,7 +13,7 @@ import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styled";
 import { Flex } from "common/styled";
-import { type TFunction } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
 

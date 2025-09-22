@@ -1,5 +1,5 @@
 import { filterNonNullable } from "common/src/helpers";
-import { UserPermissionChoice, type CurrentUserQuery } from "@gql/gql-types";
+import type { UserPermissionChoice, CurrentUserQuery } from "@gql/gql-types";
 import { gql } from "@apollo/client";
 
 export const CURRENT_USER = gql`
@@ -46,11 +46,11 @@ function hasUnitPermission(permission: UserPermissionChoice, unitPk: number, use
 
   for (const role of unitRoles) {
     const perms = filterNonNullable(role.permissions?.map((x) => x));
-    if (perms.find((x) => x === permission) == null) {
+    if (perms.some((x) => x === permission) == null) {
       continue;
     }
     const unitsInGroups = filterNonNullable(role.unitGroups?.flatMap((x) => x.units.map((y) => y.pk)));
-    if (unitsInGroups.find((x) => x === unitPk)) {
+    if (unitsInGroups.some((x) => x === unitPk)) {
       return true;
     }
 
@@ -119,6 +119,9 @@ export function hasSomePermission(
   return someUnitRoles && !onlyGeneral;
 }
 
+const hasPerm = (role: Pick<NonNullable<UserNode>["unitRoles"][0], "permissions">) =>
+  role.permissions != null && role.permissions.length > 0;
+
 /// Returns true if the user has any kind of access to the system
 export function hasAnyPermission(user: UserNode): boolean {
   if (!user) {
@@ -127,9 +130,6 @@ export function hasAnyPermission(user: UserNode): boolean {
   if (user.isSuperuser) {
     return true;
   }
-
-  const hasPerm = (role: Pick<(typeof user.unitRoles)[0], "permissions">) =>
-    role.permissions != null && role.permissions.length > 0;
 
   const someUnitRoles = user.unitRoles.some(hasPerm);
   const someGeneralRoles = user.generalRoles.some(hasPerm);

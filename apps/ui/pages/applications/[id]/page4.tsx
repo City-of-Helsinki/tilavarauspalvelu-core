@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import {
-  ApplicationPage4Document,
-  type ApplicationPage4Query,
-  type ApplicationPage4QueryVariables,
-  useSendApplicationMutation,
-} from "@gql/gql-types";
+import { ApplicationPage4Document, useSendApplicationMutation } from "@gql/gql-types";
+import type { ApplicationPage4Query, ApplicationPage4QueryVariables } from "@gql/gql-types";
 import type { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";

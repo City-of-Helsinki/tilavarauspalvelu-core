@@ -1,6 +1,7 @@
-import { type Maybe, PriceUnit } from "../gql/gql-types";
+import { PriceUnit } from "../gql/gql-types";
+import type { Maybe } from "../gql/gql-types";
 import { toNumber } from "./helpers";
-import formatters from "./number-formatters";
+import { formatters } from "./number-formatters";
 
 function getPriceUnitMinutes(unit: PriceUnit): number {
   switch (unit) {
@@ -13,7 +14,7 @@ function getPriceUnitMinutes(unit: PriceUnit): number {
     case PriceUnit.PerHalfDay:
     case PriceUnit.PerDay:
     case PriceUnit.PerWeek:
-    default:
+    case PriceUnit.Fixed:
       return 1;
   }
 }
@@ -24,7 +25,10 @@ function getPriceFractionMinutes(unit: PriceUnit): number {
     case PriceUnit.Per_30Mins:
     case PriceUnit.PerHour:
       return 15;
-    default:
+    case PriceUnit.Fixed:
+    case PriceUnit.PerDay:
+    case PriceUnit.PerHalfDay:
+    case PriceUnit.PerWeek:
       return 1;
   }
 }

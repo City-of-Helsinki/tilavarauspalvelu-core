@@ -58,11 +58,11 @@ const ToggleButton = styled.button`
 interface Item {
   name: string;
   disabled?: boolean;
-  onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 interface PopupMenuProps {
-  items: Readonly<Item[]>;
+  items: ReadonlyArray<Item>;
   style?: React.CSSProperties;
   className?: string;
 }
@@ -95,7 +95,7 @@ export function PopupMenu({ items, style, className }: PopupMenuProps): JSX.Elem
     document.removeEventListener("click", closePopup);
   };
 
-  const disabled = items.length === 0 || items.every((i) => i.disabled);
+  const disabled = items.every((i) => i.disabled);
 
   return (
     <Container ref={buttonRef} style={style} className={className}>

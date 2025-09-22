@@ -1,17 +1,20 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { useFieldArray, UseFormReturn } from "react-hook-form";
-import { AccessTypes, type ReservationUnitEditFormValues } from "./form";
+import type { UseFormReturn } from "react-hook-form";
+import { useFieldArray } from "react-hook-form";
+import { AccessTypes } from "./form";
+import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 import { ControlledDateInput, ControlledSelect } from "common/src/components/form";
 import { fromUIDate } from "common/src/common/util";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import { AutoGrid, Flex, H6 } from "common/styled";
 import { KVWrapper, Label, Value } from "@/styled";
 import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";
 import { formatDate, getTranslatedError } from "@/common/util";
-import { AccessType, type ReservationUnitEditPageFragment } from "@gql/gql-types";
+import { AccessType } from "@gql/gql-types";
+import type { ReservationUnitEditPageFragment } from "@gql/gql-types";
 import { NotificationInline } from "@/component/NotificationInline";
 
 const CurrentAccessTypeContainer = styled(Flex).attrs({
@@ -40,7 +43,7 @@ function CurrentAccessType({
 
   return (
     <div>
-      <H6 $marginBottom={"s"}>{t("accessType:validity.currentlyActive")}</H6>
+      <H6 $marginBottom="s">{t("accessType:validity.currentlyActive")}</H6>
       <CurrentAccessTypeContainer>
         <KVWrapper>
           <Label>{t("accessType:accessTypeLabel")}:</Label>
@@ -163,7 +166,7 @@ export function AccessTypeSection({
         )}
 
         {fields.map((accessType, index) => (
-          <AccessTypePart key={`${accessType.id}`} form={form} index={index} removeSelf={() => remove(index)} />
+          <AccessTypePart key={accessType.id} form={form} index={index} removeSelf={() => remove(index)} />
         ))}
 
         <div style={{ marginTop: "var(--spacing-s)" }}>

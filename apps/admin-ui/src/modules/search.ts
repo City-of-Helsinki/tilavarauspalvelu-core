@@ -1,4 +1,4 @@
-import {
+import type {
   OrderStatusWithFree,
   Priority,
   ReservationStateChoice,
@@ -8,20 +8,20 @@ import {
 } from "@gql/gql-types";
 import { fromUIDate, isValidDate } from "common/src/common/util";
 import { toNumber } from "common/src/helpers";
-import { type OptionsListT, type OptionT } from "common/src/modules/search";
-import { type TFunction } from "next-i18next";
+import type { OptionsListT, OptionT } from "common/src/modules/search";
+import type { TFunction } from "next-i18next";
 
 export interface TagOptionsList extends OptionsListT {
-  stateChoices: Readonly<Array<{ value: ReservationStateChoice; label: string }>>;
-  reservationUnits: Readonly<OptionT[]>;
-  unitGroups: Readonly<OptionT[]>;
-  reservationUnitStates: Readonly<Array<{ value: ReservationUnitPublishingState; label: string }>>;
-  priorityChoices: Readonly<Array<{ value: Priority; label: string }>>;
-  orderChoices: Readonly<OptionT[]>;
-  orderStatus: Readonly<Array<{ value: OrderStatusWithFree; label: string }>>;
-  reservationTypeChoices: Readonly<Array<{ value: ReservationTypeChoice; label: string }>>;
-  recurringChoices: Readonly<Array<{ value: "only" | "onlyNot"; label: string }>>;
-  reserveeTypes: Readonly<Array<{ value: ReserveeType; label: string }>>;
+  stateChoices: ReadonlyArray<{ value: ReservationStateChoice; label: string }>;
+  reservationUnits: ReadonlyArray<OptionT>;
+  unitGroups: ReadonlyArray<OptionT>;
+  reservationUnitStates: ReadonlyArray<{ value: ReservationUnitPublishingState; label: string }>;
+  priorityChoices: ReadonlyArray<{ value: Priority; label: string }>;
+  orderChoices: ReadonlyArray<OptionT>;
+  orderStatus: ReadonlyArray<{ value: OrderStatusWithFree; label: string }>;
+  reservationTypeChoices: ReadonlyArray<{ value: ReservationTypeChoice; label: string }>;
+  recurringChoices: ReadonlyArray<{ value: "only" | "onlyNot"; label: string }>;
+  reserveeTypes: ReadonlyArray<{ value: ReserveeType; label: string }>;
 }
 
 export function translateTag(t: TFunction, options: Readonly<TagOptionsList>) {

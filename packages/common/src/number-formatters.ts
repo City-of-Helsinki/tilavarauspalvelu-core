@@ -1,4 +1,4 @@
-const formatters = (language: string): Record<string, Intl.NumberFormat> => ({
+export const formatters = (language: string): Record<string, Intl.NumberFormat> => ({
   default: new Intl.NumberFormat(),
   currency: new Intl.NumberFormat(language, {
     style: "currency",
@@ -33,5 +33,3 @@ const formatters = (language: string): Record<string, Intl.NumberFormat> => ({
     maximumFractionDigits: 2,
   }),
 });
-
-export default formatters;

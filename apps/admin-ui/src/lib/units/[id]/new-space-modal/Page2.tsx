@@ -2,9 +2,10 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hds-react";
 import { StyledTag } from "./modules/newSpaceModal";
-import { SpaceForm, type SpaceUpdateForm } from "../SpaceForm";
+import { SpaceForm } from "../SpaceForm";
+import type { SpaceUpdateForm } from "../SpaceForm";
 import { FormErrorSummary } from "@/component/FormErrorSummary";
-import { UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { DialogActionsButtons } from "@/styled";
 
 type Props = {

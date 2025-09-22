@@ -133,7 +133,7 @@ export const WhiteButton = styled(Button)<{
 
     ${({ variant, $colorVariant }) => {
       switch (variant) {
-        case "primary":
+        case ButtonVariant.Primary:
           return `
       --color: var(--color-black);
       --background-color: var(--color-white);
@@ -143,19 +143,21 @@ export const WhiteButton = styled(Button)<{
       --color-hover: var(--color-white);
       --color-focus: var(--color-white);
   `;
-        case "secondary":
+        case ButtonVariant.Secondary:
           return `
       --color: var(--color-white);
       --border-color: var(--color-white);
       --background-color: var(--color-bus${$colorVariant === "light" ? "" : "-dark"});
   `;
-        case "supplementary":
+        case ButtonVariant.Supplementary:
           return `
       --color: var(--color-white);
       --background-color: var(--color-bus${$colorVariant === "light" ? "" : "-dark"});
       --border-color: transparent;
   `;
-        default:
+        case ButtonVariant.Clear:
+        case ButtonVariant.Danger:
+        case ButtonVariant.Success:
           return "";
       }
     }}

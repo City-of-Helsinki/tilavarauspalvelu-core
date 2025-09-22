@@ -1,16 +1,16 @@
 import { isValid, parse, set } from "date-fns";
 import { formatDate } from "../common/util";
 import { fromApiDate, fromUIDate } from "common/src/common/util";
-import { type Maybe } from "@gql/gql-types";
+import type { Maybe } from "@gql/gql-types";
 
 /* Convert api datetime to date required by date input, defaults to current date */
 export const valueForDateInput = (from: string): string => {
-  return formatDate(from || new Date().toISOString(), "d.M.yyyy") as string;
+  return formatDate(from || new Date().toISOString(), "d.M.yyyy") ?? "";
 };
 
 /* Convert api datetime to time required by time input,m defaults to current time */
 export const valueForTimeInput = (from: string): string => {
-  return formatDate(from || new Date().toISOString(), "HH:mm") as string;
+  return formatDate(from || new Date().toISOString(), "HH:mm") ?? "";
 };
 
 /* Construct date from dateinput + timeinput */
@@ -29,7 +29,7 @@ export function constructDateTimeUnsafe(date: string, time: string): Date {
 export function constructDateTimeSafe(date: string, time: string): Date | null {
   try {
     return constructDateTimeUnsafe(date, time);
-  } catch (_) {
+  } catch {
     return null;
   }
 }
@@ -45,7 +45,7 @@ export function fromAPIDateTime(d: Maybe<string> | undefined, time: Maybe<string
       return null;
     }
     return set(d, duration);
-  } catch (_) {
+  } catch {
     return null;
   }
 }
@@ -53,7 +53,7 @@ export function fromAPIDateTime(d: Maybe<string> | undefined, time: Maybe<string
 export function fromUIDateTime(date: string, time: string): Date | null {
   try {
     return fromUIDateTimeUnsafe(date, time);
-  } catch (_) {
+  } catch {
     return null;
   }
 }

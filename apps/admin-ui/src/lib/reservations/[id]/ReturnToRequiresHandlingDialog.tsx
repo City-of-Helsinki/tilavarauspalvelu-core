@@ -1,7 +1,9 @@
-import React, { type RefObject } from "react";
+import React from "react";
+import type { RefObject } from "react";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, Dialog, IconInfoCircle } from "hds-react";
-import { type ReservationNode, useRequireHandlingMutation } from "@gql/gql-types";
+import { useRequireHandlingMutation } from "@gql/gql-types";
+import type { ReservationNode } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { successToast } from "common/src/components/toast";
 import { gql } from "@apollo/client";

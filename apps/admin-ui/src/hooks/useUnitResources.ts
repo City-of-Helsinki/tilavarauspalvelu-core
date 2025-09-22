@@ -1,16 +1,12 @@
-import {
-  AuthenticationType,
-  type ReservationUnitReservationsFragment,
-  type ReservationUnitsByUnitFieldsFragment,
-  useReservationUnitsByUnitQuery,
-} from "@gql/gql-types";
+import { AuthenticationType, useReservationUnitsByUnitQuery } from "@gql/gql-types";
+import type { ReservationUnitReservationsFragment, ReservationUnitsByUnitFieldsFragment } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { createNodeId, getNode } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/components/toast";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
-import { type OptionT } from "common/src/modules/search";
+import type { OptionT } from "common/src/modules/search";
 
 export interface ReservationUnitOption extends OptionT {
   isDraft: boolean;

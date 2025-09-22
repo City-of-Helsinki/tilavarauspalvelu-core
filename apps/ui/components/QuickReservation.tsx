@@ -11,19 +11,19 @@ import {
   getReservationUnitPrice,
   isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
-import Carousel from "@/components/Carousel";
-import { type Control, type FieldValues, type SubmitHandler, type UseFormReturn } from "react-hook-form";
+import { Carousel } from "@/components/Carousel";
+import type { Control, SubmitHandler, UseFormReturn } from "react-hook-form";
 import { ControlledDateInput } from "common/src/components/form";
-import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
+import type { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { type FocusTimeSlot } from "@/modules/reservation";
+import type { FocusTimeSlot } from "@/modules/reservation";
 
 type Props = {
   reservationUnit: ReservationTimePickerFieldsFragment;
   subventionSuffix: JSX.Element | undefined;
   reservationForm: UseFormReturn<PendingReservationFormType>;
-  durationOptions: { label: string; value: number }[];
-  startingTimeOptions: { label: string; value: string }[];
+  durationOptions: Array<{ label: string; value: number }>;
+  startingTimeOptions: Array<{ label: string; value: string }>;
   focusSlot: FocusTimeSlot | null;
   nextAvailableTime: Date | null;
   submitReservation: SubmitHandler<PendingReservationFormType>;
@@ -173,7 +173,7 @@ export function QuickReservation({
           id="quick-reservation__duration"
           name="duration"
           // react-hook-form has issues with typing generic Select
-          control={control as unknown as Control<FieldValues>}
+          control={control as unknown as Control}
           label={t("reservationCalendar:duration")}
           options={durationOptions}
         />

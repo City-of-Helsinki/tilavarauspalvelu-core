@@ -1,20 +1,17 @@
 import React from "react";
 import { toApiDate } from "common/src/common/util";
-import CommonCalendar from "common/src/calendar/Calendar";
+import { CommonCalendar } from "common/src/calendar/CommonCalendar";
 import { get } from "lodash-es";
 import { addDays, endOfISOWeek, startOfISOWeek } from "date-fns";
 import styled from "styled-components";
-import { type TFunction, useTranslation } from "next-i18next";
-import {
-  ReservationTypeChoice,
-  type CalendarReservationNameFragment,
-  useReservationUnitCalendarQuery,
-  UserPermissionChoice,
-} from "@gql/gql-types";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
+import { ReservationTypeChoice, useReservationUnitCalendarQuery, UserPermissionChoice } from "@gql/gql-types";
+import type { CalendarReservationNameFragment } from "@gql/gql-types";
 import { getEventBuffers } from "common/src/calendar/util";
 import { getReservationUrl } from "@/common/urls";
 import { Legend, LegendsWrapper } from "@/component/Legend";
-import eventStyleGetter, { legend } from "./eventStyleGetter";
+import { eventStyleGetter, legend } from "./eventStyleGetter";
 import { createNodeId, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { getReserveeName } from "@/common/util";
@@ -75,7 +72,7 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
     permission: UserPermissionChoice.CanViewReservations,
   });
 
-  const calendarEventExcludedLegends = ["RESERVATION_UNIT_RELEASED", "RESERVATION_UNIT_DRAFT"];
+  const calendarEventExcludedLegends = new Set(["RESERVATION_UNIT_RELEASED", "RESERVATION_UNIT_DRAFT"]);
 
   const { data, loading: isLoading } = useReservationUnitCalendarQuery({
     fetchPolicy: "network-only",
@@ -131,7 +128,7 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
       />
       <LegendsWrapper>
         {legend
-          .filter((l) => !calendarEventExcludedLegends.includes(l.key))
+          .filter((l) => !calendarEventExcludedLegends.has(l.key))
           .map((l) => (
             <Legend key={l.label} style={l.style} label={t(l.label)} />
           ))}

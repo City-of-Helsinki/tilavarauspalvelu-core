@@ -16,44 +16,34 @@ import {
 import { i18n } from "next-i18next";
 import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
 import {
-  type AvailableTimesReservationUnitFieldsFragment,
-  type BlockingReservationFieldsFragment,
-  type EquipmentFieldsFragment,
-  type IsReservableFieldsFragment,
-  type NotReservableFieldsFragment,
-  type PriceReservationUnitFieldsFragment,
   PriceUnit,
-  type PricingFieldsFragment,
   ReservationKind,
-  type ReservationPriceFieldsFragment,
-  ReservationStartInterval,
   ReservationStateChoice,
-  type ReservationUnitAccessTypeNode,
-  type ReservationUnitNode,
   ReservationUnitPublishingState,
   ReservationUnitReservationState,
-  type UnitNode,
 } from "@gql/gql-types";
-import {
-  dateToKey,
-  isRangeReservable,
-  isSlotWithinReservationTime,
-  type ReservableMap,
-  type RoundPeriod,
-} from "@/modules/reservable";
+import type {
+  AvailableTimesReservationUnitFieldsFragment,
+  BlockingReservationFieldsFragment,
+  EquipmentFieldsFragment,
+  IsReservableFieldsFragment,
+  NotReservableFieldsFragment,
+  PriceReservationUnitFieldsFragment,
+  PricingFieldsFragment,
+  ReservationPriceFieldsFragment,
+  ReservationUnitAccessTypeNode,
+  ReservationUnitNode,
+  UnitNode,
+  ReservationStartInterval,
+} from "@gql/gql-types";
+import { dateToKey, isRangeReservable, isSlotWithinReservationTime } from "@/modules/reservable";
+import type { ReservableMap, RoundPeriod } from "@/modules/reservable";
 import { gql } from "@apollo/client";
 import { getIntervalMinutes } from "common/src/conversion";
-import {
-  capitalize,
-  dayMax,
-  dayMin,
-  filterNonNullable,
-  isPriceFree,
-  type ReadonlyDeep,
-  timeToMinutes,
-} from "common/src/helpers";
-import { type LocalizationLanguages } from "common/src/urlBuilder";
-import { type TFunction } from "i18next";
+import { capitalize, dayMax, dayMin, filterNonNullable, isPriceFree, timeToMinutes } from "common/src/helpers";
+import type { ReadonlyDeep } from "common/src/helpers";
+import type { LocalizationLanguages } from "common/src/urlBuilder";
+import type { TFunction } from "i18next";
 
 function formatTimeObject(time: { h: number; m: number }): string {
   return `${time.h.toString().padStart(2, "0")}:${time.m.toString().padStart(2, "0")}`;
@@ -75,7 +65,11 @@ export function isReservationUnitPublished(reservationUnit: Pick<ReservationUnit
     case ReservationUnitPublishingState.Published:
     case ReservationUnitPublishingState.ScheduledHiding:
       return true;
-    default:
+    case ReservationUnitPublishingState.Archived:
+    case ReservationUnitPublishingState.Draft:
+    case ReservationUnitPublishingState.Hidden:
+    case ReservationUnitPublishingState.ScheduledPeriod:
+    case ReservationUnitPublishingState.ScheduledPublishing:
       return false;
   }
 }
@@ -90,13 +84,14 @@ const equipmentCategoryOrder = [
   "Muu",
 ] as const;
 
-export function getEquipmentCategories(equipment: Readonly<Pick<EquipmentFieldsFragment, "category">[]>): string[] {
+export function getEquipmentCategories(equipment: ReadonlyArray<Pick<EquipmentFieldsFragment, "category">>): string[] {
   if (!equipment || equipment.length === 0) {
     return [];
   }
   const categories: Array<(typeof equipmentCategoryOrder)[number]> = filterNonNullable(
     equipment.map((n) => {
-      const index = equipmentCategoryOrder.findIndex((order) => order === n.category?.nameFi);
+      const categoryName = n.category?.nameFi as (typeof equipmentCategoryOrder)[number];
+      const index = equipmentCategoryOrder.indexOf(categoryName);
       if (index === -1) {
         return "Muu";
       }
@@ -115,7 +110,7 @@ export function getEquipmentCategories(equipment: Readonly<Pick<EquipmentFieldsF
 
 // Why are we doing complex frontend sorting? and always in finnish?
 export function getEquipmentList(
-  equipments: Readonly<EquipmentFieldsFragment[]>,
+  equipments: ReadonlyArray<EquipmentFieldsFragment>,
   lang: LocalizationLanguages
 ): string[] {
   if (equipments.length === 0) {
@@ -131,7 +126,7 @@ export function getEquipmentList(
           n.category?.nameFi === category ||
           (category === "Muu" &&
             n.category?.nameFi &&
-            !equipmentCategoryOrder.find((order) => order === n.category.nameFi))
+            !equipmentCategoryOrder.some((order) => order === n.category.nameFi))
       )
       .sort((a, b) => (a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0))
   );
@@ -177,7 +172,7 @@ function isFuturePricing(pricing: PricingFieldsFragment): boolean {
 
 export function getActivePricing(
   reservationUnit: Readonly<{
-    pricings: Readonly<PricingFieldsFragment[]>;
+    pricings: ReadonlyArray<PricingFieldsFragment>;
   }>
 ): PricingFieldsFragment | undefined {
   const { pricings } = reservationUnit;
@@ -279,8 +274,8 @@ export function getPriceString(props: GetPriceType): string {
   }
 
   const volume = getReservationVolume(minutes, pricing.priceUnit);
-  const highestPrice = parseFloat(pricing.highestPrice) * volume;
-  const lowestPrice = parseFloat(pricing.lowestPrice) * volume;
+  const highestPrice = Number.parseFloat(pricing.highestPrice) * volume;
+  const lowestPrice = Number.parseFloat(pricing.lowestPrice) * volume;
   const priceString =
     lowestPrice === highestPrice
       ? formatPrice(lowestPrice, true)
@@ -384,21 +379,21 @@ function getSubventionState(
   return "done";
 }
 
-export function isReservationUnitFreeOfCharge(pricings: Readonly<PricingFieldsFragment[]>, date?: Date): boolean {
+export function isReservationUnitFreeOfCharge(pricings: ReadonlyArray<PricingFieldsFragment>, date?: Date): boolean {
   return !isReservationUnitPaid(pricings, date);
 }
 
-export function isReservationUnitPaid(pricings: Readonly<PricingFieldsFragment[]>, date?: Date): boolean {
+export function isReservationUnitPaid(pricings: ReadonlyArray<PricingFieldsFragment>, date?: Date): boolean {
   const active = pricings.filter((p) => isActivePricing(p));
   const future = pricings.filter((p) => isFuturePricing(p));
   const d =
     date == null
       ? active
-      : active.concat(future).filter((p) => {
+      : [...active, ...future].filter((p) => {
           const start = new Date(p.begins);
           return start <= date;
         });
-  return d.filter((p) => !isPriceFree(p)).length > 0;
+  return d.some((p) => !isPriceFree(p));
 }
 
 /// Returns true if the given time is 'inside' the time span
@@ -424,7 +419,7 @@ export function getDayIntervals(
   startTime: { h: number; m: number },
   endTime: { h: number; m: number },
   interval: ReservationStartInterval
-): { h: number; m: number }[] {
+): Array<{ h: number; m: number }> {
   // normalize end time to allow comparison
   const nEnd = endTime.h === 0 && endTime.m === 0 ? { h: 23, m: 59 } : endTime;
   const iMins = getIntervalMinutes(interval);
@@ -451,9 +446,9 @@ export function getDayIntervals(
 export type PossibleTimesCommonProps = Readonly<{
   reservableTimes: Readonly<ReservableMap>;
   reservationUnit: Omit<IsReservableFieldsFragment, "reservableTimeSpans">;
-  activeApplicationRounds: readonly RoundPeriod[];
+  activeApplicationRounds: ReadonlyArray<RoundPeriod>;
   duration: number;
-  blockingReservations: readonly BlockingReservationFieldsFragment[];
+  blockingReservations: ReadonlyArray<BlockingReservationFieldsFragment>;
 }>;
 export type GetPossibleTimesForDayProps = {
   date: Readonly<Date>;
@@ -468,7 +463,7 @@ export function getPossibleTimesForDay({
   activeApplicationRounds,
   duration,
   blockingReservations,
-}: GetPossibleTimesForDayProps): { label: string; value: string }[] {
+}: GetPossibleTimesForDayProps): Array<{ label: string; value: string }> {
   const interval = reservationUnit.reservationStartInterval;
   const allTimes: Array<{ h: number; m: number }> = [];
   const slotsForDay = reservableTimes.get(dateToKey(date)) ?? [];
@@ -556,8 +551,8 @@ export type AvailableTimesProps = {
   duration: number;
   reservationUnit: AvailableTimesReservationUnitFieldsFragment;
   reservableTimes: ReservableMap;
-  activeApplicationRounds: readonly RoundPeriod[];
-  blockingReservations: readonly BlockingReservationFieldsFragment[];
+  activeApplicationRounds: ReadonlyArray<RoundPeriod>;
+  blockingReservations: ReadonlyArray<BlockingReservationFieldsFragment>;
   fromStartOfDay?: boolean;
 };
 
@@ -576,7 +571,7 @@ function getAvailableTimesForDay({
   }
   const [timeHours, timeMinutesRaw] = [0, 0];
 
-  const timeMinutes = timeMinutesRaw > 59 ? 59 : timeMinutesRaw;
+  const timeMinutes = Math.min(59, timeMinutesRaw);
   return getPossibleTimesForDay({
     reservableTimes,
     date: start,
@@ -797,8 +792,8 @@ type AccessTypeDurationsExtended = {
 };
 
 export function getReservationUnitAccessPeriods(
-  accessTypes: Readonly<AccessTypeDurations[]>
-): Readonly<AccessTypeDurationsExtended[]> {
+  accessTypes: ReadonlyArray<AccessTypeDurations>
+): ReadonlyArray<AccessTypeDurationsExtended> {
   type nextEndDateIterator = {
     nextEndDate: Date | null;
     array: AccessTypeDurationsExtended[];

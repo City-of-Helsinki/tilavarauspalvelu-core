@@ -1,25 +1,20 @@
 import React, { useCallback } from "react";
-import { IconCross, Option, Select } from "hds-react";
-import { useTranslation, type TFunction } from "next-i18next";
+import type { Option } from "hds-react";
+import { IconCross, Select } from "hds-react";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { fontMedium } from "common/styled";
-import { type ApolloQueryResult } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import styled from "styled-components";
-import {
-  ApplicationRoundStatusChoice,
-  ApplicationSectionStatusChoice,
-  type ApplicationSectionAllocationsQuery,
-  Weekday,
-  type ReservationUnitNode,
-} from "@gql/gql-types";
+import { ApplicationRoundStatusChoice, ApplicationSectionStatusChoice } from "@gql/gql-types";
+import type { ApplicationSectionAllocationsQuery, ReservationUnitNode, Weekday } from "@gql/gql-types";
 import { ShowAllContainer } from "common/src/components";
 import { transformWeekday } from "common/src/conversion";
-import { type DayT } from "common/src/const";
+import type { DayT } from "common/src/const";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
-import {
-  type RelatedSlot,
-  decodeTimeSlot,
-  getTimeSlotOptions,
-  isInsideSelection,
+import { decodeTimeSlot, getTimeSlotOptions, isInsideSelection } from "./modules/applicationRoundAllocation";
+import type {
+  RelatedSlot,
   SectionNodeT,
   AllocatedTimeSlotNodeT,
   SuitableTimeRangeNodeT,
@@ -103,7 +98,7 @@ function getTimeLabel(selection: string[], t: TFunction): string {
     return "";
   }
 
-  const dayString = `${t(`translation:dayLong.${day}`)}`;
+  const dayString = t(`translation:dayLong.${day}`);
 
   const beginMinutes = startHour * 60 + startMinute;
   // since all slots are 30 minutes, we add 30 minutes to the end time
@@ -397,12 +392,19 @@ export function AllocationColumn({
         <TimeSelection />
       </StyledShowAllContainer>
       {allocatedData.map((props) => (
-        <AllocatedCard {...props} key={props.key} refetchApplicationEvents={refetchApplicationEvents} />
+        <AllocatedCard
+          key={props.key}
+          applicationSection={props.applicationSection}
+          allocatedTimeSlot={props.allocatedTimeSlot}
+          refetchApplicationEvents={refetchApplicationEvents}
+        />
       ))}
       {suitableData.map((props) => (
         <SuitableTimeCard
-          {...props}
           key={props.key}
+          applicationSection={props.applicationSection}
+          timeSlot={props.timeSlot}
+          reservationUnitOptionPk={props.reservationUnitOptionPk}
           selection={selection ?? []}
           isAllocationEnabled={canAllocate}
           refetchApplicationEvents={refetchApplicationEvents}

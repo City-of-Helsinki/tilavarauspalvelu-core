@@ -1,9 +1,6 @@
-import { type CalendarEvent } from "common/src/calendar/Calendar";
-import {
-  ReservationStateChoice,
-  ReservationTypeChoice,
-  type ReservationUnitReservationsFragment,
-} from "@gql/gql-types";
+import type { CalendarEvent } from "common/src/calendar/CommonCalendar";
+import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
+import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
 import {
   CLOSED,
   COMMON_LEGEND,
@@ -65,7 +62,7 @@ export const legend: EventStyle[] = [
 ];
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
-const eventStyleGetter =
+export const eventStyleGetter =
   (currentReservationUnitPk: number) =>
   ({
     event,
@@ -109,5 +106,3 @@ const eventStyleGetter =
       style,
     };
   };
-
-export default eventStyleGetter;

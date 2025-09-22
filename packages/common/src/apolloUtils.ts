@@ -1,10 +1,11 @@
-import { ApolloError, ServerError, ServerParseError } from "@apollo/client";
-import { type GraphQLFormattedError } from "graphql";
+import type { ServerError, ServerParseError } from "@apollo/client";
+import { ApolloError } from "@apollo/client";
+import type { GraphQLFormattedError } from "graphql";
 import * as Sentry from "@sentry/nextjs";
 import { onError } from "@apollo/client/link/error";
-import toast from "./components/toast";
+import { toast } from "./components/toast";
 import { isBrowser } from "./helpers";
-import { type IncomingMessage, type IncomingHttpHeaders } from "node:http";
+import type { IncomingMessage, IncomingHttpHeaders } from "node:http";
 import qs from "querystring";
 import { getCookie } from "typescript-cookie";
 
@@ -22,7 +23,7 @@ export interface ValidationError extends ApiError {
 }
 
 export interface OverlappingError extends ApiError {
-  overlapping: { begin: string; end: string }[];
+  overlapping: Array<{ begin: string; end: string }>;
 }
 
 function mapValidationError(gqlError: GraphQLFormattedError): ValidationError[] {
@@ -166,22 +167,13 @@ export function getSeriesOverlapErrors(error: unknown): OverlappingError[] {
   return [];
 }
 
-function mapGraphQLErrors(graphQLErrors: readonly Readonly<GraphQLFormattedError>[]): ApiError[] {
-  if (graphQLErrors.length > 0) {
-    return graphQLErrors.flatMap((err) => {
-      const code = getExtensionCode(err);
-      if (code === "RESERVATION_SERIES_OVERLAPS") {
-        return mapOverlapError(err);
-      }
-      if (code === "MUTATION_VALIDATION_ERROR") {
-        return mapValidationError(err);
-      }
-      return {
-        code: code ?? "UNKNOWN",
-      };
-    });
-  }
-  return [];
+function mapGraphQLErrors(graphQLErrors: ReadonlyArray<GraphQLFormattedError>): ApiError[] {
+  return graphQLErrors.flatMap((err) => {
+    const code = getExtensionCode(err);
+    if (code === "RESERVATION_SERIES_OVERLAPS") return mapOverlapError(err);
+    if (code === "MUTATION_VALIDATION_ERROR") return mapValidationError(err);
+    return { code: code ?? "UNKNOWN" };
+  });
 }
 
 // TODO add non-graphql errors code
@@ -228,7 +220,7 @@ function extractErrorCode(error: ApiError): string | string[] {
 export const errorLink = onError(({ graphQLErrors, networkError }) => {
   // NOTE in case we have multiple errors in the response this will create separate buckets for those
   const apiErrors = mapGraphQLErrors(graphQLErrors ?? []);
-  const apiErrorCodes = apiErrors.map((e) => extractErrorCode(e)).flat();
+  const apiErrorCodes = apiErrors.flatMap((e) => extractErrorCode(e));
   const context = {
     level: "warning" as const,
     // have to encode the errors [Object Object] otherwise
@@ -271,17 +263,14 @@ export const errorLink = onError(({ graphQLErrors, networkError }) => {
 function isCSRFError(error: Error | ServerParseError | ServerError): boolean {
   const statusCode = "statusCode" in error ? error.statusCode : null;
 
-  if (statusCode === 403) {
-    if ("result" in error && error.result != null) {
-      if (typeof error.result === "object" && "code" in error.result) {
-        const code = error.result.code;
-        if (code === "CSRF_FAILURE") {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
+  return (
+    statusCode === 403 &&
+    "result" in error &&
+    error.result != null &&
+    typeof error.result === "object" &&
+    "code" in error.result &&
+    error.result.code === "CSRF_FAILURE"
+  );
 }
 
 function toastNetworkError(error: Error | ServerParseError | ServerError) {

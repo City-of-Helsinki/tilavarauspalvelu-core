@@ -1,19 +1,21 @@
 import { gql } from "@apollo/client";
 import {
-  type ApplicantNameFieldsFragment,
-  type ApplicationRoundNode,
   ApplicationRoundReservationCreationStatusChoice,
   ApplicationRoundStatusChoice,
-  type CalendarReservationFragment,
-  type CombineAffectedReservationsFragment,
-  type Maybe,
   ReservationStartInterval,
   ReservationTypeChoice,
   ReserveeType,
 } from "@gql/gql-types";
+import type {
+  ApplicantNameFieldsFragment,
+  ApplicationRoundNode,
+  CalendarReservationFragment,
+  CombineAffectedReservationsFragment,
+  Maybe,
+} from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { addSeconds } from "date-fns";
-import { type TFunction } from "next-i18next";
+import type { TFunction } from "next-i18next";
 
 export { truncate } from "common/src/helpers";
 
@@ -81,9 +83,9 @@ export function reservationToInterval(
 // this is type safe because this is gonna type error if the endpoints change
 type AffectedReservations = {
   node: Readonly<{
-    reservations: readonly CombineAffectedReservationsFragment[] | null;
+    reservations: ReadonlyArray<CombineAffectedReservationsFragment> | null;
   }> | null;
-  affectingReservations: readonly CombineAffectedReservationsFragment[] | null;
+  affectingReservations: ReadonlyArray<CombineAffectedReservationsFragment> | null;
 };
 
 /// Minimal fragment for combining affected reservations (inherit this for any queries using affectedReservations)
@@ -114,7 +116,7 @@ export function combineAffectingReservations<T extends AffectedReservations>(
   const affectingReservations = filterNonNullable(data.affectingReservations).filter((y) =>
     isAffecting(y, reservationUnitPk)
   );
-  const reservationSet = filterNonNullable(data?.node?.reservations).concat(affectingReservations);
+  const reservationSet = [...filterNonNullable(data?.node?.reservations), ...affectingReservations];
   return filterNonNullable(reservationSet);
 }
 
@@ -152,7 +154,8 @@ export function getReserveeTypeTranslationKey(
         return "translation:reserveeType.NONPROFIT_REGISTERED";
       }
       return "translation:reserveeType.NONPROFIT_UNREGISTERED";
-    default:
+    case null:
+    case undefined:
       return null;
   }
 }

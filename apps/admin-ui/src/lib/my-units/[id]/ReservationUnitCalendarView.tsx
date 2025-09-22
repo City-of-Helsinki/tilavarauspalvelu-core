@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { addDays, formatISO, startOfDay, subDays } from "date-fns";
 import { AutoGrid, Flex } from "common/styled";
 import { ReservationUnitCalendar } from "./ReservationUnitCalendar";
-import WeekNavigation from "./WeekNavigation";
+import { WeekNavigation } from "./WeekNavigation";
 import { toNumber } from "common/src/helpers";
 import { SelectFilter } from "@/component/QueryParamFilters";
 import styled from "styled-components";
@@ -16,7 +16,7 @@ export function ReservationUnitCalendarView({
   reservationUnitOptions,
   unitPk,
 }: {
-  reservationUnitOptions: { label: string; value: number }[];
+  reservationUnitOptions: Array<{ label: string; value: number }>;
   unitPk: number;
 }): JSX.Element {
   const params = useSearchParams();

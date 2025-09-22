@@ -1,9 +1,9 @@
 import { timeToMinutes, toMondayFirst } from "common/src/helpers";
 import { fromUIDateUnsafe } from "common/src/common/util";
-import { TimeSelectionForm } from "@/schemas";
-import { Weekday } from "@gql/gql-types";
+import type { TimeSelectionForm } from "@/schemas";
+import type { Weekday } from "@gql/gql-types";
 import { transformWeekday } from "common/src/conversion";
-import { DayT } from "common/src/const";
+import type { DayT } from "common/src/const";
 
 // NOTE Custom UTC date code because taking only the date part of Date results
 // in the previous date in UTC+2 timezone
@@ -15,7 +15,7 @@ function eachDayOfInterval(start: number, end: number, stepDays = 1) {
   }
   const daysWithoutCeil = (end - start) / (MILLISECONDS_IN_DAY * stepDays);
   const days = Math.ceil(daysWithoutCeil);
-  return Array.from(Array(days)).map((_, i) => i * (MILLISECONDS_IN_DAY * stepDays) + start);
+  return Array.from({ length: days }).map((_, i) => i * (MILLISECONDS_IN_DAY * stepDays) + start);
 }
 
 // epoch is Thue (4)
@@ -23,6 +23,8 @@ function dayOfWeek(time: number): Weekday {
   const weekdayNumber = ((Math.floor(time / MILLISECONDS_IN_DAY) + 4) % 7) as DayT;
   return transformWeekday(toMondayFirst(weekdayNumber));
 }
+
+const utcDate = (d: Date) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
 
 export function generateReservations(props: TimeSelectionForm) {
   const vals = props;
@@ -44,10 +46,6 @@ export function generateReservations(props: TimeSelectionForm) {
     return [];
   }
 
-  const utcDate = (d: Date) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
-  const min = (a: number, b: number) => (a < b ? a : b);
-  const max = (a: number, b: number) => (a > b ? a : b);
-
   try {
     const rawStartingDate = fromUIDateUnsafe(startingDate);
     const rawEndingDate = fromUIDateUnsafe(endingDate);
@@ -63,25 +61,24 @@ export function generateReservations(props: TimeSelectionForm) {
       return [];
     }
 
-    const sDay = max(utcDate(new Date()), utcDate(fromUIDateUnsafe(startingDate)));
+    const sDay = Math.max(utcDate(new Date()), utcDate(fromUIDateUnsafe(startingDate)));
 
     // end date with time 23:59:59
     const eDay = utcDate(fromUIDateUnsafe(endingDate)) + (MILLISECONDS_IN_DAY - 1);
-    const firstWeek = eachDayOfInterval(sDay, min(sDay + MILLISECONDS_IN_DAY * 7, eDay));
+    const firstWeek = eachDayOfInterval(sDay, Math.min(sDay + MILLISECONDS_IN_DAY * 7, eDay));
 
     return firstWeek
       .filter((time) => repeatOnDays.includes(dayOfWeek(time)))
-      .map((x) => eachDayOfInterval(x, eDay, repeatPattern === "weekly" ? 7 : 14))
-      .reduce((acc, x) => [...acc, ...x], [])
+      .flatMap((x) => eachDayOfInterval(x, eDay, repeatPattern === "weekly" ? 7 : 14))
       .map((day) => ({
         date: new Date(day),
         startTime,
         endTime,
       }))
       .sort((a, b) => a.date.getTime() - b.date.getTime());
-  } catch (e) {
+  } catch (err) {
     // eslint-disable-next-line no-console
-    console.warn("exception: ", e);
+    console.warn("exception:", err);
     // Date throws => don't crash
   }
 

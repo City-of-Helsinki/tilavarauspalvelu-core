@@ -2,20 +2,15 @@ import React, { forwardRef } from "react";
 import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircle, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { Flex, TitleSection, H1 } from "common/styled";
-import {
-  type Maybe,
-  OrderStatus,
-  ReservationStateChoice,
-  type ReservationTitleSectionFieldsFragment,
-  useReservationApplicationLinkQuery,
-} from "@gql/gql-types";
+import { OrderStatus, ReservationStateChoice, useReservationApplicationLinkQuery } from "@gql/gql-types";
+import type { Maybe, ReservationTitleSectionFieldsFragment } from "@gql/gql-types";
 import { getName } from "@/modules/reservation";
 import { formatDateTime } from "@/common/util";
 import { getApplicationUrl } from "@/common/urls";
 import { gql } from "@apollo/client";
 import { ExternalLink } from "@/component/ExternalLink";
-import StatusLabel from "common/src/components/StatusLabel";
-import { type StatusLabelType } from "common/src/tags";
+import { StatusLabel } from "common/src/components/StatusLabel";
+import type { StatusLabelType } from "common/src/tags";
 
 function getStatusLabelType(s?: Maybe<OrderStatus>): StatusLabelType {
   switch (s) {
@@ -29,7 +24,9 @@ function getStatusLabelType(s?: Maybe<OrderStatus>): StatusLabelType {
     case OrderStatus.Draft:
       return "alert";
     case OrderStatus.Cancelled:
-    default:
+    case OrderStatus.Pending:
+    case null:
+    case undefined:
       return "neutral";
   }
 }
@@ -51,7 +48,8 @@ function getReservationStateLabelProps(s?: Maybe<ReservationStateChoice>): {
       return { type: "error", icon: <IconCross aria-hidden="true" /> };
     case ReservationStateChoice.Cancelled:
       return { type: "neutral", icon: <IconCross aria-hidden="true" /> };
-    default:
+    case null:
+    case undefined:
       return {
         type: "neutral",
         icon: <IconQuestionCircle aria-hidden="true" />,

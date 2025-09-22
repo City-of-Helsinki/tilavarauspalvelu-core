@@ -6,8 +6,8 @@ import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
 interface SearchTagsProps {
   translateTag: (key: string, val: string) => string;
-  hide?: Readonly<string[]>;
-  defaultTags?: Readonly<Array<{ key: string; value: string | string[] }>>;
+  hide?: ReadonlyArray<string>;
+  defaultTags?: ReadonlyArray<{ key: string; value: string | string[] }>;
   clearButtonLabel?: string;
   clearButtonAriaLabel?: string;
 }
@@ -33,7 +33,7 @@ export function SearchTags({
     const vals = new URLSearchParams(params);
     vals.delete(tag.key, tag.value);
     // Use an empty proxy so default values don't override user choices
-    if (!vals.has(tag.key) && defaultTags.find((d) => d.key === tag.key) != null) {
+    if (!vals.has(tag.key) && defaultTags.some((d) => d.key === tag.key)) {
       vals.set(tag.key, "");
     }
     setParams(vals);
@@ -59,7 +59,7 @@ export function SearchTags({
     setParams(newParams);
   };
 
-  const tags: { key: string; value: string; tr: string }[] = [];
+  const tags: Array<{ key: string; value: string; tr: string }> = [];
   for (const [key, value] of params) {
     if (hide.includes(key) || value === "") {
       continue;

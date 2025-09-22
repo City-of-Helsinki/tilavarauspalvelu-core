@@ -3,12 +3,8 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import {
-  ApplicationSectionViewDocument,
-  type ApplicationSectionViewQuery,
-  type ApplicationSectionViewQueryVariables,
-  ApplicationStatusChoice,
-} from "@gql/gql-types";
+import { ApplicationSectionViewDocument, ApplicationStatusChoice } from "@gql/gql-types";
+import type { ApplicationSectionViewQuery, ApplicationSectionViewQueryVariables } from "@gql/gql-types";
 import { H1 } from "common/styled";
 import { AllReservations } from "@/components/application/ApprovedReservations";
 import { gql } from "@apollo/client";

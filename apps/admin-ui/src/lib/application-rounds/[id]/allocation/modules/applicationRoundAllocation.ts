@@ -1,16 +1,16 @@
 import { padStart } from "lodash-es";
-import {
-  type SuitableTimeRangeNode,
-  type ApplicationSectionNode,
-  Priority,
+import { Priority } from "@gql/gql-types";
+import type {
+  SuitableTimeRangeNode,
+  ApplicationSectionNode,
+  ApplicationSectionAllocationFragment,
   Weekday,
-  type ApplicationSectionAllocationFragment,
 } from "@gql/gql-types";
-import { type TFunction } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { filterNonNullable, formatTimeRange, sort, timeToMinutes, toNumber } from "common/src/helpers";
 import { formatDuration } from "common/src/common/util";
 import { convertWeekday, transformWeekday } from "common/src/conversion";
-import { type DayT } from "common/src/const";
+import type { DayT } from "common/src/const";
 import { set } from "date-fns";
 
 // TODO sub fragment these properly
@@ -158,7 +158,7 @@ export function formatSuitableTimeRange(
 
 export function formatTimeRangeList(
   t: TFunction,
-  aes: Pick<SuitableTimeRangeNode, "dayOfTheWeek" | "beginTime" | "endTime" | "priority">[],
+  aes: Array<Pick<SuitableTimeRangeNode, "dayOfTheWeek" | "beginTime" | "endTime" | "priority">>,
   priority: Priority
 ): string {
   const schedules = sort(
@@ -215,7 +215,7 @@ export function createDurationString(
 export type AllocatedTimeSlotNodeT = SectionNodeT["reservationUnitOptions"][0]["allocatedTimeSlots"][0];
 
 export function getRelatedTimeSlots(
-  allocations: Pick<AllocatedTimeSlotNodeT, "endTime" | "beginTime" | "dayOfTheWeek">[]
+  allocations: Array<Pick<AllocatedTimeSlotNodeT, "endTime" | "beginTime" | "dayOfTheWeek">>
 ): RelatedSlot[][] {
   const relatedSpacesTimeSlots = allocations;
 
@@ -224,7 +224,7 @@ export function getRelatedTimeSlots(
   // run reduce to get contiguous time slots (and remove extras)
   // we should end up with 7 arrays (one for each day), each having a list of time slots (beginTime, endTime)
   // then we can use that data to draw the calendar
-  const dayArray = Array.from(Array(7)).map(() => []);
+  const dayArray = Array.from({ length: 7 }).map(() => []);
   const relatedSpacesTimeSlotsByDay = relatedSpacesTimeSlots.reduce<RelatedSlot[][]>((acc, ts) => {
     const day = convertWeekday(ts.dayOfTheWeek);
     const arr = acc[day];
@@ -304,12 +304,13 @@ export function isInsideCell(
 }
 
 export function convertPriorityFilter(values: number[]): Priority[] {
-  return values.reduce<Array<Priority>>((acc, x) => {
-    if (x === 200) {
-      return [...acc, Priority.Secondary];
-    } else if (x === 300) {
-      return [...acc, Priority.Primary];
+  const result: Priority[] = [];
+  for (const x of values) {
+    if (x === 300) {
+      result.push(Priority.Primary);
+    } else if (x === 200) {
+      result.push(Priority.Secondary);
     }
-    return acc;
-  }, []);
+  }
+  return result;
 }

@@ -1,18 +1,20 @@
-import { type SuitableTimeRangeFormValues } from "./form";
-import { type ApplicationRoundTimeSlotNode, Priority, SuitableTimeFieldsFragment, Weekday } from "@/gql/gql-types";
-import { type Cell, type CellState } from "common/src/components/ApplicationTimeSelector";
-import { DayT, WEEKDAYS, WEEKDAYS_SORTED } from "common/src/const";
+import type { SuitableTimeRangeFormValues } from "./form";
+import { Priority } from "@/gql/gql-types";
+import type { ApplicationRoundTimeSlotNode, SuitableTimeFieldsFragment, Weekday } from "@/gql/gql-types";
+import type { Cell, CellState } from "common/src/components/ApplicationTimeSelector";
+import type { DayT } from "common/src/const";
+import { WEEKDAYS, WEEKDAYS_SORTED } from "common/src/const";
 import { convertWeekday, transformWeekday } from "common/src/conversion";
 import { filterNonNullable, formatTimeStruct, timeToMinutes } from "common/src/helpers";
 
 export type DailyOpeningHours = Readonly<
-  Pick<ApplicationRoundTimeSlotNode, "weekday" | "isClosed" | "reservableTimes">[]
+  Array<Pick<ApplicationRoundTimeSlotNode, "weekday" | "isClosed" | "reservableTimes">>
 >;
 
 type SchedulesT = Omit<SuitableTimeFieldsFragment, "pk" | "id">;
 
-type DayCells = Readonly<Cell[]>;
-type WeekCells = Readonly<DayCells[]>;
+type DayCells = ReadonlyArray<Cell>;
+type WeekCells = ReadonlyArray<DayCells>;
 
 const FIRST_SLOT_START = 7;
 const LAST_SLOT_START = 23;
@@ -46,7 +48,7 @@ export function createCells(openingHours: DailyOpeningHours): WeekCells {
   return cells;
 }
 
-export function aesToCells(schedule: Readonly<SchedulesT[]>, openingHours: DailyOpeningHours): WeekCells {
+export function aesToCells(schedule: ReadonlyArray<SchedulesT>, openingHours: DailyOpeningHours): WeekCells {
   const cells = createCells(openingHours);
 
   for (const aes of schedule) {
@@ -71,7 +73,7 @@ type OpeningHourPeriod = {
   end: string;
 };
 
-function getOpeningHours(day: Weekday, openingHours?: DailyOpeningHours): Readonly<OpeningHourPeriod[]> {
+function getOpeningHours(day: Weekday, openingHours?: DailyOpeningHours): ReadonlyArray<OpeningHourPeriod> {
   if (!openingHours) {
     return [];
   }
@@ -103,7 +105,7 @@ function transformCellType(cellType: CellState): Priority {
       return Priority.Primary;
     case "secondary":
       return Priority.Secondary;
-    default:
+    case "none":
       throw new Error(`Unknown cell type: ${cellType}`);
   }
 }
@@ -119,7 +121,7 @@ interface AesType extends TimeSpan {
 }
 
 function combineTimespans(prev: TimeSpan[], current: TimeSpan): TimeSpan[] {
-  if (!prev.length) {
+  if (prev.length === 0) {
     return [current];
   }
   const prevCell = prev[prev.length - 1];
@@ -128,7 +130,7 @@ function combineTimespans(prev: TimeSpan[], current: TimeSpan): TimeSpan[] {
   }
   if (prevCell.end === current.begin && prevCell.priority === current.priority) {
     return [
-      ...prev.slice(0, prev.length - 1),
+      ...prev.slice(0, -1),
       {
         begin: prevCell.begin,
         end: prevCell.end + 1,

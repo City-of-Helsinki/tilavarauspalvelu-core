@@ -3,14 +3,16 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Button, ButtonVariant, Dialog, RadioButton, Select, SelectionGroup, TextArea } from "hds-react";
 import {
-  type ReservationDenyMutation,
-  type ReservationRefundMutation,
   useDenyReservationMutation,
   useRefundReservationMutation,
-  type ReservationSeriesDenyMutation,
   useDenyReservationSeriesMutation,
   OrderStatus,
-  type DenyDialogFieldsFragment,
+} from "@gql/gql-types";
+import type {
+  ReservationDenyMutation,
+  ReservationRefundMutation,
+  ReservationSeriesDenyMutation,
+  DenyDialogFieldsFragment,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { CenterSpinner, Flex } from "common/styled";
@@ -102,7 +104,6 @@ const ReturnMoney = ({
     case "refund":
     case "no-refund":
     case "not-decided":
-    default:
       return (
         <SelectionGroup required direction="horizontal" label={t("radioLabel")}>
           <RadioButton

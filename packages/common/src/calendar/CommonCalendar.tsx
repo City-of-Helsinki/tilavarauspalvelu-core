@@ -4,7 +4,8 @@ import { addHours, endOfMonth, format, startOfWeek, getDay, startOfDay } from "d
 import { fi } from "date-fns/locale/fi";
 import { enGB } from "date-fns/locale/en-GB";
 import { sv } from "date-fns/locale/sv";
-import { Calendar as BigCalendar, dateFnsLocalizer, ToolbarProps } from "react-big-calendar";
+import type { ToolbarProps } from "react-big-calendar";
+import { Calendar as BigCalendar, dateFnsLocalizer } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
@@ -41,7 +42,7 @@ export type SlotClickProps = {
 };
 
 type Props<T> = {
-  events: (CalendarEvent<T> | CalendarEventBuffer)[];
+  events: Array<CalendarEvent<T> | CalendarEventBuffer>;
   begin: Date;
   eventStyleGetter: ({ event }: CalendarEvent<T>) => {
     style: React.CSSProperties;
@@ -133,7 +134,6 @@ const StyledCalendar = styled(BigCalendar)<{
       switch (step) {
         case 15:
           return "23px";
-        case 30:
         default:
           return "40px";
       }
@@ -467,7 +467,7 @@ const localizer = (locale: LocalizationLanguages) =>
     locales,
   });
 
-function Calendar<T extends Record<string, unknown>>({
+export function CommonCalendar<T extends Record<string, unknown>>({
   events,
   begin,
   eventStyleGetter,
@@ -547,5 +547,3 @@ function Calendar<T extends Record<string, unknown>>({
     />
   );
 }
-
-export default Calendar;

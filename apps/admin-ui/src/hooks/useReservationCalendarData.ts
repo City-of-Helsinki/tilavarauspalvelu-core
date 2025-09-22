@@ -1,15 +1,10 @@
-import {
-  type CalendarReservationFragment,
-  type Maybe,
-  ReservationStateChoice,
-  ReservationTypeChoice,
-  useReservationsByReservationUnitQuery,
-} from "@gql/gql-types";
+import { ReservationStateChoice, ReservationTypeChoice, useReservationsByReservationUnitQuery } from "@gql/gql-types";
+import type { CalendarReservationFragment, Maybe } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { toApiDate } from "common/src/common/util";
 import { errorToast } from "common/src/components/toast";
 import { createNodeId } from "common/src/helpers";
-import { type CalendarEventType } from "@/modules/reservation";
+import type { CalendarEventType } from "@/modules/reservation";
 import { combineAffectingReservations } from "@/helpers";
 
 // TODO there is an issue here with denied "Blocked" reservations shown in the Calendar as regular "Blocked" reservations

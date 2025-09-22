@@ -1,5 +1,6 @@
 import { useTranslation } from "next-i18next";
-import { type Maybe, useReservationSeriesQuery } from "@gql/gql-types";
+import { useReservationSeriesQuery } from "@gql/gql-types";
+import type { Maybe } from "@gql/gql-types";
 import { errorToast } from "common/src/components/toast";
 import { createNodeId, filterNonNullable, getNode } from "common/src/helpers";
 import { gql } from "@apollo/client";

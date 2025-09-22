@@ -12,15 +12,17 @@ import { IconGroup, IconUser } from "hds-react";
 import React, { Fragment } from "react";
 import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { camelCase } from "lodash-es";
-import { MetadataSetsFragment, MunicipalityChoice, ReserveeType } from "../../gql/gql-types";
+import type { MetadataSetsFragment } from "../../gql/gql-types";
+import { MunicipalityChoice, ReserveeType } from "../../gql/gql-types";
 import { ReservationFormField } from "./ReservationFormField";
-import { Inputs, type Reservation } from "./types";
+import type { Reservation, Inputs } from "./types";
 import { RadioButtonWithImage } from "./RadioButtonWithImage";
 import { AutoGrid, fontMedium, fontRegular, H4, H5 } from "../../styled";
 import type { OptionsRecord } from "../../types/common";
-import IconPremises from "../icons/IconPremises";
+import { SvgComponent } from "../icons/IconPremises";
 import { containsField } from "../metaFieldsHelpers";
 import { filterNonNullable } from "../helpers";
 
@@ -100,7 +102,7 @@ const reserveeOptions = [
   },
   {
     id: ReserveeType.Company,
-    icon: <IconPremises width="24" height="24" aria-hidden />,
+    icon: <SvgComponent width="24" height="24" aria-hidden />,
   },
 ];
 
@@ -158,7 +160,7 @@ function ReservationFormFields({
     .map(camelCase);
   const fieldsExtended = fields.map((field) => ({
     field,
-    required: requiredFields.find((x) => x === field) != null,
+    required: requiredFields.some((x) => x === field),
   }));
 
   // TODO the subheading logic is weird / inefficient
@@ -330,7 +332,7 @@ export function extendMetaFieldOptions(options: Omit<OptionsRecord, "municipalit
 // because we need the individual components for admin-ui (placement in dom changes)
 // and this component has more props than dom nodes.
 // Not removed yet since requires ui/ refactoring.
-function MetaFields({ reservationUnit, generalFields, reservationApplicationFields, options, data }: Props) {
+export function MetaFields({ reservationUnit, generalFields, reservationApplicationFields, options, data }: Props) {
   if (!reservationUnit.metadataSet) {
     return null;
   }
@@ -347,5 +349,3 @@ function MetaFields({ reservationUnit, generalFields, reservationApplicationFiel
     </Container>
   );
 }
-
-export default MetaFields;

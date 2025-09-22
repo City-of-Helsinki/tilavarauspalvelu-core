@@ -1,15 +1,11 @@
 import { isAfter, isBefore } from "date-fns";
-import {
-  ReservationUnitImageType,
-  type PricingFieldsFragment,
-  type ImageFragment,
-  type Maybe,
-  type SuitableTimeFieldsFragment,
-} from "../gql/gql-types";
-import { type OptionInProps } from "hds-react";
-import { type DayT, pixel } from "./const";
-import { type TFunction } from "i18next";
-import { type LocalizationLanguages } from "./urlBuilder";
+import { ReservationUnitImageType } from "../gql/gql-types";
+import type { PricingFieldsFragment, ImageFragment, Maybe, SuitableTimeFieldsFragment } from "../gql/gql-types";
+import type { OptionInProps } from "hds-react";
+import { pixel } from "./const";
+import type { DayT } from "./const";
+import type { TFunction } from "i18next";
+import type { LocalizationLanguages } from "./urlBuilder";
 import { convertWeekday } from "./conversion";
 
 /// Enforce readonly on all nested properties
@@ -18,12 +14,14 @@ export type ReadonlyDeep<T> = {
   readonly [P in keyof T]: ReadonlyDeep<T[P]>;
 };
 
-export function filterNonNullable<T>(arr: Maybe<Readonly<Array<Maybe<T | undefined>>>> | undefined): NonNullable<T>[] {
+export function filterNonNullable<T>(
+  arr: Maybe<ReadonlyArray<Maybe<T | undefined>>> | undefined
+): Array<NonNullable<T>> {
   return arr?.filter((n): n is NonNullable<T> => n != null) ?? [];
 }
 
 type SortFunc<T> = (a: T, b: T) => number;
-export function sort<T>(arr: Readonly<T[]>, func: SortFunc<T>): T[] {
+export function sort<T>(arr: ReadonlyArray<T>, func: SortFunc<T>): T[] {
   return [...arr].sort((a, b) => func(a, b));
 }
 
@@ -133,7 +131,7 @@ export async function hash(val: string): Promise<string> {
 }
 
 export function truncate(val: string, maxLen: number): string {
-  return val.length > maxLen ? `${val.substring(0, maxLen - 1)}…` : val;
+  return val.length > maxLen ? `${val.slice(0, maxLen - 1)}…` : val;
 }
 
 /// Always return an image because the Design and process should not allow imageless reservation units
@@ -168,7 +166,7 @@ function getImageSourceWithoutDefault(
   }
 }
 
-export function getMainImage(ru?: { images: Readonly<ImageFragment[]> }): ImageFragment | null {
+export function getMainImage(ru?: { images: ReadonlyArray<ImageFragment> }): ImageFragment | null {
   return ru?.images.find((img) => img.imageType === ReservationUnitImageType.Main) ?? null;
 }
 
@@ -197,7 +195,7 @@ function pickMaybeDay(
 }
 
 // Returns a Date object with the first day of the given array of Dates
-export function dayMin(days: Readonly<Array<Readonly<Date | undefined>>>): Date | undefined {
+export function dayMin(days: ReadonlyArray<Readonly<Date | undefined>>): Date | undefined {
   return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
     return pickMaybeDay(acc, day, isBefore);
   }, undefined);
@@ -215,7 +213,7 @@ export function dayMax(days: Array<Date | undefined>): Date | undefined {
 /// @return 0 if time is invalid otherwise the time in minutes
 export function timeToMinutes(time: string): number {
   const [hours, minutes] = time.split(":").map(Number);
-  if (hours != null && minutes != null && isFinite(hours) && isFinite(minutes)) {
+  if (hours != null && minutes != null && Number.isFinite(hours) && Number.isFinite(minutes)) {
     return hours * 60 + minutes;
   }
   return 0;
@@ -255,7 +253,7 @@ export function formatApiTimeInterval({
 }
 
 export function formatDayTimes(
-  schedule: Omit<SuitableTimeFieldsFragment, "pk" | "id" | "priority">[],
+  schedule: Array<Omit<SuitableTimeFieldsFragment, "pk" | "id" | "priority">>,
   day: number
 ): string {
   return schedule
@@ -311,7 +309,7 @@ export function convertOptionToHDS(option: { label: string; value: string | numb
 }
 
 /// @description Convert a list of strings to a comma separated string
-export function formatListToCSV(t: TFunction, list: Readonly<Array<Readonly<string>>>): string {
+export function formatListToCSV(t: TFunction, list: ReadonlyArray<Readonly<string>>): string {
   if (list.length === 0) {
     return "";
   }
@@ -319,7 +317,7 @@ export function formatListToCSV(t: TFunction, list: Readonly<Array<Readonly<stri
     return list[0];
   }
   const lastItem = list[list.length - 1];
-  return list.slice(0, list.length - 1).join(", ") + ` ${t("common:and")} ${lastItem}`;
+  return `${list.slice(0, -1).join(", ")} ${t("common:and")} ${lastItem}`;
 }
 
 /// @description Converts time struct to string
@@ -342,7 +340,7 @@ export function filterEmptyArray<T>(param: T[]): T[] | undefined {
   return param;
 }
 
-// oxlint-disable-next-line typescript/no-empty-object-type
+// oxlint-disable-next-line typescript/no-empty-object-type, typescript/ban-types
 export function getNode<T extends { id: string }>(data: { node?: T | null | {} } | undefined | null): T | null {
   return data?.node != null && "id" in data.node ? data.node : null;
 }

@@ -8,12 +8,8 @@ import { ViewApplication } from "@/components/application/ViewApplication";
 import { ApplicationHead } from "@/components/application/ApplicationHead";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
 import { createNodeId, getLocalizationLang, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import {
-  ApplicationStatusChoice,
-  ApplicationViewDocument,
-  type ApplicationViewQueryVariables,
-  type ApplicationViewQuery,
-} from "@gql/gql-types";
+import { ApplicationStatusChoice, ApplicationViewDocument } from "@gql/gql-types";
+import type { ApplicationViewQueryVariables, ApplicationViewQuery } from "@gql/gql-types";
 import { Tabs } from "hds-react";
 import { formatDateTime } from "@/modules/util";
 import { ApprovedReservations, BREAKPOINT } from "@/components/application/ApprovedReservations";

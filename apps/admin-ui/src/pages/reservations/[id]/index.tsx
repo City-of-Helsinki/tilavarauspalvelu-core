@@ -1,15 +1,15 @@
 import React, { useRef } from "react";
-import { type ApolloQueryResult, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import {
   ReserveeType,
-  type ReservationPageQuery,
   ReservationStateChoice,
   UserPermissionChoice,
   ReservationPageDocument,
   useReservationPageLazyQuery,
-  ReservationPageFragment,
 } from "@gql/gql-types";
+import type { ReservationPageQuery, ReservationPageFragment } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { ButtonContainer } from "common/styled";
 import { ShowWhenTargetInvisible } from "@/component/ShowWhenTargetInvisible";
@@ -22,7 +22,7 @@ import {
   reservationPrice,
   translateReservationCustomerType,
 } from "@/modules/reservation";
-import VisibleIfPermission from "@/component/VisibleIfPermission";
+import { VisibleIfPermission } from "@/component/VisibleIfPermission";
 import {
   ApprovalButtons,
   ApprovalButtonsRecurring,
@@ -38,7 +38,7 @@ import { formatAgeGroup } from "@/common/util";
 import { toUIDateTime } from "common/src/common/util";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { createClient } from "@/common/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";

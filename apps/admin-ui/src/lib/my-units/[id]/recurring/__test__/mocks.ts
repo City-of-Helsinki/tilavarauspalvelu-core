@@ -6,21 +6,23 @@ import {
   ReservationTypeChoice,
   CreateStaffReservationDocument,
   ReservationUnitDocument,
-  type ReservationUnitQuery,
   CreateReservationSeriesDocument,
-  type CreateStaffReservationFragment,
   CurrentUserDocument,
-  type CurrentUserQuery,
   FilterOptionsDocument,
-  type FilterOptionsQuery,
   TermsOfUseDocument,
-  type TermsOfUseQuery,
-  CalendarReservationFragment,
   AccessType,
   ReservationStateChoice,
-  type ReservationsByReservationUnitQueryVariables,
   ReservationsByReservationUnitDocument,
-  type ReservationsByReservationUnitQuery,
+} from "@gql/gql-types";
+import type {
+  ReservationUnitQuery,
+  CreateStaffReservationFragment,
+  CurrentUserQuery,
+  FilterOptionsQuery,
+  TermsOfUseQuery,
+  ReservationsByReservationUnitQueryVariables,
+  ReservationsByReservationUnitQuery,
+  CalendarReservationFragment,
 } from "@gql/gql-types";
 import { createNodeId } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
@@ -114,7 +116,7 @@ function createReservationUnitFragment({ pk, nameFi }: { pk: number; nameFi: str
 }
 
 // First monday off the month has reservation from 9:00 - 12:00
-export const mondayMorningReservations = Array.from(Array(12).keys()).map((x) => {
+export const mondayMorningReservations = [...Array.from({ length: 12 }).keys()].map((x) => {
   const firstMonday = nextMonday(new Date(YEAR, x, 1));
   const begin = set(firstMonday, { hours: 9, minutes: 0, milliseconds: 0 });
   const end = set(firstMonday, { hours: 12, minutes: 0, milliseconds: 0 });
@@ -126,29 +128,34 @@ export const mondayMorningReservations = Array.from(Array(12).keys()).map((x) =>
 
 // Every day has 5 x 1 hour reservations from 15 - 21
 const firstDay = new Date(YEAR, 1, 1);
-const everydayReservations = Array.from(Array(365).keys()).reduce((agv: { begin: Date; end: Date }[], i) => {
-  const begin = set(firstDay, {
-    date: i,
-    hours: 15,
-    minutes: 0,
-    milliseconds: 0,
-  });
-  const end = addHours(begin, 1);
-  return [
-    ...agv,
-    ...Array.from(Array(5).keys()).map((j) => ({
-      begin: set(begin, {
-        hours: 15 + j,
-      }),
-      end: set(end, {
-        hours: 16 + j,
-      }),
-    })),
-  ];
-}, []);
+const everydayReservations = [...Array.from({ length: 365 }).keys()].reduce(
+  (agv: Array<{ begin: Date; end: Date }>, i) => {
+    const begin = set(firstDay, {
+      date: i,
+      hours: 15,
+      minutes: 0,
+      milliseconds: 0,
+    });
+    const end = addHours(begin, 1);
+    return [
+      ...agv,
+      ...[...Array.from({ length: 5 }).keys()].map((j) => ({
+        begin: set(begin, {
+          hours: 15 + j,
+        }),
+        end: set(end, {
+          hours: 16 + j,
+        }),
+      })),
+    ];
+  },
+  []
+);
 
-const reservationsByUnitResponse: CalendarReservationFragment[] = mondayMorningReservations
-  .concat(everydayReservations)
+const reservationsByUnitResponse: CalendarReservationFragment[] = [
+  ...mondayMorningReservations,
+  ...everydayReservations,
+]
   // backend returns days unsorted but our mondays are first
   // we could also randomize the array so blocking times are neither at the start nor the end
   .sort((x, y) => x.begin.getTime() - y.begin.getTime())

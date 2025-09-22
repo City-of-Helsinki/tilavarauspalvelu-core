@@ -1,19 +1,16 @@
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
-import {
-  AuthenticationType,
-  type Maybe,
-  ReservationTypeChoice,
-  type ReservationTypeFormFieldsFragment,
-} from "@gql/gql-types";
+import { AuthenticationType, ReservationTypeChoice } from "@gql/gql-types";
+import type { Maybe, ReservationTypeFormFieldsFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { type ReservationFormType, ReservationTypes } from "@/schemas";
+import { ReservationTypes } from "@/schemas";
+import type { ReservationFormType } from "@/schemas";
 import { ShowAllContainer } from "common/src/components";
 import { ReservationMetadataSetForm, ReserverMetadataSetForm } from "./MetadataSetForm";
 import { BufferToggles } from "./BufferToggles";
-import ShowTOS from "./ShowTOS";
+import { ShowTOS } from "./ShowTOS";
 import { Element } from "@/styled";
 import { gql } from "@apollo/client";
 import { HR } from "common/styled";
@@ -75,7 +72,7 @@ function TypeSelect({ isDisabled }: { isDisabled?: boolean }) {
 }
 
 // TODO are buffers in different places for Recurring and Single reservations? Check the UI spec
-function ReservationTypeForm({
+export function ReservationTypeForm({
   reservationUnit,
   children,
   disableBufferToggle,
@@ -157,8 +154,6 @@ function ReservationTypeForm({
     </>
   );
 }
-
-export default ReservationTypeForm;
 
 export const RESERVATION_TYPE_FORM_FRAGMENT = gql`
   fragment ReservationTypeFormFields on ReservationUnitNode {

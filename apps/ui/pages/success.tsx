@@ -1,10 +1,6 @@
 import type { GetServerSidePropsContext } from "next";
-import {
-  OrderStatus,
-  ReservationStateChoice,
-  type SuccessRedirectFragment,
-  useReservationStateQuery,
-} from "@gql/gql-types";
+import { OrderStatus, ReservationStateChoice, useReservationStateQuery } from "@gql/gql-types";
+import type { SuccessRedirectFragment } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath } from "@/modules/urls";
@@ -16,7 +12,7 @@ import { ignoreMaybeArray } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
 const POLL_INTERVAL_MS = 500;
-const STOP_POLLING_TIMEOUT_MS = 30000;
+const STOP_POLLING_TIMEOUT_MS = 30_000;
 
 // TODO should be moved to /reservations/success
 // but because this is webstore callback page we need to leave the url (use an url rewrite)
@@ -84,8 +80,9 @@ function getRedirectUrl(reservation: SuccessRedirectFragment): string | null {
       return getReservationPath(reservation.pk, undefined, "paid");
     case ReservationStateChoice.WaitingForPayment:
       return null;
+    case ReservationStateChoice.Cancelled:
     case ReservationStateChoice.Created:
-    default:
+    case ReservationStateChoice.Denied:
       // TODO what is this error? or the query param, is it really used for something
       // also why not redirect to the reservation page? it shows the payment status and a link to the payment page
       return "/reservations?error=order1";

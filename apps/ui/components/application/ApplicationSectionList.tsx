@@ -1,17 +1,11 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { IconCheck, IconCross, IconQuestionCircleFill, Tooltip } from "hds-react";
-import {
-  type AgeGroupNode,
-  type Maybe,
-  Priority,
-  ApplicationSectionStatusChoice,
-  type ApplicationViewFragment,
-  type SuitableTimeFieldsFragment,
-} from "@gql/gql-types";
+import { Priority, ApplicationSectionStatusChoice } from "@gql/gql-types";
+import type { AgeGroupNode, Maybe, ApplicationViewFragment, SuitableTimeFieldsFragment } from "@gql/gql-types";
 import { WEEKDAYS } from "common/src/const";
 import { filterNonNullable, formatDayTimes, fromMondayFirstUnsafe } from "common/src/helpers";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import type { StatusLabelType } from "common/src/tags";
 import { NoWrap } from "common/styled";
 import { convertLanguageCode, formatDurationRange, getTranslationSafe, toUIDate } from "common/src/common/util";
@@ -24,7 +18,7 @@ import {
   ScheduleDay,
   RegularText,
 } from "./styled";
-import { SuitableTimeRangeFormValues } from "./funnel/form";
+import type { SuitableTimeRangeFormValues } from "./funnel/form";
 
 function ageGroupToString(ag: Maybe<AgeGroupNode> | undefined): string {
   if (!ag) {
@@ -42,7 +36,10 @@ function getLabelProps(status: ApplicationSectionStatusChoice | undefined | null
       return { type: "success", icon: <IconCheck /> };
     case ApplicationSectionStatusChoice.Rejected:
       return { type: "error", icon: <IconCross /> };
-    default:
+    case ApplicationSectionStatusChoice.InAllocation:
+    case ApplicationSectionStatusChoice.Unallocated:
+    case undefined:
+    case null:
       return { type: "info", icon: <IconQuestionCircleFill /> };
   }
 }
@@ -65,8 +62,8 @@ function SingleApplicationSection({
   secondaryTimes,
 }: {
   aes: SingleApplicationSectionT;
-  primaryTimes: Omit<SuitableTimeRangeFormValues, "pk">[];
-  secondaryTimes: Omit<SuitableTimeRangeFormValues, "pk">[];
+  primaryTimes: Array<Omit<SuitableTimeRangeFormValues, "pk">>;
+  secondaryTimes: Array<Omit<SuitableTimeRangeFormValues, "pk">>;
 }) {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);

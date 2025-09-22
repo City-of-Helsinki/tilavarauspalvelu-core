@@ -2,13 +2,13 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { FilterTags, StyledTag, ResetButton } from "common/src/tags";
 import { useSearchModify } from "@/hooks/useSearchValues";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { useSearchParams } from "next/navigation";
 
 type FilterTagProps = {
-  filters: readonly string[];
-  multiSelectFilters: readonly string[];
-  hideList: readonly string[];
+  filters: ReadonlyArray<string>;
+  multiSelectFilters: ReadonlyArray<string>;
+  hideList: ReadonlyArray<string>;
   translateTag: (key: string, value: string) => string | undefined;
 };
 

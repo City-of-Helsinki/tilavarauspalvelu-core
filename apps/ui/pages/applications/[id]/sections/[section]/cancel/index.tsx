@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import {
-  ApplicationSectionCancelDocument,
+import { ApplicationSectionCancelDocument, useCancelApplicationSectionMutation } from "@gql/gql-types";
+import type {
+  ApplicationSectionCancelQuery,
+  ApplicationSectionCancelQueryVariables,
   ApplicationSectionCancelPageFragment,
-  useCancelApplicationSectionMutation,
-  type ApplicationSectionCancelQuery,
-  type ApplicationSectionCancelQueryVariables,
 } from "@gql/gql-types";
-import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";
+import { CancellationForm } from "@/components/CancellationForm";
+import type { CancelFormValues } from "@/components/CancellationForm";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";

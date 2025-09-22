@@ -1,7 +1,8 @@
 import { errorToast } from "common/src/components/toast";
 import { useSort } from "@/hooks/useSort";
 import { RejectedOccurrencesTable, SORT_KEYS } from "./RejectedOccurrencesTable";
-import { type ApolloError, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
+import type { ApolloError } from "@apollo/client";
 import { RejectedOccurrenceOrderSet, useRejectedOccurrencesQuery } from "@gql/gql-types";
 import { More } from "@/component/More";
 import React from "react";
@@ -14,7 +15,7 @@ import { CenterSpinner } from "common/styled";
 
 type Props = {
   applicationRoundPk: number;
-  unitOptions: { label: string; value: number }[];
+  unitOptions: Array<{ label: string; value: number }>;
 };
 
 export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions }: Props): JSX.Element {

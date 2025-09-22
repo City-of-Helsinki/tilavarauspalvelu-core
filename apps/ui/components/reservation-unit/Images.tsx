@@ -3,14 +3,14 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/const";
 import type { ImageFragment } from "@gql/gql-types";
-import Carousel from "@/components/Carousel";
+import { Carousel } from "@/components/Carousel";
 import { getImageSource } from "common/src/helpers";
 import { Dialog } from "hds-react";
 import { focusStyles, removeButtonStyles } from "common/styled";
 import { FixedDialog } from "@/styled/FixedDialog";
 
 type Props = {
-  images: Readonly<ImageFragment[]>;
+  images: ReadonlyArray<ImageFragment>;
   contextName?: string;
 };
 

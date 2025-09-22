@@ -1,20 +1,15 @@
 import {
   CurrentUserDocument,
   OptionsDocument,
-  OptionsQuery,
   ReservationKind,
   ReservationPurposeOrderSet,
   ReservationUnitTypeOrderSet,
-  type CurrentUserQuery,
 } from "@/gql/gql-types";
+import type { CurrentUserQuery, OptionsQuery } from "@/gql/gql-types";
 import { createApplicationMutationMocks } from "./application.mocks";
 import { createSearchQueryMocks } from "./search.mocks";
-import {
-  type ICreateGraphQLMock,
-  type CreateGraphQLMockProps,
-  type CreateGraphQLMocksReturn,
-  createOptionQueryMock,
-} from "./test.gql.utils";
+import { createOptionQueryMock } from "./test.gql.utils";
+import type { ICreateGraphQLMock, CreateGraphQLMockProps, CreateGraphQLMocksReturn } from "./test.gql.utils";
 import { createNodeId } from "common/src/helpers";
 
 export function createGraphQLMocks({

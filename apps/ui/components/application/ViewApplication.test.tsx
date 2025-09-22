@@ -1,5 +1,6 @@
 import { expect, test, describe } from "vitest";
-import { CreateMockApplicationFragmentProps, createMockApplicationViewFragment } from "@test/application.mocks";
+import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
+import { createMockApplicationViewFragment } from "@test/application.mocks";
 import { render } from "@testing-library/react";
 import { ViewApplication } from "./ViewApplication";
 import { ApplicationStatusChoice } from "@/gql/gql-types";
@@ -12,7 +13,7 @@ function customRender({ children, ...props }: RenderProps = {}): ReturnType<type
     props.page = "page3";
   }
   const application = createMockApplicationViewFragment(props);
-  return render(<ViewApplication application={application}>{children ?? <div></div>}</ViewApplication>);
+  return render(<ViewApplication application={application}>{children ?? <div />}</ViewApplication>);
 }
 
 describe("ViewApplication", () => {

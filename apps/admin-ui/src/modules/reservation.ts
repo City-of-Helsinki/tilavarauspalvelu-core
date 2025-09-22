@@ -1,17 +1,16 @@
 import { differenceInMinutes, format } from "date-fns";
 import type { TFunction } from "i18next";
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "common";
-import {
-  type CreateTagStringFragment,
+import { PriceUnit, ReservationTypeChoice } from "@gql/gql-types";
+import type {
+  CreateTagStringFragment,
+  Maybe,
+  PricingFieldsFragment,
+  ReservationNode,
+  ReservationPriceDetailsFieldsFragment,
+  ReservationUnitPricingFieldsFragment,
+  EventStyleReservationFieldsFragment,
   ReserveeType,
-  type Maybe,
-  PriceUnit,
-  type PricingFieldsFragment,
-  type ReservationNode,
-  type ReservationPriceDetailsFieldsFragment,
-  ReservationTypeChoice,
-  type ReservationUnitPricingFieldsFragment,
-  type EventStyleReservationFieldsFragment,
 } from "@gql/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
 import { formatDate, formatDateTimeRange, getReserveeName } from "@/common/util";
@@ -19,7 +18,7 @@ import { fromAPIDateTime, getReserveeTypeTranslationKey } from "@/helpers";
 import { filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 import { convertWeekday } from "common/src/conversion";
-import { type CalendarEvent } from "common/src/calendar/Calendar";
+import type { CalendarEvent } from "common/src/calendar/CommonCalendar";
 
 export type EventType = EventStyleReservationFieldsFragment;
 export type CalendarEventType = CalendarEvent<EventType>;
@@ -160,7 +159,7 @@ export function createTagString(reservation: CreateTagStringFragment, t: TFuncti
       return createRecurringTagString(reservation, t);
     }
     return createSingleTagString(reservation, t);
-  } catch (_) {
+  } catch {
     return "";
   }
 }

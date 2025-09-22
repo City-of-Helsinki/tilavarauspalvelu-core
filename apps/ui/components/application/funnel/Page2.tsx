@@ -3,20 +3,20 @@ import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { useFormContext } from "react-hook-form";
-import { ApplicationSectionTimePickerFragment } from "@gql/gql-types";
+import type { ApplicationSectionTimePickerFragment } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { ButtonContainer } from "common/styled";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { getApplicationPath } from "@/modules/urls";
-import { type ApplicationPage2FormValues } from "./form";
-import { TimeSelectorForm } from ".";
+import type { ApplicationPage2FormValues } from "./form";
+import { TimeSelectorForm } from "./TimeSelector";
 import { gql } from "@apollo/client";
 
 type Props = {
   application: Readonly<{
     pk: number;
-    applicationSections: Readonly<ApplicationSectionTimePickerFragment[]>;
+    applicationSections: ReadonlyArray<ApplicationSectionTimePickerFragment>;
   }>;
 
   onNext: (appToSave: ApplicationPage2FormValues) => void;
@@ -93,7 +93,7 @@ function ApplicationSectionTimePicker({
     .map((n) => n.reservationUnit)
     .map((n) => ({
       value: n?.pk ?? 0,
-      label: `${n.unit && getTranslationSafe(n.unit, "name", language) + ": "}${getTranslationSafe(n, "name", language)}`,
+      label: `${n.unit && `${getTranslationSafe(n.unit, "name", language)}: `}${getTranslationSafe(n, "name", language)}`,
     }));
 
   const aes = watch(`applicationSections.${sectionIndex}`);

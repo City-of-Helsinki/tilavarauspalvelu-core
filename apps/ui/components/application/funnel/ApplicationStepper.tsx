@@ -2,8 +2,8 @@ import React from "react";
 import { Stepper as HDSStepper, StepState } from "hds-react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
-import { type ApplicationFormFragment } from "@/gql/gql-types";
-import { type ReadonlyDeep } from "common/src/helpers";
+import type { ApplicationFormFragment } from "@/gql/gql-types";
+import type { ReadonlyDeep } from "common/src/helpers";
 import { validateApplication } from "./form";
 import { isSent } from "@/modules/util";
 import { getApplicationPath } from "@/modules/urls";
@@ -13,8 +13,8 @@ import { breakpoints } from "common/src/const";
 // Ordered list of steps by page slug
 export const PAGES_WITH_STEPPER = ["page1", "page2", "page3", "page4"] as const;
 
-function getStep(slug: string) {
-  const index = PAGES_WITH_STEPPER.findIndex((x) => x === slug);
+function getStep(slug: (typeof PAGES_WITH_STEPPER)[number]) {
+  const index = PAGES_WITH_STEPPER.indexOf(slug);
   if (index === -1) {
     return 0;
   }
@@ -76,7 +76,7 @@ export function ApplicationStepper({ application }: Readonly<StepperProps>): JSX
     push(getApplicationPath(application?.pk, targetPage));
   };
 
-  const selectedStep = getStep(pathname.split("/").pop() ?? "page1");
+  const selectedStep = getStep((pathname.split("/").pop() as (typeof PAGES_WITH_STEPPER)[number]) ?? "page1");
 
   return (
     <StyledStepper

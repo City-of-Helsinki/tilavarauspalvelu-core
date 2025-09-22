@@ -3,11 +3,8 @@ import { trim } from "lodash-es";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, Checkbox, Dialog, Notification, NumberInput, TextArea } from "hds-react";
-import {
-  type ApprovalDialogFieldsFragment,
-  useApproveReservationMutation,
-  type ReservationApproveMutation,
-} from "@gql/gql-types";
+import { useApproveReservationMutation } from "@gql/gql-types";
+import type { ApprovalDialogFieldsFragment, ReservationApproveMutation } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { Flex } from "common/styled";
 import { getReservationPriceDetails } from "@/modules/reservation";

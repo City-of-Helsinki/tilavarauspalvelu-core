@@ -1,5 +1,6 @@
 import { useTranslation } from "next-i18next";
-import { ReservationList, type NewReservationListItem } from "@/component/ReservationsList";
+import { ReservationList } from "@/component/ReservationsList";
+import type { NewReservationListItem } from "@/component/ReservationsList";
 import { ReservationListButton } from "@/component/ReservationListButton";
 
 type ReservationListEditorProps = {

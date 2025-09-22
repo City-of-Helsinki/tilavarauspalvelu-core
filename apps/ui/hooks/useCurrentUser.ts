@@ -1,5 +1,7 @@
-import { useCurrentUserQuery, type CurrentUserQuery } from "@gql/gql-types";
-import { gql, type ApolloError } from "@apollo/client";
+import { useCurrentUserQuery } from "@gql/gql-types";
+import type { CurrentUserQuery } from "@gql/gql-types";
+import { gql } from "@apollo/client";
+import type { ApolloError } from "@apollo/client";
 
 // TODO this should be replaced with SSR current user in most cases.
 // Causes a flash of unauthenticated content on page load.

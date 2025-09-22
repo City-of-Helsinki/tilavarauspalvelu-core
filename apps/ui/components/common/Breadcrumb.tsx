@@ -13,7 +13,7 @@ export type RouteItem = {
 };
 
 type Props = {
-  routes: Readonly<RouteItem[]>;
+  routes: ReadonlyArray<RouteItem>;
 };
 
 const Nav = styled.nav<{ $isMobile?: boolean }>`
@@ -48,17 +48,14 @@ const Anchor = styled(Link)<{ $current?: boolean; $isMobile?: boolean }>`
     max-width: ${LIMIT_DEFAULT_CH}ch;
     ${truncatedText}
     ${({ $current }) => {
-      switch ($current) {
-        case true:
-          return currentCss;
-        case false:
-        default:
-          return `
-            color: var(--color-black);
-            text-decoration: underline;
-          `;
+      if ($current) {
+        return currentCss;
       }
-    }}
+      return `
+        color: var(--color-black);
+        text-decoration: underline;
+      `;
+    }}}
   }
 `;
 

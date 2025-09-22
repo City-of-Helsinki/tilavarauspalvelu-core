@@ -1,23 +1,24 @@
 import React from "react";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import styled from "styled-components";
 import { Button, ButtonSize, ButtonVariant, Dialog, Notification, NotificationSize } from "hds-react";
-import { z } from "zod";
+import type { z } from "zod";
 import {
-  type ChangeReservationTimeFragment,
-  type ReservationSeriesAddMutation,
   ReservationTypeChoice,
   useAddReservationToSeriesMutation,
   useStaffAdjustReservationTimeMutation,
-  Weekday,
 } from "@gql/gql-types";
-import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
+import type { ChangeReservationTimeFragment, ReservationSeriesAddMutation, Weekday } from "@gql/gql-types";
+import type { UseFormReturn } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { differenceInMinutes, format } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatDuration, toUIDate } from "common/src/common/util";
 import { useModal } from "@/context/ModalContext";
-import { TimeChangeFormSchemaRefined, TimeFormSchema } from "@/schemas";
+import type { TimeFormSchema } from "@/schemas";
+import { TimeChangeFormSchemaRefined } from "@/schemas";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { BufferToggles } from "@/component/BufferToggles";
@@ -401,8 +402,12 @@ export function EditTimeModal({
                 <Bold>
                   {reservationSeriesInfoText({
                     weekdays: filterNonNullable(reservation.reservationSeries?.weekdays),
-                    begin: ((x) => (x != null ? new Date(x) : undefined))(reservation.reservationSeries?.beginDate),
-                    end: ((x) => (x != null ? new Date(x) : undefined))(reservation.reservationSeries?.endDate),
+                    begin: reservation.reservationSeries?.beginDate
+                      ? new Date(reservation.reservationSeries.beginDate)
+                      : undefined,
+                    end: reservation.reservationSeries?.endDate
+                      ? new Date(reservation.reservationSeries.endDate)
+                      : undefined,
                     t,
                   })}
                 </Bold>

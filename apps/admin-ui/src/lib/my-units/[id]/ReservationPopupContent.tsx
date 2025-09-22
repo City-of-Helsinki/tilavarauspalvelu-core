@@ -1,12 +1,13 @@
 import React from "react";
 import styled from "styled-components";
-import { type ReservationUnitReservationsFragment, UserPermissionChoice } from "@gql/gql-types";
+import { UserPermissionChoice } from "@gql/gql-types";
+import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { getReservationUrl } from "@/common/urls";
 import { formatTime, getReserveeName } from "@/common/util";
 import { truncate } from "@/helpers";
 import { Flex } from "common/styled";
 import { CELL_BORDER } from "./const";
-import VisibleIfPermission from "@/component/VisibleIfPermission";
+import { VisibleIfPermission } from "@/component/VisibleIfPermission";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
 

@@ -3,7 +3,8 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { useRouter } from "next/router";
-import { type ApplicationCreateMutation, ReservationUnitNode, useCreateApplicationMutation } from "@/gql/gql-types";
+import { useCreateApplicationMutation } from "@/gql/gql-types";
+import type { ApplicationCreateMutation, ReservationUnitNode } from "@/gql/gql-types";
 import { getApplicationPath } from "@/modules/urls";
 import { Flex, NoWrap, WhiteButton, pageSideMargins } from "common/styled";
 import { breakpoints } from "common/src/const";
@@ -48,7 +49,7 @@ const InnerContainer = styled(Flex).attrs({
   }
 `;
 
-type NodeList = Pick<ReservationUnitNode, "pk">[];
+type NodeList = Array<Pick<ReservationUnitNode, "pk">>;
 type Props = {
   applicationRound: {
     reservationUnits: Readonly<NodeList>;
@@ -93,8 +94,8 @@ export function StartApplicationBar({ apiBaseUrl, applicationRound }: Readonly<P
       } else {
         throw new Error("create application mutation failed");
       }
-    } catch (e) {
-      displayError(e);
+    } catch (err) {
+      displayError(err);
     }
   };
 
@@ -112,7 +113,7 @@ export function StartApplicationBar({ apiBaseUrl, applicationRound }: Readonly<P
   return (
     <SpaceWrapper aria-live="polite">
       {count > 0 && (
-        <InnerContainer style={{ bottom: bottomOffset + "px" }}>
+        <InnerContainer style={{ bottom: `${bottomOffset}px` }}>
           <NoWrap id="reservationUnitCount">
             {isMobile ? t("shoppingCart:countShort", { count }) : t("shoppingCart:count", { count })}
           </NoWrap>

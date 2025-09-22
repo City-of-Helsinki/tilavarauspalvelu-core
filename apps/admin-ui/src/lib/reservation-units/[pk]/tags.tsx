@@ -2,8 +2,8 @@ import React from "react";
 import { ReservationUnitPublishingState, ReservationUnitReservationState } from "@gql/gql-types";
 import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQuestionCircle } from "hds-react";
 import { useTranslation } from "next-i18next";
-import StatusLabel from "common/src/components/StatusLabel";
-import { type StatusLabelType } from "common/src/tags";
+import { StatusLabel } from "common/src/components/StatusLabel";
+import type { StatusLabelType } from "common/src/tags";
 import { NoWrap } from "common/styled";
 
 type StatusPropsType = {
@@ -31,7 +31,7 @@ export function ReservationStateTag({ state }: { state?: ReservationUnitReservat
           type: "success",
           icon: <IconEye aria-hidden="true" />,
         };
-      default:
+      case undefined:
         return {
           type: "neutral",
           icon: <IconQuestionCircle aria-hidden="true" />,
@@ -79,7 +79,8 @@ const statusProps = (state?: ReservationUnitPublishingState): StatusPropsType =>
         type: "info",
         icon: <IconClock />,
       };
-    default:
+    case ReservationUnitPublishingState.Archived:
+    case undefined:
       return {
         type: "neutral",
         icon: <IconQuestionCircle />,

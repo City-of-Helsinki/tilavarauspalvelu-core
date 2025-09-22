@@ -1,6 +1,8 @@
-import { ApplicationStatusChoice, Priority } from "@gql/gql-types";
+import type { ApplicationStatusChoice } from "@gql/gql-types";
+import { Priority } from "@gql/gql-types";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
-import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import type { DayT } from "common/src/const";
 import {
   transformAccessCodeState,
@@ -21,7 +23,7 @@ export function getFilterSearchParams({
   unitOptions = [],
 }: {
   searchParams: ReadonlyURLSearchParams;
-  unitOptions?: { label: string; value: number }[];
+  unitOptions?: Array<{ label: string; value: number }>;
 }) {
   // If unitParam is empty, use all units the user has permission to as the filter
   // This is required on some endpoints, in case the user is missing permissions for some units
@@ -103,19 +105,20 @@ function convertRecurringParam(recurring: string | null): "only" | "onlyNot" | u
 }
 
 function transformPriorityFilter(values: string[]): Priority[] {
-  return values.reduce<Array<Priority>>((acc, x) => {
-    if (x === Priority.Secondary) {
-      return [...acc, Priority.Secondary];
-    } else if (x === Priority.Primary) {
-      return [...acc, Priority.Primary];
+  const result: Priority[] = [];
+  for (const x of values) {
+    if (x === Priority.Primary) {
+      result.push(Priority.Primary);
+    } else if (x === Priority.Secondary) {
+      result.push(Priority.Secondary);
     }
-    return acc;
-  }, []);
+  }
+  return result;
 }
 
 export function useGetFilterSearchParams({
   unitOptions = [],
-}: { unitOptions?: { label: string; value: number }[] } = {}) {
+}: { unitOptions?: Array<{ label: string; value: number }> } = {}) {
   // Process search params from the URL to get filter values used in the application review data loaders
   const searchParams = useSearchParams();
 

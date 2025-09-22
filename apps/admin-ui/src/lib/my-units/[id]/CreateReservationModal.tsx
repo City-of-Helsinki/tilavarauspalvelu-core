@@ -1,6 +1,8 @@
-import React, { type RefObject, useEffect } from "react";
+import React, { useEffect } from "react";
+import type { RefObject } from "react";
 import { gql } from "@apollo/client";
-import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import {
   Button,
   ButtonSize,
@@ -12,17 +14,14 @@ import {
   NotificationSize,
 } from "hds-react";
 import { useTranslation } from "next-i18next";
-import {
-  type CreateStaffReservationFragment,
-  type ReservationStaffCreateMutation,
-  useCreateStaffReservationMutation,
-  useReservationUnitQuery,
-} from "@gql/gql-types";
+import { useCreateStaffReservationMutation, useReservationUnitQuery } from "@gql/gql-types";
+import type { CreateStaffReservationFragment, ReservationStaffCreateMutation } from "@gql/gql-types";
 import styled from "styled-components";
 import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";
-import { ReservationFormSchema, type ReservationFormType, type ReservationFormMeta } from "@/schemas";
+import { ReservationFormSchema } from "@/schemas";
+import type { ReservationFormType, ReservationFormMeta } from "@/schemas";
 import { CenterSpinner, Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useCheckCollisions } from "@/hooks";
@@ -30,7 +29,7 @@ import { constructDateTimeSafe, dateTime, getBufferTime, getNormalizedInterval }
 import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
-import ReservationTypeForm from "@/component/ReservationTypeForm";
+import { ReservationTypeForm } from "@/component/ReservationTypeForm";
 import { createNodeId, getNode, toNumber } from "common/src/helpers";
 import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
@@ -78,7 +77,7 @@ const StyledNotification = styled(Notification)`
 `;
 
 type CreateReservationModalProps = {
-  reservationUnitOptions: { label: string; value: number }[];
+  reservationUnitOptions: Array<{ label: string; value: number }>;
   onClose: () => void;
   start?: Date;
   focusAfterCloseRef: RefObject<HTMLElement>;

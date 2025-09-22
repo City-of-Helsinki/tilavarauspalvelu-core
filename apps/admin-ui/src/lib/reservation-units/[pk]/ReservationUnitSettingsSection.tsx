@@ -2,12 +2,14 @@ import React from "react";
 import styled from "styled-components";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { type FieldValues, useController, type UseControllerProps, UseFormReturn } from "react-hook-form";
+import { useController } from "react-hook-form";
+import type { FieldValues, UseControllerProps, UseFormReturn } from "react-hook-form";
 import { AuthenticationType, ReservationStartInterval } from "@gql/gql-types";
 import { AutoGrid, Flex } from "common/styled";
 import { ControlledSelect, ControlledCheckbox, DateTimeInput } from "common/src/components/form";
 import { getTranslatedError } from "@/common/util";
-import { BUFFER_TIME_OPTIONS, ReservationUnitEditFormValues } from "./form";
+import type { ReservationUnitEditFormValues } from "./form";
+import { BUFFER_TIME_OPTIONS } from "./form";
 import { EditAccordion } from "./styled";
 import { FieldGroup } from "./FieldGroup";
 import { CustomNumberInput } from "./CustomNumberInput";
@@ -111,16 +113,17 @@ export function ReservationUnitSettingsSection({
     errors.maxReservationDuration != null ||
     errors.minReservationDuration != null;
 
-  const durationOptions = bufferTimeOptions.concat(
-    Array.from({ length: (23 - 2) * 2 + 1 })
+  const durationOptions = [
+    ...bufferTimeOptions,
+    ...Array.from({ length: (23 - 2) * 2 + 1 })
       .map((_v, i) => 3600 * 2 + i * 1800)
       .map((v) => ({
         value: v,
         label: t("reservationUnitEditor:durationHours", {
           hours: (v / 3600).toLocaleString("fi"),
         }),
-      }))
-  );
+      })),
+  ];
 
   return (
     <EditAccordion open={hasErrors} heading={t("reservationUnitEditor:settings")}>

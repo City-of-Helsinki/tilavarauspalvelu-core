@@ -10,18 +10,20 @@ import {
   Notification,
   NotificationSize,
 } from "hds-react";
-import { Control, FieldValues, Path, useController, UseControllerProps } from "react-hook-form";
+import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import type { ApplicationReservationUnitListFragment, OrderedReservationUnitCardFragment } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { Flex } from "common/styled";
 import { ErrorText } from "common/src/components/ErrorText";
-import { OrderedReservationUnitCard, ReservationUnitModalContent } from ".";
 import { useSearchParams } from "next/navigation";
 import { useSearchModify } from "@/hooks/useSearchValues";
-import { type OptionsListT } from "common/src/modules/search";
+import type { OptionsListT } from "common/src/modules/search";
 import { FixedDialog } from "@/styled/FixedDialog";
+import { OrderedReservationUnitCard } from "./OrderedReservationUnitCard";
+import { ReservationUnitModalContent } from "./ReservationUnitModalContent";
 
 type ReservationUnitType = Pick<OrderedReservationUnitCardFragment, "pk">;
 
@@ -33,6 +35,17 @@ export interface ReservationUnitListProps<T extends FieldValues> extends UseCont
   minSize?: number;
   error?: string;
 }
+
+const move = (units: number[], from: number, to: number): number[] => {
+  const i = units[from];
+  if (i == null) {
+    return units;
+  }
+  const copy = [...units];
+  copy.splice(from, 1);
+  copy.splice(to, 0, i);
+  return copy;
+};
 
 // selected reservation units are applicationEvent.eventReservationUnits
 // available reservation units are applicationRound.reservationUnits
@@ -73,19 +86,8 @@ export function ReservationUnitList<T extends FieldValues>({
     onChange([...value, ru.pk]);
   };
 
-  const move = (units: number[], from: number, to: number): number[] => {
-    const i = units[from];
-    if (i == null) {
-      return units;
-    }
-    const copy = [...units];
-    copy.splice(from, 1);
-    copy.splice(to, 0, i);
-    return copy;
-  };
-
   const handleRemove = (ru: ReservationUnitType) => {
-    onChange([...value.filter((pk: T) => Number(pk) !== ru.pk)]);
+    onChange(value.filter((pk: T) => Number(pk) !== ru.pk));
   };
 
   const moveUp = (reservationUnit: ReservationUnitType) => {

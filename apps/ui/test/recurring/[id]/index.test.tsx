@@ -2,14 +2,15 @@ import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { createMockApplicationRound } from "@test/application.mocks";
-import { type CreateGraphQLMockProps, createOptionMock } from "@/test/test.gql.utils";
+import { createOptionMock } from "@/test/test.gql.utils";
+import type { CreateGraphQLMockProps } from "@/test/test.gql.utils";
 import SeasonalSearch from "@/pages/recurring/[id]";
 import { endOfMonth, startOfDay } from "date-fns";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
 import { MockedGraphQLProvider } from "@/test/test.react.utils";
-import { type OptionsListT } from "common/src/modules/search";
+import type { OptionsListT } from "common/src/modules/search";
 import { ReservationKind } from "@/gql/gql-types";
 
 const { mockedRouterReplace, useRouter } = vi.hoisted(() => {

@@ -3,12 +3,8 @@ import { Button, ButtonVariant } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type ResourceUpdateMutation,
-  ResourceLocationType,
-  useUpdateResourceMutation,
-  useResourceQuery,
-} from "@gql/gql-types";
+import { ResourceLocationType, useUpdateResourceMutation, useResourceQuery } from "@gql/gql-types";
+import type { ResourceUpdateMutation } from "@gql/gql-types";
 import { createNodeId } from "common/src/helpers";
 import { ButtonContainer, CenterSpinner } from "common/styled";
 import { errorToast, successToast } from "common/src/components/toast";
@@ -18,13 +14,8 @@ import { gql } from "@apollo/client";
 import { Error404 } from "@/component/Error404";
 import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
-import {
-  SubPageHead,
-  ResourceEditorFields,
-  Editor,
-  ResourceUpdateSchema,
-  type ResourceUpdateForm,
-} from "@lib/units/[id]";
+import { SubPageHead, ResourceEditorFields, Editor, ResourceUpdateSchema } from "@lib/units/[id]";
+import type { ResourceUpdateForm } from "@lib/units/[id]";
 import { getUnitUrl } from "@/common/urls";
 
 type Props = {

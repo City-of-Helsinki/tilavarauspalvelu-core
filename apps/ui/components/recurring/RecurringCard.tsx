@@ -15,7 +15,8 @@ import { useTranslation } from "next-i18next";
 import type { RecurringCardFragment } from "@gql/gql-types";
 import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource, getMainImage } from "common/src/helpers";
-import Card, { CardInfoItem } from "common/src/components/Card";
+import type { CardInfoItem } from "common/src/components/Card";
+import { Card } from "common/src/components/Card";
 import { getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
@@ -89,7 +90,7 @@ export function RecurringCard({
       iconEnd={isSelected ? <IconCheck /> : <IconPlus />}
       onClick={toggleSelect}
       data-testid="recurring-card__button--toggle"
-      key={"common:selectReservationUnit"}
+      key="common:selectReservationUnit"
     >
       {isSelected ? t("common:removeReservationUnit") : t("common:selectReservationUnit")}
     </Button>

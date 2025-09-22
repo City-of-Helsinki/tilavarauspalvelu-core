@@ -1,5 +1,6 @@
 import type { SelectedRow } from "@/lib/reservation-units";
-import React, { type Dispatch, type SetStateAction, useState } from "react";
+import React, { useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { gql } from "@apollo/client";
 import { ReservationUnitOrderSet, useSearchReservationUnitsQuery } from "@gql/gql-types";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";

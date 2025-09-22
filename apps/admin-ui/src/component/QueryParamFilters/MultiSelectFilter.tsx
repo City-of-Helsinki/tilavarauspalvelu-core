@@ -4,11 +4,12 @@ import { convertOptionToHDS, filterNonNullable, toNumber } from "common/src/help
 import { Select } from "hds-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslation } from "next-i18next";
-import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
+import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
 
 interface MultiSelectFilterProps {
   name: string;
-  options: Readonly<Array<{ label: string; value: string | number }>>;
+  options: ReadonlyArray<{ label: string; value: string | number }>;
   style?: React.CSSProperties;
   className?: string;
 }
@@ -38,7 +39,7 @@ export function MultiSelectFilter(props: MultiSelectFilterProps): JSX.Element {
 
 interface BaseMultiSelectFilterProps extends MultiSelectFilterProps {
   filter: string[];
-  setFilter: (value: Array<string>) => void;
+  setFilter: (value: string[]) => void;
 }
 
 function BaseMultiSelectFilter({ name, options, filter, setFilter, ...rest }: BaseMultiSelectFilterProps): JSX.Element {

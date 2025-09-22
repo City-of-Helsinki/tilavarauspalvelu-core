@@ -1,20 +1,16 @@
 import React, { useState } from "react";
-import { type TFunction, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import styled from "styled-components";
 import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconCross, IconPen, LoadingSpinner } from "hds-react";
 import { breakpoints } from "common/src/const";
-import {
-  type ApplicationCardFragment,
-  type ApplicationNameFieldsFragment,
-  ApplicationStatusChoice,
-  type Maybe,
-  useCancelApplicationMutation,
-} from "@gql/gql-types";
+import { ApplicationStatusChoice, useCancelApplicationMutation } from "@gql/gql-types";
+import type { ApplicationCardFragment, ApplicationNameFieldsFragment, Maybe } from "@gql/gql-types";
 import { formatDateTime } from "@/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
-import Card from "common/src/components/Card";
+import { Card } from "common/src/components/Card";
 import { getApplicationPath } from "@/modules/urls";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
 import { gql } from "@apollo/client";
@@ -78,7 +74,7 @@ export function ApplicationCard({ application, actionCallback }: Props): JSX.Ele
       await mutation();
       setIsWaitingForDelete(false);
       actionCallback("cancel");
-    } catch (_) {
+    } catch {
       actionCallback("error");
     }
   };

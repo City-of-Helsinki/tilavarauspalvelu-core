@@ -1,13 +1,12 @@
 import { env } from "@/env.mjs";
-import { gql, NormalizedCacheObject, type ApolloClient } from "@apollo/client";
-import {
-  TermsOfUseTypeChoices,
-  TermsOfUseDocument,
-  type TermsOfUseQuery,
-  type TermsOfUseQueryVariables,
-  type OrderQuery,
-  type OrderQueryVariables,
-  OrderDocument,
+import { gql } from "@apollo/client";
+import type { ApolloClient, NormalizedCacheObject } from "@apollo/client";
+import { TermsOfUseTypeChoices, TermsOfUseDocument, OrderDocument } from "@gql/gql-types";
+import type {
+  TermsOfUseQuery,
+  TermsOfUseQueryVariables,
+  OrderQuery,
+  OrderQueryVariables,
   TermsOfUseFieldsFragment,
 } from "@gql/gql-types";
 import { genericTermsVariant } from "./const";

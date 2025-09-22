@@ -4,7 +4,7 @@ import { H1 } from "common/styled";
 import { Filters, UnitsDataLoader } from "@/component/units";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 export default function Page(_props: PageProps): JSX.Element {

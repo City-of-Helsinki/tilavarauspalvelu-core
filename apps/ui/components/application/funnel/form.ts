@@ -1,17 +1,15 @@
 import { startOfDay } from "date-fns";
-import { filterNonNullable, type ReadonlyDeep, timeToMinutes } from "common/src/helpers";
-import {
-  type ApplicantFieldsFragment,
-  type ApplicationFormFragment,
-  type ApplicationUpdateMutation,
-  type ApplicationPage2Fragment,
-  type Maybe,
-  MunicipalityChoice,
-  Priority,
-  ReserveeType,
-  type SuitableTimeRangeCreateInput,
-  type ApplicationSectionUpdateInput,
-  Weekday,
+import { filterNonNullable, timeToMinutes } from "common/src/helpers";
+import type { ReadonlyDeep } from "common/src/helpers";
+import { MunicipalityChoice, Priority, ReserveeType, Weekday } from "@gql/gql-types";
+import type {
+  ApplicantFieldsFragment,
+  ApplicationFormFragment,
+  ApplicationUpdateMutation,
+  ApplicationPage2Fragment,
+  Maybe,
+  SuitableTimeRangeCreateInput,
+  ApplicationSectionUpdateInput,
 } from "@gql/gql-types";
 import { z } from "zod";
 import { toApiDate, toUIDate } from "common/src/common/util";
@@ -126,15 +124,14 @@ const ApplicationSectionPage2Schema = z
     }
   })
   .superRefine((s, ctx) => {
-    const rangesPerWeek = s.suitableTimeRanges.reduce<typeof s.suitableTimeRanges>((acc, tr) => {
-      if (acc.find((x) => x.dayOfTheWeek === tr.dayOfTheWeek)) {
-        return acc;
+    const rangesPerWeek: typeof s.suitableTimeRanges = [];
+    for (const tr of s.suitableTimeRanges) {
+      if (!rangesPerWeek.some((x) => x.dayOfTheWeek === tr.dayOfTheWeek)) {
+        rangesPerWeek.push(tr);
       }
-      return [...acc, tr];
-    }, []);
+    }
 
     const isValid = rangesPerWeek.length >= s.appliedReservationsPerWeek;
-
     if (!isValid) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -153,6 +150,7 @@ function transformApplicationSectionPage2(values: ApplicationSectionPage2FormVal
 }
 
 type SectionTypePage2 = NonNullable<ApplicationPage2Fragment["applicationSections"]>[0];
+
 function convertApplicationSectionPage2(section: ReadonlyDeep<SectionTypePage2>): ApplicationSectionPage2FormValues {
   const reservationUnitPk = section.reservationUnitOptions.find(() => true)?.reservationUnit.pk ?? 0;
   const { name, appliedReservationsPerWeek } = section;
@@ -369,14 +367,12 @@ export const ApplicationPage3Schema = z
         });
       }
     }
-    if (val.applicantType === ReserveeType.Nonprofit) {
-      if (!val.municipality) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["municipality"],
-          message: "Required",
-        });
-      }
+    if (val.applicantType === ReserveeType.Nonprofit && !val.municipality) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["municipality"],
+        message: "Required",
+      });
     }
   });
 

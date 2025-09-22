@@ -7,14 +7,13 @@ import { filterNonNullable } from "common/src/helpers";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
   ApplicationRoundStatusChoice,
-  type ApplicationRoundAdminFragment,
   useEndAllocationMutation,
   ApplicationRoundReservationCreationStatusChoice,
-  type ApplicationRoundQuery,
   UserPermissionChoice,
   useSendResultsMutation,
 } from "@gql/gql-types";
-import { type ApolloQueryResult } from "@apollo/client";
+import type { ApplicationRoundAdminFragment, ApplicationRoundQuery } from "@gql/gql-types";
+import type { ApolloQueryResult } from "@apollo/client";
 import { useCheckPermission } from "@/hooks";
 import { isApplicationRoundInProgress } from "@/helpers";
 import { useDisplayError } from "common/src/hooks";

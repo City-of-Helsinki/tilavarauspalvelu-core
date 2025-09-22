@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { FormSubHeading } from "./styled";
-import { ApplicationFormTextInput } from ".";
+import { ApplicationFormTextInput } from "./ApplicationFormTextInput";
 
 export function BillingAddress() {
   const { t } = useTranslation();

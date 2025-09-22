@@ -1,10 +1,12 @@
 import React from "react";
 import { IconArrowRight, IconLinkExternal } from "hds-react";
-import { type TFunction, useTranslation } from "next-i18next";
-import { type ApplicationRoundCardFragment, ApplicationRoundStatusChoice } from "@gql/gql-types";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
+import { ApplicationRoundStatusChoice } from "@gql/gql-types";
+import type { ApplicationRoundCardFragment } from "@gql/gql-types";
 import { formatDateTime } from "@/modules/util";
 import { isValid } from "date-fns";
-import Card from "common/src/components/Card";
+import { Card } from "common/src/components/Card";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { getApplicationRoundPath } from "@/modules/urls";
 import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
@@ -31,7 +33,9 @@ function translateRoundDate(
       });
     case ApplicationRoundStatusChoice.Open:
       return t("applicationRound:card.open", { until: formatDateTime(t, end) });
-    default:
+    case ApplicationRoundStatusChoice.Handled:
+    case ApplicationRoundStatusChoice.InAllocation:
+    case ApplicationRoundStatusChoice.Sent:
       return t("applicationRound:card.past", {
         closing: formatDateTime(t, end),
       });

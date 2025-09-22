@@ -1,15 +1,11 @@
 import React from "react";
-import { NotificationType } from "hds-react";
+import type { NotificationType } from "hds-react";
 import styled from "styled-components";
 import { useLocalStorage } from "react-use";
-import NotificationWrapper from "./NotificationWrapper";
+import { NotificationWrapper } from "./NotificationWrapper";
 import { breakpoints } from "../const";
-import {
-  BannerNotificationLevel,
-  BannerNotificationTarget,
-  useShowNotificationsListQuery,
-  type ShowNotificationFieldsFragment,
-} from "../../gql/gql-types";
+import { BannerNotificationLevel, useShowNotificationsListQuery } from "../../gql/gql-types";
+import type { ShowNotificationFieldsFragment, BannerNotificationTarget } from "../../gql/gql-types";
 import { filterNonNullable } from "../helpers";
 import { useTranslation } from "next-i18next";
 import { convertLanguageCode, getTranslationSafe } from "../common/util";
@@ -108,7 +104,7 @@ function NotificationsListItem({ notification, closeFn, closedArray }: Notificat
 /// @return A list of banner notifications targeted to the specified targets, ordered by level (EXCEPTION, WARNING, NORMAL)
 /// @desc A component which returns a list of styled banner notifications, clipped at the specified amount, targeted to the specified targets and ordered by level
 /// TODO under testing: can't do target checks to the query because backend doesn't allow querying target without can_manage_notifications permission
-const BannerNotificationsList = ({ target, displayAmount = 2 }: BannerNotificationListProps) => {
+export const BannerNotificationsList = ({ target, displayAmount = 2 }: BannerNotificationListProps) => {
   const { data } = useShowNotificationsListQuery({
     variables: {
       target,
@@ -155,8 +151,6 @@ const BannerNotificationsList = ({ target, displayAmount = 2 }: BannerNotificati
     </PositionWrapper>
   );
 };
-
-export default BannerNotificationsList;
 
 export const BANNER_NOTIFICATION_COMMON_FRAGMENT = gql`
   fragment ShowNotificationFields on BannerNotificationNode {

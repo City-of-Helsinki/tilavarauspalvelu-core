@@ -11,7 +11,7 @@ type Props = {
   onClose: () => void;
 };
 
-function InfoDialog({ id, heading, text, isOpen, onClose }: Props): JSX.Element {
+export function InfoDialog({ id, heading, text, isOpen, onClose }: Props): JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -38,5 +38,3 @@ function InfoDialog({ id, heading, text, isOpen, onClose }: Props): JSX.Element 
     </Dialog>
   );
 }
-
-export default InfoDialog;

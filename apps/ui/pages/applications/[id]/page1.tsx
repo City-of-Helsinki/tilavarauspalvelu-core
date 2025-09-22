@@ -10,22 +10,18 @@ import { Flex } from "common/styled";
 import { uniq } from "lodash-es";
 import { gql } from "@apollo/client";
 import { createApolloClient } from "@/modules/apolloClient";
-import {
-  ApplicationPage1Document,
-  useUpdateApplicationMutation,
-  type ApplicationPage1Query,
-  type ApplicationPage1QueryVariables,
-} from "@/gql/gql-types";
+import { ApplicationPage1Document, useUpdateApplicationMutation } from "@/gql/gql-types";
+import type { ApplicationPage1Query, ApplicationPage1QueryVariables } from "@/gql/gql-types";
 import { getApplicationPath } from "@/modules/urls";
 import { useReservationUnitList } from "@/hooks";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { ApplicationFunnelWrapper, Page1 as Page1Impl } from "@/components/application/funnel";
 import {
-  type ApplicationPage1FormValues,
   ApplicationPage1SchemaRefined,
   transformApplicationPage1,
   convertApplicationPage1,
 } from "@/components/application/funnel/form";
+import type { ApplicationPage1FormValues } from "@/components/application/funnel/form";
 import { getSearchOptions } from "@/modules/search";
 
 function Page1({ application, options: optionsOrig }: Pick<PropsNarrowed, "application" | "options">): JSX.Element {

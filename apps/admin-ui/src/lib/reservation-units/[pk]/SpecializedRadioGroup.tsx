@@ -1,5 +1,6 @@
 import React from "react";
-import { Control, useController } from "react-hook-form";
+import type { Control } from "react-hook-form";
+import { useController } from "react-hook-form";
 import type { ReservationUnitEditFormValues } from "./form";
 import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
@@ -18,7 +19,7 @@ export function SpecializedRadioGroup({
   noTranslation,
 }: {
   name: "reservationKind" | "bufferType" | "cancellationRule";
-  options: readonly string[] | readonly { label: string; value: number }[];
+  options: ReadonlyArray<string> | readonly { label: string; value: number }[];
   control: Control<ReservationUnitEditFormValues>;
   direction?: "horizontal" | "vertical";
   required?: boolean;

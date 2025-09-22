@@ -2,13 +2,8 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
-import {
-  PurposeOrderSet,
-  UnitOrderSet,
-  type FrontPageQuery,
-  type FrontPageQueryVariables,
-  FrontPageDocument,
-} from "@gql/gql-types";
+import { PurposeOrderSet, UnitOrderSet, FrontPageDocument } from "@gql/gql-types";
+import type { FrontPageQuery, FrontPageQueryVariables } from "@gql/gql-types";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Head } from "@/components/index/Header";
 import { Purposes } from "@/components/index/Purposes";

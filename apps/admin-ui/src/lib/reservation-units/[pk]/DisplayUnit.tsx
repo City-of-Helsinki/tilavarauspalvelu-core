@@ -1,16 +1,13 @@
-import {
-  ReservationUnitPublishingState,
-  ReservationUnitReservationState,
-  UnitSubpageHeadFragment,
-} from "@gql/gql-types";
+import type { UnitSubpageHeadFragment } from "@gql/gql-types";
+import { ReservationUnitPublishingState, ReservationUnitReservationState } from "@gql/gql-types";
 import { formatAddress } from "@/common/util";
 import React from "react";
 import styled from "styled-components";
 import { Flex, fontBold, H1, NoWrap, TitleSection } from "common/styled";
 import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQuestionCircle } from "hds-react";
 import { useTranslation } from "next-i18next";
-import StatusLabel from "common/src/components/StatusLabel";
-import { type StatusLabelType } from "common/src/tags";
+import { StatusLabel } from "common/src/components/StatusLabel";
+import type { StatusLabelType } from "common/src/tags";
 
 const UnitInformationWrapper = styled.div`
   font-size: var(--fontsize-heading-s);
@@ -44,7 +41,7 @@ const getReservationStateProps = (state?: ReservationUnitReservationState): Stat
         type: "success",
         icon: <IconEye />,
       };
-    default:
+    case undefined:
       return {
         type: "neutral",
         icon: <IconQuestionCircle />,
@@ -91,7 +88,8 @@ const getPublishingStateProps = (state?: ReservationUnitPublishingState): StateP
         type: "info",
         icon: <IconClock />,
       };
-    default:
+    case ReservationUnitPublishingState.Archived:
+    case undefined:
       return {
         type: "neutral",
         icon: <IconQuestionCircle />,

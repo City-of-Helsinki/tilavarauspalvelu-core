@@ -2,7 +2,8 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "i18next";
 import { memoize } from "lodash-es";
-import { OrderStatus, ReservationStateChoice, type ReservationTableElementFragment } from "@gql/gql-types";
+import { OrderStatus, ReservationStateChoice } from "@gql/gql-types";
+import type { ReservationTableElementFragment } from "@gql/gql-types";
 import { truncate } from "@/helpers";
 import { getReservationUrl } from "@/common/urls";
 import { formatDateTime, formatDateTimeRange, getReserveeName } from "@/common/util";
@@ -10,7 +11,7 @@ import { CustomTable } from "@/component/Table";
 import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";
-import StatusLabel from "common/src/components/StatusLabel";
+import { StatusLabel } from "common/src/components/StatusLabel";
 import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircleFill } from "hds-react";
 import { gql } from "@apollo/client";
 
@@ -44,7 +45,8 @@ const getStatusLabelProps = (
       return { type: "success", icon: <IconCheck /> };
     case ReservationStateChoice.RequiresHandling:
       return { type: "info", icon: <IconCogwheel /> };
-    default:
+    case null:
+    case undefined:
       return {
         type: "info",
         icon: <IconQuestionCircleFill />,
@@ -65,7 +67,8 @@ const getPaymentStatusLabelType = (status: OrderStatus | null | undefined): Stat
     case OrderStatus.Pending:
       return "alert";
     case OrderStatus.Cancelled:
-    default:
+    case null:
+    case undefined:
       return "neutral";
   }
 };

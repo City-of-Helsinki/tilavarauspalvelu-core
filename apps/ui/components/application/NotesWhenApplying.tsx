@@ -1,4 +1,4 @@
-import { ApplicationRoundNode } from "@gql/gql-types";
+import type { ApplicationRoundNode } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { getTranslationSafe } from "common/src/common/util";

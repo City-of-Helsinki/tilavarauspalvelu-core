@@ -7,14 +7,16 @@ import { CenterSpinner, fontMedium, H1, Strong, TabWrapper } from "common/styled
 import { hasPermission as hasUnitPermission } from "@/modules/permissionHelper";
 import {
   ApplicationRoundFilterDocument,
-  type ApplicationRoundFilterFragment,
-  type ApplicationRoundFilterQuery,
-  type ApplicationRoundFilterQueryVariables,
-  type ApplicationRoundFilterUnitFragment,
-  type ApplicationSectionAllocationsQueryVariables,
   useAllApplicationEventsQuery,
   useApplicationSectionAllocationsQuery,
   UserPermissionChoice,
+} from "@gql/gql-types";
+import type {
+  ApplicationRoundFilterFragment,
+  ApplicationRoundFilterQuery,
+  ApplicationRoundFilterQueryVariables,
+  ApplicationRoundFilterUnitFragment,
+  ApplicationSectionAllocationsQueryVariables,
 } from "@gql/gql-types";
 import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, sort, toNumber } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
@@ -28,7 +30,7 @@ import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { Error403 } from "@/component/Error403";
 import { createClient } from "@/common/apolloClient";
 import { Filters } from "@/lib/application-rounds/[id]/allocation/Filters";
@@ -91,9 +93,7 @@ function useQueryVariables(
   } = useGetFilterSearchParams();
 
   const includePreferredOrder10OrHigher =
-    preferredOrderFilter != null && preferredOrderFilter.length > 0
-      ? preferredOrderFilter.filter((x) => x > 10).length > 0
-      : null;
+    preferredOrderFilter != null && preferredOrderFilter.length > 0 ? preferredOrderFilter.some((x) => x > 10) : null;
   const selectedReservationUnit = reservationUnitFilter?.[0] ?? defaultReservationUnitPk;
 
   return {
@@ -118,7 +118,7 @@ function useQueryVariables(
   };
 }
 
-function mapOrderFilter(val: readonly number[] | null | undefined): number[] {
+function mapOrderFilter(val: ReadonlyArray<number> | number | null | undefined): number[] {
   if (val == null) {
     return [];
   }
@@ -245,7 +245,7 @@ function ApplicationRoundAllocation({
   const applicationSections = filterNonNullable(appEventsData?.applicationSections?.edges?.map((e) => e?.node))
     .filter((section) => {
       const opts = section.reservationUnitOptions.filter((r) => {
-        if (r.allocatedTimeSlots.filter((ats) => ats.reservationUnitOption.pk === r.pk).length > 0) {
+        if (r.allocatedTimeSlots.some((ats) => ats.reservationUnitOption.pk === r.pk)) {
           return true;
         }
 
@@ -320,7 +320,7 @@ function ApplicationRoundAllocation({
        * remount causes flickering but HDS doesn't allow programmatically changing the active tab
        */}
       <TabWrapper>
-        <Tabs initiallyActiveTab={initiallyActiveTab >= 0 ? initiallyActiveTab : 0} key={unitFilter ?? "unit-none"}>
+        <Tabs initiallyActiveTab={Math.max(initiallyActiveTab, 0)} key={unitFilter ?? "unit-none"}>
           <TabList>
             {unitReservationUnits.map((ru) => (
               <Tab onClick={() => setSelectedReservationUnit(ru.pk)} key={ru?.pk}>

@@ -1,5 +1,6 @@
 import React from "react";
-import { type ApolloError, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
+import type { ApolloError } from "@apollo/client";
 import { AllocatedTimeSlotOrderSet, ApplicationSectionStatusChoice, useAllocatedTimeSlotsQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
@@ -14,7 +15,7 @@ import { CenterSpinner } from "common/styled";
 
 type Props = {
   applicationRoundPk: number;
-  unitOptions: { label: string; value: number }[];
+  unitOptions: Array<{ label: string; value: number }>;
 };
 
 export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): JSX.Element {

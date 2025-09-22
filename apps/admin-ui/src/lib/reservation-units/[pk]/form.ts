@@ -2,17 +2,19 @@ import { convertTime, filterNonNullable, timeToMinutes, toNumber } from "common/
 import { fromApiDate, fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
 import {
   AccessType,
-  type ApplicationRoundTimeSlotCreateInput,
   AuthenticationType,
   PaymentType,
   PriceUnit,
   ReservationKind,
   ReservationStartInterval,
-  type ReservationUnitAccessTypeCreateInput,
-  type ReservationUnitEditPageFragment,
   ReservationUnitImageType,
-  type ReservationUnitPricingCreateInput,
   Weekday,
+} from "@gql/gql-types";
+import type {
+  ApplicationRoundTimeSlotCreateInput,
+  ReservationUnitAccessTypeCreateInput,
+  ReservationUnitEditPageFragment,
+  ReservationUnitPricingCreateInput,
 } from "@gql/gql-types";
 import { addDays, endOfDay, format } from "date-fns";
 import { z } from "zod";
@@ -20,7 +22,7 @@ import { checkLengthWithoutHtml, checkTimeStringFormat } from "common/src/schema
 import { fromUIDateTime } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
 import { WEEKDAYS_SORTED } from "common/src/const";
-import { type TaxOption } from "./PricingSection";
+import type { TaxOption } from "./PricingSection";
 import sanitizeHtml from "sanitize-html";
 
 export const AccessTypes = ["ACCESS_CODE", "OPENED_BY_STAFF", "PHYSICAL_KEY", "UNRESTRICTED"] as const;
@@ -183,7 +185,8 @@ export type AccessTypesFormType = z.infer<typeof AccessTypesFormSchema>;
 function validateAccessTypes(accessTypes: AccessTypesFormType[], ctx: z.RefinementCtx): void {
   const seenDates: string[] = [];
 
-  accessTypes.forEach((at, index) => {
+  for (const at of accessTypes) {
+    const index = accessTypes.indexOf(at);
     if (fromUIDate(at.beginDate) == null) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -200,27 +203,29 @@ function validateAccessTypes(accessTypes: AccessTypesFormType[], ctx: z.Refineme
       });
     }
     seenDates.push(at.beginDate);
-  });
+  }
 }
 
 function validateSeasonalTimes(data: SeasonalFormType[], ctx: z.RefinementCtx): void {
-  data.forEach((season, index) => {
+  for (const season of data) {
+    const index = data.indexOf(season);
     // closed don't need validation (time is not saved)
     if (season.closed) {
-      return;
+      continue;
     }
     // pass empties and "" because they are never sent
     let lastEnd: number | null = null;
-    season.reservableTimes.forEach((reservableTime, i) => {
+    for (const reservableTime of season.reservableTimes) {
+      const i = season.reservableTimes.indexOf(reservableTime);
       if (reservableTime == null) {
-        return;
+        continue;
       }
       // check both begin and end
       if (reservableTime.begin == null && reservableTime.end == null) {
-        return;
+        continue;
       }
       if (reservableTime.begin === "" && reservableTime.end === "") {
-        return;
+        continue;
       }
       const path = `seasons[${index}].reservableTimes[${i}]`;
       checkTimeStringFormat(reservableTime?.begin, ctx, `${path}.begin`, "time");
@@ -285,8 +290,8 @@ function validateSeasonalTimes(data: SeasonalFormType[], ctx: z.RefinementCtx): 
       }
 
       lastEnd = endTimeMinutes;
-    });
-  });
+    }
+  }
 }
 
 function validateDateTimeInterval({
@@ -463,14 +468,16 @@ export const ReservationUnitEditSchema = z
 
     // Drafts require this validation, but only if it's directly bookable
     if (v.reservationKind !== ReservationKind.Season) {
-      if (v.minReservationDuration != null && v.maxReservationDuration != null) {
-        if (v.minReservationDuration > v.maxReservationDuration) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Min reservation duration must be less than max duration",
-            path: ["maxReservationDuration"],
-          });
-        }
+      if (
+        v.minReservationDuration != null &&
+        v.maxReservationDuration != null &&
+        v.minReservationDuration > v.maxReservationDuration
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Min reservation duration must be less than max duration",
+          path: ["maxReservationDuration"],
+        });
       }
 
       if (v.minReservationDuration != null) {
@@ -510,7 +517,7 @@ export const ReservationUnitEditSchema = z
       }
     }
 
-    if (!v.isDraft || v.pricings.length) {
+    if (!v.isDraft || v.pricings.length > 0) {
       for (let i = 0; i < v.pricings.length; i++) {
         refinePricing(v.pricings[i], ctx, `pricings.${i}`);
       }
@@ -644,14 +651,12 @@ export const ReservationUnitEditSchema = z
     checkLengthWithoutHtml(v.descriptionFi, ctx, "descriptionFi", 1, undefined, "description");
     checkLengthWithoutHtml(v.descriptionSv, ctx, "descriptionSv", 1, undefined, "description");
 
-    if (v.maxPersons && v.minPersons) {
-      if (v.maxPersons < v.minPersons) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Max persons must be greater than min persons",
-          path: ["maxPersons"],
-        });
-      }
+    if (v.maxPersons && v.minPersons && v.maxPersons < v.minPersons) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Max persons must be greater than min persons",
+        path: ["maxPersons"],
+      });
     }
 
     // TODO if it includes futurePricing check that the futurePrice date is in the future (is today ok?)
@@ -854,6 +859,8 @@ export function convertReservationUnit(data?: Node | null): ReservationUnitEditF
   };
 }
 
+const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) => t && t.begin && t.end;
+
 // Too hard to type this because of two separate mutations that have optional fields in them
 export function transformReservationUnit(values: ReservationUnitEditFormValues, taxPercentageOptions: TaxOption[]) {
   // Convert from form values to API data
@@ -896,10 +903,9 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     ...vals
   } = values;
 
-  const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) => t && t.begin && t.end;
   // NOTE mutation doesn't support pks (even if changing not adding) unlike other mutations
   const applicationRoundTimeSlots: ApplicationRoundTimeSlotCreateInput[] = seasons
-    .filter((s) => s.reservableTimes.filter(isReservableTime).length > 0 || s.closed)
+    .filter((s) => s.reservableTimes.some(isReservableTime) || s.closed)
     .map((s) => ({
       weekday: s.weekday,
       isClosed: s.closed,

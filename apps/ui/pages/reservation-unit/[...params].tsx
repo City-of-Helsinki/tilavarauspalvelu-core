@@ -10,19 +10,17 @@ import { Flex, H1, H4 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
   ReservationDocument,
-  type ReservationQuery,
-  type ReservationQueryVariables,
   ReservationStateChoice,
-  type ReservationUpdateMutation,
   ReserveeType,
   useConfirmReservationMutation,
   useDeleteReservationMutation,
   useReservationLazyQuery,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
-import { type Inputs } from "common/src/reservation-form/types";
+import type { ReservationQuery, ReservationQueryVariables, ReservationUpdateMutation } from "@gql/gql-types";
+import type { Inputs } from "common/src/reservation-form/types";
 import { createApolloClient } from "@/modules/apolloClient";
-import { default as NextError } from "next/error";
+import NextError from "next/error";
 import { getReservationPath, getReservationUnitPath, getSingleSearchPath } from "@/modules/urls";
 import { Sanitize } from "common/src/components/Sanitize";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
@@ -151,7 +149,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
     const stepLength = isUnitFreeOfCharge || requireHandling ? 2 : 5;
 
-    return Array.from(Array(stepLength)).map((_n, i) => {
+    return Array.from({ length: stepLength }).map((_n, i) => {
       const state = i === step ? 0 : i < step ? 1 : 2;
 
       return {
@@ -183,8 +181,8 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   // whitelist to allow language change and confirmation
   const whitelist = [
-    RegExp(`.*/reservations/${reservation?.pk}\\?.+`),
-    RegExp(`.*/reservation-unit/${reservationUnit?.pk}/reservation/${reservation?.pk}`),
+    new RegExp(`.*/reservations/${reservation?.pk}\\?.+`),
+    new RegExp(`.*/reservation-unit/${reservationUnit?.pk}/reservation/${reservation?.pk}`),
   ];
   // only block nextjs navigation (we should not have any <a> links and we don't want to block refresh)
   useConfirmNavigation({
@@ -306,7 +304,6 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       case 0:
         return reservationUnit?.canApplyFreeOfCharge && generalFields?.includes("applyingForFreeOfCharge");
       case 1:
-      default:
         return reservationUnit?.canApplyFreeOfCharge && reservation?.applyingForFreeOfCharge === true;
     }
   }, [step, generalFields, reservation, reservationUnit]);

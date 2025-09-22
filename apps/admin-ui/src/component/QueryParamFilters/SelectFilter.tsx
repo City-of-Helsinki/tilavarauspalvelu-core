@@ -1,14 +1,16 @@
 import React, { useMemo } from "react";
-import { Option, Select } from "hds-react";
+import type { Option } from "hds-react";
+import { Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { convertOptionToHDS, toNumber } from "common/src/helpers";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
+import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
 
 type SelectFilterProps = {
   name: string;
-  options: Readonly<Array<{ label: string; value: string | number }>>;
+  options: ReadonlyArray<{ label: string; value: string | number }>;
   sort?: boolean;
   clearable?: boolean;
 };

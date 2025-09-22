@@ -1,7 +1,9 @@
 import React from "react";
-import { defaultFilter, Option, Select, Tooltip } from "hds-react";
+import type { Option } from "hds-react";
+import { defaultFilter, Select, Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
+import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
 import { convertOptionToHDS, filterNonNullable, toNumber } from "../../helpers";
 import { convertLanguageCode } from "../../common/util";
 import styled from "styled-components";
@@ -17,11 +19,11 @@ interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
   name: Path<T>;
   control: Control<T>;
   label: string;
-  options: Readonly<Array<{ label: string; value: string | number }>>;
+  options: ReadonlyArray<{ label: string; value: string | number }>;
   required?: boolean;
   placeholder?: string;
   error?: string;
-  validate?: { [key: string]: (val: string) => boolean };
+  validate?: Record<string, (val: string) => boolean>;
   style?: React.CSSProperties;
   className?: string;
   clearable?: boolean;
@@ -84,14 +86,14 @@ export function ControlledSelect<T extends FieldValues>({
       onChange(v);
       afterChange?.(v ?? undefined);
     } else {
-      throw new Error("Invalid selection");
+      throw new TypeError("Invalid selection");
     }
   };
 
   function toHDSValue(
-    opts: Readonly<Array<{ label: string; value: string | number }>>,
+    opts: ReadonlyArray<{ label: string; value: string | number }>,
     val: string | number | Array<string | number> | undefined
-  ): Partial<Option>[] {
+  ): Array<Partial<Option>> {
     if (val == null) {
       return [];
     }

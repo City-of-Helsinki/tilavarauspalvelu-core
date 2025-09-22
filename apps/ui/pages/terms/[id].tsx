@@ -2,12 +2,8 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
-import {
-  TermsOfUseTypeChoices,
-  TermsOfUseDocument,
-  type TermsOfUseQuery,
-  type TermsOfUseQueryVariables,
-} from "@gql/gql-types";
+import { TermsOfUseTypeChoices, TermsOfUseDocument } from "@gql/gql-types";
+import type { TermsOfUseQuery, TermsOfUseQueryVariables } from "@gql/gql-types";
 import { H1 } from "common/styled";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";

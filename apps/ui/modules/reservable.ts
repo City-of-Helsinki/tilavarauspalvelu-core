@@ -2,13 +2,12 @@
  *  If it can be made, or if it can be changed
  *  Used by both new reservations and editing existing ones.
  */
-import {
-  ReservationStartInterval,
-  type ReservationNode,
-  type IsReservableFieldsFragment,
-  type ReservableTimeSpanType,
-  ReservationStateChoice,
-  type Maybe,
+import { ReservationStartInterval, ReservationStateChoice } from "@/gql/gql-types";
+import type {
+  ReservationNode,
+  IsReservableFieldsFragment,
+  ReservableTimeSpanType,
+  Maybe,
   BlockingReservationFieldsFragment,
 } from "@/gql/gql-types";
 import { dayMax, dayMin } from "common/src/helpers";
@@ -29,8 +28,8 @@ import {
   addMilliseconds,
   differenceInMinutes,
 } from "date-fns";
-import { type SlotProps } from "common/src/calendar/Calendar";
-import { type ReservationUnitNode } from "common/gql/gql-types";
+import type { SlotProps } from "common/src/calendar/CommonCalendar";
+import type { ReservationUnitNode } from "common/gql/gql-types";
 import { getIntervalMinutes } from "common/src/conversion";
 import { gql } from "@apollo/client";
 
@@ -69,7 +68,7 @@ export function dateToKey(date: Date): ReservableMapKey {
 // TODO splitting Date into actual Date and Time would make this a lot easier
 // because the key should only care about the Date part and we don't want
 // make stupid mistakes by using Map.get(new Date()) instead of Map.get(startOfDay(new Date()))
-export function generateReservableMap(reservableTimeSpans: readonly ReservableTimeSpanType[]): ReservableMap {
+export function generateReservableMap(reservableTimeSpans: ReadonlyArray<ReservableTimeSpanType>): ReservableMap {
   const converted = reservableTimeSpans
     .map((n) => {
       if (n.startDatetime == null || n.endDatetime == null) {
@@ -157,8 +156,8 @@ export type ReservationUnitReservableProps = {
   };
   reservationUnit: Omit<IsReservableFieldsFragment, "reservableTimeSpans">;
   reservableTimes: ReservableMap;
-  blockingReservations: readonly BlockingReservationFieldsFragment[];
-  activeApplicationRounds: readonly RoundPeriod[];
+  blockingReservations: ReadonlyArray<BlockingReservationFieldsFragment>;
+  activeApplicationRounds: ReadonlyArray<RoundPeriod>;
 };
 
 export const IS_RESERVABLE_FRAGMENT = gql`
@@ -314,7 +313,7 @@ function isRangeReservable_({
   reservationsMaxDaysBefore: number;
   reservationBeginsAt?: Date;
   reservationEndsAt?: Date;
-  activeApplicationRounds: readonly RoundPeriod[];
+  activeApplicationRounds: ReadonlyArray<RoundPeriod>;
 }): boolean {
   const start = range[0];
   const end = range[1];
@@ -325,7 +324,7 @@ function isRangeReservable_({
   const slots = generateSlots(start, end, ReservationStartInterval.Interval_15Mins);
 
   const res = slots.map((slot) => areReservableTimesAvailable(reservableTimes, slot));
-  if (!res.every((val) => val)) {
+  if (!res.every(Boolean)) {
     return false;
   }
 
@@ -349,7 +348,7 @@ function getBufferedEventTimes(
   end: Date,
   bufferTimeBefore: number,
   bufferTimeAfter: number,
-  isBlocked?: Maybe<boolean> | undefined
+  isBlocked?: Maybe<boolean>
 ): { start: Date; end: Date } {
   if (isBlocked) {
     return { start, end };
@@ -439,8 +438,8 @@ function isSlotWithinTimeframe(
   return isLegalTimeframe && isAfterMinDaysBefore && isBeforeMaxDaysBefore;
 }
 
-function doesSlotCollideWithApplicationRounds(slot: Date, rounds: readonly RoundPeriod[]): boolean {
-  if (rounds.length < 1) return false;
+function doesSlotCollideWithApplicationRounds(slot: Date, rounds: ReadonlyArray<RoundPeriod>): boolean {
+  if (rounds.length === 0) return false;
 
   return rounds.some((round) =>
     isWithinInterval(slot, {
@@ -457,7 +456,7 @@ function areSlotsReservable(
   reservationsMaxDaysBefore: number,
   reservationBeginsAt?: Date,
   reservationEndsAt?: Date,
-  activeApplicationRounds: readonly RoundPeriod[] = []
+  activeApplicationRounds: ReadonlyArray<RoundPeriod> = []
 ): boolean {
   return slots.every(
     (slotDate) =>
@@ -476,7 +475,7 @@ function areSlotsReservable(
 
 type PropGetterProps = {
   reservableTimes: ReservableMap;
-  activeApplicationRounds: readonly RoundPeriod[];
+  activeApplicationRounds: ReadonlyArray<RoundPeriod>;
   reservationsMinDaysBefore: number;
   reservationsMaxDaysBefore: number;
   customValidation?: (arg: Date) => boolean;
@@ -528,7 +527,7 @@ export function getBoundCheckedReservation({
     ReservationUnitNode,
     "minReservationDuration" | "maxReservationDuration" | "reservationStartInterval"
   >;
-  durationOptions: { label: string; value: number }[];
+  durationOptions: Array<{ label: string; value: number }>;
 }): { start: Date; end: Date } | null {
   // the next check is going to systematically fail unless the times are at least minReservationDuration apart
   const { minReservationDuration, reservationStartInterval } = reservationUnit;
@@ -582,7 +581,7 @@ export function clampDuration(
   duration: number,
   minReservationDurationMinutes: number,
   maxReservationDurationMinutes: number,
-  durationOptions: { label: string; value: number }[]
+  durationOptions: Array<{ label: string; value: number }>
 ): number {
   const initialDuration = Math.max(minReservationDurationMinutes, durationOptions[0]?.value ?? 0);
   return Math.min(Math.max(duration, initialDuration), maxReservationDurationMinutes);

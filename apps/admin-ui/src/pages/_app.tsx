@@ -1,27 +1,31 @@
-import React, { useEffect, type FC } from "react";
-import App, { type AppContext, type AppInitialProps, type AppProps } from "next/app";
+import React, { useEffect } from "react";
+import type { FC } from "react";
+import App from "next/app";
+import type { AppContext, AppInitialProps, AppProps } from "next/app";
 import "common/styles/global.scss";
 import "../styles/global.scss";
 import { ApolloProvider } from "@apollo/client";
 import { createClient } from "@/common/apolloClient";
 import { updateSentryConfig } from "../../sentry.client.config";
-import { type PageProps } from ".";
+import type { PageProps } from ".";
 import { appWithTranslation } from "next-i18next";
 import Layout from "./layout";
-import PageWrapper from "@/component/PageWrapper";
+import { PageWrapper } from "@/component/PageWrapper";
 import { ModalContextProvider } from "@/context/ModalContext";
 import {
   BannerNotificationTarget,
   CurrentUserDocument,
-  type CurrentUserQuery,
-  type CurrentUserQueryVariables,
   HandlingDataDocument,
-  type HandlingDataQuery,
-  type HandlingDataQueryVariables,
   ReservationStateChoice,
   ShowNotificationsListDocument,
-  type ShowNotificationsListQuery,
-  type ShowNotificationsListQueryVariables,
+} from "@gql/gql-types";
+import type {
+  CurrentUserQuery,
+  CurrentUserQueryVariables,
+  HandlingDataQuery,
+  HandlingDataQueryVariables,
+  ShowNotificationsListQuery,
+  ShowNotificationsListQueryVariables,
 } from "@gql/gql-types";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { toApiDate } from "common/src/common/util";
@@ -122,9 +126,9 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
     });
 
     return { ...ctx, currentUser: data.currentUser, handlingData, notificationsData: notificationsData };
-  } catch (error) {
+  } catch (err) {
     // eslint-disable-next-line no-console
-    console.error("Error fetching current user:", error);
+    console.error("Error fetching current user:", err);
   }
 
   return { ...ctx, currentUser: null, handlingData: null, notificationsData: null };

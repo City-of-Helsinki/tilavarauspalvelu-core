@@ -2,7 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
+import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
 
 // "&& > *" needed to position the checkbox and label correctly in the grid block
 const CenteredCheckbox = styled(Checkbox)`

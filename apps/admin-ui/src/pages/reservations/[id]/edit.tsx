@@ -2,24 +2,19 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  ReservationPermissionsDocument,
-  type ReservationPermissionsQuery,
-  type ReservationPermissionsQueryVariables,
-  UserPermissionChoice,
-  type Maybe,
-  type ReservationEditPageFragment,
+import { ReservationPermissionsDocument, UserPermissionChoice } from "@gql/gql-types";
+import type {
+  ReservationPermissionsQuery,
+  ReservationPermissionsQueryVariables,
+  Maybe,
+  ReservationEditPageFragment,
 } from "@gql/gql-types";
 import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ErrorBoundary } from "react-error-boundary";
-import {
-  ReservationChangeFormSchema,
-  type ReservationChangeFormType,
-  type ReservationFormMeta,
-  ReservationTypeSchema,
-} from "@/schemas";
-import ReservationTypeForm from "@/component/ReservationTypeForm";
+import { ReservationChangeFormSchema, ReservationTypeSchema } from "@/schemas";
+import type { ReservationChangeFormType, ReservationFormMeta } from "@/schemas";
+import { ReservationTypeForm } from "@/component/ReservationTypeForm";
 import { useStaffReservationMutation, useReservationEditData, useSession } from "@/hooks";
 import { errorToast } from "common/src/components/toast";
 import { ButtonContainer, CenterSpinner, Flex, HR } from "common/styled";
@@ -29,7 +24,7 @@ import { LinkPrev } from "@/component/LinkPrev";
 import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";

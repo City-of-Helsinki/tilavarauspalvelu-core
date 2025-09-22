@@ -4,7 +4,8 @@ import styled from "styled-components";
 import { AutoGrid, fontBold } from "../../styled";
 import { WEEKDAYS } from "../const";
 import { fromMondayFirstUnsafe, formatDayTimes } from "../helpers";
-import { Priority, SuitableTimeFieldsFragment } from "../../gql/gql-types";
+import type { SuitableTimeFieldsFragment } from "../../gql/gql-types";
+import { Priority } from "../../gql/gql-types";
 
 const WeekWrapper = styled.div`
   display: flex;
@@ -20,7 +21,7 @@ const Label = styled.div`
 
 type SchedulesT = Omit<SuitableTimeFieldsFragment, "pk" | "id">;
 
-function Weekdays({ schedules }: { schedules: Omit<SchedulesT, "priority">[] }) {
+function Weekdays({ schedules }: { schedules: Array<Omit<SchedulesT, "priority">> }) {
   const { t } = useTranslation();
   return (
     <>
@@ -50,7 +51,7 @@ const Heading = styled.p.attrs({ as: "h4" })`
   margin: 0 0 var(--spacing-xs);
 `;
 
-export function ApplicationTimePreview({ schedules }: { schedules: readonly SchedulesT[] }): JSX.Element {
+export function ApplicationTimePreview({ schedules }: { schedules: ReadonlyArray<SchedulesT> }): JSX.Element {
   const { t } = useTranslation();
 
   const primary = schedules.filter((n) => n.priority === Priority.Primary);

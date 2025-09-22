@@ -4,16 +4,13 @@ import { toApiDateUnsafe } from "common/src/common/util";
 import {
   PriceUnit,
   ReservationUnitPublishingState,
-  type ReservationUnitNode,
   ReservationKind,
   ReservationStartInterval,
   ReservationUnitReservationState,
-  type PriceReservationUnitFieldsFragment,
-  type EquipmentFieldsFragment,
   PaymentType,
 } from "@gql/gql-types";
+import type { ReservationUnitNode, PriceReservationUnitFieldsFragment, EquipmentFieldsFragment } from "@gql/gql-types";
 import {
-  type GetReservationUnitPriceProps,
   getDayIntervals,
   getEquipmentCategories,
   getEquipmentList,
@@ -24,23 +21,28 @@ import {
   getReservationUnitPrice,
   isReservationUnitPublished,
   isReservationUnitReservable,
-  type GetPriceType,
-  type NotReservableFieldsFragmentNarrow,
-  type GetPossibleTimesForDayProps,
-  type LastPossibleReservationDateProps,
   getLastPossibleReservationDate,
-  type AvailableTimesProps,
   getNextAvailableTime,
   formatNDays,
 } from "./reservationUnit";
+import type {
+  GetReservationUnitPriceProps,
+  GetPriceType,
+  NotReservableFieldsFragmentNarrow,
+  GetPossibleTimesForDayProps,
+  LastPossibleReservationDateProps,
+  AvailableTimesProps,
+} from "./reservationUnit";
 import mockTranslations from "./../public/locales/fi/prices.json";
-import { type ReservableMap, dateToKey, type RoundPeriod } from "./reservable";
+import { dateToKey } from "./reservable";
+import type { ReservableMap, RoundPeriod } from "./reservable";
 import { generateNameFragment } from "@/test/test.gql.utils";
 import { TIMERS_TO_FAKE } from "@/test/test.utils";
-import { createNodeId, ReadonlyDeep } from "common/src/helpers";
-import { type TFunction } from "i18next";
+import type { ReadonlyDeep } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
+import type { TFunction } from "i18next";
 import { vi, describe, test, expect, beforeEach, afterEach, beforeAll, afterAll } from "vitest";
-import { type DeepRequired } from "react-hook-form";
+import type { DeepRequired } from "react-hook-form";
 import { createMockIsReservableFieldsFragment } from "@/test/reservation-unit.mocks";
 
 // Turn into describe block and spec the tests
@@ -95,7 +97,7 @@ describe("getPossibleTimesForDay", () => {
     const date = startOfToday();
     const hour = getHours(new Date());
     const input = createInput({ date });
-    const output: { label: string; value: string }[] = [];
+    const output: Array<{ label: string; value: string }> = [];
     for (let i = hour; i < 24; i++) {
       // now is not in the set
       if (i !== hour) {
@@ -113,7 +115,7 @@ describe("getPossibleTimesForDay", () => {
       date,
       interval: ReservationStartInterval.Interval_60Mins,
     });
-    const output: { label: string; value: string }[] = [];
+    const output: Array<{ label: string; value: string }> = [];
     for (let i = hour; i < 24; i++) {
       output.push({ label: `${i}:00`, value: `${i}:00` });
     }
@@ -127,7 +129,7 @@ describe("getPossibleTimesForDay", () => {
       date,
       interval: ReservationStartInterval.Interval_120Mins,
     });
-    const output: { label: string; value: string }[] = [];
+    const output: Array<{ label: string; value: string }> = [];
     for (let i = hour; i < 24; i += 2) {
       output.push({ label: `${i}:00`, value: `${i}:00` });
     }
@@ -231,7 +233,7 @@ describe("getPriceString", () => {
 
   test("price range with no min", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 50.5,
       priceUnit: PriceUnit.Per_15Mins,
     });
@@ -240,7 +242,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 60.5,
       minutes: 60,
     });
@@ -249,7 +251,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 60.5,
       minutes: 61,
     });
@@ -258,7 +260,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 100,
       minutes: 61,
     });
@@ -267,7 +269,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 100,
       minutes: 90,
     });
@@ -276,7 +278,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 100,
       minutes: 91,
     });
@@ -285,7 +287,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 30,
       minutes: 60,
       priceUnit: PriceUnit.Per_15Mins,
@@ -295,7 +297,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 30,
       minutes: 60,
       priceUnit: PriceUnit.Per_30Mins,
@@ -305,7 +307,7 @@ describe("getPriceString", () => {
 
   test("price range with minutes", () => {
     const input = constructInput({
-      lowestPrice: 0.0,
+      lowestPrice: 0,
       highestPrice: 30,
       minutes: 61,
       priceUnit: PriceUnit.Per_30Mins,
@@ -462,7 +464,7 @@ describe("getEquipmentList", () => {
   });
 
   test("with equipment in predefined order", () => {
-    const equipment: ReadonlyDeep<DeepRequired<EquipmentFieldsFragment>>[] = [
+    const equipment: Array<ReadonlyDeep<DeepRequired<EquipmentFieldsFragment>>> = [
       createMockEquipment({ name: "Item A", categoryName: "Liittimet" }),
       createMockEquipment({ name: "Item B", categoryName: "Keittiö" }),
       createMockEquipment({ name: "Item C 2", categoryName: "Foobar" }),
@@ -508,7 +510,7 @@ describe("getFuturePricing", () => {
   }: {
     reservationBeginsAt?: Date;
     reservationEndsAt?: Date;
-    days: readonly Date[];
+    days: ReadonlyArray<Date>;
   }) {
     return {
       id: "1",
@@ -524,7 +526,7 @@ describe("getFuturePricing", () => {
     };
   }
 
-  const DAYS: readonly Date[] = [addDays(new Date(), 10), addDays(new Date(), 20), addDays(new Date(), 5)];
+  const DAYS: ReadonlyArray<Date> = [addDays(new Date(), 10), addDays(new Date(), 20), addDays(new Date(), 5)];
 
   test.for([
     { days: DAYS, expectedIndex: 2 },
@@ -843,7 +845,7 @@ describe("getDayIntervals", () => {
       endTime: { h: 17, m: 0 },
       interval: ReservationStartInterval.Interval_30Mins,
     };
-    const output: { h: number; m: number }[] = [];
+    const output: Array<{ h: number; m: number }> = [];
     for (let i = 9; i < 17; i++) {
       output.push({ h: i, m: 0 });
       output.push({ h: i, m: 30 });
@@ -857,7 +859,7 @@ describe("getDayIntervals", () => {
       endTime: { h: 17, m: 0 },
       interval: ReservationStartInterval.Interval_15Mins,
     };
-    const output: { h: number; m: number }[] = [];
+    const output: Array<{ h: number; m: number }> = [];
     for (let i = 9; i < 17; i++) {
       output.push({ h: i, m: 0 });
       output.push({ h: i, m: 15 });
@@ -873,7 +875,7 @@ describe("getDayIntervals", () => {
       endTime: { h: 17, m: 0 },
       interval: ReservationStartInterval.Interval_60Mins,
     };
-    const output: { h: number; m: number }[] = [];
+    const output: Array<{ h: number; m: number }> = [];
     for (let i = 9; i < 17; i++) {
       output.push({ h: i, m: 0 });
     }
@@ -886,7 +888,7 @@ describe("getDayIntervals", () => {
       endTime: { h: 24, m: 0 },
       interval: ReservationStartInterval.Interval_30Mins,
     };
-    const output: { h: number; m: number }[] = [];
+    const output: Array<{ h: number; m: number }> = [];
     for (let i = 0; i < 24; i++) {
       output.push({ h: i, m: 0 });
       output.push({ h: i, m: 30 });
@@ -918,7 +920,7 @@ describe("getDayIntervals", () => {
       endTime: { h: 17, m: 20 },
       interval: ReservationStartInterval.Interval_30Mins,
     };
-    const output: { h: number; m: number }[] = [];
+    const output: Array<{ h: number; m: number }> = [];
     for (let i = 9; i < 17; i++) {
       output.push({ h: i, m: 20 });
       output.push({ h: i, m: 50 });
@@ -932,7 +934,7 @@ describe("getDayIntervals", () => {
       endTime: { h: 17, m: 0 },
       interval: ReservationStartInterval.Interval_30Mins,
     };
-    const output: { h: number; m: number }[] = [];
+    const output: Array<{ h: number; m: number }> = [];
     for (let i = 9; i < 17; i++) {
       output.push({ h: i, m: 20 });
       if (i < 16) {
@@ -960,10 +962,10 @@ describe("getLastPossibleReservationDate", () => {
     reservationEndsAt,
   }: {
     reservationsMaxDaysBefore?: number | null;
-    reservableTimeSpans?: {
+    reservableTimeSpans?: Array<{
       begin: Date;
       end: Date;
-    }[];
+    }>;
     reservationEndsAt?: Date;
   }): LastPossibleReservationDateProps {
     return {

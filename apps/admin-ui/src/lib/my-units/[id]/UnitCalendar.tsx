@@ -1,17 +1,20 @@
-import React, { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { differenceInMinutes, isToday, setHours, startOfDay } from "date-fns";
 import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
-import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
-import { useTranslation, type TFunction } from "next-i18next";
-import { CalendarEvent } from "common/src/calendar/Calendar";
+import { ReservationTypeChoice } from "@gql/gql-types";
+import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
+import type { CalendarEvent } from "common/src/calendar/CommonCalendar";
 import { focusStyles } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { POST_PAUSE, PRE_PAUSE } from "@/common/calendarStyling";
 import { getReserveeName } from "@/common/util";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
 import { ReservationPopupContent } from "./ReservationPopupContent";
-import eventStyleGetter from "./eventStyleGetter";
+import { eventStyleGetter } from "./eventStyleGetter";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
@@ -174,8 +177,8 @@ function RowCells({ hasPermission, cols, ...rest }: CellProps): JSX.Element {
 
   return (
     <CellContent $numCols={cols} data-testid={testId}>
-      {Array.from(Array(cols).keys()).map((i) => (
-        <Cell {...rest} key={i} offset={i} hasPermission={hasPermission} />
+      {[...Array.from({ length: cols }).keys()].map((i) => (
+        <Cell key={i} {...rest} offset={i} hasPermission={hasPermission} />
       ))}
     </CellContent>
   );
@@ -233,7 +236,7 @@ function Cell({
     setParams(params);
   };
 
-  const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     handleOpenModal();
   };
@@ -493,7 +496,7 @@ export function UnitCalendar({
         <HeadingRow>
           <div />
           <CellContent $numCols={N_HOURS} key="header" className="calendar-header">
-            {Array.from(Array(N_HOURS).keys()).map((i, index) => (
+            {[...Array.from({ length: N_HOURS }).keys()].map((i, index) => (
               <Time key={i}>{index}</Time>
             ))}
           </CellContent>

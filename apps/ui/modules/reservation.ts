@@ -1,32 +1,31 @@
 import { addMinutes, addSeconds, isAfter, roundToNearestMinutes, differenceInMinutes, set } from "date-fns";
-import {
-  type ReservationNode,
+import { ReservationStateChoice, OrderStatus, ReservationCancelReasonChoice } from "@gql/gql-types";
+import type {
+  ReservationNode,
+  Maybe,
+  ListReservationsQuery,
+  IsReservableFieldsFragment,
+  ReservationUnitNode,
+  ReservationOrderStatusFragment,
+  CancellationRuleFieldsFragment,
+  BlockingReservationFieldsFragment,
+  CanUserCancelReservationFragment,
+  CanReservationBeChangedFragment,
+  PaymentOrderNode,
+  ReservationPaymentUrlFragment,
   ReservationStartInterval,
-  type Maybe,
-  type ListReservationsQuery,
-  type IsReservableFieldsFragment,
-  ReservationStateChoice,
-  type ReservationUnitNode,
-  OrderStatus,
-  type ReservationOrderStatusFragment,
-  type CancellationRuleFieldsFragment,
-  type BlockingReservationFieldsFragment,
-  type CanUserCancelReservationFragment,
-  type CanReservationBeChangedFragment,
-  type PaymentOrderNode,
-  ReservationCancelReasonChoice,
-  type ReservationPaymentUrlFragment,
 } from "@gql/gql-types";
 import { getIntervalMinutes } from "common/src/conversion";
 import { fromUIDate } from "./util";
-import { type TFunction } from "i18next";
-import { type ReservableMap, type RoundPeriod, isRangeReservable } from "./reservable";
-import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
+import type { TFunction } from "i18next";
+import { isRangeReservable } from "./reservable";
+import type { ReservableMap, RoundPeriod } from "./reservable";
+import type { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { isValidDate, toUIDate } from "common/src/common/util";
 import { getTimeString } from "./reservationUnit";
 import { timeToMinutes } from "common/src/helpers";
 import { gql } from "@apollo/client";
-import { type LocalizationLanguages } from "common/src/urlBuilder";
+import type { LocalizationLanguages } from "common/src/urlBuilder";
 
 // TimeSlots change the Calendar view. How many intervals are shown i.e. every half an hour, every hour
 // we use every hour only => 2
@@ -38,7 +37,7 @@ export const SLOTS_EVERY_HOUR = 2;
 export function getDurationOptions(
   opts: Pick<ReservationUnitNode, "minReservationDuration" | "maxReservationDuration" | "reservationStartInterval">,
   t: TFunction
-): { label: string; value: number }[] {
+): Array<{ label: string; value: number }> {
   if (opts.minReservationDuration == null || opts.maxReservationDuration == null) {
     return [];
   }
@@ -57,7 +56,7 @@ export function getDurationOptions(
     return "";
   };
 
-  const durationOptions: { label: string; value: number }[] = [];
+  const durationOptions: Array<{ label: string; value: number }> = [];
   const minReservationDurationMinutes = opts.minReservationDuration / 60;
   const maxReservationDurationMinutes = opts.maxReservationDuration / 60;
   const start = minReservationDurationMinutes > intervalMinutes ? minReservationDurationMinutes : intervalMinutes;
@@ -210,8 +209,8 @@ export type CanReservationBeChangedProps = {
   reservation: CanReservationBeChangedFragment;
   reservableTimes: ReservableMap;
   reservationUnit: IsReservableFieldsFragment;
-  activeApplicationRounds: readonly RoundPeriod[];
-  blockingReservations: readonly BlockingReservationFieldsFragment[];
+  activeApplicationRounds: ReadonlyArray<RoundPeriod>;
+  blockingReservations: ReadonlyArray<BlockingReservationFieldsFragment>;
 };
 
 export function getWhyReservationCantBeChanged(reservation: CanReservationBeChangedFragment): string | null {
@@ -345,8 +344,8 @@ export function convertFormToFocustimeSlot({
   data: PendingReservationFormType;
   reservationUnit: Omit<IsReservableFieldsFragment, "reservableTimeSpans">;
   reservableTimes: ReservableMap;
-  activeApplicationRounds: readonly RoundPeriod[];
-  blockingReservations: readonly BlockingReservationFieldsFragment[];
+  activeApplicationRounds: ReadonlyArray<RoundPeriod>;
+  blockingReservations: ReadonlyArray<BlockingReservationFieldsFragment>;
 }): FocusTimeSlot | { isReservable: false } {
   const [hours, minutes]: Array<number | undefined> = data.time
     .split(":")
@@ -490,9 +489,9 @@ function getCheckoutRedirectUrl(pk: number, lang: LocalizationLanguages, apiBase
     searchParams.set("lang", lang);
     searchParams.set("redirect_on_error", errorUrl.toString());
     return url.toString();
-  } catch (e) {
+  } catch (err) {
     // eslint-disable-next-line no-console
-    console.error(e);
+    console.error(err);
   }
   return "";
 }
@@ -515,9 +514,9 @@ export function getCheckoutUrl(
     const baseUrl = `${origin}${pathname}`;
     searchParams.set("lang", lang);
     return `${baseUrl}${baseUrl.endsWith("/") ? "" : "/"}paymentmethod?${searchParams.toString()}`;
-  } catch (e) {
+  } catch (err) {
     // eslint-disable-next-line no-console
-    console.error(e);
+    console.error(err);
   }
   return undefined;
 }

@@ -1,13 +1,15 @@
-import { type CreateGraphQLMockProps, generateNameFragment } from "@test/test.gql.utils";
+import { generateNameFragment } from "@test/test.gql.utils";
+import type { CreateGraphQLMockProps } from "@test/test.gql.utils";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { createMockReservationUnit } from "@test/reservation-unit.mocks";
 import { render, within } from "@testing-library/react";
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { ReservationUnitList } from "./ReservationUnitList";
-import { type ApplicationReservationUnitListFragment } from "@/gql/gql-types";
+import type { ApplicationReservationUnitListFragment } from "@/gql/gql-types";
 import { createNodeId } from "common/src/helpers";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
-import { type SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import type { SubmitHandler } from "react-hook-form";
 import userEvent from "@testing-library/user-event";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
@@ -84,7 +86,7 @@ function customRender({
 }
 
 type FormValues = {
-  reservationUnits: Array<number>;
+  reservationUnits: number[];
 };
 
 function WrappedRender({

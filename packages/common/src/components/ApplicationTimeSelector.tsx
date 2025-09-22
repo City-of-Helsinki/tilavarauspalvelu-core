@@ -1,10 +1,13 @@
-import React, { type HTMLAttributes, useState } from "react";
-import styled, { css, type RuleSet } from "styled-components";
-import { type TFunction, useTranslation } from "next-i18next";
+import React, { useState } from "react";
+import type { HTMLAttributes } from "react";
+import styled, { css } from "styled-components";
+import type { RuleSet } from "styled-components";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { AutoGrid, Flex, fontMedium, NoWrap } from "../../styled";
 import { WEEKDAYS_SORTED } from "../const";
 import { isTouchDevice } from "../browserHelpers";
-import { Weekday } from "../../gql/gql-types";
+import type { Weekday } from "../../gql/gql-types";
 import { convertWeekday } from "../conversion";
 
 export const CELL_STATES = ["none", "secondary", "primary"] as const;
@@ -34,7 +37,7 @@ function DayColumn({
   selectedPriority,
 }: Readonly<{
   day: Weekday;
-  cells: Readonly<Cell[]>;
+  cells: ReadonlyArray<Cell>;
   // use undefined to disable painting
   updateCell?: (cell: Cell, value: CellState) => void;
   selectedPriority?: CellState;
@@ -157,7 +160,7 @@ function formatButtonAriaLabel(t: TFunction, cell: Cell, weekday: string): strin
 }
 
 interface ApplicationTimeSelectorProps extends HTMLAttributes<HTMLDivElement> {
-  cells: Readonly<Readonly<Cell[]>[]>;
+  cells: ReadonlyArray<ReadonlyArray<Cell>>;
   onCellUpdate?: (selection: Cell, value: CellState) => void;
   selectedPriority?: CellState;
 }
@@ -172,7 +175,7 @@ export function ApplicationTimeSelector({
 }: Readonly<ApplicationTimeSelectorProps>): JSX.Element {
   return (
     <>
-      <CalendarContainer {...rest} aria-multiselectable role="table">
+      <CalendarContainer {...rest} role="table">
         {WEEKDAYS_SORTED.map((day) => (
           <DayColumn
             key={`day-${day}`}

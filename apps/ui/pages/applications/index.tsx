@@ -4,13 +4,15 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import {
   ApplicationStatusChoice,
-  type ApplicationsQuery,
   useApplicationsLazyQuery,
   ApplicationsDocument,
-  type ApplicationsQueryVariables,
   CurrentUserDocument,
-  type CurrentUserQuery,
   ApplicationOrderSet,
+} from "@gql/gql-types";
+import type {
+  ApplicationsQuery,
+  ApplicationsQueryVariables,
+  CurrentUserQuery,
   ApplicationsGroupFragment,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";

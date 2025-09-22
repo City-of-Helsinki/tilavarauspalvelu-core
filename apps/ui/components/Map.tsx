@@ -11,6 +11,11 @@ export const Map = ({ tprekId, height = "480px" }: Props): JSX.Element | null =>
   const { t, i18n } = useTranslation();
   const mapUrl = `${mapUrlPrefix}${i18n.language}/embed/unit/${tprekId}`;
   return (
-    <iframe title={t("reservationUnit:mapTitle")} style={{ border: "none", width: "100%", height }} src={mapUrl} />
+    <iframe
+      title={t("reservationUnit:mapTitle")}
+      style={{ border: "none", width: "100%", height }}
+      src={mapUrl}
+      sandbox="allow-scripts"
+    />
   );
 };

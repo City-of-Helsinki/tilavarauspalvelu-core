@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Notification, NotificationProps } from "hds-react";
+import type { NotificationProps } from "hds-react";
+import { Notification } from "hds-react";
 
 type NotificationPropsWithCentering = NotificationProps & {
   centered?: boolean;
@@ -13,7 +14,7 @@ const StyledNotification = styled(Notification)`
   }
 `;
 
-function NotificationWrapper(props: NotificationPropsWithCentering): JSX.Element | null {
+export function NotificationWrapper(props: NotificationPropsWithCentering): JSX.Element | null {
   const [isVisible, setIsVisible] = useState(true);
 
   if (!isVisible) {
@@ -29,5 +30,3 @@ function NotificationWrapper(props: NotificationPropsWithCentering): JSX.Element
     />
   );
 }
-
-export default NotificationWrapper;

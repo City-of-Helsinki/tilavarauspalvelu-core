@@ -1,7 +1,9 @@
-import React, { type ReactNode } from "react";
+import React from "react";
+import type { ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { ApolloError, gql } from "@apollo/client";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import styled from "styled-components";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,12 +24,11 @@ import {
   BannerNotificationTarget,
   useDeleteBannerNotificationMutation,
   useBannerNotificationPageQuery,
-  type BannerNotificationPageFragment,
   UserPermissionChoice,
   useUpdateBannerNotificationMutation,
   useCreateBannerNotificationMutation,
-  type BannerNotificationCreateMutation,
 } from "@gql/gql-types";
+import type { BannerNotificationPageFragment, BannerNotificationCreateMutation } from "@gql/gql-types";
 import { fromUIDate } from "common/src/common/util";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import {
@@ -41,8 +42,8 @@ import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/he
 import { ControlledDateInput } from "common/src/components/form";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { successToast } from "common/src/components/toast";
-import StatusLabel from "common/src/components/StatusLabel";
-import { type StatusLabelType } from "common/src/tags";
+import { StatusLabel } from "common/src/components/StatusLabel";
+import type { StatusLabelType } from "common/src/tags";
 import { CenterSpinner, Flex, TitleSection, H1 } from "common/styled";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { useDisplayError } from "common/src/hooks";
@@ -50,7 +51,7 @@ import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { getNotificationListUrl } from "@/common/urls";
 import { Error404 } from "@/component/Error404";
@@ -304,8 +305,8 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
         }),
       });
       router.push(getNotificationListUrl());
-    } catch (e) {
-      displayError(e);
+    } catch (err) {
+      displayError(err);
     }
   };
 
@@ -529,8 +530,8 @@ function useRemoveNotification({ notification }: { notification: BannerNotificat
 
       successToast({ text: t("notification:success.removed") });
       router.replace(getNotificationListUrl());
-    } catch (e) {
-      displayError(e);
+    } catch (err) {
+      displayError(err);
     }
   };
 

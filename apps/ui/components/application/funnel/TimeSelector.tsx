@@ -5,25 +5,21 @@ import { useFormContext } from "react-hook-form";
 import { AutoGrid, Flex } from "common/styled";
 import { filterNonNullable } from "common/src/helpers";
 import { ControlledSelect } from "common/src/components/form";
-import {
-  ApplicationTimeSelector,
-  type Cell,
-  type CellState,
-  isCellEqual,
-} from "common/src/components/ApplicationTimeSelector";
+import { ApplicationTimeSelector, isCellEqual } from "common/src/components/ApplicationTimeSelector";
+import type { Cell, CellState } from "common/src/components/ApplicationTimeSelector";
 import { successToast } from "common/src/components/toast";
 import { ErrorText } from "common/src/components/ErrorText";
-import { type TimeSelectorFragment } from "@/gql/gql-types";
+import type { TimeSelectorFragment } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
 import { aesToCells, covertCellsToTimeRange } from "./timeSelectorModule";
-import { type ApplicationPage2FormValues } from "./form";
-import { TimePreview } from ".";
+import type { ApplicationPage2FormValues } from "./form";
+import { TimePreview } from "./TimePreview";
 import { convertWeekday } from "common/src/conversion";
 
 export type TimeSelectorProps = {
   index: number;
-  reservationUnitOptions: { label: string; value: number }[];
-  reservationUnitOpeningHours: Readonly<TimeSelectorFragment[]>;
+  reservationUnitOptions: Array<{ label: string; value: number }>;
+  reservationUnitOpeningHours: ReadonlyArray<TimeSelectorFragment>;
 };
 
 export function TimeSelectorForm({
@@ -34,7 +30,7 @@ export function TimeSelectorForm({
   const { t } = useTranslation();
   const { setValue, watch } = useFormContext<ApplicationPage2FormValues>();
 
-  const setSelectorData = (index: number, selected: Readonly<Readonly<Cell[]>[]>) => {
+  const setSelectorData = (index: number, selected: ReadonlyArray<ReadonlyArray<Cell>>) => {
     const formVals = covertCellsToTimeRange(selected);
     setValue(`applicationSections.${index}.suitableTimeRanges`, formVals, {
       shouldDirty: true,

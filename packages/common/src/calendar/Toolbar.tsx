@@ -75,10 +75,10 @@ export const ToolbarBtn = styled.button.attrs({ type: "button" })<{
 `;
 
 type ToolbarProps = {
+  date: Date;
+  view: View;
   onNavigate: (n: NavigateAction) => void;
   onView: (n: View) => void;
-  view: string;
-  date: Date;
   children?: React.ReactNode;
 };
 
@@ -96,8 +96,10 @@ export function Toolbar({ onNavigate, onView, view, date, children }: Readonly<T
       title = format(date, dateStr, culture);
       break;
     }
+    case "month":
     case "week":
-    default: {
+    case "work_week":
+    case "agenda": {
       const start = startOfWeek(date, culture);
       const end = endOfWeek(date, culture);
       const startDay = format(start, "d", culture);

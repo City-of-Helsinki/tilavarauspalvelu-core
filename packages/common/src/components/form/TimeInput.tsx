@@ -1,4 +1,5 @@
-import React, { Ref, forwardRef } from "react";
+import type { Ref } from "react";
+import React, { forwardRef } from "react";
 import styled from "styled-components";
 import { IconAlertCircleFill } from "hds-react";
 import { breakpoints } from "../../const";

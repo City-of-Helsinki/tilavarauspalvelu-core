@@ -1,12 +1,10 @@
 import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
-import {
-  ReservationStateChoice,
-  ReservationStartInterval,
-  OrderStatus,
-  type ReservationOrderStatusFragment,
-  type CanUserCancelReservationFragment,
-  type PaymentOrderNode,
-  type CanReservationBeChangedFragment,
+import { ReservationStateChoice, ReservationStartInterval, OrderStatus } from "@gql/gql-types";
+import type {
+  ReservationOrderStatusFragment,
+  CanUserCancelReservationFragment,
+  PaymentOrderNode,
+  CanReservationBeChangedFragment,
 } from "@gql/gql-types";
 import {
   isReservationCancellable,
@@ -14,11 +12,11 @@ import {
   getDurationOptions,
   getNormalizedReservationOrderStatus,
   isReservationEditable,
-  type CanReservationBeChangedProps,
 } from "./reservation";
+import type { CanReservationBeChangedProps } from "./reservation";
 import { isSlotWithinReservationTime } from "./reservable";
 import { toApiDate } from "common/src/common/util";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
 import { createNodeId } from "common/src/helpers";
 
@@ -51,7 +49,7 @@ function createMockReservationUnit({
     minReservationDuration: null,
     maxReservationDuration: null,
     reservationEndsAt: reservationEndsAt?.toISOString() ?? null,
-    reservableTimeSpans: Array.from(Array(100)).map((_val, index) => {
+    reservableTimeSpans: Array.from({ length: 100 }).map((_val, index) => {
       return {
         startDatetime: `${toApiDate(addDays(new Date(), index))}T07:00:00+00:00`,
         endDatetime: `${toApiDate(addDays(new Date(), index))}T20:00:00+00:00`,
@@ -161,7 +159,7 @@ describe("getDurationOptions", () => {
   test("values for 90 min intervals", () => {
     const input = {
       minReservationDuration: 1800,
-      maxReservationDuration: 30600,
+      maxReservationDuration: 30_600,
       reservationStartInterval: ReservationStartInterval.Interval_90Mins,
     } as const;
     expect(getDurationOptions(input, mockT).map((x) => x.value)).toEqual([90, 180, 270, 360, 450]);

@@ -16,7 +16,7 @@ export function checkDateNotInPast(date: Date | null, ctx: z.RefinementCtx, path
 }
 
 export function checkDateWithinThreeYears(date: Date | null, ctx: z.RefinementCtx, path: string): void {
-  if (date && Math.abs(new Date().getTime() - date.getTime()) > THREE_YEARS_MS) {
+  if (date && Math.abs(Date.now() - date.getTime()) > THREE_YEARS_MS) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: [path],
@@ -60,7 +60,7 @@ export function checkTimeStringFormat(data: string | undefined, ctx: z.Refinemen
       path: [path],
       message: `Required`,
     });
-  } else if (!data.match(TIME_PATTERN)) {
+  } else if (!TIME_PATTERN.test(data)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: [path],

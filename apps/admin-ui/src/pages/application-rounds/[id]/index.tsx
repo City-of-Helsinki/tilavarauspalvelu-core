@@ -8,23 +8,25 @@ import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "common/styled";
 import { Button, Tabs } from "hds-react";
 import { uniqBy } from "lodash-es";
 import styled from "styled-components";
-import {
-  type ApplicationRoundAdminFragment,
-  ApplicationRoundStatusChoice,
-  CurrentUserQuery,
-  type Maybe,
-  useApplicationRoundQuery,
-  UserPermissionChoice,
+import type {
+  ApplicationRoundAdminFragment,
+  FilterOptionsQuery,
+  FilterOptionsQueryVariables,
+  Maybe,
   ApplicationRoundQuery,
   ApplicationRoundQueryVariables,
-  ApplicationRoundDocument,
   CheckPermissionsQuery,
   CheckPermissionsQueryVariables,
+  CurrentUserQuery,
+} from "@gql/gql-types";
+import {
+  ApplicationRoundDocument,
+  ApplicationRoundStatusChoice,
   CheckPermissionsDocument,
-  FilterOptionsDocument,
-  type FilterOptionsQuery,
-  type FilterOptionsQueryVariables,
   CurrentUserDocument,
+  FilterOptionsDocument,
+  useApplicationRoundQuery,
+  UserPermissionChoice,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { hasPermission } from "@/modules/permissionHelper";
@@ -33,19 +35,19 @@ import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import Link from "next/link";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { createClient } from "@/common/apolloClient";
-import { TimeframeStatus, ApplicationRoundStatusLabel } from "@lib/application-rounds";
+import { ApplicationRoundStatusLabel, TimeframeStatus } from "@lib/application-rounds";
 import {
-  ReviewEndAllocation,
   ApplicationDataLoader,
-  Filters,
   ApplicationSectionDataLoader,
-  TimeSlotDataLoader,
+  Filters,
   RejectedOccurrencesDataLoader,
+  ReviewEndAllocation,
+  TimeSlotDataLoader,
 } from "@lib/application-rounds/[id]";
-import { type TagOptionsList } from "@/modules/search";
+import type { TagOptionsList } from "@/modules/search";
 import { getFilterOptions } from "@/hooks/useFilterOptions";
 import { getApplicationRoundUrl } from "@/common/urls";
 
@@ -70,7 +72,7 @@ export default function ApplicationRound({
   const pk = applicationRoundOriginal?.pk ?? 0;
   const { data, previousData, refetch } = useApplicationRoundQuery({
     variables: { id: createNodeId("ApplicationRoundNode", pk) },
-    pollInterval: isInProgress ? 10000 : 0,
+    pollInterval: isInProgress ? 10_000 : 0,
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
     },
@@ -310,7 +312,7 @@ function getRoundUnitOptions(reservationUnits: ApplicationRoundAdminFragment["re
 function getUserPermissionFilteredUnits(
   applicationRound: Maybe<ApplicationRoundAdminFragment> | undefined,
   user: CurrentUserQuery["currentUser"]
-): { label: string; value: number }[] {
+): Array<{ label: string; value: number }> {
   // Return all units that the user has permission to view or manage in the application round
   const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
   const unitOptions = getRoundUnitOptions(reservationUnits).filter(

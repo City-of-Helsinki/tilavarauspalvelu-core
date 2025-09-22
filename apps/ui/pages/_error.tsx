@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/nextjs";
 import type { NextPage } from "next";
-import Error, { type ErrorProps } from "next/error";
+import Error from "next/error";
+import type { ErrorProps } from "next/error";
 import { ErrorContainer } from "common/src/components";
 import { env } from "@/env.mjs";
 import { getApiErrors } from "common/src/apolloUtils";

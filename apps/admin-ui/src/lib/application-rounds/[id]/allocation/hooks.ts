@@ -1,26 +1,23 @@
-import { ApolloError, gql, type ApolloQueryResult } from "@apollo/client";
+import { ApolloError, gql } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "next-i18next";
-import {
-  type AllocatedTimeSlotCreateMutation,
-  useCreateAllocatedTimeSlotMutation,
-  useDeleteAllocatedTimeSlotMutation,
-  type ApplicationSectionAllocationsQuery,
-} from "@gql/gql-types";
+import { useCreateAllocatedTimeSlotMutation, useDeleteAllocatedTimeSlotMutation } from "@gql/gql-types";
+import type { AllocatedTimeSlotCreateMutation, ApplicationSectionAllocationsQuery } from "@gql/gql-types";
 import { useState } from "react";
-import {
-  type AllocatedTimeSlotNodeT,
-  decodeTimeSlot,
-  type SectionNodeT,
-  type SuitableTimeRangeNodeT,
-  timeSlotKeyToScheduleTime,
+import { decodeTimeSlot, timeSlotKeyToScheduleTime } from "./modules/applicationRoundAllocation";
+import type {
+  AllocatedTimeSlotNodeT,
+  SectionNodeT,
+  SuitableTimeRangeNodeT,
 } from "./modules/applicationRoundAllocation";
 import { errorToast, successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { toNumber } from "common/src/helpers";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
-import { type TimeSlotRange, useSelectedSlots } from "./SelectedSlotsContext";
-import { type DayT } from "common/src/const";
+import { useSelectedSlots } from "./SelectedSlotsContext";
+import type { TimeSlotRange } from "./SelectedSlotsContext";
+import type { DayT } from "common/src/const";
 
 export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT) => void] {
   const params = useSearchParams();
@@ -68,6 +65,42 @@ export function useFocusAllocatedSlot(): [
   return [allocatedPk, setAllocated];
 }
 
+// generate a list of strings for each slot based on the interval
+const generateSelection = (selectionRange: TimeSlotRange): string[] => {
+  const { day, ends, begins } = selectionRange;
+  const beginHour = Math.floor(begins);
+  const beginMinute = Math.round((begins - beginHour) * 60);
+  const endHour = Math.floor(ends);
+  const endMinute = Math.round((ends - endHour) * 60);
+
+  const slots = [];
+  if (day == null || beginHour == null || beginMinute == null || endHour == null || endMinute == null) {
+    return [];
+  }
+  // NOTE: parseInt returns NaN for invalid => the loop checks will fail and return []
+  for (let hour = beginHour; hour <= endHour; hour++) {
+    for (let minute = 0; minute < 60; minute += 30) {
+      if (hour === beginHour && minute < beginMinute) {
+        continue;
+      }
+      if (hour === endHour && minute > endMinute) {
+        break;
+      }
+      // garbage format: hours have no leading zero, minutes have to have it
+      const minuteString = minute < 10 ? `0${minute}` : `${minute}`;
+      slots.push(`${day}-${hour}-${minuteString}`);
+    }
+  }
+  return slots;
+};
+
+const getSelection = (selection: TimeSlotRange | null): string[] => {
+  if (selection == null) {
+    return [];
+  }
+  return generateSelection(selection);
+};
+
 /// Allow selecting a continuous block on a single day
 /// state is saved in the URL as selectionBegin and selectionEnd parameters
 /// TODO rework the interface, accepts string[] for compatibility, not because it's desired
@@ -75,7 +108,7 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
   const { selection, setSelection } = useSelectedSlots();
 
   const setSelectedSlots = (slots: string[]) => {
-    if (slots.length < 1) {
+    if (slots.length === 0) {
       setSelection(null);
     } else {
       const selectionBegin = slots[0];
@@ -93,43 +126,7 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
     }
   };
 
-  // generate a list of strings for each slot based on the interval
-  const generateSelection = (selectionRange: TimeSlotRange): string[] => {
-    const { day, ends, begins } = selectionRange;
-    const beginHour = Math.floor(begins);
-    const beginMinute = Math.round((begins - beginHour) * 60);
-    const endHour = Math.floor(ends);
-    const endMinute = Math.round((ends - endHour) * 60);
-
-    const slots = [];
-    if (day == null || beginHour == null || beginMinute == null || endHour == null || endMinute == null) {
-      return [];
-    }
-    // NOTE: parseInt returns NaN for invalid => the loop checks will fail and return []
-    for (let hour = beginHour; hour <= endHour; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        if (hour === beginHour && minute < beginMinute) {
-          continue;
-        }
-        if (hour === endHour && minute > endMinute) {
-          break;
-        }
-        // garbage format: hours have no leading zero, minutes have to have it
-        const minuteString = minute < 10 ? `0${minute}` : `${minute}`;
-        slots.push(`${day}-${hour}-${minuteString}`);
-      }
-    }
-    return slots;
-  };
-
-  const getSelection = (): string[] => {
-    if (selection == null) {
-      return [];
-    }
-    return generateSelection(selection);
-  };
-
-  return [getSelection(), setSelectedSlots];
+  return [getSelection(selection), setSelectedSlots];
 }
 
 // side effects that should happen when a modification is made
@@ -187,7 +184,7 @@ export function useAcceptSlotMutation({
 
   if (!reservationUnitOptionPk) {
     // eslint-disable-next-line no-console
-    console.error("Invalid reservationUnitOptionPk: ", reservationUnitOptionPk);
+    console.error("Invalid reservationUnitOptionPk:", reservationUnitOptionPk);
   }
 
   const handleAcceptSlot = async () => {
@@ -197,7 +194,7 @@ export function useAcceptSlotMutation({
     }
     if (timeRange == null) {
       // eslint-disable-next-line no-console
-      console.error("Invalid timeRange for section: ", applicationSection);
+      console.error("Invalid timeRange for section:", applicationSection);
     }
     if (selection.length === 0 || timeRange == null) {
       errorToast({ text: t("allocation:errors.accepting.generic") });
@@ -237,8 +234,8 @@ export function useAcceptSlotMutation({
       const msg = t("allocation:acceptingSuccess", { name });
       successToast({ text: msg });
       refresh();
-    } catch (e) {
-      displayError(e);
+    } catch (err) {
+      displayError(err);
     }
   };
 
@@ -287,8 +284,8 @@ export function useRemoveAllocation({
         successToast({ text: msg });
         refresh();
       }
-    } catch (e) {
-      displayError(e);
+    } catch (err) {
+      displayError(err);
     }
   };
   return [handleRemoveAllocation, { isLoading }];

@@ -28,7 +28,7 @@ const FallbackComponent = (err: unknown) => {
   return <ErrorGeneric />;
 };
 
-export default function PageWrapper({ apiBaseUrl, children }: Props): JSX.Element {
+export function PageWrapper({ apiBaseUrl, children }: Props): JSX.Element {
   const { modalContent } = useModal();
 
   return (
