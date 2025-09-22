@@ -11,5 +11,9 @@
     "title": "Din bokning är inte klar",
     "body": "Din bokning är inte klar. Vänligen slutför bokningen inom 20 minuter.",
     "continueReservation": "Fortsätt bokningen"
+  },
+  "timeZoneDeviation": {
+    "title": "Du använder den här tjänsten utomlands:",
+    "body": "Tiderna i bokningskalendern visas i lokala tidszonen ({{timeZone}}). Vänligen ta hänsyn till tidsskillnaden när du gör en bokning."
   }
 }
