@@ -36,3 +36,5 @@ export const breakpoints = {
 } as const;
 
 export const pixel = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+
+export const EXPECTED_TIMEZONE = "Europe/Helsinki" as const;

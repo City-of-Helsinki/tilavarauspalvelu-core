@@ -11,5 +11,9 @@
     "title": "Your booking is incomplete",
     "body": "Your booking will be cancelled automatically, if it won’t be completed within 20 minutes.",
     "continueReservation": "Continue booking"
+  },
+  "timeZoneDeviation": {
+    "title": "You are using this service abroad:",
+    "body": "The times in the booking calendar are shown in the local timezone ({{timeZone}}). Please consider the time difference when making a booking."
   }
 }

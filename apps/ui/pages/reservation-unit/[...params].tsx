@@ -1,3 +1,4 @@
+import TimeZoneNotification from "common/src/components/TimeZoneNotification";
 import React, { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -331,6 +332,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   return (
     <FormProvider {...form}>
+      <TimeZoneNotification />
       <ReservationPageWrapper>
         <StyledReservationInfoCard
           reservation={reservation}
