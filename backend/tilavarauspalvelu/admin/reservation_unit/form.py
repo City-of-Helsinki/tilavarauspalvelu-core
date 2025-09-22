@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import datetime
 import json
+from decimal import Decimal
 from typing import Any
 
 from django import forms
+from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms.formsets import DELETION_FIELD_NAME
@@ -14,13 +16,14 @@ from modeltranslation.admin import TranslationStackedInline
 from subforms.fields import DynamicArrayField
 from tinymce.widgets import TinyMCE
 
-from tilavarauspalvelu.enums import AccessType, TermsOfUseTypeChoices
+from tilavarauspalvelu.enums import AccessType, ReservationKind
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing, TermsOfUse
-from tilavarauspalvelu.typing import error_codes
+from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing
 from utils.date_utils import local_date
 from utils.external_service.errors import ExternalServiceError
 from utils.utils import only_django_validation_errors
+
+# Access type
 
 
 class ReservationUnitAccessTypeForm(forms.ModelForm):
@@ -28,7 +31,7 @@ class ReservationUnitAccessTypeForm(forms.ModelForm):
 
     class Meta:
         model = ReservationUnitAccessType
-        fields = ["access_type", "begin_date"]
+        fields = []  # Use fields from Inline
         labels = {
             "access_type": _("Access type"),
             "begin_date": _("Access type begin date"),
@@ -87,8 +90,8 @@ class ReservationUnitAccessTypeFormSet(BaseInlineFormSet):
         only_begun = (True for form in self.forms if form.cleaned_data.get("begin_date", datetime.date.max) <= today)
         has_active = next(only_begun, None) is not None
         if not has_active:
-            msg = "At least one active access type is required."
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_ACTIVE_ACCESS_TYPE)
+            msg = _("At least one active access type is required.")
+            raise ValidationError(msg)
 
     @transaction.atomic
     def save(self, commit: bool = True) -> list[ReservationUnitAccessType]:  # noqa: FBT001, FBT002
@@ -99,6 +102,88 @@ class ReservationUnitAccessTypeFormSet(BaseInlineFormSet):
     def _should_delete_form(self, form: ReservationUnitAccessTypeForm) -> bool:
         # Required so errors from `validate_deletion` are not ignored.
         return (not form.errors) and super()._should_delete_form(form)
+
+
+class ReservationUnitAccessTypeInline(admin.TabularInline):
+    model = ReservationUnitAccessType
+    fields = [
+        "access_type",
+        "begin_date",
+    ]
+    form = ReservationUnitAccessTypeForm
+    formset = ReservationUnitAccessTypeFormSet
+    show_change_link = True
+    extra = 0
+
+
+# Pricing
+
+
+class ReservationUnitPricingParentForm(forms.ModelForm):
+    class Meta:
+        model = ReservationUnit
+        fields = [
+            "reservation_kind",
+            "payment_terms",
+        ]
+
+
+class ReservationUnitPricingForm(forms.ModelForm):
+    instance: ReservationUnitPricing
+
+    class Meta:
+        model = ReservationUnitPricing
+        fields = []  # Use fields from Inline
+
+
+class ReservationUnitPricingFormSet(BaseInlineFormSet):
+    form = ReservationUnitPricingForm
+    instance: ReservationUnit
+
+    def clean(self) -> None:
+        parent_form = ReservationUnitPricingParentForm(self.data)
+        parent_form.full_clean()
+        parent_data = parent_form.cleaned_data
+        if not parent_data:
+            return
+
+        is_draft = parent_data.get("is_draft", False)
+        reservation_kind = ReservationKind(parent_data["reservation_kind"])
+
+        if not is_draft and reservation_kind.allows_direct:
+            payment_terms = parent_data.get("payment_terms")
+
+            form: ReservationUnitPricingForm
+            for form in self.forms:
+                cleaned_data: dict[str, Any] | None = form.cleaned_data
+                if not cleaned_data:
+                    continue
+
+                highest_price: Decimal = cleaned_data["highest_price"]
+                if highest_price > Decimal(0) and not payment_terms:
+                    msg = _("Payment terms are required for direct booking of paid reservation units")
+                    raise ValidationError(msg)
+
+
+class ReservationUnitPricingInline(TranslationStackedInline):
+    model = ReservationUnitPricing
+    fields = [
+        "begins",
+        "is_activated_on_begins",
+        "lowest_price",
+        "highest_price",
+        "price_unit",
+        "payment_type",
+        "tax_percentage",
+        "material_price_description",
+    ]
+    form = ReservationUnitPricingForm
+    formset = ReservationUnitPricingFormSet
+    show_change_link = True
+    extra = 0
+
+
+# Reservation unit
 
 
 class ReservationUnitAdminForm(forms.ModelForm):
@@ -294,19 +379,13 @@ class ReservationUnitAdminForm(forms.ModelForm):
         }
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        qs = TermsOfUse.objects.all()
-        self.base_fields["pricing_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.PRICING)
-        self.base_fields["payment_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.PAYMENT)
-        self.base_fields["cancellation_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.CANCELLATION)
-        self.base_fields["service_specific_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.SERVICE)
-
         super().__init__(*args, **kwargs)
 
         editing: bool = getattr(self.instance, "pk", None) is not None
         if not editing:
             return
 
-        if self.instance.access_types.active_or_future().filter(access_type=AccessType.ACCESS_CODE).exists():
+        if self.instance.access_types.all().active_or_future().filter(access_type=AccessType.ACCESS_CODE).exists():
             pindora_field = self.fields["pindora_response"]
             pindora_field.initial = self.get_pindora_response(self.instance)
             pindora_field.widget.attrs.update({"cols": "100", "rows": "10"})
@@ -319,18 +398,29 @@ class ReservationUnitAdminForm(forms.ModelForm):
 
         return json.dumps(response, default=str, indent=2)
 
+    @only_django_validation_errors()
+    def clean(self) -> None:
+        cleaned_data = super().clean()
+        if not cleaned_data:
+            return
 
-class ReservationUnitPricingInline(TranslationStackedInline):
-    model = ReservationUnitPricing
-    fields = [
-        "begins",
-        "is_activated_on_begins",
-        "lowest_price",
-        "highest_price",
-        "price_unit",
-        "payment_type",
-        "tax_percentage",
-        "material_price_description",
-    ]
-    show_change_link = True
-    extra = 0
+        is_draft = cleaned_data.get("is_draft", False)
+        reservation_kind = ReservationKind(cleaned_data["reservation_kind"])
+
+        if not is_draft and reservation_kind.allows_direct:
+            cancellation_terms = cleaned_data.get("cancellation_terms")
+            if not cancellation_terms:
+                msg = _("Cancellation terms are required for direct booking")
+                raise ValidationError({"cancellation_terms": msg})
+
+            service_specific_terms = cleaned_data.get("service_specific_terms")
+            if not service_specific_terms:
+                msg = _("Service specific terms are required for direct booking")
+                raise ValidationError({"service_specific_terms": msg})
+
+            pricing_terms = cleaned_data.get("pricing_terms")
+            can_apply_free_of_charge = cleaned_data.get("can_apply_free_of_charge")
+
+            if can_apply_free_of_charge and not pricing_terms:
+                msg = _("Pricing terms are required for direct booking if the reservee can apply for free of charge")
+                raise ValidationError({"pricing_terms": msg})
