@@ -41,7 +41,7 @@
     "graphql-config": "^5.1.5",
     "husky": "^9.1.7",
     "npkill": "^0.12.2",
-    "oxlint": "^1.14.0",
+    "oxlint": "^1.16.0",
     "turbo": "^2.5.4"
   },
   "packageManager": "pnpm@9.11.0"
