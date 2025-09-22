@@ -1,4 +1,3 @@
-import type { LocalizationLanguages } from "common/src/urlBuilder";
 import { differenceInMinutes } from "date-fns";
 import type { TFunction } from "i18next";
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "common";
@@ -167,29 +166,21 @@ export function getName(
 // TODO rename: it's the time + duration
 // recurring format: {weekday(s)} {time}, {duration} | {startDate}-{endDate} | {unit}
 // single format   : {weekday} {date} {time}, {duration} | {unit}
-export function createTagString(
-  reservation: CreateTagStringFragment,
-  t: TFunction,
-  locale: LocalizationLanguages
-): string {
+export function createTagString(reservation: CreateTagStringFragment, t: TFunction): string {
   try {
     if (reservation.reservationSeries != null) {
       return createRecurringTagString(reservation, t);
     }
-    return createSingleTagString(reservation, t, locale);
+    return createSingleTagString(reservation, t);
   } catch (_) {
     return "";
   }
 }
 
-function createSingleTagString(
-  reservation: CreateTagStringFragment,
-  t: TFunction,
-  locale: LocalizationLanguages
-): string {
+function createSingleTagString(reservation: CreateTagStringFragment, t: TFunction): string {
   const begin = new Date(reservation.beginsAt);
   const end = new Date(reservation.endsAt);
-  const singleDateTimeTag = formatDateTimeRange(begin, end, { t, locale });
+  const singleDateTimeTag = formatDateTimeRange(begin, end, { t });
 
   const unitTag = reservationUnitName(reservation.reservationUnit);
 

@@ -1,5 +1,3 @@
-import { getLocalizationLang } from "common/src/helpers";
-import type { LocalizationLanguages } from "common/src/urlBuilder";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { type TFunction } from "i18next";
@@ -73,7 +71,7 @@ const getPaymentStatusLabelType = (status: OrderStatus | null | undefined): Stat
   }
 };
 
-const getColConfig = (t: TFunction, locale: LocalizationLanguages): ReservationTableColumn[] => [
+const getColConfig = (t: TFunction): ReservationTableColumn[] => [
   {
     headerName: t("reservation:Table.headings.id"),
     key: "pk",
@@ -111,14 +109,14 @@ const getColConfig = (t: TFunction, locale: LocalizationLanguages): ReservationT
     key: "begin",
     isSortable: true,
     transform: ({ beginsAt, endsAt }: ReservationTableElementFragment) =>
-      formatDateTimeRange(new Date(beginsAt), new Date(endsAt), { t, locale }),
+      formatDateTimeRange(new Date(beginsAt), new Date(endsAt), { t }),
   },
   {
     headerName: t("reservation:Table.headings.createdAt"),
     key: "created_at",
     isSortable: true,
     transform: ({ createdAt }: ReservationTableElementFragment) =>
-      createdAt ? formatDateTime(parseValidDateObject(createdAt), { t, locale }) : "-",
+      createdAt ? formatDateTime(parseValidDateObject(createdAt), { t }) : "-",
   },
   {
     headerName: t("reservation:Table.headings.paymentStatus"),
@@ -157,9 +155,9 @@ export function ReservationsTable({
   isLoading,
   reservations,
 }: Readonly<Props>): JSX.Element {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
-  const cols = memoize(() => getColConfig(t, getLocalizationLang(i18n.language)))();
+  const cols = memoize(() => getColConfig(t))();
 
   if (reservations.length === 0) {
     const name = t("reservation:emptyFilterPageName");

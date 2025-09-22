@@ -27,7 +27,14 @@ import {
   type BannerNotificationPageQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { parseUIDate, fromUIDateTime, dateForInput, timeForInput, fromUIDateTimeUnsafe } from "common/src/date-utils";
+import {
+  parseUIDate,
+  fromUIDateTime,
+  formatDate,
+  formatTime,
+  fromUIDateTimeUnsafe,
+  parseUIDateUnsafe,
+} from "common/src/date-utils";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import {
   checkValidDate,
@@ -233,10 +240,11 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
   const { t } = useTranslation("notification");
 
   const today = new Date();
-  const activeFrom = dateForInput(notification?.activeFrom ?? today.toISOString());
-  const activeFromTime = notification?.activeFrom ? timeForInput(notification?.activeFrom) : "06:00";
-  const activeUntil = notification?.activeUntil ? dateForInput(notification?.activeUntil) : "";
-  const activeUntilTime = notification?.activeUntil ? timeForInput(notification?.activeUntil) : "23:59";
+  const activeFromDate = notification?.activeFrom ? parseUIDateUnsafe(notification?.activeFrom) : today;
+  const activeFrom = formatDate(activeFromDate);
+  const activeFromTime = notification?.activeFrom ? formatTime(new Date(notification?.activeFrom)) : "06:00";
+  const activeUntil = notification?.activeUntil ? formatDate(new Date(notification?.activeUntil)) : "";
+  const activeUntilTime = notification?.activeUntil ? formatTime(new Date(notification?.activeUntil)) : "23:59";
 
   const {
     handleSubmit,
