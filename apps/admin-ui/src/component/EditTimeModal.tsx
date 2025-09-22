@@ -401,8 +401,12 @@ export function EditTimeModal({
                 <Bold>
                   {reservationSeriesInfoText({
                     weekdays: filterNonNullable(reservation.reservationSeries?.weekdays),
-                    begin: ((x) => (x != null ? new Date(x) : undefined))(reservation.reservationSeries?.beginDate),
-                    end: ((x) => (x != null ? new Date(x) : undefined))(reservation.reservationSeries?.endDate),
+                    begin: reservation.reservationSeries?.beginDate
+                      ? new Date(reservation.reservationSeries.beginDate)
+                      : undefined,
+                    end: reservation.reservationSeries?.endDate
+                      ? new Date(reservation.reservationSeries.endDate)
+                      : undefined,
                     t,
                   })}
                 </Bold>
