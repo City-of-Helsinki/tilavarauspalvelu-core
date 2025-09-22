@@ -66,7 +66,7 @@ export function addYears(date: Date, years: number): Date {
   return newDate;
 }
 
-type TimeStruct = {
+export type TimeStruct = {
   hours: number;
   minutes?: number;
 };
