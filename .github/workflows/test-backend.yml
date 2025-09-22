@@ -58,7 +58,7 @@ jobs:
 
       - name: "Set up python"
         id: setup-python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -131,7 +131,7 @@ jobs:
 
       - name: "Set up python"
         id: setup-python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -208,7 +208,7 @@ jobs:
 
       - name: "Set up python"
         id: setup-python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -227,7 +227,7 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v6
         with:
           projectBaseDir: ./backend
-        # Skip analysis for all bots
-        if: ${{ ! contains(fromJSON(vars.BOTS), github.event.pull_request.user.login) }}
+        # Skip analysis for all bots in pull requests
+        if: ${{ github.event_name != 'pull_request' || (! contains(fromJSON(vars.BOTS), github.event.pull_request.user.login)) }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
