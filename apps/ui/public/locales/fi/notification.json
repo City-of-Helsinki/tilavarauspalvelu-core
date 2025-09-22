@@ -11,5 +11,9 @@
     "title": "Varauksesi on keskeneräinen",
     "body": "Varauksesi peruuntuu automaattisesti, jos et viimestele sitä 20 minuutin kuluessa.",
     "continueReservation": "Jatka varaamista"
+  },
+  "timeZoneDeviation": {
+    "title": "Käytät palvelua ulkomailta",
+    "body": "Varauskalenterissa näkyvä aika on paikallinen aika maassa, jossa käytät palvelua ({{timeZone}}). Huomioithan aikaeron varausta tehdessäsi."
   }
 }
