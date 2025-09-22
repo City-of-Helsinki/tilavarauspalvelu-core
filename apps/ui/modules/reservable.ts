@@ -348,7 +348,7 @@ function getBufferedEventTimes(
   end: Date,
   bufferTimeBefore: number,
   bufferTimeAfter: number,
-  isBlocked?: Maybe<boolean> | undefined
+  isBlocked?: Maybe<boolean>
 ): { start: Date; end: Date } {
   if (isBlocked) {
     return { start, end };
