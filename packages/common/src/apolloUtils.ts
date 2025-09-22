@@ -167,21 +167,12 @@ export function getSeriesOverlapErrors(error: unknown): OverlappingError[] {
 }
 
 function mapGraphQLErrors(graphQLErrors: ReadonlyArray<GraphQLFormattedError>): ApiError[] {
-  if (graphQLErrors.length > 0) {
-    return graphQLErrors.flatMap((err) => {
-      const code = getExtensionCode(err);
-      if (code === "RESERVATION_SERIES_OVERLAPS") {
-        return mapOverlapError(err);
-      }
-      if (code === "MUTATION_VALIDATION_ERROR") {
-        return mapValidationError(err);
-      }
-      return {
-        code: code ?? "UNKNOWN",
-      };
-    });
-  }
-  return [];
+  return graphQLErrors.flatMap((err) => {
+    const code = getExtensionCode(err);
+    if (code === "RESERVATION_SERIES_OVERLAPS") return mapOverlapError(err);
+    if (code === "MUTATION_VALIDATION_ERROR") return mapValidationError(err);
+    return { code: code ?? "UNKNOWN" };
+  });
 }
 
 // TODO add non-graphql errors code

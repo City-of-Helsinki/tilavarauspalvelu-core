@@ -344,7 +344,7 @@ export function filterEmptyArray<T>(param: T[]): T[] | undefined {
   return param;
 }
 
-// oxlint-disable-next-line typescript/no-empty-object-type
+// oxlint-disable-next-line typescript/no-empty-object-type, typescript/ban-types
 export function getNode<T extends { id: string }>(data: { node?: T | null | {} } | undefined | null): T | null {
   return data?.node != null && "id" in data.node ? data.node : null;
 }

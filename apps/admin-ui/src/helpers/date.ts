@@ -5,12 +5,12 @@ import type { Maybe } from "@gql/gql-types";
 
 /* Convert api datetime to date required by date input, defaults to current date */
 export const valueForDateInput = (from: string): string => {
-  return formatDate(from || new Date().toISOString(), "d.M.yyyy") as string;
+  return formatDate(from || new Date().toISOString(), "d.M.yyyy") ?? "";
 };
 
 /* Convert api datetime to time required by time input,m defaults to current time */
 export const valueForTimeInput = (from: string): string => {
-  return formatDate(from || new Date().toISOString(), "HH:mm") as string;
+  return formatDate(from || new Date().toISOString(), "HH:mm") ?? "";
 };
 
 /* Construct date from dateinput + timeinput */
