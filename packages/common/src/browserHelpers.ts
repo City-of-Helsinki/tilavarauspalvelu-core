@@ -75,9 +75,9 @@ export function signOut(apiBaseUrl: string, appUrlBasePath = "") {
   form.style.display = "none";
   addFormParam(form, "csrfmiddlewaretoken", csrfToken);
   addFormParam(form, "redirect_to", returnUrl);
-  document.body.appendChild(form);
+  document.body.append(form);
   form.submit();
-  document.body.removeChild(form);
+  form?.remove();
 }
 
 function addFormParam(form: HTMLFormElement, name: string, value: string) {
@@ -85,5 +85,5 @@ function addFormParam(form: HTMLFormElement, name: string, value: string) {
   input.type = "hidden";
   input.name = name;
   input.value = value;
-  form.appendChild(input);
+  form.append(input);
 }
