@@ -227,7 +227,7 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v5
         with:
           projectBaseDir: ./backend
-        # Skip analysis for all bots
-        if: ${{ ! contains(fromJSON(vars.BOTS), github.event.actor.login) }}
+        # Skip analysis for all bots in pull requests
+        if: ${{ github.event_name != 'pull_request' || (! contains(fromJSON(vars.BOTS), github.event.pull_request.user.login)) }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
