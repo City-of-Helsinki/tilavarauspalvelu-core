@@ -12,7 +12,7 @@ import { ignoreMaybeArray } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
 const POLL_INTERVAL_MS = 500;
-const STOP_POLLING_TIMEOUT_MS = 30000;
+const STOP_POLLING_TIMEOUT_MS = 30_000;
 
 // TODO should be moved to /reservations/success
 // but because this is webstore callback page we need to leave the url (use an url rewrite)

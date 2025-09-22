@@ -72,7 +72,7 @@ export default function ApplicationRound({
   const pk = applicationRoundOriginal?.pk ?? 0;
   const { data, previousData, refetch } = useApplicationRoundQuery({
     variables: { id: createNodeId("ApplicationRoundNode", pk) },
-    pollInterval: isInProgress ? 10000 : 0,
+    pollInterval: isInProgress ? 10_000 : 0,
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
     },

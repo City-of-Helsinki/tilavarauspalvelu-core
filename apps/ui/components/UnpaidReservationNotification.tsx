@@ -66,7 +66,7 @@ function ReservationNotification({
     const paymentTimeout = setTimeout(() => {
       const minutes = remainingMinutes ?? 0;
       setRemainingMinutes(Math.max(0, minutes - 1));
-    }, 60000);
+    }, 60_000);
     if (remainingMinutes === 0 || isCreated) {
       return clearTimeout(paymentTimeout);
     }

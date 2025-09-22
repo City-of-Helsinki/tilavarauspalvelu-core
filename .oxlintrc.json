@@ -473,6 +473,7 @@
     "unicorn/no-useless-undefined": "off",
     "unicorn/no-zero-fractions": "error",
     "unicorn/number-literal-case": "off",
+    "unicorn/numeric-separators-style": "error",
     "unicorn/prefer-add-event-listener": "error",
     "unicorn/prefer-array-find": "error",
     "unicorn/prefer-array-flat": "error",
