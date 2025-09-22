@@ -36,7 +36,6 @@ function translateRoundDate(
     case ApplicationRoundStatusChoice.Handled:
     case ApplicationRoundStatusChoice.InAllocation:
     case ApplicationRoundStatusChoice.Sent:
-    default:
       return t("applicationRound:card.past", {
         closing: formatDateTime(t, end),
       });

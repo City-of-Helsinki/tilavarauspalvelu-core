@@ -27,7 +27,6 @@ export function ReservationOrderStatus({ orderStatus, testId }: Props): JSX.Elem
       case OrderStatus.Expired:
         return "error";
       case OrderStatus.Cancelled:
-      default:
         return "neutral";
     }
   }, [orderStatus]);

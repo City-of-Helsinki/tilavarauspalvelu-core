@@ -304,7 +304,6 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       case 0:
         return reservationUnit?.canApplyFreeOfCharge && generalFields?.includes("applyingForFreeOfCharge");
       case 1:
-      default:
         return reservationUnit?.canApplyFreeOfCharge && reservation?.applyingForFreeOfCharge === true;
     }
   }, [step, generalFields, reservation, reservationUnit]);

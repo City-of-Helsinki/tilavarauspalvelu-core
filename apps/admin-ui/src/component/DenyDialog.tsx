@@ -104,7 +104,6 @@ const ReturnMoney = ({
     case "refund":
     case "no-refund":
     case "not-decided":
-    default:
       return (
         <SelectionGroup required direction="horizontal" label={t("radioLabel")}>
           <RadioButton

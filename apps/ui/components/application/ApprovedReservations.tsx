@@ -675,7 +675,7 @@ const StyledStatusLabel = styled(StatusLabel)`
   }
 `;
 
-function getStatusLabelProps(status: string): {
+function getStatusLabelProps(status: ReservationsTableElem["status"]): {
   icon: JSX.Element;
   type: StatusLabelType;
 } {
@@ -690,8 +690,8 @@ function getStatusLabelProps(status: string): {
         icon: <IconPen />,
         type: "neutral",
       };
-    case "denied":
-    default:
+    case "rejected":
+    case "":
       return {
         icon: <IconCross />,
         type: "error",

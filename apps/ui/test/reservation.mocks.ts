@@ -364,7 +364,6 @@ export const reservationRenderProps = (
         },
       };
     case "default":
-    default:
       // Set all available attribute defaults
       return {
         pk: 1,
