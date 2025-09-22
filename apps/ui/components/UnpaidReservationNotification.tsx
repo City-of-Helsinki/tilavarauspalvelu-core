@@ -62,17 +62,10 @@ function ReservationNotification({
     time: remainingMinutes,
   });
 
-  function countdownMinute(minutes: number) {
-    if (minutes === 0) {
-      return 0;
-    }
-    return minutes - 1;
-  }
-
   useEffect(() => {
     const paymentTimeout = setTimeout(() => {
       const minutes = remainingMinutes ?? 0;
-      setRemainingMinutes(countdownMinute(minutes));
+      setRemainingMinutes(Math.max(0, minutes - 1));
     }, 60000);
     if (remainingMinutes === 0 || isCreated) {
       return clearTimeout(paymentTimeout);

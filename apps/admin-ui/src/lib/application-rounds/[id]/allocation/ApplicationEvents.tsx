@@ -167,6 +167,11 @@ export function AllocationPageContent({
   );
 }
 
+// allocations are not specific to the reservation unit
+const isAllocated = (section: ApplicationEventsProps["applicationSections"][0]) => {
+  return section.allocations != null && section.allocations > 0;
+};
+
 function ApplicationSectionColumn({
   applicationSections,
   reservationUnit,
@@ -177,23 +182,20 @@ function ApplicationSectionColumn({
 
   const sections = filterNonNullable(applicationSections);
 
-  // allocations are not specific to the reservation unit
-  const isAllocated = (as: (typeof sections)[0]) => as.allocations != null && as.allocations > 0;
-
-  const isAllocatedToThisUnit = (as: (typeof sections)[0]) =>
-    as.reservationUnitOptions
+  const isAllocatedToThisUnit = (section: (typeof sections)[0]) =>
+    section.reservationUnitOptions
       .filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk)
       ?.map((ruo) => ruo.allocatedTimeSlots.length > 0)
       .some(Boolean);
 
   // Locked is specific to this reservation unit
-  const isLocked = (as: (typeof sections)[0]) =>
-    as.reservationUnitOptions
+  const isLocked = (section: (typeof sections)[0]) =>
+    section.reservationUnitOptions
       .filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk)
       ?.map((ruo) => ruo.isLocked)
       .some(Boolean);
-  const isRejected = (as: (typeof sections)[0]) =>
-    as.reservationUnitOptions
+  const isRejected = (section: (typeof sections)[0]) =>
+    section.reservationUnitOptions
       .filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk)
       ?.map((ruo) => ruo.isRejected)
       .some(Boolean);

@@ -255,19 +255,14 @@ function ReservationUnitEditor({
       });
     }
 
-    const getPk = (d: typeof data) => {
-      if (d == null) {
-        return null;
+    let upPk = null;
+    if (data != null) {
+      if ("updateReservationUnit" in data) {
+        upPk = data.updateReservationUnit?.pk ?? null;
+      } else if ("createReservationUnit" in data) {
+        upPk = data.createReservationUnit?.pk ?? null;
       }
-      if ("updateReservationUnit" in d) {
-        return d.updateReservationUnit?.pk ?? null;
-      }
-      if ("createReservationUnit" in d) {
-        return d.createReservationUnit?.pk ?? null;
-      }
-      return null;
-    };
-    const upPk = getPk(data);
+    }
 
     // crude way to handle different logic for archive vs save (avoids double toast)
     if (upPk) {

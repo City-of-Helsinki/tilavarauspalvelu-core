@@ -6,24 +6,26 @@ import { UnitSpacesHierarchyFieldsFragment, useUnitSpacesHierarchyQuery } from "
 import { convertOptionToHDS, createNodeId, filterNonNullable, getNode, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
-function spacesAsHierarchy(unit: UnitSpacesHierarchyFieldsFragment | null, paddingChar: string) {
-  const allSpaces = filterNonNullable(unit?.spaces);
-  type SpaceNode = (typeof allSpaces)[0];
+type AllSpaces = NonNullable<UnitSpacesHierarchyFieldsFragment["spaces"]>;
+type SpaceNode = AllSpaces[0];
 
-  function recurse(parent: SpaceNode, spaces: SpaceNode[], depth: number, pad: string): SpaceNode[] {
-    const newParent = {
-      ...parent,
-      nameFi: "".padStart(depth, pad) + (parent.nameFi ?? "-"),
-    };
+function recurse(parent: SpaceNode, spaces: ReadonlyArray<SpaceNode>, depth: number, pad: string): SpaceNode[] {
+  const newParent = {
+    ...parent,
+    nameFi: "".padStart(depth, pad) + (parent.nameFi ?? "-"),
+  };
 
-    const children = spaces.filter((e) => e.parent?.pk === parent.pk);
+  const children = spaces.filter((e) => e.parent?.pk === parent.pk);
 
-    if (children.length === 0) {
-      return [newParent];
-    }
-    const c = children.flatMap((space) => recurse(space, spaces, depth + 1, pad));
-    return [newParent, ...c];
+  if (children.length === 0) {
+    return [newParent];
   }
+  const c = children.flatMap((space) => recurse(space, spaces, depth + 1, pad));
+  return [newParent, ...c];
+}
+
+function spacesAsHierarchy(unit: UnitSpacesHierarchyFieldsFragment | null, paddingChar: string) {
+  const allSpaces: AllSpaces = filterNonNullable(unit?.spaces);
 
   const roots = allSpaces.filter((e) => e.parent == null);
   return roots.flatMap((rootSpace) => recurse(rootSpace, allSpaces, 0, paddingChar));

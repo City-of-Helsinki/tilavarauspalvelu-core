@@ -59,8 +59,8 @@ const Calendar = forwardRef(function Calendar(
   const selectedEvent = eventsAll.find((e) => e.event?.pk === selected);
 
   // Because the calendar is fixed to 6 - 24 interval anything outside it causes rendering artefacts.
-  const isInsideCalendarRange = (x: { start: Date; end: Date }) => x.end.getHours() > 6;
-  const events = eventsAll.filter(isInsideCalendarRange);
+  // Filter events to only include what's visible on the calendar.
+  const events = eventsAll.filter((x: { start: Date; end: Date }) => x.end.getHours() > 6);
 
   const handleEditAccept = () => {
     refetch();

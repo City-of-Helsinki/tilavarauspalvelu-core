@@ -870,7 +870,16 @@ function getReservationStatusChoice(
   }
 }
 
-function sectionToreservations(t: TFunction, section: ApplicationSectionReservationFragment): ReservationsTableElem[] {
+function getAccessCodeValidThru(pindoraInfo: PindoraReservationFragment | undefined | null) {
+  if (!pindoraInfo) {
+    return null;
+  }
+  return {
+    beginsAt: pindoraInfo.accessCodeBeginsAt,
+    endsAt: pindoraInfo.accessCodeEndsAt,
+  };
+}
+function sectionToReservations(t: TFunction, section: ApplicationSectionReservationFragment): ReservationsTableElem[] {
   const reservationSeries = filterNonNullable(
     section.reservationUnitOptions.flatMap((ruo) =>
       ruo.allocatedTimeSlots.map((ats) =>
@@ -900,16 +909,6 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
         pk: 0,
       };
     });
-  }
-
-  function getAccessCodeValidThru(pindoraInfo: PindoraReservationFragment | undefined | null) {
-    if (!pindoraInfo) {
-      return null;
-    }
-    return {
-      beginsAt: pindoraInfo.accessCodeBeginsAt,
-      endsAt: pindoraInfo.accessCodeEndsAt,
-    };
   }
 
   function getReservations(r: (typeof reservationSeries)[0]): ReservationsTableElem[] {
@@ -985,7 +984,7 @@ export function AllReservations({
   application: Pick<ApplicationT, "pk">;
 }>) {
   const { t } = useTranslation();
-  const reservations = sectionToreservations(t, applicationSection);
+  const reservations = sectionToReservations(t, applicationSection);
   return (
     <>
       <H3 $noMargin>{t("application:view.reservationsTab.reservationsTitle")}</H3>
@@ -1006,7 +1005,7 @@ export function ApplicationSection({
   const { t } = useTranslation();
 
   const reservationUnits: ReservationSeriesTableElem[] = sectionToReservationUnits(t, applicationSection);
-  const reservations = sectionToreservations(t, applicationSection)
+  const reservations = sectionToReservations(t, applicationSection)
     // NOTE we need to slice even if backend returns only 20 of each
     // because we want to keep the total at 20
     .slice(0, N_RESERVATIONS_TO_SHOW);

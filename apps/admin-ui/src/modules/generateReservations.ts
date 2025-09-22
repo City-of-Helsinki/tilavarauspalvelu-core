@@ -24,6 +24,8 @@ function dayOfWeek(time: number): Weekday {
   return transformWeekday(toMondayFirst(weekdayNumber));
 }
 
+const utcDate = (d: Date) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+
 export function generateReservations(props: TimeSelectionForm) {
   const vals = props;
 
@@ -44,10 +46,6 @@ export function generateReservations(props: TimeSelectionForm) {
     return [];
   }
 
-  const utcDate = (d: Date) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
-  const min = (a: number, b: number) => (a < b ? a : b);
-  const max = (a: number, b: number) => (a > b ? a : b);
-
   try {
     const rawStartingDate = fromUIDateUnsafe(startingDate);
     const rawEndingDate = fromUIDateUnsafe(endingDate);
@@ -63,11 +61,11 @@ export function generateReservations(props: TimeSelectionForm) {
       return [];
     }
 
-    const sDay = max(utcDate(new Date()), utcDate(fromUIDateUnsafe(startingDate)));
+    const sDay = Math.max(utcDate(new Date()), utcDate(fromUIDateUnsafe(startingDate)));
 
     // end date with time 23:59:59
     const eDay = utcDate(fromUIDateUnsafe(endingDate)) + (MILLISECONDS_IN_DAY - 1);
-    const firstWeek = eachDayOfInterval(sDay, min(sDay + MILLISECONDS_IN_DAY * 7, eDay));
+    const firstWeek = eachDayOfInterval(sDay, Math.min(sDay + MILLISECONDS_IN_DAY * 7, eDay));
 
     return firstWeek
       .filter((time) => repeatOnDays.includes(dayOfWeek(time)))
