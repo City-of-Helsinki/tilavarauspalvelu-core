@@ -96,9 +96,10 @@ export function checkReservationInterval(
   }
 }
 
-// Date can't be in past
-// Time is allowed to be in the past on purpose so it's not validated
-// i.e. you can make a reservation for today 10:00 even if it's 10:30
+/// Separate schema for staff because the form fields are not mandatory
+/// Date can't be in past
+/// Time is allowed to be in the past on purpose so it's not validated
+/// i.e. you can make a reservation for today 10:00 even if it's 10:30
 export function getCreateStaffReservationFormSchema(interval: ReservationStartInterval) {
   return CreateStaffReservationFormSchema.extend(ReservationFormMetaSchema.shape)
     .superRefine((val, ctx) => {

@@ -14,7 +14,7 @@ function renderReserveeFields(type = ReserveeType.Individual): ReturnType<typeof
 
 describe("Component: Reservation Details", () => {
   it.for(getFilteredSupportedFields())(
-    `should render $fieldName label and the correct value from the reservation`,
+    `should render %s label and the correct value from the reservation`,
     (fieldName) => {
       renderGeneralFields();
       const reservationValue = Object.entries(createMetaFieldsFragment()).find(
@@ -26,12 +26,11 @@ describe("Component: Reservation Details", () => {
 });
 
 describe("Component: Reservation Details", () => {
-  it.for(getFilteredSupportedFields())("should not render $fieldName or its label, if it is null", (fieldName) => {
+  it.for(getFilteredSupportedFields())("should not render %s or its label, if it is null", (fieldName) => {
     render(
       <SummaryGeneralFields
         reservation={createMockWithMissingField({
           mock: createMetaFieldsFragment(),
-          supportedFields: getFilteredSupportedFields(),
           missingField: fieldName,
           emptyValue: null,
         })}
@@ -43,30 +42,26 @@ describe("Component: Reservation Details", () => {
     expect(screen.queryByTestId(`reservation__${fieldName}`)).not.toBeInTheDocument();
   });
 
-  it.for(getFilteredSupportedFields())(
-    "should not render $fieldName or its label, if it is an empty string",
-    (fieldName) => {
-      render(
-        <SummaryGeneralFields
-          reservation={createMockWithMissingField({
-            mock: createMetaFieldsFragment(),
-            supportedFields: getFilteredSupportedFields(),
-            missingField: fieldName,
-            emptyValue: "",
-          })}
-          options={createOptionsMock()}
-        />
-      );
+  it.for(getFilteredSupportedFields())("should not render %s or its label, if it is an empty string", (fieldName) => {
+    render(
+      <SummaryGeneralFields
+        reservation={createMockWithMissingField({
+          mock: createMetaFieldsFragment(),
+          missingField: fieldName,
+          emptyValue: "",
+        })}
+        options={createOptionsMock()}
+      />
+    );
 
-      expect(screen.queryByText(`reservationApplication:label.common.${fieldName}`)).not.toBeInTheDocument();
-    }
-  );
+    expect(screen.queryByText(`reservationApplication:label.common.${fieldName}`)).not.toBeInTheDocument();
+  });
 });
 
 describe("Component: Reservee Details", () => {
   describe("Type: individual", () => {
     it.for(getFilteredSupportedFields(ReserveeType.Individual))(
-      "should render the $fieldName label and the correct value from the reservation",
+      "should render the %s label and the correct value from the reservation",
       (fieldName) => {
         renderReserveeFields(ReserveeType.Individual);
         expect(screen.getByTestId(`reservation__${fieldName}`)).toBeInTheDocument();
@@ -77,7 +72,7 @@ describe("Component: Reservee Details", () => {
 
   describe("Type: Nonprofit", () => {
     it.for(getFilteredSupportedFields(ReserveeType.Nonprofit))(
-      "should render the $fieldName label and the correct value from the reservation",
+      "should render the %s label and the correct value from the reservation",
       (fieldName) => {
         renderReserveeFields(ReserveeType.Nonprofit);
         expect(screen.getByTestId(`reservation__${fieldName}`)).toBeInTheDocument();
@@ -88,7 +83,7 @@ describe("Component: Reservee Details", () => {
 
   describe("Type: Company", () => {
     it.for(getFilteredSupportedFields(ReserveeType.Company))(
-      "should render the $fieldName label and the correct value from the reservation",
+      "should render the %s label and the correct value from the reservation",
       (fieldName) => {
         renderReserveeFields(ReserveeType.Company);
         expect(screen.getByTestId(`reservation__${fieldName}`)).toBeInTheDocument();
@@ -100,13 +95,12 @@ describe("Component: Reservee Details", () => {
   describe("Missing values", () => {
     // Using ReserveeType.Company as it has the most fields
     it.for(Object.values(getFilteredSupportedFields(ReserveeType.Company)))(
-      "should not render $fieldName or its label, if it is null",
+      "should not render %s or its label, if it is null",
       (fieldName) => {
         render(
           <SummaryReserveeFields
             reservation={createMockWithMissingField({
               mock: createMetaFieldsFragment(ReserveeType.Company),
-              supportedFields: getFilteredSupportedFields(ReserveeType.Company),
               missingField: fieldName,
               emptyValue: "",
             })}
@@ -120,13 +114,12 @@ describe("Component: Reservee Details", () => {
     );
 
     it.for(Object.values(getFilteredSupportedFields(ReserveeType.Company)))(
-      "should not render $fieldName or its label, if it is an empty string",
+      "should not render %s or its label, if it is an empty string",
       (fieldName) => {
         render(
           <SummaryReserveeFields
             reservation={createMockWithMissingField({
               mock: createMetaFieldsFragment(ReserveeType.Company),
-              supportedFields: getFilteredSupportedFields(ReserveeType.Company),
               missingField: fieldName,
               emptyValue: "",
             })}
@@ -156,26 +149,17 @@ function getFieldValue(fieldObject: any): string {
 
 function createMockWithMissingField({
   mock,
-  supportedFields,
   missingField,
   emptyValue,
 }: {
   mock: ReservationFormFieldsFragment;
-  supportedFields: string[];
-  missingField: string;
+  missingField: keyof ReservationFormFieldsFragment;
   emptyValue: null | "";
 }): ReservationFormFieldsFragment {
-  // Generate mock data with the specific field missing
-  return supportedFields.reduce<ReservationFormFieldsFragment>(
-    (mockWithMissingField, fieldName) => {
-      return {
-        ...mockWithMissingField,
-        [fieldName as keyof ReservationFormFieldsFragment]:
-          fieldName === missingField ? emptyValue : mock[fieldName as keyof ReservationFormFieldsFragment],
-      };
-    },
-    { reserveeType: mock.reserveeType } as ReservationFormFieldsFragment
-  );
+  return {
+    ...mock,
+    [`${missingField}`]: emptyValue,
+  };
 }
 
 // We need to filter out the reserveeType field from the supported fields, to have it not be tested for being rendered

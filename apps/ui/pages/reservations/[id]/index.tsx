@@ -265,9 +265,7 @@ function Reservation({
       <ReservationPageWrapper data-testid="reservation__content" $nRows={3}>
         <Flex style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
           <Flex $direction="row" $alignItems="center" $justifyContent="space-between" $wrap="wrap">
-            <H1 $noMargin data-testid="reservation__name">
-              {t("reservations:reservationName", { id: reservation.pk })}
-            </H1>
+            <H1 $noMargin>{t("reservations:reservationName", { id: reservation.pk })}</H1>
             <Flex $gap="s" $direction="row">
               <ReservationStatus
                 testId="reservation__status"
