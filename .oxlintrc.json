@@ -343,13 +343,19 @@
     "typescript/prefer-namespace-keyword": "error",
     "typescript/triple-slash-reference": "error",
     "unicorn/consistent-assert": "error",
+    "unicorn/consistent-date-clone": "error",
     "unicorn/consistent-empty-array-spread": "error",
-    "unicorn/empty-brace-spaces": "off",
+    "unicorn/consistent-existence-index-check": "error",
+    "unicorn/empty-brace-spaces": "error",
+    "unicorn/error-message": "error",
     "unicorn/escape-case": "error",
     "unicorn/explicit-length-check": "error",
+    "unicorn/filename-case": "off",
     "unicorn/no-abusive-eslint-disable": "error",
     "unicorn/no-accessor-recursion": "error",
     "unicorn/no-anonymous-default-export": "error",
+    "unicorn/no-array-method-this-argument": "error",
+    "unicorn/no-await-expression-member": "off",
     "unicorn/no-await-in-promise-methods": "error",
     "unicorn/no-document-cookie": "error",
     "unicorn/no-empty-file": "error",
@@ -365,6 +371,7 @@
     "unicorn/no-nested-ternary": "off",
     "unicorn/no-new-array": "error",
     "unicorn/no-new-buffer": "error",
+    "unicorn/no-null": "off",
     "unicorn/no-process-exit": "error",
     "unicorn/no-single-promise-in-promise-methods": "error",
     "unicorn/no-static-only-class": "error",
@@ -374,6 +381,7 @@
     "unicorn/no-unnecessary-array-flat-depth": "error",
     "unicorn/no-unnecessary-await": "error",
     "unicorn/no-unnecessary-slice-end": "error",
+    "unicorn/no-unreadable-array-destructuring": "error",
     "unicorn/no-useless-fallback-in-spread": "error",
     "unicorn/no-useless-length-check": "error",
     "unicorn/no-useless-promise-resolve-reject": "error",
@@ -389,13 +397,17 @@
     "unicorn/prefer-code-point": "error",
     "unicorn/prefer-date-now": "error",
     "unicorn/prefer-dom-node-dataset": "error",
+    "unicorn/prefer-dom-node-text-content": "error",
     "unicorn/prefer-event-target": "error",
+    "unicorn/prefer-includes": "error",
     "unicorn/prefer-math-min-max": "error",
     "unicorn/prefer-math-trunc": "error",
+    "unicorn/prefer-modern-dom-apis": "error",
     "unicorn/prefer-modern-math-apis": "error",
     "unicorn/prefer-native-coercion-functions": "error",
     "unicorn/prefer-node-protocol": "error",
     "unicorn/prefer-number-properties": "error",
+    "unicorn/prefer-object-from-entries": "error",
     "unicorn/prefer-prototype-methods": "error",
     "unicorn/prefer-regexp-test": "error",
     "unicorn/prefer-set-has": "error",
@@ -403,9 +415,18 @@
     "unicorn/prefer-string-replace-all": "error",
     "unicorn/prefer-string-slice": "error",
     "unicorn/prefer-string-starts-ends-with": "error",
+    "unicorn/prefer-string-trim-start-end": "error",
+    "unicorn/prefer-structured-clone": "error",
     "unicorn/prefer-type-error": "error",
+    "unicorn/require-array-join-separator": "error",
     "unicorn/require-number-to-fixed-digits-argument": "error",
     "unicorn/require-post-message-target-origin": "error",
+    "unicorn/switch-case-braces": [
+      "error",
+      "avoid"
+    ],
+    "unicorn/text-encoding-identifier-case": "error",
+    "unicorn/throw-new-error": "error",
     "vitest/no-conditional-tests": "error",
     "vitest/require-local-test-context-for-concurrent-snapshots": "error"
   },
@@ -450,9 +471,19 @@
       }
     },
     {
-      "files": ["**/next-env.d.ts"],
+      "files": [
+        "**/next-env.d.ts"
+      ],
       "rules": {
         "triple-slash-reference": "off"
+      }
+    },
+    {
+      "files": [
+        "**/*.test.tsx"
+      ],
+      "rules": {
+        "unicorn/error-message": "off"
       }
     }
   ]
