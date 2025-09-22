@@ -175,6 +175,7 @@ function Errors({
                 href="#!"
                 onClick={(e) => {
                   e.preventDefault();
+                  // oxlint-disable-next-line prefer-query-selector
                   const element = document.getElementById(key) || document.getElementById(`${key}-label`);
                   const top = element?.getBoundingClientRect()?.y || 0;
                   window.scroll({

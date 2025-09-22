@@ -197,7 +197,7 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
         // or maybe we can just retry the mutation without the collisions and show them on the next page?
         const count = overlaps.length;
         setLocalError(t("myUnits:ReservationSeriesForm.newOverlapError", { count }));
-        document.getElementById("create-recurring__reservations-list")?.scrollIntoView();
+        document.querySelector("#create-recurring__reservations-list")?.scrollIntoView();
       } else {
         displayError(err);
         // on exception in ReservationSeries (because we are catching the individual errors)

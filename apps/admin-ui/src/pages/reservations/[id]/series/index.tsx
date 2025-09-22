@@ -267,7 +267,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
         if (count > 0) {
           checkedReservations.refetch();
           setLocalError(t("myUnits:ReservationSeriesForm.newOverlapError", { count }));
-          document.getElementById("edit-recurring__reservations-list")?.scrollIntoView();
+          document.querySelector("#edit-recurring__reservations-list")?.scrollIntoView();
         } else {
           displayError(err);
         }
