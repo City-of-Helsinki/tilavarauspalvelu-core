@@ -102,13 +102,13 @@ function customRender(
 }
 
 describe("Page: View reservation", () => {
-  it("renders reservation title correctly", async () => {
+  it("renders reservation name as page title", async () => {
     const view = customRender();
     await waitForAddressSection(view);
 
-    const title = view.getByTestId("reservation__name");
-    expect(title).toBeInTheDocument();
-    expect(title).toHaveTextContent("reservations:reservationName");
+    const name = view.getByRole("heading", { level: 1 });
+    expect(name).toBeInTheDocument();
+    expect(name).toHaveTextContent("reservations:reservationName");
   });
 
   describe("Status labels", () => {
