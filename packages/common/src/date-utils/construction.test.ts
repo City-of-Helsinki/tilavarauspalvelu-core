@@ -3,7 +3,6 @@ import {
   fromUIDateTime,
   fromUIDateTimeUnsafe,
   fromApiDateTime,
-  parseISODateTime,
   setTimeOnDate,
   parseCombinedUIDateTime,
   parseDateTimeStruct,
@@ -130,25 +129,6 @@ describe("construction", () => {
     it("returns null for invalid time string", () => {
       const result = fromApiDateTime("2023-12-25", "invalid");
       expect(result).toBeNull();
-    });
-  });
-
-  describe("parseISODateTime", () => {
-    it("converts to ISO string", () => {
-      const result = parseISODateTime("25.12.2023", "15:30");
-      expect(result).toBeTruthy();
-      expect(result).toMatch(/2023-12-25T\d{2}:30:00\.000Z/); // Account for timezone conversion
-    });
-
-    it("returns null for invalid inputs", () => {
-      const result = parseISODateTime("invalid", "15:30");
-      expect(result).toBeNull();
-    });
-
-    it("handles different timezone properly", () => {
-      const result = parseISODateTime("25.12.2023", "00:00");
-      expect(result).toBeTruthy();
-      expect(result).toContain("2023-12-2"); // Allow for date change due to timezone
     });
   });
 

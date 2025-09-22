@@ -111,7 +111,7 @@ export const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
         </TitleSection>
         <p data-testid="reservation_title_section__tagline">{tagline}</p>
         <Flex $gap="xs" $direction="row">
-          {t("reservation:createdAt")} {formatDateTime(parseValidDateObject(reservation.createdAt ?? ""), { t })}
+          {t("reservation:createdAt")} {formatDateTime(parseValidDateObject(reservation.createdAt), { t })}
           {applicationLink !== "" && (
             <ExternalLink href={applicationLink} size={IconSize.Small} isBold>
               {`${t("reservation:applicationLink")}: ${applicationPk}-${sectionPk}`}
