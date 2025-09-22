@@ -292,6 +292,7 @@
     "react/exhaustive-deps": "error",
     "react/forbid-elements": "error",
     "react/forward-ref-uses-ref": "error",
+    "react/iframe-missing-sandbox": "error",
     "react/jsx-boolean-value": "error",
     "react/jsx-curly-brace-presence": [
       "error",
