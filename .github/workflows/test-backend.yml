@@ -228,6 +228,6 @@ jobs:
         with:
           projectBaseDir: ./backend
         # Skip analysis for all bots
-        if: ${{ ! contains(fromJSON(vars.BOTS), github.event.pull_request.user.login) }}
+        if: ${{ ! contains(fromJSON(vars.BOTS), github.event.actor.login) }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
