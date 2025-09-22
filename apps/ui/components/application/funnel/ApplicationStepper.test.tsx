@@ -25,7 +25,7 @@ vi.mock("next/router", () => ({
 
 function checkStepperStep(view: ReturnType<typeof render>, label: string, isDisabled: boolean, isCompleted?: boolean) {
   const btn = view.getByRole("button", {
-    name: RegExp(`application:navigation.${label}.+${isCompleted ? "Valmis\\.$" : ""}`),
+    name: new RegExp(`application:navigation.${label}.+${isCompleted ? "Valmis\\.$" : ""}`),
   });
   expect(btn).toBeInTheDocument();
   if (isDisabled) {

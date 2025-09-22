@@ -78,7 +78,7 @@ export function getFilterOptions(
   }));
 
   const orderOptions = [
-    ...Array(10)
+    ...Array.from({ length: 10 })
       .keys()
       .map((n) => ({
         value: n,

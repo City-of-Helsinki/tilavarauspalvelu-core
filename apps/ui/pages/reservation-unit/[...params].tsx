@@ -149,7 +149,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
     const stepLength = isUnitFreeOfCharge || requireHandling ? 2 : 5;
 
-    return [...Array(stepLength)].map((_n, i) => {
+    return Array.from({ length: stepLength }).map((_n, i) => {
       const state = i === step ? 0 : i < step ? 1 : 2;
 
       return {
@@ -181,8 +181,8 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   // whitelist to allow language change and confirmation
   const whitelist = [
-    RegExp(`.*/reservations/${reservation?.pk}\\?.+`),
-    RegExp(`.*/reservation-unit/${reservationUnit?.pk}/reservation/${reservation?.pk}`),
+    new RegExp(`.*/reservations/${reservation?.pk}\\?.+`),
+    new RegExp(`.*/reservation-unit/${reservationUnit?.pk}/reservation/${reservation?.pk}`),
   ];
   // only block nextjs navigation (we should not have any <a> links and we don't want to block refresh)
   useConfirmNavigation({

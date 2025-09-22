@@ -78,7 +78,7 @@ test("Renders required text field", async () => {
   const fieldName = "name";
   const view = render(<WrappedComponent field={fieldName} required />);
 
-  const label = RegExp(`reservationApplication:label.individual.${fieldName}`);
+  const label = new RegExp(`reservationApplication:label.individual.${fieldName}`);
   const input = await view.findByLabelText(label);
   expect(input).toBeInTheDocument();
   expect(input).toBeRequired();
@@ -120,7 +120,7 @@ test.todo("billingEmail only allows emails or it's an error");
 test("ReserveeType changes translation namespaces", async () => {
   const fieldName = "name";
   const view = render(<WrappedComponent field={fieldName} required translationKey="COMMON" />);
-  const label = RegExp(`reservationApplication:label.common.${fieldName}`);
+  const label = new RegExp(`reservationApplication:label.common.${fieldName}`);
   const input = await view.findByLabelText(label);
   expect(input).toBeInTheDocument();
   expect(input).toBeRequired();
@@ -207,7 +207,7 @@ test("Renders a checkbox for reserveeIsUnregisteredAssociation", async () => {
 
   for (const field of checkfields) {
     const view = render(<WrappedComponent field={field} />);
-    const check = await view.findByLabelText(RegExp(field));
+    const check = await view.findByLabelText(new RegExp(field));
     expect(check).toBeInTheDocument();
     expect(check).not.toBeChecked();
     await user.click(check);
@@ -226,7 +226,7 @@ test.skip("free of charge shows termsForDiscount component", async () => {
     />
   );
 
-  const check = await view.findByLabelText(RegExp(fieldName));
+  const check = await view.findByLabelText(new RegExp(fieldName));
   expect(check).toBeInTheDocument();
   expect(check).not.toBeChecked();
   await user.click(check);

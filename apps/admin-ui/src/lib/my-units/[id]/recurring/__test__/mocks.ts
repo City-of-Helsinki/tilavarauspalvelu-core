@@ -116,7 +116,7 @@ function createReservationUnitFragment({ pk, nameFi }: { pk: number; nameFi: str
 }
 
 // First monday off the month has reservation from 9:00 - 12:00
-export const mondayMorningReservations = [...Array(12).keys()].map((x) => {
+export const mondayMorningReservations = [...Array.from({ length: 12 }).keys()].map((x) => {
   const firstMonday = nextMonday(new Date(YEAR, x, 1));
   const begin = set(firstMonday, { hours: 9, minutes: 0, milliseconds: 0 });
   const end = set(firstMonday, { hours: 12, minutes: 0, milliseconds: 0 });
@@ -128,26 +128,29 @@ export const mondayMorningReservations = [...Array(12).keys()].map((x) => {
 
 // Every day has 5 x 1 hour reservations from 15 - 21
 const firstDay = new Date(YEAR, 1, 1);
-const everydayReservations = [...Array(365).keys()].reduce((agv: Array<{ begin: Date; end: Date }>, i) => {
-  const begin = set(firstDay, {
-    date: i,
-    hours: 15,
-    minutes: 0,
-    milliseconds: 0,
-  });
-  const end = addHours(begin, 1);
-  return [
-    ...agv,
-    ...[...Array(5).keys()].map((j) => ({
-      begin: set(begin, {
-        hours: 15 + j,
-      }),
-      end: set(end, {
-        hours: 16 + j,
-      }),
-    })),
-  ];
-}, []);
+const everydayReservations = [...Array.from({ length: 365 }).keys()].reduce(
+  (agv: Array<{ begin: Date; end: Date }>, i) => {
+    const begin = set(firstDay, {
+      date: i,
+      hours: 15,
+      minutes: 0,
+      milliseconds: 0,
+    });
+    const end = addHours(begin, 1);
+    return [
+      ...agv,
+      ...[...Array.from({ length: 5 }).keys()].map((j) => ({
+        begin: set(begin, {
+          hours: 15 + j,
+        }),
+        end: set(end, {
+          hours: 16 + j,
+        }),
+      })),
+    ];
+  },
+  []
+);
 
 const reservationsByUnitResponse: CalendarReservationFragment[] = [
   ...mondayMorningReservations,

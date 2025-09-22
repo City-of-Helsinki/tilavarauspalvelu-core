@@ -177,7 +177,7 @@ function RowCells({ hasPermission, cols, ...rest }: CellProps): JSX.Element {
 
   return (
     <CellContent $numCols={cols} data-testid={testId}>
-      {[...Array(cols).keys()].map((i) => (
+      {[...Array.from({ length: cols }).keys()].map((i) => (
         <Cell key={i} {...rest} offset={i} hasPermission={hasPermission} />
       ))}
     </CellContent>
@@ -496,7 +496,7 @@ export function UnitCalendar({
         <HeadingRow>
           <div />
           <CellContent $numCols={N_HOURS} key="header" className="calendar-header">
-            {[...Array(N_HOURS).keys()].map((i, index) => (
+            {[...Array.from({ length: N_HOURS }).keys()].map((i, index) => (
               <Time key={i}>{index}</Time>
             ))}
           </CellContent>
