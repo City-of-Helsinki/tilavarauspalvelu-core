@@ -7,8 +7,8 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 from tinymce.widgets import TinyMCE
 
-from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, TermsOfUseTypeChoices
-from tilavarauspalvelu.models import ApplicationRound, ReservationUnit, TermsOfUse
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
+from tilavarauspalvelu.models import ApplicationRound, ReservationUnit
 
 
 class ApplicationRoundAdminForm(forms.ModelForm):
@@ -39,9 +39,6 @@ class ApplicationRoundAdminForm(forms.ModelForm):
             kwargs.setdefault("initial", {})
             kwargs["initial"]["status"] = ApplicationRoundStatusChoice(instance.status).label
         self.base_fields["reservation_units"].queryset = ReservationUnit.objects.select_related("unit").all()
-        self.base_fields["terms_of_use"].queryset = TermsOfUse.objects.filter(
-            terms_type=TermsOfUseTypeChoices.RECURRING
-        )
         self.base_fields["terms_of_use"].required = True
         super().__init__(*args, **kwargs)
 
