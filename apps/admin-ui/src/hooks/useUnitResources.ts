@@ -1,9 +1,4 @@
-import {
-  AuthenticationType,
-  ReservationTypeChoice,
-  type ReservationUnitsByUnitQuery,
-  useReservationUnitsByUnitQuery,
-} from "@gql/gql-types";
+import { AuthenticationType, type ReservationUnitsByUnitQuery, useReservationUnitsByUnitQuery } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
@@ -12,24 +7,27 @@ import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import { type OptionT } from "common/src/modules/search";
 
+export interface ReservationUnitOption extends OptionT {
+  isDraft: boolean;
+}
 interface UseUnitResourcesProps {
   begin: Date;
   unitPk: number;
-  reservationUnitOptions: OptionT[];
+  reservationUnitOptions: ReadonlyArray<ReservationUnitOption>;
   reservationUnitTypeFilter?: number[];
 }
 
 type ReservationType = NonNullable<ReservationUnitsByUnitQuery["affectingReservations"]>[number];
 type ReservationUnitType = NonNullable<NonNullable<ReservationUnitsByUnitQuery["unit"]>["reservationUnits"]>[number];
 
-function createDummyReservationUnit(opt: OptionT): ReservationUnitType {
+function createDummyReservationUnit(opt: ReservationUnitOption): ReservationUnitType {
   return {
     id: base64encode(`ReservationUnitNode:${opt.value}`),
     pk: opt.value,
     nameFi: opt.label,
     bufferTimeBefore: 0,
     bufferTimeAfter: 0,
-    isDraft: false,
+    isDraft: opt.isDraft,
     reservationUnitType: null,
     spaces: [],
     authentication: AuthenticationType.Weak,
@@ -47,7 +45,7 @@ export function useUnitResources({
 }: UseUnitResourcesProps) {
   const { t } = useTranslation();
   const id = base64encode(`UnitNode:${unitPk}`);
-  const isValid = Number(unitPk) > 0;
+  const isValid = unitPk > 0;
   const { data, previousData, ...rest } = useReservationUnitsByUnitQuery({
     skip: !isValid,
     variables: {
@@ -65,22 +63,6 @@ export function useUnitResources({
   const { affectingReservations, unit } = data ?? previousData ?? {};
   const resUnits = unit?.reservationUnits ?? reservationUnitOptions.map(createDummyReservationUnit);
 
-  function convertToEvent(y: ReservationType, x: ReservationUnitType) {
-    return {
-      ...y,
-      ...(y.type !== ReservationTypeChoice.Blocked
-        ? {
-            bufferTimeBefore: y.bufferTimeBefore ?? x.bufferTimeBefore ?? 0,
-            bufferTimeAfter: y.bufferTimeAfter ?? x.bufferTimeAfter ?? 0,
-          }
-        : {}),
-    };
-  }
-
-  function doesReservationAffectReservationUnit(reservation: ReservationType, reservationUnitPk: number) {
-    return reservation.affectedReservationUnits?.some((pk) => pk === reservationUnitPk);
-  }
-
   const resources = resUnits
     .filter(
       (x) =>
@@ -93,11 +75,10 @@ export function useUnitResources({
 
       return {
         title: x.nameFi ?? "",
-        url: String(x.pk ?? 0),
         isDraft: x.isDraft,
         pk: x.pk ?? 0,
         events: events.map((y) => ({
-          event: convertToEvent(y, x),
+          event: y,
           title: y.name ?? "",
           start: new Date(y.beginsAt),
           end: new Date(y.endsAt),
@@ -106,6 +87,10 @@ export function useUnitResources({
     });
 
   return { ...rest, resources };
+}
+
+function doesReservationAffectReservationUnit(reservation: ReservationType, reservationUnitPk: number) {
+  return reservation.affectedReservationUnits?.some((pk) => pk === reservationUnitPk);
 }
 
 export const RESERVATION_UNITS_BY_UNIT_QUERY = gql`
