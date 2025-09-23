@@ -19,9 +19,7 @@ def test_reservation_unit_image__delete(graphql):
 
     graphql.login_with_superuser()
 
-    input_data = {"pk": reservation_unit_image.pk}
-
-    response = graphql(DELETE_MUTATION, variables={"input": input_data})
+    response = graphql(DELETE_MUTATION, input_data={"pk": reservation_unit_image.pk})
 
     assert response.has_errors is False
     assert ReservationUnitImage.objects.count() == 0

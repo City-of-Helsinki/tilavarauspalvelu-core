@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import pytest
+from graphene_django_extensions.testing import build_query
 
 from tilavarauspalvelu.enums import UserRoleChoice
 
-from tests.factories import UnitFactory, UnitGroupFactory, UserFactory
-
-from .helpers import unit_groups_query
+from tests.factories import UnitFactory, UnitGroupFactory
 
 # Applied to all tests
 pytestmark = [
@@ -19,8 +18,7 @@ def test_unit_groups__query(graphql):
     unit_2 = UnitFactory.create(rank=2)
     unit_group = UnitGroupFactory.create(units=[unit_1, unit_2])
 
-    user = UserFactory.create_with_general_role(role=UserRoleChoice.ADMIN)
-    graphql.force_login(user)
+    graphql.login_user_with_role(role=UserRoleChoice.ADMIN)
 
     fields = """
         pk
@@ -30,21 +28,19 @@ def test_unit_groups__query(graphql):
             nameFi
         }
     """
-    query = unit_groups_query(fields=fields)
+    query = build_query("unitGroups", fields=fields, connection=True)
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
-
-    assert response.results == [
-        {
-            "pk": unit_group.pk,
-            "nameFi": unit_group.name_fi,
-            "units": [
-                {"pk": unit_1.pk, "nameFi": unit_1.name_fi},
-                {"pk": unit_2.pk, "nameFi": unit_2.name_fi},
-            ],
-        }
-    ]
+    assert len(response.edges) == 1
+    assert response.node(0) == {
+        "pk": unit_group.pk,
+        "nameFi": unit_group.name_fi,
+        "units": [
+            {"pk": unit_1.pk, "nameFi": unit_1.name_fi},
+            {"pk": unit_2.pk, "nameFi": unit_2.name_fi},
+        ],
+    }
 
 
 def test_unit_groups__query__only_with_permission(graphql):
@@ -52,21 +48,20 @@ def test_unit_groups__query__only_with_permission(graphql):
 
     graphql.login_with_regular_user()
 
-    query = unit_groups_query()
+    query = build_query("unitGroups", connection=True)
     response = graphql(query)
 
-    assert response.has_errors is False, response.errors
-    assert response.results == []
+    assert response.has_errors is True, response
+    assert response.error_message() == "No permission to access node."
 
 
 def test_unit_groups__query__unit_groups_with_no_units_are_excluded(graphql):
     UnitGroupFactory.create()
 
-    user = UserFactory.create_with_general_role(role=UserRoleChoice.ADMIN)
-    graphql.force_login(user)
+    graphql.login_user_with_role(role=UserRoleChoice.ADMIN)
 
-    query = unit_groups_query()
+    query = build_query("unitGroups", connection=True)
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
-    assert response.results == []
+    assert len(response.edges) == 0

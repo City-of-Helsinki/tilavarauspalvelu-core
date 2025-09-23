@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from tilavarauspalvelu.models import TaxPercentage
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from django.db import models
 
 __all__ = [
     "TaxPercentageManager",
@@ -9,7 +8,7 @@ __all__ = [
 ]
 
 
-class TaxPercentageQuerySet(ModelQuerySet[TaxPercentage]): ...
+class TaxPercentageQuerySet(models.QuerySet): ...
 
 
-class TaxPercentageManager(ModelManager[TaxPercentage, TaxPercentageQuerySet]): ...
+class TaxPercentageManager(models.Manager.from_queryset(TaxPercentageQuerySet)): ...

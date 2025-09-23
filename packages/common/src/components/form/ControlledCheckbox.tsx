@@ -27,7 +27,6 @@ interface CheckboxProps<T extends FieldValues> extends UseControllerProps<T> {
   tooltip?: string;
   required?: boolean;
   defaultValue?: PathValue<T, Path<T>>;
-  inverted?: boolean;
   error?: string;
   style?: React.CSSProperties;
   className?: string;
@@ -40,7 +39,6 @@ export function ControlledCheckbox<T extends FieldValues>({
   required,
   defaultValue,
   label,
-  inverted,
   error,
   tooltip,
   ...props
@@ -49,16 +47,12 @@ export function ControlledCheckbox<T extends FieldValues>({
     field: { value, onChange },
   } = useController({ control, name, defaultValue, rules: { required } });
 
-  const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(inverted ? !evt.target.checked : evt.target.checked);
-  };
-
   return (
     <StyledCheckbox
       {...props}
       id={id ?? name}
-      onChange={handleChange}
-      checked={inverted ? !value : value}
+      onChange={(e) => onChange(e.target.checked)}
+      checked={value}
       defaultChecked={typeof defaultValue === "boolean" ? defaultValue : undefined}
       label={label}
       errorText={error}

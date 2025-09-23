@@ -4,7 +4,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { ReservationSeriesView } from "@/component/ReservationSeriesView";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { getMyUnitUrl, getReservationUrl } from "@/common/urls";
-import { Flex, H1, P } from "common/styled";
+import { Flex, H1 } from "common/styled";
 import { useReservationSeries } from "@/hooks";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { UserPermissionChoice } from "@gql/gql-types";
@@ -19,18 +19,15 @@ function ReservationSeriesDoneInner({ recurringPk }: { recurringPk: number }) {
     keyPrefix: "ReservationSeries.Confirmation",
   });
 
-  const { reservations, loading } = useReservationSeries(recurringPk);
+  const { reservations } = useReservationSeries(recurringPk);
   const reservationUrl = getReservationUrl(reservations[0]?.pk);
   const unitPk = reservations[0]?.reservationUnit.unit.pk;
   const backUrl = getMyUnitUrl(unitPk);
 
-  const title = loading || reservations.length > 0 ? t(`title`) : t("allFailedTitle");
   return (
     <>
-      <H1 $marginTop="l" $marginBottom="none">
-        {title}
-      </H1>
-      <P $noMargin>{t(`successInfo`)}</P>
+      <H1 $marginBottom="none">{reservations.length > 0 ? t(`title`) : t("allFailedTitle")}</H1>
+      <p>{t(`successInfo`)}</p>
       <ReservationSeriesView reservationSeriesPk={recurringPk} />
       <Flex $direction="row" $justifyContent="flex-end" $wrap="wrap">
         <ButtonLikeLink href={backUrl}>{t(`buttonToUnit`)}</ButtonLikeLink>

@@ -6,19 +6,17 @@ import uuid
 from decimal import Decimal
 from functools import wraps
 from typing import TYPE_CHECKING
+from warnings import deprecated
 
 from django.core.cache import cache
 from django.db import transaction
 
 from config.celery import app
-from tilavarauspalvelu.enums import ReservationTypeChoice
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     Application,
     ApplicationRound,
-    ApplicationSection,
-    EmailMessage,
     PaymentOrder,
     PersonalInfoViewLog,
     Reservation,
@@ -32,14 +30,14 @@ from tilavarauspalvelu.models import (
     Unit,
     User,
 )
-from tilavarauspalvelu.typing import CeleryAutoCreateTaskSchedule
 from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
-    from collections.abc import Collection, Iterable
+    from collections.abc import Collection
 
     from celery.contrib.django.task import Task
+
 
 __all__ = [
     "anonymize_old_users_task",
@@ -48,8 +46,8 @@ __all__ = [
     "delete_expired_applications_task",
     "delete_pindora_reservation_task",
     "generate_reservation_series_from_allocations_task",
-    "notify_reservation_on_access_type_change_task",
     "prune_reservation_statistics_task",
+    "prune_reservations_task",
     "purge_image_cache_task",
     "rebuild_space_tree_hierarchy_task",
     "refresh_expired_payments_in_verkkokauppa_task",
@@ -110,29 +108,14 @@ def singleton_task[**P](task: Task) -> Task:
     return task
 
 
-@app.task(
-    name="rebuild_space_tree_hierarchy",
-    tvp_auto_create_name="Päivitä tilojen puuhierarkia",
-    tvp_auto_create_description=(
-        "Varmistaa että toimipisteiden/varausyksiköiden tilojen spaces-tietomallin puuhierarkia on ajantasalla."
-    ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="3", minute="30"),
-)
+@app.task(name="rebuild_space_tree_hierarchy")
 def rebuild_space_tree_hierarchy_task() -> None:
     with transaction.atomic():
         Space.objects.rebuild()
         ReservationUnitHierarchy.refresh()
 
 
-@app.task(
-    name="update_units_from_tprek",
-    tvp_auto_create_name="Päivitä toimipisteiden tiedot",
-    tvp_auto_create_description=(
-        "Hakee Palvelukartan rajapinnan kautta Toimipisterekisteristä Tilavaraukseen määriteltyjen toimipisteiden "
-        "ajantasaiset tiedot (Unit-tietomalli)"
-    ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="0", minute="30"),
-)
+@app.task(name="update_units_from_tprek")
 def update_units_from_tprek_task() -> None:
     from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitImporter
 
@@ -166,32 +149,20 @@ def remove_old_personal_info_view_logs_task() -> None:
     PersonalInfoViewLog.objects.filter(access_time__lt=remove_lt).delete()
 
 
-@app.task(
-    name="update_origin_hauki_resource_reservable_time_spans",
-    tvp_auto_create_name="Päivitä aukiolotietojen välimuisti",
-    tvp_auto_create_description=(
-        "Kysyy Aukiolosovelluksen rajapinnasta minkä Tilavarauksen resurssien tiedot ovat muuttuneet siellä (Opening "
-        "Hours > origin hauki resource > Opening hours hash on vaihtunut viimeksi tallennetusta arvosta) ja "
-        "päivittää tietokantaan muuttuneiden resurssien aukiolotietojen mukaiset varattavat ajat nykyhetkestä "
-        "eteenpäin (Opening Hours > origin hauki resource > Reservable time spans)."
-    ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="*", minute="30"),
-)
+@app.task(name="update_origin_hauki_resource_reservable_time_spans")
 def update_origin_hauki_resource_reservable_time_spans_task() -> None:
     from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 
     HaukiResourceHashUpdater().run()
 
 
-@app.task(
-    name="handle_unfinished_reservations",
-    tvp_auto_create_name="Peru vahvistamattomat varaukset",
-    tvp_auto_create_description=(
-        "Päivittää varaukset, joita ei ole viimeistelty määräajassa. Alustavat varaukset joita ei ole lähetetty tai "
-        "maksettu, poistetaan. Käsittelyssä hyväksytyt varaukset, joita ei ole sen jälkeen maksettu, perutaan."
-    ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="*", minute="0,5,10,15,20,25,30,35,40,45,50,55"),
-)
+@app.task(name="prune_reservations")
+@deprecated("Use 'handle_unfinished_reservations' instead. This can be removed in next release.")
+def prune_reservations_task() -> None:
+    handle_unfinished_reservations_task()
+
+
+@app.task(name="handle_unfinished_reservations")
 def handle_unfinished_reservations_task() -> None:
     # Remove reservations that did not complete checkout in time.
     Reservation.objects.delete_unfinished()
@@ -200,12 +171,7 @@ def handle_unfinished_reservations_task() -> None:
     Reservation.objects.cancel_handled_with_payment_overdue()
 
 
-@app.task(
-    name="send_application_in_allocation_email",
-    tvp_auto_create_name="Lähetä sähköposti käsiteltävistä kausivaraushakemuksista",
-    tvp_auto_create_description="",
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="8", minute="0"),
-)
+@app.task(name="send_application_in_allocation_email")
 def send_application_in_allocation_email_task() -> None:
     from tilavarauspalvelu.integrations.email.main import EmailService
 
@@ -219,27 +185,18 @@ def send_application_handled_email_task() -> None:
     EmailService.send_seasonal_booking_application_round_handled_emails()
 
 
-@app.task(
-    name="refresh_expired_payments_in_verkkokauppa",
-    tvp_auto_create_name="Merkitse maksamattomat verkkokaupan tilaukset rauenneiksi",
-    tvp_auto_create_description=(
-        "Merkitsee rauenneiksi maksutapahtumat, joiden määräaika on ohitettu (PaymentOrder-tietomalli)."
-    ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="*", minute="2,7,12,17,22,27,32,37,42,47,52,57"),
-)
+@app.task(name="update_expired_orders")
+@deprecated("Use 'refresh_expired_payments_in_verkkokauppa_task' instead. Can be removed in next release.")
+def update_expired_orders_task() -> None:
+    refresh_expired_payments_in_verkkokauppa_task()
+
+
+@app.task(name="refresh_expired_payments_in_verkkokauppa")
 def refresh_expired_payments_in_verkkokauppa_task() -> None:
     PaymentOrder.objects.refresh_expired_payments_from_verkkokauppa()
 
 
-@app.task(
-    name="prune_reservation_statistics",
-    tvp_auto_create_name="Poista vanhentunut varausstatistiikka",
-    tvp_auto_create_description=(
-        "Poistaa 5 vuotta vanhemmat, anonymisoidut varaustilastot. (Tietomalli ReservationStatistic). Aika "
-        "säädettävissä Azure DevOpsissa asetuksella REMOVE_RESERVATION_STATS_OLDER_THAN_YEARS."
-    ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="1", minute="0"),
-)
+@app.task(name="prune_reservation_statistics")
 def prune_reservation_statistics_task() -> None:
     ReservationStatistic.objects.delete_expired_statistics()
 
@@ -247,6 +204,14 @@ def prune_reservation_statistics_task() -> None:
 @app.task(name="create_missing_reservation_statistics")
 def create_missing_reservation_statistics_task() -> None:
     Reservation.objects.create_missing_statistics()
+
+
+@app.task(name="refund_paid_reservation")
+@deprecated("Use 'refund_payment_order_for_webshop_task' instead. Can be removed in next release.")
+def refund_paid_reservation_task(reservation_pk: int) -> None:
+    payment_order: PaymentOrder | None = PaymentOrder.objects.filter(reservation__pk=reservation_pk).first()
+    if payment_order is not None:
+        refund_payment_order_for_webshop_task(payment_order.pk)
 
 
 @app.task(
@@ -259,6 +224,14 @@ def refund_payment_order_for_webshop_task(payment_order_pk: int) -> None:
     payment_order: PaymentOrder | None = PaymentOrder.objects.filter(pk=payment_order_pk).first()
     if payment_order is not None:
         payment_order.actions.issue_refund_in_verkkokauppa()
+
+
+@app.task(name="cancel_reservation_invoice")
+@deprecated("Use 'cancel_payment_order_for_invoice_task' instead. Can be removed in next release.")
+def cancel_reservation_invoice_task(reservation_pk: int) -> None:
+    payment_order: PaymentOrder | None = PaymentOrder.objects.filter(reservation__pk=reservation_pk).first()
+    if payment_order is not None:
+        cancel_payment_order_for_invoice_task(payment_order.pk)
 
 
 @app.task(
@@ -290,15 +263,7 @@ def update_reservation_unit_hierarchy_task(using: str | None = None) -> None:
     ReservationUnitHierarchy.refresh(using=using)
 
 
-@app.task(
-    name="update_affecting_time_spans",
-    tvp_auto_create_name="Päivitä vaikuttavien varausten tietokantanäkymä",
-    tvp_auto_create_description=(
-        "Päivittää näkymän ensimmäiseen varattavaan aikaan vaikuttavista varauksista, joista tiettyihin "
-        "varausyksikköihin tietyllä aikavälillä vaikuttavat varaukset voidaan hakea esikäsiteltynä."
-    ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="*", minute="*/2"),
-)
+@app.task(name="update_affecting_time_spans")
 def update_affecting_time_spans_task(using: str | None = None) -> None:
     AffectingTimeSpan.refresh(using=using)
 
@@ -421,102 +386,38 @@ def generate_reservation_series_from_allocations_task(application_round_id: int)
     create_missing_pindora_reservations_task.delay()
 
 
-@app.task(
-    name="delete_expired_applications",
-    tvp_auto_create_name="Poista vanhojen kausivarauskierrosten raunneet hakemukset",
-    tvp_auto_create_description=(
-        "Poistaa ne raunneet ja perutut hakemukset, joiden kausivarauskierroksen hakuajan päättymisestä on kulunut "
-        "yli 365 päivää. Aika säädettävissä Azure DevOpsissa asetuksella REMOVE_EXPIRED_APPLICATIONS_OLDER_THAN_DAYS."
-    ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="3", minute="0"),
-)
+@app.task(name="delete_expired_applications")
 def delete_expired_applications_task() -> None:
-    Application.objects.all().delete_expired_applications()
+    Application.objects.delete_expired_applications()
 
 
-@app.task(
-    name="update_reservation_unit_search_vectors",
-    tvp_auto_create_name="Hakuvektoreiden päivitys",
-    tvp_auto_create_description=(
-        'Päivittää varausyksiköiden tekstihakuun käytettävät "hakuvektorit" varausyksiköiden uusimpien tietojen mukaan.'
-    ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="3", minute="0"),
-)
+@app.task(name="update_reservation_unit_search_vectors")
 def update_reservation_unit_search_vectors_task(pks: list[int] | None = None) -> None:
     ReservationUnit.objects.update_search_vectors(pks=pks)
 
 
-@app.task(
-    name="deactivate_old_permissions",
-    tvp_auto_create_name="Deaktivoi vanhentuneet permissiot",
-    tvp_auto_create_description=(
-        "Deaktivoi permissiot käyttäjiltä, kun viimeisestä kirjautumisesta on kulunut yli 365 päivää. Aika "
-        "säädettävissä Azure DevOpsissa asetuksealla PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS."
-    ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="1", minute="0"),
-)
+@app.task(name="deactivate_old_permissions")
 def deactivate_old_permissions_task() -> None:
     from tilavarauspalvelu.services.permission_service import deactivate_old_permissions
 
     deactivate_old_permissions()
 
 
-@app.task(
-    name="send_permission_deactivation_email",
-    tvp_auto_create_name="Lähetä sähköposti permissioiden vanhentumisesta",
-    tvp_auto_create_description=(
-        "Lähettää sähköpostiviestin käyttäjille, joiden rooli on vanhentunut tai tulee vanhentumaan seuraavan 14 "
-        "päivän kuluttua. Aika säädettävissä Azure DevOpsissa asetuksella PERMISSION_NOTIFICATION_BEFORE_DAYS."
-    ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="12", minute="0"),
-)
+@app.task(name="send_permission_deactivation_email")
 def send_permission_deactivation_email_task() -> None:
     from tilavarauspalvelu.integrations.email.main import EmailService
 
     EmailService.send_user_permissions_deactivation_emails()
 
 
-@app.task(
-    name="send_user_anonymization_email",
-    tvp_auto_create_name="Lähetä sähköposti käyttäjätunnusten vanhentumisesta",
-    tvp_auto_create_description=(
-        "Lähettää sähköpostiviestin käyttäjille, joiden käyttäjätunnus tulee vanhentumaan (anonymisoidaan) seuraavan "
-        "14 päivän kuluttua. Aika säädettävissä Azure DevOpsissa asetuksella ANONYMIZATION_NOTIFICATION_BEFORE_DAYS."
-    ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="13", minute="0"),
-)
+@app.task(name="send_user_anonymization_email")
 def send_user_anonymization_email_task() -> None:
     from tilavarauspalvelu.integrations.email.main import EmailService
 
     EmailService.send_user_anonymization_emails()
 
 
-@app.task(name="send_valid_saved_emails")
-def send_valid_saved_emails_task() -> None:
-    from tilavarauspalvelu.integrations.email.sending import send_emails_in_batches_task
-
-    EmailMessage.objects.all().expired().delete()
-
-    for message in EmailMessage.objects.all():
-        email_data = message.actions.to_email_data()
-
-        # If sending fails again, we create a copy of the current EmailMessage in `send_emails_in_batches_task`
-        # This way we don't need logic for handling emails which were partially successful
-        # (i.e. batch 1 succeeded but batch 2 failed), since the copy is then created with
-        # the failed batch's recipients. That's why we always delete the original EmailMessage here.
-        send_emails_in_batches_task(email_data=email_data)
-        message.delete()
-
-
-@app.task(
-    name="anonymize_old_users",
-    tvp_auto_create_name="Anonymisoi vanhentuneet käyttäjätunnukset",
-    tvp_auto_create_description=(
-        "Anonymisoi käyttäjät, kun viimeisestä kirjautumisesta on kulunut yli 730 päivää. Aika säädettävissä Azure "
-        "DevOpsissa asetuksealla ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS."
-    ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="1", minute="30"),
-)
+@app.task(name="anonymize_old_users")
 def anonymize_old_users_task() -> None:
     User.objects.anonymize_inactive_users()
 
@@ -540,15 +441,7 @@ def delete_pindora_reservation_task(reservation_uuid: str) -> None:
 
 
 @singleton_task
-@app.task(
-    name="create_missing_pindora_reservations",
-    tvp_auto_create_name="Puuttuvien ovikoodien luominen",
-    tvp_auto_create_description=(
-        "Luo puuttuvat ovikoodit varauksiin, joiden kulkutapa on ovikoodi ja lähettää sähköpostin uudesta "
-        "ovikoodista varauksissa."
-    ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="*", minute="*/10"),
-)
+@app.task(name="create_missing_pindora_reservations")
 def create_missing_pindora_reservations_task() -> None:
     from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 
@@ -556,52 +449,8 @@ def create_missing_pindora_reservations_task() -> None:
 
 
 @singleton_task
-@app.task(
-    name="update_pindora_access_code_is_active",
-    tvp_auto_create_name="Ovikoodin aktiivisuustilan korjaaminen",
-    tvp_auto_create_description=(
-        "Korjaa ovikoodillisten varausten ovikoodien aktiivisuuden tilan. Eli jos varauksen ovikoodi on aktiivinen "
-        "kun sen ei pitäisi olla, koodi päivitetään pinodrassa inaktiiviseksi, ja päin vastoin."
-    ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="*", minute="*/10"),
-)
+@app.task(name="update_pindora_access_code_is_active")
 def update_pindora_access_code_is_active_task() -> None:
     from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 
     PindoraService.update_access_code_is_active()
-
-
-@app.task(name="notify_reservation_on_access_type_change")
-def notify_reservation_on_access_type_change_task(reservation_pks: list[int]) -> None:
-    """Send email to given reservations assuming that their access types have changed."""
-    from tilavarauspalvelu.integrations.email.main import EmailService
-
-    now = local_datetime()
-
-    reservations: Iterable[Reservation] = (
-        Reservation.objects.all()
-        .filter(
-            pk__in=reservation_pks,
-            # Still only send email for reservations that are ongoing or in the future
-            ends_at__gt=now,
-        )
-        .exclude(type=ReservationTypeChoice.SEASONAL)
-    )
-
-    # Fetch application sections separately so that we don't send multiple emails for the same section
-    sections: Iterable[ApplicationSection] = (
-        ApplicationSection.objects.all()
-        .filter(
-            reservation_unit_options__allocated_time_slots__reservation_series__reservations__in=reservation_pks,
-            # Still only send email for sections that have reservations that are ongoing or in the future
-            reservation_unit_options__allocated_time_slots__reservation_series__reservations__ends_at__gt=now,
-        )
-        .distinct()
-        .select_related("application")
-    )
-
-    for reservation in reservations:
-        EmailService.send_reservation_access_type_changed_email(reservation)
-
-    for section in sections:
-        EmailService.send_seasonal_booking_access_type_changed_email(section)

@@ -31,7 +31,7 @@ export function ReservationSeriesView({
   const { t } = useTranslation();
   const { setModalContent } = useModal();
 
-  const { reservations, reservationSeries, loading, refetch } = useReservationSeries(reservationSeriesPk);
+  const { reservations, loading, refetch, reservationSeries } = useReservationSeries(reservationSeriesPk);
 
   const unitPk = reservationToCopy?.reservationUnit?.unit?.pk;
   const { hasPermission } = useCheckPermission({

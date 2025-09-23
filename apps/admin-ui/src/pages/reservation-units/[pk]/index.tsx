@@ -1,17 +1,15 @@
-import { useToastIfQueryParam } from "common/src/hooks/useToastIfQueryParam";
-import { useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useForm, type UseFormReturn } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  EquipmentOrderSet,
-  ReservationUnitImageType,
+  EquipmentOrderingChoices,
+  ImageType,
   ReservationKind,
   type ReservationUnitEditorParametersQuery,
-  type ReservationUnitEditPageFragment,
-  TermsOfUseTypeChoices,
+  type ReservationUnitEditQuery,
+  TermsType,
   useCreateImageMutation,
   useCreateReservationUnitMutation,
   useDeleteImageMutation,
@@ -22,7 +20,7 @@ import {
   useUpdateReservationUnitMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { Flex } from "common/styled";
 
 import { errorToast, successToast } from "common/src/components/toast";
@@ -58,6 +56,9 @@ import {
 } from "@lib/reservation-units/[pk]/";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 
+type QueryData = ReservationUnitEditQuery["reservationUnit"];
+type Node = NonNullable<QueryData>;
+
 // Override the Accordion style: force border even if the accordion is open
 // because the last section is not an accordion but a button and it looks funny otherwise
 // TODO should we limit the width of the text boxes? or the whole form?
@@ -75,16 +76,13 @@ const StyledContainerMedium = styled(Flex)`
 `;
 
 // Terms PK is not a number but any valid string
-function makeTermsOptions(
-  parameters: ReservationUnitEditorParametersQuery | undefined,
-  termsType: TermsOfUseTypeChoices
-) {
-  return filterNonNullable(parameters?.allTermsOfUse)
+function makeTermsOptions(parameters: ReservationUnitEditorParametersQuery | undefined, termsType: TermsType) {
+  return filterNonNullable(parameters?.termsOfUse?.edges.map((e) => e?.node))
     .filter((tou) => termsType === tou?.termsType)
-    .map(({ pk, nameFi }) => {
+    .map((tou) => {
       return {
-        value: pk,
-        label: nameFi ?? "no-name",
+        value: tou?.pk ?? "",
+        label: tou?.nameFi ?? "no-name",
       };
     });
 }
@@ -99,8 +97,7 @@ function useImageMutations() {
     try {
       const deletePromises = images
         .filter((image) => image.deleted)
-        .filter((image) => image.pk && image.pk > 0)
-        .map((image) => delImage({ variables: { pk: image.pk ?? 0 } }));
+        .map((image) => delImage({ variables: { pk: image.pk?.toString() ?? "" } }));
       await Promise.all(deletePromises);
     } catch (_) {
       return false;
@@ -115,7 +112,7 @@ function useImageMutations() {
             variables: {
               image: image.bytes,
               reservationUnit: resUnitPk,
-              imageType: image.imageType ?? ReservationUnitImageType.Other,
+              imageType: image.imageType ?? ImageType.Other,
             },
           })
         );
@@ -135,7 +132,7 @@ function useImageMutations() {
           return updateImagetype({
             variables: {
               pk: image.pk ?? 0,
-              imageType: image.imageType ?? ReservationUnitImageType.Other,
+              imageType: image.imageType ?? ImageType.Other,
             },
           });
         });
@@ -151,32 +148,24 @@ function useImageMutations() {
   return [reconcileImageChanges];
 }
 
-// Button stripe floats on top of the form so add padding
-const ReservationUnitForm = styled.form`
-  padding-bottom: var(--spacing-3-xl);
-`;
-
 function ReservationUnitEditor({
   reservationUnit,
   form,
   refetch,
   previewUrlPrefix,
   unitPk,
-  apiBaseUrl,
 }: {
-  reservationUnit: ReservationUnitEditPageFragment | null;
+  reservationUnit?: Node;
   form: UseFormReturn<ReservationUnitEditFormValues>;
   refetch: () => void;
   previewUrlPrefix: string;
   unitPk: number;
-  apiBaseUrl: string;
 }): JSX.Element | null {
   // ----------------------------- State and Hooks ----------------------------
   const { t } = useTranslation();
   const router = useRouter();
   const { setModalContent } = useModal();
   const [reconcileImageChanges] = useImageMutations();
-  const params = useSearchParams();
 
   const [updateMutation] = useUpdateReservationUnitMutation();
   const [createMutation] = useCreateReservationUnitMutation();
@@ -186,49 +175,41 @@ function ReservationUnitEditor({
       errorToast({ text: t("errors:errorFetchingData") });
     },
     variables: {
-      equipmentsOrderBy: EquipmentOrderSet.CategoryRankAsc,
+      equipmentsOrderBy: EquipmentOrderingChoices.CategoryRankAsc,
     },
   });
 
   // Fetch unit data only when creating a new reservation unit
   const { data: unitData } = useReservationUnitCreateUnitQuery({
-    variables: { id: createNodeId("UnitNode", unitPk) },
+    variables: { id: base64encode(`UnitNode:${unitPk}`) },
     fetchPolicy: "network-only",
-    skip: unitPk <= 0 || reservationUnit != null,
+    skip: unitPk <= 0,
   });
-  const node = getNode(unitData);
-  const unit = reservationUnit?.unit ?? node ?? null;
-
-  useToastIfQueryParam({
-    key: ["error_code", "error_message"],
-    message: t("reservationUnit:editErrorMessage", {
-      code: params.get("error_code"),
-      message: params.get("error_message"),
-    }),
-    type: "error",
-  });
+  const unit = reservationUnit?.unit ?? unitData?.unit;
 
   // ----------------------------- Constants ---------------------------------
 
-  const taxPercentageOptions = filterNonNullable(parametersData?.allTaxPercentages).map((n) => ({
-    value: Number(n.value),
-    pk: n.pk ?? -1,
-    label: n.value,
-  }));
-  const pricingTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.PricingTerms);
+  const taxPercentageOptions = filterNonNullable(parametersData?.taxPercentages?.edges.map((e) => e?.node)).map(
+    (n) => ({
+      value: Number(n.value),
+      pk: n.pk ?? -1,
+      label: n.value,
+    })
+  );
+  const pricingTermsOptions = makeTermsOptions(parametersData, TermsType.PricingTerms);
 
-  const serviceSpecificTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.ServiceTerms);
-  const paymentTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.PaymentTerms);
-  const cancellationTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.CancellationTerms);
+  const serviceSpecificTermsOptions = makeTermsOptions(parametersData, TermsType.ServiceTerms);
+  const paymentTermsOptions = makeTermsOptions(parametersData, TermsType.PaymentTerms);
+  const cancellationTermsOptions = makeTermsOptions(parametersData, TermsType.CancellationTerms);
 
-  const metadataOptions = filterNonNullable(parametersData?.allMetadataSets).map((n) => ({
-    value: n.pk,
+  const metadataOptions = filterNonNullable(parametersData?.metadataSets?.edges.map((e) => e?.node)).map((n) => ({
+    value: n?.pk ?? -1,
     label: n?.name ?? "no-name",
   }));
   const cancellationRuleOptions = filterNonNullable(
-    parametersData?.reservationUnitCancellationRules.edges?.map((e) => e?.node)
+    parametersData?.reservationUnitCancellationRules?.edges.map((e) => e?.node)
   ).map((n) => ({
-    value: n.pk,
+    value: n?.pk ?? -1,
     label: n?.nameFi ?? "no-name",
   }));
 
@@ -271,22 +252,20 @@ function ReservationUnitEditor({
     const upPk = getPk(data);
 
     // crude way to handle different logic for archive vs save (avoids double toast)
-    if (upPk) {
+    if (upPk && !formValues.isArchived) {
       const { images } = formValues;
       // res unit is saved, we can save changes to images
       const success = await reconcileImageChanges?.(upPk, images);
       if (success) {
+        // redirect if new one was created
+        if (formValues.pk === 0 && upPk > 0) {
+          router.push(getReservationUnitUrl(unitPk, upPk));
+        }
         const tkey =
           formValues.pk === 0
             ? "reservationUnitEditor:reservationUnitCreatedNotification"
             : "reservationUnitEditor:reservationUnitUpdatedNotification";
         successToast({ text: t(tkey, { name: getValues("nameFi") }) });
-        // redirect if new one was created
-        if (formValues.pk === 0 && upPk > 0) {
-          await router.push(getReservationUnitUrl(unitPk, upPk));
-        } else {
-          refetch();
-        }
       } else {
         const msg = t("reservationUnitEditor:imageSaveFailed");
         throw new Error(msg);
@@ -295,11 +274,12 @@ function ReservationUnitEditor({
       const msg = t("reservationUnitEditor:saveFailed", { error: "" });
       throw new Error(msg);
     }
+    refetch();
     return upPk;
   };
 
   return (
-    <ReservationUnitForm onSubmit={handleSubmit(onSubmit)} noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <StyledContainerMedium>
         <DisplayUnit
           heading={reservationUnit?.nameFi ?? t("reservationUnitEditor:defaultHeading")}
@@ -311,9 +291,9 @@ function ReservationUnitEditor({
         <BasicSection form={form} spaces={unit?.spaces ?? []} />
         <DescriptionSection
           form={form}
-          equipments={parametersData?.allEquipments}
-          purposes={parametersData?.allPurposes}
-          reservationUnitTypes={parametersData?.allReservationUnitTypes}
+          equipments={parametersData?.equipmentsAll}
+          purposes={parametersData?.purposes}
+          reservationUnitTypes={parametersData?.reservationUnitTypes}
         />
         <ReservationUnitSettingsSection
           form={form}
@@ -336,23 +316,20 @@ function ReservationUnitEditor({
           />
         )}
         <CommunicationSection form={form} />
-        <OpeningHoursSection
-          reservationUnit={reservationUnit}
-          previewUrlPrefix={previewUrlPrefix}
-          apiBaseUrl={apiBaseUrl}
-        />
+        <OpeningHoursSection reservationUnit={reservationUnit} previewUrlPrefix={previewUrlPrefix} />
         {isSeasonal && <SeasonalSection form={form} />}
         <AccessTypeSection form={form} accessTypes={reservationUnit?.accessTypes || []} />
       </StyledContainerMedium>
 
       <BottomButtonsStripe
         reservationUnit={reservationUnit}
+        unit={unit}
         previewUrlPrefix={previewUrlPrefix}
         setModalContent={setModalContent}
         onSubmit={onSubmit}
         form={form}
       />
-    </ReservationUnitForm>
+    </form>
   );
 }
 
@@ -362,16 +339,18 @@ type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 /// Wrap the editor so we never reset the form after async loading (because of HDS TimeInput bug)
 export default function EditorPage(props: PropsNarrowed): JSX.Element {
   const { reservationUnitPk, unitPk } = props;
+  const typename = "ReservationUnitNode";
+  const id = base64encode(`${typename}:${reservationUnitPk}`);
   const {
     data,
     loading: isLoading,
     refetch,
   } = useReservationUnitEditQuery({
-    variables: { id: createNodeId("ReservationUnitNode", reservationUnitPk) },
+    variables: { id },
     skip: reservationUnitPk <= 0,
   });
 
-  const reservationUnit = getNode(data);
+  const reservationUnit = data?.reservationUnit ?? undefined;
 
   const form = useForm<ReservationUnitEditFormValues>({
     mode: "onBlur",
@@ -386,10 +365,9 @@ export default function EditorPage(props: PropsNarrowed): JSX.Element {
   });
   const { reset } = form;
   useEffect(() => {
-    const node = getNode(data);
-    if (node != null) {
+    if (data?.reservationUnit != null) {
       reset({
-        ...convertReservationUnit(node),
+        ...convertReservationUnit(data.reservationUnit),
       });
     }
   }, [data, reset]);
@@ -413,7 +391,6 @@ export default function EditorPage(props: PropsNarrowed): JSX.Element {
         refetch={refetch}
         previewUrlPrefix={cleanPreviewUrlPrefix}
         unitPk={unitPk}
-        apiBaseUrl={props.apiBaseUrl}
       />
     </AuthorizationChecker>
   );
@@ -456,141 +433,133 @@ export const RESERVATION_UNIT_EDIT_UNIT_FRAGMENT = gql`
   }
 `;
 
-export const RESERVATION_UNIT_EDIT_PAGE_FRAGMENT = gql`
-  fragment ReservationUnitEditPage on ReservationUnitNode {
-    id
-    pk
-    publishingState
-    reservationState
-    images {
-      pk
-      ...Image
-    }
-    haukiUrl
-    cancellationRule {
-      id
-      pk
-    }
-    requireReservationHandling
-    nameFi
-    nameSv
-    nameEn
-    isDraft
-    authentication
-    spaces {
-      id
-      pk
-      nameFi
-    }
-    resources {
-      id
-      pk
-      nameFi
-    }
-    purposes {
-      id
-      pk
-      nameFi
-    }
-    pricingTerms {
-      id
-      pk
-    }
-    reservationUnitType {
-      id
-      pk
-      nameFi
-    }
-    extUuid
-    requireAdultReservee
-    notesWhenApplyingFi
-    notesWhenApplyingSv
-    notesWhenApplyingEn
-    reservationKind
-    reservationPendingInstructionsFi
-    reservationPendingInstructionsSv
-    reservationPendingInstructionsEn
-    reservationConfirmedInstructionsFi
-    reservationConfirmedInstructionsSv
-    reservationConfirmedInstructionsEn
-    reservationCancelledInstructionsFi
-    reservationCancelledInstructionsSv
-    reservationCancelledInstructionsEn
-    maxReservationDuration
-    minReservationDuration
-    reservationStartInterval
-    canApplyFreeOfCharge
-    reservationsMinDaysBefore
-    reservationsMaxDaysBefore
-    equipments {
-      id
-      pk
-      nameFi
-    }
-    unit {
-      ...ReservationUnitEditUnit
-    }
-    minPersons
-    maxPersons
-    surfaceArea
-    descriptionFi
-    descriptionSv
-    descriptionEn
-    paymentTerms {
-      id
-      pk
-    }
-    cancellationTerms {
-      id
-      pk
-    }
-    serviceSpecificTerms {
-      id
-      pk
-    }
-    reservationBlockWholeDay
-    bufferTimeBefore
-    bufferTimeAfter
-    contactInformation
-    reservationBeginsAt
-    reservationEndsAt
-    publishBeginsAt
-    publishEndsAt
-    maxReservationsPerUser
-    metadataSet {
-      id
-      pk
-    }
-    pricings {
-      pk
-      ...PricingFields
-      lowestPriceNet
-      highestPriceNet
-    }
-    applicationRoundTimeSlots {
-      ...ApplicationRoundTimeSlots
-    }
-    accessTypes(filter: { isActiveOrFuture: true }) {
-      id
-      pk
-      accessType
-      beginDate
-    }
-  }
-`;
-
 export const RESERVATION_UNIT_EDIT_QUERY = gql`
   query ReservationUnitEdit($id: ID!) {
-    node(id: $id) {
-      ... on ReservationUnitNode {
-        ...ReservationUnitEditPage
+    reservationUnit(id: $id) {
+      id
+      pk
+      publishingState
+      reservationState
+      images {
+        pk
+        ...Image
+      }
+      haukiUrl
+      cancellationRule {
+        id
+        pk
+      }
+      requireReservationHandling
+      nameFi
+      nameSv
+      nameEn
+      isDraft
+      authentication
+      spaces {
+        id
+        pk
+        nameFi
+      }
+      resources {
+        id
+        pk
+        nameFi
+      }
+      purposes {
+        id
+        pk
+        nameFi
+      }
+      pricingTerms {
+        id
+        pk
+      }
+      reservationUnitType {
+        id
+        pk
+        nameFi
+      }
+      extUuid
+      requireAdultReservee
+      notesWhenApplyingFi
+      notesWhenApplyingSv
+      notesWhenApplyingEn
+      reservationKind
+      reservationPendingInstructionsFi
+      reservationPendingInstructionsSv
+      reservationPendingInstructionsEn
+      reservationConfirmedInstructionsFi
+      reservationConfirmedInstructionsSv
+      reservationConfirmedInstructionsEn
+      reservationCancelledInstructionsFi
+      reservationCancelledInstructionsSv
+      reservationCancelledInstructionsEn
+      maxReservationDuration
+      minReservationDuration
+      reservationStartInterval
+      canApplyFreeOfCharge
+      reservationsMinDaysBefore
+      reservationsMaxDaysBefore
+      equipments {
+        id
+        pk
+        nameFi
+      }
+      unit {
+        ...ReservationUnitEditUnit
+      }
+      minPersons
+      maxPersons
+      surfaceArea
+      descriptionFi
+      descriptionSv
+      descriptionEn
+      paymentTerms {
+        id
+        pk
+      }
+      cancellationTerms {
+        id
+        pk
+      }
+      serviceSpecificTerms {
+        id
+        pk
+      }
+      reservationBlockWholeDay
+      bufferTimeBefore
+      bufferTimeAfter
+      contactInformation
+      reservationBeginsAt
+      reservationEndsAt
+      publishBeginsAt
+      publishEndsAt
+      maxReservationsPerUser
+      metadataSet {
+        id
+        pk
+      }
+      pricings {
+        pk
+        ...PricingFields
+        lowestPriceNet
+        highestPriceNet
+      }
+      applicationRoundTimeSlots {
+        ...ApplicationRoundTimeSlots
+      }
+      accessTypes(isActiveOrFuture: true) {
+        id
+        pk
+        accessType
+        beginDate
       }
     }
   }
 `;
 
 export const UPDATE_RESERVATION_UNIT = gql`
-  mutation UpdateReservationUnit($input: ReservationUnitUpdateMutation!) {
+  mutation UpdateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
     updateReservationUnit(input: $input) {
       pk
     }
@@ -598,7 +567,7 @@ export const UPDATE_RESERVATION_UNIT = gql`
 `;
 
 export const CREATE_RESERVATION_UNIT = gql`
-  mutation CreateReservationUnit($input: ReservationUnitCreateMutation!) {
+  mutation CreateReservationUnit($input: ReservationUnitCreateMutationInput!) {
     createReservationUnit(input: $input) {
       pk
     }
@@ -607,7 +576,7 @@ export const CREATE_RESERVATION_UNIT = gql`
 
 // TODO this allows for a pk input (is it for a change? i.e. not needing to delete and create a new one)
 export const CREATE_IMAGE = gql`
-  mutation CreateImage($image: Image!, $reservationUnit: Int!, $imageType: ReservationUnitImageType!) {
+  mutation CreateImage($image: Upload!, $reservationUnit: Int!, $imageType: ImageType!) {
     createReservationUnitImage(input: { image: $image, reservationUnit: $reservationUnit, imageType: $imageType }) {
       pk
     }
@@ -615,15 +584,15 @@ export const CREATE_IMAGE = gql`
 `;
 
 export const DELETE_IMAGE = gql`
-  mutation DeleteImage($pk: Int!) {
+  mutation DeleteImage($pk: ID!) {
     deleteReservationUnitImage(input: { pk: $pk }) {
-      pk
+      deleted
     }
   }
 `;
 
 export const UPDATE_IMAGE_TYPE = gql`
-  mutation UpdateImage($pk: Int!, $imageType: ReservationUnitImageType!) {
+  mutation UpdateImage($pk: Int!, $imageType: ImageType!) {
     updateReservationUnitImage(input: { pk: $pk, imageType: $imageType }) {
       pk
     }
@@ -631,32 +600,48 @@ export const UPDATE_IMAGE_TYPE = gql`
 `;
 
 export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
-  query ReservationUnitEditorParameters($equipmentsOrderBy: EquipmentOrderSet!) {
-    allEquipments(orderBy: [$equipmentsOrderBy]) {
+  query ReservationUnitEditorParameters($equipmentsOrderBy: EquipmentOrderingChoices) {
+    equipmentsAll(orderBy: [$equipmentsOrderBy]) {
       id
       nameFi
       pk
     }
-    allTaxPercentages {
-      id
-      pk
-      value
+    taxPercentages {
+      edges {
+        node {
+          id
+          pk
+          value
+        }
+      }
     }
-    allPurposes {
-      id
-      pk
-      nameFi
+    purposes {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+        }
+      }
     }
-    allReservationUnitTypes {
-      id
-      nameFi
-      pk
+    reservationUnitTypes {
+      edges {
+        node {
+          id
+          nameFi
+          pk
+        }
+      }
     }
-    allTermsOfUse {
-      id
-      pk
-      nameFi
-      termsType
+    termsOfUse {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+          termsType
+        }
+      }
     }
     reservationUnitCancellationRules {
       edges {
@@ -667,23 +652,25 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
         }
       }
     }
-    allMetadataSets {
-      id
-      name
-      pk
+    metadataSets {
+      edges {
+        node {
+          id
+          name
+          pk
+        }
+      }
     }
   }
 `;
 
 export const RESERVATION_UNIT_CREATE_UNIT_QUERY = gql`
   query ReservationUnitCreateUnit($id: ID!) {
-    node(id: $id) {
-      ... on UnitNode {
-        id
-        pk
-        nameFi
-        ...ReservationUnitEditUnit
-      }
+    unit(id: $id) {
+      id
+      pk
+      nameFi
+      ...ReservationUnitEditUnit
     }
   }
 `;

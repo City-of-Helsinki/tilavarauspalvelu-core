@@ -21,7 +21,7 @@ def test_reservation__delete__general_admin(graphql):
     graphql.force_login(user)
 
     data = get_delete_data(reservation)
-    response = graphql(DELETE_MUTATION, variables={"input": data})
+    response = graphql(DELETE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
     assert Reservation.objects.filter(pk=reservation.pk).exists() is False
@@ -33,7 +33,7 @@ def test_reservation__delete__reservation_owner(graphql):
 
     graphql.force_login(user)
     data = get_delete_data(reservation)
-    response = graphql(DELETE_MUTATION, variables={"input": data})
+    response = graphql(DELETE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
     assert Reservation.objects.filter(pk=reservation.pk).exists() is False
@@ -44,8 +44,8 @@ def test_reservation__delete__regular_user(graphql):
 
     graphql.login_with_regular_user()
     data = get_delete_data(reservation)
-    response = graphql(DELETE_MUTATION, variables={"input": data})
+    response = graphql(DELETE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "No permission to delete this reservation."
+    assert response.error_message() == "No permission to delete."
 
     assert Reservation.objects.filter(pk=reservation.pk).exists() is True

@@ -6,7 +6,7 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { gql } from "@apollo/client";
-import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { useDisplayError } from "common/src/hooks";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -106,10 +106,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { data } = await client.query<ApplicationPage2Query, ApplicationPage2QueryVariables>({
     query: ApplicationPage2Document,
     variables: {
-      id: createNodeId("ApplicationNode", pk),
+      id: base64encode(`ApplicationNode:${pk}`),
     },
   });
-  const application = getNode(data);
+  const { application } = data;
   if (application == null) {
     return notFound;
   }
@@ -125,38 +125,31 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 export default Page2;
 
-export const APPLICATION_PAGE2_FRAGMENT = gql`
-  fragment ApplicationPage2 on ApplicationNode {
-    ...ApplicationForm
-    applicationSections {
-      id
-      reservationUnitOptions {
+export const APPLICATION_PAGE2_QUERY = gql`
+  query ApplicationPage2($id: ID!) {
+    application(id: $id) {
+      ...ApplicationForm
+      applicationSections {
         id
-        reservationUnit {
+        reservationUnitOptions {
           id
-          pk
-          nameFi
-          nameEn
-          nameSv
-          unit {
+          reservationUnit {
             id
+            pk
             nameFi
             nameEn
             nameSv
-          }
-          applicationRoundTimeSlots {
-            ...TimeSelector
+            unit {
+              id
+              nameFi
+              nameEn
+              nameSv
+            }
+            applicationRoundTimeSlots {
+              ...TimeSelector
+            }
           }
         }
-      }
-    }
-  }
-`;
-export const APPLICATION_PAGE2_QUERY = gql`
-  query ApplicationPage2($id: ID!) {
-    node(id: $id) {
-      ... on ApplicationNode {
-        ...ApplicationPage2
       }
     }
   }

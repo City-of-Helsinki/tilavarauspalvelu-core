@@ -45,7 +45,7 @@ def test_reservation__requires_handling__allowed_states(graphql, outbox, state):
 
     graphql.login_with_superuser()
     input_data = get_require_handling_data(reservation)
-    response = graphql(REQUIRE_HANDLING_MUTATION, variables={"input": input_data})
+    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
 
     assert response.has_errors is False, response.errors
 
@@ -78,9 +78,10 @@ def test_reservation__requires_handling__disallowed_states(graphql, state):
 
     graphql.login_with_superuser()
     input_data = get_require_handling_data(reservation)
-    response = graphql(REQUIRE_HANDLING_MUTATION, variables={"input": input_data})
+    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
 
-    assert response.error_message(0) == "Reservation cannot be handled based on its state"
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation cannot be handled based on its state"]
 
     reservation.refresh_from_db()
     assert reservation.state == state
@@ -97,7 +98,7 @@ def test_reservation__requires_handling__pindora_api__call_succeeds(graphql):
 
     graphql.login_with_superuser()
     input_data = get_require_handling_data(reservation)
-    response = graphql(REQUIRE_HANDLING_MUTATION, variables={"input": input_data})
+    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
 
     assert response.has_errors is False, response.errors
 
@@ -118,7 +119,7 @@ def test_reservation__requires_handling__pindora_api__call_fails(graphql):
 
     graphql.login_with_superuser()
     input_data = get_require_handling_data(reservation)
-    response = graphql(REQUIRE_HANDLING_MUTATION, variables={"input": input_data})
+    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
 
     # Mutation didn't fail even if Pindora call failed.
     # Access code will be deactivated later in a background task.
@@ -139,7 +140,7 @@ def test_reservation__requires_handling__pindora_api__call_fails__404(graphql):
 
     graphql.login_with_superuser()
     input_data = get_require_handling_data(reservation)
-    response = graphql(REQUIRE_HANDLING_MUTATION, variables={"input": input_data})
+    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
 
     # Request is still successful if Pindora fails with 404
     assert response.has_errors is False, response.errors
@@ -175,9 +176,10 @@ def test_reservation__requires_handling__denied_overlaps_with_existing_reservati
     graphql.login_with_superuser()
     input_data = get_require_handling_data(reservation)
 
-    response = graphql(REQUIRE_HANDLING_MUTATION, variables={"input": input_data})
+    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
 
-    assert response.error_message(0) == "Reservation overlaps with existing reservations."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.DENIED
@@ -209,9 +211,10 @@ def test_reservation__requires_handling__denied_overlaps_with_existing_reservati
         return Reservation.objects.filter(pk=reservation.pk)
 
     with patch_method(ReservationActions.overlapping_reservations, side_effect=callback):
-        response = graphql(REQUIRE_HANDLING_MUTATION, variables={"input": input_data})
+        response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
 
-    assert response.error_message(0) == "Overlapping reservations were created at the same time."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Overlapping reservations were created at the same time."]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.DENIED
@@ -231,7 +234,7 @@ def test_reservation__requires_handling__cancel_order_if_not_paid_yet(graphql):
 
     graphql.login_with_superuser()
     input_data = get_require_handling_data(reservation)
-    response = graphql(REQUIRE_HANDLING_MUTATION, variables={"input": input_data})
+    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
 
     assert response.has_errors is False, response.errors
 
@@ -256,7 +259,7 @@ def test_reservation__requires_handling__leave_order_paid(graphql):
 
     graphql.login_with_superuser()
     input_data = get_require_handling_data(reservation)
-    response = graphql(REQUIRE_HANDLING_MUTATION, variables={"input": input_data})
+    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
 
     assert response.has_errors is False, response.errors
 

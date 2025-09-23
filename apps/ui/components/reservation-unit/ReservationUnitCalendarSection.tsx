@@ -1,7 +1,8 @@
 import React from "react";
 import {
   type ReservationQuotaReachedFragment,
-  type ReservationTimePickerFieldsFragment,
+  type ReservationUnitNode,
+  type ReservationUnitPageQuery,
   useReservationQuotaReachedQuery,
 } from "@gql/gql-types";
 import { ReservationTimePicker } from "@/components/reservation";
@@ -15,12 +16,14 @@ import { type PendingReservationFormType } from "./schema";
 import { type UseFormReturn } from "react-hook-form";
 import { Flex, H4 } from "common/styled";
 
+type ReservationUnitT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
+
 export function ReservationUnitCalendarSection({
   reservationUnit,
   reservationForm,
   ...rest
 }: {
-  reservationUnit: Readonly<ReservationTimePickerFieldsFragment>;
+  reservationUnit: ReservationUnitT;
   reservationForm: UseFormReturn<PendingReservationFormType>;
 } & Pick<
   ReservationTimePickerProps,
@@ -36,8 +39,7 @@ export function ReservationUnitCalendarSection({
     },
   });
 
-  const node = data?.node != null && "id" in data.node ? data.node : null;
-  const refreshedIsQuoteReached = node ?? reservationUnit;
+  const refreshedIsQuoteReached = data?.reservationUnit ?? reservationUnit;
   const quotaReached = isReservationQuotaReached(refreshedIsQuoteReached);
 
   return (
@@ -58,6 +60,22 @@ export function ReservationUnitCalendarSection({
     </Flex>
   );
 }
+
+export const RESERVATION_QUOTA_REACHED_FRAGMENT = gql`
+  fragment ReservationQuotaReached on ReservationUnitNode {
+    id
+    maxReservationsPerUser
+    numActiveUserReservations
+  }
+`;
+
+export const RESERVATION_QUOTA_REACHED_QUERY = gql`
+  query ReservationQuotaReached($id: ID!) {
+    reservationUnit(id: $id) {
+      ...ReservationQuotaReached
+    }
+  }
+`;
 
 function ReservationQuotaReached(props: ReservationQuotaReachedFragment): JSX.Element | null {
   const { t } = useTranslation("reservationCalendar", {
@@ -85,27 +103,11 @@ function ReservationQuotaReached(props: ReservationQuotaReachedFragment): JSX.El
   );
 }
 
-export function isReservationQuotaReached(reservationUnit: ReservationQuotaReachedFragment): boolean {
+export function isReservationQuotaReached(
+  reservationUnit: Pick<ReservationUnitNode, "maxReservationsPerUser" | "numActiveUserReservations">
+): boolean {
   return (
     reservationUnit.maxReservationsPerUser != null &&
     reservationUnit.numActiveUserReservations >= reservationUnit.maxReservationsPerUser
   );
 }
-
-export const RESERVATION_QUOTA_REACHED_FRAGMENT = gql`
-  fragment ReservationQuotaReached on ReservationUnitNode {
-    id
-    maxReservationsPerUser
-    numActiveUserReservations
-  }
-`;
-
-export const RESERVATION_QUOTA_REACHED_QUERY = gql`
-  query ReservationQuotaReached($id: ID!) {
-    node(id: $id) {
-      ... on ReservationUnitNode {
-        ...ReservationQuotaReached
-      }
-    }
-  }
-`;

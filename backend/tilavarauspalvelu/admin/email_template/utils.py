@@ -8,11 +8,11 @@ from admin_data_views.settings import admin_data_settings
 from django.urls import reverse
 from django.utils.html import format_html
 
-from tilavarauspalvelu.enums import AccessType, ReservationCancelReasonChoice, Weekday
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice, Weekday
 from tilavarauspalvelu.integrations.email.template_context.common import get_staff_reservations_ext_link
 from tilavarauspalvelu.integrations.email.typing import EmailTemplateType, EmailType
 from tilavarauspalvelu.translation import get_translated
-from utils.date_utils import local_date, local_datetime
+from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from django.utils.safestring import SafeString
@@ -45,8 +45,6 @@ def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext:
         "access_code_validity_period": (
             kwargs.get("access_code_validity_period", "11:00-15:00") if access_code_is_used else ""
         ),
-        "access_type": kwargs.get("access_type", AccessType.ACCESS_CODE.value),
-        "change_date": kwargs.get("change_date", local_date(2024, 1, 1)),
         "allocations": kwargs.get(
             "allocations",
             [
@@ -70,37 +68,6 @@ def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext:
                 },
             ],
         ),
-        "reservation_units": [
-            {
-                "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
-                "unit_name": "[TOIMIPISTEEN NIMI]",
-                "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-                "access_types": [
-                    {
-                        "access_type": str(AccessType.OPENED_BY_STAFF.label),
-                        "begin_date": "1.1.2023",
-                        "end_date": "31.5.2023",
-                    },
-                    {
-                        "access_type": str(AccessType.ACCESS_CODE.label),
-                        "begin_date": "1.6.2023",
-                        "end_date": "31.12.2023",
-                    },
-                ],
-            },
-            {
-                "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
-                "unit_name": "[TOIMIPISTEEN NIMI]",
-                "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-                "access_types": [
-                    {
-                        "access_type": str(AccessType.UNRESTRICTED.label),
-                        "begin_date": "1.2.2023",
-                        "end_date": None,
-                    },
-                ],
-            },
-        ],
         "application_id": kwargs.get("application_id", 1234),
         "application_round_name": kwargs.get("application_round_name", "[KAUSIVARAUSKIERROKSEN NIMI]"),
         "application_section_id": kwargs.get("application_section_id", 5678),

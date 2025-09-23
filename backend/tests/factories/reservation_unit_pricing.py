@@ -27,8 +27,6 @@ class ReservationUnitPricingFactory(GenericDjangoModelFactory[ReservationUnitPri
 
     is_activated_on_begins = False
 
-    material_price_description = ""
-
     tax_percentage = ForeignKeyFactory("tests.factories.TaxPercentageFactory")
     reservation_unit = ForeignKeyFactory("tests.factories.ReservationUnitFactory", required=True)
 

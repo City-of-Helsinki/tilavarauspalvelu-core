@@ -4,14 +4,14 @@ import { future1hReservation } from "@test/reservation.mocks";
 import { describe, expect, it } from "vitest";
 import {
   AccessType,
-  ReservationUnitImageType,
+  ImageType,
   PaymentType,
   PriceUnit,
   type ReservationInfoCardFragment,
   ReservationStateChoice,
 } from "@gql/gql-types";
 import { type CreateGraphQLMockProps, generateNameFragment } from "@/test/test.gql.utils";
-import { createNodeId } from "common/src/helpers";
+import { base64encode } from "common/src/helpers";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 
@@ -105,12 +105,12 @@ function createMockReservationInfoCard(price?: string): ReservationInfoCardFragm
       taxPercentage: "25.5",
     },
     reservationUnit: {
-      id: createNodeId("ReservationUnitNode", 2),
+      id: base64encode("ReservationUnitNode:2"),
       images: [
         {
-          id: createNodeId("ReservationUnitImageNode", 1),
+          id: base64encode(`ReservationUnitImageNode:1`),
           imageUrl: "https://example.com/image-image.jpg",
-          imageType: ReservationUnitImageType.Main,
+          imageType: ImageType.Main,
           largeUrl: "https://example.com/image-large.jpg",
           mediumUrl: "https://example.com/image-medium.jpg",
           smallUrl: "https://example.com/image-small.jpg",

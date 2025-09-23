@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { ApplicationFields, GeneralFields } from "./SummaryFields";
-import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
+import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { PendingReservationFormType } from "../reservation-unit/schema";
 import { type UseFormReturn } from "react-hook-form";
@@ -193,7 +193,7 @@ export function EditStep1({ reservation, options, onBack, form }: Props): JSX.El
 }
 
 export const ADJUST_RESERVATION_TIME = gql`
-  mutation AdjustReservationTime($input: ReservationAdjustTimeMutation!) {
+  mutation AdjustReservationTime($input: ReservationAdjustTimeMutationInput!) {
     adjustReservationTime(input: $input) {
       pk
       state

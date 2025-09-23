@@ -3,11 +3,11 @@ from __future__ import annotations
 from typing import Any, NamedTuple
 
 import pytest
+from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice, ReserveeType
 
 from tests.factories import ReservationFactory
-from tests.helpers import parametrize_helper
 
 
 class Params(NamedTuple):

@@ -5,7 +5,7 @@ import { type ApplicationRoundCardFragment, ApplicationRoundStatusChoice } from 
 import { formatDateTime } from "@/modules/util";
 import { isValid } from "date-fns";
 import Card from "common/src/components/Card";
-import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
+import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { getApplicationRoundPath } from "@/modules/urls";
 import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
 import { gql } from "@apollo/client";

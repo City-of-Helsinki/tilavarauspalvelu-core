@@ -145,7 +145,7 @@ and the admin UI at `localhost:3001/kasittely`.
 - [Celery] for scheduling and background task handling
 - [Poetry] for dependency management
 - [Django] as the web framework
-- [Undine] as the GraphQL framework
+- [Graphene] as the GraphQL framework
 
 [PostgreSQL]: https://www.postgresql.org/
 [PostGIS]: https://postgis.net/
@@ -153,7 +153,7 @@ and the admin UI at `localhost:3001/kasittely`.
 [Celery]: https://docs.celeryq.dev/en/stable/index.html
 [Poetry]: https://python-poetry.org/
 [Django]: https://www.djangoproject.com/
-[Undine]: https://github.com/MrThearMan/undine
+[Graphene]: https://github.com/graphql-python/graphene-django
 
 ### Integrations
 

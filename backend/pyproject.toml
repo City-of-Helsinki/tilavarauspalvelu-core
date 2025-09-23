@@ -14,34 +14,35 @@ dynamic = ["dependencies"]  # Use tool.poetry for dependency management
 requires-poetry = ">=2.0"
 
 [tool.poetry.dependencies]
-Django = "5.1.12"
+Django = "5.1.11"
 django-auditlog = "3.2.1"
-django-cors-headers = "4.9.0"
+django-cors-headers = "4.7.0"
 django-environment-config = { version = "0.2.3", extras = ["db"] }
+django-filter = "25.1"
 django-health-check = "3.20.0"
-django-helusers = "0.14.0"
+django-helusers = "0.13.3"
 django-jinja = "2.11.0"
-django-lazy-managers = "0.0.1"
-django-lookup-property = "0.2.2"
-django-modeltranslation = "0.19.17"
-django-mptt = "0.18.0"
+django-lookup-property = "0.1.8"
+django-modeltranslation = "0.19.16"
+django-mptt = "0.17.0"
 django-redis = "6.0.0"
-djangorestframework = "3.16.1"
-easy-thumbnails = "2.10.1"
+djangorestframework = "3.16.0"
+easy-thumbnails = "2.10"
+graphene-django = "3.2.3"
+graphene-django-extensions = "0.4.9"
 helsinki-profile-gdpr-api = "0.2.0"
 html2text = "2025.4.15"
 icalendar = "6.3.1"
-mjml-python = "1.3.6"
-psycopg2-binary = "2.9.10"
+mjml-python = "1.3.5"
+psycopg2 = "2.9.10"
 python-dateutil = "2.9.0.post0"
-redis = { version = "5.2.1", extras = ["hiredis"] }
-sentry-sdk = "2.38.0"
+redis = { version = "5.3.1", extras = ["hiredis"] }
+sentry-sdk = "2.33.2"
 social-auth-app-django = "5.5.1"
 stamina = "25.1.0"
-undine = "0.1.0"
 # Skip installation on Windows as uWSGI does not support it without Cygwin.
 uWSGI = { version = "2.0.30", markers = "sys_platform != 'win32'" }
-whitenoise = "6.11.0"
+whitenoise = "6.9.0"
 xhtml2pdf = "0.2.17"
 
 [tool.poetry.group.admin.dependencies]
@@ -53,35 +54,33 @@ django-admin-sortable2 = "2.2.8"
 django-extensions = "4.1"
 django-import-export = "4.3.9"
 django-more-admin-filters = "1.13"
-django-subforms = "0.4.1"
+django-subforms = "0.3.1"
 django-tinymce = "4.1.0"
 
 [tool.poetry.group.celery.dependencies]
 # Dependencies related to Celery tasks.
-celery = { version = "5.5.3", extras = ["redis"] }
+celery = { version = "5.5.2", extras = ["redis"] }
 django-celery-beat = "2.8.1"
 django-celery-results = "2.6.0"
 
 [tool.poetry.group.test.dependencies]
 # Dependencies only required for running tests.
 factory-boy = "3.3.3"
-faker = "37.8.0"
-freezegun = "1.5.5"
+faker = "37.4.2"
+freezegun = "1.5.3"
 polib = "1.2.0"
-pyinstrument = "5.1.1"
+pyinstrument = "5.0.3"
 pypdf2 = "3.0.1"
-pytest = "8.4.2"
-pytest-cov = "7.0.0"
+pytest = "8.4.1"
+pytest-cov = "6.2.1"
 pytest-django = "4.11.1"
 pytest-split = "0.10.0"
 pytest-xdist = "3.8.0"
 
 [tool.poetry.group.lint.dependencies]
 # Dependencies only required for linting.
-pre-commit = "4.3.0"
-ruff = "0.13.1"
-mypy = "1.18.2"
-django-stubs = { version = "5.2.5", extras = ["compatible-mypy"] }
+pre-commit = "4.2.0"
+ruff = "0.12.5"
 
 [project.entry-points.pytest11]
 tilavarauspalvelu = "tests.plugins"
@@ -191,6 +190,7 @@ extend-select = [
     "PLW0108",  # unnecessary-lambda
     "PLW1514",  # unspecified-encoding
     "PLW1641",  # eq-without-hash (NOTE: Does not check for __hash__ implementations in superclasses.)
+    "PLW3201",  # bad-dunder-method-name
     "PT028",    # pytest-parameter-with-default-argument
     "RUF027",   # missing-f-string-syntax
     "RUF028",   # invalid-formatter-suppression-comment
@@ -236,11 +236,6 @@ ignore = [
 
     # To be enabled in the future
     "PLW2901",  # redefined-loop-name
-
-    # No type-checking blocks
-    "TC001",
-    "TC002",
-    "TC003",
 ]
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^options$|^info$|^name$|^obj$|^request$|^user|^view$|^input_data$|^filters$"
 task-tags = ["TODO", "FIXME", "XXX", "type"]
@@ -281,10 +276,6 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
     "N802",     # Allow non-lowercase function names for webhook serializers.
     "N815",     # Allow mixedCase variables for webhook serializers.
 ]
-"tilavarauspalvelu/api/graphql/*.py" = [
-    # Undine uses some special dunder methods
-    "PLW3201",
-]
 "tilavarauspalvelu/api/graphql/extensions/error_codes.py" = [
     "ERA001",   # Commented code is fine here.
 ]
@@ -319,6 +310,9 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
 [tool.ruff.lint.isort]
 combine-as-imports = false
 split-on-trailing-comma = false
+required-imports = [
+    "from __future__ import annotations",
+]
 known-third-party = [
     "django",
 ]
@@ -371,7 +365,8 @@ builtins-allowed-modules = [
 "django.utils.timezone.now".msg = "Use `utils.date_utils.local_datetime` instead."
 "django.utils.timezone.get_default_timezone".msg = "Use `utils.date_utils.DEFAULT_TIMEZONE` instead."
 
-"tilavarauspalvelu.typing.GQLInfo".msg = "Use `undine.typing.GQLInfo` instead."
+"graphene_django_extensions.typing.GQLInfo".msg = "Use `tilavarauspalvelu.typing.GQLInfo` instead."
+"query_optimizer.typing.GQLInfo".msg = "Use `tilavarauspalvelu.typing.GQLInfo` instead."
 
 "django.contrib.auth.get_user_model".msg = "Use `tilavarauspalvelu.models.User` instead."
 
@@ -403,6 +398,8 @@ banned-from = [
     "uuid",
     "xml",
     "yaml",
+    # Project-specific
+    "error_codes",
 ]
 
 [tool.ruff.lint.flake8-self]
@@ -451,14 +448,6 @@ skips = [
     "B101",     # Assert is fine.
     "B311",     # Random is fine.
 ]
-
-[tool.mypy]
-plugins = [
-    "mypy_django_plugin.main"
-]
-
-[tool.django-stubs]
-django_settings_module = "config.settings"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"

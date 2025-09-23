@@ -5,6 +5,7 @@ from typing import NamedTuple
 from unittest.mock import MagicMock
 
 import pytest
+from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import MunicipalityChoice
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
@@ -22,7 +23,7 @@ from tests.factories.helsinki_profile import (
     ProfileEmailFactory,
     ProfilePhoneFactory,
 )
-from tests.helpers import ResponseMock, parametrize_helper, patch_method
+from tests.helpers import ResponseMock, patch_method
 
 pytestmark = [
     pytest.mark.django_db,

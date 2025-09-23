@@ -17,8 +17,6 @@ def test_reservation_unit_image__delete__regular_user(graphql):
 
     graphql.login_with_regular_user()
 
-    input_data = {"pk": reservation_unit_image.pk}
+    response = graphql(DELETE_MUTATION, input_data={"pk": reservation_unit_image.pk})
 
-    response = graphql(DELETE_MUTATION, variables={"input": input_data})
-
-    assert response.error_message(0) == "No permission to delete a reservation unit image"
+    assert response.error_message() == "No permission to delete."

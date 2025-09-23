@@ -4,6 +4,7 @@ import uuid
 
 import pytest
 import requests
+from graphene_django_extensions.testing import parametrize_helper
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
@@ -25,7 +26,7 @@ from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraReservati
 from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import ReservationUnitFactory
-from tests.helpers import ResponseMock, exact, parametrize_helper, patch_method, use_retries
+from tests.helpers import ResponseMock, exact, patch_method, use_retries
 from tests.test_integrations.test_keyless_entry.helpers import ErrorParams, default_reservation_unit_response
 
 

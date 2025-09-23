@@ -1,38 +1,14 @@
 import styled, { css } from "styled-components";
 import { focusStyles } from "./cssFragments";
 import { breakpoints } from "../src/const";
-import { fontMedium } from "./typography";
-import Link from "next/link";
 
 export type ButtonStyleProps = {
-  readonly variant?: "primary" | "secondary" | "inverted";
+  readonly variant?: "primary" | "secondary";
   readonly size?: "normal" | "large";
   readonly fontSize?: "small" | "normal";
   readonly disabled?: boolean;
   readonly width?: "full" | "auto";
 };
-
-function getBackgroundColour(variant: ButtonStyleProps["variant"] = "secondary") {
-  switch (variant) {
-    case "primary":
-      return "var(--color-bus)";
-    case "secondary":
-      return "var(--color-white)";
-    case "inverted":
-      return "transparent";
-  }
-}
-
-function getBorderColour(variant: ButtonStyleProps["variant"] = "secondary") {
-  switch (variant) {
-    case "primary":
-      return "var(--color-bus)";
-    case "secondary":
-      return "var(--color-black)";
-    case "inverted":
-      return "var(--color-white)";
-  }
-}
 
 export const ButtonCss = css<ButtonStyleProps>`
   --background-color-hover: ${({ variant }) =>
@@ -44,17 +20,16 @@ export const ButtonCss = css<ButtonStyleProps>`
   --outline-gutter: 2px;
   --outline-width: 3px;
   --font-size: ${({ fontSize }) => (fontSize === "small" ? "var(--fontsize-body-s)" : "var(--fontsize-body-m)")};
-  --color: ${({ variant }) =>
-    variant === "primary" || variant === "inverted" ? "var(--color-white)" : "var(--color-black)"};
+  --color: ${({ variant }) => (variant === "primary" ? "var(--color-white)" : "var(--color-black)")};
 
   font-size: var(--font-size);
 
   opacity: ${({ disabled }) => (disabled ? "0.5" : "1")};
   text-decoration: none;
   color: var(--color);
-  background-color: ${({ variant }) => getBackgroundColour(variant)};
+  background-color: ${({ variant }) => (variant === "primary" ? "var(--color-bus)" : "var(--color-white)")};
   padding: ${({ size }) => (size === "large" ? "12px 20px" : "0 20px")};
-  border: 2px solid ${({ variant }) => getBorderColour(variant)};
+  border: 2px solid ${({ variant }) => (variant === "primary" ? "var(--color-bus)" : "var(--color-black)")};
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -139,22 +114,4 @@ export const toggleButtonCss = css`
     color: var(--color-black-50);
     cursor: not-allowed;
   }
-`;
-
-/* small overrides that might be moved to buttonCss.ts after testing
- * gap: in case there is an icon
- * max-height since the small button this replaces is 40px + 4px padding
- */
-export const ButtonLikeLink = styled(Link)<ButtonStyleProps>`
-  ${ButtonCss}
-  ${fontMedium}
-  gap: var(--spacing-s);
-  white-space: nowrap;
-`;
-
-export const ButtonLikeExternalLink = styled.a<ButtonStyleProps>`
-  ${ButtonCss}
-  ${fontMedium}
-  gap: var(--spacing-s);
-  white-space: nowrap;
 `;

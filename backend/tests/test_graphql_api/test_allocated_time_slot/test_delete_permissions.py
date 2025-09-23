@@ -23,13 +23,12 @@ def test_allocated_time_slot__delete__application_owner(graphql):
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
     slot = option.allocated_time_slots.first()
-
     graphql.force_login(application.user)
 
     # when:
     # - User tries to delete an allocated time slot
-    response = graphql(DELETE_ALLOCATION, variables={"input": {"pk": slot.pk}})
+    response = graphql(DELETE_ALLOCATION, input_data={"pk": slot.pk})
 
     # then:
     # - The error complains about permissions
-    assert response.error_message(0) == "No permission to delete allocation."
+    assert response.error_message() == "No permission to delete."

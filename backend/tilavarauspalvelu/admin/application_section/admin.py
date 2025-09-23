@@ -73,7 +73,7 @@ class ApplicationSectionAdmin(admin.ModelAdmin):
         "id",
         "name",
         "application",
-        "_lookup_property_status",
+        "_status",
         "application_status",
     ]
     list_filter = [

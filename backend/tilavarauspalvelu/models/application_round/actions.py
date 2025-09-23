@@ -56,10 +56,8 @@ class ApplicationRoundActions:
         match self.application_round.status:
             case ApplicationRoundStatusChoice.IN_ALLOCATION:
                 # Unlock all reservation unit options, and remove all allocated time slots
-                ReservationUnitOption.objects.all().for_application_round(self.application_round).update(
-                    is_locked=False
-                )
-                AllocatedTimeSlot.objects.all().for_application_round(self.application_round).delete()
+                ReservationUnitOption.objects.for_application_round(self.application_round).update(is_locked=False)
+                AllocatedTimeSlot.objects.for_application_round(self.application_round).delete()
 
             case ApplicationRoundStatusChoice.HANDLED:
                 # Check if there are any Pindora access codes and delete them before deleting the reservations
@@ -74,8 +72,8 @@ class ApplicationRoundActions:
 
                 # Remove all reservation series, and set application round back to HANDLED
                 # NOTE: This triggers _a lot_ of `post_delete` signals fo reservations.
-                Reservation.objects.all().for_application_round(self.application_round).delete()
-                ReservationSeries.objects.all().for_application_round(self.application_round).delete()
+                Reservation.objects.for_application_round(self.application_round).delete()
+                ReservationSeries.objects.for_application_round(self.application_round).delete()
 
                 self.application_round.handled_at = None
                 self.application_round.save()

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from tilavarauspalvelu.models import TermsOfUse
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from django.db import models
 
 __all__ = [
     "TermsOfUseManager",
@@ -9,7 +8,7 @@ __all__ = [
 ]
 
 
-class TermsOfUseQuerySet(ModelQuerySet[TermsOfUse]): ...
+class TermsOfUseQuerySet(models.QuerySet): ...
 
 
-class TermsOfUseManager(ModelManager[TermsOfUse, TermsOfUseQuerySet]): ...
+class TermsOfUseManager(models.Manager.from_queryset(TermsOfUseQuerySet)): ...

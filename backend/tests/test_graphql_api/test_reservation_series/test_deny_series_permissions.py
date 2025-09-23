@@ -28,9 +28,9 @@ def test_reservation_series__deny_series__regular_user(graphql):
 
     graphql.login_with_regular_user()
 
-    response = graphql(DENY_SERIES_MUTATION, variables={"input": data})
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "No permission to access reservation series."
+    assert response.error_message() == "No permission to update."
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
@@ -44,10 +44,9 @@ def test_reservation_series__deny_series__general_admin(graphql):
         "denyReason": reason.pk,
     }
 
-    user = UserFactory.create_with_general_role(role=UserRoleChoice.ADMIN)
-    graphql.force_login(user)
+    graphql.login_user_with_role(role=UserRoleChoice.ADMIN)
 
-    response = graphql(DENY_SERIES_MUTATION, variables={"input": data})
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -67,7 +66,7 @@ def test_reservation_series__deny_series__unit_admin(graphql):
     user = UserFactory.create_with_unit_role(role=UserRoleChoice.ADMIN, units=[unit])
     graphql.force_login(user)
 
-    response = graphql(DENY_SERIES_MUTATION, variables={"input": data})
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -87,7 +86,7 @@ def test_reservation_series__deny_series__unit_handler(graphql):
     user = UserFactory.create_with_unit_role(role=UserRoleChoice.HANDLER, units=[unit])
     graphql.force_login(user)
 
-    response = graphql(DENY_SERIES_MUTATION, variables={"input": data})
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -110,7 +109,7 @@ def test_reservation_series__deny_series__unit_reserver__own_reservation(graphql
 
     graphql.force_login(user)
 
-    response = graphql(DENY_SERIES_MUTATION, variables={"input": data})
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -130,6 +129,6 @@ def test_reservation_series__deny_series__unit_reserver__other_user_reservation(
     user = UserFactory.create_with_unit_role(role=UserRoleChoice.RESERVER, units=[unit])
     graphql.force_login(user)
 
-    response = graphql(DENY_SERIES_MUTATION, variables={"input": data})
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "No permission to access reservation series."
+    assert response.error_message() == "No permission to update."

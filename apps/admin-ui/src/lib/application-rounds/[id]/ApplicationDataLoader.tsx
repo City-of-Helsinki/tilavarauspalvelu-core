@@ -1,7 +1,7 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
-import { ApplicationOrderSet, useApplicationsQuery } from "@gql/gql-types";
+import { ApplicationOrderingChoices, useApplicationsQuery } from "@gql/gql-types";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { errorToast } from "common/src/components/toast";
@@ -74,7 +74,7 @@ export function ApplicationDataLoader({ applicationRoundPk }: Props): JSX.Elemen
   );
 }
 
-function transformOrderBy(orderBy: string | null): ApplicationOrderSet[] {
+function transformOrderBy(orderBy: string | null): ApplicationOrderingChoices[] {
   if (orderBy == null) {
     return [];
   }
@@ -82,15 +82,17 @@ function transformOrderBy(orderBy: string | null): ApplicationOrderSet[] {
   const rest = desc ? orderBy.slice(1) : orderBy;
   switch (rest) {
     case "applicantType":
-      return desc ? [ApplicationOrderSet.ApplicantTypeDesc] : [ApplicationOrderSet.ApplicantTypeAsc];
+      return desc ? [ApplicationOrderingChoices.ApplicantTypeDesc] : [ApplicationOrderingChoices.ApplicantTypeAsc];
     case "applicant":
-      return desc ? [ApplicationOrderSet.ApplicantDesc] : [ApplicationOrderSet.ApplicantAsc];
+      return desc ? [ApplicationOrderingChoices.ApplicantDesc] : [ApplicationOrderingChoices.ApplicantAsc];
     case "pk":
-      return desc ? [ApplicationOrderSet.PkDesc] : [ApplicationOrderSet.PkAsc];
+      return desc ? [ApplicationOrderingChoices.PkDesc] : [ApplicationOrderingChoices.PkAsc];
     case "preferredUnitNameFi":
-      return desc ? [ApplicationOrderSet.PreferredUnitNameFiDesc] : [ApplicationOrderSet.PreferredUnitNameFiAsc];
+      return desc
+        ? [ApplicationOrderingChoices.PreferredUnitNameFiDesc]
+        : [ApplicationOrderingChoices.PreferredUnitNameFiAsc];
     case "application_status":
-      return desc ? [ApplicationOrderSet.StatusDesc] : [ApplicationOrderSet.StatusAsc];
+      return desc ? [ApplicationOrderingChoices.StatusDesc] : [ApplicationOrderingChoices.StatusAsc];
     default:
       return [];
   }
@@ -98,29 +100,26 @@ function transformOrderBy(orderBy: string | null): ApplicationOrderSet[] {
 
 export const APPLICATIONS_QUERY = gql`
   query Applications(
+    $applicationRound: Int!
+    $unit: [Int]
+    $unitGroup: [Int]
+    $applicantType: [ReserveeType]
+    $status: [ApplicationStatusChoice]!
+    $textSearch: String
+    $orderBy: [ApplicationOrderingChoices]
     $first: Int
     $after: String
-    $orderBy: [ApplicationOrderSet!]
-    # Filter
-    $applicantType: [ReserveeType!]
-    $applicationRound: Int!
-    $status: [ApplicationStatusChoice!]!
-    $textSearch: String
-    $unit: [Int!]
-    $unitGroup: [Int!]
   ) {
     applications(
+      applicationRound: $applicationRound
+      unit: $unit
+      unitGroup: $unitGroup
+      applicantType: $applicantType
+      status: $status
+      textSearch: $textSearch
+      orderBy: $orderBy
       first: $first
       after: $after
-      orderBy: $orderBy
-      filter: {
-        applicantType: $applicantType
-        applicationRound: $applicationRound
-        status: $status
-        textSearch: $textSearch
-        unit: $unit
-        unitGroup: $unitGroup
-      }
     ) {
       edges {
         node {

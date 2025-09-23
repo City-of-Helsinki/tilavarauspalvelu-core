@@ -1,8 +1,8 @@
 import { addDays, addHours, nextMonday, set } from "date-fns";
 import {
-  AuthenticationType,
+  Authentication,
   ReservationStartInterval,
-  TermsOfUseTypeChoices,
+  TermsType,
   ReservationTypeChoice,
   CreateStaffReservationDocument,
   ReservationUnitDocument,
@@ -22,7 +22,7 @@ import {
   ReservationsByReservationUnitDocument,
   type ReservationsByReservationUnitQuery,
 } from "@gql/gql-types";
-import { createNodeId } from "common/src/helpers";
+import { base64encode } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { toApiDateUnsafe } from "common/src/common/util";
 
@@ -37,7 +37,7 @@ const emptyTerms = {
   id: "",
   textFi: "",
   nameFi: "",
-  termsType: TermsOfUseTypeChoices.PaymentTerms,
+  termsType: TermsType.PaymentTerms,
 };
 
 // TODO remove and use fakeTimers with doNotFake option
@@ -86,10 +86,10 @@ const requiredFields = [
 
 function createReservationUnitFragment({ pk, nameFi }: { pk: number; nameFi: string }): CreateStaffReservationFragment {
   return {
-    authentication: AuthenticationType.Weak,
+    authentication: Authentication.Weak,
     nameFi,
     pk,
-    id: createNodeId("ReservationUnitNode", pk),
+    id: base64encode(`ReservationUnitNode:${pk}`),
     minPersons: null,
     maxPersons: null,
     bufferTimeBefore: 0,
@@ -154,7 +154,7 @@ const reservationsByUnitResponse: CalendarReservationFragment[] = mondayMorningR
   .sort((x, y) => x.begin.getTime() - y.begin.getTime())
   .map((x) => ({
     __typename: "ReservationNode",
-    id: createNodeId("ReservationNode", 1),
+    id: base64encode(`ReservationNode:1`),
     beginsAt: x.begin.toUTCString(),
     endsAt: x.end.toUTCString(),
     bufferTimeBefore: 0,
@@ -186,16 +186,26 @@ const AdminUserMock: CurrentUserQuery = {
 };
 
 const OptionsMock: FilterOptionsQuery = {
-  allReservationPurposes: [],
-  allAgeGroups: [],
-  allUnitGroups: [],
-  allReservationUnitTypes: [],
-  allReservationUnits: [],
-  allUnits: [],
+  reservationPurposes: {
+    edges: [],
+  },
+  ageGroups: {
+    edges: [],
+  },
+  unitGroups: {
+    edges: [],
+  },
+  reservationUnitTypes: {
+    edges: [],
+  },
+  reservationUnitsAll: [],
+  unitsAll: [],
 };
 
 const TermsOfUseMock: TermsOfUseQuery = {
-  allTermsOfUse: [],
+  termsOfUse: {
+    edges: [],
+  },
 };
 
 const otherMocks = [
@@ -211,7 +221,7 @@ const otherMocks = [
     request: {
       query: TermsOfUseDocument,
       variables: {
-        termsType: TermsOfUseTypeChoices.GenericTerms,
+        termsType: TermsType.GenericTerms,
       },
     },
     result: {
@@ -229,7 +239,7 @@ const otherMocks = [
   {
     request: {
       query: ReservationUnitDocument,
-      variables: { id: createNodeId("ReservationUnitNode", 1) },
+      variables: { id: base64encode(`ReservationUnitNode:1`) },
     },
     result: {
       data: createReservationUnitResponse(),
@@ -261,7 +271,7 @@ function createInIntervalQueryMock({ begin, end }: { begin: Date; end: Date }) {
   const beginDate = toApiDateUnsafe(begin);
   const endDate = toApiDateUnsafe(end);
   const variables: ReservationsByReservationUnitQueryVariables = {
-    id: createNodeId("ReservationUnitNode", 1),
+    id: base64encode(`ReservationUnitNode:1`),
     pk: 1,
     beginDate,
     endDate,
@@ -293,7 +303,7 @@ export function createGraphQLMocks({ begin, end }: { begin: Date; end: Date }) {
 
 function createReservationUnitResponse(): ReservationUnitQuery {
   return {
-    node: createReservationUnitFragment({
+    reservationUnit: createReservationUnitFragment({
       pk: 1,
       nameFi: "Studiohuone 1 + soittimet",
     }),
@@ -302,8 +312,8 @@ function createReservationUnitResponse(): ReservationUnitQuery {
 
 function createReservationsInIntervalResponse(): ReservationsByReservationUnitQuery {
   return {
-    node: {
-      id: createNodeId("ReservationUnitNode", 1),
+    reservationUnit: {
+      id: base64encode(`ReservationUnitNode:1`),
       reservations: reservationsByUnitResponse,
     },
     affectingReservations: reservationsByUnitResponse,

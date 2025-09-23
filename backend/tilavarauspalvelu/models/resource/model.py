@@ -4,15 +4,12 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from lazy_managers import LazyModelAttribute, LazyModelManager
-from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import ResourceLocationType
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnit, Space
-    from tilavarauspalvelu.models._base import ManyToManyRelatedManager
-    from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
+    from tilavarauspalvelu.models import Space
 
     from .actions import ResourceActions
     from .queryset import ResourceManager
@@ -27,17 +24,18 @@ __all__ = [
 class Resource(models.Model):
     name: str = models.CharField(max_length=255)
 
-    location_type: ResourceLocationType = TextChoicesField(
-        choices_enum=ResourceLocationType,
-        default=ResourceLocationType.FIXED,
+    location_type: str = models.CharField(
+        max_length=20,
+        choices=ResourceLocationType.choices,
+        default=ResourceLocationType.FIXED.value,
     )
 
     space: Space | None = models.ForeignKey(
         "tilavarauspalvelu.Space",
         related_name="resources",
         on_delete=models.SET_NULL,
-        blank=True,
         null=True,
+        blank=True,
     )
 
     # Translated field hints
@@ -48,8 +46,6 @@ class Resource(models.Model):
     objects: ClassVar[ResourceManager] = LazyModelManager.new()
     actions: ResourceActions = LazyModelAttribute.new()
     validators: ResourceValidator = LazyModelAttribute.new()
-
-    reservation_units: ManyToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
 
     class Meta:
         db_table = "resource"

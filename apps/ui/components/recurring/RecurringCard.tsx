@@ -17,7 +17,7 @@ import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource, getMainImage } from "common/src/helpers";
 import Card, { CardInfoItem } from "common/src/components/Card";
 import { getReservationUnitPath } from "@/modules/urls";
-import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
+import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
 

@@ -3,8 +3,8 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import {
-  PurposeOrderSet,
-  UnitOrderSet,
+  PurposeOrderingChoices,
+  UnitOrderingChoices,
   type FrontPageQuery,
   type FrontPageQueryVariables,
   FrontPageDocument,
@@ -42,12 +42,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     query: FrontPageDocument,
     fetchPolicy: "no-cache",
     variables: {
-      orderBy: [PurposeOrderSet.RankAsc],
-      orderUnitsBy: [UnitOrderSet.RankAsc],
+      orderBy: [PurposeOrderingChoices.RankAsc],
+      orderUnitsBy: [UnitOrderingChoices.RankAsc],
     },
   });
-  const purposes = filterNonNullable(data?.allPurposes);
-  const units = filterNonNullable(data?.units?.edges?.map((edge) => edge?.node));
+  const purposes = filterNonNullable(data?.purposes?.edges.map((edge) => edge?.node));
+  const units = filterNonNullable(data?.units?.edges.map((edge) => edge?.node));
 
   return {
     props: {
@@ -63,15 +63,15 @@ export default Home;
 
 // TODO we can limit the number of purposes and units fetched
 export const FRONT_PAGE_QUERY = gql`
-  query FrontPage(
-    $orderBy: [PurposeOrderSet!]
-    # Filter
-    $orderUnitsBy: [UnitOrderSet!]
-  ) {
-    allPurposes(orderBy: $orderBy) {
-      ...PurposeCard
+  query FrontPage($orderBy: [PurposeOrderingChoices], $orderUnitsBy: [UnitOrderingChoices]) {
+    purposes(orderBy: $orderBy) {
+      edges {
+        node {
+          ...PurposeCard
+        }
+      }
     }
-    units(orderBy: $orderUnitsBy, filter: { publishedReservationUnits: true }) {
+    units(publishedReservationUnits: true, orderBy: $orderUnitsBy) {
       edges {
         node {
           ...UnitListFields

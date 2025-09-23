@@ -4,18 +4,15 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import lookup_property
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
 from utils.db import SubqueryArray
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnit, Resource, Unit
-    from tilavarauspalvelu.models._base import ManyToManyRelatedManager, OneToManyRelatedManager
-    from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
-    from tilavarauspalvelu.models.resource.queryset import ResourceQuerySet
+    from tilavarauspalvelu.models import Unit
 
     from .actions import SpaceActions
     from .queryset import SpaceManager
@@ -60,9 +57,6 @@ class Space(MPTTModel):
     objects: ClassVar[SpaceManager] = LazyModelManager.new()
     actions: SpaceActions = LazyModelAttribute.new()
     validators: SpaceValidator = LazyModelAttribute.new()
-
-    resources: OneToManyRelatedManager[Resource, ResourceQuerySet]
-    reservation_units: ManyToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
 
     class Meta:
         db_table = "space"

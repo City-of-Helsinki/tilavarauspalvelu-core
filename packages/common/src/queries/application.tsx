@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const APPLICANT_NAME_FRAGMENT = gql`
-  fragment ApplicationNameFields on ApplicationNode {
+  fragment ApplicationName on ApplicationNode {
     id
     applicantType
     organisationName
@@ -11,7 +11,7 @@ export const APPLICANT_NAME_FRAGMENT = gql`
 `;
 
 export const SUITABLE_TIME_FRAGMENT = gql`
-  fragment SuitableTimeFields on SuitableTimeRangeNode {
+  fragment SuitableTime on SuitableTimeRangeNode {
     id
     pk
     beginTime

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from tilavarauspalvelu.models import EquipmentCategory
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from django.db import models
 
 __all__ = [
     "EquipmentCategoryManager",
@@ -9,7 +8,7 @@ __all__ = [
 ]
 
 
-class EquipmentCategoryQuerySet(ModelQuerySet[EquipmentCategory]): ...
+class EquipmentCategoryQuerySet(models.QuerySet): ...
 
 
-class EquipmentCategoryManager(ModelManager[EquipmentCategory, EquipmentCategoryQuerySet]): ...
+class EquipmentCategoryManager(models.Manager.from_queryset(EquipmentCategoryQuerySet)): ...

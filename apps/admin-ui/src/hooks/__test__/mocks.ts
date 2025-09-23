@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 import { addDays, addHours, startOfDay } from "date-fns";
 import {
   ReservationSeriesDocument,
-  type ReservationSeriesPageFragment,
+  type ReservationSeriesQuery,
   ReservationStartInterval,
   ReservationStateChoice,
   ReservationTypeChoice,
@@ -10,7 +10,7 @@ import {
   UpdateReservationSeriesDocument,
   UpdateStaffReservationDocument,
 } from "@gql/gql-types";
-import { createNodeId } from "common/src/helpers";
+import { base64encode } from "common/src/helpers";
 import { toApiDateUnsafe } from "common/src/common/util";
 
 export const CHANGED_WORKING_MEMO = "Sisaisen kommentti";
@@ -57,7 +57,6 @@ type ReservationEdgeProps = {
   state?: ReservationStateChoice;
 };
 
-type ReservationT = NonNullable<ReservationSeriesPageFragment["reservationSeries"]>["reservations"][number];
 function createReservation({
   pk,
   recurringPk,
@@ -70,25 +69,26 @@ function createReservation({
   beginsAt: string;
   endsAt: string;
   state?: ReservationStateChoice;
-}): ReservationT {
+}): NonNullable<ReservationSeriesQuery["reservationSeries"]>["reservations"][number] {
   return {
     bufferTimeAfter: 0,
     bufferTimeBefore: 0,
     paymentOrder: null,
     reservationUnit: {
-      id: createNodeId("ReservationUnitNode", 1),
-      pk: 1,
+      id: base64encode("ReservationUnitNode:1"),
+      pk: null,
       bufferTimeBefore: 0,
       bufferTimeAfter: 0,
       reservationStartInterval: ReservationStartInterval.Interval_15Mins,
       unit: {
-        id: createNodeId("UnitNode", 1),
+        id: base64encode("UnitNode:1"),
         pk: 0,
       },
     },
     type: ReservationTypeChoice.Behalf,
+    handlingDetails: null,
     reservationSeries: {
-      id: createNodeId("ReservationSeriesNode", recurringPk),
+      id: base64encode(`ReservationSeriesNode:${recurringPk}`),
       pk: recurringPk,
       // TODO these should not be empty
       weekdays: [],
@@ -96,7 +96,7 @@ function createReservation({
       endDate: "",
     },
     state,
-    id: createNodeId("ReservationNode", pk),
+    id: base64encode(`ReservationNode:${pk}`),
     pk,
     beginsAt,
     endsAt,
@@ -107,7 +107,7 @@ function createReservationEdge({
   startingPk,
   recurringPk,
   state = ReservationStateChoice.Confirmed,
-}: ReservationEdgeProps): ReservationT[] {
+}: ReservationEdgeProps): NonNullable<ReservationSeriesQuery["reservationSeries"]>["reservations"] {
   const begin1 = getValidInterval(0)[0];
   const end1 = getValidInterval(0)[1];
   const begin2 = getValidInterval(7)[0];
@@ -153,17 +153,14 @@ function correctReservationSeriesQueryResult(
     startingPk,
     recurringPk,
   });
-  const reservationSeries: ReservationSeriesPageFragment["reservationSeries"] = {
-    id: createNodeId("ReservationSeriesNode", recurringPk),
+  const reservationSeries: NonNullable<ReservationSeriesQuery["reservationSeries"]> = {
+    id: base64encode(`ReservationSeriesNode:${recurringPk}`),
     pk: recurringPk,
     // TODO this should not be empty
-    weekdays: [] as const,
+    weekdays: [],
     // TODO refactor the magic numbers out
     beginDate: convertDate(getValidInterval(0)[0] ?? ""),
     endDate: convertDate(getValidInterval(7)[1] ?? ""),
-    recurrenceInDays: null,
-    endTime: "10:00",
-    beginTime: "11:00",
     reservations,
     rejectedOccurrences: [],
   };
@@ -173,7 +170,7 @@ function correctReservationSeriesQueryResult(
       request: {
         query: ReservationSeriesDocument,
         variables: {
-          id: createNodeId("ReservationSeriesNode", recurringPk),
+          id: base64encode(`ReservationSeriesNode:${recurringPk}`),
         },
       },
       result: {

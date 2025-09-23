@@ -8,15 +8,14 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from helsinki_gdpr.models import SerializableMixin
 from helusers.models import AbstractUser
-from lazy_managers import LazyModelAttribute, LazyModelManager
-from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.dataclasses import IDToken
-from tilavarauspalvelu.enums import Language, ReservationNotification, UserPermissionChoice, UserRoleChoice
+from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
 from tilavarauspalvelu.services.permission_resolver import PermissionResolver
 from utils.date_utils import DEFAULT_TIMEZONE
-from utils.mixins import SerializableModelMixin
+from utils.lazy import LazyModelAttribute, LazyModelManager
 from utils.utils import get_jwt_payload
 
 if TYPE_CHECKING:
@@ -24,21 +23,8 @@ if TYPE_CHECKING:
 
     from social_django.models import UserSocialAuth
 
-    from tilavarauspalvelu.models import (
-        Application,
-        GeneralRole,
-        PersonalInfoViewLog,
-        Reservation,
-        ReservationSeries,
-        UnitRole,
-    )
-    from tilavarauspalvelu.models._base import OneToManyRelatedManager
-    from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
-    from tilavarauspalvelu.models.general_role.queryset import GeneralRoleQuerySet
-    from tilavarauspalvelu.models.personal_info_view_log.queryset import PersonalInfoViewLogQuerySet
-    from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
-    from tilavarauspalvelu.models.reservation_series.queryset import ReservationSeriesQuerySet
-    from tilavarauspalvelu.models.unit_role.queryset import UnitRoleQuerySet
+    from tilavarauspalvelu.enums import UserPermissionChoice
+    from tilavarauspalvelu.models import UnitRole
     from tilavarauspalvelu.typing import ExtraData
 
     from .actions import UserActions
@@ -54,12 +40,18 @@ __all__ = [
 
 class User(AbstractUser):
     tvp_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    preferred_language: Language = TextChoicesField(choices_enum=Language, default=Language.FI, blank=True)
+    preferred_language: str = models.CharField(
+        max_length=8,
+        blank=True,
+        choices=settings.LANGUAGES,
+        default=settings.LANGUAGE_CODE,
+    )
     date_of_birth: datetime.date | None = models.DateField(null=True, blank=True)
     profile_id: str = models.CharField(max_length=255, blank=True, default="")
 
-    reservation_notification: ReservationNotification = TextChoicesField(
-        choices_enum=ReservationNotification,
+    reservation_notification: str = models.CharField(
+        max_length=32,
+        choices=ReservationNotification.choices,
         default=ReservationNotification.ONLY_HANDLING_REQUIRED,
     )
 
@@ -70,14 +62,6 @@ class User(AbstractUser):
     actions: UserActions = LazyModelAttribute.new()
     validators: UserValidator = LazyModelAttribute.new()
     permissions = PermissionResolver()
-
-    applications: OneToManyRelatedManager[Application, ApplicationQuerySet]
-    reservations: OneToManyRelatedManager[Reservation, ReservationQuerySet]
-    assigned_unit_roles: OneToManyRelatedManager[UnitRole, UnitRoleQuerySet]
-    assigned_general_roles: OneToManyRelatedManager[GeneralRole, GeneralRoleQuerySet]
-    reservation_series: OneToManyRelatedManager[ReservationSeries, ReservationSeriesQuerySet]
-    personal_info_view_logs: OneToManyRelatedManager[PersonalInfoViewLog, PersonalInfoViewLogQuerySet]
-    as_viewer_personal_info_view_logs: OneToManyRelatedManager[PersonalInfoViewLog, PersonalInfoViewLogQuerySet]
 
     class Meta:
         db_table = "user"
@@ -239,7 +223,7 @@ class User(AbstractUser):
 AnonymousUser.permissions = PermissionResolver()
 
 
-class ProfileUser(SerializableModelMixin, User):
+class ProfileUser(SerializableMixin, User):
     """User model for the GDPR API"""
 
     objects: ClassVar[ProfileUserManager] = LazyModelManager.new()

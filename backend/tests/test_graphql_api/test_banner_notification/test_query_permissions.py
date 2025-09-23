@@ -1,16 +1,14 @@
 from __future__ import annotations
 
-import datetime
 from typing import TYPE_CHECKING
 
 import pytest
+from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import BannerNotificationTarget, UserRoleChoice
-from utils.date_utils import local_datetime
 
-from tests.factories import BannerNotificationFactory, UserFactory
+from tests.factories import BannerNotificationFactory
 from tests.factories.banner_notification import BannerNotificationBuilder
-from tests.helpers import parametrize_helper
 
 from .helpers import FieldParams, TargetParams, UserType, UserTypeParams
 
@@ -35,11 +33,9 @@ def login_based_on_type(graphql, user_type: UserType) -> User | None:
         case UserType.SUPERUSER:
             return graphql.login_with_superuser()
         case UserType.STAFF:
-            user = UserFactory.create_with_general_role(role=UserRoleChoice.RESERVER)
-            return graphql.force_login(user)
+            return graphql.login_user_with_role(role=UserRoleChoice.RESERVER)
         case UserType.NOTIFICATION_MANAGER:
-            user = UserFactory.create_with_general_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
-            return graphql.force_login(user)
+            return graphql.login_user_with_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
 
 
 @pytest.mark.parametrize(
@@ -117,9 +113,10 @@ def test_user_permissions_on_banner_notifications(graphql, target, user_type, ex
 
     # when:
     # - User requests banner notifications visible for them
-    query = """
+    response = graphql(
+        """
         query {
-          bannerNotifications (filter: {isVisible: true}){
+          bannerNotifications (isVisible: true){
             edges {
               node {
                 messageFi
@@ -127,8 +124,8 @@ def test_user_permissions_on_banner_notifications(graphql, target, user_type, ex
             }
           }
         }
-    """
-    response = graphql(query)
+        """,
+    )
 
     # then:
     # - The response contains the expected amount of notifications
@@ -139,62 +136,62 @@ def test_user_permissions_on_banner_notifications(graphql, target, user_type, ex
     **parametrize_helper(
         {
             "Anonymous user should see notification meant for all": TargetParams(
-                target=BannerNotificationTarget.ALL,
+                target=BannerNotificationTarget.ALL.value,
                 user_type=UserType.ANONYMOUS,
                 expected=1,
             ),
             "Anonymous user should see notification meant for users": TargetParams(
-                target=BannerNotificationTarget.USER,
+                target=BannerNotificationTarget.USER.value,
                 user_type=UserType.ANONYMOUS,
                 expected=1,
             ),
             "Anonymous user should not see notification meant for staff": TargetParams(
-                target=BannerNotificationTarget.STAFF,
+                target=BannerNotificationTarget.STAFF.value,
                 user_type=UserType.ANONYMOUS,
                 expected=0,
             ),
             "Regular user should see notification meant for all": TargetParams(
-                target=BannerNotificationTarget.ALL,
+                target=BannerNotificationTarget.ALL.value,
                 user_type=UserType.REGULAR,
                 expected=1,
             ),
             "Regular user should see notification meant for users": TargetParams(
-                target=BannerNotificationTarget.USER,
+                target=BannerNotificationTarget.USER.value,
                 user_type=UserType.REGULAR,
                 expected=1,
             ),
             "Regular user should not see notification meant for staff": TargetParams(
-                target=BannerNotificationTarget.STAFF,
+                target=BannerNotificationTarget.STAFF.value,
                 user_type=UserType.REGULAR,
                 expected=0,
             ),
             "Staff user should see notification meant for all": TargetParams(
-                target=BannerNotificationTarget.ALL,
+                target=BannerNotificationTarget.ALL.value,
                 user_type=UserType.STAFF,
                 expected=1,
             ),
             "Staff user should not see notification meant for users": TargetParams(
-                target=BannerNotificationTarget.USER,
+                target=BannerNotificationTarget.USER.value,
                 user_type=UserType.STAFF,
                 expected=0,
             ),
             "Staff user should see notification meant for staff": TargetParams(
-                target=BannerNotificationTarget.STAFF,
+                target=BannerNotificationTarget.STAFF.value,
                 user_type=UserType.STAFF,
                 expected=1,
             ),
             "Notification manager should see notification meant for all": TargetParams(
-                target=BannerNotificationTarget.ALL,
+                target=BannerNotificationTarget.ALL.value,
                 user_type=UserType.NOTIFICATION_MANAGER,
                 expected=1,
             ),
             "Notification manager should see notification meant for users": TargetParams(
-                target=BannerNotificationTarget.USER,
+                target=BannerNotificationTarget.USER.value,
                 user_type=UserType.NOTIFICATION_MANAGER,
                 expected=1,
             ),
             "Notification manager should see notification meant for staff": TargetParams(
-                target=BannerNotificationTarget.STAFF,
+                target=BannerNotificationTarget.STAFF.value,
                 user_type=UserType.NOTIFICATION_MANAGER,
                 expected=1,
             ),
@@ -221,18 +218,19 @@ def test_user_permissions_on_banner_notifications_with_target_filter(graphql, ta
 
     # when:
     # - User requests banner notifications visible for them in the given target audience
-    query = """
-        query ($target: BannerNotificationTarget!) {
-          bannerNotifications (filter: {isVisible: true, target: $target}){
-            edges {
-              node {
+    response = graphql(
+        f"""
+        query {{
+          bannerNotifications (isVisible: true, target: {target}){{
+            edges {{
+              node {{
                 messageFi
-              }
-            }
-          }
-        }
-    """
-    response = graphql(query, variables={"target": target})
+              }}
+            }}
+          }}
+        }}
+        """,
+    )
 
     # then:
     # - The response contains the expected amount of notifications
@@ -294,9 +292,10 @@ def test_user_permissions_on_banner_notifications_without_target_filter(graphql,
 
     # when:
     # - User requests banner notifications visible for them (without target filter)
-    query = """
+    response = graphql(
+        """
         query {
-          bannerNotifications (filter: {isVisible: true}, orderBy: pkAsc) {
+          bannerNotifications (isVisible: true, orderBy: pkAsc) {
             edges {
               node {
                 messageFi
@@ -305,8 +304,8 @@ def test_user_permissions_on_banner_notifications_without_target_filter(graphql,
             }
           }
         }
-    """
-    response = graphql(query)
+        """
+    )
 
     # then:
     # - The response contains the expected notifications
@@ -360,9 +359,10 @@ def test_field_permissions_on_banner_notifications(graphql, field, user_type, ex
 
     # when:
     # - User requests given fields in banner notifications
-    query = f"""
+    response = graphql(
+        f"""
         query {{
-          bannerNotifications (filter: {{isVisible: true}}){{
+          bannerNotifications (isVisible: true){{
             edges {{
               node {{
                 {field}
@@ -370,8 +370,8 @@ def test_field_permissions_on_banner_notifications(graphql, field, user_type, ex
             }}
           }}
         }}
-    """
-    response = graphql(query)
+        """,
+    )
 
     # then:
     # - The response contains the expected amount of errors
@@ -413,9 +413,10 @@ def test_permissions_on_non_visible_banner_notifications(graphql, user_type, exp
 
     # when:
     # - User requests banner notifications visible for them
-    query = """
+    response = graphql(
+        """
         query {
-          bannerNotifications (filter: {isVisible: false}){
+          bannerNotifications (isVisible: false){
             edges {
               node {
                 messageFi
@@ -423,8 +424,8 @@ def test_permissions_on_non_visible_banner_notifications(graphql, user_type, exp
             }
           }
         }
-        """
-    response = graphql(query)
+        """,
+    )
 
     # then:
     # - The response contains the expected amount of notifications
@@ -434,19 +435,19 @@ def test_permissions_on_non_visible_banner_notifications(graphql, user_type, exp
 @pytest.mark.parametrize(
     **parametrize_helper(
         {
-            "Anonymous user": UserTypeParams(
+            "Anonymous user should not see a both visible and non-visible banner notifications": UserTypeParams(
                 user_type=UserType.ANONYMOUS,
-                expected=1,
+                expected=0,
             ),
-            "Regular user": UserTypeParams(
+            "Regular user should not see a both visible and non-visible banner notifications": UserTypeParams(
                 user_type=UserType.REGULAR,
-                expected=1,
+                expected=0,
             ),
-            "Staff user": UserTypeParams(
+            "Staff user should not see a both visible and non-visible banner notifications": UserTypeParams(
                 user_type=UserType.STAFF,
-                expected=1,
+                expected=0,
             ),
-            "Notification manager": UserTypeParams(
+            "Notification manager should see a both visible and non-visible banner notifications": UserTypeParams(
                 user_type=UserType.NOTIFICATION_MANAGER,
                 expected=2,
             ),
@@ -457,24 +458,14 @@ def test_permission_on_both_non_visible_and_visible_banner_notifications(graphql
     # given:
     # - There is a draft notification for all & an active notification for all
     # - User of the given type is using the system
-    now = local_datetime()
-
-    BannerNotificationFactory.create(
-        target=BannerNotificationTarget.ALL,
-        draft=True,
-    )
-    BannerNotificationFactory.create(
-        target=BannerNotificationTarget.ALL,
-        draft=False,
-        active_from=now - datetime.timedelta(days=1),
-        active_until=now + datetime.timedelta(days=1),
-    )
-
+    BannerNotificationFactory.create(target=BannerNotificationTarget.ALL, draft=True)
+    BannerNotificationBuilder().active().create(target=BannerNotificationTarget.ALL)
     login_based_on_type(graphql, user_type)
 
     # when:
     # - User requests all banner notifications
-    query = """
+    response = graphql(
+        """
         query {
           bannerNotifications {
             edges {
@@ -484,8 +475,8 @@ def test_permission_on_both_non_visible_and_visible_banner_notifications(graphql
             }
           }
         }
-    """
-    response = graphql(query)
+        """,
+    )
 
     # then:
     # - The response contains the expected amount of notifications

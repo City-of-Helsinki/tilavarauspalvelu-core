@@ -3,9 +3,8 @@ from __future__ import annotations
 import datetime
 
 from django.conf import settings
+from django.db import models
 
-from tilavarauspalvelu.models import UnitRole
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from utils.date_utils import local_date
 
 __all__ = [
@@ -14,7 +13,7 @@ __all__ = [
 ]
 
 
-class UnitRoleQuerySet(ModelQuerySet[UnitRole]):
+class UnitRoleQuerySet(models.QuerySet):
     def deactivate_old_permissions(self) -> None:
         today = local_date()
         cutoff = today - datetime.timedelta(days=settings.PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS)
@@ -26,4 +25,4 @@ class UnitRoleQuerySet(ModelQuerySet[UnitRole]):
         ).update(is_role_active=False)
 
 
-class UnitRoleManager(ModelManager[UnitRole, UnitRoleQuerySet]): ...
+class UnitRoleManager(models.Manager.from_queryset(UnitRoleQuerySet)): ...

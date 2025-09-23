@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import freezegun
 import pytest
+from graphene_django_extensions.testing import parametrize_helper
 
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
@@ -30,8 +31,6 @@ from utils.date_utils import (
     utc_time_max,
     utc_time_min,
 )
-
-from tests.helpers import parametrize_helper
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import Lang

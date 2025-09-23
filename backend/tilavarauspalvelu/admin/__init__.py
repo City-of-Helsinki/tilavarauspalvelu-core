@@ -6,7 +6,6 @@ from .application.admin import ApplicationAdmin
 from .application_round.admin import ApplicationRoundAdmin
 from .application_section.admin import ApplicationSectionAdmin
 from .banner_notification.admin import BannerNotificationAdmin
-from .email_message.admin import EmailMessageAdmin
 from .equipment.admin import EquipmentAdmin
 from .equipment_category.admin import EquipmentCategoryAdmin
 from .general_role.admin import GeneralRoleAdmin
@@ -46,7 +45,6 @@ __all__ = [
     "ApplicationRoundAdmin",
     "ApplicationSectionAdmin",
     "BannerNotificationAdmin",
-    "EmailMessageAdmin",
     "EquipmentAdmin",
     "EquipmentCategoryAdmin",
     "GeneralRoleAdmin",

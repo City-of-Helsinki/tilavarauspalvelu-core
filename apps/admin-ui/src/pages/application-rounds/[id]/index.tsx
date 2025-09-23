@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { errorToast } from "common/src/components/toast";
-import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
 import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "common/styled";
 import { Button, Tabs } from "hds-react";
@@ -69,12 +69,13 @@ export default function ApplicationRound({
   /// NOTE always valid since the application round exists if we are here
   const pk = applicationRoundOriginal?.pk ?? 0;
   const { data, previousData, refetch } = useApplicationRoundQuery({
-    variables: { id: createNodeId("ApplicationRoundNode", pk) },
+    variables: { id: base64encode(`ApplicationRoundNode:${pk}`) },
     pollInterval: isInProgress ? 10000 : 0,
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
     },
   });
+  const applicationRound = data?.applicationRound ?? previousData?.applicationRound ?? applicationRoundOriginal;
 
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
@@ -82,8 +83,7 @@ export default function ApplicationRound({
   // NOTE: useEffect works, onCompleted does not work with refetch
   useEffect(() => {
     if (data) {
-      const node = getNode(data);
-      setIsInProgress(isApplicationRoundInProgress(node));
+      setIsInProgress(isApplicationRoundInProgress(data.applicationRound));
     }
   }, [data]);
 
@@ -102,10 +102,6 @@ export default function ApplicationRound({
       }
     }
   }, [unitOptions, searchParams, setParams]);
-
-  const previousNode = getNode(previousData);
-  const node = getNode(data);
-  const applicationRound = node ?? previousNode ?? applicationRoundOriginal;
 
   const originalOptions = getFilterOptions(t, optionsData);
   const reservationUnitOptions = getRoundReservationUnitOptions(applicationRound);
@@ -227,9 +223,9 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
   const client = createClient(commonProps.apiBaseUrl, req);
   const { data } = await client.query<ApplicationRoundQuery, ApplicationRoundQueryVariables>({
     query: ApplicationRoundDocument,
-    variables: { id: createNodeId("ApplicationRoundNode", pk) },
+    variables: { id: base64encode(`ApplicationRoundNode:${pk}`) },
   });
-  const applicationRound = getNode(data);
+  const { applicationRound } = data;
   const units = filterNonNullable(applicationRound?.reservationUnits.map((x) => x.unit?.pk));
 
   if (!applicationRound) {
@@ -335,7 +331,7 @@ function isAllocationEnabled(
 function hasApplicationRoundEnded(applicationRound: Pick<ApplicationRoundAdminFragment, "status">): boolean {
   return (
     applicationRound.status === ApplicationRoundStatusChoice.Handled ||
-    applicationRound.status === ApplicationRoundStatusChoice.Sent
+    applicationRound.status === ApplicationRoundStatusChoice.ResultsSent
   );
 }
 
@@ -365,10 +361,8 @@ export const APPLICATION_ROUND_ADMIN_FRAGMENT = gql`
 
 export const APPLICATION_ROUND_QUERY = gql`
   query ApplicationRound($id: ID!) {
-    node(id: $id) {
-      ... on ApplicationRoundNode {
-        ...ApplicationRoundAdmin
-      }
+    applicationRound(id: $id) {
+      ...ApplicationRoundAdmin
     }
   }
 `;

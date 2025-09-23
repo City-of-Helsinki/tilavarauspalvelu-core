@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from tilavarauspalvelu.models import PaymentMerchant
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from django.db import models
 
 __all__ = [
     "PaymentMerchantManager",
@@ -9,7 +8,7 @@ __all__ = [
 ]
 
 
-class PaymentMerchantQuerySet(ModelQuerySet[PaymentMerchant]): ...
+class PaymentMerchantQuerySet(models.QuerySet): ...
 
 
-class PaymentMerchantManager(ModelManager[PaymentMerchant, PaymentMerchantQuerySet]): ...
+class PaymentMerchantManager(models.Manager.from_queryset(PaymentMerchantQuerySet)): ...

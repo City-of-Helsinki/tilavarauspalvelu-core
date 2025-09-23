@@ -21,7 +21,7 @@ def test_update_space(graphql):
 
     # when:
     # - User tries to update the space's name
-    response = graphql(UPDATE_MUTATION, variables={"input": {"pk": space.pk, "nameFi": "bar"}})
+    response = graphql(UPDATE_MUTATION, input_data={"pk": space.pk, "nameFi": "bar"})
 
     # then:
     # - The response has no errors
@@ -41,12 +41,12 @@ def test_update_space__name_fi_cannot_be_empty(graphql, name):
 
     # when:
     # - User tries to update the space's name
-    response = graphql(UPDATE_MUTATION, variables={"input": {"pk": space.pk, "nameFi": name}})
+    response = graphql(UPDATE_MUTATION, input_data={"pk": space.pk, "name": name})
 
     # then:
     # - The response has errors about nameFi field
     # - The space is not updated in the database
-
-    assert response.error_message(0) == "This field cannot be blank."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("name") == ["This field may not be blank."]
     space.refresh_from_db()
     assert space.name_fi == "foo"

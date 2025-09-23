@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import pytest
+from graphene_django_extensions.testing import build_query
 
 from tests.helpers import TranslationsFromPOFiles
-from tests.query_builder import build_query
 
 # Applied to all tests
 pytestmark = [
@@ -11,7 +11,7 @@ pytestmark = [
 ]
 
 
-QUERY = build_query("allReservationCancelReasons", fields="value reasonFi reasonEn reasonSv")
+QUERY = build_query("reservationCancelReasons", fields="value reasonFi reasonEn reasonSv")
 
 DATA = [
     {
@@ -61,7 +61,7 @@ def test_reservation_cancel_reasons__query(graphql):
 
     assert response.has_errors is False
 
-    assert response.results == DATA
+    assert response.first_query_object == DATA
 
 
 def test_reservation_cancel_reasons__query__anonymous_user(graphql):
@@ -70,4 +70,4 @@ def test_reservation_cancel_reasons__query__anonymous_user(graphql):
 
     assert response.has_errors is False
 
-    assert response.results == DATA
+    assert response.first_query_object == DATA

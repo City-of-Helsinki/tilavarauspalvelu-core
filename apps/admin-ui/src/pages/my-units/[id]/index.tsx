@@ -6,7 +6,7 @@ import { Flex, H1, TabWrapper, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { formatAddress } from "@/common/util";
 import { getReservationSeriesUrl } from "@/common/urls";
-import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
   UnitViewDocument,
   type UnitViewQuery,
@@ -59,10 +59,9 @@ export default function MyUnitsPage({ unit }: Pick<PropsNarrowed, "unit">): JSX.
 
   const recurringReservationUrl = getReservationSeriesUrl(unit.pk);
 
-  const reservationUnitOptions = unit.reservationUnits.map(({ pk, nameFi, isDraft }) => ({
+  const reservationUnitOptions = (unit?.reservationUnits ?? []).map(({ pk, nameFi }) => ({
     label: nameFi ?? "-",
-    value: pk,
-    isDraft,
+    value: pk ?? 0,
   }));
 
   const modalCloseRef = useRef<HTMLInputElement | null>(null);
@@ -180,12 +179,13 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
 
   const commonProps = await getCommonServerSideProps();
   const apolloClient = createClient(commonProps.apiBaseUrl ?? "", req);
+  const id = base64encode(`UnitNode:${pk}`);
   const { data } = await apolloClient.query<UnitViewQuery, UnitViewQueryVariables>({
     query: UnitViewDocument,
-    variables: { id: createNodeId("UnitNode", pk) },
+    variables: { id },
   });
 
-  const unit = getNode(data);
+  const { unit } = data;
   if (unit == null) {
     return NOT_FOUND_SSR_VALUE;
   }
@@ -201,21 +201,18 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
 
 export const UNIT_VIEW_QUERY = gql`
   query UnitView($id: ID!) {
-    node(id: $id) {
-      ... on UnitNode {
+    unit(id: $id) {
+      id
+      pk
+      nameFi
+      ...LocationFields
+      reservationUnits {
         id
         pk
         nameFi
-        ...LocationFields
-        reservationUnits {
+        spaces {
           id
           pk
-          nameFi
-          isDraft
-          spaces {
-            id
-            pk
-          }
         }
       }
     }

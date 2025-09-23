@@ -14,13 +14,12 @@ export function ShowWhenTargetInvisible({ target, children }: Props): JSX.Elemen
   };
 
   useEffect(() => {
-    // oxlint-disable react/exhaustive-deps -- only on page load
     window.removeEventListener("scroll", onScroll);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", onScroll);
     };
-    // oxlint-enable react/exhaustive-deps -- only on page load
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!visible) return <> </>;

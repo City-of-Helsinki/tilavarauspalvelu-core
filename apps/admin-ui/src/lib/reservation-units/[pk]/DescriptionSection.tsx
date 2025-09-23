@@ -23,9 +23,9 @@ export function DescriptionSection({
   reservationUnitTypes,
 }: Readonly<{
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  equipments: ReservationUnitEditorParametersQuery["allEquipments"] | undefined;
-  purposes: ReservationUnitEditorParametersQuery["allPurposes"] | undefined;
-  reservationUnitTypes: ReservationUnitEditorParametersQuery["allReservationUnitTypes"] | undefined;
+  equipments: ReservationUnitEditorParametersQuery["equipmentsAll"] | undefined;
+  purposes: ReservationUnitEditorParametersQuery["purposes"] | undefined;
+  reservationUnitTypes: ReservationUnitEditorParametersQuery["reservationUnitTypes"] | undefined;
 }>) {
   const { t } = useTranslation();
   const { control, formState } = form;
@@ -36,11 +36,11 @@ export function DescriptionSection({
     label: n.nameFi ?? "no-name",
   }));
 
-  const purposeOptions = filterNonNullable(purposes).map((n) => ({
+  const purposeOptions = filterNonNullable(purposes?.edges.map((n) => n?.node)).map((n) => ({
     value: n.pk ?? -1,
     label: n.nameFi ?? "no-name",
   }));
-  const reservationUnitTypeOptions = filterNonNullable(reservationUnitTypes).map((n) => ({
+  const reservationUnitTypeOptions = filterNonNullable(reservationUnitTypes?.edges.map((n) => n?.node)).map((n) => ({
     value: n.pk ?? -1,
     label: n.nameFi ?? "no-name",
   }));

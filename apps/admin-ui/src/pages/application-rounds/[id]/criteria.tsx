@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { H1, H3, SemiBold, Strong, CenterSpinner, Flex, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useApplicationRoundCriteriaQuery, UserPermissionChoice } from "@gql/gql-types";
-import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { formatDate } from "@/common/util";
 import { errorToast } from "common/src/components/toast";
 import { Accordion as AccordionBase } from "@/component/Accordion";
@@ -44,14 +44,16 @@ const ReservationUnit = styled.div`
 function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): JSX.Element {
   const { t } = useTranslation();
 
+  const id = base64encode(`ApplicationRoundNode:${applicationRoundPk}`);
   const { data, loading } = useApplicationRoundCriteriaQuery({
-    variables: { id: createNodeId("ApplicationRoundNode", applicationRoundPk) },
+    variables: { id },
     skip: !applicationRoundPk,
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
     },
   });
-  const applicationRound = getNode(data);
+  const { applicationRound } = data ?? {};
+  const reservationUnits = filterNonNullable(applicationRound?.reservationUnits);
 
   if (loading) {
     return <CenterSpinner />;
@@ -60,7 +62,6 @@ function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): JSX.E
     return <div>Error: failed to load application round</div>;
   }
 
-  const reservationUnits = filterNonNullable(applicationRound.reservationUnits);
   return (
     <>
       <TitleSection>
@@ -141,28 +142,26 @@ export async function getServerSideProps({ locale, query }: GetServerSidePropsCo
 
 export const APPLICATION_ROUND_QUERY = gql`
   query ApplicationRoundCriteria($id: ID!) {
-    node(id: $id) {
-      ... on ApplicationRoundNode {
+    applicationRound(id: $id) {
+      id
+      pk
+      nameFi
+      reservationUnitCount
+      applicationPeriodBeginsAt
+      applicationPeriodEndsAt
+      reservationPeriodBeginDate
+      reservationPeriodEndDate
+      reservationUnits {
         id
         pk
         nameFi
-        reservationUnitCount
-        applicationPeriodBeginsAt
-        applicationPeriodEndsAt
-        reservationPeriodBeginDate
-        reservationPeriodEndDate
-        reservationUnits {
+        spaces {
           id
-          pk
           nameFi
-          spaces {
-            id
-            nameFi
-          }
-          unit {
-            id
-            nameFi
-          }
+        }
+        unit {
+          id
+          nameFi
         }
       }
     }

@@ -21,7 +21,7 @@ def test_application__restore_all_options(graphql):
     assert option.is_rejected is True
 
     graphql.login_with_superuser()
-    response = graphql(RESTORE_MUTATION, variables={"input": {"pk": application.pk}})
+    response = graphql(RESTORE_MUTATION, input_data={"pk": application.pk})
 
     assert response.has_errors is False, response
 
@@ -35,7 +35,7 @@ def test_application__restore_all_options__general_admin(graphql):
     admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
-    response = graphql(RESTORE_MUTATION, variables={"input": {"pk": application.pk}})
+    response = graphql(RESTORE_MUTATION, input_data={"pk": application.pk})
 
     assert response.has_errors is False
 
@@ -48,7 +48,7 @@ def test_application__restore_all_options__unit_admin(graphql):
     admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
-    response = graphql(RESTORE_MUTATION, variables={"input": {"pk": application.pk}})
+    response = graphql(RESTORE_MUTATION, input_data={"pk": application.pk})
 
     assert response.has_errors is False
 
@@ -63,9 +63,9 @@ def test_application__restore_all_options__unit_admin__no_permission_for_all_uni
     admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
-    response = graphql(RESTORE_MUTATION, variables={"input": {"pk": application.pk}})
+    response = graphql(RESTORE_MUTATION, input_data={"pk": application.pk})
 
-    assert response.error_message(0) == "No permission to restore all application options."
+    assert response.error_message() == "No permission to update."
 
 
 def test_application__restore_all_options__unit_admin__has_permission_for_all_units(graphql):
@@ -81,6 +81,6 @@ def test_application__restore_all_options__unit_admin__has_permission_for_all_un
     admin = UserFactory.create_with_unit_role(units=[unit_1, unit_2])
     graphql.force_login(admin)
 
-    response = graphql(RESTORE_MUTATION, variables={"input": {"pk": application.pk}})
+    response = graphql(RESTORE_MUTATION, input_data={"pk": application.pk})
 
     assert response.has_errors is False, response.errors

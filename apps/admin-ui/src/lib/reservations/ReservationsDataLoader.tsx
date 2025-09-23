@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
-import { ReservationOrderSet, useReservationListQuery, type ReservationListQueryVariables } from "@gql/gql-types";
+import {
+  ReservationOrderingChoices,
+  useReservationListQuery,
+  type ReservationListQueryVariables,
+} from "@gql/gql-types";
 import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { ReservationsTable } from "./ReservationsTable";
@@ -104,7 +108,7 @@ export function ReservationsDataLoader(): JSX.Element {
 
   const currData = data ?? previousData;
 
-  const reservations = filterNonNullable(currData?.reservations?.edges?.map((edge) => edge?.node));
+  const reservations = filterNonNullable(currData?.reservations?.edges.map((edge) => edge?.node));
   const totalCount = currData?.reservations?.totalCount;
 
   if (loading && reservations.length === 0) {
@@ -124,34 +128,40 @@ export function ReservationsDataLoader(): JSX.Element {
   );
 }
 
-function transformOrderBy(orderBy: string, desc: boolean): ReservationOrderSet | null {
+function transformOrderBy(orderBy: string, desc: boolean): ReservationOrderingChoices | null {
   switch (orderBy) {
     case "pk":
-      return desc ? ReservationOrderSet.PkDesc : ReservationOrderSet.PkAsc;
+      return desc ? ReservationOrderingChoices.PkDesc : ReservationOrderingChoices.PkAsc;
     case "begin":
-      return desc ? ReservationOrderSet.BeginsAtDesc : ReservationOrderSet.BeginsAtAsc;
+      return desc ? ReservationOrderingChoices.BeginsAtDesc : ReservationOrderingChoices.BeginsAtAsc;
     case "end":
-      return desc ? ReservationOrderSet.EndsAtDesc : ReservationOrderSet.EndsAtAsc;
+      return desc ? ReservationOrderingChoices.EndsAtDesc : ReservationOrderingChoices.EndsAtAsc;
     case "created_at":
-      return desc ? ReservationOrderSet.CreatedAtDesc : ReservationOrderSet.CreatedAtAsc;
+      return desc ? ReservationOrderingChoices.CreatedAtDesc : ReservationOrderingChoices.CreatedAtAsc;
     case "reservee_name":
-      return desc ? ReservationOrderSet.ReserveeNameDesc : ReservationOrderSet.ReserveeNameAsc;
+      return desc ? ReservationOrderingChoices.ReserveeNameDesc : ReservationOrderingChoices.ReserveeNameAsc;
     case "reservation_unit_name_fi":
-      return desc ? ReservationOrderSet.ReservationUnitNameFiDesc : ReservationOrderSet.ReservationUnitNameFiAsc;
+      return desc
+        ? ReservationOrderingChoices.ReservationUnitNameFiDesc
+        : ReservationOrderingChoices.ReservationUnitNameFiAsc;
     case "unit_name_fi":
-      return desc ? ReservationOrderSet.UnitNameFiDesc : ReservationOrderSet.UnitNameFiAsc;
+      return desc ? ReservationOrderingChoices.UnitNameFiDesc : ReservationOrderingChoices.UnitNameFiAsc;
     // NOTE inconsistent naming
     case "orderStatus":
-      return desc ? ReservationOrderSet.OrderStatusDesc : ReservationOrderSet.OrderStatusAsc;
+      return desc ? ReservationOrderingChoices.OrderStatusDesc : ReservationOrderingChoices.OrderStatusAsc;
     case "state":
-      return desc ? ReservationOrderSet.StateDesc : ReservationOrderSet.StateAsc;
+      return desc ? ReservationOrderingChoices.StateDesc : ReservationOrderingChoices.StateAsc;
     default:
       return null;
   }
 }
 
-function transformSortString(orderBy: string | null): ReservationOrderSet[] {
-  const defaultSort = [ReservationOrderSet.StateDesc, ReservationOrderSet.BeginsAtAsc, ReservationOrderSet.EndsAtAsc];
+function transformSortString(orderBy: string | null): ReservationOrderingChoices[] {
+  const defaultSort = [
+    ReservationOrderingChoices.StateDesc,
+    ReservationOrderingChoices.BeginsAtAsc,
+    ReservationOrderingChoices.EndsAtAsc,
+  ];
   if (!orderBy) {
     return defaultSort;
   }
@@ -163,59 +173,56 @@ function transformSortString(orderBy: string | null): ReservationOrderSet[] {
     return defaultSort;
   }
 
-  if (transformed === ReservationOrderSet.BeginsAtAsc) {
-    return [transformed, ReservationOrderSet.EndsAtAsc];
+  if (transformed === ReservationOrderingChoices.BeginsAtAsc) {
+    return [transformed, ReservationOrderingChoices.EndsAtAsc];
   }
-  if (transformed === ReservationOrderSet.BeginsAtDesc) {
-    return [transformed, ReservationOrderSet.EndsAtDesc];
+  if (transformed === ReservationOrderingChoices.BeginsAtDesc) {
+    return [transformed, ReservationOrderingChoices.EndsAtDesc];
   }
-  return [transformed, ReservationOrderSet.BeginsAtAsc, ReservationOrderSet.EndsAtAsc];
+  return [transformed, ReservationOrderingChoices.BeginsAtAsc, ReservationOrderingChoices.EndsAtAsc];
 }
 
 export const RESERVATION_LIST_QUERY = gql`
   query ReservationList(
     $first: Int
     $after: String
-    $orderBy: [ReservationOrderSet!]
-    # Filter
-    $applyingForFreeOfCharge: Boolean
+    $orderBy: [ReservationOrderingChoices]
+    $unit: [Int]
+    $reservationUnits: [Int]
+    $reservationUnitType: [Int]
+    $reservationType: [ReservationTypeChoice]
+    $state: [ReservationStateChoice]
+    $orderStatus: [OrderStatusWithFree]
+    $textSearch: String
+    $priceLte: Decimal
+    $priceGte: Decimal
     $beginDate: Date
+    $endDate: Date
     $createdAtGte: Date
     $createdAtLte: Date
-    $endDate: Date
+    $applyingForFreeOfCharge: Boolean
     $isRecurring: Boolean
-    $orderStatus: [OrderStatusWithFree!]
-    $priceGte: Decimal
-    $priceLte: Decimal
-    $reservationType: [ReservationTypeChoice!]
-    $reservationUnitType: [Int!]
-    $reservationUnits: [Int!]
-    $state: [ReservationStateChoice!]
-    $textSearch: String
-    $unit: [Int!]
   ) {
     reservations(
       first: $first
       after: $after
       orderBy: $orderBy
-      filter: {
-        applyingForFreeOfCharge: $applyingForFreeOfCharge
-        beginDate: $beginDate
-        createdAfter: $createdAtGte
-        createdBefore: $createdAtLte
-        endDate: $endDate
-        isRecurring: $isRecurring
-        onlyWithPermission: true
-        orderStatus: $orderStatus
-        priceGte: $priceGte
-        priceLte: $priceLte
-        reservationType: $reservationType
-        reservationUnit: $reservationUnits
-        reservationUnitType: $reservationUnitType
-        state: $state
-        textSearch: $textSearch
-        unit: $unit
-      }
+      unit: $unit
+      reservationUnits: $reservationUnits
+      reservationUnitType: $reservationUnitType
+      reservationType: $reservationType
+      state: $state
+      orderStatus: $orderStatus
+      textSearch: $textSearch
+      priceLte: $priceLte
+      priceGte: $priceGte
+      beginDate: $beginDate
+      endDate: $endDate
+      createdAtGte: $createdAtGte
+      createdAtLte: $createdAtLte
+      isRecurring: $isRecurring
+      applyingForFreeOfCharge: $applyingForFreeOfCharge
+      onlyWithPermission: true
     ) {
       edges {
         node {

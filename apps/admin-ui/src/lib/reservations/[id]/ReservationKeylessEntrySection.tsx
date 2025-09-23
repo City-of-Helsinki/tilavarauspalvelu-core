@@ -331,7 +331,7 @@ function AccessCodeChangeRepairButton({
 }
 
 export const CHANGE_RESERVATION_ACCESS_CODE_SINGLE = gql`
-  mutation ChangeReservationAccessCodeSingle($input: ReservationStaffChangeAccessCodeMutation!) {
+  mutation ChangeReservationAccessCodeSingle($input: ReservationStaffChangeAccessCodeMutationInput!) {
     staffChangeReservationAccessCode(input: $input) {
       pk
       accessCodeIsActive
@@ -341,7 +341,7 @@ export const CHANGE_RESERVATION_ACCESS_CODE_SINGLE = gql`
 `;
 
 export const REPAIR_RESERVATION_ACCESS_CODE_SINGLE = gql`
-  mutation RepairReservationAccessCodeSingle($input: ReservationStaffRepairAccessCodeMutation!) {
+  mutation RepairReservationAccessCodeSingle($input: ReservationStaffRepairAccessCodeMutationInput!) {
     staffRepairReservationAccessCode(input: $input) {
       pk
       accessCodeIsActive
@@ -351,7 +351,7 @@ export const REPAIR_RESERVATION_ACCESS_CODE_SINGLE = gql`
 `;
 
 export const CHANGE_RESERVATION_ACCESS_CODE_SERIES = gql`
-  mutation ChangeReservationAccessCodeSeries($input: ReservationSeriesChangeAccessCodeMutation!) {
+  mutation ChangeReservationAccessCodeSeries($input: ReservationSeriesChangeAccessCodeMutationInput!) {
     changeReservationSeriesAccessCode(input: $input) {
       pk
       accessCodeIsActive
@@ -361,8 +361,9 @@ export const CHANGE_RESERVATION_ACCESS_CODE_SERIES = gql`
 `;
 
 export const REPAIR_RESERVATION_ACCESS_CODE_SERIES = gql`
-  mutation RepairReservationAccessCodeSeries($input: ReservationSeriesRepairAccessCodeMutation!) {
+  mutation RepairReservationAccessCodeSeries($input: ReservationSeriesRepairAccessCodeMutationInput!) {
     repairReservationSeriesAccessCode(input: $input) {
+      pk
       accessCodeIsActive
       accessCodeGeneratedAt
     }

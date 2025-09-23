@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 import freezegun
 import pytest
 from graphql import OperationType
-from undine.relay import to_global_id
+from graphql_relay import to_global_id
 
 from tilavarauspalvelu.enums import AccessType, BannerNotificationTarget, ReservationStateChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
@@ -85,8 +85,8 @@ def test_frontend_queries__customer_ui__AffectingReservations__regular(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert isinstance(response.results, list)
-    assert len(response.results) != 0
+    assert isinstance(response.first_query_object, list)
+    assert len(response.first_query_object) != 0
 
 
 def test_frontend_queries__customer_ui__ApplicationRound__regular(graphql):
@@ -166,11 +166,11 @@ def test_frontend_queries__customer_ui__ApplicationRoundsUi__regular(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__ShowNotificationsList__regular(graphql):
+def test_frontend_queries__customer_ui__BannerNotificationsList__regular(graphql):
     customer_factories = get_customer_query_info()
-    factories = customer_factories["ShowNotificationsList"]
+    factories = customer_factories["BannerNotificationsList"]
 
-    assert len(factories) == 2
+    assert len(factories) == 1
     query_info = factories[0]
 
     now = local_datetime()
@@ -188,6 +188,38 @@ def test_frontend_queries__customer_ui__ShowNotificationsList__regular(graphql):
 
     variables = deepcopy(query_info.variables)
     variables["target"] = obj.target
+    assert_no_undefined_variables(variables)
+
+    query = query_info.query
+    graphql.login_with_regular_user()
+
+    response = graphql(query, variables=variables)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+
+
+def test_frontend_queries__customer_ui__BannerNotificationsListAll__regular(graphql):
+    customer_factories = get_customer_query_info()
+    factories = customer_factories["BannerNotificationsListAll"]
+
+    assert len(factories) == 1
+    query_info = factories[0]
+
+    now = local_datetime()
+
+    factory_args = deepcopy(query_info.factory_args)
+    factory_args["message"] = "foo"
+    factory_args["message_en"] = "foo"
+    factory_args["message_fi"] = "foo"
+    factory_args["message_sv"] = "foo"
+    factory_args["draft"] = False
+    factory_args["active_from"] = now - datetime.timedelta(days=1)
+    factory_args["active_until"] = now + datetime.timedelta(days=1)
+    factory_args["target"] = BannerNotificationTarget.ALL
+    query_info.factory.create(**factory_args)
+
+    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -218,7 +250,7 @@ def test_frontend_queries__customer_ui__CurrentUser__regular(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert response.results is not None
+    assert response.first_query_object is not None
 
 
 def test_frontend_queries__customer_ui__FrontPage__regular(graphql):
@@ -433,7 +465,7 @@ def test_frontend_queries__customer_ui__TermsOfUse__regular(graphql):
     obj: TermsOfUse = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
-    variables["termsType"] = obj.terms_type
+    variables["termsType"] = obj.terms_type.upper()
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -442,7 +474,7 @@ def test_frontend_queries__customer_ui__TermsOfUse__regular(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert len(response.results) == 1
+    assert len(response.edges) == 1
 
 
 # Regular - Has permission if own application / reservation
@@ -488,7 +520,7 @@ def test_frontend_queries__customer_ui__AccessCode__regular(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert response.results == {
+    assert response.first_query_object == {
         "id": variables["id"],
         "pindoraInfo": {
             "accessCode": "123456",
@@ -535,7 +567,7 @@ def test_frontend_queries__customer_ui__ApplicationPage1__regular(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert isinstance(response.results, dict)
+    assert isinstance(response.first_query_object, dict)
 
 
 def test_frontend_queries__customer_ui__ApplicationPage2__regular(graphql):
@@ -574,7 +606,7 @@ def test_frontend_queries__customer_ui__ApplicationPage2__regular(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert isinstance(response.results, dict)
+    assert isinstance(response.first_query_object, dict)
 
 
 def test_frontend_queries__customer_ui__ApplicationPage3__regular(graphql):
@@ -613,7 +645,7 @@ def test_frontend_queries__customer_ui__ApplicationPage3__regular(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert isinstance(response.results, dict)
+    assert isinstance(response.first_query_object, dict)
 
 
 def test_frontend_queries__customer_ui__ApplicationPage4__regular(graphql):
@@ -652,7 +684,7 @@ def test_frontend_queries__customer_ui__ApplicationPage4__regular(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert isinstance(response.results, dict)
+    assert isinstance(response.first_query_object, dict)
 
 
 def test_frontend_queries__customer_ui__ApplicationReservationSeries__regular(graphql):
@@ -678,7 +710,7 @@ def test_frontend_queries__customer_ui__ApplicationReservationSeries__regular(gr
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert isinstance(response.results, dict)
+    assert isinstance(response.first_query_object, dict)
 
 
 def test_frontend_queries__customer_ui__ApplicationReservations__regular(graphql):
@@ -708,39 +740,42 @@ def test_frontend_queries__customer_ui__ApplicationReservations__regular(graphql
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert isinstance(response.results, dict)
+    assert isinstance(response.first_query_object, dict)
 
 
 def test_frontend_queries__customer_ui__ApplicationSectionCancel__regular(graphql):
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationSectionCancel"]
 
-    assert len(factories) == 1
-    query_info = factories[0]
+    assert len(factories) == 2
+    query_info_1 = factories[0]
+    query_info_2 = factories[1]
 
     user = graphql.login_with_regular_user()
 
     series_key = "reservation_unit_options__allocated_time_slots__reservation_series"
 
     # Make sure the application has been handled and results sent to users
-    factory_args = deepcopy(query_info.factory_args)
-    factory_args["application__user"] = user
-    factory_args["application__application_round__handled_at"] = local_datetime()
-    factory_args["application__application_round__sent_at"] = local_datetime()
-    factory_args[f"{series_key}__user"] = user
-    factory_args[f"{series_key}__reservations__user"] = user
-    obj = ApplicationSectionFactory.create_in_status_handled(**factory_args)
+    factory_args_1 = deepcopy(query_info_1.factory_args)
+    factory_args_1["application__user"] = user
+    factory_args_1["application__application_round__handled_at"] = local_datetime()
+    factory_args_1["application__application_round__sent_at"] = local_datetime()
+    factory_args_1[f"{series_key}__user"] = user
+    factory_args_1[f"{series_key}__reservations__user"] = user
+    obj = ApplicationSectionFactory.create_in_status_handled(**factory_args_1)
 
-    variables = query_info.variables
-    variables["id"] = to_global_id(query_info.typename, obj.id)
+    assert query_info_2.factory is None  # ReservationCancelReason is an enum, no factory is needed.
+
+    variables = query_info_1.variables
+    variables["id"] = to_global_id(query_info_1.typename, obj.id)
     assert_no_undefined_variables(variables)
 
-    query = query_info.query
+    query = query_info_1.query
 
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert isinstance(response.results, dict)
+    assert isinstance(response.first_query_object, dict)
 
 
 def test_frontend_queries__customer_ui__ApplicationSectionView__regular(graphql):
@@ -772,7 +807,7 @@ def test_frontend_queries__customer_ui__ApplicationSectionView__regular(graphql)
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert isinstance(response.results, dict)
+    assert isinstance(response.first_query_object, dict)
 
 
 def test_frontend_queries__customer_ui__ApplicationSentPage__regular(graphql):
@@ -797,7 +832,7 @@ def test_frontend_queries__customer_ui__ApplicationSentPage__regular(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert isinstance(response.results, dict)
+    assert isinstance(response.first_query_object, dict)
 
 
 def test_frontend_queries__customer_ui__ApplicationView__regular(graphql):
@@ -836,7 +871,7 @@ def test_frontend_queries__customer_ui__ApplicationView__regular(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert isinstance(response.results, dict)
+    assert isinstance(response.first_query_object, dict)
 
 
 def test_frontend_queries__customer_ui__Applications__regular(graphql):
@@ -919,7 +954,7 @@ def test_frontend_queries__customer_ui__Order__regular(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert isinstance(response.results, dict)
+    assert isinstance(response.first_query_object, dict)
 
 
 def test_frontend_queries__customer_ui__Reservation__regular(graphql):
@@ -944,36 +979,39 @@ def test_frontend_queries__customer_ui__Reservation__regular(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert isinstance(response.results, dict)
+    assert isinstance(response.first_query_object, dict)
 
 
 def test_frontend_queries__customer_ui__ReservationCancelPage__regular(graphql):
     customer_factories = get_customer_query_info()
     factories = customer_factories["ReservationCancelPage"]
 
-    assert len(factories) == 1
-    query_info = factories[0]
+    assert len(factories) == 2
+    query_info_1 = factories[0]
+    query_info_2 = factories[1]
 
     user = graphql.login_with_regular_user()
 
     apl_key = "reservation_series__allocated_time_slot__reservation_unit_option__application_section__application"
 
-    factory_args = deepcopy(query_info.factory_args)
-    factory_args["user"] = user
-    factory_args["reservation_series__user"] = user
-    factory_args[f"{apl_key}__user"] = user
-    obj = query_info.factory.create(**factory_args)
+    factory_args_1 = deepcopy(query_info_1.factory_args)
+    factory_args_1["user"] = user
+    factory_args_1["reservation_series__user"] = user
+    factory_args_1[f"{apl_key}__user"] = user
+    obj = query_info_1.factory.create(**factory_args_1)
 
-    variables = query_info.variables
-    variables["id"] = to_global_id(query_info.typename, obj.id)
+    assert query_info_2.factory is None  # ReservationCancelReason is an enum, no factory is needed.
+
+    variables = query_info_1.variables
+    variables["id"] = to_global_id(query_info_1.typename, obj.id)
     assert_no_undefined_variables(variables)
 
-    query = query_info.query
+    query = query_info_1.query
 
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert isinstance(response.results, dict)
+    assert isinstance(response.first_query_object, dict)
 
 
 def test_frontend_queries__customer_ui__ReservationEditPage__regular(graphql):
@@ -1009,7 +1047,7 @@ def test_frontend_queries__customer_ui__ReservationEditPage__regular(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert isinstance(response.results, dict)
+    assert isinstance(response.first_query_object, dict)
 
 
 def test_frontend_queries__customer_ui__ReservationPage__regular(graphql):
@@ -1035,4 +1073,4 @@ def test_frontend_queries__customer_ui__ReservationPage__regular(graphql):
     response = graphql(query, variables=variables)
 
     assert response.has_errors is False, response.errors
-    assert isinstance(response.results, dict)
+    assert isinstance(response.first_query_object, dict)

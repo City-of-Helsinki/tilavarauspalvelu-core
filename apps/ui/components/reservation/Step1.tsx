@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
-import { type ReservationInProgressFragment } from "@gql/gql-types";
+import { type ReservationQuery } from "@gql/gql-types";
 import { Button, ButtonVariant, IconArrowLeft, LoadingSpinner, Notification } from "hds-react";
 import { useFormContext } from "react-hook-form";
 import { type OptionsRecord } from "common";
@@ -9,10 +9,11 @@ import { ActionContainer } from "./styles";
 import { ApplicationFields, GeneralFields } from "./SummaryFields";
 import { AcceptTerms } from "./AcceptTerms";
 
+type NodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
-  reservation: ReservationInProgressFragment;
+  reservation: NodeT;
   supportedFields: FieldName[];
-  options: Omit<OptionsRecord, "municipalities">;
+  options: Omit<OptionsRecord, "municipality">;
   requiresPayment: boolean;
   setStep: React.Dispatch<React.SetStateAction<number>>;
 };

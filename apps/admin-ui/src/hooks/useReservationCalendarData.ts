@@ -8,7 +8,7 @@ import {
 import { useTranslation } from "next-i18next";
 import { toApiDate } from "common/src/common/util";
 import { errorToast } from "common/src/components/toast";
-import { createNodeId } from "common/src/helpers";
+import { base64encode } from "common/src/helpers";
 import { type CalendarEventType } from "@/modules/reservation";
 import { combineAffectingReservations } from "@/helpers";
 
@@ -28,14 +28,17 @@ export function useReservationCalendarData({
 }) {
   const { t } = useTranslation();
 
+  const today = new Date();
+
+  const id = base64encode(`ReservationUnitNode:${reservationUnitPk}`);
   const { data, ...rest } = useReservationsByReservationUnitQuery({
     fetchPolicy: "no-cache",
     skip: !reservationUnitPk,
     variables: {
-      id: createNodeId("ReservationUnitNode", reservationUnitPk ?? 0),
+      id,
       pk: reservationUnitPk ?? 0,
-      beginDate: toApiDate(begin) ?? "",
-      endDate: toApiDate(end) ?? "",
+      beginDate: toApiDate(begin ?? today) ?? "",
+      endDate: toApiDate(end ?? today) ?? "",
       // NOTE we need denied to show the past reservations
       state: [
         ReservationStateChoice.Confirmed,
@@ -51,10 +54,7 @@ export function useReservationCalendarData({
 
   const blockedName = t("reservationUnit:reservationState.RESERVATION_CLOSED");
 
-  const reservations =
-    data?.node != null && "reservations" in data.node
-      ? combineAffectingReservations({ ...data, node: data.node }, reservationUnitPk)
-      : [];
+  const reservations = combineAffectingReservations(data, reservationUnitPk);
 
   const events =
     reservations

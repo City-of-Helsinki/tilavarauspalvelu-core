@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { ReservationSeriesForm } from "@lib/my-units/[id]/recurring/ReservationSeriesForm";
 import { LinkPrev } from "@/component/LinkPrev";
 import { H1 } from "common/styled";
-import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -52,12 +52,11 @@ export async function getServerSideProps({ query, locale, req }: GetServerSidePr
   }
   const commonProps = await getCommonServerSideProps();
   const apolloClient = createClient(commonProps.apiBaseUrl, req);
-  const { data } = await apolloClient.query<SeriesReservationUnitQuery, SeriesReservationUnitQueryVariables>({
+  const unitData = await apolloClient.query<SeriesReservationUnitQuery, SeriesReservationUnitQueryVariables>({
     query: SeriesReservationUnitDocument,
-    variables: { id: createNodeId("UnitNode", unitPk) },
+    variables: { id: base64encode(`UnitNode:${unitPk}`) },
   });
-  const unit = getNode(data);
-  const reservationUnits = unit?.reservationUnits ?? [];
+  const reservationUnits = unitData.data.unit?.reservationUnits ?? [];
   return {
     props: {
       unitPk,
@@ -70,19 +69,17 @@ export async function getServerSideProps({ query, locale, req }: GetServerSidePr
 
 export const SERIES_RESERVATION_UNIT_QUERY = gql`
   query SeriesReservationUnit($id: ID!) {
-    node(id: $id) {
-      ... on UnitNode {
+    unit(id: $id) {
+      id
+      nameFi
+      pk
+      reservationUnits {
         id
-        nameFi
         pk
-        reservationUnits {
-          id
-          pk
-          nameFi
-          reservationStartInterval
-          bufferTimeBefore
-          bufferTimeAfter
-        }
+        nameFi
+        reservationStartInterval
+        bufferTimeBefore
+        bufferTimeAfter
       }
     }
   }

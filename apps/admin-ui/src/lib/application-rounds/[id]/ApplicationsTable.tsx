@@ -179,7 +179,7 @@ export const APPLICATIONS_TABLE_ELEMENT_FRAGMENT = gql`
     id
     pk
     status
-    ...ApplicationNameFields
+    ...ApplicationName
     organisationIdentifier
     applicationSections {
       id

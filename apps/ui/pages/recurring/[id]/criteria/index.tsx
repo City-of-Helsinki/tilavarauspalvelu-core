@@ -11,7 +11,7 @@ import {
 import { Flex, H1 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { Sanitize } from "common/src/components/Sanitize";
-import { createNodeId, capitalize, ignoreMaybeArray, toNumber, getNode } from "common/src/helpers";
+import { base64encode, capitalize, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
@@ -108,11 +108,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { data } = await apolloClient.query<ApplicationRoundCriteriaQuery, ApplicationRoundCriteriaQueryVariables>({
     query: ApplicationRoundCriteriaDocument,
     variables: {
-      id: createNodeId("ApplicationRoundNode", pk),
+      id: base64encode(`ApplicationRoundNode:${pk}`),
     },
   });
 
-  const applicationRound = getNode(data);
+  const { applicationRound } = data;
   if (applicationRound == null) {
     return notFound;
   }
@@ -129,20 +129,18 @@ export default Criteria;
 
 export const APPLICATION_ROUND_CRITERIA_QUERY = gql`
   query ApplicationRoundCriteria($id: ID!) {
-    node(id: $id) {
-      ... on ApplicationRoundNode {
-        pk
-        id
-        nameFi
-        nameEn
-        nameSv
-        criteriaFi
-        criteriaEn
-        criteriaSv
-        notesWhenApplyingFi
-        notesWhenApplyingEn
-        notesWhenApplyingSv
-      }
+    applicationRound(id: $id) {
+      pk
+      id
+      nameFi
+      nameEn
+      nameSv
+      criteriaFi
+      criteriaEn
+      criteriaSv
+      notesWhenApplyingFi
+      notesWhenApplyingEn
+      notesWhenApplyingSv
     }
   }
 `;

@@ -4,14 +4,10 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from lazy_managers import LazyModelAttribute, LazyModelManager
+
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Unit, UnitRole
-    from tilavarauspalvelu.models._base import ManyToManyRelatedManager
-    from tilavarauspalvelu.models.unit.queryset import UnitQuerySet
-    from tilavarauspalvelu.models.unit_role.queryset import UnitRoleQuerySet
-
     from .actions import UnitGroupActions
     from .queryset import UnitGroupManager
     from .validators import UnitGroupValidator
@@ -25,10 +21,7 @@ __all__ = [
 class UnitGroup(models.Model):
     name: str = models.CharField(max_length=255)
 
-    units: ManyToManyRelatedManager[Unit, UnitQuerySet] = models.ManyToManyField(
-        "tilavarauspalvelu.Unit",
-        related_name="unit_groups",
-    )
+    units = models.ManyToManyField("tilavarauspalvelu.Unit", related_name="unit_groups")
 
     # Translated field hints
     name_fi: str | None
@@ -38,8 +31,6 @@ class UnitGroup(models.Model):
     objects: ClassVar[UnitGroupManager] = LazyModelManager.new()
     actions: UnitGroupActions = LazyModelAttribute.new()
     validators: UnitGroupValidator = LazyModelAttribute.new()
-
-    unit_roles: ManyToManyRelatedManager[UnitRole, UnitRoleQuerySet]
 
     class Meta:
         db_table = "unit_group"

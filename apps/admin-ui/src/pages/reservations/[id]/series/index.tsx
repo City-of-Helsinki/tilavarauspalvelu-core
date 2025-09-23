@@ -8,22 +8,15 @@ import {
   ReservationSeriesDocument,
   type ReservationSeriesQuery,
   type ReservationSeriesQueryVariables,
-  type ReservationSeriesRescheduleMutation,
-  type ReservationSeriesPageFragment,
+  ReservationSeriesRescheduleMutationInput,
   ReservationStartInterval,
   ReservationTypeChoice,
+  type SeriesPageQuery,
   useRescheduleReservationSeriesMutation,
   UserPermissionChoice,
   useSeriesPageQuery,
 } from "@gql/gql-types";
-import {
-  calculateMedian,
-  createNodeId,
-  filterNonNullable,
-  getNode,
-  ignoreMaybeArray,
-  toNumber,
-} from "common/src/helpers";
+import { base64encode, calculateMedian, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { format, isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Element } from "@/styled";
@@ -56,7 +49,9 @@ import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { createClient } from "@/common/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";
 
-function convertToForm(value: ReservationSeriesPageFragment["reservationSeries"]): RescheduleReservationSeriesForm {
+type NodeT = NonNullable<SeriesPageQuery["reservation"]>["reservationSeries"];
+
+function convertToForm(value: NodeT): RescheduleReservationSeriesForm {
   // buffer times can be changed individually but the base value is not saved to the recurring series
   // so we take the most common value from all future reservations
   const reservations = filterNonNullable(value?.reservations).filter((x) => new Date(x.beginsAt) >= new Date());
@@ -99,10 +94,9 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
   const apolloClient = createClient(commonProps.apiBaseUrl, req);
   const { data } = await apolloClient.query<ReservationPermissionsQuery, ReservationPermissionsQueryVariables>({
     query: ReservationPermissionsDocument,
-    variables: { id: createNodeId("ReservationNode", pk) },
+    variables: { id: base64encode(`ReservationNode:${pk}`) },
   });
-  const node = getNode(data);
-  const unitPk = node?.reservationUnit?.unit?.pk;
+  const unitPk = data?.reservation?.reservationUnit?.unit?.pk;
   if (unitPk == null) {
     return NOT_FOUND_SSR_VALUE;
   }
@@ -120,9 +114,9 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
 function SeriesPageInner({ pk }: { pk: number }) {
   const { t } = useTranslation();
   const { data, refetch, error, loading } = useSeriesPageQuery({
-    variables: { id: createNodeId("ReservationNode", pk) },
+    variables: { id: base64encode(`ReservationNode:${pk}`) },
   });
-  const reservation = getNode(data);
+  const { reservation } = data ?? {};
   const reservationSeries = reservation?.reservationSeries ?? null;
 
   const [mutate] = useRescheduleReservationSeriesMutation();
@@ -216,15 +210,15 @@ function SeriesPageInner({ pk }: { pk: number }) {
     const bufferTimeAfter = getBufferTime(reservationUnit.bufferTimeAfter, values.type, values.bufferTimeAfter);
 
     try {
-      const input: ReservationSeriesRescheduleMutation = {
+      const input: ReservationSeriesRescheduleMutationInput = {
         pk: reservationSeries.pk,
         beginDate: toApiDateUnsafe(fromUIDateUnsafe(values.startingDate)),
         beginTime: values.startTime,
         endDate: toApiDateUnsafe(fromUIDateUnsafe(values.endingDate)),
         endTime: values.endTime,
         weekdays: values.repeatOnDays,
-        bufferTimeBefore: bufferTimeBefore,
-        bufferTimeAfter: bufferTimeAfter,
+        bufferTimeBefore: bufferTimeBefore.toString(),
+        bufferTimeAfter: bufferTimeAfter.toString(),
         skipDates: skipDates.map((x) => toApiDateUnsafe(x)),
       };
       const mutRes = await mutate({ variables: { input } });
@@ -238,12 +232,11 @@ function SeriesPageInner({ pk }: { pk: number }) {
       const seriesPk = mutRes.data.rescheduleReservationSeries.pk;
       const res = await client.query<ReservationSeriesQuery, ReservationSeriesQueryVariables>({
         query: ReservationSeriesDocument,
-        variables: { id: createNodeId("ReservationSeriesNode", seriesPk) },
+        variables: { id: base64encode(`ReservationSeriesNode:${seriesPk}`) },
         // NOTE disable cache is mandatory, all the old data is invalid here
         fetchPolicy: "no-cache",
       });
-
-      const d = getNode(res.data);
+      const d = res.data?.reservationSeries;
       const createdReservations = filterNonNullable(d?.reservations);
       // find the first reservation that is in the future and redirect to it
       const first = createdReservations.find((x) => new Date(x.beginsAt) >= new Date()) ?? createdReservations[0];
@@ -384,42 +377,34 @@ function SeriesPageInner({ pk }: { pk: number }) {
   );
 }
 
-export const SERIES_PAGE_FRAGMENT = gql`
-  fragment ReservationSeriesPage on ReservationNode {
-    id
-    pk
-    type
-    reservationSeries {
-      ...ReservationSeriesFields
-      recurrenceInDays
-      endTime
-      beginTime
-    }
-    reservationUnit {
-      id
-      pk
-      nameFi
-      bufferTimeBefore
-      bufferTimeAfter
-      reservationStartInterval
-    }
-  }
-`;
-
 // TODO can we make ReservationSeries fragment smaller?
 // it has paymentOrder and reservationUnit for each reservation (not necessary)
 export const SERIES_PAGE_QUERY = gql`
   query SeriesPage($id: ID!) {
-    node(id: $id) {
-      ... on ReservationNode {
-        ...ReservationSeriesPage
+    reservation(id: $id) {
+      id
+      pk
+      type
+      reservationSeries {
+        ...ReservationSeriesFields
+        recurrenceInDays
+        endTime
+        beginTime
+      }
+      reservationUnit {
+        id
+        pk
+        nameFi
+        bufferTimeBefore
+        bufferTimeAfter
+        reservationStartInterval
       }
     }
   }
 `;
 
 export const RescheduleReservationSeries = gql`
-  mutation RescheduleReservationSeries($input: ReservationSeriesRescheduleMutation!) {
+  mutation RescheduleReservationSeries($input: ReservationSeriesRescheduleMutationInput!) {
     rescheduleReservationSeries(input: $input) {
       pk
     }

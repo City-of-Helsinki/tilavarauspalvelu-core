@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 import { TabWrapper, H1, CenterSpinner } from "common/styled";
 import {
   ReservationStateChoice,
-  ReservationOrderSet,
+  ReservationOrderingChoices,
   useListReservationsQuery,
   ReservationTypeChoice,
 } from "@gql/gql-types";
@@ -58,7 +58,8 @@ function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
               ReservationStateChoice.WaitingForPayment,
               ReservationStateChoice.Denied,
             ],
-      orderBy: tab === "upcoming" ? [ReservationOrderSet.BeginsAtAsc] : [ReservationOrderSet.BeginsAtDesc],
+      orderBy:
+        tab === "upcoming" ? [ReservationOrderingChoices.BeginsAtAsc] : [ReservationOrderingChoices.BeginsAtDesc],
       user: currentUser?.pk ?? 0,
       // NOTE today's reservations are always shown in upcoming (even when they are in the past)
       beginDate: tab === "upcoming" ? toApiDate(today) : undefined,
@@ -174,25 +175,22 @@ export default Reservations;
 // NOTE bang user ID so this doesn't get abused (don't use it without a user)
 export const LIST_RESERVATIONS = gql`
   query ListReservations(
-    $orderBy: [ReservationOrderSet!]
-    # Filter
     $beginDate: Date
     $endDate: Date
-    $reservationType: [ReservationTypeChoice!]!
-    $reservationUnits: [Int!]
-    $state: [ReservationStateChoice!]
-    $user: [Int!]
+    $state: [ReservationStateChoice]
+    $user: [Int]
+    $reservationUnits: [Int]
+    $orderBy: [ReservationOrderingChoices]
+    $reservationType: [ReservationTypeChoice]!
   ) {
     reservations(
+      beginDate: $beginDate
+      endDate: $endDate
+      state: $state
+      user: $user
+      reservationUnits: $reservationUnits
       orderBy: $orderBy
-      filter: {
-        beginDate: $beginDate
-        endDate: $endDate
-        reservationType: $reservationType
-        reservationUnit: $reservationUnits
-        state: $state
-        user: $user
-      }
+      reservationType: $reservationType
     ) {
       edges {
         node {

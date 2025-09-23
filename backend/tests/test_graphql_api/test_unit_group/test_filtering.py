@@ -20,8 +20,8 @@ def test_units__filter__only_with_permission__regular_user(graphql):
     query = unit_groups_query(only_with_permission=True)
     response = graphql(query)
 
-    assert response.has_errors is False, response.errors
-    assert response.results == []
+    assert response.has_errors is True
+    assert response.error_message() == "No permission to access node."
 
 
 def test_units__filter__only_with_permission__general_admin(graphql):
@@ -34,7 +34,7 @@ def test_units__filter__only_with_permission__general_admin(graphql):
     response = graphql(query)
 
     assert response.has_errors is False
-    assert len(response.results) == 1
+    assert len(response.edges) == 1
 
 
 def test_units__filter__only_with_permission__unit_group_admin(graphql):
@@ -49,8 +49,8 @@ def test_units__filter__only_with_permission__unit_group_admin(graphql):
     response = graphql(query)
 
     assert response.has_errors is False
-    assert len(response.results) == 1
-    assert response.results[0] == {"pk": unit_group.pk}
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": unit_group.pk}
 
 
 def test_units__filter__only_with_permission__unit_admin(graphql):
@@ -65,8 +65,8 @@ def test_units__filter__only_with_permission__unit_admin(graphql):
     response = graphql(query)
 
     assert response.has_errors is False
-    assert len(response.results) == 1
-    assert response.results[0] == {"pk": unit_group.pk}
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": unit_group.pk}
 
 
 def test_units__filter__application_round(graphql):
@@ -83,5 +83,5 @@ def test_units__filter__application_round(graphql):
     response = graphql(query)
 
     assert response.has_errors is False
-    assert len(response.results) == 1
-    assert response.results[0] == {"pk": unit_group.pk}
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": unit_group.pk}

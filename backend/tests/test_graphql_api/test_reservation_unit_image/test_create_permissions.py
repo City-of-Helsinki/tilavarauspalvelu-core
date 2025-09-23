@@ -7,7 +7,6 @@ import pytest
 from tilavarauspalvelu.enums import ReservationUnitImageType
 
 from tests.factories import ReservationUnitFactory
-from tests.helpers import create_png
 
 from .helpers import CREATE_MUTATION
 
@@ -20,19 +19,19 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit_image__create__regular_user(graphql):
+def test_reservation_unit_image__create__regular_user(graphql, mock_png):
     reservation_unit = ReservationUnitFactory.create()
 
     graphql.login_with_regular_user()
 
     data = {
-        "image": create_png(),
-        "imageType": ReservationUnitImageType.MAIN,
+        "image": mock_png,
+        "imageType": ReservationUnitImageType.MAIN.value.upper(),
         "reservationUnit": reservation_unit.id,
     }
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "No permission to create a reservation unit image"
+    assert response.error_message() == "No permission to create."
 
     reservation_unit_image: ReservationUnitImage | None = reservation_unit.images.first()
     assert reservation_unit_image is None

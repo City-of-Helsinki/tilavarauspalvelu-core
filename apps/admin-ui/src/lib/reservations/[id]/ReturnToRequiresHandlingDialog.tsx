@@ -81,7 +81,7 @@ export function ReturnToRequiresHandlingDialog({
 }
 
 export const REQUIRE_HANDLING_RESERVATION = gql`
-  mutation RequireHandling($input: ReservationRequiresHandlingMutation!) {
+  mutation RequireHandling($input: ReservationRequiresHandlingMutationInput!) {
     requireHandlingForReservation(input: $input) {
       pk
       state

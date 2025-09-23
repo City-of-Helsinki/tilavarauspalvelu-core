@@ -40,7 +40,7 @@ def test_reservation_unit__update__timeslots__add(graphql):
 
     # when:
     # - The user tries to update a reservation unit with new timeslots
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors
@@ -81,7 +81,7 @@ def test_reservation_unit__update__timeslots__replace(graphql):
 
     # when:
     # - The user tries to update a reservation unit with new timeslots
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors
@@ -110,7 +110,7 @@ def test_reservation_unit__update__timeslots__remove_all(graphql):
 
     # when:
     # - The user tries to update a reservation unit without new timeslots
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors
@@ -143,12 +143,12 @@ def test_reservation_unit__update__timeslots__weekday_required(graphql):
     # when:
     # - The user tries to update a reservation unit with new timeslots
     # - The timeslots are missing the required weekday field
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors about requiring weekday
     assert response.has_errors is True, response
-    assert response.error_message(0) == "'weekday' is required for new timeslots."
+    assert "Field 'weekday' of required" in response.error_message()
 
 
 def test_reservation_unit__update__timeslots__begin_before_end(graphql):
@@ -174,13 +174,19 @@ def test_reservation_unit__update__timeslots__begin_before_end(graphql):
     # when:
     # - The user tries to update a reservation unit with new timeslots
     # - The timeslots are missing the required weekday field
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors about end time being before begin time
     assert response.has_errors is True, response
-
-    assert response.error_message(0) == "Timeslot 1 begin time must be before end time."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRoundTimeSlots") == [
+        {
+            "reservableTimes": [
+                "Timeslot 1 begin time must be before end time.",
+            ],
+        }
+    ]
 
 
 def test_reservation_unit__update__timeslots__overlapping_reservable_times(graphql):
@@ -207,15 +213,19 @@ def test_reservation_unit__update__timeslots__overlapping_reservable_times(graph
     # when:
     # - The user tries to update a reservation unit with new timeslots
     # - The timeslots are missing the required weekday field
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors about overlapping reservable times
     assert response.has_errors is True, response
-
-    assert response.error_message(0) == (
-        "Timeslot 1 (10:00:00 - 12:00:00) overlaps with timeslot 2 (11:00:00 - 15:00:00)."
-    )
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRoundTimeSlots") == [
+        {
+            "reservableTimes": [
+                "Timeslot 1 (10:00:00 - 12:00:00) overlaps with timeslot 2 (11:00:00 - 15:00:00).",
+            ],
+        }
+    ]
 
 
 def test_reservation_unit__update__timeslots__two_for_same_day(graphql):
@@ -245,13 +255,15 @@ def test_reservation_unit__update__timeslots__two_for_same_day(graphql):
     # when:
     # - The user tries to update a reservation unit with new timeslots
     # - The timeslots are missing the required weekday field
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors about multiple timeslots for the same day
     assert response.has_errors is True, response
-
-    assert response.error_message(0) == "Got multiple timeslots for Monday."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRoundTimeSlots") == [
+        "Got multiple timeslots for Monday.",
+    ]
 
 
 def test_reservation_unit__update__timeslots__open_has_no_reservable_times(graphql):
@@ -275,13 +287,15 @@ def test_reservation_unit__update__timeslots__open_has_no_reservable_times(graph
     # when:
     # - The user tries to update a reservation unit with new timeslots
     # - The timeslots are missing the required weekday field
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors about no reservable times
     assert response.has_errors is True, response
-
-    assert response.error_message(0) == "Open timeslots must have reservable times."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRoundTimeSlots") == [
+        "Open timeslots must have reservable times.",
+    ]
 
 
 def test_reservation_unit__update__timeslots__closed_has_reservable_times(graphql):
@@ -308,13 +322,15 @@ def test_reservation_unit__update__timeslots__closed_has_reservable_times(graphq
     # when:
     # - The user tries to update a reservation unit with new timeslots
     # - The timeslots are missing the required weekday field
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors about closed timeslot having reservable times
     assert response.has_errors is True, response
-
-    assert response.error_message(0) == "Closed timeslots cannot have reservable times."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRoundTimeSlots") == [
+        "Closed timeslots cannot have reservable times.",
+    ]
 
 
 def test_reservation_unit__update__reservation_block_whole_day(graphql):
@@ -327,7 +343,7 @@ def test_reservation_unit__update__reservation_block_whole_day(graphql):
         "pricings": [],
     }
 
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 

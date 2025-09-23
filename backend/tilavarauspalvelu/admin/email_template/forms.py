@@ -86,19 +86,6 @@ class AllocationForm(forms.Form):
     reservation_unit_name = forms.CharField(widget=text_widget)
 
 
-class AccessTypeForm(forms.Form):
-    access_type = forms.ChoiceField(choices=AccessType.choices)
-    begin_date = forms.CharField(widget=text_widget)
-    end_date = forms.CharField(widget=text_widget, required=False)
-
-
-class ReservationUnitForm(forms.Form):
-    reservation_unit_name = forms.CharField(widget=text_widget)
-    unit_name = forms.CharField(widget=text_widget)
-    unit_location = forms.CharField(widget=text_widget)
-    access_types = DynamicArrayField(NestedFormField(AccessTypeForm), initial=[])
-
-
 def get_email_tester_form_fields() -> dict[str, Any]:
     initial = get_mock_params(language="fi", access_code_is_used=True)
 
@@ -108,12 +95,7 @@ def get_email_tester_form_fields() -> dict[str, Any]:
         "access_code_validity_period": forms.CharField(
             initial=initial["access_code_validity_period"], widget=text_widget
         ),
-        "access_type": forms.ChoiceField(choices=AccessType.choices, initial=initial["access_type"]),
-        "change_date": forms.DateField(initial=initial["change_date"], widget=date_widget),
         "allocations": DynamicArrayField(NestedFormField(AllocationForm), initial=initial["allocations"]),
-        "reservation_units": DynamicArrayField(
-            NestedFormField(ReservationUnitForm), initial=initial["reservation_units"]
-        ),
         "application_id": forms.IntegerField(initial=initial["application_id"], widget=number_widget),
         "application_round_name": forms.CharField(initial=initial["application_round_name"], widget=text_widget),
         "application_section_id": forms.IntegerField(initial=initial["application_section_id"], widget=number_widget),

@@ -41,15 +41,15 @@ def test_staff_repair_access_code__regular_user(graphql):
     }
 
     graphql.login_with_regular_user()
-    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
+    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "No permission to update this reservation."
+    assert response.error_message() == "No permission to update."
 
     assert PindoraService.sync_access_code.call_count == 0
 
 
 @patch_method(PindoraService.sync_access_code)
-@patch_method(EmailService.send_reservation_access_type_changed_email)
+@patch_method(EmailService.send_reservation_access_code_added_email)
 def test_staff_repair_access_code__unit_handler(graphql):
     now = local_datetime()
 
@@ -78,16 +78,16 @@ def test_staff_repair_access_code__unit_handler(graphql):
     user = UserFactory.create_with_unit_role(role=UserRoleChoice.HANDLER, units=[reservation_unit.unit])
 
     graphql.force_login(user)
-    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
+    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
     assert PindoraService.sync_access_code.call_count == 1
-    assert EmailService.send_reservation_access_type_changed_email.call_count == 1
+    assert EmailService.send_reservation_access_code_added_email.call_count == 1
 
 
 @patch_method(PindoraService.sync_access_code)
-@patch_method(EmailService.send_reservation_access_type_changed_email)
+@patch_method(EmailService.send_reservation_access_code_added_email)
 def test_staff_repair_access_code__general_handler(graphql):
     now = local_datetime()
 
@@ -114,9 +114,9 @@ def test_staff_repair_access_code__general_handler(graphql):
     user = UserFactory.create_with_general_role(role=UserRoleChoice.HANDLER)
 
     graphql.force_login(user)
-    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
+    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
     assert PindoraService.sync_access_code.call_count == 1
-    assert EmailService.send_reservation_access_type_changed_email.call_count == 1
+    assert EmailService.send_reservation_access_code_added_email.call_count == 1

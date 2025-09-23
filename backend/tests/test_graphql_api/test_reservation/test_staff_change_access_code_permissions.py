@@ -37,9 +37,9 @@ def test_staff_change_access_code__regular_user(graphql):
     }
 
     graphql.login_with_regular_user()
-    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "No permission to change this reservation's access code."
+    assert response.error_message() == "No permission to update."
 
     assert PindoraService.change_access_code.call_count == 0
     assert PindoraService.activate_access_code.call_count == 0
@@ -74,7 +74,7 @@ def test_staff_change_access_code__unit_handler(graphql):
     user = UserFactory.create_with_unit_role(role=UserRoleChoice.HANDLER, units=[reservation_unit.unit])
 
     graphql.force_login(user)
-    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -110,7 +110,7 @@ def test_staff_change_access_code__general_handler(graphql):
     user = UserFactory.create_with_general_role(role=UserRoleChoice.HANDLER)
 
     graphql.force_login(user)
-    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, variables={"input": data})
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 

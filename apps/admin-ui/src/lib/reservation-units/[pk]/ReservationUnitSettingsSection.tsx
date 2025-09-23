@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { type FieldValues, useController, type UseControllerProps, UseFormReturn } from "react-hook-form";
-import { AuthenticationType, ReservationStartInterval } from "@gql/gql-types";
+import { Authentication, ReservationStartInterval } from "@gql/gql-types";
 import { AutoGrid, Flex } from "common/styled";
 import { ControlledSelect, ControlledCheckbox, DateTimeInput } from "common/src/components/form";
 import { getTranslatedError } from "@/common/util";
@@ -91,7 +91,7 @@ export function ReservationUnitSettingsSection({
     label: t(`translation:reservationStartInterval.${choice}`),
   }));
 
-  const authenticationOptions = Object.values(AuthenticationType).map((choice) => ({
+  const authenticationOptions = Object.values(Authentication).map((choice) => ({
     value: choice,
     label: t(`translation:authentication.${choice}`),
   }));

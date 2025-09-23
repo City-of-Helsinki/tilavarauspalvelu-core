@@ -61,7 +61,7 @@ def test_application_section__order__by_application_id__asc(graphql):
 
     # when:
     # - User tries to order application sections by application id ascending
-    query = sections_query(order_by="applicationAsc")
+    query = sections_query(order_by="applicationPkAsc")
     response = graphql(query)
 
     # then:
@@ -81,7 +81,7 @@ def test_application_section__order__by_application_id__desc(graphql):
 
     # when:
     # - User tries to order application sections by application id descending
-    query = sections_query(order_by="applicationDesc")
+    query = sections_query(order_by="applicationPkDesc")
     response = graphql(query)
 
     # then:

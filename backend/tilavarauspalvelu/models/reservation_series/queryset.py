@@ -6,8 +6,7 @@ from django.db import models
 from lookup_property import L
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
-from tilavarauspalvelu.models import Reservation, ReservationSeries
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models import Reservation
 from utils.date_utils import local_datetime
 from utils.db import Now
 
@@ -20,7 +19,7 @@ __all__ = [
 ]
 
 
-class ReservationSeriesQuerySet(ModelQuerySet[ReservationSeries]):
+class ReservationSeriesQuerySet(models.QuerySet):
     def requiring_access_code(self) -> Self:
         """Return all reservation series that should have an access code but don't."""
         return self.alias(
@@ -64,4 +63,12 @@ class ReservationSeriesQuerySet(ModelQuerySet[ReservationSeries]):
         return self.filter(**{lookup: ref})
 
 
-class ReservationSeriesManager(ModelManager[ReservationSeries, ReservationSeriesQuerySet]): ...
+# Need to do this to get proper type hints in the manager methods, since
+# 'from_queryset' returns a subclass of Manager, but is not typed correctly...
+_BaseManager: type[models.Manager] = models.Manager.from_queryset(ReservationSeriesQuerySet)  # type: ignore[assignment]
+
+
+class ReservationSeriesManager(_BaseManager):
+    # Define to get type hints for queryset methods.
+    def all(self) -> ReservationSeriesQuerySet:
+        return super().all()  # type: ignore[return-value]

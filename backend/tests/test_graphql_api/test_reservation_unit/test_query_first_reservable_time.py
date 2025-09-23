@@ -3,12 +3,13 @@ from __future__ import annotations
 import datetime
 import json
 from dataclasses import asdict, dataclass
+from functools import partial
 from typing import TYPE_CHECKING, Any, NamedTuple
 
 import freezegun
 import pytest
 from django.core.cache import cache
-from pytest_undine.client import GraphQLClientHTTPResponse
+from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -31,9 +32,12 @@ from tests.factories import (
     ResourceFactory,
     SpaceFactory,
 )
-from tests.helpers import parametrize_helper
+
+from .helpers import reservation_units_query
 
 if TYPE_CHECKING:
+    from graphene_django_extensions.testing.client import GQLResponse
+
     from tilavarauspalvelu.models import ReservationUnit
 
 # Applied to all tests
@@ -41,68 +45,16 @@ pytestmark = [
     pytest.mark.django_db,
 ]
 
-
-RESERVATION_UNITS_RESERVABLE_QUERY = """
-    query (
-        $reservable_date_start: Date
-        $reservable_date_end: Date
-        $reservable_time_start: Time
-        $reservable_time_end: Time
-        $reservable_minimum_duration_minutes: Int
-        $show_only_reservable: Boolean! = false
-    ) {
-        reservationUnits(
-            firstReservableTime: {
-                reservableDateStart: $reservable_date_start
-                reservableDateEnd: $reservable_date_end
-                reservableTimeStart: $reservable_time_start
-                reservableTimeEnd: $reservable_time_end
-                reservableMinimumDurationMinutes: $reservable_minimum_duration_minutes
-                showOnlyReservable: $show_only_reservable
-            }
-        ) {
-            edges {
-                node {
-                    isClosed
-                    firstReservableDatetime
-                }
-            }
-        }
-    }
-"""
-
-
-RESERVATION_UNITS_RESERVABLE_QUERY_PK = """
-    query (
-        $reservable_date_start: Date
-        $reservable_date_end: Date
-        $reservable_time_start: Time
-        $reservable_time_end: Time
-        $reservable_minimum_duration_minutes: Int
-        $show_only_reservable: Boolean! = false
-    ) {
-        reservationUnits(
-            firstReservableTime: {
-                reservableDateStart: $reservable_date_start
-                reservableDateEnd: $reservable_date_end
-                reservableTimeStart: $reservable_time_start
-                reservableTimeEnd: $reservable_time_end
-                reservableMinimumDurationMinutes: $reservable_minimum_duration_minutes
-                showOnlyReservable: $show_only_reservable
-            }
-        ) {
-            edges {
-                node {
-                    pk
-                    isClosed
-                    firstReservableDatetime
-                }
-            }
-        }
-    }
-"""
-
-
+reservation_units_reservable_query = partial(
+    reservation_units_query,
+    fields="isClosed firstReservableDatetime",
+    calculate_first_reservable_time=True,
+)
+reservation_units_reservable_query_access_type = partial(
+    reservation_units_query,
+    fields="pk isClosed firstReservableDatetime effectiveAccessType",
+    calculate_first_reservable_time=True,
+)
 NEXT_YEAR = datetime.date.today().year + 1
 
 
@@ -115,12 +67,12 @@ def _date(year=NEXT_YEAR, month=1, day=1) -> datetime.date:
     return datetime.date(year, month, day)
 
 
-def is_closed(response: GraphQLClientHTTPResponse, *, node: int = 0) -> bool:
+def is_closed(response: GQLResponse, *, node: int = 0) -> bool:
     """Get isClosed value from response"""
     return response.node(node)["isClosed"]
 
 
-def frt(response: GraphQLClientHTTPResponse, *, node: int = 0) -> str | None:
+def frt(response: GQLResponse, *, node: int = 0) -> str | None:
     """Get first reservable time as ISO 8601 string from response"""
     first_reservable_time: str = response.node(node)["firstReservableDatetime"]
     if first_reservable_time is None:
@@ -132,7 +84,7 @@ def frt(response: GraphQLClientHTTPResponse, *, node: int = 0) -> str | None:
     )
 
 
-def frt_access_type(response: GraphQLClientHTTPResponse, *, node: int = 0) -> bool:
+def frt_access_type(response: GQLResponse, *, node: int = 0) -> bool:
     """Get isClosed value from response"""
     return response.node(node)["effectiveAccessType"]
 
@@ -212,7 +164,7 @@ class ReservableFilters:
     reservable_time_start: str | None = None
     reservable_time_end: str | None = None
     reservable_minimum_duration_minutes: int | None = None
-    show_only_reservable: bool = False
+    show_only_reservable: bool | None = None
 
     def __init__(
         self,
@@ -221,7 +173,7 @@ class ReservableFilters:
         time_start: datetime.time | None = None,
         time_end: datetime.time | None = None,
         minimum_duration_minutes: int | None = None,
-        show_only_reservable: bool = False,  # noqa: FBT002
+        show_only_reservable: bool | None = None,
     ):
         self.reservable_date_start = date_start.isoformat() if date_start else None
         self.reservable_date_end = date_end.isoformat() if date_end else None
@@ -294,7 +246,7 @@ def apply_reservation_unit_override_settings(
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__no_results_time_spans_dont_exist(graphql, reservation_unit):
     """When there are no time spans, the first reservable time should be None."""
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY)
+    response = graphql(reservation_units_reservable_query())
 
     assert response.has_errors is False, response
     assert response.node(0) == {"isClosed": True, "firstReservableDatetime": None}
@@ -348,10 +300,10 @@ def test__reservation_unit__first_reservable_time__no_results_time_spans_dont_ex
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__filters__invalid_values(graphql, reservation_unit, filters, result):
     """Invalid filter values should return an error"""
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY, variables=asdict(filters))
+    response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is True, response
-    assert result in response.error_message(0) == result
+    assert result in response.error_message() == result
 
 
 ########################################################################################################################
@@ -433,7 +385,7 @@ def test__reservation_unit__first_reservable_time__filters__too_strict_causes_no
         end_datetime=_datetime(day=2, hour=19),
     )
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY, variables=asdict(filters))
+    response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
     assert frt(response) is None
@@ -543,7 +495,7 @@ def test__query_reservation_unit_reservable__filters__should_not_exclude_time_sp
         end_datetime=_datetime(hour=14),
     )
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY, variables=asdict(filters))
+    response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=13)
@@ -694,7 +646,7 @@ def test__reservation_unit__first_reservable_time__filters__simple(graphql, rese
         end_datetime=_datetime(day=16, hour=2),
     )
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY, variables=asdict(filters))
+    response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
     assert frt(response) == result.first_reservable_datetime
@@ -775,7 +727,7 @@ def test__reservation_unit__first_reservable_time__filters__multiple_time_spans_
         end_datetime=_datetime(hour=20),
     )
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY, variables=asdict(filters))
+    response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
     assert frt(response) == result.first_reservable_datetime
@@ -856,7 +808,7 @@ def test__reservation_unit__first_reservable_time__filters__multiple_days_long_t
         end_datetime=_datetime(day=5, hour=13),
     )
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY, variables=asdict(filters))
+    response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
     assert frt(response) == result.first_reservable_datetime
@@ -992,7 +944,7 @@ def test__reservation_unit__first_reservable_time__reservation_unit_settings(
         end_datetime=_datetime(day=21, hour=21),
     )
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY)
+    response = graphql(reservation_units_reservable_query())
 
     assert response.has_errors is False, response
     assert frt(response) == result.first_reservable_datetime
@@ -1125,7 +1077,7 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         end_datetime=_datetime(day=20, hour=21),
     )
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY, variables=asdict(filters))
+    response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
     assert frt(response) == result.first_reservable_datetime
@@ -1304,7 +1256,7 @@ def test__reservation_unit__first_reservable_time__application_rounds(
         end_datetime=_datetime(day=16, hour=1),
     )
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY, variables=asdict(filters))
+    response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
     assert frt(response) == result.first_reservable_datetime
@@ -1359,11 +1311,10 @@ def test__reservation_unit__first_reservable_time__filters__application_rounds__
     )
 
     response = graphql(
-        RESERVATION_UNITS_RESERVABLE_QUERY,
-        variables={
-            "reservable_date_start": _date(month=1, day=30).isoformat(),
-            "reservable_date_end": _date(month=1, day=31).isoformat(),
-        },
+        reservation_units_reservable_query(
+            reservable_date_start=_date(month=1, day=30).isoformat(),
+            reservable_date_end=_date(month=1, day=31).isoformat(),
+        )
     )
 
     assert response.has_errors is False, response
@@ -1407,7 +1358,7 @@ def test__reservation_unit__first_reservable_time__reservations__own_reservation
     ReservationUnitHierarchy.refresh()
     AffectingTimeSpan.refresh()
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY)
+    response = graphql(reservation_units_reservable_query())
 
     assert response.has_errors is False, response
     assert frt(response) is None
@@ -1438,7 +1389,7 @@ def test__reservation_unit__first_reservable_time__reservations__unrelated_reser
     │ 1 ░░░░░░░░░░░░░░░░░░░░████░░░░░░░░░░░░░░░░░░░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
-    reservation_unit_2 = ReservationUnitFactory.create()
+    reservation_unit_2: ReservationUnit = ReservationUnitFactory()
 
     # 1st Jan 10:00 - 12:00 (2h)
     ReservableTimeSpanFactory.create(
@@ -1454,7 +1405,7 @@ def test__reservation_unit__first_reservable_time__reservations__unrelated_reser
         ends_at=_datetime(hour=12),
     )
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY)
+    response = graphql(reservation_units_reservable_query())
 
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=10)
@@ -1507,11 +1458,10 @@ def test__reservation_unit__first_reservable_time__reservations__dont_include_ca
     )
 
     response = graphql(
-        RESERVATION_UNITS_RESERVABLE_QUERY,
-        variables={
-            "reservable_date_start": _date(month=1, day=1).isoformat(),
-            "reservable_date_end": _date(month=1, day=1).isoformat(),
-        },
+        reservation_units_reservable_query(
+            reservable_date_start=_date(month=1, day=1).isoformat(),
+            reservable_date_end=_date(month=1, day=1).isoformat(),
+        )
     )
 
     assert response.has_errors is False, response
@@ -1559,13 +1509,12 @@ def test__reservation_unit__first_reservable_time__reservations__date_filters_on
     AffectingTimeSpan.refresh()
 
     response = graphql(
-        RESERVATION_UNITS_RESERVABLE_QUERY,
-        variables={
-            "reservable_date_start": _date(month=1, day=1).isoformat(),
-            "reservable_date_end": _date(month=1, day=1).isoformat(),
-            "reservable_time_start": "12:00:00",
-            "reservable_time_end": "17:00:00",
-        },
+        reservation_units_reservable_query(
+            reservable_date_start=_date(month=1, day=1).isoformat(),
+            reservable_date_end=_date(month=1, day=1).isoformat(),
+            reservable_time_start="12:00:00",
+            reservable_time_end="17:00:00",
+        )
     )
 
     assert response.has_errors is False, response
@@ -1616,12 +1565,11 @@ def test__reservation_unit__first_reservable_time__reservations__filter_start_ti
     AffectingTimeSpan.refresh()
 
     response = graphql(
-        RESERVATION_UNITS_RESERVABLE_QUERY,
-        variables={
-            "reservable_time_start": "14:00:00",
-            "reservable_time_end": "18:00:00",
-            "reservable_minimum_duration_minutes": 60,
-        },
+        reservation_units_reservable_query(
+            reservable_time_start="14:00:00",
+            reservable_time_end="18:00:00",
+            reservable_minimum_duration_minutes=60,
+        ),
     )
 
     assert response.has_errors is False, response
@@ -1654,7 +1602,7 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     │ 1 ░░░░░░░░░░░░░░░░░░░░████░░░░░░░░░░░░░░░░░░░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
-    reservation_unit_2 = ReservationUnitFactory.create(
+    reservation_unit_2: ReservationUnit = ReservationUnitFactory(
         spaces=[SpaceFactory.create()],
         origin_hauki_resource=reservation_unit.origin_hauki_resource,
     )
@@ -1679,7 +1627,7 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     ReservationUnitHierarchy.refresh()
     AffectingTimeSpan.refresh()
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY_PK)
+    response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
 
@@ -1718,7 +1666,7 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     └────────────────────────────────────────────────────┘
     """
     reservation_unit_2: ReservationUnit = ReservationUnitFactory.create(
-        resources=[ResourceFactory.create()],
+        resources=[ResourceFactory()],
         origin_hauki_resource=reservation_unit.origin_hauki_resource,
     )
     reservation_unit.unit = reservation_unit_2.unit
@@ -1742,7 +1690,7 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     ReservationUnitHierarchy.refresh()
     AffectingTimeSpan.refresh()
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY_PK)
+    response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
 
@@ -1782,15 +1730,15 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     │ 1 ░░░░░░░░░░░░░░░░░░░░████░░░░░░░░░░░░░░░░░░░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
-    common_resource = ResourceFactory.create()
+    common_resource = ResourceFactory()
 
     reservation_unit.resources.set([common_resource])
-    reservation_unit.spaces.set([SpaceFactory.create()])
+    reservation_unit.spaces.set([SpaceFactory()])
     reservation_unit.save()
 
     reservation_unit_2: ReservationUnit = ReservationUnitFactory.create(
         resources=[common_resource],
-        spaces=[SpaceFactory.create()],
+        spaces=[SpaceFactory()],
         origin_hauki_resource=reservation_unit.origin_hauki_resource,
     )
 
@@ -1811,7 +1759,7 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     ReservationUnitHierarchy.refresh()
     AffectingTimeSpan.refresh()
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY_PK)
+    response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
 
@@ -1857,7 +1805,7 @@ def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_tim
         end_datetime=_datetime(hour=12),
     )
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY)
+    response = graphql(reservation_units_reservable_query())
 
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=10)
@@ -1953,7 +1901,7 @@ def test__reservation_unit__first_reservable_time__buffers__different_length_buf
     ReservationUnitHierarchy.refresh()
     AffectingTimeSpan.refresh()
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY_PK)
+    response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
 
@@ -2036,7 +1984,7 @@ def test__reservation_unit__first_reservable_time__buffers__start_and_end_same_t
     ReservationUnitHierarchy.refresh()
     AffectingTimeSpan.refresh()
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY_PK)
+    response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
 
@@ -2129,7 +2077,7 @@ def test__reservation_unit__first_reservable_time__buffers__different_before_buf
     ReservationUnitHierarchy.refresh()
     AffectingTimeSpan.refresh()
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY_PK)
+    response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
 
@@ -2214,7 +2162,7 @@ def test__reservation_unit__first_reservable_time__buffers__different_before_buf
         ends_at=_datetime(hour=13),
     )
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY_PK)
+    response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
 
@@ -2256,7 +2204,7 @@ def test__reservation_unit__first_reservable_time__round_current_time_to_the_nex
         end_datetime=_datetime(hour=12),
     )
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY)
+    response = graphql(reservation_units_reservable_query())
 
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=10, minute=15)
@@ -2309,21 +2257,21 @@ def test__reservation_unit__first_reservable_time__extra_long_interval(graphql, 
 
     # Query without any filters.
     # The first reservable time should be the beginning of the Reservable Time Span
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY)
+    response = graphql(reservation_units_reservable_query())
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=9)
     assert is_closed(response) is False
 
     # Query one minute after beginning of the Reservable Time Span
     # The next interval is at 11:00.
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY, variables={"reservable_time_start": "09:01"})
+    response = graphql(reservation_units_reservable_query(reservable_time_start="09:01"))
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=11)
     assert is_closed(response) is False
 
     # Query one minute after the last interval
     # Next interval are at 13:00 and 15:00, but the reservation ends at 16:00, so the next valid time is at 17:00
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY, variables={"reservable_time_start": "11:01"})
+    response = graphql(reservation_units_reservable_query(reservable_time_start="11:01"))
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=17)
     assert is_closed(response) is False
@@ -2384,19 +2332,19 @@ def test__reservation_unit__first_reservable_time__blocked_type_reservation_can_
     AffectingTimeSpan.refresh()
 
     # Buffer does not overlap with BLOCKED reservation at all
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY, variables={"reservable_time_start": "10:00"})
+    response = graphql(reservation_units_reservable_query(reservable_time_start=datetime.time(hour=10).isoformat()))
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=10)
     assert is_closed(response) is False
 
     # Buffer overlaps with BLOCKED reservation from the end, which should be allowed
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY, variables={"reservable_time_start": "11:00"})
+    response = graphql(reservation_units_reservable_query(reservable_time_start=datetime.time(hour=11).isoformat()))
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=11)
     assert is_closed(response) is False
 
     # Buffer overlaps with BLOCKED reservation from the start, which should be allowed
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY, variables={"reservable_time_start": "12:00"})
+    response = graphql(reservation_units_reservable_query(reservable_time_start=datetime.time(hour=12).isoformat()))
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=14)
     assert is_closed(response) is False
@@ -2479,7 +2427,7 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
     ReservationUnitHierarchy.refresh()
     AffectingTimeSpan.refresh()
 
-    response = graphql(RESERVATION_UNITS_RESERVABLE_QUERY)
+    response = graphql(reservation_units_reservable_query())
     assert response.has_errors is False, response
     assert is_closed(response) is False
     assert frt(response) == dt(hour=21, minute=30)
@@ -2509,7 +2457,7 @@ def test__reservation_unit__first_reservable_time__no_bug_in_pagination_from_hau
     """
     common_space = SpaceFactory.create()
 
-    ReservationUnitFactory.create(name="A", spaces=[common_space], unit=reservation_unit.unit)
+    ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
 
     reservation_unit.name = "B"
     reservation_unit.spaces.set([common_space])
@@ -2524,29 +2472,11 @@ def test__reservation_unit__first_reservable_time__no_bug_in_pagination_from_hau
     ReservationUnitHierarchy.refresh()
     AffectingTimeSpan.refresh()
 
-    query = """
-        query {
-            reservationUnits(
-                orderBy: nameFiAsc
-                offset: 1
-                firstReservableTime: {
-                    showOnlyReservable: false
-                }
-            ) {
-                edges {
-                    node {
-                        isClosed
-                        firstReservableDatetime
-                    }
-                }
-            }
-        }
-    """
-
+    query = reservation_units_reservable_query(order_by="nameFiAsc", offset=1)
     response = graphql(query)
     assert response.has_errors is False, response
 
-    assert len(response.edges) == 1
+    assert len(response) == 1
     assert frt(response) == dt(hour=10)
     assert is_closed(response) is False
 
@@ -2562,7 +2492,7 @@ def test__reservation_unit__first_reservable_time__remove_not_reservable(graphql
     """
     common_space = SpaceFactory.create()
 
-    ReservationUnitFactory.create(name="A", spaces=[common_space], unit=reservation_unit.unit)
+    ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
 
     reservation_unit.name = "B"
     reservation_unit.spaces.set([common_space])
@@ -2577,29 +2507,11 @@ def test__reservation_unit__first_reservable_time__remove_not_reservable(graphql
     ReservationUnitHierarchy.refresh()
     AffectingTimeSpan.refresh()
 
-    query = """
-        query {
-            reservationUnits(
-                orderBy: nameFiAsc
-                first: 1
-                firstReservableTime: {
-                    showOnlyReservable: true
-                }
-            ) {
-                edges {
-                    node {
-                        isClosed
-                        firstReservableDatetime
-                    }
-                }
-            }
-        }
-    """
-
+    query = reservation_units_reservable_query(order_by="nameFiAsc", show_only_reservable=True, first=1)
     response = graphql(query)
     assert response.has_errors is False, response
 
-    assert len(response.edges) == 1
+    assert len(response) == 1
     assert frt(response) == dt(hour=10)
     assert is_closed(response) is False
 
@@ -2612,7 +2524,7 @@ def test__reservation_unit__first_reservable_time__previous_page_cached(graphql,
     """Checks that the page results are cached so that pagination works correctly."""
     common_space = SpaceFactory.create()
 
-    reservation_unit_2 = ReservationUnitFactory.create(name="A", spaces=[common_space], unit=reservation_unit.unit)
+    reservation_unit_2 = ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
 
     reservation_unit.name = "B"
     reservation_unit.spaces.set([common_space])
@@ -2627,34 +2539,14 @@ def test__reservation_unit__first_reservable_time__previous_page_cached(graphql,
     ReservationUnitHierarchy.refresh()
     AffectingTimeSpan.refresh()
 
-    # See "ReservationUnitPagination.calculate_cache_key" on how this is calculated
-    cache_key = (
-        "Zmlyc3RfcmVzZXJ2YWJsZV90aW1lPXsic2hvd19vbmx5X3Jlc2VydmFibGUiOiBmYWxzZX0sb3JkZXJCeT1bIm5hbWVfZmlfYXNjIl0="
-    )
+    # See "ReservationUnitFilterSet.get_filter_reservable" on how this is calculated
+    cache_key = "Y2FsY3VsYXRlX2ZpcnN0X3Jlc2VydmFibGVfdGltZT1UcnVlLG9yZGVyX2J5PVsnbmFtZV9maSdd"
 
-    query_1 = """
-        query {
-            reservationUnits(
-                orderBy: nameFiAsc
-                first: 1
-                firstReservableTime: {
-                    showOnlyReservable: false
-                }
-            ) {
-                edges {
-                    node {
-                        isClosed
-                        firstReservableDatetime
-                    }
-                }
-            }
-        }
-    """
-
+    query_1 = reservation_units_reservable_query(order_by="nameFiAsc", first=1)
     response_1 = graphql(query_1)
     assert response_1.has_errors is False, response_1
 
-    assert len(response_1.edges) == 1
+    assert len(response_1) == 1
     assert frt(response_1) is None
     assert is_closed(response_1) is True
 
@@ -2664,30 +2556,11 @@ def test__reservation_unit__first_reservable_time__previous_page_cached(graphql,
     assert cached_value[str(reservation_unit_2.pk)]["frt"] == "None"
     assert cached_value[str(reservation_unit_2.pk)]["closed"] == "True"
 
-    query_2 = """
-        query {
-            reservationUnits(
-                orderBy: nameFiAsc
-                first: 1
-                offset: 1
-                firstReservableTime: {
-                    showOnlyReservable: false
-                }
-            ) {
-                edges {
-                    node {
-                        isClosed
-                        firstReservableDatetime
-                    }
-                }
-            }
-        }
-    """
-
-    response_2 = graphql(query_2, count_queries=True)
+    query_2 = reservation_units_reservable_query(order_by="nameFiAsc", first=1, offset=1)
+    response_2 = graphql(query_2)
     assert response_2.has_errors is False, response_2
 
-    assert len(response_2.edges) == 1
+    assert len(response_2) == 1
     assert frt(response_2) == dt(hour=10)
     assert is_closed(response_2) is False
 
@@ -2700,9 +2573,9 @@ def test__reservation_unit__first_reservable_time__previous_page_cached(graphql,
     assert cached_value[str(reservation_unit.pk)]["closed"] == "False"
 
     # Check that there was no additional queries
-    response_2.assert_query_count(7)
+    response_2.assert_query_count(9)
     # ...and that we were able to skip iterating through the previous pages due to cached results.
-    assert "OFFSET 1" in response_2.queries[0]
+    assert "OFFSET 1" in response_2.queries[1]
 
 
 ########################################################################################################################
@@ -2716,7 +2589,7 @@ def test__reservation_unit__first_reservable_time__previous_page_not_cached(grap
     """
     common_space = SpaceFactory.create()
 
-    reservation_unit_2 = ReservationUnitFactory.create(name="A", spaces=[common_space], unit=reservation_unit.unit)
+    reservation_unit_2 = ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
 
     reservation_unit.name = "B"
     reservation_unit.spaces.set([common_space])
@@ -2731,35 +2604,14 @@ def test__reservation_unit__first_reservable_time__previous_page_not_cached(grap
     ReservationUnitHierarchy.refresh()
     AffectingTimeSpan.refresh()
 
-    # See ""ReservationUnitPagination.calculate_cache_key"" on how this is calculated
-    cache_key = (
-        "Zmlyc3RfcmVzZXJ2YWJsZV90aW1lPXsic2hvd19vbmx5X3Jlc2VydmFibGUiOiBmYWxzZX0sb3JkZXJCeT1bIm5hbWVfZmlfYXNjIl0="
-    )
+    # See "ReservationUnitFilterSet.get_filter_reservable" on how this is calculated
+    cache_key = "Y2FsY3VsYXRlX2ZpcnN0X3Jlc2VydmFibGVfdGltZT1UcnVlLG9yZGVyX2J5PVsnbmFtZV9maSdd"
 
-    query = """
-        query {
-            reservationUnits(
-                orderBy: nameFiAsc
-                first: 1
-                offset: 1
-                firstReservableTime: {
-                    showOnlyReservable: false
-                }
-            ) {
-                edges {
-                    node {
-                        isClosed
-                        firstReservableDatetime
-                    }
-                }
-            }
-        }
-    """
-
-    response = graphql(query, count_queries=True)
+    query = reservation_units_reservable_query(order_by="nameFiAsc", first=1, offset=1)
+    response = graphql(query)
     assert response.has_errors is False, response
 
-    assert len(response.edges) == 1
+    assert len(response) == 1
     assert frt(response) == dt(hour=10)
     assert is_closed(response) is False
 
@@ -2772,9 +2624,9 @@ def test__reservation_unit__first_reservable_time__previous_page_not_cached(grap
     assert cached_value[str(reservation_unit.pk)]["closed"] == "False"
 
     # Check that there was no additional queries
-    response.assert_query_count(7)
+    response.assert_query_count(9)
     # We also cannot skip previous pages due to missing cached results.
-    assert "OFFSET 1" not in response.queries[0]
+    assert "OFFSET 1" not in response.queries[1]
 
 
 ########################################################################################################################
@@ -2785,7 +2637,7 @@ def test__reservation_unit__first_reservable_time__different_filters_dont_share_
     """Checks that cached results based on different filters are not shared."""
     common_space = SpaceFactory.create()
 
-    ReservationUnitFactory.create(name="A", spaces=[common_space], unit=reservation_unit.unit)
+    ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
 
     reservation_unit.name = "B"
     reservation_unit.spaces.set([common_space])
@@ -2800,73 +2652,31 @@ def test__reservation_unit__first_reservable_time__different_filters_dont_share_
     ReservationUnitHierarchy.refresh()
     AffectingTimeSpan.refresh()
 
-    query_1 = """
-        query {
-            reservationUnits(
-                orderBy: nameFiAsc
-                first: 1
-                firstReservableTime: {
-                    showOnlyReservable: false
-                }
-            ) {
-                edges {
-                    node {
-                        isClosed
-                        firstReservableDatetime
-                    }
-                }
-            }
-        }
-    """
-
+    query_1 = reservation_units_reservable_query(order_by="nameFiAsc", first=1)
     response_1 = graphql(query_1)
     assert response_1.has_errors is False, response_1
 
-    assert len(response_1.edges) == 1
+    assert len(response_1) == 1
     assert frt(response_1) is None
     assert is_closed(response_1) is True
 
     # See "ReservationUnitFilterSet.get_filter_reservable" on how this is calculated
-    cache_key_1 = (
-        "Zmlyc3RfcmVzZXJ2YWJsZV90aW1lPXsic2hvd19vbmx5X3Jlc2VydmFibGUiOiBmYWxzZX0sb3JkZXJCeT1bIm5hbWVfZmlfYXNjIl0="
-    )
+    cache_key_1 = "Y2FsY3VsYXRlX2ZpcnN0X3Jlc2VydmFibGVfdGltZT1UcnVlLG9yZGVyX2J5PVsnbmFtZV9maSdd"
 
     # Check that we did cache the first page's results.
     cached_value: dict[str, dict[str, Any]] = json.loads(cache.get(cache_key_1))
     assert len(cached_value) == 1
 
     # Use a different query. Note: even ordering affects results.
-
-    query_2 = """
-        query {
-            reservationUnits(
-                orderBy: nameFiDesc
-                first: 1
-                firstReservableTime: {
-                    showOnlyReservable: false
-                }
-            ) {
-                edges {
-                    node {
-                        isClosed
-                        firstReservableDatetime
-                    }
-                }
-            }
-        }
-    """
-
-    response_2 = graphql(query_2, count_queries=True)
+    query_2 = reservation_units_reservable_query(order_by="nameFiDesc", first=1)
+    response_2 = graphql(query_2)
     assert response_2.has_errors is False, response_2
 
-    assert len(response_2.edges) == 1
+    assert len(response_2) == 1
     assert frt(response_2) == dt(hour=10)
     assert is_closed(response_2) is False
 
-    # See "ReservationUnitFilterSet.get_filter_reservable" on how this is calculated
-    cache_key_2 = (
-        "Zmlyc3RfcmVzZXJ2YWJsZV90aW1lPXsic2hvd19vbmx5X3Jlc2VydmFibGUiOiBmYWxzZX0sb3JkZXJCeT1bIm5hbWVfZmlfZGVzYyJd"
-    )
+    cache_key_2 = "Y2FsY3VsYXRlX2ZpcnN0X3Jlc2VydmFibGVfdGltZT1UcnVlLG9yZGVyX2J5PVsnLW5hbWVfZmknXQ=="
 
     # Check that we have a new cached value for the second filter's results.
     cached_value: dict[str, dict[str, Any]] = json.loads(cache.get(cache_key_2))
@@ -2876,7 +2686,7 @@ def test__reservation_unit__first_reservable_time__different_filters_dont_share_
     assert len(cached_value) == 1
 
     # We couldn't use the cached results, so make database queries as usual.
-    response_2.assert_query_count(7)
+    response_2.assert_query_count(9)
 
 
 ########################################################################################################################
@@ -2887,7 +2697,7 @@ def test__reservation_unit__first_reservable_time__use_cached_results(graphql, r
     """Check that when we query the same page twice, we use the cached results on the second query."""
     common_space = SpaceFactory.create()
 
-    ReservationUnitFactory.create(name="A", spaces=[common_space], unit=reservation_unit.unit)
+    ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
 
     reservation_unit.name = "B"
     reservation_unit.spaces.set([common_space])
@@ -2902,52 +2712,34 @@ def test__reservation_unit__first_reservable_time__use_cached_results(graphql, r
     ReservationUnitHierarchy.refresh()
     AffectingTimeSpan.refresh()
 
-    query = """
-        query {
-            reservationUnits(
-                orderBy: nameFiAsc
-                first: 1
-                firstReservableTime: {
-                    showOnlyReservable: false
-                }
-            ) {
-                edges {
-                    node {
-                        isClosed
-                        firstReservableDatetime
-                    }
-                }
-            }
-        }
-    """
-
-    response_1 = graphql(query)
+    query_1 = reservation_units_reservable_query(order_by="nameFiAsc", first=1)
+    response_1 = graphql(query_1)
     assert response_1.has_errors is False, response_1
 
-    assert len(response_1.edges) == 1
+    assert len(response_1) == 1
     assert frt(response_1) is None
     assert is_closed(response_1) is True
 
     # See "ReservationUnitFilterSet.get_filter_reservable" on how this is calculated
-    cache_key_1 = (
-        "Zmlyc3RfcmVzZXJ2YWJsZV90aW1lPXsic2hvd19vbmx5X3Jlc2VydmFibGUiOiBmYWxzZX0sb3JkZXJCeT1bIm5hbWVfZmlfYXNjIl0="
-    )
-
+    cache_key_1 = "Y2FsY3VsYXRlX2ZpcnN0X3Jlc2VydmFibGVfdGltZT1UcnVlLG9yZGVyX2J5PVsnbmFtZV9maSdd"
     # Check tha results were cached.
     cached_value: dict[str, dict[str, Any]] = json.loads(cache.get(cache_key_1))
     assert len(cached_value) == 1
 
-    response_2 = graphql(query, count_queries=True)
+    query_2 = reservation_units_reservable_query(order_by="nameFiAsc", first=1)
+    response_2 = graphql(query_2)
     assert response_2.has_errors is False, response_2
 
-    assert len(response_2.edges) == 1
+    assert len(response_2) == 1
     assert frt(response_2) is None
     assert is_closed(response_2) is True
 
     # Since we used cached results, we didn't need to make database queries.
     # Only make queries for:
-    #  1) Fetch reservation units for response
-    response_2.assert_query_count(1)
+    #  1) Count reservation units for FRT calculation
+    #  2) Count reservation units for response
+    #  3) Fetch reservation units for response
+    response_2.assert_query_count(3)
 
 
 ########################################################################################################################
@@ -2961,7 +2753,7 @@ def test__reservation_unit__first_reservable_time__use_cached_results__not_first
     """
     common_space = SpaceFactory.create()
 
-    ReservationUnitFactory.create(name="A", spaces=[common_space], unit=reservation_unit.unit)
+    ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
 
     reservation_unit.name = "B"
     reservation_unit.spaces.set([common_space])
@@ -2976,70 +2768,36 @@ def test__reservation_unit__first_reservable_time__use_cached_results__not_first
     ReservationUnitHierarchy.refresh()
     AffectingTimeSpan.refresh()
 
-    query_1 = """
-        query {
-            reservationUnits(
-                orderBy: nameFiAsc
-                first: 1
-                firstReservableTime: {
-                    showOnlyReservable: false
-                }
-            ) {
-                edges {
-                    node {
-                        isClosed
-                        firstReservableDatetime
-                    }
-                }
-            }
-        }
-    """
-
+    query_1 = reservation_units_reservable_query(order_by="nameFiAsc", first=1)
     response_1 = graphql(query_1)
     assert response_1.has_errors is False, response_1
 
-    assert len(response_1.edges) == 1
+    assert len(response_1) == 1
     assert frt(response_1) is None
     assert is_closed(response_1) is True
 
-    query_2 = """
-        query {
-            reservationUnits(
-                orderBy: nameFiAsc
-                first: 1
-                offset: 1
-                firstReservableTime: {
-                    showOnlyReservable: false
-                }
-            ) {
-                edges {
-                    node {
-                        isClosed
-                        firstReservableDatetime
-                    }
-                }
-            }
-        }
-    """
-
+    query_2 = reservation_units_reservable_query(order_by="nameFiAsc", first=1, offset=1)
     response_2 = graphql(query_2)
     assert response_2.has_errors is False, response_2
 
-    assert len(response_2.edges) == 1
+    assert len(response_2) == 1
     assert frt(response_2) == dt(hour=10)
     assert is_closed(response_2) is False
 
-    response_3 = graphql(query_2, count_queries=True)
+    query_3 = reservation_units_reservable_query(order_by="nameFiAsc", first=1, offset=1)
+    response_3 = graphql(query_3)
     assert response_3.has_errors is False, response_3
 
-    assert len(response_3.edges) == 1
+    assert len(response_3) == 1
     assert frt(response_3) == dt(hour=10)
     assert is_closed(response_3) is False
 
     # Since we used cached results, we didn't need to make database queries.
     # Only make queries for:
-    #  1) Fetch reservation units for response
-    response_3.assert_query_count(1)
+    #  1) Count reservation units for FRT calculation
+    #  2) Count reservation units for response
+    #  3) Fetch reservation units for response
+    response_3.assert_query_count(3)
 
 
 ########################################################################################################################
@@ -3054,7 +2812,7 @@ def test__reservation_unit__first_reservable_time__cached_results_not_valid_anym
     """
     common_space = SpaceFactory.create()
 
-    reservation_unit_2 = ReservationUnitFactory.create(name="A", spaces=[common_space], unit=reservation_unit.unit)
+    reservation_unit_2 = ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
 
     reservation_unit.name = "B"
     reservation_unit.spaces.set([common_space])
@@ -3091,52 +2849,15 @@ def test__reservation_unit__first_reservable_time__cached_results_not_valid_anym
             valid_until=local_datetime() + datetime.timedelta(minutes=1),  # valid
         ).to_dict(),
     }
-
-    # See ""ReservationUnitPagination.calculate_cache_key"" on how this is calculated
-    cache_key = (
-        "Zmlyc3RfcmVzZXJ2YWJsZV90aW1lPXsic2hvd19vbmx5X3Jlc2VydmFibGUiOiBmYWxzZX0sb3JkZXJCeT1bIm5hbWVfZmlfYXNjIl0="
-    )
+    cache_key = "Y2FsY3VsYXRlX2ZpcnN0X3Jlc2VydmFibGVfdGltZT1UcnVlLG9yZGVyX2J5PVsnbmFtZV9maSdd"
     cache.set(cache_key, json.dumps(cached_results), timeout=120)
 
-    query = """
-        query (
-            $reservable_date_start: Date
-            $reservable_date_end: Date
-            $reservable_time_start: Time
-            $reservable_time_end: Time
-            $reservable_minimum_duration_minutes: Int
-            $show_only_reservable: Boolean! = false
-        ) {
-            reservationUnits(
-                orderBy: nameFiAsc,
-                first: 1,
-                offset: 1,
-                firstReservableTime: {
-                    reservableDateStart: $reservable_date_start
-                    reservableDateEnd: $reservable_date_end
-                    reservableTimeStart: $reservable_time_start
-                    reservableTimeEnd: $reservable_time_end
-                    reservableMinimumDurationMinutes: $reservable_minimum_duration_minutes
-                    showOnlyReservable: $show_only_reservable
-                }
-            ) {
-                edges {
-                    node {
-                        pk
-                        isClosed
-                        firstReservableDatetime
-                        effectiveAccessType
-                    }
-                }
-            }
-        }
-    """
-
     # Query the second page
-    response = graphql(query, count_queries=True)
+    query = reservation_units_reservable_query_access_type(order_by="nameFiAsc", first=1, offset=1)
+    response = graphql(query)
     assert response.has_errors is False, response
 
-    assert len(response.edges) == 1
+    assert len(response) == 1
     assert frt(response) == dt(hour=13)
     assert frt_access_type(response) == AccessType.ACCESS_CODE
     assert is_closed(response) is False
@@ -3144,7 +2865,7 @@ def test__reservation_unit__first_reservable_time__cached_results_not_valid_anym
 
     # Since we couldn't use all the cached results,
     # we needed to fetch data from the database for re-calculation.
-    response.assert_query_count(7)
+    response.assert_query_count(9)
 
 
 ########################################################################################################################
@@ -3174,56 +2895,26 @@ def test__reservation_unit__first_reservable_time__access_type(graphql, reservat
         begin_date=_date(day=20),
     )
 
-    query = """
-        query (
-            $reservable_date_start: Date
-            $reservable_date_end: Date
-            $reservable_time_start: Time
-            $reservable_time_end: Time
-            $reservable_minimum_duration_minutes: Int
-            $show_only_reservable: Boolean! = false
-        ) {
-            reservationUnits(
-                firstReservableTime: {
-                    reservableDateStart: $reservable_date_start
-                    reservableDateEnd: $reservable_date_end
-                    reservableTimeStart: $reservable_time_start
-                    reservableTimeEnd: $reservable_time_end
-                    reservableMinimumDurationMinutes: $reservable_minimum_duration_minutes
-                    showOnlyReservable: $show_only_reservable
-                }
-            ) {
-                edges {
-                    node {
-                        isClosed
-                        firstReservableDatetime
-                        effectiveAccessType
-                    }
-                }
-            }
-        }
-    """
-
     # Before any AccessType has begun
-    response = graphql(query, variables={"reservable_date_start": _date(day=1).isoformat()})
+    response = graphql(reservation_units_reservable_query_access_type(reservable_date_start=_date(day=1).isoformat()))
     assert response.has_errors is False, response
     assert frt(response) == dt(day=1)
     assert frt_access_type(response) is None
 
     # Same date as new AccessType begins
-    response = graphql(query, variables={"reservable_date_start": _date(day=5).isoformat()})
+    response = graphql(reservation_units_reservable_query_access_type(reservable_date_start=_date(day=5).isoformat()))
     assert response.has_errors is False, response
     assert frt(response) == dt(day=5)
     assert frt_access_type(response) == AccessType.ACCESS_CODE
 
     # AccessType has changed
-    response = graphql(query, variables={"reservable_date_start": _date(day=15).isoformat()})
+    response = graphql(reservation_units_reservable_query_access_type(reservable_date_start=_date(day=15).isoformat()))
     assert response.has_errors is False, response
     assert frt(response) == dt(day=15)
     assert frt_access_type(response) == AccessType.PHYSICAL_KEY
 
     # Not a reservable time, but use AccessType from the filter date
-    response = graphql(query, variables={"reservable_date_start": _date(day=30).isoformat()})
+    response = graphql(reservation_units_reservable_query_access_type(reservable_date_start=_date(day=30).isoformat()))
     assert response.has_errors is False, response
     assert frt(response) is None
     assert frt_access_type(response) == AccessType.OPENED_BY_STAFF

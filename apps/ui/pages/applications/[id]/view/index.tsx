@@ -7,7 +7,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { ViewApplication } from "@/components/application/ViewApplication";
 import { ApplicationHead } from "@/components/application/ApplicationHead";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { createNodeId, getLocalizationLang, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
   ApplicationStatusChoice,
   ApplicationViewDocument,
@@ -25,7 +25,6 @@ import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
 import { applicationsPrefix } from "@/modules/urls";
 import { ApplicationTerms } from "@/components/application/ApplicationTerms";
-import { Flex } from "common/styled";
 
 const TabPanel = styled(Tabs.TabPanel)`
   && {
@@ -129,9 +128,7 @@ function View({ application, tos }: Readonly<Pick<PropsNarrowed, "application" |
             <ApprovedReservations application={application} applicationRound={applicationRound} />
           </TabPanel>
           <TabPanel>
-            <Flex $gap="l">
-              <WrappedViewApplication application={application} tos={tos} />
-            </Flex>
+            <WrappedViewApplication application={application} tos={tos} />
           </TabPanel>
         </Tabs>
       ) : (
@@ -174,10 +171,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const { data } = await apolloClient.query<ApplicationViewQuery, ApplicationViewQueryVariables>({
     query: ApplicationViewDocument,
-    variables: { id: createNodeId("ApplicationNode", pk) },
+    variables: { id: base64encode(`ApplicationNode:${pk}`) },
   });
 
-  const application = getNode(data);
+  const { application } = data;
   if (application == null) {
     return notFound;
   }
@@ -198,13 +195,11 @@ export default View;
 
 export const APPLICATION_VIEW_QUERY = gql`
   query ApplicationView($id: ID!) {
-    node(id: $id) {
-      ... on ApplicationNode {
-        ...ApplicationView
-        applicationSections {
-          id
-          hasReservations
-        }
+    application(id: $id) {
+      ...ApplicationView
+      applicationSections {
+        id
+        hasReservations
       }
     }
   }

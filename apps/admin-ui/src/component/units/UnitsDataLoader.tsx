@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
-import { UnitOrderSet, useUnitListQuery } from "@gql/gql-types";
-import { filterEmptyArray, filterNonNullable, mapParamToInteger } from "common/src/helpers";
+import { UnitOrderingChoices, useUnitListQuery } from "@gql/gql-types";
+import { filterEmptyArray, filterNonNullable, mapParamToInterger } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
@@ -28,7 +28,7 @@ export function UnitsDataLoader({ isMyUnits }: Props): JSX.Element {
 
   const { t } = useTranslation();
   const searchParams = useSearchParams();
-  const unitGroupFilter = filterEmptyArray(mapParamToInteger(searchParams.getAll("unitGroup"), 1));
+  const unitGroupFilter = filterEmptyArray(mapParamToInterger(searchParams.getAll("unitGroup"), 1));
   const nameFilter = searchParams.get("search") ?? undefined;
 
   const { fetchMore, loading, data, previousData } = useUnitListQuery({
@@ -70,42 +70,37 @@ export function UnitsDataLoader({ isMyUnits }: Props): JSX.Element {
   );
 }
 
-function transformSortString(orderBy: string | null): UnitOrderSet[] {
+function transformSortString(orderBy: string | null): UnitOrderingChoices[] {
   if (!orderBy) {
     return [];
   }
   switch (orderBy) {
     case "nameFi":
-      return [UnitOrderSet.NameFiAsc];
+      return [UnitOrderingChoices.NameFiAsc];
     case "-nameFi":
-      return [UnitOrderSet.NameFiDesc];
+      return [UnitOrderingChoices.NameFiDesc];
     case "reservationUnitCount":
-      return [UnitOrderSet.ReservationUnitsCountAsc];
+      return [UnitOrderingChoices.ReservationUnitsCountAsc];
     case "-reservationUnitCount":
-      return [UnitOrderSet.ReservationUnitsCountDesc];
+      return [UnitOrderingChoices.ReservationUnitsCountDesc];
     case "unitGroup":
-      return [UnitOrderSet.UnitGroupNameFiAsc];
+      return [UnitOrderingChoices.UnitGroupNameFiAsc];
     case "-unitGroup":
-      return [UnitOrderSet.UnitGroupNameFiDesc];
+      return [UnitOrderingChoices.UnitGroupNameFiDesc];
     default:
       return [];
   }
 }
 
 export const UNIT_LIST_QUERY = gql`
-  query UnitList(
-    $first: Int
-    $after: String
-    $orderBy: [UnitOrderSet!]
-    # Filter
-    $nameFi: String
-    $unitGroup: [Int!]
-  ) {
+  query UnitList($first: Int, $after: String, $orderBy: [UnitOrderingChoices], $nameFi: String, $unitGroup: [Int]) {
     units(
       first: $first
       after: $after
       orderBy: $orderBy
-      filter: { nameFiStartswith: $nameFi, unitGroup: $unitGroup, onlyWithPermission: true }
+      nameFi: $nameFi
+      onlyWithPermission: true
+      unitGroup: $unitGroup
     ) {
       edges {
         node {

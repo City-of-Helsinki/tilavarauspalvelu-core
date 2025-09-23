@@ -18,15 +18,15 @@ def test_reservation_unit__create__draft__anonymous_user(graphql):
     # - An anonymous user is using the system
     unit = UnitFactory.create()
 
-    data = {"isDraft": True, "nameFi": "foo", "unit": unit.pk}
+    data = {"isDraft": True, "name": "foo", "unit": unit.pk}
 
     # when:
     # - The user tries to create a new reservation unit with timeslots
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains errors about missing permissions
-    assert response.error_message(0) == "No permission to create a reservation unit"
+    assert response.error_message() == "No permission to create."
 
 
 def test_reservation_unit__create__draft__regular_user(graphql):
@@ -36,15 +36,15 @@ def test_reservation_unit__create__draft__regular_user(graphql):
     unit = UnitFactory.create()
     graphql.login_with_regular_user()
 
-    data = {"isDraft": True, "nameFi": "foo", "unit": unit.pk}
+    data = {"isDraft": True, "name": "foo", "unit": unit.pk}
 
     # when:
     # - The user tries to create a new reservation unit with timeslots
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains errors about missing permissions
-    assert response.error_message(0) == "No permission to create a reservation unit"
+    assert response.error_message() == "No permission to create."
 
 
 def test_reservation_unit__create__draft__superuser(graphql):
@@ -54,11 +54,11 @@ def test_reservation_unit__create__draft__superuser(graphql):
     unit = UnitFactory.create()
     graphql.login_with_superuser()
 
-    data = {"isDraft": True, "nameFi": "foo", "unit": unit.pk}
+    data = {"isDraft": True, "name": "foo", "unit": unit.pk}
 
     # when:
     # - The user tries to create a new reservation unit with timeslots
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response doesn't contain errors about missing permissions
@@ -73,11 +73,11 @@ def test_reservation_unit__create__draft__general_admin(graphql):
     admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
-    data = {"isDraft": True, "nameFi": "foo", "unit": unit.pk}
+    data = {"isDraft": True, "name": "foo", "unit": unit.pk}
 
     # when:
     # - The user tries to create a new reservation unit with timeslots
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response doesn't contain errors about missing permissions
@@ -92,11 +92,11 @@ def test_reservation_unit__create__draft__unit_admin(graphql):
     admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
-    data = {"isDraft": True, "nameFi": "foo", "unit": unit.pk}
+    data = {"isDraft": True, "name": "foo", "unit": unit.pk}
 
     # when:
     # - The user tries to create a new reservation unit with timeslots
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response doesn't contain errors about missing permissions

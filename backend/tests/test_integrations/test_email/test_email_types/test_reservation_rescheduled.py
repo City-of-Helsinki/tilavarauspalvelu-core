@@ -1,3 +1,5 @@
+# type: EmailType.RESERVATION_RESCHEDULED
+
 from __future__ import annotations
 
 import datetime

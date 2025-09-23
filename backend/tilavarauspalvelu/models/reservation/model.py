@@ -9,9 +9,8 @@ from django.db import models
 from django.db.models.functions import Concat, Trim
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from lazy_managers import LazyModelAttribute, LazyModelManager
+from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
-from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -24,18 +23,16 @@ from tilavarauspalvelu.enums import (
 from utils.auditlog_util import AuditLogger
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_range_as_string
 from utils.decimal_utils import round_decimal
-from utils.mixins import SerializableModelMixin
+from utils.fields.model import StrChoiceField
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
     from tilavarauspalvelu.models import (
-        AffectingTimeSpan,
         AgeGroup,
-        PaymentOrder,
         ReservationDenyReason,
         ReservationPurpose,
         ReservationSeries,
-        ReservationStatistic,
         ReservationUnit,
         Unit,
         User,
@@ -51,35 +48,34 @@ __all__ = [
 ]
 
 
-class Reservation(SerializableModelMixin, models.Model):
+class Reservation(SerializableMixin, models.Model):
     # Basic information
     ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
     name: str = models.CharField(max_length=255, blank=True, default="")
     description: str = models.CharField(max_length=255, blank=True, default="")
     num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
-    state: ReservationStateChoice = TextChoicesField(
-        choices_enum=ReservationStateChoice,
+    state: str = models.CharField(
+        max_length=32,
+        choices=ReservationStateChoice.choices,
         default=ReservationStateChoice.CREATED,
         db_index=True,
     )
-    type: ReservationTypeChoice | None = TextChoicesField(
-        choices_enum=ReservationTypeChoice,
-        default=ReservationTypeChoice.NORMAL,
-        null=True,  # TODO: Nullable?
-        blank=False,
-    )
-    municipality: MunicipalityChoice | None = TextChoicesField(
-        choices_enum=MunicipalityChoice,
+    type: str | None = models.CharField(
+        max_length=50,
         null=True,
-        blank=True,
+        blank=False,
+        choices=ReservationTypeChoice.choices,
+        default=ReservationTypeChoice.NORMAL,
     )
+    municipality: str | None = StrChoiceField(enum=MunicipalityChoice, null=True, blank=True)
     handling_details: str = models.TextField(blank=True, default="")
     working_memo: str = models.TextField(blank=True, default="")
 
     # Cancellation information
     cancel_details: str = models.TextField(blank=True, default="")
-    cancel_reason: ReservationCancelReasonChoice | None = TextChoicesField(
-        choices_enum=ReservationCancelReasonChoice,
+    cancel_reason: ReservationCancelReasonChoice | None = models.CharField(
+        choices=ReservationCancelReasonChoice.choices,
+        max_length=255,
         null=True,
         blank=True,
     )
@@ -91,10 +87,14 @@ class Reservation(SerializableModelMixin, models.Model):
     buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     confirmed_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    created_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=timezone.now)  # noqa: TID251
+    created_at: datetime.datetime | None = models.DateTimeField(null=True, default=timezone.now)  # noqa: TID251
 
     # Access information
-    access_type: AccessType = TextChoicesField(choices_enum=AccessType, default=AccessType.UNRESTRICTED)
+    access_type: str = models.CharField(
+        max_length=20,
+        choices=AccessType.choices,
+        default=AccessType.UNRESTRICTED.value,
+    )
     access_code_generated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     access_code_is_active: bool = models.BooleanField(default=False)
 
@@ -119,7 +119,7 @@ class Reservation(SerializableModelMixin, models.Model):
     reservee_address_city: str = models.CharField(max_length=255, blank=True, default="")
     reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")
     reservee_used_ad_login: bool = models.BooleanField(default=False, blank=True)
-    reservee_type: ReserveeType | None = TextChoicesField(choices_enum=ReserveeType, null=True, blank=True)
+    reservee_type: str | None = StrChoiceField(enum=ReserveeType, null=True, blank=True)
 
     # Relations
     reservation_unit: ReservationUnit = models.ForeignKey(
@@ -137,38 +137,34 @@ class Reservation(SerializableModelMixin, models.Model):
         "tilavarauspalvelu.ReservationSeries",
         related_name="reservations",
         on_delete=models.PROTECT,
-        blank=True,
         null=True,
+        blank=True,
     )
     deny_reason: ReservationDenyReason | None = models.ForeignKey(
         "tilavarauspalvelu.ReservationDenyReason",
         related_name="reservations",
         on_delete=models.PROTECT,
-        blank=True,
         null=True,
+        blank=True,
     )
     purpose: ReservationPurpose | None = models.ForeignKey(
         "tilavarauspalvelu.ReservationPurpose",
         related_name="reservations",
         on_delete=models.SET_NULL,
-        blank=True,
         null=True,
+        blank=True,
     )
     age_group: AgeGroup | None = models.ForeignKey(
         "tilavarauspalvelu.AgeGroup",
         related_name="reservations",
         on_delete=models.SET_NULL,
-        blank=True,
         null=True,
+        blank=True,
     )
 
     objects: ClassVar[ReservationManager] = LazyModelManager.new()
     actions: ReservationActions = LazyModelAttribute.new()
     validators: ReservationValidator = LazyModelAttribute.new()
-
-    payment_order: PaymentOrder | None  # Can be missing
-    reservation_statistic: ReservationStatistic | None  # Can be missing
-    affecting_time_span: AffectingTimeSpan | None  # Can be missing
 
     class Meta:
         db_table = "reservation"
@@ -324,7 +320,7 @@ class Reservation(SerializableModelMixin, models.Model):
         Whether the reservation's access code _should_ be active or not. This is used by background tasks
         to update access code state in Pindora in case an API call to Pindora fails in the endpoint.
         """
-        return models.Case(  # type: ignore[return-value]
+        case = models.Case(
             models.When(
                 (
                     models.Q(access_type=AccessType.ACCESS_CODE.value)
@@ -336,6 +332,7 @@ class Reservation(SerializableModelMixin, models.Model):
             default=models.Value(False),  # noqa: FBT003
             output_field=models.BooleanField(),
         )
+        return case  # noqa: RET504 type: ignore[return-value]
 
     @lookup_property
     def is_access_code_is_active_correct() -> bool:
@@ -344,14 +341,14 @@ class Reservation(SerializableModelMixin, models.Model):
         # 1. Not generated AND active -> Not possible
         # 2. Not generated AND not active -> Reservation doesn't use an access code
         # Otherwise, we should generate the access code if its are somehow missing.
-        return models.Case(  # type: ignore[return-value]
+        case = models.Case(
             models.When(
                 L(access_code_should_be_active=True),
                 then=models.Q(access_code_is_active=True),
             ),
             default=models.Q(access_code_is_active=False),
-            output_field=models.BooleanField(),
         )
+        return case  # noqa: RET504 type: ignore[return-value]
 
     def as_time_span_element(self) -> TimeSpanElement:
         from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement

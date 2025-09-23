@@ -14,7 +14,7 @@ import {
 import { useTranslation } from "next-i18next";
 import {
   type CreateStaffReservationFragment,
-  type ReservationStaffCreateMutation,
+  type ReservationStaffCreateMutationInput,
   useCreateStaffReservationMutation,
   useReservationUnitQuery,
 } from "@gql/gql-types";
@@ -31,7 +31,7 @@ import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
-import { createNodeId, getNode, toNumber } from "common/src/helpers";
+import { base64encode, toNumber } from "common/src/helpers";
 import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { SelectFilter } from "@/component/QueryParamFilters";
@@ -95,12 +95,13 @@ export function CreateReservationModal({
   const params = useSearchParams();
   const reservationUnitPk = toNumber(params.get("reservationUnit")) ?? reservationUnitOptions[0]?.value;
 
+  const id = base64encode(`ReservationUnitNode:${reservationUnitPk}`);
   const { data, loading } = useReservationUnitQuery({
-    variables: { id: createNodeId("ReservationUnitNode", reservationUnitPk ?? 0) },
+    variables: { id },
     skip: !reservationUnitPk,
   });
 
-  const reservationUnit = getNode(data);
+  const { reservationUnit } = data ?? {};
 
   const interval = getNormalizedInterval(reservationUnit?.reservationStartInterval);
   const startDate = start ?? new Date();
@@ -122,7 +123,7 @@ export function CreateReservationModal({
     },
   });
   const [create] = useCreateStaffReservationMutation();
-  const createStaffReservation = (input: ReservationStaffCreateMutation) => create({ variables: { input } });
+  const createStaffReservation = (input: ReservationStaffCreateMutationInput) => create({ variables: { input } });
   const displayError = useDisplayError();
   const onSubmit = async (values: FormValueType) => {
     try {
@@ -135,7 +136,7 @@ export function CreateReservationModal({
 
       const bufferBefore = getBufferTime(reservationUnit.bufferTimeBefore, type, enableBufferTimeBefore);
       const bufferAfter = getBufferTime(reservationUnit.bufferTimeAfter, type, enableBufferTimeAfter);
-      const input: ReservationStaffCreateMutation = {
+      const input: ReservationStaffCreateMutationInput = {
         ...rest,
         reservationUnit: reservationUnit.pk,
         type,
@@ -375,10 +376,8 @@ function ActionContainer({
 // TODO this is reused for create ReservationSeries also (though we have a common fragment)
 export const RESERVATION_UNIT_QUERY = gql`
   query ReservationUnit($id: ID!) {
-    node(id: $id) {
-      ... on ReservationUnitNode {
-        ...CreateStaffReservation
-      }
+    reservationUnit(id: $id) {
+      ...CreateStaffReservation
     }
   }
 `;
@@ -393,7 +392,7 @@ export const CREATE_STAFF_RESERVATION_FRAGMENT = gql`
 `;
 
 export const CREATE_STAFF_RESERVATION = gql`
-  mutation CreateStaffReservation($input: ReservationStaffCreateMutation!) {
+  mutation CreateStaffReservation($input: ReservationStaffCreateMutationInput!) {
     createStaffReservation(input: $input) {
       pk
     }

@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
 import {
   ReservationTypeChoice,
-  type CalendarReservationNameFragment,
+  type ReservationUnitCalendarQuery,
   useReservationUnitCalendarQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
@@ -15,7 +15,7 @@ import { getEventBuffers } from "common/src/calendar/util";
 import { getReservationUrl } from "@/common/urls";
 import { Legend, LegendsWrapper } from "@/component/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
-import { createNodeId, filterNonNullable } from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { getReserveeName } from "@/common/util";
 import { errorToast } from "common/src/components/toast";
@@ -35,13 +35,16 @@ const Container = styled.div`
   }
 `;
 
+type ReservationUnitType = NonNullable<ReservationUnitCalendarQuery["reservationUnit"]>;
+type ReservationType = NonNullable<NonNullable<ReservationUnitType["reservations"]>[0]>;
+
 function getEventTitle({
   reservationUnitPk,
   reservation,
   t,
 }: {
   reservationUnitPk: number;
-  reservation: CalendarReservationNameFragment;
+  reservation: ReservationType;
   t: TFunction;
 }) {
   const reserveeName = getReserveeName(reservation, t);
@@ -55,7 +58,7 @@ function getEventTitle({
   return [reserveeName, ""];
 }
 
-function constructEventTitle(res: CalendarReservationNameFragment, resUnitPk: number, t: TFunction) {
+function constructEventTitle(res: ReservationType, resUnitPk: number, t: TFunction) {
   const [reservee, unit] = getEventTitle({
     reservationUnitPk: resUnitPk,
     reservation: res,
@@ -77,11 +80,13 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
 
   const calendarEventExcludedLegends = ["RESERVATION_UNIT_RELEASED", "RESERVATION_UNIT_DRAFT"];
 
+  const typename = "ReservationUnitNode";
+  const id = base64encode(`${typename}:${reservationUnitPk}`);
   const { data, loading: isLoading } = useReservationUnitCalendarQuery({
     fetchPolicy: "network-only",
     skip: reservationUnitPk === 0,
     variables: {
-      id: createNodeId("ReservationUnitNode", reservationUnitPk),
+      id,
       pk: reservationUnitPk,
       state: RELATED_RESERVATION_STATES,
       beginDate: toApiDate(startOfISOWeek(new Date(begin))) ?? "",
@@ -94,10 +99,7 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
     },
   });
 
-  const reservations =
-    data?.node != null && "reservations" in data.node
-      ? combineAffectingReservations({ ...data, node: data.node }, reservationUnitPk)
-      : [];
+  const reservations = combineAffectingReservations(data, reservationUnitPk);
 
   const events = reservations.map((reservation) => {
     const isBlocked = reservation.type === ReservationTypeChoice.Blocked;
@@ -144,35 +146,21 @@ export const RESERVATION_UNIT_CALENDAR_QUERY = gql`
   query ReservationUnitCalendar(
     $id: ID!
     $pk: Int!
-    $state: [ReservationStateChoice!]
-    $beginDate: Date!
-    $endDate: Date!
+    $state: [ReservationStateChoice]
+    $beginDate: Date
+    $endDate: Date
   ) {
-    node(id: $id) {
-      ... on ReservationUnitNode {
-        id
-        pk
-        reservations(filter: { beginDate: $beginDate, endDate: $endDate, state: $state }) {
-          ...ReservationUnitReservations
-          ...CombineAffectedReservations
-        }
+    reservationUnit(id: $id) {
+      id
+      pk
+      reservations(state: $state, beginDate: $beginDate, endDate: $endDate) {
+        ...ReservationUnitReservations
+        ...CombineAffectedReservations
       }
     }
     affectingReservations(forReservationUnits: [$pk], state: $state, beginDate: $beginDate, endDate: $endDate) {
       ...ReservationUnitReservations
       ...CombineAffectedReservations
-    }
-  }
-`;
-
-export const CALENDAR_RESERVATION_NAME_FRAGMENT = gql`
-  fragment CalendarReservationName on ReservationNode {
-    id
-    reserveeName
-    type
-    reservationUnit {
-      pk
-      nameFi
     }
   }
 `;

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { FileInput } from "hds-react";
-import { ReservationUnitImageType } from "@gql/gql-types";
+import { ImageType } from "@gql/gql-types";
 import { type ImageFormType } from "./form";
 import { AutoGrid, Flex, focusStyles, removeButtonStyles } from "common/styled";
 
@@ -84,7 +84,7 @@ function ReservationUnitImage({
   deleteImage: (pk: number) => void;
   image: ImageFormType;
 }) {
-  const isMain = image.imageType === ReservationUnitImageType.Main;
+  const isMain = image.imageType === ImageType.Main;
   const { t } = useTranslation();
   return (
     <Flex $gap="s">
@@ -116,7 +116,7 @@ export function ImageEditor({ images, setImages, style, className }: Props): JSX
   const { t } = useTranslation();
 
   const addImage = (files: File[]) => {
-    const imageType = images.length === 0 ? ReservationUnitImageType.Main : ReservationUnitImageType.Other;
+    const imageType = images.length === 0 ? ImageType.Main : ImageType.Other;
 
     const newImage: ImageFormType = {
       pk: fakePk,
@@ -145,7 +145,7 @@ export function ImageEditor({ images, setImages, style, className }: Props): JSX
     setImages(
       images.map((image) => ({
         ...image,
-        imageType: pk === image.pk ? ReservationUnitImageType.Main : ReservationUnitImageType.Other,
+        imageType: pk === image.pk ? ImageType.Main : ImageType.Other,
       }))
     );
   };

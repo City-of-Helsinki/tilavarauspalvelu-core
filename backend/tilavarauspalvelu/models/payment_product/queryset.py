@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from tilavarauspalvelu.models import PaymentProduct
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from django.db import models
 
 __all__ = [
     "PaymentProductManager",
@@ -9,7 +8,7 @@ __all__ = [
 ]
 
 
-class PaymentProductQuerySet(ModelQuerySet[PaymentProduct]): ...
+class PaymentProductQuerySet(models.QuerySet): ...
 
 
-class PaymentProductManager(ModelManager[PaymentProduct, PaymentProductQuerySet]): ...
+class PaymentProductManager(models.Manager.from_queryset(PaymentProductQuerySet)): ...

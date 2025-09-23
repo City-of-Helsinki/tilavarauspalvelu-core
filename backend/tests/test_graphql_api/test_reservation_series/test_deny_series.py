@@ -41,11 +41,11 @@ def test_reservation_series__deny_series(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(DENY_SERIES_MUTATION, variables={"input": data})
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
-    assert response.results == {"denied": 5, "future": 5}
+    assert response.first_query_object == {"denied": 5, "future": 5}
     assert reservation_series.reservations.count() == 9
 
     future_reservations: Iterable[Reservation] = reservation_series.reservations.filter(begins_at__gt=local_datetime())
@@ -76,11 +76,11 @@ def test_reservation_series__deny_series__dont_need_handling_details(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(DENY_SERIES_MUTATION, variables={"input": data})
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
-    assert response.results == {"denied": 5, "future": 5}
+    assert response.first_query_object == {"denied": 5, "future": 5}
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
@@ -94,12 +94,10 @@ def test_reservation_series__deny_series__reason_missing(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(DENY_SERIES_MUTATION, variables={"input": data})
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message(0) == (
-        "Primary key 1 on model 'tilavarauspalvelu.models.reservation_deny_reason.model.ReservationDenyReason' "
-        "did not match any row."
-    )
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("denyReason") == ["Deny reason with pk 1 does not exist."]
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
@@ -119,12 +117,12 @@ def test_reservation_series__deny_series__only_deny_certain_states(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(DENY_SERIES_MUTATION, variables={"input": data})
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
     # Last reservation is denied since it's waiting for payment
-    assert response.results == {"denied": 4, "future": 5}
+    assert response.first_query_object == {"denied": 4, "future": 5}
 
 
 @patch_method(PindoraService.reschedule_access_code)
@@ -143,7 +141,7 @@ def test_reservation_series__deny_series__has_access_codes(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(DENY_SERIES_MUTATION, variables={"input": data})
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -166,7 +164,7 @@ def test_reservation_series__deny_series__has_access_codes__pindora_not_found(gr
     }
 
     graphql.login_with_superuser()
-    response = graphql(DENY_SERIES_MUTATION, variables={"input": data})
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
     # Mutation didn't fail on missing access code.
     assert response.has_errors is False, response.errors
@@ -194,12 +192,12 @@ def test_reservation_series__deny_series__has_access_codes__pindora_call_fails(g
     }
 
     graphql.login_with_superuser()
-    response = graphql(DENY_SERIES_MUTATION, variables={"input": data})
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
     # Mutation failed due to unexpected Pindora error.
     # Don't allow denying to avoid accidentally leaving valid access codes
-
-    assert response.error_message(0) == "Failed"
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Failed"]
 
     assert PindoraService.reschedule_access_code.called is True
 
@@ -223,7 +221,7 @@ def test_reservation_series__deny_series__in_seasonal_booking(graphql):
     }
 
     graphql.login_with_superuser()
-    response = graphql(DENY_SERIES_MUTATION, variables={"input": data})
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 

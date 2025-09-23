@@ -464,7 +464,7 @@ def test_reservation__filter__by_reservation_unit(graphql):
     reservation = ReservationFactory.create(reservation_unit=reservation_unit)
 
     graphql.login_with_superuser()
-    query = reservations_query(reservation_unit=reservation_unit.pk)
+    query = reservations_query(reservation_units=reservation_unit.pk)
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -479,7 +479,7 @@ def test_reservation__filter__by_reservation_unit__multiple(graphql):
     reservation_2 = ReservationFactory.create(reservation_unit=reservation_unit_2)
 
     graphql.login_with_superuser()
-    query = reservations_query(reservation_unit=[reservation_unit_1.pk, reservation_unit_2.pk])
+    query = reservations_query(reservation_units=[reservation_unit_1.pk, reservation_unit_2.pk])
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -755,7 +755,7 @@ def test_reservation__filter__by_created_at(graphql):
     gte = datetime.date(2024, 1, 2).isoformat()
 
     graphql.login_with_superuser()
-    query = reservations_query(createdAfter=gte, createdBefore=lte)
+    query = reservations_query(created_at_gte=gte, created_at_lte=lte)
     response = graphql(query)
 
     assert response.has_errors is False, response

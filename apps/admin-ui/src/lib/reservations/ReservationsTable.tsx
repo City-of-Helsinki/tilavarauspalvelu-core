@@ -178,10 +178,10 @@ export function ReservationsTable({
 export const RESERVATION_TABLE_ELEMENT_FRAGMENT = gql`
   fragment ReservationTableElement on ReservationNode {
     ...ReservationCommonFields
-    ...CalendarReservationName
     name
     reservationUnit {
       id
+      nameFi
       unit {
         id
         nameFi

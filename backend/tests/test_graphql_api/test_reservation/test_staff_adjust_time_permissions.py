@@ -4,7 +4,7 @@ import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
 
-from tests.factories import ReservationFactory, UserFactory
+from tests.factories import ReservationFactory
 
 from .helpers import ADJUST_STAFF_MUTATION, get_staff_adjust_data
 
@@ -15,26 +15,22 @@ pytestmark = [
 
 @pytest.mark.parametrize("role", [UserRoleChoice.HANDLER, UserRoleChoice.ADMIN])
 def test_reservation__staff_adjust_time__allowed(graphql, role):
-    user = UserFactory.create_with_general_role(role=role)
-    graphql.force_login(user)
-
+    graphql.login_user_with_role(role=role)
     reservation = ReservationFactory.create_for_time_adjustment()
 
     data = get_staff_adjust_data(reservation)
-    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
+    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
 
 def test_reservation__staff_adjust_time__allowed__own(graphql):
     # Reservers are allowed to adjust their own reservations.
-    user = UserFactory.create_with_general_role(role=UserRoleChoice.RESERVER)
-    graphql.force_login(user)
-
+    user = graphql.login_user_with_role(role=UserRoleChoice.RESERVER)
     reservation = ReservationFactory.create_for_time_adjustment(user=user)
 
     data = get_staff_adjust_data(reservation)
-    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
+    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -44,10 +40,10 @@ def test_reservation__staff_adjust_time__not_allowed(graphql):
     reservation = ReservationFactory.create_for_time_adjustment()
 
     data = get_staff_adjust_data(reservation)
-    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
+    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
 
     assert response.has_errors is True, response.errors
-    assert response.error_message(0) == "No permission to adjust this reservation's time."
+    assert response.error_message() == "No permission to update."
 
 
 def test_reservation__staff_adjust_time__not_allowed__own(graphql):
@@ -56,7 +52,7 @@ def test_reservation__staff_adjust_time__not_allowed__own(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(user=user)
 
     data = get_staff_adjust_data(reservation)
-    response = graphql(ADJUST_STAFF_MUTATION, variables={"input": data})
+    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
 
     assert response.has_errors is True, response.errors
-    assert response.error_message(0) == "No permission to adjust this reservation's time."
+    assert response.error_message() == "No permission to update."

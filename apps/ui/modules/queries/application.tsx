@@ -42,7 +42,7 @@ export const APPLICATION_FORM_FRAGMENT = gql`
         }
       }
       suitableTimeRanges {
-        ...SuitableTimeFields
+        ...SuitableTime
       }
       purpose {
         id
@@ -56,7 +56,7 @@ export const APPLICATION_FORM_FRAGMENT = gql`
 `;
 
 export const UPDATE_APPLICATION_MUTATION = gql`
-  mutation UpdateApplication($input: ApplicationUpdateMutation!) {
+  mutation UpdateApplication($input: ApplicationUpdateMutationInput!) {
     updateApplication(input: $input) {
       pk
     }

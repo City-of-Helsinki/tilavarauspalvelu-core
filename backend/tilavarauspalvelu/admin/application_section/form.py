@@ -10,6 +10,7 @@ from tilavarauspalvelu.enums import ApplicationSectionStatusChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import ApplicationSection, ReservationUnit, ReservationUnitOption, SuitableTimeRange
 from utils.external_service.errors import ExternalServiceError
+from utils.fields.forms import disabled_widget
 
 
 class ReservationUnitOptionInlineAdminForm(forms.ModelForm):
@@ -92,7 +93,7 @@ class ApplicationSectionAdminForm(forms.ModelForm):
     instance: ApplicationSection | None
 
     status = forms.CharField(
-        widget=forms.TextInput(attrs={"class": "readonly", "disabled": True, "required": False}),
+        widget=disabled_widget,
         required=False,
         disabled=True,
         label=_("Status"),

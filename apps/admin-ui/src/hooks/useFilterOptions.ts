@@ -18,29 +18,34 @@ export function getFilterOptions(
   queryResult: ReturnType<typeof useFilterOptionsQuery>["data"]
 ): TagOptionsList {
   const data = queryResult;
-  const reservationUnitTypes = filterNonNullable(data?.allReservationUnitTypes).map((reservationUnitType) => ({
-    label: reservationUnitType.nameFi ?? "",
-    value: reservationUnitType.pk ?? 0,
+  const reservationUnitTypes = filterNonNullable(data?.reservationUnitTypes?.edges.map((e) => e?.node)).map((type) => ({
+    label: type.nameFi ?? "",
+    value: type.pk ?? 0,
   }));
-  const reservationPurposes = filterNonNullable(data?.allReservationPurposes).map((reservationPurpose) => ({
-    label: reservationPurpose.nameFi ?? "",
-    value: reservationPurpose.pk ?? 0,
+  const reservationPurposes = filterNonNullable(data?.reservationPurposes?.edges.map((e) => e?.node)).map(
+    (purpose) => ({
+      label: purpose.nameFi ?? "",
+      value: purpose.pk ?? 0,
+    })
+  );
+  const ageGroups = sort(
+    filterNonNullable(data?.ageGroups?.edges.map((e) => e?.node)),
+    (a, b) => a.minimum - b.minimum
+  ).map((group) => ({
+    label: `${group.minimum}-${group.maximum || ""}`,
+    value: group.pk ?? 0,
   }));
-  const ageGroups = sort(filterNonNullable(data?.allAgeGroups), (a, b) => a.minimum - b.minimum).map((ageGroup) => ({
-    label: `${ageGroup.minimum}-${ageGroup.maximum || ""}`,
-    value: ageGroup.pk ?? 0,
-  }));
-  const units = filterNonNullable(data?.allUnits).map((unit) => ({
+  const units = filterNonNullable(data?.unitsAll).map((unit) => ({
     label: unit.nameFi ?? "",
     value: unit.pk ?? 0,
   }));
-  const reservationUnits = filterNonNullable(data?.allReservationUnits).map((reservationUnit) => ({
-    label: reservationUnit.nameFi ?? "",
-    value: reservationUnit.pk ?? 0,
+  const reservationUnits = filterNonNullable(data?.reservationUnitsAll).map((n) => ({
+    label: n.nameFi ?? "",
+    value: n.pk ?? 0,
   }));
-  const unitGroups = filterNonNullable(data?.allUnitGroups).map((unitGroup) => ({
-    label: unitGroup.nameFi ?? "",
-    value: unitGroup.pk ?? 0,
+  const unitGroups = filterNonNullable(data?.unitGroups?.edges.map((e) => e?.node)).map((group) => ({
+    label: group.nameFi ?? "",
+    value: group.pk ?? 0,
   }));
 
   const states = Object.values(ReservationStateChoice)
@@ -49,20 +54,29 @@ export function getFilterOptions(
       value: s,
       label: t(`reservation:state.${s}`),
     }));
+
   const orderStatus = Object.values(OrderStatusWithFree).map((s) => ({
     value: s,
     label: t(`translation:orderStatus.${s}`),
   }));
+
   const reservationTypeChoices = Object.values(ReservationTypeChoice).map((s) => ({
     value: s,
     label: t(`filters:reservationTypeChoice.${s}`),
   }));
+
+  const recurring = [
+    { value: "only", label: t("filters:label.onlyRecurring") },
+    { value: "onlyNot", label: t("filters:label.onlyNotRecurring") },
+  ] as const;
+
   const reservationUnitStates = Object.values(ReservationUnitPublishingState)
     .filter((x) => x !== ReservationUnitPublishingState.Archived)
     .map((s) => ({
       value: s,
       label: t(`reservationUnit:state.${s}`),
     }));
+
   const municipalities = Object.values(MunicipalityChoice).map((value) => ({
     label: t(`common:municipalities.${value}`),
     value: value,
@@ -88,11 +102,6 @@ export function getFilterOptions(
       },
     ]);
 
-  const recurring = [
-    { value: "only", label: t("filters:label.onlyRecurring") },
-    { value: "onlyNot", label: t("filters:label.onlyNotRecurring") },
-  ] as const;
-
   return {
     reservationUnitTypes,
     units,
@@ -107,9 +116,8 @@ export function getFilterOptions(
     reserveeTypes,
     orderChoices: orderOptions,
     priorityChoices: priorities,
-    // Not used for filter options
-    purposes: [],
-    reservationPurposes,
+    // FIXME name is wrong, we have both purposes and reservationPurposes
+    purposes: reservationPurposes,
     ageGroups: ageGroups,
     // Not used by admin at all, common interface issue
     equipments: [],
@@ -130,44 +138,59 @@ export function useFilterOptions(unitFilter?: number[]): TagOptionsList {
 
 export const FILTER_OTIONS_QUERY = gql`
   query FilterOptions(
-    $orderReservationUnitTypeBy: [ReservationUnitTypeOrderSet!] = [nameFiAsc]
-    $orderReservationPurposesBy: [ReservationPurposeOrderSet!] = [rankAsc]
-    $orderUnitsBy: [UnitOrderSet!] = [nameFiAsc]
-    $orderReservationUnitsBy: [ReservationUnitAllOrderSet!] = [nameFiAsc]
-    # Filter
+    $orderReservationUnitTypeBy: [ReservationUnitTypeOrderingChoices!] = [nameFiAsc]
+    $orderReservationPurposesBy: [ReservationPurposeOrderingChoices!] = [rankAsc]
+    $orderUnitsBy: [UnitOrderingChoices!] = [nameFiAsc]
+    $orderReservationUnitsBy: [ReservationUnitOrderingChoices!] = [nameFiAsc]
+    $unit: [Int]
     $applicationRound: Int
-    $unit: [Int!]
   ) {
-    allReservationUnitTypes(orderBy: $orderReservationUnitTypeBy) {
-      id
-      pk
-      nameFi
+    reservationUnitTypes(orderBy: $orderReservationUnitTypeBy) {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+        }
+      }
     }
-    allReservationPurposes(orderBy: $orderReservationPurposesBy) {
-      id
-      pk
-      nameFi
+    reservationPurposes(orderBy: $orderReservationPurposesBy) {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+        }
+      }
     }
-    allAgeGroups {
-      id
-      pk
-      minimum
-      maximum
+    ageGroups {
+      edges {
+        node {
+          id
+          pk
+          minimum
+          maximum
+        }
+      }
     }
-    allUnits(orderBy: $orderUnitsBy, filter: { onlyWithPermission: true }) {
+    unitsAll(onlyWithPermission: true, orderBy: $orderUnitsBy) {
       id
       nameFi
       pk
     }
-    allReservationUnits(orderBy: $orderReservationUnitsBy, filter: { onlyWithPermission: true, unit: $unit }) {
+    reservationUnitsAll(onlyWithPermission: true, unit: $unit, orderBy: $orderReservationUnitsBy) {
       id
       nameFi
       pk
     }
-    allUnitGroups(filter: { onlyWithPermission: true, applicationRound: $applicationRound }) {
-      id
-      pk
-      nameFi
+    unitGroups(onlyWithPermission: true, applicationRound: $applicationRound) {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+        }
+      }
     }
   }
 `;

@@ -31,7 +31,7 @@ def test_delete_allocated_time_slot(graphql):
 
     # when:
     # - User tries to delete an allocated time slot
-    response = graphql(DELETE_ALLOCATION, variables={"input": {"pk": slot.pk}})
+    response = graphql(DELETE_ALLOCATION, input_data={"pk": slot.pk})
 
     # then:
     # - There are no errors in the response
@@ -72,10 +72,10 @@ def test_allocated_time_slot__delete__blocked_due_to_round_status(graphql, round
 
     # when:
     # - User tries to delete an allocated time slot
-    response = graphql(DELETE_ALLOCATION, variables={"input": {"pk": slot.pk}})
+    response = graphql(DELETE_ALLOCATION, input_data={"pk": slot.pk})
 
     # then:
     # - The response complains about the status of the application round
-    assert response.error_message(0) == (
-        "Cannot delete allocations from an application round not in the allocation stage."
-    )
+    assert response.field_error_messages() == [
+        "Cannot delete allocations from an application round not in the allocation stage.",
+    ]

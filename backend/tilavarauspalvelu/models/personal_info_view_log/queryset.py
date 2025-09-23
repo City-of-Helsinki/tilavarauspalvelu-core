@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from tilavarauspalvelu.models import PersonalInfoViewLog
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from django.db import models
 
 __all__ = [
     "PersonalInfoViewLogManager",
@@ -9,7 +8,7 @@ __all__ = [
 ]
 
 
-class PersonalInfoViewLogQuerySet(ModelQuerySet[PersonalInfoViewLog]): ...
+class PersonalInfoViewLogQuerySet(models.QuerySet): ...
 
 
-class PersonalInfoViewLogManager(ModelManager[PersonalInfoViewLog, PersonalInfoViewLogQuerySet]): ...
+class PersonalInfoViewLogManager(models.Manager.from_queryset(PersonalInfoViewLogQuerySet)): ...

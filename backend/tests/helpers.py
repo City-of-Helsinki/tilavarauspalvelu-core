@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import base64
 import re
 from contextlib import contextmanager
 from functools import wraps
-from io import BytesIO
 from types import SimpleNamespace
-from typing import TYPE_CHECKING, Any, NamedTuple, Self, TypedDict, TypeVar
+from typing import TYPE_CHECKING, Any, Self
 from unittest import mock
 from unittest.mock import patch
 
@@ -14,10 +12,10 @@ import polib
 import pytest
 import stamina
 from django.conf import settings
-from django.core.files import File
 from django.utils import translation
 from django.utils.functional import lazy
 from django.utils.translation import trans_real
+from graphene_django_extensions.testing import GraphQLClient as BaseGraphQLClient
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -26,41 +24,26 @@ if TYPE_CHECKING:
 
     from django.http import HttpRequest
 
+    from tilavarauspalvelu.enums import UserRoleChoice
+    from tilavarauspalvelu.models import User
     from tilavarauspalvelu.typing import HTTPMethod, Lang
 
 __all__ = [
+    "GraphQLClient",
     "ResponseMock",
     "TranslationsFromPOFiles",
-    "create_png",
     "exact",
-    "parametrize_helper",
-    "patch_method",
-    "use_retries",
 ]
 
 
-TNamedTuple = TypeVar("TNamedTuple", bound=NamedTuple)
+class GraphQLClient(BaseGraphQLClient):
+    def login_user_with_role(self, role: UserRoleChoice) -> User | None:
+        """Login with a user with the given role."""
+        from .factories import UserFactory
 
-
-class ParametrizeArgs(TypedDict):
-    argnames: list[str]
-    argvalues: list[TNamedTuple]  # type: ignore[valid-type]
-    ids: list[str]
-
-
-def parametrize_helper[TNamedTuple: NamedTuple](__tests: dict[str, TNamedTuple], /) -> ParametrizeArgs:
-    """Construct parametrize input while setting test IDs."""
-    assert __tests, "I need some tests, please!"
-    values = list(__tests.values())
-    try:
-        return ParametrizeArgs(
-            argnames=list(values[0].__class__.__annotations__),
-            argvalues=values,
-            ids=list(__tests),
-        )
-    except AttributeError as error:
-        msg = "Improper configuration. Did you use a NamedTuple for TNamedTuple?"
-        raise RuntimeError(msg) from error
+        user = UserFactory.create_with_general_role(role=role)
+        self.force_login(user)
+        return user
 
 
 class ResponseMock:
@@ -275,13 +258,3 @@ def use_retries(attempts: int = 1):
     finally:
         stamina.set_active(is_active)
         stamina.set_testing(is_testing)
-
-
-PNG = base64.b64decode(b"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4AWNgYGAAAAAEAAHklIQGAAAAAElFTkSuQmCC")
-"""A single blank pixel PNG image in base64 encoding."""
-
-
-def create_png(name: str = "image.png") -> File:
-    bytes_io = BytesIO(PNG)
-    bytes_io.seek(0)
-    return File(bytes_io, name=name)

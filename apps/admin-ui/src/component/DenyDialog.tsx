@@ -3,11 +3,11 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Button, ButtonVariant, Dialog, RadioButton, Select, SelectionGroup, TextArea } from "hds-react";
 import {
-  type ReservationDenyMutation,
-  type ReservationRefundMutation,
+  type ReservationDenyMutationInput,
+  type ReservationRefundMutationInput,
   useDenyReservationMutation,
   useRefundReservationMutation,
-  type ReservationSeriesDenyMutation,
+  type ReservationSeriesDenyMutationInput,
   useDenyReservationSeriesMutation,
   OrderStatus,
   type DenyDialogFieldsFragment,
@@ -255,13 +255,13 @@ export function DenyDialog({
   const [denyReservationMutation] = useDenyReservationMutation();
   const [refundReservationMutation] = useRefundReservationMutation();
 
-  const denyReservation = (input: ReservationDenyMutation) => denyReservationMutation({ variables: { input } });
+  const denyReservation = (input: ReservationDenyMutationInput) => denyReservationMutation({ variables: { input } });
 
   const [returnState, setReturnState] = useState<ReturnAllowedState>(convertToReturnState(reservation));
 
   const displayError = useDisplayError();
 
-  const refundReservation = async (input: ReservationRefundMutation) => {
+  const refundReservation = async (input: ReservationRefundMutationInput) => {
     try {
       await refundReservationMutation({ variables: { input } });
       successToast({
@@ -352,7 +352,7 @@ export function DenyDialogSeries({
         throw new Error("Recurring reservation PK undefined");
       }
 
-      const input: ReservationSeriesDenyMutation = {
+      const input: ReservationSeriesDenyMutationInput = {
         pk: inputPk,
         denyReason: denyReasonPk,
         handlingDetails,
@@ -397,7 +397,7 @@ export const DENY_DIALOG_FRAGMENT = gql`
 `;
 
 export const DENY_RESERVATION = gql`
-  mutation DenyReservation($input: ReservationDenyMutation!) {
+  mutation DenyReservation($input: ReservationDenyMutationInput!) {
     denyReservation(input: $input) {
       pk
       state
@@ -406,7 +406,7 @@ export const DENY_RESERVATION = gql`
 `;
 
 export const DENY_SERIES_RESERVATION = gql`
-  mutation DenyReservationSeries($input: ReservationSeriesDenyMutation!) {
+  mutation DenyReservationSeries($input: ReservationSeriesDenyMutationInput!) {
     denyReservationSeries(input: $input) {
       denied
       future
@@ -415,7 +415,7 @@ export const DENY_SERIES_RESERVATION = gql`
 `;
 
 export const REFUND_RESERVATION = gql`
-  mutation RefundReservation($input: ReservationRefundMutation!) {
+  mutation RefundReservation($input: ReservationRefundMutationInput!) {
     refundReservation(input: $input) {
       pk
     }

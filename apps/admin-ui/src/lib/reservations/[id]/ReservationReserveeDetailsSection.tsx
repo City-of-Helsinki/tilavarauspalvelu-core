@@ -3,7 +3,7 @@ import { Accordion, ApplicationDatas } from "@/styled";
 import { DataWrapper } from "./DataWrapper";
 import React, { useState } from "react";
 import {
-  type ReservationPageFragment,
+  ReservationPageQuery,
   useReservationDateOfBirthQuery,
   useReservationProfileDataContactInfoQuery,
   useReservationProfileDataSsnQuery,
@@ -31,6 +31,8 @@ import { formatErrorMessage } from "common/src/hooks/useDisplayError";
 
 registerCountryLocale(countriesJson);
 
+type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
+
 const ReserveeDetailsAccordion = styled(Accordion)`
   div {
     row-gap: var(--spacing-s);
@@ -54,7 +56,7 @@ function ReserveeDetailsButton({
     <Button
       variant={ButtonVariant.Secondary}
       iconStart={isLoading ? <LoadingSpinner small /> : icon}
-      style={{ cursor: isLoading ? "wait" : undefined }}
+      style={{ cursor: isLoading ? "wait" : "" }}
       onClick={onClick}
       disabled={disabled}
     >
@@ -66,7 +68,7 @@ function ReserveeDetailsButton({
 export function ReservationReserveeDetailsSection({
   reservation,
 }: Readonly<{
-  reservation: ReservationPageFragment;
+  reservation: ReservationType;
 }>) {
   const { t } = useTranslation();
   const { user: currentUser } = useSession();
@@ -81,8 +83,6 @@ export function ReservationReserveeDetailsSection({
     fetchPolicy: "no-cache",
     skip: !reservation.id || !isBirthDateVisible,
   });
-
-  const dateOfBirthNode = dateOfBirthData?.node != null && "user" in dateOfBirthData.node ? dateOfBirthData.node : null;
 
   const [isSSNVisible, setIsSSNVisible] = useState(false);
   const {
@@ -149,7 +149,7 @@ export function ReservationReserveeDetailsSection({
 
         {isBirthDateVisible && (
           <DataWrapper label={t("reservation:birthDate")} isLoading={isDateOfBirthLoading}>
-            {formatDate(dateOfBirthNode?.user?.dateOfBirth) || "-"}
+            {formatDate(dateOfBirthData?.reservation?.user?.dateOfBirth) || "-"}
           </DataWrapper>
         )}
 
@@ -242,14 +242,12 @@ export function ReservationReserveeDetailsSection({
 // so don't make them automatically or inside other queries
 export const RESERVATION_DATE_OF_BIRTH_QUERY = gql`
   query ReservationDateOfBirth($id: ID!) {
-    node(id: $id) {
-      ... on ReservationNode {
+    reservation(id: $id) {
+      id
+      user {
         id
-        user {
-          id
-          pk
-          dateOfBirth
-        }
+        pk
+        dateOfBirth
       }
     }
   }

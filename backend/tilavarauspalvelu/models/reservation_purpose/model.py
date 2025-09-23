@@ -4,15 +4,10 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from lazy_managers import LazyModelAttribute, LazyModelManager
+
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationRound, ApplicationSection, Reservation
-    from tilavarauspalvelu.models._base import ManyToManyRelatedManager, OneToManyRelatedManager
-    from tilavarauspalvelu.models.application_round.queryset import ApplicationRoundQuerySet
-    from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
-    from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
-
     from .actions import ReservationPurposeActions
     from .queryset import ReservationPurposeManager
     from .validators import ReservationPurposeValidator
@@ -36,10 +31,6 @@ class ReservationPurpose(models.Model):
     objects: ClassVar[ReservationPurposeManager] = LazyModelManager.new()
     actions: ReservationPurposeActions = LazyModelAttribute.new()
     validators: ReservationPurposeValidator = LazyModelAttribute.new()
-
-    reservations: OneToManyRelatedManager[Reservation, ReservationQuerySet]
-    application_sections: OneToManyRelatedManager[ApplicationSection, ApplicationSectionQuerySet]
-    application_rounds: ManyToManyRelatedManager[ApplicationRound, ApplicationRoundQuerySet]
 
     class Meta:
         db_table = "reservation_purpose"

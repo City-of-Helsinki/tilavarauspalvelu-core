@@ -20,17 +20,17 @@ def test_spaces__create__regular_user_cannot_create_space(graphql):
     unit = UnitFactory.create()
 
     data = {
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit.pk,
     }
 
     # when:
     # - User tries to create a space
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response complains about permissions
-    assert response.error_message(0) == "No permission to create a space"
+    assert response.error_message() == "No permission to create."
 
 
 def test_spaces__create__unit_admin_can_create_space(graphql):
@@ -41,13 +41,13 @@ def test_spaces__create__unit_admin_can_create_space(graphql):
     graphql.force_login(admin)
 
     data = {
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit.pk,
     }
 
     # when:
     # - User tries to create a space for the unit they manage
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response has no errors
@@ -63,17 +63,17 @@ def test_spaces__create__unit_admin_cannot_create_space_for_other_unit(graphql):
     graphql.force_login(admin)
 
     data = {
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit_2.pk,
     }
 
     # when:
     # - User tries to create a space for some other unit they don't manage
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response complains about permissions
-    assert response.error_message(0) == "No permission to create a space"
+    assert response.error_message() == "No permission to create."
 
 
 def test_spaces__create__general_admin_can_create_space(graphql):
@@ -85,13 +85,13 @@ def test_spaces__create__general_admin_can_create_space(graphql):
     unit = UnitFactory.create()
 
     data = {
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit.pk,
     }
 
     # when:
     # - User tries to create a space for the unit they manage
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response has no errors

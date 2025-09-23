@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any
 
 from django.contrib import admin
-from modeltranslation.admin import TabbedTranslationAdmin
 from more_admin_filters.filters import MultiSelectRelatedOnlyDropdownFilter
 from rangefilter.filters import DateRangeFilterBuilder
 
@@ -17,7 +16,7 @@ class ReservationUnitFilter(MultiSelectRelatedOnlyDropdownFilter):
 
 
 @admin.register(ReservationUnitPricing)
-class ReservationUnitPricingAdmin(TabbedTranslationAdmin):
+class ReservationUnitPricingAdmin(admin.ModelAdmin):
     # List
     list_display = [
         "id",
@@ -44,10 +43,8 @@ class ReservationUnitPricingAdmin(TabbedTranslationAdmin):
         "is_activated_on_begins",
         ("lowest_price", "lowest_price_net"),
         ("highest_price", "highest_price_net"),
-        "price_unit",
-        "payment_type",
         "tax_percentage",
-        "material_price_description",
+        "price_unit",
     ]
     readonly_fields = [
         "lowest_price_net",

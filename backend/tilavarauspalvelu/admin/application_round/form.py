@@ -9,11 +9,12 @@ from tinymce.widgets import TinyMCE
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, TermsOfUseTypeChoices
 from tilavarauspalvelu.models import ApplicationRound, ReservationUnit, TermsOfUse
+from utils.fields.forms import disabled_widget
 
 
 class ApplicationRoundAdminForm(forms.ModelForm):
     status = forms.CharField(
-        widget=forms.TextInput(attrs={"class": "readonly", "disabled": True, "required": False}),
+        widget=disabled_widget,
         required=False,
         disabled=True,
         label=_("Status"),
@@ -42,7 +43,6 @@ class ApplicationRoundAdminForm(forms.ModelForm):
         self.base_fields["terms_of_use"].queryset = TermsOfUse.objects.filter(
             terms_type=TermsOfUseTypeChoices.RECURRING
         )
-        self.base_fields["terms_of_use"].required = True
         super().__init__(*args, **kwargs)
 
     class Meta:

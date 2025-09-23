@@ -1,3 +1,5 @@
+# type: EmailType.RESERVATION_CONFIRMED_STAFF_NOTIFICATION
+
 from __future__ import annotations
 
 from inspect import cleandoc

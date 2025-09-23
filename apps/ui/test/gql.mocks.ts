@@ -2,9 +2,8 @@ import {
   CurrentUserDocument,
   OptionsDocument,
   OptionsQuery,
-  ReservationKind,
-  ReservationPurposeOrderSet,
-  ReservationUnitTypeOrderSet,
+  ReservationPurposeOrderingChoices,
+  ReservationUnitTypeOrderingChoices,
   type CurrentUserQuery,
 } from "@/gql/gql-types";
 import { createApplicationMutationMocks } from "./application.mocks";
@@ -15,15 +14,14 @@ import {
   type CreateGraphQLMocksReturn,
   createOptionQueryMock,
 } from "./test.gql.utils";
-import { createNodeId } from "common/src/helpers";
+import { base64encode } from "common/src/helpers";
 
 export function createGraphQLMocks({
   noUser = false,
   isSearchError = false,
-  reservationKind = ReservationKind.Direct,
 }: CreateGraphQLMockProps = {}): CreateGraphQLMocksReturn {
   return [
-    ...createSearchQueryMocks({ isSearchError, reservationKind }),
+    ...createSearchQueryMocks({ isSearchError }),
     ...createOptionsQueryMocks(),
     ...createCurrentUserQueryMocks({ noUser }),
     ...createApplicationMutationMocks(),
@@ -38,7 +36,7 @@ function createCurrentUserQueryMocks({ noUser }: CurrentUserQueryMocksProps): Cr
   const CurrentUserMock: CurrentUserQuery = {
     currentUser: !noUser
       ? {
-          id: createNodeId("UserNode", 1),
+          id: base64encode("UserNode:1"),
           pk: 1,
           firstName: "Test",
           lastName: "User",
@@ -67,8 +65,8 @@ function createOptionsQueryMocks(): CreateGraphQLMocksReturn {
       request: {
         query: OptionsDocument,
         variables: {
-          reservationUnitTypesOrderBy: ReservationUnitTypeOrderSet.RankAsc,
-          reservationPurposesOrderBy: ReservationPurposeOrderSet.RankAsc,
+          reservationUnitTypesOrderBy: ReservationUnitTypeOrderingChoices.RankAsc,
+          reservationPurposesOrderBy: ReservationPurposeOrderingChoices.RankAsc,
           unitsOrderBy: [],
           equipmentsOrderBy: [],
           purposesOrderBy: [],

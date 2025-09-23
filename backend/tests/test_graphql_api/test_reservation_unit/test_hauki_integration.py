@@ -4,7 +4,7 @@ import urllib.parse
 
 import freezegun
 import pytest
-from undine.relay import to_global_id
+from graphql_relay import to_global_id
 
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
@@ -13,7 +13,7 @@ from tilavarauspalvelu.models.reservation_unit.actions import ReservationUnitHau
 from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
 from tests.helpers import patch_method
 
-from .helpers import UPDATE_MUTATION, get_update_draft_input_data
+from .helpers import UPDATE_MUTATION, get_draft_update_input_data, reservation_unit_query
 
 # Applied to all tests
 pytestmark = [
@@ -31,9 +31,9 @@ def test_reservation_unit__update__send_resource_to_hauki_when_resource_id_exist
         is_draft=True,
         origin_hauki_resource=OriginHaukiResourceFactory.create(),
     )
-    data = get_update_draft_input_data(reservation_unit)
+    data = get_draft_update_input_data(reservation_unit)
 
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
 
     assert HaukiResourceHashUpdater.run.call_count == 1
@@ -46,9 +46,9 @@ def test_reservation_unit__update__send_resource_to_hauki_when_resource_id_doesn
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_update_draft_input_data(reservation_unit)
+    data = get_draft_update_input_data(reservation_unit)
 
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
 
     assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 1
@@ -60,9 +60,9 @@ def test_reservation_unit__update__send_resource_to_hauki_when_exports_disabled(
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_update_draft_input_data(reservation_unit)
+    data = get_draft_update_input_data(reservation_unit)
 
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
@@ -75,23 +75,12 @@ def test_reservation_unit__update__send_resource_to_hauki_errors_returns_error_m
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_update_draft_input_data(reservation_unit)
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    data = get_draft_update_input_data(reservation_unit)
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "Sending reservation unit as resource to aukiolosovellus failed"
+    assert response.error_message() == "Sending reservation unit as resource to HAUKI failed."
 
     assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 1
-
-
-HAUKI_URL_QUERY = """
-    query ($id: ID!) {
-        node(id: $id) {
-            ... on ReservationUnitNode {
-                haukiUrl
-            }
-        }
-    }
-"""
 
 
 @freezegun.freeze_time("2023-01-01T12:00:00+02:00")
@@ -104,7 +93,8 @@ def test_reservation_unit__query__hauki_url__regular_user(graphql):
     )
 
     global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
-    response = graphql(HAUKI_URL_QUERY, variables={"id": global_id})
+    query = reservation_unit_query(fields="haukiUrl", id=global_id)
+    response = graphql(query)
 
     assert response.error_message("haukiUrl") == "No permission to access field."
 
@@ -121,7 +111,8 @@ def test_reservation_unit__query__hauki_url__superuser(graphql, settings):
     )
 
     global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
-    response = graphql(HAUKI_URL_QUERY, variables={"id": global_id})
+    query = reservation_unit_query(fields="haukiUrl", id=global_id)
+    response = graphql(query)
 
     assert response.has_errors is False, response.errors
 
@@ -141,7 +132,7 @@ def test_reservation_unit__query__hauki_url__superuser(graphql, settings):
         safe="/&?=",
     )
 
-    assert response.results == {"haukiUrl": url}
+    assert response.first_query_object == {"haukiUrl": url}
 
 
 def test_reservation_unit__query__hauki_url__superuser__no_hauki_resource(graphql):
@@ -152,9 +143,9 @@ def test_reservation_unit__query__hauki_url__superuser__no_hauki_resource(graphq
     )
 
     global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
-
+    query = reservation_unit_query(fields="haukiUrl", id=global_id)
     graphql.login_with_superuser()
-    response = graphql(HAUKI_URL_QUERY, variables={"id": global_id})
+    response = graphql(query)
 
     assert response.has_errors is False, response.errors
-    assert response.results == {"haukiUrl": None}
+    assert response.first_query_object == {"haukiUrl": None}

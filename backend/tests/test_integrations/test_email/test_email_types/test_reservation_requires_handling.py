@@ -1,3 +1,5 @@
+# type: EmailType.RESERVATION_REQUIRES_HANDLING
+
 from __future__ import annotations
 
 import datetime

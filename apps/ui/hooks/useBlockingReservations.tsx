@@ -46,7 +46,7 @@ export function useBlockingReservations(
 }
 
 export const AFFECTING_RESERVATIONS_QUERY = gql`
-  query AffectingReservations($pk: Int!, $beginDate: Date!, $endDate: Date!, $state: [ReservationStateChoice!]) {
+  query AffectingReservations($pk: Int!, $beginDate: Date!, $endDate: Date!, $state: [ReservationStateChoice]) {
     affectingReservations(forReservationUnits: [$pk], beginDate: $beginDate, endDate: $endDate, state: $state) {
       ...BlockingReservationFields
     }

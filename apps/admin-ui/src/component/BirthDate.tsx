@@ -5,7 +5,22 @@ import { useTranslation } from "next-i18next";
 import { useReservationDateOfBirthQuery, useApplicationDateOfBirthQuery } from "@gql/gql-types";
 import { formatDate } from "@/common/util";
 import { Flex } from "common/styled";
-import { createNodeId, getNode } from "common/src/helpers";
+import { base64encode } from "common/src/helpers";
+
+// NOTE separate query because all requests for dateOfBirth are logged
+// so don't make them automatically or inside other queries
+export const APPLICATION_DATE_OF_BIRTH_QUERY = gql`
+  query ApplicationDateOfBirth($id: ID!) {
+    application(id: $id) {
+      id
+      user {
+        id
+        pk
+        dateOfBirth
+      }
+    }
+  }
+`;
 
 const Button = styled.button`
   margin: 0;
@@ -24,7 +39,7 @@ type Props =
       applicationPk: number;
     };
 
-/// Component for toggling the visibility of the user's birthdate
+/// Component for toggling the visibility of the user's birth date
 /// Queries through reservation or application because of permission checks (most users are not allowed query users api)
 /// @param reservationPk - the pk of the reservation
 /// @param applicationPk - the pk of the application
@@ -41,7 +56,7 @@ export function BirthDate(props: Props): JSX.Element {
     error: errorReservation,
   } = useReservationDateOfBirthQuery({
     variables: {
-      id: createNodeId("ReservationNode", reservationPk ?? 0),
+      id: base64encode(`ReservationNode:${reservationPk}`),
     },
     fetchPolicy: "no-cache",
     skip: !reservationPk || !visible,
@@ -53,7 +68,7 @@ export function BirthDate(props: Props): JSX.Element {
     error: errorApplication,
   } = useApplicationDateOfBirthQuery({
     variables: {
-      id: createNodeId("ApplicationNode", applicationPk ?? 0),
+      id: base64encode(`ApplicationNode:${applicationPk}`),
     },
     fetchPolicy: "no-cache",
     skip: !applicationPk || !visible,
@@ -65,8 +80,21 @@ export function BirthDate(props: Props): JSX.Element {
   const isLoading = "reservationPk" in props ? isReservationLoading : isApplicationLoading;
   const error = "reservationPk" in props ? errorReservation : errorApplication;
 
-  const node = getNode(data);
-  const dateOfBirth = node?.user?.dateOfBirth;
+  function getUser(d: typeof data) {
+    if (d == null) {
+      return null;
+    }
+    if ("reservation" in d) {
+      return d.reservation?.user;
+    }
+    if ("application" in d) {
+      return d.application?.user;
+    }
+    return null;
+  }
+
+  const user = getUser(data);
+  const dateOfBirth = user?.dateOfBirth;
 
   const hideLabel = t("reservation:hideBirthDate");
   const showLabel = t("reservation:showBirthDate");
@@ -88,20 +116,3 @@ export function BirthDate(props: Props): JSX.Element {
     </Flex>
   );
 }
-
-// NOTE separate query because all requests for dateOfBirth are logged
-// so don't make them automatically or inside other queries
-export const APPLICATION_DATE_OF_BIRTH_QUERY = gql`
-  query ApplicationDateOfBirth($id: ID!) {
-    node(id: $id) {
-      ... on ApplicationNode {
-        id
-        user {
-          id
-          pk
-          dateOfBirth
-        }
-      }
-    }
-  }
-`;

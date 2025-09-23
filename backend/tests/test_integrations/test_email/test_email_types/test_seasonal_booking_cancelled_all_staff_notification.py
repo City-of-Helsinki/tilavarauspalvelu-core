@@ -1,3 +1,5 @@
+# type: EmailType.SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION
+
 from __future__ import annotations
 
 from copy import deepcopy

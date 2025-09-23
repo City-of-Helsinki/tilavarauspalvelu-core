@@ -6,7 +6,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontMedium, Strongish } from "../../styled";
 import { type ReserveeType } from "../../gql/gql-types";
-import { type Inputs, type Reservation } from "./types";
+import { Inputs, Reservation } from "./types";
 import { type OptionsRecord } from "../../types/common";
 import { ControlledCheckbox, ControlledSelect } from "../components/form";
 
@@ -73,24 +73,9 @@ const StyledTextArea = styled(TextArea)<TextAreaProps>`
  */
 const MAX_TEXT_LENGTH = 255;
 
-type FieldOptions = {
-  ageGroup: OptionsRecord["ageGroups"];
-  purpose: OptionsRecord["reservationPurposes"];
-  municipality: OptionsRecord["municipalities"];
-};
-
-// Fix to match the Field required options
-export function convertOptionsToField(options: OptionsRecord): FieldOptions {
-  return {
-    ageGroup: options.ageGroups,
-    purpose: options.reservationPurposes,
-    municipality: options.municipalities,
-  };
-}
-
 export function ReservationFormField({
   field,
-  options: originalOptions,
+  options,
   translationKey,
   required,
   reservation,
@@ -98,7 +83,6 @@ export function ReservationFormField({
   data = {},
 }: Props) {
   const { t } = useTranslation();
-  const options = convertOptionsToField(originalOptions);
 
   const lowerCaseTranslationKey = translationKey?.toLocaleLowerCase() || "individual";
 
@@ -196,7 +180,7 @@ export function ReservationFormField({
 
   const id = `reservation-form-field__${field}`;
   if (isSelectField) {
-    const optionsNarrowed = Object.keys(options).includes(field) ? options[field as keyof FieldOptions] : [];
+    const optionsNarrowed = Object.keys(options).includes(field) ? options[field as keyof OptionsRecord] : [];
     return (
       <StyledControlledSelect
         id={id}

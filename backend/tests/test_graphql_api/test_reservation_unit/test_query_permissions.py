@@ -85,7 +85,7 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
     ReservationFactory.create(
         cancel_details="Cancel Details",
         cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
-        deny_reason=ReservationDenyReasonFactory.create(reason="Deny Reason"),
+        deny_reason=ReservationDenyReasonFactory(reason="Deny Reason"),
         description="Description",
         free_of_charge_reason="Free of Charge Reason",
         handling_details="Handling Details",
@@ -141,7 +141,7 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
     ReservationFactory.create(
         cancel_details="Cancel Details",
         cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
-        deny_reason=ReservationDenyReasonFactory.create(reason="Deny Reason"),
+        deny_reason=ReservationDenyReasonFactory(reason="Deny Reason"),
         description="Description",
         free_of_charge_reason="Free of Charge Reason",
         handling_details="Handling Details",
@@ -205,7 +205,7 @@ def test_reservation_unit__query__payment_merchant__without_permissions(graphql)
     query = reservation_units_query(fields="paymentMerchant { name }")
     response = graphql(query)
 
-    assert response.error_message(0) == "No permission to access payment merchant"
+    assert response.error_message("paymentMerchant") == "No permission to access field."
 
 
 def test_reservation_unit__query__payment_product__without_permissions(graphql):
@@ -217,4 +217,4 @@ def test_reservation_unit__query__payment_product__without_permissions(graphql):
     query = reservation_units_query(fields="paymentProduct { pk merchant { pk } }")
     response = graphql(query)
 
-    assert response.error_message(0) == "No permission to access payment product"
+    assert response.error_message("paymentProduct") == "No permission to access field."

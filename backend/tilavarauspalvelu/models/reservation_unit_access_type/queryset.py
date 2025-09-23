@@ -5,8 +5,6 @@ from typing import TYPE_CHECKING, Self
 from django.db import models
 from lookup_property import L
 
-from tilavarauspalvelu.models import ReservationUnitAccessType
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from utils.date_utils import local_date
 
 if TYPE_CHECKING:
@@ -19,7 +17,7 @@ __all__ = [
 ]
 
 
-class ReservationUnitAccessTypeQuerySet(ModelQuerySet[ReservationUnitAccessType]):
+class ReservationUnitAccessTypeQuerySet(models.QuerySet):
     def active(self, *, on_date: datetime.date | None = None) -> Self:
         """Get only the active access types for each reservation unit."""
         on_date = on_date or local_date()
@@ -35,4 +33,4 @@ class ReservationUnitAccessTypeQuerySet(ModelQuerySet[ReservationUnitAccessType]
         return self.filter(L(end_date__gt=on_date))
 
 
-class ReservationUnitAccessTypeManager(ModelManager[ReservationUnitAccessType, ReservationUnitAccessTypeQuerySet]): ...
+class ReservationUnitAccessTypeManager(models.Manager.from_queryset(ReservationUnitAccessTypeQuerySet)): ...

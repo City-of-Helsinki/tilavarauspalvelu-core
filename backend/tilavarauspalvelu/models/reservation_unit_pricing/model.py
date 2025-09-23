@@ -4,11 +4,10 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from lazy_managers import LazyModelAttribute, LazyModelManager
-from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import PaymentType, PriceUnit
 from utils.auditlog_util import AuditLogger
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
@@ -28,9 +27,9 @@ __all__ = [
 
 class ReservationUnitPricing(models.Model):
     begins: datetime.date = models.DateField()
-    price_unit: PriceUnit = TextChoicesField(choices_enum=PriceUnit, default=PriceUnit.PER_HOUR)
+    price_unit: str = models.CharField(max_length=20, choices=PriceUnit.choices, default=PriceUnit.PER_HOUR)
 
-    payment_type: PaymentType | None = TextChoicesField(choices_enum=PaymentType, null=True, blank=True)
+    payment_type: str | None = models.CharField(max_length=20, choices=PaymentType.choices, null=True, blank=True)
 
     # True: This pricing is used for reservations that are created after the begins date
     # False: This pricing is used for reservations that start after the begins date
@@ -38,8 +37,6 @@ class ReservationUnitPricing(models.Model):
 
     lowest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     highest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
-    material_price_description: str = models.CharField(max_length=100, blank=True, default="")
 
     tax_percentage: TaxPercentage = models.ForeignKey(
         "tilavarauspalvelu.TaxPercentage",
@@ -52,11 +49,6 @@ class ReservationUnitPricing(models.Model):
         related_name="pricings",
         on_delete=models.CASCADE,
     )
-
-    # Translated field hints
-    material_price_description_fi: str | None
-    material_price_description_en: str | None
-    material_price_description_sv: str | None
 
     objects: ClassVar[ReservationUnitPricingManager] = LazyModelManager.new()
     actions: ReservationUnitPricingActions = LazyModelAttribute.new()

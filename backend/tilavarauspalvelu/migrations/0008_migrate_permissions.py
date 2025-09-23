@@ -1,27 +1,9 @@
-from __future__ import annotations
-
-from typing import Any
-
 import django.db.models.deletion
+import graphene_django_extensions.fields.model
 from django.conf import settings
 from django.db import migrations, models
 
 import tilavarauspalvelu.enums
-
-
-class StrChoiceField(models.CharField):
-    """CharField for TextChoices that automatically sets 'max_length' to the length of the longest choice."""
-
-    def __init__(self, enum: type[models.Choices], **kwargs: Any) -> None:
-        self.enum = enum
-        kwargs["max_length"] = max(len(val) for val, _ in enum.choices)
-        kwargs["choices"] = enum.choices
-        super().__init__(**kwargs)
-
-    def deconstruct(self) -> tuple[str, str, list[Any], dict[str, Any]]:
-        name, path, args, kwargs = super().deconstruct()
-        kwargs["enum"] = self.enum
-        return name, path, args, kwargs
 
 
 class Migration(migrations.Migration):
@@ -40,7 +22,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "role",
-                    StrChoiceField(
+                    graphene_django_extensions.fields.model.StrChoiceField(
                         choices=[
                             ("ADMIN", "Admin"),
                             ("HANDLER", "Handler"),
@@ -89,7 +71,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "role",
-                    StrChoiceField(
+                    graphene_django_extensions.fields.model.StrChoiceField(
                         choices=[
                             ("ADMIN", "Admin"),
                             ("HANDLER", "Handler"),

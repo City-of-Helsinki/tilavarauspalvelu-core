@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path, re_path, reverse
+from graphene_django_extensions import FileUploadGraphQLView
 
 from tilavarauspalvelu.api.gdpr.views import TilavarauspalveluGDPRAPIView
 from tilavarauspalvelu.api.rest.views import (
@@ -35,7 +36,7 @@ admin.site.each_context = lambda request: original_each_context(request) | {
 }
 
 urlpatterns = [
-    path("", include("undine.http.urls")),
+    path("graphql/", FileUploadGraphQLView.as_view(graphiql=settings.DEBUG)),
     path("admin/", admin.site.urls),
     path("v1/reservation_calendar/<int:pk>/", reservation_ical, name="reservation_calendar"),
     path(
@@ -71,6 +72,14 @@ if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
         path(
             "mock_verkkokauppa/",
             include("tilavarauspalvelu.api.mock_verkkokauppa_api.urls", namespace="mock_verkkokauppa"),
+        ),
+    )
+
+if settings.FRONTEND_TESTING_API_ENABLED:
+    urlpatterns.append(
+        path(
+            "testing/",
+            include("tilavarauspalvelu.api.frontend_testing_api.urls", namespace="frontend_testing_api"),
         ),
     )
 

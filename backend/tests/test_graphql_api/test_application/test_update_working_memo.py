@@ -21,9 +21,9 @@ def test_application__update_working_memo__regular_user(graphql):
         "pk": application.id,
         "workingMemo": "123",
     }
-    response = graphql(WORKING_MEMO_MUTATION, variables={"input": input_data})
+    response = graphql(WORKING_MEMO_MUTATION, input_data=input_data)
 
-    assert response.error_message(0) == "No permission to change working memo for this application."
+    assert response.error_message() == "No permission to update."
 
 
 def test_application__update_working_memo__general_admin(graphql):
@@ -36,7 +36,7 @@ def test_application__update_working_memo__general_admin(graphql):
         "pk": application.id,
         "workingMemo": "123",
     }
-    response = graphql(WORKING_MEMO_MUTATION, variables={"input": input_data})
+    response = graphql(WORKING_MEMO_MUTATION, input_data=input_data)
 
     assert response.has_errors is False, response
 
@@ -54,7 +54,7 @@ def test_application__update_working_memo__blank(graphql):
         "pk": application.id,
         "workingMemo": "",
     }
-    response = graphql(WORKING_MEMO_MUTATION, variables={"input": input_data})
+    response = graphql(WORKING_MEMO_MUTATION, input_data=input_data)
 
     assert response.has_errors is False, response
 

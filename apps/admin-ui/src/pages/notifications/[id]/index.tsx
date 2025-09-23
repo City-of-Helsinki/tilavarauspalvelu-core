@@ -20,13 +20,12 @@ import {
   BannerNotificationState,
   BannerNotificationLevel,
   BannerNotificationTarget,
-  useDeleteBannerNotificationMutation,
+  useBannerNotificationDeleteMutation,
+  useBannerNotificationUpdateMutation,
+  useBannerNotificationCreateMutation,
   useBannerNotificationPageQuery,
-  type BannerNotificationPageFragment,
+  type BannerNotificationPageQuery,
   UserPermissionChoice,
-  useUpdateBannerNotificationMutation,
-  useCreateBannerNotificationMutation,
-  type BannerNotificationCreateMutation,
 } from "@gql/gql-types";
 import { fromUIDate } from "common/src/common/util";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
@@ -37,7 +36,7 @@ import {
   checkLengthWithoutHtml,
 } from "common/src/schemas/schemaCommon";
 import { valueForDateInput, valueForTimeInput, dateTime, constructDateTimeSafe } from "@/helpers";
-import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { ControlledDateInput } from "common/src/components/form";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { successToast } from "common/src/components/toast";
@@ -53,7 +52,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { getNotificationListUrl } from "@/common/urls";
-import { Error404 } from "@/component/Error404";
 
 const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
   ssr: false,
@@ -231,7 +229,7 @@ const GridForm = styled.form`
 `;
 
 /// @brief This is the create / edit page for a single notification.
-const NotificationForm = ({ notification }: { notification?: BannerNotificationPageFragment }) => {
+const NotificationForm = ({ notification }: { notification?: BannerNotificationPageQuery["bannerNotification"] }) => {
   const { t } = useTranslation("notification");
 
   const today = new Date();
@@ -268,8 +266,8 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
     },
   });
 
-  const [createMutation] = useCreateBannerNotificationMutation();
-  const [updateMutation] = useUpdateBannerNotificationMutation();
+  const [createMutation] = useBannerNotificationCreateMutation();
+  const [updateMutation] = useBannerNotificationUpdateMutation();
 
   const router = useRouter();
   const displayError = useDisplayError();
@@ -278,25 +276,27 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
     const end = constructDateTimeSafe(data.activeUntil, data.activeUntilTime);
     const start = data.activeFrom !== "" ? dateTime(data.activeFrom, data.activeFromTime) : undefined;
 
-    const input: BannerNotificationCreateMutation = {
+    const input = {
       name: data.name,
       // either both needs to be defined or neither
       // for drafts null is fine, published it's not (schema checks)
       activeFrom: start != null && end != null ? start : null,
       activeUntil: start != null && end != null ? end.toISOString() : null,
       draft: data.isDraft,
-      messageFi: data.messageFi,
+      message: data.messageFi,
       messageEn: data.messageEn,
       messageSv: data.messageSv,
       target: convertTarget(data.targetGroup),
       level: convertLevel(data.level),
+      pk: data.pk,
     };
+    const mutationFn = data.pk === 0 ? createMutation : updateMutation;
     try {
-      if (data.pk === 0) {
-        await createMutation({ variables: { input } });
-      } else {
-        await updateMutation({ variables: { input: { pk: data.pk, ...input } } });
-      }
+      await mutationFn({
+        variables: {
+          input,
+        },
+      });
       successToast({
         text: t("form.saveSuccessToast", {
           name: data.name,
@@ -501,23 +501,20 @@ function getName(isNew: boolean, isLoading: boolean, name: string | undefined, t
   return t("notification:error.notFound");
 }
 
-function useRemoveNotification({ notification }: { notification: BannerNotificationPageFragment | null }) {
+function useRemoveNotification({ notification }: { notification?: BannerNotificationPageQuery["bannerNotification"] }) {
   const { t } = useTranslation();
 
-  const [removeMutation] = useDeleteBannerNotificationMutation();
+  const [removeMutation] = useBannerNotificationDeleteMutation();
 
   const router = useRouter();
   const displayError = useDisplayError();
 
   const removeNotification = async () => {
     try {
-      if (notification == null) {
-        throw new Error(t("notification:error.notFound"));
-      }
       const res = await removeMutation({
         variables: {
           input: {
-            pk: notification?.pk,
+            pk: String(notification?.pk ?? 0),
           },
         },
       });
@@ -543,7 +540,7 @@ function LoadedContent({
   children,
 }: {
   isNew: boolean;
-  notification: BannerNotificationPageFragment | null;
+  notification?: BannerNotificationPageQuery["bannerNotification"];
   children?: ReactNode;
 }) {
   const { t } = useTranslation();
@@ -574,20 +571,19 @@ function LoadedContent({
 /// Client only: uses hooks, window, and react-router-dom
 /// We don't have proper layouts yet, so just separate the container stuff here
 function PageWrapped({ pk }: { pk?: number }): JSX.Element {
-  const isNew = pk === 0;
+  const typename = "BannerNotificationNode";
+
+  const id = base64encode(`${typename}:${pk}`);
   const { data, loading: isLoading } = useBannerNotificationPageQuery({
-    skip: isNew,
-    variables: { id: createNodeId("BannerNotificationNode", pk ?? 0) },
+    skip: !pk,
+    variables: { id },
   });
 
-  const notification = getNode(data);
+  const notification = data?.bannerNotification ?? undefined;
 
-  if (isLoading && !isNew) {
-    return <CenterSpinner />;
-  } else if (notification != null || isNew) {
-    return <LoadedContent isNew={isNew} notification={notification} />;
-  }
-  return <Error404 />;
+  const isNew = pk === 0;
+
+  return isLoading ? <CenterSpinner /> : <LoadedContent isNew={isNew} notification={notification} />;
 }
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -617,7 +613,7 @@ export async function getServerSideProps({ locale, query }: GetServerSidePropsCo
 }
 
 export const BANNER_NOTIFICATIONS_CREATE = gql`
-  mutation CreateBannerNotification($input: BannerNotificationCreateMutation!) {
+  mutation BannerNotificationCreate($input: BannerNotificationCreateMutationInput!) {
     createBannerNotification(input: $input) {
       pk
     }
@@ -625,7 +621,7 @@ export const BANNER_NOTIFICATIONS_CREATE = gql`
 `;
 
 export const BANNER_NOTIFICATIONS_UPDATE = gql`
-  mutation UpdateBannerNotification($input: BannerNotificationUpdateMutation!) {
+  mutation BannerNotificationUpdate($input: BannerNotificationUpdateMutationInput!) {
     updateBannerNotification(input: $input) {
       pk
     }
@@ -633,36 +629,28 @@ export const BANNER_NOTIFICATIONS_UPDATE = gql`
 `;
 
 export const BANNER_NOTIFICATIONS_DELETE = gql`
-  mutation DeleteBannerNotification($input: BannerNotificationDeleteMutation!) {
+  mutation BannerNotificationDelete($input: BannerNotificationDeleteMutationInput!) {
     deleteBannerNotification(input: $input) {
-      pk
+      deleted
     }
-  }
-`;
-
-export const BANNER_NOTIFICATIONS_PAGE_FRAGMENT = gql`
-  fragment BannerNotificationPage on BannerNotificationNode {
-    id
-    pk
-    level
-    activeFrom
-    messageEn
-    messageFi
-    messageSv
-    name
-    target
-    activeUntil
-    draft
-    state
   }
 `;
 
 export const BANNER_NOTIFICATION_PAGE_QUERY = gql`
   query BannerNotificationPage($id: ID!) {
-    node(id: $id) {
-      ... on BannerNotificationNode {
-        ...BannerNotificationPage
-      }
+    bannerNotification(id: $id) {
+      id
+      pk
+      level
+      activeFrom
+      messageEn
+      messageFi
+      messageSv
+      name
+      target
+      activeUntil
+      draft
+      state
     }
   }
 `;

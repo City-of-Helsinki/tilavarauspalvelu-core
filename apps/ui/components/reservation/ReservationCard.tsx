@@ -9,7 +9,7 @@ import { getPrice } from "@/modules/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
 import { ReservationOrderStatus } from "./ReservationOrderStatus";
 import { ReservationStatus } from "./ReservationStatus";
-import { ButtonLikeExternalLink, ButtonLikeLink } from "common/src/components/ButtonLikeLink";
+import { ButtonLikeExternalLink, ButtonLikeLink } from "../common/ButtonLikeLink";
 import { capitalize, getImageSource, getMainImage } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";

@@ -15,6 +15,7 @@ __all__ = [
 class UnitAdminForm(forms.ModelForm):
     search_terms = DynamicArrayField(
         required=False,
+        default=list,
         label=_("Search terms"),
         help_text=_(
             "Additional search terms that will bring up this unit's reservation units when making text searches "

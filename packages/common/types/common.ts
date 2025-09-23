@@ -7,6 +7,6 @@ type OptionType = {
   value: number;
 };
 
-export type OptionsRecord = Record<"reservationPurposes" | "ageGroups", Readonly<OptionType[]>> & {
-  municipalities: Readonly<Array<{ label: string; value: MunicipalityChoice }>>;
+export type OptionsRecord = Record<"purpose" | "ageGroup", Readonly<OptionType[]>> & {
+  municipality: Readonly<Array<{ label: string; value: MunicipalityChoice }>>;
 };

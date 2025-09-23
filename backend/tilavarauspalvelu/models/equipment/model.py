@@ -4,12 +4,11 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from lazy_managers import LazyModelAttribute, LazyModelManager
+
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import EquipmentCategory, ReservationUnit
-    from tilavarauspalvelu.models._base import ManyToManyRelatedManager
-    from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
+    from tilavarauspalvelu.models import EquipmentCategory
 
     from .actions import EquipmentActions
     from .queryset import EquipmentManager
@@ -37,8 +36,6 @@ class Equipment(models.Model):
     objects: ClassVar[EquipmentManager] = LazyModelManager.new()
     actions: EquipmentActions = LazyModelAttribute.new()
     validators: EquipmentValidator = LazyModelAttribute.new()
-
-    reservation_units: ManyToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
 
     class Meta:
         db_table = "equipment"

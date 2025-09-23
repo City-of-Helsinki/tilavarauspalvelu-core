@@ -8,7 +8,7 @@ import {
   type ReservationPermissionsQueryVariables,
   UserPermissionChoice,
   type Maybe,
-  type ReservationEditPageFragment,
+  type ReservationEditPageQuery,
 } from "@gql/gql-types";
 import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -30,14 +30,14 @@ import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { GetServerSidePropsContext } from "next";
-import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { Error403 } from "@/component/Error403";
 import { createClient } from "@/common/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";
 
-type ReservationType = ReservationEditPageFragment;
+type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
 type FormValueType = ReservationChangeFormType & ReservationFormMeta;
 
 const InnerTextInput = styled(TextInput)`
@@ -223,10 +223,9 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
   const apolloClient = createClient(commonProps.apiBaseUrl, req);
   const { data } = await apolloClient.query<ReservationPermissionsQuery, ReservationPermissionsQueryVariables>({
     query: ReservationPermissionsDocument,
-    variables: { id: createNodeId("ReservationNode", pk) },
+    variables: { id: base64encode(`ReservationNode:${pk}`) },
   });
-  const node = getNode(data);
-  const unitPk = node?.reservationUnit?.unit?.pk;
+  const unitPk = data?.reservation?.reservationUnit?.unit?.pk;
   if (unitPk == null) {
     return NOT_FOUND_SSR_VALUE;
   }
@@ -264,33 +263,25 @@ function Wrapper({
   );
 }
 
-export const RESERVATION_EDIT_PAGE_FRAGMENT = gql`
-  fragment ReservationEditPage on ReservationNode {
-    id
-    pk
-    ...CreateTagString
-    ...ReservationCommonFields
-    ...ReservationMetaFields
-    ...ReservationTitleSectionFields
-    ...UseStaffReservation
-    reservationSeries {
-      id
-      pk
-      name
-    }
-    reservationUnit {
-      id
-      pk
-      ...ReservationTypeFormFields
-    }
-  }
-`;
-
 export const RESERVATION_EDIT_PAGE_QUERY = gql`
   query ReservationEditPage($id: ID!) {
-    node(id: $id) {
-      ... on ReservationNode {
-        ...ReservationEditPage
+    reservation(id: $id) {
+      id
+      pk
+      ...CreateTagString
+      ...ReservationCommonFields
+      ...ReservationMetaFields
+      ...ReservationTitleSectionFields
+      ...UseStaffReservation
+      reservationSeries {
+        id
+        pk
+        name
+      }
+      reservationUnit {
+        id
+        pk
+        ...ReservationTypeFormFields
       }
     }
   }

@@ -104,54 +104,58 @@ def _create_periodic_tasks() -> None:
         timezone=DEFAULT_TIMEZONE,
     )
 
-    PeriodicTask.objects.update_or_create(
+    PeriodicTask.objects.create(
+        name="Maksamattomien tilausten rauetus",
         task=refresh_expired_payments_in_verkkokauppa_task.name,
-        defaults={
-            "name": refresh_expired_payments_in_verkkokauppa_task.tvp_auto_create_name,
-            "description": refresh_expired_payments_in_verkkokauppa_task.tvp_auto_create_description,
-            "crontab": off_5_minute,
-            "enabled": True,
-        },
+        crontab=off_5_minute,
+        description=(
+            "Merkitsee rauenneiksi ja peruuu verkkokaupan rajapinnasta maksutilaukset, "
+            "jotka on luotu yli 10 minuuttia sitten mutta joita ei ole maksettu."
+        ),
     )
 
-    PeriodicTask.objects.update_or_create(
+    PeriodicTask.objects.create(
+        name="Vahvistamattomien väliaikaisten varausten poisto",
         task=handle_unfinished_reservations_task.name,
-        defaults={
-            "name": handle_unfinished_reservations_task.tvp_auto_create_name,
-            "description": handle_unfinished_reservations_task.tvp_auto_create_description,
-            "crontab": even_5_minute,
-            "enabled": True,
-        },
+        crontab=even_5_minute,
+        description=(
+            "Poistaa väliaikaiset varaukset, joita ei ole vahvistettu (lähetetty), "
+            "jos ne ovat yli 20 minuuttia vanhoja eikä niihin liity verkkomaksua. "
+            "Ne joihin liittyy verkkomaksu, poistetaan jos tilaus verkkokauppaan on "
+            "luotu yli 10 minuuttia sitten ja maksutilauksen status on rauennut tai peruttu."
+        ),
     )
 
-    PeriodicTask.objects.update_or_create(
+    PeriodicTask.objects.create(
+        name="Vaikuttavien varausten uudelleenlaskenta",
         task=update_affecting_time_spans_task.name,
-        defaults={
-            "name": update_affecting_time_spans_task.tvp_auto_create_name,
-            "description": update_affecting_time_spans_task.tvp_auto_create_description,
-            "crontab": every_other_minute,
-            "enabled": True,
-        },
+        crontab=every_other_minute,
+        description=(
+            "Päivittää näkymän ensimmäiseen varattavaan aikaan vaikuttavista varauksista, "
+            "joista tiettyihin varausyksikköihin tietyllä aikavälillä vaikuttavat varaukset "
+            "voidaan hakea esikäsiteltynä."
+        ),
     )
 
-    PeriodicTask.objects.update_or_create(
+    PeriodicTask.objects.create(
+        name="Puuttuvien ovikoodien luominen",
         task=create_missing_pindora_reservations_task.name,
-        defaults={
-            "name": create_missing_pindora_reservations_task.tvp_auto_create_name,
-            "description": create_missing_pindora_reservations_task.tvp_auto_create_description,
-            "crontab": even_5_minute,
-            "enabled": True,
-        },
+        crontab=even_5_minute,
+        description=(
+            "Luo puuttuvat ovikoodit varauksiin, joiden kulkutapa on ovikoodi ja "
+            "lähettää sähköpostin uudesta ovikoodista varauksissa."
+        ),
     )
 
-    PeriodicTask.objects.update_or_create(
+    PeriodicTask.objects.create(
+        name="Ovikoodin aktiivisuustilan korjaaminen",
         task=update_pindora_access_code_is_active_task.name,
-        defaults={
-            "name": update_pindora_access_code_is_active_task.tvp_auto_create_name,
-            "description": update_pindora_access_code_is_active_task.tvp_auto_create_description,
-            "crontab": off_5_minute,
-            "enabled": True,
-        },
+        crontab=off_5_minute,
+        description=(
+            "Korjaa ovikoodillisten varausten ovikoodien aktiivisuuden tilan. "
+            "Eli jos varauksen ovikoodi on aktiivinen kun sen ei pitäisi olla, "
+            "koodi päivitetään pinodrassa inaktiiviseksi, ja päin vastoin."
+        ),
     )
 
 

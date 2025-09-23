@@ -42,7 +42,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
     first_name = FakerFI("first_name", unique=True)
     last_name = FakerFI("last_name", unique=True)
     username = LazyAttribute(lambda i: f"{i.first_name.lower()}_{i.last_name.lower()}")
-    email = FakerFI("ascii_email")
+    email = LazyAttribute(lambda i: f"{i.first_name.lower()}.{i.last_name.lower()}@example.com")
     is_staff = False
     is_active = True
     is_superuser = False

@@ -43,8 +43,9 @@ from tests.factories import (
     SpaceFactory,
     SuitableTimeRangeFactory,
     UnitFactory,
+    UserFactory,
 )
-from tests.helpers import create_png, patch_method
+from tests.helpers import patch_method
 
 from .helpers import assert_no_undefined_variables, get_admin_query_info
 
@@ -139,33 +140,9 @@ def test_frontend_queries__customer_ui__ApproveReservation(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__ArchiveReservationUnit(graphql):
+def test_frontend_queries__customer_ui__BannerNotificationCreate(graphql):
     admin_factories = get_admin_query_info()
-    factories = admin_factories["ArchiveReservationUnit"]
-
-    assert len(factories) == 1
-    query_info = factories[0]
-
-    factory_args = deepcopy(query_info.factory_args)
-    reservation_unit = ReservationUnitFactory.create(**factory_args)
-
-    variables = deepcopy(query_info.variables)
-    variables["input"] = {
-        "pk": reservation_unit.pk,
-    }
-    assert_no_undefined_variables(variables)
-
-    query = query_info.query
-    graphql.login_with_superuser()
-
-    response = graphql(query, variables=variables)
-
-    assert response.has_errors is False, response.errors
-
-
-def test_frontend_queries__customer_ui__CreateBannerNotification(graphql):
-    admin_factories = get_admin_query_info()
-    factories = admin_factories["CreateBannerNotification"]
+    factories = admin_factories["BannerNotificationCreate"]
 
     assert len(factories) == 1
     query_info = factories[0]
@@ -186,9 +163,9 @@ def test_frontend_queries__customer_ui__CreateBannerNotification(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__DeleteBannerNotification(graphql):
+def test_frontend_queries__customer_ui__BannerNotificationDelete(graphql):
     admin_factories = get_admin_query_info()
-    factories = admin_factories["DeleteBannerNotification"]
+    factories = admin_factories["BannerNotificationDelete"]
 
     assert len(factories) == 1
     query_info = factories[0]
@@ -210,9 +187,9 @@ def test_frontend_queries__customer_ui__DeleteBannerNotification(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__UpdateBannerNotification(graphql):
+def test_frontend_queries__customer_ui__BannerNotificationUpdate(graphql):
     admin_factories = get_admin_query_info()
-    factories = admin_factories["UpdateBannerNotification"]
+    factories = admin_factories["BannerNotificationUpdate"]
 
     assert len(factories) == 1
     query_info = factories[0]
@@ -333,7 +310,7 @@ def test_frontend_queries__customer_ui__CreateAllocatedTimeSlot(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__CreateImage(graphql):
+def test_frontend_queries__customer_ui__CreateImage(graphql, mock_png):
     admin_factories = get_admin_query_info()
     factories = admin_factories["CreateImage"]
 
@@ -343,9 +320,9 @@ def test_frontend_queries__customer_ui__CreateImage(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     variables = deepcopy(query_info.variables)
-    variables["image"] = create_png()
+    variables["image"] = mock_png
     variables["reservationUnit"] = reservation_unit.pk
-    variables["imageType"] = ReservationUnitImageType.MAIN
+    variables["imageType"] = ReservationUnitImageType.MAIN.value.upper()
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -363,6 +340,7 @@ def test_frontend_queries__customer_ui__CreateReservationSeries(graphql):
     assert len(factories) == 1
     query_info = factories[0]
 
+    user = UserFactory.create()
     reservation_unit = ReservationUnitFactory.create()
 
     begin = next_hour()
@@ -379,6 +357,7 @@ def test_frontend_queries__customer_ui__CreateReservationSeries(graphql):
         "weekdays": [Weekday.MONDAY],
         "reservationDetails": {
             "type": ReservationTypeStaffChoice.STAFF.value,
+            "user": user.pk,
         },
     }
     assert_no_undefined_variables(variables)
@@ -402,7 +381,7 @@ def test_frontend_queries__customer_ui__CreateReservationUnit(graphql):
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {
-        "nameFi": "Reservation unit",
+        "name": "Reservation unit",
         "unit": unit.pk,
         "isDraft": True,
     }
@@ -425,8 +404,8 @@ def test_frontend_queries__customer_ui__CreateResource(graphql):
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {
-        "nameFi": "Resource",
-        "locationType": ResourceLocationType.MOVABLE,
+        "name": "Resource",
+        "locationType": ResourceLocationType.MOVABLE.value.upper(),
     }
     assert_no_undefined_variables(variables)
 
@@ -449,7 +428,7 @@ def test_frontend_queries__customer_ui__CreateSpace(graphql):
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {
-        "nameFi": "Resource",
+        "name": "Resource",
         "unit": unit.pk,
     }
     assert_no_undefined_variables(variables)
@@ -685,9 +664,9 @@ def test_frontend_queries__customer_ui__RefundReservation(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__RejectAllApplications(graphql):
+def test_frontend_queries__customer_ui__RejectAllApplicationOptions(graphql):
     admin_factories = get_admin_query_info()
-    factories = admin_factories["RejectAllApplications"]
+    factories = admin_factories["RejectAllApplicationOptions"]
 
     assert len(factories) == 1
     query_info = factories[0]
@@ -708,9 +687,9 @@ def test_frontend_queries__customer_ui__RejectAllApplications(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__RejectAllSections(graphql):
+def test_frontend_queries__customer_ui__RejectAllSectionOptions(graphql):
     admin_factories = get_admin_query_info()
-    factories = admin_factories["RejectAllSections"]
+    factories = admin_factories["RejectAllSectionOptions"]
 
     assert len(factories) == 1
     query_info = factories[0]
@@ -862,9 +841,9 @@ def test_frontend_queries__customer_ui__RescheduleReservationSeries(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__RestoreAllApplications(graphql):
+def test_frontend_queries__customer_ui__RestoreAllApplicationOptions(graphql):
     admin_factories = get_admin_query_info()
-    factories = admin_factories["RestoreAllApplications"]
+    factories = admin_factories["RestoreAllApplicationOptions"]
 
     assert len(factories) == 1
     query_info = factories[0]
@@ -888,9 +867,9 @@ def test_frontend_queries__customer_ui__RestoreAllApplications(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__RestoreAllSections(graphql):
+def test_frontend_queries__customer_ui__RestoreAllSectionOptions(graphql):
     admin_factories = get_admin_query_info()
-    factories = admin_factories["RestoreAllSections"]
+    factories = admin_factories["RestoreAllSectionOptions"]
 
     assert len(factories) == 1
     query_info = factories[0]
@@ -993,7 +972,7 @@ def test_frontend_queries__customer_ui__UpdateImage(graphql):
 
     variables = deepcopy(query_info.variables)
     variables["pk"] = image.pk
-    variables["imageType"] = ReservationUnitImageType.OTHER
+    variables["imageType"] = ReservationUnitImageType.OTHER.value.upper()
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -1040,7 +1019,7 @@ def test_frontend_queries__customer_ui__UpdateReservationUnit(graphql):
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": reservation_unit.pk,
-        "nameFi": "New name",
+        "name": "New name",
     }
     assert_no_undefined_variables(variables)
 
@@ -1086,7 +1065,7 @@ def test_frontend_queries__customer_ui__UpdateResource(graphql):
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": resource.pk,
-        "nameFi": "New name",
+        "name": "New name",
     }
     assert_no_undefined_variables(variables)
 
@@ -1110,7 +1089,7 @@ def test_frontend_queries__customer_ui__UpdateSpace(graphql):
     variables = deepcopy(query_info.variables)
     variables["input"] = {
         "pk": space.pk,
-        "nameFi": "New name",
+        "name": "New name",
     }
     assert_no_undefined_variables(variables)
 

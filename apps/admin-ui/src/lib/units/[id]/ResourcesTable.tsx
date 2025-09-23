@@ -70,7 +70,7 @@ function getColConfig({
 export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
   const [deleteResourceMutation] = useDeleteResourceMutation();
 
-  const deleteResource = (pk: number) => deleteResourceMutation({ variables: { input: { pk } } });
+  const deleteResource = (pk: number) => deleteResourceMutation({ variables: { input: { pk: String(pk) } } });
 
   const { t } = useTranslation();
   const router = useRouter();
@@ -142,9 +142,9 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
 }
 
 export const DELETE_RESOURCE = gql`
-  mutation DeleteResource($input: ResourceDeleteMutation!) {
+  mutation DeleteResource($input: ResourceDeleteMutationInput!) {
     deleteResource(input: $input) {
-      pk
+      deleted
     }
   }
 `;

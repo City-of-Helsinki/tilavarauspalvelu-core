@@ -11,7 +11,7 @@ import {
   ReservationEditPageDocument,
   MunicipalityChoice,
 } from "@gql/gql-types";
-import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { addYears } from "date-fns";
 import { breakpoints } from "common/src/const";
@@ -46,7 +46,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   const { reservation } = props;
   const options = {
     ...props.options,
-    municipalities: Object.values(MunicipalityChoice).map((value) => ({
+    municipality: Object.values(MunicipalityChoice).map((value) => ({
       label: t(`common:municipalities.${value.toUpperCase()}`),
       value: value,
     })),
@@ -152,12 +152,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const { data } = await client.query<ReservationEditPageQuery, ReservationEditPageQueryVariables>({
       query: ReservationEditPageDocument,
       variables: {
-        id: createNodeId("ReservationNode", pk),
+        id: base64encode(`ReservationNode:${pk}`),
         beginDate: toApiDate(new Date()) ?? "",
         endDate: toApiDate(addYears(new Date(), 2)) ?? "",
       },
     });
-    const reservation = getNode(data);
+    const { reservation } = data;
 
     if (reservation == null) {
       return notFound;
@@ -196,16 +196,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 // NOTE fragment input parameters lack documentation IsReservableFields requires $beginDate and $endDate
 export const RESERVATION_EDIT_PAGE_QUERY = gql`
-  query ReservationEditPage(
-    # Filter
-    $id: ID!
-    $beginDate: Date! # Used in fragments
-    $endDate: Date! # Used in fragments
-  ) {
-    node(id: $id) {
-      ... on ReservationNode {
-        ...EditPageReservation
-      }
+  query ReservationEditPage($id: ID!, $beginDate: Date!, $endDate: Date!) {
+    reservation(id: $id) {
+      ...EditPageReservation
     }
   }
 `;

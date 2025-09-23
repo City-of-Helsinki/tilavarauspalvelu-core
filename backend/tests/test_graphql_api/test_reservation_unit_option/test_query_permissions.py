@@ -4,7 +4,7 @@ import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
 
-from tests.factories import ApplicationFactory, UserFactory
+from tests.factories import ApplicationFactory
 
 from .helpers import section_options_query
 
@@ -38,8 +38,7 @@ def test_reservation_unit_option__query__perms__general_admin(graphql):
 
     assert option is not None
 
-    user = UserFactory.create_with_general_role(role=UserRoleChoice.ADMIN)
-    graphql.force_login(user)
+    graphql.login_user_with_role(role=UserRoleChoice.ADMIN)
 
     query = section_options_query()
     response = graphql(query)
@@ -88,7 +87,7 @@ def test_reservation_unit_option__query__perms__application_owner__cant_see_rest
     query = section_options_query(fields=fields)
     response = graphql(query)
 
-    assert response.error_message(0) == "No permission to access this field"
+    assert response.error_message() == "No permission to access field."
 
 
 def test_reservation_unit_option__query__perms__regular_user(graphql):

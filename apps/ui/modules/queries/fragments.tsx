@@ -48,7 +48,7 @@ export const BLOCKING_RESERVATION_FRAGMENT = gql`
 `;
 
 export const PINDORA_RESERVATION_FRAGMENT = gql`
-  fragment PindoraReservation on PindoraReservationInfoDataType {
+  fragment PindoraReservation on PindoraReservationInfoType {
     accessCode
     accessCodeBeginsAt
     accessCodeEndsAt
@@ -57,7 +57,7 @@ export const PINDORA_RESERVATION_FRAGMENT = gql`
 `;
 
 export const PINDORA_SERIES_FRAGMENT = gql`
-  fragment PindoraSeries on PindoraSeriesInfoDataType {
+  fragment PindoraSeries on PindoraSeriesInfoType {
     accessCode
     accessCodeIsActive
     accessCodeValidity {

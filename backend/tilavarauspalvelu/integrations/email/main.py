@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 from typing import TYPE_CHECKING
 
 from django.conf import settings
@@ -9,7 +8,7 @@ from django.db import models
 from tilavarauspalvelu.enums import AccessType, ApplicationStatusChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Application, User
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_end_of_day
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from .attachements import get_reservation_ical_attachment
 from .find_language import get_application_email_language, get_reservation_email_language, get_series_email_language
@@ -38,6 +37,42 @@ class EmailService:
     """Service for sending email notifications available in the system."""
 
     # Reservation ######################################################################################################
+
+    @staticmethod
+    def send_reservation_access_code_added_email(reservation: Reservation, *, language: Lang | None = None) -> None:
+        """Sends an email to the user when an access code has been or added to or activated for their reservation."""
+        if reservation.type == ReservationTypeChoice.SEASONAL:
+            section = reservation.actions.get_application_section()
+            if section is None:
+                return
+
+            EmailService.send_seasonal_booking_access_code_added_email(section)
+            return
+
+        if reservation.access_type != AccessType.ACCESS_CODE:
+            return
+
+        if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
+            return
+
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+            return
+
+        recipients = get_reservation_email_recipients(reservation=reservation)
+        if not recipients:
+            SentryLogger.log_message(
+                "No recipients for the 'reservation access code added' email",
+                details={"reservation": reservation.pk},
+            )
+            return
+
+        if language is None:
+            language = get_reservation_email_language(reservation=reservation)
+
+        email_type = EmailType.RESERVATION_ACCESS_CODE_ADDED
+        context = email_type.get_email_context(reservation, language=language)
+        email = EmailData.build(recipients, context, email_type)
+        send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
     def send_reservation_access_code_changed_email(reservation: Reservation, *, language: Lang | None = None) -> None:
@@ -72,47 +107,8 @@ class EmailService:
 
         email_type = EmailType.RESERVATION_ACCESS_CODE_CHANGED
         context = email_type.get_email_context(reservation, language=language)
-        email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
-        send_emails_in_batches_task.delay(email_data=email)
-
-    @staticmethod
-    def send_reservation_access_type_changed_email(reservation: Reservation, *, language: Lang | None = None) -> None:
-        """Sends an email to the user when their reservation's access type has been changed."""
-        if reservation.type == ReservationTypeChoice.SEASONAL:
-            section = reservation.actions.get_application_section()
-            if section is None:
-                return
-
-            EmailService.send_seasonal_booking_access_type_changed_email(section)
-            return
-
-        if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
-            return
-
-        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
-            return
-
-        recipients = get_reservation_email_recipients(reservation=reservation)
-        if not recipients:
-            SentryLogger.log_message(
-                "No recipients for the 'reservation access type changed' email",
-                details={"reservation": reservation.pk},
-            )
-            return
-
-        if language is None:
-            language = get_reservation_email_language(reservation=reservation)
-
-        email_type = EmailType.RESERVATION_ACCESS_TYPE_CHANGED
-        context = email_type.get_email_context(reservation, language=language)
         attachment = get_reservation_ical_attachment(reservation)
-        email = EmailData.build(
-            recipients,
-            context,
-            email_type,
-            valid_until=reservation.ends_at,
-            attachment=attachment,
-        )
+        email = EmailData.build(recipients, context, email_type, attachment=attachment)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -138,13 +134,7 @@ class EmailService:
         email_type = EmailType.RESERVATION_APPROVED
         context = email_type.get_email_context(reservation, language=language)
         attachment = get_reservation_ical_attachment(reservation)
-        email = EmailData.build(
-            recipients,
-            context,
-            email_type,
-            valid_until=reservation.ends_at,
-            attachment=attachment,
-        )
+        email = EmailData.build(recipients, context, email_type, attachment=attachment)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -173,7 +163,7 @@ class EmailService:
 
         email_type = EmailType.RESERVATION_CANCELLED
         context = email_type.get_email_context(reservation, language=language)
-        email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
+        email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -196,13 +186,7 @@ class EmailService:
         email_type = EmailType.RESERVATION_CONFIRMED
         context = email_type.get_email_context(reservation, language=language)
         attachment = get_reservation_ical_attachment(reservation)
-        email = EmailData.build(
-            recipients,
-            context,
-            email_type,
-            attachment=attachment,
-            valid_until=reservation.ends_at,
-        )
+        email = EmailData.build(recipients, context, email_type, attachment=attachment)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -227,7 +211,7 @@ class EmailService:
 
         for language, recipients in recipients_by_language.items():
             context = email_type.get_email_context(reservation, language=language)
-            email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
+            email = EmailData.build(recipients, context, email_type)
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
@@ -261,7 +245,7 @@ class EmailService:
 
         email_type = EmailType.RESERVATION_DENIED
         context = email_type.get_email_context(reservation, language=language)
-        email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
+        email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -289,7 +273,7 @@ class EmailService:
 
         email_type = EmailType.RESERVATION_REQUIRES_HANDLING
         context = email_type.get_email_context(reservation, language=language)
-        email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
+        email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -314,7 +298,7 @@ class EmailService:
 
         for language, recipients in recipients_by_language.items():
             context = email_type.get_email_context(reservation, language=language)
-            email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
+            email = EmailData.build(recipients, context, email_type)
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
@@ -338,7 +322,7 @@ class EmailService:
 
         email_type = EmailType.RESERVATION_REQUIRES_PAYMENT
         context = email_type.get_email_context(reservation, language=language)
-        email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
+        email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -368,16 +352,42 @@ class EmailService:
         email_type = EmailType.RESERVATION_RESCHEDULED
         context = email_type.get_email_context(reservation, language=language)
         attachment = get_reservation_ical_attachment(reservation)
-        email = EmailData.build(
-            recipients,
-            context,
-            email_type,
-            valid_until=reservation.ends_at,
-            attachment=attachment,
-        )
+        email = EmailData.build(recipients, context, email_type, attachment=attachment)
         send_emails_in_batches_task.delay(email_data=email)
 
     # Seasonal booking #################################################################################################
+
+    @staticmethod
+    def send_seasonal_booking_access_code_added_email(
+        application_section: ApplicationSection,
+        *,
+        language: Lang | None = None,
+    ) -> None:
+        """
+        Sends an email to the applicant when an access code has been
+        or added to or activated for their seasonal booking.
+        """
+        if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
+            return
+
+        if not application_section.actions.get_reservations().exists():
+            return
+
+        recipients = get_application_email_recipients(application=application_section.application)
+        if not recipients:
+            SentryLogger.log_message(
+                "No recipients for the 'seasonal booking access code added' email",
+                details={"application_section": application_section.pk},
+            )
+            return
+
+        if language is None:
+            language = get_application_email_language(application=application_section.application)
+
+        email_type = EmailType.SEASONAL_BOOKING_ACCESS_CODE_ADDED
+        context = email_type.get_email_context(application_section, language=language)
+        email = EmailData.build(recipients, context, email_type)
+        send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
     def send_seasonal_booking_access_code_changed_email(
@@ -385,7 +395,7 @@ class EmailService:
         *,
         language: Lang | None = None,
     ) -> None:
-        """Sends an email to the applicant when staff has changed the access code for their seasonal booking."""
+        """Sends an email to the applicant then staff has changed the access code for their seasonal booking."""
         if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
             return
 
@@ -405,38 +415,7 @@ class EmailService:
 
         email_type = EmailType.SEASONAL_BOOKING_ACCESS_CODE_CHANGED
         context = email_type.get_email_context(application_section, language=language)
-        valid_until = local_end_of_day(application_section.application.application_round.reservation_period_end_date)
-        email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
-        send_emails_in_batches_task.delay(email_data=email)
-
-    @staticmethod
-    def send_seasonal_booking_access_type_changed_email(
-        application_section: ApplicationSection,
-        *,
-        language: Lang | None = None,
-    ) -> None:
-        """Sends and email to the applicant when the access types in their application section have changed."""
-        if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
-            return
-
-        if not application_section.actions.get_reservations().exists():
-            return
-
-        recipients = get_application_email_recipients(application=application_section.application)
-        if not recipients:
-            SentryLogger.log_message(
-                "No recipients for the 'seasonal booking access type changed' email",
-                details={"application_section": application_section.pk},
-            )
-            return
-
-        if language is None:
-            language = get_application_email_language(application=application_section.application)
-
-        email_type = EmailType.SEASONAL_BOOKING_ACCESS_TYPE_CHANGED
-        context = email_type.get_email_context(application_section, language=language)
-        valid_until = local_end_of_day(application_section.application.application_round.reservation_period_end_date)
-        email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
+        email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -462,14 +441,13 @@ class EmailService:
 
         email_type = EmailType.SEASONAL_BOOKING_APPLICATION_RECEIVED
         context = email_type.get_email_context(language=language)
-        valid_until = application.application_round.application_period_ends_at
-        email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
+        email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
     def send_seasonal_booking_application_round_in_allocation_emails() -> None:
         """Sends an email to all applicants when an application round has entered the allocation phase."""
-        applications = Application.objects.all().should_send_in_allocation_email().order_by("created_at")
+        applications = Application.objects.should_send_in_allocation_email().order_by("created_at")
         if not applications:
             msg = "Zero applications require the 'seasonal booking application round in allocation email' to be sent"
             SentryLogger.log_message(msg)
@@ -485,11 +463,10 @@ class EmailService:
 
         emails: list[EmailData] = []
         email_type = EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_IN_ALLOCATION
-        valid_until = local_datetime() + datetime.timedelta(days=settings.SEASONAL_BOOKING_ALLOCATION_EMAIL_VALID_DAYS)
 
         for language, recipients in recipients_by_language.items():
             context = email_type.get_email_context(language=language)
-            email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
+            email = EmailData.build(recipients, context, email_type)
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
@@ -498,7 +475,7 @@ class EmailService:
     @staticmethod
     def send_seasonal_booking_application_round_handled_emails() -> None:
         """Sends an email to all applicants when an application round has its allocation results available."""
-        applications = Application.objects.order_by("created_at").should_send_handled_email()
+        applications = Application.objects.should_send_handled_email().order_by("created_at")
         if not applications:
             msg = "Zero applications require the 'seasonal booking application round handled email' to be sent"
             SentryLogger.log_message(msg)
@@ -514,11 +491,10 @@ class EmailService:
 
         emails: list[EmailData] = []
         email_type = EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_HANDLED
-        valid_until = local_datetime() + datetime.timedelta(days=settings.SEASONAL_BOOKING_HANDLED_EMAIL_VALID_DAYS)
 
         for language, recipients in recipients_by_language.items():
             context = email_type.get_email_context(language=language)
-            email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
+            email = EmailData.build(recipients, context, email_type)
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
@@ -553,10 +529,8 @@ class EmailService:
             language = get_application_email_language(application=application_section.application)
 
         email_type = EmailType.SEASONAL_BOOKING_CANCELLED_ALL
-        valid_until = local_datetime() + datetime.timedelta(days=settings.SEASONAL_BOOKING_CANCEL_ALL_EMAIL_VALID_DAYS)
-
         context = email_type.get_email_context(application_section, language=language)
-        email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
+        email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -584,11 +558,10 @@ class EmailService:
 
         emails: list[EmailData] = []
         email_type = EmailType.SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION
-        valid_until = local_end_of_day(application_section.application.application_round.reservation_period_end_date)
 
         for language, recipients in recipients_by_language.items():
             context = email_type.get_email_context(application_section, language=language)
-            email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
+            email = EmailData.build(recipients, context, email_type)
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
@@ -622,7 +595,7 @@ class EmailService:
 
         email_type = EmailType.SEASONAL_BOOKING_CANCELLED_SINGLE
         context = email_type.get_email_context(reservation, language=language)
-        email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
+        email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -653,8 +626,7 @@ class EmailService:
 
         email_type = EmailType.SEASONAL_BOOKING_DENIED_SERIES
         context = email_type.get_email_context(series, language=language)
-        valid_until = local_end_of_day(series.end_date)
-        email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
+        email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -686,7 +658,7 @@ class EmailService:
 
         email_type = EmailType.SEASONAL_BOOKING_DENIED_SINGLE
         context = email_type.get_email_context(reservation, language=language)
-        email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
+        email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -717,8 +689,7 @@ class EmailService:
 
         email_type = EmailType.SEASONAL_BOOKING_RESCHEDULED_SERIES
         context = email_type.get_email_context(series, language=language)
-        valid_until = local_end_of_day(series.end_date)
-        email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
+        email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
@@ -748,13 +719,7 @@ class EmailService:
         email_type = EmailType.SEASONAL_BOOKING_RESCHEDULED_SINGLE
         context = email_type.get_email_context(reservation, language=language)
         attachment = get_reservation_ical_attachment(reservation)
-        email = EmailData.build(
-            recipients,
-            context,
-            email_type,
-            valid_until=reservation.ends_at,
-            attachment=attachment,
-        )
+        email = EmailData.build(recipients, context, email_type, attachment=attachment)
         send_emails_in_batches_task.delay(email_data=email)
 
     # User #############################################################################################################
@@ -775,11 +740,10 @@ class EmailService:
         emails: list[EmailData] = []
         email_type = EmailType.USER_PERMISSIONS_DEACTIVATION
 
-        valid_until = local_datetime() + datetime.timedelta(days=settings.PERMISSION_NOTIFICATION_BEFORE_DAYS)
-
         for language, recipients in recipients_by_language.items():
             context = email_type.get_email_context(language=language)
-            email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
+
+            email = EmailData.build(recipients, context, email_type)
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
@@ -801,11 +765,9 @@ class EmailService:
         emails: list[EmailData] = []
         email_type = EmailType.USER_ANONYMIZATION
 
-        valid_until = local_datetime() + datetime.timedelta(days=settings.ANONYMIZATION_NOTIFICATION_BEFORE_DAYS)
-
         for language, recipients in recipients_by_language.items():
             context = email_type.get_email_context(language=language)
-            email = EmailData.build(recipients, context, email_type, valid_until=valid_until)
+            email = EmailData.build(recipients, context, email_type)
             emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)

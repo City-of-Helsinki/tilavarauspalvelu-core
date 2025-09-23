@@ -1,7 +1,7 @@
 import { useTranslation } from "next-i18next";
 import {
   type Maybe,
-  type ReservationSeriesUpdateMutation,
+  type ReservationSeriesUpdateMutationInput,
   ReserveeType,
   type UpdateStaffReservationMutationVariables,
   type UseStaffReservationFragment,
@@ -16,7 +16,7 @@ type InputT = UpdateStaffReservationMutationVariables["input"];
 type MemoT = UpdateStaffReservationMutationVariables["workingMemo"];
 type ExtraParamsT = { seriesName?: string };
 
-export type MutationParams = Omit<InputT, "pk"> & Omit<MemoT, "pk"> & ExtraParamsT;
+export type MutationInputParams = Omit<InputT, "pk"> & Omit<MemoT, "pk"> & ExtraParamsT;
 
 type Props = {
   reservation: UseStaffReservationFragment;
@@ -31,12 +31,12 @@ export function useStaffReservationMutation({ reservation, onSuccess }: Props) {
   const [recurringMutation] = useUpdateReservationSeriesMutation();
 
   const handleSuccess = (isRecurring: boolean) => {
-    const trKey = `reservation:EditPage.${isRecurring ? "saveSuccessRecurring" : "saveSuccess"}`;
+    const trKey = `Reservation.EditPage.${isRecurring ? "saveSuccessRecurring" : "saveSuccess"}`;
     successToast({ text: t(trKey) });
     onSuccess();
   };
 
-  const editStaffReservation = async (vals: MutationParams) => {
+  const editStaffReservation = async (vals: MutationInputParams) => {
     const { seriesName, workingMemo, ...rest } = vals;
 
     try {
@@ -48,7 +48,7 @@ export function useStaffReservationMutation({ reservation, onSuccess }: Props) {
           reserveeType,
         };
 
-        const input: ReservationSeriesUpdateMutation = {
+        const input: ReservationSeriesUpdateMutationInput = {
           name: seriesName,
           pk: reservation.reservationSeries.pk,
           description: workingMemo,
@@ -119,8 +119,8 @@ export const USE_STAFF_RESERVATION_FRAGMENT = gql`
 
 export const UPDATE_STAFF_RESERVATION_MUTATION = gql`
   mutation UpdateStaffReservation(
-    $input: ReservationStaffModifyMutation!
-    $workingMemo: ReservationWorkingMemoMutation!
+    $input: ReservationStaffModifyMutationInput!
+    $workingMemo: ReservationWorkingMemoMutationInput!
   ) {
     staffReservationModify(input: $input) {
       pk
@@ -132,7 +132,7 @@ export const UPDATE_STAFF_RESERVATION_MUTATION = gql`
 `;
 
 export const UPDATE_STAFF_RECURRING_RESERVATION_MUTATION = gql`
-  mutation UpdateReservationSeries($input: ReservationSeriesUpdateMutation!) {
+  mutation UpdateReservationSeries($input: ReservationSeriesUpdateMutationInput!) {
     updateReservationSeries(input: $input) {
       pk
     }

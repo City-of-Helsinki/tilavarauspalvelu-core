@@ -1,11 +1,9 @@
 # ruff: noqa: N802
 from __future__ import annotations
 
-import copy
 import os
 import zoneinfo
 from pathlib import Path
-from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 from env_config import Environment, values
@@ -73,8 +71,9 @@ class Common(Environment):
         "django_celery_beat",
         "django_celery_results",
         "django_extensions",
+        "django_filters",
         "easy_thumbnails",
-        "undine",
+        "graphene_django",
         "import_export",
         "mptt",
         "rangefilter",
@@ -387,22 +386,14 @@ class Common(Environment):
 
     PINDORA_MOCK_ENABLED = values.BooleanValue(default=False)
 
-    # --- Undine settings --------------------------------------------------------------------------------------------
+    # --- Graphene settings ------------------------------------------------------------------------------------------
 
-    @classproperty
-    def UNDINE(cls) -> dict[str, Any]:
-        return {
-            "SCHEMA": "tilavarauspalvelu.api.graphql.schema.schema",
-            "MAX_QUERY_COMPLEXITY": 50,
-            "AUTOGENERATION": False,
-            "GRAPHIQL_ENABLED": cls.DEBUG,
-            "ALLOW_DID_YOU_MEAN_SUGGESTIONS": cls.DEBUG,
-            "ALLOW_INTROSPECTION_QUERIES": cls.DEBUG,
-            "FILE_UPLOAD_ENABLED": True,
-            "MIDDLEWARE": [
-                "config.middleware.graphql_sentry_middleware",
-            ],
-        }
+    GRAPHENE = {
+        "SCHEMA": "tilavarauspalvelu.api.graphql.schema.schema",
+        "MIDDLEWARE": [
+            "config.middleware.GraphQLSentryMiddleware",
+        ],
+    }
 
     # --- Django REST Framework settings -----------------------------------------------------------------------------
 
@@ -427,8 +418,6 @@ class Common(Environment):
     CELERY_QUEUE_FOLDER_OUT = values.StringValue(default="/broker/queue/")
     CELERY_QUEUE_FOLDER_IN = values.StringValue(default="/broker/queue/")
     CELERY_PROCESSED_FOLDER = values.StringValue(default="/broker/processed/")
-
-    AUTO_CREATE_CELERY_TASKS = values.BooleanValue(default=False)
 
     @classproperty
     def CELERY_BROKER_URL(cls) -> str:
@@ -464,6 +453,11 @@ class Common(Environment):
 
     ADMIN_DATA_VIEWS = {
         "URLS": [
+            {
+                "route": "text-searches/",
+                "view": "tilavarauspalvelu.admin.text_search_view.text_search_list_view",
+                "name": "text_searches",
+            },
             {
                 "route": "email-templates/",
                 "view": "tilavarauspalvelu.admin.email_template.view.email_templates_admin_list_view",
@@ -501,6 +495,7 @@ class Common(Environment):
     UNSAFE_SKIP_IAT_CLAIM_VALIDATION = False
     UPDATE_RESERVATION_UNIT_THUMBNAILS = True
     DOWNLOAD_IMAGES_FOR_TEST_DATA = True
+    FRONTEND_TESTING_API_ENABLED = False
     PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED = values.BooleanValue(default=False)
 
     PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
@@ -508,10 +503,7 @@ class Common(Environment):
     REMOVE_EXPIRED_APPLICATIONS_OLDER_THAN_DAYS = 365
     TEXT_SEARCH_CACHE_TIME_DAYS = 30
     USER_IS_ADULT_AT_AGE = 18
-
-    SEASONAL_BOOKING_CANCEL_ALL_EMAIL_VALID_DAYS = 1
-    SEASONAL_BOOKING_ALLOCATION_EMAIL_VALID_DAYS = 14
-    SEASONAL_BOOKING_HANDLED_EMAIL_VALID_DAYS = 30
+    MAXIMUM_SECTIONS_PER_APPLICATION = 100
 
     APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES = values.IntegerValue(default=10)
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS = values.IntegerValue(default=730)
@@ -528,6 +520,10 @@ class Common(Environment):
     ROBOT_TEST_DATA_CREATION_RATE_LIMIT_SECONDS = values.IntegerValue(default=60)
     ROBOT_TEST_DATA_RATE_LIMIT_KEY = "robot-test-data-create-view-rate-limit"
     ROBOT_TEST_DATA_LOCK_KEY = "robot-test-data-create-view-lock"
+
+    GRAPHENE_DJANGO_EXTENSIONS = {
+        "EXPERIMENTAL_REMOVE_TRANSLATION_BASE_FIELDS": True,
+    }
 
     # Allows faking membership to certain AD groups for testing automatic role assignment
     FAKE_SUPERUSER_AD_GROUPS = values.ListValue(default=[])
@@ -643,14 +639,22 @@ class Local(Common, overrides_from=LocalMixin):
     MOCK_VERKKOKAUPPA_FRONTEND_URL = values.StringValue(default="http://localhost:3000")
     MOCK_VERKKOKAUPPA_BACKEND_URL = values.StringValue(default="http://localhost:8000")
 
+    # --- Graphene settings ------------------------------------------------------------------------------------------
+
+    GRAPHENE = {
+        "SCHEMA": Common.GRAPHENE["SCHEMA"],
+        "MIDDLEWARE": [
+            "graphene_django.debug.DjangoDebugMiddleware",
+            "config.middleware.GraphQLErrorLoggingMiddleware",
+        ],
+    }
+
     # --- Celery settings --------------------------------------------------------------------------------------------
 
     CELERY_LOG_FILE = values.StringValue(default="./broker/worker.log")
     CELERY_QUEUE_FOLDER_OUT = values.StringValue(default="./broker/queue/")
     CELERY_QUEUE_FOLDER_IN = values.StringValue(default="./broker/queue/")
     CELERY_PROCESSED_FOLDER = values.StringValue(default="./broker/processed/")
-
-    AUTO_CREATE_CELERY_TASKS = True
 
     # --- Redis settings ---------------------------------------------------------------------------------------------
 
@@ -668,6 +672,7 @@ class Local(Common, overrides_from=LocalMixin):
     SAVE_RESERVATION_STATISTICS = values.BooleanValue(default=True)
     REBUILD_SPACE_HIERARCHY = values.BooleanValue(default=True)
     RAISE_ERROR_ON_REFRESH_FAILURE = True
+    FRONTEND_TESTING_API_ENABLED = values.BooleanValue(default=True)
 
     EMAIL_VARAAMO_EXT_LINK = "https://fake.local.varaamo.hel.fi"
     EMAIL_FEEDBACK_EXT_LINK = "https://fake.local.varaamo.hel.fi/feedback"
@@ -706,8 +711,6 @@ class Docker(Common, overrides_from=DockerMixin):
 
     REDIS_URL = values.StringValue(default="redis://redis:6379/0")
 
-    AUTO_CREATE_CELERY_TASKS = True
-
     @classproperty
     def CELERY_BROKER_URL(cls):
         return cls.REDIS_URL
@@ -722,6 +725,7 @@ class Docker(Common, overrides_from=DockerMixin):
     EXPORT_AUTHORIZATION_TOKEN = values.StringValue(default="")  # nosec # NOSONAR
     ROBOT_TEST_DATA_TOKEN = values.StringValue(default="")  # nosec # NOSONAR
     RAISE_ERROR_ON_REFRESH_FAILURE = True
+    FRONTEND_TESTING_API_ENABLED = values.BooleanValue(default=True)
 
     EMAIL_VARAAMO_EXT_LINK = "https://fake.local.varaamo.hel.fi"
     EMAIL_FEEDBACK_EXT_LINK = "https://fake.local.varaamo.hel.fi/feedback"
@@ -768,6 +772,16 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     # --- Celery settings --------------------------------------------------------------------------------------------
 
     CELERY_TASK_ALWAYS_EAGER = True
+
+    # --- Graphene settings ------------------------------------------------------------------------------------------
+
+    GRAPHENE = {
+        "SCHEMA": Common.GRAPHENE["SCHEMA"],
+        "TESTING_ENDPOINT": "/graphql/",
+        "MIDDLEWARE": [
+            "config.middleware.GraphQLErrorLoggingMiddleware",
+        ],
+    }
 
     # --- Static file settings ---------------------------------------------------------------------------------------
 
@@ -826,18 +840,6 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
 
     REDIS_URL = values.StringValue(default="redis://localhost:6379/0")
 
-    # --- Undine settings --------------------------------------------------------------------------------------------
-
-    @classproperty
-    def UNDINE(cls) -> dict[str, Any]:
-        common_settings = copy.deepcopy(super().UNDINE)
-        # We need to remove sentry middleware, as it sends the `got_request_exception` signal,
-        # which causes the testing client to raise an exception.
-        common_settings["MIDDLEWARE"].remove("config.middleware.graphql_sentry_middleware")
-        # Include error tracebacks for debugging
-        common_settings["INCLUDE_ERROR_TRACEBACK"] = True
-        return common_settings
-
     # --- Misc settings ----------------------------------------------------------------------------------------------
 
     CACHES = {
@@ -865,6 +867,8 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     SAVE_RESERVATION_STATISTICS = False
     # Always re-raise silenced Sentry errors during testing for better debugging
     SENTRY_LOGGER_ALWAYS_RE_RAISE = True
+    # Enable frontend testing API for testing
+    FRONTEND_TESTING_API_ENABLED = True
     # Enable feature flag for testing
     PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED = True
     # Enable NowTT for testing
@@ -932,8 +936,6 @@ class Platta(Common, use_environ=True):
         }
 
     # --- Celery settings --------------------------------------------------------------------------------------------
-
-    AUTO_CREATE_CELERY_TASKS = True
 
     @classproperty
     def CELERY_BROKER_URL(cls) -> str:

@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { useDisplayError } from "common/src/hooks";
 import { Flex } from "common/styled";
 import { uniq } from "lodash-es";
@@ -106,10 +106,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { data } = await client.query<ApplicationPage1Query, ApplicationPage1QueryVariables>({
     query: ApplicationPage1Document,
     variables: {
-      id: createNodeId("ApplicationNode", pk),
+      id: base64encode(`ApplicationNode:${pk}`),
     },
   });
-  const application = getNode(data);
+  const { application } = data;
   if (application == null) {
     return notFound;
   }
@@ -130,10 +130,8 @@ export default Page1;
 
 export const APPLICATION_PAGE1_QUERY = gql`
   query ApplicationPage1($id: ID!) {
-    node(id: $id) {
-      ... on ApplicationNode {
-        ...ApplicationForm
-      }
+    application(id: $id) {
+      ...ApplicationForm
     }
   }
 `;

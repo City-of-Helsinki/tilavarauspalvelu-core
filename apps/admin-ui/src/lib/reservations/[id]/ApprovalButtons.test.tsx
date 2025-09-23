@@ -4,7 +4,7 @@ import { type ApprovalButtonsFragment, ReservationStateChoice } from "@gql/gql-t
 import { addDays, addMinutes } from "date-fns";
 import { ApprovalButtons } from "./ApprovalButtons";
 import { describe, expect, test, vi } from "vitest";
-import { createNodeId } from "common/src/helpers";
+import { base64encode } from "common/src/helpers";
 
 const wrappedRender = (reservation: ApprovalButtonsFragment) => {
   return render(<ApprovalButtons isFree reservation={reservation} handleClose={vi.fn()} handleAccept={vi.fn()} />);
@@ -18,7 +18,7 @@ function createInput({
   endsAt?: Date;
 }): ApprovalButtonsFragment {
   return {
-    id: createNodeId("ReservationNode", 1),
+    id: base64encode("ReservationNode:1"),
     pk: 1,
     state,
     beginsAt: endsAt.toISOString(),
@@ -26,7 +26,7 @@ function createInput({
     paymentOrder: null,
     reservationSeries: null,
     reservationUnit: {
-      id: createNodeId("ReservationUnitNode", 1),
+      id: base64encode("ReservationUnitNode:1"),
       pricings: [],
     },
     price: null,

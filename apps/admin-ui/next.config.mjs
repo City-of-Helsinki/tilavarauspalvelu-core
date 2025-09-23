@@ -65,11 +65,6 @@ const config = {
         source: "/units/:id/space/:any*",
         destination: "/units/:id/spaces/:any*",
       },
-      // healthcheck should be a simple 200 response with no resource loading
-      {
-        source: "/healthcheck",
-        destination: "/api/healthcheck",
-      },
     ];
   },
   basePath: env.NEXT_PUBLIC_BASE_URL,

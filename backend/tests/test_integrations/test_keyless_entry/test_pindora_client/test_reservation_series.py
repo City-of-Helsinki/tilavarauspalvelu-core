@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 import requests
 from freezegun import freeze_time
+from graphene_django_extensions.testing import parametrize_helper
 from rest_framework.status import (
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
@@ -32,7 +33,7 @@ from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import ReservationFactory, ReservationSeriesFactory
-from tests.helpers import ResponseMock, exact, parametrize_helper, patch_method, use_retries
+from tests.helpers import ResponseMock, exact, patch_method, use_retries
 from tests.test_integrations.test_keyless_entry.helpers import (
     ErrorParams,
     default_access_code_modify_response,

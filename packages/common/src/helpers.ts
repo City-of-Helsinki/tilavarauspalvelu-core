@@ -1,10 +1,10 @@
 import { isAfter, isBefore } from "date-fns";
 import {
-  ReservationUnitImageType,
+  ImageType,
   type PricingFieldsFragment,
   type ImageFragment,
   type Maybe,
-  type SuitableTimeFieldsFragment,
+  type SuitableTimeFragment,
 } from "../gql/gql-types";
 import { type OptionInProps } from "hds-react";
 import { type DayT, pixel } from "./const";
@@ -108,17 +108,12 @@ export function getLocalizationLang(code?: string): LocalizationLanguages {
 
 export const isBrowser = typeof window !== "undefined";
 
-function base64encode(str: string) {
+export function base64encode(str: string) {
   if (isBrowser) {
     return window.btoa(str);
     // TODO do we want unescape(encodeURIComponent(str)));?
   }
   return Buffer.from(str, "binary").toString("base64");
-}
-
-// TODO narrow type
-export function createNodeId(type: string, pk: number): string {
-  return base64encode(`ID:${type}:${pk}`);
 }
 
 export async function hash(val: string): Promise<string> {
@@ -169,7 +164,7 @@ function getImageSourceWithoutDefault(
 }
 
 export function getMainImage(ru?: { images: Readonly<ImageFragment[]> }): ImageFragment | null {
-  return ru?.images.find((img) => img.imageType === ReservationUnitImageType.Main) ?? null;
+  return ru?.images.find((img) => img.imageType === ImageType.Main) ?? null;
 }
 
 /// Returns if price is free
@@ -254,10 +249,7 @@ export function formatApiTimeInterval({
   return `${btime}–${etime}`;
 }
 
-export function formatDayTimes(
-  schedule: Omit<SuitableTimeFieldsFragment, "pk" | "id" | "priority">[],
-  day: number
-): string {
+export function formatDayTimes(schedule: Omit<SuitableTimeFragment, "pk" | "id" | "priority">[], day: number): string {
   return schedule
     .filter((s) => convertWeekday(s.dayOfTheWeek) === day)
     .map((s) => formatApiTimeInterval(s))
@@ -330,7 +322,7 @@ export function formatTimeStruct({ hour, minute }: { hour: number; minute: numbe
   return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
 }
 
-export function mapParamToInteger(param: string[], min?: number): number[] {
+export function mapParamToInterger(param: string[], min?: number): number[] {
   const numbers = param.map(Number).filter(Number.isInteger);
   return min != null ? numbers.filter((n) => n >= min) : numbers;
 }
@@ -340,9 +332,4 @@ export function filterEmptyArray<T>(param: T[]): T[] | undefined {
     return undefined;
   }
   return param;
-}
-
-// oxlint-disable-next-line typescript/no-empty-object-type
-export function getNode<T extends { id: string }>(data: { node?: T | null | {} } | undefined | null): T | null {
-  return data?.node != null && "id" in data.node ? data.node : null;
 }

@@ -5,14 +5,14 @@ import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconCross, IconPen, 
 import { breakpoints } from "common/src/const";
 import {
   type ApplicationCardFragment,
-  type ApplicationNameFieldsFragment,
+  type ApplicationNameFragment,
   ApplicationStatusChoice,
   type Maybe,
   useCancelApplicationMutation,
 } from "@gql/gql-types";
 import { formatDateTime } from "@/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
-import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
+import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import Card from "common/src/components/Card";
 import { getApplicationPath } from "@/modules/urls";
@@ -28,7 +28,7 @@ const StyledButton = styled(Button)`
 
 function formatApplicant(
   t: TFunction,
-  application: Pick<ApplicationNameFieldsFragment, "organisationName" | "applicantType" | "contactPersonFirstName">
+  application: Pick<ApplicationNameFragment, "organisationName" | "applicantType" | "contactPersonFirstName">
 ): string {
   const type = formatApplicantType(t, application);
   if (application.organisationName) {
@@ -38,7 +38,7 @@ function formatApplicant(
   return type;
 }
 
-function formatApplicantType(t: TFunction, application: Pick<ApplicationNameFieldsFragment, "applicantType">): string {
+function formatApplicantType(t: TFunction, application: Pick<ApplicationNameFragment, "applicantType">): string {
   const { applicantType } = application;
   if (!applicantType) {
     return "";
@@ -149,7 +149,7 @@ export const APPLICATION_CARD_FRAGMENT = gql`
   fragment ApplicationCard on ApplicationNode {
     id
     pk
-    ...ApplicationNameFields
+    ...ApplicationName
     status
     updatedAt
     applicationRound {
@@ -162,7 +162,7 @@ export const APPLICATION_CARD_FRAGMENT = gql`
 `;
 
 export const CANCEL_APPLICATION_MUTATION = gql`
-  mutation CancelApplication($input: ApplicationCancelMutation!) {
+  mutation CancelApplication($input: ApplicationCancelMutationInput!) {
     cancelApplication(input: $input) {
       pk
     }

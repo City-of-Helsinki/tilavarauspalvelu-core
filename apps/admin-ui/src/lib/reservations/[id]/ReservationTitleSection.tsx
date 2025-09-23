@@ -76,10 +76,9 @@ export const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
       skip: !reservation.reservationSeries?.id,
     });
 
-    const node = data?.node != null && "id" in data.node ? data.node : null;
-
-    const applicationPk = node?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
-    const sectionPk = node?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.pk;
+    const applicationPk =
+      data?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
+    const sectionPk = data?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.pk;
     const applicationLink = getApplicationUrl(applicationPk, sectionPk);
 
     const paymentStatusLabelType = getStatusLabelType(reservation.paymentOrder?.status);
@@ -126,22 +125,20 @@ export const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
 
 export const APPLICATION_LINK_QUERY = gql`
   query ReservationApplicationLink($id: ID!) {
-    node(id: $id) {
-      ... on ReservationSeriesNode {
+    reservationSeries(id: $id) {
+      id
+      allocatedTimeSlot {
         id
-        allocatedTimeSlot {
+        pk
+        reservationUnitOption {
           id
           pk
-          reservationUnitOption {
+          applicationSection {
             id
             pk
-            applicationSection {
+            application {
               id
               pk
-              application {
-                id
-                pk
-              }
             }
           }
         }

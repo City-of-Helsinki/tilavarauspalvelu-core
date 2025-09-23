@@ -79,7 +79,7 @@ export function UnitsTable({ sort, sortChanged: onSortChanged, units, isMyUnits,
   );
 }
 
-export const UNIT_TABLE_ELEMENT_FRAGMENT = gql`
+export const UNIT_TABLE_ELEMET_FRAGMENT = gql`
   fragment UnitTableElement on UnitNode {
     id
     nameFi

@@ -1,3 +1,5 @@
+# type: EmailType.RESERVATION_DENIED
+
 from __future__ import annotations
 
 import datetime

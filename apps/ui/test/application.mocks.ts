@@ -1,6 +1,6 @@
 import {
   type AgeGroupNode,
-  type ApplicationPage2Fragment,
+  type ApplicationPage2Query,
   type ApplicationRoundNode,
   ApplicationRoundReservationCreationStatusChoice,
   ApplicationRoundStatusChoice,
@@ -15,13 +15,13 @@ import {
   type PurposeNode,
   type ReservationUnitNode,
   ReserveeType,
-  TermsOfUseTypeChoices,
+  TermsType,
   UpdateApplicationDocument,
   type UpdateApplicationMutation,
   Weekday,
 } from "@/gql/gql-types";
-import { createNodeId } from "common/src/helpers";
-import { addDays, addMonths, addYears, endOfYear, startOfDay } from "date-fns";
+import { base64encode } from "common/src/helpers";
+import { addDays, addMonths, addYears } from "date-fns";
 import { type CreateGraphQLMocksReturn, generateNameFragment, generateTextFragment } from "./test.gql.utils";
 import { createMockReservationUnit } from "./reservation-unit.mocks";
 
@@ -72,7 +72,8 @@ function createMockReservationUnits({
   return Array.from({ length: nReservationUnits }, (_, i) => createMockReservationUnit({ pk: i + 1 }));
 }
 
-type ApplicationSectionMockType = NonNullable<ApplicationPage2Fragment["applicationSections"]>[number];
+type ApplicationMockType = NonNullable<ApplicationPage2Query["application"]>;
+type ApplicationSectionMockType = NonNullable<ApplicationMockType["applicationSections"]>[number];
 
 /// @param page which page is valid (page0 => nothing is valid), preview => it's sent
 function createMockApplicationSection({
@@ -115,7 +116,7 @@ function createMockApplicationSection({
   }
 
   return {
-    id: createNodeId("ApplicationSectionNode", pk),
+    id: base64encode(`ApplicationSectionNode:${pk}`),
     pk,
     status: ApplicationSectionStatusChoice.Unallocated,
     // page 1 data
@@ -135,7 +136,7 @@ function createMockApplicationSection({
 
 function createMockAgeGroupNode({ pk = 1 }: { pk?: number } = {}): AgeGroupNode {
   return {
-    id: createNodeId("AgeGroupNode", 1),
+    id: base64encode(`AgeGroupNode:1`),
     pk,
     minimum: 1,
     maximum: null,
@@ -144,7 +145,7 @@ function createMockAgeGroupNode({ pk = 1 }: { pk?: number } = {}): AgeGroupNode 
 
 function createMockPurposeNode({ pk = 1 }: { pk?: number } = {}): PurposeNode {
   return {
-    id: createNodeId("PurposeNode", 1),
+    id: base64encode(`PurposeNode:1`),
     pk,
     rank: pk,
     ...generateNameFragment("PurposeNode"),
@@ -158,7 +159,7 @@ type CreateReservationUnitOption = ApplicationSectionMockType["reservationUnitOp
 function createReservationUnitOption({ order }: { order: number }): CreateReservationUnitOption {
   const reservationUnit: CreateReservationUnitOption["reservationUnit"] = createMockReservationUnit({ pk: order });
   return {
-    id: createNodeId("ReservationUnitOptionNode", 1),
+    id: base64encode(`ReservationUnitOptionNode:1`),
     pk: order,
     preferredOrder: order,
     reservationUnit,
@@ -183,7 +184,7 @@ export function createMockApplicationFragment({
   status = ApplicationStatusChoice.Draft,
   nReservationUnitOptions = 1,
   nSections = 1,
-}: CreateMockApplicationFragmentProps = {}): ApplicationPage2Fragment {
+}: CreateMockApplicationFragmentProps = {}): ApplicationMockType {
   const page3Data = {
     applicantType: ReserveeType.Nonprofit,
     additionalInformation: "",
@@ -205,7 +206,7 @@ export function createMockApplicationFragment({
   };
 
   const MockApplicationForm = {
-    id: createNodeId("ApplicationNode", pk),
+    id: base64encode(`ApplicationNode:${pk}`),
     pk,
     status: page === "page4" ? ApplicationStatusChoice.Received : status,
     // TODO this can't be combined with the other Fragment
@@ -272,32 +273,32 @@ export function createMockApplicationRound({
   });
 
   return {
-    id: createNodeId("ApplicationRoundNode", pk),
+    id: base64encode(`ApplicationRoundNode:${pk}`),
     pk,
     ...generateNameFragment(`ApplicationRound ${pk}`),
     notesWhenApplyingFi: notesWhenApplying ? `${notesWhenApplying} FI` : null,
     notesWhenApplyingEn: notesWhenApplying ? `${notesWhenApplying} EN` : null,
     notesWhenApplyingSv: notesWhenApplying ? `${notesWhenApplying} SV` : null,
     reservationPeriodBeginDate: reservationPeriodBeginDate.toISOString(),
-    reservationPeriodEndDate: startOfDay(endOfYear(reservationPeriodBeginDate)).toISOString(),
+    reservationPeriodEndDate: addYears(reservationPeriodBeginDate, 1).toISOString(),
     publicDisplayBeginsAt: applicationPeriodBeginsAt.toISOString(),
     publicDisplayEndsAt: applicationPeriodEndsAt.toISOString(),
     applicationPeriodBeginsAt: applicationPeriodBeginsAt.toISOString(),
     applicationPeriodEndsAt: applicationPeriodEndsAt.toISOString(),
     status,
     reservationUnits,
-    applicationsCount: 0,
-    criteriaEn: null,
-    criteriaFi: null,
-    criteriaSv: null,
-    handledAt: null,
-    isSettingHandledAllowed: false,
-    purposes: [] as const,
+    applicationsCount: 0, // Scalars["Int"]["output"];
+    criteriaEn: null, // Maybe<Scalars["String"]["output"]>;
+    criteriaFi: null, // Maybe<Scalars["String"]["output"]>;
+    criteriaSv: null, // Maybe<Scalars["String"]["output"]>;
+    handledAt: null, // Maybe<Scalars["DateTime"]["output"]>;
+    isSettingHandledAllowed: false, // Scalars["Boolean"]["output"];
+    purposes: [] as const, // ReadonlyArray<ReservationPurposeNode>;
     reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice.NotCompleted,
-    reservationUnitCount: 10,
-    sentAt: null,
-    statusTimestamp: null,
-    termsOfUse: null,
+    reservationUnitCount: 10, // Scalars["Int"]["output"];
+    sentAt: null, // Maybe<Scalars["DateTime"]["output"]>;
+    statusTimestamp: null, // Maybe<Scalars["DateTime"]["output"]>;
+    termsOfUse: null, // Maybe<TermsOfUseNode>;
   };
 }
 
@@ -309,9 +310,9 @@ export function createMockApplicationViewFragment(props: CreateMockApplicationFr
     status: ApplicationRoundStatusChoice.Open,
     ...generateNameFragment("ApplicationRound"),
     termsOfUse: {
-      id: createNodeId("TermsOfUseNode", 1),
+      id: base64encode("TermsOfUseNode:1"),
       pk: "recurring",
-      termsType: TermsOfUseTypeChoices.RecurringTerms,
+      termsType: TermsType.RecurringTerms,
       ...generateNameFragment("TermsOfUse"),
       ...generateTextFragment("Recurring Terms of Use"),
     },

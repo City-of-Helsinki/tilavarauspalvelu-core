@@ -1,6 +1,6 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { ApplicationSectionOrderSet, useApplicationSectionsQuery } from "@gql/gql-types";
+import { ApplicationSectionOrderingChoices, useApplicationSectionsQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
@@ -52,7 +52,7 @@ export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): JSX
     return <CenterSpinner />;
   }
 
-  const applicationSections = filterNonNullable(dataToUse?.applicationSections?.edges?.map((edge) => edge?.node));
+  const applicationSections = filterNonNullable(dataToUse?.applicationSections?.edges.map((edge) => edge?.node));
   const totalCount = dataToUse?.applicationSections?.totalCount ?? 0;
 
   return (
@@ -78,7 +78,7 @@ export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): JSX
   );
 }
 
-function transformOrderBy(orderBy: string | null): ApplicationSectionOrderSet[] {
+function transformOrderBy(orderBy: string | null): ApplicationSectionOrderingChoices[] {
   if (orderBy == null) {
     return [];
   }
@@ -86,20 +86,22 @@ function transformOrderBy(orderBy: string | null): ApplicationSectionOrderSet[] 
   const rest = desc ? orderBy.slice(1) : orderBy;
   switch (rest) {
     case "nameFi":
-      return desc ? [ApplicationSectionOrderSet.NameDesc] : [ApplicationSectionOrderSet.NameAsc];
+      return desc ? [ApplicationSectionOrderingChoices.NameDesc] : [ApplicationSectionOrderingChoices.NameAsc];
     case "preferredUnitNameFi":
       return desc
-        ? [ApplicationSectionOrderSet.PreferredUnitNameFiDesc]
-        : [ApplicationSectionOrderSet.PreferredUnitNameFiAsc];
+        ? [ApplicationSectionOrderingChoices.PreferredUnitNameFiDesc]
+        : [ApplicationSectionOrderingChoices.PreferredUnitNameFiAsc];
     case "status":
-      return desc ? [ApplicationSectionOrderSet.StatusDesc] : [ApplicationSectionOrderSet.StatusAsc];
+      return desc ? [ApplicationSectionOrderingChoices.StatusDesc] : [ApplicationSectionOrderingChoices.StatusAsc];
     case "applicant":
-      return desc ? [ApplicationSectionOrderSet.ApplicantDesc] : [ApplicationSectionOrderSet.ApplicantAsc];
+      return desc
+        ? [ApplicationSectionOrderingChoices.ApplicantDesc]
+        : [ApplicationSectionOrderingChoices.ApplicantAsc];
     case "application_id,pk":
     case "application_id,-pk":
       return desc
-        ? [ApplicationSectionOrderSet.ApplicationDesc, ApplicationSectionOrderSet.PkDesc]
-        : [ApplicationSectionOrderSet.ApplicationAsc, ApplicationSectionOrderSet.PkAsc];
+        ? [ApplicationSectionOrderingChoices.ApplicationPkDesc, ApplicationSectionOrderingChoices.PkDesc]
+        : [ApplicationSectionOrderingChoices.ApplicationPkAsc, ApplicationSectionOrderingChoices.PkAsc];
     default:
       return [];
   }
@@ -108,41 +110,42 @@ function transformOrderBy(orderBy: string | null): ApplicationSectionOrderSet[] 
 /// NOTE might have some cache issues (because it collides with the other sections query)
 export const APPLICATION_SECTIONS_QUERY = gql`
   query ApplicationSections(
+    $applicationRound: Int!
+    $applicationStatus: [ApplicationStatusChoice]!
+    $status: [ApplicationSectionStatusChoice]
+    $unit: [Int]
+    $unitGroup: [Int]
+    $applicantType: [ReserveeType]
+    $preferredOrder: [Int]
+    $textSearch: String
+    $priority: [Priority]
+    $purpose: [Int]
+    $reservationUnit: [Int]
+    $ageGroup: [Int]
+    $municipality: [MunicipalityChoice]
+    $includePreferredOrder10OrHigher: Boolean
+    $orderBy: [ApplicationSectionOrderingChoices]
     $first: Int
     $after: String
-    $orderBy: [ApplicationSectionOrderSet!]
-    # Filter
-    $ageGroup: [Int!]
-    $applicantType: [ReserveeType!]
-    $applicationRound: Int!
-    $applicationStatus: [ApplicationStatusChoice!]!
-    $municipality: [MunicipalityChoice!]
-    $priority: [Priority!]
-    $purpose: [Int!]
-    $reservationUnit: [Int!]
-    $status: [ApplicationSectionStatusChoice!]
-    $textSearch: String
-    $unit: [Int!]
-    $unitGroup: [Int!]
   ) {
     applicationSections(
+      applicationRound: $applicationRound
+      applicationStatus: $applicationStatus
+      status: $status
+      unit: $unit
+      unitGroup: $unitGroup
+      applicantType: $applicantType
+      preferredOrder: $preferredOrder
+      textSearch: $textSearch
+      priority: $priority
+      purpose: $purpose
+      reservationUnit: $reservationUnit
+      ageGroup: $ageGroup
+      municipality: $municipality
+      includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
+      orderBy: $orderBy
       first: $first
       after: $after
-      orderBy: $orderBy
-      filter: {
-        ageGroup: $ageGroup
-        applicantType: $applicantType
-        applicationRound: $applicationRound
-        applicationStatus: $applicationStatus
-        municipality: $municipality
-        priority: $priority
-        purpose: $purpose
-        reservationUnit: $reservationUnit
-        status: $status
-        textSearch: $textSearch
-        unit: $unit
-        unitGroup: $unitGroup
-      }
     ) {
       edges {
         node {

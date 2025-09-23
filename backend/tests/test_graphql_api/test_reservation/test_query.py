@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 import freezegun
 import pytest
 from freezegun import freeze_time
-from undine.relay import to_global_id
+from graphql_relay import to_global_id
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -17,7 +17,6 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
     ReserveeType,
-    UserRoleChoice,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
@@ -45,7 +44,7 @@ from tests.factories import (
 )
 from tests.helpers import patch_method
 
-from .helpers import reservations_query
+from .helpers import reservation_query, reservations_query
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation
@@ -89,7 +88,7 @@ def test_reservation__query__all_fields(graphql):
         isHandled
         name
         numPersons
-        paymentOrder { orderUuid status paymentType receiptUrl checkoutUrl refundUuid expiresInMinutes }
+        paymentOrder { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }
         price
         priceNet
         purpose { nameFi }
@@ -175,22 +174,13 @@ def test_reservation__query__single(graphql):
     reservation = ReservationFactory.create()
 
     graphql.login_with_superuser()
-
     global_id = to_global_id("ReservationNode", reservation.pk)
-    query = """
-        query ($id: ID!) {
-          node(id: $id) {
-            ... on ReservationNode {
-              pk
-            }
-          }
-        }
-    """
+    query = reservation_query(id=global_id)
 
-    response = graphql(query, variables={"id": global_id})
+    response = graphql(query)
 
     assert response.has_errors is False, response.errors
-    assert response.results["pk"] == reservation.pk
+    assert response.first_query_object["pk"] == reservation.pk
 
 
 def test_reservation__query__reservee_name_for_individual_reservee(graphql):
@@ -201,24 +191,14 @@ def test_reservation__query__reservee_name_for_individual_reservee(graphql):
     )
 
     graphql.login_with_superuser()
-
     global_id = to_global_id("ReservationNode", reservation.pk)
-    query = """
-        query ($id: ID!) {
-          node(id: $id) {
-            ... on ReservationNode {
-              pk
-              reserveeName
-            }
-          }
-        }
-    """
+    query = reservation_query(id=global_id, fields="pk reserveeName")
 
-    response = graphql(query, variables={"id": global_id})
+    response = graphql(query)
 
     assert response.has_errors is False, response.errors
-    assert response.results["pk"] == reservation.pk
-    assert response.results["reserveeName"] == "First Last"
+    assert response.first_query_object["pk"] == reservation.pk
+    assert response.first_query_object["reserveeName"] == "First Last"
 
 
 def test_reservation__query__reservee_name_for_business_reservee(graphql):
@@ -228,51 +208,31 @@ def test_reservation__query__reservee_name_for_business_reservee(graphql):
     )
 
     graphql.login_with_superuser()
-
     global_id = to_global_id("ReservationNode", reservation.pk)
-    query = """
-        query ($id: ID!) {
-          node(id: $id) {
-            ... on ReservationNode {
-              pk
-              reserveeName
-            }
-          }
-        }
-    """
+    query = reservation_query(id=global_id, fields="pk reserveeName")
 
-    response = graphql(query, variables={"id": global_id})
+    response = graphql(query)
 
     assert response.has_errors is False, response.errors
-    assert response.results["pk"] == reservation.pk
-    assert response.results["reserveeName"] == "Business Oy"
+    assert response.first_query_object["pk"] == reservation.pk
+    assert response.first_query_object["reserveeName"] == "Business Oy"
 
 
 def test_reservation__query__reservee_name_for_nonprofit_reservee(graphql):
-    reservation = ReservationFactory.create(
+    reservation = ReservationFactory(
         reservee_type=ReserveeType.NONPROFIT,
         reservee_organisation_name="Nonprofit Ry",
     )
 
     graphql.login_with_superuser()
     global_id = to_global_id("ReservationNode", reservation.pk)
+    query = reservation_query(id=global_id, fields="pk reserveeName")
 
-    query = """
-        query ($id: ID!) {
-          node(id: $id) {
-            ... on ReservationNode {
-              pk
-              reserveeName
-            }
-          }
-        }
-    """
-
-    response = graphql(query, variables={"id": global_id})
+    response = graphql(query)
 
     assert response.has_errors is False, response.errors
-    assert response.results["pk"] == reservation.pk
-    assert response.results["reserveeName"] == "Nonprofit Ry"
+    assert response.first_query_object["pk"] == reservation.pk
+    assert response.first_query_object["reserveeName"] == "Nonprofit Ry"
 
 
 def test_reservation__query__reservee_date_of_birth_is_not_shown_to_regular_user(graphql):
@@ -419,7 +379,9 @@ def test_reservation__query__order__all_fields(graphql):
         remote_id="b3fef99e-6c18-422e-943d-cf00702af53e",
     )
 
-    fields = "paymentOrder { orderUuid status paymentType receiptUrl checkoutUrl refundUuid expiresInMinutes }"
+    fields = (
+        "paymentOrder { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }"
+    )
     query = reservations_query(fields=fields)
 
     graphql.login_with_superuser()
@@ -428,6 +390,7 @@ def test_reservation__query__order__all_fields(graphql):
     assert response.has_errors is False, response
     assert response.node(0) == {
         "paymentOrder": {
+            "reservationPk": str(reservation.pk),
             "checkoutUrl": None,
             "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
             "paymentType": "ONLINE",
@@ -446,110 +409,23 @@ def test_reservation__query__reservation_unit_is_archived_but_data_is_still_retu
     graphql.login_with_superuser()
     global_id = to_global_id("ReservationNode", reservation.pk)
 
+    fields = "pk reservationUnit { pk isArchived }"
     expected_response = {
         "pk": reservation.pk,
-        "reservationUnit": {
-            "pk": reservation_unit.pk,
-            "isArchived": True,
-        },
+        "reservationUnit": {"pk": reservation_unit.pk, "isArchived": True},
     }
 
     # Single
-    query = """
-        query ($id: ID!) {
-          node(id: $id) {
-            ... on ReservationNode {
-              pk
-              reservationUnit {
-                pk
-                isArchived
-              }
-            }
-          }
-        }
-    """
-    response = graphql(query, variables={"id": global_id})
-
+    query = reservation_query(id=global_id, fields=fields)
+    response = graphql(query)
     assert response.has_errors is False, response.errors
-    assert response.results == expected_response
+    assert response.first_query_object == expected_response
 
     # All
-    query = reservations_query(fields="pk reservationUnit { pk isArchived }")
-
+    query = reservations_query(fields=fields)
     response = graphql(query)
     assert response.has_errors is False, response.errors
     assert response.node(0) == expected_response
-
-
-def test_reservation__query__user_returned_since_has_permission_to_reservation(graphql):
-    reservation = ReservationFactory.create()
-    unit = reservation.reservation_unit.unit
-
-    # Viewer doesn't have permission to view users normally, but they can see
-    # reservee's information if they have permission to view the unit
-    user = UserFactory.create_with_unit_role(units=[unit], role=UserRoleChoice.VIEWER)
-    graphql.force_login(user)
-
-    # Single
-    query = """
-        query ($id: ID!) {
-          node(id: $id) {
-            ... on ReservationNode {
-              pk
-              user {
-                pk
-                firstName
-              }
-            }
-          }
-        }
-    """
-    global_id = to_global_id("ReservationNode", reservation.pk)
-    response = graphql(query, variables={"id": global_id})
-
-    assert response.has_errors is False, response
-
-    assert response.results == {
-        "pk": reservation.pk,
-        "user": {
-            "pk": reservation.user.pk,
-            "firstName": reservation.user.first_name,
-        },
-    }
-
-
-def test_reservation__query__user_null_since_no_permission_to_reservation(graphql):
-    reservation = ReservationFactory.create()
-    unit = UnitFactory.create()
-
-    # Here viewer doesn't have permission to view this unit specifically, so they won't
-    # see the reservee's information either, only common information
-    user = UserFactory.create_with_unit_role(units=[unit], role=UserRoleChoice.VIEWER)
-    graphql.force_login(user)
-
-    # Single
-    query = """
-        query ($id: ID!) {
-          node(id: $id) {
-            ... on ReservationNode {
-              pk
-              user {
-                pk
-                firstName
-              }
-            }
-          }
-        }
-    """
-    global_id = to_global_id("ReservationNode", reservation.pk)
-    response = graphql(query, variables={"id": global_id})
-
-    assert response.has_errors is False, response
-
-    assert response.results == {
-        "pk": reservation.pk,
-        "user": None,
-    }
 
 
 @freeze_time(local_datetime(2024, 1, 1))
@@ -598,7 +474,7 @@ def test_reservation__query__applied_pricing(graphql):
     assert response.node(0) == {
         "appliedPricing": {
             "begins": "2024-01-02",
-            "priceUnit": PriceUnit.PER_15_MINS,
+            "priceUnit": PriceUnit.PER_15_MINS.value.upper(),
             "lowestPrice": "10.0",
             "highestPrice": "20.0",
             "taxPercentage": "25.5",
@@ -626,25 +502,22 @@ def pindora_response() -> PindoraReservationResponse:
     )
 
 
-PINDORA_QUERY = """
-    query ($id: ID!) {
-        node(id: $id) {
-            ... on ReservationNode {
-                pindoraInfo {
-                    accessCode
-                    accessCodeGeneratedAt
-                    accessCodeIsActive
-                    accessCodeKeypadUrl
-                    accessCodePhoneNumber
-                    accessCodeSmsNumber
-                    accessCodeSmsMessage
-                    accessCodeBeginsAt
-                    accessCodeEndsAt
-                }
-            }
+def pindora_query(reservation: Reservation) -> str:
+    fields = """
+        pindoraInfo {
+            accessCode
+            accessCodeGeneratedAt
+            accessCodeIsActive
+            accessCodeKeypadUrl
+            accessCodePhoneNumber
+            accessCodeSmsNumber
+            accessCodeSmsMessage
+            accessCodeBeginsAt
+            accessCodeEndsAt
         }
-    }
-"""
+    """
+    global_id = to_global_id("ReservationNode", reservation.pk)
+    return reservation_query(fields=fields, id=global_id)
 
 
 @freeze_time(local_datetime(2022, 1, 1))
@@ -656,16 +529,16 @@ def test_reservation__query__pindora_info(graphql):
         ends_at=local_datetime(2022, 1, 1, 13),
     )
 
-    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = pindora_query(reservation)
 
     graphql.force_login(reservation.user)
 
     with patch_method(PindoraClient.get_reservation, return_value=pindora_response()):
-        response = graphql(PINDORA_QUERY, variables={"id": global_id})
+        response = graphql(query)
 
     assert response.has_errors is False, response
 
-    assert response.results["pindoraInfo"] == {
+    assert response.first_query_object["pindoraInfo"] == {
         "accessCode": "12345",
         "accessCodeIsActive": True,
         "accessCodeGeneratedAt": "2022-01-01T00:00:00+02:00",
@@ -688,7 +561,7 @@ def test_reservation__query__pindora_info__access_code_not_active(graphql, as_re
         ends_at=local_datetime(2022, 1, 1, 13),
     )
 
-    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = pindora_query(reservation)
 
     if as_reservee:
         graphql.force_login(reservation.user)
@@ -699,14 +572,14 @@ def test_reservation__query__pindora_info__access_code_not_active(graphql, as_re
     response["access_code_is_active"] = False
 
     with patch_method(PindoraClient.get_reservation, return_value=response):
-        response = graphql(PINDORA_QUERY, variables={"id": global_id})
+        response = graphql(query)
 
     assert response.has_errors is False, response
 
     if as_reservee:
-        assert response.results["pindoraInfo"] is None
+        assert response.first_query_object["pindoraInfo"] is None
     else:
-        assert response.results["pindoraInfo"] is not None
+        assert response.first_query_object["pindoraInfo"] is not None
 
 
 @freeze_time(local_datetime(2022, 1, 1))
@@ -719,7 +592,7 @@ def test_reservation__query__pindora_info__not_confirmed(graphql, as_reservee):
         ends_at=local_datetime(2022, 1, 1, 13),
     )
 
-    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = pindora_query(reservation)
 
     if as_reservee:
         graphql.force_login(reservation.user)
@@ -727,14 +600,14 @@ def test_reservation__query__pindora_info__not_confirmed(graphql, as_reservee):
         graphql.login_with_superuser()
 
     with patch_method(PindoraClient.get_reservation, return_value=pindora_response()):
-        response = graphql(PINDORA_QUERY, variables={"id": global_id})
+        response = graphql(query)
 
     assert response.has_errors is False, response
 
     if as_reservee:
-        assert response.results["pindoraInfo"] is None
+        assert response.first_query_object["pindoraInfo"] is None
     else:
-        assert response.results["pindoraInfo"] is not None
+        assert response.first_query_object["pindoraInfo"] is not None
 
 
 @freeze_time(local_datetime(2022, 1, 1))
@@ -746,16 +619,16 @@ def test_reservation__query__pindora_info__access_type_not_access_code(graphql):
         ends_at=local_datetime(2022, 1, 1, 13),
     )
 
-    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = pindora_query(reservation)
 
     graphql.force_login(reservation.user)
 
     with patch_method(PindoraClient.get_reservation, return_value=pindora_response()):
-        response = graphql(PINDORA_QUERY, variables={"id": global_id})
+        response = graphql(query)
 
     assert response.has_errors is False, response
 
-    assert response.results["pindoraInfo"] is None
+    assert response.first_query_object["pindoraInfo"] is None
 
 
 @freeze_time(local_datetime(2022, 1, 1))
@@ -767,16 +640,16 @@ def test_reservation__query__pindora_info__pindora_call_fails(graphql):
         ends_at=local_datetime(2022, 1, 1, 13),
     )
 
-    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = pindora_query(reservation)
 
     graphql.force_login(reservation.user)
 
     with patch_method(PindoraClient.get_reservation, side_effect=PindoraAPIError("Error")):
-        response = graphql(PINDORA_QUERY, variables={"id": global_id})
+        response = graphql(query)
 
     assert response.has_errors is False, response
 
-    assert response.results["pindoraInfo"] is None
+    assert response.first_query_object["pindoraInfo"] is None
 
 
 @freeze_time(local_datetime(2022, 1, 1))
@@ -788,7 +661,7 @@ def test_reservation__query__pindora_info__pindora_data_cached(graphql):
         ends_at=local_datetime(2022, 1, 1, 13),
     )
 
-    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = pindora_query(reservation)
 
     graphql.force_login(reservation.user)
 
@@ -796,14 +669,14 @@ def test_reservation__query__pindora_info__pindora_data_cached(graphql):
     PindoraClient._cache_reservation_response(data=data, ext_uuid=reservation.ext_uuid)
 
     with patch_method(PindoraClient.get) as pindora_api:
-        response = graphql(PINDORA_QUERY, variables={"id": global_id})
+        response = graphql(query)
 
     # cache was used, no API call was made
     assert pindora_api.called is False
 
     assert response.has_errors is False, response
 
-    assert response.results["pindoraInfo"] == {
+    assert response.first_query_object["pindoraInfo"] == {
         "accessCode": "12345",
         "accessCodeIsActive": True,
         "accessCodeGeneratedAt": "2022-01-01T00:00:00+02:00",
@@ -825,16 +698,16 @@ def test_reservation__query__pindora_info__reservation_past(graphql):
         ends_at=local_datetime(2022, 1, 1, 13),
     )
 
-    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = pindora_query(reservation)
 
     graphql.force_login(reservation.user)
 
     with patch_method(PindoraClient.get_reservation, return_value=pindora_response()):
-        response = graphql(PINDORA_QUERY, variables={"id": global_id})
+        response = graphql(query)
 
     assert response.has_errors is False, response
 
-    assert response.results["pindoraInfo"] is None
+    assert response.first_query_object["pindoraInfo"] is None
 
 
 @freeze_time(local_datetime(2022, 1, 1))
@@ -848,7 +721,7 @@ def test_reservation__query__pindora_info__in_reservation_series(graphql):
         reservation_series=series,
     )
 
-    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = pindora_query(reservation)
 
     graphql.force_login(reservation.user)
 
@@ -872,11 +745,11 @@ def test_reservation__query__pindora_info__in_reservation_series(graphql):
     )
 
     with patch_method(PindoraClient.get_reservation_series, return_value=response):
-        response = graphql(PINDORA_QUERY, variables={"id": global_id})
+        response = graphql(query)
 
     assert response.has_errors is False, response
 
-    assert response.results["pindoraInfo"] == {
+    assert response.first_query_object["pindoraInfo"] == {
         "accessCode": "12345",
         "accessCodeIsActive": True,
         "accessCodeGeneratedAt": "2022-01-01T00:00:00+02:00",
@@ -910,7 +783,7 @@ def test_reservation__query__pindora_info__in_application_section(graphql):
         ends_at=local_datetime(2022, 1, 1, 13),
     )
 
-    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = pindora_query(reservation)
 
     graphql.force_login(reservation.user)
 
@@ -934,11 +807,11 @@ def test_reservation__query__pindora_info__in_application_section(graphql):
     )
 
     with patch_method(PindoraClient.get_seasonal_booking, return_value=response):
-        response = graphql(PINDORA_QUERY, variables={"id": global_id})
+        response = graphql(query)
 
     assert response.has_errors is False, response
 
-    assert response.results["pindoraInfo"] == {
+    assert response.first_query_object["pindoraInfo"] == {
         "accessCode": "12345",
         "accessCodeIsActive": True,
         "accessCodeGeneratedAt": "2022-01-01T00:00:00+02:00",
@@ -971,7 +844,7 @@ def test_reservation__query__pindora_info__in_application_section__not_sent(grap
         ends_at=local_datetime(2022, 1, 1, 13),
     )
 
-    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = pindora_query(reservation)
 
     graphql.force_login(reservation.user)
 
@@ -995,8 +868,8 @@ def test_reservation__query__pindora_info__in_application_section__not_sent(grap
     )
 
     with patch_method(PindoraClient.get_seasonal_booking, return_value=response):
-        response = graphql(PINDORA_QUERY, variables={"id": global_id})
+        response = graphql(query)
 
     assert response.has_errors is False, response
 
-    assert response.results["pindoraInfo"] is None
+    assert response.first_query_object["pindoraInfo"] is None

@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { useUpdateSpaceMutation, type SpaceUpdateMutation, useSpaceQuery } from "@gql/gql-types";
+import { useUpdateSpaceMutation, type SpaceUpdateMutationInput, useSpaceQuery } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/components/toast";
 import { ButtonContainer, CenterSpinner, H2, H3 } from "common/styled";
 import { FormErrorSummary } from "@/component/FormErrorSummary";
-import { createNodeId, getNode } from "common/src/helpers";
+import { base64encode } from "common/src/helpers";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LinkPrev } from "@/component/LinkPrev";
@@ -41,7 +41,7 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
     refetch,
     loading: isQueryLoading,
   } = useSpaceQuery({
-    variables: { id: createNodeId("SpaceNode", space) },
+    variables: { id: base64encode(`SpaceNode:${space}`) },
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
     },
@@ -55,18 +55,18 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
   const { errors, isDirty } = formState;
 
   useEffect(() => {
-    const space = getNode(data);
-    if (space) {
+    if (data?.space != null) {
+      const { space: s } = data;
       reset({
-        nameFi: space.nameFi ?? "",
-        nameSv: space.nameSv ?? "",
-        nameEn: space.nameEn ?? "",
-        surfaceArea: space.surfaceArea ?? undefined,
-        maxPersons: space.maxPersons ?? undefined,
+        nameFi: s.nameFi ?? "",
+        nameSv: s.nameSv ?? "",
+        nameEn: s.nameEn ?? "",
+        surfaceArea: s.surfaceArea ?? undefined,
+        maxPersons: s.maxPersons ?? undefined,
         unit,
-        pk: space.pk,
-        parent: space.parent?.pk ?? null,
-        code: space.code,
+        pk: s.pk ?? 0,
+        parent: s.parent?.pk ?? null,
+        code: s.code,
       });
     }
   }, [data, reset, unit]);
@@ -77,10 +77,10 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
     return <CenterSpinner />;
   }
 
-  const updateSpace = (input: SpaceUpdateMutation) => mutation({ variables: { input } });
+  const updateSpace = (input: SpaceUpdateMutationInput) => mutation({ variables: { input } });
   const onSubmit = async (values: SpaceUpdateForm) => {
     try {
-      const { parent, surfaceArea, pk, unit, ...rest } = values;
+      const { parent, surfaceArea, pk, ...rest } = values;
       if (pk == null || pk === 0) {
         throw new Error("Space pk is not defined");
       }
@@ -89,7 +89,7 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
         pk,
         parent: parent != null && parent > 0 ? parent : null,
         surfaceArea: Math.ceil(surfaceArea ?? 0),
-      } satisfies SpaceUpdateMutation);
+      });
       successToast({
         text: t("spaces:SpaceEditor.spaceUpdatedNotification"),
       });
@@ -100,14 +100,12 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
     }
   };
 
-  const node = getNode(data);
-
   return (
     <>
       <LinkPrev route={getUnitUrl(unit, "spaces-resources")} />
       <SpaceHead
-        title={node?.parent?.nameFi || t("spaces:noParent")}
-        space={node}
+        title={data?.space?.parent?.nameFi || t("spaces:noParent")}
+        space={data?.space}
         maxPersons={watch("maxPersons")}
         surfaceArea={watch("surfaceArea")}
       />
@@ -116,7 +114,7 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
         <FormErrorSummary errors={errors} />
         <section>
           <H3>{t("spaces:SpaceEditor.hierarchy")}</H3>
-          <SpaceHierarchy space={node} />
+          <SpaceHierarchy space={data?.space} />
           <Controller
             control={control}
             name="parent"
@@ -160,45 +158,9 @@ export function SpaceEditor({ space, unit }: Props): JSX.Element {
 }
 
 export const UPDATE_SPACE = gql`
-  mutation UpdateSpace($input: SpaceUpdateMutation!) {
+  mutation UpdateSpace($input: SpaceUpdateMutationInput!) {
     updateSpace(input: $input) {
       pk
-    }
-  }
-`;
-
-export const SPACE_PAGE_FRAGMENT = gql`
-  fragment SpacePage on SpaceNode {
-    id
-    pk
-    nameFi
-    nameSv
-    nameEn
-    code
-    surfaceArea
-    maxPersons
-    unit {
-      id
-      ...UnitSubpageHead
-      descriptionFi
-      spaces {
-        id
-        pk
-        nameFi
-      }
-    }
-    parent {
-      id
-      pk
-      nameFi
-      parent {
-        id
-        nameFi
-        parent {
-          id
-          nameFi
-        }
-      }
     }
   }
 `;
@@ -206,9 +168,37 @@ export const SPACE_PAGE_FRAGMENT = gql`
 // TODO why does this query parents up the tree?
 export const SPACE_QUERY = gql`
   query Space($id: ID!) {
-    node(id: $id) {
-      ... on SpaceNode {
-        ...SpacePage
+    space(id: $id) {
+      id
+      pk
+      nameFi
+      nameSv
+      nameEn
+      code
+      surfaceArea
+      maxPersons
+      unit {
+        id
+        ...UnitSubpageHead
+        descriptionFi
+        spaces {
+          id
+          pk
+          nameFi
+        }
+      }
+      parent {
+        id
+        pk
+        nameFi
+        parent {
+          id
+          nameFi
+          parent {
+            id
+            nameFi
+          }
+        }
       }
     }
   }

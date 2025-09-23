@@ -23,11 +23,9 @@ from utils.date_utils import local_datetime
 from tests.factories import (
     ApplicationFactory,
     ApplicationSectionFactory,
-    GeneralRoleFactory,
     PaymentOrderFactory,
     ReservationFactory,
     UnitFactory,
-    UnitRoleFactory,
     UserFactory,
     UserSocialAuthFactory,
 )
@@ -51,11 +49,11 @@ def test_anonymization__user():
     UserSocialAuthFactory.create(user=mr_anonymous)
 
     # Add general role
-    GeneralRoleFactory.create(user=mr_anonymous)
+    GeneralRole.objects.create(user=mr_anonymous)
 
     # Add unit role
-    unit = UnitFactory.create(name="Role testing unit")
-    unit_role = UnitRoleFactory.create(user=mr_anonymous)
+    unit = UnitFactory(name="Role testing unit")
+    unit_role = UnitRole.objects.create(user=mr_anonymous)
     unit_role.units.add(unit)
 
     old_user_uuid = mr_anonymous.uuid

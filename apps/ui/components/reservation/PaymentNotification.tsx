@@ -1,6 +1,11 @@
-import { PaymentNotificationFragment, ReservationCancelReasonChoice, ReservationStateChoice } from "@gql/gql-types";
+import {
+  ReservationCancelReasonChoice,
+  type ReservationPaymentUrlFragment,
+  type ReservationPriceFieldsFragment,
+  ReservationStateChoice,
+} from "@gql/gql-types";
 import { Notification } from "hds-react";
-import { ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
+import { ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { convertLanguageCode, toUIDateTime } from "common/src/common/util";
@@ -9,10 +14,16 @@ import { formatters as getFormatters } from "common";
 import React, { useMemo } from "react";
 import { breakpoints } from "common/src/const";
 import { getPaymentUrl } from "@/modules/reservation";
-import { gql } from "@apollo/client";
 
 type PaymentNotificationProps = {
-  reservation: PaymentNotificationFragment;
+  reservation: ReservationPaymentUrlFragment & Pick<ReservationPriceFieldsFragment, "price">;
+  appliedPricing: {
+    taxPercentage: string;
+  } | null;
+  paymentOrder: {
+    handledPaymentDueBy: string | null;
+    checkoutUrl: string | null;
+  } | null;
   apiBaseUrl: string;
 };
 
@@ -29,12 +40,16 @@ const PriceDetails = styled.div`
   }
 `;
 
-export function PaymentNotification({ reservation, apiBaseUrl }: PaymentNotificationProps) {
+export const PaymentNotification = ({
+  reservation,
+  appliedPricing,
+  paymentOrder,
+  apiBaseUrl,
+}: PaymentNotificationProps) => {
   const { t, i18n } = useTranslation();
   const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
   const formatter = formatters["currencyWithDecimals"];
-  const { appliedPricing, paymentOrder } = reservation;
-  const price = formatter?.format(parseFloat(appliedPricing?.highestPrice ?? "") ?? 0);
+  const price = formatter?.format(parseFloat(reservation.price ?? "") ?? 0);
   const taxPercentage = formatters.strippedDecimal?.format(parseFloat(appliedPricing?.taxPercentage ?? "")) ?? "0";
 
   const deadline =
@@ -68,20 +83,6 @@ export function PaymentNotification({ reservation, apiBaseUrl }: PaymentNotifica
       </Flex>
     </Notification>
   );
-}
+};
 
-export const PAYMENT_NOTIFICATION_ORDER_FRAGMENT = gql`
-  fragment PaymentNotification on ReservationNode {
-    id
-    ...ReservationPaymentUrl
-    appliedPricing {
-      highestPrice
-      taxPercentage
-    }
-    paymentOrder {
-      id
-      handledPaymentDueBy
-      checkoutUrl
-    }
-  }
-`;
+export default PaymentNotification;

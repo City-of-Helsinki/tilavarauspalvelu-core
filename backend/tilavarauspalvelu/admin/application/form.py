@@ -4,13 +4,15 @@ from typing import Any
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from graphene_django_extensions.fields import EnumChoiceField
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, ApplicationStatusChoice
 from tilavarauspalvelu.models import Application, ApplicationSection
+from utils.fields.forms import disabled_widget
 
 
 class ApplicationSectionInlineAdminForm(forms.ModelForm):
-    status = forms.ChoiceField(choices=ApplicationSectionStatusChoice.choices, required=False, disabled=True)
+    status = EnumChoiceField(enum=ApplicationSectionStatusChoice, required=False, disabled=True)
     suitable_days_of_the_week = forms.CharField()
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -47,7 +49,7 @@ class ApplicationSectionInlineAdminForm(forms.ModelForm):
 
 class ApplicationAdminForm(forms.ModelForm):
     status = forms.CharField(
-        widget=forms.TextInput(attrs={"class": "readonly", "disabled": True, "required": False}),
+        widget=disabled_widget,
         required=False,
         disabled=True,
         label=_("Status"),

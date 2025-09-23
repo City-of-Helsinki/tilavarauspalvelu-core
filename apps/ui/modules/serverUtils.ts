@@ -1,7 +1,7 @@
 import { env } from "@/env.mjs";
 import { gql, NormalizedCacheObject, type ApolloClient } from "@apollo/client";
 import {
-  TermsOfUseTypeChoices,
+  TermsType,
   TermsOfUseDocument,
   type TermsOfUseQuery,
   type TermsOfUseQueryVariables,
@@ -44,12 +44,13 @@ export async function getGenericTerms(apolloClient: ApolloClient<unknown>): Prom
   const { data: tosData } = await apolloClient.query<TermsOfUseQuery, TermsOfUseQueryVariables>({
     query: TermsOfUseDocument,
     variables: {
-      termsType: TermsOfUseTypeChoices.GenericTerms,
+      termsType: TermsType.GenericTerms,
     },
   });
 
   // TODO missing backend filtering
-  const tos = tosData?.allTermsOfUse.find((node) => node?.pk === genericTermsVariant.BOOKING) ?? null;
+  const tos =
+    tosData?.termsOfUse?.edges?.map((e) => e?.node).find((node) => node?.pk === genericTermsVariant.BOOKING) ?? null;
 
   // NOTE there is no error reporting in the Pages even though this is required data
   // so Pages / Components might return null if tos is missing
@@ -84,7 +85,7 @@ export async function getReservationByOrderUuid(
 
 // NOTE: Needs to match ReservationStateQuery
 export const GET_ORDER = gql`
-  query Order($orderUuid: UUID!) {
+  query Order($orderUuid: String!) {
     order(orderUuid: $orderUuid) {
       id
       reservation {

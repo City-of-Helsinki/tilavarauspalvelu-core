@@ -8,26 +8,16 @@ from django.db import models
 from django.db.models import Exists, OrderBy
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
-from lazy_managers import LazyModelAttribute, LazyModelManager
+from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
-from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
 from utils.date_utils import local_datetime
 from utils.db import Now, SubqueryCount
-from utils.mixins import SerializableModelMixin
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import (
-        AgeGroup,
-        Application,
-        ReservationPurpose,
-        ReservationUnitOption,
-        SuitableTimeRange,
-    )
-    from tilavarauspalvelu.models._base import OneToManyRelatedManager
-    from tilavarauspalvelu.models.reservation_unit_option.queryset import ReservationUnitOptionQuerySet
-    from tilavarauspalvelu.models.suitable_time_range.queryset import SuitableTimeRangeQuerySet
+    from tilavarauspalvelu.models import AgeGroup, Application, ReservationPurpose
 
     from .actions import ApplicationSectionActions
     from .queryset import ApplicationSectionManager
@@ -39,7 +29,7 @@ __all__ = [
 ]
 
 
-class ApplicationSection(SerializableModelMixin, models.Model):
+class ApplicationSection(SerializableMixin, models.Model):
     """
     Represents a section of an application, which contains the reservation unit options
     and suitable time ranges that can be used fulfill the slot request included in it.
@@ -66,23 +56,18 @@ class ApplicationSection(SerializableModelMixin, models.Model):
         "tilavarauspalvelu.ReservationPurpose",
         related_name="application_sections",
         on_delete=models.SET_NULL,
-        blank=True,
         null=True,
     )
     age_group: AgeGroup | None = models.ForeignKey(
         "tilavarauspalvelu.AgeGroup",
         related_name="application_sections",
         on_delete=models.SET_NULL,
-        blank=True,
         null=True,
     )
 
     objects: ClassVar[ApplicationSectionManager] = LazyModelManager.new()
     actions: ApplicationSectionActions = LazyModelAttribute.new()
     validators: ApplicationSectionValidator = LazyModelAttribute.new()
-
-    reservation_unit_options: OneToManyRelatedManager[ReservationUnitOption, ReservationUnitOptionQuerySet]
-    suitable_time_ranges: OneToManyRelatedManager[SuitableTimeRange, SuitableTimeRangeQuerySet]
 
     class Meta:
         db_table = "application_section"
@@ -180,7 +165,7 @@ class ApplicationSection(SerializableModelMixin, models.Model):
             ),
             # Otherwise, the section is still in allocation
             default=models.Value(ApplicationSectionStatusChoice.IN_ALLOCATION.value),
-            output_field=TextChoicesField(choices_enum=ApplicationSectionStatusChoice),
+            output_field=models.CharField(),
         )
 
     @status.override
@@ -284,10 +269,8 @@ class ApplicationSection(SerializableModelMixin, models.Model):
         from tilavarauspalvelu.models import Reservation
 
         exists = Exists(
-            queryset=(
-                Reservation.objects.all()
-                .for_application_section(models.OuterRef("pk"))
-                .filter(L(access_code_should_be_active=True))
+            queryset=Reservation.objects.for_application_section(models.OuterRef("pk")).filter(
+                L(access_code_should_be_active=True),
             ),
         )
         return exists  # type: ignore[return-value]  # noqa: RET504

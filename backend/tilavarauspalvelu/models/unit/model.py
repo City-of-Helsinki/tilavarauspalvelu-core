@@ -7,21 +7,14 @@ from django.contrib.gis.db.models import PointField
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.constants import COORDINATE_SYSTEM_ID
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
 
     from django.contrib.gis.geos import Point
-
-    from tilavarauspalvelu.models import ReservationUnit, Space, UnitGroup, UnitRole
-    from tilavarauspalvelu.models._base import ManyToManyRelatedManager, OneToManyRelatedManager
-    from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
-    from tilavarauspalvelu.models.space.queryset import SpaceQuerySet
-    from tilavarauspalvelu.models.unit_group.queryset import UnitGroupQuerySet
-    from tilavarauspalvelu.models.unit_role.queryset import UnitRoleQuerySet
 
     from .actions import UnitActions
     from .queryset import UnitManager
@@ -55,7 +48,7 @@ class Unit(models.Model):
 
     coordinates: Point | None = PointField(null=True, blank=True, srid=COORDINATE_SYSTEM_ID)
 
-    search_terms: list[str] = ArrayField(models.CharField(max_length=255), blank=True, default=list)
+    search_terms = ArrayField(models.CharField(max_length=255), blank=True, default=list)
 
     allow_permissions_from_ad_groups: bool = models.BooleanField(default=False)
 
@@ -70,15 +63,15 @@ class Unit(models.Model):
         "tilavarauspalvelu.PaymentMerchant",
         related_name="units",
         on_delete=models.PROTECT,
-        blank=True,
         null=True,
+        blank=True,
     )
     payment_accounting = models.ForeignKey(
         "tilavarauspalvelu.PaymentAccounting",
         related_name="units",
         on_delete=models.PROTECT,
-        blank=True,
         null=True,
+        blank=True,
     )
 
     # Translated field hints
@@ -101,11 +94,6 @@ class Unit(models.Model):
     objects: ClassVar[UnitManager] = LazyModelManager.new()
     actions: UnitActions = LazyModelAttribute.new()
     validators: UnitValidator = LazyModelAttribute.new()
-
-    reservation_units: OneToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
-    spaces: OneToManyRelatedManager[Space, SpaceQuerySet]
-    unit_groups: ManyToManyRelatedManager[UnitGroup, UnitGroupQuerySet]
-    unit_roles: ManyToManyRelatedManager[UnitRole, UnitRoleQuerySet]
 
     class Meta:
         db_table = "unit"

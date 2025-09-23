@@ -1,7 +1,0 @@
-{% if access_code %}
-<mj-spacer />
-<mj-text>{{ access_code_label | safe }}: {{ access_code }}</mj-text>
-{% elif access_code_is_used %}
-<mj-spacer />
-<mj-text>{{ text_access_code_unavailable_instructions_html | sentence }}</mj-text>
-{% endif %}

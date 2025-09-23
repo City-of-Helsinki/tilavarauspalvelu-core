@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 
 from django.db import models
+from mptt.managers import TreeManager
+from mptt.querysets import TreeQuerySet
 
-from tilavarauspalvelu.models import Space
-from tilavarauspalvelu.models._base import ModelTreeManager, ModelTreeQuerySet
 from utils.db import SubqueryArray
 
 if TYPE_CHECKING:
@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 
-class SpaceQuerySet(ModelTreeQuerySet[Space]):
+class SpaceQuerySet(TreeQuerySet):
     def all_space_ids_though_hierarchy(self) -> set[int]:
         """
         Get ids for all spaces that are accessible though the space hierarchy
@@ -109,4 +109,4 @@ class SpaceQuerySet(ModelTreeQuerySet[Space]):
         return self.annotate(family=SubqueryArray(qs.values("id"), agg_field="id"))
 
 
-class SpaceManager(ModelTreeManager[Space, SpaceQuerySet]): ...
+class SpaceManager(TreeManager.from_queryset(SpaceQuerySet)): ...

@@ -1,31 +1,32 @@
 import {
   type Maybe,
-  type ReservationEditPageFragment,
+  type ReservationEditPageQuery,
   ReservationStateChoice,
   useReservationEditPageQuery,
 } from "@gql/gql-types";
-import { createNodeId, getNode } from "common/src/helpers";
+import { base64encode } from "common/src/helpers";
 import { useReservationSeries } from "@/hooks";
 
-type ReturnValue = {
-  reservation: Maybe<ReservationEditPageFragment>;
-  loading: boolean;
-  refetch: () => Promise<unknown>;
-};
+type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
+
 /// @param id fetch reservation related to this pk
 /// Overly complex because editing DENIED or past reservations is not allowed
 /// but the UI makes no distinction between past and present instances of a recurrence.
 /// If we don't get the next valid reservation for edits: the mutations work,
 /// but the UI is not updated to show the changes (since it's looking at a past instance).
-export function useReservationEditData(pk: number): ReturnValue {
+export function useReservationEditData(pk: number): {
+  reservation: Maybe<ReservationType> | undefined;
+  loading: boolean;
+  refetch: () => Promise<unknown>;
+} {
+  const id = base64encode(`ReservationNode:${pk}`);
   const { data, loading, refetch } = useReservationEditPageQuery({
     skip: !pk,
     fetchPolicy: "no-cache",
-    variables: { id: createNodeId("ReservationNode", pk) },
+    variables: { id },
   });
 
-  const node = getNode(data);
-  const recurringPk = node?.reservationSeries?.pk;
+  const recurringPk = data?.reservation?.reservationSeries?.pk;
   const { reservations: reservationSeries } = useReservationSeries(recurringPk);
 
   // NOTE have to be done like this instead of query params because of cache
@@ -36,17 +37,16 @@ export function useReservationEditData(pk: number): ReturnValue {
     .filter((x) => x.state === ReservationStateChoice.Confirmed);
 
   const nextPk = possibleReservations?.at(0)?.pk ?? 0;
-  const nextRecurrenceId = createNodeId("ReservationNode", nextPk);
+  const nextRecurrenceId = base64encode(`ReservationNode:${nextPk}`);
   const { data: nextRecurrence, loading: nextReservationLoading } = useReservationEditPageQuery({
     skip: nextPk === 0,
+    fetchPolicy: "no-cache",
     variables: {
       id: nextRecurrenceId,
     },
-    fetchPolicy: "no-cache",
   });
 
-  const nextNode = getNode(nextRecurrence);
-  const reservation = recurringPk ? nextNode : node;
+  const reservation = recurringPk ? nextRecurrence?.reservation : data?.reservation;
 
   return {
     reservation,

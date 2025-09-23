@@ -2,7 +2,7 @@ import { describe, expect, test, vi } from "vitest";
 import { render, within } from "@testing-library/react";
 import SearchSingle from "@/pages/search";
 import { createOptionMock } from "@/test/test.gql.utils";
-import { AccessType, ReservationKind } from "@gql/gql-types";
+import { AccessType } from "@gql/gql-types";
 import { type OptionsListT } from "common/src/modules/search";
 import { MockedGraphQLProvider } from "../test.react.utils";
 import { createGraphQLMocks } from "../gql.mocks";
@@ -41,7 +41,7 @@ const accessTypeOptions = Object.values(AccessType).map((value) => ({
 }));
 
 function customRender(): ReturnType<typeof render> {
-  const mocks = createGraphQLMocks({ reservationKind: ReservationKind.Direct });
+  const mocks = createGraphQLMocks();
   return render(
     <MockedGraphQLProvider mocks={mocks}>
       <SearchSingle
@@ -85,15 +85,15 @@ describe("SearchSingle read query params", () => {
         initiallyOpen: false,
       },
       startDate: {
-        value: "1.1.2024",
-        tagText: 'searchForm:filters.startDate {"label":"startDate","value":["1.1.2024"],"count":null}',
-        formFieldText: "1.1.2024",
+        value: "1.1.2025",
+        tagText: 'searchForm:filters.startDate {"label":"startDate","value":["1.1.2025"],"count":null}',
+        formFieldText: "1.1.2025",
         initiallyOpen: false,
       },
       endDate: {
-        value: "31.12.2024",
-        tagText: 'searchForm:filters.endDate {"label":"endDate","value":["31.12.2024"],"count":null}',
-        formFieldText: "31.12.2024",
+        value: "31.12.2025",
+        tagText: 'searchForm:filters.endDate {"label":"endDate","value":["31.12.2025"],"count":null}',
+        formFieldText: "31.12.2025",
         initiallyOpen: false,
       },
       purposes: {

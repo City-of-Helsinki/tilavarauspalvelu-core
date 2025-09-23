@@ -1,10 +1,10 @@
-import { type TermsOfUseFieldsFragment, TermsOfUseTypeChoices } from "@/gql/gql-types";
+import { type TermsOfUseFieldsFragment, TermsType } from "@/gql/gql-types";
 import Page4 from "@/pages/applications/[id]/page4";
 import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { type CreateMockApplicationFragmentProps, createMockApplicationViewFragment } from "@test/application.mocks";
-import { createNodeId } from "common/src/helpers";
+import { base64encode } from "common/src/helpers";
 import userEvent from "@testing-library/user-event";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 
@@ -55,9 +55,9 @@ function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnTyp
   }
   const application = createMockApplicationViewFragment(props);
   const tos: TermsOfUseFieldsFragment = {
-    id: createNodeId("TermsOfUseNode", 1),
-    pk: "foobar",
-    termsType: TermsOfUseTypeChoices.GenericTerms,
+    id: base64encode("TermsOfUseNode:1"),
+    pk: null,
+    termsType: TermsType.GenericTerms,
     nameFi: null,
     nameEn: null,
     nameSv: null,

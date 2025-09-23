@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { UserPermissionChoice, useUnitPageQuery } from "@gql/gql-types";
 import { formatAddress } from "@/common/util";
 import { ExternalLink } from "@/component/ExternalLink";
-import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { Error404 } from "@/component/Error404";
 import { ReservationUnitList } from "@lib/units/[id]/ReservationUnitList";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/common/urls";
@@ -63,12 +63,14 @@ function Unit({ unitPk }: { unitPk: number }): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
 
+  const typename = "UnitNode";
+  const id = base64encode(`${typename}:${unitPk}`);
   const { data, loading: isLoading } = useUnitPageQuery({
-    variables: { id: createNodeId("UnitNode", unitPk) },
+    variables: { id },
     fetchPolicy: "network-only",
   });
 
-  const unit = getNode(data);
+  const { unit } = data ?? {};
   const hasSpacesResources = Boolean(unit?.spaces?.length);
 
   if (isLoading) {
@@ -162,18 +164,16 @@ export async function getServerSideProps({ locale, query }: GetServerSidePropsCo
 
 export const UNIT_PAGE_QUERY = gql`
   query UnitPage($id: ID!) {
-    node(id: $id) {
-      ... on UnitNode {
-        id
-        pk
-        nameFi
-        tprekId
-        shortDescriptionFi
-        reservationUnits {
-          ...ReservationUnitCard
-        }
-        ...NewResourceUnitFields
+    unit(id: $id) {
+      id
+      pk
+      nameFi
+      tprekId
+      shortDescriptionFi
+      reservationUnits {
+        ...ReservationUnitCard
       }
+      ...NewResourceUnitFields
     }
   }
 `;

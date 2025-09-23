@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { type NewResourceUnitFieldsFragment, useCreateSpaceMutation, type SpaceCreateMutation } from "@gql/gql-types";
+import {
+  type NewResourceUnitFieldsFragment,
+  useCreateSpaceMutation,
+  type SpaceCreateMutationInput,
+} from "@gql/gql-types";
 import { Page1 } from "./Page1";
 import { Page2 } from "./Page2";
 import { useForm } from "react-hook-form";
@@ -19,7 +23,7 @@ type Props = {
 export function NewSpaceModal({ unit, closeModal, refetch, parentSpacePk }: Props): JSX.Element | null {
   const [mutation] = useCreateSpaceMutation();
 
-  const createSpace = (input: SpaceCreateMutation) => mutation({ variables: { input } });
+  const createSpace = (input: SpaceCreateMutationInput) => mutation({ variables: { input } });
 
   const form = useForm<SpaceUpdateForm>({
     resolver: zodResolver(SpaceUpdateSchema),
@@ -39,7 +43,7 @@ export function NewSpaceModal({ unit, closeModal, refetch, parentSpacePk }: Prop
       await createSpace({
         ...values,
         parent: parent != null && parent > 0 ? parent : null,
-        code: values.code,
+        name: values.nameFi,
       });
       closeModal();
       refetch();
@@ -62,7 +66,7 @@ export function NewSpaceModal({ unit, closeModal, refetch, parentSpacePk }: Prop
     <form noValidate onSubmit={form.handleSubmit(createSpaces)}>
       {page === 0 ? (
         <Page1
-          unitPk={unit.pk}
+          unit={unit}
           closeModal={closeModal}
           hasFixedParent={hasFixedParent}
           form={form}
@@ -92,7 +96,7 @@ export const NEW_RESOURCE_UNIT_FRAGMENT = gql`
 `;
 
 export const CREATE_SPACE_MUTATION = gql`
-  mutation CreateSpace($input: SpaceCreateMutation!) {
+  mutation CreateSpace($input: SpaceCreateMutationInput!) {
     createSpace(input: $input) {
       pk
     }

@@ -28,7 +28,7 @@ import {
   type RelatedReservationUnitsQuery,
   type RelatedReservationUnitsQueryVariables,
   type RelatedUnitCardFieldsFragment,
-  type ReservationCreateMutation,
+  type ReservationCreateMutationInput,
   ReservationUnitPageDocument,
   type ReservationUnitPageQuery,
   type ReservationUnitPageQueryVariables,
@@ -36,11 +36,10 @@ import {
   useCreateReservationMutation,
 } from "@gql/gql-types";
 import {
-  createNodeId,
+  base64encode,
   filterNonNullable,
   formatListToCSV,
   formatTimeRange,
-  getNode,
   ignoreMaybeArray,
   isPriceFree,
   timeToMinutes,
@@ -307,7 +306,7 @@ function ReservationUnit({
       throw new Error("Reservation slot is not reservable");
     }
     const { start, end } = slot;
-    const input: ReservationCreateMutation = {
+    const input: ReservationCreateMutationInput = {
       beginsAt: start.toISOString(),
       endsAt: end.toISOString(),
       reservationUnit: reservationUnit.pk,
@@ -360,7 +359,7 @@ function ReservationUnit({
 
   const [createReservationMutation] = useCreateReservationMutation();
 
-  const createReservation = async (input: ReservationCreateMutation): Promise<void> => {
+  const createReservation = async (input: ReservationCreateMutationInput): Promise<void> => {
     try {
       if (reservationUnit.pk == null) {
         throw new Error("Reservation unit pk is missing");
@@ -661,7 +660,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const endsAt = ignoreMaybeArray(query.end);
 
     if (beginsAt != null && endsAt != null) {
-      const input: ReservationCreateMutation = {
+      const input: ReservationCreateMutationInput = {
         beginsAt,
         endsAt,
         reservationUnit: pk,
@@ -702,19 +701,19 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     >({
       query: ReservationUnitPageDocument,
       variables: {
-        id: createNodeId("ReservationUnitNode", pk),
+        id: base64encode(`ReservationUnitNode:${pk}`),
         beginDate: toApiDate(startDate) ?? "",
         endDate: toApiDate(endDate) ?? "",
       },
     });
 
-    const reservationUnit = getNode(reservationUnitData);
+    const { reservationUnit } = reservationUnitData;
 
     if (reservationUnit == null) {
       return notFound;
     }
 
-    const previewPass = uuid === reservationUnit?.extUuid;
+    const previewPass = uuid === reservationUnitData.reservationUnit?.extUuid;
     if (!isReservationUnitPublished(reservationUnit) && !previewPass) {
       return notFound;
     }
@@ -738,7 +737,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         },
       });
       relatedReservationUnits = filterNonNullable(relatedData?.reservationUnits?.edges?.map((n) => n?.node)).filter(
-        (n) => n?.pk !== reservationUnit?.pk
+        (n) => n?.pk !== reservationUnitData.reservationUnit?.pk
       );
     }
 
@@ -768,52 +767,45 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 export default ReservationUnitWrapped;
 
 export const RESERVATION_UNIT_PAGE_QUERY = gql`
-  query ReservationUnitPage(
-    # Filter
-    $id: ID!
-    $beginDate: Date! # Used in fragments
-    $endDate: Date! # Used in fragments
-  ) {
-    node(id: $id) {
-      ... on ReservationUnitNode {
+  query ReservationUnitPage($id: ID!, $beginDate: Date!, $endDate: Date!) {
+    reservationUnit(id: $id) {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+      ...AvailableTimesReservationUnitFields
+      ...NotReservableFields
+      ...ReservationTimePickerFields
+      ...MetadataSets
+      ...ReservationUnitHead
+      unit {
+        ...AddressFields
+      }
+      extUuid
+      ...TermsOfUse
+      isDraft
+      applicationRoundTimeSlots {
+        ...ApplicationRoundTimeSlotFields
+      }
+      descriptionFi
+      descriptionEn
+      descriptionSv
+      canApplyFreeOfCharge
+      ...ReservationInfoSection
+      ...ReservationQuotaReached
+      publishingState
+      equipments {
         id
-        pk
-        nameFi
-        nameEn
-        nameSv
-        ...AvailableTimesReservationUnitFields
-        ...NotReservableFields
-        ...ReservationTimePickerFields
-        ...MetadataSets
-        ...ReservationUnitHead
-        unit {
-          ...AddressFields
-        }
-        extUuid
-        ...TermsOfUse
-        isDraft
-        applicationRoundTimeSlots {
-          ...ApplicationRoundTimeSlotFields
-        }
-        descriptionFi
-        descriptionEn
-        descriptionSv
-        canApplyFreeOfCharge
-        ...ReservationInfoSection
-        ...ReservationQuotaReached
-        publishingState
-        equipments {
-          id
-          ...EquipmentFields
-        }
+        ...EquipmentFields
       }
     }
   }
 `;
 
 export const RELATED_RESERVATION_UNITS_QUERY = gql`
-  query RelatedReservationUnits($unit: [Int!]!) {
-    reservationUnits(filter: { unit: $unit, isVisible: true }) {
+  query RelatedReservationUnits($unit: [Int]!) {
+    reservationUnits(unit: $unit, isVisible: true) {
       edges {
         node {
           ...RelatedUnitCardFields
@@ -824,7 +816,7 @@ export const RELATED_RESERVATION_UNITS_QUERY = gql`
 `;
 
 export const CREATE_RESERVATION = gql`
-  mutation CreateReservation($input: ReservationCreateMutation!) {
+  mutation CreateReservation($input: ReservationCreateMutationInput!) {
     createReservation(input: $input) {
       pk
     }

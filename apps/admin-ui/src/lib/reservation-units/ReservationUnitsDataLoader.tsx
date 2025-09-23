@@ -1,7 +1,6 @@
-import type { SelectedRow } from "@/lib/reservation-units";
-import React, { type Dispatch, type SetStateAction, useState } from "react";
+import React, { useState } from "react";
 import { gql } from "@apollo/client";
-import { ReservationUnitOrderSet, useSearchReservationUnitsQuery } from "@gql/gql-types";
+import { ReservationUnitOrderingChoices, useSearchReservationUnitsQuery } from "@gql/gql-types";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
@@ -11,30 +10,24 @@ import { CenterSpinner } from "common/styled";
 import { useTranslation } from "next-i18next";
 import { useGetFilterSearchParams } from "@/hooks";
 
-type Props = {
-  selectedRows: SelectedRow[];
-  setSelectedRows: Dispatch<SetStateAction<SelectedRow[]>>;
-  apiBaseUrl: string;
-};
-
-function transformOrderBy(orderBy: string, desc: boolean): ReservationUnitOrderSet | null {
+function transformOrderBy(orderBy: string, desc: boolean): ReservationUnitOrderingChoices | null {
   switch (orderBy) {
     case "nameFi":
-      return desc ? ReservationUnitOrderSet.NameFiDesc : ReservationUnitOrderSet.NameFiAsc;
+      return desc ? ReservationUnitOrderingChoices.NameFiDesc : ReservationUnitOrderingChoices.NameFiAsc;
     case "unitNameFi":
-      return desc ? ReservationUnitOrderSet.UnitNameFiDesc : ReservationUnitOrderSet.UnitNameFiAsc;
+      return desc ? ReservationUnitOrderingChoices.UnitNameFiDesc : ReservationUnitOrderingChoices.UnitNameFiAsc;
     case "typeFi":
-      return desc ? ReservationUnitOrderSet.TypeFiDesc : ReservationUnitOrderSet.TypeFiAsc;
+      return desc ? ReservationUnitOrderingChoices.TypeFiDesc : ReservationUnitOrderingChoices.TypeFiAsc;
     case "maxPersons":
-      return desc ? ReservationUnitOrderSet.MaxPersonsDesc : ReservationUnitOrderSet.MaxPersonsAsc;
+      return desc ? ReservationUnitOrderingChoices.MaxPersonsDesc : ReservationUnitOrderingChoices.MaxPersonsAsc;
     case "surfaceArea":
-      return desc ? ReservationUnitOrderSet.SurfaceAreaDesc : ReservationUnitOrderSet.SurfaceAreaAsc;
+      return desc ? ReservationUnitOrderingChoices.SurfaceAreaDesc : ReservationUnitOrderingChoices.SurfaceAreaAsc;
     default:
       return null;
   }
 }
 
-function transformSortString(orderBy: string | null): ReservationUnitOrderSet[] {
+function transformSortString(orderBy: string | null): ReservationUnitOrderingChoices[] {
   if (!orderBy) {
     return [];
   }
@@ -49,7 +42,7 @@ function transformSortString(orderBy: string | null): ReservationUnitOrderSet[] 
   return [];
 }
 
-export function ReservationUnitsDataReader({ selectedRows, setSelectedRows, apiBaseUrl }: Props): JSX.Element {
+export function ReservationUnitsDataReader(): JSX.Element {
   const [sort, setSort] = useState<string>("");
   const onSortChanged = (sortField: string) => {
     if (sort === sortField) {
@@ -99,7 +92,7 @@ export function ReservationUnitsDataReader({ selectedRows, setSelectedRows, apiB
   const { fetchMore, loading, data, previousData } = query;
 
   const { reservationUnits } = data ?? previousData ?? {};
-  const resUnits = filterNonNullable(reservationUnits?.edges?.map((edge) => edge?.node));
+  const resUnits = filterNonNullable(reservationUnits?.edges.map((edge) => edge?.node));
 
   if (loading && resUnits.length === 0) {
     return <CenterSpinner />;
@@ -107,15 +100,7 @@ export function ReservationUnitsDataReader({ selectedRows, setSelectedRows, apiB
 
   return (
     <>
-      <ReservationUnitsTable
-        reservationUnits={resUnits}
-        sort={sort}
-        sortChanged={onSortChanged}
-        isLoading={loading}
-        selectedRows={selectedRows}
-        setSelectedRows={setSelectedRows}
-        apiBaseUrl={apiBaseUrl}
-      />
+      <ReservationUnitsTable reservationUnits={resUnits} sort={sort} sortChanged={onSortChanged} isLoading={loading} />
       <More
         totalCount={data?.reservationUnits?.totalCount ?? 0}
         pageInfo={data?.reservationUnits?.pageInfo}
@@ -128,38 +113,35 @@ export function ReservationUnitsDataReader({ selectedRows, setSelectedRows, apiB
 
 export const SEARCH_RESERVATION_UNITS_QUERY = gql`
   query SearchReservationUnits(
-    $first: Int
     $after: String
-    $orderBy: [ReservationUnitOrderSet!]
-    # Filter
+    $first: Int
+    $textSearch: String
     $maxPersonsGte: Int
     $maxPersonsLte: Int
-    $publishingState: [ReservationUnitPublishingState!]
-    $reservationUnitType: [Int!]
     $surfaceAreaGte: Int
     $surfaceAreaLte: Int
-    $textSearch: String
-    $unit: [Int!]
-    $unitGroup: [Int!]
+    $unit: [Int]
+    $unitGroup: [Int]
+    $reservationUnitType: [Int]
+    $orderBy: [ReservationUnitOrderingChoices]
+    $publishingState: [ReservationUnitPublishingState]
   ) {
     reservationUnits(
       first: $first
       after: $after
       orderBy: $orderBy
-      filter: {
-        maxPersonsGte: $maxPersonsGte
-        maxPersonsLte: $maxPersonsLte
-        minPersonsGte: $maxPersonsGte
-        minPersonsLte: $maxPersonsLte
-        onlyWithManagePermission: true
-        publishingState: $publishingState
-        reservationUnitType: $reservationUnitType
-        surfaceAreaGte: $surfaceAreaGte
-        surfaceAreaLte: $surfaceAreaLte
-        textSearch: $textSearch
-        unit: $unit
-        unitGroup: $unitGroup
-      }
+      textSearch: $textSearch
+      maxPersonsGte: $maxPersonsGte
+      minPersonsGte: $maxPersonsGte
+      maxPersonsLte: $maxPersonsLte
+      minPersonsLte: $maxPersonsLte
+      surfaceAreaGte: $surfaceAreaGte
+      surfaceAreaLte: $surfaceAreaLte
+      unit: $unit
+      unitGroup: $unitGroup
+      reservationUnitType: $reservationUnitType
+      publishingState: $publishingState
+      onlyWithPermission: true
     ) {
       edges {
         node {

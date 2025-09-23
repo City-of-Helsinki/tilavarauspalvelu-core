@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime
+
 import freezegun
 import pytest
 
@@ -45,12 +47,12 @@ def test_change_reservation_series_access_code(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, variables={"input": {"pk": series.pk}})
+    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
 
     assert response.has_errors is False, response.errors
 
-    assert response.results == {
-        "accessCodeGeneratedAt": local_datetime(2024, 1, 1).isoformat(),
+    assert response.first_query_object == {
+        "accessCodeGeneratedAt": local_datetime(2024, 1, 1).astimezone(datetime.UTC).isoformat(),
         "accessCodeIsActive": True,
     }
 
@@ -91,7 +93,7 @@ def test_change_reservation_series_access_code__in_seasonal_booking(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, variables={"input": {"pk": series.pk}})
+    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
 
     assert response.has_errors is False, response.errors
 
@@ -128,7 +130,7 @@ def test_change_reservation_series_access_code__activate_if_inactive(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, variables={"input": {"pk": series.pk}})
+    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
 
     assert response.has_errors is False, response.errors
 
@@ -161,7 +163,7 @@ def test_change_reservation_series_access_code__activate_if_inactive__pindora_ca
     )
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, variables={"input": {"pk": series.pk}})
+    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
 
     assert response.has_errors is False, response.errors
 
@@ -195,9 +197,10 @@ def test_change_reservation_series_access_code__no_future_reservations(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, variables={"input": {"pk": series.pk}})
+    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
 
-    assert response.error_message(0) == "Last reservation in the series has already ended."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Last reservation in the series has already ended."]
 
 
 @patch_method(
@@ -213,9 +216,10 @@ def test_change_reservation_series_access_code__no_reservations(graphql):
     series = ReservationSeriesFactory.create()
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, variables={"input": {"pk": series.pk}})
+    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
 
-    assert response.error_message(0) == "Reservation series has no reservations."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation series has no reservations."]
 
 
 @patch_method(
@@ -242,9 +246,12 @@ def test_change_reservation_series_access_code__not_using_access_codes(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, variables={"input": {"pk": series.pk}})
+    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
 
-    assert response.error_message(0) == "Reservation series does not use access codes in any of its reservations."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation series does not use access codes in any of its reservations.",
+    ]
 
 
 @patch_method(
@@ -271,9 +278,10 @@ def test_change_reservation_series_access_code__not_requiring_active_access_code
     )
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, variables={"input": {"pk": series.pk}})
+    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
 
-    assert response.error_message(0) == "Reservation series should not have active access code."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation series should not have active access code."]
 
 
 @patch_method(PindoraService.change_access_code, side_effect=PindoraAPIError("Pindora Error"))
@@ -293,8 +301,9 @@ def test_change_reservation_series_access_code__pindora_call_fails(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, variables={"input": {"pk": series.pk}})
+    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
 
-    assert response.error_message(0) == "Pindora Error"
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Pindora Error"]
 
     assert PindoraService.change_access_code.call_count == 1

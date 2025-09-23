@@ -38,7 +38,7 @@ export function useSearchQuery(variables: SearchReservationUnitsQueryVariables) 
 
   useEffect(() => {
     if (query.data) {
-      const edgeLength = query.data.reservationUnits?.edges?.length;
+      const edgeLength = query.data.reservationUnits?.edges.length;
       if (!edgeLength || edgeLength === 0 || edgeLength < SEARCH_PAGING_LIMIT) {
         setHasMoreData(false);
       }
@@ -56,7 +56,7 @@ export function useSearchQuery(variables: SearchReservationUnitsQueryVariables) 
         after: endCursor,
       },
     });
-    const edgeLength = res.data.reservationUnits?.edges?.length;
+    const edgeLength = res.data.reservationUnits?.edges.length;
 
     if (!edgeLength || edgeLength === 0 || edgeLength < SEARCH_PAGING_LIMIT) {
       setHasMoreData(false);

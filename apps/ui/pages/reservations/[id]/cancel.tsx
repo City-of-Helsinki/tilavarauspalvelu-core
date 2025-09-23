@@ -1,21 +1,21 @@
-import React from "react";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { ReservationCancellation } from "@/components/reservation/ReservationCancellation";
+import { createApolloClient } from "@/modules/apolloClient";
+import { isReservationCancellable } from "@/modules/reservation";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
+import { gql } from "@apollo/client";
 import {
   ReservationCancelPageDocument,
   type ReservationCancelPageQuery,
   type ReservationCancelPageQueryVariables,
 } from "@gql/gql-types";
-import { ReservationCancellation } from "@/components/reservation/ReservationCancellation";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { createApolloClient } from "@/modules/apolloClient";
-import { createNodeId, getNode, ignoreMaybeArray, toInteger } from "common/src/helpers";
-import { isReservationCancellable } from "@/modules/reservation";
-import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { useTranslation } from "next-i18next";
-import { gql } from "@apollo/client";
+import { base64encode } from "common/src/helpers";
 import { type TFunction } from "i18next";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import React from "react";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -59,7 +59,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
   return (
     <>
       <Breadcrumb routes={routes} />
-      <ReservationCancellation {...props} />
+      <ReservationCancellation {...props} reservation={reservation} />
     </>
   );
 }
@@ -68,18 +68,19 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
+  const pk = params?.id;
 
   const commonProps = getCommonServerSideProps();
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const pk = toInteger(ignoreMaybeArray(params?.id));
-  if (pk != null) {
+  if (Number.isFinite(Number(pk))) {
+    const id = base64encode(`ReservationNode:${pk}`);
     const { data } = await client.query<ReservationCancelPageQuery, ReservationCancelPageQueryVariables>({
       query: ReservationCancelPageDocument,
       fetchPolicy: "no-cache",
-      variables: { id: createNodeId("ReservationNode", pk) },
+      variables: { id },
     });
-    const reservation = getNode(data);
+    const { reservation } = data || {};
 
     const canCancel = reservation != null && isReservationCancellable(reservation);
     if (canCancel) {
@@ -87,7 +88,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         props: {
           ...commonProps,
           ...(await serverSideTranslations(locale ?? "fi")),
-          reservation,
+          reservation: reservation ?? null,
         },
       };
     } else if (reservation != null) {
@@ -115,10 +116,40 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 export const RESERVATION_CANCEL_PAGE_QUERY = gql`
   query ReservationCancelPage($id: ID!) {
-    node(id: $id) {
-      ... on ReservationNode {
-        ...ReservationCancellation
-        ...CanUserCancelReservation
+    reservation(id: $id) {
+      id
+      ...ReservationInfoCard
+      name
+      reservationUnit {
+        id
+        ...CancellationRuleFields
+        cancellationTerms {
+          ...TermsOfUseTextFields
+        }
+      }
+      reservationSeries {
+        id
+        name
+        allocatedTimeSlot {
+          id
+          pk
+          reservationUnitOption {
+            id
+            applicationSection {
+              id
+              application {
+                id
+                pk
+                applicationRound {
+                  id
+                  termsOfUse {
+                    ...TermsOfUseTextFields
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

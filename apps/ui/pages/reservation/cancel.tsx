@@ -85,7 +85,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     mutation: DeleteReservationDocument,
     variables: {
       input: {
-        pk: reservation.pk,
+        pk: reservation.pk.toString(),
       },
     },
   });

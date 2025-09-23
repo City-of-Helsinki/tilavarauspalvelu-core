@@ -17,9 +17,9 @@ import {
   OrderStatus,
   useAccessCodeQuery,
   AccessType,
+  type AccessCodeQuery,
   MunicipalityChoice,
   ReservationCancelReasonChoice,
-  PindoraReservationFragment,
 } from "@gql/gql-types";
 import Link from "next/link";
 import { isBefore, sub } from "date-fns";
@@ -35,8 +35,8 @@ import { getReservationUnitName } from "@/modules/reservationUnit";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { AddressSection } from "@/components/reservation-unit";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { createNodeId, capitalize, filterNonNullable, ignoreMaybeArray, toNumber, getNode } from "common/src/helpers";
-import { ButtonLikeLink, ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
+import { base64encode, capitalize, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { ButtonLikeLink, ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
   getApplicationPath,
@@ -65,7 +65,6 @@ import {
 } from "@/components/reservation";
 import { useSearchParams } from "next/navigation";
 import { queryOptions } from "@/modules/queryOptions";
-import { OptionsRecord } from "common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -180,13 +179,12 @@ function Reservation({
     reservation.accessType === AccessType.AccessCode;
 
   const { data: accessCodeData } = useAccessCodeQuery({
-    skip: !shouldShowAccessCode,
+    skip: !reservation || !shouldShowAccessCode,
     variables: {
-      id: createNodeId("ReservationNode", reservation.pk),
+      id: base64encode(`ReservationNode:${reservation.pk}`),
     },
   });
-  const node = getNode(accessCodeData);
-  const pindoraInfo = node?.pindoraInfo;
+  const pindoraInfo = accessCodeData?.reservation?.pindoraInfo ?? null;
 
   const modifyTimeReason = getWhyReservationCantBeChanged(reservation);
   const canTimeBeModified = modifyTimeReason == null;
@@ -370,14 +368,17 @@ function Reservation({
         </div>
         <Flex>
           {shouldShowPaymentNotification(reservation) && (
-            <PaymentNotification reservation={reservation} apiBaseUrl={apiBaseUrl} />
+            <PaymentNotification
+              reservation={reservation}
+              paymentOrder={reservation.paymentOrder}
+              appliedPricing={reservation.appliedPricing}
+              apiBaseUrl={apiBaseUrl}
+            />
           )}
           <Instructions reservation={reservation} />
           <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
           <ApplicationFields reservation={reservation} options={options} supportedFields={supportedFields} />
-          {shouldShowAccessCode && pindoraInfo != null && (
-            <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />
-          )}
+          {shouldShowAccessCode && <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />}
           <TermsInfoSection reservation={reservation} termsOfUse={termsOfUse} />
           <AddressSection
             title={getReservationUnitName(reservation.reservationUnit, lang) ?? "-"}
@@ -392,10 +393,9 @@ function Reservation({
 function AccessCodeInfo({
   pindoraInfo,
   feedbackUrl,
-}: Readonly<{
-  pindoraInfo: Readonly<PindoraReservationFragment>;
-  feedbackUrl: PropsNarrowed["feedbackUrl"];
-}>): React.ReactElement {
+}: Readonly<
+  Pick<NonNullable<AccessCodeQuery["reservation"]>, "pindoraInfo"> & Pick<PropsNarrowed, "feedbackUrl">
+>): React.ReactElement {
   const { t, i18n } = useTranslation();
   return (
     <div>
@@ -451,13 +451,14 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const bookingTerms = await getGenericTerms(apolloClient);
 
     // NOTE errors will fallback to 404
+    const id = base64encode(`ReservationNode:${pk}`);
     const { data } = await apolloClient.query<ReservationPageQuery, ReservationPageQueryVariables>({
       query: ReservationPageDocument,
       fetchPolicy: "no-cache",
-      variables: { id: createNodeId("ReservationNode", pk) },
+      variables: { id },
     });
 
-    const reservation = getNode(data);
+    const { reservation } = data ?? {};
 
     if (reservation?.reservationSeries != null) {
       const recurringId = reservation.reservationSeries.id;
@@ -468,12 +469,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         query: ApplicationReservationSeriesDocument,
         variables: { id: recurringId },
       });
-
-      const allocatedTimeSlot =
-        recurringData?.node != null && "allocatedTimeSlot" in recurringData.node
-          ? recurringData.node.allocatedTimeSlot
-          : null;
-      const applicationPk = allocatedTimeSlot?.reservationUnitOption.applicationSection?.application?.pk;
+      const applicationPk =
+        recurringData?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
       return {
         redirect: {
           permanent: true,
@@ -484,19 +481,18 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         },
       };
     } else if (reservation != null) {
-      const qOptions = await queryOptions(apolloClient, locale ?? "");
-      const options: OptionsRecord = {
-        ...qOptions,
-        municipalities: Object.values(MunicipalityChoice).map((value) => ({
-          label: value.toString(),
-          value: value,
-        })) as ReadonlyArray<Readonly<{ label: string; value: MunicipalityChoice }>>,
-      };
+      const options = await queryOptions(apolloClient, locale ?? "");
       return {
         props: {
           ...commonProps,
           ...(await serverSideTranslations(locale ?? "fi")),
-          options,
+          options: {
+            ...options,
+            municipality: Object.values(MunicipalityChoice).map((value) => ({
+              label: value as string,
+              value: value,
+            })),
+          },
           reservation,
           termsOfUse: {
             genericTerms: bookingTerms ?? null,
@@ -513,19 +509,17 @@ export default Reservation;
 
 export const GET_APPLICATION_RESERVATION_SERIES_QUERY = gql`
   query ApplicationReservationSeries($id: ID!) {
-    node(id: $id) {
-      ... on ReservationSeriesNode {
+    reservationSeries(id: $id) {
+      id
+      allocatedTimeSlot {
         id
-        allocatedTimeSlot {
+        reservationUnitOption {
           id
-          reservationUnitOption {
+          applicationSection {
             id
-            applicationSection {
+            application {
               id
-              application {
-                id
-                pk
-              }
+              pk
             }
           }
         }
@@ -534,40 +528,32 @@ export const GET_APPLICATION_RESERVATION_SERIES_QUERY = gql`
   }
 `;
 
-export const RESERVATION_PAGE_FRAGMENT = gql`
-  fragment ReservationPage on ReservationNode {
-    id
-    type
-    ...MetaFields
-    ...ReservationInfoCard
-    ...Instructions
-    ...CanReservationBeChanged
-    calendarUrl
-    ...PaymentNotification
-    paymentOrder {
-      id
-      receiptUrl
-    }
-    reservationSeries {
-      id
-    }
-    reservationUnit {
-      id
-      unit {
-        ...AddressFields
-      }
-      canApplyFreeOfCharge
-      ...MetadataSets
-      ...TermsOfUse
-    }
-  }
-`;
-
-export const RESERVATION_PAGE_QUERY = gql`
+export const GET_RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
-    node(id: $id) {
-      ... on ReservationNode {
-        ...ReservationPage
+    reservation(id: $id) {
+      id
+      type
+      ...MetaFields
+      ...ReservationInfoCard
+      ...Instructions
+      ...CanReservationBeChanged
+      calendarUrl
+      ...ReservationPaymentUrl
+      paymentOrder {
+        id
+        receiptUrl
+      }
+      reservationSeries {
+        id
+      }
+      reservationUnit {
+        id
+        unit {
+          ...AddressFields
+        }
+        canApplyFreeOfCharge
+        ...MetadataSets
+        ...TermsOfUse
       }
     }
   }

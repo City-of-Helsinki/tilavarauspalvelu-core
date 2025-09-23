@@ -10,8 +10,7 @@ import {
   type ApplicationsQueryVariables,
   CurrentUserDocument,
   type CurrentUserQuery,
-  ApplicationOrderSet,
-  ApplicationsGroupFragment,
+  ApplicationOrderingChoices,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { ApplicationsGroup } from "@/components/application";
@@ -38,7 +37,7 @@ function ApplicationGroups({
   applications,
   actionCallback,
 }: {
-  applications: ApplicationsGroupFragment[];
+  applications: NonNullable<NonNullable<NonNullable<ApplicationsQuery["applications"]>["edges"][0]>["node"]>[];
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 }) {
   const { t } = useTranslation();
@@ -87,7 +86,7 @@ function ApplicationsPage({ data: initialData }: PropsNarrowed): JSX.Element | n
     variables: {
       user: currentUser?.pk ?? 0,
       status: VALID_STATUSES,
-      orderBy: [ApplicationOrderSet.SentAtDesc],
+      orderBy: [ApplicationOrderingChoices.SentAtDesc],
     },
   });
 
@@ -156,7 +155,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: {
       user: user.pk,
       status: VALID_STATUSES,
-      orderBy: [ApplicationOrderSet.SentAtDesc],
+      orderBy: [ApplicationOrderingChoices.SentAtDesc],
     },
   });
 
@@ -172,13 +171,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 // NOTE because this doesn't have pagination we use orderBy for development purposes only
 // if you create new application it's the first one in the list
 export const APPLICATIONS = gql`
-  query Applications(
-    $orderBy: [ApplicationOrderSet!]!
-    # Filter
-    $user: Int!
-    $status: [ApplicationStatusChoice!]!
-  ) {
-    applications(orderBy: $orderBy, filter: { user: $user, status: $status }) {
+  query Applications($user: Int!, $status: [ApplicationStatusChoice]!, $orderBy: [ApplicationOrderingChoices]!) {
+    applications(user: $user, status: $status, orderBy: $orderBy) {
       edges {
         node {
           ...ApplicationsGroup

@@ -12,7 +12,7 @@ import { PUBLIC_URL } from "@/common/const";
 export async function getStaticProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
-      ...(await getCommonServerSideProps()),
+      ...getCommonServerSideProps(),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

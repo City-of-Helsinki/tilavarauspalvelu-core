@@ -58,7 +58,7 @@ jobs:
 
       - name: "Set up python"
         id: setup-python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -131,7 +131,7 @@ jobs:
 
       - name: "Set up python"
         id: setup-python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -145,7 +145,6 @@ jobs:
         with:
           workflow: update_test_durations.yml
           name: test_durations
-          path: backend
 
       - name: "Run pytest with coverage"
         working-directory: backend
@@ -208,7 +207,7 @@ jobs:
 
       - name: "Set up python"
         id: setup-python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -224,10 +223,10 @@ jobs:
           sed -i 's@<source>@<source>backend/@g' coverage.xml
 
       - name: "SonarCloud Scan"
-        uses: SonarSource/sonarqube-scan-action@v6
+        uses: SonarSource/sonarqube-scan-action@v5
         with:
           projectBaseDir: ./backend
-        # Skip analysis for all bots in pull requests
-        if: ${{ github.event_name != 'pull_request' || (! contains(fromJSON(vars.BOTS), github.event.pull_request.user.login)) }}
+        # Skip analysis for all bots
+        if: ${{ ! contains(fromJSON(vars.BOTS), github.event.pull_request.user.login) }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

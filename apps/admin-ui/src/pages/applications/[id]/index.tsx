@@ -6,7 +6,7 @@ import { isEqual, trim } from "lodash-es";
 import { type ApolloQueryResult, gql } from "@apollo/client";
 import { CenterSpinner, Flex, fontMedium, H1, H3, H4, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
   type ApplicationAdminQuery,
   type ApplicationPageFieldsFragment,
@@ -16,11 +16,11 @@ import {
   type ReservationUnitOptionFieldsFragment,
   ReserveeType,
   useApplicationAdminQuery,
-  useRejectAllApplicationsMutation,
-  useRejectAllSectionsMutation,
+  useRejectAllApplicationOptionsMutation,
+  useRejectAllSectionOptionsMutation,
   useRejectRestMutation,
-  useRestoreAllApplicationsMutation,
-  useRestoreAllSectionsMutation,
+  useRestoreAllApplicationOptionsMutation,
+  useRestoreAllSectionOptionsMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { formatDuration } from "common/src/common/util";
@@ -189,9 +189,9 @@ function RejectAllOptionsButton({
     requireAll: true,
   });
 
-  const [rejectMutation, { loading: rejectLoading }] = useRejectAllSectionsMutation();
+  const [rejectMutation, { loading: rejectLoading }] = useRejectAllSectionOptionsMutation();
 
-  const [restoreMutation, { loading: restoreLoading }] = useRestoreAllSectionsMutation();
+  const [restoreMutation, { loading: restoreLoading }] = useRestoreAllSectionOptionsMutation();
 
   const displayError = useDisplayError();
 
@@ -460,9 +460,9 @@ function RejectApplicationButton({
     requireAll: true,
   });
 
-  const [rejectionMutation, { loading: isRejectionLoading }] = useRejectAllApplicationsMutation();
+  const [rejectionMutation, { loading: isRejectionLoading }] = useRejectAllApplicationOptionsMutation();
 
-  const [restoreMutation, { loading: isRestoreLoading }] = useRestoreAllApplicationsMutation();
+  const [restoreMutation, { loading: isRestoreLoading }] = useRestoreAllApplicationOptionsMutation();
   const displayError = useDisplayError();
 
   const isLoading = isRejectionLoading || isRestoreLoading;
@@ -554,6 +554,7 @@ export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | nu
   const ref = useRef<HTMLHeadingElement>(null);
   const { t } = useTranslation();
 
+  const id = base64encode(`ApplicationNode:${pk}`);
   const {
     data,
     loading: isLoading,
@@ -561,10 +562,10 @@ export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | nu
     error,
   } = useApplicationAdminQuery({
     skip: !(pk > 0),
-    variables: { id: createNodeId("ApplicationNode", pk) },
+    variables: { id },
   });
 
-  const application = getNode(data);
+  const application = data?.application;
   const applicationRound = application?.applicationRound;
 
   if (isLoading) {
@@ -724,7 +725,7 @@ export const APPLICATION_PAGE_SECTION_FRAGMENT = gql`
   fragment ApplicationPageSection on ApplicationSectionNode {
     ...ApplicationSectionCommon
     suitableTimeRanges {
-      ...SuitableTimeFields
+      ...SuitableTime
     }
     purpose {
       id
@@ -788,21 +789,19 @@ export const RESERVATION_UNIT_OPTION_FRAGMENT = gql`
 
 export const APPLICATION_ADMIN_QUERY = gql`
   query ApplicationAdmin($id: ID!) {
-    node(id: $id) {
-      ... on ApplicationNode {
-        ...ApplicationPageFields
-        workingMemo
-        user {
-          id
-          email
-        }
+    application(id: $id) {
+      ...ApplicationPageFields
+      workingMemo
+      user {
+        id
+        email
       }
     }
   }
 `;
 
 export const REJECT_ALL_SECTION_OPTIONS = gql`
-  mutation RejectAllSections($input: RejectAllSectionOptionsMutation!) {
+  mutation RejectAllSectionOptions($input: RejectAllSectionOptionsMutationInput!) {
     rejectAllSectionOptions(input: $input) {
       pk
     }
@@ -810,7 +809,7 @@ export const REJECT_ALL_SECTION_OPTIONS = gql`
 `;
 
 export const RESTORE_ALL_SECTION_OPTIONS = gql`
-  mutation RestoreAllSections($input: RestoreAllSectionOptionsMutation!) {
+  mutation RestoreAllSectionOptions($input: RestoreAllSectionOptionsMutationInput!) {
     restoreAllSectionOptions(input: $input) {
       pk
     }
@@ -818,7 +817,7 @@ export const RESTORE_ALL_SECTION_OPTIONS = gql`
 `;
 
 export const REJECT_APPLICATION = gql`
-  mutation RejectAllApplications($input: RejectAllApplicationOptionsMutation!) {
+  mutation RejectAllApplicationOptions($input: RejectAllApplicationOptionsMutationInput!) {
     rejectAllApplicationOptions(input: $input) {
       pk
     }
@@ -826,7 +825,7 @@ export const REJECT_APPLICATION = gql`
 `;
 
 export const RESTORE_APPLICATION = gql`
-  mutation RestoreAllApplications($input: RestoreAllApplicationOptionsMutation!) {
+  mutation RestoreAllApplicationOptions($input: RestoreAllApplicationOptionsMutationInput!) {
     restoreAllApplicationOptions(input: $input) {
       pk
     }

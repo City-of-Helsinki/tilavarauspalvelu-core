@@ -6,7 +6,6 @@ import { type CreateGraphQLMockProps } from "@test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
 import { ReservationUnitModalContent, type ReservationUnitModalProps } from "./ReservationUnitModalContent";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
-import { ReservationKind } from "@/gql/gql-types";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
   const params = vi.fn();
@@ -49,7 +48,7 @@ function customRender(
     isSearchError: false,
   }
 ): ReturnType<typeof render> {
-  const mocks = createGraphQLMocks({ ...mockProps, reservationKind: ReservationKind.Season });
+  const mocks = createGraphQLMocks(mockProps);
   const round = createMockApplicationRound();
   const options: ReservationUnitModalProps["options"] = {
     units: [],

@@ -13,7 +13,7 @@ import { getTranslationSafe } from "common/src/common/util";
 
 const createAddressSectionMock = (proper = true): AddressFieldsFragment => ({
   id: "1",
-  pk: 1,
+  pk: proper ? 1 : null,
   tprekId: proper ? "12345" : null,
   addressStreetEn: proper ? "Test street 1 EN" : null,
   addressStreetFi: proper ? "Test street 1 FI" : null,

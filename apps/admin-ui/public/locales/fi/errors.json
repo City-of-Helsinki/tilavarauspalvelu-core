@@ -55,9 +55,6 @@
     "HELSINKI_PROFILE_KEYCLOAK_REFRESH_TOKEN_EXPIRED": "Henkilötietoja ei voida näyttää, koska niiden katselun vaatimaa käyttöoikeustunnusta ei saatu noudettua. Kirjaudu ulos ja takaisin sisään sen virkistämiseksi.",
     "HELSINKI_PROFILE_PERMISSION_DENIED": "Käyttöoikeutesi eivät riitä henkilötietojen näyttämiseen",
     "HELSINKI_PROFILE_USER_MISSING_PROFILE_ID": "Varauksen luoneen käyttäjän Helsinki-profiilin tunniste puuttuu.",
-    "RESERVATION_UNIT_PRICING_CANNOT_CHANGE_PAST": "Varausyksikön hinnoittelua ei voi muuttaa menneisyydessä",
-    "SCALAR_CONVERSION_ERROR": "Kentän validointi virhe.",
-    "MODEL_CONSTRAINT_VIOLATION": "Tallennus epäonnistui, koska pakollinen tieto (constraint) puuttui.",
     "validation": {
       "ALLOCATION_APPLICATION_STATUS_NOT_ALLOWED": "Vuoroa ei voi jakaa, koska hakemuksen tila ei ole sallittu.",
       "ALLOCATION_APPLIED_RESERVATIONS_PER_WEEK_EXCEEDED": "Hakemukselle on jo jaettu maksimi määrä vuoroja.",

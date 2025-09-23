@@ -1,22 +1,22 @@
 import {
   AccessType,
-  ReservationUnitImageType,
-  type MetaFieldsFragment,
+  ImageType,
+  MetaFieldsFragment,
   MunicipalityChoice,
   OrderStatus,
+  type PaymentOrderNode,
   PaymentType,
   PriceUnit,
   ReservationCancelReasonChoice,
-  type ReservationPageFragment,
+  type ReservationPageQuery,
   ReservationStateChoice,
   ReservationTypeChoice,
   ReserveeType,
-  TermsOfUseTypeChoices,
+  TermsType,
 } from "@gql/gql-types";
-import { createNodeId } from "common/src/helpers";
+import { base64encode } from "common/src/helpers";
 import type { FieldName } from "common/src/metaFieldsHelpers";
 import { generateNameFragment } from "@/test/test.gql.utils";
-import { OptionsRecord } from "common";
 
 export function generateTextFragment(text: string) {
   return {
@@ -36,7 +36,7 @@ export function generateDescriptionFragment(description: string) {
 
 export function generatePurposeFragment(name: string) {
   return {
-    id: createNodeId("PurposeNode", 1),
+    id: base64encode(`PurposeNode:${name}`),
     pk: 1,
     ...generateNameFragment(name),
   };
@@ -45,7 +45,7 @@ export function generatePurposeFragment(name: string) {
 export function generateAgeGroupFragment(props: { id: number; min: number; max: number }) {
   const { id, min, max } = props;
   return {
-    id: createNodeId("AgeGroupNode", id),
+    id: base64encode(`AgeGroupNode:${id}`),
     pk: id,
     minimum: min,
     maximum: max,
@@ -94,16 +94,21 @@ export type MockReservationProps = {
   } | null;
 };
 
-export type ReservationPaymentOrderFragment = ReservationPageFragment["paymentOrder"];
+export type ReservationPaymentOrderFragment = Pick<
+  PaymentOrderNode,
+  "id" | "reservationPk" | "status" | "paymentType" | "receiptUrl" | "checkoutUrl"
+>;
 
-export function createMockReservation(props: MockReservationProps): Readonly<ReservationPageFragment> {
+export function createMockReservation(
+  props: MockReservationProps
+): Readonly<NonNullable<ReservationPageQuery["reservation"]>> {
   const {
     applyingForFreeOfCharge = false,
     beginsAt = new Date(2024, 0, 1, 10, 0, 0, 0).toISOString(),
     canApplyFreeOfCharge = true,
     cancellable = false,
     cancellationTerms = {
-      id: createNodeId("CancellationTermsNode", 1),
+      id: base64encode(`CancellationTermsNode:1`),
       ...generateTextFragment("Test cancellation terms"),
     },
     endsAt = new Date(2024, 0, 1, 12, 0, 0, 0).toISOString(),
@@ -118,11 +123,11 @@ export function createMockReservation(props: MockReservationProps): Readonly<Res
       handledPaymentDueBy: new Date(2024, 0, 1, 12, 0, 0, 0).toISOString(),
     },
     paymentTerms = {
-      id: createNodeId("PaymentTermsNode", 1),
+      id: base64encode(`PaymentTermsNode:1`),
       ...generateTextFragment("Test payment terms"),
     },
     appliedPricing = {
-      id: createNodeId("AppliedPricingNode", 1),
+      id: base64encode(`AppliedPricingNode:1`),
       begins: new Date(2000, 0, 1, 0, 0, 0, 0).toISOString(),
       priceUnit: PriceUnit.PerHour,
       paymentType: PaymentType.Online,
@@ -133,12 +138,12 @@ export function createMockReservation(props: MockReservationProps): Readonly<Res
     pk = 1,
     price = "10.0",
     pricingTerms = {
-      id: createNodeId("PricingTermsNode", 1),
+      id: base64encode(`PricingTermsNode:1`),
       ...generateNameFragment("Test Pricing Terms"),
       ...generateTextFragment("Test pricing terms text"),
     },
     serviceSpecificTerms = {
-      id: createNodeId("ServiceSpecificTermsNode", 1),
+      id: base64encode(`ServiceSpecificTermsNode:1`),
       ...generateTextFragment("Test service specific terms"),
     },
     state = ReservationStateChoice.Confirmed,
@@ -156,7 +161,7 @@ export function createMockReservation(props: MockReservationProps): Readonly<Res
     endsAt: endsAt,
     freeOfChargeReason: "Test free of charge reason",
     municipality: MunicipalityChoice.Helsinki,
-    id: createNodeId("ReservationNode", pk),
+    id: base64encode(`ReservationNode:${pk}`),
     isHandled: cancellable ? false : isHandled,
     numPersons: 5,
     appliedPricing: appliedPricing,
@@ -170,22 +175,22 @@ export function createMockReservation(props: MockReservationProps): Readonly<Res
     },
     reservationSeries: null,
     reservationUnit: {
-      id: createNodeId("ReservationUnitNode", 1),
+      id: base64encode(`ReservationUnitNode:1`),
       pk: 1,
       ...generateNameFragment("Test Reservation Unit"),
       ...generateDescriptionFragment("Test reservation unit description"),
       images: [
         {
-          id: createNodeId("ReservationUnitImageNode", 1),
+          id: base64encode(`ReservationUnitImageNode:1`),
           largeUrl: "https://example.com/image-large.jpg",
           mediumUrl: "https://example.com/image-medium.jpg",
           smallUrl: "https://example.com/image-small.jpg",
           imageUrl: "https://example.com/image-image.jpg",
-          imageType: ReservationUnitImageType.Main,
+          imageType: ImageType.Main,
         },
       ],
       unit: {
-        id: createNodeId("UnitNode", 1),
+        id: base64encode("UnitNode:1"),
         pk: 1,
         tprekId: "123456",
         addressZip: "00100",
@@ -201,16 +206,16 @@ export function createMockReservation(props: MockReservationProps): Readonly<Res
       minPersons: 1,
       maxPersons: 100,
       metadataSet: {
-        id: createNodeId("MetadataSetNode", 1),
+        id: base64encode(`MetadataSetNode:1`),
         requiredFields: [
           {
-            id: createNodeId("RequiredFieldsNode", 1),
+            id: base64encode(`RequiredFieldsNode:1`),
             fieldName: "Test required field",
           },
         ],
         supportedFields: [
           {
-            id: createNodeId("SupportedFieldsNode", 1),
+            id: base64encode(`SupportedFieldsNode:1`),
             fieldName: "Test supported field",
           },
         ],
@@ -235,22 +240,22 @@ export function createMockReservation(props: MockReservationProps): Readonly<Res
       reservationEndsAt: null,
       pricings: [
         {
-          id: createNodeId("PricingNode", 1),
+          id: base64encode("PricingNode:1"),
           begins: new Date(2000, 0, 1, 0, 0, 0, 0).toISOString(),
           priceUnit: PriceUnit.PerHour,
           paymentType: PaymentType.Online,
           highestPrice: price,
           lowestPrice: "0.0",
           taxPercentage: {
-            id: createNodeId("TaxPercentageNode", 1),
+            id: base64encode("TaxPercentageNode:1"),
             pk: 1,
-            value: "25.5",
+            value: "24.5",
           },
         },
       ],
       cancellationRule: cancellable
         ? {
-            id: createNodeId("ReservationUnitCancellationRuleNode", 1),
+            id: base64encode("ReservationUnitCancellationRuleNode:1"),
             canBeCancelledTimeBefore: 0,
             ...generateNameFragment("Test cancelation rule"),
           }
@@ -277,9 +282,9 @@ export function createTermsOfUseMock(empty: boolean = false) {
     genericTerms: empty
       ? null
       : {
-          id: createNodeId("TermsOfUseNode", 1),
+          id: base64encode("TermsOfUseNode:1"),
           pk: "1",
-          termsType: TermsOfUseTypeChoices.GenericTerms,
+          termsType: TermsType.GenericTerms,
           ...generateNameFragment("TermsOfUse name"),
           ...generateTextFragment("Test terms of use"),
         },
@@ -409,7 +414,7 @@ export function createReservationPageMock({
   price?: string;
   paymentOrder?: ReservationPaymentOrderFragment & { handledPaymentDueBy: string };
   cancellable?: boolean;
-}): ReservationPageFragment {
+}): Readonly<NonNullable<ReservationPageQuery["reservation"]>> {
   return createMockReservation({
     pk,
     state: state,
@@ -423,9 +428,9 @@ export function createReservationPageMock({
   });
 }
 
-export function createOptionsMock(): Readonly<OptionsRecord> {
+export function createOptionsMock() {
   return {
-    reservationPurposes: [
+    purpose: [
       {
         label: "Test purpose FI",
         value: 1,
@@ -439,7 +444,7 @@ export function createOptionsMock(): Readonly<OptionsRecord> {
         value: 3,
       },
     ],
-    ageGroups: [
+    ageGroup: [
       {
         label: "1 - 15",
         value: 1,
@@ -457,7 +462,7 @@ export function createOptionsMock(): Readonly<OptionsRecord> {
         value: 4,
       },
     ],
-    municipalities: [
+    municipality: [
       {
         label: "Helsinki",
         value: MunicipalityChoice.Helsinki,

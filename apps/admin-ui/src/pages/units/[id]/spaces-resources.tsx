@@ -3,7 +3,7 @@ import React, { createRef } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { UserPermissionChoice, useSpacesResourcesQuery } from "@gql/gql-types";
-import { createNodeId, toNumber, ignoreMaybeArray, getNode } from "common/src/helpers";
+import { base64encode, toNumber, ignoreMaybeArray } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { Error404 } from "@/component/Error404";
 import { fontBold, H2, CenterSpinner, Flex } from "common/styled";
@@ -32,12 +32,13 @@ function SpacesResources({ unitPk }: { unitPk: number }): JSX.Element {
   const newSpacesButtonRef = createRef<HTMLButtonElement>();
   const newResourceButtonRef = createRef<HTMLButtonElement>();
 
+  const id = base64encode(`UnitNode:${unitPk}`);
   const {
     data,
     refetch,
     loading: isLoading,
   } = useSpacesResourcesQuery({
-    variables: { id: createNodeId("UnitNode", unitPk) },
+    variables: { id },
     fetchPolicy: "network-only",
     onError: () => {
       errorToast({ text: t("errors:errorFetchingData") });
@@ -50,7 +51,7 @@ function SpacesResources({ unitPk }: { unitPk: number }): JSX.Element {
     return <CenterSpinner />;
   }
 
-  const unit = getNode(data);
+  const { unit } = data ?? {};
   if (unit == null) {
     return <Error404 />;
   }
@@ -143,13 +144,11 @@ export async function getServerSideProps({ locale, query }: GetServerSidePropsCo
 
 export const SPACES_RESOURCES_QUERY = gql`
   query SpacesResources($id: ID!) {
-    node(id: $id) {
-      ... on UnitNode {
-        id
-        ...UnitSubpageHead
-        ...SpacesTable
-        ...ResourceTable
-      }
+    unit(id: $id) {
+      id
+      ...UnitSubpageHead
+      ...SpacesTable
+      ...ResourceTable
     }
   }
 `;

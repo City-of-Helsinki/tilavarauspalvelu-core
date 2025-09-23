@@ -29,11 +29,10 @@ pytestmark = [
 @freeze_time(local_datetime(year=2023, month=12, day=1))
 def test_reservation_series__reschedule_series__general_role(graphql, role, has_permission):
     series = create_reservation_series()
-    user = UserFactory.create_with_general_role(role=role)
-    graphql.force_login(user)
+    graphql.login_user_with_role(role=role)
 
     data = get_minimal_reschedule_data(series)
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is not has_permission
 
@@ -46,7 +45,7 @@ def test_reservation_series__reschedule_series__general_reserver__own_reservatio
 
     graphql.force_login(user)
     data = get_minimal_reschedule_data(series)
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -68,7 +67,7 @@ def test_reservation_series__reschedule_series__unit_role(graphql, role, has_per
 
     graphql.force_login(user)
     data = get_minimal_reschedule_data(series)
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is not has_permission
 
@@ -81,6 +80,6 @@ def test_reservation_series__reschedule_series__unit_reserver__own_reservation(g
 
     graphql.force_login(user)
     data = get_minimal_reschedule_data(series)
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False

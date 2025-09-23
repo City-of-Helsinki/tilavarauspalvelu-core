@@ -8,8 +8,8 @@ import type { GetServerSidePropsContext } from "next";
 import { applicationsPath, applicationsPrefix, getApplicationPath } from "@/modules/urls";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
-import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 import { ApplicationSentPageDocument, type ApplicationSentPageQuery } from "@/gql/gql-types";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -77,14 +77,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const { data } = await apolloClient.query<ApplicationSentPageQuery>({
     query: ApplicationSentPageDocument,
-    variables: { id: createNodeId("ApplicationNode", pk) },
+    variables: { id: base64encode(`ApplicationNode:${pk}`) },
   });
 
-  const application = getNode(data);
-  if (application == null) {
+  if (data.application == null) {
     return notFound;
   }
-  const { status } = application;
+  const { status } = data.application;
   if (!isSent(status)) {
     return notFound;
   }
@@ -103,12 +102,10 @@ export default Sent;
 
 export const APPLICATION_SENT_PAGE_QUERY = gql`
   query ApplicationSentPage($id: ID!) {
-    node(id: $id) {
-      ... on ApplicationNode {
-        id
-        pk
-        status
-      }
+    application(id: $id) {
+      id
+      pk
+      status
     }
   }
 `;

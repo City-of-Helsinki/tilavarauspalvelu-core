@@ -28,8 +28,8 @@ def test_reservation_unit_image__order_by_image_type_by_default(graphql):
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
     assert response.node(0)["images"] == [
-        {"pk": img_1.pk, "imageType": ReservationUnitImageType.MAIN},
-        {"pk": img_4.pk, "imageType": ReservationUnitImageType.MAIN},
-        {"pk": img_2.pk, "imageType": ReservationUnitImageType.OTHER},
-        {"pk": img_3.pk, "imageType": ReservationUnitImageType.OTHER},
+        {"pk": img_1.pk, "imageType": ReservationUnitImageType.MAIN.value.upper()},
+        {"pk": img_4.pk, "imageType": ReservationUnitImageType.MAIN.value.upper()},
+        {"pk": img_2.pk, "imageType": ReservationUnitImageType.OTHER.value.upper()},
+        {"pk": img_3.pk, "imageType": ReservationUnitImageType.OTHER.value.upper()},
     ]

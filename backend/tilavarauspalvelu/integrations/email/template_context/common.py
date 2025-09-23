@@ -1,25 +1,21 @@
 from __future__ import annotations
 
-import datetime
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
-from django.db.models import Prefetch
 from django.utils.translation import pgettext
-from lookup_property import L
 
-from tilavarauspalvelu.enums import AccessType, Weekday
-from tilavarauspalvelu.models import ReservationUnitAccessType
+from tilavarauspalvelu.enums import Weekday
 from tilavarauspalvelu.translation import get_attr_by_language
-from utils.date_utils import DEFAULT_TIMEZONE, local_date_string, local_datetime, local_time_string
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_time_string
 from utils.utils import update_query_params
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    import datetime
     from decimal import Decimal
 
-    from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries, ReservationUnit, Unit
+    from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries, Unit
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 
@@ -380,74 +376,6 @@ def params_for_access_code_section(*, section: ApplicationSection) -> dict[str, 
 
     params["allocations"] = _compile_allocations_map(allocations_using_access_codes)
 
-    return params
-
-
-def params_for_access_type_change_section(*, section: ApplicationSection) -> dict[str, Any]:
-    reservation_units: Iterable[ReservationUnit] = (
-        section.actions.get_reservation_units()
-        .select_related("unit")
-        .prefetch_related(
-            Prefetch(
-                "access_types",
-                queryset=(
-                    ReservationUnitAccessType.objects.all()
-                    .annotate(end_date=L("end_date"))
-                    .on_period(begin_date=section.reservations_begin_date, end_date=section.reservations_end_date)
-                ),
-            ),
-        )
-    )
-
-    return {
-        "reservation_units": [
-            {
-                "reservation_unit_name": reservation_unit.name,
-                "unit_name": reservation_unit.unit.name,
-                "unit_location": reservation_unit.unit.address,
-                "access_types": [
-                    {
-                        "access_type": str(AccessType(access.access_type).label),
-                        "begin_date": local_date_string(access.begin_date),
-                        "end_date": (
-                            local_date_string(access.end_date - datetime.timedelta(days=1))
-                            if access.end_date != datetime.date.max
-                            else None
-                        ),
-                    }
-                    for access in reservation_unit.access_types.all()
-                ],
-            }
-            for reservation_unit in reservation_units
-        ],
-    }
-
-
-def params_for_access_code_section_plain(*, section: ApplicationSection) -> dict[str, Any]:
-    """Access code for email without allocation specific information"""
-    from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-    from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
-
-    params = {
-        "access_code": "",
-        "access_code_is_used": False,
-    }
-
-    if not section.should_have_active_access_code:
-        return params
-
-    params["access_code_is_used"] = True
-
-    try:
-        response = PindoraService.get_access_code(section)
-    except PindoraNotFoundError:
-        return params
-
-    # If access code is not actually active, even when we think it should be, don't show it in emails
-    if not response.access_code_is_active:
-        return params
-
-    params["access_code"] = response.access_code
     return params
 
 

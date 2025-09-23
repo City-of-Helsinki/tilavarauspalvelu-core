@@ -106,7 +106,7 @@
     "@typescript-eslint/triple-slash-reference": "error",
     "react/react-in-jsx-scope": "off",
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "error",
+    "react-hooks/exhaustive-deps": "warn",
     "curly": "off",
     "unicorn/empty-brace-spaces": "off",
     "unicorn/no-nested-ternary": "off",
@@ -115,8 +115,8 @@
     "import-x/namespace": "error",
     "import-x/default": "error",
     "import-x/no-named-as-default": "off",
-    "import-x/no-named-as-default-member": "error",
-    "import-x/no-duplicates": "error",
+    "import-x/no-named-as-default-member": "warn",
+    "import-x/no-duplicates": "warn",
     "no-console": "error",
     "eqeqeq": [
       "error",
@@ -135,8 +135,8 @@
     "react/forward-ref-uses-ref": "error",
     "react/button-has-type": "error",
     "react/void-dom-elements-no-children": "error",
-    "import-x/no-dynamic-require": "error",
-    "import-x/extensions": "error"
+    "import-x/no-dynamic-require": "warn",
+    "import-x/extensions": "warn"
   },
   "ignorePatterns": [
     "node_modules/",
@@ -171,12 +171,6 @@
         "no-with": "off",
         "prefer-rest-params": "error",
         "prefer-spread": "error"
-      }
-    },
-    {
-      "files": ["**/next-env.d.ts"],
-      "rules": {
-        "triple-slash-reference": "off"
       }
     }
   ]

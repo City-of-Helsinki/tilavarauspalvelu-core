@@ -35,9 +35,9 @@ def test_repair_reservation_series_access_code__regular_user(graphql):
 
     graphql.login_with_regular_user()
 
-    response = graphql(REPAIR_ACCESS_CODE_SERIES_MUTATION, variables={"input": {"pk": series.pk}})
+    response = graphql(REPAIR_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
 
-    assert response.error_message(0) == "No permission to access reservation series."
+    assert response.error_message() == "No permission to update."
 
 
 @patch_method(PindoraService.sync_access_code)
@@ -59,6 +59,6 @@ def test_repair_reservation_series_access_code__general_admin(graphql):
     user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
-    response = graphql(REPAIR_ACCESS_CODE_SERIES_MUTATION, variables={"input": {"pk": series.pk}})
+    response = graphql(REPAIR_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
 
     assert response.has_errors is False, response.errors

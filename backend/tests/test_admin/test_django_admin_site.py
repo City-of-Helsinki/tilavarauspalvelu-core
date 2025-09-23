@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-from http import HTTPStatus
 from typing import TYPE_CHECKING
 
 import pytest
@@ -11,7 +10,7 @@ from django.urls import reverse
 
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.models import EmailMessage, Reservation
+from tilavarauspalvelu.models import Reservation
 
 from tests import factories
 from tests.helpers import ResponseMock, patch_method
@@ -56,12 +55,6 @@ def test_django_admin_site__pages_load__model_admins(create_all_models):
     client = Client()
     client.force_login(user)
 
-    email_message = EmailMessage.objects.first()
-    page_status = {
-        "/admin/tilavarauspalvelu/emailmessage/add/": HTTPStatus.FORBIDDEN,
-        f"/admin/tilavarauspalvelu/emailmessage/{email_message.pk}/delete/": HTTPStatus.FORBIDDEN,
-    }
-
     # Loop over all models that are registered to the admin site
     for model, model_admin in admin.site._registry.items():
         # Only test models from tilavarauspalvelu app
@@ -74,7 +67,7 @@ def test_django_admin_site__pages_load__model_admins(create_all_models):
             if url_pattern.lookup_str.endswith((".changelist_view", ".add_view")):
                 admin_url = reverse(f"admin:{url_pattern.name}")
 
-                assert client.get(admin_url).status_code == page_status.get(admin_url, HTTPStatus.OK), admin_url
+                assert client.get(admin_url).status_code == 200, admin_url
 
             # Edit & Delete views
             elif url_pattern.lookup_str.endswith((".change_view", ".delete_view")):
@@ -84,7 +77,7 @@ def test_django_admin_site__pages_load__model_admins(create_all_models):
 
                 admin_url = reverse(f"admin:{url_pattern.name}", args=[first_object.pk])
 
-                assert client.get(admin_url).status_code == page_status.get(admin_url, HTTPStatus.OK), admin_url
+                assert client.get(admin_url).status_code == 200, admin_url
 
             # Skipped views
             elif (

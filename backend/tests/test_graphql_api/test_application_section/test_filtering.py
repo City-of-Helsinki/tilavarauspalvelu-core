@@ -21,8 +21,7 @@ from tests.factories import (
     SuitableTimeRangeFactory,
     UnitGroupFactory,
 )
-
-from .helpers import PREFERRED_ORDER_QUERY, sections_query
+from tests.test_graphql_api.test_application_section.helpers import sections_query
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnitOption
@@ -533,36 +532,20 @@ def test_application_section__filter__suitable_time_range_priority(graphql):
 
     # when:
     # - User tries to filter suitable time ranges inside a section with a specific priority
-    query = """
-        query ($priority: [Priority!]) {
-          applicationSections {
-            edges {
-              node {
-                suitableTimeRanges(filter: {priority: $priority}) {
-                  pk
-                  priority
-                }
-              }
-            }
-          }
-        }
-    """
-    response = graphql(query, variables={"priority": Priority.PRIMARY})
+    query = sections_query(
+        fields="pk suitableTimeRanges { pk priority }",
+        suitable_time_ranges__priority=Priority.PRIMARY,
+    )
+    response = graphql(query)
 
     # then:
     # - The response contains no errors
     # - The response contains the right application section with only the requested suitable time ranges
     assert response.has_errors is False, response
-
     assert len(response.edges) == 1, response
-    assert response.node(0) == {
-        "suitableTimeRanges": [
-            {
-                "pk": suitable_primary.pk,
-                "priority": Priority.PRIMARY.value,
-            },
-        ],
-    }
+    assert response.node(0)["suitableTimeRanges"] == [
+        {"pk": suitable_primary.pk, "priority": Priority.PRIMARY.value},
+    ]
 
 
 def test_application_section__filter__by_preferred_order(graphql):
@@ -586,7 +569,8 @@ def test_application_section__filter__by_preferred_order(graphql):
 
     # when:
     # - User tries to filter application sections with a specific preferred order
-    response = graphql(PREFERRED_ORDER_QUERY, variables={"preferredOrder": [1]})
+    query = sections_query(preferred_order=1)
+    response = graphql(query)
 
     # then:
     # - The response contains no errors
@@ -617,7 +601,8 @@ def test_application_section__filter__by_preferred_order__multiple(graphql):
 
     # when:
     # - User tries to filter application sections with a specific preferred orders
-    response = graphql(PREFERRED_ORDER_QUERY, variables={"preferredOrder": [1, 3]})
+    query = sections_query(preferred_order=[1, 3])
+    response = graphql(query)
 
     # then:
     # - The response contains no errors
@@ -653,7 +638,8 @@ def test_application_section__filter__by_include_preferred_order_10_or_higher(gr
 
     # when:
     # - User tries to filter application sections with a preferred order 10 or higher
-    response = graphql(PREFERRED_ORDER_QUERY, variables={"preferredOrder": [], "allHigherThan10": True})
+    query = sections_query(include_preferred_order_10_or_higher=True)
+    response = graphql(query)
 
     # then:
     # - The response contains no errors
@@ -689,7 +675,8 @@ def test_application_section__filter__by_include_preferred_order_10_or_higher__w
 
     # when:
     # - User tries to filter application sections with a preferred order 10 or higher, and a specific preferred order
-    response = graphql(PREFERRED_ORDER_QUERY, variables={"preferredOrder": [1], "allHigherThan10": True})
+    query = sections_query(preferred_order=1, include_preferred_order_10_or_higher=True)
+    response = graphql(query)
 
     # then:
     # - The response contains no errors
@@ -1174,21 +1161,9 @@ def test_application_section__filter__reservation_unit_options__preferred_order(
 
     # when:
     # - User tries to filter only section reservation units with preferred order of 0
-    query = """
-        query ($preferredOrder: [Int!]) {
-          applicationSections {
-            edges {
-              node {
-                pk
-                reservationUnitOptions(filter: {preferredOrder: $preferredOrder}) {
-                  preferredOrder
-                }
-              }
-            }
-          }
-        }
-    """
-    response = graphql(query, variables={"preferredOrder": 0})
+    fields = "pk reservationUnitOptions { preferredOrder }"
+    query = sections_query(fields=fields, reservation_unit_options__preferred_order=0)
+    response = graphql(query)
 
     # then:
     # - The response contains only the section reservation units with the given preferred order
@@ -1209,25 +1184,18 @@ def test_application_section__filter__suitable_time_ranges__by_fulfilled(graphql
     time_range_2 = SuitableTimeRangeFactory.create(application_section=section, day_of_the_week=Weekday.TUESDAY)
     graphql.login_with_superuser()
 
-    query = """
-        query ($fulfilled: Boolean!) {
-          applicationSections {
-            edges {
-              node {
-                pk
-                suitableTimeRanges(filter: {fulfilled: $fulfilled}) {
-                  pk
-                  dayOfTheWeek
-                }
-              }
-            }
-          }
+    fields = """
+        pk
+        suitableTimeRanges {
+            pk
+            dayOfTheWeek
         }
     """
 
     # when:
     # - User tries to filter only to fulfilled suitable time ranges
-    response = graphql(query, variables={"fulfilled": True})
+    query = sections_query(fields=fields, suitable_time_ranges__fulfilled=True)
+    response = graphql(query)
 
     # then:
     # - The response contains only the suitable time ranges that are fulfilled
@@ -1235,16 +1203,14 @@ def test_application_section__filter__suitable_time_ranges__by_fulfilled(graphql
     assert response.node(0) == {
         "pk": section.pk,
         "suitableTimeRanges": [
-            {
-                "pk": time_range_1.pk,
-                "dayOfTheWeek": Weekday.MONDAY.value,
-            },
+            {"pk": time_range_1.pk, "dayOfTheWeek": Weekday.MONDAY.value},
         ],
     }
 
     # when:
     # - User tries to filter only to unfulfilled suitable time ranges
-    response = graphql(query, variables={"fulfilled": False})
+    query = sections_query(fields=fields, suitable_time_ranges__fulfilled=False)
+    response = graphql(query)
 
     # then:
     # - The response contains only the suitable time ranges that are not fulfilled
@@ -1252,10 +1218,7 @@ def test_application_section__filter__suitable_time_ranges__by_fulfilled(graphql
     assert response.node(0) == {
         "pk": section.pk,
         "suitableTimeRanges": [
-            {
-                "pk": time_range_2.pk,
-                "dayOfTheWeek": Weekday.TUESDAY.value,
-            },
+            {"pk": time_range_2.pk, "dayOfTheWeek": Weekday.TUESDAY.value},
         ],
     }
 

@@ -10,7 +10,6 @@ import re
 import unicodedata
 import urllib.parse
 from contextlib import contextmanager
-from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
@@ -26,6 +25,7 @@ from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
+    from pathlib import Path
 
     from django.http import HttpRequest
 
@@ -33,7 +33,6 @@ if TYPE_CHECKING:
 
 __all__ = [
     "comma_sep_str",
-    "get_nested",
     "get_query_params",
     "get_text_search_language",
     "only_django_validation_errors",
@@ -79,38 +78,6 @@ def comma_sep_str(values: Iterable[Any], *, last_sep: str = "&", quote: bool = F
         string += f"'{previous_value}'" if quote else previous_value
 
     return string
-
-
-def get_nested(obj: dict | list | None, /, *args: str | int, default: Any = None) -> Any:
-    """
-    Get value from a nested structure containing dicts with string keys or lists,
-    where the keys and list indices might not exist.
-
-    1) `data["foo"][0]["bar"]["baz"]`
-     - Might raise a `KeyError` or `IndexError` if any of the keys or indices don't exist.
-
-    2) `get_nested(data, "foo", 0, "bar", "baz")`
-     - Will return `None` (default) if any of the keys or indices don't exist.
-    """
-    if not args:
-        return obj if obj is not None else default
-
-    arg, args = args[0], args[1:]
-
-    if isinstance(arg, int):
-        obj = obj or []
-        try:
-            obj = obj[arg]
-        except (IndexError, KeyError):
-            obj = None
-        return get_nested(obj, *args, default=default)
-
-    obj = obj or {}
-    try:
-        return get_nested(obj.get(arg), *args, default=default)
-    except AttributeError:
-        obj = None
-        return get_nested(obj, *args, default=default)
 
 
 class with_indices[T]:  # noqa: N801, RUF100
@@ -367,25 +334,3 @@ def check_path(path: Path, *, should_be_file: bool = False, should_be_dir: bool 
         raise FileNotFoundError(msg)
 
     return path
-
-
-@contextmanager
-def run_profiler(*, interval: float = 0.001) -> Generator[None]:
-    """Run pyinstrument profiler in context and save the output to disk."""
-    from pyinstrument import Profiler
-    from pyinstrument.renderers import HTMLRenderer
-
-    profiler = Profiler(interval=interval)
-    html_renderer = HTMLRenderer()
-
-    profiler.start()
-    try:
-        yield
-    finally:
-        profile_session = profiler.stop()
-
-        output_html = html_renderer.render(profile_session)
-        now = local_datetime().strftime("%Y-%m-%dT%H-%M-%S")
-
-        html_path = Path(f"profile-{now}.{html_renderer.output_file_extension}")
-        html_path.write_text(output_html, encoding="utf-8")

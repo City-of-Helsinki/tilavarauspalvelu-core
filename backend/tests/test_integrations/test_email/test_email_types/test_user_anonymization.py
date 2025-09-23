@@ -1,3 +1,5 @@
+# type: EmailType.USER_ANONYMIZATION
+
 from __future__ import annotations
 
 import datetime

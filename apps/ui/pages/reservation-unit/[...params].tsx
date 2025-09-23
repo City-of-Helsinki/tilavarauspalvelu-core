@@ -13,7 +13,7 @@ import {
   type ReservationQuery,
   type ReservationQueryVariables,
   ReservationStateChoice,
-  type ReservationUpdateMutation,
+  type ReservationUpdateMutationInput,
   ReserveeType,
   useConfirmReservationMutation,
   useDeleteReservationMutation,
@@ -32,7 +32,7 @@ import { Step0 } from "@/components/reservation/Step0";
 import { Step1 } from "@/components/reservation/Step1";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
-import { createNodeId, filterNonNullable, getNode, toNumber } from "common/src/helpers";
+import { base64encode, filterNonNullable, toNumber } from "common/src/helpers";
 import { containsField } from "common/src/metaFieldsHelpers";
 import { errorToast } from "common/src/components/toast";
 import { getGeneralFields } from "@/components/reservation/SummaryFields";
@@ -98,7 +98,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     fetchPolicy: "no-cache",
   });
 
-  const reservation = resData?.node != null && "pk" in resData.node ? resData.node : props.reservation;
+  const reservation = resData?.reservation ?? props.reservation;
   const reservationUnit = reservation.reservationUnit;
 
   useRemoveStoredReservation();
@@ -175,7 +175,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     return deleteReservation({
       variables: {
         input: {
-          pk: reservation.pk,
+          pk: reservation?.pk?.toString() ?? "",
         },
       },
     });
@@ -228,7 +228,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       throw new Error("Reservation pk is required");
     }
 
-    const input: ReservationUpdateMutation = {
+    const input: ReservationUpdateMutationInput = {
       ...rest,
       // force update to empty -> NA
       reserveeIdentifier:
@@ -278,9 +278,9 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       } else if (state === ReservationStateChoice.RequiresHandling) {
         router.push(getReservationPath(pk, undefined, "requires_handling"));
       } else if (state === ReservationStateChoice.WaitingForPayment) {
-        const { paymentOrder } = data?.confirmReservation ?? {};
+        const { order } = data?.confirmReservation ?? {};
         const lang = convertLanguageCode(i18n.language);
-        const checkoutUrl = getCheckoutUrl(paymentOrder, lang);
+        const checkoutUrl = getCheckoutUrl(order, lang);
         if (!checkoutUrl) {
           throw new Error("No checkout url found");
         }
@@ -439,10 +439,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const { data: resData } = await apolloClient.query<ReservationQuery, ReservationQueryVariables>({
     query: ReservationDocument,
-    variables: { id: createNodeId("ReservationNode", reservationPk) },
+    variables: { id: base64encode(`ReservationNode:${reservationPk}`) },
   });
 
-  const reservation = getNode(resData);
+  const { reservation } = resData;
 
   // Valid path but no reservation found -> redirect to reservation unit page
   if (reservation?.pk == null) {
@@ -483,39 +483,31 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-export const RESERVATION_IN_PROGRESS_FRAGMENT = gql`
-  fragment ReservationInProgress on ReservationNode {
-    id
-    pk
-    name
-    ...MetaFields
-    ...ReservationInfoCard
-    bufferTimeBefore
-    bufferTimeAfter
-    calendarUrl
-    reservationUnit {
-      id
-      canApplyFreeOfCharge
-      ...CancellationRuleFields
-      ...MetadataSets
-      ...TermsOfUse
-      requireReservationHandling
-    }
-  }
-`;
-
 export const RESERVATION_IN_PROGRESS_QUERY = gql`
   query Reservation($id: ID!) {
-    node(id: $id) {
-      ... on ReservationNode {
-        ...ReservationInProgress
+    reservation(id: $id) {
+      id
+      pk
+      name
+      ...MetaFields
+      ...ReservationInfoCard
+      bufferTimeBefore
+      bufferTimeAfter
+      calendarUrl
+      reservationUnit {
+        id
+        canApplyFreeOfCharge
+        ...CancellationRuleFields
+        ...MetadataSets
+        ...TermsOfUse
+        requireReservationHandling
       }
     }
   }
 `;
 
 export const UPDATE_RESERVATION = gql`
-  mutation UpdateReservation($input: ReservationUpdateMutation!) {
+  mutation UpdateReservation($input: ReservationUpdateMutationInput!) {
     updateReservation(input: $input) {
       pk
       state
@@ -524,11 +516,11 @@ export const UPDATE_RESERVATION = gql`
 `;
 
 export const CONFIRM_RESERVATION = gql`
-  mutation ConfirmReservation($input: ReservationConfirmMutation!) {
+  mutation ConfirmReservation($input: ReservationConfirmMutationInput!) {
     confirmReservation(input: $input) {
       pk
       state
-      paymentOrder {
+      order {
         id
         checkoutUrl
       }
@@ -537,9 +529,9 @@ export const CONFIRM_RESERVATION = gql`
 `;
 
 export const DELETE_RESERVATION = gql`
-  mutation DeleteReservation($input: ReservationDeleteTentativeMutation!) {
+  mutation DeleteReservation($input: ReservationDeleteTentativeMutationInput!) {
     deleteTentativeReservation(input: $input) {
-      pk
+      deleted
     }
   }
 `;

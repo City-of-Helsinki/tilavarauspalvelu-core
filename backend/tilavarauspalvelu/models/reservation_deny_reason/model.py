@@ -4,13 +4,10 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from lazy_managers import LazyModelAttribute, LazyModelManager
+
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Reservation
-    from tilavarauspalvelu.models._base import OneToManyRelatedManager
-    from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
-
     from .actions import ReservationDenyReasonActions
     from .queryset import ReservationDenyReasonManager
     from .validators import ReservationDenyReasonValidator
@@ -34,8 +31,6 @@ class ReservationDenyReason(models.Model):
     objects: ClassVar[ReservationDenyReasonManager] = LazyModelManager.new()
     actions: ReservationDenyReasonActions = LazyModelAttribute.new()
     validators: ReservationDenyReasonValidator = LazyModelAttribute.new()
-
-    reservations: OneToManyRelatedManager[Reservation, ReservationQuerySet]
 
     class Meta:
         db_table = "reservation_deny_reason"

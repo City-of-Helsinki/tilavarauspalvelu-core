@@ -5,19 +5,19 @@ import json
 from typing import Any
 
 from django import forms
+from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms.formsets import DELETION_FIELD_NAME
 from django.forms.models import BaseInlineFormSet
 from django.utils.translation import gettext_lazy as _
-from modeltranslation.admin import TranslationStackedInline
 from subforms.fields import DynamicArrayField
 from tinymce.widgets import TinyMCE
 
+from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, TermsOfUseTypeChoices
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing, TermsOfUse
-from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date
 from utils.external_service.errors import ExternalServiceError
 from utils.utils import only_django_validation_errors
@@ -113,6 +113,7 @@ class ReservationUnitAdminForm(forms.ModelForm):
 
     search_terms = DynamicArrayField(
         required=False,
+        default=list,
         label=_("Search terms"),
         help_text=_(
             "Additional search terms that will bring up this reservation unit when making text searches "
@@ -320,17 +321,7 @@ class ReservationUnitAdminForm(forms.ModelForm):
         return json.dumps(response, default=str, indent=2)
 
 
-class ReservationUnitPricingInline(TranslationStackedInline):
+class ReservationUnitPricingInline(admin.TabularInline):
     model = ReservationUnitPricing
-    fields = [
-        "begins",
-        "is_activated_on_begins",
-        "lowest_price",
-        "highest_price",
-        "price_unit",
-        "payment_type",
-        "tax_percentage",
-        "material_price_description",
-    ]
     show_change_link = True
     extra = 0

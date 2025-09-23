@@ -134,7 +134,7 @@ class ReservationUnitExporter(BaseCSVExporter):
                 "resources",
                 "purposes",
                 "equipments",
-                models.Prefetch("pricings", ReservationUnitPricing.objects.all().active()),
+                models.Prefetch("pricings", ReservationUnitPricing.objects.active()),
             )
             .annotate(
                 publishing_state=L("publishing_state"),
@@ -237,7 +237,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 equipments="Equipments",
                 state="State",
                 reservation_state="Reservation state",
-                updated_at="Updated at",
             ),
         ]
 

@@ -21,7 +21,7 @@ def test_reservation__update__working_memo__general_admin(graphql):
 
     graphql.force_login(admin)
     data = get_working_memo_update_data(reservation)
-    response = graphql(UPDATE_WORKING_MEMO_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_WORKING_MEMO_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -37,7 +37,7 @@ def test_reservation__update__working_memo__general_commenter(graphql):
 
     graphql.force_login(admin)
     data = get_working_memo_update_data(reservation)
-    response = graphql(UPDATE_WORKING_MEMO_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_WORKING_MEMO_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -53,7 +53,7 @@ def test_reservation__update__working_memo__unit_commenter(graphql):
 
     graphql.force_login(admin)
     data = get_working_memo_update_data(reservation)
-    response = graphql(UPDATE_WORKING_MEMO_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_WORKING_MEMO_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -67,9 +67,9 @@ def test_reservation__update__working_memo__regular_user(graphql):
 
     graphql.login_with_regular_user()
     data = get_working_memo_update_data(reservation)
-    response = graphql(UPDATE_WORKING_MEMO_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_WORKING_MEMO_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "No permission to edit this reservation's working memo."
+    assert response.error_message() == "No permission to update."
 
     reservation.refresh_from_db()
     assert reservation.working_memo == ""
@@ -84,7 +84,7 @@ def test_reservation__update__working_memo__staff_and_own_reservation(graphql):
 
     graphql.force_login(admin)
     data = get_working_memo_update_data(reservation)
-    response = graphql(UPDATE_WORKING_MEMO_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_WORKING_MEMO_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -101,9 +101,9 @@ def test_reservation__update__working_memo__reserver_staff_user_and_not_own_rese
 
     graphql.force_login(admin)
     data = get_working_memo_update_data(reservation)
-    response = graphql(UPDATE_WORKING_MEMO_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_WORKING_MEMO_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "No permission to edit this reservation's working memo."
+    assert response.error_message() == "No permission to update."
 
     reservation.refresh_from_db()
     assert reservation.working_memo == ""
@@ -115,7 +115,7 @@ def test_reservation__update__empty(graphql):
 
     data = {"pk": reservation.pk, "workingMemo": ""}
 
-    response = graphql(UPDATE_WORKING_MEMO_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_WORKING_MEMO_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 

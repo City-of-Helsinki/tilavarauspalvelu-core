@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from tilavarauspalvelu.models import ReservationPurpose
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from django.db import models
 
 __all__ = [
     "ReservationPurposeManager",
@@ -9,7 +8,7 @@ __all__ = [
 ]
 
 
-class ReservationPurposeQuerySet(ModelQuerySet[ReservationPurpose]): ...
+class ReservationPurposeQuerySet(models.QuerySet): ...
 
 
-class ReservationPurposeManager(ModelManager[ReservationPurpose, ReservationPurposeQuerySet]): ...
+class ReservationPurposeManager(models.Manager.from_queryset(ReservationPurposeQuerySet)): ...

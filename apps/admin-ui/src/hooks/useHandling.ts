@@ -10,7 +10,7 @@ export function useHandling() {
   const { isAuthenticated } = useSession();
 
   const today = useMemo(() => startOfDay(new Date()), []);
-  const { data, previousData, refetch } = useHandlingDataQuery({
+  const { data, refetch } = useHandlingDataQuery({
     skip: !isAuthenticated,
     variables: {
       beginDate: toApiDate(today) ?? "",
@@ -18,30 +18,24 @@ export function useHandling() {
     },
   });
 
-  const d = data ?? previousData;
-  const handlingCount: number = d?.reservations?.totalCount ?? 0;
-  const unitCount: number = d?.allUnits?.length ?? 0;
+  const handlingCount: number = data?.reservations?.edges?.length ?? 0;
+  const unitCount: number = data?.unitsAll?.length ?? 0;
   const hasOwnUnits: boolean = unitCount > 0;
 
   return { handlingCount, hasOwnUnits, refetch };
 }
 
 export const HANDLING_COUNT_QUERY = gql`
-  query HandlingData(
-    # Filter
-    $beginDate: Date!
-    $state: [ReservationStateChoice!]!
-  ) {
-    reservations(filter: { state: $state, beginDate: $beginDate, onlyWithHandlingPermission: true }) {
+  query HandlingData($beginDate: Date!, $state: [ReservationStateChoice]!) {
+    reservations(state: $state, beginDate: $beginDate, onlyWithHandlingPermission: true) {
       edges {
         node {
           id
           pk
         }
       }
-      totalCount
     }
-    allUnits(filter: { onlyWithPermission: true }) {
+    unitsAll(onlyWithPermission: true) {
       id
     }
   }

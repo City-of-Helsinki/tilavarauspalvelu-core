@@ -4,7 +4,7 @@ import pytest
 
 from tests.factories import PaymentMerchantFactory, UnitFactory, UnitGroupFactory, UserFactory
 
-from .helpers import units_query
+from .helpers import units_all_query, units_query
 
 # Applied to all tests
 pytestmark = [
@@ -20,7 +20,7 @@ def test_units__filter__only_with_permission__regular_user(graphql):
     response = graphql(query)
 
     assert response.has_errors is False
-    assert len(response.results) == 0
+    assert len(response.edges) == 0
 
 
 def test_units__filter__only_with_permission__general_admin__can_manage_units(graphql):
@@ -33,7 +33,7 @@ def test_units__filter__only_with_permission__general_admin__can_manage_units(gr
     response = graphql(query)
 
     assert response.has_errors is False
-    assert len(response.results) == 1
+    assert len(response.edges) == 1
 
 
 def test_units__filter__only_with_permission__unit_admin__can_manage_units(graphql):
@@ -47,8 +47,8 @@ def test_units__filter__only_with_permission__unit_admin__can_manage_units(graph
     response = graphql(query)
 
     assert response.has_errors is False
-    assert len(response.results) == 1
-    assert response.results[0] == {"pk": unit.pk}
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": unit.pk}
 
 
 def test_units__filter__only_with_permission__unit_group_admin__can_manage_units(graphql):
@@ -63,47 +63,15 @@ def test_units__filter__only_with_permission__unit_group_admin__can_manage_units
     response = graphql(query)
 
     assert response.has_errors is False
-    assert len(response.results) == 1
-    assert response.results[0] == {"pk": unit.pk}
-
-
-def test_unit_all__filter__only_with_permission__general_admin(graphql):
-    unit_1 = UnitFactory.create()
-    unit_2 = UnitFactory.create()
-
-    user = UserFactory.create_with_general_role()
-    graphql.force_login(user)
-
-    query = units_query(onlyWithPermission=True)
-    response = graphql(query)
-    assert response.has_errors is False, response.errors
-
-    assert sorted(response.results, key=lambda x: x["pk"]) == [
-        {"pk": unit_1.pk},
-        {"pk": unit_2.pk},
-    ]
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": unit.pk}
 
 
 def test_units__query__hide_payment_merchant_without_permissions(graphql):
     unit = UnitFactory.create(payment_merchant=PaymentMerchantFactory.create())
 
     graphql.login_with_regular_user()
-
-    query = """
-        query {
-            units {
-                edges {
-                    node {
-                        nameFi
-                        paymentMerchant {
-                            name
-                        }
-                    }
-                }
-            }
-        }
-    """
-
+    query = units_query(fields="nameFi paymentMerchant { name }")
     response = graphql(query)
 
     assert response.has_errors is False
@@ -116,25 +84,26 @@ def test_units__query__show_payment_merchant_with_permissions(graphql):
     unit = UnitFactory.create(payment_merchant=PaymentMerchantFactory.create())
 
     graphql.login_with_superuser()
-
-    query = """
-        query {
-            units {
-                edges {
-                    node {
-                        nameFi
-                        paymentMerchant {
-                            name
-                        }
-                    }
-                }
-            }
-        }
-    """
-
+    query = units_query(fields="nameFi paymentMerchant { name }")
     response = graphql(query)
 
     assert response.has_errors is False
 
     assert len(response.edges) == 1
     assert response.node(0) == {"nameFi": unit.name, "paymentMerchant": {"name": unit.payment_merchant.name}}
+
+
+def test_unit_all__filter__only_with_permission__general_admin(graphql):
+    unit_1 = UnitFactory.create()
+    unit_2 = UnitFactory.create()
+
+    user = UserFactory.create_with_general_role()
+    graphql.force_login(user)
+
+    query = units_all_query(onlyWithPermission=True)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.first_query_object) == 2
+    assert response.first_query_object[0] == {"pk": unit_1.pk}
+    assert response.first_query_object[1] == {"pk": unit_2.pk}

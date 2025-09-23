@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.enums import Weekday
+from tilavarauspalvelu.enums import Priority, Weekday
 from tilavarauspalvelu.models import ApplicationSection, SuitableTimeRange
-from utils.date_utils import local_date
+from utils.date_utils import local_date, local_time
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
 
@@ -29,7 +29,7 @@ def test_update_application__single_field(graphql):
         "pk": application.id,
         "additionalInformation": "bar",
     }
-    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
 
     # then:
     # - The response contains no errors
@@ -77,7 +77,7 @@ def test_update_application__application_sections__replace(graphql):
             },
         ],
     }
-    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
 
     # then:
     # - The response contains no errors
@@ -116,7 +116,7 @@ def test_update_application__application_sections__not_deleted_if_not_given(grap
         "pk": application.pk,
         "additionalInformation": "bar",
     }
-    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
 
     # then:
     # - The response contains no errors
@@ -128,6 +128,42 @@ def test_update_application__application_sections__not_deleted_if_not_given(grap
 
     suitable = section.suitable_time_ranges.first()
     assert suitable.pk == old_range_pk
+
+
+def test_update_application__application_sections__too_many(graphql, settings):
+    settings.MAXIMUM_SECTIONS_PER_APPLICATION = 0
+
+    application = ApplicationFactory.create_in_status_draft()
+    graphql.login_with_superuser()
+
+    input_data = {
+        "pk": application.pk,
+        "applicationSections": [
+            {
+                "name": "foo",
+                "numPersons": 1,
+                "reservationsBeginDate": application.application_round.reservation_period_begin_date.isoformat(),
+                "reservationsEndDate": application.application_round.reservation_period_end_date.isoformat(),
+                "reservationMinDuration": 100,
+                "reservationMaxDuration": 100,
+                "appliedReservationsPerWeek": 1,
+                "suitableTimeRanges": [
+                    {
+                        "priority": Priority.PRIMARY.value,
+                        "dayOfTheWeek": Weekday.MONDAY.value,
+                        "beginTime": local_time(hour=12).isoformat(),
+                        "endTime": local_time(hour=14).isoformat(),
+                    },
+                ],
+            },
+        ],
+    }
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Cannot create more than 0 application sections in one application",
+    ]
 
 
 def test_update_application__application_sections__deleted_if_empty(graphql):
@@ -143,7 +179,7 @@ def test_update_application__application_sections__deleted_if_empty(graphql):
         "pk": application.pk,
         "applicationSections": [],
     }
-    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
 
     # then:
     # - The response contains no errors
@@ -162,10 +198,10 @@ def test_update_application__user(graphql):
         "pk": application.id,
         "user": user.pk,
     }
-    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
 
     # User cannot be updated
-    assert response.has_errors is True, response
+    assert response.has_schema_errors is True, response
 
 
 def test_update_application__application_round(graphql):
@@ -177,10 +213,10 @@ def test_update_application__application_round(graphql):
         "pk": application.id,
         "application_round": application_round.pk,
     }
-    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
 
     # Application round cannot be updated
-    assert response.has_errors is True, response
+    assert response.has_schema_errors is True, response
 
 
 def test_update_application__sent_at(graphql):
@@ -191,10 +227,10 @@ def test_update_application__sent_at(graphql):
         "pk": application.id,
         "sentAt": local_date().isoformat(),
     }
-    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
 
     # Sent date cannot be updated, must use specific mutation
-    assert response.has_errors is True, response
+    assert response.has_schema_errors is True, response
 
 
 def test_update_application__working_memo(graphql):
@@ -205,7 +241,7 @@ def test_update_application__working_memo(graphql):
         "pk": application.id,
         "workingMemo": "foo",
     }
-    response = graphql(UPDATE_MUTATION, variables={"input": input_data})
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
 
     # Working memo cannot be updated, must use specific mutation
-    assert response.has_errors is True, response
+    assert response.has_schema_errors is True, response

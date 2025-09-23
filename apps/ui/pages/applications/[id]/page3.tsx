@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { gql } from "@apollo/client";
 import { AutoGrid, ButtonContainer, Flex } from "common/styled";
 import { useDisplayError } from "common/src/hooks";
-import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
   type ApplicationPage3FormValues,
   ApplicationPage3Schema,
@@ -39,7 +39,6 @@ function Page3Form(): JSX.Element | null {
   const { watch, unregister, register, setValue } = useFormContext<ApplicationPage3FormValues>();
   const type = watch("applicantType");
 
-  const hasRegistration = watch("isRegisteredAssociation");
   useEffect(() => {
     if (type === ReserveeType.Individual) {
       unregister("organisationName");
@@ -48,12 +47,17 @@ function Page3Form(): JSX.Element | null {
       unregister("organisationStreetAddress");
       unregister("organisationCity");
       unregister("organisationPostCode");
-    } else if (type === ReserveeType.Company || hasRegistration) {
+    }
+
+    const hasRegistration = type === ReserveeType.Nonprofit || type === ReserveeType.Company;
+    if (hasRegistration) {
       register("organisationIdentifier", { required: true });
     } else {
+      // Unregister does not remove the form value (neither from DOM nor from the form state)
+      setValue("organisationIdentifier", undefined);
       unregister("organisationIdentifier");
     }
-  }, [hasRegistration, type, register, unregister, setValue]);
+  }, [type, register, unregister, setValue]);
 
   const hasBillingAddress = watch("hasBillingAddress");
   useEffect(() => {
@@ -82,12 +86,18 @@ function Page3({ application }: Pick<PropsNarrowed, "application">): JSX.Element
 
   const form = useForm<ApplicationPage3FormValues>({
     mode: "onChange",
-    values: convertApplicationPage3(application),
+    defaultValues: convertApplicationPage3(application),
     resolver: zodResolver(ApplicationPage3Schema),
     reValidateMode: "onChange",
   });
 
-  const { handleSubmit } = form;
+  const { handleSubmit, reset } = form;
+
+  useEffect(() => {
+    if (application != null) {
+      reset(convertApplicationPage3(application));
+    }
+  }, [application, reset]);
 
   const { t } = useTranslation();
   const [mutate] = useUpdateApplicationMutation();
@@ -159,9 +169,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
   const { data } = await apolloClient.query<ApplicationPage3Query, ApplicationPage3QueryVariables>({
     query: ApplicationPage3Document,
-    variables: { id: createNodeId("ApplicationNode", pk) },
+    variables: { id: base64encode(`ApplicationNode:${pk}`) },
   });
-  const application = getNode(data);
+  const { application } = data;
   if (application == null) {
     return notFound;
   }
@@ -179,10 +189,8 @@ export default Page3;
 
 export const APPLICATION_PAGE3_QUERY = gql`
   query ApplicationPage3($id: ID!) {
-    node(id: $id) {
-      ... on ApplicationNode {
-        ...ApplicationForm
-      }
+    application(id: $id) {
+      ...ApplicationForm
     }
   }
 `;

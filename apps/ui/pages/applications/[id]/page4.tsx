@@ -12,9 +12,9 @@ import Link from "next/link";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { createNodeId, getNode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { getApplicationPath } from "@/modules/urls";
-import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
+import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { ButtonContainer, Flex } from "common/styled";
 import { Button, ButtonSize, ButtonVariant, IconArrowLeft, LoadingSpinner } from "hds-react";
 import { useDisplayError } from "common/src/hooks";
@@ -143,9 +143,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const { data } = await apolloClient.query<ApplicationPage4Query, ApplicationPage4QueryVariables>({
     query: ApplicationPage4Document,
-    variables: { id: createNodeId("ApplicationNode", pk) },
+    variables: { id: base64encode(`ApplicationNode:${pk}`) },
   });
-  const application = getNode(data);
+  const { application } = data;
   if (application == null) {
     return notFound;
   }
@@ -165,16 +165,14 @@ export default Page4;
 // TODO narrow down the query fragment (if possible), need at least TermsOfUse and ApplicationForm
 export const APPLICATION_PREVIEW_QUERY = gql`
   query ApplicationPage4($id: ID!) {
-    node(id: $id) {
-      ... on ApplicationNode {
-        ...ApplicationView
-      }
+    application(id: $id) {
+      ...ApplicationView
     }
   }
 `;
 
 export const SEND_APPLICATION_MUTATION = gql`
-  mutation SendApplication($input: ApplicationSendMutation!) {
+  mutation SendApplication($input: ApplicationSendMutationInput!) {
     sendApplication(input: $input) {
       pk
     }

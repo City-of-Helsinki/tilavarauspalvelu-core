@@ -38,12 +38,6 @@ export const FullRow = styled.div`
   grid-column: 1 / -1;
 `;
 
-export const P = styled.p<{
-  $noMargin?: boolean;
-}>`
-  ${({ $noMargin }) => ($noMargin ? "margin: 0" : "")}
-`;
-
 export type SpacingSize = "none" | "2-xs" | "xs" | "s" | "m" | "l" | "xl" | "2-xl";
 
 // TODO should allow for switching to smaller gap on mobile (scale down)

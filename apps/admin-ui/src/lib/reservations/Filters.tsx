@@ -18,7 +18,7 @@ import { useForm } from "react-hook-form";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
-import { mapParamToInteger } from "common/src/helpers";
+import { mapParamToInterger } from "common/src/helpers";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { mapFormToSearchParams } from "common/src/modules/search";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
@@ -101,7 +101,7 @@ export function Filters({
   const searchParams = useSearchParams();
 
   // TODO this only filters the options after a search, have to use form data if we want to filter without searching
-  const unitFilter = mapParamToInteger(searchParams.getAll("unit"), 1);
+  const unitFilter = mapParamToInterger(searchParams.getAll("unit"), 1);
   const options = useFilterOptions(unitFilter);
 
   const defaultValues = mapParamsToForm(searchParams);

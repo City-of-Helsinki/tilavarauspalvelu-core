@@ -4,11 +4,11 @@ import datetime
 from typing import NamedTuple
 
 import pytest
+from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.models import ReservableTimeSpan
 
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory
-from tests.helpers import parametrize_helper
 
 # Applied to all tests
 pytestmark = [

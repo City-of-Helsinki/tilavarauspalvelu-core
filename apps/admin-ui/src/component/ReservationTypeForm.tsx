@@ -2,7 +2,7 @@ import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
 import {
-  AuthenticationType,
+  Authentication,
   type Maybe,
   ReservationTypeChoice,
   type ReservationTypeFormFieldsFragment,
@@ -96,7 +96,7 @@ function ReservationTypeForm({
   }
 
   const showAuthWarning =
-    type === ReservationTypeChoice.Behalf && reservationUnit.authentication === AuthenticationType.Strong;
+    type === ReservationTypeChoice.Behalf && reservationUnit.authentication === Authentication.Strong;
 
   return (
     <>

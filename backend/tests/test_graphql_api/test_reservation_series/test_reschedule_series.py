@@ -37,7 +37,7 @@ def test_reservation_series__reschedule_series__change_begin_date(graphql):
     data = get_minimal_reschedule_data(reservation_series, beginDate="2023-12-05")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -66,7 +66,7 @@ def test_reservation_series__reschedule_series__change_begin_time(graphql):
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -99,7 +99,7 @@ def test_reservation_series__reschedule_series__change_end_date(graphql):
     )
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -126,7 +126,7 @@ def test_reservation_series__reschedule_series__change_end_time(graphql):
     data = get_minimal_reschedule_data(reservation_series, endTime="14:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -154,11 +154,12 @@ def test_reservation_series__reschedule_series__change_begin_date__reservations_
     data = get_minimal_reschedule_data(reservation_series, beginDate="2023-12-05")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message(0) == (
-        "Reservation series' begin date cannot be changed after its first reservation's start time is in the past."
-    )
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation series' begin date cannot be changed after its first reservation's start time is in the past.",
+    ]
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
@@ -168,7 +169,7 @@ def test_reservation_series__reschedule_series__change_weekdays(graphql):
     data = get_minimal_reschedule_data(reservation_series, weekdays=[Weekday.TUESDAY.value])
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -194,23 +195,19 @@ def test_reservation_series__reschedule_series__change_weekdays__invalid_weekday
     data = get_minimal_reschedule_data(reservation_series, weekdays=[8])
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
-    assert response.has_errors
+    assert response.has_schema_errors
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
 def test_reservation_series__reschedule_series__change_buffer_times(graphql):
     reservation_series = create_reservation_series()
 
-    data = get_minimal_reschedule_data(
-        reservation_series,
-        bufferTimeBefore=int(datetime.timedelta(minutes=30).total_seconds()),
-        bufferTimeAfter=int(datetime.timedelta(hours=1).total_seconds()),
-    )
+    data = get_minimal_reschedule_data(reservation_series, bufferTimeBefore="00:30:00", bufferTimeAfter="01:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -229,9 +226,12 @@ def test_reservation_series__reschedule_series__empty_series(graphql):
     data = get_minimal_reschedule_data(reservation_series)
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message(0) == ("Reservation series must have at least one future reservation to reschedule")
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation series must have at least one future reservation to reschedule",
+    ]
 
 
 @freeze_time(local_datetime(year=2024, month=12, day=1))
@@ -241,9 +241,12 @@ def test_reservation_series__reschedule_series__all_reservations_in_the_past(gra
     data = get_minimal_reschedule_data(reservation_series)
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message(0) == ("Reservation series must have at least one future reservation to reschedule")
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation series must have at least one future reservation to reschedule",
+    ]
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))  # Monday
@@ -253,7 +256,7 @@ def test_reservation_series__reschedule_series__change_part_of_the_series(graphq
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -285,7 +288,7 @@ def test_reservation_series__reschedule_series__change_part_of_the_series__durin
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -323,7 +326,7 @@ def test_reservation_series__reschedule_series__dont_remove_unconfirmed_reservat
     data = get_minimal_reschedule_data(reservation_series, weekdays=[Weekday.TUESDAY.value])
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -350,7 +353,7 @@ def test_reservation_series__reschedule_series__details_from_reservation__use_ne
     data = get_minimal_reschedule_data(reservation_series, weekdays=[Weekday.TUESDAY.value])
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -389,7 +392,7 @@ def test_reservation_series__reschedule_series__details_from_reservation__next_i
     data = get_minimal_reschedule_data(reservation_series, weekdays=[Weekday.TUESDAY.value])
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -423,9 +426,10 @@ def test_reservation_series__reschedule_series__end_date_before_begin_date(graph
     data = get_minimal_reschedule_data(reservation_series, endDate="2023-01-01")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "Begin date cannot be after end date."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Begin date cannot be after end date."]
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
@@ -435,9 +439,12 @@ def test_reservation_series__reschedule_series__end_date_more_than_two_years_int
     data = get_minimal_reschedule_data(reservation_series, endDate="2025-12-02")  # 2 years + 1 day
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "Cannot create reservations for more than 2 years in the future."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Cannot create reservations for more than 2 years in the future.",
+    ]
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
@@ -453,9 +460,12 @@ def test_reservation_series__reschedule_series__end_time_before_begin_time__same
     )
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "Begin time cannot be after end time if on the same day."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Begin time cannot be after end time if on the same day.",
+    ]
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
@@ -471,7 +481,7 @@ def test_reservation_series__reschedule_series__end_time_before_begin_time__diff
     )
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     # It's enough to check that the mutation was successful, unlike the tests above.
     assert response.has_errors is False
@@ -484,9 +494,12 @@ def test_reservation_series__reschedule_series__invalid_start_interval(graphql):
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:01")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "Reservation start time does not match the allowed interval of 15 minutes."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation start time does not match the allowed interval of 15 minutes.",
+    ]
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
@@ -515,9 +528,9 @@ def test_reservation_series__reschedule_series__overlapping_reservations(graphql
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "Not all reservations can be made due to overlapping reservations."
+    assert response.error_message() == "Not all reservations can be made due to overlapping reservations."
     assert response.errors[0]["extensions"]["overlapping"] == [
         {
             "begin": "2023-12-04T08:00:00+02:00",
@@ -551,12 +564,12 @@ def test_reservation_series__reschedule_series__overlapping_reservations__buffer
         state=ReservationStateChoice.CONFIRMED,
     )
 
-    data = get_minimal_reschedule_data(reservation_series, beginTime=datetime.time(hour=8, minute=0).isoformat())
+    data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "Not all reservations can be made due to overlapping reservations."
+    assert response.error_message() == "Not all reservations can be made due to overlapping reservations."
     assert response.errors[0]["extensions"]["overlapping"] == [
         {
             "begin": "2023-12-04T08:00:00+02:00",
@@ -590,12 +603,12 @@ def test_reservation_series__reschedule_series__overlapping_reservations__buffer
         state=ReservationStateChoice.CONFIRMED,
     )
 
-    data = get_minimal_reschedule_data(reservation_series, endTime=datetime.time(hour=13, minute=0).isoformat())
+    data = get_minimal_reschedule_data(reservation_series, endTime="13:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "Not all reservations can be made due to overlapping reservations."
+    assert response.error_message() == "Not all reservations can be made due to overlapping reservations."
     assert response.errors[0]["extensions"]["overlapping"] == [
         {
             "begin": "2023-12-04T10:00:00+02:00",
@@ -633,7 +646,7 @@ def test_reservation_series__reschedule_series__overlapping_reservations__only_b
     data = get_minimal_reschedule_data(reservation_series, endTime="13:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -647,7 +660,7 @@ def test_reservation_series__reschedule_series__skip_dates(graphql):
     data = get_minimal_reschedule_data(reservation_series, skipDates=["2023-12-04", "2024-01-01"])
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -679,7 +692,7 @@ def test_reservation_series__reschedule_series__create_statistics(graphql, setti
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -707,7 +720,7 @@ def test_reservation_series__reschedule_series__create_statistics__partial(graph
     data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -726,7 +739,7 @@ def test_reservation_series__reschedule_series__same_day_ongoing_reservation(gra
     data = get_minimal_reschedule_data(reservation_series, beginTime="11:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -754,7 +767,7 @@ def test_reservation_series__reschedule_series__same_day_future_reservation(grap
     data = get_minimal_reschedule_data(reservation_series, beginTime="11:00:00")
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -786,7 +799,7 @@ def test_reservation_series__reschedule_series__is_access_code(graphql):
     data = get_minimal_reschedule_data(reservation_series)
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -804,7 +817,7 @@ def test_reservation_series__reschedule_series__was_access_code(graphql):
     data = get_minimal_reschedule_data(reservation_series)
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -822,7 +835,7 @@ def test_reservation_series__reschedule_series__changed_to_access_code(graphql):
     data = get_minimal_reschedule_data(reservation_series)
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -840,10 +853,10 @@ def test_reservation_series__reschedule_series__pindora_call_fails(graphql):
     data = get_minimal_reschedule_data(reservation_series)
 
     graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     # Mutation failed due to unexpected Pindora error.
-
-    assert response.error_message(0) == "Pindora Error"
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Pindora Error"]
 
     assert PindoraService.sync_access_code.called is True

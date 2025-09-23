@@ -1,3 +1,5 @@
+# type: EmailType.RESERVATION_REQUIRES_PAYMENT
+
 from __future__ import annotations
 
 from decimal import Decimal

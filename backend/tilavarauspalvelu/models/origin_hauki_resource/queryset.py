@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from tilavarauspalvelu.models import OriginHaukiResource
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from django.db import models
 
 __all__ = [
     "OriginHaukiResourceManager",
@@ -9,7 +8,7 @@ __all__ = [
 ]
 
 
-class OriginHaukiResourceQuerySet(ModelQuerySet[OriginHaukiResource]): ...
+class OriginHaukiResourceQuerySet(models.QuerySet): ...
 
 
-class OriginHaukiResourceManager(ModelManager[OriginHaukiResource, OriginHaukiResourceQuerySet]): ...
+class OriginHaukiResourceManager(models.Manager.from_queryset(OriginHaukiResourceQuerySet)): ...

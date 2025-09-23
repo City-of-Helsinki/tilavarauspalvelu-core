@@ -7,7 +7,7 @@ import { AutoGrid, ButtonContainer, Flex, fontMedium } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { ControlledSelect } from "common/src/components/form";
 import { ReservationCancelReasonChoice } from "@gql/gql-types";
-import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
+import { ButtonLikeLink } from "./common/ButtonLikeLink";
 import TermsBox from "common/src/termsbox/TermsBox";
 import { AccordionWithState } from "./Accordion";
 import { Sanitize } from "common/src/components/Sanitize";
@@ -35,15 +35,13 @@ const FormWrapper = styled(Flex)`
   }
 `;
 
-type CancellationFormProps = {
+export function CancellationForm(props: {
   onNext: (values: CancelFormValues) => void;
   cancellationTerms: string | null;
   backLink: string;
   isLoading?: boolean;
   isDisabled?: boolean;
-};
-
-export function CancellationForm(props: Readonly<CancellationFormProps>): JSX.Element {
+}): JSX.Element {
   const { onNext, isLoading, isDisabled, cancellationTerms, backLink } = props;
   const { t } = useTranslation();
 

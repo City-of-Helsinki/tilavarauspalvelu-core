@@ -1,3 +1,5 @@
+# type: EmailType.RESERVATION_ACCESS_CODE_CHANGED
+
 from __future__ import annotations
 
 import datetime
@@ -315,7 +317,8 @@ def test_reservation_access_code_changed__send_email(outbox):
     assert outbox[0].subject == "The door code of your booking has changed"
     assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
 
-    assert len(outbox[0].attachments) == 0
+    assert len(outbox[0].attachments) == 1
+    assert outbox[0].attachments[0][0] == "reservation_calendar.ics"
 
 
 @pytest.mark.django_db

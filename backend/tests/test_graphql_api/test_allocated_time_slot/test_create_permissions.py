@@ -25,8 +25,8 @@ def test_allocated_time_slot__create__applicant(graphql):
     # when:
     # - The user tries to make an allocation for a reservation unit option
     input_data = allocation_create_data(option)
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - The error complains about permissions
-    assert response.error_message(0) == "No permission to create."
+    assert response.error_message() == "No permission to create."

@@ -41,7 +41,7 @@ def test_allocated_time_slot__create(graphql):
     # when:
     # - The user tries to make an allocation for a reservation unit option
     input_data = allocation_create_data(option)
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - There are no errors in the response
@@ -67,7 +67,7 @@ def test_allocated_time_slot__create__still_in_allocation_if_applied_not_fulfill
     # when:
     # - The user tries to make an allocation for a reservation unit option
     input_data = allocation_create_data(option)
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - There are no errors in the response
@@ -95,7 +95,7 @@ def test_allocated_time_slot__create__incomplete_data(graphql, missing_key):
     # - The user tries to make an allocation for a reservation unit option
     input_data = allocation_create_data(option)
     input_data.pop(missing_key)
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - There are errors in the response (the actual error is not that important)
@@ -117,11 +117,13 @@ def test_allocated_time_slot__create__application_not_yet_in_allocation(graphql)
     # when:
     # - The user tries to make an allocation for a reservation unit option
     input_data = allocation_create_data(option)
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - The response complains about the application being in the wrong status
-    assert response.error_message(0) == "Cannot allocate to application in status: 'RECEIVED'"
+    assert response.field_error_messages() == [
+        "Cannot allocate to application in status: 'RECEIVED'",
+    ]
 
 
 def test_allocated_time_slot__create__application_not_in_allocation_anymore__HANDLED(graphql):
@@ -140,11 +142,11 @@ def test_allocated_time_slot__create__application_not_in_allocation_anymore__HAN
     # when:
     # - The user tries to make an allocation for a reservation unit option
     input_data = allocation_create_data(option)
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - The response complains about the application being in the wrong status
-    assert response.error_message(0) == "Cannot allocate to application section in status: 'HANDLED'"
+    assert response.field_error_messages() == ["Cannot allocate to application section in status: 'HANDLED'"]
 
 
 def test_allocated_time_slot__create__application_not_in_allocation_anymore__REJECTED(graphql):
@@ -165,11 +167,11 @@ def test_allocated_time_slot__create__application_not_in_allocation_anymore__REJ
     # when:
     # - The user tries to make an allocation for a reservation unit option
     input_data = allocation_create_data(option)
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - The response complains about the application being in the wrong status
-    assert response.error_message(0) == "Cannot allocate to application section in status: 'REJECTED'"
+    assert response.field_error_messages() == ["Cannot allocate to application section in status: 'REJECTED'"]
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -186,16 +188,16 @@ def test_allocated_time_slot__create__approve_duration_longer_than_section_maxim
     # - The user tries to make an allocation for a reservation unit option,
     #   but for longer than the maximum allowed duration.
     input_data = allocation_create_data(option, end_time=datetime.time(12, 30), force=force)
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - If force=False -> The response complains about the duration being too long
     # - If force=True -> The allocation is successful
     assert response.has_errors is (not force)
     if not force:
-        assert response.error_message(0) == (
+        assert response.field_error_messages() == [
             "Allocation duration too long. Maximum allowed is 02:00:00 while given duration is 02:30:00."
-        )
+        ]
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -212,16 +214,16 @@ def test_allocated_time_slot__create__approve_duration_shorter_than_section_mini
     # - The user tries to make an allocation for a reservation unit option,
     #   but for shorter than the maximum allowed duration.
     input_data = allocation_create_data(option, end_time=datetime.time(10, 30), force=force)
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - If force=False -> The response complains about the duration being too short
     # - If force=True -> The allocation is successful
     assert response.has_errors is (not force)
     if not force:
-        assert response.error_message(0) == (
+        assert response.field_error_messages() == [
             "Allocation duration too short. Minimum allowed is 01:00:00 while given duration is 00:30:00."
-        )
+        ]
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -238,14 +240,16 @@ def test_allocated_time_slot__create__approve_duration_not_multiple_of_30_minute
     # - The user tries to make an allocation for a reservation unit option,
     #   but not for a multiple of 30 minutes
     input_data = allocation_create_data(option, end_time=datetime.time(11, 0, 1), force=force)
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - If force=False -> The response complains about the duration being invalid
     # - If force=True -> The allocation is successful
     assert response.has_errors is (not force)
     if not force:
-        assert response.error_message(0) == "Allocation duration must be a multiple of 30 minutes."
+        assert response.field_error_messages() == [
+            "Allocation duration must be a multiple of 30 minutes.",
+        ]
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -267,11 +271,16 @@ def test_allocated_time_slot__create__approve_more_than_events_per_week(graphql,
         end_time=datetime.time(14, 0, 0),
         force=force,
     )
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - The response complains about too many allocations already exising
-    assert response.error_message(0) == "Cannot allocate to application section in status: 'HANDLED'"
+    assert sorted(response.field_error_messages()) == [
+        # There is a separate check for the number of allocations per week
+        # but since the application section status is tied to the number of allocations,
+        # this message is what is given first.
+        "Cannot allocate to application section in status: 'HANDLED'",
+    ]
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -293,14 +302,16 @@ def test_allocated_time_slot__create__approve_outside_of_suitable_time_ranges(gr
         end_time=datetime.time(15, 0, 0),
         force=force,
     )
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - If force=False -> The response complains about the duration being invalid
     # - If force=True -> The allocation is successful
     assert response.has_errors is (not force)
     if not force:
-        assert response.error_message(0) == "Given time slot does not fit within applicants suitable time ranges."
+        assert response.field_error_messages() == [
+            "Given time slot does not fit within applicants suitable time ranges.",
+        ]
 
 
 def test_allocated_time_slot__create__approved_time_falls_on_two_back_to_back_suitable_time_ranges(graphql):
@@ -327,7 +338,7 @@ def test_allocated_time_slot__create__approved_time_falls_on_two_back_to_back_su
         begin_time=datetime.time(13, 0),
         end_time=datetime.time(15, 0),
     )
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - The allocation is successful
@@ -358,11 +369,13 @@ def test_allocated_time_slot__create__approved_time_falls_on_two_separated_wishe
         begin_time=datetime.time(13, 30),
         end_time=datetime.time(15, 30),
     )
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - The response complains about the allocated time being invalid.
-    assert response.error_message(0) == "Given time slot does not fit within applicants suitable time ranges."
+    assert response.field_error_messages() == [
+        "Given time slot does not fit within applicants suitable time ranges.",
+    ]
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -383,11 +396,13 @@ def test_allocated_time_slot__create__reservation_unit_rejected(graphql, force):
     # - The user tries to make an allocation for a reservation unit option,
     #   but the reservation unit is rejected.
     input_data = allocation_create_data(option, force=force)
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - The response complains about the reservation unit not being included.
-    assert response.error_message(0) == "This reservation unit option has been rejected."
+    assert response.field_error_messages() == [
+        "This reservation unit option has been rejected.",
+    ]
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -408,11 +423,13 @@ def test_allocated_time_slot__create__reservation_unit_locked(graphql, force):
     # - The user tries to make an allocation for a reservation unit option,
     #   but the reservation unit is rejected.
     input_data = allocation_create_data(option, force=force)
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - The response complains about the reservation unit not being included.
-    assert response.error_message(0) == "This reservation unit option has been locked."
+    assert response.field_error_messages() == [
+        "This reservation unit option has been locked.",
+    ]
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -443,13 +460,13 @@ def test_allocated_time_slot__create__two_allocations_for_same_day(graphql, forc
         end_time=datetime.time(14, 0),
         force=force,
     )
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - The response complains about the allocations being on the same day of the week
-    assert response.error_message(0) == (
+    assert response.field_error_messages() == [
         "Cannot make multiple allocations on the same day of the week for one application section."
-    )
+    ]
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -472,14 +489,14 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation_for_sa
     # - The user tries to make an allocation for a reservation unit option,
     #   but there is already an allocation for the same reservation unit at that time.
     input_data = allocation_create_data(option, force=force)
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - The response complains about the there being another allocation already.
-    assert response.error_message(0) == (
+    assert response.field_error_messages() == [
         "Given time slot has already been allocated for another application section "
-        "with a related reservation unit or resource."
-    )
+        "with a related reservation unit or resource.",
+    ]
 
 
 def test_allocated_time_slot__create__overlapping_with_another_allocation_for_different_reservation_unit(graphql):
@@ -496,7 +513,7 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation_for_di
     # when:
     # - The user tries to make an allocation for a reservation unit option
     input_data = allocation_create_data(option)
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - The allocation is successful
@@ -527,11 +544,11 @@ def test_allocated_time_slot__create__overlapping_in_related_reservation_unit(gr
     # - The user tries to make an allocation for a reservation unit option,
     #   but there is already an allocation for the child unit.
     input_data = allocation_create_data(option, force=force)
-    response = graphql(CREATE_ALLOCATION, variables={"input": input_data})
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
     # - The response complains about the there being another allocation already.
-    assert response.error_message(0) == (
+    assert response.field_error_messages() == [
         "Given time slot has already been allocated for another application section "
-        "with a related reservation unit or resource."
-    )
+        "with a related reservation unit or resource.",
+    ]

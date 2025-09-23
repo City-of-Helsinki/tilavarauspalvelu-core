@@ -2,7 +2,7 @@ import { errorToast } from "common/src/components/toast";
 import { useSort } from "@/hooks/useSort";
 import { RejectedOccurrencesTable, SORT_KEYS } from "./RejectedOccurrencesTable";
 import { type ApolloError, gql } from "@apollo/client";
-import { RejectedOccurrenceOrderSet, useRejectedOccurrencesQuery } from "@gql/gql-types";
+import { RejectedOccurrenceOrderingChoices, useRejectedOccurrencesQuery } from "@gql/gql-types";
 import { More } from "@/component/More";
 import React from "react";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
@@ -54,7 +54,7 @@ export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions 
   }
 
   const totalCount = dataToUse?.rejectedOccurrences?.totalCount ?? 0;
-  const rejectedOccurrences = filterNonNullable(dataToUse?.rejectedOccurrences?.edges?.map((edge) => edge?.node));
+  const rejectedOccurrences = filterNonNullable(dataToUse?.rejectedOccurrences?.edges.map((edge) => edge?.node));
 
   return (
     <>
@@ -79,7 +79,7 @@ export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions 
   );
 }
 
-function transformOrderBy(orderBy: string | null): RejectedOccurrenceOrderSet[] {
+function transformOrderBy(orderBy: string | null): RejectedOccurrenceOrderingChoices[] {
   if (orderBy == null) {
     return [];
   }
@@ -89,24 +89,30 @@ function transformOrderBy(orderBy: string | null): RejectedOccurrenceOrderSet[] 
     case "application_id,application_section_id":
     case "application_id,-application_section_id":
       return desc
-        ? [RejectedOccurrenceOrderSet.ApplicationPkDesc, RejectedOccurrenceOrderSet.PkDesc]
-        : [RejectedOccurrenceOrderSet.ApplicationPkAsc, RejectedOccurrenceOrderSet.PkAsc];
+        ? [RejectedOccurrenceOrderingChoices.ApplicationPkDesc, RejectedOccurrenceOrderingChoices.PkDesc]
+        : [RejectedOccurrenceOrderingChoices.ApplicationPkAsc, RejectedOccurrenceOrderingChoices.PkAsc];
     case "applicant":
-      return desc ? [RejectedOccurrenceOrderSet.ApplicantDesc] : [RejectedOccurrenceOrderSet.ApplicantAsc];
+      return desc
+        ? [RejectedOccurrenceOrderingChoices.ApplicantDesc]
+        : [RejectedOccurrenceOrderingChoices.ApplicantAsc];
     case "rejected_event_name_fi":
       return desc
-        ? [RejectedOccurrenceOrderSet.ApplicationSectionNameDesc]
-        : [RejectedOccurrenceOrderSet.ApplicationSectionNameAsc];
+        ? [RejectedOccurrenceOrderingChoices.ApplicationSectionNameDesc]
+        : [RejectedOccurrenceOrderingChoices.ApplicationSectionNameAsc];
     case "rejected_unit_name_fi":
-      return desc ? [RejectedOccurrenceOrderSet.UnitNameDesc] : [RejectedOccurrenceOrderSet.UnitNameAsc];
+      return desc ? [RejectedOccurrenceOrderingChoices.UnitNameDesc] : [RejectedOccurrenceOrderingChoices.UnitNameAsc];
     case "rejected_reservation_unit_name_fi":
       return desc
-        ? [RejectedOccurrenceOrderSet.ReservationUnitNameDesc]
-        : [RejectedOccurrenceOrderSet.ReservationUnitNameAsc];
+        ? [RejectedOccurrenceOrderingChoices.ReservationUnitNameDesc]
+        : [RejectedOccurrenceOrderingChoices.ReservationUnitNameAsc];
     case "time_of_occurrence":
-      return desc ? [RejectedOccurrenceOrderSet.BeginDatetimeDesc] : [RejectedOccurrenceOrderSet.BeginDatetimeAsc];
+      return desc
+        ? [RejectedOccurrenceOrderingChoices.BeginDatetimeDesc]
+        : [RejectedOccurrenceOrderingChoices.BeginDatetimeAsc];
     case "rejection_reason":
-      return desc ? [RejectedOccurrenceOrderSet.RejectionReasonDesc] : [RejectedOccurrenceOrderSet.RejectionReasonAsc];
+      return desc
+        ? [RejectedOccurrenceOrderingChoices.RejectionReasonDesc]
+        : [RejectedOccurrenceOrderingChoices.RejectionReasonAsc];
     default:
       return [];
   }
@@ -114,27 +120,24 @@ function transformOrderBy(orderBy: string | null): RejectedOccurrenceOrderSet[] 
 
 export const REJECTED_OCCURRENCES_QUERY = gql`
   query RejectedOccurrences(
-    $first: Int
-    $after: String
-    $orderBy: [RejectedOccurrenceOrderSet!]
-    # Filter
-    $applicationRound: Int!
-    $reservationUnit: [Int!]
+    $applicationRound: Int
+    $unit: [Int]
+    $unitGroup: [Int]
+    $reservationUnit: [Int]
+    $orderBy: [RejectedOccurrenceOrderingChoices]
     $textSearch: String
-    $unit: [Int!]
-    $unitGroup: [Int!]
+    $after: String
+    $first: Int
   ) {
     rejectedOccurrences(
-      first: $first
-      after: $after
+      applicationRound: $applicationRound
+      unit: $unit
+      unitGroup: $unitGroup
+      reservationUnit: $reservationUnit
       orderBy: $orderBy
-      filter: {
-        applicationRound: $applicationRound
-        reservationUnit: $reservationUnit
-        textSearch: $textSearch
-        unit: $unit
-        unitGroup: $unitGroup
-      }
+      textSearch: $textSearch
+      after: $after
+      first: $first
     ) {
       totalCount
       pageInfo {

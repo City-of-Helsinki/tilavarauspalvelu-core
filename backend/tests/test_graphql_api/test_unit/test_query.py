@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+from enum import Enum
+
 import pytest
-from undine.relay import to_global_id
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFactory, UnitGroupFactory
+
+from .helpers import units_query
 
 # Applied to all tests
 pytestmark = [
@@ -15,45 +18,38 @@ def test_units__query(graphql):
     unit = UnitFactory.create()
     graphql.login_with_superuser()
 
-    query = """
-        query($id: ID!) {
-            node(id: $id) {
-                ... on UnitNode {
-                    pk
-                    nameFi
-                    nameEn
-                    nameSv
-                    descriptionFi
-                    descriptionEn
-                    descriptionSv
-                    shortDescriptionFi
-                    shortDescriptionEn
-                    shortDescriptionSv
-                    webPage
-                    email
-                    phone
-                    addressStreetFi
-                    addressStreetEn
-                    addressStreetSv
-                    addressZip
-                    addressCityFi
-                    addressCityEn
-                    addressCitySv
-                    reservationUnits { nameFi }
-                    spaces { nameFi }
-                    unitGroups { nameFi }
-                    paymentMerchant { name }
-                }
-            }
-        }
+    fields = """
+        pk
+        nameFi
+        nameEn
+        nameSv
+        descriptionFi
+        descriptionEn
+        descriptionSv
+        shortDescriptionFi
+        shortDescriptionEn
+        shortDescriptionSv
+        webPage
+        email
+        phone
+        addressStreetFi
+        addressStreetEn
+        addressStreetSv
+        addressZip
+        addressCityFi
+        addressCityEn
+        addressCitySv
+        reservationUnits { nameFi }
+        spaces { nameFi }
+        unitGroups { nameFi }
+        paymentMerchant { name }
     """
-    global_id = to_global_id("UnitNode", object_id=unit.pk)
-
-    response = graphql(query, variables={"id": global_id})
+    response = graphql(units_query(fields=fields))
 
     assert response.has_errors is False
 
-    assert response.results == {
+    assert len(response.edges) == 1
+    assert response.node(0) == {
         "pk": unit.pk,
         "nameFi": unit.name_fi,
         "nameEn": unit.name_en,
@@ -88,24 +84,18 @@ def test_units__query__unit_groups_alphabetical_order(graphql):
     unit_group_3 = UnitGroupFactory.create(units=[unit], name="ABC")
 
     graphql.login_with_superuser()
-
-    query = """
-        query($id: ID!) {
-            node(id: $id) {
-                ... on UnitNode {
-                    pk
-                    unitGroups { nameFi }
-                }
-            }
+    fields = """
+        pk
+        unitGroups {
+            nameFi
         }
     """
-    global_id = to_global_id("UnitNode", object_id=unit.pk)
-
-    response = graphql(query, variables={"id": global_id})
+    response = graphql(units_query(fields=fields))
 
     assert response.has_errors is False
 
-    assert response.results == {
+    assert len(response.edges) == 1
+    assert response.node(0) == {
         "pk": unit.pk,
         "unitGroups": [
             {"nameFi": unit_group_1.name_fi},
@@ -120,23 +110,16 @@ def test_units__query__unit_groups__no_permissions(graphql):
     UnitGroupFactory.create(units=[unit], name="AAA")
 
     graphql.login_with_regular_user()
-
-    query = """
-        query($id: ID!) {
-            node(id: $id) {
-                ... on UnitNode {
-                    pk
-                    unitGroups { nameFi }
-                }
-            }
+    fields = """
+        pk
+        unitGroups {
+            nameFi
         }
     """
-    global_id = to_global_id("UnitNode", object_id=unit.pk)
-
-    response = graphql(query, variables={"id": global_id})
+    response = graphql(units_query(fields=fields))
 
     assert response.has_errors is True
-    assert response.error_message(0) == "No permission to access unit group"
+    assert response.error_message() == "No permission to access node."
 
 
 def test_units__query__check_duplication_is_prevented(graphql):
@@ -178,51 +161,22 @@ def test_units__query__check_duplication_is_prevented(graphql):
     group_3 = UnitGroupFactory.create(name="A3", units=[unit_3, unit_4])
     group_4 = UnitGroupFactory.create(name="A4", units=[unit_4, unit_1])
 
-    query = """
-        query (
-            $nameFi: String!
-            $publishedReservationUnits: Boolean!
-            $ownReservations: Boolean!
-            $onlyDirectBookable: Boolean!
-          ) {
-          units (
-            filter: {
-              AND: {
-                  nameFiStartswith: $nameFi
-                  publishedReservationUnits: $publishedReservationUnits
-                  ownReservations: $ownReservations
-                  onlyDirectBookable: $onlyDirectBookable
-              }
-            }
-            orderBy: [
-              unitGroupNameFiAsc
-              pkAsc
-            ]
-          ) {
-            edges {
-              node {
-                pk
-                unitGroups {
-                    pk
-                }
-                reservationUnits(orderBy: pkAsc) {
-                    pk
-                    reservations(orderBy: pkAsc) {
-                        pk
-                    }
-                }
-              }
-            }
-          }
-        }
-    """
-    variables = {
-        "nameFi": "A",
-        "publishedReservationUnits": True,
-        "ownReservations": True,
-        "onlyDirectBookable": True,
-    }
-    response = graphql(query, variables=variables)
+    # Create testing enum since test client doesn't correctly handle
+    # ordering enums from strings in sub-entities (e.g. 'reservation_unit__order_by').
+    class TestEnum(Enum):
+        pkAsc = "pkAsc"
+
+    query = units_query(
+        fields="pk unitGroups { pk } reservationUnits { pk reservations { pk } }",
+        name_fi="A",
+        published_reservation_units=True,
+        own_reservations=True,
+        only_direct_bookable=True,
+        order_by=["unitGroupNameFiAsc", "pkAsc"],
+        reservationUnits__order_by=TestEnum.pkAsc,
+        reservationUnits__reservations__order_by=TestEnum.pkAsc,
+    )
+    response = graphql(query)
 
     assert response.has_errors is False
     assert len(response.edges) == 4

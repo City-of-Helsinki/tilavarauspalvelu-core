@@ -2,17 +2,47 @@ import React from "react";
 import { Button, ButtonSize, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { type UseFormReturn } from "react-hook-form";
-import { type ReservationUnitEditFormValues } from "./form";
+import { UseFormReturn } from "react-hook-form";
+import type { ReservationUnitEditFormValues } from "./form";
 import { getUnitUrl } from "@/common/urls";
 import { successToast } from "common/src/components/toast";
-import { useArchiveReservationUnitMutation, type Maybe, type ReservationUnitEditPageFragment } from "@gql/gql-types";
+import type { ReservationUnitEditQuery, UnitSubpageHeadFragment } from "@gql/gql-types";
 import { breakpoints } from "common/src/const";
-import { ButtonLikeExternalLink, Flex, pageSideMargins, WhiteButton } from "common/styled";
+import { Flex, pageSideMargins, WhiteButton } from "common/styled";
 import { useDisplayError } from "common/src/hooks";
 import { useModal } from "@/context/ModalContext";
 import { useRouter } from "next/router";
-import { gql } from "@apollo/client";
+
+type QueryData = ReservationUnitEditQuery["reservationUnit"];
+type Node = NonNullable<QueryData>;
+
+const PreviewLink = styled.a`
+  display: flex;
+  place-items: center;
+  border: 2px solid var(--color-white);
+  background-color: transparent;
+  text-decoration: none;
+
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: var(--color-white);
+
+  :link,
+  :visited {
+    opacity: 1;
+    color: var(--color-white);
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--color-white);
+      color: var(--color-black);
+    }
+  }
+
+  > span {
+    margin: 0 var(--spacing-m);
+  }
+`;
 
 const ButtonsStripe = styled(Flex).attrs({
   $direction: "row",
@@ -119,7 +149,7 @@ function ArchiveDialog({
   onClose,
   onAccept,
 }: {
-  reservationUnit: Pick<ReservationUnitEditPageFragment, "nameFi">;
+  reservationUnit: Pick<Node, "nameFi">;
   onClose: () => void;
   onAccept: () => void;
 }): JSX.Element {
@@ -154,12 +184,14 @@ function DiscardChangesDialog({ onClose, onAccept }: { onClose: () => void; onAc
 
 export function BottomButtonsStripe({
   reservationUnit,
+  unit,
   previewUrlPrefix,
   setModalContent,
   onSubmit,
   form,
 }: {
-  reservationUnit: Maybe<ReservationUnitEditPageFragment>;
+  reservationUnit: Node | undefined;
+  unit?: UnitSubpageHeadFragment | null;
   previewUrlPrefix: string;
   setModalContent: (content: JSX.Element | null) => void;
   onSubmit: (formValues: ReservationUnitEditFormValues) => Promise<number>;
@@ -168,19 +200,20 @@ export function BottomButtonsStripe({
   const { t } = useTranslation();
   const displayError = useDisplayError();
   const router = useRouter();
-  const [archiveMutation] = useArchiveReservationUnitMutation();
 
   const { setValue, watch, formState, handleSubmit } = form;
   const { isDirty: hasChanges, isSubmitting: isSaving } = formState;
 
-  const archiveEnabled = watch("pk") !== 0;
+  const archiveEnabled = watch("pk") !== 0 && !watch("isArchived");
   const draftEnabled = hasChanges || !watch("isDraft");
   const publishEnabled = hasChanges || watch("isDraft");
+
   const isPreviewDisabled = isSaving || !reservationUnit?.pk || !reservationUnit?.extUuid || previewUrlPrefix === "";
 
   // Have to define these like this because otherwise the state changes don't work
   const handlePublish = async () => {
     setValue("isDraft", false);
+    setValue("isArchived", false);
     try {
       await handleSubmit(onSubmit)();
     } catch (error) {
@@ -190,6 +223,7 @@ export function BottomButtonsStripe({
 
   const handleSaveAsDraft = async () => {
     setValue("isDraft", true);
+    setValue("isArchived", false);
     try {
       await handleSubmit(onSubmit)();
     } catch (error) {
@@ -198,15 +232,13 @@ export function BottomButtonsStripe({
   };
 
   const handleAcceptArchive = async () => {
+    setValue("isArchived", true);
+    setValue("isDraft", false);
     setModalContent(null);
     try {
-      if (reservationUnit == null) {
-        throw new Error("Can't try to archive non existing reservation unit.");
-      }
-      const { unit, pk } = reservationUnit;
-      await archiveMutation({ variables: { input: { pk } } });
+      await handleSubmit(onSubmit)();
       successToast({ text: t("reservationUnitEditor:ArchiveDialog.success") });
-      router.push(getUnitUrl(unit.pk));
+      router.push(getUnitUrl(unit?.pk));
     } catch (e) {
       displayError(e);
     }
@@ -240,13 +272,6 @@ export function BottomButtonsStripe({
     }
   };
 
-  const previewUrl = !isPreviewDisabled
-    ? `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.extUuid}`
-    : undefined;
-  const previewTitle = t(
-    hasChanges ? "reservationUnitEditor:noPreviewUnsavedChangesTooltip" : "reservationUnitEditor:previewTooltip"
-  );
-
   return (
     <ButtonsStripe>
       <WhiteButton
@@ -271,17 +296,20 @@ export function BottomButtonsStripe({
         {t("reservationUnitEditor:archive")}
       </WhiteButton>
 
-      <ButtonLikeExternalLink
+      <PreviewLink
         target="_blank"
         rel="noopener noreferrer"
         className="preview-link"
-        href={previewUrl}
-        disabled={previewUrl == null}
-        variant="inverted"
-        title={previewTitle}
+        href={
+          !isPreviewDisabled ? `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.extUuid}` : undefined
+        }
+        onClick={(e) => isPreviewDisabled && e.preventDefault()}
+        title={t(
+          hasChanges ? "reservationUnitEditor:noPreviewUnsavedChangesTooltip" : "reservationUnitEditor:previewTooltip"
+        )}
       >
         <span>{t("reservationUnitEditor:preview")}</span>
-      </ButtonLikeExternalLink>
+      </PreviewLink>
 
       <WhiteButton
         size={ButtonSize.Small}
@@ -307,11 +335,3 @@ export function BottomButtonsStripe({
     </ButtonsStripe>
   );
 }
-
-export const ARCHIVE_RESERVATION_UNIT = gql`
-  mutation ArchiveReservationUnit($input: ReservationUnitArchiveMutation!) {
-    archiveReservationUnit(input: $input) {
-      pk
-    }
-  }
-`;

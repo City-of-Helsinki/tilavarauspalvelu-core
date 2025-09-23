@@ -1,81 +1,17 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any
 
 import django.contrib.postgres.fields
 import django.core.validators
 import django.db.models.constraints
 import django.db.models.deletion
 from django.conf import settings
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import migrations, models
 
 import tilavarauspalvelu.enums
 import tilavarauspalvelu.validators
-
-if TYPE_CHECKING:
-    from django import forms
-
-
-class StrChoiceField(models.CharField):
-    """CharField for TextChoices that automatically sets 'max_length' to the length of the longest choice."""
-
-    def __init__(self, enum: type[models.Choices], **kwargs: Any) -> None:
-        self.enum = enum
-        kwargs["max_length"] = max(len(val) for val, _ in enum.choices)
-        kwargs["choices"] = enum.choices
-        super().__init__(**kwargs)
-
-    def deconstruct(self) -> tuple[str, str, list[Any], dict[str, Any]]:
-        name, path, args, kwargs = super().deconstruct()
-        kwargs["enum"] = self.enum
-        return name, path, args, kwargs
-
-
-class IntChoiceField(models.IntegerField):
-    """
-    IntegerField for IntegerChoices that sets 'min_value' and 'max_value' validators
-    instead of regular choice validation. Useful when you don't want integer choices to be
-    converted to strings in graphql endpoints (ref: `graphene_django.converter.convert_choice_name`).
-    Pair with `common.fields.serializer.IntChoiceField` to validate choices in serializers.
-    """
-
-    def __init__(self, enum: type[models.Choices], **kwargs: Any) -> None:
-        self.enum = enum
-
-        min_value = int(min(val for val, _ in enum.choices))
-        max_value = int(max(val for val, _ in enum.choices))
-        msg = f"Value must be between {min_value} and {max_value}."
-        # These validators are passed to the serializer field as its 'min_value' and 'max_value'.
-        kwargs["validators"] = [
-            MinValueValidator(limit_value=min_value, message=msg),
-            MaxValueValidator(limit_value=max_value, message=msg),
-        ]
-        super().__init__(**kwargs)
-
-    def deconstruct(self) -> tuple[str, str, list[Any], dict[str, Any]]:
-        name, path, args, kwargs = super().deconstruct()
-        kwargs["enum"] = self.enum
-        return name, path, args, kwargs
-
-    def validate(self, value: int | None, model_instance: models.Model) -> None:
-        original_choices = self.choices
-        try:
-            self.choices = self.enum.choices
-            super().validate(value, model_instance)
-        finally:
-            self.choices = original_choices
-
-    def formfield(self, **kwargs: Any) -> forms.IntegerField:
-        original_choices = self.choices
-        try:
-            self.choices = self.enum.choices
-            choices = super().formfield(**kwargs)
-        finally:
-            self.choices = original_choices
-
-        return choices
+import utils.fields.model
 
 
 class WeekdayChoice(models.IntegerChoices):
@@ -161,7 +97,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "day_of_the_week",
-                    StrChoiceField(
+                    utils.fields.model.StrChoiceField(
                         choices=[
                             ("MONDAY", "Monday"),
                             ("TUESDAY", "Tuesday"),
@@ -291,7 +227,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "applicant_type",
-                    StrChoiceField(
+                    utils.fields.model.StrChoiceField(
                         choices=[
                             ("INDIVIDUAL", "Individual"),
                             ("ASSOCIATION", "Association"),
@@ -441,7 +377,7 @@ class Migration(migrations.Migration):
                 ("core_business_sv", models.TextField(blank=True, null=True)),
                 (
                     "organisation_type",
-                    StrChoiceField(
+                    utils.fields.model.StrChoiceField(
                         choices=[
                             ("COMPANY", "Company"),
                             ("REGISTERED_ASSOCIATION", "Registered association"),
@@ -517,7 +453,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "priority",
-                    StrChoiceField(
+                    utils.fields.model.StrChoiceField(
                         choices=[("PRIMARY", "Primary"), ("SECONDARY", "Secondary")],
                         enum=tilavarauspalvelu.enums.Priority,
                         max_length=9,
@@ -525,7 +461,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "day_of_the_week",
-                    StrChoiceField(
+                    utils.fields.model.StrChoiceField(
                         choices=[
                             ("MONDAY", "Monday"),
                             ("TUESDAY", "Tuesday"),
@@ -567,7 +503,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "weekday",
-                    IntChoiceField(
+                    utils.fields.model.IntChoiceField(
                         enum=WeekdayChoice,
                         validators=[
                             django.core.validators.MinValueValidator(

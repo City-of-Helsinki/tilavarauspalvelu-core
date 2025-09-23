@@ -14,6 +14,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
   type ApplicationReservationUnitListFragment,
+  type Maybe,
   type RecurringCardFragment,
   ReservationKind,
 } from "@gql/gql-types";
@@ -25,7 +26,7 @@ import { convertLanguageCode, getTranslationSafe } from "common/src/common/util"
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
-import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
+import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 // TODO this is weird import path
 import { SearchFormValues, SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
 import { useSearchModify } from "@/hooks/useSearchValues";
@@ -45,8 +46,8 @@ const ImageSizeWrapper = styled.div`
 type ReservationUnitCardProps = Readonly<{
   reservationUnit: Omit<RecurringCardFragment, "currentAccessType" | "effectiveAccessType">;
   isSelected: boolean;
-  handleAdd: (pk: number) => void;
-  handleRemove: (pk: number) => void;
+  handleAdd: (pk: Maybe<number>) => void;
+  handleRemove: (pk: Maybe<number>) => void;
 }>;
 
 function ReservationUnitCard({ reservationUnit, handleAdd, handleRemove, isSelected }: ReservationUnitCardProps) {
@@ -153,7 +154,7 @@ export function ReservationUnitModalContent({
     handleSearch(criteria, true);
   };
 
-  const reservationUnits = filterNonNullable(data?.reservationUnits?.edges?.map((n) => n?.node));
+  const reservationUnits = filterNonNullable(data?.reservationUnits?.edges.map((n) => n?.node));
 
   return (
     <Flex>

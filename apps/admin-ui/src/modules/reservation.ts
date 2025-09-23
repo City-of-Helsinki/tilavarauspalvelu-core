@@ -8,10 +8,11 @@ import {
   PriceUnit,
   type PricingFieldsFragment,
   type ReservationNode,
-  type ReservationPriceDetailsFieldsFragment,
+  type ReservationPageQuery,
+  ReservationPriceDetailsFieldsFragment,
   ReservationTypeChoice,
-  type ReservationUnitPricingFieldsFragment,
-  type EventStyleReservationFieldsFragment,
+  ReservationUnitPricingFieldsFragment,
+  EventStyleReservationFieldsFragment,
 } from "@gql/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
 import { formatDate, formatDateTimeRange, getReserveeName } from "@/common/util";
@@ -24,11 +25,13 @@ import { type CalendarEvent } from "common/src/calendar/Calendar";
 export type EventType = EventStyleReservationFieldsFragment;
 export type CalendarEventType = CalendarEvent<EventType>;
 
+type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
+
 function reservationUnitName(reservationUnit: Maybe<CreateTagStringFragment["reservationUnit"]>): string {
   return reservationUnit ? `${reservationUnit.nameFi}, ${reservationUnit.unit?.nameFi || ""}` : "-";
 }
 
-export function reservationPrice(reservation: Pick<ReservationNode, "price">, t: TFunction): string {
+export function reservationPrice(reservation: ReservationType, t: TFunction): string {
   return getReservationPrice(reservation.price, t("reservation:noPrice"), true);
 }
 
@@ -132,7 +135,7 @@ export function getTranslationKeyForCustomerTypeChoice(
 }
 
 export function translateReservationCustomerType(
-  res: Pick<ReservationNode, "type" | "reserveeType" | "reserveeIdentifier">,
+  res: Pick<ReservationType, "type" | "reserveeType" | "reserveeIdentifier">,
   t: TFunction
 ): string {
   const [part1, part2] = getTranslationKeyForCustomerTypeChoice(res.type, res.reserveeType, res.reserveeIdentifier);

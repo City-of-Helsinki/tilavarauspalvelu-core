@@ -3,7 +3,7 @@ export { useDebounce } from "./useDebounce";
 export { useReservableTimes } from "./useReservableTimes";
 export { useReservationUnitList } from "./useReservationUnitList";
 export { useSearchQuery } from "./useSearchQuery";
-export { useToastIfQueryParam } from "common/src/hooks/useToastIfQueryParam";
+export { useToastIfQueryParam } from "./useToastIfQueryParam";
 export { useCurrentUser } from "./useCurrentUser";
 export { useAvailableTimes } from "./useAvailableTimes";
 export { useRemoveStoredReservation } from "./useRemoveStoredReservation";

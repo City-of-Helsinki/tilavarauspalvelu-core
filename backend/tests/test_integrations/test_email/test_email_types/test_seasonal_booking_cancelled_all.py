@@ -1,3 +1,5 @@
+# type: EmailType.SEASONAL_BOOKING_CANCELLED_ALL
+
 from __future__ import annotations
 
 from inspect import cleandoc

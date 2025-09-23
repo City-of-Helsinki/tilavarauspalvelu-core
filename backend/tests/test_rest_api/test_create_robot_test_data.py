@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+from decimal import Decimal
 from http import HTTPStatus
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import pytest
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from freezegun import freeze_time
 
@@ -28,9 +30,21 @@ from utils.date_utils import local_datetime
 from tests.factories import (
     ApplicationFactory,
     ApplicationRoundFactory,
+    EquipmentFactory,
+    OriginHaukiResourceFactory,
+    PaymentAccountingFactory,
+    PaymentMerchantFactory,
+    PaymentProductFactory,
+    PurposeFactory,
     ReservationFactory,
+    ReservationMetadataSetFactory,
+    ReservationPurposeFactory,
     ReservationSeriesFactory,
+    ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
+    ReservationUnitTypeFactory,
+    TaxPercentageFactory,
+    TermsOfUseFactory,
     UnitFactory,
     UserFactory,
 )
@@ -163,13 +177,15 @@ def test_robot_test_data_create_view__lock(api_client, settings):
 @pytest.mark.slow
 @pytest.mark.django_db
 def test_create_robot_test_data():
+    _create_required_data()
+
     create_robot_test_data()
 
     assert Unit.objects.count() == 1
-    assert ReservationUnit.objects.count() == 23
-    assert Space.objects.count() == 23
-    assert ReservationUnitPricing.objects.count() == 23
-    assert ReservationUnitAccessType.objects.count() == 23
+    assert ReservationUnit.objects.count() == 20
+    assert Space.objects.count() == 20
+    assert ReservationUnitPricing.objects.count() == 20
+    assert ReservationUnitAccessType.objects.count() == 20
     assert User.objects.count() == 29
     assert ApplicationRound.objects.count() == 1
     assert Reservation.objects.count() == 1
@@ -177,7 +193,16 @@ def test_create_robot_test_data():
 
 @pytest.mark.slow
 @pytest.mark.django_db
+def test_create_robot_test_data__fails_due_to_missing_data():
+    with pytest.raises(ValidationError):
+        create_robot_test_data()
+
+
+@pytest.mark.slow
+@pytest.mark.django_db
 def test_create_robot_test_data__remove_existing_data_between_runs():
+    _create_required_data()
+
     # Unit is recreated
     harakka = UnitFactory.create(name="Harakka, piilokoju", tprek_id="71677")
 
@@ -201,10 +226,10 @@ def test_create_robot_test_data__remove_existing_data_between_runs():
     create_robot_test_data()
 
     assert Unit.objects.count() == 1 + 1  # +1 unit for 'other_reservation'
-    assert ReservationUnit.objects.count() == 23 + 1  # +1 reservation unit for 'other_reservation'
-    assert Space.objects.count() == 23
-    assert ReservationUnitPricing.objects.count() == 23
-    assert ReservationUnitAccessType.objects.count() == 23
+    assert ReservationUnit.objects.count() == 20 + 1  # +1 reservation unit for 'other_reservation'
+    assert Space.objects.count() == 20
+    assert ReservationUnitPricing.objects.count() == 20
+    assert ReservationUnitAccessType.objects.count() == 20
     assert User.objects.count() == 29 + 1  # +1 user for other entities
     assert ApplicationRound.objects.count() == 1 + 1  # +1 application round for 'other_application'
     assert Reservation.objects.count() == 1 + 1  # +1 reservation for 'other_reservation'
@@ -219,6 +244,8 @@ def test_create_robot_test_data__remove_existing_data_between_runs():
 @pytest.mark.slow
 @pytest.mark.django_db
 def test_create_robot_test_data__users_can_exist_before_run():
+    _create_required_data()
+
     UserFactory.create(username="u-5ubvcxgrxzdf5nj7y4sbjnvyeq")
 
     create_robot_test_data()
@@ -257,3 +284,98 @@ def mock_data_generation() -> Generator[NonCallableMock]:
     path = "tilavarauspalvelu.api.rest.views.create_robot_test_data"
     with patch(path) as mock:
         yield mock
+
+
+def _create_required_data():
+    ReservationUnitTypeFactory.create(name="Kokoustila")
+
+    ReservationMetadataSetFactory.create(name="Lomake 1")
+    ReservationMetadataSetFactory.create(name="Lomake 2")
+    ReservationMetadataSetFactory.create(name="Lomake 3")
+    ReservationMetadataSetFactory.create(name="Lomake 3 - maksuttomuuspyyntö sallittu")
+    ReservationMetadataSetFactory.create(name="Lomake 4 - maksuttomuuspyyntö sallittu")
+
+    ReservationUnitCancellationRuleFactory.create(name="Varauksen alkuun asti")
+    ReservationUnitCancellationRuleFactory.create(name="14 vrk ennen alkamista")
+
+    TermsOfUseFactory.create(id="pay0")
+    TermsOfUseFactory.create(id="pay1")
+    TermsOfUseFactory.create(id="pay3")
+    TermsOfUseFactory.create(id="pay4")
+    TermsOfUseFactory.create(id="cancel0days")
+    TermsOfUseFactory.create(id="cancel0days_delayok")
+    TermsOfUseFactory.create(id="cancel2weeks")
+    TermsOfUseFactory.create(id="KUVAlaite")
+    TermsOfUseFactory.create(id="KUVA_oodi")
+    TermsOfUseFactory.create(id="KUVA_nupa")
+    TermsOfUseFactory.create(id="KUVA_oodi_maksuton")
+    TermsOfUseFactory.create(id="KUVA_nupakausi")
+    TermsOfUseFactory.create(id="pricing_nupa")
+    TermsOfUseFactory.create(id="KUVAnupa")
+
+    PurposeFactory.create(name="Harrasta yhdessä")
+    PurposeFactory.create(name="Järjestä tapahtuma")
+    PurposeFactory.create(name="Käytä laitteita")
+    PurposeFactory.create(name="Liiku ja rentoudu")
+    PurposeFactory.create(name="Löydä juhlatila")
+    PurposeFactory.create(name="Pidä kokous")
+    PurposeFactory.create(name="Tee musiikkia tai äänitä")
+    PurposeFactory.create(name="Työskentele yksin tai ryhmässä")
+
+    ReservationPurposeFactory.create(name="Harrastustoiminta, muu")
+
+    EquipmentFactory.create(name="Äänitekniikka")
+    EquipmentFactory.create(name="Astianpesukone")
+    EquipmentFactory.create(name="Perusastiasto ja -keittiövälineet")
+    EquipmentFactory.create(name="Biljardipöytä")
+    EquipmentFactory.create(name="ClickShare")
+    EquipmentFactory.create(name="Esiintymislava")
+    EquipmentFactory.create(name="HDMI")
+    EquipmentFactory.create(name="Muu internet-yhteys")
+    EquipmentFactory.create(name="Istumapaikkoja")
+    EquipmentFactory.create(name="Jääkaappi")
+    EquipmentFactory.create(name="Jatkojohto")
+    EquipmentFactory.create(name="Kahvinkeitin")
+    EquipmentFactory.create(name="Liesi")
+    EquipmentFactory.create(name="Liikuntavälineitä")
+    EquipmentFactory.create(name="Mikroaaltouuni")
+    EquipmentFactory.create(name="Näyttö")
+    EquipmentFactory.create(name="Pakastin")
+    EquipmentFactory.create(name="Peiliseinä")
+    EquipmentFactory.create(name="Piano")
+    EquipmentFactory.create(name="Pöytä tai pöytiä")
+    EquipmentFactory.create(name="Sähkörummut")
+    EquipmentFactory.create(name="SCART")
+    EquipmentFactory.create(name="Sohvaryhmä")
+    EquipmentFactory.create(name="Studiolaitteisto")
+    EquipmentFactory.create(name="Tietokone")
+    EquipmentFactory.create(name="Uuni")
+    EquipmentFactory.create(name="Valkotaulu, tussitaulu")
+    EquipmentFactory.create(name="Vedenkeitin")
+    EquipmentFactory.create(name="Vesipiste")
+
+    TaxPercentageFactory.create(value=Decimal("0.0"))
+    TaxPercentageFactory.create(value=Decimal("25.5"))
+
+    OriginHaukiResourceFactory.create(id="2952865")
+    OriginHaukiResourceFactory.create(id="2956668")
+    OriginHaukiResourceFactory.create(id="2958620")
+    OriginHaukiResourceFactory.create(id="2956344")
+    OriginHaukiResourceFactory.create(id="2959295")
+    OriginHaukiResourceFactory.create(id="2959623")
+    OriginHaukiResourceFactory.create(id="2964786")
+    OriginHaukiResourceFactory.create(id="2964787")
+    OriginHaukiResourceFactory.create(id="2959579")
+    OriginHaukiResourceFactory.create(id="2959580")
+    OriginHaukiResourceFactory.create(id="2959581")
+
+    PaymentMerchantFactory.create(id="c9acaa73-b582-471c-b002-b038a8c00fb1")
+    PaymentMerchantFactory.create(id="9be158db-8e3a-4560-8e68-f3214b207d6c")
+
+    PaymentProductFactory.create(id="630dcc27-1ff1-3e12-b1ea-9df2571a36bc")
+    PaymentProductFactory.create(id="eee7a1a4-b309-3919-aa7b-6d7eb675f9f4")
+    PaymentProductFactory.create(id="19161df6-9f1c-3a0f-a953-d013ca2e3c0c")
+    PaymentProductFactory.create(id="3cc8c05f-78cc-391c-b442-4f1b251697d3")
+    PaymentProductFactory.create(id="db9cb2d4-0a72-3e5e-a5b6-9479ef59e256")
+
+    PaymentAccountingFactory.create(name="Pihlajasaarten testikirjasto")

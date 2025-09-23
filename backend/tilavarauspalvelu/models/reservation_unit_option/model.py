@@ -4,12 +4,11 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from lazy_managers import LazyModelAttribute, LazyModelManager
+
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import AllocatedTimeSlot, ApplicationSection, ReservationUnit
-    from tilavarauspalvelu.models._base import OneToManyRelatedManager
-    from tilavarauspalvelu.models.allocated_timeslot.queryset import AllocatedTimeSlotQuerySet
+    from tilavarauspalvelu.models import ApplicationSection, ReservationUnit
 
     from .actions import ReservationUnitOptionActions
     from .queryset import ReservationUnitOptionManager
@@ -40,8 +39,6 @@ class ReservationUnitOption(models.Model):
     objects: ClassVar[ReservationUnitOptionManager] = LazyModelManager.new()
     actions: ReservationUnitOptionActions = LazyModelAttribute.new()
     validators: ReservationUnitOptionValidator = LazyModelAttribute.new()
-
-    allocated_time_slots: OneToManyRelatedManager[AllocatedTimeSlot, AllocatedTimeSlotQuerySet]
 
     class Meta:
         db_table = "reservation_unit_option"

@@ -7,7 +7,6 @@ from lookup_property import L
 
 from tilavarauspalvelu.enums import ApplicationStatusChoice
 from tilavarauspalvelu.models import Application
-from utils.date_utils import local_datetime
 
 from tests.factories import (
     AllocatedTimeSlotFactory,
@@ -24,7 +23,7 @@ pytestmark = [
 
 
 def test_application__status():
-    now = local_datetime()
+    now = datetime.datetime.now(tz=datetime.UTC)
     application_round = ApplicationRoundFactory.create(
         application_period_begins_at=now - datetime.timedelta(days=7),
         application_period_ends_at=now + datetime.timedelta(days=1),
@@ -98,7 +97,7 @@ def test_application__status():
 
 
 def test_application__all_sections_allocated():
-    now = local_datetime()
+    now = datetime.datetime.now(tz=datetime.UTC)
     application_round = ApplicationRoundFactory.create(
         application_period_begins_at=now - datetime.timedelta(days=7),
         application_period_ends_at=now + datetime.timedelta(days=1),

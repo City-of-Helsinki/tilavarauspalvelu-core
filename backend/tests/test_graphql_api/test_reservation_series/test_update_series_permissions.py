@@ -28,10 +28,8 @@ def test_reservation_series__update_series__general_admin(graphql, role, has_per
     series = ReservationSeriesFactory.create()
 
     data = {"pk": series.id, "name": "New name"}
-    user = UserFactory.create_with_general_role(role=role)
-    graphql.force_login(user)
-
-    response = graphql(UPDATE_SERIES_MUTATION, variables={"input": data})
+    graphql.login_user_with_role(role=role)
+    response = graphql(UPDATE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is not has_permission
 
@@ -43,7 +41,7 @@ def test_reservation_series__update_series__general_reserver__own_reservation(gr
 
     data = {"pk": series.id, "name": "New name"}
     graphql.force_login(user=user)
-    response = graphql(UPDATE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
@@ -64,7 +62,7 @@ def test_reservation_series__update_series__unit_admin(graphql, role, has_permis
 
     data = {"pk": series.id, "name": "New name"}
     graphql.force_login(user)
-    response = graphql(UPDATE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is not has_permission
 
@@ -76,6 +74,6 @@ def test_reservation_series__update_series__unit_reserver__own_reservation(graph
 
     data = {"pk": series.id, "name": "New name"}
     graphql.force_login(user)
-    response = graphql(UPDATE_SERIES_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False

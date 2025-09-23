@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from tilavarauspalvelu.models import AffectingTimeSpan
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from django.db import models
 
 __all__ = [
     "AffectingTimeSpanManager",
@@ -9,7 +8,7 @@ __all__ = [
 ]
 
 
-class AffectingTimeSpanQuerySet(ModelQuerySet[AffectingTimeSpan]): ...
+class AffectingTimeSpanQuerySet(models.QuerySet): ...
 
 
-class AffectingTimeSpanManager(ModelManager[AffectingTimeSpan, AffectingTimeSpanQuerySet]): ...
+class AffectingTimeSpanManager(models.Manager.from_queryset(AffectingTimeSpanQuerySet)): ...

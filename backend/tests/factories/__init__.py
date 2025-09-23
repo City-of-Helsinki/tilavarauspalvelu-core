@@ -7,7 +7,6 @@ from .application_round import ApplicationRoundFactory
 from .application_round_time_slot import ApplicationRoundTimeSlotFactory
 from .application_section import ApplicationSectionFactory
 from .banner_notification import BannerNotificationFactory
-from .email_message import EmailMessageFactory
 from .equipment import EquipmentFactory
 from .equipment_category import EquipmentCategoryFactory
 from .general_role import GeneralRoleFactory
@@ -53,7 +52,6 @@ __all__ = [
     "ApplicationRoundTimeSlotFactory",
     "ApplicationSectionFactory",
     "BannerNotificationFactory",
-    "EmailMessageFactory",
     "EquipmentCategoryFactory",
     "EquipmentFactory",
     "GeneralRoleFactory",

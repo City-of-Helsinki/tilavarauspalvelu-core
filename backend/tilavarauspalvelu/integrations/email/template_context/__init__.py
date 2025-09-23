@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from .reservation import (
+    get_context_for_reservation_access_code_added,
     get_context_for_reservation_access_code_changed,
-    get_context_for_reservation_access_type_changed,
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
     get_context_for_reservation_confirmed,
@@ -14,8 +14,8 @@ from .reservation import (
     get_context_for_reservation_rescheduled,
 )
 from .seasonal_bookings import (
+    get_context_for_seasonal_booking_access_code_added,
     get_context_for_seasonal_booking_access_code_changed,
-    get_context_for_seasonal_booking_access_type_changed,
     get_context_for_seasonal_booking_application_received,
     get_context_for_seasonal_booking_application_round_handled,
     get_context_for_seasonal_booking_application_round_in_allocation,
@@ -30,8 +30,8 @@ from .seasonal_bookings import (
 from .user import get_context_for_user_anonymization, get_context_for_user_permissions_deactivation
 
 __all__ = [
+    "get_context_for_reservation_access_code_added",
     "get_context_for_reservation_access_code_changed",
-    "get_context_for_reservation_access_type_changed",
     "get_context_for_reservation_approved",
     "get_context_for_reservation_cancelled",
     "get_context_for_reservation_confirmed",
@@ -41,8 +41,8 @@ __all__ = [
     "get_context_for_reservation_requires_handling_staff_notification",
     "get_context_for_reservation_requires_payment",
     "get_context_for_reservation_rescheduled",
+    "get_context_for_seasonal_booking_access_code_added",
     "get_context_for_seasonal_booking_access_code_changed",
-    "get_context_for_seasonal_booking_access_type_changed",
     "get_context_for_seasonal_booking_application_received",
     "get_context_for_seasonal_booking_application_round_handled",
     "get_context_for_seasonal_booking_application_round_in_allocation",

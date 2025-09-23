@@ -12,12 +12,18 @@ pytestmark = [
 
 
 def test_application_sections__query__perms__anonymous_user(graphql):
+    # given:
+    # - There is an application section
+    # - An anonymous user is using the system
     ApplicationSectionFactory.create_in_status_unallocated()
 
+    # when:
+    # - The user queries for application sections
     response = graphql(sections_query())
 
-    assert response.has_errors is False, response.errors
-    assert response.edges == []
+    # then:
+    # - The response contains an error about permissions
+    assert response.error_message() == "No permission to access node."
 
 
 def test_application_sections__query__perms__superuser(graphql):

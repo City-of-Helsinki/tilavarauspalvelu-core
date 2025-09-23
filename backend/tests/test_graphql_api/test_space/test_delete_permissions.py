@@ -21,11 +21,11 @@ def test_regular_user_cannot_delete_space(graphql):
 
     # when:
     # - User tries to delete the space
-    response = graphql(DELETE_MUTATION, variables={"input": {"pk": space.pk}})
+    response = graphql(DELETE_MUTATION, input_data={"pk": space.pk})
 
     # then:
     # - Response complains about mutation permissions
-    assert response.error_message(0) == "No permission to delete a space"
+    assert response.error_message() == "No permission to delete."
 
 
 def test_unit_admin_can_delete_space(graphql):
@@ -38,7 +38,7 @@ def test_unit_admin_can_delete_space(graphql):
 
     # when:
     # - User tries to delete the space
-    response = graphql(DELETE_MUTATION, variables={"input": {"pk": space.pk}})
+    response = graphql(DELETE_MUTATION, input_data={"pk": space.pk})
 
     # then:
     # - Response has no errors
@@ -56,11 +56,11 @@ def test_unit_admin_can_delete_space_if_not_for_spaces_unit(graphql):
 
     # when:
     # - User tries to delete the space
-    response = graphql(DELETE_MUTATION, variables={"input": {"pk": space.pk}})
+    response = graphql(DELETE_MUTATION, input_data={"pk": space.pk})
 
     # then:
     # - Response complains about mutation permissions
-    assert response.error_message(0) == "No permission to delete a space"
+    assert response.error_message() == "No permission to delete."
 
 
 def test_general_admin_can_delete_space(graphql):
@@ -73,7 +73,7 @@ def test_general_admin_can_delete_space(graphql):
 
     # when:
     # - User tries to delete the space
-    response = graphql(DELETE_MUTATION, variables={"input": {"pk": space.pk}})
+    response = graphql(DELETE_MUTATION, input_data={"pk": space.pk})
 
     # then:
     # - Response has no errors

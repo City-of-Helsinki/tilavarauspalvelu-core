@@ -40,7 +40,7 @@ export const SpaceUpdateSchema = z.object({
   // optional because of TS, update requires it, create can't have it
   pk: z.number().optional(),
   parent: z.number().nullable(),
-  code: z.string().optional(),
+  code: z.string().nullish(),
 });
 
 export type SpaceUpdateForm = z.infer<typeof SpaceUpdateSchema>;

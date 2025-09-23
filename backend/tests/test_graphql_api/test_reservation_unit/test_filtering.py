@@ -4,13 +4,13 @@ import datetime
 from typing import NamedTuple
 
 import pytest
+from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import (
     AccessType,
     ReservationKind,
     ReservationUnitPublishingState,
     ReservationUnitReservationState,
-    UserRoleChoice,
 )
 from utils.date_utils import local_date, local_datetime
 
@@ -22,10 +22,8 @@ from tests.factories import (
     ReservationUnitTypeFactory,
     UnitFactory,
     UnitGroupFactory,
-    UnitRoleFactory,
     UserFactory,
 )
-from tests.helpers import parametrize_helper
 
 from .helpers import (
     create_reservation_units_for_reservation_state_filtering,
@@ -355,7 +353,7 @@ def test_reservation_unit__filter__by_name_fi(graphql):
     reservation_unit = ReservationUnitFactory.create(name_fi="foo")
     ReservationUnitFactory.create(name_fi="bar")
 
-    query = reservation_units_query(nameFiExact="foo")
+    query = reservation_units_query(nameFi="foo")
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
@@ -398,11 +396,11 @@ def test_reservation_unit__filter__by_rank(graphql):
 
 
 def test_reservation_unit__filter__by_reservation_unit_type_rank(graphql):
-    type_1 = ReservationUnitTypeFactory.create(rank=1)
-    type_2 = ReservationUnitTypeFactory.create(rank=2)
-    type_3 = ReservationUnitTypeFactory.create(rank=3)
-    type_4 = ReservationUnitTypeFactory.create(rank=4)
-    type_5 = ReservationUnitTypeFactory.create(rank=5)
+    type_1 = ReservationUnitTypeFactory(rank=1)
+    type_2 = ReservationUnitTypeFactory(rank=2)
+    type_3 = ReservationUnitTypeFactory(rank=3)
+    type_4 = ReservationUnitTypeFactory(rank=4)
+    type_5 = ReservationUnitTypeFactory(rank=5)
 
     ReservationUnitFactory.create(reservation_unit_type=type_1)
     reservation_unit_1 = ReservationUnitFactory.create(reservation_unit_type=type_2)
@@ -426,26 +424,10 @@ def test_reservation_unit__filter__application_rounds__by_active(graphql):
     application_round = ApplicationRoundFactory.create_in_status_open(reservation_units=[reservation_unit])
     ApplicationRoundFactory.create_in_status_in_allocation(reservation_units=[reservation_unit])
 
-    query = """
-        query {
-            reservationUnits(
-                orderBy: pkAsc
-            ) {
-                edges {
-                    node {
-                        applicationRounds(
-                            filter: {
-                                active: true
-                            }
-                        ) {
-                            pk
-                        }
-                    }
-                }
-            }
-        }
-    """
-
+    query = reservation_units_query(
+        fields="applicationRounds { pk }",
+        application_rounds__active=True,
+    )
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
@@ -587,60 +569,18 @@ def test_reservation_unit__filter__only_with_permission__general_admin(graphql):
 
 
 def test_reservation_unit__filter__only_with_permission__unit_admin(graphql):
-    reservation_unit_1 = ReservationUnitFactory.create()
-    reservation_unit_2 = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create()
     ReservationUnitFactory.create()
 
-    user = UserFactory.create()
-
-    UnitRoleFactory.create(user=user, role=UserRoleChoice.ADMIN, units=[reservation_unit_1.unit])
-    UnitRoleFactory.create(user=user, role=UserRoleChoice.VIEWER, units=[reservation_unit_2.unit])
-
+    user = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
     graphql.force_login(user)
 
     query = reservation_units_query(onlyWithPermission=True)
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": reservation_unit_1.pk}
-    assert response.node(1) == {"pk": reservation_unit_2.pk}
-
-
-def test_reservation_unit__filter__only_with_manage_permission__general_admin(graphql):
-    reservation_unit_1 = ReservationUnitFactory.create()
-    reservation_unit_2 = ReservationUnitFactory.create()
-
-    user = UserFactory.create_with_general_role()
-    graphql.force_login(user)
-
-    query = reservation_units_query(onlyWithManagePermission=True)
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": reservation_unit_1.pk}
-    assert response.node(1) == {"pk": reservation_unit_2.pk}
-
-
-def test_reservation_unit__filter__only_with_manage_permission__unit_admin(graphql):
-    reservation_unit_1 = ReservationUnitFactory.create()
-    reservation_unit_2 = ReservationUnitFactory.create()
-    ReservationUnitFactory.create()
-
-    user = UserFactory.create()
-
-    UnitRoleFactory.create(user=user, role=UserRoleChoice.ADMIN, units=[reservation_unit_1.unit])
-    UnitRoleFactory.create(user=user, role=UserRoleChoice.VIEWER, units=[reservation_unit_2.unit])
-
-    graphql.force_login(user)
-
-    query = reservation_units_query(onlyWithManagePermission=True)
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
-    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(0) == {"pk": reservation_unit.pk}
 
 
 # Reservation state
@@ -881,38 +821,13 @@ def test_reservation_unit__filter__by_access_type(graphql):
     ReservationUnitFactory.create(name="access code", access_types__access_type=AccessType.ACCESS_CODE)
     ReservationUnitFactory.create(name="opened by staff", access_types__access_type=AccessType.OPENED_BY_STAFF)
 
-    query = """
-        query (
-            $accessTypes: [AccessType!]!
-            $accessTypeBeginDate: Date!
-            $accessTypeEndDate: Date!
-        ) {
-            reservationUnits(
-                orderBy: pkAsc
-                filter: {
-                    accessType: {
-                        accessTypes: $accessTypes
-                        accessTypeBeginDate: $accessTypeBeginDate
-                        accessTypeEndDate: $accessTypeEndDate
-                    }
-                }
-            ) {
-                edges {
-                    node {
-                        nameFi
-                    }
-                }
-            }
-        }
-    """
-
-    variables = {
-        "accessTypes": AccessType.PHYSICAL_KEY,
-        "accessTypeBeginDate": today.isoformat(),
-        "accessTypeEndDate": (today + datetime.timedelta(days=1)).isoformat(),
-    }
-
-    response = graphql(query, variables=variables)
+    query = reservation_units_query(
+        fields="nameFi",
+        access_type=AccessType.PHYSICAL_KEY,
+        access_type_begin_date=today.isoformat(),
+        access_type_end_date=(today + datetime.timedelta(days=1)).isoformat(),
+    )
+    response = graphql(query)
 
     assert response.has_errors is False
     assert len(response.edges) == 1
@@ -938,35 +853,9 @@ def test_reservation_unit__filter__by_access_type__no_period(graphql):
     ReservationUnitFactory.create(name="keyless", access_types__access_type=AccessType.ACCESS_CODE)
     ReservationUnitFactory.create(name="opened by staff", access_types__access_type=AccessType.OPENED_BY_STAFF)
 
-    query = """
-        query (
-            $accessTypes: [AccessType!]!
-        ) {
-            reservationUnits(
-                orderBy: pkAsc
-                filter: {
-                    accessType: {
-                        accessTypes: $accessTypes
-
-                    }
-                }
-            ) {
-                edges {
-                    node {
-                        nameFi
-                    }
-                }
-            }
-        }
-    """
-
-    variables = {
-        "accessTypes": AccessType.PHYSICAL_KEY,
-    }
-
+    query = reservation_units_query(fields="nameFi", access_type=AccessType.PHYSICAL_KEY)
     graphql.login_with_superuser()
-
-    response = graphql(query, variables=variables)
+    response = graphql(query)
 
     assert response.has_errors is False
     assert len(response.edges) == 1

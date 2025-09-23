@@ -5,6 +5,8 @@ import uuid
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
+from graphene_django_extensions.testing import build_mutation, build_query
+
 from tilavarauspalvelu.enums import ReservationTypeChoice, Weekday
 from tilavarauspalvelu.integrations.keyless_entry.typing import (
     PindoraReservationSeriesAccessCodeValidity,
@@ -14,12 +16,12 @@ from tilavarauspalvelu.models import ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local_time
 
 from tests.factories import ReservationSeriesFactory
-from tests.query_builder import build_mutation, build_query
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationSeries, ReservationUnit
+    from tilavarauspalvelu.models import ReservationSeries, ReservationUnit, User
 
-reservation_series_query = partial(build_query, "reservationSeries", connection=True, order_by="nameAsc")
+reservation_series_single_query = partial(build_query, "reservationSeries")
+reservation_series_many_query = partial(build_query, "pagedReservationSeries", connection=True, order_by="nameAsc")
 
 CREATE_SERIES_MUTATION = build_mutation("createReservationSeries", "ReservationSeriesCreateMutation")
 UPDATE_SERIES_MUTATION = build_mutation("updateReservationSeries", "ReservationSeriesUpdateMutation")
@@ -47,7 +49,7 @@ REPAIR_ACCESS_CODE_SERIES_MUTATION = build_mutation(
 )
 
 
-def get_minimal_series_data(reservation_unit: ReservationUnit, **overrides: Any) -> dict[str, Any]:
+def get_minimal_series_data(reservation_unit: ReservationUnit, user: User, **overrides: Any) -> dict[str, Any]:
     return {
         "weekdays": [Weekday.MONDAY.value],
         "beginDate": datetime.date(2024, 1, 1).isoformat(),  # Mon
@@ -58,6 +60,7 @@ def get_minimal_series_data(reservation_unit: ReservationUnit, **overrides: Any)
         "recurrenceInDays": 7,
         "reservationDetails": {
             "type": ReservationTypeChoice.STAFF.value,
+            "user": user.pk,
         },
         **overrides,
     }

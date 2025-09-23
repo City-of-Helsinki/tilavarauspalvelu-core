@@ -1,57 +1,54 @@
-import datetime
-import uuid
-from inspect import cleandoc
-from typing import Any, TypedDict
+from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
+import graphene
 from django.contrib.auth import logout
-from undine import Entrypoint, GQLInfo, RootType, create_schema
-from undine.exceptions import GraphQLModelNotFoundError
-from undine.optimizer.optimizer import optimize_sync
-from undine.relay import Connection, Node
+from graphene import Field
+from graphene_django_extensions.errors import GQLNotFoundError
+from query_optimizer import DjangoListField, optimize_single
+from query_optimizer.compiler import optimize
 
-from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReservationStateChoice, UserPermissionChoice
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice, UserPermissionChoice
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
-from tilavarauspalvelu.integrations.helsinki_profile.typing import PermissionCheckResult, UserProfileInfo
 from tilavarauspalvelu.models import AllocatedTimeSlot, PaymentOrder, Reservation, User
+from tilavarauspalvelu.models.banner_notification.model import BannerNotification
 from tilavarauspalvelu.translation import translated
-from utils.date_utils import local_end_of_day, local_start_of_day
 
-from .types import (
-    AgeGroupNode,
+from .mutations import (
     AllocatedTimeSlotCreateMutation,
     AllocatedTimeSlotDeleteMutation,
-    AllocatedTimeSlotNode,
     ApplicationCancelMutation,
     ApplicationCreateMutation,
-    ApplicationNode,
-    ApplicationRoundNode,
-    ApplicationSectionNode,
+    ApplicationSectionCreateMutation,
+    ApplicationSectionDeleteMutation,
     ApplicationSectionReservationCancellationMutation,
+    ApplicationSectionUpdateMutation,
     ApplicationSendMutation,
     ApplicationUpdateMutation,
     ApplicationWorkingMemoMutation,
     BannerNotificationCreateMutation,
     BannerNotificationDeleteMutation,
-    BannerNotificationNode,
     BannerNotificationUpdateMutation,
-    EquipmentCategoryNode,
-    EquipmentNode,
-    PaymentOrderNode,
-    PurposeNode,
+    CurrentUserUpdateMutation,
+    EquipmentCategoryCreateMutation,
+    EquipmentCategoryDeleteMutation,
+    EquipmentCategoryUpdateMutation,
+    EquipmentCreateMutation,
+    EquipmentDeleteMutation,
+    EquipmentUpdateMutation,
+    PurposeCreateMutation,
+    PurposeUpdateMutation,
     RejectAllApplicationOptionsMutation,
     RejectAllSectionOptionsMutation,
-    RejectedOccurrenceNode,
     ReservationAdjustTimeMutation,
     ReservationApproveMutation,
-    ReservationCancelMutation,
+    ReservationCancellationMutation,
     ReservationConfirmMutation,
     ReservationCreateMutation,
+    ReservationDeleteMutation,
     ReservationDeleteTentativeMutation,
     ReservationDenyMutation,
-    ReservationDenyReasonNode,
-    ReservationMetadataSetNode,
-    ReservationNode,
-    ReservationPurposeNode,
     ReservationRefundMutation,
     ReservationRequiresHandlingMutation,
     ReservationSeriesAddMutation,
@@ -66,16 +63,11 @@ from .types import (
     ReservationStaffCreateMutation,
     ReservationStaffModifyMutation,
     ReservationStaffRepairAccessCodeMutation,
-    ReservationUnitAllNode,
-    ReservationUnitArchiveMutation,
-    ReservationUnitCancellationRuleNode,
     ReservationUnitCreateMutation,
     ReservationUnitImageCreateMutation,
     ReservationUnitImageDeleteMutation,
     ReservationUnitImageUpdateMutation,
-    ReservationUnitNode,
     ReservationUnitOptionUpdateMutation,
-    ReservationUnitTypeNode,
     ReservationUnitUpdateMutation,
     ReservationUpdateMutation,
     ReservationWorkingMemoMutation,
@@ -89,6 +81,36 @@ from .types import (
     SpaceCreateMutation,
     SpaceDeleteMutation,
     SpaceUpdateMutation,
+    UnitUpdateMutation,
+    UserStaffUpdateMutation,
+)
+from .queries import (
+    AgeGroupNode,
+    AllocatedTimeSlotNode,
+    ApplicationNode,
+    ApplicationRoundNode,
+    ApplicationSectionNode,
+    BannerNotificationNode,
+    EquipmentAllNode,
+    EquipmentCategoryNode,
+    EquipmentNode,
+    HelsinkiProfileDataNode,
+    PaymentOrderNode,
+    PermissionCheckerType,
+    PurposeNode,
+    RejectedOccurrenceNode,
+    ReservationCancelReasonType,
+    ReservationDenyReasonNode,
+    ReservationMetadataSetNode,
+    ReservationNode,
+    ReservationPurposeNode,
+    ReservationSeriesNode,
+    ReservationUnitAllNode,
+    ReservationUnitCancellationRuleNode,
+    ReservationUnitNode,
+    ReservationUnitTypeNode,
+    ResourceNode,
+    SpaceNode,
     TaxPercentageNode,
     TermsOfUseNode,
     UnitAllNode,
@@ -96,161 +118,122 @@ from .types import (
     UnitNode,
     UserNode,
 )
-from .types.helsinki_profile.queries import HelsinkiProfileResolver
-from .types.reservation_unit.queries.pagination import ReservationConnection
+from .types.payment_order.permissions import PaymentOrderPermission
+from .types.reservation_cancel_reason.types import CancelReasonDict
+
+if TYPE_CHECKING:
+    import datetime
+    from collections.abc import Collection
+
+    from django.db import models
+
+    from tilavarauspalvelu.integrations.helsinki_profile.typing import UserProfileInfo
+    from tilavarauspalvelu.typing import AnyUser, GQLInfo
 
 
-class ReservationCancelReasonType(TypedDict):
-    value: ReservationCancelReasonChoice
-    reason_fi: str
-    reason_en: str
-    reason_sv: str
-
-
-class Query(RootType):
-    # --------------------------------------------------------------------------------
-    # Node interface
-    # --------------------------------------------------------------------------------
-
-    node = Entrypoint(Node, nullable=True)
-
-    # --------------------------------------------------------------------------------
+class Query(graphene.ObjectType):
+    #
     # Seasonal booking
-    # --------------------------------------------------------------------------------
-
-    application_rounds = Entrypoint(Connection(ApplicationRoundNode))
-    applications = Entrypoint(Connection(ApplicationNode))
-    application_sections = Entrypoint(Connection(ApplicationSectionNode))
-    allocated_time_slots = Entrypoint(Connection(AllocatedTimeSlotNode))
-
-    affecting_allocated_time_slots = Entrypoint(
+    application_round = ApplicationRoundNode.Node()
+    application_rounds = ApplicationRoundNode.Connection()
+    application = ApplicationNode.Node()
+    applications = ApplicationNode.Connection()
+    application_section = ApplicationSectionNode.Node()
+    application_sections = ApplicationSectionNode.Connection()
+    allocated_time_slots = AllocatedTimeSlotNode.Connection()
+    affecting_allocated_time_slots = DjangoListField(
         AllocatedTimeSlotNode,
-        many=True,
-        description=cleandoc(
-            """
-            Return all allocations that affect allocations for the given reservation unit
-            (through space hierarchy or common resource) during the given time period.
-            """
+        reservation_unit=graphene.NonNull(graphene.Int),
+        begin_date=graphene.NonNull(graphene.Date),
+        end_date=graphene.NonNull(graphene.Date),
+        description=(
+            "Return all allocations that affect allocations for given reservation unit "
+            "(through space hierarchy or common resource) during the given time period."
         ),
+        no_filters=True,
     )
-
-    @affecting_allocated_time_slots.resolve
-    def resolve_affecting_allocated_time_slots(
-        self,
-        info: GQLInfo[User],
-        *,
-        reservation_unit: int,
-        begin_date: datetime.date,
-        end_date: datetime.date,
-    ) -> list[AllocatedTimeSlot]:
-        # TODO: Could be a Filter on AllocatedTimeSlotFilterSet?
-        queryset = AllocatedTimeSlot.objects.all().affecting_allocations(reservation_unit, begin_date, end_date)
-        return optimize_sync(queryset, info)
-
-    # --------------------------------------------------------------------------------
+    #
+    # Reservable entities
+    unit = UnitNode.Node()
+    units = UnitNode.Connection()
+    units_all = UnitAllNode.ListField()
+    resource = ResourceNode.Node()
+    resources = ResourceNode.Connection()
+    space = SpaceNode.Node()
+    spaces = SpaceNode.Connection()
+    equipment = EquipmentNode.Node()
+    equipments = EquipmentNode.Connection()
+    equipments_all = EquipmentAllNode.ListField()
+    equipment_category = EquipmentCategoryNode.Node()
+    equipment_categories = EquipmentCategoryNode.Connection()
+    #
     # Reservation units
-    # --------------------------------------------------------------------------------
-
-    units = Entrypoint(Connection(UnitNode))
-    reservation_units = Entrypoint(ReservationConnection(ReservationUnitNode))
-    reservation_unit_cancellation_rules = Entrypoint(Connection(ReservationUnitCancellationRuleNode))
-
-    # --------------------------------------------------------------------------------
+    reservation_unit = ReservationUnitNode.Node()
+    reservation_units = ReservationUnitNode.Connection()
+    reservation_units_all = ReservationUnitAllNode.ListField()
+    reservation_unit_types = ReservationUnitTypeNode.Connection()
+    reservation_unit_cancellation_rules = ReservationUnitCancellationRuleNode.Connection()
+    tax_percentages = TaxPercentageNode.Connection()
+    metadata_sets = ReservationMetadataSetNode.Connection()
+    purposes = PurposeNode.Connection()
+    #
     # Reservations
-    # --------------------------------------------------------------------------------
-
-    reservations = Entrypoint(Connection(ReservationNode))
-    rejected_occurrences = Entrypoint(Connection(RejectedOccurrenceNode))
-
-    order = Entrypoint(PaymentOrderNode)
-
-    @order.resolve
-    def resolve_order(self, info: GQLInfo[User], *, order_uuid: uuid.UUID) -> PaymentOrder:
-        queryset = PaymentOrder.objects.filter(reservation__isnull=False)
-
-        order = optimize_sync(queryset, info, remote_id=order_uuid)
-        if order is None:
-            msg = f"PaymentOrder {str(order_uuid)!r} does not exist."
-            raise GraphQLModelNotFoundError(msg)
-
-        return order
-
-    affecting_reservations = Entrypoint(
+    reservation = ReservationNode.Node()
+    reservations = ReservationNode.Connection()
+    affecting_reservations = DjangoListField(
         ReservationNode,
-        many=True,
-        description=cleandoc(
-            """
-            Find all reservations that affect other reservations through the space hierarchy or a common resource.
-            """
+        description=(
+            "Find all reservations that affect other reservations through the space hierarchy or a common resource."
+        ),
+        for_units=graphene.List(
+            graphene.Int,
+            default_value=(),
+            description="Reservations should contain at least one reservation unit that belongs to any of these units.",
+        ),
+        for_reservation_units=graphene.List(
+            graphene.Int,
+            default_value=(),
+            description="Reservations should contain at least one these reservation units.",
         ),
     )
-
-    @affecting_reservations.resolve
-    def resolve_affecting_reservations(
-        self,
-        info: GQLInfo[User],
-        *,
-        begin_date: datetime.date,
-        end_date: datetime.date,
-        state: list[ReservationStateChoice] | None = None,
-        for_units: list[int] | None = None,
-        for_reservation_units: list[int] | None = None,
-    ) -> list[Reservation]:
-        # TODO: Could be a Filter on ReservationFilterSet?
-        queryset = (
-            Reservation.objects.all()
-            .affecting_reservations(
-                units=for_units or [],
-                reservation_units=for_reservation_units or [],
-            )
-            .filter(
-                ends_at__gte=local_start_of_day(begin_date),
-                begins_at__lte=local_end_of_day(end_date),
-            )
-        )
-        if state is not None:
-            queryset = queryset.filter(state__in=state)
-
-        return optimize_sync(queryset, info)
-
-    # --------------------------------------------------------------------------------
-    # Dropdown options
-    # --------------------------------------------------------------------------------
-
-    all_units = Entrypoint(UnitAllNode, many=True)
-    all_unit_groups = Entrypoint(UnitGroupNode, many=True)
-    all_equipments = Entrypoint(EquipmentNode, many=True)
-    all_equipment_categories = Entrypoint(EquipmentCategoryNode, many=True)
-    all_reservation_units = Entrypoint(ReservationUnitAllNode, many=True)
-    all_tax_percentages = Entrypoint(TaxPercentageNode, many=True)
-    all_purposes = Entrypoint(PurposeNode, many=True)
-    all_metadata_sets = Entrypoint(ReservationMetadataSetNode, many=True)
-    all_reservation_unit_types = Entrypoint(ReservationUnitTypeNode, many=True)
-    all_age_groups = Entrypoint(AgeGroupNode, many=True)
-    all_reservation_deny_reasons = Entrypoint(ReservationDenyReasonNode, many=True)
-    all_reservation_purposes = Entrypoint(ReservationPurposeNode, many=True)
-    all_terms_of_use = Entrypoint(TermsOfUseNode, many=True)
-
-    @Entrypoint
-    def all_reservation_cancel_reasons(self) -> list[ReservationCancelReasonType]:
-        return [
-            ReservationCancelReasonType(
-                value=reason.value,
-                reason_fi=translated(reason.label, "fi"),
-                reason_en=translated(reason.label, "en"),
-                reason_sv=translated(reason.label, "sv"),
-            )
-            for reason in ReservationCancelReasonChoice.user_selectable
-        ]
-
-    # --------------------------------------------------------------------------------
+    reservation_series = ReservationSeriesNode.Node()
+    paged_reservation_series = ReservationSeriesNode.Connection()
+    rejected_occurrence = RejectedOccurrenceNode.Node()
+    rejected_occurrences = RejectedOccurrenceNode.Connection()
+    reservation_cancel_reasons = Field(graphene.List(graphene.NonNull(ReservationCancelReasonType)), required=True)
+    reservation_deny_reasons = ReservationDenyReasonNode.Connection()
+    reservation_purposes = ReservationPurposeNode.Connection()
+    age_groups = AgeGroupNode.Connection()
+    order = Field(PaymentOrderNode, order_uuid=graphene.String(required=True))
+    #
     # User
-    # --------------------------------------------------------------------------------
+    user = UserNode.Node()
+    current_user = UserNode.Field()
+    check_permissions = Field(
+        PermissionCheckerType,
+        permission=graphene.NonNull(graphene.Enum.from_enum(UserPermissionChoice)),
+        units=graphene.List(graphene.NonNull(graphene.Int)),
+        require_all=graphene.Argument(graphene.Boolean, default_value=False),
+    )
+    profile_data = Field(
+        HelsinkiProfileDataNode,
+        application_pk=graphene.Int(description="View profile data for this application's user."),
+        reservation_pk=graphene.Int(description="View profile data for this reservation's user."),
+        description=(
+            "Get information about a user from Helsinki profile. "
+            "If user is not a profile user, still return data stored in our database, e.g. first and last name. "
+            "Use only one of 'reservation_pk' or 'application_pk' to select the user. "
+            "This determines the required permissions to view the user's data."
+        ),
+    )
+    #
+    # Misc.
+    terms_of_use = TermsOfUseNode.Connection()
+    banner_notification = BannerNotificationNode.Node()
+    banner_notifications = BannerNotificationNode.Connection()
+    unit_groups = UnitGroupNode.Connection()
 
-    current_user = Entrypoint(UserNode, nullable=True)
-
-    @current_user.resolve
-    def resolve_current_user(self, info: GQLInfo[User]) -> User | None:
+    def resolve_current_user(root: None, info: GQLInfo, **kwargs: Any) -> User | None:
         if not info.context.user.is_active:
             logout(info.context)
             return None
@@ -259,168 +242,156 @@ class Query(RootType):
             return None
 
         HelsinkiProfileClient.ensure_token_valid(user=info.context.user, session=info.context.session)
+        return optimize_single(User.objects.all(), info, max_complexity=15, pk=info.context.user.pk)
 
-        return optimize_sync(User.objects.all(), info, pk=info.context.user.pk)
+    def resolve_profile_data(root: None, info: GQLInfo, **kwargs: Any) -> UserProfileInfo:
+        reservation_pk: int | None = kwargs.get("reservation_pk")
+        application_pk: int | None = kwargs.get("application_pk")
+        return HelsinkiProfileDataNode.get_data(info, application_pk=application_pk, reservation_pk=reservation_pk)
 
-    @current_user.permissions
-    def current_user_permissions(root: Any, info: GQLInfo[User], value: User) -> None:  # noqa: ARG002
-        """Always allow current user access."""
-        return
+    def resolve_order(root: None, info: GQLInfo, *, order_uuid: str, **kwargs: Any) -> PaymentOrder | None:
+        queryset = optimize(PaymentOrder.objects.filter(remote_id=order_uuid, reservation__isnull=False), info)
+        order = next(iter(queryset), None)  # Avoids adding additional ordering.
+        if order is None:
+            msg = f"PaymentOrder-object with orderUuid='{order_uuid}' does not exist."
+            raise GQLNotFoundError(msg)
 
-    @Entrypoint
-    def check_permissions(
-        self,
-        info: GQLInfo[User],
-        *,
-        permission: UserPermissionChoice,
-        units: list[int] | None = None,
-        require_all: bool = False,
-    ) -> PermissionCheckResult:
-        user = info.context.user
+        if PaymentOrderPermission.has_node_permission(order, info.context.user, {}):
+            return order
+        return None
 
-        # Anonymous or inactive users have no permissions
-        if user.permissions.is_user_anonymous_or_inactive():
-            return PermissionCheckResult(has_permission=False)
-
-        # Superusers have all permissions
-        if user.is_superuser:
-            return PermissionCheckResult(has_permission=True)
-
-        # Has the given permission through their general roles
-        if permission in user.active_general_permissions:
-            return PermissionCheckResult(has_permission=True)
-
-        has_permission = user.permissions.has_permission_for_unit_or_their_unit_group(
-            permission=permission,
-            unit_ids=units or [],
-            require_all=require_all,
+    def resolve_check_permissions(root: None, info: GQLInfo, **kwargs: Any) -> dict[str, bool]:
+        return PermissionCheckerType.run(
+            user=info.context.user,
+            permission=UserPermissionChoice(kwargs["permission"]),
+            unit_ids=kwargs.get("units", []),
+            require_all=kwargs.get("require_all", False),
         )
 
-        return PermissionCheckResult(has_permission=has_permission)
+    def resolve_banner_notifications(root: None, info: GQLInfo, **kwargs: Any) -> models.QuerySet[BannerNotification]:
+        user: AnyUser = info.context.user
+        if user.permissions.can_manage_notifications():
+            return BannerNotification.objects.all()
+        if kwargs.get("is_visible"):
+            return BannerNotification.objects.visible(info.context.user)
+        return BannerNotification.objects.none()
 
-    @Entrypoint
-    def profile_data(
-        self,
-        info: GQLInfo[User],
-        *,
-        application_pk: int | None = None,
-        reservation_pk: int | None = None,
-    ) -> UserProfileInfo:
-        """
-        Get information about a user from Helsinki profile.
-        If user is not a profile user, still return data stored in our database, e.g. first and last name.
+    def resolve_affecting_allocated_time_slots(
+        root: None,
+        info: GQLInfo,
+        reservation_unit: int,
+        begin_date: datetime.date,
+        end_date: datetime.date,
+    ) -> models.QuerySet:
+        return AllocatedTimeSlot.objects.affecting_allocations(reservation_unit, begin_date, end_date)
 
-        Use only one of 'reservationPk' or 'applicationPk' to select the user.
-        This determines the required permissions to view the user's data.
-        If neither is given, the user is the currently logged in user.
+    def resolve_affecting_reservations(
+        root: None,
+        info: GQLInfo,
+        for_units: Collection[int],
+        for_reservation_units: Collection[int],
+        **kwargs: Any,
+    ) -> models.QuerySet:
+        return Reservation.objects.affecting_reservations(for_units, for_reservation_units)
 
-        :param application_pk: View profile data for this application's user.
-        :param reservation_pk: View profile data for this reservation's user.
-        """
-        if reservation_pk is not None:
-            user = HelsinkiProfileResolver.get_user_from_reservation(reservation_pk, info)
-        elif application_pk is not None:
-            user = HelsinkiProfileResolver.get_user_from_application(application_pk, info)
-        else:
-            user = info.context.user
-
-        return HelsinkiProfileResolver.resolve(info, user)
-
-    # --------------------------------------------------------------------------------
-    # Banner notifications
-    # --------------------------------------------------------------------------------
-
-    banner_notifications = Entrypoint(Connection(BannerNotificationNode))
+    def resolve_reservation_cancel_reasons(root: None, info: GQLInfo, **kwargs: Any) -> list[CancelReasonDict]:
+        return [
+            CancelReasonDict(
+                value=reason.value,
+                reason_fi=translated(reason.label, "fi"),
+                reason_en=translated(reason.label, "en"),
+                reason_sv=translated(reason.label, "sv"),
+            )
+            for reason in ReservationCancelReasonChoice.user_selectable
+        ]
 
 
-class Mutation(RootType):
-    # --------------------------------------------------------------------------------
+class Mutation(graphene.ObjectType):
+    #
     # Seasonal booking
-    # --------------------------------------------------------------------------------
-
-    create_application = Entrypoint(ApplicationCreateMutation)
-    update_application = Entrypoint(ApplicationUpdateMutation)
-    send_application = Entrypoint(ApplicationSendMutation)
-    cancel_application = Entrypoint(ApplicationCancelMutation)
-    update_application_working_memo = Entrypoint(ApplicationWorkingMemoMutation)
-    create_allocated_timeslot = Entrypoint(AllocatedTimeSlotCreateMutation)
-    delete_allocated_timeslot = Entrypoint(AllocatedTimeSlotDeleteMutation)
-    update_reservation_unit_option = Entrypoint(ReservationUnitOptionUpdateMutation)
-    reject_all_section_options = Entrypoint(RejectAllSectionOptionsMutation)
-    restore_all_section_options = Entrypoint(RestoreAllSectionOptionsMutation)
-    reject_all_application_options = Entrypoint(RejectAllApplicationOptionsMutation)
-    restore_all_application_options = Entrypoint(RestoreAllApplicationOptionsMutation)
-    cancel_all_application_section_reservations = Entrypoint(ApplicationSectionReservationCancellationMutation)
-    set_application_round_handled = Entrypoint(SetApplicationRoundHandledMutation)
-    set_application_round_results_sent = Entrypoint(SetApplicationRoundResultsSentMutation)
-
-    # --------------------------------------------------------------------------------
+    create_application = ApplicationCreateMutation.Field()
+    update_application = ApplicationUpdateMutation.Field()
+    send_application = ApplicationSendMutation.Field()
+    cancel_application = ApplicationCancelMutation.Field()
+    update_application_working_memo = ApplicationWorkingMemoMutation.Field()
+    create_application_section = ApplicationSectionCreateMutation.Field()
+    update_application_section = ApplicationSectionUpdateMutation.Field()
+    delete_application_section = ApplicationSectionDeleteMutation.Field()
+    create_allocated_timeslot = AllocatedTimeSlotCreateMutation.Field()
+    delete_allocated_timeslot = AllocatedTimeSlotDeleteMutation.Field()
+    update_reservation_unit_option = ReservationUnitOptionUpdateMutation.Field()
+    reject_all_section_options = RejectAllSectionOptionsMutation.Field()
+    restore_all_section_options = RestoreAllSectionOptionsMutation.Field()
+    reject_all_application_options = RejectAllApplicationOptionsMutation.Field()
+    restore_all_application_options = RestoreAllApplicationOptionsMutation.Field()
+    cancel_all_application_section_reservations = ApplicationSectionReservationCancellationMutation.Field()
+    set_application_round_handled = SetApplicationRoundHandledMutation.Field()
+    set_application_round_results_sent = SetApplicationRoundResultsSentMutation.Field()
+    #
     # Reservable entities
-    # --------------------------------------------------------------------------------
-
-    create_space = Entrypoint(SpaceCreateMutation)
-    update_space = Entrypoint(SpaceUpdateMutation)
-    delete_space = Entrypoint(SpaceDeleteMutation)
-    create_resource = Entrypoint(ResourceCreateMutation)
-    update_resource = Entrypoint(ResourceUpdateMutation)
-    delete_resource = Entrypoint(ResourceDeleteMutation)
-
-    # --------------------------------------------------------------------------------
+    update_unit = UnitUpdateMutation.Field()
+    create_resource = ResourceCreateMutation.Field()
+    update_resource = ResourceUpdateMutation.Field()
+    delete_resource = ResourceDeleteMutation.Field()
+    create_space = SpaceCreateMutation.Field()
+    update_space = SpaceUpdateMutation.Field()
+    delete_space = SpaceDeleteMutation.Field()
+    create_equipment = EquipmentCreateMutation.Field()
+    update_equipment = EquipmentUpdateMutation.Field()
+    delete_equipment = EquipmentDeleteMutation.Field()
+    create_equipment_category = EquipmentCategoryCreateMutation.Field()
+    update_equipment_category = EquipmentCategoryUpdateMutation.Field()
+    delete_equipment_category = EquipmentCategoryDeleteMutation.Field()
+    #
     # Reservation unit
-    # --------------------------------------------------------------------------------
-
-    create_reservation_unit = Entrypoint(ReservationUnitCreateMutation)
-    update_reservation_unit = Entrypoint(ReservationUnitUpdateMutation)
-    archive_reservation_unit = Entrypoint(ReservationUnitArchiveMutation)
-    create_reservation_unit_image = Entrypoint(ReservationUnitImageCreateMutation)
-    update_reservation_unit_image = Entrypoint(ReservationUnitImageUpdateMutation)
-    delete_reservation_unit_image = Entrypoint(ReservationUnitImageDeleteMutation)
-
-    # --------------------------------------------------------------------------------
+    create_reservation_unit = ReservationUnitCreateMutation.Field()
+    update_reservation_unit = ReservationUnitUpdateMutation.Field()
+    create_reservation_unit_image = ReservationUnitImageCreateMutation.Field()
+    update_reservation_unit_image = ReservationUnitImageUpdateMutation.Field()
+    delete_reservation_unit_image = ReservationUnitImageDeleteMutation.Field()
+    create_purpose = PurposeCreateMutation.Field()
+    update_purpose = PurposeUpdateMutation.Field()
+    #
     # Reservations
-    # --------------------------------------------------------------------------------
-
-    create_reservation = Entrypoint(ReservationCreateMutation)
-    create_staff_reservation = Entrypoint(ReservationStaffCreateMutation)
-    update_reservation = Entrypoint(ReservationUpdateMutation)
-    confirm_reservation = Entrypoint(ReservationConfirmMutation)
-    cancel_reservation = Entrypoint(ReservationCancelMutation)
-    deny_reservation = Entrypoint(ReservationDenyMutation)
-    delete_tentative_reservation = Entrypoint(ReservationDeleteTentativeMutation)
-    approve_reservation = Entrypoint(ReservationApproveMutation)
-    refund_reservation = Entrypoint(ReservationRefundMutation)
-    require_handling_for_reservation = Entrypoint(ReservationRequiresHandlingMutation)
-    update_reservation_working_memo = Entrypoint(ReservationWorkingMemoMutation)
-    adjust_reservation_time = Entrypoint(ReservationAdjustTimeMutation)
-
-    # --------------------------------------------------------------------------------
+    create_reservation = ReservationCreateMutation.Field()
+    create_staff_reservation = ReservationStaffCreateMutation.Field()
+    update_reservation = ReservationUpdateMutation.Field()
+    confirm_reservation = ReservationConfirmMutation.Field()
+    cancel_reservation = ReservationCancellationMutation.Field()
+    deny_reservation = ReservationDenyMutation.Field()
+    delete_reservation = ReservationDeleteMutation.Field(  # TODO: Remove this after frontend is updated.
+        deprecation_reason="Renamed to 'deleteTentativeReservation'."
+    )
+    delete_tentative_reservation = ReservationDeleteTentativeMutation.Field()
+    approve_reservation = ReservationApproveMutation.Field()
+    refund_reservation = ReservationRefundMutation.Field()
+    require_handling_for_reservation = ReservationRequiresHandlingMutation.Field()
+    update_reservation_working_memo = ReservationWorkingMemoMutation.Field()
+    adjust_reservation_time = ReservationAdjustTimeMutation.Field()
+    #
     # Staff reservations
-    # --------------------------------------------------------------------------------
-
-    staff_adjust_reservation_time = Entrypoint(ReservationStaffAdjustTimeMutation)
-    staff_reservation_modify = Entrypoint(ReservationStaffModifyMutation)
-    staff_change_reservation_access_code = Entrypoint(ReservationStaffChangeAccessCodeMutation)
-    staff_repair_reservation_access_code = Entrypoint(ReservationStaffRepairAccessCodeMutation)
-
-    # --------------------------------------------------------------------------------
+    staff_adjust_reservation_time = ReservationStaffAdjustTimeMutation.Field()
+    staff_reservation_modify = ReservationStaffModifyMutation.Field()
+    staff_change_reservation_access_code = ReservationStaffChangeAccessCodeMutation.Field()
+    staff_repair_reservation_access_code = ReservationStaffRepairAccessCodeMutation.Field()
+    #
     # Reservation series
-    # --------------------------------------------------------------------------------
+    create_reservation_series = ReservationSeriesCreateMutation.Field()
+    update_reservation_series = ReservationSeriesUpdateMutation.Field()
+    add_reservation_to_series = ReservationSeriesAddMutation.Field()
+    reschedule_reservation_series = ReservationSeriesRescheduleMutation.Field()
+    deny_reservation_series = ReservationSeriesDenyMutation.Field()
+    change_reservation_series_access_code = ReservationSeriesChangeAccessCodeMutation.Field()
+    repair_reservation_series_access_code = ReservationSeriesRepairAccessCodeMutation.Field()
+    #
+    # User
+    update_current_user = CurrentUserUpdateMutation.Field()
+    update_staff_user = UserStaffUpdateMutation.Field()
+    #
+    # Misc.
+    create_banner_notification = BannerNotificationCreateMutation.Field()
+    update_banner_notification = BannerNotificationUpdateMutation.Field()
+    delete_banner_notification = BannerNotificationDeleteMutation.Field()
 
-    create_reservation_series = Entrypoint(ReservationSeriesCreateMutation)
-    update_reservation_series = Entrypoint(ReservationSeriesUpdateMutation)
-    add_reservation_to_series = Entrypoint(ReservationSeriesAddMutation)
-    reschedule_reservation_series = Entrypoint(ReservationSeriesRescheduleMutation)
-    deny_reservation_series = Entrypoint(ReservationSeriesDenyMutation)
-    change_reservation_series_access_code = Entrypoint(ReservationSeriesChangeAccessCodeMutation)
-    repair_reservation_series_access_code = Entrypoint(ReservationSeriesRepairAccessCodeMutation)
 
-    # --------------------------------------------------------------------------------
-    # Banner notifications
-    # --------------------------------------------------------------------------------
-
-    create_banner_notification = Entrypoint(BannerNotificationCreateMutation)
-    update_banner_notification = Entrypoint(BannerNotificationUpdateMutation)
-    delete_banner_notification = Entrypoint(BannerNotificationDeleteMutation)
-
-
-schema = create_schema(query=Query, mutation=Mutation)
+schema = graphene.Schema(query=Query, mutation=Mutation)

@@ -9,7 +9,7 @@ import {
   reservationToInterval,
 } from "@/helpers";
 import { type NewReservationListItem } from "@/component/ReservationsList";
-import { createNodeId, timeToMinutes } from "common/src/helpers";
+import { base64encode, timeToMinutes } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/components/toast";
 import { useTranslation } from "next-i18next";
@@ -33,13 +33,15 @@ function useReservationsInInterval({
   const isValidQuery =
     isIntervalValid && reservationUnitPk != null && reservationUnitPk > 0 && apiStart != null && apiEnd != null;
 
+  const typename = "ReservationUnitNode";
+  const id = base64encode(`${typename}:${reservationUnitPk}`);
   // NOTE unlike array fetches this fetches a single element with an included array
   // so it doesn't have the 100 limitation of array fetch nor does it have pagination
   // NOTE Reuse the query (useCheckCollisions), even though it's a bit larger than we need
   const { loading, data, refetch } = useReservationsByReservationUnitQuery({
     skip: !isValidQuery,
     variables: {
-      id: createNodeId("ReservationUnitNode", reservationUnitPk ?? 0),
+      id,
       pk: reservationUnitPk ?? 0,
       state: RELATED_RESERVATION_STATES,
       beginDate: apiStart ?? "",
@@ -51,11 +53,7 @@ function useReservationsInInterval({
     },
   });
 
-  const reservations = (
-    data?.node != null && "reservations" in data.node
-      ? combineAffectingReservations({ ...data, node: data.node }, reservationUnitPk)
-      : []
-  )
+  const reservations = combineAffectingReservations(data, reservationUnitPk)
     .map((x) => reservationToInterval(x, reservationType))
     .filter((x): x is CollisionInterval => x != null);
 

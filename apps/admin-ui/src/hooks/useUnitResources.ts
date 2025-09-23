@@ -1,38 +1,38 @@
 import {
-  AuthenticationType,
-  type ReservationUnitReservationsFragment,
-  type ReservationUnitsByUnitFieldsFragment,
+  Authentication,
+  ReservationTypeChoice,
+  type ReservationUnitsByUnitQuery,
   useReservationUnitsByUnitQuery,
 } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
-import { createNodeId, getNode } from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/components/toast";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import { type OptionT } from "common/src/modules/search";
 
-export interface ReservationUnitOption extends OptionT {
-  isDraft: boolean;
-}
 interface UseUnitResourcesProps {
   begin: Date;
   unitPk: number;
-  reservationUnitOptions: ReadonlyArray<ReservationUnitOption>;
+  reservationUnitOptions: OptionT[];
   reservationUnitTypeFilter?: number[];
 }
 
-function createDummyReservationUnit(opt: ReservationUnitOption): ReservationUnitsByUnitFieldsFragment {
+type ReservationType = NonNullable<ReservationUnitsByUnitQuery["affectingReservations"]>[number];
+type ReservationUnitType = NonNullable<NonNullable<ReservationUnitsByUnitQuery["unit"]>["reservationUnits"]>[number];
+
+function createDummyReservationUnit(opt: OptionT): ReservationUnitType {
   return {
-    id: createNodeId("ReservationUnitNode", opt.value),
+    id: base64encode(`ReservationUnitNode:${opt.value}`),
     pk: opt.value,
     nameFi: opt.label,
     bufferTimeBefore: 0,
     bufferTimeAfter: 0,
-    isDraft: opt.isDraft,
+    isDraft: false,
     reservationUnitType: null,
     spaces: [],
-    authentication: AuthenticationType.Weak,
+    authentication: Authentication.Weak,
   };
 }
 
@@ -46,12 +46,13 @@ export function useUnitResources({
   reservationUnitTypeFilter = [],
 }: UseUnitResourcesProps) {
   const { t } = useTranslation();
-  const isValid = unitPk > 0;
+  const id = base64encode(`UnitNode:${unitPk}`);
+  const isValid = Number(unitPk) > 0;
   const { data, previousData, ...rest } = useReservationUnitsByUnitQuery({
     skip: !isValid,
     variables: {
-      id: createNodeId("UnitNode", unitPk),
-      pk: unitPk,
+      id,
+      pk: Number(unitPk),
       beginDate: toApiDate(begin) ?? "",
       endDate: toApiDate(begin) ?? "",
       state: RELATED_RESERVATION_STATES,
@@ -61,11 +62,24 @@ export function useUnitResources({
     },
   });
 
-  const affectingReservations = data?.affectingReservations ?? previousData?.affectingReservations ?? [];
-
-  const dataToUse = data ?? previousData;
-  const unit = getNode(dataToUse);
+  const { affectingReservations, unit } = data ?? previousData ?? {};
   const resUnits = unit?.reservationUnits ?? reservationUnitOptions.map(createDummyReservationUnit);
+
+  function convertToEvent(y: ReservationType, x: ReservationUnitType) {
+    return {
+      ...y,
+      ...(y.type !== ReservationTypeChoice.Blocked
+        ? {
+            bufferTimeBefore: y.bufferTimeBefore ?? x.bufferTimeBefore ?? 0,
+            bufferTimeAfter: y.bufferTimeAfter ?? x.bufferTimeAfter ?? 0,
+          }
+        : {}),
+    };
+  }
+
+  function doesReservationAffectReservationUnit(reservation: ReservationType, reservationUnitPk: number) {
+    return reservation.affectedReservationUnits?.some((pk) => pk === reservationUnitPk);
+  }
 
   const resources = resUnits
     .filter(
@@ -74,14 +88,16 @@ export function useUnitResources({
         (x.reservationUnitType?.pk != null && reservationUnitTypeFilter.includes(x.reservationUnitType.pk))
     )
     .map((x) => {
-      const events = affectingReservations.filter((y) => doesReservationAffectReservationUnit(y, x.pk ?? 0));
+      const affecting = affectingReservations?.filter((y) => doesReservationAffectReservationUnit(y, x.pk ?? 0));
+      const events = filterNonNullable(affecting);
 
       return {
         title: x.nameFi ?? "",
+        url: String(x.pk ?? 0),
         isDraft: x.isDraft,
-        pk: x.pk,
+        pk: x.pk ?? 0,
         events: events.map((y) => ({
-          event: y,
+          event: convertToEvent(y, x),
           title: y.name ?? "",
           start: new Date(y.beginsAt),
           end: new Date(y.endsAt),
@@ -92,47 +108,32 @@ export function useUnitResources({
   return { ...rest, resources };
 }
 
-function doesReservationAffectReservationUnit(
-  reservation: ReservationUnitReservationsFragment,
-  reservationUnitPk: number
-) {
-  return reservation.affectedReservationUnits?.some((pk) => pk === reservationUnitPk);
-}
-
-export const RESERVATION_UNITS_BY_UNIT_FIELDS_FRAGMENT = gql`
-  fragment ReservationUnitsByUnitFields on ReservationUnitNode {
-    id
-    pk
-    nameFi
-    spaces {
-      id
-      pk
-    }
-    reservationUnitType {
-      id
-      pk
-    }
-    bufferTimeBefore
-    bufferTimeAfter
-    isDraft
-    authentication
-  }
-`;
-
 export const RESERVATION_UNITS_BY_UNIT_QUERY = gql`
   query ReservationUnitsByUnit(
     $id: ID!
     $pk: Int!
-    $state: [ReservationStateChoice!]
-    $beginDate: Date!
-    $endDate: Date!
+    $state: [ReservationStateChoice]
+    $beginDate: Date
+    $endDate: Date
   ) {
-    node(id: $id) {
-      ... on UnitNode {
+    unit(id: $id) {
+      id
+      reservationUnits {
         id
-        reservationUnits {
-          ...ReservationUnitsByUnitFields
+        pk
+        nameFi
+        spaces {
+          id
+          pk
         }
+        reservationUnitType {
+          id
+          pk
+        }
+        bufferTimeBefore
+        bufferTimeAfter
+        isDraft
+        authentication
       }
     }
     affectingReservations(beginDate: $beginDate, endDate: $endDate, state: $state, forUnits: [$pk]) {

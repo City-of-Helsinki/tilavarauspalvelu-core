@@ -359,7 +359,6 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
         SetName.set_3: FieldCombination(
             supported=[
                 "description",
-                "municipality",
                 "name",
                 "num_persons",
                 "purpose",
@@ -373,7 +372,6 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
             ],
             required=[
                 "description",
-                "municipality",
                 "num_persons",
                 "purpose",
                 "reservee_email",
@@ -389,7 +387,6 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
             supported=[
                 "age_group",
                 "description",
-                "municipality",
                 "name",
                 "num_persons",
                 "purpose",
@@ -404,7 +401,6 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
             required=[
                 "age_group",
                 "description",
-                "municipality",
                 "num_persons",
                 "purpose",
                 "reservee_email",
@@ -420,7 +416,6 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
             supported=[
                 "applying_for_free_of_charge",
                 "description",
-                "municipality",
                 "name",
                 "num_persons",
                 "purpose",
@@ -434,7 +429,6 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
             ],
             required=[
                 "description",
-                "municipality",
                 "num_persons",
                 "purpose",
                 "reservee_email",
@@ -451,7 +445,6 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
                 "age_group",
                 "applying_for_free_of_charge",
                 "description",
-                "municipality",
                 "name",
                 "num_persons",
                 "purpose",
@@ -466,7 +459,6 @@ def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]
             required=[
                 "age_group",
                 "description",
-                "municipality",
                 "num_persons",
                 "purpose",
                 "reservee_email",
@@ -516,7 +508,6 @@ def _create_metadata_fields() -> list[ReservationMetadataField]:
         "description",
         "num_persons",
         "purpose",
-        "municipality",
     ]
     metadata_fields = [
         ReservationMetadataFieldFactory.build(field_name=field_name)  #

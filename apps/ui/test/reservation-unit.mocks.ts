@@ -1,9 +1,9 @@
 import {
   type ApplicationRoundTimeSlotNode,
-  AuthenticationType,
-  ReservationUnitImageType,
+  Authentication,
+  ImageType,
   type IsReservableFieldsFragment,
-  ReservationFormType,
+  ReservationForm,
   ReservationKind,
   ReservationStartInterval,
   type ReservationUnitNode,
@@ -13,7 +13,7 @@ import {
   Weekday,
 } from "@/gql/gql-types";
 import { ReservableMap, type RoundPeriod } from "@/modules/reservable";
-import { createNodeId } from "common/src/helpers";
+import { base64encode } from "common/src/helpers";
 import { addDays, addYears, endOfDay, format, startOfDay, startOfToday } from "date-fns";
 import { createMockReservationUnitType, generateDescriptionFragment, generateNameFragment } from "./test.gql.utils";
 
@@ -68,7 +68,7 @@ export function createMockIsReservableFieldsFragment({
 
 export function createMockReservationUnit({ pk }: { pk: number }): ReservationUnitNode {
   const timeSelector: ApplicationRoundTimeSlotNode = {
-    id: createNodeId("ApplicationRoundTimeSlotNode", 1),
+    id: base64encode(`ApplicationRoundTimeSlotNode:1`),
     pk,
     weekday: Weekday.Tuesday,
     isClosed: false,
@@ -80,7 +80,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     ],
   };
   return {
-    id: createNodeId("ReservationUnitNode", pk),
+    id: base64encode(`ReservationUnitNode:${pk}`),
     pk,
     ...generateNameFragment(`ReservationUnit ${pk}`),
     // TODO this is weird
@@ -100,13 +100,13 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     }),
     images: [
       {
-        id: createNodeId("Image", 1),
+        id: base64encode("Image:1"),
         pk: 1,
         imageUrl: "https://example.com/image1.jpg",
         largeUrl: "https://example.com/image1_large.jpg",
         mediumUrl: "https://example.com/image1_medium.jpg",
         smallUrl: "https://example.com/image1_small.jpg",
-        imageType: ReservationUnitImageType.Main,
+        imageType: ImageType.Main,
       },
     ] as const,
     accessTypes: [],
@@ -116,7 +116,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     // applicationRoundTimeSlots: [] as const, // ReadonlyArray<ApplicationRoundTimeSlotNode>;
     applicationRoundTimeSlots: [timeSelector],
     applicationRounds: [] as const, // ReadonlyArray<ApplicationRoundNode>;
-    authentication: AuthenticationType.Weak,
+    authentication: Authentication.Weak,
     bufferTimeAfter: 0, //Scalars["Duration"]["output"];
     bufferTimeBefore: 0, // Scalars["Duration"]["output"];
     calculatedSurfaceArea: 0, // Scalars["Int"]["output"];
@@ -162,7 +162,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     reservationPendingInstructionsSv: null, // Maybe<Scalars["String"]["output"]>;
     reservationStartInterval: ReservationStartInterval.Interval_30Mins,
     reservationState: ReservationUnitReservationState.Reservable,
-    reservations: [], //Maybe<ReadonlyArray<ReservationNode>>;
+    reservations: null, //Maybe<ReadonlyArray<ReservationNode>>;
     reservationsMaxDaysBefore: null, // Maybe<Scalars["Int"]["output"]>;
     reservationsMinDaysBefore: null, // Maybe<Scalars["Int"]["output"]>;
     resources: [] as const, // ReadonlyArray<ResourceNode>;
@@ -174,13 +174,13 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     notesWhenApplyingFi: null, // Maybe<Scalars["String"]["output"]>;
     notesWhenApplyingSv: null, // Maybe<Scalars["String"]["output"]>;
     extUuid: "dummy-uuid", // Scalars["UUID"]["output"];
-    reservationForm: ReservationFormType.ReserveeInfoForm,
+    reservationForm: ReservationForm.ReserveeInfoForm,
   };
 }
 
 function createMockUnit({ pk }: { pk: number }): UnitNode {
   return {
-    id: createNodeId("UnitNode", 1),
+    id: base64encode(`UnitNode:${pk}`),
     pk, // Maybe<Scalars["Int"]["output"]>;
     ...generateNameFragment(`Unit ${pk}`),
     ...generateDescriptionFragment(`Unit Description ${pk}`),

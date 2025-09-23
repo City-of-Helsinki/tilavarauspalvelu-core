@@ -20,16 +20,16 @@ def test_application__send__regular_user(graphql):
     application = ApplicationFactory.create_application_ready_for_sending()
 
     graphql.login_with_regular_user()
-    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
 
-    assert response.error_message(0) == "No permission to send this application."
+    assert response.error_message() == "No permission to update."
 
 
 def test_application__send__regular_user__own_application(graphql):
     application = ApplicationFactory.create_application_ready_for_sending()
 
     graphql.force_login(application.user)
-    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
 
     assert response.has_errors is False, response
 
@@ -44,9 +44,9 @@ def test_application__send__regular_user__own_application__application_period_ov
     )
 
     graphql.force_login(application.user)
-    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
 
-    assert response.error_message(0) == "No permission to send this application."
+    assert response.error_message() == "No permission to update."
 
 
 def test_application__send__general_admin(graphql):
@@ -54,7 +54,7 @@ def test_application__send__general_admin(graphql):
     admin = UserFactory.create_with_general_role()
 
     graphql.force_login(admin)
-    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
 
     assert response.has_errors is False, response
 
@@ -67,6 +67,6 @@ def test_application__update__unit_admin(graphql):
     admin = UserFactory.create_with_unit_role(units=[unit])
 
     graphql.force_login(admin)
-    response = graphql(SEND_MUTATION, variables={"input": {"pk": application.pk}})
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
 
     assert response.has_errors is False, response

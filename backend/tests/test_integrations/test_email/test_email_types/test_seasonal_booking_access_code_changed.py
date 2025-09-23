@@ -1,3 +1,5 @@
+# type: EmailType.SEASONAL_BOOKING_ACCESS_CODE_CHANGED
+
 from __future__ import annotations
 
 import datetime

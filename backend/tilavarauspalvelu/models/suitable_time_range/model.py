@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
-from undine.utils.model_fields import TextChoicesField
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Priority, Weekday
+from utils.fields.model import StrChoiceField
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
@@ -28,8 +28,8 @@ __all__ = [
 class SuitableTimeRange(models.Model):
     """Represent a time range that the applicant has marked as suitable for their application section."""
 
-    priority: Priority = TextChoicesField(choices_enum=Priority)
-    day_of_the_week: Weekday = TextChoicesField(choices_enum=Weekday)
+    priority: str = StrChoiceField(enum=Priority)
+    day_of_the_week: str = StrChoiceField(enum=Weekday)
     begin_time: datetime.time = models.TimeField()
     end_time: datetime.time = models.TimeField()
 

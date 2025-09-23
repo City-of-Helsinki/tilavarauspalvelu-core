@@ -9,7 +9,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { env } from "@/env.mjs";
 import { buildGraphQLUrl, getSignInUrl, type LocalizationLanguages } from "common/src/urlBuilder";
-import { createNodeId, getLocalizationLang } from "common/src/helpers";
+import { base64encode, getLocalizationLang } from "common/src/helpers";
 import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import { getReservationInProgressPath } from "./modules/urls";
 
@@ -84,30 +84,26 @@ type Data = {
 };
 
 const RESERVATION_QUERY = `
-  reservation: node(id: $reservationId) {
-    ... on ReservationNode {
+  reservation(id: $reservationId) {
+    id
+    type
+    state
+    reservationUnit {
       id
-      type
-      state
-      reservationUnit {
-        id
-        pk
-      }
-      user {
-        id
-        pk
-      }
+      pk
+    }
+    user {
+      id
+      pk
     }
   }`;
 
 const APPLICATION_QUERY = `
-  application: node(id: $applicationId) {
-    ... on ApplicationNode {
+  application(id: $applicationId) {
+    id
+    user {
       id
-      user {
-        id
-        pk
-      }
+      pk
     }
   }`;
 
@@ -135,8 +131,8 @@ async function fetchUserData(
     return null;
   }
 
-  const applicationId = opts?.applicationPk != null ? createNodeId("ApplicationNode", opts.applicationPk) : null;
-  const reservationId = opts?.reservationPk != null ? createNodeId("ReservationNode", opts.reservationPk) : null;
+  const applicationId = opts?.applicationPk != null ? base64encode(`ApplicationNode:${opts.applicationPk}`) : null;
+  const reservationId = opts?.reservationPk != null ? base64encode(`ReservationNode:${opts.reservationPk}`) : null;
 
   // NOTE: need to build queries dynamically because of the optional parameters
   const params =
@@ -166,7 +162,7 @@ ${applicationId ? "$applicationId: ID!" : ""}
   if (!res.ok) {
     const text = await res.text();
     // eslint-disable-next-line no-console
-    console.warn(`Middleware: request failed: ${res.status} with message: ${text}`);
+    console.warn(`Middleware request failed: ${res.status} with message: ${text}`);
     // prefer throw here because we want all query failures -> end in same fail state
     throw new Error(res.statusText);
   }
@@ -174,7 +170,7 @@ ${applicationId ? "$applicationId: ID!" : ""}
   const data: unknown = await res.json();
   if (typeof data !== "object" || data == null || !("data" in data)) {
     // eslint-disable-next-line no-console
-    console.warn("Middleware: no data in response");
+    console.warn("no data in response");
     return null;
   }
 
@@ -376,7 +372,6 @@ function isPageRequest(url: URL): boolean {
   if (
     // ignore healthcheck because it's for automated test suite that can't do redirects
     url.pathname.startsWith("/healthcheck") ||
-    url.pathname.startsWith("/api/healthcheck") ||
     url.pathname.startsWith("/_next") ||
     url.pathname.match(/\.(webmanifest|js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf|pdf)$/) ||
     url.pathname.startsWith("/503") ||
@@ -456,7 +451,7 @@ export async function middleware(req: NextRequest) {
     // block infinite redirect loop (there is no graceful way to handle this)
     if (req.url.includes("redirect_to")) {
       // eslint-disable-next-line no-console
-      console.error("Middleware: Infinite redirect loop detected");
+      console.error("Infinite redirect loop detected");
       return NextResponse.next();
     }
     return NextResponse.redirect(csrfRedirectUrl);
@@ -474,25 +469,25 @@ export async function middleware(req: NextRequest) {
   if (RESERVATION_ROUTES.some((route) => doesUrlMatch(req.url, route))) {
     const id = url.pathname.match(/\/reservations?\/(\d+)/)?.[1];
     const pk = Number(id);
+    // can be either an url issues (user error) or a bug in our matcher
     if (pk > 0) {
       reservationPk = pk;
-    } else if (id != null && id !== "") {
-      // can be either an url issues (user error) or a bug in our matcher
+    } else if (id !== "") {
       // fall through empty for listing page
       // eslint-disable-next-line no-console
-      console.error("Middleware: Invalid reservation id");
+      console.error("Invalid reservation id");
     }
   }
   if (APPLICATION_ROUTES.some((route) => doesUrlMatch(req.url, route))) {
     const id = url.pathname.match(/\/applications?\/(\d+)/)?.[1];
     const pk = Number(id);
+    // can be either an url issues (user error) or a bug in our matcher
     if (pk > 0) {
       applicationPk = pk;
-    } else if (id == null && id !== "") {
-      // can be either an url issues (user error) or a bug in our matcher
+    } else if (id !== "") {
       // fall through empty for listing page
       // eslint-disable-next-line no-console
-      console.error("Middleware: Invalid application id");
+      console.error("Invalid application id");
     }
   }
 

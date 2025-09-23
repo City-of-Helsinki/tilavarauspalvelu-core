@@ -24,11 +24,11 @@ def test_application_round__set_handled(graphql):
     graphql.login_with_superuser()
 
     with disable_reservation_generation() as mock:
-        response = graphql(SET_HANDLED_MUTATION, variables={"input": {"pk": application_round.pk}})
-
-    assert response.has_errors is False, response.errors
+        response = graphql(SET_HANDLED_MUTATION, input_data={"pk": application_round.pk})
 
     assert mock.call_count == 1
+
+    assert response.has_errors is False, response.errors
 
     application_round.refresh_from_db()
     assert application_round.status == ApplicationRoundStatusChoice.HANDLED
@@ -50,9 +50,10 @@ def test_application_round__set_handled__wrong_status(graphql, status):
     graphql.login_with_superuser()
 
     with disable_reservation_generation():
-        response = graphql(SET_HANDLED_MUTATION, variables={"input": {"pk": application_round.pk}})
+        response = graphql(SET_HANDLED_MUTATION, input_data={"pk": application_round.pk})
 
-    assert response.error_message(0) == "Application round is not in allocation status."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Application round is not in allocation status."]
 
 
 def test_application_round__set_handled__general_admin(graphql):
@@ -63,7 +64,7 @@ def test_application_round__set_handled__general_admin(graphql):
     graphql.force_login(admin)
 
     with disable_reservation_generation():
-        response = graphql(SET_HANDLED_MUTATION, variables={"input": {"pk": application_round.pk}})
+        response = graphql(SET_HANDLED_MUTATION, input_data={"pk": application_round.pk})
 
     assert response.has_errors is False, response.errors
 
@@ -81,7 +82,7 @@ def test_application_round__set_handled__unit_admin(graphql):
     graphql.force_login(admin)
 
     with disable_reservation_generation():
-        response = graphql(SET_HANDLED_MUTATION, variables={"input": {"pk": application_round.pk}})
+        response = graphql(SET_HANDLED_MUTATION, input_data={"pk": application_round.pk})
 
     assert response.has_errors is False, response.errors
 
@@ -103,9 +104,9 @@ def test_application_round__set_handled__unit_admin__no_perms_to_all_units(graph
     graphql.force_login(admin)
 
     with disable_reservation_generation():
-        response = graphql(SET_HANDLED_MUTATION, variables={"input": {"pk": application_round.pk}})
+        response = graphql(SET_HANDLED_MUTATION, input_data={"pk": application_round.pk})
 
-    assert response.error_message(0) == "No permission to manage this application round."
+    assert response.error_message() == "No permission to update."
 
 
 def test_application_round__set_handled__unit_admin__has_perms_to_all_units(graphql):
@@ -121,7 +122,7 @@ def test_application_round__set_handled__unit_admin__has_perms_to_all_units(grap
     graphql.force_login(admin)
 
     with disable_reservation_generation():
-        response = graphql(SET_HANDLED_MUTATION, variables={"input": {"pk": application_round.pk}})
+        response = graphql(SET_HANDLED_MUTATION, input_data={"pk": application_round.pk})
 
     assert response.has_errors is False, response.errors
 
@@ -151,12 +152,12 @@ def test_application_round__set_handled__error__has_applications_in_status(graph
     graphql.login_with_superuser()
 
     with disable_reservation_generation():
-        response = graphql(SET_HANDLED_MUTATION, variables={"input": {"pk": application_round.pk}})
+        response = graphql(SET_HANDLED_MUTATION, input_data={"pk": application_round.pk})
 
     if raises_error:
         assert response.has_errors is True, response.errors
-
-        assert response.error_message(0) == "Application round has applications still in allocation."
+        assert response.error_message() == "Mutation was unsuccessful."
+        assert response.field_error_messages() == ["Application round has applications still in allocation."]
     else:
         assert response.has_errors is False, response.errors
         application_round.refresh_from_db()

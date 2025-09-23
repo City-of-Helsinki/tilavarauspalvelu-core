@@ -2,16 +2,16 @@ import { convertTime, filterNonNullable, timeToMinutes, toNumber } from "common/
 import { fromApiDate, fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
 import {
   AccessType,
-  type ApplicationRoundTimeSlotCreateInput,
-  AuthenticationType,
+  Authentication,
+  ImageType,
   PaymentType,
   PriceUnit,
   ReservationKind,
   ReservationStartInterval,
-  type ReservationUnitAccessTypeCreateInput,
-  type ReservationUnitEditPageFragment,
-  ReservationUnitImageType,
-  type ReservationUnitPricingCreateInput,
+  type ReservationUnitEditQuery,
+  type ReservationUnitPricingSerializerInput,
+  type UpdateApplicationRoundTimeSlotSerializerInput,
+  type ReservationUnitAccessTypeSerializerInput,
   Weekday,
 } from "@gql/gql-types";
 import { addDays, endOfDay, format } from "date-fns";
@@ -25,7 +25,8 @@ import sanitizeHtml from "sanitize-html";
 
 export const AccessTypes = ["ACCESS_CODE", "OPENED_BY_STAFF", "PHYSICAL_KEY", "UNRESTRICTED"] as const;
 
-type Node = ReservationUnitEditPageFragment;
+type QueryData = ReservationUnitEditQuery["reservationUnit"];
+type Node = NonNullable<QueryData>;
 
 /// @param date string in UI format
 /// @returns true if date is in the future
@@ -148,8 +149,8 @@ const ImageFormSchema = z.object({
   pk: z.number().optional(),
   mediumUrl: z.string().optional(),
   imageUrl: z.string().optional(),
-  imageType: z.nativeEnum(ReservationUnitImageType).optional(),
-  originalImageType: z.nativeEnum(ReservationUnitImageType).optional(),
+  imageType: z.nativeEnum(ImageType).optional(),
+  originalImageType: z.nativeEnum(ImageType).optional(),
   bytes: z.instanceof(File).optional(),
   deleted: z.boolean().optional(),
 });
@@ -372,7 +373,7 @@ export const BUFFER_TIME_OPTIONS = ["noBuffer", "bufferTimesSet"] as const;
 
 export const ReservationUnitEditSchema = z
   .object({
-    authentication: z.nativeEnum(AuthenticationType),
+    authentication: z.nativeEnum(Authentication),
     // TODO these are optional (0 is bit different than not set)
     // because if they are set (non undefined) we should show the active checkbox
     bufferTimeAfter: z.number(),
@@ -440,6 +441,7 @@ export const ReservationUnitEditSchema = z
     images: z.array(ImageFormSchema),
     // internal values
     isDraft: z.boolean(),
+    isArchived: z.boolean(),
     // do we show optional fields to the user? not sent to backend but changes if the field is sent
     hasFuturePricing: z.boolean(),
     hasScheduledPublish: z.boolean(),
@@ -454,6 +456,10 @@ export const ReservationUnitEditSchema = z
     accessTypes: z.array(AccessTypesFormSchema),
   })
   .superRefine((v, ctx) => {
+    if (v.isArchived) {
+      return;
+    }
+
     validateAccessTypes(v.accessTypes, ctx);
 
     // Drafts also require seasonal times validation
@@ -771,7 +777,7 @@ function convertAccessTypes(accessTypes: NonNullable<Node["accessTypes"]>): Acce
   }));
 }
 
-export function convertReservationUnit(data?: Node | null): ReservationUnitEditFormValues {
+export function convertReservationUnit(data?: Node): ReservationUnitEditFormValues {
   // Convert from API data to form values
   return {
     bufferType:
@@ -828,7 +834,7 @@ export function convertReservationUnit(data?: Node | null): ReservationUnitEditF
     equipments: filterNonNullable(data?.equipments?.map((e) => e?.pk)),
     purposes: filterNonNullable(data?.purposes?.map((p) => p?.pk)),
     surfaceArea: data?.surfaceArea ?? 0,
-    authentication: data?.authentication ?? AuthenticationType.Weak,
+    authentication: data?.authentication ?? Authentication.Weak,
     reservationUnitType: data?.reservationUnitType?.pk ?? null,
     metadataSet: data?.metadataSet?.pk ?? null,
     paymentTerms: data?.paymentTerms?.pk ?? null,
@@ -839,6 +845,7 @@ export function convertReservationUnit(data?: Node | null): ReservationUnitEditF
     pricings: convertPricingList(filterNonNullable(data?.pricings)),
     images: filterNonNullable(data?.images).map((i) => convertImage(i)),
     isDraft: data?.isDraft ?? false,
+    isArchived: false,
     seasons: convertSeasonalList(filterNonNullable(data?.applicationRoundTimeSlots)),
     hasFuturePricing: data?.pricings?.some((p) => new Date(p.begins) > new Date()) ?? false,
     hasScheduledPublish: data?.publishBeginsAt != null || data?.publishEndsAt != null,
@@ -860,6 +867,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
   const {
     pk,
     isDraft,
+    isArchived,
     surfaceArea,
     reservationKind,
     reservationEndsDate,
@@ -898,7 +906,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
 
   const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) => t && t.begin && t.end;
   // NOTE mutation doesn't support pks (even if changing not adding) unlike other mutations
-  const applicationRoundTimeSlots: ApplicationRoundTimeSlotCreateInput[] = seasons
+  const applicationRoundTimeSlots: UpdateApplicationRoundTimeSlotSerializerInput[] = seasons
     .filter((s) => s.reservableTimes.filter(isReservableTime).length > 0 || s.closed)
     .map((s) => ({
       weekday: s.weekday,
@@ -910,8 +918,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     const d = fromUIDateTime(date, time);
     return d != null ? d.toISOString() : null;
   }
-
-  const accessTypes: ReservationUnitAccessTypeCreateInput[] = filterNonNullable(
+  const accessTypes: ReservationUnitAccessTypeSerializerInput[] = filterNonNullable(
     accessTypesForm.map((at) => ({
       pk: at.pk,
       accessType: at.accessType,
@@ -922,7 +929,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
   return {
     ...vals,
     ...(pk > 0 ? { pk } : {}),
-    nameFi: vals.nameFi.trim(),
+    name: vals.nameFi.trim(),
     surfaceArea: surfaceArea != null && surfaceArea > 0 ? Math.floor(surfaceArea) : null,
     reservationBeginsAt:
       hasScheduledReservation && hasReservationBegins
@@ -944,6 +951,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     bufferTimeBefore: hasBufferTimeBefore && bufferType === "bufferTimesSet" ? bufferTimeBefore : 0,
     reservationKind,
     isDraft,
+    isArchived,
     notesWhenApplyingEn: cleanHtmlContent(notesWhenApplyingEn),
     notesWhenApplyingFi: cleanHtmlContent(notesWhenApplyingFi),
     notesWhenApplyingSv: cleanHtmlContent(notesWhenApplyingSv),
@@ -968,11 +976,11 @@ function transformPricing(
   values: PricingFormValues,
   hasFuturePricing: boolean,
   taxPercentageOptions: TaxOption[]
-): ReservationUnitPricingCreateInput | null {
+): ReservationUnitPricingSerializerInput | null {
   if (!hasFuturePricing && isAfterToday(values.begins)) {
     return null;
   }
-  // Without a valid taxPercentage mutation fails even if it's free pricing,
+  // without a valid taxPrecentage mutation fails even if it's free pricing
   // but we don't have a valid taxPercentage for free pricings (user has made no selection)
   const taxPercentage = values.taxPercentage > 0 ? values.taxPercentage : (taxPercentageOptions[0]?.pk ?? 0);
   if (taxPercentage === 0) {
@@ -981,12 +989,12 @@ function transformPricing(
 
   const begins = fromUIDate(values.begins) ?? new Date();
   return {
+    taxPercentage,
     begins: toApiDate(begins) ?? "",
     highestPrice: values.isPaid ? values.highestPrice.toString() : "0",
     lowestPrice: values.isPaid ? values.lowestPrice.toString() : "0",
-    taxPercentage,
     ...(values.pk > 0 ? { pk: values.pk } : {}),
     ...(values.priceUnit != null ? { priceUnit: values.priceUnit } : {}),
-    paymentType: values.paymentType ?? PaymentType.Online,
+    ...(values.paymentType != null ? { paymentType: values.paymentType } : {}),
   };
 }

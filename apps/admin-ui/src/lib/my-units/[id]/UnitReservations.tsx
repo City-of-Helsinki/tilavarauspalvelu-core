@@ -17,7 +17,6 @@ import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { translateTag } from "@/modules/search";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
-import { type ReservationUnitOption } from "@/hooks/useUnitResources";
 
 const LegendContainer = styled.div`
   max-width: 100%;
@@ -31,8 +30,8 @@ const LegendContainer = styled.div`
 
 interface UnitReservationsProps {
   unitPk: number;
-  reservationUnitOptions: ReadonlyArray<ReservationUnitOption>;
-  canCreateReservations: boolean;
+  reservationUnitOptions: { label: string; value: number }[];
+  canCreateReservations?: boolean;
 }
 
 function UnitReservationsInner({
@@ -91,10 +90,10 @@ export function UnitReservations(props: UnitReservationsProps): JSX.Element {
   };
 
   useEffect(() => {
-    // oxlint-disable-next-line react/exhaustive-deps -- only on page load
     if (searchParams.get("date") == null) {
       handleTodayClick();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on page load
   }, []);
 
   const hideTags = ["date", "tab", "reservationUnit", "isModalOpen", "timeOffset", "cellId"];

@@ -56,14 +56,14 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     }
     try {
       const res = await deleteSpaceMutation({
-        variables: { input: { pk } },
+        variables: { input: { pk: String(pk) } },
       });
       if (res.errors != null && res.errors.length > 0) {
         throw new ApolloError({
           graphQLErrors: res.errors,
         });
       }
-      if (res.data?.deleteSpace?.pk) {
+      if (res.data?.deleteSpace?.deleted) {
         setSpaceWaitingForDelete(null);
         refetch();
       } else {
@@ -235,9 +235,9 @@ export const SPACE_TABLE_FRAGMENT = gql`
 `;
 
 export const DELETE_SPACE = gql`
-  mutation DeleteSpace($input: SpaceDeleteMutation!) {
+  mutation DeleteSpace($input: SpaceDeleteMutationInput!) {
     deleteSpace(input: $input) {
-      pk
+      deleted
     }
   }
 `;

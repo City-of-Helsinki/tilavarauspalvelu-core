@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 from freezegun import freeze_time
-from undine.relay import to_global_id
+from graphql_relay import to_global_id
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
@@ -24,10 +24,10 @@ from tests.factories import (
 )
 from tests.helpers import patch_method
 
-from .helpers import sections_query
+from .helpers import section_query, sections_query
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnit
+    from tilavarauspalvelu.models import ApplicationSection, ReservationUnit
 
 # Applied to all tests
 pytestmark = [
@@ -166,7 +166,7 @@ def test_application_section__all_statuses(graphql):
     """
 
     graphql.login_with_superuser()
-    response = graphql(query, count_queries=True)
+    response = graphql(query)
 
     assert response.has_errors is False, response
     # (1 query for session, doesn't always happen for some reason)
@@ -202,29 +202,26 @@ def pindora_response(reservation_unit: ReservationUnit) -> PindoraSeasonalBookin
     )
 
 
-PINDORA_QUERY = """
-    query ($id: ID!) {
-        node(id: $id) {
-            ... on ApplicationSectionNode {
-                pindoraInfo {
-                    accessCode
-                    accessCodeGeneratedAt
-                    accessCodeIsActive
-                    accessCodeKeypadUrl
-                    accessCodePhoneNumber
-                    accessCodeSmsNumber
-                    accessCodeSmsMessage
-                    accessCodeValidity {
-                        reservationId
-                        reservationSeriesId
-                        accessCodeBeginsAt
-                        accessCodeEndsAt
-                    }
-                }
+def pindora_query(section: ApplicationSection) -> str:
+    fields = """
+        pindoraInfo {
+            accessCode
+            accessCodeGeneratedAt
+            accessCodeIsActive
+            accessCodeKeypadUrl
+            accessCodePhoneNumber
+            accessCodeSmsNumber
+            accessCodeSmsMessage
+            accessCodeValidity {
+                reservationId
+                reservationSeriesId
+                accessCodeBeginsAt
+                accessCodeEndsAt
             }
         }
-    }
-"""
+    """
+    global_id = to_global_id("ApplicationSectionNode", section.pk)
+    return section_query(fields=fields, id=global_id)
 
 
 @freeze_time(local_datetime(2022, 1, 1))
@@ -249,18 +246,18 @@ def test_application_section__query__pindora_info(graphql):
         type=ReservationTypeChoice.NORMAL,
     )
 
-    global_id = to_global_id("ApplicationSectionNode", section.pk)
+    query = pindora_query(section)
 
     graphql.login_with_superuser()
 
     data = pindora_response(series.reservation_unit)
 
     with patch_method(PindoraClient.get_seasonal_booking, return_value=data):
-        response = graphql(PINDORA_QUERY, variables={"id": global_id})
+        response = graphql(query)
 
     assert response.has_errors is False, response.errors
 
-    assert response.results["pindoraInfo"] == {
+    assert response.first_query_object["pindoraInfo"] == {
         "accessCode": "1234",
         "accessCodeGeneratedAt": "2022-01-01T12:00:00+02:00",
         "accessCodeIsActive": True,
@@ -301,7 +298,7 @@ def test_application_section__query__pindora_info__access_code_not_active(graphq
         type=ReservationTypeChoice.NORMAL,
     )
 
-    global_id = to_global_id("ApplicationSectionNode", section.pk)
+    query = pindora_query(section)
 
     if as_reservee:
         graphql.force_login(section.application.user)
@@ -312,14 +309,14 @@ def test_application_section__query__pindora_info__access_code_not_active(graphq
     response["access_code_is_active"] = False
 
     with patch_method(PindoraClient.get_seasonal_booking, return_value=response):
-        response = graphql(PINDORA_QUERY, variables={"id": global_id})
+        response = graphql(query)
 
     assert response.has_errors is False, response.errors
 
     if as_reservee:
-        assert response.results["pindoraInfo"] is None
+        assert response.first_query_object["pindoraInfo"] is None
     else:
-        assert response.results["pindoraInfo"] is not None
+        assert response.first_query_object["pindoraInfo"] is not None
 
 
 @freeze_time(local_datetime(2022, 1, 1))
@@ -343,18 +340,18 @@ def test_application_section__query__pindora_info__access_type_not_access_code(g
         type=ReservationTypeChoice.NORMAL,
     )
 
-    global_id = to_global_id("ApplicationSectionNode", section.pk)
+    query = pindora_query(section)
 
     graphql.login_with_superuser()
 
     data = pindora_response(series.reservation_unit)
 
     with patch_method(PindoraClient.get_seasonal_booking, return_value=data):
-        response = graphql(PINDORA_QUERY, variables={"id": global_id})
+        response = graphql(query)
 
     assert response.has_errors is False, response.errors
 
-    assert response.results["pindoraInfo"] is None
+    assert response.first_query_object["pindoraInfo"] is None
 
 
 @freeze_time(local_datetime(2022, 1, 1))
@@ -378,16 +375,16 @@ def test_application_section__query__pindora_info__pindora_call_fails(graphql):
         type=ReservationTypeChoice.NORMAL,
     )
 
-    global_id = to_global_id("ApplicationSectionNode", section.pk)
+    query = pindora_query(section)
 
     graphql.login_with_superuser()
 
     with patch_method(PindoraClient.get_seasonal_booking, side_effect=PindoraAPIError("Error")):
-        response = graphql(PINDORA_QUERY, variables={"id": global_id})
+        response = graphql(query)
 
     assert response.has_errors is False, response.errors
 
-    assert response.results["pindoraInfo"] is None
+    assert response.first_query_object["pindoraInfo"] is None
 
 
 @freeze_time(local_datetime(2022, 1, 3))
@@ -411,15 +408,15 @@ def test_application_section__query__pindora_info__section_past(graphql):
         type=ReservationTypeChoice.NORMAL,
     )
 
-    global_id = to_global_id("ApplicationSectionNode", section.pk)
+    query = pindora_query(section)
 
     graphql.login_with_superuser()
 
     data = pindora_response(series.reservation_unit)
 
     with patch_method(PindoraClient.get_seasonal_booking, return_value=data):
-        response = graphql(PINDORA_QUERY, variables={"id": global_id})
+        response = graphql(query)
 
     assert response.has_errors is False, response.errors
 
-    assert response.results["pindoraInfo"] is None
+    assert response.first_query_object["pindoraInfo"] is None

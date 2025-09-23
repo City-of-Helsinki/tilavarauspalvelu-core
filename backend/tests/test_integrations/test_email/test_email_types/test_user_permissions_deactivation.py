@@ -1,3 +1,5 @@
+# type: EmailType.USER_PERMISSIONS_DEACTIVATION
+
 from __future__ import annotations
 
 import datetime

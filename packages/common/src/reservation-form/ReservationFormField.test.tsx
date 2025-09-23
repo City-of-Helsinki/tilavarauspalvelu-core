@@ -19,15 +19,15 @@ function Wrapper({ children }: { children: React.ReactNode }): JSX.Element {
 
 /* options are gotten from GraphQL so some mock data */
 const options: OptionsRecord = {
-  reservationPurposes: [
+  purpose: [
     { value: 1, label: "Purpose" },
     { value: 2, label: "Not a thing" },
   ],
-  ageGroups: [
+  ageGroup: [
     { value: 1, label: "1-9" },
     { value: 2, label: "10-" },
   ],
-  municipalities: [
+  municipality: [
     { value: MunicipalityChoice.Helsinki, label: "Helsinki" },
     { value: MunicipalityChoice.Other, label: "Muu" },
   ],

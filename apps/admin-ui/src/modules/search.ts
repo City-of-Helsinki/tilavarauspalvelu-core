@@ -33,7 +33,7 @@ export function translateTag(t: TFunction, options: Readonly<TagOptionsList>) {
       case "applicantType":
         return t(`translation:reserveeType.${value.toUpperCase()}`);
       case "purpose":
-        return options.reservationPurposes.find((o) => String(o.value) === value)?.label ?? "";
+        return options.purposes.find((o) => String(o.value) === value)?.label ?? "";
       case "ageGroup":
         return options.ageGroups.find((o) => String(o.value) === value)?.label ?? "";
       case "priority":

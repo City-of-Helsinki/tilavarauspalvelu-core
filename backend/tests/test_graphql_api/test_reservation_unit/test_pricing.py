@@ -4,18 +4,12 @@ import datetime
 from decimal import Decimal
 
 import pytest
-from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import PaymentType
+from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.models import ReservationUnit
-from utils.date_utils import local_date, local_datetime
+from utils.date_utils import local_date
 
-from tests.factories import (
-    ReservationUnitAccessTypeFactory,
-    ReservationUnitFactory,
-    ReservationUnitPricingFactory,
-    SpaceFactory,
-)
+from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory, TaxPercentageFactory
 
 from .helpers import (
     CREATE_MUTATION,
@@ -23,7 +17,6 @@ from .helpers import (
     get_create_draft_input_data,
     get_create_non_draft_input_data,
     get_pricing_data,
-    get_update_draft_input_data,
     reservation_units_query,
 )
 
@@ -31,9 +24,6 @@ from .helpers import (
 pytestmark = [
     pytest.mark.django_db,
 ]
-
-
-# Query
 
 
 def test_reservation_unit__query__pricing__old_pricings_not_returned(graphql):
@@ -81,130 +71,95 @@ def test_reservation_unit__query__pricing__old_pricings_not_returned(graphql):
     }
 
 
-# Create
-
-
 def test_reservation_unit__create__pricing__is_not_required_for_drafts(graphql):
     graphql.login_with_superuser()
-    input_data = get_create_draft_input_data()
-
-    response = graphql(CREATE_MUTATION, variables={"input": input_data})
+    response = graphql(CREATE_MUTATION, input_data=get_create_draft_input_data())
 
     assert response.has_errors is False, response
 
-    reservation_unit = ReservationUnit.objects.get(pk=response.results["pk"])
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
     assert reservation_unit.pricings.count() == 0
 
 
-def test_reservation_unit__create__pricing__must_have_one_active_pricing_if_not_draft__empty(graphql):
+def test_reservation_unit__create__pricing__is_required_for_non_drafts(graphql):
     graphql.login_with_superuser()
-
-    input_data = get_create_non_draft_input_data(pricings=[])
-
-    response = graphql(CREATE_MUTATION, variables={"input": input_data})
+    response = graphql(CREATE_MUTATION, input_data=get_create_draft_input_data(isDraft=False))
 
     assert response.has_errors is True, response
-    assert response.error_message(0) == "At least one active pricing is required for non-draft reservation units."
-
-    assert ReservationUnit.objects.count() == 0
-
-
-def test_reservation_unit__create__pricing__must_have_one_active_pricing_if_not_draft__not_active(graphql):
-    tomorrow = local_date() + datetime.timedelta(days=1)
-    pricing = get_pricing_data(begins=tomorrow.isoformat())
-
-    input_data = get_create_non_draft_input_data(pricings=[pricing])
-
-    graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": input_data})
-
-    assert response.has_errors is True, response
-    assert response.error_message(0) == "At least one active pricing is required for non-draft reservation units."
-
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_MISSING
     assert ReservationUnit.objects.count() == 0
 
 
 def test_reservation_unit__create__pricing__free_pricing_doesnt_require_price_information(graphql):
-    pricing = get_pricing_data()
-    del pricing["lowestPrice"]
-    del pricing["highestPrice"]
-
-    input_data = get_create_draft_input_data(pricings=[pricing])
+    tax_percentage = TaxPercentageFactory.create(value=Decimal("0.0"))
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": input_data})
+    data = get_create_draft_input_data(
+        pricings=[
+            {
+                "begins": local_date().isoformat(),
+                "taxPercentage": tax_percentage.id,
+            },
+        ],
+    )
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
-    reservation_unit = ReservationUnit.objects.get(pk=response.results["pk"])
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
     assert reservation_unit.pricings.count() == 1
 
     pricing = reservation_unit.pricings.first()
-    assert pricing.begins == datetime.date(2022, 9, 11)
+    assert pricing.begins == local_date()
     assert pricing.lowest_price == 0
     assert pricing.highest_price == 0
     assert pricing.lowest_price_net == 0
     assert pricing.highest_price_net == 0
-    assert pricing.tax_percentage.value == Decimal(10)
-    assert pricing.payment_type == PaymentType.ONLINE_OR_INVOICE
+    assert pricing.tax_percentage.value == 0
+    assert pricing.payment_type is None
 
 
 def test_reservation_unit__create__pricing__begins_is_required(graphql):
-    pricing_data = get_pricing_data(begins=None)
-    input_data = get_create_draft_input_data(pricings=pricing_data)
-
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": input_data})
 
+    pricing_data = get_pricing_data(begins=None)
+    response = graphql(CREATE_MUTATION, input_data=get_create_draft_input_data(pricings=pricing_data))
     assert response.has_errors is True, response
 
     del pricing_data["begins"]
-    input_data = get_create_draft_input_data(pricings=pricing_data)
-
-    response = graphql(CREATE_MUTATION, variables={"input": input_data})
+    response = graphql(CREATE_MUTATION, input_data=get_create_draft_input_data(pricings=pricing_data))
     assert response.has_errors is True, response
 
 
 def test_reservation_unit__create__pricing__lowest_price_is_higher_than_highest(graphql):
-    pricing = get_pricing_data(lowestPrice=20, highestPrice=10)
-    input_data = get_create_draft_input_data(pricings=[pricing])
-
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": input_data})
+
+    data = get_create_draft_input_data(
+        pricings=[
+            get_pricing_data(
+                lowestPrice=20,
+                highestPrice=10,
+            )
+        ],
+    )
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is True, response
-    assert response.error_message(0) == "Highest price cannot be less than lowest price."
-
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_INVALID_PRICES
     assert ReservationUnit.objects.count() == 0
 
 
-def test_reservation_unit__create__pricing__missing_lowest_price(graphql):
-    pricing_data = get_pricing_data()
-
-    # Lowest price is assumed to be zero if missing
-    del pricing_data["lowestPrice"]
-
-    input_data = get_create_draft_input_data(pricings=[pricing_data])
-
+@pytest.mark.parametrize("missing_field", ["lowestPrice", "highestPrice"])
+def test_reservation_unit__create__pricing__missing_one_price_field(graphql, missing_field):
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": input_data})
 
-    assert response.has_errors is False, response.errors
-
-
-def test_reservation_unit__create__pricing__missing_highest_price(graphql):
     pricing_data = get_pricing_data()
+    del pricing_data[missing_field]
+    data = get_create_draft_input_data(pricings=[pricing_data])
+    response = graphql(CREATE_MUTATION, input_data=data)
 
-    # Lowest price is assumed to be zero if missing
-    del pricing_data["highestPrice"]
-
-    input_data = get_create_draft_input_data(pricings=[pricing_data])
-
-    graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": input_data})
-
-    assert response.error_message(0) == "Highest price cannot be less than lowest price."
-
+    assert response.has_errors is True, response
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_INVALID_PRICES
     assert ReservationUnit.objects.count() == 0
 
 
@@ -213,79 +168,61 @@ def test_reservation_unit__create__pricing__payment_type_field_is_required(graph
 
     pricing_data = get_pricing_data()
     del pricing_data["paymentType"]
-
-    input_data = get_create_draft_input_data(pricings=[pricing_data])
-
-    response = graphql(CREATE_MUTATION, variables={"input": input_data})
+    data = get_create_draft_input_data(pricings=[pricing_data])
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is True, response
-    assert "Field 'paymentType' of required type 'PaymentType!' was not provided." in response.error_message(0)
-
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICING_NO_PAYMENT_TYPE
     assert ReservationUnit.objects.count() == 0
 
 
 def test_reservation_unit__create__pricing__allow_only_one_pricing_per_date(graphql):
-    input_data = get_create_draft_input_data(pricings=[get_pricing_data(), get_pricing_data()])
-
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": input_data})
+    data = get_create_draft_input_data(
+        pricings=[
+            get_pricing_data(),
+            get_pricing_data(),
+        ],
+    )
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is True, response
-    assert response.error_message(0) == "Reservation unit can have only one pricing per date."
-
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_DUPLICATE_DATE
     assert ReservationUnit.objects.count() == 0
 
 
-# Update
+def test_reservation_unit__create__pricing__creating_future_pricing_without_active_is_blocked(graphql):
+    graphql.login_with_superuser()
+    tomorrow = local_date() + datetime.timedelta(days=1)
+    data = get_create_draft_input_data(
+        pricings=[
+            get_pricing_data(begins=tomorrow.isoformat()),
+        ],
+    )
+
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_NO_ACTIVE_PRICING
+    assert ReservationUnit.objects.count() == 0
 
 
 def test_reservation_unit__update__pricing__active_pricing_can_be_created_on_update(graphql):
-    space = SpaceFactory.create()
-    reservation_unit = ReservationUnitFactory.create(spaces=[space])
-    ReservationUnitAccessTypeFactory.create(reservation_unit=reservation_unit)
-
-    assert reservation_unit.pricings.count() == 0
-
-    # Update the reservation unit with active pricing
-    update_data = {
-        "pk": reservation_unit.pk,
-        "isDraft": False,
-        "pricings": [get_pricing_data()],
-    }
-
     graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, variables={"input": update_data})
+    data = get_create_non_draft_input_data(pricings=[])
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
-    reservation_unit.refresh_from_db()
-    assert reservation_unit.pricings.count() == 1
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    assert reservation_unit.pricings.count() == 0
 
-
-@freeze_time(local_datetime(2022, 1, 1, 12))
-def test_reservation_unit__update__pricing__readd_current_date_price(graphql):
-    space = SpaceFactory.create()
-    reservation_unit = ReservationUnitFactory.create(spaces=[space])
-    ReservationUnitAccessTypeFactory.create(reservation_unit=reservation_unit)
-    pricing = ReservationUnitPricingFactory.create(reservation_unit=reservation_unit, begins=local_date(2022, 1, 1))
-
-    update_data = {
-        "pk": reservation_unit.pk,
-        "isDraft": False,
-        "pricings": [
-            {
-                "begins": pricing.begins.isoformat(),
-                "priceUnit": pricing.price_unit.value,
-                "lowestPrice": str(pricing.lowest_price),
-                "highestPrice": str(pricing.highest_price),
-                "taxPercentage": pricing.tax_percentage.pk,
-                "paymentType": pricing.payment_type.value,
-            }
-        ],
-    }
-
-    graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, variables={"input": update_data})
+    # Update the reservation unit with active pricing
+    data["pk"] = reservation_unit.pk
+    data["isDraft"] = False
+    data["pricings"] = [get_pricing_data()]
+    data["accessTypes"] = []
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
@@ -294,24 +231,26 @@ def test_reservation_unit__update__pricing__readd_current_date_price(graphql):
 
 
 def test_reservation_unit__update__pricing__future_pricing_can_be_created_on_update(graphql):
+    graphql.login_with_superuser()
     today = local_date()
+    data = get_create_draft_input_data(
+        pricings=[
+            get_pricing_data(begins=today.isoformat()),
+        ],
+    )
+    response = graphql(CREATE_MUTATION, input_data=data)
 
-    space = SpaceFactory.create()
-    reservation_unit = ReservationUnitFactory.create(spaces=[space])
-    ReservationUnitAccessTypeFactory.create(reservation_unit=reservation_unit)
-    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit, begins=today.isoformat())
+    assert response.has_errors is False, response
+
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    assert reservation_unit.pricings.count() == 1
 
     # Reservation unit already has an active pricing, add a future pricing
-    tomorrow = local_date() + datetime.timedelta(days=1)
-
-    update_data = {
-        "pk": reservation_unit.pk,
-        "isDraft": False,
-        "pricings": [get_pricing_data(begins=tomorrow.isoformat())],
-    }
-
-    graphql.login_with_superuser()
-    response = graphql(UPDATE_MUTATION, variables={"input": update_data})
+    tomorrow = today + datetime.timedelta(days=1)
+    data["pk"] = reservation_unit.pk
+    data["pricings"][0]["pk"] = reservation_unit.pricings.first().pk
+    data["pricings"].append(get_pricing_data(begins=tomorrow.isoformat()))
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
@@ -321,25 +260,22 @@ def test_reservation_unit__update__pricing__future_pricing_can_be_created_on_upd
 
 def test_reservation_unit__update__pricing__add_another_active_pricing(graphql):
     graphql.login_with_superuser()
-
-    create_data = get_create_draft_input_data(pricings=[get_pricing_data(begins="2022-09-01")])
-
-    response = graphql(CREATE_MUTATION, variables={"input": create_data})
+    data = get_create_draft_input_data(
+        pricings=[
+            get_pricing_data(begins="2022-09-01"),
+        ],
+    )
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
-    reservation_unit = ReservationUnit.objects.get(pk=response.results["pk"])
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    assert reservation_unit.pricings.count() == 1
 
-    pricings = list(reservation_unit.pricings.all())
-    assert len(pricings) == 1
-
-    update_data = get_update_draft_input_data(reservation_unit)
-    update_data["pricings"] = [
-        {"pk": pricings[0].pk},
-        get_pricing_data(begins="2022-09-02"),  # Becomes the new active pricing
-    ]
-
-    response = graphql(UPDATE_MUTATION, variables={"input": update_data})
+    data["pk"] = reservation_unit.pk
+    data["pricings"][0]["pk"] = reservation_unit.pricings.first().pk
+    data["pricings"].append(get_pricing_data(begins="2022-09-02"))  # Becomes the new active pricing
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
@@ -350,33 +286,25 @@ def test_reservation_unit__update__pricing__add_another_active_pricing(graphql):
 def test_reservation_unit__update__pricing__add_another_future_pricing(graphql):
     graphql.login_with_superuser()
     tomorrow = local_date() + datetime.timedelta(days=1)
-
-    create_data = get_create_draft_input_data(
+    data = get_create_draft_input_data(
         pricings=[
             get_pricing_data(),
             get_pricing_data(begins=tomorrow.isoformat()),
         ],
     )
-
-    response = graphql(CREATE_MUTATION, variables={"input": create_data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
-    reservation_unit = ReservationUnit.objects.get(pk=response.results["pk"])
-
-    pricings = list(reservation_unit.pricings.all())
-    assert len(pricings) == 2
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    assert reservation_unit.pricings.count() == 2
 
     day_after_tomorrow = tomorrow + datetime.timedelta(days=1)
-
-    update_data = get_update_draft_input_data(reservation_unit)
-    update_data["pricings"] = [
-        {"pk": pricings[0].pk},
-        {"pk": pricings[1].pk},
-        get_pricing_data(begins=day_after_tomorrow.isoformat()),  # Future pricing
-    ]
-
-    response = graphql(UPDATE_MUTATION, variables={"input": update_data})
+    data["pk"] = reservation_unit.pk
+    data["pricings"][0]["pk"] = reservation_unit.pricings.first().pk
+    data["pricings"][1]["pk"] = reservation_unit.pricings.last().pk
+    data["pricings"].append(get_pricing_data(begins=day_after_tomorrow.isoformat()))
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
@@ -390,82 +318,70 @@ def test_reservation_unit__update__pricing__remove_pricings(graphql):
     today = local_date()
     past_pricing_date = (today - datetime.timedelta(days=2)).isoformat()
     future_pricing_date = (today + datetime.timedelta(days=2)).isoformat()
-
-    create_data = get_create_draft_input_data(
+    data = get_create_draft_input_data(
         pricings=[
             get_pricing_data(begins=past_pricing_date),
             get_pricing_data(begins=today.isoformat()),
             get_pricing_data(begins=future_pricing_date),
         ],
     )
-
-    response = graphql(CREATE_MUTATION, variables={"input": create_data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
-    reservation_unit = ReservationUnit.objects.get(pk=response.results["pk"])
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    assert reservation_unit.pricings.count() == 3
 
-    pricings = list(reservation_unit.pricings.all())
-    assert len(pricings) == 3
-
-    active_pricing = reservation_unit.pricings.get(begins=today)
-
-    # Remove past and future pricing
-    update_data = get_update_draft_input_data(reservation_unit)
-    update_data["pricings"] = [
-        {"pk": active_pricing.pk},
-    ]
-
-    response = graphql(UPDATE_MUTATION, variables={"input": update_data})
+    # Remove past and future pricing from the payload
+    data["pk"] = reservation_unit.pk
+    data["pricings"].pop(0)  # Remove past pricing
+    data["pricings"].pop(1)  # Remove future pricing
+    active_pricing_pk = reservation_unit.pricings.filter(begins=today).first().pk
+    data["pricings"][0]["pk"] = active_pricing_pk
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.pricings.count() == 2  # Past and active pricing
-    assert reservation_unit.pricings.order_by("begins").last().pk == active_pricing.pk
+    assert reservation_unit.pricings.last().pk == active_pricing_pk
 
     # Try to remove all pricings, which fails silently, as only future pricings can be removed (not past or active ones)
-    update_data["pricings"] = []
-
-    response = graphql(UPDATE_MUTATION, variables={"input": update_data})
+    data["pricings"] = []
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.pricings.count() == 2  # Past and active pricing
-    assert reservation_unit.pricings.order_by("begins").last().pk == active_pricing.pk
+    assert reservation_unit.pricings.last().pk == active_pricing_pk
 
 
-def test_reservation_unit__update__pricing__not_including_active_pricing_while_future_exists(graphql):
+def test_reservation_unit__update__pricing__remove_active_pricing_while_future_exists(graphql):
     graphql.login_with_superuser()
 
     future_pricing_date = local_date() + datetime.timedelta(days=2)
-    create_data = get_create_draft_input_data(
+    data = get_create_draft_input_data(
         pricings=[
             get_pricing_data(),
             get_pricing_data(begins=future_pricing_date.isoformat()),
         ],
     )
-    response = graphql(CREATE_MUTATION, variables={"input": create_data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
-    reservation_unit = ReservationUnit.objects.get(pk=response.results["pk"])
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    assert reservation_unit.pricings.count() == 2
 
-    pricings = list(reservation_unit.pricings.all())
-    assert len(pricings) == 2
+    # Remove active pricing
+    data["pk"] = reservation_unit.pk
+    data["pricings"].pop(0)
+    data["pricings"][0]["pk"] = reservation_unit.pricings.first().pk
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
-    future_pricing = reservation_unit.pricings.get(begins=future_pricing_date)
-
-    # Updating without including the active pricing does not remove it
-    update_data = get_update_draft_input_data(reservation_unit)
-    update_data["pricings"] = [
-        {"pk": future_pricing.pk},
-    ]
-
-    response = graphql(UPDATE_MUTATION, variables={"input": update_data})
-
-    assert response.has_errors is False, response.errors
+    assert response.has_errors is True, response
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_NO_ACTIVE_PRICING
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.pricings.count() == 2
@@ -474,20 +390,18 @@ def test_reservation_unit__update__pricing__not_including_active_pricing_while_f
 def test_reservation_unit__update__pricing__pricings_not_sent_for_non_draft_reservation_unit(graphql):
     graphql.login_with_superuser()
 
-    create_data = get_create_non_draft_input_data(pricings=[get_pricing_data()])
-    response = graphql(CREATE_MUTATION, variables={"input": create_data})
+    data = get_create_non_draft_input_data(pricings=[get_pricing_data()])
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
-    reservation_unit = ReservationUnit.objects.get(pk=response.results["pk"])
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
+    assert reservation_unit.pricings.count() == 1
 
-    pricings = list(reservation_unit.pricings.all())
-    assert len(pricings) == 1
-
-    update_data = get_update_draft_input_data(reservation_unit)
-    update_data["isDraft"] = False
-    update_data["accessTypes"] = []
-
-    response = graphql(UPDATE_MUTATION, variables={"input": update_data})
+    data["pk"] = reservation_unit.pk
+    data["isDraft"] = False
+    del data["pricings"]
+    data["accessTypes"] = []
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response

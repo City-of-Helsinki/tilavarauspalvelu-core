@@ -54,11 +54,6 @@ const nextConfig = {
         source: "/applications/:id/reservations/:reservationId/cancel",
         destination: "/reservations/:reservationId/cancel",
       },
-      // healthcheck should be a simple 200 response with no resource loading
-      {
-        source: "/healthcheck",
-        destination: "/api/healthcheck",
-      },
     ];
   },
   // NOTE webpack.experimental.topLevelAwait breaks middleware (it hangs forever)

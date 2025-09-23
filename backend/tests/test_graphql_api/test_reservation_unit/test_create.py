@@ -27,15 +27,15 @@ def test_reservation_unit__create(graphql):
 
     data = {
         "isDraft": True,
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit.pk,
     }
 
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
-    reservation_unit = ReservationUnit.objects.get(pk=response.results["pk"])
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
     assert reservation_unit.is_draft is True
     assert reservation_unit.unit == unit
 
@@ -71,18 +71,18 @@ def test_reservation_unit__create__send_to_hauki__succeeded(graphql, settings):
 
     data = {
         "isDraft": True,
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit.pk,
     }
 
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert HaukiAPIClient.get_resource.call_count == 1
     assert HaukiAPIClient.create_resource.call_count == 1
 
     assert response.has_errors is False
 
-    reservation_unit = ReservationUnit.objects.get(pk=response.results["pk"])
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
     assert reservation_unit.is_draft is True
     assert reservation_unit.unit == unit
     assert reservation_unit.origin_hauki_resource.id == 123
@@ -98,16 +98,16 @@ def test_reservation_unit__create__send_to_hauki__failed(graphql, settings):
 
     data = {
         "isDraft": True,
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit.pk,
     }
 
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert HaukiAPIClient.get_resource.call_count == 1
     assert HaukiAPIClient.create_resource.call_count == 1
 
-    assert response.error_message(0) == "Sending reservation unit as resource to aukiolosovellus failed"
+    assert response.error_message() == "Sending reservation unit as resource to HAUKI failed."
 
     # Unit is still created
     reservation_unit: ReservationUnit | None = ReservationUnit.objects.first()
@@ -123,13 +123,14 @@ def test_reservation_unit__create__empty_name(graphql):
 
     data = {
         "isDraft": True,
-        "nameFi": "",
+        "name": "",
         "unit": unit.pk,
     }
 
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "This field cannot be blank."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("name") == ["This field may not be blank."]
 
 
 def test_reservation_unit__create__instructions(graphql):
@@ -138,7 +139,7 @@ def test_reservation_unit__create__instructions(graphql):
 
     data = {
         "isDraft": True,
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit.pk,
         "reservationPendingInstructionsFi": "Pending instructions fi",
         "reservationPendingInstructionsSv": "Pending instructions sv",
@@ -151,11 +152,11 @@ def test_reservation_unit__create__instructions(graphql):
         "reservationCancelledInstructionsEn": "Cancelled instructions en",
     }
 
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
-    reservation_unit: ReservationUnit = ReservationUnit.objects.get(pk=response.results["pk"])
+    reservation_unit: ReservationUnit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
     assert reservation_unit.reservation_pending_instructions_fi == "Pending instructions fi"
     assert reservation_unit.reservation_pending_instructions_sv == "Pending instructions sv"
     assert reservation_unit.reservation_pending_instructions_en == "Pending instructions en"
@@ -171,11 +172,11 @@ def test_reservation_unit__create__non_draft(graphql):
     data = get_create_non_draft_input_data()
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
-    assert ReservationUnit.objects.filter(pk=response.results["pk"]).exists()
+    assert ReservationUnit.objects.filter(pk=response.first_query_object["pk"]).exists()
 
 
 def test_reservation_unit__create__non_draft__empty_name_translation(graphql):
@@ -183,9 +184,12 @@ def test_reservation_unit__create__non_draft__empty_name_translation(graphql):
     data["nameEn"] = ""
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "Not-draft reservation unit must have a name in english."
+    assert response.error_message().startswith("Mutation was unsuccessful.")
+    assert response.field_error_messages() == [
+        "Not draft state reservation units must have a translations. Missing translation for nameEn.",
+    ]
     assert ReservationUnit.objects.count() == 0
 
 
@@ -194,9 +198,12 @@ def test_reservation_unit__create__non_draft__missing_name_translation(graphql):
     del data["nameEn"]
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "Not-draft reservation unit must have a name in english."
+    assert response.error_message().startswith("Mutation was unsuccessful.")
+    assert response.field_error_messages() == [
+        "Not draft state reservation units must have a translations. Missing translation for nameEn.",
+    ]
     assert ReservationUnit.objects.count() == 0
 
 
@@ -205,9 +212,12 @@ def test_reservation_unit__create__non_draft__empty_description_translation(grap
     data["descriptionEn"] = ""
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "Not-draft reservation unit must have a description in english."
+    assert response.error_message().startswith("Mutation was unsuccessful.")
+    assert response.field_error_messages() == [
+        "Not draft state reservation units must have a translations. Missing translation for descriptionEn.",
+    ]
     assert ReservationUnit.objects.count() == 0
 
 
@@ -216,9 +226,12 @@ def test_reservation_unit__create__non_draft__missing_description_translation(gr
     del data["descriptionEn"]
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "Not-draft reservation unit must have a description in english."
+    assert response.error_message().startswith("Mutation was unsuccessful.")
+    assert response.field_error_messages() == [
+        "Not draft state reservation units must have a translations. Missing translation for descriptionEn.",
+    ]
     assert ReservationUnit.objects.count() == 0
 
 
@@ -228,11 +241,12 @@ def test_reservation_unit__create__non_draft__empty_spaces_and_missing_resources
     data["spaces"] = []
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == (
-        "Not-draft state reservation unit must have one or more space or resource defined"
-    )
+    assert response.error_message().startswith("Mutation was unsuccessful.")
+    assert response.field_error_messages() == [
+        "Not draft state reservation unit must have one or more space or resource defined",
+    ]
     assert ReservationUnit.objects.count() == 0
 
 
@@ -242,11 +256,12 @@ def test_reservation_unit__create__non_draft__missing_spaces_and_missing_resourc
     del data["spaces"]
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == (
-        "Not-draft state reservation unit must have one or more space or resource defined"
-    )
+    assert response.error_message().startswith("Mutation was unsuccessful.")
+    assert response.field_error_messages() == [
+        "Not draft state reservation unit must have one or more space or resource defined"
+    ]
     assert ReservationUnit.objects.count() == 0
 
 
@@ -255,9 +270,10 @@ def test_reservation_unit__create__non_draft__missing_reservation_unit_type(grap
     del data["reservationUnitType"]
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "Not-draft reservation unit must have a reservation unit type"
+    assert response.error_message().startswith("Mutation was unsuccessful.")
+    assert response.field_error_messages() == ["Not draft reservation unit must have a reservation unit type."]
     assert ReservationUnit.objects.count() == 0
 
 
@@ -266,9 +282,10 @@ def test_reservation_unit__create__non_draft__min_persons_over_max_persons(graph
     data["minPersons"] = 11
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "'minPersons' can't be more than 'maxPersons'"
+    assert response.error_message().startswith("Mutation was unsuccessful.")
+    assert response.field_error_messages() == ["minPersons can't be more than maxPersons"]
     assert ReservationUnit.objects.count() == 0
 
 
@@ -277,11 +294,11 @@ def test_reservation_unit__create__non_draft__reservation_kind_defaults_to_direc
     del data["reservationKind"]
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
-    reservation_unit = ReservationUnit.objects.get(pk=response.results["pk"])
+    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
     assert reservation_unit.reservation_kind == ReservationKind.DIRECT_AND_SEASON
 
 
@@ -294,10 +311,10 @@ def test_reservation_unit__create__min_max_reservation_duration__valid(graphql):
     data["maxReservationDuration"] = int(datetime.timedelta(hours=3).total_seconds())
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False
-    assert ReservationUnit.objects.filter(pk=response.results["pk"]).exists()
+    assert ReservationUnit.objects.filter(pk=response.first_query_object["pk"]).exists()
 
 
 def test_reservation_unit__create__min_reservation_duration_greater_than_max_reservation_duration(graphql):
@@ -306,9 +323,10 @@ def test_reservation_unit__create__min_reservation_duration_greater_than_max_res
     data["maxReservationDuration"] = int(datetime.timedelta(hours=1).total_seconds())
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "'minReservationDuration' can't be greater than 'maxReservationDuration'"
+    assert response.error_message().startswith("Mutation was unsuccessful."), response
+    assert response.field_error_messages() == ["minReservationDuration can't be greater than maxReservationDuration"]
     assert ReservationUnit.objects.count() == 0
 
 
@@ -319,9 +337,10 @@ def test_reservation_unit__create__min_max_reservation_duration__shorter_than_st
     data[field_name] = int(datetime.timedelta(minutes=30).total_seconds())
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == f"'{field_name}' must be at least the 'reservationStartInterval'"
+    assert response.error_message().startswith("Mutation was unsuccessful."), response
+    assert response.field_error_messages() == [f"{field_name} must be at least the reservation start interval"]
     assert ReservationUnit.objects.count() == 0
 
 
@@ -332,9 +351,10 @@ def test_reservation_unit__create__min_max_reservation_duration__not_multiple_of
     data[field_name] = int(datetime.timedelta(minutes=90).total_seconds())
 
     graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == f"'{field_name}' must be a multiple of the 'reservationStartInterval'"
+    assert response.error_message().startswith("Mutation was unsuccessful."), response
+    assert response.field_error_messages() == [f"{field_name} must be a multiple of the reservation start interval"]
     assert ReservationUnit.objects.count() == 0
 
 
@@ -350,7 +370,7 @@ def test_reservation_unit__create__with_timeslots(graphql):
 
     data = {
         "isDraft": True,
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit.pk,
         "applicationRoundTimeSlots": [
             {
@@ -368,7 +388,7 @@ def test_reservation_unit__create__with_timeslots(graphql):
 
     # when:
     # - The user tries to create a new reservation unit with timeslots
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors
@@ -389,7 +409,7 @@ def test_reservation_unit__create__with_timeslots__weekday_required(graphql):
 
     data = {
         "isDraft": True,
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit.pk,
         "applicationRoundTimeSlots": [
             {
@@ -403,12 +423,12 @@ def test_reservation_unit__create__with_timeslots__weekday_required(graphql):
     # when:
     # - The user tries to create a new reservation unit with timeslots
     # - Timeslot is missing weekday
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors about requiring weekday
     assert response.has_errors is True, response
-    assert "Field 'weekday' of required" in response.error_message(0)
+    assert "Field 'weekday' of required" in response.error_message()
 
 
 def test_reservation_unit__create__with_timeslots__begin_before_end(graphql):
@@ -420,7 +440,7 @@ def test_reservation_unit__create__with_timeslots__begin_before_end(graphql):
 
     data = {
         "isDraft": True,
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit.pk,
         "applicationRoundTimeSlots": [
             {
@@ -435,13 +455,19 @@ def test_reservation_unit__create__with_timeslots__begin_before_end(graphql):
     # when:
     # - The user tries to create a new reservation unit with timeslots
     # - Timeslot reservable times overlap
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors about end time being before begin time
     assert response.has_errors is True, response
-
-    assert response.error_message(0) == "Timeslot 1 begin time must be before end time."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRoundTimeSlots") == [
+        {
+            "reservableTimes": [
+                "Timeslot 1 begin time must be before end time.",
+            ],
+        },
+    ]
 
 
 def test_reservation_unit__create__with_timeslots__overlapping_reservable_times(graphql):
@@ -453,7 +479,7 @@ def test_reservation_unit__create__with_timeslots__overlapping_reservable_times(
 
     data = {
         "isDraft": True,
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit.pk,
         "applicationRoundTimeSlots": [
             {
@@ -469,15 +495,19 @@ def test_reservation_unit__create__with_timeslots__overlapping_reservable_times(
     # when:
     # - The user tries to create a new reservation unit with timeslots
     # - Timeslot reservable times overlap
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors about overlapping reservable times
     assert response.has_errors is True, response
-
-    assert response.error_message(0) == (
-        "Timeslot 1 (10:00:00 - 12:00:00) overlaps with timeslot 2 (11:00:00 - 15:00:00)."
-    )
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRoundTimeSlots") == [
+        {
+            "reservableTimes": [
+                "Timeslot 1 (10:00:00 - 12:00:00) overlaps with timeslot 2 (11:00:00 - 15:00:00).",
+            ],
+        },
+    ]
 
 
 def test_reservation_unit__create__with_timeslots__two_for_same_day(graphql):
@@ -489,7 +519,7 @@ def test_reservation_unit__create__with_timeslots__two_for_same_day(graphql):
 
     data = {
         "isDraft": True,
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit.pk,
         "applicationRoundTimeSlots": [
             {
@@ -508,13 +538,15 @@ def test_reservation_unit__create__with_timeslots__two_for_same_day(graphql):
     # when:
     # - The user tries to create a new reservation unit with timeslots
     # - There are two timeslots for the same day
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors about multiple timeslots for the same day
     assert response.has_errors is True, response
-
-    assert response.error_message(0) == "Got multiple timeslots for Monday."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRoundTimeSlots") == [
+        "Got multiple timeslots for Monday.",
+    ]
 
 
 def test_reservation_unit__create__with_timeslots__open_has_no_reservable_times(graphql):
@@ -526,7 +558,7 @@ def test_reservation_unit__create__with_timeslots__open_has_no_reservable_times(
 
     data = {
         "isDraft": True,
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit.pk,
         "applicationRoundTimeSlots": [
             {
@@ -539,13 +571,15 @@ def test_reservation_unit__create__with_timeslots__open_has_no_reservable_times(
     # when:
     # - The user tries to create a new reservation unit with timeslots
     # - There are two timeslots for the same day
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors about no reservable times
     assert response.has_errors is True, response
-
-    assert response.error_message(0) == "Open timeslots must have reservable times."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRoundTimeSlots") == [
+        "Open timeslots must have reservable times.",
+    ]
 
 
 def test_reservation_unit__create__with_timeslots__closed_has_reservable_times(graphql):
@@ -557,7 +591,7 @@ def test_reservation_unit__create__with_timeslots__closed_has_reservable_times(g
 
     data = {
         "isDraft": True,
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit.pk,
         "applicationRoundTimeSlots": [
             {
@@ -573,13 +607,15 @@ def test_reservation_unit__create__with_timeslots__closed_has_reservable_times(g
     # when:
     # - The user tries to create a new reservation unit with timeslots
     # - There are two timeslots for the same day
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors about closed timeslot having reservable times
     assert response.has_errors is True, response
-
-    assert response.error_message(0) == "Closed timeslots cannot have reservable times."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRoundTimeSlots") == [
+        "Closed timeslots cannot have reservable times.",
+    ]
 
 
 def test_reservation_unit__create__reservation_block_whole_day(graphql):
@@ -588,12 +624,12 @@ def test_reservation_unit__create__reservation_block_whole_day(graphql):
 
     data = {
         "isDraft": True,
-        "nameFi": "foo",
+        "name": "foo",
         "unit": unit.pk,
         "reservationBlockWholeDay": True,
     }
 
-    response = graphql(CREATE_MUTATION, variables={"input": data})
+    response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 

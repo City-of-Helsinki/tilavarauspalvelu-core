@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import pytest
+from auditlog.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
 
+from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, AuthenticationType, TermsOfUseTypeChoices
 from tilavarauspalvelu.models import ReservationUnit
 from utils.auditlog_util import AuditLogger
 
-from tests.factories import ReservationMetadataSetFactory, ReservationUnitFactory, SpaceFactory, TermsOfUseFactory
+from tests.factories import ReservationMetadataSetFactory, ReservationUnitFactory, TermsOfUseFactory
 
-from .helpers import UPDATE_MUTATION, get_update_draft_input_data
+from .helpers import UPDATE_MUTATION, get_draft_update_input_data
 
 # Applied to all tests
 pytestmark = [
@@ -24,9 +27,9 @@ def test_reservation_unit__update__name(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_update_draft_input_data(reservation_unit, nameFi="foo")
+    data = get_draft_update_input_data(reservation_unit, nameFi="foo")
 
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
 
     reservation_unit.refresh_from_db()
@@ -38,9 +41,9 @@ def test_reservation_unit__update__metadata_set(graphql):
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     metadata_set = ReservationMetadataSetFactory.create()
-    data = get_update_draft_input_data(reservation_unit, metadataSet=metadata_set.pk)
+    data = get_draft_update_input_data(reservation_unit, metadataSet=metadata_set.pk)
 
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
 
     reservation_unit.refresh_from_db()
@@ -51,9 +54,9 @@ def test_reservation_unit__update__metadata_set__null(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_update_draft_input_data(reservation_unit, metadataSet=None)
+    data = get_draft_update_input_data(reservation_unit, metadataSet=None)
 
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
 
     reservation_unit.refresh_from_db()
@@ -67,14 +70,14 @@ def test_reservation_unit__update__terms_of_use(graphql):
     cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
     service_specific_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.SERVICE)
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_update_draft_input_data(
+    data = get_draft_update_input_data(
         reservation_unit,
         paymentTerms=payment_terms.pk,
         cancellationTerms=cancellation_terms.pk,
         serviceSpecificTerms=service_specific_terms.pk,
     )
 
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
 
     reservation_unit.refresh_from_db()
@@ -87,7 +90,7 @@ def test_reservation_unit__update__instructions(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_update_draft_input_data(
+    data = get_draft_update_input_data(
         reservation_unit,
         reservationPendingInstructionsFi="Pending instructions fi",
         reservationPendingInstructionsSv="Pending instructions sv",
@@ -100,7 +103,7 @@ def test_reservation_unit__update__instructions(graphql):
         reservationCancelledInstructionsEn="Cancelled instructions en",
     )
 
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
 
     reservation_unit.refresh_from_db()
@@ -119,9 +122,9 @@ def test_reservation_unit__update__authentication(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_update_draft_input_data(reservation_unit, authentication=AuthenticationType.STRONG)
+    data = get_draft_update_input_data(reservation_unit, authentication=AuthenticationType.STRONG.value.upper())
 
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
 
     reservation_unit.refresh_from_db()
@@ -132,11 +135,11 @@ def test_reservation_unit__update__errors_with_invalid_authentication(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_update_draft_input_data(reservation_unit, authentication="invalid")
+    data = get_draft_update_input_data(reservation_unit, authentication="invalid")
 
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message(0).startswith("Variable '$input' got invalid value 'invalid'")
+    assert response.error_message().startswith("Variable '$input' got invalid value 'invalid'")
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.authentication != "invalid"
@@ -146,20 +149,68 @@ def test_reservation_unit__update__errors_with_empty_name(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_update_draft_input_data(reservation_unit, nameFi="")
+    data = get_draft_update_input_data(reservation_unit, name="")
 
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message(0) == "This field cannot be blank."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("name") == ["This field may not be blank."]
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.name_fi != ""
 
 
+def test_reservation_unit__update__archiving_removes_contact_information_and_audit_logs(graphql, settings):
+    settings.AUDIT_LOGGING_ENABLED = True
+    AuditLogger.register(
+        ReservationUnit,
+        # Exclude lookup properties, since they are calculated values.
+        exclude_fields=[
+            "_publishing_state",
+            "_reservation_state",
+            "_active_pricing_price",
+            "_current_access_type",
+        ],
+    )
+
+    graphql.login_with_superuser()
+
+    reservation_unit = ReservationUnitFactory.create(is_draft=True, contact_information="foo")
+    reservation_unit.contact_information = "bar"
+    reservation_unit.save()
+
+    # Two log entries are exist for the reservation unit,
+    # one for the creation and one for the contact information update
+    content_type = ContentType.objects.get_for_model(ReservationUnit)
+    log_entries = LogEntry.objects.filter(content_type_id=content_type.pk, object_id=reservation_unit.pk).order_by("pk")
+
+    assert log_entries[0].action == LogEntry.Action.CREATE
+    assert log_entries[1].changes == {"contact_information": ["foo", "bar"]}
+    assert log_entries.count() == 2
+
+    # Update the reservation unit to be archived
+    data = get_draft_update_input_data(reservation_unit, isArchived=True)
+
+    response = graphql(UPDATE_MUTATION, input_data=data)
+    assert response.has_errors is False, response
+
+    reservation_unit.refresh_from_db()
+
+    # ReservationUnit is marked as both archived and draft
+    assert reservation_unit.is_archived is True
+    assert reservation_unit.is_draft is True
+
+    # Contact information is removed
+    assert reservation_unit.contact_information == ""
+
+    # Old log entries are removed
+    log_entries = LogEntry.objects.filter(content_type_id=content_type.pk, object_id=reservation_unit.pk)
+    assert log_entries.count() == 0
+
+
 def test_reservation_unit__update__publish(graphql):
     graphql.login_with_superuser()
 
-    space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(
         is_draft=True,
         name="foo",
@@ -172,11 +223,10 @@ def test_reservation_unit__update__publish(graphql):
         description_en="foo",
         pricings__highest_price=20,
         access_types__access_type=AccessType.UNRESTRICTED,
-        spaces=[space],
     )
-    data = get_update_draft_input_data(reservation_unit, isDraft=False)
+    data = get_draft_update_input_data(reservation_unit, isDraft=False)
 
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
 
     reservation_unit.refresh_from_db()
@@ -198,8 +248,8 @@ def test_reservation_unit__update__publish__no_pricings_fails(graphql):
         description_en="foo",
         pricings=[],
     )
-    data = get_update_draft_input_data(reservation_unit, isDraft=False)
+    data = get_draft_update_input_data(reservation_unit, isDraft=False)
 
-    response = graphql(UPDATE_MUTATION, variables={"input": data})
+    response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is True, response
-    assert response.error_message(0) == "At least one active pricing is required for non-draft reservation units."
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_MISSING

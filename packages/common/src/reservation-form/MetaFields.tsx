@@ -25,7 +25,7 @@ import { containsField } from "../metaFieldsHelpers";
 import { filterNonNullable } from "../helpers";
 
 type CommonProps = {
-  options: Readonly<Omit<OptionsRecord, "municipalities">>;
+  options: Readonly<Omit<OptionsRecord, "municipality">>;
   data?: {
     termsForDiscount?: JSX.Element | string;
   };
@@ -316,10 +316,10 @@ export function ReserverMetaFields({
 // Modify options to include static enums
 // the options Record (and down stream components don't narrow types properly)
 // so missing keys are not type errors but instead turn Select components -> TextFields
-export function extendMetaFieldOptions(options: Omit<OptionsRecord, "municipalities">, t: TFunction): OptionsRecord {
+export function extendMetaFieldOptions(options: Omit<OptionsRecord, "municipality">, t: TFunction): OptionsRecord {
   return {
     ...options,
-    municipalities: Object.values(MunicipalityChoice).map((value) => ({
+    municipality: Object.values(MunicipalityChoice).map((value) => ({
       label: t(`common:municipalities.${value.toUpperCase()}`),
       value: value,
     })),

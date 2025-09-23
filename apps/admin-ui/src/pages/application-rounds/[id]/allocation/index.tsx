@@ -7,7 +7,6 @@ import { CenterSpinner, fontMedium, H1, Strong, TabWrapper } from "common/styled
 import { hasPermission as hasUnitPermission } from "@/modules/permissionHelper";
 import {
   ApplicationRoundFilterDocument,
-  type ApplicationRoundFilterFragment,
   type ApplicationRoundFilterQuery,
   type ApplicationRoundFilterQueryVariables,
   type ApplicationRoundFilterUnitFragment,
@@ -16,7 +15,7 @@ import {
   useApplicationSectionAllocationsQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { createNodeId, filterNonNullable, getNode, ignoreMaybeArray, sort, toNumber } from "common/src/helpers";
+import { base64encode, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { truncate } from "@/helpers";
@@ -72,7 +71,7 @@ const NumberOfResultsContainer = styled.div`
   }
 `;
 
-type ApplicationRoundFilterQueryType = ApplicationRoundFilterFragment;
+type ApplicationRoundFilterQueryType = NonNullable<ApplicationRoundFilterQuery["applicationRound"]>;
 type ReservationUnitFilterQueryType = NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
 
 function useQueryVariables(
@@ -99,13 +98,8 @@ function useQueryVariables(
   return {
     applicationRound: applicationRound.pk ?? 0,
     priority: priorityFilter,
-    preferredOrder:
-      preferredOrderFilter != null && preferredOrderFilter.length > 0
-        ? {
-            values: preferredOrderFilter,
-            allHigherThan10: includePreferredOrder10OrHigher ?? false,
-          }
-        : undefined,
+    preferredOrder: preferredOrderFilter,
+    includePreferredOrder10OrHigher,
     textSearch: nameFilter,
     municipality: municipalityFilter,
     applicantType: applicantTypeFilter,
@@ -118,7 +112,7 @@ function useQueryVariables(
   };
 }
 
-function mapOrderFilter(val: readonly number[] | null | undefined): number[] {
+function mapOrderFilter(val: ApplicationSectionAllocationsQueryVariables["preferredOrder"]): number[] {
   if (val == null) {
     return [];
   }
@@ -214,7 +208,7 @@ function ApplicationRoundAllocation({
     variables: {
       applicationRound: applicationRound.pk ?? 0,
       reservationUnit: [selectedReservationUnit ?? 0],
-      unit: unitFilter ? [unitFilter] : [],
+      unit: [unitFilter],
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
     },
     // NOTE returns incorrectly filtered data if we enable cache
@@ -226,7 +220,7 @@ function ApplicationRoundAllocation({
   const totalCount =
     allEventsData?.applicationSections?.totalCount ?? allEventsPreviousData?.applicationSections?.totalCount ?? 0;
   const allEvents = filterNonNullable(
-    (allEventsData ?? allEventsPreviousData)?.applicationSections?.edges?.map((e) => e?.node)
+    (allEventsData ?? allEventsPreviousData)?.applicationSections?.edges.map((e) => e?.node)
   );
   if (allEvents.length !== totalCount && totalCount < 100) {
     // eslint-disable-next-line no-console -- TODO use logger
@@ -242,18 +236,18 @@ function ApplicationRoundAllocation({
   // NOTE we can't filter the query because we need to show allocated in different units
   // so for all data we remove non allocated that don't match the preferredOrder
   // for calendar / right hand side we do more extensive filtering later.
-  const applicationSections = filterNonNullable(appEventsData?.applicationSections?.edges?.map((e) => e?.node))
+  const applicationSections = filterNonNullable(appEventsData?.applicationSections?.edges.map((e) => e?.node))
     .filter((section) => {
       const opts = section.reservationUnitOptions.filter((r) => {
         if (r.allocatedTimeSlots.filter((ats) => ats.reservationUnitOption.pk === r.pk).length > 0) {
           return true;
         }
 
-        const preferredOrderFilter = mapOrderFilter(queryVariables.preferredOrder?.values);
+        const preferredOrderFilter = mapOrderFilter(queryVariables.preferredOrder);
         if (preferredOrderFilter.length > 0) {
           const includedInPreferredOrder =
             preferredOrderFilter.includes(r.preferredOrder) ||
-            (queryVariables.preferredOrder?.allHigherThan10 && r.preferredOrder >= 10);
+            (queryVariables.includePreferredOrder10OrHigher && r.preferredOrder >= 10);
           return includedInPreferredOrder && r.reservationUnit.pk === selectedReservationUnit;
         }
         return r.reservationUnit.pk === selectedReservationUnit;
@@ -293,7 +287,7 @@ function ApplicationRoundAllocation({
   };
 
   const handleRefetchApplicationEvents = async () => {
-    const id = createNodeId("ApplicationRoundNode", applicationRound.pk ?? 0);
+    const id = base64encode(`ApplicationRoundNode:${applicationRound.pk}`);
     await query.client.refetchQueries({
       include: ["ApplicationRound", id],
     });
@@ -398,7 +392,6 @@ export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Elemen
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
   useEffect(() => {
-    // oxlint-disable react/exhaustive-deps -- this is the correct list, but should be refactored
     // TODO need to add the side effect to the select filter
     // or maybe not? an invalid value is going to get filtered here anyway and we use the first reservation unit
     const setUnitFilter = (value: number) => {
@@ -412,7 +405,7 @@ export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Elemen
     if (filteredUnits.length > 0 && (unitFilter == null || unitFilter < 1)) {
       setUnitFilter(filteredUnits[0]?.pk ?? 0);
     }
-    // oxlint-enable react/exhaustive-deps -- this is the correct list, but should be refactored
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- this is the correct list, but should be refactored
   }, [filteredUnits]);
 
   // user has no accesss to specific unit through URL with search params -> reset the filter
@@ -453,13 +446,15 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const client = createClient(commonProps.apiBaseUrl, req);
   const { data } = await client.query<ApplicationRoundFilterQuery, ApplicationRoundFilterQueryVariables>({
     query: ApplicationRoundFilterDocument,
-    variables: { id: createNodeId("ApplicationRoundNode", pk) },
+    variables: { id: base64encode(`ApplicationRoundNode:${pk}`) },
   });
 
-  const applicationRound = getNode(data);
+  const { applicationRound } = data;
+
   if (applicationRound == null) {
     return NOT_FOUND_SSR_VALUE;
   }
+
   return {
     props: {
       applicationRound,
@@ -469,76 +464,69 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-export const APPLICATION_SECTION_ALLOCATION_FRAGMENT = gql`
-  fragment ApplicationSectionAllocation on ApplicationSectionNode {
-    ...ApplicationSectionFields
-    allocations
-    suitableTimeRanges(filter: { fulfilled: false }) {
-      id
-      beginTime
-      endTime
-      dayOfTheWeek
-      priority
-      fulfilled
-    }
-    reservationUnitOptions {
-      id
-      pk
-      isRejected
-      isLocked
-      allocatedTimeSlots {
-        pk
-        ...AllocatedTimeSlot
-        reservationUnitOption {
-          id
-          pk
-          applicationSection {
-            id
-            pk
-          }
-        }
-      }
-    }
-  }
-`;
-
 export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
   query ApplicationSectionAllocations(
-    $after: String
-    # Filter
-    $ageGroup: [Int!]
-    $applicantType: [ReserveeType!]
     $applicationRound: Int!
-    $applicationStatus: [ApplicationStatusChoice!]!
+    $applicationStatus: [ApplicationStatusChoice]!
+    $status: [ApplicationSectionStatusChoice]
+    $applicantType: [ReserveeType]
+    $preferredOrder: [Int]
+    $textSearch: String
+    $priority: [Priority]
+    $purpose: [Int]
+    $reservationUnit: Int!
     $beginDate: Date!
     $endDate: Date!
-    $municipality: [MunicipalityChoice!]
-    $preferredOrder: PreferredOrderFilterInput
-    $priority: [Priority!]
-    $purpose: [Int!]
-    $reservationUnit: Int!
-    $status: [ApplicationSectionStatusChoice!]
-    $textSearch: String
+    $ageGroup: [Int]
+    $municipality: [MunicipalityChoice]
+    $includePreferredOrder10OrHigher: Boolean
+    $after: String
   ) {
     applicationSections(
+      applicationRound: $applicationRound
+      applicationStatus: $applicationStatus
+      status: $status
+      applicantType: $applicantType
+      preferredOrder: $preferredOrder
+      textSearch: $textSearch
+      priority: $priority
+      purpose: $purpose
+      reservationUnit: [$reservationUnit]
+      ageGroup: $ageGroup
+      municipality: $municipality
+      includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
       after: $after
-      filter: {
-        ageGroup: $ageGroup
-        applicantType: $applicantType
-        applicationRound: $applicationRound
-        applicationStatus: $applicationStatus
-        municipality: $municipality
-        preferredOrder: $preferredOrder
-        priority: $priority
-        purpose: $purpose
-        reservationUnit: [$reservationUnit]
-        status: $status
-        textSearch: $textSearch
-      }
     ) {
       edges {
         node {
-          ...ApplicationSectionAllocation
+          ...ApplicationSectionFields
+          allocations
+          suitableTimeRanges(fulfilled: false) {
+            id
+            beginTime
+            endTime
+            dayOfTheWeek
+            priority
+            fulfilled
+          }
+          reservationUnitOptions {
+            id
+            pk
+            isRejected
+            isLocked
+            allocatedTimeSlots {
+              pk
+              ...AllocatedTimeSlot
+              reservationUnitOption {
+                id
+                pk
+                applicationSection {
+                  id
+                  pk
+                }
+              }
+            }
+          }
         }
       }
       pageInfo {
@@ -557,17 +545,15 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
 export const ALL_EVENTS_PER_UNIT_QUERY = gql`
   query AllApplicationEvents(
     $applicationRound: Int!
-    $applicationStatus: [ApplicationStatusChoice!]!
-    $reservationUnit: [Int!]!
-    $unit: [Int!]!
+    $applicationStatus: [ApplicationStatusChoice]!
+    $unit: [Int]!
+    $reservationUnit: [Int]!
   ) {
     applicationSections(
-      filter: {
-        applicationRound: $applicationRound
-        applicationStatus: $applicationStatus
-        reservationUnit: $reservationUnit
-        unit: $unit
-      }
+      applicationRound: $applicationRound
+      reservationUnit: $reservationUnit
+      unit: $unit
+      applicationStatus: $applicationStatus
     ) {
       edges {
         node {
@@ -587,34 +573,26 @@ export const ALL_EVENTS_PER_UNIT_QUERY = gql`
   }
 `;
 
-export const APPLICATION_ROUND_FILTER_FRAGMENT = gql`
-  fragment ApplicationRoundFilter on ApplicationRoundNode {
-    id
-    pk
-    nameFi
-    status
-    reservationPeriodBeginDate
-    reservationPeriodEndDate
-    reservationUnits {
-      id
-      pk
-      nameFi
-      unit {
-        ...ApplicationRoundFilterUnit
-      }
-    }
-  }
-`;
-
 /* minimal query for allocation page to populate the unit filter and reservation-units tabs
  * only needs to be done once when landing on the page
  * filtered queries only include the reservation-units that match the filters
  */
 export const APPLICATION_ROUND_FILTER_OPTIONS = gql`
   query ApplicationRoundFilter($id: ID!) {
-    node(id: $id) {
-      ... on ApplicationRoundNode {
-        ...ApplicationRoundFilter
+    applicationRound(id: $id) {
+      id
+      pk
+      nameFi
+      status
+      reservationPeriodBeginDate
+      reservationPeriodEndDate
+      reservationUnits {
+        id
+        pk
+        nameFi
+        unit {
+          ...ApplicationRoundFilterUnit
+        }
       }
     }
   }

@@ -2,8 +2,7 @@
 
 {{ text_reservation_cancelled | sentence | safe }}
 {{ reason_cancel_label | safe }}: {{ cancel_reason }}
-{% if handled_payment_due_by is not none %}{{ handled_payment_due_by_label | safe }}: {{ handled_payment_due_by }}
-{% endif %}
+
 {% include "email/text/partials/reservation_basic_info.jinja" %}
 
 {% include "email/text/partials/reservation_price.jinja" %}

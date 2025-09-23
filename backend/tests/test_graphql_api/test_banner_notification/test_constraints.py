@@ -5,9 +5,9 @@ from typing import Any, NamedTuple
 
 import pytest
 from django.db import IntegrityError
+from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tests.factories import BannerNotificationFactory
-from tests.helpers import parametrize_helper
 
 # Applied to all tests
 pytestmark = [

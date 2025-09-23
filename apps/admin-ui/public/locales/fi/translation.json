@@ -41,8 +41,8 @@
     "SUNDAY": "Sunnuntai"
   },
   "authentication": {
-    "weak": "Heikko tunnistautuminen",
-    "strong": "Vahva tunnistautuminen"
+    "WEAK": "Heikko tunnistautuminen",
+    "STRONG": "Vahva tunnistautuminen"
   },
   "reserveeType": {
     "INDIVIDUAL": "Yksityishenkilö",
@@ -84,17 +84,17 @@
     "REJECTED": "Hylätty"
   },
   "locationType": {
-    "fixed": "Kiinteä",
-    "movable": "Siirrettävä"
+    "FIXED": "Kiinteä",
+    "MOVABLE": "Siirrettävä"
   },
   "priceUnit": {
-    "fixed": "Per kerta",
-    "per_15_mins": "Per 15 min",
-    "per_30_mins": "Per 30 min",
-    "per_day": "Per päivä",
-    "per_half_day": "Per puoli päivää",
-    "per_hour": "Per tunti",
-    "per_week": "Per viikko"
+    "FIXED": "Per kerta",
+    "PER_15_MINS": "Per 15 min",
+    "PER_30_MINS": "Per 30 min",
+    "PER_DAY": "Per päivä",
+    "PER_HALF_DAY": "Per puoli päivää",
+    "PER_HOUR": "Per tunti",
+    "PER_WEEK": "Per viikko"
   },
   "orderStatus": {
     "ALL": "Maksuton",
@@ -109,16 +109,16 @@
     "FREE": "Maksuton"
   },
   "reservationStartInterval": {
-    "interval_15_mins": "15 min välein",
-    "interval_30_mins": "30 min välein",
-    "interval_60_mins": "1 tunnin välein",
-    "interval_90_mins": "1,5 tunnin välein",
-    "interval_120_mins": "2 tunnin välein",
-    "interval_180_mins": "3 tunnin välein",
-    "interval_240_mins": "4 tunnin välein",
-    "interval_300_mins": "5 tunnin välein",
-    "interval_360_mins": "6 tunnin välein",
-    "interval_420_mins": "7 tunnin välein"
+    "INTERVAL_15_MINS": "15 min välein",
+    "INTERVAL_30_MINS": "30 min välein",
+    "INTERVAL_60_MINS": "1 tunnin välein",
+    "INTERVAL_90_MINS": "1,5 tunnin välein",
+    "INTERVAL_120_MINS": "2 tunnin välein",
+    "INTERVAL_180_MINS": "3 tunnin välein",
+    "INTERVAL_240_MINS": "4 tunnin välein",
+    "INTERVAL_300_MINS": "5 tunnin välein",
+    "INTERVAL_360_MINS": "6 tunnin välein",
+    "INTERVAL_420_MINS": "7 tunnin välein"
   },
   "Calendar": {
     "legend": {

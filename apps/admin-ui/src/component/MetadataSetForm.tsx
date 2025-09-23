@@ -5,17 +5,16 @@ import { ReserverMetaFields, ReservationMetaFields } from "common/src/reservatio
 import { useGeneralFields, useApplicationFields } from "common/src/hooks";
 import { type MetadataSetsFragment } from "@gql/gql-types";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
-import { type OptionsRecord } from "common";
 
 type Props = {
   reservationUnit: MetadataSetsFragment;
 };
 
 export const ReservationMetadataSetForm = ({ reservationUnit }: Props): JSX.Element => {
-  const { ageGroups, reservationPurposes } = useFilterOptions();
-  const options: Omit<OptionsRecord, "municipalities"> = {
-    ageGroups,
-    reservationPurposes,
+  const { ageGroups, purposes } = useFilterOptions();
+  const options = {
+    ageGroup: ageGroups,
+    purpose: purposes,
   };
 
   // TODO naming: generalFields = reservationFields (Varauksen tiedot)
@@ -35,10 +34,10 @@ export const ReservationMetadataSetForm = ({ reservationUnit }: Props): JSX.Elem
 // TODO this component can be wholly deprecated maybe? translations / options?
 export const ReserverMetadataSetForm = ({ reservationUnit }: Props): JSX.Element => {
   const { watch } = useFormContext<Reservation>();
-  const { ageGroups, reservationPurposes } = useFilterOptions();
-  const options: Omit<OptionsRecord, "municipalities"> = {
-    ageGroups,
-    reservationPurposes,
+  const { ageGroups, purposes } = useFilterOptions();
+  const options = {
+    ageGroup: ageGroups,
+    purpose: purposes,
   };
 
   // TODO naming: applicationFields = reserverFields (Varaajan tiedot)

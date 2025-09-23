@@ -4,7 +4,7 @@ import {
   type ApplicationSectionNode,
   Priority,
   Weekday,
-  type ApplicationSectionAllocationFragment,
+  type ApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
 import { type TFunction } from "next-i18next";
 import { filterNonNullable, formatTimeRange, sort, timeToMinutes, toNumber } from "common/src/helpers";
@@ -13,8 +13,10 @@ import { convertWeekday, transformWeekday } from "common/src/conversion";
 import { type DayT } from "common/src/const";
 import { set } from "date-fns";
 
-// TODO sub fragment these properly
-export type SectionNodeT = ApplicationSectionAllocationFragment;
+// TODO use a fragment
+type QueryT = NonNullable<ApplicationSectionAllocationsQuery["applicationSections"]>;
+type EdgeT = NonNullable<QueryT["edges"][0]>;
+export type SectionNodeT = NonNullable<EdgeT["node"]>;
 export type SuitableTimeRangeNodeT = SectionNodeT["suitableTimeRanges"][0];
 export type ReservationUnitOptionNodeT = NonNullable<SectionNodeT["reservationUnitOptions"]>[0];
 

@@ -3,14 +3,14 @@ import { filterNonNullable, type ReadonlyDeep, timeToMinutes } from "common/src/
 import {
   type ApplicantFieldsFragment,
   type ApplicationFormFragment,
-  type ApplicationUpdateMutation,
-  type ApplicationPage2Fragment,
+  type ApplicationPage2Query,
+  type ApplicationUpdateMutationInput,
   type Maybe,
   MunicipalityChoice,
   Priority,
   ReserveeType,
-  type SuitableTimeRangeCreateInput,
-  type ApplicationSectionUpdateInput,
+  type SuitableTimeRangeSerializerInput,
+  type UpdateApplicationSectionForApplicationSerializerInput,
   Weekday,
 } from "@gql/gql-types";
 import { z } from "zod";
@@ -20,6 +20,9 @@ import { checkValidDateOnly, lessThanMaybeDate } from "common/src/schemas/schema
 import { CELL_STATES } from "common/src/components/ApplicationTimeSelector";
 
 type SectionType = NonNullable<ApplicationFormFragment["applicationSections"]>[0];
+
+type NodePage2 = NonNullable<ApplicationPage2Query["application"]>;
+type SectionTypePage2 = NonNullable<NodePage2["applicationSections"]>[0];
 
 const SuitableTimeRangeFormTypeSchema = z.object({
   pk: z.number().optional(),
@@ -144,7 +147,9 @@ const ApplicationSectionPage2Schema = z
     }
   });
 
-function transformApplicationSectionPage2(values: ApplicationSectionPage2FormValues): ApplicationSectionUpdateInput {
+function transformApplicationSectionPage2(
+  values: ApplicationSectionPage2FormValues
+): UpdateApplicationSectionForApplicationSerializerInput {
   // NOTE: there is a type issue somewhere that causes this to be a string for some cases
   return {
     pk: Number(values.pk),
@@ -152,7 +157,6 @@ function transformApplicationSectionPage2(values: ApplicationSectionPage2FormVal
   };
 }
 
-type SectionTypePage2 = NonNullable<ApplicationPage2Fragment["applicationSections"]>[0];
 function convertApplicationSectionPage2(section: ReadonlyDeep<SectionTypePage2>): ApplicationSectionPage2FormValues {
   const reservationUnitPk = section.reservationUnitOptions.find(() => true)?.reservationUnit.pk ?? 0;
   const { name, appliedReservationsPerWeek } = section;
@@ -343,10 +347,8 @@ export const ApplicationPage3Schema = z
     billingStreetAddress: z.string().min(1).max(80).optional(),
     billingCity: z.string().min(1).max(80).optional(),
     billingPostCode: z.string().min(1).max(32).optional(),
-    // not submitted, we use it to remove the billing address from submit without losing the frontend state
+    // this is not submitted, we can use it to remove the billing address from submit without losing the frontend state
     hasBillingAddress: z.boolean(),
-    // not submitted
-    isRegisteredAssociation: z.boolean(),
     additionalInformation: z.string().max(255).optional(),
     // municipality is only for Organisations
     municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]).optional(),
@@ -357,23 +359,25 @@ export const ApplicationPage3Schema = z
     path: ["applicantType"],
   })
   .superRefine((val, ctx) => {
-    if (val.applicantType === ReserveeType.Company || val.applicantType === ReserveeType.Nonprofit) {
-      const requiredToHaveId = val.applicantType !== ReserveeType.Nonprofit;
-      const { isRegisteredAssociation } = val;
-      const hasId = val.organisationIdentifier != null && val.organisationIdentifier !== "";
-      if ((requiredToHaveId || isRegisteredAssociation) && !hasId) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["organisationIdentifier"],
-          message: "Required",
-        });
-      }
+    switch (val.applicantType) {
+      case ReserveeType.Nonprofit:
+      case ReserveeType.Company:
+        if (!val.organisationIdentifier) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["organisation", "identifier"],
+            message: "Required",
+          });
+        }
+        break;
+      default:
+        break;
     }
     if (val.applicantType === ReserveeType.Nonprofit) {
       if (!val.municipality) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: ["municipality"],
+          path: ["homeCity"],
           message: "Required",
         });
       }
@@ -401,26 +405,28 @@ const transformEventReservationUnit = (pk: number, priority: number) => ({
   reservationUnit: pk,
 });
 
-function transformSuitableTimeRange(timeRange: SuitableTimeRangeFormValues): SuitableTimeRangeCreateInput {
+function transformSuitableTimeRange(timeRange: SuitableTimeRangeFormValues): SuitableTimeRangeSerializerInput {
   return timeRange;
 }
 
 // NOTE this works only for subsections of an application mutation
 // if needed without an application mutation needs to use a different SerializerInput
-function transformApplicationSection(ae: ApplicationSectionPage1FormValues): ApplicationSectionUpdateInput {
+function transformApplicationSection(
+  ae: ApplicationSectionPage1FormValues
+): UpdateApplicationSectionForApplicationSerializerInput {
   const begin = transformDateString(ae.begin);
   const end = transformDateString(ae.end);
 
-  const commonData: ApplicationSectionUpdateInput = {
+  const commonData: UpdateApplicationSectionForApplicationSerializerInput = {
     ...(begin != null ? { reservationsBeginDate: begin } : {}),
     ...(end != null ? { reservationsEndDate: end } : {}),
     name: ae.name,
-    numPersons: ae.numPersons ?? 0,
+    numPersons: ae.numPersons,
     ageGroup: ae.ageGroup,
     purpose: ae.purpose,
     reservationMinDuration: ae.minDuration ?? 0, // "3600" == 1h
     reservationMaxDuration: ae.maxDuration ?? 0, // "7200" == 2h
-    appliedReservationsPerWeek: ae.appliedReservationsPerWeek ?? 0,
+    appliedReservationsPerWeek: ae.appliedReservationsPerWeek,
     // TODO should validate that the units are on the application round
     reservationUnitOptions: ae.reservationUnits.map((ruo, ruoIndex) => transformEventReservationUnit(ruo, ruoIndex)),
   };
@@ -434,7 +440,7 @@ function transformApplicationSection(ae: ApplicationSectionPage1FormValues): App
   return commonData;
 }
 
-export function transformApplicationPage2(values: ApplicationPage2FormValues): ApplicationUpdateMutation {
+export function transformApplicationPage2(values: ApplicationPage2FormValues): ApplicationUpdateMutationInput {
   const { pk } = values;
   const appEvents = values.applicationSections;
   return {
@@ -444,7 +450,7 @@ export function transformApplicationPage2(values: ApplicationPage2FormValues): A
 }
 
 // For page 1
-export function transformApplicationPage1(values: ApplicationPage1FormValues): ApplicationUpdateMutation {
+export function transformApplicationPage1(values: ApplicationPage1FormValues): ApplicationUpdateMutationInput {
   const { pk, applicantType } = values;
   const appEvents = filterNonNullable(values.applicationSections);
   return {
@@ -455,7 +461,7 @@ export function transformApplicationPage1(values: ApplicationPage1FormValues): A
 }
 
 export function convertApplicationPage2(
-  app: ReadonlyDeep<Pick<ApplicationPage2Fragment, "pk" | "applicationSections">>
+  app: ReadonlyDeep<Pick<NodePage2, "pk" | "applicationSections">>
 ): ApplicationPage2FormValues {
   return {
     pk: app?.pk ?? 0,
@@ -500,31 +506,12 @@ export function createDefaultPage1Section(
   };
 }
 
-function isAnyOrganisationField(app: ApplicantFieldsFragment): boolean {
-  return (
-    app.organisationName !== "" ||
-    app.organisationIdentifier !== "" ||
-    app.organisationCoreBusiness !== "" ||
-    app.organisationStreetAddress !== "" ||
-    app.organisationCity !== "" ||
-    app.organisationPostCode !== ""
-  );
-}
-
-export function convertApplicationPage3(app: Maybe<ApplicantFieldsFragment>): ApplicationPage3FormValues {
+export function convertApplicationPage3(app?: Maybe<ApplicantFieldsFragment>): ApplicationPage3FormValues {
   const isOrganisation = app?.applicantType !== ReserveeType.Individual;
 
   const hasBillingAddress =
     app?.applicantType === ReserveeType.Individual ||
     (app?.billingStreetAddress != null && app?.billingStreetAddress !== "");
-
-  // complex due to we want to default this to false even for Nonprofits unless the user
-  // is editing an existing application (they have once set this explicitly to true)
-  const isUnregisteredAssociation =
-    app != null &&
-    app.applicantType === ReserveeType.Nonprofit &&
-    isAnyOrganisationField(app) &&
-    app.organisationIdentifier === "";
 
   return {
     pk: app?.pk ?? 0,
@@ -543,8 +530,6 @@ export function convertApplicationPage3(app: Maybe<ApplicantFieldsFragment>): Ap
     contactPersonPhoneNumber: app?.contactPersonPhoneNumber ?? "",
 
     hasBillingAddress,
-    isRegisteredAssociation: !isUnregisteredAssociation,
-
     billingStreetAddress: hasBillingAddress ? app?.billingStreetAddress : undefined,
     billingCity: hasBillingAddress ? app?.billingCity : undefined,
     billingPostCode: hasBillingAddress ? app?.billingPostCode : undefined,
@@ -560,7 +545,7 @@ function isAddressValid(streetAddress?: string, postCode?: string, city?: string
   );
 }
 
-export function transformPage3Application(values: ApplicationPage3FormValues): ApplicationUpdateMutation {
+export function transformPage3Application(values: ApplicationPage3FormValues): ApplicationUpdateMutationInput {
   const shouldSaveBillingAddress = values.applicantType === ReserveeType.Individual || values.hasBillingAddress;
 
   const isOrganisation = values.organisationName != null && values.applicantType !== ReserveeType.Individual;
@@ -571,7 +556,6 @@ export function transformPage3Application(values: ApplicationPage3FormValues): A
   );
 
   const isBillingAddressValid = isAddressValid(values.billingStreetAddress, values.billingPostCode, values.billingCity);
-  const shouldSaveIdentifier = values.isRegisteredAssociation || values.applicantType !== ReserveeType.Nonprofit;
 
   return {
     pk: values.pk,
@@ -585,8 +569,7 @@ export function transformPage3Application(values: ApplicationPage3FormValues): A
     ...(isOrganisation
       ? {
           organisationName: values.organisationName || undefined,
-          // force update to empty
-          organisationIdentifier: shouldSaveIdentifier ? (values.organisationIdentifier ?? "") : "",
+          organisationIdentifier: values.organisationIdentifier || undefined,
           organisationCoreBusiness: values.organisationCoreBusiness || undefined,
           organisationStreetAddress: isOrganisationAddressValid ? values.organisationStreetAddress : undefined,
           organisationPostCode: isOrganisationAddressValid ? values.organisationPostCode : undefined,

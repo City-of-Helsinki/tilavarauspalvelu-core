@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from lazy_managers import LazyModelAttribute, LazyModelManager
-from undine.utils.model_fields import TextChoicesField
+from graphene_django_extensions.fields.model import StrChoiceField
 
 from tilavarauspalvelu.enums import UserRoleChoice
 from utils.auditlog_util import AuditLogger
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
@@ -27,14 +27,14 @@ __all__ = [
 
 class GeneralRole(models.Model):
     user: User = models.ForeignKey("tilavarauspalvelu.User", related_name="general_roles", on_delete=models.CASCADE)
-    role: UserRoleChoice = TextChoicesField(choices_enum=UserRoleChoice)
+    role: str = StrChoiceField(enum=UserRoleChoice)
 
     assigner: User | None = models.ForeignKey(
         "tilavarauspalvelu.User",
         related_name="assigned_general_roles",
         on_delete=models.SET_NULL,
-        blank=True,
         null=True,
+        blank=True,
     )
 
     created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)

@@ -1,3 +1,5 @@
+# type: EmailType.SEASONAL_BOOKING_RESCHEDULED_SERIES
+
 from __future__ import annotations
 
 import uuid

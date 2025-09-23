@@ -5,7 +5,7 @@ import { Notification, NotificationSize } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H1 } from "common/styled";
 import {
-  type ApplicationCreateMutation,
+  type ApplicationCreateMutationInput,
   ApplicationRoundDocument,
   type ApplicationRoundQuery,
   type ApplicationRoundQueryVariables,
@@ -17,14 +17,7 @@ import {
   type CurrentUserQuery,
   ReservationKind,
 } from "@gql/gql-types";
-import {
-  createNodeId,
-  filterNonNullable,
-  getNode,
-  ignoreMaybeArray,
-  type ReadonlyDeep,
-  toNumber,
-} from "common/src/helpers";
+import { base64encode, filterNonNullable, ignoreMaybeArray, type ReadonlyDeep, toNumber } from "common/src/helpers";
 import { type SearchFormValues, SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
 import { createApolloClient } from "@/modules/apolloClient";
 import { RecurringCard } from "@/components/recurring/RecurringCard";
@@ -147,11 +140,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { data } = await apolloClient.query<ApplicationRoundQuery, ApplicationRoundQueryVariables>({
     query: ApplicationRoundDocument,
     variables: {
-      id: createNodeId("ApplicationRoundNode", pk),
+      id: base64encode(`ApplicationRoundNode:${pk}`),
     },
   });
-
-  const applicationRound = getNode(data);
+  const { applicationRound } = data;
   if (applicationRound == null) {
     return notFound;
   }
@@ -172,7 +164,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   });
 
   if (isPostLogin && userData.currentUser != null) {
-    const input: ApplicationCreateMutation = {
+    const input: ApplicationCreateMutationInput = {
       applicationRound: applicationRound.pk ?? 0,
     };
 
@@ -221,27 +213,25 @@ export default SeasonalSearch;
 
 export const APPLICATION_ROUND_QUERY = gql`
   query ApplicationRound($id: ID!) {
-    node(id: $id) {
-      ... on ApplicationRoundNode {
+    applicationRound(id: $id) {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+      status
+      reservationPeriodBeginDate
+      reservationPeriodEndDate
+      reservationUnits {
         id
         pk
-        nameFi
-        nameEn
-        nameSv
-        status
-        reservationPeriodBeginDate
-        reservationPeriodEndDate
-        reservationUnits {
-          id
-          pk
-        }
       }
     }
   }
 `;
 
 export const CREATE_APPLICATION_MUTATION = gql`
-  mutation CreateApplication($input: ApplicationCreateMutation!) {
+  mutation CreateApplication($input: ApplicationCreateMutationInput!) {
     createApplication(input: $input) {
       pk
     }

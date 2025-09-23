@@ -15,12 +15,15 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.db.models import NOT_PROVIDED, ForeignObjectRel
 from django.db.models.fields.related import RelatedField
+from graphene.types.utils import get_underlying_type
+from graphene.utils.str_converters import to_snake_case
+from graphene_django import DjangoObjectType
+from graphene_django.rest_framework.mutation import SerializerMutationOptions
+from graphene_django.types import DjangoObjectTypeOptions
 from graphql import (
     FieldNode,
     GraphQLInputObjectType,
-    GraphQLInterfaceType,
     GraphQLObjectType,
-    InlineFragmentNode,
     NonNullTypeNode,
     OperationDefinitionNode,
     OperationType,
@@ -30,10 +33,6 @@ from graphql import (
     print_ast,
     value_from_ast_untyped,
 )
-from undine.settings import undine_settings
-from undine.utils.graphql.undine_extensions import get_undine_mutation_type, get_undine_query_type
-from undine.utils.graphql.utils import get_underlying_type
-from undine.utils.text import to_snake_case
 
 from tilavarauspalvelu.api.graphql.schema import schema
 from utils.date_utils import local_date, local_datetime, local_time
@@ -43,6 +42,8 @@ from tests.factories._base import GenericDjangoModelFactory
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+    from graphene.types.objecttype import ObjectTypeOptions
 
 
 type ModelField = models.Field | models.ForeignObjectRel
@@ -150,10 +151,10 @@ def get_factory_info_for_definition(operation: OperationDefinitionNode) -> list[
 def get_root_type(operation: OperationDefinitionNode) -> GraphQLObjectType:
     match operation.operation.value:
         case "query":
-            root_type = schema.query_type
+            root_type = schema.graphql_schema.query_type
 
         case "mutation":
-            root_type = schema.mutation_type
+            root_type = schema.graphql_schema.mutation_type
 
         case _:
             msg = f"Unhandled operation: '{operation}'"
@@ -183,18 +184,33 @@ def get_operation_variables(operation: OperationDefinitionNode) -> dict[str, Any
 
 
 def get_factory(root_type: GraphQLObjectType, field_node: FieldNode) -> type[GenericDjangoModelFactory]:
+    name = field_node.name.value
+
+    object_type = get_object_type_for_root_operation(name, root_type)
+
+    graphene_type: DjangoObjectType | None = getattr(object_type, "graphene_type", None)
+    if graphene_type is None:
+        msg = f"No graphene type found for '{name}'"
+        raise TypeError(msg)
+
+    options: ObjectTypeOptions = graphene_type._meta
+
     match root_type.name:
         case "Query":
-            object_type = get_object_type(root_type, field_node)
-            query_type = get_undine_query_type(object_type)
-            model = query_type.__model__
+            options: DjangoObjectTypeOptions
+            model: type[models.Model] = options.model
+
         case "Mutation":
-            input_object_type = get_input_object_type(root_type, field_node)
-            mutation_type = get_undine_mutation_type(input_object_type)
-            model = mutation_type.__model__
+            options: SerializerMutationOptions
+            model: type[models.Model] = options.model_class
+
         case _:
             msg = f"Root type '{root_type.name}' is not a valid root type"
             raise TypeError(msg)
+
+    if not issubclass(model, models.Model):
+        msg = f"Graphene type '{name}' does not have a Django model"
+        raise TypeError(msg)
 
     factory = factories_by_model().get(model)
     if factory is None:
@@ -204,51 +220,41 @@ def get_factory(root_type: GraphQLObjectType, field_node: FieldNode) -> type[Gen
     return factory
 
 
-def get_object_type(root_type: GraphQLObjectType, field_node: FieldNode) -> GraphQLObjectType:
-    name = field_node.name.value
-
+def get_object_type_for_root_operation(name: str, root_type: GraphQLObjectType) -> GraphQLObjectType:
     entrypoint = root_type.fields.get(name)
     if entrypoint is None:
         msg = f"No entrypoint found for '{name}'"
         raise KeyError(msg)
 
-    gql_type: GraphQLObjectType | GraphQLInterfaceType = get_underlying_type(entrypoint.type)  # type: ignore[assignment]
-
-    if isinstance(gql_type, GraphQLInterfaceType) and gql_type.name == "Node":
-        inline_fragment = next(s for s in field_node.selection_set.selections if isinstance(s, InlineFragmentNode))
-        inline_type_name = inline_fragment.type_condition.name.value
-        gql_type = undine_settings.SCHEMA.get_type(inline_type_name)  # type: ignore[assignment]
-
-    elif gql_type.name.endswith("Connection"):
-        edge_type: GraphQLObjectType = get_underlying_type(gql_type.fields["edges"].type)  # type: ignore[assignment]
-        node_type: GraphQLObjectType = get_underlying_type(edge_type.fields["node"].type)  # type: ignore[assignment]
+    gql_type = get_underlying_type(entrypoint.type)
+    if gql_type.name.endswith("Connection"):
+        edge_type = get_underlying_type(gql_type.fields["edges"].type)
+        node_type = get_underlying_type(edge_type.fields["node"].type)
         gql_type = node_type
 
     return gql_type
 
 
-def get_input_object_type(root_type: GraphQLObjectType, field_node: FieldNode) -> GraphQLInputObjectType:
-    name = field_node.name.value
-
+def get_input_object_type_for_root_operation(name: str, root_type: GraphQLObjectType) -> GraphQLInputObjectType:
     entrypoint = root_type.fields.get(name)
     if entrypoint is None:
         msg = f"No entrypoint found for '{name}'"
         raise KeyError(msg)
 
-    input_argument = entrypoint.args.get(undine_settings.MUTATION_INPUT_DATA_KEY)
+    input_argument = entrypoint.args.get("input")
     if input_argument is None:
-        msg = f"No '{undine_settings.MUTATION_INPUT_DATA_KEY}' argument found for '{name}'"
+        msg = f"No 'input' argument found for '{name}'"
         raise KeyError(msg)
 
-    return get_underlying_type(input_argument.type)  # type: ignore[return-value]
+    return get_underlying_type(input_argument.type)
 
 
 def get_root_operation_typename(root_type: GraphQLObjectType, field_node: FieldNode) -> str:
     if root_type.name == "Mutation":
-        input_object_type = get_input_object_type(root_type, field_node)
+        input_object_type = get_input_object_type_for_root_operation(field_node.name.value, root_type)
         return input_object_type.name
 
-    object_type = get_object_type(root_type, field_node)
+    object_type = get_object_type_for_root_operation(field_node.name.value, root_type)
     return object_type.name
 
 
@@ -270,12 +276,6 @@ def get_factory_arguments(
     model: type[models.Model],
     lookup: str = "",
 ) -> dict[str, Any]:
-    if isinstance(selection_node, InlineFragmentNode):
-        factory_args: dict[str, Any] = {}
-        for selection in selection_node.selection_set.selections:
-            factory_args |= get_factory_arguments(selection, model=model, lookup=lookup)
-        return factory_args
-
     if not isinstance(selection_node, FieldNode):
         msg = f"Unhandled selection node type: ({type(selection_node)}) {selection_node}"
         raise NotImplementedError(msg)
@@ -352,12 +352,6 @@ def determine_value_for_field(field: ModelField) -> Any:  # noqa: PLR0911, PLR09
         return field.default
 
     match field:
-        case models.EmailField():
-            return "admin@example.com"
-
-        case models.URLField():
-            return "https://www.example.com"
-
         case models.CharField():
             if field.choices:
                 return field.choices[0][0]
@@ -388,6 +382,12 @@ def determine_value_for_field(field: ModelField) -> Any:  # noqa: PLR0911, PLR09
 
         case models.DurationField():
             return datetime.timedelta()
+
+        case models.EmailField():
+            return "admin@example.com"
+
+        case models.URLField():
+            return "https://www.example.com"
 
         case models.UUIDField():
             return uuid.uuid4()

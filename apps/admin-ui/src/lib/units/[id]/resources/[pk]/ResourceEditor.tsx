@@ -4,12 +4,12 @@ import { useTranslation } from "next-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  type ResourceUpdateMutation,
-  ResourceLocationType,
+  type ResourceUpdateMutationInput,
+  LocationType,
   useUpdateResourceMutation,
   useResourceQuery,
 } from "@gql/gql-types";
-import { createNodeId } from "common/src/helpers";
+import { base64encode } from "common/src/helpers";
 import { ButtonContainer, CenterSpinner } from "common/styled";
 import { errorToast, successToast } from "common/src/components/toast";
 import { FormErrorSummary } from "@/component/FormErrorSummary";
@@ -39,8 +39,8 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
 
   const { data, loading, previousData, refetch } = useResourceQuery({
     variables: {
-      id: createNodeId("ResourceNode", resourcePk ?? 0),
-      unitId: createNodeId("UnitNode", unitPk),
+      id: base64encode(`ResourceNode:${resourcePk}`),
+      unitId: base64encode(`UnitNode:${unitPk}`),
     },
     skip: !resourcePk || Number.isNaN(resourcePk),
     onError: (e) => {
@@ -50,7 +50,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
 
   const [mutation, { loading: isMutationLoading }] = useUpdateResourceMutation();
 
-  const updateResource = async (input: ResourceUpdateMutation) => {
+  const updateResource = async (input: ResourceUpdateMutationInput) => {
     const res = await mutation({ variables: { input } });
     await refetch();
     return res;
@@ -64,8 +64,8 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
   const { errors, isDirty } = formState;
 
   useEffect(() => {
-    const resource = data?.resource != null && "pk" in data.resource ? data.resource : null;
-    if (resource) {
+    if (data?.resource) {
+      const { resource } = data;
       reset({
         nameFi: resource.nameFi ?? "",
         nameEn: resource.nameEn,
@@ -76,13 +76,12 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
     }
   }, [data, reset]);
 
-  const possibleData = data ?? previousData;
-  const unit = possibleData?.unit != null && "pk" in possibleData.unit ? possibleData.unit : null;
-  const resource = possibleData?.resource != null && "pk" in possibleData.resource ? possibleData.resource : null;
-
-  if ((resource == null || unit == null) && loading) {
+  if (loading) {
     return <CenterSpinner />;
   }
+
+  const { unit, resource } = data ?? previousData ?? {};
+
   if (resource == null || unit == null) {
     return <Error404 />;
   }
@@ -95,7 +94,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
       await updateResource({
         ...values,
         pk: values.pk,
-        locationType: ResourceLocationType.Fixed,
+        locationType: LocationType.Fixed,
       });
 
       successToast({
@@ -136,32 +135,28 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
 
 export const RESOURCE_QUERY = gql`
   query Resource($id: ID!, $unitId: ID!) {
-    resource: node(id: $id) {
-      ... on ResourceNode {
+    resource(id: $id) {
+      id
+      pk
+      nameFi
+      nameSv
+      nameEn
+      space {
         id
         pk
-        nameFi
-        nameSv
-        nameEn
-        space {
-          id
-          pk
-        }
       }
     }
-    unit: node(id: $unitId) {
-      ... on UnitNode {
-        id
-        pk
-        nameFi
-        ...LocationFields
-      }
+    unit(id: $unitId) {
+      id
+      pk
+      nameFi
+      ...LocationFields
     }
   }
 `;
 
 export const UPDATE_RESOURCE = gql`
-  mutation UpdateResource($input: ResourceUpdateMutation!) {
+  mutation UpdateResource($input: ResourceUpdateMutationInput!) {
     updateResource(input: $input) {
       pk
     }

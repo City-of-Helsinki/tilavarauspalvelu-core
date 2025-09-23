@@ -26,7 +26,7 @@ from tests.helpers import patch_method
         access_code_is_active=True,
     ),
 )
-@patch_method(EmailService.send_reservation_access_type_changed_email)
+@patch_method(EmailService.send_reservation_access_code_added_email)
 def test_create_missing_pindora_reservations__create_missing():
     now = local_datetime()
 
@@ -44,7 +44,7 @@ def test_create_missing_pindora_reservations__create_missing():
 
     assert PindoraClient.create_reservation.call_count == 1
     assert PindoraClient.create_reservation.call_args.kwargs["is_active"] is True
-    assert EmailService.send_reservation_access_type_changed_email.call_count == 1
+    assert EmailService.send_reservation_access_code_added_email.call_count == 1
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE)
@@ -117,7 +117,7 @@ def test_create_missing_pindora_reservations__in_the_past():
         access_code_is_active=True,
     ),
 )
-@patch_method(EmailService.send_reservation_access_type_changed_email)
+@patch_method(EmailService.send_reservation_access_code_added_email)
 def test_create_missing_pindora_reservations__ongoing():
     now = local_datetime()
 
@@ -135,7 +135,7 @@ def test_create_missing_pindora_reservations__ongoing():
 
     assert PindoraClient.create_reservation.call_count == 1
     assert PindoraClient.create_reservation.call_args.kwargs["is_active"] is True
-    assert EmailService.send_reservation_access_type_changed_email.call_count == 1
+    assert EmailService.send_reservation_access_code_added_email.call_count == 1
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at == datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE)

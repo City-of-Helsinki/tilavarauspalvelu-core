@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import pytest
+from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationUnitTypeFactory
-from tests.query_builder import build_query
 
 # Applied to all tests
 pytestmark = [
@@ -23,13 +23,13 @@ def test_reservation_unit_type__query(graphql):
         nameEn
         rank
     """
-    query = build_query("allReservationUnitTypes", fields=fields)
+    query = build_query("reservationUnitTypes", fields=fields, connection=True)
     response = graphql(query)
 
     assert response.has_errors is False
 
-    assert len(response.results) == 1
-    assert response.results[0] == {
+    assert len(response.edges) == 1
+    assert response.node(0) == {
         "pk": res_unit_type.pk,
         "nameFi": res_unit_type.name_fi,
         "nameSv": res_unit_type.name_sv,
@@ -45,12 +45,12 @@ def test_reservation_unit_type__order__by_name(graphql):
 
     graphql.login_with_superuser()
 
-    query = build_query("allReservationUnitTypes", order_by="nameFiAsc")
+    query = build_query("reservationUnitTypes", connection=True, order_by="nameFiAsc")
     response = graphql(query)
 
     assert response.has_errors is False
 
-    assert len(response.results) == 3
-    assert response.results[0] == {"pk": res_unit_type_1.pk}
-    assert response.results[1] == {"pk": res_unit_type_3.pk}
-    assert response.results[2] == {"pk": res_unit_type_2.pk}
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": res_unit_type_1.pk}
+    assert response.node(1) == {"pk": res_unit_type_3.pk}
+    assert response.node(2) == {"pk": res_unit_type_2.pk}

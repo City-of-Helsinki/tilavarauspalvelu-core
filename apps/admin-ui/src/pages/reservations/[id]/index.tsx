@@ -8,7 +8,6 @@ import {
   UserPermissionChoice,
   ReservationPageDocument,
   useReservationPageLazyQuery,
-  ReservationPageFragment,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { ButtonContainer } from "common/styled";
@@ -33,7 +32,7 @@ import {
   DataWrapper,
 } from "@lib/reservations/[id]/";
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
-import { createNodeId, getNode, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/helpers";
+import { base64encode, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/helpers";
 import { formatAgeGroup } from "@/common/util";
 import { toUIDateTime } from "common/src/common/util";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -45,7 +44,7 @@ import { hasPermission } from "@/modules/permissionHelper";
 import { useSession } from "@/hooks";
 import { Error403 } from "@/component/Error403";
 
-type ReservationType = ReservationPageFragment;
+type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
 function ApprovalButtonsWithPermChecks({
   reservation,
@@ -96,7 +95,7 @@ function ReservationSummary({
   reservation,
   isFree,
 }: Readonly<{
-  reservation: ReservationPageFragment;
+  reservation: ReservationType;
   isFree: boolean;
 }>) {
   const { t } = useTranslation();
@@ -165,7 +164,7 @@ function ReservationWorkingMemoAccordion({
   reservation,
   onReservationUpdated,
 }: Readonly<{
-  reservation: ReservationPageFragment;
+  reservation: ReservationType;
   onReservationUpdated: () => void;
 }>) {
   const { t } = useTranslation();
@@ -190,7 +189,7 @@ function ReservationWorkingMemoAccordion({
 function ReservationDetailsAccordion({
   reservation,
 }: Readonly<{
-  reservation: ReservationPageFragment;
+  reservation: ReservationType;
 }>) {
   const { t } = useTranslation();
 
@@ -214,7 +213,7 @@ function ReservationDetailsAccordion({
 function ReservationUserAccordion({
   reservation,
 }: Readonly<{
-  reservation: ReservationPageFragment;
+  reservation: ReservationType;
 }>) {
   const { t } = useTranslation();
 
@@ -251,7 +250,7 @@ function ReservationUserAccordion({
 function ReservationPricingDetailsAccordion({
   reservation,
 }: Readonly<{
-  reservation: ReservationPageFragment;
+  reservation: ReservationType;
 }>) {
   const { t } = useTranslation();
 
@@ -279,7 +278,7 @@ function RequestedReservation({
   reservation,
   refetch,
 }: {
-  reservation: ReservationPageFragment;
+  reservation: ReservationType;
   refetch: () => Promise<ApolloQueryResult<ReservationPageQuery>>;
 }): JSX.Element | null {
   const { t } = useTranslation();
@@ -338,10 +337,11 @@ function RequestedReservation({
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 export default function Page({ reservation }: PropsNarrowed): JSX.Element {
+  const id = base64encode(`ReservationNode:${reservation.pk ?? 0}`);
   const [_fetch, query] = useReservationPageLazyQuery({
     // NOTE have to be no-cache because we have some key collisions (tag line disappears if cached)
     fetchPolicy: "no-cache",
-    variables: { id: createNodeId("ReservationNode", reservation.pk ?? 0) },
+    variables: { id },
   });
 
   const { user } = useSession();
@@ -351,8 +351,7 @@ export default function Page({ reservation }: PropsNarrowed): JSX.Element {
     return <Error403 />;
   }
 
-  const node = getNode(query.data);
-  const reservationRefreshed = node ?? reservation;
+  const reservationRefreshed = query.data?.reservation ?? reservation;
 
   return <RequestedReservation reservation={reservationRefreshed} refetch={query.refetch} />;
 }
@@ -365,14 +364,13 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
 
   const commonProps = await getCommonServerSideProps();
   const apolloClient = createClient(commonProps.apiBaseUrl, req);
-  const { data } = await apolloClient.query<ReservationPageQuery>({
+  const reservationPageQuery = await apolloClient.query<ReservationPageQuery>({
     query: ReservationPageDocument,
-    variables: { id: createNodeId("ReservationNode", pk) },
+    variables: { id: base64encode(`ReservationNode:${pk}`) },
   });
 
-  const reservation = getNode(data);
-  const unit = reservation?.reservationUnit?.unit?.pk;
-  if (reservation == null || unit == null) {
+  const reservation = reservationPageQuery.data.reservation;
+  if (reservation == null) {
     return NOT_FOUND_SSR_VALUE;
   }
 
@@ -385,47 +383,39 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
   };
 }
 
-export const RESERVATION_PAGE_FRAGMENT = gql`
-  fragment ReservationPage on ReservationNode {
-    id
-    ...CreateTagString
-    ...ReservationCommonFields
-    ...TimeBlockSection
-    ...ReservationTitleSectionFields
-    ...ReservationKeylessEntry
-    reservationSeries {
-      id
-      pk
-      beginDate
-      beginTime
-      endDate
-      endTime
-      weekdays
-      name
-      description
-    }
-    ...ApprovalButtons
-    cancelReason
-    denyReason {
-      id
-      reasonFi
-    }
-    reservationUnit {
-      id
-      pk
-      reservationStartInterval
-      ...ReservationTypeFormFields
-    }
-    ...ReservationMetaFields
-  }
-`;
-
 export const RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
-    node(id: $id) {
-      ... on ReservationNode {
-        ...ReservationPage
+    reservation(id: $id) {
+      id
+      ...CreateTagString
+      ...ReservationCommonFields
+      ...TimeBlockSection
+      ...ReservationTitleSectionFields
+      ...ReservationKeylessEntry
+      reservationSeries {
+        id
+        pk
+        beginDate
+        beginTime
+        endDate
+        endTime
+        weekdays
+        name
+        description
       }
+      ...ApprovalButtons
+      cancelReason
+      denyReason {
+        id
+        reasonFi
+      }
+      reservationUnit {
+        id
+        pk
+        reservationStartInterval
+        ...ReservationTypeFormFields
+      }
+      ...ReservationMetaFields
     }
   }
 `;

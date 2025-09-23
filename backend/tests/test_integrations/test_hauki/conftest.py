@@ -23,7 +23,7 @@ def _force_HaukiAPIClient_to_be_mocked():
 
 @pytest.fixture
 def reservation_unit() -> ReservationUnit:
-    return ReservationUnitFactory.create(
+    return ReservationUnitFactory(
         origin_hauki_resource=OriginHaukiResourceFactory.create(id=999, opening_hours_hash="abc123"),
         unit__tprek_id=1234,
         unit__tprek_department_id=4321,

@@ -5,12 +5,15 @@ import enum
 import operator
 from enum import StrEnum
 from inspect import cleandoc
+from types import DynamicClassAttribute
 from typing import Literal
 
 from django.db import models
 from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
+
+from tilavarauspalvelu.typing import permission
 
 __all__ = [
     "AccessType",
@@ -53,9 +56,6 @@ __all__ = [
     "UserRoleChoice",
     "Weekday",
 ]
-
-
-class permission(classmethod): ...  # noqa: N801
 
 
 class ReservationNotification(models.TextChoices):
@@ -292,10 +292,7 @@ class UserRoleChoice(models.TextChoices):
 # There is the disadvantage that we don't get autocomplete of permissions like this,
 # but we also don't duplicate permissions from the roles above. This should be fine,
 # as the enum is not really used in our code but meant for the frontend.
-UserPermissionChoice: type[models.TextChoices] = models.TextChoices(
-    "UserPermissionChoice",
-    UserRoleChoice.permission_choices(),
-)
+UserPermissionChoice = models.TextChoices("UserPermissionChoice", UserRoleChoice.permission_choices())
 
 
 class HaukiResourceState(models.TextChoices):
@@ -353,15 +350,15 @@ class HaukiResourceState(models.TextChoices):
             cls.UNDEFINED,
         ]
 
-    @enum.property
+    @DynamicClassAttribute
     def is_accessible(self) -> bool:
         return self in HaukiResourceState.accessible_states()
 
-    @enum.property
+    @DynamicClassAttribute
     def is_reservable(self) -> bool:
         return self in HaukiResourceState.reservable_states()
 
-    @enum.property
+    @DynamicClassAttribute
     def is_closed(self) -> bool:
         return self in HaukiResourceState.closed_states()
 
@@ -1028,29 +1025,29 @@ class ApplicationRoundStatusChoice(models.TextChoices):
     RESULTS_SENT = "SENT", pgettext_lazy("ApplicationRoundStatus", "Results Sent")
     """All application results have been sent to users"""
 
-    @enum.property
+    @DynamicClassAttribute
     def is_allocation_upcoming(self) -> bool:
         return self in {
             ApplicationRoundStatusChoice.UPCOMING,
             ApplicationRoundStatusChoice.OPEN,
         }
 
-    @enum.property
+    @DynamicClassAttribute
     def can_remove_allocations(self) -> bool:
         return self == ApplicationRoundStatusChoice.IN_ALLOCATION
 
-    @enum.property
+    @DynamicClassAttribute
     def past_allocation(self) -> bool:
         return self in {
             ApplicationRoundStatusChoice.HANDLED,
             ApplicationRoundStatusChoice.RESULTS_SENT,
         }
 
-    @enum.property
+    @DynamicClassAttribute
     def is_ongoing(self) -> bool:
         return self != ApplicationRoundStatusChoice.RESULTS_SENT
 
-    @enum.property
+    @DynamicClassAttribute
     def allows_resetting(self) -> bool:
         return self in {
             ApplicationRoundStatusChoice.IN_ALLOCATION,
@@ -1083,7 +1080,7 @@ class ApplicationStatusChoice(models.TextChoices):
     HANDLED = "HANDLED", pgettext_lazy("ApplicationStatus", "Handled")
     """Application's events have all been allocated"""
 
-    RESULTS_SENT = "RESULTS_SENT", pgettext_lazy("ApplicationStatus", "Results Sent")
+    RESULTS_SENT = "RESULT_SENT", pgettext_lazy("ApplicationStatus", "Results Sent")
     """Application's results have been sent to user"""
 
     EXPIRED = "EXPIRED", pgettext_lazy("ApplicationStatus", "Expired")
@@ -1092,29 +1089,29 @@ class ApplicationStatusChoice(models.TextChoices):
     CANCELLED = "CANCELLED", pgettext_lazy("ApplicationStatus", "Cancelled")
     """Application cancelled by user"""
 
-    @enum.property
+    @DynamicClassAttribute
     def can_decline(self) -> bool:
         return self == ApplicationStatusChoice.IN_ALLOCATION
 
-    @enum.property
+    @DynamicClassAttribute
     def can_allocate(self) -> bool:
         return self == ApplicationStatusChoice.IN_ALLOCATION
 
-    @enum.property
+    @DynamicClassAttribute
     def can_send(self) -> bool:
         return self in {
             ApplicationStatusChoice.DRAFT,
             ApplicationStatusChoice.RECEIVED,
         }
 
-    @enum.property
+    @DynamicClassAttribute
     def can_cancel(self) -> bool:
         return self in {
             ApplicationStatusChoice.DRAFT,
             ApplicationStatusChoice.RECEIVED,
         }
 
-    @enum.property
+    @DynamicClassAttribute
     def can_flag(self) -> bool:
         return self in {
             ApplicationStatusChoice.IN_ALLOCATION,
@@ -1122,7 +1119,7 @@ class ApplicationStatusChoice(models.TextChoices):
             ApplicationStatusChoice.RESULTS_SENT,
         }
 
-    @enum.property
+    @DynamicClassAttribute
     def can_reset(self) -> bool:
         return self in {
             ApplicationStatusChoice.IN_ALLOCATION,
@@ -1151,18 +1148,18 @@ class ApplicationSectionStatusChoice(models.TextChoices):
     REJECTED = "REJECTED", pgettext_lazy("ApplicationSectionStatus", "Rejected")
     """All applied slots for this application section have been locked or rejected."""
 
-    @enum.property
+    @DynamicClassAttribute
     def can_allocate(self) -> bool:
         return self in {
             ApplicationSectionStatusChoice.UNALLOCATED,
             ApplicationSectionStatusChoice.IN_ALLOCATION,
         }
 
-    @enum.property
+    @DynamicClassAttribute
     def can_delete(self) -> bool:
         return self == ApplicationSectionStatusChoice.UNALLOCATED
 
-    @enum.property
+    @DynamicClassAttribute
     def can_reset(self) -> bool:
         return self in {
             ApplicationSectionStatusChoice.UNALLOCATED,
@@ -1182,20 +1179,6 @@ class BannerNotificationTarget(models.TextChoices):
     STAFF = "STAFF", pgettext_lazy("BannerNotificationTarget", "Staff")
     USER = "USER", pgettext_lazy("BannerNotificationTarget", "User")
 
-    @classproperty
-    def for_staff(cls) -> list[str]:
-        return [  # type: ignore[return-type]
-            cls.STAFF.value,
-            cls.ALL.value,
-        ]
-
-    @classproperty
-    def for_customers(cls) -> list[str]:
-        return [  # type: ignore[return-type]
-            cls.USER.value,
-            cls.ALL.value,
-        ]
-
 
 class BannerNotificationState(models.TextChoices):
     DRAFT = "DRAFT", pgettext_lazy("BannerNotificationState", "Draft")
@@ -1203,19 +1186,19 @@ class BannerNotificationState(models.TextChoices):
     ACTIVE = "ACTIVE", pgettext_lazy("BannerNotificationState", "Active")
 
 
-class ADLoginAMR(enum.StrEnum):
+class ADLoginAMR(enum.Enum):
     HELSINKI_ADFS = "helsinki_adfs"
     HELSINKIAD = "helsinkiad"
     HELSINKIAZUREAD = "helsinkiazuread"
     EDUAD = "eduad"
 
 
-class ProfileLoginAMR(enum.StrEnum):
+class ProfileLoginAMR(enum.Enum):
     SUOMI_FI = "suomi_fi"
     HELTUNNISTUSSUOMIFI = "heltunnistussuomifi"
 
 
-class LoginMethod(enum.StrEnum):
+class LoginMethod(enum.Enum):
     PROFILE = "PROFILE"
     AD = "AD"
     OTHER = "OTHER"

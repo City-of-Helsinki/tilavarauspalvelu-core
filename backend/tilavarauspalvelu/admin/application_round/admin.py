@@ -9,7 +9,7 @@ from django.contrib.admin import helpers
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
-from modeltranslation.admin import TabbedTranslationAdmin
+from modeltranslation.admin import TranslationAdmin
 
 from tilavarauspalvelu.admin.application_round.form import ApplicationRoundAdminForm
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
 
 @admin.register(ApplicationRound)
-class ApplicationRoundAdmin(ExtraButtonsMixin, TabbedTranslationAdmin):
+class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
     # Functions
     actions = ["reset_application_rounds"]
 
@@ -34,11 +34,11 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TabbedTranslationAdmin):
         "name",
         "reservation_period_begin_date",
         "reservation_period_end_date",
-        "_lookup_property_status",
+        "_status",
         "handled_at",
         "sent_at",
     ]
-    list_filter = ["_lookup_property_status"]
+    list_filter = ["_status"]
     ordering = ["-reservation_period_begin_date"]
 
     # Form
