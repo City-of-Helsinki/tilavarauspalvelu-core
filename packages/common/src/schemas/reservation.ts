@@ -5,6 +5,7 @@ import {
   ReservationFormType,
   ReservationStartInterval,
   ReservationTypeChoice,
+  ReservationUnitNode,
   ReserveeType,
 } from "../../gql/gql-types";
 import { checkTimeStringFormat, checkValidFutureDate } from "./schemaCommon";
@@ -205,7 +206,7 @@ export type ReservationFormValueT = z.infer<typeof PartialFormSchema>;
 /// The single source of truth for the form fields used by a form type.
 /// only for internal use (type / refinements)
 /// this returns incorrect schema for ContactInfo, but makes schema refinement possible
-export function getReservationSchemaBase(formType: ReservationFormType) {
+export function getReservationSchemaUnrefined(formType: ReservationFormType) {
   switch (formType) {
     case ReservationFormType.ContactInfoForm:
     case ReservationFormType.ReserveeInfoForm:
@@ -219,16 +220,26 @@ export function getReservationSchemaBase(formType: ReservationFormType) {
   }
 }
 
+type ReservationUnitForRefinement = Pick<ReservationUnitNode, "reservationForm" | "minPersons" | "maxPersons">;
+
 /// TODO this could use formContainsField helper to automatically construct the schema
 /// issue with this is that it removes the type narrowing provided by a switch.
-function getReservationFormSchemaImpl(formType: ReservationFormType) {
-  if (formType === ReservationFormType.ContactInfoForm) {
+function getReservationFormSchemaImpl(reservationUnit: ReservationUnitForRefinement) {
+  if (reservationUnit.reservationForm === ReservationFormType.ContactInfoForm) {
     return ContactInfoFormSchema;
   }
-  return getReservationSchemaBase(formType)
+  return getReservationSchemaUnrefined(reservationUnit.reservationForm)
     .refine((val) => val.reserveeType === ReserveeType.Individual || val.reserveeOrganisationName.length > 0, {
       path: ["reserveeOrganisationName"],
       message: "Required",
+    })
+    .refine((val) => reservationUnit.minPersons != null && val.numPersons >= reservationUnit.minPersons, {
+      path: ["numPersons"],
+      message: "Too small",
+    })
+    .refine((val) => reservationUnit.maxPersons != null && val.numPersons <= reservationUnit.maxPersons, {
+      path: ["numPersons"],
+      message: "Too large",
     })
     .refine(
       (val) =>
@@ -243,8 +254,8 @@ function getReservationFormSchemaImpl(formType: ReservationFormType) {
 }
 
 /// Get the schema that matches the selected FormType
-export function getReservationFormSchema(formType: ReservationFormType) {
-  return getReservationFormSchemaImpl(formType).refine(
+export function getReservationFormSchema(reservationUnit: ReservationUnitForRefinement) {
+  return getReservationFormSchemaImpl(reservationUnit).refine(
     (val) => !val.applyingForFreeOfCharge || (val.freeOfChargeReason != null && val.freeOfChargeReason.length > 0),
     {
       path: ["freeOfChargeReason"],

@@ -1,6 +1,6 @@
 import { ReserveeType, type ReservationFormFieldsFragment, ReservationFormType } from "../../gql/gql-types";
 import { type TFunction } from "next-i18next";
-import { getReservationSchemaBase, type ReservationFormValueT } from "../schemas";
+import { getReservationSchemaUnrefined, type ReservationFormValueT } from "../schemas";
 import type { FieldError } from "react-hook-form";
 import { filterEmptyString } from "../helpers";
 
@@ -88,7 +88,7 @@ export function getFilteredGeneralFields(formType: ReservationFormType): FormFie
 
 /// Get stored reservation fields (graphql) based on form type.
 function getFormFields(type: ReservationFormType): FormFieldArray {
-  const schema = getReservationSchemaBase(type);
+  const schema = getReservationSchemaUnrefined(type);
   // NOTE this doesn't type all options correctly because the schemas are a union
   // it's missing both purpose and ageGroup but they are present in the Javascript
   const keys = schema.keyof().options;
@@ -104,29 +104,33 @@ export function formContainsField(type: ReservationFormType, fieldName: keyof Re
 export function translateReserveeFormError(
   t: TFunction,
   fieldLabel: string,
-  error: FieldError | undefined
+  error: FieldError | undefined,
+  params: {
+    minValue?: number | null;
+    maxValue?: number | null;
+  } = {}
 ): string | undefined {
   if (error == null) {
     return undefined;
   }
 
-  // custom error message can be set, but not type
+  const { maxValue, minValue } = params;
+  // custom error message can be set, but not type / code
   if (error.message === "Required" || error.type === "invalid_type") {
-    return t("forms:Required", { fieldName: fieldLabel });
+    return t("forms:Required", { fieldName: t(fieldLabel) });
   } else if (error.message === "Invalid email") {
     return t("forms:invalidEmail");
+  } else if (error.message === "Too large") {
+    if (maxValue != null) {
+      return t("forms:maxNumPersons", { maxValue });
+    }
+    return t("forms:tooLarge", { fieldName: t(fieldLabel) });
+  } else if (error.message === "Too small") {
+    if (minValue != null) {
+      return t("forms:minNumPersons", { minValue });
+    }
+    return t("forms:tooSmall", { fieldName: t(fieldLabel) });
   }
-
-  /* TODO do we need this still? and how we manipulate it
-  switch (error.type) {
-    case "min":
-      if (field === "numPersons") return t("forms:minNumPersons", { minValue });
-      break;
-    case "max":
-      if (field === "numPersons") return t("forms:maxNumPersons", { maxValue });
-      break;
-  }
-  */
 
   return filterEmptyString(error.message);
 }
