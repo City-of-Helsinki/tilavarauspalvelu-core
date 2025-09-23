@@ -30,7 +30,7 @@ export interface FormatDateTimeRangeOptions extends FormatDateTimeOptions {
   showEndDate?: boolean;
 }
 
-export interface ReservationDateTime {
+export interface ApplicationReservationDateTime {
   date: Date;
   time: string;
   dayOfWeek: string;
