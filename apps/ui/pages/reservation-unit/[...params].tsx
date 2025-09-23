@@ -320,7 +320,6 @@ export const RESERVATION_IN_PROGRESS_QUERY = gql`
     reservation(id: $id) {
       id
       pk
-      name
       ...ReservationFormFields
       ...ReservationInfoCard
       bufferTimeBefore
@@ -330,6 +329,8 @@ export const RESERVATION_IN_PROGRESS_QUERY = gql`
         id
         canApplyFreeOfCharge
         reservationForm
+        minPersons
+        maxPersons
         ...CancellationRuleFields
         ...TermsOfUse
         requireReservationHandling
