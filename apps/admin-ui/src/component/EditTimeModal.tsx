@@ -88,8 +88,8 @@ function reservationSeriesInfoText({
       .sort((a, b) => convertWeekday(a) - convertWeekday(b))
       .map((weekday) => t(`translation:dayShort.${weekday}`))
       .join(", "),
-    begin: begin && formatDate(begin),
-    end: end && formatDate(end),
+    begin: begin && formatDate(begin, {}),
+    end: end && formatDate(end, {}),
   });
 }
 
@@ -354,7 +354,7 @@ export function EditTimeModal({
     mode: "onChange",
     defaultValues: {
       pk: reservation.pk ?? undefined,
-      date: formatDate(startDateTime, { locale }),
+      date: formatDate(startDateTime, {}),
       startTime: formatTime(startDateTime),
       endTime: formatTime(endDateTime),
       enableBufferTimeAfter: !!reservation.bufferTimeAfter,

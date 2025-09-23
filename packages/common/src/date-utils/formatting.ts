@@ -8,7 +8,7 @@ import type {
   FormatDateTimeOptions,
   FormatDateTimeRangeOptions,
   TimeStruct,
-  ReservationDateTime,
+  ApplicationReservationDateTime,
   FormatDateRangeOptions,
 } from "./types";
 
@@ -92,13 +92,14 @@ export function formatTime(date: Date | null, locale: LocalizationLanguages = "f
  *   formatDate(new Date("2023-12-25T15:30:00")) // "25.12.2023"
  *   formatDate(new Date("2023-12-25T15:30:00"), { includeWeekday: true }) // "ma 25.12.2023"
  */
-export function formatDate(date: Date | null, options?: FormatDateOptions): string {
-  const {
+export function formatDate(
+  date: Date | null,
+  {
     includeWeekday = false,
     locale = "fi",
     formatString = includeWeekday ? UI_DATE_FORMAT_WITH_WEEKDAY : UI_DATE_FORMAT,
-  } = options ?? {};
-
+  }: FormatDateOptions = {}
+): string {
   if (!date || !isValidDate(date)) {
     return "";
   }
@@ -121,15 +122,16 @@ export function formatDate(date: Date | null, options?: FormatDateOptions): stri
  *   formatDateTime(new Date("2023-12-25T15:30:00"), { includeSeparator: true }) // "25.12.2023 @ 15:30"
  *   formatDateTime(new Date("2023-12-25T15:30:00"), { includeTimeSeparator: false }) // "ma 25.12.2023 15:30"
  */
-export function formatDateTime(date: Date | null, options?: FormatDateTimeOptions): string {
-  const {
+export function formatDateTime(
+  date: Date | null,
+  {
     t,
     includeWeekday = true,
     includeTimeSeparator = true,
     locale = "fi",
     formatString = UI_DATE_FORMAT_WITH_WEEKDAY,
-  } = options ?? {};
-
+  }: FormatDateTimeOptions = {}
+): string {
   if (!date || !isValidDate(date)) {
     return "";
   }
@@ -177,7 +179,7 @@ export function formatDateTimeStrings({
     endTime: string;
   };
   trailingMinutes?: boolean;
-}): ReservationDateTime {
+}): ApplicationReservationDateTime {
   const start = new Date(reservation.beginsAt);
   const end = new Date(reservation.endsAt);
   const dayOfWeek = t(`weekDayLong.${start.getDay()}`);
@@ -237,12 +239,14 @@ export function formatTimeRange(
  *   formatDateRange(new Date("2023-12-25T00:00:01"), new Date("2023-12-25T23:59:59"))
  *   // "ma 25.12.2023"
  */
-export function formatDateRange(start: Date | null, end: Date | null, options?: FormatDateRangeOptions): string {
+export function formatDateRange(
+  start: Date | null,
+  end: Date | null,
+  { includeWeekday = true, showEndDate = true, locale = "fi" }: FormatDateRangeOptions = {}
+): string {
   if (!start || !end || !isValidDate(start) || !isValidDate(end)) {
     return "";
   }
-
-  const { includeWeekday = true, showEndDate = true, locale = "fi" } = options ?? {};
 
   if (!showEndDate || isSameDay(start, end)) {
     return formatDate(start, { includeWeekday, locale }) || "";
@@ -277,20 +281,18 @@ export function formatDateRange(start: Date | null, end: Date | null, options?: 
 export function formatDateTimeRange(
   start: Date | null,
   end: Date | null,
-  options?: FormatDateTimeRangeOptions
-): string {
-  if (!start || !end || !isValidDate(start) || !isValidDate(end)) {
-    return "";
-  }
-
-  const {
+  {
     t,
     includeWeekday = true,
     showEndDate = true,
     includeTimeSeparator = true,
     locale = "fi",
     formatString = UI_DATE_FORMAT,
-  } = options ?? {};
+  }: FormatDateTimeRangeOptions = {}
+): string {
+  if (!start || !end || !isValidDate(start) || !isValidDate(end)) {
+    return "";
+  }
 
   const startDateTime = formatDateTime(start, { t, includeWeekday, includeTimeSeparator, locale, formatString });
   const endFormat = !isSameDay(start, end) && showEndDate ? `${UI_TIME_FORMAT} ${formatString}` : UI_TIME_FORMAT;
