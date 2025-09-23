@@ -104,29 +104,33 @@ export function formContainsField(type: ReservationFormType, fieldName: keyof Re
 export function translateReserveeFormError(
   t: TFunction,
   fieldLabel: string,
-  error: FieldError | undefined
+  error: FieldError | undefined,
+  params: {
+    minValue?: number | null;
+    maxValue?: number | null;
+  } = {}
 ): string | undefined {
   if (error == null) {
     return undefined;
   }
 
-  // custom error message can be set, but not type
+  const { maxValue, minValue } = params;
+  // custom error message can be set, but not type / code
   if (error.message === "Required" || error.type === "invalid_type") {
-    return t("forms:Required", { fieldName: fieldLabel });
+    return t("forms:Required", { fieldName: t(fieldLabel) });
   } else if (error.message === "Invalid email") {
     return t("forms:invalidEmail");
+  } else if (error.message === "Too large") {
+    if (maxValue != null) {
+      return t("forms:maxNumPersons", { maxValue });
+    }
+    return t("forms:tooLarge", { fieldName: t(fieldLabel) });
+  } else if (error.message === "Too small") {
+    if (minValue != null) {
+      return t("forms:minNumPersons", { minValue });
+    }
+    return t("forms:tooSmall", { fieldName: t(fieldLabel) });
   }
-
-  /* TODO do we need this still? and how we manipulate it
-  switch (error.type) {
-    case "min":
-      if (field === "numPersons") return t("forms:minNumPersons", { minValue });
-      break;
-    case "max":
-      if (field === "numPersons") return t("forms:maxNumPersons", { maxValue });
-      break;
-  }
-  */
 
   return filterEmpty(error.message) ?? undefined;
 }

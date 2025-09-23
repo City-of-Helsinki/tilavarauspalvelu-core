@@ -23,7 +23,7 @@ import { ControlledCheckbox, ControlledNumberInput, ControlledSelect } from "../
 import { StyledCheckboxWrapper, StyledTextArea, StyledTextInput } from "./styled";
 
 interface CommonWithFields {
-  reservationUnit: Pick<ReservationUnitNode, "reservationForm">;
+  reservationUnit: Pick<ReservationUnitNode, "reservationForm" | "minPersons" | "maxPersons">;
 }
 
 interface ReservationFormGeneralSectionProps extends CommonWithFields {
@@ -74,7 +74,10 @@ export function ReservationFormGeneralSection({ reservationUnit, options, data }
   };
 
   const getFieldError = (field: keyof ReservationFormValueT): string | undefined => {
-    return translateReserveeFormError(t, createLabel(field), errors[field]);
+    return translateReserveeFormError(t, createLabel(field), errors[field], {
+      minValue: reservationUnit.minPersons,
+      maxValue: reservationUnit.maxPersons,
+    });
   };
 
   const hasPurpose = fields.find((x) => x === "purpose") != null;

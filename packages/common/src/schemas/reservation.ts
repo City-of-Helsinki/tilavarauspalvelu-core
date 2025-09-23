@@ -5,6 +5,7 @@ import {
   ReservationFormType,
   ReservationStartInterval,
   ReservationTypeChoice,
+  ReservationUnitNode,
   ReserveeType,
 } from "../../gql/gql-types";
 import { checkTimeStringFormat, checkValidFutureDate } from "./schemaCommon";
@@ -231,16 +232,26 @@ function getReservationSchemaNarrow(formType: ReservationFormType) {
   }
 }
 
+type ReservationUnitForRefinement = Pick<ReservationUnitNode, "reservationForm" | "minPersons" | "maxPersons">;
+
 /// TODO this could use formContainsField helper to automatically construct the schema
 /// issue with this is that it removes the type narrowing provided by a switch.
-function getReservationFormSchemaImpl(formType: ReservationFormType) {
-  if (formType === ReservationFormType.ContactInfoForm) {
+function getReservationFormSchemaImpl(reservationUnit: ReservationUnitForRefinement) {
+  if (reservationUnit.reservationForm === ReservationFormType.ContactInfoForm) {
     return ContactInfoFormSchema;
   }
-  return getReservationSchemaNarrow(formType)
+  return getReservationSchemaNarrow(reservationUnit.reservationForm)
     .refine((val) => val.reserveeType === ReserveeType.Individual || val.reserveeOrganisationName.length > 0, {
       path: ["reserveeOrganisationName"],
       message: "Required",
+    })
+    .refine((val) => reservationUnit.minPersons != null && val.numPersons >= reservationUnit.minPersons, {
+      path: ["numPersons"],
+      message: "Too small",
+    })
+    .refine((val) => reservationUnit.maxPersons != null && val.numPersons <= reservationUnit.maxPersons, {
+      path: ["numPersons"],
+      message: "Too large",
     })
     .refine(
       (val) =>
@@ -255,8 +266,8 @@ function getReservationFormSchemaImpl(formType: ReservationFormType) {
 }
 
 /// Get the schema that matches the selected FormType
-export function getReservationFormSchema(formType: ReservationFormType) {
-  return getReservationFormSchemaImpl(formType).refine(
+export function getReservationFormSchema(reservationUnit: ReservationUnitForRefinement) {
+  return getReservationFormSchemaImpl(reservationUnit).refine(
     (val) => !val.applyingForFreeOfCharge || (val.freeOfChargeReason != null && val.freeOfChargeReason.length > 0),
     {
       path: ["freeOfChargeReason"],

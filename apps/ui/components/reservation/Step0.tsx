@@ -64,7 +64,7 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
     ageGroup: reservation.ageGroup?.pk ?? undefined,
     reserveeIsUnregisteredAssociation: false,
   };
-  const formSchema = getReservationFormSchema(reservation.reservationUnit.reservationForm);
+  const formSchema = getReservationFormSchema(reservation.reservationUnit);
   // NOTE infered type is not exactly correct it doesn't create all four discrimating unions
   type FT = z.infer<ReturnType<typeof getReservationFormSchema>>;
 
