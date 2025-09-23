@@ -74,7 +74,7 @@ describe("formatting", () => {
   describe("formatDate", () => {
     it("formats date without weekday", () => {
       const date = new Date("2023-12-25T15:30:00");
-      const result = formatDate(date);
+      const result = formatDate(date, {});
       expect(result).toBe("25.12.2023");
     });
 
@@ -86,13 +86,13 @@ describe("formatting", () => {
     });
 
     it("handles null date", () => {
-      const result = formatDate(null);
+      const result = formatDate(null, {});
       expect(result).toBe("");
     });
 
     it("handles invalid date", () => {
       const invalidDate = new Date("invalid");
-      const result = formatDate(invalidDate);
+      const result = formatDate(invalidDate, {});
       expect(result).toBe("");
     });
 
@@ -129,13 +129,13 @@ describe("formatting", () => {
     });
 
     it("handles null date", () => {
-      const result = formatDateTime(null);
+      const result = formatDateTime(null, {});
       expect(result).toBe("");
     });
 
     it("uses default values when no options provided", () => {
       const date = new Date("2023-12-25T15:30:00");
-      const result = formatDateTime(date);
+      const result = formatDateTime(date, {});
       expect(result).toContain("ma");
       expect(result).toContain("25.12.2023");
       expect(result).toContain("@");
@@ -228,7 +228,7 @@ describe("formatting", () => {
     it("formats same day range", () => {
       const start = new Date("2023-12-25T10:00:00");
       const end = new Date("2023-12-25T15:00:00");
-      const result = formatDateRange(start, end);
+      const result = formatDateRange(start, end, {});
       expect(result).toContain("25.12.2023");
       expect(result).not.toContain("–"); // Should not have range separator for same day
     });
@@ -236,7 +236,7 @@ describe("formatting", () => {
     it("formats multi-day range", () => {
       const start = new Date("2023-12-25T10:00:00");
       const end = new Date("2023-12-26T15:00:00");
-      const result = formatDateRange(start, end);
+      const result = formatDateRange(start, end, {});
       expect(result).toContain("ma 25.12.2023");
       expect(result).toContain("ti 26.12.2023");
       expect(result).toContain("–");
@@ -245,7 +245,7 @@ describe("formatting", () => {
     it("includes weekday by default", () => {
       const start = new Date("2023-12-25T10:00:00"); // Monday
       const end = new Date("2023-12-26T15:00:00"); // Tuesday
-      const result = formatDateRange(start, end);
+      const result = formatDateRange(start, end, {});
       expect(result).toContain("ma");
       expect(result).toContain("ti");
     });
@@ -260,13 +260,13 @@ describe("formatting", () => {
     });
 
     it("handles null dates", () => {
-      const result = formatDateRange(null, null);
+      const result = formatDateRange(null, null, {});
       expect(result).toBe("");
     });
 
     it("handles invalid dates", () => {
       const invalidDate = new Date("invalid");
-      const result = formatDateRange(invalidDate, invalidDate);
+      const result = formatDateRange(invalidDate, invalidDate, {});
       expect(result).toBe("");
     });
   });
@@ -313,7 +313,7 @@ describe("formatting", () => {
     });
 
     it("handles null dates", () => {
-      const result = formatDateTimeRange(null, null);
+      const result = formatDateTimeRange(null, null, {});
       expect(result).toBe("");
     });
   });

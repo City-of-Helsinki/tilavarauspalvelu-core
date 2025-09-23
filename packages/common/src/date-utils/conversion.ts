@@ -66,22 +66,22 @@ export function parseUIDateUnsafe(date: string): Date {
  */
 export function dateForInput(date: Date | string): string {
   if (date instanceof Date) {
-    const formatted = formatDate(date);
+    const formatted = formatDate(date, {});
     return formatted || "";
   }
   // Try to parse as API date first, then as UI date
   const apiDate = parseApiDate(date);
   if (apiDate) {
-    const formatted = formatDate(apiDate);
+    const formatted = formatDate(apiDate, {});
     return formatted || "";
   }
   const uiDate = parseUIDate(date);
   if (uiDate) {
-    const formatted = formatDate(uiDate);
+    const formatted = formatDate(uiDate, {});
     return formatted || "";
   }
   // Fallback to current date
-  const formatted = formatDate(new Date());
+  const formatted = formatDate(new Date(), {});
   return formatted || "";
 }
 

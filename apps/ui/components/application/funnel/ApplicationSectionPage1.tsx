@@ -43,8 +43,8 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
 
   const selectDefaultPeriod = (): void => {
     clearErrors([`applicationSections.${index}.begin`, `applicationSections.${index}.end`]);
-    const begin = formatDate(periodStartDate);
-    const end = formatDate(periodEndDate);
+    const begin = formatDate(periodStartDate, {});
+    const end = formatDate(periodEndDate, {});
     setValue(`applicationSections.${index}.begin`, begin);
     setValue(`applicationSections.${index}.end`, end);
   };
@@ -56,8 +56,8 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
   const selectionIsDefaultPeriod =
     applicationPeriodEndsAt != null &&
     applicationPeriodBeginsAt != null &&
-    applicationPeriodBeginsAt === formatDate(periodStartDate) &&
-    applicationPeriodEndsAt === formatDate(periodEndDate);
+    applicationPeriodBeginsAt === formatDate(periodStartDate, {}) &&
+    applicationPeriodEndsAt === formatDate(periodEndDate, {});
 
   type FieldName =
     | "begin"
@@ -139,7 +139,7 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
       <Checkbox
         id={`applicationSections.${index}.defaultPeriod`}
         checked={selectionIsDefaultPeriod}
-        label={`${t("application:Page1.defaultPeriodPrefix")} ${formatDateRange(periodStartDate, periodEndDate)}`}
+        label={`${t("application:Page1.defaultPeriodPrefix")} ${formatDateRange(periodStartDate, periodEndDate, {})}`}
         onChange={selectDefaultPeriod}
         disabled={selectionIsDefaultPeriod}
       />

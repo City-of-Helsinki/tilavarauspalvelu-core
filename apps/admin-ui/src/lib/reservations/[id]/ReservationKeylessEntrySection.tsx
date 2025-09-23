@@ -175,10 +175,10 @@ function ReservationKeylessEntryRecurring({
       </Flex>
 
       <DataWrapper label={t("common:startingDate")}>
-        {validityBeginsDate ? formatDate(parseValidDateObject(validityBeginsDate)) : "-"}
+        {validityBeginsDate ? formatDate(parseValidDateObject(validityBeginsDate), {}) : "-"}
       </DataWrapper>
       <DataWrapper label={t("common:endingDate")}>
-        {validityEndsDate ? formatDate(parseValidDateObject(validityEndsDate)) : "-"}
+        {validityEndsDate ? formatDate(parseValidDateObject(validityEndsDate), {}) : "-"}
       </DataWrapper>
 
       <Flex $alignItems="center" $gap="xs" $direction="row">
@@ -191,7 +191,7 @@ function ReservationKeylessEntryRecurring({
         </DataWrapper>
         {validityBeginsTime && (
           <Tooltip placement="top">
-            {t("accessType:validity.fromNextReservation")} ({formatDate(parseValidDateObject(validityBeginsTime))})
+            {t("accessType:validity.fromNextReservation")} ({formatDate(parseValidDateObject(validityBeginsTime), {})})
           </Tooltip>
         )}
       </Flex>
