@@ -3,6 +3,8 @@
   "Required": "{{fieldName}} on pakollinen",
   "minNumPersons": "Osallistujamäärän tulee olla vähintään {{minValue}} henkilöä",
   "maxNumPersons": "Osallistujamäärä voi olla enintään {{maxValue}} henkilöä",
+  "tooSmall": "{{fieldName}} on liian pieni.",
+  "tooLarge": "{{fieldName}} on liian suuri.",
   "heading": {
     "errorsTitle": "Täytä puuttuvat tiedot",
     "errorsSubtitle": "Täytä seuraavat kohdat tehdäksesi varauksen:"

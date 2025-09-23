@@ -3,6 +3,8 @@
   "Required": "{{fieldName}} är obligatorisk",
   "minNumPersons": "Antalet deltagare kan vara minimum {{minValue}} personer",
   "maxNumPersons": "Antalet deltagare kan vara maximalt {{maxValue}} personer",
+  "tooSmall": "{{fieldName}} är för liten.",
+  "tooLarge": "{{fieldName}} är för stor.",
   "heading": {
     "errorsTitle": "Fyll i den information som saknas",
     "errorsSubtitle": "Fyll i följande fält för att göra bokningen:"
