@@ -27,7 +27,7 @@ class ApplicationRoundTimeSlot(models.Model):
         on_delete=models.CASCADE,
     )
 
-    weekday: Weekday = TextChoicesField(choices_enum=Weekday)
+    weekday: Weekday = TextChoicesField(enum=Weekday)
     is_closed: bool = models.BooleanField(default=False)
     reservable_times: list[TimeSlotDB] = ArrayField(
         base_field=HStoreField(),

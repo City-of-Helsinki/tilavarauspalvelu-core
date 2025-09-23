@@ -7,6 +7,8 @@ simply so that it's registered before any mutations.
 
 from __future__ import annotations
 
+from .extensions import converters  # noqa: F401  # isort:skip
+
 from .types.age_group.types import AgeGroupNode
 from .types.allocated_time_slot.types import AllocatedTimeSlotNode
 from .types.application.types import ApplicationNode

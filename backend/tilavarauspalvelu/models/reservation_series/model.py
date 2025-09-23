@@ -57,7 +57,7 @@ class ReservationSeries(models.Model):
 
     recurrence_in_days: int | None = models.PositiveIntegerField(null=True, blank=True)  # TODO: Nullable?
 
-    weekdays: list[Weekday] = ArrayField(TextChoicesField(choices_enum=Weekday), size=7, default=list)
+    weekdays: list[Weekday] = ArrayField(TextChoicesField(enum=Weekday), size=7, default=list)
 
     # Relations
 
@@ -156,7 +156,7 @@ class ReservationSeries(models.Model):
             agg_field="access_type",
             distinct=True,
             coalesce_output_type="varchar",
-            output_field=TextChoicesField(choices_enum=AccessType),
+            output_field=TextChoicesField(enum=AccessType),
         )
         return sq  # type: ignore[return-value]  # noqa: RET504
 
@@ -184,7 +184,7 @@ class ReservationSeries(models.Model):
                 IndexTransform(1, models.CharField(), L("used_access_types")),
                 models.Value(AccessTypeWithMultivalued.UNRESTRICTED.value),  # If no reservations in series
             ),
-            output_field=TextChoicesField(choices_enum=AccessTypeWithMultivalued),
+            output_field=TextChoicesField(enum=AccessTypeWithMultivalued),
         )
         return case  # type: ignore[return-value]  # noqa: RET504
 

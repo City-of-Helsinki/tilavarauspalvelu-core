@@ -9,10 +9,10 @@ from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
 from lookup_property import L
 
-from tilavarauspalvelu.api.graphql.extensions.filters import TimezoneAwareDateFilter
 from tilavarauspalvelu.enums import OrderStatusWithFree, ReservationStateChoice, ReservationTypeChoice, UserRoleChoice
 from tilavarauspalvelu.models import Reservation
 from utils.db import text_search
+from utils.fields.filters import TimezoneAwareDateFilter
 from utils.utils import log_text_search
 
 if TYPE_CHECKING:

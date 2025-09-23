@@ -29,7 +29,7 @@ __all__ = [
 
 class UnitRole(models.Model):
     user: User = models.ForeignKey("tilavarauspalvelu.User", related_name="unit_roles", on_delete=models.CASCADE)
-    role: UserRoleChoice = TextChoicesField(choices_enum=UserRoleChoice)
+    role: UserRoleChoice = TextChoicesField(enum=UserRoleChoice)
 
     units: ManyToManyRelatedManager[Unit, UnitQuerySet] = models.ManyToManyField(
         "tilavarauspalvelu.Unit",

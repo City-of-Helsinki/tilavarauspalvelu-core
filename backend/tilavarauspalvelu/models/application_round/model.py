@@ -164,7 +164,7 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundStatusChoice.OPEN.value),
             ),
             default=models.Value(ApplicationRoundStatusChoice.IN_ALLOCATION.value),
-            output_field=TextChoicesField(choices_enum=ApplicationRoundStatusChoice),
+            output_field=TextChoicesField(enum=ApplicationRoundStatusChoice),
         )
 
     @status.override
@@ -279,7 +279,7 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.FAILED.value),
             ),
             default=models.Value(ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED.value),
-            output_field=TextChoicesField(choices_enum=ApplicationRoundReservationCreationStatusChoice),
+            output_field=TextChoicesField(enum=ApplicationRoundReservationCreationStatusChoice),
         )
 
     @reservation_creation_status.override

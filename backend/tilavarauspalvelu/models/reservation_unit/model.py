@@ -132,20 +132,20 @@ class ReservationUnit(models.Model):
     # Enums
 
     authentication: AuthenticationType = TextChoicesField(
-        choices_enum=AuthenticationType,
+        enum=AuthenticationType,
         default=AuthenticationType.WEAK,
     )
     reservation_start_interval: ReservationStartInterval = TextChoicesField(
-        choices_enum=ReservationStartInterval,
+        enum=ReservationStartInterval,
         default=ReservationStartInterval.INTERVAL_15_MINUTES,
     )
     reservation_kind: ReservationKind = TextChoicesField(
-        choices_enum=ReservationKind,
+        enum=ReservationKind,
         default=ReservationKind.DIRECT_AND_SEASON,
         db_index=True,
     )
     reservation_form: ReservationFormType = TextChoicesField(
-        choices_enum=ReservationFormType,
+        enum=ReservationFormType,
         default=ReservationFormType.CONTACT_INFO_FORM,
         db_index=True,
     )
@@ -420,7 +420,7 @@ class ReservationUnit(models.Model):
             ),
             # Otherwise, Reservation Unit is published.
             default=models.Value(ReservationUnitPublishingState.PUBLISHED.value),
-            output_field=TextChoicesField(choices_enum=ReservationUnitPublishingState),
+            output_field=TextChoicesField(enum=ReservationUnitPublishingState),
         )
         return case  # type: ignore[return-value]  # noqa: RET504
 
@@ -514,7 +514,7 @@ class ReservationUnit(models.Model):
             ),
             # Otherwise, Reservation Unit is reservable
             default=models.Value(ReservationUnitReservationState.RESERVABLE.value),
-            output_field=TextChoicesField(choices_enum=ReservationUnitReservationState),
+            output_field=TextChoicesField(enum=ReservationUnitReservationState),
         )
 
         return case  # type: ignore[return-value]  # noqa: RET504
@@ -530,7 +530,7 @@ class ReservationUnit(models.Model):
                 .active()
                 .values("access_type")[:1]
             ),
-            output_field=TextChoicesField(choices_enum=AccessType, null=True),
+            output_field=TextChoicesField(enum=AccessType, null=True),
         )
         return sq  # type: ignore[return-value]  # noqa: RET504
 

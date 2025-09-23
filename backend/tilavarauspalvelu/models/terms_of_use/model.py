@@ -31,7 +31,7 @@ class TermsOfUse(models.Model):
     text: str = models.TextField()
 
     terms_type: TermsOfUseTypeChoices = TextChoicesField(
-        choices_enum=TermsOfUseTypeChoices,
+        enum=TermsOfUseTypeChoices,
         default=TermsOfUseTypeChoices.GENERIC,
         blank=False,
     )

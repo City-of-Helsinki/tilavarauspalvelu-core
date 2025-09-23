@@ -28,8 +28,8 @@ __all__ = [
 class SuitableTimeRange(models.Model):
     """Represent a time range that the applicant has marked as suitable for their application section."""
 
-    priority: Priority = TextChoicesField(choices_enum=Priority)
-    day_of_the_week: Weekday = TextChoicesField(choices_enum=Weekday)
+    priority: Priority = TextChoicesField(enum=Priority)
+    day_of_the_week: Weekday = TextChoicesField(enum=Weekday)
     begin_time: datetime.time = models.TimeField()
     end_time: datetime.time = models.TimeField()
 

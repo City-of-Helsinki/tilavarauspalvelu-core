@@ -573,7 +573,7 @@ type Query {
     after: String
     before: String
     pk: [String]
-    termsType: TermsType
+    termsType: TermsOfUseTypeChoices
 
     """Ordering"""
     orderBy: [TermsOfUseOrderingChoices]
@@ -782,10 +782,10 @@ type ReservationUnitNode implements Node {
   reservationBlockWholeDay: Boolean!
   canApplyFreeOfCharge: Boolean!
   allowReservationsWithoutOpeningHours: Boolean!
-  authentication: Authentication!
+  authentication: AuthenticationType!
   reservationStartInterval: ReservationStartInterval!
   reservationKind: ReservationKind!
-  reservationForm: ReservationForm!
+  reservationForm: ReservationFormType!
   searchTerms: [String!]!
   unit: UnitNode!
   reservationUnitType: ReservationUnitTypeNode
@@ -934,7 +934,7 @@ scalar UUID
 scalar Duration
 
 """An enumeration."""
-enum Authentication {
+enum AuthenticationType {
   """Weak"""
   WEAK
 
@@ -982,24 +982,13 @@ enum ReservationKind {
   DIRECT_AND_SEASON
 }
 
-"""An enumeration."""
-enum ReservationForm {
-  """Contact information only"""
+"""Reservation forms for that are supported by the system."""
+enum ReservationFormType {
   CONTACT_INFO_FORM
-
-  """Contact information and event description"""
   RESERVEE_INFO_FORM
-
-  """Purpose of use"""
   PURPOSE_FORM
-
-  """Age group"""
   AGE_GROUP_FORM
-
-  """Purpose of use + discount"""
   PURPOSE_SUBVENTION_FORM
-
-  """Age group + discount"""
   AGE_GROUP_SUBVENTION_FORM
 }
 
@@ -1149,16 +1138,6 @@ enum ReservationUnitReservationState {
   RESERVABLE
   SCHEDULED_CLOSING
   RESERVATION_CLOSED
-}
-
-"""Reservation forms for that are supported by the system."""
-enum ReservationFormType {
-  CONTACT_INFO_FORM
-  RESERVEE_INFO_FORM
-  PURPOSE_FORM
-  AGE_GROUP_FORM
-  PURPOSE_SUBVENTION_FORM
-  AGE_GROUP_SUBVENTION_FORM
 }
 
 """How is the reservee able to enter the space in their reservation unit?"""
@@ -1395,7 +1374,7 @@ type TermsOfUseNode implements Node {
   textFi: String
   textEn: String
   textSv: String
-  termsType: TermsType!
+  termsType: TermsOfUseTypeChoices!
 
   """The ID of the object"""
   id: ID!
@@ -1403,7 +1382,7 @@ type TermsOfUseNode implements Node {
 }
 
 """An enumeration."""
-enum TermsType {
+enum TermsOfUseTypeChoices {
   """Generic terms"""
   GENERIC_TERMS
 
@@ -2398,7 +2377,7 @@ enum ReservationUnitAccessTypeOrderingChoices {
 }
 
 type ReservationUnitImageNode implements Node {
-  imageType: ImageType!
+  imageType: ReservationUnitImageType!
   largeUrl: String
   mediumUrl: String
   smallUrl: String
@@ -2410,7 +2389,7 @@ type ReservationUnitImageNode implements Node {
 }
 
 """An enumeration."""
-enum ImageType {
+enum ReservationUnitImageType {
   """Main image"""
   MAIN
 
@@ -3281,7 +3260,7 @@ enum Status {
   HANDLED
 
   """Results Sent"""
-  RESULT_SENT
+  RESULTS_SENT
 
   """Expired"""
   EXPIRED
@@ -3671,17 +3650,8 @@ type ResourceCreateMutationPayload {
   nameFi: String
   nameEn: String
   nameSv: String
-  locationType: LocationType
+  locationType: ResourceLocationType
   space: Int
-}
-
-"""An enumeration."""
-enum LocationType {
-  """Fixed"""
-  FIXED
-
-  """Movable"""
-  MOVABLE
 }
 
 input ResourceCreateMutationInput {
@@ -3690,7 +3660,7 @@ input ResourceCreateMutationInput {
   nameFi: String
   nameEn: String
   nameSv: String
-  locationType: LocationType
+  locationType: ResourceLocationType
   space: Int
 }
 
@@ -3700,7 +3670,7 @@ type ResourceUpdateMutationPayload {
   nameFi: String
   nameEn: String
   nameSv: String
-  locationType: LocationType
+  locationType: ResourceLocationType
   space: Int
 }
 
@@ -3710,7 +3680,7 @@ input ResourceUpdateMutationInput {
   nameFi: String
   nameEn: String
   nameSv: String
-  locationType: LocationType
+  locationType: ResourceLocationType
   space: Int
 }
 
@@ -3915,10 +3885,10 @@ type ReservationUnitCreateMutationPayload {
   reservationBlockWholeDay: Boolean
   canApplyFreeOfCharge: Boolean
   allowReservationsWithoutOpeningHours: Boolean
-  authentication: Authentication
+  authentication: AuthenticationType
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
-  reservationForm: ReservationForm
+  reservationForm: ReservationFormType
   publishingState: String
   searchTerms: [String]
   unit: Int
@@ -3987,10 +3957,10 @@ input ReservationUnitCreateMutationInput {
   reservationBlockWholeDay: Boolean
   canApplyFreeOfCharge: Boolean
   allowReservationsWithoutOpeningHours: Boolean
-  authentication: Authentication
+  authentication: AuthenticationType
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
-  reservationForm: ReservationForm
+  reservationForm: ReservationFormType
   searchTerms: [String]
   unit: Int!
   reservationUnitType: Int
@@ -4015,7 +3985,7 @@ input ReservationUnitImageFieldSerializerInput {
   largeUrl: String
   mediumUrl: String
   smallUrl: String
-  imageType: ImageType!
+  imageType: ReservationUnitImageType!
 }
 
 """Represents a file upload."""
@@ -4100,10 +4070,10 @@ type ReservationUnitUpdateMutationPayload {
   reservationBlockWholeDay: Boolean
   canApplyFreeOfCharge: Boolean
   allowReservationsWithoutOpeningHours: Boolean
-  authentication: Authentication
+  authentication: AuthenticationType
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
-  reservationForm: ReservationForm
+  reservationForm: ReservationFormType
   publishingState: String
   searchTerms: [String]
   unit: Int
@@ -4172,10 +4142,10 @@ input ReservationUnitUpdateMutationInput {
   reservationBlockWholeDay: Boolean
   canApplyFreeOfCharge: Boolean
   allowReservationsWithoutOpeningHours: Boolean
-  authentication: Authentication
+  authentication: AuthenticationType
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
-  reservationForm: ReservationForm
+  reservationForm: ReservationFormType
   searchTerms: [String]
   unit: Int
   reservationUnitType: Int
@@ -4200,7 +4170,7 @@ input UpdateReservationUnitImageFieldSerializerInput {
   largeUrl: String
   mediumUrl: String
   smallUrl: String
-  imageType: ImageType
+  imageType: ReservationUnitImageType
 }
 
 input UpdateReservationUnitPricingSerializerInput {
@@ -4231,24 +4201,24 @@ input UpdateApplicationRoundTimeSlotSerializerInput {
 type ReservationUnitImageCreateMutationPayload {
   pk: Int
   reservationUnit: Int
-  imageType: ImageType
+  imageType: ReservationUnitImageType
 }
 
 input ReservationUnitImageCreateMutationInput {
   pk: Int
   reservationUnit: Int!
   image: Upload!
-  imageType: ImageType!
+  imageType: ReservationUnitImageType!
 }
 
 type ReservationUnitImageUpdateMutationPayload {
   pk: Int
-  imageType: ImageType
+  imageType: ReservationUnitImageType
 }
 
 input ReservationUnitImageUpdateMutationInput {
   pk: Int!
-  imageType: ImageType
+  imageType: ReservationUnitImageType
 }
 
 type ReservationUnitImageDeleteMutationPayload {
@@ -4786,23 +4756,23 @@ input ReservationSeriesRepairAccessCodeMutationInput {
 
 type CurrentUserUpdateMutationPayload {
   pk: Int
-  preferredLanguage: PreferredLanguage
+  preferredLanguage: Language
 }
 
 """An enumeration."""
-enum PreferredLanguage {
+enum Language {
   """Finnish"""
   FI
 
-  """English"""
-  EN
-
   """Swedish"""
   SV
+
+  """English"""
+  EN
 }
 
 input CurrentUserUpdateMutationInput {
-  preferredLanguage: PreferredLanguage
+  preferredLanguage: Language
 }
 
 type UserStaffUpdateMutationPayload {

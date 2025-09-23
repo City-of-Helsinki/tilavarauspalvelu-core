@@ -180,7 +180,7 @@ class ApplicationSection(SerializableModelMixin, models.Model):
             ),
             # Otherwise, the section is still in allocation
             default=models.Value(ApplicationSectionStatusChoice.IN_ALLOCATION.value),
-            output_field=TextChoicesField(choices_enum=ApplicationSectionStatusChoice),
+            output_field=TextChoicesField(enum=ApplicationSectionStatusChoice),
         )
 
     @status.override

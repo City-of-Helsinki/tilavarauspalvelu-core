@@ -28,7 +28,7 @@ class Resource(models.Model):
     name: str = models.CharField(max_length=255)
 
     location_type: ResourceLocationType = TextChoicesField(
-        choices_enum=ResourceLocationType,
+        enum=ResourceLocationType,
         default=ResourceLocationType.FIXED,
     )
 

@@ -28,8 +28,8 @@ class BannerNotification(models.Model):
     name: str = models.CharField(max_length=100, unique=True)
     message: str = models.TextField(max_length=1_000, blank=True, default="")
     draft: bool = models.BooleanField(default=True)
-    level: BannerNotificationLevel = TextChoicesField(choices_enum=BannerNotificationLevel)
-    target: BannerNotificationTarget = TextChoicesField(choices_enum=BannerNotificationTarget)
+    level: BannerNotificationLevel = TextChoicesField(enum=BannerNotificationLevel)
+    target: BannerNotificationTarget = TextChoicesField(enum=BannerNotificationTarget)
     active_from: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
     active_until: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
 
@@ -116,7 +116,7 @@ class BannerNotification(models.Model):
                 then=models.Value(BannerNotificationState.SCHEDULED.value),
             ),
             default=models.Value(BannerNotificationState.DRAFT.value),  # past notifications are considered drafts
-            output_field=TextChoicesField(choices_enum=BannerNotificationState),
+            output_field=TextChoicesField(enum=BannerNotificationState),
         )
 
     @lookup_property

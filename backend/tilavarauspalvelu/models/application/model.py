@@ -43,7 +43,7 @@ class Application(SerializableModelMixin, models.Model):
     """
 
     # Basic information
-    applicant_type: ReserveeType | None = TextChoicesField(choices_enum=ReserveeType, null=True, blank=True)
+    applicant_type: ReserveeType | None = TextChoicesField(enum=ReserveeType, null=True, blank=True)
     additional_information: str = models.TextField(blank=True, default="")
 
     # Handling data
@@ -76,7 +76,7 @@ class Application(SerializableModelMixin, models.Model):
     organisation_street_address: str = models.TextField(max_length=255, blank=True, default="")
     organisation_post_code: str = models.CharField(max_length=255, blank=True, default="")
     organisation_city: str = models.TextField(max_length=255, blank=True, default="")
-    municipality: MunicipalityChoice | None = TextChoicesField(choices_enum=MunicipalityChoice, null=True, blank=True)
+    municipality: MunicipalityChoice | None = TextChoicesField(enum=MunicipalityChoice, null=True, blank=True)
 
     # Auto-filled fields
     created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
@@ -177,7 +177,7 @@ class Application(SerializableModelMixin, models.Model):
                 then=models.Value(ApplicationStatusChoice.IN_ALLOCATION.value),
             ),
             default=models.Value(ApplicationStatusChoice.HANDLED.value),
-            output_field=TextChoicesField(choices_enum=ApplicationStatusChoice),
+            output_field=TextChoicesField(enum=ApplicationStatusChoice),
         )
 
     @status.override

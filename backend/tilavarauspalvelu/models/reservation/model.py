@@ -58,18 +58,18 @@ class Reservation(SerializableModelMixin, models.Model):
     description: str = models.CharField(max_length=255, blank=True, default="")
     num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
     state: ReservationStateChoice = TextChoicesField(
-        choices_enum=ReservationStateChoice,
+        enum=ReservationStateChoice,
         default=ReservationStateChoice.CREATED,
         db_index=True,
     )
     type: ReservationTypeChoice | None = TextChoicesField(
-        choices_enum=ReservationTypeChoice,
+        enum=ReservationTypeChoice,
         default=ReservationTypeChoice.NORMAL,
         null=True,  # TODO: Nullable?
         blank=False,
     )
     municipality: MunicipalityChoice | None = TextChoicesField(
-        choices_enum=MunicipalityChoice,
+        enum=MunicipalityChoice,
         null=True,
         blank=True,
     )
@@ -79,7 +79,7 @@ class Reservation(SerializableModelMixin, models.Model):
     # Cancellation information
     cancel_details: str = models.TextField(blank=True, default="")
     cancel_reason: ReservationCancelReasonChoice | None = TextChoicesField(
-        choices_enum=ReservationCancelReasonChoice,
+        enum=ReservationCancelReasonChoice,
         null=True,
         blank=True,
     )
@@ -94,7 +94,7 @@ class Reservation(SerializableModelMixin, models.Model):
     created_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=timezone.now)  # noqa: TID251
 
     # Access information
-    access_type: AccessType = TextChoicesField(choices_enum=AccessType, default=AccessType.UNRESTRICTED)
+    access_type: AccessType = TextChoicesField(enum=AccessType, default=AccessType.UNRESTRICTED)
     access_code_generated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     access_code_is_active: bool = models.BooleanField(default=False)
 
@@ -119,7 +119,7 @@ class Reservation(SerializableModelMixin, models.Model):
     reservee_address_city: str = models.CharField(max_length=255, blank=True, default="")
     reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")
     reservee_used_ad_login: bool = models.BooleanField(default=False, blank=True)
-    reservee_type: ReserveeType | None = TextChoicesField(choices_enum=ReserveeType, null=True, blank=True)
+    reservee_type: ReserveeType | None = TextChoicesField(enum=ReserveeType, null=True, blank=True)
 
     # Relations
     reservation_unit: ReservationUnit = models.ForeignKey(

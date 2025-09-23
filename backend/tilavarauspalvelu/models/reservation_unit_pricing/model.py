@@ -28,9 +28,9 @@ __all__ = [
 
 class ReservationUnitPricing(models.Model):
     begins: datetime.date = models.DateField()
-    price_unit: PriceUnit = TextChoicesField(choices_enum=PriceUnit, default=PriceUnit.PER_HOUR)
+    price_unit: PriceUnit = TextChoicesField(enum=PriceUnit, default=PriceUnit.PER_HOUR)
 
-    payment_type: PaymentType | None = TextChoicesField(choices_enum=PaymentType, null=True, blank=True)
+    payment_type: PaymentType | None = TextChoicesField(enum=PaymentType, null=True, blank=True)
 
     # True: This pricing is used for reservations that are created after the begins date
     # False: This pricing is used for reservations that start after the begins date

@@ -34,7 +34,7 @@ class AllocatedTimeSlot(models.Model):
     Will be converted to reservations when the application round has been allocated.
     """
 
-    day_of_the_week: Weekday = TextChoicesField(choices_enum=Weekday)
+    day_of_the_week: Weekday = TextChoicesField(enum=Weekday)
     begin_time: datetime.time = models.TimeField()
     end_time: datetime.time = models.TimeField()
 

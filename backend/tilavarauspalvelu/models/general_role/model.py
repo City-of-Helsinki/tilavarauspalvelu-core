@@ -27,7 +27,7 @@ __all__ = [
 
 class GeneralRole(models.Model):
     user: User = models.ForeignKey("tilavarauspalvelu.User", related_name="general_roles", on_delete=models.CASCADE)
-    role: UserRoleChoice = TextChoicesField(choices_enum=UserRoleChoice)
+    role: UserRoleChoice = TextChoicesField(enum=UserRoleChoice)
 
     assigner: User | None = models.ForeignKey(
         "tilavarauspalvelu.User",
