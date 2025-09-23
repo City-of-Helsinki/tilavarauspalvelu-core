@@ -17,4 +17,9 @@ class TaxPercentageFilterSet(ModelFilterSet):
         model = TaxPercentage
         fields = [
             "value",
+            "is_enabled",
+        ]
+        order_by = [
+            "pk",
+            "is_enabled",
         ]

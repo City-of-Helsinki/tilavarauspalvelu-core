@@ -45,6 +45,7 @@ class ReservationUnitPricing(models.Model):
         "tilavarauspalvelu.TaxPercentage",
         related_name="reservation_unit_pricings",
         on_delete=models.PROTECT,
+        limit_choices_to=models.Q(is_enabled=True),
     )
 
     reservation_unit: ReservationUnit = models.ForeignKey(
