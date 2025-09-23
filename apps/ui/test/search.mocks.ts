@@ -7,7 +7,6 @@ import {
 } from "@/gql/gql-types";
 import { CreateGraphQLMocksReturn, ICreateGraphQLMock } from "./test.gql.utils";
 import { createMockReservationUnit } from "./reservation-unit.mocks";
-import { addYears } from "date-fns";
 
 interface SearchQueryProps extends ICreateGraphQLMock {
   isSearchError: boolean;
@@ -60,7 +59,7 @@ export function createSearchQueryMocks({ isSearchError }: SearchQueryProps): Cre
     {
       request: {
         query: SearchReservationUnitsDocument,
-        variables: createSearchVariablesMock({ date: null }),
+        variables: createSearchVariablesMock(),
       },
       result: {
         data: SearchReservationUnitsQueryMock,
@@ -82,10 +81,8 @@ export function createSearchQueryMocks({ isSearchError }: SearchQueryProps): Cre
 
 function createSearchVariablesMock({
   textSearch = undefined,
-  date = new Date(2024, 1, 1),
 }: {
   textSearch?: string | null;
-  date?: Date | null;
   // TODO return type issues because all of them are optional (by backend)
   // we'd need to match them to a Required return type that we actully use
   // so what happens:
@@ -94,9 +91,6 @@ function createSearchVariablesMock({
 } = {}): Readonly<SearchReservationUnitsQueryVariables> {
   return {
     textSearch,
-    accessTypeBeginDate: date ? date.toISOString() : undefined,
-    accessTypeEndDate: date ? addYears(date, 1).toISOString() : undefined,
-    reservableDateStart: date ? date.toISOString() : undefined,
     applicationRound: [1],
     first: 36,
     orderBy: [ReservationUnitOrderingChoices.NameFiAsc, ReservationUnitOrderingChoices.PkAsc],

@@ -138,10 +138,6 @@ export function processVariables({
   const equipments = filterEmptyArray(mapParamToInterger(values.getAll("equipments"), 1));
   const showOnlyReservable = ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
   const applicationRound = "applicationRound" in rest && isSeasonal ? rest.applicationRound : undefined;
-  const reservationPeriodBeginDate =
-    "reservationPeriodBeginDate" in rest && isSeasonal ? rest.reservationPeriodBeginDate : undefined;
-  const reservationPeriodEndDate =
-    "reservationPeriodEndDate" in rest && isSeasonal ? rest.reservationPeriodEndDate : undefined;
   const timeEnd = filterEmpty(ignoreMaybeArray(values.getAll("timeEnd")));
   const timeBegin = filterEmpty(ignoreMaybeArray(values.getAll("timeBegin")));
   const accessType = filterEmptyArray(filterNonNullable(values.getAll("accessTypes").map(transformAccessTypeSafe)));
@@ -153,15 +149,9 @@ export function processVariables({
     reservationUnitType: reservationUnitTypes,
     equipments,
     accessType,
-    accessTypeBeginDate: filterEmpty(isSeasonal ? reservationPeriodBeginDate : reservableDateStart),
-    accessTypeEndDate: filterEmpty(isSeasonal ? reservationPeriodEndDate : reservableDateEnd),
-    ...(startDate != null || isSeasonal
-      ? isSeasonal
-        ? { reservableDateStart: reservationPeriodBeginDate } // Used to find effectiveAccessType in /recurring/[id] page
-        : {
-            reservableDateStart,
-          }
-      : {}),
+    accessTypeBeginDate: filterEmpty(isSeasonal ? undefined : reservableDateStart),
+    accessTypeEndDate: filterEmpty(isSeasonal ? undefined : reservableDateEnd),
+    reservableDateStart: filterEmpty(reservableDateStart),
     reservableDateEnd: filterEmpty(reservableDateEnd),
     reservableTimeStart: filterEmpty(timeBegin),
     reservableTimeEnd: filterEmpty(timeEnd),
