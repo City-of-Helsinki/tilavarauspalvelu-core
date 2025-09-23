@@ -161,6 +161,8 @@ function ReserveeFormPart({ reservationUnit }: Pick<ReservationTypeFormProps, "r
 export const RESERVATION_TYPE_FORM_FRAGMENT = gql`
   fragment ReservationTypeFormFields on ReservationUnitNode {
     reservationForm
+    minPersons
+    maxPersons
     authentication
     bufferTimeBefore
     bufferTimeAfter

@@ -3,6 +3,8 @@
   "Required": "{{fieldName}} is required",
   "minNumPersons": "Number of participants must be minimum {{minValue}} persons",
   "maxNumPersons": "Number of participants can be maximum {{maxValue}} persons",
+  "tooSmall": "{{fieldName}} is too small.",
+  "tooLarge": "{{fieldName}} is too large.",
   "heading": {
     "errorsTitle": "Fill in the missing information",
     "errorsSubtitle": "Fill in the following fields to make the booking:"
