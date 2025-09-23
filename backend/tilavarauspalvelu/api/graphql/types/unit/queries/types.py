@@ -2,6 +2,7 @@ from undine import Field, GQLInfo, QueryType
 from undine.optimizer import OptimizationData
 from undine.relay import Node
 
+from tilavarauspalvelu.api.graphql.extensions.utils import TranslatedField
 from tilavarauspalvelu.models import PaymentMerchant, Unit, User
 
 from .filtersets import UnitFilterSet
@@ -21,31 +22,36 @@ class UnitNode(
     pk = Field()
     tprek_id = Field()
 
-    name_fi = Field()
-    name_sv = Field()
-    name_en = Field()
+    name = Field(TranslatedField)
+    name_fi = Field(deprecation_reason="Use 'name' instead.")
+    name_sv = Field(deprecation_reason="Use 'name' instead.")
+    name_en = Field(deprecation_reason="Use 'name' instead.")
 
-    description_fi = Field()
-    description_sv = Field()
-    description_en = Field()
+    description = Field(TranslatedField)
+    description_fi = Field(deprecation_reason="Use 'description' instead.")
+    description_sv = Field(deprecation_reason="Use 'description' instead.")
+    description_en = Field(deprecation_reason="Use 'description' instead.")
 
-    short_description_fi = Field()
-    short_description_sv = Field()
-    short_description_en = Field()
+    short_description = Field(TranslatedField)
+    short_description_fi = Field(deprecation_reason="Use 'short_description' instead.")
+    short_description_sv = Field(deprecation_reason="Use 'short_description' instead.")
+    short_description_en = Field(deprecation_reason="Use 'short_description' instead.")
 
     web_page = Field()
     email = Field()
     phone = Field()
 
-    address_street_fi = Field()
-    address_street_sv = Field()
-    address_street_en = Field()
+    address_street = Field(TranslatedField)
+    address_street_fi = Field(deprecation_reason="Use 'address_street' instead.")
+    address_street_sv = Field(deprecation_reason="Use 'address_street' instead.")
+    address_street_en = Field(deprecation_reason="Use 'address_street' instead.")
 
     address_zip = Field()
 
-    address_city_fi = Field()
-    address_city_sv = Field()
-    address_city_en = Field()
+    address_city = Field(TranslatedField)
+    address_city_fi = Field(deprecation_reason="Use 'address_city' instead.")
+    address_city_sv = Field(deprecation_reason="Use 'address_city' instead.")
+    address_city_en = Field(deprecation_reason="Use 'address_city' instead.")
 
     reservation_units = Field()
     spaces = Field()
@@ -76,6 +82,7 @@ class UnitAllNode(
     pk = Field()
     tprek_id = Field()
 
-    name_fi = Field()
-    name_sv = Field()
-    name_en = Field()
+    name = Field(TranslatedField)
+    name_fi = Field(deprecation_reason="Use 'name' instead.")
+    name_sv = Field(deprecation_reason="Use 'name' instead.")
+    name_en = Field(deprecation_reason="Use 'name' instead.")

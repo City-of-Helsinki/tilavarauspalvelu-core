@@ -983,19 +983,22 @@ type ApplicationRoundNode implements Node {
   applicationPeriodBeginsAt: DateTime!
   applicationPeriodEndsAt: DateTime!
   applicationsCount: Int!
-  criteriaEn: String
-  criteriaFi: String
-  criteriaSv: String
+  criteria: TranslatedField!
+  criteriaEn: String @deprecated(reason: "Use 'criteria' instead.")
+  criteriaFi: String @deprecated(reason: "Use 'criteria' instead.")
+  criteriaSv: String @deprecated(reason: "Use 'criteria' instead.")
   handledAt: DateTime
   """The Global ID of an object."""
   id: ID!
   isSettingHandledAllowed: Boolean!
-  nameEn: String
-  nameFi: String
-  nameSv: String
-  notesWhenApplyingEn: String
-  notesWhenApplyingFi: String
-  notesWhenApplyingSv: String
+  name: TranslatedField!
+  nameEn: String @deprecated(reason: "Use 'name' instead.")
+  nameFi: String @deprecated(reason: "Use 'name' instead.")
+  nameSv: String @deprecated(reason: "Use 'name' instead.")
+  notesWhenApplying: TranslatedField!
+  notesWhenApplyingEn: String @deprecated(reason: "Use 'notes_when_applying' instead.")
+  notesWhenApplyingFi: String @deprecated(reason: "Use 'notes_when_applying' instead.")
+  notesWhenApplyingSv: String @deprecated(reason: "Use 'notes_when_applying' instead.")
   pk: Int!
   publicDisplayBeginsAt: DateTime!
   publicDisplayEndsAt: DateTime!
@@ -1123,9 +1126,10 @@ type BannerNotificationNode implements Node {
   """The Global ID of an object."""
   id: ID!
   level: BannerNotificationLevel!
-  messageEn: String
-  messageFi: String
-  messageSv: String
+  message: TranslatedField!
+  messageEn: String @deprecated(reason: "Use 'message' instead.")
+  messageFi: String @deprecated(reason: "Use 'message' instead.")
+  messageSv: String @deprecated(reason: "Use 'message' instead.")
   name: String!
   pk: Int!
   state: BannerNotificationState!
@@ -1153,9 +1157,10 @@ type BannerNotificationNodeEdge {
 type EquipmentCategoryNode implements Node {
   """The Global ID of an object."""
   id: ID!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  name: TranslatedField!
+  nameEn: String @deprecated(reason: "Use 'name' instead.")
+  nameFi: String @deprecated(reason: "Use 'name' instead.")
+  nameSv: String @deprecated(reason: "Use 'name' instead.")
   pk: Int!
   rank: Int!
 }
@@ -1164,9 +1169,10 @@ type EquipmentNode implements Node {
   category: EquipmentCategoryNode! @complexity(value: 1)
   """The Global ID of an object."""
   id: ID!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  name: TranslatedField!
+  nameEn: String @deprecated(reason: "Use 'name' instead.")
+  nameFi: String @deprecated(reason: "Use 'name' instead.")
+  nameSv: String @deprecated(reason: "Use 'name' instead.")
   pk: Int!
 }
 
@@ -1284,9 +1290,10 @@ type PurposeNode implements Node {
   """The Global ID of an object."""
   id: ID!
   imageUrl: String
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  name: TranslatedField!
+  nameEn: String @deprecated(reason: "Use 'name' instead.")
+  nameFi: String @deprecated(reason: "Use 'name' instead.")
+  nameSv: String @deprecated(reason: "Use 'name' instead.")
   pk: Int!
   rank: Int!
   smallUrl: String
@@ -1326,13 +1333,6 @@ type ReservableTimeSpanType {
   endDatetime: DateTime!
 }
 
-type ReservationCancelReasonType {
-  value: ReservationCancelReasonChoice!
-  reasonFi: String!
-  reasonEn: String!
-  reasonSv: String!
-}
-
 type ReservationDeleteTentativeMutationOutput {
   pk: Int!
 }
@@ -1341,9 +1341,10 @@ type ReservationDenyReasonNode implements Node {
   """The Global ID of an object."""
   id: ID!
   pk: Int!
-  reasonEn: String
-  reasonFi: String
-  reasonSv: String
+  reason: TranslatedField!
+  reasonEn: String @deprecated(reason: "Use 'reason' instead.")
+  reasonFi: String @deprecated(reason: "Use 'reason' instead.")
+  reasonSv: String @deprecated(reason: "Use 'reason' instead.")
 }
 
 type ReservationMetadataFieldNode implements Node {
@@ -1451,9 +1452,10 @@ type ReservationNodeEdge {
 type ReservationPurposeNode implements Node {
   """The Global ID of an object."""
   id: ID!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  name: TranslatedField!
+  nameEn: String @deprecated(reason: "Use 'name' instead.")
+  nameFi: String @deprecated(reason: "Use 'name' instead.")
+  nameSv: String @deprecated(reason: "Use 'name' instead.")
   pk: Int!
   rank: Int!
 }
@@ -1525,9 +1527,10 @@ This Node should be kept to the bare minimum and never expose any relations to a
 type ReservationUnitAllNode implements Node {
   """The Global ID of an object."""
   id: ID!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  name: TranslatedField!
+  nameEn: String @deprecated(reason: "Use 'name' instead.")
+  nameFi: String @deprecated(reason: "Use 'name' instead.")
+  nameSv: String @deprecated(reason: "Use 'name' instead.")
   pk: Int!
 }
 
@@ -1535,9 +1538,10 @@ type ReservationUnitCancellationRuleNode implements Node {
   canBeCancelledTimeBefore: Duration
   """The Global ID of an object."""
   id: ID!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  name: TranslatedField!
+  nameEn: String @deprecated(reason: "Use 'name' instead.")
+  nameFi: String @deprecated(reason: "Use 'name' instead.")
+  nameSv: String @deprecated(reason: "Use 'name' instead.")
   pk: Int!
 }
 
@@ -1594,9 +1598,10 @@ type ReservationUnitNode implements Node {
   cancellationTerms: TermsOfUseNode @complexity(value: 1)
   contactInformation: String!
   currentAccessType: AccessType
-  descriptionEn: String
-  descriptionFi: String
-  descriptionSv: String
+  description: TranslatedField!
+  descriptionEn: String @deprecated(reason: "Use 'description' instead.")
+  descriptionFi: String @deprecated(reason: "Use 'description' instead.")
+  descriptionSv: String @deprecated(reason: "Use 'description' instead.")
   effectiveAccessType: AccessType
   equipments(
     filter: EquipmentFilterSet
@@ -1617,12 +1622,14 @@ type ReservationUnitNode implements Node {
   metadataSet: ReservationMetadataSetNode @complexity(value: 1)
   minPersons: Int
   minReservationDuration: Duration
-  nameEn: String
-  nameFi: String
-  nameSv: String
-  notesWhenApplyingEn: String
-  notesWhenApplyingFi: String
-  notesWhenApplyingSv: String
+  name: TranslatedField!
+  nameEn: String @deprecated(reason: "Use 'name' instead.")
+  nameFi: String @deprecated(reason: "Use 'name' instead.")
+  nameSv: String @deprecated(reason: "Use 'name' instead.")
+  notesWhenApplying: TranslatedField!
+  notesWhenApplyingEn: String @deprecated(reason: "Use 'notes_when_applying' instead.")
+  notesWhenApplyingFi: String @deprecated(reason: "Use 'notes_when_applying' instead.")
+  notesWhenApplyingSv: String @deprecated(reason: "Use 'notes_when_applying' instead.")
   """
   Number of active reservations made by the user to this ReservationUnit.
   This is used to determine if the user can make a new reservation based on the 'maxReservationsPerUser'.
@@ -1655,18 +1662,21 @@ type ReservationUnitNode implements Node {
   ): [ReservableTimeSpanType!]
   reservationBeginsAt: DateTime
   reservationBlockWholeDay: Boolean!
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsSv: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsSv: String
+  reservationCancelledInstructions: TranslatedField!
+  reservationCancelledInstructionsEn: String @deprecated(reason: "Use 'reservation_cancelled_instructions' instead.")
+  reservationCancelledInstructionsFi: String @deprecated(reason: "Use 'reservation_cancelled_instructions' instead.")
+  reservationCancelledInstructionsSv: String @deprecated(reason: "Use 'reservation_cancelled_instructions' instead.")
+  reservationConfirmedInstructions: TranslatedField!
+  reservationConfirmedInstructionsEn: String @deprecated(reason: "Use 'reservation_confirmed_instructions' instead.")
+  reservationConfirmedInstructionsFi: String @deprecated(reason: "Use 'reservation_confirmed_instructions' instead.")
+  reservationConfirmedInstructionsSv: String @deprecated(reason: "Use 'reservation_confirmed_instructions' instead.")
   reservationEndsAt: DateTime
   reservationForm: ReservationFormType!
   reservationKind: ReservationKind!
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsSv: String
+  reservationPendingInstructions: TranslatedField!
+  reservationPendingInstructionsEn: String @deprecated(reason: "Use 'reservation_pending_instructions' instead.")
+  reservationPendingInstructionsFi: String @deprecated(reason: "Use 'reservation_pending_instructions' instead.")
+  reservationPendingInstructionsSv: String @deprecated(reason: "Use 'reservation_pending_instructions' instead.")
   reservationStartInterval: ReservationStartInterval!
   reservationState: ReservationUnitReservationState!
   reservationUnitType: ReservationUnitTypeNode @complexity(value: 1)
@@ -1743,9 +1753,10 @@ type ReservationUnitPricingNode implements Node {
 type ReservationUnitTypeNode implements Node {
   """The Global ID of an object."""
   id: ID!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  name: TranslatedField!
+  nameEn: String @deprecated(reason: "Use 'name' instead.")
+  nameFi: String @deprecated(reason: "Use 'name' instead.")
+  nameSv: String @deprecated(reason: "Use 'name' instead.")
   pk: Int!
   rank: Int!
 }
@@ -1758,9 +1769,10 @@ type ResourceNode implements Node {
   """The Global ID of an object."""
   id: ID!
   locationType: ResourceLocationType!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  name: TranslatedField!
+  nameEn: String @deprecated(reason: "Use 'name' instead.")
+  nameFi: String @deprecated(reason: "Use 'name' instead.")
+  nameSv: String @deprecated(reason: "Use 'name' instead.")
   pk: Int!
   space: SpaceNode @complexity(value: 1)
 }
@@ -1778,9 +1790,10 @@ type SpaceNode implements Node {
   """The Global ID of an object."""
   id: ID!
   maxPersons: Int
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  name: TranslatedField!
+  nameEn: String @deprecated(reason: "Use 'name' instead.")
+  nameFi: String @deprecated(reason: "Use 'name' instead.")
+  nameSv: String @deprecated(reason: "Use 'name' instead.")
   parent: SpaceNode @complexity(value: 1)
   pk: Int!
   resources(
@@ -1813,19 +1826,28 @@ type TaxPercentageNode implements Node {
 type TermsOfUseNode implements Node {
   """The Global ID of an object."""
   id: ID!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  name: TranslatedField!
+  nameEn: String @deprecated(reason: "Use 'name' instead.")
+  nameFi: String @deprecated(reason: "Use 'name' instead.")
+  nameSv: String @deprecated(reason: "Use 'name' instead.")
   pk: String!
   termsType: TermsOfUseTypeChoices!
-  textEn: String
-  textFi: String
-  textSv: String
+  text: TranslatedField!
+  textEn: String @deprecated(reason: "Use 'text' instead.")
+  textFi: String @deprecated(reason: "Use 'text' instead.")
+  textSv: String @deprecated(reason: "Use 'text' instead.")
 }
 
 type TimeSlotType {
   begin: Time!
   end: Time!
+}
+
+"""Resolves a translatable field to its translations."""
+type TranslatedField {
+  fi: String
+  en: String
+  sv: String
 }
 
 """
@@ -1834,9 +1856,10 @@ This Node should be kept to the bare minimum and never expose any relations to a
 type UnitAllNode implements Node {
   """The Global ID of an object."""
   id: ID!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  name: TranslatedField!
+  nameEn: String @deprecated(reason: "Use 'name' instead.")
+  nameFi: String @deprecated(reason: "Use 'name' instead.")
+  nameSv: String @deprecated(reason: "Use 'name' instead.")
   pk: Int!
   tprekId: String
 }
@@ -1844,9 +1867,10 @@ type UnitAllNode implements Node {
 type UnitGroupNode implements Node {
   """The Global ID of an object."""
   id: ID!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  name: TranslatedField!
+  nameEn: String @deprecated(reason: "Use 'name' instead.")
+  nameFi: String @deprecated(reason: "Use 'name' instead.")
+  nameSv: String @deprecated(reason: "Use 'name' instead.")
   pk: Int!
   units(
     filter: UnitFilterSet
@@ -1855,22 +1879,26 @@ type UnitGroupNode implements Node {
 }
 
 type UnitNode implements Node {
-  addressCityEn: String
-  addressCityFi: String
-  addressCitySv: String
-  addressStreetEn: String
-  addressStreetFi: String
-  addressStreetSv: String
+  addressCity: TranslatedField!
+  addressCityEn: String @deprecated(reason: "Use 'address_city' instead.")
+  addressCityFi: String @deprecated(reason: "Use 'address_city' instead.")
+  addressCitySv: String @deprecated(reason: "Use 'address_city' instead.")
+  addressStreet: TranslatedField!
+  addressStreetEn: String @deprecated(reason: "Use 'address_street' instead.")
+  addressStreetFi: String @deprecated(reason: "Use 'address_street' instead.")
+  addressStreetSv: String @deprecated(reason: "Use 'address_street' instead.")
   addressZip: String!
-  descriptionEn: String
-  descriptionFi: String
-  descriptionSv: String
+  description: TranslatedField!
+  descriptionEn: String @deprecated(reason: "Use 'description' instead.")
+  descriptionFi: String @deprecated(reason: "Use 'description' instead.")
+  descriptionSv: String @deprecated(reason: "Use 'description' instead.")
   email: Email!
   """The Global ID of an object."""
   id: ID!
-  nameEn: String
-  nameFi: String
-  nameSv: String
+  name: TranslatedField!
+  nameEn: String @deprecated(reason: "Use 'name' instead.")
+  nameFi: String @deprecated(reason: "Use 'name' instead.")
+  nameSv: String @deprecated(reason: "Use 'name' instead.")
   paymentMerchant: PaymentMerchantNode @complexity(value: 1)
   phone: String!
   pk: Int!
@@ -1878,9 +1906,10 @@ type UnitNode implements Node {
     filter: ReservationUnitFilterSet
     orderBy: [ReservationUnitOrderSet!]
   ): [ReservationUnitNode!]! @complexity(value: 1)
-  shortDescriptionEn: String
-  shortDescriptionFi: String
-  shortDescriptionSv: String
+  shortDescription: TranslatedField!
+  shortDescriptionEn: String @deprecated(reason: "Use 'short_description' instead.")
+  shortDescriptionFi: String @deprecated(reason: "Use 'short_description' instead.")
+  shortDescriptionSv: String @deprecated(reason: "Use 'short_description' instead.")
   spaces(
     filter: SpaceFilterSet
     orderBy: [SpaceOrderSet!]
@@ -3196,7 +3225,6 @@ type Query {
     filter: PurposeFilterSet
     orderBy: [PurposeOrderSet!]
   ): [PurposeNode!]!
-  allReservationCancelReasons: [ReservationCancelReasonType!]!
   allReservationDenyReasons(
     filter: ReservationDenyReasonFilterSet
     orderBy: [ReservationDenyReasonOrderSet!]

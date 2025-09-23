@@ -22,9 +22,11 @@ def test_purpose__query(graphql):
         query {
             allPurposes {
                 pk
-                nameFi
-                nameEn
-                nameSv
+                name {
+                    fi
+                    en
+                    sv
+                }
                 imageUrl
                 smallUrl
                 rank
@@ -39,9 +41,11 @@ def test_purpose__query(graphql):
     assert response.results == [
         {
             "pk": purpose.pk,
-            "nameFi": purpose.name_fi,
-            "nameEn": purpose.name_en,
-            "nameSv": purpose.name_sv,
+            "name": {
+                "fi": purpose.name_fi,
+                "en": purpose.name_en,
+                "sv": purpose.name_sv,
+            },
             "imageUrl": None,
             "smallUrl": None,
             "rank": purpose.rank,

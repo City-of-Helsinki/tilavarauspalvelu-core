@@ -1,9 +1,10 @@
 import dataclasses
 from typing import Any
 
+from django.db import models
 from django.db.models import Q
 from django.db.models.constants import LOOKUP_SEP
-from graphql import GraphQLBoolean, GraphQLFieldResolver, GraphQLInputType, GraphQLOutputType
+from graphql import GraphQLArgumentMap, GraphQLBoolean, GraphQLFieldResolver, GraphQLInputType, GraphQLOutputType
 from lookup_property import L
 from lookup_property.field import LookupPropertyField
 from lookup_property.typing import LOOKUP_PREFIX
@@ -28,7 +29,7 @@ from undine.utils.model_utils import determine_output_field, get_model_field
 
 from tilavarauspalvelu.models import User
 
-from .utils import NullablePermissionResolver, NullablePermissions
+from .utils import NullablePermissionResolver, NullablePermissions, TranslatedField
 
 
 def get_lookup_name(ref: L) -> str:
@@ -187,3 +188,49 @@ def _(ref: NullablePermissions, **kwargs: Any) -> GraphQLFieldResolver:
         permission_check=ref.permission_check,
         resolver=resolver,
     )
+
+
+@convert_to_field_ref.register
+def _(ref: type[TranslatedField], **kwargs: Any) -> Any:
+    caller: Field = kwargs["caller"]
+    field: models.CharField = get_model_field(model=caller.query_type.__model__, lookup=caller.field_name)  # type: ignore[assignment]
+    translated_field = ref(field=field)
+    caller.optimize_func = translated_field.optimize
+    return translated_field
+
+
+@convert_to_field_ref.register
+def _(ref: TranslatedField, **kwargs: Any) -> Any:
+    caller: Field = kwargs["caller"]
+    caller.optimize_func = ref.optimize
+    return ref
+
+
+@convert_to_field_resolver.register
+def _(ref: TranslatedField, **kwargs: Any) -> GraphQLFieldResolver:
+    return ref.resolve
+
+
+@convert_to_graphql_type.register
+def _(ref: TranslatedField, **kwargs: Any) -> GraphQLInputType | GraphQLOutputType:
+    return ref.graphql_type()
+
+
+@convert_to_graphql_argument_map.register
+def _(_: TranslatedField, **kwargs: Any) -> GraphQLArgumentMap:
+    return {}
+
+
+@convert_to_description.register
+def _(ref: TranslatedField, **kwargs: Any) -> str | None:
+    return convert_to_description(ref.field, **kwargs)
+
+
+@is_field_nullable.register
+def _(_: TranslatedField, **kwargs: Any) -> bool:
+    return False
+
+
+@is_many.register
+def _(_: TranslatedField, **kwargs: Any) -> bool:
+    return False
