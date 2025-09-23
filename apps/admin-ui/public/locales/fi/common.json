@@ -146,5 +146,6 @@
   "selectPlaceholder": "Valitse",
   "textSearchPlaceHolder": "Hae",
   "noFilteredResults": "Valitsemillasi suodattimilla ei löytynyt yhtään {{name}}. Muuta rajausta tai tyhjennä kaikki suodattimet.",
-  "notANumber": "Ei ole numero"
+  "notANumber": "Ei ole numero",
+  "abort": "Keskeytä"
 }

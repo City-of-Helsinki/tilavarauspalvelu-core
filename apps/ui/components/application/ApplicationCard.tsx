@@ -12,7 +12,7 @@ import {
 } from "@gql/gql-types";
 import { formatDateTime } from "@/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
-import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import Card from "common/src/components/Card";
 import { getApplicationPath } from "@/modules/urls";

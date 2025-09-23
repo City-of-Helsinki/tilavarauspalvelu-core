@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { type Dispatch, type SetStateAction, useState } from "react";
+import type { SelectedRow } from "@/lib/reservation-units";
 import { gql } from "@apollo/client";
 import { ReservationUnitOrderingChoices, useSearchReservationUnitsQuery } from "@gql/gql-types";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
@@ -9,6 +10,12 @@ import { errorToast } from "common/src/components/toast";
 import { CenterSpinner } from "common/styled";
 import { useTranslation } from "next-i18next";
 import { useGetFilterSearchParams } from "@/hooks";
+
+type Props = {
+  selectedRows: SelectedRow[];
+  setSelectedRows: Dispatch<SetStateAction<SelectedRow[]>>;
+  apiBaseUrl: string;
+};
 
 function transformOrderBy(orderBy: string, desc: boolean): ReservationUnitOrderingChoices | null {
   switch (orderBy) {
@@ -42,7 +49,7 @@ function transformSortString(orderBy: string | null): ReservationUnitOrderingCho
   return [];
 }
 
-export function ReservationUnitsDataReader(): JSX.Element {
+export function ReservationUnitsDataReader({ selectedRows, setSelectedRows, apiBaseUrl }: Props): JSX.Element {
   const [sort, setSort] = useState<string>("");
   const onSortChanged = (sortField: string) => {
     if (sort === sortField) {
@@ -100,7 +107,15 @@ export function ReservationUnitsDataReader(): JSX.Element {
 
   return (
     <>
-      <ReservationUnitsTable reservationUnits={resUnits} sort={sort} sortChanged={onSortChanged} isLoading={loading} />
+      <ReservationUnitsTable
+        reservationUnits={resUnits}
+        sort={sort}
+        sortChanged={onSortChanged}
+        isLoading={loading}
+        selectedRows={selectedRows}
+        setSelectedRows={setSelectedRows}
+        apiBaseUrl={apiBaseUrl}
+      />
       <More
         totalCount={data?.reservationUnits?.totalCount ?? 0}
         pageInfo={data?.reservationUnits?.pageInfo}

@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { useToastIfQueryParam } from "common/src/hooks/useToastIfQueryParam";
+import { useSearchParams } from "next/navigation";
 import { useTranslation } from "next-i18next";
 import { H1, HR } from "common/styled";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
@@ -11,13 +13,30 @@ import {
 } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
-import { ReservationUnitsDataReader, Filters } from "@lib/reservation-units/";
+import { ReservationUnitsDataReader, Filters, type SelectedRow } from "@lib/reservation-units/";
 import { createClient } from "@/common/apolloClient";
 import { getFilterOptions } from "@/hooks/useFilterOptions";
 
-function ReservationUnits({ optionsData }: { optionsData: PageProps["optionsData"] }): JSX.Element {
+function ReservationUnits({
+  optionsData,
+  apiBaseUrl,
+}: {
+  optionsData: PageProps["optionsData"];
+  apiBaseUrl: string;
+}): JSX.Element {
   const { t } = useTranslation();
   const options = getFilterOptions(t, optionsData);
+  const [selectedRows, setSelectedRows] = useState<SelectedRow[]>([]);
+  const params = useSearchParams();
+
+  useToastIfQueryParam({
+    key: ["error_code", "error_message"],
+    message: t("reservationUnit:editErrorMessage", {
+      code: params.get("error_code"),
+      message: params.get("error_message"),
+    }),
+    type: "error",
+  });
 
   return (
     <>
@@ -27,7 +46,11 @@ function ReservationUnits({ optionsData }: { optionsData: PageProps["optionsData
       </div>
       <Filters options={options} />
       <HR />
-      <ReservationUnitsDataReader />
+      <ReservationUnitsDataReader
+        selectedRows={selectedRows}
+        setSelectedRows={setSelectedRows}
+        apiBaseUrl={apiBaseUrl}
+      />
     </>
   );
 }
@@ -36,7 +59,7 @@ type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 export default function Page(props: PageProps): JSX.Element {
   return (
     <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanManageReservationUnits}>
-      <ReservationUnits optionsData={props.optionsData} />
+      <ReservationUnits optionsData={props.optionsData} apiBaseUrl={props.apiBaseUrl} />
     </AuthorizationChecker>
   );
 }

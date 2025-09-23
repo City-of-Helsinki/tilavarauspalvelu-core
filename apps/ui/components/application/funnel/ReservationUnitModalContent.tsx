@@ -26,7 +26,7 @@ import { convertLanguageCode, getTranslationSafe } from "common/src/common/util"
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
-import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 // TODO this is weird import path
 import { SearchFormValues, SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
 import { useSearchModify } from "@/hooks/useSearchValues";
