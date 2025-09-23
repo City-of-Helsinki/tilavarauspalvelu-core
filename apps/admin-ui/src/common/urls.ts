@@ -124,3 +124,13 @@ function getCustomerUrl(): string {
 export function getAccessibilityTermsUrl(): string {
   return `${getCustomerUrl()}/terms/accessibility-admin`;
 }
+
+export function getOpeningHoursUrl(apiBaseUrl: string, reservationUnitPk: number | null): string {
+  let reservationUnitString = "";
+  if (reservationUnitPk == null || !(reservationUnitPk > 0)) {
+    return "";
+  } else {
+    reservationUnitString = reservationUnitPk.toString();
+  }
+  return `${apiBaseUrl}/v1/edit_opening_hours/?reservationUnits=${reservationUnitString}`;
+}

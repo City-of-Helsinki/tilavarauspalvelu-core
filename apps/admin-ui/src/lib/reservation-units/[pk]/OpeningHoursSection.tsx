@@ -5,6 +5,7 @@ import { AutoGrid } from "common/styled";
 import { EditAccordion } from "./styled";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import type { ReservationUnitEditQuery } from "@gql/gql-types";
+import { getOpeningHoursUrl } from "@/common/urls";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
@@ -12,10 +13,12 @@ type Node = NonNullable<QueryData>;
 export function OpeningHoursSection({
   reservationUnit,
   previewUrlPrefix,
+  apiBaseUrl,
 }: {
   // TODO can we simplify this by passing the hauki url only?
   reservationUnit: Node | undefined;
   previewUrlPrefix: string;
+  apiBaseUrl: string;
 }) {
   const { t } = useTranslation();
 
@@ -29,8 +32,8 @@ export function OpeningHoursSection({
           <p style={{ gridColumn: "1 / -1" }}>{t("reservationUnitEditor:openingHoursHelperTextHasLink")}</p>
           {/* TODO this should be external? i.e. standard a link */}
           <ButtonLikeLink
-            disabled={!reservationUnit?.haukiUrl}
-            href={reservationUnit?.haukiUrl ?? ""}
+            disabled={!apiBaseUrl || !reservationUnit?.pk}
+            href={getOpeningHoursUrl(apiBaseUrl, reservationUnit?.pk)}
             target="_blank"
             fontSize="small"
             rel="noopener noreferrer"
