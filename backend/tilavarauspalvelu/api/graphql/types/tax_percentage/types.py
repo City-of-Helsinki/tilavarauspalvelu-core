@@ -18,6 +18,7 @@ class TaxPercentageNode(DjangoNode):
         fields = [
             "pk",
             "value",
+            "is_enabled",
         ]
         filterset_class = TaxPercentageFilterSet
         permission_classes = [TaxPercentagePermission]

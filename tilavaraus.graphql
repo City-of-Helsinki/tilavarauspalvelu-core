@@ -373,6 +373,7 @@ type Query {
     after: String
     before: String
     value: Decimal
+    isEnabled: Boolean
     pk: [Int]
 
     """Ordering"""
@@ -2422,6 +2423,7 @@ type ReservationUnitPricingNode implements Node {
 
 type TaxPercentageNode implements Node {
   value: Decimal!
+  isEnabled: Boolean!
 
   """The ID of the object"""
   id: ID!
@@ -2802,6 +2804,8 @@ type TaxPercentageNodeEdge {
 enum TaxPercentageOrderingChoices {
   pkAsc
   pkDesc
+  isEnabledAsc
+  isEnabledDesc
 }
 
 type ReservationMetadataSetNodeConnection {
