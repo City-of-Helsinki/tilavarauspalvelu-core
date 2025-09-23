@@ -34,11 +34,11 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
         "name",
         "reservation_period_begin_date",
         "reservation_period_end_date",
-        "_status",
+        "status",
         "handled_at",
         "sent_at",
     ]
-    list_filter = ["_status"]
+    list_filter = ["_lookup_property_status"]
     ordering = ["-reservation_period_begin_date"]
 
     # Form
@@ -99,6 +99,10 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
                 status=L("status"),
             )
         )
+
+    @admin.display(ordering=L("status"))
+    def status(self, obj: ApplicationRound) -> str:
+        return obj.status
 
     @button(label="Export applications to CSV", change_form=True)
     def export_applications_to_csv(self, request: WSGIRequest, pk: int) -> FileResponse | None:

@@ -3,8 +3,8 @@ from __future__ import annotations
 import pytest
 from freezegun import freeze_time
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationStateChoice, TermsOfUseTypeChoices
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date, local_datetime, next_hour
 
 from tests.factories import (

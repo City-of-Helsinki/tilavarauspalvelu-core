@@ -10,7 +10,6 @@ from graphene_django_extensions.serializers import NotProvided
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.reservation_unit_option.serializers import (
     ReservationUnitOptionApplicantSerializer,
 )
@@ -24,6 +23,7 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ApplicationRound, ApplicationSection, Reservation
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_datetime
 from utils.db import Now
 from utils.utils import comma_sep_str

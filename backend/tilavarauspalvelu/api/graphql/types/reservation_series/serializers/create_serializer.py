@@ -10,7 +10,6 @@ from graphql import GraphQLError
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import (
     MunicipalityChoice,
     ReservationStartInterval,
@@ -22,6 +21,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationSeries
 from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
+from tilavarauspalvelu.typing import error_codes
 from utils.external_service.errors import ExternalServiceError
 from utils.fields.serializer import CurrentUserDefaultNullable, input_only_field
 

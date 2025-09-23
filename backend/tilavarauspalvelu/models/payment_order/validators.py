@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_date
 
 if TYPE_CHECKING:

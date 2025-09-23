@@ -9,13 +9,13 @@ from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPr
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import CharField, IntegerField
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.models import Reservation, ReservationDenyReason
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_datetime
 from utils.external_service.errors import external_service_errors_as_validation_errors
 

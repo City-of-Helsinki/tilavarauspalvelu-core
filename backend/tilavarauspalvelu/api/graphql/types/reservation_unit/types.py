@@ -11,11 +11,11 @@ from lookup_property import L
 from query_optimizer import AnnotatedField, DjangoListField, ManuallyOptimizedField
 from query_optimizer.optimizer import QueryOptimizer
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
 from tilavarauspalvelu.enums import AccessType, ReservationUnitPublishingState, ReservationUnitReservationState
 from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
 from tilavarauspalvelu.models import OriginHaukiResource, PaymentMerchant, Reservation, ReservationUnit, Unit
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.db import SubqueryCount
 

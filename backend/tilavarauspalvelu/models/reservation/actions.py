@@ -9,7 +9,6 @@ from django.utils.translation import pgettext
 from icalendar import Calendar, Event, Timezone, TimezoneDaylight, TimezoneStandard
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import (
     CalendarProperty,
     EventProperty,
@@ -30,6 +29,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateO
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservation, ReservationMetadataField
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:

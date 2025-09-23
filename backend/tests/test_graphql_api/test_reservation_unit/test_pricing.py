@@ -5,8 +5,8 @@ from decimal import Decimal
 
 import pytest
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date
 
 from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory, TaxPercentageFactory

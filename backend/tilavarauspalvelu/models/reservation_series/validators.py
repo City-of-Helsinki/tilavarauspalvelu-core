@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date, local_datetime
 
 if TYPE_CHECKING:

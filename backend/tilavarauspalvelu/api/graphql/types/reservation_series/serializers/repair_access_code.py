@@ -5,10 +5,10 @@ from typing import Any
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework.fields import BooleanField, DateTimeField, IntegerField
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import ReservationSeries
+from tilavarauspalvelu.typing import error_codes
 from utils.external_service.errors import external_service_errors_as_validation_errors
 
 __all__ = [

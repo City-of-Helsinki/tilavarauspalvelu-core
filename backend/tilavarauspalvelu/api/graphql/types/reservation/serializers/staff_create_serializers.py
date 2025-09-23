@@ -8,7 +8,6 @@ from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPr
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import (
     AccessType,
     MunicipalityChoice,
@@ -19,6 +18,7 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose, ReservationUnit
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.errors import ExternalServiceError
 

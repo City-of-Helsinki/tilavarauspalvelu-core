@@ -8,20 +8,19 @@ from graphene_django_extensions.fields import IntegerPrimaryKeyField
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.application_section.serializers import (
     ApplicationSectionForApplicationSerializer,
 )
 from tilavarauspalvelu.enums import ApplicationStatusChoice, ReserveeType, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ReservationUnitOption
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import TimeSlot, local_datetime, local_timedelta_string, merge_time_slots, time_difference
 from utils.fields.serializer import CurrentUserDefaultNullable
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationRound, ApplicationSection, User
     from tilavarauspalvelu.typing import ErrorList
-
 
 __all__ = [
     "ApplicationCancelSerializer",

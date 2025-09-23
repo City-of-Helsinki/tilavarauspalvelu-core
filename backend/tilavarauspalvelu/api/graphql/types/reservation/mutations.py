@@ -6,7 +6,6 @@ import graphene
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.payment_order.types import PaymentOrderNode
 from tilavarauspalvelu.enums import AccessType, OrderStatus
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
@@ -14,6 +13,7 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFo
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.tasks import delete_pindora_reservation_task
+from tilavarauspalvelu.typing import error_codes
 
 from .permissions import (
     ReservationCommentPermission,

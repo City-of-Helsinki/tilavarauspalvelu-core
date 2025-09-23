@@ -6,8 +6,8 @@ from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.models import AllocatedTimeSlot, SuitableTimeRange
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import time_difference, timedelta_to_json
 
 if TYPE_CHECKING:

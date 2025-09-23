@@ -7,18 +7,17 @@ from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import ReservationConfirmData
-
 
 __all__ = [
     "ReservationConfirmSerializer",

@@ -10,7 +10,6 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.errors import GQLCodeError
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.application_round_time_slot.serializers import (
     ApplicationRoundTimeSlotSerializer,
 )
@@ -24,6 +23,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
 

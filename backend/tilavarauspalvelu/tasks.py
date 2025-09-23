@@ -388,7 +388,7 @@ def generate_reservation_series_from_allocations_task(application_round_id: int)
 
 @app.task(name="delete_expired_applications")
 def delete_expired_applications_task() -> None:
-    Application.objects.delete_expired_applications()
+    Application.objects.all().delete_expired_applications()
 
 
 @app.task(name="update_reservation_unit_search_vectors")

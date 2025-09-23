@@ -8,7 +8,6 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.fields import CharField, IntegerField
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, ReservationCancelReasonChoice, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
@@ -19,6 +18,7 @@ from tilavarauspalvelu.tasks import (
     cancel_payment_order_without_webshop_payment_task,
     refund_payment_order_for_webshop_task,
 )
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import external_service_errors_as_validation_errors
 

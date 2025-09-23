@@ -6,13 +6,13 @@ from graphene_django_extensions import NestingModelSerializer
 from lookup_property import L
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
 from tilavarauspalvelu.models import ApplicationRound
 from tilavarauspalvelu.tasks import (
     generate_reservation_series_from_allocations_task,
     send_application_handled_email_task,
 )
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_datetime
 
 

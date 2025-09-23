@@ -73,7 +73,7 @@ class ApplicationSectionAdmin(admin.ModelAdmin):
         "id",
         "name",
         "application",
-        "_status",
+        "status",
         "application_status",
     ]
     list_filter = [
@@ -153,6 +153,10 @@ class ApplicationSectionAdmin(admin.ModelAdmin):
             )
         )
 
-    @admin.display()
-    def application_status(self, obj) -> str:
+    @admin.display(ordering=L("status"))
+    def status(self, obj: ApplicationSection) -> str:
+        return obj.status
+
+    @admin.display(ordering=L("application__status"))
+    def application_status(self, obj: ApplicationSection) -> str:
         return obj.application_status

@@ -5,7 +5,6 @@ import enum
 import operator
 from enum import StrEnum
 from inspect import cleandoc
-from types import DynamicClassAttribute
 from typing import Literal
 
 from django.db import models
@@ -350,15 +349,15 @@ class HaukiResourceState(models.TextChoices):
             cls.UNDEFINED,
         ]
 
-    @DynamicClassAttribute
+    @enum.property
     def is_accessible(self) -> bool:
         return self in HaukiResourceState.accessible_states()
 
-    @DynamicClassAttribute
+    @enum.property
     def is_reservable(self) -> bool:
         return self in HaukiResourceState.reservable_states()
 
-    @DynamicClassAttribute
+    @enum.property
     def is_closed(self) -> bool:
         return self in HaukiResourceState.closed_states()
 
@@ -1025,29 +1024,29 @@ class ApplicationRoundStatusChoice(models.TextChoices):
     RESULTS_SENT = "SENT", pgettext_lazy("ApplicationRoundStatus", "Results Sent")
     """All application results have been sent to users"""
 
-    @DynamicClassAttribute
+    @enum.property
     def is_allocation_upcoming(self) -> bool:
         return self in {
             ApplicationRoundStatusChoice.UPCOMING,
             ApplicationRoundStatusChoice.OPEN,
         }
 
-    @DynamicClassAttribute
+    @enum.property
     def can_remove_allocations(self) -> bool:
         return self == ApplicationRoundStatusChoice.IN_ALLOCATION
 
-    @DynamicClassAttribute
+    @enum.property
     def past_allocation(self) -> bool:
         return self in {
             ApplicationRoundStatusChoice.HANDLED,
             ApplicationRoundStatusChoice.RESULTS_SENT,
         }
 
-    @DynamicClassAttribute
+    @enum.property
     def is_ongoing(self) -> bool:
         return self != ApplicationRoundStatusChoice.RESULTS_SENT
 
-    @DynamicClassAttribute
+    @enum.property
     def allows_resetting(self) -> bool:
         return self in {
             ApplicationRoundStatusChoice.IN_ALLOCATION,
@@ -1080,7 +1079,7 @@ class ApplicationStatusChoice(models.TextChoices):
     HANDLED = "HANDLED", pgettext_lazy("ApplicationStatus", "Handled")
     """Application's events have all been allocated"""
 
-    RESULTS_SENT = "RESULT_SENT", pgettext_lazy("ApplicationStatus", "Results Sent")
+    RESULTS_SENT = "RESULTS_SENT", pgettext_lazy("ApplicationStatus", "Results Sent")
     """Application's results have been sent to user"""
 
     EXPIRED = "EXPIRED", pgettext_lazy("ApplicationStatus", "Expired")
@@ -1089,29 +1088,29 @@ class ApplicationStatusChoice(models.TextChoices):
     CANCELLED = "CANCELLED", pgettext_lazy("ApplicationStatus", "Cancelled")
     """Application cancelled by user"""
 
-    @DynamicClassAttribute
+    @enum.property
     def can_decline(self) -> bool:
         return self == ApplicationStatusChoice.IN_ALLOCATION
 
-    @DynamicClassAttribute
+    @enum.property
     def can_allocate(self) -> bool:
         return self == ApplicationStatusChoice.IN_ALLOCATION
 
-    @DynamicClassAttribute
+    @enum.property
     def can_send(self) -> bool:
         return self in {
             ApplicationStatusChoice.DRAFT,
             ApplicationStatusChoice.RECEIVED,
         }
 
-    @DynamicClassAttribute
+    @enum.property
     def can_cancel(self) -> bool:
         return self in {
             ApplicationStatusChoice.DRAFT,
             ApplicationStatusChoice.RECEIVED,
         }
 
-    @DynamicClassAttribute
+    @enum.property
     def can_flag(self) -> bool:
         return self in {
             ApplicationStatusChoice.IN_ALLOCATION,
@@ -1119,7 +1118,7 @@ class ApplicationStatusChoice(models.TextChoices):
             ApplicationStatusChoice.RESULTS_SENT,
         }
 
-    @DynamicClassAttribute
+    @enum.property
     def can_reset(self) -> bool:
         return self in {
             ApplicationStatusChoice.IN_ALLOCATION,
@@ -1148,18 +1147,18 @@ class ApplicationSectionStatusChoice(models.TextChoices):
     REJECTED = "REJECTED", pgettext_lazy("ApplicationSectionStatus", "Rejected")
     """All applied slots for this application section have been locked or rejected."""
 
-    @DynamicClassAttribute
+    @enum.property
     def can_allocate(self) -> bool:
         return self in {
             ApplicationSectionStatusChoice.UNALLOCATED,
             ApplicationSectionStatusChoice.IN_ALLOCATION,
         }
 
-    @DynamicClassAttribute
+    @enum.property
     def can_delete(self) -> bool:
         return self == ApplicationSectionStatusChoice.UNALLOCATED
 
-    @DynamicClassAttribute
+    @enum.property
     def can_reset(self) -> bool:
         return self in {
             ApplicationSectionStatusChoice.UNALLOCATED,

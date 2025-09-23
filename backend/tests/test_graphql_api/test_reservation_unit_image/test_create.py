@@ -54,7 +54,7 @@ def test_reservation_unit_image__create__invalid_image_type(graphql, mock_png):
 
     assert response.error_message() == (
         "Variable '$input' got invalid value 'FOO' at 'input.imageType'; "
-        "Value 'FOO' does not exist in 'ImageType' enum."
+        "Value 'FOO' does not exist in 'ReservationUnitImageType' enum."
     )
 
     reservation_unit_image: ReservationUnitImage | None = reservation_unit.images.first()

@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING, Any
 
 from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_start_of_day
 from utils.utils import comma_sep_str
 

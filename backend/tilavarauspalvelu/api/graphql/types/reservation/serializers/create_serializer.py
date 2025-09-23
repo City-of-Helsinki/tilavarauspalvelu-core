@@ -8,19 +8,18 @@ from graphene_django_extensions.fields import IntegerPrimaryKeyField
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import DateTimeField, IntegerField
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, PaymentType
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnit
+from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
     from tilavarauspalvelu.typing import AnyUser, ReservationCreateData, WSGIRequest
-
 
 __all__ = [
     "ReservationCreateSerializer",
