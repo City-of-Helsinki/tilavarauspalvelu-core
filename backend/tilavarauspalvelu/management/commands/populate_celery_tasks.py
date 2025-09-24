@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import celery
 from django.core.management.base import BaseCommand
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
-from tilavarauspalvelu.typing import CeleryAutoCreateTaskSchedule
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import CeleryAutoCreateTaskSchedule
 
 
 class Command(BaseCommand):
