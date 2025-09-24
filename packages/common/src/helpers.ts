@@ -1,6 +1,6 @@
 import { isAfter, isBefore } from "date-fns";
 import {
-  ImageType,
+  ReservationUnitImageType,
   type PricingFieldsFragment,
   type ImageFragment,
   type Maybe,
@@ -164,7 +164,7 @@ function getImageSourceWithoutDefault(
 }
 
 export function getMainImage(ru?: { images: Readonly<ImageFragment[]> }): ImageFragment | null {
-  return ru?.images.find((img) => img.imageType === ImageType.Main) ?? null;
+  return ru?.images.find((img) => img.imageType === ReservationUnitImageType.Main) ?? null;
 }
 
 /// Returns if price is free

@@ -1,14 +1,14 @@
 import { env } from "@/env.mjs";
 import { gql, NormalizedCacheObject, type ApolloClient } from "@apollo/client";
 import {
-  TermsType,
+  TermsOfUseTypeChoices,
   TermsOfUseDocument,
   type TermsOfUseQuery,
   type TermsOfUseQueryVariables,
   type OrderQuery,
   type OrderQueryVariables,
   OrderDocument,
-  TermsOfUseFieldsFragment,
+  type TermsOfUseFieldsFragment,
 } from "@gql/gql-types";
 import { genericTermsVariant } from "./const";
 import { getVersion } from "./baseUtils.mjs";
@@ -44,7 +44,7 @@ export async function getGenericTerms(apolloClient: ApolloClient<unknown>): Prom
   const { data: tosData } = await apolloClient.query<TermsOfUseQuery, TermsOfUseQueryVariables>({
     query: TermsOfUseDocument,
     variables: {
-      termsType: TermsType.GenericTerms,
+      termsType: TermsOfUseTypeChoices.GenericTerms,
     },
   });
 

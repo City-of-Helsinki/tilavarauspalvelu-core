@@ -2,7 +2,7 @@ import React from "react";
 import { Button, ButtonVariant, Dialog } from "hds-react";
 import { useTranslation } from "next-i18next";
 import {
-  LocationType,
+  ResourceLocationType,
   type ResourceCreateMutationInput,
   type NewResourceUnitFieldsFragment,
   useCreateResourceMutation,
@@ -51,7 +51,7 @@ export function NewResourceModal({ unit, closeModal, refetch, spacePk }: ModalPr
       await createResource({
         ...rest,
         name: values.nameFi,
-        locationType: LocationType.Fixed,
+        locationType: ResourceLocationType.Fixed,
       });
       closeModal();
       refetch();

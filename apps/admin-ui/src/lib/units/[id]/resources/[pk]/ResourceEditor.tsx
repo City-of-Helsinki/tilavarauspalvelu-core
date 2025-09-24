@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type ResourceUpdateMutationInput,
-  LocationType,
+  ResourceLocationType,
   useUpdateResourceMutation,
   useResourceQuery,
 } from "@gql/gql-types";
@@ -94,7 +94,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
       await updateResource({
         ...values,
         pk: values.pk,
-        locationType: LocationType.Fixed,
+        locationType: ResourceLocationType.Fixed,
       });
 
       successToast({

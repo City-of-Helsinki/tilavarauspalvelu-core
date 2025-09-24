@@ -1,8 +1,8 @@
 import { addDays, addHours, nextMonday, set } from "date-fns";
 import {
-  Authentication,
+  AuthenticationType,
   ReservationStartInterval,
-  TermsType,
+  TermsOfUseTypeChoices,
   ReservationTypeChoice,
   CreateStaffReservationDocument,
   ReservationUnitDocument,
@@ -37,7 +37,7 @@ const emptyTerms = {
   id: "",
   textFi: "",
   nameFi: "",
-  termsType: TermsType.PaymentTerms,
+  termsType: TermsOfUseTypeChoices.PaymentTerms,
 };
 
 // TODO remove and use fakeTimers with doNotFake option
@@ -86,7 +86,7 @@ const requiredFields = [
 
 function createReservationUnitFragment({ pk, nameFi }: { pk: number; nameFi: string }): CreateStaffReservationFragment {
   return {
-    authentication: Authentication.Weak,
+    authentication: AuthenticationType.Weak,
     nameFi,
     pk,
     id: base64encode(`ReservationUnitNode:${pk}`),
@@ -221,7 +221,7 @@ const otherMocks = [
     request: {
       query: TermsOfUseDocument,
       variables: {
-        termsType: TermsType.GenericTerms,
+        termsType: TermsOfUseTypeChoices.GenericTerms,
       },
     },
     result: {

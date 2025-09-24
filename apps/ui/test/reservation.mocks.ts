@@ -1,6 +1,6 @@
 import {
   AccessType,
-  ImageType,
+  ReservationUnitImageType,
   MetaFieldsFragment,
   MunicipalityChoice,
   OrderStatus,
@@ -12,7 +12,7 @@ import {
   ReservationStateChoice,
   ReservationTypeChoice,
   ReserveeType,
-  TermsType,
+  TermsOfUseTypeChoices,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import type { FieldName } from "common/src/metaFieldsHelpers";
@@ -186,7 +186,7 @@ export function createMockReservation(
           mediumUrl: "https://example.com/image-medium.jpg",
           smallUrl: "https://example.com/image-small.jpg",
           imageUrl: "https://example.com/image-image.jpg",
-          imageType: ImageType.Main,
+          imageType: ReservationUnitImageType.Main,
         },
       ],
       unit: {
@@ -284,7 +284,7 @@ export function createTermsOfUseMock(empty: boolean = false) {
       : {
           id: base64encode("TermsOfUseNode:1"),
           pk: "1",
-          termsType: TermsType.GenericTerms,
+          termsType: TermsOfUseTypeChoices.GenericTerms,
           ...generateNameFragment("TermsOfUse name"),
           ...generateTextFragment("Test terms of use"),
         },

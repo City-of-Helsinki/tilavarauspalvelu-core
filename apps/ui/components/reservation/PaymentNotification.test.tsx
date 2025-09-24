@@ -2,7 +2,7 @@ import { createReservationPageMock } from "@test/reservation.mocks";
 import { render, screen } from "@testing-library/react";
 import PaymentNotification from "@/components/reservation/PaymentNotification";
 import { describe, it, expect } from "vitest";
-import { AppliedPricingInfo, OrderStatus, PaymentOrderNode, PaymentType, PriceUnit } from "@gql/gql-types";
+import { OrderStatus, PaymentOrderNode, PaymentType, PriceUnit } from "@gql/gql-types";
 import { toUIDateTime } from "common/src/common/util";
 
 function customRender() {
@@ -63,7 +63,7 @@ function createPaymentOrderMock(): PaymentOrderNode {
   };
 }
 
-function createAppliedPricingMock(): AppliedPricingInfo {
+function createAppliedPricingMock() {
   return {
     begins: new Date("2023-10-01T12:00:00Z").toISOString(),
     highestPrice: "10.0",

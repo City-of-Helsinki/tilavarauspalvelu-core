@@ -15,7 +15,7 @@ import {
   type PurposeNode,
   type ReservationUnitNode,
   ReserveeType,
-  TermsType,
+  TermsOfUseTypeChoices,
   UpdateApplicationDocument,
   type UpdateApplicationMutation,
   Weekday,
@@ -312,7 +312,7 @@ export function createMockApplicationViewFragment(props: CreateMockApplicationFr
     termsOfUse: {
       id: base64encode("TermsOfUseNode:1"),
       pk: "recurring",
-      termsType: TermsType.RecurringTerms,
+      termsType: TermsOfUseTypeChoices.RecurringTerms,
       ...generateNameFragment("TermsOfUse"),
       ...generateTextFragment("Recurring Terms of Use"),
     },
