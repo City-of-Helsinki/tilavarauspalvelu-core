@@ -161,8 +161,6 @@ export function processVariables({
     personsAllowed,
     first: SEARCH_PAGING_LIMIT,
     orderBy,
-    isDraft: false,
-    isVisible: true,
     reservationKind: kind,
   };
 }

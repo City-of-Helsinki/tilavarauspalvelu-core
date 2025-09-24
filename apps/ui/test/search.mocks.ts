@@ -94,8 +94,6 @@ function createSearchVariablesMock({
     applicationRound: [1],
     first: 36,
     orderBy: [ReservationUnitOrderingChoices.NameFiAsc, ReservationUnitOrderingChoices.PkAsc],
-    isDraft: false,
-    isVisible: true,
     reservationKind: ReservationKind.Season,
   } as const;
 }

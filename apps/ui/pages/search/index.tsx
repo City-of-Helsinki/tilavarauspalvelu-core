@@ -132,8 +132,6 @@ export const SEARCH_RESERVATION_UNITS = gql`
     $before: String
     $after: String
     $orderBy: [ReservationUnitOrderingChoices]
-    $isDraft: Boolean
-    $isVisible: Boolean
     $reservationKind: ReservationKind
   ) {
     reservationUnits(
@@ -158,8 +156,8 @@ export const SEARCH_RESERVATION_UNITS = gql`
       after: $after
       before: $before
       orderBy: $orderBy
-      isDraft: $isDraft
-      isVisible: $isVisible
+      isDraft: false
+      isVisible: true
       reservationKind: $reservationKind
       calculateFirstReservableTime: true
     ) {
