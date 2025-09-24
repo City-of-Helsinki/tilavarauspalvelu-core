@@ -6,11 +6,11 @@ import { type UseStaffReservationFragment } from "@gql/gql-types";
 import { type MutationInputParams, useStaffReservationMutation } from "./useStaffReservationMutation";
 import { vi, describe, test, expect, beforeEach } from "vitest";
 import { MUTATION_DATA, createMocks } from "./__test__/mocks";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 
 export function createMockReservation({ pk }: { pk: number }): UseStaffReservationFragment {
   return {
-    id: base64encode("ReservationNode:" + pk),
+    id: createNodeId("ReservationNode", pk),
     pk,
     reservationSeries: null,
   };

@@ -20,7 +20,7 @@ import {
   type UpdateApplicationMutation,
   Weekday,
 } from "@/gql/gql-types";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 import { addDays, addMonths, addYears } from "date-fns";
 import { type CreateGraphQLMocksReturn, generateNameFragment, generateTextFragment } from "./test.gql.utils";
 import { createMockReservationUnit } from "./reservation-unit.mocks";
@@ -116,7 +116,7 @@ function createMockApplicationSection({
   }
 
   return {
-    id: base64encode(`ApplicationSectionNode:${pk}`),
+    id: createNodeId("ApplicationSectionNode", pk),
     pk,
     status: ApplicationSectionStatusChoice.Unallocated,
     // page 1 data
@@ -136,7 +136,7 @@ function createMockApplicationSection({
 
 function createMockAgeGroupNode({ pk = 1 }: { pk?: number } = {}): AgeGroupNode {
   return {
-    id: base64encode(`AgeGroupNode:1`),
+    id: createNodeId("AgeGroupNode", 1),
     pk,
     minimum: 1,
     maximum: null,
@@ -145,7 +145,7 @@ function createMockAgeGroupNode({ pk = 1 }: { pk?: number } = {}): AgeGroupNode 
 
 function createMockPurposeNode({ pk = 1 }: { pk?: number } = {}): PurposeNode {
   return {
-    id: base64encode(`PurposeNode:1`),
+    id: createNodeId("PurposeNode", 1),
     pk,
     rank: pk,
     ...generateNameFragment("PurposeNode"),
@@ -159,7 +159,7 @@ type CreateReservationUnitOption = ApplicationSectionMockType["reservationUnitOp
 function createReservationUnitOption({ order }: { order: number }): CreateReservationUnitOption {
   const reservationUnit: CreateReservationUnitOption["reservationUnit"] = createMockReservationUnit({ pk: order });
   return {
-    id: base64encode(`ReservationUnitOptionNode:1`),
+    id: createNodeId("ReservationUnitOptionNode", 1),
     pk: order,
     preferredOrder: order,
     reservationUnit,
@@ -206,7 +206,7 @@ export function createMockApplicationFragment({
   };
 
   const MockApplicationForm = {
-    id: base64encode(`ApplicationNode:${pk}`),
+    id: createNodeId("ApplicationNode", pk),
     pk,
     status: page === "page4" ? ApplicationStatusChoice.Received : status,
     // TODO this can't be combined with the other Fragment
@@ -273,7 +273,7 @@ export function createMockApplicationRound({
   });
 
   return {
-    id: base64encode(`ApplicationRoundNode:${pk}`),
+    id: createNodeId("ApplicationRoundNode", pk),
     pk,
     ...generateNameFragment(`ApplicationRound ${pk}`),
     notesWhenApplyingFi: notesWhenApplying ? `${notesWhenApplying} FI` : null,
@@ -310,7 +310,7 @@ export function createMockApplicationViewFragment(props: CreateMockApplicationFr
     status: ApplicationRoundStatusChoice.Open,
     ...generateNameFragment("ApplicationRound"),
     termsOfUse: {
-      id: base64encode("TermsOfUseNode:1"),
+      id: createNodeId("TermsOfUseNode", 1),
       pk: "recurring",
       termsType: TermsOfUseTypeChoices.RecurringTerms,
       ...generateNameFragment("TermsOfUse"),

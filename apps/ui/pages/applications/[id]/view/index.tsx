@@ -7,7 +7,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { ViewApplication } from "@/components/application/ViewApplication";
 import { ApplicationHead } from "@/components/application/ApplicationHead";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { base64encode, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
   ApplicationStatusChoice,
   ApplicationViewDocument,
@@ -174,7 +174,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const { data } = await apolloClient.query<ApplicationViewQuery, ApplicationViewQueryVariables>({
     query: ApplicationViewDocument,
-    variables: { id: base64encode(`ApplicationNode:${pk}`) },
+    variables: { id: createNodeId("ApplicationNode", pk) },
   });
 
   const { application } = data;

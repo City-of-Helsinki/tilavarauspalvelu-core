@@ -4,7 +4,7 @@ import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { type CreateMockApplicationFragmentProps, createMockApplicationViewFragment } from "@test/application.mocks";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 import userEvent from "@testing-library/user-event";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 
@@ -55,7 +55,7 @@ function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnTyp
   }
   const application = createMockApplicationViewFragment(props);
   const tos: TermsOfUseFieldsFragment = {
-    id: base64encode("TermsOfUseNode:1"),
+    id: createNodeId("TermsOfUseNode", 1),
     pk: null,
     termsType: TermsOfUseTypeChoices.GenericTerms,
     nameFi: null,

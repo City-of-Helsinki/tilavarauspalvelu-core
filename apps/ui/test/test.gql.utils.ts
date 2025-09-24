@@ -1,5 +1,5 @@
 import { MunicipalityChoice, type OptionsQuery, type ReservationUnitTypeNode } from "@/gql/gql-types";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import { createNodeId, filterNonNullable } from "common/src/helpers";
 import { type DocumentNode } from "graphql";
 import { translateOption } from "@/modules/search";
 import { type OptionsListT } from "common/src/modules/search";
@@ -77,32 +77,32 @@ export function createOptionQueryMock({
 
   const ageGroups = ageGroupOptions.map((val) => ({
     ...val,
-    id: base64encode(`ReservationPurposeNode:${val.pk}`),
+    id: createNodeId("ReservationPurposeNode", val.pk),
   }));
 
   const reservationPurposes = reservationPurposeOptions.map(({ value, label }) => ({
-    id: base64encode(`ReservationPurposeNode:${value}`),
+    id: createNodeId("ReservationPurposeNode", value),
     pk: value,
     nameFi: label,
     nameSv: label,
     nameEn: label,
   }));
   const units = Array.from({ length: nCount }, (_, i) => ({
-    id: base64encode(`UnitNode:${i + 1}`),
+    id: createNodeId("UnitNode", i + 1),
     pk: i + 1,
     nameFi: `Unit ${i + 1} FI`,
     nameSv: `Unit ${i + 1} SV`,
     nameEn: `Unit ${i + 1} EN`,
   }));
   const equipments = Array.from({ length: nCount }, (_, i) => ({
-    id: base64encode(`EquipmentNode:${i + 1}`),
+    id: createNodeId("EquipmentNode", i + 1),
     pk: i + 1,
     nameFi: `Equipment ${i + 1} FI`,
     nameSv: `Equipment ${i + 1} SV`,
     nameEn: `Equipment ${i + 1} EN`,
   }));
   const purposes = Array.from({ length: nCount }, (_, i) => ({
-    id: base64encode(`PurposeNode:${i + 1}`),
+    id: createNodeId("PurposeNode", i + 1),
     pk: i + 1,
     nameFi: `Purpose ${i + 1} FI`,
     nameSv: `Purpose ${i + 1} SV`,

@@ -32,7 +32,7 @@ import { Step0 } from "@/components/reservation/Step0";
 import { Step1 } from "@/components/reservation/Step1";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
-import { base64encode, filterNonNullable, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, toNumber } from "common/src/helpers";
 import { containsField } from "common/src/metaFieldsHelpers";
 import { errorToast } from "common/src/components/toast";
 import { getGeneralFields } from "@/components/reservation/SummaryFields";
@@ -439,7 +439,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const { data: resData } = await apolloClient.query<ReservationQuery, ReservationQueryVariables>({
     query: ReservationDocument,
-    variables: { id: base64encode(`ReservationNode:${reservationPk}`) },
+    variables: { id: createNodeId("ReservationNode", reservationPk) },
   });
 
   const { reservation } = resData;

@@ -5,7 +5,7 @@ import { render, within } from "@testing-library/react";
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { ReservationUnitList } from "./ReservationUnitList";
 import { type ApplicationReservationUnitListFragment } from "@/gql/gql-types";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import userEvent from "@testing-library/user-event";
@@ -64,7 +64,7 @@ function customRender({
     length: nReservationUnits,
   }).map((_, i) => i + 1);
   const applicationRound: ApplicationReservationUnitListFragment = {
-    id: base64encode("ApplicationRound:1"),
+    id: createNodeId("ApplicationRound", 1),
     pk: 1,
     ...generateNameFragment("ApplicationRound 1"),
     reservationUnits: values.map((pk) => createMockReservationUnit({ pk })),

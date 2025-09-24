@@ -4,22 +4,22 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, IconLock, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { Flex, NoWrap, H1, H4, fontRegular } from "common/styled";
+import { Flex, fontRegular, H1, H4, NoWrap } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
-  ReservationStateChoice,
-  type ReservationPageQuery,
-  type ReservationPageQueryVariables,
-  ReservationPageDocument,
+  type AccessCodeQuery,
+  AccessType,
+  ApplicationReservationSeriesDocument,
   type ApplicationReservationSeriesQuery,
   type ApplicationReservationSeriesQueryVariables,
-  ApplicationReservationSeriesDocument,
-  OrderStatus,
-  useAccessCodeQuery,
-  AccessType,
-  type AccessCodeQuery,
   MunicipalityChoice,
+  OrderStatus,
   ReservationCancelReasonChoice,
+  ReservationPageDocument,
+  type ReservationPageQuery,
+  type ReservationPageQueryVariables,
+  ReservationStateChoice,
+  useAccessCodeQuery,
 } from "@gql/gql-types";
 import Link from "next/link";
 import { isBefore, sub } from "date-fns";
@@ -35,8 +35,8 @@ import { getReservationUnitName } from "@/modules/reservationUnit";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { AddressSection } from "@/components/reservation-unit";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { base64encode, capitalize, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { ButtonLikeLink, ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
+import { capitalize, createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { ButtonLikeExternalLink, ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
   getApplicationPath,
@@ -52,16 +52,16 @@ import { gql } from "@apollo/client";
 import StatusLabel from "common/src/components/StatusLabel";
 import IconButton from "common/src/components/IconButton";
 import {
-  NotModifiableReason,
+  ApplicationFields,
+  GeneralFields,
   Instructions,
   LabelValuePair,
-  ReservationStatus,
+  NotModifiableReason,
+  PaymentNotification,
   ReservationInfoCard,
   ReservationOrderStatus,
+  ReservationStatus,
   TermsInfoSection,
-  GeneralFields,
-  ApplicationFields,
-  PaymentNotification,
 } from "@/components/reservation";
 import { useSearchParams } from "next/navigation";
 import { queryOptions } from "@/modules/queryOptions";
@@ -81,6 +81,7 @@ const SubHeading = styled(H4).attrs({
   }
 
   /* TODO make this into a css fragment */
+
   a,
   a:visited {
     color: var(--color-black);
@@ -94,6 +95,7 @@ const SubHeading = styled(H4).attrs({
         position: relative;
         right: calc(var(--spacing-xs) * -1);
       }
+
       display: inline-block;
       margin-right: var(--spacing-m);
       margin-bottom: 0;
@@ -181,7 +183,7 @@ function Reservation({
   const { data: accessCodeData } = useAccessCodeQuery({
     skip: !reservation || !shouldShowAccessCode,
     variables: {
-      id: base64encode(`ReservationNode:${reservation.pk}`),
+      id: createNodeId("ReservationNode", reservation.pk ?? 0),
     },
   });
   const pindoraInfo = accessCodeData?.reservation?.pindoraInfo ?? null;
@@ -451,11 +453,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const bookingTerms = await getGenericTerms(apolloClient);
 
     // NOTE errors will fallback to 404
-    const id = base64encode(`ReservationNode:${pk}`);
     const { data } = await apolloClient.query<ReservationPageQuery, ReservationPageQueryVariables>({
       query: ReservationPageDocument,
       fetchPolicy: "no-cache",
-      variables: { id },
+      variables: { id: createNodeId("ReservationNode", pk) },
     });
 
     const { reservation } = data ?? {};

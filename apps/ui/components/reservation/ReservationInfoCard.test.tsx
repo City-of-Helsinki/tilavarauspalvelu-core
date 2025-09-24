@@ -11,7 +11,7 @@ import {
   ReservationStateChoice,
 } from "@gql/gql-types";
 import { type CreateGraphQLMockProps, generateNameFragment } from "@/test/test.gql.utils";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 
@@ -105,10 +105,10 @@ function createMockReservationInfoCard(price?: string): ReservationInfoCardFragm
       taxPercentage: "25.5",
     },
     reservationUnit: {
-      id: base64encode("ReservationUnitNode:2"),
+      id: createNodeId("ReservationUnitNode", 2),
       images: [
         {
-          id: base64encode(`ReservationUnitImageNode:1`),
+          id: createNodeId("ReservationUnitImageNode", 1),
           imageUrl: "https://example.com/image-image.jpg",
           imageType: ReservationUnitImageType.Main,
           largeUrl: "https://example.com/image-large.jpg",

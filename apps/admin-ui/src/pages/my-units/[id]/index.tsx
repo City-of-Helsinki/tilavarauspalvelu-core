@@ -6,7 +6,7 @@ import { Flex, H1, TabWrapper, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { formatAddress } from "@/common/util";
 import { getReservationSeriesUrl } from "@/common/urls";
-import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
   UnitViewDocument,
   type UnitViewQuery,
@@ -180,10 +180,9 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
 
   const commonProps = await getCommonServerSideProps();
   const apolloClient = createClient(commonProps.apiBaseUrl ?? "", req);
-  const id = base64encode(`UnitNode:${pk}`);
   const { data } = await apolloClient.query<UnitViewQuery, UnitViewQueryVariables>({
     query: UnitViewDocument,
-    variables: { id },
+    variables: { id: createNodeId("UnitNode", pk) },
   });
 
   const { unit } = data;

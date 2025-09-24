@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { gql } from "@apollo/client";
 import { AutoGrid, ButtonContainer, Flex } from "common/styled";
 import { useDisplayError } from "common/src/hooks";
-import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
   type ApplicationPage3FormValues,
   ApplicationPage3Schema,
@@ -159,7 +159,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
   const { data } = await apolloClient.query<ApplicationPage3Query, ApplicationPage3QueryVariables>({
     query: ApplicationPage3Document,
-    variables: { id: base64encode(`ApplicationNode:${pk}`) },
+    variables: { id: createNodeId("ApplicationNode", pk) },
   });
   const { application } = data;
   if (application == null) {

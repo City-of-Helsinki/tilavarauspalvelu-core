@@ -108,12 +108,16 @@ export function getLocalizationLang(code?: string): LocalizationLanguages {
 
 export const isBrowser = typeof window !== "undefined";
 
-export function base64encode(str: string) {
+function base64encode(str: string) {
   if (isBrowser) {
     return window.btoa(str);
     // TODO do we want unescape(encodeURIComponent(str)));?
   }
   return Buffer.from(str, "binary").toString("base64");
+}
+
+export function createNodeId(type: string, pk: number): string {
+  return base64encode(`${type}:${pk}`);
 }
 
 export async function hash(val: string): Promise<string> {

@@ -17,7 +17,7 @@ import {
   type CurrentUserQuery,
   ReservationKind,
 } from "@gql/gql-types";
-import { base64encode, filterNonNullable, ignoreMaybeArray, type ReadonlyDeep, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, type ReadonlyDeep, toNumber } from "common/src/helpers";
 import { type SearchFormValues, SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
 import { createApolloClient } from "@/modules/apolloClient";
 import { RecurringCard } from "@/components/recurring/RecurringCard";
@@ -140,7 +140,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { data } = await apolloClient.query<ApplicationRoundQuery, ApplicationRoundQueryVariables>({
     query: ApplicationRoundDocument,
     variables: {
-      id: base64encode(`ApplicationRoundNode:${pk}`),
+      id: createNodeId("ApplicationRoundNode", pk),
     },
   });
   const { applicationRound } = data;

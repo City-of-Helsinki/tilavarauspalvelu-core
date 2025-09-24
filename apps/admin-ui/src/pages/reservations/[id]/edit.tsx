@@ -3,12 +3,12 @@ import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  type Maybe,
+  type ReservationEditPageQuery,
   ReservationPermissionsDocument,
   type ReservationPermissionsQuery,
   type ReservationPermissionsQueryVariables,
   UserPermissionChoice,
-  type Maybe,
-  type ReservationEditPageQuery,
 } from "@gql/gql-types";
 import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -20,7 +20,7 @@ import {
   ReservationTypeSchema,
 } from "@/schemas";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
-import { useStaffReservationMutation, useReservationEditData, useSession } from "@/hooks";
+import { useReservationEditData, useSession, useStaffReservationMutation } from "@/hooks";
 import { errorToast } from "common/src/components/toast";
 import { ButtonContainer, CenterSpinner, Flex, HR } from "common/styled";
 import { createTagString } from "@/modules/reservation";
@@ -30,7 +30,7 @@ import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { GetServerSidePropsContext } from "next";
-import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { Error403 } from "@/component/Error403";
@@ -223,7 +223,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
   const apolloClient = createClient(commonProps.apiBaseUrl, req);
   const { data } = await apolloClient.query<ReservationPermissionsQuery, ReservationPermissionsQueryVariables>({
     query: ReservationPermissionsDocument,
-    variables: { id: base64encode(`ReservationNode:${pk}`) },
+    variables: { id: createNodeId("ReservationNode", pk) },
   });
   const unitPk = data?.reservation?.reservationUnit?.unit?.pk;
   if (unitPk == null) {

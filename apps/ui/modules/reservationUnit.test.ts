@@ -37,7 +37,7 @@ import mockTranslations from "./../public/locales/fi/prices.json";
 import { type ReservableMap, dateToKey, type RoundPeriod } from "./reservable";
 import { generateNameFragment } from "@/test/test.gql.utils";
 import { TIMERS_TO_FAKE } from "@/test/test.utils";
-import { base64encode, ReadonlyDeep } from "common/src/helpers";
+import { createNodeId, ReadonlyDeep } from "common/src/helpers";
 import { type TFunction } from "i18next";
 import { vi, describe, test, expect, beforeEach, afterEach, beforeAll, afterAll } from "vitest";
 import { type DeepRequired } from "react-hook-form";
@@ -747,7 +747,7 @@ describe("isReservationUnitReservable", () => {
     reservableTimeSpans?: ReservationUnitNode["reservableTimeSpans"];
   }): NotReservableFieldsFragmentNarrow {
     return {
-      id: base64encode("ReservationUnitNode:1"),
+      id: createNodeId("ReservationUnitNode", 1),
       reservationKind: ReservationKind.Direct,
       minReservationDuration,
       maxReservationDuration,
@@ -1117,7 +1117,7 @@ describe("getNextAvailableTime", () => {
       start,
       duration,
       reservationUnit: {
-        id: base64encode("ReservationUnit:1"),
+        id: createNodeId("ReservationUnit", 1),
         reservationsMinDaysBefore,
         reservationsMaxDaysBefore,
         bufferTimeBefore: 0,

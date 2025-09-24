@@ -9,7 +9,7 @@ import { applicationsPath, applicationsPrefix, getApplicationPath } from "@/modu
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
-import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 import { ApplicationSentPageDocument, type ApplicationSentPageQuery } from "@/gql/gql-types";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -77,7 +77,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const { data } = await apolloClient.query<ApplicationSentPageQuery>({
     query: ApplicationSentPageDocument,
-    variables: { id: base64encode(`ApplicationNode:${pk}`) },
+    variables: { id: createNodeId("ApplicationNode", pk) },
   });
 
   if (data.application == null) {

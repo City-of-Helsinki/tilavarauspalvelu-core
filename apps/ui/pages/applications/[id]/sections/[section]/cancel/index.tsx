@@ -11,7 +11,7 @@ import { type CancelFormValues, CancellationForm } from "@/components/Cancellati
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import { base64encode, filterNonNullable, formatApiTimeInterval } from "common/src/helpers";
+import { createNodeId, filterNonNullable, formatApiTimeInterval, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { getApplicationPath } from "@/modules/urls";
 import { useTranslation } from "next-i18next";
 import { ApolloError, gql } from "@apollo/client";
@@ -213,17 +213,16 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
-  const pk = params?.section;
 
   const commonProps = getCommonServerSideProps();
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
 
+  const pk = toNumber(ignoreMaybeArray(params?.section));
   if (Number.isFinite(Number(pk))) {
-    const id = base64encode(`ApplicationSectionNode:${pk}`);
     const { data } = await client.query<ApplicationSectionCancelQuery, ApplicationSectionCancelQueryVariables>({
       query: ApplicationSectionCancelDocument,
       fetchPolicy: "no-cache",
-      variables: { id },
+      variables: { id: createNodeId("ApplicationSectionNode", pk ?? 0) },
     });
     const { applicationSection } = data || {};
     const section = applicationSection;

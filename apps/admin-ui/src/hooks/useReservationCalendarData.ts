@@ -8,7 +8,7 @@ import {
 import { useTranslation } from "next-i18next";
 import { toApiDate } from "common/src/common/util";
 import { errorToast } from "common/src/components/toast";
-import { base64encode } from "common/src/helpers";
+import { createNodeId } from "common/src/helpers";
 import { type CalendarEventType } from "@/modules/reservation";
 import { combineAffectingReservations } from "@/helpers";
 
@@ -30,12 +30,11 @@ export function useReservationCalendarData({
 
   const today = new Date();
 
-  const id = base64encode(`ReservationUnitNode:${reservationUnitPk}`);
   const { data, ...rest } = useReservationsByReservationUnitQuery({
     fetchPolicy: "no-cache",
     skip: !reservationUnitPk,
     variables: {
-      id,
+      id: createNodeId("ReservationUnitNode", reservationUnitPk ?? 0),
       pk: reservationUnitPk ?? 0,
       beginDate: toApiDate(begin ?? today) ?? "",
       endDate: toApiDate(end ?? today) ?? "",

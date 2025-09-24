@@ -22,7 +22,7 @@ import {
   useUpdateReservationUnitMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { base64encode, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { Flex } from "common/styled";
 
 import { errorToast, successToast } from "common/src/components/toast";
@@ -194,7 +194,7 @@ function ReservationUnitEditor({
 
   // Fetch unit data only when creating a new reservation unit
   const { data: unitData } = useReservationUnitCreateUnitQuery({
-    variables: { id: base64encode(`UnitNode:${unitPk}`) },
+    variables: { id: createNodeId("UnitNode", unitPk) },
     fetchPolicy: "network-only",
     skip: unitPk <= 0,
   });
@@ -367,14 +367,12 @@ type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 /// Wrap the editor so we never reset the form after async loading (because of HDS TimeInput bug)
 export default function EditorPage(props: PropsNarrowed): JSX.Element {
   const { reservationUnitPk, unitPk } = props;
-  const typename = "ReservationUnitNode";
-  const id = base64encode(`${typename}:${reservationUnitPk}`);
   const {
     data,
     loading: isLoading,
     refetch,
   } = useReservationUnitEditQuery({
-    variables: { id },
+    variables: { id: createNodeId("ReservationUnitNode", reservationUnitPk) },
     skip: reservationUnitPk <= 0,
   });
 
