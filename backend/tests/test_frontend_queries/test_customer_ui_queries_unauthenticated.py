@@ -164,11 +164,11 @@ def test_frontend_queries__customer_ui__ApplicationRoundsUi__unauthenticated(gra
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__BannerNotificationsList__unauthenticated(graphql):
+def test_frontend_queries__customer_ui__ShowNotificationsList__unauthenticated(graphql):
     customer_factories = get_customer_query_info()
-    factories = customer_factories["BannerNotificationsList"]
+    factories = customer_factories["ShowNotificationsList"]
 
-    assert len(factories) == 1
+    assert len(factories) == 2
     query_info = factories[0]
 
     now = local_datetime()
@@ -186,37 +186,6 @@ def test_frontend_queries__customer_ui__BannerNotificationsList__unauthenticated
 
     variables = deepcopy(query_info.variables)
     variables["target"] = obj.target
-    assert_no_undefined_variables(variables)
-
-    query = query_info.query
-
-    response = graphql(query, variables=variables)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 1
-
-
-def test_frontend_queries__customer_ui__BannerNotificationsListAll__unauthenticated(graphql):
-    customer_factories = get_customer_query_info()
-    factories = customer_factories["BannerNotificationsListAll"]
-
-    assert len(factories) == 1
-    query_info = factories[0]
-
-    now = local_datetime()
-
-    factory_args = deepcopy(query_info.factory_args)
-    factory_args["message"] = "foo"
-    factory_args["message_en"] = "foo"
-    factory_args["message_fi"] = "foo"
-    factory_args["message_sv"] = "foo"
-    factory_args["draft"] = False
-    factory_args["active_from"] = now - datetime.timedelta(days=1)
-    factory_args["active_until"] = now + datetime.timedelta(days=1)
-    factory_args["target"] = BannerNotificationTarget.ALL
-    query_info.factory.create(**factory_args)
-
-    variables = deepcopy(query_info.variables)
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -676,14 +645,11 @@ def test_frontend_queries__customer_ui__ApplicationSectionCancel__unauthenticate
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationSectionCancel"]
 
-    assert len(factories) == 2
+    assert len(factories) == 1
     query_info_1 = factories[0]
-    query_info_2 = factories[1]
 
     factory_args_1 = deepcopy(query_info_1.factory_args)
     obj = query_info_1.factory.create(**factory_args_1)
-
-    assert query_info_2.factory is None  # ReservationCancelReason is an enum, no factory is needed.
 
     variables = query_info_1.variables
     variables["id"] = to_global_id(query_info_1.typename, obj.id)
@@ -870,14 +836,11 @@ def test_frontend_queries__customer_ui__ReservationCancelPage__unauthenticated(g
     customer_factories = get_customer_query_info()
     factories = customer_factories["ReservationCancelPage"]
 
-    assert len(factories) == 2
+    assert len(factories) == 1
     query_info_1 = factories[0]
-    query_info_2 = factories[1]
 
     factory_args_1 = deepcopy(query_info_1.factory_args)
     obj = query_info_1.factory.create(**factory_args_1)
-
-    assert query_info_2.factory is None  # ReservationCancelReason is an enum, no factory is needed.
 
     variables = query_info_1.variables
     variables["id"] = to_global_id(query_info_1.typename, obj.id)

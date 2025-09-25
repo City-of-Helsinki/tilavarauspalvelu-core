@@ -374,7 +374,7 @@ def test_frontend_queries__customer_ui__ApplicationSectionCancel(graphql):
     customer_factories = get_customer_query_info()
     factories = customer_factories["ApplicationSectionCancel"]
 
-    assert len(factories) == 2  # Second query is cancel reasons, but those are static.
+    assert len(factories) == 1
     query_info = factories[0]
 
     factory_args_1 = deepcopy(query_info.factory_args)
@@ -497,43 +497,11 @@ def test_frontend_queries__customer_ui__Applications(graphql):
     assert len(response.edges) == 1
 
 
-def test_frontend_queries__customer_ui__BannerNotificationsList(graphql):
+def test_frontend_queries__customer_ui__ShowNotificationsList(graphql):
     customer_factories = get_customer_query_info()
-    factories = customer_factories["BannerNotificationsList"]
+    factories = customer_factories["ShowNotificationsList"]
 
-    assert len(factories) == 1
-    query_info = factories[0]
-
-    now = local_datetime()
-
-    factory_args = deepcopy(query_info.factory_args)
-    factory_args["message"] = "foo"
-    factory_args["message_en"] = "foo"
-    factory_args["message_fi"] = "foo"
-    factory_args["message_sv"] = "foo"
-    factory_args["draft"] = False
-    factory_args["active_from"] = now - datetime.timedelta(days=1)
-    factory_args["active_until"] = now + datetime.timedelta(days=1)
-    obj: BannerNotification = query_info.factory.create(**factory_args)
-
-    variables = deepcopy(query_info.variables)
-    variables["target"] = obj.target
-    assert_no_undefined_variables(variables)
-
-    query = query_info.query
-    graphql.login_with_superuser()
-
-    response = graphql(query, variables=variables)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 1
-
-
-def test_frontend_queries__customer_ui__BannerNotificationsListAll(graphql):
-    customer_factories = get_customer_query_info()
-    factories = customer_factories["BannerNotificationsListAll"]
-
-    assert len(factories) == 1
+    assert len(factories) == 2
     query_info = factories[0]
 
     now = local_datetime()
@@ -547,9 +515,10 @@ def test_frontend_queries__customer_ui__BannerNotificationsListAll(graphql):
     factory_args["active_from"] = now - datetime.timedelta(days=1)
     factory_args["active_until"] = now + datetime.timedelta(days=1)
     factory_args["target"] = BannerNotificationTarget.ALL
-    query_info.factory.create(**factory_args)
+    obj: BannerNotification = query_info.factory.create(**factory_args)
 
     variables = deepcopy(query_info.variables)
+    variables["target"] = obj.target
     assert_no_undefined_variables(variables)
 
     query = query_info.query
@@ -755,7 +724,7 @@ def test_frontend_queries__customer_ui__ReservationCancelPage(graphql):
     customer_factories = get_customer_query_info()
     factories = customer_factories["ReservationCancelPage"]
 
-    assert len(factories) == 2  # Second query is cancel reasons, but those are static.
+    assert len(factories) == 1
     query_info = factories[0]
 
     factory_args_1 = deepcopy(query_info.factory_args)
