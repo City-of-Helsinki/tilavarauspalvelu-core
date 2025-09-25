@@ -637,6 +637,9 @@ function constructPricing({
       pk: 1,
       value: (taxPercentage ?? 24).toString(),
     },
+    materialPriceDescriptionFi: "",
+    materialPriceDescriptionEn: "",
+    materialPriceDescriptionSv: "",
     paymentType: PaymentType.OnlineOrInvoice,
   };
 }

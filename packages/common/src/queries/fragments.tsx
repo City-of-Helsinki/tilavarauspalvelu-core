@@ -80,6 +80,9 @@ export const PRICING_FRAGMENT = gql`
       pk
       value
     }
+    materialPriceDescriptionFi
+    materialPriceDescriptionEn
+    materialPriceDescriptionSv
   }
 `;
 
