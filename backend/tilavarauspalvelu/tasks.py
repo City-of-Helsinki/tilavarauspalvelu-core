@@ -492,7 +492,15 @@ def send_user_anonymization_email_task() -> None:
     EmailService.send_user_anonymization_emails()
 
 
-@app.task(name="send_valid_saved_emails")
+@app.task(
+    name="send_valid_saved_emails",
+    tvp_auto_create_name="Lähetä epäonnistuneet sähköpostiviestit",
+    tvp_auto_create_description=(
+        "Yrittää uudelleenlähettää sähköpostiviestejä, joiden lähetys epäonnistui suoraan, "
+        "mikäli sähköposti on vielä aiheellista lähettää uudelleen."
+    ),
+    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="*", minute="*/10"),
+)
 def send_valid_saved_emails_task() -> None:
     from tilavarauspalvelu.integrations.email.sending import send_emails_in_batches_task
 
