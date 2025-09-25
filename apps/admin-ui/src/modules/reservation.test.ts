@@ -36,6 +36,9 @@ function constructPricing({
       value: "24",
     },
     paymentType: PaymentType.Online,
+    materialPriceDescriptionFi: "",
+    materialPriceDescriptionEn: "",
+    materialPriceDescriptionSv: "",
   };
 }
 

@@ -1,10 +1,11 @@
+import { capitalize } from "lodash-es";
 import React from "react";
 import styled from "styled-components";
 import { addDays, startOfDay } from "date-fns";
-import { IconAlertCircleFill, RadioButton } from "hds-react";
+import { IconAlertCircleFill, RadioButton, TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { Controller, UseFormReturn } from "react-hook-form";
-import { AutoGrid } from "common/styled";
+import { type Control, Controller, UseFormReturn } from "react-hook-form";
+import { AutoGrid, Flex, HR } from "common/styled";
 import {
   ControlledDateInput,
   ControlledNumberInput,
@@ -16,6 +17,11 @@ import { getTranslatedError } from "@/common/util";
 import { FieldGroup } from "./FieldGroup";
 import { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
+
+const FuturePricingContainer = styled(Flex)<{ $toggled: boolean }>`
+  padding-block: var(--spacing-s);
+  ${({ $toggled }) => $toggled && "background: var(--color-black-5);"}
+`;
 
 const Error = styled.div`
   margin-top: var(--spacing-3-xs);
@@ -254,21 +260,68 @@ function PricingControl({
   form,
   taxPercentageOptions,
 }: {
-  form: UseFormReturn<ReservationUnitEditFormValues>;
   pricing: ReservationUnitEditFormValues["pricings"][0];
+  form: UseFormReturn<ReservationUnitEditFormValues>;
   taxPercentageOptions: TaxOption[];
 }) {
   const { t } = useTranslation("reservationUnitEditor");
+  const { watch, control } = form;
+  const index = watch("pricings").findIndex((p) => p.pk === pricing.pk);
+  const toggleFieldName = `pricings.${index}.hasMaterialPrice` as const;
+  const showMaterialDescriptions = watch(toggleFieldName);
   return (
-    <FieldGroup
-      key={`pricing-${pricing.pk}`}
-      heading={t("label.pricingType")}
-      required
-      tooltip={t("tooltip.pricingType")}
-      style={{ gridColumn: "1 / -1" }}
-    >
-      <PricingTypeView pk={pricing.pk} form={form} taxPercentageOptions={taxPercentageOptions} />
-    </FieldGroup>
+    <Flex>
+      <FieldGroup
+        key={`pricing-${pricing.pk}`}
+        heading={pricing.isFuture ? `Maksullisuus ${pricing.begins} alkaen` : t("label.pricingType")}
+        required
+        tooltip={t("tooltip.pricingType")}
+      >
+        <PricingTypeView pk={pricing.pk} form={form} taxPercentageOptions={taxPercentageOptions} />
+      </FieldGroup>
+      <ControlledCheckbox name={toggleFieldName} control={control} label={t("label.hasMaterialPrice")} />
+      {showMaterialDescriptions && (
+        <Flex $gap="xs" key={pricing.pk}>
+          <MaterialPricingDescription
+            index={index}
+            control={control}
+            language="fi"
+            helperText={t("label.materialPriceDescriptionHelperText")}
+          />
+          <MaterialPricingDescription index={index} control={control} language="sv" />
+          <MaterialPricingDescription index={index} control={control} language="en" />
+        </Flex>
+      )}
+    </Flex>
+  );
+}
+
+type DescriptionProps = {
+  control: Control<ReservationUnitEditFormValues>;
+  language: "fi" | "sv" | "en";
+  index: number;
+  helperText?: string;
+};
+
+function MaterialPricingDescription({ control, language, index, helperText }: DescriptionProps) {
+  const { t } = useTranslation("reservationUnitEditor");
+  const label = t(`label.materialPriceDescription${capitalize(language)}`);
+  return (
+    <Controller
+      name={`pricings.${index}.materialPriceDescription${capitalize(language)}`}
+      control={control}
+      render={({ field: { value, onChange } }) => (
+        <TextInput
+          id={label + index}
+          name={`pricings.${index}.materialPriceDescription${capitalize(language)}`}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          required
+          label={label}
+          helperText={helperText}
+        />
+      )}
+    />
   );
 }
 
@@ -291,7 +344,29 @@ export function PricingSection({
 
   return (
     <EditAccordion open={hasErrors} heading={t("label.pricings")}>
-      <AutoGrid>
+      <Flex $gap="s">
+        <Flex $direction="column" $gap="s">
+          <ControlledCheckbox
+            control={control}
+            name="canApplyFreeOfCharge"
+            label={t("label.canApplyFreeOfCharge")}
+            tooltip={t("tooltip.canApplyFreeOfCharge")}
+            disabled={!isPaid}
+          />
+          {watch("canApplyFreeOfCharge") && isPaid && (
+            <ControlledSelect
+              control={control}
+              name="pricingTerms"
+              label={t("label.pricingTerms")}
+              required
+              clearable
+              options={pricingTermsOptions}
+              error={getTranslatedError(t, errors.pricingTerms?.message)}
+              tooltip={t("tooltip.pricingTerms")}
+            />
+          )}
+          <HR />
+        </Flex>
         {watch("pricings")
           .filter((p) => !p.isFuture)
           .map((pricing) => (
@@ -302,44 +377,21 @@ export function PricingSection({
               taxPercentageOptions={taxPercentageOptions}
             />
           ))}
-        <ControlledCheckbox
-          control={control}
-          name="hasFuturePricing"
-          label={t("label.hasFuturePrice")}
-          style={{ gridColumn: "1 / -1" }}
-        />
-        {watch("hasFuturePricing") &&
-          watch("pricings")
-            .filter((p) => p.isFuture)
-            .map((pricing) => (
-              <PricingControl
-                key={pricing.pk}
-                form={form}
-                pricing={pricing}
-                taxPercentageOptions={taxPercentageOptions}
-              />
-            ))}
-        {isPaid && (
-          <ControlledCheckbox
-            control={control}
-            name="canApplyFreeOfCharge"
-            label={t("label.canApplyFreeOfCharge")}
-            tooltip={t("tooltip.canApplyFreeOfCharge")}
-          />
-        )}
-        {watch("canApplyFreeOfCharge") && isPaid && (
-          <ControlledSelect
-            control={control}
-            name="pricingTerms"
-            label={t("label.pricingTerms")}
-            required
-            clearable
-            options={pricingTermsOptions}
-            error={getTranslatedError(t, errors.pricingTerms?.message)}
-            tooltip={t("tooltip.pricingTerms")}
-          />
-        )}
-      </AutoGrid>
+        <FuturePricingContainer $gap="s" $toggled={watch("hasFuturePricing")}>
+          <ControlledCheckbox control={control} name="hasFuturePricing" label={t("label.hasFuturePrice")} />
+          {watch("hasFuturePricing") &&
+            watch("pricings")
+              .filter((p) => p.isFuture)
+              .map((pricing) => (
+                <PricingControl
+                  key={pricing.pk}
+                  form={form}
+                  pricing={pricing}
+                  taxPercentageOptions={taxPercentageOptions}
+                />
+              ))}
+        </FuturePricingContainer>
+      </Flex>
     </EditAccordion>
   );
 }

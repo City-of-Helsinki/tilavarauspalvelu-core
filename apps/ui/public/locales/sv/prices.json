@@ -10,5 +10,6 @@
   },
   "priceFree": "Avgiftsfri",
   "taxPercentage": "moms {{count}}%",
-  "total": "Totalt"
+  "total": "Totalt",
+  "materialPrice": "materialkostnad"
 }

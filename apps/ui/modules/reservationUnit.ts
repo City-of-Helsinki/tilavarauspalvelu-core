@@ -275,6 +275,9 @@ export function getPriceString(props: GetPriceType): string {
   const { t, pricing, minutes = 0 } = props;
 
   if (isPriceFree(pricing)) {
+    if (pricing.materialPriceDescriptionFi !== "") {
+      return capitalize(t("prices:materialPrice"));
+    }
     return t("prices:priceFree") ?? "0";
   }
 
@@ -286,8 +289,10 @@ export function getPriceString(props: GetPriceType): string {
       ? formatPrice(lowestPrice, true)
       : `${formatPrice(lowestPrice)} - ${formatPrice(highestPrice, true)}`;
   const unitString =
-    pricing.priceUnit === PriceUnit.Fixed || minutes ? "" : t(`prices:priceUnits.${pricing.priceUnit}`);
-  return trim(`${priceString} / ${unitString}`, " / ");
+    pricing.priceUnit === PriceUnit.Fixed || minutes ? "" : t(`prices:priceUnits.${pricing.priceUnit.toUpperCase()}`);
+  const returnPriceString = trim(`${priceString} / ${unitString}`, " / ");
+  const materialPriceDescription = pricing.materialPriceDescriptionFi ? ` ${t("prices:materialPrice")}` : "";
+  return `${returnPriceString}${materialPriceDescription}`;
 }
 
 export type GetReservationUnitPriceProps = {

@@ -10,5 +10,6 @@
   },
   "priceFree": "Maksuton",
   "taxPercentage": "alv {{count}}%",
-  "total": "Yhteensä"
+  "total": "Yhteensä",
+  "materialPrice": "materiaalimaksu"
 }

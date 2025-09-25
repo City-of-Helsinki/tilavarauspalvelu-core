@@ -10,7 +10,7 @@ export const HR = styled.hr<{
   $type?: "dashed" | "solid";
 }>`
   border: 0;
-  border-top: 1px ${({ $type }) => $type ?? "solid"} var(--color-black-20);
+  border-top: 1px ${({ $type }) => $type ?? "solid"} var(--color-black-10);
   width: 100%;
 `;
 

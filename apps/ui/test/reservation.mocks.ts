@@ -251,6 +251,9 @@ export function createMockReservation(
             pk: 1,
             value: "24.5",
           },
+          materialPriceDescriptionFi: "Testimateriaali FI",
+          materialPriceDescriptionEn: "Test material EN",
+          materialPriceDescriptionSv: "Testmaterial SV",
         },
       ],
       cancellationRule: cancellable
