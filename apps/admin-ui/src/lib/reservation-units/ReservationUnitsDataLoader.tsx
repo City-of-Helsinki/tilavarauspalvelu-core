@@ -156,7 +156,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
       unitGroup: $unitGroup
       reservationUnitType: $reservationUnitType
       publishingState: $publishingState
-      onlyWithPermission: true
+      onlyWithManagePermission: true
     ) {
       edges {
         node {
