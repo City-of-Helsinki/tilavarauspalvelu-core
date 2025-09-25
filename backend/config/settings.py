@@ -5,6 +5,7 @@ import os
 import zoneinfo
 from pathlib import Path
 
+import dj_database_url
 from django.utils.translation import gettext_lazy as _
 from env_config import Environment, values
 from env_config.decorators import classproperty
@@ -899,6 +900,16 @@ class CI(EmptyDefaults, Common, use_environ=True):
 class Platta(Common, use_environ=True):
     """Common settings for platta environments. Not to be used directly."""
 
+    # --- Database settings ------------------------------------------------------------------------------------------
+
+    @classproperty
+    def DATABASES(cls):
+        database_url = os.environ["DATABASE_URL"]
+        config = dj_database_url.parse(database_url)
+        config["CONN_MAX_AGE"] = int(os.getenv("CONN_MAX_AGE", "0"))
+        config["PASSWORD"] = os.environ["DATABASE_PASSWORD"]
+        return {"default": config}
+
     # --- Email settings ---------------------------------------------------------------------------------------------
 
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -982,9 +993,6 @@ class MidHook(EmptyDefaults, Platta, use_environ=True):
     """
 
     DEBUG = True
-
-    # Migrations require the database
-    DATABASES = values.DatabaseURLValue()
 
 
 class Development(Platta, use_environ=True):
