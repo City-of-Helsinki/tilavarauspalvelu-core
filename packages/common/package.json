@@ -23,7 +23,7 @@
     "focus-trap-react": "^11.0.4",
     "graphql": "^16.11.0",
     "hds-react": "^4.7.1",
-    "i18next": "^25.2.1",
+    "i18next": "^25.5.2",
     "lodash-es": "^4.17.21",
     "prettier-config": "workspace:*",
     "react": "^18.3.1",
