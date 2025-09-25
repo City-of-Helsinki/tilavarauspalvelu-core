@@ -149,6 +149,14 @@
   "overrides": [
     {
       "files": [
+        "next-env.d.ts"
+      ],
+      "rules": {
+        "triple-slash-reference": "off"
+      }
+    },
+    {
+      "files": [
         "**/*.ts",
         "**/*.tsx",
         "**/*.mts",
