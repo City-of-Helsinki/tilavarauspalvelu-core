@@ -228,19 +228,35 @@ function IconList({
         }
       : null,
   ] as const);
-
+  const activePricing = getActivePricing(reservationUnit);
   return (
     <IconListWrapper>
-      {iconsTexts.map(({ icon, key, text }) =>
-        key !== "accessType" ? (
-          <IconWithText key={key} icon={icon} text={text} />
-        ) : (
-          <AccessTypeTooltipWrapper key={key}>
-            <IconWithText icon={icon} text={text} />
-            {reservationUnit.accessTypes.length > 1 && <AccessTypeTooltip accessTypes={reservationUnit.accessTypes} />}
-          </AccessTypeTooltipWrapper>
-        )
-      )}
+      {iconsTexts.map(({ icon, key, text }) => {
+        switch (key) {
+          case "accessType":
+            return (
+              <AccessTypeTooltipWrapper key={key}>
+                <IconWithText icon={icon} text={text} />
+                {reservationUnit.accessTypes.length > 1 && (
+                  <AccessTypeTooltip accessTypes={reservationUnit.accessTypes} />
+                )}
+              </AccessTypeTooltipWrapper>
+            );
+          case "unitPrice":
+            return (
+              <AccessTypeTooltipWrapper key={key}>
+                <IconWithText icon={icon} text={text} />
+                {activePricing && getTranslationSafe(activePricing, "materialPriceDescription", lang) !== "" && (
+                  <Tooltip>
+                    {activePricing != null ? getTranslationSafe(activePricing, "materialPriceDescription", lang) : ""}
+                  </Tooltip>
+                )}
+              </AccessTypeTooltipWrapper>
+            );
+          default:
+            return <IconWithText key={key} icon={icon} text={text} />;
+        }
+      })}
     </IconListWrapper>
   );
 }

@@ -10,5 +10,6 @@
   },
   "priceFree": "Free",
   "taxPercentage": "VAT {{count}}%",
-  "total": "Total"
+  "total": "Total",
+  "materialPrice": "material price"
 }

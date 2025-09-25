@@ -57,6 +57,10 @@ const PricingFormSchema = z.object({
   isFuture: z.boolean(),
   // frontend only value, this is used to control if we should show price section
   isPaid: z.boolean(),
+  hasMaterialPrice: z.boolean(),
+  materialPriceDescriptionFi: z.string().max(100),
+  materialPriceDescriptionEn: z.string().max(100),
+  materialPriceDescriptionSv: z.string().max(100),
 });
 
 type PricingFormValues = z.infer<typeof PricingFormSchema>;
@@ -699,6 +703,10 @@ function convertPricing(p?: PricingNode): PricingFormValues {
     priceUnit: p?.priceUnit ?? null,
     paymentType: p?.paymentType ?? null,
     begins: convertBegins(p?.begins),
+    hasMaterialPrice: !!p?.materialPriceDescriptionFi,
+    materialPriceDescriptionFi: p?.materialPriceDescriptionFi ?? "",
+    materialPriceDescriptionEn: p?.materialPriceDescriptionEn ?? "",
+    materialPriceDescriptionSv: p?.materialPriceDescriptionSv ?? "",
   };
 }
 
@@ -732,6 +740,10 @@ function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
       priceUnit: null,
       paymentType: null,
       begins,
+      hasMaterialPrice: false,
+      materialPriceDescriptionFi: "",
+      materialPriceDescriptionEn: "",
+      materialPriceDescriptionSv: "",
     });
   }
   return prices;
@@ -996,5 +1008,8 @@ function transformPricing(
     ...(values.pk > 0 ? { pk: values.pk } : {}),
     ...(values.priceUnit != null ? { priceUnit: values.priceUnit } : {}),
     ...(values.paymentType != null ? { paymentType: values.paymentType } : {}),
+    materialPriceDescriptionFi: values.hasMaterialPrice ? values.materialPriceDescriptionFi : "",
+    materialPriceDescriptionEn: values.hasMaterialPrice ? values.materialPriceDescriptionEn : "",
+    materialPriceDescriptionSv: values.hasMaterialPrice ? values.materialPriceDescriptionSv : "",
   };
 }
