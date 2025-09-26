@@ -1,17 +1,19 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
+from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
+from lookup_property import lookup_property
 
 from tilavarauspalvelu.enums import PaymentType, PriceUnit
 from utils.auditlog_util import AuditLogger
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
-    import datetime
     from decimal import Decimal
 
     from tilavarauspalvelu.models import ReservationUnit, TaxPercentage
@@ -45,6 +47,7 @@ class ReservationUnitPricing(models.Model):
         "tilavarauspalvelu.TaxPercentage",
         related_name="reservation_unit_pricings",
         on_delete=models.PROTECT,
+        limit_choices_to=models.Q(is_enabled=True),
     )
 
     reservation_unit: ReservationUnit = models.ForeignKey(
@@ -98,6 +101,32 @@ class ReservationUnitPricing(models.Model):
         if self.tax_percentage == 0:
             return self.highest_price
         return self.highest_price / self.tax_percentage.multiplier
+
+    @lookup_property(skip_codegen=True)
+    def end_date() -> datetime.date:
+        """End date of the pricing (exclusive)."""
+        sq = Coalesce(
+            models.Subquery(
+                queryset=(
+                    ReservationUnitPricing.objects.filter(
+                        begins__gt=models.OuterRef("begins"),
+                        reservation_unit=models.OuterRef("reservation_unit"),
+                    )
+                    .order_by("begins")
+                    .values("begins")[:1]
+                ),
+                output_field=models.DateField(),
+            ),
+            models.Value(datetime.date.max),
+        )
+        return sq  # type: ignore[return-value]  # noqa: RET504
+
+    @end_date.override
+    def _(self) -> datetime.date:
+        access_type = ReservationUnitPricing.objects.filter(begins__gt=self.begins).order_by("begins").first()
+        if access_type is None:
+            return datetime.date.max
+        return access_type.begins
 
 
 AuditLogger.register(ReservationUnitPricing)
