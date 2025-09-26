@@ -15,8 +15,7 @@ import { MultiSelectFilter } from "@/component/QueryParamFilters";
 import { DayNavigation } from "@/component/QueryParamFilters/DayNavigation";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { translateTag } from "@/modules/search";
-import { useFilterOptions } from "@/hooks/useFilterOptions";
+import { TagOptionsList, translateTag } from "@/modules/search";
 import { type ReservationUnitOption } from "@/hooks/useUnitResources";
 
 const LegendContainer = styled.div`
@@ -33,13 +32,14 @@ interface UnitReservationsProps {
   unitPk: number;
   reservationUnitOptions: ReadonlyArray<ReservationUnitOption>;
   canCreateReservations: boolean;
+  tagOptions: TagOptionsList;
 }
 
 function UnitReservationsInner({
   unitPk,
   reservationUnitOptions,
   canCreateReservations,
-}: UnitReservationsProps): JSX.Element {
+}: Omit<UnitReservationsProps, "tagOptions">): JSX.Element {
   const searchParams = useSearchParams();
   const { t } = useTranslation();
   const { reservationUnitTypeFilter } = useGetFilterSearchParams();
@@ -76,10 +76,8 @@ function UnitReservationsInner({
   );
 }
 
-export function UnitReservations(props: UnitReservationsProps): JSX.Element {
+export function UnitReservations({ tagOptions, ...props }: UnitReservationsProps): JSX.Element {
   const { t } = useTranslation();
-
-  const options = useFilterOptions();
 
   const searchParams = useSearchParams();
   const setSearchParams = useSetSearchParams();
@@ -107,10 +105,10 @@ export function UnitReservations(props: UnitReservationsProps): JSX.Element {
             zIndex: "var(--tilavaraus-admin-stack-select-over-calendar)",
           }}
           name="reservationUnitType"
-          options={options.reservationUnitTypes}
+          options={tagOptions.reservationUnitTypes}
         />
       </AutoGrid>
-      <SearchTags hide={hideTags} translateTag={translateTag(t, options)} />
+      <SearchTags hide={hideTags} translateTag={translateTag(t, tagOptions)} />
       <HR />
       <Flex $gap="none" $direction="row" $justifyContent="space-between" $alignItems="center">
         <Button size={ButtonSize.Small} variant={ButtonVariant.Secondary} onClick={handleTodayClick}>
