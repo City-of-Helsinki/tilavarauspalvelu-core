@@ -9,6 +9,9 @@ import { formatAddress } from "@/common/util";
 import { getReservationSeriesUrl } from "@/common/urls";
 import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
+  FilterOptionsDocument,
+  type FilterOptionsQuery,
+  type FilterOptionsQueryVariables,
   UnitViewDocument,
   type UnitViewQuery,
   type UnitViewQueryVariables,
@@ -29,6 +32,7 @@ import { fromUIDate } from "common/src/common/util";
 import { addMinutes } from "date-fns";
 import { createClient } from "@/common/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";
+import { getFilterOptions } from "@/hooks/useFilterOptions";
 
 const LocationOnlyOnDesktop = styled.p`
   display: none;
@@ -42,9 +46,11 @@ const TabPanel = styled(Tabs.TabPanel)`
   padding-block: var(--spacing-m);
 `;
 
-export default function MyUnitsPage({ unit }: Pick<PropsNarrowed, "unit">): JSX.Element {
+export default function MyUnitsPage({ unit, optionsData }: Pick<PropsNarrowed, "unit" | "optionsData">): JSX.Element {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
+
+  const options = getFilterOptions(t, optionsData);
 
   const createReservationBtnRef = useRef<HTMLButtonElement>(null);
   const { user } = useSession();
@@ -146,6 +152,7 @@ export default function MyUnitsPage({ unit }: Pick<PropsNarrowed, "unit">): JSX.
               reservationUnitOptions={reservationUnitOptions}
               unitPk={unit.pk ?? 0}
               canCreateReservations={canCreateReservations}
+              tagOptions={options}
             />
           </TabPanel>
           <TabPanel>
@@ -179,13 +186,24 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
   if (pk == null || pk <= 0) {
     return NOT_FOUND_SSR_VALUE;
   }
-
+  const start = performance.now();
   const commonProps = await getCommonServerSideProps();
   const apolloClient = createClient(commonProps.apiBaseUrl ?? "", req);
-  const { data } = await apolloClient.query<UnitViewQuery, UnitViewQueryVariables>({
+  const unitQuery = apolloClient.query<UnitViewQuery, UnitViewQueryVariables>({
     query: UnitViewDocument,
     variables: { id: createNodeId("UnitNode", pk) },
   });
+  const optionsQuery = apolloClient.query<FilterOptionsQuery, FilterOptionsQueryVariables>({
+    query: FilterOptionsDocument,
+  });
+
+  const [unitQueryRes, optionsQueryRes] = await Promise.all([unitQuery, optionsQuery]);
+  const { data } = unitQueryRes;
+  const { data: optionsData } = optionsQueryRes;
+
+  const end = performance.now();
+  // oxlint-disable-next-line no-console
+  console.log(`SSR queries took: ${end - start} ms`);
 
   const { unit } = data;
   if (unit == null) {
@@ -195,6 +213,7 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
   return {
     props: {
       unit,
+      optionsData,
       ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
