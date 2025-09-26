@@ -1,5 +1,6 @@
-import { addSeconds } from "date-fns";
+import { addSeconds, addWeeks, startOfISOWeek } from "date-fns";
 import { type CalendarEventBuffer } from "./Calendar";
+import { ReservableTimeSpanType } from "../../gql/gql-types";
 
 export type ReservationEventType = {
   beginsAt: string;
@@ -35,4 +36,37 @@ export function getEventBuffers(events: ReservationEventType[]): CalendarEventBu
   }
 
   return buffers;
+}
+
+/// Invert reservable timespans to get closed timespans
+export function getEventClosedHours(events: ReservableTimeSpanType[], weekBegin: Date): CalendarEventBuffer[] {
+  if (events.length === 0) return [];
+
+  const weekBeginTime = startOfISOWeek(weekBegin);
+  const weekEndTime = addWeeks(weekBeginTime, 1);
+
+  // Create a closed event spanning the whole week
+  const closedEvents: CalendarEventBuffer[] = [
+    {
+      start: weekBeginTime,
+      end: weekEndTime,
+      event: { state: "CLOSED" },
+    },
+  ];
+
+  // For every reservable timespan, split the last closed event into two parts:
+  // one before and one after the reservable timespan
+  for (const rst of events) {
+    const rstStart = new Date(rst.startDatetime);
+    const rstEnd = new Date(rst.endDatetime);
+
+    (closedEvents[closedEvents.length - 1] as CalendarEventBuffer).end = rstStart;
+    closedEvents.push({
+      start: rstEnd,
+      end: weekEndTime,
+      event: { state: "CLOSED" },
+    });
+  }
+
+  return closedEvents;
 }
