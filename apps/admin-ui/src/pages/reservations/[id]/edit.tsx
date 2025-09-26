@@ -9,19 +9,14 @@ import {
   type ReservationPermissionsQuery,
   type ReservationPermissionsQueryVariables,
   UserPermissionChoice,
+  ReserveeType,
 } from "@gql/gql-types";
 import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ErrorBoundary } from "react-error-boundary";
-import {
-  ReservationChangeFormSchema,
-  type ReservationChangeFormType,
-  type ReservationFormMeta,
-  ReservationTypeSchema,
-} from "@/schemas";
-import ReservationTypeForm from "@/component/ReservationTypeForm";
+import { ReservationChangeFormSchema, type ReservationChangeFormType } from "common/src/schemas";
+import { ReservationTypeForm } from "@/component/ReservationTypeForm";
 import { useReservationEditData, useSession, useStaffReservationMutation } from "@/hooks";
-import { errorToast } from "common/src/components/toast";
 import { ButtonContainer, CenterSpinner, Flex, HR } from "common/styled";
 import { createTagString } from "@/modules/reservation";
 import { ReservationTitleSection } from "@lib/reservations/[id]";
@@ -38,8 +33,6 @@ import { createClient } from "@/common/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";
 
 type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
-type FormValueType = ReservationChangeFormType & ReservationFormMeta;
-
 const InnerTextInput = styled(TextInput)`
   grid-column: 1 / -1;
   max-width: var(--prose-width);
@@ -59,34 +52,26 @@ function EditReservation({
   const reservationUnit = reservation.reservationUnit;
 
   // TODO recurring requires a description and a name box
-  const form = useForm<FormValueType>({
-    // @ts-expect-error -- schema refinement breaks typing
-    resolver: zodResolver(
-      ReservationChangeFormSchema.refine((x) => x.seriesName || !reservation.reservationSeries, {
-        path: ["seriesName"],
-        message: "Required",
-      })
-    ),
+  const form = useForm<ReservationChangeFormType>({
+    resolver: zodResolver(ReservationChangeFormSchema),
     mode: "onChange",
     defaultValues: {
       seriesName: reservation.reservationSeries?.name ?? "",
       comments: reservation.workingMemo ?? "",
-      type: ReservationTypeSchema.optional().parse(reservation.type?.toUpperCase()),
+      type: reservation.type ?? undefined,
       name: reservation.name ?? "",
       description: reservation.description ?? "",
       ageGroup: reservation.ageGroup?.pk ?? undefined,
       applyingForFreeOfCharge: reservation.applyingForFreeOfCharge ?? undefined,
+      reserveeIsUnregisteredAssociation:
+        reservation.reserveeType === ReserveeType.Nonprofit && reservation.reserveeIdentifier === "",
       freeOfChargeReason: reservation.freeOfChargeReason ?? undefined,
       municipality: reservation.municipality ?? undefined,
       numPersons: reservation.numPersons ?? undefined,
       purpose: reservation.purpose?.pk ?? undefined,
-      reserveeAddressCity: reservation.reserveeAddressCity ?? "",
-      reserveeAddressStreet: reservation.reserveeAddressStreet ?? "",
-      reserveeAddressZip: reservation.reserveeAddressZip ?? "",
       reserveeEmail: reservation.reserveeEmail ?? "",
       reserveeFirstName: reservation.reserveeFirstName ?? "",
       reserveeIdentifier: reservation.reserveeIdentifier ?? "",
-      reserveeIsUnregisteredAssociation: !!reservation.reserveeIdentifier,
       reserveeLastName: reservation.reserveeLastName ?? "",
       reserveeOrganisationName: reservation.reserveeOrganisationName ?? "",
       reserveePhone: reservation.reserveePhone ?? "",
@@ -99,21 +84,13 @@ function EditReservation({
     onSuccess,
   });
 
-  const onSubmit = (values: FormValueType) => {
-    if (!reservationUnit.pk) {
-      errorToast({ text: "ERROR: Can't update without reservation unit" });
-      return;
-    }
-    if (!reservation.pk) {
-      errorToast({ text: "ERROR: Can't update without reservation" });
-      return;
-    }
-
+  const onSubmit = (values: ReservationChangeFormType) => {
     const { seriesName, comments, reserveeIsUnregisteredAssociation, reserveeIdentifier, ...rest } = values;
 
     const toSubmit = {
+      // TODO don't use spread it breaks type checking for unknown fields
       ...rest,
-      seriesName: seriesName !== "" ? seriesName : undefined,
+      seriesName,
       // force update to empty -> NA
       reserveeIdentifier: !reserveeIsUnregisteredAssociation ? reserveeIdentifier : "",
       workingMemo: comments,
@@ -270,7 +247,7 @@ export const RESERVATION_EDIT_PAGE_QUERY = gql`
       pk
       ...CreateTagString
       ...ReservationCommonFields
-      ...ReservationMetaFields
+      ...ReservationFormFields
       ...ReservationTitleSectionFields
       ...UseStaffReservation
       reservationSeries {

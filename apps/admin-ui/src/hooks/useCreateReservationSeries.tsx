@@ -6,7 +6,7 @@ import {
   useCreateReservationSeriesMutation,
   type ReservationSeriesReservationCreateSerializerInput,
 } from "@gql/gql-types";
-import type { ReservationSeriesForm, ReservationFormMeta } from "@/schemas";
+import { type ReservationSeriesFormValues } from "@/schemas";
 import { fromUIDateUnsafe, toApiDateUnsafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
 import { useSession } from "@/hooks";
@@ -34,8 +34,7 @@ export function useCreateReservationSeries() {
 
   // NOTE unsafe
   const mutate = async (props: {
-    // FIXME this type is incorrect, it should include the reservation meta fields
-    data: ReservationSeriesForm & ReservationFormMeta;
+    data: Omit<ReservationSeriesFormValues, "enableBufferTimeAfter" | "enableBufferTimeBefore">;
     skipDates: Date[];
     reservationUnitPk: number;
     buffers: { before?: number; after?: number };
@@ -54,19 +53,17 @@ export function useCreateReservationSeries() {
       repeatPattern,
       reserveeType,
       reserveeIsUnregisteredAssociation,
-      enableBufferTimeAfter,
-      enableBufferTimeBefore,
       reserveeIdentifier,
       ...rest
     } = data;
 
-    const name = data.type === "BLOCKED" ? "BLOCKED" : (seriesName ?? "");
-
     if (user?.pk == null) {
       throw new Error("Current user pk missing");
     }
+    const name = data.type === "BLOCKED" ? "BLOCKED" : (seriesName ?? "");
 
     const reservationDetails: ReservationSeriesReservationCreateSerializerInput = {
+      // TODO don't use spread it breaks type checking for unknown fields
       ...rest,
       type: transformReservationTypeStaffChoice(type),
       reserveeIdentifier: !reserveeIsUnregisteredAssociation ? reserveeIdentifier : undefined,

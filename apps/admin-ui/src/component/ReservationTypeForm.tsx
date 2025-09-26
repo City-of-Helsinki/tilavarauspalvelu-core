@@ -1,22 +1,19 @@
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
-import {
-  AuthenticationType,
-  type Maybe,
-  ReservationTypeChoice,
-  type ReservationTypeFormFieldsFragment,
-} from "@gql/gql-types";
+import { AuthenticationType, ReservationTypeChoice, type ReservationTypeFormFieldsFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { type ReservationFormType, ReservationTypes } from "@/schemas";
+import { type CreateStaffReservationFormValues, ReservationTypes } from "common/src/schemas";
 import { ShowAllContainer } from "common/src/components";
-import { ReservationMetadataSetForm, ReserverMetadataSetForm } from "./MetadataSetForm";
+import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "common/src/reservation-form";
 import { BufferToggles } from "./BufferToggles";
 import ShowTOS from "./ShowTOS";
 import { Element } from "@/styled";
 import { gql } from "@apollo/client";
 import { HR } from "common/styled";
+import type { OptionsRecord } from "common";
+import { useFilterOptions } from "@/hooks/useFilterOptions";
 
 const CommentsTextArea = styled(TextArea)`
   grid-column: 1 / -1;
@@ -34,7 +31,7 @@ function TypeSelect({ isDisabled }: { isDisabled?: boolean }) {
     watch,
     control,
     formState: { errors },
-  } = useFormContext<ReservationFormType>();
+  } = useFormContext<CreateStaffReservationFormValues>();
   const { t } = useTranslation();
 
   const type = watch("type");
@@ -74,26 +71,31 @@ function TypeSelect({ isDisabled }: { isDisabled?: boolean }) {
   );
 }
 
+type ReservationTypeFormProps = {
+  reservationUnit: ReservationTypeFormFieldsFragment;
+  children?: React.ReactNode;
+  disableBufferToggle?: boolean;
+  disableTypeSelect?: boolean;
+};
+
 // TODO are buffers in different places for Recurring and Single reservations? Check the UI spec
-function ReservationTypeForm({
+export function ReservationTypeForm({
   reservationUnit,
   children,
   disableBufferToggle,
   disableTypeSelect,
-}: {
-  reservationUnit: Maybe<ReservationTypeFormFieldsFragment> | undefined;
-  children?: React.ReactNode;
-  disableBufferToggle?: boolean;
-  disableTypeSelect?: boolean;
-}): JSX.Element | null {
+}: ReservationTypeFormProps): JSX.Element | null {
   const { t } = useTranslation();
 
-  const { watch, register } = useFormContext<ReservationFormType>();
+  const { watch, register } = useFormContext<CreateStaffReservationFormValues>();
   const type = watch("type");
 
-  if (reservationUnit == null) {
-    return null;
-  }
+  const { ageGroups, reservationPurposes } = useFilterOptions();
+
+  const options: OptionsRecord = {
+    ageGroup: ageGroups,
+    purpose: reservationPurposes,
+  };
 
   const showAuthWarning =
     type === ReservationTypeChoice.Behalf && reservationUnit.authentication === AuthenticationType.Strong;
@@ -103,14 +105,13 @@ function ReservationTypeForm({
       <Element $wide>
         <TypeSelect isDisabled={disableTypeSelect} />
       </Element>
-      {type === ReservationTypeChoice.Blocked && (
+      {type === ReservationTypeChoice.Blocked ? (
         <CommentsTextArea
           label={t("reservationApplication:comment")}
           id="reservationApplication:comment"
           {...register("comments")}
         />
-      )}
-      {type !== ReservationTypeChoice.Blocked && (
+      ) : (
         <>
           {showAuthWarning && (
             <Element $wide>
@@ -120,10 +121,7 @@ function ReservationTypeForm({
             </Element>
           )}
           {!disableBufferToggle && (
-            <BufferToggles
-              before={reservationUnit.bufferTimeBefore ?? 0}
-              after={reservationUnit.bufferTimeAfter ?? 0}
-            />
+            <BufferToggles before={reservationUnit.bufferTimeBefore} after={reservationUnit.bufferTimeAfter} />
           )}
           {children}
           <CommentsTextArea
@@ -134,22 +132,14 @@ function ReservationTypeForm({
           <HR style={{ gridColumn: "1 / -1" }} />
           <Element $wide>
             <div style={{ marginBottom: 48 }}>
-              <ReservationMetadataSetForm reservationUnit={reservationUnit} />
+              <ReservationFormGeneralSection reservationUnit={reservationUnit} options={options} />
             </div>
             {type === ReservationTypeChoice.Staff ? (
               <StyledShowAllContainer showAllLabel={t("myUnits:ReservationForm.showReserver")} maximumNumber={0}>
-                <>
-                  <ReserverMetadataSetForm reservationUnit={reservationUnit} />
-                  <HR style={{ gridColumn: "1 / -1" }} />
-                  <ShowTOS reservationUnit={reservationUnit} />
-                </>
+                <ReserveeFormPart reservationUnit={reservationUnit} />
               </StyledShowAllContainer>
             ) : (
-              <>
-                <ReserverMetadataSetForm reservationUnit={reservationUnit} />
-                <HR style={{ gridColumn: "1 / -1" }} />
-                <ShowTOS reservationUnit={reservationUnit} />
-              </>
+              <ReserveeFormPart reservationUnit={reservationUnit} />
             )}
           </Element>
         </>
@@ -158,11 +148,21 @@ function ReservationTypeForm({
   );
 }
 
-export default ReservationTypeForm;
+function ReserveeFormPart({ reservationUnit }: Pick<ReservationTypeFormProps, "reservationUnit">): React.ReactElement {
+  return (
+    <>
+      <ReservationFormReserveeSection reservationUnit={reservationUnit} />
+      <HR style={{ gridColumn: "1 / -1" }} />
+      <ShowTOS reservationUnit={reservationUnit} />
+    </>
+  );
+}
 
 export const RESERVATION_TYPE_FORM_FRAGMENT = gql`
   fragment ReservationTypeFormFields on ReservationUnitNode {
-    ...MetadataSets
+    reservationForm
+    minPersons
+    maxPersons
     authentication
     bufferTimeBefore
     bufferTimeAfter
