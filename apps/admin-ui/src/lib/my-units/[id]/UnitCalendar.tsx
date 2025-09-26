@@ -1,5 +1,5 @@
 import React, { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
-import { differenceInMinutes, isToday, setHours, startOfDay } from "date-fns";
+import { addMinutes, differenceInMinutes, isToday, setHours, setMinutes, startOfDay } from "date-fns";
 import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
 import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
@@ -16,11 +16,13 @@ import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
+type ReservableTimeSpanType = { start: Date; end: Date }[];
 type Resource = {
   title: string;
   pk: number;
   isDraft: boolean;
   events: CalendarEventType[];
+  reservableTimeSpans: ReservableTimeSpanType;
 };
 
 const N_HOURS = 24;
@@ -187,6 +189,7 @@ type CellProps = {
   date: Date;
   onComplete: () => void;
   hasPermission: boolean;
+  reservableTimeSpans: ReservableTimeSpanType;
 };
 
 const CellStyled = styled.div<{ $isPast?: boolean }>`
@@ -208,18 +211,54 @@ function Cell({
   date,
   hasPermission,
   reservationUnitPk,
+  reservableTimeSpans,
 }: { offset: number } & Omit<CellProps, "cols">): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
 
-  const now = new Date();
-  const isPast = (index: number) => {
-    return setHours(date, Math.round(index / 2)) < now;
-  };
-
   const cellId = `${reservationUnitPk}-${offset}`;
-  const testId = `UnitCalendar__RowCalendar--cell-${cellId}`;
+
+  const now = new Date();
+  const isPast = setHours(date, Math.round(offset / 2)) < now;
+
+  // Use date from the first reservable time span instead of `date` to prevent flickering when day is changed, which
+  // causes an API request and `reservableTimeSpans` contains `previousData`, but `date` is already the changed date
+  const reservableStartTimeDate = reservableTimeSpans[0]?.start ?? date;
+
+  // Check if the cell is open (is inside any reservable time span) and invert the result
+  const isClosed =
+    reservableTimeSpans.length > 0 && // Don't show as closed if reservable time spans are not yet loaded
+    reservableTimeSpans[0]?.start &&
+    !reservableTimeSpans.some((span) => {
+      // Cell start is at e.g. 8:00 for offset 16, 8:30 for offset 17
+      // Cell end is at e.g. 8:30 for offset 16, 9:00 for offset 17
+      const cellHours = Math.floor(offset / 2);
+      const cellMinutes = (offset * 30) % 60;
+
+      const cellStart = setMinutes(setHours(reservableStartTimeDate, cellHours), cellMinutes);
+      const cellEnd = addMinutes(cellStart, 30);
+
+      // Cell is closed, if it doesn't overlap with any reservable time span
+      // i.e. if the cell start is after the span end or the cell end is before the span start
+
+      // Is this Cell inside the reservable time span?
+      //     ┌─ Cell ─┐
+      //═══  │        │      # No
+      //═════│        │      # No
+      //═════│══      │      # Yes
+      //═════│════════│      # Yes
+      //     │        │
+      //     │  ════  │      # Yes
+      //     │════════│      # Yes
+      //═════│════════│═════ # Yes
+      //     │        │
+      //     │════════│═════ # Yes
+      //     │      ══│═════ # Yes
+      //     │        │═════ # No
+      //     │        │  ═══ # No
+      return cellStart < span.end && cellEnd > span.start;
+    });
 
   const handleOpenModal = () => {
     if (!hasPermission) {
@@ -249,10 +288,10 @@ function Cell({
     <CellStyled
       ref={ref}
       onClick={handleClick}
-      $isPast={isPast(offset)}
-      data-testid={testId}
-      tabIndex={isPast(offset) ? -1 : 0}
       onKeyDown={handleKeyDown}
+      $isPast={isPast || isClosed}
+      tabIndex={isPast || isClosed ? -1 : 0}
+      data-testid={`UnitCalendar__RowCalendar--cell-${cellId}`}
     />
   );
 }
@@ -518,6 +557,7 @@ export function UnitCalendar({
                 reservationUnitPk={row.pk}
                 hasPermission={canCreateReservations}
                 onComplete={refetch}
+                reservableTimeSpans={row.reservableTimeSpans}
               />
               {/* TODO events should be over the cells (tabindex is not correct now) */}
               <Events events={row.events} styleGetter={eventStyleGetter(row.pk)} />
