@@ -30,13 +30,11 @@ function createDummyReservationUnit(opt: ReservationUnitOption): ReservationUnit
     isDraft: opt.isDraft,
     reservationUnitType: null,
     spaces: [],
+    reservableTimeSpans: [],
     authentication: AuthenticationType.Weak,
   };
 }
 
-// TODO this should be split into two queries one for the reservation units and one for the daily reservations
-// since the reservation units only change on page load
-// reservations change when the date changes
 export function useUnitResources({
   begin,
   unitPk,
@@ -82,6 +80,11 @@ export function useUnitResources({
         start: new Date(y.beginsAt),
         end: new Date(y.endsAt),
       })),
+      reservableTimeSpans:
+        x.reservableTimeSpans?.map((rts) => ({
+          start: new Date(rts.startDatetime),
+          end: new Date(rts.endDatetime),
+        })) ?? [],
     };
   });
 
@@ -97,8 +100,8 @@ export const RESERVATION_UNITS_BY_UNIT_QUERY = gql`
     $id: ID!
     $pk: Int!
     $state: [ReservationStateChoice]
-    $beginDate: Date
-    $endDate: Date
+    $beginDate: Date!
+    $endDate: Date!
   ) {
     unit(id: $id) {
       id
@@ -118,6 +121,10 @@ export const RESERVATION_UNITS_BY_UNIT_QUERY = gql`
         bufferTimeAfter
         isDraft
         authentication
+        reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
+          startDatetime
+          endDatetime
+        }
       }
     }
     affectingReservations(beginDate: $beginDate, endDate: $endDate, state: $state, forUnits: [$pk]) {
