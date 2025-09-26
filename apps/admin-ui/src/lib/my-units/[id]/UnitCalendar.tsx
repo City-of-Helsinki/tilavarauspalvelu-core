@@ -362,19 +362,17 @@ function Event({ event, styleGetter }: EventProps): JSX.Element {
   const start = new Date(event.start);
   const endDate = new Date(event.end);
 
-  const eventStartMinutes = start.getHours() * 60 + start.getMinutes();
-  const startMinutes = eventStartMinutes;
-
-  const hourPercent = 100 / N_HOURS;
-  const hours = startMinutes / 60;
-  const left = `${hourPercent * hours}%`;
-
   const durationMinutes = differenceInMinutes(endDate, start);
 
+  const startMinutes = start.getHours() * 60 + start.getMinutes();
+  const hours = startMinutes / 60;
+
+  const hourPercent = 100 / N_HOURS;
+
+  const left = `${hourPercent * hours}%`;
   const right = `calc(${left} + ${durationMinutes / 60} * ${100 / N_HOURS}% + 1px)`;
 
   const reservation = event.event;
-  const testId = `UnitCalendar__RowCalendar--event-${reservation?.pk}`;
   return (
     <>
       <PreBuffer event={event} hourPercent={hourPercent} left={left} style={TemplateProps} />
@@ -386,7 +384,10 @@ function Event({ event, styleGetter }: EventProps): JSX.Element {
           zIndex: 5,
         }}
       >
-        <EventContent style={{ ...styleGetter(event).style }} data-testid={testId}>
+        <EventContent
+          style={{ ...styleGetter(event).style }}
+          data-testid={`UnitCalendar__RowCalendar--event-${reservation?.pk}`}
+        >
           <p>{title}</p>
           {/* NOTE don't set position on Popup it breaks responsiveness */}
           <Popup trigger={EventTriggerButton}>
@@ -430,6 +431,29 @@ interface UnitCalendarProps {
   canCreateReservations?: boolean;
 }
 
+function scrollCalendarToCurrentTime(calendarRef: React.RefObject<HTMLDivElement>, date: Date) {
+  // scroll to around 9 - 17 on load
+  const ref = calendarRef.current;
+
+  if (!ref) {
+    return;
+  }
+
+  const FIRST_HOUR = 7;
+  const now = new Date();
+  const cellToScroll = isToday(date) ? Math.min(now.getHours(), 24) : Math.min(FIRST_HOUR, 24);
+  const firstElementOfHeader = ref.querySelector(`.calendar-header > div:nth-of-type(${cellToScroll})`);
+  // horizontal scroll the calendar element
+  // NOTE Don't use scrollIntoView because it changes focus on Chrome
+  if (firstElementOfHeader && ref.parentElement) {
+    const elementPos = firstElementOfHeader.getBoundingClientRect().left;
+    // move a bit backwards to handle row title on mobile
+    const x = elementPos - 35;
+    const originalScrollLeft = ref.parentElement.scrollLeft;
+    ref.parentElement.scrollTo(x + originalScrollLeft, 0);
+  }
+}
+
 export function UnitCalendar({
   date,
   resources,
@@ -440,27 +464,8 @@ export function UnitCalendar({
   const orderedResources = sortByDraftStatusAndTitle([...resources]);
   const startDate = startOfDay(date);
 
-  // scroll to around 9 - 17 on load
   const scrollCalendar = useCallback(() => {
-    const ref = calendarRef.current;
-
-    if (!ref) {
-      return;
-    }
-
-    const FIRST_HOUR = 7;
-    const now = new Date();
-    const cellToScroll = isToday(date) ? Math.min(now.getHours(), 24) : Math.min(FIRST_HOUR, 24);
-    const firstElementOfHeader = ref.querySelector(`.calendar-header > div:nth-of-type(${cellToScroll})`);
-    // horizontal scroll the calendar element
-    // NOTE Don't use scrollIntoView because it changes focus on Chrome
-    if (firstElementOfHeader && ref.parentElement) {
-      const elementPos = firstElementOfHeader.getBoundingClientRect().left;
-      // move a bit backwards to handle row title on mobile
-      const x = elementPos - 35;
-      const originalScrollLeft = ref.parentElement.scrollLeft;
-      ref.parentElement.scrollTo(x + originalScrollLeft, 0);
-    }
+    scrollCalendarToCurrentTime(calendarRef, date);
   }, [date]);
 
   useEffect(() => {
