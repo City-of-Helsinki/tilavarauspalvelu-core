@@ -10,7 +10,7 @@ pytestmark = [
 ]
 
 
-def test_purpose__create__regular_user(graphql):
+def test_intended_use__create__regular_user(graphql):
     data = {"name": "foo"}
 
     graphql.login_with_regular_user()

@@ -12,12 +12,12 @@ from .equipment import EquipmentFactory
 from .equipment_category import EquipmentCategoryFactory
 from .general_role import GeneralRoleFactory
 from .hauki import HaukiAPIResourceFactory, HaukiAPIResourceListResponseFactory
+from .intended_use import IntendedUseFactory
 from .origin_hauki_resource import OriginHaukiResourceFactory
 from .payment_accounting import PaymentAccountingFactory
 from .payment_merchant import PaymentMerchantFactory
 from .payment_order import PaymentOrderFactory
 from .payment_product import PaymentProductFactory
-from .purpose import PurposeFactory
 from .rejected_occurrence import RejectedOccurrenceFactory
 from .reservable_time_span import ReservableTimeSpanFactory
 from .reservation import ReservationFactory
@@ -59,6 +59,7 @@ __all__ = [
     "GeneralRoleFactory",
     "HaukiAPIResourceFactory",
     "HaukiAPIResourceListResponseFactory",
+    "IntendedUseFactory",
     "OrderCustomerFactory",
     "OrderFactory",
     "OriginHaukiResourceFactory",
@@ -67,7 +68,6 @@ __all__ = [
     "PaymentMerchantFactory",
     "PaymentOrderFactory",
     "PaymentProductFactory",
-    "PurposeFactory",
     "RefundFactory",
     "RefundStatusResultFactory",
     "RejectedOccurrenceFactory",

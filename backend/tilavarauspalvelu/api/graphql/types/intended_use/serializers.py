@@ -2,16 +2,16 @@ from __future__ import annotations
 
 from graphene_django_extensions import NestingModelSerializer
 
-from tilavarauspalvelu.models import Purpose
+from tilavarauspalvelu.models import IntendedUse
 
 __all__ = [
-    "PurposeSerializer",
+    "IntendedUseSerializer",
 ]
 
 
-class PurposeSerializer(NestingModelSerializer):
+class IntendedUseSerializer(NestingModelSerializer):
     class Meta:
-        model = Purpose
+        model = IntendedUse
         fields = [
             "pk",
             "name",
