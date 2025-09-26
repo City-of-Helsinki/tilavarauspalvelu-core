@@ -94,7 +94,7 @@ def _create_caisa() -> None:
         text=(
             "Varaus maksetaan kokonaisuudessaan etukäteen varauksenteon yhteydessä. "
             "Palvelussa ilmoitetut hinnat sisältävät arvolisäveron. "
-            "Mahdolliset lisäpalvelut eivät sisälly hintaan.",
+            "Mahdolliset lisäpalvelut eivät sisälly hintaan."
         ),
         terms_type=TermsOfUseTypeChoices.PAYMENT,
     )
@@ -113,7 +113,7 @@ def _create_caisa() -> None:
             "Alennettu hinta laskutetaan. Jos valitset maksutavaksi laskun, "
             "varaus tulee maksaa eräpäivään mennessä. Lasku maksutapana edellyttää "
             "vähintään 18 vuoden ikää. Palvelussa ilmoitetut hinnat sisältävät arvolisäveron. "
-            "Mahdolliset lisäpalvelut eivät sisälly hintaan.",
+            "Mahdolliset lisäpalvelut eivät sisälly hintaan."
         ),
         terms_type=TermsOfUseTypeChoices.PAYMENT,
     )
