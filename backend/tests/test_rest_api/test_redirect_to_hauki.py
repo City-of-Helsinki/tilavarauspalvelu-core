@@ -15,7 +15,9 @@ from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory, 
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__single_reservation_unit(api_client):
+def test_redirect_to_hauki__single_reservation_unit(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     hauki_resource = OriginHaukiResourceFactory.create()
     unit = UnitFactory.create(origin_hauki_resource=hauki_resource, tprek_department_id="1234")
     reservation_unit = ReservationUnitFactory.create(
@@ -37,7 +39,7 @@ def test_redirect_to_hauki__single_reservation_unit(api_client):
 
     response = api_client.get(url)
 
-    assert response.status_code == 302
+    assert response.status_code == 302, response.content.decode()
     assert response.url == (
         "https://fake.test.hauki.admin.com/resource/test-origin%3Af08dcb9f-9765-4747-b0c8-6d472326e562/"
         "?hsa_source=test-origin"
@@ -53,7 +55,9 @@ def test_redirect_to_hauki__single_reservation_unit(api_client):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__multiple_reservation_units(api_client):
+def test_redirect_to_hauki__multiple_reservation_units(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     hauki_resource = OriginHaukiResourceFactory.create()
     unit = UnitFactory.create(origin_hauki_resource=hauki_resource, tprek_department_id="1234")
     reservation_unit_1 = ReservationUnitFactory.create(
@@ -98,7 +102,9 @@ def test_redirect_to_hauki__multiple_reservation_units(api_client):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__no_redirect_on_error(api_client):
+def test_redirect_to_hauki__no_redirect_on_error(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     hauki_resource = OriginHaukiResourceFactory.create()
     unit = UnitFactory.create(origin_hauki_resource=hauki_resource, tprek_department_id="1234")
     reservation_unit = ReservationUnitFactory.create(
@@ -128,7 +134,42 @@ def test_redirect_to_hauki__no_redirect_on_error(api_client):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__not_logged_in(api_client):
+def test_redirect_to_hauki__not_allowed_redirect_on_error(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://real.varaamo.hel.fi"]
+
+    hauki_resource = OriginHaukiResourceFactory.create()
+    unit = UnitFactory.create(origin_hauki_resource=hauki_resource, tprek_department_id="1234")
+    reservation_unit = ReservationUnitFactory.create(
+        ext_uuid=uuid.UUID("f08dcb9f-9765-4747-b0c8-6d472326e562"),
+        origin_hauki_resource=hauki_resource,
+        unit=unit,
+    )
+
+    user = UserFactory.create_superuser(email="test.user@varaamo.fi")
+
+    url = update_query_params(
+        reverse("edit_opening_hours"),
+        reservation_units=reservation_unit.pk,
+        redirect_on_error="https://fake.varaamo.hel.fi",
+        lang="en",
+    )
+
+    api_client.force_login(user)
+
+    response = api_client.get(url)
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "The 'redirect_on_error' parameter points to an origin that is not allowed.",
+        "code": "REDIRECT_ON_ERROR_ORIGIN_NOT_ALLOWED",
+    }
+
+
+@pytest.mark.django_db
+@freeze_time(local_datetime(year=2024, month=1, day=1))
+def test_redirect_to_hauki__not_logged_in(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     hauki_resource = OriginHaukiResourceFactory.create()
     unit = UnitFactory.create(origin_hauki_resource=hauki_resource, tprek_department_id="1234")
     reservation_unit = ReservationUnitFactory.create(
@@ -157,7 +198,9 @@ def test_redirect_to_hauki__not_logged_in(api_client):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__user_no_email(api_client):
+def test_redirect_to_hauki__user_no_email(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     hauki_resource = OriginHaukiResourceFactory.create()
     unit = UnitFactory.create(origin_hauki_resource=hauki_resource, tprek_department_id="1234")
     reservation_unit = ReservationUnitFactory.create(
@@ -190,7 +233,9 @@ def test_redirect_to_hauki__user_no_email(api_client):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__no_reservation_unit(api_client):
+def test_redirect_to_hauki__no_reservation_unit(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     hauki_resource = OriginHaukiResourceFactory.create()
     UnitFactory.create(origin_hauki_resource=hauki_resource, tprek_department_id="1234")
 
@@ -217,7 +262,9 @@ def test_redirect_to_hauki__no_reservation_unit(api_client):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__missing_reservation_unit(api_client):
+def test_redirect_to_hauki__missing_reservation_unit(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     hauki_resource = OriginHaukiResourceFactory.create()
     unit = UnitFactory.create(origin_hauki_resource=hauki_resource, tprek_department_id="1234")
     reservation_unit = ReservationUnitFactory.create(
@@ -250,7 +297,9 @@ def test_redirect_to_hauki__missing_reservation_unit(api_client):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__primary_unit_missing_department_id(api_client):
+def test_redirect_to_hauki__primary_unit_missing_department_id(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     hauki_resource = OriginHaukiResourceFactory.create()
     unit_1 = UnitFactory.create(origin_hauki_resource=hauki_resource)
     reservation_unit_1 = ReservationUnitFactory.create(
@@ -290,7 +339,9 @@ def test_redirect_to_hauki__primary_unit_missing_department_id(api_client):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__reservation_unit_missing_hauki_resource(api_client):
+def test_redirect_to_hauki__reservation_unit_missing_hauki_resource(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     hauki_resource = OriginHaukiResourceFactory.create()
     unit = UnitFactory.create(origin_hauki_resource=hauki_resource, tprek_department_id="1234")
     reservation_unit_1 = ReservationUnitFactory.create(
@@ -328,7 +379,9 @@ def test_redirect_to_hauki__reservation_unit_missing_hauki_resource(api_client):
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_redirect_to_hauki__reservation_unit_permission_denied(api_client):
+def test_redirect_to_hauki__reservation_unit_permission_denied(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
     hauki_resource = OriginHaukiResourceFactory.create()
     unit_1 = UnitFactory.create(origin_hauki_resource=hauki_resource, tprek_department_id="1234")
     reservation_unit_1 = ReservationUnitFactory.create(
@@ -370,6 +423,7 @@ def test_redirect_to_hauki__reservation_unit_permission_denied(api_client):
 @pytest.mark.django_db
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_redirect_to_hauki__settings_missing(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
     settings.HAUKI_ADMIN_UI_URL = None
 
     hauki_resource = OriginHaukiResourceFactory.create()
