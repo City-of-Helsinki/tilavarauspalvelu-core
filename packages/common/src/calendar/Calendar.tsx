@@ -20,7 +20,7 @@ export type CalendarEvent<T> = {
 };
 
 export type CalendarBufferEvent = {
-  state: "BUFFER";
+  state: "BUFFER" | "CLOSED";
 };
 
 export type CalendarEventBuffer = {
@@ -42,6 +42,7 @@ export type SlotClickProps = {
 
 type Props<T> = {
   events: (CalendarEvent<T> | CalendarEventBuffer)[];
+  backgroundEvents?: (CalendarEvent<T> | CalendarEventBuffer)[];
   begin: Date;
   eventStyleGetter: ({ event }: CalendarEvent<T>) => {
     style: React.CSSProperties;
@@ -469,6 +470,7 @@ const localizer = (locale: LocalizationLanguages) =>
 
 function Calendar<T extends Record<string, unknown>>({
   events,
+  backgroundEvents = [],
   begin,
   eventStyleGetter,
   slotPropGetter,
@@ -513,6 +515,7 @@ function Calendar<T extends Record<string, unknown>>({
       }}
       eventPropGetter={eventStyleGetter}
       events={events}
+      backgroundEvents={backgroundEvents}
       date={begin}
       onNavigate={onNavigate}
       view={viewType}

@@ -137,7 +137,7 @@ export function useFilterOptions(unitFilter?: number[]): TagOptionsList {
   return getFilterOptions(t, data);
 }
 
-export const FILTER_OTIONS_QUERY = gql`
+export const FILTER_OPTIONS_QUERY = gql`
   query FilterOptions(
     $orderReservationUnitTypeBy: [ReservationUnitTypeOrderingChoices!] = [nameFiAsc]
     $orderReservationPurposesBy: [ReservationPurposeOrderingChoices!] = [rankAsc]

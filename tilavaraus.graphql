@@ -2431,8 +2431,8 @@ type TaxPercentageNode implements Node {
 }
 
 type ReservableTimeSpanType {
-  startDatetime: DateTime
-  endDatetime: DateTime
+  startDatetime: DateTime!
+  endDatetime: DateTime!
 }
 
 """Ordering fields for the 'ReservationPurpose' model."""
