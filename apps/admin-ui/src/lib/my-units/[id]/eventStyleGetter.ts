@@ -5,7 +5,7 @@ import {
   type ReservationUnitReservationsFragment,
 } from "@gql/gql-types";
 import {
-  CLOSED,
+  BLOCKED,
   COMMON_LEGEND,
   CONFIRMED,
   EVENT_STYLE,
@@ -50,7 +50,7 @@ export const legend: EventStyle[] = [
   {
     key: "CLOSED",
     label: "myUnits:Calendar.legend.closed",
-    style: CLOSED.style,
+    style: BLOCKED.style,
   },
   {
     key: "RESERVATION_UNIT_RELEASED",
@@ -78,17 +78,19 @@ const eventStyleGetter =
     const isConfirmed = event?.state === ReservationStateChoice.Confirmed;
     const isWaitingForPayment = event?.state === ReservationStateChoice.WaitingForPayment;
 
-    const isClosed = event?.type === ReservationTypeChoice.Blocked;
+    const isBlocked = event?.type === ReservationTypeChoice.Blocked;
     const isStaff = event?.type === ReservationTypeChoice.Staff;
     // @ts-expect-error: TODO: we are dynamically overriding an enum upstream
     const isBuffer = event?.state === "BUFFER";
+    // @ts-expect-error: TODO: we are dynamically overriding an enum upstream
+    const isClosed = event?.state === "CLOSED";
 
     const style = {
       ...EVENT_STYLE,
     };
 
-    if (isConfirmed && isClosed) {
-      Object.assign(style, CLOSED.style);
+    if (isConfirmed && isBlocked) {
+      Object.assign(style, BLOCKED.style);
     } else if (isConfirmed && isStaff) {
       Object.assign(style, STAFF_RESERVATION.style);
     } else if (isWaitingForPayment) {
@@ -97,6 +99,18 @@ const eventStyleGetter =
       Object.assign(style, CONFIRMED.style);
     } else if (isBuffer) {
       Object.assign(style, { ...POST_PAUSE.style, border: 0 });
+    } else if (isClosed) {
+      return {
+        style: {
+          background: "var(--tilavaraus-event-booking-closed)",
+          backgroundColor: "var(--tilavaraus-event-booking-closed)",
+          borderRadius: "0px",
+          display: "block",
+          border: 0,
+          // Invisible text, real solution is to fix big-calendar not to render it
+          color: "var(--tilavaraus-event-booking-break)",
+        },
+      };
     } else {
       Object.assign(style, UNCONFIRMED.style);
     }
