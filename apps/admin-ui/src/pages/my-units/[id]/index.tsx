@@ -51,7 +51,10 @@ export default function MyUnitsPage({ unit }: Pick<PropsNarrowed, "unit">): JSX.
 
   const searchParams = useSearchParams();
   const setSearchParams = useSetSearchParams();
+
   const selectedTab = searchParams.get("tab") ?? "unit";
+  const activeTab = selectedTab === "reservation-unit" ? 1 : 0;
+
   const handleTabChange = (tab: "unit" | "reservation-unit") => {
     const vals = new URLSearchParams(searchParams);
     vals.set("tab", tab);
@@ -68,7 +71,7 @@ export default function MyUnitsPage({ unit }: Pick<PropsNarrowed, "unit">): JSX.
 
   const modalCloseRef = useRef<HTMLInputElement | null>(null);
 
-  // Find the calendar cell used to open the modal
+  // Find the calendar cell used to open the modal, so it can be focused after closing the modal
   useEffect(() => {
     const cellId = searchParams.get("cellId");
     const testId = `UnitCalendar__RowCalendar--cell-${cellId}`;
@@ -106,14 +109,11 @@ export default function MyUnitsPage({ unit }: Pick<PropsNarrowed, "unit">): JSX.
   const selectedDate = fromUIDate(searchParams.get("date") ?? "") ?? new Date();
   const timeOffset = toNumber(searchParams.get("timeOffset")) ?? 0;
 
-  const activeTab = selectedTab === "reservation-unit" ? 1 : 0;
-
-  const title = unit?.nameFi ?? "-";
+  const title = unit.nameFi ?? "-";
   const canCreateReservations =
-    hasPermission(user, UserPermissionChoice.CanCreateStaffReservations, unit.pk) &&
-    unit != null &&
-    reservationUnitOptions.length > 0;
+    hasPermission(user, UserPermissionChoice.CanCreateStaffReservations, unit.pk) && reservationUnitOptions.length > 0;
   const address = formatAddress(unit, "");
+
   return (
     <>
       <TimeZoneNotification />

@@ -40,13 +40,13 @@ function createDummyReservationUnit(opt: ReservationUnitOption): ReservationUnit
 export function useUnitResources({
   begin,
   unitPk,
-  reservationUnitOptions,
+  reservationUnitOptions, // Used to prefill the calendar before the actual data is loaded
   reservationUnitTypeFilter = [],
 }: UseUnitResourcesProps) {
   const { t } = useTranslation();
-  const isValid = Number(unitPk) > 0;
-  const { data, previousData, ...rest } = useReservationUnitsByUnitQuery({
-    skip: !isValid,
+
+  const { data, previousData, loading, refetch } = useReservationUnitsByUnitQuery({
+    skip: Number(unitPk) <= 0,
     variables: {
       id: createNodeId("UnitNode", unitPk),
       pk: Number(unitPk),
@@ -60,32 +60,32 @@ export function useUnitResources({
   });
 
   const { affectingReservations, unit } = data ?? previousData ?? {};
-  const resUnits = unit?.reservationUnits ?? reservationUnitOptions.map(createDummyReservationUnit);
 
-  const resources = resUnits
-    .filter(
-      (x) =>
-        !reservationUnitTypeFilter?.length ||
-        (x.reservationUnitType?.pk != null && reservationUnitTypeFilter.includes(x.reservationUnitType.pk))
-    )
-    .map((x) => {
-      const affecting = affectingReservations?.filter((y) => doesReservationAffectReservationUnit(y, x.pk ?? 0));
-      const events = filterNonNullable(affecting);
+  let reservationUnits = unit?.reservationUnits ?? reservationUnitOptions.map(createDummyReservationUnit);
+  if (reservationUnitTypeFilter?.length) {
+    reservationUnits = reservationUnits.filter(
+      (ru) => ru.reservationUnitType?.pk != null && reservationUnitTypeFilter.includes(ru.reservationUnitType.pk)
+    );
+  }
 
-      return {
-        title: x.nameFi ?? "",
-        isDraft: x.isDraft,
-        pk: x.pk ?? 0,
-        events: events.map((y) => ({
-          event: y,
-          title: y.name ?? "",
-          start: new Date(y.beginsAt),
-          end: new Date(y.endsAt),
-        })),
-      };
-    });
+  const resources = reservationUnits.map((x) => {
+    const affecting = affectingReservations?.filter((y) => doesReservationAffectReservationUnit(y, x.pk ?? 0));
+    const events = filterNonNullable(affecting);
 
-  return { ...rest, resources };
+    return {
+      pk: x.pk ?? 0,
+      title: x.nameFi ?? "",
+      isDraft: x.isDraft,
+      events: events.map((y) => ({
+        event: y,
+        title: y.name ?? "",
+        start: new Date(y.beginsAt),
+        end: new Date(y.endsAt),
+      })),
+    };
+  });
+
+  return { loading, refetch, resources };
 }
 
 function doesReservationAffectReservationUnit(reservation: ReservationType, reservationUnitPk: number) {
