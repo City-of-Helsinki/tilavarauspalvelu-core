@@ -39,8 +39,8 @@ class ReservableTimeSpanItem(NamedTuple):
 
 
 class ReservableTimeSpanType(graphene.ObjectType):
-    start_datetime = graphene.DateTime()
-    end_datetime = graphene.DateTime()
+    start_datetime = graphene.DateTime(required=True)
+    end_datetime = graphene.DateTime(required=True)
 
 
 class ReservationUnitNode(DjangoNode):
