@@ -56,7 +56,7 @@ export const POST_PAUSE = {
   },
 };
 
-export const CLOSED = {
+export const BLOCKED = {
   style: {
     ...STYLE_COMMON,
     backgroundColor: "var(--color-black-20)",
