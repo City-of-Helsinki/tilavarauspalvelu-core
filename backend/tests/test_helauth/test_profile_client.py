@@ -49,9 +49,7 @@ def test_helsinki_profile_client__prefill_info__all_primary():
         "reservee_last_name": "User",
         "reservee_email": "user@example.com",
         "reservee_phone": "0123456789",
-        "reservee_address_street": "Example street 1",
         "reservee_address_zip": "00100",
-        "reservee_address_city": "Helsinki",
         "municipality": MunicipalityChoice.HELSINKI.value,
     }
 
@@ -91,9 +89,7 @@ def test_helsinki_profile_client__prefill_info__highest_priority_address(types, 
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
-    assert prefill_info["reservee_address_street"] == addresses[select]["address"]
     assert prefill_info["reservee_address_zip"] == addresses[select]["postalCode"]
-    assert prefill_info["reservee_address_city"] == addresses[select]["city"]
 
 
 @patch_method(HelsinkiProfileClient.request)
@@ -111,9 +107,7 @@ def test_helsinki_profile_client__prefill_info__permanent_address():
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
-    assert prefill_info["reservee_address_street"] == "Permanent street 1"
     assert prefill_info["reservee_address_zip"] == "00100"
-    assert prefill_info["reservee_address_city"] == "Helsinki"
 
 
 @patch_method(HelsinkiProfileClient.request)
@@ -130,9 +124,7 @@ def test_helsinki_profile_client__prefill_info__permanent_foreign_address():
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
-    assert prefill_info["reservee_address_street"] == "Foreign street 1"
     assert prefill_info["reservee_address_zip"] is None
-    assert prefill_info["reservee_address_city"] is None
 
 
 @patch_method(HelsinkiProfileClient.request)
@@ -149,9 +141,7 @@ def test_helsinki_profile_client__prefill_info__no_address():
     user = UserFactory.create()
     prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
-    assert prefill_info["reservee_address_street"] is None
     assert prefill_info["reservee_address_zip"] is None
-    assert prefill_info["reservee_address_city"] is None
 
 
 @patch_method(HelsinkiProfileClient.request)
