@@ -423,14 +423,6 @@ function sortByDraftStatusAndTitle(resources: Resource[]) {
   });
 }
 
-interface UnitCalendarProps {
-  date: Date;
-  resources: Resource[];
-  refetch: () => void;
-  isLoading?: boolean;
-  canCreateReservations?: boolean;
-}
-
 function scrollCalendarToCurrentTime(calendarRef: React.RefObject<HTMLDivElement>, date: Date) {
   // scroll to around 9 - 17 on load
   const ref = calendarRef.current;
@@ -454,11 +446,20 @@ function scrollCalendarToCurrentTime(calendarRef: React.RefObject<HTMLDivElement
   }
 }
 
+interface UnitCalendarProps {
+  date: Date;
+  resources: Resource[];
+  refetch: () => void;
+  canCreateReservations?: boolean;
+  isLoading: boolean;
+}
+
 export function UnitCalendar({
   date,
   resources,
   refetch,
   canCreateReservations = false,
+  isLoading,
 }: UnitCalendarProps): JSX.Element {
   const calendarRef = useRef<HTMLDivElement>(null);
   const orderedResources = sortByDraftStatusAndTitle([...resources]);
@@ -490,9 +491,11 @@ export function UnitCalendar({
 
   const height = resources.length > MAX_RESOURCES_WITHOUT_SCROLL ? containerHeight : "auto";
 
-  /* TODO use a darker background if loading */
   return (
-    <Container $height={height}>
+    <Container
+      $height={height}
+      style={{ background: isLoading ? "var(--tilavaraus-event-booking-past-date)" : "transparent" }}
+    >
       <HideTimesOverTitles />
       <FlexContainer $numCols={N_COLS} ref={calendarRef}>
         <HeadingRow>
