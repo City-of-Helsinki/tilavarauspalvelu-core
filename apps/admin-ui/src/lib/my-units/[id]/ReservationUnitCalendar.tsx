@@ -112,8 +112,13 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
     };
   });
 
-  const evts = filterNonNullable(events.map((e) => e.event)).filter((e) => e.type !== ReservationTypeChoice.Blocked);
-  const eventBuffers = getEventBuffers(evts);
+  const eventBuffers = getEventBuffers(
+    filterNonNullable(events.map((e) => e.event)).filter((e) => e.type !== ReservationTypeChoice.Blocked)
+  ).filter((buffer) => {
+    // Show buffers only between 06:00-23:00
+    // Without this fiter there might be a bugger starting at 05:30, which overlaps the reservation starting at 06:00
+    return buffer.start.getHours() >= 6 && buffer.end.getHours() > 6;
+  });
 
   return (
     <Container>
