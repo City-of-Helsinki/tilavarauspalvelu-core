@@ -11,7 +11,7 @@ import {
   useReservationUnitCalendarQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { getEventBuffers } from "common/src/calendar/util";
+import { getEventBuffers, getEventClosedHours } from "common/src/calendar/util";
 import { getReservationUrl } from "@/common/urls";
 import { Legend, LegendsWrapper } from "@/component/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
@@ -70,7 +70,6 @@ function constructEventTitle(res: ReservationType, resUnitPk: number, t: TFuncti
   return reservee;
 }
 
-// TODO this is a copy of the RequestedReservationCalendar
 export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Props): JSX.Element {
   const { t } = useTranslation();
   const { hasPermission } = useCheckPermission({
@@ -80,6 +79,7 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
 
   const calendarEventExcludedLegends = ["RESERVATION_UNIT_RELEASED", "RESERVATION_UNIT_DRAFT"];
 
+  const beginDate = new Date(begin);
   const { data, loading: isLoading } = useReservationUnitCalendarQuery({
     fetchPolicy: "network-only",
     skip: reservationUnitPk === 0,
@@ -87,8 +87,8 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
       id: createNodeId("ReservationUnitNode", reservationUnitPk),
       pk: reservationUnitPk,
       state: RELATED_RESERVATION_STATES,
-      beginDate: toApiDate(startOfISOWeek(new Date(begin))) ?? "",
-      endDate: toApiDate(addDays(endOfISOWeek(new Date(begin)), 1)) ?? "",
+      beginDate: toApiDate(startOfISOWeek(beginDate)) ?? "",
+      endDate: toApiDate(addDays(endOfISOWeek(beginDate), 1)) ?? "",
     },
     onError: () => {
       errorToast({
@@ -120,11 +120,17 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
     return buffer.start.getHours() >= 6 && buffer.end.getHours() > 6;
   });
 
+  const eventClosedHours = getEventClosedHours(
+    filterNonNullable(data?.reservationUnit?.reservableTimeSpans),
+    beginDate
+  );
+
   return (
     <Container>
       <CommonCalendar
         events={[...events, ...eventBuffers]}
-        begin={startOfISOWeek(new Date(begin))}
+        backgroundEvents={eventClosedHours}
+        begin={startOfISOWeek(beginDate)}
         eventStyleGetter={eventStyleGetter(reservationUnitPk)}
         isLoading={isLoading}
         onSelectEvent={(e) => {
@@ -150,8 +156,8 @@ export const RESERVATION_UNIT_CALENDAR_QUERY = gql`
     $id: ID!
     $pk: Int!
     $state: [ReservationStateChoice]
-    $beginDate: Date
-    $endDate: Date
+    $beginDate: Date!
+    $endDate: Date!
   ) {
     reservationUnit(id: $id) {
       id
@@ -159,6 +165,10 @@ export const RESERVATION_UNIT_CALENDAR_QUERY = gql`
       reservations(state: $state, beginDate: $beginDate, endDate: $endDate) {
         ...ReservationUnitReservations
         ...CombineAffectedReservations
+      }
+      reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
+        startDatetime
+        endDatetime
       }
     }
     affectingReservations(forReservationUnits: [$pk], state: $state, beginDate: $beginDate, endDate: $endDate) {
