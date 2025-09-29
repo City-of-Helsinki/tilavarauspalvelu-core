@@ -357,6 +357,10 @@ const StyledCalendar = styled(BigCalendar)<{
     border-left: 2px solid var(--color-black-30);
   }
 
+  .rbc-event-buffer {
+    background-color: var(--tilavaraus-event-booking-break);
+  }
+
   .rbc-event {
     &:hover {
       cursor: default;
