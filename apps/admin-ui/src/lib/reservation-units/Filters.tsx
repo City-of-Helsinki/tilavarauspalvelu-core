@@ -32,6 +32,7 @@ type SearchFormValues = {
   unit: number[];
   reservationUnitType: number[];
   reservationUnitState: ReservationUnitPublishingState[];
+  unitGroup: number[];
   maxPersonsGte?: number;
   maxPersonsLte?: number;
   surfaceAreaGte?: number;
@@ -44,6 +45,7 @@ function mapParamsToForm(searchParams: ReadonlyURLSearchParams): SearchFormValue
     reservationUnitTypeFilter,
     textFilter,
     reservationUnitStateFilter,
+    unitGroupFilter,
     maxPersonsGteFilter: maxPersonsGte,
     maxPersonsLteFilter: maxPersonsLte,
     surfaceAreaGteFilter: surfaceAreaGte,
@@ -54,6 +56,7 @@ function mapParamsToForm(searchParams: ReadonlyURLSearchParams): SearchFormValue
     unit: unitFilter ?? [],
     reservationUnitType: reservationUnitTypeFilter ?? [],
     reservationUnitState: reservationUnitStateFilter ?? [],
+    unitGroup: unitGroupFilter ?? [],
     maxPersonsGte,
     maxPersonsLte,
     surfaceAreaGte,
@@ -79,6 +82,7 @@ export function Filters({ options }: { options: TagOptionsList }): JSX.Element {
     reset(mapParamsToForm(searchParams));
   }, [searchParams, reset]);
   const initiallyOpen =
+    defaultValues.unitGroup != null ||
     defaultValues.maxPersonsGte != null ||
     defaultValues.maxPersonsLte != null ||
     defaultValues.surfaceAreaGte != null ||
@@ -104,6 +108,7 @@ export function Filters({ options }: { options: TagOptionsList }): JSX.Element {
           options={options.reservationUnitStates}
           name="reservationUnitState"
         />
+        <ControlledMultiSelectFilter control={control} name="unitGroup" options={options.unitGroups} />
         <ControlledRangeNumberFilter
           control={control}
           label={t("filters:label.maxPersons")}
