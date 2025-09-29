@@ -88,7 +88,7 @@ export function getFilteredGeneralFields(formType: ReservationFormType): FormFie
 
 /// Get stored reservation fields (graphql) based on form type.
 function getFormFields(type: ReservationFormType): FormFieldArray {
-  const schema = getReservationSchemaBase(type);
+  const schema = getReservationSchemaBase(type)({ minPersons: 1, maxPersons: Infinity });
   const keys = schema.keyof().options;
   // @ts-expect-error -- keyof returns incorrect type (picking the first option from discriminating union)
   return keys.filter((x) => x !== ("reserveeIsUnregisteredAssociation" as const)) satisfies FormFieldArray;
