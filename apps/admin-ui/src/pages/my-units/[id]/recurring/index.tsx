@@ -1,3 +1,4 @@
+import TimeZoneNotification from "common/src/components/TimeZoneNotification";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { ReservationSeriesForm } from "@lib/my-units/[id]/recurring/ReservationSeriesForm";
@@ -34,6 +35,7 @@ export default function Page({ apiBaseUrl, unitPk, reservationUnits }: PropsNarr
       permission={UserPermissionChoice.CanCreateStaffReservations}
       unitPk={unitPk}
     >
+      <TimeZoneNotification />
       <LinkPrev />
       <H1 $noMargin>{t("myUnits:ReservationSeries.pageTitle")}</H1>
       {reservationUnitOptions.length > 0 ? (
