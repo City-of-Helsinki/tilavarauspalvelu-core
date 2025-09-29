@@ -97,7 +97,6 @@ export function ReservationFormGeneralSection({ reservationUnit, options, data }
           type="text"
           errorText={getFieldError("name")}
           invalid={getFieldError("name") != null}
-          required
           maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
           $isWide
         />
@@ -122,8 +121,7 @@ export function ReservationFormGeneralSection({ reservationUnit, options, data }
           label={createLabel("numPersons")}
           errorText={getFieldError("numPersons")}
           required
-          min={1} //minValue}
-          // max={maxValue}
+          min={1}
         />
       )}
       {hasAgeGroup && (
