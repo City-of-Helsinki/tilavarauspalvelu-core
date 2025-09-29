@@ -11,7 +11,7 @@ import {
   useReservationUnitCalendarQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { getEventBuffers, getEventClosedHours } from "common/src/calendar/util";
+import { getEventBuffers, useSlotPropGetter } from "common/src/calendar/util";
 import { getReservationUrl } from "@/common/urls";
 import { Legend, LegendsWrapper } from "@/component/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
@@ -120,16 +120,13 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
     return buffer.start.getHours() >= 6 && buffer.end.getHours() > 6;
   });
 
-  const eventClosedHours = getEventClosedHours(
-    filterNonNullable(data?.reservationUnit?.reservableTimeSpans),
-    beginDate
-  );
+  const slotPropGetter = useSlotPropGetter(filterNonNullable(data?.reservationUnit?.reservableTimeSpans));
 
   return (
     <Container>
       <CommonCalendar
         events={[...events, ...eventBuffers]}
-        backgroundEvents={eventClosedHours}
+        slotPropGetter={slotPropGetter}
         begin={startOfISOWeek(beginDate)}
         eventStyleGetter={eventStyleGetter(reservationUnitPk)}
         isLoading={isLoading}

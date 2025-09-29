@@ -82,8 +82,6 @@ const eventStyleGetter =
     const isStaff = event?.type === ReservationTypeChoice.Staff;
     // @ts-expect-error: TODO: we are dynamically overriding an enum upstream
     const isBuffer = event?.state === "BUFFER";
-    // @ts-expect-error: TODO: we are dynamically overriding an enum upstream
-    const isClosed = event?.state === "CLOSED";
 
     const style = {
       ...EVENT_STYLE,
@@ -99,18 +97,6 @@ const eventStyleGetter =
       Object.assign(style, CONFIRMED.style);
     } else if (isBuffer) {
       Object.assign(style, { ...POST_PAUSE.style, border: 0 });
-    } else if (isClosed) {
-      return {
-        style: {
-          background: "var(--tilavaraus-event-booking-closed)",
-          backgroundColor: "var(--tilavaraus-event-booking-closed)",
-          borderRadius: "0px",
-          display: "block",
-          border: 0,
-          // Invisible text, real solution is to fix big-calendar not to render it
-          color: "var(--tilavaraus-event-booking-break)",
-        },
-      };
     } else {
       Object.assign(style, UNCONFIRMED.style);
     }
