@@ -1,6 +1,7 @@
-import { addSeconds, addWeeks, startOfISOWeek } from "date-fns";
-import { type CalendarEventBuffer } from "./Calendar";
+import { addMinutes, addSeconds } from "date-fns";
+import { type CalendarEventBuffer, SlotProps } from "./Calendar";
 import { ReservableTimeSpanType } from "../../gql/gql-types";
+import { useMemo } from "react";
 
 export type ReservationEventType = {
   beginsAt: string;
@@ -8,6 +9,8 @@ export type ReservationEventType = {
   bufferTimeBefore: number;
   bufferTimeAfter: number;
 };
+
+export type TimeSpanType = { start: Date; end: Date };
 
 export function getEventBuffers(events: ReservationEventType[]): CalendarEventBuffer[] {
   const buffers: CalendarEventBuffer[] = [];
@@ -38,35 +41,49 @@ export function getEventBuffers(events: ReservationEventType[]): CalendarEventBu
   return buffers;
 }
 
-/// Invert reservable timespans to get closed timespans
-export function getEventClosedHours(events: ReservableTimeSpanType[], weekBegin: Date): CalendarEventBuffer[] {
-  if (events.length === 0) return [];
+export function isCellOverlappingSpan(cellStart: Date, cellEnd: Date, spanStart: Date, spanEnd: Date): boolean {
+  // Is this Cell inside the reservable time span?
+  //     ┌─ Cell ─┐
+  //═══  │        │      # No
+  //═════│        │      # No
+  //═════│══      │      # Yes
+  //═════│════════│      # Yes
+  //     │        │
+  //     │  ════  │      # Yes
+  //     │════════│      # Yes
+  //═════│════════│═════ # Yes
+  //     │        │
+  //     │════════│═════ # Yes
+  //     │      ══│═════ # Yes
+  //     │        │═════ # No
+  //     │        │  ═══ # No
+  return cellStart < spanEnd && cellEnd > spanStart;
+}
 
-  const weekBeginTime = startOfISOWeek(weekBegin);
-  const weekEndTime = addWeeks(weekBeginTime, 1);
+export function useSlotPropGetter(reservableTimeSpans: ReservableTimeSpanType[]): (date: Date) => SlotProps {
+  return useMemo(() => {
+    const reservableTimeSpanDates: TimeSpanType[] = reservableTimeSpans?.map((rts) => ({
+      start: new Date(rts.startDatetime),
+      end: new Date(rts.endDatetime),
+    }));
 
-  // Create a closed event spanning the whole week
-  const closedEvents: CalendarEventBuffer[] = [
-    {
-      start: weekBeginTime,
-      end: weekEndTime,
-      event: { state: "CLOSED" },
-    },
-  ];
+    return (date: Date): SlotProps => {
+      const isPast = date < new Date();
+      if (isPast) return { className: "rbc-timeslot-inactive" };
 
-  // For every reservable timespan, split the last closed event into two parts:
-  // one before and one after the reservable timespan
-  for (const rst of events) {
-    const rstStart = new Date(rst.startDatetime);
-    const rstEnd = new Date(rst.endDatetime);
+      if (reservableTimeSpanDates.length === 0) return { className: "rbc-timeslot-inactive" };
 
-    (closedEvents[closedEvents.length - 1] as CalendarEventBuffer).end = rstStart;
-    closedEvents.push({
-      start: rstEnd,
-      end: weekEndTime,
-      event: { state: "CLOSED" },
-    });
-  }
+      // Calendar cells are 30min slots
+      const cellStart = date;
+      const cellEnd = addMinutes(cellStart, 30);
 
-  return closedEvents;
+      // Cell is closed, if it doesn't overlap with any reservable time span
+      const isClosed = !reservableTimeSpanDates.some((span) => {
+        return isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end);
+      });
+      if (isClosed) return { className: "rbc-timeslot-inactive" };
+
+      return {};
+    };
+  }, [reservableTimeSpans]);
 }

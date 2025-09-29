@@ -14,15 +14,15 @@ import { ReservationPopupContent } from "./ReservationPopupContent";
 import eventStyleGetter from "./eventStyleGetter";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { isCellOverlappingSpan, TimeSpanType } from "common/src/calendar/util";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
-type ReservableTimeSpanType = { start: Date; end: Date }[];
 type Resource = {
   title: string;
   pk: number;
   isDraft: boolean;
   events: CalendarEventType[];
-  reservableTimeSpans: ReservableTimeSpanType;
+  reservableTimeSpans: TimeSpanType[];
 };
 
 const N_HOURS = 24;
@@ -189,7 +189,7 @@ type CellProps = {
   date: Date;
   onComplete: () => void;
   hasPermission: boolean;
-  reservableTimeSpans: ReservableTimeSpanType;
+  reservableTimeSpans: TimeSpanType[];
 };
 
 const CellStyled = styled.div<{ $isPast?: boolean }>`
@@ -242,22 +242,7 @@ function Cell({
       // Cell is closed, if it doesn't overlap with any reservable time span
       // i.e. if the cell start is after the span end or the cell end is before the span start
 
-      // Is this Cell inside the reservable time span?
-      //     ┌─ Cell ─┐
-      //═══  │        │      # No
-      //═════│        │      # No
-      //═════│══      │      # Yes
-      //═════│════════│      # Yes
-      //     │        │
-      //     │  ════  │      # Yes
-      //     │════════│      # Yes
-      //═════│════════│═════ # Yes
-      //     │        │
-      //     │════════│═════ # Yes
-      //     │      ══│═════ # Yes
-      //     │        │═════ # No
-      //     │        │  ═══ # No
-      return cellStart < span.end && cellEnd > span.start;
+      return isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end);
     });
 
   const handleOpenModal = () => {
