@@ -11,7 +11,7 @@ import {
   useReservationUnitCalendarQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { getEventBuffers, useSlotPropGetter } from "common/src/calendar/util";
+import { useSlotPropGetter } from "common/src/calendar/util";
 import { getReservationUrl } from "@/common/urls";
 import { Legend, LegendsWrapper } from "@/component/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
@@ -112,20 +112,15 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
     };
   });
 
-  const eventBuffers = getEventBuffers(
-    filterNonNullable(events.map((e) => e.event)).filter((e) => e.type !== ReservationTypeChoice.Blocked)
-  ).filter((buffer) => {
-    // Show buffers only between 06:00-23:00
-    // Without this fiter there might be a bugger starting at 05:30, which overlaps the reservation starting at 06:00
-    return buffer.start.getHours() >= 6 && buffer.end.getHours() > 6;
-  });
-
-  const slotPropGetter = useSlotPropGetter(filterNonNullable(data?.reservationUnit?.reservableTimeSpans));
+  const slotPropGetter = useSlotPropGetter(
+    filterNonNullable(data?.reservationUnit?.reservableTimeSpans),
+    filterNonNullable(reservations)
+  );
 
   return (
     <Container>
       <CommonCalendar
-        events={[...events, ...eventBuffers]}
+        events={events}
         slotPropGetter={slotPropGetter}
         begin={startOfISOWeek(beginDate)}
         eventStyleGetter={eventStyleGetter(reservationUnitPk)}
