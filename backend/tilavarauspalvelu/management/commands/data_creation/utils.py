@@ -91,7 +91,12 @@ def with_logs[**P, T](func: Callable[P, T]) -> Callable[P, T]:
     return wrapper
 
 
-def refresh_materialized_views_at_the_end[**P](func: Callable[P, None]) -> Callable[P, None]:
+def defer_reservation_unit_create_operations[**P](func: Callable[P, None]) -> Callable[P, None]:
+    """
+    Defer some operations that would trigger from reservation unit creation through signals.
+    Otherwise we would run these operations too many times when creating a lot of reservation units.
+    """
+
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> None:
         with override_settings(
@@ -100,15 +105,13 @@ def refresh_materialized_views_at_the_end[**P](func: Callable[P, None]) -> Calla
             SAVE_RESERVATION_STATISTICS=False,
             UPDATE_SEARCH_VECTORS=False,
         ):
-            try:
-                func(*args, **kwargs)
-            finally:
-                print("Refreshing reservation unit hierarchy...")  # noqa: T201, RUF100
-                ReservationUnitHierarchy.refresh()
-                print("Refreshing affecting time spans...")  # noqa: T201, RUF100
-                AffectingTimeSpan.refresh()
-                print("Refreshing search vectors...")  # noqa: T201, RUF100
-                ReservationUnit.objects.update_search_vectors()
+            func(*args, **kwargs)
+            print("Refreshing reservation unit hierarchy...")  # noqa: T201, RUF100
+            ReservationUnitHierarchy.refresh()
+            print("Refreshing affecting time spans...")  # noqa: T201, RUF100
+            AffectingTimeSpan.refresh()
+            print("Refreshing search vectors...")  # noqa: T201, RUF100
+            ReservationUnit.objects.all().update_search_vectors()
 
     return wrapper
 
