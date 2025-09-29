@@ -1,3 +1,4 @@
+import TimeZoneNotification from "common/src/components/TimeZoneNotification";
 import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
@@ -115,6 +116,7 @@ export default function MyUnitsPage({ unit }: Pick<PropsNarrowed, "unit">): JSX.
   const address = formatAddress(unit, "");
   return (
     <>
+      <TimeZoneNotification />
       <TitleSection>
         <H1 $noMargin>{title}</H1>
         {address !== "" && <LocationOnlyOnDesktop>{address}</LocationOnlyOnDesktop>}
