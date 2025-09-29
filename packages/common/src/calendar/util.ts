@@ -13,6 +13,7 @@ export type ReservationEventType = {
 export type TimeSpanType = { start: Date; end: Date };
 
 export function getEventBuffers(events: ReservationEventType[]): CalendarEventBuffer[] {
+  // TODO: Deprecate this and make buffers non-events, use useSlotPropGetter and getBuffersFromEvents instead
   const buffers: CalendarEventBuffer[] = [];
   for (const event of events) {
     if (!event.beginsAt || !event.endsAt) {
@@ -41,6 +42,31 @@ export function getEventBuffers(events: ReservationEventType[]): CalendarEventBu
   return buffers;
 }
 
+export function getBuffersFromEvents(events: ReservationEventType[]): TimeSpanType[] {
+  const buffers: TimeSpanType[] = [];
+
+  for (const event of events) {
+    const { bufferTimeBefore, bufferTimeAfter } = event;
+
+    if (bufferTimeBefore) {
+      const begin = new Date(event.beginsAt);
+      buffers.push({
+        start: addSeconds(begin, -1 * bufferTimeBefore),
+        end: begin,
+      });
+    }
+    if (bufferTimeAfter) {
+      const end = new Date(event.endsAt);
+      buffers.push({
+        start: end,
+        end: addSeconds(end, bufferTimeAfter),
+      });
+    }
+  }
+
+  return buffers;
+}
+
 export function isCellOverlappingSpan(cellStart: Date, cellEnd: Date, spanStart: Date, spanEnd: Date): boolean {
   // Is this Cell inside the reservable time span?
   //     ┌─ Cell ─┐
@@ -60,12 +86,17 @@ export function isCellOverlappingSpan(cellStart: Date, cellEnd: Date, spanStart:
   return cellStart < spanEnd && cellEnd > spanStart;
 }
 
-export function useSlotPropGetter(reservableTimeSpans: ReservableTimeSpanType[]): (date: Date) => SlotProps {
+export function useSlotPropGetter(
+  reservableTimeSpans: ReservableTimeSpanType[],
+  events: ReservationEventType[]
+): (date: Date) => SlotProps {
   return useMemo(() => {
     const reservableTimeSpanDates: TimeSpanType[] = reservableTimeSpans?.map((rts) => ({
       start: new Date(rts.startDatetime),
       end: new Date(rts.endDatetime),
     }));
+
+    const bufferTimeSpans = getBuffersFromEvents(events);
 
     return (date: Date): SlotProps => {
       const isPast = date < new Date();
@@ -83,7 +114,13 @@ export function useSlotPropGetter(reservableTimeSpans: ReservableTimeSpanType[])
       });
       if (isClosed) return { className: "rbc-timeslot-inactive" };
 
+      // Cell is buffer, if it overlaps with any buffer time span
+      const isBuffer = bufferTimeSpans.some((span) => {
+        return isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end);
+      });
+      if (isBuffer) return { className: "rbc-event-buffer" };
+
       return {};
     };
-  }, [reservableTimeSpans]);
+  }, [reservableTimeSpans, events]);
 }
