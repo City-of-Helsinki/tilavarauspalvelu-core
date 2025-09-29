@@ -287,6 +287,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     lomake_3_sub.supported_fields.set([
         fields_by_name["applying_for_free_of_charge"],
         fields_by_name["description"],
+        fields_by_name["free_of_charge_reason"],
         fields_by_name["municipality"],
         fields_by_name["name"],
         fields_by_name["num_persons"],
@@ -313,10 +314,11 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         fields_by_name["reservee_phone"],
         fields_by_name["reservee_type"],
     ])
-    lomake_4_sub.required_fields.set([
+    lomake_4_sub.supported_fields.set([
         fields_by_name["age_group"],
         fields_by_name["applying_for_free_of_charge"],
         fields_by_name["description"],
+        fields_by_name["free_of_charge_reason"],
         fields_by_name["municipality"],
         fields_by_name["name"],
         fields_by_name["num_persons"],
@@ -330,7 +332,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         fields_by_name["reservee_phone"],
         fields_by_name["reservee_type"],
     ])
-    lomake_4_sub.supported_fields.set([
+    lomake_4_sub.required_fields.set([
         fields_by_name["age_group"],
         fields_by_name["description"],
         fields_by_name["municipality"],
