@@ -41,17 +41,19 @@ class Command(BaseCommand):
             if not schedule_hour and not schedule_minute:
                 continue
 
-            crontab_schedule, _ = CrontabSchedule.objects.get_or_create(hour=schedule_hour, minute=schedule_minute)
+            # Don't use get_or_create, since it's possible to have duplicate schedules
+            crontab_schedule = CrontabSchedule.objects.filter(hour=schedule_hour, minute=schedule_minute).first()
+            if crontab_schedule is None:
+                crontab_schedule = CrontabSchedule.objects.create(hour=schedule_hour, minute=schedule_minute)
 
-            # Create or get the PeriodicTask object
-            task_defaults = {
-                "name": tvp_auto_create_name,
-                "description": tvp_auto_create_description,
-                "task": task_name,
-                "enabled": False,
-                "crontab": crontab_schedule,
-            }
-
-            PeriodicTask.objects.get_or_create(task=task_name, defaults=task_defaults)
+            task = PeriodicTask.objects.filter(task=task_name).first()
+            if task is None:
+                PeriodicTask.objects.create(
+                    task=task_name,
+                    name=tvp_auto_create_name,
+                    description=tvp_auto_create_description,
+                    enabled=False,
+                    crontab=crontab_schedule,
+                )
 
         self.stdout.write(self.style.SUCCESS("Successfully populated Periodic Tasks."))
