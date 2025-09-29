@@ -994,6 +994,14 @@ class MidHook(EmptyDefaults, Platta, use_environ=True):
 
     DEBUG = True
 
+    @classproperty
+    def DATABASES(cls):
+        database_url = os.environ["DATABASE_URL"]
+        config = dj_database_url.parse(database_url)
+        config["CONN_MAX_AGE"] = int(os.getenv("CONN_MAX_AGE", "0"))
+        config["PASSWORD"] = os.environ["DATABASE_PASSWORD"]
+        return {"default": config}
+
 
 class Development(Platta, use_environ=True):
     """Settings for the Development environment on Platta."""
