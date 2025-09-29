@@ -21,7 +21,7 @@ def test_reservation_deny_reasons__query(graphql):
 
     graphql.login_with_superuser()
 
-    query = deny_query(fields="pk reasonFi reasonEn reasonSv")
+    query = deny_query(fields="pk reason { fi en sv }")
     response = graphql(query)
 
     assert response.has_errors is False
@@ -29,9 +29,11 @@ def test_reservation_deny_reasons__query(graphql):
     assert len(response.edges) == 1
     assert response.node() == {
         "pk": deny_reason.pk,
-        "reasonFi": deny_reason.reason_fi,
-        "reasonEn": deny_reason.reason_en,
-        "reasonSv": deny_reason.reason_sv,
+        "reason": {
+            "fi": deny_reason.reason_fi,
+            "en": deny_reason.reason_en,
+            "sv": deny_reason.reason_sv,
+        },
     }
 
 

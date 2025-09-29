@@ -522,7 +522,8 @@ class Common(Environment):
     ROBOT_TEST_DATA_LOCK_KEY = "robot-test-data-create-view-lock"
 
     GRAPHENE_DJANGO_EXTENSIONS = {
-        "EXPERIMENTAL_REMOVE_TRANSLATION_BASE_FIELDS": True,
+        "EXPERIMENTAL_TRANSLATION_FIELDS": True,
+        "EXPERIMENTAL_TRANSLATION_FIELDS_KIND": "types",
     }
 
     # Allows faking membership to certain AD groups for testing automatic role assignment

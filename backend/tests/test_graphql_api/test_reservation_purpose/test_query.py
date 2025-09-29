@@ -18,9 +18,11 @@ def test_reservation_purpose__query(graphql):
 
     fields = """
         pk
-        nameFi
-        nameSv
-        nameEn
+        name {
+            fi
+            sv
+            en
+        }
         rank
     """
     query = build_query("reservationPurposes", fields=fields, connection=True)
@@ -31,9 +33,11 @@ def test_reservation_purpose__query(graphql):
     assert len(response.edges) == 1
     assert response.node() == {
         "pk": res_purpose.pk,
-        "nameFi": res_purpose.name_fi,
-        "nameSv": res_purpose.name_sv,
-        "nameEn": res_purpose.name_en,
+        "name": {
+            "fi": res_purpose.name_fi,
+            "sv": res_purpose.name_sv,
+            "en": res_purpose.name_en,
+        },
         "rank": res_purpose.rank,
     }
 

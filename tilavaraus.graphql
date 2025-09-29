@@ -623,15 +623,9 @@ type Query {
 }
 
 type ApplicationRoundNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  criteriaFi: String
-  criteriaEn: String
-  criteriaSv: String
-  notesWhenApplyingFi: String
-  notesWhenApplyingEn: String
-  notesWhenApplyingSv: String
+  name: String!
+  criteria: String!
+  notesWhenApplying: String!
   applicationPeriodBeginsAt: DateTime!
   applicationPeriodEndsAt: DateTime!
   reservationPeriodBeginDate: Date!
@@ -720,6 +714,9 @@ type ApplicationRoundNode implements Node {
   applicationsCount: Int!
   reservationUnitCount: Int!
   pk: Int
+  criteriaTranslations: Translatable!
+  nameTranslations: Translatable!
+  notesWhenApplyingTranslations: Translatable!
 }
 
 """An object with an ID"""
@@ -745,25 +742,13 @@ scalar Date
 type ReservationUnitNode implements Node {
   extUuid: UUID!
   rank: Int!
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  name: String!
+  description: String!
   contactInformation: String!
-  notesWhenApplyingFi: String
-  notesWhenApplyingEn: String
-  notesWhenApplyingSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
+  notesWhenApplying: String
+  reservationPendingInstructions: String!
+  reservationConfirmedInstructions: String!
+  reservationCancelledInstructions: String!
   surfaceArea: Int
   minPersons: Int
   maxPersons: Int
@@ -925,6 +910,12 @@ type ReservationUnitNode implements Node {
   calculatedSurfaceArea: Int!
   currentAccessType: AccessType
   pk: Int
+  reservationConfirmedInstructionsTranslations: Translatable!
+  reservationPendingInstructionsTranslations: Translatable!
+  reservationCancelledInstructionsTranslations: Translatable!
+  descriptionTranslations: Translatable!
+  nameTranslations: Translatable!
+  notesWhenApplyingTranslations: Translatable!
 }
 
 """
@@ -997,25 +988,15 @@ enum ReservationFormType {
 
 type UnitNode implements Node {
   tprekId: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
+  name: String!
+  description: String!
+  shortDescription: String!
   webPage: String!
   email: String!
   phone: String!
-  addressStreetFi: String
-  addressStreetEn: String
-  addressStreetSv: String
+  addressStreet: String!
   addressZip: String!
-  addressCityFi: String
-  addressCityEn: String
-  addressCitySv: String
+  addressCity: String!
   paymentMerchant: PaymentMerchantNode
   reservationUnits(
     nameFi: String
@@ -1114,6 +1095,11 @@ type UnitNode implements Node {
   """The ID of the object"""
   id: ID!
   pk: Int
+  addressCityTranslations: Translatable!
+  shortDescriptionTranslations: Translatable!
+  descriptionTranslations: Translatable!
+  nameTranslations: Translatable!
+  addressStreetTranslations: Translatable!
 }
 
 type PaymentMerchantNode implements Node {
@@ -1188,9 +1174,7 @@ enum ReservationUnitOrderingChoices {
 }
 
 type SpaceNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  name: String!
   surfaceArea: Int
   maxPersons: Int
   code: String!
@@ -1232,24 +1216,35 @@ type SpaceNode implements Node {
   """The ID of the object"""
   id: ID!
   pk: Int
+  nameTranslations: Translatable!
 }
 
 type ResourceNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  name: String!
   locationType: ResourceLocationType!
   space: SpaceNode
 
   """The ID of the object"""
   id: ID!
   pk: Int
+  nameTranslations: Translatable!
 }
 
 """An enumeration."""
 enum ResourceLocationType {
   FIXED
   MOVABLE
+}
+
+type Translatable {
+  """Translation in fi."""
+  fi: String
+
+  """Translation in en."""
+  en: String
+
+  """Translation in sv."""
+  sv: String
 }
 
 """Ordering fields for the 'Resource' model."""
@@ -1265,9 +1260,7 @@ enum SpaceOrderingChoices {
 }
 
 type UnitGroupNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  name: String!
   units(
     nameFi: String
     nameFi_Icontains: String
@@ -1293,6 +1286,7 @@ type UnitGroupNode implements Node {
   """The ID of the object"""
   id: ID!
   pk: Int
+  nameTranslations: Translatable!
 }
 
 """Ordering fields for the 'Unit' model."""
@@ -1333,24 +1327,22 @@ enum UnitGroupOrderingChoices {
 
 type ReservationUnitTypeNode implements Node {
   rank: Int!
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  name: String!
 
   """The ID of the object"""
   id: ID!
   pk: Int
+  nameTranslations: Translatable!
 }
 
 type ReservationUnitCancellationRuleNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  name: String!
   canBeCancelledTimeBefore: Duration
 
   """The ID of the object"""
   id: ID!
   pk: Int
+  nameTranslations: Translatable!
 }
 
 type ReservationMetadataSetNode implements Node {
@@ -1372,17 +1364,15 @@ type ReservationMetadataFieldNode implements Node {
 }
 
 type TermsOfUseNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  textFi: String
-  textEn: String
-  textSv: String
+  name: String
+  text: String!
   termsType: TermsOfUseTypeChoices!
 
   """The ID of the object"""
   id: ID!
   pk: String
+  textTranslations: Translatable!
+  nameTranslations: Translatable!
 }
 
 """An enumeration."""
@@ -1416,15 +1406,14 @@ type PaymentProductNode implements Node {
 
 type PurposeNode implements Node {
   rank: Int!
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  name: String!
 
   """The ID of the object"""
   id: ID!
   imageUrl: String
   smallUrl: String
   pk: Int
+  nameTranslations: Translatable!
 }
 
 """Ordering fields for the 'Purpose' model."""
@@ -1440,24 +1429,22 @@ enum PurposeOrderingChoices {
 }
 
 type EquipmentNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  name: String!
   category: EquipmentCategoryNode!
 
   """The ID of the object"""
   id: ID!
   pk: Int
+  nameTranslations: Translatable!
 }
 
 type EquipmentCategoryNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  name: String!
 
   """The ID of the object"""
   id: ID!
   pk: Int
+  nameTranslations: Translatable!
 }
 
 """Ordering fields for the 'Equipment' model."""
@@ -2041,13 +2028,12 @@ enum ApplicationSectionOrderingChoices {
 
 type ReservationPurposeNode implements Node {
   rank: Int!
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  name: String!
 
   """The ID of the object"""
   id: ID!
   pk: Int
+  nameTranslations: Translatable!
 }
 
 type AgeGroupNode implements Node {
@@ -2272,13 +2258,12 @@ type PindoraSeriesValidityInfoType {
 }
 
 type ReservationDenyReasonNode implements Node {
-  reasonFi: String
-  reasonEn: String
-  reasonSv: String
+  reason: String!
 
   """The ID of the object"""
   id: ID!
   pk: Int
+  reasonTranslations: Translatable!
 }
 
 type PaymentOrderNode implements Node {
@@ -2420,6 +2405,7 @@ type ReservationUnitPricingNode implements Node {
   lowestPriceNet: Decimal!
   highestPriceNet: Decimal!
   pk: Int
+  materialPriceDescriptionTranslations: Translatable!
 }
 
 type TaxPercentageNode implements Node {
@@ -2595,13 +2581,16 @@ This Node should be kept to the bare minimum and never expose any relations to a
 """
 type UnitAllNode implements Node {
   tprekId: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  name: String!
 
   """The ID of the object"""
   id: ID!
   pk: Int
+  addressCityTranslations: Translatable!
+  shortDescriptionTranslations: Translatable!
+  descriptionTranslations: Translatable!
+  nameTranslations: Translatable!
+  addressStreetTranslations: Translatable!
 }
 
 type ResourceNodeConnection {
@@ -2662,13 +2651,12 @@ type EquipmentNodeEdge {
 This Node should be kept to the bare minimum and never expose any relations to avoid performance issues.
 """
 type EquipmentAllNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  name: String!
 
   """The ID of the object"""
   id: ID!
   pk: Int
+  nameTranslations: Translatable!
 }
 
 type EquipmentCategoryNodeConnection {
@@ -2717,13 +2705,17 @@ type ReservationUnitNodeEdge {
 This Node should be kept to the bare minimum and never expose any relations to avoid performance issues.
 """
 type ReservationUnitAllNode implements Node {
-  nameFi: String
-  nameEn: String
-  nameSv: String
+  name: String!
 
   """The ID of the object"""
   id: ID!
   pk: Int
+  reservationConfirmedInstructionsTranslations: Translatable!
+  reservationPendingInstructionsTranslations: Translatable!
+  reservationCancelledInstructionsTranslations: Translatable!
+  descriptionTranslations: Translatable!
+  nameTranslations: Translatable!
+  notesWhenApplyingTranslations: Translatable!
 }
 
 type ReservationUnitTypeNodeConnection {
@@ -3049,6 +3041,7 @@ enum TermsOfUseOrderingChoices {
 
 type BannerNotificationNode implements Node {
   name: String!
+  message: String!
   messageFi: String
   messageEn: String
   messageSv: String
@@ -3062,6 +3055,7 @@ type BannerNotificationNode implements Node {
   id: ID!
   state: BannerNotificationState!
   pk: Int
+  messageTranslations: Translatable!
 }
 
 """An enumeration."""

@@ -97,25 +97,37 @@ def test_reservation_unit__query__all_fields(graphql):
         extUuid
         rank
 
-        nameFi
-        nameEn
-        nameSv
-        descriptionFi
-        descriptionEn
-        descriptionSv
+        name {
+            fi
+            sv
+            en
+        }
+        description {
+            fi
+            sv
+            en
+        }
         contactInformation
-        notesWhenApplyingFi
-        notesWhenApplyingEn
-        notesWhenApplyingSv
-        reservationPendingInstructionsFi
-        reservationPendingInstructionsSv
-        reservationPendingInstructionsEn
-        reservationConfirmedInstructionsFi
-        reservationConfirmedInstructionsSv
-        reservationConfirmedInstructionsEn
-        reservationCancelledInstructionsFi
-        reservationCancelledInstructionsSv
-        reservationCancelledInstructionsEn
+        notesWhenApplying {
+            fi
+            sv
+            en
+        }
+        reservationPendingInstructions {
+            fi
+            sv
+            en
+            }
+        reservationConfirmedInstructions {
+            fi
+            sv
+            en
+         }
+        reservationCancelledInstructions {
+            fi
+            sv
+            en
+          }
 
         surfaceArea
         minPersons
@@ -174,25 +186,37 @@ def test_reservation_unit__query__all_fields(graphql):
         "extUuid": str(reservation_unit.ext_uuid),
         "rank": reservation_unit.rank,
         #
-        "nameFi": reservation_unit.name_fi,
-        "nameEn": reservation_unit.name_en,
-        "nameSv": reservation_unit.name_sv,
-        "descriptionFi": reservation_unit.description_fi,
-        "descriptionEn": reservation_unit.description_en,
-        "descriptionSv": reservation_unit.description_sv,
-        "notesWhenApplyingFi": reservation_unit.notes_when_applying_fi,
-        "notesWhenApplyingEn": reservation_unit.notes_when_applying_en,
-        "notesWhenApplyingSv": reservation_unit.notes_when_applying_sv,
+        "name": {
+            "fi": reservation_unit.name_fi,
+            "sv": reservation_unit.name_sv,
+            "en": reservation_unit.name_en,
+        },
+        "description": {
+            "fi": reservation_unit.description_fi,
+            "sv": reservation_unit.description_sv,
+            "en": reservation_unit.description_en,
+        },
+        "notesWhenApplying": {
+            "fi": reservation_unit.notes_when_applying_fi,
+            "sv": reservation_unit.notes_when_applying_sv,
+            "en": reservation_unit.notes_when_applying_en,
+        },
         "contactInformation": reservation_unit.contact_information,
-        "reservationPendingInstructionsEn": reservation_unit.reservation_pending_instructions_en,
-        "reservationPendingInstructionsFi": reservation_unit.reservation_pending_instructions_fi,
-        "reservationPendingInstructionsSv": reservation_unit.reservation_pending_instructions_sv,
-        "reservationConfirmedInstructionsEn": reservation_unit.reservation_confirmed_instructions_en,
-        "reservationConfirmedInstructionsFi": reservation_unit.reservation_confirmed_instructions_fi,
-        "reservationConfirmedInstructionsSv": reservation_unit.reservation_confirmed_instructions_sv,
-        "reservationCancelledInstructionsEn": reservation_unit.reservation_cancelled_instructions_en,
-        "reservationCancelledInstructionsFi": reservation_unit.reservation_cancelled_instructions_fi,
-        "reservationCancelledInstructionsSv": reservation_unit.reservation_cancelled_instructions_sv,
+        "reservationPendingInstructions": {
+            "fi": reservation_unit.reservation_pending_instructions_fi,
+            "sv": reservation_unit.reservation_pending_instructions_sv,
+            "en": reservation_unit.reservation_pending_instructions_en,
+        },
+        "reservationConfirmedInstructions": {
+            "fi": reservation_unit.reservation_confirmed_instructions_fi,
+            "sv": reservation_unit.reservation_confirmed_instructions_sv,
+            "en": reservation_unit.reservation_confirmed_instructions_en,
+        },
+        "reservationCancelledInstructions": {
+            "fi": reservation_unit.reservation_cancelled_instructions_fi,
+            "sv": reservation_unit.reservation_cancelled_instructions_sv,
+            "en": reservation_unit.reservation_cancelled_instructions_en,
+        },
         #
         "surfaceArea": reservation_unit.surface_area,
         "minPersons": reservation_unit.min_persons,
@@ -232,13 +256,19 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
     fields = """
         pk
         unit {
-            nameFi
+            name {
+                fi
+            }
         }
         reservationUnitType {
-            nameFi
+            name {
+                fi
+            }
         }
         cancellationRule {
-            nameFi
+            name {
+                fi
+            }
         }
         metadataSet {
             name
@@ -281,13 +311,19 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
     assert response.node(0) == {
         "pk": reservation_unit.pk,
         "unit": {
-            "nameFi": reservation_unit.unit.name_fi,
+            "name": {
+                "fi": reservation_unit.unit.name_fi,
+            },
         },
         "reservationUnitType": {
-            "nameFi": reservation_unit.reservation_unit_type.name_fi,
+            "name": {
+                "fi": reservation_unit.reservation_unit_type.name_fi,
+            },
         },
         "cancellationRule": {
-            "nameFi": reservation_unit.cancellation_rule.name_fi,
+            "name": {
+                "fi": reservation_unit.cancellation_rule.name_fi,
+            },
         },
         "metadataSet": {
             "name": reservation_unit.metadata_set.name,

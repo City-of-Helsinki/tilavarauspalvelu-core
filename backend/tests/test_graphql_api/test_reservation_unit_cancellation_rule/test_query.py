@@ -18,9 +18,11 @@ def test_reservation_unit_cancellation_rules__query(graphql):
 
     fields = """
         pk
-        nameFi
-        nameSv
-        nameEn
+        name {
+            fi
+            sv
+            en
+        }
     """
     query = build_query("reservationUnitCancellationRules", fields=fields, connection=True)
     response = graphql(query)
@@ -30,9 +32,11 @@ def test_reservation_unit_cancellation_rules__query(graphql):
     assert len(response.edges) == 1
     assert response.node() == {
         "pk": rules.pk,
-        "nameFi": rules.name_fi,
-        "nameSv": rules.name_sv,
-        "nameEn": rules.name_en,
+        "name": {
+            "fi": rules.name_fi,
+            "sv": rules.name_sv,
+            "en": rules.name_en,
+        },
     }
 
 
@@ -41,9 +45,11 @@ def test_reservation_unit_cancellation_rules__query__anonymous_user(graphql):
 
     fields = """
         pk
-        nameFi
-        nameSv
-        nameEn
+        name {
+            fi
+            sv
+            en
+        }
     """
     query = build_query("reservationUnitCancellationRules", fields=fields, connection=True)
     response = graphql(query)
