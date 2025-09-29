@@ -650,3 +650,22 @@ def test_reservation_series__create_series__access_type_access_code__pindora_cal
     assert reservations[0].access_type == AccessType.ACCESS_CODE
     assert reservations[0].access_code_generated_at is None
     assert reservations[0].access_code_is_active is False
+
+
+def test_reservation_series__create_series__weekdays_that_never_occur(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    user = graphql.login_with_superuser()
+
+    weekdays = [Weekday.MONDAY.value, Weekday.WEDNESDAY.value]
+
+    data = get_minimal_series_data(reservation_unit, user, weekdays=weekdays)
+
+    response = graphql(CREATE_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    series = ReservationSeries.objects.get(pk=response.first_query_object["pk"])
+    reservations: list[Reservation] = list(series.reservations.all())
+
+    assert len(reservations) == 1
+    assert reservations[0].begins_at.date() == local_date(2024, 1, 1)
