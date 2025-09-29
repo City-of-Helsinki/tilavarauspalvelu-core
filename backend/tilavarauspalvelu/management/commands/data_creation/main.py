@@ -20,11 +20,11 @@ from .create_reservation_units import _create_reservation_units
 from .create_reservations import _create_reservation_series, _create_reservations
 from .create_seasonal_booking import _create_application_rounds
 from .create_users import _create_users
-from .utils import refresh_materialized_views_at_the_end, with_logs
+from .utils import defer_reservation_unit_create_operations, with_logs
 
 
 @with_logs
-@refresh_materialized_views_at_the_end
+@defer_reservation_unit_create_operations
 def create_test_data(*, flush: bool = True) -> None:
     if flush:
         _clear_database()

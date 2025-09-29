@@ -28,6 +28,7 @@ from tilavarauspalvelu.enums import (
     TermsOfUseTypeChoices,
     Weekday,
 )
+from tilavarauspalvelu.management.commands.data_creation.utils import defer_reservation_unit_create_operations
 from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
     Application,
@@ -91,6 +92,7 @@ def handle_model_object_errors() -> Generator[None]:
 
 @transaction.atomic()
 @handle_model_object_errors()
+@defer_reservation_unit_create_operations
 def create_robot_test_data() -> None:
     if os.getenv("DJANGO_SETTINGS_ENVIRONMENT") == "Production":
         msg = "Hey! This is the production environment! Don't just try to generate test data! >:("

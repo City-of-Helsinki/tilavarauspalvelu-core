@@ -123,7 +123,6 @@ from .types.reservation_cancel_reason.types import CancelReasonDict
 
 if TYPE_CHECKING:
     import datetime
-    from collections.abc import Collection
 
     from django.db import models
 
@@ -273,7 +272,7 @@ class Query(graphene.ObjectType):
         if user.permissions.can_manage_notifications():
             return BannerNotification.objects.all()
         if kwargs.get("is_visible"):
-            return BannerNotification.objects.visible(info.context.user)
+            return BannerNotification.objects.all().visible(info.context.user)
         return BannerNotification.objects.none()
 
     def resolve_affecting_allocated_time_slots(
@@ -283,16 +282,16 @@ class Query(graphene.ObjectType):
         begin_date: datetime.date,
         end_date: datetime.date,
     ) -> models.QuerySet:
-        return AllocatedTimeSlot.objects.affecting_allocations(reservation_unit, begin_date, end_date)
+        return AllocatedTimeSlot.objects.all().affecting_allocations(reservation_unit, begin_date, end_date)
 
     def resolve_affecting_reservations(
         root: None,
         info: GQLInfo,
-        for_units: Collection[int],
-        for_reservation_units: Collection[int],
+        for_units: list[int],
+        for_reservation_units: list[int],
         **kwargs: Any,
     ) -> models.QuerySet:
-        return Reservation.objects.affecting_reservations(for_units, for_reservation_units)
+        return Reservation.objects.all().affecting_reservations(for_units, for_reservation_units)
 
     def resolve_reservation_cancel_reasons(root: None, info: GQLInfo, **kwargs: Any) -> list[CancelReasonDict]:
         return [
