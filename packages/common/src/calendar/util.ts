@@ -1,7 +1,6 @@
 import { addMinutes, addSeconds } from "date-fns";
 import { type CalendarEventBuffer, SlotProps } from "./Calendar";
 import { ReservableTimeSpanType } from "../../gql/gql-types";
-import { useMemo } from "react";
 
 export type ReservationEventType = {
   beginsAt: string;
@@ -90,37 +89,35 @@ export function useSlotPropGetter(
   reservableTimeSpans: ReservableTimeSpanType[],
   events: ReservationEventType[]
 ): (date: Date) => SlotProps {
-  return useMemo(() => {
-    const reservableTimeSpanDates: TimeSpanType[] = reservableTimeSpans?.map((rts) => ({
-      start: new Date(rts.startDatetime),
-      end: new Date(rts.endDatetime),
-    }));
+  const reservableTimeSpanDates: TimeSpanType[] = reservableTimeSpans?.map((rts) => ({
+    start: new Date(rts.startDatetime),
+    end: new Date(rts.endDatetime),
+  }));
 
-    const bufferTimeSpans = getBuffersFromEvents(events);
+  const bufferTimeSpans = getBuffersFromEvents(events);
 
-    return (date: Date): SlotProps => {
-      const isPast = date < new Date();
-      if (isPast) return { className: "rbc-timeslot-inactive" };
+  return (date: Date): SlotProps => {
+    const isPast = date < new Date();
+    if (isPast) return { className: "rbc-timeslot-inactive" };
 
-      if (reservableTimeSpanDates.length === 0) return { className: "rbc-timeslot-inactive" };
+    if (reservableTimeSpanDates.length === 0) return { className: "rbc-timeslot-inactive" };
 
-      // Calendar cells are 30min slots
-      const cellStart = date;
-      const cellEnd = addMinutes(cellStart, 30);
+    // Calendar cells are 30min slots
+    const cellStart = date;
+    const cellEnd = addMinutes(cellStart, 30);
 
-      // Cell is closed, if it doesn't overlap with any reservable time span
-      const isClosed = !reservableTimeSpanDates.some((span) => {
-        return isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end);
-      });
-      if (isClosed) return { className: "rbc-timeslot-inactive" };
+    // Cell is closed, if it doesn't overlap with any reservable time span
+    const isClosed = !reservableTimeSpanDates.some((span) => {
+      return isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end);
+    });
+    if (isClosed) return { className: "rbc-timeslot-inactive" };
 
-      // Cell is buffer, if it overlaps with any buffer time span
-      const isBuffer = bufferTimeSpans.some((span) => {
-        return isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end);
-      });
-      if (isBuffer) return { className: "rbc-event-buffer" };
+    // Cell is buffer, if it overlaps with any buffer time span
+    const isBuffer = bufferTimeSpans.some((span) => {
+      return isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end);
+    });
+    if (isBuffer) return { className: "rbc-event-buffer" };
 
-      return {};
-    };
-  }, [reservableTimeSpans, events]);
+    return {};
+  };
 }
