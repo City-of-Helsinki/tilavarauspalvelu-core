@@ -146,9 +146,9 @@ class SetName(StrEnum):
             case SetName.set_4:
                 return ReservationFormType.AGE_GROUP_FORM
             case SetName.set_5:
-                return ReservationFormType.PURPOSE_SUBVENTION_FORM
+                return ReservationFormType.PURPOSE_FORM
             case SetName.set_6:
-                return ReservationFormType.AGE_GROUP_SUBVENTION_FORM
+                return ReservationFormType.AGE_GROUP_FORM
             case _:
                 msg = f"Unknown reservation form for {self}"
                 raise ValueError(msg)

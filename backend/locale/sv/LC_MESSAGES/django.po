@@ -2541,16 +2541,6 @@ msgid "Age group"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
-msgctxt "ReservationFormType"
-msgid "Purpose of use + discount"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "ReservationFormType"
-msgid "Age group + discount"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
 msgctxt "PricingType"
 msgid "Paid"
 msgstr ""
@@ -3140,6 +3130,11 @@ msgstr "Din bokning är bekräftad"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
+msgid "Deadline"
+msgstr "Tidsfrist"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
 msgid "Thank you for your booking at Varaamo"
 msgstr "Tack för din bokning på Varaamo"
 
@@ -3222,11 +3217,6 @@ msgstr ""
 msgctxt "Email"
 msgid "Pay the booking at Varaamo"
 msgstr "Betala bokningen på Varaamo"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Deadline"
-msgstr "Tidsfrist"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
