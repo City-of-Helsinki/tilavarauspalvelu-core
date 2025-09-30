@@ -87,8 +87,6 @@ export default withSentryConfig(config, {
   sentryUrl: "",
   authToken: "",
   silent: !process.env.CI,
-  // Hides source maps from generated client bundles
-  hideSourceMaps: true,
   // Automatically tree-shake Sentry logger statements to reduce bundle size
   disableLogger: true,
   // Upload a larger set of source maps for prettier stack traces (increases build time)
