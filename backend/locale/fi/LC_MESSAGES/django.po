@@ -2622,16 +2622,6 @@ msgid "Age group"
 msgstr "Ikäryhmä"
 
 #: tilavarauspalvelu/enums.py
-msgctxt "ReservationFormType"
-msgid "Purpose of use + discount"
-msgstr "Käyttötarkoitus + alenus"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "ReservationFormType"
-msgid "Age group + discount"
-msgstr "Ikäryhmä + alenus"
-
-#: tilavarauspalvelu/enums.py
 msgctxt "PricingType"
 msgid "Paid"
 msgstr "Maksullinen"
@@ -3220,6 +3210,11 @@ msgstr "Varauksesi on vahvistettu"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
+msgid "Deadline"
+msgstr "Määräaika"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
 msgid "Thank you for your booking at Varaamo"
 msgstr "Kiitos varauksestasi Varaamossa"
 
@@ -3303,11 +3298,6 @@ msgstr ""
 msgctxt "Email"
 msgid "Pay the booking at Varaamo"
 msgstr "Maksa varaus Varaamossa"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Deadline"
-msgstr "Määräaika"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"

@@ -797,18 +797,6 @@ class ReservationFormType(models.TextChoices):
     )
     """Asks for user's age group, in addition to contact and reservee information, and purpose of use."""
 
-    PURPOSE_SUBVENTION_FORM = (
-        "PURPOSE_SUBVENTION_FORM",
-        pgettext_lazy("ReservationFormType", "Purpose of use + discount"),
-    )
-    """Adds option to apply for subvention to the purpose form."""
-
-    AGE_GROUP_SUBVENTION_FORM = (
-        "AGE_GROUP_SUBVENTION_FORM",
-        pgettext_lazy("ReservationFormType", "Age group + discount"),
-    )
-    """Adds option to apply for subvention to the age group form."""
-
 
 class PricingType(models.TextChoices):
     PAID = "paid", pgettext_lazy("PricingType", "Paid")
