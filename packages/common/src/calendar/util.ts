@@ -9,7 +9,10 @@ export type ReservationEventType = {
   bufferTimeAfter: number;
 };
 
-export type TimeSpanType = { start: Date; end: Date };
+export type TimeSpanType = Readonly<{
+  start: Readonly<Date>;
+  end: Readonly<Date>;
+}>;
 
 export function getEventBuffers(events: ReservationEventType[]): CalendarEventBuffer[] {
   // TODO: Deprecate this and make buffers non-events, use useSlotPropGetter and getBuffersFromEvents instead
@@ -66,7 +69,12 @@ export function getBuffersFromEvents(events: ReservationEventType[]): TimeSpanTy
   return buffers;
 }
 
-export function isCellOverlappingSpan(cellStart: Date, cellEnd: Date, spanStart: Date, spanEnd: Date): boolean {
+export function isCellOverlappingSpan(
+  cellStart: Readonly<Date>,
+  cellEnd: Readonly<Date>,
+  spanStart: Readonly<Date>,
+  spanEnd: Readonly<Date>
+): boolean {
   // Is this Cell inside the reservable time span?
   //     ┌─ Cell ─┐
   //═══  │        │      # No
@@ -88,7 +96,7 @@ export function isCellOverlappingSpan(cellStart: Date, cellEnd: Date, spanStart:
 export function useSlotPropGetter(
   reservableTimeSpans: ReservableTimeSpanType[],
   events: ReservationEventType[]
-): (date: Date) => SlotProps {
+): (date: Readonly<Date>) => SlotProps {
   const reservableTimeSpanDates: TimeSpanType[] = reservableTimeSpans?.map((rts) => ({
     start: new Date(rts.startDatetime),
     end: new Date(rts.endDatetime),
@@ -96,14 +104,13 @@ export function useSlotPropGetter(
 
   const bufferTimeSpans = getBuffersFromEvents(events);
 
-  return (date: Date): SlotProps => {
-    const isPast = date < new Date();
+  return (cellStart: Readonly<Date>): SlotProps => {
+    const isPast = cellStart < new Date();
     if (isPast) return { className: "rbc-timeslot-inactive" };
 
     if (reservableTimeSpanDates.length === 0) return { className: "rbc-timeslot-inactive" };
 
     // Calendar cells are 30min slots
-    const cellStart = date;
     const cellEnd = addMinutes(cellStart, 30);
 
     // Cell is closed, if it doesn't overlap with any reservable time span
