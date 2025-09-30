@@ -72,5 +72,9 @@
     "activeUntil": "Voimassa asti",
     "targetGroup": "Kohderyhmä",
     "level": "Tyyppi"
+  },
+  "timeZoneDeviation": {
+    "title": "Käytät palvelua ulkomailta",
+    "body": "Varauskalenterin ajat näytetään paikallisessa aikavyöhykkeessä ({{timeZone}}). Huomioithan aikaeron varausta tehdessäsi."
   }
 }
