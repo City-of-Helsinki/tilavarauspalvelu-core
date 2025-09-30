@@ -3,7 +3,6 @@
 version: 2
 
 updates:
-
   # Update GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -29,19 +28,30 @@ updates:
     labels:
       - "dependencies"
       - "javascript"
-      - "manual"
     allow:
       # major updates that break the app
       - dependency-name: "react"
       - dependency-name: "react-dom"
       - dependency-name: "@types/react"
+      - dependency-name: "react-hook-form"
+      - dependency-name: "@hookform/resolvers"
+      - dependency-name: "nuka-carousel"
     ignore:
       - dependency-name: "react"
-        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+        update-types:
+          ["version-update:semver-minor", "version-update:semver-patch"]
       - dependency-name: "react-dom"
-        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+        update-types:
+          ["version-update:semver-minor", "version-update:semver-patch"]
       - dependency-name: "@types/react"
-        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+        update-types:
+          ["version-update:semver-minor", "version-update:semver-patch"]
+      - dependency-name: "@hookform/resolvers"
+        update-types:
+          ["version-update:semver-minor", "version-update:semver-patch"]
+      - dependency-name: "nuka-carousel"
+        update-types:
+          ["version-update:semver-minor", "version-update:semver-patch"]
     groups:
       react:
         patterns:
@@ -71,8 +81,8 @@ updates:
       # resolvers depend on react-hook-form upgrade
       - dependency-name: "@hookform/resolvers"
         update-types: ["version-update:semver-major"]
-      # react-router-dom major update breaks .mjs import
-      - dependency-name: "react-router-dom"
+      # complete rewrite from v7 to v8
+      - dependency-name: "nuka-carousel"
         update-types: ["version-update:semver-major"]
     # NOTE can't do a single group for all it will fail to update
     # either just accept multiple PRs or do fine grained groups manually
@@ -108,7 +118,7 @@ updates:
           - "vite-*"
 
   # Update Poetry dependencies
-  - package-ecosystem: "pip"  # yes, this is correct
+  - package-ecosystem: "pip" # yes, this is correct
     directory: "/backend/"
     schedule:
       interval: "weekly"
