@@ -149,6 +149,14 @@
   "overrides": [
     {
       "files": [
+        "instrumentation-client.ts"
+      ],
+      "rules": {
+        "import/namespace": "off"
+      }
+    },
+    {
+      "files": [
         "next-env.d.ts"
       ],
       "rules": {
