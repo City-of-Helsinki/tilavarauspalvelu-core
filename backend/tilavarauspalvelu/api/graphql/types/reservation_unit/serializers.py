@@ -18,7 +18,7 @@ from tilavarauspalvelu.api.graphql.types.reservation_unit_access_type.serializer
 )
 from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
-from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationUnitPublishingState, Weekday
+from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, Weekday
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     import datetime
 
 __all__ = [
+    "ReservationUnitArchiveSerializer",
     "ReservationUnitSerializer",
 ]
 
@@ -80,7 +81,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
             #
             # Booleans
             "is_draft",
-            "is_archived",
             "require_adult_reservee",
             "require_reservation_handling",
             "reservation_block_whole_day",
@@ -122,13 +122,12 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         is_draft = self.get_or_default("is_draft", data)
-        is_archived = self.get_or_default("is_archived", data)
 
         self._validate_reservation_duration_fields(data)
         self._validate_pricings(data)
         self._validate_access_types(access_types=data.get("access_types", []), is_draft=is_draft)
 
-        if not is_draft and not is_archived:
+        if not is_draft:
             self._validate_for_publish(data)
 
         return data
@@ -355,7 +354,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
     def save(self, **kwargs: Any) -> ReservationUnit:
         instance = super().save(**kwargs)
-        self.remove_personal_data_and_logs_on_archive(instance)
         self.update_hauki(instance)
         return instance
 
@@ -370,13 +368,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
     @transaction.atomic
     def update(self, instance: ReservationUnit, validated_data: dict[str, Any]) -> ReservationUnit:
-        # The ReservationUnit can't be archived if it has active reservations in the future
-        if instance.publishing_state != ReservationUnitPublishingState.ARCHIVED and validated_data.get("is_archived"):
-            future_reservations = instance.reservations.going_to_occur().filter(ends_at__gt=local_datetime())
-            if future_reservations.exists():
-                msg = "Reservation unit can't be archived if it has any reservations in the future"
-                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS)
-
         pricings = validated_data.pop("pricings", [])
         access_types = validated_data.pop("access_types", [])
         self.handle_pricings(pricings, instance)
@@ -385,22 +376,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
         # Verkkokauppa payment product update is triggered by the post_save signal of the ReservationUnit,
         # and requires a paid pricing to already be present in the database.
         return super().update(instance, validated_data)
-
-    def remove_personal_data_and_logs_on_archive(self, instance: ReservationUnit) -> None:
-        """
-        When reservation unit is archived, we want to delete all personally identifiable information (GDPR stuff).
-        Because all changes are stored to the audit log, we also need to delete old audit events related to the unit.
-        """
-        if not self.validated_data.get("is_archived", False) and not instance.is_archived:
-            return
-
-        # Reset contact information and mark reservation unit as draft
-        instance.contact_information = ""
-        instance.is_draft = True
-        instance.save()
-
-        # Remove all logs related to the reservation unit
-        LogEntry.objects.get_for_object(instance).delete()
 
     @staticmethod
     def update_hauki(instance: ReservationUnit) -> None:
@@ -462,3 +437,41 @@ class ReservationUnitSerializer(NestingModelSerializer):
             )
 
         reservation_unit.actions.update_access_types_for_reservations()
+
+
+class ReservationUnitArchiveSerializer(NestingModelSerializer):
+    instance: ReservationUnit
+
+    class Meta:
+        model = ReservationUnit
+        fields = [
+            "pk",
+        ]
+
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        if self.instance.is_archived:
+            return data
+
+        future_reservations = self.instance.reservations.all().going_to_occur().filter(ends_at__gt=local_datetime())
+        if future_reservations.exists():
+            msg = "Reservation unit can't be archived if it has any reservations in the future"
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS)
+
+        data["is_archived"] = True
+
+        # Remove PII
+        data["contact_information"] = ""
+        data["is_draft"] = True
+
+        return data
+
+    def save(self, **kwargs: Any) -> ReservationUnit:
+        if self.instance.is_archived:
+            return self.instance
+
+        instance = super().save(**kwargs)
+
+        # Remove all logs related to the reservation unit
+        LogEntry.objects.get_for_object(instance).delete()
+
+        return instance

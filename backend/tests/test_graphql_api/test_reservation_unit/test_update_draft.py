@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import pytest
-from auditlog.models import LogEntry
-from django.contrib.contenttypes.models import ContentType
 
 from tilavarauspalvelu.enums import AccessType, AuthenticationType, TermsOfUseTypeChoices
 from tilavarauspalvelu.models import ReservationUnit
@@ -158,54 +156,6 @@ def test_reservation_unit__update__errors_with_empty_name(graphql):
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.name_fi != ""
-
-
-def test_reservation_unit__update__archiving_removes_contact_information_and_audit_logs(graphql, settings):
-    settings.AUDIT_LOGGING_ENABLED = True
-    AuditLogger.register(
-        ReservationUnit,
-        # Exclude lookup properties, since they are calculated values.
-        exclude_fields=[
-            "_publishing_state",
-            "_reservation_state",
-            "_active_pricing_price",
-            "_current_access_type",
-        ],
-    )
-
-    graphql.login_with_superuser()
-
-    reservation_unit = ReservationUnitFactory.create(is_draft=True, contact_information="foo")
-    reservation_unit.contact_information = "bar"
-    reservation_unit.save()
-
-    # Two log entries are exist for the reservation unit,
-    # one for the creation and one for the contact information update
-    content_type = ContentType.objects.get_for_model(ReservationUnit)
-    log_entries = LogEntry.objects.filter(content_type_id=content_type.pk, object_id=reservation_unit.pk).order_by("pk")
-
-    assert log_entries[0].action == LogEntry.Action.CREATE
-    assert log_entries[1].changes == {"contact_information": ["foo", "bar"]}
-    assert log_entries.count() == 2
-
-    # Update the reservation unit to be archived
-    data = get_draft_update_input_data(reservation_unit, isArchived=True)
-
-    response = graphql(UPDATE_MUTATION, input_data=data)
-    assert response.has_errors is False, response
-
-    reservation_unit.refresh_from_db()
-
-    # ReservationUnit is marked as both archived and draft
-    assert reservation_unit.is_archived is True
-    assert reservation_unit.is_draft is True
-
-    # Contact information is removed
-    assert reservation_unit.contact_information == ""
-
-    # Old log entries are removed
-    log_entries = LogEntry.objects.filter(content_type_id=content_type.pk, object_id=reservation_unit.pk)
-    assert log_entries.count() == 0
 
 
 def test_reservation_unit__update__publish(graphql):

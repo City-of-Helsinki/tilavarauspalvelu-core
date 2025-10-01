@@ -33,6 +33,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
 
 __all__ = [
+    "ARCHIVE_MUTATION",
     "CREATE_MUTATION",
     "UPDATE_MUTATION",
     "create_reservation_units_for_reservation_state_filtering",
@@ -54,6 +55,7 @@ reservation_units_all_query = partial(build_query, "reservationUnitsAll", connec
 
 CREATE_MUTATION = build_mutation("createReservationUnit", "ReservationUnitCreateMutation")
 UPDATE_MUTATION = build_mutation("updateReservationUnit", "ReservationUnitUpdateMutation")
+ARCHIVE_MUTATION = build_mutation("archiveReservationUnit", "ReservationUnitArchiveMutation")
 
 
 def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:
