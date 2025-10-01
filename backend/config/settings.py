@@ -396,6 +396,14 @@ class Common(Environment):
         ],
     }
 
+    @classproperty
+    def ALLOW_DID_YOU_MEAN_SUGGESTIONS(cls) -> bool:
+        return cls.DEBUG
+
+    @classproperty
+    def ALLOW_INTROSPECTION_QUERIES(cls) -> bool:
+        return cls.DEBUG
+
     # --- Django REST Framework settings -----------------------------------------------------------------------------
 
     REST_FRAMEWORK = {
