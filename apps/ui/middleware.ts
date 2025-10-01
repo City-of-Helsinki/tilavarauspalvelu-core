@@ -316,7 +316,7 @@ async function maybeSaveUserLanguage(req: NextRequest, user: User | null): Promi
 
     const query: QqlQuery = {
       query: `
-        mutation SaveUserLanguage($preferredLanguage: PreferredLanguage!) {
+        mutation SaveUserLanguage($preferredLanguage: Language!) {
           updateCurrentUser(
             input:{
               preferredLanguage: $preferredLanguage
