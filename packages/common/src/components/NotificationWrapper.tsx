@@ -10,6 +10,12 @@ const StyledNotification = styled(Notification)`
   > div {
     max-width: var(--tilavaraus-page-max-width);
     margin: 0 auto;
+    & p {
+      &:first-of-type {
+        margin-top: 0;
+      }
+      font-size: var(--fontsize-body-s);
+    }
   }
 `;
 
