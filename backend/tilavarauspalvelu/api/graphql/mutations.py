@@ -76,7 +76,11 @@ from .types.reservation_series.mutations import (
     ReservationSeriesRescheduleMutation,
     ReservationSeriesUpdateMutation,
 )
-from .types.reservation_unit.mutations import ReservationUnitCreateMutation, ReservationUnitUpdateMutation
+from .types.reservation_unit.mutations import (
+    ReservationUnitArchiveMutation,
+    ReservationUnitCreateMutation,
+    ReservationUnitUpdateMutation,
+)
 from .types.reservation_unit_image.mutations import (
     ReservationUnitImageCreateMutation,
     ReservationUnitImageDeleteMutation,
@@ -136,6 +140,7 @@ __all__ = [
     "ReservationStaffCreateMutation",
     "ReservationStaffModifyMutation",
     "ReservationStaffRepairAccessCodeMutation",
+    "ReservationUnitArchiveMutation",
     "ReservationUnitCreateMutation",
     "ReservationUnitImageCreateMutation",
     "ReservationUnitImageDeleteMutation",
