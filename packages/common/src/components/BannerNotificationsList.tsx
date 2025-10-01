@@ -3,7 +3,6 @@ import { NotificationType } from "hds-react";
 import styled from "styled-components";
 import { useLocalStorage } from "react-use";
 import NotificationWrapper from "./NotificationWrapper";
-import { breakpoints } from "../const";
 import {
   BannerNotificationLevel,
   BannerNotificationTarget,
@@ -15,6 +14,7 @@ import { useTranslation } from "next-i18next";
 import { convertLanguageCode, getTranslationSafe } from "../common/util";
 import { gql } from "@apollo/client";
 import { ClientOnly } from "./ClientOnly";
+import { Sanitize } from "./Sanitize";
 
 type BannerNotificationListProps = {
   target: BannerNotificationTarget;
@@ -49,19 +49,6 @@ const BannerNotificationBackground = styled.div`
   }
 `;
 
-const BannerNotificationText = styled.div`
-  font-size: var(--fontsize-body-m);
-  p:first-of-type {
-    margin-top: 0;
-  }
-  a {
-    text-decoration: underline;
-  }
-  @media (max-width: ${breakpoints.xl}) {
-    padding-right: var(--spacing-l);
-  }
-`;
-
 function convertNotificationType(level: BannerNotificationLevel): NotificationType {
   switch (level) {
     case BannerNotificationLevel.Exception:
@@ -88,14 +75,7 @@ function NotificationsListItem({ notification, closeFn, closedArray }: Notificat
         data-testid="BannerNotificationList__Notification"
         onClose={() => closeFn([...closedArray, notification.id + (notification.activeFrom ?? "")])}
       >
-        {notification && (
-          <BannerNotificationText
-            /* oxlint-disable-next-line react/no-danger */
-            dangerouslySetInnerHTML={{
-              __html: innerHtml,
-            }}
-          />
-        )}
+        {notification && <Sanitize html={innerHtml} />}
       </NotificationWrapper>
     </BannerNotificationBackground>
   );
