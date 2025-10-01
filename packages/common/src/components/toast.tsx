@@ -54,22 +54,7 @@ const Container = styled(TC)`
     left: var(--spacing-s);
     transform: translateY(-50%);
     z-index: 1;
-    display: none;
-  }
-  [class^="Toastify__toast-body"] {
-    border-radius: 0;
-
-    /* HDS doesn't render the icon if the toast doesn't have a label, so we
-    show the toastify icon instead, and make room for it with padding */
-    &:not(:has([class*="Notification-module_label"])) {
-      [class^="Toastify__toast-icon"] {
-        display: block;
-      }
-      [class*="Notification-module_notification"] {
-        padding-left: var(--spacing-2-xl);
-        padding-right: var(--spacing-2-xl);
-      }
-    }
+    display: block;
   }
   [class^="Toastify__close-button"] {
     position: absolute;
@@ -99,7 +84,7 @@ const HDSNotification = styled(Notification)`
     border-width: 0;
   }
   [class^="Notification-module_content"] {
-    padding-top: 8px;
+    padding: 8px var(--spacing-l) 0;
     white-space: pre-line;
   }
   .progress-bar {
