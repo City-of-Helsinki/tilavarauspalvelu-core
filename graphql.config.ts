@@ -43,11 +43,7 @@ const gqlConfig = {
 };
 
 const schema = "tilavaraus.graphql";
-const plugins = [
-  "typescript",
-  "typescript-operations",
-  "typescript-react-apollo",
-] as const;
+const plugins = ["typescript", "typescript-operations", "typescript-react-apollo"] as const;
 
 const config: IGraphQLConfig = {
   projects: {
@@ -61,9 +57,6 @@ const config: IGraphQLConfig = {
             "packages/common/gql/gql-types.ts": {
               plugins,
             },
-          },
-          hooks: {
-            afterOneFileWrite: ["prettier --write"],
           },
         },
       },
@@ -79,9 +72,6 @@ const config: IGraphQLConfig = {
               plugins,
             },
           },
-          hooks: {
-            afterOneFileWrite: ["prettier --write"],
-          },
         },
       },
     },
@@ -95,9 +85,6 @@ const config: IGraphQLConfig = {
             "apps/ui/gql/gql-types.ts": {
               plugins,
             },
-          },
-          hooks: {
-            afterOneFileWrite: ["prettier --write"],
           },
         },
       },
