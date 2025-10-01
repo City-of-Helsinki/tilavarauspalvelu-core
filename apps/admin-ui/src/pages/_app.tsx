@@ -4,7 +4,7 @@ import "common/styles/global.scss";
 import "../styles/global.scss";
 import { ApolloProvider } from "@apollo/client";
 import { createClient } from "@/common/apolloClient";
-import { updateSentryConfig } from "../../sentry.client.config";
+import { updateSentryConfig } from "../../instrumentation-client";
 import { type PageProps } from ".";
 import { appWithTranslation } from "next-i18next";
 import Layout from "./layout";
@@ -35,6 +35,7 @@ function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
     }
   }, [sentryDsn, sentryEnvironment]);
 
+  // NOTE incorrectly typed (apiBaseUrl can be undefined during build)
   const apolloClient = createClient(apiBaseUrl ?? "");
 
   // Manual rehydration of currentUser (otherwise we have flashes of unauthenticated state)

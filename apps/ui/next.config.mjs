@@ -92,6 +92,6 @@ export default withSentryConfig(nextConfig, {
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   tunnelRoute: "/monitoring",
   sourcemaps: {
-    disable: !env.SENTRY_ENABLE_SOURCE_MAPS,
+    // disable: !env.SENTRY_ENABLE_SOURCE_MAPS,
   },
 });
