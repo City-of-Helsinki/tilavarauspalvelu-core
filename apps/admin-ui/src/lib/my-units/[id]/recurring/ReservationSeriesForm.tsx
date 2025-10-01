@@ -37,6 +37,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { getMyUnitUrl, getReservationSeriesUrl } from "@/common/urls";
 import { type OptionT } from "common/src/modules/search";
+import { breakpoints } from "common/src/const";
 
 const InnerTextInput = styled(TextInput)`
   grid-column: 1 / -1;
@@ -84,6 +85,22 @@ function ReservationSeriesFormWrapper({ reservationUnitOptions, unitPk }: Series
 }
 
 export { ReservationSeriesFormWrapper as ReservationSeriesForm };
+
+const ButtonContainer = styled(Flex).attrs({
+  $direction: "row",
+  $justifyContent: "flex-end",
+})`
+  grid-column: 1 / -1;
+
+  > * {
+    flex: 1;
+  }
+  @media (min-width: ${breakpoints.s}) {
+    > * {
+      flex: unset;
+    }
+  }
+`;
 
 type FormValues = ReservationSeriesFormT & ReservationFormMeta;
 
@@ -333,7 +350,7 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
             </ReservationTypeForm>
           )}
 
-          <Flex $direction="row" $justifyContent="flex-end" style={{ gridColumn: "1 / -1" }}>
+          <ButtonContainer>
             {/* cancel is disabled while sending because we have no rollback */}
             <ButtonLikeLink
               href={`${getMyUnitUrl(unitPk)}`}
@@ -351,7 +368,7 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
             >
               {t("common:reserve")}
             </Button>
-          </Flex>
+          </ButtonContainer>
         </AutoGrid>
       </form>
     </FormProvider>
