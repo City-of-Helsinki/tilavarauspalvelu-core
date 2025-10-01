@@ -3,11 +3,12 @@
   "titleSent": "Your booking is now being processed",
   "applicationInfo": "Booking details",
   "summaryIngress": "Your booking is being processed. Please see the booking summary.",
-  "reserveeTypePrefix": "I am creating the application...",
+  "reserveeTypePrefix": "I am making the booking...",
+  "reserveeType": "Reservee type",
   "reserveeTypes": {
     "labels": {
       "NONPROFIT": "On behalf of an association or community",
-      "COMPANY": "On behalf of the company",
+      "COMPANY": "On behalf of a company",
       "INDIVIDUAL": "As a private person"
     }
   },
@@ -26,61 +27,28 @@
     "nonprofit": {
       "reserveeFirstName": "Contact person’s first name",
       "reserveeLastName": "Contact person’s last name",
-      "reserveeAddressStreet": "Street address",
-      "reserveeAddressZip": "Postal code",
-      "reserveeAddressCity": "City",
       "reserveeEmail": "Contact person’s e-mail address",
       "reserveePhone": "Contact person’s telephone number",
       "reserveeOrganisationName": "Official name",
       "reserveeIdentifier": "Business ID",
       "reserveeIsUnregisteredAssociation": "The community is not registered",
-      "municipality": "Domicile",
-      "showBillingAddress": "Invoicing address",
-      "billingFirstName": "Booker’s first name",
-      "billingLastName": "Booker’s last name",
-      "billingPhone": "Telephone",
-      "billingEmail": "E-mail address",
-      "billingAddressStreet": "Street address",
-      "billingAddressZip": "Postal code",
-      "billingAddressCity": "City"
+      "municipality": "Domicile"
     },
     "individual": {
       "reserveeFirstName": "First name",
       "reserveeLastName": "Last name",
-      "reserveeAddressStreet": "Street address",
-      "reserveeAddressZip": "Postal code",
-      "reserveeAddressCity": "City",
       "reserveeEmail": "E-mail address",
       "reserveePhone": "Telephone",
-      "municipality": "Domicile",
-      "showBillingAddress": "Invoicing address",
-      "billingFirstName": "Booker’s first name",
-      "billingLastName": "Booker’s last name",
-      "billingPhone": "Telephone",
-      "billingEmail": "E-mail address",
-      "billingAddressStreet": "Street address",
-      "billingAddressZip": "Postal code",
-      "billingAddressCity": "City"
+      "municipality": "Domicile"
     },
     "company": {
       "reserveeFirstName": "Contact person’s first name",
       "reserveeLastName": "Contact person’s last name",
-      "reserveeAddressStreet": "Street address",
-      "reserveeAddressZip": "Postal code",
-      "reserveeAddressCity": "City",
       "reserveeEmail": "Contact person’s e-mail address",
       "reserveePhone": "Contact person’s telephone number",
       "reserveeOrganisationName": "Official name",
       "reserveeIdentifier": "Business ID",
-      "municipality": "Domicile",
-      "showBillingAddress": "Invoicing address",
-      "billingFirstName": "Booker’s first name",
-      "billingLastName": "Booker’s last name",
-      "billingPhone": "Telephone",
-      "billingEmail": "E-mail address",
-      "billingAddressStreet": "Street address",
-      "billingAddressZip": "Postal code",
-      "billingAddressCity": "City"
+      "municipality": "Domicile"
     },
     "headings": {
       "companyInfo": "Company information",
@@ -90,8 +58,5 @@
     "subHeadings": {
       "subvention": "Apply for a reduced price"
     }
-  },
-  "processLabels": {
-    "handlingRequired": "Booking is being processed"
   }
 }

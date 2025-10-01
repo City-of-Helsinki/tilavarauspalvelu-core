@@ -17,7 +17,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatDuration, toUIDate } from "common/src/common/util";
 import { useModal } from "@/context/ModalContext";
-import { TimeChangeFormSchemaRefined, TimeFormSchema } from "@/schemas";
+import { getTimeChangeFormSchemaRefined, TimeFormSchema } from "common/src/schemas";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { BufferToggles } from "@/component/BufferToggles";
@@ -250,8 +250,7 @@ export function NewReservationModal({ reservationToCopy, onAccept, onClose }: Ne
   const interval = getNormalizedInterval(reservationUnit.reservationStartInterval);
 
   const form = useForm<EditFormValueType>({
-    // @ts-expect-error -- schema refinement breaks typing
-    resolver: zodResolver(TimeChangeFormSchemaRefined(interval)),
+    resolver: zodResolver(getTimeChangeFormSchemaRefined(interval)),
     mode: "onChange",
     defaultValues: {
       enableBufferTimeAfter: true,
@@ -340,8 +339,7 @@ export function EditTimeModal({
   }
 
   const form = useForm<EditFormValueType>({
-    // @ts-expect-error -- schema refinement breaks typing
-    resolver: zodResolver(TimeChangeFormSchemaRefined(interval)),
+    resolver: zodResolver(getTimeChangeFormSchemaRefined(interval)),
     mode: "onChange",
     defaultValues: {
       pk: reservation.pk ?? undefined,

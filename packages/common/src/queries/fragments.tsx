@@ -1,45 +1,5 @@
 import { gql } from "@apollo/client";
 
-export const RESERVEE_BILLING_FRAGMENT = gql`
-  fragment ReserveeBillingFields on ReservationNode {
-    id
-    reserveeFirstName
-    reserveeLastName
-    reserveeEmail
-    reserveePhone
-    reserveeType
-    reserveeOrganisationName
-    reserveeIdentifier
-    reserveeAddressStreet
-    reserveeAddressCity
-    reserveeAddressZip
-  }
-`;
-
-export const METAFIELDS_FRAGMENT = gql`
-  fragment MetaFields on ReservationNode {
-    ...ReserveeBillingFields
-    applyingForFreeOfCharge
-    freeOfChargeReason
-    description
-    numPersons
-    ageGroup {
-      id
-      pk
-      maximum
-      minimum
-    }
-    purpose {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
-    municipality
-  }
-`;
-
 export const TERMS_OF_USE_NAME_FRAGMENT = gql`
   fragment TermsOfUseNameFields on TermsOfUseNode {
     id
@@ -111,24 +71,5 @@ export const LOCATION_FRAGMENT_I18N = gql`
     addressStreetSv
     addressCityEn
     addressCitySv
-  }
-`;
-
-export const METADATA_SETS_FRAGMENT = gql`
-  fragment MetadataSets on ReservationUnitNode {
-    id
-    minPersons
-    maxPersons
-    metadataSet {
-      id
-      requiredFields {
-        id
-        fieldName
-      }
-      supportedFields {
-        id
-        fieldName
-      }
-    }
   }
 `;

@@ -108,6 +108,12 @@
     "CANCELLED": "Peruutettu",
     "FREE": "Maksuton"
   },
+  "reservationForm": {
+    "AGE_GROUP_FORM": "Lomake 3: Käyttötarkoitus",
+    "CONTACT_INFO_FORM": "Lomake 1: Vain yhteystiedot",
+    "PURPOSE_FORM": "Lomake 4: Ikäryhmä",
+    "RESERVEE_INFO_FORM": "Lomake 2: Yhteystiedot ja tilaisuuden kuvaus"
+  },
   "reservationStartInterval": {
     "INTERVAL_15_MINS": "15 min välein",
     "INTERVAL_30_MINS": "30 min välein",
