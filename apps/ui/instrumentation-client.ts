@@ -41,3 +41,5 @@ export function updateSentryConfig(dsn: string, environment: string) {
     environment,
   });
 }
+
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
