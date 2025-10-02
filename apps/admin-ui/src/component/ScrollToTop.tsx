@@ -1,14 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useScrollPosition } from "@n8tb1t/use-scroll-position";
 import { IconAngleUp } from "hds-react";
-import { useMedia } from "react-use";
 import { focusStyles } from "common/styled";
 import { useTranslation } from "next-i18next";
-import { breakpoints } from "common/src/const";
 
 const Btn = styled.button`
-  --min-size: 44px;
+  --min-size: 34px;
   & {
     --background-color-focus: var(--color-black);
     --color-focus: var(--color-white);
@@ -38,26 +35,22 @@ export function ScrollToTop(): JSX.Element | null {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
 
-  // TODO why disable this on mobile? (proably because it blocks some submit buttons)
-  const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
-
-  useScrollPosition(
-    ({ currPos }) => {
+  useEffect(() => {
+    const POLL_INTERVAL = 300;
+    const timer = setInterval(() => {
       const height = window.innerHeight;
-      const yPos = Math.abs(currPos.y) + window.innerHeight;
+      const currPos = window.scrollY;
+      const yPos = currPos + window.innerHeight;
       setIsVisible(yPos > height + 100);
-    },
-    undefined,
-    undefined,
-    undefined,
-    300
-  );
+    }, POLL_INTERVAL);
+    return () => clearInterval(timer);
+  }, []);
 
   const handleClick = () => {
     window.scroll({ top: 0, left: 0, behavior: "smooth" });
   };
 
-  if (!isMobile || !isVisible) {
+  if (!isVisible) {
     return null;
   }
   return (
