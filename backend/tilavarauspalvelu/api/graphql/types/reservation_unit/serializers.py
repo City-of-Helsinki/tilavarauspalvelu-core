@@ -241,6 +241,11 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
         # Highest price cannot be less than the lowest price
         for pricing in pricings:
+            tax_percentage = pricing.get("tax_percentage")
+            if not tax_percentage.is_enabled:
+                msg = "This tax percentage cannot be used anymore."
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_TAX_PERCENTAGE_DISABLED)
+
             highest_price = pricing.get("highest_price")
             lowest_price = pricing.get("lowest_price")
 
