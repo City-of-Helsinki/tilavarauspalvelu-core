@@ -1611,7 +1611,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         authentication=AuthenticationType.WEAK,
         reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES,
         reservation_kind=ReservationKind.DIRECT,
-        reservation_form=ReservationFormType.PURPOSE_SUBVENTION_FORM,
+        reservation_form=ReservationFormType.PURPOSE_FORM,
         #
         # Lists
         search_terms=[],
@@ -1799,7 +1799,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         authentication=AuthenticationType.WEAK,
         reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES,
         reservation_kind=ReservationKind.DIRECT,
-        reservation_form=ReservationFormType.AGE_GROUP_SUBVENTION_FORM,
+        reservation_form=ReservationFormType.AGE_GROUP_FORM,
         #
         # Lists
         search_terms=[],
@@ -2705,7 +2705,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         authentication=AuthenticationType.WEAK,
         reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES,
         reservation_kind=ReservationKind.SEASON,
-        reservation_form=ReservationFormType.AGE_GROUP_SUBVENTION_FORM,
+        reservation_form=ReservationFormType.AGE_GROUP_FORM,
         #
         # Lists
         search_terms=[],
@@ -2861,7 +2861,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         authentication=AuthenticationType.WEAK,
         reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES,
         reservation_kind=ReservationKind.SEASON,
-        reservation_form=ReservationFormType.PURPOSE_SUBVENTION_FORM,
+        reservation_form=ReservationFormType.PURPOSE_FORM,
         #
         # Lists
         search_terms=[],
@@ -3016,7 +3016,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         authentication=AuthenticationType.WEAK,
         reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES,
         reservation_kind=ReservationKind.SEASON,
-        reservation_form=ReservationFormType.AGE_GROUP_SUBVENTION_FORM,
+        reservation_form=ReservationFormType.AGE_GROUP_FORM,
         #
         # Lists
         search_terms=[],

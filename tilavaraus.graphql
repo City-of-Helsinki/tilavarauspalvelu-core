@@ -991,8 +991,6 @@ enum ReservationFormType {
   RESERVEE_INFO_FORM
   PURPOSE_FORM
   AGE_GROUP_FORM
-  PURPOSE_SUBVENTION_FORM
-  AGE_GROUP_SUBVENTION_FORM
 }
 
 type UnitNode implements Node {
