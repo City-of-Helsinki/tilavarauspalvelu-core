@@ -14,6 +14,7 @@ from tilavarauspalvelu.enums import (
     ApplicationRoundStatusChoice,
     ApplicationStatusChoice,
     ReservationKind,
+    TermsOfUseTypeChoices,
 )
 from utils.date_utils import local_datetime
 from utils.db import Now
@@ -77,6 +78,7 @@ class ApplicationRound(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
+        limit_choices_to=models.Q(terms_type=TermsOfUseTypeChoices.RECURRING),
     )
 
     objects: ClassVar[ApplicationRoundManager] = LazyModelManager.new()
