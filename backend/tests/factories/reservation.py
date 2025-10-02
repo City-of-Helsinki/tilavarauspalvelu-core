@@ -81,8 +81,6 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     reservee_email = FakerFI("ascii_email")
     reservee_phone = FakerFI("phone_number")
     reservee_organisation_name = FakerFI("company")
-    reservee_address_street = FakerFI("street_address")
-    reservee_address_city = FakerFI("city")
     reservee_address_zip = FakerFI("postcode")
     reservee_used_ad_login = False
     reservee_type = ReserveeType.INDIVIDUAL

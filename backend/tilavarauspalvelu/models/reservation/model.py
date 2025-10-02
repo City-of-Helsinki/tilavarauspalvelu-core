@@ -115,8 +115,6 @@ class Reservation(SerializableModelMixin, models.Model):
     reservee_email: str | None = models.EmailField(null=True, blank=True)
     reservee_phone: str = models.CharField(max_length=255, blank=True, default="")
     reservee_organisation_name: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_address_street: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_address_city: str = models.CharField(max_length=255, blank=True, default="")
     reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")
     reservee_used_ad_login: bool = models.BooleanField(default=False, blank=True)
     reservee_type: ReserveeType | None = TextChoicesField(enum=ReserveeType, null=True, blank=True)
@@ -195,8 +193,6 @@ class Reservation(SerializableModelMixin, models.Model):
         {"name": "reservee_email"},
         {"name": "reservee_phone"},
         {"name": "reservee_address_zip"},
-        {"name": "reservee_address_city"},
-        {"name": "reservee_address_street"},
         {"name": "reservee_identifier"},
         {"name": "reservee_organisation_name"},
         {"name": "free_of_charge_reason"},

@@ -247,8 +247,6 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
             reservee_email=next_reservation.reservee_email,
             reservee_phone=next_reservation.reservee_phone,
             reservee_organisation_name=next_reservation.reservee_organisation_name,
-            reservee_address_street=next_reservation.reservee_address_street,
-            reservee_address_city=next_reservation.reservee_address_city,
             reservee_address_zip=next_reservation.reservee_address_zip,
             reservee_type=next_reservation.reservee_type,
             #

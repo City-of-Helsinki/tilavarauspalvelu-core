@@ -139,14 +139,6 @@ def test_query_user_data__full(api_client, settings):
                                 "value": reservation.reservee_address_zip,
                             },
                             {
-                                "key": "RESERVEE_ADDRESS_CITY",
-                                "value": reservation.reservee_address_city,
-                            },
-                            {
-                                "key": "RESERVEE_ADDRESS_STREET",
-                                "value": reservation.reservee_address_street,
-                            },
-                            {
                                 "key": "RESERVEE_IDENTIFIER",
                                 "value": reservation.reservee_identifier,
                             },
