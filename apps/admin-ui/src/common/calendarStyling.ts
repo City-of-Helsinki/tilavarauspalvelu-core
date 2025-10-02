@@ -51,7 +51,7 @@ export const POST_PAUSE = {
     borderColor: "var(--color-black-40)",
     borderLeft: "3px / 1px solid var(--color-black)",
     background: "var(--tilavaraus-event-booking-break)",
-    // Invisibile text, real solution is to fix big-calendar not to render it
+    // Invisible text, real solution is to fix big-calendar not to render it
     color: "var(--tilavaraus-event-booking-break)",
   },
 };
@@ -93,6 +93,16 @@ export const INTERSECTING_RESERVATION_UNIT = {
   },
 };
 
+export const REST = {
+  style: {
+    background: `var(--tilavaraus-event-rest-background)`,
+    color: `black`,
+    borderColor: `var(--tilavaraus-event-rest-border-color)`,
+    borderStyle: "solid",
+    borderWidth: "0px 0px 0px 3px",
+  },
+};
+
 export const EVENT_STYLE: React.CSSProperties = {
   cursor: "pointer",
   borderRadius: "0px",
@@ -102,7 +112,25 @@ export const EVENT_STYLE: React.CSSProperties = {
   opacity: 0.8,
 };
 
-export const COMMON_LEGEND = [
+type EventKey =
+  | "CONFIRMED"
+  | "UNCONFIRMED"
+  | "STAFF_RESERVATION"
+  | "INTERSECTING_RESERVATION_UNIT"
+  | "PAUSE"
+  | "CLOSED"
+  | "WAITING_PAYMENT"
+  | "RESERVATION_UNIT_RELEASED"
+  | "RESERVATION_UNIT_DRAFT"
+  | "REST";
+
+export type EventStyleType = {
+  key: EventKey;
+  label: string;
+  style: Record<string, string>;
+};
+
+export const CALENDAR_LEGENDS = [
   {
     key: "CONFIRMED",
     label: "myUnits:Calendar.legend.confirmed",
@@ -122,5 +150,37 @@ export const COMMON_LEGEND = [
     key: "STAFF_RESERVATION",
     label: "myUnits:Calendar.legend.staffReservation",
     style: STAFF_RESERVATION.style,
+  },
+
+  {
+    key: "INTERSECTING_RESERVATION_UNIT",
+    label: "myUnits:Calendar.legend.intersecting",
+    style: INTERSECTING_RESERVATION_UNIT.style,
+  },
+  {
+    key: "PAUSE",
+    label: "myUnits:Calendar.legend.pause",
+    style: POST_PAUSE.style,
+  },
+  {
+    key: "CLOSED",
+    label: "myUnits:Calendar.legend.closed",
+    style: BLOCKED.style,
+  },
+  {
+    key: "RESERVATION_UNIT_RELEASED",
+    label: "myUnits:Calendar.legend.reservationUnitReleased",
+    style: RESERVATION_UNIT_RELEASED.style,
+  },
+  {
+    key: "RESERVATION_UNIT_DRAFT",
+    label: "myUnits:Calendar.legend.reservationUnitDraft",
+    style: RESERVATION_UNIT_DRAFT.style,
+  },
+
+  {
+    key: "REST",
+    label: "myUnits:Calendar.legend.reserved",
+    style: REST.style,
   },
 ] as const;
