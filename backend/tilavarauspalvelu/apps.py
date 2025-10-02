@@ -6,6 +6,9 @@ from django.apps import AppConfig
 from django.conf import settings
 from django.core.management import call_command
 from django.db.models.signals import post_migrate
+from graphql import NoSchemaIntrospectionCustomRule
+from graphql.pyutils import did_you_mean
+from graphql.validation.validate import validate
 
 
 class TilavarauspalveluConfig(AppConfig):
@@ -22,6 +25,18 @@ class TilavarauspalveluConfig(AppConfig):
             # Run after migration command is run, even if no migrations are applied
             # Essentially this is run every time a new version is deployed to a server
             post_migrate.connect(self.run_populate_celery_tasks, sender=self)
+
+        # See: https://github.com/graphql-python/graphql-core/issues/97#issuecomment-642967670
+        if not settings.ALLOW_DID_YOU_MEAN_SUGGESTIONS:
+            did_you_mean.__globals__["MAX_LENGTH"] = 0
+
+        # This is cursed, but Graphene does not expose a way to add new validation rules
+        # to the validation step of the GraphQL schema without overriding the schema execution itself.
+        if not settings.ALLOW_INTROSPECTION_QUERIES:
+            validate.__globals__["specified_rules"] = (
+                *validate.__globals__["specified_rules"],
+                NoSchemaIntrospectionCustomRule,
+            )
 
     def register_signals(self) -> None:
         import tilavarauspalvelu.signals  # noqa: F401
