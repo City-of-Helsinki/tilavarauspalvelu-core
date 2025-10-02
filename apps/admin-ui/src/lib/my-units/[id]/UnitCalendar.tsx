@@ -1,5 +1,5 @@
 import React, { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
-import { differenceInMinutes, isToday, setHours, startOfDay } from "date-fns";
+import { addMinutes, differenceInMinutes, isToday, setHours, setMinutes, startOfDay } from "date-fns";
 import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
 import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
@@ -14,6 +14,7 @@ import { ReservationPopupContent } from "./ReservationPopupContent";
 import eventStyleGetter from "./eventStyleGetter";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { isCellOverlappingSpan, TimeSpanType } from "common/src/calendar/util";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 type Resource = {
@@ -21,6 +22,7 @@ type Resource = {
   pk: number;
   isDraft: boolean;
   events: CalendarEventType[];
+  reservableTimeSpans: TimeSpanType[];
 };
 
 const N_HOURS = 24;
@@ -187,6 +189,7 @@ type CellProps = {
   date: Date;
   onComplete: () => void;
   hasPermission: boolean;
+  reservableTimeSpans: TimeSpanType[];
 };
 
 const CellStyled = styled.div<{ $isPast?: boolean }>`
@@ -208,18 +211,39 @@ function Cell({
   date,
   hasPermission,
   reservationUnitPk,
+  reservableTimeSpans,
 }: { offset: number } & Omit<CellProps, "cols">): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
 
-  const now = new Date();
-  const isPast = (index: number) => {
-    return setHours(date, Math.round(index / 2)) < now;
-  };
-
   const cellId = `${reservationUnitPk}-${offset}`;
-  const testId = `UnitCalendar__RowCalendar--cell-${cellId}`;
+
+  const now = new Date();
+  const isPast = setHours(date, Math.round(offset / 2)) < now;
+
+  // Use date from the first reservable time span instead of `date` to prevent flickering when day is changed, which
+  // causes an API request and `reservableTimeSpans` contains `previousData`, but `date` is already the changed date
+  const reservableStartTimeDate = reservableTimeSpans[0]?.start ?? date;
+
+  // Check if the cell is open (is inside any reservable time span) and invert the result
+  const isClosed =
+    reservableTimeSpans.length > 0 && // Don't show as closed if reservable time spans are not yet loaded
+    reservableTimeSpans[0]?.start &&
+    !reservableTimeSpans.some((span) => {
+      // Cell start is at e.g. 8:00 for offset 16, 8:30 for offset 17
+      // Cell end is at e.g. 8:30 for offset 16, 9:00 for offset 17
+      const cellHours = Math.floor(offset / 2);
+      const cellMinutes = (offset * 30) % 60;
+
+      const cellStart = setMinutes(setHours(reservableStartTimeDate, cellHours), cellMinutes);
+      const cellEnd = addMinutes(cellStart, 30);
+
+      // Cell is closed, if it doesn't overlap with any reservable time span
+      // i.e. if the cell start is after the span end or the cell end is before the span start
+
+      return isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end);
+    });
 
   const handleOpenModal = () => {
     if (!hasPermission) {
@@ -249,10 +273,10 @@ function Cell({
     <CellStyled
       ref={ref}
       onClick={handleClick}
-      $isPast={isPast(offset)}
-      data-testid={testId}
-      tabIndex={isPast(offset) ? -1 : 0}
       onKeyDown={handleKeyDown}
+      $isPast={isPast || isClosed}
+      tabIndex={isPast || isClosed ? -1 : 0}
+      data-testid={`UnitCalendar__RowCalendar--cell-${cellId}`}
     />
   );
 }
@@ -362,19 +386,17 @@ function Event({ event, styleGetter }: EventProps): JSX.Element {
   const start = new Date(event.start);
   const endDate = new Date(event.end);
 
-  const eventStartMinutes = start.getHours() * 60 + start.getMinutes();
-  const startMinutes = eventStartMinutes;
-
-  const hourPercent = 100 / N_HOURS;
-  const hours = startMinutes / 60;
-  const left = `${hourPercent * hours}%`;
-
   const durationMinutes = differenceInMinutes(endDate, start);
 
+  const startMinutes = start.getHours() * 60 + start.getMinutes();
+  const hours = startMinutes / 60;
+
+  const hourPercent = 100 / N_HOURS;
+
+  const left = `${hourPercent * hours}%`;
   const right = `calc(${left} + ${durationMinutes / 60} * ${100 / N_HOURS}% + 1px)`;
 
   const reservation = event.event;
-  const testId = `UnitCalendar__RowCalendar--event-${reservation?.pk}`;
   return (
     <>
       <PreBuffer event={event} hourPercent={hourPercent} left={left} style={TemplateProps} />
@@ -386,7 +408,10 @@ function Event({ event, styleGetter }: EventProps): JSX.Element {
           zIndex: 5,
         }}
       >
-        <EventContent style={{ ...styleGetter(event).style }} data-testid={testId}>
+        <EventContent
+          style={{ ...styleGetter(event).style }}
+          data-testid={`UnitCalendar__RowCalendar--event-${reservation?.pk}`}
+        >
           <p>{title}</p>
           {/* NOTE don't set position on Popup it breaks responsiveness */}
           <Popup trigger={EventTriggerButton}>
@@ -422,12 +447,35 @@ function sortByDraftStatusAndTitle(resources: Resource[]) {
   });
 }
 
+function scrollCalendarToCurrentTime(calendarRef: React.RefObject<HTMLDivElement>, date: Date) {
+  // scroll to around 9 - 17 on load
+  const ref = calendarRef.current;
+
+  if (!ref) {
+    return;
+  }
+
+  const FIRST_HOUR = 7;
+  const now = new Date();
+  const cellToScroll = isToday(date) ? Math.min(now.getHours(), 24) : Math.min(FIRST_HOUR, 24);
+  const firstElementOfHeader = ref.querySelector(`.calendar-header > div:nth-of-type(${cellToScroll})`);
+  // horizontal scroll the calendar element
+  // NOTE Don't use scrollIntoView because it changes focus on Chrome
+  if (firstElementOfHeader && ref.parentElement) {
+    const elementPos = firstElementOfHeader.getBoundingClientRect().left;
+    // move a bit backwards to handle row title on mobile
+    const x = elementPos - 35;
+    const originalScrollLeft = ref.parentElement.scrollLeft;
+    ref.parentElement.scrollTo(x + originalScrollLeft, 0);
+  }
+}
+
 interface UnitCalendarProps {
   date: Date;
   resources: Resource[];
   refetch: () => void;
-  isLoading?: boolean;
   canCreateReservations?: boolean;
+  isLoading: boolean;
 }
 
 export function UnitCalendar({
@@ -435,32 +483,14 @@ export function UnitCalendar({
   resources,
   refetch,
   canCreateReservations = false,
+  isLoading,
 }: UnitCalendarProps): JSX.Element {
   const calendarRef = useRef<HTMLDivElement>(null);
   const orderedResources = sortByDraftStatusAndTitle([...resources]);
   const startDate = startOfDay(date);
 
-  // scroll to around 9 - 17 on load
   const scrollCalendar = useCallback(() => {
-    const ref = calendarRef.current;
-
-    if (!ref) {
-      return;
-    }
-
-    const FIRST_HOUR = 7;
-    const now = new Date();
-    const cellToScroll = isToday(date) ? Math.min(now.getHours(), 24) : Math.min(FIRST_HOUR, 24);
-    const firstElementOfHeader = ref.querySelector(`.calendar-header > div:nth-of-type(${cellToScroll})`);
-    // horizontal scroll the calendar element
-    // NOTE Don't use scrollIntoView because it changes focus on Chrome
-    if (firstElementOfHeader && ref.parentElement) {
-      const elementPos = firstElementOfHeader.getBoundingClientRect().left;
-      // move a bit backwards to handle row title on mobile
-      const x = elementPos - 35;
-      const originalScrollLeft = ref.parentElement.scrollLeft;
-      ref.parentElement.scrollTo(x + originalScrollLeft, 0);
-    }
+    scrollCalendarToCurrentTime(calendarRef, date);
   }, [date]);
 
   useEffect(() => {
@@ -485,9 +515,11 @@ export function UnitCalendar({
 
   const height = resources.length > MAX_RESOURCES_WITHOUT_SCROLL ? containerHeight : "auto";
 
-  /* TODO use a darker background if loading */
   return (
-    <Container $height={height}>
+    <Container
+      $height={height}
+      style={{ background: isLoading ? "var(--tilavaraus-event-booking-past-date)" : "transparent" }}
+    >
       <HideTimesOverTitles />
       <FlexContainer $numCols={N_COLS} ref={calendarRef}>
         <HeadingRow>
@@ -510,6 +542,7 @@ export function UnitCalendar({
                 reservationUnitPk={row.pk}
                 hasPermission={canCreateReservations}
                 onComplete={refetch}
+                reservableTimeSpans={row.reservableTimeSpans}
               />
               {/* TODO events should be over the cells (tabindex is not correct now) */}
               <Events events={row.events} styleGetter={eventStyleGetter(row.pk)} />

@@ -1,5 +1,6 @@
-import { addSeconds } from "date-fns";
-import { type CalendarEventBuffer } from "./Calendar";
+import { addMinutes, addSeconds } from "date-fns";
+import { type CalendarEventBuffer, SlotProps } from "./Calendar";
+import { ReservableTimeSpanType } from "../../gql/gql-types";
 
 export type ReservationEventType = {
   beginsAt: string;
@@ -8,7 +9,13 @@ export type ReservationEventType = {
   bufferTimeAfter: number;
 };
 
+export type TimeSpanType = Readonly<{
+  start: Readonly<Date>;
+  end: Readonly<Date>;
+}>;
+
 export function getEventBuffers(events: ReservationEventType[]): CalendarEventBuffer[] {
+  // TODO: Deprecate this and make buffers non-events, use useSlotPropGetter and getBuffersFromEvents instead
   const buffers: CalendarEventBuffer[] = [];
   for (const event of events) {
     if (!event.beginsAt || !event.endsAt) {
@@ -35,4 +42,89 @@ export function getEventBuffers(events: ReservationEventType[]): CalendarEventBu
   }
 
   return buffers;
+}
+
+export function getBuffersFromEvents(events: ReservationEventType[]): TimeSpanType[] {
+  const buffers: TimeSpanType[] = [];
+
+  for (const event of events) {
+    const { bufferTimeBefore, bufferTimeAfter } = event;
+
+    if (bufferTimeBefore) {
+      const begin = new Date(event.beginsAt);
+      buffers.push({
+        start: addSeconds(begin, -1 * bufferTimeBefore),
+        end: begin,
+      });
+    }
+    if (bufferTimeAfter) {
+      const end = new Date(event.endsAt);
+      buffers.push({
+        start: end,
+        end: addSeconds(end, bufferTimeAfter),
+      });
+    }
+  }
+
+  return buffers;
+}
+
+export function isCellOverlappingSpan(
+  cellStart: Readonly<Date>,
+  cellEnd: Readonly<Date>,
+  spanStart: Readonly<Date>,
+  spanEnd: Readonly<Date>
+): boolean {
+  // Is this Cell inside the reservable time span?
+  //     ┌─ Cell ─┐
+  //═══  │        │      # No
+  //═════│        │      # No
+  //═════│══      │      # Yes
+  //═════│════════│      # Yes
+  //     │        │
+  //     │  ════  │      # Yes
+  //     │════════│      # Yes
+  //═════│════════│═════ # Yes
+  //     │        │
+  //     │════════│═════ # Yes
+  //     │      ══│═════ # Yes
+  //     │        │═════ # No
+  //     │        │  ═══ # No
+  return cellStart < spanEnd && cellEnd > spanStart;
+}
+
+export function useSlotPropGetter(
+  reservableTimeSpans: ReservableTimeSpanType[],
+  events: ReservationEventType[]
+): (date: Readonly<Date>) => SlotProps {
+  const reservableTimeSpanDates: TimeSpanType[] = reservableTimeSpans?.map((rts) => ({
+    start: new Date(rts.startDatetime),
+    end: new Date(rts.endDatetime),
+  }));
+
+  const bufferTimeSpans = getBuffersFromEvents(events);
+
+  return (cellStart: Readonly<Date>): SlotProps => {
+    const isPast = cellStart < new Date();
+    if (isPast) return { className: "rbc-timeslot-inactive" };
+
+    if (reservableTimeSpanDates.length === 0) return { className: "rbc-timeslot-inactive" };
+
+    // Calendar cells are 30min slots
+    const cellEnd = addMinutes(cellStart, 30);
+
+    // Cell is closed, if it doesn't overlap with any reservable time span
+    const isClosed = !reservableTimeSpanDates.some((span) => {
+      return isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end);
+    });
+    if (isClosed) return { className: "rbc-timeslot-inactive" };
+
+    // Cell is buffer, if it overlaps with any buffer time span
+    const isBuffer = bufferTimeSpans.some((span) => {
+      return isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end);
+    });
+    if (isBuffer) return { className: "rbc-event-buffer" };
+
+    return {};
+  };
 }

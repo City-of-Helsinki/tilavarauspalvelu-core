@@ -110,7 +110,7 @@ export function combineAffectingReservations<T extends AffectedReservations>(
     return [];
   }
 
-  // NOTE we could use a recular concat here (we only have single reservationUnit here)
+  // NOTE we could use a regular concat here (we only have single reservationUnit here)
   const affectingReservations = filterNonNullable(data.affectingReservations).filter((y) =>
     isAffecting(y, reservationUnitPk)
   );

@@ -822,6 +822,8 @@ def test_frontend_queries__admin_ui__ReservationUnitCalendar(graphql):
     variables = query_info_1.variables
     variables["id"] = to_global_id(query_info_1.typename, obj.id)
     variables["pk"] = obj.pk
+    variables["beginDate"] = local_date().isoformat()
+    variables["endDate"] = (local_date() + datetime.timedelta(days=1)).isoformat()
     assert_no_undefined_variables(variables)
 
     query = query_info_1.query
@@ -893,6 +895,8 @@ def test_frontend_queries__admin_ui__ReservationUnitsByUnit(graphql):
     variables = query_info_1.variables
     variables["id"] = to_global_id(query_info_1.typename, obj.id)
     variables["pk"] = obj.pk
+    variables["beginDate"] = local_date().isoformat()
+    variables["endDate"] = (local_date() + datetime.timedelta(days=7)).isoformat()
     assert_no_undefined_variables(variables)
 
     query = query_info_1.query

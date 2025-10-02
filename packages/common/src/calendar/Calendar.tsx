@@ -20,7 +20,7 @@ export type CalendarEvent<T> = {
 };
 
 export type CalendarBufferEvent = {
-  state: "BUFFER";
+  state: "BUFFER" | "CLOSED";
 };
 
 export type CalendarEventBuffer = {
@@ -354,6 +354,10 @@ const StyledCalendar = styled(BigCalendar)<{
   .rbc-timeslot-inactive {
     background-color: var(--color-black-5);
     border-left: 2px solid var(--color-black-30);
+  }
+
+  .rbc-event-buffer {
+    background-color: var(--tilavaraus-event-booking-break);
   }
 
   .rbc-event {
