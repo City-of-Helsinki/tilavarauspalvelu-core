@@ -110,7 +110,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
             # Forward many-to-many related
             "spaces",
             "resources",
-            "purposes",
+            "intended_uses",
             "equipments",
             #
             # Reverse one-to-many related
