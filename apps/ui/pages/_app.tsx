@@ -10,7 +10,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { TrackingWrapper } from "@/modules/tracking";
 import "common/styles/global.scss";
 import "../styles/global.scss";
-import { updateSentryConfig } from "@/sentry.client.config";
+import { updateSentryConfig } from "@/instrumentation-client";
 import { ToastContainer } from "common/src/components/toast";
 import { CookieBanner, CookieConsentContextProvider } from "hds-react";
 import sitesettings from "./sitesettings.json";

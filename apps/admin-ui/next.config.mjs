@@ -72,6 +72,18 @@ const config = {
       },
     ];
   },
+  // NOTE sentry/nextjs doesn't have options to bundle static/chunks
+  // widenClientFileUpload should enable them but it doesn't
+  // the only option is custom webpack configuration to add SSR sourcemaps
+  productionBrowserSourceMaps: env.SENTRY_ENABLE_SOURCE_MAPS,
+  webpack: (config, { isServer }) => {
+    if (isServer && env.SENTRY_ENABLE_SOURCE_MAPS) {
+      // oxlint-disable-next-line no-console
+      console.log("Server build: adding sourcemaps");
+      config.devtool = "source-map";
+    }
+    return config;
+  },
   basePath: env.NEXT_PUBLIC_BASE_URL,
   compiler: {
     styledComponents: {
@@ -102,7 +114,8 @@ export default withSentryConfig(config, {
   tunnelRoute: "/monitoring",
   // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
   automaticVercelMonitors: false,
+  // Disable sourcemaps because we use nextjs configuration for it
   sourcemaps: {
-    disable: !env.SENTRY_ENABLE_SOURCE_MAPS,
+    disable: true,
   },
 });
