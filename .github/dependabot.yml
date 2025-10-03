@@ -102,6 +102,14 @@ updates:
       hds:
         patterns:
           - "hds-*"
+      codegen:
+        patterns:
+          - "@graphql-codegen/*"
+          - "@graphql-tools/*"
+      apollo-graphql:
+        patterns:
+          - "@apollo/client"
+          - "apollo-upload-client"
       linter:
         patterns:
           - "oxlint"
