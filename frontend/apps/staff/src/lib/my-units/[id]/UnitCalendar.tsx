@@ -163,13 +163,14 @@ const HideTimesOverTitles = styled.div`
   z-index: var(--tilavaraus-admin-stack-calendar-header-names);
 `;
 
-const Container = styled.div<{ $height: number | "auto" }>`
+const Container = styled.div<{ $height: number | "auto"; $isLoading: boolean }>`
   max-width: 100%;
   overflow: auto;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
 
   height: ${({ $height }) => (typeof $height === "number" ? `${$height}px` : "auto")};
+  background: ${({ $isLoading }) => ($isLoading ? "var(--color-black-10)" : "transparent")};
 `;
 
 const EventContainer = styled.div`
@@ -506,10 +507,7 @@ export function UnitCalendar({
   const height = resources.length > MAX_RESOURCES_WITHOUT_SCROLL ? containerHeight : "auto";
 
   return (
-    <Container
-      $height={height}
-      style={{ background: isLoading ? "var(--tilavaraus-event-booking-past-date)" : "transparent" }}
-    >
+    <Container $height={height} $isLoading={isLoading}>
       <HideTimesOverTitles />
       <FlexContainer $numCols={N_COLS} ref={calendarRef}>
         <HeadingRow>
