@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { addHours, endOfMonth, format, startOfWeek, getDay, startOfDay } from "date-fns";
+import { addHours, endOfMonth, format, getDay, startOfDay, startOfWeek } from "date-fns";
 import { fi } from "date-fns/locale/fi";
 import { enGB } from "date-fns/locale/en-GB";
 import { sv } from "date-fns/locale/sv";
@@ -173,6 +173,7 @@ const StyledCalendar = styled(BigCalendar)<{
         border-top: 1px solid var(--color-black-20);
         border-left: none;
         flex: none;
+        background-image: none !important; // Gutter has the same date in slotPropGetter as the first column
 
         &:first-of-type {
           border-color: var(--color-black-20);
@@ -241,6 +242,11 @@ const StyledCalendar = styled(BigCalendar)<{
   &.view-day {
     .rbc-time-column {
       padding-top: 1px;
+
+      // Disable showing today column with different background color
+      &.rbc-now.rbc-today {
+        background-color: transparent;
+      }
     }
 
     .rbc-day-slot {
