@@ -68,7 +68,7 @@ const nextConfig = {
   webpack: (config, { isServer }) => {
     if (isServer && env.SENTRY_ENABLE_SOURCE_MAPS) {
       // oxlint-disable-next-line no-console
-      console.log("Server build: adding sourcemaps");
+      console.log("Adding sourcemaps to server build");
       config.devtool = "source-map";
     }
     return config;
