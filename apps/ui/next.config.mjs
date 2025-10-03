@@ -61,6 +61,18 @@ const nextConfig = {
       },
     ];
   },
+  // NOTE sentry/nextjs doesn't have options to bundle static/chunks
+  // widenClientFileUpload should enable them but it doesn't
+  // the only option is custom webpack configuration to add SSR sourcemaps
+  productionBrowserSourceMaps: env.SENTRY_ENABLE_SOURCE_MAPS,
+  webpack: (config, { isServer }) => {
+    if (isServer && env.SENTRY_ENABLE_SOURCE_MAPS) {
+      // oxlint-disable-next-line no-console
+      console.log("Server build: adding sourcemaps");
+      config.devtool = "source-map";
+    }
+    return config;
+  },
   // NOTE webpack.experimental.topLevelAwait breaks middleware (it hangs forever)
   compiler: {
     styledComponents: {
@@ -91,7 +103,8 @@ export default withSentryConfig(nextConfig, {
   },
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   tunnelRoute: "/monitoring",
+  // Disable sourcemaps because we use nextjs configuration for it
   sourcemaps: {
-    // disable: !env.SENTRY_ENABLE_SOURCE_MAPS,
+    disable: true,
   },
 });
