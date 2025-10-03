@@ -30,6 +30,9 @@ jobs:
       # required because error pages use build time env vars, not runtime env vars
       # it's the same on every environment
       EMAIL_VARAAMO_EXT_LINK: "https://lomake.hel.fi/varaamo-palaute"
+      SENTRY_ENABLE_SOURCE_MAPS: ${{ startsWith(github.event.release.tag_name, 'v') || startsWith(github.event.release.tag_name, 'hotfix-') || startsWith(github.event.release.tag_name, 'release-') }}
+      SENTRY_URL: "https://sentry.hel.fi"
+      SENTRY_ORG: "city-of-helsinki"
 
     permissions:
       contents: read
@@ -49,6 +52,13 @@ jobs:
     - uses: dtinth/setup-github-actions-caching-for-turbo@v1
     - name: Run codegen
       run: pnpm codegen
+
+    - name: "Create release name"
+      id: release
+      run: >-
+        echo "release=tilavarauspalvelu-$(echo ${{ inputs.app-name }})@$(
+          echo ${{ github.ref_name || github.sha }} | tr '/' '-'
+        )" >> $GITHUB_OUTPUT
 
     - name: "Set up Docker Buildx"
       uses: docker/setup-buildx-action@v3
@@ -97,6 +107,12 @@ jobs:
           NEXT_PUBLIC_SOURCE_BRANCH_NAME=${{ github.ref_name }}
           CI=true
           SENTRY_ENABLE_SOURCE_MAPS={{ env.SENTRY_ENABLE_SOURCE_MAPS }}
+          RELEASE_NAME=${{ steps.release.outputs.release }}
+          SENTRY_PROJECT=tilavarauspalvelu-${{ inputs.app-name }}
+          SENTRY_URL=${{ env.SENTRY_URL }}
+          SENTRY_ORG=${{ env.SENTRY_ORG }}
+        secrets: |
+          "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         annotations: ${{ steps.meta.outputs.annotations }}

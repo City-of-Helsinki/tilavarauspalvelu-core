@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/node:24-bullseye-slim AS base
+FROM public.ecr.aws/docker/library/node:24-slim AS base
 
 # Generates a trimmed down version of the package list for installer
 # doesn't invalidate layer cache if the result from turbo prune stays the same.
@@ -7,22 +7,15 @@ WORKDIR /app
 RUN npm install -g turbo
 COPY . .
 ARG APP
-RUN echo "APP: $APP"
 RUN turbo prune --scope=$APP --docker
 
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
-RUN apt-get update && apt-get install -y --no-install-recommends dumb-init ca-certificates
-RUN npm install -g corepack@latest
-RUN corepack enable
-WORKDIR /app
-COPY --from=builder /app/scripts/ /app/scripts
-COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
-RUN pnpm install --frozen-lockfile
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends dumb-init ca-certificates && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
 
-# Build the project
-COPY --from=builder /app/out/full/ .
 ARG APP
 # Required because the client (js bundle) variables are compile time only
 ARG NEXT_PUBLIC_TILAVARAUS_API_URL
@@ -32,6 +25,7 @@ ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
 ARG EMAIL_VARAAMO_EXT_LINK
 ENV EMAIL_VARAAMO_EXT_LINK=$EMAIL_VARAAMO_EXT_LINK
 # Version information from build pipeline (pass it to sentry sourcemap upload)
+# TODO we can probably remove this and use github to create version tag for us
 ARG NEXT_PUBLIC_SOURCE_VERSION
 ARG NEXT_PUBLIC_SOURCE_BRANCH_NAME
 ENV NEXT_PUBLIC_SOURCE_VERSION=$NEXT_PUBLIC_SOURCE_VERSION
@@ -39,16 +33,44 @@ ENV NEXT_PUBLIC_SOURCE_BRANCH_NAME=$NEXT_PUBLIC_SOURCE_BRANCH_NAME
 # Pass CI variable to the build
 ARG CI
 ENV CI=$CI
-
 # Build should not fail on missing env variables
-# TODO this should be removed because we need NEXT_PUBLIC_TILAVARAUS_API_URL to be set during build
-# unless we let it be undefined and use "" as default value (does it work?)
-# because it's on the frontend it needs to be present during build
 ENV SKIP_ENV_VALIDATION=true
+# Sentry args for sourcemap upload
+ARG SENTRY_PROJECT
+ENV SENTRY_PROJECT=$SENTRY_PROJECT
+ARG RELEASE_NAME
+ARG SENTRY_ENABLE_SOURCE_MAPS
+ENV SENTRY_ENABLE_SOURCE_MAPS=$SENTRY_ENABLE_SOURCE_MAPS
+# Allow failure because we rather have builds without sourcemaps than no builds
+ENV SENTRY_ALLOW_FAILURE=true
+ARG SENTRY_URL
+ENV SENTRY_URL=$SENTRY_URL
+ARG SENTRY_ORG
+ENV SENTRY_ORG=$SENTRY_ORG
+
+RUN BUILD_DIR="/app/apps/$APP/.next/"
+
+RUN npm install -g corepack@latest @sentry/cli && corepack enable
+WORKDIR /app
+COPY --from=builder /app/scripts/ /app/scripts
+COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+RUN pnpm install --frozen-lockfile
+
+# Build the project
+COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
-RUN npm install -g corepack@latest
-RUN corepack enable
 RUN pnpm turbo run build --filter=$APP...
+
+# Only upload sourcemaps so they match the actual build
+# other artifacts like source code refs have to be added elsewhere
+RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
+  if [ "$SENTRY_ENABLE_SOURCE_MAPS" = "true" ] ; then \
+    sentry-cli sourcemaps inject --ignore "node_modules" "$BUILD_DIR" && \
+    sentry-cli sourcemaps upload --ignore "node_modules" --release "$RELEASE_NAME" "$BUILD_DIR" && \
+    sentry-cli releases new "$RELEASE_NAME" ; \
+  fi
+RUN find $BUILD_DIR -name "*.map" -print0 | xargs -0 rm
 
 FROM base AS runner
 ARG APP
