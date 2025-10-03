@@ -97,6 +97,8 @@ jobs:
           NEXT_PUBLIC_SOURCE_BRANCH_NAME=${{ github.ref_name }}
           CI=true
           SENTRY_ENABLE_SOURCE_MAPS={{ env.SENTRY_ENABLE_SOURCE_MAPS }}
+        secrets: |
+          "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}"
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         annotations: ${{ steps.meta.outputs.annotations }}
