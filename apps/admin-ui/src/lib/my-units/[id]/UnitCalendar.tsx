@@ -3,11 +3,11 @@ import { addMinutes, differenceInMinutes, isToday, setHours, setMinutes, startOf
 import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
 import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
-import { useTranslation, type TFunction } from "next-i18next";
+import { type TFunction, useTranslation } from "next-i18next";
 import { CalendarEvent } from "common/src/calendar/Calendar";
 import { focusStyles } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { POST_PAUSE, PRE_PAUSE } from "@/common/calendarStyling";
+import { EVENT_BUFFER } from "@/common/calendarStyling";
 import { getReserveeName } from "@/common/util";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
 import { ReservationPopupContent } from "./ReservationPopupContent";
@@ -15,6 +15,7 @@ import eventStyleGetter from "./eventStyleGetter";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { isCellOverlappingSpan, TimeSpanType } from "common/src/calendar/util";
+import { IconClock } from "hds-react";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 type Resource = {
@@ -313,14 +314,16 @@ function PreBuffer({
   return (
     <div
       style={{
-        ...PRE_PAUSE.style,
+        ...EVENT_BUFFER.style,
         ...TemplateProps,
         left: `calc(${left} - ${width})`,
         width,
       }}
       title={t("myUnits:Calendar.legend.pause")}
       key={`${event.event?.pk}-pre`}
-    />
+    >
+      <IconClock />
+    </div>
   );
 }
 
@@ -342,14 +345,16 @@ function PostBuffer({
   return (
     <div
       style={{
-        ...POST_PAUSE.style,
+        ...EVENT_BUFFER.style,
         ...TemplateProps,
         left: right,
         width,
       }}
       title={t("myUnits:Calendar.legend.pause")}
       key={`${event.event?.pk}-post`}
-    />
+    >
+      <IconClock />
+    </div>
   );
 }
 
