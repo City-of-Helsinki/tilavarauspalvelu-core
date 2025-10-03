@@ -357,7 +357,7 @@ const StyledCalendar = styled(BigCalendar)<{
   }
 
   .rbc-event-buffer {
-    background-color: var(--tilavaraus-event-booking-break);
+    background-color: var(--color-black-10);
   }
 
   .rbc-event {
