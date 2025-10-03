@@ -7,8 +7,8 @@ const STYLE_COMMON = {
 export const CONFIRMED = {
   style: {
     ...STYLE_COMMON,
-    borderColor: "var(--tilavaraus-event-booking-success-border)",
-    background: "var(--tilavaraus-event-booking-success)",
+    background: "var(--color-tram-light)",
+    borderColor: "var(--color-tram-dark)",
   },
 };
 
@@ -22,17 +22,17 @@ export const WAITING_PAYMENT = {
 export const UNCONFIRMED = {
   style: {
     ...STYLE_COMMON,
-    borderColor: "var(--tilavaraus-event-booking-wish-border)",
+    background: "var(--color-summer-light)",
+    borderColor: "var(--color-summer-dark)",
     borderStyle: "dashed",
-    background: "var(--tilavaraus-event-booking-wish)",
   },
 };
 
 export const STAFF_RESERVATION = {
   style: {
     ...STYLE_COMMON,
-    borderColor: "var(--tilavaraus-event-booking-internal-border)",
-    background: "var(--tilavaraus-event-booking-internal)",
+    background: "var(--color-bus-light)",
+    borderColor: "var(--color-bus-dark)",
   },
 };
 
@@ -59,26 +59,25 @@ export const POST_PAUSE = {
 export const BLOCKED = {
   style: {
     ...STYLE_COMMON,
-    backgroundColor: "var(--color-black-20)",
-    borderColor: "var(--tilavaraus-event-booking-closed-border)",
-    background: "var(--tilavaraus-event-booking-closed)",
+    background: "var(--color-black-10)",
+    borderColor: "var(--color-black-90)",
   },
 };
 
 export const RESERVATION_UNIT_RELEASED = {
   style: {
     ...STYLE_COMMON,
-    borderColor: "var(--color-black-20)",
     background: "var(--color-white)",
+    borderColor: "var(--color-black-20)",
   },
 };
 
 export const RESERVATION_UNIT_DRAFT = {
   style: {
     ...STYLE_COMMON,
+    background: "var(--color-white)",
     borderColor: "var(--color-alert-dark)",
     borderStyle: "dashed",
-    background: "var(--color-white)",
     width: "4px",
   },
 };
@@ -130,7 +129,7 @@ export type EventStyleType = {
   style: Record<string, string>;
 };
 
-export const CALENDAR_LEGENDS = [
+export const CALENDAR_LEGENDS: EventStyleType[] = [
   {
     key: "CONFIRMED",
     label: "myUnits:Calendar.legend.confirmed",
