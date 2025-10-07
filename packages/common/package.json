@@ -69,7 +69,7 @@
     "stylelint": "^16.25.0",
     "stylelint-config-standard": "^39.0.1",
     "stylelint-config-styled-components": "^0.1.1",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.3",
     "typescript-cookie": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4"
