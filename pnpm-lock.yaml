@@ -178,8 +178,8 @@ importers:
         specifier: ^4.5.2
         version: 4.5.2(vite@7.0.6(@types/node@24.7.0)(jiti@2.6.1)(sass@1.89.2)(terser@5.44.0)(yaml@2.8.1))
       happy-dom:
-        specifier: ^18.0.1
-        version: 18.0.1
+        specifier: ^19.0.2
+        version: 19.0.2
       oxlint:
         specifier: ^1.20.0
         version: 1.20.0
@@ -206,7 +206,7 @@ importers:
         version: 5.1.4(typescript@5.9.3)(vite@7.0.6(@types/node@24.7.0)(jiti@2.6.1)(sass@1.89.2)(terser@5.44.0)(yaml@2.8.1))
       vitest:
         specifier: ^3.2.4
-        version: 3.2.4(@types/node@24.7.0)(happy-dom@18.0.1)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.89.2)(terser@5.44.0)(yaml@2.8.1)
+        version: 3.2.4(@types/node@24.7.0)(happy-dom@19.0.2)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.89.2)(terser@5.44.0)(yaml@2.8.1)
 
   apps/ui:
     dependencies:
@@ -320,8 +320,8 @@ importers:
         specifier: ^4.5.2
         version: 4.5.2(vite@7.0.6(@types/node@24.7.0)(jiti@2.6.1)(sass@1.89.2)(terser@5.44.0)(yaml@2.8.1))
       happy-dom:
-        specifier: ^18.0.1
-        version: 18.0.1
+        specifier: ^19.0.2
+        version: 19.0.2
       oxlint:
         specifier: ^1.20.0
         version: 1.20.0
@@ -348,7 +348,7 @@ importers:
         version: 5.1.4(typescript@5.9.3)(vite@7.0.6(@types/node@24.7.0)(jiti@2.6.1)(sass@1.89.2)(terser@5.44.0)(yaml@2.8.1))
       vitest:
         specifier: ^3.2.4
-        version: 3.2.4(@types/node@24.7.0)(happy-dom@18.0.1)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.89.2)(terser@5.44.0)(yaml@2.8.1)
+        version: 3.2.4(@types/node@24.7.0)(happy-dom@19.0.2)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.89.2)(terser@5.44.0)(yaml@2.8.1)
 
   packages/common:
     dependencies:
@@ -444,8 +444,8 @@ importers:
         specifier: ^4.5.2
         version: 4.5.2(vite@7.0.6(@types/node@24.7.0)(jiti@2.6.1)(sass@1.89.2)(terser@5.44.0)(yaml@2.8.1))
       happy-dom:
-        specifier: ^18.0.1
-        version: 18.0.1
+        specifier: ^19.0.2
+        version: 19.0.2
       next:
         specifier: 15.5.4
         version: 15.5.4(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.89.2)
@@ -481,7 +481,7 @@ importers:
         version: 5.1.4(typescript@5.9.3)(vite@7.0.6(@types/node@24.7.0)(jiti@2.6.1)(sass@1.89.2)(terser@5.44.0)(yaml@2.8.1))
       vitest:
         specifier: ^3.2.4
-        version: 3.2.4(@types/node@24.7.0)(happy-dom@18.0.1)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.89.2)(terser@5.44.0)(yaml@2.8.1)
+        version: 3.2.4(@types/node@24.7.0)(happy-dom@19.0.2)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.89.2)(terser@5.44.0)(yaml@2.8.1)
 
   packages/prettier-config:
     devDependencies:
@@ -4062,10 +4062,6 @@ packages:
   graphql@16.11.0:
     resolution: {integrity: sha512-mS1lbMsxgQj6hge1XZ6p7GPhbrtFwUFYi3wRzXAC/FmYnyXMTvvI3td3rjmQ2u8ewXueaSvRPWaEcgVVOT9Jnw==}
     engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
-
-  happy-dom@18.0.1:
-    resolution: {integrity: sha512-qn+rKOW7KWpVTtgIUi6RVmTBZJSe2k0Db0vh1f7CWrWclkkc7/Q+FrOfkZIb2eiErLyqu5AXEzE7XthO9JVxRA==}
-    engines: {node: '>=20.0.0'}
 
   happy-dom@19.0.2:
     resolution: {integrity: sha512-831CLbgDyjRbd2lApHZFsBDe56onuFcjsCBPodzWpzedTpeDr8CGZjs7iEIdNW1DVwSFRecfwzLpVyGBPamwGA==}
@@ -9993,12 +9989,6 @@ snapshots:
 
   graphql@16.11.0: {}
 
-  happy-dom@18.0.1:
-    dependencies:
-      '@types/node': 20.19.19
-      '@types/whatwg-mimetype': 3.0.2
-      whatwg-mimetype: 3.0.0
-
   happy-dom@19.0.2:
     dependencies:
       '@types/node': 20.19.19
@@ -11866,7 +11856,7 @@ snapshots:
       terser: 5.44.0
       yaml: 2.8.1
 
-  vitest@3.2.4(@types/node@24.7.0)(happy-dom@18.0.1)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.89.2)(terser@5.44.0)(yaml@2.8.1):
+  vitest@3.2.4(@types/node@24.7.0)(happy-dom@19.0.2)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.89.2)(terser@5.44.0)(yaml@2.8.1):
     dependencies:
       '@types/chai': 5.2.2
       '@vitest/expect': 3.2.4
@@ -11893,7 +11883,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 24.7.0
-      happy-dom: 18.0.1
+      happy-dom: 19.0.2
       jsdom: 26.0.0
     transitivePeerDependencies:
       - jiti
