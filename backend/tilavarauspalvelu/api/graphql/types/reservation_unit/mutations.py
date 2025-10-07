@@ -3,7 +3,7 @@ from __future__ import annotations
 from graphene_django_extensions import CreateMutation, UpdateMutation
 
 from .permissions import ReservationUnitPermission
-from .serializers import ReservationUnitSerializer
+from .serializers import ReservationUnitArchiveSerializer, ReservationUnitSerializer
 
 
 class ReservationUnitCreateMutation(CreateMutation):
@@ -15,4 +15,10 @@ class ReservationUnitCreateMutation(CreateMutation):
 class ReservationUnitUpdateMutation(UpdateMutation):
     class Meta:
         serializer_class = ReservationUnitSerializer
+        permission_classes = [ReservationUnitPermission]
+
+
+class ReservationUnitArchiveMutation(UpdateMutation):
+    class Meta:
+        serializer_class = ReservationUnitArchiveSerializer
         permission_classes = [ReservationUnitPermission]
