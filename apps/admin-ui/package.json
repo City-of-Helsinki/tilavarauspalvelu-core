@@ -49,7 +49,7 @@
     "zod": "^3.25.64"
   },
   "devDependencies": {
-    "@graphql-tools/graphql-tag-pluck": "^8.3.19",
+    "@graphql-tools/graphql-tag-pluck": "^8.3.21",
     "@happy-dom/jest-environment": "^19.0.2",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
