@@ -42,7 +42,7 @@
     "husky": "^9.1.7",
     "npkill": "^0.12.2",
     "oxlint": "^1.20.0",
-    "turbo": "^2.5.4"
+    "turbo": "^2.5.8"
   },
   "packageManager": "pnpm@10.18.1"
 }
