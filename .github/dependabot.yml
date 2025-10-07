@@ -110,6 +110,11 @@ updates:
         patterns:
           - "@apollo/client"
           - "apollo-upload-client"
+      typescript:
+        patterns:
+          - "typescript"
+          - "@tsconfig/node20"
+          - "@types/node"
       linter:
         patterns:
           - "oxlint"
