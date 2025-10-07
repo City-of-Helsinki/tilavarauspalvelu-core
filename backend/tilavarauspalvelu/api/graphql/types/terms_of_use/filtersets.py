@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from django_filters import MultipleChoiceFilter
+from graphene_django.filter import ListFilter
 from graphene_django_extensions import ModelFilterSet
 
 from tilavarauspalvelu.models import TermsOfUse
@@ -11,7 +11,7 @@ __all__ = [
 
 
 class TermsOfUseFilterSet(ModelFilterSet):
-    pk = MultipleChoiceFilter()
+    pk = ListFilter(lookup_expr="in")
 
     class Meta:
         model = TermsOfUse
