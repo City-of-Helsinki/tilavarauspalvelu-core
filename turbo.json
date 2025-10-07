@@ -2,18 +2,29 @@
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "build": {
-      "env": ["SENTRY_*", "SKIP_ENV_VALIDATION", "EMAIL_VARAAMO_EXT_LINK"],
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "env": [
+        "SENTRY_*",
+        "SKIP_ENV_VALIDATION",
+        "EMAIL_VARAAMO_EXT_LINK"
+      ],
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "tsc:check": {
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/common/**/*/*.ts", "$TURBO_ROOT$/packages/common/**/*.tsx"]
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/common/**/*/*.ts",
+        "$TURBO_ROOT$/packages/common/**/*.tsx"
+      ]
     },
     "tsc:clean": {
       "cache": false
     },
-    "lint": {},
-    "lint:fix": {},
     "lint:css": {},
     "format": {
       "cache": false
@@ -22,8 +33,15 @@
       "cache": false
     },
     "test": {
-      "env": ["SKIP_ENV_VALIDATION"],
-      "inputs": ["**/*.tsx", "**/*.ts", "test/**/*.ts", "test/**/*.tsx"]
+      "env": [
+        "SKIP_ENV_VALIDATION"
+      ],
+      "inputs": [
+        "**/*.tsx",
+        "**/*.ts",
+        "test/**/*.ts",
+        "test/**/*.tsx"
+      ]
     },
     "dev": {
       "cache": false,
