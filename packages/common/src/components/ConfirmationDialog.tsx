@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, ButtonVariant, Dialog, IconAlertCircleFill, IconQuestionCircle } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { filterEmpty } from "../helpers";
 
 type Props = {
   acceptLabel?: string;
@@ -13,11 +14,13 @@ type Props = {
   id?: string;
   isOpen: boolean;
   variant?: "danger" | "primary";
+  testId?: string;
 };
 
 // TODO opening the dialog scrolls the page to the top
 export function ConfirmationDialog(props: Props): JSX.Element | null {
-  const { onAccept, onCancel, acceptIcon, variant, isOpen } = props;
+  const { onAccept, onCancel, acceptIcon, variant, isOpen, testId: testIdOrig } = props;
+  const testId = filterEmpty(testIdOrig);
   const { acceptLabel, cancelLabel, heading, content } = props;
   const { t } = useTranslation();
 
@@ -43,10 +46,15 @@ export function ConfirmationDialog(props: Props): JSX.Element | null {
           variant={variant === "danger" ? ButtonVariant.Danger : ButtonVariant.Primary}
           onClick={() => onAccept?.()}
           iconStart={acceptIcon}
+          data-testid={testId ? `${testId}__ConfirmationDialog--accept` : undefined}
         >
           {acceptLabel || t("common:approve")}
         </Button>
-        <Button variant={ButtonVariant.Secondary} onClick={() => onCancel?.()}>
+        <Button
+          data-testid={testId ? `${testId}__ConfirmationDialog--cancel` : undefined}
+          variant={ButtonVariant.Secondary}
+          onClick={() => onCancel?.()}
+        >
           {cancelLabel || t("common:cancel")}
         </Button>
       </Dialog.ActionButtons>

@@ -302,6 +302,7 @@ function AccessCodeChangeRepairButton({
     <SingleButtonContainer $justifyContent="center" $isRecurring={!!reservation.reservationSeries}>
       <Button
         size={ButtonSize.Small}
+        data-testid="AccessCodeChangeRepairButton--open-dialog"
         onClick={() => {
           if (!reservation.isAccessCodeIsActiveCorrect) {
             // if access code is broken, execute mutation immediately, no need to confirm
@@ -325,6 +326,7 @@ function AccessCodeChangeRepairButton({
         acceptLabel={t("accessType:actions.change")}
         cancelLabel={t("common:cancel")}
         acceptIcon={<IconRefresh />}
+        testId="AccessCodeChangeRepairButton"
       />
     </SingleButtonContainer>
   );
