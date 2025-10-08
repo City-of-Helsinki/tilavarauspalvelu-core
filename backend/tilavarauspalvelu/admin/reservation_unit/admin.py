@@ -13,15 +13,10 @@ from tilavarauspalvelu.admin.reservation_unit_image.admin import ReservationUnit
 from tilavarauspalvelu.enums import AccessType, ReservationKind
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType
+from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 
-from .form import (
-    ReservationUnitAccessTypeForm,
-    ReservationUnitAccessTypeFormSet,
-    ReservationUnitAdminForm,
-    ReservationUnitPricingInline,
-)
+from .form import ReservationUnitAccessTypeInline, ReservationUnitAdminForm, ReservationUnitPricingInline
 
 if TYPE_CHECKING:
     from django import forms
@@ -31,13 +26,6 @@ if TYPE_CHECKING:
 
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
     from tilavarauspalvelu.typing import WSGIRequest
-
-
-class ReservationUnitAccessTypeInline(admin.TabularInline):
-    model = ReservationUnitAccessType
-    form = ReservationUnitAccessTypeForm
-    formset = ReservationUnitAccessTypeFormSet
-    extra = 0
 
 
 class CurrentAccessTypeFilter(admin.SimpleListFilter):

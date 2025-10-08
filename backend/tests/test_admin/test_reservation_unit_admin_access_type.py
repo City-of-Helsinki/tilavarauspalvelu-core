@@ -7,7 +7,7 @@ import pytest
 from django.urls import reverse
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import AccessType
+from tilavarauspalvelu.enums import AccessType, ReservationKind, TermsOfUseTypeChoices
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
@@ -16,7 +16,7 @@ from tests.factories import (
     ReservationFactory,
     ReservationUnitAccessTypeFactory,
     ReservationUnitFactory,
-    TaxPercentageFactory,
+    TermsOfUseFactory,
     UnitFactory,
     UserFactory,
 )
@@ -33,11 +33,27 @@ pytestmark = [
 ]
 
 
+def get_form_reservation_unit(**kwargs: Any) -> ReservationUnit:
+    pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
+    payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
+    cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
+    service_specific_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.SERVICE)
+
+    return ReservationUnitFactory.create(**{
+        "reservation_kind": ReservationKind.SEASON,
+        "payment_terms": payment_terms,
+        "cancellation_terms": cancellation_terms,
+        "service_specific_terms": service_specific_terms,
+        "pricing_terms": pricing_terms,
+        **kwargs,
+    })
+
+
 def test_reservation_unit_admin__access_types(api_client):
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = get_form_reservation_unit()
 
     url = reverse("admin:tilavarauspalvelu_reservationunit_change", args=[reservation_unit.pk])
     data = {
@@ -53,7 +69,7 @@ def test_reservation_unit_admin__access_types(api_client):
     response = api_client.post(path=url, data=data)
 
     # Response is a redirect to the list view
-    assert response.status_code == 302
+    assert response.status_code == 302, response.content
     assert response.url == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
 
     reservation_unit.refresh_from_db()
@@ -68,10 +84,7 @@ def test_reservation_unit_admin__access_types__set_to_past(api_client):
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
-    # Needed to get default tax percentage
-    TaxPercentageFactory.create()
-
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = get_form_reservation_unit()
 
     url = reverse("admin:tilavarauspalvelu_reservationunit_change", args=[reservation_unit.pk])
     data = {
@@ -105,10 +118,7 @@ def test_reservation_unit_admin__access_types__move_past_begin_date(api_client):
     api_client.force_login(user)
     today = local_date()
 
-    # Needed to get default tax percentage
-    TaxPercentageFactory.create()
-
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = get_form_reservation_unit()
 
     access_type_1 = ReservationUnitAccessTypeFactory.create(
         reservation_unit=reservation_unit,
@@ -157,10 +167,7 @@ def test_reservation_unit_admin__access_types__move_active_begin_date(api_client
     api_client.force_login(user)
     today = local_date()
 
-    # Needed to get default tax percentage
-    TaxPercentageFactory.create()
-
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = get_form_reservation_unit()
 
     access_type = ReservationUnitAccessTypeFactory.create(
         reservation_unit=reservation_unit,
@@ -200,10 +207,7 @@ def test_reservation_unit_admin__access_types__move_begin_date_to_past(api_clien
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
-    # Needed to get default tax percentage
-    TaxPercentageFactory.create()
-
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = get_form_reservation_unit()
 
     access_type_1 = ReservationUnitAccessTypeFactory.create(
         reservation_unit=reservation_unit,
@@ -253,10 +257,7 @@ def test_reservation_unit_admin__access_types__no_active_access_type(api_client)
     api_client.force_login(user)
     today = local_date()
 
-    # Needed to get default tax percentage
-    TaxPercentageFactory.create()
-
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = get_form_reservation_unit()
 
     access_type = ReservationUnitAccessTypeFactory.create(
         reservation_unit=reservation_unit,
@@ -286,7 +287,7 @@ def test_reservation_unit_admin__access_types__no_active_access_type(api_client)
     assert response.status_code == 200
     assert errors == [
         {
-            "code": "RESERVATION_UNIT_MISSING_ACTIVE_ACCESS_TYPE",
+            "code": "",
             "message": "At least one active access type is required.",
         },
     ]
@@ -297,7 +298,7 @@ def test_reservation_unit_admin__access_types__access_code_checks_pindora(api_cl
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = get_form_reservation_unit()
 
     access_type = ReservationUnitAccessTypeFactory.create(
         reservation_unit=reservation_unit,
@@ -320,7 +321,7 @@ def test_reservation_unit_admin__access_types__access_code_checks_pindora(api_cl
     response = api_client.post(path=url, data=data)
 
     # Response is a redirect to the list view
-    assert response.status_code == 302
+    assert response.status_code == 302, response.content
     assert response.url == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
 
     reservation_unit.refresh_from_db()
@@ -338,7 +339,7 @@ def test_reservation_unit_admin__access_types__already_access_code_skips_pindora
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = get_form_reservation_unit()
 
     access_type = ReservationUnitAccessTypeFactory.create(
         reservation_unit=reservation_unit,
@@ -361,7 +362,7 @@ def test_reservation_unit_admin__access_types__already_access_code_skips_pindora
     response = api_client.post(path=url, data=data)
 
     # Response is a redirect to the list view
-    assert response.status_code == 302
+    assert response.status_code == 302, response.content
     assert response.url == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
 
     reservation_unit.refresh_from_db()
@@ -381,10 +382,7 @@ def test_reservation_unit_admin__access_types__set_new_access_type_to_reservatio
 
     today = local_date(2023, 1, 1)
 
-    # Needed to get default tax percentage
-    TaxPercentageFactory.create()
-
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = get_form_reservation_unit()
 
     access_type = ReservationUnitAccessTypeFactory.create(
         reservation_unit=reservation_unit,
@@ -456,7 +454,7 @@ def test_reservation_unit_admin__access_types__set_new_access_type_to_reservatio
         response = api_client.post(path=url, data=data)
 
     # Response is a redirect to the list view
-    assert response.status_code == 302
+    assert response.status_code == 302, response.content
     assert response.url == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
 
     past_reservation.refresh_from_db()
@@ -473,10 +471,7 @@ def test_reservation_unit_admin__access_types__cannot_delete_active(api_client):
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
-    # Needed to get default tax percentage
-    TaxPercentageFactory.create()
-
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = get_form_reservation_unit()
 
     today = local_date()
 
@@ -519,8 +514,20 @@ def test_reservation_unit_admin__access_types__new(api_client):
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
+    pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
+    payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
+    cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
+    service_specific_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.SERVICE)
+
     unit = UnitFactory.create()
-    reservation_unit = ReservationUnitFactory.build(unit=unit)
+    reservation_unit = ReservationUnitFactory.build(
+        unit=unit,
+        reservation_kind=ReservationKind.SEASON,
+        payment_terms=payment_terms,
+        cancellation_terms=cancellation_terms,
+        service_specific_terms=service_specific_terms,
+        pricing_terms=pricing_terms,
+    )
 
     url = reverse("admin:tilavarauspalvelu_reservationunit_add")
     data = {
@@ -536,7 +543,7 @@ def test_reservation_unit_admin__access_types__new(api_client):
     response = api_client.post(path=url, data=data)
 
     # Response is a redirect to the list view
-    assert response.status_code == 302
+    assert response.status_code == 302, response.content
     assert response.url == reverse("admin:tilavarauspalvelu_reservationunit_changelist")
 
     reservation_unit = ReservationUnit.objects.first()
@@ -551,11 +558,20 @@ def test_reservation_unit_admin__access_types__new__access_code(api_client):
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
-    # Needed to get default tax percentage
-    TaxPercentageFactory.create()
+    pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
+    payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
+    cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
+    service_specific_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.SERVICE)
 
     unit = UnitFactory.create()
-    reservation_unit = ReservationUnitFactory.build(unit=unit)
+    reservation_unit = ReservationUnitFactory.build(
+        unit=unit,
+        reservation_kind=ReservationKind.SEASON,
+        payment_terms=payment_terms,
+        cancellation_terms=cancellation_terms,
+        service_specific_terms=service_specific_terms,
+        pricing_terms=pricing_terms,
+    )
 
     url = reverse("admin:tilavarauspalvelu_reservationunit_add")
     data = {
@@ -590,11 +606,20 @@ def test_reservation_unit_admin__access_types__new__cannot_be_access_type_on_cre
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
-    # Needed to get default tax percentage
-    TaxPercentageFactory.create()
+    pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
+    payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
+    cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
+    service_specific_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.SERVICE)
 
     unit = UnitFactory.create()
-    reservation_unit = ReservationUnitFactory.build(unit=unit)
+    reservation_unit = ReservationUnitFactory.build(
+        unit=unit,
+        reservation_kind=ReservationKind.SEASON,
+        payment_terms=payment_terms,
+        cancellation_terms=cancellation_terms,
+        service_specific_terms=service_specific_terms,
+        pricing_terms=pricing_terms,
+    )
 
     url = reverse("admin:tilavarauspalvelu_reservationunit_add")
     data = {

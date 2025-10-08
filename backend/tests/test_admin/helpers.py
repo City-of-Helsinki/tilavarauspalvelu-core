@@ -54,6 +54,10 @@ def required_reservation_unit_form_data(reservation_unit: ReservationUnit) -> di
         "authentication": reservation_unit.authentication,
         "reservation_start_interval": reservation_unit.reservation_start_interval,
         "reservation_form": reservation_unit.reservation_form,
+        "payment_terms": getattr(reservation_unit.payment_terms, "pk", ""),
+        "cancellation_terms": getattr(reservation_unit.cancellation_terms, "pk", ""),
+        "service_specific_terms": getattr(reservation_unit.service_specific_terms, "pk", ""),
+        "pricing_terms": getattr(reservation_unit.pricing_terms, "pk", ""),
         #
         # Inline form metadata
         **management_form_data("images"),

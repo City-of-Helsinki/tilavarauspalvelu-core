@@ -1604,6 +1604,14 @@ msgid "Begin date of this access type"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "At least one active access type is required."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Payment terms are required for direct booking of paid reservation units"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid ""
 "Additional search terms that will bring up this reservation unit when making "
 "text searches in the customer UI. These terms should be added to make sure "
@@ -2005,6 +2013,20 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Product used for payments"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Cancellation terms are required for direct booking"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Service specific terms are required for direct booking"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Pricing terms are required for direct booking if the reservee can apply for "
+"free of charge"
 msgstr ""
 
 #: tilavarauspalvelu/admin/space/admin.py
@@ -3140,6 +3162,11 @@ msgstr "Din bokning är bekräftad"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
+msgid "Deadline"
+msgstr "Tidsfrist"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
 msgid "Thank you for your booking at Varaamo"
 msgstr "Tack för din bokning på Varaamo"
 
@@ -3222,11 +3249,6 @@ msgstr ""
 msgctxt "Email"
 msgid "Pay the booking at Varaamo"
 msgstr "Betala bokningen på Varaamo"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Deadline"
-msgstr "Tidsfrist"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"

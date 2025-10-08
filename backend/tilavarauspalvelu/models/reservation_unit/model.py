@@ -21,6 +21,7 @@ from tilavarauspalvelu.enums import (
     ReservationStartInterval,
     ReservationUnitPublishingState,
     ReservationUnitReservationState,
+    TermsOfUseTypeChoices,
 )
 from utils.auditlog_util import AuditLogger
 from utils.db import Now
@@ -195,6 +196,7 @@ class ReservationUnit(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
+        limit_choices_to=models.Q(terms_type=TermsOfUseTypeChoices.CANCELLATION),
     )
     service_specific_terms: TermsOfUse | None = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
@@ -202,6 +204,7 @@ class ReservationUnit(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
+        limit_choices_to=models.Q(terms_type=TermsOfUseTypeChoices.SERVICE),
     )
     pricing_terms: TermsOfUse | None = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
@@ -209,6 +212,7 @@ class ReservationUnit(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
+        limit_choices_to=models.Q(terms_type=TermsOfUseTypeChoices.PRICING),
     )
     payment_terms: TermsOfUse | None = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
@@ -216,6 +220,7 @@ class ReservationUnit(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
+        limit_choices_to=models.Q(terms_type=TermsOfUseTypeChoices.PAYMENT),
     )
     payment_product: PaymentProduct | None = models.ForeignKey(
         "tilavarauspalvelu.PaymentProduct",
