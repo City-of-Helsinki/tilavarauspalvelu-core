@@ -18,9 +18,9 @@ from tests.factories import (
     ApplicationRoundFactory,
     ApplicationRoundTimeSlotFactory,
     EquipmentFactory,
+    IntendedUseFactory,
     PaymentMerchantFactory,
     PaymentProductFactory,
-    PurposeFactory,
     ReservationFactory,
     ReservationMetadataSetFactory,
     ReservationUnitCancellationRuleFactory,
@@ -396,7 +396,7 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
         resources {
             nameFi
         }
-        purposes {
+        intendedUses {
             nameFi
         }
         equipments {
@@ -410,7 +410,7 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
     reservation_unit = ReservationUnitFactory.create(
         spaces=[SpaceFactory.create()],
         resources=[ResourceFactory.create()],
-        purposes=[PurposeFactory.create()],
+        intended_uses=[IntendedUseFactory.create()],
         equipments=[EquipmentFactory.create()],
         application_rounds=[ApplicationRoundFactory.create()],
     )
@@ -434,9 +434,9 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
                 "nameFi": reservation_unit.resources.first().name_fi,
             },
         ],
-        "purposes": [
+        "intendedUses": [
             {
-                "nameFi": reservation_unit.purposes.first().name_fi,
+                "nameFi": reservation_unit.intended_uses.first().name_fi,
             },
         ],
         "equipments": [

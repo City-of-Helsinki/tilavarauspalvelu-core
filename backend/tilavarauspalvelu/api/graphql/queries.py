@@ -19,11 +19,11 @@ from .types.banner_notification.types import BannerNotificationNode
 from .types.equipment.types import EquipmentAllNode, EquipmentNode
 from .types.equipment_category.types import EquipmentCategoryNode
 from .types.helsinki_profile.types import HelsinkiProfileDataNode
+from .types.intended_use.types import IntendedUseNode
 from .types.payment_merchant.types import PaymentMerchantNode
 from .types.payment_order.types import PaymentOrderNode
 from .types.payment_product.types import PaymentProductNode
 from .types.permissions.types import GeneralRoleNode, PermissionCheckerType, UnitRoleNode
-from .types.purpose.types import PurposeNode
 from .types.rejected_occurrence.types import RejectedOccurrenceNode
 from .types.reservation.types import ReservationNode
 from .types.reservation_cancel_reason.types import ReservationCancelReasonType
@@ -61,11 +61,11 @@ __all__ = [
     "EquipmentNode",
     "GeneralRoleNode",
     "HelsinkiProfileDataNode",
+    "IntendedUseNode",
     "PaymentMerchantNode",
     "PaymentOrderNode",
     "PaymentProductNode",
     "PermissionCheckerType",
-    "PurposeNode",
     "RejectedOccurrenceNode",
     "ReservationCancelReasonType",
     "ReservationDenyReasonNode",

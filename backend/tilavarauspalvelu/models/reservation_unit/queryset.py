@@ -172,7 +172,7 @@ class ReservationUnitQuerySet(ModelQuerySet[ReservationUnit]):
         ).prefetch_related(
             "spaces",
             "resources",
-            "purposes",
+            "intended_uses",
             "equipments",
         )
         if pks is not None:
@@ -228,7 +228,7 @@ class ReservationUnitQuerySet(ModelQuerySet[ReservationUnit]):
                         models.Value(
                             " ".join(
                                 name
-                                for inst in reservation_unit.purposes.all()
+                                for inst in reservation_unit.intended_uses.all()
                                 if (name := getattr(inst, f"name_{lang}", ""))
                             ),
                             output_field=models.CharField(),
