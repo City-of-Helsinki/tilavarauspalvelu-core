@@ -1558,6 +1558,7 @@ type ReservationNode implements Node {
   accessCodeShouldBeActive: Boolean
   isAccessCodeIsActiveCorrect: Boolean
   calendarUrl: String
+  draftExpiresAt: DateTime
 
   """
   Which reservation units' reserveability is affected by this reservation?
