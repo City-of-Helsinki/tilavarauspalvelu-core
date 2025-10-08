@@ -94,8 +94,6 @@ def test_reservation__query__all_fields(graphql):
         purpose { nameFi }
         reservationSeries { user { email } }
         reservationUnit { nameFi }
-        reserveeAddressCity
-        reserveeAddressStreet
         reserveeAddressZip
         reserveeEmail
         reserveeFirstName
@@ -150,8 +148,6 @@ def test_reservation__query__all_fields(graphql):
         "purpose": None,
         "reservationSeries": None,
         "reservationUnit": {"nameFi": reservation.reservation_unit.name_fi},
-        "reserveeAddressCity": reservation.reservee_address_city,
-        "reserveeAddressStreet": reservation.reservee_address_street,
         "reserveeAddressZip": reservation.reservee_address_zip,
         "reserveeEmail": reservation.reservee_email,
         "reserveeFirstName": reservation.reservee_first_name,

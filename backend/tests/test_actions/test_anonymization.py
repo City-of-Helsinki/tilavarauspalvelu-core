@@ -135,8 +135,6 @@ def test_anonymization__reservation():
     reservation = ReservationFactory.create(
         user=mr_anonymous,
         reservee_address_zip="0100",
-        reservee_address_city="Helsinki",
-        reservee_address_street="Test Address 1",
         free_of_charge_reason="Test reason",
         cancel_details="Test cancel details",
         handling_details="Test handling details",
@@ -154,8 +152,6 @@ def test_anonymization__reservation():
     assert reservation.reservee_email == mr_anonymous.email
     assert reservation.reservee_phone == ""
     assert reservation.reservee_address_zip == "99999"
-    assert reservation.reservee_address_city == ANONYMIZED
-    assert reservation.reservee_address_street == ANONYMIZED
 
     # Reservee_id and organisation name should not be anonymized
     assert reservation.reservee_identifier != "1234567-2"
