@@ -331,9 +331,13 @@ export function mapParamToInteger(param: string[], min?: number): number[] {
   return min != null ? numbers.filter((n) => n >= min) : numbers;
 }
 
-export function filterEmptyArray<T>(param: T[]): T[] | undefined {
-  if (param.length === 0) {
-    return undefined;
+export function filterEmpty<S, T extends Array<S> | string>(val: T | null | undefined): T | null {
+  if (val == null || val.length === 0) {
+    return null;
   }
-  return param;
+  return val;
+}
+
+export function filterEmptyArray<T>(param: T[]): T[] | undefined {
+  return filterEmpty(param) ?? undefined;
 }
