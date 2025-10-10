@@ -6,14 +6,16 @@ import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { addYears } from "date-fns";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import {
-  convertLanguageCode,
-  fromUIDate,
-  getTranslationSafe,
+  formatDate,
+  formatTime,
+  formatTimeRange,
+  parseUIDate,
   isValidDate,
-  toApiDate,
-  toUIDate,
-} from "common/src/common/util";
+  timeToMinutes,
+  formatApiDate,
+} from "common/src/date-utils";
 import { formatters as getFormatters } from "common";
 import { Flex, H4 } from "common/styled";
 import { breakpoints } from "common/src/const";
@@ -40,10 +42,8 @@ import {
   createNodeId,
   filterNonNullable,
   formatListToCSV,
-  formatTimeRange,
   ignoreMaybeArray,
   isPriceFree,
-  timeToMinutes,
   toNumber,
 } from "common/src/helpers";
 import { Sanitize } from "common/src/components/Sanitize";
@@ -54,7 +54,6 @@ import {
   getFuturePricing,
   getPriceString,
   getReservationUnitName,
-  getTimeString,
   isReservationUnitPublished,
   isReservationUnitReservable,
 } from "@/modules/reservationUnit";
@@ -235,7 +234,6 @@ function ReservationUnit({
   const lang = convertLanguageCode(i18n.language);
   const router = useRouter();
   useRemoveStoredReservation();
-
   const [isPricingTermsDialogOpen, setIsPricingTermsDialogOpen] = useState(false);
 
   const durationOptions = getDurationOptions(reservationUnit, t);
@@ -243,11 +241,11 @@ function ReservationUnit({
   const minReservationDurationMinutes = getMinReservationDuration(reservationUnit);
   const maxReservationDurationMinutes = getMaxReservationDuration(reservationUnit);
 
-  const searchUIDate = fromUIDate(searchDate ?? "");
+  const searchUIDate = parseUIDate(searchDate ?? "");
   // TODO should be the first reservable day (the reservableTimeSpans logic is too complex and needs refactoring)
   // i.e. using a naive approach will return empty timespsans either reuse the logic for QuickReservation or refactor
   const defaultDate = new Date();
-  const defaultDateString = toUIDate(defaultDate);
+  const defaultDateString = formatDate(defaultDate);
   const defaultValues = {
     date: searchUIDate != null && isValidDate(searchUIDate) ? (searchDate ?? "") : defaultDateString,
     duration: clampDuration(
@@ -256,7 +254,7 @@ function ReservationUnit({
       maxReservationDurationMinutes,
       durationOptions
     ),
-    time: searchTime ?? getTimeString(defaultDate),
+    time: searchTime ?? formatTime(defaultDate),
     isControlsVisible: true,
   };
 
@@ -618,7 +616,7 @@ function PriceChangeNotice({ futurePricing }: { futurePricing: PricingFieldsFrag
         i18nKey="reservationUnit:futurePricingNotice"
         defaults="Huomioi <bold>hinnoittelumuutos {{date}} alkaen. Uusi hinta on {{price}}</bold>."
         values={{
-          date: toUIDate(begins),
+          date: formatDate(begins),
           price: priceString,
         }}
         components={{ bold: <strong /> }}
@@ -708,8 +706,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       query: ReservationUnitPageDocument,
       variables: {
         id: createNodeId("ReservationUnitNode", pk),
-        beginDate: toApiDate(startDate) ?? "",
-        endDate: toApiDate(endDate) ?? "",
+        beginDate: formatApiDate(startDate) ?? "",
+        endDate: formatApiDate(endDate) ?? "",
       },
     });
 

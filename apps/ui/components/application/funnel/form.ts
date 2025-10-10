@@ -1,5 +1,5 @@
 import { startOfDay } from "date-fns";
-import { filterNonNullable, type ReadonlyDeep, timeToMinutes } from "common/src/helpers";
+import { filterNonNullable, type ReadonlyDeep } from "common/src/helpers";
 import {
   type ApplicantFieldsFragment,
   type ApplicationFormFragment,
@@ -14,8 +14,7 @@ import {
   Weekday,
 } from "@gql/gql-types";
 import { z } from "zod";
-import { toApiDate, toUIDate } from "common/src/common/util";
-import { fromUIDate } from "@/modules/util";
+import { parseUIDate, timeToMinutes, formatApiDate, formatDate } from "common/src/date-utils";
 import { checkValidDateOnly, lessThanMaybeDate } from "common/src/schemas/schemaCommon";
 import { CELL_STATES } from "common/src/components/ApplicationTimeSelector";
 
@@ -71,10 +70,10 @@ const ApplicationSectionPage1Schema = z
     message: "Maximum duration must be greater than minimum duration",
   })
   .superRefine((val, ctx) => {
-    checkValidDateOnly(fromUIDate(val.begin ?? ""), ctx, `begin`);
+    checkValidDateOnly(parseUIDate(val.begin ?? ""), ctx, `begin`);
   })
   .superRefine((val, ctx) => {
-    checkValidDateOnly(fromUIDate(val.end ?? ""), ctx, `end`);
+    checkValidDateOnly(parseUIDate(val.end ?? ""), ctx, `end`);
   })
   .superRefine((val, ctx) => {
     if (lessThanMaybeDate(val.end, val.begin)) {
@@ -223,7 +222,7 @@ function convertDate(date: string | null | undefined): string | undefined {
   if (date == null) {
     return undefined;
   }
-  return toUIDate(new Date(date)) || undefined;
+  return formatDate(new Date(date)) || undefined;
 }
 
 const ApplicantTypeSchema = z.enum([ReserveeType.Individual, ReserveeType.Company, ReserveeType.Nonprofit]);
@@ -265,7 +264,7 @@ function checkDateRange(props: {
 
 /// check that the given time is inside a DateRange
 /// Assumes that date validity has already been checked (adds a range error if the date is invalid)
-/// but that's implementation specific and could change in the future (depending on the fromUIDate implementation)
+/// but that's implementation specific and could change in the future (depending on the parseUIDate implementation)
 function checkApplicationRoundDates(
   round: {
     begin: Date;
@@ -279,8 +278,8 @@ function checkApplicationRoundDates(
   if (begin == null || end == null) {
     return;
   }
-  const b = fromUIDate(begin);
-  const e = fromUIDate(end);
+  const b = parseUIDate(begin);
+  const e = parseUIDate(end);
 
   if (b != null) {
     checkDateRange({
@@ -392,9 +391,9 @@ function transformDateString(date?: string | null): string | null {
   if (date == null) {
     return null;
   }
-  const d = fromUIDate(date);
+  const d = parseUIDate(date);
   if (d != null) {
-    return toApiDate(d);
+    return formatApiDate(d);
   }
   return null;
 }

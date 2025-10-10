@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconArrowRight, IconCalendar, IconSize } from "hds-react";
 import { type ApplicationRoundCardFragment } from "@gql/gql-types";
-import { formatDate } from "@/common/util";
+import { formatDateRange, parseValidDateObject } from "common/src/date-utils";
 import { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
 import { getApplicationRoundUrl } from "@/common/urls";
 import { TimeframeStatus } from "./TimeframeStatus";
@@ -40,7 +40,13 @@ function ReservationPeriod({
   return (
     <Flex $gap="xs" $direction="row" $alignItems="center">
       <IconCalendar size={IconSize.ExtraSmall} />
-      {formatDate(reservationPeriodBeginDate)}-{formatDate(reservationPeriodEndDate)}
+      {formatDateRange(
+        parseValidDateObject(reservationPeriodBeginDate),
+        parseValidDateObject(reservationPeriodEndDate),
+        {
+          includeWeekday: false,
+        }
+      )}
     </Flex>
   );
 }

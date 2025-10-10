@@ -1,11 +1,12 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import type { TFunction } from "i18next";
+import { type TFunction } from "i18next";
 import { memoize } from "lodash-es";
 import { OrderStatus, ReservationStateChoice, type ReservationTableElementFragment } from "@gql/gql-types";
 import { truncate } from "@/helpers";
 import { getReservationUrl } from "@/common/urls";
-import { formatDateTime, formatDateTimeRange, getReserveeName } from "@/common/util";
+import { formatDateTime, formatDateTimeRange, parseValidDateObject } from "common/src/date-utils";
+import { getReserveeName } from "@/common/util";
 import { CustomTable } from "@/component/Table";
 import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styled";
@@ -108,13 +109,14 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     key: "begin",
     isSortable: true,
     transform: ({ beginsAt, endsAt }: ReservationTableElementFragment) =>
-      formatDateTimeRange(t, new Date(beginsAt), new Date(endsAt)),
+      formatDateTimeRange(new Date(beginsAt), new Date(endsAt), { t }),
   },
   {
     headerName: t("reservation:Table.headings.createdAt"),
     key: "created_at",
     isSortable: true,
-    transform: ({ createdAt }: ReservationTableElementFragment) => (createdAt ? formatDateTime(createdAt) : "-"),
+    transform: ({ createdAt }: ReservationTableElementFragment) =>
+      createdAt ? formatDateTime(parseValidDateObject(createdAt), { t }) : "-",
   },
   {
     headerName: t("reservation:Table.headings.paymentStatus"),

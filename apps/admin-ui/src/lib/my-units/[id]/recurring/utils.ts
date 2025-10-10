@@ -1,10 +1,3 @@
-import { parse } from "date-fns";
-
-type DateRange = {
-  begin: Date;
-  end: Date;
-};
-
 // Assumes that 08:00 - 09:00 and 09:00 - 10:00 do not overlap
 // Assumes that begin <= end
 export function isOverlapping(a: DateRange, b: DateRange) {
@@ -14,11 +7,7 @@ export function isOverlapping(a: DateRange, b: DateRange) {
   return true;
 }
 
-// no exception wrapping because parse only throws on invalid format strings (not on invalid inputs)
-export function convertToDate(d: Date, time: string) {
-  if (!d || Number.isNaN(d.getTime())) {
-    return undefined;
-  }
-  const res = parse(time, "HH:mm", d);
-  return !Number.isNaN(res.getTime()) ? res : undefined;
-}
+type DateRange = {
+  begin: Date;
+  end: Date;
+};

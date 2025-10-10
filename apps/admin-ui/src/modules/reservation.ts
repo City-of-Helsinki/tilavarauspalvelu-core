@@ -1,4 +1,4 @@
-import { differenceInMinutes, format } from "date-fns";
+import { differenceInMinutes } from "date-fns";
 import type { TFunction } from "i18next";
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "common";
 import {
@@ -14,9 +14,18 @@ import {
   ReservationUnitPricingFieldsFragment,
   EventStyleReservationFieldsFragment,
 } from "@gql/gql-types";
-import { formatDuration, fromApiDate } from "common/src/common/util";
-import { formatDate, formatDateTimeRange, getReserveeName } from "@/common/util";
-import { fromAPIDateTime, getReserveeTypeTranslationKey } from "@/helpers";
+import {
+  dateToMinutes,
+  formatDateRange,
+  formatDateTimeRange,
+  formatDuration,
+  formatTimeRange,
+  parseApiDate,
+  fromApiDateTime,
+  parseValidDateObject,
+} from "common/src/date-utils";
+import { getReserveeName } from "@/common/util";
+import { getReserveeTypeTranslationKey } from "@/helpers";
 import { filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 import { convertWeekday } from "common/src/conversion";
@@ -36,7 +45,7 @@ export function reservationPrice(reservation: ReservationType, t: TFunction): st
 }
 
 function getBeginTime(p: PricingFieldsFragment): number {
-  return fromApiDate(p.begins)?.getTime() ?? 0;
+  return parseApiDate(p.begins)?.getTime() ?? 0;
 }
 
 /** returns reservation unit pricing at given date */
@@ -53,7 +62,7 @@ export function getReservationUnitPricing(
   // Find the first pricing that is valid at the given date
   // requires using reduce because we have no end dates => the last begin should be used
   return pricings.reduce<(typeof pricings)[0] | null>((prev, current) => {
-    const begin = fromApiDate(current.begins);
+    const begin = parseApiDate(current.begins);
     if (begin != null && begin.getTime() <= from.getTime()) {
       return current;
     }
@@ -171,7 +180,7 @@ export function createTagString(reservation: CreateTagStringFragment, t: TFuncti
 function createSingleTagString(reservation: CreateTagStringFragment, t: TFunction): string {
   const begin = new Date(reservation.beginsAt);
   const end = new Date(reservation.endsAt);
-  const singleDateTimeTag = formatDateTimeRange(t, begin, end);
+  const singleDateTimeTag = formatDateTimeRange(begin, end, { t });
 
   const unitTag = reservationUnitName(reservation.reservationUnit);
 
@@ -194,11 +203,11 @@ function createRecurringTagString(reservation: CreateTagStringFragment, t: TFunc
     return "";
   }
 
-  const recurringTag = `${formatDate(beginDate)}–${formatDate(endDate)}`;
+  const recurringTag = `${formatDateRange(parseValidDateObject(beginDate), parseValidDateObject(endDate), { includeWeekday: false })}`;
   const unitTag = reservationUnitName(reservation.reservationUnit);
 
-  const begin = fromAPIDateTime(beginDate, beginTime);
-  const end = fromAPIDateTime(endDate, endTime);
+  const begin = fromApiDateTime(beginDate, beginTime);
+  const end = fromApiDateTime(endDate, endTime);
   if (begin == null || end == null) {
     return "";
   }
@@ -210,7 +219,7 @@ function createRecurringTagString(reservation: CreateTagStringFragment, t: TFunc
   const durMinutes = differenceInMinutes(new Date(reservation.endsAt), new Date(reservation.beginsAt));
   const durationTag = formatDuration(t, { minutes: durMinutes });
 
-  const recurringDateTag = `${weekDayTag} ${format(begin, "HH:mm")}–${format(end, "HH:mm")}`;
+  const recurringDateTag = `${weekDayTag} ${formatTimeRange(dateToMinutes(begin), dateToMinutes(end))}`;
 
   return `${recurringDateTag}, ${durationTag} ${recurringTag.length > 0 ? " | " : ""} ${recurringTag} | ${unitTag}`;
 }

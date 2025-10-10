@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { isBefore } from "date-fns";
 import { DateInput } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { fromUIDate, isValidDate, toUIDate } from "common/src/common/util";
+import { parseUIDate, isValidDate, formatDate } from "common/src/date-utils";
 import { getLocalizationLang } from "common/src/helpers";
 import { startOfDay } from "date-fns/startOfDay";
 
@@ -42,16 +42,16 @@ export function DateRangePicker({
   limits,
   placeholder,
 }: DateRangePickerProps) {
-  const [internalStartDateString, setInternalStartDateString] = useState<string>(() => toUIDate(startDate));
-  const [internalEndDateString, setInternalEndDateString] = useState<string>(() => toUIDate(endDate));
+  const [internalStartDateString, setInternalStartDateString] = useState<string>(() => formatDate(startDate));
+  const [internalEndDateString, setInternalEndDateString] = useState<string>(() => formatDate(endDate));
   const [startDateError, setStartDateError] = useState<string | null>(null);
   const [endDateError, setEndDateError] = useState<string | null>(null);
   const { t, i18n } = useTranslation();
 
   // Pass params instead of state because React state updates are async
   const validateAndUpdateUpstream = ({ start, end }: { start: string; end: string }) => {
-    const sd = fromUIDate(start);
-    const ed = fromUIDate(end);
+    const sd = parseUIDate(start);
+    const ed = parseUIDate(end);
 
     const isStartDateEmpty = start === "";
     if (!isStartDateEmpty) {
@@ -64,14 +64,14 @@ export function DateRangePicker({
       } else if (isStartDateBeforeMin && limits?.startMinDate != null) {
         setStartDateError(
           t("dateSelector:errors.dateIsTooSmall", {
-            minDate: toUIDate(limits?.startMinDate),
+            minDate: formatDate(limits?.startMinDate),
           })
         );
         onChangeStartDate(null);
       } else if (isStartDateAfterMax && limits?.startMaxDate != null) {
         setStartDateError(
           t("dateSelector:errors.dateIsTooBig", {
-            maxDate: toUIDate(limits?.startMaxDate),
+            maxDate: formatDate(limits?.startMaxDate),
           })
         );
         onChangeStartDate(null);
@@ -91,14 +91,14 @@ export function DateRangePicker({
       } else if (isEndDateBeforeMin && limits?.endMinDate != null) {
         setEndDateError(
           t("dateSelector:errors.dateIsTooSmall", {
-            minDate: toUIDate(limits?.endMinDate),
+            minDate: formatDate(limits?.endMinDate),
           })
         );
         onChangeEndDate(null);
       } else if (isEndDateAfterMax && limits?.endMaxDate != null) {
         setEndDateError(
           t("dateSelector:errors.dateIsTooBig", {
-            maxDate: toUIDate(limits?.endMaxDate),
+            maxDate: formatDate(limits?.endMaxDate),
           })
         );
         onChangeEndDate(null);
@@ -117,8 +117,8 @@ export function DateRangePicker({
   };
 
   useEffect(() => {
-    setInternalStartDateString(toUIDate(startDate));
-    setInternalEndDateString(toUIDate(endDate));
+    setInternalStartDateString(formatDate(startDate));
+    setInternalEndDateString(formatDate(endDate));
     setStartDateError(null);
     setEndDateError(null);
   }, [startDate, endDate]);
@@ -152,7 +152,7 @@ export function DateRangePicker({
   };
 
   const helperText = t("dateSelector:infoDate");
-  const internalStartDate = fromUIDate(internalStartDateString);
+  const internalStartDate = parseUIDate(internalStartDateString);
 
   return (
     <>

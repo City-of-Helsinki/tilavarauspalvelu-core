@@ -11,7 +11,7 @@ import {
 import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { Button, ButtonSize, IconAlertCircleFill, IconRefresh, Tooltip } from "hds-react";
-import { formatDate, formatTime } from "@/common/util";
+import { dateToMinutes, formatDate, formatTimeRange, parseValidDateObject } from "common/src/date-utils";
 import React, { useState } from "react";
 import { Accordion } from "@/styled";
 import { DataWrapper } from "./DataWrapper";
@@ -119,8 +119,9 @@ function ReservationKeylessEntrySingle({
   onSuccess: () => void;
 }>) {
   const { t } = useTranslation();
-
   const pindoraInfo = reservation.pindoraInfo;
+  const pindoraAccessCodeBegins = parseValidDateObject(pindoraInfo?.accessCodeBeginsAt ?? "");
+  const pindoraAccessCodeEnds = parseValidDateObject(pindoraInfo?.accessCodeEndsAt ?? "");
 
   return (
     <SummaryHorizontal>
@@ -135,7 +136,7 @@ function ReservationKeylessEntrySingle({
 
       <DataWrapper label={t("accessType:validity.label")}>
         {reservation.pindoraInfo
-          ? `${formatTime(pindoraInfo?.accessCodeBeginsAt)}–${formatTime(pindoraInfo?.accessCodeEndsAt)}`
+          ? `${formatTimeRange(dateToMinutes(pindoraAccessCodeBegins), dateToMinutes(pindoraAccessCodeEnds))}`
           : "-"}
       </DataWrapper>
 
@@ -173,18 +174,24 @@ function ReservationKeylessEntryRecurring({
         )}
       </Flex>
 
-      <DataWrapper label={t("common:startingDate")}>{formatDate(validityBeginsDate) || "-"}</DataWrapper>
-      <DataWrapper label={t("common:endingDate")}>{formatDate(validityEndsDate) || "-"}</DataWrapper>
+      <DataWrapper label={t("common:startingDate")}>
+        {validityBeginsDate ? formatDate(parseValidDateObject(validityBeginsDate), {}) : "-"}
+      </DataWrapper>
+      <DataWrapper label={t("common:endingDate")}>
+        {validityEndsDate ? formatDate(parseValidDateObject(validityEndsDate), {}) : "-"}
+      </DataWrapper>
 
       <Flex $alignItems="center" $gap="xs" $direction="row">
         <DataWrapper label={t("accessType:validity.label")}>
           <NoWrap>
-            {validityBeginsTime ? `${formatTime(validityBeginsTime)}–${formatTime(validityEndsTime)}` : "-"}
+            {validityBeginsTime
+              ? `${formatTimeRange(dateToMinutes(parseValidDateObject(validityBeginsTime)), dateToMinutes(parseValidDateObject(validityEndsTime ?? "")))}`
+              : "-"}
           </NoWrap>
         </DataWrapper>
         {validityBeginsTime && (
           <Tooltip placement="top">
-            {t("accessType:validity.fromNextReservation")} ({formatDate(validityBeginsTime)})
+            {t("accessType:validity.fromNextReservation")} ({formatDate(parseValidDateObject(validityBeginsTime), {})})
           </Tooltip>
         )}
       </Flex>

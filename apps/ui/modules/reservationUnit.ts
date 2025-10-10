@@ -14,7 +14,7 @@ import {
   sub,
 } from "date-fns";
 import { i18n } from "next-i18next";
-import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import {
   type AvailableTimesReservationUnitFieldsFragment,
   type BlockingReservationFieldsFragment,
@@ -48,25 +48,13 @@ import {
   dayMax,
   dayMin,
   filterNonNullable,
+  formatTimeStruct,
   isPriceFree,
   type ReadonlyDeep,
-  timeToMinutes,
 } from "common/src/helpers";
+import { timeToMinutes, formatApiDate } from "common/src/date-utils";
 import { type LocalizationLanguages } from "common/src/urlBuilder";
 import { type TFunction } from "i18next";
-
-function formatTimeObject(time: { h: number; m: number }): string {
-  return `${time.h.toString().padStart(2, "0")}:${time.m.toString().padStart(2, "0")}`;
-}
-
-function formatTime(date: Date): string {
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-  return formatTimeObject({ h: getHours(date), m: getMinutes(date) });
-}
-
-export { formatTime as getTimeString };
 
 export function isReservationUnitPublished(reservationUnit: Pick<ReservationUnitNode, "publishingState">): boolean {
   const { publishingState } = reservationUnit;
@@ -241,7 +229,8 @@ export function getFuturePricing(
 
   return reservationDate
     ? (futurePricings.reverse().find((n) => {
-        return n.begins <= toUIDate(new Date(reservationDate), "yyyy-MM-dd");
+        const apiDate = formatApiDate(new Date(reservationDate));
+        return apiDate ? n.begins <= apiDate : false;
       }) ?? null)
     : (futurePricings[0] ?? null);
 }
@@ -496,30 +485,39 @@ export function getPossibleTimesForDay({
   }
 
   const realDuration = duration >= getIntervalMinutes(interval) ? duration : getIntervalMinutes(interval);
-  const times = allTimes
-    .filter((span) => {
-      const { h: slotH, m: slotM } = span;
-      const slotDate = new Date(date);
-      slotDate.setHours(slotH, slotM, 0, 0);
-      if (slotDate < new Date()) {
-        return false;
-      }
-      const isReservable = isRangeReservable({
-        blockingReservations,
-        range: {
-          start: slotDate,
-          end: addMinutes(slotDate, realDuration),
-        },
-        reservationUnit,
-        reservableTimes,
-        activeApplicationRounds,
-      });
-      return isReservable;
-    })
-    // TODO the conversion should be done in a separate function so we can reuse the logic without string conversion
-    .map((time) => formatTimeObject(time))
-    .map((time) => ({ label: time, value: time }));
-  return times;
+  return filterNonNullable(
+    allTimes
+      .filter((span) => {
+        const { h: slotH, m: slotM } = span;
+        const slotDate = new Date(date);
+        slotDate.setHours(slotH, slotM, 0, 0);
+        if (slotDate < new Date()) {
+          return false;
+        }
+        const isReservable = isRangeReservable({
+          blockingReservations,
+          range: {
+            start: slotDate,
+            end: addMinutes(slotDate, realDuration),
+          },
+          reservationUnit,
+          reservableTimes,
+          activeApplicationRounds,
+        });
+        return isReservable;
+      })
+      // TODO the conversion should be done in a separate function so we can reuse the logic without string conversion
+      .map((time) => convertTimeToOptions(time))
+  );
+}
+
+function convertTimeToOptions(time: { h: number; m: number }): { label: string; value: string } | null {
+  const { h, m } = time;
+  if (h < 0 || m < 0) {
+    return null;
+  }
+  const label = formatTimeStruct({ hour: h, minute: m });
+  return { label, value: label };
 }
 
 export type LastPossibleReservationDateProps = Pick<

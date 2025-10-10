@@ -5,8 +5,7 @@ import { type SubmitHandler, useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
 import { addYears, startOfDay } from "date-fns";
 import { ControlledNumberInput, TimeRangePicker } from "common/src/components/form";
-import { toUIDate } from "common/src/common/util";
-import { fromUIDate } from "@/modules/util";
+import { formatDate, parseUIDate } from "common/src/date-utils";
 import { getDurationOptions } from "@/modules/const";
 import { DateRangePicker } from "@/components/form";
 import { FilterTagList } from "../FilterTagList";
@@ -211,10 +210,10 @@ export function SingleSearchForm({
               begin: t("common:beginLabel"),
               end: t("common:endLabel"),
             }}
-            startDate={fromUIDate(getValues("startDate") ?? "")}
-            endDate={fromUIDate(getValues("endDate") ?? "")}
-            onChangeStartDate={(date: Date | null) => setValue("startDate", date != null ? toUIDate(date) : null)}
-            onChangeEndDate={(date: Date | null) => setValue("endDate", date != null ? toUIDate(date) : null)}
+            startDate={parseUIDate(getValues("startDate") ?? "")}
+            endDate={parseUIDate(getValues("endDate") ?? "")}
+            onChangeStartDate={(date: Date | null) => setValue("startDate", date != null ? formatDate(date) : null)}
+            onChangeEndDate={(date: Date | null) => setValue("endDate", date != null ? formatDate(date) : null)}
             limits={{
               startMinDate: startOfDay(new Date()),
               startMaxDate: addYears(new Date(), 2),

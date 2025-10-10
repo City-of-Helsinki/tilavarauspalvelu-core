@@ -27,7 +27,14 @@ import {
   type BannerNotificationPageQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { fromUIDate } from "common/src/common/util";
+import {
+  parseUIDate,
+  fromUIDateTime,
+  formatDate,
+  formatTime,
+  fromUIDateTimeUnsafe,
+  parseUIDateUnsafe,
+} from "common/src/date-utils";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import {
   checkValidDate,
@@ -35,7 +42,6 @@ import {
   checkTimeStringFormat,
   checkLengthWithoutHtml,
 } from "common/src/schemas/schemaCommon";
-import { valueForDateInput, valueForTimeInput, dateTime, constructDateTimeSafe } from "@/helpers";
 import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { ControlledDateInput } from "common/src/components/form";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
@@ -145,8 +151,8 @@ const checkStartIsBeforeEnd = (
   },
   ctx: z.RefinementCtx
 ) => {
-  const start = constructDateTimeSafe(data.activeFrom, data.activeFromTime);
-  const end = constructDateTimeSafe(data.activeUntil, data.activeUntilTime);
+  const start = fromUIDateTime(data.activeFrom, data.activeFromTime);
+  const end = fromUIDateTime(data.activeUntil, data.activeUntilTime);
   if (start && end && start > end) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -203,7 +209,7 @@ const NotificationFormSchema = z
   .superRefine((x, ctx) => {
     if (!x.isDraft || x.activeFrom !== "" || x.activeFromTime !== "") {
       checkTimeStringFormat(x.activeFromTime, ctx, "activeFromTime");
-      checkValidDate(fromUIDate(x.activeFrom), ctx, "activeFrom");
+      checkValidDate(parseUIDate(x.activeFrom), ctx, "activeFrom");
     }
   })
   // End time can't be in the past unless it's a draft
@@ -212,9 +218,9 @@ const NotificationFormSchema = z
     if (!x.isDraft || x.activeUntil !== "" || x.activeUntilTime !== "") {
       checkTimeStringFormat(x.activeUntilTime, ctx, "activeUntilTime");
       if (!x.isDraft) {
-        checkValidFutureDate(fromUIDate(x.activeUntil), ctx, "activeUntil");
+        checkValidFutureDate(parseUIDate(x.activeUntil), ctx, "activeUntil");
       } else {
-        checkValidDate(fromUIDate(x.activeUntil), ctx, "activeUntil");
+        checkValidDate(parseUIDate(x.activeUntil), ctx, "activeUntil");
       }
     }
   })
@@ -233,10 +239,11 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
   const { t } = useTranslation("notification");
 
   const today = new Date();
-  const activeFrom = valueForDateInput(notification?.activeFrom ?? today.toISOString());
-  const activeFromTime = notification?.activeFrom ? valueForTimeInput(notification?.activeFrom) : "06:00";
-  const activeUntil = notification?.activeUntil ? valueForDateInput(notification?.activeUntil) : "";
-  const activeUntilTime = notification?.activeUntil ? valueForTimeInput(notification?.activeUntil) : "23:59";
+  const activeFromDate = notification?.activeFrom ? parseUIDateUnsafe(notification?.activeFrom) : today;
+  const activeFrom = formatDate(activeFromDate);
+  const activeFromTime = notification?.activeFrom ? formatTime(new Date(notification?.activeFrom)) : "06:00";
+  const activeUntil = notification?.activeUntil ? formatDate(new Date(notification?.activeUntil)) : "";
+  const activeUntilTime = notification?.activeUntil ? formatTime(new Date(notification?.activeUntil)) : "23:59";
 
   const {
     handleSubmit,
@@ -273,14 +280,14 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
   const displayError = useDisplayError();
 
   const onSubmit = async (data: NotificationFormType) => {
-    const end = constructDateTimeSafe(data.activeUntil, data.activeUntilTime);
-    const start = data.activeFrom !== "" ? dateTime(data.activeFrom, data.activeFromTime) : undefined;
+    const end = fromUIDateTime(data.activeUntil, data.activeUntilTime);
+    const start = data.activeFrom !== "" ? fromUIDateTimeUnsafe(data.activeFrom, data.activeFromTime) : undefined;
 
     const input = {
       name: data.name,
       // either both needs to be defined or neither
       // for drafts null is fine, published it's not (schema checks)
-      activeFrom: start != null && end != null ? start : null,
+      activeFrom: start != null && end != null ? start.toISOString() : null,
       activeUntil: start != null && end != null ? end.toISOString() : null,
       draft: data.isDraft,
       message: data.messageFi,

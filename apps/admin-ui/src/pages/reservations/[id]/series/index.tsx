@@ -16,8 +16,14 @@ import {
   UserPermissionChoice,
   useSeriesPageQuery,
 } from "@gql/gql-types";
-import { createNodeId, calculateMedian, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { format, isSameDay } from "date-fns";
+import {
+  calculateMedian,
+  createNodeId,
+  filterNonNullable,
+  ignoreMaybeArray,
+  toNumber,
+} from "common/src/helpers";
+import { isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Element } from "@/styled";
 import { AutoGrid, ButtonContainer, CenterSpinner, H1, Strong } from "common/styled";
@@ -25,14 +31,22 @@ import { LinkPrev } from "@/component/LinkPrev";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonSize, Notification } from "hds-react";
-import { fromApiDate, fromUIDate, fromUIDateUnsafe, toApiDateUnsafe, toUIDate } from "common/src/common/util";
+import {
+  parseApiDate,
+  fromApiDateTime,
+  parseUIDate,
+  formatDate,
+  parseUIDateUnsafe,
+  formatApiDateUnsafe,
+  formatTime,
+} from "common/src/date-utils";
 import { ControlledDateInput, TimeInput } from "common/src/components/form";
 import { WeekdaysSelector } from "@/component/WeekdaysSelector";
 import { ReservationListEditor } from "@/component/ReservationListEditor";
 import { useFilteredReservationList, useMultipleReservation, useSession } from "@/hooks";
 import { RescheduleReservationSeriesForm, RescheduleReservationSeriesFormSchema } from "@/schemas";
 import { errorToast, successToast } from "common/src/components/toast";
-import { fromAPIDateTime, getBufferTime } from "@/helpers";
+import { getBufferTime } from "@/helpers";
 import { BufferToggles } from "@/component/BufferToggles";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { getReservationUrl } from "@/common/urls";
@@ -57,13 +71,14 @@ function convertToForm(value: NodeT): RescheduleReservationSeriesForm {
   const reservations = filterNonNullable(value?.reservations).filter((x) => new Date(x.beginsAt) >= new Date());
   const bufferTimeBefore = calculateMedian(reservations.map((x) => x.bufferTimeBefore));
   const bufferTimeAfter = calculateMedian(reservations.map((x) => x.bufferTimeAfter));
-  const begin = fromAPIDateTime(value?.beginDate, value?.beginTime);
-  const end = fromAPIDateTime(value?.endDate, value?.endTime);
+  const begin = fromApiDateTime(value?.beginDate, value?.beginTime);
+  const end = fromApiDateTime(value?.endDate, value?.endTime);
+
   return {
-    startingDate: value?.beginDate != null ? toUIDate(fromApiDate(value.beginDate)) : "",
-    endingDate: value?.endDate != null ? toUIDate(fromApiDate(value.endDate)) : "",
-    startTime: begin ? format(begin, "HH:mm") : "",
-    endTime: end ? format(end, "HH:mm") : "",
+    startingDate: value?.beginDate != null ? formatDate(parseApiDate(value.beginDate)) : "",
+    endingDate: value?.endDate != null ? formatDate(parseApiDate(value.endDate)) : "",
+    startTime: begin ? formatTime(begin) : "",
+    endTime: end ? formatTime(end) : "",
     repeatOnDays: filterNonNullable(value?.weekdays),
     bufferTimeBefore: bufferTimeBefore > 0,
     bufferTimeAfter: bufferTimeAfter > 0,
@@ -168,8 +183,8 @@ function SeriesPageInner({ pk }: { pk: number }) {
   const checkedReservations = useFilteredReservationList({
     items: newReservations,
     reservationUnitPk: reservationUnit?.pk ?? 0,
-    begin: fromUIDate(watch("startingDate")) ?? new Date(),
-    end: fromUIDate(watch("endingDate")) ?? new Date(),
+    begin: parseUIDate(watch("startingDate")) ?? new Date(),
+    end: parseUIDate(watch("endingDate")) ?? new Date(),
     startTime: watch("startTime"),
     endTime: watch("endTime"),
     reservationType: reservation?.type ?? ReservationTypeChoice.Staff,
@@ -212,14 +227,14 @@ function SeriesPageInner({ pk }: { pk: number }) {
     try {
       const input: ReservationSeriesRescheduleMutationInput = {
         pk: reservationSeries.pk,
-        beginDate: toApiDateUnsafe(fromUIDateUnsafe(values.startingDate)),
+        beginDate: formatApiDateUnsafe(parseUIDateUnsafe(values.startingDate)),
         beginTime: values.startTime,
-        endDate: toApiDateUnsafe(fromUIDateUnsafe(values.endingDate)),
+        endDate: formatApiDateUnsafe(parseUIDateUnsafe(values.endingDate)),
         endTime: values.endTime,
         weekdays: values.repeatOnDays,
         bufferTimeBefore: bufferTimeBefore.toString(),
         bufferTimeAfter: bufferTimeAfter.toString(),
-        skipDates: skipDates.map((x) => toApiDateUnsafe(x)),
+        skipDates: skipDates.map((x) => formatApiDateUnsafe(x)),
       };
       const mutRes = await mutate({ variables: { input } });
       if (mutRes.data?.rescheduleReservationSeries?.pk == null) {

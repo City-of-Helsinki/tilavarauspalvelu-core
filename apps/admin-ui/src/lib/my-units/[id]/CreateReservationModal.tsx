@@ -19,14 +19,14 @@ import {
   useReservationUnitQuery,
 } from "@gql/gql-types";
 import styled from "styled-components";
-import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";
 import { ReservationFormSchema, type ReservationFormType, type ReservationFormMeta } from "@/schemas";
 import { CenterSpinner, Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useCheckCollisions } from "@/hooks";
-import { constructDateTimeSafe, dateTime, getBufferTime, getNormalizedInterval } from "@/helpers";
+import { getBufferTime, getNormalizedInterval } from "@/helpers";
+import { fromUIDateTimeUnsafe, formatDate, formatTime, fromUIDateTime } from "common/src/date-utils";
 import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
@@ -115,8 +115,8 @@ export function CreateReservationModal({
 
     mode: "onChange",
     defaultValues: {
-      date: format(startDate, "dd.MM.yyyy"),
-      startTime: format(startDate, "HH:mm"),
+      date: formatDate(startDate, {}),
+      startTime: formatTime(startDate),
       enableBufferTimeBefore: false,
       enableBufferTimeAfter: false,
     },
@@ -139,8 +139,8 @@ export function CreateReservationModal({
         ...rest,
         reservationUnit: reservationUnit.pk,
         type,
-        beginsAt: dateTime(date, startTime),
-        endsAt: dateTime(date, endTime),
+        beginsAt: fromUIDateTimeUnsafe(date, startTime).toISOString(),
+        endsAt: fromUIDateTimeUnsafe(date, endTime).toISOString(),
         bufferTimeBefore: bufferBefore,
         bufferTimeAfter: bufferAfter,
         workingMemo: comments,
@@ -282,8 +282,8 @@ function useCheckFormCollisions({
   const bufferBeforeSeconds = getBufferTime(reservationUnit.bufferTimeBefore, type, enableBufferTimeBefore);
   const bufferAfterSeconds = getBufferTime(reservationUnit.bufferTimeAfter, type, enableBufferTimeAfter);
 
-  const start = constructDateTimeSafe(formDate, formStartTime);
-  const end = constructDateTimeSafe(formDate, formEndTime);
+  const start = formDate && formStartTime ? fromUIDateTime(formDate, formStartTime) : new Date();
+  const end = formDate && formEndTime ? fromUIDateTime(formDate, formEndTime) : null;
   const { hasCollisions } = useCheckCollisions({
     reservationPk: undefined,
     reservationUnitPk: reservationUnit?.pk ?? 0,
