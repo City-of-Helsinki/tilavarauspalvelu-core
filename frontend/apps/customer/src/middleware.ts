@@ -1,19 +1,18 @@
-// NOTE middleware can't import lodash or any other library that has
-import type { NextRequest } from "next/server";
 // Dynamic Code Evaluation
 // This is because Vercel doesn't support NodeJs as a runtime environment
 // and edge doesn't allow Dynamic Code Evaluation
 // This app is not edge compatible, but it's impossible to disable the checks.
 // Workaround as long as the function isn't needed is to split imports in such a way
 // that libraries are not imported in the middleware.
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { isPageRequest, redirectCsrfToken } from "ui/src/middlewareHelpers";
 import { createNodeId, getLocalizationLang } from "ui/src/modules/helpers";
 import { buildGraphQLUrl, getSignInUrl, type LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { env } from "@/env.mjs";
 import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import { getReservationInProgressPath } from "./modules/urls";
 
-const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
+const API_BASE_URL = env.TILAVARAUS_API_URL ?? "";
 
 type QqlQuery = {
   query: string;
@@ -63,7 +62,7 @@ function gqlQueryFetch(req: NextRequest, query: QqlQuery) {
 
   return fetch({
     method: "POST",
-    url: buildGraphQLUrl(apiBaseUrl),
+    url: buildGraphQLUrl(API_BASE_URL),
     headers: newHeaders,
     // @ts-expect-error -- something broken in node types, body can be a string
     body,
@@ -355,7 +354,7 @@ function getRedirectProtectedRoute(req: NextRequest, user: User | null): string 
     const host = headers.get("x-forwarded-host") ?? url.host;
     const origin = `${protocol}://${host}`;
     return getSignInUrl({
-      apiBaseUrl,
+      apiBaseUrl: API_BASE_URL,
       callBackUrl: url.pathname,
       language: getLocalizationLang(getLocalizationFromUrl(url)),
       originOverride: origin,
@@ -363,55 +362,6 @@ function getRedirectProtectedRoute(req: NextRequest, user: User | null): string 
     });
   }
   return null;
-}
-
-/// Check if the request is a page request
-/// @param url - URL
-/// @returns boolean
-function isPageRequest(url: URL): boolean {
-  if (
-    // ignore healthcheck because it's for automated test suite that can't do redirects
-    url.pathname.startsWith("/healthcheck") ||
-    url.pathname.startsWith("/api/healthcheck") ||
-    url.pathname.startsWith("/_next") ||
-    url.pathname.match(/\.(webmanifest|js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf|pdf)$/) ||
-    url.pathname.startsWith("/503") ||
-    url.pathname.startsWith("/en/503") ||
-    url.pathname.startsWith("/sv/503")
-  ) {
-    return false;
-  }
-  return true;
-}
-
-/// are we missing a csrf token in cookies
-/// if so get the backend url to redirect to and add the current url as a redirect_to parameter
-function redirectCsrfToken(req: NextRequest): URL | undefined {
-  const { cookies } = req;
-  const hasCsrfToken = cookies.has("csrftoken");
-  if (hasCsrfToken) {
-    return undefined;
-  }
-
-  // need to ignore all assets outside of html requests (which don't have an extension)
-  // so could we just check any request that doesn't have an extension?
-  const requestUrl = new URL(req.url);
-  if (!isPageRequest(requestUrl)) {
-    return undefined;
-  }
-
-  const csrfUrl = `${apiBaseUrl}/csrf/`;
-  const redirectUrl = new URL(csrfUrl);
-
-  // On server envs everything is in the same domain and 80/443 ports, so ignore the host part of the url.
-  // More robust solution (supporting separate domains) would need to take into account us being behind
-  // a gateway so the public url doesn't match the internal url.
-  const origin = requestUrl.origin;
-  const hostPart = origin.includes("localhost") ? origin : "";
-  const next = `${hostPart}${requestUrl.pathname}`;
-  redirectUrl.searchParams.set("redirect_to", next);
-
-  return redirectUrl;
 }
 
 // Run the middleware only on paths that require authentication
@@ -447,7 +397,12 @@ function getLangPrefix(url: URL): "" | "en" | "sv" {
 }
 
 export async function middleware(req: NextRequest) {
-  const csrfRedirectUrl = redirectCsrfToken(req);
+  // don't make unnecessary requests to the backend for every asset
+  if (!isPageRequest(new URL(req.url))) {
+    return NextResponse.next();
+  }
+
+  const csrfRedirectUrl = redirectCsrfToken(req, API_BASE_URL);
   if (csrfRedirectUrl) {
     // block infinite redirect loop (there is no graceful way to handle this)
     if (req.url.includes("redirect_to")) {
@@ -456,11 +411,6 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
     return NextResponse.redirect(csrfRedirectUrl);
-  }
-
-  // don't make unnecessary requests to the backend for every asset
-  if (!isPageRequest(new URL(req.url))) {
-    return NextResponse.next();
   }
 
   const url = new URL(req.url);
@@ -560,4 +510,6 @@ export const config = {
   /* i18n locale router and middleware have a bug in nextjs, matcher breaks the router
   matcher: undefined
   */
+  // TODO nodejs runtime doesn't work for some reason
+  // runtime: "nodejs",
 };
