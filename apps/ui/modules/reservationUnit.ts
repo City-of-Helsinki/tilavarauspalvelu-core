@@ -291,7 +291,7 @@ export function getPriceString(props: GetPriceType): string {
   const unitString =
     pricing.priceUnit === PriceUnit.Fixed || minutes ? "" : t(`prices:priceUnits.${pricing.priceUnit.toUpperCase()}`);
   const returnPriceString = trim(`${priceString} / ${unitString}`, " / ");
-  const materialPriceDescription = pricing.materialPriceDescriptionFi ? ` ${t("prices:materialPrice")}` : "";
+  const materialPriceDescription = pricing.materialPriceDescriptionFi ? ` + ${t("prices:materialPrice")}` : "";
   return `${returnPriceString}${materialPriceDescription}`;
 }
 
