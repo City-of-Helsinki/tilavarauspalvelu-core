@@ -622,7 +622,7 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
       nameFi
       pk
     }
-    taxPercentages {
+    taxPercentages(isEnabled: true) {
       edges {
         node {
           id
