@@ -153,6 +153,8 @@
       "numPersons": "Group size",
       "ageGroup": "Age group",
       "purpose": "Booking purpose",
+      "duration": "Duration",
+      "period": "Period",
       "additionalInfo": "",
       "begin": "Start date",
       "end": "End date",
