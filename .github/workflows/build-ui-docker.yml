@@ -106,7 +106,7 @@ jobs:
           NEXT_PUBLIC_SOURCE_VERSION=${{ github.sha }}
           NEXT_PUBLIC_SOURCE_BRANCH_NAME=${{ github.ref_name }}
           CI=true
-          SENTRY_ENABLE_SOURCE_MAPS={{ env.SENTRY_ENABLE_SOURCE_MAPS }}
+          SENTRY_ENABLE_SOURCE_MAPS=${{ env.SENTRY_ENABLE_SOURCE_MAPS }}
           RELEASE_NAME=${{ steps.release.outputs.release }}
           SENTRY_PROJECT=tilavarauspalvelu-${{ inputs.app-name }}
           SENTRY_URL=${{ env.SENTRY_URL }}
