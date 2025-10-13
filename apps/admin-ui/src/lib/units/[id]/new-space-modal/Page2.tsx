@@ -27,7 +27,7 @@ export function Page2({ onPrevPage, hasFixedParent, form, children }: Props): JS
     <>
       <Dialog.Header title={modalTitle} id="modal-header" />
       <Dialog.Content>
-        <StyledTag>{`${t("spaces:SpaceModal.phase")} 2/2`}</StyledTag>
+        <StyledTag placeholder="">{`${t("spaces:SpaceModal.phase")} 2/2`}</StyledTag>
         <p className="text-body" id="custom-dialog-content">
           {modalContent}
         </p>

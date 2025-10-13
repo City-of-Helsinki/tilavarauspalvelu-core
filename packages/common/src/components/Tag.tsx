@@ -22,7 +22,7 @@ const ColoredTag = styled(StyledTag)<{ $type: StatusLabelType }>`
 
 function Tag({ ariaLabel, type = "neutral", children, onClick }: TagPropsType): JSX.Element {
   return (
-    <ColoredTag $type={type} aria-label={ariaLabel} onClick={onClick}>
+    <ColoredTag $type={type} aria-label={ariaLabel} onClick={onClick} placeholder="">
       {children}
     </ColoredTag>
   );
