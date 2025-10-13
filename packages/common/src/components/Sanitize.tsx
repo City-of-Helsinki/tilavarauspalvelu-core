@@ -21,7 +21,19 @@ const StyledContent = styled.div`
   }
 `;
 
-const config = {
+/// Remove unwanted tags from content
+/// Turns all empty content (even with empty tags) to empty string
+export function cleanHtmlContent(html: string): string {
+  if (html === "") {
+    return "";
+  }
+  if (sanitizeHtml(html, { allowedTags: [] }) === "") {
+    return "";
+  }
+  return sanitizeHtml(html, sanitizeConfig);
+}
+
+const sanitizeConfig = {
   allowedTags: [
     "h1",
     "h2",
@@ -62,7 +74,7 @@ export function Sanitize({ html }: Props): JSX.Element | null {
     <StyledContent
       /* oxlint-disable-next-line react/no-danger */
       dangerouslySetInnerHTML={{
-        __html: sanitizeHtml(html, config),
+        __html: sanitizeHtml(html, sanitizeConfig),
       }}
     />
   );

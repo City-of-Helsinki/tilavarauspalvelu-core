@@ -21,7 +21,7 @@ import { fromUIDateTime } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
 import { WEEKDAYS_SORTED } from "common/src/const";
 import { type TaxOption } from "./PricingSection";
-import sanitizeHtml from "sanitize-html";
+import { cleanHtmlContent } from "common/src/components/Sanitize";
 
 export const AccessTypes = ["ACCESS_CODE", "OPENED_BY_STAFF", "PHYSICAL_KEY", "UNRESTRICTED"] as const;
 
@@ -407,25 +407,25 @@ export const ReservationUnitEditSchema = z
     reservationsMaxDaysBefore: z.number(),
     reservationKind: z.nativeEnum(ReservationKind),
     contactInformation: z.string(),
-    reservationPendingInstructionsFi: z.string(),
-    reservationPendingInstructionsEn: z.string(),
-    reservationPendingInstructionsSv: z.string(),
-    reservationConfirmedInstructionsFi: z.string(),
-    reservationConfirmedInstructionsEn: z.string(),
-    reservationConfirmedInstructionsSv: z.string(),
-    reservationCancelledInstructionsFi: z.string(),
-    reservationCancelledInstructionsEn: z.string(),
-    reservationCancelledInstructionsSv: z.string(),
-    descriptionFi: z.string().max(4000),
-    descriptionEn: z.string().max(4000),
-    descriptionSv: z.string().max(4000),
+    reservationPendingInstructionsFi: z.string().transform(cleanHtmlContent),
+    reservationPendingInstructionsEn: z.string().transform(cleanHtmlContent),
+    reservationPendingInstructionsSv: z.string().transform(cleanHtmlContent),
+    reservationConfirmedInstructionsFi: z.string().transform(cleanHtmlContent),
+    reservationConfirmedInstructionsEn: z.string().transform(cleanHtmlContent),
+    reservationConfirmedInstructionsSv: z.string().transform(cleanHtmlContent),
+    reservationCancelledInstructionsFi: z.string().transform(cleanHtmlContent),
+    reservationCancelledInstructionsEn: z.string().transform(cleanHtmlContent),
+    reservationCancelledInstructionsSv: z.string().transform(cleanHtmlContent),
+    descriptionFi: z.string().max(4000).transform(cleanHtmlContent),
+    descriptionEn: z.string().max(4000).transform(cleanHtmlContent),
+    descriptionSv: z.string().max(4000).transform(cleanHtmlContent),
     nameFi: z.string().min(1, { message: "Required" }).max(80),
     nameEn: z.string().max(80),
     nameSv: z.string().max(80),
     // backend allows nulls but not empty strings, these are not required though
-    notesWhenApplyingFi: z.string().max(2000),
-    notesWhenApplyingEn: z.string().max(2000),
-    notesWhenApplyingSv: z.string().max(2000),
+    notesWhenApplyingFi: z.string().max(2000).transform(cleanHtmlContent),
+    notesWhenApplyingEn: z.string().max(2000).transform(cleanHtmlContent),
+    notesWhenApplyingSv: z.string().max(2000).transform(cleanHtmlContent),
     spaces: z.array(z.number()),
     resources: z.array(z.number()),
     equipments: z.array(z.number()),
@@ -907,9 +907,6 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     bufferTimeAfter,
     bufferTimeBefore,
     cancellationRule,
-    notesWhenApplyingEn,
-    notesWhenApplyingFi,
-    notesWhenApplyingSv,
     seasons,
     accessTypes: accessTypesForm,
     images, // images are updated with a separate mutation
@@ -964,24 +961,11 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     reservationKind,
     isDraft,
     isArchived,
-    notesWhenApplyingEn: cleanHtmlContent(notesWhenApplyingEn),
-    notesWhenApplyingFi: cleanHtmlContent(notesWhenApplyingFi),
-    notesWhenApplyingSv: cleanHtmlContent(notesWhenApplyingSv),
     cancellationRule: hasCancellationRule ? cancellationRule : null,
     pricings: filterNonNullable(pricings.map((p) => transformPricing(p, hasFuturePricing, taxPercentageOptions))),
     accessTypes,
     applicationRoundTimeSlots,
   };
-}
-
-function cleanHtmlContent(html: string): string | null {
-  if (html === "") {
-    return null;
-  }
-  if (sanitizeHtml(html, { allowedTags: [] }) === "") {
-    return null;
-  }
-  return html;
 }
 
 function transformPricing(
