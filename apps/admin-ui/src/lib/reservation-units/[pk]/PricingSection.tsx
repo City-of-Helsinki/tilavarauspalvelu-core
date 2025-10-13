@@ -310,10 +310,12 @@ function MaterialPricingDescription({ control, language, index, helperText }: De
     <Controller
       name={`pricings.${index}.materialPriceDescription${capitalize(language)}`}
       control={control}
-      render={({ field: { value, onChange } }) => (
+      render={({ field: { value, onChange }, fieldState: { error } }) => (
         <TextInput
           id={label + index}
           name={`pricings.${index}.materialPriceDescription${capitalize(language)}`}
+          errorText={getTranslatedError(t, error?.message)} //errors.pricingTerms?.message)}
+          invalid={getTranslatedError(t, error?.message) != null} //errors.pricingTerms?.message)}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           required
