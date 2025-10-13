@@ -59,7 +59,7 @@
     "@types/react": "18.2.7",
     "@types/react-dom": "18.3.0",
     "@types/sanitize-html": "^2.16.0",
-    "@vitejs/plugin-react": "^4.5.2",
+    "@vitejs/plugin-react": "^5.0.4",
     "happy-dom": "^20.0.0",
     "oxlint": "^1.20.0",
     "postcss-styled-syntax": "^0.7.1",
