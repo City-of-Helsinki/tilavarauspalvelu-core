@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { subDays } from "date-fns";
+import sanitizeHtml from "sanitize-html";
 import { fromUIDate } from "../common/util";
 
 const THREE_YEARS_MS = 3 * 365 * 24 * 60 * 60 * 1000;
@@ -83,7 +84,7 @@ export function checkLengthWithoutHtml(
   max?: number,
   name?: string
 ) {
-  const stripped = str.replaceAll(/<[^>]*>/g, "");
+  const stripped = sanitizeHtml(str, { allowedTags: [] });
 
   if (min != null && stripped.length < min) {
     ctx.addIssue({

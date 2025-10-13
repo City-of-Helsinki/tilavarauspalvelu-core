@@ -52,6 +52,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/common/const";
 import { getNotificationListUrl } from "@/common/urls";
+import { cleanHtmlContent } from "common/src/components/Sanitize";
 
 const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
   ssr: false,
@@ -168,9 +169,9 @@ const NotificationFormSchema = z
     activeUntil: z.string(),
     activeUntilTime: z.string(),
     // NOTE max length is because backend doesn't allow over 1000 characters
-    messageFi: z.string().max(1000),
-    messageEn: z.string().max(1000),
-    messageSv: z.string().max(1000),
+    messageFi: z.string().max(1000).transform(cleanHtmlContent),
+    messageEn: z.string().max(1000).transform(cleanHtmlContent),
+    messageSv: z.string().max(1000).transform(cleanHtmlContent),
     // refinement is not empty for these two (not having empty as an option forces a default value)
     targetGroup: z
       .enum(["ALL", "STAFF", "USER"])
