@@ -91,6 +91,7 @@ export function FilterTagList({ filters, multiSelectFilters, hideList, translate
               id={`filter-tag__${key}-${val}`}
               onClick={() => handleRemoveTag(key, val)}
               onDelete={() => handleRemoveTag(key, val)}
+              placeholder=""
               key={`${key}-${val}`}
               aria-label={t(`searchForm:removeFilter`, {
                 value: translateTag(key, val),
@@ -107,6 +108,7 @@ export function FilterTagList({ filters, multiSelectFilters, hideList, translate
             id={`filter-tag__${key}`}
             onDelete={() => handleRemoveTag(key)}
             onClick={() => handleRemoveTag(key)}
+            placeholder=""
             key={key}
             aria-label={t(`searchForm:removeFilter`, {
               value: label,
@@ -121,6 +123,7 @@ export function FilterTagList({ filters, multiSelectFilters, hideList, translate
           onClick={() => handleResetTags(hideList)}
           onDelete={() => handleResetTags(hideList)}
           data-testid="search-form__reset-button"
+          placeholder=""
         >
           {t("common:clear")}
         </ResetButton>

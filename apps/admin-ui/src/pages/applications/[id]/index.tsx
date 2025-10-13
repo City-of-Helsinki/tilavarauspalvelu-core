@@ -337,7 +337,11 @@ function ReservationUnitOptionsSection({
       key: "status",
       transform: ({ isRejected, isLocked }: ReservationUnitOptionFieldsFragment) => {
         if (isRejected || isLocked) {
-          return <DeclinedTag iconStart={<IconCross />}>{t("application:rejected")}</DeclinedTag>;
+          return (
+            <DeclinedTag iconStart={<IconCross />} placeholder="">
+              {t("application:rejected")}
+            </DeclinedTag>
+          );
         }
       },
     },

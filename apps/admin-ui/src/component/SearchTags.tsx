@@ -81,6 +81,7 @@ export function SearchTags({
           key={`${tag.key}-${tag.value}`}
           id={`search-tag-${tag.key}`}
           aria-label={t("common:removeTag", { tag: tag.tr })}
+          placeholder=""
         >
           {tag.tr}
         </StyledTag>
@@ -90,6 +91,7 @@ export function SearchTags({
           onClick={handleReset}
           onDelete={handleReset}
           aria-label={clearButtonAriaLabel ?? t("common:clearTags")}
+          placeholder=""
         >
           {clearButtonLabel ?? t("common:clear")}
         </ResetButton>

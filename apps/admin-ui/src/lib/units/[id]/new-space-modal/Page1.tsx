@@ -29,7 +29,7 @@ export function Page1({ unit, closeModal, hasFixedParent, form, onNextPage, chil
     <>
       <Dialog.Header title={modalTitle} id="modal-header" />
       <Dialog.Content>
-        <StyledTag>{`${t("spaces:SpaceModal.phase")} 1/2`}</StyledTag>
+        <StyledTag placeholder="">{`${t("spaces:SpaceModal.phase")} 1/2`}</StyledTag>
         <p className="text-body" id="custom-dialog-content">
           {modalContent}
         </p>
