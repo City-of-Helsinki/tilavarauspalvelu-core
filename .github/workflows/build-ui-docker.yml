@@ -30,7 +30,8 @@ jobs:
       # required because error pages use build time env vars, not runtime env vars
       # it's the same on every environment
       EMAIL_VARAAMO_EXT_LINK: "https://lomake.hel.fi/varaamo-palaute"
-      SENTRY_ENABLE_SOURCE_MAPS: ${{ startsWith(github.event.release.tag_name, 'v') || startsWith(github.event.release.tag_name, 'hotfix-') || startsWith(github.event.release.tag_name, 'release-') }}
+      # TODO this should only be ran for release tags (v*, hotfix-*, release-*), but {{ github.event.release.tag_name }} is not correct during a run
+      SENTRY_ENABLE_SOURCE_MAPS: true
       SENTRY_URL: "https://sentry.hel.fi"
       SENTRY_ORG: "city-of-helsinki"
 
