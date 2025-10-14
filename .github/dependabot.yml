@@ -57,6 +57,12 @@ updates:
         patterns:
           - "react"
           - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      react-hook-form:
+        patterns:
+          - "react-hook-form"
+          - "@hookform/resolvers"
 
   # npm dependencies that pass without manual intervention
   - package-ecosystem: "npm"
@@ -96,6 +102,7 @@ updates:
           - "next-i18next"
       i18n:
         patterns:
+          - "i18next"
           - "i18next-*"
           - "react-i18next"
           - "next-i18next"
