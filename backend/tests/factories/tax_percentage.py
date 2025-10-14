@@ -19,5 +19,6 @@ class TaxPercentageFactory(GenericDjangoModelFactory[TaxPercentage]):
         django_get_or_create = ["value"]
 
     value = FuzzyChoice(choices=[Decimal(val) for val in ("0.0", "10.0", "14.0", "24.0", "25.5")])
+    is_enabled = True
 
     reservation_unit_pricings = ReverseForeignKeyFactory("tests.factories.ReservationUnitPricingFactory")
