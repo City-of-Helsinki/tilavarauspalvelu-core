@@ -8,12 +8,12 @@ import { Flex, fontRegular, H1, H4, NoWrap } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
   type AccessCodeQuery,
-  AccessType,
   ApplicationReservationSeriesDocument,
   type ApplicationReservationSeriesQuery,
   type ApplicationReservationSeriesQueryVariables,
   MunicipalityChoice,
   OrderStatus,
+  AccessType,
   ReservationCancelReasonChoice,
   ReservationPageDocument,
   type ReservationPageQuery,
@@ -35,7 +35,7 @@ import { getReservationUnitName } from "@/modules/reservationUnit";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { AddressSection } from "@/components/reservation-unit";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { capitalize, createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { capitalize, createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { ButtonLikeExternalLink, ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
@@ -52,16 +52,16 @@ import { gql } from "@apollo/client";
 import StatusLabel from "common/src/components/StatusLabel";
 import IconButton from "common/src/components/IconButton";
 import {
-  ApplicationFields,
-  GeneralFields,
   Instructions,
   LabelValuePair,
   NotModifiableReason,
-  PaymentNotification,
   ReservationInfoCard,
   ReservationOrderStatus,
   ReservationStatus,
   TermsInfoSection,
+  SummaryGeneralFields,
+  SummaryReserveeFields,
+  PaymentNotification,
 } from "@/components/reservation";
 import { useSearchParams } from "next/navigation";
 import { queryOptions } from "@/modules/queryOptions";
@@ -226,8 +226,6 @@ function Reservation({
   const { beginsAt, endsAt } = reservation;
   const timeString = capitalize(formatDateTimeRange(t, new Date(beginsAt), new Date(endsAt)));
 
-  const supportedFields = filterNonNullable(reservation.reservationUnit.metadataSet?.supportedFields);
-
   const isBeingHandled = reservation.state === ReservationStateChoice.RequiresHandling;
   const isCancellable = isReservationCancellable(reservation);
 
@@ -268,9 +266,7 @@ function Reservation({
       <ReservationPageWrapper data-testid="reservation__content" $nRows={3}>
         <Flex style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
           <Flex $direction="row" $alignItems="center" $justifyContent="space-between" $wrap="wrap">
-            <H1 $noMargin data-testid="reservation__name">
-              {t("reservations:reservationName", { id: reservation.pk })}
-            </H1>
+            <H1 $noMargin>{t("reservations:reservationName", { id: reservation.pk })}</H1>
             <Flex $gap="s" $direction="row">
               <ReservationStatus
                 testId="reservation__status"
@@ -378,8 +374,8 @@ function Reservation({
             />
           )}
           <Instructions reservation={reservation} />
-          <GeneralFields supportedFields={supportedFields} reservation={reservation} options={options} />
-          <ApplicationFields reservation={reservation} options={options} supportedFields={supportedFields} />
+          <SummaryGeneralFields reservation={reservation} options={options} />
+          <SummaryReserveeFields reservation={reservation} options={options} />
           {shouldShowAccessCode && <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />}
           <TermsInfoSection reservation={reservation} termsOfUse={termsOfUse} />
           <AddressSection
@@ -529,12 +525,12 @@ export const GET_APPLICATION_RESERVATION_SERIES_QUERY = gql`
   }
 `;
 
-export const GET_RESERVATION_PAGE_QUERY = gql`
+export const RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
     reservation(id: $id) {
       id
       type
-      ...MetaFields
+      ...ReservationFormFields
       ...ReservationInfoCard
       ...Instructions
       ...CanReservationBeChanged
@@ -553,7 +549,6 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
           ...AddressFields
         }
         canApplyFreeOfCharge
-        ...MetadataSets
         ...TermsOfUse
       }
     }

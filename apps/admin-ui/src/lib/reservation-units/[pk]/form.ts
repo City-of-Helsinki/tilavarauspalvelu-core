@@ -6,6 +6,7 @@ import {
   ReservationUnitImageType,
   PaymentType,
   PriceUnit,
+  ReservationFormType,
   ReservationKind,
   ReservationStartInterval,
   type ReservationUnitEditQuery,
@@ -18,12 +19,10 @@ import { addDays, endOfDay, format } from "date-fns";
 import { z } from "zod";
 import { checkLengthWithoutHtml, checkTimeStringFormat } from "common/src/schemas/schemaCommon";
 import { fromUIDateTime } from "@/helpers";
-import { intervalToNumber } from "@/schemas/utils";
 import { WEEKDAYS_SORTED } from "common/src/const";
 import { type TaxOption } from "./PricingSection";
 import { cleanHtmlContent } from "common/src/components/Sanitize";
-
-export const AccessTypes = ["ACCESS_CODE", "OPENED_BY_STAFF", "PHYSICAL_KEY", "UNRESTRICTED"] as const;
+import { getIntervalMinutes } from "common/src/conversion";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
@@ -440,7 +439,7 @@ export const ReservationUnitEditSchema = z
     pricingTerms: z.string().nullable(),
     cancellationTerms: z.string().nullable(),
     serviceSpecificTerms: z.string().nullable(),
-    metadataSet: z.number().nullable(),
+    reservationForm: z.nativeEnum(ReservationFormType).optional(),
     surfaceArea: z.number(),
     images: z.array(ImageFormSchema),
     // internal values
@@ -485,14 +484,14 @@ export const ReservationUnitEditSchema = z
 
       if (v.minReservationDuration != null) {
         const minDurationMinutes = Math.floor(v.minReservationDuration / 60);
-        if (minDurationMinutes < intervalToNumber(v.reservationStartInterval)) {
+        if (minDurationMinutes < getIntervalMinutes(v.reservationStartInterval)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "duration can't be less than reservation start interval",
             path: ["minReservationDuration"],
           });
         }
-        if (minDurationMinutes % intervalToNumber(v.reservationStartInterval) !== 0) {
+        if (minDurationMinutes % getIntervalMinutes(v.reservationStartInterval) !== 0) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "duration must be a multiple of the reservation start interval",
@@ -503,14 +502,14 @@ export const ReservationUnitEditSchema = z
 
       if (v.maxReservationDuration != null) {
         const maxDurationMinutes = Math.floor(v.maxReservationDuration / 60);
-        if (maxDurationMinutes % intervalToNumber(v.reservationStartInterval) !== 0) {
+        if (maxDurationMinutes % getIntervalMinutes(v.reservationStartInterval) !== 0) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "duration must be a multiple of the reservation start interval",
             path: ["maxReservationDuration"],
           });
         }
-        if (maxDurationMinutes < intervalToNumber(v.reservationStartInterval)) {
+        if (maxDurationMinutes < getIntervalMinutes(v.reservationStartInterval)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "duration can't be less than reservation start interval",
@@ -581,11 +580,11 @@ export const ReservationUnitEditSchema = z
           path: ["authentication"],
         });
       }
-      if (v.metadataSet == null) {
+      if (v.reservationForm == null) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Required",
-          path: ["metadataSet"],
+          path: ["reservationForm"],
         });
       }
     }
@@ -848,7 +847,7 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
     surfaceArea: data?.surfaceArea ?? 0,
     authentication: data?.authentication ?? AuthenticationType.Weak,
     reservationUnitType: data?.reservationUnitType?.pk ?? null,
-    metadataSet: data?.metadataSet?.pk ?? null,
+    reservationForm: data?.reservationForm,
     paymentTerms: data?.paymentTerms?.pk ?? null,
     pricingTerms: data?.pricingTerms?.pk ?? null,
     serviceSpecificTerms: data?.serviceSpecificTerms?.pk ?? null,

@@ -22,7 +22,7 @@ import styled from "styled-components";
 import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";
-import { ReservationFormSchema, type ReservationFormType, type ReservationFormMeta } from "@/schemas";
+import { type CreateStaffReservationFormValues, getCreateStaffReservationFormSchema } from "common/src/schemas";
 import { CenterSpinner, Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useCheckCollisions } from "@/hooks";
@@ -30,8 +30,8 @@ import { constructDateTimeSafe, dateTime, getBufferTime, getNormalizedInterval }
 import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
-import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { createNodeId, toNumber } from "common/src/helpers";
+import { ReservationTypeForm } from "@/component/ReservationTypeForm";
 import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { SelectFilter } from "@/component/QueryParamFilters";
@@ -60,7 +60,7 @@ const MandatoryFieldsText = styled.div`
   font-size: var(--fontsize-body-s);
 `;
 
-type FormValueType = ReservationFormType & ReservationFormMeta;
+type FormValueType = CreateStaffReservationFormValues;
 
 const Form = styled.form`
   display: grid;
@@ -105,8 +105,7 @@ export function CreateReservationModal({
   const interval = getNormalizedInterval(reservationUnit?.reservationStartInterval);
   const startDate = start ?? new Date();
   const form = useForm<FormValueType>({
-    // @ts-expect-error -- schema refinement breaks typing
-    resolver: zodResolver(ReservationFormSchema(interval)),
+    resolver: zodResolver(getCreateStaffReservationFormSchema(interval)),
     // TODO onBlur or onChange? onChange is anoying because it highlights even untouched fields
     // onBlur on the other hand does no validation on the focused field till it's blurred
 
@@ -130,23 +129,7 @@ export function CreateReservationModal({
         throw new Error("Missing reservation unit");
       }
 
-      const { comments, date, startTime, endTime, type, enableBufferTimeBefore, enableBufferTimeAfter, ...rest } =
-        values;
-
-      const bufferBefore = getBufferTime(reservationUnit.bufferTimeBefore, type, enableBufferTimeBefore);
-      const bufferAfter = getBufferTime(reservationUnit.bufferTimeAfter, type, enableBufferTimeAfter);
-      const input: ReservationStaffCreateMutationInput = {
-        ...rest,
-        reservationUnit: reservationUnit.pk,
-        type,
-        beginsAt: dateTime(date, startTime),
-        endsAt: dateTime(date, endTime),
-        bufferTimeBefore: bufferBefore,
-        bufferTimeAfter: bufferAfter,
-        workingMemo: comments,
-      };
-
-      await createStaffReservation(input);
+      await createStaffReservation(transformCreateReservationMutation(values, reservationUnit));
 
       successToast({
         text: t("myUnits:ReservationDialog.saveSuccess", {
@@ -189,6 +172,40 @@ export function CreateReservationModal({
       </Dialog.Content>
     </FixedDialog>
   );
+}
+
+function transformCreateReservationMutation(
+  values: FormValueType,
+  reservationUnit: Pick<CreateStaffReservationFragment, "bufferTimeBefore" | "bufferTimeAfter" | "pk">
+): ReservationStaffCreateMutationInput {
+  if (!reservationUnit?.pk) {
+    throw new Error("Missing reservation unit");
+  }
+  const {
+    comments,
+    date,
+    startTime,
+    endTime,
+    type,
+    enableBufferTimeBefore,
+    enableBufferTimeAfter,
+    reserveeIsUnregisteredAssociation,
+    ...rest
+  } = values;
+
+  const bufferBefore = getBufferTime(reservationUnit.bufferTimeBefore, type, enableBufferTimeBefore);
+  const bufferAfter = getBufferTime(reservationUnit.bufferTimeAfter, type, enableBufferTimeAfter);
+  return {
+    // TODO don't use spread it allows passing unknown attributes to the object (even with Exact)
+    ...rest,
+    reservationUnit: reservationUnit.pk,
+    type,
+    beginsAt: dateTime(date, startTime),
+    endsAt: dateTime(date, endTime),
+    bufferTimeBefore: bufferBefore,
+    bufferTimeAfter: bufferAfter,
+    workingMemo: comments,
+  } satisfies ReservationStaffCreateMutationInput;
 }
 
 function DialogContent({
@@ -383,6 +400,7 @@ export const RESERVATION_UNIT_QUERY = gql`
 
 export const CREATE_STAFF_RESERVATION_FRAGMENT = gql`
   fragment CreateStaffReservation on ReservationUnitNode {
+    id
     pk
     nameFi
     reservationStartInterval

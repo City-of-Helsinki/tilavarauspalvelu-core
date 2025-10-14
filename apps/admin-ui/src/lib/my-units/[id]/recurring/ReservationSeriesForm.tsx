@@ -1,25 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type CreateStaffReservationFragment,
-  type Maybe,
-  ReservationTypeChoice,
-  useReservationUnitQuery,
-} from "@gql/gql-types";
+import { type CreateStaffReservationFragment, type Maybe, useReservationUnitQuery } from "@gql/gql-types";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, LoadingSpinner, Notification, TextInput } from "hds-react";
 import styled from "styled-components";
 import { fromUIDate } from "common/src/common/util";
-import {
-  type ReservationFormMeta,
-  type ReservationSeriesForm as ReservationSeriesFormT,
-  ReservationSeriesFormSchema,
-} from "@/schemas";
+import { type ReservationSeriesFormValues, getReservationSeriesSchema } from "@/schemas";
 import { type NewReservationListItem } from "@/component/ReservationsList";
 import { WeekdaysSelector } from "@/component/WeekdaysSelector";
 import { useCreateReservationSeries, useFilteredReservationList, useMultipleReservation } from "@/hooks";
-import ReservationTypeForm from "@/component/ReservationTypeForm";
+import { ReservationTypeForm } from "@/component/ReservationTypeForm";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { createNodeId, toNumber } from "common/src/helpers";
@@ -102,8 +93,6 @@ const ButtonContainer = styled(Flex).attrs({
   }
 `;
 
-type FormValues = ReservationSeriesFormT & ReservationFormMeta;
-
 interface ReservationSeriesFormProps {
   reservationUnit: Maybe<CreateStaffReservationFragment>;
   unitPk: number;
@@ -113,7 +102,7 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
 
   const interval = getNormalizedInterval(reservationUnit?.reservationStartInterval);
 
-  const form = useForm<FormValues>({
+  const form = useForm<ReservationSeriesFormValues>({
     // TODO onBlur doesn't work properly we have to submit the form to get validation errors
     mode: "onBlur",
     defaultValues: {
@@ -121,8 +110,7 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
       enableBufferTimeBefore: false,
       repeatPattern: "weekly",
     },
-    // @ts-expect-error -- schema refinement breaks typing
-    resolver: zodResolver(ReservationSeriesFormSchema(interval)),
+    resolver: zodResolver(getReservationSeriesSchema(interval)),
   });
 
   const {
@@ -166,7 +154,6 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
     reservationUnit,
   });
 
-  const reservationType = watch("type") ?? ReservationTypeChoice.Blocked;
   const checkedReservations = useFilteredReservationList({
     items: newReservations,
     reservationUnitPk: reservationUnit?.pk ?? 0,
@@ -174,13 +161,13 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
     end: fromUIDate(watch("endingDate")) ?? new Date(),
     startTime,
     endTime,
-    reservationType,
+    reservationType: watch("type"),
   });
 
   const router = useRouter();
   const displayError = useDisplayError();
 
-  const onSubmit = async ({ enableBufferTimeBefore, enableBufferTimeAfter, ...data }: FormValues) => {
+  const onSubmit = async ({ enableBufferTimeBefore, enableBufferTimeAfter, ...data }: ReservationSeriesFormValues) => {
     setLocalError(null);
 
     const skipDates = removedReservations

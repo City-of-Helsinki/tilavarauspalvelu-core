@@ -737,7 +737,6 @@ export const NOT_RESERVABLE_FIELDS_FRAGMENT = gql`
     ...IsReservableFields
     reservationState
     reservationKind
-    ...MetadataSets
   }
 `;
 
@@ -760,7 +759,6 @@ function getNotReservableReason(reservationUnit: NotReservableFieldsFragmentNarr
     maxReservationDuration,
     reservationKind,
     reservationState,
-    metadataSet,
     reservableTimeSpans,
     reservationBeginsAt,
   } = reservationUnit;
@@ -772,11 +770,7 @@ function getNotReservableReason(reservationUnit: NotReservableFieldsFragmentNarr
     return "reservationUnit is not reservable";
   }
   const resBegins = reservationBeginsAt ? new Date(reservationBeginsAt) : null;
-  const hasSupportedFields = (metadataSet?.supportedFields?.length ?? 0) > 0;
   const hasReservableTimes = (reservableTimeSpans?.length ?? 0) > 0;
-  if (!hasSupportedFields) {
-    return "reservationUnit has no supported fields";
-  }
   if (!hasReservableTimes) {
     return "reservationUnit has no reservable times";
   }

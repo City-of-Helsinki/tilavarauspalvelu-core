@@ -755,16 +755,6 @@ describe("isReservationUnitReservable", () => {
       minReservationDuration,
       maxReservationDuration,
       reservationBeginsAt: reservationBeginsAt?.toISOString() ?? null,
-      metadataSet: {
-        id: "1234",
-        supportedFields: [
-          {
-            id: "1234",
-            fieldName: "name",
-          },
-        ],
-        requiredFields: [] as const,
-      },
       reservationState,
       reservableTimeSpans,
     };
