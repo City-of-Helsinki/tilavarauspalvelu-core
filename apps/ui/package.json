@@ -28,7 +28,7 @@
     "hds-react": "^4.7.1",
     "i18next": "^25.6.0",
     "lodash-es": "^4.17.21",
-    "next": "15.5.4",
+    "next": "15.5.5",
     "next-compose-plugins": "^2.2.1",
     "next-i18next": "^15.4.2",
     "nuka-carousel": "^7.0.0",
