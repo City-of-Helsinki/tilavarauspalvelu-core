@@ -55,7 +55,7 @@ django-admin-rangefilter = "0.13.3"
 django-admin-sortable2 = "2.2.8"
 django-extensions = "4.1"
 django-import-export = "4.3.10"
-django-more-admin-filters = "1.13"
+django-more-admin-filters = "1.14"
 django-subforms = "0.4.1"
 django-tinymce = "4.1.0"
 
