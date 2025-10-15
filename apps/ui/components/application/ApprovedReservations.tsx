@@ -62,7 +62,7 @@ import { isReservationCancellableReason, ReservationCancellableReason } from "@/
 import {
   formatDate,
   formatDateRange,
-  formatDateTimeStrings,
+  applicationReservationDateTime,
   setMondayFirst,
   formatApiDate,
 } from "common/src/date-utils";
@@ -867,7 +867,7 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
   function getRejected(r: (typeof reservationSeries)[0]): ReservationsTableElem[] {
     return r.rejectedOccurrences.map((res) => {
       const reservation = { beginsAt: res.beginDatetime, endsAt: res.endDatetime };
-      const rest = formatDateTimeStrings({ t, reservation });
+      const rest = applicationReservationDateTime({ t, reservation });
       return {
         ...rest,
         reservationUnit: r.reservationUnit,
@@ -890,12 +890,18 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
 
   function getReservations(r: (typeof reservationSeries)[0]): ReservationsTableElem[] {
     return r.reservations.reduce<ReservationsTableElem[]>((acc, res, idx, ar) => {
-      const { isModified, ...rest } = formatDateTimeStrings({ t, reservation: res, orig: r.allocatedTimeSlot });
+      const { isModified, ...rest } = applicationReservationDateTime({
+        t,
+        reservation: res,
+        orig: r.allocatedTimeSlot,
+      });
       const status = getReservationStatusChoice(res.state, isModified);
       const accessTypeChanged = idx !== 0 && res.accessType !== ar[idx - 1]?.accessType;
       const accessCodeValidThru = getAccessCodeValidThru(res.pindoraInfo);
       const accessCodeTime =
-        accessCodeValidThru != null ? formatDateTimeStrings({ t, reservation: accessCodeValidThru }).time : null;
+        accessCodeValidThru != null
+          ? applicationReservationDateTime({ t, reservation: accessCodeValidThru }).time
+          : null;
       const reservationTableElem: ReservationsTableElem = {
         ...rest,
         reservationUnit: r.reservationUnit,

@@ -8,7 +8,7 @@ import { type ReservationCancelPageQuery, useCancelReservationMutation } from "@
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
-import { formatDate, formatDateTimeStrings } from "common/src/date-utils";
+import { formatDate, applicationReservationDateTime } from "common/src/date-utils";
 import { useDisplayError } from "common/src/hooks";
 import { getApplicationPath, getReservationPath } from "@/modules/urls";
 import { getPrice } from "@/modules/reservationUnit";
@@ -115,7 +115,7 @@ function ApplicationInfoCard({ reservation }: { reservation: CancellationProps["
   const reservationUnitName = getTranslationSafe(reservation.reservationUnit, "name", lang);
   const price = getPrice(t, reservation, lang);
 
-  const { dayOfWeek, time, date } = formatDateTimeStrings({ t, reservation, trailingMinutes: true });
+  const { dayOfWeek, time, date } = applicationReservationDateTime({ t, reservation, trailingMinutes: true });
 
   const icons = [
     {
