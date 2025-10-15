@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 import TimeZoneNotification from "common/src/components/TimeZoneNotification";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -28,7 +28,6 @@ import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCar
 import { Step0 } from "@/components/reservation/Step0";
 import { Step1 } from "@/components/reservation/Step1";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
 import { createNodeId, toNumber } from "common/src/modules/helpers";
 import { queryOptions } from "@/modules/queryOptions";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
@@ -108,44 +107,20 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   const [deleteReservation] = useDeleteReservationMutation({
     errorPolicy: "all",
-    onError: () => {
-      router.push(getReservationUnitPath(reservationUnit?.pk));
-    },
-  });
-
-  const confirmMessage = t("reservations:confirmNavigation");
-  // NOTE this is the only place where reservation is deleted, don't add a second place or it gets called repeatedly
-  const onNavigationConfirmed = useCallback(() => {
-    // TODO rewrite browser history so user will not end up here if they press next
-    return deleteReservation({
-      variables: {
-        input: {
-          pk: reservation?.pk?.toString() ?? "",
-        },
-      },
-    });
-  }, [deleteReservation, reservation?.pk]);
-
-  // whitelist to allow language change and confirmation
-  const whitelist = [
-    RegExp(`.*/reservations/${reservation?.pk}\\?.+`),
-    RegExp(`.*/reservation-unit/${reservationUnit?.pk}/reservation/${reservation?.pk}`),
-  ];
-  // only block nextjs navigation (we should not have any <a> links and we don't want to block refresh)
-  useConfirmNavigation({
-    confirm: true,
-    confirmMessage,
-    onNavigationConfirmed,
-    whitelist,
   });
 
   const pageTitle =
     step === 0 ? t("reservationCalendar:heading.newReservation") : t("reservationCalendar:heading.pendingReservation");
 
-  // NOTE: only navigate away from the page if the reservation is cancelled the confirmation hook handles delete
-  const cancelReservation = useCallback(() => {
-    router.push(getReservationUnitPath(reservationUnit?.pk));
-  }, [router, reservationUnit]);
+  const cancelReservation = () => {
+    try {
+      const input = { pk: reservation?.pk?.toString() ?? "" };
+      deleteReservation({ variables: { input } });
+    } finally {
+      // ignore errors
+      router.push(getReservationUnitPath(reservationUnit?.pk));
+    }
+  };
 
   const handleStepClick = async (_: unknown, index: number) => {
     const newStep = filterStep(index);
