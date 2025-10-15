@@ -30,21 +30,22 @@ const BodyText = styled.p`
   margin: 0;
 `;
 
+type ReservationNotificationProps = {
+  onDelete: () => void;
+  onNext: () => void;
+  reservation: ReservationNotificationFragment;
+  disabled?: boolean;
+  isLoading?: boolean;
+};
+
 function ReservationNotification({
   onDelete,
   onNext,
   reservation,
   disabled,
   isLoading,
-}: {
-  onDelete: () => void;
-  onNext: () => void;
-  reservation: ReservationNotificationFragment;
-  disabled?: boolean;
-  isLoading?: boolean;
-}) {
-  const startRemainingMinutes = reservation.paymentOrder?.expiresInMinutes;
-  const [remainingMinutes, setRemainingMinutes] = useState(startRemainingMinutes);
+}: ReservationNotificationProps): React.ReactElement | null {
+  const [paymentRemainingMinutes, setPaymentRemainingMinutes] = useState(reservation.paymentOrder?.expiresInMinutes);
   const { t } = useTranslation(["notification, common"]);
   const isCreated = reservation.state === ReservationStateChoice.Created;
 
@@ -52,27 +53,21 @@ function ReservationNotification({
   const title = t(`${translateKey}.title`);
   const submitButtonText = t(`${translateKey}${isCreated ? ".continueReservation" : ".payReservation"}`);
   const text = t(`${translateKey}.body`, {
-    time: remainingMinutes,
+    time: paymentRemainingMinutes,
   });
 
-  function countdownMinute(minutes: number) {
-    if (minutes === 0) {
-      return 0;
-    }
-    return minutes - 1;
-  }
-
   useEffect(() => {
-    const paymentTimeout = setTimeout(() => {
-      const minutes = remainingMinutes ?? 0;
-      setRemainingMinutes(countdownMinute(minutes));
-    }, 60000);
-    if (remainingMinutes === 0 || isCreated) {
-      return clearTimeout(paymentTimeout);
+    if (paymentRemainingMinutes != null && paymentRemainingMinutes > 0) {
+      const paymentTimeout = setTimeout(() => {
+        const minutes = paymentRemainingMinutes ?? 0;
+        setPaymentRemainingMinutes(Math.max(minutes - 1, 0));
+      }, 60_000);
+      return () => clearTimeout(paymentTimeout);
     }
-  }, [remainingMinutes, isCreated]);
+  }, [paymentRemainingMinutes]);
 
-  if (!isCreated && !remainingMinutes) {
+  const isExpired = paymentRemainingMinutes ?? 0 <= 0;
+  if (!isCreated && isExpired) {
     return null;
   }
 
@@ -113,7 +108,7 @@ function ReservationNotification({
   );
 }
 
-export function InProgressReservationNotification() {
+export function InProgressReservationNotification(): React.ReactElement {
   const { t, i18n } = useTranslation();
   const { currentUser } = useCurrentUser();
   const { data, refetch } = useListInProgressReservationsQuery({
