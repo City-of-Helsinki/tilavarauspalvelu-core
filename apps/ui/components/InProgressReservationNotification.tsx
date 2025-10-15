@@ -21,20 +21,38 @@ import { errorToast, successToast } from "common/src/components/toast";
 import { getReservationInProgressPath } from "@/modules/urls";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { Flex } from "common/styled";
-import { getApiErrors } from "common/src/apolloUtils";
+import { isNotFoundError } from "common/src/apolloUtils";
 import { type ParsedUrlQuery } from "querystring";
+import { useDisplayError } from "common/src/hooks";
+import { differenceInMinutes } from "date-fns";
+import { CREATED_RESERVATION_TIMEOUT_MINUTES } from "@/modules/const";
 
 const BodyText = styled.p`
   margin: 0;
 `;
 
-function isNotFoundError(e: unknown): boolean {
-  const errors = getApiErrors(e);
-  if (errors.length > 0) {
-    const notFoundErrors = errors.filter((e) => e.code === "NOT_FOUND");
-    return notFoundErrors.length > 0;
+type ReservationNotificationProps = {
+  onDelete: () => void;
+  onNext: () => void;
+  reservation: ReservationNotificationFragment;
+  disabled?: boolean;
+  isLoading?: boolean;
+};
+
+/// Get the time before the reservation expires
+/// handle both Payment and Initial variants
+/// backend doesn't return remaining time for Initial reservations
+/// @return 0 if the reservation has expired otherwise time till expires in minutes
+function getRemainingMinutes(reservation: ReservationNotificationFragment): number {
+  if (reservation.state === ReservationStateChoice.WaitingForPayment) {
+    return reservation.paymentOrder?.expiresInMinutes ?? 0;
   }
-  return false;
+  if (reservation.state === ReservationStateChoice.Created && reservation.createdAt != null) {
+    const createdAt = new Date(reservation.createdAt);
+    const since = differenceInMinutes(new Date(), createdAt);
+    return Math.max(CREATED_RESERVATION_TIMEOUT_MINUTES - since, 0);
+  }
+  return 0;
 }
 
 function ReservationNotification({
@@ -43,43 +61,29 @@ function ReservationNotification({
   reservation,
   disabled,
   isLoading,
-}: {
-  onDelete: () => void;
-  onNext: () => void;
-  reservation: ReservationNotificationFragment;
-  disabled?: boolean;
-  isLoading?: boolean;
-}) {
-  const startRemainingMinutes = reservation.paymentOrder?.expiresInMinutes;
-  const [remainingMinutes, setRemainingMinutes] = useState(startRemainingMinutes);
+}: ReservationNotificationProps): React.ReactElement | null {
+  const [remainingMinutes, setRemainingMinutes] = useState(getRemainingMinutes(reservation));
   const { t } = useTranslation(["notification, common"]);
   const isCreated = reservation.state === ReservationStateChoice.Created;
 
   const translateKey = isCreated ? "notification:createdReservation" : "notification:waitingForPayment";
   const title = t(`${translateKey}.title`);
-  const submitButtonText = t(`${translateKey}${isCreated ? ".continueReservation" : ".payReservation"}`);
+  const submitButtonText = t(`${translateKey}${".continueButton"}`);
   const text = t(`${translateKey}.body`, {
     time: remainingMinutes,
   });
 
-  function countdownMinute(minutes: number) {
-    if (minutes === 0) {
-      return 0;
-    }
-    return minutes - 1;
-  }
-
   useEffect(() => {
-    const paymentTimeout = setTimeout(() => {
-      const minutes = remainingMinutes ?? 0;
-      setRemainingMinutes(countdownMinute(minutes));
-    }, 60000);
-    if (remainingMinutes === 0 || isCreated) {
-      return clearTimeout(paymentTimeout);
+    if (remainingMinutes > 0) {
+      const updateTimeTimeout = setTimeout(() => {
+        setRemainingMinutes(Math.max(remainingMinutes - 1, 0));
+      }, 60_000);
+      return () => clearTimeout(updateTimeTimeout);
     }
-  }, [remainingMinutes, isCreated]);
+  }, [remainingMinutes]);
 
-  if (!isCreated && !remainingMinutes) {
+  const isExpired = remainingMinutes <= 0;
+  if (isExpired) {
     return null;
   }
 
@@ -103,7 +107,7 @@ function ReservationNotification({
             iconStart={isLoading ? <LoadingSpinner small /> : undefined}
             data-testid="reservation-notification__button--delete"
           >
-            {t("notification:waitingForPayment.cancelReservation")}
+            {t("notification:cancelReservationButton")}
           </Button>
           <Button
             variant={ButtonVariant.Secondary}
@@ -120,14 +124,14 @@ function ReservationNotification({
   );
 }
 
-export function InProgressReservationNotification() {
+export function InProgressReservationNotification(): React.ReactElement {
   const { t, i18n } = useTranslation();
   const { currentUser } = useCurrentUser();
   const { data, refetch } = useListInProgressReservationsQuery({
     skip: !currentUser?.pk,
     variables: {
       state: [ReservationStateChoice.WaitingForPayment, ReservationStateChoice.Created],
-      orderBy: ReservationOrderingChoices.PkDesc,
+      orderBy: ReservationOrderingChoices.CreatedAtDesc,
       user: currentUser?.pk ?? 0,
       beginDate: toApiDate(new Date()) ?? "",
       reservationType: ReservationTypeChoice.Normal,
@@ -155,6 +159,7 @@ export function InProgressReservationNotification() {
 
   const unpaidReservation = reservations
     .filter(() => !shouldHidePaymentNotification)
+    .filter((r) => r.paymentOrder?.expiresInMinutes != null)
     .find((r) => r.state === ReservationStateChoice.WaitingForPayment);
   const createdReservation = reservations
     .filter(() => !shouldHideCreatedNotification)
@@ -163,12 +168,13 @@ export function InProgressReservationNotification() {
   const [deleteReservation, { loading: isDeleteLoading }] = useDeleteReservationMutation();
 
   const lang = convertLanguageCode(i18n.language);
-  const checkoutUrl = getCheckoutUrl(unpaidReservation?.paymentOrder, lang);
 
   // Lazy minimal query to check if the reservation is still valid
   const [reservationQ] = useReservationStateLazyQuery({
     fetchPolicy: "no-cache",
   });
+
+  const displayError = useDisplayError();
 
   const client = useApolloClient();
   const refreshQueryCache = () => {
@@ -183,29 +189,32 @@ export function InProgressReservationNotification() {
   // how about WaitingForPayment?
   // it would still be proper to invalidate the cache so if there is such a page, it would show the correct data.
   const handleDelete = async (reservation: ReservationNotificationFragment) => {
+    // never happens but isn't type enforced
+    if (reservation?.pk == null) {
+      return;
+    }
     // If we are on the page for the reservation we are deleting, we should redirect to the front page.
     // The funnel page: reservation-unit/:pk/reservation/:pk should not show this notification at all.
-    if (reservation?.pk) {
-      try {
-        const { data } = await deleteReservation({
-          variables: {
-            input: {
-              pk: reservation.pk.toString(),
-            },
+    try {
+      const { data } = await deleteReservation({
+        variables: {
+          input: {
+            pk: reservation.pk.toString(),
           },
+        },
+      });
+      const deleted = data?.deleteTentativeReservation?.deleted;
+      if (deleted) {
+        successToast({
+          text: t("notification:reservationCancelledTitle"),
         });
-        const deleted = data?.deleteTentativeReservation?.deleted;
-        if (deleted) {
-          successToast({
-            text: t("notification:waitingForPayment.reservationCancelledTitle"),
-          });
-        }
-      } catch (e) {
-        // silently ignore NOT_FOUND (just refresh query cache)
-        if (!isNotFoundError(e)) {
-          throw e;
-        }
       }
+    } catch (e) {
+      // silently ignore NOT_FOUND (just refresh query cache)
+      if (!isNotFoundError(e)) {
+        displayError(e);
+      }
+    } finally {
       if (shouldRedirectAfterDelete(reservation.pk, router.pathname, router.query)) {
         router.push("/");
       } else {
@@ -214,20 +223,21 @@ export function InProgressReservationNotification() {
     }
   };
 
-  // TODO should pass the reservation here and remove the useOrder hook
-  const handleCheckout = () => {
+  const handleCheckout = (reservation: ReservationNotificationFragment) => {
+    const checkoutUrl = getCheckoutUrl(reservation.paymentOrder, lang);
     if (checkoutUrl) {
       router.push(checkoutUrl);
     }
   };
 
   const handleContinue = async (reservation: ReservationNotificationFragment) => {
-    if (reservation.reservationUnit.pk == null) {
-      throw new Error("No reservation unit pk");
+    // never happens but isn't type enforced
+    if (reservation.reservationUnit.pk == null || reservation.pk == null) {
+      return;
     }
     const res = await reservationQ({
       variables: {
-        id: createNodeId("ReservationNode", reservation.pk ?? 0),
+        id: createNodeId("ReservationNode", reservation.pk),
       },
     });
     if (res.data?.reservation == null) {
@@ -252,7 +262,6 @@ export function InProgressReservationNotification() {
             key={x.pk}
             onDelete={() => handleDelete(x)}
             onNext={() => handleContinue(x)}
-            // disabled={!createdReservation?.pk}
             isLoading={isDeleteLoading}
             reservation={x}
           />
@@ -260,8 +269,8 @@ export function InProgressReservationNotification() {
           <ReservationNotification
             key={x.pk}
             onDelete={() => handleDelete(x)}
-            onNext={handleCheckout}
-            disabled={!checkoutUrl}
+            onNext={() => handleCheckout(x)}
+            disabled={x.paymentOrder?.checkoutUrl == null}
             isLoading={isDeleteLoading}
             reservation={x}
           />
@@ -289,6 +298,7 @@ export const RESERVATION_NOTIFICATION_FRAGMENT = gql`
     id
     pk
     state
+    createdAt
     paymentOrder {
       id
       expiresInMinutes
