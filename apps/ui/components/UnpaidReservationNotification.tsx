@@ -22,21 +22,13 @@ import { errorToast, successToast } from "common/src/components/toast";
 import { getReservationInProgressPath } from "@/modules/urls";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { Flex } from "common/src/styled";
-import { getApiErrors } from "common/src/modules/apolloUtils";
+import { isNotFoundError } from "common/src/modules/apolloUtils";
 import { type ParsedUrlQuery } from "querystring";
+import { useDisplayError } from "common/src/hooks";
 
 const BodyText = styled.p`
   margin: 0;
 `;
-
-function isNotFoundError(e: unknown): boolean {
-  const errors = getApiErrors(e);
-  if (errors.length > 0) {
-    const notFoundErrors = errors.filter((e) => e.code === "NOT_FOUND");
-    return notFoundErrors.length > 0;
-  }
-  return false;
-}
 
 function ReservationNotification({
   onDelete,
@@ -171,6 +163,8 @@ export function InProgressReservationNotification() {
     fetchPolicy: "no-cache",
   });
 
+  const displayError = useDisplayError();
+
   const client = useApolloClient();
   const refreshQueryCache = () => {
     const p1 = client.refetchQueries({
@@ -184,29 +178,32 @@ export function InProgressReservationNotification() {
   // how about WaitingForPayment?
   // it would still be proper to invalidate the cache so if there is such a page, it would show the correct data.
   const handleDelete = async (reservation: ReservationNotificationFragment) => {
+    // never happens but isn't type enforced
+    if (reservation?.pk == null) {
+      return;
+    }
     // If we are on the page for the reservation we are deleting, we should redirect to the front page.
     // The funnel page: reservation-unit/:pk/reservation/:pk should not show this notification at all.
-    if (reservation?.pk) {
-      try {
-        const { data } = await deleteReservation({
-          variables: {
-            input: {
-              pk: reservation.pk.toString(),
-            },
+    try {
+      const { data } = await deleteReservation({
+        variables: {
+          input: {
+            pk: reservation.pk.toString(),
           },
+        },
+      });
+      const deleted = data?.deleteTentativeReservation?.deleted;
+      if (deleted) {
+        successToast({
+          text: t("notification:waitingForPayment.reservationCancelledTitle"),
         });
-        const deleted = data?.deleteTentativeReservation?.deleted;
-        if (deleted) {
-          successToast({
-            text: t("notification:waitingForPayment.reservationCancelledTitle"),
-          });
-        }
-      } catch (e) {
-        // silently ignore NOT_FOUND (just refresh query cache)
-        if (!isNotFoundError(e)) {
-          throw e;
-        }
       }
+    } catch (e) {
+      // silently ignore NOT_FOUND (just refresh query cache)
+      if (!isNotFoundError(e)) {
+        displayError(e);
+      }
+    } finally {
       if (shouldRedirectAfterDelete(reservation.pk, router.pathname, router.query)) {
         router.push("/");
       } else {
@@ -223,12 +220,13 @@ export function InProgressReservationNotification() {
   };
 
   const handleContinue = async (reservation: ReservationNotificationFragment) => {
-    if (reservation.reservationUnit.pk == null) {
-      throw new Error("No reservation unit pk");
+    // never happens but isn't type enforced
+    if (reservation.reservationUnit.pk == null || reservation.pk == null) {
+      return;
     }
     const res = await reservationQ({
       variables: {
-        id: createNodeId("ReservationNode", reservation.pk ?? 0),
+        id: createNodeId("ReservationNode", reservation.pk),
       },
     });
     if (res.data?.reservation == null) {

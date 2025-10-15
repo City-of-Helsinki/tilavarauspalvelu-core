@@ -198,6 +198,15 @@ export function getApiErrors(error: unknown): ApiError[] {
   return [];
 }
 
+export function isNotFoundError(e: unknown): boolean {
+  const errors = getApiErrors(e);
+  if (errors.length > 0) {
+    const notFoundErrors = errors.filter((e) => e.code === "NOT_FOUND");
+    return notFoundErrors.length > 0;
+  }
+  return false;
+}
+
 function getExtensionCode(e: GraphQLFormattedError): string | null {
   if (e.extensions == null) {
     return null;
