@@ -44,6 +44,7 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { useDisplayError } from "common/src/hooks";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
+import { isNotFoundError } from "common/src/apolloUtils";
 
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
   grid-column: 1 / -1;
@@ -223,7 +224,10 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
         window.scrollTo(0, 0);
       }
     } catch (err) {
-      // TODO: NOT_FOUND at least is non-recoverable so we should redirect to the reservation unit page
+      // NOT_FOUND is non-recoverable so redirect to the reservation unit page
+      if (isNotFoundError(err)) {
+        router.push(getReservationUnitPath(reservationUnit?.pk));
+      }
       displayError(err);
     }
   };
@@ -261,7 +265,10 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
         throw new Error("Invalid state");
       }
     } catch (err) {
-      // TODO: NOT_FOUND at least is non-recoverable so we should redirect to the reservation unit page
+      // NOT_FOUND is non-recoverable so redirect to the reservation unit page
+      if (isNotFoundError(err)) {
+        router.push(getReservationUnitPath(reservationUnit?.pk));
+      }
       displayError(err);
     }
   };
