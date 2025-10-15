@@ -29,6 +29,7 @@ import { useRouter } from "next/router";
 import { getReservationInProgressPath, getReservationUnitPath } from "@/modules/urls";
 import { gql } from "@apollo/client";
 import { ErrorListBox } from "common/src/components/ErrorListBox";
+import { isNotFoundError } from "common/src/modules/apolloUtils";
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
@@ -151,7 +152,10 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
         await router.push(getReservationInProgressPath(reservation.reservationUnit.pk, reservation.pk, 1));
       }
     } catch (err) {
-      // TODO: NOT_FOUND at least is non-recoverable so we should redirect to the reservation unit page
+      // NOT_FOUND is non-recoverable so redirect to the reservation unit page
+      if (isNotFoundError(err)) {
+        router.push(getReservationUnitPath(reservation.reservationUnit?.pk));
+      }
       displayError(err);
     }
   };
