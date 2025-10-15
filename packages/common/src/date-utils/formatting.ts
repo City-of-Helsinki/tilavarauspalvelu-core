@@ -154,7 +154,7 @@ export function formatDateTime(
  *   orig: { beginTime: "15:00", endTime: "16:30" } })
  *   // { date: Date("2023-12-25"), time: "15:30 - 17:00", dayOfWeek: "ma", isModified: true }
  */
-export function formatDateTimeStrings({
+export function applicationReservationDateTime({
   t,
   reservation,
   orig,

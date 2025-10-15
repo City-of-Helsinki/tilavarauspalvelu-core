@@ -4,7 +4,7 @@ import {
   formatTime,
   formatDate,
   formatDateTime,
-  formatDateTimeStrings,
+  applicationReservationDateTime,
   formatTimeRange,
   formatDateRange,
   formatDateTimeRange,
@@ -150,7 +150,7 @@ describe("formatting", () => {
         endsAt: "2023-12-25T17:00:00.000Z",
       };
 
-      const result = formatDateTimeStrings({
+      const result = applicationReservationDateTime({
         t: mockT,
         reservation,
         trailingMinutes: true,
@@ -172,7 +172,7 @@ describe("formatting", () => {
         endTime: "16:00",
       };
 
-      const result = formatDateTimeStrings({
+      const result = applicationReservationDateTime({
         t: mockT,
         reservation,
         orig,
@@ -188,7 +188,7 @@ describe("formatting", () => {
         endsAt: "2023-12-25T17:00:00.000Z",
       };
 
-      const result = formatDateTimeStrings({
+      const result = applicationReservationDateTime({
         t: mockT,
         reservation,
         trailingMinutes: true,
