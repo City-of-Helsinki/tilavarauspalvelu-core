@@ -1,16 +1,15 @@
 {
+  "reservationCancelledTitle": "Din bokning har avbokats.",
+  "cancelReservationButton": "Avboka bokningen",
   "waitingForPayment": {
     "title": "Din bokning väntar på betalning",
     "body": "Din bokning annulleras automatiskt om betalning inte görs inom {{time}} minuter.",
-    "cancelReservation": "Avboka bokningen",
-    "cancelingReservation": "Avbokar bokningen...",
-    "payReservation": "Betala",
-    "reservationCancelledTitle": "Din bokning har avbokats!"
+    "continueButton": "Betala"
   },
   "createdReservation": {
     "title": "Din bokning är inte klar",
-    "body": "Din bokning är inte klar. Vänligen slutför bokningen inom 20 minuter.",
-    "continueReservation": "Fortsätt bokningen"
+    "body": "Din bokning är inte klar. Vänligen slutför bokningen inom {{time}} minuter.",
+    "continueButton": "Fortsätt bokningen"
   },
   "timeZoneDeviation": {
     "title": "Du använder den här tjänsten utomlands:",
