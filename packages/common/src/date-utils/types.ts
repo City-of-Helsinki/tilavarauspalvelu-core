@@ -10,24 +10,27 @@ export type TimeStruct = {
 export interface CommonDateOptions {
   t?: TFunction;
   locale?: LocalizationLanguages | "fi" | "sv" | "en";
-  formatString?: string;
 }
 
 export interface FormatDateOptions extends CommonDateOptions {
   includeWeekday?: boolean;
+  showYear?: boolean;
 }
 
 export interface FormatDateTimeOptions extends CommonDateOptions {
   includeWeekday?: boolean;
   includeTimeSeparator?: boolean;
+  showYear?: boolean;
 }
 
 export interface FormatDateRangeOptions extends FormatDateOptions {
   showEndDate?: boolean;
+  showYear?: boolean;
 }
 
 export interface FormatDateTimeRangeOptions extends FormatDateTimeOptions {
   showEndDate?: boolean;
+  showYear?: boolean;
 }
 
 export interface ApplicationReservationDateTime {

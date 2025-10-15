@@ -18,7 +18,7 @@ import type {
 
 export const UI_DATE_FORMAT = "d.M.yyyy";
 export const UI_DATE_FORMAT_SHORT = "d.M.";
-export const UI_DATE_FORMAT_WITH_WEEKDAY = "cccccc d.M.yyyy";
+const UI_DATE_FORMAT_WITH_WEEKDAY = "cccccc d.M.yyyy";
 export const UI_TIME_FORMAT = "HH:mm";
 export const API_DATE_FORMAT = "yyyy-MM-dd";
 
@@ -94,16 +94,12 @@ export function formatTime(date: Date | null, locale: LocalizationLanguages = "f
  */
 export function formatDate(
   date: Date | null,
-  {
-    includeWeekday = false,
-    locale = "fi",
-    formatString = includeWeekday ? UI_DATE_FORMAT_WITH_WEEKDAY : UI_DATE_FORMAT,
-  }: FormatDateOptions = {}
+  { includeWeekday = false, showYear = true, locale = "fi" }: FormatDateOptions = {}
 ): string {
   if (!date || !isValidDate(date)) {
     return "";
   }
-
+  const formatString = includeWeekday ? UI_DATE_FORMAT_WITH_WEEKDAY : showYear ? UI_DATE_FORMAT : UI_DATE_FORMAT_SHORT;
   return format(date, formatString, getFormatLocaleObject(locale));
 }
 
@@ -124,13 +120,7 @@ export function formatDate(
  */
 export function formatDateTime(
   date: Date | null,
-  {
-    t,
-    includeWeekday = true,
-    includeTimeSeparator = true,
-    locale = "fi",
-    formatString = UI_DATE_FORMAT_WITH_WEEKDAY,
-  }: FormatDateTimeOptions = {}
+  { t, includeWeekday = true, includeTimeSeparator = true, showYear = true, locale = "fi" }: FormatDateTimeOptions = {}
 ): string {
   if (!date || !isValidDate(date)) {
     return "";
@@ -141,6 +131,7 @@ export function formatDateTime(
   if (t) {
     return `${t("common:dayShort." + setMondayFirst(date.getDay()))} ${format(date, UI_DATE_FORMAT)}${separator} ${format(date, UI_TIME_FORMAT)}`.trim();
   }
+  const formatString = showYear ? UI_DATE_FORMAT_WITH_WEEKDAY : UI_DATE_FORMAT_SHORT;
   return format(
     date,
     `${includeWeekday ? formatString : UI_DATE_FORMAT}'${separator}'${UI_TIME_FORMAT}`,
@@ -242,17 +233,17 @@ export function formatTimeRange(
 export function formatDateRange(
   start: Date | null,
   end: Date | null,
-  { includeWeekday = true, showEndDate = true, locale = "fi" }: FormatDateRangeOptions = {}
+  { includeWeekday = true, showEndDate = true, showYear = true, locale = "fi" }: FormatDateRangeOptions = {}
 ): string {
   if (!start || !end || !isValidDate(start) || !isValidDate(end)) {
     return "";
   }
 
   if (!showEndDate || isSameDay(start, end)) {
-    return formatDate(start, { includeWeekday, locale }) || "";
+    return formatDate(start, { includeWeekday, showYear, locale }) || "";
   }
 
-  return `${formatDate(start, { includeWeekday, locale })}–${formatDate(end, { includeWeekday, locale })}`;
+  return `${formatDate(start, { includeWeekday, showYear, locale })}–${formatDate(end, { includeWeekday, showYear, locale })}`;
 }
 
 /**
@@ -287,15 +278,18 @@ export function formatDateTimeRange(
     showEndDate = true,
     includeTimeSeparator = true,
     locale = "fi",
-    formatString = UI_DATE_FORMAT,
+    showYear = true,
   }: FormatDateTimeRangeOptions = {}
 ): string {
   if (!start || !end || !isValidDate(start) || !isValidDate(end)) {
     return "";
   }
 
-  const startDateTime = formatDateTime(start, { t, includeWeekday, includeTimeSeparator, locale, formatString });
-  const endFormat = !isSameDay(start, end) && showEndDate ? `${UI_TIME_FORMAT} ${formatString}` : UI_TIME_FORMAT;
+  const startDateTime = formatDateTime(start, { t, includeWeekday, includeTimeSeparator, locale, showYear });
+  const endFormat =
+    !isSameDay(start, end) && showEndDate
+      ? `${UI_TIME_FORMAT} ${showYear ? UI_DATE_FORMAT : UI_DATE_FORMAT_SHORT}`
+      : UI_TIME_FORMAT;
   const endDateTime = format(end, endFormat, getFormatLocaleObject(locale));
 
   return `${startDateTime}–${endDateTime}`.trim();
