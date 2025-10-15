@@ -48,8 +48,6 @@ ENV SENTRY_URL=$SENTRY_URL
 ARG SENTRY_ORG
 ENV SENTRY_ORG=$SENTRY_ORG
 
-RUN BUILD_DIR="/app/apps/$APP/.next/"
-
 RUN npm install -g corepack@latest @sentry/cli && corepack enable
 WORKDIR /app
 COPY --from=builder /app/scripts/ /app/scripts
@@ -66,11 +64,11 @@ RUN pnpm turbo run build --filter=$APP...
 # other artifacts like source code refs have to be added elsewhere
 RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,env=SENTRY_AUTH_TOKEN \
   if [ "$SENTRY_ENABLE_SOURCE_MAPS" = "true" ] ; then \
-    sentry-cli sourcemaps inject --ignore "node_modules" "$BUILD_DIR" && \
-    sentry-cli sourcemaps upload --ignore "node_modules" --release "$RELEASE_NAME" "$BUILD_DIR" && \
+    sentry-cli sourcemaps inject --ignore "node_modules" /app/apps/$APP/.next/ && \
+    sentry-cli sourcemaps upload --ignore "node_modules" --release "$RELEASE_NAME" /app/apps/$APP/.next/ && \
     sentry-cli releases new "$RELEASE_NAME" ; \
   fi
-RUN find $BUILD_DIR -name "*.map" -print0 | xargs -0 rm
+RUN find /app/apps/$APP/.next/ -name "*.map" -print0 | xargs -0 rm
 
 FROM base AS runner
 ARG APP
