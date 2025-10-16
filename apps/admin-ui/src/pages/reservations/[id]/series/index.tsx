@@ -16,13 +16,7 @@ import {
   UserPermissionChoice,
   useSeriesPageQuery,
 } from "@gql/gql-types";
-import {
-  calculateMedian,
-  createNodeId,
-  filterNonNullable,
-  ignoreMaybeArray,
-  toNumber,
-} from "common/src/helpers";
+import { calculateMedian, createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Element } from "@/styled";

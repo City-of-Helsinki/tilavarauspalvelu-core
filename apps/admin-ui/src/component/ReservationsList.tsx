@@ -1,5 +1,4 @@
 import React from "react";
-import { formatDateRange } from "common/src/date-utils";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { startOfDay } from "date-fns";
@@ -11,6 +10,7 @@ import { useModal } from "@/context/ModalContext";
 import { H6 } from "common/styled";
 import StatusLabel from "common/src/components/StatusLabel";
 import { gql } from "@apollo/client";
+import { formatDate } from "common/src/date-utils";
 
 export type NewReservationListItem = {
   date: Date;
@@ -218,6 +218,8 @@ export function ReservationList(props: Props | ExtendedProps) {
 
   const removed = items.filter((x) => x.isRemoved).length;
   const count = items.length - removed;
+  const formatReservationSlot = (item: NewReservationListItem) =>
+    `${formatDate(item.date, { includeWeekday: true })}, ${item.startTime}-${item.endTime}`;
   return (
     <ListWrapper data-testid="reservations-list" $isTall={isTall}>
       <TitleWrapper>
@@ -237,7 +239,7 @@ export function ReservationList(props: Props | ExtendedProps) {
           <StyledListItem key={`${item.date}-${item.startTime}-${item.endTime}`}>
             <TextWrapper $failed={!!item.error}>
               <DateElement $isRemoved={(item.isRemoved || item.isOverlapping || item.isCancelled) ?? false}>
-                {`${formatDateRange(new Date(item.date), new Date(item.endTime), { includeWeekday: true })}`}
+                {formatReservationSlot(item)}
               </DateElement>
               <StatusElement item={item} />
             </TextWrapper>
