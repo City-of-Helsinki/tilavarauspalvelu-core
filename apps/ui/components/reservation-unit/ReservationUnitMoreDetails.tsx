@@ -12,15 +12,9 @@ import { getFuturePricing, getPriceString, getReservationUnitName } from "@/modu
 import { JustForMobile } from "@/modules/style/layout";
 import { Accordion } from "hds-react";
 import { gql } from "@apollo/client";
-import {
-  filterNonNullable,
-  formatListToCSV,
-  formatTimeRange,
-  isPriceFree,
-  timeToMinutes,
-  toNumber,
-} from "common/src/helpers";
-import { convertLanguageCode, getTranslationSafe, toUIDate } from "common/src/common/util";
+import { filterNonNullable, formatListToCSV, isPriceFree, toNumber } from "common/src/helpers";
+import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { formatDate, formatTimeRange, timeToMinutes } from "common/src/date-utils";
 import { ReservationInfoSection } from "./ReservationInfoSection";
 import { Sanitize } from "common/src/components/Sanitize";
 import styled from "styled-components";
@@ -165,7 +159,7 @@ function PriceChangeNotice({ futurePricing }: { futurePricing: PricingFieldsFrag
         i18nKey="reservationUnit:futurePricingNotice"
         defaults="Huomioi <bold>hinnoittelumuutos {{date}} alkaen. Uusi hinta on {{price}}</bold>."
         values={{
-          date: toUIDate(begins),
+          date: formatDate(begins),
           price: priceString,
         }}
         components={{ bold: <strong /> }}

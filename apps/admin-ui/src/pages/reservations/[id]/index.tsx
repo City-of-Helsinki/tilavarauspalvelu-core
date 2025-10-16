@@ -32,12 +32,7 @@ import {
   DataWrapper,
 } from "@lib/reservations/[id]/";
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
-import {
-  createNodeId,
-  ignoreMaybeArray,
-  isPriceFree,
-  toNumber,
-} from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/helpers";
 import { formatAgeGroup } from "@/common/util";
 import { formatDateTime } from "common/src/date-utils";
 import { getCommonServerSideProps } from "@/modules/serverUtils";

@@ -7,16 +7,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { addYears } from "date-fns";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
-import {
-  formatDate,
-  formatTime,
-  formatTimeRange,
-  parseUIDate,
-  isValidDate,
-  timeToMinutes,
-  formatApiDate,
-} from "common/src/date-utils";
-import { formatters as getFormatters } from "common";
+import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "common/src/date-utils";
 import { Flex, H4 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
@@ -29,13 +20,7 @@ import {
   type ReservationUnitPageQueryVariables,
   useCreateReservationMutation,
 } from "@gql/gql-types";
-import {
-  createNodeId,
-  filterNonNullable,
-  ignoreMaybeArray,
-  isPriceFree,
-  toNumber,
-} from "common/src/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { Sanitize } from "common/src/components/Sanitize";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getPostLoginUrl } from "@/modules/util";

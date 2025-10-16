@@ -1,8 +1,4 @@
-import {
-  AuthenticationType,
-  type ReservationUnitsByUnitQuery,
-  useReservationUnitsByUnitQuery,
-} from "@gql/gql-types";
+import { AuthenticationType, type ReservationUnitsByUnitQuery, useReservationUnitsByUnitQuery } from "@gql/gql-types";
 import { createNodeId, filterNonNullable } from "common/src/helpers";
 import { formatApiDate } from "common/src/date-utils";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
