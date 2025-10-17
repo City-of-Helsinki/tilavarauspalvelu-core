@@ -328,67 +328,64 @@ function ReservationUnit({
     : undefined;
 
   return (
-    <>
-      <TimeZoneNotification />
-      <ReservationUnitPageWrapper>
-        <Head
-          reservationUnit={reservationUnit}
-          reservationUnitIsReservable={reservationUnitIsReservable}
-          subventionSuffix={subventionSuffix}
-        />
-        <div>
-          {reservationUnitIsReservable && (
-            <QuickReservation
-              reservationUnit={reservationUnit}
-              reservationForm={reservationForm}
-              durationOptions={durationOptions}
-              startingTimeOptions={startingTimeOptions}
-              nextAvailableTime={nextAvailableTime}
-              focusSlot={focusSlot}
-              submitReservation={submitReservation}
-              LoginAndSubmit={LoginAndSubmit}
-              subventionSuffix={subventionSuffix}
-            />
-          )}
-          <JustForDesktop customBreakpoint={breakpoints.l}>
-            <AddressSection unit={reservationUnit.unit} title={getReservationUnitName(reservationUnit) ?? "-"} />
-          </JustForDesktop>
-        </div>
-        <PageContentWrapper>
-          <div data-testid="reservation-unit__description">
-            <H4 as="h2">{t("reservationUnit:description")}</H4>
-            <Sanitize html={getTranslationSafe(reservationUnit, "description", lang)} />
-          </div>
-          {equipment.length > 0 && (
-            <div data-testid="reservation-unit__equipment">
-              <H4 as="h2">{t("reservationUnit:equipment")}</H4>
-              <EquipmentList equipment={equipment} />
-            </div>
-          )}
-          {reservationUnitIsReservable && (
-            <ReservationUnitCalendarSection
-              reservationUnit={reservationUnit}
-              reservationForm={reservationForm}
-              startingTimeOptions={startingTimeOptions}
-              blockingReservations={blockingReservations}
-              loginAndSubmitButton={LoginAndSubmit}
-              submitReservation={submitReservation}
-            />
-          )}
-          <ReservationUnitMoreDetails reservationUnit={reservationUnit} isReservable={reservationUnitIsReservable} />
-        </PageContentWrapper>
-        {pricingTermsContent != null && (
-          <InfoDialog
-            id="pricing-terms"
-            heading={t("reservationUnit:pricingTerms")}
-            text={pricingTermsContent ?? ""}
-            isOpen={isPricingTermsDialogOpen}
-            onClose={() => setIsPricingTermsDialogOpen(false)}
+    <ReservationUnitPageWrapper>
+      <Head
+        reservationUnit={reservationUnit}
+        reservationUnitIsReservable={reservationUnitIsReservable}
+        subventionSuffix={subventionSuffix}
+      />
+      <div>
+        {reservationUnitIsReservable && (
+          <QuickReservation
+            reservationUnit={reservationUnit}
+            reservationForm={reservationForm}
+            durationOptions={durationOptions}
+            startingTimeOptions={startingTimeOptions}
+            nextAvailableTime={nextAvailableTime}
+            focusSlot={focusSlot}
+            submitReservation={submitReservation}
+            LoginAndSubmit={LoginAndSubmit}
+            subventionSuffix={subventionSuffix}
           />
         )}
-        <StyledRelatedUnits thisReservationUnitPk={reservationUnit.pk} unitPk={reservationUnit.unit.pk} />
-      </ReservationUnitPageWrapper>
-    </>
+        <JustForDesktop customBreakpoint={breakpoints.l}>
+          <AddressSection unit={reservationUnit.unit} title={getReservationUnitName(reservationUnit) ?? "-"} />
+        </JustForDesktop>
+      </div>
+      <PageContentWrapper>
+        <div data-testid="reservation-unit__description">
+          <H4 as="h2">{t("reservationUnit:description")}</H4>
+          <Sanitize html={getTranslationSafe(reservationUnit, "description", lang)} />
+        </div>
+        {equipment.length > 0 && (
+          <div data-testid="reservation-unit__equipment">
+            <H4 as="h2">{t("reservationUnit:equipment")}</H4>
+            <EquipmentList equipment={equipment} />
+          </div>
+        )}
+        {reservationUnitIsReservable && (
+          <ReservationUnitCalendarSection
+            reservationUnit={reservationUnit}
+            reservationForm={reservationForm}
+            startingTimeOptions={startingTimeOptions}
+            blockingReservations={blockingReservations}
+            loginAndSubmitButton={LoginAndSubmit}
+            submitReservation={submitReservation}
+          />
+        )}
+        <ReservationUnitMoreDetails reservationUnit={reservationUnit} isReservable={reservationUnitIsReservable} />
+      </PageContentWrapper>
+      {pricingTermsContent != null && (
+        <InfoDialog
+          id="pricing-terms"
+          heading={t("reservationUnit:pricingTerms")}
+          text={pricingTermsContent ?? ""}
+          isOpen={isPricingTermsDialogOpen}
+          onClose={() => setIsPricingTermsDialogOpen(false)}
+        />
+      )}
+      <StyledRelatedUnits thisReservationUnitPk={reservationUnit.pk} unitPk={reservationUnit.unit.pk} />
+    </ReservationUnitPageWrapper>
   );
 }
 
@@ -422,6 +419,7 @@ function ReservationUnitWrapped({ reservationUnit, ...rest }: PropsNarrowed) {
   return (
     <>
       <Breadcrumb routes={routes} />
+      <TimeZoneNotification />
       <ReservationUnit reservationUnit={reservationUnitUpdated} {...rest} />
     </>
   );
