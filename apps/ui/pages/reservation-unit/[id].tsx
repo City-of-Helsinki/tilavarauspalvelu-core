@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
-import { addYears } from "date-fns";
+import { addMonths, addDays } from "date-fns";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "common/src/date-utils";
 import { Flex, H4 } from "common/styled";
@@ -19,6 +19,7 @@ import {
   type ReservationUnitPageQuery,
   type ReservationUnitPageQueryVariables,
   useCreateReservationMutation,
+  useReservationUnitTimeSpansQuery,
 } from "@gql/gql-types";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { Sanitize } from "common/src/components/Sanitize";
@@ -70,6 +71,7 @@ import { formatErrorMessage } from "common/src/hooks/useDisplayError";
 import { errorToast } from "common/src/components/toast";
 import { QuickReservation } from "@/components/QuickReservation";
 import { ReservationUnitMoreDetails } from "@/components/reservation-unit/ReservationUnitMoreDetails";
+
 function SubmitFragment({
   apiBaseUrl,
   focusSlot,
@@ -147,6 +149,8 @@ function ReservationUnit({
   useRemoveStoredReservation();
   const [isPricingTermsDialogOpen, setIsPricingTermsDialogOpen] = useState(false);
 
+  const reservableTimes = useReservableTimes(reservationUnit);
+
   const durationOptions = getDurationOptions(reservationUnit, t);
 
   const minReservationDurationMinutes = getMinReservationDuration(reservationUnit);
@@ -223,8 +227,6 @@ function ReservationUnit({
     };
     return await createReservation(input);
   };
-
-  const reservableTimes = useReservableTimes(reservationUnit);
 
   // TODO the use of focusSlot is weird it double's up for both
   // calendar focus date and the reservation slot which causes issues
@@ -390,9 +392,8 @@ function ReservationUnit({
   );
 }
 
-function ReservationUnitWrapped(props: PropsNarrowed) {
+function ReservationUnitWrapped({ reservationUnit, ...rest }: PropsNarrowed) {
   const { t, i18n } = useTranslation();
-  const { reservationUnit } = props;
   const lang = convertLanguageCode(i18n.language);
   const reservationUnitName = getTranslationSafe(reservationUnit, "name", lang);
   const routes = [
@@ -400,10 +401,28 @@ function ReservationUnitWrapped(props: PropsNarrowed) {
     { title: reservationUnitName ?? "-" },
   ] as const;
 
+  // Client side fetch more reservable times so the initial page loads faster
+  const today = useMemo(() => new Date(), []);
+  const daysInToFuture = reservationUnit.reservationsMaxDaysBefore ?? 2 * 365;
+  const { data: timeSpansData } = useReservationUnitTimeSpansQuery({
+    variables: {
+      id: reservationUnit.id,
+      beginDate: formatApiDate(today) ?? "",
+      endDate: formatApiDate(addDays(today, daysInToFuture + 1)) ?? "",
+    },
+  });
+
+  const reservableTimeSpans =
+    timeSpansData?.reservationUnit?.reservableTimeSpans ?? reservationUnit.reservableTimeSpans;
+  const reservationUnitUpdated = {
+    ...reservationUnit,
+    reservableTimeSpans,
+  };
+
   return (
     <>
       <Breadcrumb routes={routes} />
-      <ReservationUnit {...props} />
+      <ReservationUnit reservationUnit={reservationUnitUpdated} {...rest} />
     </>
   );
 }
@@ -467,10 +486,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
     const today = new Date();
     const startDate = today;
-    const endDate = addYears(today, 2);
+    const endDate = addMonths(today, 1);
 
     let innerStartTime = performance.now();
-    // This takes 400ms+ on local server
     const { data: reservationUnitData } = await apolloClient.query<
       ReservationUnitPageQuery,
       ReservationUnitPageQueryVariables
@@ -530,6 +548,18 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 }
 
 export default ReservationUnitWrapped;
+
+export const RESERVATION_UNIT_TIME_SPANS_QUERY = gql`
+  query ReservationUnitTimeSpans($id: ID!, $beginDate: Date!, $endDate: Date!) {
+    reservationUnit(id: $id) {
+      id
+      reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
+        startDatetime
+        endDatetime
+      }
+    }
+  }
+`;
 
 export const RESERVATION_UNIT_PAGE_QUERY = gql`
   query ReservationUnitPage($id: ID!, $beginDate: Date!, $endDate: Date!) {
