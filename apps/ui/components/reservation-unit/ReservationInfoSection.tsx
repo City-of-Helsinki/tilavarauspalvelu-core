@@ -28,7 +28,7 @@ export const RESERVATION_INFO_CONTAINER_FRAGMENT = gql`
 
 type NodeT = ReservationInfoSectionFragment;
 type ReservationInfoSectionProps = {
-  reservationUnit: NodeT;
+  reservationUnit: NodeT | undefined;
   reservationUnitIsReservable: boolean;
 };
 
@@ -58,7 +58,7 @@ export function ReservationInfoSection({
 }: ReservationInfoSectionProps): JSX.Element | null {
   const { t } = useTranslation();
 
-  if (!reservationUnitIsReservable) {
+  if (!reservationUnitIsReservable || reservationUnit == null) {
     return null;
   }
 

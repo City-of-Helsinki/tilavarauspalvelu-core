@@ -375,13 +375,15 @@ function ReservationUnit({
           )}
           <ReservationUnitMoreDetails reservationUnit={reservationUnit} isReservable={reservationUnitIsReservable} />
         </PageContentWrapper>
-        <InfoDialog
-          id="pricing-terms"
-          heading={t("reservationUnit:pricingTerms")}
-          text={pricingTermsContent ?? ""}
-          isOpen={isPricingTermsDialogOpen}
-          onClose={() => setIsPricingTermsDialogOpen(false)}
-        />
+        {pricingTermsContent != null && (
+          <InfoDialog
+            id="pricing-terms"
+            heading={t("reservationUnit:pricingTerms")}
+            text={pricingTermsContent ?? ""}
+            isOpen={isPricingTermsDialogOpen}
+            onClose={() => setIsPricingTermsDialogOpen(false)}
+          />
+        )}
         <StyledRelatedUnits thisReservationUnitPk={reservationUnit.pk} unitPk={reservationUnit.unit.pk} />
       </ReservationUnitPageWrapper>
     </>
@@ -542,7 +544,6 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
       ...ReservationTimePickerFields
       ...MetadataSets
       ...ReservationUnitHead
-      ...ReservationUnitMoreDetails
       extUuid
       isDraft
       descriptionFi
@@ -552,6 +553,15 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
       ...ReservationInfoSection
       ...ReservationQuotaReached
       publishingState
+      pricingTerms {
+        id
+        textFi
+        textEn
+        textSv
+      }
+      unit {
+        ...AddressFields
+      }
       equipments {
         id
         ...EquipmentFields
