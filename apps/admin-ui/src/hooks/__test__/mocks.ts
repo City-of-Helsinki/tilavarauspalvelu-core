@@ -11,7 +11,6 @@ import {
   UpdateStaffReservationDocument,
 } from "@gql/gql-types";
 import { createNodeId } from "common/src/helpers";
-import { formatApiDateUnsafe } from "common/src/date-utils";
 
 export const CHANGED_WORKING_MEMO = "Sisaisen kommentti";
 
@@ -73,6 +72,7 @@ function createReservation({
   return {
     bufferTimeAfter: 0,
     bufferTimeBefore: 0,
+    price: null,
     paymentOrder: null,
     reservationUnit: {
       id: createNodeId("ReservationUnitNode", 1),
@@ -133,13 +133,6 @@ function createReservationEdge({
   ];
 }
 
-// Necessary because API Date is not DateTime
-// convert ISO string -> Date -> API date string "YYYY-MM-DD"
-function convertDate(str: string) {
-  const date = new Date(str);
-  return formatApiDateUnsafe(date);
-}
-
 function correctReservationSeriesQueryResult(
   startingPk: number,
   recurringPk: number,
@@ -155,12 +148,6 @@ function correctReservationSeriesQueryResult(
   });
   const reservationSeries: NonNullable<ReservationSeriesQuery["reservationSeries"]> = {
     id: createNodeId("ReservationSeriesNode", recurringPk),
-    pk: recurringPk,
-    // TODO this should not be empty
-    weekdays: [],
-    // TODO refactor the magic numbers out
-    beginDate: convertDate(getValidInterval(0)[0] ?? ""),
-    endDate: convertDate(getValidInterval(7)[1] ?? ""),
     reservations,
     rejectedOccurrences: [],
   };

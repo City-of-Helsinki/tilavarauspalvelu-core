@@ -146,37 +146,6 @@ export const RESERVATION_META_FRAGMENT = gql`
   }
 `;
 
-export const RECURRING_RESERVATION_FRAGMENT = gql`
-  fragment ReservationSeriesFields on ReservationSeriesNode {
-    id
-    pk
-    weekdays
-    beginDate
-    endDate
-    rejectedOccurrences {
-      id
-      beginDatetime
-      endDatetime
-      rejectionReason
-    }
-    reservations {
-      ...ChangeReservationTime
-      state
-      paymentOrder {
-        id
-        status
-      }
-      reservationUnit {
-        id
-        unit {
-          id
-          pk
-        }
-      }
-    }
-  }
-`;
-
 // TODO don't use convenience fragments
 export const APPLICATION_ROUND_TIME_SLOTS_FRAGMENT = gql`
   fragment ApplicationRoundTimeSlots on ApplicationRoundTimeSlotNode {
