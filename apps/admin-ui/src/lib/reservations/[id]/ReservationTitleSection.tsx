@@ -8,6 +8,7 @@ import {
   ReservationStateChoice,
   type ReservationTitleSectionFieldsFragment,
   useReservationApplicationLinkQuery,
+  UserPermissionChoice,
 } from "@gql/gql-types";
 import { getName } from "@/modules/reservation";
 import { formatDateTime, parseValidDateObject } from "common/src/modules/date-utils";
@@ -15,6 +16,8 @@ import { getApplicationUrl } from "@/modules/urls";
 import { gql } from "@apollo/client";
 import { ExternalLink } from "@/components/ExternalLink";
 import StatusLabel, { type StatusLabelType } from "common/src/components/StatusLabel";
+import { useSession } from "@/hooks";
+import { hasPermission } from "@/modules/permissionHelper";
 
 function getStatusLabelType(s?: Maybe<OrderStatus>): StatusLabelType {
   switch (s) {
@@ -39,21 +42,21 @@ function getReservationStateLabelProps(s?: Maybe<ReservationStateChoice>): {
 } {
   switch (s) {
     case ReservationStateChoice.Created:
-      return { type: "draft", icon: <IconPen aria-hidden="true" /> };
+      return { type: "draft", icon: <IconPen /> };
     case ReservationStateChoice.WaitingForPayment:
-      return { type: "alert", icon: <IconEuroSign aria-hidden="true" /> };
+      return { type: "alert", icon: <IconEuroSign /> };
     case ReservationStateChoice.RequiresHandling:
-      return { type: "info", icon: <IconCogwheel aria-hidden="true" /> };
+      return { type: "info", icon: <IconCogwheel /> };
     case ReservationStateChoice.Confirmed:
-      return { type: "success", icon: <IconCheck aria-hidden="true" /> };
+      return { type: "success", icon: <IconCheck /> };
     case ReservationStateChoice.Denied:
-      return { type: "error", icon: <IconCross aria-hidden="true" /> };
+      return { type: "error", icon: <IconCross /> };
     case ReservationStateChoice.Cancelled:
-      return { type: "neutral", icon: <IconCross aria-hidden="true" /> };
+      return { type: "neutral", icon: <IconCross /> };
     default:
       return {
         type: "neutral",
-        icon: <IconQuestionCircle aria-hidden="true" />,
+        icon: <IconQuestionCircle />,
       };
   }
 }
@@ -65,20 +68,40 @@ type Props = Readonly<{
   noMargin?: boolean;
 }>;
 
+function useApplicationLink({ reservation }: { reservation: ReservationTitleSectionFieldsFragment }) {
+  const { t } = useTranslation();
+
+  // User can view the Reservation without access to the Application
+  const { user } = useSession();
+  const hasApplicationPermissions = hasPermission(
+    user,
+    UserPermissionChoice.CanViewApplications,
+    reservation.reservationUnit.unit.pk
+  );
+
+  const isQueryEnabled = reservation.reservationSeries?.id && hasApplicationPermissions;
+  const { data } = useReservationApplicationLinkQuery({
+    variables: { id: reservation.reservationSeries?.id ?? "" },
+    skip: !isQueryEnabled,
+  });
+
+  const applicationPk =
+    data?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
+  const sectionPk = data?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.pk;
+  const applicationLink = getApplicationUrl(applicationPk, sectionPk);
+
+  return {
+    applicationLink,
+    applicationLinkLabel:
+      applicationLink !== "" ? `${t("reservation:applicationLink")}: ${applicationPk}-${sectionPk}` : "",
+  };
+}
+
 export const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
   ({ reservation, tagline, overrideTitle, noMargin }: Props, ref) => {
     const { t } = useTranslation();
 
-    // ignore error on purpose because this is going to fail with permission error
-    const { data, error: _err } = useReservationApplicationLinkQuery({
-      variables: { id: reservation.reservationSeries?.id ?? "" },
-      skip: !reservation.reservationSeries?.id,
-    });
-
-    const applicationPk =
-      data?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.application?.pk;
-    const sectionPk = data?.reservationSeries?.allocatedTimeSlot?.reservationUnitOption?.applicationSection?.pk;
-    const applicationLink = getApplicationUrl(applicationPk, sectionPk);
+    const { applicationLink, applicationLinkLabel } = useApplicationLink({ reservation });
 
     const paymentStatusLabelType = getStatusLabelType(reservation.paymentOrder?.status);
     const reservationState = getReservationStateLabelProps(reservation.state);
@@ -113,7 +136,7 @@ export const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
           {t("reservation:createdAt")} {formatDateTime(parseValidDateObject(reservation.createdAt), { t })}
           {applicationLink !== "" && (
             <ExternalLink href={applicationLink} size={IconSize.Small} isBold>
-              {`${t("reservation:applicationLink")}: ${applicationPk}-${sectionPk}`}
+              {applicationLinkLabel}
             </ExternalLink>
           )}
         </Flex>
@@ -155,6 +178,13 @@ export const RESERVATION_TITLE_SECTION_FRAGMENT = gql`
     name
     pk
     reserveeName
+    reservationUnit {
+      id
+      unit {
+        id
+        pk
+      }
+    }
     reservationSeries {
       id
     }
