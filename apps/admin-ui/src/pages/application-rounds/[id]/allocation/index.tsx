@@ -124,7 +124,6 @@ function mapOrderFilter(val: ApplicationSectionAllocationsQueryVariables["prefer
 
 interface ApplicationRoundAllocationProps {
   applicationRound: PropsNarrowed["applicationRound"];
-  // TODO refactor the others to use the RoundNode
   units: ApplicationRoundFilterUnitFragment[];
   reservationUnits: ReservationUnitFilterQueryType[];
 }
@@ -362,15 +361,14 @@ function ApplicationRoundAllocation({
 function useFilteredUnits(applicationRound: ApplicationRoundFilterQueryType | null) {
   const { user } = useSession();
 
-  const resUnits = filterNonNullable(applicationRound?.reservationUnits);
-  const unitData = resUnits.map((ru) => ru?.unit);
-  const units = uniqBy(filterNonNullable(unitData), "pk");
-
-  const hasAccess = (unit: (typeof units)[0]) =>
+  const canManageApplications = (unit: ApplicationRoundFilterQueryType["reservationUnits"][0]["unit"]) =>
     unit.pk != null && hasUnitPermission(user, UserPermissionChoice.CanManageApplications, unit?.pk);
 
+  const resUnits = filterNonNullable(applicationRound?.reservationUnits).filter((ru) => canManageApplications(ru.unit));
+  const units = uniqBy(filterNonNullable(resUnits.map((ru) => ru?.unit)), "pk");
+
   const sortedUnits = sort(
-    units.filter(hasAccess),
+    units.filter(canManageApplications),
     // TODO name sort fails with numbers because 11 < 2
     (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0
   );
