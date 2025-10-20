@@ -48,7 +48,7 @@ function formatErrorMessages(
     const begin = new Date(reservationUnit.reservationBeginsAt);
     if (begin > new Date()) {
       const futureOpeningText = t("reservationUnit:notifications.futureOpening", {
-        date: formatDateTime(begin, { locale }),
+        date: formatDateTime(begin, { t, locale }),
       });
       returnText = futureOpeningText;
     }

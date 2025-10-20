@@ -5,7 +5,6 @@
   "timeLabelBegin": "Time from",
   "timeLabelEnd": "Time until",
   "dateWithWeekday": "{{date, datetime}}",
-  "dayTimeSeparator": ",",
   "dateGte": "from {{value}}",
   "dateLte": "until {{value}}",
   "today": "Today",

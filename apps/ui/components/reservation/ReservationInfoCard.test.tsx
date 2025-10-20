@@ -54,7 +54,7 @@ describe("Component: ReservationInfoCard", () => {
 
   it("should show the reservation duration", () => {
     customRender();
-    const durationText = "7.1.2024 @ 09:00–10:00";
+    const durationText = "7.1.2024 klo 09:00–10:00";
     const durationHoursText = 'common:abbreviations:hour {"count":1}';
     expect(screen.getByTestId("reservation__reservation-info-card__duration").textContent).toContain(durationText);
     expect(screen.getByTestId("reservation__reservation-info-card__duration").textContent).toContain(durationHoursText);
