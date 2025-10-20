@@ -4,13 +4,14 @@ import { useTranslation } from "next-i18next";
 import { startOfDay } from "date-fns";
 import { RejectionReadinessChoice, type ReservationToCopyFragment, UserPermissionChoice } from "@gql/gql-types";
 import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
-import { useCheckPermission } from "@/hooks";
+import { useSession } from "@/hooks";
 import { NewReservationModal } from "@/components/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
 import { H6 } from "common/src/styled";
 import StatusLabel from "common/src/components/StatusLabel";
 import { gql } from "@apollo/client";
 import { formatDate } from "common/src/modules/date-utils";
+import { hasPermission } from "@/modules/permissionHelper";
 
 export type NewReservationListItem = {
   date: Date;
@@ -153,14 +154,12 @@ type AddNewReservationButtonProps = {
 };
 
 function AddNewReservationButton({ reservationToCopy, refetch }: AddNewReservationButtonProps) {
-  const unitPk = reservationToCopy?.reservationUnit?.unit?.pk;
-  const { hasPermission } = useCheckPermission({
-    units: unitPk ? [unitPk] : [],
-    permission: UserPermissionChoice.CanManageReservations,
-  });
   const { t } = useTranslation();
-
   const { setModalContent } = useModal();
+  const { user } = useSession();
+
+  const unitPk = reservationToCopy?.reservationUnit?.unit?.pk;
+  const hasAccess = hasPermission(user, UserPermissionChoice.CanManageReservations, unitPk);
 
   const handleClose = () => {
     setModalContent(null);
@@ -181,7 +180,7 @@ function AddNewReservationButton({ reservationToCopy, refetch }: AddNewReservati
   };
 
   return (
-    <Button size={ButtonSize.Small} variant={ButtonVariant.Secondary} disabled={!hasPermission} onClick={handleClick}>
+    <Button size={ButtonSize.Small} variant={ButtonVariant.Secondary} disabled={!hasAccess} onClick={handleClick}>
       {t("myUnits:ReservationSeries.addNewReservation")}
     </Button>
   );

@@ -19,9 +19,10 @@ import { createNodeId, filterNonNullable } from "common/src/modules/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/modules/const";
 import { getReserveeName } from "@/modules/util";
 import { errorToast } from "common/src/components/toast";
-import { useCheckPermission } from "@/hooks";
+import { useSession } from "@/hooks";
 import { gql } from "@apollo/client";
 import { combineAffectingReservations } from "@/modules/helpers";
+import { hasPermission } from "@/modules/permissionHelper";
 
 type Props = {
   begin: string;
@@ -72,10 +73,9 @@ function constructEventTitle(res: ReservationType, resUnitPk: number, t: TFuncti
 
 export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Props): JSX.Element {
   const { t } = useTranslation();
-  const { hasPermission } = useCheckPermission({
-    units: [unitPk],
-    permission: UserPermissionChoice.CanViewReservations,
-  });
+  const { user } = useSession();
+
+  const hasViewAccess = hasPermission(user, UserPermissionChoice.CanViewReservations, unitPk);
 
   const calendarEventExcludedLegends = ["RESERVATION_UNIT_RELEASED", "RESERVATION_UNIT_DRAFT"];
 
@@ -126,7 +126,7 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
         eventStyleGetter={eventStyleGetter(reservationUnitPk)}
         isLoading={isLoading}
         onSelectEvent={(e) => {
-          if (hasPermission) {
+          if (hasViewAccess) {
             window.open(getReservationUrl(e.event?.pk, true), "_blank");
           }
         }}
