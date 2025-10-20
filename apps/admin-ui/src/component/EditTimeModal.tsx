@@ -1,4 +1,3 @@
-import { t } from "i18next";
 import React from "react";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
@@ -94,7 +93,7 @@ function reservationSeriesInfoText({
 
 type EditFormValueType = z.infer<typeof TimeFormSchema>;
 
-function formatDateInterval(begin: Date, end: Date) {
+function formatDateInterval(t: TFunction, begin: Date, end: Date) {
   const dateString = formatDateTimeRange(begin, end);
   const durationString = formatDuration(t, {
     minutes: differenceInMinutes(end, begin),
@@ -189,7 +188,7 @@ function DialogContent({
 
   const translateError = (errorMsg?: string) => (errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "");
 
-  const newTimeString = start && end ? formatDateInterval(start, end) : "";
+  const newTimeString = start && end ? formatDateInterval(t, start, end) : "";
   const translateKey = type === "move" ? "reservation:EditTimeModal" : "reservation:NewReservationModal";
   const isDisabled = (!isDirty && !isValid) || isLoading || hasCollisions;
   return (
@@ -381,7 +380,7 @@ export function EditTimeModal({
     onAccept();
   };
 
-  const originalTime = formatDateInterval(startDateTime, endDateTime);
+  const originalTime = formatDateInterval(t, startDateTime, endDateTime);
   return (
     <StyledDialog
       variant="primary"
