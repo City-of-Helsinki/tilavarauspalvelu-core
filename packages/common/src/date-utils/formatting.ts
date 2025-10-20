@@ -328,16 +328,16 @@ export function formatDuration(t: TFunction, duration: TimeStruct, abbreviated: 
   const hourKey = abbreviated ? "common:abbreviations:hour" : "common:hour";
   const minuteKey = abbreviated ? "common:abbreviations:minute" : "common:minute";
 
-  const p = [];
+  const p: string[] = [];
 
-  if (hour) {
-    p.push(t(hourKey, { count: hour }).toLocaleLowerCase());
+  if (hour > 0) {
+    p.push(t(hourKey, { count: hour }));
   }
-  if (min) {
-    p.push(t(minuteKey, { count: min }).toLocaleLowerCase());
+  if (min > 0) {
+    p.push(t(minuteKey, { count: min }));
   }
-  if (!hour && !min) {
-    p.push(t(minuteKey, { count: 0 }).toLocaleLowerCase());
+  if (hour === 0 && min === 0) {
+    p.push(t(minuteKey, { count: 0 }));
   }
 
   return p.join(" ");

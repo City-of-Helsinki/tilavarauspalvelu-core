@@ -32,6 +32,10 @@
     "hour": "{{count}} t",
     "minute": "{{count}} min"
   },
+  "hour_one": "{{count}} tunti",
+  "hour_other": "{{count}} tuntia",
+  "minute_one": "{{count}} minuutti",
+  "minute_other": "{{count}} minuuttia",
   "hours": "Tunnit",
   "minutes": "Minuutit",
   "subtract": "Vähennä",
