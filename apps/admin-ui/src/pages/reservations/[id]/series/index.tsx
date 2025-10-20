@@ -405,10 +405,35 @@ export const SERIES_PAGE_QUERY = gql`
       pk
       type
       reservationSeries {
-        ...ReservationSeriesFields
+        id
+        pk
+        weekdays
+        beginDate
+        endDate
         recurrenceInDays
         endTime
         beginTime
+        rejectedOccurrences {
+          id
+          beginDatetime
+          endDatetime
+          rejectionReason
+        }
+        reservations {
+          ...ChangeReservationTime
+          state
+          paymentOrder {
+            id
+            status
+          }
+          reservationUnit {
+            id
+            unit {
+              id
+              pk
+            }
+          }
+        }
       }
       reservationUnit {
         id
