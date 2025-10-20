@@ -107,18 +107,18 @@ describe("formatting", () => {
     it("formats datetime with weekday and separator", () => {
       const date = new Date("2023-12-25T15:30:00");
       const result = formatDateTime(date, { t: mockT });
-      expect(result).toContain("common:dayShort.0");
+      expect(result).toContain("common:weekDay.0");
       expect(result).toContain("25.12.2023");
-      expect(result).toContain("common:dayTimeSeparator");
-      expect(result).toMatch("common:dayShort.0 25.12.2023common:dayTimeSeparator 15:30");
+      expect(result).toContain("klo");
+      expect(result).toMatch("common:weekDay.0 25.12.2023 klo 15:30");
     });
 
     it("formats without weekday", () => {
       const date = new Date("2023-12-25T15:30:00");
       const result = formatDateTime(date, { includeWeekday: false });
       expect(result).toContain("25.12.2023");
-      expect(result).toContain("@");
-      expect(result).toMatch("25.12.2023 @ 15:30");
+      expect(result).toContain("klo 15:30");
+      expect(result).toMatch("25.12.2023 klo 15:30");
     });
 
     it("formats without time separator", () => {
@@ -138,8 +138,8 @@ describe("formatting", () => {
       const result = formatDateTime(date, {});
       expect(result).toContain("ma");
       expect(result).toContain("25.12.2023");
-      expect(result).toContain("@");
-      expect(result).toMatch("ma 25.12.2023 @ 15:30");
+      expect(result).toContain("klo 15:30");
+      expect(result).toMatch("ma 25.12.2023 klo 15:30");
     });
   });
 
@@ -277,7 +277,7 @@ describe("formatting", () => {
       const end = new Date("2023-12-25T17:00:00");
       const result = formatDateTimeRange(start, end, { t: mockT });
       expect(result).toContain("25.12.2023");
-      expect(result).toContain("common:dayTimeSeparator");
+      expect(result).toContain("klo");
       expect(result).toMatch(/\d{2}:\d{2}/);
       expect(result).toContain("17:00");
     });
@@ -287,7 +287,7 @@ describe("formatting", () => {
       const end = new Date("2023-12-26T17:00:00");
       const result = formatDateTimeRange(start, end, { t: mockT });
       expect(result).toContain("25.12.2023");
-      expect(result).toContain("common:dayTimeSeparator");
+      expect(result).toContain("klo");
       expect(result).toMatch(/\d{2}:\d{2}/);
       expect(result).toContain("17:00 26.12.2023");
     });
@@ -309,7 +309,6 @@ describe("formatting", () => {
         includeTimeSeparator: false,
       });
       expect(result).not.toContain("klo");
-      expect(result).not.toContain("@");
     });
 
     it("handles null dates", () => {

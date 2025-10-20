@@ -1,3 +1,6 @@
+/**
+ * Display formatting functions, with i18n.t and/or date-fns format
+ */
 import { format, isBefore, isSameDay, type Locale } from "date-fns";
 import { fi, sv, enGB } from "date-fns/locale";
 import { type TFunction } from "next-i18next";
@@ -12,9 +15,12 @@ import type {
   FormatDateRangeOptions,
 } from "./types";
 
-/**
- * Display formatting functions, with i18n.t and/or date-fns format
- */
+// Fallback localized separator between date and time, if i18n.t is not available
+const localSeparator = {
+  fi: " klo ",
+  sv: " kl. ",
+  en: ", ",
+};
 
 export const UI_DATE_FORMAT = "d.M.yyyy";
 export const UI_DATE_FORMAT_SHORT = "d.M.";
@@ -104,13 +110,13 @@ export function formatDate(
 }
 
 /**
- * Returns date and time as a localized string, with optional weekday and day/time separators
+ * Returns date and time as a localized string, with optional weekday and day/time separator
  * @param date - Date object to format
  * @param options - Formatting options using FormatDateOptions
  *   @param {TFunction} [options.t] - i18n translation function, needed for localized separator
  *   @param [options.includeTimeSeparator=true] - Whether to include separator between date and time
  *   @param [options.includeWeekday=true] - Whether to include the weekday name
- *   @param {"fi" | "sv" | "en"} [options.locale="fi"] - Locale for formatting
+ *   @param {"fi" | "sv" | "en"} [options.locale="fi"] - Locale for i18n. Works best when options.t is also provided.
  * @returns Formatted datetime string or empty string if invalid
  * @example
  *   formatDateTime(new Date("2023-12-25T15:30:00")) // "ma 25.12.2023 @ 15:30"
@@ -126,15 +132,17 @@ export function formatDateTime(
     return "";
   }
 
-  const separator = includeTimeSeparator ? (t ? t("common:dayTimeSeparator") : " @ ") : " ";
+  const separator = includeTimeSeparator ? localSeparator[locale] : "";
 
   if (t) {
-    return `${t("common:dayShort." + setMondayFirst(date.getDay()))} ${format(date, UI_DATE_FORMAT)}${separator} ${format(date, UI_TIME_FORMAT)}`.trim();
+    return `${t("common:weekDay." + setMondayFirst(date.getDay()))} ${format(date, UI_DATE_FORMAT)}${separator}${format(date, UI_TIME_FORMAT)}`.trim();
   }
   const formatString = showYear ? UI_DATE_FORMAT_WITH_WEEKDAY : UI_DATE_FORMAT_SHORT;
   return format(
     date,
-    `${includeWeekday ? formatString : UI_DATE_FORMAT}'${separator}'${UI_TIME_FORMAT}`,
+    separator === ""
+      ? `${includeWeekday ? formatString : UI_DATE_FORMAT} ${UI_TIME_FORMAT}`
+      : `${includeWeekday ? formatString : UI_DATE_FORMAT}'${separator}'${UI_TIME_FORMAT}`,
     getFormatLocaleObject(locale)
   ).trim();
 }

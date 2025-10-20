@@ -127,7 +127,7 @@ export function ApplicationCard({ application, actionCallback }: Props): JSX.Ele
       buttons={buttons}
     >
       <br />
-      {t("applicationCard:saved")} {formatDateTime(parseValidDateObject(application.updatedAt), { locale: lang })}
+      {t("applicationCard:saved")} {formatDateTime(parseValidDateObject(application.updatedAt), { t, locale: lang })}
       {isWaitingForDelete && (
         <ConfirmationDialog
           isOpen

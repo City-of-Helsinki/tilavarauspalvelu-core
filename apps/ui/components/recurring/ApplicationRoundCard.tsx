@@ -29,13 +29,13 @@ function translateRoundDate(
   switch (round.status) {
     case ApplicationRoundStatusChoice.Upcoming:
       return t("applicationRound:card.pending", {
-        opening: formatDateTime(begin, { locale }),
+        opening: formatDateTime(begin, { t, locale }),
       });
     case ApplicationRoundStatusChoice.Open:
-      return t("applicationRound:card.open", { until: formatDateTime(end, { locale }) });
+      return t("applicationRound:card.open", { until: formatDateTime(end, { t, locale }) });
     default:
       return t("applicationRound:card.past", {
-        closing: formatDateTime(end, { locale }),
+        closing: formatDateTime(end, { t, locale }),
       });
   }
 }
