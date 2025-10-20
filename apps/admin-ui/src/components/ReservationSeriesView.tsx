@@ -7,9 +7,10 @@ import { ReservationListButton } from "@/components/ReservationListButton";
 import { DenyDialog } from "@/components/DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import { EditTimeModal } from "@/components/EditTimeModal";
-import { useCheckPermission, useReservationSeries } from "@/hooks";
 import { isPossibleToDeny, isPossibleToEdit } from "@/modules/reservationModificationRules";
 import { CenterSpinner } from "common/src/styled";
+import { useReservationSeries, useSession } from "@/hooks";
+import { hasPermission } from "@/modules/permissionHelper";
 
 type Props = {
   reservationSeriesPk: number;
@@ -30,14 +31,8 @@ export function ReservationSeriesView({
 }: Readonly<Props>) {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
-
+  const { user } = useSession();
   const { reservations, loading, refetch, reservationSeries } = useReservationSeries(reservationSeriesPk);
-
-  const unitPk = reservationToCopy?.reservationUnit?.unit?.pk;
-  const { hasPermission } = useCheckPermission({
-    units: unitPk ? [unitPk] : [],
-    permission: UserPermissionChoice.CanManageReservations,
-  });
 
   if (loading) {
     return <CenterSpinner />;
@@ -69,7 +64,6 @@ export function ReservationSeriesView({
   const handleRemove = (res: (typeof reservations)[0]) => {
     setModalContent(
       <DenyDialog
-        // @ts-expect-error -- FIXME make a separate version of DenyDialog for reservations series
         reservation={res}
         onReject={() => {
           refetch();
@@ -96,12 +90,14 @@ export function ReservationSeriesView({
       };
     }) ?? [];
 
+  const unitPk = reservationToCopy?.reservationUnit?.unit?.pk;
+  const hasManageAccess = hasPermission(user, UserPermissionChoice.CanManageReservations, unitPk);
   const forDisplay: NewReservationListItem[] = reservations.map((x) => {
     const buttons = [];
     const startDate = new Date(x.beginsAt);
     const endDate = new Date(x.endsAt);
 
-    if (hasPermission && onChange && isPossibleToEdit(x.state, endDate)) {
+    if (hasManageAccess && onChange && isPossibleToEdit(x.state, endDate)) {
       buttons.push(<ReservationListButton key="change" callback={() => handleChange(x)} type="change" t={t} />);
     }
 
@@ -109,7 +105,7 @@ export function ReservationSeriesView({
     if (onSelect && x.state === ReservationStateChoice.Confirmed && pk != null) {
       buttons.push(<ReservationListButton key="show" callback={() => onSelect(pk)} type="show" t={t} />);
     }
-    if (hasPermission && isPossibleToDeny(x.state, endDate)) {
+    if (hasManageAccess && isPossibleToDeny(x.state, endDate)) {
       buttons.push(<ReservationListButton key="deny" callback={() => handleRemove(x)} type="deny" t={t} />);
     }
 
