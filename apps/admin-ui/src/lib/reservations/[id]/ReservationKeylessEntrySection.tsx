@@ -19,8 +19,9 @@ import styled, { css } from "styled-components";
 import { ButtonContainer, Flex, NoWrap } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
-import { useCheckPermission } from "@/hooks";
+import { useSession } from "@/hooks";
 import { gql } from "@apollo/client";
+import { hasPermission } from "@/modules/permissionHelper";
 
 const SummaryHorizontal = styled.div<{
   $isRecurring?: boolean;
@@ -255,10 +256,7 @@ function AccessCodeChangeRepairButton({
   const [changeAccessCodeMutationSeries] = useChangeReservationAccessCodeSeriesMutation();
   const [repairAccessCodeMutationSeries] = useRepairReservationAccessCodeSeriesMutation();
 
-  const { hasPermission } = useCheckPermission({
-    units: [reservation.reservationUnit?.unit?.pk ?? 0],
-    permission: UserPermissionChoice.CanManageReservations,
-  });
+  const { user } = useSession();
 
   const displayError = useDisplayError();
 
@@ -302,6 +300,9 @@ function AccessCodeChangeRepairButton({
     displayError(e);
   };
 
+  const unitPk = reservation?.reservationUnit?.unit?.pk;
+  const hasManageAccess = hasPermission(user, UserPermissionChoice.CanManageReservations, unitPk);
+
   const endDate = reservation.reservationSeries?.endDate || reservation.endsAt;
   const isReservationEnded = new Date() > new Date(endDate);
 
@@ -320,7 +321,7 @@ function AccessCodeChangeRepairButton({
           }
         }}
         iconStart={<IconRefresh />}
-        disabled={!hasPermission || isReservationEnded}
+        disabled={!hasManageAccess || isReservationEnded}
       >
         {reservation.isAccessCodeIsActiveCorrect ? t("accessType:actions.change") : t("accessType:actions.repair")}
       </Button>

@@ -1,7 +1,8 @@
 import React, { type ReactNode } from "react";
-import { useCheckPermission, useSession } from "@/hooks";
+import { useSession } from "@/hooks";
 import { UserPermissionChoice, type VisibleIfPermissionFieldsFragment } from "@gql/gql-types";
 import { gql } from "@apollo/client";
+import { hasPermission } from "@/modules/permissionHelper";
 
 function VisibleIfPermission({
   reservation,
@@ -12,17 +13,16 @@ function VisibleIfPermission({
   reservation: VisibleIfPermissionFieldsFragment;
   permission: UserPermissionChoice;
   children: ReactNode;
-  otherwise?: JSX.Element | null;
-}): JSX.Element | null {
+  otherwise?: React.ReactElement | null;
+}): React.ReactElement | null {
   const { user } = useSession();
   const isOwner = reservation.user?.pk === user?.pk;
-  const { hasPermission } = useCheckPermission({
-    units: [reservation.reservationUnit.unit?.pk ?? 0],
-    permission,
-  });
 
-  if (!isOwner && !hasPermission) {
-    return otherwise ? otherwise : null;
+  const unitPk = reservation?.reservationUnit?.unit?.pk;
+  const hasAccess = hasPermission(user, permission, unitPk);
+
+  if (!isOwner && !hasAccess) {
+    return otherwise ?? null;
   }
 
   // eslint-disable-next-line react/jsx-no-useless-fragment -- return type issues
