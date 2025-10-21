@@ -128,7 +128,7 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
       const labelType = getPaymentStatusLabelType(paymentOrder.status);
       return (
         <StatusLabel type={labelType} icon={<IconEuroSign />} slim>
-          {t(`translation:orderStatus.${paymentOrder.status}`)}
+          {t(`reservation:orderStatus.${paymentOrder.status}`)}
         </StatusLabel>
       );
     },

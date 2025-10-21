@@ -1,9 +1,8 @@
 import React, { forwardRef } from "react";
 import { gql } from "@apollo/client";
-import { IconEuroSign, IconSize } from "hds-react";
+import { IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
-import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
-import { ReservationStatusLabel } from "ui/src/components/statuses";
+import { ReservationStatusLabel, OrderStatusLabel } from "ui/src/components/statuses";
 import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
 import { Flex, TitleSection, H1 } from "ui/src/styled";
 import { ExternalLink } from "@/components/ExternalLink";
@@ -12,29 +11,10 @@ import { hasPermission } from "@/modules/permissionHelper";
 import { getName } from "@/modules/reservation";
 import { getApplicationUrl } from "@/modules/urls";
 import {
-  type Maybe,
-  OrderStatus,
   type ReservationTitleSectionFieldsFragment,
   useReservationApplicationLinkQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-
-function getStatusLabelType(s?: Maybe<OrderStatus>): StatusLabelType {
-  switch (s) {
-    case OrderStatus.Paid:
-    case OrderStatus.Refunded:
-      return "success";
-    case OrderStatus.Expired:
-      return "error";
-    case OrderStatus.PaidByInvoice:
-    case OrderStatus.PaidManually:
-    case OrderStatus.Draft:
-      return "alert";
-    case OrderStatus.Cancelled:
-    default:
-      return "neutral";
-  }
-}
 
 type Props = Readonly<{
   reservation: ReservationTitleSectionFieldsFragment;
@@ -78,21 +58,16 @@ export const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
 
     const { applicationLink, applicationLinkLabel } = useApplicationLink({ reservation });
 
-    const paymentStatusLabelType = getStatusLabelType(reservation.paymentOrder?.status);
-
     return (
       <div>
         <TitleSection $noMargin={noMargin} ref={ref}>
           <H1 $noMargin>{overrideTitle ?? getName(reservation, t)}</H1>
           <Flex $direction="row" $alignItems="center">
             {reservation.paymentOrder?.status != null && (
-              <StatusLabel
-                type={paymentStatusLabelType}
-                data-testid="reservation_title_section__order_status"
-                icon={<IconEuroSign aria-hidden="true" />}
-              >
-                {t(`translation:orderStatus.${reservation.paymentOrder?.status}`)}
-              </StatusLabel>
+              <OrderStatusLabel
+                status={reservation.paymentOrder?.status}
+                testId="reservation_title_section__order_status"
+              />
             )}
             {reservation.state && (
               <ReservationStatusLabel state={reservation.state} testId="reservation_title_section__reservation_state" />
