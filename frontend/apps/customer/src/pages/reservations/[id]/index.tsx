@@ -52,16 +52,11 @@ import { gql } from "@apollo/client";
 import StatusLabel from "ui/src/components/StatusLabel";
 import IconButton from "ui/src/components/IconButton";
 import { LabelValuePair } from "@/components/LabelValuePair";
-import {
-  ReservationInfoCard,
-  ReservationOrderStatus,
-  SummaryGeneralFields,
-  SummaryReserveeFields,
-} from "@/components/reservation";
+import { ReservationInfoCard, SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
 import { PaymentNotification, TermsInfoSection, Instructions, NotModifiableReason } from "@/lib/reservation/[id]";
 import { useSearchParams } from "next/navigation";
 import { queryOptions } from "@/modules/queryOptions";
-import { ReservationStatusLabel } from "ui/src/components/statuses";
+import { ReservationStatusLabel, OrderStatusLabel } from "ui/src/components/statuses";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -269,7 +264,7 @@ function Reservation({
                 state={reservation.state ?? ReservationStateChoice.Confirmed}
               />
               {normalizedOrderStatus && (
-                <ReservationOrderStatus orderStatus={normalizedOrderStatus} testId="reservation__payment-status" />
+                <OrderStatusLabel status={normalizedOrderStatus} testId="reservation__payment-status" />
               )}
               {shouldShowAccessCode && (
                 <StatusLabel
