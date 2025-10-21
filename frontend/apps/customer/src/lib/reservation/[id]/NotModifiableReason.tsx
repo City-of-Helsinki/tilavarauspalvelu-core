@@ -22,10 +22,10 @@ export function NotModifiableReason(reservation: CanReservationBeChangedFragment
   }
   return (
     <Reasons>
-      {t(`reservations:modifyTimeReasons:${modifyTimeReason}`)}
+      {t(`reservation:modifyTimeReasons:${modifyTimeReason}`)}
       {modifyTimeReason === "RESERVATION_MODIFICATION_NOT_ALLOWED" &&
         isCancellationAllowed &&
-        ` ${t("reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED_SUFFIX")}`}
+        ` ${t("reservation:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED_SUFFIX")}`}
     </Reasons>
   );
 }

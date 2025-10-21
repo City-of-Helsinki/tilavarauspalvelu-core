@@ -72,7 +72,7 @@ function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
 
   useEffect(() => {
     if (routerError === "order1") {
-      errorToast({ text: t("reservations:confirmationError.body") });
+      errorToast({ text: t("reservation:confirmationError.body") });
     }
   }, [routerError, t]);
 
@@ -97,15 +97,15 @@ function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
       <TabWrapper data-testid="Reservations--page__tab_container">
         <Tabs>
           <TabList>
-            <Tab onClick={() => setTab("upcoming")}>{t("reservations:upcomingReservations")}</Tab>
-            <Tab onClick={() => setTab("past")}>{t("reservations:pastReservations")}</Tab>
-            <Tab onClick={() => setTab("cancelled")}>{t("reservations:cancelledReservations")}</Tab>
+            <Tab onClick={() => setTab("upcoming")}>{t("reservation:upcomingReservations")}</Tab>
+            <Tab onClick={() => setTab("past")}>{t("reservation:pastReservations")}</Tab>
+            <Tab onClick={() => setTab("cancelled")}>{t("reservation:cancelledReservations")}</Tab>
           </TabList>
           <StyledTabPanel>
             {isLoading ? (
               <CenterSpinner />
             ) : reservations.length === 0 ? (
-              <EmptyMessage>{t("reservations:noUpcomingReservations")}</EmptyMessage>
+              <EmptyMessage>{t("reservation:noUpcomingReservations")}</EmptyMessage>
             ) : (
               reservations?.map((reservation) => (
                 <ReservationCard
@@ -121,7 +121,7 @@ function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
             {isLoading ? (
               <CenterSpinner />
             ) : reservations.length === 0 ? (
-              <EmptyMessage>{t("reservations:noPastReservations")}</EmptyMessage>
+              <EmptyMessage>{t("reservation:noPastReservations")}</EmptyMessage>
             ) : (
               reservations?.map((reservation) => (
                 <ReservationCard
@@ -137,7 +137,7 @@ function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
             {isLoading ? (
               <CenterSpinner />
             ) : reservations.length === 0 ? (
-              <EmptyMessage>{t("reservations:noCancelledReservations")}</EmptyMessage>
+              <EmptyMessage>{t("reservation:noCancelledReservations")}</EmptyMessage>
             ) : (
               reservations?.map((reservation) => (
                 <ReservationCard

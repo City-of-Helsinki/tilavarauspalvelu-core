@@ -30,10 +30,10 @@ function Cancel(_props: NarrowedProps): JSX.Element {
   const routes = [
     {
       slug: reservationsPrefix,
-      title: t("breadcrumb:reservations"),
+      title: t("breadcrumb:reservation"),
     },
     {
-      title: t("reservations:cancel.reservation"),
+      title: t("reservation:cancel.reservation"),
     },
   ] as const;
 

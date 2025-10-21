@@ -96,7 +96,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       const state = i === step ? 0 : i < step ? 1 : 2;
 
       return {
-        label: `${i + 1}. ${t(`reservations:steps.${i + 1}`)}`,
+        label: `${i + 1}. ${t(`reservation:steps.${i + 1}`)}`,
         state,
       };
     });
@@ -154,7 +154,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
         {notesWhenReserving && (
           <PinkBox>
             <H4 as="h2" $marginTop="none">
-              {t("reservations:reservationInfoBoxHeading")}
+              {t("reservation:reservationInfoBoxHeading")}
             </H4>
             <Sanitize html={notesWhenReserving} />
           </PinkBox>
@@ -197,7 +197,7 @@ function NewReservationWrapper(props: PropsNarrowed): JSX.Element | null {
       title: reservationUnitName,
     },
     {
-      title: t("reservations:reservationName", { id: reservation.pk }),
+      title: t("reservation:reservationName", { id: reservation.pk }),
     },
   ] as const;
 

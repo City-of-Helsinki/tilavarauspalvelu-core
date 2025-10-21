@@ -71,13 +71,13 @@
   "noUpcomingReservations": "Ei tulevia varauksia",
   "noPastReservations": "Ei menneitä varauksia",
   "noCancelledReservations": "Ei peruttuja varauksia",
-  "status": {
-    "cancelled": "Peruttu",
-    "confirmed": "Hyväksytty",
-    "denied": "Hylätty",
-    "requiresHandling": "Käsiteltävänä",
-    "created": "Luonnos",
-    "waitingForPayment": "Odottaa maksua"
+  "state": {
+    "REQUIRES_HANDLING": "Käsiteltävänä",
+    "CONFIRMED": "Hyväksytty",
+    "DENIED": "Hylätty",
+    "CANCELLED": "Peruttu",
+    "CREATED": "Luonnos",
+    "WAITING_FOR_PAYMENT": "Odottaa maksua"
   },
   "paymentBanner": {
     "title": "Varauksesi odottaa maksua",

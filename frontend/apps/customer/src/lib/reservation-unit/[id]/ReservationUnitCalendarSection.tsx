@@ -45,7 +45,7 @@ export function ReservationUnitCalendarSection({
   return (
     <Flex $gap="m" data-testid="reservation-unit__calendar--wrapper">
       <H4 as="h2" $marginBottom="none">
-        {t("reservations:reservationCalendar", {
+        {t("reservation:reservationCalendar", {
           title: getTranslation(reservationUnit, "name", lang),
         })}
       </H4>
