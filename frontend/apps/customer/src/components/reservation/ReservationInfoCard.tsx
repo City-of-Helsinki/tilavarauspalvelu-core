@@ -131,7 +131,7 @@ export function ReservationInfoCard({
       <Flex data-testid="reservation__reservation-info-card__content" $gap="xs">
         {showReservationNumber && (
           <Subheading>
-            {t("reservations:reservationNumber")}:{" "}
+            {t("reservation:reservationNumber")}:{" "}
             <span data-testid="reservation__reservation-info-card__reservationNumber">{reservation.pk ?? "-"}</span>
           </Subheading>
         )}

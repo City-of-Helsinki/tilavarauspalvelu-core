@@ -40,7 +40,7 @@ describe("Component: Instructions", () => {
       instructionsText = mockReservationUnit.reservationPendingInstructionsFi ?? "FAIL HERE";
     }
     // check that the heading is present...
-    expect(view.queryByText("reservations:reservationInfo")).toBeInTheDocument();
+    expect(view.queryByText("reservation:reservationInfo")).toBeInTheDocument();
     // ...and that the text matches with the query result
     expect(view.getByText(instructionsText));
   });
@@ -52,7 +52,7 @@ describe("Component: Instructions", () => {
       const view = customRender(mockReservation);
 
       // check that the section isn't shown at all === the heading text isn't found
-      expect(view.queryByText("reservations:reservationInfo")).not.toBeInTheDocument();
+      expect(view.queryByText("reservation:reservationInfo")).not.toBeInTheDocument();
     }
   );
 

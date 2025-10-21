@@ -9,7 +9,6 @@ import {
 import { type CreateGraphQLMockProps } from "@test/test.gql.utils";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { render, screen, within } from "@testing-library/react";
-import { camelCase } from "lodash-es";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Reservation from "@/pages/reservations/[id]";
 import { OrderStatus, ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
@@ -102,7 +101,7 @@ describe("Page: View reservation", () => {
 
     const name = view.getByRole("heading", { level: 1 });
     expect(name).toBeInTheDocument();
-    expect(name).toHaveTextContent("reservations:reservationName");
+    expect(name).toHaveTextContent("reservation:reservationName");
   });
 
   describe("Status labels", () => {
@@ -111,7 +110,7 @@ describe("Page: View reservation", () => {
       await waitForAddressSection(view);
 
       const headingSection = view.getByTestId("reservation__content").childNodes[0] as HTMLElement;
-      const statusText = "reservations:status." + camelCase(state);
+      const statusText = `reservation:state.${state}`;
       expect(within(headingSection).getByText(statusText)).toBeInTheDocument();
     });
   });
@@ -122,7 +121,7 @@ describe("Page: View reservation", () => {
       await waitForAddressSection(view);
 
       const buttonSection = view.getByTestId("reservation__content").childNodes[2] as HTMLElement;
-      const modificationText = "reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED";
+      const modificationText = "reservation:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED";
       expect(within(buttonSection).getByText(modificationText)).toBeInTheDocument();
     });
 
@@ -131,7 +130,7 @@ describe("Page: View reservation", () => {
       await waitForAddressSection(view);
 
       const buttonSection = view.getByTestId("reservation__content").childNodes[2] as HTMLElement;
-      expect(within(buttonSection).getByText("reservations:cancel.reservation")).toBeInTheDocument();
+      expect(within(buttonSection).getByText("reservation:cancel.reservation")).toBeInTheDocument();
     });
 
     it("shows action buttons if the reservation can be modified", async () => {
@@ -139,7 +138,7 @@ describe("Page: View reservation", () => {
       await waitForAddressSection(view);
 
       const buttonSection = view.getByTestId("reservation__content").childNodes[2] as HTMLElement;
-      expect.poll(() => within(buttonSection).getByText("reservations:modifyReservationTime"));
+      expect.poll(() => within(buttonSection).getByText("reservation:modifyReservationTime"));
       expect.poll(() => within(buttonSection).getByTestId("reservation-detail__button--edit"));
     });
     it("Should show the pay button if the reservation is waiting for payment", async () => {
@@ -147,7 +146,7 @@ describe("Page: View reservation", () => {
       await waitForAddressSection(view);
 
       const buttonSection = view.getByTestId("reservation__content").childNodes[2] as HTMLElement;
-      expect(within(buttonSection).getByText("reservations:payReservation")).toBeInTheDocument();
+      expect(within(buttonSection).getByText("reservation:payReservation")).toBeInTheDocument();
       expect(within(buttonSection).getAllByRole("button")).toHaveLength(1);
     });
   });
@@ -158,10 +157,10 @@ describe("Page: View reservation", () => {
       await waitForAddressSection(view);
 
       const buttonSection = view.getByTestId("reservation__content").childNodes[2] as HTMLElement;
-      const modificationText = "reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED";
+      const modificationText = "reservation:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED";
       expect(within(buttonSection).getByText(modificationText)).toBeInTheDocument();
-      expect(within(buttonSection).queryByText("reservations:modifyReservationTime")).not.toBeInTheDocument();
-      expect(within(buttonSection).queryByText("reservations:cancel.reservation")).not.toBeInTheDocument();
+      expect(within(buttonSection).queryByText("reservation:modifyReservationTime")).not.toBeInTheDocument();
+      expect(within(buttonSection).queryByText("reservation:cancel.reservation")).not.toBeInTheDocument();
     });
   });
 

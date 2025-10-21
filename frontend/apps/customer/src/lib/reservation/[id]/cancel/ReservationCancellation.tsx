@@ -73,9 +73,9 @@ export function ReservationCancellation(props: CancellationProps): JSX.Element {
   };
 
   const isApplication = isPartOfApplication(reservation);
-  const title = t("reservations:cancel.reservation");
-  const ingress = isApplication ? t("reservations:cancel.ingressApplication") : t("reservations:cancel.ingress");
-  const infoBody = isApplication ? t("reservations:cancel.infoBodyApplication") : t("reservations:cancel.infoBody");
+  const title = t("reservation:cancel.reservation");
+  const ingress = isApplication ? t("reservation:cancel.ingressApplication") : t("reservation:cancel.ingress");
+  const infoBody = isApplication ? t("reservation:cancel.infoBodyApplication") : t("reservation:cancel.infoBody");
 
   const lang = getLocalizationLang(i18n.language);
   const cancellationTerms = getTranslatedTerms(reservation, lang);

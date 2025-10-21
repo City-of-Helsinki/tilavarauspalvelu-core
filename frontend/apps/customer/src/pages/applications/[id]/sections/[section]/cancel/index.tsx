@@ -53,7 +53,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
     {
       // NOTE Don't set slug. It hides the mobile breadcrumb
       slug: "",
-      title: t("reservations:cancel.reservation"),
+      title: t("reservation:cancel.reservation"),
     },
   ];
 
@@ -104,18 +104,18 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
     setOnAcceptHandler(() => () => onAccept(values));
   };
 
-  const title = t("reservations:cancelSection.title");
-  const ingress = t("reservations:cancelSection.ingress");
-  const infoBody = t("reservations:cancelSection.body");
+  const title = t("reservation:cancelSection.title");
+  const ingress = t("reservation:cancelSection.ingress");
+  const infoBody = t("reservation:cancelSection.body");
 
   const lang = getLocalizationLang(i18n.language);
   const round = applicationSection?.application?.applicationRound;
   const { termsOfUse } = round ?? {};
   const cancellationTerms = termsOfUse ? getTranslation(termsOfUse, "text", lang) : null;
 
-  const modalTitle = t("reservations:cancelSection.modal.title");
-  const modalContent = t("reservations:cancelSection.modal.body");
-  const modalAcceptLabel = t("reservations:cancelSection.modal.btnAccept");
+  const modalTitle = t("reservation:cancelSection.modal.title");
+  const modalContent = t("reservation:cancelSection.modal.body");
+  const modalAcceptLabel = t("reservation:cancelSection.modal.btnAccept");
   const modalCancelLabel = t("common:prev");
 
   return (
@@ -196,7 +196,7 @@ function ApplicationSectionInfoCard({
   const icons = [
     {
       icon: <IconCalendarEvent aria-hidden="true" />,
-      value: `${getNReservations(applicationSection)} ${t("reservations:cancelSection.reservations")}`,
+      value: `${getNReservations(applicationSection)} ${t("reservation:cancelSection.reservations")}`,
     },
     {
       icon: <IconClock aria-hidden="true" />,
@@ -209,7 +209,7 @@ function ApplicationSectionInfoCard({
   ];
 
   const { reservationsBeginDate, reservationsEndDate } = applicationSection ?? {};
-  const dateLabel = t("reservations:cancelSection.dateLabel");
+  const dateLabel = t("reservation:cancelSection.dateLabel");
   const begin = formatDate(parseApiDate(reservationsBeginDate ?? ""));
   const end = formatDate(parseApiDate(reservationsEndDate ?? ""));
   const text = `${dateLabel} ${begin} - ${end}`;
