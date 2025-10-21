@@ -1,53 +1,43 @@
 import { createMockReservation } from "@test/reservation.mocks";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { getTranslation } from "@ui/modules/helpers";
 import { type InstructionsFragment, ReservationStateChoice } from "@gql/gql-types";
-import { getReservationUnitInstructionsKey, Instructions } from "./Instructions";
+import { Instructions } from "./Instructions";
 
 const customRender = (reservation: InstructionsFragment): ReturnType<typeof render> =>
   render(<Instructions reservation={reservation} />);
 
-const shouldHaveInstructions = [
-  ReservationStateChoice.Created,
-  ReservationStateChoice.RequiresHandling,
-  ReservationStateChoice.Cancelled,
-  ReservationStateChoice.Confirmed,
-];
-
-const shouldNotHaveInstructions = [ReservationStateChoice.Denied, ReservationStateChoice.WaitingForPayment];
-
 describe("Component: Instructions", () => {
-  it("should format the instructions texts (== pass it through a sanitizer)", () => {
-    const testInstructions = {
-      id: "1",
+  it("should sanitize html content", () => {
+    const reservation = createMockReservation({
       state: ReservationStateChoice.Confirmed,
-      reservationUnit: {
-        id: "1",
-        reservationConfirmedInstructionsFi: "regular text <script>text inside script</script>",
-      },
-    };
-    // @ts-expect-error: doesn't match the type by design, since we're only providing reservationConfirmedInstructionsFi
-    const view = customRender(testInstructions);
+      reservationConfirmedInstructions: "regular text <script>text inside script</script>",
+    });
+    const view = customRender(reservation);
 
     // sanitizer should remove <script> and its contents
-    expect(view.queryByText("<script>")).not.toBeInTheDocument();
-    expect(view.queryByText("text inside script")).not.toBeInTheDocument();
-    expect(view.getByText("regular text")).toBeInTheDocument();
+    expect(view.queryByText(/<script>/)).not.toBeInTheDocument();
+    expect(view.queryByText(/text inside script/)).not.toBeInTheDocument();
+    expect(view.getByText(/regular text/)).toBeInTheDocument();
   });
 
-  it.for(Object.values(shouldHaveInstructions))("should show correct text for reservation state: %s", (state) => {
+  it.for([
+    ReservationStateChoice.Created,
+    ReservationStateChoice.RequiresHandling,
+    ReservationStateChoice.Cancelled,
+    ReservationStateChoice.Confirmed,
+  ])("should show correct text for reservation state: %s", (state) => {
     const mockReservation = createMockReservation({ state });
     const view = customRender(mockReservation);
 
-    const instructionsKey = getReservationUnitInstructionsKey(state);
-    if (instructionsKey == null) {
-      throw new Error("never");
-    }
     const mockReservationUnit = mockReservation.reservationUnit;
-    const instructionsText = getTranslation(mockReservationUnit, instructionsKey, "fi");
-    if (instructionsText === "") {
-      throw new Error("never");
+    let instructionsText = "FAIL HERE";
+    if (state === ReservationStateChoice.Cancelled) {
+      instructionsText = mockReservationUnit.reservationCancelledInstructionsFi ?? "FAIL HERE";
+    } else if (state === ReservationStateChoice.Confirmed) {
+      instructionsText = mockReservationUnit.reservationConfirmedInstructionsFi ?? "FAIL HERE";
+    } else {
+      instructionsText = mockReservationUnit.reservationPendingInstructionsFi ?? "FAIL HERE";
     }
     // check that the heading is present...
     expect(view.queryByText("reservations:reservationInfo")).toBeInTheDocument();
@@ -55,8 +45,8 @@ describe("Component: Instructions", () => {
     expect(view.getByText(instructionsText));
   });
 
-  it.for(shouldNotHaveInstructions)(
-    "should not render the instructions element at all for reservation state: %s",
+  it.for([ReservationStateChoice.Denied, ReservationStateChoice.WaitingForPayment])(
+    "should NOT render the instructions element at all for reservation state: %s",
     (state) => {
       const mockReservation = createMockReservation({ state });
       const view = customRender(mockReservation);

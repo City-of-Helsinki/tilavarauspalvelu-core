@@ -65,6 +65,7 @@ export type MockReservationProps = {
   cancellable?: boolean;
   canApplyFreeOfCharge?: boolean;
   applyingForFreeOfCharge?: boolean;
+  reservationConfirmedInstructions?: string;
   cancellationTerms?: {
     id: string;
     textFi: string;
@@ -104,6 +105,7 @@ export function createMockReservation(
 ): Readonly<NonNullable<ReservationPageQuery["reservation"]>> {
   const {
     applyingForFreeOfCharge = false,
+    reservationConfirmedInstructions = "Test confirmed instructions",
     beginsAt = new Date(2024, 0, 1, 10, 0, 0, 0).toISOString(),
     canApplyFreeOfCharge = true,
     cancellable = false,
@@ -208,9 +210,9 @@ export function createMockReservation(
       reservationPendingInstructionsFi: "Test pending instructions FI",
       reservationPendingInstructionsEn: "Test pending instructions EN",
       reservationPendingInstructionsSv: "Test pending instructions SV",
-      reservationConfirmedInstructionsFi: "Test confirmed instructions FI",
-      reservationConfirmedInstructionsEn: "Test confirmed instructions EN",
-      reservationConfirmedInstructionsSv: "Test confirmed instructions SV",
+      reservationConfirmedInstructionsFi: `${reservationConfirmedInstructions} FI`,
+      reservationConfirmedInstructionsEn: `${reservationConfirmedInstructions} EN`,
+      reservationConfirmedInstructionsSv: `${reservationConfirmedInstructions} SV`,
       reservationCancelledInstructionsFi: "Test cancelled instructions FI",
       reservationCancelledInstructionsEn: "Test cancelled instructions EN",
       reservationCancelledInstructionsSv: "Test cancelled instructions SV",
