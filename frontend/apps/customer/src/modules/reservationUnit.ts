@@ -133,13 +133,10 @@ export function getReservationUnitName(
   if (!reservationUnit) {
     return undefined;
   }
-  const key = `name${capitalize(language)}`;
-  if (key in reservationUnit) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- silly magic to avoid implicit any type
-    const val: unknown = (reservationUnit as any)[key];
-    if (typeof val === "string" && val.length > 0) {
-      return val;
-    }
+  const key = `name${capitalize(language)}` as keyof typeof reservationUnit;
+  const val = reservationUnit[key];
+  if (typeof val === "string" && val.length > 0) {
+    return val;
   }
   return reservationUnit.nameFi ?? "-";
 }
