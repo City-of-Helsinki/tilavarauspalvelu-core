@@ -254,7 +254,7 @@ function ReservationPricingDetailsAccordion({
         <DataWrapper label={t("reservation:paymentState")}>
           {reservation.paymentOrder?.status == null
             ? "-"
-            : t(`translation:orderStatus.${reservation.paymentOrder?.status}`)}
+            : t(`reservation:orderStatus.${reservation.paymentOrder?.status}`)}
         </DataWrapper>
         <DataWrapper label={t("reservation:applyingForFreeOfCharge")}>
           {t(reservation.applyingForFreeOfCharge ? "common:true" : "common:false")}

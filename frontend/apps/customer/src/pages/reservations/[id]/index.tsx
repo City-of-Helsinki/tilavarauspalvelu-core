@@ -11,7 +11,7 @@ import styled from "styled-components";
 import { ButtonLikeLink, ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
 import IconButton from "ui/src/components/IconButton";
 import StatusLabel from "ui/src/components/StatusLabel";
-import { ReservationStatusLabel } from "ui/src/components/statuses";
+import { ReservationStatusLabel, OrderStatusLabel } from "ui/src/components/statuses";
 import { useToastIfQueryParam } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDateTimeRange } from "ui/src/modules/date-utils";
@@ -27,12 +27,7 @@ import { Flex, fontRegular, H1, H4, NoWrap } from "ui/src/styled";
 import { AddressSection } from "@/components/AddressSection";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { LabelValuePair } from "@/components/LabelValuePair";
-import {
-  ReservationInfoCard,
-  ReservationOrderStatus,
-  SummaryGeneralFields,
-  SummaryReserveeFields,
-} from "@/components/reservation";
+import { ReservationInfoCard, SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
 import { useEnvContext } from "@/context/EnvContext";
 import { PaymentNotification, TermsInfoSection, Instructions, NotModifiableReason } from "@/lib/reservation/[id]";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -272,7 +267,7 @@ function Reservation({
                 state={reservation.state ?? ReservationStateChoice.Confirmed}
               />
               {normalizedOrderStatus && (
-                <ReservationOrderStatus orderStatus={normalizedOrderStatus} testId="reservation__payment-status" />
+                <OrderStatusLabel status={normalizedOrderStatus} testId="reservation__payment-status" />
               )}
               {shouldShowAccessCode && (
                 <StatusLabel

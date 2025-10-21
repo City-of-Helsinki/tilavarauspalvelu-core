@@ -5,10 +5,9 @@ import { trim } from "lodash-es";
 import { useTranslation } from "next-i18next";
 import { ButtonLikeExternalLink, ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import Card from "ui/src/components/Card";
-import { ReservationStatusLabel } from "ui/src/components/statuses";
+import { ReservationStatusLabel, OrderStatusLabel } from "ui/src/components/statuses";
 import { formatDateTimeRange } from "ui/src/modules/date-utils";
 import { capitalize, getImageSource, getLocalizationLang, getTranslation, getMainImage } from "ui/src/modules/helpers";
-import { ReservationOrderStatus } from "@/components/reservation";
 import { getNormalizedReservationOrderStatus, getPaymentUrl, isReservationCancellable } from "@/modules/reservation";
 import { getPrice } from "@/modules/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
@@ -51,11 +50,7 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
   const tags = [];
   if (normalizedOrderStatus != null)
     tags.push(
-      <ReservationOrderStatus
-        orderStatus={normalizedOrderStatus}
-        data-testid="reservation-card__order-status"
-        key="order-status"
-      />
+      <OrderStatusLabel status={normalizedOrderStatus} testId="reservation-card__order-status" key="order-status" />
     );
   tags.push(
     <ReservationStatusLabel

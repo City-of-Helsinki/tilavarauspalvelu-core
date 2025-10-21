@@ -126,7 +126,7 @@ export function translateTag(t: TFunction, options: Readonly<TagOptionsList>) {
           return t("filters:noPaymentStatus");
         }
         return t("filters:tag.orderStatus", {
-          status: t(`translation:orderStatus.${value}`),
+          status: t(`reservation:orderStatus.${value}`),
         });
       case "recurring":
         return options.recurringChoices.find((x) => x.value === value)?.label ?? "";
