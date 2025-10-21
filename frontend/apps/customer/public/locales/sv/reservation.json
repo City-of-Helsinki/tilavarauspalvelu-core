@@ -71,13 +71,13 @@
   "noUpcomingReservations": "Inga kommande bokningar",
   "noPastReservations": "Inga tidigare bokningar",
   "noCancelledReservations": "Inga avbokade bokningar",
-  "status": {
-    "cancelled": "Avbokad",
-    "confirmed": "Godkänd",
-    "denied": "Avvisad",
-    "requiresHandling": "I behandling",
-    "created": "Utkast",
-    "waitingForPayment": "Inväntar betalning"
+  "state": {
+    "REQUIRES_HANDLING": "I behandling",
+    "CONFIRMED": "Godkänd",
+    "DENIED": "Avvisad",
+    "CANCELLED": "Avbokad",
+    "CREATED": "Utkast",
+    "WAITING_FOR_PAYMENT": "Inväntar betalning"
   },
   "paymentBanner": {
     "title": "Din bokning väntar på betalning",

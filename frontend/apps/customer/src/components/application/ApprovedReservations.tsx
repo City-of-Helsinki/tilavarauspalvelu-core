@@ -241,7 +241,7 @@ function formatReservationTimes(t: TFunction, aes: ApplicationSectionReservation
 
 function accessCodeSafe(pindoraInfo: PindoraSectionFragment | null, t: TFunction) {
   if (!pindoraInfo?.accessCode) {
-    return t("reservations:contactSupport");
+    return t("reservation:contactSupport");
   } else {
     return pindoraInfo.accessCode;
   }
@@ -751,7 +751,7 @@ function ReservationsTable({
           <OnlyForMobile>{dayOfWeek}</OnlyForMobile>
           {time}
           {accessCodeTime && time !== accessCodeTime && (
-            <StyledTooltip>{`${t("reservations:accessCodeDuration")}: ${accessCodeTime}`}</StyledTooltip>
+            <StyledTooltip>{`${t("reservation:accessCodeDuration")}: ${accessCodeTime}`}</StyledTooltip>
           )}
         </IconTextWrapper>
       ),
@@ -781,7 +781,7 @@ function ReservationsTable({
         return (
           <IconTextWrapper>
             {t(`reservationUnit:accessTypes.${elem.accessType}`)}
-            {elem.accessTypeChanged && <StyledTooltip>{t("reservations:accessTypeChanged")}</StyledTooltip>}
+            {elem.accessTypeChanged && <StyledTooltip>{t("reservation:accessTypeChanged")}</StyledTooltip>}
           </IconTextWrapper>
         );
       },
@@ -814,7 +814,7 @@ function ReservationsTable({
           onClick={() => handleCancel(pk)}
           disabled={isCancellableReason !== ""}
           title={
-            isCancellableReason === "" ? t("common:cancel") : t(`reservations:modifyTimeReasons.${isCancellableReason}`)
+            isCancellableReason === "" ? t("common:cancel") : t(`reservation:modifyTimeReasons.${isCancellableReason}`)
           }
           // Corresponding mobile menu is on the first row
           className="hide-on-mobile"

@@ -33,7 +33,7 @@ function getBreadcrumbs(t: TFunction, reservation: PropsNarrowed["reservation"])
         title: t("breadcrumb:application", { id: applicationPk }),
       },
       {
-        title: t("reservations:cancel.reservation"),
+        title: t("reservation:cancel.reservation"),
       },
     ];
   }
@@ -44,10 +44,10 @@ function getBreadcrumbs(t: TFunction, reservation: PropsNarrowed["reservation"])
     },
     {
       slug: getReservationPath(reservation.pk),
-      title: t("reservations:reservationName", { id: reservation.pk }),
+      title: t("reservation:reservationName", { id: reservation.pk }),
     },
     {
-      title: t("reservations:cancel.reservation"),
+      title: t("reservation:cancel.reservation"),
     },
   ] as const;
 }

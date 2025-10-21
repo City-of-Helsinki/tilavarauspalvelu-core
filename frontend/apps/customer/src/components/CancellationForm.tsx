@@ -47,7 +47,7 @@ export function CancellationForm(props: {
 
   const reasons = Object.values(ReservationCancelReasonChoice)
     .map((r) => ({
-      label: t(`reservations:cancel.reasons.${r}`),
+      label: t(`reservation:cancel.reasons.${r}`),
       value: r,
     }))
     .filter((r) => r.value !== ReservationCancelReasonChoice.NotPaid);
@@ -68,7 +68,7 @@ export function CancellationForm(props: {
             id="reservation-cancel__reason"
             name="reason"
             control={control}
-            label={t("reservations:cancel.reason")}
+            label={t("reservation:cancel.reason")}
             options={reasons}
             required
             disabled={isDisabled}
@@ -85,7 +85,7 @@ export function CancellationForm(props: {
               disabled={isDisabled || isLoading || !watch("reason")}
               data-testid="reservation-cancel__button--cancel"
             >
-              {t("reservations:cancel.reservation")}
+              {t("reservation:cancel.reservation")}
             </Button>
           </Actions>
         </AutoGrid>

@@ -7,12 +7,13 @@ import { formatDateTimeRange } from "ui/src/modules/date-utils";
 import { getNormalizedReservationOrderStatus, getPaymentUrl, isReservationCancellable } from "@/modules/reservation";
 import { getPrice } from "@/modules/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
-import { ReservationStatus, ReservationOrderStatus } from "@/components/reservation";
+import { ReservationOrderStatus } from "@/components/reservation";
 import { ButtonLikeExternalLink, ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { capitalize, getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
 import Card from "ui/src/components/Card";
 import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
 import { gql } from "@apollo/client";
+import { ReservationStatusLabel } from "ui/src/components/statuses";
 
 type CardType = "upcoming" | "past" | "cancelled";
 
@@ -58,7 +59,7 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
       />
     );
   tags.push(
-    <ReservationStatus
+    <ReservationStatusLabel
       data-testid="reservation-card__status"
       state={reservation.state ?? ReservationStateChoice.Created}
       key="status"
@@ -85,7 +86,7 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
         key="cancel"
         width="full"
       >
-        {t("reservations:cancel.reservationAbbreviated")}
+        {t("reservation:cancel.reservationAbbreviated")}
         <IconCross />
       </ButtonLikeLink>
     );
@@ -107,7 +108,7 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
         key="payment"
         width="full"
       >
-        {t("reservations:payReservation")}
+        {t("reservation:payReservation")}
         <IconArrowRight />
       </ButtonLikeExternalLink>
     );

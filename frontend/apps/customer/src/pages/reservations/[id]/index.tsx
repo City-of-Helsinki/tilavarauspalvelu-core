@@ -55,13 +55,13 @@ import { LabelValuePair } from "@/components/LabelValuePair";
 import {
   ReservationInfoCard,
   ReservationOrderStatus,
-  ReservationStatus,
   SummaryGeneralFields,
   SummaryReserveeFields,
 } from "@/components/reservation";
 import { PaymentNotification, TermsInfoSection, Instructions, NotModifiableReason } from "@/lib/reservation/[id]";
 import { useSearchParams } from "next/navigation";
 import { queryOptions } from "@/modules/queryOptions";
+import { ReservationStatusLabel } from "ui/src/components/statuses";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -193,18 +193,18 @@ function Reservation({
 
   useToastIfQueryParam({
     key: "timeUpdated",
-    message: t("reservations:saveNewTimeSuccess"),
+    message: t("reservation:saveNewTimeSuccess"),
   });
 
   useToastIfQueryParam({
     key: "deleted",
-    message: t("reservations:reservationCancelledTitle"),
+    message: t("reservation:reservationCancelledTitle"),
   });
 
   useToastIfQueryParam({
     key: "polling_timeout",
-    title: t("reservations:notifications.polling_timeout.title"),
-    message: t("reservations:notifications.polling_timeout.body"),
+    title: t("reservation:notifications.polling_timeout.title"),
+    message: t("reservation:notifications.polling_timeout.body"),
     type: "alert",
   });
 
@@ -216,7 +216,7 @@ function Reservation({
       params.get("error_code") === "CANCELLED" ||
       params.get("error_code") === "RESERVATION_PAYMENT_ORDER_PAST_DUE_BY" ||
       params.get("error_code") === "RESERVATION_PAYMENT_NOT_PENDING"
-        ? t("reservations:reservationNoLongerPayable")
+        ? t("reservation:reservationNoLongerPayable")
         : params.get("error_message") || t("error:genericError"),
     type: "error",
   });
@@ -237,7 +237,7 @@ function Reservation({
       title: t("breadcrumb:reservations"),
     },
     {
-      title: t("reservations:reservationName", { id: reservation.pk }),
+      title: t("reservation:reservationName", { id: reservation.pk }),
     },
   ] as const;
 
@@ -254,17 +254,17 @@ function Reservation({
         <Notification
           type={statusNotification === "requires_handling" ? "info" : "success"}
           data-testid="reservation__status-notification"
-          label={t(`reservations:notifications.${statusNotification}.title`)}
+          label={t(`reservation:notifications.${statusNotification}.title`)}
         >
-          {t(`reservations:notifications.${statusNotification}.body`)}
+          {t(`reservation:notifications.${statusNotification}.body`)}
         </Notification>
       )}
       <ReservationPageWrapper data-testid="reservation__content" $nRows={3}>
         <Flex style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
           <Flex $direction="row" $alignItems="center" $justifyContent="space-between" $wrap="wrap">
-            <H1 $noMargin>{t("reservations:reservationName", { id: reservation.pk })}</H1>
+            <H1 $noMargin>{t("reservation:reservationName", { id: reservation.pk })}</H1>
             <Flex $gap="s" $direction="row">
-              <ReservationStatus
+              <ReservationStatusLabel
                 testId="reservation__status"
                 state={reservation.state ?? ReservationStateChoice.Confirmed}
               />
@@ -303,7 +303,7 @@ function Reservation({
                 href={reservation.calendarUrl ?? ""}
                 role="button"
               >
-                {t("reservations:saveToCalendar")}
+                {t("reservation:saveToCalendar")}
                 <IconCalendar />
               </ButtonLikeExternalLink>
             )}
@@ -315,7 +315,7 @@ function Reservation({
                 target="_blank"
                 role="button"
               >
-                {t("reservations:downloadReceipt")}
+                {t("reservation:downloadReceipt")}
                 <IconLinkExternal />
               </ButtonLikeExternalLink>
             )}
@@ -331,7 +331,7 @@ function Reservation({
                 data-testid="reservation-detail__button--checkout"
                 role="button"
               >
-                {t("reservations:payReservation")}
+                {t("reservation:payReservation")}
                 <IconArrowRight />
               </ButtonLikeExternalLink>
             )}
@@ -342,7 +342,7 @@ function Reservation({
                 data-testid="reservation-detail__button--edit"
                 role="button"
               >
-                {t("reservations:modifyReservationTime")}
+                {t("reservation:modifyReservationTime")}
                 <IconCalendar />
               </ButtonLikeLink>
             )}
@@ -353,7 +353,7 @@ function Reservation({
                 data-testid="reservation-detail__button--cancel"
                 role="button"
               >
-                {t(`reservations:cancel.${isBeingHandled ? "application" : "reservation"}`)}
+                {t(`reservation:cancel.${isBeingHandled ? "application" : "reservation"}`)}
                 <IconCross />
               </ButtonLikeLink>
             )}
@@ -402,7 +402,7 @@ function AccessCodeInfo({
             testId="reservation__access-code"
           />
           <LabelValuePair
-            label={t("reservations:accessCodeDuration")}
+            label={t("reservation:accessCodeDuration")}
             value={formatDateTimeRange(
               new Date(pindoraInfo.accessCodeBeginsAt),
               new Date(pindoraInfo.accessCodeEndsAt),
@@ -414,7 +414,7 @@ function AccessCodeInfo({
       ) : (
         <IconButton
           href={getFeedbackUrl(feedbackUrl, i18n)}
-          label={t("reservations:contactSupport")}
+          label={t("reservation:contactSupport")}
           icon={<IconLinkExternal />}
         />
       )}
