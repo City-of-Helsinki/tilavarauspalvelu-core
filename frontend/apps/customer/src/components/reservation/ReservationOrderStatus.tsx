@@ -31,7 +31,7 @@ export function ReservationOrderStatus({ orderStatus, testId }: Props): JSX.Elem
     }
   }, [orderStatus]);
 
-  const statusText = t(`reservations:orderStatus.${camelCase(orderStatus)}`);
+  const statusText = t(`reservation:orderStatus.${camelCase(orderStatus)}`);
 
   return (
     <StatusLabel type={labelType} icon={<IconEuroSign />} data-testid={testId}>

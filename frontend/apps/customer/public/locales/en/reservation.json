@@ -71,13 +71,13 @@
   "noUpcomingReservations": "No upcoming bookings",
   "noPastReservations": "No past bookings",
   "noCancelledReservations": "No cancelled bookings",
-  "status": {
-    "cancelled": "Cancelled",
-    "confirmed": "Confirmed",
-    "denied": "Denied",
-    "requiresHandling": "Being processed",
-    "created": "Draft",
-    "waitingForPayment": "Awaiting payment"
+  "state": {
+    "REQUIRES_HANDLING": "Being processed",
+    "CONFIRMED": "Confirmed",
+    "DENIED": "Denied",
+    "CANCELLED": "Cancelled",
+    "CREATED": "Draft",
+    "WAITING_FOR_PAYMENT": "Awaiting payment"
   },
   "paymentBanner": {
     "title": "Your booking is waiting for payment",

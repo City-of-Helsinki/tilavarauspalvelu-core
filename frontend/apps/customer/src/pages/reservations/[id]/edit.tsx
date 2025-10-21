@@ -55,7 +55,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
     reset(transformReservation(reservation));
   }, [reservation, reset]);
 
-  const title = step === 0 ? "reservations:editReservationTime" : "reservationCalendar:heading.pendingReservation";
+  const title = step === 0 ? "reservation:editReservationTime" : "reservationCalendar:heading.pendingReservation";
 
   const handleStepClick = (_: React.MouseEvent<HTMLButtonElement>, index: number) => {
     if (index === 0 || index === 1) {
@@ -70,11 +70,11 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   const isDirty = dirtyFields.date || dirtyFields.time || dirtyFields.duration;
   const steps = [
     {
-      label: `1. ${t("reservations:steps.1")}`,
+      label: `1. ${t("reservation:steps.1")}`,
       state: step === 0 ? StepState.available : StepState.completed,
     },
     {
-      label: `2. ${t("reservations:steps.2")}`,
+      label: `2. ${t("reservation:steps.2")}`,
       state: step === 1 ? StepState.available : isValid && isDirty ? StepState.available : StepState.disabled,
     },
   ];
@@ -105,10 +105,10 @@ function ReservationEditPageWrapper(props: PropsNarrowed): JSX.Element {
     },
     {
       slug: getReservationPath(reservation.pk),
-      title: t("reservations:reservationName", { id: reservation.pk }),
+      title: t("reservation:reservationName", { id: reservation.pk }),
     },
     {
-      title: t("reservations:modifyReservationTime"),
+      title: t("reservation:modifyReservationTime"),
     },
   ] as const;
 

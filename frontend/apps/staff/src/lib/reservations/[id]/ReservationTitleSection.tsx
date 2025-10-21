@@ -1,8 +1,9 @@
 import React, { forwardRef } from "react";
 import { gql } from "@apollo/client";
-import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircle, IconSize } from "hds-react";
+import { IconEuroSign, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
 import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
+import { ReservationStatusLabel } from "ui/src/components/statuses";
 import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
 import { Flex, TitleSection, H1 } from "ui/src/styled";
 import { ExternalLink } from "@/components/ExternalLink";
@@ -13,7 +14,6 @@ import { getApplicationUrl } from "@/modules/urls";
 import {
   type Maybe,
   OrderStatus,
-  ReservationStateChoice,
   type ReservationTitleSectionFieldsFragment,
   useReservationApplicationLinkQuery,
   UserPermissionChoice,
@@ -33,31 +33,6 @@ function getStatusLabelType(s?: Maybe<OrderStatus>): StatusLabelType {
     case OrderStatus.Cancelled:
     default:
       return "neutral";
-  }
-}
-
-function getReservationStateLabelProps(s?: Maybe<ReservationStateChoice>): {
-  type: StatusLabelType;
-  icon: JSX.Element;
-} {
-  switch (s) {
-    case ReservationStateChoice.Created:
-      return { type: "draft", icon: <IconPen /> };
-    case ReservationStateChoice.WaitingForPayment:
-      return { type: "alert", icon: <IconEuroSign /> };
-    case ReservationStateChoice.RequiresHandling:
-      return { type: "info", icon: <IconCogwheel /> };
-    case ReservationStateChoice.Confirmed:
-      return { type: "success", icon: <IconCheck /> };
-    case ReservationStateChoice.Denied:
-      return { type: "error", icon: <IconCross /> };
-    case ReservationStateChoice.Cancelled:
-      return { type: "neutral", icon: <IconCross /> };
-    default:
-      return {
-        type: "neutral",
-        icon: <IconQuestionCircle />,
-      };
   }
 }
 
@@ -104,7 +79,6 @@ export const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
     const { applicationLink, applicationLinkLabel } = useApplicationLink({ reservation });
 
     const paymentStatusLabelType = getStatusLabelType(reservation.paymentOrder?.status);
-    const reservationState = getReservationStateLabelProps(reservation.state);
 
     return (
       <div>
@@ -121,13 +95,7 @@ export const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
               </StatusLabel>
             )}
             {reservation.state && (
-              <StatusLabel
-                type={reservationState.type}
-                icon={reservationState.icon}
-                data-testid="reservation_title_section__reservation_state"
-              >
-                {t(`reservation:state.${reservation.state}`)}
-              </StatusLabel>
+              <ReservationStatusLabel state={reservation.state} testId="reservation_title_section__reservation_state" />
             )}
           </Flex>
         </TitleSection>

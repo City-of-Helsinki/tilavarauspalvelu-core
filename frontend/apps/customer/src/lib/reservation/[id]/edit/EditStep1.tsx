@@ -180,7 +180,7 @@ export function EditStep1({ reservation, options, onBack, form }: Props): JSX.El
             disabled={!termsAccepted || isLoading}
             data-testid="reservation__button--continue"
           >
-            {t("reservations:saveNewTime")}
+            {t("reservation:saveNewTime")}
           </Button>
         </Actions>
       </StyledForm>
