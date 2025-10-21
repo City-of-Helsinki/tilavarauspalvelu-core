@@ -11,6 +11,18 @@
     "CREATED": "Luonnos",
     "WAITING_FOR_PAYMENT": "Odottaa maksua"
   },
+  "orderStatus": {
+    "ALL": "Maksuton",
+    "PAID": "Maksettu",
+    "PAID_MANUALLY": "Maksetaan paikan päällä",
+    "PAID_BY_INVOICE": "Maksu laskulla",
+    "PENDING": "Odottaa maksua",
+    "DRAFT": "Maksu kesken",
+    "EXPIRED": "Ei maksettu",
+    "REFUNDED": "Maksu palautettu",
+    "CANCELLED": "Peruutettu",
+    "FREE": "Maksuton"
+  },
   "applicationLink": "Avaa hakemus",
   "approve": "Hyväksy",
   "reject": "Hylkää",
