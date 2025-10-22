@@ -1,18 +1,13 @@
-import { isBrowser } from "./helpers";
-
 export type UserTypeChoice = "customer" | "admin";
 export type LocalizationLanguages = "fi" | "sv" | "en";
 
 /// Returns url for graphql endpoint
 /// @param apiUrl - base url for api (hostname typically)
-/// @param enableFetchHack a workaround to node-fetch dns problems with localhost
 /// @returns url for graphql endpoint
 /// only needed on server side, only needed on localhost
 /// this will not work with authentication so remove if adding session cookies to SSR requests
-export function buildGraphQLUrl(apiUrl: string, enableFetchHack?: boolean) {
-  const shouldModifyLocalhost = enableFetchHack && !isBrowser && apiUrl.includes("localhost");
-  const url = shouldModifyLocalhost ? apiUrl.replace("localhost", "127.0.0.1") : apiUrl;
-  return `${url}${url.endsWith("/") ? "" : "/"}graphql/`;
+export function buildGraphQLUrl(apiUrl: string) {
+  return `${apiUrl}${apiUrl.endsWith("/") ? "" : "/"}graphql/`;
 }
 
 function buildAuthUrl(apiUrl: string) {

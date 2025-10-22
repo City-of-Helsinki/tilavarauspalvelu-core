@@ -578,16 +578,3 @@ In Customer UI most queries are done on SSR.
 
 Probably an SSR error. These are not visible in the browser.
 Check the console logs in the terminal where `pnpm dev` is running.
-
-#### Node 18 / 20 fetch failed server side
-
-Node 18+ fetch defaults `localhost` to IPv6 not IPv4.
-
-Check that your `/etc/hosts` has
-```
-127.0.0.1       localhost
-# IMPORTANT! ipv6 address after ipv4
-::1             localhost
-```
-
-Use `ENABLE_FETCH_HACK=true` env which changes SSR fetches to 127.0.0.1 instead of localhost.
