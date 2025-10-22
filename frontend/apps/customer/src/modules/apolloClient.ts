@@ -3,7 +3,6 @@ import { relayStylePagination } from "@apollo/client/utilities";
 import { type ParsedUrlQuery } from "querystring";
 import { type GetServerSidePropsContext, type PreviewData } from "next";
 import { buildGraphQLUrl } from "ui/src/modules/urlBuilder";
-import { env } from "@/env.mjs";
 import { isBrowser } from "./const";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 import { enchancedFetch, errorLink } from "ui/src/modules/apolloUtils";
@@ -16,7 +15,7 @@ if (process.env.NODE_ENV === "development") {
 
 export function createApolloClient(hostUrl: string, ctx?: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>) {
   const isServer = typeof window === "undefined";
-  const uri = buildGraphQLUrl(hostUrl, env.ENABLE_FETCH_HACK);
+  const uri = buildGraphQLUrl(hostUrl);
   const httpLink = new HttpLink({
     uri,
     // TODO this might be useless
