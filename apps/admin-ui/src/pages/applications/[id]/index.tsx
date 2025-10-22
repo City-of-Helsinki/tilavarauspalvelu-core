@@ -562,7 +562,6 @@ export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | nu
     data,
     loading: isLoading,
     refetch,
-    error,
   } = useApplicationAdminQuery({
     skip: !(pk > 0),
     variables: { id: createNodeId("ApplicationNode", pk) },
@@ -573,10 +572,6 @@ export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | nu
 
   if (isLoading) {
     return <CenterSpinner />;
-  }
-
-  if (error) {
-    return <div>{t("errors:errorFetchingApplication")}</div>;
   }
 
   // NOTE id query will return null if the application is not found or the user does not have permission
