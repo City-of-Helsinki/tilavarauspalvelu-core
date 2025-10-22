@@ -127,10 +127,10 @@ describe("createTag", () => {
     });
 
     const tag = createTagString(input, mockT);
-    expect(tag).not.toContain("dayShort.MONDAY, dayShort.TUESDAY, dayShort.THURSDAY");
+    expect(tag).not.toContain("weekdayShortEnum.MONDAY, weekdayShortEnum.TUESDAY, weekdayShortEnum.THURSDAY");
     expect(tag).toContain("1.4.2023");
     expect(tag).toContain("12:00–14:00, common:abbreviations:hour");
-    expect(tag).toContain("weekDay.5");
+    expect(tag).toContain("weekdayShortEnum.SATURDAY");
     expect(tag).toContain("Reservation unit 1");
   });
 });
