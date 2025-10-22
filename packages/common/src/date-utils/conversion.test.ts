@@ -221,21 +221,20 @@ describe("conversion", () => {
       expect(setMondayFirst(0)).toBe(6);
     });
     it("handles input 0 correctly to Sunday first", () => {
-      expect(setSundayFirst(0)).toBe(0);
+      expect(setSundayFirst(0)).toBe(1);
     });
 
-    it("handles input 3 correctly to Monday first", () => {
+    it("handles input 0 correctly to Monday first", () => {
       expect(setMondayFirst(3)).toBe(2);
     });
-    it("handles input 0 correctly to Sunday first", () => {
-      expect(setSundayFirst(3)).toBe(3);
+    it("handles input 3 correctly to Sunday first", () => {
+      expect(setSundayFirst(3)).toBe(4);
     });
 
     it("handles input 6 correctly to Monday first", () => {
       expect(setMondayFirst(6)).toBe(5);
     });
-
-    it("handles input 0 correctly to Sunday first", () => {
+    it("handles input 6 correctly to Sunday first", () => {
       expect(setSundayFirst(6)).toBe(0);
     });
   });
