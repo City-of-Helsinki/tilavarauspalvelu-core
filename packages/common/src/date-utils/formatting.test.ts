@@ -107,10 +107,10 @@ describe("formatting", () => {
     it("formats datetime with weekday and separator", () => {
       const date = new Date("2023-12-25T15:30:00");
       const result = formatDateTime(date, { t: mockT });
-      expect(result).toContain("common:weekDay.0");
+      expect(result).toContain("common:weekdayShortEnum.MONDAY");
       expect(result).toContain("25.12.2023");
       expect(result).toContain("klo");
-      expect(result).toMatch("common:weekDay.0 25.12.2023 klo 15:30");
+      expect(result).toMatch("common:weekdayShortEnum.MONDAY 25.12.2023 klo 15:30");
     });
 
     it("formats without weekday", () => {

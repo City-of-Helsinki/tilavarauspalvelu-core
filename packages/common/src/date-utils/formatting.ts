@@ -1,18 +1,19 @@
 /**
  * Display formatting functions, with i18n.t and/or date-fns format
  */
-import { format, isBefore, isSameDay, type Locale } from "date-fns";
-import { fi, sv, enGB } from "date-fns/locale";
+import { Day, format, isBefore, isSameDay, type Locale } from "date-fns";
+import { enGB, fi, sv } from "date-fns/locale";
 import { type TFunction } from "next-i18next";
+import { transformWeekday } from "../conversion";
 import type { LocalizationLanguages } from "../urlBuilder";
-import { dateToMinutes, isValidDate, minutesToHoursString, timeToMinutes, setMondayFirst } from "./conversion";
+import { dateToMinutes, isValidDate, minutesToHoursString, setMondayFirst, timeToMinutes } from "./conversion";
 import type {
+  ApplicationReservationDateTime,
   FormatDateOptions,
+  FormatDateRangeOptions,
   FormatDateTimeOptions,
   FormatDateTimeRangeOptions,
   TimeStruct,
-  ApplicationReservationDateTime,
-  FormatDateRangeOptions,
 } from "./types";
 
 // Fallback localized separator between date and time, if i18n.t is not available
@@ -31,21 +32,21 @@ export const API_DATE_FORMAT = "yyyy-MM-dd";
 /**
  * Returns the date-fns locale object for the given locale code
  * @param {LocalizationLanguages} locale - locale code ("fi", "sv", "en")
- * @returns date-fns locale object
+ * @returns date-fns locale object, with week starting on Monday
  * @example
  *  getFormatLocaleObject("fi") // fi locale object
  *  getFormatLocaleObject("sv") // sv locale object
  *  getFormatLocaleObject("en") // enGB locale object
  */
-function getFormatLocaleObject(locale?: LocalizationLanguages): { locale: Locale } {
+function getFormatLocaleObject(locale?: LocalizationLanguages): { locale: Locale; weekStartsOn: Day } {
   switch (locale) {
     case "sv":
-      return { locale: sv };
+      return { locale: sv, weekStartsOn: 1 };
     case "en":
-      return { locale: enGB };
+      return { locale: enGB, weekStartsOn: 1 };
     default:
     case "fi":
-      return { locale: fi };
+      return { locale: fi, weekStartsOn: 1 };
   }
 }
 
@@ -135,7 +136,7 @@ export function formatDateTime(
   const separator = includeTimeSeparator ? localSeparator[locale] : "";
 
   if (t) {
-    return `${t("common:weekDay." + setMondayFirst(date.getDay()))} ${format(date, UI_DATE_FORMAT)}${separator}${format(date, UI_TIME_FORMAT)}`.trim();
+    return `${t("common:weekdayShortEnum." + transformWeekday(setMondayFirst(date.getDay())))} ${format(date, UI_DATE_FORMAT)}${separator}${format(date, UI_TIME_FORMAT)}`.trim();
   }
   const formatString = showYear ? UI_DATE_FORMAT_WITH_WEEKDAY : UI_DATE_FORMAT_SHORT;
   return format(
