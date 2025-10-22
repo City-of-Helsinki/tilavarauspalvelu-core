@@ -20,6 +20,7 @@ const ServerSchema = z.object({
   SENTRY_DSN: z.string().optional(),
   SENTRY_ENVIRONMENT: z.string().optional(),
   SENTRY_ENABLE_SOURCE_MAPS: coerceBoolean,
+  SKIP_ENV_VALIDATION: coerceBoolean,
   RESERVATION_UNIT_PREVIEW_URL_PREFIX: optionalUrl,
   // mandatory because the SSR can't connect to the API without it
   // frontend SSR is running on a different host than the backend

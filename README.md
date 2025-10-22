@@ -121,10 +121,10 @@ make generate
 1. Install correct Node version.
 
 ```shell
-nvm use 20
+nvm use
 ```
 
-2. Install pnpm.
+2. Install pnpm if not installed through OS package manager.
 
 ```shell
 npm install -g pnpm
@@ -136,14 +136,20 @@ npm install -g pnpm
 pnpm i
 ```
 
-4. Copy `.env.example` to `.env.local`.
+4. Add pre-commit hooks
+
+```shell
+pnpm husky
+```
+
+5. Copy `.env.example` to `.env.local`.
 
 ```shell
 cp apps/ui/.env.example apps/ui/.env.local
 cp apps/admin-ui/.env.example apps/admin-ui/.env.local
 ```
 
-5. Start the frontend.
+6. Start the frontend.
 
 ```shell
 pnpm dev
@@ -428,23 +434,26 @@ Codegen is used to generate Typescript types from GraphQL queries.
 
 [Codegen]: https://the-guild.dev/graphql/codegen
 
-Needs to be run if either the backend schema or any frontend query changes.
+Needs to be run if either the backend schema or any frontend GQL query changes.
 
-Pulls the schema from `http://localhost:8000/graphql/`, crawls the frontend code for queries, and generates Typescript types for them.
+Uses the schema file `tilavaraus.graphql` in the repo root and crawls the frontend code for `gql` tagged strings. Then generates Typescript types for them.
 
-Update GraphQL schema and types.
+Update GraphQL schema and types. Uses GNU Parallel to update all apps.
 ``` sh
 pnpm codegen
 ```
 
-Run in watch mode (all apps).
+Run in watch mode for all apps.
 ``` sh
 pnpm codegen:watch
 ```
+
 Watch mode has some issues with changes in packages/common not propagated to the other packages.
+Also when switching branches it might hit an unrecoverable error.
 In those cases running `pnpm codegen` first fixes the issue.
 
-Individual apps
+Can be run for individual apps with
+
 ``` shell
 # customer
 pnpm codegen:ui
@@ -456,24 +465,30 @@ pnpm codegen:common
 
 ### Linting
 
-Lint is done by three different tools with their own commands.
-All lints are ran on CI, but locally they are not run by default.
+Linting is done with four different tools each with their own commands.
 
-Typecheck all packages. Relatively fast to run.
+All lints are ran on CI and if you enable pre-commit hooks they are ran locally to modified files.
+
+Typecheck all packages.
 ``` shell
 pnpm tsc:check
 # if you need to remove caches
 pnpm tsc:clean
 ```
 
-Run eslint and prettier. Takes a while to run.
+Run oxlint.
 ``` shell
 pnpm lint
 # automatic fixing
 pnpm lint:fix
 ```
 
-Stylelint all packages.
+Run prettier on all files.
+```shell
+pnpm format
+```
+
+Run stylelint.
 ``` shell
 pnpm lint:css
 ```
@@ -519,15 +534,12 @@ pnpm {command} --filter {package_name}
 pnpm {command} --filter {package_name}...
 ```
 
-Turborepo uses aggressive caching for all commands. This might cause issues in situations where
-the file is unchanged e.g. during large rebases.
+Turborepo uses aggressive caching for all commands. This can cause issues in situations where
+some files are read from cache. Typical cases are either during a rebase or stash popping.
 
-Disable turborepo cache.
+Force a run without reading from local cache.
 ``` shell
-# disable reads (this is usually what you want)
-pnpm lint --force
-# disable writes (usually if you adding a new commands)
-pnpm build --no-cache
+pnpm {cmd} --force
 ```
 
 #### Other commands
@@ -572,9 +584,16 @@ If only needed on the root package.
 #### Don't find query in the network tab
 
 If the query is done on the server side (i.e. in `getServerSideProps`), you won't find it in the network tab.
-In Customer UI most queries are done on SSR.
 
 #### Getting 404 on valid page load
 
 Probably an SSR error. These are not visible in the browser.
 Check the console logs in the terminal where `pnpm dev` is running.
+
+#### Max complexity error on graphql query
+
+Adding a new relation or a fragment to a graphql query often requires modifiying the backend allowed complexity for that
+endpoint. Find the `max_complexity` for that specific endpoint in the backend code and increase it by one till it doesn't error anymore.
+Remember to run backend in watch mode or `make run` after each change.
+
+Max complexity is a security measure, but the default `10` is low compared to the complexity of a lot of the frontend queries.
