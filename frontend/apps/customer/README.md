@@ -38,22 +38,19 @@ Starts production version
 
 See `.env.local.example` and Azure DevOps library for values.
 
-| Name                 | Description                                                    |
-| -------------------- | -------------------------------------------------------------- |
-| NEXT_PUBLIC_BASE_URL | application baseUrl                                            |
-| TILAVARAUS_API_URL   | tilavaraus-core base url                                       |
-| PROFILE_UI_URL       | helsinki profile frontend url for a link                       |
-| SENTRY_DSN           | Sentry dsn                                                     |
-| SENTRY_ENVIRONMENT   | Sentry environment, for example 'test', 'prod'                 |
-| SENTRY_AUTH_TOKEN    | auth token for sentry cli                                      |
-| MATOMO_ENABLED       | 'true' enables matomo tracking                                 |
-| HOTJAR_ENABLED       | 'true' enables hotjar tracking                                 |
-| ENABLE_FETCH_HACK    | 'true' to fix localhost dns problem                            |
-| SKIP_ENV_VALIDATION  | 'true' to allow empty env values (especially for build / test) |
+| Name                 | Description                                         |
+| -------------------- | --------------------------------------------------- |
+| NEXT_PUBLIC_BASE_URL | application baseUrl                                 |
+| TILAVARAUS_API_URL   | tilavaraus-core base url                            |
+| PROFILE_UI_URL       | helsinki profile frontend url for a link            |
+| SENTRY_DSN           | Sentry dsn                                          |
+| SENTRY_ENVIRONMENT   | Sentry environment, for example 'test', 'prod'      |
+| SENTRY_AUTH_TOKEN    | auth token for sentry cli                           |
+| MATOMO_ENABLED       | 'true' enables matomo tracking                      |
+| HOTJAR_ENABLED       | 'true' enables hotjar tracking                      |
+| SKIP_ENV_VALIDATION  | 'true' to allow empty env values (for build / test) |
 
 `TILAVARAUS_API_URL` is required to be set because the node server doing SSR can't connect to the backend without it.
 Unlike a pure browser bundle even if they are running on the same host, the SSR is a separate server behind a reverse proxy.
-
-`ENABLE_FETCH_HACK` has no effect if `API_URL` is not localhost but you should NOT enable it on an actual server deployment.
 
 `SKIP_ENV_VALIDATION` should only be used for building and testing.

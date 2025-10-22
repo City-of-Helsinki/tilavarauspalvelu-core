@@ -63,7 +63,7 @@ function gqlQueryFetch(req: NextRequest, query: QqlQuery) {
 
   return fetch({
     method: "POST",
-    url: buildGraphQLUrl(apiBaseUrl, env.ENABLE_FETCH_HACK),
+    url: buildGraphQLUrl(apiBaseUrl),
     headers: newHeaders,
     // @ts-expect-error -- something broken in node types, body can be a string
     body,
