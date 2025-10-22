@@ -4,7 +4,6 @@ import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, NormalizedCacheObjec
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { type IncomingMessage } from "http";
 import { buildGraphQLUrl } from "ui/src/modules/urlBuilder";
-import { env } from "@/env.mjs";
 import { isBrowser } from "./const";
 import { relayStylePagination } from "@apollo/client/utilities";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
@@ -18,7 +17,7 @@ if (process.env.NODE_ENV !== "production") {
 
 export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClient<NormalizedCacheObject> {
   const isServer = typeof window === "undefined";
-  const uri = buildGraphQLUrl(hostUrl, env.ENABLE_FETCH_HACK);
+  const uri = buildGraphQLUrl(hostUrl);
   const uploadLinkOptions = {
     uri,
     credentials: "include",

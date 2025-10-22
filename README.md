@@ -690,19 +690,6 @@ If the query is done on the server side (i.e. in `getServerSideProps`) you won't
 Probably an SSR error. These are not visible in the browser.
 Check the console logs in the terminal where `pnpm dev` is running.
 
-#### Node 18 / 20 fetch failed server side
-
-Node 18+ fetch defaults `localhost` to IPv6 not IPv4.
-
-Check that your `/etc/hosts` has
-```
-127.0.0.1       localhost
-# IMPORTANT! ipv6 address after ipv4
-::1             localhost
-```
-
-Use `ENABLE_FETCH_HACK=true` env which changes SSR fetches to 127.0.0.1 instead of localhost.
-
 #### Max complexity error on graphql query
 
 Adding a new relation or a fragment to a graphql query often requires modifiying the backend allowed complexity for that
