@@ -203,5 +203,5 @@ export function setSundayFirst(day: number): DayT {
   if (day < 0) {
     throw new Error(`Invalid day ${day}`);
   }
-  return (day % 6) as DayT;
+  return ((day + 1) % 7) as DayT;
 }
