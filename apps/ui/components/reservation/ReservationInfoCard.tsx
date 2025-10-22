@@ -83,7 +83,7 @@ export function ReservationInfoCard({
   const timeString = capitalize(
     formatDateTimeRange(new Date(beginsAt), new Date(endsAt), {
       locale: getLocalizationLang(i18n.language),
-      includeWeekday: false,
+      includeWeekday: true,
     })
   );
 
