@@ -22,7 +22,6 @@ const ServerSchema = z.object({
   SENTRY_DSN: z.string().optional(),
   SENTRY_ENVIRONMENT: z.string().optional(),
   SENTRY_ENABLE_SOURCE_MAPS: coerceBoolean,
-  ENABLE_FETCH_HACK: coerceBoolean,
   SKIP_ENV_VALIDATION: coerceBoolean,
   HOTJAR_ENABLED: coerceBoolean,
   MATOMO_ENABLED: coerceBoolean,
