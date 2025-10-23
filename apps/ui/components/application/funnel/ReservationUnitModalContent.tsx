@@ -21,7 +21,7 @@ import {
 import { filterNonNullable, getImageSource, getMainImage } from "common/src/helpers";
 import { CenterSpinner, Flex, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
-import Card from "common/src/components/Card";
+import { Card } from "common/src/components";
 import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
