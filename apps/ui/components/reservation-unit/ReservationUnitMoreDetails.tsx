@@ -3,9 +3,9 @@ import { Trans, useTranslation } from "next-i18next";
 import {
   type ApplicationRoundTimeSlotFieldsFragment,
   type NoticeWhenReservingFragment,
-  type ReservationUnitMoreDetailsFragment,
   TimeSlotType,
   type PricingFieldsFragment,
+  useReservationUnitMoreDetailsQuery,
 } from "@gql/gql-types";
 import { Map as MapComponent } from "@/components/Map";
 import { getFuturePricing, getPriceString, getReservationUnitName } from "@/modules/reservationUnit";
@@ -23,23 +23,30 @@ import { breakpoints } from "common/src/const";
 import { AddressSection } from "./AddressSection";
 import { useGenericTerms } from "common/src/hooks";
 
-/// Below the fold content
-/// TODO use a client side fetch instead of passing data from SSR (requires more refactors)
-export function ReservationUnitMoreDetails({
-  reservationUnit,
-  isReservable,
-}: Readonly<{
-  reservationUnit: ReservationUnitMoreDetailsFragment;
+type ReservationUnitMoreDetailsProps = {
+  reservationUnit: Readonly<{
+    id: string;
+  }>;
   isReservable: boolean;
-}>) {
+};
+
+/// Below the fold content so uses a client side query for data
+export function ReservationUnitMoreDetails({
+  reservationUnit: { id },
+  isReservable,
+}: Readonly<ReservationUnitMoreDetailsProps>) {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
+  const query = useReservationUnitMoreDetailsQuery({ variables: { id } });
+  const { data } = query;
+  const reservationUnit = data?.reservationUnit ?? undefined;
+
   const termsOfUse = useGenericTerms();
 
-  const activeApplicationRounds = reservationUnit.applicationRounds;
+  const activeApplicationRounds = reservationUnit?.applicationRounds ?? [];
   const showApplicationRoundTimeSlots = activeApplicationRounds.length > 0;
-  const applicationRoundTimeSlots = reservationUnit.applicationRoundTimeSlots;
+  const applicationRoundTimeSlots = reservationUnit?.applicationRoundTimeSlots ?? [];
   const shouldDisplayPricingTerms = useMemo(() => {
     const pricings = filterNonNullable(reservationUnit?.pricings);
     if (pricings.length === 0) {
@@ -49,16 +56,16 @@ export function ReservationUnitMoreDetails({
     return reservationUnit?.canApplyFreeOfCharge && isPaid;
   }, [reservationUnit?.canApplyFreeOfCharge, reservationUnit?.pricings]);
 
-  const paymentTermsContent = reservationUnit.paymentTerms
+  const paymentTermsContent = reservationUnit?.paymentTerms
     ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang)
     : undefined;
-  const cancellationTermsContent = reservationUnit.cancellationTerms
+  const cancellationTermsContent = reservationUnit?.cancellationTerms
     ? getTranslationSafe(reservationUnit.cancellationTerms, "text", lang)
     : undefined;
-  const pricingTermsContent = reservationUnit.pricingTerms
+  const pricingTermsContent = reservationUnit?.pricingTerms
     ? getTranslationSafe(reservationUnit.pricingTerms, "text", lang)
     : undefined;
-  const serviceSpecificTermsContent = reservationUnit.serviceSpecificTerms
+  const serviceSpecificTermsContent = reservationUnit?.serviceSpecificTerms
     ? getTranslationSafe(reservationUnit.serviceSpecificTerms, "text", lang)
     : undefined;
 
@@ -74,7 +81,7 @@ export function ReservationUnitMoreDetails({
           ))}
         </Accordion>
       )}
-      {reservationUnit.unit?.tprekId && (
+      {reservationUnit?.unit?.tprekId && (
         <Accordion closeButton={false} heading={t("common:location")} initiallyOpen>
           <JustForMobile customBreakpoint={breakpoints.l}>
             <AddressSection unit={reservationUnit.unit} title={getReservationUnitName(reservationUnit) ?? "-"} />
@@ -115,14 +122,16 @@ export function ReservationUnitMoreDetails({
 function NoticeWhenReservingSection({
   reservationUnit,
 }: {
-  reservationUnit: NoticeWhenReservingFragment;
+  reservationUnit: NoticeWhenReservingFragment | undefined;
 }): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-  const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);
+  const notesWhenReserving = reservationUnit
+    ? getTranslationSafe(reservationUnit, "notesWhenApplying", lang)
+    : undefined;
 
-  const appRounds = reservationUnit.applicationRounds;
-  const futurePricing = getFuturePricing(reservationUnit, appRounds);
+  const appRounds = reservationUnit?.applicationRounds ?? [];
+  const futurePricing = reservationUnit ? getFuturePricing(reservationUnit, appRounds) : undefined;
 
   if (!futurePricing && !notesWhenReserving) {
     return null;
@@ -266,6 +275,15 @@ export const RESERVATION_UNIT_MODE_DETAILS_FRAGMENT = gql`
     }
     unit {
       ...AddressFields
+    }
+  }
+`;
+
+export const RESERVATION_UNIT_MODE_DETAILS_QUERY = gql`
+  query ReservationUnitMoreDetails($id: ID!) {
+    reservationUnit(id: $id) {
+      id
+      ...ReservationUnitMoreDetails
     }
   }
 `;
