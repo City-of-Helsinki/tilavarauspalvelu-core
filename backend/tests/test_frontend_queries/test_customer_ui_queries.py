@@ -874,6 +874,7 @@ def test_frontend_queries__customer_ui__ReservationUnitPage(graphql):
 
     assert response.has_errors is False, response.errors
 
+
 def test_frontend_queries__customer_ui__ReservationUnitMoreDetails(graphql):
     customer_factories = get_customer_query_info()
     factories = customer_factories["ReservationUnitMoreDetails"]
@@ -886,17 +887,17 @@ def test_frontend_queries__customer_ui__ReservationUnitMoreDetails(graphql):
     factory_args["application_rounds__application_period_ends_at"] = local_datetime(2024, 2, 1)
     factory_args["application_rounds__reservation_period_begin_date"] = local_date(2024, 2, 2)
     factory_args["application_rounds__reservation_period_end_date"] = local_date(2024, 3, 1)
-    #factory_args["application_rounds__public_display_begins_at"] = local_datetime(2024, 1, 1)
-    #factory_args["application_rounds__public_display_ends_at"] = local_datetime(2024, 2, 2)
-    #factory_args["application_round_time_slots__is_closed"] = False
+    # factory_args["application_rounds__public_display_begins_at"] = local_datetime(2024, 1, 1)
+    # factory_args["application_rounds__public_display_ends_at"] = local_datetime(2024, 2, 2)
+    # factory_args["application_round_time_slots__is_closed"] = False
     obj: ReservationUnit = query_info.factory.create(**factory_args)
 
     ReservationFactory.create_for_reservation_unit(obj)
 
     variables = deepcopy(query_info.variables)
     variables["id"] = to_global_id(query_info.typename, obj.id)
-    #variables["beginDate"] = local_date().isoformat()
-    #variables["endDate"] = local_date().isoformat()
+    # variables["beginDate"] = local_date().isoformat()
+    # variables["endDate"] = local_date().isoformat()
 
     query = query_info.query
     graphql.login_with_superuser()
@@ -905,8 +906,10 @@ def test_frontend_queries__customer_ui__ReservationUnitMoreDetails(graphql):
 
     assert response.has_errors is False, response.errors
 
+
 def test_frontend_queries__customer_ui__ReservationUnitTimeSpans(graphql):
     pass
+
 
 def test_frontend_queries__customer_ui__SearchReservationUnits(graphql):
     customer_factories = get_customer_query_info()
