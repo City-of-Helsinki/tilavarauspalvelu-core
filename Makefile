@@ -43,3 +43,8 @@ services:
 
 stop:
 	@docker compose stop
+
+codegen:
+	@pnpm codegen:common
+	@pnpm codegen:ui
+	@pnpm codegen:admin
