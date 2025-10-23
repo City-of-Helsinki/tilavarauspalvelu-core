@@ -3,11 +3,10 @@ import React, { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
-import { Stepper } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
-import { Flex, H1, H4 } from "common/src/styled";
+import { H1, H4 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import {
   ReservationDocument,
@@ -42,7 +41,7 @@ import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util
 import { gql } from "@apollo/client";
 import { PinkBox as PinkBoxBase } from "@/components/reservation/styles";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { ReservationPageWrapper } from "@/styled/reservation";
+import { ReservationPageWrapper, ReservationStepper, ReservationTitleSection } from "@/styled/reservation";
 import { useDisplayError } from "common/src/hooks";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
 
@@ -70,13 +69,6 @@ const StyledForm = styled.form`
   @media (min-width: ${breakpoints.m}) {
     grid-column: span 1;
     grid-row: 2 / -1;
-  }
-`;
-
-const TitleSection = styled(Flex)`
-  grid-column: 1 / -1;
-  @media (min-width: ${breakpoints.m}) {
-    grid-column: span 1;
   }
 `;
 
@@ -347,7 +339,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
             <Sanitize html={notesWhenReserving} />
           </PinkBox>
         )}
-        <TitleSection>
+        <ReservationTitleSection>
           <H1 $noMargin>{pageTitle}</H1>
           {/* TODO what's the logic here?
            * in what case are there more than 2 steps?
@@ -355,7 +347,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
            * TODO why isn't this shown when creating a paid version? I think there was on purpose reason for that? maybe?
            */}
           {steps.length <= 2 && (
-            <Stepper
+            <ReservationStepper
               language={i18n.language}
               selectedStep={step}
               style={{ width: "100%" }}
@@ -363,7 +355,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
               steps={steps}
             />
           )}
-        </TitleSection>
+        </ReservationTitleSection>
         <StyledForm onSubmit={handleSubmit(onSubmit)} noValidate>
           {step === 0 && (
             <Step0 reservation={reservation} cancelReservation={cancelReservation} options={props.options} />

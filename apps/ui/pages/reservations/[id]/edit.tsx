@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
-import styled from "styled-components";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -14,16 +13,15 @@ import {
 import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { formatApiDate } from "common/src/modules/date-utils";
 import { addYears } from "date-fns";
-import { breakpoints } from "common/src/modules/const";
 import { H1 } from "common/src/styled";
 import { gql } from "@apollo/client";
-import { StepState, Stepper } from "hds-react";
+import { StepState } from "hds-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { EditStep0 } from "@/components/reservation/EditStep0";
 import { EditStep1 } from "@/components/reservation/EditStep1";
 import { PendingReservationFormSchema, type PendingReservationFormType } from "@/components/reservation-unit/schema";
-import { ReservationPageWrapper } from "@/styled/reservation";
+import { ReservationPageWrapper, ReservationStepper, ReservationTitleSection } from "@/styled/reservation";
 import { queryOptions } from "@/modules/queryOptions";
 import { isReservationEditable, transformReservation } from "@/modules/reservation";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
@@ -31,15 +29,6 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
-
-// HDS pushes className into wrong element (sub not the outermost)
-const StepperWrapper = styled.div`
-  grid-column: 1 / -1;
-  grid-row: 1;
-  @media (min-width: ${breakpoints.m}) {
-    grid-column: 1 / span 1;
-  }
-`;
 
 function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   const { t, i18n } = useTranslation();
@@ -92,10 +81,10 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
 
   return (
     <ReservationPageWrapper $nRows={5}>
-      <StepperWrapper>
+      <ReservationTitleSection>
         <H1 $marginTop="none">{t(title)}</H1>
-        <Stepper language={i18n.language} selectedStep={step} onStepClick={handleStepClick} steps={steps} />
-      </StepperWrapper>
+        <ReservationStepper language={i18n.language} selectedStep={step} onStepClick={handleStepClick} steps={steps} />
+      </ReservationTitleSection>
       {step === 0 ? (
         <EditStep0 reservation={reservation} reservationForm={form} nextStep={() => setStep(1)} />
       ) : (
