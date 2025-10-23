@@ -7,7 +7,7 @@ import { breakpoints } from "common/src/modules/const";
 import { Maybe, useRelatedReservationUnitsQuery, type RelatedUnitCardFieldsFragment } from "@gql/gql-types";
 import Carousel from "../Carousel";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
-import Card from "common/src/components/Card";
+import { Card } from "common/src/components";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { filterNonNullable, getImageSource, getMainImage } from "common/src/modules/helpers";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";

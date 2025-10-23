@@ -14,7 +14,7 @@ import { formatDateTime, parseValidDateObject } from "common/src/modules/date-ut
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
-import Card from "common/src/components/Card";
+import { Card } from "common/src/components";
 import { getApplicationPath } from "@/modules/urls";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
 import { gql } from "@apollo/client";
