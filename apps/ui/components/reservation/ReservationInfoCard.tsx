@@ -1,11 +1,12 @@
+import { Card } from "common/src/components";
+import { breakpoints } from "common/src/modules/const";
 import React, { useMemo } from "react";
-import Link from "next/link";
 import { gql } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { formatters as getFormatters } from "common";
-import { Flex, H4, Strong } from "common/src/styled";
+import { Flex, fontMedium, Strong } from "common/src/styled";
 import {
   AccessType,
   type ReservationInfoCardFragment,
@@ -24,29 +25,26 @@ import { formatDateTimeRange, formatDuration } from "common/src/modules/date-uti
 import { getReservationUnitPath } from "@/modules/urls";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 
-const Wrapper = styled.div<{ $color: "gold" | "silver" }>`
-  --bg-color: var(${({ $color }) => ($color === "gold" ? "--color-gold-light" : "--color-silver-light")});
-  background-color: var(--bg-color);
-`;
-
-const MainImage = styled.img`
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  height: 291px;
-  object-fit: cover;
-`;
-
-const Content = styled(Flex).attrs({
-  $gap: "xs",
-})`
-  padding: 1px var(--spacing-m) var(--spacing-xs);
-`;
-
-const StyledLink = styled(Link)`
-  text-decoration: underline;
-  color: var(--color-black-90);
-  text-underline-offset: 4px;
+const InfoCard = styled(Card)`
+  && h2 {
+    margin: 0;
+    color: var(--color-black-90);
+    font-size: var(--fontsize-heading-s);
+    ${fontMedium};
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    @media (min-width: ${breakpoints.s}) {
+      font-size: var(--fontsize-heading-m);
+    }
+  }
+  [class*="Card__ImageWrapper"],
+  img {
+    height: 291px;
+    max-height: 291px;
+  }
+  .card-with-image {
+    gap: var(--spacing-xs);
+  }
 `;
 
 const Subheading = styled.p`
@@ -118,19 +116,19 @@ export function ReservationInfoCard({
 
   const unitName = reservationUnit.unit != null ? getTranslationSafe(reservationUnit.unit, "name", lang) : "-";
 
-  // TODO why does this not use the Card component?
   return (
-    <Wrapper $color={bgColor} className={className} style={style}>
-      {!disableImage && <MainImage src={imgSrc} alt={name} />}
-      <Content data-testid="reservation__reservation-info-card__content">
-        <H4 as="h2" $marginBottom="none">
-          <StyledLink
-            data-testid="reservation__reservation-info-card__reservationUnit"
-            href={getReservationUnitPath(reservationUnit.pk)}
-          >
-            {name}
-          </StyledLink>
-        </H4>
+    <InfoCard
+      variant="vertical"
+      backgroundColor={bgColor === "gold" ? "var(--color-gold-light)" : "var(--color-silver-light)"}
+      className={className}
+      style={{ ...style, height: "auto" }}
+      imageSrc={!disableImage ? imgSrc : undefined}
+      imageAlt={!disableImage ? name : undefined}
+      heading={name}
+      headingLevel={2}
+      link={getReservationUnitPath(reservationUnit.pk)}
+    >
+      <Flex data-testid="reservation__reservation-info-card__content" $gap="xs">
         {showReservationNumber && (
           <Subheading>
             {t("reservations:reservationNumber")}:{" "}
@@ -158,8 +156,8 @@ export function ReservationInfoCard({
             {shouldDisplayAccessCode && accessCode && `: ${accessCode}`}
           </div>
         )}
-      </Content>
-    </Wrapper>
+      </Flex>
+    </InfoCard>
   );
 }
 
