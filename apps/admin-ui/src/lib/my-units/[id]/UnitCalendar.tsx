@@ -3,11 +3,11 @@ import { addMinutes, differenceInMinutes, isToday, setHours, setMinutes, startOf
 import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
 import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
-import { useTranslation, type TFunction } from "next-i18next";
+import { type TFunction, useTranslation } from "next-i18next";
 import { CalendarEvent } from "common/src/calendar/Calendar";
 import { focusStyles } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { POST_PAUSE, PRE_PAUSE } from "@/common/calendarStyling";
+import { EVENT_BUFFER, NOT_RESERVABLE } from "@/common/calendarStyling";
 import { getReserveeName } from "@/common/util";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
 import { ReservationPopupContent } from "./ReservationPopupContent";
@@ -15,6 +15,8 @@ import eventStyleGetter from "./eventStyleGetter";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { isCellOverlappingSpan, TimeSpanType } from "common/src/calendar/util";
+import { IconClock } from "hds-react";
+import { formatTimeRange, timeForInput, timeToMinutes } from "common/src/date-utils";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 type Resource = {
@@ -37,9 +39,10 @@ const DESKTOP_MARGIN = 500;
 const MAX_RESOURCES_WITHOUT_SCROLL = 10;
 
 const TemplateProps: CSSProperties = {
-  zIndex: "var(--tilavaraus-admin-stack-calendar-buffer)",
-  height: `${CELL_HEIGHT}px`,
   position: "absolute",
+  top: "1px", // Show border on top of the cell
+  height: `${CELL_HEIGHT - 1}px`,
+  zIndex: "var(--tilavaraus-admin-stack-calendar-buffer)",
 };
 
 type EventStyleGetter = ({ event }: CalendarEventType) => {
@@ -101,7 +104,7 @@ const HeadingRow = styled.div`
   ${rowCommonCss}
 `;
 
-const Time = styled.div`
+const HeaderTime = styled.div`
   display: flex;
   align-items: center;
   border-left: ${CELL_BORDER};
@@ -136,13 +139,18 @@ const EventContent = styled.div`
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    padding: var(--spacing-xs);
-
-    margin: 0;
+    padding-left: var(--spacing-xs);
+    padding-right: var(--spacing-xs);
+    padding-top: var(--spacing-3-xs);
     position: absolute;
+    margin: 0;
     width: calc(100% - var(--spacing-xs) * 2);
     height: calc(100% - var(--spacing-xs) * 2);
     pointer-events: none;
+    font-size: var(--fontsize-body-s);
+  }
+  p:nth-child(2) {
+    top: calc(var(--spacing-xs) * 1.5);
   }
 `;
 
@@ -162,13 +170,34 @@ const HideTimesOverTitles = styled.div`
   z-index: var(--tilavaraus-admin-stack-calendar-header-names);
 `;
 
-const Container = styled.div<{ $height: number | "auto" }>`
+const Container = styled.div<{ $height: number | "auto"; $isLoading: boolean }>`
   max-width: 100%;
   overflow: auto;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
 
   height: ${({ $height }) => (typeof $height === "number" ? `${$height}px` : "auto")};
+  background: ${({ $isLoading }) => ($isLoading ? "var(--color-black-10)" : "transparent")};
+`;
+
+const EventContainer = styled.div`
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+`;
+
+const CellStyled = styled.div`
+  height: 100%;
+  width: 100%;
+  border-left: ${CELL_BORDER};
+  border-top: ${CELL_BORDER};
+  cursor: pointer;
+
+  &:focus {
+    ${focusStyles};
+    z-index: var(--tilavaraus-admin-stack-calendar-pick-time-focus);
+  }
 `;
 
 function RowCells({ hasPermission, cols, ...rest }: CellProps): JSX.Element {
@@ -192,18 +221,31 @@ type CellProps = {
   reservableTimeSpans: TimeSpanType[];
 };
 
-const CellStyled = styled.div<{ $isPast?: boolean }>`
-  ${({ $isPast }) => ($isPast ? "background: var(--tilavaraus-event-booking-past-date);" : "")}
-  height: 100%;
-  width: 100%;
-  border-left: ${CELL_BORDER};
-  border-top: ${CELL_BORDER};
+function getIsCellClosed(offset: number, reservableTimeSpans: TimeSpanType[], selectedDate: Date): boolean {
+  // Use date from the first reservable time span instead of `date` to prevent flickering when day is changed, which
+  // causes an API request and `reservableTimeSpans` contains `previousData`, but `selectedDate` has already changed
+  const reservableStartTimeDate = reservableTimeSpans[0]?.start ?? selectedDate;
 
-  &:focus {
-    ${focusStyles};
-    z-index: var(--tilavaraus-admin-stack-calendar-pick-time-focus);
+  if (reservableTimeSpans.length === 0 || !reservableTimeSpans[0]?.start) {
+    return false; // Don't show as closed if reservable time spans are not yet loaded
   }
-`;
+
+  const isOpen = reservableTimeSpans.some((span) => {
+    // Cell start is at e.g. 8:00 for offset 16, 8:30 for offset 17
+    // Cell end is at e.g. 8:30 for offset 16, 9:00 for offset 17
+    const cellHours = Math.floor(offset / 2);
+    const cellMinutes = (offset * 30) % 60;
+
+    const cellStart = setMinutes(setHours(reservableStartTimeDate, cellHours), cellMinutes);
+    const cellEnd = addMinutes(cellStart, 30);
+
+    // Cell is open, if it overlaps with any reservable time span
+    // i.e. if the cell start is after the span end or the cell end is before the span start
+    return isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end);
+  });
+
+  return !isOpen;
+}
 
 /// Focusable cell that opens the reservation modal
 function Cell({
@@ -222,28 +264,7 @@ function Cell({
   const now = new Date();
   const isPast = setHours(date, Math.round(offset / 2)) < now;
 
-  // Use date from the first reservable time span instead of `date` to prevent flickering when day is changed, which
-  // causes an API request and `reservableTimeSpans` contains `previousData`, but `date` is already the changed date
-  const reservableStartTimeDate = reservableTimeSpans[0]?.start ?? date;
-
-  // Check if the cell is open (is inside any reservable time span) and invert the result
-  const isClosed =
-    reservableTimeSpans.length > 0 && // Don't show as closed if reservable time spans are not yet loaded
-    reservableTimeSpans[0]?.start &&
-    !reservableTimeSpans.some((span) => {
-      // Cell start is at e.g. 8:00 for offset 16, 8:30 for offset 17
-      // Cell end is at e.g. 8:30 for offset 16, 9:00 for offset 17
-      const cellHours = Math.floor(offset / 2);
-      const cellMinutes = (offset * 30) % 60;
-
-      const cellStart = setMinutes(setHours(reservableStartTimeDate, cellHours), cellMinutes);
-      const cellEnd = addMinutes(cellStart, 30);
-
-      // Cell is closed, if it doesn't overlap with any reservable time span
-      // i.e. if the cell start is after the span end or the cell end is before the span start
-
-      return isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end);
-    });
+  const isClosed = getIsCellClosed(offset, reservableTimeSpans, date);
 
   const handleOpenModal = () => {
     if (!hasPermission) {
@@ -274,9 +295,9 @@ function Cell({
       ref={ref}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      $isPast={isPast || isClosed}
       tabIndex={isPast || isClosed ? -1 : 0}
       data-testid={`UnitCalendar__RowCalendar--cell-${cellId}`}
+      style={isPast || isClosed ? NOT_RESERVABLE.style : undefined}
     />
   );
 }
@@ -285,73 +306,68 @@ function PreBuffer({
   event,
   hourPercent,
   left,
-  style,
 }: {
   event: CalendarEventType;
   hourPercent: number;
   left: string;
-  style?: CSSProperties;
 }): JSX.Element | null {
-  const buffer = event.event?.bufferTimeBefore;
   const { t } = useTranslation();
 
-  if (buffer) {
-    const width = `${(hourPercent * buffer) / 3600}%`;
-    return (
-      <div
-        style={{
-          ...PRE_PAUSE.style,
-          ...style,
-          left: `calc(${left} - ${width})`,
-          width,
-        }}
-        title={t("myUnits:Calendar.legend.pause")}
-        key={`${event.event?.pk}-pre`}
-      />
-    );
-  }
-  return null;
+  const buffer = event.event?.bufferTimeBefore;
+  if (buffer == null) return null;
+
+  const width = `${(hourPercent * buffer) / 3600}%`;
+  return (
+    <div
+      style={{
+        ...EVENT_BUFFER.style,
+        ...TemplateProps,
+        left: `calc(${left} - ${width})`,
+        width,
+      }}
+      title={t("myUnits:Calendar.legend.pause")}
+      key={`${event.event?.pk}-pre`}
+    >
+      <IconClock />
+    </div>
+  );
 }
 
 function PostBuffer({
   event,
   hourPercent,
   right,
-  style,
 }: {
   event: CalendarEventType;
   hourPercent: number;
   right: string;
-  style?: CSSProperties;
 }): JSX.Element | null {
-  const buffer = event.event?.bufferTimeAfter;
   const { t } = useTranslation();
 
-  if (buffer == null) {
-    return null;
-  }
+  const buffer = event.event?.bufferTimeAfter;
+  if (buffer == null) return null;
 
   const width = `calc(${(hourPercent * buffer) / 3600}% - 1px)`;
   return (
     <div
       style={{
-        ...POST_PAUSE.style,
-        ...style,
+        ...EVENT_BUFFER.style,
+        ...TemplateProps,
         left: right,
         width,
       }}
       title={t("myUnits:Calendar.legend.pause")}
       key={`${event.event?.pk}-post`}
-    />
+    >
+      <IconClock />
+    </div>
   );
 }
 
 function getEventTitle({ reservation: { title, event }, t }: { reservation: CalendarEventType; t: TFunction }) {
-  if (event?.type === ReservationTypeChoice.Blocked) {
-    return t("myUnits:Calendar.legend.closed");
-  }
-
-  return event && event?.pk !== event?.reservationUnit?.pk ? getReserveeName(event, t) : title;
+  if (event?.type === ReservationTypeChoice.Blocked) return t("myUnits:Calendar.legend.closed");
+  if (event && event?.pk !== event?.reservationUnit?.pk) return getReserveeName(event, t);
+  return title;
 }
 
 const EventTriggerButton = () => (
@@ -367,19 +383,7 @@ const EventTriggerButton = () => (
   />
 );
 
-const EventContainer = styled.div`
-  position: absolute;
-  width: 100%;
-  top: 0;
-  left: 0;
-`;
-
-type EventProps = {
-  event: CalendarEventType;
-  styleGetter: EventStyleGetter;
-};
-
-function Event({ event, styleGetter }: EventProps): JSX.Element {
+function Event({ event, styleGetter }: { event: CalendarEventType; styleGetter: EventStyleGetter }): JSX.Element {
   const { t } = useTranslation();
 
   const title = getEventTitle({ reservation: event, t });
@@ -387,19 +391,18 @@ function Event({ event, styleGetter }: EventProps): JSX.Element {
   const endDate = new Date(event.end);
 
   const durationMinutes = differenceInMinutes(endDate, start);
-
   const startMinutes = start.getHours() * 60 + start.getMinutes();
   const hours = startMinutes / 60;
-
   const hourPercent = 100 / N_HOURS;
 
   const left = `${hourPercent * hours}%`;
   const right = `calc(${left} + ${durationMinutes / 60} * ${100 / N_HOURS}% + 1px)`;
 
+  const timeRange = formatTimeRange(timeToMinutes(timeForInput(event.start)), timeToMinutes(timeForInput(event.end)));
   const reservation = event.event;
   return (
     <>
-      <PreBuffer event={event} hourPercent={hourPercent} left={left} style={TemplateProps} />
+      <PreBuffer event={event} hourPercent={hourPercent} left={left} />
       <div
         style={{
           left,
@@ -412,6 +415,7 @@ function Event({ event, styleGetter }: EventProps): JSX.Element {
           style={{ ...styleGetter(event).style }}
           data-testid={`UnitCalendar__RowCalendar--event-${reservation?.pk}`}
         >
+          <p>{timeRange}</p>
           <p>{title}</p>
           {/* NOTE don't set position on Popup it breaks responsiveness */}
           <Popup trigger={EventTriggerButton}>
@@ -419,7 +423,7 @@ function Event({ event, styleGetter }: EventProps): JSX.Element {
           </Popup>
         </EventContent>
       </div>
-      <PostBuffer event={event} hourPercent={hourPercent} right={right} style={TemplateProps} />
+      <PostBuffer event={event} hourPercent={hourPercent} right={right} />
     </>
   );
 }
@@ -516,20 +520,18 @@ export function UnitCalendar({
   const height = resources.length > MAX_RESOURCES_WITHOUT_SCROLL ? containerHeight : "auto";
 
   return (
-    <Container
-      $height={height}
-      style={{ background: isLoading ? "var(--tilavaraus-event-booking-past-date)" : "transparent" }}
-    >
+    <Container $height={height} $isLoading={isLoading}>
       <HideTimesOverTitles />
       <FlexContainer $numCols={N_COLS} ref={calendarRef}>
         <HeadingRow>
           <div />
           <CellContent $numCols={N_HOURS} key="header" className="calendar-header">
-            {Array.from(Array(N_HOURS).keys()).map((i, index) => (
-              <Time key={i}>{index}</Time>
+            {Array.from(Array(N_HOURS).keys()).map((i, hour) => (
+              <HeaderTime key={i}>{hour}</HeaderTime>
             ))}
           </CellContent>
         </HeadingRow>
+
         {orderedResources.map((row) => (
           <Row key={row.pk}>
             <ResourceNameContainer title={row.title} $isDraft={row.isDraft}>
