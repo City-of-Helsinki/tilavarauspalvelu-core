@@ -1,4 +1,6 @@
 import { breakpoints } from "common/src/modules/const";
+import { Flex } from "common/src/styled";
+import { Stepper } from "hds-react";
 import styled from "styled-components";
 
 const CARD_COLUMN_SIZE = 390;
@@ -24,5 +26,32 @@ export const ReservationUnitPageWrapper = styled(ReservationPageWrapper)`
   }
   @media (min-width: ${breakpoints.l}) {
     grid-template-columns: 2fr 1fr;
+  }
+`;
+
+export const NewReservationForm = styled.form`
+  display: flex;
+  gap: var(--spacing-m);
+  flex-direction: column;
+
+  grid-column: 1 / -1;
+  grid-row: 3;
+  @media (min-width: ${breakpoints.m}) {
+    grid-column: span 1;
+    grid-row: 2 / -1;
+  }
+`;
+
+export const ReservationTitleSection = styled(Flex)`
+  grid-column: 1 / -1;
+  @media (min-width: ${breakpoints.m}) {
+    grid-column: span 1;
+  }
+`;
+
+// HDS uses fixed width for the stepper content, make sure it's long enough for all variations (single line).
+export const ReservationStepper = styled(Stepper)`
+  & {
+    --hds-step-width: 155px;
   }
 `;
