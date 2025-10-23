@@ -4,7 +4,7 @@ import { IconArrowRight, IconLinkExternal } from "hds-react";
 import { type TFunction, useTranslation } from "next-i18next";
 import { type ApplicationRoundCardFragment, ApplicationRoundStatusChoice } from "@gql/gql-types";
 import { isValid } from "date-fns";
-import Card from "common/src/components/Card";
+import { Card } from "common/src/components";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { getApplicationRoundPath } from "@/modules/urls";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
