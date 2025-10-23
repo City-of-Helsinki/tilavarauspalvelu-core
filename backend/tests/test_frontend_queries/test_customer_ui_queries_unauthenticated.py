@@ -389,6 +389,15 @@ def test_frontend_queries__customer_ui__ReservationUnitPage__unauthenticated(gra
 
     assert response.has_errors is False, response.errors
 
+def test_frontend_queries__customer_ui__ReservationUnitMoreDetails__unauthenticated(graphql):
+    customer_factories = get_customer_query_info()
+    factories = customer_factories["ReservationUnitPage"]
+
+    assert len(factories) == 1
+    query_info = factories[0]
+
+def test_frontend_queries__customer_ui__ReservationUnitTimeSpans__unauthenticated(graphql):
+    pass
 
 def test_frontend_queries__customer_ui__SearchReservationUnits__unauthenticated(graphql):
     customer_factories = get_customer_query_info()
