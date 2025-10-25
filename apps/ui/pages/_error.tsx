@@ -3,7 +3,7 @@ import type { NextPage } from "next";
 import Error, { type ErrorProps } from "next/error";
 import { ErrorContainer } from "common/src/components";
 import { env } from "@/env.mjs";
-import { getApiErrors } from "common/src/apolloUtils";
+import { getApiErrors } from "common/src/modules/apolloUtils";
 
 const CustomErrorComponent: NextPage<ErrorProps> = (props) => {
   return <ErrorContainer title={props.title} statusCode={props.statusCode} feedbackUrl={env.EMAIL_VARAAMO_EXT_LINK} />;

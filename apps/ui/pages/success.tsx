@@ -7,7 +7,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { CenterSpinner } from "common/styled";
-import { ignoreMaybeArray } from "common/src/helpers";
+import { ignoreMaybeArray } from "common/src/modules/helpers";
 import { gql } from "@apollo/client";
 
 const POLL_INTERVAL_MS = 500;

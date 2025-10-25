@@ -3,7 +3,7 @@ import { getReservationUnitInstructionsKey, Instructions } from "./Instructions"
 import { type InstructionsFragment, ReservationStateChoice } from "@gql/gql-types";
 import { describe, expect, it } from "vitest";
 import { createMockReservation } from "@test/reservation.mocks";
-import { getTranslationSafe } from "common/src/common/util";
+import { getTranslationSafe } from "common/src/modules/util";
 
 const customRender = (reservation: InstructionsFragment): ReturnType<typeof render> =>
   render(<Instructions reservation={reservation} />);

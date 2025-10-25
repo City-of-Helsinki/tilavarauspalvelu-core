@@ -9,10 +9,10 @@ import { getSingleSearchPath } from "@/modules/urls";
 import { ReservationUnitSearch } from "./ReservationUnitSearch";
 import { pixel } from "@/styled/util";
 import { Flex, H3, anchorStyles, focusStyles } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import { ShowAllContainer } from "common/src/components";
-import { getTranslationSafe } from "common/src/common/util";
-import { getLocalizationLang } from "common/src/helpers";
+import { getTranslationSafe } from "common/src/modules/util";
+import { getLocalizationLang } from "common/src/modules/helpers";
 import { gql } from "@apollo/client";
 
 const Top = styled(Flex).attrs({

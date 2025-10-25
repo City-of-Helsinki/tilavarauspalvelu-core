@@ -4,7 +4,7 @@ import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { type CreateMockApplicationFragmentProps, createMockApplicationViewFragment } from "@test/application.mocks";
-import { createNodeId } from "common/src/helpers";
+import { createNodeId } from "common/src/modules/helpers";
 import userEvent from "@testing-library/user-event";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 

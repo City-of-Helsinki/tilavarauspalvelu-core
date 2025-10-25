@@ -12,8 +12,8 @@ import { H1 } from "common/styled";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { Sanitize } from "common/src/components/Sanitize";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
-import { ignoreMaybeArray } from "common/src/helpers";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
+import { ignoreMaybeArray } from "common/src/modules/helpers";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

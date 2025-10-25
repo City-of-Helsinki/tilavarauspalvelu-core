@@ -4,7 +4,7 @@ import { type ApprovalButtonsFragment, ReservationStateChoice } from "@gql/gql-t
 import { addDays, addMinutes } from "date-fns";
 import { ApprovalButtons } from "./ApprovalButtons";
 import { describe, expect, test, vi } from "vitest";
-import { createNodeId } from "common/src/helpers";
+import { createNodeId } from "common/src/modules/helpers";
 
 const wrappedRender = (reservation: ApprovalButtonsFragment) => {
   return render(<ApprovalButtons isFree reservation={reservation} handleClose={vi.fn()} handleAccept={vi.fn()} />);

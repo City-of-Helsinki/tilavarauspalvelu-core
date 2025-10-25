@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconCross, IconPen, LoadingSpinner } from "hds-react";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import {
   type ApplicationCardFragment,
   type ApplicationNameFragment,
@@ -18,7 +18,7 @@ import Card from "common/src/components/Card";
 import { getApplicationPath } from "@/modules/urls";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
 import { gql } from "@apollo/client";
-import { convertLanguageCode } from "common/src/common/util";
+import { convertLanguageCode } from "common/src/modules/util";
 
 const StyledButton = styled(Button)`
   @media (max-width: ${breakpoints.s}) {

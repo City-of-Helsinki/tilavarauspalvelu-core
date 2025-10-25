@@ -1,4 +1,4 @@
-import { getLocalizationLang } from "common/src/helpers";
+import { getLocalizationLang } from "common/src/modules/helpers";
 import React from "react";
 import { gql } from "@apollo/client";
 import { type ReservationInfoSectionFragment } from "@gql/gql-types";

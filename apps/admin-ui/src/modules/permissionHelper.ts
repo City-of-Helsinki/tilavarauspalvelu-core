@@ -1,4 +1,4 @@
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/modules/helpers";
 import { UserPermissionChoice, type CurrentUserQuery } from "@gql/gql-types";
 import { gql } from "@apollo/client";
 

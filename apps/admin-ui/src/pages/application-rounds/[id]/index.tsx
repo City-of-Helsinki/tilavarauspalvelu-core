@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { errorToast } from "common/src/components/toast";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { isApplicationRoundInProgress } from "@/modules/helpers";
 import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "common/styled";
 import { Button, Tabs } from "hds-react";

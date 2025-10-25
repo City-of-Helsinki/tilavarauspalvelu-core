@@ -8,7 +8,7 @@ import {
 import { useTranslation } from "next-i18next";
 import { formatApiDate } from "common/src/date-utils";
 import { errorToast } from "common/src/components/toast";
-import { createNodeId } from "common/src/helpers";
+import { createNodeId } from "common/src/modules/helpers";
 import { type CalendarEventType } from "@/modules/reservation";
 import { combineAffectingReservations } from "@/modules/helpers";
 

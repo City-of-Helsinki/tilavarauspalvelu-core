@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Option, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { convertOptionToHDS, toNumber } from "common/src/helpers";
+import { convertOptionToHDS, toNumber } from "common/src/modules/helpers";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";

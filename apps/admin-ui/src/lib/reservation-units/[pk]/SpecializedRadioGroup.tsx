@@ -4,7 +4,7 @@ import type { ReservationUnitEditFormValues } from "./form";
 import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import { ControlledRadioGroup } from "common/src/components/form";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import { getTranslatedError } from "@/modules/util";
 
 export function SpecializedRadioGroup({

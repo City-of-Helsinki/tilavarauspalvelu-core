@@ -1,8 +1,8 @@
 import { env } from "@/env.mjs";
 import { ApplicationStatusChoice } from "@gql/gql-types";
 
-export { isBrowser } from "common/src/helpers";
-export { getSignOutUrl } from "common/src/urlBuilder";
+export { isBrowser } from "common/src/modules/helpers";
+export { getSignOutUrl } from "common/src/modules/urlBuilder";
 
 export const PUBLIC_URL = env.NEXT_PUBLIC_BASE_URL ?? "";
 

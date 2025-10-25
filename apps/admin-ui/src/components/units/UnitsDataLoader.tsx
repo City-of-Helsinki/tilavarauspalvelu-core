@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
 import { UnitOrderingChoices, useUnitListQuery } from "@gql/gql-types";
-import { filterEmptyArray, filterNonNullable, mapParamToInteger } from "common/src/helpers";
+import { filterEmptyArray, filterNonNullable, mapParamToInteger } from "common/src/modules/helpers";
 import { errorToast } from "common/src/components/toast";
 import { LARGE_LIST_PAGE_SIZE } from "@/modules/const";
 import { More } from "@/components/More";

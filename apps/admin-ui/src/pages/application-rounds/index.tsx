@@ -10,7 +10,7 @@ import {
   type ApplicationRoundListElementFragment,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/modules/helpers";
 import { getApplicationRoundUrl } from "@/modules/urls";
 import { truncate } from "@/modules/helpers";
 import { ApplicationRoundCard } from "@lib/application-rounds";

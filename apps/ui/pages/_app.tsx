@@ -14,7 +14,7 @@ import { updateSentryConfig } from "@/instrumentation-client";
 import { ToastContainer } from "common/src/components/toast";
 import { CookieBanner, CookieConsentContextProvider } from "hds-react";
 import sitesettings from "./sitesettings.json";
-import { convertLanguageCode } from "common/src/common/util";
+import { convertLanguageCode } from "common/src/modules/util";
 import { ANALYTICS_COOKIE_GROUP_NAME, isBrowser } from "@/modules/const";
 
 /// check if the user has accepted the statistics cookies

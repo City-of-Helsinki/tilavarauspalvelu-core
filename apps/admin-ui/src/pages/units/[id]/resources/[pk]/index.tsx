@@ -1,6 +1,6 @@
 import React from "react";
 import { ResourceEditor } from "@lib/units/[id]/resources/[pk]/ResourceEditor";
-import { ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";

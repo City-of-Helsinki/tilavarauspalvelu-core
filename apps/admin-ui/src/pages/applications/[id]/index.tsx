@@ -5,8 +5,8 @@ import { Button, ButtonSize, ButtonVariant, IconArrowRedo, IconCross, LoadingSpi
 import { isEqual, trim } from "lodash-es";
 import { type ApolloQueryResult, gql } from "@apollo/client";
 import { CenterSpinner, Flex, fontMedium, H1, H3, H4, TitleSection } from "common/styled";
-import { breakpoints } from "common/src/const";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { breakpoints } from "common/src/modules/const";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import {
   type ApplicationAdminQuery,
   type ApplicationPageFieldsFragment,

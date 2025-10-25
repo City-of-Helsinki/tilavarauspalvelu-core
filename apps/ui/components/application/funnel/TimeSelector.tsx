@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant, Notification, NotificationSize } from "hds-react";
 import { useFormContext } from "react-hook-form";
 import { AutoGrid, Flex } from "common/styled";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/modules/helpers";
 import { ControlledSelect } from "common/src/components/form";
 import {
   ApplicationTimeSelector,
@@ -18,7 +18,7 @@ import { gql } from "@apollo/client";
 import { aesToCells, covertCellsToTimeRange } from "./timeSelectorModule";
 import { type ApplicationPage2FormValues } from "./form";
 import { TimePreview } from ".";
-import { convertWeekday } from "common/src/conversion";
+import { convertWeekday } from "common/src/modules/conversion";
 
 export type TimeSelectorProps = {
   index: number;

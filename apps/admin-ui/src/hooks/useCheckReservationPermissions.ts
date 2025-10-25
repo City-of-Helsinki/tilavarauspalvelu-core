@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useCheckPermission } from "./useCheckPermission";
-import { createNodeId, filterNonNullable } from "common/src/helpers";
+import { createNodeId, filterNonNullable } from "common/src/modules/helpers";
 import { useReservationPermissionsQuery, UserPermissionChoice } from "@gql/gql-types";
 
 /// @param pk - Primary key of the reservation

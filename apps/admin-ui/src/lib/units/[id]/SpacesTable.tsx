@@ -10,7 +10,7 @@ import { NewSpaceModal } from "./new-space-modal/NewSpaceModal";
 import { errorToast } from "common/src/components/toast";
 import { CustomTable } from "@/components/Table";
 import { getSpaceUrl } from "@/modules/urls";
-import { truncate } from "common/src/helpers";
+import { truncate } from "common/src/modules/helpers";
 import { MAX_NAME_LENGTH } from "@/modules/const";
 import { TableLink } from "@/styled";
 import { Flex } from "common/styled";

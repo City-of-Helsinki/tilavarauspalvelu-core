@@ -21,8 +21,8 @@ import { RadioButtonWithImage } from "./RadioButtonWithImage";
 import { AutoGrid, fontMedium, fontRegular, H4, H5 } from "../../styled";
 import type { OptionsRecord } from "../../types/common";
 import IconPremises from "../icons/IconPremises";
-import { containsField } from "../metaFieldsHelpers";
-import { filterNonNullable } from "../helpers";
+import { containsField } from "../modules/metaFieldsHelpers";
+import { filterNonNullable } from "../modules/helpers";
 
 type CommonProps = {
   options: Readonly<Omit<OptionsRecord, "municipality">>;

@@ -12,7 +12,7 @@ import {
   useListReservationsQuery,
   ReservationTypeChoice,
 } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/modules/helpers";
 import { useSession } from "@/hooks";
 import { ReservationCard } from "@/components/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";

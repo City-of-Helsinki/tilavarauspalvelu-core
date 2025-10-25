@@ -6,10 +6,10 @@ import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { addYears } from "date-fns";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "common/src/date-utils";
 import { Flex, H4 } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import {
   CreateReservationDocument,
   type CreateReservationMutation,
@@ -20,7 +20,7 @@ import {
   type ReservationUnitPageQueryVariables,
   useCreateReservationMutation,
 } from "@gql/gql-types";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { Sanitize } from "common/src/components/Sanitize";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getPostLoginUrl } from "@/modules/util";
@@ -65,7 +65,7 @@ import {
   useReservableTimes,
 } from "@/hooks";
 import { gql } from "@apollo/client";
-import { type ApiError, getApiErrors } from "common/src/apolloUtils";
+import { type ApiError, getApiErrors } from "common/src/modules/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
 import { errorToast } from "common/src/components/toast";
 import { QuickReservation } from "@/components/QuickReservation";

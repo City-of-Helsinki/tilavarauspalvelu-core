@@ -1,10 +1,10 @@
 import { type EditPageReservationFragment, useAdjustReservationTimeMutation } from "@gql/gql-types";
 import { Button, ButtonVariant, IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/modules/helpers";
 import { errorToast } from "common/src/components/toast";
 import { ApplicationFields, GeneralFields } from "./SummaryFields";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";

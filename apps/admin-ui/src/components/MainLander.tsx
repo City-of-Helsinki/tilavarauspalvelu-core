@@ -3,13 +3,13 @@ import IconButton from "common/src/components/IconButton";
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { signIn } from "common/src/browserHelpers";
+import { signIn } from "common/src/modules/browserHelpers";
 import { Button, IconArrowRight, IconGroup, IconLinkExternal } from "hds-react";
 import { fontBold, H2 } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import { HERO_IMAGE_URL } from "@/modules/const";
 import { KorosHeading, Heading } from "./KorosHeading";
-import { getLocalizationLang } from "common/src/helpers";
+import { getLocalizationLang } from "common/src/modules/helpers";
 
 const LoginBtn = styled(Button)`
   --background-color: var(--color-white);

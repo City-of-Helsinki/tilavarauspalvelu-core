@@ -26,9 +26,9 @@ import {
 } from "common/src/date-utils";
 import { getReserveeName } from "@/modules/util";
 import { getReserveeTypeTranslationKey } from "@/modules/helpers";
-import { filterNonNullable, sort, toNumber } from "common/src/helpers";
+import { filterNonNullable, sort, toNumber } from "common/src/modules/helpers";
 import { gql } from "@apollo/client";
-import { convertWeekday } from "common/src/conversion";
+import { convertWeekday } from "common/src/modules/conversion";
 import { type CalendarEvent } from "common/src/calendar/Calendar";
 
 export type EventType = EventStyleReservationFieldsFragment;

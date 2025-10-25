@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation, type TFunction } from "next-i18next";
 import { Select } from "hds-react";
 import { UnitSpacesQuery, useUnitSpacesQuery } from "@gql/gql-types";
-import { createNodeId, convertOptionToHDS, filterNonNullable, toNumber } from "common/src/helpers";
+import { createNodeId, convertOptionToHDS, filterNonNullable, toNumber } from "common/src/modules/helpers";
 import { gql } from "@apollo/client";
 
 function spacesAsHierarchy(unit: UnitSpacesQuery["unit"] | undefined, paddingChar: string) {

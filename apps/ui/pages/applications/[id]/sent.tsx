@@ -9,7 +9,7 @@ import { applicationsPath, applicationsPrefix, getApplicationPath } from "@/modu
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { gql } from "@apollo/client";
 import { ApplicationSentPageDocument, type ApplicationSentPageQuery } from "@/gql/gql-types";
 import { createApolloClient } from "@/modules/apolloClient";

@@ -3,7 +3,7 @@ import { generateReservations } from "./generateReservations";
 import { formatDate } from "common/src/date-utils";
 import { describe, expect, test } from "vitest";
 import { Weekday } from "@gql/gql-types";
-import { WEEKDAYS_SORTED } from "common/src/const";
+import { WEEKDAYS_SORTED } from "common/src/modules/const";
 
 function createInput({
   startingDate,

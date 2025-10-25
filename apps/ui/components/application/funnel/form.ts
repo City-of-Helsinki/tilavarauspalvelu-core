@@ -1,5 +1,5 @@
 import { startOfDay } from "date-fns";
-import { filterNonNullable, type ReadonlyDeep } from "common/src/helpers";
+import { filterNonNullable, type ReadonlyDeep } from "common/src/modules/helpers";
 import {
   type ApplicantFieldsFragment,
   type ApplicationFormFragment,

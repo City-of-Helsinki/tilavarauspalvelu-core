@@ -12,7 +12,7 @@ import { useModal } from "@/context/ModalContext";
 import { Flex } from "common/styled";
 import { getReservationPriceDetails } from "@/modules/reservation";
 import { successToast } from "common/src/components/toast";
-import { toNumber } from "common/src/helpers";
+import { toNumber } from "common/src/modules/helpers";
 import { gql } from "@apollo/client";
 import { useDisplayError } from "common/src/hooks";
 

@@ -1,4 +1,4 @@
-import { capitalize } from "../helpers";
+import { capitalize } from "./helpers";
 
 export const chunkArray = <T>(array: T[], size: number): T[][] => {
   const result = [];

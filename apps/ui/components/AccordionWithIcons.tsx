@@ -3,7 +3,7 @@ import { IconAngleDown, IconAngleUp, useAccordion } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Flex, toggleButtonCss, truncatedText } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 
 type Props = {
   heading: string;

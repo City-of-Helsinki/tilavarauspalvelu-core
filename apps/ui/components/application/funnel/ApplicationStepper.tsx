@@ -3,12 +3,12 @@ import { Stepper as HDSStepper, StepState } from "hds-react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { type ApplicationFormFragment } from "@/gql/gql-types";
-import { type ReadonlyDeep } from "common/src/helpers";
+import { type ReadonlyDeep } from "common/src/modules/helpers";
 import { validateApplication } from "./form";
 import { isSent } from "@/modules/util";
 import { getApplicationPath } from "@/modules/urls";
 import styled from "styled-components";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 
 // Ordered list of steps by page slug
 export const PAGES_WITH_STEPPER = ["page1", "page2", "page3", "page4"] as const;

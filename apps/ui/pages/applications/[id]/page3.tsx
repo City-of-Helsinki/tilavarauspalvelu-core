@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { gql } from "@apollo/client";
 import { AutoGrid, ButtonContainer, Flex } from "common/styled";
 import { useDisplayError } from "common/src/hooks";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import {
   type ApplicationPage3FormValues,
   ApplicationPage3Schema,

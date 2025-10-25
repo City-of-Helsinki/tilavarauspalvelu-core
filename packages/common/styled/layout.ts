@@ -1,5 +1,5 @@
 import { css } from "styled-components";
-import { breakpoints } from "../src/const";
+import { breakpoints } from "../src/modules/const";
 
 // the dynamic side margins for the page layout
 // NOTE these are copied from HDS --header-margin but it's a local variable so we can't use it here

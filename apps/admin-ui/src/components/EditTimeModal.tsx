@@ -31,10 +31,10 @@ import { BufferToggles } from "@/components/BufferToggles";
 import { useCheckCollisions } from "@/hooks";
 import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
 import { gql } from "@apollo/client";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/modules/helpers";
 import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
-import { convertWeekday } from "common/src/conversion";
+import { convertWeekday } from "common/src/modules/conversion";
 
 const StyledForm = styled.form`
   margin-top: var(--spacing-m);

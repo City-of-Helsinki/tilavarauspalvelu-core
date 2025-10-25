@@ -1,7 +1,7 @@
 import React, { Ref, forwardRef } from "react";
 import styled from "styled-components";
 import { IconAlertCircleFill } from "hds-react";
-import { breakpoints } from "../../const";
+import { breakpoints } from "../../modules/const";
 
 const TimeInputContainer = styled.div`
   --border-width: 2px;

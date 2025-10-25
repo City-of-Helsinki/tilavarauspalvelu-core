@@ -7,8 +7,8 @@ import {
   ignoreMaybeArray,
   mapParamToInteger,
   toNumber,
-} from "common/src/helpers";
-import { type LocalizationLanguages } from "common/src/urlBuilder";
+} from "common/src/modules/helpers";
+import { type LocalizationLanguages } from "common/src/modules/urlBuilder";
 import {
   EquipmentOrderingChoices,
   type Maybe,
@@ -23,13 +23,13 @@ import {
   ReservationUnitTypeOrderingChoices,
   UnitOrderingChoices,
 } from "@gql/gql-types";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { parseUIDate, formatApiDate } from "common/src/date-utils";
 import { startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "./const";
 import { gql, type ApolloClient } from "@apollo/client";
 import { type ReadonlyURLSearchParams } from "next/navigation";
-import { transformAccessTypeSafe } from "common/src/conversion";
+import { transformAccessTypeSafe } from "common/src/modules/conversion";
 import { type OptionsListT, type OptionT } from "common/src/modules/search";
 
 function transformOrderByName(desc: boolean, language: LocalizationLanguages) {

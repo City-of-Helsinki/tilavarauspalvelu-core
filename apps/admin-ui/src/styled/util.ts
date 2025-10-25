@@ -1,7 +1,7 @@
 import { Accordion as AccordionBase, Dialog } from "hds-react";
 import styled, { css } from "styled-components";
 import { fontMedium } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import Link from "next/link";
 
 export const TableLink = styled(Link)`

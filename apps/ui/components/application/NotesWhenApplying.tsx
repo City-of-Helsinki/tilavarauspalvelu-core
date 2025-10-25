@@ -1,11 +1,11 @@
 import { ApplicationRoundNode } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { getTranslationSafe } from "common/src/common/util";
-import { getLocalizationLang } from "common/src/helpers";
+import { getTranslationSafe } from "common/src/modules/util";
+import { getLocalizationLang } from "common/src/modules/helpers";
 import { Sanitize } from "common/src/components/Sanitize";
 import { H4 } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 
 const NotesBox = styled.div`
   box-sizing: border-box;

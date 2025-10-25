@@ -9,10 +9,10 @@ import {
   type ApplicationRoundCriteriaQueryVariables,
 } from "@gql/gql-types";
 import { Flex, H1 } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import { Sanitize } from "common/src/components/Sanitize";
-import { createNodeId, capitalize, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { createNodeId, capitalize, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { gql } from "@apollo/client";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { getCommonServerSideProps } from "@/modules/serverUtils";

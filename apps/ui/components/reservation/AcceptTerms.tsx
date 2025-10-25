@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { Sanitize } from "common/src/components/Sanitize";
 import { type TermsOfUseTextFieldsFragment, type Maybe, type TermsOfUseFragment } from "@/gql/gql-types";
 import { Flex } from "common/styled";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 
 export function AcceptTerms({
   reservationUnit,
