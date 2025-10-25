@@ -4,7 +4,7 @@ import { gql } from "@apollo/client";
 import { ReservationUnitOrderingChoices, useSearchReservationUnitsQuery } from "@gql/gql-types";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/modules/const";
-import { More } from "@/component/More";
+import { More } from "@/components/More";
 import { ReservationUnitsTable } from "./ReservationUnitsTable";
 import { errorToast } from "common/src/components/toast";
 import { CenterSpinner } from "common/styled";

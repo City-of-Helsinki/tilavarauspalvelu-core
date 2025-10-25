@@ -6,7 +6,7 @@ import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { useDeleteResourceMutation, type Maybe, type ResourceTableFragment } from "@gql/gql-types";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { getResourceUrl } from "@/modules/urls";
-import { CustomTable } from "@/component/Table";
+import { CustomTable } from "@/components/Table";
 import { successToast } from "common/src/components/toast";
 import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/modules/const";

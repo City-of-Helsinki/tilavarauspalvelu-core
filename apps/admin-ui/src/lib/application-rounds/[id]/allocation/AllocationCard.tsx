@@ -7,7 +7,7 @@ import { type ApplicationSectionAllocationsQuery, Priority } from "@gql/gql-type
 import { filterNonNullable } from "common/src/helpers";
 import { Flex, fontMedium, H5, SemiBold, Strong } from "common/styled";
 import { formatDuration, timeToMinutes } from "common/src/date-utils";
-import { Accordion } from "@/component/Accordion";
+import { Accordion } from "@/components/Accordion";
 import {
   type AllocatedTimeSlotNodeT,
   createDurationString,
@@ -19,7 +19,7 @@ import {
 } from "./modules/applicationRoundAllocation";
 import { useAcceptSlotMutation, useRefreshApplications, useRemoveAllocation } from "./hooks";
 import { getApplicantName } from "@/modules/helpers";
-import { NotificationInline } from "@/component/NotificationInline";
+import { NotificationInline } from "@/components/NotificationInline";
 
 type Props = {
   applicationSection: SectionNodeT;

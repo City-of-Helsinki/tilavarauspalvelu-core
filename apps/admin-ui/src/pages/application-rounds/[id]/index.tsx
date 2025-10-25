@@ -26,7 +26,7 @@ import {
   type FilterOptionsQueryVariables,
   CurrentUserDocument,
 } from "@gql/gql-types";
-import { ButtonLikeLink } from "@/component/ButtonLikeLink";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { hasPermission } from "@/modules/permissionHelper";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";

@@ -16,23 +16,23 @@ import {
   type ReservationSeriesForm as ReservationSeriesFormT,
   ReservationSeriesFormSchema,
 } from "@/schemas";
-import { type NewReservationListItem } from "@/component/ReservationsList";
-import { WeekdaysSelector } from "@/component/WeekdaysSelector";
+import { type NewReservationListItem } from "@/components/ReservationsList";
+import { WeekdaysSelector } from "@/components/WeekdaysSelector";
 import { useCreateReservationSeries, useFilteredReservationList, useMultipleReservation } from "@/hooks";
-import ReservationTypeForm from "@/component/ReservationTypeForm";
-import { ControlledTimeInput } from "@/component/ControlledTimeInput";
+import ReservationTypeForm from "@/components/ReservationTypeForm";
+import { ControlledTimeInput } from "@/components/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { createNodeId, toNumber } from "common/src/helpers";
 import { Element } from "@/styled";
 import { AutoGrid, Flex, Strong } from "common/styled";
 import { errorToast } from "common/src/components/toast";
-import { ButtonLikeLink } from "@/component/ButtonLikeLink";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { useDisplayError } from "common/src/hooks";
 import { getSeriesOverlapErrors } from "common/src/apolloUtils";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { isReservationEq, ReservationListEditor } from "@/component/ReservationListEditor";
+import { isReservationEq, ReservationListEditor } from "@/components/ReservationListEditor";
 import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
-import { SelectFilter } from "@/component/QueryParamFilters";
+import { SelectFilter } from "@/components/QueryParamFilters";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { getMyUnitUrl, getReservationSeriesUrl } from "@/modules/urls";

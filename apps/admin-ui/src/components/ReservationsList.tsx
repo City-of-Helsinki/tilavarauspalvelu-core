@@ -5,7 +5,7 @@ import { startOfDay } from "date-fns";
 import { RejectionReadinessChoice, type ReservationToCopyFragment, UserPermissionChoice } from "@gql/gql-types";
 import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
 import { useCheckPermission } from "@/hooks";
-import { NewReservationModal } from "@/component/EditTimeModal";
+import { NewReservationModal } from "@/components/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
 import { H6 } from "common/styled";
 import StatusLabel from "common/src/components/StatusLabel";

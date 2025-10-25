@@ -5,7 +5,7 @@ import { IconLinkExternal, IconSize } from "hds-react";
 import { type ApplicationsTableElementFragment, ApplicationStatusChoice } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { getApplicantName, translateReserveeType, truncate } from "@/modules/helpers";
-import { CustomTable } from "@/component/Table";
+import { CustomTable } from "@/components/Table";
 import { calculateAppliedReservationTime, formatAppliedReservationTime } from "./utils";
 import { getApplicationUrl } from "@/modules/urls";
 import { ExternalTableLink } from "@/styled";

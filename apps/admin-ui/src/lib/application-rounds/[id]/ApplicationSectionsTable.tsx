@@ -14,7 +14,7 @@ import { type ApplicationSectionTableElementFragment, ApplicationSectionStatusCh
 import { MAX_APPLICATION_ROUND_NAME_LENGTH } from "@/modules/const";
 import { getApplicantName, truncate } from "@/modules/helpers";
 import { getApplicationUrl } from "@/modules/urls";
-import { CustomTable } from "@/component/Table";
+import { CustomTable } from "@/components/Table";
 import { calculateAppliedReservationTime, formatAppliedReservationTime } from "./utils";
 import { ExternalTableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";

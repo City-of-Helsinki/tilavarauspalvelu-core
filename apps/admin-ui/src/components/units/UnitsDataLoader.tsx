@@ -4,7 +4,7 @@ import { UnitOrderingChoices, useUnitListQuery } from "@gql/gql-types";
 import { filterEmptyArray, filterNonNullable, mapParamToInteger } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
 import { LARGE_LIST_PAGE_SIZE } from "@/modules/const";
-import { More } from "@/component/More";
+import { More } from "@/components/More";
 import { UnitsTable } from "./UnitsTable";
 import { CenterSpinner } from "common/styled";
 import { useTranslation } from "next-i18next";

@@ -13,7 +13,7 @@ import {
 } from "@gql/gql-types";
 import { useSlotPropGetter } from "common/src/calendar/util";
 import { getReservationUrl } from "@/modules/urls";
-import { Legend, LegendsWrapper } from "@/component/Legend";
+import { Legend, LegendsWrapper } from "@/components/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { createNodeId, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";

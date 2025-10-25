@@ -27,14 +27,14 @@ import { Flex } from "common/styled";
 
 import { errorToast, successToast } from "common/src/components/toast";
 import { useModal } from "@/context/ModalContext";
-import { Error404 } from "@/component/Error404";
+import { Error404 } from "@/components/Error404";
 
 import { getReservationUnitUrl } from "@/modules/urls";
 import { ApolloError, gql } from "@apollo/client";
 import { breakpoints } from "common/src/const";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { AuthorizationChecker } from "@/component/AuthorizationChecker";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import {
