@@ -16,7 +16,7 @@ import {
 } from "@gql/gql-types";
 import { type ApolloQueryResult } from "@apollo/client";
 import { useCheckPermission } from "@/hooks";
-import { isApplicationRoundInProgress } from "@/helpers";
+import { isApplicationRoundInProgress } from "@/modules/helpers";
 import { useDisplayError } from "common/src/hooks";
 
 const StyledNotification = styled(Notification)`

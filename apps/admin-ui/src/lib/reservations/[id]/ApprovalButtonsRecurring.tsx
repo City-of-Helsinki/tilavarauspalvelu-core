@@ -2,12 +2,12 @@ import React, { useRef } from "react";
 import { type ReservationSeriesNode } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
-import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import { DenyDialogSeries } from "@/component/DenyDialog";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
+import { DenyDialogSeries } from "@/components/DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import { useReservationSeries } from "@/hooks";
 import { isPossibleToDeny } from "@/modules/reservationModificationRules";
-import { getReservationUrl } from "@/common/urls";
+import { getReservationUrl } from "@/modules/urls";
 
 type Props = {
   reservationSeries: Pick<ReservationSeriesNode, "pk">;

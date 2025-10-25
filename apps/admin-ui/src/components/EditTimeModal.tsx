@@ -25,11 +25,11 @@ import {
 } from "common/src/date-utils";
 import { useModal } from "@/context/ModalContext";
 import { TimeChangeFormSchemaRefined, TimeFormSchema } from "@/schemas";
-import { ControlledTimeInput } from "@/component/ControlledTimeInput";
+import { ControlledTimeInput } from "@/components/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
-import { BufferToggles } from "@/component/BufferToggles";
+import { BufferToggles } from "@/components/BufferToggles";
 import { useCheckCollisions } from "@/hooks";
-import { getBufferTime, getNormalizedInterval } from "@/helpers";
+import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
 import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
 import { successToast } from "common/src/components/toast";

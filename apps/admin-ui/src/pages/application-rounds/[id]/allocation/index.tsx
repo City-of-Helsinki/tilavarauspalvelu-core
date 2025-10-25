@@ -17,10 +17,10 @@ import {
 } from "@gql/gql-types";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
-import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
-import { truncate } from "@/helpers";
+import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
+import { truncate } from "@/modules/helpers";
 import { AllocationPageContent } from "@lib/application-rounds/[id]/allocation";
-import { LinkPrev } from "@/component/LinkPrev";
+import { LinkPrev } from "@/components/LinkPrev";
 import { useGetFilterSearchParams, useSession } from "@/hooks";
 import { gql } from "@apollo/client";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
@@ -28,8 +28,8 @@ import { useSearchParams } from "next/navigation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
-import { Error403 } from "@/component/Error403";
-import { createClient } from "@/common/apolloClient";
+import { Error403 } from "@/components/Error403";
+import { createClient } from "@/modules/apolloClient";
 import { Filters } from "@/lib/application-rounds/[id]/allocation/Filters";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;

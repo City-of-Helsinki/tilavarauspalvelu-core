@@ -2,8 +2,8 @@ import React, { useRef } from "react";
 import { type ApprovalButtonsFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
-import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import { DenyDialog } from "@/component/DenyDialog";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
+import { DenyDialog } from "@/components/DenyDialog";
 import { ApproveDialog } from "./ApproveDialog";
 import { ReturnToRequiresHandlingDialog } from "./ReturnToRequiresHandlingDialog";
 import { useModal } from "@/context/ModalContext";
@@ -14,7 +14,7 @@ import {
   isPossibleToReturn,
 } from "@/modules/reservationModificationRules";
 import { gql } from "@apollo/client";
-import { getReservationUrl } from "@/common/urls";
+import { getReservationUrl } from "@/modules/urls";
 
 export const APPROVAL_BUTTONS_FRAGMENT = gql`
   fragment ApprovalButtons on ReservationNode {

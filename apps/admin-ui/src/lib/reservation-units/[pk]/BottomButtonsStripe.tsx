@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { type UseFormReturn } from "react-hook-form";
 import { type ReservationUnitEditFormValues } from "./form";
-import { getUnitUrl } from "@/common/urls";
+import { getUnitUrl } from "@/modules/urls";
 import { successToast } from "common/src/components/toast";
 import type { ReservationUnitEditQuery, UnitSubpageHeadFragment } from "@gql/gql-types";
 import { breakpoints } from "common/src/const";

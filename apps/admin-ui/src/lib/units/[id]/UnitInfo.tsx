@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { fontMedium, Flex } from "common/styled";
-import { formatAddress } from "@/common/util";
+import { formatAddress } from "@/modules/util";
 import { IconCheck } from "hds-react";
 import { gql } from "@apollo/client";
 import { type UnitResourceInfoFieldsFragment } from "@gql/gql-types";

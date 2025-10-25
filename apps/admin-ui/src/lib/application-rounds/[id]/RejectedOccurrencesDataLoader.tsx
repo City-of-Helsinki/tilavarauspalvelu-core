@@ -3,13 +3,13 @@ import { useSort } from "@/hooks/useSort";
 import { RejectedOccurrencesTable, SORT_KEYS } from "./RejectedOccurrencesTable";
 import { type ApolloError, gql } from "@apollo/client";
 import { RejectedOccurrenceOrderingChoices, useRejectedOccurrencesQuery } from "@gql/gql-types";
-import { More } from "@/component/More";
+import { More } from "@/components/More";
 import React from "react";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
 import { getPermissionErrors } from "common/src/apolloUtils";
 import { useTranslation } from "next-i18next";
 import { useGetFilterSearchParams } from "@/hooks";
-import { LIST_PAGE_SIZE } from "@/common/const";
+import { LIST_PAGE_SIZE } from "@/modules/const";
 import { CenterSpinner } from "common/styled";
 
 type Props = {

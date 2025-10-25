@@ -11,7 +11,7 @@ import {
   STAFF_RESERVATION,
   WAITING_PAYMENT,
   POST_PAUSE,
-} from "@/common/calendarStyling";
+} from "@/modules/calendarStyling";
 import { gql } from "@apollo/client";
 
 const SELECTED = {

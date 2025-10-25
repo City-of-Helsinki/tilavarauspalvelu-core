@@ -11,9 +11,9 @@ import {
 } from "@gql/gql-types";
 import { getName } from "@/modules/reservation";
 import { formatDateTime, parseValidDateObject } from "common/src/date-utils";
-import { getApplicationUrl } from "@/common/urls";
+import { getApplicationUrl } from "@/modules/urls";
 import { gql } from "@apollo/client";
-import { ExternalLink } from "@/component/ExternalLink";
+import { ExternalLink } from "@/components/ExternalLink";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
 

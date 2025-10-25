@@ -3,7 +3,7 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { ErrorContainer } from "common/src/components";
-import { PUBLIC_URL } from "@/common/const";
+import { PUBLIC_URL } from "@/modules/const";
 
 /// next doesn't allow getServersideProps in 404.tsx (you have to use app router for that)
 /// so all props are build time not runtime (e.g. no dynamic environment variables)

@@ -17,11 +17,11 @@ import {
   UNITS_URL_PREFIX,
   REQUESTED_RESERVATIONS_URL_PREFIX,
   getAccessibilityTermsUrl,
-} from "@/common/urls";
+} from "@/modules/urls";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { getLocalizationLang } from "common/src/helpers";
 import { useRouter } from "next/router";
-import { PUBLIC_URL } from "@/common/const";
+import { PUBLIC_URL } from "@/modules/const";
 
 type Props = {
   apiBaseUrl: string;
@@ -236,7 +236,7 @@ function NavigationLink({
     evt.preventDefault();
     const route = routes[0];
     if (route != null) {
-      // NOTE: this is a workaround for the HDS Header component not closing the mobile menu on navigation, if there isn't a page reload
+      // NOTE: this is a workaround for the HDS Header components not closing the mobile menu on navigation, if there isn't a page reload
       // TODO: remove this when HDS Header is fixed
       document.getElementById("Menu")?.querySelector("button")?.click();
       router.push(route);

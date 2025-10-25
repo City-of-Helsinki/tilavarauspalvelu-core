@@ -6,13 +6,13 @@ import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { AutoGrid } from "common/styled";
 import { ControlledSelect } from "common/src/components/form";
-import { getTranslatedError } from "@/common/util";
+import { getTranslatedError } from "@/modules/util";
 import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 import { getTranslatedTooltipTex } from "./utils";
 import { ImageEditor } from "./ImageEditor";
 
-const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
+const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {
   ssr: false,
 });
 

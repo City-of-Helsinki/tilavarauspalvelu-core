@@ -11,10 +11,10 @@ import {
   IconSize,
 } from "hds-react";
 import { type ApplicationSectionTableElementFragment, ApplicationSectionStatusChoice } from "@gql/gql-types";
-import { MAX_APPLICATION_ROUND_NAME_LENGTH } from "@/common/const";
-import { getApplicantName, truncate } from "@/helpers";
-import { getApplicationUrl } from "@/common/urls";
-import { CustomTable } from "@/component/Table";
+import { MAX_APPLICATION_ROUND_NAME_LENGTH } from "@/modules/const";
+import { getApplicantName, truncate } from "@/modules/helpers";
+import { getApplicationUrl } from "@/modules/urls";
+import { CustomTable } from "@/components/Table";
 import { calculateAppliedReservationTime, formatAppliedReservationTime } from "./utils";
 import { ExternalTableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";

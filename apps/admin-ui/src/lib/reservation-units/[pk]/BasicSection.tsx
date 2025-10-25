@@ -4,7 +4,7 @@ import { ReservationKind, ReservationUnitEditQuery, ReservationUnitEditUnitFragm
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { TextInput } from "hds-react";
-import { getTranslatedError } from "@/common/util";
+import { getTranslatedError } from "@/modules/util";
 import { ControlledSelect } from "common/src/components/form";
 import React from "react";
 import { CustomNumberInput } from "./CustomNumberInput";

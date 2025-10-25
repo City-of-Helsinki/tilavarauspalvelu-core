@@ -2,21 +2,21 @@ import TimeZoneNotification from "common/src/components/TimeZoneNotification";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { ReservationSeriesForm } from "@lib/my-units/[id]/recurring/ReservationSeriesForm";
-import { LinkPrev } from "@/component/LinkPrev";
+import { LinkPrev } from "@/components/LinkPrev";
 import { H1 } from "common/styled";
 import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { AuthorizationChecker } from "@/component/AuthorizationChecker";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
-import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import {
   SeriesReservationUnitDocument,
   UserPermissionChoice,
   type SeriesReservationUnitQuery,
   type SeriesReservationUnitQueryVariables,
 } from "@gql/gql-types";
-import { createClient } from "@/common/apolloClient";
+import { createClient } from "@/modules/apolloClient";
 import { gql } from "@apollo/client";
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];

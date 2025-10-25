@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import { ControlledRadioGroup } from "common/src/components/form";
 import { breakpoints } from "common/src/const";
-import { getTranslatedError } from "@/common/util";
+import { getTranslatedError } from "@/modules/util";
 
 export function SpecializedRadioGroup({
   name,

@@ -12,10 +12,10 @@ import {
 import { createNodeId } from "common/src/helpers";
 import { ButtonContainer, CenterSpinner } from "common/styled";
 import { errorToast, successToast } from "common/src/components/toast";
-import { FormErrorSummary } from "@/component/FormErrorSummary";
-import { LinkPrev } from "@/component/LinkPrev";
+import { FormErrorSummary } from "@/components/FormErrorSummary";
+import { LinkPrev } from "@/components/LinkPrev";
 import { gql } from "@apollo/client";
-import { Error404 } from "@/component/Error404";
+import { Error404 } from "@/components/Error404";
 import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
 import {
@@ -25,7 +25,7 @@ import {
   ResourceUpdateSchema,
   type ResourceUpdateForm,
 } from "@lib/units/[id]";
-import { getUnitUrl } from "@/common/urls";
+import { getUnitUrl } from "@/modules/urls";
 
 type Props = {
   resourcePk?: number;

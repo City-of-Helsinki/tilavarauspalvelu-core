@@ -3,12 +3,12 @@ import App, { type AppContext, type AppInitialProps, type AppProps } from "next/
 import "common/styles/global.scss";
 import "../styles/global.scss";
 import { ApolloProvider } from "@apollo/client";
-import { createClient } from "@/common/apolloClient";
+import { createClient } from "@/modules/apolloClient";
 import { updateSentryConfig } from "../../instrumentation-client";
 import { type PageProps } from ".";
 import { appWithTranslation } from "next-i18next";
 import Layout from "./layout";
-import PageWrapper from "@/component/PageWrapper";
+import PageWrapper from "@/components/PageWrapper";
 import { ModalContextProvider } from "@/context/ModalContext";
 import {
   BannerNotificationTarget,

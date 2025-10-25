@@ -5,17 +5,17 @@ import styled from "styled-components";
 import { UserPermissionChoice, useSpacesResourcesQuery } from "@gql/gql-types";
 import { createNodeId, toNumber, ignoreMaybeArray } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
-import { Error404 } from "@/component/Error404";
+import { Error404 } from "@/components/Error404";
 import { fontBold, H2, CenterSpinner, Flex } from "common/styled";
-import { LinkPrev } from "@/component/LinkPrev";
+import { LinkPrev } from "@/components/LinkPrev";
 import { gql } from "@apollo/client";
 import { useModal } from "@/context/ModalContext";
 import { FixedDialog } from "@/styled/FixedDialog";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { AuthorizationChecker } from "@/component/AuthorizationChecker";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
-import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { ResourcesTable, SubPageHead, SpacesTable, NewSpaceModal, NewResourceModal } from "@lib/units/[id]/";
 
 const ActionButton = styled(Button)`

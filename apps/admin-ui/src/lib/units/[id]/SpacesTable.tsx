@@ -8,10 +8,10 @@ import { type Maybe, type SpacesTableFragment, useDeleteSpaceMutation } from "@g
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { NewSpaceModal } from "./new-space-modal/NewSpaceModal";
 import { errorToast } from "common/src/components/toast";
-import { CustomTable } from "@/component/Table";
-import { getSpaceUrl } from "@/common/urls";
+import { CustomTable } from "@/components/Table";
+import { getSpaceUrl } from "@/modules/urls";
 import { truncate } from "common/src/helpers";
-import { MAX_NAME_LENGTH } from "@/common/const";
+import { MAX_NAME_LENGTH } from "@/modules/const";
 import { TableLink } from "@/styled";
 import { Flex } from "common/styled";
 import { useDisplayError } from "common/src/hooks";

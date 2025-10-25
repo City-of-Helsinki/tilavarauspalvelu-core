@@ -20,10 +20,10 @@ import {
 import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { type ApolloQueryResult, gql } from "@apollo/client";
-import { getApplicationUrl } from "@/common/urls";
-import { getApplicantName } from "@/helpers";
-import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/common/const";
-import { formatAgeGroup } from "@/common/util";
+import { getApplicationUrl } from "@/modules/urls";
+import { getApplicantName } from "@/modules/helpers";
+import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/modules/const";
+import { formatAgeGroup } from "@/modules/util";
 import { useDisplayError } from "common/src/hooks";
 import Link from "next/link";
 

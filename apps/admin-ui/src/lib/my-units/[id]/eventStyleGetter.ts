@@ -16,7 +16,7 @@ import {
   STAFF_RESERVATION,
   UNCONFIRMED,
   WAITING_PAYMENT,
-} from "@/common/calendarStyling";
+} from "@/modules/calendarStyling";
 
 type EventKey =
   | "CONFIRMED"

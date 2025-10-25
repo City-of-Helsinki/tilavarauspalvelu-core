@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Accordion as AccordionBase } from "@/component/Accordion";
+import { Accordion as AccordionBase } from "@/components/Accordion";
 
 export const EditAccordion = styled(AccordionBase)`
   & h2 {

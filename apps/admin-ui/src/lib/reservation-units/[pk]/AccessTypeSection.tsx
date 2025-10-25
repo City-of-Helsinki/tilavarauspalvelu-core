@@ -11,8 +11,8 @@ import { AutoGrid, Flex, H6 } from "common/styled";
 import { KVWrapper, Label, Value } from "@/styled";
 import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";
 import { AccessType, ReservationUnitEditQuery } from "@gql/gql-types";
-import { getTranslatedError } from "@/common/util";
-import { NotificationInline } from "@/component/NotificationInline";
+import { getTranslatedError } from "@/modules/util";
+import { NotificationInline } from "@/components/NotificationInline";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;

@@ -7,13 +7,13 @@ import { breakpoints } from "common/src/const";
 import { useApplicationRoundCriteriaQuery, UserPermissionChoice } from "@gql/gql-types";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { errorToast } from "common/src/components/toast";
-import { Accordion as AccordionBase } from "@/component/Accordion";
+import { Accordion as AccordionBase } from "@/components/Accordion";
 import { TimeframeStatus } from "@lib/application-rounds";
-import { AuthorizationChecker } from "@/component/AuthorizationChecker";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
-import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { formatDate, parseValidDateObject } from "common/src/date-utils";
 
 const Accordion = styled(AccordionBase)`

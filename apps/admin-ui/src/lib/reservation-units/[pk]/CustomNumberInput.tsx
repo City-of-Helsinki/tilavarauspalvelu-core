@@ -1,7 +1,7 @@
 import { UseFormReturn } from "react-hook-form";
 import type { ReservationUnitEditFormValues } from "./form";
 import { useTranslation } from "next-i18next";
-import { getTranslatedError } from "@/common/util";
+import { getTranslatedError } from "@/modules/util";
 import { ControlledNumberInput } from "common/src/components/form";
 import React from "react";
 

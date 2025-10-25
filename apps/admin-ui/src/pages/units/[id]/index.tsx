@@ -3,21 +3,21 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { UserPermissionChoice, useUnitPageQuery } from "@gql/gql-types";
-import { formatAddress } from "@/common/util";
-import { ExternalLink } from "@/component/ExternalLink";
+import { formatAddress } from "@/modules/util";
+import { ExternalLink } from "@/components/ExternalLink";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { Error404 } from "@/component/Error404";
+import { Error404 } from "@/components/Error404";
 import { ReservationUnitList } from "@lib/units/[id]/ReservationUnitList";
-import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/common/urls";
+import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/modules/urls";
 import { CenterSpinner, Flex, fontMedium, H1, H2, H3 } from "common/styled";
 import { gql } from "@apollo/client";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { AuthorizationChecker } from "@/component/AuthorizationChecker";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
-import { PUBLIC_URL, NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { PUBLIC_URL, NOT_FOUND_SSR_VALUE } from "@/modules/const";
 
 const Image = styled.img`
   clip-path: circle(50% at 50% 50%);

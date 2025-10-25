@@ -25,26 +25,26 @@ import {
 } from "@gql/gql-types";
 import { formatDateRange, formatDateTime, formatDuration, parseValidDateObject } from "common/src/date-utils";
 import { ApplicationTimePreview } from "common/src/components/ApplicationTimePreview";
-import { formatAgeGroups, formatNumber } from "@/common/util";
-import { ScrollIntoView } from "@/component/ScrollIntoView";
-import { Accordion as AccordionBase } from "@/component/Accordion";
-import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
-import { ShowWhenTargetInvisible } from "@/component/ShowWhenTargetInvisible";
-import { StickyHeader } from "@/component/StickyHeader";
-import { BirthDate } from "@/component/BirthDate";
-import { ValueBox } from "@/component/ValueBox";
-import { TimeSelector } from "@/component/TimeSelector";
-import { getApplicantName, translateReserveeType } from "@/helpers";
-import { Error404 } from "@/component/Error404";
+import { formatAgeGroups, formatNumber } from "@/modules/util";
+import { ScrollIntoView } from "@/components/ScrollIntoView";
+import { Accordion as AccordionBase } from "@/components/Accordion";
+import { ApplicationWorkingMemo } from "@/components/WorkingMemo";
+import { ShowWhenTargetInvisible } from "@/components/ShowWhenTargetInvisible";
+import { StickyHeader } from "@/components/StickyHeader";
+import { BirthDate } from "@/components/BirthDate";
+import { ValueBox } from "@/components/ValueBox";
+import { TimeSelector } from "@/components/TimeSelector";
+import { getApplicantName, translateReserveeType } from "@/modules/helpers";
+import { Error404 } from "@/components/Error404";
 import { useCheckPermission } from "@/hooks";
 import { ApplicationDatas, Summary } from "@/styled";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
 import { useDisplayError } from "common/src/hooks";
-import { Error403 } from "@/component/Error403";
+import { Error403 } from "@/components/Error403";
 import { GetServerSidePropsContext } from "next";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 
 const Value = styled.span`
   ${fontMedium}

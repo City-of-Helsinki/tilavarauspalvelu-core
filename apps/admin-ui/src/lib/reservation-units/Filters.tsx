@@ -7,8 +7,8 @@ import {
   ControlledSearchFilter,
   ControlledMultiSelectFilter,
   ControlledRangeNumberFilter,
-} from "@/component/QueryParamFilters";
-import { SearchTags } from "@/component/SearchTags";
+} from "@/components/QueryParamFilters";
+import { SearchTags } from "@/components/SearchTags";
 import { Flex } from "common/styled";
 import { type TagOptionsList, translateTag } from "@/modules/search";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";

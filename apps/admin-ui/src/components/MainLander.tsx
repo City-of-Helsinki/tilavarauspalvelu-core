@@ -1,4 +1,4 @@
-import { getAccessibilityTermsUrl } from "@/common/urls";
+import { getAccessibilityTermsUrl } from "@/modules/urls";
 import IconButton from "common/src/components/IconButton";
 import React from "react";
 import styled from "styled-components";
@@ -7,7 +7,7 @@ import { signIn } from "common/src/browserHelpers";
 import { Button, IconArrowRight, IconGroup, IconLinkExternal } from "hds-react";
 import { fontBold, H2 } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { HERO_IMAGE_URL } from "@/common/const";
+import { HERO_IMAGE_URL } from "@/modules/const";
 import { KorosHeading, Heading } from "./KorosHeading";
 import { getLocalizationLang } from "common/src/helpers";
 

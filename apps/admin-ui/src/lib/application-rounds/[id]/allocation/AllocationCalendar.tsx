@@ -8,7 +8,7 @@ import { ApplicationSectionStatusChoice, type SuitableTimeRangeNode } from "@gql
 import { fontMedium } from "common/styled";
 import { breakpoints, type DayT, WEEKDAYS } from "common/src/const";
 import { transformWeekday } from "common/src/conversion";
-import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
+import { ALLOCATION_CALENDAR_TIMES } from "@/modules/const";
 import {
   applicationEventSchedulesToCells,
   getTimeSeries,
