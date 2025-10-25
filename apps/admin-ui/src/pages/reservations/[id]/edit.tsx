@@ -19,13 +19,13 @@ import {
   type ReservationFormMeta,
   ReservationTypeSchema,
 } from "@/schemas";
-import ReservationTypeForm from "@/component/ReservationTypeForm";
+import ReservationTypeForm from "@/components/ReservationTypeForm";
 import { useReservationEditData, useSession, useStaffReservationMutation } from "@/hooks";
 import { errorToast } from "common/src/components/toast";
 import { ButtonContainer, CenterSpinner, Flex, HR } from "common/styled";
 import { createTagString } from "@/modules/reservation";
 import { ReservationTitleSection } from "@lib/reservations/[id]";
-import { LinkPrev } from "@/component/LinkPrev";
+import { LinkPrev } from "@/components/LinkPrev";
 import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -33,7 +33,7 @@ import { GetServerSidePropsContext } from "next";
 import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { Error403 } from "@/component/Error403";
+import { Error403 } from "@/components/Error403";
 import { createClient } from "@/modules/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";
 

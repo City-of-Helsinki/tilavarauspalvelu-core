@@ -5,7 +5,7 @@ import type { UnitTableElementFragment } from "@gql/gql-types";
 import type { TFunction } from "i18next";
 import { truncate } from "@/modules/helpers";
 import { getMyUnitUrl, getUnitUrl } from "@/modules/urls";
-import { CustomTable } from "@/component/Table";
+import { CustomTable } from "@/components/Table";
 import { MAX_UNIT_NAME_LENGTH } from "@/modules/const";
 import { TableLink } from "@/styled";
 import { gql } from "@apollo/client";

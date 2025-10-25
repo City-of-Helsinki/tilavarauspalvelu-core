@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import { ShowAllContainer } from "common/src/components";
-import { SearchTags } from "@/component/SearchTags";
+import { SearchTags } from "@/components/SearchTags";
 import {
   ControlledMultiSelectFilter,
   ControlledSearchFilter,
   ControlledSelectFilter,
-} from "@/component/QueryParamFilters";
+} from "@/components/QueryParamFilters";
 import { translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";

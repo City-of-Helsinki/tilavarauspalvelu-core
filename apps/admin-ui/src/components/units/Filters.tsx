@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { AutoGrid } from "common/styled";
-import { ControlledMultiSelectFilter, ControlledSearchFilter } from "@/component/QueryParamFilters";
-import { SearchTags } from "@/component/SearchTags";
+import { ControlledMultiSelectFilter, ControlledSearchFilter } from "@/components/QueryParamFilters";
+import { SearchTags } from "@/components/SearchTags";
 import { translateTag } from "@/modules/search";
 import { useTranslation } from "next-i18next";
 import { useForm } from "react-hook-form";

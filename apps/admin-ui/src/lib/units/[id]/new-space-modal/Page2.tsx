@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hds-react";
 import { StyledTag } from "./modules/newSpaceModal";
 import { SpaceForm, type SpaceUpdateForm } from "../SpaceForm";
-import { FormErrorSummary } from "@/component/FormErrorSummary";
+import { FormErrorSummary } from "@/components/FormErrorSummary";
 import { UseFormReturn } from "react-hook-form";
 import { DialogActionsButtons } from "@/styled";
 

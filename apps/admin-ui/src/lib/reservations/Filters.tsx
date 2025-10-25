@@ -10,8 +10,8 @@ import {
   ControlledSelectFilter,
   ControlledDateRangeFilter,
   ControlledRangeNumberFilter,
-} from "@/component/QueryParamFilters";
-import { SearchTags } from "@/component/SearchTags";
+} from "@/components/QueryParamFilters";
+import { SearchTags } from "@/components/SearchTags";
 import { OrderStatusWithFree, ReservationTypeChoice, ReservationStateChoice } from "@gql/gql-types";
 import { translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";

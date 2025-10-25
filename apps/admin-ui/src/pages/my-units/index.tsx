@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { H1 } from "common/styled";
-import { Filters, UnitsDataLoader } from "@/component/units";
+import { Filters, UnitsDataLoader } from "@/components/units";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
