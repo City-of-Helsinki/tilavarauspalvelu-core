@@ -8,7 +8,7 @@ import { fontBold } from "common/styled";
 import { breakpoints, WEEKDAYS_SORTED } from "common/src/const";
 import { useTranslation } from "next-i18next";
 import { ReservationUnitEditFormValues } from "./form";
-import { Accordion } from "@/component/Accordion";
+import { Accordion } from "@/components/Accordion";
 import { getTranslatedError } from "@/modules/util";
 
 const SeasonRowWrapper = styled.div`

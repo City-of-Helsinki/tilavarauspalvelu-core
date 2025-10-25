@@ -7,7 +7,7 @@ import { truncate } from "@/modules/helpers";
 import { getReservationUrl } from "@/modules/urls";
 import { formatDateTime, formatDateTimeRange, parseValidDateObject } from "common/src/date-utils";
 import { getReserveeName } from "@/modules/util";
-import { CustomTable } from "@/component/Table";
+import { CustomTable } from "@/components/Table";
 import { MAX_NAME_LENGTH } from "@/modules/const";
 import { TableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";

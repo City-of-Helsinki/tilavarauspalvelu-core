@@ -28,7 +28,7 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { parseUIDate, fromUIDateTime, formatDate, formatTime } from "common/src/date-utils";
-import { ButtonLikeLink } from "@/component/ButtonLikeLink";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import {
   checkValidDate,
   checkValidFutureDate,
@@ -37,7 +37,7 @@ import {
 } from "common/src/schemas/schemaCommon";
 import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { ControlledDateInput } from "common/src/components/form";
-import { ControlledTimeInput } from "@/component/ControlledTimeInput";
+import { ControlledTimeInput } from "@/components/ControlledTimeInput";
 import { successToast } from "common/src/components/toast";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
@@ -46,14 +46,14 @@ import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { AuthorizationChecker } from "@/component/AuthorizationChecker";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { getNotificationListUrl } from "@/modules/urls";
 import { cleanHtmlContent } from "common/src/components/Sanitize";
 
-const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
+const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {
   ssr: false,
 });
 

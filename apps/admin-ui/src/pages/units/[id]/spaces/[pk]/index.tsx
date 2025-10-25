@@ -4,7 +4,7 @@ import { ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { type GetServerSidePropsContext } from "next";
-import { AuthorizationChecker } from "@/component/AuthorizationChecker";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 

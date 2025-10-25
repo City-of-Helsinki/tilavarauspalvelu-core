@@ -18,7 +18,7 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { useSession } from "@/hooks";
-import { ButtonLikeLink } from "@/component/ButtonLikeLink";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { gql } from "@apollo/client";
 import { useModal } from "@/context/ModalContext";
 import { useSearchParams } from "next/navigation";

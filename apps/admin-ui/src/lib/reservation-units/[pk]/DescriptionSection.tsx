@@ -12,7 +12,7 @@ import { EditAccordion } from "./styled";
 import { getTranslatedTooltipTex } from "./utils";
 import { ImageEditor } from "./ImageEditor";
 
-const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
+const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {
   ssr: false,
 });
 

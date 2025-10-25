@@ -31,7 +31,7 @@ export const ReservationMetadataSetForm = ({ reservationUnit }: Props): JSX.Elem
   );
 };
 
-// TODO this component can be wholly deprecated maybe? translations / options?
+// TODO this components can be wholly deprecated maybe? translations / options?
 export const ReserverMetadataSetForm = ({ reservationUnit }: Props): JSX.Element => {
   const { watch } = useFormContext<Reservation>();
   const { ageGroups, reservationPurposes } = useFilterOptions();

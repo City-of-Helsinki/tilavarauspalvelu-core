@@ -1,5 +1,5 @@
 import React from "react";
-import { CustomTable } from "@/component/Table";
+import { CustomTable } from "@/components/Table";
 import { getApplicationUrl, getReservationUrl } from "@/modules/urls";
 import type { RejectedOccurrencesTableElementFragment } from "@gql/gql-types";
 import { truncate } from "common/src/helpers";

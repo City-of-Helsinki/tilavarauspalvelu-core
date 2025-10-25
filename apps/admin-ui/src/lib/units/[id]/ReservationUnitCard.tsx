@@ -6,7 +6,7 @@ import { getImageSource, getMainImage } from "common/src/helpers";
 import StatusLabel from "common/src/components/StatusLabel";
 import { getReservationUnitUrl } from "@/modules/urls";
 import Card from "common/src/components/Card";
-import { ButtonLikeLink } from "@/component/ButtonLikeLink";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { gql } from "@apollo/client";
 
 interface IProps {

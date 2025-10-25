@@ -28,13 +28,13 @@ import { useCheckCollisions } from "@/hooks";
 import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
 import { fromUIDateTimeUnsafe, formatDate, formatTime, fromUIDateTime } from "common/src/date-utils";
 import { useModal } from "@/context/ModalContext";
-import { ControlledTimeInput } from "@/component/ControlledTimeInput";
+import { ControlledTimeInput } from "@/components/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
-import ReservationTypeForm from "@/component/ReservationTypeForm";
+import ReservationTypeForm from "@/components/ReservationTypeForm";
 import { createNodeId, toNumber } from "common/src/helpers";
 import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
-import { SelectFilter } from "@/component/QueryParamFilters";
+import { SelectFilter } from "@/components/QueryParamFilters";
 import { FixedDialog } from "@/styled/FixedDialog";
 import { useSearchParams } from "next/navigation";
 

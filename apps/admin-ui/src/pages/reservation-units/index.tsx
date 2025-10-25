@@ -3,7 +3,7 @@ import { useToastIfQueryParam } from "common/src/hooks/useToastIfQueryParam";
 import { useSearchParams } from "next/navigation";
 import { useTranslation } from "next-i18next";
 import { H1, HR } from "common/styled";
-import { AuthorizationChecker } from "@/component/AuthorizationChecker";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   FilterOptionsDocument,

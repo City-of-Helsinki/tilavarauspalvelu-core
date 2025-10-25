@@ -6,7 +6,7 @@ import type { AllocatedSectionsTableElementFragment } from "@gql/gql-types";
 import { convertWeekday } from "common/src/conversion";
 import { getApplicantName, truncate } from "@/modules/helpers";
 import { getApplicationUrl, getReservationUrl } from "@/modules/urls";
-import { CustomTable } from "@/component/Table";
+import { CustomTable } from "@/components/Table";
 import { ExternalTableLink, TableLink } from "@/styled";
 import styled from "styled-components";
 import { gql } from "@apollo/client";

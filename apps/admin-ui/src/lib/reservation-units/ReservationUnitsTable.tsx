@@ -11,7 +11,7 @@ import {
 } from "@gql/gql-types";
 import { truncate } from "@/modules/helpers";
 import { getOpeningHoursUrl, getReservationUnitUrl } from "@/modules/urls";
-import { CustomTable } from "@/component/Table";
+import { CustomTable } from "@/components/Table";
 import { isBrowser, MAX_NAME_LENGTH } from "@/modules/const";
 import { TableLink } from "@/styled";
 import {

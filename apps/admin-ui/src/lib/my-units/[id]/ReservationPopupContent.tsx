@@ -7,7 +7,7 @@ import { getReserveeName } from "@/modules/util";
 import { truncate } from "@/modules/helpers";
 import { Flex } from "common/styled";
 import { CELL_BORDER } from "./const";
-import VisibleIfPermission from "@/component/VisibleIfPermission";
+import VisibleIfPermission from "@/components/VisibleIfPermission";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NewReservationListItem } from "@/component/ReservationsList";
+import { NewReservationListItem } from "@/components/ReservationsList";
 import { ApolloError, gql, useApolloClient } from "@apollo/client";
 import {
   ReservationPermissionsDocument,
@@ -21,7 +21,7 @@ import { isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Element } from "@/styled";
 import { AutoGrid, ButtonContainer, CenterSpinner, H1, Strong } from "common/styled";
-import { LinkPrev } from "@/component/LinkPrev";
+import { LinkPrev } from "@/components/LinkPrev";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonSize, Notification } from "hds-react";
@@ -35,20 +35,20 @@ import {
   formatTime,
 } from "common/src/date-utils";
 import { ControlledDateInput, TimeInput } from "common/src/components/form";
-import { WeekdaysSelector } from "@/component/WeekdaysSelector";
-import { ReservationListEditor } from "@/component/ReservationListEditor";
+import { WeekdaysSelector } from "@/components/WeekdaysSelector";
+import { ReservationListEditor } from "@/components/ReservationListEditor";
 import { useFilteredReservationList, useMultipleReservation, useSession } from "@/hooks";
 import { RescheduleReservationSeriesForm, RescheduleReservationSeriesFormSchema } from "@/schemas";
 import { errorToast, successToast } from "common/src/components/toast";
 import { getBufferTime } from "@/modules/helpers";
-import { BufferToggles } from "@/component/BufferToggles";
-import { ButtonLikeLink } from "@/component/ButtonLikeLink";
+import { BufferToggles } from "@/components/BufferToggles";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { getReservationUrl } from "@/modules/urls";
 import { getSeriesOverlapErrors } from "common/src/apolloUtils";
 import { useDisplayError } from "common/src/hooks";
 import { generateReservations } from "@/modules/generateReservations";
-import { Error404 } from "@/component/Error404";
-import { Error403 } from "@/component/Error403";
+import { Error404 } from "@/components/Error404";
+import { Error403 } from "@/components/Error403";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";

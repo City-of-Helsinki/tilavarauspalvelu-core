@@ -1,12 +1,12 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { ErrorBoundary } from "react-error-boundary";
-import { ReservationSeriesView } from "@/component/ReservationSeriesView";
-import { ButtonLikeLink } from "@/component/ButtonLikeLink";
+import { ReservationSeriesView } from "@/components/ReservationSeriesView";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { getMyUnitUrl, getReservationUrl } from "@/modules/urls";
 import { Flex, H1, P } from "common/styled";
 import { useReservationSeries } from "@/hooks";
-import { AuthorizationChecker } from "@/component/AuthorizationChecker";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { getCommonServerSideProps } from "@/modules/serverUtils";

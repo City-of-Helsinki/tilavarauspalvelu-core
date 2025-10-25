@@ -9,7 +9,7 @@ import {
   type ApplicationSectionAllocationsQuery,
   type ReservationUnitNode,
 } from "@gql/gql-types";
-import { Accordion } from "@/component/Accordion";
+import { Accordion } from "@/components/Accordion";
 import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";
 import { type AllocationApplicationSectionCardType, ApplicationSectionCard } from "./ApplicationEventCard";

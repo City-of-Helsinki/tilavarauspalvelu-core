@@ -10,12 +10,12 @@ import {
   type BannerNotificationsListQuery,
   useBannerNotificationsListQuery,
 } from "@gql/gql-types";
-import { ButtonLikeLink } from "@/component/ButtonLikeLink";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { formatDate, formatTime } from "common/src/date-utils";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/modules/const";
-import { CustomTable } from "@/component/Table";
+import { CustomTable } from "@/components/Table";
 import { filterNonNullable } from "common/src/helpers";
-import { More } from "@/component/More";
+import { More } from "@/components/More";
 import { TableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";
 import StatusLabel from "common/src/components/StatusLabel";
@@ -24,7 +24,7 @@ import { getNotificationListUrl, getNotificationUrl } from "@/modules/urls";
 import { CenterSpinner, TitleSection, H1 } from "common/styled";
 import { gql, useApolloClient } from "@apollo/client";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { AuthorizationChecker } from "@/component/AuthorizationChecker";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSidePropsContext } from "next";
 import { createClient } from "@/modules/apolloClient";
