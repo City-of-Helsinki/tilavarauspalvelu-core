@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { errorToast } from "common/src/components/toast";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { isApplicationRoundInProgress } from "@/helpers";
+import { isApplicationRoundInProgress } from "@/modules/helpers";
 import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "common/styled";
 import { Button, Tabs } from "hds-react";
 import { uniqBy } from "lodash-es";
@@ -34,8 +34,8 @@ import Link from "next/link";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSidePropsContext } from "next";
-import { NOT_FOUND_SSR_VALUE } from "@/common/const";
-import { createClient } from "@/common/apolloClient";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { createClient } from "@/modules/apolloClient";
 import { TimeframeStatus, ApplicationRoundStatusLabel } from "@lib/application-rounds";
 import {
   ReviewEndAllocation,
@@ -47,7 +47,7 @@ import {
 } from "@lib/application-rounds/[id]";
 import { type TagOptionsList } from "@/modules/search";
 import { getFilterOptions } from "@/hooks/useFilterOptions";
-import { getApplicationRoundUrl } from "@/common/urls";
+import { getApplicationRoundUrl } from "@/modules/urls";
 
 const TabContent = styled(Flex).attrs({
   $direction: "column",

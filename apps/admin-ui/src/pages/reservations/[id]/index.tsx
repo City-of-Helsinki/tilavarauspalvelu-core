@@ -33,13 +33,13 @@ import {
 } from "@lib/reservations/[id]/";
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
 import { createNodeId, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/helpers";
-import { formatAgeGroup } from "@/common/util";
+import { formatAgeGroup } from "@/modules/util";
 import { formatDateTime } from "common/src/date-utils";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
-import { NOT_FOUND_SSR_VALUE } from "@/common/const";
-import { createClient } from "@/common/apolloClient";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { createClient } from "@/modules/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";
 import { useSession } from "@/hooks";
 import { Error403 } from "@/component/Error403";

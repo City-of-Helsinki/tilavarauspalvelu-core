@@ -49,8 +49,8 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { AuthorizationChecker } from "@/component/AuthorizationChecker";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
-import { NOT_FOUND_SSR_VALUE } from "@/common/const";
-import { getNotificationListUrl } from "@/common/urls";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { getNotificationListUrl } from "@/modules/urls";
 import { cleanHtmlContent } from "common/src/components/Sanitize";
 
 const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {

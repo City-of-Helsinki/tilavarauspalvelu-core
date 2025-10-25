@@ -3,7 +3,7 @@ import {
   ReservationUnitReservationState,
   UnitSubpageHeadFragment,
 } from "@gql/gql-types";
-import { formatAddress } from "@/common/util";
+import { formatAddress } from "@/modules/util";
 import React from "react";
 import styled from "styled-components";
 import { Flex, fontBold, H1, NoWrap, TitleSection } from "common/styled";

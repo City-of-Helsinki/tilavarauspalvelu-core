@@ -6,7 +6,7 @@ import { breakpoints } from "common/src/const";
 import { z } from "zod";
 import { UseFormReturn } from "react-hook-form";
 import { ControlledNumberInput } from "common/src/components/form/ControlledNumberInput";
-import { getTranslatedError } from "@/common/util";
+import { getTranslatedError } from "@/modules/util";
 
 const EditorColumns = styled.div`
   display: grid;

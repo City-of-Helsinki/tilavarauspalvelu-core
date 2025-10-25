@@ -12,16 +12,16 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { useSlotPropGetter } from "common/src/calendar/util";
-import { getReservationUrl } from "@/common/urls";
+import { getReservationUrl } from "@/modules/urls";
 import { Legend, LegendsWrapper } from "@/component/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { createNodeId, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { getReserveeName } from "@/common/util";
+import { getReserveeName } from "@/modules/util";
 import { errorToast } from "common/src/components/toast";
 import { useCheckPermission } from "@/hooks";
 import { gql } from "@apollo/client";
-import { combineAffectingReservations } from "@/helpers";
+import { combineAffectingReservations } from "@/modules/helpers";
 
 type Props = {
   begin: string;

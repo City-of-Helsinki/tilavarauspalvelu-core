@@ -31,11 +31,11 @@ import { useDisplayError } from "common/src/hooks";
 import { getSeriesOverlapErrors } from "common/src/apolloUtils";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { isReservationEq, ReservationListEditor } from "@/component/ReservationListEditor";
-import { getBufferTime, getNormalizedInterval } from "@/helpers";
+import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
 import { SelectFilter } from "@/component/QueryParamFilters";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
-import { getMyUnitUrl, getReservationSeriesUrl } from "@/common/urls";
+import { getMyUnitUrl, getReservationSeriesUrl } from "@/modules/urls";
 import { type OptionT } from "common/src/modules/search";
 import { breakpoints } from "common/src/const";
 

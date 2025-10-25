@@ -10,7 +10,7 @@ import { formatApiDate } from "common/src/date-utils";
 import { errorToast } from "common/src/components/toast";
 import { createNodeId } from "common/src/helpers";
 import { type CalendarEventType } from "@/modules/reservation";
-import { combineAffectingReservations } from "@/helpers";
+import { combineAffectingReservations } from "@/modules/helpers";
 
 // TODO there is an issue here with denied "Blocked" reservations shown in the Calendar as regular "Blocked" reservations
 // so it looks confusing. It works properly if we want to show the reservation itself even if it's denied, but there should

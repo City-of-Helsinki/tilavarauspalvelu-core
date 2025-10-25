@@ -16,7 +16,7 @@ import { useRouter } from "next/router";
 import { ParentSelector, type SpaceUpdateForm, SpaceForm, SpaceUpdateSchema } from "@lib/units/[id]";
 import { SpaceHead } from "./SpaceHead";
 import { SpaceHierarchy } from "./SpaceHierarchy";
-import { getUnitUrl } from "@/common/urls";
+import { getUnitUrl } from "@/modules/urls";
 
 const Form = styled.form`
   display: flex;

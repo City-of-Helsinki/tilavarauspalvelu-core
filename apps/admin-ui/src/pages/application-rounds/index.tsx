@@ -11,8 +11,8 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { getApplicationRoundUrl } from "@/common/urls";
-import { truncate } from "@/helpers";
+import { getApplicationRoundUrl } from "@/modules/urls";
+import { truncate } from "@/modules/helpers";
 import { ApplicationRoundCard } from "@lib/application-rounds";
 import { TableLink } from "@/styled";
 import { CustomTable } from "@/component/Table";

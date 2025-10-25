@@ -24,8 +24,8 @@ import {
   fromApiDateTime,
   parseValidDateObject,
 } from "common/src/date-utils";
-import { getReserveeName } from "@/common/util";
-import { getReserveeTypeTranslationKey } from "@/helpers";
+import { getReserveeName } from "@/modules/util";
+import { getReserveeTypeTranslationKey } from "@/modules/helpers";
 import { filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 import { convertWeekday } from "common/src/conversion";

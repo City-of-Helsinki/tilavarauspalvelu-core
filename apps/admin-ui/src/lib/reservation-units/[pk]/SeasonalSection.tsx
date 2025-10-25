@@ -9,7 +9,7 @@ import { breakpoints, WEEKDAYS_SORTED } from "common/src/const";
 import { useTranslation } from "next-i18next";
 import { ReservationUnitEditFormValues } from "./form";
 import { Accordion } from "@/component/Accordion";
-import { getTranslatedError } from "@/common/util";
+import { getTranslatedError } from "@/modules/util";
 
 const SeasonRowWrapper = styled.div`
   display: grid;

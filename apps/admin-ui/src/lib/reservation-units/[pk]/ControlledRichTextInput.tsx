@@ -1,7 +1,7 @@
 import React, { type HTMLAttributes } from "react";
 import { Control, useController } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { getTranslatedError } from "@/common/util";
+import { getTranslatedError } from "@/modules/util";
 import dynamic from "next/dynamic";
 import type { ReservationUnitEditFormValues } from "./form";
 import { getTranslatedTooltipTex } from "./utils";

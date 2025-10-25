@@ -14,7 +14,7 @@ import {
 import { ShowAllContainer } from "common/src/components";
 import { transformWeekday } from "common/src/conversion";
 import { type DayT } from "common/src/const";
-import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
+import { ALLOCATION_CALENDAR_TIMES } from "@/modules/const";
 import {
   type RelatedSlot,
   decodeTimeSlot,

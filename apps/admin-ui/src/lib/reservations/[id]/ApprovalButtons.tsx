@@ -14,7 +14,7 @@ import {
   isPossibleToReturn,
 } from "@/modules/reservationModificationRules";
 import { gql } from "@apollo/client";
-import { getReservationUrl } from "@/common/urls";
+import { getReservationUrl } from "@/modules/urls";
 
 export const APPROVAL_BUTTONS_FRAGMENT = gql`
   fragment ApprovalButtons on ReservationNode {

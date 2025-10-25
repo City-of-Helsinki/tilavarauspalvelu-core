@@ -29,7 +29,7 @@ import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { BufferToggles } from "@/component/BufferToggles";
 import { useCheckCollisions } from "@/hooks";
-import { getBufferTime, getNormalizedInterval } from "@/helpers";
+import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
 import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
 import { successToast } from "common/src/components/toast";

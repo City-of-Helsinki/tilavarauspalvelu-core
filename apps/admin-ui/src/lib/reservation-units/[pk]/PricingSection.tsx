@@ -13,7 +13,7 @@ import {
   ControlledCheckbox,
 } from "common/src/components/form";
 import { PaymentType, PriceUnit } from "@gql/gql-types";
-import { getTranslatedError } from "@/common/util";
+import { getTranslatedError } from "@/modules/util";
 import { FieldGroup } from "./FieldGroup";
 import { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";

@@ -5,8 +5,8 @@ import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant, Tabs } from "hds-react";
 import { Flex, H1, TabWrapper, TitleSection } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { formatAddress } from "@/common/util";
-import { getReservationSeriesUrl } from "@/common/urls";
+import { formatAddress } from "@/modules/util";
+import { getReservationSeriesUrl } from "@/modules/urls";
 import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import {
   FilterOptionsDocument,
@@ -26,11 +26,11 @@ import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { type GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { CreateReservationModal, ReservationUnitCalendarView, UnitReservations } from "@lib/my-units/[id]/";
 import { parseUIDate } from "common/src/date-utils";
 import { addMinutes } from "date-fns";
-import { createClient } from "@/common/apolloClient";
+import { createClient } from "@/modules/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";
 import { getFilterOptions } from "@/hooks/useFilterOptions";
 

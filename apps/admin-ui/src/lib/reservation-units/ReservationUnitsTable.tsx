@@ -9,10 +9,10 @@ import {
   ReservationUnitReservationState,
   type ReservationUnitTableElementFragment,
 } from "@gql/gql-types";
-import { truncate } from "@/helpers";
-import { getOpeningHoursUrl, getReservationUnitUrl } from "@/common/urls";
+import { truncate } from "@/modules/helpers";
+import { getOpeningHoursUrl, getReservationUnitUrl } from "@/modules/urls";
 import { CustomTable } from "@/component/Table";
-import { isBrowser, MAX_NAME_LENGTH } from "@/common/const";
+import { isBrowser, MAX_NAME_LENGTH } from "@/modules/const";
 import { TableLink } from "@/styled";
 import {
   IconCheck,
