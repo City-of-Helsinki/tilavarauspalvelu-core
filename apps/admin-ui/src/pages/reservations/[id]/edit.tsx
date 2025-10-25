@@ -32,9 +32,9 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { GetServerSidePropsContext } from "next";
 import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { Error403 } from "@/component/Error403";
-import { createClient } from "@/common/apolloClient";
+import { createClient } from "@/modules/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";
 
 type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;

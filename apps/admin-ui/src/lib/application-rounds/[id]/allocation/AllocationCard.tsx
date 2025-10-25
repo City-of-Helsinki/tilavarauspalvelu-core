@@ -18,7 +18,7 @@ import {
   type SuitableTimeRangeNodeT,
 } from "./modules/applicationRoundAllocation";
 import { useAcceptSlotMutation, useRefreshApplications, useRemoveAllocation } from "./hooks";
-import { getApplicantName } from "@/helpers";
+import { getApplicantName } from "@/modules/helpers";
 import { NotificationInline } from "@/component/NotificationInline";
 
 type Props = {

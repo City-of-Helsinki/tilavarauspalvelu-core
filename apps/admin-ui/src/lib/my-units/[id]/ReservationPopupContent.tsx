@@ -1,10 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 import { type ReservationUnitReservationsFragment, UserPermissionChoice } from "@gql/gql-types";
-import { getReservationUrl } from "@/common/urls";
+import { getReservationUrl } from "@/modules/urls";
 import { formatDurationFromDates, parseValidDateObject } from "common/src/date-utils";
-import { getReserveeName } from "@/common/util";
-import { truncate } from "@/helpers";
+import { getReserveeName } from "@/modules/util";
+import { truncate } from "@/modules/helpers";
 import { Flex } from "common/styled";
 import { CELL_BORDER } from "./const";
 import VisibleIfPermission from "@/component/VisibleIfPermission";

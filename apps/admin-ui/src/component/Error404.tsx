@@ -1,6 +1,6 @@
 import React from "react";
 import { ErrorContainer } from "common/src/components";
-import { PUBLIC_URL } from "@/common/const";
+import { PUBLIC_URL } from "@/modules/const";
 import { env } from "../env.mjs";
 
 export function Error404(): JSX.Element {

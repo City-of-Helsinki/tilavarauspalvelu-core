@@ -7,7 +7,7 @@ import {
   combineAffectingReservations,
   doesIntervalCollide,
   reservationToInterval,
-} from "@/helpers";
+} from "@/modules/helpers";
 import { type NewReservationListItem } from "@/component/ReservationsList";
 import { createNodeId } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";

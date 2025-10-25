@@ -17,11 +17,11 @@ import {
   UNITS_URL_PREFIX,
   REQUESTED_RESERVATIONS_URL_PREFIX,
   getAccessibilityTermsUrl,
-} from "@/common/urls";
+} from "@/modules/urls";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { getLocalizationLang } from "common/src/helpers";
 import { useRouter } from "next/router";
-import { PUBLIC_URL } from "@/common/const";
+import { PUBLIC_URL } from "@/modules/const";
 
 type Props = {
   apiBaseUrl: string;

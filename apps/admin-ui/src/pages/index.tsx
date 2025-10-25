@@ -4,7 +4,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { H2 } from "common/styled";
-import { HERO_IMAGE_URL } from "@/common/const";
+import { HERO_IMAGE_URL } from "@/modules/const";
 import { KorosHeading, Heading } from "@/component/KorosHeading";
 import { useSession } from "@/hooks";
 import { getCommonServerSideProps } from "@/modules/serverUtils";

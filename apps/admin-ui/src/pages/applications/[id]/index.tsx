@@ -25,7 +25,7 @@ import {
 } from "@gql/gql-types";
 import { formatDateRange, formatDateTime, formatDuration, parseValidDateObject } from "common/src/date-utils";
 import { ApplicationTimePreview } from "common/src/components/ApplicationTimePreview";
-import { formatAgeGroups, formatNumber } from "@/common/util";
+import { formatAgeGroups, formatNumber } from "@/modules/util";
 import { ScrollIntoView } from "@/component/ScrollIntoView";
 import { Accordion as AccordionBase } from "@/component/Accordion";
 import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
@@ -34,7 +34,7 @@ import { StickyHeader } from "@/component/StickyHeader";
 import { BirthDate } from "@/component/BirthDate";
 import { ValueBox } from "@/component/ValueBox";
 import { TimeSelector } from "@/component/TimeSelector";
-import { getApplicantName, translateReserveeType } from "@/helpers";
+import { getApplicantName, translateReserveeType } from "@/modules/helpers";
 import { Error404 } from "@/component/Error404";
 import { useCheckPermission } from "@/hooks";
 import { ApplicationDatas, Summary } from "@/styled";
@@ -44,7 +44,7 @@ import { Error403 } from "@/component/Error403";
 import { GetServerSidePropsContext } from "next";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 
 const Value = styled.span`
   ${fontMedium}

@@ -25,7 +25,7 @@ import {
   ResourceUpdateSchema,
   type ResourceUpdateForm,
 } from "@lib/units/[id]";
-import { getUnitUrl } from "@/common/urls";
+import { getUnitUrl } from "@/modules/urls";
 
 type Props = {
   resourcePk?: number;

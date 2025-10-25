@@ -29,7 +29,7 @@ import { errorToast, successToast } from "common/src/components/toast";
 import { useModal } from "@/context/ModalContext";
 import { Error404 } from "@/component/Error404";
 
-import { getReservationUnitUrl } from "@/common/urls";
+import { getReservationUnitUrl } from "@/modules/urls";
 import { ApolloError, gql } from "@apollo/client";
 import { breakpoints } from "common/src/const";
 import { useRouter } from "next/router";
@@ -56,7 +56,7 @@ import {
   PricingSection,
   ErrorInfo,
 } from "@lib/reservation-units/[pk]/";
-import { NOT_FOUND_SSR_VALUE } from "@/common/const";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;

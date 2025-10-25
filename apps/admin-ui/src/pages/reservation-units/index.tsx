@@ -14,7 +14,7 @@ import {
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { ReservationUnitsDataReader, Filters, type SelectedRow } from "@lib/reservation-units/";
-import { createClient } from "@/common/apolloClient";
+import { createClient } from "@/modules/apolloClient";
 import { getFilterOptions } from "@/hooks/useFilterOptions";
 
 function ReservationUnits({

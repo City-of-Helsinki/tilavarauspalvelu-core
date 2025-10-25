@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import { AutoGrid, Flex, HR } from "common/styled";
 import { SearchTags } from "@/component/SearchTags";
-import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
+import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
 import { AccessCodeState, ApplicationSectionStatusChoice, ApplicationStatusChoice, ReserveeType } from "@gql/gql-types";
 import { ControlledMultiSelectFilter, ControlledSearchFilter } from "@/component/QueryParamFilters";
 import { type TagOptionsList, translateTag } from "@/modules/search";

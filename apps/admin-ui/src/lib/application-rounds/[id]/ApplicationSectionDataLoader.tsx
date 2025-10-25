@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 import { ApplicationSectionOrderingChoices, useApplicationSectionsQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
-import { LIST_PAGE_SIZE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
+import { LIST_PAGE_SIZE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
 import { errorToast } from "common/src/components/toast";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";

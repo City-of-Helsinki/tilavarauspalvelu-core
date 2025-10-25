@@ -7,7 +7,7 @@ import { DenyDialogSeries } from "@/component/DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import { useReservationSeries } from "@/hooks";
 import { isPossibleToDeny } from "@/modules/reservationModificationRules";
-import { getReservationUrl } from "@/common/urls";
+import { getReservationUrl } from "@/modules/urls";
 
 type Props = {
   reservationSeries: Pick<ReservationSeriesNode, "pk">;

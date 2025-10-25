@@ -3,7 +3,7 @@ import type { SelectedRow } from "@/lib/reservation-units";
 import { gql } from "@apollo/client";
 import { ReservationUnitOrderingChoices, useSearchReservationUnitsQuery } from "@gql/gql-types";
 import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
-import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
+import { LARGE_LIST_PAGE_SIZE } from "@/modules/const";
 import { More } from "@/component/More";
 import { ReservationUnitsTable } from "./ReservationUnitsTable";
 import { errorToast } from "common/src/components/toast";

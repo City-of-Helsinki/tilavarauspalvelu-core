@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { type ReservationUnitCardFragment } from "@gql/gql-types";
 import { getImageSource, getMainImage } from "common/src/helpers";
 import StatusLabel from "common/src/components/StatusLabel";
-import { getReservationUnitUrl } from "@/common/urls";
+import { getReservationUnitUrl } from "@/modules/urls";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { gql } from "@apollo/client";

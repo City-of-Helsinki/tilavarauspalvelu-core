@@ -25,7 +25,7 @@ import { ReservationFormSchema, type ReservationFormType, type ReservationFormMe
 import { CenterSpinner, Flex } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useCheckCollisions } from "@/hooks";
-import { getBufferTime, getNormalizedInterval } from "@/helpers";
+import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
 import { fromUIDateTimeUnsafe, formatDate, formatTime, fromUIDateTime } from "common/src/date-utils";
 import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";

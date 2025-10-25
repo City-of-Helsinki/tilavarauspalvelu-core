@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { AutoGrid } from "common/styled";
 import { EditAccordion } from "./styled";
 import type { ReservationUnitEditQuery } from "@gql/gql-types";
-import { getOpeningHoursUrl } from "@/common/urls";
+import { getOpeningHoursUrl } from "@/modules/urls";
 import { isBrowser } from "common/src/helpers";
 import { ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
 

@@ -1,5 +1,5 @@
 import { ApplicationStatusChoice, Priority } from "@gql/gql-types";
-import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
+import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import type { DayT } from "common/src/const";
 import {
