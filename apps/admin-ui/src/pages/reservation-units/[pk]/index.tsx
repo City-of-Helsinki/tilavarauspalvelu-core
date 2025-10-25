@@ -22,7 +22,7 @@ import {
   useUpdateReservationUnitMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { Flex } from "common/styled";
 
 import { errorToast, successToast } from "common/src/components/toast";
@@ -31,7 +31,7 @@ import { Error404 } from "@/components/Error404";
 
 import { getReservationUnitUrl } from "@/modules/urls";
 import { ApolloError, gql } from "@apollo/client";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";

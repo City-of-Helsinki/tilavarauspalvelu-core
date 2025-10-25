@@ -9,7 +9,7 @@ import {
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
-import { ignoreMaybeArray } from "common/src/helpers";
+import { ignoreMaybeArray } from "common/src/modules/helpers";
 import { H1 } from "common/styled";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";

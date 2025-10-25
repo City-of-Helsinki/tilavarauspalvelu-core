@@ -14,8 +14,8 @@ import {
   ReserveeType,
   TermsOfUseTypeChoices,
 } from "@gql/gql-types";
-import { createNodeId } from "common/src/helpers";
-import type { FieldName } from "common/src/metaFieldsHelpers";
+import { createNodeId } from "common/src/modules/helpers";
+import type { FieldName } from "common/src/modules/metaFieldsHelpers";
 import { generateNameFragment } from "@/test/test.gql.utils";
 
 export function generateTextFragment(text: string) {

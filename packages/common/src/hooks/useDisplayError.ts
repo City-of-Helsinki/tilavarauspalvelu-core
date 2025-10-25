@@ -1,4 +1,4 @@
-import { type ApiError, getApiErrors } from "../apolloUtils";
+import { type ApiError, getApiErrors } from "../modules/apolloUtils";
 import { errorToast } from "../components/toast";
 import { type TFunction, useTranslation } from "next-i18next";
 

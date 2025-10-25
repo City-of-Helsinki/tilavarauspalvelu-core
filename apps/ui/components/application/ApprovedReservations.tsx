@@ -31,11 +31,17 @@ import {
   H5,
   CenterSpinner,
 } from "common/styled";
-import { breakpoints } from "common/src/const";
-import { getTranslationSafe } from "common/src/common/util";
-import { filterNonNullable, formatApiTimeInterval, getLocalizationLang, sort, toNumber } from "common/src/helpers";
-import type { LocalizationLanguages } from "common/src/urlBuilder";
-import { convertWeekday } from "common/src/conversion";
+import { breakpoints } from "common/src/modules/const";
+import { getTranslationSafe } from "common/src/modules/util";
+import {
+  filterNonNullable,
+  formatApiTimeInterval,
+  getLocalizationLang,
+  sort,
+  toNumber,
+} from "common/src/modules/helpers";
+import type { LocalizationLanguages } from "common/src/modules/urlBuilder";
+import { convertWeekday } from "common/src/modules/conversion";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { IconButton, StatusLabel } from "common/src/components";
 import type { StatusLabelType } from "common/src/tags";

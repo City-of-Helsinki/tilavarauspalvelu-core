@@ -1,4 +1,4 @@
-import { convertTime, filterNonNullable, toNumber } from "common/src/helpers";
+import { convertTime, filterNonNullable, toNumber } from "common/src/modules/helpers";
 import {
   parseApiDate,
   parseUIDate,
@@ -26,7 +26,7 @@ import { addDays, endOfDay } from "date-fns";
 import { z } from "zod";
 import { checkLengthWithoutHtml, checkTimeStringFormat } from "common/src/schemas/schemaCommon";
 import { intervalToNumber } from "@/schemas/utils";
-import { WEEKDAYS_SORTED } from "common/src/const";
+import { WEEKDAYS_SORTED } from "common/src/modules/const";
 import { type TaxOption } from "./PricingSection";
 import { cleanHtmlContent } from "common/src/components/Sanitize";
 

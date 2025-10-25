@@ -22,13 +22,13 @@ import { useCreateReservationSeries, useFilteredReservationList, useMultipleRese
 import ReservationTypeForm from "@/components/ReservationTypeForm";
 import { ControlledTimeInput } from "@/components/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
-import { createNodeId, toNumber } from "common/src/helpers";
+import { createNodeId, toNumber } from "common/src/modules/helpers";
 import { Element } from "@/styled";
 import { AutoGrid, Flex, Strong } from "common/styled";
 import { errorToast } from "common/src/components/toast";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { useDisplayError } from "common/src/hooks";
-import { getSeriesOverlapErrors } from "common/src/apolloUtils";
+import { getSeriesOverlapErrors } from "common/src/modules/apolloUtils";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { isReservationEq, ReservationListEditor } from "@/components/ReservationListEditor";
 import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
@@ -37,7 +37,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { getMyUnitUrl, getReservationSeriesUrl } from "@/modules/urls";
 import { type OptionT } from "common/src/modules/search";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 
 const InnerTextInput = styled(TextInput)`
   grid-column: 1 / -1;

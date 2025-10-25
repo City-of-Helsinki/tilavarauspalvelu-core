@@ -9,7 +9,7 @@ import { More } from "@/components/More";
 import { LIST_PAGE_SIZE } from "@/modules/const";
 import { ReservationsTable } from "./ReservationsTable";
 import { parseUIDate, formatApiDate } from "common/src/date-utils";
-import { filterEmptyArray, filterNonNullable } from "common/src/helpers";
+import { filterEmptyArray, filterNonNullable } from "common/src/modules/helpers";
 import { errorToast } from "common/src/components/toast";
 import { CenterSpinner } from "common/styled";
 import { useTranslation } from "next-i18next";

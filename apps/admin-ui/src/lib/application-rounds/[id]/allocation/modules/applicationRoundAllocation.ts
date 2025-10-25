@@ -7,10 +7,10 @@ import {
   type ApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
 import { type TFunction } from "next-i18next";
-import { filterNonNullable, sort, toNumber } from "common/src/helpers";
+import { filterNonNullable, sort, toNumber } from "common/src/modules/helpers";
 import { formatDuration, formatTimeRange, timeToMinutes } from "common/src/date-utils";
-import { convertWeekday, transformWeekday } from "common/src/conversion";
-import { type DayT } from "common/src/const";
+import { convertWeekday, transformWeekday } from "common/src/modules/conversion";
+import { type DayT } from "common/src/modules/const";
 import { set } from "date-fns";
 
 // TODO use a fragment

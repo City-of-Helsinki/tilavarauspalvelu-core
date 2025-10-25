@@ -8,8 +8,8 @@ import type { NextRequest } from "next/server";
 // that libraries are not imported in the middleware.
 import { NextResponse } from "next/server";
 import { env } from "@/env.mjs";
-import { buildGraphQLUrl, getSignInUrl, type LocalizationLanguages } from "common/src/urlBuilder";
-import { createNodeId, getLocalizationLang } from "common/src/helpers";
+import { buildGraphQLUrl, getSignInUrl, type LocalizationLanguages } from "common/src/modules/urlBuilder";
+import { createNodeId, getLocalizationLang } from "common/src/modules/helpers";
 import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import { getReservationInProgressPath } from "./modules/urls";
 

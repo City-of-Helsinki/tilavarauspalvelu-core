@@ -12,14 +12,14 @@ import { getFuturePricing, getPriceString, getReservationUnitName } from "@/modu
 import { JustForMobile } from "@/modules/style/layout";
 import { Accordion } from "hds-react";
 import { gql } from "@apollo/client";
-import { filterNonNullable, formatListToCSV, isPriceFree, toNumber } from "common/src/helpers";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { filterNonNullable, formatListToCSV, isPriceFree, toNumber } from "common/src/modules/helpers";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { formatDate, formatTimeRange, timeToMinutes } from "common/src/date-utils";
 import { ReservationInfoSection } from "./ReservationInfoSection";
 import { Sanitize } from "common/src/components/Sanitize";
 import styled from "styled-components";
 import { formatters as getFormatters } from "common";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import { AddressSection } from "./AddressSection";
 import { useGenericTerms } from "common/src/hooks";
 

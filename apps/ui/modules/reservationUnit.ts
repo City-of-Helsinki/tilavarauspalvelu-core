@@ -14,7 +14,7 @@ import {
   sub,
 } from "date-fns";
 import { i18n } from "next-i18next";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import {
   type AvailableTimesReservationUnitFieldsFragment,
   type BlockingReservationFieldsFragment,
@@ -42,7 +42,7 @@ import {
   type RoundPeriod,
 } from "@/modules/reservable";
 import { gql } from "@apollo/client";
-import { getIntervalMinutes } from "common/src/conversion";
+import { getIntervalMinutes } from "common/src/modules/conversion";
 import {
   capitalize,
   dayMax,
@@ -51,9 +51,9 @@ import {
   formatTimeStruct,
   isPriceFree,
   type ReadonlyDeep,
-} from "common/src/helpers";
+} from "common/src/modules/helpers";
 import { timeToMinutes, formatApiDate } from "common/src/date-utils";
-import { type LocalizationLanguages } from "common/src/urlBuilder";
+import { type LocalizationLanguages } from "common/src/modules/urlBuilder";
 import { type TFunction } from "i18next";
 
 export function isReservationUnitPublished(reservationUnit: Pick<ReservationUnitNode, "publishingState">): boolean {

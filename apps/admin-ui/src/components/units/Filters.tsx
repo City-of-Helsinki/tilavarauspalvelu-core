@@ -10,7 +10,7 @@ import { SearchButton, SearchButtonContainer } from "common/src/components/Searc
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { mapFormToSearchParams } from "common/src/modules/search";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
-import { mapParamToInteger } from "common/src/helpers";
+import { mapParamToInteger } from "common/src/modules/helpers";
 
 type SearchFormValues = {
   search: string;

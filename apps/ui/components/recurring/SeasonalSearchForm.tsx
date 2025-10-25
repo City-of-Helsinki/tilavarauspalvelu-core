@@ -9,7 +9,7 @@ import { SearchButton, SearchButtonContainer } from "common/src/components/Searc
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
 import { ControlledNumberInput } from "common/src/components/form";
-import { mapParamToInteger, toNumber } from "common/src/helpers";
+import { mapParamToInteger, toNumber } from "common/src/modules/helpers";
 import { AutoGrid, Flex } from "common/styled";
 
 const filterOrder = [

@@ -9,7 +9,7 @@ import {
   useUpdateResourceMutation,
   useResourceQuery,
 } from "@gql/gql-types";
-import { createNodeId } from "common/src/helpers";
+import { createNodeId } from "common/src/modules/helpers";
 import { ButtonContainer, CenterSpinner } from "common/styled";
 import { errorToast, successToast } from "common/src/components/toast";
 import { FormErrorSummary } from "@/components/FormErrorSummary";

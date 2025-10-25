@@ -14,15 +14,15 @@ import {
 import NotificationWrapper from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks";
 import { getCheckoutUrl } from "@/modules/reservation";
-import { createNodeId, filterNonNullable } from "common/src/helpers";
+import { createNodeId, filterNonNullable } from "common/src/modules/helpers";
 import { gql, useApolloClient } from "@apollo/client";
-import { convertLanguageCode } from "common/src/common/util";
+import { convertLanguageCode } from "common/src/modules/util";
 import { formatApiDate } from "common/src/date-utils";
 import { errorToast, successToast } from "common/src/components/toast";
 import { getReservationInProgressPath } from "@/modules/urls";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { Flex } from "common/styled";
-import { getApiErrors } from "common/src/apolloUtils";
+import { getApiErrors } from "common/src/modules/apolloUtils";
 import { type ParsedUrlQuery } from "querystring";
 
 const BodyText = styled.p`

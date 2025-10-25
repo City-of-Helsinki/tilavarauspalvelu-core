@@ -6,7 +6,7 @@ import { useUpdateSpaceMutation, type SpaceUpdateMutationInput, useSpaceQuery } 
 import { errorToast, successToast } from "common/src/components/toast";
 import { ButtonContainer, CenterSpinner, H2, H3 } from "common/styled";
 import { FormErrorSummary } from "@/components/FormErrorSummary";
-import { createNodeId } from "common/src/helpers";
+import { createNodeId } from "common/src/modules/helpers";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LinkPrev } from "@/components/LinkPrev";

@@ -12,7 +12,7 @@ import {
   BlockingReservationFieldsFragment,
 } from "@/gql/gql-types";
 import { formatApiDateUnsafe } from "common/src/date-utils";
-import { dayMax, dayMin } from "common/src/helpers";
+import { dayMax, dayMin } from "common/src/modules/helpers";
 import {
   differenceInSeconds,
   isValid,
@@ -31,7 +31,7 @@ import {
 } from "date-fns";
 import { type SlotProps } from "common/src/calendar/Calendar";
 import { type ReservationUnitNode } from "common/gql/gql-types";
-import { getIntervalMinutes } from "common/src/conversion";
+import { getIntervalMinutes } from "common/src/modules/conversion";
 import { gql } from "@apollo/client";
 
 export type RoundPeriod = {

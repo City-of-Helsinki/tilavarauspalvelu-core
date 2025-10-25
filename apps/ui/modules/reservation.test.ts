@@ -20,7 +20,7 @@ import { isSlotWithinReservationTime } from "./reservable";
 import { formatApiDate } from "common/src/date-utils";
 import { type TFunction } from "i18next";
 import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
-import { createNodeId } from "common/src/helpers";
+import { createNodeId } from "common/src/modules/helpers";
 
 function createMockCancellationRule({
   canBeCancelledTimeBefore = 0,

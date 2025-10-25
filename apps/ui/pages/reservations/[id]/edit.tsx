@@ -11,10 +11,10 @@ import {
   ReservationEditPageDocument,
   MunicipalityChoice,
 } from "@gql/gql-types";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { formatApiDate } from "common/src/date-utils";
 import { addYears } from "date-fns";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import { H1 } from "common/styled";
 import { gql } from "@apollo/client";
 import { StepState, Stepper } from "hds-react";

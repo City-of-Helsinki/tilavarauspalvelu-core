@@ -14,7 +14,7 @@ import { AllReservations } from "@/components/application/ApprovedReservations";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { applicationsPrefix, getApplicationPath } from "@/modules/urls";
 
 function ViewAll({ applicationSection }: PropsNarrowed): JSX.Element {

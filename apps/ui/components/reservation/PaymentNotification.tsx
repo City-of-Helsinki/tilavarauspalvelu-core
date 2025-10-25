@@ -8,12 +8,12 @@ import { Notification } from "hds-react";
 import { ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { convertLanguageCode } from "common/src/common/util";
+import { convertLanguageCode } from "common/src/modules/util";
 import { formatDateTime, parseValidDateObject } from "common/src/date-utils";
 import { Flex, fontMedium } from "common/styled";
 import { formatters as getFormatters } from "common";
 import React, { useMemo } from "react";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import { getPaymentUrl } from "@/modules/reservation";
 
 type PaymentNotificationProps = {

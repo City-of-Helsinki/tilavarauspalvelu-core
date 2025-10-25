@@ -8,7 +8,7 @@ import { Flex, H1, P } from "common/styled";
 import { useReservationSeries } from "@/hooks";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { UserPermissionChoice } from "@gql/gql-types";
-import { ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";

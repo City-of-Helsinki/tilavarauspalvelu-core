@@ -1,4 +1,4 @@
-import type { LocalizationLanguages } from "common/src/urlBuilder";
+import type { LocalizationLanguages } from "common/src/modules/urlBuilder";
 import React from "react";
 import { IconArrowRight, IconLinkExternal } from "hds-react";
 import { type TFunction, useTranslation } from "next-i18next";
@@ -7,7 +7,7 @@ import { isValid } from "date-fns";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { getApplicationRoundPath } from "@/modules/urls";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { formatDateTime, formatDate } from "common/src/date-utils";
 import { gql } from "@apollo/client";
 

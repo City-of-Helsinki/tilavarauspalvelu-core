@@ -22,8 +22,8 @@ import {
   ReservationsByReservationUnitDocument,
   type ReservationsByReservationUnitQuery,
 } from "@gql/gql-types";
-import { createNodeId } from "common/src/helpers";
-import { RELATED_RESERVATION_STATES } from "common/src/const";
+import { createNodeId } from "common/src/modules/helpers";
+import { RELATED_RESERVATION_STATES } from "common/src/modules/const";
 import { formatApiDateUnsafe } from "common/src/date-utils";
 
 export function createReservationUnits(): CreateStaffReservationFragment[] {

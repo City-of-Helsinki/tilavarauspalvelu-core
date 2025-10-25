@@ -1,6 +1,6 @@
 import React from "react";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { convertOptionToHDS, filterNonNullable, toNumber } from "common/src/helpers";
+import { convertOptionToHDS, filterNonNullable, toNumber } from "common/src/modules/helpers";
 import { Select } from "hds-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslation } from "next-i18next";

@@ -9,7 +9,7 @@ import { parseUIDate, isValidDate, formatDate } from "common/src/date-utils";
 import { startOfDay } from "date-fns";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { AutoGrid, Flex, HR } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import { SearchTags } from "@/components/SearchTags";
 import { MultiSelectFilter } from "@/components/QueryParamFilters";
 import { DayNavigation } from "@/components/QueryParamFilters/DayNavigation";

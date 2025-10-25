@@ -8,8 +8,8 @@ import {
   createMapUrl,
 } from "@/components/reservation-unit/AddressSection";
 import { describe, expect, it } from "vitest";
-import { getLocalizationLang } from "common/src/helpers";
-import { getTranslationSafe } from "common/src/common/util";
+import { getLocalizationLang } from "common/src/modules/helpers";
+import { getTranslationSafe } from "common/src/modules/util";
 
 const createAddressSectionMock = (proper = true): AddressFieldsFragment => ({
   id: "1",

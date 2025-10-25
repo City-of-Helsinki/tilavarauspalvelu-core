@@ -1,8 +1,8 @@
 import React from "react";
 import { type ApplicationAdminQuery, Priority } from "@gql/gql-types";
-import { convertWeekday, transformWeekday } from "common/src/conversion";
-import { filterNonNullable } from "common/src/helpers";
-import { WEEKDAYS } from "common/src/const";
+import { convertWeekday, transformWeekday } from "common/src/modules/conversion";
+import { filterNonNullable } from "common/src/modules/helpers";
+import { WEEKDAYS } from "common/src/modules/const";
 import { ApplicationTimeSelector, type Cell } from "common/src/components/ApplicationTimeSelector";
 import { useTranslation } from "next-i18next";
 

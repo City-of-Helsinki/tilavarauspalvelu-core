@@ -2,12 +2,12 @@ import { IconCheck, IconCross } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled, { css } from "styled-components";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/modules/helpers";
 import { timeToMinutes } from "common/src/date-utils";
 import { ApplicationSectionStatusChoice, type SuitableTimeRangeNode } from "@gql/gql-types";
 import { fontMedium } from "common/styled";
-import { breakpoints, type DayT, WEEKDAYS } from "common/src/const";
-import { transformWeekday } from "common/src/conversion";
+import { breakpoints, type DayT, WEEKDAYS } from "common/src/modules/const";
+import { transformWeekday } from "common/src/modules/conversion";
 import { ALLOCATION_CALENDAR_TIMES } from "@/modules/const";
 import {
   applicationEventSchedulesToCells,

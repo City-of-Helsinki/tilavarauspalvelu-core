@@ -1,6 +1,6 @@
 import { ReservationUnitNode } from "@/gql/gql-types";
 import { generateReservableMap, type ReservableMap } from "@/modules/reservable";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/modules/helpers";
 import { useMemo } from "react";
 
 export function useReservableTimes(reservationUnit: Pick<ReservationUnitNode, "reservableTimeSpans">): ReservableMap {

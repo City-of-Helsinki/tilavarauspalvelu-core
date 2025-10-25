@@ -9,9 +9,9 @@ import {
   useShowNotificationsListQuery,
   type ShowNotificationFieldsFragment,
 } from "../../gql/gql-types";
-import { filterNonNullable } from "../helpers";
+import { filterNonNullable } from "../modules/helpers";
 import { useTranslation } from "next-i18next";
-import { convertLanguageCode, getTranslationSafe } from "../common/util";
+import { convertLanguageCode, getTranslationSafe } from "../modules/util";
 import { gql } from "@apollo/client";
 import { ClientOnly } from "./ClientOnly";
 import { Sanitize } from "./Sanitize";

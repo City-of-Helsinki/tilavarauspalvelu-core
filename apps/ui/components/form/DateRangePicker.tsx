@@ -3,7 +3,7 @@ import { isBefore } from "date-fns";
 import { DateInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { parseUIDate, isValidDate, formatDate } from "common/src/date-utils";
-import { getLocalizationLang } from "common/src/helpers";
+import { getLocalizationLang } from "common/src/modules/helpers";
 import { startOfDay } from "date-fns/startOfDay";
 
 export interface DateRangePickerProps {

@@ -1,6 +1,6 @@
 import React, { type Dispatch, type SetStateAction } from "react";
 import type { SelectedRow } from "@/lib/reservation-units";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import { Flex } from "common/styled";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "i18next";

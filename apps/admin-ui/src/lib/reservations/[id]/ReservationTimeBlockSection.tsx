@@ -16,7 +16,7 @@ import { Legend, LegendsWrapper } from "@/components/Legend";
 import { EditTimeModal } from "@/components/EditTimeModal";
 import { isPossibleToEdit } from "@/modules/reservationModificationRules";
 import { getEventBuffers } from "common/src/calendar/util";
-import { filterNonNullable, toNumber } from "common/src/helpers";
+import { filterNonNullable, toNumber } from "common/src/modules/helpers";
 import VisibleIfPermission from "@/components/VisibleIfPermission";
 import { useReservationCalendarData, useReservationSeries } from "@/hooks";
 import { add, startOfISOWeek } from "date-fns";

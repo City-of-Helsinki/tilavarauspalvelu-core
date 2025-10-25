@@ -3,13 +3,13 @@ import { IconArrowDown, IconArrowUp, ButtonSize, ButtonVariant, Button, ButtonPr
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Flex, H6, fontBold, fontMedium, fontRegular } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import type { OrderedReservationUnitCardFragment } from "@gql/gql-types";
 import { getReservationUnitName } from "@/modules/reservationUnit";
-import { getImageSource, getMainImage } from "common/src/helpers";
+import { getImageSource, getMainImage } from "common/src/modules/helpers";
 import Card from "common/src/components/Card";
 import { ErrorText } from "common/src/components/ErrorText";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { gql } from "@apollo/client";
 
 const NameCardContainer = styled(Flex).attrs({ $gap: "none" })`

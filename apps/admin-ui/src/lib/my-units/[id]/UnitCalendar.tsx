@@ -6,7 +6,7 @@ import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from 
 import { useTranslation, type TFunction } from "next-i18next";
 import { CalendarEvent } from "common/src/calendar/Calendar";
 import { focusStyles } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import { POST_PAUSE, PRE_PAUSE } from "@/modules/calendarStyling";
 import { getReserveeName } from "@/modules/util";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";

@@ -18,9 +18,9 @@ import { addMinutes, differenceInMinutes } from "date-fns";
 import { eventStyleGetter } from "@/components/common/calendarUtils";
 import { Legend } from "@/components/calendar/Legend";
 import { useMedia } from "react-use";
-import { breakpoints, RELATED_RESERVATION_STATES } from "common/src/const";
+import { breakpoints, RELATED_RESERVATION_STATES } from "common/src/modules/const";
 import { getEventBuffers } from "common/src/calendar/util";
-import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
+import { filterNonNullable, getLocalizationLang } from "common/src/modules/helpers";
 import {
   SLOTS_EVERY_HOUR,
   convertFormToFocustimeSlot,

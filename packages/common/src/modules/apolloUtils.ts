@@ -2,7 +2,7 @@ import { ApolloError, ServerError, ServerParseError } from "@apollo/client";
 import { type GraphQLFormattedError } from "graphql";
 import * as Sentry from "@sentry/nextjs";
 import { onError } from "@apollo/client/link/error";
-import toast from "./components/toast";
+import toast from "../components/toast";
 import { isBrowser } from "./helpers";
 import { type IncomingMessage, type IncomingHttpHeaders } from "node:http";
 import qs from "querystring";

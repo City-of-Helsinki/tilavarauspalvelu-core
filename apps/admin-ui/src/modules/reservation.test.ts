@@ -11,7 +11,7 @@ import { createTagString, getReservationUnitPricing } from "./reservation";
 import { addHours, addMonths } from "date-fns";
 import { formatApiDateUnsafe } from "common/src/date-utils";
 import { describe, expect, test } from "vitest";
-import { createNodeId } from "common/src/helpers";
+import { createNodeId } from "common/src/modules/helpers";
 
 const mockT = ((x: string) => x) as TFunction;
 

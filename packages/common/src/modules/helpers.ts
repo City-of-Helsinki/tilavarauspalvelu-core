@@ -5,11 +5,11 @@ import {
   type ImageFragment,
   type Maybe,
   type SuitableTimeFragment,
-} from "../gql/gql-types";
+} from "../../gql/gql-types";
 import { type OptionInProps } from "hds-react";
 import { pixel } from "./const";
 import { type TFunction } from "i18next";
-import { minutesToHoursString, timeToMinutes } from "./date-utils";
+import { minutesToHoursString, timeToMinutes } from "../date-utils";
 import { type LocalizationLanguages } from "./urlBuilder";
 import { convertWeekday } from "./conversion";
 

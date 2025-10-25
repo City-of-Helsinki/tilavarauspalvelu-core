@@ -3,7 +3,7 @@ import { IconSearch, TextInput } from "hds-react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import { getSingleSearchPath } from "@/modules/urls";
 
 const StyledTextInput = styled(TextInput)`

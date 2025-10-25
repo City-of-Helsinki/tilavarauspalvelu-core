@@ -6,7 +6,7 @@ import type { Maybe, SpaceQuery } from "@gql/gql-types";
 import { formatAddress } from "@/modules/util";
 import { getUnitUrl } from "@/modules/urls";
 import { Flex, fontMedium, H1 } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import Link from "next/link";
 
 interface IProps {

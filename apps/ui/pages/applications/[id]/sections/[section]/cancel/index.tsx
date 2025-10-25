@@ -11,13 +11,19 @@ import { type CancelFormValues, CancellationForm } from "@/components/Cancellati
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import { createNodeId, filterNonNullable, formatApiTimeInterval, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import {
+  createNodeId,
+  filterNonNullable,
+  formatApiTimeInterval,
+  ignoreMaybeArray,
+  toNumber,
+} from "common/src/modules/helpers";
 import { getApplicationPath } from "@/modules/urls";
 import { useTranslation } from "next-i18next";
 import { ApolloError, gql } from "@apollo/client";
 import { H1 } from "common/styled";
-import { breakpoints } from "common/src/const";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { breakpoints } from "common/src/modules/const";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { parseApiDate, formatDate } from "common/src/date-utils";
 import { useRouter } from "next/router";
 import { IconCalendarEvent, IconClock, IconLocation, IconTrash } from "hds-react";

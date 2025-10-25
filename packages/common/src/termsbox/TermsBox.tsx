@@ -3,7 +3,7 @@ import { Checkbox, IconLinkExternal } from "hds-react";
 import styled from "styled-components";
 import Link from "next/link";
 import { H6 } from "../../styled";
-import { breakpoints } from "../const";
+import { breakpoints } from "../modules/const";
 
 type LinkT = {
   href: string;

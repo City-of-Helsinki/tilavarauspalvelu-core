@@ -5,7 +5,7 @@ import { vi, describe, test, expect } from "vitest";
 import { getReservationUnitPath } from "@/modules/urls";
 import { createMockReservationUnitType, generateNameFragment } from "@/test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
-import { createNodeId } from "common/src/helpers";
+import { createNodeId } from "common/src/modules/helpers";
 
 describe("RecurringCard", () => {
   test("should render recurring card", () => {

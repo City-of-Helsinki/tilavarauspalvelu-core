@@ -8,7 +8,7 @@ import { PopupMenu } from "common/src/components/PopupMenu";
 import { getResourceUrl } from "@/modules/urls";
 import { CustomTable } from "@/components/Table";
 import { successToast } from "common/src/components/toast";
-import { truncate } from "common/src/helpers";
+import { truncate } from "common/src/modules/helpers";
 import { MAX_NAME_LENGTH } from "@/modules/const";
 import { TableLink } from "@/styled";
 import { Flex } from "common/styled";

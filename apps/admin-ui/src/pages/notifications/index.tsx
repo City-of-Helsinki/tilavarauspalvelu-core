@@ -14,7 +14,7 @@ import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { formatDate, formatTime } from "common/src/date-utils";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/modules/const";
 import { CustomTable } from "@/components/Table";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/modules/helpers";
 import { More } from "@/components/More";
 import { TableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";

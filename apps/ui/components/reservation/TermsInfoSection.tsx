@@ -1,7 +1,7 @@
 import { useTranslation } from "next-i18next";
 import React, { useMemo } from "react";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { Sanitize } from "common/src/components/Sanitize";
 import type { ReservationPageQuery } from "@gql/gql-types";

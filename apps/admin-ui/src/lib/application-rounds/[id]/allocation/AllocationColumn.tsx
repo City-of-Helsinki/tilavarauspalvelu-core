@@ -12,8 +12,8 @@ import {
   type ReservationUnitNode,
 } from "@gql/gql-types";
 import { ShowAllContainer } from "common/src/components";
-import { transformWeekday } from "common/src/conversion";
-import { type DayT } from "common/src/const";
+import { transformWeekday } from "common/src/modules/conversion";
+import { type DayT } from "common/src/modules/const";
 import { ALLOCATION_CALENDAR_TIMES } from "@/modules/const";
 import {
   type RelatedSlot,
@@ -26,7 +26,7 @@ import {
 } from "./modules/applicationRoundAllocation";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
-import { convertOptionToHDS, filterNonNullable, toNumber } from "common/src/helpers";
+import { convertOptionToHDS, filterNonNullable, toNumber } from "common/src/modules/helpers";
 import { addMinutes, startOfDay } from "date-fns";
 import { timeToMinutes, formatTimeRange } from "common/src/date-utils";
 

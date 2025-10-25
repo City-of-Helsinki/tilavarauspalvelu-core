@@ -2,7 +2,7 @@ import React from "react";
 import { CustomTable } from "@/components/Table";
 import { getApplicationUrl, getReservationUrl } from "@/modules/urls";
 import type { RejectedOccurrencesTableElementFragment } from "@gql/gql-types";
-import { truncate } from "common/src/helpers";
+import { truncate } from "common/src/modules/helpers";
 import { IconLinkExternal, IconSize } from "hds-react";
 import { memoize } from "lodash-es";
 import { useTranslation, type TFunction } from "next-i18next";

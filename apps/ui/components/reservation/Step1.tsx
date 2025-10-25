@@ -4,7 +4,7 @@ import { type ReservationQuery } from "@gql/gql-types";
 import { Button, ButtonVariant, IconArrowLeft, LoadingSpinner, Notification } from "hds-react";
 import { useFormContext } from "react-hook-form";
 import { type OptionsRecord } from "common";
-import { type FieldName } from "common/src/metaFieldsHelpers";
+import { type FieldName } from "common/src/modules/metaFieldsHelpers";
 import { ActionContainer } from "./styles";
 import { ApplicationFields, GeneralFields } from "./SummaryFields";
 import { AcceptTerms } from "./AcceptTerms";
