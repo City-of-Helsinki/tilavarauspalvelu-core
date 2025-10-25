@@ -3,7 +3,7 @@ import { useTranslation, type TFunction } from "next-i18next";
 import { memoize, orderBy, uniqBy } from "lodash-es";
 import { IconLinkExternal, IconSize } from "hds-react";
 import { type ApplicationsTableElementFragment, ApplicationStatusChoice } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/modules/helpers";
 import { getApplicantName, translateReserveeType, truncate } from "@/modules/helpers";
 import { CustomTable } from "@/components/Table";
 import { calculateAppliedReservationTime, formatAppliedReservationTime } from "./utils";

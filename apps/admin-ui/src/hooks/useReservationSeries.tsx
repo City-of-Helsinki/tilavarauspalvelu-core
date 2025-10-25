@@ -1,7 +1,7 @@
 import { useTranslation } from "next-i18next";
 import { type Maybe, useReservationSeriesQuery } from "@gql/gql-types";
 import { errorToast } from "common/src/components/toast";
-import { createNodeId, filterNonNullable } from "common/src/helpers";
+import { createNodeId, filterNonNullable } from "common/src/modules/helpers";
 import { gql } from "@apollo/client";
 
 /// @param recurringPk fetch reservations related to this pk

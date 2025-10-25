@@ -35,7 +35,7 @@ import {
   checkTimeStringFormat,
   checkLengthWithoutHtml,
 } from "common/src/schemas/schemaCommon";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { ControlledDateInput } from "common/src/components/form";
 import { ControlledTimeInput } from "@/components/ControlledTimeInput";
 import { successToast } from "common/src/components/toast";

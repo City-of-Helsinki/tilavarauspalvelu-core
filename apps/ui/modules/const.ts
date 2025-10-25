@@ -1,7 +1,7 @@
 import type { TFunction } from "i18next";
 
-export { isBrowser } from "common/src/helpers";
-export { genericTermsVariant } from "common/src/const";
+export { isBrowser } from "common/src/modules/helpers";
+export { genericTermsVariant } from "common/src/modules/const";
 
 export const mapUrlPrefix = "https://palvelukartta.hel.fi/";
 

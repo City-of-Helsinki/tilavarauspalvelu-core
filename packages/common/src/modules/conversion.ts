@@ -11,7 +11,7 @@ import {
   ReservationUnitPublishingState,
   ReserveeType,
   Weekday,
-} from "../gql/gql-types";
+} from "../../gql/gql-types";
 import { type DayT } from "./const";
 
 export function transformWeekday(d: DayT): Weekday {

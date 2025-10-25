@@ -7,11 +7,11 @@ import { AccessCodeState, ApplicationSectionStatusChoice, ApplicationStatusChoic
 import { ControlledMultiSelectFilter, ControlledSearchFilter } from "@/components/QueryParamFilters";
 import { type TagOptionsList, translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";
-import { DayT } from "common/src/const";
+import { DayT } from "common/src/modules/const";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { mapFormToSearchParams } from "common/src/modules/search";
-import { convertWeekday } from "common/src/conversion";
+import { convertWeekday } from "common/src/modules/conversion";
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 

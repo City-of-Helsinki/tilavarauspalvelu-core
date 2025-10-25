@@ -1,6 +1,6 @@
 import { type SearchReservationUnitsQueryVariables, useSearchReservationUnitsQuery } from "@/gql/gql-types";
 import { SEARCH_PAGING_LIMIT } from "@/modules/const";
-import { hash, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { hash, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 

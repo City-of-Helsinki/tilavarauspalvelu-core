@@ -6,7 +6,7 @@ import { maxBy } from "lodash-es";
 import { parseUIDate, formatDateTimeRange } from "common/src/date-utils";
 import { Transition } from "react-transition-group";
 import { Flex, fontBold, fontMedium, fontRegular, SemiBold } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import { type Control, type FieldValues, type SubmitHandler, useController, type UseFormReturn } from "react-hook-form";
@@ -15,7 +15,7 @@ import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { useMedia } from "react-use";
 import { type FocusTimeSlot } from "@/modules/reservation";
 import { ControlledDateInput } from "common/src/components/form";
-import { capitalize, getLocalizationLang } from "common/src/helpers";
+import { capitalize, getLocalizationLang } from "common/src/modules/helpers";
 
 type CommonProps = {
   reservationUnit: ReservationTimePickerFieldsFragment;

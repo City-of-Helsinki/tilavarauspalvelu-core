@@ -11,12 +11,12 @@ import MetaFields from "common/src/reservation-form/MetaFields";
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
 import { type ReservationQuery, ReserveeType } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/helpers";
-import { containsField, FieldName } from "common/src/metaFieldsHelpers";
+import { filterNonNullable } from "common/src/modules/helpers";
+import { containsField, FieldName } from "common/src/modules/metaFieldsHelpers";
 import { getApplicationFields, getGeneralFields } from "./SummaryFields";
 import { type Inputs } from "common/src/reservation-form/types";
 import { LinkLikeButton } from "common/styled";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { type OptionsRecord } from "common";
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;

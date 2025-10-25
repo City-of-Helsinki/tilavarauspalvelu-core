@@ -1,6 +1,6 @@
 import { Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { EXPECTED_TIMEZONE } from "../const";
+import { EXPECTED_TIMEZONE } from "../modules/const";
 
 function TimeZoneNotification() {
   const { t } = useTranslation();

@@ -18,7 +18,7 @@ import { useForm } from "react-hook-form";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
-import { mapParamToInteger } from "common/src/helpers";
+import { mapParamToInteger } from "common/src/modules/helpers";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { mapFormToSearchParams } from "common/src/modules/search";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";

@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, IconLock, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { Flex, fontRegular, H1, H4, NoWrap } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import {
   type AccessCodeQuery,
   AccessType,
@@ -43,7 +43,7 @@ import {
   getLocalizationLang,
   ignoreMaybeArray,
   toNumber,
-} from "common/src/helpers";
+} from "common/src/modules/helpers";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
   getApplicationPath,
@@ -54,7 +54,7 @@ import {
   reservationsPrefix,
 } from "@/modules/urls";
 import { useToastIfQueryParam } from "@/hooks";
-import { convertLanguageCode } from "common/src/common/util";
+import { convertLanguageCode } from "common/src/modules/util";
 import { gql } from "@apollo/client";
 import StatusLabel from "common/src/components/StatusLabel";
 import IconButton from "common/src/components/IconButton";

@@ -3,7 +3,7 @@ import { useTranslation, type TFunction } from "next-i18next";
 import { memoize } from "lodash-es";
 import { IconLinkExternal, IconSize, Tooltip } from "hds-react";
 import type { AllocatedSectionsTableElementFragment } from "@gql/gql-types";
-import { convertWeekday } from "common/src/conversion";
+import { convertWeekday } from "common/src/modules/conversion";
 import { getApplicantName, truncate } from "@/modules/helpers";
 import { getApplicationUrl, getReservationUrl } from "@/modules/urls";
 import { CustomTable } from "@/components/Table";

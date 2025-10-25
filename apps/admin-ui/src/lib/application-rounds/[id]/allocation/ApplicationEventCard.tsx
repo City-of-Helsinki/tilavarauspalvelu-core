@@ -9,8 +9,8 @@ import {
   useRejectRestMutation,
 } from "@gql/gql-types";
 import { fontMedium, SemiBold } from "common/styled";
-import { filterNonNullable, truncate } from "common/src/helpers";
-import { convertWeekday } from "common/src/conversion";
+import { filterNonNullable, truncate } from "common/src/modules/helpers";
+import { convertWeekday } from "common/src/modules/conversion";
 import {
   type AllocatedTimeSlotNodeT,
   createDurationString,

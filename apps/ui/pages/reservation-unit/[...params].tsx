@@ -8,7 +8,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { Flex, H1, H4 } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import {
   ReservationDocument,
   type ReservationQuery,
@@ -33,12 +33,12 @@ import { Step0 } from "@/components/reservation/Step0";
 import { Step1 } from "@/components/reservation/Step1";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
-import { createNodeId, filterNonNullable, toNumber } from "common/src/helpers";
-import { containsField } from "common/src/metaFieldsHelpers";
+import { createNodeId, filterNonNullable, toNumber } from "common/src/modules/helpers";
+import { containsField } from "common/src/modules/metaFieldsHelpers";
 import { errorToast } from "common/src/components/toast";
 import { getGeneralFields } from "@/components/reservation/SummaryFields";
 import { queryOptions } from "@/modules/queryOptions";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { gql } from "@apollo/client";
 import { PinkBox as PinkBoxBase } from "@/components/reservation/styles";
 import { Breadcrumb } from "@/components/common/Breadcrumb";

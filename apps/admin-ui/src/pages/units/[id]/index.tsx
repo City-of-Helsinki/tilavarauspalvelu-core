@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { UserPermissionChoice, useUnitPageQuery } from "@gql/gql-types";
 import { formatAddress } from "@/modules/util";
 import { ExternalLink } from "@/components/ExternalLink";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { Error404 } from "@/components/Error404";
 import { ReservationUnitList } from "@lib/units/[id]/ReservationUnitList";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/modules/urls";

@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { IconArrowRight, IconSignout, IconSize } from "hds-react";
-import { signOut } from "common/src/browserHelpers";
+import { signOut } from "common/src/modules/browserHelpers";
 import { getSingleSearchPath } from "@/modules/urls";
 import { IconButton } from "common/src/components";
 import { Flex } from "common/styled";

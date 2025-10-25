@@ -2,7 +2,7 @@ import { UseFormReturn } from "react-hook-form";
 import type { ReservationUnitEditFormValues } from "./form";
 import { ReservationKind, ReservationUnitEditQuery, ReservationUnitEditUnitFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/modules/helpers";
 import { TextInput } from "hds-react";
 import { getTranslatedError } from "@/modules/util";
 import { ControlledSelect } from "common/src/components/form";

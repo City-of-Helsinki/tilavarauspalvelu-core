@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { type ReservationNode, ReserveeType } from "@/gql/gql-types";
-import { containsField, type FieldName } from "common/src/metaFieldsHelpers";
+import { containsField, type FieldName } from "common/src/modules/metaFieldsHelpers";
 import { AutoGrid, H4 } from "common/styled";
 import { type MetaFieldsFragment } from "common/gql/gql-types";
 import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";

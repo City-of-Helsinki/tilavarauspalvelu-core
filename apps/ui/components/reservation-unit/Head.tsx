@@ -1,12 +1,12 @@
-import type { LocalizationLanguages } from "common/src/urlBuilder";
+import type { LocalizationLanguages } from "common/src/modules/urlBuilder";
 import { IconClock, IconGroup, IconEuroSign, IconHome, IconSize, IconLock, Tooltip } from "hds-react";
 import React from "react";
 import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { ReservationKind, type ReservationUnitHeadFragment } from "@gql/gql-types";
 import { Flex, H1, H3 } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import { formatDateRange, formatDateTime, formatDuration, formatDate } from "common/src/date-utils";
 import { IconWithText } from "@/components/common/IconWithText";
 import { Images } from "./Images";
@@ -16,7 +16,7 @@ import {
   getReservationUnitAccessPeriods,
   isReservationUnitPaid,
 } from "@/modules/reservationUnit";
-import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
+import { filterNonNullable, getLocalizationLang } from "common/src/modules/helpers";
 import { gql } from "@apollo/client";
 
 interface HeadProps {

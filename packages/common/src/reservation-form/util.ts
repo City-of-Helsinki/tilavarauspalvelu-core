@@ -1,7 +1,7 @@
 import { camelCase, get, uniq } from "lodash-es";
 import { type ReservationMetadataFieldNode, ReserveeType } from "../../gql/gql-types";
 import { reservationApplicationFields } from "./types";
-import { containsField } from "../metaFieldsHelpers";
+import { containsField } from "../modules/metaFieldsHelpers";
 
 export function getReservationApplicationFields({
   supportedFields,

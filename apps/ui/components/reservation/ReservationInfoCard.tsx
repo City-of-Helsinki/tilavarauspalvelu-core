@@ -13,10 +13,16 @@ import {
   useAccessCodeQuery,
 } from "@gql/gql-types";
 import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
-import { createNodeId, capitalize, getImageSource, getLocalizationLang, getMainImage } from "common/src/helpers";
+import {
+  createNodeId,
+  capitalize,
+  getImageSource,
+  getLocalizationLang,
+  getMainImage,
+} from "common/src/modules/helpers";
 import { formatDateTimeRange, formatDuration } from "common/src/date-utils";
 import { getReservationUnitPath } from "@/modules/urls";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 
 const Wrapper = styled.div<{ $color: "gold" | "silver" }>`
   --bg-color: var(${({ $color }) => ($color === "gold" ? "--color-gold-light" : "--color-silver-light")});

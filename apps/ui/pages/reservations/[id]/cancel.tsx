@@ -7,7 +7,7 @@ import {
 import { ReservationCancellation } from "@/components/reservation/ReservationCancellation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { isReservationCancellable } from "@/modules/reservation";
 import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
 import { Breadcrumb } from "@/components/common/Breadcrumb";

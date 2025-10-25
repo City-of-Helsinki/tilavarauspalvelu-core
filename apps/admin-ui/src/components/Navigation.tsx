@@ -1,5 +1,5 @@
 import { useTranslation } from "next-i18next";
-import { signIn, signOut } from "common/src/browserHelpers";
+import { signIn, signOut } from "common/src/modules/browserHelpers";
 import { useSession, useHandling } from "@/hooks";
 import { Header, IconLinkExternal, IconSignout, IconStar, IconUser, LogoSize, TitleStyleType } from "hds-react";
 import React from "react";
@@ -19,7 +19,7 @@ import {
   getAccessibilityTermsUrl,
 } from "@/modules/urls";
 import { UserPermissionChoice } from "@gql/gql-types";
-import { getLocalizationLang } from "common/src/helpers";
+import { getLocalizationLang } from "common/src/modules/helpers";
 import { useRouter } from "next/router";
 import { PUBLIC_URL } from "@/modules/const";
 

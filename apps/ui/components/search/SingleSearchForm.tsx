@@ -16,7 +16,7 @@ import { type OptionsListT } from "common/src/modules/search";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
-import { ignoreMaybeArray, mapParamToInteger, toNumber } from "common/src/helpers";
+import { ignoreMaybeArray, mapParamToInteger, toNumber } from "common/src/modules/helpers";
 import { Flex } from "common/styled";
 import { ShowAllContainer } from "common/src/components";
 

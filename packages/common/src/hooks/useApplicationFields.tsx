@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { type MetadataSetsFragment, ReserveeType } from "../../gql/gql-types";
-import { filterNonNullable } from "../helpers";
-import { containsField } from "../metaFieldsHelpers";
+import { filterNonNullable } from "../modules/helpers";
+import { containsField } from "../modules/metaFieldsHelpers";
 import { getReservationApplicationFields } from "../reservation-form/util";
 
 // TODO is the hook necessary?

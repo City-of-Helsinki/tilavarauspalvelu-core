@@ -30,7 +30,7 @@ import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { GetServerSidePropsContext } from "next";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { Error403 } from "@/components/Error403";

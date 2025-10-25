@@ -1,13 +1,13 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { getTranslationSafe } from "common/src/common/util";
+import { getTranslationSafe } from "common/src/modules/util";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { createApolloClient } from "@/modules/apolloClient";
 import { ViewApplication } from "@/components/application/ViewApplication";
 import { ApplicationHead } from "@/components/application/ApplicationHead";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { createNodeId, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { createNodeId, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import {
   ApplicationStatusChoice,
   ApplicationViewDocument,

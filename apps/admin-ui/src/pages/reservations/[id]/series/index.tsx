@@ -16,7 +16,13 @@ import {
   UserPermissionChoice,
   useSeriesPageQuery,
 } from "@gql/gql-types";
-import { calculateMedian, createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import {
+  calculateMedian,
+  createNodeId,
+  filterNonNullable,
+  ignoreMaybeArray,
+  toNumber,
+} from "common/src/modules/helpers";
 import { isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Element } from "@/styled";
@@ -44,7 +50,7 @@ import { getBufferTime } from "@/modules/helpers";
 import { BufferToggles } from "@/components/BufferToggles";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { getReservationUrl } from "@/modules/urls";
-import { getSeriesOverlapErrors } from "common/src/apolloUtils";
+import { getSeriesOverlapErrors } from "common/src/modules/apolloUtils";
 import { useDisplayError } from "common/src/hooks";
 import { generateReservations } from "@/modules/generateReservations";
 import { Error404 } from "@/components/Error404";

@@ -9,8 +9,8 @@ import {
   reservationToInterval,
 } from "@/modules/helpers";
 import { type NewReservationListItem } from "@/components/ReservationsList";
-import { createNodeId } from "common/src/helpers";
-import { RELATED_RESERVATION_STATES } from "common/src/const";
+import { createNodeId } from "common/src/modules/helpers";
+import { RELATED_RESERVATION_STATES } from "common/src/modules/const";
 import { errorToast } from "common/src/components/toast";
 import { useTranslation } from "next-i18next";
 

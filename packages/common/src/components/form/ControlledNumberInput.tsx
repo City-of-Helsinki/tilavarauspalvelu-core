@@ -3,7 +3,7 @@ import React from "react";
 import { NumberInput } from "hds-react";
 import { type FieldValues, useController, UseControllerProps } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { toNumber } from "../../helpers";
+import { toNumber } from "../../modules/helpers";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   min?: number;

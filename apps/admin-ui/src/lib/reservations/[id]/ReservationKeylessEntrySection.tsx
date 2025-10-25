@@ -17,7 +17,7 @@ import { Accordion } from "@/styled";
 import { DataWrapper } from "./DataWrapper";
 import styled, { css } from "styled-components";
 import { ButtonContainer, Flex, NoWrap } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { useCheckPermission } from "@/hooks";
 import { gql } from "@apollo/client";

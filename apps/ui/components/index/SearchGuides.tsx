@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { Button, IconArrowRight, ImageWithCard } from "hds-react";
 import { Flex, H3 } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import { seasonalPrefix } from "@/modules/urls";
 
 const StyledImageWithCard = styled(ImageWithCard)`

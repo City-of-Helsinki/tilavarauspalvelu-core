@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 
 const MobileWrapper = styled.div<{ $breakpoint: string }>`
   @media (min-width: ${({ $breakpoint }) => $breakpoint}) {

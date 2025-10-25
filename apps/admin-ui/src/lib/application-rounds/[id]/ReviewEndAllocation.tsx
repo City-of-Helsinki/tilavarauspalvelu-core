@@ -3,7 +3,7 @@ import { Button, ButtonVariant, LoadingSpinner, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { gql } from "@apollo/client";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/modules/helpers";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
   ApplicationRoundStatusChoice,

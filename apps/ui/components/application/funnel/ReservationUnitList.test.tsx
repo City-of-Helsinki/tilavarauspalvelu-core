@@ -5,7 +5,7 @@ import { render, within } from "@testing-library/react";
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { ReservationUnitList } from "./ReservationUnitList";
 import { type ApplicationReservationUnitListFragment } from "@/gql/gql-types";
-import { createNodeId } from "common/src/helpers";
+import { createNodeId } from "common/src/modules/helpers";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import userEvent from "@testing-library/user-event";

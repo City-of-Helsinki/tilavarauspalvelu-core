@@ -2,10 +2,10 @@ import React, { useMemo } from "react";
 import { Button } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { chunkArray } from "common/src/common/util";
+import { chunkArray } from "common/src/modules/util";
 import { parseUIDate, formatDate } from "common/src/date-utils";
 import { Flex, fontMedium, H4, NoWrap } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import {
   getLastPossibleReservationDate,

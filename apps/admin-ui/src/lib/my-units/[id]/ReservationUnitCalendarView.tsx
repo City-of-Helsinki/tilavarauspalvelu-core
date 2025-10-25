@@ -3,7 +3,7 @@ import { addDays, formatISO, startOfDay, subDays } from "date-fns";
 import { AutoGrid, Flex } from "common/styled";
 import { ReservationUnitCalendar } from "./ReservationUnitCalendar";
 import WeekNavigation from "./WeekNavigation";
-import { toNumber } from "common/src/helpers";
+import { toNumber } from "common/src/modules/helpers";
 import { SelectFilter } from "@/components/QueryParamFilters";
 import styled from "styled-components";
 import { useSearchParams } from "next/navigation";

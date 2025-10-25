@@ -2,7 +2,7 @@ import React from "react";
 import { IconArrowRight, IconLayers, IconHome, IconGroup, IconPen, IconCheck } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { type ReservationUnitCardFragment } from "@gql/gql-types";
-import { getImageSource, getMainImage } from "common/src/helpers";
+import { getImageSource, getMainImage } from "common/src/modules/helpers";
 import StatusLabel from "common/src/components/StatusLabel";
 import { getReservationUnitUrl } from "@/modules/urls";
 import Card from "common/src/components/Card";

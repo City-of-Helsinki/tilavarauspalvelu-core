@@ -16,11 +16,11 @@ import {
 } from "./modules/applicationRoundAllocation";
 import { errorToast, successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
-import { toNumber } from "common/src/helpers";
+import { toNumber } from "common/src/modules/helpers";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
 import { type TimeSlotRange, useSelectedSlots } from "./SelectedSlotsContext";
-import { type DayT } from "common/src/const";
+import { type DayT } from "common/src/modules/const";
 
 export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT) => void] {
   const params = useSearchParams();

@@ -1,9 +1,9 @@
 import { ReservationTypeChoice, useReservationsByReservationUnitQuery } from "@gql/gql-types";
 import { errorToast } from "common/src/components/toast";
 import { combineAffectingReservations, doesIntervalCollide, reservationToInterval } from "@/modules/helpers";
-import { createNodeId } from "common/src/helpers";
+import { createNodeId } from "common/src/modules/helpers";
 import { formatApiDate } from "common/src/date-utils";
-import { RELATED_RESERVATION_STATES } from "common/src/const";
+import { RELATED_RESERVATION_STATES } from "common/src/modules/const";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 

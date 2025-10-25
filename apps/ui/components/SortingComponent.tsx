@@ -5,9 +5,9 @@ import { useSearchModify } from "@/hooks/useSearchValues";
 import styled from "styled-components";
 import { IconSize, IconSortAscending, IconSortDescending, Option, Select } from "hds-react";
 import { Flex, fontMedium, focusStyles } from "common/styled";
-import { breakpoints } from "common/src/const";
-import { convertOptionToHDS } from "common/src/helpers";
-import { convertLanguageCode } from "common/src/common/util";
+import { breakpoints } from "common/src/modules/const";
+import { convertOptionToHDS } from "common/src/modules/helpers";
+import { convertLanguageCode } from "common/src/modules/util";
 
 export const SORTING_OPTIONS = [
   {

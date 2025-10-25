@@ -11,11 +11,11 @@ import {
   ReservationTypeChoice,
   ReserveeType,
 } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/modules/helpers";
 import { addSeconds } from "date-fns";
 import { type TFunction } from "next-i18next";
 
-export { truncate } from "common/src/helpers";
+export { truncate } from "common/src/modules/helpers";
 
 export type CollisionInterval = {
   start: Date;

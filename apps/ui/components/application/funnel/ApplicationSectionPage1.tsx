@@ -5,7 +5,7 @@ import { useFormContext } from "react-hook-form";
 import { gql } from "@apollo/client";
 import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { AutoGrid, Flex, H4 } from "common/styled";
-import { getLocalizationLang } from "common/src/helpers";
+import { getLocalizationLang } from "common/src/modules/helpers";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { ControlledNumberInput, ControlledSelect } from "common/src/components/form";
 import { formatDate, formatDateRange } from "common/src/date-utils";

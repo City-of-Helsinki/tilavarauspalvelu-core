@@ -18,11 +18,11 @@ import {
   type RecurringCardFragment,
   ReservationKind,
 } from "@gql/gql-types";
-import { filterNonNullable, getImageSource, getMainImage } from "common/src/helpers";
+import { filterNonNullable, getImageSource, getMainImage } from "common/src/modules/helpers";
 import { CenterSpinner, Flex, H3 } from "common/styled";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 import Card from "common/src/components/Card";
-import { convertLanguageCode, getTranslationSafe } from "common/src/common/util";
+import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";

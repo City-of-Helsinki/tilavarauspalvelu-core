@@ -6,7 +6,7 @@ import styled from "styled-components";
 import type { NavigateAction, View } from "react-big-calendar";
 import { useTranslation } from "next-i18next";
 import { Flex, NoWrap, fontMedium } from "../../styled";
-import { breakpoints } from "../const";
+import { breakpoints } from "../modules/const";
 
 const DateNavigationWrapper = styled(Flex).attrs({
   $direction: "row",

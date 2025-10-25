@@ -1,6 +1,6 @@
 import { Tag } from "hds-react";
 import styled from "styled-components";
-import { breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/modules/const";
 
 export const EditorColumns = styled.div`
   display: grid;

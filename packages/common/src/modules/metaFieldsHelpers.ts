@@ -1,5 +1,5 @@
 import { camelCase } from "lodash-es";
-import type { ReservationMetadataFieldNode } from "../gql/gql-types";
+import type { ReservationMetadataFieldNode } from "../../gql/gql-types";
 
 export type FieldName = Pick<ReservationMetadataFieldNode, "fieldName">;
 /// Transitional helper when moving from string fields

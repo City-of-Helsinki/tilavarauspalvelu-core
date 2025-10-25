@@ -25,7 +25,7 @@ import { trim } from "lodash-es";
 import { gql } from "@apollo/client";
 import { getName as getCountryName, registerLocale as registerCountryLocale } from "i18n-iso-countries";
 import countriesJson from "i18n-iso-countries/langs/fi.json";
-import { getApiErrors } from "common/src/apolloUtils";
+import { getApiErrors } from "common/src/modules/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
 import { formatDate, parseValidDateObject } from "common/src/date-utils";
 
