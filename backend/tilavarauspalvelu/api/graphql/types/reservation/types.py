@@ -104,14 +104,17 @@ class ReservationNode(DjangoNode):
     is_handled = AnnotatedField(
         graphene.Boolean,
         expression=models.Q(handled_at__isnull=False),
+        required=False,
     )
     access_code_should_be_active = AnnotatedField(
         graphene.Boolean,
         expression=L("access_code_should_be_active"),
+        required=False,
     )
     is_access_code_is_active_correct = AnnotatedField(
         graphene.Boolean,
         expression=L("is_access_code_is_active_correct"),
+        required=False,
     )
 
     calendar_url = graphene.String()
@@ -166,9 +169,9 @@ class ReservationNode(DjangoNode):
     #
     access_type = graphene.Field(graphene.Enum.from_enum(AccessType))
     access_code_generated_at = graphene.DateTime()
-    access_code_is_active = graphene.Boolean()
+    access_code_is_active = graphene.Boolean(required=False)
     #
-    applying_for_free_of_charge = graphene.Boolean()
+    applying_for_free_of_charge = graphene.Boolean(required=False)
     free_of_charge_reason = graphene.String()
     #
     reservee_identifier = graphene.String()

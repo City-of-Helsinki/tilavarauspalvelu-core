@@ -123,6 +123,11 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         priceNet
         taxPercentageValue
         isHandled
+        accessType
+        accessCodeGeneratedAt
+        accessCodeIsActive
+        accessCodeShouldBeActive
+        isAccessCodeIsActiveCorrect
     """
 
     query = reservations_query(fields=fields)
@@ -156,6 +161,11 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         "taxPercentageValue": None,
         "unitPrice": None,
         "user": None,
+        "accessCodeShouldBeActive": None,
+        "isAccessCodeIsActiveCorrect": None,
+        "accessType": None,
+        "accessCodeGeneratedAt": None,
+        "accessCodeIsActive": None,
     }
 
 
