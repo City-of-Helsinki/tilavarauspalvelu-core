@@ -28,7 +28,7 @@ import { type GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { CreateReservationModal, ReservationUnitCalendarView, UnitReservations } from "@lib/my-units/[id]/";
-import { parseUIDate } from "common/src/date-utils";
+import { parseUIDate } from "common/src/modules/date-utils";
 import { addMinutes } from "date-fns";
 import { createClient } from "@/modules/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";

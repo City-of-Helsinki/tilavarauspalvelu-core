@@ -10,7 +10,7 @@ import {
   useReservationApplicationLinkQuery,
 } from "@gql/gql-types";
 import { getName } from "@/modules/reservation";
-import { formatDateTime, parseValidDateObject } from "common/src/date-utils";
+import { formatDateTime, parseValidDateObject } from "common/src/modules/date-utils";
 import { getApplicationUrl } from "@/modules/urls";
 import { gql } from "@apollo/client";
 import { ExternalLink } from "@/components/ExternalLink";

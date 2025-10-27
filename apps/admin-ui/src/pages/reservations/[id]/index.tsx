@@ -34,7 +34,7 @@ import {
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
 import { createNodeId, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/modules/helpers";
 import { formatAgeGroup } from "@/modules/util";
-import { formatDateTime } from "common/src/date-utils";
+import { formatDateTime } from "common/src/modules/date-utils";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";

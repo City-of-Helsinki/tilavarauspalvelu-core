@@ -28,7 +28,7 @@ import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
 import { convertOptionToHDS, filterNonNullable, toNumber } from "common/src/modules/helpers";
 import { addMinutes, startOfDay } from "date-fns";
-import { timeToMinutes, formatTimeRange } from "common/src/date-utils";
+import { timeToMinutes, formatTimeRange } from "common/src/modules/date-utils";
 
 type Props = {
   applicationSections: SectionNodeT[] | null;

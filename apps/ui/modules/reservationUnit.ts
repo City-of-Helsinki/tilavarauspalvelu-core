@@ -52,7 +52,7 @@ import {
   isPriceFree,
   type ReadonlyDeep,
 } from "common/src/modules/helpers";
-import { timeToMinutes, formatApiDate } from "common/src/date-utils";
+import { timeToMinutes, formatApiDate } from "common/src/modules/date-utils";
 import { type LocalizationLanguages } from "common/src/modules/urlBuilder";
 import { type TFunction } from "i18next";
 

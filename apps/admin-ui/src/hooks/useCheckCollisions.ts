@@ -2,7 +2,7 @@ import { ReservationTypeChoice, useReservationsByReservationUnitQuery } from "@g
 import { errorToast } from "common/src/components/toast";
 import { combineAffectingReservations, doesIntervalCollide, reservationToInterval } from "@/modules/helpers";
 import { createNodeId } from "common/src/modules/helpers";
-import { formatApiDate } from "common/src/date-utils";
+import { formatApiDate } from "common/src/modules/date-utils";
 import { RELATED_RESERVATION_STATES } from "common/src/modules/const";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";

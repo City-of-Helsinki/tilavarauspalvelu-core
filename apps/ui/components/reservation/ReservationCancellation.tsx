@@ -8,7 +8,7 @@ import { type ReservationCancelPageQuery, useCancelReservationMutation } from "@
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { formatDate, applicationReservationDateTime } from "common/src/date-utils";
+import { formatDate, applicationReservationDateTime } from "common/src/modules/date-utils";
 import { useDisplayError } from "common/src/hooks";
 import { getApplicationPath, getReservationPath } from "@/modules/urls";
 import { getPrice } from "@/modules/reservationUnit";

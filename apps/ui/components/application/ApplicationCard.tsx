@@ -10,7 +10,7 @@ import {
   type Maybe,
   useCancelApplicationMutation,
 } from "@gql/gql-types";
-import { formatDateTime, parseValidDateObject } from "common/src/date-utils";
+import { formatDateTime, parseValidDateObject } from "common/src/modules/date-utils";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";

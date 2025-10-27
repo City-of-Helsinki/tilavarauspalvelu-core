@@ -5,7 +5,7 @@ import { Legend, LegendsWrapper } from "@/components/Legend";
 import { legend } from "./eventStyleGetter";
 import { UnitCalendar } from "./UnitCalendar";
 import { useUnitResources, useGetFilterSearchParams } from "@/hooks";
-import { parseUIDate, isValidDate, formatDate } from "common/src/date-utils";
+import { parseUIDate, isValidDate, formatDate } from "common/src/modules/date-utils";
 import { startOfDay } from "date-fns";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { AutoGrid, Flex, HR } from "common/src/styled";

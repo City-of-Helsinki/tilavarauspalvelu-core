@@ -23,7 +23,7 @@ import {
   useRestoreAllSectionOptionsMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { formatDateRange, formatDateTime, formatDuration, parseValidDateObject } from "common/src/date-utils";
+import { formatDateRange, formatDateTime, formatDuration, parseValidDateObject } from "common/src/modules/date-utils";
 import { ApplicationTimePreview } from "common/src/components/ApplicationTimePreview";
 import { formatAgeGroups, formatNumber } from "@/modules/util";
 import { ScrollIntoView } from "@/components/ScrollIntoView";

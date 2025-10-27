@@ -14,7 +14,7 @@ import {
 } from "@/gql/gql-types";
 import { ReservableMap, type RoundPeriod } from "@/modules/reservable";
 import { createNodeId } from "common/src/modules/helpers";
-import { formatApiDateUnsafe } from "common/src/date-utils";
+import { formatApiDateUnsafe } from "common/src/modules/date-utils";
 import { addDays, addYears, endOfDay, startOfDay, startOfToday } from "date-fns";
 import { createMockReservationUnitType, generateDescriptionFragment, generateNameFragment } from "./test.gql.utils";
 

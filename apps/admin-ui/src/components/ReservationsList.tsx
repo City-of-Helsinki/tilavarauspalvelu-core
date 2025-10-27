@@ -10,7 +10,7 @@ import { useModal } from "@/context/ModalContext";
 import { H6 } from "common/src/styled";
 import StatusLabel from "common/src/components/StatusLabel";
 import { gql } from "@apollo/client";
-import { formatDate } from "common/src/date-utils";
+import { formatDate } from "common/src/modules/date-utils";
 
 export type NewReservationListItem = {
   date: Date;

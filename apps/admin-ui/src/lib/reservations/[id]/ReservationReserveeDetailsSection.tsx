@@ -27,7 +27,7 @@ import { getName as getCountryName, registerLocale as registerCountryLocale } fr
 import countriesJson from "i18n-iso-countries/langs/fi.json";
 import { getApiErrors } from "common/src/modules/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
-import { formatDate, parseValidDateObject } from "common/src/date-utils";
+import { formatDate, parseValidDateObject } from "common/src/modules/date-utils";
 
 registerCountryLocale(countriesJson);
 

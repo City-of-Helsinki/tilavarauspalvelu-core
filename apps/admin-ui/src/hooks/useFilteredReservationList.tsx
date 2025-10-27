@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { ReservationTypeChoice, type Maybe, useReservationsByReservationUnitQuery } from "@gql/gql-types";
-import { isValidDate, formatApiDate, timeToMinutes } from "common/src/date-utils";
+import { isValidDate, formatApiDate, timeToMinutes } from "common/src/modules/date-utils";
 import { addDays, addMinutes, startOfDay } from "date-fns";
 import {
   type CollisionInterval,

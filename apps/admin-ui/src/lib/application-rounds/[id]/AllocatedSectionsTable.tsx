@@ -10,7 +10,7 @@ import { CustomTable } from "@/components/Table";
 import { ExternalTableLink, TableLink } from "@/styled";
 import styled from "styled-components";
 import { gql } from "@apollo/client";
-import { timeToMinutes, formatTimeRange } from "common/src/date-utils";
+import { timeToMinutes, formatTimeRange } from "common/src/modules/date-utils";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;

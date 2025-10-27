@@ -7,7 +7,7 @@ import {
   formatApiDate,
   formatDate,
   formatTime,
-} from "common/src/date-utils";
+} from "common/src/modules/date-utils";
 import {
   AccessType,
   AuthenticationType,

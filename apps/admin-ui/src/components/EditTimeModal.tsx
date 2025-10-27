@@ -22,7 +22,7 @@ import {
   fromUIDateTimeUnsafe,
   formatTime,
   formatDate,
-} from "common/src/date-utils";
+} from "common/src/modules/date-utils";
 import { useModal } from "@/context/ModalContext";
 import { TimeChangeFormSchemaRefined, TimeFormSchema } from "@/schemas";
 import { ControlledTimeInput } from "@/components/ControlledTimeInput";

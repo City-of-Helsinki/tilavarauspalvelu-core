@@ -11,7 +11,7 @@ import {
   useBannerNotificationsListQuery,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
-import { formatDate, formatTime } from "common/src/date-utils";
+import { formatDate, formatTime } from "common/src/modules/date-utils";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/modules/const";
 import { CustomTable } from "@/components/Table";
 import { filterNonNullable } from "common/src/modules/helpers";

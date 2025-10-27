@@ -7,7 +7,7 @@ import { IconLinkExternal, IconSize } from "hds-react";
 import { memoize } from "lodash-es";
 import { useTranslation, type TFunction } from "next-i18next";
 import { getApplicantName } from "@/modules/helpers";
-import { formatDate, formatTime, parseValidDateObject } from "common/src/date-utils";
+import { formatDate, formatTime, parseValidDateObject } from "common/src/modules/date-utils";
 import { ExternalTableLink } from "@/styled";
 import { gql } from "@apollo/client";
 

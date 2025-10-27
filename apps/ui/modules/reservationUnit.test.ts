@@ -1,6 +1,6 @@
 import { get as mockGet } from "lodash-es";
 import { addDays, addHours, addMonths, endOfDay, getHours, set, startOfDay, startOfToday } from "date-fns";
-import { formatApiDateUnsafe } from "common/src/date-utils";
+import { formatApiDateUnsafe } from "common/src/modules/date-utils";
 import {
   PriceUnit,
   ReservationUnitPublishingState,

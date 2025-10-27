@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconArrowRight, IconCalendar, IconSize } from "hds-react";
 import { type ApplicationRoundCardFragment } from "@gql/gql-types";
-import { formatDateRange, parseValidDateObject } from "common/src/date-utils";
+import { formatDateRange, parseValidDateObject } from "common/src/modules/date-utils";
 import { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
 import { getApplicationRoundUrl } from "@/modules/urls";
 import { TimeframeStatus } from "./TimeframeStatus";

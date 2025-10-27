@@ -14,7 +14,7 @@ import {
   Weekday,
 } from "@gql/gql-types";
 import { z } from "zod";
-import { parseUIDate, timeToMinutes, formatApiDate, formatDate } from "common/src/date-utils";
+import { parseUIDate, timeToMinutes, formatApiDate, formatDate } from "common/src/modules/date-utils";
 import { checkValidDateOnly, lessThanMaybeDate } from "common/src/schemas/schemaCommon";
 import { CELL_STATES } from "common/src/components/ApplicationTimeSelector";
 

@@ -5,8 +5,8 @@ import styled from "styled-components";
 import { type ApolloQueryResult } from "@apollo/client";
 import { type ApplicationSectionAllocationsQuery, Priority } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/modules/helpers";
-import { formatDuration, timeToMinutes } from "common/src/date-utils";
 import { Flex, fontMedium, H5, SemiBold, Strong } from "common/src/styled";
+import { formatDuration, timeToMinutes } from "common/src/modules/date-utils";
 import { Accordion } from "@/components/Accordion";
 import {
   type AllocatedTimeSlotNodeT,
