@@ -5,7 +5,7 @@ import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { AccessTypes, type ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 import { ControlledDateInput, ControlledSelect } from "common/src/components/form";
-import { formatDate, parseUIDate, parseValidDateObject } from "common/src/date-utils";
+import { formatDate, parseUIDate, parseValidDateObject } from "common/src/modules/date-utils";
 import StatusLabel from "common/src/components/StatusLabel";
 import { AutoGrid, Flex, H6 } from "common/src/styled";
 import { KVWrapper, Label, Value } from "@/styled";

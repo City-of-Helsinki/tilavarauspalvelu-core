@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { type ReservationUnitReservationsFragment, UserPermissionChoice } from "@gql/gql-types";
 import { getReservationUrl } from "@/modules/urls";
-import { formatDurationFromDates, parseValidDateObject } from "common/src/date-utils";
+import { formatDurationFromDates, parseValidDateObject } from "common/src/modules/date-utils";
 import { getReserveeName } from "@/modules/util";
 import { truncate } from "@/modules/helpers";
 import { Flex } from "common/src/styled";

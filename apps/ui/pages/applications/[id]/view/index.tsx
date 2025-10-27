@@ -15,7 +15,7 @@ import {
   type ApplicationViewQuery,
 } from "@gql/gql-types";
 import { Tabs } from "hds-react";
-import { formatDateTime } from "common/src/date-utils";
+import { formatDateTime } from "common/src/modules/date-utils";
 import { ApprovedReservations, BREAKPOINT } from "@/components/application/ApprovedReservations";
 import { gql } from "@apollo/client";
 import { Breadcrumb } from "@/components/common/Breadcrumb";

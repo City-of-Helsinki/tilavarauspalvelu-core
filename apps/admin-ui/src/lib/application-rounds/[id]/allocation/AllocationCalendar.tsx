@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled, { css } from "styled-components";
 import { filterNonNullable } from "common/src/modules/helpers";
-import { timeToMinutes } from "common/src/date-utils";
+import { timeToMinutes } from "common/src/modules/date-utils";
 import { ApplicationSectionStatusChoice, type SuitableTimeRangeNode } from "@gql/gql-types";
 import { fontMedium } from "common/src/styled";
 import { breakpoints, type DayT, WEEKDAYS } from "common/src/modules/const";

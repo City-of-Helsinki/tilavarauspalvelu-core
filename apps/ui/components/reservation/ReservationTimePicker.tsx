@@ -33,7 +33,7 @@ import {
   getSlotPropGetter,
   isRangeReservable,
 } from "@/modules/reservable";
-import { formatDuration, formatTime, parseUIDate, formatApiDate, formatDate } from "common/src/date-utils";
+import { formatApiDate, formatDate, formatDuration, formatTime, parseUIDate } from "common/src/modules/date-utils";
 import { useTranslation } from "next-i18next";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
 import { type UseFormReturn } from "react-hook-form";

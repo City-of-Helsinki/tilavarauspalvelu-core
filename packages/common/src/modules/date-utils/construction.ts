@@ -1,5 +1,5 @@
 import { parse, set } from "date-fns";
-import { toNumber } from "../modules/helpers";
+import { toNumber } from "../helpers";
 import { parseUIDate, parseApiDate, isValidDate } from "./conversion";
 import { UI_DATE_FORMAT, UI_TIME_FORMAT } from "./index";
 import type { TimeStruct } from "./types";

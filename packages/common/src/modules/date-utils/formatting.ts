@@ -4,8 +4,8 @@
 import { Day, format, isBefore, isSameDay, type Locale } from "date-fns";
 import { enGB, fi, sv } from "date-fns/locale";
 import { type TFunction } from "next-i18next";
-import { transformWeekday } from "../modules/conversion";
-import type { LocalizationLanguages } from "../modules/urlBuilder";
+import { transformWeekday } from "../conversion";
+import type { LocalizationLanguages } from "../urlBuilder";
 import { dateToMinutes, isValidDate, minutesToHoursString, setMondayFirst, timeToMinutes } from "./conversion";
 import type {
   ApplicationReservationDateTime,

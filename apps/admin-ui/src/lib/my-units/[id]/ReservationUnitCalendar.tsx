@@ -1,6 +1,6 @@
 import React from "react";
-import { formatApiDate } from "common/src/date-utils";
 import CommonCalendar from "common/src/calendar/Calendar";
+import { formatApiDate } from "common/src/modules/date-utils";
 import { get } from "lodash-es";
 import { addDays, endOfISOWeek, startOfISOWeek } from "date-fns";
 import styled from "styled-components";

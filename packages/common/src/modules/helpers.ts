@@ -9,7 +9,7 @@ import {
 import { type OptionInProps } from "hds-react";
 import { pixel } from "./const";
 import { type TFunction } from "i18next";
-import { minutesToHoursString, timeToMinutes } from "../date-utils";
+import { minutesToHoursString, timeToMinutes } from "./date-utils";
 import { type LocalizationLanguages } from "./urlBuilder";
 import { convertWeekday } from "./conversion";
 

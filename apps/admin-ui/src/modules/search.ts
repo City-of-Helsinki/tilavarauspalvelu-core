@@ -6,7 +6,7 @@ import {
   ReservationUnitPublishingState,
   ReserveeType,
 } from "@gql/gql-types";
-import { parseUIDate, isValidDate } from "common/src/date-utils";
+import { parseUIDate, isValidDate } from "common/src/modules/date-utils";
 import { toNumber } from "common/src/modules/helpers";
 import { type OptionsListT, type OptionT } from "common/src/modules/search";
 import { type TFunction } from "next-i18next";

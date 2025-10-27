@@ -26,7 +26,7 @@ import { CenterSpinner, Flex } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { useCheckCollisions } from "@/hooks";
 import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
-import { fromUIDateTimeUnsafe, formatDate, formatTime, fromUIDateTime } from "common/src/date-utils";
+import { fromUIDateTimeUnsafe, formatDate, formatTime, fromUIDateTime } from "common/src/modules/date-utils";
 import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/components/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";

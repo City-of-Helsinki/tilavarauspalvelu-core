@@ -8,7 +8,7 @@ import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
 import { getApplicationRoundPath } from "@/modules/urls";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { formatDateTime, formatDate } from "common/src/date-utils";
+import { formatDateTime, formatDate } from "common/src/modules/date-utils";
 import { gql } from "@apollo/client";
 
 interface CardProps {

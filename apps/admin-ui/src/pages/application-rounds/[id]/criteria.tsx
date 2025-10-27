@@ -14,7 +14,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { formatDate, parseValidDateObject } from "common/src/date-utils";
+import { formatDate, parseValidDateObject } from "common/src/modules/date-utils";
 
 const Accordion = styled(AccordionBase)`
   && > div > h2 {

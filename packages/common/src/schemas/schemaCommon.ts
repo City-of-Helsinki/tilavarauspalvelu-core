@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { subDays } from "date-fns";
 import sanitizeHtml from "sanitize-html";
-import { parseUIDate } from "../date-utils";
+import { parseUIDate } from "../modules/date-utils";
 
 const THREE_YEARS_MS = 3 * 365 * 24 * 60 * 60 * 1000;
 const TIME_PATTERN = /^[0-2][0-9]:[0-5][0-9]$/;

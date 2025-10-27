@@ -39,7 +39,7 @@ import {
   parseUIDateUnsafe,
   formatApiDateUnsafe,
   formatTime,
-} from "common/src/date-utils";
+} from "common/src/modules/date-utils";
 import { ControlledDateInput, TimeInput } from "common/src/components/form";
 import { WeekdaysSelector } from "@/components/WeekdaysSelector";
 import { ReservationListEditor } from "@/components/ReservationListEditor";

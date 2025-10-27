@@ -5,7 +5,7 @@ import { type ReservationInfoSectionFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { H4, Strong } from "common/src/styled";
 import styled from "styled-components";
-import { formatDurationRange, formatDateTime, parseValidDateObject } from "common/src/date-utils";
+import { formatDurationRange, formatDateTime, parseValidDateObject } from "common/src/modules/date-utils";
 import { formatNDays } from "@/modules/reservationUnit";
 
 const Subheading = styled(H4).attrs({ as: "h2", $noMargin: true })`

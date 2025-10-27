@@ -3,7 +3,7 @@ import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Button, ButtonVariant, IconAngleDown, IconAngleUp, IconCross, IconSize } from "hds-react";
 import { maxBy } from "lodash-es";
-import { parseUIDate, formatDateTimeRange } from "common/src/date-utils";
+import { parseUIDate, formatDateTimeRange } from "common/src/modules/date-utils";
 import { Transition } from "react-transition-group";
 import { Flex, fontBold, fontMedium, fontRegular, SemiBold } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";

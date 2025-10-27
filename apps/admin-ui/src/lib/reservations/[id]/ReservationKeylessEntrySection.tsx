@@ -11,7 +11,7 @@ import {
 import { successToast } from "common/src/components/toast";
 import { useDisplayError } from "common/src/hooks";
 import { Button, ButtonSize, IconAlertCircleFill, IconRefresh, Tooltip } from "hds-react";
-import { dateToMinutes, formatDate, formatTimeRange, parseValidDateObject } from "common/src/date-utils";
+import { dateToMinutes, formatDate, formatTimeRange, parseValidDateObject } from "common/src/modules/date-utils";
 import React, { useState } from "react";
 import { Accordion } from "@/styled";
 import { DataWrapper } from "./DataWrapper";

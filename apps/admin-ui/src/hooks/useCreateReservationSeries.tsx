@@ -7,7 +7,7 @@ import {
   type ReservationSeriesReservationCreateSerializerInput,
 } from "@gql/gql-types";
 import type { ReservationSeriesForm, ReservationFormMeta } from "@/schemas";
-import { parseUIDateUnsafe, formatApiDateUnsafe } from "common/src/date-utils";
+import { parseUIDateUnsafe, formatApiDateUnsafe } from "common/src/modules/date-utils";
 import { gql } from "@apollo/client";
 import { useSession } from "@/hooks";
 
