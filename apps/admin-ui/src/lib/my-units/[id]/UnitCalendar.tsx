@@ -4,7 +4,7 @@ import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
 import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { useTranslation, type TFunction } from "next-i18next";
-import { CalendarEvent } from "common/src/calendar/Calendar";
+import { CalendarEvent } from "common/src/components/calendar/Calendar";
 import { focusStyles } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { POST_PAUSE, PRE_PAUSE } from "@/modules/calendarStyling";
@@ -14,7 +14,7 @@ import { ReservationPopupContent } from "./ReservationPopupContent";
 import eventStyleGetter from "./eventStyleGetter";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { isCellOverlappingSpan, TimeSpanType } from "common/src/calendar/util";
+import { isCellOverlappingSpan, TimeSpanType } from "common/src/components/calendar/util";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 type Resource = {

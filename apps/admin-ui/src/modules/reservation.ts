@@ -29,7 +29,7 @@ import { getReserveeTypeTranslationKey } from "@/modules/helpers";
 import { filterNonNullable, sort, toNumber } from "common/src/modules/helpers";
 import { gql } from "@apollo/client";
 import { convertWeekday } from "common/src/modules/conversion";
-import { type CalendarEvent } from "common/src/calendar/Calendar";
+import { type CalendarEvent } from "common/src/components/calendar/Calendar";
 
 export type EventType = EventStyleReservationFieldsFragment;
 export type CalendarEventType = CalendarEvent<EventType>;

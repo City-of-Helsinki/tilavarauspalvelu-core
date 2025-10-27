@@ -1,6 +1,6 @@
 import React from "react";
-import CommonCalendar from "common/src/calendar/Calendar";
 import { formatApiDate } from "common/src/modules/date-utils";
+import CommonCalendar from "common/src/components/calendar/Calendar";
 import { get } from "lodash-es";
 import { addDays, endOfISOWeek, startOfISOWeek } from "date-fns";
 import styled from "styled-components";
@@ -11,7 +11,7 @@ import {
   useReservationUnitCalendarQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { useSlotPropGetter } from "common/src/calendar/util";
+import { useSlotPropGetter } from "common/src/components/calendar/util";
 import { getReservationUrl } from "@/modules/urls";
 import { Legend, LegendsWrapper } from "@/components/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";

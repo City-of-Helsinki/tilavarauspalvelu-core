@@ -29,7 +29,7 @@ import {
   addMilliseconds,
   differenceInMinutes,
 } from "date-fns";
-import { type SlotProps } from "common/src/calendar/Calendar";
+import { type SlotProps } from "common/src/components/calendar/Calendar";
 import { type ReservationUnitNode } from "common/gql/gql-types";
 import { getIntervalMinutes } from "common/src/modules/conversion";
 import { gql } from "@apollo/client";
