@@ -11,8 +11,7 @@ import {
 } from "@gql/gql-types";
 import { WEEKDAYS } from "common/src/modules/const";
 import { filterNonNullable, formatDayTimes } from "common/src/modules/helpers";
-import StatusLabel from "common/src/components/StatusLabel";
-import type { StatusLabelType } from "common/src/tags";
+import StatusLabel, { type StatusLabelType } from "common/src/components/StatusLabel";
 import { NoWrap } from "common/src/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { formatDurationRange, formatDate, setMondayFirst } from "common/src/date-utils";
