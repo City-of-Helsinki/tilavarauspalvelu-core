@@ -15,7 +15,7 @@ import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils
 import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { getApplicationPath } from "@/modules/urls";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
-import { ButtonContainer, Flex } from "common/styled";
+import { ButtonContainer, Flex } from "common/src/styled";
 import { Button, ButtonSize, ButtonVariant, IconArrowLeft, LoadingSpinner } from "hds-react";
 import { useDisplayError } from "common/src/hooks";
 import { ErrorText } from "common/src/components/ErrorText";

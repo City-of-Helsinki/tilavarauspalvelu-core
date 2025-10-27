@@ -19,7 +19,7 @@ import {
   ReservationKind,
 } from "@gql/gql-types";
 import { filterNonNullable, getImageSource, getMainImage } from "common/src/modules/helpers";
-import { CenterSpinner, Flex, H3 } from "common/styled";
+import { CenterSpinner, Flex, H3 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import Card from "common/src/components/Card";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";

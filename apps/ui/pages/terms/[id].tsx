@@ -8,7 +8,7 @@ import {
   type TermsOfUseQueryVariables,
   TermsOfUseTypeChoices,
 } from "@gql/gql-types";
-import { H1 } from "common/styled";
+import { H1 } from "common/src/styled";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { Sanitize } from "common/src/components/Sanitize";

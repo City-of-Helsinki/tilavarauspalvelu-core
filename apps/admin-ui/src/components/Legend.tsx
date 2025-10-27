@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Flex } from "common/styled";
+import { Flex } from "common/src/styled";
 
 type Props = {
   label: string;

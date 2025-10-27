@@ -8,7 +8,7 @@ import { getUnitUrl } from "@/modules/urls";
 import { successToast } from "common/src/components/toast";
 import type { ReservationUnitEditQuery, UnitSubpageHeadFragment } from "@gql/gql-types";
 import { breakpoints } from "common/src/modules/const";
-import { ButtonLikeExternalLink, Flex, pageSideMargins, WhiteButton } from "common/styled";
+import { ButtonLikeExternalLink, Flex, pageSideMargins, WhiteButton } from "common/src/styled";
 import { useDisplayError } from "common/src/hooks";
 import { useModal } from "@/context/ModalContext";
 import { useRouter } from "next/router";

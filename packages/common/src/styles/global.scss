@@ -1,4 +1,4 @@
-@use "variables";
+@use "variables.css";
 
 /* hack to deal with iPhone user agent overriding inherited colours with apple-system-blue */
 input:is([type="button"], [type="submit"], [type="reset"]),

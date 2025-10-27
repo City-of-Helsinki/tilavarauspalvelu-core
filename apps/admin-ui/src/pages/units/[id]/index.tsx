@@ -9,7 +9,7 @@ import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "com
 import { Error404 } from "@/components/Error404";
 import { ReservationUnitList } from "@lib/units/[id]/ReservationUnitList";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/modules/urls";
-import { CenterSpinner, Flex, fontMedium, H1, H2, H3 } from "common/styled";
+import { CenterSpinner, Flex, fontMedium, H1, H2, H3 } from "common/src/styled";
 import { gql } from "@apollo/client";
 import Link from "next/link";
 import { useRouter } from "next/router";

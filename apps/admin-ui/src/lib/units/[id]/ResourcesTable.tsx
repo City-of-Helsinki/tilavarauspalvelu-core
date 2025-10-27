@@ -11,7 +11,7 @@ import { successToast } from "common/src/components/toast";
 import { truncate } from "common/src/modules/helpers";
 import { MAX_NAME_LENGTH } from "@/modules/const";
 import { TableLink } from "@/styled";
-import { Flex } from "common/styled";
+import { Flex } from "common/src/styled";
 import { type TFunction } from "next-i18next";
 import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Notification } from "hds-react";
-import { fontMedium, fontRegular, Flex } from "common/styled";
+import { fontMedium, fontRegular, Flex } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 
 export const StyledNotification = styled(Notification)`

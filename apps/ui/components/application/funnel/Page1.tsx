@@ -3,7 +3,7 @@ import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconPlus } from "hds
 import { useTranslation } from "next-i18next";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { filterNonNullable } from "common/src/modules/helpers";
-import { ButtonContainer } from "common/styled";
+import { ButtonContainer } from "common/src/styled";
 import { type ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { useReservationUnitList } from "@/hooks";
 import { ApplicationSectionPage1 } from ".";

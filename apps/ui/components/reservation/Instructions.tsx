@@ -1,6 +1,6 @@
 import { type InstructionsFragment, type Maybe, ReservationStateChoice } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
-import { H4 } from "common/styled";
+import { H4 } from "common/src/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { Sanitize } from "common/src/components/Sanitize";
 import { useTranslation } from "next-i18next";

@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { IconCross, Option, Select } from "hds-react";
 import { useTranslation, type TFunction } from "next-i18next";
-import { fontMedium } from "common/styled";
+import { fontMedium } from "common/src/styled";
 import { type ApolloQueryResult } from "@apollo/client";
 import styled from "styled-components";
 import {

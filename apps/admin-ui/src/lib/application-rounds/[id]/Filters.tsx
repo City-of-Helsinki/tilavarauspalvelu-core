@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
-import { AutoGrid, Flex, HR } from "common/styled";
+import { AutoGrid, Flex, HR } from "common/src/styled";
 import { SearchTags } from "@/components/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
 import { AccessCodeState, ApplicationSectionStatusChoice, ApplicationStatusChoice, ReserveeType } from "@gql/gql-types";

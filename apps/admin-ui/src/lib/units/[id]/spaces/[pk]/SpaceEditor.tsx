@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { useUpdateSpaceMutation, type SpaceUpdateMutationInput, useSpaceQuery } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/components/toast";
-import { ButtonContainer, CenterSpinner, H2, H3 } from "common/styled";
+import { ButtonContainer, CenterSpinner, H2, H3 } from "common/src/styled";
 import { FormErrorSummary } from "@/components/FormErrorSummary";
 import { createNodeId } from "common/src/modules/helpers";
 import { Controller, useForm } from "react-hook-form";

@@ -7,7 +7,7 @@ import { EditAccordion } from "./styled";
 import { ControlledDateInput, ControlledSelect } from "common/src/components/form";
 import { formatDate, parseUIDate, parseValidDateObject } from "common/src/date-utils";
 import StatusLabel from "common/src/components/StatusLabel";
-import { AutoGrid, Flex, H6 } from "common/styled";
+import { AutoGrid, Flex, H6 } from "common/src/styled";
 import { KVWrapper, Label, Value } from "@/styled";
 import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";
 import { AccessType, ReservationUnitEditQuery } from "@gql/gql-types";

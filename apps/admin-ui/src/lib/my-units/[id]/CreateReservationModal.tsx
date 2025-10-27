@@ -22,7 +22,7 @@ import styled from "styled-components";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";
 import { ReservationFormSchema, type ReservationFormType, type ReservationFormMeta } from "@/schemas";
-import { CenterSpinner, Flex } from "common/styled";
+import { CenterSpinner, Flex } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { useCheckCollisions } from "@/hooks";
 import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";

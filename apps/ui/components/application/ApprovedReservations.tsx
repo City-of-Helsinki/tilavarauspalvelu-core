@@ -30,7 +30,7 @@ import {
   LinkLikeButton,
   H5,
   CenterSpinner,
-} from "common/styled";
+} from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { getTranslationSafe } from "common/src/modules/util";
 import {

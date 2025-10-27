@@ -2,7 +2,7 @@ import { IconAngleRight } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { H1 } from "common/styled";
+import { H1 } from "common/src/styled";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
 import { applicationsPath, applicationsPrefix, getApplicationPath } from "@/modules/urls";

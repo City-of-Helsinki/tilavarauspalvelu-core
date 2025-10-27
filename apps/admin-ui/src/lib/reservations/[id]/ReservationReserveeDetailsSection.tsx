@@ -18,7 +18,7 @@ import {
   Notification,
   NotificationSize,
 } from "hds-react";
-import { Flex, H5 } from "common/styled";
+import { Flex, H5 } from "common/src/styled";
 import styled from "styled-components";
 import { useSession } from "@/hooks";
 import { trim } from "lodash-es";

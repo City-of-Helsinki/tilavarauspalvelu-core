@@ -10,7 +10,7 @@ import {
   useReservationPageLazyQuery,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { ButtonContainer } from "common/styled";
+import { ButtonContainer } from "common/src/styled";
 import { ShowWhenTargetInvisible } from "@/components/ShowWhenTargetInvisible";
 import { StickyHeader } from "@/components/StickyHeader";
 import { ReservationWorkingMemo } from "@/components/WorkingMemo";

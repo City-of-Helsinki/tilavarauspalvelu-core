@@ -13,7 +13,7 @@ import {
   type DenyDialogFieldsFragment,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { CenterSpinner, Flex } from "common/styled";
+import { CenterSpinner, Flex } from "common/src/styled";
 import { useDenyReasonOptions } from "@/hooks";
 import { successToast } from "common/src/components/toast";
 import { ApolloError, gql } from "@apollo/client";

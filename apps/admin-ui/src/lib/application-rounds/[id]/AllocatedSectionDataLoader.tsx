@@ -14,7 +14,7 @@ import { useSort } from "@/hooks/useSort";
 import { useGetFilterSearchParams } from "@/hooks";
 import { AllocatedSectionsTable, SORT_KEYS } from "./AllocatedSectionsTable";
 import { getPermissionErrors } from "common/src/modules/apolloUtils";
-import { CenterSpinner } from "common/styled";
+import { CenterSpinner } from "common/src/styled";
 
 type Props = {
   applicationRoundPk: number;

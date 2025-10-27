@@ -6,7 +6,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { WEEKDAYS_SORTED } from "common/src/modules/const";
-import { Flex } from "common/styled";
+import { Flex } from "common/src/styled";
 import { Weekday } from "@gql/gql-types";
 
 const Day = styled.button`

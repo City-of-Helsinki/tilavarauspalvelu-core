@@ -18,7 +18,7 @@ import { TableLink } from "@/styled";
 import { CustomTable } from "@/components/Table";
 import { Error404 } from "@/components/Error404";
 import { Accordion } from "hds-react";
-import { CenterSpinner, Flex, H1 } from "common/styled";
+import { CenterSpinner, Flex, H1 } from "common/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";

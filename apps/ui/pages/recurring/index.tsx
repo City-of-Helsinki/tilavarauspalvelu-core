@@ -2,7 +2,7 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { Flex, H1, H2 } from "common/styled";
+import { Flex, H1, H2 } from "common/src/styled";
 import {
   type ApplicationRoundFieldsFragment,
   ApplicationRoundOrderingChoices,

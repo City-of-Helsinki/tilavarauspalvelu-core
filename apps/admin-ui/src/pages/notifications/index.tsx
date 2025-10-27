@@ -21,7 +21,7 @@ import type { StatusLabelType } from "common/src/tags";
 import StatusLabel from "common/src/components/StatusLabel";
 import { IconCheck, IconClock, IconPen, IconQuestionCircleFill } from "hds-react";
 import { getNotificationListUrl, getNotificationUrl } from "@/modules/urls";
-import { CenterSpinner, TitleSection, H1 } from "common/styled";
+import { CenterSpinner, TitleSection, H1 } from "common/src/styled";
 import { gql, useApolloClient } from "@apollo/client";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";

@@ -18,7 +18,7 @@ import { MetadataSetsFragment, MunicipalityChoice, ReserveeType } from "../../gq
 import { ReservationFormField } from "./ReservationFormField";
 import { Inputs, type Reservation } from "./types";
 import { RadioButtonWithImage } from "./RadioButtonWithImage";
-import { AutoGrid, fontMedium, fontRegular, H4, H5 } from "../../styled";
+import { AutoGrid, fontMedium, fontRegular, H4, H5 } from "../styled";
 import type { OptionsRecord } from "../../types/common";
 import IconPremises from "../icons/IconPremises";
 import { containsField } from "../modules/metaFieldsHelpers";

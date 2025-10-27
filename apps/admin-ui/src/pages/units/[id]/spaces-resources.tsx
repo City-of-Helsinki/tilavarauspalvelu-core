@@ -6,7 +6,7 @@ import { UserPermissionChoice, useSpacesResourcesQuery } from "@gql/gql-types";
 import { createNodeId, toNumber, ignoreMaybeArray } from "common/src/modules/helpers";
 import { errorToast } from "common/src/components/toast";
 import { Error404 } from "@/components/Error404";
-import { fontBold, H2, CenterSpinner, Flex } from "common/styled";
+import { fontBold, H2, CenterSpinner, Flex } from "common/src/styled";
 import { LinkPrev } from "@/components/LinkPrev";
 import { gql } from "@apollo/client";
 import { useModal } from "@/context/ModalContext";

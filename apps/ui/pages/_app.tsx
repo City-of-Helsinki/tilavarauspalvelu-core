@@ -2,13 +2,11 @@ import React, { useEffect, useState, type FC } from "react";
 import { ApolloProvider } from "@apollo/client";
 import { appWithTranslation, useTranslation } from "next-i18next";
 import type { AppProps } from "next/app";
-import { ThemeProvider } from "styled-components";
-import { theme } from "common";
 import PageWrapper from "../components/common/PageWrapper";
 import { ExternalScripts } from "@/components/ExternalScripts";
 import { createApolloClient } from "@/modules/apolloClient";
 import { TrackingWrapper } from "@/modules/tracking";
-import "common/styles/global.scss";
+import "common/src/styles/global.scss";
 import "../styles/global.scss";
 import { updateSentryConfig } from "@/instrumentation-client";
 import { ToastContainer } from "common/src/components/toast";
@@ -80,13 +78,11 @@ function MyApp({ Component, pageProps }: AppProps) {
       <TrackingWrapper matomoEnabled={enableMatomo}>
         {/* TODO is this ever called on the server? then the ctx is not undefined */}
         <ApolloProvider client={client}>
-          <ThemeProvider theme={theme}>
-            <PageWrapper {...pageProps}>
-              <Component {...pageProps} />
-              <CookieBanner />
-            </PageWrapper>
-            <ToastContainer />
-          </ThemeProvider>
+          <PageWrapper {...pageProps}>
+            <Component {...pageProps} />
+            <CookieBanner />
+          </PageWrapper>
+          <ToastContainer />
         </ApolloProvider>
       </TrackingWrapper>
       <ExternalScripts enableMatomo={enableMatomo} enableHotjar={enableHotjar} />

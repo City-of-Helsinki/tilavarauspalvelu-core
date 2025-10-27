@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "next-i18next";
-import { H1, HR } from "common/styled";
+import { H1, HR } from "common/src/styled";
 import { Filters, ReservationsDataLoader } from "@lib/reservations";
 import { ReservationStateChoice } from "@gql/gql-types";
 import { formatDate } from "common/src/date-utils";

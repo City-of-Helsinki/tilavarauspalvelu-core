@@ -7,7 +7,7 @@ import { Stepper } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
-import { Flex, H1, H4 } from "common/styled";
+import { Flex, H1, H4 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import {
   ReservationDocument,

@@ -10,7 +10,7 @@ import React from "react";
 import { CustomNumberInput } from "./CustomNumberInput";
 import { SpecializedRadioGroup } from "./SpecializedRadioGroup";
 import { EditAccordion } from "./styled";
-import { AutoGrid, FullRow } from "common/styled";
+import { AutoGrid, FullRow } from "common/src/styled";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;

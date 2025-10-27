@@ -4,7 +4,7 @@ import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQ
 import { useTranslation } from "next-i18next";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
-import { NoWrap } from "common/styled";
+import { NoWrap } from "common/src/styled";
 
 type StatusPropsType = {
   type: StatusLabelType;

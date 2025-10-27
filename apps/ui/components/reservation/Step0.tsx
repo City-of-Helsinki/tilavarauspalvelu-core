@@ -15,7 +15,7 @@ import { filterNonNullable } from "common/src/modules/helpers";
 import { containsField, FieldName } from "common/src/modules/metaFieldsHelpers";
 import { getApplicationFields, getGeneralFields } from "./SummaryFields";
 import { type Inputs } from "common/src/reservation-form/types";
-import { LinkLikeButton } from "common/styled";
+import { LinkLikeButton } from "common/src/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { type OptionsRecord } from "common";
 

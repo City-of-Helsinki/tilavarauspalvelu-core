@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { fontMedium, Flex } from "common/styled";
+import { fontMedium, Flex } from "common/src/styled";
 import { formatAddress } from "@/modules/util";
 import { IconCheck } from "hds-react";
 import { gql } from "@apollo/client";

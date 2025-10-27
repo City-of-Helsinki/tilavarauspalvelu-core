@@ -26,7 +26,7 @@ import {
 import { isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Element } from "@/styled";
-import { AutoGrid, ButtonContainer, CenterSpinner, H1, Strong } from "common/styled";
+import { AutoGrid, ButtonContainer, CenterSpinner, H1, Strong } from "common/src/styled";
 import { LinkPrev } from "@/components/LinkPrev";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

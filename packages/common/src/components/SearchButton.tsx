@@ -1,5 +1,5 @@
 import { breakpoints } from "../modules/const";
-import { Flex } from "../../styled";
+import { Flex } from "../styled";
 import { Button, ButtonSize, ButtonVariant, IconSearch, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";

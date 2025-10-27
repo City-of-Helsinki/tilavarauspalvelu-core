@@ -10,7 +10,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { convertLanguageCode } from "common/src/modules/util";
 import { formatDateTime, parseValidDateObject } from "common/src/date-utils";
-import { Flex, fontMedium } from "common/styled";
+import { Flex, fontMedium } from "common/src/styled";
 import { formatters as getFormatters } from "common";
 import React, { useMemo } from "react";
 import { breakpoints } from "common/src/modules/const";

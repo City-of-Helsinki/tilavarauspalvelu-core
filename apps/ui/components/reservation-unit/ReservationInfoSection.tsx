@@ -3,7 +3,7 @@ import React from "react";
 import { gql } from "@apollo/client";
 import { type ReservationInfoSectionFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { H4, Strong } from "common/styled";
+import { H4, Strong } from "common/src/styled";
 import styled from "styled-components";
 import { formatDurationRange, formatDateTime, parseValidDateObject } from "common/src/date-utils";
 import { formatNDays } from "@/modules/reservationUnit";

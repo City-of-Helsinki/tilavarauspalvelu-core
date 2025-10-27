@@ -17,7 +17,7 @@ import { SearchButton, SearchButtonContainer } from "common/src/components/Searc
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
 import { ignoreMaybeArray, mapParamToInteger, toNumber } from "common/src/modules/helpers";
-import { Flex } from "common/styled";
+import { Flex } from "common/src/styled";
 import { ShowAllContainer } from "common/src/components";
 
 const StyledCheckBox = styled(Checkbox)`

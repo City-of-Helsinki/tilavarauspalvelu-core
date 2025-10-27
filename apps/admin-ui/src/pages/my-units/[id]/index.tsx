@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant, Tabs } from "hds-react";
-import { Flex, H1, TabWrapper, TitleSection } from "common/styled";
+import { Flex, H1, TabWrapper, TitleSection } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { formatAddress } from "@/modules/util";
 import { getReservationSeriesUrl } from "@/modules/urls";

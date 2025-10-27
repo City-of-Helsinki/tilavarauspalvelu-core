@@ -9,7 +9,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { Navigation } from "./Navigation";
 import { ToastContainer } from "common/src/components/toast";
 import { useModal } from "@/context/ModalContext";
-import { mainStyles } from "common/styled";
+import { mainStyles } from "common/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 
 type Props = {

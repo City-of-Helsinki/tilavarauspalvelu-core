@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { IconAngleLeft, IconSize } from "hds-react";
 import { useRouter } from "next/router";
-import { focusStyles, removeButtonStyles } from "common/styled";
+import { focusStyles, removeButtonStyles } from "common/src/styled";
 
 const StyledLink = styled.button`
   ${removeButtonStyles}

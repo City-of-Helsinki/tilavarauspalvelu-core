@@ -8,7 +8,7 @@ import styled from "styled-components";
 import { addYears } from "date-fns";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "common/src/date-utils";
-import { Flex, H4 } from "common/styled";
+import { Flex, H4 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import {
   CreateReservationDocument,

@@ -23,7 +23,7 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
-import { Flex } from "common/styled";
+import { Flex } from "common/src/styled";
 
 import { errorToast, successToast } from "common/src/components/toast";
 import { useModal } from "@/context/ModalContext";

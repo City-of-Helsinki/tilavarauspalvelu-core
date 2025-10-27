@@ -1,7 +1,7 @@
 import React, { type HTMLAttributes, useState } from "react";
 import styled, { css, type RuleSet } from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
-import { AutoGrid, Flex, fontMedium, NoWrap } from "../../styled";
+import { AutoGrid, Flex, fontMedium, NoWrap } from "../styled";
 import { WEEKDAYS_SORTED } from "../modules/const";
 import { isTouchDevice } from "../modules/browserHelpers";
 import { Weekday } from "../../gql/gql-types";
