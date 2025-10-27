@@ -8,7 +8,7 @@ import { breakpoints } from "common/src/modules/const";
 import { ControlledSelect } from "common/src/components/form";
 import { ReservationCancelReasonChoice } from "@gql/gql-types";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
-import TermsBox from "common/src/termsbox/TermsBox";
+import TermsBox from "common/src/components/TermsBox";
 import { AccordionWithState } from "./Accordion";
 import { Sanitize } from "common/src/components/Sanitize";
 
