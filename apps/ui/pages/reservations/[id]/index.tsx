@@ -24,7 +24,7 @@ import {
 import Link from "next/link";
 import { isBefore, sub } from "date-fns";
 import { createApolloClient } from "@/modules/apolloClient";
-import { formatDateTimeRange } from "common/src/date-utils";
+import { formatDateTimeRange } from "common/src/modules/date-utils";
 import {
   getNormalizedReservationOrderStatus,
   getPaymentUrl,

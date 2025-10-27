@@ -3,7 +3,7 @@ import { ButtonVariant, IconArrowRight, IconCross, IconEuroSign, IconLock } from
 import { useTranslation } from "next-i18next";
 import { trim } from "lodash-es";
 import { type ReservationCardFragment, ReservationStateChoice } from "@gql/gql-types";
-import { formatDateTimeRange } from "common/src/date-utils";
+import { formatDateTimeRange } from "common/src/modules/date-utils";
 import { getNormalizedReservationOrderStatus, getPaymentUrl, isReservationCancellable } from "@/modules/reservation";
 import { getPrice } from "@/modules/reservationUnit";
 import { getReservationPath } from "@/modules/urls";

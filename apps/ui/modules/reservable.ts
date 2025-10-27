@@ -11,7 +11,7 @@ import {
   type Maybe,
   BlockingReservationFieldsFragment,
 } from "@/gql/gql-types";
-import { formatApiDateUnsafe } from "common/src/date-utils";
+import { formatApiDateUnsafe } from "common/src/modules/date-utils";
 import { dayMax, dayMin } from "common/src/modules/helpers";
 import {
   differenceInSeconds,

@@ -14,7 +14,7 @@ import { filterNonNullable, formatDayTimes } from "common/src/modules/helpers";
 import StatusLabel, { type StatusLabelType } from "common/src/components/StatusLabel";
 import { NoWrap } from "common/src/styled";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { formatDurationRange, formatDate, setMondayFirst } from "common/src/date-utils";
+import { formatDurationRange, formatDate, setMondayFirst } from "common/src/modules/date-utils";
 import {
   ApplicationInfoContainer,
   ApplicationSection,

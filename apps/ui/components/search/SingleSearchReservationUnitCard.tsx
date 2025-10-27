@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { type SingleSearchCardFragment } from "@gql/gql-types";
 import { isToday, isTomorrow, isValid } from "date-fns";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { formatDate, formatTime } from "common/src/date-utils";
+import { formatDate, formatTime } from "common/src/modules/date-utils";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { isBrowser } from "@/modules/const";
 import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";

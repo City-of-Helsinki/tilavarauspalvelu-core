@@ -71,7 +71,7 @@ import {
   applicationReservationDateTime,
   setMondayFirst,
   formatApiDate,
-} from "common/src/date-utils";
+} from "common/src/modules/date-utils";
 import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 
 const N_RESERVATIONS_TO_SHOW = 20;

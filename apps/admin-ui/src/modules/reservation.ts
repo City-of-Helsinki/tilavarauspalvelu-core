@@ -23,7 +23,7 @@ import {
   parseApiDate,
   fromApiDateTime,
   parseValidDateObject,
-} from "common/src/date-utils";
+} from "common/src/modules/date-utils";
 import { getReserveeName } from "@/modules/util";
 import { getReserveeTypeTranslationKey } from "@/modules/helpers";
 import { filterNonNullable, sort, toNumber } from "common/src/modules/helpers";

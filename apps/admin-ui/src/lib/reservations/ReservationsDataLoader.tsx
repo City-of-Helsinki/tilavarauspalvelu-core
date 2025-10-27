@@ -8,7 +8,7 @@ import {
 import { More } from "@/components/More";
 import { LIST_PAGE_SIZE } from "@/modules/const";
 import { ReservationsTable } from "./ReservationsTable";
-import { parseUIDate, formatApiDate } from "common/src/date-utils";
+import { parseUIDate, formatApiDate } from "common/src/modules/date-utils";
 import { filterEmptyArray, filterNonNullable } from "common/src/modules/helpers";
 import { errorToast } from "common/src/components/toast";
 import { CenterSpinner } from "common/src/styled";

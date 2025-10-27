@@ -12,7 +12,7 @@ import {
   MunicipalityChoice,
 } from "@gql/gql-types";
 import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
-import { formatApiDate } from "common/src/date-utils";
+import { formatApiDate } from "common/src/modules/date-utils";
 import { addYears } from "date-fns";
 import { breakpoints } from "common/src/modules/const";
 import { H1 } from "common/src/styled";

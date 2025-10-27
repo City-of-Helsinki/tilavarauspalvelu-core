@@ -1,7 +1,7 @@
 import { addDays } from "date-fns";
 import { ReservationStartInterval, ReservationTypeChoice, Weekday } from "@gql/gql-types";
 import { ReservationSeriesForm, ReservationSeriesFormSchema } from "./reservationSeries";
-import { formatDate } from "common/src/date-utils";
+import { formatDate } from "common/src/modules/date-utils";
 import { expect, test } from "vitest";
 
 const tomorrow = addDays(new Date(), 1);

@@ -2,7 +2,7 @@ import { ReservationStartInterval } from "@gql/gql-types";
 import { addDays, addHours, setMinutes, subDays } from "date-fns";
 import { ReservationFormSchema } from "./reservation";
 import { describe, test, expect } from "vitest";
-import { formatTime, formatDate } from "common/src/date-utils";
+import { formatTime, formatDate } from "common/src/modules/date-utils";
 
 describe("with schema", () => {
   const futureEndTime = formatTime(setMinutes(addHours(new Date(), 3), 0));

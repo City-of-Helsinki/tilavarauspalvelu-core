@@ -24,7 +24,7 @@ import { ApolloError, gql } from "@apollo/client";
 import { H1 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { parseApiDate, formatDate } from "common/src/date-utils";
+import { parseApiDate, formatDate } from "common/src/modules/date-utils";
 import { useRouter } from "next/router";
 import { IconCalendarEvent, IconClock, IconLocation, IconTrash } from "hds-react";
 import { Card } from "common/src/components";

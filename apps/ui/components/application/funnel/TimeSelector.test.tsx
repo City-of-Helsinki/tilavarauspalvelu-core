@@ -10,7 +10,7 @@ import { transformWeekday } from "common/src/modules/conversion";
 import { createNodeId, formatTimeStruct } from "common/src/modules/helpers";
 import { type OpenHoursState } from "common/src/components/ApplicationTimeSelector";
 import { selectOption } from "@/test/test.utils";
-import { formatApiTimeUnsafe } from "common/src/date-utils";
+import { formatApiTimeUnsafe } from "common/src/modules/date-utils";
 import { type DayT, WEEKDAYS_SORTED } from "common/src/modules/const";
 
 type ApplicationPage2 = NonNullable<ApplicationPage2Query["application"]>;

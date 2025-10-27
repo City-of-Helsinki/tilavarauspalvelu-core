@@ -6,7 +6,7 @@ import { MockedProvider } from "@apollo/client/testing";
 import { ReservationSeriesForm } from "./ReservationSeriesForm";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { createGraphQLMocks, createReservationUnits, mondayMorningReservations, YEAR } from "./__test__/mocks";
-import { formatDate } from "common/src/date-utils";
+import { formatDate } from "common/src/modules/date-utils";
 import { Weekday } from "@gql/gql-types";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {

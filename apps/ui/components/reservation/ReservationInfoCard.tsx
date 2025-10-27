@@ -20,7 +20,7 @@ import {
   getLocalizationLang,
   getMainImage,
 } from "common/src/modules/helpers";
-import { formatDateTimeRange, formatDuration } from "common/src/date-utils";
+import { formatDateTimeRange, formatDuration } from "common/src/modules/date-utils";
 import { getReservationUnitPath } from "@/modules/urls";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 

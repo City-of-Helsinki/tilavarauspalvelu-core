@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { IconClock, IconSize } from "hds-react";
 import { isPast, isFuture, isToday } from "date-fns";
 import { useTranslation } from "next-i18next";
-import { formatDate, parseValidDateObject } from "common/src/date-utils";
+import { formatDate, parseValidDateObject } from "common/src/modules/date-utils";
 
 interface IProps {
   applicationPeriodBeginsAt?: string;

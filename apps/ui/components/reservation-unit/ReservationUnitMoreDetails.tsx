@@ -14,7 +14,7 @@ import { Accordion } from "hds-react";
 import { gql } from "@apollo/client";
 import { filterNonNullable, formatListToCSV, isPriceFree, toNumber } from "common/src/modules/helpers";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { formatDate, formatTimeRange, timeToMinutes } from "common/src/date-utils";
+import { formatDate, formatTimeRange, timeToMinutes } from "common/src/modules/date-utils";
 import { ReservationInfoSection } from "./ReservationInfoSection";
 import { Sanitize } from "common/src/components/Sanitize";
 import styled from "styled-components";

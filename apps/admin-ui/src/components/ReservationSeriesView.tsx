@@ -1,4 +1,4 @@
-import { formatTime } from "common/src/date-utils";
+import { formatTime } from "common/src/modules/date-utils";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { ReservationStateChoice, type ReservationToCopyFragment, UserPermissionChoice } from "@gql/gql-types";

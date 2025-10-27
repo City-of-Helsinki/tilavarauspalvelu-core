@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ReservationStartInterval, ReservationTypeChoice, Weekday } from "@gql/gql-types";
-import { parseUIDate } from "common/src/date-utils";
+import { parseUIDate } from "common/src/modules/date-utils";
 import { checkReservationInterval, checkStartEndTime, ReservationTypeSchema } from "./reservation";
 import { checkDateNotInPast, checkTimeStringFormat } from "common/src/schemas/schemaCommon";
 import { intervalToNumber } from "./utils";

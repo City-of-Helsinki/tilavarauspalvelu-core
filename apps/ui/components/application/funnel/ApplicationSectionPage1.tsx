@@ -8,7 +8,7 @@ import { AutoGrid, Flex, H4 } from "common/src/styled";
 import { getLocalizationLang } from "common/src/modules/helpers";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { ControlledNumberInput, ControlledSelect } from "common/src/components/form";
-import { formatDate, formatDateRange } from "common/src/date-utils";
+import { formatDate, formatDateRange } from "common/src/modules/date-utils";
 import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
 import { type ApplicationPage1FormValues } from "./form";

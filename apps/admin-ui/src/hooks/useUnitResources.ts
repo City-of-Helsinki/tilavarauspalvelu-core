@@ -1,6 +1,6 @@
 import { AuthenticationType, type ReservationUnitsByUnitQuery, useReservationUnitsByUnitQuery } from "@gql/gql-types";
 import { createNodeId, filterNonNullable } from "common/src/modules/helpers";
-import { formatApiDate } from "common/src/date-utils";
+import { formatApiDate } from "common/src/modules/date-utils";
 import { RELATED_RESERVATION_STATES } from "common/src/modules/const";
 import { errorToast } from "common/src/components/toast";
 import { gql } from "@apollo/client";

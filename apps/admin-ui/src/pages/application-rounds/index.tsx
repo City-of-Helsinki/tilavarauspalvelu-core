@@ -23,7 +23,7 @@ import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
-import { formatDate, parseValidDateObject } from "common/src/date-utils";
+import { formatDate, parseValidDateObject } from "common/src/modules/date-utils";
 
 const AccordionWithoutTopPadding = styled(Accordion).attrs({
   closeButton: false,

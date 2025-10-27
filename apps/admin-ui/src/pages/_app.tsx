@@ -24,7 +24,7 @@ import {
   type ShowNotificationsListQueryVariables,
 } from "@gql/gql-types";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { formatApiDate } from "common/src/date-utils";
+import { formatApiDate } from "common/src/modules/date-utils";
 
 function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
   const { Component, pageProps, currentUser, handlingData, notificationsData } = props;

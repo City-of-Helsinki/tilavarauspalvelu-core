@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { parseUIDate } from "common/src/date-utils";
+import { parseUIDate } from "common/src/modules/date-utils";
 import { ReservationStartInterval, ReservationTypeChoice } from "@gql/gql-types";
 import { intervalToNumber } from "./utils";
 import { checkTimeStringFormat, checkValidFutureDate } from "common/src/schemas/schemaCommon";

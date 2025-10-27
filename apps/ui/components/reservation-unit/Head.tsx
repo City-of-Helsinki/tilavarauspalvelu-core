@@ -7,7 +7,7 @@ import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util
 import { ReservationKind, type ReservationUnitHeadFragment } from "@gql/gql-types";
 import { Flex, H1, H3 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
-import { formatDateRange, formatDateTime, formatDuration, formatDate } from "common/src/date-utils";
+import { formatDateRange, formatDateTime, formatDuration, formatDate } from "common/src/modules/date-utils";
 import { IconWithText } from "@/components/common/IconWithText";
 import { Images } from "./Images";
 import {

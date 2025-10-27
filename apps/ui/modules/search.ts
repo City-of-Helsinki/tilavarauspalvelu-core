@@ -24,7 +24,7 @@ import {
   UnitOrderingChoices,
 } from "@gql/gql-types";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { parseUIDate, formatApiDate } from "common/src/date-utils";
+import { parseUIDate, formatApiDate } from "common/src/modules/date-utils";
 import { startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "./const";
 import { gql, type ApolloClient } from "@apollo/client";

@@ -5,7 +5,7 @@ import { memoize } from "lodash-es";
 import { OrderStatus, ReservationStateChoice, type ReservationTableElementFragment } from "@gql/gql-types";
 import { truncate } from "@/modules/helpers";
 import { getReservationUrl } from "@/modules/urls";
-import { formatDateTime, formatDateTimeRange, parseValidDateObject } from "common/src/date-utils";
+import { formatDateTime, formatDateTimeRange, parseValidDateObject } from "common/src/modules/date-utils";
 import { getReserveeName } from "@/modules/util";
 import { CustomTable } from "@/components/Table";
 import { MAX_NAME_LENGTH } from "@/modules/const";

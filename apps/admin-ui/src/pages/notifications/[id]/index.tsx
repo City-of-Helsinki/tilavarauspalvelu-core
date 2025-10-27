@@ -27,7 +27,7 @@ import {
   type BannerNotificationPageQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { parseUIDate, fromUIDateTime, formatDate, formatTime } from "common/src/date-utils";
+import { parseUIDate, fromUIDateTime, formatDate, formatTime } from "common/src/modules/date-utils";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import {
   checkValidDate,

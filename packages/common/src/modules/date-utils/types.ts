@@ -1,5 +1,5 @@
 import type { TFunction } from "next-i18next";
-import type { LocalizationLanguages } from "../modules/urlBuilder";
+import type { LocalizationLanguages } from "../urlBuilder";
 
 export type TimeStruct = {
   hours?: number | null;

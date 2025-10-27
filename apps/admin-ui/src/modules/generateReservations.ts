@@ -1,4 +1,4 @@
-import { parseUIDateUnsafe, timeToMinutes, setMondayFirst } from "common/src/date-utils";
+import { parseUIDateUnsafe, timeToMinutes, setMondayFirst } from "common/src/modules/date-utils";
 import { TimeSelectionForm } from "@/schemas";
 import { Weekday } from "@gql/gql-types";
 import { transformWeekday } from "common/src/modules/conversion";

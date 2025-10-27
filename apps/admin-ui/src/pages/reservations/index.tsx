@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { formatDate } from "common/src/date-utils";
+import { formatDate } from "common/src/modules/date-utils";
 import { useTranslation } from "next-i18next";
 import { H1 } from "common/src/styled";
 import { Filters, ReservationsDataLoader } from "@lib/reservations";
