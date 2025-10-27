@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { FilterTags, StyledTag, ResetButton } from "common/src/tags";
+import { SearchTagContainer, SearchTag, TagResetButton } from "common/src/styled/tags";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
@@ -74,9 +74,9 @@ export function SearchTags({
   const shouldShowResetButton = tags.length > 0 || defaultTags.length > 0;
 
   return (
-    <FilterTags>
+    <SearchTagContainer>
       {tags.map((tag) => (
-        <StyledTag
+        <SearchTag
           onDelete={() => handleDelete(tag)}
           key={`${tag.key}-${tag.value}`}
           id={`search-tag-${tag.key}`}
@@ -84,18 +84,18 @@ export function SearchTags({
           placeholder=""
         >
           {tag.tr}
-        </StyledTag>
+        </SearchTag>
       ))}
       {shouldShowResetButton && (
-        <ResetButton
+        <TagResetButton
           onClick={handleReset}
           onDelete={handleReset}
           aria-label={clearButtonAriaLabel ?? t("common:clearTags")}
           placeholder=""
         >
           {clearButtonLabel ?? t("common:clear")}
-        </ResetButton>
+        </TagResetButton>
       )}
-    </FilterTags>
+    </SearchTagContainer>
   );
 }

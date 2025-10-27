@@ -1,7 +1,7 @@
+import type { StatusLabelType as HDSStatusLabelType } from "hds-react";
 import React from "react";
 import { StatusLabel as HDSStatusLabel } from "hds-react";
 import styled from "styled-components";
-import { type StatusLabelType, getStatusBorderColor, getStatusBackgroundColor } from "../tags";
 
 type StatusLabelProps = {
   type: StatusLabelType;
@@ -54,3 +54,42 @@ function StatusLabel({ type, icon, slim = false, children, ...rest }: Readonly<S
 }
 
 export default StatusLabel;
+
+export type StatusLabelType = HDSStatusLabelType | "draft";
+
+export const getStatusBorderColor = ($type: StatusLabelType) => {
+  switch ($type) {
+    case "info":
+      return "var(--color-coat-of-arms-medium-light)";
+    case "alert":
+      return "var(--color-engel-dark)";
+    case "success":
+      return "var(--color-tram-medium-light)";
+    case "error":
+      // using custom value since there is no suitable color in the HDS color palette for this (--color-metro is too dark)
+      return "#FBA782";
+    case "draft":
+      return "var(--color-suomenlinna)";
+    case "neutral":
+    default:
+      return "var(--color-silver-dark)";
+  }
+};
+
+export const getStatusBackgroundColor = ($type: StatusLabelType) => {
+  switch ($type) {
+    case "info":
+      return "var(--color-coat-of-arms-light)";
+    case "alert":
+      return "var(--color-engel-medium-light)";
+    case "success":
+      return "var(--color-tram-light)";
+    case "error":
+      return "var(--color-metro-medium-light)";
+    case "draft":
+      return "var(--color-suomenlinna-medium-light)";
+    case "neutral":
+    default:
+      return "var(--color-silver)";
+  }
+};
