@@ -8,8 +8,8 @@ import { Calendar as BigCalendar, dateFnsLocalizer, ToolbarProps } from "react-b
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
-import { dateToMinutes, formatTimeRange } from "../date-utils";
-import type { LocalizationLanguages } from "../modules/urlBuilder";
+import { dateToMinutes, formatTimeRange } from "../../modules/date-utils";
+import type { LocalizationLanguages } from "../../modules/urlBuilder";
 
 export type CalendarEvent<T> = {
   title?: string;

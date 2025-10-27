@@ -7,19 +7,12 @@ import {
   useListReservationsQuery,
 } from "@/gql/gql-types";
 import styled from "styled-components";
-import Calendar, {
-  type SlotClickProps,
-  type CalendarEvent,
-  SlotProps,
-  type CalendarEventBuffer,
-} from "common/src/calendar/Calendar";
-import { Toolbar } from "common/src/calendar/Toolbar";
 import { addMinutes, differenceInMinutes } from "date-fns";
 import { eventStyleGetter } from "@/components/common/calendarUtils";
 import { Legend } from "@/components/calendar/Legend";
 import { useMedia } from "react-use";
 import { breakpoints, RELATED_RESERVATION_STATES } from "common/src/modules/const";
-import { getEventBuffers } from "common/src/calendar/util";
+import { getEventBuffers } from "common/src/components/calendar/util";
 import { filterNonNullable, getLocalizationLang } from "common/src/modules/helpers";
 import {
   SLOTS_EVERY_HOUR,
@@ -33,6 +26,13 @@ import {
   getSlotPropGetter,
   isRangeReservable,
 } from "@/modules/reservable";
+import Calendar, {
+  type CalendarEvent,
+  type CalendarEventBuffer,
+  type SlotClickProps,
+  SlotProps,
+} from "common/src/components/calendar/Calendar";
+import { Toolbar } from "common/src/components/calendar/Toolbar";
 import { formatApiDate, formatDate, formatDuration, formatTime, parseUIDate } from "common/src/modules/date-utils";
 import { useTranslation } from "next-i18next";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
@@ -118,7 +118,7 @@ function useCalendarEventChange({
   const { t } = useTranslation();
   // TODO this doesn't optimize anything
   // any change in the event will cause a full recalculation
-  const calendarEvents: Array<CalendarEventBuffer | CalendarEvent<ReservationNode>> = useMemo(() => {
+  return useMemo(() => {
     const shouldDisplayFocusSlot = focusSlot.isReservable;
 
     let focusEvent = null;
@@ -169,8 +169,6 @@ function useCalendarEventChange({
       ]),
     ];
   }, [reservationUnit, t, focusSlot, blockingReservations]);
-
-  return calendarEvents;
 }
 
 export function ReservationTimePicker({
