@@ -44,7 +44,7 @@ import type { LocalizationLanguages } from "common/src/modules/urlBuilder";
 import { convertWeekday } from "common/src/modules/conversion";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { IconButton, StatusLabel } from "common/src/components";
-import type { StatusLabelType } from "common/src/tags";
+import type { StatusLabelType } from "common/src/components/StatusLabel";
 import { Sanitize } from "common/src/components/Sanitize";
 import {
   type ApplicationSectionReservationFragment,

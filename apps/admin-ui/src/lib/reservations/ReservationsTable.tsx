@@ -10,8 +10,7 @@ import { getReserveeName } from "@/modules/util";
 import { CustomTable } from "@/components/Table";
 import { MAX_NAME_LENGTH } from "@/modules/const";
 import { TableLink } from "@/styled";
-import type { StatusLabelType } from "common/src/tags";
-import StatusLabel from "common/src/components/StatusLabel";
+import StatusLabel, { type StatusLabelType } from "common/src/components/StatusLabel";
 import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircleFill } from "hds-react";
 import { gql } from "@apollo/client";
 

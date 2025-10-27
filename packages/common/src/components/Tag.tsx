@@ -1,5 +1,6 @@
 import React from "react";
-import { getStatusBackgroundColor, getStatusBorderColor, StatusLabelType, StyledTag } from "../tags";
+import { getStatusBackgroundColor, getStatusBorderColor, StatusLabelType } from "./StatusLabel";
+import { SearchTag } from "../styled";
 import styled from "styled-components";
 
 type TagPropsType = {
@@ -9,7 +10,7 @@ type TagPropsType = {
   children: string;
 };
 
-const ColoredTag = styled(StyledTag)<{ $type: StatusLabelType }>`
+const ColoredTag = styled(SearchTag)<{ $type: StatusLabelType }>`
   & {
     --background-color: ${(props) => getStatusBackgroundColor(props.$type)};
     --tag-color: var(--color-black);

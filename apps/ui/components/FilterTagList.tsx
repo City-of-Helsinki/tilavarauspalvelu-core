@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { FilterTags, StyledTag, ResetButton } from "common/src/tags";
+import { SearchTagContainer, SearchTag, TagResetButton } from "common/src/styled/tags";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { type TFunction } from "i18next";
 import { useSearchParams } from "next/navigation";
@@ -72,7 +72,7 @@ export function FilterTagList({ filters, multiSelectFilters, hideList, translate
   const hasTags = filteredTags.length > 0;
 
   return (
-    <FilterTags data-testid="search-form__filter--tags">
+    <SearchTagContainer data-testid="search-form__filter--tags">
       {filteredTags.map((key) => {
         const value = searchValues.getAll(key);
         const label = t(`searchForm:filters.${key}`, {
@@ -87,7 +87,7 @@ export function FilterTagList({ filters, multiSelectFilters, hideList, translate
           const isOldFormat = value.length === 1 && value[0]?.includes(",");
           const values = isOldFormat ? (value[0]?.split(",") ?? []) : value;
           return values.map((val) => (
-            <StyledTag
+            <SearchTag
               id={`filter-tag__${key}-${val}`}
               onClick={() => handleRemoveTag(key, val)}
               onDelete={() => handleRemoveTag(key, val)}
@@ -99,12 +99,12 @@ export function FilterTagList({ filters, multiSelectFilters, hideList, translate
             >
               {/* TODO when can this return undefined? should we filter or remove the possibility? */}
               {translateTag(key, val) ?? ""}
-            </StyledTag>
+            </SearchTag>
           ));
         }
         // TODO why are these different? (multi select and single select)
         return (
-          <StyledTag
+          <SearchTag
             id={`filter-tag__${key}`}
             onDelete={() => handleRemoveTag(key)}
             onClick={() => handleRemoveTag(key)}
@@ -115,19 +115,19 @@ export function FilterTagList({ filters, multiSelectFilters, hideList, translate
             })}
           >
             {key === "duration" && !Number.isNaN(Number(value)) ? translateDuration(t, Number(value)) : label}
-          </StyledTag>
+          </SearchTag>
         );
       })}
       {hasTags && (
-        <ResetButton
+        <TagResetButton
           onClick={() => handleResetTags(hideList)}
           onDelete={() => handleResetTags(hideList)}
           data-testid="search-form__reset-button"
           placeholder=""
         >
           {t("common:clear")}
-        </ResetButton>
+        </TagResetButton>
       )}
-    </FilterTags>
+    </SearchTagContainer>
   );
 }
