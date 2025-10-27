@@ -1,7 +1,7 @@
 import React from "react";
 import { IconLinkExternal } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { AutoGrid } from "common/styled";
+import { AutoGrid } from "common/src/styled";
 import { EditAccordion } from "./styled";
 import type { ReservationUnitEditQuery } from "@gql/gql-types";
 import { getOpeningHoursUrl } from "@/modules/urls";

@@ -4,7 +4,7 @@ import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { type FieldValues, useController, type UseControllerProps, UseFormReturn } from "react-hook-form";
 import { AuthenticationType, ReservationStartInterval } from "@gql/gql-types";
-import { AutoGrid, Flex } from "common/styled";
+import { AutoGrid, Flex } from "common/src/styled";
 import { ControlledSelect, ControlledCheckbox, DateTimeInput } from "common/src/components/form";
 import { getTranslatedError } from "@/modules/util";
 import { BUFFER_TIME_OPTIONS, ReservationUnitEditFormValues } from "./form";

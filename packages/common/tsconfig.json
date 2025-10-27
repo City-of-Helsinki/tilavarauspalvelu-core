@@ -9,7 +9,6 @@
   "include": [
     "src",
     "gql",
-    "styles",
     "index.ts",
     "types/**/*.d.ts",
     "prettier.config.cjs",

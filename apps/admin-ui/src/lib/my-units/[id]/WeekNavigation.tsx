@@ -3,7 +3,7 @@ import { Button, ButtonSize, ButtonVariant, IconAngleLeft, IconAngleRight } from
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { formatDateRange } from "common/src/date-utils";
-import { Flex } from "common/styled";
+import { Flex } from "common/src/styled";
 import styled from "styled-components";
 
 const Btn = styled(Button)`

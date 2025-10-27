@@ -27,7 +27,7 @@ import {
   seasonalPrefix,
   singleSearchPrefix,
 } from "@/modules/urls";
-import { fontBold, fontMedium } from "common/styled";
+import { fontBold, fontMedium } from "common/src/styled";
 
 type HeaderProps = {
   apiBaseUrl: string;

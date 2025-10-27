@@ -8,7 +8,7 @@ import { useUnitResources, useGetFilterSearchParams } from "@/hooks";
 import { parseUIDate, isValidDate, formatDate } from "common/src/date-utils";
 import { startOfDay } from "date-fns";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
-import { AutoGrid, Flex, HR } from "common/styled";
+import { AutoGrid, Flex, HR } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { SearchTags } from "@/components/SearchTags";
 import { MultiSelectFilter } from "@/components/QueryParamFilters";

@@ -10,7 +10,7 @@ import { getPermissionErrors } from "common/src/modules/apolloUtils";
 import { useTranslation } from "next-i18next";
 import { useGetFilterSearchParams } from "@/hooks";
 import { LIST_PAGE_SIZE } from "@/modules/const";
-import { CenterSpinner } from "common/styled";
+import { CenterSpinner } from "common/src/styled";
 
 type Props = {
   applicationRoundPk: number;

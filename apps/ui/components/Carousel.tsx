@@ -3,7 +3,7 @@ import NukaCarousel from "nuka-carousel";
 import { IconAngleLeft, IconAngleRight, IconSize } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { focusStyles } from "common/styled";
+import { focusStyles } from "common/src/styled";
 
 type Props = {
   children: React.ReactNode[];

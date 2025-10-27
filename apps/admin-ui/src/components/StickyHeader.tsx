@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { ButtonContainer, H2 } from "common/styled";
+import { ButtonContainer, H2 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 
 const Sticky = styled.div`

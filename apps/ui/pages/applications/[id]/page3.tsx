@@ -14,7 +14,7 @@ import {
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { gql } from "@apollo/client";
-import { AutoGrid, ButtonContainer, Flex } from "common/styled";
+import { AutoGrid, ButtonContainer, Flex } from "common/src/styled";
 import { useDisplayError } from "common/src/hooks";
 import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import {

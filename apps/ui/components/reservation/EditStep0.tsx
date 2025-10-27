@@ -4,7 +4,7 @@ import { differenceInMinutes } from "date-fns";
 import { Button, ButtonVariant, IconArrowRight, IconCross } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { H4 } from "common/styled";
+import { H4 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import {
   convertFormToFocustimeSlot,

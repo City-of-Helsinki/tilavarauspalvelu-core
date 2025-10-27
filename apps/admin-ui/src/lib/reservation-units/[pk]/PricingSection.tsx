@@ -5,7 +5,7 @@ import { addDays, startOfDay } from "date-fns";
 import { IconAlertCircleFill, RadioButton, TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { type Control, Controller, UseFormReturn } from "react-hook-form";
-import { AutoGrid, Flex, HR } from "common/styled";
+import { AutoGrid, Flex, HR } from "common/src/styled";
 import {
   ControlledDateInput,
   ControlledNumberInput,

@@ -9,7 +9,7 @@ import {
   type ApplicationSectionViewQueryVariables,
   ApplicationStatusChoice,
 } from "@gql/gql-types";
-import { H1 } from "common/styled";
+import { H1 } from "common/src/styled";
 import { AllReservations } from "@/components/application/ApprovedReservations";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";

@@ -5,7 +5,7 @@ import { getReservationUrl } from "@/modules/urls";
 import { formatDurationFromDates, parseValidDateObject } from "common/src/date-utils";
 import { getReserveeName } from "@/modules/util";
 import { truncate } from "@/modules/helpers";
-import { Flex } from "common/styled";
+import { Flex } from "common/src/styled";
 import { CELL_BORDER } from "./const";
 import VisibleIfPermission from "@/components/VisibleIfPermission";
 import { useTranslation } from "next-i18next";

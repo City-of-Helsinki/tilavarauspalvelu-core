@@ -1,7 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
 import { IconAngleLeft, IconAngleRight, IconSize } from "hds-react";
-import { Flex, fontMedium, truncatedText } from "common/styled";
+import { Flex, fontMedium, truncatedText } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { useMedia } from "react-use";
 import Link from "next/link";

@@ -2,7 +2,7 @@ import React from "react";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { H1, H3, SemiBold, Strong, CenterSpinner, Flex, TitleSection } from "common/styled";
+import { H1, H3, SemiBold, Strong, CenterSpinner, Flex, TitleSection } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { useApplicationRoundCriteriaQuery, UserPermissionChoice } from "@gql/gql-types";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";

@@ -1,7 +1,7 @@
 import React, { forwardRef } from "react";
 import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircle, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { Flex, TitleSection, H1 } from "common/styled";
+import { Flex, TitleSection, H1 } from "common/src/styled";
 import {
   type Maybe,
   OrderStatus,

@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useReservationDateOfBirthQuery, useApplicationDateOfBirthQuery } from "@gql/gql-types";
 import { formatDate, parseValidDateObject } from "common/src/date-utils";
-import { Flex } from "common/styled";
+import { Flex } from "common/src/styled";
 import { createNodeId } from "common/src/modules/helpers";
 
 // NOTE separate query because all requests for dateOfBirth are logged

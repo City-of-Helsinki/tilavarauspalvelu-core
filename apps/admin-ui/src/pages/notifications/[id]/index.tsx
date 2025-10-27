@@ -41,7 +41,7 @@ import { ControlledTimeInput } from "@/components/ControlledTimeInput";
 import { successToast } from "common/src/components/toast";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
-import { CenterSpinner, Flex, TitleSection, H1 } from "common/styled";
+import { CenterSpinner, Flex, TitleSection, H1 } from "common/src/styled";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";

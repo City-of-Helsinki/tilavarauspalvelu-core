@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant, Notification, NotificationSize } from "hds-react";
 import { useFormContext } from "react-hook-form";
-import { AutoGrid, Flex } from "common/styled";
+import { AutoGrid, Flex } from "common/src/styled";
 import { filterNonNullable } from "common/src/modules/helpers";
 import { ControlledSelect } from "common/src/components/form";
 import {

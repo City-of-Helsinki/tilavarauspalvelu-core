@@ -9,7 +9,7 @@ import {
   useCreateApplicationMutation,
 } from "@/gql/gql-types";
 import { getApplicationPath } from "@/modules/urls";
-import { Flex, NoWrap, WhiteButton, pageSideMargins } from "common/styled";
+import { Flex, NoWrap, WhiteButton, pageSideMargins } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { useMedia } from "react-use";
 import { ignoreMaybeArray, toNumber } from "common/src/modules/helpers";

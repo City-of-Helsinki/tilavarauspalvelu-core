@@ -22,7 +22,7 @@ import {
 import ReservationTypeForm from "@/components/ReservationTypeForm";
 import { useReservationEditData, useSession, useStaffReservationMutation } from "@/hooks";
 import { errorToast } from "common/src/components/toast";
-import { ButtonContainer, CenterSpinner, Flex, HR } from "common/styled";
+import { ButtonContainer, CenterSpinner, Flex, HR } from "common/src/styled";
 import { createTagString } from "@/modules/reservation";
 import { ReservationTitleSection } from "@lib/reservations/[id]";
 import { LinkPrev } from "@/components/LinkPrev";

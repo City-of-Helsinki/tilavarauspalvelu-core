@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Tooltip } from "hds-react";
-import { fontMedium } from "common/styled";
+import { fontMedium } from "common/src/styled";
 
 const FieldGroupWrapper = styled.div`
   display: grid;

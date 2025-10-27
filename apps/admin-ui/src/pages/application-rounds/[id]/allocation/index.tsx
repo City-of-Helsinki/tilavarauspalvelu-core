@@ -3,7 +3,7 @@ import { Tabs } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { uniqBy } from "lodash-es";
 import styled from "styled-components";
-import { CenterSpinner, fontMedium, H1, Strong, TabWrapper } from "common/styled";
+import { CenterSpinner, fontMedium, H1, Strong, TabWrapper } from "common/src/styled";
 import { hasPermission as hasUnitPermission } from "@/modules/permissionHelper";
 import {
   ApplicationRoundFilterDocument,

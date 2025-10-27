@@ -7,7 +7,7 @@ import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
 import { useCheckPermission } from "@/hooks";
 import { NewReservationModal } from "@/components/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
-import { H6 } from "common/styled";
+import { H6 } from "common/src/styled";
 import StatusLabel from "common/src/components/StatusLabel";
 import { gql } from "@apollo/client";
 import { formatDate } from "common/src/date-utils";

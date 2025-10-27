@@ -6,7 +6,7 @@ import { useFormContext } from "react-hook-form";
 import { type ApplicationPage2Query } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/modules/helpers";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { ButtonContainer } from "common/styled";
+import { ButtonContainer } from "common/src/styled";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { getApplicationPath } from "@/modules/urls";
 import { type ApplicationPage2FormValues } from "./form";

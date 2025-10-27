@@ -9,7 +9,7 @@ import { useModal } from "@/context/ModalContext";
 import { EditTimeModal } from "@/components/EditTimeModal";
 import { useCheckPermission, useReservationSeries } from "@/hooks";
 import { isPossibleToDeny, isPossibleToEdit } from "@/modules/reservationModificationRules";
-import { CenterSpinner } from "common/styled";
+import { CenterSpinner } from "common/src/styled";
 
 type Props = {
   reservationSeriesPk: number;

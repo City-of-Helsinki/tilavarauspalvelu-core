@@ -4,7 +4,7 @@ import type { GetServerSidePropsContext } from "next";
 import { Notification, NotificationSize } from "hds-react";
 import { useMedia } from "react-use";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { Flex, H1 } from "common/styled";
+import { Flex, H1 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { ReservationKind } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/modules/helpers";

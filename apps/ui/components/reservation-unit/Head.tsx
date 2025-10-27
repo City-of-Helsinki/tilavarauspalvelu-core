@@ -5,7 +5,7 @@ import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { ReservationKind, type ReservationUnitHeadFragment } from "@gql/gql-types";
-import { Flex, H1, H3 } from "common/styled";
+import { Flex, H1, H3 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { formatDateRange, formatDateTime, formatDuration, formatDate } from "common/src/date-utils";
 import { IconWithText } from "@/components/common/IconWithText";

@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react";
 import styled from "styled-components";
-import { Flex, focusStyles } from "../../styled";
+import { Flex, focusStyles } from "../styled";
 
 type Props = {
   id?: string;

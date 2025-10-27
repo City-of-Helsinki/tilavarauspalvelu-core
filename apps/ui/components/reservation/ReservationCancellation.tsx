@@ -2,7 +2,7 @@ import React from "react";
 import styled, { css } from "styled-components";
 import { IconClock, IconEuroSign, IconLocation } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { H1 } from "common/styled";
+import { H1 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { type ReservationCancelPageQuery, useCancelReservationMutation } from "@gql/gql-types";
 import { ReservationInfoCard } from "./ReservationInfoCard";

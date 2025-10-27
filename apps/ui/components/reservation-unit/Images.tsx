@@ -6,7 +6,7 @@ import type { ImageFragment } from "@gql/gql-types";
 import Carousel from "@/components/Carousel";
 import { getImageSource } from "common/src/modules/helpers";
 import { Dialog } from "hds-react";
-import { focusStyles, removeButtonStyles } from "common/styled";
+import { focusStyles, removeButtonStyles } from "common/src/styled";
 import { FixedDialog } from "@/styled/FixedDialog";
 
 type Props = {

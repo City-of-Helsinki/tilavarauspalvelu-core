@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled, { css, RuleSet } from "styled-components";
-import { Flex, truncatedText } from "common/styled";
+import { Flex, truncatedText } from "common/src/styled";
 
 type LegendItemT = {
   title: string;

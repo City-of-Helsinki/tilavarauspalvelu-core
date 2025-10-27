@@ -9,7 +9,7 @@ import {
   ControlledRangeNumberFilter,
 } from "@/components/QueryParamFilters";
 import { SearchTags } from "@/components/SearchTags";
-import { Flex } from "common/styled";
+import { Flex } from "common/src/styled";
 import { type TagOptionsList, translateTag } from "@/modules/search";
 import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import { Button, ButtonVariant, IconCross, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { AutoGrid, ButtonContainer, Flex, fontMedium } from "common/styled";
+import { AutoGrid, ButtonContainer, Flex, fontMedium } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { ControlledSelect } from "common/src/components/form";
 import { ReservationCancelReasonChoice } from "@gql/gql-types";

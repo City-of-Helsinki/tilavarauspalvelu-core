@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { IconArrowRight, IconSize } from "hds-react";
 import Link from "next/link";
 import { breakpoints } from "common/src/modules/const";
-import { Flex, H3, anchorStyles, focusStyles } from "common/styled";
+import { Flex, H3, anchorStyles, focusStyles } from "common/src/styled";
 import type { UnitListFieldsFragment } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import { singleSearchPrefix } from "@/modules/urls";

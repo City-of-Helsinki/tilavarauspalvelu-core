@@ -5,7 +5,7 @@ import { Tabs, TabList, Tab, TabPanel } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import { TabWrapper, H1, CenterSpinner } from "common/styled";
+import { TabWrapper, H1, CenterSpinner } from "common/src/styled";
 import {
   ReservationStateChoice,
   ReservationOrderingChoices,

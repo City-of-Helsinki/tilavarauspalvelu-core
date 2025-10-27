@@ -4,7 +4,7 @@ import { useTranslation, type TFunction } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant, IconArrowRedo, IconCross, LoadingSpinner, Tag } from "hds-react";
 import { isEqual, trim } from "lodash-es";
 import { type ApolloQueryResult, gql } from "@apollo/client";
-import { CenterSpinner, Flex, fontMedium, H1, H3, H4, TitleSection } from "common/styled";
+import { CenterSpinner, Flex, fontMedium, H1, H3, H4, TitleSection } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import {

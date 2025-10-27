@@ -4,7 +4,7 @@ import { gql } from "@apollo/client";
 import { errorToast } from "common/src/components/toast";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
 import { isApplicationRoundInProgress } from "@/modules/helpers";
-import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "common/styled";
+import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "common/src/styled";
 import { Button, Tabs } from "hds-react";
 import { uniqBy } from "lodash-es";
 import styled from "styled-components";
