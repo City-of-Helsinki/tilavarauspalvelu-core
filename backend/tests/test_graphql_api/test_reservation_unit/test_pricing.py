@@ -48,10 +48,11 @@ def test_reservation_unit__query__pricing__old_pricings_not_returned(graphql):
         reservation_unit=reservation_unit_2,
         begins=today - datetime.timedelta(days=10),
         highest_price=20,
+        is_activated_on_begins=True,
     )
 
     graphql.login_with_superuser()
-    query = reservation_units_query(fields="pk pricings { highestPrice }")
+    query = reservation_units_query(fields="pk pricings { highestPrice isActivatedOnBegins }")
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
@@ -59,14 +60,14 @@ def test_reservation_unit__query__pricing__old_pricings_not_returned(graphql):
     assert response.node(0) == {
         "pk": reservation_unit.pk,
         "pricings": [
-            {"highestPrice": "10.00"},
-            {"highestPrice": "11.00"},
+            {"highestPrice": "10.00", "isActivatedOnBegins": False},
+            {"highestPrice": "11.00", "isActivatedOnBegins": False},
         ],
     }
     assert response.node(1) == {
         "pk": reservation_unit_2.pk,
         "pricings": [
-            {"highestPrice": "20.00"},
+            {"highestPrice": "20.00", "isActivatedOnBegins": True},
         ],
     }
 
