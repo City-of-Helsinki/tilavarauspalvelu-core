@@ -9,7 +9,7 @@ import {
   type ReservationApproveMutationInput,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { Flex } from "common/styled";
+import { Flex } from "common/src/styled";
 import { getReservationPriceDetails } from "@/modules/reservation";
 import { successToast } from "common/src/components/toast";
 import { toNumber } from "common/src/modules/helpers";

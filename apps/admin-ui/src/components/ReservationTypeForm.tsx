@@ -16,7 +16,7 @@ import { BufferToggles } from "./BufferToggles";
 import ShowTOS from "./ShowTOS";
 import { Element } from "@/styled";
 import { gql } from "@apollo/client";
-import { HR } from "common/styled";
+import { HR } from "common/src/styled";
 
 const CommentsTextArea = styled(TextArea)`
   grid-column: 1 / -1;

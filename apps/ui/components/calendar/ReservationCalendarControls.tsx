@@ -5,7 +5,7 @@ import { Button, ButtonVariant, IconAngleDown, IconAngleUp, IconCross, IconSize 
 import { maxBy } from "lodash-es";
 import { parseUIDate, formatDateTimeRange } from "common/src/date-utils";
 import { Transition } from "react-transition-group";
-import { Flex, fontBold, fontMedium, fontRegular, SemiBold } from "common/styled";
+import { Flex, fontBold, fontMedium, fontRegular, SemiBold } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";

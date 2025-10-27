@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useToastIfQueryParam } from "common/src/hooks/useToastIfQueryParam";
 import { useSearchParams } from "next/navigation";
 import { useTranslation } from "next-i18next";
-import { H1, HR } from "common/styled";
+import { H1, HR } from "common/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {

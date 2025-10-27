@@ -6,7 +6,7 @@ import { errorToast } from "common/src/components/toast";
 import { LARGE_LIST_PAGE_SIZE } from "@/modules/const";
 import { More } from "@/components/More";
 import { UnitsTable } from "./UnitsTable";
-import { CenterSpinner } from "common/styled";
+import { CenterSpinner } from "common/src/styled";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 

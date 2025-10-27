@@ -2,7 +2,7 @@ import React, { type HTMLAttributes } from "react";
 import { IconArrowDown, IconArrowUp, ButtonSize, ButtonVariant, Button, ButtonPresetTheme } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { Flex, H6, fontBold, fontMedium, fontRegular } from "common/styled";
+import { Flex, H6, fontBold, fontMedium, fontRegular } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import type { OrderedReservationUnitCardFragment } from "@gql/gql-types";
 import { getReservationUnitName } from "@/modules/reservationUnit";

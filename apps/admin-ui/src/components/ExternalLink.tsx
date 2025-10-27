@@ -1,7 +1,7 @@
 import React from "react";
 import { IconLinkExternal, IconSize } from "hds-react";
 import styled from "styled-components";
-import { fontMedium } from "common/styled";
+import { fontMedium } from "common/src/styled";
 import Link from "next/link";
 
 type Props = {

@@ -2,7 +2,7 @@ import { IconArrowRight, IconEuroSign, IconGroup, IconHome } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
-import { H3 } from "common/styled";
+import { H3 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { Maybe, useRelatedReservationUnitsQuery, type RelatedUnitCardFieldsFragment } from "@gql/gql-types";
 import Carousel from "../Carousel";

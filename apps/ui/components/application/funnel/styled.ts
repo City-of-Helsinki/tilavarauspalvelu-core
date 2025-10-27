@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { H5, FullRow } from "common/styled";
+import { H5, FullRow } from "common/src/styled";
 
 export const SpanFullRow = styled(FullRow).attrs({ as: "span" })``;
 

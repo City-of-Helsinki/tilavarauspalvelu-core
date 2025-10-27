@@ -8,7 +8,7 @@ import {
   type ReservationUnitNode,
   useRejectRestMutation,
 } from "@gql/gql-types";
-import { fontMedium, SemiBold } from "common/styled";
+import { fontMedium, SemiBold } from "common/src/styled";
 import { filterNonNullable, truncate } from "common/src/modules/helpers";
 import { convertWeekday } from "common/src/modules/conversion";
 import {

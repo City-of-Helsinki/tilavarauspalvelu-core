@@ -4,7 +4,7 @@ import styled, { css } from "styled-components";
 import { Controller, useFieldArray, UseFormReturn } from "react-hook-form";
 import { TimeInput } from "common/src/components/form/TimeInput";
 import { IconButton } from "common/src/components";
-import { fontBold } from "common/styled";
+import { fontBold } from "common/src/styled";
 import { breakpoints, WEEKDAYS_SORTED } from "common/src/modules/const";
 import { useTranslation } from "next-i18next";
 import { ReservationUnitEditFormValues } from "./form";

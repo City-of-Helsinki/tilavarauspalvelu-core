@@ -2,7 +2,7 @@ import React from "react";
 import { ErrorContainer } from "common/src/components";
 import { env } from "@/env.mjs";
 import { PUBLIC_URL } from "@/modules/const";
-import { Flex } from "common/styled";
+import { Flex } from "common/src/styled";
 
 export function ErrorGeneric(): JSX.Element {
   return (

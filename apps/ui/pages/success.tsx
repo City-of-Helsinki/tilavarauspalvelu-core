@@ -6,7 +6,7 @@ import { getReservationPath } from "@/modules/urls";
 import { createApolloClient } from "@/modules/apolloClient";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { CenterSpinner } from "common/styled";
+import { CenterSpinner } from "common/src/styled";
 import { ignoreMaybeArray } from "common/src/modules/helpers";
 import { gql } from "@apollo/client";
 

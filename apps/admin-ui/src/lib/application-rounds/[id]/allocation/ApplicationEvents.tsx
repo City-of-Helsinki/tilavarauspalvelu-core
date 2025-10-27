@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { Flex, H4, fontMedium } from "common/styled";
+import { Flex, H4, fontMedium } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import {
   type ApplicationRoundStatusChoice,

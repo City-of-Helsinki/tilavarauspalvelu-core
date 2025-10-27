@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { type UnitSubpageHeadFragment } from "@gql/gql-types";
 import { formatAddress } from "@/modules/util";
-import { Flex, H1, fontMedium } from "common/styled";
+import { Flex, H1, fontMedium } from "common/src/styled";
 import { gql } from "@apollo/client";
 
 interface IProps {

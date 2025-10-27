@@ -10,7 +10,7 @@ import {
   useResourceQuery,
 } from "@gql/gql-types";
 import { createNodeId } from "common/src/modules/helpers";
-import { ButtonContainer, CenterSpinner } from "common/styled";
+import { ButtonContainer, CenterSpinner } from "common/src/styled";
 import { errorToast, successToast } from "common/src/components/toast";
 import { FormErrorSummary } from "@/components/FormErrorSummary";
 import { LinkPrev } from "@/components/LinkPrev";

@@ -1,6 +1,6 @@
 import React, { useEffect, type FC } from "react";
 import App, { type AppContext, type AppInitialProps, type AppProps } from "next/app";
-import "common/styles/global.scss";
+import "common/src/styles/global.scss";
 import "../styles/global.scss";
 import { ApolloProvider } from "@apollo/client";
 import { createClient } from "@/modules/apolloClient";

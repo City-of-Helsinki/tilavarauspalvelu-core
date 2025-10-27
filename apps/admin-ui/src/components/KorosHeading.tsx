@@ -1,7 +1,7 @@
 import React, { type CSSProperties, type ReactNode } from "react";
 import styled, { css } from "styled-components";
 import { Koros } from "hds-react";
-import { Flex, H1 } from "common/styled";
+import { Flex, H1 } from "common/src/styled";
 
 interface IProps {
   heroImage: string;

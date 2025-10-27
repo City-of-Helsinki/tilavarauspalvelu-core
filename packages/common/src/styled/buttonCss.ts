@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 import { focusStyles } from "./cssFragments";
-import { breakpoints } from "../src/modules/const";
+import { breakpoints } from "../modules/const";
 import { fontMedium } from "./typography";
 import Link from "next/link";
 

@@ -4,7 +4,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, IconLock, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { Flex, fontRegular, H1, H4, NoWrap } from "common/styled";
+import { Flex, fontRegular, H1, H4, NoWrap } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import {
   type AccessCodeQuery,

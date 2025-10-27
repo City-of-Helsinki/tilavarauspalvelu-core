@@ -1,7 +1,7 @@
 import React, { ElementType } from "react";
 import styled from "styled-components";
 import Link from "next/link";
-import { Flex, fontMedium } from "../../styled";
+import { Flex, fontMedium } from "../styled";
 import { breakpoints } from "../modules/const";
 
 type CardVariant = "default" | "vertical";

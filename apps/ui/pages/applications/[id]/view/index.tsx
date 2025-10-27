@@ -25,7 +25,7 @@ import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
 import { applicationsPrefix } from "@/modules/urls";
 import { ApplicationTerms } from "@/components/application/ApplicationTerms";
-import { Flex } from "common/styled";
+import { Flex } from "common/src/styled";
 
 const TabPanel = styled(Tabs.TabPanel)`
   && {

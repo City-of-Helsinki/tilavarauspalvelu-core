@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { AutoGrid } from "common/styled";
+import { AutoGrid } from "common/src/styled";
 import { ControlledMultiSelectFilter, ControlledSearchFilter } from "@/components/QueryParamFilters";
 import { SearchTags } from "@/components/SearchTags";
 import { translateTag } from "@/modules/search";

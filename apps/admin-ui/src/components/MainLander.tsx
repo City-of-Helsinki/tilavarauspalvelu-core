@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { signIn } from "common/src/modules/browserHelpers";
 import { Button, IconArrowRight, IconGroup, IconLinkExternal } from "hds-react";
-import { fontBold, H2 } from "common/styled";
+import { fontBold, H2 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { HERO_IMAGE_URL } from "@/modules/const";
 import { KorosHeading, Heading } from "./KorosHeading";

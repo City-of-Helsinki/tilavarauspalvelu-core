@@ -13,7 +13,7 @@ import { getSpaceUrl } from "@/modules/urls";
 import { truncate } from "common/src/modules/helpers";
 import { MAX_NAME_LENGTH } from "@/modules/const";
 import { TableLink } from "@/styled";
-import { Flex } from "common/styled";
+import { Flex } from "common/src/styled";
 import { useDisplayError } from "common/src/hooks";
 import { useModal } from "@/context/ModalContext";
 import { FixedDialog } from "@/styled/FixedDialog";

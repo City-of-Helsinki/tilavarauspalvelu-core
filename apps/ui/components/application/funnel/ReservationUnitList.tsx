@@ -15,7 +15,7 @@ import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import type { ApplicationReservationUnitListFragment, OrderedReservationUnitCardFragment } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/modules/helpers";
-import { Flex } from "common/styled";
+import { Flex } from "common/src/styled";
 import { ErrorText } from "common/src/components/ErrorText";
 import { OrderedReservationUnitCard, ReservationUnitModalContent } from ".";
 import { useSearchParams } from "next/navigation";

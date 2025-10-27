@@ -8,7 +8,7 @@ import { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
 import { getApplicationRoundUrl } from "@/modules/urls";
 import { TimeframeStatus } from "./TimeframeStatus";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
-import { Flex, fontMedium } from "common/styled";
+import { Flex, fontMedium } from "common/src/styled";
 import { Card } from "common/src/components";
 import { gql } from "@apollo/client";
 

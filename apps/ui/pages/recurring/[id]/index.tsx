@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import type { GetServerSidePropsContext } from "next";
 import { Notification, NotificationSize } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { H1 } from "common/styled";
+import { H1 } from "common/src/styled";
 import {
   type ApplicationCreateMutationInput,
   ApplicationRoundDocument,

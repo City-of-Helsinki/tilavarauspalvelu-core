@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { getTranslationSafe } from "common/src/modules/util";
 import { getLocalizationLang } from "common/src/modules/helpers";
 import { Sanitize } from "common/src/components/Sanitize";
-import { H4 } from "common/styled";
+import { H4 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 
 const NotesBox = styled.div`

@@ -15,7 +15,7 @@ import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/modules/hel
 import { formatApiDate } from "common/src/date-utils";
 import { addYears } from "date-fns";
 import { breakpoints } from "common/src/modules/const";
-import { H1 } from "common/styled";
+import { H1 } from "common/src/styled";
 import { gql } from "@apollo/client";
 import { StepState, Stepper } from "hds-react";
 import { zodResolver } from "@hookform/resolvers/zod";

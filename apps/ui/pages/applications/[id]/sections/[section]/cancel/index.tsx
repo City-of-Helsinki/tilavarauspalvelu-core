@@ -21,7 +21,7 @@ import {
 import { getApplicationPath } from "@/modules/urls";
 import { useTranslation } from "next-i18next";
 import { ApolloError, gql } from "@apollo/client";
-import { H1 } from "common/styled";
+import { H1 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
 import { parseApiDate, formatDate } from "common/src/date-utils";

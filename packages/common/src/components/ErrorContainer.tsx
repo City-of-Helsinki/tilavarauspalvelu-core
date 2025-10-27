@@ -4,7 +4,7 @@ import { TFunction, useTranslation } from "next-i18next";
 import IconButton from "./IconButton";
 import { IconArrowRight } from "hds-react";
 import React from "react";
-import { Flex, H1 } from "../../styled";
+import { Flex, H1 } from "../styled";
 import { breakpoints } from "../modules/const";
 
 const IMAGE_WIDTH = "418";

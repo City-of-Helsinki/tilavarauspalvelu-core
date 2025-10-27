@@ -8,7 +8,7 @@ import {
   type ApplicationRoundCriteriaQuery,
   type ApplicationRoundCriteriaQueryVariables,
 } from "@gql/gql-types";
-import { Flex, H1 } from "common/styled";
+import { Flex, H1 } from "common/src/styled";
 import { breakpoints } from "common/src/modules/const";
 import { Sanitize } from "common/src/components/Sanitize";
 import { createNodeId, capitalize, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";

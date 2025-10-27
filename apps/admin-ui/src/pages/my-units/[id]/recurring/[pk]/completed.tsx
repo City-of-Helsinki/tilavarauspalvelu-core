@@ -4,7 +4,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { ReservationSeriesView } from "@/components/ReservationSeriesView";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { getMyUnitUrl, getReservationUrl } from "@/modules/urls";
-import { Flex, H1, P } from "common/styled";
+import { Flex, H1, P } from "common/src/styled";
 import { useReservationSeries } from "@/hooks";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { UserPermissionChoice } from "@gql/gql-types";

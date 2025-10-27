@@ -24,7 +24,7 @@ import { ControlledTimeInput } from "@/components/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { createNodeId, toNumber } from "common/src/modules/helpers";
 import { Element } from "@/styled";
-import { AutoGrid, Flex, Strong } from "common/styled";
+import { AutoGrid, Flex, Strong } from "common/src/styled";
 import { errorToast } from "common/src/components/toast";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { useDisplayError } from "common/src/hooks";

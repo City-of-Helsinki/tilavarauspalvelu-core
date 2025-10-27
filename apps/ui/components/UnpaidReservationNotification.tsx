@@ -21,7 +21,7 @@ import { formatApiDate } from "common/src/date-utils";
 import { errorToast, successToast } from "common/src/components/toast";
 import { getReservationInProgressPath } from "@/modules/urls";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
-import { Flex } from "common/styled";
+import { Flex } from "common/src/styled";
 import { getApiErrors } from "common/src/modules/apolloUtils";
 import { type ParsedUrlQuery } from "querystring";
 

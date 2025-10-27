@@ -4,7 +4,7 @@ import { Controller, UseFormReturn } from "react-hook-form";
 import type { ReservationUnitEditorParametersQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/modules/helpers";
-import { AutoGrid } from "common/styled";
+import { AutoGrid } from "common/src/styled";
 import { ControlledSelect } from "common/src/components/form";
 import { getTranslatedError } from "@/modules/util";
 import type { ReservationUnitEditFormValues } from "./form";

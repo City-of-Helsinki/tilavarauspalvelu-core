@@ -9,7 +9,7 @@ import { More } from "@/components/More";
 import { useSort } from "@/hooks/useSort";
 import { ApplicationSectionsTable, SORT_KEYS } from "./ApplicationSectionsTable";
 import { useGetFilterSearchParams } from "@/hooks";
-import { CenterSpinner } from "common/styled";
+import { CenterSpinner } from "common/src/styled";
 
 type Props = {
   applicationRoundPk: number;

@@ -10,7 +10,7 @@ import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
 import { ControlledNumberInput } from "common/src/components/form";
 import { mapParamToInteger, toNumber } from "common/src/modules/helpers";
-import { AutoGrid, Flex } from "common/styled";
+import { AutoGrid, Flex } from "common/src/styled";
 
 const filterOrder = [
   "textSearch",
