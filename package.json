@@ -30,7 +30,7 @@
     "codegen:watch": "pnpm codegen:admin --watch & pnpm codegen:ui --watch & pnpm codegen:common --watch"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^6.0.0",
+    "@graphql-codegen/cli": "^6.0.1",
     "@graphql-codegen/schema-ast": "^5.0.0",
     "@graphql-codegen/typescript": "^5.0.2",
     "@graphql-codegen/typescript-operations": "^5.0.2",
