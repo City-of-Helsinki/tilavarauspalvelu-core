@@ -2404,6 +2404,7 @@ type ReservationUnitPricingNode implements Node {
   begins: Date!
   priceUnit: PriceUnit!
   paymentType: PaymentType
+  isActivatedOnBegins: Boolean!
   lowestPrice: Decimal!
   highestPrice: Decimal!
   materialPriceDescriptionFi: String
