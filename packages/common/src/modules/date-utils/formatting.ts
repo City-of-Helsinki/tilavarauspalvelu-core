@@ -383,7 +383,7 @@ export function formatDurationFromDates(
   if (!start || !end || !isValidDate(start) || !isValidDate(end)) {
     return "";
   }
-  if (isBefore(start, end)) {
+  if (!isBefore(start, end)) {
     return "-";
   }
   const beginMins = dateToMinutes(start);
