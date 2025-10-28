@@ -171,18 +171,8 @@ const NotificationFormSchema = z
     messageEn: z.string().max(1000).transform(cleanHtmlContent),
     messageSv: z.string().max(1000).transform(cleanHtmlContent),
     // refinement is not empty for these two (not having empty as an option forces a default value)
-    targetGroup: z
-      .enum(["ALL", "STAFF", "USER"])
-      .optional()
-      .refine((x) => x != null, {
-        message: "Target group cannot be empty",
-      }),
-    level: z
-      .enum(["EXCEPTION", "NORMAL", "WARNING"])
-      .optional()
-      .refine((x) => x != null, {
-        message: "Level cannot be empty",
-      }),
+    targetGroup: z.enum(["ALL", "STAFF", "USER"]),
+    level: z.enum(["EXCEPTION", "NORMAL", "WARNING"]),
     pk: z.number(),
   })
   // strip HTML when validating string length
@@ -316,12 +306,12 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
     { value: "NORMAL", label: t("levelEnum.NORMAL") },
     { value: "WARNING", label: t("levelEnum.WARNING") },
     { value: "EXCEPTION", label: t("levelEnum.EXCEPTION") },
-  ];
+  ] as const;
   const targetGroupOptions = [
     { value: "ALL", label: t("target.ALL") },
     { value: "STAFF", label: t("target.STAFF") },
     { value: "USER", label: t("target.USER") },
-  ];
+  ] as const;
 
   return (
     <GridForm onSubmit={handleSubmit(onSubmit)} noValidate>
