@@ -25,9 +25,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   sassOptions: {
     includePaths: [join(ROOT_PATH, "src")],
     silenceDeprecations: ["legacy-js-api"],
