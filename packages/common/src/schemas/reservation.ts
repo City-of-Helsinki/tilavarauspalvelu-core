@@ -214,10 +214,8 @@ export function getReservationSchemaBase(formType: ReservationFormType) {
     case ReservationFormType.ReserveeInfoForm:
       return ReserveeInfoFormSchema;
     case ReservationFormType.PurposeForm:
-    case ReservationFormType.PurposeSubventionForm:
       return PurposeFormSchema;
     case ReservationFormType.AgeGroupForm:
-    case ReservationFormType.AgeGroupSubventionForm:
       return AgeGroupFormSchema;
   }
 }
@@ -233,10 +231,8 @@ function getReservationSchemaUnrefined(reservationUnit: ReservationUnitForRefine
     case ReservationFormType.ReserveeInfoForm:
       return ReserveeInfoFormSchema({ maxPersons, minPersons });
     case ReservationFormType.PurposeForm:
-    case ReservationFormType.PurposeSubventionForm:
       return PurposeFormSchema({ maxPersons, minPersons });
     case ReservationFormType.AgeGroupForm:
-    case ReservationFormType.AgeGroupSubventionForm:
       return AgeGroupFormSchema({ maxPersons, minPersons });
   }
 }

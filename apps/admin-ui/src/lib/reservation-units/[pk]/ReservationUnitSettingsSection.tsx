@@ -97,18 +97,11 @@ export function ReservationUnitSettingsSection({
 
   const isDirect = watch("reservationKind") === "DIRECT" || watch("reservationKind") === "DIRECT_AND_SEASON";
 
-  // waiting for backend to remove these keys (they are unused)
-  const hiddenFormOptions = new Set([
-    ReservationFormType.PurposeSubventionForm,
-    ReservationFormType.AgeGroupSubventionForm,
-  ]);
   const formOptions = sort(
-    Object.values(ReservationFormType)
-      .filter((choice) => !hiddenFormOptions.has(choice))
-      .map((choice) => ({
-        value: choice,
-        label: t(`translation:reservationForm.${choice}`),
-      })),
+    Object.values(ReservationFormType).map((choice) => ({
+      value: choice,
+      label: t(`translation:reservationForm.${choice}`),
+    })),
     (a, b) => a.label.localeCompare(b.label)
   );
   const hasErrors =
