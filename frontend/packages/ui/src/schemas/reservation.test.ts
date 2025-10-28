@@ -1,8 +1,8 @@
 import { addDays, subDays } from "date-fns";
 import { formatApiTimeUnsafe, formatDate } from "../modules/date-utils";
 import { describe, test, expect } from "vitest";
-import { ReservationStartInterval } from "../../gql/gql-types";
-import { getCreateStaffReservationFormSchema } from "./reservation";
+import { ReservationStartInterval, ReservationTypeChoice } from "../../gql/gql-types";
+import { type CreateStaffReservationFormSchema, getCreateStaffReservationFormSchema } from "./reservation";
 import type { TimeStruct } from "../modules/date-utils/types";
 
 function createInput({
@@ -15,13 +15,14 @@ function createInput({
   end?: TimeStruct;
 }) {
   return {
-    type: "BLOCKED",
+    type: ReservationTypeChoice.Blocked,
     date: formatDate(date),
     startTime: formatApiTimeUnsafe(start.hours ?? 0, start.minutes ?? 0),
     endTime: formatApiTimeUnsafe(end.hours ?? 0, end.minutes ?? 0),
     enableBufferTimeAfter: false,
     enableBufferTimeBefore: false,
-  };
+    comments: "",
+  } satisfies CreateStaffReservationFormSchema;
 }
 
 describe("CreateStaffReservation schema", () => {

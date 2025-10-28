@@ -24,7 +24,7 @@ const TimeSelectionSchemaBase = z.object({
   endingDate: z.string(),
   startTime: z.string(),
   endTime: z.string(),
-  repeatOnDays: z.array(z.nativeEnum(Weekday)).min(1).max(7),
+  repeatOnDays: z.array(z.enum(Weekday)).min(1).max(7),
   repeatPattern: z.literal("weekly").or(z.literal("biweekly")),
 });
 
@@ -33,7 +33,7 @@ export type TimeSelectionFormValues = z.infer<typeof TimeSelectionSchemaBase>;
 const ReservationSeriesFormSchema = z
   .object({
     type: ReservationTypeSchema,
-    seriesName: z.string(),
+    seriesName: z.string().max(255),
     comments: z.string().max(500),
     enableBufferTimeBefore: z.boolean(),
     enableBufferTimeAfter: z.boolean(),
@@ -48,13 +48,10 @@ export function getReservationSeriesSchema(interval: ReservationStartInterval) {
   return (
     ReservationSeriesFormSchema.extend(ReservationFormMetaSchema.shape)
       // this refine works without partial since it's the last required value
-      .refine(
-        (s) => s.type === ReservationTypeChoice.Blocked || (s.seriesName !== undefined && s.seriesName.length > 0),
-        {
-          path: ["seriesName"],
-          message: "Required",
-        }
-      )
+      .refine((s) => s.type === ReservationTypeChoice.Blocked || s.seriesName.length > 0, {
+        path: ["seriesName"],
+        message: "Required",
+      })
       .superRefine((val, ctx) => checkDateNotInPast(convertToDate(val.startingDate), ctx, "startingDate"))
       .superRefine((val, ctx) => checkDateNotInPast(convertToDate(val.endingDate), ctx, "endingDate"))
       .refine((s) => dateIsBefore(convertToDate(s.startingDate), convertToDate(s.endingDate)), {
@@ -70,11 +67,11 @@ export function getReservationSeriesSchema(interval: ReservationStartInterval) {
       .superRefine((val, ctx) => checkStartEndTime(val, ctx))
       // custom email validator because the base schema doesn't work for Series and Django validates email strings
       .superRefine((val, ctx) => {
-        const emailValidator = z.union([z.string().email(), z.string().length(0)]).optional();
+        const emailValidator = z.union([z.email(), z.string().length(0)]).optional();
         const res = emailValidator.safeParse(val.reserveeEmail);
         if (!res.success) {
           ctx.addIssue({
-            code: z.ZodIssueCode.invalid_string,
+            code: z.ZodIssueCode.custom,
             validation: "email",
             path: ["reserveeEmail"],
           });

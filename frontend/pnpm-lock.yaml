@@ -126,8 +126,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       zod:
-        specifier: ^3.25.64
-        version: 3.25.64
+        specifier: ^4.1.12
+        version: 4.1.12
     devDependencies:
       '@happy-dom/jest-environment':
         specifier: ^20.0.0
@@ -283,8 +283,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       zod:
-        specifier: ^3.25.64
-        version: 3.25.64
+        specifier: ^4.1.12
+        version: 4.1.12
     devDependencies:
       '@graphql-tools/graphql-tag-pluck':
         specifier: ^8.3.21
@@ -422,8 +422,8 @@ importers:
         specifier: workspace:*
         version: link:../tsconfig
       zod:
-        specifier: ^3.25.64
-        version: 3.25.64
+        specifier: ^4.1.12
+        version: 4.1.12
     devDependencies:
       '@apollo/client':
         specifier: ^3.13.8
@@ -6029,8 +6029,8 @@ packages:
   zen-observable@0.8.15:
     resolution: {integrity: sha512-PQ2PC7R9rslx84ndNBZB/Dkv8V8fZEpk83RLgXtYd0fwUgEjseMn1Dgajh2x6S8QbZAFa9p2qVCEuYZNgve0dQ==}
 
-  zod@3.25.64:
-    resolution: {integrity: sha512-hbP9FpSZf7pkS7hRVUrOjhwKJNyampPgtXKc3AN6DsWtoHsg2Sb4SQaS4Tcay380zSwd2VPo9G9180emBACp5g==}
+  zod@4.1.12:
+    resolution: {integrity: sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ==}
 
 snapshots:
 
@@ -12146,4 +12146,4 @@ snapshots:
 
   zen-observable@0.8.15: {}
 
-  zod@3.25.64: {}
+  zod@4.1.12: {}

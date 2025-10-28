@@ -56,29 +56,6 @@ const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {
   ssr: false,
 });
 
-// helpers so we get typechecking without casting
-function convertLevel(level: "EXCEPTION" | "NORMAL" | "WARNING"): BannerNotificationLevel {
-  switch (level) {
-    case "EXCEPTION":
-      return BannerNotificationLevel.Exception;
-    case "NORMAL":
-      return BannerNotificationLevel.Normal;
-    case "WARNING":
-      return BannerNotificationLevel.Warning;
-  }
-}
-
-function convertTarget(target: "ALL" | "STAFF" | "USER"): BannerNotificationTarget {
-  switch (target) {
-    case "ALL":
-      return BannerNotificationTarget.All;
-    case "STAFF":
-      return BannerNotificationTarget.Staff;
-    case "USER":
-      return BannerNotificationTarget.User;
-  }
-}
-
 const StyledStatusLabel = styled(StatusLabel)`
   align-self: center;
   white-space: nowrap;
@@ -93,20 +70,11 @@ function BannerNotificationStatusLabel({ state }: { state: BannerNotificationSta
   const statusLabelProps = ((s: BannerNotificationState): NotificationStatus => {
     switch (s) {
       case BannerNotificationState.Draft:
-        return {
-          type: "draft",
-          icon: <IconPen aria-hidden="true" />,
-        };
+        return { type: "draft", icon: <IconPen /> };
       case BannerNotificationState.Active:
-        return {
-          type: "success",
-          icon: <IconCheck aria-hidden="true" />,
-        };
+        return { type: "success", icon: <IconCheck /> };
       case BannerNotificationState.Scheduled:
-        return {
-          type: "info",
-          icon: <IconClock aria-hidden="true" />,
-        };
+        return { type: "info", icon: <IconClock /> };
     }
   })(state);
 
@@ -135,7 +103,7 @@ const InnerButtons = styled(ButtonContainerCommon)`
   flex-wrap: wrap;
 `;
 
-const checkStartIsBeforeEnd = (
+function checkStartIsBeforeEnd(
   data: {
     activeFrom: string;
     activeUntil: string;
@@ -143,7 +111,7 @@ const checkStartIsBeforeEnd = (
     activeUntilTime: string;
   },
   ctx: z.RefinementCtx
-) => {
+) {
   const start = fromUIDateTime(data.activeFrom, data.activeFromTime);
   const end = fromUIDateTime(data.activeUntil, data.activeUntilTime);
   if (start && end && start > end) {
@@ -155,11 +123,21 @@ const checkStartIsBeforeEnd = (
       message: "End time needs to be after start time.",
     });
   }
-};
+}
+
+function getHTMLMessageSchema(minLength: number, maxLength: number) {
+  return z
+    .string()
+    .max(1000)
+    .transform(cleanHtmlContent)
+    .superRefine((x, ctx) => {
+      checkLengthWithoutHtml(x, ctx, "", minLength, maxLength);
+    });
+}
 
 const NotificationFormSchema = z
   .object({
-    name: z.string().min(1).max(100),
+    name: z.string().min(1, { error: "Required" }).max(100),
     inFuture: z.boolean(),
     isDraft: z.boolean(),
     activeFrom: z.string(),
@@ -167,30 +145,21 @@ const NotificationFormSchema = z
     activeUntil: z.string(),
     activeUntilTime: z.string(),
     // NOTE max length is because backend doesn't allow over 1000 characters
-    messageFi: z.string().max(1000).transform(cleanHtmlContent),
-    messageEn: z.string().max(1000).transform(cleanHtmlContent),
-    messageSv: z.string().max(1000).transform(cleanHtmlContent),
+    // strip HTML when validating string length
+    // for now only finnish is mandatory but all have max length
+    messageFi: getHTMLMessageSchema(1, 500),
+    messageEn: getHTMLMessageSchema(0, 500),
+    messageSv: getHTMLMessageSchema(0, 500),
     // refinement is not empty for these two (not having empty as an option forces a default value)
-    targetGroup: z.enum(["ALL", "STAFF", "USER"]),
-    level: z.enum(["EXCEPTION", "NORMAL", "WARNING"]),
+    targetGroup: z.enum(BannerNotificationTarget, { error: "Required" }),
+    level: z.enum(BannerNotificationLevel, { error: "Required" }),
     pk: z.number(),
-  })
-  // strip HTML when validating string length
-  // for now only finnish is mandatory but all have max length
-  .superRefine((x, ctx) => {
-    checkLengthWithoutHtml(x.messageFi, ctx, "messageFi", 1, 500);
-  })
-  .superRefine((x, ctx) => {
-    checkLengthWithoutHtml(x.messageEn, ctx, "messageEn", 0, 500);
-  })
-  .superRefine((x, ctx) => {
-    checkLengthWithoutHtml(x.messageSv, ctx, "messageSv", 0, 500);
   })
   // skip date time validation for drafts if both fields are empty
   // if draft and time or date input validate both (can't construct date without both)
   // published requires a DateTime (past is fine)
   .superRefine((x, ctx) => {
-    if (!x.isDraft || x.activeFrom !== "" || x.activeFromTime !== "") {
+    if (!x.isDraft && (x.activeFrom !== "" || x.activeFromTime !== "")) {
       checkTimeStringFormat(x.activeFromTime, ctx, "activeFromTime");
       checkValidDate(parseUIDate(x.activeFrom), ctx, "activeFrom");
     }
@@ -198,7 +167,7 @@ const NotificationFormSchema = z
   // End time can't be in the past unless it's a draft
   // TODO future date check doesn't check for today time, so it's possible to set now() - 2h as the end time
   .superRefine((x, ctx) => {
-    if (!x.isDraft || x.activeUntil !== "" || x.activeUntilTime !== "") {
+    if (!x.isDraft && (x.activeUntil !== "" || x.activeUntilTime !== "")) {
       checkTimeStringFormat(x.activeUntilTime, ctx, "activeUntilTime");
       if (!x.isDraft) {
         checkValidFutureDate(parseUIDate(x.activeUntil), ctx, "activeUntil");
@@ -277,8 +246,8 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
       message: data.messageFi,
       messageEn: data.messageEn,
       messageSv: data.messageSv,
-      target: convertTarget(data.targetGroup),
-      level: convertLevel(data.level),
+      target: data.targetGroup,
+      level: data.level,
       pk: data.pk,
     };
     const mutationFn = data.pk === 0 ? createMutation : updateMutation;
@@ -302,16 +271,14 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
 
   const translateError = (errorMsg?: string) => (errorMsg ? t(`forms:errors.${errorMsg}`) : "");
 
-  const levelOptions = [
-    { value: "NORMAL", label: t("levelEnum.NORMAL") },
-    { value: "WARNING", label: t("levelEnum.WARNING") },
-    { value: "EXCEPTION", label: t("levelEnum.EXCEPTION") },
-  ] as const;
-  const targetGroupOptions = [
-    { value: "ALL", label: t("target.ALL") },
-    { value: "STAFF", label: t("target.STAFF") },
-    { value: "USER", label: t("target.USER") },
-  ] as const;
+  const levelOptions = Object.values(BannerNotificationLevel).map((x) => ({
+    value: x,
+    label: t(`levelEnum.${x}`),
+  }));
+  const targetGroupOptions = Object.values(BannerNotificationTarget).map((x) => ({
+    value: x,
+    label: t(`target.${x}`),
+  }));
 
   return (
     <GridForm onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -413,7 +380,7 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
             style={{ gridColumn: "1 / -1" }}
             onChange={(val) => onChange(val)}
             value={value}
-            errorText={errors.messageFi?.message ? translateError(errors.messageFi?.message) : undefined}
+            errorText={errors.messageFi?.message ? translateError(errors.messageFi.message) : undefined}
             required
             data-testid="Notification__Page--message-fi-input"
           />
@@ -428,6 +395,7 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
             label={t("form.messageEn")}
             style={{ gridColumn: "1 / -1" }}
             onChange={(val) => onChange(val)}
+            errorText={errors.messageEn?.message ? translateError(errors.messageEn.message) : undefined}
             value={value}
             data-testid="Notification__Page--message-en-input"
           />
@@ -442,6 +410,7 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
             label={t("form.messageSv")}
             style={{ gridColumn: "1 / -1" }}
             onChange={(val) => onChange(val)}
+            errorText={errors.messageSv?.message ? translateError(errors.messageSv.message) : undefined}
             value={value}
             data-testid="Notification__Page--message-sv-input"
           />

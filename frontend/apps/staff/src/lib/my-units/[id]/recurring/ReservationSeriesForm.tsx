@@ -332,7 +332,9 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
                 required
                 {...register("seriesName")}
                 invalid={errors.seriesName != null}
-                errorText={translateError(errors.seriesName?.message)}
+                errorText={
+                  errors.seriesName?.message != null ? t(`forms:errors.${errors.seriesName.message}`) : undefined
+                }
               />
             </ReservationTypeForm>
           )}

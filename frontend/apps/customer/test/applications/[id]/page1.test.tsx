@@ -182,7 +182,7 @@ describe("Page1", () => {
     await user.type(eventsPerWeek, "11");
     const submitBtn = view.getByRole("button", { name: "common:next" });
     await user.click(submitBtn);
-    expect(view.queryAllByText("application:validation.Number must be less than or equal to 7")).toHaveLength(1);
+    expect(view.queryAllByText("application:validation.lte_7")).toHaveLength(1);
   });
 
   // TODO should these be schema tests
