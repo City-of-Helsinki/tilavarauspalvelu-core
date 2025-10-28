@@ -64,7 +64,13 @@ function mapParamsToForm(searchParams: ReadonlyURLSearchParams): SearchFormValue
   };
 }
 
-export function Filters({ options }: { options: TagOptionsList }): JSX.Element {
+export function Filters({
+  options,
+  onChangedCriteria,
+}: {
+  options: TagOptionsList;
+  onChangedCriteria: () => void;
+}): JSX.Element {
   const { t } = useTranslation();
   const setSearchParams = useSetSearchParams();
   const searchParams = useSearchParams();
@@ -80,7 +86,8 @@ export function Filters({ options }: { options: TagOptionsList }): JSX.Element {
   const { handleSubmit, control, reset } = form;
   useEffect(() => {
     reset(mapParamsToForm(searchParams));
-  }, [searchParams, reset]);
+    onChangedCriteria(); // can't have this in the dependency array, to stop infinite update loops
+  }, [searchParams, reset]); // oxlint-disable-line exhaustive-deps
   const initiallyOpen =
     defaultValues.unitGroup != null ||
     defaultValues.maxPersonsGte != null ||
