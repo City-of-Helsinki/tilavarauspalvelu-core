@@ -1,11 +1,13 @@
 import { gql } from "@apollo/client";
 import {
-  COMMON_LEGEND,
+  CALENDAR_LEGENDS,
   CONFIRMED,
   EVENT_STYLE,
+  EventStyleType,
+  POST_PAUSE,
+  REST,
   STAFF_RESERVATION,
   WAITING_PAYMENT,
-  POST_PAUSE,
 } from "@/modules/calendarStyling";
 import { type CalendarEventType, type EventType } from "@/modules/reservation";
 import {
@@ -21,23 +23,8 @@ const SELECTED = {
   },
 };
 
-const REST = {
-  style: {
-    background: `var(--tilavaraus-event-rest-background)`,
-    color: `black`,
-    borderColor: `var(--tilavaraus-event-rest-border-color)`,
-    borderStyle: "solid",
-    borderWidth: "0px 0px 0px 3px",
-  },
-};
-
-export const legend = [
-  ...COMMON_LEGEND,
-  {
-    label: "myUnits:Calendar.legend.reserved",
-    style: REST.style,
-  },
-];
+const selected_legends = ["CONFIRMED", "WAITING_PAYMENT", "UNCONFIRMED", "STAFF_RESERVATION", "REST"];
+export const legend: EventStyleType[] = CALENDAR_LEGENDS.filter((x) => selected_legends.includes(x.key));
 
 export const EVENT_STYLE_RESERVATION_FRAGMENT = gql`
   fragment EventStyleReservationFields on ReservationNode {
@@ -59,7 +46,7 @@ export const EVENT_STYLE_RESERVATION_FRAGMENT = gql`
 
 type CurrentReservationType = Pick<EventStyleReservationFieldsFragment, "pk" | "reservationSeries">;
 
-// TODO combine with the eventStyleGetter in my-units/eventStyleGetter.ts
+// TODO merge this with eventStyleGetter in admin-ui/src/lib/my-units/[id]/eventStyleGetter.ts
 const eventStyleGetter =
   (currentReservation: CurrentReservationType, selectedReservation: EventType | undefined) =>
   ({
@@ -75,7 +62,7 @@ const eventStyleGetter =
     const isConfirmed = event?.state === ReservationStateChoice.Confirmed;
     const isWaitingForPayment = event?.state === ReservationStateChoice.WaitingForPayment;
 
-    const isClosed = event?.type === ReservationTypeChoice.Blocked;
+    const isBlocked = event?.type === ReservationTypeChoice.Blocked;
     const isStaff = event?.type === ReservationTypeChoice.Staff;
     // @ts-expect-error: TODO: we are dynamically overriding an enum upstream
     const isBuffer = event?.state === "BUFFER";
@@ -90,12 +77,12 @@ const eventStyleGetter =
       Object.assign(style, STAFF_RESERVATION.style);
     } else if (isWaitingForPayment) {
       Object.assign(style, WAITING_PAYMENT.style);
-    } else if (isConfirmed && !isClosed) {
+    } else if (isConfirmed && !isBlocked) {
       Object.assign(style, CONFIRMED.style);
     } else if (isBuffer) {
       Object.assign(style, { ...POST_PAUSE.style, border: 0 });
     } else {
-      Object.assign(style, REST.style);
+      Object.assign(style, REST.style); // TODO: Use UNCONFIRMED.style instead?
     }
 
     if (currentReservation?.pk === event?.pk || isPartOfRecurrence) {

@@ -1,13 +1,11 @@
 import { type CalendarEvent } from "ui/src/components/calendar/Calendar";
 import {
   BLOCKED,
-  COMMON_LEGEND,
+  CALENDAR_LEGENDS,
   CONFIRMED,
   EVENT_STYLE,
+  EventStyleType,
   INTERSECTING_RESERVATION_UNIT,
-  POST_PAUSE,
-  RESERVATION_UNIT_DRAFT,
-  RESERVATION_UNIT_RELEASED,
   STAFF_RESERVATION,
   UNCONFIRMED,
   WAITING_PAYMENT,
@@ -18,53 +16,21 @@ import {
   type ReservationUnitReservationsFragment,
 } from "@gql/gql-types";
 
-type EventKey =
-  | "CONFIRMED"
-  | "UNCONFIRMED"
-  | "STAFF_RESERVATION"
-  | "INTERSECTING_RESERVATION_UNIT"
-  | "PAUSE"
-  | "CLOSED"
-  | "WAITING_PAYMENT"
-  | "RESERVATION_UNIT_RELEASED"
-  | "RESERVATION_UNIT_DRAFT";
-
-type EventStyle = {
-  key: EventKey;
-  label: string;
-  style: Record<string, string>;
-};
-
-export const legend: EventStyle[] = [
-  ...COMMON_LEGEND,
-  {
-    key: "INTERSECTING_RESERVATION_UNIT",
-    label: "myUnits:Calendar.legend.intersecting",
-    style: INTERSECTING_RESERVATION_UNIT.style,
-  },
-  {
-    key: "PAUSE",
-    label: "myUnits:Calendar.legend.pause",
-    style: POST_PAUSE.style,
-  },
-  {
-    key: "CLOSED",
-    label: "myUnits:Calendar.legend.closed",
-    style: BLOCKED.style,
-  },
-  {
-    key: "RESERVATION_UNIT_RELEASED",
-    label: "myUnits:Calendar.legend.reservationUnitReleased",
-    style: RESERVATION_UNIT_RELEASED.style,
-  },
-  {
-    key: "RESERVATION_UNIT_DRAFT",
-    label: "myUnits:Calendar.legend.reservationUnitDraft",
-    style: RESERVATION_UNIT_DRAFT.style,
-  },
+const selected_legends = [
+  "CONFIRMED",
+  "WAITING_PAYMENT",
+  "UNCONFIRMED",
+  "STAFF_RESERVATION",
+  "INTERSECTING_RESERVATION_UNIT",
+  "PAUSE",
+  "CLOSED",
+  "RESERVATION_UNIT_RELEASED",
+  "RESERVATION_UNIT_DRAFT",
 ];
+export const legend: EventStyleType[] = CALENDAR_LEGENDS.filter((x) => selected_legends.includes(x.key));
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
+// TODO: TODO merge this with eventStyleGetter in admin-ui/src/lib/reservations/[id]/eventStyleGetter.ts
 const eventStyleGetter =
   (currentReservationUnitPk: number) =>
   ({
@@ -80,8 +46,6 @@ const eventStyleGetter =
 
     const isBlocked = event?.type === ReservationTypeChoice.Blocked;
     const isStaff = event?.type === ReservationTypeChoice.Staff;
-    // @ts-expect-error: TODO: we are dynamically overriding an enum upstream
-    const isBuffer = event?.state === "BUFFER";
 
     const style = {
       ...EVENT_STYLE,
@@ -95,12 +59,11 @@ const eventStyleGetter =
       Object.assign(style, WAITING_PAYMENT.style);
     } else if (isConfirmed) {
       Object.assign(style, CONFIRMED.style);
-    } else if (isBuffer) {
-      Object.assign(style, { ...POST_PAUSE.style, border: 0 });
     } else {
       Object.assign(style, UNCONFIRMED.style);
     }
 
+    // Apply over any previous styles
     if (!isCurrentReservationUnit) {
       Object.assign(style, INTERSECTING_RESERVATION_UNIT.style);
     }
