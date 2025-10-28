@@ -98,17 +98,21 @@ function useSlotPropGetter(
     // Cell is buffer, if it overlaps with any buffer time span
     const buffer = bufferTimeSpans.find((span) => isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end));
     if (buffer) {
-      // Return style only for one single slot in middle of the buffer event
+      // Show clock icon only for the first and last buffer cell
       const beginOfDay = addHours(startOfDay(cellStart), 6);
       const beginOfBuffer = buffer.start > beginOfDay ? buffer.start : beginOfDay;
 
-      if (cellStart.getTime() === beginOfBuffer.getTime()) {
+      const isFirstOrLastBufferCell =
+        cellStart.getTime() === beginOfBuffer.getTime() || //
+        cellEnd.getTime() === buffer.end.getTime();
+
+      if (isFirstOrLastBufferCell) {
         return {
           style: {
             ...EVENT_BUFFER.style,
             backgroundImage: HDS_CLOCK_ICON_SVG,
             backgroundRepeat: "no-repeat",
-            backgroundPosition: "left center",
+            backgroundPosition: "center",
             backgroundSize: "16px",
           },
         };
