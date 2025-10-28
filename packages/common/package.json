@@ -47,7 +47,7 @@
     "typescript-cookie": "^1.0.6"
   },
   "devDependencies": {
-    "@apollo/client": "^3.13.8",
+    "@apollo/client": "^4.0.8",
     "@happy-dom/jest-environment": "^20.0.0",
     "@sentry/nextjs": "^10.19.0",
     "@testing-library/dom": "^10.4.1",
