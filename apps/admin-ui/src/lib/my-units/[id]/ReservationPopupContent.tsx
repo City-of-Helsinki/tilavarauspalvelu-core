@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { type ReservationUnitReservationsFragment, UserPermissionChoice } from "@gql/gql-types";
 import { getReservationUrl } from "@/modules/urls";
-import { formatDurationFromDates, parseValidDateObject } from "common/src/modules/date-utils";
+import { dateToMinutes, formatTimeRange, parseValidDateObject } from "common/src/modules/date-utils";
 import { getReserveeName } from "@/modules/util";
 import { truncate } from "@/modules/helpers";
 import { Flex } from "common/src/styled";
@@ -43,14 +43,14 @@ export function ReservationPopupContent({
 }): JSX.Element {
   const { t } = useTranslation();
 
-  const reservationStart = parseValidDateObject(reservation.beginsAt);
-  const reservationEnd = parseValidDateObject(reservation.endsAt);
+  const startMins = dateToMinutes(parseValidDateObject(reservation.beginsAt));
+  const endMins = dateToMinutes(parseValidDateObject(reservation.endsAt));
   const eventName = getReserveeName(reservation, t, 22) || "-";
   return (
     <PopupContent>
       <Flex $gap="xs">
         <Heading>
-          {formatDurationFromDates(t, reservationStart, reservationEnd)} / {reservation.reservationUnit?.nameFi ?? "-"}
+          {formatTimeRange(startMins, endMins)} / {reservation.reservationUnit?.nameFi ?? "-"}
         </Heading>
         <VisibleIfPermission reservation={reservation} permission={UserPermissionChoice.CanViewReservations}>
           <Reservee>
