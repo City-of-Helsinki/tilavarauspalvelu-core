@@ -44,7 +44,7 @@ function ReservationUnits({
         <H1 $marginTop="l">{t("reservationUnit:reservationUnitListHeading")}</H1>
         <p>{t("reservationUnit:reservationUnitListDescription")}</p>
       </div>
-      <Filters options={options} />
+      <Filters options={options} onChangedCriteria={() => setSelectedRows([])} />
       <HR />
       <ReservationUnitsDataReader
         selectedRows={selectedRows}
