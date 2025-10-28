@@ -172,7 +172,7 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
       </AutoGrid>
       <ApplicationSectionSummary
         applicationSection={getValues(`applicationSections.${index}`)}
-        name={watch(`applicationSections.${index}.name`)}
+        name={watch(`applicationSections.${index}.name`) ?? "-"}
       />
       <Button
         variant={ButtonVariant.Secondary}
