@@ -111,7 +111,6 @@ const CardContent = styled.div<{ $itemCount: number }>`
   gap: var(--spacing-s);
   position: relative;
   width: 100%;
-  height: 100%;
   padding: var(--spacing-s) var(--spacing-m);
   flex-grow: 1;
   font-size: var(--fontsize-body-m);
