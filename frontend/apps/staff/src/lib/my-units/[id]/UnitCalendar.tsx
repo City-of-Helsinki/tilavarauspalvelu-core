@@ -7,14 +7,14 @@ import { type TFunction, useTranslation } from "next-i18next";
 import { CalendarEvent } from "ui/src/components/calendar/Calendar";
 import { focusStyles } from "ui/src/styled";
 import { breakpoints } from "ui/src/modules/const";
-import { EVENT_BUFFER } from "@/modules/calendarStyling";
+import { EVENT_BUFFER, NOT_RESERVABLE } from "@/modules/calendarStyling";
 import { getReserveeName } from "@/modules/util";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
 import { ReservationPopupContent } from "./ReservationPopupContent";
 import eventStyleGetter from "./eventStyleGetter";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { isCellOverlappingSpan, TimeSpanType } from "common/src/components/calendar/util";
+import { isCellOverlappingSpan, TimeSpanType } from "ui/src/components/calendar/util";
 import { IconClock } from "hds-react";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
@@ -181,12 +181,12 @@ const EventContainer = styled.div`
   left: 0;
 `;
 
-const CellStyled = styled.div<{ $isPast?: boolean }>`
-  ${({ $isPast }) => ($isPast ? "background: var(--tilavaraus-event-booking-past-date);" : "")}
+const CellStyled = styled.div`
   height: 100%;
   width: 100%;
   border-left: ${CELL_BORDER};
   border-top: ${CELL_BORDER};
+  cursor: pointer;
 
   &:focus {
     ${focusStyles};
@@ -289,9 +289,9 @@ function Cell({
       ref={ref}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      $isPast={isPast || isClosed}
       tabIndex={isPast || isClosed ? -1 : 0}
       data-testid={`UnitCalendar__RowCalendar--cell-${cellId}`}
+      style={isPast || isClosed ? NOT_RESERVABLE.style : undefined}
     />
   );
 }

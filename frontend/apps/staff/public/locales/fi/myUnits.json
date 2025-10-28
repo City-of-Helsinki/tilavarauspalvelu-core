@@ -16,6 +16,8 @@
       "intersecting": "Toisen varausyksikön varaus",
       "pause": "Tauko",
       "closed": "Suljettu",
+      "notReservable": "Ei varattavissa",
+      "reservable": "Vapaa",
       "waitingPayment": "Hyväksytty varaus, Odottaa maksua",
       "staffReservation": "Sisäinen varaus",
       "reserved": "Varattu",
