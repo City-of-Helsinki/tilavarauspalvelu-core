@@ -135,8 +135,8 @@ importers:
         specifier: ^1.0.6
         version: 1.0.6
       zod:
-        specifier: ^3.25.64
-        version: 3.25.64
+        specifier: ^4.1.12
+        version: 4.1.12
     devDependencies:
       '@graphql-tools/graphql-tag-pluck':
         specifier: ^8.3.21
@@ -280,8 +280,8 @@ importers:
         specifier: ^1.0.6
         version: 1.0.6
       zod:
-        specifier: ^3.25.64
-        version: 3.25.64
+        specifier: ^4.1.12
+        version: 4.1.12
     devDependencies:
       '@happy-dom/jest-environment':
         specifier: ^20.0.0
@@ -398,8 +398,8 @@ importers:
         specifier: workspace:*
         version: link:../tsconfig
       zod:
-        specifier: ^3.25.64
-        version: 3.25.64
+        specifier: ^4.1.12
+        version: 4.1.12
     devDependencies:
       '@apollo/client':
         specifier: ^3.13.8
@@ -3617,8 +3617,8 @@ packages:
   electron-to-chromium@1.5.232:
     resolution: {integrity: sha512-ENirSe7wf8WzyPCibqKUG1Cg43cPaxH4wRR7AJsX7MCABCHBIOFqvaYODSLKUuZdraxUTHRE/0A2Aq8BYKEHOg==}
 
-  electron-to-chromium@1.5.240:
-    resolution: {integrity: sha512-OBwbZjWgrCOH+g6uJsA2/7Twpas2OlepS9uvByJjR2datRDuKGYeD+nP8lBBks2qnB7bGJNHDUx7c/YLaT3QMQ==}
+  electron-to-chromium@1.5.241:
+    resolution: {integrity: sha512-ILMvKX/ZV5WIJzzdtuHg8xquk2y0BOGlFOxBVwTpbiXqWIH0hamG45ddU4R3PQ0gYu+xgo0vdHXHli9sHIGb4w==}
 
   emoji-regex@10.6.0:
     resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
@@ -6029,8 +6029,8 @@ packages:
   zen-observable@0.8.15:
     resolution: {integrity: sha512-PQ2PC7R9rslx84ndNBZB/Dkv8V8fZEpk83RLgXtYd0fwUgEjseMn1Dgajh2x6S8QbZAFa9p2qVCEuYZNgve0dQ==}
 
-  zod@3.25.64:
-    resolution: {integrity: sha512-hbP9FpSZf7pkS7hRVUrOjhwKJNyampPgtXKc3AN6DsWtoHsg2Sb4SQaS4Tcay380zSwd2VPo9G9180emBACp5g==}
+  zod@4.1.12:
+    resolution: {integrity: sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ==}
 
 snapshots:
 
@@ -9084,7 +9084,7 @@ snapshots:
     dependencies:
       baseline-browser-mapping: 2.8.20
       caniuse-lite: 1.0.30001751
-      electron-to-chromium: 1.5.240
+      electron-to-chromium: 1.5.241
       node-releases: 2.0.26
       update-browserslist-db: 1.1.4(browserslist@4.27.0)
 
@@ -9501,7 +9501,7 @@ snapshots:
 
   electron-to-chromium@1.5.232: {}
 
-  electron-to-chromium@1.5.240: {}
+  electron-to-chromium@1.5.241: {}
 
   emoji-regex@10.6.0: {}
 
@@ -12041,4 +12041,4 @@ snapshots:
 
   zen-observable@0.8.15: {}
 
-  zod@3.25.64: {}
+  zod@4.1.12: {}
