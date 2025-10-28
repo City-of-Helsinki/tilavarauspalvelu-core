@@ -61,7 +61,7 @@
     "@types/sanitize-html": "^2.16.0",
     "@vitejs/plugin-react": "^5.0.4",
     "happy-dom": "^20.0.0",
-    "next": "15.5.6",
+    "next": "16.0.0",
     "next-i18next": "^15.4.2",
     "oxlint": "^1.23.0",
     "postcss-styled-syntax": "^0.7.1",
