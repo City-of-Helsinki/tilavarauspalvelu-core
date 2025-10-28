@@ -30,6 +30,8 @@ export const ReservationUnitPageWrapper = styled(ReservationPageWrapper)`
 `;
 
 export const NewReservationForm = styled.form`
+  display: grid;
+  gap: var(--spacing-m);
   grid-column: 1 / -1;
   grid-row: 3;
   @media (min-width: ${breakpoints.m}) {
