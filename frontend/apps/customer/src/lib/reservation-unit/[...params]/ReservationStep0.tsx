@@ -11,10 +11,9 @@ import {
   ReserveeType,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
-import { getExtendedGeneralFormFields } from "@ui/reservation-form/util";
-import { getReservationFormSchema, type ReservationFormValueT } from "@ui/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { getReservationFormSchema, ReservationFormValues, type ReservationFormValueT } from "@ui/schemas";
+import { getExtendedGeneralFormFields } from "@ui/reservation-form/util";
 import { Flex, LinkLikeButton } from "@ui/styled";
 import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
 import { type OptionsRecord } from "@ui/types";
@@ -61,10 +60,8 @@ export function ReservationStep0({ reservation, cancelReservation, options }: Pr
     reserveeIsUnregisteredAssociation: false,
   };
   const formSchema = getReservationFormSchema(reservation.reservationUnit);
-  // NOTE infered type is not exactly correct it doesn't create all four discrimating unions
-  type FT = z.infer<ReturnType<typeof getReservationFormSchema>>;
 
-  const form = useForm<FT>({
+  const form = useForm<ReservationFormValues>({
     defaultValues,
     mode: "onChange",
     resolver: zodResolver(formSchema),
@@ -80,7 +77,7 @@ export function ReservationStep0({ reservation, cancelReservation, options }: Pr
   const [updateReservation] = useUpdateReservationMutation();
 
   // TODO move to free function but requires us to type the FT (using ReturnValue + infer probably)
-  function transformReservationFom(values: FT): ReservationUpdateMutationInput {
+  function transformReservationFom(values: ReservationFormValues): ReservationUpdateMutationInput {
     const {
       reserveeFirstName,
       reserveeLastName,
@@ -135,7 +132,7 @@ export function ReservationStep0({ reservation, cancelReservation, options }: Pr
     return input;
   }
 
-  const onSubmit = async (payload: FT): Promise<void> => {
+  const onSubmit = async (payload: ReservationFormValues): Promise<void> => {
     const input = transformReservationFom(payload);
     try {
       const { data } = await updateReservation({

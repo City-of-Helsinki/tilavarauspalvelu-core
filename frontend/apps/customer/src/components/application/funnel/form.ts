@@ -25,11 +25,11 @@ type SectionTypePage2 = NonNullable<NodePage2["applicationSections"]>[0];
 
 const SuitableTimeRangeFormTypeSchema = z.object({
   pk: z.number().optional(),
-  priority: z.nativeEnum(Priority),
+  priority: z.enum(Priority),
   // TODO validate Time input string
   beginTime: z.string(),
   endTime: z.string(),
-  dayOfTheWeek: z.nativeEnum(Weekday),
+  dayOfTheWeek: z.enum(Weekday),
 });
 export type SuitableTimeRangeFormValues = z.infer<typeof SuitableTimeRangeFormTypeSchema>;
 
@@ -50,12 +50,7 @@ const ApplicationSectionPage1Schema = z
     purpose: z.number().refine((s) => s, { path: [""], message: "Required" }),
     minDuration: z.number().min(1, { message: "Required" }),
     maxDuration: z.number().min(1, { message: "Required" }),
-    appliedReservationsPerWeek: z
-      .number()
-      .min(1)
-      .max(7)
-      .nullable()
-      .refine((s) => s, { path: [""], message: "Required" }),
+    appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }).max(7, { error: "lte_7" }),
     begin: z.string().min(1, { message: "Required" }),
     end: z.string().min(1, { message: "Required" }),
     // TODO do we want to keep the pk of the options? so we can update them when the order changes and not recreate the whole list on save?
@@ -112,7 +107,7 @@ const ApplicationSectionPage2Schema = z
     reservationUnitPk: z.number(),
     priority: z.enum(CELL_STATES),
     // NOTE: not sent or modified here, but required for validation
-    appliedReservationsPerWeek: z.number().min(1).max(7),
+    appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }).max(7, { error: "lte_7" }),
   })
   .superRefine((s, ctx) => {
     const isValid =
@@ -340,7 +335,7 @@ export const ApplicationPage3Schema = z
 
     contactPersonFirstName: z.string().min(1).max(255),
     contactPersonLastName: z.string().min(1).max(255),
-    contactPersonEmail: z.string().min(1).max(254).email(),
+    contactPersonEmail: z.email().min(1).max(254),
     contactPersonPhoneNumber: z.string().min(1).max(255),
 
     billingStreetAddress: z.string().min(1).max(80).optional(),

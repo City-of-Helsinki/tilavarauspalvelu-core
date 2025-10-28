@@ -42,7 +42,7 @@
     "tsconfig": "workspace:*",
     "typescript-cookie": "^1.0.6",
     "ui": "workspace:*",
-    "zod": "^3.25.64"
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@happy-dom/jest-environment": "^20.0.0",

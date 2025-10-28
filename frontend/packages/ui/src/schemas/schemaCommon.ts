@@ -27,13 +27,8 @@ export function checkDateWithinThreeYears(date: Date | null, ctx: z.RefinementCt
 }
 
 export function checkValidDateOnly(date: Date | null, ctx: z.RefinementCtx, path: string) {
-  if (!date) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: [path],
-      message: "Required",
-    });
-  } else if (Number.isNaN(date.getTime())) {
+  // NOTE typical use case goes through our date parser that converts invalid dates -> null
+  if (date == null || Number.isNaN(date.getTime())) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: [path],
@@ -50,8 +45,10 @@ export function checkValidDate(date: Date | null, ctx: z.RefinementCtx, path: st
 }
 
 export function checkValidFutureDate(date: Date | null, ctx: z.RefinementCtx, path: string): void {
-  checkValidDate(date, ctx, path);
+  // different order so we get "not past" errors before of "not inside 3-year range"
+  checkValidDateOnly(date, ctx, path);
   checkDateNotInPast(date, ctx, path);
+  checkDateWithinThreeYears(date, ctx, path);
 }
 
 export function checkTimeStringFormat(data: string | undefined, ctx: z.RefinementCtx, path: string, errorKey?: string) {

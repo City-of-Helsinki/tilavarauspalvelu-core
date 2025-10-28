@@ -87,7 +87,11 @@ export function ReservationTypeForm({
 }: ReservationTypeFormProps): JSX.Element | null {
   const { t } = useTranslation();
 
-  const { watch, register } = useFormContext<CreateStaffReservationFormValues>();
+  const {
+    watch,
+    register,
+    formState: { errors },
+  } = useFormContext<CreateStaffReservationFormValues>();
   const type = watch("type");
 
   const { ageGroups, reservationPurposes } = useFilterOptions();
@@ -110,6 +114,7 @@ export function ReservationTypeForm({
           label={t("reservationApplication:comment")}
           id="reservationApplication:comment"
           {...register("comments")}
+          errorText={errors.comments?.message != null ? t(`forms:errors.${errors.comments.message}`) : undefined}
         />
       ) : (
         <>
@@ -128,6 +133,7 @@ export function ReservationTypeForm({
             id="reservationApplication:comment"
             label={t("reservationApplication:comment")}
             {...register("comments")}
+            errorText={errors.comments?.message != null ? t(`forms:errors.${errors.comments.message}`) : undefined}
           />
           <HR style={{ gridColumn: "1 / -1" }} />
           <Element $wide>

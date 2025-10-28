@@ -12,33 +12,44 @@ import { checkTimeStringFormat, checkValidFutureDate } from "./schemaCommon";
 import { getIntervalMinutes } from "../modules/conversion";
 
 export const ReservationTypes = Object.values(ReservationTypeChoice);
-export const ReservationTypeSchema = z.nativeEnum(ReservationTypeChoice);
+export const ReservationTypeSchema = z.enum(ReservationTypeChoice, { error: "Required" });
 
 export type ReservationType = z.infer<typeof ReservationTypeSchema>;
+
+function getTimeStringSchema(key: string) {
+  return z
+    .string({ error: "Required" })
+    .min(1, { error: "Required" })
+    .superRefine((val, ctx) => checkTimeStringFormat(val, ctx, "", key));
+}
 
 export const TimeFormSchema = z.object({
   pk: z.number().optional(),
   // NOTE date needs to be string that is not coerced because it uses FI format
-  date: z.string(),
-  startTime: z.string(),
-  endTime: z.string(),
+  date: z
+    .string({ error: "Required" })
+    .min(1, { error: "Required" })
+    .superRefine((d, ctx) => {
+      checkValidFutureDate(parseUIDate(d), ctx, "");
+    }),
+  startTime: getTimeStringSchema("startTime"),
+  endTime: getTimeStringSchema("endTime"),
   enableBufferTimeAfter: z.boolean(),
   enableBufferTimeBefore: z.boolean(),
   type: ReservationTypeSchema,
 });
 
 const CreateStaffReservationFormSchema = z
-  // TODO this is bad, use form schema instead
   .object({
-    comments: z.string().optional(),
+    comments: z.string(),
     // backend doesn't accept bad emails (empty is fine)
-    reserveeEmail: z.union([z.string().email(), z.string().length(0)]).optional(),
+    reserveeEmail: z.union([z.email(), z.string().length(0)]).optional(),
   })
   .extend(TimeFormSchema.shape);
 
 export type CreateReservationFormType = z.infer<typeof CreateStaffReservationFormSchema>;
 
-type CreateStaffReservationFormSchema = z.infer<typeof CreateStaffReservationFormSchema>;
+export type CreateStaffReservationFormSchema = z.infer<typeof CreateStaffReservationFormSchema>;
 type TimeFormValuesT = z.infer<typeof TimeFormSchema>;
 
 // Only used for admin forms
@@ -54,7 +65,7 @@ export const ReservationFormMetaSchema = z.object({
   municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]).optional(),
   numPersons: z.number().optional(),
   purpose: z.number().optional(),
-  reserveeEmail: z.union([z.string().email(), z.string().length(0)]).optional(),
+  reserveeEmail: z.union([z.email(), z.string().length(0)]).optional(),
   reserveeFirstName: z.string().optional(),
   reserveeIdentifier: z.string().optional(),
   reserveeIsUnregisteredAssociation: z.boolean().optional(),
@@ -102,13 +113,6 @@ export function checkReservationInterval(
 /// i.e. you can make a reservation for today 10:00 even if it's 10:30
 export function getCreateStaffReservationFormSchema(interval: ReservationStartInterval) {
   return CreateStaffReservationFormSchema.extend(ReservationFormMetaSchema.shape)
-    .superRefine((val, ctx) => {
-      if (val.date) {
-        checkValidFutureDate(parseUIDate(val.date), ctx, "date");
-      }
-    })
-    .superRefine((val, ctx) => checkTimeStringFormat(val.startTime, ctx, "startTime"))
-    .superRefine((val, ctx) => checkTimeStringFormat(val.endTime, ctx, "endTime"))
     .superRefine((val, ctx) => checkStartEndTime(val, ctx))
     .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", getIntervalMinutes(interval)))
     .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15))
@@ -120,13 +124,7 @@ export function getCreateStaffReservationFormSchema(interval: ReservationStartIn
 
 // NOTE duplicated schema because schemas need to be refined after merge (only times in this case)
 export function getTimeChangeFormSchemaRefined(interval: ReservationStartInterval) {
-  return TimeFormSchema.superRefine((val, ctx) => {
-    const d = val.date ? parseUIDate(val.date) : null;
-    checkValidFutureDate(d, ctx, "date");
-  })
-    .superRefine((val, ctx) => checkTimeStringFormat(val.startTime, ctx, "startTime"))
-    .superRefine((val, ctx) => checkTimeStringFormat(val.endTime, ctx, "endTime"))
-    .superRefine((val, ctx) => checkStartEndTime(val, ctx))
+  return TimeFormSchema.superRefine((val, ctx) => checkStartEndTime(val, ctx))
     .superRefine((val, ctx) => checkReservationInterval(val.startTime, ctx, "startTime", getIntervalMinutes(interval)))
     .superRefine((val, ctx) => checkReservationInterval(val.endTime, ctx, "endTime", 15))
     .refine((s) => s.type, {
@@ -160,7 +158,7 @@ const ContactInfoFormSchema = z.object({
   reserveeLastName: z.string().min(2, "Required"),
   // TODO check for valid characters (not regex, simpler)
   reserveePhone: z.string().min(3, "Required"),
-  reserveeEmail: z.string().min(1, "Required").email(),
+  reserveeEmail: z.email().min(1, "Required"),
   // Optional for all forms based on the reservationUnit settings (could be added dynamically)
   applyingForFreeOfCharge: z.boolean().optional(),
   freeOfChargeReason: z.string().optional(),
@@ -174,7 +172,8 @@ type SchemaParams = {
 const ReserveeInfoFormSchema = (params: SchemaParams) =>
   z
     .object({
-      reserveeType: z.enum([ReserveeType.Individual, ReserveeType.Nonprofit, ReserveeType.Company]),
+      reserveeType: z.enum(ReserveeType),
+      name: z.string(), // not mandatory
       description: z.string().min(3, "Required"),
       municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]),
       numPersons: z.number().min(params.minPersons, "Too small").max(params.maxPersons, "Too large"),
@@ -239,9 +238,12 @@ function getReservationSchemaUnrefined(reservationUnit: ReservationUnitForRefine
 
 type ReservationUnitForRefinement = Pick<ReservationUnitNode, "reservationForm" | "minPersons" | "maxPersons">;
 
+// NOTE infered type is not exactly correct it doesn't create all four discrimating unions
+type ReservationSchemaT = ReturnType<typeof getReservationSchemaUnrefined> | typeof ContactInfoFormSchema;
+
 /// TODO this could use formContainsField helper to automatically construct the schema
 /// issue with this is that it removes the type narrowing provided by a switch.
-function getReservationFormSchemaImpl(reservationUnit: ReservationUnitForRefinement) {
+function getReservationFormSchemaImpl(reservationUnit: ReservationUnitForRefinement): ReservationSchemaT {
   if (reservationUnit.reservationForm === ReservationFormType.ContactInfoForm) {
     return ContactInfoFormSchema;
   }
@@ -263,7 +265,7 @@ function getReservationFormSchemaImpl(reservationUnit: ReservationUnitForRefinem
 }
 
 /// Get the schema that matches the selected FormType
-export function getReservationFormSchema(reservationUnit: ReservationUnitForRefinement) {
+export function getReservationFormSchema(reservationUnit: ReservationUnitForRefinement): ReservationSchemaT {
   return getReservationFormSchemaImpl(reservationUnit).refine(
     (val) => !val.applyingForFreeOfCharge || (val.freeOfChargeReason != null && val.freeOfChargeReason.length > 0),
     {
@@ -272,3 +274,5 @@ export function getReservationFormSchema(reservationUnit: ReservationUnitForRefi
     }
   );
 }
+
+export type ReservationFormValues = z.infer<ReservationSchemaT>;
