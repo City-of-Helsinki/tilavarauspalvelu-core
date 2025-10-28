@@ -1,3 +1,6 @@
+const HDS_CLOCK_ICON_SVG =
+  'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMTUiIHZpZXdCb3g9IjAgMCAxNCAxNSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik02Ljk5OTY3IDAuODMzNDk2QzEwLjY4MTYgMC44MzM0OTYgMTMuNjY2MyAzLjgxODI2IDEzLjY2NjMgNy41MDAxNkMxMy42NjYzIDExLjE4MjEgMTAuNjgxNiAxNC4xNjY4IDYuOTk5NjcgMTQuMTY2OEMzLjMxNzc4IDE0LjE2NjggMC4zMzMwMDggMTEuMTgyMSAwLjMzMzAwOCA3LjUwMDE2QzAuMzMzMDA4IDMuODE4MjYgMy4zMTc3OCAwLjgzMzQ5NiA2Ljk5OTY3IDAuODMzNDk2Wk02Ljk5OTY3IDIuMTY2ODNDNC4wNTQxNiAyLjE2NjgzIDEuNjY2MzQgNC41NTQ2NCAxLjY2NjM0IDcuNTAwMTZDMS42NjYzNCAxMC40NDU3IDQuMDU0MTYgMTIuODMzNSA2Ljk5OTY3IDEyLjgzMzVDOS45NDUxOSAxMi44MzM1IDEyLjMzMyAxMC40NDU3IDEyLjMzMyA3LjUwMDE2QzEyLjMzMyA0LjU1NDY0IDkuOTQ1MTkgMi4xNjY4MyA2Ljk5OTY3IDIuMTY2ODNaTTcuNjY2MzQgMy41MDAxNkw3LjY2Njc3IDcuMjIyODNMOS44MjgxIDkuMzg1NzhMOC44ODUyOSAxMC4zMjg2TDYuNTI4MjcgNy45NzE1N0w2LjUyOTQzIDcuOTcwODNMNi4zMzM1MSA3Ljc3NjAyTDYuMzMzMDEgMy41MDAxNkg3LjY2NjM0WiIgZmlsbD0iIzMzMzMzMyIvPgo8L3N2Zz4K")';
+
 const STYLE_COMMON = {
   borderStyle: "solid",
   borderWidth: "0px 0px 0px 3px",
@@ -36,23 +39,16 @@ export const STAFF_RESERVATION = {
   },
 };
 
-export const PRE_PAUSE = {
+export const EVENT_BUFFER = {
   style: {
-    ...STYLE_COMMON,
-    borderColor: "var(--color-black-40)",
-    borderLeft: "3px / 1px solid var(--color-black)",
     background: "var(--color-black-10)",
-    color: "black",
-  },
-};
-
-export const POST_PAUSE = {
-  style: {
     borderColor: "var(--color-black-40)",
     borderLeft: "3px / 1px solid var(--color-black)",
-    background: "var(--tilavaraus-event-booking-break)",
-    // Invisible text, real solution is to fix big-calendar not to render it
-    color: "var(--tilavaraus-event-booking-break)",
+    opacity: "0.5",
+    color: "var(--color-black-80)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
 };
 
@@ -159,7 +155,13 @@ export const CALENDAR_LEGENDS: EventStyleType[] = [
   {
     key: "PAUSE",
     label: "myUnits:Calendar.legend.pause",
-    style: POST_PAUSE.style,
+    style: {
+      ...EVENT_BUFFER.style,
+      backgroundImage: HDS_CLOCK_ICON_SVG,
+      backgroundRepeat: "no-repeat",
+      backgroundPosition: "center",
+      backgroundSize: "20px",
+    },
   },
   {
     key: "CLOSED",

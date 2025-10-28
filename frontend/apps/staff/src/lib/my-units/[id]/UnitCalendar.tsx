@@ -3,18 +3,19 @@ import { addMinutes, differenceInMinutes, isToday, setHours, setMinutes, startOf
 import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
 import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
-import { useTranslation, type TFunction } from "next-i18next";
+import { type TFunction, useTranslation } from "next-i18next";
 import { CalendarEvent } from "ui/src/components/calendar/Calendar";
 import { focusStyles } from "ui/src/styled";
 import { breakpoints } from "ui/src/modules/const";
-import { POST_PAUSE, PRE_PAUSE } from "@/modules/calendarStyling";
+import { EVENT_BUFFER } from "@/modules/calendarStyling";
 import { getReserveeName } from "@/modules/util";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
 import { ReservationPopupContent } from "./ReservationPopupContent";
 import eventStyleGetter from "./eventStyleGetter";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { isCellOverlappingSpan, TimeSpanType } from "ui/src/components/calendar/util";
+import { isCellOverlappingSpan, TimeSpanType } from "common/src/components/calendar/util";
+import { IconClock } from "hds-react";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 type Resource = {
@@ -313,14 +314,16 @@ function PreBuffer({
   return (
     <div
       style={{
-        ...PRE_PAUSE.style,
+        ...EVENT_BUFFER.style,
         ...TemplateProps,
         left: `calc(${left} - ${width})`,
         width,
       }}
       title={t("myUnits:Calendar.legend.pause")}
       key={`${event.event?.pk}-pre`}
-    />
+    >
+      <IconClock />
+    </div>
   );
 }
 
@@ -342,14 +345,16 @@ function PostBuffer({
   return (
     <div
       style={{
-        ...POST_PAUSE.style,
+        ...EVENT_BUFFER.style,
         ...TemplateProps,
         left: right,
         width,
       }}
       title={t("myUnits:Calendar.legend.pause")}
       key={`${event.event?.pk}-post`}
-    />
+    >
+      <IconClock />
+    </div>
   );
 }
 
@@ -493,6 +498,7 @@ export function UnitCalendar({
   useEffect(() => {
     // SSR doesn't have window, so set it inside a hook
     setWindowHeight(window.innerHeight);
+
     function updateSize() {
       setWindowHeight(window.innerHeight);
     }
