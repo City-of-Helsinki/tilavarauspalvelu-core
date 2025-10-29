@@ -9,7 +9,7 @@ import { Flex, fontBold, fontMedium, fontRegular, SemiBold } from "ui/src/styled
 import { breakpoints } from "ui/src/modules/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
-import { type Control, type FieldValues, type SubmitHandler, useController, type UseFormReturn } from "react-hook-form";
+import { type SubmitHandler, useController, type UseFormReturn } from "react-hook-form";
 import { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { useMedia } from "react-use";
@@ -177,8 +177,7 @@ export function ReservationCalendarControls({
               <ControlledSelect
                 id="calendar-controls__duration"
                 name="duration"
-                // react-hook-form has issues with typing generic Select
-                control={control as unknown as Control<FieldValues>}
+                control={control}
                 label={t("reservationCalendar:duration")}
                 options={durationOptions}
               />
@@ -187,8 +186,7 @@ export function ReservationCalendarControls({
               id="calendar-controls__time"
               name="time"
               label={t("reservationCalendar:startTime")}
-              // react-hook-form has issues with typing generic Select
-              control={control as unknown as Control<FieldValues>}
+              control={control}
               options={startingTimeOptions}
               placeholder={t("common:select")}
             />

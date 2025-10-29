@@ -20,7 +20,7 @@ import { toNumber } from "ui/src/modules/helpers";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
 import { type TimeSlotRange, useSelectedSlots } from "./SelectedSlotsContext";
-import { type DayT } from "ui/src/modules/const";
+import { numberToDayT } from "ui/src/modules/conversion";
 
 export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT) => void] {
   const params = useSearchParams();
@@ -85,10 +85,14 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
       }
       const begins = decodeTimeSlot(selectionBegin);
       const ends = decodeTimeSlot(selectionEnd);
+      const day = numberToDayT(begins.day);
+      if (day == null) {
+        return;
+      }
       setSelection({
         begins: begins.hour,
         ends: ends.hour,
-        day: begins.day as DayT,
+        day,
       });
     }
   };

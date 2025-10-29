@@ -13,7 +13,7 @@ import {
   isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
 import Carousel from "@/components/Carousel";
-import { type Control, type FieldValues, type SubmitHandler, type UseFormReturn } from "react-hook-form";
+import { type SubmitHandler, type UseFormReturn } from "react-hook-form";
 import { ControlledDateInput } from "ui/src/components/form";
 import { type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
@@ -174,8 +174,7 @@ export function QuickReservation({
         <ControlledSelect
           id="quick-reservation__duration"
           name="duration"
-          // react-hook-form has issues with typing generic Select
-          control={control as unknown as Control<FieldValues>}
+          control={control}
           label={t("reservationCalendar:duration")}
           options={durationOptions}
         />
