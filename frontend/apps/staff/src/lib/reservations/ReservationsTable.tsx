@@ -1,10 +1,9 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircleFill } from "hds-react";
 import { type TFunction } from "i18next";
 import { memoize } from "lodash-es";
 import { useTranslation } from "next-i18next";
-import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
+import { OrderStatusLabel, ReservationStatusLabel } from "ui/src/components/statuses";
 import { formatDateTime, formatDateTimeRange, parseValidDateObject } from "ui/src/modules/date-utils";
 import { CustomTable } from "@/components/Table";
 import { MAX_NAME_LENGTH } from "@/modules/const";
@@ -12,7 +11,7 @@ import { truncate } from "@/modules/helpers";
 import { getReservationUrl } from "@/modules/urls";
 import { getReserveeName } from "@/modules/util";
 import { TableLink } from "@/styled";
-import { OrderStatus, ReservationStateChoice, type ReservationTableElementFragment } from "@gql/gql-types";
+import { ReservationStateChoice, type ReservationTableElementFragment } from "@gql/gql-types";
 
 type ReservationTableColumn = {
   headerName: string;
@@ -26,48 +25,6 @@ type Props = {
   sortChanged: (field: string) => void;
   isLoading: boolean;
   reservations: ReservationTableElementFragment[];
-};
-
-const getStatusLabelProps = (
-  state: ReservationStateChoice | null | undefined
-): { type: StatusLabelType; icon: JSX.Element } => {
-  switch (state) {
-    case ReservationStateChoice.Created:
-      return { type: "draft", icon: <IconPen /> };
-    case ReservationStateChoice.Denied:
-      return { type: "error", icon: <IconCross /> };
-    case ReservationStateChoice.WaitingForPayment:
-      return { type: "alert", icon: <IconEuroSign /> };
-    case ReservationStateChoice.Cancelled:
-      return { type: "neutral", icon: <IconCross /> };
-    case ReservationStateChoice.Confirmed:
-      return { type: "success", icon: <IconCheck /> };
-    case ReservationStateChoice.RequiresHandling:
-      return { type: "info", icon: <IconCogwheel /> };
-    default:
-      return {
-        type: "info",
-        icon: <IconQuestionCircleFill />,
-      };
-  }
-};
-
-const getPaymentStatusLabelType = (status: OrderStatus | null | undefined): StatusLabelType => {
-  switch (status) {
-    case OrderStatus.Refunded:
-    case OrderStatus.Paid:
-      return "success";
-    case OrderStatus.Expired:
-      return "error";
-    case OrderStatus.PaidManually:
-    case OrderStatus.PaidByInvoice:
-    case OrderStatus.Draft:
-    case OrderStatus.Pending:
-      return "alert";
-    case OrderStatus.Cancelled:
-    default:
-      return "neutral";
-  }
 };
 
 const getColConfig = (t: TFunction): ReservationTableColumn[] => [
@@ -121,30 +78,16 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     headerName: t("reservation:Table.headings.paymentStatus"),
     key: "orderStatus",
     isSortable: true,
-    transform: ({ paymentOrder }: ReservationTableElementFragment) => {
-      if (!paymentOrder) {
-        return "-";
-      }
-      const labelType = getPaymentStatusLabelType(paymentOrder.status);
-      return (
-        <StatusLabel type={labelType} icon={<IconEuroSign />} slim>
-          {t(`reservation:orderStatus.${paymentOrder.status}`)}
-        </StatusLabel>
-      );
-    },
+    transform: ({ paymentOrder }: ReservationTableElementFragment) =>
+      paymentOrder ? <OrderStatusLabel status={paymentOrder.status} /> : "-",
   },
   {
     headerName: t("reservation:Table.headings.state"),
     key: "state",
     isSortable: true,
-    transform: ({ state }: ReservationTableElementFragment) => {
-      const labelProps = getStatusLabelProps(state);
-      return (
-        <StatusLabel type={labelProps.type} icon={labelProps.icon} slim>
-          {t(`reservation:state.${state}`)}
-        </StatusLabel>
-      );
-    },
+    transform: ({ state }: ReservationTableElementFragment) => (
+      <ReservationStatusLabel state={state ?? ReservationStateChoice.Created} />
+    ),
   },
 ];
 

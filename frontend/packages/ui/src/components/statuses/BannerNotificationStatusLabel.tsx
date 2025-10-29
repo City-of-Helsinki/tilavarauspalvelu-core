@@ -3,7 +3,7 @@ import { IconCheck, IconClock, IconPen } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { BannerNotificationState } from "../../../gql/gql-types";
-import StatusLabel, { type StatusLabelType } from "../StatusLabel";
+import { StatusLabel, type StatusLabelType } from "../StatusLabel";
 
 const StyledStatusLabel = styled(StatusLabel)`
   align-self: center;

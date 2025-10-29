@@ -1,7 +1,7 @@
 import React from "react";
 import { IconArrowTopRight, IconCheck, IconClock, IconCogwheel, IconEnvelope, IconQuestionCircle } from "hds-react";
 import { useTranslation } from "next-i18next";
-import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
+import { StatusLabel, type StatusLabelType } from "ui/src/components/StatusLabel";
 import { ApplicationRoundStatusChoice, type Maybe } from "@gql/gql-types";
 
 type RoundStatus = {
@@ -11,7 +11,7 @@ type RoundStatus = {
   group: string;
 };
 
-export function getApplicationRoundStatus(status: Maybe<ApplicationRoundStatusChoice> | undefined): RoundStatus {
+export function getApplicationRoundStatus(status: ApplicationRoundStatusChoice): RoundStatus {
   switch (status) {
     case ApplicationRoundStatusChoice.Open:
       return {

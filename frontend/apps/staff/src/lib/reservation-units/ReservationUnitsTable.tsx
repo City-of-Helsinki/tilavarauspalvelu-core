@@ -1,22 +1,9 @@
 import React, { type Dispatch, type SetStateAction } from "react";
 import { gql } from "@apollo/client";
-import {
-  IconCheck,
-  IconClock,
-  IconEye,
-  IconEyeCrossed,
-  IconInfoCircle,
-  IconLinkExternal,
-  IconLock,
-  IconPen,
-  IconQuestionCircleFill,
-  IconSize,
-} from "hds-react";
-import type { TFunction } from "i18next";
-import { useTranslation } from "next-i18next";
+import { IconInfoCircle, IconLinkExternal, IconSize } from "hds-react";
+import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import { ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
-import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
 import { breakpoints } from "ui/src/modules/const";
 import { Flex } from "ui/src/styled";
 import { CustomTable } from "@/components/Table";
@@ -26,11 +13,8 @@ import { isBrowser, MAX_NAME_LENGTH } from "@/modules/const";
 import { truncate } from "@/modules/helpers";
 import { getOpeningHoursUrl, getReservationUnitUrl } from "@/modules/urls";
 import { TableLink } from "@/styled";
-import {
-  ReservationUnitPublishingState,
-  ReservationUnitReservationState,
-  type ReservationUnitTableElementFragment,
-} from "@gql/gql-types";
+import { type ReservationUnitTableElementFragment } from "@gql/gql-types";
+import { ReservationUnitPublishingStatusLabel, ReservationUnitReservationStatusLabel } from "./[pk]/tags";
 
 type ReservationUnitsTableProps = {
   sort: string;
@@ -39,45 +23,6 @@ type ReservationUnitsTableProps = {
   isLoading?: boolean;
   selectedRows: SelectedRow[];
   setSelectedRows: Dispatch<SetStateAction<SelectedRow[]>>;
-};
-
-const getStatusLabelProps = (
-  state: ReservationUnitReservationState | null | undefined
-): { type: StatusLabelType; icon: JSX.Element } => {
-  switch (state) {
-    case ReservationUnitReservationState.Reservable:
-      return { type: "success", icon: <IconEye /> };
-    case ReservationUnitReservationState.ReservationClosed:
-      return { type: "neutral", icon: <IconLock /> };
-    case ReservationUnitReservationState.ScheduledReservation:
-    case ReservationUnitReservationState.ScheduledClosing:
-    case ReservationUnitReservationState.ScheduledPeriod:
-      return { type: "info", icon: <IconClock /> };
-    default:
-      return { type: "info", icon: <IconQuestionCircleFill /> };
-  }
-};
-
-const getPublishingStateProps = (
-  state: ReservationUnitPublishingState | null | undefined
-): { type: StatusLabelType; icon: JSX.Element } => {
-  switch (state) {
-    case ReservationUnitPublishingState.ScheduledHiding:
-    case ReservationUnitPublishingState.ScheduledPeriod:
-    case ReservationUnitPublishingState.ScheduledPublishing:
-      return { type: "info", icon: <IconClock aria-hidden="true" /> };
-    case ReservationUnitPublishingState.Published:
-      return { type: "success", icon: <IconCheck aria-hidden="true" /> };
-    case ReservationUnitPublishingState.Draft:
-      return { type: "draft", icon: <IconPen aria-hidden="true" /> };
-    case ReservationUnitPublishingState.Hidden:
-      return { type: "neutral", icon: <IconEyeCrossed aria-hidden="true" /> };
-    default:
-      return {
-        type: "neutral",
-        icon: <IconQuestionCircleFill aria-hidden="true" />,
-      };
-  }
 };
 
 const getColConfig = (t: TFunction) => [
@@ -130,26 +75,16 @@ const getColConfig = (t: TFunction) => [
   {
     headerName: t("reservationUnit:headings.state"),
     key: "state",
-    transform: ({ publishingState }: ReservationUnitTableElementFragment) => {
-      const labelProps = getPublishingStateProps(publishingState);
-      return (
-        <StatusLabel type={labelProps.type} icon={labelProps.icon} slim>
-          {t(`reservationUnit:state.${publishingState}`)}
-        </StatusLabel>
-      );
-    },
+    transform: ({ publishingState }: ReservationUnitTableElementFragment) => (
+      <ReservationUnitPublishingStatusLabel state={publishingState} slim />
+    ),
   },
   {
     headerName: t("reservationUnit:headings.reservationState"),
     key: "reservationState",
-    transform: ({ reservationState }: ReservationUnitTableElementFragment) => {
-      const labelProps = getStatusLabelProps(reservationState);
-      return (
-        <StatusLabel type={labelProps.type} icon={labelProps.icon} slim>
-          {t(`reservationUnit:reservationState.${reservationState}`)}
-        </StatusLabel>
-      );
-    },
+    transform: ({ reservationState }: ReservationUnitTableElementFragment) => (
+      <ReservationUnitReservationStatusLabel state={reservationState} slim />
+    ),
   },
 ];
 
