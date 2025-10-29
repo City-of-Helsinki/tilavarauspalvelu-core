@@ -11,8 +11,7 @@ import {
 import { useTranslation } from "next-i18next";
 import { ApplicationStatusChoice, type Maybe } from "../../../gql/gql-types";
 import type { UserTypeChoice } from "../../modules/urlBuilder";
-import { type StatusLabelType } from "../StatusLabel";
-import StatusLabel from "../StatusLabel";
+import { StatusLabel, type StatusLabelType } from "../StatusLabel";
 
 function getAdminApplicationStatusLabelProps(status: ApplicationStatusChoice): {
   type: StatusLabelType;
@@ -46,10 +45,7 @@ function getCustomerApplicationStatusLabelProps(status: ApplicationStatusChoice)
       return { type: "success", icon: <IconCheck /> };
     case ApplicationStatusChoice.Handled:
     case ApplicationStatusChoice.InAllocation:
-      return {
-        type: "info",
-        icon: <IconCogwheel />,
-      };
+      return { type: "info", icon: <IconCogwheel /> };
     case ApplicationStatusChoice.Received:
       return { type: "alert", icon: <IconEnvelope /> };
     // These two should never be shown to the client, so they are shown as any other unexpected status

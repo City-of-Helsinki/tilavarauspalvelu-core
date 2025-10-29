@@ -3,7 +3,7 @@ import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import StatusLabel from "ui/src/components/StatusLabel";
+import { StatusLabel } from "ui/src/components/StatusLabel";
 import { ControlledDateInput, ControlledSelect } from "ui/src/components/form";
 import { formatDate, parseUIDate, parseValidDateObject } from "ui/src/modules/date-utils";
 import { AutoGrid, Flex, H6 } from "ui/src/styled";
