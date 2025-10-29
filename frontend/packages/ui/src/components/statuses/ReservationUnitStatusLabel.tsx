@@ -1,9 +1,9 @@
 import React from "react";
-import { ReservationUnitPublishingState, ReservationUnitReservationState } from "@gql/gql-types";
+import { ReservationUnitPublishingState, ReservationUnitReservationState } from "../../../gql/gql-types";
 import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQuestionCircle } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { StatusLabel, type StatusLabelType } from "ui/src/components/StatusLabel";
-import { NoWrap } from "ui/src/styled";
+import { StatusLabel, type StatusLabelType } from "../StatusLabel";
+import { NoWrap } from "../../styled";
 
 type StatusPropsType = {
   type: StatusLabelType;

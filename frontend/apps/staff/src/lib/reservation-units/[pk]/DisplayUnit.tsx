@@ -7,7 +7,10 @@ import { formatAddress } from "@/modules/util";
 import React from "react";
 import styled from "styled-components";
 import { Flex, fontBold, H1, TitleSection } from "ui/src/styled";
-import { ReservationUnitPublishingStatusLabel, ReservationUnitReservationStatusLabel } from "./tags";
+import {
+  ReservationUnitPublishingStatusLabel,
+  ReservationUnitReservationStatusLabel,
+} from "ui/src/components/statuses";
 
 const UnitInformationWrapper = styled.div`
   font-size: var(--fontsize-heading-s);

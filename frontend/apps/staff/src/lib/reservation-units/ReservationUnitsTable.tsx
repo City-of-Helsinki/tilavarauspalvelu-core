@@ -14,7 +14,10 @@ import { IconInfoCircle, IconLinkExternal, IconSize } from "hds-react";
 import { ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
 import { gql } from "@apollo/client";
 import styled from "styled-components";
-import { ReservationUnitPublishingStatusLabel, ReservationUnitReservationStatusLabel } from "./[pk]/tags";
+import {
+  ReservationUnitPublishingStatusLabel,
+  ReservationUnitReservationStatusLabel,
+} from "ui/src/components/statuses";
 
 type Props = {
   sort: string;
