@@ -2,16 +2,7 @@ import React, { type ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ApolloError, gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Button,
-  ButtonVariant,
-  IconCheck,
-  IconClock,
-  IconPen,
-  RadioButton,
-  SelectionGroup,
-  TextInput,
-} from "hds-react";
+import { Button, ButtonVariant, RadioButton, SelectionGroup, TextInput } from "hds-react";
 import { type GetServerSidePropsContext } from "next";
 import { useTranslation, type TFunction } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -20,9 +11,9 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import { z } from "zod";
 import { cleanHtmlContent } from "ui/src/components/Sanitize";
-import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
 import { ControlledDateInput } from "ui/src/components/form";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
+import { BannerNotificationStatusLabel } from "ui/src/components/statuses";
 import { successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { parseUIDate, fromUIDateTime, formatDate, formatTime } from "ui/src/modules/date-utils";
@@ -54,37 +45,6 @@ import {
 const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {
   ssr: false,
 });
-
-const StyledStatusLabel = styled(StatusLabel)`
-  align-self: center;
-  white-space: nowrap;
-`;
-
-type NotificationStatus = {
-  type: StatusLabelType;
-  icon: JSX.Element;
-};
-
-function BannerNotificationStatusLabel({ state }: { state: BannerNotificationState }) {
-  const statusLabelProps = ((s: BannerNotificationState): NotificationStatus => {
-    switch (s) {
-      case BannerNotificationState.Draft:
-        return { type: "draft", icon: <IconPen /> };
-      case BannerNotificationState.Active:
-        return { type: "success", icon: <IconCheck /> };
-      case BannerNotificationState.Scheduled:
-        return { type: "info", icon: <IconClock /> };
-    }
-  })(state);
-
-  const { t } = useTranslation();
-
-  return (
-    <StyledStatusLabel type={statusLabelProps.type} icon={statusLabelProps.icon}>
-      {t(`notification:state.${state}`)}
-    </StyledStatusLabel>
-  );
-}
 
 const ButtonContainerCommon = styled(Flex).attrs({
   $justifyContent: "space-between",

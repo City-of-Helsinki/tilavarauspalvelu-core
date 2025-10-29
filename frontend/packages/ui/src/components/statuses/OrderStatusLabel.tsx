@@ -27,7 +27,7 @@ type Props = {
   testId?: string;
 };
 
-export function OrderStatusLabel({ status, testId }: Props): JSX.Element {
+export function OrderStatusLabel({ status, testId }: Props): React.ReactElement {
   const { t } = useTranslation();
 
   const labelType = getStatusLabelType(status);

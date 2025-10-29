@@ -1,7 +1,7 @@
 import React from "react";
-import { IconCheck, IconCross, IconQuestionCircleFill, Tooltip } from "hds-react";
+import { Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
-import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
+import { ApplicationSectionStatusLabel } from "ui/src/components/statuses";
 import { WEEKDAYS } from "ui/src/modules/const";
 import { formatDurationRange, formatDate, setMondayFirst } from "ui/src/modules/date-utils";
 import { filterNonNullable, formatDayTimes, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
@@ -30,20 +30,6 @@ function ageGroupToString(ag: Maybe<AgeGroupNode> | undefined): string {
     return "";
   }
   return `${ag.minimum} - ${ag.maximum}`;
-}
-
-function getLabelProps(status: ApplicationSectionStatusChoice | undefined | null): {
-  type: StatusLabelType;
-  icon: JSX.Element;
-} {
-  switch (status) {
-    case ApplicationSectionStatusChoice.Handled:
-      return { type: "success", icon: <IconCheck /> };
-    case ApplicationSectionStatusChoice.Rejected:
-      return { type: "error", icon: <IconCross /> };
-    default:
-      return { type: "info", icon: <IconQuestionCircleFill /> };
-  }
 }
 
 function InfoListItem({ label, value }: { label: string; value: string | JSX.Element }) {
@@ -82,7 +68,6 @@ function SingleApplicationSection({
     }));
   const shouldShowStatusLabel =
     aes.status === ApplicationSectionStatusChoice.Rejected || aes.status === ApplicationSectionStatusChoice.Handled;
-  const statusProps = getLabelProps(aes.status);
 
   const reservationsBegin = formatDate(new Date(aes.reservationsBeginDate));
   const reservationsEnd = formatDate(new Date(aes.reservationsEndDate));
@@ -129,9 +114,7 @@ function SingleApplicationSection({
       <ApplicationSectionHeader>
         {aes.name}
         {shouldShowStatusLabel && (
-          <StatusLabel type={statusProps.type} icon={statusProps.icon} data-testid="application-section__status">
-            {t(`application:applicationSectionStatus.${aes.status}`)}
-          </StatusLabel>
+          <ApplicationSectionStatusLabel testId="application-section__status" user="customer" status={aes.status} />
         )}
       </ApplicationSectionHeader>
       <ApplicationInfoContainer>
