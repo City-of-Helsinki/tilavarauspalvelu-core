@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { type Control, type FieldValues, type SubmitHandler, type UseFormReturn } from "react-hook-form";
+import { type SubmitHandler, type UseFormReturn } from "react-hook-form";
 import { Button } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -174,8 +174,7 @@ export function QuickReservation({
         <ControlledSelect
           id="quick-reservation__duration"
           name="duration"
-          // react-hook-form has issues with typing generic Select
-          control={control as unknown as Control<FieldValues>}
+          control={control}
           label={t("reservationCalendar:duration")}
           options={durationOptions}
         />

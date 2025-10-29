@@ -18,7 +18,9 @@ function RUImage({ image }: { image: ImageFormType }): JSX.Element {
 
   if (image.bytes) {
     const reader = new FileReader();
-    reader.addEventListener("load", () => setImageUrl(reader.result as string));
+    reader.addEventListener("load", () => {
+      setImageUrl(reader.result?.toString() ?? "");
+    });
     reader.readAsDataURL(image.bytes);
   }
 
