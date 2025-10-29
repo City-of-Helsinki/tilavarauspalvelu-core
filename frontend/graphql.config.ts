@@ -42,7 +42,7 @@ const gqlConfig = {
   scalars,
 };
 
-const schema = "tilavaraus.graphql";
+const schema = "../tilavaraus.graphql";
 const plugins = ["typescript", "typescript-operations", "typescript-react-apollo"] as const;
 
 const config: IGraphQLConfig = {
