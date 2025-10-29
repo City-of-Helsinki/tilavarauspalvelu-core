@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { gql } from "@apollo/client";
-import { TimeframeStatus, ApplicationRoundStatusLabel } from "@lib/application-rounds";
+import { TimeframeStatus } from "@lib/application-rounds";
 import {
   ReviewEndAllocation,
   ApplicationDataLoader,
@@ -17,6 +17,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
+import { ApplicationRoundStatusLabel } from "ui/src/components/statuses";
 import { errorToast } from "ui/src/components/toast";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "ui/src/styled";
