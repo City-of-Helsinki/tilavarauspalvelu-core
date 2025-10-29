@@ -4,7 +4,7 @@ import { startOfDay } from "date-fns";
 import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import StatusLabel from "ui/src/components/StatusLabel";
+import { StatusLabel } from "ui/src/components/StatusLabel";
 import { formatDate } from "ui/src/modules/date-utils";
 import { H6 } from "ui/src/styled";
 import { NewReservationModal } from "@/components/EditTimeModal";

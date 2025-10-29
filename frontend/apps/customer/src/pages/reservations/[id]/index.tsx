@@ -1,7 +1,7 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import { isBefore, sub } from "date-fns";
-import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, IconLock, Notification } from "hds-react";
+import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, Notification } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -10,8 +10,7 @@ import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { ButtonLikeLink, ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
 import IconButton from "ui/src/components/IconButton";
-import StatusLabel from "ui/src/components/StatusLabel";
-import { ReservationStatusLabel, OrderStatusLabel } from "ui/src/components/statuses";
+import { AccessCodeStatusLabel, OrderStatusLabel, ReservationStatusLabel } from "ui/src/components/statuses";
 import { useToastIfQueryParam } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDateTimeRange } from "ui/src/modules/date-utils";
@@ -269,15 +268,7 @@ function Reservation({
               {normalizedOrderStatus && (
                 <OrderStatusLabel status={normalizedOrderStatus} testId="reservation__payment-status" />
               )}
-              {shouldShowAccessCode && (
-                <StatusLabel
-                  type="info"
-                  icon={<IconLock aria-hidden="false" aria-label={t(`reservationUnit:accessType`)} />}
-                  data-testid="reservation__access-code"
-                >
-                  {t("reservationUnit:accessTypes.ACCESS_CODE")}
-                </StatusLabel>
-              )}
+              {shouldShowAccessCode && <AccessCodeStatusLabel />}
             </Flex>
           </Flex>
           <SubHeading>
