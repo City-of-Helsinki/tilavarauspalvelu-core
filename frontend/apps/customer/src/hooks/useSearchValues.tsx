@@ -1,6 +1,7 @@
 import { type ParsedUrlQueryInput } from "node:querystring";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
+import { ignoreMaybeArray } from "ui/src/modules/helpers";
 
 export function useSearchModify() {
   const router = useRouter();
@@ -9,8 +10,9 @@ export function useSearchModify() {
   const handleRouteChange = (query: URLSearchParams | ParsedUrlQueryInput) => {
     if (query instanceof URLSearchParams) {
       // [id] param is not included in the URLSearchParams object but required when routing
-      if (router.query.id) {
-        query.set("id", router.query.id as string);
+      const id = ignoreMaybeArray(router.query.id);
+      if (id) {
+        query.set("id", id);
       }
       router.replace({ query: query.toString() }, undefined, {
         shallow: true,

@@ -74,8 +74,9 @@ function View({ application, tos }: Readonly<Pick<PropsNarrowed, "application" |
 
   const handleRouteChange = (query: URLSearchParams) => {
     // [id] param is not included in the URLSearchParams object but required when routing
-    if (router.query.id) {
-      query.set("id", router.query.id as string);
+    const id = ignoreMaybeArray(router.query.id);
+    if (id != null) {
+      query.set("id", id);
     }
     router.replace({ query: query.toString() }, undefined, {
       shallow: true,

@@ -52,6 +52,14 @@ export function convertWeekday(d: Weekday): DayT {
   }
 }
 
+// safe coercion for day
+export function numberToDayT(day: number): DayT | null {
+  if (day === 0 || day === 1 || day === 2 || day === 3 || day === 4 || day === 5 || day === 6) {
+    return day;
+  }
+  return null;
+}
+
 export function transformReservationType(d: string): ReservationTypeChoice | null {
   switch (d) {
     case ReservationTypeChoice.Staff:

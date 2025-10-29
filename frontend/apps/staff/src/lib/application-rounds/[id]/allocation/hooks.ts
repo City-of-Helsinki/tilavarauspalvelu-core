@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import { errorToast, successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
-import { type DayT } from "ui/src/modules/const";
+import { numberToDayT } from "ui/src/modules/conversion";
 import { toNumber } from "ui/src/modules/helpers";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import {
@@ -85,10 +85,14 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
       }
       const begins = decodeTimeSlot(selectionBegin);
       const ends = decodeTimeSlot(selectionEnd);
+      const day = numberToDayT(begins.day);
+      if (day == null) {
+        return;
+      }
       setSelection({
         begins: begins.hour,
         ends: ends.hour,
-        day: begins.day as DayT,
+        day,
       });
     }
   };

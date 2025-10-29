@@ -1,4 +1,3 @@
-import type { DayT } from "ui/src/modules/const";
 import { transformWeekday } from "ui/src/modules/conversion";
 import { parseUIDateUnsafe, timeToMinutes, setMondayFirst } from "ui/src/modules/date-utils";
 import type { TimeSelectionFormValues } from "@/schemas";
@@ -19,7 +18,7 @@ function eachDayOfInterval(start: number, end: number, stepDays = 1) {
 
 // epoch is Thue (4)
 function dayOfWeek(time: number): Weekday {
-  const weekdayNumber = ((Math.floor(time / MILLISECONDS_IN_DAY) + 4) % 7) as DayT;
+  const weekdayNumber = (Math.floor(time / MILLISECONDS_IN_DAY) + 4) % 7;
   return transformWeekday(setMondayFirst(weekdayNumber));
 }
 

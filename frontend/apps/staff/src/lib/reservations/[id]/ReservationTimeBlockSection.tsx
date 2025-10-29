@@ -104,9 +104,9 @@ const Calendar = forwardRef(function Calendar(
           refetch(d);
         }}
         viewType={calendarViewType}
-        onView={(n: string) => {
-          if (["day", "week", "month"].includes(n)) {
-            setCalendarViewType(n as "day" | "week" | "month");
+        onView={(n) => {
+          if (n === "day" || n === "week" || n === "month") {
+            setCalendarViewType(n);
           }
         }}
       />

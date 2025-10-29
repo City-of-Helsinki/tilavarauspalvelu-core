@@ -479,7 +479,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
           options: {
             ...options,
             municipality: Object.values(MunicipalityChoice).map((value) => ({
-              label: value as string,
+              label: value.toString(),
               value: value,
             })),
           },

@@ -125,7 +125,7 @@ const Carousel = forwardRef(function Carousel(
           <ul>
             {children.map((child, idx) => (
               <li
-                key={`carousel-control-${(child as React.ReactElement)?.key}`}
+                key={`carousel-control-${formatReactNode(child)}`}
                 className={currentSlide === idx ? "active" : undefined}
               >
                 <button type="button" aria-label={`${controlAriaLabel} #${idx + 1}`} onClick={() => goToSlide(idx)}>
@@ -153,5 +153,12 @@ const Carousel = forwardRef(function Carousel(
     </StyledCarousel>
   );
 });
+
+function formatReactNode(node: React.ReactNode): string {
+  if (node != null && typeof node === "object" && "key" in node && typeof node.key === "string") {
+    return node.key;
+  }
+  return node?.toString() ?? "";
+}
 
 export default Carousel;

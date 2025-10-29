@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { type Control, type FieldValues, type SubmitHandler, useController, type UseFormReturn } from "react-hook-form";
+import { type SubmitHandler, useController, type UseFormReturn } from "react-hook-form";
 import { Transition } from "react-transition-group";
 import { useMedia } from "react-use";
 import { Button, ButtonVariant, IconAngleDown, IconAngleUp, IconCross, IconSize } from "hds-react";
@@ -177,8 +177,7 @@ export function ReservationCalendarControls({
               <ControlledSelect
                 id="calendar-controls__duration"
                 name="duration"
-                // react-hook-form has issues with typing generic Select
-                control={control as unknown as Control<FieldValues>}
+                control={control}
                 label={t("reservationCalendar:duration")}
                 options={durationOptions}
               />
@@ -187,8 +186,7 @@ export function ReservationCalendarControls({
               id="calendar-controls__time"
               name="time"
               label={t("reservationCalendar:startTime")}
-              // react-hook-form has issues with typing generic Select
-              control={control as unknown as Control<FieldValues>}
+              control={control}
               options={startingTimeOptions}
               placeholder={t("common:select")}
             />
