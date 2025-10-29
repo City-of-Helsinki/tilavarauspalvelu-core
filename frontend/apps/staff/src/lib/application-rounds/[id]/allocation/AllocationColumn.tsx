@@ -6,7 +6,7 @@ import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import { ShowAllContainer } from "ui/src/components";
 import { type DayT } from "ui/src/modules/const";
-import { transformWeekday } from "ui/src/modules/conversion";
+import { numberToDayT, transformWeekday } from "ui/src/modules/conversion";
 import { timeToMinutes, formatTimeRange } from "ui/src/modules/date-utils";
 import { convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";
 import { fontMedium } from "ui/src/styled";
@@ -118,16 +118,16 @@ function deserializeSlot(slot: string): { day: DayT; hour: number; mins: number 
   if (res.length !== 3) {
     return null;
   }
-  const [day, hour, mins] = res;
-  if (day == null || hour == null || mins == null) {
+  const [d, hour, mins] = res;
+  if (d == null || hour == null || mins == null) {
     return null;
   }
-  // safe coercion for day
-  if (day < 0 || day > 6) {
+  const day = numberToDayT(d);
+  if (day == null) {
     return null;
   }
 
-  return { day: day as DayT, hour, mins };
+  return { day: day, hour, mins };
 }
 
 function TimeSelection(): JSX.Element {
@@ -140,11 +140,14 @@ function TimeSelection(): JSX.Element {
       if (sel == null) {
         return [];
       }
-      const day = sel.split("-")[0];
+      const d = sel.split("-")[0];
       const start = ALLOCATION_CALENDAR_TIMES[0];
       const end = ALLOCATION_CALENDAR_TIMES[1];
-      // TODO unsafe
-      return getTimeSlotOptions(Number(day) as DayT, start, 0, end, type === "end");
+      const day = numberToDayT(Number(d));
+      if (day == null) {
+        return [];
+      }
+      return getTimeSlotOptions(day, start, 0, end, type === "end");
     },
     [selection]
   );

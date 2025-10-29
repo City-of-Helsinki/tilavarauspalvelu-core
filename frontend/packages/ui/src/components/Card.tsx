@@ -1,4 +1,4 @@
-import React, { ElementType } from "react";
+import React, { type ElementType } from "react";
 import Link from "next/link";
 import styled from "styled-components";
 import { breakpoints } from "../modules/const";
@@ -397,13 +397,13 @@ function Texts({
 }: Readonly<{
   heading: string;
   headingTestId?: string;
-  headingLevel: number;
+  headingLevel: 1 | 2 | 3 | 4 | 5 | 6;
   text: string;
   textTestId?: string;
   link?: string;
   LinkComponent?: LinkComponent;
 }>) {
-  const headingElement = `h${headingLevel.toString()}` as ElementType;
+  const headingElement: ElementType = `h${headingLevel}`;
   return (
     <TextContainer>
       <WrapWithLink

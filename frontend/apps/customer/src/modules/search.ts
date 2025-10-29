@@ -230,7 +230,7 @@ export async function getSearchOptions(
   );
 
   const municipalities = Object.values(MunicipalityChoice).map((value) => ({
-    label: value as string, // TODO: Translate this
+    label: value.toString(),
     value: value,
   }));
 

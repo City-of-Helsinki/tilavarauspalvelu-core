@@ -84,8 +84,8 @@ export default function MyUnitsPage({ unit, optionsData }: Pick<PropsNarrowed, "
     const isModalOpen = searchParams.get("isModalOpen") === "true";
     if (isModalOpen && cellId) {
       const el = document.querySelector(`[data-testid="${testId}"]`);
-      if (el) {
-        modalCloseRef.current = el as HTMLInputElement;
+      if (el && el instanceof HTMLInputElement) {
+        modalCloseRef.current = el;
       }
     }
   }, [searchParams]);
