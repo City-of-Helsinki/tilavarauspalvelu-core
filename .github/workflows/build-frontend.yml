@@ -23,7 +23,7 @@ jobs:
     name: "Build ui docker"
     uses: ./.github/workflows/build-ui-docker.yml
     with:
-      app-name: "ui"
+      app-name: "customer"
       base-url: ""
     secrets: inherit
 
@@ -31,6 +31,6 @@ jobs:
     name: "Build admin ui docker"
     uses: ./.github/workflows/build-ui-docker.yml
     with:
-      app-name: "admin-ui"
+      app-name: "staff"
       base-url: "/kasittely"
     secrets: inherit
