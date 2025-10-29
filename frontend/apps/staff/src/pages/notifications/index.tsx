@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { gql, useApolloClient } from "@apollo/client";
-import { IconCheck, IconClock, IconPen, IconQuestionCircleFill } from "hds-react";
-import { GetServerSidePropsContext } from "next";
+import { type GetServerSidePropsContext } from "next";
 import { type TFunction, useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
+import { BannerNotificationStatusLabel } from "ui/src/components/statuses";
 import { formatDate, formatTime } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { CenterSpinner, TitleSection, H1 } from "ui/src/styled";
@@ -20,7 +19,6 @@ import { TableLink } from "@/styled";
 import {
   BannerNotificationOrderingChoices,
   type BannerNotificationTableElementFragment,
-  BannerNotificationState,
   UserPermissionChoice,
   BannerNotificationsListDocument,
   type BannerNotificationsListQueryVariables,
@@ -28,38 +26,13 @@ import {
   useBannerNotificationsListQuery,
 } from "@gql/gql-types";
 
-const getStatusLabelProps = (
-  state: BannerNotificationState | null | undefined
-): { type: StatusLabelType; icon: JSX.Element } => {
-  switch (state) {
-    case BannerNotificationState.Draft:
-      return { type: "draft", icon: <IconPen /> };
-    case BannerNotificationState.Scheduled:
-      return { type: "info", icon: <IconClock /> };
-    case BannerNotificationState.Active:
-      return { type: "success", icon: <IconCheck /> };
-    default:
-      return {
-        type: "info",
-        icon: <IconQuestionCircleFill />,
-      };
-  }
-};
-
 // Tila, Nimi, Voimassa alk, Voimassa asti, Kohderyhmä, Tyyppi
 const getColConfig = (t: TFunction) => [
   {
     headerName: t("notification:headings.state"),
     key: "state",
     isSortable: true,
-    transform: (notification: BannerNotificationTableElementFragment) => {
-      const labelProps = getStatusLabelProps(notification.state);
-      return (
-        <StatusLabel type={labelProps.type} icon={labelProps.icon} slim>
-          {t(`notification:state.${notification.state ?? "noState"}`)}
-        </StatusLabel>
-      );
-    },
+    transform: ({ state }: BannerNotificationTableElementFragment) => <BannerNotificationStatusLabel state={state} />,
   },
   {
     headerName: t("notification:headings.name"),

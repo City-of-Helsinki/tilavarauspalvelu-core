@@ -9,9 +9,9 @@ export type Props = {
   testId?: string;
 };
 
-function getReservationStateLabelProps(s: ReservationStateChoice): {
+function getStatusProps(s: ReservationStateChoice): {
   type: StatusLabelType;
-  icon: JSX.Element;
+  icon: React.ReactElement;
 } {
   switch (s) {
     case ReservationStateChoice.Created:
@@ -29,15 +29,14 @@ function getReservationStateLabelProps(s: ReservationStateChoice): {
   }
 }
 
-export function ReservationStatusLabel({ state, testId }: Props): JSX.Element {
+export function ReservationStatusLabel({ state, testId }: Props): React.ReactElement {
   const { t } = useTranslation();
 
-  const statusText = t(`reservation:state.${state}`);
-  const { type, icon } = getReservationStateLabelProps(state);
+  const { type, icon } = getStatusProps(state);
 
   return (
     <StatusLabel type={type} icon={icon} data-testid={testId}>
-      {statusText}
+      {t(`reservation:state.${state}`)}
     </StatusLabel>
   );
 }
