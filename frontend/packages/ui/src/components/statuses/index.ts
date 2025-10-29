@@ -8,3 +8,4 @@ export {
   ReservationUnitPublishingStatusLabel,
   ReservationUnitReservationStatusLabel,
 } from "./ReservationUnitStatusLabel";
+export { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
