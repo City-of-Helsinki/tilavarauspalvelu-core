@@ -4,6 +4,10 @@ import { IconInfoCircle, IconLinkExternal, IconSize } from "hds-react";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import { ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
+import {
+  ReservationUnitPublishingStatusLabel,
+  ReservationUnitReservationStatusLabel,
+} from "ui/src/components/statuses";
 import { breakpoints } from "ui/src/modules/const";
 import { Flex } from "ui/src/styled";
 import { CustomTable } from "@/components/Table";
@@ -14,7 +18,6 @@ import { truncate } from "@/modules/helpers";
 import { getOpeningHoursUrl, getReservationUnitUrl } from "@/modules/urls";
 import { TableLink } from "@/styled";
 import { type ReservationUnitTableElementFragment } from "@gql/gql-types";
-import { ReservationUnitPublishingStatusLabel, ReservationUnitReservationStatusLabel } from "./[pk]/tags";
 
 type ReservationUnitsTableProps = {
   sort: string;

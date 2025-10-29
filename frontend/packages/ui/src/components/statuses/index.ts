@@ -4,3 +4,7 @@ export { OrderStatusLabel } from "./OrderStatusLabel";
 export { BannerNotificationStatusLabel } from "./BannerNotificationStatusLabel";
 export { ApplicationSectionStatusLabel } from "./ApplicationSectionStatusLabel";
 export { AccessCodeStatusLabel } from "./AccessCodeStatusLabel";
+export {
+  ReservationUnitPublishingStatusLabel,
+  ReservationUnitReservationStatusLabel,
+} from "./ReservationUnitStatusLabel";
