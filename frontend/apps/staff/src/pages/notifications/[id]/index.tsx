@@ -6,16 +6,7 @@ import styled from "styled-components";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import {
-  Button,
-  ButtonVariant,
-  IconCheck,
-  IconClock,
-  IconPen,
-  RadioButton,
-  SelectionGroup,
-  TextInput,
-} from "hds-react";
+import { Button, ButtonVariant, RadioButton, SelectionGroup, TextInput } from "hds-react";
 import {
   BannerNotificationState,
   BannerNotificationLevel,
@@ -38,8 +29,8 @@ import {
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { ControlledDateInput } from "ui/src/components/form";
 import { ControlledTimeInput } from "@/components/ControlledTimeInput";
+import { BannerNotificationStatusLabel } from "ui/src/components/statuses";
 import { successToast } from "ui/src/components/toast";
-import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
 import { CenterSpinner, Flex, TitleSection, H1 } from "ui/src/styled";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { useDisplayError } from "ui/src/hooks";
@@ -55,37 +46,6 @@ import { cleanHtmlContent } from "ui/src/components/Sanitize";
 const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {
   ssr: false,
 });
-
-const StyledStatusLabel = styled(StatusLabel)`
-  align-self: center;
-  white-space: nowrap;
-`;
-
-type NotificationStatus = {
-  type: StatusLabelType;
-  icon: JSX.Element;
-};
-
-function BannerNotificationStatusLabel({ state }: { state: BannerNotificationState }) {
-  const statusLabelProps = ((s: BannerNotificationState): NotificationStatus => {
-    switch (s) {
-      case BannerNotificationState.Draft:
-        return { type: "draft", icon: <IconPen /> };
-      case BannerNotificationState.Active:
-        return { type: "success", icon: <IconCheck /> };
-      case BannerNotificationState.Scheduled:
-        return { type: "info", icon: <IconClock /> };
-    }
-  })(state);
-
-  const { t } = useTranslation();
-
-  return (
-    <StyledStatusLabel type={statusLabelProps.type} icon={statusLabelProps.icon}>
-      {t(`notification:state.${state}`)}
-    </StyledStatusLabel>
-  );
-}
 
 const ButtonContainerCommon = styled(Flex).attrs({
   $justifyContent: "space-between",
