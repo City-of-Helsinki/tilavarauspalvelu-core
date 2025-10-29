@@ -1,4 +1,4 @@
-# Build and deploy to the development environment after merging to the main branch.
+# Build and deploy to the test environment after creating a tag with the given pattern.
 
 resources:
   repositories:
@@ -12,15 +12,22 @@ trigger:
   # If another instance of this pipeline is running,
   # wait for it to complete and then run all other changes in a batch.
   batch: true
-  branches:
+  tags:
+    # Trigger when creating tags like v1.0.0, release-1.0.0, hotfix-1.0.0, v1.0.0-ui, v1.0.0-staff,
+    # but not when creating tags like v1.0.0-customer, v1.0.0-core, etc.
     include:
-      - main
+      - "v*"
+      - "release-*"
+      - "hotfix-*"
+    exclude:
+      - "*-customer"
+      - "*-core"
   paths:
     # Should use turborepo to calculate the real needed packages,
     # but currently this is not possible.
     include:
       - packages/common
-      - apps/admin-ui
+      - apps/staff
     exclude:
       - README.md
 
@@ -32,4 +39,4 @@ pool: Default
 
 extends:
   # Filename for pipeline to extend from the Azure DevOps Repository.
-  template: admin-ui-build-dev.yml@tilavarauspalvelu-pipelines
+  template: admin-ui-build-release.yml@tilavarauspalvelu-pipelines

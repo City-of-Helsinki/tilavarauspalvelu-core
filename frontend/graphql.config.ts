@@ -61,28 +61,28 @@ const config: IGraphQLConfig = {
         },
       },
     },
-    "admin-ui": {
+    staff: {
       schema,
-      documents: "apps/admin-ui/**/!(*.d|gql-types).{ts,tsx}",
+      documents: "apps/staff/**/!(*.d|gql-types).{ts,tsx}",
       extensions: {
         codegen: {
           config: gqlConfig,
           generates: {
-            "apps/admin-ui/gql/gql-types.ts": {
+            "apps/staff/gql/gql-types.ts": {
               plugins,
             },
           },
         },
       },
     },
-    ui: {
+    customer: {
       schema,
-      documents: "apps/ui/**/!(*.d|gql-types).{ts,tsx}",
+      documents: "apps/customer/**/!(*.d|gql-types).{ts,tsx}",
       extensions: {
         codegen: {
           config: gqlConfig,
           generates: {
-            "apps/ui/gql/gql-types.ts": {
+            "apps/customer/gql/gql-types.ts": {
               plugins,
             },
           },
