@@ -6,7 +6,7 @@ from decimal import Decimal
 import pytest
 
 from tilavarauspalvelu.enums import PaymentType, PriceUnit
-from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date
 
@@ -278,6 +278,35 @@ def test_reservation_unit__create__pricing__cannot_use_disabled_tax_percentage(g
     ]
 
     assert ReservationUnit.objects.count() == 0
+
+
+def test_reservation_unit__create__pricing__material_pricing_allowed_tags(graphql):
+    graphql.login_with_superuser()
+
+    material_price_description = '<strong>Valid</strong> <a href="https://example.com" target="_blank" rel="">link</a>'
+
+    data = get_create_draft_input_data(
+        pricings=[
+            get_pricing_data(materialPriceDescriptionFi=material_price_description),
+        ],
+    )
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response
+    assert ReservationUnitPricing.objects.first().material_price_description_fi == material_price_description
+
+
+def test_reservation_unit__create__pricing__material_pricing_blocked_tags(graphql):
+    graphql.login_with_superuser()
+    data = get_create_draft_input_data(
+        pricings=[
+            get_pricing_data(materialPriceDescriptionFi="<h1>Title</h1> <script>alert('xss')</script>"),
+        ],
+    )
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response
+    assert ReservationUnitPricing.objects.first().material_price_description_fi == "Title alert('xss')"
 
 
 # Update
