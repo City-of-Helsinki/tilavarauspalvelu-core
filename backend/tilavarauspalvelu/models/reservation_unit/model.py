@@ -10,6 +10,7 @@ from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.db.models import Subquery
 from django.utils.translation import gettext_lazy as _
+from django_nh3.models import Nh3Field
 from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 
@@ -87,12 +88,38 @@ class ReservationUnit(models.Model):
     # Strings
 
     name: str = models.CharField(max_length=255)
-    description: str = models.TextField(blank=True, default="")
-    contact_information: str = models.TextField(blank=True, default="")
-    notes_when_applying: str | None = models.TextField(null=True, blank=True, max_length=2000)
-    reservation_pending_instructions: str = models.TextField(blank=True, default="")
-    reservation_confirmed_instructions: str = models.TextField(blank=True, default="")
-    reservation_cancelled_instructions: str = models.TextField(blank=True, default="")
+    description: str = Nh3Field(
+        blank=True,
+        default="",
+        tags=settings.NH3_ALLOWED_TAGS,
+        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+    )
+    contact_information: str = Nh3Field(blank=True, default="")
+    notes_when_applying: str | None = Nh3Field(
+        null=True,
+        blank=True,
+        max_length=2000,
+        tags=settings.NH3_ALLOWED_TAGS,
+        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+    )
+    reservation_pending_instructions: str = Nh3Field(
+        blank=True,
+        default="",
+        tags=settings.NH3_ALLOWED_TAGS,
+        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+    )
+    reservation_confirmed_instructions: str = Nh3Field(
+        blank=True,
+        default="",
+        tags=settings.NH3_ALLOWED_TAGS,
+        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+    )
+    reservation_cancelled_instructions: str = Nh3Field(
+        blank=True,
+        default="",
+        tags=settings.NH3_ALLOWED_TAGS,
+        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+    )
 
     # Integers
 
