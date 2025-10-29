@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django_nh3.models import Nh3Field
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.enums import PaymentType, PriceUnit
@@ -39,7 +40,15 @@ class ReservationUnitPricing(models.Model):
     lowest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     highest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
-    material_price_description: str = models.CharField(max_length=100, blank=True, default="")
+    material_price_description: str = Nh3Field(
+        max_length=500,
+        blank=True,
+        default="",
+        tags={"a", "strong"},
+        attributes={
+            "a": {"href", "target"},
+        },
+    )
 
     tax_percentage: TaxPercentage = models.ForeignKey(
         "tilavarauspalvelu.TaxPercentage",
