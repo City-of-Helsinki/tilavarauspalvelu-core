@@ -1,9 +1,10 @@
 import React from "react";
 import { type Control, Controller, UseFormReturn } from "react-hook-form";
 import { addDays, startOfDay } from "date-fns";
-import { IconAlertCircleFill, RadioButton, TextInput } from "hds-react";
+import { IconAlertCircleFill, RadioButton } from "hds-react";
 import { capitalize } from "lodash-es";
 import { useTranslation } from "next-i18next";
+import dynamic from "next/dynamic";
 import styled from "styled-components";
 import {
   ControlledDateInput,
@@ -17,6 +18,10 @@ import { PaymentType, PriceUnit } from "@gql/gql-types";
 import { FieldGroup } from "./FieldGroup";
 import { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
+
+const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {
+  ssr: false,
+});
 
 const FuturePricingContainer = styled(Flex)<{ $toggled: boolean }>`
   padding-block: var(--spacing-s);
@@ -311,13 +316,11 @@ function MaterialPricingDescription({ control, language, index, helperText }: De
       name={`pricings.${index}.materialPriceDescription${capitalize(language)}`}
       control={control}
       render={({ field: { value, onChange }, fieldState: { error } }) => (
-        <TextInput
+        <RichTextInput
           id={label + index}
-          name={`pricings.${index}.materialPriceDescription${capitalize(language)}`}
-          errorText={getTranslatedError(t, error?.message)} //errors.pricingTerms?.message)}
-          invalid={getTranslatedError(t, error?.message) != null} //errors.pricingTerms?.message)}
+          errorText={getTranslatedError(t, error?.message)}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(val) => onChange(val)}
           required
           label={label}
           helperText={helperText}

@@ -51,6 +51,7 @@ const ErrorText = styled.span`
 const StyledReactQuill = styled(ReactQuill)<{
   $error?: boolean;
 }>`
+  background: var(--color-white);
   border: 2px solid ${({ $error }) => ($error ? "var(--color-error)" : "var(--color-black-50)")};
   > div {
     font-size: var(--fontsize-body-l);
