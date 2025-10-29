@@ -16,6 +16,8 @@ concurrency:
 
 env:
   PYTHON_VERSION: 3.13
+  NODE_VERSION: 24
+  PNPM_VERSION: 10
 
 jobs:
 
@@ -69,17 +71,22 @@ jobs:
 
       - name: "Install pnpm"
         uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
 
       - name: "Install Node"
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}
+          cache-dependency-path: frontend/pnpm-lock.yaml
           cache: "pnpm"
 
       - name: "Install frontend dependencies"
+        working-directory: frontend
         run: pnpm install --frozen-lockfile
 
       - name: "Pick queries from frontend files"
+        working-directory: frontend
         run: pnpm gql-pluck
 
       - name: "Defragment frontend queries"

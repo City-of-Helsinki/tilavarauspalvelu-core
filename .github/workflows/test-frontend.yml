@@ -13,6 +13,8 @@ concurrency:
 
 env:
   SKIP_ENV_VALIDATION: "true"
+  NODE_VERSION: 24
+  PNPM_VERSION: 10
 
 jobs:
   # Disabled because it broke, and no idea why.
@@ -28,15 +30,25 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+
       - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
       - uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: ${{ env.NODE_VERSION }}
+          cache-dependency-path: frontend/pnpm-lock.yaml
           cache: "pnpm"
+
       - name: Install dependencies
+        working-directory: frontend
         run: pnpm install --frozen-lockfile
+
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+
       - name: Lint admin ui
+        working-directory: frontend
         run: |
           pnpm codegen
           pnpm tsc:check --filter=admin-ui...
@@ -52,15 +64,25 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+
       - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
       - uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: ${{ env.NODE_VERSION }}
+          cache-dependency-path: frontend/pnpm-lock.yaml
           cache: "pnpm"
+
       - name: Install dependencies
+        working-directory: frontend
         run: pnpm install --frozen-lockfile
+
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+
       - name: Test admin ui
+        working-directory: frontend
         run: |
           pnpm codegen
           pnpm test --filter=admin-ui...
@@ -73,15 +95,25 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+
       - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
       - uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: ${{ env.NODE_VERSION }}
+          cache-dependency-path: frontend/pnpm-lock.yaml
           cache: "pnpm"
+
       - name: Install dependencies
+        working-directory: frontend
         run: pnpm install --frozen-lockfile
+
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+
       - name: Lint ui
+        working-directory: frontend
         run: |
           pnpm codegen
           pnpm tsc:check --filter=ui...
@@ -97,15 +129,25 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
+
       - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
       - uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: ${{ env.NODE_VERSION }}
+          cache-dependency-path: frontend/pnpm-lock.yaml
           cache: "pnpm"
+
       - name: Install dependencies
+        working-directory: frontend
         run: pnpm install --frozen-lockfile
+
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+
       - name: Test ui
+        working-directory: frontend
         run: |
           pnpm codegen
           pnpm test --filter=ui...
