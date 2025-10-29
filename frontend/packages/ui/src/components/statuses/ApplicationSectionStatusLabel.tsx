@@ -1,6 +1,6 @@
 import React from "react";
 import { ApplicationSectionStatusChoice } from "../../../gql/gql-types";
-import StatusLabel, { type StatusLabelType } from "../StatusLabel";
+import { StatusLabel, type StatusLabelType } from "../StatusLabel";
 import { IconArrowBottomRight, IconCheck, IconCogwheel, IconCross, IconQuestionCircleFill } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { UserTypeChoice } from "../../modules/urlBuilder";

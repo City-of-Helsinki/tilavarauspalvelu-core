@@ -8,7 +8,7 @@ import { useSession } from "@/hooks";
 import { NewReservationModal } from "@/components/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
 import { H6 } from "ui/src/styled";
-import StatusLabel from "ui/src/components/StatusLabel";
+import { StatusLabel } from "ui/src/components/StatusLabel";
 import { gql } from "@apollo/client";
 import { formatDate } from "ui/src/modules/date-utils";
 import { hasPermission } from "@/modules/permissionHelper";

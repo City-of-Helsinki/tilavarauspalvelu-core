@@ -2,7 +2,7 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
-import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, IconLock, Notification } from "hds-react";
+import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { Flex, fontRegular, H1, H4, NoWrap } from "ui/src/styled";
 import { breakpoints } from "ui/src/modules/const";
@@ -49,14 +49,13 @@ import {
 import { useToastIfQueryParam } from "ui/src/hooks";
 import { convertLanguageCode } from "ui/src/modules/util";
 import { gql } from "@apollo/client";
-import StatusLabel from "ui/src/components/StatusLabel";
 import IconButton from "ui/src/components/IconButton";
 import { LabelValuePair } from "@/components/LabelValuePair";
 import { ReservationInfoCard, SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
 import { PaymentNotification, TermsInfoSection, Instructions, NotModifiableReason } from "@/lib/reservation/[id]";
 import { useSearchParams } from "next/navigation";
 import { queryOptions } from "@/modules/queryOptions";
-import { ReservationStatusLabel, OrderStatusLabel } from "ui/src/components/statuses";
+import { AccessCodeStatusLabel, OrderStatusLabel, ReservationStatusLabel } from "ui/src/components/statuses";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -266,15 +265,7 @@ function Reservation({
               {normalizedOrderStatus && (
                 <OrderStatusLabel status={normalizedOrderStatus} testId="reservation__payment-status" />
               )}
-              {shouldShowAccessCode && (
-                <StatusLabel
-                  type="info"
-                  icon={<IconLock aria-hidden="false" aria-label={t(`reservationUnit:accessType`)} />}
-                  data-testid="reservation__access-code"
-                >
-                  {t("reservationUnit:accessTypes.ACCESS_CODE")}
-                </StatusLabel>
-              )}
+              {shouldShowAccessCode && <AccessCodeStatusLabel />}
             </Flex>
           </Flex>
           <SubHeading>

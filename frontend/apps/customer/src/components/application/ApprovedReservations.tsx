@@ -37,8 +37,8 @@ import { filterNonNullable, formatApiTimeInterval, getLocalizationLang, sort, to
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { convertWeekday } from "ui/src/modules/conversion";
 import { PopupMenu } from "ui/src/components/PopupMenu";
-import { IconButton, StatusLabel } from "ui/src/components";
-import type { StatusLabelType } from "ui/src/components/StatusLabel";
+import { IconButton } from "ui/src/components";
+import { StatusLabel, type StatusLabelType } from "ui/src/components/StatusLabel";
 import { Sanitize } from "ui/src/components/Sanitize";
 import {
   type ApplicationSectionReservationFragment,
@@ -584,6 +584,7 @@ function getReservationSeriesAccessText(reservationUnit: ReservationSeriesTableE
   }
 }
 
+type ApprovedReservationStatus = "" | "rejected" | "modified" | "cancelled";
 type ReservationsTableElem = {
   date: Date;
   dayOfWeek: string;
@@ -596,7 +597,7 @@ type ReservationsTableElem = {
   accessTypeChanged?: boolean;
   accessCodeTime?: string | null;
   pindoraInfo?: PindoraReservationFragment | null;
-  status: "" | "rejected" | "modified" | "cancelled";
+  status: ApprovedReservationStatus;
   isCancellableReason: ReservationCancellableReason;
   pk: number;
 };
@@ -656,28 +657,32 @@ const StyledStatusLabel = styled(StatusLabel)`
   }
 `;
 
-function getStatusLabelProps(status: string): {
+function getStatusLabelProps(status: ApprovedReservationStatus): {
   icon: JSX.Element;
   type: StatusLabelType;
 } {
   switch (status) {
     case "cancelled":
-      return {
-        icon: <IconCross />,
-        type: "neutral",
-      };
+      return { icon: <IconCross />, type: "neutral" };
     case "modified":
-      return {
-        icon: <IconPen />,
-        type: "neutral",
-      };
-    case "denied":
+      return { icon: <IconPen />, type: "neutral" };
+    case "rejected":
     default:
-      return {
-        icon: <IconCross />,
-        type: "error",
-      };
+      return { icon: <IconCross />, type: "error" };
   }
+}
+
+function ApprovedReservationStatus({ status }: { status: ApprovedReservationStatus }): React.ReactElement | undefined {
+  const { t } = useTranslation();
+  if (status === "") {
+    return undefined;
+  }
+  const labelProps = getStatusLabelProps(status);
+  return (
+    <StyledStatusLabel icon={labelProps.icon} type={labelProps.type}>
+      {t(`application:view.reservationsTab.${status}`)}
+    </StyledStatusLabel>
+  );
 }
 
 const StyledTooltip = styled(Tooltip)`
@@ -790,17 +795,7 @@ function ReservationsTable({
       key: "status",
       headerName: "",
       isSortable: false,
-      transform: ({ status }: ReservationsTableElem) => {
-        if (status === "") {
-          return "";
-        }
-        const labelProps = getStatusLabelProps(status);
-        return (
-          <StyledStatusLabel icon={labelProps.icon} type={labelProps.type}>
-            {t(`application:view.reservationsTab.${status}`)}
-          </StyledStatusLabel>
-        );
-      },
+      transform: ({ status }: ReservationsTableElem) => <ApprovedReservationStatus status={status} />,
     },
     {
       key: "cancelButton",

@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { ReservationStateChoice } from "../../../gql/gql-types";
 import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen } from "hds-react";
-import StatusLabel, { type StatusLabelType } from "../StatusLabel";
+import { StatusLabel, type StatusLabelType } from "../StatusLabel";
 
 export type Props = {
   state: ReservationStateChoice;

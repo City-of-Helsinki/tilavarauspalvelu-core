@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconCheck, IconClock, IconPen } from "hds-react";
-import StatusLabel, { type StatusLabelType } from "../StatusLabel";
+import { StatusLabel, type StatusLabelType } from "../StatusLabel";
 import { BannerNotificationState } from "../../../gql/gql-types";
 
 const StyledStatusLabel = styled(StatusLabel)`
