@@ -34,9 +34,10 @@ import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
 import { gql } from "@apollo/client";
 import { PinkBox as PinkBoxBase } from "@/components/reservation/styles";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { ReservationPageWrapper, ReservationStepper, ReservationTitleSection } from "@/styled/reservation";
+import { ReservationPageWrapper, ReservationTitleSection } from "@/styled/reservation";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
 import { useSearchParams } from "next/navigation";
+import { StyledStepper } from "@/styled/util";
 
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
   grid-column: 1 / -1;
@@ -166,7 +167,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
          * TODO why isn't this shown when creating a paid version? I think there was on purpose reason for that? maybe?
          */}
         {steps.length <= 2 && (
-          <ReservationStepper
+          <StyledStepper
             language={i18n.language}
             selectedStep={step}
             style={{ width: "100%" }}

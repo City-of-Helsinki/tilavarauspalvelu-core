@@ -1,7 +1,8 @@
 import { fontMedium, fontRegular } from "ui/src/styled";
-import { Button } from "hds-react";
+import { Button, Stepper } from "hds-react";
 import Link from "next/link";
 import styled from "styled-components";
+import { breakpoints } from "@ui/modules/const";
 
 export const pixel = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
 
@@ -31,5 +32,19 @@ export const InlineStyledLink = styled(Link)`
     color: var(--color-black);
     text-decoration: underline;
     ${fontRegular};
+  }
+`;
+
+export const StyledStepper = styled(Stepper)`
+  /* HDS uses fixed width for the stepper content, make sure it's long enough for all variations (single line). */
+  & {
+    --hds-step-width: 155px;
+  }
+  /* HDS stepper line breaks aggressively while adding extra white space */
+  p {
+    white-space: nowrap;
+    @media (max-width: ${breakpoints.m}) {
+      white-space: unset;
+    }
   }
 `;

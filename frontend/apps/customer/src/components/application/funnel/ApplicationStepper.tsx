@@ -1,5 +1,5 @@
 import React from "react";
-import { Stepper as HDSStepper, StepState } from "hds-react";
+import { StepState } from "hds-react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { type ApplicationFormFragment } from "@gql/gql-types";
@@ -7,8 +7,7 @@ import { type ReadonlyDeep } from "ui/src/modules/helpers";
 import { validateApplication } from "./form";
 import { isSent } from "@/modules/util";
 import { getApplicationPath } from "@/modules/urls";
-import styled from "styled-components";
-import { breakpoints } from "ui/src/modules/const";
+import { StyledStepper } from "@/styled/util";
 
 // Ordered list of steps by page slug
 export const PAGES_WITH_STEPPER = ["page1", "page2", "page3", "page4"] as const;
@@ -40,16 +39,6 @@ function calculateAvailableStep(application: ReadonlyDeep<ApplicationFormFragmen
   }
   return StepState.disabled;
 }
-
-const StyledStepper = styled(HDSStepper)`
-  p {
-    /* HDS stepper line breaks aggressively while adding extra white space */
-    white-space: nowrap;
-    @media (max-width: ${breakpoints.m}) {
-      white-space: unset;
-    }
-  }
-`;
 
 type StepperProps = {
   application: ReadonlyDeep<ApplicationFormFragment>;

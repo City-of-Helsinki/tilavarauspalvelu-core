@@ -21,11 +21,12 @@ import { useForm } from "react-hook-form";
 import { EditStep0 } from "@/components/reservation/EditStep0";
 import { EditStep1 } from "@/components/reservation/EditStep1";
 import { PendingReservationFormSchema, type PendingReservationFormType } from "@/components/reservation-unit/schema";
-import { ReservationPageWrapper, ReservationStepper, ReservationTitleSection } from "@/styled/reservation";
+import { ReservationPageWrapper, ReservationTitleSection } from "@/styled/reservation";
 import { queryOptions } from "@/modules/queryOptions";
 import { isReservationEditable, transformReservation } from "@/modules/reservation";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { StyledStepper } from "@/styled/util";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -83,7 +84,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
     <ReservationPageWrapper $nRows={5}>
       <ReservationTitleSection>
         <H1 $marginTop="none">{t(title)}</H1>
-        <ReservationStepper language={i18n.language} selectedStep={step} onStepClick={handleStepClick} steps={steps} />
+        <StyledStepper language={i18n.language} selectedStep={step} onStepClick={handleStepClick} steps={steps} />
       </ReservationTitleSection>
       {step === 0 ? (
         <EditStep0 reservation={reservation} reservationForm={form} nextStep={() => setStep(1)} />
