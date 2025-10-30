@@ -1,6 +1,6 @@
 import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
 import styled from "styled-components";
-import { breakpoints } from "../modules/const";
+import { breakpoints } from "@ui/modules/const";
 
 export const NoWrap = styled.span`
   white-space: nowrap;

@@ -6,7 +6,7 @@
   "sideEffects": [
     "**/*.css"
   ],
-  "main": "./index.ts",
+  "main": "./src/index.ts",
   "types": "./dist/index.d.ts",
   "scripts": {
     "lint": "oxlint . -c ../../.oxlintrc.json",

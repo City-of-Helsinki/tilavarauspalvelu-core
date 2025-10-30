@@ -3,7 +3,11 @@
   "compilerOptions": {
     "plugins": [{ "name": "next" }],
     "module": "esnext",
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@ui/*": ["./src/*"]
+    }
   },
   "exclude": ["node_modules/"],
   "include": [
