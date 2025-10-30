@@ -70,7 +70,7 @@
   "showBirthDate": "Näytä",
   "alreadyEnded": "Päättynyt",
   "keylessEntryHeader": "Avaimeton kulku",
-  "dueByParenthesis": "(määräaika {{date}})",
+  "dueBy": "määräaika {{date}}",
   "DenyDialog": {
     "reject": "Hylkää varaus",
     "denyReason": "Hylkäyksen syy",

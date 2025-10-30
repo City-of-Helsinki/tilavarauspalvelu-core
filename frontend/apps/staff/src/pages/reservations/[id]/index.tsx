@@ -16,9 +16,10 @@ import { StickyHeader } from "@/components/StickyHeader";
 import { ReservationWorkingMemo } from "@/components/WorkingMemo";
 import {
   createTagString,
+  formatReservationPriceLong,
   getName,
   getReservationUnitPricing,
-  reservationPrice,
+  formatReservationPrice,
   translateReservationCustomerType,
 } from "@/modules/reservation";
 import VisibleIfPermission from "@/components/VisibleIfPermission";
@@ -34,7 +35,6 @@ import {
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
 import { createNodeId, ignoreMaybeArray, isPriceFree, toNumber } from "ui/src/modules/helpers";
 import { formatAgeGroup } from "@/modules/util";
-import { formatDateTime } from "ui/src/modules/date-utils";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
@@ -129,15 +129,7 @@ function ReservationSummary({
       )}
       {!isFree && (
         <DataWrapper isSummary label={t("reservation:price")}>
-          {`${reservationPrice(reservation, t)}${
-            reservation.paymentOrder?.handledPaymentDueBy
-              ? ` ${t("reservation.dueByParenthesis", {
-                  date: formatDateTime(new Date(reservation.paymentOrder.handledPaymentDueBy), {
-                    includeTimeSeparator: true,
-                  }),
-                })}`
-              : ""
-          }${reservation.applyingForFreeOfCharge ? `, ${t("reservation:appliesSubvention")}` : ""}`}
+          {formatReservationPriceLong(t, reservation)}
         </DataWrapper>
       )}
       {reservation.state === ReservationStateChoice.Cancelled && (
@@ -257,7 +249,7 @@ function ReservationPricingDetailsAccordion({
     <Accordion id="reservation__pricing-details" heading={t("reservation:pricingDetails")}>
       <ApplicationDatas>
         <DataWrapper label={t("reservation:price")}>
-          {reservation.price && reservationPrice(reservation, t)}
+          {reservation.price && formatReservationPrice(t, reservation)}
         </DataWrapper>
         <DataWrapper label={t("reservation:paymentState")}>
           {reservation.paymentOrder?.status == null
