@@ -20,9 +20,7 @@ export const BlackButton = styled(Button)`
 
 /// Used for making a reservation, scales the button to max container width
 export const SubmitButton = styled(Button)`
-  && {
-    width: 100%;
-  }
+  flex-grow: 1;
 `;
 
 // TODO there should be other link styles combine this with them
