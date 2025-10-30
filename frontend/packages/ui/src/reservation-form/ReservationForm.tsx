@@ -54,7 +54,11 @@ const Subheading = styled(H4).attrs({ as: "h2" })`
   margin: 0;
 `;
 
-export function ReservationFormGeneralSection({ reservationUnit, options, data }: ReservationFormGeneralSectionProps) {
+export function ReservationFormGeneralSection({
+  reservationUnit,
+  options,
+  data,
+}: ReservationFormGeneralSectionProps): React.ReactElement | null {
   const { t } = useTranslation();
   const form = useFormContext<ReservationFormValueT>();
   const {
@@ -65,7 +69,7 @@ export function ReservationFormGeneralSection({ reservationUnit, options, data }
 
   const fields = getFilteredGeneralFields(reservationUnit.reservationForm);
 
-  if (fields.length === 0) {
+  if (fields.length === 0 && !data?.enableSubvention) {
     return null;
   }
 
@@ -159,7 +163,7 @@ export function ReservationFormReserveeSection({
   reservationUnit,
   style,
   className,
-}: ReservationFormReserveeSectionProps) {
+}: ReservationFormReserveeSectionProps): React.ReactElement {
   const form = useFormContext<ReservationFormValueT>();
   const {
     watch,
