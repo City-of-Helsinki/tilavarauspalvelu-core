@@ -30,7 +30,7 @@ import {
   IndividualForm,
   OrganisationForm,
 } from "@/components/application/funnel/";
-import { FormSubHeading } from "@/components/application/funnel/styled";
+import { FormSubHeading } from "@/styled/application";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";

@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { FormSubHeading } from "./styled";
+import { FormSubHeading } from "@/styled/application";
 import { ApplicationFormTextInput } from ".";
 
 export function BillingAddress() {

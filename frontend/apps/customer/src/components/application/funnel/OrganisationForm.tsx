@@ -5,7 +5,7 @@ import { MunicipalityChoice } from "@gql/gql-types";
 import { ControlledCheckbox, ControlledSelect } from "ui/src/components/form";
 import { ApplicationFormTextInput, BillingAddress, ContactPersonSection } from ".";
 import { type ApplicationPage3FormValues } from "./form";
-import { FormSubHeading } from "./styled";
+import { FormSubHeading } from "@/styled/application";
 
 export function OrganisationForm(): JSX.Element {
   const { t } = useTranslation();

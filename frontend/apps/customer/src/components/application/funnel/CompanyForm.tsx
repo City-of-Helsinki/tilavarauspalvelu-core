@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { ControlledCheckbox } from "ui/src/components/form";
-import { FormSubHeading } from "./styled";
+import { FormSubHeading } from "@/styled/application";
 import { type ApplicationPage3FormValues } from "./form";
 import { ApplicationFormTextInput, BillingAddress } from ".";
 

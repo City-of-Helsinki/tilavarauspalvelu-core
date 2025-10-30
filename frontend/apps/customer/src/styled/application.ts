@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Notification } from "hds-react";
-import { fontMedium, fontRegular, Flex } from "ui/src/styled";
+import { fontMedium, fontRegular, Flex, FullRow, H5 } from "ui/src/styled";
 import { breakpoints } from "ui/src/modules/const";
 
 export const StyledNotification = styled(Notification)`
@@ -161,4 +161,11 @@ export const ScheduleDay = styled.div`
   span:last-child {
     padding-left: var(--spacing-xs);
   }
+`;
+
+export const SpanFullRow = styled(FullRow).attrs({ as: "span" })``;
+
+export const FormSubHeading = styled(H5).attrs({ as: "h2" })`
+  margin: 0;
+  grid-column: 1 / -1;
 `;

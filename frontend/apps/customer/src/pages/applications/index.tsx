@@ -13,7 +13,7 @@ import {
   ApplicationOrderingChoices,
 } from "@gql/gql-types";
 import { filterNonNullable } from "ui/src/modules/helpers";
-import { ApplicationsGroup } from "@/components/application";
+import { ApplicationsGroup } from "@/lib/applications";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { useCurrentUser } from "@/hooks";

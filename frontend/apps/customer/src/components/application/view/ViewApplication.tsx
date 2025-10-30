@@ -2,8 +2,9 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { ApplicationStatusChoice, type ApplicationViewFragment } from "@gql/gql-types";
 import { gql } from "@apollo/client";
-import { ApplicationSection, ApplicationSectionHeader, StyledNotification } from "./styled";
-import { ApplicantInfoPreview, ApplicationSectionList } from ".";
+import { ApplicationSection, ApplicationSectionHeader, StyledNotification } from "@/styled/application";
+import { ApplicantInfoPreview } from "./ApplicantInfoPreview";
+import { ApplicationSectionList } from "./ApplicationSectionList";
 
 type ViewApplicationProps = {
   application: ApplicationViewFragment;
