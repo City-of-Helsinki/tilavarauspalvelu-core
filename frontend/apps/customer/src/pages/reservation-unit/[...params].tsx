@@ -50,10 +50,9 @@ const StyledReservationInfoCard = styled(ReservationInfoCard)`
 
 const PinkBox = styled(PinkBoxBase)`
   grid-column: 1 / -1;
-  grid-row: 4;
+  grid-row: auto;
   @media (min-width: ${breakpoints.m}) {
     grid-column: span 1 / -1;
-    grid-row: 3;
   }
 `;
 
@@ -143,42 +142,44 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     return <NextError statusCode={404} />;
   }
 
+  // If steps > 2 then it requires payment but the payment provider has a separate stepper so hide ours
+  const shouldShowStepper = steps.length <= 2;
+
   return (
-    <ReservationPageWrapper>
+    <>
       <TimeZoneNotification />
-      <StyledReservationInfoCard
-        reservation={reservation}
-        bgColor="gold"
-        shouldDisplayReservationUnitPrice={shouldDisplayReservationUnitPrice}
-      />
-      {notesWhenReserving && (
-        <PinkBox>
-          <H4 as="h2" $marginTop="none">
-            {t("reservations:reservationInfoBoxHeading")}
-          </H4>
-          <Sanitize html={notesWhenReserving} />
-        </PinkBox>
-      )}
-      <ReservationTitleSection>
-        <H1 $noMargin>{pageTitle}</H1>
-        {/* TODO what's the logic here?
-         * in what case are there more than 2 steps?
-         * why do we not show that?
-         * TODO why isn't this shown when creating a paid version? I think there was on purpose reason for that? maybe?
-         */}
-        {steps.length <= 2 && (
-          <StyledStepper
-            language={i18n.language}
-            selectedStep={step}
-            style={{ width: "100%" }}
-            onStepClick={handleStepClick}
-            steps={steps}
-          />
+      <ReservationPageWrapper>
+        <StyledReservationInfoCard
+          reservation={reservation}
+          bgColor="gold"
+          shouldDisplayReservationUnitPrice={shouldDisplayReservationUnitPrice}
+        />
+        {notesWhenReserving && (
+          <PinkBox>
+            <H4 as="h2" $marginTop="none">
+              {t("reservations:reservationInfoBoxHeading")}
+            </H4>
+            <Sanitize html={notesWhenReserving} />
+          </PinkBox>
         )}
-      </ReservationTitleSection>
-      {step === 0 && <Step0 reservation={reservation} cancelReservation={cancelReservation} options={props.options} />}
-      {step === 1 && <Step1 reservation={reservation} options={props.options} requiresPayment={steps.length > 2} />}
-    </ReservationPageWrapper>
+        <ReservationTitleSection>
+          <H1 $noMargin>{pageTitle}</H1>
+          {shouldShowStepper && (
+            <StyledStepper
+              language={i18n.language}
+              selectedStep={step}
+              style={{ width: "100%" }}
+              onStepClick={handleStepClick}
+              steps={steps}
+            />
+          )}
+        </ReservationTitleSection>
+        {step === 0 && (
+          <Step0 reservation={reservation} cancelReservation={cancelReservation} options={props.options} />
+        )}
+        {step === 1 && <Step1 reservation={reservation} options={props.options} requiresPayment={steps.length > 2} />}
+      </ReservationPageWrapper>
+    </>
   );
 }
 

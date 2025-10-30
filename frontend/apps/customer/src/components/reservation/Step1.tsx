@@ -15,6 +15,7 @@ import { getCheckoutUrl } from "@/modules/reservation";
 import { useRouter } from "next/router";
 import { gql } from "@apollo/client";
 import { isNotFoundError } from "@ui/modules/apolloUtils";
+import { Flex } from "@ui/styled";
 
 type NodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
@@ -94,34 +95,36 @@ export function Step1({ reservation, options, requiresPayment }: Props): JSX.Ele
 
   return (
     <NewReservationForm onSubmit={handleSubmit(onSubmit)} noValidate>
-      <SummaryGeneralFields reservation={reservation} options={options} />
-      <SummaryReserveeFields reservation={reservation} options={options} />
-      <AcceptTerms
-        reservationUnit={reservation.reservationUnit}
-        isTermsAccepted={isTermsAccepted}
-        setIsTermsAccepted={handleTermsAcceptedChange}
-      />
-      <ActionContainer>
-        <Button
-          type="submit"
-          variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
-          iconEnd={isSubmitting ? <LoadingSpinner small /> : undefined}
-          data-testid="reservation__button--continue"
-          disabled={!areTermsAccepted || isSubmitting}
-        >
-          {requiresPayment
-            ? t("notification:waitingForPayment.continueButton")
-            : t("reservationCalendar:makeReservation")}
-        </Button>
-        <Button
-          variant={ButtonVariant.Secondary}
-          iconStart={<IconArrowLeft />}
-          onClick={handleBack}
-          data-testid="reservation__button--prev"
-        >
-          {t("common:prev")}
-        </Button>
-      </ActionContainer>
+      <Flex>
+        <SummaryGeneralFields reservation={reservation} options={options} />
+        <SummaryReserveeFields reservation={reservation} options={options} />
+        <AcceptTerms
+          reservationUnit={reservation.reservationUnit}
+          isTermsAccepted={isTermsAccepted}
+          setIsTermsAccepted={handleTermsAcceptedChange}
+        />
+        <ActionContainer>
+          <Button
+            type="submit"
+            variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
+            iconEnd={isSubmitting ? <LoadingSpinner small /> : undefined}
+            data-testid="reservation__button--continue"
+            disabled={!areTermsAccepted || isSubmitting}
+          >
+            {requiresPayment
+              ? t("notification:waitingForPayment.continueButton")
+              : t("reservationCalendar:makeReservation")}
+          </Button>
+          <Button
+            variant={ButtonVariant.Secondary}
+            iconStart={<IconArrowLeft />}
+            onClick={handleBack}
+            data-testid="reservation__button--prev"
+          >
+            {t("common:prev")}
+          </Button>
+        </ActionContainer>
+      </Flex>
     </NewReservationForm>
   );
 }
