@@ -228,7 +228,7 @@ describe("isStartTimeValid", () => {
   test("YES for 15 min intervals", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const start = addHours(date, 9);
-    const interval = ReservationStartInterval.Interval_15Mins;
+    const interval = ReservationStartInterval.Interval_15Minutes;
     const reservableTimes = createMockReservableTimes();
     expect(isStartTimeValid(start, reservableTimes, interval)).toBe(true);
   });
@@ -236,35 +236,35 @@ describe("isStartTimeValid", () => {
   test("YES for 30 min intervals", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const start = addHours(date, 9);
-    const interval = ReservationStartInterval.Interval_30Mins;
+    const interval = ReservationStartInterval.Interval_30Minutes;
     const reservableTimes = createMockReservableTimes();
     expect(isStartTimeValid(start, reservableTimes, interval)).toBe(true);
   });
   test("YES for 60 min intervals", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const start = addHours(date, 9);
-    const interval = ReservationStartInterval.Interval_60Mins;
+    const interval = ReservationStartInterval.Interval_60Minutes;
     const reservableTimes = createMockReservableTimes();
     expect(isStartTimeValid(start, reservableTimes, interval)).toBe(true);
   });
   test("NO for 60 min intervals", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const start = addHours(date, 9.5);
-    const interval = ReservationStartInterval.Interval_60Mins;
+    const interval = ReservationStartInterval.Interval_60Minutes;
     const reservableTimes = createMockReservableTimes();
     expect(isStartTimeValid(start, reservableTimes, interval)).toBe(false);
   });
   test("YES for 120 min intervals", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const start = addHours(date, 10);
-    const interval = ReservationStartInterval.Interval_120Mins;
+    const interval = ReservationStartInterval.Interval_120Minutes;
     const reservableTimes = createMockReservableTimes();
     expect(isStartTimeValid(start, reservableTimes, interval)).toBe(true);
   });
   test("NO for 120 min intervals", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const start = addHours(date, 9);
-    const interval = ReservationStartInterval.Interval_120Mins;
+    const interval = ReservationStartInterval.Interval_120Minutes;
     const reservableTimes = createMockReservableTimes();
     expect(isStartTimeValid(start, reservableTimes, interval)).toBe(false);
   });
@@ -347,7 +347,7 @@ describe("isRangeReservable", () => {
     const input = createInput({
       start: addHours(date, 9),
       end: addHours(date, 10),
-      interval: ReservationStartInterval.Interval_120Mins,
+      interval: ReservationStartInterval.Interval_120Minutes,
     });
     expect(isRangeReservable(input)).toBe(false);
   });
@@ -357,7 +357,7 @@ describe("isRangeReservable", () => {
     const input = createInput({
       start: addHours(date, 10),
       end: addHours(date, 12),
-      interval: ReservationStartInterval.Interval_120Mins,
+      interval: ReservationStartInterval.Interval_120Minutes,
     });
     expect(isRangeReservable(input)).toBe(true);
   });
@@ -367,7 +367,7 @@ describe("isRangeReservable", () => {
     const input = createInput({
       start: addHours(date, 11),
       end: addHours(date, 13),
-      interval: ReservationStartInterval.Interval_120Mins,
+      interval: ReservationStartInterval.Interval_120Minutes,
     });
     expect(isRangeReservable(input)).toBe(false);
   });
@@ -377,7 +377,7 @@ describe("isRangeReservable", () => {
     const input = createInput({
       start: addHours(date, 10),
       end: addHours(date, 13),
-      interval: ReservationStartInterval.Interval_120Mins,
+      interval: ReservationStartInterval.Interval_120Minutes,
     });
     expect(isRangeReservable(input)).toBe(false);
   });

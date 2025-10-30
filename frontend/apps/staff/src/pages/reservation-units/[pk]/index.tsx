@@ -216,11 +216,11 @@ function ReservationUnitEditor({
       label: n.value,
     })
   );
-  const pricingTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.PricingTerms);
+  const pricingTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.Pricing);
 
-  const serviceSpecificTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.ServiceTerms);
-  const paymentTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.PaymentTerms);
-  const cancellationTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.CancellationTerms);
+  const serviceSpecificTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.Service);
+  const paymentTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.Payment);
+  const cancellationTermsOptions = makeTermsOptions(parametersData, TermsOfUseTypeChoices.Cancellation);
 
   const cancellationRuleOptions = filterNonNullable(
     parametersData?.reservationUnitCancellationRules?.edges.map((e) => e?.node)

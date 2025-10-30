@@ -44,7 +44,7 @@ function createMockReservationUnit({
     bufferTimeBefore: 0,
     bufferTimeAfter: 0,
     id: "123f4w90",
-    reservationStartInterval: ReservationStartInterval.Interval_15Mins,
+    reservationStartInterval: ReservationStartInterval.Interval_15Minutes,
     reservationBeginsAt: addDays(new Date(), -1).toISOString(),
     reservationsMinDaysBefore,
     reservationsMaxDaysBefore: null,
@@ -128,19 +128,19 @@ describe("getDurationOptions", () => {
 
   test.for([
     {
-      reservationStartInterval: ReservationStartInterval.Interval_120Mins,
+      reservationStartInterval: ReservationStartInterval.Interval_120Minutes,
       minReservationDuration: 0,
       maxReservationDuration: 5400,
       expected: [],
     },
     {
-      reservationStartInterval: ReservationStartInterval.Interval_60Mins,
+      reservationStartInterval: ReservationStartInterval.Interval_60Minutes,
       minReservationDuration: 5400,
       maxReservationDuration: 0,
       expected: [],
     },
     {
-      reservationStartInterval: ReservationStartInterval.Interval_60Mins,
+      reservationStartInterval: ReservationStartInterval.Interval_60Minutes,
       minReservationDuration: 0,
       maxReservationDuration: 0,
       expected: [],
@@ -153,7 +153,7 @@ describe("getDurationOptions", () => {
     const input = {
       minReservationDuration: 1800,
       maxReservationDuration: 5400,
-      reservationStartInterval: ReservationStartInterval.Interval_15Mins,
+      reservationStartInterval: ReservationStartInterval.Interval_15Minutes,
     } as const;
     expect(getDurationOptions(input, mockT).map((x) => x.value)).toEqual([30, 45, 60, 75, 90]);
   });
@@ -162,7 +162,7 @@ describe("getDurationOptions", () => {
     const input = {
       minReservationDuration: 1800,
       maxReservationDuration: 30600,
-      reservationStartInterval: ReservationStartInterval.Interval_90Mins,
+      reservationStartInterval: ReservationStartInterval.Interval_90Minutes,
     } as const;
     expect(getDurationOptions(input, mockT).map((x) => x.value)).toEqual([90, 180, 270, 360, 450]);
   });
