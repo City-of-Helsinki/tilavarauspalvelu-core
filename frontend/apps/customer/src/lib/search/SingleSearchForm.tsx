@@ -8,7 +8,7 @@ import { ControlledNumberInput, TimeRangePicker } from "ui/src/components/form";
 import { formatDate, parseUIDate } from "ui/src/modules/date-utils";
 import { getDurationOptions } from "@/modules/const";
 import { DateRangePicker } from "@/components/form";
-import { FilterTagList } from "../FilterTagList";
+import { FilterTagList } from "@/components/FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";

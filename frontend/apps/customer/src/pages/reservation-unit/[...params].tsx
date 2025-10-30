@@ -25,8 +25,7 @@ import {
 import { Sanitize } from "ui/src/components/Sanitize";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
-import { Step0 } from "@/components/reservation/Step0";
-import { Step1 } from "@/components/reservation/Step1";
+import { ReservationStep0, ReservationStep1 } from "@/lib/reservation-unit/[...params]";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createNodeId, toNumber } from "ui/src/modules/helpers";
 import { queryOptions } from "@/modules/queryOptions";
@@ -175,9 +174,11 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
           )}
         </ReservationTitleSection>
         {step === 0 && (
-          <Step0 reservation={reservation} cancelReservation={cancelReservation} options={props.options} />
+          <ReservationStep0 reservation={reservation} cancelReservation={cancelReservation} options={props.options} />
         )}
-        {step === 1 && <Step1 reservation={reservation} options={props.options} requiresPayment={steps.length > 2} />}
+        {step === 1 && (
+          <ReservationStep1 reservation={reservation} options={props.options} requiresPayment={steps.length > 2} />
+        )}
       </ReservationPageWrapper>
     </>
   );

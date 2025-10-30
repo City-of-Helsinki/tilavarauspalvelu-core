@@ -12,7 +12,7 @@ import {
   type ApplicationRoundsUiQueryVariables,
 } from "@gql/gql-types";
 import { filterNonNullable } from "ui/src/modules/helpers";
-import { ApplicationRoundCard } from "@/components/recurring/ApplicationRoundCard";
+import { ApplicationRoundCard } from "@/lib/recurring";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Breadcrumb } from "@/components/common/Breadcrumb";

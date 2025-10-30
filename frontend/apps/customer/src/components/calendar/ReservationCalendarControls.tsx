@@ -10,7 +10,7 @@ import { breakpoints } from "ui/src/modules/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import { type Control, type FieldValues, type SubmitHandler, useController, type UseFormReturn } from "react-hook-form";
-import { PendingReservationFormType } from "@/components/reservation-unit/schema";
+import { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { useMedia } from "react-use";
 import { type FocusTimeSlot } from "@/modules/reservation";

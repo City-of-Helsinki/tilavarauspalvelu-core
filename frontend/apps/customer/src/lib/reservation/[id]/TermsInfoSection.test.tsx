@@ -1,5 +1,5 @@
-import { TermsInfoSection } from "@/components/reservation/TermsInfoSection";
 import React from "react";
+import { TermsInfoSection } from "./TermsInfoSection";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createMockReservation, createTermsOfUseMock, generateTextFragment } from "@test/reservation.mocks";

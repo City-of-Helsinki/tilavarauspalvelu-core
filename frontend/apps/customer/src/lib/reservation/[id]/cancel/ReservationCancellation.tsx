@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import { H1 } from "ui/src/styled";
 import { breakpoints } from "ui/src/modules/const";
 import { type ReservationCancelPageQuery, useCancelReservationMutation } from "@gql/gql-types";
-import { ReservationInfoCard } from "./ReservationInfoCard";
+import { ReservationInfoCard } from "@/components/reservation";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
 import { formatDate, applicationReservationDateTime } from "ui/src/modules/date-utils";
@@ -14,7 +14,7 @@ import { getApplicationPath, getReservationPath } from "@/modules/urls";
 import { getPrice } from "@/modules/reservationUnit";
 import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { useRouter } from "next/router";
-import { type CancelFormValues, CancellationForm } from "../CancellationForm";
+import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";
 import { Card } from "ui/src/components";
 import { gql } from "@apollo/client";
 

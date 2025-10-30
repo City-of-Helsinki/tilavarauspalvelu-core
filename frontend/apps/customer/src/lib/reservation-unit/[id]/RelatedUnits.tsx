@@ -1,11 +1,11 @@
-import { IconArrowRight, IconEuroSign, IconGroup, IconHome } from "hds-react";
 import React from "react";
+import { IconArrowRight, IconEuroSign, IconGroup, IconHome } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import { H3 } from "ui/src/styled";
 import { breakpoints } from "ui/src/modules/const";
 import { type Maybe, useRelatedReservationUnitsQuery, type RelatedUnitCardFieldsFragment } from "@gql/gql-types";
-import Carousel from "../Carousel";
+import Carousel from "@/components/Carousel";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { Card } from "ui/src/components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";

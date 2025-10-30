@@ -4,7 +4,7 @@ import {
   type ReservationCancelPageQuery,
   type ReservationCancelPageQueryVariables,
 } from "@gql/gql-types";
-import { ReservationCancellation } from "@/components/reservation/ReservationCancellation";
+import { ReservationCancellation } from "@/lib/reservation/[id]/cancel";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";

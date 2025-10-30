@@ -37,19 +37,19 @@ import {
   getDurationOptions,
 } from "@/modules/reservation";
 import { clampDuration, getMaxReservationDuration, getMinReservationDuration } from "@/modules/reservable";
-import { SubventionSuffix } from "@/components/reservation";
-import InfoDialog from "@/components/common/InfoDialog";
 import {
-  AddressSection,
   EquipmentList,
   Head,
   RelatedUnits,
   ReservationUnitCalendarSection,
-} from "@/components/reservation-unit";
+  ReservationUnitMoreDetails,
+  SubventionSuffix,
+} from "@/lib/reservation-unit/[id]/";
+import InfoDialog from "@/components/common/InfoDialog";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useForm, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PendingReservationFormSchema, type PendingReservationFormType } from "@/components/reservation-unit/schema";
+import { PendingReservationFormSchema, type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { LoginFragment } from "@/components/LoginFragment";
 import { SubmitButton } from "@/styled/util";
 import { ReservationUnitPageWrapper } from "@/styled/reservation";
@@ -63,7 +63,8 @@ import { type ApiError, getApiErrors } from "ui/src/modules/apolloUtils";
 import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
 import { errorToast } from "ui/src/components/toast";
 import { QuickReservation } from "@/components/QuickReservation";
-import { ReservationUnitMoreDetails } from "@/components/reservation-unit/ReservationUnitMoreDetails";
+import { AddressSection } from "@/components/AddressSection";
+
 function SubmitFragment({
   apiBaseUrl,
   focusSlot,

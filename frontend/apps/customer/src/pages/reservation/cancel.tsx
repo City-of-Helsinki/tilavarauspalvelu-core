@@ -1,6 +1,6 @@
 import React from "react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { CancelledLinkSet } from "@/components/reservation/CancelledLinkSet";
+import { CancelledLinkSet } from "@/lib/reservation/[id]/cancel";
 import {
   DeleteReservationDocument,
   type DeleteReservationMutation,

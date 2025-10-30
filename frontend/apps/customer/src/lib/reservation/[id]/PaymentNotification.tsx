@@ -88,5 +88,3 @@ export const PaymentNotification = ({
     </Notification>
   );
 };
-
-export default PaymentNotification;

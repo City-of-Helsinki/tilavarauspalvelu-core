@@ -14,14 +14,13 @@ import {
 } from "@/modules/reservation";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import { type UseFormReturn } from "react-hook-form";
-import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
+import { type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
-import { ReservationTimePicker } from "./ReservationTimePicker";
-import { ReservationInfoCard } from "./ReservationInfoCard";
+import { ReservationTimePicker, ReservationInfoCard } from "@/components/reservation";
 import { Sanitize } from "ui/src/components/Sanitize";
-import { PinkBox as PinkBoxBase } from "./styles";
+import { PinkBox as PinkBoxBase } from "@/components/reservation/styles";
 import { getReservationPath } from "@/modules/urls";
 import { gql } from "@apollo/client";
 import ErrorComponent from "next/error";
