@@ -29,15 +29,7 @@ const RESERVATION_FIELDS = {
   nonprofit: ORGANISATION_FIELDS,
   company: ORGANISATION_FIELDS,
   // reservation : Varauksen tiedot (aka generalFields)
-  general: [
-    "name",
-    "purpose",
-    "numPersons",
-    "ageGroup",
-    "description",
-    "applyingForFreeOfCharge",
-    "freeOfChargeReason",
-  ] as const,
+  general: ["name", "purpose", "numPersons", "ageGroup", "description"] as const,
 } as const;
 
 function convertTypeToKey(t: ReserveeType | "general"): keyof typeof RESERVATION_FIELDS {
@@ -53,11 +45,12 @@ function convertTypeToKey(t: ReserveeType | "general"): keyof typeof RESERVATION
   }
 }
 
-/// new non filtered version of the Varauksen tiedot section
-/// non filtered (no reservationType / supportedFields) so this is only applicable for Summaries
-/// for actual forms need to use either reservationType (new) or supportedFields (old)
-export function getReservationFormGeneralFields() {
-  return RESERVATION_FIELDS["general"];
+/// non filtered version of the Varauksen tiedot section
+/// this is only applicable for Summaries / Errors
+/// for rendering forms use a the filtered variation
+/// this adds optional free of charge that is not included in the form enums (but directly controlled with reservation unit toggle).
+export function getExtendedGeneralFormFields() {
+  return [...RESERVATION_FIELDS["general"], "applyingForFreeOfCharge", "freeOfChargeReason"] as const;
 }
 
 export function getReservationFormFields({

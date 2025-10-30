@@ -12,7 +12,7 @@ import {
   ReserveeType,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
-import { getReservationFormGeneralFields } from "@ui/reservation-form/util";
+import { getExtendedGeneralFormFields } from "@ui/reservation-form/util";
 import { getReservationFormSchema, type ReservationFormValueT } from "@ui/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -220,7 +220,7 @@ function FormErrors<T extends FieldValues>({
   } = form;
 
   // Doesn't require filtering since we can't get errors if the field doesn't exist
-  const generalFields = getReservationFormGeneralFields();
+  const generalFields = getExtendedGeneralFormFields();
 
   if (Object.keys(errors).length === 0) {
     return null;

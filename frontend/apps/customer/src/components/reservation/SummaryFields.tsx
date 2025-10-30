@@ -5,10 +5,10 @@ import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
 import { LabelValuePair } from "./LabelValuePair";
 import { type OptionsRecord } from "@ui/types";
 import {
-  getReservationFormGeneralFields,
   getReservationFormReserveeFields,
   formContainsField,
   type FormField,
+  getExtendedGeneralFormFields,
 } from "@ui/reservation-form/util";
 
 type SummaryReserveeFieldsProps = {
@@ -66,7 +66,7 @@ export function SummaryGeneralFields({
 }): JSX.Element | null {
   const { t } = useTranslation();
 
-  const generalFields = getReservationFormGeneralFields();
+  const generalFields = getExtendedGeneralFormFields();
   const filteredGeneralFields = generalFields.filter((key) => isNotEmpty(key, reservation));
 
   if (filteredGeneralFields.length === 0) {
