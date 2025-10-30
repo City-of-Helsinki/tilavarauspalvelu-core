@@ -16,7 +16,7 @@ import { getExtendedGeneralFormFields } from "@ui/reservation-form/util";
 import { getReservationFormSchema, type ReservationFormValueT } from "@ui/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { LinkLikeButton } from "@ui/styled";
+import { Flex, LinkLikeButton } from "@ui/styled";
 import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
 import { type OptionsRecord } from "@ui/types";
 import { NewReservationForm } from "@/styled/reservation";
@@ -167,12 +167,36 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
 
   return (
     <NewReservationForm onSubmit={handleSubmit(onSubmit)} noValidate>
-      <ReservationForm
-        reservation={reservation}
-        options={options}
-        form={form}
-        onSubventionButtonClick={() => setIsDialogOpen(true)}
-      />
+      <Flex>
+        <ReservationForm
+          reservation={reservation}
+          options={options}
+          form={form}
+          onSubventionButtonClick={() => setIsDialogOpen(true)}
+        />
+        <FormErrors form={form} reserveeType={reserveeType} />
+        <ActionContainer>
+          <Button
+            type="submit"
+            variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
+            iconEnd={isSubmitting ? <LoadingSpinner small /> : <IconArrowRight />}
+            disabled={isSubmitting}
+            data-testid="reservation__button--continue"
+          >
+            {t("common:next")}
+          </Button>
+          <Button
+            type="button"
+            variant={ButtonVariant.Secondary}
+            iconStart={<IconCross />}
+            disabled={isSubmitting}
+            onClick={cancelReservation}
+            data-testid="reservation__button--cancel"
+          >
+            {t("common:stop")}
+          </Button>
+        </ActionContainer>
+      </Flex>
       <InfoDialog
         id="pricing-terms"
         heading={t("reservationUnit:pricingTerms")}
@@ -180,28 +204,6 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
       />
-      <FormErrors form={form} reserveeType={reserveeType} />
-      <ActionContainer>
-        <Button
-          type="submit"
-          variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
-          iconEnd={isSubmitting ? <LoadingSpinner small /> : <IconArrowRight />}
-          disabled={isSubmitting}
-          data-testid="reservation__button--continue"
-        >
-          {t("common:next")}
-        </Button>
-        <Button
-          type="button"
-          variant={ButtonVariant.Secondary}
-          iconStart={<IconCross />}
-          disabled={isSubmitting}
-          onClick={cancelReservation}
-          data-testid="reservation__button--cancel"
-        >
-          {t("common:stop")}
-        </Button>
-      </ActionContainer>
     </NewReservationForm>
   );
 }
@@ -243,10 +245,7 @@ function FormErrors<T extends FieldValues>({
 
 const MandatoryFieldsInfoText = styled.p`
   font-size: var(--fontsize-body-s);
-  margin-top: calc(var(--spacing-xs) * -1);
-  && {
-    margin-bottom: var(--spacing-s);
-  }
+  margin-top: 0;
 `;
 
 interface ReservationFormProps<T extends FieldValues> {

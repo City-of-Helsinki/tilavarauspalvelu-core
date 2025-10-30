@@ -31,15 +31,14 @@ export const ReservationUnitPageWrapper = styled(ReservationPageWrapper)`
 export const NewReservationForm = styled.form`
   display: grid;
   gap: var(--spacing-m);
-  grid-column: 1 / -1;
-  grid-row: 3;
+  grid-column: span 1;
   @media (min-width: ${breakpoints.m}) {
-    grid-column: span 1;
     grid-row: 2 / -1;
   }
 `;
 
 export const ReservationTitleSection = styled(Flex)`
+  grid-row: 1;
   display: flex;
   gap: var(--spacing-m);
   flex-direction: column;
