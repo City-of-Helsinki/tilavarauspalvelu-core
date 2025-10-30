@@ -18,7 +18,7 @@ import { Tabs } from "hds-react";
 import { formatDateTime } from "ui/src/modules/date-utils";
 import { ApprovedReservations, BREAKPOINT } from "@/components/application/ApprovedReservations";
 import { gql } from "@apollo/client";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import styled from "styled-components";
 import { useToastIfQueryParam } from "ui/src/hooks";
 import { useRouter } from "next/router";

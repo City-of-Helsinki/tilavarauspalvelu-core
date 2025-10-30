@@ -8,7 +8,7 @@ import { Flex, H1 } from "ui/src/styled";
 import { breakpoints } from "ui/src/modules/const";
 import { ReservationKind } from "@gql/gql-types";
 import { filterNonNullable } from "ui/src/modules/helpers";
-import { ListWithPagination } from "@/components/common/ListWithPagination";
+import { ListWithPagination } from "@/components/ListWithPagination";
 import { SingleSearchCard, SingleSearchForm } from "@/lib/search";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -16,7 +16,7 @@ import { getSearchOptions, processVariables } from "@/modules/search";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { SortingComponent } from "@/components/SortingComponent";
 import { useSearchParams } from "next/navigation";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { gql } from "@apollo/client";
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {

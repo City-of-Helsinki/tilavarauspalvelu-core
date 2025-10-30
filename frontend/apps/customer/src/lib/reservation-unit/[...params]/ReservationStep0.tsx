@@ -4,8 +4,7 @@ import { useForm, FormProvider, type UseFormReturn, FieldValues } from "react-ho
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/reservation-form";
-import { ActionContainer } from "@/components/reservation/styles";
-import InfoDialog from "@/components/common/InfoDialog";
+import InfoDialog from "@/components/InfoDialog";
 import {
   type ReservationQuery,
   type ReservationUpdateMutationInput,
@@ -19,7 +18,7 @@ import { z } from "zod";
 import { Flex, LinkLikeButton } from "@ui/styled";
 import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
 import { type OptionsRecord } from "@ui/types";
-import { NewReservationForm } from "@/styled/reservation";
+import { ActionContainer, NewReservationForm } from "@/styled/reservation";
 import { useDisplayError } from "@ui/hooks";
 import { useRouter } from "next/router";
 import { getReservationInProgressPath, getReservationUnitPath } from "@/modules/urls";

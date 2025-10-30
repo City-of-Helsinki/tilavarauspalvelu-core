@@ -4,10 +4,9 @@ import { Button, ButtonVariant, IconArrowLeft, LoadingSpinner } from "hds-react"
 import { type ReservationQuery, ReservationStateChoice, useConfirmReservationMutation } from "@gql/gql-types";
 import { useForm } from "react-hook-form";
 import { type OptionsRecord } from "@ui/types";
-import { ActionContainer } from "@/components/reservation/styles";
 import { SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
 import { AcceptTerms } from "@/components/AcceptTerms";
-import { NewReservationForm } from "@/styled/reservation";
+import { ActionContainer, NewReservationForm } from "@/styled/reservation";
 import { useDisplayError } from "@ui/hooks";
 import { getReservationInProgressPath, getReservationPath, getReservationUnitPath } from "@/modules/urls";
 import { convertLanguageCode } from "@ui/modules/util";

@@ -7,7 +7,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
 import { applicationsPath, applicationsPrefix, getApplicationPath } from "@/modules/urls";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { gql } from "@apollo/client";

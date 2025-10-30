@@ -13,7 +13,7 @@ import { H1 } from "ui/src/styled";
 import { AllReservations } from "@/components/application/ApprovedReservations";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
 import { applicationsPrefix, getApplicationPath } from "@/modules/urls";
 

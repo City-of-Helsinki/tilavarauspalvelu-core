@@ -14,7 +14,7 @@ import { Sanitize } from "@ui/components/Sanitize";
 import { createNodeId, capitalize, ignoreMaybeArray, toNumber } from "@ui/modules/helpers";
 import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
 import { gql } from "@apollo/client";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getApplicationRoundPath, seasonalPrefix } from "@/modules/urls";

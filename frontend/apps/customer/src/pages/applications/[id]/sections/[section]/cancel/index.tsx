@@ -31,7 +31,7 @@ import { Card } from "ui/src/components";
 import styled from "styled-components";
 import { isReservationCancellable } from "@/modules/reservation";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { useDisplayError } from "ui/src/hooks";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

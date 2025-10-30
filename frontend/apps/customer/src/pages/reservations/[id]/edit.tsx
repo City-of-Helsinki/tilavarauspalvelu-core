@@ -24,7 +24,7 @@ import { ReservationPageWrapper, ReservationTitleSection } from "@/styled/reserv
 import { queryOptions } from "@/modules/queryOptions";
 import { isReservationEditable, transformReservation } from "@/modules/reservation";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { StyledStepper } from "@/styled/util";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];

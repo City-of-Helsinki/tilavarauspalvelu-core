@@ -21,7 +21,7 @@ const Main = styled.main`
   ${mainStyles}
 `;
 
-function PageWrapper({ apiBaseUrl, profileLink, feedbackUrl, children, version }: PageProps): JSX.Element {
+export function PageWrapper({ apiBaseUrl, profileLink, feedbackUrl, children, version }: PageProps): JSX.Element {
   return (
     <>
       <Head>
@@ -37,5 +37,3 @@ function PageWrapper({ apiBaseUrl, profileLink, feedbackUrl, children, version }
     </>
   );
 }
-
-export default PageWrapper;

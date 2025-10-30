@@ -21,14 +21,14 @@ import { createNodeId, filterNonNullable, ignoreMaybeArray, type ReadonlyDeep, t
 import { type SearchFormValues, SeasonalSearchForm } from "@/components/SeasonalSearchForm";
 import { createApolloClient } from "@/modules/apolloClient";
 import { useReservationUnitList } from "@/hooks";
-import { ListWithPagination } from "@/components/common/ListWithPagination";
+import { ListWithPagination } from "@/components/ListWithPagination";
 import { StartApplicationBar, RecurringCard } from "@/lib/recurring/[id]";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getSearchOptions, processVariables } from "@/modules/search";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { SortingComponent } from "@/components/SortingComponent";
 import { useSearchParams } from "next/navigation";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { getApplicationPath, seasonalPrefix } from "@/modules/urls";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { gql } from "@apollo/client";
