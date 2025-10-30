@@ -73,7 +73,7 @@ def _create_purposes() -> list[Purpose]:
             name_en="Hold a meeting",
             name_sv="Håll möte",
             image_url=(
-                "https://tilavaraus.test.hel.ninja/"
+                "https://varaamo.test.hel.ninja/"
                 "media/reservation_unit_purpose_images/Varaamo_Pida_kokous_Maija_Astikainen.jpg"
             ),
             image_filename="Varaamo_Pida_kokous_Maija_Astikainen",
@@ -83,7 +83,7 @@ def _create_purposes() -> list[Purpose]:
             name_en="Find a party venue",
             name_sv="Hitta festlokal",
             image_url=(
-                "https://tilavaraus.test.hel.ninja/"
+                "https://varaamo.test.hel.ninja/"
                 "media/reservation_unit_purpose_images/Varaamo_Loyda_juhlatila_Maija_Astikainen.jpg"
             ),
             image_filename="Varaamo_Loyda_juhlatila_Maija_Astikainen",
@@ -93,7 +93,7 @@ def _create_purposes() -> list[Purpose]:
             name_en="Organise an event",
             name_sv="Arrangera evenemang",
             image_url=(
-                "https://tilavaraus.test.hel.ninja/"
+                "https://varaamo.test.hel.ninja/"
                 "media/reservation_unit_purpose_images/Varaamo_Jarjesta_tapahtuma_Vesa_Laitinen.jpg"
             ),
             image_filename="Varaamo_Jarjesta_tapahtuma_Vesa_Laitinen",
@@ -103,7 +103,7 @@ def _create_purposes() -> list[Purpose]:
             name_en="Engage in hobbies together",
             name_sv="Utöva hobbyer tillsammans",
             image_url=(
-                "https://tilavaraus.test.hel.ninja/"
+                "https://varaamo.test.hel.ninja/"
                 "media/reservation_unit_purpose_images/Varaamo_Harrasta_yhdessa_Maija_Astikainen.jpg"
             ),
             image_filename="Varaamo_Harrasta_yhdessa_Maija_Astikainen",
@@ -113,7 +113,7 @@ def _create_purposes() -> list[Purpose]:
             name_en="Exercise and relax",
             name_sv="Motionera och koppla av",
             image_url=(
-                "https://tilavaraus.test.hel.ninja/"
+                "https://varaamo.test.hel.ninja/"
                 "media/reservation_unit_purpose_images/Varaamo_Liiku_Maija_Astikainen.jpg"
             ),
             image_filename="Varaamo_Liiku_Maija_Astikainen",
@@ -123,7 +123,7 @@ def _create_purposes() -> list[Purpose]:
             name_en="Exercise and relax",
             name_sv="Motionera och koppla av",
             image_url=(
-                "https://tilavaraus.test.hel.ninja/"
+                "https://varaamo.test.hel.ninja/"
                 "media/reservation_unit_purpose_images/Varaamo_Pelaa_digitaalisesti_Maija_Astikainen_FmzBTxt.jpg"
             ),
             image_filename="Varaamo_Pelaa_digitaalisesti_Maija_Astikainen_FmzBTxt",
@@ -133,7 +133,7 @@ def _create_purposes() -> list[Purpose]:
             name_en="Work alone or in a group",
             name_sv="Arbeta enskilt eller i grupp",
             image_url=(
-                "https://tilavaraus.test.hel.ninja/"
+                "https://varaamo.test.hel.ninja/"
                 "media/reservation_unit_purpose_images/Varaamo_Tyoskentele_yksin_tai_ryhmassa_Maija_Astikainen.jpg"
             ),
             image_filename="Varaamo_Tyoskentele_yksin_tai_ryhmassa_Maija_Astikainen",
@@ -143,7 +143,7 @@ def _create_purposes() -> list[Purpose]:
             name_en="Make music or record",
             name_sv="Gör musik eller spela in",
             image_url=(
-                "https://tilavaraus.test.hel.ninja/"
+                "https://varaamo.test.hel.ninja/"
                 "media/reservation_unit_purpose_images/Varaamo_Tee_musiikkia_ja_aanita_Maija_Astikainen.jpg"
             ),
             image_filename="Varaamo_Tee_musiikkia_ja_aanita_Maija_Astikainen",
@@ -153,7 +153,7 @@ def _create_purposes() -> list[Purpose]:
             name_en="Use equipment",
             name_sv="Använd utrustning",
             image_url=(
-                "https://tilavaraus.test.hel.ninja/"
+                "https://varaamo.test.hel.ninja/"
                 "media/reservation_unit_purpose_images/Varaamo_Kayta_laitteita2_Maija_Astikainen.jpg"
             ),
             image_filename="Varaamo_Kayta_laitteita2_Maija_Astikainen",
@@ -163,7 +163,7 @@ def _create_purposes() -> list[Purpose]:
             name_en="Take a sauna or stay in a cabin",
             name_sv="Bada bastu eller bo i stuga",
             image_url=(
-                "https://tilavaraus.test.hel.ninja/"
+                "https://varaamo.test.hel.ninja/"
                 "media/reservation_unit_purpose_images/Varaamo_sauna_maarit_hohteri.png"
             ),
             image_filename="Varaamo_sauna_maarit_hohteri",
@@ -174,7 +174,7 @@ def _create_purposes() -> list[Purpose]:
             name_en="Organize an exhibition",
             name_sv="Organisera en utställning",
             image_url=(
-                "https://tilavaraus.test.hel.ninja/"
+                "https://varaamo.test.hel.ninja/"
                 "media/reservation_unit_purpose_images/JPG-1_varaamo_jakomaki_2811202_maija_astikainen-3202-Edit.jpg"
             ),
             image_filename="JPG-1_varaamo_jakomaki_2811202_maija_astikainen-3202-Edit",

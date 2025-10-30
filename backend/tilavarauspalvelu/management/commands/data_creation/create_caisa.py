@@ -755,7 +755,7 @@ def _create_caisa() -> None:
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=aina_kasiteltava_kellarikerros,
         image_url=(
-            "https://tilavaraus.test.hel.ninja/"
+            "https://varaamo.test.hel.ninja/"
             "media/reservation_unit_images/JPG-1_varaamo_oodi_20112023_kuva_maija_astikainen-1274-Edit_oMzGYv0.jpg"
         ),
         filename="JPG-1_varaamo_oodi_20112023_kuva_maija_astikainen-1274-Edit_oMzGYv0",
@@ -850,7 +850,7 @@ def _create_caisa() -> None:
 
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=maksuton_mankeli,
-        image_url="https://tilavaraus.test.hel.ninja/media/reservation_unit_images/Kuva1.png",
+        image_url="https://varaamo.test.hel.ninja/media/reservation_unit_images/Kuva1.png",
         filename="Kuva1",
         extension=".png",
     )
@@ -859,7 +859,7 @@ def _create_caisa() -> None:
 
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=maksuton_mankeli,
-        image_url="https://tilavaraus.test.hel.ninja/media/reservation_unit_images/Kuva2.png",
+        image_url="https://varaamo.test.hel.ninja/media/reservation_unit_images/Kuva2.png",
         filename="Kuva2",
         extension=".png",
         image_type=ReservationUnitImageType.OTHER,
@@ -869,7 +869,7 @@ def _create_caisa() -> None:
 
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=maksuton_mankeli,
-        image_url="https://tilavaraus.test.hel.ninja/media/reservation_unit_images/Kuva3.png",
+        image_url="https://varaamo.test.hel.ninja/media/reservation_unit_images/Kuva3.png",
         filename="Kuva3",
         extension=".png",
         image_type=ReservationUnitImageType.OTHER,
@@ -980,7 +980,7 @@ def _create_caisa() -> None:
 
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=aina_maksullinen_aitio,
-        image_url="https://tilavaraus.test.hel.ninja/media/reservation_unit_images/generoitukuva1_3CLHzHt.png",
+        image_url="https://varaamo.test.hel.ninja/media/reservation_unit_images/generoitukuva1_3CLHzHt.png",
         filename="generoitukuva1_3CLHzHt",
         extension=".png",
     )
@@ -1093,7 +1093,7 @@ def _create_caisa() -> None:
 
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=alennuskelpoinen_aula,
-        image_url="https://tilavaraus.test.hel.ninja/media/reservation_unit_images/123456_wwOt8W0.png",
+        image_url="https://varaamo.test.hel.ninja/media/reservation_unit_images/123456_wwOt8W0.png",
         filename="123456_wwOt8W0",
         extension=".png",
     )
@@ -1182,7 +1182,7 @@ def _create_caisa() -> None:
 
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=perumiskelvoton_parveke,
-        image_url="https://tilavaraus.test.hel.ninja/media/reservation_unit_images/123456.png",
+        image_url="https://varaamo.test.hel.ninja/media/reservation_unit_images/123456.png",
         filename="123456",
         extension=".png",
     )
@@ -1283,7 +1283,7 @@ def _create_caisa() -> None:
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=perumiskelvoton_patio,
         image_url=(
-            "https://tilavaraus.test.hel.ninja/"
+            "https://varaamo.test.hel.ninja/"
             "media/reservation_unit_images/JPG-2_varaamo_jakomaki_2811202_maija_astikainen-3487-Edit.jpg"
         ),
         filename="JPG-2_varaamo_jakomaki_2811202_maija_astikainen-3487-Edit",
@@ -1389,7 +1389,7 @@ def _create_caisa() -> None:
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=toistuvien_varausten_toimisto,
         image_url=(
-            "https://tilavaraus.test.hel.ninja/"
+            "https://varaamo.test.hel.ninja/"
             "media/reservation_unit_images/JPG-1_varaamo_oodi_20112023_kuva_maija_astikainen-9585-Edit_u0yheVh.jpg"
         ),
         filename="JPG-1_varaamo_oodi_20112023_kuva_maija_astikainen-9585-Edit_u0yheVh",
@@ -1482,7 +1482,7 @@ def _create_caisa() -> None:
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=tauotettu_takkahuone,
         image_url=(
-            "https://tilavaraus.test.hel.ninja/"
+            "https://varaamo.test.hel.ninja/"
             "media/reservation_unit_images/JPG-2_varaamo_jakomaki_2811202_maija_astikainen-3487-Edit_BarUEdV.jpg"
         ),
         filename="JPG-2_varaamo_jakomaki_2811202_maija_astikainen-3487-Edit_BarUEdV",
@@ -1586,7 +1586,7 @@ def _create_caisa() -> None:
 
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=aina_kasiteltava_kammio,
-        image_url="https://tilavaraus.test.hel.ninja/media/reservation_unit_images/saunabaari.jpg",
+        image_url="https://varaamo.test.hel.ninja/media/reservation_unit_images/saunabaari.jpg",
         filename="saunabaari",
     )
     if image is not None:
@@ -1594,7 +1594,7 @@ def _create_caisa() -> None:
 
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=aina_kasiteltava_kammio,
-        image_url="https://tilavaraus.test.hel.ninja/media/reservation_unit_images/generoitukuva.png",
+        image_url="https://varaamo.test.hel.ninja/media/reservation_unit_images/generoitukuva.png",
         filename="generoitukuva",
         extension=".png",
         image_type=ReservationUnitImageType.OTHER,
