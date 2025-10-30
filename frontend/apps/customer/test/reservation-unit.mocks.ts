@@ -47,7 +47,7 @@ export function createMockReservableTimes(): ReservableMap {
 export function createMockIsReservableFieldsFragment({
   bufferTimeBefore = 0,
   bufferTimeAfter = 0,
-  interval = ReservationStartInterval.Interval_15Mins,
+  interval = ReservationStartInterval.Interval_15Minutes,
   maxReservationDuration = 0,
   minReservationDuration = 0,
   reservationsMinDaysBefore = 0,
@@ -161,7 +161,7 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     reservationPendingInstructionsEn: null, // Maybe<Scalars["String"]["output"]>;
     reservationPendingInstructionsFi: null, // Maybe<Scalars["String"]["output"]>;
     reservationPendingInstructionsSv: null, // Maybe<Scalars["String"]["output"]>;
-    reservationStartInterval: ReservationStartInterval.Interval_30Mins,
+    reservationStartInterval: ReservationStartInterval.Interval_30Minutes,
     reservationState: ReservationUnitReservationState.Reservable,
     reservations: null, //Maybe<ReadonlyArray<ReservationNode>>;
     reservationsMaxDaysBefore: null, // Maybe<Scalars["Int"]["output"]>;

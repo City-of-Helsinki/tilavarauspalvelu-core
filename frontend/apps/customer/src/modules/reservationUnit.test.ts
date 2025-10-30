@@ -69,7 +69,7 @@ describe("getPossibleTimesForDay", () => {
 
   function createInput({
     date,
-    interval = ReservationStartInterval.Interval_30Mins,
+    interval = ReservationStartInterval.Interval_30Minutes,
     duration = 30,
     reservableTimes = mockReservableTimes(),
   }: {
@@ -111,7 +111,7 @@ describe("getPossibleTimesForDay", () => {
     const hour = getHours(new Date()) + 1;
     const input = createInput({
       date,
-      interval: ReservationStartInterval.Interval_60Mins,
+      interval: ReservationStartInterval.Interval_60Minutes,
     });
     const output: { label: string; value: string }[] = [];
     for (let i = hour; i < 24; i++) {
@@ -125,7 +125,7 @@ describe("getPossibleTimesForDay", () => {
     const hour = getHours(new Date()) + 2;
     const input = createInput({
       date,
-      interval: ReservationStartInterval.Interval_120Mins,
+      interval: ReservationStartInterval.Interval_120Minutes,
     });
     const output: { label: string; value: string }[] = [];
     for (let i = hour; i < 24; i += 2) {
@@ -834,7 +834,7 @@ describe("getDayIntervals", () => {
     const input = {
       startTime: { h: 9, m: 0 },
       endTime: { h: 17, m: 0 },
-      interval: ReservationStartInterval.Interval_30Mins,
+      interval: ReservationStartInterval.Interval_30Minutes,
     };
     const output: { h: number; m: number }[] = [];
     for (let i = 9; i < 17; i++) {
@@ -848,7 +848,7 @@ describe("getDayIntervals", () => {
     const input = {
       startTime: { h: 9, m: 0 },
       endTime: { h: 17, m: 0 },
-      interval: ReservationStartInterval.Interval_15Mins,
+      interval: ReservationStartInterval.Interval_15Minutes,
     };
     const output: { h: number; m: number }[] = [];
     for (let i = 9; i < 17; i++) {
@@ -864,7 +864,7 @@ describe("getDayIntervals", () => {
     const input = {
       startTime: { h: 9, m: 0 },
       endTime: { h: 17, m: 0 },
-      interval: ReservationStartInterval.Interval_60Mins,
+      interval: ReservationStartInterval.Interval_60Minutes,
     };
     const output: { h: number; m: number }[] = [];
     for (let i = 9; i < 17; i++) {
@@ -877,7 +877,7 @@ describe("getDayIntervals", () => {
     const input = {
       startTime: { h: 0, m: 0 },
       endTime: { h: 24, m: 0 },
-      interval: ReservationStartInterval.Interval_30Mins,
+      interval: ReservationStartInterval.Interval_30Minutes,
     };
     const output: { h: number; m: number }[] = [];
     for (let i = 0; i < 24; i++) {
@@ -891,7 +891,7 @@ describe("getDayIntervals", () => {
     const input = {
       startTime: { h: 17, m: 0 },
       endTime: { h: 9, m: 0 },
-      interval: ReservationStartInterval.Interval_30Mins,
+      interval: ReservationStartInterval.Interval_30Minutes,
     };
     const res = getDayIntervals(input.startTime, input.endTime, input.interval);
     expect(res).toEqual([]);
@@ -900,7 +900,7 @@ describe("getDayIntervals", () => {
     const input = {
       startTime: { h: 17, m: 0 },
       endTime: { h: 17, m: 0 },
-      interval: ReservationStartInterval.Interval_30Mins,
+      interval: ReservationStartInterval.Interval_30Minutes,
     };
     const res = getDayIntervals(input.startTime, input.endTime, input.interval);
     expect(res).toEqual([]);
@@ -909,7 +909,7 @@ describe("getDayIntervals", () => {
     const input = {
       startTime: { h: 9, m: 20 },
       endTime: { h: 17, m: 20 },
-      interval: ReservationStartInterval.Interval_30Mins,
+      interval: ReservationStartInterval.Interval_30Minutes,
     };
     const output: { h: number; m: number }[] = [];
     for (let i = 9; i < 17; i++) {
@@ -923,7 +923,7 @@ describe("getDayIntervals", () => {
     const input = {
       startTime: { h: 9, m: 20 },
       endTime: { h: 17, m: 0 },
-      interval: ReservationStartInterval.Interval_30Mins,
+      interval: ReservationStartInterval.Interval_30Minutes,
     };
     const output: { h: number; m: number }[] = [];
     for (let i = 9; i < 17; i++) {
@@ -1115,7 +1115,7 @@ describe("getNextAvailableTime", () => {
         reservationsMaxDaysBefore,
         bufferTimeBefore: 0,
         bufferTimeAfter: 0,
-        reservationStartInterval: ReservationStartInterval.Interval_30Mins,
+        reservationStartInterval: ReservationStartInterval.Interval_30Minutes,
         maxReservationDuration: null,
         minReservationDuration: null,
         reservationBeginsAt: null,
