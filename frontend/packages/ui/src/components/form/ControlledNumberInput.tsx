@@ -6,6 +6,7 @@ import { useTranslation } from "next-i18next";
 import { filterEmpty, toNumber } from "../../modules/helpers";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
+  id?: string;
   min?: number;
   max?: number;
   required?: boolean;
@@ -20,6 +21,7 @@ interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
 
 // set some page specific defaults for translations
 export function ControlledNumberInput<T extends FieldValues>({
+  id,
   control,
   name,
   min,
@@ -50,7 +52,7 @@ export function ControlledNumberInput<T extends FieldValues>({
       value={value ?? ""}
       onChange={handleChange}
       required={required}
-      id={name}
+      id={id ?? name}
       label={label}
       minusStepButtonAriaLabel={t("common:subtract")}
       plusStepButtonAriaLabel={t("common:add")}

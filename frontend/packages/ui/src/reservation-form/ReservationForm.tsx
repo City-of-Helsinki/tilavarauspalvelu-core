@@ -117,6 +117,7 @@ export function ReservationFormGeneralSection({ reservationUnit, options, data }
       {hasNumPersons && (
         <ControlledNumberInput<ReservationFormValueT>
           name="numPersons"
+          id={constructReservationFieldId("numPersons")}
           control={control}
           label={createLabel("numPersons")}
           errorText={getFieldError("numPersons")}
