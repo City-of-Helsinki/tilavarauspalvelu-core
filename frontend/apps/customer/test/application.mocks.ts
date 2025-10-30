@@ -312,7 +312,7 @@ export function createMockApplicationViewFragment(props: CreateMockApplicationFr
     termsOfUse: {
       id: createNodeId("TermsOfUseNode", 1),
       pk: "recurring",
-      termsType: TermsOfUseTypeChoices.RecurringTerms,
+      termsType: TermsOfUseTypeChoices.Recurring,
       ...generateNameFragment("TermsOfUse"),
       ...generateTextFragment("Recurring Terms of Use"),
     },

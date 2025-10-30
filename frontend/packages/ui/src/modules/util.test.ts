@@ -15,10 +15,10 @@ vi.mock("next-i18next", () => ({
 }));
 
 test("getIntervalMinutes", () => {
-  expect(getIntervalMinutes(ReservationStartInterval.Interval_15Mins)).toBe(15);
-  expect(getIntervalMinutes(ReservationStartInterval.Interval_30Mins)).toBe(30);
-  expect(getIntervalMinutes(ReservationStartInterval.Interval_60Mins)).toBe(60);
-  expect(getIntervalMinutes(ReservationStartInterval.Interval_90Mins)).toBe(90);
+  expect(getIntervalMinutes(ReservationStartInterval.Interval_15Minutes)).toBe(15);
+  expect(getIntervalMinutes(ReservationStartInterval.Interval_30Minutes)).toBe(30);
+  expect(getIntervalMinutes(ReservationStartInterval.Interval_60Minutes)).toBe(60);
+  expect(getIntervalMinutes(ReservationStartInterval.Interval_90Minutes)).toBe(90);
 });
 
 describe("getEventBuffers", () => {

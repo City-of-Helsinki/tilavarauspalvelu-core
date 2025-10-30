@@ -132,7 +132,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
 
   const [localError, setLocalError] = useState<string | null>(null);
 
-  const interval = reservation?.reservationUnit.reservationStartInterval ?? ReservationStartInterval.Interval_15Mins;
+  const interval = reservation?.reservationUnit.reservationStartInterval ?? ReservationStartInterval.Interval_15Minutes;
 
   const form = useForm<RescheduleReservationSeriesForm>({
     // FIXME there is no validation here (schema is incomplete, need to run the same refinements as in the create form)

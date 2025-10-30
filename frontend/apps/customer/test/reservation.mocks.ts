@@ -269,7 +269,7 @@ export function createTermsOfUseMock(empty: boolean = false) {
       : {
           id: createNodeId("TermsOfUseNode", 1),
           pk: "1",
-          termsType: TermsOfUseTypeChoices.GenericTerms,
+          termsType: TermsOfUseTypeChoices.Generic,
           ...generateNameFragment("TermsOfUse name"),
           ...generateTextFragment("Test terms of use"),
         },

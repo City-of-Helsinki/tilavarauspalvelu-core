@@ -818,7 +818,7 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
     reservationEndsTime: data?.reservationEndsAt ? formatTime(new Date(data.reservationEndsAt)) : "",
     requireAdultReservee: data?.requireAdultReservee ?? false,
     requireReservationHandling: data?.requireReservationHandling ?? false,
-    reservationStartInterval: data?.reservationStartInterval ?? ReservationStartInterval.Interval_15Mins,
+    reservationStartInterval: data?.reservationStartInterval ?? ReservationStartInterval.Interval_15Minutes,
     canApplyFreeOfCharge: data?.canApplyFreeOfCharge ?? false,
     reservationsMinDaysBefore: data?.reservationsMinDaysBefore ?? 0,
     reservationsMaxDaysBefore: data?.reservationsMaxDaysBefore ?? 0,

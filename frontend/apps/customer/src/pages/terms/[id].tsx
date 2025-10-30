@@ -27,7 +27,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { data } = await apolloClient.query<TermsOfUseQuery, TermsOfUseQueryVariables>({
     query: TermsOfUseDocument,
     variables: {
-      termsType: TermsOfUseTypeChoices.GenericTerms,
+      termsType: TermsOfUseTypeChoices.Generic,
       pk: genericTermsId ?? "",
     },
   });

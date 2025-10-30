@@ -322,7 +322,7 @@ function isRangeReservable_({
     return false;
   }
   // TODO we should be able to check the range without generating all the slots
-  const slots = generateSlots(start, end, ReservationStartInterval.Interval_15Mins);
+  const slots = generateSlots(start, end, ReservationStartInterval.Interval_15Minutes);
 
   const res = slots.map((slot) => areReservableTimesAvailable(reservableTimes, slot));
   if (!res.every((val) => val)) {
