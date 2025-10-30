@@ -216,7 +216,7 @@ export function formatTimeRange(
   if (beginMins == null || beginMins < 0 || beginMins > 1440) {
     return "";
   }
-  if (!endMins) {
+  if (!endMins || beginMins === endMins) {
     return minutesToHoursString(beginMins, trailingMinutes);
   }
   return `${minutesToHoursString(beginMins, trailingMinutes)}–${minutesToHoursString(endMins, trailingMinutes)}`;
