@@ -109,9 +109,9 @@
     "FREE": "Maksuton"
   },
   "reservationForm": {
-    "AGE_GROUP_FORM": "Lomake 3: Käyttötarkoitus",
+    "AGE_GROUP_FORM": "Lomake 4: Ikäryhmä",
     "CONTACT_INFO_FORM": "Lomake 1: Vain yhteystiedot",
-    "PURPOSE_FORM": "Lomake 4: Ikäryhmä",
+    "PURPOSE_FORM": "Lomake 3: Käyttötarkoitus",
     "RESERVEE_INFO_FORM": "Lomake 2: Yhteystiedot ja tilaisuuden kuvaus"
   },
   "reservationStartInterval": {
