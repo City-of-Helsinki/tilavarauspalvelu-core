@@ -11,7 +11,7 @@ import {
   ReservationUnitReservationState,
   type UnitNode,
   Weekday,
-} from "@/gql/gql-types";
+} from "@gql/gql-types";
 import { ReservableMap, type RoundPeriod } from "@/modules/reservable";
 import { createNodeId } from "ui/src/modules/helpers";
 import { formatApiDateUnsafe } from "ui/src/modules/date-utils";

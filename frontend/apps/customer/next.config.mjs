@@ -3,8 +3,8 @@ import { join } from "node:path";
 import * as url from "node:url";
 import i18nconfig from "./next-i18next.config.cjs";
 import { withSentryConfig } from "@sentry/nextjs";
-import { env } from "./env.mjs";
-import { getVersion } from "./modules/baseUtils.mjs";
+import { env } from "./src/env.mjs";
+import { getVersion } from "./src/modules/baseUtils.mjs";
 
 // NOTE required for next-i18next to find the config file (when not .js)
 // required to be cjs because they don't support esm
@@ -29,6 +29,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   sassOptions: {
+    includePaths: [join(ROOT_PATH, "src")],
     silenceDeprecations: ["legacy-js-api"],
   },
   i18n,
