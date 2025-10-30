@@ -20,7 +20,7 @@ import {
 import { getIntervalMinutes } from "ui/src/modules/conversion";
 import { type TFunction } from "i18next";
 import { type ReservableMap, type RoundPeriod, isRangeReservable } from "./reservable";
-import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
+import { type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { formatTime, parseUIDate, isValidDate, timeToMinutes, formatDate } from "ui/src/modules/date-utils";
 import { gql } from "@apollo/client";
 import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";

@@ -12,7 +12,7 @@ import { ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { useDisplayError } from "ui/src/hooks";
 import { useReservationUnitList } from "@/hooks";
 import { useSearchParams } from "next/navigation";
-import { LoginFragment } from "../LoginFragment";
+import { LoginFragment } from "@/components/LoginFragment";
 import { getPostLoginUrl } from "@/modules/util";
 import { isBrowser } from "@/modules/const";
 

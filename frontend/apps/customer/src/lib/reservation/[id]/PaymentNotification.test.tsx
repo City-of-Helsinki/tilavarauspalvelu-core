@@ -1,6 +1,6 @@
 import { createReservationPageMock } from "@test/reservation.mocks";
 import { render, screen } from "@testing-library/react";
-import PaymentNotification from "@/components/reservation/PaymentNotification";
+import { PaymentNotification } from "./PaymentNotification";
 import type { TFunction } from "i18next";
 import { describe, it, expect } from "vitest";
 import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";

@@ -10,10 +10,7 @@ import {
   FrontPageDocument,
 } from "@gql/gql-types";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { Head } from "@/components/index/Header";
-import { Purposes } from "@/components/index/Purposes";
-import { SearchGuides } from "@/components/index/SearchGuides";
-import { Units } from "@/components/index/Units";
+import { Head, Purposes, SearchGuides, Units } from "@/lib/index";
 import { createApolloClient } from "@/modules/apolloClient";
 import { filterNonNullable } from "@ui/modules/helpers";
 import { gql } from "@apollo/client";

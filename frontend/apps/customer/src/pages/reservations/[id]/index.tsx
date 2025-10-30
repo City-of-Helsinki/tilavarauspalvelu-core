@@ -33,7 +33,7 @@ import {
 } from "@/modules/reservation";
 import { getReservationUnitName } from "@/modules/reservationUnit";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { AddressSection } from "@/components/reservation-unit";
+import { AddressSection } from "@/components/AddressSection";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
 import { ButtonLikeLink, ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
 import { createNodeId, capitalize, getLocalizationLang, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
@@ -52,17 +52,14 @@ import { gql } from "@apollo/client";
 import StatusLabel from "ui/src/components/StatusLabel";
 import IconButton from "ui/src/components/IconButton";
 import {
-  Instructions,
   LabelValuePair,
-  NotModifiableReason,
   ReservationInfoCard,
   ReservationOrderStatus,
   ReservationStatus,
-  TermsInfoSection,
   SummaryGeneralFields,
   SummaryReserveeFields,
-  PaymentNotification,
 } from "@/components/reservation";
+import { PaymentNotification, TermsInfoSection, Instructions, NotModifiableReason } from "@/lib/reservation/[id]";
 import { useSearchParams } from "next/navigation";
 import { queryOptions } from "@/modules/queryOptions";
 

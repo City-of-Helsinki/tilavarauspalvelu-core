@@ -20,7 +20,7 @@ import { Sanitize } from "@ui/components/Sanitize";
 import styled from "styled-components";
 import { formatters as getFormatters } from "@ui/index";
 import { breakpoints } from "@ui/modules/const";
-import { AddressSection } from "./AddressSection";
+import { AddressSection } from "@/components/AddressSection";
 import { useGenericTerms } from "@ui/hooks";
 
 /// Below the fold content

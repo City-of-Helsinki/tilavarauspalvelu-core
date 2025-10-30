@@ -4,9 +4,9 @@ import { Button, ButtonVariant, IconArrowLeft, LoadingSpinner } from "hds-react"
 import { type ReservationQuery, ReservationStateChoice, useConfirmReservationMutation } from "@gql/gql-types";
 import { useForm } from "react-hook-form";
 import { type OptionsRecord } from "@ui/types";
-import { ActionContainer } from "./styles";
-import { SummaryGeneralFields, SummaryReserveeFields } from "./SummaryFields";
-import { AcceptTerms } from "./AcceptTerms";
+import { ActionContainer } from "@/components/reservation/styles";
+import { SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
+import { AcceptTerms } from "@/components/AcceptTerms";
 import { NewReservationForm } from "@/styled/reservation";
 import { useDisplayError } from "@ui/hooks";
 import { getReservationInProgressPath, getReservationPath, getReservationUnitPath } from "@/modules/urls";
@@ -24,7 +24,7 @@ type Props = {
   requiresPayment: boolean;
 };
 
-export function Step1({ reservation, options, requiresPayment }: Props): JSX.Element {
+export function ReservationStep1({ reservation, options, requiresPayment }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
   // empty react-hook-form on purpose (still using old useState for data)
   const {

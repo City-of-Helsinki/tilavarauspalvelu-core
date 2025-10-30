@@ -4,8 +4,8 @@ import { useForm, FormProvider, type UseFormReturn, FieldValues } from "react-ho
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/reservation-form";
-import { ActionContainer } from "./styles";
-import InfoDialog from "../common/InfoDialog";
+import { ActionContainer } from "@/components/reservation/styles";
+import InfoDialog from "@/components/common/InfoDialog";
 import {
   type ReservationQuery,
   type ReservationUpdateMutationInput,
@@ -34,7 +34,7 @@ type Props = {
   options: OptionsRecord;
 };
 
-export function Step0({ reservation, cancelReservation, options }: Props): JSX.Element {
+export function ReservationStep0({ reservation, cancelReservation, options }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 

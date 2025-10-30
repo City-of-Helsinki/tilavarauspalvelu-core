@@ -14,7 +14,7 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { useSession } from "@/hooks";
-import { ReservationCard } from "@/components/reservation";
+import { ReservationCard } from "@/lib/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { addDays } from "date-fns";

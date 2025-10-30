@@ -18,12 +18,11 @@ import {
   ReservationKind,
 } from "@gql/gql-types";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, type ReadonlyDeep, toNumber } from "ui/src/modules/helpers";
-import { type SearchFormValues, SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
+import { type SearchFormValues, SeasonalSearchForm } from "@/components/SeasonalSearchForm";
 import { createApolloClient } from "@/modules/apolloClient";
-import { RecurringCard } from "@/components/recurring/RecurringCard";
 import { useReservationUnitList } from "@/hooks";
 import { ListWithPagination } from "@/components/common/ListWithPagination";
-import { StartApplicationBar } from "@/components/recurring/StartApplicationBar";
+import { StartApplicationBar, RecurringCard } from "@/lib/recurring/[id]";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getSearchOptions, processVariables } from "@/modules/search";
 import { useSearchQuery } from "@/hooks/useSearchQuery";

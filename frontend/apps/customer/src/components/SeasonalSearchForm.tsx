@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { TextInput } from "hds-react";
 import { type SubmitHandler, useForm } from "react-hook-form";
-import { FilterTagList } from "../FilterTagList";
+import { FilterTagList } from "./FilterTagList";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { type OptionsListT } from "ui/src/modules/search";
 import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";

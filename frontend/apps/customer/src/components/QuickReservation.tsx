@@ -15,7 +15,7 @@ import {
 import Carousel from "@/components/Carousel";
 import { type Control, type FieldValues, type SubmitHandler, type UseFormReturn } from "react-hook-form";
 import { ControlledDateInput } from "ui/src/components/form";
-import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
+import { type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { type FocusTimeSlot } from "@/modules/reservation";
 
