@@ -1,6 +1,5 @@
 import { breakpoints } from "ui/src/modules/const";
 import { Flex } from "ui/src/styled";
-import { Stepper } from "hds-react";
 import styled from "styled-components";
 
 const CARD_COLUMN_SIZE = 390;
@@ -44,11 +43,4 @@ export const ReservationTitleSection = styled(Flex)`
   display: flex;
   gap: var(--spacing-m);
   flex-direction: column;
-`;
-
-// HDS uses fixed width for the stepper content, make sure it's long enough for all variations (single line).
-export const ReservationStepper = styled(Stepper)`
-  & {
-    --hds-step-width: 155px;
-  }
 `;
