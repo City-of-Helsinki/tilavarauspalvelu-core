@@ -1,12 +1,12 @@
 import React, { useMemo } from "react";
-import { Card } from "ui/src/components";
-import { breakpoints } from "ui/src/modules/const";
+import { Card } from "@ui/components";
+import { breakpoints } from "@ui/modules/const";
 import { gql } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { formatters as getFormatters } from "ui";
-import { Flex, fontMedium, Strong } from "ui/src/styled";
+import { formatters as getFormatters } from "@ui/index";
+import { Flex, fontMedium, Strong } from "@ui/styled";
 import {
   AccessType,
   type ReservationInfoCardFragment,
@@ -14,10 +14,10 @@ import {
   useAccessCodeQuery,
 } from "@gql/gql-types";
 import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
-import { createNodeId, capitalize, getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
-import { formatDateTimeRange, formatDuration } from "ui/src/modules/date-utils";
+import { createNodeId, capitalize, getImageSource, getLocalizationLang, getMainImage } from "@ui/modules/helpers";
+import { formatDateTimeRange, formatDuration } from "@ui/modules/date-utils";
 import { getReservationUnitPath } from "@/modules/urls";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
 
 const InfoCard = styled(Card)`
   && h2 {

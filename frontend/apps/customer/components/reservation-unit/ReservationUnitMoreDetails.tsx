@@ -12,16 +12,16 @@ import { getFuturePricing, getPriceString, getReservationUnitName } from "@/modu
 import { JustForMobile } from "@/modules/style/layout";
 import { Accordion } from "hds-react";
 import { gql } from "@apollo/client";
-import { filterNonNullable, formatListToCSV, isPriceFree, toNumber } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { formatDate, formatTimeRange, timeToMinutes } from "ui/src/modules/date-utils";
+import { filterNonNullable, formatListToCSV, isPriceFree, toNumber } from "@ui/modules/helpers";
+import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
+import { formatDate, formatTimeRange, timeToMinutes } from "@ui/modules/date-utils";
 import { ReservationInfoSection } from "./ReservationInfoSection";
-import { Sanitize } from "ui/src/components/Sanitize";
+import { Sanitize } from "@ui/components/Sanitize";
 import styled from "styled-components";
-import { formatters as getFormatters } from "ui";
-import { breakpoints } from "ui/src/modules/const";
+import { formatters as getFormatters } from "@ui/index";
+import { breakpoints } from "@ui/modules/const";
 import { AddressSection } from "./AddressSection";
-import { useGenericTerms } from "ui/src/hooks";
+import { useGenericTerms } from "@ui/hooks";
 
 /// Below the fold content
 /// TODO use a client side fetch instead of passing data from SSR (requires more refactors)

@@ -1,3 +1,4 @@
+import React, { useMemo } from "react";
 import {
   ReservationCancelReasonChoice,
   type ReservationPaymentUrlFragment,
@@ -5,15 +6,14 @@ import {
   ReservationStateChoice,
 } from "@gql/gql-types";
 import { Notification } from "hds-react";
-import { ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
+import { ButtonLikeExternalLink } from "@ui/components/ButtonLikeLink";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { convertLanguageCode } from "ui/src/modules/util";
-import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
-import { Flex, fontMedium } from "ui/src/styled";
-import { formatters as getFormatters } from "ui";
-import React, { useMemo } from "react";
-import { breakpoints } from "ui/src/modules/const";
+import { convertLanguageCode } from "@ui/modules/util";
+import { formatDateTime, parseValidDateObject } from "@ui/modules/date-utils";
+import { Flex, fontMedium } from "@ui/styled";
+import { formatters as getFormatters } from "@ui/index";
+import { breakpoints } from "@ui/modules/const";
 import { getPaymentUrl } from "@/modules/reservation";
 
 type PaymentNotificationProps = {

@@ -1,6 +1,6 @@
 import { differenceInMinutes } from "date-fns";
 import type { TFunction } from "i18next";
-import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "ui";
+import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
 import {
   type CreateTagStringFragment,
   ReserveeType,

@@ -3,7 +3,7 @@ import { Button, ButtonVariant, IconArrowRight, IconCross, LoadingSpinner } from
 import { useForm, FormProvider, type UseFormReturn, FieldValues } from "react-hook-form";
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "ui/src/reservation-form";
+import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/reservation-form";
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
 import {
@@ -12,20 +12,20 @@ import {
   ReserveeType,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
-import { getReservationFormGeneralFields } from "ui/src/reservation-form/util";
-import { getReservationFormSchema, type ReservationFormValueT } from "ui/src/schemas";
+import { getReservationFormGeneralFields } from "@ui/reservation-form/util";
+import { getReservationFormSchema, type ReservationFormValueT } from "@ui/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { LinkLikeButton } from "ui/src/styled";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { type OptionsRecord } from "ui";
+import { LinkLikeButton } from "@ui/styled";
+import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
+import { type OptionsRecord } from "@ui/types";
 import { NewReservationForm } from "@/styled/reservation";
-import { useDisplayError } from "ui/src/hooks";
+import { useDisplayError } from "@ui/hooks";
 import { useRouter } from "next/router";
 import { getReservationInProgressPath, getReservationUnitPath } from "@/modules/urls";
 import { gql } from "@apollo/client";
-import { ErrorListBox } from "ui/src/components/ErrorListBox";
-import { isNotFoundError } from "ui/src/modules/apolloUtils";
+import { ErrorListBox } from "@ui/components/ErrorListBox";
+import { isNotFoundError } from "@ui/modules/apolloUtils";
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
