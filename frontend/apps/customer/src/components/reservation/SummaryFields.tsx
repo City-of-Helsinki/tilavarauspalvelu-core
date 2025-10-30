@@ -1,7 +1,6 @@
 import { type TFunction, useTranslation } from "next-i18next";
 import { MunicipalityChoice, type ReservationFormFieldsFragment } from "@gql/gql-types";
 import { AutoGrid, H4 } from "@ui/styled";
-import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
 import { LabelValuePair } from "./LabelValuePair";
 import { type OptionsRecord } from "@ui/types";
 import {
@@ -36,18 +35,18 @@ export function SummaryReserveeFields({ reservation, options }: Readonly<Summary
       <H4 as="h2">{t("reservationCalendar:reserverInfo")}</H4>
       <AutoGrid>
         {hasReserveeType && reserveeType != null && (
-          <ParagraphAlt $isWide>
-            <PreviewLabel>{t("reservationApplication:reserveeTypePrefix")}</PreviewLabel>
-            <PreviewValue data-testid="reservation__reserveeType">
-              {t(`reservationApplication:reserveeTypes.labels.${reserveeType}`)}
-            </PreviewValue>
-          </ParagraphAlt>
+          <LabelValuePair
+            label={t("reservationApplication:reserveeTypePrefix")}
+            value={t(`reservationApplication:reserveeTypes.labels.${reserveeType}`)}
+            testId="reservation__summary-fields__reserveeType"
+            isWide
+          />
         )}
         {filteredReserveeFields.map((key) => {
           const value = convertMaybeOptionValue(t, key, reservation, options);
           const typeNamespace = reserveeType?.toLocaleLowerCase() ?? "individual";
           const label = t(`reservationApplication:label.${typeNamespace}.${key}`);
-          const testId = `reservation__${key}`;
+          const testId = `reservation__summary-fields__${key}`;
           return <LabelValuePair key={key} label={label} value={value} testId={testId} />;
         })}
       </AutoGrid>
@@ -81,7 +80,7 @@ export function SummaryGeneralFields({
           const value = convertMaybeOptionValue(t, key, reservation, options);
           const isWide = WIDE_FIELDS.has(key);
           const label = t(`reservationApplication:label.common.${key}`);
-          const testId = `reservation__${key}`;
+          const testId = `reservation__summary-fields__${key}`;
           return <LabelValuePair key={key} label={label} value={value} testId={testId} isWide={isWide} />;
         })}
       </AutoGrid>
