@@ -44,7 +44,7 @@ export async function getGenericTerms(apolloClient: ApolloClient<unknown>): Prom
   const { data: tosData } = await apolloClient.query<TermsOfUseQuery, TermsOfUseQueryVariables>({
     query: TermsOfUseDocument,
     variables: {
-      termsType: TermsOfUseTypeChoices.GenericTerms,
+      termsType: TermsOfUseTypeChoices.Generic,
       pk: genericTermsVariant.BOOKING,
     },
   });

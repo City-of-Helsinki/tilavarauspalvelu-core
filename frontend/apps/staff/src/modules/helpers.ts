@@ -181,7 +181,7 @@ export function isApplicationRoundInProgress(
 /// @return Normalized interval
 /// @desc reservations made in the admin ui don't follow the customer interval rules
 export function getNormalizedInterval(interval: Maybe<ReservationStartInterval> | undefined) {
-  return interval === ReservationStartInterval.Interval_15Mins
-    ? ReservationStartInterval.Interval_15Mins
-    : ReservationStartInterval.Interval_30Mins;
+  return interval === ReservationStartInterval.Interval_15Minutes
+    ? ReservationStartInterval.Interval_15Minutes
+    : ReservationStartInterval.Interval_30Minutes;
 }
