@@ -311,7 +311,7 @@ function ReservationUnitEditor({
         <DescriptionSection
           form={form}
           equipments={parametersData?.equipmentsAll}
-          purposes={parametersData?.purposes}
+          intendedUses={parametersData?.intendedUses}
           reservationUnitTypes={parametersData?.reservationUnitTypes}
         />
         <ReservationUnitSettingsSection form={form} cancellationRuleOptions={cancellationRuleOptions} />
@@ -485,7 +485,7 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
         pk
         nameFi
       }
-      purposes {
+      intendedUses {
         id
         pk
         nameFi
@@ -631,7 +631,7 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
         }
       }
     }
-    purposes {
+    intendedUses {
       edges {
         node {
           id

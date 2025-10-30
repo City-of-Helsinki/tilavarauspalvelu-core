@@ -102,7 +102,7 @@ function WrappedRender({
   const options = {
     units: [],
     equipments: [],
-    purposes: [],
+    intendedUses: [],
     reservationPurposes: [],
     reservationUnitTypes: [],
     ageGroups: [],

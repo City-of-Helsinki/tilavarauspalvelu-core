@@ -25,7 +25,7 @@ export type SearchFormValues = {
   personsAllowed: number | null;
   units: number[];
   reservationUnitTypes: number[];
-  purposes: number[];
+  intendedUses: number[];
   textSearch: string;
   accessTypes: string[];
 };
@@ -33,7 +33,7 @@ export type SearchFormValues = {
 // TODO combine as much as possible with the one in single-search (move them to a common place)
 function mapSeasonalQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   return {
-    purposes: mapParamToInteger(params.getAll("purposes"), 1),
+    intendedUses: mapParamToInteger(params.getAll("intendedUses"), 1),
     units: mapParamToInteger(params.getAll("units"), 1),
     reservationUnitTypes: mapParamToInteger(params.getAll("reservationUnitTypes"), 1),
     personsAllowed: toNumber(params.get("personsAllowed")),
@@ -43,7 +43,7 @@ function mapSeasonalQueryToForm(params: ReadonlyURLSearchParams): SearchFormValu
 }
 
 export type SearchFormProps = {
-  options: Pick<OptionsListT, "purposes" | "reservationUnitTypes" | "units">;
+  options: Pick<OptionsListT, "intendedUses" | "reservationUnitTypes" | "units">;
   handleSearch: SubmitHandler<SearchFormValues>;
   isLoading: boolean;
 };
@@ -74,8 +74,8 @@ export function SeasonalSearchForm({
         return options.units.find((n) => String(n.value) === value)?.label;
       case "reservationUnitTypes":
         return options.reservationUnitTypes.find((n) => String(n.value) === value)?.label;
-      case "purposes":
-        return options.purposes.find((n) => String(n.value) === value)?.label;
+      case "intendedUses":
+        return options.intendedUses.find((n) => String(n.value) === value)?.label;
       case "accessTypes":
         return accessTypeOptions.find((n) => String(n.value) === value)?.label;
       default:
@@ -83,7 +83,7 @@ export function SeasonalSearchForm({
     }
   };
 
-  const multiSelectFilters = ["units", "reservationUnitTypes", "purposes", "accessTypes"] as const;
+  const multiSelectFilters = ["units", "reservationUnitTypes", "intendedUses", "accessTypes"] as const;
   const hideList = ["id", "order", "sort", "ref", "selectedReservationUnits", "modalShown"] as const;
 
   return (
@@ -142,11 +142,11 @@ export function SeasonalSearchForm({
           multiselect
           enableSearch
           clearable
-          name="purposes"
+          name="intendedUses"
           control={control}
-          options={options.purposes}
-          disabled={options.purposes.length === 0}
-          label={t("searchForm:labels.purposes")}
+          options={options.intendedUses}
+          disabled={options.intendedUses.length === 0}
+          label={t("searchForm:labels.intendedUses")}
         />
         <ControlledSelect
           multiselect

@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import styled from "styled-components";
-import type { PurposeCardFragment } from "@gql/gql-types";
+import type { IntendedUseCardFragment } from "@gql/gql-types";
 import { getSingleSearchPath } from "@/modules/urls";
 import { ReservationUnitSearch } from "./ReservationUnitSearch";
 import { pixel } from "@/styled/util";
@@ -64,7 +64,7 @@ const Image = styled.img`
 `;
 
 type Props = {
-  purposes: PurposeCardFragment[];
+  purposes: IntendedUseCardFragment[];
 };
 
 export function Purposes({ purposes }: Props): JSX.Element {
@@ -72,15 +72,15 @@ export function Purposes({ purposes }: Props): JSX.Element {
   const isMobile = useMedia(`(max-width: ${breakpoints.s})`, false);
   const itemLimit = useMemo(() => (isMobile ? 4 : 8), [isMobile]);
 
-  const getImg = (item: Pick<PurposeCardFragment, "smallUrl" | "imageUrl">) => {
+  const getImg = (item: Pick<IntendedUseCardFragment, "smallUrl" | "imageUrl">) => {
     return item.smallUrl || item.imageUrl || pixel;
   };
   const lang = getLocalizationLang(i18n.language);
-  const getName = (item: Pick<PurposeCardFragment, "nameFi" | "nameEn" | "nameSv">) => {
+  const getName = (item: Pick<IntendedUseCardFragment, "nameFi" | "nameEn" | "nameSv">) => {
     return getTranslationSafe(item, "name", lang);
   };
 
-  const getSearchLink = (purpose: PurposeCardFragment): string => {
+  const getSearchLink = (purpose: IntendedUseCardFragment): string => {
     const params = new URLSearchParams();
     // next/link so it's safer to return invalid search params than empty link
     params.set("purposes", purpose.pk?.toString() ?? "");
@@ -119,8 +119,8 @@ export function Purposes({ purposes }: Props): JSX.Element {
   );
 }
 
-export const PURPOSE_CARD_FRAGMENT = gql`
-  fragment PurposeCard on PurposeNode {
+export const INTENDED_USE_CARD_FRAGMENT = gql`
+  fragment IntendedUseCard on IntendedUseNode {
     id
     pk
     nameFi

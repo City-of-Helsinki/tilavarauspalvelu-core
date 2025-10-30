@@ -28,7 +28,7 @@ const StyledCheckBox = styled(Checkbox)`
 type SearchFormValues = {
   // TODO there is some confusion on the types of these
   // they are actually an array of pks (number) but they are encoded as val1,val2,val3 string
-  purposes: number[];
+  intendedUses: number[];
   units: number[];
   equipments: number[];
   reservationUnitTypes: number[];
@@ -48,7 +48,7 @@ function mapQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   const duration = dur != null && dur > 0 ? dur : null;
   const showOnlyReservable = ignoreMaybeArray(params.getAll("showOnlyReservable")) !== "false";
   return {
-    purposes: mapParamToInteger(params.getAll("purposes"), 1),
+    intendedUses: mapParamToInteger(params.getAll("intendedUses"), 1),
     units: mapParamToInteger(params.getAll("units"), 1),
     equipments: mapParamToInteger(params.getAll("equipments"), 1),
     reservationUnitTypes: mapParamToInteger(params.getAll("reservationUnitTypes"), 1),
@@ -75,11 +75,11 @@ const filterOrder = [
   "personsAllowed",
   "reservationUnitTypes",
   "units",
-  "purposes",
+  "intendedUses",
   "equipments",
   "accessTypes",
 ] as const;
-const multiSelectFilters = ["units", "reservationUnitTypes", "purposes", "equipments", "accessTypes"] as const;
+const multiSelectFilters = ["units", "reservationUnitTypes", "intendedUses", "equipments", "accessTypes"] as const;
 // we don't want to show "showOnlyReservable" as a FilterTag, as it has its own checkbox in the form
 const hideTagList = ["showOnlyReservable", "order", "sort", "ref"];
 
@@ -90,7 +90,7 @@ type SingleSearchFormProps = {
 
 // TODO rewrite this without the form state (use query params directly, but don't refresh the page)
 export function SingleSearchForm({
-  options: { reservationUnitTypes, purposes, units, equipments },
+  options: { reservationUnitTypes, intendedUses, units, equipments },
   isLoading,
 }: Readonly<SingleSearchFormProps>): JSX.Element | null {
   const { handleSearch } = useSearchModify();
@@ -119,8 +119,8 @@ export function SingleSearchForm({
         return units.find((n) => compFn(n, value))?.label;
       case "reservationUnitTypes":
         return reservationUnitTypes.find((n) => compFn(n, value))?.label;
-      case "purposes":
-        return purposes.find((n) => compFn(n, value))?.label;
+      case "intendedUses":
+        return intendedUses.find((n) => compFn(n, value))?.label;
       case "equipments":
         return equipments.find((n) => compFn(n, value))?.label;
       case "duration":
@@ -151,7 +151,7 @@ export function SingleSearchForm({
     formValues.duration ||
     formValues.units.length ||
     formValues.personsAllowed ||
-    formValues.purposes.length ||
+    formValues.intendedUses.length ||
     formValues.equipments.length ||
     formValues.accessTypes.length
   );
@@ -262,9 +262,9 @@ export function SingleSearchForm({
           min={1}
         />
         <ControlledSelect
-          name="purposes"
-          label={t("searchForm:labels.purposes")}
-          options={purposes}
+          name="intendedUses"
+          label={t("searchForm:labels.intendedUses")}
+          options={intendedUses}
           control={control}
           multiselect
           clearable

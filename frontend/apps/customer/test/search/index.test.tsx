@@ -65,7 +65,7 @@ describe("SearchSingle read query params", () => {
       | "textSearch"
       | "startDate"
       | "endDate"
-      | "purposes"
+      | "intendedUses"
       | "units"
       | "equipments"
       | "reservationUnitTypes"
@@ -96,10 +96,10 @@ describe("SearchSingle read query params", () => {
         formFieldText: "31.12.2025",
         initiallyOpen: false,
       },
-      purposes: {
+      intendedUses: {
         value: "1",
-        tagText: options.purposes[0]?.label,
-        formFieldText: options.purposes[0]?.label,
+        tagText: options.intendedUses[0]?.label,
+        formFieldText: options.intendedUses[0]?.label,
         initiallyOpen: true,
       },
       units: {
@@ -181,7 +181,7 @@ describe("SearchSingle read query params", () => {
       "textSearch",
       "startDate",
       "endDate",
-      "purposes",
+      "intendedUses",
       "units",
       "equipments",
       "reservationUnitTypes",
@@ -207,7 +207,14 @@ describe("SearchSingle read query params", () => {
   });
 
   test.for(
-    selectFilterParamsForTest(["purposes", "units", "equipments", "reservationUnitTypes", "duration", "accessTypes"])
+    selectFilterParamsForTest([
+      "intendedUses",
+      "units",
+      "equipments",
+      "reservationUnitTypes",
+      "duration",
+      "accessTypes",
+    ])
   )("Use $key query param in form", ({ key, value, formFieldText }) => {
     setUrlSearchParams(key, value);
     const view = customRender();

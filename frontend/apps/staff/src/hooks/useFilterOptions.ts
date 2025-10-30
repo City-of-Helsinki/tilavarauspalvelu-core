@@ -116,8 +116,8 @@ export function getFilterOptions(
     reserveeTypes,
     orderChoices: orderOptions,
     priorityChoices: priorities,
-    // purposes are not used for filter options in admin-ui
-    purposes: [],
+    // intendedUses are not used for filter options in admin-ui
+    intendedUses: [],
     reservationPurposes,
     ageGroups: ageGroups,
     // Not used by admin at all, common interface issue

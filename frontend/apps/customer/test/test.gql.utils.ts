@@ -35,7 +35,9 @@ export function createOptionMock(
   return {
     units: filterNonNullable(opts.unitsAll).map((n) => translateOption(n, lang)),
     equipments: filterNonNullable(opts.equipmentsAll).map((n) => translateOption(n, lang)),
-    purposes: filterNonNullable(opts.purposes?.edges.map((edge) => edge?.node)).map((n) => translateOption(n, lang)),
+    intendedUses: filterNonNullable(opts.intendedUses?.edges.map((edge) => edge?.node)).map((n) =>
+      translateOption(n, lang)
+    ),
     reservationUnitTypes: filterNonNullable(opts.reservationUnitTypes?.edges.map((edge) => edge?.node)).map((n) =>
       translateOption(n, lang)
     ),
@@ -101,7 +103,7 @@ export function createOptionQueryMock({
     nameSv: `Equipment ${i + 1} SV`,
     nameEn: `Equipment ${i + 1} EN`,
   }));
-  const purposes = Array.from({ length: nCount }, (_, i) => ({
+  const intendedUses = Array.from({ length: nCount }, (_, i) => ({
     id: createNodeId("PurposeNode", i + 1),
     pk: i + 1,
     nameFi: `Purpose ${i + 1} FI`,
@@ -119,8 +121,8 @@ export function createOptionQueryMock({
     reservationUnitTypes: {
       edges: reservationUnitTypes.map((node) => ({ node })),
     },
-    purposes: {
-      edges: purposes.map((node) => ({ node })),
+    intendedUses: {
+      edges: intendedUses.map((node) => ({ node })),
     },
     equipmentsAll: equipments,
     unitsAll: units,
