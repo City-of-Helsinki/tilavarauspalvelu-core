@@ -5,7 +5,7 @@ import { ReservationStartInterval, ReservationTypeChoice, Weekday } from "@gql/g
 import { getReservationSeriesSchema, ReservationSeriesFormValues } from "./reservationSeries";
 
 const tomorrow = addDays(new Date(), 1);
-const interval = ReservationStartInterval.Interval_15Mins;
+const interval = ReservationStartInterval.Interval_15Minutes;
 
 function createInput({
   type = ReservationTypeChoice.Blocked,
