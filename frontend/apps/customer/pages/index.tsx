@@ -15,7 +15,7 @@ import { Purposes } from "@/components/index/Purposes";
 import { SearchGuides } from "@/components/index/SearchGuides";
 import { Units } from "@/components/index/Units";
 import { createApolloClient } from "@/modules/apolloClient";
-import { filterNonNullable } from "ui/src/modules/helpers";
+import { filterNonNullable } from "@ui/modules/helpers";
 import { gql } from "@apollo/client";
 
 function Home({ purposes, units }: Props): JSX.Element {
