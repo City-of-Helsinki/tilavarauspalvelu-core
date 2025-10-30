@@ -1,4 +1,4 @@
-import { type TermsOfUseFieldsFragment, TermsOfUseTypeChoices } from "@/gql/gql-types";
+import { type TermsOfUseFieldsFragment, TermsOfUseTypeChoices } from "@gql/gql-types";
 import Page4 from "@/pages/applications/[id]/page4";
 import { render, within } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";

@@ -5,7 +5,7 @@ import {
   ReservationPurposeOrderingChoices,
   ReservationUnitTypeOrderingChoices,
   type CurrentUserQuery,
-} from "@/gql/gql-types";
+} from "@gql/gql-types";
 import { createApplicationMutationMocks } from "./application.mocks";
 import { createSearchQueryMocks } from "./search.mocks";
 import {

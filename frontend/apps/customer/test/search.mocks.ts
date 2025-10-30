@@ -4,7 +4,7 @@ import {
   SearchReservationUnitsDocument,
   type SearchReservationUnitsQuery,
   type SearchReservationUnitsQueryVariables,
-} from "@/gql/gql-types";
+} from "@gql/gql-types";
 import { CreateGraphQLMocksReturn, ICreateGraphQLMock } from "./test.gql.utils";
 import { createMockReservationUnit } from "./reservation-unit.mocks";
 
