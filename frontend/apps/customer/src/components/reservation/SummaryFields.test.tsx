@@ -58,13 +58,17 @@ describe("Component: Reservation Details", () => {
   });
 });
 
+function constructTestId(fieldName: ReturnType<typeof getFilteredSupportedFields>[0]): string {
+  return `reservation__summary-fields__${fieldName}`;
+}
+
 describe("Component: Reservee Details", () => {
   describe("Type: individual", () => {
     it.for(getFilteredSupportedFields(ReserveeType.Individual))(
       "should render the %s label and the correct value from the reservation",
       (fieldName) => {
         renderReserveeFields(ReserveeType.Individual);
-        expect(screen.getByTestId(`reservation__${fieldName}`)).toBeInTheDocument();
+        expect(screen.getByTestId(constructTestId(fieldName))).toBeInTheDocument();
         expect(screen.getByText(`reservationApplication:label.individual.${fieldName}`)).toBeInTheDocument();
       }
     );
@@ -75,7 +79,7 @@ describe("Component: Reservee Details", () => {
       "should render the %s label and the correct value from the reservation",
       (fieldName) => {
         renderReserveeFields(ReserveeType.Nonprofit);
-        expect(screen.getByTestId(`reservation__${fieldName}`)).toBeInTheDocument();
+        expect(screen.getByTestId(constructTestId(fieldName))).toBeInTheDocument();
         expect(screen.getByText(`reservationApplication:label.nonprofit.${fieldName}`)).toBeInTheDocument();
       }
     );
@@ -86,7 +90,7 @@ describe("Component: Reservee Details", () => {
       "should render the %s label and the correct value from the reservation",
       (fieldName) => {
         renderReserveeFields(ReserveeType.Company);
-        expect(screen.getByTestId(`reservation__${fieldName}`)).toBeInTheDocument();
+        expect(screen.getByTestId(constructTestId(fieldName))).toBeInTheDocument();
         expect(screen.getByText(`reservationApplication:label.company.${fieldName}`)).toBeInTheDocument();
       }
     );
