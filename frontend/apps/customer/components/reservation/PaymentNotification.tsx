@@ -5,15 +5,15 @@ import {
   ReservationStateChoice,
 } from "@gql/gql-types";
 import { Notification } from "hds-react";
-import { ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
+import { ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { convertLanguageCode } from "common/src/modules/util";
-import { formatDateTime, parseValidDateObject } from "common/src/modules/date-utils";
-import { Flex, fontMedium } from "common/src/styled";
-import { formatters as getFormatters } from "common";
+import { convertLanguageCode } from "ui/src/modules/util";
+import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
+import { Flex, fontMedium } from "ui/src/styled";
+import { formatters as getFormatters } from "ui";
 import React, { useMemo } from "react";
-import { breakpoints } from "common/src/modules/const";
+import { breakpoints } from "ui/src/modules/const";
 import { getPaymentUrl } from "@/modules/reservation";
 
 type PaymentNotificationProps = {

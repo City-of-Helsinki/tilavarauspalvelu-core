@@ -10,9 +10,10 @@ import {
   ReservationStateChoice,
   type Maybe,
   BlockingReservationFieldsFragment,
+  type ReservationUnitNode,
 } from "@/gql/gql-types";
-import { formatApiDateUnsafe } from "common/src/modules/date-utils";
-import { dayMax, dayMin } from "common/src/modules/helpers";
+import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
+import { dayMax, dayMin } from "ui/src/modules/helpers";
 import {
   differenceInSeconds,
   isValid,
@@ -29,9 +30,8 @@ import {
   addMilliseconds,
   differenceInMinutes,
 } from "date-fns";
-import { type SlotProps } from "common/src/components/calendar/Calendar";
-import { type ReservationUnitNode } from "common/gql/gql-types";
-import { getIntervalMinutes } from "common/src/modules/conversion";
+import { type SlotProps } from "ui/src/components/calendar/Calendar";
+import { getIntervalMinutes } from "ui/src/modules/conversion";
 import { gql } from "@apollo/client";
 
 export type RoundPeriod = {

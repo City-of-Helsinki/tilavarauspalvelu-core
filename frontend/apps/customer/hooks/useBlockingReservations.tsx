@@ -1,9 +1,9 @@
 import { addYears } from "date-fns";
 import { gql } from "@apollo/client";
 import { useAffectingReservationsQuery } from "@/gql/gql-types";
-import { filterNonNullable } from "common/src/modules/helpers";
-import { formatApiDate } from "common/src/modules/date-utils";
-import { RELATED_RESERVATION_STATES } from "common/src/modules/const";
+import { filterNonNullable } from "ui/src/modules/helpers";
+import { formatApiDate } from "ui/src/modules/date-utils";
+import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { BLOCKING_RESERVATIONS_POLL_INTERVAL } from "@/modules/const";
 
 // NOTE use client side polling because

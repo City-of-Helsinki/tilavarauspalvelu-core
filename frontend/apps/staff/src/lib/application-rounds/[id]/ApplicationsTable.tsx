@@ -3,13 +3,13 @@ import { useTranslation, type TFunction } from "next-i18next";
 import { memoize, orderBy, uniqBy } from "lodash-es";
 import { IconLinkExternal, IconSize } from "hds-react";
 import { type ApplicationsTableElementFragment, ApplicationStatusChoice } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/modules/helpers";
+import { filterNonNullable } from "ui/src/modules/helpers";
 import { getApplicantName, translateReserveeType, truncate } from "@/modules/helpers";
 import { CustomTable } from "@/components/Table";
 import { calculateAppliedReservationTime, formatAppliedReservationTime } from "./utils";
 import { getApplicationUrl } from "@/modules/urls";
 import { ExternalTableLink } from "@/styled";
-import { ApplicationStatusLabel } from "common/src/components/statuses";
+import { ApplicationStatusLabel } from "ui/src/components/statuses";
 import { gql } from "@apollo/client";
 
 const unitsTruncateLen = 23;

@@ -2,23 +2,23 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant, Notification, NotificationSize } from "hds-react";
 import { useFormContext } from "react-hook-form";
-import { AutoGrid, Flex } from "common/src/styled";
-import { filterNonNullable } from "common/src/modules/helpers";
-import { ControlledSelect } from "common/src/components/form";
+import { AutoGrid, Flex } from "ui/src/styled";
+import { filterNonNullable } from "ui/src/modules/helpers";
+import { ControlledSelect } from "ui/src/components/form";
 import {
   ApplicationTimeSelector,
   type Cell,
   type CellState,
   isCellEqual,
-} from "common/src/components/ApplicationTimeSelector";
-import { successToast } from "common/src/components/toast";
-import { ErrorText } from "common/src/components/ErrorText";
+} from "ui/src/components/ApplicationTimeSelector";
+import { successToast } from "ui/src/components/toast";
+import { ErrorText } from "ui/src/components/ErrorText";
 import { type TimeSelectorFragment } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
 import { aesToCells, covertCellsToTimeRange } from "./timeSelectorModule";
 import { type ApplicationPage2FormValues } from "./form";
 import { TimePreview } from ".";
-import { convertWeekday } from "common/src/modules/conversion";
+import { convertWeekday } from "ui/src/modules/conversion";
 
 export type TimeSelectorProps = {
   index: number;

@@ -17,10 +17,10 @@ import {
   type CanReservationBeChangedProps,
 } from "./reservation";
 import { isSlotWithinReservationTime } from "./reservable";
-import { formatApiDate } from "common/src/modules/date-utils";
+import { formatApiDate } from "ui/src/modules/date-utils";
 import { type TFunction } from "i18next";
 import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
-import { createNodeId } from "common/src/modules/helpers";
+import { createNodeId } from "ui/src/modules/helpers";
 
 function createMockCancellationRule({
   canBeCancelledTimeBefore = 0,

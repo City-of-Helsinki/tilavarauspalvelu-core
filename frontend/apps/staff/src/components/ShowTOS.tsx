@@ -1,9 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { useGenericTerms } from "common/src/hooks/useGenericTerms";
+import { useGenericTerms } from "ui/src/hooks/useGenericTerms";
 import { type Maybe, type TermsOfUseTextFieldsFragment } from "@gql/gql-types";
-import { Sanitize } from "common/src/components/Sanitize";
+import { Sanitize } from "ui/src/components/Sanitize";
 
 // NOTE This is partial duplicate from ui/application/Preview.tsx
 // see if we can combine them (and other Terms later with parameters)

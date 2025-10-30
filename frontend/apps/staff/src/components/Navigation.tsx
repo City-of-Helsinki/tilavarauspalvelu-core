@@ -1,11 +1,11 @@
 import { useTranslation } from "next-i18next";
-import { signIn, signOut } from "common/src/modules/browserHelpers";
+import { signIn, signOut } from "ui/src/modules/browserHelpers";
 import { useSession, useHandling } from "@/hooks";
 import { Header, IconLinkExternal, IconSignout, IconStar, IconUser, LogoSize, TitleStyleType } from "hds-react";
 import React from "react";
 import styled from "styled-components";
 import { useLocation } from "react-use";
-import Logo from "common/src/components/Logo";
+import Logo from "ui/src/components/Logo";
 import { hasSomePermission } from "@/modules/permissionHelper";
 import { env } from "@/env.mjs";
 import {
@@ -19,7 +19,7 @@ import {
   getAccessibilityTermsUrl,
 } from "@/modules/urls";
 import { UserPermissionChoice } from "@gql/gql-types";
-import { getLocalizationLang } from "common/src/modules/helpers";
+import { getLocalizationLang } from "ui/src/modules/helpers";
 import { useRouter } from "next/router";
 import { PUBLIC_URL } from "@/modules/const";
 

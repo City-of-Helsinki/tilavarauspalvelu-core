@@ -30,22 +30,16 @@ import {
   LinkLikeButton,
   H5,
   CenterSpinner,
-} from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
-import { getTranslationSafe } from "common/src/modules/util";
-import {
-  filterNonNullable,
-  formatApiTimeInterval,
-  getLocalizationLang,
-  sort,
-  toNumber,
-} from "common/src/modules/helpers";
-import type { LocalizationLanguages } from "common/src/modules/urlBuilder";
-import { convertWeekday } from "common/src/modules/conversion";
-import { PopupMenu } from "common/src/components/PopupMenu";
-import { IconButton, StatusLabel } from "common/src/components";
-import type { StatusLabelType } from "common/src/components/StatusLabel";
-import { Sanitize } from "common/src/components/Sanitize";
+} from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
+import { getTranslationSafe } from "ui/src/modules/util";
+import { filterNonNullable, formatApiTimeInterval, getLocalizationLang, sort, toNumber } from "ui/src/modules/helpers";
+import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
+import { convertWeekday } from "ui/src/modules/conversion";
+import { PopupMenu } from "ui/src/components/PopupMenu";
+import { IconButton, StatusLabel } from "ui/src/components";
+import type { StatusLabelType } from "ui/src/components/StatusLabel";
+import { Sanitize } from "ui/src/components/Sanitize";
 import {
   type ApplicationSectionReservationFragment,
   useApplicationReservationsQuery,
@@ -62,7 +56,7 @@ import {
 } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
 import { getApplicationReservationPath, getApplicationSectionPath, getReservationUnitPath } from "@/modules/urls";
-import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { AccordionWithIcons } from "@/components/AccordionWithIcons";
 import { isReservationCancellableReason, ReservationCancellableReason } from "@/modules/reservation";
 import {
@@ -71,7 +65,7 @@ import {
   applicationReservationDateTime,
   setMondayFirst,
   formatApiDate,
-} from "common/src/modules/date-utils";
+} from "ui/src/modules/date-utils";
 import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 
 const N_RESERVATIONS_TO_SHOW = 20;

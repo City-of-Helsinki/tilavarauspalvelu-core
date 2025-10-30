@@ -15,7 +15,7 @@ import {
   TermsOfUseTypeChoices,
   ReservationFormType,
 } from "@gql/gql-types";
-import { createNodeId } from "common/src/modules/helpers";
+import { createNodeId } from "ui/src/modules/helpers";
 import { generateNameFragment } from "@/test/test.gql.utils";
 
 export function generateTextFragment(text: string) {

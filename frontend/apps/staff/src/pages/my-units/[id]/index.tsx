@@ -1,13 +1,13 @@
-import TimeZoneNotification from "common/src/components/TimeZoneNotification";
+import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
 import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant, Tabs } from "hds-react";
-import { Flex, H1, TabWrapper, TitleSection } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
+import { Flex, H1, TabWrapper, TitleSection } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
 import { formatAddress } from "@/modules/util";
 import { getReservationSeriesUrl } from "@/modules/urls";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
+import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import {
   FilterOptionsDocument,
   type FilterOptionsQuery,
@@ -28,7 +28,7 @@ import { type GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { CreateReservationModal, ReservationUnitCalendarView, UnitReservations } from "@lib/my-units/[id]/";
-import { parseUIDate } from "common/src/modules/date-utils";
+import { parseUIDate } from "ui/src/modules/date-utils";
 import { addMinutes } from "date-fns";
 import { createClient } from "@/modules/apolloClient";
 import { hasPermission } from "@/modules/permissionHelper";

@@ -1,7 +1,7 @@
 import { ApplicationStatusChoice, Priority } from "@gql/gql-types";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
-import type { DayT } from "common/src/modules/const";
+import type { DayT } from "ui/src/modules/const";
 import {
   transformAccessCodeState,
   transformApplicationSectionStatus,
@@ -13,14 +13,8 @@ import {
   transformReservationUnitState,
   transformReserveeType,
   transformWeekday,
-} from "common/src/modules/conversion";
-import {
-  filterEmptyArray,
-  filterNonNullable,
-  mapParamToInteger,
-  toInteger,
-  toNumber,
-} from "common/src/modules/helpers";
+} from "ui/src/modules/conversion";
+import { filterEmptyArray, filterNonNullable, mapParamToInteger, toInteger, toNumber } from "ui/src/modules/helpers";
 
 export function getFilterSearchParams({
   searchParams,

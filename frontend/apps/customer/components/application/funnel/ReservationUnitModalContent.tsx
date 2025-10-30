@@ -18,20 +18,20 @@ import {
   type RecurringCardFragment,
   ReservationKind,
 } from "@gql/gql-types";
-import { filterNonNullable, getImageSource, getMainImage } from "common/src/modules/helpers";
-import { CenterSpinner, Flex, H3 } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
-import Card from "common/src/components/Card";
-import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
+import { filterNonNullable, getImageSource, getMainImage } from "ui/src/modules/helpers";
+import { CenterSpinner, Flex, H3 } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
+import Card from "ui/src/components/Card";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
-import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 // TODO this is weird import path
 import { SearchFormValues, SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { processVariables } from "@/modules/search";
-import { type OptionsListT } from "common/src/modules/search";
+import { type OptionsListT } from "ui/src/modules/search";
 import { useSearchParams } from "next/navigation";
 import { useSearchQuery } from "@/hooks";
 

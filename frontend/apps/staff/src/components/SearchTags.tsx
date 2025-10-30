@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { SearchTagContainer, SearchTag, TagResetButton } from "common/src/styled/tags";
+import { SearchTagContainer, SearchTag, TagResetButton } from "ui/src/styled/tags";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 

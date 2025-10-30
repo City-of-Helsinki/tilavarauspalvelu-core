@@ -12,15 +12,15 @@ import {
   type CurrentUserQuery,
   ApplicationOrderingChoices,
 } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/modules/helpers";
+import { filterNonNullable } from "ui/src/modules/helpers";
 import { ApplicationsGroup } from "@/components/application";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { useCurrentUser } from "@/hooks";
-import { H1 } from "common/src/styled";
+import { H1 } from "ui/src/styled";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { gql } from "@apollo/client";
-import { errorToast, successToast } from "common/src/components/toast";
+import { errorToast, successToast } from "ui/src/components/toast";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

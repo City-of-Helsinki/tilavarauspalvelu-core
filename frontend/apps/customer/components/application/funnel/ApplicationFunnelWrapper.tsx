@@ -1,9 +1,9 @@
 import React from "react";
 import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { breakpoints } from "common/src/modules/const";
-import { type ReadonlyDeep } from "common/src/modules/helpers";
-import { H2, HR } from "common/src/styled";
+import { breakpoints } from "ui/src/modules/const";
+import { type ReadonlyDeep } from "ui/src/modules/helpers";
+import { H2, HR } from "ui/src/styled";
 import { type ApplicationFormFragment } from "@gql/gql-types";
 import { applicationsPrefix } from "@/modules/urls";
 import { Breadcrumb } from "@/components/common/Breadcrumb";

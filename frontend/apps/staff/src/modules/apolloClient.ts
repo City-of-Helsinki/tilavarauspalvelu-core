@@ -3,12 +3,12 @@ import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, NormalizedCacheObjec
 // @ts-ignore -- types require nodenext which breaks bundler option that breaks the build
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { type IncomingMessage } from "http";
-import { buildGraphQLUrl } from "common/src/modules/urlBuilder";
+import { buildGraphQLUrl } from "ui/src/modules/urlBuilder";
 import { env } from "@/env.mjs";
 import { isBrowser } from "./const";
 import { relayStylePagination } from "@apollo/client/utilities";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
-import { enchancedFetch, errorLink } from "common/src/modules/apolloUtils";
+import { enchancedFetch, errorLink } from "ui/src/modules/apolloUtils";
 
 if (process.env.NODE_ENV !== "production") {
   // Adds messages only in a dev environment

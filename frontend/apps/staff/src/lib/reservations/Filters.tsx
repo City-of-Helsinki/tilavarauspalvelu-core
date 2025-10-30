@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { ShowAllContainer } from "common/src/components";
-import { Flex } from "common/src/styled";
+import { ShowAllContainer } from "ui/src/components";
+import { Flex } from "ui/src/styled";
 import {
   ControlledCheckboxFilter,
   ControlledMultiSelectFilter,
@@ -16,11 +16,11 @@ import { OrderStatusWithFree, ReservationTypeChoice, ReservationStateChoice } fr
 import { translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
+import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
-import { mapParamToInteger } from "common/src/modules/helpers";
+import { mapParamToInteger } from "ui/src/modules/helpers";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
-import { mapFormToSearchParams } from "common/src/modules/search";
+import { mapFormToSearchParams } from "ui/src/modules/search";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 
 const MoreWrapper = styled(ShowAllContainer)`

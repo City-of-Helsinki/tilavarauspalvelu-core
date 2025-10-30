@@ -3,12 +3,12 @@ import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { IconArrowRight, IconSize } from "hds-react";
 import Link from "next/link";
-import { breakpoints } from "common/src/modules/const";
-import { Flex, H3, anchorStyles, focusStyles } from "common/src/styled";
+import { breakpoints } from "ui/src/modules/const";
+import { Flex, H3, anchorStyles, focusStyles } from "ui/src/styled";
 import type { UnitListFieldsFragment } from "@gql/gql-types";
-import { IconButton } from "common/src/components";
+import { IconButton } from "ui/src/components";
 import { singleSearchPrefix } from "@/modules/urls";
-import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
 import { gql } from "@apollo/client";
 
 const ITEM_LIMIT = 8;

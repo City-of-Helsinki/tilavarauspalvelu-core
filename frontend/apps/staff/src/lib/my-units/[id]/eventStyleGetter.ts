@@ -1,4 +1,4 @@
-import { type CalendarEvent } from "common/src/components/calendar/Calendar";
+import { type CalendarEvent } from "ui/src/components/calendar/Calendar";
 import {
   ReservationStateChoice,
   ReservationTypeChoice,

@@ -11,7 +11,7 @@ import {
 import { type TFunction, useTranslation } from "next-i18next";
 import { type TagOptionsList } from "@/modules/search";
 import { gql } from "@apollo/client";
-import { filterNonNullable, sort } from "common/src/modules/helpers";
+import { filterNonNullable, sort } from "ui/src/modules/helpers";
 
 export function getFilterOptions(
   t: TFunction,

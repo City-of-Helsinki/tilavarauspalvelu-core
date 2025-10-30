@@ -8,9 +8,9 @@ import {
   useUpdateReservationSeriesMutation,
   useUpdateStaffReservationMutation,
 } from "@gql/gql-types";
-import { successToast } from "common/src/components/toast";
+import { successToast } from "ui/src/components/toast";
 import { ApolloError, gql } from "@apollo/client";
-import { useDisplayError } from "common/src/hooks";
+import { useDisplayError } from "ui/src/hooks";
 
 type InputT = UpdateStaffReservationMutationVariables["input"];
 type MemoT = UpdateStaffReservationMutationVariables["workingMemo"];

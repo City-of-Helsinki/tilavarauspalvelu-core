@@ -13,12 +13,12 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { useSession } from "@/hooks";
 import { type CurrentUserQuery } from "@gql/gql-types";
-import Logo from "common/src/components/Logo";
+import Logo from "ui/src/components/Logo";
 import { useRouter } from "next/router";
-import { breakpoints } from "common/src/modules/const";
+import { breakpoints } from "ui/src/modules/const";
 import { useLocation } from "react-use";
-import { signIn, signOut } from "common/src/modules/browserHelpers";
-import { getLocalizationLang } from "common/src/modules/helpers";
+import { signIn, signOut } from "ui/src/modules/browserHelpers";
+import { getLocalizationLang } from "ui/src/modules/helpers";
 import { env } from "@/env.mjs";
 import {
   applicationsPrefix,
@@ -27,7 +27,7 @@ import {
   seasonalPrefix,
   singleSearchPrefix,
 } from "@/modules/urls";
-import { fontBold, fontMedium } from "common/src/styled";
+import { fontBold, fontMedium } from "ui/src/styled";
 
 type HeaderProps = {
   apiBaseUrl: string;

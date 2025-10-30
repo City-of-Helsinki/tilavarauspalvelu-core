@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { MunicipalityChoice } from "@gql/gql-types";
-import { ControlledCheckbox, ControlledSelect } from "common/src/components/form";
+import { ControlledCheckbox, ControlledSelect } from "ui/src/components/form";
 import { ApplicationFormTextInput, BillingAddress, ContactPersonSection } from ".";
 import { type ApplicationPage3FormValues } from "./form";
 import { FormSubHeading } from "./styled";

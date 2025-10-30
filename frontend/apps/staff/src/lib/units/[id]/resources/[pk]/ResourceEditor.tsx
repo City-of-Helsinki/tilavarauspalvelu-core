@@ -9,14 +9,14 @@ import {
   useUpdateResourceMutation,
   useResourceQuery,
 } from "@gql/gql-types";
-import { createNodeId } from "common/src/modules/helpers";
-import { ButtonContainer, CenterSpinner } from "common/src/styled";
-import { errorToast, successToast } from "common/src/components/toast";
+import { createNodeId } from "ui/src/modules/helpers";
+import { ButtonContainer, CenterSpinner } from "ui/src/styled";
+import { errorToast, successToast } from "ui/src/components/toast";
 import { FormErrorSummary } from "@/components/FormErrorSummary";
 import { LinkPrev } from "@/components/LinkPrev";
 import { gql } from "@apollo/client";
 import { Error404 } from "@/components/Error404";
-import { useDisplayError } from "common/src/hooks";
+import { useDisplayError } from "ui/src/hooks";
 import { useRouter } from "next/router";
 import {
   SubPageHead,

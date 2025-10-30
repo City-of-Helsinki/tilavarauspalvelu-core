@@ -3,9 +3,9 @@ import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, Dialog, IconInfoCircle } from "hds-react";
 import { type ReservationNode, useRequireHandlingMutation } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { successToast } from "common/src/components/toast";
+import { successToast } from "ui/src/components/toast";
 import { gql } from "@apollo/client";
-import { useDisplayError } from "common/src/hooks";
+import { useDisplayError } from "ui/src/hooks";
 
 type ReservationType = Pick<ReservationNode, "pk">;
 type Props = {

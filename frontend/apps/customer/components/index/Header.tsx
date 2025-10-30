@@ -1,5 +1,5 @@
 import React from "react";
-import { H1 } from "common/src/styled";
+import { H1 } from "ui/src/styled";
 
 interface HeadProps {
   heading: string;

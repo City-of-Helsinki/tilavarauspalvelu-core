@@ -10,7 +10,7 @@ import {
   useReservationPageLazyQuery,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { ButtonContainer } from "common/src/styled";
+import { ButtonContainer } from "ui/src/styled";
 import { ShowWhenTargetInvisible } from "@/components/ShowWhenTargetInvisible";
 import { StickyHeader } from "@/components/StickyHeader";
 import { ReservationWorkingMemo } from "@/components/WorkingMemo";
@@ -32,9 +32,9 @@ import {
   DataWrapper,
 } from "@lib/reservations/[id]/";
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
-import { createNodeId, ignoreMaybeArray, isPriceFree, toNumber } from "common/src/modules/helpers";
+import { createNodeId, ignoreMaybeArray, isPriceFree, toNumber } from "ui/src/modules/helpers";
 import { formatAgeGroup } from "@/modules/util";
-import { formatDateTime } from "common/src/modules/date-utils";
+import { formatDateTime } from "ui/src/modules/date-utils";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";

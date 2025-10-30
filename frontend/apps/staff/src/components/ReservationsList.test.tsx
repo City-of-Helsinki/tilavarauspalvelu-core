@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import { addDays } from "date-fns";
-import { formatDate } from "common/src/modules/date-utils";
+import { formatDate } from "ui/src/modules/date-utils";
 import { ReservationList } from "./ReservationsList";
 import { describe, test, expect } from "vitest";
 

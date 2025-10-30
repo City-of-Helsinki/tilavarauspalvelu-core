@@ -2,7 +2,7 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { Flex, H1, H2 } from "common/src/styled";
+import { Flex, H1, H2 } from "ui/src/styled";
 import {
   type ApplicationRoundFieldsFragment,
   ApplicationRoundOrderingChoices,
@@ -11,7 +11,7 @@ import {
   type ApplicationRoundsUiQuery,
   type ApplicationRoundsUiQueryVariables,
 } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/modules/helpers";
+import { filterNonNullable } from "ui/src/modules/helpers";
 import { ApplicationRoundCard } from "@/components/recurring/ApplicationRoundCard";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";

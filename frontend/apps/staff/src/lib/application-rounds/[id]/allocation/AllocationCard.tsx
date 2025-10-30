@@ -4,9 +4,9 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { type ApolloQueryResult } from "@apollo/client";
 import { type ApplicationSectionAllocationsQuery, Priority } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/modules/helpers";
-import { Flex, fontMedium, H5, SemiBold, Strong } from "common/src/styled";
-import { formatDuration, timeToMinutes } from "common/src/modules/date-utils";
+import { filterNonNullable } from "ui/src/modules/helpers";
+import { Flex, fontMedium, H5, SemiBold, Strong } from "ui/src/styled";
+import { formatDuration, timeToMinutes } from "ui/src/modules/date-utils";
 import { Accordion } from "@/components/Accordion";
 import {
   type AllocatedTimeSlotNodeT,

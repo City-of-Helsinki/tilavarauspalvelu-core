@@ -8,10 +8,10 @@ import {
 import { More } from "@/components/More";
 import { LIST_PAGE_SIZE } from "@/modules/const";
 import { ReservationsTable } from "./ReservationsTable";
-import { parseUIDate, formatApiDate } from "common/src/modules/date-utils";
-import { filterEmptyArray, filterNonNullable } from "common/src/modules/helpers";
-import { errorToast } from "common/src/components/toast";
-import { CenterSpinner } from "common/src/styled";
+import { parseUIDate, formatApiDate } from "ui/src/modules/date-utils";
+import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
+import { errorToast } from "ui/src/components/toast";
+import { CenterSpinner } from "ui/src/styled";
 import { useTranslation } from "next-i18next";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";

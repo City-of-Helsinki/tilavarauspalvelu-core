@@ -1,4 +1,4 @@
-import { fontMedium, fontRegular } from "common/src/styled";
+import { fontMedium, fontRegular } from "ui/src/styled";
 import { Button } from "hds-react";
 import Link from "next/link";
 import styled from "styled-components";

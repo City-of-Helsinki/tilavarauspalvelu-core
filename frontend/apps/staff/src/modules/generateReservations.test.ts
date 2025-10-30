@@ -1,9 +1,9 @@
 import { addDays, nextMonday } from "date-fns";
 import { generateReservations } from "./generateReservations";
-import { formatDate } from "common/src/modules/date-utils";
+import { formatDate } from "ui/src/modules/date-utils";
 import { describe, expect, test } from "vitest";
 import { Weekday } from "@gql/gql-types";
-import { WEEKDAYS_SORTED } from "common/src/modules/const";
+import { WEEKDAYS_SORTED } from "ui/src/modules/const";
 
 function createInput({
   startingDate,

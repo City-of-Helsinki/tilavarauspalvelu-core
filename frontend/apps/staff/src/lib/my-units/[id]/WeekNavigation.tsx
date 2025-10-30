@@ -1,9 +1,9 @@
+import React from "react";
 import { endOfISOWeek, getISOWeek, startOfISOWeek } from "date-fns";
 import { Button, ButtonSize, ButtonVariant, IconAngleLeft, IconAngleRight } from "hds-react";
-import React from "react";
 import { useTranslation } from "next-i18next";
-import { formatDateRange } from "common/src/modules/date-utils";
-import { Flex } from "common/src/styled";
+import { formatDateRange } from "ui/src/modules/date-utils";
+import { Flex } from "ui/src/styled";
 import styled from "styled-components";
 
 const Btn = styled(Button)`

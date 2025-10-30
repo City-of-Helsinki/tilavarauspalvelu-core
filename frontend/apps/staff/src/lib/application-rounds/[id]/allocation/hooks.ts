@@ -14,13 +14,13 @@ import {
   type SuitableTimeRangeNodeT,
   timeSlotKeyToScheduleTime,
 } from "./modules/applicationRoundAllocation";
-import { errorToast, successToast } from "common/src/components/toast";
-import { useDisplayError } from "common/src/hooks";
-import { toNumber } from "common/src/modules/helpers";
+import { errorToast, successToast } from "ui/src/components/toast";
+import { useDisplayError } from "ui/src/hooks";
+import { toNumber } from "ui/src/modules/helpers";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";
 import { type TimeSlotRange, useSelectedSlots } from "./SelectedSlotsContext";
-import { type DayT } from "common/src/modules/const";
+import { type DayT } from "ui/src/modules/const";
 
 export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT) => void] {
   const params = useSearchParams();

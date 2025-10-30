@@ -1,7 +1,7 @@
 import React, { forwardRef } from "react";
 import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircle, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { Flex, TitleSection, H1 } from "common/src/styled";
+import { Flex, TitleSection, H1 } from "ui/src/styled";
 import {
   type Maybe,
   OrderStatus,
@@ -11,11 +11,11 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { getName } from "@/modules/reservation";
-import { formatDateTime, parseValidDateObject } from "common/src/modules/date-utils";
+import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
 import { getApplicationUrl } from "@/modules/urls";
 import { gql } from "@apollo/client";
 import { ExternalLink } from "@/components/ExternalLink";
-import StatusLabel, { type StatusLabelType } from "common/src/components/StatusLabel";
+import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
 import { useSession } from "@/hooks";
 import { hasPermission } from "@/modules/permissionHelper";
 

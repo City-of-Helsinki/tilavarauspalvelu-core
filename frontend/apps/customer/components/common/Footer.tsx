@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { Footer as HDSFooter, IconLinkExternal, IconSize } from "hds-react";
-import Logo from "common/src/components/Logo";
+import Logo from "ui/src/components/Logo";
 import styled from "styled-components";
 import { getFeedbackUrl } from "@/modules/urls";
 

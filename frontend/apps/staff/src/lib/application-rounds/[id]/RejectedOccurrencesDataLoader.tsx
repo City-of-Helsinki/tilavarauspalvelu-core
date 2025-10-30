@@ -1,16 +1,16 @@
-import { errorToast } from "common/src/components/toast";
+import { errorToast } from "ui/src/components/toast";
 import { useSort } from "@/hooks/useSort";
 import { RejectedOccurrencesTable, SORT_KEYS } from "./RejectedOccurrencesTable";
 import { type ApolloError, gql } from "@apollo/client";
 import { RejectedOccurrenceOrderingChoices, useRejectedOccurrencesQuery } from "@gql/gql-types";
 import { More } from "@/components/More";
 import React from "react";
-import { filterEmptyArray, filterNonNullable } from "common/src/modules/helpers";
-import { getPermissionErrors } from "common/src/modules/apolloUtils";
+import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
+import { getPermissionErrors } from "ui/src/modules/apolloUtils";
 import { useTranslation } from "next-i18next";
 import { useGetFilterSearchParams } from "@/hooks";
 import { LIST_PAGE_SIZE } from "@/modules/const";
-import { CenterSpinner } from "common/src/styled";
+import { CenterSpinner } from "ui/src/styled";
 
 type Props = {
   applicationRoundPk: number;

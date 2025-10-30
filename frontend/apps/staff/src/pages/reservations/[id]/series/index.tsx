@@ -16,17 +16,11 @@ import {
   UserPermissionChoice,
   useSeriesPageQuery,
 } from "@gql/gql-types";
-import {
-  calculateMedian,
-  createNodeId,
-  filterNonNullable,
-  ignoreMaybeArray,
-  toNumber,
-} from "common/src/modules/helpers";
+import { calculateMedian, createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Element } from "@/styled";
-import { AutoGrid, ButtonContainer, CenterSpinner, H1, Strong } from "common/src/styled";
+import { AutoGrid, ButtonContainer, CenterSpinner, H1, Strong } from "ui/src/styled";
 import { LinkPrev } from "@/components/LinkPrev";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,19 +33,19 @@ import {
   parseUIDateUnsafe,
   formatApiDateUnsafe,
   formatTime,
-} from "common/src/modules/date-utils";
-import { ControlledDateInput, TimeInput } from "common/src/components/form";
+} from "ui/src/modules/date-utils";
+import { ControlledDateInput, TimeInput } from "ui/src/components/form";
 import { WeekdaysSelector } from "@/components/WeekdaysSelector";
 import { ReservationListEditor } from "@/components/ReservationListEditor";
 import { useFilteredReservationList, useMultipleReservation, useSession } from "@/hooks";
 import { getRescheduleReservationSeriesSchema, RescheduleReservationSeriesForm } from "@/schemas";
-import { errorToast, successToast } from "common/src/components/toast";
+import { errorToast, successToast } from "ui/src/components/toast";
 import { getBufferTime } from "@/modules/helpers";
 import { BufferToggles } from "@/components/BufferToggles";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { getReservationUrl } from "@/modules/urls";
-import { getSeriesOverlapErrors } from "common/src/modules/apolloUtils";
-import { useDisplayError } from "common/src/hooks";
+import { getSeriesOverlapErrors } from "ui/src/modules/apolloUtils";
+import { useDisplayError } from "ui/src/hooks";
 import { generateReservations } from "@/modules/generateReservations";
 import { Error404 } from "@/components/Error404";
 import { Error403 } from "@/components/Error403";

@@ -2,20 +2,20 @@ import React from "react";
 import styled, { css } from "styled-components";
 import { IconClock, IconEuroSign, IconLocation } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { H1 } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
+import { H1 } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
 import { type ReservationCancelPageQuery, useCancelReservationMutation } from "@gql/gql-types";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { ReservationPageWrapper } from "@/styled/reservation";
-import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { formatDate, applicationReservationDateTime } from "common/src/modules/date-utils";
-import { useDisplayError } from "common/src/hooks";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { formatDate, applicationReservationDateTime } from "ui/src/modules/date-utils";
+import { useDisplayError } from "ui/src/hooks";
 import { getApplicationPath, getReservationPath } from "@/modules/urls";
 import { getPrice } from "@/modules/reservationUnit";
-import { type LocalizationLanguages } from "common/src/modules/urlBuilder";
+import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { useRouter } from "next/router";
 import { type CancelFormValues, CancellationForm } from "../CancellationForm";
-import { Card } from "common/src/components";
+import { Card } from "ui/src/components";
 import { gql } from "@apollo/client";
 
 const infoCss = css`

@@ -4,16 +4,16 @@ import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { gql } from "@apollo/client";
 import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
-import { AutoGrid, Flex, H4 } from "common/src/styled";
-import { getLocalizationLang } from "common/src/modules/helpers";
-import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
-import { ControlledNumberInput, ControlledSelect } from "common/src/components/form";
-import { formatDate, formatDateRange } from "common/src/modules/date-utils";
+import { AutoGrid, Flex, H4 } from "ui/src/styled";
+import { getLocalizationLang } from "ui/src/modules/helpers";
+import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
+import { ControlledNumberInput, ControlledSelect } from "ui/src/components/form";
+import { formatDate, formatDateRange } from "ui/src/modules/date-utils";
 import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
 import { type ApplicationPage1FormValues } from "./form";
 import { ApplicationSectionSummary, ReservationUnitList } from ".";
-import { type OptionsListT } from "common/src/modules/search";
+import { type OptionsListT } from "ui/src/modules/search";
 import { startOfDay } from "date-fns/startOfDay";
 
 type Props = Readonly<{

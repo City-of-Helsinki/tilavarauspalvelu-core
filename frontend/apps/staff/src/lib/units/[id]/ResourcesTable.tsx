@@ -2,18 +2,18 @@ import React, { useRef, useState } from "react";
 import { trim } from "lodash-es";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
-import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
+import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { useDeleteResourceMutation, type Maybe, type ResourceTableFragment } from "@gql/gql-types";
-import { PopupMenu } from "common/src/components/PopupMenu";
+import { PopupMenu } from "ui/src/components/PopupMenu";
 import { getResourceUrl } from "@/modules/urls";
 import { CustomTable } from "@/components/Table";
-import { successToast } from "common/src/components/toast";
-import { truncate } from "common/src/modules/helpers";
+import { successToast } from "ui/src/components/toast";
+import { truncate } from "ui/src/modules/helpers";
 import { MAX_NAME_LENGTH } from "@/modules/const";
 import { TableLink } from "@/styled";
-import { Flex } from "common/src/styled";
+import { Flex } from "ui/src/styled";
 import { type TFunction } from "next-i18next";
-import { useDisplayError } from "common/src/hooks";
+import { useDisplayError } from "ui/src/hooks";
 import { useRouter } from "next/router";
 
 interface IProps {

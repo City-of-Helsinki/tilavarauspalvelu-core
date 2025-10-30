@@ -3,8 +3,8 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { Button, IconArrowRight, ImageWithCard } from "hds-react";
-import { Flex, H3 } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
+import { Flex, H3 } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
 import { seasonalPrefix } from "@/modules/urls";
 
 const StyledImageWithCard = styled(ImageWithCard)`

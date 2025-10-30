@@ -15,7 +15,7 @@ import { ResourceEditorFields } from "./ResourceEditForm";
 import { DialogActionsButtons } from "@/styled";
 import { UnitInfo } from "./UnitInfo";
 import { gql } from "@apollo/client";
-import { useDisplayError } from "common/src/hooks";
+import { useDisplayError } from "ui/src/hooks";
 
 interface ModalProps {
   unit: NewResourceUnitFieldsFragment;

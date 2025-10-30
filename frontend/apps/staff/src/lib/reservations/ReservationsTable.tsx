@@ -5,12 +5,12 @@ import { memoize } from "lodash-es";
 import { OrderStatus, ReservationStateChoice, type ReservationTableElementFragment } from "@gql/gql-types";
 import { truncate } from "@/modules/helpers";
 import { getReservationUrl } from "@/modules/urls";
-import { formatDateTime, formatDateTimeRange, parseValidDateObject } from "common/src/modules/date-utils";
+import { formatDateTime, formatDateTimeRange, parseValidDateObject } from "ui/src/modules/date-utils";
 import { getReserveeName } from "@/modules/util";
 import { CustomTable } from "@/components/Table";
 import { MAX_NAME_LENGTH } from "@/modules/const";
 import { TableLink } from "@/styled";
-import StatusLabel, { type StatusLabelType } from "common/src/components/StatusLabel";
+import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
 import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircleFill } from "hds-react";
 import { gql } from "@apollo/client";
 

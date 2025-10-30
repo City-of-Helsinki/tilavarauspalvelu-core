@@ -1,15 +1,15 @@
-import TimeZoneNotification from "common/src/components/TimeZoneNotification";
 import React, { useEffect, useMemo, useState } from "react";
+import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { addYears } from "date-fns";
-import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "common/src/modules/date-utils";
-import { Flex, H4 } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "ui/src/modules/date-utils";
+import { Flex, H4 } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
 import {
   CreateReservationDocument,
   type CreateReservationMutation,
@@ -20,8 +20,8 @@ import {
   type ReservationUnitPageQueryVariables,
   useCreateReservationMutation,
 } from "@gql/gql-types";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
-import { Sanitize } from "common/src/components/Sanitize";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { Sanitize } from "ui/src/components/Sanitize";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getPostLoginUrl } from "@/modules/util";
 import {
@@ -56,18 +56,12 @@ import { ReservationUnitPageWrapper } from "@/styled/reservation";
 import { getReservationInProgressPath, getSingleSearchPath } from "@/modules/urls";
 import { ButtonVariant, LoadingSpinner } from "hds-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { useDisplayError } from "common/src/hooks";
-import {
-  useAvailableTimes,
-  useBlockingReservations,
-  useRemoveStoredReservation,
-  useToastIfQueryParam,
-  useReservableTimes,
-} from "@/hooks";
+import { useDisplayError, useToastIfQueryParam } from "ui/src/hooks";
+import { useAvailableTimes, useBlockingReservations, useRemoveStoredReservation, useReservableTimes } from "@/hooks";
 import { gql } from "@apollo/client";
-import { type ApiError, getApiErrors } from "common/src/modules/apolloUtils";
-import { formatErrorMessage } from "common/src/hooks/useDisplayError";
-import { errorToast } from "common/src/components/toast";
+import { type ApiError, getApiErrors } from "ui/src/modules/apolloUtils";
+import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
+import { errorToast } from "ui/src/components/toast";
 import { QuickReservation } from "@/components/QuickReservation";
 import { ReservationUnitMoreDetails } from "@/components/reservation-unit/ReservationUnitMoreDetails";
 function SubmitFragment({

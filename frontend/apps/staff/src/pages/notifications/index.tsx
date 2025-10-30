@@ -11,16 +11,16 @@ import {
   useBannerNotificationsListQuery,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
-import { formatDate, formatTime } from "common/src/modules/date-utils";
+import { formatDate, formatTime } from "ui/src/modules/date-utils";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/modules/const";
 import { CustomTable } from "@/components/Table";
-import { filterNonNullable } from "common/src/modules/helpers";
+import { filterNonNullable } from "ui/src/modules/helpers";
 import { More } from "@/components/More";
 import { TableLink } from "@/styled";
-import StatusLabel, { type StatusLabelType } from "common/src/components/StatusLabel";
+import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
 import { IconCheck, IconClock, IconPen, IconQuestionCircleFill } from "hds-react";
 import { getNotificationListUrl, getNotificationUrl } from "@/modules/urls";
-import { CenterSpinner, TitleSection, H1 } from "common/src/styled";
+import { CenterSpinner, TitleSection, H1 } from "ui/src/styled";
 import { gql, useApolloClient } from "@apollo/client";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";

@@ -1,6 +1,6 @@
 import { get as mockGet } from "lodash-es";
 import { addDays, addHours, addMonths, endOfDay, getHours, set, startOfDay, startOfToday } from "date-fns";
-import { formatApiDateUnsafe } from "common/src/modules/date-utils";
+import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
 import {
   PriceUnit,
   ReservationUnitPublishingState,
@@ -37,7 +37,7 @@ import mockTranslations from "./../public/locales/fi/prices.json";
 import { type ReservableMap, dateToKey, type RoundPeriod } from "./reservable";
 import { generateNameFragment } from "@/test/test.gql.utils";
 import { TIMERS_TO_FAKE } from "@/test/test.utils";
-import { createNodeId, ReadonlyDeep } from "common/src/modules/helpers";
+import { createNodeId, ReadonlyDeep } from "ui/src/modules/helpers";
 import { type TFunction } from "i18next";
 import { vi, describe, test, expect, beforeEach, afterEach, beforeAll, afterAll } from "vitest";
 import { type DeepRequired } from "react-hook-form";

@@ -7,7 +7,7 @@ import {
   type ReservationCommonFieldsFragment,
 } from "@gql/gql-types";
 import type { TFunction } from "next-i18next";
-import { truncate } from "common/src/modules/helpers";
+import { truncate } from "ui/src/modules/helpers";
 
 export const formatNumber = (input?: number | null, suffix?: string): string => {
   if (input == null) return "";

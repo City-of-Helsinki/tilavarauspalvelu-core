@@ -3,19 +3,19 @@ import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Button, ButtonVariant, IconAngleDown, IconAngleUp, IconCross, IconSize } from "hds-react";
 import { maxBy } from "lodash-es";
-import { parseUIDate, formatDateTimeRange } from "common/src/modules/date-utils";
+import { parseUIDate, formatDateTimeRange } from "ui/src/modules/date-utils";
 import { Transition } from "react-transition-group";
-import { Flex, fontBold, fontMedium, fontRegular, SemiBold } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
+import { Flex, fontBold, fontMedium, fontRegular, SemiBold } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import { type Control, type FieldValues, type SubmitHandler, useController, type UseFormReturn } from "react-hook-form";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
-import { ControlledSelect } from "common/src/components/form/ControlledSelect";
+import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { useMedia } from "react-use";
 import { type FocusTimeSlot } from "@/modules/reservation";
-import { ControlledDateInput } from "common/src/components/form";
-import { capitalize, getLocalizationLang } from "common/src/modules/helpers";
+import { ControlledDateInput } from "ui/src/components/form";
+import { capitalize, getLocalizationLang } from "ui/src/modules/helpers";
 
 type CommonProps = {
   reservationUnit: ReservationTimePickerFieldsFragment;

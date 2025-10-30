@@ -1,8 +1,8 @@
 import { MunicipalityChoice, type OptionsQuery, type ReservationUnitTypeNode } from "@/gql/gql-types";
-import { createNodeId, filterNonNullable } from "common/src/modules/helpers";
+import { createNodeId, filterNonNullable } from "ui/src/modules/helpers";
 import { type DocumentNode } from "graphql";
 import { translateOption } from "@/modules/search";
-import { type OptionsListT } from "common/src/modules/search";
+import { type OptionsListT } from "ui/src/modules/search";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ICreateGraphQLMock {}

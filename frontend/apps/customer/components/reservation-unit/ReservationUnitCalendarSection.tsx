@@ -10,11 +10,11 @@ import { Notification } from "hds-react";
 import { type ReservationTimePickerProps } from "@/components/reservation/ReservationTimePicker";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
-import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
 import { useReservableTimes } from "@/hooks";
 import { type PendingReservationFormType } from "./schema";
 import { type UseFormReturn } from "react-hook-form";
-import { Flex, H4 } from "common/src/styled";
+import { Flex, H4 } from "ui/src/styled";
 
 type ReservationUnitT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 

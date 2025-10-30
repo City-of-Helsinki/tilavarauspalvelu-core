@@ -2,14 +2,14 @@ import React from "react";
 import { gql } from "@apollo/client";
 import { ApplicationSectionOrderingChoices, useApplicationSectionsQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { filterEmptyArray, filterNonNullable } from "common/src/modules/helpers";
+import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
 import { LIST_PAGE_SIZE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
-import { errorToast } from "common/src/components/toast";
+import { errorToast } from "ui/src/components/toast";
 import { More } from "@/components/More";
 import { useSort } from "@/hooks/useSort";
 import { ApplicationSectionsTable, SORT_KEYS } from "./ApplicationSectionsTable";
 import { useGetFilterSearchParams } from "@/hooks";
-import { CenterSpinner } from "common/src/styled";
+import { CenterSpinner } from "ui/src/styled";
 
 type Props = {
   applicationRoundPk: number;

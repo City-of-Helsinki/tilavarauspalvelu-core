@@ -9,12 +9,12 @@ import {
   type ReservationApproveMutationInput,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { Flex } from "common/src/styled";
+import { Flex } from "ui/src/styled";
 import { getReservationPriceDetails } from "@/modules/reservation";
-import { successToast } from "common/src/components/toast";
-import { toNumber } from "common/src/modules/helpers";
+import { successToast } from "ui/src/components/toast";
+import { toNumber } from "ui/src/modules/helpers";
 import { gql } from "@apollo/client";
-import { useDisplayError } from "common/src/hooks";
+import { useDisplayError } from "ui/src/hooks";
 
 const Label = styled.p`
   color: var(--color-black-70);

@@ -27,22 +27,22 @@ import {
   type BannerNotificationPageQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { parseUIDate, fromUIDateTime, formatDate, formatTime } from "common/src/modules/date-utils";
+import { parseUIDate, fromUIDateTime, formatDate, formatTime } from "ui/src/modules/date-utils";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import {
   checkValidDate,
   checkValidFutureDate,
   checkTimeStringFormat,
   checkLengthWithoutHtml,
-} from "common/src/schemas/schemaCommon";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
-import { ControlledDateInput } from "common/src/components/form";
+} from "ui/src/schemas/schemaCommon";
+import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { ControlledDateInput } from "ui/src/components/form";
 import { ControlledTimeInput } from "@/components/ControlledTimeInput";
-import { successToast } from "common/src/components/toast";
-import StatusLabel, { type StatusLabelType } from "common/src/components/StatusLabel";
-import { CenterSpinner, Flex, TitleSection, H1 } from "common/src/styled";
-import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { useDisplayError } from "common/src/hooks";
+import { successToast } from "ui/src/components/toast";
+import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
+import { CenterSpinner, Flex, TitleSection, H1 } from "ui/src/styled";
+import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
+import { useDisplayError } from "ui/src/hooks";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
@@ -50,7 +50,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { getNotificationListUrl } from "@/modules/urls";
-import { cleanHtmlContent } from "common/src/components/Sanitize";
+import { cleanHtmlContent } from "ui/src/components/Sanitize";
 
 const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {
   ssr: false,

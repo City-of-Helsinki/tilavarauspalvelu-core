@@ -2,7 +2,7 @@ import React from "react";
 import { useController, UseControllerProps, FieldValues } from "react-hook-form";
 import { TimeInput } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { filterEmpty } from "common/src/modules/helpers";
+import { filterEmpty } from "ui/src/modules/helpers";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   error?: string;

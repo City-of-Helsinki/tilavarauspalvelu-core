@@ -2,7 +2,7 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { ErrorContainer } from "common/src/components";
+import { ErrorContainer } from "ui/src/components";
 
 // TODO this is a copy of 404.tsx, but with 500 instead of 404
 

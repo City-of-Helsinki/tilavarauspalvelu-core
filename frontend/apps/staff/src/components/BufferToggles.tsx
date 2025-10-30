@@ -2,7 +2,7 @@ import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Checkbox, Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { Flex } from "common/src/styled";
+import { Flex } from "ui/src/styled";
 
 type BufferControllerProps = {
   name: "enableBufferTimeBefore" | "enableBufferTimeAfter";

@@ -4,8 +4,8 @@ import { differenceInMinutes } from "date-fns";
 import { Button, ButtonVariant, IconArrowRight, IconCross } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { H4 } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
+import { H4 } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
 import {
   convertFormToFocustimeSlot,
   createDateTime,
@@ -15,12 +15,12 @@ import {
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import { type UseFormReturn } from "react-hook-form";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
-import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
-import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { ReservationTimePicker } from "./ReservationTimePicker";
 import { ReservationInfoCard } from "./ReservationInfoCard";
-import { Sanitize } from "common/src/components/Sanitize";
+import { Sanitize } from "ui/src/components/Sanitize";
 import { PinkBox as PinkBoxBase } from "./styles";
 import { getReservationPath } from "@/modules/urls";
 import { gql } from "@apollo/client";

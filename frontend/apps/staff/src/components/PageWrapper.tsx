@@ -3,13 +3,13 @@ import { ErrorBoundary } from "react-error-boundary";
 import * as Sentry from "@sentry/nextjs";
 import styled from "styled-components";
 import { ErrorGeneric } from "@/components/ErrorGeneric";
-import { BannerNotificationsList } from "common/src/components";
+import { BannerNotificationsList } from "ui/src/components";
 import { BannerNotificationTarget } from "@gql/gql-types";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { Navigation } from "./Navigation";
-import { ToastContainer } from "common/src/components/toast";
+import { ToastContainer } from "ui/src/components/toast";
 import { useModal } from "@/context/ModalContext";
-import { mainStyles } from "common/src/styled";
+import { mainStyles } from "ui/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 
 type Props = {

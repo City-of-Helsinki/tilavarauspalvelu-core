@@ -5,11 +5,11 @@ import { useTranslation } from "next-i18next";
 import { type UseFormReturn } from "react-hook-form";
 import { type ReservationUnitEditFormValues } from "./form";
 import { getUnitUrl } from "@/modules/urls";
-import { successToast } from "common/src/components/toast";
+import { successToast } from "ui/src/components/toast";
 import type { ReservationUnitEditQuery, UnitSubpageHeadFragment } from "@gql/gql-types";
-import { breakpoints } from "common/src/modules/const";
-import { ButtonLikeExternalLink, Flex, pageSideMargins, WhiteButton } from "common/src/styled";
-import { useDisplayError } from "common/src/hooks";
+import { breakpoints } from "ui/src/modules/const";
+import { ButtonLikeExternalLink, Flex, pageSideMargins, WhiteButton } from "ui/src/styled";
+import { useDisplayError } from "ui/src/hooks";
 import { useModal } from "@/context/ModalContext";
 import { useRouter } from "next/router";
 

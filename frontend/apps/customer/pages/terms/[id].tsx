@@ -8,12 +8,12 @@ import {
   type TermsOfUseQueryVariables,
   TermsOfUseTypeChoices,
 } from "@gql/gql-types";
-import { H1 } from "common/src/styled";
+import { H1 } from "ui/src/styled";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import { Sanitize } from "common/src/components/Sanitize";
-import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { ignoreMaybeArray } from "common/src/modules/helpers";
+import { Sanitize } from "ui/src/components/Sanitize";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { ignoreMaybeArray } from "ui/src/modules/helpers";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

@@ -3,11 +3,11 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import type { Maybe, LocationFieldsI18nFragment, AddressFieldsFragment } from "@gql/gql-types";
 import { IconLinkExternal } from "hds-react";
-import { IconButton } from "common/src/components";
+import { IconButton } from "ui/src/components";
 import { mapUrlPrefix } from "@/modules/const";
-import { Flex, H4, fontMedium } from "common/src/styled";
-import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { type LocalizationLanguages } from "common/src/modules/urlBuilder";
+import { Flex, H4, fontMedium } from "ui/src/styled";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { gql } from "@apollo/client";
 
 const AddressSpan = styled.span`

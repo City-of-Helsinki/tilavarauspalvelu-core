@@ -3,9 +3,9 @@ import styled from "styled-components";
 import { addDays, subDays } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Button, IconAngleLeft, IconAngleRight, DateInput, ButtonSize, ButtonVariant } from "hds-react";
-import { parseUIDate, formatDate, setMondayFirst } from "common/src/modules/date-utils";
-import { Flex } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
+import { parseUIDate, formatDate, setMondayFirst } from "ui/src/modules/date-utils";
+import { Flex } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
 import { useSearchParams } from "next/navigation";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 

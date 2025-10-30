@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { IconCross, Option, Select } from "hds-react";
 import { useTranslation, type TFunction } from "next-i18next";
-import { fontMedium } from "common/src/styled";
+import { fontMedium } from "ui/src/styled";
 import { type ApolloQueryResult } from "@apollo/client";
 import styled from "styled-components";
 import {
@@ -11,9 +11,9 @@ import {
   Weekday,
   type ReservationUnitNode,
 } from "@gql/gql-types";
-import { ShowAllContainer } from "common/src/components";
-import { transformWeekday } from "common/src/modules/conversion";
-import { type DayT } from "common/src/modules/const";
+import { ShowAllContainer } from "ui/src/components";
+import { transformWeekday } from "ui/src/modules/conversion";
+import { type DayT } from "ui/src/modules/const";
 import { ALLOCATION_CALENDAR_TIMES } from "@/modules/const";
 import {
   type RelatedSlot,
@@ -26,9 +26,9 @@ import {
 } from "./modules/applicationRoundAllocation";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
-import { convertOptionToHDS, filterNonNullable, toNumber } from "common/src/modules/helpers";
+import { convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";
 import { addMinutes, startOfDay } from "date-fns";
-import { timeToMinutes, formatTimeRange } from "common/src/modules/date-utils";
+import { timeToMinutes, formatTimeRange } from "ui/src/modules/date-utils";
 
 type Props = {
   applicationSections: SectionNodeT[] | null;

@@ -20,7 +20,7 @@ import {
   type UpdateApplicationMutation,
   Weekday,
 } from "@/gql/gql-types";
-import { createNodeId } from "common/src/modules/helpers";
+import { createNodeId } from "ui/src/modules/helpers";
 import { addDays, addMonths, addYears } from "date-fns";
 import { type CreateGraphQLMocksReturn, generateNameFragment, generateTextFragment } from "./test.gql.utils";
 import { createMockReservationUnit } from "./reservation-unit.mocks";

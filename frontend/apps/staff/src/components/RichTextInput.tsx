@@ -5,7 +5,7 @@ import React from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import styled from "styled-components";
-import { Flex } from "common/src/styled";
+import { Flex } from "ui/src/styled";
 
 const Container = styled.div<{ $disabled: boolean }>`
   .ql-toolbar {

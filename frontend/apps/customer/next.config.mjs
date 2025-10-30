@@ -17,7 +17,7 @@ const { i18n } = i18nconfig;
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ["common"],
+  transpilePackages: ["ui"],
   // create a smaller bundle
   output: "standalone",
   // this includes files from the monorepo base two directories up

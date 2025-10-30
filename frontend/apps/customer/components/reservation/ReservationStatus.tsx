@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import { ReservationStateChoice } from "@gql/gql-types";
 import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircle } from "hds-react";
-import StatusLabel, { type StatusLabelType } from "common/src/components/StatusLabel";
+import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
 
 export type Props = {
   state: ReservationStateChoice;

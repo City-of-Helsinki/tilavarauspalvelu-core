@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect, useState } from "react";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { Flex, H2 } from "common/src/styled";
+import { Flex, H2 } from "ui/src/styled";
 
 const ToggleButton = styled.button`
   border: 0;

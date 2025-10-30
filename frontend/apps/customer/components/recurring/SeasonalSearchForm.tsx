@@ -3,14 +3,14 @@ import { useTranslation } from "next-i18next";
 import { TextInput } from "hds-react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { FilterTagList } from "../FilterTagList";
-import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { type OptionsListT } from "common/src/modules/search";
-import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
+import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
+import { type OptionsListT } from "ui/src/modules/search";
+import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
-import { ControlledNumberInput } from "common/src/components/form";
-import { mapParamToInteger, toNumber } from "common/src/modules/helpers";
-import { AutoGrid, Flex } from "common/src/styled";
+import { ControlledNumberInput } from "ui/src/components/form";
+import { mapParamToInteger, toNumber } from "ui/src/modules/helpers";
+import { AutoGrid, Flex } from "ui/src/styled";
 
 const filterOrder = [
   "textSearch",

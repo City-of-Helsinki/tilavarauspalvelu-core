@@ -9,11 +9,11 @@ import {
   useCreateApplicationMutation,
 } from "@/gql/gql-types";
 import { getApplicationPath } from "@/modules/urls";
-import { Flex, NoWrap, WhiteButton, pageSideMargins } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
+import { Flex, NoWrap, WhiteButton, pageSideMargins } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
 import { useMedia } from "react-use";
-import { ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
-import { useDisplayError } from "common/src/hooks";
+import { ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { useDisplayError } from "ui/src/hooks";
 import { useReservationUnitList } from "@/hooks";
 import { useSearchParams } from "next/navigation";
 import { LoginFragment } from "../LoginFragment";

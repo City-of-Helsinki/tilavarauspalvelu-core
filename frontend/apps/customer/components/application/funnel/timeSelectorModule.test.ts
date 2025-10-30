@@ -8,10 +8,10 @@ import {
 } from "./timeSelectorModule";
 import { type SuitableTimeRangeFormValues } from "./form";
 import { Priority, Weekday } from "@/gql/gql-types";
-import { type Cell } from "common/src/components/ApplicationTimeSelector";
-import { type DayT, WEEKDAYS_SORTED } from "common/src/modules/const";
-import { formatApiTimeUnsafe } from "common/src/modules/date-utils";
-import { transformWeekday } from "common/src/modules/conversion";
+import { type Cell } from "ui/src/components/ApplicationTimeSelector";
+import { type DayT, WEEKDAYS_SORTED } from "ui/src/modules/const";
+import { formatApiTimeUnsafe } from "ui/src/modules/date-utils";
+import { transformWeekday } from "ui/src/modules/conversion";
 
 function createDayCells(
   day: Weekday,

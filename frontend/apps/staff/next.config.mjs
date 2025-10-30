@@ -14,7 +14,7 @@ const ROOT_PATH = url.fileURLToPath(new URL(".", import.meta.url));
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
-  transpilePackages: ["common"],
+  transpilePackages: ["ui"],
   // create a smaller bundle
   output: "standalone",
   // this includes files from the monorepo base two directories up
