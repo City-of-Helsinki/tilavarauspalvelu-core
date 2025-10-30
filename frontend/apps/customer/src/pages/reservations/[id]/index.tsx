@@ -32,7 +32,7 @@ import {
   isReservationCancellable,
 } from "@/modules/reservation";
 import { getReservationUnitName } from "@/modules/reservationUnit";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { AddressSection } from "@/components/AddressSection";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
 import { ButtonLikeLink, ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
@@ -51,8 +51,8 @@ import { convertLanguageCode } from "ui/src/modules/util";
 import { gql } from "@apollo/client";
 import StatusLabel from "ui/src/components/StatusLabel";
 import IconButton from "ui/src/components/IconButton";
+import { LabelValuePair } from "@/components/LabelValuePair";
 import {
-  LabelValuePair,
   ReservationInfoCard,
   ReservationOrderStatus,
   ReservationStatus,

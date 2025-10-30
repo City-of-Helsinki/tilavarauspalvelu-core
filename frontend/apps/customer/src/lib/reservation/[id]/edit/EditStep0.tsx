@@ -20,7 +20,7 @@ import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { ReservationTimePicker, ReservationInfoCard } from "@/components/reservation";
 import { Sanitize } from "ui/src/components/Sanitize";
-import { PinkBox as PinkBoxBase } from "@/components/reservation/styles";
+import { PinkBox as PinkBoxBase } from "@/styled/reservation";
 import { getReservationPath } from "@/modules/urls";
 import { gql } from "@apollo/client";
 import ErrorComponent from "next/error";

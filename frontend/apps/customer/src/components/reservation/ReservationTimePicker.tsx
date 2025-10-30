@@ -8,7 +8,7 @@ import {
 } from "@gql/gql-types";
 import styled from "styled-components";
 import { addMinutes, differenceInMinutes } from "date-fns";
-import { eventStyleGetter } from "@/components/common/calendarUtils";
+import { eventStyleGetter } from "@/modules/eventStyleGetter";
 import { Legend } from "@/components/calendar/Legend";
 import { useMedia } from "react-use";
 import { breakpoints, RELATED_RESERVATION_STATES } from "ui/src/modules/const";

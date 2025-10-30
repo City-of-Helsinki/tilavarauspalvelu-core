@@ -10,7 +10,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { isReservationCancellable } from "@/modules/reservation";
 import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { type TFunction } from "i18next";

@@ -45,7 +45,7 @@ import {
   ReservationUnitMoreDetails,
   SubventionSuffix,
 } from "@/lib/reservation-unit/[id]/";
-import InfoDialog from "@/components/common/InfoDialog";
+import InfoDialog from "@/components/InfoDialog";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useForm, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -55,7 +55,7 @@ import { SubmitButton } from "@/styled/util";
 import { ReservationUnitPageWrapper } from "@/styled/reservation";
 import { getReservationInProgressPath, getSingleSearchPath } from "@/modules/urls";
 import { ButtonVariant, LoadingSpinner } from "hds-react";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { useDisplayError, useToastIfQueryParam } from "ui/src/hooks";
 import { useAvailableTimes, useBlockingReservations, useRemoveStoredReservation, useReservableTimes } from "@/hooks";
 import { gql } from "@apollo/client";

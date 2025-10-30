@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { Flex, H4 } from "ui/src/styled";
 import { formatDuration, parseUIDate } from "ui/src/modules/date-utils";
 import { type ApplicationSectionPage1FormValues } from "./form";
-import { IconWithText } from "@/components/common/IconWithText";
+import { IconWithText } from "@/components/IconWithText";
 
 const Message = styled.p`
   margin: 0;

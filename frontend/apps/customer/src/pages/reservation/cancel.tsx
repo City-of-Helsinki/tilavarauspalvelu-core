@@ -1,5 +1,5 @@
 import React from "react";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { CancelledLinkSet } from "@/lib/reservation/[id]/cancel";
 import {
   DeleteReservationDocument,

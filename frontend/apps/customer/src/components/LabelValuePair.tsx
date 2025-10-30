@@ -1,4 +1,4 @@
-import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
+import { PreviewLabel, PreviewValue, ValuePairContainer } from "@/styled/reservation";
 
 export function LabelValuePair({
   label,
@@ -12,9 +12,9 @@ export function LabelValuePair({
   testId?: string;
 }) {
   return (
-    <ParagraphAlt $isWide={isWide}>
+    <ValuePairContainer $isWide={isWide}>
       <PreviewLabel>{label}</PreviewLabel>
       <PreviewValue data-testid={testId}>{value}</PreviewValue>
-    </ParagraphAlt>
+    </ValuePairContainer>
   );
 }

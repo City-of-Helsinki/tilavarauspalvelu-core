@@ -15,7 +15,7 @@ import { filterNonNullable } from "ui/src/modules/helpers";
 import { ApplicationRoundCard } from "@/lib/recurring";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { gql } from "@apollo/client";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];

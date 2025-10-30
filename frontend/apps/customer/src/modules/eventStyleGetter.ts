@@ -1,10 +1,9 @@
-import React from "react";
 import type { CalendarEvent } from "ui/src/components/calendar/Calendar";
 import type { ReservationNode } from "@gql/gql-types";
 
 type ReservationStateWithInitial = string;
 
-const eventStyleGetter = (
+export const eventStyleGetter = (
   { event }: CalendarEvent<ReservationNode>,
   ownReservations: number[],
   draggable = true
@@ -62,5 +61,3 @@ const eventStyleGetter = (
     className,
   };
 };
-
-export { eventStyleGetter };

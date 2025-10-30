@@ -1,7 +1,7 @@
 import { type TFunction, useTranslation } from "next-i18next";
 import { MunicipalityChoice, type ReservationFormFieldsFragment } from "@gql/gql-types";
 import { AutoGrid, H4 } from "@ui/styled";
-import { LabelValuePair } from "./LabelValuePair";
+import { LabelValuePair } from "@/components/LabelValuePair";
 import { type OptionsRecord } from "@ui/types";
 import {
   getReservationFormReserveeFields,

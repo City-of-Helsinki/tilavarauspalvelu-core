@@ -19,7 +19,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { addDays } from "date-fns";
 import { errorToast } from "ui/src/components/toast";
-import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { gql } from "@apollo/client";
 
 const StyledTabPanel = styled(TabPanel)`
