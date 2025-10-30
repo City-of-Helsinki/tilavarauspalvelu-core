@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { FormSubHeading, SpanFullRow } from "./styled";
+import { FormSubHeading, SpanFullRow } from "@/styled/application";
 import { ApplicationFormTextInput, BillingAddress } from ".";
 
 export function IndividualForm(): JSX.Element {

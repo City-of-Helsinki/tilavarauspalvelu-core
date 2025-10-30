@@ -23,8 +23,8 @@ import {
   InfoItem,
   ScheduleDay,
   RegularText,
-} from "./styled";
-import { SuitableTimeRangeFormValues } from "./funnel/form";
+} from "@/styled/application";
+import { type SuitableTimeRangeFormValues } from "../funnel/form";
 
 function ageGroupToString(ag: Maybe<AgeGroupNode> | undefined): string {
   if (!ag) {

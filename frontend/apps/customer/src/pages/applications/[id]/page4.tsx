@@ -20,7 +20,8 @@ import { Button, ButtonSize, ButtonVariant, IconArrowLeft, LoadingSpinner } from
 import { useDisplayError } from "ui/src/hooks";
 import { ErrorText } from "ui/src/components/ErrorText";
 import { validateApplication, PAGES_WITH_STEPPER, ApplicationFunnelWrapper } from "@/components/application/funnel";
-import { ApplicationTerms, ViewApplication } from "@/components/application";
+import { ApplicationTerms } from "@/components/application";
+import { ViewApplication } from "@/components/application/view";
 import { gql } from "@apollo/client";
 
 // User has to accept the terms of service then on submit we change the application status
