@@ -28,7 +28,7 @@ type Props = {
   focusSlot: FocusTimeSlot | null;
   nextAvailableTime: Date | null;
   submitReservation: SubmitHandler<PendingReservationFormType>;
-  LoginAndSubmit: JSX.Element;
+  LoginAndSubmit: React.ReactElement;
   className?: string;
   style?: React.CSSProperties;
 };
@@ -48,10 +48,11 @@ const Form = styled.form`
 `;
 
 const Price = styled.div`
-  /* no-wrap for price and subvention suffix */
   display: inline-grid;
   padding-bottom: var(--spacing-m);
   height: var(--spacing-m);
+
+  flex-grow: 1;
 
   &:empty {
     display: none;
@@ -193,9 +194,7 @@ export function QuickReservation({
         <Price data-testid="quick-reservation__price">
           {focusSlot?.isReservable && (
             <>
-              <NoWrap>
-                {t("common:price")}: <PriceValue>{price}</PriceValue>
-              </NoWrap>
+              {t("common:price")}: <PriceValue>{price}</PriceValue>
               <NoWrap>{!isFreeOfCharge && subventionSuffix}</NoWrap>
             </>
           )}
