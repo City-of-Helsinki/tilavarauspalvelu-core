@@ -117,7 +117,6 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
       const { reserveeIsUnregisteredAssociation, reserveeIdentifier, ...d } = rest;
       input.reserveeIdentifier =
         reserveeType !== ReserveeType.Individual && !reserveeIsUnregisteredAssociation ? reserveeIdentifier : "";
-      input.name = d.name;
       input.description = d.description;
       input.numPersons = d.numPersons;
       input.reserveeOrganisationName = d.reserveeOrganisationName;
@@ -126,6 +125,9 @@ export function Step0({ reservation, cancelReservation, options }: Props): JSX.E
     }
     if ("ageGroup" in rest && typeof rest.ageGroup === "number") {
       input.ageGroup = rest.ageGroup;
+    }
+    if ("name" in rest && typeof rest.name === "string") {
+      input.name = rest.name;
     }
     if ("purpose" in rest && typeof rest.purpose === "number") {
       input.purpose = rest.purpose;

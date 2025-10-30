@@ -175,7 +175,6 @@ const ReserveeInfoFormSchema = (params: SchemaParams) =>
   z
     .object({
       reserveeType: z.enum([ReserveeType.Individual, ReserveeType.Nonprofit, ReserveeType.Company]),
-      name: z.string(), // not mandatory
       description: z.string().min(3, "Required"),
       municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]),
       numPersons: z.number().min(params.minPersons, "Too small").max(params.maxPersons, "Too large"),
@@ -190,6 +189,7 @@ const PurposeFormSchema = (params: SchemaParams) =>
   z
     .object({
       purpose: z.number().min(1),
+      name: z.string(), // not mandatory
     })
     .extend(ReserveeInfoFormSchema(params).shape);
 
