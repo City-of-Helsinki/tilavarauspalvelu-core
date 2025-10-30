@@ -163,8 +163,7 @@ def _create_purposes() -> list[Purpose]:
             name_en="Take a sauna or stay in a cabin",
             name_sv="Bada bastu eller bo i stuga",
             image_url=(
-                "https://varaamo.test.hel.ninja/"
-                "media/reservation_unit_purpose_images/Varaamo_sauna_maarit_hohteri.png"
+                "https://varaamo.test.hel.ninja/media/reservation_unit_purpose_images/Varaamo_sauna_maarit_hohteri.png"
             ),
             image_filename="Varaamo_sauna_maarit_hohteri",
             extension=".png",
