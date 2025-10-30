@@ -513,7 +513,7 @@ function Calendar<T extends Record<string, unknown>>({
         dayFormat: "EEEEEE d.M.",
         timeGutterFormat: "H",
         eventTimeRangeFormat: ({ start, end }: { start: Date; end: Date }) =>
-          `${formatTimeRange(dateToMinutes(start) ?? 0, dateToMinutes(end) ?? 0)}`,
+          formatTimeRange(dateToMinutes(start) ?? 0, dateToMinutes(end) ?? 0),
       }}
       eventPropGetter={eventStyleGetter}
       events={events}
