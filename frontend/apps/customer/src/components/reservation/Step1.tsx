@@ -110,7 +110,7 @@ export function Step1({ reservation, options, requiresPayment }: Props): JSX.Ele
           disabled={!areTermsAccepted || isSubmitting}
         >
           {requiresPayment
-            ? t("notification:waitingForPayment.payReservation")
+            ? t("notification:waitingForPayment.continueButton")
             : t("reservationCalendar:makeReservation")}
         </Button>
         <Button
