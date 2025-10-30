@@ -11,9 +11,9 @@ import { addMinutes, differenceInMinutes } from "date-fns";
 import { eventStyleGetter } from "@/components/common/calendarUtils";
 import { Legend } from "@/components/calendar/Legend";
 import { useMedia } from "react-use";
-import { breakpoints, RELATED_RESERVATION_STATES } from "common/src/modules/const";
-import { getEventBuffers } from "common/src/components/calendar/util";
-import { filterNonNullable, getLocalizationLang } from "common/src/modules/helpers";
+import { breakpoints, RELATED_RESERVATION_STATES } from "ui/src/modules/const";
+import { getEventBuffers } from "ui/src/components/calendar/util";
+import { filterNonNullable, getLocalizationLang } from "ui/src/modules/helpers";
 import {
   SLOTS_EVERY_HOUR,
   convertFormToFocustimeSlot,
@@ -31,9 +31,9 @@ import Calendar, {
   type CalendarEventBuffer,
   type SlotClickProps,
   SlotProps,
-} from "common/src/components/calendar/Calendar";
-import { Toolbar } from "common/src/components/calendar/Toolbar";
-import { formatApiDate, formatDate, formatDuration, formatTime, parseUIDate } from "common/src/modules/date-utils";
+} from "ui/src/components/calendar/Calendar";
+import { Toolbar } from "ui/src/components/calendar/Toolbar";
+import { formatApiDate, formatDate, formatDuration, formatTime, parseUIDate } from "ui/src/modules/date-utils";
 import { useTranslation } from "next-i18next";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
 import { type UseFormReturn } from "react-hook-form";

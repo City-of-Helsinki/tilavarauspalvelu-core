@@ -3,8 +3,8 @@ import { Button, ButtonVariant, LoadingSpinner, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { gql } from "@apollo/client";
-import { filterNonNullable } from "common/src/modules/helpers";
-import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
+import { filterNonNullable } from "ui/src/modules/helpers";
+import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import {
   ApplicationRoundStatusChoice,
   type ApplicationRoundAdminFragment,
@@ -17,7 +17,7 @@ import {
 import { type ApolloQueryResult } from "@apollo/client";
 import { useCheckPermission } from "@/hooks";
 import { isApplicationRoundInProgress } from "@/modules/helpers";
-import { useDisplayError } from "common/src/hooks";
+import { useDisplayError } from "ui/src/hooks";
 
 const StyledNotification = styled(Notification)`
   margin-right: auto;

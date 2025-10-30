@@ -1,7 +1,7 @@
 import React, { type Dispatch, type SetStateAction } from "react";
 import type { SelectedRow } from "@/lib/reservation-units";
-import { breakpoints } from "common/src/modules/const";
-import { Flex } from "common/src/styled";
+import { breakpoints } from "ui/src/modules/const";
+import { Flex } from "ui/src/styled";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "i18next";
 import {
@@ -26,8 +26,8 @@ import {
   IconQuestionCircleFill,
   IconSize,
 } from "hds-react";
-import { ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
-import StatusLabel, { type StatusLabelType } from "common/src/components/StatusLabel";
+import { ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
+import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
 import { gql } from "@apollo/client";
 import styled from "styled-components";
 

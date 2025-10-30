@@ -4,8 +4,8 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, IconLock, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { Flex, fontRegular, H1, H4, NoWrap } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
+import { Flex, fontRegular, H1, H4, NoWrap } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
 import {
   type AccessCodeQuery,
   ApplicationReservationSeriesDocument,
@@ -24,7 +24,7 @@ import {
 import Link from "next/link";
 import { isBefore, sub } from "date-fns";
 import { createApolloClient } from "@/modules/apolloClient";
-import { formatDateTimeRange } from "common/src/modules/date-utils";
+import { formatDateTimeRange } from "ui/src/modules/date-utils";
 import {
   getNormalizedReservationOrderStatus,
   getPaymentUrl,
@@ -35,8 +35,8 @@ import { getReservationUnitName } from "@/modules/reservationUnit";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { AddressSection } from "@/components/reservation-unit";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { ButtonLikeLink, ButtonLikeExternalLink } from "common/src/components/ButtonLikeLink";
-import { createNodeId, capitalize, getLocalizationLang, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
+import { ButtonLikeLink, ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
+import { createNodeId, capitalize, getLocalizationLang, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
   getApplicationPath,
@@ -46,11 +46,11 @@ import {
   type ReservationNotifications,
   reservationsPrefix,
 } from "@/modules/urls";
-import { useToastIfQueryParam } from "@/hooks";
-import { convertLanguageCode } from "common/src/modules/util";
+import { useToastIfQueryParam } from "ui/src/hooks";
+import { convertLanguageCode } from "ui/src/modules/util";
 import { gql } from "@apollo/client";
-import StatusLabel from "common/src/components/StatusLabel";
-import IconButton from "common/src/components/IconButton";
+import StatusLabel from "ui/src/components/StatusLabel";
+import IconButton from "ui/src/components/IconButton";
 import {
   Instructions,
   LabelValuePair,

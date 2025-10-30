@@ -1,10 +1,10 @@
-import TimeZoneNotification from "common/src/components/TimeZoneNotification";
+import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { ReservationSeriesForm } from "@lib/my-units/[id]/recurring/ReservationSeriesForm";
 import { LinkPrev } from "@/components/LinkPrev";
-import { H1 } from "common/src/styled";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
+import { H1 } from "ui/src/styled";
+import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";

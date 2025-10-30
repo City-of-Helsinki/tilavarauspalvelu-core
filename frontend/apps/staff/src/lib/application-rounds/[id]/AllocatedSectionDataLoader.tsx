@@ -6,15 +6,15 @@ import {
   useAllocatedTimeSlotsQuery,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { filterEmptyArray, filterNonNullable } from "common/src/modules/helpers";
+import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
 import { LIST_PAGE_SIZE } from "@/modules/const";
-import { errorToast } from "common/src/components/toast";
+import { errorToast } from "ui/src/components/toast";
 import { More } from "@/components/More";
 import { useSort } from "@/hooks/useSort";
 import { useGetFilterSearchParams } from "@/hooks";
 import { AllocatedSectionsTable, SORT_KEYS } from "./AllocatedSectionsTable";
-import { getPermissionErrors } from "common/src/modules/apolloUtils";
-import { CenterSpinner } from "common/src/styled";
+import { getPermissionErrors } from "ui/src/modules/apolloUtils";
+import { CenterSpinner } from "ui/src/styled";
 
 type Props = {
   applicationRoundPk: number;

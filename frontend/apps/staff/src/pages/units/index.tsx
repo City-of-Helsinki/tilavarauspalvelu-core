@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, LinkSize } from "hds-react";
-import { H1, HR } from "common/src/styled";
+import { H1, HR } from "ui/src/styled";
 import { useTranslation } from "next-i18next";
 import { Filters, UnitsDataLoader } from "@/components/units";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";

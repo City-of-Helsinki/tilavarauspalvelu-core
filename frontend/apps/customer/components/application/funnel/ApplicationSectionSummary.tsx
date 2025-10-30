@@ -3,8 +3,8 @@ import { differenceInWeeks } from "date-fns";
 import { IconCalendar, IconClock, IconGroup } from "hds-react";
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { Flex, H4 } from "common/src/styled";
-import { formatDuration, parseUIDate } from "common/src/modules/date-utils";
+import { Flex, H4 } from "ui/src/styled";
+import { formatDuration, parseUIDate } from "ui/src/modules/date-utils";
 import { type ApplicationSectionPage1FormValues } from "./form";
 import { IconWithText } from "@/components/common/IconWithText";
 

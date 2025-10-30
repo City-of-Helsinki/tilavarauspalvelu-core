@@ -2,7 +2,7 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { ErrorContainer } from "common/src/components";
+import { ErrorContainer } from "ui/src/components";
 import { PUBLIC_URL } from "@/modules/const";
 
 /// next doesn't allow getServersideProps in 404.tsx (you have to use app router for that)

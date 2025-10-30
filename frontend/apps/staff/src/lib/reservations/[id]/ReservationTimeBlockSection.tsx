@@ -1,6 +1,6 @@
 import React, { forwardRef, type Ref, useEffect, useRef, useState } from "react";
-import CommonCalendar from "common/src/components/calendar/Calendar";
-import { Toolbar, ToolbarBtn } from "common/src/components/calendar/Toolbar";
+import CommonCalendar from "ui/src/components/calendar/Calendar";
+import { Toolbar, ToolbarBtn } from "ui/src/components/calendar/Toolbar";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import {
@@ -15,8 +15,8 @@ import { eventStyleGetter, legend } from "./eventStyleGetter";
 import { Legend, LegendsWrapper } from "@/components/Legend";
 import { EditTimeModal } from "@/components/EditTimeModal";
 import { isPossibleToEdit } from "@/modules/reservationModificationRules";
-import { getEventBuffers } from "common/src/components/calendar/util";
-import { filterNonNullable, toNumber } from "common/src/modules/helpers";
+import { getEventBuffers } from "ui/src/components/calendar/util";
+import { filterNonNullable, toNumber } from "ui/src/modules/helpers";
 import VisibleIfPermission from "@/components/VisibleIfPermission";
 import { useReservationCalendarData, useReservationSeries } from "@/hooks";
 import { add, startOfISOWeek } from "date-fns";

@@ -22,19 +22,19 @@ import {
   fromUIDateTimeUnsafe,
   formatTime,
   formatDate,
-} from "common/src/modules/date-utils";
+} from "ui/src/modules/date-utils";
 import { useModal } from "@/context/ModalContext";
-import { getTimeChangeFormSchemaRefined, TimeFormSchema } from "common/src/schemas";
+import { getTimeChangeFormSchemaRefined, TimeFormSchema } from "ui/src/schemas";
 import { ControlledTimeInput } from "@/components/ControlledTimeInput";
-import { ControlledDateInput } from "common/src/components/form";
+import { ControlledDateInput } from "ui/src/components/form";
 import { BufferToggles } from "@/components/BufferToggles";
 import { useCheckCollisions } from "@/hooks";
 import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
 import { gql } from "@apollo/client";
-import { filterNonNullable } from "common/src/modules/helpers";
-import { successToast } from "common/src/components/toast";
-import { useDisplayError } from "common/src/hooks";
-import { convertWeekday } from "common/src/modules/conversion";
+import { filterNonNullable } from "ui/src/modules/helpers";
+import { successToast } from "ui/src/components/toast";
+import { useDisplayError } from "ui/src/hooks";
+import { convertWeekday } from "ui/src/modules/conversion";
 
 const StyledForm = styled.form`
   margin-top: var(--spacing-m);

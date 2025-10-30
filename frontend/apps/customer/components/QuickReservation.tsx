@@ -2,10 +2,10 @@ import React, { useMemo } from "react";
 import { Button } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { chunkArray } from "common/src/modules/util";
-import { parseUIDate, formatDate } from "common/src/modules/date-utils";
-import { Flex, fontMedium, H4, NoWrap } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
+import { chunkArray } from "ui/src/modules/util";
+import { parseUIDate, formatDate } from "ui/src/modules/date-utils";
+import { Flex, fontMedium, H4, NoWrap } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import {
   getLastPossibleReservationDate,
@@ -14,9 +14,9 @@ import {
 } from "@/modules/reservationUnit";
 import Carousel from "@/components/Carousel";
 import { type Control, type FieldValues, type SubmitHandler, type UseFormReturn } from "react-hook-form";
-import { ControlledDateInput } from "common/src/components/form";
+import { ControlledDateInput } from "ui/src/components/form";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
-import { ControlledSelect } from "common/src/components/form/ControlledSelect";
+import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { type FocusTimeSlot } from "@/modules/reservation";
 
 type Props = {

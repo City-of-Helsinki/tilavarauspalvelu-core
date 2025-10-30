@@ -3,9 +3,9 @@ import { gql } from "@apollo/client";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useReservationDateOfBirthQuery, useApplicationDateOfBirthQuery } from "@gql/gql-types";
-import { formatDate, parseValidDateObject } from "common/src/modules/date-utils";
-import { Flex } from "common/src/styled";
-import { createNodeId } from "common/src/modules/helpers";
+import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
+import { Flex } from "ui/src/styled";
+import { createNodeId } from "ui/src/modules/helpers";
 
 // NOTE separate query because all requests for dateOfBirth are logged
 // so don't make them automatically or inside other queries

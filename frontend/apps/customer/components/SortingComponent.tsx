@@ -4,10 +4,10 @@ import { useSearchParams } from "next/navigation";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import styled from "styled-components";
 import { IconSize, IconSortAscending, IconSortDescending, Option, Select } from "hds-react";
-import { Flex, fontMedium, focusStyles } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
-import { convertOptionToHDS } from "common/src/modules/helpers";
-import { convertLanguageCode } from "common/src/modules/util";
+import { Flex, fontMedium, focusStyles } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
+import { convertOptionToHDS } from "ui/src/modules/helpers";
+import { convertLanguageCode } from "ui/src/modules/util";
 
 export const SORTING_OPTIONS = [
   {

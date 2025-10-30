@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import type { GetServerSidePropsContext } from "next";
 import { Notification, NotificationSize } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { H1 } from "common/src/styled";
+import { H1 } from "ui/src/styled";
 import {
   type ApplicationCreateMutationInput,
   ApplicationRoundDocument,
@@ -17,13 +17,7 @@ import {
   type CurrentUserQuery,
   ReservationKind,
 } from "@gql/gql-types";
-import {
-  createNodeId,
-  filterNonNullable,
-  ignoreMaybeArray,
-  type ReadonlyDeep,
-  toNumber,
-} from "common/src/modules/helpers";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, type ReadonlyDeep, toNumber } from "ui/src/modules/helpers";
 import { type SearchFormValues, SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
 import { createApolloClient } from "@/modules/apolloClient";
 import { RecurringCard } from "@/components/recurring/RecurringCard";
@@ -39,7 +33,7 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { getApplicationPath, seasonalPrefix } from "@/modules/urls";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { gql } from "@apollo/client";
-import { convertLanguageCode } from "common/src/modules/util";
+import { convertLanguageCode } from "ui/src/modules/util";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { createPortal } from "react-dom";
 

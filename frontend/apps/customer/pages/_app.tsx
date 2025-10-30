@@ -6,13 +6,13 @@ import PageWrapper from "../components/common/PageWrapper";
 import { ExternalScripts } from "@/components/ExternalScripts";
 import { createApolloClient } from "@/modules/apolloClient";
 import { TrackingWrapper } from "@/modules/tracking";
-import "common/src/styles/global.scss";
+import "ui/src/styles/global.scss";
 import "../styles/global.scss";
 import { updateSentryConfig } from "@/instrumentation-client";
-import { ToastContainer } from "common/src/components/toast";
+import { ToastContainer } from "ui/src/components/toast";
 import { CookieBanner, CookieConsentContextProvider } from "hds-react";
 import sitesettings from "./sitesettings.json";
-import { convertLanguageCode } from "common/src/modules/util";
+import { convertLanguageCode } from "ui/src/modules/util";
 import { ANALYTICS_COOKIE_GROUP_NAME, isBrowser } from "@/modules/const";
 
 /// check if the user has accepted the statistics cookies

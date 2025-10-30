@@ -59,9 +59,6 @@ importers:
       '@sentry/nextjs':
         specifier: ^10.19.0
         version: 10.19.0(@opentelemetry/context-async-hooks@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.1.0(@opentelemetry/api@1.9.0))(next@15.5.6(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.93.2))(react@18.3.1)(webpack@5.94.0)
-      common:
-        specifier: workspace:*
-        version: link:../../packages/common
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -122,6 +119,9 @@ importers:
       typescript-cookie:
         specifier: ^1.0.6
         version: 1.0.6
+      ui:
+        specifier: workspace:*
+        version: link:../../packages/ui
       zod:
         specifier: ^3.25.64
         version: 3.25.64
@@ -204,9 +204,6 @@ importers:
       apollo-upload-client:
         specifier: 18.0.1
         version: 18.0.1(@apollo/client@3.13.8(@types/react@18.3.26)(graphql-ws@6.0.6(graphql@16.11.0)(ws@8.18.3))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(graphql@16.11.0)
-      common:
-        specifier: workspace:*
-        version: link:../../packages/common
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -276,6 +273,9 @@ importers:
       typescript-cookie:
         specifier: ^1.0.6
         version: 1.0.6
+      ui:
+        specifier: workspace:*
+        version: link:../../packages/ui
       zod:
         specifier: ^3.25.64
         version: 3.25.64
@@ -347,7 +347,25 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@24.9.1)(happy-dom@20.0.0)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.93.2)(terser@5.44.0)(yaml@2.8.1)
 
-  packages/common:
+  packages/prettier-config:
+    devDependencies:
+      '@prettier/plugin-oxc':
+        specifier: ^0.0.4
+        version: 0.0.4
+      globals:
+        specifier: ^16.4.0
+        version: 16.4.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
+  packages/tsconfig:
+    devDependencies:
+      '@tsconfig/node20':
+        specifier: ^20.1.6
+        version: 20.1.6
+
+  packages/ui:
     dependencies:
       date-fns:
         specifier: ^4.1.0
@@ -479,24 +497,6 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@24.9.1)(happy-dom@20.0.0)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.93.2)(terser@5.44.0)(yaml@2.8.1)
-
-  packages/prettier-config:
-    devDependencies:
-      '@prettier/plugin-oxc':
-        specifier: ^0.0.4
-        version: 0.0.4
-      globals:
-        specifier: ^16.4.0
-        version: 16.4.0
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-
-  packages/tsconfig:
-    devDependencies:
-      '@tsconfig/node20':
-        specifier: ^20.1.6
-        version: 20.1.6
 
 packages:
 
@@ -822,10 +822,6 @@ packages:
 
   '@babel/runtime@7.27.0':
     resolution: {integrity: sha512-VtPOkrdPHZsKc/clNqyi9WUA8TINkZ4cGk63UUE3u4pmB2k+ZMQRDuIOagv8UVd6j7k0T3+RRIb7beKTebNbcw==}
-    engines: {node: '>=6.9.0'}
-
-  '@babel/runtime@7.27.6':
-    resolution: {integrity: sha512-vbavdySgbTTrmFE+EsiqUTzlOr5bzlnJtUv9PynGCAKvfQqjIXbvFdumPM/GxMDfyuGMJaJAU6TO4zc1Jf1i8Q==}
     engines: {node: '>=6.9.0'}
 
   '@babel/runtime@7.28.2':
@@ -4903,10 +4899,6 @@ packages:
     resolution: {integrity: sha512-OCVPnIObs4N29kxTjzLfUryOkvZEq+pf8jTF0lg8E7uETuWHA+v7j3c/xJmiqpX450191LlmZfUKkXxkTry7nA==}
     engines: {node: ^10 || ^12 || >=14}
 
-  postcss@8.5.5:
-    resolution: {integrity: sha512-d/jtm+rdNT8tpXuHY5MMtcbJFBkhXE6593XVR9UoGCH8jSFGci7jGvMGH5RYd5PBJW+00NZQt6gf7CbagJCrhg==}
-    engines: {node: ^10 || ^12 || >=14}
-
   postcss@8.5.6:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
@@ -6437,8 +6429,6 @@ snapshots:
   '@babel/runtime@7.27.0':
     dependencies:
       regenerator-runtime: 0.14.1
-
-  '@babel/runtime@7.27.6': {}
 
   '@babel/runtime@7.28.2': {}
 
@@ -10836,12 +10826,6 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  postcss@8.5.5:
-    dependencies:
-      nanoid: 3.3.11
-      picocolors: 1.1.1
-      source-map-js: 1.2.1
-
   postcss@8.5.6:
     dependencies:
       nanoid: 3.3.11
@@ -10921,7 +10905,7 @@ snapshots:
 
   react-big-calendar@1.19.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.27.6
+      '@babel/runtime': 7.28.4
       clsx: 1.2.1
       date-arithmetic: 4.1.0
       dayjs: 1.11.13
@@ -11199,7 +11183,7 @@ snapshots:
       htmlparser2: 8.0.2
       is-plain-object: 5.0.0
       parse-srcset: 1.0.2
-      postcss: 8.5.5
+      postcss: 8.5.6
 
   sass@1.93.2:
     dependencies:

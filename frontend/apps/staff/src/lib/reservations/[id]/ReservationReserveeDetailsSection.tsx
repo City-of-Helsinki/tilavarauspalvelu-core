@@ -1,7 +1,7 @@
+import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { Accordion, ApplicationDatas } from "@/styled";
 import { DataWrapper } from "./DataWrapper";
-import React, { useState } from "react";
 import {
   ReservationPageQuery,
   useReservationDateOfBirthQuery,
@@ -18,16 +18,16 @@ import {
   Notification,
   NotificationSize,
 } from "hds-react";
-import { Flex, H5 } from "common/src/styled";
+import { Flex, H5 } from "ui/src/styled";
 import styled from "styled-components";
 import { useSession } from "@/hooks";
 import { trim } from "lodash-es";
 import { gql } from "@apollo/client";
 import { getName as getCountryName, registerLocale as registerCountryLocale } from "i18n-iso-countries";
 import countriesJson from "i18n-iso-countries/langs/fi.json";
-import { getApiErrors } from "common/src/modules/apolloUtils";
-import { formatErrorMessage } from "common/src/hooks/useDisplayError";
-import { formatDate, parseValidDateObject } from "common/src/modules/date-utils";
+import { getApiErrors } from "ui/src/modules/apolloUtils";
+import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
+import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
 
 registerCountryLocale(countriesJson);
 

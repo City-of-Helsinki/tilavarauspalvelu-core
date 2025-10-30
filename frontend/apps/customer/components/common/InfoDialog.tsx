@@ -1,7 +1,7 @@
 import { Button, ButtonVariant, Dialog, IconInfoCircleFill } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { Sanitize } from "common/src/components/Sanitize";
+import { Sanitize } from "ui/src/components/Sanitize";
 
 type Props = {
   id: string;

@@ -13,7 +13,7 @@ import {
   ReservationStateChoice,
 } from "@/gql/gql-types";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
-import { createNodeId, toNumber } from "common/src/modules/helpers";
+import { createNodeId, toNumber } from "ui/src/modules/helpers";
 import { createMockIsReservableFieldsFragment, createMockReservableTimes } from "@/test/reservation-unit.mocks";
 
 describe("generateReservableMap", () => {

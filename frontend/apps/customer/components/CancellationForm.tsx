@@ -3,14 +3,14 @@ import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import { Button, ButtonVariant, IconCross, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { AutoGrid, ButtonContainer, Flex, fontMedium } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
-import { ControlledSelect } from "common/src/components/form";
+import { AutoGrid, ButtonContainer, Flex, fontMedium } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
+import { ControlledSelect } from "ui/src/components/form";
 import { ReservationCancelReasonChoice } from "@gql/gql-types";
-import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
-import TermsBox from "common/src/components/TermsBox";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
+import TermsBox from "ui/src/components/TermsBox";
 import { AccordionWithState } from "./Accordion";
-import { Sanitize } from "common/src/components/Sanitize";
+import { Sanitize } from "ui/src/components/Sanitize";
 
 const Actions = styled(ButtonContainer).attrs({
   $justifyContent: "space-between",

@@ -10,7 +10,7 @@ import {
   UpdateReservationSeriesDocument,
   UpdateStaffReservationDocument,
 } from "@gql/gql-types";
-import { createNodeId } from "common/src/modules/helpers";
+import { createNodeId } from "ui/src/modules/helpers";
 
 export const CHANGED_WORKING_MEMO = "Sisaisen kommentti";
 

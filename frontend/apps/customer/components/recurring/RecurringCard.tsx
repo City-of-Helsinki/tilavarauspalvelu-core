@@ -14,11 +14,11 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import type { RecurringCardFragment } from "@gql/gql-types";
 import { getReservationUnitName } from "@/modules/reservationUnit";
-import { getImageSource, getMainImage } from "common/src/modules/helpers";
-import Card, { type CardInfoItem } from "common/src/components/Card";
+import { getImageSource, getMainImage } from "ui/src/modules/helpers";
+import Card, { type CardInfoItem } from "ui/src/components/Card";
 import { getReservationUnitPath } from "@/modules/urls";
-import { ButtonLikeLink } from "common/src/components/ButtonLikeLink";
-import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
 import { gql } from "@apollo/client";
 
 interface CardProps {

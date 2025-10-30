@@ -1,5 +1,5 @@
-import { formatTime } from "common/src/modules/date-utils";
 import React from "react";
+import { formatTime } from "ui/src/modules/date-utils";
 import { useTranslation } from "next-i18next";
 import { ReservationStateChoice, type ReservationToCopyFragment, UserPermissionChoice } from "@gql/gql-types";
 import { NewReservationListItem, ReservationList } from "@/components/ReservationsList";
@@ -8,7 +8,7 @@ import { DenyDialog } from "@/components/DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import { EditTimeModal } from "@/components/EditTimeModal";
 import { isPossibleToDeny, isPossibleToEdit } from "@/modules/reservationModificationRules";
-import { CenterSpinner } from "common/src/styled";
+import { CenterSpinner } from "ui/src/styled";
 import { useReservationSeries, useSession } from "@/hooks";
 import { hasPermission } from "@/modules/permissionHelper";
 

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useToastIfQueryParam } from "common/src/hooks/useToastIfQueryParam";
+import { useToastIfQueryParam } from "ui/src/hooks";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { useForm, type UseFormReturn } from "react-hook-form";
@@ -22,16 +22,16 @@ import {
   useUpdateReservationUnitMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
-import { Flex } from "common/src/styled";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { Flex } from "ui/src/styled";
 
-import { errorToast, successToast } from "common/src/components/toast";
+import { errorToast, successToast } from "ui/src/components/toast";
 import { useModal } from "@/context/ModalContext";
 import { Error404 } from "@/components/Error404";
 
 import { getReservationUnitUrl } from "@/modules/urls";
 import { ApolloError, gql } from "@apollo/client";
-import { breakpoints } from "common/src/modules/const";
+import { breakpoints } from "ui/src/modules/const";
 import { useRouter } from "next/router";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";

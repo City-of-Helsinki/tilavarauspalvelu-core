@@ -7,7 +7,7 @@ import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 import { ControlledRichTextInput } from "./ControlledRichTextInput";
 import { getTranslatedTooltipTex } from "./utils";
-import { Flex, fontMedium, H4 } from "common/src/styled";
+import { Flex, fontMedium, H4 } from "ui/src/styled";
 
 const SubAccordion = styled(EditAccordion)`
   border-bottom: none !important;

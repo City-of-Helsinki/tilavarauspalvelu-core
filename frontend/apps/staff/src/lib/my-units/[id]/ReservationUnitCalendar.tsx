@@ -1,6 +1,6 @@
 import React from "react";
-import { formatApiDate } from "common/src/modules/date-utils";
-import CommonCalendar from "common/src/components/calendar/Calendar";
+import { formatApiDate } from "ui/src/modules/date-utils";
+import CommonCalendar from "ui/src/components/calendar/Calendar";
 import { get } from "lodash-es";
 import { addDays, endOfISOWeek, startOfISOWeek } from "date-fns";
 import styled from "styled-components";
@@ -11,14 +11,14 @@ import {
   useReservationUnitCalendarQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { useSlotPropGetter } from "common/src/components/calendar/util";
+import { useSlotPropGetter } from "ui/src/components/calendar/util";
 import { getReservationUrl } from "@/modules/urls";
 import { Legend, LegendsWrapper } from "@/components/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
-import { createNodeId, filterNonNullable } from "common/src/modules/helpers";
-import { RELATED_RESERVATION_STATES } from "common/src/modules/const";
+import { createNodeId, filterNonNullable } from "ui/src/modules/helpers";
+import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { getReserveeName } from "@/modules/util";
-import { errorToast } from "common/src/components/toast";
+import { errorToast } from "ui/src/components/toast";
 import { useSession } from "@/hooks";
 import { gql } from "@apollo/client";
 import { combineAffectingReservations } from "@/modules/helpers";

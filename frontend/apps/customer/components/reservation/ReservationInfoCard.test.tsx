@@ -11,7 +11,7 @@ import {
   ReservationStateChoice,
 } from "@gql/gql-types";
 import { type CreateGraphQLMockProps, generateNameFragment } from "@/test/test.gql.utils";
-import { createNodeId } from "common/src/modules/helpers";
+import { createNodeId } from "ui/src/modules/helpers";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 

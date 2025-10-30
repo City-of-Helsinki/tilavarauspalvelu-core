@@ -5,20 +5,20 @@ import { Tabs, TabList, Tab, TabPanel } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import { TabWrapper, H1, CenterSpinner } from "common/src/styled";
+import { TabWrapper, H1, CenterSpinner } from "ui/src/styled";
 import {
   ReservationStateChoice,
   ReservationOrderingChoices,
   useListReservationsQuery,
   ReservationTypeChoice,
 } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/modules/helpers";
+import { filterNonNullable } from "ui/src/modules/helpers";
 import { useSession } from "@/hooks";
 import { ReservationCard } from "@/components/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { formatApiDate } from "common/src/modules/date-utils";
+import { formatApiDate } from "ui/src/modules/date-utils";
 import { addDays } from "date-fns";
-import { errorToast } from "common/src/components/toast";
+import { errorToast } from "ui/src/components/toast";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { gql } from "@apollo/client";
 

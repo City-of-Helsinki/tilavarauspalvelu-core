@@ -13,8 +13,8 @@ import {
   Weekday,
 } from "@/gql/gql-types";
 import { ReservableMap, type RoundPeriod } from "@/modules/reservable";
-import { createNodeId } from "common/src/modules/helpers";
-import { formatApiDateUnsafe } from "common/src/modules/date-utils";
+import { createNodeId } from "ui/src/modules/helpers";
+import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
 import { addDays, addYears, endOfDay, startOfDay, startOfToday } from "date-fns";
 import { createMockReservationUnitType, generateDescriptionFragment, generateNameFragment } from "./test.gql.utils";
 

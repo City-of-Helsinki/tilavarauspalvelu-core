@@ -11,20 +11,20 @@ import {
   useListInProgressReservationsQuery,
   useReservationStateLazyQuery,
 } from "@gql/gql-types";
-import NotificationWrapper from "common/src/components/NotificationWrapper";
+import NotificationWrapper from "ui/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks";
 import { getCheckoutUrl } from "@/modules/reservation";
-import { createNodeId, filterNonNullable } from "common/src/modules/helpers";
+import { createNodeId, filterNonNullable } from "ui/src/modules/helpers";
 import { gql, useApolloClient } from "@apollo/client";
-import { convertLanguageCode } from "common/src/modules/util";
-import { formatApiDate } from "common/src/modules/date-utils";
-import { errorToast, successToast } from "common/src/components/toast";
+import { convertLanguageCode } from "ui/src/modules/util";
+import { formatApiDate } from "ui/src/modules/date-utils";
+import { errorToast, successToast } from "ui/src/components/toast";
 import { getReservationInProgressPath } from "@/modules/urls";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
-import { Flex } from "common/src/styled";
-import { isNotFoundError } from "common/src/modules/apolloUtils";
+import { Flex } from "ui/src/styled";
+import { isNotFoundError } from "ui/src/modules/apolloUtils";
 import { type ParsedUrlQuery } from "querystring";
-import { useDisplayError } from "common/src/hooks";
+import { useDisplayError } from "ui/src/hooks";
 import { differenceInMinutes } from "date-fns";
 import { CREATED_RESERVATION_TIMEOUT_MINUTES } from "@/modules/const";
 

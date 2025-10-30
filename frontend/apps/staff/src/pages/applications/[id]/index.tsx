@@ -4,9 +4,9 @@ import { useTranslation, type TFunction } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant, IconArrowRedo, IconCross, LoadingSpinner, Tag } from "hds-react";
 import { isEqual, trim } from "lodash-es";
 import { type ApolloQueryResult, gql } from "@apollo/client";
-import { CenterSpinner, Flex, fontMedium, H1, H3, H4, TitleSection } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
+import { CenterSpinner, Flex, fontMedium, H1, H3, H4, TitleSection } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import {
   type ApplicationAdminQuery,
   type ApplicationPageFieldsFragment,
@@ -23,8 +23,8 @@ import {
   useRestoreAllSectionOptionsMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { formatDateRange, formatDateTime, formatDuration, parseValidDateObject } from "common/src/modules/date-utils";
-import { ApplicationTimePreview } from "common/src/components/ApplicationTimePreview";
+import { formatDateRange, formatDateTime, formatDuration, parseValidDateObject } from "ui/src/modules/date-utils";
+import { ApplicationTimePreview } from "ui/src/components/ApplicationTimePreview";
 import { formatAgeGroups, formatNumber } from "@/modules/util";
 import { ScrollIntoView } from "@/components/ScrollIntoView";
 import { Accordion as AccordionBase } from "@/components/Accordion";
@@ -38,8 +38,8 @@ import { getApplicantName, translateReserveeType } from "@/modules/helpers";
 import { Error404 } from "@/components/Error404";
 import { useCheckPermission } from "@/hooks";
 import { ApplicationDatas, Summary } from "@/styled";
-import { ApplicationStatusLabel } from "common/src/components/statuses";
-import { useDisplayError } from "common/src/hooks";
+import { ApplicationStatusLabel } from "ui/src/components/statuses";
+import { useDisplayError } from "ui/src/hooks";
 import { Error403 } from "@/components/Error403";
 import { GetServerSidePropsContext } from "next";
 import { getCommonServerSideProps } from "@/modules/serverUtils";

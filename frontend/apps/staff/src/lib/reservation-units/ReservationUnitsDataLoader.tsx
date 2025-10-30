@@ -2,12 +2,12 @@ import React, { type Dispatch, type SetStateAction, useState } from "react";
 import type { SelectedRow } from "@/lib/reservation-units";
 import { gql } from "@apollo/client";
 import { ReservationUnitOrderingChoices, useSearchReservationUnitsQuery } from "@gql/gql-types";
-import { filterEmptyArray, filterNonNullable } from "common/src/modules/helpers";
+import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/modules/const";
 import { More } from "@/components/More";
 import { ReservationUnitsTable } from "./ReservationUnitsTable";
-import { errorToast } from "common/src/components/toast";
-import { CenterSpinner } from "common/src/styled";
+import { errorToast } from "ui/src/components/toast";
+import { CenterSpinner } from "ui/src/styled";
 import { useTranslation } from "next-i18next";
 import { useGetFilterSearchParams } from "@/hooks";
 

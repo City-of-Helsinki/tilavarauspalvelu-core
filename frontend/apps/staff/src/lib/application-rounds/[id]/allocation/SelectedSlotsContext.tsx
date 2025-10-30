@@ -1,4 +1,4 @@
-import { DayT } from "common/src/modules/const";
+import { DayT } from "ui/src/modules/const";
 import React, { createContext, useContext, useMemo, useState } from "react";
 
 type SelectedSlotsContextProps = {

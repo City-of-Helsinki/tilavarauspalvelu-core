@@ -1,5 +1,5 @@
 import React from "react";
-import { ErrorContainer } from "common/src/components";
+import { ErrorContainer } from "ui/src/components";
 import { PUBLIC_URL } from "@/modules/const";
 import { env } from "../env.mjs";
 

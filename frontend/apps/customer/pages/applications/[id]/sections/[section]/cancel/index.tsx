@@ -17,22 +17,22 @@ import {
   formatApiTimeInterval,
   ignoreMaybeArray,
   toNumber,
-} from "common/src/modules/helpers";
+} from "ui/src/modules/helpers";
 import { getApplicationPath } from "@/modules/urls";
 import { useTranslation } from "next-i18next";
 import { ApolloError, gql } from "@apollo/client";
-import { H1 } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
-import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { parseApiDate, formatDate } from "common/src/modules/date-utils";
+import { H1 } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { parseApiDate, formatDate } from "ui/src/modules/date-utils";
 import { useRouter } from "next/router";
 import { IconCalendarEvent, IconClock, IconLocation, IconTrash } from "hds-react";
-import { Card } from "common/src/components";
+import { Card } from "ui/src/components";
 import styled from "styled-components";
 import { isReservationCancellable } from "@/modules/reservation";
-import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
+import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { useDisplayError } from "common/src/hooks";
+import { useDisplayError } from "ui/src/hooks";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 

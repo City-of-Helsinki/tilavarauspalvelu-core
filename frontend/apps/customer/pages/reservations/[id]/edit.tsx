@@ -10,10 +10,10 @@ import {
   ReservationEditPageDocument,
   MunicipalityChoice,
 } from "@gql/gql-types";
-import { createNodeId, ignoreMaybeArray, toNumber } from "common/src/modules/helpers";
-import { formatApiDate } from "common/src/modules/date-utils";
+import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { formatApiDate } from "ui/src/modules/date-utils";
 import { addYears } from "date-fns";
-import { H1 } from "common/src/styled";
+import { H1 } from "ui/src/styled";
 import { gql } from "@apollo/client";
 import { StepState } from "hds-react";
 import { zodResolver } from "@hookform/resolvers/zod";

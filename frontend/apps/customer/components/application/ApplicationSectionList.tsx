@@ -9,12 +9,12 @@ import {
   type ApplicationViewFragment,
   type SuitableTimeFragment,
 } from "@gql/gql-types";
-import { WEEKDAYS } from "common/src/modules/const";
-import { filterNonNullable, formatDayTimes } from "common/src/modules/helpers";
-import StatusLabel, { type StatusLabelType } from "common/src/components/StatusLabel";
-import { NoWrap } from "common/src/styled";
-import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { formatDurationRange, formatDate, setMondayFirst } from "common/src/modules/date-utils";
+import { WEEKDAYS } from "ui/src/modules/const";
+import { filterNonNullable, formatDayTimes } from "ui/src/modules/helpers";
+import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
+import { NoWrap } from "ui/src/styled";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { formatDurationRange, formatDate, setMondayFirst } from "ui/src/modules/date-utils";
 import {
   ApplicationInfoContainer,
   ApplicationSection,

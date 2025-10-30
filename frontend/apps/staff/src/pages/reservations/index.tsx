@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react";
-import { formatDate } from "common/src/modules/date-utils";
+import { formatDate } from "ui/src/modules/date-utils";
 import { useTranslation } from "next-i18next";
-import { H1 } from "common/src/styled";
+import { H1 } from "ui/src/styled";
 import { Filters, ReservationsDataLoader } from "@lib/reservations";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useSearchParams } from "next/navigation";

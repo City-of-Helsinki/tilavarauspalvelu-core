@@ -1,3 +1,4 @@
+import React from "react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { CancelledLinkSet } from "@/components/reservation/CancelledLinkSet";
 import {
@@ -9,12 +10,11 @@ import {
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
-import { ignoreMaybeArray } from "common/src/modules/helpers";
-import { H1 } from "common/src/styled";
+import { ignoreMaybeArray } from "ui/src/modules/helpers";
+import { H1 } from "ui/src/styled";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import React from "react";
 
 // This is the callback page from webstore if user cancels the order
 // TODO this would be nicer if we could use a reservation/[id]/cancelled page (or reservation/[id])

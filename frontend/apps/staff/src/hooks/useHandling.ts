@@ -1,9 +1,8 @@
 import { useMemo } from "react";
 import { startOfDay } from "date-fns";
 import { useSession } from "@/hooks";
-import { useHandlingDataQuery } from "@gql/gql-types";
-import { formatApiDate } from "common/src/modules/date-utils";
-import { ReservationStateChoice } from "common/gql/gql-types";
+import { useHandlingDataQuery, ReservationStateChoice } from "@gql/gql-types";
+import { formatApiDate } from "ui/src/modules/date-utils";
 import { gql } from "@apollo/client";
 
 export function useHandling() {

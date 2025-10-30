@@ -6,9 +6,9 @@ import {
   useReservationsByReservationUnitQuery,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { formatApiDate } from "common/src/modules/date-utils";
-import { errorToast } from "common/src/components/toast";
-import { createNodeId } from "common/src/modules/helpers";
+import { formatApiDate } from "ui/src/modules/date-utils";
+import { errorToast } from "ui/src/components/toast";
+import { createNodeId } from "ui/src/modules/helpers";
 import { type CalendarEventType } from "@/modules/reservation";
 import { combineAffectingReservations } from "@/modules/helpers";
 

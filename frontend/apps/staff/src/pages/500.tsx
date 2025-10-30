@@ -1,7 +1,7 @@
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { ErrorContainer } from "common/src/components";
+import { ErrorContainer } from "ui/src/components";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { PUBLIC_URL } from "@/modules/const";
 

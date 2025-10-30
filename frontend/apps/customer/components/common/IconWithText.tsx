@@ -1,5 +1,5 @@
-import { Flex } from "common/src/styled";
 import React from "react";
+import { Flex } from "ui/src/styled";
 
 type IconWithTextProps = {
   icon: JSX.Element;

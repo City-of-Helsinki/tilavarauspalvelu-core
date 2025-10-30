@@ -1,12 +1,12 @@
 import React, { useMemo } from "react";
-import TimeZoneNotification from "common/src/components/TimeZoneNotification";
+import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
-import { H1, H4 } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
+import { H1, H4 } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
 import {
   ReservationDocument,
   type ReservationQuery,
@@ -22,15 +22,15 @@ import {
   getReservationUnitPath,
   getSingleSearchPath,
 } from "@/modules/urls";
-import { Sanitize } from "common/src/components/Sanitize";
+import { Sanitize } from "ui/src/components/Sanitize";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import { Step0 } from "@/components/reservation/Step0";
 import { Step1 } from "@/components/reservation/Step1";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { createNodeId, toNumber } from "common/src/modules/helpers";
+import { createNodeId, toNumber } from "ui/src/modules/helpers";
 import { queryOptions } from "@/modules/queryOptions";
-import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
 import { gql } from "@apollo/client";
 import { PinkBox as PinkBoxBase } from "@/components/reservation/styles";
 import { Breadcrumb } from "@/components/common/Breadcrumb";

@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { Flex, H4, fontMedium } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
+import { Flex, H4, fontMedium } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
 import {
   type ApplicationRoundStatusChoice,
   ApplicationSectionStatusChoice,
@@ -14,7 +14,7 @@ import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";
 import { type AllocationApplicationSectionCardType, ApplicationSectionCard } from "./ApplicationEventCard";
 import { type ApolloQueryResult } from "@apollo/client";
-import { filterNonNullable } from "common/src/modules/helpers";
+import { filterNonNullable } from "ui/src/modules/helpers";
 import {
   type AllocatedTimeSlotNodeT,
   getRelatedTimeSlots,

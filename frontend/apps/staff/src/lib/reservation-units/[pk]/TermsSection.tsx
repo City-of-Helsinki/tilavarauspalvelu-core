@@ -3,10 +3,10 @@ import styled from "styled-components";
 import { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { EditAccordion } from "./styled";
-import { ControlledSelect } from "common/src/components/form";
+import { ControlledSelect } from "ui/src/components/form";
 import { type ReservationUnitEditFormValues } from "./form";
 import { ControlledRichTextInput } from "./ControlledRichTextInput";
-import { AutoGrid } from "common/src/styled";
+import { AutoGrid } from "ui/src/styled";
 
 type OptionType = { value: string; label: string };
 

@@ -11,7 +11,7 @@ import { SpaceUpdateSchema, SpaceUpdateForm } from "../SpaceForm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { gql } from "@apollo/client";
 import { UnitInfo } from "../UnitInfo";
-import { useDisplayError } from "common/src/hooks";
+import { useDisplayError } from "ui/src/hooks";
 
 type Props = {
   unit: NewResourceUnitFieldsFragment;

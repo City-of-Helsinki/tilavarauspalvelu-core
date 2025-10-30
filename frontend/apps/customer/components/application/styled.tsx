@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Notification } from "hds-react";
-import { fontMedium, fontRegular, Flex } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
+import { fontMedium, fontRegular, Flex } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
 
 export const StyledNotification = styled(Notification)`
   line-height: var(--fontsize-heading-m);

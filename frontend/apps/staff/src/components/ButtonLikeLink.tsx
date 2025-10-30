@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { ButtonCss, ButtonStyleProps } from "common/src/styled";
+import { ButtonCss, ButtonStyleProps } from "ui/src/styled";
 import Link from "next/link";
 
 /// @brief looks like a button but is a link

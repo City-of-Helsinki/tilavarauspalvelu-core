@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { IconAngleUp } from "hds-react";
-import { focusStyles } from "common/src/styled";
+import { focusStyles } from "ui/src/styled";
 import { useTranslation } from "next-i18next";
 
 const Btn = styled.button`

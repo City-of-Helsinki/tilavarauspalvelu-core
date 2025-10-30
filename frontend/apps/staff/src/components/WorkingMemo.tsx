@@ -8,9 +8,9 @@ import {
   type UpdateApplicationWorkingMemoMutation,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { successToast } from "common/src/components/toast";
-import { ButtonContainer } from "common/src/styled";
-import { useDisplayError } from "common/src/hooks";
+import { successToast } from "ui/src/components/toast";
+import { ButtonContainer } from "ui/src/styled";
+import { useDisplayError } from "ui/src/hooks";
 
 function WorkingMemo({
   initialValue,

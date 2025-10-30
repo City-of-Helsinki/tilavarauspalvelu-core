@@ -1,6 +1,6 @@
 import React, { useEffect, type FC } from "react";
 import App, { type AppContext, type AppInitialProps, type AppProps } from "next/app";
-import "common/src/styles/global.scss";
+import "ui/src/styles/global.scss";
 import "../styles/global.scss";
 import { ApolloProvider } from "@apollo/client";
 import { createClient } from "@/modules/apolloClient";
@@ -24,7 +24,7 @@ import {
   type ShowNotificationsListQueryVariables,
 } from "@gql/gql-types";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { formatApiDate } from "common/src/modules/date-utils";
+import { formatApiDate } from "ui/src/modules/date-utils";
 
 function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
   const { Component, pageProps, currentUser, handlingData, notificationsData } = props;

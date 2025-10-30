@@ -3,7 +3,7 @@ import { Tabs } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { uniqBy } from "lodash-es";
 import styled from "styled-components";
-import { CenterSpinner, fontMedium, H1, Strong, TabWrapper } from "common/src/styled";
+import { CenterSpinner, fontMedium, H1, Strong, TabWrapper } from "ui/src/styled";
 import { hasPermission as hasUnitPermission } from "@/modules/permissionHelper";
 import {
   ApplicationRoundFilterDocument,
@@ -15,8 +15,8 @@ import {
   useApplicationSectionAllocationsQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "common/src/modules/helpers";
-import { errorToast } from "common/src/components/toast";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "ui/src/modules/helpers";
+import { errorToast } from "ui/src/components/toast";
 import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
 import { truncate } from "@/modules/helpers";
 import { AllocationPageContent } from "@lib/application-rounds/[id]/allocation";

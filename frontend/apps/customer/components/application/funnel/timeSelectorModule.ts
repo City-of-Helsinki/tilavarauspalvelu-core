@@ -1,10 +1,10 @@
 import { type SuitableTimeRangeFormValues } from "./form";
-import { type ApplicationRoundTimeSlotNode, Priority, SuitableTimeFragment, Weekday } from "@/gql/gql-types";
-import { type Cell, type CellState } from "common/src/components/ApplicationTimeSelector";
-import { DayT, WEEKDAYS, WEEKDAYS_SORTED } from "common/src/modules/const";
-import { convertWeekday, transformWeekday } from "common/src/modules/conversion";
-import { filterNonNullable, formatTimeStruct } from "common/src/modules/helpers";
-import { timeToMinutes } from "common/src/modules/date-utils";
+import { type ApplicationRoundTimeSlotNode, Priority, SuitableTimeFragment, Weekday } from "@gql/gql-types";
+import { type Cell, type CellState } from "ui/src/components/ApplicationTimeSelector";
+import { DayT, WEEKDAYS, WEEKDAYS_SORTED } from "ui/src/modules/const";
+import { convertWeekday, transformWeekday } from "ui/src/modules/conversion";
+import { filterNonNullable, formatTimeStruct } from "ui/src/modules/helpers";
+import { timeToMinutes } from "ui/src/modules/date-utils";
 
 export type DailyOpeningHours = Readonly<
   Pick<ApplicationRoundTimeSlotNode, "weekday" | "isClosed" | "reservableTimes">[]

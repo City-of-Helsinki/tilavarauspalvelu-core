@@ -1,7 +1,7 @@
-import { parseUIDateUnsafe, timeToMinutes, setMondayFirst } from "common/src/modules/date-utils";
+import { parseUIDateUnsafe, timeToMinutes, setMondayFirst } from "ui/src/modules/date-utils";
 import { Weekday } from "@gql/gql-types";
-import { transformWeekday } from "common/src/modules/conversion";
-import type { DayT } from "common/src/modules/const";
+import { transformWeekday } from "ui/src/modules/conversion";
+import type { DayT } from "ui/src/modules/const";
 import type { TimeSelectionFormValues } from "@/schemas";
 
 // NOTE Custom UTC date code because taking only the date part of Date results

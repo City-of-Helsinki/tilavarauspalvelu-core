@@ -1,13 +1,9 @@
-/**
- *  First part of the Reservation process form
- *  This component needs to be wrapped inside a Form context
- */
+import React, { useState } from "react";
 import { Button, ButtonVariant, IconArrowRight, IconCross, LoadingSpinner } from "hds-react";
 import { useForm, FormProvider, type UseFormReturn, FieldValues } from "react-hook-form";
-import React, { useState } from "react";
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "common/src/reservation-form";
+import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "ui/src/reservation-form";
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
 import {
@@ -16,20 +12,20 @@ import {
   ReserveeType,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
-import { getReservationFormGeneralFields } from "common/src/reservation-form/util";
-import { getReservationFormSchema, type ReservationFormValueT } from "common/src/schemas";
+import { getReservationFormGeneralFields } from "ui/src/reservation-form/util";
+import { getReservationFormSchema, type ReservationFormValueT } from "ui/src/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { LinkLikeButton } from "common/src/styled";
-import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
-import { type OptionsRecord } from "common";
+import { LinkLikeButton } from "ui/src/styled";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { type OptionsRecord } from "ui";
 import { NewReservationForm } from "@/styled/reservation";
-import { useDisplayError } from "common/src/hooks";
+import { useDisplayError } from "ui/src/hooks";
 import { useRouter } from "next/router";
 import { getReservationInProgressPath, getReservationUnitPath } from "@/modules/urls";
 import { gql } from "@apollo/client";
-import { ErrorListBox } from "common/src/components/ErrorListBox";
-import { isNotFoundError } from "common/src/modules/apolloUtils";
+import { ErrorListBox } from "ui/src/components/ErrorListBox";
+import { isNotFoundError } from "ui/src/modules/apolloUtils";
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {

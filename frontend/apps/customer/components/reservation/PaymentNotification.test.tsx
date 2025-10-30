@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import PaymentNotification from "@/components/reservation/PaymentNotification";
 import type { TFunction } from "i18next";
 import { describe, it, expect } from "vitest";
-import { formatDateTime, parseValidDateObject } from "common/src/modules/date-utils";
+import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
 import { OrderStatus, PaymentOrderNode, PaymentType, PriceUnit } from "@gql/gql-types";
 
 function customRender() {

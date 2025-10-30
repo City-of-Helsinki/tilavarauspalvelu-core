@@ -18,8 +18,8 @@
     "tsc:check": {
       "inputs": [
         "$TURBO_DEFAULT$",
-        "$TURBO_ROOT$/packages/common/**/*/*.ts",
-        "$TURBO_ROOT$/packages/common/**/*.tsx"
+        "$TURBO_ROOT$/packages/ui/**/*/*.ts",
+        "$TURBO_ROOT$/packages/ui/**/*.tsx"
       ]
     },
     "tsc:clean": {

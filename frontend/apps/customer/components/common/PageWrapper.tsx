@@ -1,12 +1,12 @@
 import React from "react";
 import Head from "next/head";
 import styled from "styled-components";
-import { BannerNotificationsList } from "common/src/components";
+import { BannerNotificationsList } from "ui/src/components";
 import { BannerNotificationTarget } from "@gql/gql-types";
 import Footer from "./Footer";
 import Navigation from "./Navigation";
 import { InProgressReservationNotification } from "@/components/InProgressReservationNotification";
-import { mainStyles } from "common/src/styled";
+import { mainStyles } from "ui/src/styled";
 
 interface PageProps {
   children: React.ReactNode;

@@ -8,11 +8,11 @@ import type { PurposeCardFragment } from "@gql/gql-types";
 import { getSingleSearchPath } from "@/modules/urls";
 import { ReservationUnitSearch } from "./ReservationUnitSearch";
 import { pixel } from "@/styled/util";
-import { Flex, H3, anchorStyles, focusStyles } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
-import { ShowAllContainer } from "common/src/components";
-import { getTranslationSafe } from "common/src/modules/util";
-import { getLocalizationLang } from "common/src/modules/helpers";
+import { Flex, H3, anchorStyles, focusStyles } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
+import { ShowAllContainer } from "ui/src/components";
+import { getTranslationSafe } from "ui/src/modules/util";
+import { getLocalizationLang } from "ui/src/modules/helpers";
 import { gql } from "@apollo/client";
 
 const Top = styled(Flex).attrs({

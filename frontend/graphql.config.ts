@@ -47,14 +47,14 @@ const plugins = ["typescript", "typescript-operations", "typescript-react-apollo
 
 const config: IGraphQLConfig = {
   projects: {
-    common: {
+    ui: {
       schema,
-      documents: "packages/common/**/!(*.d|gql-types).{ts,tsx}",
+      documents: "packages/ui/**/!(*.d|gql-types).{ts,tsx}",
       extensions: {
         codegen: {
           config: gqlConfig,
           generates: {
-            "packages/common/gql/gql-types.ts": {
+            "packages/ui/gql/gql-types.ts": {
               plugins,
             },
           },

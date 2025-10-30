@@ -3,13 +3,13 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconArrowRight, IconCalendar, IconSize } from "hds-react";
 import { type ApplicationRoundCardFragment } from "@gql/gql-types";
-import { formatDateRange, parseValidDateObject } from "common/src/modules/date-utils";
+import { formatDateRange, parseValidDateObject } from "ui/src/modules/date-utils";
 import { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
 import { getApplicationRoundUrl } from "@/modules/urls";
 import { TimeframeStatus } from "./TimeframeStatus";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
-import { Flex, fontMedium } from "common/src/styled";
-import { Card } from "common/src/components";
+import { Flex, fontMedium } from "ui/src/styled";
+import { Card } from "ui/src/components";
 import { gql } from "@apollo/client";
 
 const Times = styled(Flex).attrs({

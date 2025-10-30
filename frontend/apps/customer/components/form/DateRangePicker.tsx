@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { isBefore } from "date-fns";
 import { DateInput } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { parseUIDate, isValidDate, formatDate } from "common/src/modules/date-utils";
-import { getLocalizationLang } from "common/src/modules/helpers";
+import { parseUIDate, isValidDate, formatDate } from "ui/src/modules/date-utils";
+import { getLocalizationLang } from "ui/src/modules/helpers";
 import { startOfDay } from "date-fns/startOfDay";
 
 export interface DateRangePickerProps {

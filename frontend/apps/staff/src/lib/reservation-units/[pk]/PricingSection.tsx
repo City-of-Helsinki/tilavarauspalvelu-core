@@ -1,17 +1,17 @@
-import { capitalize } from "lodash-es";
 import React from "react";
+import { capitalize } from "lodash-es";
 import styled from "styled-components";
 import { addDays, startOfDay } from "date-fns";
 import { IconAlertCircleFill, RadioButton, TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { type Control, Controller, UseFormReturn } from "react-hook-form";
-import { AutoGrid, Flex, HR } from "common/src/styled";
+import { AutoGrid, Flex, HR } from "ui/src/styled";
 import {
   ControlledDateInput,
   ControlledNumberInput,
   ControlledSelect,
   ControlledCheckbox,
-} from "common/src/components/form";
+} from "ui/src/components/form";
 import { PaymentType, PriceUnit } from "@gql/gql-types";
 import { getTranslatedError } from "@/modules/util";
 import { FieldGroup } from "./FieldGroup";

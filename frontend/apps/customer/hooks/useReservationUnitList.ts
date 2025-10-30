@@ -1,5 +1,5 @@
 import type { ReservationUnitNode } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/modules/helpers";
+import { filterNonNullable } from "ui/src/modules/helpers";
 import { useSearchParams } from "next/navigation";
 import { useSearchModify } from "./useSearchValues";
 

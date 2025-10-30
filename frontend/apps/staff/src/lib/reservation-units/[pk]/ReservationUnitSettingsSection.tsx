@@ -4,15 +4,15 @@ import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { type FieldValues, useController, type UseControllerProps, UseFormReturn } from "react-hook-form";
 import { AuthenticationType, ReservationFormType, ReservationStartInterval } from "@gql/gql-types";
-import { AutoGrid, Flex } from "common/src/styled";
-import { ControlledSelect, ControlledCheckbox, DateTimeInput } from "common/src/components/form";
+import { AutoGrid, Flex } from "ui/src/styled";
+import { ControlledSelect, ControlledCheckbox, DateTimeInput } from "ui/src/components/form";
 import { getTranslatedError } from "@/modules/util";
 import { BUFFER_TIME_OPTIONS, ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 import { FieldGroup } from "./FieldGroup";
 import { CustomNumberInput } from "./CustomNumberInput";
 import { SpecializedRadioGroup } from "./SpecializedRadioGroup";
-import { sort } from "common/src/modules/helpers";
+import { sort } from "ui/src/modules/helpers";
 
 const Indent = styled.div<{ $noIndent: boolean }>`
   ${({ $noIndent }) => ($noIndent ? null : `margin-left: var(--spacing-l);`)}

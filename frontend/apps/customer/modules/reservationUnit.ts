@@ -1,4 +1,4 @@
-import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "common";
+import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "ui";
 import { trim, uniq } from "lodash-es";
 import {
   addDays,
@@ -13,8 +13,7 @@ import {
   startOfDay,
   sub,
 } from "date-fns";
-import { i18n } from "next-i18next";
-import { convertLanguageCode, getTranslationSafe } from "common/src/modules/util";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
 import {
   type AvailableTimesReservationUnitFieldsFragment,
   type BlockingReservationFieldsFragment,
@@ -42,7 +41,7 @@ import {
   type RoundPeriod,
 } from "@/modules/reservable";
 import { gql } from "@apollo/client";
-import { getIntervalMinutes } from "common/src/modules/conversion";
+import { getIntervalMinutes } from "ui/src/modules/conversion";
 import {
   capitalize,
   dayMax,
@@ -51,9 +50,9 @@ import {
   formatTimeStruct,
   isPriceFree,
   type ReadonlyDeep,
-} from "common/src/modules/helpers";
-import { timeToMinutes, formatApiDate } from "common/src/modules/date-utils";
-import { type LocalizationLanguages } from "common/src/modules/urlBuilder";
+} from "ui/src/modules/helpers";
+import { timeToMinutes, formatApiDate } from "ui/src/modules/date-utils";
+import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { type TFunction } from "i18next";
 
 export function isReservationUnitPublished(reservationUnit: Pick<ReservationUnitNode, "publishingState">): boolean {
@@ -129,7 +128,7 @@ export function getEquipmentList(
 
 export function getReservationUnitName(
   reservationUnit: Pick<ReservationUnitNode, "nameFi" | "nameSv" | "nameEn"> | undefined,
-  language: string = i18n?.language ?? "fi"
+  language: string = "fi"
 ): string | undefined {
   if (!reservationUnit) {
     return undefined;

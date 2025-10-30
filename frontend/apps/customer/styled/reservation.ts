@@ -1,5 +1,5 @@
-import { breakpoints } from "common/src/modules/const";
-import { Flex } from "common/src/styled";
+import { breakpoints } from "ui/src/modules/const";
+import { Flex } from "ui/src/styled";
 import { Stepper } from "hds-react";
 import styled from "styled-components";
 

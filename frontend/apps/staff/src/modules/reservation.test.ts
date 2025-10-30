@@ -9,9 +9,9 @@ import {
 } from "@gql/gql-types";
 import { createTagString, getReservationUnitPricing } from "./reservation";
 import { addHours, addMonths } from "date-fns";
-import { formatApiDateUnsafe } from "common/src/modules/date-utils";
+import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
 import { describe, expect, test } from "vitest";
-import { createNodeId } from "common/src/modules/helpers";
+import { createNodeId } from "ui/src/modules/helpers";
 
 const mockT = ((x: string) => x) as TFunction;
 

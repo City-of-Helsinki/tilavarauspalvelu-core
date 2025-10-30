@@ -1,8 +1,7 @@
-import { type ApplicationRoundNode } from "common/gql/gql-types";
-import { type Maybe } from "@/gql/gql-types";
-import { getTranslationSafe } from "common/src/modules/util";
-import type { ReadonlyDeep } from "common/src/modules/helpers";
-import { type LocalizationLanguages } from "common/src/modules/urlBuilder";
+import type { Maybe, ApplicationRoundNode } from "@/gql/gql-types";
+import { getTranslationSafe } from "ui/src/modules/util";
+import type { ReadonlyDeep } from "ui/src/modules/helpers";
+import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 
 type ApplicationRoundType = Maybe<Pick<ReadonlyDeep<ApplicationRoundNode>, "nameFi" | "nameSv" | "nameEn">> | undefined;
 

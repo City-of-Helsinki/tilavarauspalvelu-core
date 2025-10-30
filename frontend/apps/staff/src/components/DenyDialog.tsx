@@ -13,12 +13,12 @@ import {
   type DenyDialogFieldsFragment,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { CenterSpinner, Flex } from "common/src/styled";
+import { CenterSpinner, Flex } from "ui/src/styled";
 import { useDenyReasonOptions } from "@/hooks";
-import { successToast } from "common/src/components/toast";
+import { successToast } from "ui/src/components/toast";
 import { ApolloError, gql } from "@apollo/client";
-import { convertOptionToHDS, toNumber } from "common/src/modules/helpers";
-import { useDisplayError } from "common/src/hooks";
+import { convertOptionToHDS, toNumber } from "ui/src/modules/helpers";
+import { useDisplayError } from "ui/src/hooks";
 import { isBefore } from "date-fns";
 
 const ActionButtons = styled(Dialog.ActionButtons)`

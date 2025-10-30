@@ -8,9 +8,9 @@ import {
   type ReservationUnitNode,
   useRejectRestMutation,
 } from "@gql/gql-types";
-import { fontMedium, SemiBold } from "common/src/styled";
-import { filterNonNullable, truncate } from "common/src/modules/helpers";
-import { convertWeekday } from "common/src/modules/conversion";
+import { fontMedium, SemiBold } from "ui/src/styled";
+import { filterNonNullable, truncate } from "ui/src/modules/helpers";
+import { convertWeekday } from "ui/src/modules/conversion";
 import {
   type AllocatedTimeSlotNodeT,
   createDurationString,
@@ -18,13 +18,13 @@ import {
   type SectionNodeT,
 } from "./modules/applicationRoundAllocation";
 import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
-import { PopupMenu } from "common/src/components/PopupMenu";
+import { PopupMenu } from "ui/src/components/PopupMenu";
 import { type ApolloQueryResult, gql } from "@apollo/client";
 import { getApplicationUrl } from "@/modules/urls";
 import { getApplicantName } from "@/modules/helpers";
 import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/modules/const";
 import { formatAgeGroup } from "@/modules/util";
-import { useDisplayError } from "common/src/hooks";
+import { useDisplayError } from "ui/src/hooks";
 import Link from "next/link";
 
 export type AllocationApplicationSectionCardType = "unallocated" | "allocated" | "partial" | "declined";

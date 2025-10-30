@@ -1,11 +1,11 @@
 import { AuthenticationType, type ReservationUnitsByUnitQuery, useReservationUnitsByUnitQuery } from "@gql/gql-types";
-import { createNodeId, filterNonNullable } from "common/src/modules/helpers";
-import { formatApiDate } from "common/src/modules/date-utils";
-import { RELATED_RESERVATION_STATES } from "common/src/modules/const";
-import { errorToast } from "common/src/components/toast";
+import { createNodeId, filterNonNullable } from "ui/src/modules/helpers";
+import { formatApiDate } from "ui/src/modules/date-utils";
+import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
+import { errorToast } from "ui/src/components/toast";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
-import { type OptionT } from "common/src/modules/search";
+import { type OptionT } from "ui/src/modules/search";
 
 export interface ReservationUnitOption extends OptionT {
   isDraft: boolean;

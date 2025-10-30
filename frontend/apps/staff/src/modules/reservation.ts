@@ -1,6 +1,6 @@
 import { differenceInMinutes } from "date-fns";
 import type { TFunction } from "i18next";
-import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "common";
+import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "ui";
 import {
   type CreateTagStringFragment,
   ReserveeType,
@@ -23,13 +23,13 @@ import {
   parseApiDate,
   fromApiDateTime,
   parseValidDateObject,
-} from "common/src/modules/date-utils";
+} from "ui/src/modules/date-utils";
 import { getReserveeName } from "@/modules/util";
 import { getReserveeTypeTranslationKey } from "@/modules/helpers";
-import { filterNonNullable, sort, toNumber } from "common/src/modules/helpers";
+import { filterNonNullable, sort, toNumber } from "ui/src/modules/helpers";
 import { gql } from "@apollo/client";
-import { convertWeekday } from "common/src/modules/conversion";
-import { type CalendarEvent } from "common/src/components/calendar/Calendar";
+import { convertWeekday } from "ui/src/modules/conversion";
+import { type CalendarEvent } from "ui/src/components/calendar/Calendar";
 
 export type EventType = EventStyleReservationFieldsFragment;
 export type CalendarEventType = CalendarEvent<EventType>;

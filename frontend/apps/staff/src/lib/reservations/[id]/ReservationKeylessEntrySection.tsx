@@ -8,17 +8,17 @@ import {
   useRepairReservationAccessCodeSingleMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { successToast } from "common/src/components/toast";
-import { useDisplayError } from "common/src/hooks";
+import { successToast } from "ui/src/components/toast";
+import { useDisplayError } from "ui/src/hooks";
 import { Button, ButtonSize, IconAlertCircleFill, IconRefresh, Tooltip } from "hds-react";
-import { dateToMinutes, formatDate, formatTimeRange, parseValidDateObject } from "common/src/modules/date-utils";
+import { dateToMinutes, formatDate, formatTimeRange, parseValidDateObject } from "ui/src/modules/date-utils";
 import React, { useState } from "react";
 import { Accordion } from "@/styled";
 import { DataWrapper } from "./DataWrapper";
 import styled, { css } from "styled-components";
-import { ButtonContainer, Flex, NoWrap } from "common/src/styled";
-import { breakpoints } from "common/src/modules/const";
-import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
+import { ButtonContainer, Flex, NoWrap } from "ui/src/styled";
+import { breakpoints } from "ui/src/modules/const";
+import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { useSession } from "@/hooks";
 import { gql } from "@apollo/client";
 import { hasPermission } from "@/modules/permissionHelper";

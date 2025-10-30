@@ -25,9 +25,9 @@
     "gql-pluck": "node scripts/gql-pluck.mjs",
     "codegen:staff": "graphql-codegen --project staff",
     "codegen:customer": "graphql-codegen --project customer",
-    "codegen:common": "graphql-codegen --project common",
-    "codegen": "parallel pnpm ::: codegen:staff codegen:customer codegen:common",
-    "codegen:watch": "pnpm codegen:staff --watch & pnpm codegen:customer --watch & pnpm codegen:common --watch"
+    "codegen:ui": "graphql-codegen --project ui",
+    "codegen": "parallel pnpm ::: codegen:staff codegen:customer codegen:ui",
+    "codegen:watch": "pnpm codegen:staff --watch & pnpm codegen:customer --watch & pnpm codegen:ui --watch"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^6.0.1",

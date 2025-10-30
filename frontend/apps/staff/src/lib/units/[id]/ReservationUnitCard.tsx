@@ -2,10 +2,10 @@ import React from "react";
 import { IconArrowRight, IconLayers, IconHome, IconGroup, IconPen, IconCheck } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { type ReservationUnitCardFragment } from "@gql/gql-types";
-import { getImageSource, getMainImage } from "common/src/modules/helpers";
-import StatusLabel from "common/src/components/StatusLabel";
+import { getImageSource, getMainImage } from "ui/src/modules/helpers";
+import StatusLabel from "ui/src/components/StatusLabel";
 import { getReservationUnitUrl } from "@/modules/urls";
-import Card from "common/src/components/Card";
+import Card from "ui/src/components/Card";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { gql } from "@apollo/client";
 

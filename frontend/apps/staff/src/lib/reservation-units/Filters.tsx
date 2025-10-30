@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { ShowAllContainer } from "common/src/components";
+import { ShowAllContainer } from "ui/src/components";
 import { ReservationUnitPublishingState } from "@gql/gql-types";
 import {
   ControlledSearchFilter,
@@ -9,13 +9,13 @@ import {
   ControlledRangeNumberFilter,
 } from "@/components/QueryParamFilters";
 import { SearchTags } from "@/components/SearchTags";
-import { Flex } from "common/src/styled";
+import { Flex } from "ui/src/styled";
 import { type TagOptionsList, translateTag } from "@/modules/search";
-import { SearchButton, SearchButtonContainer } from "common/src/components/SearchButton";
+import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useForm } from "react-hook-form";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
-import { mapFormToSearchParams } from "common/src/modules/search";
+import { mapFormToSearchParams } from "ui/src/modules/search";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 
 const MoreWrapper = styled(ShowAllContainer)`

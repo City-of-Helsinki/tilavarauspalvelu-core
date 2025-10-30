@@ -4,15 +4,15 @@ import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
 import { AuthenticationType, ReservationTypeChoice, type ReservationTypeFormFieldsFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { type CreateStaffReservationFormValues, ReservationTypes } from "common/src/schemas";
-import { ShowAllContainer } from "common/src/components";
-import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "common/src/reservation-form";
+import { type CreateStaffReservationFormValues, ReservationTypes } from "ui/src/schemas";
+import { ShowAllContainer } from "ui/src/components";
+import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "ui/src/reservation-form";
 import { BufferToggles } from "./BufferToggles";
 import ShowTOS from "./ShowTOS";
 import { Element } from "@/styled";
 import { gql } from "@apollo/client";
-import { HR } from "common/src/styled";
-import type { OptionsRecord } from "common";
+import { HR } from "ui/src/styled";
+import type { OptionsRecord } from "ui";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 
 const CommentsTextArea = styled(TextArea)`
