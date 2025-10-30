@@ -1,4 +1,4 @@
-import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "ui";
+import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
 import { trim, uniq } from "lodash-es";
 import {
   addDays,
@@ -13,7 +13,7 @@ import {
   startOfDay,
   sub,
 } from "date-fns";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
 import {
   type AvailableTimesReservationUnitFieldsFragment,
   type BlockingReservationFieldsFragment,
@@ -41,7 +41,7 @@ import {
   type RoundPeriod,
 } from "@/modules/reservable";
 import { gql } from "@apollo/client";
-import { getIntervalMinutes } from "ui/src/modules/conversion";
+import { getIntervalMinutes } from "@ui/modules/conversion";
 import {
   capitalize,
   dayMax,
@@ -50,9 +50,9 @@ import {
   formatTimeStruct,
   isPriceFree,
   type ReadonlyDeep,
-} from "ui/src/modules/helpers";
-import { timeToMinutes, formatApiDate } from "ui/src/modules/date-utils";
-import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
+} from "@ui/modules/helpers";
+import { timeToMinutes, formatApiDate } from "@ui/modules/date-utils";
+import { type LocalizationLanguages } from "@ui/modules/urlBuilder";
 import { type TFunction } from "i18next";
 
 export function isReservationUnitPublished(reservationUnit: Pick<ReservationUnitNode, "publishingState">): boolean {

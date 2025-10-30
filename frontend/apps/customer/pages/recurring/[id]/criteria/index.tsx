@@ -8,11 +8,11 @@ import {
   type ApplicationRoundCriteriaQuery,
   type ApplicationRoundCriteriaQueryVariables,
 } from "@gql/gql-types";
-import { Flex, H1 } from "ui/src/styled";
-import { breakpoints } from "ui/src/modules/const";
-import { Sanitize } from "ui/src/components/Sanitize";
-import { createNodeId, capitalize, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { Flex, H1 } from "@ui/styled";
+import { breakpoints } from "@ui/modules/const";
+import { Sanitize } from "@ui/components/Sanitize";
+import { createNodeId, capitalize, ignoreMaybeArray, toNumber } from "@ui/modules/helpers";
+import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
 import { gql } from "@apollo/client";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { getCommonServerSideProps } from "@/modules/serverUtils";

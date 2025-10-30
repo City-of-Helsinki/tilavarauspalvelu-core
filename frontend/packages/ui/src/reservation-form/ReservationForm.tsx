@@ -5,8 +5,8 @@ import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { MunicipalityChoice, type ReservationUnitNode, ReserveeType } from "../../gql/gql-types";
 import { ReservationFormField } from "./ReservationFormField";
-import { AutoGrid, H4, H5 } from "../styled";
-import type { OptionsRecord } from "../../types/common";
+import { AutoGrid, H4, H5 } from "@ui/styled";
+import type { OptionsRecord } from "@ui/types";
 import { ReservationSubventionSection } from "./ReservationSubventionSection";
 import {
   constructReservationFieldId,
@@ -18,8 +18,8 @@ import {
   getFilteredGeneralFields,
 } from "./util";
 import { CustomerTypeSelector } from "./CustomerTypeSelector";
-import { type ReservationFormValueT } from "../schemas";
-import { ControlledCheckbox, ControlledNumberInput, ControlledSelect } from "../components/form";
+import { type ReservationFormValueT } from "@ui/schemas";
+import { ControlledCheckbox, ControlledNumberInput, ControlledSelect } from "@ui/components/form";
 import { StyledCheckboxWrapper, StyledTextArea, StyledTextInput } from "./styled";
 
 interface CommonWithFields {
