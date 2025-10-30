@@ -23,6 +23,7 @@ import {
   parseApiDate,
   fromApiDateTime,
   parseValidDateObject,
+  formatDateTime,
 } from "ui/src/modules/date-utils";
 import { getReserveeName } from "@/modules/util";
 import { getReserveeTypeTranslationKey } from "@/modules/helpers";
@@ -40,8 +41,21 @@ function reservationUnitName(reservationUnit: Maybe<CreateTagStringFragment["res
   return reservationUnit ? `${reservationUnit.nameFi}, ${reservationUnit.unit?.nameFi || ""}` : "-";
 }
 
-export function reservationPrice(reservation: ReservationType, t: TFunction): string {
+export function formatReservationPrice(t: TFunction, reservation: ReservationType): string {
   return getReservationPrice(reservation.price, t("reservation:noPrice"), true);
+}
+
+export function formatReservationPriceLong(t: TFunction, reservation: ReservationType): string {
+  const dueBy = reservation.paymentOrder?.handledPaymentDueBy;
+  const dueByString = dueBy
+    ? ` (${t("reservation:dueBy", {
+        date: formatDateTime(new Date(dueBy), {
+          includeTimeSeparator: true,
+        }),
+      })})`
+    : "";
+  const subventionString = reservation.applyingForFreeOfCharge ? `, ${t("reservation:appliesSubvention")}` : "";
+  return `${formatReservationPrice(t, reservation)}${dueByString}${subventionString}`;
 }
 
 function getBeginTime(p: PricingFieldsFragment): number {
