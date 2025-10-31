@@ -9,7 +9,7 @@ import { formatters as getFormatters } from "@ui/index";
 import { breakpoints } from "@ui/modules/const";
 import { formatDate, formatTimeRange, timeToMinutes } from "@ui/modules/date-utils";
 import { filterNonNullable, formatListToCSV, getLocalizationLang, isPriceFree, toNumber } from "@ui/modules/helpers";
-import { getTranslationSafe } from "@ui/modules/util";
+import { getTranslation } from "@ui/modules/util";
 import { AddressSection } from "@/components/AddressSection";
 import { Map as MapComponent } from "@/components/Map";
 import { getFuturePricing, getPriceString, getReservationUnitName } from "@/modules/reservationUnit";
@@ -50,16 +50,16 @@ export function ReservationUnitMoreDetails({
   }, [reservationUnit?.canApplyFreeOfCharge, reservationUnit?.pricings]);
 
   const paymentTermsContent = reservationUnit.paymentTerms
-    ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang)
+    ? getTranslation(reservationUnit.paymentTerms, "text", lang)
     : undefined;
   const cancellationTermsContent = reservationUnit.cancellationTerms
-    ? getTranslationSafe(reservationUnit.cancellationTerms, "text", lang)
+    ? getTranslation(reservationUnit.cancellationTerms, "text", lang)
     : undefined;
   const pricingTermsContent = reservationUnit.pricingTerms
-    ? getTranslationSafe(reservationUnit.pricingTerms, "text", lang)
+    ? getTranslation(reservationUnit.pricingTerms, "text", lang)
     : undefined;
   const serviceSpecificTermsContent = reservationUnit.serviceSpecificTerms
-    ? getTranslationSafe(reservationUnit.serviceSpecificTerms, "text", lang)
+    ? getTranslation(reservationUnit.serviceSpecificTerms, "text", lang)
     : undefined;
 
   return (
@@ -107,7 +107,7 @@ export function ReservationUnitMoreDetails({
         data-testid="reservation-unit__terms-of-use"
       >
         {serviceSpecificTermsContent && <Sanitize html={serviceSpecificTermsContent} />}
-        {termsOfUse && <Sanitize html={getTranslationSafe(termsOfUse, "text", lang)} />}
+        {termsOfUse != null && <Sanitize html={getTranslation(termsOfUse, "text", lang)} />}
       </Accordion>
     </>
   );
@@ -119,7 +119,7 @@ function NoticeWhenReservingSection({
 }): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
-  const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);
+  const notesWhenReserving = getTranslation(reservationUnit, "notesWhenApplying", lang);
 
   const appRounds = reservationUnit.applicationRounds;
   const futurePricing = getFuturePricing(reservationUnit, appRounds);

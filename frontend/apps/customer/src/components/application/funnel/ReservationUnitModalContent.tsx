@@ -18,7 +18,7 @@ import Card from "ui/src/components/Card";
 import { breakpoints } from "ui/src/modules/const";
 import { filterNonNullable, getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
 import { type OptionsListT } from "ui/src/modules/search";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { CenterSpinner, Flex, H3 } from "ui/src/styled";
 import { type SearchFormValues, SeasonalSearchForm } from "@/components/SeasonalSearchForm";
 import { useSearchQuery } from "@/hooks";
@@ -66,7 +66,7 @@ function ReservationUnitCard({ reservationUnit, handleAdd, handleRemove, isSelec
     : t("reservationUnitModal:selectReservationUnit");
   const name = getReservationUnitName(reservationUnit);
   const reservationUnitTypeName = reservationUnit.reservationUnitType
-    ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
+    ? getTranslation(reservationUnit.reservationUnitType, "name", lang)
     : undefined;
   const unitName = reservationUnit.unit ? getUnitName(reservationUnit.unit, lang) : undefined;
 

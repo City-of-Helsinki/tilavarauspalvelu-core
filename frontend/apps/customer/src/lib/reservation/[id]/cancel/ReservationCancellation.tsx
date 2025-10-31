@@ -9,7 +9,7 @@ import { useDisplayError } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDate, applicationReservationDateTime } from "ui/src/modules/date-utils";
 import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { H1 } from "ui/src/styled";
 import { getLocalizationLang } from "@ui/modules/helpers";
 import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";
@@ -113,7 +113,7 @@ function ApplicationInfoCard({ reservation }: { reservation: CancellationProps["
   const name = reservation.reservationSeries?.name;
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
-  const reservationUnitName = getTranslationSafe(reservation.reservationUnit, "name", lang);
+  const reservationUnitName = getTranslation(reservation.reservationUnit, "name", lang);
   const price = getPrice(t, reservation, lang);
 
   const { dayOfWeek, time, date } = applicationReservationDateTime({ t, reservation, trailingMinutes: true });
@@ -164,13 +164,13 @@ function getTranslatedTerms(
         ?.applicationRound;
     const { termsOfUse } = round ?? {};
     if (termsOfUse) {
-      return getTranslationSafe(termsOfUse, "text", lang);
+      return getTranslation(termsOfUse, "text", lang);
     }
     return null;
   }
   const reservationUnit = reservation.reservationUnit;
   if (reservationUnit.cancellationTerms != null) {
-    return getTranslationSafe(reservationUnit.cancellationTerms, "text", lang);
+    return getTranslation(reservationUnit.cancellationTerms, "text", lang);
   }
   return null;
 }

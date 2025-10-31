@@ -19,7 +19,7 @@ import {
   ignoreMaybeArray,
   toNumber,
 } from "ui/src/modules/helpers";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { H1 } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";
@@ -111,7 +111,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
   const lang = getLocalizationLang(i18n.language);
   const round = applicationSection?.application?.applicationRound;
   const { termsOfUse } = round ?? {};
-  const cancellationTerms = termsOfUse ? getTranslationSafe(termsOfUse, "text", lang) : null;
+  const cancellationTerms = termsOfUse ? getTranslation(termsOfUse, "text", lang) : null;
 
   const modalTitle = t("reservations:cancelSection.modal.title");
   const modalContent = t("reservations:cancelSection.modal.body");
@@ -190,8 +190,7 @@ function ApplicationSectionInfoCard({
     return `${dayOfWeekString} ${formatApiTimeInterval({ beginTime, endTime })}`;
   });
 
-  const reservationUnitName =
-    firstReservationUnit != null ? getTranslationSafe(firstReservationUnit, "name", lang) : "-";
+  const reservationUnitName = firstReservationUnit != null ? getTranslation(firstReservationUnit, "name", lang) : "-";
   const locationString = `${reservationUnitName}${reservationUnits.length > 1 ? ` +${reservationUnits.length - 1}` : ""}`;
 
   const icons = [

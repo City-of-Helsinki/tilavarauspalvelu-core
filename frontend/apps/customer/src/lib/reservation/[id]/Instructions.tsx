@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import { Sanitize } from "ui/src/components/Sanitize";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { H4 } from "ui/src/styled";
 import { getLocalizationLang } from "@ui/modules/helpers";
 import { type InstructionsFragment, type Maybe, ReservationStateChoice } from "@gql/gql-types";
@@ -16,7 +16,7 @@ export function Instructions({ reservation }: Props): JSX.Element | null {
   const instructionsKey = getReservationUnitInstructionsKey(reservation.state);
 
   const instructionsText =
-    instructionsKey != null ? getTranslationSafe(reservation.reservationUnit, instructionsKey, lang) : null;
+    instructionsKey != null ? getTranslation(reservation.reservationUnit, instructionsKey, lang) : null;
   const showInstructions = instructionsKey != null && instructionsText != null && instructionsText !== "";
 
   if (!showInstructions) {

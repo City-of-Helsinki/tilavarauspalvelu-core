@@ -9,7 +9,7 @@ import styled from "styled-components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { breakpoints } from "ui/src/modules/const";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { H4 } from "ui/src/styled";
 import { getLocalizationLang } from "@ui/modules/helpers";
 import { QuickReservation } from "@/components/QuickReservation";
@@ -183,7 +183,7 @@ function EditStep0({
   });
 
   const lang = getLocalizationLang(i18n.language);
-  const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);
+  const notesWhenReserving = getTranslation(reservationUnit, "notesWhenApplying", lang);
 
   return (
     <>

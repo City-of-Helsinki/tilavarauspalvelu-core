@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { breakpoints } from "ui/src/modules/const";
 import { getLocalizationLang } from "ui/src/modules/helpers";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { H4 } from "ui/src/styled";
 import { ApplicationRoundNode } from "@gql/gql-types";
 
@@ -25,7 +25,7 @@ interface NotesWhenApplyingProps extends React.HTMLAttributes<HTMLDivElement> {
 export function NotesWhenApplying({ applicationRound, ...rest }: NotesWhenApplyingProps) {
   const { t, i18n } = useTranslation();
 
-  const translatedNotes = getTranslationSafe(applicationRound, "notesWhenApplying", getLocalizationLang(i18n.language));
+  const translatedNotes = getTranslation(applicationRound, "notesWhenApplying", getLocalizationLang(i18n.language));
 
   if (translatedNotes === "") {
     return null;

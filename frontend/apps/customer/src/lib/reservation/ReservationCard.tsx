@@ -7,7 +7,7 @@ import { ButtonLikeExternalLink, ButtonLikeLink } from "ui/src/components/Button
 import Card from "ui/src/components/Card";
 import { formatDateTimeRange } from "ui/src/modules/date-utils";
 import { capitalize, getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { ReservationStatus, ReservationOrderStatus } from "@/components/reservation";
 import { getNormalizedReservationOrderStatus, getPaymentUrl, isReservationCancellable } from "@/modules/reservation";
 import { getPrice } from "@/modules/reservationUnit";
@@ -40,8 +40,8 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
     return null;
   }
 
-  const name = getTranslationSafe(reservationUnit, "name", lang);
-  const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
+  const name = getTranslation(reservationUnit, "name", lang);
+  const unitName = getTranslation(reservationUnit.unit, "name", lang);
   const title = trim(`${name}, ${unitName}`, ", ");
 
   const normalizedOrderStatus = getNormalizedReservationOrderStatus(reservation);

@@ -44,5 +44,3 @@ export function getTranslation<K extends PossibleKeys, T extends string | null>(
   // never
   throw new Error(`Object is missing translation for ${key}`);
 }
-
-export { getTranslation as getTranslationSafe };
