@@ -3,7 +3,7 @@ import { IconArrowRight, IconLayers, IconHome, IconGroup, IconPen, IconCheck } f
 import { useTranslation } from "next-i18next";
 import { type ReservationUnitCardFragment } from "@gql/gql-types";
 import { getImageSource, getMainImage } from "ui/src/modules/helpers";
-import StatusLabel from "ui/src/components/StatusLabel";
+import { StatusLabel } from "ui/src/components/StatusLabel";
 import { getReservationUnitUrl } from "@/modules/urls";
 import Card from "ui/src/components/Card";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";

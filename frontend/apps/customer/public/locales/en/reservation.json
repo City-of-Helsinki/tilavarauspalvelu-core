@@ -71,13 +71,13 @@
   "noUpcomingReservations": "No upcoming bookings",
   "noPastReservations": "No past bookings",
   "noCancelledReservations": "No cancelled bookings",
-  "status": {
-    "cancelled": "Cancelled",
-    "confirmed": "Confirmed",
-    "denied": "Denied",
-    "requiresHandling": "Being processed",
-    "created": "Draft",
-    "waitingForPayment": "Awaiting payment"
+  "state": {
+    "REQUIRES_HANDLING": "Being processed",
+    "CONFIRMED": "Confirmed",
+    "DENIED": "Denied",
+    "CANCELLED": "Cancelled",
+    "CREATED": "Draft",
+    "WAITING_FOR_PAYMENT": "Awaiting payment"
   },
   "paymentBanner": {
     "title": "Your booking is waiting for payment",
@@ -119,14 +119,16 @@
   },
   "makeReservation": "Make a booking",
   "orderStatus": {
-    "draft": "Awaiting payment",
-    "paid": "Paid",
-    "paidManually": "Payment on site",
-    "paidByInvoice": "Payment by invoice",
-    "pending": "Awaiting payment",
-    "cancelled": "Payment cancelled",
-    "expired": "Unpaid",
-    "refunded": "Refunded"
+    "DRAFT": "Awaiting payment",
+    "PAID": "Paid",
+    "PAID_MANUALLY": "Payment on site",
+    "PAID_BY_INVOICE": "Payment by invoice",
+    "PENDING": "Awaiting payment",
+    "CANCELLED": "Payment cancelled",
+    "EXPIRED": "Unpaid",
+    "REFUNDED": "Refunded",
+    "ALL": "Free",
+    "FREE": "Free"
   },
   "reservationEditFailed": "Failed to edit the booking",
   "backToReservationUnit": "Back to destination page",

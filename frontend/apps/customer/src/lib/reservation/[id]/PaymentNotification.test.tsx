@@ -23,8 +23,8 @@ function customRender() {
 describe("Component: Payment Notification", () => {
   it("should render the payment notification component with correct text", () => {
     customRender();
-    expect(screen.getByText("reservations:paymentBanner.title")).toBeInTheDocument();
-    expect(screen.getByText("reservations:paymentBanner.description")).toBeInTheDocument();
+    expect(screen.getByText("reservation:paymentBanner.title")).toBeInTheDocument();
+    expect(screen.getByText("reservation:paymentBanner.description")).toBeInTheDocument();
   });
 
   it("should render the payment notification component with correct price details", () => {

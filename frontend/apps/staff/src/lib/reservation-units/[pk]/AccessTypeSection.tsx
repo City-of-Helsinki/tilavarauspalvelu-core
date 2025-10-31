@@ -6,7 +6,7 @@ import { type ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 import { ControlledDateInput, ControlledSelect } from "ui/src/components/form";
 import { formatDate, parseUIDate, parseValidDateObject } from "ui/src/modules/date-utils";
-import StatusLabel from "ui/src/components/StatusLabel";
+import { StatusLabel } from "ui/src/components/StatusLabel";
 import { AutoGrid, Flex, H6 } from "ui/src/styled";
 import { KVWrapper, Label, Value } from "@/styled";
 import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";

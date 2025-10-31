@@ -36,7 +36,8 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSidePropsContext } from "next";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { createClient } from "@/modules/apolloClient";
-import { TimeframeStatus, ApplicationRoundStatusLabel } from "@lib/application-rounds";
+import { ApplicationRoundStatusLabel } from "ui/src/components/statuses";
+import { TimeframeStatus } from "@lib/application-rounds";
 import {
   ReviewEndAllocation,
   ApplicationDataLoader,

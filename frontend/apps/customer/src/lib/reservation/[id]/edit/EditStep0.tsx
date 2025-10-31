@@ -191,7 +191,7 @@ function EditStep0({
       {notesWhenReserving !== "" && (
         <PinkBox>
           <H4 as="h2" $marginTop="none">
-            {t("reservations:reservationInfoBoxHeading")}
+            {t("reservation:reservationInfoBoxHeading")}
           </H4>
           <Sanitize html={notesWhenReserving} />
         </PinkBox>

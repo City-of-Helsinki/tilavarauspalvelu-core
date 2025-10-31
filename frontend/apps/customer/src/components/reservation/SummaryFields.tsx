@@ -119,14 +119,11 @@ function convertMaybeOptionValue(
     // eslint-disable-next-line no-console
     console.warn("convertMaybeOptionValue: rawValue is not pk, but object: ", rawValue);
     return "unknown";
-  }
-  if (typeof rawValue === "boolean") {
+  } else if (typeof rawValue === "boolean") {
     return t(`common:${String(rawValue)}`);
-  }
-  if (typeof rawValue === "string") {
+  } else if (typeof rawValue === "string") {
     return rawValue;
-  }
-  if (typeof rawValue === "number") {
+  } else if (typeof rawValue === "number") {
     return String(rawValue);
   }
   return "unknown";

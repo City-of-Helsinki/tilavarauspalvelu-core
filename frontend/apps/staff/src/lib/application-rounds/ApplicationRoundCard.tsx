@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { IconArrowRight, IconCalendar, IconSize } from "hds-react";
 import { type ApplicationRoundCardFragment } from "@gql/gql-types";
 import { formatDateRange, parseValidDateObject } from "ui/src/modules/date-utils";
-import { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
+import { ApplicationRoundStatusLabel } from "ui/src/components/statuses";
 import { getApplicationRoundUrl } from "@/modules/urls";
 import { TimeframeStatus } from "./TimeframeStatus";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";

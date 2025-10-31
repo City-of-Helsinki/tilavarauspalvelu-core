@@ -25,14 +25,14 @@ function BaseLinkSet(props: Props): JSX.Element {
       {resUnitUrl ? (
         <IconButton
           href={resUnitUrl}
-          label={t("reservations:backToReservationUnit")}
+          label={t("reservation:backToReservationUnit")}
           icon={<IconArrowRight size={IconSize.Medium} aria-hidden="true" />}
         />
       ) : (
         <IconButton
           href={getSingleSearchPath()}
           icon={<IconArrowRight size={IconSize.Medium} aria-hidden="true" />}
-          label={t("reservations:backToSearch")}
+          label={t("reservation:backToSearch")}
         />
       )}
       <IconButton
