@@ -10,7 +10,7 @@ import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { Card } from "ui/src/components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { filterNonNullable, getImageSource, getMainImage } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { getReservationUnitPath } from "@/modules/urls";
 import { gql } from "@apollo/client";
 
@@ -71,13 +71,13 @@ function RelatedUnitCard({ reservationUnit }: { reservationUnit: RelatedUnitCard
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
-  const name = getTranslationSafe(reservationUnit, "name", lang);
-  const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
+  const name = getTranslation(reservationUnit, "name", lang);
+  const unitName = getTranslation(reservationUnit.unit, "name", lang);
   const pricing = getActivePricing(reservationUnit);
   const unitPrice = pricing != null ? getPriceString({ t, pricing }) : undefined;
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
-      ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
+      ? getTranslation(reservationUnit.reservationUnitType, "name", lang)
       : undefined;
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");

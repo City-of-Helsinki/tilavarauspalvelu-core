@@ -15,7 +15,7 @@ import {
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import { type UseFormReturn } from "react-hook-form";
 import { type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { ReservationTimePicker, ReservationInfoCard } from "@/components/reservation";
@@ -182,7 +182,7 @@ function EditStep0({
   });
 
   const lang = convertLanguageCode(i18n.language);
-  const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);
+  const notesWhenReserving = getTranslation(reservationUnit, "notesWhenApplying", lang);
 
   return (
     <>

@@ -13,7 +13,7 @@ import {
   startOfDay,
   sub,
 } from "date-fns";
-import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
+import { convertLanguageCode, getTranslation } from "@ui/modules/util";
 import {
   type AvailableTimesReservationUnitFieldsFragment,
   type BlockingReservationFieldsFragment,
@@ -123,7 +123,7 @@ export function getEquipmentList(
       .sort((a, b) => (a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0))
   );
 
-  return sortedEquipment.map((n) => getTranslationSafe(n, "name", lang));
+  return sortedEquipment.map((n) => getTranslation(n, "name", lang));
 }
 
 export function getReservationUnitName(
@@ -151,7 +151,7 @@ export function getUnitName(
   if (unit == null) {
     return undefined;
   }
-  return getTranslationSafe(unit, "name", convertLanguageCode(locale));
+  return getTranslation(unit, "name", convertLanguageCode(locale));
 }
 
 function isActivePricing(pricing: PricingFieldsFragment): boolean {

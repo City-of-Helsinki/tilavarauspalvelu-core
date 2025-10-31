@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { getReservationFormSchema, ReservationFormValues, type ReservationFormValueT } from "@ui/schemas";
 import { getExtendedGeneralFormFields } from "@ui/reservation-form/util";
 import { Flex, LinkLikeButton } from "@ui/styled";
-import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
+import { convertLanguageCode, getTranslation } from "@ui/modules/util";
 import { type OptionsRecord } from "@ui/types";
 import { ActionContainer, NewReservationForm } from "@/styled/reservation";
 import { useDisplayError } from "@ui/hooks";
@@ -158,7 +158,7 @@ export function ReservationStep0({ reservation, cancelReservation, options }: Pr
 
   const lang = convertLanguageCode(i18n.language);
   const pricingTerms = reservation.reservationUnit.pricingTerms
-    ? getTranslationSafe(reservation.reservationUnit.pricingTerms, "text", lang)
+    ? getTranslation(reservation.reservationUnit.pricingTerms, "text", lang)
     : "";
 
   return (

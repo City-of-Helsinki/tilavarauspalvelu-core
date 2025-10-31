@@ -23,7 +23,7 @@ import { useTranslation } from "next-i18next";
 import { ApolloError, gql } from "@apollo/client";
 import { H1 } from "ui/src/styled";
 import { breakpoints } from "ui/src/modules/const";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { parseApiDate, formatDate } from "ui/src/modules/date-utils";
 import { useRouter } from "next/router";
 import { IconCalendarEvent, IconClock, IconLocation, IconTrash } from "hds-react";
@@ -110,7 +110,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
   const lang = convertLanguageCode(i18n.language);
   const round = applicationSection?.application?.applicationRound;
   const { termsOfUse } = round ?? {};
-  const cancellationTerms = termsOfUse ? getTranslationSafe(termsOfUse, "text", lang) : null;
+  const cancellationTerms = termsOfUse ? getTranslation(termsOfUse, "text", lang) : null;
 
   const modalTitle = t("reservations:cancelSection.modal.title");
   const modalContent = t("reservations:cancelSection.modal.body");
@@ -189,8 +189,7 @@ function ApplicationSectionInfoCard({
     return `${dayOfWeekString} ${formatApiTimeInterval({ beginTime, endTime })}`;
   });
 
-  const reservationUnitName =
-    firstReservationUnit != null ? getTranslationSafe(firstReservationUnit, "name", lang) : "-";
+  const reservationUnitName = firstReservationUnit != null ? getTranslation(firstReservationUnit, "name", lang) : "-";
   const locationString = `${reservationUnitName}${reservationUnits.length > 1 ? ` +${reservationUnits.length - 1}` : ""}`;
 
   const icons = [

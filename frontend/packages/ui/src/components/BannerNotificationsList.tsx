@@ -11,7 +11,7 @@ import {
 } from "../../gql/gql-types";
 import { filterNonNullable } from "../modules/helpers";
 import { useTranslation } from "next-i18next";
-import { convertLanguageCode, getTranslationSafe } from "../modules/util";
+import { convertLanguageCode, getTranslation } from "../modules/util";
 import { gql } from "@apollo/client";
 import { ClientOnly } from "./ClientOnly";
 import { Sanitize } from "./Sanitize";
@@ -64,7 +64,7 @@ function NotificationsListItem({ notification, closeFn, closedArray }: Notificat
   const { t, i18n } = useTranslation();
   const notificationType = convertNotificationType(notification.level);
   const lang = convertLanguageCode(i18n.language);
-  const innerHtml = getTranslationSafe(notification, "message", lang);
+  const innerHtml = getTranslation(notification, "message", lang);
 
   return (
     <BannerNotificationBackground>

@@ -29,7 +29,7 @@ import { ReservationStep0, ReservationStep1 } from "@/lib/reservation-unit/[...p
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createNodeId, toNumber } from "ui/src/modules/helpers";
 import { queryOptions } from "@/modules/queryOptions";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { gql } from "@apollo/client";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ReservationPageWrapper, ReservationTitleSection, PinkBox as PinkBoxBase } from "@/styled/reservation";
@@ -133,7 +133,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       : reservationUnit.canApplyFreeOfCharge && reservation.applyingForFreeOfCharge === true;
 
   const lang = convertLanguageCode(i18n.language);
-  const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);
+  const notesWhenReserving = getTranslation(reservationUnit, "notesWhenApplying", lang);
 
   // it should be Created only here (SSR should have redirected)
   if (reservation.state !== ReservationStateChoice.Created) {
@@ -187,7 +187,7 @@ function NewReservationWrapper(props: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
   const { reservation } = props;
-  const reservationUnitName = getTranslationSafe(reservation.reservationUnit, "name", lang);
+  const reservationUnitName = getTranslation(reservation.reservationUnit, "name", lang);
   const routes = [
     {
       slug: getSingleSearchPath(),

@@ -3,7 +3,7 @@ import TermsBox from "ui/src/components/TermsBox";
 import { useTranslation } from "next-i18next";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { type TermsOfUseTextFieldsFragment, type Maybe, type TermsOfUseFragment } from "@gql/gql-types";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 
 export function AcceptTerms({
   reservationUnit,
@@ -90,6 +90,6 @@ function SanitizedTerms({
     return null;
   }
 
-  const localTerms = getTranslationSafe(terms, "text", lang);
+  const localTerms = getTranslation(terms, "text", lang);
   return <Sanitize html={localTerms} />;
 }

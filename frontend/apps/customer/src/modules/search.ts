@@ -23,7 +23,7 @@ import {
   ReservationUnitTypeOrderingChoices,
   UnitOrderingChoices,
 } from "@gql/gql-types";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { parseUIDate, formatApiDate } from "ui/src/modules/date-utils";
 import { startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "./const";
@@ -179,7 +179,7 @@ export function translateOption(
 ): OptionT {
   return {
     value: val.pk ?? 0,
-    label: getTranslationSafe(val, "name", lang),
+    label: getTranslation(val, "name", lang),
   };
 }
 

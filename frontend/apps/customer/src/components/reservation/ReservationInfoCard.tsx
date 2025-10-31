@@ -17,7 +17,7 @@ import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
 import { createNodeId, capitalize, getImageSource, getLocalizationLang, getMainImage } from "@ui/modules/helpers";
 import { formatDateTimeRange, formatDuration } from "@ui/modules/date-utils";
 import { getReservationUnitPath } from "@/modules/urls";
-import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
+import { convertLanguageCode, getTranslation } from "@ui/modules/util";
 
 const InfoCard = styled(Card)`
   && h2 {
@@ -104,11 +104,11 @@ export function ReservationInfoCard({
       ? isReservationUnitPaid(reservationUnit.pricings, new Date(beginsAt))
       : Number(reservation?.price) > 0;
 
-  const name = getTranslationSafe(reservationUnit, "name", lang);
+  const name = getTranslation(reservationUnit, "name", lang);
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");
 
-  const unitName = reservationUnit.unit != null ? getTranslationSafe(reservationUnit.unit, "name", lang) : "-";
+  const unitName = reservationUnit.unit != null ? getTranslation(reservationUnit.unit, "name", lang) : "-";
 
   return (
     <InfoCard

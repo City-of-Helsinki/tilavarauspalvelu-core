@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { addYears } from "date-fns";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "ui/src/modules/date-utils";
 import { Flex, H4 } from "ui/src/styled";
 import { breakpoints } from "ui/src/modules/const";
@@ -317,7 +317,7 @@ function ReservationUnit({
   );
 
   const pricingTermsContent = reservationUnit.pricingTerms
-    ? getTranslationSafe(reservationUnit.pricingTerms, "text", lang)
+    ? getTranslation(reservationUnit.pricingTerms, "text", lang)
     : undefined;
 
   return (
@@ -350,7 +350,7 @@ function ReservationUnit({
         <PageContentWrapper>
           <div data-testid="reservation-unit__description">
             <H4 as="h2">{t("reservationUnit:description")}</H4>
-            <Sanitize html={getTranslationSafe(reservationUnit, "description", lang)} />
+            <Sanitize html={getTranslation(reservationUnit, "description", lang)} />
           </div>
           {equipment.length > 0 && (
             <div data-testid="reservation-unit__equipment">
@@ -387,7 +387,7 @@ function ReservationUnitWrapped(props: PropsNarrowed) {
   const { t, i18n } = useTranslation();
   const { reservationUnit } = props;
   const lang = convertLanguageCode(i18n.language);
-  const reservationUnitName = getTranslationSafe(reservationUnit, "name", lang);
+  const reservationUnitName = getTranslation(reservationUnit, "name", lang);
   const routes = [
     { slug: getSingleSearchPath(), title: t("breadcrumb:searchSingle") },
     { title: reservationUnitName ?? "-" },
