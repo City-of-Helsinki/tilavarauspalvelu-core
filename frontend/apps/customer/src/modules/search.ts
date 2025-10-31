@@ -15,7 +15,7 @@ import {
 } from "ui/src/modules/helpers";
 import { type OptionsListT, type OptionT } from "ui/src/modules/search";
 import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import {
   EquipmentOrderingChoices,
   type Maybe,
@@ -179,7 +179,7 @@ export function translateOption(
 ): OptionT {
   return {
     value: val.pk ?? 0,
-    label: getTranslationSafe(val, "name", lang),
+    label: getTranslation(val, "name", lang),
   };
 }
 

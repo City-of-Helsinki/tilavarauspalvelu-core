@@ -38,7 +38,7 @@ import {
 } from "ui/src/modules/date-utils";
 import { filterNonNullable, formatApiTimeInterval, getLocalizationLang, sort, toNumber } from "ui/src/modules/helpers";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import {
   fontBold,
   fontMedium,
@@ -199,8 +199,8 @@ function formatAesName(aes: ApplicationSectionT, lang: LocalizationLanguages): s
     return "-";
   }
   const { unit } = firstResUnit;
-  const resUnitName = getTranslationSafe(firstResUnit, "name", lang);
-  const unitName = unit != null ? getTranslationSafe(unit, "name", lang) : "";
+  const resUnitName = getTranslation(firstResUnit, "name", lang);
+  const unitName = unit != null ? getTranslation(unit, "name", lang) : "";
   return `${resUnitName}, ${unitName}`;
 }
 
@@ -435,11 +435,11 @@ function ReservationSeriesTable({
     },
   ];
 
-  const getTranslation = (elem: ModalT | null, field: "name" | "reservationConfirmedInstructions") => {
+  const translate = (elem: ModalT | null, field: "name" | "reservationConfirmedInstructions") => {
     if (elem == null) {
       return "";
     }
-    return getTranslationSafe(elem, field, lang);
+    return getTranslation(elem, field, lang);
   };
 
   return (
@@ -459,11 +459,11 @@ function ReservationSeriesTable({
       >
         <Dialog.Header
           id="reservation-unit-modal-help-header"
-          title={getTranslation(modal, "name")}
+          title={translate(modal, "name")}
           iconStart={<IconInfoCircle />}
         />
         <Dialog.Content id="dialog-content">
-          <Sanitize html={getTranslation(modal, "reservationConfirmedInstructions")} />
+          <Sanitize html={translate(modal, "reservationConfirmedInstructions")} />
           {modal?.accessTypes.some((aT: { accessType: AccessType }) => aT.accessType !== AccessType.Unrestricted) && (
             <ReservationUnitAccessTypeList
               accessTypes={modal.accessTypes}
@@ -628,8 +628,8 @@ function createReservationUnitLink({
   >;
 }): JSX.Element {
   const { pk } = reservationUnit;
-  const name = getTranslationSafe(reservationUnit, "name", lang);
-  const unit = reservationUnit.unit ? `, ${getTranslationSafe(reservationUnit.unit, "name", lang)}` : "";
+  const name = getTranslation(reservationUnit, "name", lang);
+  const unit = reservationUnit.unit ? `, ${getTranslation(reservationUnit.unit, "name", lang)}` : "";
   if (pk == null || pk <= 0) {
     return (
       <span>

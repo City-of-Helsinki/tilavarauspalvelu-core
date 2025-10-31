@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { getLocalizationLang } from "ui/src/modules/helpers";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { AddressFieldsFragment } from "@gql/gql-types";
 import { AddressSection, createAccessibilityUrl, createGoogleUrl, createHslUrl, createMapUrl } from "./AddressSection";
 
@@ -33,8 +33,8 @@ describe("Component: AddressSection | Test create url functions", () => {
   });
   it("should return expected value/format with createGoogleUrl function", () => {
     const mock = createAddressSectionMock();
-    const addressStreet = getTranslationSafe(mock ?? {}, "addressStreet", fi);
-    const addressCity = getTranslationSafe(mock ?? {}, "addressCity", fi);
+    const addressStreet = getTranslation(mock ?? {}, "addressStreet", fi);
+    const addressCity = getTranslation(mock ?? {}, "addressCity", fi);
     const destination = encodeURI(`${addressStreet},${addressCity}`);
     expect(createGoogleUrl(fi, mock)).toEqual(
       `https://www.google.com/maps/dir/?api=1&hl=${fi}&destination=${destination}`
@@ -42,8 +42,8 @@ describe("Component: AddressSection | Test create url functions", () => {
   });
   it("should return expected value/format with createHslUrl function", () => {
     const mock = createAddressSectionMock();
-    const addressStreet = getTranslationSafe(mock ?? {}, "addressStreet", fi);
-    const addressCity = getTranslationSafe(mock ?? {}, "addressCity", fi);
+    const addressStreet = getTranslation(mock ?? {}, "addressStreet", fi);
+    const addressCity = getTranslation(mock ?? {}, "addressCity", fi);
     const destination = encodeURI(`${addressStreet},${addressCity}`);
     expect(createHslUrl(fi, createAddressSectionMock())).toEqual(
       `https://reittiopas.hsl.fi/reitti/-/${destination}/?locale=${fi}`

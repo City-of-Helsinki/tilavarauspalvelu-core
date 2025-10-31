@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { ignoreMaybeArray } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { H1 } from "ui/src/styled";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -55,8 +55,8 @@ function GenericTerms({ genericTerms }: PropsNarrowed): JSX.Element {
   const { i18n } = useTranslation();
 
   const lang = convertLanguageCode(i18n.language);
-  const title = getTranslationSafe(genericTerms, "name", lang);
-  const text = getTranslationSafe(genericTerms, "text", lang);
+  const title = getTranslation(genericTerms, "name", lang);
+  const text = getTranslation(genericTerms, "text", lang);
 
   return (
     <>

@@ -45,8 +45,6 @@ export function getTranslation<K extends PossibleKeys, T extends string | null>(
   throw new Error(`Object is missing translation for ${key}`);
 }
 
-export { getTranslation as getTranslationSafe };
-
 export function convertLanguageCode(lang: string): "fi" | "sv" | "en" {
   if (lang === "sv" || lang === "en" || lang === "fi") {
     return lang;

@@ -7,7 +7,7 @@ import { breakpoints } from "ui/src/modules/const";
 import { formatDateRange, formatDateTime, formatDuration, formatDate } from "ui/src/modules/date-utils";
 import { filterNonNullable, getLocalizationLang } from "ui/src/modules/helpers";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { Flex, H1, H3 } from "ui/src/styled";
 import { IconWithText } from "@/components/IconWithText";
 import {
@@ -87,8 +87,8 @@ export function Head({
 }: Readonly<HeadProps>): JSX.Element {
   const { i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-  const reservationUnitName = getTranslationSafe(reservationUnit, "name", lang);
-  const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
+  const reservationUnitName = getTranslation(reservationUnit, "name", lang);
+  const unitName = getTranslation(reservationUnit.unit, "name", lang);
 
   return (
     <Wrapper>
@@ -185,7 +185,7 @@ function IconList({
       ? {
           key: "reservationUnitType",
           icon: <IconHome size={IconSize.Small} />,
-          text: getTranslationSafe(reservationUnit.reservationUnitType, "name", lang),
+          text: getTranslation(reservationUnit.reservationUnitType, "name", lang),
         }
       : null,
     reservationUnit.maxPersons != null
@@ -252,10 +252,8 @@ function IconList({
             return (
               <AccessTypeTooltipWrapper key={key}>
                 <IconWithText icon={icon} text={text} />
-                {activePricing && getTranslationSafe(activePricing, "materialPriceDescription", lang) !== "" && (
-                  <Tooltip>
-                    {activePricing != null ? getTranslationSafe(activePricing, "materialPriceDescription", lang) : ""}
-                  </Tooltip>
+                {activePricing && getTranslation(activePricing, "materialPriceDescription", lang) !== "" && (
+                  <Tooltip>{getTranslation(activePricing, "materialPriceDescription", lang)}</Tooltip>
                 )}
               </AccessTypeTooltipWrapper>
             );
