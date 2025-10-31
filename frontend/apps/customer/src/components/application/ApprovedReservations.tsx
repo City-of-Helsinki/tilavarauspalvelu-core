@@ -1113,9 +1113,9 @@ export const APPLICATION_SECTION_RESERVATION_UNIT_FRAGMENT = gql`
       nameSv
       nameEn
     }
-    reservationCancelledInstructionsFi
-    reservationCancelledInstructionsSv
-    reservationCancelledInstructionsEn
+    reservationConfirmedInstructionsFi
+    reservationConfirmedInstructionsSv
+    reservationConfirmedInstructionsEn
     accessTypes {
       id
       pk

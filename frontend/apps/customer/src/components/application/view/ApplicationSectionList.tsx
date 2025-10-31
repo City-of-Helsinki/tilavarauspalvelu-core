@@ -121,7 +121,7 @@ function SingleApplicationSection({
     {
       key: "purpose",
       label: t("application:preview.applicationEvent.purpose"),
-      value: <span>{getTranslationSafe(aes.purpose ?? {}, "name", lang)}</span>,
+      value: aes.purpose != null ? <span>{getTranslationSafe(aes.purpose, "name", lang)}</span> : null,
     },
   ];
 
@@ -140,9 +140,9 @@ function SingleApplicationSection({
           <InfoItem>
             <h3 className="info-label">{t("application:preview.applicationEvent.applicationInfo")}</h3>
             <ul>
-              {infos.map(({ key, ...rest }) => (
-                <InfoListItem key={key} {...rest} />
-              ))}
+              {infos.map(({ key, label, value }) =>
+                value != null ? <InfoListItem key={key} label={label} value={value} /> : null
+              )}
             </ul>
           </InfoItem>
         </InfoItemContainer>

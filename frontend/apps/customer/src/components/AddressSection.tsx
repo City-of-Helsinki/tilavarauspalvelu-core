@@ -101,8 +101,8 @@ export function AddressSection({ title, unit }: Props): JSX.Element {
 
   const lang = getLocalizationLang(i18n.language);
 
-  const addressStreet = location ? getTranslationSafe(unit ?? {}, "addressStreet", lang) : undefined;
-  const addressCity = location ? getTranslationSafe(unit ?? {}, "addressCity", lang) : undefined;
+  const addressStreet = unit ? getTranslationSafe(unit, "addressStreet", lang) : undefined;
+  const addressCity = unit ? getTranslationSafe(unit, "addressCity", lang) : undefined;
 
   const unitMapUrl = createMapUrl(lang, unit);
   const googleUrl = createGoogleUrl(lang, unit);

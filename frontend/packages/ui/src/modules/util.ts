@@ -1,4 +1,5 @@
 import { capitalize } from "./helpers";
+import { LocalizationLanguages } from "./urlBuilder";
 
 export const chunkArray = <T>(array: T[], size: number): T[][] => {
   const result = [];
@@ -12,26 +13,36 @@ export const chunkArray = <T>(array: T[], size: number): T[][] => {
   return result;
 };
 
+type PossibleKeys = string;
+type Lang = Capitalize<LocalizationLanguages>;
+export type RecordWithTranslation<K extends PossibleKeys, T extends string | null> = {
+  // enforce {K}Fi | {K}En | {K}Sv to exist in the record
+  [Property in `${K}${Lang}`]: T;
+} & {
+  // allow any other keys we don't care about
+  [key: string]: unknown;
+};
+
 /// Find a translation from a gql query result
 /// @param lang - language to use, use useTranslation hook in get the current language inside a component
-// TODO rename to getTranslation when the other one is removed
-// TODO Records are bad, use a query result type instead?
-// TODO key should not be a string (so we don't accidentially pass "nameFi" here)
-// gather all used keys and make a string literal for them (typically it's just name)
-export function getTranslationSafe(parent: Record<string, unknown>, key: string, lang: "fi" | "sv" | "en"): string {
-  const keyString = `${key}${capitalize(lang)}`;
-  if (parent && parent[keyString]) {
-    if (typeof parent[keyString] === "string") {
-      return String(parent[keyString]);
-    }
+/// grpaphql schema allows for nulls for translated fields -> treat them as empty strings
+export function getTranslation<K extends PossibleKeys, T extends string | null>(
+  dict: RecordWithTranslation<K, T>,
+  key: K,
+  lang: LocalizationLanguages
+): string {
+  const localKey: `${K}${Lang}` = `${key}${capitalize(lang)}`;
+  const val = dict[localKey];
+  // type guard for return type (type enforcement checks that the Keys map to strings)
+  if (typeof val === "string") {
+    return val;
   }
-  const fallback = "fi";
-  const fallbackKeyString = `${key}${capitalize(fallback)}`;
-  if (parent && parent[fallbackKeyString]) {
-    if (typeof parent[fallbackKeyString] === "string") {
-      return String(parent[fallbackKeyString]);
-    }
+  // oxlint-disable-next-line eqeqeq -- don't allow undefined here
+  if (val === null) {
+    return "";
   }
-
-  return "";
+  // never
+  throw new Error(`Object is missing translation for ${key}`);
 }
+
+export { getTranslation as getTranslationSafe };

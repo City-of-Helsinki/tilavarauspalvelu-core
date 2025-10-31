@@ -1,7 +1,7 @@
 import { createMockReservation } from "@test/reservation.mocks";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { type InstructionsFragment, ReservationStateChoice } from "@gql/gql-types";
 import { getReservationUnitInstructionsKey, Instructions } from "./Instructions";
 
@@ -40,9 +40,15 @@ describe("Component: Instructions", () => {
     const mockReservation = createMockReservation({ state });
     const view = customRender(mockReservation);
 
-    const instructionsKey = getReservationUnitInstructionsKey(state) ?? "";
-    const mockReservationUnit = mockReservation.reservationUnit ?? {};
-    const instructionsText = getTranslationSafe(mockReservationUnit, instructionsKey, "fi");
+    const instructionsKey = getReservationUnitInstructionsKey(state);
+    if (instructionsKey == null) {
+      throw new Error("never");
+    }
+    const mockReservationUnit = mockReservation.reservationUnit;
+    const instructionsText = getTranslation(mockReservationUnit, instructionsKey, "fi");
+    if (instructionsText === "") {
+      throw new Error("never");
+    }
     // check that the heading is present...
     expect(view.queryByText("reservations:reservationInfo")).toBeInTheDocument();
     // ...and that the text matches with the query result
