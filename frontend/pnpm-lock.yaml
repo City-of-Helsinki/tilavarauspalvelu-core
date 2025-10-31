@@ -77,6 +77,9 @@ importers:
       i18next:
         specifier: ^25.6.0
         version: 25.6.0(typescript@5.9.3)
+      import-in-the-middle:
+        specifier: ^1.15.0
+        version: 1.15.0
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -225,6 +228,9 @@ importers:
       i18next:
         specifier: ^25.6.0
         version: 25.6.0(typescript@5.9.3)
+      import-in-the-middle:
+        specifier: ^1.15.0
+        version: 1.15.0
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21

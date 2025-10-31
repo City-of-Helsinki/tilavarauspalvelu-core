@@ -26,6 +26,7 @@
     "hds-core": "^4.7.1",
     "hds-react": "^4.7.1",
     "i18next": "^25.6.0",
+    "import-in-the-middle": "^1.15.0",
     "lodash-es": "^4.17.21",
     "next": "16.0.1",
     "next-compose-plugins": "^2.2.1",
