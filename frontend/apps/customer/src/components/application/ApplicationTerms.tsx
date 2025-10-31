@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { Sanitize } from "ui/src/components/Sanitize";
 import TermsBox from "ui/src/components/TermsBox";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { getLocalizationLang } from "@ui/modules/helpers";
 import { type Maybe, type TermsOfUseTextFieldsFragment } from "@gql/gql-types";
 
@@ -27,7 +27,7 @@ export function ApplicationTerms({
         <TermsBox
           id="preview.acceptTermsOfUse"
           heading={t("reservationCalendar:heading.cancellationPaymentTerms")}
-          body={<Sanitize html={getTranslationSafe(generalTos, "text", lang)} />}
+          body={<Sanitize html={getTranslation(generalTos, "text", lang)} />}
           acceptLabel={t("application:preview.userAcceptsGeneralTerms")}
           data-testid="terms-box__container--general-terms"
           accepted={isTermsAccepted?.general}
@@ -38,7 +38,7 @@ export function ApplicationTerms({
         <TermsBox
           id="preview.acceptServiceSpecificTerms"
           heading={t("reservationCalendar:heading.termsOfUse")}
-          body={<Sanitize html={getTranslationSafe(serviceTos, "text", lang)} />}
+          body={<Sanitize html={getTranslation(serviceTos, "text", lang)} />}
           acceptLabel={t("application:preview.userAcceptsSpecificTerms")}
           accepted={isTermsAccepted?.specific}
           data-testid="terms-box__container--service-specific-terms"

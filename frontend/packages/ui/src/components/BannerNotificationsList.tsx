@@ -11,7 +11,7 @@ import {
   type ShowNotificationFieldsFragment,
 } from "../../gql/gql-types";
 import { filterNonNullable, getLocalizationLang } from "../modules/helpers";
-import { getTranslationSafe } from "../modules/util";
+import { getTranslation } from "../modules/util";
 import { ClientOnly } from "./ClientOnly";
 import NotificationWrapper from "./NotificationWrapper";
 import { Sanitize } from "./Sanitize";
@@ -64,7 +64,7 @@ function NotificationsListItem({ notification, closeFn, closedArray }: Notificat
   const { t, i18n } = useTranslation();
   const notificationType = convertNotificationType(notification.level);
   const lang = getLocalizationLang(i18n.language);
-  const innerHtml = getTranslationSafe(notification, "message", lang);
+  const innerHtml = getTranslation(notification, "message", lang);
 
   return (
     <BannerNotificationBackground>

@@ -4,7 +4,7 @@ import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { filterNonNullable, getLocalizationLang } from "ui/src/modules/helpers";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { ButtonContainer } from "ui/src/styled";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { getApplicationPath } from "@/modules/urls";
@@ -89,7 +89,7 @@ function ApplicationSectionTimePicker({
     .map((n) => n.reservationUnit)
     .map((n) => ({
       value: n?.pk ?? 0,
-      label: `${n.unit && getTranslationSafe(n.unit, "name", language) + ": "}${getTranslationSafe(n, "name", language)}`,
+      label: `${n.unit && getTranslation(n.unit, "name", language) + ": "}${getTranslation(n, "name", language)}`,
     }));
 
   const aes = watch(`applicationSections.${sectionIndex}`);

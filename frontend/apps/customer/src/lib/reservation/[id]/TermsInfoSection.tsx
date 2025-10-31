@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import { Sanitize } from "ui/src/components/Sanitize";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { getLocalizationLang } from "@ui/modules/helpers";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
@@ -32,16 +32,16 @@ export function TermsInfoSection({
 
   const lang = getLocalizationLang(i18n.language);
   const paymentTermsContent =
-    reservationUnit.paymentTerms != null ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang) : undefined;
+    reservationUnit.paymentTerms != null ? getTranslation(reservationUnit.paymentTerms, "text", lang) : undefined;
   const cancellationTermsContent =
     reservationUnit.cancellationTerms != null
-      ? getTranslationSafe(reservationUnit.cancellationTerms, "text", lang)
+      ? getTranslation(reservationUnit.cancellationTerms, "text", lang)
       : undefined;
   const pricingTermsContent =
-    reservationUnit.pricingTerms != null ? getTranslationSafe(reservationUnit.pricingTerms, "text", lang) : undefined;
+    reservationUnit.pricingTerms != null ? getTranslation(reservationUnit.pricingTerms, "text", lang) : undefined;
   const serviceSpecificTermsContent =
     reservationUnit.serviceSpecificTerms != null
-      ? getTranslationSafe(reservationUnit.serviceSpecificTerms, "text", lang)
+      ? getTranslation(reservationUnit.serviceSpecificTerms, "text", lang)
       : undefined;
 
   return (
@@ -63,9 +63,7 @@ export function TermsInfoSection({
       )}
       <Accordion heading={t("reservationUnit:termsOfUse")} theme="thin" data-testid="reservation__terms-of-use">
         {serviceSpecificTermsContent && <Sanitize html={serviceSpecificTermsContent} />}
-        {termsOfUse?.genericTerms != null && (
-          <Sanitize html={getTranslationSafe(termsOfUse.genericTerms, "text", lang)} />
-        )}
+        {termsOfUse?.genericTerms != null && <Sanitize html={getTranslation(termsOfUse.genericTerms, "text", lang)} />}
       </Accordion>
     </div>
   );

@@ -7,7 +7,7 @@ import Card from "ui/src/components/Card";
 import { ErrorText } from "ui/src/components/ErrorText";
 import { breakpoints } from "ui/src/modules/const";
 import { getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { Flex, H6, fontBold, fontMedium, fontRegular } from "ui/src/styled";
 import { getReservationUnitName } from "@/modules/reservationUnit";
 import type { OrderedReservationUnitCardFragment } from "@gql/gql-types";
@@ -203,7 +203,7 @@ export function OrderedReservationUnitCard({
   const lang = getLocalizationLang(i18n.language);
 
   const { unit } = reservationUnit;
-  const unitName = unit ? getTranslationSafe(unit, "name", lang) : "-";
+  const unitName = unit ? getTranslation(unit, "name", lang) : "-";
 
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");

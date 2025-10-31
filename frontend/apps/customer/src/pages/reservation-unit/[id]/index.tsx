@@ -25,7 +25,7 @@ import {
   ignoreMaybeArray,
   toNumber,
 } from "ui/src/modules/helpers";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { Flex, H4 } from "ui/src/styled";
 import { AddressSection } from "@/components/AddressSection";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -325,7 +325,7 @@ function ReservationUnit({
   );
 
   const pricingTermsContent = reservationUnit.pricingTerms
-    ? getTranslationSafe(reservationUnit.pricingTerms, "text", lang)
+    ? getTranslation(reservationUnit.pricingTerms, "text", lang)
     : undefined;
 
   const activePricing = getActivePricing(reservationUnit);
@@ -360,13 +360,13 @@ function ReservationUnit({
         <PageContentWrapper>
           <div data-testid="reservation-unit__description">
             <H4 as="h2">{t("reservationUnit:description")}</H4>
-            <Sanitize html={getTranslationSafe(reservationUnit, "description", lang)} />
+            <Sanitize html={getTranslation(reservationUnit, "description", lang)} />
           </div>
           {activePricing?.materialPriceDescriptionFi &&
             cleanHtmlContent(activePricing?.materialPriceDescriptionFi.trim()).length > 0 && (
               <div>
                 <H4 as="h2">{capitalize(t("prices:materialPrice"))}</H4>
-                <Sanitize html={getTranslationSafe(activePricing, "materialPriceDescription", lang)} />
+                <Sanitize html={getTranslation(activePricing, "materialPriceDescription", lang)} />
               </div>
             )}
           {equipment.length > 0 && (
@@ -404,7 +404,7 @@ function ReservationUnitWrapped(props: PropsNarrowed) {
   const { t, i18n } = useTranslation();
   const { reservationUnit } = props;
   const lang = getLocalizationLang(i18n.language);
-  const reservationUnitName = getTranslationSafe(reservationUnit, "name", lang);
+  const reservationUnitName = getTranslation(reservationUnit, "name", lang);
   const routes = [
     { slug: getSingleSearchPath(), title: t("breadcrumb:searchSingle") },
     { title: reservationUnitName ?? "-" },

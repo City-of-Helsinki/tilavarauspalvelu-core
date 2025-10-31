@@ -12,7 +12,7 @@ import { useDisplayError } from "@ui/hooks";
 import { isNotFoundError } from "@ui/modules/apolloUtils";
 import { transformMunicipality } from "@ui/modules/conversion";
 import { getLocalizationLang } from "@ui/modules/helpers";
-import { getTranslationSafe } from "@ui/modules/util";
+import { getTranslation } from "@ui/modules/util";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/reservation-form";
 import { getExtendedGeneralFormFields } from "@ui/reservation-form/util";
 import { getReservationFormSchema, ReservationFormValues, type ReservationFormValueT } from "@ui/schemas";
@@ -165,7 +165,7 @@ export function ReservationStep0({ reservation, cancelReservation, options }: Pr
 
   const lang = getLocalizationLang(i18n.language);
   const pricingTerms = reservation.reservationUnit.pricingTerms
-    ? getTranslationSafe(reservation.reservationUnit.pricingTerms, "text", lang)
+    ? getTranslation(reservation.reservationUnit.pricingTerms, "text", lang)
     : "";
 
   return (

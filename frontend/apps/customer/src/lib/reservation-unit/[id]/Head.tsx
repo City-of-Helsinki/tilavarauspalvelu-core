@@ -7,9 +7,9 @@ import { breakpoints } from "ui/src/modules/const";
 import { formatDateRange, formatDateTime, formatDuration, formatDate } from "ui/src/modules/date-utils";
 import { filterNonNullable, getLocalizationLang } from "ui/src/modules/helpers";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { Flex, H1, H3 } from "ui/src/styled";
-import { Sanitize } from "@ui/components/Sanitize";
+import { cleanHtmlContent, Sanitize } from "@ui/components/Sanitize";
 import { IconWithText } from "@/components/IconWithText";
 import {
   getActivePricing,
@@ -88,8 +88,8 @@ export function Head({
 }: Readonly<HeadProps>): JSX.Element {
   const { i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
-  const reservationUnitName = getTranslationSafe(reservationUnit, "name", lang);
-  const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
+  const reservationUnitName = getTranslation(reservationUnit, "name", lang);
+  const unitName = getTranslation(reservationUnit.unit, "name", lang);
 
   return (
     <Wrapper>
@@ -186,7 +186,7 @@ function IconList({
       ? {
           key: "reservationUnitType",
           icon: <IconHome size={IconSize.Small} />,
-          text: getTranslationSafe(reservationUnit.reservationUnitType, "name", lang),
+          text: getTranslation(reservationUnit.reservationUnitType, "name", lang),
         }
       : null,
     reservationUnit.maxPersons != null
@@ -253,11 +253,13 @@ function IconList({
             return (
               <AccessTypeTooltipWrapper key={key}>
                 <IconWithText icon={icon} text={text} />
-                {activePricing && getTranslationSafe(activePricing, "materialPriceDescription", lang) !== "" && (
-                  <Tooltip>
-                    <Sanitize html={getTranslationSafe(activePricing, "materialPriceDescription", lang)} />
-                  </Tooltip>
-                )}
+                {activePricing &&
+                  cleanHtmlContent(getTranslation(activePricing, "materialPriceDescription", lang)).trim().length >
+                    0 && (
+                    <Tooltip>
+                      <Sanitize html={getTranslation(activePricing, "materialPriceDescription", lang)} />
+                    </Tooltip>
+                  )}
               </AccessTypeTooltipWrapper>
             );
           default:

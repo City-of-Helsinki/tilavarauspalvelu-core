@@ -8,7 +8,7 @@ import { Card, Tag } from "ui/src/components/";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { formatDate, formatTime } from "ui/src/modules/date-utils";
 import { getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { isBrowser } from "@/modules/const";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
@@ -70,17 +70,17 @@ interface PropsT {
 export function SingleSearchCard({ reservationUnit }: PropsT): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
-  const name = getTranslationSafe(reservationUnit, "name", lang);
+  const name = getTranslation(reservationUnit, "name", lang);
 
   const link = useConstructLink(reservationUnit);
-  const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
+  const unitName = getTranslation(reservationUnit.unit, "name", lang);
 
   const pricing = getActivePricing(reservationUnit);
   const unitPrice = pricing != null ? getPriceString({ t, pricing }) : undefined;
 
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
-      ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
+      ? getTranslation(reservationUnit.reservationUnitType, "name", lang)
       : undefined;
 
   const img = getMainImage(reservationUnit);

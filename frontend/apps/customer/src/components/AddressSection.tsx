@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconButton } from "ui/src/components";
 import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { Flex, H4, fontMedium } from "ui/src/styled";
 import { getLocalizationLang } from "@ui/modules/helpers";
 import { mapUrlPrefix } from "@/modules/const";
@@ -39,8 +39,8 @@ export function createHslUrl(
     return "";
   }
 
-  const addressStreet = getTranslationSafe(location, "addressStreet", locale);
-  const addressCity = getTranslationSafe(location, "addressCity", locale);
+  const addressStreet = getTranslation(location, "addressStreet", locale);
+  const addressCity = getTranslation(location, "addressCity", locale);
   if (addressStreet === "" || addressCity === "") {
     return "";
   }
@@ -58,8 +58,8 @@ export function createGoogleUrl(
     return "";
   }
 
-  const addressStreet = getTranslationSafe(location, "addressStreet", locale);
-  const addressCity = getTranslationSafe(location, "addressCity", locale);
+  const addressStreet = getTranslation(location, "addressStreet", locale);
+  const addressCity = getTranslation(location, "addressCity", locale);
   if (addressStreet === "" || addressCity === "") {
     return "";
   }
@@ -96,13 +96,13 @@ type Props = {
   unit: Maybe<AddressFieldsFragment> | undefined;
 };
 
-export function AddressSection({ title, unit }: Props): JSX.Element {
+export function AddressSection({ title, unit }: Props): React.ReactElement | null {
   const { t, i18n } = useTranslation();
 
   const lang = getLocalizationLang(i18n.language);
 
-  const addressStreet = unit ? getTranslationSafe(unit, "addressStreet", lang) : undefined;
-  const addressCity = unit ? getTranslationSafe(unit, "addressCity", lang) : undefined;
+  const addressStreet = unit ? getTranslation(unit, "addressStreet", lang) : undefined;
+  const addressCity = unit ? getTranslation(unit, "addressCity", lang) : undefined;
 
   const unitMapUrl = createMapUrl(lang, unit);
   const googleUrl = createGoogleUrl(lang, unit);
