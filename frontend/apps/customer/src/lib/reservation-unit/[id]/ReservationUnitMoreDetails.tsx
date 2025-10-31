@@ -107,7 +107,7 @@ export function ReservationUnitMoreDetails({
         data-testid="reservation-unit__terms-of-use"
       >
         {serviceSpecificTermsContent && <Sanitize html={serviceSpecificTermsContent} />}
-        <Sanitize html={getTranslationSafe(termsOfUse ?? {}, "text", lang)} />
+        {termsOfUse && <Sanitize html={getTranslationSafe(termsOfUse, "text", lang)} />}
       </Accordion>
     </>
   );

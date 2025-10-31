@@ -28,8 +28,8 @@ export function sort<T>(arr: Readonly<T[]>, func: SortFunc<T>): T[] {
   return [...arr].sort((a, b) => func(a, b));
 }
 
-export function capitalize(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1);
+export function capitalize<T extends string>(s: T): Capitalize<T> {
+  return (s.charAt(0).toUpperCase() + s.slice(1)) as Capitalize<T>;
 }
 
 /// Safe string -> number conversion
