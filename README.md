@@ -50,6 +50,12 @@ For more detailed information, please refer to the [Tilavarauspalvelu page in Co
   - [Translations](#translations)
   - [Debugging](#debugging)
 - [Frontend](#frontend)
+  - [Codegen](#codegen)
+  - [Linting](#linting-1)
+  - [Testing](#testing-1)
+  - [Configuration](#configuration)
+  - [Scripts](#scripts)
+  - [Common Issues](#common-issues)
 
 ---
 
@@ -65,6 +71,9 @@ see the [backend](#backend) section.
   - Ubuntu: https://docs.docker.com/engine/install/ubuntu/
   - Mac: https://docs.docker.com/desktop/setup/install/mac-install/
   - Windows: https://docs.docker.com/desktop/setup/install/windows-install/
+- GNU parallel (for codegen without watch mode)
+  - Ubuntu: `sudo apt-get install parallel`
+  - Mac: `brew install parallel`
 - Node version manager
   - Ubuntu: https://github.com/nvm-sh/nvm
   - Mac: `brew install nvm`
@@ -80,13 +89,13 @@ see the [backend](#backend) section.
 
 1. Copy `backend/.env.example` to `backend/.env`.
 
-```shell
+```sh
 cp backend/.env.example backend/.env
 ```
 
 2. Build and run backend with Docker.
 
-```shell
+```sh
 make run
 ```
 
@@ -97,13 +106,13 @@ To generate test data, follow the steps below.
 
 1. Connect to running container.
 
-```shell
+```sh
 make bash
 ```
 
 2. Generate test data.
 
-```shell
+```sh
 make generate
 ```
 
@@ -111,30 +120,58 @@ make generate
 
 1. Install correct Node version.
 
-```shell
-nvm use 20
+```sh
+nvm use
 ```
 
-2. Install pnpm.
+2. Install pnpm if not installed through OS package manager.
 
-```shell
+```sh
 npm install -g pnpm
 ```
 
 3. Install dependencies.
 
-```shell
+```sh
+cd frontend
 pnpm i
 ```
 
-4. Start the frontend.
+4. Add pre-commit hooks
 
-```shell
+```sh
+# IMPORTANT run in the repo root
+pnpm husky frontend/.husky
+```
+
+5. Copy `.env.example` to `.env.local`.
+
+```sh
+cp frontend/apps/customer/.env.example frontend/apps/customer/.env.local
+cp frontend/apps/staff/.env.example frontend/apps/staff/.env.local
+```
+
+6. Run codegen
+
+For non Windows users using GNU parallel
+```sh
+cd frontend
+pnpm codegen
+```
+
+For Windows
+```sh
+make codegen
+```
+
+7. Start the frontend.
+
+```sh
+cd frontend
 pnpm dev
 ```
 
-You should now be able to open the customer UI at `localhost:3000`
-and the admin UI at `localhost:3001/kasittely`.
+You should now be able to open the customer UI at `localhost:3000` and the staff UI at `localhost:3001/kasittely`.
 
 ## Backend
 
@@ -404,4 +441,228 @@ See documentation for [django-environment-config] for more details.
 
 ## Frontend
 
-TODO: Check [old readme](README-ui.md)
+### Tech Stack
+
+- [React]: https://react.dev/
+- [NextJs]: https://nextjs.org/
+- [Apollo GraphQL client]: https://www.apollographql.com/
+- [Codegen GraphQL]: https://the-guild.dev/graphql/codegen
+
+### Codegen
+
+Codegen is used to generate Typescript types from GraphQL queries.
+
+[Codegen]: https://the-guild.dev/graphql/codegen
+
+Needs to be run if either the backend schema or any frontend GQL query changes.
+
+Uses the schema file `tilavaraus.graphql` in the repo root and crawls the frontend code for `gql` tagged strings. Then generates Typescript types for them.
+
+Update GraphQL schema and types. Uses GNU Parallel to update all apps.
+```sh
+cd frontend
+pnpm codegen
+```
+
+Run in watch mode (waiting for file changes) for all apps.
+```sh
+cd frontend
+pnpm codegen:watch
+```
+
+Watch mode has some issues with changes in packages/ui not propagated to the other packages.
+Also when switching branches it might hit an unrecoverable error.
+In those cases running `pnpm codegen` first fixes the issue.
+
+Can be run for individual apps with
+
+```sh
+cd frontend
+# customer ui
+pnpm codegen:customer
+# saff ui
+pnpm codegen:staff
+# common ui package
+pnpm codegen:ui
+```
+
+### Linting
+
+Linting is done with four different tools:
+
+- tsc : typechecking using typescript compiler
+- oxlint : general linter
+- prettier : formatter
+- stylelint : css linting
+
+All lints are ran on CI and if you enable pre-commit hooks they are ran locally to modified files.
+
+Typecheck all packages.
+```sh
+cd frontend
+pnpm tsc:check
+# if you need to remove caches
+pnpm tsc:clean
+```
+
+Run oxlint.
+``` sh
+cd frontend
+pnpm lint
+# automatic fixing
+pnpm lint:fix
+```
+
+Run prettier on all files.
+```sh
+cd frontend
+pnpm format
+```
+
+Run stylelint.
+```sh
+cd frontend
+pnpm lint:css
+```
+
+### Testing
+
+Tests are ran using `vitest`.
+
+Locally tests run in watch mode (waiting for file changes) by default, so they need to be run per application.
+
+```sh
+cd frontend
+# customer
+cd apps/customer
+pnpm test
+# admin
+cd apps/staff
+pnpm test
+# common
+cd packages/ui
+pnpm test
+```
+
+Run all tests to all packages locally.
+```sh
+cd frontend
+CI=true pnpm test
+```
+
+### Updating dependencies
+
+Frontend dependencies are managed using `pnpm` monorepo. [dependabot] will normally open pull requests for them.
+
+[pnpm]: https://pnpm.io/
+[dependabot]: https://github.com/dependabot
+
+For manual update of packages. You can check outdated packages with
+```sh
+cd frontend
+pnpm outdated -r
+```
+
+To update a specific package.
+```sh
+cd frontend
+# minor version
+pnpm up -r {package_name}
+# major version
+pnpm up -r {package_name}@latest
+```
+
+### Translations
+
+Translations are done using `i18next` package that uses one `.json` file per translation namespace.
+These are stored in `public/locales/` for both apps. Common translations need to be duplicated
+between the apps (i.e. components that are in `packages/ui/` require duplicated translations for both app).
+
+Translations are loaded using `next-i18next` that automatically picks the correct `.json` files to load per page.
+
+### Scripts
+
+All available top level scripts are listed in the root `package.json`. Most of them use turborepo to run
+the same command in all packages. They can be run with `pnpm {command}`.
+
+Top level commands are ran parallel to all packages (that contain that command) and output
+to standard output. Normally this is what you want, but if you have 100 lint errors in both apps
+all the errors are going to be mixed together.
+
+In these cases you can target commands to specific packages using the `--filter` flag. `{package_name}` is the subpath e.g. `staff` for `apps/staff`.
+```sh
+cd frontend
+# only that package
+pnpm {command} --filter {package_name}
+# only that package and it's dependencies
+pnpm {command} --filter {package_name}...
+```
+
+Turborepo uses aggressive caching for all commands. This can cause issues in situations where
+some files are read from cache. Typical cases are either during a rebase or stash popping.
+
+Force a run without reading from local cache.
+```sh
+cd frontend
+pnpm {cmd} --force
+```
+
+#### Other commands
+
+Pluck graphql queries from frontend code as `graphql` files per app and store them in `/gql-pluck-output/`.
+```sh
+cd frontend
+pnpm gql-pluck
+```
+
+Interactive tool to remove package caches `node_modules`. Useful if other commands are not working (broken dependencies).
+```sh
+cd frontend
+pnpm clean
+```
+
+Build and start the app in production mode. Useful for testing the production build locally.
+```sh
+cd frontend
+pnpm build
+pnpm start
+```
+
+Production builds `pnpm build` breaks local caches. If restarting development server doesn't work then
+```sh
+cd frontend
+rm -rf apps/customer/.next apps/customer/.turbo apps/staff/.next apps/staff/.turbo
+```
+
+#### Adding a new command
+
+If the command should be run inside a package.
+
+- Add the command to all needed `package.json` of the individual packages.
+- Add the master command to `turbo.json`
+- Add `turbo $cmd` to `/package.json`
+- Run the command `pnpm $cmd`
+
+If only needed on the root package.
+
+- Add the `$cmd` directly to `/package.json`
+- Run the command `pnpm $cmd`
+
+### Common Issues
+
+#### Don't find query in the network tab
+
+If the query is done on the server side (i.e. in `getServerSideProps`) you won't find it in the network tab.
+
+#### Getting 404 on valid page load
+
+Probably an SSR error. These are not visible in the browser.
+Check the console logs in the terminal where `pnpm dev` is running.
+
+#### Max complexity error on graphql query
+
+Adding a new relation or a fragment to a graphql query often requires modifiying the backend allowed complexity for that
+endpoint. Find the `max_complexity` for that specific endpoint in the backend code and increase it by one till it doesn't error anymore.
+Remember to run backend in watch mode or `make run` after each change.
+
+Max complexity is a security measure, but the default `10` is low compared to the complexity of a lot of the frontend queries.
