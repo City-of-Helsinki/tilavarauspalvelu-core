@@ -9,7 +9,7 @@ import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource, getMainImage } from "ui/src/modules/helpers";
 import Card from "ui/src/components/Card";
 import { ErrorText } from "ui/src/components/ErrorText";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { gql } from "@apollo/client";
 
 const NameCardContainer = styled(Flex).attrs({ $gap: "none" })`
@@ -203,7 +203,7 @@ export function OrderedReservationUnitCard({
   const lang = convertLanguageCode(i18n.language);
 
   const { unit } = reservationUnit;
-  const unitName = unit ? getTranslationSafe(unit, "name", lang) : "-";
+  const unitName = unit ? getTranslation(unit, "name", lang) : "-";
 
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");

@@ -13,7 +13,7 @@ import { WEEKDAYS } from "ui/src/modules/const";
 import { filterNonNullable, formatDayTimes } from "ui/src/modules/helpers";
 import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
 import { NoWrap } from "ui/src/styled";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { formatDurationRange, formatDate, setMondayFirst } from "ui/src/modules/date-utils";
 import {
   ApplicationInfoContainer,
@@ -79,7 +79,7 @@ function SingleApplicationSection({
     }))
     .map((ru) => ({
       pk: ru.pk,
-      name: getTranslationSafe(ru, "name", lang).trim(),
+      name: getTranslation(ru, "name", lang).trim(),
     }));
   const shouldShowStatusLabel =
     aes.status === ApplicationSectionStatusChoice.Rejected || aes.status === ApplicationSectionStatusChoice.Handled;
@@ -121,7 +121,7 @@ function SingleApplicationSection({
     {
       key: "purpose",
       label: t("application:preview.applicationEvent.purpose"),
-      value: aes.purpose != null ? <span>{getTranslationSafe(aes.purpose, "name", lang)}</span> : null,
+      value: aes.purpose != null ? <span>{getTranslation(aes.purpose, "name", lang)}</span> : null,
     },
   ];
 

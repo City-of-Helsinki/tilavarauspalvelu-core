@@ -3,7 +3,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { type SingleSearchCardFragment } from "@gql/gql-types";
 import { isToday, isTomorrow, isValid } from "date-fns";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { formatDate, formatTime } from "ui/src/modules/date-utils";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { isBrowser } from "@/modules/const";
@@ -70,17 +70,17 @@ interface PropsT {
 export function SingleSearchCard({ reservationUnit }: PropsT): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-  const name = getTranslationSafe(reservationUnit, "name", lang);
+  const name = getTranslation(reservationUnit, "name", lang);
 
   const link = useConstructLink(reservationUnit);
-  const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
+  const unitName = getTranslation(reservationUnit.unit, "name", lang);
 
   const pricing = getActivePricing(reservationUnit);
   const unitPrice = pricing != null ? getPriceString({ t, pricing }) : undefined;
 
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
-      ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
+      ? getTranslation(reservationUnit.reservationUnitType, "name", lang)
       : undefined;
 
   const img = getMainImage(reservationUnit);

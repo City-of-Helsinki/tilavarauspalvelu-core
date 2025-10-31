@@ -8,7 +8,7 @@ import { Flex, H3, anchorStyles, focusStyles } from "ui/src/styled";
 import type { UnitListFieldsFragment } from "@gql/gql-types";
 import { IconButton } from "ui/src/components";
 import { singleSearchPrefix } from "@/modules/urls";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { gql } from "@apollo/client";
 
 const ITEM_LIMIT = 8;
@@ -72,7 +72,7 @@ export function Units({ units }: Props): JSX.Element | null {
               href={`${singleSearchPrefix}?units=${unit.pk}#content`}
               data-testid="front-page__units--unit"
             >
-              {getTranslationSafe(unit, "name", lang) || "-"}
+              {getTranslation(unit, "name", lang) || "-"}
               <IconArrowRight size={IconSize.Large} />
             </UnitItemLink>
           ))}

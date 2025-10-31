@@ -11,7 +11,7 @@ import { pixel } from "@/styled/util";
 import { Flex, H3, anchorStyles, focusStyles } from "ui/src/styled";
 import { breakpoints } from "ui/src/modules/const";
 import { ShowAllContainer } from "ui/src/components";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { getLocalizationLang } from "ui/src/modules/helpers";
 import { gql } from "@apollo/client";
 
@@ -77,7 +77,7 @@ export function Purposes({ purposes }: Props): JSX.Element {
   };
   const lang = getLocalizationLang(i18n.language);
   const getName = (item: Pick<PurposeCardFragment, "nameFi" | "nameEn" | "nameSv">) => {
-    return getTranslationSafe(item, "name", lang);
+    return getTranslation(item, "name", lang);
   };
 
   const getSearchLink = (purpose: PurposeCardFragment): string => {

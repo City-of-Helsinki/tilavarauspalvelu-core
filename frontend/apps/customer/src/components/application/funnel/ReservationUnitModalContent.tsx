@@ -22,7 +22,7 @@ import { filterNonNullable, getImageSource, getMainImage } from "ui/src/modules/
 import { CenterSpinner, Flex, H3 } from "ui/src/styled";
 import { breakpoints } from "ui/src/modules/const";
 import Card from "ui/src/components/Card";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
@@ -66,7 +66,7 @@ function ReservationUnitCard({ reservationUnit, handleAdd, handleRemove, isSelec
     : t("reservationUnitModal:selectReservationUnit");
   const name = getReservationUnitName(reservationUnit);
   const reservationUnitTypeName = reservationUnit.reservationUnitType
-    ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
+    ? getTranslation(reservationUnit.reservationUnitType, "name", lang)
     : undefined;
   const unitName = reservationUnit.unit ? getUnitName(reservationUnit.unit, lang) : undefined;
 

@@ -11,7 +11,7 @@ import { ReservationStatus, ReservationOrderStatus } from "@/components/reservat
 import { ButtonLikeExternalLink, ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { capitalize, getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
 import Card from "ui/src/components/Card";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { gql } from "@apollo/client";
 
 type CardType = "upcoming" | "past" | "cancelled";
@@ -40,8 +40,8 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
     return null;
   }
 
-  const name = getTranslationSafe(reservationUnit, "name", lang);
-  const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
+  const name = getTranslation(reservationUnit, "name", lang);
+  const unitName = getTranslation(reservationUnit.unit, "name", lang);
   const title = trim(`${name}, ${unitName}`, ", ");
 
   const normalizedOrderStatus = getNormalizedReservationOrderStatus(reservation);

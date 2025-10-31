@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -94,7 +94,7 @@ function View({ application, tos }: Readonly<Pick<PropsNarrowed, "application" |
 
   const { applicationRound } = application;
   const lang = getLocalizationLang(i18n.language);
-  const applicationRoundName = getTranslationSafe(applicationRound, "name", lang);
+  const applicationRoundName = getTranslation(applicationRound, "name", lang);
   const { sentAt } = applicationRound;
   const handledAt = sentAt ? new Date(sentAt) : new Date();
   const showReservations =

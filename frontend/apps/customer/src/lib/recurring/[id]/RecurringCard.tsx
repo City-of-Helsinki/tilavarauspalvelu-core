@@ -18,7 +18,7 @@ import { getImageSource, getMainImage } from "ui/src/modules/helpers";
 import Card, { type CardInfoItem } from "ui/src/components/Card";
 import { getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { gql } from "@apollo/client";
 
 interface CardProps {
@@ -40,11 +40,11 @@ export function RecurringCard({
 
   const name = getReservationUnitName(reservationUnit);
 
-  const unitName = reservationUnit.unit ? getTranslationSafe(reservationUnit.unit, "name", lang) : "-";
+  const unitName = reservationUnit.unit ? getTranslation(reservationUnit.unit, "name", lang) : "-";
 
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
-      ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
+      ? getTranslation(reservationUnit.reservationUnitType, "name", lang)
       : undefined;
 
   const img = getMainImage(reservationUnit);

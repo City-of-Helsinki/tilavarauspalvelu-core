@@ -12,7 +12,7 @@ import { Flex, H1 } from "@ui/styled";
 import { breakpoints } from "@ui/modules/const";
 import { Sanitize } from "@ui/components/Sanitize";
 import { createNodeId, capitalize, ignoreMaybeArray, toNumber } from "@ui/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
+import { convertLanguageCode, getTranslation } from "@ui/modules/util";
 import { gql } from "@apollo/client";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -52,7 +52,7 @@ const ContentWrapper = styled.div`
 function Criteria({ applicationRound }: Readonly<PropsNarrowed>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-  const name = getTranslationSafe(applicationRound, "name", lang);
+  const name = getTranslation(applicationRound, "name", lang);
 
   const routes = [
     {
@@ -70,7 +70,7 @@ function Criteria({ applicationRound }: Readonly<PropsNarrowed>): JSX.Element | 
 
   const title = capitalize(t("applicationRound:criteria"));
   const subtitle = `${name} ${t("applicationRound:criteria")}`;
-  const criteria = getTranslationSafe(applicationRound, "criteria", lang);
+  const criteria = getTranslation(applicationRound, "criteria", lang);
 
   return (
     <>

@@ -12,7 +12,7 @@ import { H1 } from "ui/src/styled";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { Sanitize } from "ui/src/components/Sanitize";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { ignoreMaybeArray } from "ui/src/modules/helpers";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -55,8 +55,8 @@ function GenericTerms({ genericTerms }: PropsNarrowed): JSX.Element {
   const { i18n } = useTranslation();
 
   const lang = convertLanguageCode(i18n.language);
-  const title = getTranslationSafe(genericTerms, "name", lang);
-  const text = getTranslationSafe(genericTerms, "text", lang);
+  const title = getTranslation(genericTerms, "name", lang);
+  const text = getTranslation(genericTerms, "text", lang);
 
   return (
     <>

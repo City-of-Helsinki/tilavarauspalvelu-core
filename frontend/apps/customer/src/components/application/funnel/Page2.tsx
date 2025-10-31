@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { useFormContext } from "react-hook-form";
 import { type ApplicationPage2Query } from "@gql/gql-types";
 import { filterNonNullable } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { ButtonContainer } from "ui/src/styled";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { getApplicationPath } from "@/modules/urls";
@@ -89,7 +89,7 @@ function ApplicationSectionTimePicker({
     .map((n) => n.reservationUnit)
     .map((n) => ({
       value: n?.pk ?? 0,
-      label: `${n.unit && getTranslationSafe(n.unit, "name", language) + ": "}${getTranslationSafe(n, "name", language)}`,
+      label: `${n.unit && getTranslation(n.unit, "name", language) + ": "}${getTranslation(n, "name", language)}`,
     }));
 
   const aes = watch(`applicationSections.${sectionIndex}`);
