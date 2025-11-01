@@ -176,8 +176,6 @@ class ReservationNode(DjangoNode):
     reservee_last_name = graphene.String()
     reservee_email = graphene.String()
     reservee_phone = graphene.String()
-    reservee_address_street = graphene.String()
-    reservee_address_city = graphene.String()
     reservee_address_zip = graphene.String()
     reservee_organisation_name = graphene.String()
     reservee_type = graphene.Field(graphene.Enum.from_enum(ReserveeType))
@@ -228,8 +226,6 @@ class ReservationNode(DjangoNode):
             "reservee_last_name",
             "reservee_email",
             "reservee_phone",
-            "reservee_address_street",
-            "reservee_address_city",
             "reservee_address_zip",
             "reservee_organisation_name",
             "reservee_type",

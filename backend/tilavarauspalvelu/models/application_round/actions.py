@@ -227,8 +227,6 @@ class ApplicationRoundActions:
             reservation_details["description"] = application.organisation_core_business
             reservation_details["reservee_organisation_name"] = application.organisation_name
             reservation_details["reservee_identifier"] = application.organisation_identifier
-            reservation_details["reservee_address_street"] = application.organisation_street_address
-            reservation_details["reservee_address_city"] = application.organisation_city
             reservation_details["reservee_address_zip"] = application.organisation_post_code
 
         return reservation_details

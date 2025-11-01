@@ -1250,14 +1250,6 @@ msgid "Reservee organisation name"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee address street"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee address city"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee address zip code"
 msgstr ""
 
@@ -1402,14 +1394,6 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee's organisation name"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee's street address"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee's city"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py

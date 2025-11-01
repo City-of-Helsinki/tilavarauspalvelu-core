@@ -1536,8 +1536,6 @@ type ReservationNode implements Node {
   reserveeEmail: String
   reserveePhone: String
   reserveeOrganisationName: String
-  reserveeAddressStreet: String
-  reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeType: ReserveeType
   reservationUnit: ReservationUnitNode!
@@ -4306,8 +4304,6 @@ type ReservationStaffCreateMutationPayload {
   reserveeEmail: String
   reserveePhone: String
   reserveeOrganisationName: String
-  reserveeAddressStreet: String
-  reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeType: ReserveeType
   ageGroup: Int
@@ -4337,8 +4333,6 @@ input ReservationStaffCreateMutationInput {
   reserveeEmail: String
   reserveePhone: String
   reserveeOrganisationName: String
-  reserveeAddressStreet: String
-  reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeType: ReserveeType
   reservationUnit: Int!
@@ -4360,8 +4354,6 @@ type ReservationUpdateMutationPayload {
   reserveeEmail: String
   reserveePhone: String
   reserveeOrganisationName: String
-  reserveeAddressStreet: String
-  reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeType: ReserveeType
   ageGroup: Int
@@ -4383,8 +4375,6 @@ input ReservationUpdateMutationInput {
   reserveeEmail: String
   reserveePhone: String
   reserveeOrganisationName: String
-  reserveeAddressStreet: String
-  reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeType: ReserveeType
   ageGroup: Int
@@ -4529,8 +4519,6 @@ type ReservationStaffModifyMutationPayload {
   reserveeLastName: String
   reserveePhone: String
   reserveeOrganisationName: String
-  reserveeAddressStreet: String
-  reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeEmail: String
   reserveeType: ReserveeType
@@ -4564,8 +4552,6 @@ input ReservationStaffModifyMutationInput {
   reserveeLastName: String
   reserveePhone: String
   reserveeOrganisationName: String
-  reserveeAddressStreet: String
-  reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeEmail: String
   reserveeType: ReserveeType
@@ -4644,8 +4630,6 @@ input ReservationSeriesReservationCreateSerializerInput {
   reserveeEmail: String
   reserveePhone: String
   reserveeOrganisationName: String
-  reserveeAddressStreet: String
-  reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeType: ReserveeType
   user: Int!
@@ -4695,8 +4679,6 @@ input UpdateReservationSeriesReservationUpdateSerializerInput {
   reserveeEmail: String
   reserveePhone: String
   reserveeOrganisationName: String
-  reserveeAddressStreet: String
-  reserveeAddressCity: String
   reserveeAddressZip: String
   reserveeType: ReserveeType
   purpose: Int
