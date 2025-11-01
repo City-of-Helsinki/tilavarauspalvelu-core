@@ -1,8 +1,8 @@
 import React from "react";
 import { formatApiDate } from "ui/src/modules/date-utils";
-import CommonCalendar from "ui/src/components/calendar/Calendar";
+import CommonCalendar, { type SlotProps } from "ui/src/components/calendar/Calendar";
 import { get } from "lodash-es";
-import { addDays, endOfISOWeek, startOfISOWeek } from "date-fns";
+import { addDays, addHours, addMinutes, endOfISOWeek, startOfDay, startOfISOWeek } from "date-fns";
 import styled from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
 import {
@@ -11,7 +11,6 @@ import {
   useReservationUnitCalendarQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { useSlotPropGetter } from "ui/src/components/calendar/util";
 import { getReservationUrl } from "@/modules/urls";
 import { Legend, LegendsWrapper } from "@/components/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
@@ -23,6 +22,14 @@ import { useSession } from "@/hooks";
 import { gql } from "@apollo/client";
 import { combineAffectingReservations } from "@/modules/helpers";
 import { hasPermission } from "@/modules/permissionHelper";
+import { ReservableTimeSpanType } from "ui/gql/gql-types";
+import {
+  getBuffersFromEvents,
+  isCellOverlappingSpan,
+  ReservationEventType,
+  TimeSpanType,
+} from "ui/src/components/calendar/util";
+import { EVENT_BUFFER, HDS_CLOCK_ICON_SVG, NOT_RESERVABLE } from "@/modules/calendarStyling";
 
 type Props = {
   begin: string;
@@ -69,6 +76,59 @@ function constructEventTitle(res: ReservationType, resUnitPk: number, t: TFuncti
     return `${reservee} (${unit})`;
   }
   return reservee;
+}
+
+function useSlotPropGetter(
+  reservableTimeSpans: ReservableTimeSpanType[],
+  events: ReservationEventType[]
+): (date: Readonly<Date>) => SlotProps {
+  const reservableTimeSpanDates: TimeSpanType[] = reservableTimeSpans?.map((rts) => ({
+    start: new Date(rts.startDatetime),
+    end: new Date(rts.endDatetime),
+  }));
+
+  const bufferTimeSpans = getBuffersFromEvents(events);
+
+  return (cellStart: Readonly<Date>): SlotProps => {
+    const isPast = cellStart < new Date();
+    if (isPast) return { style: NOT_RESERVABLE.style };
+
+    // Calendar cells are 30min slots
+    const cellEnd = addMinutes(cellStart, 30);
+
+    // Cell is buffer, if it overlaps with any buffer time span
+    const buffer = bufferTimeSpans.find((span) => isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end));
+    if (buffer) {
+      // Show clock icon only for the first and last buffer cell
+      const beginOfDay = addHours(startOfDay(cellStart), 6);
+      const beginOfBuffer = buffer.start > beginOfDay ? buffer.start : beginOfDay;
+
+      const isFirstOrLastBufferCell =
+        cellStart.getTime() === beginOfBuffer.getTime() || //
+        cellEnd.getTime() === buffer.end.getTime();
+
+      if (isFirstOrLastBufferCell) {
+        return {
+          style: {
+            ...EVENT_BUFFER.style,
+            backgroundImage: HDS_CLOCK_ICON_SVG,
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
+            backgroundSize: "16px",
+          },
+        };
+      }
+      return { style: EVENT_BUFFER.style };
+    }
+
+    // Cell is closed, if it doesn't overlap with any reservable time span
+    const isClosed =
+      reservableTimeSpanDates.length > 0 &&
+      !reservableTimeSpanDates.some((span) => isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end));
+    if (isClosed) return { style: NOT_RESERVABLE.style };
+
+    return {};
+  };
 }
 
 export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Props): JSX.Element {

@@ -173,6 +173,7 @@ const StyledCalendar = styled(BigCalendar)<{
         border-top: 1px solid var(--color-black-20);
         border-left: none;
         flex: none;
+        background-image: none !important; /* Gutter has the same date in slotPropGetter as the first column */
 
         &:first-of-type {
           border-color: var(--color-black-20);
@@ -241,6 +242,10 @@ const StyledCalendar = styled(BigCalendar)<{
   &.view-day {
     .rbc-time-column {
       padding-top: 1px;
+
+      &.rbc-now.rbc-today {
+        background-color: transparent; /* Disable showing today column with different background color */
+      }
     }
 
     .rbc-day-slot {
@@ -357,7 +362,7 @@ const StyledCalendar = styled(BigCalendar)<{
   }
 
   .rbc-event-buffer {
-    background-color: var(--tilavaraus-event-booking-break);
+    background-color: var(--color-black-10);
   }
 
   .rbc-event {
