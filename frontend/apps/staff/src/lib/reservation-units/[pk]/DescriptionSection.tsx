@@ -19,12 +19,12 @@ const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {
 export function DescriptionSection({
   form,
   equipments,
-  purposes,
+  intendedUses,
   reservationUnitTypes,
 }: Readonly<{
   form: UseFormReturn<ReservationUnitEditFormValues>;
   equipments: ReservationUnitEditorParametersQuery["equipmentsAll"] | undefined;
-  purposes: ReservationUnitEditorParametersQuery["purposes"] | undefined;
+  intendedUses: ReservationUnitEditorParametersQuery["intendedUses"] | undefined;
   reservationUnitTypes: ReservationUnitEditorParametersQuery["reservationUnitTypes"] | undefined;
 }>) {
   const { t } = useTranslation();
@@ -36,7 +36,7 @@ export function DescriptionSection({
     label: n.nameFi ?? "no-name",
   }));
 
-  const purposeOptions = filterNonNullable(purposes?.edges.map((n) => n?.node)).map((n) => ({
+  const purposeOptions = filterNonNullable(intendedUses?.edges.map((n) => n?.node)).map((n) => ({
     value: n.pk ?? -1,
     label: n.nameFi ?? "no-name",
   }));
@@ -67,12 +67,12 @@ export function DescriptionSection({
         />
         <ControlledSelect
           control={control}
-          name="purposes"
+          name="intendedUses"
           multiselect
-          label={t("reservationUnitEditor:purposesLabel")}
-          placeholder={t("reservationUnitEditor:purposesPlaceholder")}
+          label={t("reservationUnitEditor:intendedUsesLabel")}
+          placeholder={t("reservationUnitEditor:intendedUsesPlaceholder")}
           options={purposeOptions}
-          tooltip={t("reservationUnitEditor:tooltip.purposes")}
+          tooltip={t("reservationUnitEditor:tooltip.intendedUses")}
         />
         <ControlledSelect
           control={control}

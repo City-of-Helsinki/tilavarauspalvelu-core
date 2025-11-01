@@ -369,7 +369,7 @@ class AllocationInfo:
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
-class PurposeData:
+class IntendedUseData:
     name_fi: str
     name_en: str
     name_sv: str

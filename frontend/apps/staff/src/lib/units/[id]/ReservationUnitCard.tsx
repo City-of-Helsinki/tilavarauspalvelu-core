@@ -18,7 +18,7 @@ export function ReservationUnitCard({ reservationUnit, unitPk }: Readonly<IProps
   const { t } = useTranslation();
 
   const image = getMainImage(reservationUnit);
-  const hasPurposes = (reservationUnit.purposes.length ?? 0) > 0;
+  const hasPurposes = (reservationUnit.intendedUses.length ?? 0) > 0;
   const link = getReservationUnitUrl(unitPk, reservationUnit.pk);
   const imgSrc = getImageSource(image, "medium");
 
@@ -27,7 +27,7 @@ export function ReservationUnitCard({ reservationUnit, unitPk }: Readonly<IProps
     infos.push({
       icon: <IconLayers />,
       value: t("reservationUnitCard:purpose", {
-        count: reservationUnit.purposes?.length,
+        count: reservationUnit.intendedUses?.length,
       }),
     });
   }
@@ -97,7 +97,7 @@ export const RESERVATION_UNIT_CARD_FRAGMENT = gql`
     images {
       ...Image
     }
-    purposes {
+    intendedUses {
       id
     }
     resources {

@@ -12,13 +12,13 @@ from .email_message.model import EmailMessage
 from .equipment.model import Equipment
 from .equipment_category.model import EquipmentCategory
 from .general_role.model import GeneralRole
+from .intended_use.model import IntendedUse
 from .origin_hauki_resource.model import OriginHaukiResource
 from .payment_accounting.model import PaymentAccounting
 from .payment_merchant.model import PaymentMerchant
 from .payment_order.model import PaymentOrder
 from .payment_product.model import PaymentProduct
 from .personal_info_view_log.model import PersonalInfoViewLog
-from .purpose.model import Purpose
 from .rejected_occurrence.model import RejectedOccurrence
 from .reservable_time_span.model import ReservableTimeSpan
 from .reservation.model import Reservation
@@ -59,6 +59,7 @@ __all__ = [
     "Equipment",
     "EquipmentCategory",
     "GeneralRole",
+    "IntendedUse",
     "OriginHaukiResource",
     "PaymentAccounting",
     "PaymentMerchant",
@@ -66,7 +67,6 @@ __all__ = [
     "PaymentProduct",
     "PersonalInfoViewLog",
     "ProfileUser",
-    "Purpose",
     "RejectedOccurrence",
     "ReservableTimeSpan",
     "Reservation",
