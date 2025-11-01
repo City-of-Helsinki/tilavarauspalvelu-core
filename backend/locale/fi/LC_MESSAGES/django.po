@@ -1641,6 +1641,14 @@ msgid "Begin date of this access type"
 msgstr "Päivä jolloin kulkutavan käyttö alkaa"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "At least one active access type is required."
+msgstr "Varausyksiköllä on oltava vähintään yksi aktiivinen kulkutapa."
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Payment terms are required for direct booking of paid reservation units"
+msgstr "Maksuehdot vaaditaan suoravaraamiseen maksullisille varausyksiköihin"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid ""
 "Additional search terms that will bring up this reservation unit when making "
 "text searches in the customer UI. These terms should be added to make sure "
@@ -2066,6 +2074,22 @@ msgstr "Maksujen kirjanpidon tiliöintitiedot"
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Product used for payments"
 msgstr "Tuote, jota käytetään maksuihin"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Cancellation terms are required for direct booking"
+msgstr "Peruutusehdot vaaditaan suoravaraamiseen"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Service specific terms are required for direct booking"
+msgstr "Palvelukohtaiset ehdot vaaditaan suoravaraamiseen"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Pricing terms are required for direct booking if the reservee can apply for "
+"free of charge"
+msgstr ""
+"Hinnoitteluehdot vaaditaan suoravaraamiseen jos varaaja voi hakea "
+"maksuttomuutta"
 
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"
