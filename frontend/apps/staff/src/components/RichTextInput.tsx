@@ -35,6 +35,15 @@ const Asterix = styled.span`
   transform: translateY(var(--spacing-3-xs));
 `;
 
+const HelperText = styled.div`
+  color: var(--color-black-60);
+  display: block;
+  font-size: var(--fontsize-body-m);
+  line-height: var(--lineheight-l);
+  margin-top: var(--spacing-3-xs);
+  white-space: pre-line;
+`;
+
 const ErrorText = styled.span`
   color: var(--color-error);
 `;
@@ -42,6 +51,7 @@ const ErrorText = styled.span`
 const StyledReactQuill = styled(ReactQuill)<{
   $error?: boolean;
 }>`
+  background: var(--color-white);
   border: 2px solid ${({ $error }) => ($error ? "var(--color-error)" : "var(--color-black-50)")};
   > div {
     font-size: var(--fontsize-body-l);
@@ -65,6 +75,7 @@ type Props = {
   onChange: (v: string) => void;
   errorText?: string;
   tooltipText?: string;
+  helperText?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 function RichTextInput({
@@ -75,6 +86,7 @@ function RichTextInput({
   id,
   errorText,
   tooltipText,
+  helperText,
   onChange,
   ...rest
 }: Props): JSX.Element {
@@ -102,6 +114,7 @@ function RichTextInput({
       ) : (
         ""
       )}
+      {helperText ? <HelperText>{helperText}</HelperText> : ""}
     </Container>
   );
 }

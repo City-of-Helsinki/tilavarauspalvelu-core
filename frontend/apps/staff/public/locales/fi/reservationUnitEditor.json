@@ -35,7 +35,7 @@
     "materialPriceDescriptionFi": "Materiaalimaksun tiedot fi",
     "materialPriceDescriptionSv": "Materiaalimaksun tiedot sv",
     "materialPriceDescriptionEn": "Materiaalimaksun tiedot en",
-    "materialPriceDescriptionHelperText": "Kerro hinta ja mahdolliset lisätiedot (max 100 merkkiä).",
+    "materialPriceDescriptionHelperText": "Kerro hinta ja mahdolliset lisätiedot (max 500 merkkiä).",
     "canApplyFreeOfCharge": "Asiakas voi pyytää hinnan alennusta tai maksuttomuutta",
     "pricings": "Hinnoittelu",
     "reservationForm": "Varauslomake",

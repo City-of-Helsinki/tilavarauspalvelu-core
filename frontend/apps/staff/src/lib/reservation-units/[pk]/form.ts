@@ -64,9 +64,9 @@ const PricingFormSchema = z.object({
   // frontend only value, this is used to control if we should show price section
   isPaid: z.boolean(),
   hasMaterialPrice: z.boolean(),
-  materialPriceDescriptionFi: z.string().max(100),
-  materialPriceDescriptionEn: z.string().max(100),
-  materialPriceDescriptionSv: z.string().max(100),
+  materialPriceDescriptionFi: z.string().max(500),
+  materialPriceDescriptionEn: z.string().max(500),
+  materialPriceDescriptionSv: z.string().max(500),
 });
 
 type PricingFormValues = z.infer<typeof PricingFormSchema>;
