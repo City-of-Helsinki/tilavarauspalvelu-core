@@ -3183,6 +3183,7 @@ type Mutation {
   deleteEquipmentCategory(input: EquipmentCategoryDeleteMutationInput!): EquipmentCategoryDeleteMutationPayload
   createReservationUnit(input: ReservationUnitCreateMutationInput!): ReservationUnitCreateMutationPayload
   updateReservationUnit(input: ReservationUnitUpdateMutationInput!): ReservationUnitUpdateMutationPayload
+  archiveReservationUnit(input: ReservationUnitArchiveMutationInput!): ReservationUnitArchiveMutationPayload
   createReservationUnitImage(input: ReservationUnitImageCreateMutationInput!): ReservationUnitImageCreateMutationPayload
   updateReservationUnitImage(input: ReservationUnitImageUpdateMutationInput!): ReservationUnitImageUpdateMutationPayload
   deleteReservationUnitImage(input: ReservationUnitImageDeleteMutationInput!): ReservationUnitImageDeleteMutationPayload
@@ -3885,7 +3886,6 @@ type ReservationUnitCreateMutationPayload {
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
   isDraft: Boolean
-  isArchived: Boolean
   requireAdultReservee: Boolean
   requireReservationHandling: Boolean
   reservationBlockWholeDay: Boolean
@@ -3957,7 +3957,6 @@ input ReservationUnitCreateMutationInput {
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
   isDraft: Boolean
-  isArchived: Boolean
   requireAdultReservee: Boolean
   requireReservationHandling: Boolean
   reservationBlockWholeDay: Boolean
@@ -4073,7 +4072,6 @@ type ReservationUnitUpdateMutationPayload {
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
   isDraft: Boolean
-  isArchived: Boolean
   requireAdultReservee: Boolean
   requireReservationHandling: Boolean
   reservationBlockWholeDay: Boolean
@@ -4145,7 +4143,6 @@ input ReservationUnitUpdateMutationInput {
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
   isDraft: Boolean
-  isArchived: Boolean
   requireAdultReservee: Boolean
   requireReservationHandling: Boolean
   reservationBlockWholeDay: Boolean
@@ -4208,6 +4205,14 @@ input UpdateApplicationRoundTimeSlotSerializerInput {
   weekday: Weekday!
   isClosed: Boolean
   reservableTimes: [TimeSlotSerializerInput]
+}
+
+type ReservationUnitArchiveMutationPayload {
+  pk: Int
+}
+
+input ReservationUnitArchiveMutationInput {
+  pk: Int!
 }
 
 type ReservationUnitImageCreateMutationPayload {

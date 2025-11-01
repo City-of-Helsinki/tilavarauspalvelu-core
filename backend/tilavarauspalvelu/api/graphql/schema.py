@@ -63,6 +63,7 @@ from .mutations import (
     ReservationStaffCreateMutation,
     ReservationStaffModifyMutation,
     ReservationStaffRepairAccessCodeMutation,
+    ReservationUnitArchiveMutation,
     ReservationUnitCreateMutation,
     ReservationUnitImageCreateMutation,
     ReservationUnitImageDeleteMutation,
@@ -345,6 +346,7 @@ class Mutation(graphene.ObjectType):
     # Reservation unit
     create_reservation_unit = ReservationUnitCreateMutation.Field()
     update_reservation_unit = ReservationUnitUpdateMutation.Field()
+    archive_reservation_unit = ReservationUnitArchiveMutation.Field()
     create_reservation_unit_image = ReservationUnitImageCreateMutation.Field()
     update_reservation_unit_image = ReservationUnitImageUpdateMutation.Field()
     delete_reservation_unit_image = ReservationUnitImageDeleteMutation.Field()

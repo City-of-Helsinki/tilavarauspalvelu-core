@@ -6,12 +6,17 @@ import { type UseFormReturn } from "react-hook-form";
 import { type ReservationUnitEditFormValues } from "./form";
 import { getUnitUrl } from "@/modules/urls";
 import { successToast } from "ui/src/components/toast";
-import type { ReservationUnitEditQuery, UnitSubpageHeadFragment } from "@gql/gql-types";
 import { breakpoints } from "ui/src/modules/const";
 import { ButtonLikeExternalLink, Flex, pageSideMargins, WhiteButton } from "ui/src/styled";
+import {
+  useArchiveReservationUnitMutation,
+  type ReservationUnitEditQuery,
+  type UnitSubpageHeadFragment,
+} from "@gql/gql-types";
 import { useDisplayError } from "ui/src/hooks";
 import { useModal } from "@/context/ModalContext";
 import { useRouter } from "next/router";
+import { gql } from "@apollo/client";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
@@ -172,11 +177,12 @@ export function BottomButtonsStripe({
   const { t } = useTranslation();
   const displayError = useDisplayError();
   const router = useRouter();
+  const [archiveMutation] = useArchiveReservationUnitMutation();
 
   const { setValue, watch, formState, handleSubmit } = form;
   const { isDirty: hasChanges, isSubmitting: isSaving } = formState;
 
-  const archiveEnabled = watch("pk") !== 0 && !watch("isArchived");
+  const archiveEnabled = watch("pk") !== 0;
   const draftEnabled = hasChanges || !watch("isDraft");
   const publishEnabled = hasChanges || watch("isDraft");
 
@@ -185,7 +191,6 @@ export function BottomButtonsStripe({
   // Have to define these like this because otherwise the state changes don't work
   const handlePublish = async () => {
     setValue("isDraft", false);
-    setValue("isArchived", false);
     try {
       await handleSubmit(onSubmit)();
     } catch (error) {
@@ -195,7 +200,6 @@ export function BottomButtonsStripe({
 
   const handleSaveAsDraft = async () => {
     setValue("isDraft", true);
-    setValue("isArchived", false);
     try {
       await handleSubmit(onSubmit)();
     } catch (error) {
@@ -204,11 +208,12 @@ export function BottomButtonsStripe({
   };
 
   const handleAcceptArchive = async () => {
-    setValue("isArchived", true);
-    setValue("isDraft", false);
     setModalContent(null);
     try {
-      await handleSubmit(onSubmit)();
+      if (reservationUnit?.pk == null) {
+        throw new Error("pk should not be null");
+      }
+      await archiveMutation({ variables: { input: { pk: reservationUnit.pk } } });
       successToast({ text: t("reservationUnitEditor:ArchiveDialog.success") });
       router.push(getUnitUrl(unit?.pk));
     } catch (e) {
@@ -311,3 +316,11 @@ export function BottomButtonsStripe({
     </ButtonsStripe>
   );
 }
+
+gql`
+  mutation ArchiveReservationUnit($input: ReservationUnitArchiveMutationInput!) {
+    archiveReservationUnit(input: $input) {
+      pk
+    }
+  }
+`;
