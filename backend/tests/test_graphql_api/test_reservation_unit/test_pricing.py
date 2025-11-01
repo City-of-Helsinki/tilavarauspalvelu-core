@@ -5,11 +5,18 @@ from decimal import Decimal
 
 import pytest
 
+from tilavarauspalvelu.enums import PaymentType, PriceUnit
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date
 
-from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory, TaxPercentageFactory
+from tests.factories import (
+    ReservationUnitAccessTypeFactory,
+    ReservationUnitFactory,
+    ReservationUnitPricingFactory,
+    SpaceFactory,
+    TaxPercentageFactory,
+)
 
 from .helpers import (
     CREATE_MUTATION,
@@ -69,6 +76,40 @@ def test_reservation_unit__query__pricing__old_pricings_not_returned(graphql):
             {"highestPrice": "20.00"},
         ],
     }
+
+
+def test_reservation_unit__query__pricing__disabled_tax_percentage_returned(graphql):
+    tax_percentage = TaxPercentageFactory.create(is_enabled=False, value=24)
+
+    reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitPricingFactory.create(
+        reservation_unit=reservation_unit,
+        begins=local_date(),
+        tax_percentage=tax_percentage,
+    )
+
+    graphql.login_with_superuser()
+
+    query = reservation_units_query(fields="pk pricings { taxPercentage { value isEnabled } }")
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+
+    assert len(response.edges) == 1
+    assert response.node(0) == {
+        "pk": reservation_unit.pk,
+        "pricings": [
+            {
+                "taxPercentage": {
+                    "value": "24.00",
+                    "isEnabled": False,
+                },
+            },
+        ],
+    }
+
+
+# Create
 
 
 def test_reservation_unit__create__pricing__is_not_required_for_drafts(graphql):
@@ -205,6 +246,40 @@ def test_reservation_unit__create__pricing__creating_future_pricing_without_acti
     assert response.has_errors is True, response
     assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_NO_ACTIVE_PRICING
     assert ReservationUnit.objects.count() == 0
+
+
+def test_reservation_unit__create__pricing__cannot_use_disabled_tax_percentage(graphql):
+    tax_percentage = TaxPercentageFactory.create(is_enabled=False, value=Decimal("11.0"))
+
+    input_data = get_create_draft_input_data(
+        pricings=[
+            {
+                "begins": "2022-09-11",
+                "priceUnit": PriceUnit.PER_15_MINS.value.upper(),
+                "lowestPrice": "18.2",
+                "highestPrice": "21.5",
+                "taxPercentage": tax_percentage.id,
+                "paymentType": PaymentType.ONLINE_OR_INVOICE,
+            },
+        ],
+    )
+
+    graphql.login_with_superuser()
+    response = graphql(CREATE_MUTATION, variables={"input": input_data})
+
+    assert response.has_errors is True, response
+    assert response.error_message() == "Mutation was unsuccessful."
+
+    # Since "Pricing <-> Tax Percentage" relation has the "limit_choices_to" constraint,
+    # disabled pricings are treated as not existing in serializers.
+    assert response.field_error_messages("pricings") == [
+        {"taxPercentage": [f'Invalid pk "{tax_percentage.pk}" - object does not exist.']},
+    ]
+
+    assert ReservationUnit.objects.count() == 0
+
+
+# Update
 
 
 def test_reservation_unit__update__pricing__active_pricing_can_be_created_on_update(graphql):
@@ -405,3 +480,37 @@ def test_reservation_unit__update__pricing__pricings_not_sent_for_non_draft_rese
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
+
+
+def test_reservation_unit__update__pricing__cannot_use_disabled_tax_percentage(graphql):
+    space = SpaceFactory.create()
+    reservation_unit = ReservationUnitFactory.create(spaces=[space])
+    ReservationUnitAccessTypeFactory.create(reservation_unit=reservation_unit)
+
+    tax_percentage = TaxPercentageFactory.create(is_enabled=False, value=Decimal("10.0"))
+
+    update_data = {
+        "pk": reservation_unit.pk,
+        "pricings": [
+            {
+                "begins": "2022-09-11",
+                "priceUnit": PriceUnit.PER_15_MINS.value.upper(),
+                "lowestPrice": "18.2",
+                "highestPrice": "21.5",
+                "taxPercentage": tax_percentage.id,
+                "paymentType": PaymentType.ONLINE_OR_INVOICE,
+            },
+        ],
+    }
+
+    graphql.login_with_superuser()
+    response = graphql(UPDATE_MUTATION, variables={"input": update_data})
+
+    assert response.has_errors is True, response
+    assert response.error_message() == "Mutation was unsuccessful."
+
+    # Since "Pricing <-> Tax Percentage" relation has the "limit_choices_to" constraint,
+    # disabled pricings are treated as not existing in serializers.
+    assert response.field_error_messages("pricings") == [
+        {"taxPercentage": [f'Invalid pk "{tax_percentage.pk}" - object does not exist.']},
+    ]
