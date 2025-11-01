@@ -6,7 +6,7 @@ import { filterNonNullable } from "../modules/helpers";
 export function useGenericTerms() {
   const { data } = useTermsOfUseQuery({
     variables: {
-      termsType: TermsOfUseTypeChoices.GenericTerms,
+      termsType: TermsOfUseTypeChoices.Generic,
       pk: genericTermsVariant.BOOKING,
     },
   });

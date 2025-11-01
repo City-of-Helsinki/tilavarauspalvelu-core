@@ -38,7 +38,7 @@ const emptyTerms = {
   id: "",
   textFi: "",
   nameFi: "",
-  termsType: TermsOfUseTypeChoices.PaymentTerms,
+  termsType: TermsOfUseTypeChoices.Payment,
 };
 
 // TODO remove and use fakeTimers with doNotFake option
@@ -55,7 +55,7 @@ function createReservationUnitFragment({ pk, nameFi }: { pk: number; nameFi: str
     bufferTimeAfter: 0,
     minPersons: null,
     maxPersons: null,
-    reservationStartInterval: ReservationStartInterval.Interval_15Mins,
+    reservationStartInterval: ReservationStartInterval.Interval_15Minutes,
     pricingTerms: emptyTerms,
     paymentTerms: emptyTerms,
     cancellationTerms: emptyTerms,
@@ -172,7 +172,7 @@ const otherMocks = [
     request: {
       query: TermsOfUseDocument,
       variables: {
-        termsType: TermsOfUseTypeChoices.GenericTerms,
+        termsType: TermsOfUseTypeChoices.Generic,
       },
     },
     result: {

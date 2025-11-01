@@ -76,7 +76,7 @@ function createReservation({
       pk: null,
       bufferTimeBefore: 0,
       bufferTimeAfter: 0,
-      reservationStartInterval: ReservationStartInterval.Interval_15Mins,
+      reservationStartInterval: ReservationStartInterval.Interval_15Minutes,
       unit: {
         id: createNodeId("UnitNode", 1),
         pk: 0,

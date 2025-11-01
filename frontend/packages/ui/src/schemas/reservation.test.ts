@@ -29,7 +29,7 @@ describe("CreateStaffReservation schema", () => {
   test(`date tomorrow is valid`, () => {
     const tomorrow = addDays(new Date(), 1);
     const input = createInput({ date: tomorrow });
-    const res = getCreateStaffReservationFormSchema(ReservationStartInterval.Interval_15Mins).safeParse(input);
+    const res = getCreateStaffReservationFormSchema(ReservationStartInterval.Interval_15Minutes).safeParse(input);
     expect(res.success).toBeTruthy();
   });
 
@@ -37,7 +37,7 @@ describe("CreateStaffReservation schema", () => {
   test("can make a past reservation for today", () => {
     const today = new Date();
     const input = createInput({ date: today, start: { hours: 0 }, end: { hours: 5 } });
-    const res = getCreateStaffReservationFormSchema(ReservationStartInterval.Interval_15Mins).safeParse(input);
+    const res = getCreateStaffReservationFormSchema(ReservationStartInterval.Interval_15Minutes).safeParse(input);
     expect(res.success).toBeTruthy();
   });
 
@@ -46,7 +46,7 @@ describe("CreateStaffReservation schema", () => {
   test("cant make reservation to a day past", () => {
     const input = createInput({ date: yesterday });
 
-    const res = getCreateStaffReservationFormSchema(ReservationStartInterval.Interval_15Mins).safeParse(input);
+    const res = getCreateStaffReservationFormSchema(ReservationStartInterval.Interval_15Minutes).safeParse(input);
     expect(res.success).toBeFalsy();
     if (!res.success) {
       expect(res.error.issues.filter((x) => x.path.includes("date"))).toHaveLength(1);
@@ -62,7 +62,7 @@ describe("CreateStaffReservation schema", () => {
 
   describe("15 min interval", () => {
     const possibleMinutes = [0, 15, 30, 45] as const;
-    const schema = getCreateStaffReservationFormSchema(ReservationStartInterval.Interval_15Mins);
+    const schema = getCreateStaffReservationFormSchema(ReservationStartInterval.Interval_15Minutes);
     // TODO could pick an end interval on random
     test.for(possibleMinutes)(`valid interval for %s minutes`, (start) => {
       const tomorrow = addDays(new Date(), 1);
@@ -94,7 +94,7 @@ describe("CreateStaffReservation schema", () => {
   describe("half an hour interval", () => {
     const possibleMinutes = [0, 30] as const;
 
-    const schema = getCreateStaffReservationFormSchema(ReservationStartInterval.Interval_30Mins);
+    const schema = getCreateStaffReservationFormSchema(ReservationStartInterval.Interval_30Minutes);
     test.for(possibleMinutes)(`valid interval for %d minutes`, (start) => {
       const tomorrow = addDays(new Date(), 1);
       const input = createInput({

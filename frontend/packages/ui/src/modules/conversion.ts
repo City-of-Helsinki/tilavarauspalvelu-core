@@ -99,25 +99,25 @@ export function transformReserveeTypeUnsafe(reserveeType: string): ReserveeType 
 
 export function getIntervalMinutes(reservationStartInterval: ReservationStartInterval): number {
   switch (reservationStartInterval) {
-    case ReservationStartInterval.Interval_15Mins:
+    case ReservationStartInterval.Interval_15Minutes:
       return 15;
-    case ReservationStartInterval.Interval_30Mins:
+    case ReservationStartInterval.Interval_30Minutes:
       return 30;
-    case ReservationStartInterval.Interval_60Mins:
+    case ReservationStartInterval.Interval_60Minutes:
       return 60;
-    case ReservationStartInterval.Interval_90Mins:
+    case ReservationStartInterval.Interval_90Minutes:
       return 90;
-    case ReservationStartInterval.Interval_120Mins:
+    case ReservationStartInterval.Interval_120Minutes:
       return 120;
-    case ReservationStartInterval.Interval_180Mins:
+    case ReservationStartInterval.Interval_180Minutes:
       return 180;
-    case ReservationStartInterval.Interval_240Mins:
+    case ReservationStartInterval.Interval_240Minutes:
       return 240;
-    case ReservationStartInterval.Interval_300Mins:
+    case ReservationStartInterval.Interval_300Minutes:
       return 300;
-    case ReservationStartInterval.Interval_360Mins:
+    case ReservationStartInterval.Interval_360Minutes:
       return 360;
-    case ReservationStartInterval.Interval_420Mins:
+    case ReservationStartInterval.Interval_420Minutes:
       return 420;
   }
 }
