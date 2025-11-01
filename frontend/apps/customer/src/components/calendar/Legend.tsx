@@ -1,3 +1,4 @@
+import { unavailableBackgroundSVG } from "@ui/components/calendar/util";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled, { css, RuleSet } from "styled-components";
@@ -46,6 +47,18 @@ const LegendItem = styled.div<{
   place-content: flex-start;
   gap: var(--spacing-3-xs);
   position: relative;
+  /* the time indicator ball on the left side of the line */
+  &:last-child:after {
+    content: "";
+    display: block;
+    background-color: var(--color-bus-dark);
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    position: absolute;
+    left: 0;
+    top: 18px;
+  }
 `;
 
 const LegendTitle = styled.div`
@@ -60,6 +73,9 @@ const defaultItems: LegendItemT[] = [
     title: "initial",
     color: "var(--tilavaraus-event-initial-color)",
     border: "var(--tilavaraus-event-initial-border)",
+    css: css`
+      border-style: dashed;
+    `,
   },
   {
     title: "busy",
@@ -69,7 +85,11 @@ const defaultItems: LegendItemT[] = [
   {
     title: "unavailable",
     color: "var(--color-black-10)",
-    border: "transparent",
+    border: "var(--color-black-20)",
+    css: css`
+      background-image: ${unavailableBackgroundSVG};
+      background-size: auto 10px;
+    `,
   },
   {
     title: "free",
@@ -79,7 +99,7 @@ const defaultItems: LegendItemT[] = [
     title: "timeIndicator",
     border: "transparent",
     css: css`
-      border-top: 4px dotted #551a8b;
+      border-top: 2px solid var(--color-bus-dark);
       top: 20px;
     `,
   },

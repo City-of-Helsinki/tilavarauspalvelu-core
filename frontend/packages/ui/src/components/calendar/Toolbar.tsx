@@ -1,5 +1,5 @@
 import React from "react";
-import { IconAngleLeft, IconAngleRight } from "hds-react";
+import { IconAngleLeft, IconAngleRight, IconCalendarRecurring } from "hds-react";
 import { format, startOfWeek, endOfWeek } from "date-fns";
 import { fi } from "date-fns/locale/fi";
 import styled from "styled-components";
@@ -41,6 +41,9 @@ export const ToolbarBtn = styled.button.attrs({ type: "button" })<{
 }>`
   /* rbc-toolbar button overrides these */
   && {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2-xs);
     border: 2px solid var(--color-black);
     border-radius: 0;
     cursor: pointer;
@@ -124,7 +127,10 @@ export function Toolbar({ onNavigate, onView, view, date, children }: Readonly<T
       aria-hidden="true"
     >
       <Flex $direction="row">
-        <ToolbarBtn onClick={() => onNavigate("TODAY")}>{t("common:today")}</ToolbarBtn>
+        <ToolbarBtn onClick={() => onNavigate("TODAY")}>
+          <IconCalendarRecurring />
+          {t("common:today")}
+        </ToolbarBtn>
         {children}
       </Flex>
       <DateNavigationWrapper>

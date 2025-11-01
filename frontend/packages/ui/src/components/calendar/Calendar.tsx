@@ -1,3 +1,4 @@
+import { unavailableBackgroundSVG } from "@ui/components/calendar/util";
 import React from "react";
 import styled from "styled-components";
 import { addHours, endOfMonth, format, startOfWeek, getDay, startOfDay, parseISO } from "date-fns";
@@ -8,8 +9,8 @@ import { Calendar as BigCalendar, dateFnsLocalizer, ToolbarProps } from "react-b
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
-import { dateToMinutes, formatTimeRange } from "../../modules/date-utils";
-import type { LocalizationLanguages } from "../../modules/urlBuilder";
+import { dateToMinutes, formatTimeRange } from "@ui/modules/date-utils";
+import type { LocalizationLanguages } from "@ui/modules/urlBuilder";
 
 export type CalendarEvent<T> = {
   title?: string;
@@ -118,8 +119,59 @@ const StyledCalendar = styled(BigCalendar)<{
   }}
 
   .rbc-current-time-indicator {
-    border-top: 4px dotted #551a8b;
+    z-index: calc(var(--tilavaraus-stack-order-calendar-gutter) + 1);
+    border-top: 2px solid var(--color-bus-dark);
     background-color: transparent;
+    position: absolute;
+
+    /* the time indicator ball between the gutter and the calendar */
+    &:after {
+      content: "";
+      display: block;
+      background: var(--color-bus-dark);
+      height: 6px;
+      width: 6px;
+      border-radius: 50%;
+      position: absolute;
+      top: -4px;
+      left: -2.5px;
+    }
+  }
+
+  /* stretch the current time indicator over the entire week view on each day of the week */
+  &.view-week .rbc-day-slot:nth-child(2) .rbc-current-time-indicator {
+    left: 0;
+    right: -600%;
+  }
+
+  &.view-week .rbc-day-slot:nth-child(3) .rbc-current-time-indicator {
+    left: -100%;
+    right: -500%;
+  }
+
+  &.view-week .rbc-day-slot:nth-child(4) .rbc-current-time-indicator {
+    left: -200%;
+    right: -400%;
+  }
+
+  &.view-week .rbc-day-slot:nth-child(5) .rbc-current-time-indicator {
+    left: -300%;
+    right: -300%;
+  }
+
+  &.view-week .rbc-day-slot:nth-child(6) .rbc-current-time-indicator {
+    left: -400%;
+    right: -200%;
+  }
+
+  &.view-week .rbc-day-slot:nth-child(7) .rbc-current-time-indicator {
+    left: -500%;
+    right: -100%;
+  }
+
+  &.view-week .rbc-day-slot:nth-child(8) .rbc-current-time-indicator {
+    left: -600%;
+    right: 0;
   }
 
   .rbc-timeslot-group {
@@ -197,6 +249,12 @@ const StyledCalendar = styled(BigCalendar)<{
   .rbc-time-header {
     .rbc-today {
       background-color: transparent;
+      span {
+        color: var(--color-white);
+        padding: var(--spacing-2-xs) var(--spacing-2-xs);
+        background-color: var(--color-bus);
+        border-radius: var(--spacing-s);
+      }
     }
 
     .rbc-time-header-content {
@@ -357,6 +415,8 @@ const StyledCalendar = styled(BigCalendar)<{
   }
 
   .rbc-timeslot-inactive {
+    background-image: ${unavailableBackgroundSVG};
+    background-size: auto 10px;
     background-color: var(--color-black-5);
     border-left: 2px solid var(--color-black-30);
   }
