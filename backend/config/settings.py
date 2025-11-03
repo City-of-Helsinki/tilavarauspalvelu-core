@@ -537,6 +537,31 @@ class Common(Environment):
     # Allows faking membership to certain AD groups for testing automatic role assignment
     FAKE_SUPERUSER_AD_GROUPS = values.ListValue(default=[])
 
+    NH3_ALLOWED_TAGS = {
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "p",
+        "br",
+        "div",
+        "span",
+        "ol",
+        "ul",
+        "li",
+        "strong",
+        "em",
+        "u",
+        "a",
+        "pre",
+    }
+    NH3_ALLOWED_ATTRIBUTES = {
+        "a": {"href", "target"},
+        "*": {"style"},
+    }
+
 
 class EmptyDefaults:
     """

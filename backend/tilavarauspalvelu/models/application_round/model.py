@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, ClassVar
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django_nh3.models import Nh3Field
 from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 
@@ -45,8 +46,18 @@ class ApplicationRound(models.Model):
     """
 
     name: str = models.CharField(max_length=255)
-    criteria: str = models.TextField(blank=True, default="")
-    notes_when_applying: str = models.TextField(blank=True, default="")
+    criteria: str = Nh3Field(
+        blank=True,
+        default="",
+        tags=settings.NH3_ALLOWED_TAGS,
+        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+    )
+    notes_when_applying: str = Nh3Field(
+        blank=True,
+        default="",
+        tags=settings.NH3_ALLOWED_TAGS,
+        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+    )
 
     # Period when the application round accepts applications
     application_period_begins_at: datetime.datetime = models.DateTimeField()

@@ -183,7 +183,7 @@ def test_reservation_approved__get_context__access_code__inactive(email_reservat
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 def test_reservation_approved__get_context__instance(email_reservation):
-    instructions_html = '<p>[HYVÄKSYTYN VARAUKSEN OHJEET] <a href="https://foo.bar">LINK</a></p>'
+    instructions_html = '<p>[HYVÄKSYTYN VARAUKSEN OHJEET] <a href="https://foo.bar" rel="">LINK</a></p>'
     instructions_text = "[HYVÄKSYTYN VARAUKSEN OHJEET] LINK <https://foo.bar>"
 
     email_reservation.reservation_unit.reservation_confirmed_instructions_en = instructions_html
