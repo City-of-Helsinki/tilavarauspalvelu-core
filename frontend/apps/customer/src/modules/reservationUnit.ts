@@ -23,7 +23,6 @@ import {
   dayMin,
   filterNonNullable,
   formatTimeStruct,
-  getLocalizationLang,
   isPriceFree,
   type ReadonlyDeep,
 } from "@ui/modules/helpers";
@@ -53,7 +52,6 @@ import {
   type ReservationUnitNode,
   ReservationUnitPublishingState,
   ReservationUnitReservationState,
-  type UnitNode,
 } from "@gql/gql-types";
 
 export function isReservationUnitPublished(reservationUnit: Pick<ReservationUnitNode, "publishingState">): boolean {
@@ -125,34 +123,6 @@ export function getEquipmentList(
   );
 
   return sortedEquipment.map((n) => getTranslation(n, "name", lang));
-}
-
-export function getReservationUnitName(
-  reservationUnit: Pick<ReservationUnitNode, "nameFi" | "nameSv" | "nameEn"> | undefined,
-  language: string = "fi"
-): string | undefined {
-  if (!reservationUnit) {
-    return undefined;
-  }
-  const key = `name${capitalize(language)}`;
-  if (key in reservationUnit) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- silly magic to avoid implicit any type
-    const val: unknown = (reservationUnit as any)[key];
-    if (typeof val === "string" && val.length > 0) {
-      return val;
-    }
-  }
-  return reservationUnit.nameFi ?? "-";
-}
-
-export function getUnitName(
-  unit: Pick<UnitNode, "nameFi" | "nameSv" | "nameEn">,
-  locale: LocalizationLanguages
-): string | undefined {
-  if (unit == null) {
-    return undefined;
-  }
-  return getTranslation(unit, "name", getLocalizationLang(locale));
 }
 
 function isActivePricing(pricing: PricingFieldsFragment): boolean {
