@@ -1,6 +1,8 @@
 import React, { type RefObject, useEffect } from "react";
-import { gql } from "@apollo/client";
+import { ErrorBoundary } from "react-error-boundary";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
+import { gql } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
   ButtonSize,
@@ -12,31 +14,29 @@ import {
   NotificationSize,
 } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { useSearchParams } from "next/navigation";
+import styled from "styled-components";
+import { ControlledDateInput } from "ui/src/components/form";
+import { successToast } from "ui/src/components/toast";
+import { useDisplayError } from "ui/src/hooks";
+import { breakpoints } from "ui/src/modules/const";
+import { fromUIDateTimeUnsafe, formatDate, formatTime, fromUIDateTime } from "ui/src/modules/date-utils";
+import { createNodeId, toNumber } from "ui/src/modules/helpers";
+import { type CreateStaffReservationFormValues, getCreateStaffReservationFormSchema } from "ui/src/schemas";
+import { CenterSpinner, Flex } from "ui/src/styled";
+import { ControlledTimeInput } from "@/components/ControlledTimeInput";
+import { SelectFilter } from "@/components/QueryParamFilters";
+import { ReservationTypeForm } from "@/components/ReservationTypeForm";
+import { useModal } from "@/context/ModalContext";
+import { useCheckCollisions } from "@/hooks";
+import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
+import { FixedDialog } from "@/styled/FixedDialog";
 import {
   type CreateStaffReservationFragment,
   type ReservationStaffCreateMutationInput,
   useCreateStaffReservationMutation,
   useReservationUnitQuery,
 } from "@gql/gql-types";
-import styled from "styled-components";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ErrorBoundary } from "react-error-boundary";
-import { type CreateStaffReservationFormValues, getCreateStaffReservationFormSchema } from "ui/src/schemas";
-import { CenterSpinner, Flex } from "ui/src/styled";
-import { breakpoints } from "ui/src/modules/const";
-import { useCheckCollisions } from "@/hooks";
-import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
-import { fromUIDateTimeUnsafe, formatDate, formatTime, fromUIDateTime } from "ui/src/modules/date-utils";
-import { useModal } from "@/context/ModalContext";
-import { ControlledTimeInput } from "@/components/ControlledTimeInput";
-import { ControlledDateInput } from "ui/src/components/form";
-import { createNodeId, toNumber } from "ui/src/modules/helpers";
-import { ReservationTypeForm } from "@/components/ReservationTypeForm";
-import { successToast } from "ui/src/components/toast";
-import { useDisplayError } from "ui/src/hooks";
-import { SelectFilter } from "@/components/QueryParamFilters";
-import { FixedDialog } from "@/styled/FixedDialog";
-import { useSearchParams } from "next/navigation";
 
 // NOTE HDS forces buttons over each other on mobile, we want them side-by-side
 const ActionButtons = styled(Dialog.ActionButtons)`

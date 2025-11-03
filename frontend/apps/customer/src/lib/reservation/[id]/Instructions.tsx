@@ -1,9 +1,9 @@
-import { type InstructionsFragment, type Maybe, ReservationStateChoice } from "@gql/gql-types";
 import { gql } from "@apollo/client";
-import { H4 } from "ui/src/styled";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { Sanitize } from "ui/src/components/Sanitize";
 import { useTranslation } from "next-i18next";
+import { Sanitize } from "ui/src/components/Sanitize";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { H4 } from "ui/src/styled";
+import { type InstructionsFragment, type Maybe, ReservationStateChoice } from "@gql/gql-types";
 
 type Props = {
   reservation: InstructionsFragment;

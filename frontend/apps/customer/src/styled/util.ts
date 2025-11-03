@@ -1,7 +1,7 @@
-import { fontMedium, fontRegular } from "ui/src/styled";
 import { Button, Stepper } from "hds-react";
 import Link from "next/link";
 import styled from "styled-components";
+import { fontMedium, fontRegular } from "ui/src/styled";
 import { breakpoints } from "@ui/modules/const";
 
 export const pixel = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";

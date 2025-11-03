@@ -1,19 +1,19 @@
 import React, { useEffect } from "react";
-import { useTranslation } from "next-i18next";
-import { AutoGrid, Flex, HR } from "ui/src/styled";
-import { SearchTags } from "@/components/SearchTags";
-import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
-import { AccessCodeState, ApplicationSectionStatusChoice, ApplicationStatusChoice, ReserveeType } from "@gql/gql-types";
-import { ControlledMultiSelectFilter, ControlledSearchFilter } from "@/components/QueryParamFilters";
-import { type TagOptionsList, translateTag } from "@/modules/search";
 import { useForm } from "react-hook-form";
-import { DayT } from "ui/src/modules/const";
-import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
-import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { mapFormToSearchParams } from "ui/src/modules/search";
-import { convertWeekday } from "ui/src/modules/conversion";
+import { useTranslation } from "next-i18next";
 import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
+import { DayT } from "ui/src/modules/const";
+import { convertWeekday } from "ui/src/modules/conversion";
+import { mapFormToSearchParams } from "ui/src/modules/search";
+import { AutoGrid, Flex, HR } from "ui/src/styled";
+import { ControlledMultiSelectFilter, ControlledSearchFilter } from "@/components/QueryParamFilters";
+import { SearchTags } from "@/components/SearchTags";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
+import { type TagOptionsList, translateTag } from "@/modules/search";
+import { AccessCodeState, ApplicationSectionStatusChoice, ApplicationStatusChoice, ReserveeType } from "@gql/gql-types";
 
 interface FilterProps {
   options: TagOptionsList;

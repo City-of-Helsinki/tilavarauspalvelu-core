@@ -1,8 +1,8 @@
-import { type SearchReservationUnitsQueryVariables, useSearchReservationUnitsQuery } from "@gql/gql-types";
-import { SEARCH_PAGING_LIMIT } from "@/modules/const";
-import { hash, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { hash, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { SEARCH_PAGING_LIMIT } from "@/modules/const";
+import { type SearchReservationUnitsQueryVariables, useSearchReservationUnitsQuery } from "@gql/gql-types";
 
 /* Wrap the search query with a custom hook
  * because we can't trust the query.loading nor totalCount nor hasNextPage

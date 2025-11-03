@@ -2,11 +2,11 @@ import React from "react";
 import { MockedProvider } from "@apollo/client/testing";
 import { render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { type UseStaffReservationFragment } from "@gql/gql-types";
-import { type MutationInputParams, useStaffReservationMutation } from "./useStaffReservationMutation";
 import { vi, describe, test, expect, beforeEach } from "vitest";
-import { MUTATION_DATA, createMocks } from "./__test__/mocks";
 import { createNodeId } from "ui/src/modules/helpers";
+import { type UseStaffReservationFragment } from "@gql/gql-types";
+import { MUTATION_DATA, createMocks } from "./__test__/mocks";
+import { type MutationInputParams, useStaffReservationMutation } from "./useStaffReservationMutation";
 
 export function createMockReservation({ pk }: { pk: number }): UseStaffReservationFragment {
   return {

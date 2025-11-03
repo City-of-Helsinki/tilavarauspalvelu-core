@@ -1,28 +1,5 @@
 import React, { useRef } from "react";
 import { type ApolloQueryResult, gql } from "@apollo/client";
-import { useTranslation } from "next-i18next";
-import {
-  ReserveeType,
-  type ReservationPageQuery,
-  ReservationStateChoice,
-  UserPermissionChoice,
-  ReservationPageDocument,
-  useReservationPageLazyQuery,
-} from "@gql/gql-types";
-import { useModal } from "@/context/ModalContext";
-import { ButtonContainer } from "ui/src/styled";
-import { ShowWhenTargetInvisible } from "@/components/ShowWhenTargetInvisible";
-import { StickyHeader } from "@/components/StickyHeader";
-import { ReservationWorkingMemo } from "@/components/WorkingMemo";
-import {
-  createTagString,
-  formatReservationPriceLong,
-  getName,
-  getReservationUnitPricing,
-  formatReservationPrice,
-  translateReservationCustomerType,
-} from "@/modules/reservation";
-import VisibleIfPermission from "@/components/VisibleIfPermission";
 import {
   ApprovalButtons,
   ApprovalButtonsRecurring,
@@ -32,17 +9,40 @@ import {
   ReservationReserveeDetailsSection,
   DataWrapper,
 } from "@lib/reservations/[id]/";
-import { Accordion, ApplicationDatas, Summary } from "@/styled";
-import { createNodeId, ignoreMaybeArray, isPriceFree, toNumber } from "ui/src/modules/helpers";
-import { formatAgeGroup } from "@/modules/util";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
-import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { createClient } from "@/modules/apolloClient";
-import { hasPermission } from "@/modules/permissionHelper";
-import { useSession } from "@/hooks";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { createNodeId, ignoreMaybeArray, isPriceFree, toNumber } from "ui/src/modules/helpers";
+import { ButtonContainer } from "ui/src/styled";
 import { Error403 } from "@/components/Error403";
+import { ShowWhenTargetInvisible } from "@/components/ShowWhenTargetInvisible";
+import { StickyHeader } from "@/components/StickyHeader";
+import VisibleIfPermission from "@/components/VisibleIfPermission";
+import { ReservationWorkingMemo } from "@/components/WorkingMemo";
+import { useModal } from "@/context/ModalContext";
+import { useSession } from "@/hooks";
+import { createClient } from "@/modules/apolloClient";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { hasPermission } from "@/modules/permissionHelper";
+import {
+  createTagString,
+  formatReservationPriceLong,
+  getName,
+  getReservationUnitPricing,
+  formatReservationPrice,
+  translateReservationCustomerType,
+} from "@/modules/reservation";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { formatAgeGroup } from "@/modules/util";
+import { Accordion, ApplicationDatas, Summary } from "@/styled";
+import {
+  ReserveeType,
+  type ReservationPageQuery,
+  ReservationStateChoice,
+  UserPermissionChoice,
+  ReservationPageDocument,
+  useReservationPageLazyQuery,
+} from "@gql/gql-types";
 
 type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 

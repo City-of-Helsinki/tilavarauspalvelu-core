@@ -1,9 +1,9 @@
 import { addDays, subDays } from "date-fns";
-import { formatApiTimeUnsafe, formatDate } from "../modules/date-utils";
 import { describe, test, expect } from "vitest";
 import { ReservationStartInterval, ReservationTypeChoice } from "../../gql/gql-types";
-import { type CreateStaffReservationFormSchema, getCreateStaffReservationFormSchema } from "./reservation";
+import { formatApiTimeUnsafe, formatDate } from "../modules/date-utils";
 import type { TimeStruct } from "../modules/date-utils/types";
+import { type CreateStaffReservationFormSchema, getCreateStaffReservationFormSchema } from "./reservation";
 
 function createInput({
   date,

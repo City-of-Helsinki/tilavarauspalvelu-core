@@ -1,19 +1,19 @@
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import { gql } from "@apollo/client";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
-import { AuthenticationType, ReservationTypeChoice, type ReservationTypeFormFieldsFragment } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { type CreateStaffReservationFormValues, ReservationTypes } from "@ui/schemas";
 import { ShowAllContainer } from "@ui/components";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/reservation-form";
-import { BufferToggles } from "./BufferToggles";
-import ShowTOS from "./ShowTOS";
-import { Element } from "@/styled";
-import { gql } from "@apollo/client";
+import { type CreateStaffReservationFormValues, ReservationTypes } from "@ui/schemas";
 import { HR } from "@ui/styled";
 import type { OptionsRecord } from "@ui/types";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
+import { Element } from "@/styled";
+import { AuthenticationType, ReservationTypeChoice, type ReservationTypeFormFieldsFragment } from "@gql/gql-types";
+import { BufferToggles } from "./BufferToggles";
+import ShowTOS from "./ShowTOS";
 
 const CommentsTextArea = styled(TextArea)`
   grid-column: 1 / -1;

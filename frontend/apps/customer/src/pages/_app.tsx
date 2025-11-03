@@ -1,19 +1,19 @@
 import React, { useEffect, useState, type FC } from "react";
 import { ApolloProvider } from "@apollo/client";
+import { CookieBanner, CookieConsentContextProvider } from "hds-react";
 import { appWithTranslation, useTranslation } from "next-i18next";
 import type { AppProps } from "next/app";
-import { PageWrapper } from "@/components/PageWrapper";
-import { ExternalScripts } from "@/components/ExternalScripts";
-import { createApolloClient } from "@/modules/apolloClient";
-import { TrackingWrapper } from "@/modules/tracking";
-import "ui/src/styles/global.scss";
-import "../styles/global.scss";
-import { updateSentryConfig } from "../../instrumentation-client";
 import { ToastContainer } from "ui/src/components/toast";
-import { CookieBanner, CookieConsentContextProvider } from "hds-react";
-import sitesettings from "./sitesettings.json";
 import { convertLanguageCode } from "ui/src/modules/util";
+import "ui/src/styles/global.scss";
+import { ExternalScripts } from "@/components/ExternalScripts";
+import { PageWrapper } from "@/components/PageWrapper";
+import { createApolloClient } from "@/modules/apolloClient";
 import { ANALYTICS_COOKIE_GROUP_NAME, isBrowser } from "@/modules/const";
+import { TrackingWrapper } from "@/modules/tracking";
+import { updateSentryConfig } from "../../instrumentation-client";
+import "../styles/global.scss";
+import sitesettings from "./sitesettings.json";
 
 /// check if the user has accepted the statistics cookies
 /// only client side

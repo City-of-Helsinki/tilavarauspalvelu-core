@@ -1,9 +1,9 @@
-import { camelCase } from "lodash-es";
 import React, { useMemo } from "react";
-import { useTranslation } from "next-i18next";
-import { ReservationStateChoice } from "@gql/gql-types";
 import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircle } from "hds-react";
+import { camelCase } from "lodash-es";
+import { useTranslation } from "next-i18next";
 import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
+import { ReservationStateChoice } from "@gql/gql-types";
 
 export type Props = {
   state: ReservationStateChoice;

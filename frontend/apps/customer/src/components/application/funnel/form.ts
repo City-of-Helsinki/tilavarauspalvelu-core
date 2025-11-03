@@ -1,6 +1,9 @@
-import { z } from "zod";
 import { startOfDay } from "date-fns";
+import { z } from "zod";
+import { CELL_STATES } from "ui/src/components/ApplicationTimeSelector";
+import { parseUIDate, timeToMinutes, formatApiDate, formatDate } from "ui/src/modules/date-utils";
 import { filterNonNullable, type ReadonlyDeep } from "ui/src/modules/helpers";
+import { checkValidDateOnly, lessThanMaybeDate } from "ui/src/schemas/schemaCommon";
 import {
   type ApplicantFieldsFragment,
   type ApplicationFormFragment,
@@ -14,9 +17,6 @@ import {
   type UpdateApplicationSectionForApplicationSerializerInput,
   Weekday,
 } from "@gql/gql-types";
-import { parseUIDate, timeToMinutes, formatApiDate, formatDate } from "ui/src/modules/date-utils";
-import { checkValidDateOnly, lessThanMaybeDate } from "ui/src/schemas/schemaCommon";
-import { CELL_STATES } from "ui/src/components/ApplicationTimeSelector";
 
 type SectionType = NonNullable<ApplicationFormFragment["applicationSections"]>[0];
 

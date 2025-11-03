@@ -1,15 +1,13 @@
 import React, { useEffect, type FC } from "react";
-import App, { type AppContext, type AppInitialProps, type AppProps } from "next/app";
-import "ui/src/styles/global.scss";
-import "../styles/global.scss";
 import { ApolloProvider } from "@apollo/client";
-import { createClient } from "@/modules/apolloClient";
-import { updateSentryConfig } from "../../instrumentation-client";
-import { type PageProps } from ".";
 import { appWithTranslation } from "next-i18next";
-import Layout from "./layout";
+import App, { type AppContext, type AppInitialProps, type AppProps } from "next/app";
+import { formatApiDate } from "ui/src/modules/date-utils";
+import "ui/src/styles/global.scss";
 import PageWrapper from "@/components/PageWrapper";
 import { ModalContextProvider } from "@/context/ModalContext";
+import { createClient } from "@/modules/apolloClient";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   BannerNotificationTarget,
   CurrentUserDocument,
@@ -23,8 +21,10 @@ import {
   type ShowNotificationsListQuery,
   type ShowNotificationsListQueryVariables,
 } from "@gql/gql-types";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { formatApiDate } from "ui/src/modules/date-utils";
+import { type PageProps } from ".";
+import { updateSentryConfig } from "../../instrumentation-client";
+import "../styles/global.scss";
+import Layout from "./layout";
 
 function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
   const { Component, pageProps, currentUser, handlingData, notificationsData } = props;

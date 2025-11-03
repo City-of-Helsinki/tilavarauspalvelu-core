@@ -1,6 +1,6 @@
-import { ApplicationStatusChoice, Maybe } from "@gql/gql-types";
-import { Flex, H1 } from "ui/src/styled";
 import { ApplicationStatusLabel } from "ui/src/components/statuses";
+import { Flex, H1 } from "ui/src/styled";
+import { ApplicationStatusChoice, Maybe } from "@gql/gql-types";
 
 export function ApplicationHead({
   status,

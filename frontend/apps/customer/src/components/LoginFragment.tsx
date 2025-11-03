@@ -1,9 +1,9 @@
 import React from "react";
+import { Button, ButtonSize } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { signIn } from "ui/src/modules/browserHelpers";
-import { useSession } from "@/hooks";
-import { Button, ButtonSize } from "hds-react";
 import { getLocalizationLang } from "ui/src/modules/helpers";
+import { useSession } from "@/hooks";
 
 type Props = {
   apiBaseUrl: string;

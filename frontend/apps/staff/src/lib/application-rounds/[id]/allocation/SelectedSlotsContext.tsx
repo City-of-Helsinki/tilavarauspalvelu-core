@@ -1,5 +1,5 @@
-import { DayT } from "ui/src/modules/const";
 import React, { createContext, useContext, useMemo, useState } from "react";
+import { DayT } from "ui/src/modules/const";
 
 type SelectedSlotsContextProps = {
   selection: TimeSlotRange | null;

@@ -1,16 +1,16 @@
-import { errorToast } from "ui/src/components/toast";
-import { useSort } from "@/hooks/useSort";
-import { RejectedOccurrencesTable, SORT_KEYS } from "./RejectedOccurrencesTable";
-import { type ApolloError, gql } from "@apollo/client";
-import { RejectedOccurrenceOrderingChoices, useRejectedOccurrencesQuery } from "@gql/gql-types";
-import { More } from "@/components/More";
 import React from "react";
-import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
-import { getPermissionErrors } from "ui/src/modules/apolloUtils";
+import { type ApolloError, gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
-import { useGetFilterSearchParams } from "@/hooks";
-import { LIST_PAGE_SIZE } from "@/modules/const";
+import { errorToast } from "ui/src/components/toast";
+import { getPermissionErrors } from "ui/src/modules/apolloUtils";
+import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";
+import { More } from "@/components/More";
+import { useGetFilterSearchParams } from "@/hooks";
+import { useSort } from "@/hooks/useSort";
+import { LIST_PAGE_SIZE } from "@/modules/const";
+import { RejectedOccurrenceOrderingChoices, useRejectedOccurrencesQuery } from "@gql/gql-types";
+import { RejectedOccurrencesTable, SORT_KEYS } from "./RejectedOccurrencesTable";
 
 type Props = {
   applicationRoundPk: number;

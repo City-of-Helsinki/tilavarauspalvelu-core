@@ -1,5 +1,10 @@
 /// This file contains the search query for reservation units
 /// e.g. the common search pages (both seasonal and single)
+import { gql, type ApolloClient } from "@apollo/client";
+import { startOfDay } from "date-fns";
+import { type ReadonlyURLSearchParams } from "next/navigation";
+import { transformAccessTypeSafe } from "ui/src/modules/conversion";
+import { parseUIDate, formatApiDate } from "ui/src/modules/date-utils";
 import {
   filterEmptyArray,
   filterNonNullable,
@@ -8,7 +13,9 @@ import {
   mapParamToInteger,
   toNumber,
 } from "ui/src/modules/helpers";
+import { type OptionsListT, type OptionT } from "ui/src/modules/search";
 import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
 import {
   EquipmentOrderingChoices,
   type Maybe,
@@ -23,14 +30,7 @@ import {
   ReservationUnitTypeOrderingChoices,
   UnitOrderingChoices,
 } from "@gql/gql-types";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { parseUIDate, formatApiDate } from "ui/src/modules/date-utils";
-import { startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "./const";
-import { gql, type ApolloClient } from "@apollo/client";
-import { type ReadonlyURLSearchParams } from "next/navigation";
-import { transformAccessTypeSafe } from "ui/src/modules/conversion";
-import { type OptionsListT, type OptionT } from "ui/src/modules/search";
 
 function transformOrderByName(desc: boolean, language: LocalizationLanguages) {
   if (language === "fi") {

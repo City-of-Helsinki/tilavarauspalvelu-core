@@ -1,5 +1,6 @@
-import { GraphQLError } from "graphql";
 import { addDays, addHours, startOfDay } from "date-fns";
+import { GraphQLError } from "graphql";
+import { createNodeId } from "ui/src/modules/helpers";
 import {
   ReservationSeriesDocument,
   type ReservationSeriesQuery,
@@ -10,7 +11,6 @@ import {
   UpdateReservationSeriesDocument,
   UpdateStaffReservationDocument,
 } from "@gql/gql-types";
-import { createNodeId } from "ui/src/modules/helpers";
 
 export const CHANGED_WORKING_MEMO = "Sisaisen kommentti";
 

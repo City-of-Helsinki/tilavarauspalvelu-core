@@ -1,23 +1,23 @@
 import React, { useRef, useState } from "react";
+import { ApolloError, gql } from "@apollo/client";
 import { IconGroup } from "hds-react";
 import { trim } from "lodash-es";
 import { useTranslation } from "next-i18next";
-import { ApolloError, gql } from "@apollo/client";
-import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
-import { type Maybe, type SpacesTableFragment, useDeleteSpaceMutation } from "@gql/gql-types";
-import { PopupMenu } from "ui/src/components/PopupMenu";
-import { NewSpaceModal } from "./new-space-modal/NewSpaceModal";
-import { errorToast } from "ui/src/components/toast";
-import { CustomTable } from "@/components/Table";
-import { getSpaceUrl } from "@/modules/urls";
-import { truncate } from "ui/src/modules/helpers";
-import { MAX_NAME_LENGTH } from "@/modules/const";
-import { TableLink } from "@/styled";
-import { Flex } from "ui/src/styled";
-import { useDisplayError } from "ui/src/hooks";
-import { useModal } from "@/context/ModalContext";
-import { FixedDialog } from "@/styled/FixedDialog";
 import { useRouter } from "next/router";
+import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
+import { PopupMenu } from "ui/src/components/PopupMenu";
+import { errorToast } from "ui/src/components/toast";
+import { useDisplayError } from "ui/src/hooks";
+import { truncate } from "ui/src/modules/helpers";
+import { Flex } from "ui/src/styled";
+import { CustomTable } from "@/components/Table";
+import { useModal } from "@/context/ModalContext";
+import { MAX_NAME_LENGTH } from "@/modules/const";
+import { getSpaceUrl } from "@/modules/urls";
+import { TableLink } from "@/styled";
+import { FixedDialog } from "@/styled/FixedDialog";
+import { type Maybe, type SpacesTableFragment, useDeleteSpaceMutation } from "@gql/gql-types";
+import { NewSpaceModal } from "./new-space-modal/NewSpaceModal";
 
 type SpaceT = SpacesTableFragment["spaces"][0];
 

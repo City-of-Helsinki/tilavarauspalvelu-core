@@ -1,19 +1,5 @@
 import React, { type Dispatch, type SetStateAction } from "react";
-import type { SelectedRow } from "@/lib/reservation-units";
-import { breakpoints } from "ui/src/modules/const";
-import { Flex } from "ui/src/styled";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "i18next";
-import {
-  ReservationUnitPublishingState,
-  ReservationUnitReservationState,
-  type ReservationUnitTableElementFragment,
-} from "@gql/gql-types";
-import { truncate } from "@/modules/helpers";
-import { getOpeningHoursUrl, getReservationUnitUrl } from "@/modules/urls";
-import { CustomTable } from "@/components/Table";
-import { isBrowser, MAX_NAME_LENGTH } from "@/modules/const";
-import { TableLink } from "@/styled";
+import { gql } from "@apollo/client";
 import {
   IconCheck,
   IconClock,
@@ -26,10 +12,24 @@ import {
   IconQuestionCircleFill,
   IconSize,
 } from "hds-react";
+import type { TFunction } from "i18next";
+import { useTranslation } from "next-i18next";
+import styled from "styled-components";
 import { ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
 import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
-import { gql } from "@apollo/client";
-import styled from "styled-components";
+import { breakpoints } from "ui/src/modules/const";
+import { Flex } from "ui/src/styled";
+import { CustomTable } from "@/components/Table";
+import type { SelectedRow } from "@/lib/reservation-units";
+import { isBrowser, MAX_NAME_LENGTH } from "@/modules/const";
+import { truncate } from "@/modules/helpers";
+import { getOpeningHoursUrl, getReservationUnitUrl } from "@/modules/urls";
+import { TableLink } from "@/styled";
+import {
+  ReservationUnitPublishingState,
+  ReservationUnitReservationState,
+  type ReservationUnitTableElementFragment,
+} from "@gql/gql-types";
 
 type Props = {
   sort: string;

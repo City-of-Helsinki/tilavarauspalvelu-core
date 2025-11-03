@@ -1,8 +1,8 @@
-import { render } from "@testing-library/react";
-import { SORTING_OPTIONS, SortingComponent } from "./SortingComponent";
-import { vi, describe, test, expect, afterEach, beforeEach } from "vitest";
-import userEvent from "@testing-library/user-event";
 import { selectOption } from "@test/test.utils";
+import { render } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { vi, describe, test, expect, afterEach, beforeEach } from "vitest";
+import { SORTING_OPTIONS, SortingComponent } from "./SortingComponent";
 
 // Reusing mocks is ridiculously difficult because of hoisted imports
 const { mockedRouterReplace, useRouter } = vi.hoisted(() => {

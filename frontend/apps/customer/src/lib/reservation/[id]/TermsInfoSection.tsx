@@ -1,11 +1,11 @@
-import { useTranslation } from "next-i18next";
 import React, { useMemo } from "react";
-import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
+import { useTranslation } from "next-i18next";
+import { Sanitize } from "ui/src/components/Sanitize";
 import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
-import { Sanitize } from "ui/src/components/Sanitize";
-import type { ReservationPageQuery } from "@gql/gql-types";
+import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import { getServerSideProps } from "@/pages/reservations/[id]";
+import type { ReservationPageQuery } from "@gql/gql-types";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

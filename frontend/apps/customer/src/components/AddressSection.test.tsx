@@ -1,9 +1,9 @@
 import { render } from "@testing-library/react";
-import { AddressFieldsFragment } from "@gql/gql-types";
-import { AddressSection, createAccessibilityUrl, createGoogleUrl, createHslUrl, createMapUrl } from "./AddressSection";
 import { describe, expect, it } from "vitest";
 import { getLocalizationLang } from "ui/src/modules/helpers";
 import { getTranslationSafe } from "ui/src/modules/util";
+import { AddressFieldsFragment } from "@gql/gql-types";
+import { AddressSection, createAccessibilityUrl, createGoogleUrl, createHslUrl, createMapUrl } from "./AddressSection";
 
 const createAddressSectionMock = (proper = true): AddressFieldsFragment => ({
   id: "1",

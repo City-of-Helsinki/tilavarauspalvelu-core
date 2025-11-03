@@ -1,5 +1,5 @@
-import { useCurrentUserQuery } from "@gql/gql-types";
 import { useEffect } from "react";
+import { useCurrentUserQuery } from "@gql/gql-types";
 
 const POLLING_INTERVAL = 60 * 1000; // 1 minute
 

@@ -1,11 +1,7 @@
 import React, { type ReactNode } from "react";
-import dynamic from "next/dynamic";
-import { ApolloError, gql } from "@apollo/client";
-import { useTranslation, type TFunction } from "next-i18next";
-import styled from "styled-components";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
+import { ApolloError, gql } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
   ButtonVariant,
@@ -16,6 +12,34 @@ import {
   SelectionGroup,
   TextInput,
 } from "hds-react";
+import { type GetServerSidePropsContext } from "next";
+import { useTranslation, type TFunction } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
+import styled from "styled-components";
+import { z } from "zod";
+import { cleanHtmlContent } from "ui/src/components/Sanitize";
+import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
+import { ControlledDateInput } from "ui/src/components/form";
+import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
+import { successToast } from "ui/src/components/toast";
+import { useDisplayError } from "ui/src/hooks";
+import { parseUIDate, fromUIDateTime, formatDate, formatTime } from "ui/src/modules/date-utils";
+import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import {
+  checkValidDate,
+  checkValidFutureDate,
+  checkTimeStringFormat,
+  checkLengthWithoutHtml,
+} from "ui/src/schemas/schemaCommon";
+import { CenterSpinner, Flex, TitleSection, H1 } from "ui/src/styled";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
+import { ControlledTimeInput } from "@/components/ControlledTimeInput";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getNotificationListUrl } from "@/modules/urls";
 import {
   BannerNotificationState,
   BannerNotificationLevel,
@@ -27,30 +51,6 @@ import {
   type BannerNotificationPageQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { parseUIDate, fromUIDateTime, formatDate, formatTime } from "ui/src/modules/date-utils";
-import { ButtonLikeLink } from "@/components/ButtonLikeLink";
-import {
-  checkValidDate,
-  checkValidFutureDate,
-  checkTimeStringFormat,
-  checkLengthWithoutHtml,
-} from "ui/src/schemas/schemaCommon";
-import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { ControlledDateInput } from "ui/src/components/form";
-import { ControlledTimeInput } from "@/components/ControlledTimeInput";
-import { successToast } from "ui/src/components/toast";
-import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
-import { CenterSpinner, Flex, TitleSection, H1 } from "ui/src/styled";
-import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
-import { useDisplayError } from "ui/src/hooks";
-import { useRouter } from "next/router";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { AuthorizationChecker } from "@/components/AuthorizationChecker";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
-import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { getNotificationListUrl } from "@/modules/urls";
-import { cleanHtmlContent } from "ui/src/components/Sanitize";
 
 const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {
   ssr: false,

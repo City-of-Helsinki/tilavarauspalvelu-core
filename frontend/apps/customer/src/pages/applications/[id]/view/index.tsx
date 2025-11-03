@@ -1,31 +1,31 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { gql } from "@apollo/client";
+import { Tabs } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { createApolloClient } from "@/modules/apolloClient";
-import { ViewApplication } from "@/components/application/view/ViewApplication";
-import { ApplicationHead } from "@/components/application/ApplicationHead";
-import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
+import styled from "styled-components";
+import { useToastIfQueryParam } from "ui/src/hooks";
+import { formatDateTime } from "ui/src/modules/date-utils";
 import { createNodeId, getLocalizationLang, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { getTranslationSafe } from "ui/src/modules/util";
+import { Flex } from "ui/src/styled";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { ApplicationHead } from "@/components/application/ApplicationHead";
+import { ApplicationTerms } from "@/components/application/ApplicationTerms";
+import { ApprovedReservations, BREAKPOINT } from "@/components/application/ApprovedReservations";
+import { ViewApplication } from "@/components/application/view/ViewApplication";
+import { createApolloClient } from "@/modules/apolloClient";
+import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
+import { applicationsPrefix } from "@/modules/urls";
 import {
   ApplicationStatusChoice,
   ApplicationViewDocument,
   type ApplicationViewQueryVariables,
   type ApplicationViewQuery,
 } from "@gql/gql-types";
-import { Tabs } from "hds-react";
-import { formatDateTime } from "ui/src/modules/date-utils";
-import { ApprovedReservations, BREAKPOINT } from "@/components/application/ApprovedReservations";
-import { gql } from "@apollo/client";
-import { Breadcrumb } from "@/components/Breadcrumb";
-import styled from "styled-components";
-import { useToastIfQueryParam } from "ui/src/hooks";
-import { useRouter } from "next/router";
-import { useSearchParams } from "next/navigation";
-import { applicationsPrefix } from "@/modules/urls";
-import { ApplicationTerms } from "@/components/application/ApplicationTerms";
-import { Flex } from "ui/src/styled";
 
 const TabPanel = styled(Tabs.TabPanel)`
   && {

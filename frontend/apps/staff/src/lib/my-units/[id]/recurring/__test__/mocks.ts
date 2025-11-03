@@ -1,4 +1,7 @@
 import { addDays, addHours, nextMonday, set } from "date-fns";
+import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
+import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
+import { createNodeId } from "ui/src/modules/helpers";
 import {
   AuthenticationType,
   ReservationStartInterval,
@@ -23,9 +26,6 @@ import {
   type ReservationsByReservationUnitQuery,
   ReservationFormType,
 } from "@gql/gql-types";
-import { createNodeId } from "ui/src/modules/helpers";
-import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
-import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
 
 export function createReservationUnits(): CreateStaffReservationFragment[] {
   return [

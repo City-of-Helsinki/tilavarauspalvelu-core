@@ -1,8 +1,8 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import TermsBox, { type TermBoxProps } from "./TermsBox";
-import { vi, describe, test, expect } from "vitest";
 import userEvent from "@testing-library/user-event";
+import { vi, describe, test, expect } from "vitest";
+import TermsBox, { type TermBoxProps } from "./TermsBox";
 
 const bodyText = `Excepteur ut veniam minim id. Veniam laboris laborum cupidatat nisi sunt est magna id voluptate. Ullamco elit do tempor et dolore. Sit dolore laborum excepteur laborum qui eiusmod. Nisi proident officia labore sunt sit labore. Non aute ut exercitation elit sint. Aute irure reprehenderit reprehenderit amet sunt velit irure voluptate.`;
 

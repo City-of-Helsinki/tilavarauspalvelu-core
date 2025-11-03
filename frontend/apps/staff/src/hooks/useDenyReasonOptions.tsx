@@ -1,8 +1,8 @@
-import { useTranslation } from "next-i18next";
-import { useReservationDenyReasonsQuery, ReservationDenyReasonOrderingChoices } from "@gql/gql-types";
-import { filterNonNullable } from "ui/src/modules/helpers";
-import { errorToast } from "ui/src/components/toast";
 import { gql } from "@apollo/client";
+import { useTranslation } from "next-i18next";
+import { errorToast } from "ui/src/components/toast";
+import { filterNonNullable } from "ui/src/modules/helpers";
+import { useReservationDenyReasonsQuery, ReservationDenyReasonOrderingChoices } from "@gql/gql-types";
 
 export function useDenyReasonOptions() {
   const { t } = useTranslation();

@@ -1,6 +1,23 @@
+import { gql } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
 import type { TFunction } from "i18next";
+import { type CalendarEvent } from "ui/src/components/calendar/Calendar";
+import { convertWeekday } from "ui/src/modules/conversion";
+import {
+  dateToMinutes,
+  formatDateRange,
+  formatDateTimeRange,
+  formatDuration,
+  formatTimeRange,
+  parseApiDate,
+  fromApiDateTime,
+  parseValidDateObject,
+  formatDateTime,
+} from "ui/src/modules/date-utils";
+import { filterNonNullable, sort, toNumber } from "ui/src/modules/helpers";
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
+import { getReserveeTypeTranslationKey } from "@/modules/helpers";
+import { getReserveeName } from "@/modules/util";
 import {
   type CreateTagStringFragment,
   ReserveeType,
@@ -14,23 +31,6 @@ import {
   ReservationUnitPricingFieldsFragment,
   EventStyleReservationFieldsFragment,
 } from "@gql/gql-types";
-import {
-  dateToMinutes,
-  formatDateRange,
-  formatDateTimeRange,
-  formatDuration,
-  formatTimeRange,
-  parseApiDate,
-  fromApiDateTime,
-  parseValidDateObject,
-  formatDateTime,
-} from "ui/src/modules/date-utils";
-import { getReserveeName } from "@/modules/util";
-import { getReserveeTypeTranslationKey } from "@/modules/helpers";
-import { filterNonNullable, sort, toNumber } from "ui/src/modules/helpers";
-import { gql } from "@apollo/client";
-import { convertWeekday } from "ui/src/modules/conversion";
-import { type CalendarEvent } from "ui/src/components/calendar/Calendar";
 
 export type EventType = EventStyleReservationFieldsFragment;
 export type CalendarEventType = CalendarEvent<EventType>;

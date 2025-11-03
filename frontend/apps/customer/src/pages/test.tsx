@@ -1,8 +1,8 @@
-import CustomErrorComponent from "@/pages/_error";
 import type { GetServerSidePropsContext } from "next";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import CustomErrorComponent from "@/pages/_error";
 
 function Page() {
   const params = useSearchParams();

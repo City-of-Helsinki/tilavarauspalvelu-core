@@ -1,4 +1,8 @@
+import { addHours, addMonths } from "date-fns";
 import type { TFunction } from "i18next";
+import { describe, expect, test } from "vitest";
+import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
+import { createNodeId } from "ui/src/modules/helpers";
 import {
   type CreateTagStringFragment,
   PaymentType,
@@ -8,10 +12,6 @@ import {
   Weekday,
 } from "@gql/gql-types";
 import { createTagString, getReservationUnitPricing } from "./reservation";
-import { addHours, addMonths } from "date-fns";
-import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
-import { describe, expect, test } from "vitest";
-import { createNodeId } from "ui/src/modules/helpers";
 
 const mockT = ((x: string) => x) as TFunction;
 

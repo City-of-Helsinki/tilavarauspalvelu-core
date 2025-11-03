@@ -1,10 +1,10 @@
 import React from "react";
-import { TermsInfoSection } from "./TermsInfoSection";
+import { createMockReservation, createTermsOfUseMock, generateTextFragment } from "@test/reservation.mocks";
+import { generateNameFragment } from "@test/test.gql.utils";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { createMockReservation, createTermsOfUseMock, generateTextFragment } from "@test/reservation.mocks";
 import type { ReservationPageQuery } from "@gql/gql-types";
-import { generateNameFragment } from "@test/test.gql.utils";
+import { TermsInfoSection } from "./TermsInfoSection";
 
 type NodeT = NonNullable<ReservationPageQuery["reservation"]>;
 

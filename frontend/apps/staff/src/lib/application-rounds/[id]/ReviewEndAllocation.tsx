@@ -1,10 +1,14 @@
 import React, { useState } from "react";
+import { gql } from "@apollo/client";
+import { type ApolloQueryResult } from "@apollo/client";
 import { Button, ButtonVariant, LoadingSpinner, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { gql } from "@apollo/client";
-import { filterNonNullable } from "ui/src/modules/helpers";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
+import { useDisplayError } from "ui/src/hooks";
+import { filterNonNullable } from "ui/src/modules/helpers";
+import { useCheckPermission } from "@/hooks";
+import { isApplicationRoundInProgress } from "@/modules/helpers";
 import {
   ApplicationRoundStatusChoice,
   type ApplicationRoundAdminFragment,
@@ -14,10 +18,6 @@ import {
   UserPermissionChoice,
   useSendResultsMutation,
 } from "@gql/gql-types";
-import { type ApolloQueryResult } from "@apollo/client";
-import { useCheckPermission } from "@/hooks";
-import { isApplicationRoundInProgress } from "@/modules/helpers";
-import { useDisplayError } from "ui/src/hooks";
 
 const StyledNotification = styled(Notification)`
   margin-right: auto;

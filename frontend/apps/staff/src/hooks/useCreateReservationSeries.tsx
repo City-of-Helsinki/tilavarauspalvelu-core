@@ -1,3 +1,7 @@
+import { gql } from "@apollo/client";
+import { parseUIDateUnsafe, formatApiDateUnsafe } from "ui/src/modules/date-utils";
+import { useSession } from "@/hooks";
+import { type ReservationSeriesFormValues } from "@/schemas";
 import {
   ReservationStateChoice,
   ReservationTypeChoice,
@@ -6,10 +10,6 @@ import {
   useCreateReservationSeriesMutation,
   type ReservationSeriesReservationCreateSerializerInput,
 } from "@gql/gql-types";
-import { type ReservationSeriesFormValues } from "@/schemas";
-import { parseUIDateUnsafe, formatApiDateUnsafe } from "ui/src/modules/date-utils";
-import { gql } from "@apollo/client";
-import { useSession } from "@/hooks";
 
 // Not all choices are valid for reservation series (the ui should not allow these)
 function transformReservationTypeStaffChoice(t: ReservationTypeChoice): ReservationTypeStaffChoice {

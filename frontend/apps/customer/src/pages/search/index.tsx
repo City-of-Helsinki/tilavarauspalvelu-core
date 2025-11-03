@@ -1,23 +1,23 @@
 import React, { useEffect, useRef } from "react";
-import { useTranslation } from "next-i18next";
-import type { GetServerSidePropsContext } from "next";
-import { Notification, NotificationSize } from "hds-react";
 import { useMedia } from "react-use";
+import { gql } from "@apollo/client";
+import { Notification, NotificationSize } from "hds-react";
+import type { GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { Flex, H1 } from "ui/src/styled";
+import { useSearchParams } from "next/navigation";
 import { breakpoints } from "ui/src/modules/const";
-import { ReservationKind } from "@gql/gql-types";
 import { filterNonNullable } from "ui/src/modules/helpers";
+import { Flex, H1 } from "ui/src/styled";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { ListWithPagination } from "@/components/ListWithPagination";
+import { SortingComponent } from "@/components/SortingComponent";
+import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { SingleSearchCard, SingleSearchForm } from "@/lib/search";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getSearchOptions, processVariables } from "@/modules/search";
-import { useSearchQuery } from "@/hooks/useSearchQuery";
-import { SortingComponent } from "@/components/SortingComponent";
-import { useSearchParams } from "next/navigation";
-import { Breadcrumb } from "@/components/Breadcrumb";
-import { gql } from "@apollo/client";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { ReservationKind } from "@gql/gql-types";
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;

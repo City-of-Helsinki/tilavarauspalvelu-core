@@ -1,13 +1,16 @@
-import { useTranslation } from "next-i18next";
-import { signIn, signOut } from "ui/src/modules/browserHelpers";
-import { useSession, useHandling } from "@/hooks";
-import { Header, IconLinkExternal, IconSignout, IconStar, IconUser, LogoSize, TitleStyleType } from "hds-react";
 import React from "react";
-import styled from "styled-components";
 import { useLocation } from "react-use";
+import { Header, IconLinkExternal, IconSignout, IconStar, IconUser, LogoSize, TitleStyleType } from "hds-react";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+import styled from "styled-components";
 import Logo from "ui/src/components/Logo";
-import { hasSomePermission } from "@/modules/permissionHelper";
+import { signIn, signOut } from "ui/src/modules/browserHelpers";
+import { getLocalizationLang } from "ui/src/modules/helpers";
 import { env } from "@/env.mjs";
+import { useSession, useHandling } from "@/hooks";
+import { PUBLIC_URL } from "@/modules/const";
+import { hasSomePermission } from "@/modules/permissionHelper";
 import {
   APPLICATION_ROUNDS_URL_PREFIX,
   BANNER_NOTIFICATIONS_URL_PREFIX,
@@ -19,9 +22,6 @@ import {
   getAccessibilityTermsUrl,
 } from "@/modules/urls";
 import { UserPermissionChoice } from "@gql/gql-types";
-import { getLocalizationLang } from "ui/src/modules/helpers";
-import { useRouter } from "next/router";
-import { PUBLIC_URL } from "@/modules/const";
 
 type Props = {
   apiBaseUrl: string;

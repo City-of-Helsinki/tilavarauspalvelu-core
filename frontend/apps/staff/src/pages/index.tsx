@@ -1,12 +1,12 @@
 import React from "react";
 import { type GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
-import { useTranslation } from "next-i18next";
 import { H2 } from "ui/src/styled";
-import { HERO_IMAGE_URL } from "@/modules/const";
 import { KorosHeading, Heading } from "@/components/KorosHeading";
 import { useSession } from "@/hooks";
+import { HERO_IMAGE_URL } from "@/modules/const";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 const Ingress = styled(H2)`

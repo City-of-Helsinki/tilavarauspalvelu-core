@@ -1,22 +1,22 @@
 import React, { useState } from "react";
-import { type EditPageReservationFragment, useAdjustReservationTimeMutation } from "@gql/gql-types";
-import { Button, ButtonVariant, IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
-import { breakpoints } from "@ui/modules/const";
-import { useTranslation } from "next-i18next";
-import styled from "styled-components";
-import { errorToast } from "@ui/components/toast";
-import { ButtonLikeLink } from "@ui/components/ButtonLikeLink";
-import { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import { ReservationInfoCard, SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
 import { type UseFormReturn } from "react-hook-form";
-import { convertReservationFormToApi } from "@/modules/reservation";
-import { AcceptTerms } from "@/components/AcceptTerms";
-import { getReservationPath } from "@/modules/urls";
-import { useDisplayError } from "@ui/hooks";
-import { useRouter } from "next/router";
-import ErrorComponent from "next/error";
 import { gql } from "@apollo/client";
+import { Button, ButtonVariant, IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
+import { useTranslation } from "next-i18next";
+import ErrorComponent from "next/error";
+import { useRouter } from "next/router";
+import styled from "styled-components";
+import { ButtonLikeLink } from "@ui/components/ButtonLikeLink";
+import { errorToast } from "@ui/components/toast";
+import { useDisplayError } from "@ui/hooks";
+import { breakpoints } from "@ui/modules/const";
 import { type OptionsRecord } from "@ui/types";
+import { AcceptTerms } from "@/components/AcceptTerms";
+import { ReservationInfoCard, SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
+import { convertReservationFormToApi } from "@/modules/reservation";
+import { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import { getReservationPath } from "@/modules/urls";
+import { type EditPageReservationFragment, useAdjustReservationTimeMutation } from "@gql/gql-types";
 
 type Props = {
   reservation: EditPageReservationFragment;

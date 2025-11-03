@@ -2,18 +2,7 @@
  *  If it can be made, or if it can be changed
  *  Used by both new reservations and editing existing ones.
  */
-import {
-  ReservationStartInterval,
-  type ReservationNode,
-  type IsReservableFieldsFragment,
-  type ReservableTimeSpanType,
-  ReservationStateChoice,
-  type Maybe,
-  BlockingReservationFieldsFragment,
-  type ReservationUnitNode,
-} from "@gql/gql-types";
-import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
-import { dayMax, dayMin } from "ui/src/modules/helpers";
+import { gql } from "@apollo/client";
 import {
   differenceInSeconds,
   isValid,
@@ -32,7 +21,18 @@ import {
 } from "date-fns";
 import { type SlotProps } from "ui/src/components/calendar/Calendar";
 import { getIntervalMinutes } from "ui/src/modules/conversion";
-import { gql } from "@apollo/client";
+import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
+import { dayMax, dayMin } from "ui/src/modules/helpers";
+import {
+  ReservationStartInterval,
+  type ReservationNode,
+  type IsReservableFieldsFragment,
+  type ReservableTimeSpanType,
+  ReservationStateChoice,
+  type Maybe,
+  BlockingReservationFieldsFragment,
+  type ReservationUnitNode,
+} from "@gql/gql-types";
 
 export type RoundPeriod = {
   reservationPeriodBeginDate: string;

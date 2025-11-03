@@ -1,20 +1,20 @@
 import React from "react";
 import { type ApolloError, gql } from "@apollo/client";
+import { useTranslation } from "next-i18next";
+import { errorToast } from "ui/src/components/toast";
+import { getPermissionErrors } from "ui/src/modules/apolloUtils";
+import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
+import { CenterSpinner } from "ui/src/styled";
+import { More } from "@/components/More";
+import { useGetFilterSearchParams } from "@/hooks";
+import { useSort } from "@/hooks/useSort";
+import { LIST_PAGE_SIZE } from "@/modules/const";
 import {
   AllocatedTimeSlotOrderingChoices,
   ApplicationSectionStatusChoice,
   useAllocatedTimeSlotsQuery,
 } from "@gql/gql-types";
-import { useTranslation } from "next-i18next";
-import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
-import { LIST_PAGE_SIZE } from "@/modules/const";
-import { errorToast } from "ui/src/components/toast";
-import { More } from "@/components/More";
-import { useSort } from "@/hooks/useSort";
-import { useGetFilterSearchParams } from "@/hooks";
 import { AllocatedSectionsTable, SORT_KEYS } from "./AllocatedSectionsTable";
-import { getPermissionErrors } from "ui/src/modules/apolloUtils";
-import { CenterSpinner } from "ui/src/styled";
 
 type Props = {
   applicationRoundPk: number;

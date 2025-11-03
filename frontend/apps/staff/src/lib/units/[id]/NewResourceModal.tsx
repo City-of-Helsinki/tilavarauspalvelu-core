@@ -1,21 +1,21 @@
 import React from "react";
+import { useForm } from "react-hook-form";
+import { gql } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonVariant, Dialog } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { useDisplayError } from "ui/src/hooks";
+import { FormErrorSummary } from "@/components/FormErrorSummary";
+import { DialogActionsButtons } from "@/styled";
 import {
   ResourceLocationType,
   type ResourceCreateMutationInput,
   type NewResourceUnitFieldsFragment,
   useCreateResourceMutation,
 } from "@gql/gql-types";
-import { Editor, ResourceUpdateForm, ResourceUpdateSchema } from "./modules/resourceEditor";
-import { FormErrorSummary } from "@/components/FormErrorSummary";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { ResourceEditorFields } from "./ResourceEditForm";
-import { DialogActionsButtons } from "@/styled";
 import { UnitInfo } from "./UnitInfo";
-import { gql } from "@apollo/client";
-import { useDisplayError } from "ui/src/hooks";
+import { Editor, ResourceUpdateForm, ResourceUpdateSchema } from "./modules/resourceEditor";
 
 interface ModalProps {
   unit: NewResourceUnitFieldsFragment;

@@ -1,5 +1,19 @@
 import React, { useMemo } from "react";
+import { gql } from "@apollo/client";
+import { Accordion } from "hds-react";
 import { Trans, useTranslation } from "next-i18next";
+import styled from "styled-components";
+import { Sanitize } from "@ui/components/Sanitize";
+import { useGenericTerms } from "@ui/hooks";
+import { formatters as getFormatters } from "@ui/index";
+import { breakpoints } from "@ui/modules/const";
+import { formatDate, formatTimeRange, timeToMinutes } from "@ui/modules/date-utils";
+import { filterNonNullable, formatListToCSV, isPriceFree, toNumber } from "@ui/modules/helpers";
+import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
+import { AddressSection } from "@/components/AddressSection";
+import { Map as MapComponent } from "@/components/Map";
+import { getFuturePricing, getPriceString, getReservationUnitName } from "@/modules/reservationUnit";
+import { JustForMobile } from "@/modules/style/layout";
 import {
   type ApplicationRoundTimeSlotFieldsFragment,
   type NoticeWhenReservingFragment,
@@ -7,21 +21,7 @@ import {
   TimeSlotType,
   type PricingFieldsFragment,
 } from "@gql/gql-types";
-import { Map as MapComponent } from "@/components/Map";
-import { getFuturePricing, getPriceString, getReservationUnitName } from "@/modules/reservationUnit";
-import { JustForMobile } from "@/modules/style/layout";
-import { Accordion } from "hds-react";
-import { gql } from "@apollo/client";
-import { filterNonNullable, formatListToCSV, isPriceFree, toNumber } from "@ui/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
-import { formatDate, formatTimeRange, timeToMinutes } from "@ui/modules/date-utils";
 import { ReservationInfoSection } from "./ReservationInfoSection";
-import { Sanitize } from "@ui/components/Sanitize";
-import styled from "styled-components";
-import { formatters as getFormatters } from "@ui/index";
-import { breakpoints } from "@ui/modules/const";
-import { AddressSection } from "@/components/AddressSection";
-import { useGenericTerms } from "@ui/hooks";
 
 /// Below the fold content
 /// TODO use a client side fetch instead of passing data from SSR (requires more refactors)

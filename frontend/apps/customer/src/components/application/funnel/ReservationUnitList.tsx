@@ -1,4 +1,6 @@
 import React, { useRef } from "react";
+import { Control, FieldValues, Path, useController, UseControllerProps } from "react-hook-form";
+import { gql } from "@apollo/client";
 import {
   Button,
   ButtonPresetTheme,
@@ -10,18 +12,16 @@ import {
   Notification,
   NotificationSize,
 } from "hds-react";
-import { Control, FieldValues, Path, useController, UseControllerProps } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { gql } from "@apollo/client";
-import type { ApplicationReservationUnitListFragment, OrderedReservationUnitCardFragment } from "@gql/gql-types";
-import { filterNonNullable } from "ui/src/modules/helpers";
-import { Flex } from "ui/src/styled";
-import { ErrorText } from "ui/src/components/ErrorText";
-import { OrderedReservationUnitCard, ReservationUnitModalContent } from ".";
 import { useSearchParams } from "next/navigation";
-import { useSearchModify } from "@/hooks/useSearchValues";
+import { ErrorText } from "ui/src/components/ErrorText";
+import { filterNonNullable } from "ui/src/modules/helpers";
 import { type OptionsListT } from "ui/src/modules/search";
+import { Flex } from "ui/src/styled";
+import { useSearchModify } from "@/hooks/useSearchValues";
 import { FixedDialog } from "@/styled/FixedDialog";
+import type { ApplicationReservationUnitListFragment, OrderedReservationUnitCardFragment } from "@gql/gql-types";
+import { OrderedReservationUnitCard, ReservationUnitModalContent } from ".";
 
 type ReservationUnitType = Pick<OrderedReservationUnitCardFragment, "pk">;
 

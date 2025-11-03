@@ -1,16 +1,16 @@
 import React from "react";
-import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import { Button, ButtonVariant, IconCross, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { AutoGrid, ButtonContainer, Flex, fontMedium } from "ui/src/styled";
-import { breakpoints } from "ui/src/modules/const";
-import { ControlledSelect } from "ui/src/components/form";
-import { ReservationCancelReasonChoice } from "@gql/gql-types";
+import styled from "styled-components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
-import TermsBox from "ui/src/components/TermsBox";
-import { AccordionWithState } from "./Accordion";
 import { Sanitize } from "ui/src/components/Sanitize";
+import TermsBox from "ui/src/components/TermsBox";
+import { ControlledSelect } from "ui/src/components/form";
+import { breakpoints } from "ui/src/modules/const";
+import { AutoGrid, ButtonContainer, Flex, fontMedium } from "ui/src/styled";
+import { ReservationCancelReasonChoice } from "@gql/gql-types";
+import { AccordionWithState } from "./Accordion";
 
 const Actions = styled(ButtonContainer).attrs({
   $justifyContent: "space-between",

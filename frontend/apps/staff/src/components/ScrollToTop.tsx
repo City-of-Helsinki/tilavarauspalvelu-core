@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
 import { IconAngleUp } from "hds-react";
-import { focusStyles } from "ui/src/styled";
 import { useTranslation } from "next-i18next";
+import styled from "styled-components";
+import { focusStyles } from "ui/src/styled";
 
 const Btn = styled.button`
   --min-size: 34px;

@@ -1,4 +1,6 @@
 import { trim } from "lodash-es";
+import type { TFunction } from "next-i18next";
+import { truncate } from "ui/src/modules/helpers";
 import {
   type Maybe,
   type ReservationNode,
@@ -6,8 +8,6 @@ import {
   type LocationFieldsFragment,
   type ReservationCommonFieldsFragment,
 } from "@gql/gql-types";
-import type { TFunction } from "next-i18next";
-import { truncate } from "ui/src/modules/helpers";
 
 export const formatNumber = (input?: number | null, suffix?: string): string => {
   if (input == null) return "";

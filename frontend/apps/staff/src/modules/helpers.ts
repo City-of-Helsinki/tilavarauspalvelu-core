@@ -1,4 +1,7 @@
 import { gql } from "@apollo/client";
+import { addSeconds } from "date-fns";
+import { type TFunction } from "next-i18next";
+import { filterNonNullable } from "ui/src/modules/helpers";
 import {
   type ApplicantNameFieldsFragment,
   type ApplicationRoundNode,
@@ -11,9 +14,7 @@ import {
   ReservationTypeChoice,
   ReserveeType,
 } from "@gql/gql-types";
-import { filterNonNullable } from "ui/src/modules/helpers";
-import { addSeconds } from "date-fns";
-import { type TFunction } from "next-i18next";
+
 export { truncate } from "ui/src/modules/helpers";
 
 export type CollisionInterval = {

@@ -1,15 +1,59 @@
 import React, { useEffect, useMemo, useState } from "react";
-import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
+import { useForm, type UseFormReturn } from "react-hook-form";
+import { gql } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { addYears } from "date-fns";
+import { ButtonVariant, LoadingSpinner } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
 import styled from "styled-components";
-import { addYears } from "date-fns";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "ui/src/modules/date-utils";
-import { Flex, H4 } from "ui/src/styled";
+import { Sanitize } from "ui/src/components/Sanitize";
+import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
+import { errorToast } from "ui/src/components/toast";
+import { useDisplayError, useToastIfQueryParam } from "ui/src/hooks";
+import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
+import { type ApiError, getApiErrors } from "ui/src/modules/apolloUtils";
 import { breakpoints } from "ui/src/modules/const";
+import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "ui/src/modules/date-utils";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { Flex, H4 } from "ui/src/styled";
+import { AddressSection } from "@/components/AddressSection";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import InfoDialog from "@/components/InfoDialog";
+import { LoginFragment } from "@/components/LoginFragment";
+import { QuickReservation } from "@/components/QuickReservation";
+import { useAvailableTimes, useBlockingReservations, useRemoveStoredReservation, useReservableTimes } from "@/hooks";
+import {
+  EquipmentList,
+  Head,
+  RelatedUnits,
+  ReservationUnitCalendarSection,
+  ReservationUnitMoreDetails,
+  SubventionSuffix,
+} from "@/lib/reservation-unit/[id]/";
+import { createApolloClient } from "@/modules/apolloClient";
+import { clampDuration, getMaxReservationDuration, getMinReservationDuration } from "@/modules/reservable";
+import {
+  convertFormToFocustimeSlot,
+  createDateTime,
+  type FocusTimeSlot,
+  getDurationOptions,
+} from "@/modules/reservation";
+import {
+  getReservationUnitName,
+  isReservationUnitPublished,
+  isReservationUnitReservable,
+} from "@/modules/reservationUnit";
+import { PendingReservationFormSchema, type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { JustForDesktop } from "@/modules/style/layout";
+import { getReservationInProgressPath, getSingleSearchPath } from "@/modules/urls";
+import { getPostLoginUrl } from "@/modules/util";
+import { ReservationUnitPageWrapper } from "@/styled/reservation";
+import { SubmitButton } from "@/styled/util";
 import {
   CreateReservationDocument,
   type CreateReservationMutation,
@@ -20,50 +64,6 @@ import {
   type ReservationUnitPageQueryVariables,
   useCreateReservationMutation,
 } from "@gql/gql-types";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { Sanitize } from "ui/src/components/Sanitize";
-import { createApolloClient } from "@/modules/apolloClient";
-import { getPostLoginUrl } from "@/modules/util";
-import {
-  getReservationUnitName,
-  isReservationUnitPublished,
-  isReservationUnitReservable,
-} from "@/modules/reservationUnit";
-import { JustForDesktop } from "@/modules/style/layout";
-import {
-  convertFormToFocustimeSlot,
-  createDateTime,
-  type FocusTimeSlot,
-  getDurationOptions,
-} from "@/modules/reservation";
-import { clampDuration, getMaxReservationDuration, getMinReservationDuration } from "@/modules/reservable";
-import {
-  EquipmentList,
-  Head,
-  RelatedUnits,
-  ReservationUnitCalendarSection,
-  ReservationUnitMoreDetails,
-  SubventionSuffix,
-} from "@/lib/reservation-unit/[id]/";
-import InfoDialog from "@/components/InfoDialog";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { useForm, type UseFormReturn } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { PendingReservationFormSchema, type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import { LoginFragment } from "@/components/LoginFragment";
-import { SubmitButton } from "@/styled/util";
-import { ReservationUnitPageWrapper } from "@/styled/reservation";
-import { getReservationInProgressPath, getSingleSearchPath } from "@/modules/urls";
-import { ButtonVariant, LoadingSpinner } from "hds-react";
-import { Breadcrumb } from "@/components/Breadcrumb";
-import { useDisplayError, useToastIfQueryParam } from "ui/src/hooks";
-import { useAvailableTimes, useBlockingReservations, useRemoveStoredReservation, useReservableTimes } from "@/hooks";
-import { gql } from "@apollo/client";
-import { type ApiError, getApiErrors } from "ui/src/modules/apolloUtils";
-import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
-import { errorToast } from "ui/src/components/toast";
-import { QuickReservation } from "@/components/QuickReservation";
-import { AddressSection } from "@/components/AddressSection";
 
 function SubmitFragment({
   apiBaseUrl,

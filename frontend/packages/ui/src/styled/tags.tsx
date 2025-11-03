@@ -1,5 +1,5 @@
-import styled from "styled-components";
 import { Tag } from "hds-react";
+import styled from "styled-components";
 import { Flex } from "./index";
 
 export const SearchTagContainer = styled(Flex).attrs({

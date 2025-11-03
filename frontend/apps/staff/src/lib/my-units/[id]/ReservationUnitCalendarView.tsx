@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { addDays, formatISO, startOfDay, subDays } from "date-fns";
+import { useSearchParams } from "next/navigation";
+import styled from "styled-components";
+import { toNumber } from "ui/src/modules/helpers";
 import { AutoGrid, Flex } from "ui/src/styled";
+import { SelectFilter } from "@/components/QueryParamFilters";
 import { ReservationUnitCalendar } from "./ReservationUnitCalendar";
 import WeekNavigation from "./WeekNavigation";
-import { toNumber } from "ui/src/modules/helpers";
-import { SelectFilter } from "@/components/QueryParamFilters";
-import styled from "styled-components";
-import { useSearchParams } from "next/navigation";
 
 const SelectFilterStyled = styled(SelectFilter)`
   z-index: var(--tilavaraus-admin-stack-select-over-calendar);

@@ -1,10 +1,10 @@
 import React, { useMemo } from "react";
+import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
 import { Option, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { convertOptionToHDS, toNumber } from "ui/src/modules/helpers";
 import { useSearchParams } from "next/navigation";
+import { convertOptionToHDS, toNumber } from "ui/src/modules/helpers";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
 
 type SelectFilterProps = {
   name: string;

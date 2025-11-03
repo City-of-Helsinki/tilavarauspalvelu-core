@@ -1,11 +1,11 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
-import { Button, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hds-react";
-import { StyledTag } from "./modules/newSpaceModal";
-import { SpaceForm, type SpaceUpdateForm } from "../SpaceForm";
-import { FormErrorSummary } from "@/components/FormErrorSummary";
 import { UseFormReturn } from "react-hook-form";
+import { Button, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hds-react";
+import { useTranslation } from "next-i18next";
+import { FormErrorSummary } from "@/components/FormErrorSummary";
 import { DialogActionsButtons } from "@/styled";
+import { SpaceForm, type SpaceUpdateForm } from "../SpaceForm";
+import { StyledTag } from "./modules/newSpaceModal";
 
 type Props = {
   hasFixedParent: boolean;

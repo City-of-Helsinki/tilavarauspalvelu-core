@@ -1,5 +1,4 @@
-import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
-import { trim, uniq } from "lodash-es";
+import { gql } from "@apollo/client";
 import {
   addDays,
   addMinutes,
@@ -13,7 +12,29 @@ import {
   startOfDay,
   sub,
 } from "date-fns";
+import { type TFunction } from "i18next";
+import { trim, uniq } from "lodash-es";
+import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
+import { getIntervalMinutes } from "@ui/modules/conversion";
+import { timeToMinutes, formatApiDate } from "@ui/modules/date-utils";
+import {
+  capitalize,
+  dayMax,
+  dayMin,
+  filterNonNullable,
+  formatTimeStruct,
+  isPriceFree,
+  type ReadonlyDeep,
+} from "@ui/modules/helpers";
+import { type LocalizationLanguages } from "@ui/modules/urlBuilder";
 import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
+import {
+  dateToKey,
+  isRangeReservable,
+  isSlotWithinReservationTime,
+  type ReservableMap,
+  type RoundPeriod,
+} from "@/modules/reservable";
 import {
   type AvailableTimesReservationUnitFieldsFragment,
   type BlockingReservationFieldsFragment,
@@ -33,27 +54,6 @@ import {
   ReservationUnitReservationState,
   type UnitNode,
 } from "@gql/gql-types";
-import {
-  dateToKey,
-  isRangeReservable,
-  isSlotWithinReservationTime,
-  type ReservableMap,
-  type RoundPeriod,
-} from "@/modules/reservable";
-import { gql } from "@apollo/client";
-import { getIntervalMinutes } from "@ui/modules/conversion";
-import {
-  capitalize,
-  dayMax,
-  dayMin,
-  filterNonNullable,
-  formatTimeStruct,
-  isPriceFree,
-  type ReadonlyDeep,
-} from "@ui/modules/helpers";
-import { timeToMinutes, formatApiDate } from "@ui/modules/date-utils";
-import { type LocalizationLanguages } from "@ui/modules/urlBuilder";
-import { type TFunction } from "i18next";
 
 export function isReservationUnitPublished(reservationUnit: Pick<ReservationUnitNode, "publishingState">): boolean {
   const { publishingState } = reservationUnit;

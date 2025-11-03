@@ -1,28 +1,15 @@
 import React, { useEffect } from "react";
-import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
-import type { GetServerSidePropsContext } from "next";
-import { useRouter } from "next/router";
-import {
-  ApplicationPage3Document,
-  type ApplicationPage3Query,
-  type ApplicationPage3QueryVariables,
-  ReserveeType,
-  useUpdateApplicationMutation,
-} from "@gql/gql-types";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { gql } from "@apollo/client";
-import { AutoGrid, ButtonContainer, Flex } from "ui/src/styled";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from "hds-react";
+import type { GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
 import { useDisplayError } from "ui/src/hooks";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import {
-  type ApplicationPage3FormValues,
-  ApplicationPage3Schema,
-  convertApplicationPage3,
-  transformPage3Application,
-} from "@/components/application/funnel/form";
+import { AutoGrid, ButtonContainer, Flex } from "ui/src/styled";
 import {
   ApplicantTypeSelector,
   ApplicationFunnelWrapper,
@@ -30,10 +17,23 @@ import {
   IndividualForm,
   OrganisationForm,
 } from "@/components/application/funnel/";
-import { FormSubHeading } from "@/styled/application";
+import {
+  type ApplicationPage3FormValues,
+  ApplicationPage3Schema,
+  convertApplicationPage3,
+  transformPage3Application,
+} from "@/components/application/funnel/form";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
+import { FormSubHeading } from "@/styled/application";
+import {
+  ApplicationPage3Document,
+  type ApplicationPage3Query,
+  type ApplicationPage3QueryVariables,
+  ReserveeType,
+  useUpdateApplicationMutation,
+} from "@gql/gql-types";
 
 function Page3Form(): JSX.Element | null {
   const { watch, unregister, register, setValue } = useFormContext<ApplicationPage3FormValues>();

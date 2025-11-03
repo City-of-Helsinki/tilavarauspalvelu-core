@@ -1,6 +1,6 @@
 import React from "react";
-import styled from "styled-components";
 import { Tooltip } from "hds-react";
+import styled from "styled-components";
 import { fontMedium } from "ui/src/styled";
 
 const FieldGroupWrapper = styled.div`

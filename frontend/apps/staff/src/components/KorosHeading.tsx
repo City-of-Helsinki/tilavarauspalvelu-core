@@ -1,6 +1,6 @@
 import React, { type CSSProperties, type ReactNode } from "react";
-import styled, { css } from "styled-components";
 import { Koros } from "hds-react";
+import styled, { css } from "styled-components";
 import { Flex, H1 } from "ui/src/styled";
 
 interface IProps {

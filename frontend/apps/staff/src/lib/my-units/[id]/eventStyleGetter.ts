@@ -1,10 +1,5 @@
 import { type CalendarEvent } from "ui/src/components/calendar/Calendar";
 import {
-  ReservationStateChoice,
-  ReservationTypeChoice,
-  type ReservationUnitReservationsFragment,
-} from "@gql/gql-types";
-import {
   BLOCKED,
   COMMON_LEGEND,
   CONFIRMED,
@@ -17,6 +12,11 @@ import {
   UNCONFIRMED,
   WAITING_PAYMENT,
 } from "@/modules/calendarStyling";
+import {
+  ReservationStateChoice,
+  ReservationTypeChoice,
+  type ReservationUnitReservationsFragment,
+} from "@gql/gql-types";
 
 type EventKey =
   | "CONFIRMED"

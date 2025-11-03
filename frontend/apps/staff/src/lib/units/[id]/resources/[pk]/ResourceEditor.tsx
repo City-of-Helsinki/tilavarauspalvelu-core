@@ -1,23 +1,7 @@
 import React, { useEffect } from "react";
-import { Button, ButtonVariant } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type ResourceUpdateMutationInput,
-  ResourceLocationType,
-  useUpdateResourceMutation,
-  useResourceQuery,
-} from "@gql/gql-types";
-import { createNodeId } from "ui/src/modules/helpers";
-import { ButtonContainer, CenterSpinner } from "ui/src/styled";
-import { errorToast, successToast } from "ui/src/components/toast";
-import { FormErrorSummary } from "@/components/FormErrorSummary";
-import { LinkPrev } from "@/components/LinkPrev";
 import { gql } from "@apollo/client";
-import { Error404 } from "@/components/Error404";
-import { useDisplayError } from "ui/src/hooks";
-import { useRouter } from "next/router";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   SubPageHead,
   ResourceEditorFields,
@@ -25,7 +9,23 @@ import {
   ResourceUpdateSchema,
   type ResourceUpdateForm,
 } from "@lib/units/[id]";
+import { Button, ButtonVariant } from "hds-react";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+import { errorToast, successToast } from "ui/src/components/toast";
+import { useDisplayError } from "ui/src/hooks";
+import { createNodeId } from "ui/src/modules/helpers";
+import { ButtonContainer, CenterSpinner } from "ui/src/styled";
+import { Error404 } from "@/components/Error404";
+import { FormErrorSummary } from "@/components/FormErrorSummary";
+import { LinkPrev } from "@/components/LinkPrev";
 import { getUnitUrl } from "@/modules/urls";
+import {
+  type ResourceUpdateMutationInput,
+  ResourceLocationType,
+  useUpdateResourceMutation,
+  useResourceQuery,
+} from "@gql/gql-types";
 
 type Props = {
   resourcePk?: number;

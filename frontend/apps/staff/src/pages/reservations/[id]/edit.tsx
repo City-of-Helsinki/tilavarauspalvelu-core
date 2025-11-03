@@ -1,7 +1,27 @@
 import React from "react";
-import styled from "styled-components";
-import { useTranslation } from "next-i18next";
+import { ErrorBoundary } from "react-error-boundary";
+import { FormProvider, useForm } from "react-hook-form";
+import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ReservationTitleSection } from "@lib/reservations/[id]";
+import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
+import { GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
+import styled from "styled-components";
+import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { ReservationChangeFormSchema, type ReservationChangeFormType } from "ui/src/schemas";
+import { ButtonContainer, CenterSpinner, Flex, HR } from "ui/src/styled";
+import { Error403 } from "@/components/Error403";
+import { LinkPrev } from "@/components/LinkPrev";
+import { ReservationTypeForm } from "@/components/ReservationTypeForm";
+import { useReservationEditData, useSession, useStaffReservationMutation } from "@/hooks";
+import { createClient } from "@/modules/apolloClient";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { hasPermission } from "@/modules/permissionHelper";
+import { createTagString } from "@/modules/reservation";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   type Maybe,
   type ReservationEditPageQuery,
@@ -11,26 +31,6 @@ import {
   UserPermissionChoice,
   ReserveeType,
 } from "@gql/gql-types";
-import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
-import { FormProvider, useForm } from "react-hook-form";
-import { ErrorBoundary } from "react-error-boundary";
-import { ReservationChangeFormSchema, type ReservationChangeFormType } from "ui/src/schemas";
-import { ReservationTypeForm } from "@/components/ReservationTypeForm";
-import { useReservationEditData, useSession, useStaffReservationMutation } from "@/hooks";
-import { ButtonContainer, CenterSpinner, Flex, HR } from "ui/src/styled";
-import { createTagString } from "@/modules/reservation";
-import { ReservationTitleSection } from "@lib/reservations/[id]";
-import { LinkPrev } from "@/components/LinkPrev";
-import { gql } from "@apollo/client";
-import { useRouter } from "next/router";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { GetServerSidePropsContext } from "next";
-import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { Error403 } from "@/components/Error403";
-import { createClient } from "@/modules/apolloClient";
-import { hasPermission } from "@/modules/permissionHelper";
 
 type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
 const InnerTextInput = styled(TextInput)`

@@ -1,9 +1,9 @@
-import { camelCase } from "lodash-es";
 import React, { useMemo } from "react";
-import { useTranslation } from "next-i18next";
-import { OrderStatus } from "@gql/gql-types";
 import { IconEuroSign } from "hds-react";
+import { camelCase } from "lodash-es";
+import { useTranslation } from "next-i18next";
 import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
+import { OrderStatus } from "@gql/gql-types";
 
 export type Props = {
   orderStatus: OrderStatus;

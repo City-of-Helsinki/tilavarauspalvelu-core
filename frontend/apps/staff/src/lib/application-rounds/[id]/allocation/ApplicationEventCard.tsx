@@ -1,31 +1,31 @@
 import React, { useState } from "react";
+import { type ApolloQueryResult, gql } from "@apollo/client";
 import { IconAngleDown, IconAngleUp, IconLinkExternal, IconSize, RadioButton } from "hds-react";
 import { useTranslation } from "next-i18next";
+import Link from "next/link";
 import styled, { css } from "styled-components";
+import { PopupMenu } from "ui/src/components/PopupMenu";
+import { useDisplayError } from "ui/src/hooks";
+import { convertWeekday } from "ui/src/modules/conversion";
+import { filterNonNullable, truncate } from "ui/src/modules/helpers";
+import { fontMedium, SemiBold } from "ui/src/styled";
+import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/modules/const";
+import { getApplicantName } from "@/modules/helpers";
+import { getApplicationUrl } from "@/modules/urls";
+import { formatAgeGroup } from "@/modules/util";
 import {
   type ApplicationSectionAllocationsQuery,
   type Maybe,
   type ReservationUnitNode,
   useRejectRestMutation,
 } from "@gql/gql-types";
-import { fontMedium, SemiBold } from "ui/src/styled";
-import { filterNonNullable, truncate } from "ui/src/modules/helpers";
-import { convertWeekday } from "ui/src/modules/conversion";
+import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
 import {
   type AllocatedTimeSlotNodeT,
   createDurationString,
   formatSuitableTimeRange,
   type SectionNodeT,
 } from "./modules/applicationRoundAllocation";
-import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
-import { PopupMenu } from "ui/src/components/PopupMenu";
-import { type ApolloQueryResult, gql } from "@apollo/client";
-import { getApplicationUrl } from "@/modules/urls";
-import { getApplicantName } from "@/modules/helpers";
-import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/modules/const";
-import { formatAgeGroup } from "@/modules/util";
-import { useDisplayError } from "ui/src/hooks";
-import Link from "next/link";
 
 export type AllocationApplicationSectionCardType = "unallocated" | "allocated" | "partial" | "declined";
 

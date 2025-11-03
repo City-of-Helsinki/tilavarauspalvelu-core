@@ -1,17 +1,17 @@
 import React from "react";
-import styled from "styled-components";
 import { UseFormReturn } from "react-hook-form";
-import { ReservationFormValueT } from "../schemas";
 import { useTranslation } from "next-i18next";
+import styled from "styled-components";
+import { ControlledCheckbox } from "../components/form";
+import { ReservationFormValueT } from "../schemas";
+import { Strongish } from "../styled";
+import { StyledCheckboxWrapper, StyledTextArea } from "./styled";
 import {
   constructReservationFieldId,
   constructReservationFieldLabel,
   RESERVATION_FIELD_MAX_TEXT_LENGTH,
   translateReserveeFormError,
 } from "./util";
-import { StyledCheckboxWrapper, StyledTextArea } from "./styled";
-import { ControlledCheckbox } from "../components/form";
-import { Strongish } from "../styled";
 
 const Subheading = styled(Strongish)`
   display: block;

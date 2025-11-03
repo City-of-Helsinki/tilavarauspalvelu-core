@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { type ApplicantFieldsFragment, ReserveeType } from "@gql/gql-types";
 import { ApplicationInfoContainer, InfoItem, InfoItemContainer } from "@/styled/application";
+import { type ApplicantFieldsFragment, ReserveeType } from "@gql/gql-types";
 
 const LabelValue = ({
   label,

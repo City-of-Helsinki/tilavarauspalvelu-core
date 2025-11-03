@@ -1,13 +1,13 @@
 import React from "react";
 import { StepState } from "hds-react";
-import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
-import { type ApplicationFormFragment } from "@gql/gql-types";
+import { useRouter } from "next/router";
 import { type ReadonlyDeep } from "ui/src/modules/helpers";
-import { validateApplication } from "./form";
-import { isSent } from "@/modules/util";
 import { getApplicationPath } from "@/modules/urls";
+import { isSent } from "@/modules/util";
 import { StyledStepper } from "@/styled/util";
+import { type ApplicationFormFragment } from "@gql/gql-types";
+import { validateApplication } from "./form";
 
 // Ordered list of steps by page slug
 export const PAGES_WITH_STEPPER = ["page1", "page2", "page3", "page4"] as const;

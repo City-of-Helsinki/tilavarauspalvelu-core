@@ -1,7 +1,12 @@
 import React from "react";
+import { gql } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { filterNonNullable } from "@ui/modules/helpers";
+import { Head, Purposes, SearchGuides, Units } from "@/lib/index";
+import { createApolloClient } from "@/modules/apolloClient";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   PurposeOrderingChoices,
   UnitOrderingChoices,
@@ -9,11 +14,6 @@ import {
   type FrontPageQueryVariables,
   FrontPageDocument,
 } from "@gql/gql-types";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { Head, Purposes, SearchGuides, Units } from "@/lib/index";
-import { createApolloClient } from "@/modules/apolloClient";
-import { filterNonNullable } from "@ui/modules/helpers";
-import { gql } from "@apollo/client";
 
 function Home({ purposes, units }: Props): JSX.Element {
   const { t } = useTranslation(["home", "common"]);

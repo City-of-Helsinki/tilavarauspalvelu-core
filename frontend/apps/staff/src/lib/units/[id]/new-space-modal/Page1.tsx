@@ -1,13 +1,13 @@
 import React from "react";
+import { Controller, UseFormReturn } from "react-hook-form";
 import { Button, ButtonVariant, Dialog, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { H4 } from "ui/src/styled";
+import { DialogActionsButtons } from "@/styled";
 import { type UnitPageQuery } from "@gql/gql-types";
 import { ParentSelector } from "../ParentSelector";
-import { StyledTag } from "./modules/newSpaceModal";
-import { Controller, UseFormReturn } from "react-hook-form";
 import { SpaceUpdateForm } from "../SpaceForm";
-import { DialogActionsButtons } from "@/styled";
-import { H4 } from "ui/src/styled";
+import { StyledTag } from "./modules/newSpaceModal";
 
 type Props = {
   unit: Pick<NonNullable<UnitPageQuery["unit"]>, "pk">;

@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "next-i18next";
+import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
+import { mapParamToInteger } from "ui/src/modules/helpers";
+import { mapFormToSearchParams } from "ui/src/modules/search";
 import { AutoGrid } from "ui/src/styled";
 import { ControlledMultiSelectFilter, ControlledSearchFilter } from "@/components/QueryParamFilters";
 import { SearchTags } from "@/components/SearchTags";
-import { translateTag } from "@/modules/search";
-import { useTranslation } from "next-i18next";
-import { useForm } from "react-hook-form";
-import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
-import { mapFormToSearchParams } from "ui/src/modules/search";
-import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
-import { mapParamToInteger } from "ui/src/modules/helpers";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { translateTag } from "@/modules/search";
 
 type SearchFormValues = {
   search: string;

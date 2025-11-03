@@ -1,5 +1,5 @@
-import { ignoreMaybeArray } from "ui/src/modules/helpers";
 import { useRouter } from "next/router";
+import { ignoreMaybeArray } from "ui/src/modules/helpers";
 
 /// @param keysToCopy - copy these from the original query. required because of the way Next.js route params work
 /// ex. without keys a path with [id] param turns .../8 into .../[id]. there is no automatic substitution

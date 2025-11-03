@@ -1,12 +1,12 @@
 import React from "react";
-import styled from "styled-components";
 import { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { EditAccordion } from "./styled";
+import styled from "styled-components";
 import { ControlledSelect } from "ui/src/components/form";
-import { type ReservationUnitEditFormValues } from "./form";
-import { ControlledRichTextInput } from "./ControlledRichTextInput";
 import { AutoGrid } from "ui/src/styled";
+import { ControlledRichTextInput } from "./ControlledRichTextInput";
+import { type ReservationUnitEditFormValues } from "./form";
+import { EditAccordion } from "./styled";
 
 type OptionType = { value: string; label: string };
 

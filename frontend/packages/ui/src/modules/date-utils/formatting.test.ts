@@ -1,3 +1,4 @@
+import type { TFunction } from "next-i18next";
 import { describe, expect, it } from "vitest";
 import {
   parseValidDateObject,
@@ -15,7 +16,6 @@ import {
   formatApiTime,
   formatApiTimeUnsafe,
 } from "./formatting";
-import type { TFunction } from "next-i18next";
 
 // Mock translation function
 const mockT = ((key: string) => key) as TFunction;

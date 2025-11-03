@@ -1,8 +1,8 @@
-import { expect, test, describe } from "vitest";
 import { CreateMockApplicationFragmentProps, createMockApplicationViewFragment } from "@test/application.mocks";
 import { render } from "@testing-library/react";
-import { ViewApplication } from "./ViewApplication";
+import { expect, test, describe } from "vitest";
 import { ApplicationStatusChoice } from "@gql/gql-types";
+import { ViewApplication } from "./ViewApplication";
 
 interface RenderProps extends CreateMockApplicationFragmentProps {
   children?: JSX.Element;

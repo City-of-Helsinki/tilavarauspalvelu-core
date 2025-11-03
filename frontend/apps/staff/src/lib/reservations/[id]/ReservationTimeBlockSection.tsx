@@ -1,30 +1,30 @@
 import React, { forwardRef, type Ref, useEffect, useRef, useState } from "react";
+import { gql } from "@apollo/client";
+import { add, startOfISOWeek } from "date-fns";
+import { useTranslation } from "next-i18next";
+import { useSearchParams } from "next/navigation";
+import styled from "styled-components";
 import CommonCalendar from "ui/src/components/calendar/Calendar";
 import { Toolbar, ToolbarBtn } from "ui/src/components/calendar/Toolbar";
-import styled from "styled-components";
-import { useTranslation } from "next-i18next";
+import { getEventBuffers } from "ui/src/components/calendar/util";
+import { filterNonNullable, toNumber } from "ui/src/modules/helpers";
+import { EditTimeModal } from "@/components/EditTimeModal";
+import { Legend, LegendsWrapper } from "@/components/Legend";
+import { ReservationSeriesView } from "@/components/ReservationSeriesView";
+import VisibleIfPermission from "@/components/VisibleIfPermission";
+import { useModal } from "@/context/ModalContext";
+import { useReservationCalendarData, useReservationSeries } from "@/hooks";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { type CalendarEventType, type EventType } from "@/modules/reservation";
+import { isPossibleToEdit } from "@/modules/reservationModificationRules";
+import { Accordion } from "@/styled";
 import {
   ReservationStateChoice,
   ReservationTypeChoice,
   type TimeBlockSectionFragment,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { useModal } from "@/context/ModalContext";
-import { type CalendarEventType, type EventType } from "@/modules/reservation";
 import { eventStyleGetter, legend } from "./eventStyleGetter";
-import { Legend, LegendsWrapper } from "@/components/Legend";
-import { EditTimeModal } from "@/components/EditTimeModal";
-import { isPossibleToEdit } from "@/modules/reservationModificationRules";
-import { getEventBuffers } from "ui/src/components/calendar/util";
-import { filterNonNullable, toNumber } from "ui/src/modules/helpers";
-import VisibleIfPermission from "@/components/VisibleIfPermission";
-import { useReservationCalendarData, useReservationSeries } from "@/hooks";
-import { add, startOfISOWeek } from "date-fns";
-import { ReservationSeriesView } from "@/components/ReservationSeriesView";
-import { Accordion } from "@/styled";
-import { gql } from "@apollo/client";
-import { useSearchParams } from "next/navigation";
-import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
 const Container = styled.div`
   .rbc-calendar {

@@ -1,5 +1,3 @@
-import { ApplicationStatusChoice, Priority } from "@gql/gql-types";
-import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import type { DayT } from "ui/src/modules/const";
 import {
@@ -15,6 +13,8 @@ import {
   transformWeekday,
 } from "ui/src/modules/conversion";
 import { filterEmptyArray, filterNonNullable, mapParamToInteger, toInteger, toNumber } from "ui/src/modules/helpers";
+import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
+import { ApplicationStatusChoice, Priority } from "@gql/gql-types";
 
 export function getFilterSearchParams({
   searchParams,

@@ -1,4 +1,10 @@
 import { describe, expect, test } from "vitest";
+import { type Cell } from "ui/src/components/ApplicationTimeSelector";
+import { type DayT, WEEKDAYS_SORTED } from "ui/src/modules/const";
+import { transformWeekday } from "ui/src/modules/conversion";
+import { formatApiTimeUnsafe } from "ui/src/modules/date-utils";
+import { Priority, Weekday } from "@gql/gql-types";
+import { type SuitableTimeRangeFormValues } from "./form";
 import {
   aesToCells,
   covertCellsToTimeRange,
@@ -6,12 +12,6 @@ import {
   type DailyOpeningHours,
   type TimeSpan,
 } from "./timeSelectorModule";
-import { type SuitableTimeRangeFormValues } from "./form";
-import { Priority, Weekday } from "@gql/gql-types";
-import { type Cell } from "ui/src/components/ApplicationTimeSelector";
-import { type DayT, WEEKDAYS_SORTED } from "ui/src/modules/const";
-import { formatApiTimeUnsafe } from "ui/src/modules/date-utils";
-import { transformWeekday } from "ui/src/modules/conversion";
 
 function createDayCells(
   day: Weekday,

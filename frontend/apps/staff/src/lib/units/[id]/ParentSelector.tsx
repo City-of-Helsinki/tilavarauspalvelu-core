@@ -1,9 +1,9 @@
 import React from "react";
-import { useTranslation, type TFunction } from "next-i18next";
-import { Select } from "hds-react";
-import { UnitSpacesQuery, useUnitSpacesQuery } from "@gql/gql-types";
-import { createNodeId, convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";
 import { gql } from "@apollo/client";
+import { Select } from "hds-react";
+import { useTranslation, type TFunction } from "next-i18next";
+import { createNodeId, convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";
+import { UnitSpacesQuery, useUnitSpacesQuery } from "@gql/gql-types";
 
 function spacesAsHierarchy(unit: UnitSpacesQuery["unit"] | undefined, paddingChar: string) {
   const allSpaces = filterNonNullable(unit?.spaces);

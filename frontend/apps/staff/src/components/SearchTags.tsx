@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { SearchTagContainer, SearchTag, TagResetButton } from "ui/src/styled/tags";
 import { useSearchParams } from "next/navigation";
+import { SearchTagContainer, SearchTag, TagResetButton } from "ui/src/styled/tags";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
 interface SearchTagsProps {

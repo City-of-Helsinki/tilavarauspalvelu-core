@@ -1,22 +1,22 @@
-import { Button, ButtonVariant, IconPlusCircleFill } from "hds-react";
 import React, { createRef } from "react";
-import { useTranslation } from "next-i18next";
-import styled from "styled-components";
-import { UserPermissionChoice, useSpacesResourcesQuery } from "@gql/gql-types";
-import { createNodeId, toNumber, ignoreMaybeArray } from "ui/src/modules/helpers";
-import { errorToast } from "ui/src/components/toast";
-import { Error404 } from "@/components/Error404";
-import { fontBold, H2, CenterSpinner, Flex } from "ui/src/styled";
-import { LinkPrev } from "@/components/LinkPrev";
 import { gql } from "@apollo/client";
-import { useModal } from "@/context/ModalContext";
-import { FixedDialog } from "@/styled/FixedDialog";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { AuthorizationChecker } from "@/components/AuthorizationChecker";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
-import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { ResourcesTable, SubPageHead, SpacesTable, NewSpaceModal, NewResourceModal } from "@lib/units/[id]/";
+import { Button, ButtonVariant, IconPlusCircleFill } from "hds-react";
+import { type GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import styled from "styled-components";
+import { errorToast } from "ui/src/components/toast";
+import { createNodeId, toNumber, ignoreMaybeArray } from "ui/src/modules/helpers";
+import { fontBold, H2, CenterSpinner, Flex } from "ui/src/styled";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
+import { Error404 } from "@/components/Error404";
+import { LinkPrev } from "@/components/LinkPrev";
+import { useModal } from "@/context/ModalContext";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { FixedDialog } from "@/styled/FixedDialog";
+import { UserPermissionChoice, useSpacesResourcesQuery } from "@gql/gql-types";
 
 const ActionButton = styled(Button)`
   span {

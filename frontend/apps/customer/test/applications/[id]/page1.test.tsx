@@ -1,14 +1,14 @@
-import Page1 from "@/pages/applications/[id]/page1";
-import { render, screen, within } from "@testing-library/react";
-import { vi, expect, test, describe } from "vitest";
-import { createGraphQLMocks } from "@test/gql.mocks";
 import { createMockApplicationFragment, type CreateMockApplicationFragmentProps } from "@test/application.mocks";
+import { createGraphQLMocks } from "@test/gql.mocks";
 import { createOptionMock } from "@test/test.gql.utils";
-import userEvent from "@testing-library/user-event";
-import { selectFirstOption } from "@test/test.utils";
-import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
+import { selectFirstOption } from "@test/test.utils";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { vi, expect, test, describe } from "vitest";
 import { type OptionsListT } from "ui/src/modules/search";
+import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
+import Page1 from "@/pages/applications/[id]/page1";
 
 const { mockedRouterPush, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();

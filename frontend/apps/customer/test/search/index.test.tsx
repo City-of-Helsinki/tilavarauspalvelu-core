@@ -1,11 +1,11 @@
-import { describe, expect, test, vi } from "vitest";
-import { render, within } from "@testing-library/react";
-import SearchSingle from "@/pages/search";
 import { createOptionMock } from "@test/test.gql.utils";
-import { AccessType } from "@gql/gql-types";
+import { render, within } from "@testing-library/react";
+import { describe, expect, test, vi } from "vitest";
 import { type OptionsListT } from "ui/src/modules/search";
-import { MockedGraphQLProvider } from "../test.react.utils";
+import SearchSingle from "@/pages/search";
+import { AccessType } from "@gql/gql-types";
 import { createGraphQLMocks } from "../gql.mocks";
+import { MockedGraphQLProvider } from "../test.react.utils";
 
 const { useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();

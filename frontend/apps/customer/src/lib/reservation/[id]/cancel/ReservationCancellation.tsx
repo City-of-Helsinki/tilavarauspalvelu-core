@@ -1,22 +1,22 @@
 import React from "react";
-import styled, { css } from "styled-components";
+import { gql } from "@apollo/client";
 import { IconClock, IconEuroSign, IconLocation } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { H1 } from "ui/src/styled";
-import { breakpoints } from "ui/src/modules/const";
-import { type ReservationCancelPageQuery, useCancelReservationMutation } from "@gql/gql-types";
-import { ReservationInfoCard } from "@/components/reservation";
-import { ReservationPageWrapper } from "@/styled/reservation";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { formatDate, applicationReservationDateTime } from "ui/src/modules/date-utils";
-import { useDisplayError } from "ui/src/hooks";
-import { getApplicationPath, getReservationPath } from "@/modules/urls";
-import { getPrice } from "@/modules/reservationUnit";
-import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { useRouter } from "next/router";
-import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";
+import styled, { css } from "styled-components";
 import { Card } from "ui/src/components";
-import { gql } from "@apollo/client";
+import { useDisplayError } from "ui/src/hooks";
+import { breakpoints } from "ui/src/modules/const";
+import { formatDate, applicationReservationDateTime } from "ui/src/modules/date-utils";
+import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { H1 } from "ui/src/styled";
+import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";
+import { ReservationInfoCard } from "@/components/reservation";
+import { getPrice } from "@/modules/reservationUnit";
+import { getApplicationPath, getReservationPath } from "@/modules/urls";
+import { ReservationPageWrapper } from "@/styled/reservation";
+import { type ReservationCancelPageQuery, useCancelReservationMutation } from "@gql/gql-types";
 
 const infoCss = css`
   @media (min-width: ${breakpoints.m}) {

@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { Logo as HDSLogo, logoFi, LogoProps, LogoSize, logoSv } from "hds-react";
+import { useTranslation } from "next-i18next";
 
 function logoSrcFromLanguage(language: string) {
   if (language === "sv") {

@@ -1,6 +1,6 @@
 import { set } from "date-fns";
-import { isOverlapping } from "./utils";
 import { describe, test, expect } from "vitest";
+import { isOverlapping } from "./utils";
 
 describe("isOverlapping", () => {
   test("21:00 - 22:15 and 22:00 - 23:00 on the same day overlap", () => {

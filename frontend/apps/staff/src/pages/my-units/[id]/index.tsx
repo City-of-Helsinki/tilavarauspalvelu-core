@@ -1,13 +1,29 @@
-import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
 import React, { useEffect, useRef } from "react";
-import styled from "styled-components";
-import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
+import { CreateReservationModal, ReservationUnitCalendarView, UnitReservations } from "@lib/my-units/[id]/";
+import { addMinutes } from "date-fns";
 import { Button, ButtonSize, ButtonVariant, Tabs } from "hds-react";
-import { Flex, H1, TabWrapper, TitleSection } from "ui/src/styled";
+import { type GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useSearchParams } from "next/navigation";
+import styled from "styled-components";
+import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
 import { breakpoints } from "ui/src/modules/const";
-import { formatAddress } from "@/modules/util";
-import { getReservationSeriesUrl } from "@/modules/urls";
+import { parseUIDate } from "ui/src/modules/date-utils";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { Flex, H1, TabWrapper, TitleSection } from "ui/src/styled";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
+import { useModal } from "@/context/ModalContext";
+import { useSession } from "@/hooks";
+import { getFilterOptions } from "@/hooks/useFilterOptions";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { createClient } from "@/modules/apolloClient";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { hasPermission } from "@/modules/permissionHelper";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getReservationSeriesUrl } from "@/modules/urls";
+import { formatAddress } from "@/modules/util";
 import {
   FilterOptionsDocument,
   type FilterOptionsQuery,
@@ -17,22 +33,6 @@ import {
   type UnitViewQueryVariables,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { useSession } from "@/hooks";
-import { ButtonLikeLink } from "@/components/ButtonLikeLink";
-import { gql } from "@apollo/client";
-import { useModal } from "@/context/ModalContext";
-import { useSearchParams } from "next/navigation";
-import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { type GetServerSidePropsContext } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { CreateReservationModal, ReservationUnitCalendarView, UnitReservations } from "@lib/my-units/[id]/";
-import { parseUIDate } from "ui/src/modules/date-utils";
-import { addMinutes } from "date-fns";
-import { createClient } from "@/modules/apolloClient";
-import { hasPermission } from "@/modules/permissionHelper";
-import { getFilterOptions } from "@/hooks/useFilterOptions";
 
 const LocationOnlyOnDesktop = styled.p`
   display: none;

@@ -1,10 +1,10 @@
 import React from "react";
+import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
 import { defaultFilter, Option, Select, Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
+import styled from "styled-components";
 import { convertOptionToHDS, filterNonNullable, toNumber } from "../../modules/helpers";
 import { convertLanguageCode } from "../../modules/util";
-import styled from "styled-components";
 import { fontMedium } from "../../styled";
 
 const StyledControlledSelect = styled(Select)<{ $strongLabel?: boolean }>`

@@ -1,8 +1,8 @@
-import { render, screen } from "@testing-library/react";
-import { SummaryGeneralFields, SummaryReserveeFields } from "./SummaryFields";
-import { ReservationFormFieldsFragment, ReserveeType } from "@gql/gql-types";
 import { createMetaFieldsFragment, createOptionsMock, createSupportedFieldsMock } from "@test/reservation.mocks";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { ReservationFormFieldsFragment, ReserveeType } from "@gql/gql-types";
+import { SummaryGeneralFields, SummaryReserveeFields } from "./SummaryFields";
 
 function renderGeneralFields(): ReturnType<typeof render> {
   return render(<SummaryGeneralFields reservation={createMetaFieldsFragment()} options={createOptionsMock()} />);

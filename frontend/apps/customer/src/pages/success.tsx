@@ -1,14 +1,14 @@
+import { useEffect, useState } from "react";
+import { gql } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
-import { OrderStatus, ReservationStateChoice, ReservationStateQuery, useReservationStateQuery } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
+import { ignoreMaybeArray } from "ui/src/modules/helpers";
+import { CenterSpinner } from "ui/src/styled";
+import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath } from "@/modules/urls";
-import { createApolloClient } from "@/modules/apolloClient";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { CenterSpinner } from "ui/src/styled";
-import { ignoreMaybeArray } from "ui/src/modules/helpers";
-import { gql } from "@apollo/client";
+import { OrderStatus, ReservationStateChoice, ReservationStateQuery, useReservationStateQuery } from "@gql/gql-types";
 
 const POLL_INTERVAL_MS = 500;
 const STOP_POLLING_TIMEOUT_MS = 30000;

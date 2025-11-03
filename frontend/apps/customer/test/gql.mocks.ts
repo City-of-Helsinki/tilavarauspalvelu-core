@@ -1,3 +1,4 @@
+import { createNodeId } from "ui/src/modules/helpers";
 import {
   CurrentUserDocument,
   OptionsDocument,
@@ -14,7 +15,6 @@ import {
   type CreateGraphQLMocksReturn,
   createOptionQueryMock,
 } from "./test.gql.utils";
-import { createNodeId } from "ui/src/modules/helpers";
 
 export function createGraphQLMocks({
   noUser = false,

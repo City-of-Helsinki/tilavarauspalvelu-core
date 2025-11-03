@@ -1,7 +1,7 @@
+import { vi, describe, test, expect } from "vitest";
 import { type ReservationNode, ReservationStartInterval } from "../../gql/gql-types";
 import { getEventBuffers } from "../components/calendar/util";
 import { getIntervalMinutes } from "./conversion";
-import { vi, describe, test, expect } from "vitest";
 
 const tfunction = (str: string, options: { count: number }) => {
   const countStr = options?.count > 1 ? "plural" : "singular";

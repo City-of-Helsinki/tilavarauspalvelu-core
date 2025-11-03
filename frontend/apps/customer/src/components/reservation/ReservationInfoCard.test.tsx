@@ -1,7 +1,10 @@
-import { ReservationInfoCard } from "./";
-import { render, screen } from "@testing-library/react";
+import { createGraphQLMocks } from "@test/gql.mocks";
 import { future1hReservation } from "@test/reservation.mocks";
+import { type CreateGraphQLMockProps, generateNameFragment } from "@test/test.gql.utils";
+import { MockedGraphQLProvider } from "@test/test.react.utils";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { createNodeId } from "ui/src/modules/helpers";
 import {
   AccessType,
   ReservationUnitImageType,
@@ -10,10 +13,7 @@ import {
   type ReservationInfoCardFragment,
   ReservationStateChoice,
 } from "@gql/gql-types";
-import { type CreateGraphQLMockProps, generateNameFragment } from "@test/test.gql.utils";
-import { createNodeId } from "ui/src/modules/helpers";
-import { createGraphQLMocks } from "@test/gql.mocks";
-import { MockedGraphQLProvider } from "@test/test.react.utils";
+import { ReservationInfoCard } from "./";
 
 interface CustomRenderProps extends CreateGraphQLMockProps {
   reservation?: ReservationInfoCardFragment;

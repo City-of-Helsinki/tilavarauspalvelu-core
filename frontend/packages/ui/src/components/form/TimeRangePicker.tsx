@@ -1,10 +1,10 @@
 import React from "react";
+import { type FieldValues, Path, useController, UseControllerProps } from "react-hook-form";
+import { IconAlertCircleFill } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { IconAlertCircleFill } from "hds-react";
-import { type FieldValues, Path, useController, UseControllerProps } from "react-hook-form";
-import { ControlledSelect } from "./ControlledSelect";
 import { timeToMinutes } from "../../modules/date-utils";
+import { ControlledSelect } from "./ControlledSelect";
 
 interface TimeRangePickerProps<T extends FieldValues> extends Omit<UseControllerProps<T>, "name" | "disabled"> {
   names: { begin: Path<T>; end: Path<T> };

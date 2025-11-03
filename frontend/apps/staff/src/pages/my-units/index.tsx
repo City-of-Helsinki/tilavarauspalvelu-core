@@ -1,10 +1,10 @@
 import React from "react";
+import { type GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H1 } from "ui/src/styled";
 import { Filters, UnitsDataLoader } from "@/components/units";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 export default function Page(_props: PageProps): JSX.Element {

@@ -7,9 +7,9 @@ import type { NextRequest } from "next/server";
 // Workaround as long as the function isn't needed is to split imports in such a way
 // that libraries are not imported in the middleware.
 import { NextResponse } from "next/server";
-import { env } from "@/env.mjs";
-import { buildGraphQLUrl, getSignInUrl, type LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { createNodeId, getLocalizationLang } from "ui/src/modules/helpers";
+import { buildGraphQLUrl, getSignInUrl, type LocalizationLanguages } from "ui/src/modules/urlBuilder";
+import { env } from "@/env.mjs";
 import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import { getReservationInProgressPath } from "./modules/urls";
 

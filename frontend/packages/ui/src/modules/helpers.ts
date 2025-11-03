@@ -1,4 +1,6 @@
 import { isAfter, isBefore } from "date-fns";
+import { type OptionInProps } from "hds-react";
+import { type TFunction } from "i18next";
 import {
   ReservationUnitImageType,
   type PricingFieldsFragment,
@@ -6,12 +8,10 @@ import {
   type Maybe,
   type SuitableTimeFragment,
 } from "../../gql/gql-types";
-import { type OptionInProps } from "hds-react";
 import { pixel } from "./const";
-import { type TFunction } from "i18next";
+import { convertWeekday } from "./conversion";
 import { minutesToHoursString, timeToMinutes } from "./date-utils";
 import { type LocalizationLanguages } from "./urlBuilder";
-import { convertWeekday } from "./conversion";
 
 /// Enforce readonly on all nested properties
 /// only single level deep i.e. {a: {b: {c: string}}} -> {readonly a: {b: {c: string}}}

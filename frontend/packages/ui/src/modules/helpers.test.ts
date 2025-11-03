@@ -1,6 +1,6 @@
 import { type TFunction } from "i18next";
-import { formatApiTimeInterval, formatListToCSV } from "./helpers";
 import { describe, test, expect } from "vitest";
+import { formatApiTimeInterval, formatListToCSV } from "./helpers";
 
 describe("formatApiTimeInterval", () => {
   test("should properly format api time interval", () => {

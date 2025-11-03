@@ -1,10 +1,10 @@
-import { IconMenuDots } from "hds-react";
 import React, { useEffect, useRef, useState } from "react";
-import styled from "styled-components";
-import { FocusTrap } from "focus-trap-react";
 import { createPortal } from "react-dom";
-import { Flex, toggleButtonCss } from "../styled";
+import { FocusTrap } from "focus-trap-react";
+import { IconMenuDots } from "hds-react";
 import { useTranslation } from "next-i18next";
+import styled from "styled-components";
+import { Flex, toggleButtonCss } from "../styled";
 
 const Container = styled.div`
   position: relative;

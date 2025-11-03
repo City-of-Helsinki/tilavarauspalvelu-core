@@ -1,20 +1,20 @@
 import React from "react";
+import type { GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { ignoreMaybeArray } from "ui/src/modules/helpers";
+import { H1 } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { CancelledLinkSet } from "@/lib/reservation/[id]/cancel";
+import { createApolloClient } from "@/modules/apolloClient";
+import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
+import { getReservationPath, reservationsPrefix } from "@/modules/urls";
 import {
   DeleteReservationDocument,
   type DeleteReservationMutation,
   type DeleteReservationMutationVariables,
   ReservationStateChoice,
 } from "@gql/gql-types";
-import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
-import { getReservationPath, reservationsPrefix } from "@/modules/urls";
-import { ignoreMaybeArray } from "ui/src/modules/helpers";
-import { H1 } from "ui/src/styled";
-import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 // This is the callback page from webstore if user cancels the order
 // TODO this would be nicer if we could use a reservation/[id]/cancelled page (or reservation/[id])

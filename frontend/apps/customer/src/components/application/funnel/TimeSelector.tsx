@@ -1,24 +1,24 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
-import { Button, ButtonSize, ButtonVariant, Notification, NotificationSize } from "hds-react";
 import { useFormContext } from "react-hook-form";
-import { AutoGrid, Flex } from "ui/src/styled";
-import { filterNonNullable } from "ui/src/modules/helpers";
-import { ControlledSelect } from "ui/src/components/form";
+import { gql } from "@apollo/client";
+import { Button, ButtonSize, ButtonVariant, Notification, NotificationSize } from "hds-react";
+import { useTranslation } from "next-i18next";
 import {
   ApplicationTimeSelector,
   type Cell,
   type CellState,
   isCellEqual,
 } from "ui/src/components/ApplicationTimeSelector";
-import { successToast } from "ui/src/components/toast";
 import { ErrorText } from "ui/src/components/ErrorText";
-import { type TimeSelectorFragment } from "@gql/gql-types";
-import { gql } from "@apollo/client";
-import { aesToCells, covertCellsToTimeRange } from "./timeSelectorModule";
-import { type ApplicationPage2FormValues } from "./form";
-import { TimePreview } from ".";
+import { ControlledSelect } from "ui/src/components/form";
+import { successToast } from "ui/src/components/toast";
 import { convertWeekday } from "ui/src/modules/conversion";
+import { filterNonNullable } from "ui/src/modules/helpers";
+import { AutoGrid, Flex } from "ui/src/styled";
+import { type TimeSelectorFragment } from "@gql/gql-types";
+import { TimePreview } from ".";
+import { type ApplicationPage2FormValues } from "./form";
+import { aesToCells, covertCellsToTimeRange } from "./timeSelectorModule";
 
 export type TimeSelectorProps = {
   index: number;

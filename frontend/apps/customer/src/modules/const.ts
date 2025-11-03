@@ -1,4 +1,5 @@
 import type { TFunction } from "i18next";
+
 export { isBrowser } from "ui/src/modules/helpers";
 export { genericTermsVariant } from "ui/src/modules/const";
 

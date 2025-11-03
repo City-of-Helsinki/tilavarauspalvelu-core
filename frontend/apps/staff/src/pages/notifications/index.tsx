@@ -1,5 +1,22 @@
 import React, { useEffect, useState } from "react";
+import { gql, useApolloClient } from "@apollo/client";
+import { IconCheck, IconClock, IconPen, IconQuestionCircleFill } from "hds-react";
+import { GetServerSidePropsContext } from "next";
 import { type TFunction, useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
+import { formatDate, formatTime } from "ui/src/modules/date-utils";
+import { filterNonNullable } from "ui/src/modules/helpers";
+import { CenterSpinner, TitleSection, H1 } from "ui/src/styled";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
+import { More } from "@/components/More";
+import { CustomTable } from "@/components/Table";
+import { createClient } from "@/modules/apolloClient";
+import { GQL_MAX_RESULTS_PER_QUERY } from "@/modules/const";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getNotificationListUrl, getNotificationUrl } from "@/modules/urls";
+import { TableLink } from "@/styled";
 import {
   BannerNotificationOrderingChoices,
   type BannerNotificationTableElementFragment,
@@ -10,23 +27,6 @@ import {
   type BannerNotificationsListQuery,
   useBannerNotificationsListQuery,
 } from "@gql/gql-types";
-import { ButtonLikeLink } from "@/components/ButtonLikeLink";
-import { formatDate, formatTime } from "ui/src/modules/date-utils";
-import { GQL_MAX_RESULTS_PER_QUERY } from "@/modules/const";
-import { CustomTable } from "@/components/Table";
-import { filterNonNullable } from "ui/src/modules/helpers";
-import { More } from "@/components/More";
-import { TableLink } from "@/styled";
-import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
-import { IconCheck, IconClock, IconPen, IconQuestionCircleFill } from "hds-react";
-import { getNotificationListUrl, getNotificationUrl } from "@/modules/urls";
-import { CenterSpinner, TitleSection, H1 } from "ui/src/styled";
-import { gql, useApolloClient } from "@apollo/client";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { AuthorizationChecker } from "@/components/AuthorizationChecker";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { GetServerSidePropsContext } from "next";
-import { createClient } from "@/modules/apolloClient";
 
 const getStatusLabelProps = (
   state: BannerNotificationState | null | undefined

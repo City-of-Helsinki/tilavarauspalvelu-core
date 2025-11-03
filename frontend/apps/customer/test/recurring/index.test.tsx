@@ -1,8 +1,8 @@
-import { ApplicationRoundStatusChoice } from "@gql/gql-types";
-import RecurringLander from "@/pages/recurring";
+import { createMockApplicationRound } from "@test/application.mocks";
 import { render } from "@testing-library/react";
 import { vi, describe, test, expect, afterEach, beforeEach } from "vitest";
-import { createMockApplicationRound } from "@test/application.mocks";
+import RecurringLander from "@/pages/recurring";
+import { ApplicationRoundStatusChoice } from "@gql/gql-types";
 
 beforeEach(() => {
   vi.useFakeTimers({

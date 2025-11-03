@@ -1,19 +1,19 @@
-import { IconArrowRight, IconSize } from "hds-react";
-import Link from "next/link";
 import React, { useMemo } from "react";
-import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
-import styled from "styled-components";
-import type { PurposeCardFragment } from "@gql/gql-types";
-import { getSingleSearchPath } from "@/modules/urls";
-import { ReservationUnitSearch } from "./ReservationUnitSearch";
-import { pixel } from "@/styled/util";
-import { Flex, H3, anchorStyles, focusStyles } from "ui/src/styled";
-import { breakpoints } from "ui/src/modules/const";
-import { ShowAllContainer } from "ui/src/components";
-import { getTranslationSafe } from "ui/src/modules/util";
-import { getLocalizationLang } from "ui/src/modules/helpers";
 import { gql } from "@apollo/client";
+import { IconArrowRight, IconSize } from "hds-react";
+import { useTranslation } from "next-i18next";
+import Link from "next/link";
+import styled from "styled-components";
+import { ShowAllContainer } from "ui/src/components";
+import { breakpoints } from "ui/src/modules/const";
+import { getLocalizationLang } from "ui/src/modules/helpers";
+import { getTranslationSafe } from "ui/src/modules/util";
+import { Flex, H3, anchorStyles, focusStyles } from "ui/src/styled";
+import { getSingleSearchPath } from "@/modules/urls";
+import { pixel } from "@/styled/util";
+import type { PurposeCardFragment } from "@gql/gql-types";
+import { ReservationUnitSearch } from "./ReservationUnitSearch";
 
 const Top = styled(Flex).attrs({
   $justifyContent: "space-between",

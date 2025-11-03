@@ -1,16 +1,16 @@
 import React, { type HTMLAttributes } from "react";
+import { gql } from "@apollo/client";
 import { IconArrowDown, IconArrowUp, ButtonSize, ButtonVariant, Button, ButtonPresetTheme } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { Flex, H6, fontBold, fontMedium, fontRegular } from "ui/src/styled";
-import { breakpoints } from "ui/src/modules/const";
-import type { OrderedReservationUnitCardFragment } from "@gql/gql-types";
-import { getReservationUnitName } from "@/modules/reservationUnit";
-import { getImageSource, getMainImage } from "ui/src/modules/helpers";
 import Card from "ui/src/components/Card";
 import { ErrorText } from "ui/src/components/ErrorText";
+import { breakpoints } from "ui/src/modules/const";
+import { getImageSource, getMainImage } from "ui/src/modules/helpers";
 import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { gql } from "@apollo/client";
+import { Flex, H6, fontBold, fontMedium, fontRegular } from "ui/src/styled";
+import { getReservationUnitName } from "@/modules/reservationUnit";
+import type { OrderedReservationUnitCardFragment } from "@gql/gql-types";
 
 const NameCardContainer = styled(Flex).attrs({ $gap: "none" })`
   flex-direction: column;

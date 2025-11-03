@@ -1,20 +1,20 @@
 import React, { useState } from "react";
-import { useTranslation } from "next-i18next";
-import { Button, ButtonVariant, IconArrowLeft, LoadingSpinner } from "hds-react";
-import { type ReservationQuery, ReservationStateChoice, useConfirmReservationMutation } from "@gql/gql-types";
 import { useForm } from "react-hook-form";
-import { type OptionsRecord } from "@ui/types";
-import { SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
-import { AcceptTerms } from "@/components/AcceptTerms";
-import { ActionContainer, NewReservationForm } from "@/styled/reservation";
-import { useDisplayError } from "@ui/hooks";
-import { getReservationInProgressPath, getReservationPath, getReservationUnitPath } from "@/modules/urls";
-import { convertLanguageCode } from "@ui/modules/util";
-import { getCheckoutUrl } from "@/modules/reservation";
-import { useRouter } from "next/router";
 import { gql } from "@apollo/client";
+import { Button, ButtonVariant, IconArrowLeft, LoadingSpinner } from "hds-react";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+import { useDisplayError } from "@ui/hooks";
 import { isNotFoundError } from "@ui/modules/apolloUtils";
+import { convertLanguageCode } from "@ui/modules/util";
 import { Flex } from "@ui/styled";
+import { type OptionsRecord } from "@ui/types";
+import { AcceptTerms } from "@/components/AcceptTerms";
+import { SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
+import { getCheckoutUrl } from "@/modules/reservation";
+import { getReservationInProgressPath, getReservationPath, getReservationUnitPath } from "@/modules/urls";
+import { ActionContainer, NewReservationForm } from "@/styled/reservation";
+import { type ReservationQuery, ReservationStateChoice, useConfirmReservationMutation } from "@gql/gql-types";
 
 type NodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {

@@ -1,7 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { gql, useApolloClient } from "@apollo/client";
+import { differenceInMinutes } from "date-fns";
+import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+import { type ParsedUrlQuery } from "querystring";
 import styled from "styled-components";
+import NotificationWrapper from "ui/src/components/NotificationWrapper";
+import { errorToast, successToast } from "ui/src/components/toast";
+import { useDisplayError } from "ui/src/hooks";
+import { isNotFoundError } from "ui/src/modules/apolloUtils";
+import { formatApiDate } from "ui/src/modules/date-utils";
+import { createNodeId, filterNonNullable } from "ui/src/modules/helpers";
+import { convertLanguageCode } from "ui/src/modules/util";
+import { Flex } from "ui/src/styled";
+import { useCurrentUser } from "@/hooks";
+import { CREATED_RESERVATION_TIMEOUT_MINUTES } from "@/modules/const";
+import { getCheckoutUrl } from "@/modules/reservation";
+import { getReservationInProgressPath } from "@/modules/urls";
 import {
   type ReservationNotificationFragment,
   ReservationOrderingChoices,
@@ -11,22 +27,6 @@ import {
   useListInProgressReservationsQuery,
   useReservationStateLazyQuery,
 } from "@gql/gql-types";
-import NotificationWrapper from "ui/src/components/NotificationWrapper";
-import { useCurrentUser } from "@/hooks";
-import { getCheckoutUrl } from "@/modules/reservation";
-import { createNodeId, filterNonNullable } from "ui/src/modules/helpers";
-import { gql, useApolloClient } from "@apollo/client";
-import { convertLanguageCode } from "ui/src/modules/util";
-import { formatApiDate } from "ui/src/modules/date-utils";
-import { errorToast, successToast } from "ui/src/components/toast";
-import { getReservationInProgressPath } from "@/modules/urls";
-import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
-import { Flex } from "ui/src/styled";
-import { isNotFoundError } from "ui/src/modules/apolloUtils";
-import { type ParsedUrlQuery } from "querystring";
-import { useDisplayError } from "ui/src/hooks";
-import { differenceInMinutes } from "date-fns";
-import { CREATED_RESERVATION_TIMEOUT_MINUTES } from "@/modules/const";
 
 const BodyText = styled.p`
   margin: 0;

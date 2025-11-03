@@ -1,20 +1,20 @@
-import { ButtonSize, ButtonVariant, IconArrowRight, IconCross } from "hds-react";
 import React from "react";
-import { useTranslation } from "next-i18next";
-import styled from "styled-components";
-import { useRouter } from "next/router";
-import { type ApplicationCreateMutationInput, ReservationUnitNode, useCreateApplicationMutation } from "@gql/gql-types";
-import { getApplicationPath } from "@/modules/urls";
-import { Flex, NoWrap, WhiteButton, pageSideMargins } from "ui/src/styled";
-import { breakpoints } from "ui/src/modules/const";
 import { useMedia } from "react-use";
-import { ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { useDisplayError } from "ui/src/hooks";
-import { useReservationUnitList } from "@/hooks";
+import { ButtonSize, ButtonVariant, IconArrowRight, IconCross } from "hds-react";
+import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
+import styled from "styled-components";
+import { useDisplayError } from "ui/src/hooks";
+import { breakpoints } from "ui/src/modules/const";
+import { ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { Flex, NoWrap, WhiteButton, pageSideMargins } from "ui/src/styled";
 import { LoginFragment } from "@/components/LoginFragment";
-import { getPostLoginUrl } from "@/modules/util";
+import { useReservationUnitList } from "@/hooks";
 import { isBrowser } from "@/modules/const";
+import { getApplicationPath } from "@/modules/urls";
+import { getPostLoginUrl } from "@/modules/util";
+import { type ApplicationCreateMutationInput, ReservationUnitNode, useCreateApplicationMutation } from "@gql/gql-types";
 
 const SpaceWrapper = styled.div`
   height: 76px;

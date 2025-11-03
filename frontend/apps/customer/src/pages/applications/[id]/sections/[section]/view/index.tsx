@@ -1,21 +1,21 @@
 import React from "react";
+import { gql } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { H1 } from "ui/src/styled";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { AllReservations } from "@/components/application/ApprovedReservations";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { applicationsPrefix, getApplicationPath } from "@/modules/urls";
 import {
   ApplicationSectionViewDocument,
   type ApplicationSectionViewQuery,
   type ApplicationSectionViewQueryVariables,
   ApplicationStatusChoice,
 } from "@gql/gql-types";
-import { H1 } from "ui/src/styled";
-import { AllReservations } from "@/components/application/ApprovedReservations";
-import { gql } from "@apollo/client";
-import { useTranslation } from "next-i18next";
-import { Breadcrumb } from "@/components/Breadcrumb";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { applicationsPrefix, getApplicationPath } from "@/modules/urls";
 
 function ViewAll({ applicationSection }: PropsNarrowed): JSX.Element {
   const { t, i18n } = useTranslation();

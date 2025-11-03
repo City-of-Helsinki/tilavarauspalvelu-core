@@ -1,13 +1,17 @@
 import React, { Fragment } from "react";
-import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
-import { MunicipalityChoice, type ReservationUnitNode, ReserveeType } from "../../gql/gql-types";
-import { ReservationFormField } from "./ReservationFormField";
+import { useTranslation } from "next-i18next";
+import styled from "styled-components";
+import { ControlledCheckbox, ControlledNumberInput, ControlledSelect } from "@ui/components/form";
+import { type ReservationFormValueT } from "@ui/schemas";
 import { AutoGrid, H4, H5 } from "@ui/styled";
 import type { OptionsRecord } from "@ui/types";
+import { MunicipalityChoice, type ReservationUnitNode, ReserveeType } from "../../gql/gql-types";
+import { CustomerTypeSelector } from "./CustomerTypeSelector";
+import { ReservationFormField } from "./ReservationFormField";
 import { ReservationSubventionSection } from "./ReservationSubventionSection";
+import { StyledCheckboxWrapper, StyledTextArea, StyledTextInput } from "./styled";
 import {
   constructReservationFieldId,
   constructReservationFieldLabel,
@@ -17,10 +21,6 @@ import {
   getReservationFormFields,
   getFilteredGeneralFields,
 } from "./util";
-import { CustomerTypeSelector } from "./CustomerTypeSelector";
-import { type ReservationFormValueT } from "@ui/schemas";
-import { ControlledCheckbox, ControlledNumberInput, ControlledSelect } from "@ui/components/form";
-import { StyledCheckboxWrapper, StyledTextArea, StyledTextInput } from "./styled";
 
 interface CommonWithFields {
   reservationUnit: Pick<ReservationUnitNode, "reservationForm" | "minPersons" | "maxPersons">;

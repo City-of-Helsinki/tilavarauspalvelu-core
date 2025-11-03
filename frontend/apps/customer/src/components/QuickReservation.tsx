@@ -1,23 +1,23 @@
 import React, { useMemo } from "react";
+import { type Control, type FieldValues, type SubmitHandler, type UseFormReturn } from "react-hook-form";
 import { Button } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { chunkArray } from "ui/src/modules/util";
-import { parseUIDate, formatDate } from "ui/src/modules/date-utils";
-import { Flex, fontMedium, H4, NoWrap } from "ui/src/styled";
+import { ControlledDateInput } from "ui/src/components/form";
+import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { breakpoints } from "ui/src/modules/const";
-import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
+import { parseUIDate, formatDate } from "ui/src/modules/date-utils";
+import { chunkArray } from "ui/src/modules/util";
+import { Flex, fontMedium, H4, NoWrap } from "ui/src/styled";
+import Carousel from "@/components/Carousel";
+import { type FocusTimeSlot } from "@/modules/reservation";
 import {
   getLastPossibleReservationDate,
   getReservationUnitPrice,
   isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
-import Carousel from "@/components/Carousel";
-import { type Control, type FieldValues, type SubmitHandler, type UseFormReturn } from "react-hook-form";
-import { ControlledDateInput } from "ui/src/components/form";
 import { type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
-import { type FocusTimeSlot } from "@/modules/reservation";
+import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 
 type Props = {
   reservationUnit: ReservationTimePickerFieldsFragment;

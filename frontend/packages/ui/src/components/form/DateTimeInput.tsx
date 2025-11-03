@@ -1,10 +1,10 @@
 import React from "react";
+import { type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
+import { startOfDay } from "date-fns/startOfDay";
 import { DateInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
 import { TimeInput } from "./TimeInput";
-import { startOfDay } from "date-fns/startOfDay";
 
 const DateTimeWrapper = styled.div`
   display: grid;

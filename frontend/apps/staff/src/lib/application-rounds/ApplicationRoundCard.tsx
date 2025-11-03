@@ -1,16 +1,16 @@
 import React from "react";
+import { gql } from "@apollo/client";
+import { IconArrowRight, IconCalendar, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { IconArrowRight, IconCalendar, IconSize } from "hds-react";
-import { type ApplicationRoundCardFragment } from "@gql/gql-types";
-import { formatDateRange, parseValidDateObject } from "ui/src/modules/date-utils";
-import { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
-import { getApplicationRoundUrl } from "@/modules/urls";
-import { TimeframeStatus } from "./TimeframeStatus";
-import { ButtonLikeLink } from "@/components/ButtonLikeLink";
-import { Flex, fontMedium } from "ui/src/styled";
 import { Card } from "ui/src/components";
-import { gql } from "@apollo/client";
+import { formatDateRange, parseValidDateObject } from "ui/src/modules/date-utils";
+import { Flex, fontMedium } from "ui/src/styled";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
+import { getApplicationRoundUrl } from "@/modules/urls";
+import { type ApplicationRoundCardFragment } from "@gql/gql-types";
+import { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
+import { TimeframeStatus } from "./TimeframeStatus";
 
 const Times = styled(Flex).attrs({
   $gap: "m",

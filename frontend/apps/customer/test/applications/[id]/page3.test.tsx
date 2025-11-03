@@ -1,12 +1,12 @@
-import { type ApplicationPage3Query } from "@gql/gql-types";
-import Page3 from "@/pages/applications/[id]/page3";
-import { render, within } from "@testing-library/react";
-import { vi, expect, test, describe } from "vitest";
-import { createGraphQLMocks } from "@test/gql.mocks";
 import { createMockApplicationFragment, type CreateMockApplicationFragmentProps } from "@test/application.mocks";
-import userEvent from "@testing-library/user-event";
-import { getApplicationPath } from "@/modules/urls";
+import { createGraphQLMocks } from "@test/gql.mocks";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
+import { render, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { vi, expect, test, describe } from "vitest";
+import { getApplicationPath } from "@/modules/urls";
+import Page3 from "@/pages/applications/[id]/page3";
+import { type ApplicationPage3Query } from "@gql/gql-types";
 
 const { mockedRouterPush, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();

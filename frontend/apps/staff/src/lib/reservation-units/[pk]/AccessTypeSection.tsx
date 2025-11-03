@@ -1,18 +1,18 @@
 import React from "react";
-import styled from "styled-components";
-import { useTranslation } from "next-i18next";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
-import { type ReservationUnitEditFormValues } from "./form";
-import { EditAccordion } from "./styled";
+import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";
+import { useTranslation } from "next-i18next";
+import styled from "styled-components";
+import StatusLabel from "ui/src/components/StatusLabel";
 import { ControlledDateInput, ControlledSelect } from "ui/src/components/form";
 import { formatDate, parseUIDate, parseValidDateObject } from "ui/src/modules/date-utils";
-import StatusLabel from "ui/src/components/StatusLabel";
 import { AutoGrid, Flex, H6 } from "ui/src/styled";
-import { KVWrapper, Label, Value } from "@/styled";
-import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";
-import { AccessType, ReservationUnitEditQuery } from "@gql/gql-types";
-import { getTranslatedError } from "@/modules/util";
 import { NotificationInline } from "@/components/NotificationInline";
+import { getTranslatedError } from "@/modules/util";
+import { KVWrapper, Label, Value } from "@/styled";
+import { AccessType, ReservationUnitEditQuery } from "@gql/gql-types";
+import { type ReservationUnitEditFormValues } from "./form";
+import { EditAccordion } from "./styled";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;

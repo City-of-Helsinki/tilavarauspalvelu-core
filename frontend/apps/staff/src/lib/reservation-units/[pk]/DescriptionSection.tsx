@@ -1,16 +1,16 @@
 import React from "react";
-import dynamic from "next/dynamic";
 import { Controller, UseFormReturn } from "react-hook-form";
-import type { ReservationUnitEditorParametersQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
+import dynamic from "next/dynamic";
+import { ControlledSelect } from "ui/src/components/form";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { AutoGrid } from "ui/src/styled";
-import { ControlledSelect } from "ui/src/components/form";
 import { getTranslatedError } from "@/modules/util";
+import type { ReservationUnitEditorParametersQuery } from "@gql/gql-types";
+import { ImageEditor } from "./ImageEditor";
 import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 import { getTranslatedTooltipTex } from "./utils";
-import { ImageEditor } from "./ImageEditor";
 
 const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {
   ssr: false,

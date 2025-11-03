@@ -1,13 +1,13 @@
 import React from "react";
-import styled from "styled-components";
-import { useTranslation } from "next-i18next";
 import { type UseFormReturn } from "react-hook-form";
 import { TextInput } from "hds-react";
+import { useTranslation } from "next-i18next";
+import styled from "styled-components";
+import { Flex, fontMedium, H4 } from "ui/src/styled";
+import { ControlledRichTextInput } from "./ControlledRichTextInput";
 import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
-import { ControlledRichTextInput } from "./ControlledRichTextInput";
 import { getTranslatedTooltipTex } from "./utils";
-import { Flex, fontMedium, H4 } from "ui/src/styled";
 
 const SubAccordion = styled(EditAccordion)`
   border-bottom: none !important;

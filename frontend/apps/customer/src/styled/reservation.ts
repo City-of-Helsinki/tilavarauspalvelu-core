@@ -1,6 +1,6 @@
+import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";
 import { Flex } from "ui/src/styled";
-import styled from "styled-components";
 
 const CARD_COLUMN_SIZE = 390;
 

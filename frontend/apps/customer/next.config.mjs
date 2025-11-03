@@ -1,8 +1,8 @@
 // @ts-check
+import { withSentryConfig } from "@sentry/nextjs";
 import { join } from "node:path";
 import * as url from "node:url";
 import i18nconfig from "./next-i18next.config.cjs";
-import { withSentryConfig } from "@sentry/nextjs";
 import { env } from "./src/env.mjs";
 import { getVersion } from "./src/modules/baseUtils.mjs";
 

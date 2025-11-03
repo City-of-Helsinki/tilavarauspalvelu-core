@@ -1,9 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { type CreateGraphQLMockProps } from "@test/test.gql.utils";
-import { render, screen, within } from "@testing-library/react";
-import Reservation from "@/pages/reservations/[id]";
-import { OrderStatus, ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
-import { camelCase } from "lodash-es";
+import { createGraphQLMocks } from "@test/gql.mocks";
 import {
   createOptionsMock,
   createReservationPageMock,
@@ -11,8 +6,13 @@ import {
   type ReservationPaymentOrderFragment,
   reservationRenderProps,
 } from "@test/reservation.mocks";
-import { createGraphQLMocks } from "@test/gql.mocks";
+import { type CreateGraphQLMockProps } from "@test/test.gql.utils";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
+import { render, screen, within } from "@testing-library/react";
+import { camelCase } from "lodash-es";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import Reservation from "@/pages/reservations/[id]";
+import { OrderStatus, ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
   const params = vi.fn();

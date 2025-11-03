@@ -1,16 +1,16 @@
 import React from "react";
-import { useTranslation, type TFunction } from "next-i18next";
-import { memoize } from "lodash-es";
+import { gql } from "@apollo/client";
 import { IconLinkExternal, IconSize, Tooltip } from "hds-react";
-import type { AllocatedSectionsTableElementFragment } from "@gql/gql-types";
+import { memoize } from "lodash-es";
+import { useTranslation, type TFunction } from "next-i18next";
+import styled from "styled-components";
 import { convertWeekday } from "ui/src/modules/conversion";
+import { timeToMinutes, formatTimeRange } from "ui/src/modules/date-utils";
+import { CustomTable } from "@/components/Table";
 import { getApplicantName, truncate } from "@/modules/helpers";
 import { getApplicationUrl, getReservationUrl } from "@/modules/urls";
-import { CustomTable } from "@/components/Table";
 import { ExternalTableLink, TableLink } from "@/styled";
-import styled from "styled-components";
-import { gql } from "@apollo/client";
-import { timeToMinutes, formatTimeRange } from "ui/src/modules/date-utils";
+import type { AllocatedSectionsTableElementFragment } from "@gql/gql-types";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;

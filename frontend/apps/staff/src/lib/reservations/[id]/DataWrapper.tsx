@@ -1,6 +1,6 @@
 import React from "react";
-import { KVWrapper, Label, Value } from "@/styled";
 import { LoadingSpinner } from "hds-react";
+import { KVWrapper, Label, Value } from "@/styled";
 
 export function DataWrapper({
   label,

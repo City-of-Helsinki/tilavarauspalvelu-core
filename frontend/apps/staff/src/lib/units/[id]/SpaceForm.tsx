@@ -1,11 +1,11 @@
 import React from "react";
-import { TextInput } from "hds-react";
-import styled from "styled-components";
-import { useTranslation } from "next-i18next";
-import { breakpoints } from "ui/src/modules/const";
-import { z } from "zod";
 import { UseFormReturn } from "react-hook-form";
+import { TextInput } from "hds-react";
+import { useTranslation } from "next-i18next";
+import styled from "styled-components";
+import { z } from "zod";
 import { ControlledNumberInput } from "ui/src/components/form";
+import { breakpoints } from "ui/src/modules/const";
 import { getTranslatedError } from "@/modules/util";
 
 const EditorColumns = styled.div`

@@ -1,13 +1,13 @@
 import React from "react";
-import styled from "styled-components";
-import { addHours, endOfMonth, format, startOfWeek, getDay, startOfDay, parseISO } from "date-fns";
-import { fi } from "date-fns/locale/fi";
-import { enGB } from "date-fns/locale/en-GB";
-import { sv } from "date-fns/locale/sv";
 import { Calendar as BigCalendar, dateFnsLocalizer, ToolbarProps } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
-import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import { addHours, endOfMonth, format, startOfWeek, getDay, startOfDay, parseISO } from "date-fns";
+import { enGB } from "date-fns/locale/en-GB";
+import { fi } from "date-fns/locale/fi";
+import { sv } from "date-fns/locale/sv";
+import styled from "styled-components";
 import { dateToMinutes, formatTimeRange } from "../../modules/date-utils";
 import type { LocalizationLanguages } from "../../modules/urlBuilder";
 

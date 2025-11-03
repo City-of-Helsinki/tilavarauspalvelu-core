@@ -1,14 +1,14 @@
 import React from "react";
+import { gql } from "@apollo/client";
+import { IconLinkExternal } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import type { Maybe, LocationFieldsI18nFragment, AddressFieldsFragment } from "@gql/gql-types";
-import { IconLinkExternal } from "hds-react";
 import { IconButton } from "ui/src/components";
-import { mapUrlPrefix } from "@/modules/const";
-import { Flex, H4, fontMedium } from "ui/src/styled";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
 import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { gql } from "@apollo/client";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { Flex, H4, fontMedium } from "ui/src/styled";
+import { mapUrlPrefix } from "@/modules/const";
+import type { Maybe, LocationFieldsI18nFragment, AddressFieldsFragment } from "@gql/gql-types";
 
 const AddressSpan = styled.span`
   font-size: var(--fontsize-body-l);

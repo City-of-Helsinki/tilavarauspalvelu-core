@@ -1,7 +1,15 @@
 import React, { forwardRef } from "react";
+import { gql } from "@apollo/client";
 import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen, IconQuestionCircle, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
+import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
+import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
 import { Flex, TitleSection, H1 } from "ui/src/styled";
+import { ExternalLink } from "@/components/ExternalLink";
+import { useSession } from "@/hooks";
+import { hasPermission } from "@/modules/permissionHelper";
+import { getName } from "@/modules/reservation";
+import { getApplicationUrl } from "@/modules/urls";
 import {
   type Maybe,
   OrderStatus,
@@ -10,14 +18,6 @@ import {
   useReservationApplicationLinkQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { getName } from "@/modules/reservation";
-import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
-import { getApplicationUrl } from "@/modules/urls";
-import { gql } from "@apollo/client";
-import { ExternalLink } from "@/components/ExternalLink";
-import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
-import { useSession } from "@/hooks";
-import { hasPermission } from "@/modules/permissionHelper";
 
 function getStatusLabelType(s?: Maybe<OrderStatus>): StatusLabelType {
   switch (s) {

@@ -1,13 +1,13 @@
 import React from "react";
 import { Link, LinkSize } from "hds-react";
-import { H1, HR } from "ui/src/styled";
+import { type GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
-import { Filters, UnitsDataLoader } from "@/components/units";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { H1, HR } from "ui/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
+import { Filters, UnitsDataLoader } from "@/components/units";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { UserPermissionChoice } from "@gql/gql-types";
-import { type GetServerSidePropsContext } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 function Units(): JSX.Element {
   const { t } = useTranslation();

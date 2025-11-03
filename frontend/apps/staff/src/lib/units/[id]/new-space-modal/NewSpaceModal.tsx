@@ -1,17 +1,17 @@
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { gql } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useDisplayError } from "ui/src/hooks";
 import {
   type NewResourceUnitFieldsFragment,
   useCreateSpaceMutation,
   type SpaceCreateMutationInput,
 } from "@gql/gql-types";
+import { SpaceUpdateSchema, SpaceUpdateForm } from "../SpaceForm";
+import { UnitInfo } from "../UnitInfo";
 import { Page1 } from "./Page1";
 import { Page2 } from "./Page2";
-import { useForm } from "react-hook-form";
-import { SpaceUpdateSchema, SpaceUpdateForm } from "../SpaceForm";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { gql } from "@apollo/client";
-import { UnitInfo } from "../UnitInfo";
-import { useDisplayError } from "ui/src/hooks";
 
 type Props = {
   unit: NewResourceUnitFieldsFragment;

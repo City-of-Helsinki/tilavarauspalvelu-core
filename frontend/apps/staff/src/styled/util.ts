@@ -1,8 +1,8 @@
 import { Accordion as AccordionBase, Dialog } from "hds-react";
-import styled, { css } from "styled-components";
-import { fontMedium } from "ui/src/styled";
-import { breakpoints } from "ui/src/modules/const";
 import Link from "next/link";
+import styled, { css } from "styled-components";
+import { breakpoints } from "ui/src/modules/const";
+import { fontMedium } from "ui/src/styled";
 
 export const TableLink = styled(Link)`
   --focus-ring-color: var(--color-coat-of-arms);

@@ -1,12 +1,34 @@
 import React, { useMemo } from "react";
-import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
-import styled from "styled-components";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
+import { gql } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
-import { H1, H4 } from "ui/src/styled";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { default as NextError } from "next/error";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
+import styled from "styled-components";
+import { Sanitize } from "ui/src/components/Sanitize";
+import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
 import { breakpoints } from "ui/src/modules/const";
+import { createNodeId, toNumber } from "ui/src/modules/helpers";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { H1, H4 } from "ui/src/styled";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
+import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
+import { ReservationStep0, ReservationStep1 } from "@/lib/reservation-unit/[...params]";
+import { createApolloClient } from "@/modules/apolloClient";
+import { queryOptions } from "@/modules/queryOptions";
+import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import {
+  getReservationInProgressPath,
+  getReservationPath,
+  getReservationUnitPath,
+  getSingleSearchPath,
+} from "@/modules/urls";
+import { ReservationPageWrapper, ReservationTitleSection, PinkBox as PinkBoxBase } from "@/styled/reservation";
+import { StyledStepper } from "@/styled/util";
 import {
   ReservationDocument,
   type ReservationQuery,
@@ -14,28 +36,6 @@ import {
   ReservationStateChoice,
   useDeleteReservationMutation,
 } from "@gql/gql-types";
-import { createApolloClient } from "@/modules/apolloClient";
-import { default as NextError } from "next/error";
-import {
-  getReservationInProgressPath,
-  getReservationPath,
-  getReservationUnitPath,
-  getSingleSearchPath,
-} from "@/modules/urls";
-import { Sanitize } from "ui/src/components/Sanitize";
-import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
-import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
-import { ReservationStep0, ReservationStep1 } from "@/lib/reservation-unit/[...params]";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { createNodeId, toNumber } from "ui/src/modules/helpers";
-import { queryOptions } from "@/modules/queryOptions";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { gql } from "@apollo/client";
-import { Breadcrumb } from "@/components/Breadcrumb";
-import { ReservationPageWrapper, ReservationTitleSection, PinkBox as PinkBoxBase } from "@/styled/reservation";
-import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
-import { useSearchParams } from "next/navigation";
-import { StyledStepper } from "@/styled/util";
 
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
   grid-column: 1 / -1;

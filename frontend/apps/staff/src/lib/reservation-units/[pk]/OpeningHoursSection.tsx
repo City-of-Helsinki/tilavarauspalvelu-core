@@ -1,12 +1,12 @@
 import React from "react";
 import { IconLinkExternal } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { AutoGrid } from "ui/src/styled";
-import { EditAccordion } from "./styled";
-import type { ReservationUnitEditQuery } from "@gql/gql-types";
-import { getOpeningHoursUrl } from "@/modules/urls";
-import { isBrowser } from "ui/src/modules/helpers";
 import { ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
+import { isBrowser } from "ui/src/modules/helpers";
+import { AutoGrid } from "ui/src/styled";
+import { getOpeningHoursUrl } from "@/modules/urls";
+import type { ReservationUnitEditQuery } from "@gql/gql-types";
+import { EditAccordion } from "./styled";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;

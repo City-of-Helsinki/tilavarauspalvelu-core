@@ -1,23 +1,23 @@
-import { Button, ButtonVariant, IconPlusCircleFill, Notification, NotificationSize } from "hds-react";
 import React from "react";
-import { useTranslation } from "next-i18next";
-import styled from "styled-components";
-import { UserPermissionChoice, useUnitPageQuery } from "@gql/gql-types";
-import { formatAddress } from "@/modules/util";
-import { ExternalLink } from "@/components/ExternalLink";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { Error404 } from "@/components/Error404";
-import { ReservationUnitList } from "@lib/units/[id]/ReservationUnitList";
-import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/modules/urls";
-import { CenterSpinner, Flex, fontMedium, H1, H2, H3 } from "ui/src/styled";
 import { gql } from "@apollo/client";
+import { ReservationUnitList } from "@lib/units/[id]/ReservationUnitList";
+import { Button, ButtonVariant, IconPlusCircleFill, Notification, NotificationSize } from "hds-react";
+import { type GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
+import styled from "styled-components";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { CenterSpinner, Flex, fontMedium, H1, H2, H3 } from "ui/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
+import { Error404 } from "@/components/Error404";
+import { ExternalLink } from "@/components/ExternalLink";
 import { PUBLIC_URL, NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/modules/urls";
+import { formatAddress } from "@/modules/util";
+import { UserPermissionChoice, useUnitPageQuery } from "@gql/gql-types";
 
 const Image = styled.img`
   clip-path: circle(50% at 50% 50%);
