@@ -3,7 +3,7 @@ import {
   BLOCKED,
   CALENDAR_LEGENDS,
   CONFIRMED,
-  EVENT_STYLE,
+  CALENDAR_EVENT_BASE_STYLE,
   EventStyleType,
   INTERSECTING_RESERVATION_UNIT,
   STAFF_RESERVATION,
@@ -24,6 +24,8 @@ const selected_legends = [
   "INTERSECTING_RESERVATION_UNIT",
   "PAUSE",
   "CLOSED",
+  "NOT_RESERVABLE",
+  "RESERVABLE",
   "RESERVATION_UNIT_RELEASED",
   "RESERVATION_UNIT_DRAFT",
 ];
@@ -48,7 +50,7 @@ const eventStyleGetter =
     const isStaff = event?.type === ReservationTypeChoice.Staff;
 
     const style = {
-      ...EVENT_STYLE,
+      ...CALENDAR_EVENT_BASE_STYLE,
     };
 
     if (isConfirmed && isBlocked) {

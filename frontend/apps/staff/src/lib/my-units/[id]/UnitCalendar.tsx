@@ -10,7 +10,7 @@ import { breakpoints } from "ui/src/modules/const";
 import { focusStyles } from "ui/src/styled";
 import { isCellOverlappingSpan, TimeSpanType } from "@ui/components/calendar/util";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { EVENT_BUFFER } from "@/modules/calendarStyling";
+import { EVENT_BUFFER, NOT_RESERVABLE } from "@/modules/calendarStyling";
 import { getReserveeName } from "@/modules/util";
 import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { ReservationPopupContent } from "./ReservationPopupContent";
@@ -181,12 +181,12 @@ const EventContainer = styled.div`
   left: 0;
 `;
 
-const CellStyled = styled.div<{ $isPast?: boolean }>`
-  ${({ $isPast }) => ($isPast ? "background: var(--tilavaraus-event-booking-past-date);" : "")}
+const CellStyled = styled.div`
   height: 100%;
   width: 100%;
   border-left: ${CELL_BORDER};
   border-top: ${CELL_BORDER};
+  cursor: pointer;
 
   &:focus {
     ${focusStyles};
@@ -289,9 +289,9 @@ function Cell({
       ref={ref}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      $isPast={isPast || isClosed}
       tabIndex={isPast || isClosed ? -1 : 0}
       data-testid={`UnitCalendar__RowCalendar--cell-${cellId}`}
+      style={isPast || isClosed ? NOT_RESERVABLE.style : undefined}
     />
   );
 }

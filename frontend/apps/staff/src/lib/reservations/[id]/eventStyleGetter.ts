@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 import {
+  CALENDAR_EVENT_BASE_STYLE,
   CALENDAR_LEGENDS,
   CONFIRMED,
-  EVENT_STYLE,
   EVENT_BUFFER,
   EventStyleType,
   REST,
@@ -68,7 +68,7 @@ const eventStyleGetter =
     const isBuffer = event?.state === "BUFFER";
 
     const style = {
-      ...EVENT_STYLE,
+      ...CALENDAR_EVENT_BASE_STYLE,
       padding: "3px 6px",
       color: "var(--color-white)",
     };
