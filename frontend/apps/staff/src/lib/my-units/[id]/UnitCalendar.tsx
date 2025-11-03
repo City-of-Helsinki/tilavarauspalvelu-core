@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import styled, { css } from "styled-components";
 import { CalendarEvent } from "ui/src/components/calendar/Calendar";
 import { breakpoints } from "ui/src/modules/const";
+import { formatTimeRange, timeForInput, timeToMinutes } from "ui/src/modules/date-utils";
 import { focusStyles } from "ui/src/styled";
 import { isCellOverlappingSpan, TimeSpanType } from "@ui/components/calendar/util";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
@@ -138,13 +139,19 @@ const EventContent = styled.div`
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    padding: var(--spacing-xs);
-
-    margin: 0;
+    padding-left: var(--spacing-xs);
+    padding-right: var(--spacing-xs);
+    padding-top: var(--spacing-3-xs);
     position: absolute;
+    margin: 0;
     width: calc(100% - var(--spacing-xs) * 2);
     height: calc(100% - var(--spacing-xs) * 2);
     pointer-events: none;
+    font-size: var(--fontsize-body-s);
+  }
+
+  p:nth-child(2) {
+    top: calc(var(--spacing-xs) * 1.5);
   }
 `;
 
@@ -392,6 +399,7 @@ function Event({ event, styleGetter }: { event: CalendarEventType; styleGetter: 
   const left = `${hourPercent * hours}%`;
   const right = `calc(${left} + ${durationMinutes / 60} * ${100 / N_HOURS}% + 1px)`;
 
+  const timeRange = formatTimeRange(timeToMinutes(timeForInput(event.start)), timeToMinutes(timeForInput(event.end)));
   const reservation = event.event;
   return (
     <>
@@ -408,6 +416,7 @@ function Event({ event, styleGetter }: { event: CalendarEventType; styleGetter: 
           style={{ ...styleGetter(event).style }}
           data-testid={`UnitCalendar__RowCalendar--event-${reservation?.pk}`}
         >
+          <p>{timeRange}</p>
           <p>{title}</p>
           {/* NOTE don't set position on Popup it breaks responsiveness */}
           <Popup trigger={EventTriggerButton}>
