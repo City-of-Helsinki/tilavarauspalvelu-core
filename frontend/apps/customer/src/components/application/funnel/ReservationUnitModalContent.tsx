@@ -24,7 +24,6 @@ import { type SearchFormValues, SeasonalSearchForm } from "@/components/Seasonal
 import { useSearchQuery } from "@/hooks";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { getApplicationRoundName } from "@/modules/applicationRound";
-import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { processVariables } from "@/modules/search";
 import { getReservationUnitPath } from "@/modules/urls";
 import {
@@ -64,11 +63,11 @@ function ReservationUnitCard({ reservationUnit, handleAdd, handleRemove, isSelec
   const buttonText = isSelected
     ? t("reservationUnitModal:deselectReservationUnit")
     : t("reservationUnitModal:selectReservationUnit");
-  const name = getReservationUnitName(reservationUnit);
+  const name = getTranslation(reservationUnit, "name", lang);
   const reservationUnitTypeName = reservationUnit.reservationUnitType
     ? getTranslation(reservationUnit.reservationUnitType, "name", lang)
     : undefined;
-  const unitName = reservationUnit.unit ? getUnitName(reservationUnit.unit, lang) : undefined;
+  const unitName = getTranslation(reservationUnit.unit, "name", lang);
 
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "small");
