@@ -1,18 +1,19 @@
 import React from "react";
 import type { NavigateAction, View } from "react-big-calendar";
-import { format, startOfWeek, endOfWeek } from "date-fns";
+import { endOfWeek, format, startOfWeek } from "date-fns";
 import { fi } from "date-fns/locale/fi";
-import { IconAngleLeft, IconAngleRight } from "hds-react";
+import { IconAngleLeft, IconAngleRight, IconCalendarRecurring } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { breakpoints } from "../../modules/const";
-import { Flex, NoWrap, fontMedium } from "../../styled";
+import { breakpoints } from "@ui/modules/const";
+import { Flex, fontMedium, NoWrap } from "@ui/styled";
 
 const DateNavigationWrapper = styled(Flex).attrs({
   $direction: "row",
   $alignItems: "center",
 })`
   flex-grow: 1;
+
   > span {
     flex-grow: 1;
   }
@@ -40,7 +41,11 @@ export const ToolbarBtn = styled.button.attrs({ type: "button" })<{
   $active?: boolean;
 }>`
   /* rbc-toolbar button overrides these */
+
   && {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2-xs);
     border: 2px solid var(--color-black);
     border-radius: 0;
     cursor: pointer;
@@ -48,15 +53,14 @@ export const ToolbarBtn = styled.button.attrs({ type: "button" })<{
     color: var(--color-black);
     font-size: var(--fontsize-body-m);
     height: 44px;
-    ${fontMedium}
 
+    ${fontMedium}
     ${(props) =>
       props.$borderless &&
       `
       border: none;
       color: var(--color-gray-dark);
     `}
-
     ${(props) =>
       props.$active &&
       `
@@ -65,7 +69,6 @@ export const ToolbarBtn = styled.button.attrs({ type: "button" })<{
       color: var(--color-white);
       border-color: var(--color-bus);
     `}
-
     &[disabled] {
       cursor: not-allowed;
       border-color: var(--color-black-30);
@@ -124,7 +127,10 @@ export function Toolbar({ onNavigate, onView, view, date, children }: Readonly<T
       aria-hidden="true"
     >
       <Flex $direction="row">
-        <ToolbarBtn onClick={() => onNavigate("TODAY")}>{t("common:today")}</ToolbarBtn>
+        <ToolbarBtn onClick={() => onNavigate("TODAY")}>
+          <IconCalendarRecurring />
+          {t("common:today")}
+        </ToolbarBtn>
         {children}
       </Flex>
       <DateNavigationWrapper>
