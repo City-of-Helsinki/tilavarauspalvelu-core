@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { useMedia } from "react-use";
+import { gql } from "@apollo/client";
+import { isBefore } from "date-fns";
 import {
   Button,
   ButtonSize,
@@ -14,13 +17,28 @@ import {
   Table,
   Tooltip,
 } from "hds-react";
+import { type TFunction } from "i18next";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
-import styled from "styled-components";
-import { type TFunction } from "i18next";
-import { useMedia } from "react-use";
 import { useRouter } from "next/router";
-import { isBefore } from "date-fns";
+import styled from "styled-components";
+import { IconButton, StatusLabel } from "ui/src/components";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
+import { PopupMenu } from "ui/src/components/PopupMenu";
+import { Sanitize } from "ui/src/components/Sanitize";
+import type { StatusLabelType } from "ui/src/components/StatusLabel";
+import { breakpoints } from "ui/src/modules/const";
+import { convertWeekday } from "ui/src/modules/conversion";
+import {
+  formatDate,
+  formatDateRange,
+  applicationReservationDateTime,
+  setMondayFirst,
+  formatApiDate,
+} from "ui/src/modules/date-utils";
+import { filterNonNullable, formatApiTimeInterval, getLocalizationLang, sort, toNumber } from "ui/src/modules/helpers";
+import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
+import { getTranslationSafe } from "ui/src/modules/util";
 import {
   fontBold,
   fontMedium,
@@ -31,15 +49,10 @@ import {
   H5,
   CenterSpinner,
 } from "ui/src/styled";
-import { breakpoints } from "ui/src/modules/const";
-import { getTranslationSafe } from "ui/src/modules/util";
-import { filterNonNullable, formatApiTimeInterval, getLocalizationLang, sort, toNumber } from "ui/src/modules/helpers";
-import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { convertWeekday } from "ui/src/modules/conversion";
-import { PopupMenu } from "ui/src/components/PopupMenu";
-import { IconButton, StatusLabel } from "ui/src/components";
-import type { StatusLabelType } from "ui/src/components/StatusLabel";
-import { Sanitize } from "ui/src/components/Sanitize";
+import { AccordionWithIcons } from "@/components/AccordionWithIcons";
+import { isReservationCancellableReason, ReservationCancellableReason } from "@/modules/reservation";
+import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
+import { getApplicationReservationPath, getApplicationSectionPath, getReservationUnitPath } from "@/modules/urls";
 import {
   type ApplicationSectionReservationFragment,
   useApplicationReservationsQuery,
@@ -54,19 +67,6 @@ import {
   Maybe,
   ApplicationRoundNode,
 } from "@gql/gql-types";
-import { gql } from "@apollo/client";
-import { getApplicationReservationPath, getApplicationSectionPath, getReservationUnitPath } from "@/modules/urls";
-import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
-import { AccordionWithIcons } from "@/components/AccordionWithIcons";
-import { isReservationCancellableReason, ReservationCancellableReason } from "@/modules/reservation";
-import {
-  formatDate,
-  formatDateRange,
-  applicationReservationDateTime,
-  setMondayFirst,
-  formatApiDate,
-} from "ui/src/modules/date-utils";
-import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 
 const N_RESERVATIONS_TO_SHOW = 20;
 

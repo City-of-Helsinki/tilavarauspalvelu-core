@@ -2,15 +2,15 @@ import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import * as Sentry from "@sentry/nextjs";
 import styled from "styled-components";
-import { ErrorGeneric } from "@/components/ErrorGeneric";
 import { BannerNotificationsList } from "ui/src/components";
-import { BannerNotificationTarget } from "@gql/gql-types";
-import { ScrollToTop } from "@/components/ScrollToTop";
-import { Navigation } from "./Navigation";
 import { ToastContainer } from "ui/src/components/toast";
-import { useModal } from "@/context/ModalContext";
 import { mainStyles } from "ui/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
+import { ErrorGeneric } from "@/components/ErrorGeneric";
+import { ScrollToTop } from "@/components/ScrollToTop";
+import { useModal } from "@/context/ModalContext";
+import { BannerNotificationTarget } from "@gql/gql-types";
+import { Navigation } from "./Navigation";
 
 type Props = {
   apiBaseUrl: string;

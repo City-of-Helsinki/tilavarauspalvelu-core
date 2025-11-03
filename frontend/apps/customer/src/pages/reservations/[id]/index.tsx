@@ -1,11 +1,52 @@
 import React from "react";
-import type { GetServerSidePropsContext } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import styled from "styled-components";
+import { gql } from "@apollo/client";
+import { isBefore, sub } from "date-fns";
 import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, IconLock, Notification } from "hds-react";
+import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
-import { Flex, fontRegular, H1, H4, NoWrap } from "ui/src/styled";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import styled from "styled-components";
+import { ButtonLikeLink, ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
+import IconButton from "ui/src/components/IconButton";
+import StatusLabel from "ui/src/components/StatusLabel";
+import { useToastIfQueryParam } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
+import { formatDateTimeRange } from "ui/src/modules/date-utils";
+import { createNodeId, capitalize, getLocalizationLang, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { convertLanguageCode } from "ui/src/modules/util";
+import { Flex, fontRegular, H1, H4, NoWrap } from "ui/src/styled";
+import { AddressSection } from "@/components/AddressSection";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { LabelValuePair } from "@/components/LabelValuePair";
+import {
+  ReservationInfoCard,
+  ReservationOrderStatus,
+  ReservationStatus,
+  SummaryGeneralFields,
+  SummaryReserveeFields,
+} from "@/components/reservation";
+import { PaymentNotification, TermsInfoSection, Instructions, NotModifiableReason } from "@/lib/reservation/[id]";
+import { createApolloClient } from "@/modules/apolloClient";
+import { queryOptions } from "@/modules/queryOptions";
+import {
+  getNormalizedReservationOrderStatus,
+  getPaymentUrl,
+  getWhyReservationCantBeChanged,
+  isReservationCancellable,
+} from "@/modules/reservation";
+import { getReservationUnitName } from "@/modules/reservationUnit";
+import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
+import {
+  getApplicationPath,
+  getFeedbackUrl,
+  getReservationPath,
+  getReservationUnitPath,
+  type ReservationNotifications,
+  reservationsPrefix,
+} from "@/modules/urls";
+import { ReservationPageWrapper } from "@/styled/reservation";
 import {
   type AccessCodeQuery,
   ApplicationReservationSeriesDocument,
@@ -21,47 +62,6 @@ import {
   ReservationStateChoice,
   useAccessCodeQuery,
 } from "@gql/gql-types";
-import Link from "next/link";
-import { isBefore, sub } from "date-fns";
-import { createApolloClient } from "@/modules/apolloClient";
-import { formatDateTimeRange } from "ui/src/modules/date-utils";
-import {
-  getNormalizedReservationOrderStatus,
-  getPaymentUrl,
-  getWhyReservationCantBeChanged,
-  isReservationCancellable,
-} from "@/modules/reservation";
-import { getReservationUnitName } from "@/modules/reservationUnit";
-import { Breadcrumb } from "@/components/Breadcrumb";
-import { AddressSection } from "@/components/AddressSection";
-import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { ButtonLikeLink, ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
-import { createNodeId, capitalize, getLocalizationLang, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { ReservationPageWrapper } from "@/styled/reservation";
-import {
-  getApplicationPath,
-  getFeedbackUrl,
-  getReservationPath,
-  getReservationUnitPath,
-  type ReservationNotifications,
-  reservationsPrefix,
-} from "@/modules/urls";
-import { useToastIfQueryParam } from "ui/src/hooks";
-import { convertLanguageCode } from "ui/src/modules/util";
-import { gql } from "@apollo/client";
-import StatusLabel from "ui/src/components/StatusLabel";
-import IconButton from "ui/src/components/IconButton";
-import { LabelValuePair } from "@/components/LabelValuePair";
-import {
-  ReservationInfoCard,
-  ReservationOrderStatus,
-  ReservationStatus,
-  SummaryGeneralFields,
-  SummaryReserveeFields,
-} from "@/components/reservation";
-import { PaymentNotification, TermsInfoSection, Instructions, NotModifiableReason } from "@/lib/reservation/[id]";
-import { useSearchParams } from "next/navigation";
-import { queryOptions } from "@/modules/queryOptions";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

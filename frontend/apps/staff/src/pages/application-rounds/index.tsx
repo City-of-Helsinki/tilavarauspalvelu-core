@@ -1,8 +1,22 @@
 import React from "react";
 import { gql } from "@apollo/client";
+import { ApplicationRoundCard } from "@lib/application-rounds";
+import { Accordion } from "hds-react";
 import { orderBy } from "lodash-es";
+import { type GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
+import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
+import { filterNonNullable } from "ui/src/modules/helpers";
+import { CenterSpinner, Flex, H1 } from "ui/src/styled";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
+import { Error404 } from "@/components/Error404";
+import { CustomTable } from "@/components/Table";
+import { truncate } from "@/modules/helpers";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getApplicationRoundUrl } from "@/modules/urls";
+import { TableLink } from "@/styled";
 import {
   ApplicationRoundStatusChoice,
   type ApplicationRoundNode,
@@ -10,20 +24,6 @@ import {
   type ApplicationRoundListElementFragment,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { filterNonNullable } from "ui/src/modules/helpers";
-import { getApplicationRoundUrl } from "@/modules/urls";
-import { truncate } from "@/modules/helpers";
-import { ApplicationRoundCard } from "@lib/application-rounds";
-import { TableLink } from "@/styled";
-import { CustomTable } from "@/components/Table";
-import { Error404 } from "@/components/Error404";
-import { Accordion } from "hds-react";
-import { CenterSpinner, Flex, H1 } from "ui/src/styled";
-import { AuthorizationChecker } from "@/components/AuthorizationChecker";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
-import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
 
 const AccordionWithoutTopPadding = styled(Accordion).attrs({
   closeButton: false,

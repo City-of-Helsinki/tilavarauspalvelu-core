@@ -1,3 +1,7 @@
+import { type TFunction } from "next-i18next";
+import { parseUIDate, isValidDate } from "ui/src/modules/date-utils";
+import { toNumber } from "ui/src/modules/helpers";
+import { type OptionsListT, type OptionT } from "ui/src/modules/search";
 import {
   OrderStatusWithFree,
   Priority,
@@ -6,10 +10,6 @@ import {
   ReservationUnitPublishingState,
   ReserveeType,
 } from "@gql/gql-types";
-import { parseUIDate, isValidDate } from "ui/src/modules/date-utils";
-import { toNumber } from "ui/src/modules/helpers";
-import { type OptionsListT, type OptionT } from "ui/src/modules/search";
-import { type TFunction } from "next-i18next";
 
 export interface TagOptionsList extends OptionsListT {
   stateChoices: Readonly<Array<{ value: ReservationStateChoice; label: string }>>;

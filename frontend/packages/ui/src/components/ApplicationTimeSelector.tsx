@@ -1,11 +1,11 @@
 import React, { type HTMLAttributes, useState } from "react";
-import styled, { css, type RuleSet } from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
-import { AutoGrid, Flex, fontMedium, NoWrap } from "../styled";
-import { WEEKDAYS_SORTED } from "../modules/const";
-import { isTouchDevice } from "../modules/browserHelpers";
+import styled, { css, type RuleSet } from "styled-components";
 import { Weekday } from "../../gql/gql-types";
+import { isTouchDevice } from "../modules/browserHelpers";
+import { WEEKDAYS_SORTED } from "../modules/const";
 import { convertWeekday } from "../modules/conversion";
+import { AutoGrid, Flex, fontMedium, NoWrap } from "../styled";
 
 export const CELL_STATES = ["none", "secondary", "primary"] as const;
 export const OPEN_HOURS_STATES = ["open", "unavailable"] as const;

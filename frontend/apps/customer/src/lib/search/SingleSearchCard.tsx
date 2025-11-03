@@ -1,18 +1,18 @@
-import { IconArrowRight, IconEuroSign, IconGroup, IconHome, IconLock, IconSize } from "hds-react";
 import React from "react";
-import { useTranslation } from "next-i18next";
-import { type SingleSearchCardFragment } from "@gql/gql-types";
-import { isToday, isTomorrow, isValid } from "date-fns";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { formatDate, formatTime } from "ui/src/modules/date-utils";
-import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
-import { isBrowser } from "@/modules/const";
-import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
-import { getImageSource, getMainImage } from "ui/src/modules/helpers";
-import { Card, Tag } from "ui/src/components/";
-import { useSearchParams } from "next/navigation";
-import { getReservationUnitPath } from "@/modules/urls";
 import { gql } from "@apollo/client";
+import { isToday, isTomorrow, isValid } from "date-fns";
+import { IconArrowRight, IconEuroSign, IconGroup, IconHome, IconLock, IconSize } from "hds-react";
+import { useTranslation } from "next-i18next";
+import { useSearchParams } from "next/navigation";
+import { Card, Tag } from "ui/src/components/";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
+import { formatDate, formatTime } from "ui/src/modules/date-utils";
+import { getImageSource, getMainImage } from "ui/src/modules/helpers";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { isBrowser } from "@/modules/const";
+import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
+import { getReservationUnitPath } from "@/modules/urls";
+import { type SingleSearchCardFragment } from "@gql/gql-types";
 
 function StatusTag(props: Pick<SingleSearchCardFragment, "isClosed" | "firstReservableDatetime">): JSX.Element {
   const { t } = useTranslation();

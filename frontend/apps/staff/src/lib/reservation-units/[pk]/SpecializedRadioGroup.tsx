@@ -1,11 +1,11 @@
 import React from "react";
 import { Control, useController } from "react-hook-form";
-import type { ReservationUnitEditFormValues } from "./form";
-import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
+import { useTranslation } from "next-i18next";
 import { ControlledRadioGroup } from "ui/src/components/form";
 import { breakpoints } from "ui/src/modules/const";
 import { getTranslatedError } from "@/modules/util";
+import type { ReservationUnitEditFormValues } from "./form";
 
 export function SpecializedRadioGroup({
   name,

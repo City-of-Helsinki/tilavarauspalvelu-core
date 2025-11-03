@@ -1,16 +1,16 @@
 import React, { useState } from "react";
+import { ApolloError, gql } from "@apollo/client";
+import { IconCalendarEvent, IconClock, IconLocation, IconTrash } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import {
-  ApplicationSectionCancelDocument,
-  useCancelApplicationSectionMutation,
-  type ApplicationSectionCancelQuery,
-  type ApplicationSectionCancelQueryVariables,
-} from "@gql/gql-types";
-import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";
-import { ReservationPageWrapper } from "@/styled/reservation";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { createApolloClient } from "@/modules/apolloClient";
+import { useRouter } from "next/router";
+import styled from "styled-components";
+import { Card } from "ui/src/components";
+import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
+import { useDisplayError } from "ui/src/hooks";
+import { breakpoints } from "ui/src/modules/const";
+import { parseApiDate, formatDate } from "ui/src/modules/date-utils";
 import {
   createNodeId,
   filterNonNullable,
@@ -18,21 +18,21 @@ import {
   ignoreMaybeArray,
   toNumber,
 } from "ui/src/modules/helpers";
-import { getApplicationPath } from "@/modules/urls";
-import { useTranslation } from "next-i18next";
-import { ApolloError, gql } from "@apollo/client";
-import { H1 } from "ui/src/styled";
-import { breakpoints } from "ui/src/modules/const";
 import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { parseApiDate, formatDate } from "ui/src/modules/date-utils";
-import { useRouter } from "next/router";
-import { IconCalendarEvent, IconClock, IconLocation, IconTrash } from "hds-react";
-import { Card } from "ui/src/components";
-import styled from "styled-components";
-import { isReservationCancellable } from "@/modules/reservation";
-import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
+import { H1 } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { useDisplayError } from "ui/src/hooks";
+import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";
+import { createApolloClient } from "@/modules/apolloClient";
+import { isReservationCancellable } from "@/modules/reservation";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getApplicationPath } from "@/modules/urls";
+import { ReservationPageWrapper } from "@/styled/reservation";
+import {
+  ApplicationSectionCancelDocument,
+  useCancelApplicationSectionMutation,
+  type ApplicationSectionCancelQuery,
+  type ApplicationSectionCancelQueryVariables,
+} from "@gql/gql-types";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 

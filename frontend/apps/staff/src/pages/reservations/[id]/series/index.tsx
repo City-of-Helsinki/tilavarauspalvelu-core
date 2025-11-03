@@ -1,6 +1,46 @@
 import React, { useEffect, useState } from "react";
-import { NewReservationListItem } from "@/components/ReservationsList";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { ApolloError, gql, useApolloClient } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { isSameDay } from "date-fns";
+import { Button, ButtonSize, Notification } from "hds-react";
+import { type GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
+import { ControlledDateInput, TimeInput } from "ui/src/components/form";
+import { errorToast, successToast } from "ui/src/components/toast";
+import { useDisplayError } from "ui/src/hooks";
+import { getSeriesOverlapErrors } from "ui/src/modules/apolloUtils";
+import {
+  parseApiDate,
+  fromApiDateTime,
+  parseUIDate,
+  formatDate,
+  parseUIDateUnsafe,
+  formatApiDateUnsafe,
+  formatTime,
+} from "ui/src/modules/date-utils";
+import { calculateMedian, createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { AutoGrid, ButtonContainer, CenterSpinner, H1, Strong } from "ui/src/styled";
+import { BufferToggles } from "@/components/BufferToggles";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
+import { Error403 } from "@/components/Error403";
+import { Error404 } from "@/components/Error404";
+import { LinkPrev } from "@/components/LinkPrev";
+import { ReservationListEditor } from "@/components/ReservationListEditor";
+import { NewReservationListItem } from "@/components/ReservationsList";
+import { WeekdaysSelector } from "@/components/WeekdaysSelector";
+import { useFilteredReservationList, useMultipleReservation, useSession } from "@/hooks";
+import { createClient } from "@/modules/apolloClient";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { generateReservations } from "@/modules/generateReservations";
+import { getBufferTime } from "@/modules/helpers";
+import { hasPermission } from "@/modules/permissionHelper";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getReservationUrl } from "@/modules/urls";
+import { getRescheduleReservationSeriesSchema, RescheduleReservationSeriesForm } from "@/schemas";
+import { Element } from "@/styled";
 import {
   ReservationPermissionsDocument,
   type ReservationPermissionsQuery,
@@ -16,46 +56,6 @@ import {
   UserPermissionChoice,
   useSeriesPageQuery,
 } from "@gql/gql-types";
-import { calculateMedian, createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { isSameDay } from "date-fns";
-import { useTranslation } from "next-i18next";
-import { Element } from "@/styled";
-import { AutoGrid, ButtonContainer, CenterSpinner, H1, Strong } from "ui/src/styled";
-import { LinkPrev } from "@/components/LinkPrev";
-import { Controller, FormProvider, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, ButtonSize, Notification } from "hds-react";
-import {
-  parseApiDate,
-  fromApiDateTime,
-  parseUIDate,
-  formatDate,
-  parseUIDateUnsafe,
-  formatApiDateUnsafe,
-  formatTime,
-} from "ui/src/modules/date-utils";
-import { ControlledDateInput, TimeInput } from "ui/src/components/form";
-import { WeekdaysSelector } from "@/components/WeekdaysSelector";
-import { ReservationListEditor } from "@/components/ReservationListEditor";
-import { useFilteredReservationList, useMultipleReservation, useSession } from "@/hooks";
-import { getRescheduleReservationSeriesSchema, RescheduleReservationSeriesForm } from "@/schemas";
-import { errorToast, successToast } from "ui/src/components/toast";
-import { getBufferTime } from "@/modules/helpers";
-import { BufferToggles } from "@/components/BufferToggles";
-import { ButtonLikeLink } from "@/components/ButtonLikeLink";
-import { getReservationUrl } from "@/modules/urls";
-import { getSeriesOverlapErrors } from "ui/src/modules/apolloUtils";
-import { useDisplayError } from "ui/src/hooks";
-import { generateReservations } from "@/modules/generateReservations";
-import { Error404 } from "@/components/Error404";
-import { Error403 } from "@/components/Error403";
-import { useRouter } from "next/router";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
-import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { createClient } from "@/modules/apolloClient";
-import { hasPermission } from "@/modules/permissionHelper";
 
 type NodeT = NonNullable<SeriesPageQuery["reservation"]>["reservationSeries"];
 

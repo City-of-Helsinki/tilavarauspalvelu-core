@@ -1,12 +1,12 @@
 import React from "react";
+import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { breakpoints } from "ui/src/modules/const";
-import type { EquipmentFieldsFragment } from "@gql/gql-types";
 import { ShowAllContainer } from "ui/src/components";
-import { getEquipmentList } from "@/modules/reservationUnit";
+import { breakpoints } from "ui/src/modules/const";
 import { convertLanguageCode } from "ui/src/modules/util";
-import { gql } from "@apollo/client";
+import { getEquipmentList } from "@/modules/reservationUnit";
+import type { EquipmentFieldsFragment } from "@gql/gql-types";
 
 type Props = {
   equipment: EquipmentFieldsFragment[];

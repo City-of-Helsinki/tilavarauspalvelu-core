@@ -1,5 +1,6 @@
 import { env } from "@/env.mjs";
 import { ApplicationStatusChoice } from "@gql/gql-types";
+
 export { isBrowser } from "ui/src/modules/helpers";
 export { getSignOutUrl } from "ui/src/modules/urlBuilder";
 

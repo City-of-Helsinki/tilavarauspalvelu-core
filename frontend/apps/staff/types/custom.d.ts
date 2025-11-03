@@ -1,3 +1,4 @@
+// TODO is this necessary
 declare module "*.svg" {
   import type { FunctionComponent, SVGProps } from "react";
 

@@ -1,6 +1,6 @@
-import { isBrowser } from "./const";
 import { ReadonlyURLSearchParams } from "next/navigation";
 import { type Maybe, ApplicationStatusChoice } from "@gql/gql-types";
+import { isBrowser } from "./const";
 
 export function getPostLoginUrl(params: Readonly<URLSearchParams> = new ReadonlyURLSearchParams()): string | undefined {
   if (!isBrowser) {

@@ -1,6 +1,6 @@
+import { type Control, type FieldValues, type Path, type UseControllerProps } from "react-hook-form";
 import styled from "styled-components";
 import { ControlledNumberFilter } from "./NumberFilter";
-import { type Control, type FieldValues, type Path, type UseControllerProps } from "react-hook-form";
 
 const RangeContrainer = styled.div`
   display: grid;

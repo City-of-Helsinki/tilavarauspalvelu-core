@@ -1,8 +1,8 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import { endOfTomorrow, endOfYesterday } from "date-fns";
-import { TimeframeStatus } from "./TimeframeStatus";
 import { test, expect } from "vitest";
+import { TimeframeStatus } from "./TimeframeStatus";
 
 const pastDate = endOfYesterday().toISOString();
 const today = new Date().toISOString();

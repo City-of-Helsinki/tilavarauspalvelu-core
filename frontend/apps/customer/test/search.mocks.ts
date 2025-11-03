@@ -5,8 +5,8 @@ import {
   type SearchReservationUnitsQuery,
   type SearchReservationUnitsQueryVariables,
 } from "@gql/gql-types";
-import { CreateGraphQLMocksReturn, ICreateGraphQLMock } from "./test.gql.utils";
 import { createMockReservationUnit } from "./reservation-unit.mocks";
+import { CreateGraphQLMocksReturn, ICreateGraphQLMock } from "./test.gql.utils";
 
 interface SearchQueryProps extends ICreateGraphQLMock {
   isSearchError: boolean;

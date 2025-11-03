@@ -1,8 +1,8 @@
-import { breakpoints } from "../modules/const";
-import { Flex } from "../styled";
 import { Button, ButtonSize, ButtonVariant, IconSearch, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
+import { breakpoints } from "../modules/const";
+import { Flex } from "../styled";
 
 export const SearchButtonContainer = styled(Flex).attrs({
   $justifyContent: "space-between",

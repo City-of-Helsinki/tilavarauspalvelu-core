@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocation } from "react-use";
 import {
   Header,
   IconKey,
@@ -10,16 +11,15 @@ import {
   TitleStyleType,
 } from "hds-react";
 import { useTranslation } from "next-i18next";
-import styled from "styled-components";
-import { useSession } from "@/hooks";
-import { type CurrentUserQuery } from "@gql/gql-types";
-import Logo from "ui/src/components/Logo";
 import { useRouter } from "next/router";
-import { breakpoints } from "ui/src/modules/const";
-import { useLocation } from "react-use";
+import styled from "styled-components";
+import Logo from "ui/src/components/Logo";
 import { signIn, signOut } from "ui/src/modules/browserHelpers";
+import { breakpoints } from "ui/src/modules/const";
 import { getLocalizationLang } from "ui/src/modules/helpers";
+import { fontBold, fontMedium } from "ui/src/styled";
 import { env } from "@/env.mjs";
+import { useSession } from "@/hooks";
 import {
   applicationsPrefix,
   reservationsPrefix,
@@ -27,7 +27,7 @@ import {
   seasonalPrefix,
   singleSearchPrefix,
 } from "@/modules/urls";
-import { fontBold, fontMedium } from "ui/src/styled";
+import { type CurrentUserQuery } from "@gql/gql-types";
 
 type HeaderProps = {
   apiBaseUrl: string;

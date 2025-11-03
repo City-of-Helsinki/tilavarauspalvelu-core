@@ -1,12 +1,12 @@
 import React from "react";
 import { SpaceEditor } from "@lib/units/[id]/spaces/[pk]/SpaceEditor";
+import { type GetServerSidePropsContext } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { type GetServerSidePropsContext } from "next";
-import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { UserPermissionChoice } from "@gql/gql-types";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;

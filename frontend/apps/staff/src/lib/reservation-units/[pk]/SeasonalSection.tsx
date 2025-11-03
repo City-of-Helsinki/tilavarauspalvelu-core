@@ -1,15 +1,15 @@
 import React, { Fragment } from "react";
-import { Button, ButtonVariant, Checkbox, IconMinus, IconPlus } from "hds-react";
-import styled, { css } from "styled-components";
 import { Controller, useFieldArray, UseFormReturn } from "react-hook-form";
-import { TimeInput } from "ui/src/components/form/TimeInput";
-import { IconButton } from "ui/src/components";
-import { fontBold } from "ui/src/styled";
-import { breakpoints, WEEKDAYS_SORTED } from "ui/src/modules/const";
+import { Button, ButtonVariant, Checkbox, IconMinus, IconPlus } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { ReservationUnitEditFormValues } from "./form";
+import styled, { css } from "styled-components";
+import { IconButton } from "ui/src/components";
+import { TimeInput } from "ui/src/components/form/TimeInput";
+import { breakpoints, WEEKDAYS_SORTED } from "ui/src/modules/const";
+import { fontBold } from "ui/src/styled";
 import { Accordion } from "@/components/Accordion";
 import { getTranslatedError } from "@/modules/util";
+import { ReservationUnitEditFormValues } from "./form";
 
 const SeasonRowWrapper = styled.div`
   display: grid;

@@ -1,16 +1,16 @@
 import React from "react";
-import { formatTime } from "ui/src/modules/date-utils";
 import { useTranslation } from "next-i18next";
-import { ReservationStateChoice, type ReservationToCopyFragment, UserPermissionChoice } from "@gql/gql-types";
-import { NewReservationListItem, ReservationList } from "@/components/ReservationsList";
-import { ReservationListButton } from "@/components/ReservationListButton";
-import { DenyDialog } from "@/components/DenyDialog";
-import { useModal } from "@/context/ModalContext";
-import { EditTimeModal } from "@/components/EditTimeModal";
-import { isPossibleToDeny, isPossibleToEdit } from "@/modules/reservationModificationRules";
+import { formatTime } from "ui/src/modules/date-utils";
 import { CenterSpinner } from "ui/src/styled";
+import { DenyDialog } from "@/components/DenyDialog";
+import { EditTimeModal } from "@/components/EditTimeModal";
+import { ReservationListButton } from "@/components/ReservationListButton";
+import { NewReservationListItem, ReservationList } from "@/components/ReservationsList";
+import { useModal } from "@/context/ModalContext";
 import { useReservationSeries, useSession } from "@/hooks";
 import { hasPermission } from "@/modules/permissionHelper";
+import { isPossibleToDeny, isPossibleToEdit } from "@/modules/reservationModificationRules";
+import { ReservationStateChoice, type ReservationToCopyFragment, UserPermissionChoice } from "@gql/gql-types";
 
 type Props = {
   reservationSeriesPk: number;

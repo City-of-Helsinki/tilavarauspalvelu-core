@@ -1,15 +1,15 @@
+import React from "react";
+import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQuestionCircle } from "hds-react";
+import { useTranslation } from "next-i18next";
+import styled from "styled-components";
+import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
+import { Flex, fontBold, H1, NoWrap, TitleSection } from "ui/src/styled";
+import { formatAddress } from "@/modules/util";
 import {
   ReservationUnitPublishingState,
   ReservationUnitReservationState,
   UnitSubpageHeadFragment,
 } from "@gql/gql-types";
-import { formatAddress } from "@/modules/util";
-import React from "react";
-import styled from "styled-components";
-import { Flex, fontBold, H1, NoWrap, TitleSection } from "ui/src/styled";
-import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQuestionCircle } from "hds-react";
-import { useTranslation } from "next-i18next";
-import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
 
 const UnitInformationWrapper = styled.div`
   font-size: var(--fontsize-heading-s);

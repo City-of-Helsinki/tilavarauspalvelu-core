@@ -1,3 +1,4 @@
+import React from "react";
 import {
   IconArrowRight,
   IconGroup,
@@ -9,30 +10,29 @@ import {
   IconCross,
   IconSize,
 } from "hds-react";
-import React from "react";
 import { useTranslation } from "next-i18next";
+import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
+import Card from "ui/src/components/Card";
+import { breakpoints } from "ui/src/modules/const";
+import { filterNonNullable, getImageSource, getMainImage } from "ui/src/modules/helpers";
+import { type OptionsListT } from "ui/src/modules/search";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { CenterSpinner, Flex, H3 } from "ui/src/styled";
+import { type SearchFormValues, SeasonalSearchForm } from "@/components/SeasonalSearchForm";
+import { useSearchQuery } from "@/hooks";
+import { useSearchModify } from "@/hooks/useSearchValues";
+import { getApplicationRoundName } from "@/modules/applicationRound";
+import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
+import { processVariables } from "@/modules/search";
+import { getReservationUnitPath } from "@/modules/urls";
 import {
   type ApplicationReservationUnitListFragment,
   type Maybe,
   type RecurringCardFragment,
   ReservationKind,
 } from "@gql/gql-types";
-import { filterNonNullable, getImageSource, getMainImage } from "ui/src/modules/helpers";
-import { CenterSpinner, Flex, H3 } from "ui/src/styled";
-import { breakpoints } from "ui/src/modules/const";
-import Card from "ui/src/components/Card";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { getApplicationRoundName } from "@/modules/applicationRound";
-import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
-import { getReservationUnitPath } from "@/modules/urls";
-import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
-import { type SearchFormValues, SeasonalSearchForm } from "@/components/SeasonalSearchForm";
-import { useSearchModify } from "@/hooks/useSearchValues";
-import { processVariables } from "@/modules/search";
-import { type OptionsListT } from "ui/src/modules/search";
-import { useSearchParams } from "next/navigation";
-import { useSearchQuery } from "@/hooks";
 
 const ImageSizeWrapper = styled.div`
   @media (min-width: ${breakpoints.m}) {

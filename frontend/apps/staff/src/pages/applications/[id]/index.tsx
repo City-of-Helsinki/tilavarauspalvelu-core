@@ -1,12 +1,34 @@
 import React, { type ReactNode, useRef } from "react";
-import styled from "styled-components";
-import { useTranslation, type TFunction } from "next-i18next";
+import { type ApolloQueryResult, gql } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, IconArrowRedo, IconCross, LoadingSpinner, Tag } from "hds-react";
 import { isEqual, trim } from "lodash-es";
-import { type ApolloQueryResult, gql } from "@apollo/client";
-import { CenterSpinner, Flex, fontMedium, H1, H3, H4, TitleSection } from "ui/src/styled";
+import { GetServerSidePropsContext } from "next";
+import { useTranslation, type TFunction } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import styled from "styled-components";
+import { ApplicationTimePreview } from "ui/src/components/ApplicationTimePreview";
+import { ApplicationStatusLabel } from "ui/src/components/statuses";
+import { useDisplayError } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
+import { formatDateRange, formatDateTime, formatDuration, parseValidDateObject } from "ui/src/modules/date-utils";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { CenterSpinner, Flex, fontMedium, H1, H3, H4, TitleSection } from "ui/src/styled";
+import { Accordion as AccordionBase } from "@/components/Accordion";
+import { BirthDate } from "@/components/BirthDate";
+import { Error403 } from "@/components/Error403";
+import { Error404 } from "@/components/Error404";
+import { ScrollIntoView } from "@/components/ScrollIntoView";
+import { ShowWhenTargetInvisible } from "@/components/ShowWhenTargetInvisible";
+import { StickyHeader } from "@/components/StickyHeader";
+import { TimeSelector } from "@/components/TimeSelector";
+import { ValueBox } from "@/components/ValueBox";
+import { ApplicationWorkingMemo } from "@/components/WorkingMemo";
+import { useCheckPermission } from "@/hooks";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { getApplicantName, translateReserveeType } from "@/modules/helpers";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { formatAgeGroups, formatNumber } from "@/modules/util";
+import { ApplicationDatas, Summary } from "@/styled";
 import {
   type ApplicationAdminQuery,
   type ApplicationPageFieldsFragment,
@@ -23,28 +45,6 @@ import {
   useRestoreAllSectionOptionsMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { formatDateRange, formatDateTime, formatDuration, parseValidDateObject } from "ui/src/modules/date-utils";
-import { ApplicationTimePreview } from "ui/src/components/ApplicationTimePreview";
-import { formatAgeGroups, formatNumber } from "@/modules/util";
-import { ScrollIntoView } from "@/components/ScrollIntoView";
-import { Accordion as AccordionBase } from "@/components/Accordion";
-import { ApplicationWorkingMemo } from "@/components/WorkingMemo";
-import { ShowWhenTargetInvisible } from "@/components/ShowWhenTargetInvisible";
-import { StickyHeader } from "@/components/StickyHeader";
-import { BirthDate } from "@/components/BirthDate";
-import { ValueBox } from "@/components/ValueBox";
-import { TimeSelector } from "@/components/TimeSelector";
-import { getApplicantName, translateReserveeType } from "@/modules/helpers";
-import { Error404 } from "@/components/Error404";
-import { useCheckPermission } from "@/hooks";
-import { ApplicationDatas, Summary } from "@/styled";
-import { ApplicationStatusLabel } from "ui/src/components/statuses";
-import { useDisplayError } from "ui/src/hooks";
-import { Error403 } from "@/components/Error403";
-import { GetServerSidePropsContext } from "next";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 
 const Value = styled.span`
   ${fontMedium}

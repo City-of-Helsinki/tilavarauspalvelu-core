@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo } from "react";
-import { useTranslation } from "next-i18next";
-import { H1, HR } from "ui/src/styled";
 import { Filters, ReservationsDataLoader } from "@lib/reservations";
-import { ReservationStateChoice } from "@gql/gql-types";
-import { formatDate } from "ui/src/modules/date-utils";
+import { type GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
+import { formatDate } from "ui/src/modules/date-utils";
+import { H1, HR } from "ui/src/styled";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
+import { ReservationStateChoice } from "@gql/gql-types";
 
 const defaultStates = [
   ReservationStateChoice.Denied,

@@ -1,7 +1,15 @@
 import React, { useState } from "react";
+import { ApolloError, gql } from "@apollo/client";
+import { isBefore } from "date-fns";
+import { Button, ButtonVariant, Dialog, RadioButton, Select, SelectionGroup, TextArea } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { Button, ButtonVariant, Dialog, RadioButton, Select, SelectionGroup, TextArea } from "hds-react";
+import { successToast } from "ui/src/components/toast";
+import { useDisplayError } from "ui/src/hooks";
+import { convertOptionToHDS, toNumber } from "ui/src/modules/helpers";
+import { CenterSpinner, Flex } from "ui/src/styled";
+import { useModal } from "@/context/ModalContext";
+import { useDenyReasonOptions } from "@/hooks";
 import {
   type ReservationDenyMutationInput,
   type ReservationRefundMutationInput,
@@ -12,14 +20,6 @@ import {
   OrderStatus,
   type DenyDialogFieldsFragment,
 } from "@gql/gql-types";
-import { useModal } from "@/context/ModalContext";
-import { CenterSpinner, Flex } from "ui/src/styled";
-import { useDenyReasonOptions } from "@/hooks";
-import { successToast } from "ui/src/components/toast";
-import { ApolloError, gql } from "@apollo/client";
-import { convertOptionToHDS, toNumber } from "ui/src/modules/helpers";
-import { useDisplayError } from "ui/src/hooks";
-import { isBefore } from "date-fns";
 
 const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;

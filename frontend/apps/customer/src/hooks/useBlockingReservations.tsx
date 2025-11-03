@@ -1,10 +1,10 @@
-import { addYears } from "date-fns";
 import { gql } from "@apollo/client";
-import { useAffectingReservationsQuery } from "@gql/gql-types";
-import { filterNonNullable } from "ui/src/modules/helpers";
-import { formatApiDate } from "ui/src/modules/date-utils";
+import { addYears } from "date-fns";
 import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
+import { formatApiDate } from "ui/src/modules/date-utils";
+import { filterNonNullable } from "ui/src/modules/helpers";
 import { BLOCKING_RESERVATIONS_POLL_INTERVAL } from "@/modules/const";
+import { useAffectingReservationsQuery } from "@gql/gql-types";
 
 // NOTE use client side polling because
 // - it gets outdated fast (somebody else makes a reservation)

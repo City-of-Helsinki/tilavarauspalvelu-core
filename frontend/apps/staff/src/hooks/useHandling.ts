@@ -1,9 +1,9 @@
 import { useMemo } from "react";
+import { gql } from "@apollo/client";
 import { startOfDay } from "date-fns";
+import { formatApiDate } from "ui/src/modules/date-utils";
 import { useSession } from "@/hooks";
 import { useHandlingDataQuery, ReservationStateChoice } from "@gql/gql-types";
-import { formatApiDate } from "ui/src/modules/date-utils";
-import { gql } from "@apollo/client";
 
 export function useHandling() {
   const { isAuthenticated } = useSession();

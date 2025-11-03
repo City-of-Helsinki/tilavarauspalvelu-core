@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { IconSearch, TextInput } from "hds-react";
-import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";
 import { getSingleSearchPath } from "@/modules/urls";

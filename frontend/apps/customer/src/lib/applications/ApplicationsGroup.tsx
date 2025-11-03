@@ -1,8 +1,8 @@
 import React from "react";
+import { gql } from "@apollo/client";
 import { Flex, H2 } from "ui/src/styled";
 import { type ApplicationsGroupFragment } from "@gql/gql-types";
 import { ApplicationCard } from "./ApplicationCard";
-import { gql } from "@apollo/client";
 
 type Props = {
   name: string;

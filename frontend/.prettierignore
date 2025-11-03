@@ -27,3 +27,6 @@ pnpm-lock.yaml
 .vscode
 .vs
 .idea
+
+# Typescript type overrides
+**/custom.d.ts

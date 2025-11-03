@@ -1,9 +1,9 @@
-import { render } from "@testing-library/react";
-import { getReservationUnitInstructionsKey, Instructions } from "./Instructions";
-import { type InstructionsFragment, ReservationStateChoice } from "@gql/gql-types";
-import { describe, expect, it } from "vitest";
 import { createMockReservation } from "@test/reservation.mocks";
+import { render } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import { getTranslationSafe } from "ui/src/modules/util";
+import { type InstructionsFragment, ReservationStateChoice } from "@gql/gql-types";
+import { getReservationUnitInstructionsKey, Instructions } from "./Instructions";
 
 const customRender = (reservation: InstructionsFragment): ReturnType<typeof render> =>
   render(<Instructions reservation={reservation} />);

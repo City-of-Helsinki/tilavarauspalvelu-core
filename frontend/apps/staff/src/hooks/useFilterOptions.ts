@@ -1,3 +1,7 @@
+import { gql } from "@apollo/client";
+import { type TFunction, useTranslation } from "next-i18next";
+import { filterNonNullable, sort } from "ui/src/modules/helpers";
+import { type TagOptionsList } from "@/modules/search";
 import {
   MunicipalityChoice,
   OrderStatusWithFree,
@@ -8,10 +12,6 @@ import {
   ReserveeType,
   useFilterOptionsQuery,
 } from "@gql/gql-types";
-import { type TFunction, useTranslation } from "next-i18next";
-import { type TagOptionsList } from "@/modules/search";
-import { gql } from "@apollo/client";
-import { filterNonNullable, sort } from "ui/src/modules/helpers";
 
 export function getFilterOptions(
   t: TFunction,

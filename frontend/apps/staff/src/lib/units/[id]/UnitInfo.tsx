@@ -1,9 +1,9 @@
 import React from "react";
+import { gql } from "@apollo/client";
+import { IconCheck } from "hds-react";
 import styled from "styled-components";
 import { fontMedium, Flex } from "ui/src/styled";
 import { formatAddress } from "@/modules/util";
-import { IconCheck } from "hds-react";
-import { gql } from "@apollo/client";
 import { type UnitResourceInfoFieldsFragment } from "@gql/gql-types";
 
 const UnitInfoWrapper = styled(Flex).attrs({

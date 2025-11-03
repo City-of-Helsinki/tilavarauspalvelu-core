@@ -1,31 +1,10 @@
 import React, { Children, cloneElement, useEffect, useMemo, useState } from "react";
-import {
-  type BlockingReservationFieldsFragment,
-  ReservationNode,
-  type ReservationTimePickerFieldsFragment,
-  ReservationTypeChoice,
-  useListReservationsQuery,
-} from "@gql/gql-types";
-import styled from "styled-components";
-import { addMinutes, differenceInMinutes } from "date-fns";
-import { eventStyleGetter } from "@/modules/eventStyleGetter";
-import { Legend } from "@/components/calendar/Legend";
+import { type UseFormReturn } from "react-hook-form";
 import { useMedia } from "react-use";
-import { breakpoints, RELATED_RESERVATION_STATES } from "ui/src/modules/const";
-import { getEventBuffers } from "ui/src/components/calendar/util";
-import { filterNonNullable, getLocalizationLang } from "ui/src/modules/helpers";
-import {
-  SLOTS_EVERY_HOUR,
-  convertFormToFocustimeSlot,
-  getDurationOptions,
-  getNewReservation,
-} from "@/modules/reservation";
-import {
-  type ReservableMap,
-  getBoundCheckedReservation,
-  getSlotPropGetter,
-  isRangeReservable,
-} from "@/modules/reservable";
+import { gql } from "@apollo/client";
+import { addMinutes, differenceInMinutes } from "date-fns";
+import { useTranslation } from "next-i18next";
+import styled from "styled-components";
 import Calendar, {
   type CalendarEvent,
   type CalendarEventBuffer,
@@ -33,13 +12,34 @@ import Calendar, {
   SlotProps,
 } from "ui/src/components/calendar/Calendar";
 import { Toolbar } from "ui/src/components/calendar/Toolbar";
+import { getEventBuffers } from "ui/src/components/calendar/util";
+import { breakpoints, RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { formatApiDate, formatDate, formatDuration, formatTime, parseUIDate } from "ui/src/modules/date-utils";
-import { useTranslation } from "next-i18next";
-import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
-import { type UseFormReturn } from "react-hook-form";
-import { type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import { filterNonNullable, getLocalizationLang } from "ui/src/modules/helpers";
+import { Legend } from "@/components/calendar/Legend";
 import { useCurrentUser } from "@/hooks";
-import { gql } from "@apollo/client";
+import { eventStyleGetter } from "@/modules/eventStyleGetter";
+import {
+  type ReservableMap,
+  getBoundCheckedReservation,
+  getSlotPropGetter,
+  isRangeReservable,
+} from "@/modules/reservable";
+import {
+  SLOTS_EVERY_HOUR,
+  convertFormToFocustimeSlot,
+  getDurationOptions,
+  getNewReservation,
+} from "@/modules/reservation";
+import { type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import {
+  type BlockingReservationFieldsFragment,
+  ReservationNode,
+  type ReservationTimePickerFieldsFragment,
+  ReservationTypeChoice,
+  useListReservationsQuery,
+} from "@gql/gql-types";
+import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
 
 type WeekOptions = "day" | "week" | "month";
 

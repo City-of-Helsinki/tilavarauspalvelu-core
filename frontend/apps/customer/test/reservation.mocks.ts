@@ -1,3 +1,5 @@
+import { generateNameFragment } from "@test/test.gql.utils";
+import { createNodeId } from "ui/src/modules/helpers";
 import {
   AccessType,
   ReservationUnitImageType,
@@ -15,8 +17,6 @@ import {
   TermsOfUseTypeChoices,
   ReservationFormType,
 } from "@gql/gql-types";
-import { createNodeId } from "ui/src/modules/helpers";
-import { generateNameFragment } from "@test/test.gql.utils";
 
 export function generateTextFragment(text: string) {
   return {

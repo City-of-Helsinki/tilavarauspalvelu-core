@@ -1,7 +1,12 @@
 import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { useTranslation } from "next-i18next";
+import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { ShowAllContainer } from "ui/src/components";
+import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
+import { mapParamToInteger } from "ui/src/modules/helpers";
+import { mapFormToSearchParams } from "ui/src/modules/search";
 import { Flex } from "ui/src/styled";
 import {
   ControlledCheckboxFilter,
@@ -12,16 +17,11 @@ import {
   ControlledRangeNumberFilter,
 } from "@/components/QueryParamFilters";
 import { SearchTags } from "@/components/SearchTags";
-import { OrderStatusWithFree, ReservationTypeChoice, ReservationStateChoice } from "@gql/gql-types";
-import { translateTag } from "@/modules/search";
-import { useForm } from "react-hook-form";
-import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
-import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
-import { mapParamToInteger } from "ui/src/modules/helpers";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
-import { mapFormToSearchParams } from "ui/src/modules/search";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { translateTag } from "@/modules/search";
+import { OrderStatusWithFree, ReservationTypeChoice, ReservationStateChoice } from "@gql/gql-types";
 
 const MoreWrapper = styled(ShowAllContainer)`
   .ShowAllContainer__ToggleButton {

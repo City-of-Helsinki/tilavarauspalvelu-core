@@ -1,20 +1,20 @@
 import React, { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
-import { addMinutes, differenceInMinutes, isToday, setHours, setMinutes, startOfDay } from "date-fns";
 import Popup from "reactjs-popup";
-import styled, { css } from "styled-components";
-import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
+import { addMinutes, differenceInMinutes, isToday, setHours, setMinutes, startOfDay } from "date-fns";
 import { useTranslation, type TFunction } from "next-i18next";
+import { useSearchParams } from "next/navigation";
+import styled, { css } from "styled-components";
 import { CalendarEvent } from "ui/src/components/calendar/Calendar";
-import { focusStyles } from "ui/src/styled";
+import { isCellOverlappingSpan, TimeSpanType } from "ui/src/components/calendar/util";
 import { breakpoints } from "ui/src/modules/const";
+import { focusStyles } from "ui/src/styled";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { POST_PAUSE, PRE_PAUSE } from "@/modules/calendarStyling";
 import { getReserveeName } from "@/modules/util";
-import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
+import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { ReservationPopupContent } from "./ReservationPopupContent";
+import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
 import eventStyleGetter from "./eventStyleGetter";
-import { useSearchParams } from "next/navigation";
-import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { isCellOverlappingSpan, TimeSpanType } from "ui/src/components/calendar/util";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 type Resource = {

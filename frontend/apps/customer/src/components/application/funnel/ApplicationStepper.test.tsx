@@ -1,7 +1,7 @@
+import { createMockApplicationFragment } from "@test/application.mocks";
+import { render } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
 import { PAGES_WITH_STEPPER, ApplicationStepper } from "./ApplicationStepper";
-import { render } from "@testing-library/react";
-import { createMockApplicationFragment } from "@test/application.mocks";
 
 const { useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();

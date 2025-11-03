@@ -1,19 +1,19 @@
-import { IconAngleRight } from "hds-react";
 import React from "react";
-import { useTranslation } from "next-i18next";
-import styled from "styled-components";
-import { H1 } from "ui/src/styled";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { gql } from "@apollo/client";
+import { IconAngleRight } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
-import { applicationsPath, applicationsPrefix, getApplicationPath } from "@/modules/urls";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { Breadcrumb } from "@/components/Breadcrumb";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import styled from "styled-components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { gql } from "@apollo/client";
-import { ApplicationSentPageDocument, type ApplicationSentPageQuery } from "@gql/gql-types";
+import { H1 } from "ui/src/styled";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { createApolloClient } from "@/modules/apolloClient";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { applicationsPath, applicationsPrefix, getApplicationPath } from "@/modules/urls";
 import { isSent } from "@/modules/util";
+import { ApplicationSentPageDocument, type ApplicationSentPageQuery } from "@gql/gql-types";
 
 const Paragraph = styled.p`
   max-width: var(--prose-width);

@@ -1,8 +1,8 @@
 import React from "react";
+import type { FieldErrors, FieldValues } from "react-hook-form";
 import { ErrorSummary } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import type { FieldErrors, FieldValues } from "react-hook-form";
 
 type Props<T extends FieldValues> = {
   fieldNamePrefix?: string;

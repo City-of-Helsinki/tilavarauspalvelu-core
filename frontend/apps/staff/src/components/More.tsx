@@ -1,9 +1,9 @@
 import React, { useState } from "react";
+import type { ApolloQueryResult } from "@apollo/client";
 import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
-import type { ApolloQueryResult } from "@apollo/client";
-import type { PageInfo, Query } from "@gql/gql-types";
 import { Flex } from "ui/src/styled";
+import type { PageInfo, Query } from "@gql/gql-types";
 
 type Props = {
   count: number;

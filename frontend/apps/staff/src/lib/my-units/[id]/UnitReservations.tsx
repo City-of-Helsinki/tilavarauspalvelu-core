@@ -1,22 +1,22 @@
 import React, { useEffect } from "react";
-import { useTranslation } from "next-i18next";
-import styled from "styled-components";
-import { Legend, LegendsWrapper } from "@/components/Legend";
-import { legend } from "./eventStyleGetter";
-import { UnitCalendar } from "./UnitCalendar";
-import { useUnitResources, useGetFilterSearchParams } from "@/hooks";
-import { parseUIDate, isValidDate, formatDate } from "ui/src/modules/date-utils";
 import { startOfDay } from "date-fns";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
-import { AutoGrid, Flex, HR } from "ui/src/styled";
+import { useTranslation } from "next-i18next";
+import { useSearchParams } from "next/navigation";
+import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";
-import { SearchTags } from "@/components/SearchTags";
+import { parseUIDate, isValidDate, formatDate } from "ui/src/modules/date-utils";
+import { AutoGrid, Flex, HR } from "ui/src/styled";
+import { Legend, LegendsWrapper } from "@/components/Legend";
 import { MultiSelectFilter } from "@/components/QueryParamFilters";
 import { DayNavigation } from "@/components/QueryParamFilters/DayNavigation";
-import { useSearchParams } from "next/navigation";
+import { SearchTags } from "@/components/SearchTags";
+import { useUnitResources, useGetFilterSearchParams } from "@/hooks";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { TagOptionsList, translateTag } from "@/modules/search";
 import { type ReservationUnitOption } from "@/hooks/useUnitResources";
+import { TagOptionsList, translateTag } from "@/modules/search";
+import { UnitCalendar } from "./UnitCalendar";
+import { legend } from "./eventStyleGetter";
 
 const LegendContainer = styled.div`
   max-width: 100%;

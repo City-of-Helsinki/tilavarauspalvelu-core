@@ -1,9 +1,14 @@
 import React, { useState } from "react";
-import { useToastIfQueryParam } from "ui/src/hooks";
-import { useSearchParams } from "next/navigation";
+import { ReservationUnitsDataReader, Filters, type SelectedRow } from "@lib/reservation-units/";
+import { type GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useSearchParams } from "next/navigation";
+import { useToastIfQueryParam } from "ui/src/hooks";
 import { H1, HR } from "ui/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
+import { getFilterOptions } from "@/hooks/useFilterOptions";
+import { createClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   FilterOptionsDocument,
@@ -11,11 +16,6 @@ import {
   FilterOptionsQueryVariables,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type GetServerSidePropsContext } from "next";
-import { ReservationUnitsDataReader, Filters, type SelectedRow } from "@lib/reservation-units/";
-import { createClient } from "@/modules/apolloClient";
-import { getFilterOptions } from "@/hooks/useFilterOptions";
 
 function ReservationUnits({
   optionsData,

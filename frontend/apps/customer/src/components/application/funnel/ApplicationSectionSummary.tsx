@@ -3,10 +3,10 @@ import { differenceInWeeks } from "date-fns";
 import { IconCalendar, IconClock, IconGroup } from "hds-react";
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { Flex, H4 } from "ui/src/styled";
 import { formatDuration, parseUIDate } from "ui/src/modules/date-utils";
-import { type ApplicationSectionPage1FormValues } from "./form";
+import { Flex, H4 } from "ui/src/styled";
 import { IconWithText } from "@/components/IconWithText";
+import { type ApplicationSectionPage1FormValues } from "./form";
 
 const Message = styled.p`
   margin: 0;

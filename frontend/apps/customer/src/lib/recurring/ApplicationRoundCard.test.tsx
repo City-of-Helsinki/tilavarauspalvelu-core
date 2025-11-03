@@ -1,8 +1,8 @@
-import { ApplicationRoundStatusChoice, type ApplicationRoundCardFragment } from "@gql/gql-types";
 import { render } from "@testing-library/react";
-import { ApplicationRoundCard } from "./ApplicationRoundCard";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { getApplicationRoundPath } from "@/modules/urls";
+import { ApplicationRoundStatusChoice, type ApplicationRoundCardFragment } from "@gql/gql-types";
+import { ApplicationRoundCard } from "./ApplicationRoundCard";
 
 function createApplicationRoundCard({
   status = ApplicationRoundStatusChoice.Open,

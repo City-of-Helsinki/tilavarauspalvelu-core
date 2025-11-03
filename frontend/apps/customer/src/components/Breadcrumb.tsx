@@ -1,11 +1,11 @@
 import React from "react";
-import styled, { css } from "styled-components";
-import { IconAngleLeft, IconAngleRight, IconSize } from "hds-react";
-import { Flex, fontMedium, truncatedText } from "ui/src/styled";
-import { breakpoints } from "ui/src/modules/const";
 import { useMedia } from "react-use";
-import Link from "next/link";
+import { IconAngleLeft, IconAngleRight, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
+import Link from "next/link";
+import styled, { css } from "styled-components";
+import { breakpoints } from "ui/src/modules/const";
+import { Flex, fontMedium, truncatedText } from "ui/src/styled";
 
 export type RouteItem = {
   title: string;

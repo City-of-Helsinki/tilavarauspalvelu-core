@@ -1,13 +1,5 @@
 import React, { useState } from "react";
-import { useTranslation } from "next-i18next";
-import { Accordion, ApplicationDatas } from "@/styled";
-import { DataWrapper } from "./DataWrapper";
-import {
-  ReservationPageQuery,
-  useReservationDateOfBirthQuery,
-  useReservationProfileDataContactInfoQuery,
-  useReservationProfileDataSsnQuery,
-} from "@gql/gql-types";
+import { gql } from "@apollo/client";
 import {
   Button,
   ButtonVariant,
@@ -18,16 +10,24 @@ import {
   Notification,
   NotificationSize,
 } from "hds-react";
-import { Flex, H5 } from "ui/src/styled";
-import styled from "styled-components";
-import { useSession } from "@/hooks";
-import { trim } from "lodash-es";
-import { gql } from "@apollo/client";
 import { getName as getCountryName, registerLocale as registerCountryLocale } from "i18n-iso-countries";
 import countriesJson from "i18n-iso-countries/langs/fi.json";
-import { getApiErrors } from "ui/src/modules/apolloUtils";
+import { trim } from "lodash-es";
+import { useTranslation } from "next-i18next";
+import styled from "styled-components";
 import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
+import { getApiErrors } from "ui/src/modules/apolloUtils";
 import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
+import { Flex, H5 } from "ui/src/styled";
+import { useSession } from "@/hooks";
+import { Accordion, ApplicationDatas } from "@/styled";
+import {
+  ReservationPageQuery,
+  useReservationDateOfBirthQuery,
+  useReservationProfileDataContactInfoQuery,
+  useReservationProfileDataSsnQuery,
+} from "@gql/gql-types";
+import { DataWrapper } from "./DataWrapper";
 
 registerCountryLocale(countriesJson);
 

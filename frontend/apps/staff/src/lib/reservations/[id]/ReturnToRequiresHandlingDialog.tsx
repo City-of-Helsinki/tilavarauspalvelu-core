@@ -1,11 +1,11 @@
 import React, { type RefObject } from "react";
-import { useTranslation } from "next-i18next";
-import { Button, ButtonVariant, Dialog, IconInfoCircle } from "hds-react";
-import { type ReservationNode, useRequireHandlingMutation } from "@gql/gql-types";
-import { useModal } from "@/context/ModalContext";
-import { successToast } from "ui/src/components/toast";
 import { gql } from "@apollo/client";
+import { Button, ButtonVariant, Dialog, IconInfoCircle } from "hds-react";
+import { useTranslation } from "next-i18next";
+import { successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
+import { useModal } from "@/context/ModalContext";
+import { type ReservationNode, useRequireHandlingMutation } from "@gql/gql-types";
 
 type ReservationType = Pick<ReservationNode, "pk">;
 type Props = {

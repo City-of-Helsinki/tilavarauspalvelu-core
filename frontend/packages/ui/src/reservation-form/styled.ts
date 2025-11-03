@@ -1,5 +1,5 @@
-import styled from "styled-components";
 import { TextArea, TextInput } from "hds-react";
+import styled from "styled-components";
 import { fontMedium } from "../styled";
 
 export const StyledCheckboxWrapper = styled.div<{

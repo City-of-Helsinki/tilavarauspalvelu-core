@@ -1,8 +1,17 @@
 import React, { useState } from "react";
+import { gql } from "@apollo/client";
+import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconCross, IconPen, LoadingSpinner } from "hds-react";
 import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconCross, IconPen, LoadingSpinner } from "hds-react";
+import { Card } from "ui/src/components";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
+import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
+import { ApplicationStatusLabel } from "ui/src/components/statuses";
 import { breakpoints } from "ui/src/modules/const";
+import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
+import { convertLanguageCode } from "ui/src/modules/util";
+import { getApplicationRoundName } from "@/modules/applicationRound";
+import { getApplicationPath } from "@/modules/urls";
 import {
   type ApplicationCardFragment,
   type ApplicationNameFragment,
@@ -10,15 +19,6 @@ import {
   type Maybe,
   useCancelApplicationMutation,
 } from "@gql/gql-types";
-import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
-import { getApplicationRoundName } from "@/modules/applicationRound";
-import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
-import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
-import { Card } from "ui/src/components";
-import { getApplicationPath } from "@/modules/urls";
-import { ApplicationStatusLabel } from "ui/src/components/statuses";
-import { gql } from "@apollo/client";
-import { convertLanguageCode } from "ui/src/modules/util";
 
 const StyledButton = styled(Button)`
   @media (max-width: ${breakpoints.s}) {

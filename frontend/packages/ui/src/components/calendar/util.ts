@@ -1,6 +1,6 @@
 import { addMinutes, addSeconds } from "date-fns";
-import { type CalendarEventBuffer, SlotProps } from "./Calendar";
 import { ReservableTimeSpanType } from "../../../gql/gql-types";
+import { type CalendarEventBuffer, SlotProps } from "./Calendar";
 
 export type ReservationEventType = {
   beginsAt: string;

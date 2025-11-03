@@ -1,20 +1,20 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { useTranslation } from "next-i18next";
-import styled from "styled-components";
-import { H1, H3, SemiBold, Strong, CenterSpinner, Flex, TitleSection } from "ui/src/styled";
-import { breakpoints } from "ui/src/modules/const";
-import { useApplicationRoundCriteriaQuery, UserPermissionChoice } from "@gql/gql-types";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { errorToast } from "ui/src/components/toast";
-import { Accordion as AccordionBase } from "@/components/Accordion";
 import { TimeframeStatus } from "@lib/application-rounds";
-import { AuthorizationChecker } from "@/components/AuthorizationChecker";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { type GetServerSidePropsContext } from "next";
-import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import styled from "styled-components";
+import { errorToast } from "ui/src/components/toast";
+import { breakpoints } from "ui/src/modules/const";
 import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { H1, H3, SemiBold, Strong, CenterSpinner, Flex, TitleSection } from "ui/src/styled";
+import { Accordion as AccordionBase } from "@/components/Accordion";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { useApplicationRoundCriteriaQuery, UserPermissionChoice } from "@gql/gql-types";
 
 const Accordion = styled(AccordionBase)`
   && > div > h2 {

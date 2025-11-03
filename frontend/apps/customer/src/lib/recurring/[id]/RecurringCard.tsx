@@ -1,3 +1,5 @@
+import React from "react";
+import { gql } from "@apollo/client";
 import {
   IconGroup,
   IconCheck,
@@ -10,16 +12,14 @@ import {
   IconHome,
   IconLock,
 } from "hds-react";
-import React from "react";
 import { useTranslation } from "next-i18next";
-import type { RecurringCardFragment } from "@gql/gql-types";
-import { getReservationUnitName } from "@/modules/reservationUnit";
-import { getImageSource, getMainImage } from "ui/src/modules/helpers";
-import Card, { type CardInfoItem } from "ui/src/components/Card";
-import { getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
+import Card, { type CardInfoItem } from "ui/src/components/Card";
+import { getImageSource, getMainImage } from "ui/src/modules/helpers";
 import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { gql } from "@apollo/client";
+import { getReservationUnitName } from "@/modules/reservationUnit";
+import { getReservationUnitPath } from "@/modules/urls";
+import type { RecurringCardFragment } from "@gql/gql-types";
 
 interface CardProps {
   reservationUnit: RecurringCardFragment;

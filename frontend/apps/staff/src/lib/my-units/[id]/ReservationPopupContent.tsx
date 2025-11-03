@@ -1,15 +1,15 @@
 import React from "react";
-import styled from "styled-components";
-import { type ReservationUnitReservationsFragment, UserPermissionChoice } from "@gql/gql-types";
-import { getReservationUrl } from "@/modules/urls";
-import { dateToMinutes, formatTimeRange, parseValidDateObject } from "ui/src/modules/date-utils";
-import { getReserveeName } from "@/modules/util";
-import { truncate } from "@/modules/helpers";
-import { Flex } from "ui/src/styled";
-import { CELL_BORDER } from "./const";
-import VisibleIfPermission from "@/components/VisibleIfPermission";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
+import styled from "styled-components";
+import { dateToMinutes, formatTimeRange, parseValidDateObject } from "ui/src/modules/date-utils";
+import { Flex } from "ui/src/styled";
+import VisibleIfPermission from "@/components/VisibleIfPermission";
+import { truncate } from "@/modules/helpers";
+import { getReservationUrl } from "@/modules/urls";
+import { getReserveeName } from "@/modules/util";
+import { type ReservationUnitReservationsFragment, UserPermissionChoice } from "@gql/gql-types";
+import { CELL_BORDER } from "./const";
 
 const MAX_POPOVER_COMMENT_LENGTH = 140;
 const POPOVER_MAX_WIDTH = 300;

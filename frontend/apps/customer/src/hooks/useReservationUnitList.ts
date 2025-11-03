@@ -1,6 +1,6 @@
-import type { ReservationUnitNode } from "@gql/gql-types";
-import { filterNonNullable } from "ui/src/modules/helpers";
 import { useSearchParams } from "next/navigation";
+import { filterNonNullable } from "ui/src/modules/helpers";
+import type { ReservationUnitNode } from "@gql/gql-types";
 import { useSearchModify } from "./useSearchValues";
 
 type NodeList = Pick<ReservationUnitNode, "pk">[];

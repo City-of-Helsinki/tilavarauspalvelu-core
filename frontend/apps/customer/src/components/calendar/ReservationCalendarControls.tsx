@@ -1,21 +1,21 @@
 import React, { useMemo } from "react";
-import { type TFunction, useTranslation } from "next-i18next";
-import styled from "styled-components";
+import { type Control, type FieldValues, type SubmitHandler, useController, type UseFormReturn } from "react-hook-form";
+import { Transition } from "react-transition-group";
+import { useMedia } from "react-use";
 import { Button, ButtonVariant, IconAngleDown, IconAngleUp, IconCross, IconSize } from "hds-react";
 import { maxBy } from "lodash-es";
-import { parseUIDate, formatDateTimeRange } from "ui/src/modules/date-utils";
-import { Transition } from "react-transition-group";
-import { Flex, fontBold, fontMedium, fontRegular, SemiBold } from "ui/src/styled";
-import { breakpoints } from "ui/src/modules/const";
-import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
-import { getReservationUnitPrice } from "@/modules/reservationUnit";
-import { type Control, type FieldValues, type SubmitHandler, useController, type UseFormReturn } from "react-hook-form";
-import { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
-import { useMedia } from "react-use";
-import { type FocusTimeSlot } from "@/modules/reservation";
+import { type TFunction, useTranslation } from "next-i18next";
+import styled from "styled-components";
 import { ControlledDateInput } from "ui/src/components/form";
+import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
+import { breakpoints } from "ui/src/modules/const";
+import { parseUIDate, formatDateTimeRange } from "ui/src/modules/date-utils";
 import { capitalize, getLocalizationLang } from "ui/src/modules/helpers";
+import { Flex, fontBold, fontMedium, fontRegular, SemiBold } from "ui/src/styled";
+import { type FocusTimeSlot } from "@/modules/reservation";
+import { getReservationUnitPrice } from "@/modules/reservationUnit";
+import { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 
 type CommonProps = {
   reservationUnit: ReservationTimePickerFieldsFragment;

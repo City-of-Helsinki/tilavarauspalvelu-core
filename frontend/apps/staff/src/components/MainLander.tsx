@@ -1,15 +1,15 @@
 import React from "react";
-import { getAccessibilityTermsUrl } from "@/modules/urls";
-import IconButton from "ui/src/components/IconButton";
-import styled from "styled-components";
-import { useTranslation } from "next-i18next";
-import { signIn } from "ui/src/modules/browserHelpers";
 import { Button, IconArrowRight, IconGroup, IconLinkExternal } from "hds-react";
-import { fontBold, H2 } from "ui/src/styled";
+import { useTranslation } from "next-i18next";
+import styled from "styled-components";
+import IconButton from "ui/src/components/IconButton";
+import { signIn } from "ui/src/modules/browserHelpers";
 import { breakpoints } from "ui/src/modules/const";
-import { HERO_IMAGE_URL } from "@/modules/const";
-import { KorosHeading, Heading } from "./KorosHeading";
 import { getLocalizationLang } from "ui/src/modules/helpers";
+import { fontBold, H2 } from "ui/src/styled";
+import { HERO_IMAGE_URL } from "@/modules/const";
+import { getAccessibilityTermsUrl } from "@/modules/urls";
+import { KorosHeading, Heading } from "./KorosHeading";
 
 const LoginBtn = styled(Button)`
   --background-color: var(--color-white);

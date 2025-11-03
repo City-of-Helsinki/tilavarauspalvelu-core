@@ -1,5 +1,5 @@
-import { Maybe, ReservationStateChoice } from "@gql/gql-types";
 import { addHours, isToday } from "date-fns";
+import { Maybe, ReservationStateChoice } from "@gql/gql-types";
 
 /* Rules
  * Approve only if REQUIRES_HANDLING

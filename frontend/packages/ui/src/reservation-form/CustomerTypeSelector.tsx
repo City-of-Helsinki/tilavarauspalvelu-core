@@ -1,13 +1,13 @@
 import React from "react";
-import styled from "styled-components";
-import { useTranslation } from "next-i18next";
 import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
 import { IconGroup, IconUser } from "hds-react";
-import IconPremises from "../icons/IconPremises";
+import { useTranslation } from "next-i18next";
+import styled from "styled-components";
 import { ReserveeType } from "../../gql/gql-types";
-import { RadioButtonWithImage } from "./RadioButtonWithImage";
-import { Flex, FullRow } from "../styled";
 import { ErrorText } from "../components/ErrorText";
+import IconPremises from "../icons/IconPremises";
+import { Flex, FullRow } from "../styled";
+import { RadioButtonWithImage } from "./RadioButtonWithImage";
 
 const TypeLabel = styled(FullRow).attrs({ as: "p" })`
   margin: 0;

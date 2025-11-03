@@ -1,9 +1,9 @@
 import React, { type HTMLAttributes } from "react";
 import { Checkbox, IconLinkExternal } from "hds-react";
-import styled from "styled-components";
 import Link from "next/link";
-import { H6 } from "../styled";
+import styled from "styled-components";
 import { breakpoints } from "../modules/const";
+import { H6 } from "../styled";
 
 type LinkT = {
   href: string;

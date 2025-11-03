@@ -1,22 +1,22 @@
 import React, { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { gql } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ParentSelector, type SpaceUpdateForm, SpaceForm, SpaceUpdateSchema } from "@lib/units/[id]";
 import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 import styled from "styled-components";
-import { useUpdateSpaceMutation, type SpaceUpdateMutationInput, useSpaceQuery } from "@gql/gql-types";
 import { errorToast, successToast } from "ui/src/components/toast";
+import { useDisplayError } from "ui/src/hooks";
+import { createNodeId } from "ui/src/modules/helpers";
 import { ButtonContainer, CenterSpinner, H2, H3 } from "ui/src/styled";
 import { FormErrorSummary } from "@/components/FormErrorSummary";
-import { createNodeId } from "ui/src/modules/helpers";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { LinkPrev } from "@/components/LinkPrev";
-import { gql } from "@apollo/client";
-import { useDisplayError } from "ui/src/hooks";
-import { useRouter } from "next/router";
-import { ParentSelector, type SpaceUpdateForm, SpaceForm, SpaceUpdateSchema } from "@lib/units/[id]";
+import { getUnitUrl } from "@/modules/urls";
+import { useUpdateSpaceMutation, type SpaceUpdateMutationInput, useSpaceQuery } from "@gql/gql-types";
 import { SpaceHead } from "./SpaceHead";
 import { SpaceHierarchy } from "./SpaceHierarchy";
-import { getUnitUrl } from "@/modules/urls";
 
 const Form = styled.form`
   display: flex;

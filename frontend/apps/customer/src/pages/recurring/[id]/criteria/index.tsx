@@ -1,24 +1,24 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
-import styled from "styled-components";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import styled from "styled-components";
+import { Sanitize } from "@ui/components/Sanitize";
+import { breakpoints } from "@ui/modules/const";
+import { createNodeId, capitalize, ignoreMaybeArray, toNumber } from "@ui/modules/helpers";
+import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
+import { Flex, H1 } from "@ui/styled";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { NotesWhenApplying } from "@/components/application";
+import { createApolloClient } from "@/modules/apolloClient";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getApplicationRoundPath, seasonalPrefix } from "@/modules/urls";
 import {
   ApplicationRoundCriteriaDocument,
   type ApplicationRoundCriteriaQuery,
   type ApplicationRoundCriteriaQueryVariables,
 } from "@gql/gql-types";
-import { Flex, H1 } from "@ui/styled";
-import { breakpoints } from "@ui/modules/const";
-import { Sanitize } from "@ui/components/Sanitize";
-import { createNodeId, capitalize, ignoreMaybeArray, toNumber } from "@ui/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
-import { gql } from "@apollo/client";
-import { Breadcrumb } from "@/components/Breadcrumb";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { createApolloClient } from "@/modules/apolloClient";
-import { getApplicationRoundPath, seasonalPrefix } from "@/modules/urls";
-import { NotesWhenApplying } from "@/components/application";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

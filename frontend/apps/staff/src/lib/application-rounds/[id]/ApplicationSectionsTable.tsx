@@ -1,6 +1,5 @@
 import React from "react";
-import { useTranslation, type TFunction } from "next-i18next";
-import { memoize, orderBy, uniqBy } from "lodash-es";
+import { gql } from "@apollo/client";
 import {
   IconArrowBottomRight,
   IconCheck,
@@ -10,15 +9,16 @@ import {
   IconQuestionCircle,
   IconSize,
 } from "hds-react";
-import { type ApplicationSectionTableElementFragment, ApplicationSectionStatusChoice } from "@gql/gql-types";
+import { memoize, orderBy, uniqBy } from "lodash-es";
+import { useTranslation, type TFunction } from "next-i18next";
+import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
+import { CustomTable } from "@/components/Table";
 import { MAX_APPLICATION_ROUND_NAME_LENGTH } from "@/modules/const";
 import { getApplicantName, truncate } from "@/modules/helpers";
 import { getApplicationUrl } from "@/modules/urls";
-import { CustomTable } from "@/components/Table";
-import { calculateAppliedReservationTime, formatAppliedReservationTime } from "./utils";
 import { ExternalTableLink } from "@/styled";
-import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
-import { gql } from "@apollo/client";
+import { type ApplicationSectionTableElementFragment, ApplicationSectionStatusChoice } from "@gql/gql-types";
+import { calculateAppliedReservationTime, formatAppliedReservationTime } from "./utils";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;

@@ -1,28 +1,28 @@
 import React, { useState } from "react";
+import { gql } from "@apollo/client";
+import { Button, ButtonSize, ButtonVariant, IconArrowLeft, LoadingSpinner } from "hds-react";
+import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Link from "next/link";
 import { useRouter } from "next/router";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
+import { ErrorText } from "ui/src/components/ErrorText";
+import { useDisplayError } from "ui/src/hooks";
+import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { ButtonContainer, Flex } from "ui/src/styled";
+import { ApplicationTerms } from "@/components/application";
+import { validateApplication, PAGES_WITH_STEPPER, ApplicationFunnelWrapper } from "@/components/application/funnel";
+import { ViewApplication } from "@/components/application/view";
+import { createApolloClient } from "@/modules/apolloClient";
+import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
+import { getApplicationPath } from "@/modules/urls";
 import {
   ApplicationPage4Document,
   type ApplicationPage4Query,
   type ApplicationPage4QueryVariables,
   useSendApplicationMutation,
 } from "@gql/gql-types";
-import type { GetServerSidePropsContext } from "next";
-import Link from "next/link";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
-import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { getApplicationPath } from "@/modules/urls";
-import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
-import { ButtonContainer, Flex } from "ui/src/styled";
-import { Button, ButtonSize, ButtonVariant, IconArrowLeft, LoadingSpinner } from "hds-react";
-import { useDisplayError } from "ui/src/hooks";
-import { ErrorText } from "ui/src/components/ErrorText";
-import { validateApplication, PAGES_WITH_STEPPER, ApplicationFunnelWrapper } from "@/components/application/funnel";
-import { ApplicationTerms } from "@/components/application";
-import { ViewApplication } from "@/components/application/view";
-import { gql } from "@apollo/client";
 
 // User has to accept the terms of service then on submit we change the application status
 // This uses separate Send mutation (not update) so no onNext like the other pages

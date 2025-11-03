@@ -1,13 +1,13 @@
 import React from "react";
-import { addDays } from "date-fns";
+import { MockedProvider } from "@apollo/client/testing";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MockedProvider } from "@apollo/client/testing";
-import { ReservationSeriesForm } from "./ReservationSeriesForm";
+import { addDays } from "date-fns";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { createGraphQLMocks, createReservationUnits, mondayMorningReservations, YEAR } from "./__test__/mocks";
 import { formatDate } from "ui/src/modules/date-utils";
 import { Weekday } from "@gql/gql-types";
+import { ReservationSeriesForm } from "./ReservationSeriesForm";
+import { createGraphQLMocks, createReservationUnits, mondayMorningReservations, YEAR } from "./__test__/mocks";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
   const params = vi.fn();

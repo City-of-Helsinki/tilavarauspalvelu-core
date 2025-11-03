@@ -1,19 +1,19 @@
 import React from "react";
-import { capitalize } from "lodash-es";
-import styled from "styled-components";
+import { type Control, Controller, UseFormReturn } from "react-hook-form";
 import { addDays, startOfDay } from "date-fns";
 import { IconAlertCircleFill, RadioButton, TextInput } from "hds-react";
+import { capitalize } from "lodash-es";
 import { useTranslation } from "next-i18next";
-import { type Control, Controller, UseFormReturn } from "react-hook-form";
-import { AutoGrid, Flex, HR } from "ui/src/styled";
+import styled from "styled-components";
 import {
   ControlledDateInput,
   ControlledNumberInput,
   ControlledSelect,
   ControlledCheckbox,
 } from "ui/src/components/form";
-import { PaymentType, PriceUnit } from "@gql/gql-types";
+import { AutoGrid, Flex, HR } from "ui/src/styled";
 import { getTranslatedError } from "@/modules/util";
+import { PaymentType, PriceUnit } from "@gql/gql-types";
 import { FieldGroup } from "./FieldGroup";
 import { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";

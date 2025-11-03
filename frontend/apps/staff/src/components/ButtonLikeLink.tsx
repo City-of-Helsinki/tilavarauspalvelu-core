@@ -1,6 +1,6 @@
+import Link from "next/link";
 import styled from "styled-components";
 import { ButtonCss, ButtonStyleProps } from "ui/src/styled";
-import Link from "next/link";
 
 /// @brief looks like a button but is a link
 /// @desc why? because nesting buttons and links is invalid html and HDS doesn't include this

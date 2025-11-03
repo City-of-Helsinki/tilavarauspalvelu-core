@@ -1,31 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { useTranslation } from "next-i18next";
+import { useForm } from "react-hook-form";
+import { gql } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { addYears } from "date-fns";
+import { StepState } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { formatApiDate } from "ui/src/modules/date-utils";
+import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { H1 } from "ui/src/styled";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { EditStep0, EditStep1 } from "@/lib/reservation/[id]/edit";
 import { createApolloClient } from "@/modules/apolloClient";
+import { queryOptions } from "@/modules/queryOptions";
+import { isReservationEditable, transformReservation } from "@/modules/reservation";
+import { PendingReservationFormSchema, type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getReservationPath, reservationsPrefix } from "@/modules/urls";
+import { ReservationPageWrapper, ReservationTitleSection } from "@/styled/reservation";
+import { StyledStepper } from "@/styled/util";
 import {
   type ReservationEditPageQuery,
   type ReservationEditPageQueryVariables,
   ReservationEditPageDocument,
   MunicipalityChoice,
 } from "@gql/gql-types";
-import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { formatApiDate } from "ui/src/modules/date-utils";
-import { addYears } from "date-fns";
-import { H1 } from "ui/src/styled";
-import { gql } from "@apollo/client";
-import { StepState } from "hds-react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { EditStep0, EditStep1 } from "@/lib/reservation/[id]/edit";
-import { PendingReservationFormSchema, type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import { ReservationPageWrapper, ReservationTitleSection } from "@/styled/reservation";
-import { queryOptions } from "@/modules/queryOptions";
-import { isReservationEditable, transformReservation } from "@/modules/reservation";
-import { getReservationPath, reservationsPrefix } from "@/modules/urls";
-import { Breadcrumb } from "@/components/Breadcrumb";
-import { StyledStepper } from "@/styled/util";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

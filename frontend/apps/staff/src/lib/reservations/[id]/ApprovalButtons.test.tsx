@@ -1,10 +1,10 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import { type ApprovalButtonsFragment, ReservationStateChoice } from "@gql/gql-types";
 import { addDays, addMinutes } from "date-fns";
-import { ApprovalButtons } from "./ApprovalButtons";
 import { describe, expect, test, vi } from "vitest";
 import { createNodeId } from "ui/src/modules/helpers";
+import { type ApprovalButtonsFragment, ReservationStateChoice } from "@gql/gql-types";
+import { ApprovalButtons } from "./ApprovalButtons";
 
 const wrappedRender = (reservation: ApprovalButtonsFragment) => {
   return render(<ApprovalButtons isFree reservation={reservation} handleClose={vi.fn()} handleAccept={vi.fn()} />);

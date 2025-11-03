@@ -1,5 +1,5 @@
-import { env } from "@/env.mjs";
 import { gql, NormalizedCacheObject, type ApolloClient } from "@apollo/client";
+import { env } from "@/env.mjs";
 import {
   TermsOfUseTypeChoices,
   TermsOfUseDocument,
@@ -10,8 +10,8 @@ import {
   OrderDocument,
   type TermsOfUseFieldsFragment,
 } from "@gql/gql-types";
-import { genericTermsVariant } from "./const";
 import { getVersion } from "./baseUtils.mjs";
+import { genericTermsVariant } from "./const";
 
 export { getVersion };
 

@@ -1,13 +1,13 @@
 import React, { useRef, useState } from "react";
+import { Dialog } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";
-import type { ImageFragment } from "@gql/gql-types";
-import Carousel from "@/components/Carousel";
 import { getImageSource } from "ui/src/modules/helpers";
-import { Dialog } from "hds-react";
 import { focusStyles, removeButtonStyles } from "ui/src/styled";
+import Carousel from "@/components/Carousel";
 import { FixedDialog } from "@/styled/FixedDialog";
+import type { ImageFragment } from "@gql/gql-types";
 
 type Props = {
   images: Readonly<ImageFragment[]>;

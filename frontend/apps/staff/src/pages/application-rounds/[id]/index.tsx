@@ -1,13 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
-import { errorToast } from "ui/src/components/toast";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { isApplicationRoundInProgress } from "@/modules/helpers";
-import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "ui/src/styled";
+import { TimeframeStatus, ApplicationRoundStatusLabel } from "@lib/application-rounds";
+import {
+  ReviewEndAllocation,
+  ApplicationDataLoader,
+  Filters,
+  ApplicationSectionDataLoader,
+  TimeSlotDataLoader,
+  RejectedOccurrencesDataLoader,
+} from "@lib/application-rounds/[id]";
 import { Button, Tabs } from "hds-react";
 import { uniqBy } from "lodash-es";
+import { GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
+import { errorToast } from "ui/src/components/toast";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "ui/src/styled";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
+import { getFilterOptions } from "@/hooks/useFilterOptions";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { createClient } from "@/modules/apolloClient";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { isApplicationRoundInProgress } from "@/modules/helpers";
+import { hasPermission } from "@/modules/permissionHelper";
+import { type TagOptionsList } from "@/modules/search";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getApplicationRoundUrl } from "@/modules/urls";
 import {
   type ApplicationRoundAdminFragment,
   ApplicationRoundStatusChoice,
@@ -26,28 +48,6 @@ import {
   type FilterOptionsQueryVariables,
   CurrentUserDocument,
 } from "@gql/gql-types";
-import { ButtonLikeLink } from "@/components/ButtonLikeLink";
-import { hasPermission } from "@/modules/permissionHelper";
-import { useSearchParams } from "next/navigation";
-import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import Link from "next/link";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { GetServerSidePropsContext } from "next";
-import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { createClient } from "@/modules/apolloClient";
-import { TimeframeStatus, ApplicationRoundStatusLabel } from "@lib/application-rounds";
-import {
-  ReviewEndAllocation,
-  ApplicationDataLoader,
-  Filters,
-  ApplicationSectionDataLoader,
-  TimeSlotDataLoader,
-  RejectedOccurrencesDataLoader,
-} from "@lib/application-rounds/[id]";
-import { type TagOptionsList } from "@/modules/search";
-import { getFilterOptions } from "@/hooks/useFilterOptions";
-import { getApplicationRoundUrl } from "@/modules/urls";
 
 const TabContent = styled(Flex).attrs({
   $direction: "column",

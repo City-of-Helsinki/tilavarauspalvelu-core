@@ -1,18 +1,18 @@
 import { useMemo } from "react";
-import { ReservationTypeChoice, type Maybe, useReservationsByReservationUnitQuery } from "@gql/gql-types";
-import { isValidDate, formatApiDate, timeToMinutes } from "ui/src/modules/date-utils";
 import { addDays, addMinutes, startOfDay } from "date-fns";
+import { useTranslation } from "next-i18next";
+import { errorToast } from "ui/src/components/toast";
+import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
+import { isValidDate, formatApiDate, timeToMinutes } from "ui/src/modules/date-utils";
+import { createNodeId } from "ui/src/modules/helpers";
+import { type NewReservationListItem } from "@/components/ReservationsList";
 import {
   type CollisionInterval,
   combineAffectingReservations,
   doesIntervalCollide,
   reservationToInterval,
 } from "@/modules/helpers";
-import { type NewReservationListItem } from "@/components/ReservationsList";
-import { createNodeId } from "ui/src/modules/helpers";
-import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
-import { errorToast } from "ui/src/components/toast";
-import { useTranslation } from "next-i18next";
+import { ReservationTypeChoice, type Maybe, useReservationsByReservationUnitQuery } from "@gql/gql-types";
 
 function useReservationsInInterval({
   begin,

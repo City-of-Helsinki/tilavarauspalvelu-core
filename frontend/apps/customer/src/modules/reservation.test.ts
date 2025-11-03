@@ -1,4 +1,8 @@
 import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
+import { type TFunction } from "i18next";
+import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
+import { formatApiDate } from "ui/src/modules/date-utils";
+import { createNodeId } from "ui/src/modules/helpers";
 import {
   ReservationStateChoice,
   ReservationStartInterval,
@@ -8,6 +12,7 @@ import {
   type PaymentOrderNode,
   type CanReservationBeChangedFragment,
 } from "@gql/gql-types";
+import { isSlotWithinReservationTime } from "./reservable";
 import {
   isReservationCancellable,
   getCheckoutUrl,
@@ -16,11 +21,6 @@ import {
   isReservationEditable,
   type CanReservationBeChangedProps,
 } from "./reservation";
-import { isSlotWithinReservationTime } from "./reservable";
-import { formatApiDate } from "ui/src/modules/date-utils";
-import { type TFunction } from "i18next";
-import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
-import { createNodeId } from "ui/src/modules/helpers";
 
 function createMockCancellationRule({
   canBeCancelledTimeBefore = 0,

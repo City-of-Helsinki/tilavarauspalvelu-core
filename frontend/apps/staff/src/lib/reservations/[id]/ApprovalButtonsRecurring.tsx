@@ -1,13 +1,13 @@
 import React, { useRef } from "react";
-import { type ReservationSeriesNode } from "@gql/gql-types";
-import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
+import { useTranslation } from "next-i18next";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { DenyDialogSeries } from "@/components/DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import { useReservationSeries } from "@/hooks";
 import { isPossibleToDeny } from "@/modules/reservationModificationRules";
 import { getReservationUrl } from "@/modules/urls";
+import { type ReservationSeriesNode } from "@gql/gql-types";
 
 type Props = {
   reservationSeries: Pick<ReservationSeriesNode, "pk">;

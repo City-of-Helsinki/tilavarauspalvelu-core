@@ -1,6 +1,6 @@
+import { gql } from "@apollo/client";
 import { TermsOfUseTypeChoices, useTermsOfUseQuery } from "../../gql/gql-types";
 import { genericTermsVariant } from "../modules/const";
-import { gql } from "@apollo/client";
 import { filterNonNullable } from "../modules/helpers";
 
 export function useGenericTerms() {

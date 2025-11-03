@@ -1,12 +1,12 @@
 import React from "react";
+import { useController, useFormContext } from "react-hook-form";
 import { RadioButton } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { ReserveeType } from "@gql/gql-types";
-import { useController, useFormContext } from "react-hook-form";
-import type { ApplicationPage3FormValues } from "./form";
-import { Flex } from "ui/src/styled";
 import styled from "styled-components";
 import { ErrorText } from "ui/src/components/ErrorText";
+import { Flex } from "ui/src/styled";
+import { ReserveeType } from "@gql/gql-types";
+import type { ApplicationPage3FormValues } from "./form";
 
 const Label = styled.p`
   margin: 0;

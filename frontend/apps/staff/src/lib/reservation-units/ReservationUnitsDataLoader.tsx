@@ -1,15 +1,15 @@
 import React, { type Dispatch, type SetStateAction, useState } from "react";
-import type { SelectedRow } from "@/lib/reservation-units";
 import { gql } from "@apollo/client";
-import { ReservationUnitOrderingChoices, useSearchReservationUnitsQuery } from "@gql/gql-types";
-import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
-import { LARGE_LIST_PAGE_SIZE } from "@/modules/const";
-import { More } from "@/components/More";
-import { ReservationUnitsTable } from "./ReservationUnitsTable";
-import { errorToast } from "ui/src/components/toast";
-import { CenterSpinner } from "ui/src/styled";
 import { useTranslation } from "next-i18next";
+import { errorToast } from "ui/src/components/toast";
+import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
+import { CenterSpinner } from "ui/src/styled";
+import { More } from "@/components/More";
 import { useGetFilterSearchParams } from "@/hooks";
+import type { SelectedRow } from "@/lib/reservation-units";
+import { LARGE_LIST_PAGE_SIZE } from "@/modules/const";
+import { ReservationUnitOrderingChoices, useSearchReservationUnitsQuery } from "@gql/gql-types";
+import { ReservationUnitsTable } from "./ReservationUnitsTable";
 
 type Props = {
   selectedRows: SelectedRow[];

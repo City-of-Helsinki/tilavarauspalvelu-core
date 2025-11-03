@@ -1,8 +1,8 @@
-import styled, { css } from "styled-components";
-import { focusStyles } from "./cssFragments";
-import { breakpoints } from "../modules/const";
-import { fontMedium } from "./typography";
 import Link from "next/link";
+import styled, { css } from "styled-components";
+import { breakpoints } from "../modules/const";
+import { focusStyles } from "./cssFragments";
+import { fontMedium } from "./typography";
 
 export type ButtonStyleProps = {
   readonly variant?: "primary" | "secondary" | "inverted";

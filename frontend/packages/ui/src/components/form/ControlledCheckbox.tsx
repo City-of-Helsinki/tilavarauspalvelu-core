@@ -1,9 +1,9 @@
 import React from "react";
+import { Control, FieldValues, Path, PathValue, useController, UseControllerProps } from "react-hook-form";
 import { Checkbox } from "hds-react";
 import styled from "styled-components";
-import { fontRegular } from "../../styled";
-import { Control, FieldValues, Path, PathValue, useController, UseControllerProps } from "react-hook-form";
 import { filterEmpty } from "../../modules/helpers";
+import { fontRegular } from "../../styled";
 
 const StyledCheckbox = styled(Checkbox)`
   && {

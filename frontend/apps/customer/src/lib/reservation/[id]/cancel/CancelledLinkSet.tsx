@@ -1,10 +1,10 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { IconArrowRight, IconSignout, IconSize } from "hds-react";
-import { signOut } from "ui/src/modules/browserHelpers";
-import { getSingleSearchPath } from "@/modules/urls";
+import { useTranslation } from "next-i18next";
 import { IconButton } from "ui/src/components";
+import { signOut } from "ui/src/modules/browserHelpers";
 import { Flex } from "ui/src/styled";
+import { getSingleSearchPath } from "@/modules/urls";
 
 type Props =
   | {

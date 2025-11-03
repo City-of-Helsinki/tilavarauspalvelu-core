@@ -1,24 +1,14 @@
 import React from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useRouter } from "next/router";
+import { gql } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { uniq } from "lodash-es";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { useRouter } from "next/router";
 import { useDisplayError } from "ui/src/hooks";
+import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
-import { uniq } from "lodash-es";
-import { gql } from "@apollo/client";
-import { createApolloClient } from "@/modules/apolloClient";
-import {
-  ApplicationPage1Document,
-  useUpdateApplicationMutation,
-  type ApplicationPage1Query,
-  type ApplicationPage1QueryVariables,
-} from "@gql/gql-types";
-import { getApplicationPath } from "@/modules/urls";
-import { useReservationUnitList } from "@/hooks";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { ApplicationFunnelWrapper, Page1 as Page1Impl } from "@/components/application/funnel";
 import {
   type ApplicationPage1FormValues,
@@ -26,7 +16,17 @@ import {
   transformApplicationPage1,
   convertApplicationPage1,
 } from "@/components/application/funnel/form";
+import { useReservationUnitList } from "@/hooks";
+import { createApolloClient } from "@/modules/apolloClient";
 import { getSearchOptions } from "@/modules/search";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getApplicationPath } from "@/modules/urls";
+import {
+  ApplicationPage1Document,
+  useUpdateApplicationMutation,
+  type ApplicationPage1Query,
+  type ApplicationPage1QueryVariables,
+} from "@gql/gql-types";
 
 function Page1({ application, options: optionsOrig }: Pick<PropsNarrowed, "application" | "options">): JSX.Element {
   const router = useRouter();

@@ -1,8 +1,9 @@
 import React from "react";
-import { NotificationType } from "hds-react";
-import styled from "styled-components";
 import { useLocalStorage } from "react-use";
-import NotificationWrapper from "./NotificationWrapper";
+import { gql } from "@apollo/client";
+import { NotificationType } from "hds-react";
+import { useTranslation } from "next-i18next";
+import styled from "styled-components";
 import {
   BannerNotificationLevel,
   BannerNotificationTarget,
@@ -10,10 +11,9 @@ import {
   type ShowNotificationFieldsFragment,
 } from "../../gql/gql-types";
 import { filterNonNullable } from "../modules/helpers";
-import { useTranslation } from "next-i18next";
 import { convertLanguageCode, getTranslationSafe } from "../modules/util";
-import { gql } from "@apollo/client";
 import { ClientOnly } from "./ClientOnly";
+import NotificationWrapper from "./NotificationWrapper";
 import { Sanitize } from "./Sanitize";
 
 type BannerNotificationListProps = {

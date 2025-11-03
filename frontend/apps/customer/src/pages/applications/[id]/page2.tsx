@@ -1,22 +1,13 @@
 import React, { useEffect } from "react";
-import * as Sentry from "@sentry/nextjs";
 import { FormProvider, useForm } from "react-hook-form";
-import { useRouter } from "next/router";
+import { gql } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as Sentry from "@sentry/nextjs";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { gql } from "@apollo/client";
-import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { useRouter } from "next/router";
 import { useDisplayError } from "ui/src/hooks";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { createApolloClient } from "@/modules/apolloClient";
-import { getApplicationPath } from "@/modules/urls";
-import {
-  ApplicationPage2Document,
-  useUpdateApplicationMutation,
-  type ApplicationPage2Query,
-  type ApplicationPage2QueryVariables,
-} from "@gql/gql-types";
+import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { ApplicationFunnelWrapper, Page2 as Page2Impl } from "@/components/application/funnel";
 import {
   type ApplicationPage2FormValues,
@@ -24,6 +15,15 @@ import {
   convertApplicationPage2,
   ApplicationPage2Schema,
 } from "@/components/application/funnel/form";
+import { createApolloClient } from "@/modules/apolloClient";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getApplicationPath } from "@/modules/urls";
+import {
+  ApplicationPage2Document,
+  useUpdateApplicationMutation,
+  type ApplicationPage2Query,
+  type ApplicationPage2QueryVariables,
+} from "@gql/gql-types";
 
 function Page2({ application }: Pick<PropsNarrowed, "application">): JSX.Element {
   const router = useRouter();

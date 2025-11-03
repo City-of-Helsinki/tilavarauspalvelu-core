@@ -1,22 +1,22 @@
 import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
+import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { ShowAllContainer } from "ui/src/components";
-import { SearchTags } from "@/components/SearchTags";
+import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
+import { mapFormToSearchParams } from "ui/src/modules/search";
 import {
   ControlledMultiSelectFilter,
   ControlledSearchFilter,
   ControlledSelectFilter,
 } from "@/components/QueryParamFilters";
-import { translateTag } from "@/modules/search";
-import { useForm } from "react-hook-form";
-import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
+import { SearchTags } from "@/components/SearchTags";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
-import { type ApplicationRoundFilterUnitFragment, MunicipalityChoice, Priority, ReserveeType } from "@gql/gql-types";
-import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
-import { gql } from "@apollo/client";
-import { mapFormToSearchParams } from "ui/src/modules/search";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { translateTag } from "@/modules/search";
+import { type ApplicationRoundFilterUnitFragment, MunicipalityChoice, Priority, ReserveeType } from "@gql/gql-types";
 
 type UnitFilterQueryType = ApplicationRoundFilterUnitFragment;
 

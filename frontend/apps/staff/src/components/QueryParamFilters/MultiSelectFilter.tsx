@@ -1,10 +1,10 @@
 import React from "react";
-import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";
-import { Select } from "hds-react";
-import { useSearchParams } from "next/navigation";
-import { useTranslation } from "next-i18next";
 import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
+import { Select } from "hds-react";
+import { useTranslation } from "next-i18next";
+import { useSearchParams } from "next/navigation";
+import { convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
 interface MultiSelectFilterProps {
   name: string;

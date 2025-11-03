@@ -1,10 +1,10 @@
 import React from "react";
+import type { ApolloQueryResult } from "@apollo/client";
+import { Button, ButtonVariant } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { Button, ButtonVariant } from "hds-react";
-import type { PageInfo, SearchReservationUnitsQuery } from "@gql/gql-types";
-import type { ApolloQueryResult } from "@apollo/client";
 import { CenterSpinner, Flex } from "ui/src/styled";
+import type { PageInfo, SearchReservationUnitsQuery } from "@gql/gql-types";
 
 const HitCountSummary = styled.div`
   font-size: var(--fontsize-body-l);

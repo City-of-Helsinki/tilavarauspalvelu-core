@@ -1,4 +1,10 @@
+import { set } from "date-fns";
 import { padStart } from "lodash-es";
+import { type TFunction } from "next-i18next";
+import { type DayT } from "ui/src/modules/const";
+import { convertWeekday, transformWeekday } from "ui/src/modules/conversion";
+import { formatDuration, formatTimeRange, timeToMinutes } from "ui/src/modules/date-utils";
+import { filterNonNullable, sort, toNumber } from "ui/src/modules/helpers";
 import {
   type SuitableTimeRangeNode,
   type ApplicationSectionNode,
@@ -6,12 +12,6 @@ import {
   Weekday,
   type ApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
-import { type TFunction } from "next-i18next";
-import { filterNonNullable, sort, toNumber } from "ui/src/modules/helpers";
-import { formatDuration, formatTimeRange, timeToMinutes } from "ui/src/modules/date-utils";
-import { convertWeekday, transformWeekday } from "ui/src/modules/conversion";
-import { type DayT } from "ui/src/modules/const";
-import { set } from "date-fns";
 
 // TODO use a fragment
 type QueryT = NonNullable<ApplicationSectionAllocationsQuery["applicationSections"]>;

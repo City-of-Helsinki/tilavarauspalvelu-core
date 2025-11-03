@@ -1,4 +1,10 @@
+import { gql } from "@apollo/client";
 import { addMinutes, addSeconds, isAfter, roundToNearestMinutes, differenceInMinutes, set } from "date-fns";
+import { type TFunction } from "i18next";
+import { getIntervalMinutes } from "ui/src/modules/conversion";
+import { formatTime, parseUIDate, isValidDate, timeToMinutes, formatDate } from "ui/src/modules/date-utils";
+import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
+import { type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import {
   type ReservationNode,
   ReservationStartInterval,
@@ -17,13 +23,7 @@ import {
   ReservationCancelReasonChoice,
   type ReservationPaymentUrlFragment,
 } from "@gql/gql-types";
-import { getIntervalMinutes } from "ui/src/modules/conversion";
-import { type TFunction } from "i18next";
 import { type ReservableMap, type RoundPeriod, isRangeReservable } from "./reservable";
-import { type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import { formatTime, parseUIDate, isValidDate, timeToMinutes, formatDate } from "ui/src/modules/date-utils";
-import { gql } from "@apollo/client";
-import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
 
 // TimeSlots change the Calendar view. How many intervals are shown i.e. every half an hour, every hour
 // we use every hour only => 2

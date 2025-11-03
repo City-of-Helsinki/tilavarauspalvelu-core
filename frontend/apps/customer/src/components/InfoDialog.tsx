@@ -1,5 +1,5 @@
-import { Button, ButtonVariant, Dialog, IconInfoCircleFill } from "hds-react";
 import React from "react";
+import { Button, ButtonVariant, Dialog, IconInfoCircleFill } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { Sanitize } from "ui/src/components/Sanitize";
 

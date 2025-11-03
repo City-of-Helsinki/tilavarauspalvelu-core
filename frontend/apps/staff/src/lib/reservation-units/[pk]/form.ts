@@ -1,4 +1,8 @@
-import { convertTime, filterNonNullable, toNumber } from "ui/src/modules/helpers";
+import { addDays, endOfDay } from "date-fns";
+import { z } from "zod";
+import { cleanHtmlContent } from "ui/src/components/Sanitize";
+import { WEEKDAYS_SORTED } from "ui/src/modules/const";
+import { getIntervalMinutes } from "ui/src/modules/conversion";
 import {
   parseApiDate,
   parseUIDate,
@@ -8,6 +12,8 @@ import {
   formatDate,
   formatTime,
 } from "ui/src/modules/date-utils";
+import { convertTime, filterNonNullable, toNumber } from "ui/src/modules/helpers";
+import { checkLengthWithoutHtml, checkTimeStringFormat } from "ui/src/schemas/schemaCommon";
 import {
   AccessType,
   AuthenticationType,
@@ -23,13 +29,7 @@ import {
   type ReservationUnitAccessTypeSerializerInput,
   Weekday,
 } from "@gql/gql-types";
-import { addDays, endOfDay } from "date-fns";
-import { z } from "zod";
-import { checkLengthWithoutHtml, checkTimeStringFormat } from "ui/src/schemas/schemaCommon";
-import { WEEKDAYS_SORTED } from "ui/src/modules/const";
 import { type TaxOption } from "./PricingSection";
-import { cleanHtmlContent } from "ui/src/components/Sanitize";
-import { getIntervalMinutes } from "ui/src/modules/conversion";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;

@@ -1,11 +1,22 @@
 import React from "react";
-import type { EditPageReservationFragment } from "@gql/gql-types";
+import { type UseFormReturn } from "react-hook-form";
+import { gql } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
 import { Button, ButtonVariant, IconArrowRight, IconCross } from "hds-react";
 import { useTranslation } from "next-i18next";
+import ErrorComponent from "next/error";
 import styled from "styled-components";
-import { H4 } from "ui/src/styled";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
+import { Sanitize } from "ui/src/components/Sanitize";
 import { breakpoints } from "ui/src/modules/const";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { H4 } from "ui/src/styled";
+import { QuickReservation } from "@/components/QuickReservation";
+import { ReservationTimePicker, ReservationInfoCard } from "@/components/reservation";
+import { useAvailableTimes } from "@/hooks";
+import { useBlockingReservations } from "@/hooks/useBlockingReservations";
+import { useReservableTimes } from "@/hooks/useReservableTimes";
+import { isRangeReservable } from "@/modules/reservable";
 import {
   convertFormToFocustimeSlot,
   createDateTime,
@@ -13,21 +24,10 @@ import {
   isReservationEditable,
 } from "@/modules/reservation";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
-import { type UseFormReturn } from "react-hook-form";
 import { type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { useReservableTimes } from "@/hooks/useReservableTimes";
-import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
-import { ReservationTimePicker, ReservationInfoCard } from "@/components/reservation";
-import { Sanitize } from "ui/src/components/Sanitize";
-import { PinkBox as PinkBoxBase } from "@/styled/reservation";
 import { getReservationPath } from "@/modules/urls";
-import { gql } from "@apollo/client";
-import ErrorComponent from "next/error";
-import { useAvailableTimes } from "@/hooks";
-import { useBlockingReservations } from "@/hooks/useBlockingReservations";
-import { isRangeReservable } from "@/modules/reservable";
-import { QuickReservation } from "@/components/QuickReservation";
+import { PinkBox as PinkBoxBase } from "@/styled/reservation";
+import type { EditPageReservationFragment } from "@gql/gql-types";
 
 const StyledCalendarWrapper = styled.div`
   grid-column: 1 / -1;

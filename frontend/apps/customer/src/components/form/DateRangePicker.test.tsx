@@ -1,8 +1,8 @@
-import userEvent from "@testing-library/user-event";
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { DateRangePicker, type DateRangePickerProps } from "./DateRangePicker";
+import userEvent from "@testing-library/user-event";
 import { vi, test, expect, describe } from "vitest";
+import { DateRangePicker, type DateRangePickerProps } from "./DateRangePicker";
 
 const defaultProps: DateRangePickerProps = {
   endDate: null,

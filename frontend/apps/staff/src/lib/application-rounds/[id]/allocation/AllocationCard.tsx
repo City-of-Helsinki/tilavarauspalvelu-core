@@ -1,13 +1,16 @@
 import React from "react";
+import { type ApolloQueryResult } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { type ApolloQueryResult } from "@apollo/client";
-import { type ApplicationSectionAllocationsQuery, Priority } from "@gql/gql-types";
+import { formatDuration, timeToMinutes } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { Flex, fontMedium, H5, SemiBold, Strong } from "ui/src/styled";
-import { formatDuration, timeToMinutes } from "ui/src/modules/date-utils";
 import { Accordion } from "@/components/Accordion";
+import { NotificationInline } from "@/components/NotificationInline";
+import { getApplicantName } from "@/modules/helpers";
+import { type ApplicationSectionAllocationsQuery, Priority } from "@gql/gql-types";
+import { useAcceptSlotMutation, useRefreshApplications, useRemoveAllocation } from "./hooks";
 import {
   type AllocatedTimeSlotNodeT,
   createDurationString,
@@ -17,9 +20,6 @@ import {
   type SectionNodeT,
   type SuitableTimeRangeNodeT,
 } from "./modules/applicationRoundAllocation";
-import { useAcceptSlotMutation, useRefreshApplications, useRemoveAllocation } from "./hooks";
-import { getApplicantName } from "@/modules/helpers";
-import { NotificationInline } from "@/components/NotificationInline";
 
 type Props = {
   applicationSection: SectionNodeT;

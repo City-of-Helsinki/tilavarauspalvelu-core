@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { parseUIDate } from "../modules/date-utils";
 import {
   MunicipalityChoice,
   ReservationFormType,
@@ -8,8 +7,9 @@ import {
   ReservationUnitNode,
   ReserveeType,
 } from "../../gql/gql-types";
-import { checkTimeStringFormat, checkValidFutureDate } from "./schemaCommon";
 import { getIntervalMinutes } from "../modules/conversion";
+import { parseUIDate } from "../modules/date-utils";
+import { checkTimeStringFormat, checkValidFutureDate } from "./schemaCommon";
 
 export const ReservationTypes = Object.values(ReservationTypeChoice);
 export const ReservationTypeSchema = z.enum(ReservationTypeChoice, { error: "Required" });

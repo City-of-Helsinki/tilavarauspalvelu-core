@@ -1,8 +1,8 @@
 import React from "react";
 import { ErrorContainer } from "ui/src/components";
+import { Flex } from "ui/src/styled";
 import { env } from "@/env.mjs";
 import { PUBLIC_URL } from "@/modules/const";
-import { Flex } from "ui/src/styled";
 
 export function ErrorGeneric(): JSX.Element {
   return (

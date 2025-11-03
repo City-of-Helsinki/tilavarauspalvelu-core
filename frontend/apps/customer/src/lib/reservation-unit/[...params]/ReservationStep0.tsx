@@ -1,29 +1,29 @@
 import React, { useState } from "react";
-import { Button, ButtonVariant, IconArrowRight, IconCross, LoadingSpinner } from "hds-react";
 import { useForm, FormProvider, type UseFormReturn, FieldValues } from "react-hook-form";
+import { gql } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, ButtonVariant, IconArrowRight, IconCross, LoadingSpinner } from "hds-react";
 import { Trans, useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 import styled from "styled-components";
+import { ErrorListBox } from "@ui/components/ErrorListBox";
+import { useDisplayError } from "@ui/hooks";
+import { isNotFoundError } from "@ui/modules/apolloUtils";
+import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/reservation-form";
+import { getExtendedGeneralFormFields } from "@ui/reservation-form/util";
+import { getReservationFormSchema, ReservationFormValues, type ReservationFormValueT } from "@ui/schemas";
+import { Flex, LinkLikeButton } from "@ui/styled";
+import { type OptionsRecord } from "@ui/types";
 import InfoDialog from "@/components/InfoDialog";
+import { getReservationInProgressPath, getReservationUnitPath } from "@/modules/urls";
+import { ActionContainer, NewReservationForm } from "@/styled/reservation";
 import {
   type ReservationQuery,
   type ReservationUpdateMutationInput,
   ReserveeType,
   useUpdateReservationMutation,
 } from "@gql/gql-types";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { getReservationFormSchema, ReservationFormValues, type ReservationFormValueT } from "@ui/schemas";
-import { getExtendedGeneralFormFields } from "@ui/reservation-form/util";
-import { Flex, LinkLikeButton } from "@ui/styled";
-import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
-import { type OptionsRecord } from "@ui/types";
-import { ActionContainer, NewReservationForm } from "@/styled/reservation";
-import { useDisplayError } from "@ui/hooks";
-import { useRouter } from "next/router";
-import { getReservationInProgressPath, getReservationUnitPath } from "@/modules/urls";
-import { gql } from "@apollo/client";
-import { ErrorListBox } from "@ui/components/ErrorListBox";
-import { isNotFoundError } from "@ui/modules/apolloUtils";
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {

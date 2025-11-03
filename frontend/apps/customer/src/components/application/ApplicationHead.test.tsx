@@ -1,7 +1,7 @@
-import { expect, test, describe } from "vitest";
 import { render } from "@testing-library/react";
-import { ApplicationHead } from "./ApplicationHead";
+import { expect, test, describe } from "vitest";
 import { ApplicationStatusChoice } from "@gql/gql-types";
+import { ApplicationHead } from "./ApplicationHead";
 
 describe("ApplicationHead", () => {
   test("should render application head", () => {

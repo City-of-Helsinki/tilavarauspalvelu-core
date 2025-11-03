@@ -1,8 +1,8 @@
-import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
-import { type SearchFormProps, SeasonalSearchForm } from "./SeasonalSearchForm";
+import { selectOption } from "@test/test.utils";
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { selectOption } from "@test/test.utils";
+import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
+import { type SearchFormProps, SeasonalSearchForm } from "./SeasonalSearchForm";
 
 const { mockedRouterReplace, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();

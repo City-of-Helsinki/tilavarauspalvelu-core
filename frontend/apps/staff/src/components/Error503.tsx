@@ -1,7 +1,7 @@
 import React from "react";
-import { PUBLIC_URL } from "@/modules/const";
-import { env } from "@/env.mjs";
 import { ErrorContainer } from "ui/src/components";
+import { env } from "@/env.mjs";
+import { PUBLIC_URL } from "@/modules/const";
 
 export function Error503(): JSX.Element {
   return (

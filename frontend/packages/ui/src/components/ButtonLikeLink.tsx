@@ -1,6 +1,6 @@
+import Link from "next/link";
 import styled from "styled-components";
 import { fontMedium, ButtonCss, ButtonStyleProps } from "../styled";
-import Link from "next/link";
 
 /* small overrides that might be moved to buttonCss.ts after testing
  * gap: in case there is an icon

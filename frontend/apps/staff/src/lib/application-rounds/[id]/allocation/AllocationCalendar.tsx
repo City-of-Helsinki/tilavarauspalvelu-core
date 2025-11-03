@@ -1,14 +1,16 @@
-import { IconCheck, IconCross } from "hds-react";
 import React, { useState } from "react";
+import { IconCheck, IconCross } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled, { css } from "styled-components";
-import { filterNonNullable } from "ui/src/modules/helpers";
-import { timeToMinutes } from "ui/src/modules/date-utils";
-import { ApplicationSectionStatusChoice, type SuitableTimeRangeNode } from "@gql/gql-types";
-import { fontMedium } from "ui/src/styled";
 import { breakpoints, type DayT, WEEKDAYS } from "ui/src/modules/const";
 import { transformWeekday } from "ui/src/modules/conversion";
+import { timeToMinutes } from "ui/src/modules/date-utils";
+import { filterNonNullable } from "ui/src/modules/helpers";
+import { fontMedium } from "ui/src/styled";
+import { useGetFilterSearchParams } from "@/hooks";
 import { ALLOCATION_CALENDAR_TIMES } from "@/modules/const";
+import { ApplicationSectionStatusChoice, type SuitableTimeRangeNode } from "@gql/gql-types";
+import { useFocusAllocatedSlot, useFocusApplicationEvent, useSlotSelection } from "./hooks";
 import {
   applicationEventSchedulesToCells,
   getTimeSeries,
@@ -20,8 +22,6 @@ import {
   type SectionNodeT,
   ReservationUnitOptionNodeT,
 } from "./modules/applicationRoundAllocation";
-import { useFocusAllocatedSlot, useFocusApplicationEvent, useSlotSelection } from "./hooks";
-import { useGetFilterSearchParams } from "@/hooks";
 
 type Props = {
   applicationSections: SectionNodeT[];

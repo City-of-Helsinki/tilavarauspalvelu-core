@@ -1,20 +1,17 @@
 import React from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
+import { gql } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { differenceInMinutes } from "date-fns";
+import { Button, ButtonSize, ButtonVariant, Dialog, Notification, NotificationSize } from "hds-react";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
-import { Button, ButtonSize, ButtonVariant, Dialog, Notification, NotificationSize } from "hds-react";
 import { z } from "zod";
-import {
-  type ChangeReservationTimeFragment,
-  type ReservationSeriesAddMutationInput,
-  ReservationTypeChoice,
-  useAddReservationToSeriesMutation,
-  useStaffAdjustReservationTimeMutation,
-  Weekday,
-} from "@gql/gql-types";
-import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
-import { differenceInMinutes } from "date-fns";
-import { ErrorBoundary } from "react-error-boundary";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { ControlledDateInput } from "ui/src/components/form";
+import { successToast } from "ui/src/components/toast";
+import { useDisplayError } from "ui/src/hooks";
+import { convertWeekday } from "ui/src/modules/conversion";
 import {
   formatDuration,
   formatDateTimeRange,
@@ -23,18 +20,21 @@ import {
   formatTime,
   formatDate,
 } from "ui/src/modules/date-utils";
-import { useModal } from "@/context/ModalContext";
+import { filterNonNullable } from "ui/src/modules/helpers";
 import { getTimeChangeFormSchemaRefined, TimeFormSchema } from "ui/src/schemas";
-import { ControlledTimeInput } from "@/components/ControlledTimeInput";
-import { ControlledDateInput } from "ui/src/components/form";
 import { BufferToggles } from "@/components/BufferToggles";
+import { ControlledTimeInput } from "@/components/ControlledTimeInput";
+import { useModal } from "@/context/ModalContext";
 import { useCheckCollisions } from "@/hooks";
 import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
-import { gql } from "@apollo/client";
-import { filterNonNullable } from "ui/src/modules/helpers";
-import { successToast } from "ui/src/components/toast";
-import { useDisplayError } from "ui/src/hooks";
-import { convertWeekday } from "ui/src/modules/conversion";
+import {
+  type ChangeReservationTimeFragment,
+  type ReservationSeriesAddMutationInput,
+  ReservationTypeChoice,
+  useAddReservationToSeriesMutation,
+  useStaffAdjustReservationTimeMutation,
+  Weekday,
+} from "@gql/gql-types";
 
 const StyledForm = styled.form`
   margin-top: var(--spacing-m);

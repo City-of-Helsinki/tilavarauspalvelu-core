@@ -1,6 +1,6 @@
-import { type ApiError, getApiErrors } from "../modules/apolloUtils";
-import { errorToast } from "../components/toast";
 import { type TFunction, useTranslation } from "next-i18next";
+import { errorToast } from "../components/toast";
+import { type ApiError, getApiErrors } from "../modules/apolloUtils";
 
 /// formatErrorMessage
 /// this should not check for missing keys

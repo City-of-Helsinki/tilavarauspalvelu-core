@@ -1,19 +1,19 @@
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { Sanitize } from "ui/src/components/Sanitize";
+import { ignoreMaybeArray } from "ui/src/modules/helpers";
+import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { H1 } from "ui/src/styled";
+import { createApolloClient } from "@/modules/apolloClient";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   TermsOfUseDocument,
   type TermsOfUseQuery,
   type TermsOfUseQueryVariables,
   TermsOfUseTypeChoices,
 } from "@gql/gql-types";
-import { H1 } from "ui/src/styled";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { createApolloClient } from "@/modules/apolloClient";
-import { Sanitize } from "ui/src/components/Sanitize";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { ignoreMaybeArray } from "ui/src/modules/helpers";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

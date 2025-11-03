@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
-import { UnitOrderingChoices, useUnitListQuery } from "@gql/gql-types";
-import { filterEmptyArray, filterNonNullable, mapParamToInteger } from "ui/src/modules/helpers";
-import { errorToast } from "ui/src/components/toast";
-import { LARGE_LIST_PAGE_SIZE } from "@/modules/const";
-import { More } from "@/components/More";
-import { UnitsTable } from "./UnitsTable";
-import { CenterSpinner } from "ui/src/styled";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
+import { errorToast } from "ui/src/components/toast";
+import { filterEmptyArray, filterNonNullable, mapParamToInteger } from "ui/src/modules/helpers";
+import { CenterSpinner } from "ui/src/styled";
+import { More } from "@/components/More";
+import { LARGE_LIST_PAGE_SIZE } from "@/modules/const";
+import { UnitOrderingChoices, useUnitListQuery } from "@gql/gql-types";
+import { UnitsTable } from "./UnitsTable";
 
 type Props = {
   isMyUnits?: boolean;
