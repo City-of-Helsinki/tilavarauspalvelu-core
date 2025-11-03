@@ -8,8 +8,8 @@ import { enGB } from "date-fns/locale/en-GB";
 import { fi } from "date-fns/locale/fi";
 import { sv } from "date-fns/locale/sv";
 import styled from "styled-components";
-import { dateToMinutes, formatTimeRange } from "../../modules/date-utils";
-import type { LocalizationLanguages } from "../../modules/urlBuilder";
+import { dateToMinutes, formatTimeRange } from "@ui/modules/date-utils";
+import type { LocalizationLanguages } from "@ui/modules/urlBuilder";
 
 export type CalendarEvent<T> = {
   title?: string;
@@ -121,9 +121,10 @@ const StyledCalendar = styled(BigCalendar)<{
     z-index: calc(var(--tilavaraus-stack-order-calendar-gutter) + 1);
     border-top: 2px solid var(--color-bus-dark);
     background-color: transparent;
-    /* this is the ball on the left, not sure if will be used
+    position: absolute;
+
+    /* the time indicator ball between the gutter and the calendar */
     &:after {
-      z-index: 15000;
       content: "";
       display: block;
       background: var(--color-bus-dark);
@@ -134,7 +135,42 @@ const StyledCalendar = styled(BigCalendar)<{
       top: -4px;
       left: -2.5px;
     }
-    */
+  }
+
+  /* stretch the current time indicator over the entire week view on each day of the week */
+  &.view-week .rbc-day-slot:nth-child(2) .rbc-current-time-indicator {
+    left: 0;
+    right: -600%;
+  }
+
+  &.view-week .rbc-day-slot:nth-child(3) .rbc-current-time-indicator {
+    left: -100%;
+    right: -500%;
+  }
+
+  &.view-week .rbc-day-slot:nth-child(4) .rbc-current-time-indicator {
+    left: -200%;
+    right: -400%;
+  }
+
+  &.view-week .rbc-day-slot:nth-child(5) .rbc-current-time-indicator {
+    left: -300%;
+    right: -300%;
+  }
+
+  &.view-week .rbc-day-slot:nth-child(6) .rbc-current-time-indicator {
+    left: -400%;
+    right: -200%;
+  }
+
+  &.view-week .rbc-day-slot:nth-child(7) .rbc-current-time-indicator {
+    left: -500%;
+    right: -100%;
+  }
+
+  &.view-week .rbc-day-slot:nth-child(8) .rbc-current-time-indicator {
+    left: -600%;
+    right: 0;
   }
 
   .rbc-timeslot-group {

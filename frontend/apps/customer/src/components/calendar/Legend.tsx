@@ -46,6 +46,18 @@ const LegendItem = styled.div<{
   place-content: flex-start;
   gap: var(--spacing-3-xs);
   position: relative;
+  /* the time indicator ball on the left side of the line */
+  &:last-child:after {
+    content: "";
+    display: block;
+    background-color: var(--color-bus-dark);
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    position: absolute;
+    left: 0;
+    top: 18px;
+  }
 `;
 
 const LegendTitle = styled.div`
