@@ -7,6 +7,7 @@ from django.contrib.gis.db.models import PointField
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django_nh3.models import Nh3Field
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.constants import COORDINATE_SYSTEM_ID
@@ -43,7 +44,13 @@ class Unit(models.Model):
     tprek_last_modified: datetime.datetime | None = models.DateTimeField(blank=True, null=True)
 
     name: str = models.CharField(max_length=255)
-    description: str = models.TextField(max_length=4000, blank=True, default="")
+    description: str = Nh3Field(
+        max_length=4000,
+        blank=True,
+        default="",
+        tags=settings.NH3_ALLOWED_TAGS,
+        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+    )
     short_description: str = models.CharField(max_length=255, blank=True, default="")
     web_page: str = models.URLField(max_length=255, blank=True, default="")
     email: str = models.EmailField(max_length=255, blank=True, default="")
