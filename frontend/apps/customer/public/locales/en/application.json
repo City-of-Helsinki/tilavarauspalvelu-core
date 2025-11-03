@@ -218,7 +218,7 @@
   "sent": {
     "heading": "Thank you for the application",
     "subHeading": "Your application has been received and will be processed at the end of the application round.",
-    "body": "If necessary, you can edit your application within the application round. Only the most recent application will be processed. Please delete previously submitted applications.\n\nSubmitted applications are marked with a blue In process icon."
+    "body": "If necessary, you can edit your application within the application round. Only the most recent application will be processed. Please delete previously submitted applications.\n\nSubmitted applications are marked with a yellow Sent icon."
   },
   "navigation": {
     "page1": "Booking details",
