@@ -3,8 +3,8 @@ import {
   CALENDAR_LEGENDS,
   CONFIRMED,
   EVENT_STYLE,
+  EVENT_BUFFER,
   EventStyleType,
-  POST_PAUSE,
   REST,
   STAFF_RESERVATION,
   WAITING_PAYMENT,
@@ -80,7 +80,12 @@ const eventStyleGetter =
     } else if (isConfirmed && !isBlocked) {
       Object.assign(style, CONFIRMED.style);
     } else if (isBuffer) {
-      Object.assign(style, { ...POST_PAUSE.style, border: 0 });
+      Object.assign(style, {
+        ...EVENT_BUFFER.style,
+        border: 0,
+        // Invisible text, real solution is to fix big-calendar not to render it
+        color: "var(--color-black-10)",
+      });
     } else {
       Object.assign(style, REST.style); // TODO: Use UNCONFIRMED.style instead?
     }
