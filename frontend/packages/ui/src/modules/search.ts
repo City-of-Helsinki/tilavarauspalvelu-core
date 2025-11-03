@@ -4,7 +4,7 @@ export type OptionT = Readonly<{ value: number; label: string }>;
 export type OptionsListT = Readonly<{
   units: Readonly<OptionT[]>;
   equipments: Readonly<OptionT[]>;
-  purposes: Readonly<OptionT[]>;
+  intendedUses: Readonly<OptionT[]>;
   reservationPurposes: Readonly<OptionT[]>;
   reservationUnitTypes: Readonly<OptionT[]>;
   ageGroups: Readonly<OptionT[]>;

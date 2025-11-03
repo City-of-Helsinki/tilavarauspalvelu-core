@@ -8,7 +8,7 @@ import { Head, Purposes, SearchGuides, Units } from "@/lib/index";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
-  PurposeOrderingChoices,
+  IntendedUseOrderingChoices,
   UnitOrderingChoices,
   type FrontPageQuery,
   type FrontPageQueryVariables,
@@ -39,11 +39,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     query: FrontPageDocument,
     fetchPolicy: "no-cache",
     variables: {
-      orderBy: [PurposeOrderingChoices.RankAsc],
+      orderBy: [IntendedUseOrderingChoices.RankAsc],
       orderUnitsBy: [UnitOrderingChoices.RankAsc],
     },
   });
-  const purposes = filterNonNullable(data?.purposes?.edges.map((edge) => edge?.node));
+  const purposes = filterNonNullable(data?.intendedUses?.edges.map((edge) => edge?.node));
   const units = filterNonNullable(data?.units?.edges.map((edge) => edge?.node));
 
   return {
@@ -58,13 +58,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 export default Home;
 
-// TODO we can limit the number of purposes and units fetched
+// TODO we can limit the number of intended uses and units fetched
 export const FRONT_PAGE_QUERY = gql`
-  query FrontPage($orderBy: [PurposeOrderingChoices], $orderUnitsBy: [UnitOrderingChoices]) {
-    purposes(orderBy: $orderBy) {
+  query FrontPage($orderBy: [IntendedUseOrderingChoices], $orderUnitsBy: [UnitOrderingChoices]) {
+    intendedUses(orderBy: $orderBy) {
       edges {
         node {
-          ...PurposeCard
+          ...IntendedUseCard
         }
       }
     }

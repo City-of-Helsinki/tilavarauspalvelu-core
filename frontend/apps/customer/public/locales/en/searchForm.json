@@ -11,7 +11,7 @@
     "personsAllowed": "Number of participants",
     "reservationUnitTypes": "Type of space",
     "units": "Location",
-    "purposes": "Purpose of use",
+    "intendedUses": "Purpose of use",
     "equipments": "Equipment",
     "duration": "Duration",
     "accessTypes": "Access to the space",
