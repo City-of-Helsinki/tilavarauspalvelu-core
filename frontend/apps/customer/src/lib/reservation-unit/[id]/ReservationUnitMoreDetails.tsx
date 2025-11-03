@@ -12,7 +12,7 @@ import { filterNonNullable, formatListToCSV, getLocalizationLang, isPriceFree, t
 import { getTranslation } from "@ui/modules/util";
 import { AddressSection } from "@/components/AddressSection";
 import { Map as MapComponent } from "@/components/Map";
-import { getFuturePricing, getPriceString, getReservationUnitName } from "@/modules/reservationUnit";
+import { getFuturePricing, getPriceString } from "@/modules/reservationUnit";
 import { JustForMobile } from "@/modules/style/layout";
 import {
   type ApplicationRoundTimeSlotFieldsFragment,
@@ -77,7 +77,7 @@ export function ReservationUnitMoreDetails({
       {reservationUnit.unit?.tprekId && (
         <Accordion closeButton={false} heading={t("common:location")} initiallyOpen>
           <JustForMobile customBreakpoint={breakpoints.l}>
-            <AddressSection unit={reservationUnit.unit} title={getReservationUnitName(reservationUnit) ?? "-"} />
+            <AddressSection unit={reservationUnit.unit} title={getTranslation(reservationUnit, "name", lang) ?? "-"} />
           </JustForMobile>
           <MapComponent tprekId={reservationUnit.unit?.tprekId ?? ""} />
         </Accordion>

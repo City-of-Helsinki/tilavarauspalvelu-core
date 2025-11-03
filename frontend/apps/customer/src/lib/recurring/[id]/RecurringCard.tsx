@@ -17,7 +17,6 @@ import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import Card, { type CardInfoItem } from "ui/src/components/Card";
 import { getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
 import { getTranslation } from "ui/src/modules/util";
-import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
 import type { RecurringCardFragment } from "@gql/gql-types";
 
@@ -38,9 +37,9 @@ export function RecurringCard({
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
 
-  const name = getReservationUnitName(reservationUnit);
+  const name = getTranslation(reservationUnit, "name", lang);
 
-  const unitName = reservationUnit.unit ? getTranslation(reservationUnit.unit, "name", lang) : "-";
+  const unitName = getTranslation(reservationUnit.unit, "name", lang);
 
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null

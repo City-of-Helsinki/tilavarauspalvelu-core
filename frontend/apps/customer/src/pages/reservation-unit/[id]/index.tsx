@@ -49,12 +49,7 @@ import {
   type FocusTimeSlot,
   getDurationOptions,
 } from "@/modules/reservation";
-import {
-  getActivePricing,
-  getReservationUnitName,
-  isReservationUnitPublished,
-  isReservationUnitReservable,
-} from "@/modules/reservationUnit";
+import { getActivePricing, isReservationUnitPublished, isReservationUnitReservable } from "@/modules/reservationUnit";
 import { PendingReservationFormSchema, type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { JustForDesktop } from "@/modules/style/layout";
@@ -354,7 +349,7 @@ function ReservationUnit({
             />
           )}
           <JustForDesktop customBreakpoint={breakpoints.l}>
-            <AddressSection unit={reservationUnit.unit} title={getReservationUnitName(reservationUnit) ?? "-"} />
+            <AddressSection unit={reservationUnit.unit} title={getTranslation(reservationUnit, "name", lang)} />
           </JustForDesktop>
         </div>
         <PageContentWrapper>

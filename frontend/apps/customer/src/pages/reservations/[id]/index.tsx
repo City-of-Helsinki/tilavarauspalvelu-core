@@ -15,6 +15,7 @@ import { useToastIfQueryParam } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDateTimeRange } from "ui/src/modules/date-utils";
 import { createNodeId, capitalize, getLocalizationLang, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { getTranslation } from "ui/src/modules/util";
 import { Flex, fontRegular, H1, H4, NoWrap } from "ui/src/styled";
 import { AddressSection } from "@/components/AddressSection";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -35,7 +36,6 @@ import {
   getWhyReservationCantBeChanged,
   isReservationCancellable,
 } from "@/modules/reservation";
-import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
 import {
   getApplicationPath,
@@ -286,7 +286,7 @@ function Reservation({
               data-testid="reservation__reservation-unit"
               href={getReservationUnitPath(reservation.reservationUnit.pk)}
             >
-              {getReservationUnitName(reservation.reservationUnit, lang) ?? "-"}
+              {getTranslation(reservation.reservationUnit, "name", lang)}
             </Link>
             <NoWrap data-testid="reservation__time">{timeString}</NoWrap>
           </SubHeading>
@@ -374,7 +374,7 @@ function Reservation({
           {shouldShowAccessCode && <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />}
           <TermsInfoSection reservation={reservation} termsOfUse={termsOfUse} />
           <AddressSection
-            title={getReservationUnitName(reservation.reservationUnit, lang) ?? "-"}
+            title={getTranslation(reservation.reservationUnit, "name", lang)}
             unit={reservation.reservationUnit.unit}
           />
         </Flex>
