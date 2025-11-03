@@ -14,6 +14,7 @@ from tilavarauspalvelu.enums import (
     EventProperty,
     OrderStatus,
     PaymentType,
+    ReservationFormType,
     ReservationStateChoice,
     ReserveeType,
     TimezoneProperty,
@@ -27,7 +28,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
 )
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservation, ReservationMetadataField
+from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservation
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
@@ -241,22 +242,53 @@ class ReservationActions:
         *,
         reservee_type: ReserveeType | None = None,
     ) -> list[str]:
+        reservation_form = self.reservation.reservation_unit.reservation_form
+
+        required_fields = [
+            "reservee_first_name",
+            "reservee_last_name",
+            "reservee_email",
+            "reservee_phone",
+        ]
+        if reservation_form == ReservationFormType.CONTACT_INFO_FORM:
+            return required_fields
+
         if reservee_type is None:
             reservee_type = self.reservation.reservee_type
 
-        qs = ReservationMetadataField.objects.filter(
-            metadata_sets_required__reservation_units__reservations=self.reservation,
-        )
-
-        # Some fields are never mandatory for an individual reserver even if marked so in the metadata.
-        if reservee_type == ReserveeType.INDIVIDUAL:
-            qs = qs.exclude(field_name__in=["reservee_identifier", "reservee_organisation_name"])
-
-        # Reservee identifier is optional for non-profit reservers (they can be unregistered)
         if reservee_type == ReserveeType.NONPROFIT:
-            qs = qs.exclude(field_name__in=["reservee_identifier"])
+            required_fields += [
+                "reservee_organisation_name",
+            ]
+        elif reservee_type in ReserveeType.COMPANY:
+            required_fields += [
+                "reservee_organisation_name",
+                "reservee_identifier",
+            ]
 
-        return list(qs.distinct().order_by("field_name").values_list("field_name", flat=True))
+        required_fields += [
+            "description",
+            "reservee_type",
+        ]
+        if reservation_form == ReservationFormType.RESERVEE_INFO_FORM:
+            return required_fields
+
+        required_fields += [
+            "purpose",
+            "num_persons",
+            "municipality",
+        ]
+        if reservation_form == ReservationFormType.PURPOSE_FORM:
+            return required_fields
+
+        required_fields += [
+            "age_group",
+        ]
+        if reservation_form == ReservationFormType.AGE_GROUP_FORM:
+            return required_fields
+
+        msg = f"Unknown reservation form type: {reservation_form}"
+        raise ValueError(msg)
 
     def create_payment_order_paid_immediately(self, payment_type: PaymentType) -> PaymentOrder:
         if payment_type == PaymentType.ON_SITE:
