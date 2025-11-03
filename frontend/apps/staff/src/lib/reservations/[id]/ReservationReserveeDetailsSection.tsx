@@ -18,7 +18,8 @@ import styled from "styled-components";
 import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
 import { getApiErrors } from "ui/src/modules/apolloUtils";
 import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
-import { Flex, H5 } from "ui/src/styled";
+import { H5 } from "ui/src/styled";
+import { breakpoints } from "@ui/modules/const";
 import { useSession } from "@/hooks";
 import { Accordion, ApplicationDatas } from "@/styled";
 import {
@@ -36,6 +37,16 @@ type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 const ReserveeDetailsAccordion = styled(Accordion)`
   div {
     row-gap: var(--spacing-s);
+  }
+`;
+
+const ReserveeButtonContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-s);
+  @media (max-width: ${breakpoints.s}) {
+    flex-direction: column;
+    gap: var(--spacing-xs);
   }
 `;
 
@@ -205,7 +216,7 @@ export function ReservationReserveeDetailsSection({
         <>
           <Notification>{t("reservation:reserveeShowInfosNotification")}</Notification>
 
-          <Flex $direction={"row"}>
+          <ReserveeButtonContainer>
             <ReserveeDetailsButton
               isLoading={isContactInfoLoading}
               onClick={() => {
@@ -233,7 +244,7 @@ export function ReservationReserveeDetailsSection({
               icon={<IconPersonGenderless />}
               text={t("reservation:reserveeShowSSN")}
             />
-          </Flex>
+          </ReserveeButtonContainer>
         </>
       ) : null}
     </ReserveeDetailsAccordion>
