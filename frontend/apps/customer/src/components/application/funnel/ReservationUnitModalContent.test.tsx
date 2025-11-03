@@ -52,7 +52,7 @@ function customRender(
   const round = createMockApplicationRound();
   const options: ReservationUnitModalProps["options"] = {
     units: [],
-    purposes: [],
+    intendedUses: [],
     reservationUnitTypes: [],
   } as const;
   const props: ReservationUnitModalProps = {

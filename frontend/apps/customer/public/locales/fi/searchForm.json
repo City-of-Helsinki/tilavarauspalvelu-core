@@ -11,7 +11,7 @@
     "personsAllowed": "Henkilömäärä",
     "reservationUnitTypes": "Tilan tyyppi",
     "units": "Toimipiste",
-    "purposes": "Käyttötarkoitus",
+    "intendedUses": "Käyttötarkoitus",
     "equipments": "Varustelu",
     "duration": "Kesto",
     "accessTypes": "Pääsy tilaan",
