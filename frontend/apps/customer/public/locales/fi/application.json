@@ -214,7 +214,7 @@
   "sent": {
     "heading": "Kiitos hakemuksesta!",
     "subHeading": "Hakemuksesi on vastaanotettu ja siirtyy käsiteltäväksi hakuajan päätyttyä.",
-    "body": "Voit halutessasi muokata hakemustasi ennen hakuajan päättymistä. Vain viimeisin lähetetty hakemus huomioidaan. Poistathan aiemmin lähetetyt hakemukset.\n\nLähetetyn hakemuksen tunnistat sinisestä Käsittelyssä-symbolista."
+    "body": "Voit halutessasi muokata hakemustasi ennen hakuajan päättymistä. Vain viimeisin lähetetty hakemus huomioidaan. Poistathan aiemmin lähetetyt hakemukset.\n\nLähetetyn hakemuksen tunnistat keltaisesta Lähetetty-symbolista."
   },
   "navigation": {
     "page1": "Varauksen tiedot",
