@@ -11,7 +11,7 @@
     "personsAllowed": "Personantal",
     "reservationUnitTypes": "Lokaltyp",
     "units": "Verksamhetsställe",
-    "purposes": "Användningsändamål",
+    "intendedUses": "Användningsändamål",
     "equipments": "Utrustning",
     "duration": "Varaktighet",
     "accessTypes": "Tillträde till utrymmet",
