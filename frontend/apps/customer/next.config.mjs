@@ -2,6 +2,7 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import { join } from "node:path";
 import * as url from "node:url";
+import { CSP_HEADER } from "ui/src/baseUtils.mjs";
 import i18nconfig from "./next-i18next.config.cjs";
 import { env } from "./src/env.mjs";
 import { getVersion } from "./src/modules/baseUtils.mjs";
@@ -56,6 +57,20 @@ const nextConfig = {
       {
         source: "/healthcheck",
         destination: "/api/healthcheck",
+      },
+    ];
+  },
+  // oxlint-disable-next-line require-await
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: CSP_HEADER.replace(/\n/g, ""),
+          },
+        ],
       },
     ];
   },
