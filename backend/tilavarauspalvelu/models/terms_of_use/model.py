@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar
 
+from django.conf import settings
 from django.db import models
 from django.utils.translation import pgettext_lazy
+from django_nh3.models import Nh3Field
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.enums import TermsOfUseTypeChoices
@@ -28,7 +30,11 @@ __all__ = [
 class TermsOfUse(models.Model):
     id: str = models.CharField(primary_key=True, max_length=100)
     name: str | None = models.CharField(max_length=255, null=True, blank=True)
-    text: str = models.TextField()
+
+    text: str = Nh3Field(
+        tags=settings.NH3_ALLOWED_TAGS,
+        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+    )
 
     terms_type: TermsOfUseTypeChoices = TextChoicesField(
         enum=TermsOfUseTypeChoices,
