@@ -18,12 +18,12 @@ import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { getTranslationSafe } from "ui/src/modules/util";
 import {
   EquipmentOrderingChoices,
+  IntendedUseOrderingChoices,
   type Maybe,
   MunicipalityChoice,
   OptionsDocument,
   type OptionsQuery,
   type OptionsQueryVariables,
-  PurposeOrderingChoices,
   type QueryReservationUnitsArgs,
   ReservationKind,
   ReservationUnitOrderingChoices,
@@ -128,7 +128,7 @@ export function processVariables({
   const isSeasonal = kind === ReservationKind.Season;
   const textSearch = filterEmpty(values.get("textSearch"));
   const personsAllowed = filterEmpty(toNumber(values.get("personsAllowed")));
-  const purposes = filterEmptyArray(mapParamToInteger(values.getAll("purposes"), 1));
+  const intendedUses = filterEmptyArray(mapParamToInteger(values.getAll("intendedUses"), 1));
   const unit = filterEmptyArray(mapParamToInteger(values.getAll("units"), 1));
   const reservationUnitTypes = filterEmptyArray(mapParamToInteger(values.getAll("reservationUnitTypes"), 1));
   const equipments = filterEmptyArray(mapParamToInteger(values.getAll("equipments"), 1));
@@ -147,7 +147,7 @@ export function processVariables({
 
   return {
     textSearch: filterEmpty(textSearch),
-    purposes,
+    intendedUses,
     unit,
     reservationUnitType: reservationUnitTypes,
     equipments,
@@ -204,7 +204,7 @@ export async function getSearchOptions(
     query: OptionsDocument,
     variables: {
       reservationUnitTypesOrderBy: ReservationUnitTypeOrderingChoices.RankAsc,
-      purposesOrderBy: PurposeOrderingChoices.RankAsc,
+      intendedUseOrderBy: IntendedUseOrderingChoices.RankAsc,
       unitsOrderBy: getUnitsOrderBy(lang),
       equipmentsOrderBy: EquipmentOrderingChoices.CategoryRankAsc,
       ...(page === "direct" ? { onlyDirectBookable: true } : {}),
@@ -215,7 +215,7 @@ export async function getSearchOptions(
   const reservationUnitTypes = filterNonNullable(
     optionsData?.reservationUnitTypes?.edges?.map((edge) => edge?.node)
   ).map((n) => translateOption(n, lang));
-  const purposes = filterNonNullable(optionsData?.purposes?.edges?.map((edge) => edge?.node)).map((n) =>
+  const intendedUses = filterNonNullable(optionsData?.intendedUses?.edges?.map((edge) => edge?.node)).map((n) =>
     translateOption(n, lang)
   );
 
@@ -237,7 +237,7 @@ export async function getSearchOptions(
   return {
     units,
     equipments,
-    purposes,
+    intendedUses,
     reservationPurposes,
     reservationUnitTypes,
     ageGroups,
@@ -262,7 +262,7 @@ function sortAgeGroups(ageGroups: AgeGroup[]): NonNullable<AgeGroup>[] {
 export const OPTIONS_QUERY = gql`
   query Options(
     $reservationUnitTypesOrderBy: [ReservationUnitTypeOrderingChoices]
-    $purposesOrderBy: [PurposeOrderingChoices]
+    $intendedUseOrderBy: [IntendedUseOrderingChoices]
     $unitsOrderBy: [UnitOrderingChoices]
     $equipmentsOrderBy: [EquipmentOrderingChoices]
     $reservationPurposesOrderBy: [ReservationPurposeOrderingChoices]
@@ -280,7 +280,7 @@ export const OPTIONS_QUERY = gql`
         }
       }
     }
-    purposes(orderBy: $purposesOrderBy) {
+    intendedUses(orderBy: $intendedUseOrderBy) {
       edges {
         node {
           id

@@ -14,7 +14,7 @@ import {
   type CreateApplicationMutationVariables,
   MunicipalityChoice,
   Priority,
-  type PurposeNode,
+  type IntendedUseNode,
   type ReservationUnitNode,
   ReserveeType,
   TermsOfUseTypeChoices,
@@ -128,7 +128,7 @@ function createMockApplicationSection({
     reservationsEndDate: addDays(new Date(), 30 + 1).toISOString(),
     appliedReservationsPerWeek: 1,
     ageGroup: createMockAgeGroupNode(),
-    purpose: createMockPurposeNode(),
+    purpose: createMockIntendedUseNode(),
     reservationUnitOptions,
     ...page2Data,
   };
@@ -143,12 +143,12 @@ function createMockAgeGroupNode({ pk = 1 }: { pk?: number } = {}): AgeGroupNode 
   };
 }
 
-function createMockPurposeNode({ pk = 1 }: { pk?: number } = {}): PurposeNode {
+function createMockIntendedUseNode({ pk = 1 }: { pk?: number } = {}): IntendedUseNode {
   return {
-    id: createNodeId("PurposeNode", 1),
+    id: createNodeId("IntendedUseNode", 1),
     pk,
     rank: pk,
-    ...generateNameFragment("PurposeNode"),
+    ...generateNameFragment("IntendedUseNode"),
     imageUrl: null,
     smallUrl: null,
   };
@@ -293,7 +293,7 @@ export function createMockApplicationRound({
     criteriaSv: null, // Maybe<Scalars["String"]["output"]>;
     handledAt: null, // Maybe<Scalars["DateTime"]["output"]>;
     isSettingHandledAllowed: false, // Scalars["Boolean"]["output"];
-    purposes: [] as const, // ReadonlyArray<ReservationPurposeNode>;
+    purposes: [] as const, // ReadonlyArray<ReservationIntendedUseNode>;
     reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice.NotCompleted,
     reservationUnitCount: 10, // Scalars["Int"]["output"];
     sentAt: null, // Maybe<Scalars["DateTime"]["output"]>;

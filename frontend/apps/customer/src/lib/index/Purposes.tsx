@@ -9,10 +9,10 @@ import { ShowAllContainer } from "ui/src/components";
 import { breakpoints } from "ui/src/modules/const";
 import { getLocalizationLang } from "ui/src/modules/helpers";
 import { getTranslationSafe } from "ui/src/modules/util";
-import { Flex, H3, anchorStyles, focusStyles } from "ui/src/styled";
+import { anchorStyles, Flex, focusStyles, H3 } from "ui/src/styled";
 import { getSingleSearchPath } from "@/modules/urls";
 import { pixel } from "@/styled/util";
-import type { PurposeCardFragment } from "@gql/gql-types";
+import type { IntendedUseCardFragment } from "@gql/gql-types";
 import { ReservationUnitSearch } from "./ReservationUnitSearch";
 
 const Top = styled(Flex).attrs({
@@ -25,6 +25,7 @@ const Top = styled(Flex).attrs({
   & > * {
     flex-grow: 0;
   }
+
   @media (max-width: ${breakpoints.s}) {
     & > * {
       flex-grow: 1;
@@ -34,6 +35,7 @@ const Top = styled(Flex).attrs({
 
 const PurposeContainer = styled(ShowAllContainer)`
   width: 100%;
+
   .ShowAllContainer__Content {
     display: grid;
     gap: var(--spacing-l) var(--spacing-m);
@@ -64,7 +66,7 @@ const Image = styled.img`
 `;
 
 type Props = {
-  purposes: PurposeCardFragment[];
+  purposes: IntendedUseCardFragment[];
 };
 
 export function Purposes({ purposes }: Props): JSX.Element {
@@ -72,15 +74,15 @@ export function Purposes({ purposes }: Props): JSX.Element {
   const isMobile = useMedia(`(max-width: ${breakpoints.s})`, false);
   const itemLimit = useMemo(() => (isMobile ? 4 : 8), [isMobile]);
 
-  const getImg = (item: Pick<PurposeCardFragment, "smallUrl" | "imageUrl">) => {
+  const getImg = (item: Pick<IntendedUseCardFragment, "smallUrl" | "imageUrl">) => {
     return item.smallUrl || item.imageUrl || pixel;
   };
   const lang = getLocalizationLang(i18n.language);
-  const getName = (item: Pick<PurposeCardFragment, "nameFi" | "nameEn" | "nameSv">) => {
+  const getName = (item: Pick<IntendedUseCardFragment, "nameFi" | "nameEn" | "nameSv">) => {
     return getTranslationSafe(item, "name", lang);
   };
 
-  const getSearchLink = (purpose: PurposeCardFragment): string => {
+  const getSearchLink = (purpose: IntendedUseCardFragment): string => {
     const params = new URLSearchParams();
     // next/link so it's safer to return invalid search params than empty link
     params.set("purposes", purpose.pk?.toString() ?? "");
@@ -119,8 +121,8 @@ export function Purposes({ purposes }: Props): JSX.Element {
   );
 }
 
-export const PURPOSE_CARD_FRAGMENT = gql`
-  fragment PurposeCard on PurposeNode {
+export const INTENDED_USE_CARD_FRAGMENT = gql`
+  fragment IntendedUseCard on IntendedUseNode {
     id
     pk
     nameFi

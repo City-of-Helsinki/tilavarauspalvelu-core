@@ -116,7 +116,7 @@ export const SEARCH_RESERVATION_UNITS = gql`
     $personsAllowed: Int
     $unit: [Int]
     $reservationUnitType: [Int]
-    $purposes: [Int]
+    $intendedUses: [Int]
     $equipments: [Int]
     $accessType: [AccessType]
     $accessTypeBeginDate: Date
@@ -140,7 +140,7 @@ export const SEARCH_RESERVATION_UNITS = gql`
       personsAllowed: $personsAllowed
       unit: $unit
       reservationUnitType: $reservationUnitType
-      purposes: $purposes
+      intendedUses: $intendedUses
       equipments: $equipments
       accessType: $accessType
       accessTypeBeginDate: $accessTypeBeginDate

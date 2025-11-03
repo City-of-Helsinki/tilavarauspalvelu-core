@@ -123,7 +123,7 @@ export type ReservationUnitModalProps = Readonly<{
   handleAdd: (ru: Pick<RecurringCardFragment, "pk">) => void;
   handleRemove: (ru: Pick<RecurringCardFragment, "pk">) => void;
   currentReservationUnits: Pick<RecurringCardFragment, "pk">[];
-  options: Pick<OptionsListT, "purposes" | "reservationUnitTypes" | "units">;
+  options: Pick<OptionsListT, "intendedUses" | "reservationUnitTypes" | "units">;
 }>;
 
 /// Does queries to get a list of reservation units based on user selected filters
