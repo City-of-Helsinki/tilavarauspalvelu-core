@@ -5,7 +5,13 @@ from typing import Any, NamedTuple
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice, ReserveeType
+from tilavarauspalvelu.enums import (
+    AccessType,
+    ReservationFormType,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+    ReserveeType,
+)
 
 from tests.factories import ReservationFactory
 
@@ -224,3 +230,82 @@ def test_reservation__is_access_code_is_active_correct__inactive_when_should_be(
         access_code_is_active=False,
     )
     assert reservation.is_access_code_is_active_correct is True
+
+
+def test_reservation__reservation_form__contact_info_form():
+    reservation = ReservationFactory.build(
+        reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value
+    )
+    required_fields = {
+        "reservee_first_name",
+        "reservee_last_name",
+        "reservee_email",
+        "reservee_phone",
+    }
+    assert set(reservation.actions.get_required_fields()) == required_fields
+
+
+@pytest.mark.parametrize("reservee_type", [ReserveeType.INDIVIDUAL, ReserveeType.COMPANY, ReserveeType.NONPROFIT])
+def test_reservation__reservation_form__reservee_info_form(reservee_type):
+    reservation = ReservationFactory.build(
+        reservation_unit__reservation_form=ReservationFormType.RESERVEE_INFO_FORM.value
+    )
+    required_fields = {
+        "reservee_first_name",
+        "reservee_last_name",
+        "reservee_email",
+        "reservee_phone",
+        "description",
+        "reservee_type",
+    }
+    if reservee_type == ReserveeType.NONPROFIT:
+        required_fields.update(["reservee_organisation_name"])
+    elif reservee_type in ReserveeType.COMPANY:
+        required_fields.update(["reservee_organisation_name", "reservee_identifier"])
+
+    assert set(reservation.actions.get_required_fields(reservee_type=reservee_type)) == required_fields
+
+
+@pytest.mark.parametrize("reservee_type", [ReserveeType.INDIVIDUAL, ReserveeType.COMPANY, ReserveeType.NONPROFIT])
+def test_reservation__reservation_form__purpose_form(reservee_type):
+    reservation = ReservationFactory.build(reservation_unit__reservation_form=ReservationFormType.PURPOSE_FORM.value)
+    required_fields = {
+        "reservee_first_name",
+        "reservee_last_name",
+        "reservee_email",
+        "reservee_phone",
+        "description",
+        "reservee_type",
+        "purpose",
+        "num_persons",
+        "municipality",
+    }
+    if reservee_type == ReserveeType.NONPROFIT:
+        required_fields.update(["reservee_organisation_name"])
+    elif reservee_type in ReserveeType.COMPANY:
+        required_fields.update(["reservee_organisation_name", "reservee_identifier"])
+
+    assert set(reservation.actions.get_required_fields(reservee_type=reservee_type)) == required_fields
+
+
+@pytest.mark.parametrize("reservee_type", [ReserveeType.INDIVIDUAL, ReserveeType.COMPANY, ReserveeType.NONPROFIT])
+def test_reservation__reservation_form__age_group_form(reservee_type):
+    reservation = ReservationFactory.build(reservation_unit__reservation_form=ReservationFormType.AGE_GROUP_FORM.value)
+    required_fields = {
+        "reservee_first_name",
+        "reservee_last_name",
+        "reservee_email",
+        "reservee_phone",
+        "description",
+        "reservee_type",
+        "purpose",
+        "num_persons",
+        "municipality",
+        "age_group",
+    }
+    if reservee_type == ReserveeType.NONPROFIT:
+        required_fields.update(["reservee_organisation_name"])
+    elif reservee_type in ReserveeType.COMPANY:
+        required_fields.update(["reservee_organisation_name", "reservee_identifier"])
+
+    assert set(reservation.actions.get_required_fields(reservee_type=reservee_type)) == required_fields
