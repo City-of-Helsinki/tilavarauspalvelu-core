@@ -60,6 +60,23 @@ export const BLOCKED = {
   },
 };
 
+export const NOT_RESERVABLE = {
+  style: {
+    background: "var(--color-black-10)",
+    backgroundRepeat: "repeat",
+    backgroundSize: "6px",
+    backgroundImage:
+      "url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzUiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCAzNSA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPG1hc2sgaWQ9Im1hc2swXzcxNzZfMTk1MTI4IiBzdHlsZT0ibWFzay10eXBlOmx1bWluYW5jZSIgbWFza1VuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeD0iMCIgeT0iMCIgd2lkdGg9IjM1IiBoZWlnaHQ9IjUwIj4KPHBhdGggZD0iTTM0Ljg3NDUgMEgwLjg3NDUxMlY1MEgzNC44NzQ1VjBaIiBmaWxsPSJ3aGl0ZSIvPgo8L21hc2s+CjxnIG1hc2s9InVybCgjbWFzazBfNzE3Nl8xOTUxMjgpIj4KPHBhdGggZD0iTTM0LjI3OTcgLTAuNzc5MzM2TDAuMzQ0NzI3IDQ5LjEyNUwxLjQ2OTM1IDUwLjc3ODlMMzUuNDA0MyAwLjg3NDUxN0wzNC4yNzk3IC0wLjc3OTMzNloiIGZpbGw9IiM2NjY2NjYiLz4KPHBhdGggZD0iTTE3LjI3OTcgLTI1Ljc3OTNMLTE2LjY1NTMgMjQuMTI1TC0xNS41MzA3IDI1Ljc3ODlMMTguNDA0MyAtMjQuMTI1NUwxNy4yNzk3IC0yNS43NzkzWiIgZmlsbD0iIzY2NjY2NiIvPgo8cGF0aCBkPSJNNTEuMjc5NyAyNC4yMjA3TDE3LjM0NDcgNzQuMTI1TDE4LjQ2OTMgNzUuNzc4OUw1Mi40MDQzIDI1Ljg3NDVMNTEuMjc5NyAyNC4yMjA3WiIgZmlsbD0iIzY2NjY2NiIvPgo8L2c+Cjwvc3ZnPgo=')",
+  },
+};
+
+export const RESERVABLE = {
+  style: {
+    ...STYLE_COMMON,
+    borderColor: "transparent",
+  },
+};
+
 export const RESERVATION_UNIT_RELEASED = {
   style: {
     ...STYLE_COMMON,
@@ -98,26 +115,34 @@ export const REST = {
   },
 };
 
-export const EVENT_STYLE: React.CSSProperties = {
+export const CALENDAR_EVENT_BASE_STYLE: React.CSSProperties = {
   cursor: "pointer",
   borderRadius: "0px",
   display: "block",
   borderColor: "transparent",
   fontSize: "var(--fontsize-body-s)",
-  opacity: 0.8,
+};
+
+// Gray outline, for styles with white background
+const LEGEND_BORDER_STYLE = {
+  borderStyle: "solid",
+  borderWidth: "1px",
+  borderColor: "var(--color-black-20)",
 };
 
 type EventKey =
   | "CONFIRMED"
+  | "WAITING_PAYMENT"
   | "UNCONFIRMED"
   | "STAFF_RESERVATION"
   | "INTERSECTING_RESERVATION_UNIT"
   | "PAUSE"
   | "CLOSED"
-  | "WAITING_PAYMENT"
-  | "RESERVATION_UNIT_RELEASED"
-  | "RESERVATION_UNIT_DRAFT"
-  | "REST";
+  | "NOT_RESERVABLE"
+  | "RESERVABLE"
+  | "REST"
+  | "RESERVATION_UNIT_RELEASED" // TODO: Released -> Published
+  | "RESERVATION_UNIT_DRAFT";
 
 export type EventStyleType = {
   key: EventKey;
@@ -169,6 +194,24 @@ export const CALENDAR_LEGENDS: EventStyleType[] = [
     style: BLOCKED.style,
   },
   {
+    key: "NOT_RESERVABLE",
+    label: "myUnits:Calendar.legend.notReservable",
+    style: { ...NOT_RESERVABLE.style, ...LEGEND_BORDER_STYLE },
+  },
+
+  {
+    key: "RESERVABLE",
+    label: "myUnits:Calendar.legend.reservable",
+    style: { ...RESERVABLE.style, ...LEGEND_BORDER_STYLE },
+  },
+
+  {
+    key: "REST",
+    label: "myUnits:Calendar.legend.reserved",
+    style: REST.style,
+  },
+
+  {
     key: "RESERVATION_UNIT_RELEASED",
     label: "myUnits:Calendar.legend.reservationUnitReleased",
     style: RESERVATION_UNIT_RELEASED.style,
@@ -177,11 +220,5 @@ export const CALENDAR_LEGENDS: EventStyleType[] = [
     key: "RESERVATION_UNIT_DRAFT",
     label: "myUnits:Calendar.legend.reservationUnitDraft",
     style: RESERVATION_UNIT_DRAFT.style,
-  },
-
-  {
-    key: "REST",
-    label: "myUnits:Calendar.legend.reserved",
-    style: REST.style,
   },
 ] as const;
