@@ -26,6 +26,9 @@ import { updateSentryConfig } from "../../instrumentation-client";
 import "../styles/global.scss";
 import Layout from "./layout";
 
+// suppress useLayoutEffect warnings on SSR till it's fixed upstream in HDS
+if (typeof window === "undefined") React.useLayoutEffect = () => {};
+
 function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
   const { Component, pageProps, currentUser, handlingData, notificationsData } = props;
   const { apiBaseUrl, sentryDsn, sentryEnvironment, version } = pageProps;
