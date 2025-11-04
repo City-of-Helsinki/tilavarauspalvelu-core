@@ -9,8 +9,9 @@ import { useDisplayError } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDate, applicationReservationDateTime } from "ui/src/modules/date-utils";
 import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { H1 } from "ui/src/styled";
+import { getLocalizationLang } from "@ui/modules/helpers";
 import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";
 import { ReservationInfoCard } from "@/components/reservation";
 import { getPrice } from "@/modules/reservationUnit";
@@ -78,7 +79,7 @@ export function ReservationCancellation(props: CancellationProps): JSX.Element {
   const ingress = isApplication ? t("reservations:cancel.ingressApplication") : t("reservations:cancel.ingress");
   const infoBody = isApplication ? t("reservations:cancel.infoBodyApplication") : t("reservations:cancel.infoBody");
 
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const cancellationTerms = getTranslatedTerms(reservation, lang);
 
   return (
@@ -111,7 +112,7 @@ function ApplicationInfoCard({ reservation }: { reservation: CancellationProps["
   // NOTE assumes that the name of the reservationSeries is copied from applicationSection when it's created
   const name = reservation.reservationSeries?.name;
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const reservationUnitName = getTranslationSafe(reservation.reservationUnit, "name", lang);
   const price = getPrice(t, reservation, lang);
 

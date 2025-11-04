@@ -23,11 +23,12 @@ import {
   dayMin,
   filterNonNullable,
   formatTimeStruct,
+  getLocalizationLang,
   isPriceFree,
   type ReadonlyDeep,
 } from "@ui/modules/helpers";
 import { type LocalizationLanguages } from "@ui/modules/urlBuilder";
-import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
+import { getTranslationSafe } from "@ui/modules/util";
 import {
   dateToKey,
   isRangeReservable,
@@ -151,7 +152,7 @@ export function getUnitName(
   if (unit == null) {
     return undefined;
   }
-  return getTranslationSafe(unit, "name", convertLanguageCode(locale));
+  return getTranslationSafe(unit, "name", getLocalizationLang(locale));
 }
 
 function isActivePricing(pricing: PricingFieldsFragment): boolean {

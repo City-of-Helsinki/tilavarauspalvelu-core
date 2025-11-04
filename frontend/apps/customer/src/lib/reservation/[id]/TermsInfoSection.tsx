@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import { Sanitize } from "ui/src/components/Sanitize";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getTranslationSafe } from "ui/src/modules/util";
+import { getLocalizationLang } from "@ui/modules/helpers";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import { getServerSideProps } from "@/pages/reservations/[id]";
@@ -29,7 +30,7 @@ export function TermsInfoSection({
     return reservation.applyingForFreeOfCharge || (reservationUnit.canApplyFreeOfCharge && !isFreeOfCharge);
   }, [reservation, reservationUnit]);
 
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const paymentTermsContent =
     reservationUnit.paymentTerms != null ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang) : undefined;
   const cancellationTermsContent =

@@ -16,9 +16,9 @@ import styled from "styled-components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import Card from "ui/src/components/Card";
 import { breakpoints } from "ui/src/modules/const";
-import { filterNonNullable, getImageSource, getMainImage } from "ui/src/modules/helpers";
+import { filterNonNullable, getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
 import { type OptionsListT } from "ui/src/modules/search";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { CenterSpinner, Flex, H3 } from "ui/src/styled";
 import { type SearchFormValues, SeasonalSearchForm } from "@/components/SeasonalSearchForm";
 import { useSearchQuery } from "@/hooks";
@@ -51,7 +51,7 @@ type ReservationUnitCardProps = Readonly<{
 
 function ReservationUnitCard({ reservationUnit, handleAdd, handleRemove, isSelected }: ReservationUnitCardProps) {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
 
   const toggleSelection = () => {
     if (isSelected) {
@@ -136,7 +136,7 @@ export function ReservationUnitModalContent({
   options,
 }: ReservationUnitModalProps): JSX.Element {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
 
   const searchValues = useSearchParams();
   const variables = processVariables({

@@ -8,7 +8,7 @@ import { formatters as getFormatters } from "@ui/index";
 import { breakpoints } from "@ui/modules/const";
 import { formatDateTimeRange, formatDuration } from "@ui/modules/date-utils";
 import { createNodeId, capitalize, getImageSource, getLocalizationLang, getMainImage } from "@ui/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
+import { getTranslationSafe } from "@ui/modules/util";
 import { Flex, fontMedium, Strong } from "@ui/styled";
 import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
@@ -92,7 +92,7 @@ export function ReservationInfoCard({
   }
 
   const duration = differenceInMinutes(new Date(endsAt), new Date(beginsAt));
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const price: string | null = getPrice(t, reservation, lang, shouldDisplayReservationUnitPrice);
 
   const { taxPercentageValue, state } = reservation;

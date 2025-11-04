@@ -2,7 +2,8 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { Sanitize } from "ui/src/components/Sanitize";
 import TermsBox from "ui/src/components/TermsBox";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getTranslationSafe } from "ui/src/modules/util";
+import { getLocalizationLang } from "@ui/modules/helpers";
 import { type TermsOfUseTextFieldsFragment, type Maybe, type TermsOfUseFragment } from "@gql/gql-types";
 
 export function AcceptTerms({
@@ -82,7 +83,7 @@ function SanitizedTerms({
   returnEmpty?: boolean;
 }): JSX.Element | null {
   const { i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
 
   if (terms == null && returnEmpty) {
     return <span />;

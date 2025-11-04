@@ -7,8 +7,8 @@ import { useSearchParams } from "next/navigation";
 import { Card, Tag } from "ui/src/components/";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { formatDate, formatTime } from "ui/src/modules/date-utils";
-import { getImageSource, getMainImage } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { isBrowser } from "@/modules/const";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
@@ -69,7 +69,7 @@ interface PropsT {
 
 export function SingleSearchCard({ reservationUnit }: PropsT): JSX.Element {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const name = getTranslationSafe(reservationUnit, "name", lang);
 
   const link = useConstructLink(reservationUnit);

@@ -7,7 +7,8 @@ import { Card } from "ui/src/components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { formatDateTime, formatDate } from "ui/src/modules/date-utils";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getTranslationSafe } from "ui/src/modules/util";
+import { getLocalizationLang } from "@ui/modules/helpers";
 import { getApplicationRoundPath } from "@/modules/urls";
 import { type ApplicationRoundCardFragment, ApplicationRoundStatusChoice } from "@gql/gql-types";
 
@@ -42,7 +43,7 @@ function translateRoundDate(
 
 export function ApplicationRoundCard({ applicationRound }: Readonly<CardProps>): JSX.Element {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
 
   const name = getTranslationSafe(applicationRound, "name", lang);
   const timeString = translateRoundDate(t, lang, applicationRound);

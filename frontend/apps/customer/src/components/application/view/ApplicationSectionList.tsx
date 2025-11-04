@@ -4,8 +4,8 @@ import { useTranslation } from "next-i18next";
 import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
 import { WEEKDAYS } from "ui/src/modules/const";
 import { formatDurationRange, formatDate, setMondayFirst } from "ui/src/modules/date-utils";
-import { filterNonNullable, formatDayTimes } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { filterNonNullable, formatDayTimes, getLocalizationLang } from "ui/src/modules/helpers";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { NoWrap } from "ui/src/styled";
 import {
   ApplicationInfoContainer,
@@ -69,7 +69,7 @@ function SingleApplicationSection({
   secondaryTimes: Omit<SuitableTimeRangeFormValues, "pk">[];
 }) {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const reservationUnits = filterNonNullable(aes.reservationUnitOptions)
     .map(({ reservationUnit }) => ({
       pk: reservationUnit.pk ?? 0,

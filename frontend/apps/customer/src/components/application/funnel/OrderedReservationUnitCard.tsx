@@ -6,8 +6,8 @@ import styled from "styled-components";
 import Card from "ui/src/components/Card";
 import { ErrorText } from "ui/src/components/ErrorText";
 import { breakpoints } from "ui/src/modules/const";
-import { getImageSource, getMainImage } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { Flex, H6, fontBold, fontMedium, fontRegular } from "ui/src/styled";
 import { getReservationUnitName } from "@/modules/reservationUnit";
 import type { OrderedReservationUnitCardFragment } from "@gql/gql-types";
@@ -200,7 +200,7 @@ export function OrderedReservationUnitCard({
   ...rest
 }: Readonly<Props>): JSX.Element {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
 
   const { unit } = reservationUnit;
   const unitName = unit ? getTranslationSafe(unit, "name", lang) : "-";

@@ -3,8 +3,9 @@ import { gql } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { H1 } from "ui/src/styled";
+import { getLocalizationLang } from "@ui/modules/helpers";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { AllReservations } from "@/components/application/ApprovedReservations";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -23,7 +24,7 @@ function ViewAll({ applicationSection }: PropsNarrowed): JSX.Element {
   const heading = `${applicationSection.name} - ${headingPrefix}`;
   const { application } = applicationSection;
   const { applicationRound } = application;
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const route = [
     {
       slug: applicationsPrefix,

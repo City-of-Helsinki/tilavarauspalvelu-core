@@ -17,8 +17,14 @@ import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
 import { type ApiError, getApiErrors } from "ui/src/modules/apolloUtils";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "ui/src/modules/date-utils";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import {
+  createNodeId,
+  filterNonNullable,
+  getLocalizationLang,
+  ignoreMaybeArray,
+  toNumber,
+} from "ui/src/modules/helpers";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { Flex, H4 } from "ui/src/styled";
 import { AddressSection } from "@/components/AddressSection";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -137,7 +143,7 @@ function ReservationUnit({
   mutationErrors,
 }: Readonly<PropsNarrowed>): JSX.Element | null {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const router = useRouter();
   useRemoveStoredReservation();
   const [isPricingTermsDialogOpen, setIsPricingTermsDialogOpen] = useState(false);
@@ -386,7 +392,7 @@ function ReservationUnit({
 function ReservationUnitWrapped(props: PropsNarrowed) {
   const { t, i18n } = useTranslation();
   const { reservationUnit } = props;
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const reservationUnitName = getTranslationSafe(reservationUnit, "name", lang);
   const routes = [
     { slug: getSingleSearchPath(), title: t("breadcrumb:searchSingle") },

@@ -6,8 +6,9 @@ import Link from "next/link";
 import styled from "styled-components";
 import { IconButton } from "ui/src/components";
 import { breakpoints } from "ui/src/modules/const";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { Flex, H3, anchorStyles, focusStyles } from "ui/src/styled";
+import { getLocalizationLang } from "@ui/modules/helpers";
 import { singleSearchPrefix } from "@/modules/urls";
 import type { UnitListFieldsFragment } from "@gql/gql-types";
 
@@ -53,7 +54,7 @@ type Props = {
 
 export function Units({ units }: Props): JSX.Element | null {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
 
   if (units.length === 0) {
     return null;

@@ -5,8 +5,9 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconButton } from "ui/src/components";
 import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { Flex, H4, fontMedium } from "ui/src/styled";
+import { getLocalizationLang } from "@ui/modules/helpers";
 import { mapUrlPrefix } from "@/modules/const";
 import type { Maybe, LocationFieldsI18nFragment, AddressFieldsFragment } from "@gql/gql-types";
 
@@ -98,7 +99,7 @@ type Props = {
 export function AddressSection({ title, unit }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
 
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
 
   const addressStreet = location ? getTranslationSafe(unit ?? {}, "addressStreet", lang) : undefined;
   const addressCity = location ? getTranslationSafe(unit ?? {}, "addressCity", lang) : undefined;

@@ -6,8 +6,8 @@ import { useTranslation } from "next-i18next";
 import { Card } from "ui/src/components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { breakpoints } from "ui/src/modules/const";
-import { filterNonNullable, getImageSource, getMainImage } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { filterNonNullable, getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { H3 } from "ui/src/styled";
 import Carousel from "@/components/Carousel";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
@@ -69,7 +69,7 @@ export function RelatedUnits({
 
 function RelatedUnitCard({ reservationUnit }: { reservationUnit: RelatedUnitCardFieldsFragment }): JSX.Element {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
 
   const name = getTranslationSafe(reservationUnit, "name", lang);
   const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);

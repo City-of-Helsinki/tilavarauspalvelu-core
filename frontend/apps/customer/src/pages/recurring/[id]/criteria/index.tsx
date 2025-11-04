@@ -6,8 +6,8 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { Sanitize } from "@ui/components/Sanitize";
 import { breakpoints } from "@ui/modules/const";
-import { createNodeId, capitalize, ignoreMaybeArray, toNumber } from "@ui/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
+import { createNodeId, capitalize, ignoreMaybeArray, toNumber, getLocalizationLang } from "@ui/modules/helpers";
+import { getTranslationSafe } from "@ui/modules/util";
 import { Flex, H1 } from "@ui/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { NotesWhenApplying } from "@/components/application";
@@ -51,7 +51,7 @@ const ContentWrapper = styled.div`
 
 function Criteria({ applicationRound }: Readonly<PropsNarrowed>): JSX.Element | null {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const name = getTranslationSafe(applicationRound, "name", lang);
 
   const routes = [

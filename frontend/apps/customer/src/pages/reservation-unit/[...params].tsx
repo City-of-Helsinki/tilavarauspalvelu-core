@@ -10,8 +10,8 @@ import styled from "styled-components";
 import { Sanitize } from "ui/src/components/Sanitize";
 import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
 import { breakpoints } from "ui/src/modules/const";
-import { createNodeId, toNumber } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { createNodeId, getLocalizationLang, toNumber } from "ui/src/modules/helpers";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { H1, H4 } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
@@ -132,7 +132,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       ? reservationUnit.canApplyFreeOfCharge
       : reservationUnit.canApplyFreeOfCharge && reservation.applyingForFreeOfCharge === true;
 
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);
 
   // it should be Created only here (SSR should have redirected)
@@ -185,7 +185,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
 function NewReservationWrapper(props: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const { reservation } = props;
   const reservationUnitName = getTranslationSafe(reservation.reservationUnit, "name", lang);
   const routes = [

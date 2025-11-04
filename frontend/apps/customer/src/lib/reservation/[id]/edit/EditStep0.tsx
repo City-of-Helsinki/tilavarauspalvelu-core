@@ -9,8 +9,9 @@ import styled from "styled-components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { breakpoints } from "ui/src/modules/const";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { H4 } from "ui/src/styled";
+import { getLocalizationLang } from "@ui/modules/helpers";
 import { QuickReservation } from "@/components/QuickReservation";
 import { ReservationTimePicker, ReservationInfoCard } from "@/components/reservation";
 import { useAvailableTimes } from "@/hooks";
@@ -181,7 +182,7 @@ function EditStep0({
     blockingReservations,
   });
 
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);
 
   return (
