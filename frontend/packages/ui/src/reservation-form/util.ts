@@ -110,7 +110,7 @@ export function translateReserveeFormError(
   // custom error message can be set, but not type / code
   if (error.message === "Required" || error.type === "invalid_type") {
     return t("forms:Required", { fieldName: t(fieldLabel) });
-  } else if (error.message === "Invalid email") {
+  } else if (error.message === "invalidEmail") {
     return t("forms:invalidEmail");
   } else if (error.message === "Too large") {
     if (maxValue != null) {
