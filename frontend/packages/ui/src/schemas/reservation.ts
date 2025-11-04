@@ -39,11 +39,14 @@ export const TimeFormSchema = z.object({
   type: ReservationTypeSchema,
 });
 
+const email = z.email({ error: "invalidEmail" });
+// backend doesn't accept bad emails (empty is fine)
+const optionalEmail = z.union([email, z.string().length(0)]).optional();
+
 const CreateStaffReservationFormSchema = z
   .object({
     comments: z.string(),
-    // backend doesn't accept bad emails (empty is fine)
-    reserveeEmail: z.union([z.email(), z.string().length(0)]).optional(),
+    reserveeEmail: optionalEmail,
   })
   .extend(TimeFormSchema.shape);
 
@@ -65,7 +68,7 @@ export const ReservationFormMetaSchema = z.object({
   municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]).optional(),
   numPersons: z.number().optional(),
   purpose: z.number().optional(),
-  reserveeEmail: z.union([z.email(), z.string().length(0)]).optional(),
+  reserveeEmail: optionalEmail,
   reserveeFirstName: z.string().optional(),
   reserveeIdentifier: z.string().optional(),
   reserveeIsUnregisteredAssociation: z.boolean().optional(),
@@ -158,7 +161,7 @@ const ContactInfoFormSchema = z.object({
   reserveeLastName: z.string().min(2, "Required"),
   // TODO check for valid characters (not regex, simpler)
   reserveePhone: z.string().min(3, "Required"),
-  reserveeEmail: z.email().min(1, "Required"),
+  reserveeEmail: email.min(1, "Required"),
   // Optional for all forms based on the reservationUnit settings (could be added dynamically)
   applyingForFreeOfCharge: z.boolean().optional(),
   freeOfChargeReason: z.string().optional(),
