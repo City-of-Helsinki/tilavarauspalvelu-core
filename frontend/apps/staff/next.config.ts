@@ -2,9 +2,8 @@
 import { join } from "node:path";
 import * as url from "node:url";
 import { withSentryConfig } from "@sentry/nextjs";
-import i18nconfig from "./next-i18next.config.cjs";
 import { env } from "./src/env.mjs";
-import { getVersion } from "./src/modules/baseUtils.mjs";
+import { getVersion } from "./src/modules/baseUtils";
 
 // NOTE required for next-i18next to find the config file (when not .js)
 // required to be cjs because they don't support esm
@@ -12,16 +11,15 @@ process.env.I18NEXT_DEFAULT_CONFIG_PATH = "./next-i18next.config.cjs";
 
 const ROOT_PATH = url.fileURLToPath(new URL(".", import.meta.url));
 
-const { i18n } = i18nconfig;
-
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const config = {
   reactStrictMode: true,
   transpilePackages: ["ui"],
   // create a smaller bundle
   output: "standalone",
   // this includes files from the monorepo base two directories up
   outputFileTracingRoot: join(ROOT_PATH, "../../"),
+  // don't block builds use a separate CI step for this
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -29,28 +27,40 @@ const nextConfig = {
     includePaths: [join(ROOT_PATH, "src")],
     silenceDeprecations: ["legacy-js-api"],
   },
-  i18n,
-  basePath: env.NEXT_PUBLIC_BASE_URL,
+  i18n: {
+    locales: ["fi"],
+    defaultLocale: "fi",
+  },
   // eslint-disable-next-line require-await
   async rewrites() {
     return [
       {
-        source: "/reservation/confirmation/:id",
-        destination: "/reservations/:id/confirmation",
+        source: "/units/:id/reservation-units/new",
+        destination: "/reservation-units/new?id=:id",
       },
-      // old series/:reservation cancel url
+      // secondary route when accessed through unit pages
       {
-        // Old search url
-        source: "/search/single",
-        destination: "/search",
+        source: "/units/:id/reservation-units/:any*",
+        destination: "/reservation-units/:any*",
+      },
+      // old notifications route
+      {
+        source: "/messaging/notifications/:any*",
+        destination: "/notifications/:any*",
+      },
+      // old all reservations route
+      {
+        source: "/reservations/all",
+        destination: "/reservations",
+      },
+      // Fix missing 's' in resources and spaces
+      {
+        source: "/units/:id/resource/:any*",
+        destination: "/units/:id/resources/:any*",
       },
       {
-        source: "/applications/:id/view/:reservationId/cancel",
-        destination: "/reservations/:reservationId/cancel",
-      },
-      {
-        source: "/applications/:id/reservations/:reservationId/cancel",
-        destination: "/reservations/:reservationId/cancel",
+        source: "/units/:id/space/:any*",
+        destination: "/units/:id/spaces/:any*",
       },
       // healthcheck should be a simple 200 response with no resource loading
       {
@@ -63,15 +73,15 @@ const nextConfig = {
   // widenClientFileUpload should enable them but it doesn't
   // the only option is custom webpack configuration to add SSR sourcemaps
   productionBrowserSourceMaps: env.SENTRY_ENABLE_SOURCE_MAPS,
-  webpack: (config, { isServer }) => {
+  webpack: (config: { devtool: string }, { isServer }: { isServer: boolean }) => {
     if (isServer && env.SENTRY_ENABLE_SOURCE_MAPS) {
       // oxlint-disable-next-line no-console
-      console.log("Adding sourcemaps to server build");
+      console.log("Server build: adding sourcemaps");
       config.devtool = "source-map";
     }
     return config;
   },
-  // NOTE webpack.experimental.topLevelAwait breaks middleware (it hangs forever)
+  basePath: env.NEXT_PUBLIC_BASE_URL,
   compiler: {
     styledComponents: {
       ssr: true,
@@ -80,14 +90,12 @@ const nextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
+export default withSentryConfig(config, {
   org: "city-of-helsinki",
-  project: "tilavarauspalvelu-ui",
+  project: "tilavarauspalvelu-admin-ui",
   sentryUrl: "",
   authToken: "",
   silent: !process.env.CI,
-  // For all available options, see:
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
   // Automatically tree-shake Sentry logger statements to reduce bundle size
   disableLogger: true,
   // Upload a larger set of source maps for prettier stack traces (increases build time)
@@ -101,6 +109,8 @@ export default withSentryConfig(nextConfig, {
   },
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   tunnelRoute: "/monitoring",
+  // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
+  automaticVercelMonitors: false,
   // Disable sourcemaps because we use nextjs configuration for it
   sourcemaps: {
     disable: true,
