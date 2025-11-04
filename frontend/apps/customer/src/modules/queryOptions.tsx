@@ -1,6 +1,6 @@
 import { type ApolloClient } from "@apollo/client";
 import { filterNonNullable, getLocalizationLang } from "@ui/modules/helpers";
-import { getTranslationSafe } from "@ui/modules/util";
+import { getTranslation } from "@ui/modules/util";
 import { type OptionsRecord } from "@ui/types";
 import { OptionsDocument, type OptionsQueryVariables, type OptionsQuery } from "@gql/gql-types";
 
@@ -24,7 +24,7 @@ export async function queryOptions(
 
   const sortedAgeGroups = ageGroups.sort((a, b) => a.minimum - b.minimum);
   const purposeOptions = reservationPurposes.map((purpose) => ({
-    label: getTranslationSafe(purpose, "name", lang),
+    label: getTranslation(purpose, "name", lang),
     value: purpose.pk ?? 0,
   }));
   const ageGroupOptions = [

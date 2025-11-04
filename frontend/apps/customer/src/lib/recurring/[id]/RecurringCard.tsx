@@ -16,8 +16,7 @@ import { useTranslation } from "next-i18next";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import Card, { type CardInfoItem } from "ui/src/components/Card";
 import { getImageSource, getMainImage } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { getReservationUnitName } from "@/modules/reservationUnit";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { getReservationUnitPath } from "@/modules/urls";
 import type { RecurringCardFragment } from "@gql/gql-types";
 
@@ -38,13 +37,13 @@ export function RecurringCard({
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
-  const name = getReservationUnitName(reservationUnit);
+  const name = getTranslation(reservationUnit, "name", lang);
 
-  const unitName = reservationUnit.unit ? getTranslationSafe(reservationUnit.unit, "name", lang) : "-";
+  const unitName = getTranslation(reservationUnit.unit, "name", lang);
 
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
-      ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
+      ? getTranslation(reservationUnit.reservationUnitType, "name", lang)
       : undefined;
 
   const img = getMainImage(reservationUnit);

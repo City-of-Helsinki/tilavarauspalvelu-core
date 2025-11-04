@@ -18,7 +18,7 @@ import { type ApiError, getApiErrors } from "ui/src/modules/apolloUtils";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { Flex, H4 } from "ui/src/styled";
 import { AddressSection } from "@/components/AddressSection";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -42,11 +42,7 @@ import {
   type FocusTimeSlot,
   getDurationOptions,
 } from "@/modules/reservation";
-import {
-  getReservationUnitName,
-  isReservationUnitPublished,
-  isReservationUnitReservable,
-} from "@/modules/reservationUnit";
+import { isReservationUnitPublished, isReservationUnitReservable } from "@/modules/reservationUnit";
 import { PendingReservationFormSchema, type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { JustForDesktop } from "@/modules/style/layout";
@@ -317,7 +313,7 @@ function ReservationUnit({
   );
 
   const pricingTermsContent = reservationUnit.pricingTerms
-    ? getTranslationSafe(reservationUnit.pricingTerms, "text", lang)
+    ? getTranslation(reservationUnit.pricingTerms, "text", lang)
     : undefined;
 
   return (
@@ -344,13 +340,13 @@ function ReservationUnit({
             />
           )}
           <JustForDesktop customBreakpoint={breakpoints.l}>
-            <AddressSection unit={reservationUnit.unit} title={getReservationUnitName(reservationUnit) ?? "-"} />
+            <AddressSection unit={reservationUnit.unit} title={getTranslation(reservationUnit, "name", lang)} />
           </JustForDesktop>
         </div>
         <PageContentWrapper>
           <div data-testid="reservation-unit__description">
             <H4 as="h2">{t("reservationUnit:description")}</H4>
-            <Sanitize html={getTranslationSafe(reservationUnit, "description", lang)} />
+            <Sanitize html={getTranslation(reservationUnit, "description", lang)} />
           </div>
           {equipment.length > 0 && (
             <div data-testid="reservation-unit__equipment">
@@ -387,7 +383,7 @@ function ReservationUnitWrapped(props: PropsNarrowed) {
   const { t, i18n } = useTranslation();
   const { reservationUnit } = props;
   const lang = convertLanguageCode(i18n.language);
-  const reservationUnitName = getTranslationSafe(reservationUnit, "name", lang);
+  const reservationUnitName = getTranslation(reservationUnit, "name", lang);
   const routes = [
     { slug: getSingleSearchPath(), title: t("breadcrumb:searchSingle") },
     { title: reservationUnitName ?? "-" },

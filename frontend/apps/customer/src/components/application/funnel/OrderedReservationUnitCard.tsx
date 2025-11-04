@@ -7,9 +7,8 @@ import Card from "ui/src/components/Card";
 import { ErrorText } from "ui/src/components/ErrorText";
 import { breakpoints } from "ui/src/modules/const";
 import { getImageSource, getMainImage } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { Flex, H6, fontBold, fontMedium, fontRegular } from "ui/src/styled";
-import { getReservationUnitName } from "@/modules/reservationUnit";
 import type { OrderedReservationUnitCardFragment } from "@gql/gql-types";
 
 const NameCardContainer = styled(Flex).attrs({ $gap: "none" })`
@@ -203,7 +202,7 @@ export function OrderedReservationUnitCard({
   const lang = convertLanguageCode(i18n.language);
 
   const { unit } = reservationUnit;
-  const unitName = unit ? getTranslationSafe(unit, "name", lang) : "-";
+  const unitName = getTranslation(unit, "name", lang);
 
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");
@@ -218,7 +217,7 @@ export function OrderedReservationUnitCard({
         </PreCardLabel>
         <OverlayContainer>
           <CardContainer>
-            <Card heading={getReservationUnitName(reservationUnit) ?? ""} text={unitName} imageSrc={imgSrc} />
+            <Card heading={getTranslation(reservationUnit, "name", lang)} text={unitName} imageSrc={imgSrc} />
           </CardContainer>
           <OrderButtonContainer>
             <DeleteContainer>

@@ -10,7 +10,7 @@ import styled from "styled-components";
 import { useToastIfQueryParam } from "ui/src/hooks";
 import { formatDateTime } from "ui/src/modules/date-utils";
 import { createNodeId, getLocalizationLang, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { getTranslationSafe } from "ui/src/modules/util";
+import { getTranslation } from "ui/src/modules/util";
 import { Flex } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ApplicationHead } from "@/components/application/ApplicationHead";
@@ -94,7 +94,7 @@ function View({ application, tos }: Readonly<Pick<PropsNarrowed, "application" |
 
   const { applicationRound } = application;
   const lang = getLocalizationLang(i18n.language);
-  const applicationRoundName = getTranslationSafe(applicationRound, "name", lang);
+  const applicationRoundName = getTranslation(applicationRound, "name", lang);
   const { sentAt } = applicationRound;
   const handledAt = sentAt ? new Date(sentAt) : new Date();
   const showReservations =

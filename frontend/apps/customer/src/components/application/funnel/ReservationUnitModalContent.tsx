@@ -18,13 +18,12 @@ import Card from "ui/src/components/Card";
 import { breakpoints } from "ui/src/modules/const";
 import { filterNonNullable, getImageSource, getMainImage } from "ui/src/modules/helpers";
 import { type OptionsListT } from "ui/src/modules/search";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { CenterSpinner, Flex, H3 } from "ui/src/styled";
 import { type SearchFormValues, SeasonalSearchForm } from "@/components/SeasonalSearchForm";
 import { useSearchQuery } from "@/hooks";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { getApplicationRoundName } from "@/modules/applicationRound";
-import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { processVariables } from "@/modules/search";
 import { getReservationUnitPath } from "@/modules/urls";
 import {
@@ -64,11 +63,11 @@ function ReservationUnitCard({ reservationUnit, handleAdd, handleRemove, isSelec
   const buttonText = isSelected
     ? t("reservationUnitModal:deselectReservationUnit")
     : t("reservationUnitModal:selectReservationUnit");
-  const name = getReservationUnitName(reservationUnit);
+  const name = getTranslation(reservationUnit, "name", lang);
   const reservationUnitTypeName = reservationUnit.reservationUnitType
-    ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
+    ? getTranslation(reservationUnit.reservationUnitType, "name", lang)
     : undefined;
-  const unitName = reservationUnit.unit ? getUnitName(reservationUnit.unit, lang) : undefined;
+  const unitName = getTranslation(reservationUnit.unit, "name", lang);
 
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "small");

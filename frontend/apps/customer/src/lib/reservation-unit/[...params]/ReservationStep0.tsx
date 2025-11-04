@@ -9,7 +9,7 @@ import styled from "styled-components";
 import { ErrorListBox } from "@ui/components/ErrorListBox";
 import { useDisplayError } from "@ui/hooks";
 import { isNotFoundError } from "@ui/modules/apolloUtils";
-import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
+import { convertLanguageCode, getTranslation } from "@ui/modules/util";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/reservation-form";
 import { getExtendedGeneralFormFields } from "@ui/reservation-form/util";
 import { getReservationFormSchema, ReservationFormValues, type ReservationFormValueT } from "@ui/schemas";
@@ -158,7 +158,7 @@ export function ReservationStep0({ reservation, cancelReservation, options }: Pr
 
   const lang = convertLanguageCode(i18n.language);
   const pricingTerms = reservation.reservationUnit.pricingTerms
-    ? getTranslationSafe(reservation.reservationUnit.pricingTerms, "text", lang)
+    ? getTranslation(reservation.reservationUnit.pricingTerms, "text", lang)
     : "";
 
   return (

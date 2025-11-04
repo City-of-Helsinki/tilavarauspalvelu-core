@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { Sanitize } from "ui/src/components/Sanitize";
 import TermsBox from "ui/src/components/TermsBox";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { type TermsOfUseTextFieldsFragment, type Maybe, type TermsOfUseFragment } from "@gql/gql-types";
 
 export function AcceptTerms({
@@ -90,6 +90,6 @@ function SanitizedTerms({
     return null;
   }
 
-  const localTerms = getTranslationSafe(terms, "text", lang);
+  const localTerms = getTranslation(terms, "text", lang);
   return <Sanitize html={localTerms} />;
 }

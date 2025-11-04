@@ -27,7 +27,7 @@ import {
   type ReadonlyDeep,
 } from "@ui/modules/helpers";
 import { type LocalizationLanguages } from "@ui/modules/urlBuilder";
-import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
+import { getTranslation } from "@ui/modules/util";
 import {
   dateToKey,
   isRangeReservable,
@@ -52,7 +52,6 @@ import {
   type ReservationUnitNode,
   ReservationUnitPublishingState,
   ReservationUnitReservationState,
-  type UnitNode,
 } from "@gql/gql-types";
 
 export function isReservationUnitPublished(reservationUnit: Pick<ReservationUnitNode, "publishingState">): boolean {
@@ -123,35 +122,7 @@ export function getEquipmentList(
       .sort((a, b) => (a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0))
   );
 
-  return sortedEquipment.map((n) => getTranslationSafe(n, "name", lang));
-}
-
-export function getReservationUnitName(
-  reservationUnit: Pick<ReservationUnitNode, "nameFi" | "nameSv" | "nameEn"> | undefined,
-  language: string = "fi"
-): string | undefined {
-  if (!reservationUnit) {
-    return undefined;
-  }
-  const key = `name${capitalize(language)}`;
-  if (key in reservationUnit) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- silly magic to avoid implicit any type
-    const val: unknown = (reservationUnit as any)[key];
-    if (typeof val === "string" && val.length > 0) {
-      return val;
-    }
-  }
-  return reservationUnit.nameFi ?? "-";
-}
-
-export function getUnitName(
-  unit: Pick<UnitNode, "nameFi" | "nameSv" | "nameEn">,
-  locale: LocalizationLanguages
-): string | undefined {
-  if (unit == null) {
-    return undefined;
-  }
-  return getTranslationSafe(unit, "name", convertLanguageCode(locale));
+  return sortedEquipment.map((n) => getTranslation(n, "name", lang));
 }
 
 function isActivePricing(pricing: PricingFieldsFragment): boolean {

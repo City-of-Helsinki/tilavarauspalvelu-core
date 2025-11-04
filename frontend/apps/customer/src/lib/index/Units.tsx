@@ -6,7 +6,7 @@ import Link from "next/link";
 import styled from "styled-components";
 import { IconButton } from "ui/src/components";
 import { breakpoints } from "ui/src/modules/const";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { Flex, H3, anchorStyles, focusStyles } from "ui/src/styled";
 import { singleSearchPrefix } from "@/modules/urls";
 import type { UnitListFieldsFragment } from "@gql/gql-types";
@@ -72,7 +72,7 @@ export function Units({ units }: Props): JSX.Element | null {
               href={`${singleSearchPrefix}?units=${unit.pk}#content`}
               data-testid="front-page__units--unit"
             >
-              {getTranslationSafe(unit, "name", lang) || "-"}
+              {getTranslation(unit, "name", lang) || "-"}
               <IconArrowRight size={IconSize.Large} />
             </UnitItemLink>
           ))}

@@ -3,7 +3,7 @@ import { type UseFormReturn } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { convertLanguageCode, getTranslation } from "ui/src/modules/util";
 import { Flex, H4 } from "ui/src/styled";
 import { ReservationTimePicker } from "@/components/reservation";
 import { type ReservationTimePickerProps } from "@/components/reservation/ReservationTimePicker";
@@ -46,7 +46,7 @@ export function ReservationUnitCalendarSection({
     <Flex $gap="m" data-testid="reservation-unit__calendar--wrapper">
       <H4 as="h2" $marginBottom="none">
         {t("reservations:reservationCalendar", {
-          title: getTranslationSafe(reservationUnit, "name", lang),
+          title: getTranslation(reservationUnit, "name", lang),
         })}
       </H4>
       <ReservationQuotaReached {...refreshedIsQuoteReached} />
