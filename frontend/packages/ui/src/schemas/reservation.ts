@@ -65,7 +65,7 @@ export const ReservationFormMetaSchema = z.object({
   ageGroup: z.number().optional(),
   applyingForFreeOfCharge: z.boolean().optional(),
   freeOfChargeReason: z.string().optional(),
-  municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]).optional(),
+  municipality: z.enum(MunicipalityChoice).optional(),
   numPersons: z.number().optional(),
   purpose: z.number().optional(),
   reserveeEmail: optionalEmail,
@@ -75,7 +75,7 @@ export const ReservationFormMetaSchema = z.object({
   reserveeLastName: z.string().optional(),
   reserveeOrganisationName: z.string().optional(),
   reserveePhone: z.string().optional(),
-  reserveeType: z.enum([ReserveeType.Individual, ReserveeType.Nonprofit, ReserveeType.Company]).optional(),
+  reserveeType: z.enum(ReserveeType).optional(),
 });
 
 export function checkStartEndTime(
@@ -175,10 +175,10 @@ type SchemaParams = {
 const ReserveeInfoFormSchema = (params: SchemaParams) =>
   z
     .object({
-      reserveeType: z.enum(ReserveeType),
+      reserveeType: z.enum(ReserveeType, { error: "Required" }),
       name: z.string(), // not mandatory
       description: z.string().min(3, "Required"),
-      municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]),
+      municipality: z.enum(MunicipalityChoice, { error: "Required" }),
       numPersons: z.number().min(params.minPersons, "Too small").max(params.maxPersons, "Too large"),
       // these are only required for organisations
       reserveeIdentifier: z.string(),
