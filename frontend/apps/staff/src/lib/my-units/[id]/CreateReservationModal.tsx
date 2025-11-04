@@ -3,16 +3,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Button,
-  ButtonSize,
-  ButtonVariant,
-  Dialog,
-  IconSearch,
-  LoadingSpinner,
-  Notification,
-  NotificationSize,
-} from "hds-react";
+import { Button, ButtonVariant, Dialog, LoadingSpinner, Notification, NotificationSize } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
@@ -40,14 +31,17 @@ import {
 
 // NOTE HDS forces buttons over each other on mobile, we want them side-by-side
 const ActionButtons = styled(Dialog.ActionButtons)`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: end;
-  align-items: center;
-  gap: var(--spacing-s);
-  padding: var(--spacing-s);
+  && {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
+    align-items: center;
+    gap: var(--spacing-s);
+    padding-left: 0;
+    padding-right: 0;
+  }
   @media (max-width: ${breakpoints.m}) {
-    > button {
+    && > button {
       margin: 0;
       flex-basis: 47%;
     }
@@ -69,7 +63,6 @@ const Form = styled.form`
 
   height: 100%;
   margin-top: var(--spacing-m);
-  margin-bottom: var(--spacing-m);
 `;
 
 const StyledNotification = styled(Notification)`
@@ -335,6 +328,8 @@ function CollisionWarning({
       label={t("errors:timeCollision")}
       type="error"
       data-testid="CreateReservationModal__collision-warning"
+      // force to take a whole line so we don't move the action buttons on large screens
+      style={{ width: "100%" }}
     >
       {t("errors:timeCollision")}
     </StyledNotification>
@@ -367,8 +362,7 @@ function ActionContainer({
       <CollisionWarning form={form} reservationUnit={reservationUnit} />
       <Button
         type="button"
-        size={ButtonSize.Small}
-        iconStart={isSubmitting ? <LoadingSpinner small /> : <IconSearch />}
+        iconStart={isSubmitting ? <LoadingSpinner small /> : undefined}
         disabled={isDisabled}
         onClick={() => {
           handleSubmit(onSubmit)();
@@ -378,7 +372,6 @@ function ActionContainer({
         {t("myUnits:ReservationDialog.accept")}
       </Button>
       <Button
-        size={ButtonSize.Small}
         variant={ButtonVariant.Secondary}
         onClick={onCancel}
         data-testid="CreateReservationModal__cancel-reservation"
