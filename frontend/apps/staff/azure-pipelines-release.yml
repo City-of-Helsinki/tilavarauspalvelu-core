@@ -23,11 +23,9 @@ trigger:
       - "*-customer"
       - "*-core"
   paths:
-    # Should use turborepo to calculate the real needed packages,
-    # but currently this is not possible.
     include:
-      - packages/common
-      - apps/staff
+      - frontend/apps/staff
+      - frontend/packages
     exclude:
       - README.md
 
