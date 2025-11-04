@@ -1,5 +1,5 @@
 import { type NextApiRequest, type NextApiResponse } from "next";
-import { getVersion } from "@/modules/baseUtils.mjs";
+import { getVersion } from "@/modules/baseUtils";
 
 type ResponseData = {
   message: string;

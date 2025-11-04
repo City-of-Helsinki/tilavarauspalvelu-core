@@ -10,7 +10,7 @@ import {
   OrderDocument,
   type TermsOfUseFieldsFragment,
 } from "@gql/gql-types";
-import { getVersion } from "./baseUtils.mjs";
+import { getVersion } from "./baseUtils";
 import { genericTermsVariant } from "./const";
 
 export { getVersion };

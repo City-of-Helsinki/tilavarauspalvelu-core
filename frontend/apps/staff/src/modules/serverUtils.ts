@@ -1,4 +1,4 @@
-import { getVersion } from "@/modules/baseUtils.mjs";
+import { getVersion } from "@/modules/baseUtils";
 
 export async function getCommonServerSideProps() {
   const { env } = await import("@/env.mjs");
