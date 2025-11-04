@@ -3,8 +3,9 @@ import { type UseFormReturn } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { Flex, H4 } from "ui/src/styled";
+import { getLocalizationLang } from "@ui/modules/helpers";
 import { ReservationTimePicker } from "@/components/reservation";
 import { type ReservationTimePickerProps } from "@/components/reservation/ReservationTimePicker";
 import { useReservableTimes } from "@/hooks";
@@ -30,7 +31,7 @@ export function ReservationUnitCalendarSection({
   "startingTimeOptions" | "blockingReservations" | "loginAndSubmitButton" | "submitReservation"
 >): JSX.Element {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const reservableTimes = useReservableTimes(reservationUnit);
 
   const { data } = useReservationQuotaReachedQuery({

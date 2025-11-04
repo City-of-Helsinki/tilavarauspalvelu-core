@@ -7,7 +7,7 @@ import { breakpoints } from "ui/src/modules/const";
 import { formatDateRange, formatDateTime, formatDuration, formatDate } from "ui/src/modules/date-utils";
 import { filterNonNullable, getLocalizationLang } from "ui/src/modules/helpers";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { Flex, H1, H3 } from "ui/src/styled";
 import { IconWithText } from "@/components/IconWithText";
 import {
@@ -86,7 +86,7 @@ export function Head({
   subventionSuffix,
 }: Readonly<HeadProps>): JSX.Element {
   const { i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const reservationUnitName = getTranslationSafe(reservationUnit, "name", lang);
   const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
 
@@ -164,7 +164,7 @@ function IconList({
   subventionSuffix,
 }: Readonly<Pick<HeadProps, "reservationUnit" | "subventionSuffix">>): JSX.Element {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const minDur = reservationUnit.minReservationDuration ?? 0;
   const maxDur = reservationUnit.maxReservationDuration ?? 0;
   const minReservationDuration = formatDuration(t, { seconds: minDur });

@@ -11,8 +11,7 @@ import { errorToast, successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { isNotFoundError } from "ui/src/modules/apolloUtils";
 import { formatApiDate } from "ui/src/modules/date-utils";
-import { createNodeId, filterNonNullable } from "ui/src/modules/helpers";
-import { convertLanguageCode } from "ui/src/modules/util";
+import { createNodeId, filterNonNullable, getLocalizationLang } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
 import { useCurrentUser } from "@/hooks";
 import { CREATED_RESERVATION_TIMEOUT_MINUTES } from "@/modules/const";
@@ -168,7 +167,7 @@ export function InProgressReservationNotification(): React.ReactElement {
 
   const [deleteReservation, { loading: isDeleteLoading }] = useDeleteReservationMutation();
 
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
 
   // Lazy minimal query to check if the reservation is still valid
   const [reservationQ] = useReservationStateLazyQuery({

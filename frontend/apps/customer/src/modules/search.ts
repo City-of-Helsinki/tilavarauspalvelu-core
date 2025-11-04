@@ -15,7 +15,7 @@ import {
 } from "ui/src/modules/helpers";
 import { type OptionsListT, type OptionT } from "ui/src/modules/search";
 import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getTranslationSafe } from "ui/src/modules/util";
 import {
   EquipmentOrderingChoices,
   type Maybe,
@@ -199,7 +199,7 @@ export async function getSearchOptions(
   page: "seasonal" | "direct",
   locale: string
 ): Promise<OptionsListT> {
-  const lang = convertLanguageCode(locale);
+  const lang = getLocalizationLang(locale);
   const { data: optionsData } = await apolloClient.query<OptionsQuery, OptionsQueryVariables>({
     query: OptionsDocument,
     variables: {

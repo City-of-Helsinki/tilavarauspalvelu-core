@@ -9,7 +9,7 @@ import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { ApplicationStatusLabel } from "ui/src/components/statuses";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
-import { convertLanguageCode } from "ui/src/modules/util";
+import { getLocalizationLang } from "@ui/modules/helpers";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getApplicationPath } from "@/modules/urls";
 import {
@@ -61,7 +61,7 @@ type Props = {
 
 export function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
 
   const [isWaitingForDelete, setIsWaitingForDelete] = useState(false);
 

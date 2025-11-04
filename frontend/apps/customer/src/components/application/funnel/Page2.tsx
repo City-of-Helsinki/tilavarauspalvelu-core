@@ -3,8 +3,8 @@ import { useFormContext } from "react-hook-form";
 import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import { filterNonNullable } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { filterNonNullable, getLocalizationLang } from "ui/src/modules/helpers";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { ButtonContainer } from "ui/src/styled";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { getApplicationPath } from "@/modules/urls";
@@ -74,7 +74,7 @@ function ApplicationSectionTimePicker({
   const { watch } = useFormContext<ApplicationPage2FormValues>();
 
   const { i18n } = useTranslation();
-  const language = convertLanguageCode(i18n.language);
+  const language = getLocalizationLang(i18n.language);
 
   const allOpeningHours = section?.reservationUnitOptions.map((ruo) => ({
     pk: ruo.reservationUnit.pk ?? 0,

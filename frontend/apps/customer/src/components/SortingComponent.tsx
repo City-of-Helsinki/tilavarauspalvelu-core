@@ -4,8 +4,7 @@ import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";
-import { convertOptionToHDS } from "ui/src/modules/helpers";
-import { convertLanguageCode } from "ui/src/modules/util";
+import { convertOptionToHDS, getLocalizationLang } from "ui/src/modules/helpers";
 import { Flex, fontMedium, focusStyles } from "ui/src/styled";
 import { useSearchModify } from "@/hooks/useSearchValues";
 
@@ -84,7 +83,7 @@ export function SortingComponent() {
   const searchValues = useSearchParams();
   const { handleRouteChange } = useSearchModify();
   const { t, i18n } = useTranslation();
-  const language = convertLanguageCode(i18n.language);
+  const language = getLocalizationLang(i18n.language);
 
   const sortingOptions = SORTING_OPTIONS.map((option) => ({
     label: t(option.label),

@@ -15,10 +15,11 @@ import {
   createNodeId,
   filterNonNullable,
   formatApiTimeInterval,
+  getLocalizationLang,
   ignoreMaybeArray,
   toNumber,
 } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { H1 } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";
@@ -107,7 +108,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
   const ingress = t("reservations:cancelSection.ingress");
   const infoBody = t("reservations:cancelSection.body");
 
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const round = applicationSection?.application?.applicationRound;
   const { termsOfUse } = round ?? {};
   const cancellationTerms = termsOfUse ? getTranslationSafe(termsOfUse, "text", lang) : null;
@@ -178,7 +179,7 @@ function ApplicationSectionInfoCard({
   const opts = applicationSection?.reservationUnitOptions;
   const reservationUnits = filterNonNullable(opts?.flatMap((option) => option?.reservationUnit));
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const firstReservationUnit = reservationUnits.find(() => true);
   const allocatedSlots = opts?.flatMap((option) => option.allocatedTimeSlots);
 

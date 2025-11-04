@@ -8,8 +8,8 @@ import { useGenericTerms } from "@ui/hooks";
 import { formatters as getFormatters } from "@ui/index";
 import { breakpoints } from "@ui/modules/const";
 import { formatDate, formatTimeRange, timeToMinutes } from "@ui/modules/date-utils";
-import { filterNonNullable, formatListToCSV, isPriceFree, toNumber } from "@ui/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "@ui/modules/util";
+import { filterNonNullable, formatListToCSV, getLocalizationLang, isPriceFree, toNumber } from "@ui/modules/helpers";
+import { getTranslationSafe } from "@ui/modules/util";
 import { AddressSection } from "@/components/AddressSection";
 import { Map as MapComponent } from "@/components/Map";
 import { getFuturePricing, getPriceString, getReservationUnitName } from "@/modules/reservationUnit";
@@ -33,7 +33,7 @@ export function ReservationUnitMoreDetails({
   isReservable: boolean;
 }>) {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
 
   const termsOfUse = useGenericTerms();
 
@@ -118,7 +118,7 @@ function NoticeWhenReservingSection({
   reservationUnit: NoticeWhenReservingFragment;
 }): JSX.Element | null {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const notesWhenReserving = getTranslationSafe(reservationUnit, "notesWhenApplying", lang);
 
   const appRounds = reservationUnit.applicationRounds;

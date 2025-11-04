@@ -15,8 +15,8 @@ import {
 import { useTranslation } from "next-i18next";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import Card, { type CardInfoItem } from "ui/src/components/Card";
-import { getImageSource, getMainImage } from "ui/src/modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
+import { getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
+import { getTranslationSafe } from "ui/src/modules/util";
 import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
 import type { RecurringCardFragment } from "@gql/gql-types";
@@ -36,7 +36,7 @@ export function RecurringCard({
   removeReservationUnit,
 }: Readonly<CardProps>): JSX.Element {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
 
   const name = getReservationUnitName(reservationUnit);
 

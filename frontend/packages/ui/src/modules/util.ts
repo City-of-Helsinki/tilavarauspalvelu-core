@@ -35,10 +35,3 @@ export function getTranslationSafe(parent: Record<string, unknown>, key: string,
 
   return "";
 }
-
-export function convertLanguageCode(lang: string): "fi" | "sv" | "en" {
-  if (lang === "sv" || lang === "en" || lang === "fi") {
-    return lang;
-  }
-  return "fi";
-}

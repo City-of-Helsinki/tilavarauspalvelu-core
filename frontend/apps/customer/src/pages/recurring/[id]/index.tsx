@@ -6,8 +6,14 @@ import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
-import { createNodeId, filterNonNullable, ignoreMaybeArray, type ReadonlyDeep, toNumber } from "ui/src/modules/helpers";
-import { convertLanguageCode } from "ui/src/modules/util";
+import {
+  createNodeId,
+  filterNonNullable,
+  getLocalizationLang,
+  ignoreMaybeArray,
+  type ReadonlyDeep,
+  toNumber,
+} from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ListWithPagination } from "@/components/ListWithPagination";
@@ -40,7 +46,7 @@ type SeasonalSearchProps = ReadonlyDeep<Pick<NarrowedProps, "applicationRound" |
 
 function SeasonalSearch({ apiBaseUrl, applicationRound, options }: Readonly<SeasonalSearchProps>): JSX.Element {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const searchValues = useSearchParams();
 
   const { handleSearch } = useSearchModify();

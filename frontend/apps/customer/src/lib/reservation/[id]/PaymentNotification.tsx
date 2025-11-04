@@ -6,7 +6,7 @@ import { ButtonLikeExternalLink } from "@ui/components/ButtonLikeLink";
 import { formatters as getFormatters } from "@ui/index";
 import { breakpoints } from "@ui/modules/const";
 import { formatDateTime, parseValidDateObject } from "@ui/modules/date-utils";
-import { convertLanguageCode } from "@ui/modules/util";
+import { getLocalizationLang } from "@ui/modules/helpers";
 import { Flex, fontMedium } from "@ui/styled";
 import { getPaymentUrl } from "@/modules/reservation";
 import {
@@ -60,7 +60,7 @@ export const PaymentNotification = ({
           includeWeekday: false,
         })
       : "-";
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const isExpired =
     reservation.state === ReservationStateChoice.Cancelled &&
     reservation.cancelReason === ReservationCancelReasonChoice.NotPaid;

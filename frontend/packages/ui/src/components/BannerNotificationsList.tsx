@@ -10,8 +10,8 @@ import {
   useShowNotificationsListQuery,
   type ShowNotificationFieldsFragment,
 } from "../../gql/gql-types";
-import { filterNonNullable } from "../modules/helpers";
-import { convertLanguageCode, getTranslationSafe } from "../modules/util";
+import { filterNonNullable, getLocalizationLang } from "../modules/helpers";
+import { getTranslationSafe } from "../modules/util";
 import { ClientOnly } from "./ClientOnly";
 import NotificationWrapper from "./NotificationWrapper";
 import { Sanitize } from "./Sanitize";
@@ -63,7 +63,7 @@ function convertNotificationType(level: BannerNotificationLevel): NotificationTy
 function NotificationsListItem({ notification, closeFn, closedArray }: NotificationsListItemProps) {
   const { t, i18n } = useTranslation();
   const notificationType = convertNotificationType(notification.level);
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const innerHtml = getTranslationSafe(notification, "message", lang);
 
   return (

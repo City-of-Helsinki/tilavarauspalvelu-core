@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ShowAllContainer } from "ui/src/components";
 import { breakpoints } from "ui/src/modules/const";
-import { convertLanguageCode } from "ui/src/modules/util";
+import { getLocalizationLang } from "@ui/modules/helpers";
 import { getEquipmentList } from "@/modules/reservationUnit";
 import type { EquipmentFieldsFragment } from "@gql/gql-types";
 
@@ -35,7 +35,7 @@ const EquipmentItem = styled.li`
 
 export function EquipmentList({ equipment, itemsToShow = 6 }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const equipmentList = getEquipmentList(equipment, lang);
 
   return (

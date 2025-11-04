@@ -3,8 +3,7 @@ import { type Control, type FieldValues, type Path, useController, type UseContr
 import { defaultFilter, Option, Select, Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { convertOptionToHDS, filterNonNullable, toNumber } from "../../modules/helpers";
-import { convertLanguageCode } from "../../modules/util";
+import { convertOptionToHDS, filterNonNullable, getLocalizationLang, toNumber } from "../../modules/helpers";
 import { fontMedium } from "../../styled";
 
 const StyledControlledSelect = styled(Select)<{ $strongLabel?: boolean }>`
@@ -61,7 +60,7 @@ export function ControlledSelect<T extends FieldValues>({
   ...rest
 }: SelectProps<T>): JSX.Element {
   const { t, i18n } = useTranslation(["common"]);
-  const language = convertLanguageCode(i18n.language);
+  const language = getLocalizationLang(i18n.language);
 
   const {
     field: { value, onChange },

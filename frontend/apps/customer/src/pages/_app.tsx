@@ -4,8 +4,8 @@ import { CookieBanner, CookieConsentContextProvider } from "hds-react";
 import { appWithTranslation, useTranslation } from "next-i18next";
 import type { AppProps } from "next/app";
 import { ToastContainer } from "ui/src/components/toast";
-import { convertLanguageCode } from "ui/src/modules/util";
 import "ui/src/styles/global.scss";
+import { getLocalizationLang } from "@ui/modules/helpers";
 import { ExternalScripts } from "@/components/ExternalScripts";
 import { PageWrapper } from "@/components/PageWrapper";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -65,7 +65,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const { hasUserAcceptedStatistics: statisticsAccepted, recheck } = useHasUserAcceptedStatistics();
 
   const client = createApolloClient(apiBaseUrl ?? "", undefined);
-  const language = convertLanguageCode(i18n.language);
+  const language = getLocalizationLang(i18n.language);
 
   const enableMatomo = matomoEnabled && statisticsAccepted;
   const enableHotjar = hotjarEnabled && statisticsAccepted;

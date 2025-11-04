@@ -6,7 +6,7 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { useDisplayError } from "@ui/hooks";
 import { isNotFoundError } from "@ui/modules/apolloUtils";
-import { convertLanguageCode } from "@ui/modules/util";
+import { getLocalizationLang } from "@ui/modules/helpers";
 import { Flex } from "@ui/styled";
 import { type OptionsRecord } from "@ui/types";
 import { AcceptTerms } from "@/components/AcceptTerms";
@@ -69,7 +69,7 @@ export function ReservationStep1({ reservation, options, requiresPayment }: Prop
         await router.push(getReservationPath(pk, undefined, "requires_handling"));
       } else if (state === ReservationStateChoice.WaitingForPayment) {
         const { order } = data?.confirmReservation ?? {};
-        const lang = convertLanguageCode(i18n.language);
+        const lang = getLocalizationLang(i18n.language);
         const checkoutUrl = getCheckoutUrl(order, lang);
         if (!checkoutUrl) {
           throw new Error("No checkout url found");

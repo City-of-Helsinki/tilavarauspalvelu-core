@@ -15,7 +15,6 @@ import { useToastIfQueryParam } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDateTimeRange } from "ui/src/modules/date-utils";
 import { createNodeId, capitalize, getLocalizationLang, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { convertLanguageCode } from "ui/src/modules/util";
 import { Flex, fontRegular, H1, H4, NoWrap } from "ui/src/styled";
 import { AddressSection } from "@/components/AddressSection";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -170,7 +169,7 @@ function Reservation({
   Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl" | "options" | "apiBaseUrl">
 >): React.ReactElement | null {
   const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
+  const lang = getLocalizationLang(i18n.language);
   const params = useSearchParams();
   const statusNotification = convertNotify(params.get("notify"));
   const shouldShowAccessCode =
