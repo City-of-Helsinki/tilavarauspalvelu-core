@@ -10,7 +10,7 @@ import { Card } from "ui/src/components";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { useDisplayError } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
-import { parseApiDate, formatDate } from "ui/src/modules/date-utils";
+import { parseApiDate, formatDateRange } from "ui/src/modules/date-utils";
 import {
   createNodeId,
   filterNonNullable,
@@ -210,9 +210,7 @@ function ApplicationSectionInfoCard({
 
   const { reservationsBeginDate, reservationsEndDate } = applicationSection ?? {};
   const dateLabel = t("reservation:cancelSection.dateLabel");
-  const begin = formatDate(parseApiDate(reservationsBeginDate ?? ""));
-  const end = formatDate(parseApiDate(reservationsEndDate ?? ""));
-  const text = `${dateLabel} ${begin} - ${end}`;
+  const text = `${dateLabel} ${formatDateRange(parseApiDate(reservationsBeginDate ?? ""), parseApiDate(reservationsEndDate ?? ""), { includeWeekday: false })}`;
   return <ApplicationInfo heading={name ?? ""} text={text} variant="vertical" infos={icons} />;
 }
 
