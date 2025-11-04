@@ -74,6 +74,7 @@
       "RESERVATION_UNIT_MAX_DURATION_EXCEEDED": "För lång bokningstid.",
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "Personen som gör bokningen måste vara myndig.",
       "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "Du har det maximala antalet bokningar för detta objekt.",
+      "RESERVATION_MODIFICATION_NOT_ALLOWED": "Tyvärr går det inte att ändra bokningen.",
       "USER_NOT_INTERNAL_USER": "Det är inte tillåtet att göra en bokning.",
       "generic_validation_error": "Ett fel uppstod.",
       "invalid": "Ogiltigt värde."

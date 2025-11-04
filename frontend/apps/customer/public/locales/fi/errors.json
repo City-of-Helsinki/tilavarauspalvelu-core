@@ -74,6 +74,7 @@
       "RESERVATION_UNIT_MAX_DURATION_EXCEEDED": "Liian pitkä varausaika.",
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "Varaajan on oltava täysi-ikäinen.",
       "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "Sinulla on maksimi määrä varauksia tässä kohteessa.",
+      "RESERVATION_MODIFICATION_NOT_ALLOWED": "Valitettavasti varausta ei voi muuttaa.",
       "USER_NOT_INTERNAL_USER": "Varauksen tekeminen ei ole sallittu.",
       "generic_validation_error": "Tapahtui virhe.",
       "invalid": "Virheellinen arvo."
