@@ -1,6 +1,6 @@
+import { type ParsedUrlQueryInput } from "node:querystring";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
-import { type ParsedUrlQueryInput } from "node:querystring";
 
 export function useSearchModify() {
   const router = useRouter();

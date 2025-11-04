@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { type ParsedUrlQuery } from "querystring";
 import { gql, useApolloClient } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import { type ParsedUrlQuery } from "querystring";
 import styled from "styled-components";
 import NotificationWrapper from "ui/src/components/NotificationWrapper";
 import { errorToast, successToast } from "ui/src/components/toast";
