@@ -1,6 +1,6 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { IconClock, IconEuroSign, IconLocation } from "hds-react";
+import { IconClock, IconLocation } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled, { css } from "styled-components";
@@ -13,7 +13,6 @@ import { H1 } from "ui/src/styled";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";
 import { ReservationInfoCard } from "@/components/reservation";
-import { getPrice } from "@/modules/reservationUnit";
 import { getApplicationPath, getReservationPath } from "@/modules/urls";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { type ReservationCancelPageQuery, useCancelReservationMutation } from "@gql/gql-types";
@@ -112,7 +111,6 @@ function ApplicationInfoCard({ reservation }: { reservation: CancellationProps["
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   const reservationUnitName = getTranslation(reservation.reservationUnit, "name", lang);
-  const price = getPrice(t, reservation, lang);
 
   const { dayOfWeek, time, date } = applicationReservationDateTime({ t, reservation, trailingMinutes: true });
 
@@ -124,10 +122,6 @@ function ApplicationInfoCard({ reservation }: { reservation: CancellationProps["
     {
       icon: <IconLocation aria-hidden="true" />,
       value: reservationUnitName,
-    },
-    {
-      icon: <IconEuroSign aria-hidden="true" />,
-      value: price ?? "",
     },
   ];
 
