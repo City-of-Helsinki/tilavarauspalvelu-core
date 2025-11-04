@@ -289,9 +289,6 @@ importers:
         specifier: ^4.1.12
         version: 4.1.12
     devDependencies:
-      '@graphql-tools/graphql-tag-pluck':
-        specifier: ^8.3.21
-        version: 8.3.21(graphql@16.11.0)
       '@happy-dom/jest-environment':
         specifier: ^20.0.10
         version: 20.0.10(@jest/environment@29.7.0)(@jest/fake-timers@29.7.0)(@jest/types@29.6.3)(jest-mock@29.7.0)(jest-util@29.7.0)
