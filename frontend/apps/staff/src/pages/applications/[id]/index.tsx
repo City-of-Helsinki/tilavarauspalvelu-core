@@ -27,7 +27,7 @@ import { useCheckPermission } from "@/hooks";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { getApplicantName, translateReserveeType } from "@/modules/helpers";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { formatAgeGroups, formatNumber } from "@/modules/util";
+import { formatAgeGroup, formatNumber } from "@/modules/util";
 import { ApplicationDatas, Summary } from "@/styled";
 import {
   type ApplicationAdminQuery,
@@ -398,24 +398,17 @@ function ApplicationSectionDetails({
   const beginDate = parseValidDateObject(section.reservationsBeginDate);
   const endDate = parseValidDateObject(section.reservationsEndDate);
   const dates = formatDateRange(beginDate, endDate);
-
+  const ageGroup = section.ageGroup
+    ? t("common:agesSuffix", {
+        range: trim(formatAgeGroup(section.ageGroup) || undefined, "-"),
+      })
+    : null;
   return (
     <ScrollIntoView key={section.pk} hash={hash}>
       <Accordion heading={heading} initiallyOpen>
         <Flex>
           <ApplicationDatas>
-            {section.ageGroup && (
-              <ValueBox
-                label={t("applicationSection:ageGroup")}
-                value={formatAgeGroups(
-                  {
-                    minimum: section.ageGroup.minimum,
-                    maximum: section.ageGroup.maximum ?? undefined,
-                  },
-                  t
-                )}
-              />
-            )}
+            {section.ageGroup && <ValueBox label={t("applicationSection:ageGroup")} value={ageGroup} />}
             <ValueBox
               label={t("applicationSection:groupSize")}
               value={formatNumber(section.numPersons, t("common:membersSuffix"))}

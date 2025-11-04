@@ -17,18 +17,6 @@ export const formatNumber = (input?: number | null, suffix?: string): string => 
   return `${number}${suffix || ""}`;
 };
 
-interface IAgeGroups {
-  minimum?: number;
-  maximum?: number;
-}
-
-export function formatAgeGroups(ageGroups: IAgeGroups, t: TFunction): string {
-  return t("common:agesSuffix", {
-    range: trim(`${ageGroups.minimum || ""}-${ageGroups.maximum || ""}`, "-"),
-  });
-}
-
-// TODO why have the two separate versions of this? (s)
 export function formatAgeGroup(
   group: Maybe<Pick<NonNullable<ReservationNode["ageGroup"]>, "minimum" | "maximum">> | undefined
 ): string | null {
