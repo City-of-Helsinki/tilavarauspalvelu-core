@@ -45,7 +45,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@happy-dom/jest-environment": "^20.0.0",
+    "@happy-dom/jest-environment": "^20.0.10",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
@@ -56,7 +56,7 @@
     "@types/react-dom": "^18.3.7",
     "@types/react-transition-group": "^4.4.12",
     "@vitejs/plugin-react": "^5.0.4",
-    "happy-dom": "^20.0.0",
+    "happy-dom": "^20.0.10",
     "oxlint": "^1.25.0",
     "postcss-styled-syntax": "^0.7.1",
     "prettier": "^3.6.2",
