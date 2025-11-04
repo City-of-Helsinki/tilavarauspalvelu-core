@@ -1,17 +1,9 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import {
-  IconArrowBottomRight,
-  IconCheck,
-  IconCogwheel,
-  IconCross,
-  IconLinkExternal,
-  IconQuestionCircle,
-  IconSize,
-} from "hds-react";
+import { IconLinkExternal, IconSize } from "hds-react";
 import { memoize, orderBy, uniqBy } from "lodash-es";
 import { useTranslation, type TFunction } from "next-i18next";
-import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
+import { ApplicationSectionStatusLabel } from "ui/src/components/statuses";
 import { CustomTable } from "@/components/Table";
 import { MAX_APPLICATION_ROUND_NAME_LENGTH } from "@/modules/const";
 import { getApplicantName, truncate } from "@/modules/helpers";
@@ -73,27 +65,6 @@ function sectionMapper(aes: ApplicationSectionTableElementFragment): Application
   };
 }
 
-const getStatusProps = (status?: ApplicationSectionStatusChoice): { type: StatusLabelType; icon: JSX.Element } => {
-  switch (status) {
-    case ApplicationSectionStatusChoice.Unallocated:
-      return {
-        type: "alert",
-        icon: <IconArrowBottomRight />,
-      };
-    case ApplicationSectionStatusChoice.InAllocation:
-      return { type: "info", icon: <IconCogwheel /> };
-    case ApplicationSectionStatusChoice.Handled:
-      return { type: "success", icon: <IconCheck /> };
-    case ApplicationSectionStatusChoice.Rejected:
-      return { type: "error", icon: <IconCross /> };
-    default:
-      return {
-        type: "neutral",
-        icon: <IconQuestionCircle />,
-      };
-  }
-};
-
 export const SORT_KEYS = ["application_id,pk", "applicant", "nameFi", "preferredUnitNameFi", "status"];
 
 const getColConfig = (t: TFunction) =>
@@ -145,14 +116,9 @@ const getColConfig = (t: TFunction) =>
     {
       headerTKey: "applicationSection:headings.phase",
       key: "status",
-      transform: ({ status }: { status: ApplicationSectionStatusChoice }) => {
-        const statusProps = getStatusProps(status);
-        return (
-          <StatusLabel type={statusProps.type} icon={statusProps.icon} slim>
-            {t(`translation:ApplicationSectionStatusChoice.${status}`)}
-          </StatusLabel>
-        );
-      },
+      transform: ({ status }: { status: ApplicationSectionStatusChoice }) => (
+        <ApplicationSectionStatusLabel status={status} user="admin" slim />
+      ),
     },
   ].map(({ headerTKey, key, ...col }) => ({
     ...col,

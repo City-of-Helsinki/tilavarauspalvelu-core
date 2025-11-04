@@ -37,7 +37,7 @@ export function applicationEventSchedulesToCells(
   firstSlotStart: number | undefined,
   lastSlotStart: number | undefined
 ): Cell[][] {
-  const cells = [] as Cell[][];
+  const cells: Cell[][] = [];
   if (firstSlotStart == null || lastSlotStart == null) {
     return cells;
   }

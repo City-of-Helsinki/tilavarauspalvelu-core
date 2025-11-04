@@ -28,17 +28,17 @@ function Cancel({ apiBaseUrl }: NarrowedProps): JSX.Element {
   const routes = [
     {
       slug: reservationsPrefix,
-      title: t("breadcrumb:reservations"),
+      title: t("breadcrumb:reservation"),
     },
     {
-      title: t("reservations:cancel.reservation"),
+      title: t("reservation:cancel.reservation"),
     },
   ] as const;
 
   return (
     <>
       <Breadcrumb routes={routes} />
-      <H1 $noMargin>{t("reservations:reservationCancelledTitle")}</H1>
+      <H1 $noMargin>{t("reservation:reservationCancelledTitle")}</H1>
       <CancelledLinkSet apiBaseUrl={apiBaseUrl} />
     </>
   );

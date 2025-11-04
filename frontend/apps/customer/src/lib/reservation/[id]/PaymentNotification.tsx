@@ -64,7 +64,7 @@ export const PaymentNotification = ({
   const isExpired =
     reservation.state === ReservationStateChoice.Cancelled &&
     reservation.cancelReason === ReservationCancelReasonChoice.NotPaid;
-  const translationPath = isExpired ? "reservations:paymentBanner.expired" : "reservations:paymentBanner";
+  const translationPath = isExpired ? "reservation:paymentBanner.expired" : "reservation:paymentBanner";
   const paymentUrl = getPaymentUrl(reservation, lang, apiBaseUrl);
   return (
     <Notification data-testid="reservation__payment-notification" type="alert" label={t(`${translationPath}.title`)}>
@@ -80,7 +80,7 @@ export const PaymentNotification = ({
           </div>
           {!isExpired && (
             <ButtonLikeExternalLink href={paymentUrl} disabled={!paymentUrl} variant="primary">
-              {t("reservations:payReservation")}
+              {t("reservation:payReservation")}
             </ButtonLikeExternalLink>
           )}
         </PriceDetails>

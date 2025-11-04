@@ -47,7 +47,7 @@ export function createOptionMock(
       label: `${op.minimum ?? ""}-${op.maximum ?? ""}`,
     })),
     municipalities: Object.values(MunicipalityChoice).map((value) => ({
-      label: value as string,
+      label: value.toString(),
       value: value,
     })),
   };

@@ -4,12 +4,12 @@ import { IconArrowRight, IconCalendar, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Card } from "ui/src/components";
+import { ApplicationRoundStatusLabel } from "ui/src/components/statuses";
 import { formatDateRange, parseValidDateObject } from "ui/src/modules/date-utils";
 import { Flex, fontMedium } from "ui/src/styled";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { getApplicationRoundUrl } from "@/modules/urls";
 import { type ApplicationRoundCardFragment } from "@gql/gql-types";
-import { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
 import { TimeframeStatus } from "./TimeframeStatus";
 
 const Times = styled(Flex).attrs({

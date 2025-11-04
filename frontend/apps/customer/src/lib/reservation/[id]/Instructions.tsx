@@ -24,7 +24,7 @@ export function Instructions({ reservation }: Props): JSX.Element | null {
 
   return (
     <div>
-      <H4 as="h2">{t("reservations:reservationInfo")}</H4>
+      <H4 as="h2">{t("reservation:reservationInfo")}</H4>
       <Sanitize html={instructionsText} />
     </div>
   );

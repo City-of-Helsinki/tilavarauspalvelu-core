@@ -5,10 +5,10 @@ import { trim } from "lodash-es";
 import { useTranslation } from "next-i18next";
 import { ButtonLikeExternalLink, ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import Card from "ui/src/components/Card";
+import { ReservationStatusLabel, OrderStatusLabel } from "ui/src/components/statuses";
 import { formatDateTimeRange } from "ui/src/modules/date-utils";
 import { capitalize, getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
 import { convertLanguageCode, getTranslationSafe } from "ui/src/modules/util";
-import { ReservationStatus, ReservationOrderStatus } from "@/components/reservation";
 import { getNormalizedReservationOrderStatus, getPaymentUrl, isReservationCancellable } from "@/modules/reservation";
 import { getPrice } from "@/modules/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
@@ -51,14 +51,10 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
   const tags = [];
   if (normalizedOrderStatus != null)
     tags.push(
-      <ReservationOrderStatus
-        orderStatus={normalizedOrderStatus}
-        data-testid="reservation-card__order-status"
-        key="order-status"
-      />
+      <OrderStatusLabel status={normalizedOrderStatus} testId="reservation-card__order-status" key="order-status" />
     );
   tags.push(
-    <ReservationStatus
+    <ReservationStatusLabel
       data-testid="reservation-card__status"
       state={reservation.state ?? ReservationStateChoice.Created}
       key="status"
@@ -85,7 +81,7 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
         key="cancel"
         width="full"
       >
-        {t("reservations:cancel.reservationAbbreviated")}
+        {t("reservation:cancel.reservationAbbreviated")}
         <IconCross />
       </ButtonLikeLink>
     );
@@ -107,7 +103,7 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
         key="payment"
         width="full"
       >
-        {t("reservations:payReservation")}
+        {t("reservation:payReservation")}
         <IconArrowRight />
       </ButtonLikeExternalLink>
     );

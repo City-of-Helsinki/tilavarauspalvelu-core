@@ -22,11 +22,11 @@ import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { IconButton, StatusLabel } from "ui/src/components";
+import { IconButton } from "ui/src/components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { PopupMenu } from "ui/src/components/PopupMenu";
 import { Sanitize } from "ui/src/components/Sanitize";
-import type { StatusLabelType } from "ui/src/components/StatusLabel";
+import { StatusLabel, type StatusLabelType } from "ui/src/components/StatusLabel";
 import { breakpoints } from "ui/src/modules/const";
 import { convertWeekday } from "ui/src/modules/conversion";
 import {
@@ -241,7 +241,7 @@ function formatReservationTimes(t: TFunction, aes: ApplicationSectionReservation
 
 function accessCodeSafe(pindoraInfo: PindoraSectionFragment | null, t: TFunction) {
   if (!pindoraInfo?.accessCode) {
-    return t("reservations:contactSupport");
+    return t("reservation:contactSupport");
   } else {
     return pindoraInfo.accessCode;
   }
@@ -584,6 +584,7 @@ function getReservationSeriesAccessText(reservationUnit: ReservationSeriesTableE
   }
 }
 
+type ApprovedReservationStatus = "" | "rejected" | "modified" | "cancelled";
 type ReservationsTableElem = {
   date: Date;
   dayOfWeek: string;
@@ -596,7 +597,7 @@ type ReservationsTableElem = {
   accessTypeChanged?: boolean;
   accessCodeTime?: string | null;
   pindoraInfo?: PindoraReservationFragment | null;
-  status: "" | "rejected" | "modified" | "cancelled";
+  status: ApprovedReservationStatus;
   isCancellableReason: ReservationCancellableReason;
   pk: number;
 };
@@ -656,28 +657,32 @@ const StyledStatusLabel = styled(StatusLabel)`
   }
 `;
 
-function getStatusLabelProps(status: string): {
+function getStatusLabelProps(status: ApprovedReservationStatus): {
   icon: JSX.Element;
   type: StatusLabelType;
 } {
   switch (status) {
     case "cancelled":
-      return {
-        icon: <IconCross />,
-        type: "neutral",
-      };
+      return { icon: <IconCross />, type: "neutral" };
     case "modified":
-      return {
-        icon: <IconPen />,
-        type: "neutral",
-      };
-    case "denied":
+      return { icon: <IconPen />, type: "neutral" };
+    case "rejected":
     default:
-      return {
-        icon: <IconCross />,
-        type: "error",
-      };
+      return { icon: <IconCross />, type: "error" };
   }
+}
+
+function ApprovedReservationStatus({ status }: { status: ApprovedReservationStatus }): React.ReactElement | undefined {
+  const { t } = useTranslation();
+  if (status === "") {
+    return undefined;
+  }
+  const labelProps = getStatusLabelProps(status);
+  return (
+    <StyledStatusLabel icon={labelProps.icon} type={labelProps.type}>
+      {t(`application:view.reservationsTab.${status}`)}
+    </StyledStatusLabel>
+  );
 }
 
 const StyledTooltip = styled(Tooltip)`
@@ -751,7 +756,7 @@ function ReservationsTable({
           <OnlyForMobile>{dayOfWeek}</OnlyForMobile>
           {time}
           {accessCodeTime && time !== accessCodeTime && (
-            <StyledTooltip>{`${t("reservations:accessCodeDuration")}: ${accessCodeTime}`}</StyledTooltip>
+            <StyledTooltip>{`${t("reservation:accessCodeDuration")}: ${accessCodeTime}`}</StyledTooltip>
           )}
         </IconTextWrapper>
       ),
@@ -781,7 +786,7 @@ function ReservationsTable({
         return (
           <IconTextWrapper>
             {t(`reservationUnit:accessTypes.${elem.accessType}`)}
-            {elem.accessTypeChanged && <StyledTooltip>{t("reservations:accessTypeChanged")}</StyledTooltip>}
+            {elem.accessTypeChanged && <StyledTooltip>{t("reservation:accessTypeChanged")}</StyledTooltip>}
           </IconTextWrapper>
         );
       },
@@ -790,17 +795,7 @@ function ReservationsTable({
       key: "status",
       headerName: "",
       isSortable: false,
-      transform: ({ status }: ReservationsTableElem) => {
-        if (status === "") {
-          return "";
-        }
-        const labelProps = getStatusLabelProps(status);
-        return (
-          <StyledStatusLabel icon={labelProps.icon} type={labelProps.type}>
-            {t(`application:view.reservationsTab.${status}`)}
-          </StyledStatusLabel>
-        );
-      },
+      transform: ({ status }: ReservationsTableElem) => <ApprovedReservationStatus status={status} />,
     },
     {
       key: "cancelButton",
@@ -814,7 +809,7 @@ function ReservationsTable({
           onClick={() => handleCancel(pk)}
           disabled={isCancellableReason !== ""}
           title={
-            isCancellableReason === "" ? t("common:cancel") : t(`reservations:modifyTimeReasons.${isCancellableReason}`)
+            isCancellableReason === "" ? t("common:cancel") : t(`reservation:modifyTimeReasons.${isCancellableReason}`)
           }
           // Corresponding mobile menu is on the first row
           className="hide-on-mobile"

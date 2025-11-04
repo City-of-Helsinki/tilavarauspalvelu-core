@@ -57,7 +57,7 @@ export function getFilterOptions(
 
   const orderStatus = Object.values(OrderStatusWithFree).map((s) => ({
     value: s,
-    label: t(`translation:orderStatus.${s}`),
+    label: t(`reservation:orderStatus.${s}`),
   }));
 
   const reservationTypeChoices = Object.values(ReservationTypeChoice).map((s) => ({
