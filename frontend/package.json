@@ -43,7 +43,7 @@
     "npkill": "^0.12.2",
     "oxlint": "^1.25.0",
     "ts-node": "^10.9.2",
-    "turbo": "^2.5.8"
+    "turbo": "^2.6.0"
   },
   "packageManager": "pnpm@10.20.0"
 }
