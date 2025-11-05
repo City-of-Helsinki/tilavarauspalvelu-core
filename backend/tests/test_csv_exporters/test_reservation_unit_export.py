@@ -105,6 +105,7 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.pricings.first().tax_percentage
     assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_begins_at)
     assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_ends_at)
+    assert row_2[next(index)] == reservation_unit_1.reservation_form
     assert row_2[next(index)] == reservation_unit_1.metadata_set.name
     assert row_2[next(index)] == reservation_unit_1.require_reservation_handling
     assert row_2[next(index)] == AuthenticationType(reservation_unit_1.authentication).label

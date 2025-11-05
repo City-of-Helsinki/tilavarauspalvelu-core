@@ -63,6 +63,7 @@ class ReservationUnitExportRow(BaseExportRow):
     tax_percentage: str = ""
     reservation_begins_at: str = ""
     reservation_ends_at: str = ""
+    reservation_form: str = ""
     reservation_metadata_set: str = ""
     require_a_handling: str | bool = ""
     authentication: str = ""
@@ -183,6 +184,7 @@ class ReservationUnitExporter(BaseCSVExporter):
                 tax_percentage="Tax percentage",
                 reservation_begins_at="Reservation begins",
                 reservation_ends_at="Reservation ends",
+                reservation_form="Reservation form",
                 reservation_metadata_set="Reservation metadata set",
                 require_a_handling="Require a handling",
                 authentication="Authentication",
@@ -281,6 +283,7 @@ class ReservationUnitExporter(BaseCSVExporter):
                 tax_percentage=getattr(pricing, "tax_percentage", ""),
                 reservation_begins_at=self.format_datetime(instance.reservation_begins_at),
                 reservation_ends_at=self.format_datetime(instance.reservation_ends_at),
+                reservation_form=getattr(instance, "reservation_form", ""),
                 reservation_metadata_set=getattr(instance.metadata_set, "name", ""),
                 require_a_handling=instance.require_reservation_handling,
                 authentication=str(AuthenticationType(instance.authentication).label),
