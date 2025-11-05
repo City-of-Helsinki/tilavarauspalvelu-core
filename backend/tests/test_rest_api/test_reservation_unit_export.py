@@ -81,6 +81,7 @@ def test_reservation_unit_export(api_client, settings):
         "require_a_handling",
         "reservation_begins_at",
         "reservation_ends_at",
+        "reservation_form",
         "reservation_kind",
         "reservation_metadata_set",
         "reservation_start_interval",
