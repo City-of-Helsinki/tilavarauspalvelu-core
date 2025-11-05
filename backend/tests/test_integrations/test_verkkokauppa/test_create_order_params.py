@@ -61,7 +61,10 @@ def test_get_verkkokauppa_order_params__to_json():
 
     assert len(json["items"]) == 1
     assert json["items"][0]["productId"] == str(reservation.reservation_unit.payment_product.id)
-    assert json["items"][0]["productName"] == reservation.reservation_unit.name_fi
+    assert (
+        json["items"][0]["productName"]
+        == f"{reservation.reservation_unit.name_fi}, {reservation.reservation_unit.unit.name_fi}"
+    )
     assert json["items"][0]["quantity"] == 1
     assert json["items"][0]["unit"] == "pcs"
     assert json["items"][0]["rowPriceNet"] == "10.12"

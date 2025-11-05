@@ -46,6 +46,9 @@ def test_get_verkkokauppa_order_params__respect_reservee_language():
         name_fi="Nimi",
         name_en="Name",
         name_sv="Namn",
+        unit__name_fi="NIMI",
+        unit__name_en="NAME",
+        unit__name_sv="NAMN",
     )
 
     reservation_en = ReservationFactory.create(
@@ -54,7 +57,7 @@ def test_get_verkkokauppa_order_params__respect_reservee_language():
         reservee_type=ReserveeType.INDIVIDUAL,
     )
     order_params = get_verkkokauppa_order_params(reservation_en)
-    assert order_params.items[0].product_name == "Name"
+    assert order_params.items[0].product_name == "Name, NAME"
 
     reservation_sv = ReservationFactory.create(
         reservation_unit=reservation_unit,
@@ -62,7 +65,7 @@ def test_get_verkkokauppa_order_params__respect_reservee_language():
         reservee_type=ReserveeType.INDIVIDUAL,
     )
     order_params = get_verkkokauppa_order_params(reservation_sv)
-    assert order_params.items[0].product_name == "Namn"
+    assert order_params.items[0].product_name == "Namn, NAMN"
 
 
 def test_get_meta_label():

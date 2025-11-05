@@ -76,10 +76,12 @@ def get_verkkokauppa_order_params(
 ) -> CreateOrderParams:
     reservation_unit: ReservationUnit = reservation.reservation_unit
     preferred_language = reservation.user.get_preferred_language()
+    reservation_unit_name = getattr(reservation_unit, f"name_{preferred_language}", reservation_unit.name)
+    unit_name = getattr(reservation_unit.unit, f"name_{preferred_language}", reservation_unit.unit.name)
     items = [
         OrderItemParams(
             product_id=reservation_unit.payment_product.id,
-            product_name=getattr(reservation_unit, f"name_{preferred_language}", reservation_unit.name),
+            product_name=f"{reservation_unit_name}, {unit_name}",
             quantity=1,  # Currently, we don't support quantities larger than 1
             unit="pcs",
             row_price_net=reservation.price_net,
