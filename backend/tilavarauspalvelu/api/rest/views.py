@@ -504,7 +504,6 @@ def redirect_to_hauki(request: WSGIRequest) -> HttpResponseRedirect:
 
     existing_pks = {reservation_unit.pk for reservation_unit in reservation_units}
     missing_pks = set(given_pks) - existing_pks
-
     if missing_pks:
         msg = f"Some of the reservation units could not be found: {comma_sep_str(sorted(missing_pks))}"
         raise ValidationError(msg, code="HAUKI_INVALID_RESERVATION_UNITS")
@@ -512,15 +511,11 @@ def redirect_to_hauki(request: WSGIRequest) -> HttpResponseRedirect:
     # At this point we should have at least one reservation unit.
     # Always use the first one given by frontend as the primary reservation unit.
     primary = reservation_units[0]
-
     if primary.unit.tprek_department_id is None:
         msg = f"Primary reservation unit '{primary.ext_uuid}' department ID is missing"
         raise ValidationError(msg, code="HAUKI_DEPARTMENT_ID_MISSING")
 
-    target_resources: list[uuid.UUID] = []
-
-    # Don't include the primary reservation unit in the target resources.
-    for reservation_unit in reservation_units[1:]:
+    for reservation_unit in reservation_units:
         if reservation_unit.origin_hauki_resource is None:
             msg = f"Reservation unit '{reservation_unit.ext_uuid}' is not linked to a Hauki resource"
             raise ValidationError(msg, code="HAUKI_RESOURCE_NOT_LINKED")
@@ -529,7 +524,8 @@ def redirect_to_hauki(request: WSGIRequest) -> HttpResponseRedirect:
             msg = f"User does not have permission to manage reservation unit '{reservation_unit.ext_uuid}'"
             raise ValidationError(msg, code="HAUKI_PERMISSIONS_DENIED")
 
-        target_resources.append(reservation_unit.ext_uuid)
+    # Don't include the primary reservation unit in the target resources.
+    target_resources: list[uuid.UUID] = [reservation_unit.ext_uuid for reservation_unit in reservation_units[1:]]
 
     hauki_url = generate_hauki_link(
         reservation_unit_uuid=primary.ext_uuid,
