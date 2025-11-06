@@ -6,9 +6,11 @@ import { Button, ButtonVariant, IconArrowRight, IconCross, LoadingSpinner } from
 import { Trans, useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
+import { ReservationStateChoice } from "ui/gql/gql-types";
 import { ErrorListBox } from "@ui/components/ErrorListBox";
 import { useDisplayError } from "@ui/hooks";
 import { isNotFoundError } from "@ui/modules/apolloUtils";
+import { transformMunicipality } from "@ui/modules/conversion";
 import { getLocalizationLang } from "@ui/modules/helpers";
 import { getTranslationSafe } from "@ui/modules/util";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/reservation-form";
@@ -117,11 +119,13 @@ export function ReservationStep0({ reservation, cancelReservation, options }: Pr
       input.description = d.description;
       input.numPersons = d.numPersons;
       input.reserveeOrganisationName = d.reserveeOrganisationName;
-      input.municipality = d.municipality;
       input.reserveeType = d.reserveeType;
     }
     if ("ageGroup" in rest && typeof rest.ageGroup === "number") {
       input.ageGroup = rest.ageGroup;
+    }
+    if ("municipality" in rest && typeof rest.municipality === "string") {
+      input.municipality = transformMunicipality(rest.municipality);
     }
     if ("name" in rest && typeof rest.name === "string") {
       input.name = rest.name;
@@ -141,7 +145,7 @@ export function ReservationStep0({ reservation, cancelReservation, options }: Pr
           input,
         },
       });
-      if (data?.updateReservation?.state === "CANCELLED") {
+      if (data?.updateReservation?.state === ReservationStateChoice.Cancelled) {
         await router.push(getReservationUnitPath(reservation.reservationUnit.pk));
       } else {
         await router.push(getReservationInProgressPath(reservation.reservationUnit.pk, reservation.pk, 1));
