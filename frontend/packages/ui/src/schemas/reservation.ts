@@ -170,16 +170,20 @@ const ContactInfoFormSchema = z.object({
 type SchemaParams = {
   minPersons: number;
   maxPersons: number;
+  numPersonsRequired: boolean;
 };
 
 const ReserveeInfoFormSchema = (params: SchemaParams) =>
   z
     .object({
       reserveeType: z.enum(ReserveeType, { error: "Required" }),
-      name: z.string(), // not mandatory
       description: z.string().min(3, "Required"),
-      municipality: z.enum(MunicipalityChoice, { error: "Required" }),
-      numPersons: z.number().min(params.minPersons, "Too small").max(params.maxPersons, "Too large"),
+      numPersons: z
+        .number()
+        .min(params.minPersons, "Too small")
+        .max(params.maxPersons, "Too large")
+        .optional()
+        .refine((x) => x != null || !params.numPersonsRequired, { message: "Required" }),
       // these are only required for organisations
       reserveeIdentifier: z.string(),
       reserveeIsUnregisteredAssociation: z.boolean(),
@@ -191,6 +195,7 @@ const PurposeFormSchema = (params: SchemaParams) =>
   z
     .object({
       purpose: z.number().min(1),
+      municipality: z.enum(MunicipalityChoice, { error: "Required" }),
       name: z.string(), // not mandatory
     })
     .extend(ReserveeInfoFormSchema(params).shape);
@@ -206,7 +211,9 @@ const PkSchema = z.object({
   pk: z.number(),
 });
 // NOTE min / max don't matter for types
-const PartialFormSchema = AgeGroupFormSchema({ minPersons: 1, maxPersons: 2 }).partial().extend(PkSchema.shape);
+const PartialFormSchema = AgeGroupFormSchema({ minPersons: 1, maxPersons: 2, numPersonsRequired: false })
+  .partial()
+  .extend(PkSchema.shape);
 export type ReservationFormValueT = z.infer<typeof PartialFormSchema>;
 
 export function getReservationSchemaBase(formType: ReservationFormType) {
@@ -222,20 +229,32 @@ export function getReservationSchemaBase(formType: ReservationFormType) {
   }
 }
 
+export function isNumPersonsRequired(reservationForm: ReservationFormType): boolean {
+  switch (reservationForm) {
+    case ReservationFormType.ContactInfoForm:
+    case ReservationFormType.ReserveeInfoForm:
+      return false;
+    case ReservationFormType.PurposeForm:
+    case ReservationFormType.AgeGroupForm:
+      return true;
+  }
+}
+
 /// The single source of truth for the form fields used by a form type.
 /// only for internal use (type / refinements)
 /// this returns incorrect schema for ContactInfo, but makes schema refinement possible
 function getReservationSchemaUnrefined(reservationUnit: ReservationUnitForRefinement) {
   const maxPersons = reservationUnit.maxPersons ?? Infinity;
   const minPersons = reservationUnit.minPersons ?? 1;
+  const numPersonsRequired = isNumPersonsRequired(reservationUnit.reservationForm);
   switch (reservationUnit.reservationForm) {
     case ReservationFormType.ContactInfoForm:
     case ReservationFormType.ReserveeInfoForm:
-      return ReserveeInfoFormSchema({ maxPersons, minPersons });
+      return ReserveeInfoFormSchema({ maxPersons, minPersons, numPersonsRequired });
     case ReservationFormType.PurposeForm:
-      return PurposeFormSchema({ maxPersons, minPersons });
+      return PurposeFormSchema({ maxPersons, minPersons, numPersonsRequired });
     case ReservationFormType.AgeGroupForm:
-      return AgeGroupFormSchema({ maxPersons, minPersons });
+      return AgeGroupFormSchema({ maxPersons, minPersons, numPersonsRequired });
   }
 }
 

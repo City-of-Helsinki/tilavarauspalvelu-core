@@ -4,7 +4,7 @@ import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ControlledCheckbox, ControlledNumberInput, ControlledSelect } from "@ui/components/form";
-import { type ReservationFormValueT } from "@ui/schemas";
+import { isNumPersonsRequired, type ReservationFormValueT } from "@ui/schemas";
 import { AutoGrid, H4, H5 } from "@ui/styled";
 import type { OptionsRecord } from "@ui/types";
 import { MunicipalityChoice, type ReservationUnitNode, ReserveeType } from "../../gql/gql-types";
@@ -90,6 +90,8 @@ export function ReservationFormGeneralSection({
   const hasDescription = fields.find((x) => x === "description") != null;
   const hasNumPersons = fields.find((x) => x === "numPersons") != null;
 
+  const numPersonRequired = isNumPersonsRequired(reservationUnit.reservationForm);
+
   return (
     <AutoGrid>
       <Subheading>{t("reservationCalendar:reservationInfo")}</Subheading>
@@ -125,8 +127,9 @@ export function ReservationFormGeneralSection({
           control={control}
           label={createLabel("numPersons")}
           errorText={getFieldError("numPersons")}
-          required
-          min={1}
+          required={numPersonRequired}
+          min={reservationUnit.minPersons ?? 1}
+          max={reservationUnit.maxPersons ?? undefined}
         />
       )}
       {hasAgeGroup && (
