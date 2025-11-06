@@ -22,7 +22,7 @@
       "applyingForFreeOfChargeButton": "Check discount groups <button>here</button>.",
       "applyingForFreeOfCharge": "I apply for a reduced fee and I have familiarised myself with the discount groups.",
       "freeOfChargeReason": "Justification",
-      "reserveeType": "Applicant type"
+      "reserveeType": "Reservee type"
     },
     "nonprofit": {
       "reserveeFirstName": "Contact person’s first name",
