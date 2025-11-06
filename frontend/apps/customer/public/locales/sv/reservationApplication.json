@@ -4,7 +4,7 @@
   "applicationInfo": "Uppgifter om bokningen",
   "summaryIngress": "Din bokning behandlas. Se bokningsöversikten.",
   "reserveeTypePrefix": "Jag gör bokningen...",
-  "reserveeType": "Varaajan tyyppi",
+  "reserveeType": "Typ av sökande",
   "reserveeTypes": {
     "labels": {
       "NONPROFIT": "För en organisation, grupp eller samfund",
