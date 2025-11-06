@@ -295,11 +295,15 @@ def test_query_current_user__unit_admin__unit_group(graphql):
 def test_query_current_user__unit_admin__multiple_roles(graphql):
     unit_1 = UnitFactory.create()
     unit_2 = UnitFactory.create()
+    unit_3 = UnitFactory.create()
+    unit_group = UnitGroupFactory.create(units=[unit_2, unit_3])
 
     user = UserFactory.create()
 
-    unit_role_1 = UnitRoleFactory.create(user=user, role=UserRoleChoice.RESERVER, units=[unit_1])
-    unit_role_2 = UnitRoleFactory.create(user=user, role=UserRoleChoice.VIEWER, units=[unit_2])
+    UnitRoleFactory.create(user=user, role=UserRoleChoice.RESERVER, units=[unit_1])
+    UnitRoleFactory.create(user=user, role=UserRoleChoice.VIEWER, units=[unit_1, unit_2])
+    UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, units=[unit_2])
+    UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, unit_groups=[unit_group])
 
     graphql.force_login(user)
 
@@ -308,6 +312,9 @@ def test_query_current_user__unit_admin__multiple_roles(graphql):
         unitRoles {
             role
             units {
+                pk
+            }
+            unitGroups {
                 pk
             }
             permissions
@@ -321,24 +328,39 @@ def test_query_current_user__unit_admin__multiple_roles(graphql):
         "pk": user.pk,
         "unitRoles": [
             {
-                "role": unit_role_1.role,
+                "role": "RESERVER",
                 "units": [
-                    {
-                        "pk": unit_1.pk,
-                    },
+                    {"pk": unit_1.pk},
                 ],
+                "unitGroups": [],
                 "permissions": [
                     "CAN_CREATE_STAFF_RESERVATIONS",
                 ],
             },
             {
-                "role": unit_role_2.role,
+                "role": "VIEWER",
                 "units": [
-                    {
-                        "pk": unit_2.pk,
-                    },
+                    {"pk": unit_1.pk},
+                    {"pk": unit_2.pk},
+                ],
+                "unitGroups": [],
+                "permissions": [
+                    "CAN_VIEW_RESERVATIONS",
+                ],
+            },
+            {
+                "role": "HANDLER",
+                "units": [
+                    {"pk": unit_2.pk},
+                ],
+                "unitGroups": [
+                    {"pk": unit_group.pk},
                 ],
                 "permissions": [
+                    "CAN_CREATE_STAFF_RESERVATIONS",
+                    "CAN_MANAGE_APPLICATIONS",
+                    "CAN_MANAGE_RESERVATIONS",
+                    "CAN_VIEW_APPLICATIONS",
                     "CAN_VIEW_RESERVATIONS",
                 ],
             },
@@ -411,9 +433,7 @@ def test_query_current_user__inactive_unit_roles(graphql):
             {
                 "role": unit_role.role,
                 "units": [
-                    {
-                        "pk": unit_1.pk,
-                    },
+                    {"pk": unit_1.pk},
                 ],
                 "permissions": [
                     "CAN_CREATE_STAFF_RESERVATIONS",

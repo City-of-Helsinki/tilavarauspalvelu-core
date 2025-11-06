@@ -120,7 +120,15 @@ class User(AbstractUser):
 
     @property
     def active_unit_roles(self) -> dict[int, list[UserRoleChoice]]:
-        """Get unit roles by unit id for the user."""
+        """
+        Get unit roles by unit id for the user.
+
+        Output format:
+        {
+            1: [UserRoleChoice.RESERVER, UserRoleChoice.VIEWER],
+            2: [UserRoleChoice.HANDLER],
+        }
+        """
         if hasattr(self, "_unit_roles"):
             return self._unit_roles
         self._calculate_active_unit_roles()
@@ -140,7 +148,15 @@ class User(AbstractUser):
 
     @property
     def active_unit_group_roles(self) -> dict[int, list[UserRoleChoice]]:
-        """Get unit roles by unit group id for the user."""
+        """
+        Get unit roles by unit group id for the user.
+
+        Output format:
+        {
+            1: [UserRoleChoice.RESERVER, UserRoleChoice.VIEWER],
+            2: [UserRoleChoice.HANDLER],
+        }
+        """
         if hasattr(self, "_unit_group_roles"):
             return self._unit_group_roles
         self._calculate_active_unit_roles()

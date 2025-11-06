@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from itertools import chain
 from typing import TYPE_CHECKING
 
 import graphene
@@ -71,13 +72,11 @@ class UnitRoleNode(DjangoNode):
         if user.is_anonymous or not user.is_active:
             return []
 
-        permissions: list[UserPermissionChoice] = []
-        for unit in root.units.all():
-            permissions += user.active_unit_permissions.get(unit.pk, [])
-        for unit_group in root.unit_groups.all():
-            permissions += user.active_unit_group_permissions.get(unit_group.pk, [])
+        # If user has this role in any of their active unit or unit group roles, return permissions for the role
+        if root.role in chain(*user.active_unit_roles.values(), *user.active_unit_group_roles.values()):
+            return sorted(root.role.permissions)
 
-        return sorted(set(permissions))
+        return []
 
     @staticmethod
     def optimize_permissions(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
