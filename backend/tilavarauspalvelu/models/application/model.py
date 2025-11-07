@@ -59,7 +59,7 @@ class Application(SerializableModelMixin, models.Model):
     # Contact person data
     contact_person_first_name: str = models.CharField(max_length=255, blank=True, default="")
     contact_person_last_name: str = models.CharField(max_length=255, blank=True, default="")
-    contact_person_email: str | None = models.EmailField(null=True, blank=True)
+    contact_person_email: str | None = models.EmailField(null=True, blank=True)  # noqa: DJ001
     contact_person_phone_number: str = models.CharField(max_length=255, blank=True, default="")
 
     # Billing address
@@ -69,7 +69,7 @@ class Application(SerializableModelMixin, models.Model):
 
     # Organisation data
     organisation_name: str = models.CharField(max_length=255, blank=True, default="")
-    organisation_email: str | None = models.EmailField(null=True, blank=True)
+    organisation_email: str | None = models.EmailField(null=True, blank=True)  # noqa: DJ001
     organisation_identifier: str = models.CharField(max_length=255, blank=True, default="")
     organisation_year_established: int | None = models.PositiveIntegerField(null=True, blank=True)
     organisation_active_members: int | None = models.PositiveIntegerField(null=True, blank=True)

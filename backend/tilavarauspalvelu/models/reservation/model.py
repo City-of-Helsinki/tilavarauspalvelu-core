@@ -113,7 +113,7 @@ class Reservation(SerializableModelMixin, models.Model):
     reservee_identifier: str = models.CharField(max_length=255, blank=True, default="")
     reservee_first_name: str = models.CharField(max_length=255, blank=True, default="")
     reservee_last_name: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_email: str | None = models.EmailField(null=True, blank=True)
+    reservee_email: str | None = models.EmailField(null=True, blank=True)  # noqa: DJ001
     reservee_phone: str = models.CharField(max_length=255, blank=True, default="")
     reservee_organisation_name: str = models.CharField(max_length=255, blank=True, default="")
     reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")

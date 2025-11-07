@@ -40,7 +40,7 @@ class Unit(models.Model):
     rank: int = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
 
     tprek_id: str | None = models.CharField(max_length=255, unique=True, blank=True, null=True)
-    tprek_department_id: str | None = models.CharField(max_length=255, blank=True, null=True)
+    tprek_department_id: str | None = models.CharField(max_length=255, blank=True, null=True)  # noqa: DJ001
     tprek_last_modified: datetime.datetime | None = models.DateTimeField(blank=True, null=True)
 
     name: str = models.CharField(max_length=255)

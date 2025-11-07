@@ -29,7 +29,7 @@ __all__ = [
 
 class TermsOfUse(models.Model):
     id: str = models.CharField(primary_key=True, max_length=100)
-    name: str | None = models.CharField(max_length=255, null=True, blank=True)
+    name: str | None = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
 
     text: str = Nh3Field(
         tags=settings.NH3_ALLOWED_TAGS,

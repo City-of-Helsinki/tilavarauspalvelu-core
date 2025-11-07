@@ -36,7 +36,7 @@ class ReservationStatistic(models.Model):
 
     num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
     state: str = models.CharField(max_length=255)
-    reservation_type: str | None = models.CharField(max_length=255, null=True, blank=True)
+    reservation_type: str | None = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
 
     begin: datetime.datetime = models.DateTimeField()
     end: datetime.datetime = models.DateTimeField()
@@ -59,7 +59,7 @@ class ReservationStatistic(models.Model):
     reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")
     reservee_is_unregistered_association: bool = models.BooleanField(null=True, default=False, blank=True)
     reservee_language: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_type: str | None = models.CharField(max_length=255, null=True, blank=True)
+    reservee_type: str | None = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
 
     # Access type information
 
@@ -70,7 +70,7 @@ class ReservationStatistic(models.Model):
 
     primary_reservation_unit: int | None = models.BigIntegerField(null=True, blank=True)
     primary_reservation_unit_name: str = models.CharField(max_length=255)
-    primary_unit_tprek_id: str | None = models.CharField(max_length=255, null=True, blank=True)
+    primary_unit_tprek_id: str | None = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
     primary_unit_name: str = models.CharField(max_length=255)
 
     deny_reason: int | None = models.BigIntegerField(null=True, blank=True)
