@@ -204,6 +204,9 @@ export function ReservationFormReserveeSection({
   const organisationOnlySet = new Set(["reserveeIdentifier", "reserveeOrganisationName"]);
   const organisationFields = fields.filter((x) => organisationOnlySet.has(x));
   const otherFields = fields.filter((x) => !organisationOnlySet.has(x));
+  const showMunicipality = otherFields.find((x) => x === "municipality") != null;
+  // default to non orgs (e.g. if no reserveeType is selected)
+  const isOrganisation = reserveeType === ReserveeType.Nonprofit || reserveeType === ReserveeType.Company;
 
   return (
     <AutoGrid data-testid="reservation__form--reservee-info" className={className} style={style}>
@@ -216,19 +219,20 @@ export function ReservationFormReserveeSection({
       ) : reserveeType === ReserveeType.Company ? (
         <GroupHeading>{t("reservationApplication:label.headings.companyInfo")}</GroupHeading>
       ) : null}
-      {/* TODO propably best to separate the organisation part of the form to it's own section */}
-      {reserveeType != null && reserveeType !== ReserveeType.Individual ? (
+      {reserveeType != null && isOrganisation ? (
         <>
-          <ControlledSelect
-            name="municipality"
-            id={constructReservationFieldId("municipality")}
-            label={createLabel("municipality")}
-            error={getFieldError("municipality")}
-            control={control}
-            required
-            options={municipalityOptions}
-            strongLabel
-          />
+          {showMunicipality && (
+            <ControlledSelect
+              name="municipality"
+              id={constructReservationFieldId("municipality")}
+              label={createLabel("municipality")}
+              error={getFieldError("municipality")}
+              control={control}
+              required
+              options={municipalityOptions}
+              strongLabel
+            />
+          )}
           {organisationFields.map((field) => (
             <Fragment key={`key-${field}-container`}>
               <ReservationFormField field={field} reserveeType={reserveeType} form={form} />
@@ -253,20 +257,18 @@ export function ReservationFormReserveeSection({
           <ReservationFormField field={field} reserveeType={reserveeType} form={form} />
         </Fragment>
       ))}
-      {otherFields.find((x) => x === "municipality") != null &&
-        reserveeType !== ReserveeType.Company &&
-        reserveeType !== ReserveeType.Nonprofit && (
-          <ControlledSelect
-            name="municipality"
-            id={constructReservationFieldId("municipality")}
-            label={createLabel("municipality")}
-            error={getFieldError("municipality")}
-            control={control}
-            required
-            options={municipalityOptions}
-            strongLabel
-          />
-        )}
+      {showMunicipality && !isOrganisation && (
+        <ControlledSelect
+          name="municipality"
+          id={constructReservationFieldId("municipality")}
+          label={createLabel("municipality")}
+          error={getFieldError("municipality")}
+          control={control}
+          required
+          options={municipalityOptions}
+          strongLabel
+        />
+      )}
     </AutoGrid>
   );
 }
