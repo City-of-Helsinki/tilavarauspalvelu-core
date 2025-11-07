@@ -73,7 +73,7 @@ class ReservationSeriesFilterSet(ModelFilterSet):
 
         query = Q()
         for word in words:
-            word = word.strip()
+            word = word.strip()  # noqa: PLW2901
             if language == "en":
                 query |= Q(reservation_unit__name_en__istartswith=word)
             elif language == "sv":

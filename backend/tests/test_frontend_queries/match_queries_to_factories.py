@@ -265,7 +265,7 @@ def ensure_same_pks_and_ids(args: dict[str, Any]) -> None:
 
         if key.endswith("__pk"):
             common = key.removesuffix("__pk")
-            key = f"{common}__id"
+            key = f"{common}__id"  # noqa: PLW2901
             if key in args:
                 args[key] = value
 

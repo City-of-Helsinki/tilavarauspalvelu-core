@@ -310,9 +310,6 @@ def build_search(text: str, *, separator: Literal["|", "&", "<->"] = "|") -> str
 
     Ref. https://www.postgresql.org/docs/current/datatype-textsearch.html#DATATYPE-TSQUERY
     """
-    search_terms: list[str] = []
-    for value in text.replace("'", " ").replace("-", " ").split(" "):
-        if value:
-            value = f"'{value}':*"
-            search_terms.append(value)
+    text = text.replace("'", " ").replace("-", " ")
+    search_terms: list[str] = [f"'{value}':*" for value in text.split(" ") if value]
     return f" {separator} ".join(search_terms)

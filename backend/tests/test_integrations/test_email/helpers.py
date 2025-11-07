@@ -27,9 +27,7 @@ def html_email_to_text(html_content: str) -> str:
     previous_was_linebreak: bool = False
     for row in converted_text.split("\n"):
         # Remove unnecessary markup.
-        row = row.replace("|", "")
-        row = row.replace("---", "")
-        row = row.strip()
+        row = row.replace("|", "").replace("---", "").strip()  # noqa: PLW2901
 
         # Remove multiple empty lines (leave the first one)
         if not row:

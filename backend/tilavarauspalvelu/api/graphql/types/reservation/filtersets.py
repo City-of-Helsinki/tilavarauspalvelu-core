@@ -157,7 +157,7 @@ class ReservationFilterSet(ModelFilterSet):
         words = value.split(",")
         q = Q()
         for word in words:
-            word = word.strip()
+            word = word.strip()  # noqa: PLW2901
             if language == "en":
                 q |= Q(reservation_unit__name_en__istartswith=word)
             elif language == "sv":

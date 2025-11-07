@@ -22,9 +22,9 @@ def merge_overlapping_time_span_elements(*time_span_lists: Iterable[TimeSpanElem
     # Go thought the list of timespans, merging any timespans whose
     # unbuffered times overlap with each other.
     merged_time_span_elements: list[TimeSpanElement] = [copy(ts) for ts in time_span_elements[:1]]
-    for current in time_span_elements[1:]:
+    for _current in time_span_elements[1:]:
         # Must make copies of all timespans since this algorithm modifies the timespans.
-        current = copy(current)
+        current = copy(_current)
         # Current time span's unbuffered time can overlap only with the previous timespan,
         # since all previous overlapping time spans will have been merged.
         previous = merged_time_span_elements[-1]
