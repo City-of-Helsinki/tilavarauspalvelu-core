@@ -170,16 +170,13 @@ extend-select = [
     "FURB110",  # if-exp-instead-of-or-operator
     "FURB113",  # repeated-append
     "FURB131",  # delete-full-slice
-    "FURB132",  # check-and-remove-from-set
     "FURB142",  # for-loop-set-mutations
     "FURB145",  # slice-copy
     "FURB148",  # unnecessary-enumerate
-    "FURB157",  # verbose-decimal-constructor
     "FURB171",  # single-item-membership-test
     "FURB189",  # subclass-builtin
     "FURB192",  # sorted-min-max
     "LOG004",   # log-exception-outside-except-handler
-    "LOG014",   # exc-info-outside-except-handler
     "PLC1901",  # compare-to-empty-string
     "PLC2701",  # import-private-name
     "PLC2801",  # unnecessary-dunder-call
@@ -189,45 +186,28 @@ extend-select = [
     "PLR0916",  # too-many-boolean-expressions
     "PLR0917",  # too-many-positional-arguments
     "PLR1702",  # too-many-nested-blocks
-    "PLR1733",  # unnecessary-dict-index-lookup
     "PLR6104",  # non-augmented-assignment
     "PLR6201",  # literal-membership
     "PLW0108",  # unnecessary-lambda
     "PLW1514",  # unspecified-encoding
-    "PLW1641",  # eq-without-hash (NOTE: Does not check for __hash__ implementations in superclasses.)
-    "PT028",    # pytest-parameter-with-default-argument
     "RUF027",   # missing-f-string-syntax
-    "RUF028",   # invalid-formatter-suppression-comment
     "RUF031",   # incorrectly-parenthesized-tuple-in-subscript
     "RUF036",   # none-not-at-end-of-union
     "RUF045",   # implicit-class-var-in-dataclass
     "RUF047",   # needless-else
-    "RUF053",   # class-with-mixed-type-vars
     "RUF055",   # unnecessary-regular-expression
     "RUF056",   # falsy-dict-get-fallback
-    "RUF057",   # unnecessary-round
-    "RUF059",   # unused-unpacked-variable
     "RUF060",   # in-empty-collection
     "RUF102",   # invalid-rule-code
     "TC008",    # quoted-type-alias
     "UP042",    # replace-str-enum
-    "UP045",    # non-pep604-annotation-optional
-    "UP046",    # non-pep695-generic-class
-    "UP047",    # non-pep695-generic-function
-    "UP049",    # private-type-parameter
 ]
 ignore = [
-    # Conflicting with ruff-format
-    "ISC001",   # single-line-implicit-string-concatenation
-
-    # Code style preference
+    # Conflicting with ruff-format, code style preference
     "COM812",   # missing-trailing-comma
 
     # No need to annotate mutable class variables with `typing.ClassVar`
     "RUF012",   # mutable-class-default
-
-    # Allow longer error messages in raised exceptions
-    "TRY003",   # raise-vanilla-args
 
     # Any-typing allowed
     "ANN401",   # any-type
