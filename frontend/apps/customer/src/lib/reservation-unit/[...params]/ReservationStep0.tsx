@@ -114,8 +114,10 @@ export function ReservationStep0({ reservation, cancelReservation, options }: Pr
 
     if ("reserveeIdentifier" in rest) {
       const { reserveeIsUnregisteredAssociation, reserveeIdentifier, ...d } = rest;
-      input.reserveeIdentifier =
-        reserveeType !== ReserveeType.Individual && !reserveeIsUnregisteredAssociation ? reserveeIdentifier : "";
+      // only apply the boolean toggle for Nonprofits
+      const isUnregisted = reserveeIsUnregisteredAssociation && reserveeType === ReserveeType.Nonprofit;
+      const noId = reserveeType === ReserveeType.Individual || isUnregisted;
+      input.reserveeIdentifier = !noId ? reserveeIdentifier : "";
       input.description = d.description;
       input.numPersons = d.numPersons;
       input.reserveeOrganisationName = d.reserveeOrganisationName;
