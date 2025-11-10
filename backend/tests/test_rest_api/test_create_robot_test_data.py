@@ -14,6 +14,7 @@ from tilavarauspalvelu.management.commands.create_robot_test_data import create_
 from tilavarauspalvelu.models import (
     Application,
     ApplicationRound,
+    GeneralRole,
     Reservation,
     ReservationSeries,
     ReservationUnit,
@@ -21,6 +22,8 @@ from tilavarauspalvelu.models import (
     ReservationUnitPricing,
     Space,
     Unit,
+    UnitGroup,
+    UnitRole,
     User,
 )
 from utils.date_utils import local_datetime
@@ -166,13 +169,16 @@ def test_create_robot_test_data():
     create_robot_test_data()
 
     assert Unit.objects.count() == 1
+    assert UnitGroup.objects.count() == 1
     assert ReservationUnit.objects.count() == 23
     assert Space.objects.count() == 23
     assert ReservationUnitPricing.objects.count() == 23
     assert ReservationUnitAccessType.objects.count() == 23
-    assert User.objects.count() == 29
+    assert User.objects.count() == 39
     assert ApplicationRound.objects.count() == 1
-    assert Reservation.objects.count() == 1
+    assert Reservation.objects.count() == 2
+    assert UnitRole.objects.count() == 2
+    assert GeneralRole.objects.count() == 1
 
 
 @pytest.mark.slow
@@ -205,9 +211,9 @@ def test_create_robot_test_data__remove_existing_data_between_runs():
     assert Space.objects.count() == 23
     assert ReservationUnitPricing.objects.count() == 23
     assert ReservationUnitAccessType.objects.count() == 23
-    assert User.objects.count() == 29 + 1  # +1 user for other entities
+    assert User.objects.count() == 39 + 1  # +1 user for other entities
     assert ApplicationRound.objects.count() == 1 + 1  # +1 application round for 'other_application'
-    assert Reservation.objects.count() == 1 + 1  # +1 reservation for 'other_reservation'
+    assert Reservation.objects.count() == 2 + 1  # +1 reservation for 'other_reservation'
 
     # Reservations in other units are not deleted
     assert Reservation.objects.filter(pk=other_reservation.pk).exists()
@@ -223,7 +229,7 @@ def test_create_robot_test_data__users_can_exist_before_run():
 
     create_robot_test_data()
 
-    assert User.objects.count() == 29
+    assert User.objects.count() == 39
 
 
 @pytest.mark.slow

@@ -21,11 +21,11 @@ from tilavarauspalvelu.enums import (
     PriceUnit,
     ReservationFormType,
     ReservationKind,
-    ReservationNotification,
     ReservationStartInterval,
     ReservationStateChoice,
     ReservationTypeChoice,
     TermsOfUseTypeChoices,
+    UserRoleChoice,
     Weekday,
 )
 from tilavarauspalvelu.management.commands.data_creation.utils import defer_reservation_unit_create_operations
@@ -36,6 +36,7 @@ from tilavarauspalvelu.models import (
     ApplicationRoundTimeSlot,
     Equipment,
     EquipmentCategory,
+    GeneralRole,
     IntendedUse,
     OriginHaukiResource,
     PaymentAccounting,
@@ -56,6 +57,8 @@ from tilavarauspalvelu.models import (
     TaxPercentage,
     TermsOfUse,
     Unit,
+    UnitGroup,
+    UnitRole,
     User,
 )
 from tilavarauspalvelu.typing import TimeSlotDB
@@ -103,6 +106,7 @@ def create_robot_test_data() -> None:
     create_reservation_units()
     create_application_rounds()
     create_past_reservations()
+    create_permissions()
 
 
 def remove_existing_data() -> None:
@@ -137,6 +141,8 @@ def remove_existing_data() -> None:
     application_round.delete()
     reservation_units.delete()
     harakka.delete()
+
+    UnitGroup.objects.filter(name_fi="Automaatiotestit (Älä poista)").delete()
 
 
 def create_reservation_units() -> None:  # noqa: PLR0915
@@ -1128,6 +1134,12 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         payment_merchant=harakka_merchant,
         payment_accounting=pihlajasarten_accounting,
     )
+    harakka_group = UnitGroup.objects.create(
+        name_fi="Automaatiotestit (Älä poista)",
+        name_sv="Automaatiotestit (Älä poista) SV",
+        name_en="Automaatiotestit (Älä poista) EN",
+    )
+    harakka_group.units.set([harakka])
 
     # ------------------------------------------------------------------------------------------------------------
     # DESKTOP
@@ -3186,6 +3198,7 @@ def copy_reservation_unit(original: ReservationUnit, *, kind: Literal["android",
 
 
 def create_users() -> None:
+    # NOTE: Ande should have bookings in the past like Päivi Mustonen
     User.objects.update_or_create(
         username="u-5ubvcxgrxzdf5nj7y4sbjnvyeq",
         defaults={
@@ -3322,6 +3335,8 @@ def create_users() -> None:
             "profile_id": "UHJvZmlsZU5vZGU6YTNiOGRkMjItMzcyYS00MDUwLTg4NTUtYzUzM2FkODhhNDY5",
         },
     )
+
+    # Has bookings in the past
     User.objects.update_or_create(
         username="u-uslsa3ewcvcmbcfyub5b26lfmu",
         defaults={
@@ -3396,7 +3411,7 @@ def create_users() -> None:
             "first_name": "Tirehtoori",
             "last_name": "Tötterstrom",
             "email": "qfaksi+tirehtoori@gmail.com",
-            "password": make_password("Tötterstrom"),
+            "password": make_password("DjangoPassu4312"),
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3413,7 +3428,7 @@ def create_users() -> None:
             "first_name": "Pekka",
             "last_name": "Virtanen",
             "email": "qfaksi+pekka@gmail.com",
-            "password": make_password("Virtanen"),
+            "password": make_password("DjangoPassu4312"),
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3430,7 +3445,7 @@ def create_users() -> None:
             "first_name": "Hannu",
             "last_name": "Rantala",
             "email": "qfaksi+hannu@gmail.com",
-            "password": make_password("Rantala"),
+            "password": make_password("DjangoPassu4312"),
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3447,7 +3462,7 @@ def create_users() -> None:
             "first_name": "Seppo",
             "last_name": "Korhonen",
             "email": "qfaksi+seppo@gmail.com",
-            "password": make_password("Korhonen"),
+            "password": make_password("DjangoPassu4312"),
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3464,7 +3479,7 @@ def create_users() -> None:
             "first_name": "Risto",
             "last_name": "Hakkarainen",
             "email": "qfaksi+risto@gmail.com",
-            "password": make_password("Hakkarainen"),
+            "password": make_password("DjangoPassu4312"),
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3481,7 +3496,7 @@ def create_users() -> None:
             "first_name": "Erkki",
             "last_name": "Nieminen",
             "email": "qfaksi+erkki@gmail.com",
-            "password": make_password("Nieminen"),
+            "password": make_password("DjangoPassu4312"),
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3498,7 +3513,7 @@ def create_users() -> None:
             "first_name": "Ari",
             "last_name": "Laine",
             "email": "qfaksi+ari@gmail.com",
-            "password": make_password("Laine"),
+            "password": make_password("DjangoPassu4312"),
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3515,7 +3530,7 @@ def create_users() -> None:
             "first_name": "Kari",
             "last_name": "Kekkonen",
             "email": "qfaksi+kari@gmail.com",
-            "password": make_password("Kekkonen"),
+            "password": make_password("DjangoPassu4312"),
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3532,7 +3547,7 @@ def create_users() -> None:
             "first_name": "Esa",
             "last_name": "Mattila",
             "email": "qfaksi+esa@gmail.com",
-            "password": make_password("Mattila"),
+            "password": make_password("DjangoPassu4312"),
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3549,7 +3564,7 @@ def create_users() -> None:
             "first_name": "Pertti",
             "last_name": "Kallio",
             "email": "qfaksi+pertti@gmail.com",
-            "password": make_password("Kallio"),
+            "password": make_password("DjangoPassu4312"),
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3566,7 +3581,7 @@ def create_users() -> None:
             "first_name": "Antero",
             "last_name": "Salonen",
             "email": "qfaksi+antero@gmail.com",
-            "password": make_password("Salonen"),
+            "password": make_password("DjangoPassu4312"),
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3680,6 +3695,218 @@ def create_users() -> None:
         },
     )
 
+    # desktop-test-data-set-7: Sanna Hämäläinen
+    User.objects.update_or_create(
+        username="u-eplnxl7s3baungvx4cvjsjb6ge",
+        defaults={
+            "first_name": "Sanna",
+            "last_name": "Hämäläinen",
+            "email": "qfaksi+sanna@gmail.com",
+            "password": make_password("Hämäläinen"),
+            "is_staff": False,
+            "is_active": True,
+            "is_superuser": False,
+            "uuid": "23d6dbaf-f2d8-4146-9ab7-e0aa99243e31",  # GDPR UUID
+            "tvp_uuid": "9b87a19a-382f-47d2-ab72-1022043746f7",  # Statistics UUID
+            "department_name": None,
+            "date_of_birth": local_datetime(1992, 5, 25),
+            "profile_id": "UHJvZmlsZU5vZGU6YWFmMjE2ZTMtN2M0Zi00OTI0LWE3ODEtMDFlNDE4NTNmNGQz",
+        },
+    )
+
+    # desktop-test-data-set-9: Kirsi Heikkinen
+    User.objects.update_or_create(
+        username="u-3zqtvhpzhbevrdcej7prbobe2i",
+        defaults={
+            "first_name": "Kirsi",
+            "last_name": "Heikkinen",
+            "email": "qfaksi+kirsi@gmail.com",
+            "password": make_password("Heikkinen"),
+            "is_staff": False,
+            "is_active": True,
+            "is_superuser": False,
+            "uuid": "de613a9d-f938-4958-8c44-4fdf10b824d2",  # GDPR UUID
+            "tvp_uuid": "2cc03425-9ba5-4352-bb60-7ef73a1bbca9",  # Statistics UUID
+            "department_name": None,
+            "date_of_birth": local_datetime(1979, 6, 3),
+            "profile_id": "UHJvZmlsZU5vZGU6ODkyMzljOWQtNmEzMC00NDZlLTg0NjItMjIwZTA4M2RiYjFk",
+        },
+    )
+
+    # desktop-test-data-set-10: Marja Koskinen
+
+    User.objects.update_or_create(
+        username="u-lelgrutpxffxra7r6z7cmc5ksu",
+        defaults={
+            "first_name": "Marja",
+            "last_name": "Koskinen",
+            "email": "qfaksi+marja@gmail.com",
+            "password": make_password("Koskinen"),
+            "is_staff": False,
+            "is_active": True,
+            "is_superuser": False,
+            "uuid": "591668d2-6fb9-4b78-83f1-f67e260baa95",  # GDPR UUID
+            "tvp_uuid": "ce39f6c8-1ffc-482c-9519-77899a64dbc1",  # Statistics UUID
+            "department_name": None,
+            "date_of_birth": local_datetime(1984, 3, 29),
+            "profile_id": "UHJvZmlsZU5vZGU6Y2QwMDJkNTUtNWNjZC00NmMwLWEzY2ItZTI4YzlhMWU1ZTZl",
+        },
+    )
+
+    # desktop-test-data-set-11: Tiina Järvinen
+    User.objects.update_or_create(
+        username="u-n76joq6monajzlqxzoff4ore4i",
+        defaults={
+            "first_name": "Tiina",
+            "last_name": "Järvinen",
+            "email": "qfaksi+tiina@gmail.com",
+            "password": make_password("Järvinen"),
+            "is_staff": False,
+            "is_active": True,
+            "is_superuser": False,
+            "uuid": "6ffc9743-cc73-409c-ae17-cb8a5e3a24e2",  # GDPR UUID
+            "tvp_uuid": "fca6c807-6773-48d5-bab2-b72e5d676667",  # Statistics UUID
+            "department_name": None,
+            "date_of_birth": local_datetime(1993, 2, 18),
+            "profile_id": "UHJvZmlsZU5vZGU6Yjc4MjQzNGYtMzBhOS00NjkxLThmZmEtY2NmNDZhZDA2ZDEw",
+        },
+    )
+
+    # admin-test-data-set-2: Marika Salminen (Permission target admin)
+    _marika, _ = User.objects.update_or_create(
+        username="u-ftm3qi35knfdxoysmn24qpz3ce",
+        defaults={
+            "first_name": "Marika",
+            "last_name": "Salminen",
+            "email": "qfaksi+marika@gmail.com",
+            "password": make_password("DjangoPassu4312"),
+            "is_staff": True,
+            "is_active": True,
+            "is_superuser": False,  # Not superuser, for permission testing
+            "uuid": "2cd9b823-7d53-4a3b-bb12-6375c83f3b11",  # GDPR UUID
+            "tvp_uuid": "f418047c-623b-40c6-9579-d4c5cc524e39",  # Statistics UUID
+            "department_name": None,
+            "date_of_birth": local_datetime(1985, 7, 14),
+            "profile_id": "UHJvZmlsZU5vZGU6ZjEwNjgzODUtNjljYy00YmVlLTk5MmUtZWI1YjNiMzFhMWEy",
+        },
+    )
+
+    # admin-test-data-set-3: Niko Selänne (Permission target with unit permissions)
+    # NOTE: This user must have UNIT ROLE permission to "Harakka, piilokoju"
+    User.objects.update_or_create(
+        username="u-hzt64qcjsbb2lnmk7li7tqc4ve",
+        defaults={
+            "first_name": "Niko",
+            "last_name": "Selänne",
+            "email": "qfaksi+niko@gmail.com",
+            "password": make_password("DjangoPassu4312"),
+            "is_staff": True,
+            "is_active": True,
+            "is_superuser": False,  # Not superuser, has unit permissions
+            "uuid": "3e67ee40-4990-43a5-b58a-fad1f9c05ca9",  # GDPR UUID
+            "tvp_uuid": "23135598-b45d-40f9-89b0-521e132f164b",  # Statistics UUID
+            "department_name": None,
+            "date_of_birth": local_datetime(1985, 7, 15),
+            "profile_id": "UHJvZmlsZU5vZGU6MmE4N2Q0M2YtNTFjZC00OTk3LTk2ZTUtODE0ZDczMjAyYmMy",
+        },
+    )
+
+    # admin-test-data-set-4: Mikko Mäkinen (Permission target with unit group permissions)
+    # NOTE: This user must have unit group named "Automaatiotestit (Älä poista)", which contains "Harakka, piilokoju"
+    User.objects.update_or_create(
+        username="u-lloau4zl65c3lpbpgamxa3edoa",
+        defaults={
+            "first_name": "Mikko",
+            "last_name": "Mäkinen",
+            "email": "qfaksi+mikko@gmail.com",
+            "password": make_password("DjangoPassu4312"),
+            "is_staff": True,
+            "is_active": True,
+            "is_superuser": False,  # Not superuser, has unit group permissions
+            "uuid": "5adc0a73-2bf7-45b5-bc2f-3019706c8370",  # GDPR UUID
+            "tvp_uuid": "2377236b-6d59-4cf2-8123-d74d1535156a",  # Statistics UUID
+            "department_name": None,
+            "date_of_birth": local_datetime(1985, 6, 20),
+            "profile_id": "UHJvZmlsZU5vZGU6ZjY0YjBlODAtYjExYS00NTM3LTg3ODAtYTAwZjBlNzI1YmMy",
+        },
+    )
+
+    # admin-test-data-set-4: Timo Nieminen (Django admin)
+    User.objects.update_or_create(
+        username="Timo",
+        defaults={
+            "first_name": "Timo",
+            "last_name": "Nieminen",
+            "email": "qfaksi+nieminen@gmail.com",
+            "password": make_password("DjangoPassu4312"),
+            "is_staff": True,
+            "is_active": True,
+            "is_superuser": True,
+            "uuid": "308d1890-bb0f-11f0-b515-0a580a830111",  # GDPR UUID
+            "tvp_uuid": "440e3a1e-9d2d-4a3a-8e45-0d63a6e37164",  # Statistics UUID
+            "department_name": None,
+            "date_of_birth": local_datetime(1976, 7, 16),
+            "profile_id": "",
+        },
+    )
+
+    # combined-test-data-set-2: Tabitah Testitar (User with access code)
+    User.objects.update_or_create(
+        username="u-u6rsbwp6hfedrjz4ttdgk36sz4",
+        defaults={
+            "first_name": "Tabitah",
+            "last_name": "Testitar",
+            "email": "qfaksi+tabitah@gmail.com",
+            "password": make_password("Testitar"),
+            "is_staff": False,
+            "is_active": True,
+            "is_superuser": False,
+            "uuid": "a7a320d9-fe39-4838-a73c-9cc6656fd2cf",  # GDPR UUID
+            "tvp_uuid": "508f36dc-3a53-4359-a46c-5d124f88147d",  # Statistics UUID
+            "department_name": None,
+            "date_of_birth": local_datetime(1981, 4, 9),
+            "profile_id": "UHJvZmlsZU5vZGU6YWVmYWJhNTktMjQyNC00ZmFmLTkxZDMtMzcyNjNkODY2NDM4",
+        },
+    )
+
+    # mobile-android-data-set-2: Elina Laine
+    User.objects.update_or_create(
+        username="u-3ubdbnexc5cotcl623jagjbzni",
+        defaults={
+            "first_name": "Elina",
+            "last_name": "Laine",
+            "email": "qfaksi+elina@gmail.com",
+            "password": make_password("Laine"),
+            "is_staff": False,
+            "is_active": True,
+            "is_superuser": False,
+            "uuid": "dd0230b4-9717-44e9-897e-d6d20324396a",  # GDPR UUID
+            "tvp_uuid": "09365345-5eab-4f41-89cd-0af68fa5d9c6",  # Statistics UUID
+            "department_name": None,
+            "date_of_birth": local_datetime(1988, 11, 13),
+            "profile_id": "UHJvZmlsZU5vZGU6ZTcwMTc5ZTYtYzVjNy00ZGRmLTkwYzQtYTRlM2RiOGNkNjI1",
+        },
+    )
+
+    # mobile-iphone-data-set-1: Merja Kangas
+    User.objects.update_or_create(
+        username="u-d7wshr3wqrfsdjcyprfvklq3lu",
+        defaults={
+            "first_name": "Merja",
+            "last_name": "Kangas",
+            "email": "qfaksi+merja@gmail.com",
+            "password": make_password("Kangas"),
+            "is_staff": False,
+            "is_active": True,
+            "is_superuser": False,
+            "uuid": "1fed23c7-7684-4b21-a458-7c4b552e1b5d",  # GDPR UUID
+            "tvp_uuid": "ccf8c3fa-15ed-493c-9723-197bc7b86107",  # Statistics UUID
+            "department_name": None,
+            "date_of_birth": local_datetime(1992, 7, 25),
+            "profile_id": "UHJvZmlsZU5vZGU6MDhmZmMyOTctOTU4Zi00YjkyLTliMTYtOTgzNDc1YmJlODQ2",
+        },
+    )
+
 
 def create_application_rounds() -> None:
     nupa_kausivarausehto, _ = TermsOfUse.objects.get_or_create(
@@ -3741,6 +3968,7 @@ def create_past_reservations() -> None:
 
     maksuton_mankeli = ReservationUnit.objects.get(ext_uuid="7bbd9b47-ad06-495a-a530-b094574208d6")
 
+    # Päivi Mustonen reservation
     Reservation.objects.create(
         user=user,
         reservation_unit=maksuton_mankeli,
@@ -3749,3 +3977,40 @@ def create_past_reservations() -> None:
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
     )
+
+    # Ande AutomaatioTesteri past reservation
+    user = User.objects.get(username="u-5ubvcxgrxzdf5nj7y4sbjnvyeq")
+    Reservation.objects.create(
+        user=user,
+        reservation_unit=maksuton_mankeli,
+        begins_at=local_datetime(2025, 6, 14, 10),
+        ends_at=local_datetime(2025, 6, 14, 12),
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+
+def create_permissions() -> None:
+    # Marika Salminen
+    GeneralRole.objects.create(
+        user=User.objects.get(username="u-ftm3qi35knfdxoysmn24qpz3ce"),
+        role=UserRoleChoice.ADMIN,
+    )
+
+    # Niko Selänne
+    niko = User.objects.get(username="u-hzt64qcjsbb2lnmk7li7tqc4ve")
+    niko_role = UnitRole.objects.create(
+        user=niko,
+        assigner=niko,
+        role=UserRoleChoice.RESERVER.value,
+    )
+    niko_role.units.set([Unit.objects.get(name_fi="Harakka, piilokoju")])
+
+    # Mikko Mäkinen
+    mikko = User.objects.get(username="u-lloau4zl65c3lpbpgamxa3edoa")
+    mikko_role = UnitRole.objects.create(
+        user=mikko,
+        assigner=mikko,
+        role=UserRoleChoice.RESERVER.value,
+    )
+    mikko_role.unit_groups.set([UnitGroup.objects.get(name_fi="Automaatiotestit (Älä poista)")])
