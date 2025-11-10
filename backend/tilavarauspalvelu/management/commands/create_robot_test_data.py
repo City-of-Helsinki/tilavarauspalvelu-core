@@ -3199,12 +3199,8 @@ def create_users() -> None:
             "uuid": "ed03515c-d1be-465e-b53f-c72414b6b824",  # GDPR UUID
             "tvp_uuid": "e5c391e8-8a6b-49ba-8b91-7c7a50b15b33",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1974, 6, 18),
             "profile_id": "UHJvZmlsZU5vZGU6YmUyMGNmYTQtNTQ3MS00ZjM1LWEwYzctODg5YmQ4MTgzNzA5",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3220,12 +3216,8 @@ def create_users() -> None:
             "uuid": "74ba69fa-8f0f-4823-a98c-70a9e36a898f",  # GDPR UUID
             "tvp_uuid": "0e8fe48b-ee20-4694-bbdc-9bce3d23ea26",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1982, 3, 15),
             "profile_id": "UHJvZmlsZU5vZGU6NGVkNzU2MWItZTJhMy00NTMwLTgwOWYtMjJiYzNlOTU3NDUz",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3241,12 +3233,8 @@ def create_users() -> None:
             "uuid": "d96ad3b1-9627-4e6f-8164-0cf820251fca",  # GDPR UUID
             "tvp_uuid": "060e2aa4-bbf3-41e5-b0c7-a9b0ef843940",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1990, 10, 22),
             "profile_id": "UHJvZmlsZU5vZGU6OTQ3NWI0ZDctYmMyMi00ZjcwLWFmNGUtNTQyOWI0ZDZmYjg2",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3262,12 +3250,8 @@ def create_users() -> None:
             "uuid": "ff782ed6-a3ce-42ae-a4d2-494fd388b917",  # GDPR UUID
             "tvp_uuid": "bce3ecb8-41bd-4372-affb-8bf4fa929c35",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1985, 7, 7),
             "profile_id": "UHJvZmlsZU5vZGU6NTRhNWE1NDctMzRmOS00NjliLWE0NjktNjdmOWExMDdhMDk4",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3283,12 +3267,8 @@ def create_users() -> None:
             "uuid": "e18f9eef-3945-47c0-b5ee-f5fe42f7f0e4",  # GDPR UUID
             "tvp_uuid": "344a7685-c346-4e94-851a-6520c6776d20",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1976, 12, 11),
             "profile_id": "UHJvZmlsZU5vZGU6M2FmODg4NWYtOTkzMy00MjM1LTkyNDktMGU3MTI5ODViMDcx",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3304,12 +3284,8 @@ def create_users() -> None:
             "uuid": "14406f31-6911-4d39-9d1c-c68855d58ae2",  # GDPR UUID
             "tvp_uuid": "bcc347a2-a1f1-4686-bb46-03c840f2de48",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1989, 6, 4),
             "profile_id": "UHJvZmlsZU5vZGU6Y2VlYzZkOTItYjdkNi00NTZhLWI5M2UtYzc4MjI5YjAwMTli",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3325,12 +3301,8 @@ def create_users() -> None:
             "uuid": "41341fba-0c15-4674-8f9d-f444cfdff3a6",  # GDPR UUID
             "tvp_uuid": "71a34673-620f-41d1-b653-a9e326a490e7",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1976, 5, 5),
             "profile_id": "UHJvZmlsZU5vZGU6YWMxODIyNDMtZWFjOS00YzdkLWFjYTAtZDAzZTllYjJhMzIz",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3346,12 +3318,8 @@ def create_users() -> None:
             "uuid": "319cb4e0-a2b0-4baf-a3bb-85b29877b1c0",  # GDPR UUID
             "tvp_uuid": "51771b83-b81a-4948-92ff-a03a2e8fb0d2",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1989, 1, 24),
             "profile_id": "UHJvZmlsZU5vZGU6YTNiOGRkMjItMzcyYS00MDUwLTg4NTUtYzUzM2FkODhhNDY5",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3367,12 +3335,8 @@ def create_users() -> None:
             "uuid": "a497206c-9615-44c0-88b8-a07a1d796565",  # GDPR UUID
             "tvp_uuid": "e090178e-2b9a-4986-bd90-dacd3cf279f6",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1991, 5, 16),
             "profile_id": "UHJvZmlsZU5vZGU6M2IyZjgzM2YtNTU0ZS00N2NjLWE5NWQtMGVmM2IyZmYyMjA3",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3388,12 +3352,8 @@ def create_users() -> None:
             "uuid": "b803106a-5e30-4c5e-b4ff-94b9e306415c",  # GDPR UUID
             "tvp_uuid": "a8497405-b2e2-4022-8d6e-8b9675fd4883",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1987, 12, 12),
             "profile_id": "UHJvZmlsZU5vZGU6YTkyNTlhMTctZTcxMi00ZWNiLWI0ZWYtZTczODIzNmZkNmY1",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3409,12 +3369,8 @@ def create_users() -> None:
             "uuid": "2ded49ea-b3a0-4b4b-bdac-0c0697c19675",  # GDPR UUID
             "tvp_uuid": "bf954d1f-be58-41bf-b581-b75b94feba70",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1988, 8, 3),
             "profile_id": "UHJvZmlsZU5vZGU6NTAyNzE3MTEtMjA2Ny00YTcxLThmYzQtNWU4ZTA0YTNmY2Q3",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3430,12 +3386,8 @@ def create_users() -> None:
             "uuid": "5a7c4494-a2b8-44dd-a7cb-6bd29ceafd71",  # GDPR UUID
             "tvp_uuid": "2766ef5c-124d-48aa-9d22-50df0b0749b1",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1974, 4, 30),
             "profile_id": "UHJvZmlsZU5vZGU6MzdkNGEwMzEtY2RhYy00ZTkzLWI5Y2MtM2JmMjY0YjZmNDE0",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3451,12 +3403,8 @@ def create_users() -> None:
             "uuid": "4fe6f96f-8c5d-4f93-aa3c-c9a1d3ae773d",  # GDPR UUID
             "tvp_uuid": "1d5cd73a-06aa-4562-9099-2ceb1afc0268",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1969, 8, 12),
             "profile_id": "UHJvZmlsZU5vZGU6NWFhMDAyODEtNmQzMS00YTgwLWI4YjktYWYzN2JmZWI0NWQ1",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3472,12 +3420,8 @@ def create_users() -> None:
             "uuid": "932bb1b8-ecf2-4e5e-8e7a-2beaf856489d",  # GDPR UUID
             "tvp_uuid": "e7b60ed1-fb55-4603-9834-3d4324fd5da9",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1985, 6, 22),
             "profile_id": "UHJvZmlsZU5vZGU6MmVmMTQxYTQtNjIzMy00MTAyLWE2YTQtZGM2Mzk0ZWNmMmFm",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3493,12 +3437,8 @@ def create_users() -> None:
             "uuid": "a1092c86-a2a2-4fe9-90e2-9f60e0c075e7",  # GDPR UUID
             "tvp_uuid": "06bf3918-b7bc-4174-8cc8-6c1d59544613",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1981, 12, 10),
             "profile_id": "UHJvZmlsZU5vZGU6ZjJlNDhjNTEtZmExOS00N2I5LTg0NmItM2FlYjU0N2I4YTky",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3514,12 +3454,8 @@ def create_users() -> None:
             "uuid": "56fceeac-4dec-4de1-875b-3c161f24f76f",  # GDPR UUID
             "tvp_uuid": "3cc77909-ed84-45eb-b619-175ea6da3ff5",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1977, 6, 28),
             "profile_id": "UHJvZmlsZU5vZGU6MmFkZTBmYzktMDFlOS00ZGM4LWFjNjAtNDNhOTk5ZjJmNzY2",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3535,12 +3471,8 @@ def create_users() -> None:
             "uuid": "90cca167-9afa-4d8b-9b46-0581f80b1fe4",  # GDPR UUID
             "tvp_uuid": "861923fe-d931-4a81-b03b-0490e1c8b66c",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1993, 10, 5),
             "profile_id": "UHJvZmlsZU5vZGU6ODIwMWRlZmQtMDJlYi00ZjU3LTgxYTMtYTJkOTU1MTA0ZGI1",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3556,12 +3488,8 @@ def create_users() -> None:
             "uuid": "51e82706-8a4a-4fef-9e8e-29a1cbb04e7a",  # GDPR UUID
             "tvp_uuid": "20489318-7a6f-4650-9d10-b8da675ee31e",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1982, 10, 14),
             "profile_id": "UHJvZmlsZU5vZGU6MjhjZTdhZWMtNTBjYS00MWFiLTkxZTctYjdiOTllYjE5ZjIw",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3577,12 +3505,8 @@ def create_users() -> None:
             "uuid": "f1b141a2-5dac-497f-91d8-738b2c1be4fb",  # GDPR UUID
             "tvp_uuid": "6a8fd873-9f35-4afe-9dde-092047c4995b",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1984, 6, 19),
             "profile_id": "UHJvZmlsZU5vZGU6MGE4NmY5YjItYjU4ZC00YzE0LTgwYjItYTE0ZGQ2MTgyM2Ji",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3598,12 +3522,8 @@ def create_users() -> None:
             "uuid": "961aec36-6453-4f4e-978e-563aa73177cf",  # GDPR UUID
             "tvp_uuid": "061ba9cb-4206-484c-8cbd-fd8533d01741",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1975, 8, 15),
             "profile_id": "UHJvZmlsZU5vZGU6MDQ4ZmRmN2MtMjlhMS00M2U3LTk2MjQtYWNkYTNkNWRkYWNh",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3619,12 +3539,8 @@ def create_users() -> None:
             "uuid": "3c6ed394-64a4-4265-bb55-15e300c81fd9",  # GDPR UUID
             "tvp_uuid": "8ad333ad-021d-47e9-a8bc-803c0d6e28fa",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1983, 6, 7),
             "profile_id": "UHJvZmlsZU5vZGU6MGI0NDc4ZjEtNDQ3Ny00YmEwLTg5NjctNDM4MjZmZjI0ZGMx",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3640,12 +3556,8 @@ def create_users() -> None:
             "uuid": "4fe1b482-746c-4ba8-8e28-0744933c55e5",  # GDPR UUID
             "tvp_uuid": "835e2f31-bd26-46c2-a4ac-292218bf654a",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1985, 8, 12),
             "profile_id": "UHJvZmlsZU5vZGU6M2Q1NTczZmMtYTUzMC00ZTgwLWI5MjAtODk0ODNmNmFhOTIy",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3661,12 +3573,8 @@ def create_users() -> None:
             "uuid": "eafc26b0-c403-4644-ba93-fd153cca0643",  # GDPR UUID
             "tvp_uuid": "0ac0c309-8ebe-4326-94c1-f98b0dba7824",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1975, 11, 22),
             "profile_id": "UHJvZmlsZU5vZGU6Mjk3OGYxZDQtOGYxOS00ZjRlLTk4OGYtMmNkZWI1MTViMzY0",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3682,12 +3590,8 @@ def create_users() -> None:
             "uuid": "0d007109-9337-4641-8aa0-585c60b10a9c",  # GDPR UUID
             "tvp_uuid": "e9c3a265-9f0b-460f-a95a-8a637c31e181",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1985, 6, 18),
             "profile_id": "UHJvZmlsZU5vZGU6MmU0ZTkxMTEtMjMzYS00MWE4LTgxZGMtZWRhM2Q5YjczNmIx",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3703,12 +3607,8 @@ def create_users() -> None:
             "uuid": "1fed23c7-7684-4b21-a458-7c4b552e1b5d",  # GDPR UUID
             "tvp_uuid": "ccf8c3fa-15ed-493c-9723-197bc7b86107",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1992, 7, 25),
             "profile_id": "UHJvZmlsZU5vZGU6MDhmZmMyOTctOTU4Zi00YjkyLTliMTYtOTgzNDc1YmJlODQ2",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3724,12 +3624,8 @@ def create_users() -> None:
             "uuid": "0f9e72c3-b660-4495-a690-75481db2126a",  # GDPR UUID
             "tvp_uuid": "4cd5de1d-0e7a-42e9-a496-87d3c83ee129",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1984, 11, 8),
             "profile_id": "UHJvZmlsZU5vZGU6ZTNlN2I5ZTItMjMwNC00MmIzLWE4Y2UtYTRhMzcyYzIyMjc1",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3745,12 +3641,8 @@ def create_users() -> None:
             "uuid": "07f7026a-2c02-415a-b1e1-d2ab6189204c",  # GDPR UUID
             "tvp_uuid": "7bf6a12d-11fd-451d-85ef-466d3990f0b6",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1979, 12, 14),
             "profile_id": "UHJvZmlsZU5vZGU6ZDhhYjlmZmItZTg3NC00NTM1LTlmOGUtYmUwZjQ4ZjE1YzVh",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3766,12 +3658,8 @@ def create_users() -> None:
             "uuid": "0c016256-32d5-4276-a28f-8bf76196ba35",  # GDPR UUID
             "tvp_uuid": "6a1087f7-cc9a-4ebb-8149-4c1727e19c53",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1986, 10, 23),
             "profile_id": "UHJvZmlsZU5vZGU6ZDRjNGExNzctZjExNy00ZDg3LTlhMTAtNDJjZDEyNWI1MzZm",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
     User.objects.update_or_create(
@@ -3787,12 +3675,8 @@ def create_users() -> None:
             "uuid": "4cea964b-b23b-4ef0-bd78-536bf48802e4",  # GDPR UUID
             "tvp_uuid": "f7259555-96b3-4ebe-b5d7-3b7ef4ab2895",  # Statistics UUID
             "department_name": None,
-            "preferred_language": "fi",
             "date_of_birth": local_datetime(1991, 5, 7),
             "profile_id": "UHJvZmlsZU5vZGU6NDEwZjA1ZDgtNzU3MC00NTFmLWIwMmItYjc2ZjIzMTA5ODdi",
-            "reservation_notification": ReservationNotification.ONLY_HANDLING_REQUIRED,
-            "sent_email_about_deactivating_permissions": False,
-            "sent_email_about_anonymization": False,
         },
     )
 
