@@ -1140,8 +1140,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         #
         # Strings
         name="Maksuton Mankeli (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="Maksuton Mankeli ENG (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_sv="Maksuton Mankeli SW (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Maksuton Mankeli (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="Maksuton Mankeli (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         description=(
             "Käytä tätä varausyksikköä, kun haluan varata suorimman ja yksinkertaisimman prosessin mukaan. "
             "Varaaminen on maksutonta ja kaikki varaukset hyväksytään. "
@@ -1269,8 +1269,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     )
     _maksuton_mankeli_space = Space.objects.create(
         name="Maksuton Mankeli (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="Maksuton Mankeli ENG (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_sv="Maksuton Mankeli SW (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Maksuton Mankeli (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="Maksuton Mankeli (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         surface_area=100,
         max_persons=1,
         unit=harakka,
@@ -1307,8 +1307,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         #
         # Strings
         name="Aina maksullinen Aitio (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="Aina maksullinen Aitio (AUTOMAATIOTESTI ÄLÄ POISTA)EN",
-        name_sv="Aina maksullinen Aitio (AUTOMAATIOTESTI ÄLÄ POISTA)SV",
+        name_en="Aina maksullinen Aitio (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="Aina maksullinen Aitio (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         description=(
             "Käytä tätä varausyksikköä, kun haluan varata maksullisen tilan suorimman prosessin mukaan. "
             "Varaaja voi olla yhdistys, yritys tai yksityishenkilö. "
@@ -1445,7 +1445,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     )
     _aina_maksullinen_aitio_space = Space.objects.create(
         name="Aina maksullinen aitio (AUTOMAATIO TESTI ÄLÄ POISTA)",
-        name_en="Aina maksullinen aitio (AUTOMAATIO TESTI ÄLÄ POISTA) ENG",
+        name_en="Aina maksullinen aitio (AUTOMAATIO TESTI ÄLÄ POISTA) EN",
         name_sv="Aina maksullinen aitio (AUTOMAATIO TESTI ÄLÄ POISTA) SV",
         surface_area=50,
         max_persons=6,
@@ -1489,8 +1489,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         #
         # Strings
         name="Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA) en",
-        name_sv="Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
+        name_en="Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         description=(
             "Käytä tätä varausyksikköä, kun haluan varata varausyksikön, "
             "jonka kaikki varaukset siirtyvät käsittelyyn. "
@@ -1572,10 +1572,10 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         reservation_pending_instructions_en="",
         reservation_pending_instructions_sv="",
         reservation_confirmed_instructions="Hyväksytty varaus",
-        reservation_confirmed_instructions_en="Hyväksytty varaus ENG",
+        reservation_confirmed_instructions_en="Hyväksytty varaus EN",
         reservation_confirmed_instructions_sv="Hyväksytty varaus SV",
         reservation_cancelled_instructions="Peruttu varaus",
-        reservation_cancelled_instructions_en="Peruttu varaus ENG",
+        reservation_cancelled_instructions_en="Peruttu varaus EN",
         reservation_cancelled_instructions_sv="Peruttu varaus SV",
         #
         # Integers
@@ -1630,8 +1630,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     )
     _aina_kasiteltava_kellarikerros_space = Space.objects.create(
         name="Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="Aina käsiteltävä kellarikerrosEN (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_sv="Aina käsiteltävä kellarikerrosSV (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="Aina käsiteltävä kellarikerros (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         surface_area=100,
         max_persons=50,
         unit=harakka,
@@ -1677,8 +1677,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         #
         # Strings
         name="Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA) en",
-        name_sv="Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
+        name_en="Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         description=(
             "Käytä tätä varausyksikköä, kun haluan varata joko maksullisen tilan tai hakea hinnan alennusta. "
             "Alennusta haettaessa varaus siirtyy aina käsittelyyn. "
@@ -1818,8 +1818,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     )
     _alennuskelpoinen_aula_space = Space.objects.create(
         name="Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="Alennuskelpoinen aulaEN (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_sv="Alennuskelpoinen aulaSV (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="Alennuskelpoinen aula (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         surface_area=10,
         max_persons=5,
         unit=harakka,
@@ -1860,15 +1860,15 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         #
         # Strings
         name="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA) en",
-        name_sv="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
+        name_en="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         description="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        description_en="Perumiskelvoton parveke, maksuton EN (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        description_sv="Perumiskelvoton parveke, maksuton SV (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        description_en="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        description_sv="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         contact_information="",
-        notes_when_applying="Varausyksikkökohtaiset lisätiedot fi",
-        notes_when_applying_en="Varausyksikkökohtaiset lisätiedot en",
-        notes_when_applying_sv="Varausyksikkökohtaiset lisätiedot sv",
+        notes_when_applying="Varausyksikkökohtaiset lisätiedot",
+        notes_when_applying_en="Varausyksikkökohtaiset lisätiedot EN",
+        notes_when_applying_sv="Varausyksikkökohtaiset lisätiedot SV",
         reservation_pending_instructions="Varausvahvistuksen lisäohjeteksti suomeksi",
         reservation_pending_instructions_en="Varausvahvistuksen lisäohjeteksti englanniksi",
         reservation_pending_instructions_sv="Varausvahvistuksen lisäohjeteksti ruotsiksi",
@@ -1931,8 +1931,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     )
     _perumiskelvoton_parveke_space = Space.objects.create(
         name="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="Perumiskelvoton parveke, maksuton EN (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_sv="Perumiskelvoton parveke, maksuton SV (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="Perumiskelvoton parveke, maksuton (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         surface_area=35,
         max_persons=4,
         unit=harakka,
@@ -1967,15 +1967,15 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         #
         # Strings
         name="Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA) ENG",
+        name_en="Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
         name_sv="Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         description="admin test",
-        description_en="admin test eng",
-        description_sv="admin test sv",
+        description_en="admin test EN",
+        description_sv="admin test SV",
         contact_information="",
         notes_when_applying="admin test",
-        notes_when_applying_en="admin test eng",
-        notes_when_applying_sv="admin test sv",
+        notes_when_applying_en="admin test EN",
+        notes_when_applying_sv="admin test SV",
         reservation_pending_instructions="",
         reservation_pending_instructions_en="",
         reservation_pending_instructions_sv="",
@@ -2038,7 +2038,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     )
     _aina_varattu_yksikko_space = Space.objects.create(
         name="Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA) ENG",
+        name_en="Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
         name_sv="Aina varattu yksikkö (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         surface_area=40,
         max_persons=20,
@@ -2076,7 +2076,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         #
         # Strings
         name="Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA) ENG",
+        name_en="Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
         name_sv="Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         description=(
             "Tällä varausyksiköllä testataan avaimetonta kulkua."
@@ -2263,7 +2263,7 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     )
     _ovikoodi_maksuton_kasiteltava_yksikko_space = Space.objects.create(
         name="Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA) ENG",
+        name_en="Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
         name_sv="Ovikoodi maksuton käsiteltävä (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         surface_area=40,
         max_persons=20,
@@ -2299,11 +2299,11 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         #
         # Strings
         name="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA) eng",
-        name_sv="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
+        name_en="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         description="tuplabuukkaus",
-        description_en="tuplabuukkaus eng",
-        description_sv="tuplabuukkaus sv",
+        description_en="tuplabuukkaus EN",
+        description_sv="tuplabuukkaus SV",
         contact_information="",
         notes_when_applying="",
         notes_when_applying_en="",
@@ -2370,8 +2370,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     )
     _tuplabuukattu_tupla_space = Space.objects.create(
         name="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA) eng",
-        name_sv="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
+        name_en="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="Tuplabuukattu tupa (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         surface_area=60,
         max_persons=40,
         unit=harakka,
@@ -2412,11 +2412,11 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         #
         # Strings
         name="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA) en",
-        name_sv="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
-        description="Kuvaus fi",
-        description_en="Kuvaus en",
-        description_sv="Kuvaus sv",
+        name_en="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
+        description="Kuvaus",
+        description_en="Kuvaus EN",
+        description_sv="Kuvaus SV",
         contact_information="",
         notes_when_applying="",
         notes_when_applying_en="",
@@ -2483,8 +2483,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     )
     _kausivarausyksikko_malmi_space = Space.objects.create(
         name="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA) en",
-        name_sv="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
+        name_en="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="KAUSIVARAUS yksikkö Malmi (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         surface_area=100,
         max_persons=1,
         unit=harakka,
@@ -2532,11 +2532,11 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         #
         # Strings
         name="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA) en",
-        name_sv="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
+        name_en="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         description="Kuvaus fi",
-        description_en="Kuvaus en",
-        description_sv="Kuvaus sv",
+        description_en="Kuvaus EN",
+        description_sv="Kuvaus SV",
         contact_information="",
         notes_when_applying="",
         notes_when_applying_en="",
@@ -2603,8 +2603,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     )
     _kausivarausyksikko_keskusta_space = Space.objects.create(
         name="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA) en",
-        name_sv="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA) sv",
+        name_en="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="KAUSIVARAUS yksikkö Keskusta (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         surface_area=100,
         max_persons=1,
         unit=harakka,
@@ -2653,11 +2653,11 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         #
         # Strings
         name="KAUSIVARAUS yksikkö OVIKOODI Yrjö (Manuaalitestaus)",
-        name_en="KAUSIVARAUS yksikkö OVIKOODI Yrjö en (Manuaalitestaus)",
-        name_sv="KAUSIVARAUS yksikkö OVIKOODI Yrjö sv (Manuaalitestaus)",
+        name_en="KAUSIVARAUS yksikkö OVIKOODI Yrjö (Manuaalitestaus) EN",
+        name_sv="KAUSIVARAUS yksikkö OVIKOODI Yrjö (Manuaalitestaus) SV",
         description="Kausivaraus yksikkö Yrjö \nAukiolo \nMa - pe 10:00-22:00 Varauksella \n12:00-13:00 Suljettu",
-        description_en="Kuvaus en",
-        description_sv="Kuvaus sv",
+        description_en="Kuvaus EN",
+        description_sv="Kuvaus SV",
         contact_information="",
         notes_when_applying="",
         notes_when_applying_en="",
@@ -2724,8 +2724,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     )
     _kausivarausyksikko_yrjo_space = Space.objects.create(
         name="KAUSIVARAUS yksikkö Yrjö (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="KAUSIVARAUS yksikkö Yrjö (AUTOMAATIOTESTI ÄLÄ POISTA) E",
-        name_sv="KAUSIVARAUS yksikkö Yrjö (AUTOMAATIOTESTI ÄLÄ POISTA) S",
+        name_en="KAUSIVARAUS yksikkö Yrjö (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="KAUSIVARAUS yksikkö Yrjö (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         surface_area=50,
         max_persons=10,
         unit=harakka,
@@ -2809,11 +2809,11 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         #
         # Strings
         name="KAUSIVARAUS yksikkö Kalevi (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="KAUSIVARAUS yksikkö Kalevi en (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_sv="KAUSIVARAUS yksikkö Kalevi sv (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="KAUSIVARAUS yksikkö Kalevi (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="KAUSIVARAUS yksikkö Kalevi (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         description="Kuvaus fi\nAukioloaika\nMa - pe 10:00-22:00 Varauksella\n13:00 - 14:00 Suljettu",
-        description_en="Kuvaus en",
-        description_sv="Kuvaus sv",
+        description_en="Kuvaus EN",
+        description_sv="Kuvaus SV",
         contact_information="",
         notes_when_applying="",
         notes_when_applying_en="",
@@ -2880,8 +2880,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     )
     _kausivarausyksikko_kalevi_space = Space.objects.create(
         name="KAUSIVARAUS yksikkö Kalevi (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="KAUSIVARAUS yksikkö Kalevi en (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_sv="KAUSIVARAUS yksikkö Kalevi sv (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="KAUSIVARAUS yksikkö Kalevi (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="KAUSIVARAUS yksikkö Kalevi (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         surface_area=60,
         max_persons=20,
         unit=harakka,
@@ -2964,11 +2964,11 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         #
         # Strings
         name="KAUSIVARAUS yksikkö Piitu (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="KAUSIVARAUS yksikkö Piitu en (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_sv="KAUSIVARAUS yksikkö Piitu sv (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="KAUSIVARAUS yksikkö Piitu (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="KAUSIVARAUS yksikkö Piitu (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         description="Kuvaus fi\nAukioloaika\nMa - pe 10:00-22:00 Varauksella\n14:00 - 15:00 Suljettu",
-        description_en="Kuvaus en",
-        description_sv="Kuvaus sv",
+        description_en="Kuvaus EN",
+        description_sv="Kuvaus SV",
         contact_information="Vastuuhenkilön yhteystiedot",
         notes_when_applying="",
         notes_when_applying_en="",
@@ -3035,8 +3035,8 @@ def create_reservation_units() -> None:  # noqa: PLR0915
     )
     _kausivarausyksikko_piitu_space = Space.objects.create(
         name="KAUSIVARAUS yksikkö Piitu (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_en="KAUSIVARAUS yksikkö Piitu en (AUTOMAATIOTESTI ÄLÄ POISTA)",
-        name_sv="KAUSIVARAUS yksikkö Piitu sv (AUTOMAATIOTESTI ÄLÄ POISTA)",
+        name_en="KAUSIVARAUS yksikkö Piitu (AUTOMAATIOTESTI ÄLÄ POISTA) EN",
+        name_sv="KAUSIVARAUS yksikkö Piitu (AUTOMAATIOTESTI ÄLÄ POISTA) SV",
         surface_area=60,
         max_persons=20,
         unit=harakka,
@@ -3825,8 +3825,8 @@ def create_application_rounds() -> None:
 
     _kausivaraus_round = ApplicationRound.objects.create(
         name="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA)",
-        name_en="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA) eng",
-        name_sv="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA) sv",
+        name_en="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA) EN",
+        name_sv="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA) SV",
         criteria="Hakukriteerit (suomeksi)",
         criteria_en="Hakukriteerit (englanniksi)",
         criteria_sv="Hakukriteerit (ruotsiksi)",
