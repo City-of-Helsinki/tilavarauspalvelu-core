@@ -14,7 +14,7 @@ dynamic = ["dependencies"]  # Use tool.poetry for dependency management
 requires-poetry = ">=2.0"
 
 [tool.poetry.dependencies]
-Django = "5.1.13"
+Django = "5.1.14"
 django-auditlog = "3.3.0"
 django-cors-headers = "4.9.0"
 django-environment-config = { version = "0.2.3", extras = ["db"] }
@@ -83,7 +83,7 @@ pytest-xdist = "3.8.0"
 [tool.poetry.group.lint.dependencies]
 # Dependencies only required for linting.
 pre-commit = "4.3.0"
-ruff = "0.14.3"
+ruff = "0.14.4"
 mypy = "1.18.2"
 django-stubs = { version = "5.2.7", extras = ["compatible-mypy"] }
 
