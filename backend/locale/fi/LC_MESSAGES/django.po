@@ -2633,16 +2633,6 @@ msgid "Age group"
 msgstr "Ikäryhmä"
 
 #: tilavarauspalvelu/enums.py
-msgctxt "PricingType"
-msgid "Paid"
-msgstr "Maksullinen"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "PricingType"
-msgid "Free"
-msgstr "Maksuton"
-
-#: tilavarauspalvelu/enums.py
 msgctxt "PaymentType"
 msgid "On site"
 msgstr "Paikan päällä"

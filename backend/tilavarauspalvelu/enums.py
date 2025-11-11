@@ -34,7 +34,6 @@ __all__ = [
     "PaymentType",
     "PriceUnit",
     "PricingStatus",
-    "PricingType",
     "Priority",
     "RejectionReadinessChoice",
     "ReservationCancelReasonChoice",
@@ -796,11 +795,6 @@ class ReservationFormType(models.TextChoices):
         pgettext_lazy("ReservationFormType", "Age group"),
     )
     """Asks for user's age group, in addition to contact and reservee information, and purpose of use."""
-
-
-class PricingType(models.TextChoices):
-    PAID = "PAID", pgettext_lazy("PricingType", "Paid")
-    FREE = "FREE", pgettext_lazy("PricingType", "Free")
 
 
 class PaymentType(models.TextChoices):
