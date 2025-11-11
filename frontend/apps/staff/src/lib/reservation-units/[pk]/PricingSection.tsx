@@ -368,6 +368,7 @@ export function PricingSection({
               options={pricingTermsOptions}
               error={getTranslatedError(t, errors.pricingTerms?.message)}
               tooltip={t("tooltip.pricingTerms")}
+              enableSearch
             />
           )}
           <HR />

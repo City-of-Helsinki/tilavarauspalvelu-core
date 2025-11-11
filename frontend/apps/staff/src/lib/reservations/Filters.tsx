@@ -8,6 +8,7 @@ import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchBut
 import { mapParamToInteger } from "ui/src/modules/helpers";
 import { mapFormToSearchParams } from "ui/src/modules/search";
 import { Flex } from "ui/src/styled";
+import { ControlledSelect } from "@ui/components/form";
 import {
   ControlledCheckboxFilter,
   ControlledMultiSelectFilter,
@@ -142,14 +143,31 @@ export function Filters({
           name="reservationType"
         />
         <ControlledMultiSelectFilter control={control} options={options.stateChoices} name="state" />
-        <ControlledMultiSelectFilter control={control} options={options.reservationUnits} name="reservationUnit" />
+        <ControlledSelect
+          label={t("filters:label.reservationUnit")}
+          control={control}
+          options={options.reservationUnits}
+          name="reservationUnit"
+          multiselect
+          enableSearch
+        />
         <ControlledSearchFilter control={control} name="search" labelKey="searchReservation" />
         <ControlledDateRangeFilter control={control} nameBegin="dateGte" nameEnd="dateLte" />
-        <ControlledMultiSelectFilter control={control} options={options.units} name="unit" />
-        <ControlledMultiSelectFilter
+        <ControlledSelect
+          label={t("filters:label.unit")}
+          control={control}
+          options={options.units}
+          name="unit"
+          multiselect
+          enableSearch
+        />
+        <ControlledSelect
+          label={t("filters:label.reservationUnitType")}
           control={control}
           options={options.reservationUnitTypes}
           name="reservationUnitType"
+          multiselect
+          enableSearch
         />
         <ControlledRangeNumberFilter
           control={control}
