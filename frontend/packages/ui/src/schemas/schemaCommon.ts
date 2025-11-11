@@ -6,6 +6,10 @@ import { parseUIDate } from "../modules/date-utils";
 const THREE_YEARS_MS = 3 * 365 * 24 * 60 * 60 * 1000;
 const TIME_PATTERN = /^[0-2][0-9]:[0-5][0-9]$/;
 
+export const emailField = z.email({ error: "invalidEmail" }).max(254);
+// backend doesn't accept bad emails (empty is fine)
+export const optionalEmailField = z.union([emailField, z.string().length(0)]).optional();
+
 export function checkDateNotInPast(date: Date | null, ctx: z.RefinementCtx, path: string): void {
   if (date && date < subDays(new Date(), 1)) {
     ctx.addIssue({

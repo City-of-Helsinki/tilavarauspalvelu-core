@@ -9,7 +9,7 @@ import {
 } from "../../gql/gql-types";
 import { getIntervalMinutes } from "../modules/conversion";
 import { parseUIDate } from "../modules/date-utils";
-import { checkTimeStringFormat, checkValidFutureDate } from "./schemaCommon";
+import { checkTimeStringFormat, checkValidFutureDate, emailField, optionalEmailField } from "./schemaCommon";
 
 export const ReservationTypes = Object.values(ReservationTypeChoice);
 export const ReservationTypeSchema = z.enum(ReservationTypeChoice, { error: "Required" });
@@ -39,14 +39,10 @@ export const TimeFormSchema = z.object({
   type: ReservationTypeSchema,
 });
 
-const email = z.email({ error: "invalidEmail" });
-// backend doesn't accept bad emails (empty is fine)
-const optionalEmail = z.union([email, z.string().length(0)]).optional();
-
 const CreateStaffReservationFormSchema = z
   .object({
     comments: z.string(),
-    reserveeEmail: optionalEmail,
+    reserveeEmail: optionalEmailField,
   })
   .extend(TimeFormSchema.shape);
 
@@ -68,7 +64,7 @@ export const ReservationFormMetaSchema = z.object({
   municipality: z.enum(MunicipalityChoice).optional(),
   numPersons: z.number().optional(),
   purpose: z.number().optional(),
-  reserveeEmail: optionalEmail,
+  reserveeEmail: optionalEmailField,
   reserveeFirstName: z.string().optional(),
   reserveeIdentifier: z.string().optional(),
   reserveeIsUnregisteredAssociation: z.boolean().optional(),
@@ -157,7 +153,7 @@ const ContactInfoFormSchema = z.object({
   reserveeLastName: z.string().min(2, "Required"),
   // TODO check for valid characters (not regex, simpler)
   reserveePhone: z.string().min(3, "Required"),
-  reserveeEmail: email.min(1, "Required"),
+  reserveeEmail: emailField,
   // Optional for all forms based on the reservationUnit settings (could be added dynamically)
   applyingForFreeOfCharge: z.boolean().optional(),
   freeOfChargeReason: z.string().optional(),
