@@ -3,8 +3,8 @@ import { type UseFormReturn } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { Flex, H4 } from "ui/src/styled";
-import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { ReservationTimePicker } from "@/components/reservation";
 import { type ReservationTimePickerProps } from "@/components/reservation/ReservationTimePicker";
 import { useReservableTimes } from "@/hooks";
@@ -13,7 +13,6 @@ import {
   type ReservationQuotaReachedFragment,
   type ReservationUnitNode,
   type ReservationUnitPageQuery,
-  useReservationQuotaReachedQuery,
 } from "@gql/gql-types";
 
 type ReservationUnitT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
@@ -21,10 +20,14 @@ type ReservationUnitT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>
 export function ReservationUnitCalendarSection({
   reservationUnit,
   reservationForm,
+  isQuotaReached,
+  refreshedQuotaReservationUnit,
   ...rest
 }: {
   reservationUnit: ReservationUnitT;
   reservationForm: UseFormReturn<PendingReservationFormType>;
+  isQuotaReached: boolean;
+  refreshedQuotaReservationUnit: ReservationQuotaReachedFragment;
 } & Pick<
   ReservationTimePickerProps,
   "startingTimeOptions" | "blockingReservations" | "loginAndSubmitButton" | "submitReservation"
@@ -33,15 +36,6 @@ export function ReservationUnitCalendarSection({
   const lang = getLocalizationLang(i18n.language);
   const reservableTimes = useReservableTimes(reservationUnit);
 
-  const { data } = useReservationQuotaReachedQuery({
-    variables: {
-      id: reservationUnit.id,
-    },
-  });
-
-  const refreshedIsQuoteReached = data?.reservationUnit ?? reservationUnit;
-  const quotaReached = isReservationQuotaReached(refreshedIsQuoteReached);
-
   return (
     <Flex $gap="m" data-testid="reservation-unit__calendar--wrapper">
       <H4 as="h2" $marginBottom="none">
@@ -49,12 +43,12 @@ export function ReservationUnitCalendarSection({
           title: getTranslation(reservationUnit, "name", lang),
         })}
       </H4>
-      <ReservationQuotaReached {...refreshedIsQuoteReached} />
+      <ReservationQuotaReached {...refreshedQuotaReservationUnit} />
       <ReservationTimePicker
         reservationUnit={reservationUnit}
         reservationForm={reservationForm}
         reservableTimes={reservableTimes}
-        isReservationQuotaReached={quotaReached}
+        isReservationQuotaReached={isQuotaReached}
         {...rest}
       />
     </Flex>
