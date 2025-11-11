@@ -31,10 +31,13 @@ function ReservationUnits({
 
   useToastIfQueryParam({
     key: ["error_code", "error_message"],
-    message: t("reservationUnit:editErrorMessage", {
-      code: params.get("error_code"),
-      message: params.get("error_message"),
-    }),
+    message:
+      params.get("error_code") === "HAUKI_RESOURCE_NOT_LINKED"
+        ? t("reservationUnit:missingHaukiResource")
+        : t("reservationUnit:editErrorMessage", {
+            code: params.get("error_code"),
+            message: params.get("error_message"),
+          }),
     type: "error",
   });
 
@@ -44,7 +47,7 @@ function ReservationUnits({
         <H1 $marginTop="l">{t("reservationUnit:reservationUnitListHeading")}</H1>
         <p>{t("reservationUnit:reservationUnitListDescription")}</p>
       </div>
-      <Filters options={options} />
+      <Filters options={options} onChangedCriteria={() => setSelectedRows([])} />
       <HR />
       <ReservationUnitsDataReader
         selectedRows={selectedRows}
