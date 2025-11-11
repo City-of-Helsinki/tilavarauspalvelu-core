@@ -60,6 +60,7 @@ export function TermsSection({
             label={t(`reservationUnitEditor:label.${name}`)}
             placeholder={t(`reservationUnitEditor:termsPlaceholder`)}
             tooltip={t(`reservationUnitEditor:tooltip.${name}`)}
+            enableSearch
           />
         ))}
         {(["notesWhenApplyingFi", "notesWhenApplyingEn", "notesWhenApplyingSv"] as const).map((n) => (

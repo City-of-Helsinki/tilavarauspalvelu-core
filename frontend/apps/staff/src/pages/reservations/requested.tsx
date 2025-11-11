@@ -50,7 +50,11 @@ export default function RequestedListingPage(_props: PageProps) {
         <H1 $marginTop="l">{t("reservation:listHeading")}</H1>
         <p>{t("reservation:listDescription")}</p>
       </div>
-      <Filters defaultFilters={defaultFilters} clearButtonLabel={t("common:returnDefaults")} />
+      <Filters
+        defaultFilters={defaultFilters}
+        clearButtonLabel={t("common:returnDefaults")}
+        clearButtonAriaLabel={t("common:defaultTags")}
+      />
       <HR />
       <ReservationsDataLoader />
     </>
