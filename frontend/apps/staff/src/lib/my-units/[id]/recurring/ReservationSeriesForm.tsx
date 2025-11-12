@@ -329,7 +329,6 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
               <InnerTextInput
                 id="seriesName"
                 label={t(`${TRANS_PREFIX}.name`)}
-                required
                 {...register("seriesName")}
                 invalid={errors.seriesName != null}
                 errorText={

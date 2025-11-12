@@ -144,11 +144,7 @@ export const ReservationChangeFormSchema = z
     seriesName: z.string(),
     comments: z.string(),
   })
-  .extend(ReservationFormMetaSchema.shape)
-  .refine((val) => val.type === ReservationTypeChoice.Blocked || val.seriesName.length > 0, {
-    path: ["seriesName"],
-    message: "Required",
-  });
+  .extend(ReservationFormMetaSchema.shape);
 
 export type ReservationChangeFormType = z.infer<typeof ReservationChangeFormSchema>;
 
