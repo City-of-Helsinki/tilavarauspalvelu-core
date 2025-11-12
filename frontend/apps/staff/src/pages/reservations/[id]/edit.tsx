@@ -121,7 +121,6 @@ function EditReservation({
               id="seriesName"
               disabled={reservationUnit == null}
               label={t(`myUnits:ReservationSeriesForm.name`)}
-              required
               {...register("seriesName")}
               invalid={errors.seriesName != null}
               errorText={translateError(errors.seriesName?.message)}

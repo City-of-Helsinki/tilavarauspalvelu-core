@@ -9,7 +9,7 @@ import {
   ReservationTypeSchema,
   ReservationFormMetaSchema,
 } from "ui/src/schemas";
-import { ReservationStartInterval, ReservationTypeChoice, Weekday } from "@gql/gql-types";
+import { ReservationStartInterval, Weekday } from "@gql/gql-types";
 
 // NOTE schema refinement is quirky since zod objects can't be merged after it
 // always use the exact refined scheme for validation and displaying errors to the user
@@ -47,11 +47,6 @@ const dateIsBefore = (date: Date | null, other: Date | null) => date && other &&
 export function getReservationSeriesSchema(interval: ReservationStartInterval) {
   return (
     ReservationSeriesFormSchema.extend(ReservationFormMetaSchema.shape)
-      // this refine works without partial since it's the last required value
-      .refine((s) => s.type === ReservationTypeChoice.Blocked || s.seriesName.length > 0, {
-        path: ["seriesName"],
-        message: "Required",
-      })
       .superRefine((val, ctx) => checkDateNotInPast(convertToDate(val.startingDate), ctx, "startingDate"))
       .superRefine((val, ctx) => checkDateNotInPast(convertToDate(val.endingDate), ctx, "endingDate"))
       .refine((s) => dateIsBefore(convertToDate(s.startingDate), convertToDate(s.endingDate)), {
