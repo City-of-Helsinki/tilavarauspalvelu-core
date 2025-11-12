@@ -7,8 +7,6 @@ export const mapUrlPrefix = "https://palvelukartta.hel.fi/";
 
 export const ANALYTICS_COOKIE_GROUP_NAME = "statistics";
 
-export const CREATED_RESERVATION_TIMEOUT_MINUTES = 20;
-
 export const BLOCKING_RESERVATIONS_POLL_INTERVAL = 1000 * 20;
 export const SEARCH_PAGING_LIMIT = 36;
 

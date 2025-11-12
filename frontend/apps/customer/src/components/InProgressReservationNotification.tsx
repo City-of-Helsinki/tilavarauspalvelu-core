@@ -14,7 +14,6 @@ import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId, filterNonNullable, getLocalizationLang } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
 import { useCurrentUser } from "@/hooks";
-import { CREATED_RESERVATION_TIMEOUT_MINUTES } from "@/modules/const";
 import { getCheckoutUrl } from "@/modules/reservation";
 import { getReservationInProgressPath } from "@/modules/urls";
 import {
@@ -47,10 +46,10 @@ function getRemainingMinutes(reservation: ReservationNotificationFragment): numb
   if (reservation.state === ReservationStateChoice.WaitingForPayment) {
     return reservation.paymentOrder?.expiresInMinutes ?? 0;
   }
-  if (reservation.state === ReservationStateChoice.Created && reservation.createdAt != null) {
-    const createdAt = new Date(reservation.createdAt);
-    const since = differenceInMinutes(new Date(), createdAt);
-    return Math.max(CREATED_RESERVATION_TIMEOUT_MINUTES - since, 0);
+  if (reservation.state === ReservationStateChoice.Created && reservation.draftExpiresAt != null) {
+    const expiresAt = new Date(reservation.draftExpiresAt);
+    const till = differenceInMinutes(expiresAt, new Date());
+    return Math.max(till, 0);
   }
   return 0;
 }
@@ -88,14 +87,7 @@ function ReservationNotification({
   }
 
   return (
-    <NotificationWrapper
-      type="alert"
-      dismissible
-      centered
-      label={title}
-      closeButtonLabelText={t("common:close")}
-      data-testid="unpaid-reservation-notification__title"
-    >
+    <NotificationWrapper type="alert" centered label={title} data-testid="unpaid-reservation-notification__title">
       <Flex $wrap="wrap" $direction="row">
         <BodyText>{text}</BodyText>
         <Flex $gap="s" $direction="row">
@@ -298,7 +290,7 @@ export const RESERVATION_NOTIFICATION_FRAGMENT = gql`
     id
     pk
     state
-    createdAt
+    draftExpiresAt
     paymentOrder {
       id
       expiresInMinutes
