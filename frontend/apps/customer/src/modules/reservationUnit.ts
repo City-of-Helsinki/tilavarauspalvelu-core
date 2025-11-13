@@ -16,7 +16,7 @@ import { type TFunction } from "i18next";
 import { trim, uniq } from "lodash-es";
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
 import { getIntervalMinutes } from "@ui/modules/conversion";
-import { timeToMinutes, formatApiDate } from "@ui/modules/date-utils";
+import { formatApiDate, timeToMinutes } from "@ui/modules/date-utils";
 import {
   capitalize,
   dayMax,
@@ -363,7 +363,16 @@ export function getPrice(
       minutes,
     });
   }
-  return getReservationPrice(reservation.price ?? undefined, t("prices:priceFree"), true, lang);
+  const showOnlyMaterialPrice =
+    Number(reservation.price) === 0 && getActivePricing(reservation.reservationUnit)?.materialPriceDescriptionFi;
+  if (showOnlyMaterialPrice) {
+    return capitalize(t("prices:materialPrice"));
+  }
+  const reservationPrice = getReservationPrice(reservation.price, t("prices:priceFree"), true, lang);
+  const materialPriceDescription = getActivePricing(reservation.reservationUnit)?.materialPriceDescriptionFi
+    ? ` + ${t("prices:materialPrice")}`
+    : "";
+  return `${reservationPrice}${materialPriceDescription}`;
 }
 
 function getSubventionState(
