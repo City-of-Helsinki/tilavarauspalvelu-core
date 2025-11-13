@@ -306,7 +306,7 @@ def test_reservation_unit__create__pricing__material_pricing_blocked_tags(graphq
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
-    assert ReservationUnitPricing.objects.first().material_price_description_fi == "Title alert('xss')"
+    assert ReservationUnitPricing.objects.first().material_price_description_fi == "<h1>Title</h1> alert('xss')"
 
 
 # Update
