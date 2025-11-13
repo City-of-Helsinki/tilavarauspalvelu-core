@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
-import { Option, Select } from "hds-react";
+import { defaultFilter, Option, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import { convertOptionToHDS, toNumber } from "ui/src/modules/helpers";
@@ -11,6 +11,8 @@ type SelectFilterProps = {
   options: Readonly<Array<{ label: string; value: string | number }>>;
   sort?: boolean;
   clearable?: boolean;
+  enableSearch?: boolean;
+  style?: React.CSSProperties;
 };
 
 export function SelectFilter(props: SelectFilterProps) {
@@ -45,6 +47,8 @@ function BaseSelectFilter({
   onChange,
   sort = false,
   clearable = false,
+  enableSearch = false,
+  style,
 }: BaseSelectFilterProps): JSX.Element {
   const { t } = useTranslation();
   const label = t(`filters:label.${name}`);
@@ -78,6 +82,8 @@ function BaseSelectFilter({
       onChange={(sel) => handleChange(sel)}
       value={options.find((x) => x.value.toString() === value?.toString())?.value?.toString()}
       clearable={clearable ?? false}
+      filter={enableSearch ? defaultFilter : undefined}
+      style={style}
     />
   );
 }
@@ -85,16 +91,17 @@ function BaseSelectFilter({
 interface ControlledSelectProps<T extends FieldValues> extends UseControllerProps<T>, Omit<SelectFilterProps, "name"> {
   name: Path<T>;
   control: Control<T>;
+  enableSearch?: boolean;
 }
 
 export function ControlledSelectFilter<T extends FieldValues>({
   control,
   ...props
 }: ControlledSelectProps<T>): JSX.Element {
-  const { name } = props;
+  const { name, enableSearch } = props;
   const {
     field: { value, onChange },
   } = useController({ name, control });
 
-  return <BaseSelectFilter {...props} value={value} onChange={(val) => onChange(val)} />;
+  return <BaseSelectFilter {...props} value={value} onChange={(val) => onChange(val)} enableSearch={enableSearch} />;
 }

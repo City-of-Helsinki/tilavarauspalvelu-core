@@ -7,7 +7,6 @@ import { DayT } from "ui/src/modules/const";
 import { convertWeekday } from "ui/src/modules/conversion";
 import { mapFormToSearchParams } from "ui/src/modules/search";
 import { AutoGrid, Flex, HR } from "ui/src/styled";
-import { ControlledSelect } from "@ui/components/form";
 import { ControlledMultiSelectFilter, ControlledSearchFilter } from "@/components/QueryParamFilters";
 import { SearchTags } from "@/components/SearchTags";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
@@ -124,14 +123,7 @@ export function Filters({
     <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)}>
       <AutoGrid>
         <ControlledMultiSelectFilter control={control} name="unitGroup" options={options.unitGroups} />
-        <ControlledSelect
-          label={t("filters:label.unit")}
-          control={control}
-          name="unit"
-          options={options.units}
-          multiselect
-          enableSearch
-        />
+        <ControlledMultiSelectFilter control={control} name="unit" options={options.units} enableSearch />
         {statusOption === "section" ? (
           <ControlledMultiSelectFilter control={control} name="sectionStatus" options={sectionStatusOptions} />
         ) : statusOption === "application" ? (
@@ -139,12 +131,10 @@ export function Filters({
         ) : null}
 
         {enableReservationUnit && (
-          <ControlledSelect
-            label={t("filters:label.reservationUnit")}
+          <ControlledMultiSelectFilter
             control={control}
             name="reservationUnit"
             options={options.reservationUnits}
-            multiselect
             enableSearch
           />
         )}
