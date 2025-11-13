@@ -70,12 +70,12 @@ const ApplicationSectionPage1Schema = z
   .superRefine((val, ctx) => {
     if (lessThanMaybeDate(val.end, val.begin)) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["end"],
         message: "End date must be after begin date",
       });
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["begin"],
         message: "Begin date must be before end date",
       });
@@ -113,7 +113,7 @@ const ApplicationSectionPage2Schema = z
       s.suitableTimeRanges.filter((tr) => lengthOfTimeRange(tr) < s.minDuration).length === 0;
     if (!isValid) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["suitableTimeRanges"],
         message: "Suitable time range must be at least as long as the minimum duration",
       });
@@ -131,7 +131,7 @@ const ApplicationSectionPage2Schema = z
 
     if (!isValid) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["suitableTimeRanges"],
         message: "At least as many suitable time ranges as applied reservations per week",
       });
@@ -239,7 +239,7 @@ function checkDateRange(props: {
   if (startOfDay(date).getTime() < startOfDay(range.begin).getTime()) {
     const message = `${part} date must be after application round begin date`;
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: [path],
       message,
     });
@@ -247,7 +247,7 @@ function checkDateRange(props: {
   if (startOfDay(date).getTime() > startOfDay(range.end).getTime()) {
     const message = `${part} date must be before application round end date`;
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: [path],
       message,
     });
@@ -298,7 +298,7 @@ export function ApplicationPage1SchemaRefined(round: { begin: Date; end: Date })
   return ApplicationPage1Schema.superRefine((val, ctx) => {
     if (val.applicationSections == null || val.applicationSections.length === 0) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["applicationSections"],
         message: "Required",
       });
@@ -352,7 +352,7 @@ export const ApplicationPage3Schema = z
       const hasId = val.organisationIdentifier != null && val.organisationIdentifier !== "";
       if ((requiredToHaveId || isRegisteredAssociation) && !hasId) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           path: ["organisationIdentifier"],
           message: "Required",
         });
@@ -361,7 +361,7 @@ export const ApplicationPage3Schema = z
     if (val.applicantType === ReserveeType.Nonprofit) {
       if (!val.municipality) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           path: ["municipality"],
           message: "Required",
         });
