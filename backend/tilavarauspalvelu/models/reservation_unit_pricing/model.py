@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar
 
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_nh3.models import Nh3Field
@@ -44,10 +45,8 @@ class ReservationUnitPricing(models.Model):
         max_length=500,
         blank=True,
         default="",
-        tags={"a", "strong"},
-        attributes={
-            "a": {"href", "target"},
-        },
+        tags=settings.NH3_ALLOWED_TAGS,
+        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
 
     tax_percentage: TaxPercentage = models.ForeignKey(
