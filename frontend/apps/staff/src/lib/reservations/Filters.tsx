@@ -143,24 +143,15 @@ export function Filters({
           name="reservationType"
         />
         <ControlledMultiSelectFilter control={control} options={options.stateChoices} name="state" />
-        <ControlledSelect
-          label={t("filters:label.reservationUnit")}
+        <ControlledMultiSelectFilter
           control={control}
           options={options.reservationUnits}
           name="reservationUnit"
-          multiselect
           enableSearch
         />
         <ControlledSearchFilter control={control} name="search" labelKey="searchReservation" />
         <ControlledDateRangeFilter control={control} nameBegin="dateGte" nameEnd="dateLte" />
-        <ControlledSelect
-          label={t("filters:label.unit")}
-          control={control}
-          options={options.units}
-          name="unit"
-          multiselect
-          enableSearch
-        />
+        <ControlledMultiSelectFilter control={control} options={options.units} name="unit" enableSearch />
         <ControlledSelect
           label={t("filters:label.reservationUnitType")}
           control={control}

@@ -7,7 +7,6 @@ import { ShowAllContainer } from "ui/src/components";
 import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
 import { mapFormToSearchParams } from "ui/src/modules/search";
 import { Flex } from "ui/src/styled";
-import { ControlledSelect } from "@ui/components/form";
 import {
   ControlledSearchFilter,
   ControlledMultiSelectFilter,
@@ -105,20 +104,11 @@ export function Filters({
         maximumNumber={4}
       >
         <ControlledSearchFilter control={control} name="search" labelKey="reservationUnit" />
-        <ControlledSelect
-          label={t("filters:label.unit")}
-          control={control}
-          options={options.units}
-          name="unit"
-          multiselect
-          enableSearch
-        />
-        <ControlledSelect
-          label={t("filters:label.reservationUnitType")}
+        <ControlledMultiSelectFilter control={control} options={options.units} name="unit" enableSearch />
+        <ControlledMultiSelectFilter
           control={control}
           options={options.reservationUnitTypes}
           name="reservationUnitType"
-          multiselect
           enableSearch
         />
         <ControlledMultiSelectFilter
