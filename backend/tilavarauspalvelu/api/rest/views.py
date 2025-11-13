@@ -108,7 +108,10 @@ def csrf_view(request: WSGIRequest) -> HttpResponseRedirect | JsonResponse:  # N
     if redirect_to is not None:
         parsed_uri = urlparse(redirect_to)
         origin = f"{parsed_uri.scheme}://{parsed_uri.netloc}".removesuffix("/")
-        if origin not in settings.CORS_ALLOWED_ORIGINS:
+        if (
+            parsed_uri.netloc  # Only validate if netloc is given (No netloc means relative URL, which is allowed).
+            and origin not in settings.CORS_ALLOWED_ORIGINS
+        ):
             msg = "The 'redirect_to' parameter points to an origin that is not allowed."
             return JsonResponse({"detail": msg, "code": "REDIRECT_TO_ORIGIN_NOT_ALLOWED"}, status=400)
 
