@@ -106,6 +106,7 @@ export function UnitReservations({ tagOptions, ...props }: UnitReservationsProps
           }}
           name="reservationUnitType"
           options={tagOptions.reservationUnitTypes}
+          enableSearch
         />
       </AutoGrid>
       <SearchTags hide={hideTags} translateTag={translateTag(t, tagOptions)} />
