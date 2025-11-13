@@ -537,6 +537,20 @@ class Common(Environment):
     # Allows faking membership to certain AD groups for testing automatic role assignment
     FAKE_SUPERUSER_AD_GROUPS = values.ListValue(default=[])
 
+    TINYMCE_DEFAULT_CONFIG = {
+        "theme": "silver",
+        "height": 350,
+        "menubar": False,
+        "browser_spellcheck": True,
+        "plugins": "advlist,autolink,lists,link,image,charmap,preview,anchor,"
+        "searchreplace,visualblocks,code,fullscreen,insertdatetime,media,table,"
+        "help,wordcount",
+        "toolbar": "undo redo | blocks | "
+        "bold italic backcolor | alignleft aligncenter "
+        "alignright alignjustify | bullist numlist outdent indent | "
+        "removeformat | help",
+    }
+
     NH3_ALLOWED_TAGS = {
         "h1",
         "h2",
