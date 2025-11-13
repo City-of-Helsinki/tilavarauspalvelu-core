@@ -13,7 +13,7 @@ export const optionalEmailField = z.union([emailField, z.string().length(0)]).op
 export function checkDateNotInPast(date: Date | null, ctx: z.RefinementCtx, path: string): void {
   if (date && date < subDays(new Date(), 1)) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: [path],
       message: "Date can't be in the past",
     });
@@ -23,7 +23,7 @@ export function checkDateNotInPast(date: Date | null, ctx: z.RefinementCtx, path
 export function checkDateWithinThreeYears(date: Date | null, ctx: z.RefinementCtx, path: string): void {
   if (date && Math.abs(new Date().getTime() - date.getTime()) > THREE_YEARS_MS) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: [path],
       message: "Date needs to be within three years.",
     });
@@ -34,7 +34,7 @@ export function checkValidDateOnly(date: Date | null, ctx: z.RefinementCtx, path
   // NOTE typical use case goes through our date parser that converts invalid dates -> null
   if (date == null || Number.isNaN(date.getTime())) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: [path],
       message: "Invalid date",
     });
@@ -58,19 +58,19 @@ export function checkValidFutureDate(date: Date | null, ctx: z.RefinementCtx, pa
 export function checkTimeStringFormat(data: string | undefined, ctx: z.RefinementCtx, path: string, errorKey?: string) {
   if (!data) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: [path],
       message: `Required`,
     });
   } else if (!data.match(TIME_PATTERN)) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: [path],
       message: `${errorKey ?? path} is not in time format.`,
     });
   } else if (Number(data.replace(":", ".")) >= 24) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: [path],
       message: `${errorKey ?? path} can't be more than 24 hours.`,
     });
@@ -89,14 +89,14 @@ export function checkLengthWithoutHtml(
 
   if (min != null && stripped.length < min) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: [path],
       message: `${name ?? "Message"} cannot be shorter than ${min} characters`,
     });
   }
   if (max != null && stripped.length > max) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: [path],
       message: `${name ?? "Message"} cannot be longer than ${max} characters`,
     });

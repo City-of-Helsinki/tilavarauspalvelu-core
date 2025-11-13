@@ -84,7 +84,7 @@ export function checkStartEndTime(
     Number(data.startTime.replace(":", ".")) >= Number(data.endTime.replace(":", "."))
   ) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: ["endTime"],
       message: "End time needs to be after start time.",
     });
@@ -99,7 +99,7 @@ export function checkReservationInterval(
 ): undefined {
   if (time && Number(time.substring(3)) % interval !== 0) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: [path],
       message: `${path} has to be in ${interval} minutes increments.`,
     });
