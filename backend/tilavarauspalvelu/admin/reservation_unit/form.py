@@ -134,6 +134,9 @@ class ReservationUnitPricingForm(forms.ModelForm):
     class Meta:
         model = ReservationUnitPricing
         fields = []  # Use fields from Inline
+        widgets = {
+            "material_price_description": TinyMCE(mce_attrs={"height": "250px"}),
+        }
 
 
 class ReservationUnitPricingFormSet(BaseInlineFormSet):
