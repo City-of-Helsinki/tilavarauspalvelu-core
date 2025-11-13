@@ -9,6 +9,7 @@ import { filterNonNullable, getLocalizationLang } from "ui/src/modules/helpers";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { getTranslationSafe } from "ui/src/modules/util";
 import { Flex, H1, H3 } from "ui/src/styled";
+import { Sanitize } from "@ui/components/Sanitize";
 import { IconWithText } from "@/components/IconWithText";
 import {
   getActivePricing,
@@ -254,7 +255,7 @@ function IconList({
                 <IconWithText icon={icon} text={text} />
                 {activePricing && getTranslationSafe(activePricing, "materialPriceDescription", lang) !== "" && (
                   <Tooltip>
-                    {activePricing != null ? getTranslationSafe(activePricing, "materialPriceDescription", lang) : ""}
+                    <Sanitize html={getTranslationSafe(activePricing, "materialPriceDescription", lang)} />
                   </Tooltip>
                 )}
               </AccessTypeTooltipWrapper>
