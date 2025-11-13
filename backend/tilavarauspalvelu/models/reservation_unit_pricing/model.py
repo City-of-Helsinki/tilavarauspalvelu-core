@@ -42,9 +42,9 @@ class ReservationUnitPricing(models.Model):
     highest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     material_price_description: str = Nh3Field(
-        max_length=500,
         blank=True,
         default="",
+        max_length=1000,  # Double of the limit of 500 chars in order to accommodate HTML tags
         tags=settings.NH3_ALLOWED_TAGS,
         attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
