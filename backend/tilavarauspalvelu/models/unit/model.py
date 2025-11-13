@@ -45,7 +45,7 @@ class Unit(models.Model):
 
     name: str = models.CharField(max_length=255)
     description: str = Nh3Field(
-        max_length=4000,
+        max_length=8000,  # Double of the limit of 4000 chars in order to accommodate HTML tags
         blank=True,
         default="",
         tags=settings.NH3_ALLOWED_TAGS,

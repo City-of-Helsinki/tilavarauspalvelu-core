@@ -91,32 +91,40 @@ class ReservationUnit(models.Model):
     description: str = Nh3Field(
         blank=True,
         default="",
+        max_length=8000,  # Double of the limit of 4000 chars in order to accommodate HTML tags
         tags=settings.NH3_ALLOWED_TAGS,
         attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
-    contact_information: str = Nh3Field(blank=True, default="")
+    contact_information: str = Nh3Field(
+        blank=True,
+        default="",
+        max_length=1000,  # Double of the limit of 500 chars in order to accommodate HTML tags
+    )
     notes_when_applying: str | None = Nh3Field(
         null=True,
         blank=True,
-        max_length=2000,
+        max_length=4000,  # Double of the limit of 2000 chars in order to accommodate HTML tags
         tags=settings.NH3_ALLOWED_TAGS,
         attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
     reservation_pending_instructions: str = Nh3Field(
         blank=True,
         default="",
+        max_length=8000,  # Double of the limit of 8000 chars in order to accommodate HTML tags
         tags=settings.NH3_ALLOWED_TAGS,
         attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
     reservation_confirmed_instructions: str = Nh3Field(
         blank=True,
         default="",
+        max_length=8000,  # Double of the limit of 8000 chars in order to accommodate HTML tags
         tags=settings.NH3_ALLOWED_TAGS,
         attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
     reservation_cancelled_instructions: str = Nh3Field(
         blank=True,
         default="",
+        max_length=8000,  # Double of the limit of 8000 chars in order to accommodate HTML tags
         tags=settings.NH3_ALLOWED_TAGS,
         attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
