@@ -115,16 +115,16 @@
     "RESERVEE_INFO_FORM": "Lomake 2: Yhteystiedot ja tilaisuuden kuvaus"
   },
   "reservationStartInterval": {
-    "INTERVAL_15_MINS": "15 min välein",
-    "INTERVAL_30_MINS": "30 min välein",
-    "INTERVAL_60_MINS": "1 tunnin välein",
-    "INTERVAL_90_MINS": "1,5 tunnin välein",
-    "INTERVAL_120_MINS": "2 tunnin välein",
-    "INTERVAL_180_MINS": "3 tunnin välein",
-    "INTERVAL_240_MINS": "4 tunnin välein",
-    "INTERVAL_300_MINS": "5 tunnin välein",
-    "INTERVAL_360_MINS": "6 tunnin välein",
-    "INTERVAL_420_MINS": "7 tunnin välein"
+    "INTERVAL_15_MINUTES": "15 min välein",
+    "INTERVAL_30_MINUTES": "30 min välein",
+    "INTERVAL_60_MINUTES": "1 tunnin välein",
+    "INTERVAL_90_MINUTES": "1,5 tunnin välein",
+    "INTERVAL_120_MINUTES": "2 tunnin välein",
+    "INTERVAL_180_MINUTES": "3 tunnin välein",
+    "INTERVAL_240_MINUTES": "4 tunnin välein",
+    "INTERVAL_300_MINUTES": "5 tunnin välein",
+    "INTERVAL_360_MINUTES": "6 tunnin välein",
+    "INTERVAL_420_MINUTES": "7 tunnin välein"
   },
   "Calendar": {
     "legend": {
