@@ -60,13 +60,13 @@ describe("Component: ReservationInfoCard", () => {
     expect(screen.getByTestId("reservation__reservation-info-card__duration").textContent).toContain(durationHoursText);
   });
 
-  it("should show the a text for being free of charge when the price is 0", () => {
+  it("should show the text for material price, when the price is 0", () => {
     customRender({
       reservation: createMockReservationInfoCard("0"),
     });
     expect(
       screen.getByText((_, element) => {
-        return element?.textContent?.trim() === "common:price: prices:priceFree";
+        return element?.textContent?.trim() === "common:price: Prices:materialPrice";
       })
     ).toBeInTheDocument();
   });
@@ -77,7 +77,10 @@ describe("Component: ReservationInfoCard", () => {
     });
     expect(
       screen.getByText((_, element) => {
-        return element?.textContent?.trim() === 'common:price: 10,00 € (common:inclTax {"taxPercentage":"25,5"})';
+        return (
+          element?.textContent?.trim() ===
+          "common:price: 10,00 € + prices:materialPrice (common:inclTax" + ' {"taxPercentage":"25,5"})'
+        );
       })
     ).toBeInTheDocument();
   });
