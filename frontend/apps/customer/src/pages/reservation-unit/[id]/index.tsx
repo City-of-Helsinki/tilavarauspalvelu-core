@@ -9,7 +9,7 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { Sanitize } from "ui/src/components/Sanitize";
+import { cleanHtmlContent, Sanitize } from "ui/src/components/Sanitize";
 import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
 import { errorToast } from "ui/src/components/toast";
 import { useDisplayError, useToastIfQueryParam } from "ui/src/hooks";
@@ -18,6 +18,7 @@ import { type ApiError, getApiErrors } from "ui/src/modules/apolloUtils";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "ui/src/modules/date-utils";
 import {
+  capitalize,
   createNodeId,
   filterNonNullable,
   getLocalizationLang,
@@ -49,6 +50,7 @@ import {
   getDurationOptions,
 } from "@/modules/reservation";
 import {
+  getActivePricing,
   getReservationUnitName,
   isReservationUnitPublished,
   isReservationUnitReservable,
@@ -326,6 +328,8 @@ function ReservationUnit({
     ? getTranslationSafe(reservationUnit.pricingTerms, "text", lang)
     : undefined;
 
+  const activePricing = getActivePricing(reservationUnit);
+
   return (
     <>
       <TimeZoneNotification />
@@ -358,6 +362,13 @@ function ReservationUnit({
             <H4 as="h2">{t("reservationUnit:description")}</H4>
             <Sanitize html={getTranslationSafe(reservationUnit, "description", lang)} />
           </div>
+          {activePricing?.materialPriceDescriptionFi &&
+            cleanHtmlContent(activePricing?.materialPriceDescriptionFi.trim()).length > 0 && (
+              <>
+                <H4 as="h2">{capitalize(t("prices:materialPrice"))}</H4>
+                <Sanitize html={getTranslationSafe(activePricing, "materialPriceDescription", lang)} />
+              </>
+            )}
           {equipment.length > 0 && (
             <div data-testid="reservation-unit__equipment">
               <H4 as="h2">{t("reservationUnit:equipment")}</H4>
