@@ -176,7 +176,7 @@ def remove_old_personal_info_view_logs_task() -> None:
         "päivittää tietokantaan muuttuneiden resurssien aukiolotietojen mukaiset varattavat ajat nykyhetkestä "
         "eteenpäin (Opening Hours > origin hauki resource > Reservable time spans)."
     ),
-    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="*", minute="30"),
+    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="*", minute="0,15,30,45"),
 )
 def update_origin_hauki_resource_reservable_time_spans_task() -> None:
     from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
