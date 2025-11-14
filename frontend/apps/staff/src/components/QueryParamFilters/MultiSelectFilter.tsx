@@ -1,6 +1,6 @@
 import React from "react";
 import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
-import { Select } from "hds-react";
+import { defaultFilter, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import { convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";
@@ -11,6 +11,7 @@ interface MultiSelectFilterProps {
   options: Readonly<Array<{ label: string; value: string | number }>>;
   style?: React.CSSProperties;
   className?: string;
+  enableSearch?: boolean;
 }
 
 // TODO is the T param good enough for type safety?
@@ -39,9 +40,17 @@ export function MultiSelectFilter(props: MultiSelectFilterProps): JSX.Element {
 interface BaseMultiSelectFilterProps extends MultiSelectFilterProps {
   filter: string[];
   setFilter: (value: Array<string>) => void;
+  enableSearch?: boolean;
 }
 
-function BaseMultiSelectFilter({ name, options, filter, setFilter, ...rest }: BaseMultiSelectFilterProps): JSX.Element {
+function BaseMultiSelectFilter({
+  name,
+  options,
+  filter,
+  setFilter,
+  enableSearch,
+  ...rest
+}: BaseMultiSelectFilterProps): JSX.Element {
   const { t } = useTranslation();
   const label = t(`filters:label.${name}`);
   const placeholder = t(`filters:placeholder.${name}`);
@@ -50,6 +59,7 @@ function BaseMultiSelectFilter({ name, options, filter, setFilter, ...rest }: Ba
       {...rest}
       clearable
       multiSelect
+      filter={enableSearch ? defaultFilter : undefined}
       texts={{
         label,
         placeholder,
@@ -72,6 +82,7 @@ interface ControlledMultiSelectProps<T extends FieldValues>
     Omit<MultiSelectFilterProps, "name"> {
   name: Path<T>;
   control: Control<T>;
+  enableSearch?: boolean;
 }
 
 /// Controlled variant for transitioning on select searching to submit based searching
@@ -81,6 +92,7 @@ export function ControlledMultiSelectFilter<T extends FieldValues>({
   control,
   style,
   className,
+  enableSearch = false,
 }: ControlledMultiSelectProps<T>): JSX.Element {
   const {
     field: { value, onChange },
@@ -106,6 +118,7 @@ export function ControlledMultiSelectFilter<T extends FieldValues>({
       className={className}
       filter={convertedValues}
       setFilter={setFilter}
+      enableSearch={enableSearch}
     />
   );
 }

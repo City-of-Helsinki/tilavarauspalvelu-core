@@ -123,7 +123,7 @@ export function Filters({
     <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)}>
       <AutoGrid>
         <ControlledMultiSelectFilter control={control} name="unitGroup" options={options.unitGroups} />
-        <ControlledMultiSelectFilter control={control} name="unit" options={options.units} />
+        <ControlledMultiSelectFilter control={control} name="unit" options={options.units} enableSearch />
         {statusOption === "section" ? (
           <ControlledMultiSelectFilter control={control} name="sectionStatus" options={sectionStatusOptions} />
         ) : statusOption === "application" ? (
@@ -131,7 +131,12 @@ export function Filters({
         ) : null}
 
         {enableReservationUnit && (
-          <ControlledMultiSelectFilter control={control} name="reservationUnit" options={options.reservationUnits} />
+          <ControlledMultiSelectFilter
+            control={control}
+            name="reservationUnit"
+            options={options.reservationUnits}
+            enableSearch
+          />
         )}
         {enableApplicant && (
           <ControlledMultiSelectFilter control={control} name="applicant" options={applicantOptions} />

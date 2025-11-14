@@ -97,11 +97,12 @@ export function Filters({ options }: { options: TagOptionsList }): JSX.Element {
         maximumNumber={4}
       >
         <ControlledSearchFilter control={control} name="search" labelKey="reservationUnit" />
-        <ControlledMultiSelectFilter control={control} options={options.units} name="unit" />
+        <ControlledMultiSelectFilter control={control} options={options.units} name="unit" enableSearch />
         <ControlledMultiSelectFilter
           control={control}
           options={options.reservationUnitTypes}
           name="reservationUnitType"
+          enableSearch
         />
         <ControlledMultiSelectFilter
           control={control}

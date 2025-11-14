@@ -64,6 +64,7 @@ export function DescriptionSection({
           helper={t("reservationUnitEditor:reservationUnitTypeHelperText")}
           error={getTranslatedError(t, errors.reservationUnitType?.message)}
           tooltip={t("reservationUnitEditor:tooltip.reservationUnitType")}
+          enableSearch
         />
         <ControlledSelect
           control={control}
@@ -73,6 +74,7 @@ export function DescriptionSection({
           placeholder={t("reservationUnitEditor:intendedUsesPlaceholder")}
           options={purposeOptions}
           tooltip={t("reservationUnitEditor:tooltip.intendedUses")}
+          enableSearch
         />
         <ControlledSelect
           control={control}
@@ -82,6 +84,7 @@ export function DescriptionSection({
           placeholder={t("reservationUnitEditor:equipmentsPlaceholder")}
           options={equipmentOptions}
           tooltip={t("reservationUnitEditor:tooltip.equipments")}
+          enableSearch
         />
         {(["descriptionFi", "descriptionEn", "descriptionSv"] as const).map((fieldName) => (
           <Controller

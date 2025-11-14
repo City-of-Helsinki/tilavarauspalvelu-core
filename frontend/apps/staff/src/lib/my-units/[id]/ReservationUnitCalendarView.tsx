@@ -28,7 +28,7 @@ export function ReservationUnitCalendarView({
   return (
     <>
       <AutoGrid>
-        <SelectFilterStyled name="reservationUnit" clearable={false} options={reservationUnitOptions} />
+        <SelectFilterStyled name="reservationUnit" clearable={false} options={reservationUnitOptions} enableSearch />
       </AutoGrid>
       <Flex $justifyContent="center" $direction="row">
         <WeekNavigation
