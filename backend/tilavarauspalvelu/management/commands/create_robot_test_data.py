@@ -3205,7 +3205,7 @@ def create_users() -> None:
             "first_name": "Ande",
             "last_name": "AutomaatioTesteri",
             "email": "qfaksi+ande@gmail.com",
-            "password": make_password("AutomaatioTesteri"),
+            "password": make_password("AutomaatioTesteri"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3222,7 +3222,7 @@ def create_users() -> None:
             "first_name": "Mikael",
             "last_name": "Virtanen",
             "email": "qfaksi+mikael@gmail.com",
-            "password": make_password("Virtanen"),
+            "password": make_password("Virtanen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3239,7 +3239,7 @@ def create_users() -> None:
             "first_name": "Jukka",
             "last_name": "Korhonen",
             "email": "qfaksi+jukka@gmail.com",
-            "password": make_password("Korhonen"),
+            "password": make_password("Korhonen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3256,7 +3256,7 @@ def create_users() -> None:
             "first_name": "Petri",
             "last_name": "Makinen",
             "email": "qfaksi+petri@gmail.com",
-            "password": make_password("Makinen"),
+            "password": make_password("Makinen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3273,7 +3273,7 @@ def create_users() -> None:
             "first_name": "Antti",
             "last_name": "Nieminen",
             "email": "qfaksi+antti@gmail.com",
-            "password": make_password("Nieminen"),
+            "password": make_password("Nieminen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3290,7 +3290,7 @@ def create_users() -> None:
             "first_name": "Matti",
             "last_name": "Mäkelä",
             "email": "qfaksi+matti@gmail.com",
-            "password": make_password("Mäkelä"),
+            "password": make_password("Mäkelä"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3307,7 +3307,7 @@ def create_users() -> None:
             "first_name": "Anna",
             "last_name": "Korhonen",
             "email": "qfaksi+anna@gmail.com",
-            "password": make_password("Korhonen"),
+            "password": make_password("Korhonen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3324,7 +3324,7 @@ def create_users() -> None:
             "first_name": "Mari",
             "last_name": "Leppänen",
             "email": "qfaksi+mari@gmail.com",
-            "password": make_password("Leppänen"),
+            "password": make_password("Leppänen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3343,7 +3343,7 @@ def create_users() -> None:
             "first_name": "Päivi",
             "last_name": "Mustonen",
             "email": "qfaksi+paivi@gmail.com",
-            "password": make_password("Mustonen"),
+            "password": make_password("Mustonen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3360,7 +3360,7 @@ def create_users() -> None:
             "first_name": "Kaisa",
             "last_name": "Rantanen",
             "email": "qfaksi+kaisa@gmail.com",
-            "password": make_password("Rantanen"),
+            "password": make_password("Rantanen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3377,7 +3377,7 @@ def create_users() -> None:
             "first_name": "Ulla",
             "last_name": "Hakala",
             "email": "qfaksi+ulla@gmail.com",
-            "password": make_password("Hakala"),
+            "password": make_password("Hakala"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3394,7 +3394,7 @@ def create_users() -> None:
             "first_name": "Riitta",
             "last_name": "Lindström",
             "email": "qfaksi+riitta@gmail.com",
-            "password": make_password("Lindström"),
+            "password": make_password("Lindström"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3411,7 +3411,7 @@ def create_users() -> None:
             "first_name": "Tirehtoori",
             "last_name": "Tötterstrom",
             "email": "qfaksi+tirehtoori@gmail.com",
-            "password": make_password("DjangoPassu4312"),
+            "password": make_password("DjangoPassu4312"),  # nosec # NOSONAR
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3428,7 +3428,7 @@ def create_users() -> None:
             "first_name": "Pekka",
             "last_name": "Virtanen",
             "email": "qfaksi+pekka@gmail.com",
-            "password": make_password("DjangoPassu4312"),
+            "password": make_password("DjangoPassu4312"),  # nosec # NOSONAR
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3445,7 +3445,7 @@ def create_users() -> None:
             "first_name": "Hannu",
             "last_name": "Rantala",
             "email": "qfaksi+hannu@gmail.com",
-            "password": make_password("DjangoPassu4312"),
+            "password": make_password("DjangoPassu4312"),  # nosec # NOSONAR
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3462,7 +3462,7 @@ def create_users() -> None:
             "first_name": "Seppo",
             "last_name": "Korhonen",
             "email": "qfaksi+seppo@gmail.com",
-            "password": make_password("DjangoPassu4312"),
+            "password": make_password("DjangoPassu4312"),  # nosec # NOSONAR
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3479,7 +3479,7 @@ def create_users() -> None:
             "first_name": "Risto",
             "last_name": "Hakkarainen",
             "email": "qfaksi+risto@gmail.com",
-            "password": make_password("DjangoPassu4312"),
+            "password": make_password("DjangoPassu4312"),  # nosec # NOSONAR
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3496,7 +3496,7 @@ def create_users() -> None:
             "first_name": "Erkki",
             "last_name": "Nieminen",
             "email": "qfaksi+erkki@gmail.com",
-            "password": make_password("DjangoPassu4312"),
+            "password": make_password("DjangoPassu4312"),  # nosec # NOSONAR
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3513,7 +3513,7 @@ def create_users() -> None:
             "first_name": "Ari",
             "last_name": "Laine",
             "email": "qfaksi+ari@gmail.com",
-            "password": make_password("DjangoPassu4312"),
+            "password": make_password("DjangoPassu4312"),  # nosec # NOSONAR
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3530,7 +3530,7 @@ def create_users() -> None:
             "first_name": "Kari",
             "last_name": "Kekkonen",
             "email": "qfaksi+kari@gmail.com",
-            "password": make_password("DjangoPassu4312"),
+            "password": make_password("DjangoPassu4312"),  # nosec # NOSONAR
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3547,7 +3547,7 @@ def create_users() -> None:
             "first_name": "Esa",
             "last_name": "Mattila",
             "email": "qfaksi+esa@gmail.com",
-            "password": make_password("DjangoPassu4312"),
+            "password": make_password("DjangoPassu4312"),  # nosec # NOSONAR
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3564,7 +3564,7 @@ def create_users() -> None:
             "first_name": "Pertti",
             "last_name": "Kallio",
             "email": "qfaksi+pertti@gmail.com",
-            "password": make_password("DjangoPassu4312"),
+            "password": make_password("DjangoPassu4312"),  # nosec # NOSONAR
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3581,7 +3581,7 @@ def create_users() -> None:
             "first_name": "Antero",
             "last_name": "Salonen",
             "email": "qfaksi+antero@gmail.com",
-            "password": make_password("DjangoPassu4312"),
+            "password": make_password("DjangoPassu4312"),  # nosec # NOSONAR
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3598,7 +3598,7 @@ def create_users() -> None:
             "first_name": "Tuula",
             "last_name": "Aaltonen",
             "email": "qfaksi+tuula@gmail.com",
-            "password": make_password("Aaltonen"),
+            "password": make_password("Aaltonen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3615,7 +3615,7 @@ def create_users() -> None:
             "first_name": "Helena",
             "last_name": "Hiltunen",
             "email": "qfaksi+merja@gmail.com",
-            "password": make_password("Hiltunen"),
+            "password": make_password("Hiltunen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3632,7 +3632,7 @@ def create_users() -> None:
             "first_name": "Helena",
             "last_name": "Hiltunen",
             "email": "qfaksi+helena@gmail.com",
-            "password": make_password("Hiltunen"),
+            "password": make_password("Hiltunen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3649,7 +3649,7 @@ def create_users() -> None:
             "first_name": "Seija",
             "last_name": "Mäenpää",
             "email": "qfaksi+seija@gmail.com",
-            "password": make_password("Mäenpää"),
+            "password": make_password("Mäenpää"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3666,7 +3666,7 @@ def create_users() -> None:
             "first_name": "Maija",
             "last_name": "Peltonen",
             "email": "qfaksi+maija@gmail.com",
-            "password": make_password("Peltonen"),
+            "password": make_password("Peltonen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3683,7 +3683,7 @@ def create_users() -> None:
             "first_name": "Liisa",
             "last_name": "Koivisto",
             "email": "qfaksi+liisa@gmail.com",
-            "password": make_password("Koivisto"),
+            "password": make_password("Koivisto"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3702,7 +3702,7 @@ def create_users() -> None:
             "first_name": "Sanna",
             "last_name": "Hämäläinen",
             "email": "qfaksi+sanna@gmail.com",
-            "password": make_password("Hämäläinen"),
+            "password": make_password("Hämäläinen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3721,7 +3721,7 @@ def create_users() -> None:
             "first_name": "Kirsi",
             "last_name": "Heikkinen",
             "email": "qfaksi+kirsi@gmail.com",
-            "password": make_password("Heikkinen"),
+            "password": make_password("Heikkinen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3741,7 +3741,7 @@ def create_users() -> None:
             "first_name": "Marja",
             "last_name": "Koskinen",
             "email": "qfaksi+marja@gmail.com",
-            "password": make_password("Koskinen"),
+            "password": make_password("Koskinen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3760,7 +3760,7 @@ def create_users() -> None:
             "first_name": "Tiina",
             "last_name": "Järvinen",
             "email": "qfaksi+tiina@gmail.com",
-            "password": make_password("Järvinen"),
+            "password": make_password("Järvinen"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3779,7 +3779,7 @@ def create_users() -> None:
             "first_name": "Marika",
             "last_name": "Salminen",
             "email": "qfaksi+marika@gmail.com",
-            "password": make_password("DjangoPassu4312"),
+            "password": make_password("DjangoPassu4312"),  # nosec # NOSONAR
             "is_staff": True,
             "is_active": True,
             "is_superuser": False,  # Not superuser, for permission testing
@@ -3799,7 +3799,7 @@ def create_users() -> None:
             "first_name": "Niko",
             "last_name": "Selänne",
             "email": "qfaksi+niko@gmail.com",
-            "password": make_password("DjangoPassu4312"),
+            "password": make_password("DjangoPassu4312"),  # nosec # NOSONAR
             "is_staff": True,
             "is_active": True,
             "is_superuser": False,  # Not superuser, has unit permissions
@@ -3819,7 +3819,7 @@ def create_users() -> None:
             "first_name": "Mikko",
             "last_name": "Mäkinen",
             "email": "qfaksi+mikko@gmail.com",
-            "password": make_password("DjangoPassu4312"),
+            "password": make_password("DjangoPassu4312"),  # nosec # NOSONAR
             "is_staff": True,
             "is_active": True,
             "is_superuser": False,  # Not superuser, has unit group permissions
@@ -3838,7 +3838,7 @@ def create_users() -> None:
             "first_name": "Timo",
             "last_name": "Nieminen",
             "email": "qfaksi+nieminen@gmail.com",
-            "password": make_password("DjangoPassu4312"),
+            "password": make_password("DjangoPassu4312"),  # nosec # NOSONAR
             "is_staff": True,
             "is_active": True,
             "is_superuser": True,
@@ -3857,7 +3857,7 @@ def create_users() -> None:
             "first_name": "Tabitah",
             "last_name": "Testitar",
             "email": "qfaksi+tabitah@gmail.com",
-            "password": make_password("Testitar"),
+            "password": make_password("Testitar"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3876,7 +3876,7 @@ def create_users() -> None:
             "first_name": "Elina",
             "last_name": "Laine",
             "email": "qfaksi+elina@gmail.com",
-            "password": make_password("Laine"),
+            "password": make_password("Laine"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
@@ -3895,7 +3895,7 @@ def create_users() -> None:
             "first_name": "Merja",
             "last_name": "Kangas",
             "email": "qfaksi+merja@gmail.com",
-            "password": make_password("Kangas"),
+            "password": make_password("Kangas"),  # nosec # NOSONAR
             "is_staff": False,
             "is_active": True,
             "is_superuser": False,
