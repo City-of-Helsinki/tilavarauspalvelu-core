@@ -1,9 +1,8 @@
 /// NOTE client only
 /// Quill is not SSR compatible
-import React from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import React, { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
 import { IconAlertCircleFill, Tooltip } from "hds-react";
+import Quill from "quill";
 import styled from "styled-components";
 import { Flex } from "ui/src/styled";
 
@@ -48,7 +47,7 @@ const ErrorText = styled.span`
   color: var(--color-error);
 `;
 
-const StyledReactQuill = styled(ReactQuill)<{
+const EditorContainer = styled.div<{
   $error?: boolean;
 }>`
   background: var(--color-white);
@@ -62,11 +61,82 @@ const StyledReactQuill = styled(ReactQuill)<{
   }
 `;
 
-const modules = {
-  toolbar: [["bold"], ["link"]],
-};
+const toolbarOptions = ["bold", "link"];
 
-type Props = {
+interface QuillEditorProps {
+  onTextChange: (source: string) => void;
+  id?: string;
+  defaultValue?: string;
+  value?: string;
+}
+
+const QuillEditor = forwardRef<Quill | null, QuillEditorProps>(({ id, value, defaultValue, onTextChange }, ref) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const defaultValueRef = useRef(defaultValue);
+  const onTextChangeRef = useRef(onTextChange);
+  const quillRef = useRef<Quill | null>(null);
+
+  useLayoutEffect(() => {
+    onTextChangeRef.current = onTextChange;
+  });
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const editorContainer = container.appendChild(container.ownerDocument.createElement("div"));
+    const quill = new Quill(editorContainer, {
+      theme: "snow",
+      formats: toolbarOptions,
+      modules: {
+        toolbar: toolbarOptions,
+      },
+    });
+
+    quillRef.current = quill;
+
+    if (typeof ref === "function") {
+      ref(quill);
+    } else if (ref) {
+      ref.current = quill;
+    }
+
+    if (defaultValueRef.current) {
+      quill.root.innerHTML = defaultValueRef.current;
+    }
+
+    quill.on(Quill.events.TEXT_CHANGE, () => {
+      onTextChangeRef.current?.(quill.root.innerHTML);
+    });
+
+    return () => {
+      if (typeof ref === "function") {
+        ref(null);
+      } else if (ref) {
+        ref.current = null;
+      }
+      container.innerHTML = "";
+    };
+  }, [ref]);
+
+  useEffect(() => {
+    const quill = quillRef.current;
+    if (!quill || value === undefined) return;
+
+    // Only update if different to avoid cursor jumps
+    if (quill.root.innerHTML !== value) {
+      const selection = quill.getSelection(); // Preserve cursor position
+      quill.root.innerHTML = value;
+      if (selection) {
+        quill.setSelection(selection);
+      }
+    }
+  }, [value]);
+
+  return <div id={id} ref={containerRef}></div>;
+});
+
+type RichTextProps = {
   required?: boolean;
   disabled?: boolean;
   label?: string;
@@ -89,7 +159,7 @@ function RichTextInput({
   helperText,
   onChange,
   ...rest
-}: Props): JSX.Element {
+}: RichTextProps): JSX.Element {
   return (
     <Container {...rest} $disabled={disabled} id={`${id}-container`}>
       <Flex $justifyContent="space-between" $direction="row">
@@ -98,14 +168,9 @@ function RichTextInput({
         </Label>
         {tooltipText && <Tooltip>{tooltipText}</Tooltip>}
       </Flex>
-      <StyledReactQuill
-        modules={modules}
-        readOnly={disabled}
-        id={id}
-        value={value}
-        onChange={onChange}
-        $error={errorText !== undefined}
-      />
+      <EditorContainer $error={errorText !== undefined}>
+        <QuillEditor value={value} defaultValue={value} onTextChange={onChange} />
+      </EditorContainer>
       {errorText ? (
         <Flex $alignItems="center" $direction="row" $gap="xs">
           <IconAlertCircleFill color="var(--color-error)" />
