@@ -88,8 +88,8 @@
       "text_other": "Du har {{count}}/{{total}} bokningar för det här objektet."
     },
     "full": {
-      "title": "Du kan inte göra nya bokningar.",
-      "text": "Det maximala antalet bokningar {{count}} har fyllts för det här objektet."
+      "title": "En ny bokning kan inte göras.",
+      "text": "Det maximala antalet bokningar för detta objekt är {{count}}."
     }
   },
   "quickReservation": {

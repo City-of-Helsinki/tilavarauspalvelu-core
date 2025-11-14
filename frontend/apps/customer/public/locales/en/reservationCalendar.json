@@ -88,8 +88,8 @@
       "text_other": "You have {{count}}/{{total}} bookings for this item."
     },
     "full": {
-      "title": "You cannot make new bookings.",
-      "text": "You have reached the maximum number of bookings {{count}} for this item."
+      "title": "A new booking cannot be made.",
+      "text": "The maximum number of bookings for this item is {{count}}."
     }
   },
   "quickReservation": {

@@ -43,7 +43,6 @@
   "api": {
     "CHANGES_NOT_ALLOWED": "Muutoksia ei sallita.",
     "CREATE_PERMISSION_DENIED": "Ei lupaa luoda.",
-    "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "Varausten enimmäismäärä on ylittynyt.",
     "NOT_FOUND": "Varaus on vanhentunut.",
     "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",
     "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Tarkista varausaika.",

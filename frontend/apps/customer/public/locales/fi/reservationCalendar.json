@@ -86,8 +86,8 @@
       "text_other": "Sinulla on {{count}}/{{total}} varausta tähän kohteeseen."
     },
     "full": {
-      "title": "Et voi tehdä uusia varauksia.",
-      "text": "Sinun varausten enimmäismäärä {{count}} on täynnä tähän kohteeseen."
+      "title": "Uutta varausta ei voi tehdä.",
+      "text": "Varausten enimmäismäärä tähän kohteeseen on {{count}}."
     }
   },
   "quickReservation": {
