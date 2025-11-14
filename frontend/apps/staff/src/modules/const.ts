@@ -14,13 +14,11 @@ export const ALLOCATION_CALENDAR_TIMES = [7, 23] as const;
 export const NUMBER_OF_DECIMALS = 6;
 
 /// Poll updates to application sections on the allocation page (in milliseconds), 0 to disable.
-/// Why use this? if there are multiple users working on the same allocation, they will see updates.
-/// If you are testing, you can use multiple tabs / browsers to see the updates.
-/// Reason to disable (especially in production): the allocations queries are heavy and may cause performance issues.
-/// TODO if this is left enabled it should be moved to env (so we can disable without recompiling).
+/// If there are multiple users working on the same allocation they will see updates.
 /// NOTE seems to work fine without backoff logic (the next query is run after the previous one is finished)
-/// better solution would be to use subscriptions (i.e. drive updates from the backend).
-export const ALLOCATION_POLL_INTERVAL = 20000;
+export const ALLOCATION_POLL_INTERVAL_MS = 30 * 1000;
+/// Poll the current user lazily if user doesn't navigate to another page.
+export const CURRENT_USER_POLL_INTERVAL_MS = 5 * 60 * 1000;
 
 // This is a backend (or library) limit based on testing
 export const GQL_MAX_RESULTS_PER_QUERY = 100;

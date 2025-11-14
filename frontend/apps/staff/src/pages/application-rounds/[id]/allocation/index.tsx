@@ -11,13 +11,19 @@ import styled from "styled-components";
 import { errorToast } from "ui/src/components/toast";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "ui/src/modules/helpers";
 import { CenterSpinner, fontMedium, H1, Strong, TabWrapper } from "ui/src/styled";
+import { useVisibilityChange } from "@ui/hooks";
+import { disablePollIfHidden } from "@ui/modules/browserHelpers";
 import { Error403 } from "@/components/Error403";
 import { LinkPrev } from "@/components/LinkPrev";
 import { useGetFilterSearchParams, useSession } from "@/hooks";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { Filters } from "@/lib/application-rounds/[id]/allocation/Filters";
 import { createClient } from "@/modules/apolloClient";
-import { ALLOCATION_POLL_INTERVAL, NOT_FOUND_SSR_VALUE, VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
+import {
+  ALLOCATION_POLL_INTERVAL_MS,
+  NOT_FOUND_SSR_VALUE,
+  VALID_ALLOCATION_APPLICATION_STATUSES,
+} from "@/modules/const";
 import { truncate } from "@/modules/helpers";
 import { hasPermission as hasUnitPermission } from "@/modules/permissionHelper";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -166,7 +172,7 @@ function ApplicationRoundAllocation({
   const query = useApplicationSectionAllocationsQuery({
     // On purpose skip if the reservation unit is not selected (it is required)
     skip: queryVariables.reservationUnit === 0,
-    pollInterval: ALLOCATION_POLL_INTERVAL,
+    pollInterval: disablePollIfHidden(ALLOCATION_POLL_INTERVAL_MS),
     // NOTE required otherwise this returns stale data when filters change
     // there is an issue with the caches (sometimes returns incorrect data, not stale but incorrect)
     fetchPolicy: "network-only",
@@ -175,7 +181,12 @@ function ApplicationRoundAllocation({
       errorToast({ text: t("errors:errorFetchingData") });
     },
   });
-  const { data: refreshedData, loading, refetch, previousData, fetchMore } = query;
+  const { data: refreshedData, loading, refetch, previousData, fetchMore, stopPolling, startPolling } = query;
+
+  useVisibilityChange({
+    onHidden: stopPolling,
+    onShow: () => startPolling(ALLOCATION_POLL_INTERVAL_MS),
+  });
 
   // NOTE onComplete isn't called more than once
   // how this interacts with the polling is unknown

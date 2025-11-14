@@ -1,9 +1,10 @@
 import { useEffect } from "react";
+import { isWindowVisible } from "@ui/modules/browserHelpers";
+import { CURRENT_USER_POLL_INTERVAL_MS } from "@/modules/const";
 import { useCurrentUserQuery } from "@gql/gql-types";
 
-const POLLING_INTERVAL = 60 * 1000; // 1 minute
-
-// Testing use of manual polling / refetching with current user query.
+// Use manual polling
+// SSR writes the query result to cache so refetch only after an interval
 // problem with Apollo hooks is that nextjs reruns all hooks on query param change.
 export function useSession() {
   const { data, error, refetch } = useCurrentUserQuery({
@@ -16,9 +17,11 @@ export function useSession() {
   // setup polling
   useEffect(() => {
     const id = setInterval(() => {
-      refetch();
-    }, POLLING_INTERVAL);
-    return () => clearTimeout(id);
+      if (isWindowVisible()) {
+        refetch();
+      }
+    }, CURRENT_USER_POLL_INTERVAL_MS);
+    return () => clearInterval(id);
   }, [refetch]);
 
   const user = data?.currentUser ?? null;
