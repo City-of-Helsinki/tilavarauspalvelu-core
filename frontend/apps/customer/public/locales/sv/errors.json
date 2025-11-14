@@ -43,7 +43,6 @@
   "api": {
     "CHANGES_NOT_ALLOWED": "Du kan inte göra ändringar.",
     "CREATE_PERMISSION_DENIED": "Ingen behörighet att skapa.",
-    "RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED": "Det maximala antalet bokningar har överskridits.",
     "NOT_FOUND": "Bokningen hittades inte.",
     "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
     "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Kontrollera bokningstiden.",
