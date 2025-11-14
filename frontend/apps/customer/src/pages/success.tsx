@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { gql } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -6,12 +6,10 @@ import { useRouter } from "next/router";
 import { ignoreMaybeArray } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";
 import { createApolloClient } from "@/modules/apolloClient";
+import { WEBSTORE_SUCCESS_POLL_INTERVAL_MS, WEBSTORE_SUCCESS_POLL_TIMEOUT_MS } from "@/modules/const";
 import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath } from "@/modules/urls";
 import { OrderStatus, ReservationStateChoice, ReservationStateQuery, useReservationStateQuery } from "@gql/gql-types";
-
-const POLL_INTERVAL_MS = 500;
-const STOP_POLLING_TIMEOUT_MS = 30000;
 
 // TODO should be moved to /reservations/success
 // but because this is webstore callback page we need to leave the url (use an url rewrite)
@@ -96,26 +94,23 @@ type NarrowedProps = Exclude<Props, { notFound: boolean }>;
 /// Show loading page if the reservation is still waiting for payment
 /// assuming the user landed here correctly from the webstore callback
 /// the reservation is paid and confirmed but our backend hasn't updated the state yet
-function Page(props: NarrowedProps): JSX.Element {
-  const id = props.reservation.id;
-  const [isPolling, setIsPolling] = useState(true);
+export default function Page({ reservation }: NarrowedProps): JSX.Element {
   // is there a point where we stop polling and return an error to the user?
   const { data, stopPolling } = useReservationStateQuery({
     variables: {
-      id,
+      id: reservation.id,
     },
-    pollInterval: isPolling ? POLL_INTERVAL_MS : 0,
+    pollInterval: WEBSTORE_SUCCESS_POLL_INTERVAL_MS,
   });
 
   const router = useRouter();
   useEffect(() => {
     const endPolling = setTimeout(() => {
-      setIsPolling(false);
       stopPolling();
-      router.replace(getReservationPath(props.reservation.pk, undefined, "polling_timeout"));
-    }, STOP_POLLING_TIMEOUT_MS);
+      router.replace(getReservationPath(reservation.pk, undefined, "polling_timeout"));
+    }, WEBSTORE_SUCCESS_POLL_TIMEOUT_MS);
     return () => clearTimeout(endPolling);
-  }, [stopPolling, props.reservation.pk, router]);
+  }, [stopPolling, reservation.pk, router]);
 
   useEffect(() => {
     const reservation = data?.reservation;
@@ -128,7 +123,6 @@ function Page(props: NarrowedProps): JSX.Element {
     }
     const redirectUrl = getRedirectUrl(reservation);
     if (redirectUrl != null) {
-      setIsPolling(false);
       stopPolling();
       router.replace(redirectUrl);
     }
@@ -136,8 +130,6 @@ function Page(props: NarrowedProps): JSX.Element {
 
   return <CenterSpinner />;
 }
-
-export default Page;
 
 export const GET_RESERVATION_STATE = gql`
   query ReservationState($id: ID!) {

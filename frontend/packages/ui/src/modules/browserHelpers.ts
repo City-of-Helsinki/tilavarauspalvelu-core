@@ -79,10 +79,22 @@ export function signOut(apiBaseUrl: string, appUrlBasePath = "") {
   document.body.removeChild(form);
 }
 
-function addFormParam(form: HTMLFormElement, name: string, value: string) {
+function addFormParam(form: HTMLFormElement, name: string, value: string): void {
   const input = document.createElement("input");
   input.type = "hidden";
   input.name = name;
   input.value = value;
   form.appendChild(input);
+}
+
+// should not be called on SSR => fallback to disable poll
+export function disablePollIfHidden(pollInterval: number): number {
+  if (isWindowVisible()) {
+    return 0;
+  }
+  return pollInterval;
+}
+
+export function isWindowVisible(): boolean {
+  return isBrowser && document.visibilityState === "visible";
 }

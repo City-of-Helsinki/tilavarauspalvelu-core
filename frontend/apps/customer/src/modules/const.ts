@@ -7,7 +7,13 @@ export const mapUrlPrefix = "https://palvelukartta.hel.fi/";
 
 export const ANALYTICS_COOKIE_GROUP_NAME = "statistics";
 
-export const BLOCKING_RESERVATIONS_POLL_INTERVAL = 1000 * 20;
+// Poll other reservations when user is looking at the reservation calendar
+export const BLOCKING_RESERVATIONS_POLL_INTERVAL_MS = 30 * 1000;
+// Poll after webstore redirect to success to wait for backend webhook to be activated
+export const WEBSTORE_SUCCESS_POLL_INTERVAL_MS = 500;
+// Timeout webstore redirect if backend hasn't confirmed the reservation
+export const WEBSTORE_SUCCESS_POLL_TIMEOUT_MS = 30 * 1000;
+
 export const SEARCH_PAGING_LIMIT = 36;
 
 type DurationOption = { label: string; value: number };
