@@ -55,8 +55,8 @@ const PricingFormSchema = z.object({
   lowestPriceNet: z.number(),
   highestPrice: z.number(),
   highestPriceNet: z.number(),
-  priceUnit: z.nativeEnum(PriceUnit).nullable(),
-  paymentType: z.nativeEnum(PaymentType).nullable(),
+  priceUnit: z.enum(PriceUnit).nullable(),
+  paymentType: z.enum(PaymentType).nullable(),
   // NOTE this has to be a string because of HDS date input in ui format: "d.M.yyyy"
   begins: z.string(),
   // frontend only value, otherwise invalid begin values will break future dates
@@ -79,7 +79,7 @@ function refinePricing(data: PricingFormValues | undefined, ctx: z.RefinementCtx
     ctx.addIssue({
       message: "Required",
       path: [`${path}.begins`],
-      code: z.ZodIssueCode.custom,
+      code: "custom",
     });
   }
   const date = parseUIDate(data.begins);
@@ -87,7 +87,7 @@ function refinePricing(data: PricingFormValues | undefined, ctx: z.RefinementCtx
     ctx.addIssue({
       message: "Invalid date",
       path: [`${path}.begins`],
-      code: z.ZodIssueCode.custom,
+      code: "custom",
     });
   }
 
@@ -95,7 +95,7 @@ function refinePricing(data: PricingFormValues | undefined, ctx: z.RefinementCtx
     ctx.addIssue({
       message: "Begin needs to be in the future",
       path: [`${path}.begins`],
-      code: z.ZodIssueCode.custom,
+      code: "custom",
     });
   }
 
@@ -106,42 +106,42 @@ function refinePricing(data: PricingFormValues | undefined, ctx: z.RefinementCtx
       ctx.addIssue({
         message: "must be a number",
         path: [`${path}.lowestPrice`],
-        code: z.ZodIssueCode.custom,
+        code: "custom",
       });
     }
     if (Number.isNaN(highestPrice)) {
       ctx.addIssue({
         message: "must be a number",
         path: [`${path}.highestPrice`],
-        code: z.ZodIssueCode.custom,
+        code: "custom",
       });
     }
     if (Number.isNaN(lowestPriceNet)) {
       ctx.addIssue({
         message: "must be a number",
         path: [`${path}.lowestPriceNet`],
-        code: z.ZodIssueCode.custom,
+        code: "custom",
       });
     }
     if (Number.isNaN(highestPriceNet)) {
       ctx.addIssue({
         message: "must be a number",
         path: [`${path}.highestPriceNet`],
-        code: z.ZodIssueCode.custom,
+        code: "custom",
       });
     }
     if (data.taxPercentage <= 0) {
       ctx.addIssue({
         message: "taxPercentage must be selected",
         path: [`${path}.taxPercentage`],
-        code: z.ZodIssueCode.custom,
+        code: "custom",
       });
     }
     if (lowestPrice > highestPrice) {
       ctx.addIssue({
         message: "lowestPrice must be lower than highestPrice",
         path: [`${path}.lowestPrice`],
-        code: z.ZodIssueCode.custom,
+        code: "custom",
       });
     }
 
@@ -149,7 +149,7 @@ function refinePricing(data: PricingFormValues | undefined, ctx: z.RefinementCtx
       ctx.addIssue({
         message: "Required",
         path: [`${path}.paymentType`],
-        code: z.ZodIssueCode.custom,
+        code: "custom",
       });
     }
   }
@@ -159,8 +159,8 @@ const ImageFormSchema = z.object({
   pk: z.number().optional(),
   mediumUrl: z.string().optional(),
   imageUrl: z.string().optional(),
-  imageType: z.nativeEnum(ReservationUnitImageType).optional(),
-  originalImageType: z.nativeEnum(ReservationUnitImageType).optional(),
+  imageType: z.enum(ReservationUnitImageType).optional(),
+  originalImageType: z.enum(ReservationUnitImageType).optional(),
   bytes: z.instanceof(File).optional(),
   deleted: z.boolean().optional(),
 });
@@ -175,7 +175,7 @@ const ReservableTimeSchema = z.object({
 const SeasonalFormSchema = z.object({
   pk: z.number(),
   closed: z.boolean(),
-  weekday: z.nativeEnum(Weekday),
+  weekday: z.enum(Weekday),
   // unregister leaves undefined in the array
   // undefined => not rendered, not saved
   // empty => rendered as empty, not saved
@@ -186,7 +186,7 @@ type SeasonalFormType = z.infer<typeof SeasonalFormSchema>;
 
 const AccessTypesFormSchema = z.object({
   pk: z.number().optional(),
-  accessType: z.nativeEnum(AccessType),
+  accessType: z.enum(AccessType),
   beginDate: z.string(),
 });
 export type AccessTypesFormType = z.infer<typeof AccessTypesFormSchema>;
@@ -197,7 +197,7 @@ function validateAccessTypes(accessTypes: AccessTypesFormType[], ctx: z.Refineme
   accessTypes.forEach((at, index) => {
     if (parseUIDate(at.beginDate) == null) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "access type invalid beginDate",
         path: [`accessTypes.${index}.beginDate`],
       });
@@ -205,7 +205,7 @@ function validateAccessTypes(accessTypes: AccessTypesFormType[], ctx: z.Refineme
 
     if (seenDates.includes(at.beginDate)) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "access type duplicate beginDate",
         path: [`accessTypes.${index}.beginDate`],
       });
@@ -242,14 +242,14 @@ function validateSeasonalTimes(data: SeasonalFormType[], ctx: z.RefinementCtx): 
       // this corresponds to the backend error: "Timeslot 1 begin and end time must be at 30 minute intervals."
       if (beginTimeMinutes % 30 !== 0) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "time must be at 30 minute intervals",
           path: [`${path}.begin`],
         });
       }
       if (endTimeMinutes % 30 !== 0) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "time must be at 30 minute intervals",
           path: [`${path}.end`],
         });
@@ -260,7 +260,7 @@ function validateSeasonalTimes(data: SeasonalFormType[], ctx: z.RefinementCtx): 
       const t2 = endTimeMinutes;
       if (t1 >= t2 && t2 !== 0) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Begin must be before end",
           path: [`${path}.end`],
         });
@@ -271,7 +271,7 @@ function validateSeasonalTimes(data: SeasonalFormType[], ctx: z.RefinementCtx): 
         if (lastEnd != null) {
           if (lastEnd === beginTimeMinutes) {
             ctx.addIssue({
-              code: z.ZodIssueCode.custom,
+              code: "custom",
               message: "Previous end can't be the same as next begin",
               // NOTE design has it the other way around
               path: [`${path}.begin`],
@@ -279,7 +279,7 @@ function validateSeasonalTimes(data: SeasonalFormType[], ctx: z.RefinementCtx): 
           }
           if (lastEnd === 0 || lastEnd > beginTimeMinutes) {
             ctx.addIssue({
-              code: z.ZodIssueCode.custom,
+              code: "custom",
               message: "Previous end must be before next begin",
               // NOTE design has it the other way around
               path: [`${path}.begin`],
@@ -288,7 +288,7 @@ function validateSeasonalTimes(data: SeasonalFormType[], ctx: z.RefinementCtx): 
         }
         if (lastEnd == null) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             message: "Not allowed to add a second time without first",
             path: [`${path}.begin`],
           });
@@ -322,14 +322,14 @@ function validateDateTimeInterval({
 }) {
   if (beginDate !== "" && beginTime === "") {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       message: "Required",
       path: [path.beginTime],
     });
   }
   if (beginDate === "" && beginTime !== "") {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       message: "Required",
       path: [path.beginDate],
     });
@@ -337,14 +337,14 @@ function validateDateTimeInterval({
 
   if (endDate !== "" && endTime === "") {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       message: "Required",
       path: [path.endTime],
     });
   }
   if (endDate === "" && endTime !== "") {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       message: "Required",
       path: [path.endDate],
     });
@@ -354,21 +354,21 @@ function validateDateTimeInterval({
   const end = fromUIDateTime(endDate, endTime);
   if (beginDate !== "" && begin == null) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       message: "Invalid date",
       path: [path.beginDate],
     });
   }
   if (endDate !== "" && end == null) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       message: "Invalid date",
       path: [path.endDate],
     });
   }
   if (begin && end && begin >= end) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       message: `${path.beginDate} must be before end`,
       path: [path.beginDate],
     });
@@ -383,7 +383,7 @@ export const BUFFER_TIME_OPTIONS = ["noBuffer", "bufferTimesSet"] as const;
 
 export const ReservationUnitEditSchema = z
   .object({
-    authentication: z.nativeEnum(AuthenticationType),
+    authentication: z.enum(AuthenticationType),
     // TODO these are optional (0 is bit different than not set)
     // because if they are set (non undefined) we should show the active checkbox
     bufferTimeAfter: z.number(),
@@ -407,11 +407,11 @@ export const ReservationUnitEditSchema = z
     reservationEndsTime: z.string(),
     requireAdultReservee: z.boolean(),
     requireReservationHandling: z.boolean(),
-    reservationStartInterval: z.nativeEnum(ReservationStartInterval),
+    reservationStartInterval: z.enum(ReservationStartInterval),
     canApplyFreeOfCharge: z.boolean(),
     reservationsMinDaysBefore: z.number(),
     reservationsMaxDaysBefore: z.number(),
-    reservationKind: z.nativeEnum(ReservationKind),
+    reservationKind: z.enum(ReservationKind),
     contactInformation: z.string(),
     reservationPendingInstructionsFi: z.string().transform(cleanHtmlContent),
     reservationPendingInstructionsEn: z.string().transform(cleanHtmlContent),
@@ -446,7 +446,7 @@ export const ReservationUnitEditSchema = z
     pricingTerms: z.string().nullable(),
     cancellationTerms: z.string().nullable(),
     serviceSpecificTerms: z.string().nullable(),
-    reservationForm: z.nativeEnum(ReservationFormType).optional(),
+    reservationForm: z.enum(ReservationFormType).optional(),
     surfaceArea: z.number(),
     images: z.array(ImageFormSchema),
     // internal values
@@ -477,7 +477,7 @@ export const ReservationUnitEditSchema = z
       if (v.minReservationDuration != null && v.maxReservationDuration != null) {
         if (v.minReservationDuration > v.maxReservationDuration) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             message: "Min reservation duration must be less than max duration",
             path: ["maxReservationDuration"],
           });
@@ -488,14 +488,14 @@ export const ReservationUnitEditSchema = z
         const minDurationMinutes = Math.floor(v.minReservationDuration / 60);
         if (minDurationMinutes < getIntervalMinutes(v.reservationStartInterval)) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             message: "duration can't be less than reservation start interval",
             path: ["minReservationDuration"],
           });
         }
         if (minDurationMinutes % getIntervalMinutes(v.reservationStartInterval) !== 0) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             message: "duration must be a multiple of the reservation start interval",
             path: ["minReservationDuration"],
           });
@@ -506,14 +506,14 @@ export const ReservationUnitEditSchema = z
         const maxDurationMinutes = Math.floor(v.maxReservationDuration / 60);
         if (maxDurationMinutes % getIntervalMinutes(v.reservationStartInterval) !== 0) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             message: "duration must be a multiple of the reservation start interval",
             path: ["maxReservationDuration"],
           });
         }
         if (maxDurationMinutes < getIntervalMinutes(v.reservationStartInterval)) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             message: "duration can't be less than reservation start interval",
             path: ["maxReservationDuration"],
           });
@@ -533,7 +533,7 @@ export const ReservationUnitEditSchema = z
 
     if (v.accessTypes.length === 0) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "access types are required for publish",
         path: ["accessTypes"],
       });
@@ -542,49 +542,49 @@ export const ReservationUnitEditSchema = z
     if (v.reservationKind !== ReservationKind.Season) {
       if (v.minReservationDuration == null) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Required",
           path: ["minReservationDuration"],
         });
       }
       if (v.maxReservationDuration == null) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Required",
           path: ["maxReservationDuration"],
         });
       }
       if (v.reservationsMinDaysBefore == null) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Required",
           path: ["reservationsMinDaysBefore"],
         });
       }
       if (v.reservationsMaxDaysBefore == null || v.reservationsMaxDaysBefore === 0) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Required",
           path: ["reservationsMaxDaysBefore"],
         });
       }
       if (v.reservationStartInterval == null) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Required",
           path: ["reservationStartInterval"],
         });
       }
       if (v.authentication == null) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Required",
           path: ["authentication"],
         });
       }
       if (v.reservationForm == null) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Required",
           path: ["reservationForm"],
         });
@@ -625,28 +625,28 @@ export const ReservationUnitEditSchema = z
     // the backend error on mutation: "Not draft state reservation unit must have one or more space or resource",
     if (v.spaces.length === 0 && v.resources.length === 0) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Required",
         path: ["spaces"],
       });
     }
     if (v.reservationUnitType == null) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Required",
         path: ["reservationUnitType"],
       });
     }
     if (v.nameEn === "") {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Required",
         path: ["nameEn"],
       });
     }
     if (v.nameSv === "") {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Required",
         path: ["nameSv"],
       });
@@ -658,7 +658,7 @@ export const ReservationUnitEditSchema = z
     if (v.maxPersons && v.minPersons) {
       if (v.maxPersons < v.minPersons) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Max persons must be greater than min persons",
           path: ["maxPersons"],
         });
@@ -669,7 +669,7 @@ export const ReservationUnitEditSchema = z
     const isPaid = v.pricings.some((p) => p.highestPrice > 0);
     if (v.canApplyFreeOfCharge && isPaid && v.pricingTerms == null) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Required",
         path: ["pricingTerms"],
       });

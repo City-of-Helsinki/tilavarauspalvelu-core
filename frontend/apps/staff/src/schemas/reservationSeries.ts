@@ -66,7 +66,7 @@ export function getReservationSeriesSchema(interval: ReservationStartInterval) {
         const res = emailValidator.safeParse(val.reserveeEmail);
         if (!res.success) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             validation: "email",
             path: ["reserveeEmail"],
           });

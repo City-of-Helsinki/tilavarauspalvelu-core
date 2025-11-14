@@ -116,7 +116,7 @@ function checkStartIsBeforeEnd(
   const end = fromUIDateTime(data.activeUntil, data.activeUntilTime);
   if (start && end && start > end) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       // NOTE Don't add to multiple paths, it hides the error message
       // TODO this is problematic because it doesn't update if any of the other fields change
       path: ["activeUntil"],

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { CELL_STATES } from "ui/src/components/ApplicationTimeSelector";
 import { parseUIDate, timeToMinutes, formatApiDate, formatDate } from "ui/src/modules/date-utils";
 import { filterNonNullable, type ReadonlyDeep } from "ui/src/modules/helpers";
-import { checkValidDateOnly, lessThanMaybeDate } from "ui/src/schemas/schemaCommon";
+import { checkValidDateOnly, emailField, lessThanMaybeDate } from "ui/src/schemas/schemaCommon";
 import {
   type ApplicantFieldsFragment,
   type ApplicationFormFragment,
@@ -42,10 +42,7 @@ const ApplicationSectionPage1Schema = z
       .min(1)
       // don't preselect a value for the user
       .optional()
-      .refine((s) => s, {
-        path: [""],
-        message: "Required",
-      }),
+      .refine((s) => s, { message: "Required" }),
     ageGroup: z.number().refine((s) => s, { path: [""], message: "Required" }),
     purpose: z.number().refine((s) => s, { path: [""], message: "Required" }),
     minDuration: z.number().min(1, { message: "Required" }),
@@ -73,12 +70,12 @@ const ApplicationSectionPage1Schema = z
   .superRefine((val, ctx) => {
     if (lessThanMaybeDate(val.end, val.begin)) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["end"],
         message: "End date must be after begin date",
       });
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["begin"],
         message: "Begin date must be before end date",
       });
@@ -116,7 +113,7 @@ const ApplicationSectionPage2Schema = z
       s.suitableTimeRanges.filter((tr) => lengthOfTimeRange(tr) < s.minDuration).length === 0;
     if (!isValid) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["suitableTimeRanges"],
         message: "Suitable time range must be at least as long as the minimum duration",
       });
@@ -134,7 +131,7 @@ const ApplicationSectionPage2Schema = z
 
     if (!isValid) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["suitableTimeRanges"],
         message: "At least as many suitable time ranges as applied reservations per week",
       });
@@ -242,7 +239,7 @@ function checkDateRange(props: {
   if (startOfDay(date).getTime() < startOfDay(range.begin).getTime()) {
     const message = `${part} date must be after application round begin date`;
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: [path],
       message,
     });
@@ -250,7 +247,7 @@ function checkDateRange(props: {
   if (startOfDay(date).getTime() > startOfDay(range.end).getTime()) {
     const message = `${part} date must be before application round end date`;
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: [path],
       message,
     });
@@ -301,7 +298,7 @@ export function ApplicationPage1SchemaRefined(round: { begin: Date; end: Date })
   return ApplicationPage1Schema.superRefine((val, ctx) => {
     if (val.applicationSections == null || val.applicationSections.length === 0) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["applicationSections"],
         message: "Required",
       });
@@ -323,24 +320,23 @@ export function ApplicationPage1SchemaRefined(round: { begin: Date; end: Date })
 export const ApplicationPage3Schema = z
   .object({
     pk: z.number(),
-    applicantType: ApplicantTypeSchema.optional(),
-
-    // TODO identifier is only optional for Associations (not for Companies / Communities)
-    organisationName: z.string().min(1).max(255).optional(),
+    // use a refine to allow undefined initialisation
+    applicantType: ApplicantTypeSchema.optional().refine((val) => val != null, { message: "Required" }),
+    organisationName: z.string().min(1, { error: "Required" }).max(255).optional(),
     organisationIdentifier: z.string().max(255).optional(),
-    organisationCoreBusiness: z.string().min(1).max(255).optional(),
-    organisationStreetAddress: z.string().min(1).max(80).optional(),
-    organisationCity: z.string().min(1).max(80).optional(),
-    organisationPostCode: z.string().min(1).max(32).optional(),
+    organisationCoreBusiness: z.string().min(1, { error: "Required" }).max(255).optional(),
+    organisationStreetAddress: z.string().min(1, { error: "Required" }).max(80).optional(),
+    organisationCity: z.string().min(1, { error: "Required" }).max(80).optional(),
+    organisationPostCode: z.string().min(1, { error: "Required" }).max(32).optional(),
 
-    contactPersonFirstName: z.string().min(1).max(255),
-    contactPersonLastName: z.string().min(1).max(255),
-    contactPersonEmail: z.email().min(1).max(254),
-    contactPersonPhoneNumber: z.string().min(1).max(255),
+    contactPersonFirstName: z.string().min(1, { error: "Required" }).max(255),
+    contactPersonLastName: z.string().min(1, { error: "Required" }).max(255),
+    contactPersonEmail: emailField,
+    contactPersonPhoneNumber: z.string().min(1, { error: "Required" }).max(255),
 
-    billingStreetAddress: z.string().min(1).max(80).optional(),
-    billingCity: z.string().min(1).max(80).optional(),
-    billingPostCode: z.string().min(1).max(32).optional(),
+    billingStreetAddress: z.string().min(1, { error: "Required" }).max(80).optional(),
+    billingCity: z.string().min(1, { error: "Required" }).max(80).optional(),
+    billingPostCode: z.string().min(1, { error: "Required" }).max(32).optional(),
     // not submitted, we use it to remove the billing address from submit without losing the frontend state
     hasBillingAddress: z.boolean(),
     // not submitted
@@ -349,11 +345,6 @@ export const ApplicationPage3Schema = z
     // municipality is only for Organisations
     municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]).optional(),
   })
-  // have to check at form level otherwise it forbids undefined initialization
-  .refine((val) => val.applicantType != null, {
-    message: "Required",
-    path: ["applicantType"],
-  })
   .superRefine((val, ctx) => {
     if (val.applicantType === ReserveeType.Company || val.applicantType === ReserveeType.Nonprofit) {
       const requiredToHaveId = val.applicantType !== ReserveeType.Nonprofit;
@@ -361,7 +352,7 @@ export const ApplicationPage3Schema = z
       const hasId = val.organisationIdentifier != null && val.organisationIdentifier !== "";
       if ((requiredToHaveId || isRegisteredAssociation) && !hasId) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           path: ["organisationIdentifier"],
           message: "Required",
         });
@@ -370,7 +361,7 @@ export const ApplicationPage3Schema = z
     if (val.applicantType === ReserveeType.Nonprofit) {
       if (!val.municipality) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           path: ["municipality"],
           message: "Required",
         });

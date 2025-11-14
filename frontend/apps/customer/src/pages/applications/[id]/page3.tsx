@@ -77,7 +77,7 @@ function Page3Form(): JSX.Element | null {
   }
 }
 
-function Page3({ application }: Pick<PropsNarrowed, "application">): JSX.Element {
+export default function Page3({ application }: Pick<PropsNarrowed, "application">): JSX.Element {
   const router = useRouter();
 
   const form = useForm<ApplicationPage3FormValues>({
@@ -142,9 +142,8 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const commonProps = getCommonServerSideProps();
-  const { locale } = ctx;
+  const { locale, query } = ctx;
 
-  const { query } = ctx;
   const pk = toNumber(ignoreMaybeArray(query.id));
   const notFound = {
     notFound: true,
@@ -174,8 +173,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   };
 }
-
-export default Page3;
 
 export const APPLICATION_PAGE3_QUERY = gql`
   query ApplicationPage3($id: ID!) {
