@@ -132,7 +132,7 @@ class BasePindoraClient(BaseExternalServiceClient):
 
     @classmethod
     def _mock_create_access_code(cls) -> str:
-        return "".join(random.choices(string.digits, k=5))  # noqa: S311
+        return "".join(random.choices(string.digits, k=5))  # noqa: S311 # nosec # NOSONAR
 
 
 class PindoraReservationUnitClient(BasePindoraClient):
