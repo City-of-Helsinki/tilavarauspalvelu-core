@@ -14,7 +14,6 @@ import {
   type ReservationQuotaReachedFragment,
   type ReservationUnitNode,
   type ReservationUnitPageQuery,
-  useReservationQuotaReachedQuery,
 } from "@gql/gql-types";
 
 type ReservationUnitT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
@@ -22,10 +21,14 @@ type ReservationUnitT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>
 export function ReservationUnitCalendarSection({
   reservationUnit,
   reservationForm,
+  isQuotaReached,
+  refreshedQuotaReservationUnit,
   ...rest
 }: {
   reservationUnit: ReservationUnitT;
   reservationForm: UseFormReturn<PendingReservationFormType>;
+  isQuotaReached: boolean;
+  refreshedQuotaReservationUnit: ReservationQuotaReachedFragment;
 } & Pick<
   ReservationTimePickerProps,
   "startingTimeOptions" | "blockingReservations" | "loginAndSubmitButton" | "submitReservation"
@@ -34,15 +37,6 @@ export function ReservationUnitCalendarSection({
   const lang = getLocalizationLang(i18n.language);
   const reservableTimes = useReservableTimes(reservationUnit);
 
-  const { data } = useReservationQuotaReachedQuery({
-    variables: {
-      id: reservationUnit.id,
-    },
-  });
-
-  const refreshedIsQuoteReached = data?.reservationUnit ?? reservationUnit;
-  const quotaReached = isReservationQuotaReached(refreshedIsQuoteReached);
-
   return (
     <Flex $gap="m" data-testid="reservation-unit__calendar--wrapper">
       <H4 as="h2" $marginBottom="none">
@@ -50,12 +44,12 @@ export function ReservationUnitCalendarSection({
           title: getTranslationSafe(reservationUnit, "name", lang),
         })}
       </H4>
-      <ReservationQuotaReached {...refreshedIsQuoteReached} />
+      <ReservationQuotaReached {...refreshedQuotaReservationUnit} />
       <ReservationTimePicker
         reservationUnit={reservationUnit}
         reservationForm={reservationForm}
         reservableTimes={reservableTimes}
-        isReservationQuotaReached={quotaReached}
+        isReservationQuotaReached={isQuotaReached}
         {...rest}
       />
     </Flex>

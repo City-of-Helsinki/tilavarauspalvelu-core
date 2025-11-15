@@ -41,6 +41,7 @@ import {
   ReservationUnitMoreDetails,
   SubventionSuffix,
 } from "@/lib/reservation-unit/[id]/";
+import { isReservationQuotaReached } from "@/lib/reservation-unit/[id]/ReservationUnitCalendarSection";
 import { createApolloClient } from "@/modules/apolloClient";
 import { clampDuration, getMaxReservationDuration, getMinReservationDuration } from "@/modules/reservable";
 import {
@@ -71,6 +72,7 @@ import {
   type ReservationUnitPageQuery,
   type ReservationUnitPageQueryVariables,
   useCreateReservationMutation,
+  useReservationQuotaReachedQuery,
 } from "@gql/gql-types";
 
 function SubmitFragment({
@@ -79,12 +81,14 @@ function SubmitFragment({
   buttonText,
   loadingText,
   reservationForm,
+  isQuotaReached,
 }: Readonly<{
   focusSlot: FocusTimeSlot;
   apiBaseUrl: string;
   reservationForm: UseFormReturn<PendingReservationFormType>;
   loadingText: string;
   buttonText: string;
+  isQuotaReached: boolean;
 }>): JSX.Element {
   const returnToUrl = useMemo(() => {
     if (!focusSlot.isReservable) {
@@ -110,7 +114,7 @@ function SubmitFragment({
           type="submit"
           variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
           iconStart={isSubmitting ? <LoadingSpinner small /> : undefined}
-          disabled={!isReservable || isSubmitting}
+          disabled={!isReservable || isSubmitting || isQuotaReached}
           data-testid="quick-reservation__button--submit"
         >
           {isSubmitting ? loadingText : buttonText}
@@ -288,6 +292,15 @@ function ReservationUnit({
 
   const equipment = filterNonNullable(reservationUnit.equipments);
 
+  const { data } = useReservationQuotaReachedQuery({
+    variables: {
+      id: reservationUnit.id,
+    },
+  });
+
+  const refreshedQuotaReservationUnit = data?.reservationUnit ?? reservationUnit;
+  const isQuotaReached = isReservationQuotaReached(refreshedQuotaReservationUnit);
+
   const LoginAndSubmit = useMemo(
     () => (
       <SubmitFragment
@@ -296,9 +309,10 @@ function ReservationUnit({
         reservationForm={reservationForm}
         loadingText={t("reservationCalendar:makeReservationLoading")}
         buttonText={t("reservationCalendar:makeReservation")}
+        isQuotaReached={isQuotaReached}
       />
     ),
-    [apiBaseUrl, focusSlot, reservationForm, t]
+    [apiBaseUrl, focusSlot, isQuotaReached, reservationForm, t]
   );
 
   useToastIfQueryParam({
@@ -383,6 +397,8 @@ function ReservationUnit({
               blockingReservations={blockingReservations}
               loginAndSubmitButton={LoginAndSubmit}
               submitReservation={submitReservation}
+              isQuotaReached={isQuotaReached}
+              refreshedQuotaReservationUnit={refreshedQuotaReservationUnit}
             />
           )}
           <ReservationUnitMoreDetails reservationUnit={reservationUnit} isReservable={reservationUnitIsReservable} />
