@@ -21,13 +21,12 @@ import { ReservationKind } from "@gql/gql-types";
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
-  const commonProps = getCommonServerSideProps();
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const { apiBaseUrl } = getCommonServerSideProps();
+  const apolloClient = createApolloClient(apiBaseUrl, ctx);
   const opts = await getSearchOptions(apolloClient, "direct", locale ?? "");
 
   return {
     props: {
-      ...getCommonServerSideProps(),
       ...(await serverSideTranslations(locale ?? "fi")),
       options: opts,
     },

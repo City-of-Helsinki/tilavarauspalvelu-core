@@ -53,7 +53,7 @@ function customRender(props: CreateGraphQLMockProps = {}): ReturnType<typeof ren
   const options: OptionsListT = createOptionMock();
   return render(
     <MockedGraphQLProvider mocks={mocks}>
-      <SeasonalSearch applicationRound={round} apiBaseUrl="http://localhost:8000" options={options} />
+      <SeasonalSearch applicationRound={round} options={options} />
     </MockedGraphQLProvider>
   );
 }

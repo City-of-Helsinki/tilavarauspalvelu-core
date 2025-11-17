@@ -16,10 +16,23 @@ import { genericTermsVariant } from "./const";
 
 export { getVersion };
 
-interface CustomerEnvConfig extends CommonEnvConfig {
+export interface CustomerEnvConfig extends CommonEnvConfig {
   matomoEnabled: boolean;
   hotjarEnabled: boolean;
   profileLink: string;
+}
+
+export function getDefaultServerSideProps(): CustomerEnvConfig {
+  return {
+    apiBaseUrl: "",
+    matomoEnabled: false,
+    hotjarEnabled: false,
+    profileLink: "",
+    feedbackUrl: "",
+    sentryDsn: "",
+    sentryEnvironment: "",
+    version: getVersion(),
+  };
 }
 
 export function getCommonServerSideProps(): CustomerEnvConfig {

@@ -76,8 +76,8 @@ export const APPLICATION_SECTION_VIEW_QUERY = gql`
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
-  const commonProps = getCommonServerSideProps();
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const { apiBaseUrl } = getCommonServerSideProps();
+  const apolloClient = createApolloClient(apiBaseUrl, ctx);
 
   const { query } = ctx;
   const { section } = query;
@@ -88,7 +88,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const notFoundRetvalue = {
     props: {
       notFound: true,
-      ...commonProps,
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
     notFound: true,
   };
@@ -114,7 +114,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      ...commonProps,
       applicationSection,
       ...(await serverSideTranslations(locale ?? "fi")),
     },

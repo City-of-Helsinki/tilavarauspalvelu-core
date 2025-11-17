@@ -89,10 +89,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, query } = ctx;
   const pk = toNumber(ignoreMaybeArray(query.id));
 
-  const commonProps = getCommonServerSideProps();
   const notFound = {
     props: {
-      ...commonProps,
       notFound: true,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
@@ -102,7 +100,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
 
-  const client = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const { apiBaseUrl } = getCommonServerSideProps();
+  const client = createApolloClient(apiBaseUrl, ctx);
   const { data } = await client.query<ApplicationPage2Query, ApplicationPage2QueryVariables>({
     query: ApplicationPage2Document,
     variables: {
@@ -116,7 +115,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      ...commonProps,
       application,
       ...(await serverSideTranslations(locale ?? "fi")),
     },

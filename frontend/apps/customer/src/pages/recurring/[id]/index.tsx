@@ -20,6 +20,7 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import { ListWithPagination } from "@/components/ListWithPagination";
 import { type SearchFormValues, SeasonalSearchForm } from "@/components/SeasonalSearchForm";
 import { SortingComponent } from "@/components/SortingComponent";
+import { useEnvContext } from "@/context/EnvContext";
 import { useReservationUnitList } from "@/hooks";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { useSearchModify } from "@/hooks/useSearchValues";
@@ -42,12 +43,13 @@ import {
   ReservationKind,
 } from "@gql/gql-types";
 
-type SeasonalSearchProps = ReadonlyDeep<Pick<NarrowedProps, "applicationRound" | "options" | "apiBaseUrl">>;
+type SeasonalSearchProps = ReadonlyDeep<Pick<NarrowedProps, "applicationRound" | "options">>;
 
-function SeasonalSearch({ apiBaseUrl, applicationRound, options }: Readonly<SeasonalSearchProps>): JSX.Element {
+function SeasonalSearch({ applicationRound, options }: Readonly<SeasonalSearchProps>): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   const searchValues = useSearchParams();
+  const { env } = useEnvContext();
 
   const { handleSearch } = useSearchModify();
 
@@ -116,7 +118,10 @@ function SeasonalSearch({ apiBaseUrl, applicationRound, options }: Readonly<Seas
         fetchMore={(cursor) => fetchMore(cursor)}
         sortingComponent={<SortingComponent />}
       />
-      {createPortal(<StartApplicationBar applicationRound={applicationRound} apiBaseUrl={apiBaseUrl} />, document.body)}
+      {createPortal(
+        <StartApplicationBar applicationRound={applicationRound} apiBaseUrl={env.apiBaseUrl} />,
+        document.body
+      )}
     </>
   );
 }
@@ -126,15 +131,14 @@ type NarrowedProps = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params, query } = ctx;
-  const commonProps = getCommonServerSideProps();
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const { apiBaseUrl } = getCommonServerSideProps();
+  const apolloClient = createApolloClient(apiBaseUrl, ctx);
   const pk = toNumber(ignoreMaybeArray(params?.id));
   const isPostLogin = query.isPostLogin === "true";
 
   const notFound = {
     notFound: true,
     props: {
-      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
       notFound: true,
     },
@@ -206,7 +210,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const opts = await getSearchOptions(apolloClient, "seasonal", locale ?? "fi");
   return {
     props: {
-      ...commonProps,
       applicationRound,
       options: opts,
       ...(await serverSideTranslations(locale ?? "fi")),

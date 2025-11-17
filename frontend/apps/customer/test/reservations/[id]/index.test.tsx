@@ -90,13 +90,7 @@ function customRender(
   const termsOfUse = createTermsOfUseMock();
   return render(
     <MockedGraphQLProvider mocks={createGraphQLMocks(mockProps)}>
-      <Reservation
-        termsOfUse={termsOfUse}
-        reservation={reservation}
-        feedbackUrl=""
-        options={createOptionsMock()}
-        apiBaseUrl={"http://localhost:8000"}
-      />
+      <Reservation termsOfUse={termsOfUse} reservation={reservation} options={createOptionsMock()} />
     </MockedGraphQLProvider>
   );
 }

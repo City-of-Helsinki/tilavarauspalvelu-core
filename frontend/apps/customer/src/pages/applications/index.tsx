@@ -129,8 +129,8 @@ export default ApplicationsPage;
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
 
-  const commonProps = getCommonServerSideProps();
-  const client = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const { apiBaseUrl } = getCommonServerSideProps();
+  const client = createApolloClient(apiBaseUrl, ctx);
 
   // NOTE have to be done with double query because applications returns everything the user has access to (not what he owns)
   const { data: userData } = await client.query<CurrentUserQuery>({
@@ -143,9 +143,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return {
       notFound: true,
       props: {
-        ...commonProps,
-        ...(await serverSideTranslations(locale ?? "fi")),
         notFound: true,
+        ...(await serverSideTranslations(locale ?? "fi")),
       },
     };
   }
@@ -161,9 +160,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      ...getCommonServerSideProps(),
-      ...(await serverSideTranslations(locale ?? "fi")),
       data: appData,
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 }

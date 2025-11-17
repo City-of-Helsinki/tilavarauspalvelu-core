@@ -14,7 +14,6 @@ import { TabWrapper, H1, CenterSpinner } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { useSession } from "@/hooks";
 import { ReservationCard } from "@/lib/reservation";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   ReservationStateChoice,
   ReservationOrderingChoices,
@@ -161,7 +160,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      ...getCommonServerSideProps(),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

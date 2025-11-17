@@ -126,14 +126,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
   const pk = toNumber(ignoreMaybeArray(params?.id));
 
-  const commonProps = getCommonServerSideProps();
-  const client = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const { apiBaseUrl } = getCommonServerSideProps();
+  const client = createApolloClient(apiBaseUrl, ctx);
 
   const notFound = {
     notFound: true,
     props: {
       notFound: true,
-      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
@@ -173,7 +172,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
     return {
       props: {
-        ...commonProps,
         ...(await serverSideTranslations(locale ?? "fi")),
         reservation,
         options,

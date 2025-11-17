@@ -123,8 +123,8 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
-  const commonProps = getCommonServerSideProps();
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const { apiBaseUrl } = getCommonServerSideProps();
+  const apolloClient = createApolloClient(apiBaseUrl, ctx);
 
   const tos = await getGenericTerms(apolloClient);
 
@@ -134,7 +134,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const notFound = {
     props: {
       notFound: true,
-      ...commonProps,
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
     notFound: true,
   };
@@ -153,7 +153,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      ...commonProps,
       application,
       tos,
       ...(await serverSideTranslations(locale ?? "fi")),

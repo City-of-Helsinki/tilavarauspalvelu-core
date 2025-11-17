@@ -44,17 +44,7 @@ function customRender(): ReturnType<typeof render> {
   const mocks = createGraphQLMocks();
   return render(
     <MockedGraphQLProvider mocks={mocks}>
-      <SearchSingle
-        options={options}
-        matomoEnabled={false}
-        hotjarEnabled={false}
-        profileLink={""}
-        apiBaseUrl={"http://localhost:8000"}
-        feedbackUrl={"http://localhost:8000"}
-        sentryDsn={""}
-        sentryEnvironment={"CI"}
-        version={""}
-      />
+      <SearchSingle options={options} />
     </MockedGraphQLProvider>
   );
 }

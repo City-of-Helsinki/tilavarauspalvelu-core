@@ -1,7 +1,6 @@
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import CustomErrorComponent from "@/pages/_error";
 
 function Page() {
@@ -13,7 +12,6 @@ function Page() {
 export async function getStaticProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
-      ...getCommonServerSideProps(),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
