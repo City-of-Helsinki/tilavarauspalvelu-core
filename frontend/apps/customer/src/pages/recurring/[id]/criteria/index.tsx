@@ -83,7 +83,7 @@ function Criteria({ applicationRound }: Readonly<PropsNarrowed>): JSX.Element | 
       <Breadcrumb routes={routes} />
       <ContentWrapper>
         <Flex $gap="none">
-          <H1 $noMargin>{title}</H1>
+          <H1 $marginTop="none">{title}</H1>
           <p>{subtitle}</p>
         </Flex>
         <Sanitize html={criteria} />

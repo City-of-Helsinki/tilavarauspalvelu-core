@@ -72,7 +72,7 @@ function RecurringLander({ applicationRounds }: Readonly<Pick<Props, "applicatio
     <>
       <Breadcrumb routes={routes} />
       <div>
-        <H1 $noMargin>{t("recurringLander:heading")}</H1>
+        <H1 $marginTop="none">{t("recurringLander:heading")}</H1>
         <p>{t("recurringLander:subHeading")}</p>
       </div>
       <>

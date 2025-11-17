@@ -92,7 +92,7 @@ function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
   return (
     <>
       <Breadcrumb routes={routes} />
-      <H1 $noMargin>{t(`navigation:Item.reservations`)}</H1>
+      <H1 $marginTop="none">{t(`navigation:Item.reservations`)}</H1>
       {/* HDS tabs doesn't support data-testid */}
       <TabWrapper data-testid="Reservations--page__tab_container">
         <Tabs>
