@@ -442,6 +442,7 @@ export async function middleware(req: NextRequest) {
     }
     return NextResponse.next();
   } catch {
+    // FIXME this should push the error to Sentry?
     // NOTE all backend errors will return the 503 page
     // if the middleware request fails there is no way to recover
     const rewriteUrl = new URL(`${langPrefix}/503`, req.url);

@@ -16,16 +16,17 @@ import { genericTermsVariant } from "./const";
 export { getVersion };
 
 export interface CustomerEnvConfig extends CommonEnvConfig {
-  matomoEnabled: boolean;
-  hotjarEnabled: boolean;
+  isHotjarEnabled: boolean;
+  isMatomoEnabled: boolean;
   profileLink: string;
 }
 
 export function getDefaultServerSideProps(): CustomerEnvConfig {
   return {
     apiBaseUrl: "",
-    matomoEnabled: false,
-    hotjarEnabled: false,
+    isConsoleLoggingEnabled: true,
+    isHotjarEnabled: false,
+    isMatomoEnabled: false,
     profileLink: "",
     feedbackUrl: "",
     sentryDsn: "",
@@ -37,8 +38,8 @@ export function getDefaultServerSideProps(): CustomerEnvConfig {
 export function getCommonServerSideProps(): CustomerEnvConfig {
   // NOTE don't return undefined here, it breaks JSON.stringify used by getServerSideProps
   // use null or default value instead
-  const matomoEnabled = env.MATOMO_ENABLED ?? false;
-  const hotjarEnabled = env.HOTJAR_ENABLED ?? false;
+  const isMatomoEnabled = env.MATOMO_ENABLED ?? false;
+  const isHotjarEnabled = env.HOTJAR_ENABLED ?? false;
   const profileLink = env.PROFILE_UI_URL ?? "";
   const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
   const feedbackUrl = env.EMAIL_VARAAMO_EXT_LINK ?? "";
@@ -48,8 +49,9 @@ export function getCommonServerSideProps(): CustomerEnvConfig {
 
   return {
     apiBaseUrl,
-    matomoEnabled,
-    hotjarEnabled,
+    isConsoleLoggingEnabled: env.ENABLE_CONSOLE_LOGGING ?? false,
+    isHotjarEnabled,
+    isMatomoEnabled,
     profileLink,
     feedbackUrl,
     sentryDsn,
