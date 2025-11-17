@@ -529,6 +529,9 @@ class Common(Environment):
     ROBOT_TEST_DATA_CREATION_RATE_LIMIT_SECONDS = values.IntegerValue(default=60)
     ROBOT_TEST_DATA_RATE_LIMIT_KEY = "robot-test-data-create-view-rate-limit"
     ROBOT_TEST_DATA_LOCK_KEY = "robot-test-data-create-view-lock"
+    # Emails to these addresses will be cached, so that robot tests can verify the email contents.
+    ROBOT_EMAIL_ADDRESSES = values.ListValue(default=[])
+    ROBOT_EMAIL_CACHE_KEY = "robot-emails"
 
     GRAPHENE_DJANGO_EXTENSIONS = {
         "EXPERIMENTAL_REMOVE_TRANSLATION_BASE_FIELDS": True,

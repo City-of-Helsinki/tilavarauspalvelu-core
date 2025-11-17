@@ -17,6 +17,7 @@ from tilavarauspalvelu.api.rest.views import (
     reservation_ical,
     reservation_statistics_export,
     reservation_unit_export,
+    robot_email_cache,
     robot_test_data_create_view,
     terms_of_use_pdf,
 )
@@ -73,6 +74,12 @@ if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
             "mock_verkkokauppa/",
             include("tilavarauspalvelu.api.mock_verkkokauppa_api.urls", namespace="mock_verkkokauppa"),
         ),
+    )
+
+
+if settings.ROBOT_EMAIL_ADDRESSES:
+    urlpatterns.append(
+        path("v1/robot_email_cache/", robot_email_cache, name="robot_email_cache"),
     )
 
 if settings.DEBUG:

@@ -593,3 +593,27 @@ def robot_test_data_create_view(request: WSGIRequest) -> HttpResponse:
         cache.delete(lock_key)
 
     return HttpResponse(status=204)
+
+
+@require_GET
+@csrf_exempt  # NOSONAR
+def robot_email_cache(request: WSGIRequest) -> HttpResponse:
+    """
+    Retrieve cached robot email data.
+
+    Use the 'recipient' or 'subject' query parameter to filter emails sent to specific recipient(s) or subjects.
+    """
+    if not settings.ROBOT_EMAIL_ADDRESSES:
+        msg = "Robot email cache is not enabled."
+        return HttpResponseForbidden(msg)
+
+    subject_filter = request.GET.get("subject", "")
+    recipient_filter = request.GET.get("recipient", "")
+    cache_key_template = f"{settings.ROBOT_EMAIL_CACHE_KEY}:*:{subject_filter}*:{recipient_filter}*"
+    robot_email_data = cache.get_many(cache.keys(cache_key_template))
+
+    return JsonResponse(
+        sorted(robot_email_data.values(), key=lambda item: item["timestamp"], reverse=True),
+        safe=False,
+        status=200,
+    )
