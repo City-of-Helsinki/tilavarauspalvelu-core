@@ -549,7 +549,7 @@ msgid "Handled date"
 msgstr "Käsittelyn valmistumispäivä ja -aika"
 
 #: tilavarauspalvelu/admin/application_round/form.py
-msgid "Purposes"
+msgid "IntendedUses"
 msgstr "Varaustarkoitukset"
 
 #: tilavarauspalvelu/admin/application_round/form.py
@@ -652,7 +652,7 @@ msgstr ""
 "hakijoille."
 
 #: tilavarauspalvelu/admin/application_round/form.py
-msgid "Purposes that are allowed in this application period."
+msgid "IntendedUses that are allowed in this application period."
 msgstr "Kausivarauskierroksella mahdolliset käyttötarkoitukset."
 
 #: tilavarauspalvelu/admin/application_round/form.py
