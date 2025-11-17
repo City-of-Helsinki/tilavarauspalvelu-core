@@ -11,6 +11,7 @@ import { type ReservationInfoSectionFragment } from "@gql/gql-types";
 const Subheading = styled(H4).attrs({ as: "h2", $noMargin: true })`
   border-bottom: 1px solid var(--color-black-50);
   padding-bottom: var(--spacing-s);
+  margin-bottom: var(--spacing-s);
 `;
 
 export const RESERVATION_INFO_CONTAINER_FRAGMENT = gql`
