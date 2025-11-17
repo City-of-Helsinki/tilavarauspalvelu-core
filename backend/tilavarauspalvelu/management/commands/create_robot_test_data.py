@@ -28,6 +28,9 @@ from tilavarauspalvelu.enums import (
     UserRoleChoice,
     Weekday,
 )
+from tilavarauspalvelu.management.commands.data_creation.create_reservation_related_things import (
+    _fetch_and_build_reservation_unit_image,
+)
 from tilavarauspalvelu.management.commands.data_creation.utils import defer_reservation_unit_create_operations
 from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
@@ -1311,6 +1314,13 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         begin_date=local_date(2025, 6, 6),
         access_type=AccessType.UNRESTRICTED,
     )
+    _maksuton_mankeli_image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=_maksuton_mankeli,
+        image_url="https://i.postimg.cc/y8gtchXQ/maksuton-mankeli.jpg",
+        filename="maksuton-mankeli",
+    )
+    if _maksuton_mankeli_image is not None:
+        _maksuton_mankeli_image.save()
 
     _aina_maksullinen_aitio = ReservationUnit.objects.create(
         #
@@ -3193,6 +3203,13 @@ def copy_reservation_unit(original: ReservationUnit, *, kind: Literal["android",
 
         access_type.reservation_unit = android_version
         access_type.save()
+
+    for image in original.images.all():
+        image._state.adding = True  # noqa: SLF001
+        image.id = None
+
+        image.reservation_unit = android_version
+        image.save()
 
     return android_version
 
