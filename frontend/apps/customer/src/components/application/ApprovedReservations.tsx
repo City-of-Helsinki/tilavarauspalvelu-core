@@ -23,7 +23,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { IconButton } from "ui/src/components";
-import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
+import { ButtonLikeExternalLink, ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { PopupMenu } from "ui/src/components/PopupMenu";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { StatusLabel, type StatusLabelType } from "ui/src/components/StatusLabel";
@@ -997,7 +997,9 @@ export function ApplicationSection({
     // NOTE we need to slice even if backend returns only 20 of each
     // because we want to keep the total at 20
     .slice(0, N_RESERVATIONS_TO_SHOW);
-
+  const hasCancellableReservations = !!sectionToreservations(t, applicationSection).find(
+    (r) => r.isCancellableReason === ""
+  );
   return (
     <Flex>
       <div>
@@ -1015,10 +1017,17 @@ export function ApplicationSection({
           {t("application:view.reservationsTab.showAllReservations")}
           <IconLinkExternal />
         </ButtonLikeLink>
-        <ButtonLikeLink href={getApplicationSectionPath(applicationSection.pk, application.pk, "cancel")}>
+        <ButtonLikeExternalLink
+          href={
+            hasCancellableReservations
+              ? getApplicationSectionPath(applicationSection.pk, application.pk, "cancel")
+              : undefined
+          }
+          disabled={!hasCancellableReservations}
+        >
           {t("application:view.reservationsTab.cancelApplication")}
           <IconCross />
-        </ButtonLikeLink>
+        </ButtonLikeExternalLink>
       </ButtonContainer>
     </Flex>
   );
