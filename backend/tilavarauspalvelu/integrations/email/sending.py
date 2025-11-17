@@ -6,6 +6,7 @@ from smtplib import SMTPException
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.mail import EmailMultiAlternatives
 
 from config.celery import app
@@ -75,6 +76,22 @@ def send_emails_in_batches_task(email_data: EmailData) -> None:
 
     if db_email_message is not None:
         db_email_message.save()
+
+    elif settings.ROBOT_EMAIL_ADDRESSES:
+        robot_recipients = set(settings.ROBOT_EMAIL_ADDRESSES).intersection(set(email_data.recipients))
+        if robot_recipients:
+            timestamp = email_data.created_at.isoformat()
+            cache.set(
+                f"{settings.ROBOT_EMAIL_CACHE_KEY}:{timestamp}:{email_data.subject}:{', '.join(robot_recipients)}",
+                {
+                    "timestamp": email_data.created_at.isoformat(),
+                    "recipients": list(robot_recipients),
+                    "subject": email_data.subject,
+                    "text_content": email_data.text_content,
+                    "attachments": [attachment.get("filename") for attachment in email_data.attachments],
+                },
+                timeout=60 * 60 * 6,  # Cache for 6 hours
+            )
 
 
 @app.task(name="send_multiple_emails_in_batches")
