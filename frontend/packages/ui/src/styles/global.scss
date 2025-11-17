@@ -17,6 +17,9 @@ p {
   @media (min-width: 768px) {
     font-size: var(--fontsize-body-l);
   }
+  &:first-of-type {
+    margin-top: 0;
+  }
   &:last-of-type {
     margin-bottom: 0;
   }
