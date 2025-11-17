@@ -7,6 +7,7 @@ import { signIn } from "ui/src/modules/browserHelpers";
 import { breakpoints } from "ui/src/modules/const";
 import { getLocalizationLang } from "ui/src/modules/helpers";
 import { fontBold, H2 } from "ui/src/styled";
+import { useEnvContext } from "@/context/EnvContext";
 import { HERO_IMAGE_URL } from "@/modules/const";
 import { getAccessibilityTermsUrl } from "@/modules/urls";
 import { KorosHeading, Heading } from "./KorosHeading";
@@ -47,8 +48,11 @@ const Ingress = styled(H2)`
   }
 `;
 
-export function MainLander({ apiBaseUrl }: Readonly<{ apiBaseUrl: string }>): React.ReactElement {
+export function MainLander(): React.ReactElement {
   const { t, i18n } = useTranslation();
+  // localhost login requires server address (on a real server it's the same address on client side)
+  const { env } = useEnvContext();
+  const { apiBaseUrl } = env;
 
   return (
     <>

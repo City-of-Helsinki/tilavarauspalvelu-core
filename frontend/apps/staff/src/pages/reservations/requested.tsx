@@ -7,7 +7,6 @@ import { useSearchParams } from "next/navigation";
 import { formatDate } from "ui/src/modules/date-utils";
 import { H1, HR } from "ui/src/styled";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { ReservationStateChoice } from "@gql/gql-types";
 
 const defaultStates = [
@@ -63,7 +62,6 @@ type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

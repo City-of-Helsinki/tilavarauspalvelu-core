@@ -10,7 +10,6 @@ import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { ReservationSeriesView } from "@/components/ReservationSeriesView";
 import { useReservationSeries } from "@/hooks";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getMyUnitUrl, getReservationUrl } from "@/modules/urls";
 import { UserPermissionChoice } from "@gql/gql-types";
 
@@ -49,13 +48,9 @@ function ErrorComponent() {
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page({ apiBaseUrl, pk, unitPk }: PropsNarrowed) {
+export default function Page({ pk, unitPk }: PropsNarrowed) {
   return (
-    <AuthorizationChecker
-      apiUrl={apiBaseUrl}
-      permission={UserPermissionChoice.CanCreateStaffReservations}
-      unitPk={unitPk}
-    >
+    <AuthorizationChecker permission={UserPermissionChoice.CanCreateStaffReservations} unitPk={unitPk}>
       <ErrorBoundary FallbackComponent={ErrorComponent}>
         <ReservationSeriesDoneInner recurringPk={pk} />
       </ErrorBoundary>
@@ -73,7 +68,6 @@ export async function getServerSideProps({ query, locale }: GetServerSidePropsCo
     props: {
       pk,
       unitPk,
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

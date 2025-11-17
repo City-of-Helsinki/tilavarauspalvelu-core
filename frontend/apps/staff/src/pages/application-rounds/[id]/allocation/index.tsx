@@ -451,8 +451,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return NOT_FOUND_SSR_VALUE;
   }
 
-  const commonProps = await getCommonServerSideProps();
-  const client = createClient(commonProps.apiBaseUrl, req);
+  const { apiBaseUrl } = await getCommonServerSideProps();
+  const client = createClient(apiBaseUrl, req);
   const { data } = await client.query<ApplicationRoundFilterQuery, ApplicationRoundFilterQueryVariables>({
     query: ApplicationRoundFilterDocument,
     variables: { id: createNodeId("ApplicationRoundNode", pk) },
@@ -467,7 +467,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return {
     props: {
       applicationRound,
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

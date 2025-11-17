@@ -38,7 +38,6 @@ import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { ControlledTimeInput } from "@/components/ControlledTimeInput";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getNotificationListUrl } from "@/modules/urls";
 import {
   BannerNotificationState,
@@ -545,9 +544,9 @@ function PageWrapped({ pk }: { pk?: number }): JSX.Element {
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page({ apiBaseUrl, pk }: PropsNarrowed): JSX.Element {
+export default function Page({ pk }: PropsNarrowed): JSX.Element {
   return (
-    <AuthorizationChecker apiUrl={apiBaseUrl} permission={UserPermissionChoice.CanManageNotifications}>
+    <AuthorizationChecker permission={UserPermissionChoice.CanManageNotifications}>
       <PageWrapped pk={pk} />
     </AuthorizationChecker>
   );
@@ -563,7 +562,6 @@ export async function getServerSideProps({ locale, query }: GetServerSidePropsCo
   return {
     props: {
       pk: isNew ? 0 : pk,
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

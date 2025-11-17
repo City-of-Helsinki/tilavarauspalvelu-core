@@ -20,6 +20,7 @@ import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel
 import { breakpoints } from "ui/src/modules/const";
 import { Flex } from "ui/src/styled";
 import { CustomTable } from "@/components/Table";
+import { useEnvContext } from "@/context/EnvContext";
 import type { SelectedRow } from "@/lib/reservation-units";
 import { isBrowser, MAX_NAME_LENGTH } from "@/modules/const";
 import { truncate } from "@/modules/helpers";
@@ -31,14 +32,13 @@ import {
   type ReservationUnitTableElementFragment,
 } from "@gql/gql-types";
 
-type Props = {
+type ReservationUnitsTableProps = {
   sort: string;
   sortChanged: (field: string) => void;
   reservationUnits: ReservationUnitTableElementFragment[];
   isLoading?: boolean;
   selectedRows: SelectedRow[];
   setSelectedRows: Dispatch<SetStateAction<SelectedRow[]>>;
-  apiBaseUrl: string;
 };
 
 const getStatusLabelProps = (
@@ -160,8 +160,7 @@ export function ReservationUnitsTable({
   isLoading,
   selectedRows,
   setSelectedRows,
-  apiBaseUrl,
-}: Props): JSX.Element {
+}: ReservationUnitsTableProps): JSX.Element {
   const { t } = useTranslation();
 
   const cols = getColConfig(t);
@@ -186,7 +185,7 @@ export function ReservationUnitsTable({
       selectAllRowsText={t("common:selectAllRows")}
       clearSelectionsText={t("common:clearAllSelections")}
       setSelectedRows={setSelectedRows}
-      customActionButtons={[<ActionButtons t={t} selectedRows={selectedRows} apiBaseUrl={apiBaseUrl}></ActionButtons>]}
+      customActionButtons={[<ActionButtons selectedRows={selectedRows}></ActionButtons>]}
     />
   );
 }
@@ -198,21 +197,17 @@ const Spacer = styled.div`
   }
 `;
 
-function ActionButtons({
-  t,
-  selectedRows,
-  apiBaseUrl,
-}: {
-  t: TFunction;
+type ActionButtonsProps = {
   selectedRows: SelectedRow[];
-  apiBaseUrl: string;
-}): JSX.Element {
+};
+function ActionButtons({ selectedRows }: ActionButtonsProps): React.ReactElement {
+  const { env } = useEnvContext();
+  const { t } = useTranslation();
+
   const selectedPks = selectedRows.map((id) => Number(id)).filter((id) => !isNaN(id));
   const redirectOnErrorUrl = isBrowser ? window.location.href : undefined;
-  const editLink =
-    getOpeningHoursUrl(apiBaseUrl, selectedPks, redirectOnErrorUrl) !== ""
-      ? getOpeningHoursUrl(apiBaseUrl, selectedPks, redirectOnErrorUrl)
-      : undefined;
+  const openingHoursUrl = getOpeningHoursUrl(env.apiBaseUrl, selectedPks, redirectOnErrorUrl);
+  const editLink = openingHoursUrl !== "" ? openingHoursUrl : undefined;
   return (
     <Spacer>
       <Flex $gap={"xs"} $direction={"row"} $wrap={"wrap"}>

@@ -26,7 +26,6 @@ import { ApplicationWorkingMemo } from "@/components/WorkingMemo";
 import { useCheckPermission } from "@/hooks";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { getApplicantName, translateReserveeType } from "@/modules/helpers";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { formatAgeGroup, formatNumber } from "@/modules/util";
 import { ApplicationDatas, Summary } from "@/styled";
 import {
@@ -710,7 +709,6 @@ export async function getServerSideProps({ locale, query }: GetServerSidePropsCo
   return {
     props: {
       pk,
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

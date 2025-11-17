@@ -7,7 +7,6 @@ import { useSearchParams } from "next/navigation";
 import { formatDate } from "ui/src/modules/date-utils";
 import { H1 } from "ui/src/styled";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 export default function ListReservationsPage(): JSX.Element {
   const { t } = useTranslation();
@@ -50,7 +49,6 @@ export default function ListReservationsPage(): JSX.Element {
 export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

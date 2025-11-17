@@ -1,4 +1,5 @@
 import { gql, NormalizedCacheObject, type ApolloClient } from "@apollo/client";
+import { type CommonEnvConfig } from "@ui/types";
 import { env } from "@/env.mjs";
 import {
   TermsOfUseTypeChoices,
@@ -15,7 +16,13 @@ import { genericTermsVariant } from "./const";
 
 export { getVersion };
 
-export function getCommonServerSideProps() {
+interface CustomerEnvConfig extends CommonEnvConfig {
+  matomoEnabled: boolean;
+  hotjarEnabled: boolean;
+  profileLink: string;
+}
+
+export function getCommonServerSideProps(): CustomerEnvConfig {
   // NOTE don't return undefined here, it breaks JSON.stringify used by getServerSideProps
   // use null or default value instead
   const matomoEnabled = env.MATOMO_ENABLED ?? false;
@@ -28,10 +35,10 @@ export function getCommonServerSideProps() {
   const version = getVersion();
 
   return {
+    apiBaseUrl,
     matomoEnabled,
     hotjarEnabled,
     profileLink,
-    apiBaseUrl,
     feedbackUrl,
     sentryDsn,
     sentryEnvironment,
