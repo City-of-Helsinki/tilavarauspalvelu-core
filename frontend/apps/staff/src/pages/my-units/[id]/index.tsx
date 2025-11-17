@@ -13,6 +13,7 @@ import { breakpoints } from "ui/src/modules/const";
 import { parseUIDate } from "ui/src/modules/date-utils";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex, H1, TabWrapper, TitleSection } from "ui/src/styled";
+import { logGraphQLQuery } from "@ui/modules/apolloUtils";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { useModal } from "@/context/ModalContext";
 import { useSession } from "@/hooks";
@@ -200,8 +201,8 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
   const { data: optionsData } = optionsQueryRes;
 
   const end = performance.now();
-  // oxlint-disable-next-line no-console
-  console.log(`SSR queries took: ${end - start} ms`);
+  const timeMs = Math.round(end - start);
+  logGraphQLQuery(timeMs, req.url, [UnitViewDocument, FilterOptionsDocument]);
 
   const { unit } = data;
   if (unit == null) {

@@ -7,6 +7,7 @@ import App from "next/app";
 import type { AppContext, AppInitialProps, AppProps } from "next/app";
 import { ToastContainer } from "ui/src/components/toast";
 import "ui/src/styles/global.scss";
+import { initialiseLogWrite } from "@ui/modules/browserHelpers";
 import { getLocalizationLang } from "@ui/modules/helpers";
 import { ExternalScripts } from "@/components/ExternalScripts";
 import { PageWrapper } from "@/components/PageWrapper";
@@ -60,12 +61,17 @@ function useHasUserAcceptedStatistics() {
 
 function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
   const { Component, envConfig, pageProps } = props;
-  const { hotjarEnabled, matomoEnabled, apiBaseUrl, sentryDsn, sentryEnvironment } = envConfig;
+  const { isHotjarEnabled, isMatomoEnabled, isConsoleLoggingEnabled, apiBaseUrl, sentryDsn, sentryEnvironment } =
+    envConfig;
   useEffect(() => {
     if (sentryDsn) {
       updateSentryConfig(sentryDsn, sentryEnvironment);
     }
   }, [sentryDsn, sentryEnvironment]);
+
+  if (isConsoleLoggingEnabled) {
+    initialiseLogWrite();
+  }
 
   const { i18n } = useTranslation();
   const { hasUserAcceptedStatistics: statisticsAccepted, recheck } = useHasUserAcceptedStatistics();
@@ -73,8 +79,8 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
   const client = createApolloClient(apiBaseUrl ?? "", undefined);
   const language = getLocalizationLang(i18n.language);
 
-  const enableMatomo = matomoEnabled && statisticsAccepted;
-  const enableHotjar = hotjarEnabled && statisticsAccepted;
+  const enableMatomo = isMatomoEnabled && statisticsAccepted;
+  const enableHotjar = isHotjarEnabled && statisticsAccepted;
 
   return (
     <CookieConsentContextProvider

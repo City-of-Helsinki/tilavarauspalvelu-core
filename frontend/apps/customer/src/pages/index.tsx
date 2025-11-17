@@ -32,7 +32,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const { data } = await apolloClient.query<FrontPageQuery, FrontPageQueryVariables>({
     query: FrontPageDocument,
-    fetchPolicy: "no-cache",
     variables: {
       orderBy: [IntendedUseOrderingChoices.RankAsc],
       orderUnitsBy: [UnitOrderingChoices.RankAsc],

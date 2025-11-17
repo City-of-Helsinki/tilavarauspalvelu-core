@@ -91,3 +91,67 @@ function addFormParam(form: HTMLFormElement, name: string, value: string): void 
 export function isWindowVisible(): boolean {
   return isBrowser && document.visibilityState === "visible";
 }
+
+export function initialiseLogWrite() {
+  // browser logger doesn't work on node (use a proper transport)
+  if (typeof window !== "undefined") {
+    // @ts-expect-error -- FIXME (or this is fine)
+    globalThis.ROARR = globalThis.ROARR ?? {};
+    // @ts-expect-error -- FIXME (or this is fine)
+    globalThis.ROARR.write = (message: string) => {
+      const res = LogMessageSchema.safeParse(JSON.parse(message));
+      if (res.success) {
+        const { message: msg, context } = res.data;
+        const { logLevel, query, variables, type, operationName: _, ...rest } = context;
+        const css = getCSSPerLogLevel(logLevel);
+        const hasContext = !isEmpty(rest);
+        const ctxStr = hasContext ? `\nwith context: ${JSON.stringify(rest)}` : "";
+        const queryStr = query != null ? `\n${query}` : "";
+        const variablesStr = variables != null ? `\nwith variables: ${variables}` : "";
+        // oxlint-disable-next-line no-console
+        console.log(`%c${formatLogLevel(logLevel)}: ${type ?? ""} ${msg}${queryStr}${variablesStr}${ctxStr}`, css);
+      }
+    };
+  }
+}
+
+function isEmpty(obj: object) {
+  return Object.keys(obj).length === 0;
+}
+
+const LogMessageSchema = z.object({
+  context: z.looseObject({
+    logLevel: z.number(),
+    query: z.string().optional(),
+    type: z.string().optional(),
+    operationName: z.string().optional(),
+    variables: z.string().optional(),
+  }),
+  message: z.string(),
+});
+
+function formatLogLevel(logLevel: number): string {
+  if (logLevel >= 50) {
+    return "ERROR";
+  } else if (logLevel >= 40) {
+    return "WARN";
+  } else if (logLevel >= 20) {
+    return "INFO";
+  } else if (logLevel >= 10) {
+    return "TRACE";
+  }
+  return "DEBUG";
+}
+
+function getCSSPerLogLevel(logLevel: number): string {
+  if (logLevel >= 50) {
+    return `background-color: crimson; color: black;`;
+  } else if (logLevel >= 40) {
+    return `background-color: darkorange; color: black;`;
+  } else if (logLevel >= 20) {
+    return `background-color: deepskyblue; color: black;`;
+  } else if (logLevel >= 10) {
+    return `background-color: lightskyblue; color: black;`;
+  }
+  return "";
+}

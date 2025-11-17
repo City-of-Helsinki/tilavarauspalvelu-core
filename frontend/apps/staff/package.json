@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev -p 3001 --turbopack",
+    "dev": "ROARR_LOG=true next dev -p 3001 --turbopack",
     "build": "SKIP_ENV_VALIDATION=true next build",
     "start": "next start",
     "lint": "oxlint . -c ../../.oxlintrc.json --type-aware",
@@ -41,6 +41,7 @@
     "react-i18next": "^16.3.5",
     "react-use": "^17.6.0",
     "reactjs-popup": "^2.0.6",
+    "roarr": "^7.21.2",
     "sass": "^1.93.2",
     "styled-components": "6.1.19",
     "tsconfig": "workspace:*",
