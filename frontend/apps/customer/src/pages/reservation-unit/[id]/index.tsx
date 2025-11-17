@@ -364,10 +364,10 @@ function ReservationUnit({
           </div>
           {activePricing?.materialPriceDescriptionFi &&
             cleanHtmlContent(activePricing?.materialPriceDescriptionFi.trim()).length > 0 && (
-              <>
+              <div>
                 <H4 as="h2">{capitalize(t("prices:materialPrice"))}</H4>
                 <Sanitize html={getTranslationSafe(activePricing, "materialPriceDescription", lang)} />
-              </>
+              </div>
             )}
           {equipment.length > 0 && (
             <div data-testid="reservation-unit__equipment">
