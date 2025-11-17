@@ -116,7 +116,7 @@ function ApplicationsPage({ data: initialData }: PropsNarrowed): JSX.Element | n
     <>
       <Breadcrumb routes={routes} />
       <div>
-        <H1 $noMargin>{t("applications:heading")}</H1>
+        <H1 $marginTop="none">{t("applications:heading")}</H1>
         <p>{t("applications:subHeading")}</p>
       </div>
       <ApplicationGroups applications={applications} actionCallback={actionCallback} />
