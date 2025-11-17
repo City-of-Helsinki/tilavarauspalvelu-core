@@ -11,6 +11,7 @@ const CustomErrorComponent: NextPage<ErrorProps> = (props) => {
 };
 
 CustomErrorComponent.getInitialProps = async (contextData) => {
+  // TODO rewrite using the transform error function
   // GraphQL errors return statusCode 200
   // manually bucket them as separate errors based on the backend error code
   const gqlErrors = getApiErrors(contextData.err);
