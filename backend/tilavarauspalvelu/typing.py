@@ -292,8 +292,8 @@ class StaffCreateReservationData(TypedDict):
     reservee_address_zip: NotRequired[str]
     reservee_type: NotRequired[ReserveeType]
 
-    age_group: NotRequired[ReservationPurpose | None]
-    purpose: NotRequired[AgeGroup | None]
+    age_group: NotRequired[AgeGroup | None]
+    purpose: NotRequired[ReservationPurpose | None]
 
     state: NotRequired[ReservationStateChoice]
     confirmed_at: NotRequired[datetime.datetime]
