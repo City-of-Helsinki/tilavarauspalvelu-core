@@ -3,7 +3,6 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ErrorContainer } from "ui/src/components";
 import { PUBLIC_URL } from "@/modules/const";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 /// next doesn't allow getServersideProps in 404.tsx (you have to use app router for that)
 /// so all props are build time not runtime (e.g. no dynamic environment variables)
@@ -12,7 +11,6 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 export async function getStaticProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

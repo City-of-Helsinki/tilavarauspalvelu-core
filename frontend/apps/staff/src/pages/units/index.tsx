@@ -6,7 +6,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H1, HR } from "ui/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { Filters, UnitsDataLoader } from "@/components/units";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { UserPermissionChoice } from "@gql/gql-types";
 
 function Units(): JSX.Element {
@@ -31,9 +30,9 @@ function Units(): JSX.Element {
 }
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-export default function Page(props: PageProps): JSX.Element {
+export default function Page(_props: PageProps): JSX.Element {
   return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanManageReservationUnits}>
+    <AuthorizationChecker permission={UserPermissionChoice.CanManageReservationUnits}>
       <Units />
     </AuthorizationChecker>
   );
@@ -42,7 +41,6 @@ export default function Page(props: PageProps): JSX.Element {
 export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

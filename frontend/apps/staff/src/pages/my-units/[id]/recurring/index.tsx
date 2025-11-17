@@ -21,7 +21,7 @@ import {
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page({ apiBaseUrl, unitPk, reservationUnits }: PropsNarrowed): JSX.Element {
+export default function Page({ unitPk, reservationUnits }: PropsNarrowed): JSX.Element {
   const { t } = useTranslation();
 
   const reservationUnitOptions = reservationUnits.map((unit) => ({
@@ -30,11 +30,7 @@ export default function Page({ apiBaseUrl, unitPk, reservationUnits }: PropsNarr
   }));
 
   return (
-    <AuthorizationChecker
-      apiUrl={apiBaseUrl}
-      permission={UserPermissionChoice.CanCreateStaffReservations}
-      unitPk={unitPk}
-    >
+    <AuthorizationChecker permission={UserPermissionChoice.CanCreateStaffReservations} unitPk={unitPk}>
       <TimeZoneNotification />
       <LinkPrev />
       <H1 $noMargin>{t("myUnits:ReservationSeries.pageTitle")}</H1>
@@ -52,8 +48,8 @@ export async function getServerSideProps({ query, locale, req }: GetServerSidePr
   if (unitPk <= 0) {
     return NOT_FOUND_SSR_VALUE;
   }
-  const commonProps = await getCommonServerSideProps();
-  const apolloClient = createClient(commonProps.apiBaseUrl, req);
+  const { apiBaseUrl } = await getCommonServerSideProps();
+  const apolloClient = createClient(apiBaseUrl, req);
   const unitData = await apolloClient.query<SeriesReservationUnitQuery, SeriesReservationUnitQueryVariables>({
     query: SeriesReservationUnitDocument,
     variables: { id: createNodeId("UnitNode", unitPk) },
@@ -63,7 +59,6 @@ export async function getServerSideProps({ query, locale, req }: GetServerSidePr
     props: {
       unitPk,
       reservationUnits,
-      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

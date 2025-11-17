@@ -3,7 +3,6 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ErrorContainer } from "ui/src/components";
 import { PUBLIC_URL } from "@/modules/const";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 // TODO this is a copy of 404.tsx, but with 500 instead of 404
 
@@ -11,7 +10,6 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 export async function getStaticProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
-      ...getCommonServerSideProps(),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

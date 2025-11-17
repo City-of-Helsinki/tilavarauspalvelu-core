@@ -14,7 +14,6 @@ import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { Error404 } from "@/components/Error404";
 import { CustomTable } from "@/components/Table";
 import { truncate } from "@/modules/helpers";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationRoundUrl } from "@/modules/urls";
 import { TableLink } from "@/styled";
 import {
@@ -196,9 +195,9 @@ function AllApplicationRounds(): JSX.Element | null {
 }
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-export default function Page(props: PageProps): JSX.Element {
+export default function Page(_props: PageProps): JSX.Element {
   return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanManageApplications}>
+    <AuthorizationChecker permission={UserPermissionChoice.CanManageApplications}>
       <AllApplicationRounds />
     </AuthorizationChecker>
   );
@@ -207,7 +206,6 @@ export default function Page(props: PageProps): JSX.Element {
 export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

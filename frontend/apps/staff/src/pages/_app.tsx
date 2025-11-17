@@ -5,9 +5,10 @@ import App, { type AppContext, type AppInitialProps, type AppProps } from "next/
 import { formatApiDate } from "ui/src/modules/date-utils";
 import "ui/src/styles/global.scss";
 import PageWrapper from "@/components/PageWrapper";
+import { EnvContextProvider } from "@/context/EnvContext";
 import { ModalContextProvider } from "@/context/ModalContext";
 import { createClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { type StaffEnvConfig, getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   BannerNotificationTarget,
   CurrentUserDocument,
@@ -21,7 +22,6 @@ import {
   type ShowNotificationsListQuery,
   type ShowNotificationsListQueryVariables,
 } from "@gql/gql-types";
-import { type PageProps } from ".";
 import { updateSentryConfig } from "../../instrumentation-client";
 import "../styles/global.scss";
 import Layout from "./layout";
@@ -29,9 +29,9 @@ import Layout from "./layout";
 // suppress useLayoutEffect warnings on SSR till it's fixed upstream in HDS
 if (typeof window === "undefined") React.useLayoutEffect = () => {};
 
-function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
-  const { Component, pageProps, currentUser, handlingData, notificationsData } = props;
-  const { apiBaseUrl, sentryDsn, sentryEnvironment, version } = pageProps;
+function MyApp<T>(props: AppProps<T> & AppOwnProps): JSX.Element {
+  const { Component, pageProps, currentUser, handlingData, notificationsData, envConfig } = props;
+  const { apiBaseUrl, sentryDsn, sentryEnvironment, version } = envConfig;
   useEffect(() => {
     if (sentryDsn) {
       updateSentryConfig(sentryDsn, sentryEnvironment);
@@ -73,13 +73,15 @@ function MyApp(props: AppProps<PageProps> & AppOwnProps): JSX.Element {
 
   return (
     <ApolloProvider client={apolloClient}>
-      <ModalContextProvider>
-        <Layout version={version}>
-          <PageWrapper apiBaseUrl={apiBaseUrl}>
-            <Component {...pageProps} />
-          </PageWrapper>
-        </Layout>
-      </ModalContextProvider>
+      <EnvContextProvider env={envConfig}>
+        <ModalContextProvider>
+          <Layout version={version}>
+            <PageWrapper>
+              <Component {...pageProps} />
+            </PageWrapper>
+          </Layout>
+        </ModalContextProvider>
+      </EnvContextProvider>
     </ApolloProvider>
   );
 }
@@ -88,6 +90,7 @@ type AppOwnProps = {
   currentUser: CurrentUserQuery["currentUser"];
   handlingData: HandlingDataQuery | null;
   notificationsData: ShowNotificationsListQuery | null;
+  envConfig: StaffEnvConfig;
 };
 
 // Override the data fetching for the whole app
@@ -125,13 +128,19 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
       },
     });
 
-    return { ...ctx, currentUser: data.currentUser, handlingData, notificationsData: notificationsData };
+    return {
+      ...ctx,
+      envConfig: commonProps,
+      currentUser: data.currentUser,
+      handlingData,
+      notificationsData: notificationsData,
+    };
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Error fetching current user:", error);
   }
 
-  return { ...ctx, currentUser: null, handlingData: null, notificationsData: null };
+  return { ...ctx, envConfig: commonProps, currentUser: null, handlingData: null, notificationsData: null };
 };
 
 // NOTE inferred type problem so casting to FC

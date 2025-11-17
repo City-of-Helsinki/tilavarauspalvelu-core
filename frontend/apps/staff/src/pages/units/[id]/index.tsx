@@ -14,7 +14,6 @@ import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { Error404 } from "@/components/Error404";
 import { ExternalLink } from "@/components/ExternalLink";
 import { PUBLIC_URL, NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/modules/urls";
 import { formatAddress } from "@/modules/util";
 import { UserPermissionChoice, useUnitPageQuery } from "@gql/gql-types";
@@ -136,10 +135,10 @@ function Unit({ unitPk }: { unitPk: number }): JSX.Element {
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page(props: PropsNarrowed): JSX.Element {
+export default function Page({ pk }: PropsNarrowed): JSX.Element {
   return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanManageReservationUnits}>
-      <Unit unitPk={props.pk} />
+    <AuthorizationChecker permission={UserPermissionChoice.CanManageReservationUnits}>
+      <Unit unitPk={pk} />
     </AuthorizationChecker>
   );
 }
@@ -154,7 +153,6 @@ export async function getServerSideProps({ locale, query }: GetServerSidePropsCo
   return {
     props: {
       pk,
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

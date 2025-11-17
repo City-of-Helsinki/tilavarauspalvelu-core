@@ -14,7 +14,6 @@ import { Error404 } from "@/components/Error404";
 import { LinkPrev } from "@/components/LinkPrev";
 import { useModal } from "@/context/ModalContext";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { FixedDialog } from "@/styled/FixedDialog";
 import { UserPermissionChoice, useSpacesResourcesQuery } from "@gql/gql-types";
 
@@ -121,7 +120,7 @@ type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 export default function Page(props: PropsNarrowed): JSX.Element {
   return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanManageReservationUnits}>
+    <AuthorizationChecker permission={UserPermissionChoice.CanManageReservationUnits}>
       <SpacesResources unitPk={props.pk} />
     </AuthorizationChecker>
   );
@@ -135,7 +134,6 @@ export async function getServerSideProps({ locale, query }: GetServerSidePropsCo
   return {
     props: {
       pk,
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

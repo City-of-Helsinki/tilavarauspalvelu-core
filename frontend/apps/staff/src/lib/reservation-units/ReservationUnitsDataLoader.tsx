@@ -14,7 +14,6 @@ import { ReservationUnitsTable } from "./ReservationUnitsTable";
 type Props = {
   selectedRows: SelectedRow[];
   setSelectedRows: Dispatch<SetStateAction<SelectedRow[]>>;
-  apiBaseUrl: string;
 };
 
 function transformOrderBy(orderBy: string, desc: boolean): ReservationUnitOrderingChoices | null {
@@ -49,7 +48,7 @@ function transformSortString(orderBy: string | null): ReservationUnitOrderingCho
   return [];
 }
 
-export function ReservationUnitsDataReader({ selectedRows, setSelectedRows, apiBaseUrl }: Props): JSX.Element {
+export function ReservationUnitsDataReader({ selectedRows, setSelectedRows }: Props): JSX.Element {
   const [sort, setSort] = useState<string>("");
   const onSortChanged = (sortField: string) => {
     if (sort === sortField) {
@@ -114,7 +113,6 @@ export function ReservationUnitsDataReader({ selectedRows, setSelectedRows, apiB
         isLoading={loading}
         selectedRows={selectedRows}
         setSelectedRows={setSelectedRows}
-        apiBaseUrl={apiBaseUrl}
       />
       <More
         totalCount={data?.reservationUnits?.totalCount ?? 0}

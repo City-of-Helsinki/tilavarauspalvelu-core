@@ -13,7 +13,6 @@ import { H1, H3, SemiBold, Strong, CenterSpinner, Flex, TitleSection } from "ui/
 import { Accordion as AccordionBase } from "@/components/Accordion";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useApplicationRoundCriteriaQuery, UserPermissionChoice } from "@gql/gql-types";
 
 const Accordion = styled(AccordionBase)`
@@ -117,7 +116,7 @@ type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Element {
   return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanManageApplications}>
+    <AuthorizationChecker permission={UserPermissionChoice.CanManageApplications}>
       <Criteria applicationRoundPk={props.pk} />
     </AuthorizationChecker>
   );
@@ -133,7 +132,6 @@ export async function getServerSideProps({ locale, query }: GetServerSidePropsCo
   return {
     props: {
       pk,
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

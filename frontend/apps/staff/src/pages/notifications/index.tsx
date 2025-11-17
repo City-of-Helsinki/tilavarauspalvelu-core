@@ -243,22 +243,21 @@ export default function ApplicationRoundRouted(props: PageProps): JSX.Element {
     });
   }, [apolloClient, props]);
   return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanManageNotifications}>
+    <AuthorizationChecker permission={UserPermissionChoice.CanManageNotifications}>
       <Notifications {...props} />
     </AuthorizationChecker>
   );
 }
 
 export async function getServerSideProps({ locale, req }: GetServerSidePropsContext) {
-  const commonProps = await getCommonServerSideProps();
-  const apolloClient = createClient(commonProps.apiBaseUrl, req);
+  const { apiBaseUrl } = await getCommonServerSideProps();
+  const apolloClient = createClient(apiBaseUrl, req);
   const notifications = await apolloClient.query<BannerNotificationsListQuery, BannerNotificationsListQueryVariables>({
     query: BannerNotificationsListDocument,
   });
   return {
     props: {
       notifications: notifications.data,
-      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

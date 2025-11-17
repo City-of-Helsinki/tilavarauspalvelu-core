@@ -6,7 +6,6 @@ import { UserPermissionChoice } from "@gql/gql-types";
 import { Error403 } from "./Error403";
 
 interface BaseProps {
-  apiUrl: string;
   children: React.ReactElement | React.ReactElement[];
 }
 interface PropsWithPermission extends BaseProps {
@@ -15,10 +14,10 @@ interface PropsWithPermission extends BaseProps {
 }
 type AuthorizationCheckerProps = BaseProps | PropsWithPermission;
 
-export function AuthorizationChecker({ apiUrl, children, ...rest }: AuthorizationCheckerProps): React.ReactElement {
+export function AuthorizationChecker({ children, ...rest }: AuthorizationCheckerProps): React.ReactElement {
   const { user: currentUser, isAuthenticated } = useSession();
   if (!isAuthenticated) {
-    return <MainLander apiBaseUrl={apiUrl} />;
+    return <MainLander />;
   }
 
   let hasAccess = false;

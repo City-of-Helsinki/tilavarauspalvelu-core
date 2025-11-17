@@ -4,7 +4,6 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H1 } from "ui/src/styled";
 import { Filters, UnitsDataLoader } from "@/components/units";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 export default function Page(_props: PageProps): JSX.Element {
@@ -25,7 +24,6 @@ export default function Page(_props: PageProps): JSX.Element {
 export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

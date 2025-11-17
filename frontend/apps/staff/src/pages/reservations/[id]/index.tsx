@@ -352,8 +352,8 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
     return NOT_FOUND_SSR_VALUE;
   }
 
-  const commonProps = await getCommonServerSideProps();
-  const apolloClient = createClient(commonProps.apiBaseUrl, req);
+  const { apiBaseUrl } = await getCommonServerSideProps();
+  const apolloClient = createClient(apiBaseUrl, req);
   const reservationPageQuery = await apolloClient.query<ReservationPageQuery>({
     query: ReservationPageDocument,
     variables: { id: createNodeId("ReservationNode", pk) },
@@ -367,7 +367,6 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
   return {
     props: {
       reservation,
-      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

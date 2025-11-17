@@ -5,14 +5,13 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { UserPermissionChoice } from "@gql/gql-types";
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 export default function Page(props: PropsNarrowed): JSX.Element {
   return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanManageReservationUnits}>
+    <AuthorizationChecker permission={UserPermissionChoice.CanManageReservationUnits}>
       <ResourceEditor resourcePk={props.resourcePk} unitPk={props.unitPk} />
     </AuthorizationChecker>
   );
@@ -30,7 +29,6 @@ export async function getServerSideProps({ locale, query }: GetServerSidePropsCo
     props: {
       unitPk,
       resourcePk,
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

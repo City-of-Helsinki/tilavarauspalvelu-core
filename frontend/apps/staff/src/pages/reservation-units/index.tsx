@@ -17,13 +17,7 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 
-function ReservationUnits({
-  optionsData,
-  apiBaseUrl,
-}: {
-  optionsData: PageProps["optionsData"];
-  apiBaseUrl: string;
-}): JSX.Element {
+function ReservationUnits({ optionsData }: { optionsData: PageProps["optionsData"] }): JSX.Element {
   const { t } = useTranslation();
   const options = getFilterOptions(t, optionsData);
   const [selectedRows, setSelectedRows] = useState<SelectedRow[]>([]);
@@ -46,27 +40,23 @@ function ReservationUnits({
       </div>
       <Filters options={options} />
       <HR />
-      <ReservationUnitsDataReader
-        selectedRows={selectedRows}
-        setSelectedRows={setSelectedRows}
-        apiBaseUrl={apiBaseUrl}
-      />
+      <ReservationUnitsDataReader selectedRows={selectedRows} setSelectedRows={setSelectedRows} />
     </>
   );
 }
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-export default function Page(props: PageProps): JSX.Element {
+export default function Page({ optionsData }: PageProps): JSX.Element {
   return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanManageReservationUnits}>
-      <ReservationUnits optionsData={props.optionsData} apiBaseUrl={props.apiBaseUrl} />
+    <AuthorizationChecker permission={UserPermissionChoice.CanManageReservationUnits}>
+      <ReservationUnits optionsData={optionsData} />
     </AuthorizationChecker>
   );
 }
 
 export async function getServerSideProps({ locale, req }: GetServerSidePropsContext) {
-  const commonProps = await getCommonServerSideProps();
-  const apolloClient = createClient(commonProps.apiBaseUrl, req);
+  const { apiBaseUrl } = await getCommonServerSideProps();
+  const apolloClient = createClient(apiBaseUrl, req);
 
   const options = await apolloClient.query<FilterOptionsQuery, FilterOptionsQueryVariables>({
     query: FilterOptionsDocument,
@@ -74,7 +64,6 @@ export async function getServerSideProps({ locale, req }: GetServerSidePropsCont
   return {
     props: {
       optionsData: options.data,
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

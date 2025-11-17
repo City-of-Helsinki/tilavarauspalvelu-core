@@ -187,8 +187,8 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
     return NOT_FOUND_SSR_VALUE;
   }
   const start = performance.now();
-  const commonProps = await getCommonServerSideProps();
-  const apolloClient = createClient(commonProps.apiBaseUrl ?? "", req);
+  const { apiBaseUrl } = await getCommonServerSideProps();
+  const apolloClient = createClient(apiBaseUrl, req);
   const unitQuery = apolloClient.query<UnitViewQuery, UnitViewQueryVariables>({
     query: UnitViewDocument,
     variables: { id: createNodeId("UnitNode", pk) },
@@ -214,7 +214,6 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
     props: {
       unit,
       optionsData,
-      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

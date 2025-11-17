@@ -8,12 +8,12 @@ import { mainStyles } from "ui/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { ErrorGeneric } from "@/components/ErrorGeneric";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { useEnvContext } from "@/context/EnvContext";
 import { useModal } from "@/context/ModalContext";
 import { BannerNotificationTarget } from "@gql/gql-types";
 import { Navigation } from "./Navigation";
 
 type Props = {
-  apiBaseUrl: string;
   children: React.ReactElement;
 };
 
@@ -28,14 +28,15 @@ const FallbackComponent = (err: unknown) => {
   return <ErrorGeneric />;
 };
 
-export default function PageWrapper({ apiBaseUrl, children }: Props): JSX.Element {
+export default function PageWrapper({ children }: Props): JSX.Element {
   const { modalContent } = useModal();
+  const { env } = useEnvContext();
 
   return (
     <ErrorBoundary FallbackComponent={(e) => FallbackComponent(e)}>
-      <Navigation apiBaseUrl={apiBaseUrl} />
+      <Navigation apiBaseUrl={env.apiBaseUrl} />
       <Content>
-        <AuthorizationChecker apiUrl={apiBaseUrl}>
+        <AuthorizationChecker>
           <BannerNotificationsList target={BannerNotificationTarget.Staff} />
           {children}
         </AuthorizationChecker>

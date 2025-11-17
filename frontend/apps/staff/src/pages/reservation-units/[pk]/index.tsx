@@ -34,9 +34,9 @@ import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/
 import { Flex } from "ui/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { Error404 } from "@/components/Error404";
+import { useEnvContext } from "@/context/EnvContext";
 import { useModal } from "@/context/ModalContext";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getReservationUnitUrl } from "@/modules/urls";
 import {
   EquipmentOrderingChoices,
@@ -366,6 +366,8 @@ export default function EditorPage(props: PropsNarrowed): JSX.Element {
     skip: reservationUnitPk <= 0,
   });
 
+  const { env } = useEnvContext();
+
   const reservationUnit = data?.reservationUnit ?? undefined;
 
   const form = useForm<ReservationUnitEditFormValues>({
@@ -397,17 +399,17 @@ export default function EditorPage(props: PropsNarrowed): JSX.Element {
     return <Error404 />;
   }
 
-  const cleanPreviewUrlPrefix = props.reservationUnitPreviewUrl.replace(/\/$/, "");
+  const cleanPreviewUrlPrefix = env.reservationUnitPreviewUrl.replace(/\/$/, "");
 
   return (
-    <AuthorizationChecker apiUrl={props.apiBaseUrl} permission={UserPermissionChoice.CanManageReservationUnits}>
+    <AuthorizationChecker permission={UserPermissionChoice.CanManageReservationUnits}>
       <ReservationUnitEditor
         reservationUnit={reservationUnit}
         form={form}
         refetch={refetch}
         previewUrlPrefix={cleanPreviewUrlPrefix}
         unitPk={unitPk}
-        apiBaseUrl={props.apiBaseUrl}
+        apiBaseUrl={env.apiBaseUrl}
       />
     </AuthorizationChecker>
   );
@@ -425,7 +427,6 @@ export async function getServerSideProps({ query, locale }: GetServerSidePropsCo
     props: {
       unitPk,
       reservationUnitPk,
-      ...(await getCommonServerSideProps()),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
