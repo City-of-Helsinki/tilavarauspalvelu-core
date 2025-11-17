@@ -538,7 +538,7 @@ msgid "Handled date"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_round/form.py
-msgid "Purposes"
+msgid "IntendedUses"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_round/form.py
@@ -635,7 +635,7 @@ msgid "When the application round applications were sent to applicants."
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_round/form.py
-msgid "Purposes that are allowed in this application period."
+msgid "IntendedUses that are allowed in this application period."
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_round/form.py
