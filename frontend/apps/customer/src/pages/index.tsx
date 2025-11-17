@@ -4,7 +4,7 @@ import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { filterNonNullable } from "@ui/modules/helpers";
-import { Head, Purposes, SearchGuides, Units } from "@/lib/index";
+import { Head, IntendedUses, SearchGuides, Units } from "@/lib/index";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
@@ -15,13 +15,13 @@ import {
   FrontPageDocument,
 } from "@gql/gql-types";
 
-function Home({ purposes, units }: Props): JSX.Element {
+function Home({ intendedUses, units }: Props): JSX.Element {
   const { t } = useTranslation(["home", "common"]);
 
   return (
     <>
       <Head heading={t("head.heading")} text={t("head.text")} />
-      <Purposes purposes={purposes} />
+      <IntendedUses intendedUses={intendedUses} />
       <Units units={units} />
       <SearchGuides />
     </>
@@ -43,13 +43,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       orderUnitsBy: [UnitOrderingChoices.RankAsc],
     },
   });
-  const purposes = filterNonNullable(data?.intendedUses?.edges.map((edge) => edge?.node));
+  const intendedUses = filterNonNullable(data?.intendedUses?.edges.map((edge) => edge?.node));
   const units = filterNonNullable(data?.units?.edges.map((edge) => edge?.node));
 
   return {
     props: {
       ...commonProps,
-      purposes,
+      intendedUses,
       units,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
