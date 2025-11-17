@@ -8,10 +8,8 @@ import { relayStylePagination } from "@apollo/client/utilities";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { enchancedFetch, errorLink } from "ui/src/modules/apolloUtils";
 import { buildGraphQLUrl } from "ui/src/modules/urlBuilder";
-import { isBrowser } from "./const";
 
-if (process.env.NODE_ENV !== "production") {
-  // Adds messages only in a dev environment
+if (process.env.NODE_ENV === "development") {
   loadDevMessages();
   loadErrorMessages();
 }
@@ -38,7 +36,7 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
     link: isServer ? from([errorLink, httpLink]) : from([errorLink, uploadLink]),
     defaultOptions: {
       query: {
-        fetchPolicy: isBrowser ? "cache-first" : "no-cache",
+        fetchPolicy: isServer ? "no-cache" : "cache-first",
       },
     },
     cache: new InMemoryCache({

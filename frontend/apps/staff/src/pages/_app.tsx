@@ -4,8 +4,11 @@ import { ApolloProvider } from "@apollo/client";
 import { appWithTranslation } from "next-i18next";
 import App from "next/app";
 import type { AppContext, AppInitialProps, AppProps } from "next/app";
+import type { Router } from "next/router";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import "ui/src/styles/global.scss";
+import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apolloUtils";
+import { initialiseLogWrite } from "@ui/modules/browserHelpers";
 import { PageWrapper } from "@/components/PageWrapper";
 import { EnvContextProvider } from "@/context/EnvContext";
 import { ModalContextProvider } from "@/context/ModalContext";
@@ -36,12 +39,16 @@ if (typeof window === "undefined") React.useLayoutEffect = () => {};
 
 function MyApp<T>(props: AppProps<T> & AppOwnProps): JSX.Element {
   const { Component, pageProps, currentUser, handlingData, notificationsData, envConfig } = props;
-  const { apiBaseUrl, sentryDsn, sentryEnvironment, version } = envConfig;
+  const { apiBaseUrl, isConsoleLoggingEnabled, sentryDsn, sentryEnvironment, version } = envConfig;
   useEffect(() => {
     if (sentryDsn) {
       updateSentryConfig(sentryDsn, sentryEnvironment);
     }
   }, [sentryDsn, sentryEnvironment]);
+
+  if (isConsoleLoggingEnabled) {
+    initialiseLogWrite();
+  }
 
   // NOTE incorrectly typed (apiBaseUrl can be undefined during build)
   const apolloClient = createClient(apiBaseUrl ?? "");
@@ -49,7 +56,7 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): JSX.Element {
   // Manual rehydration of currentUser (otherwise we have flashes of unauthenticated state)
   // DO NOT use useEffect / async here
   // React rendering loop
-  // -> render component
+  // -> render the component without currentUser
   // -> run useEffect
   // -> redraw component with currentUser
   if (currentUser) {
@@ -91,6 +98,10 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): JSX.Element {
   );
 }
 
+function formatUrlPath(router: Router): string {
+  return `${router.basePath}${router.pathname}`;
+}
+
 type AppOwnProps = {
   currentUser: CurrentUserQuery["currentUser"];
   handlingData: HandlingDataQuery | null;
@@ -109,29 +120,35 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
   const client = createClient(commonProps.apiBaseUrl, context.ctx.req);
 
   try {
+    const startTime = performance.now();
+    const urlPathString = formatUrlPath(context.router);
     const { data } = await client.query<CurrentUserQuery, CurrentUserQueryVariables>({
       query: CurrentUserDocument,
-      fetchPolicy: "no-cache",
     });
+    logGraphQLQuery(performance.now() - startTime, urlPathString, CurrentUserDocument);
+
     // Need to fetch all data required by the Navigation component otherwise it flashes
+    const handlingTime = performance.now();
     const { data: handlingData } = await client.query<HandlingDataQuery, HandlingDataQueryVariables>({
       query: HandlingDataDocument,
-      fetchPolicy: "no-cache",
       variables: {
         beginDate: formatApiDate(new Date()) ?? "",
         state: ReservationStateChoice.RequiresHandling,
       },
     });
+    logGraphQLQuery(performance.now() - handlingTime, urlPathString, HandlingDataDocument);
+
+    const notificationTime = performance.now();
     const { data: notificationsData } = await client.query<
       ShowNotificationsListQuery,
       ShowNotificationsListQueryVariables
     >({
       query: ShowNotificationsListDocument,
-      fetchPolicy: "no-cache",
       variables: {
         target: BannerNotificationTarget.Staff,
       },
     });
+    logGraphQLQuery(performance.now() - notificationTime, urlPathString, ShowNotificationsListDocument);
 
     return {
       ...ctx,
@@ -141,8 +158,9 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
       notificationsData: notificationsData,
     };
   } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error("Error fetching current user:", err);
+    const error = transformQueryError(err);
+    logGraphQLError(error);
+    // FIXME there is no sentry error for this (this doesn't use the nextjs _error component)
   }
 
   return { ...ctx, envConfig: commonProps, currentUser: null, handlingData: null, notificationsData: null };

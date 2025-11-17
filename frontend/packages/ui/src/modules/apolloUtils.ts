@@ -3,8 +3,11 @@ import qs from "node:querystring";
 import type { ServerError, ServerParseError } from "@apollo/client";
 import { ApolloError } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
+import { getOperationName } from "@apollo/client/utilities";
 import * as Sentry from "@sentry/nextjs";
-import type { GraphQLFormattedError } from "graphql";
+import type { GraphQLFormattedError, DocumentNode } from "graphql";
+import { print } from "graphql";
+import { Roarr as log } from "roarr";
 import { getCookie } from "typescript-cookie";
 import { toast } from "../components/toast";
 import { isBrowser } from "./helpers";
@@ -25,6 +28,25 @@ export interface ValidationError extends ApiError {
 export interface OverlappingError extends ApiError {
   overlapping: Array<{ begin: string; end: string }>;
 }
+
+export type QueryErrorT =
+  | {
+      type: "GRAPHQL_ERROR";
+      message: string;
+      details: ApiError[];
+      ctx?: Record<string, unknown>;
+    }
+  | {
+      type: "NETWORK_ERROR";
+      code: string; // ECONREFUSE (others?)
+      message: string;
+      ctx?: Record<string, unknown>;
+    }
+  | {
+      type: "NON_API_ERROR";
+      message: string;
+      ctx?: Record<string, unknown>;
+    };
 
 function mapValidationError(gqlError: GraphQLFormattedError): ValidationError[] {
   const { extensions } = gqlError;
@@ -68,6 +90,7 @@ const PERMISSION_ERROR_CODES = [
   "DELETE_PERMISSION_DENIED",
   "MUTATION_PERMISSION_DENIED",
   "NODE_PERMISSION_DENIED",
+  "FILTER_PERMISSION_DENIED",
 ];
 // TODO refactor users to use getApiErrors
 export function getPermissionErrors(error: unknown): ValidationError[] {
@@ -167,6 +190,10 @@ export function getSeriesOverlapErrors(error: unknown): OverlappingError[] {
   return [];
 }
 
+function isPermissionError(code: string | null): boolean {
+  return code != null && new Set(PERMISSION_ERROR_CODES).has(code);
+}
+
 function mapGraphQLErrors(graphQLErrors: ReadonlyArray<Readonly<GraphQLFormattedError>>): ApiError[] {
   if (graphQLErrors.length > 0) {
     return graphQLErrors.flatMap((err) => {
@@ -175,6 +202,10 @@ function mapGraphQLErrors(graphQLErrors: ReadonlyArray<Readonly<GraphQLFormatted
         return mapOverlapError(err);
       }
       if (code === "MUTATION_VALIDATION_ERROR") {
+        return mapValidationError(err);
+      }
+      if (isPermissionError(code)) {
+        // TODO improve mapping (it works for code, but other fields including message is null)
         return mapValidationError(err);
       }
       return {
@@ -235,7 +266,22 @@ function extractErrorCode(error: ApiError): string | string[] {
 /// Capture all graphql errors as warnings in Sentry
 /// if some errors are properly handled in the UI add filter here
 /// During development log to console
-export const errorLink = onError(({ graphQLErrors, networkError }) => {
+export const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
+  // TODO improve this by
+  // - finding all unique error codes
+  // - take the operationName
+  //
+  // add the following context to all errors
+  // - error code <-> path
+  // - operationName
+  // - query document
+  // - variables? (can this be PII so we shouldn't log it?)
+  //
+  // - one function to transform the error (handles the different cases with network errors)
+  // - then a single log function (for now it can both send to sentry and local logger)
+  //   - create a fingerprint that is bit more specific than currently, but most of the info (query etc. should go to
+  //   context)
+
   // NOTE in case we have multiple errors in the response this will create separate buckets for those
   const apiErrors = mapGraphQLErrors(graphQLErrors ?? []);
   const apiErrorCodes = apiErrors.flatMap((e) => extractErrorCode(e));
@@ -256,22 +302,34 @@ export const errorLink = onError(({ graphQLErrors, networkError }) => {
     toastNetworkError(networkError);
   }
 
-  // During development (especially for SSR) log to console since there is no network tab
-  // better method would be to use a logger / push errors to client side
-  if (process.env.NODE_ENV === "development") {
-    if (graphQLErrors) {
-      for (const error of graphQLErrors) {
-        // eslint-disable-next-line no-console
-        console.error(`GQL_ERROR: ${JSON.stringify(error, null, 2)}`);
-      }
-    } else if (networkError) {
-      if (isCSRFError(networkError)) {
-        // don't log CSRF errors to console
-        return;
-      }
-      // eslint-disable-next-line no-console
-      console.error(`NETWORK_ERROR: ${JSON.stringify(networkError, null, 2)}`);
+  // TODO rewrite using the new transform function
+  if (graphQLErrors) {
+    for (const error of graphQLErrors) {
+      log.error(
+        {
+          type: "GRAPHQL_ERROR",
+          operationName: operation.operationName,
+          query: print(operation.query),
+          variables: JSON.stringify(operation.variables),
+        },
+        JSON.stringify(error)
+      );
     }
+  } else if (networkError) {
+    if (isCSRFError(networkError)) {
+      // don't log CSRF errors to console
+      return;
+    }
+    // TODO this is not a proper way of transforming the errors (network at least)
+    log.error(
+      {
+        type: "GRAPHQL_NETWORK_ERROR",
+        operationName: operation.operationName,
+        query: print(operation.query),
+        variables: JSON.stringify(operation.variables),
+      },
+      `NETWORK_ERROR: ${JSON.stringify(networkError)}`
+    );
   }
 });
 
@@ -319,7 +377,7 @@ function toastNetworkError(error: Error | ServerParseError | ServerError) {
   }
 }
 
-export function getServerCookie(headers: IncomingHttpHeaders | undefined, name: string) {
+function getServerCookie(headers: IncomingHttpHeaders | undefined, name: string) {
   const cookie = headers?.cookie;
   if (cookie == null) {
     return null;
@@ -383,5 +441,88 @@ export function enchancedFetch(req?: IncomingMessage) {
       ...init,
       headers,
     });
+  };
+}
+
+export function logGraphQLError(error: QueryErrorT): void {
+  if (error.type === "GRAPHQL_ERROR") {
+    const permissionError = error.details.find((x) => isPermissionError(x.code));
+    if (permissionError) {
+      log.error(`graphql permission error: ${JSON.stringify(permissionError)}`);
+    } else {
+      log.error(`graphql errors: ${JSON.stringify(error)}`);
+    }
+  } else {
+    log.error(`other errors: ${JSON.stringify(error)}`);
+  }
+}
+
+export function logGraphQLQuery(
+  timeMs: number,
+  url: string | undefined,
+  documents: DocumentNode | DocumentNode[]
+): void {
+  const operationName = Array.isArray(documents) ? documents.map(getOperationName) : getOperationName(documents);
+  const t = Math.round(timeMs);
+  // TODO should log if it's a mutation / query (though we probably aren't logging mutations)
+  log.info(
+    {
+      timeMs: t,
+      url,
+      operationName,
+    },
+    `GQL query ${operationName} took: ${t} ms`
+  );
+}
+
+export function transformQueryError(error: unknown): QueryErrorT {
+  // TODO don't let these fall through
+  // check the error code and return 503 page
+  // need
+  // - a conversion function to create more complex error type with
+  //  - code (ours, enum)
+  //  - message
+  // - check the code
+  // -> log to sentry based on it
+  const gqlErrors = getApiErrors(error);
+  if (gqlErrors.length > 0) {
+    const codes = new Set(gqlErrors.map((e) => e.code));
+    return {
+      type: "GRAPHQL_ERROR",
+      message: `Graphql VALIDATION errors: ${codes.keys().toArray()}`,
+      details: gqlErrors,
+    };
+  } else if (error instanceof ApolloError && error.networkError != null) {
+    const { cause } = error.networkError;
+    if (
+      typeof cause === "object" &&
+      cause != null &&
+      "code" in cause &&
+      cause.code != null &&
+      typeof cause.code === "string"
+    ) {
+      // The backend is down
+      if (cause.code === "ECONNREFUSED") {
+        return {
+          type: "NETWORK_ERROR",
+          code: "ECONREFUSE",
+          message: "Connection refused (backend down).",
+        };
+      }
+      return {
+        type: "NETWORK_ERROR",
+        code: cause.code,
+        message: `${cause.code} fetch error`,
+      };
+    }
+    return {
+      type: "NETWORK_ERROR",
+      code: "UNKNOWN", //cause.code,
+      message: `Unknown fetch error with cause "${cause?.toString()}"`,
+    };
+  }
+  return {
+    type: "NON_API_ERROR",
+    message: `Unknown fetch error with details "${JSON.stringify(error)}"`,
   };
 }

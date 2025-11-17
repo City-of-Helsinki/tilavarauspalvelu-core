@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev -p 3000 --turbopack",
+    "dev": "ROARR_LOG=true next dev -p 3000 --turbopack",
     "build": "SKIP_ENV_VALIDATION=true next build",
     "start": "next start",
     "test": "SKIP_ENV_VALIDATION=true TZ=Europe/Helsinki vitest",
@@ -38,6 +38,7 @@
     "react-hook-form": "7.66.1",
     "react-transition-group": "^4.4.5",
     "react-use": "^17.6.0",
+    "roarr": "^7.21.2",
     "styled-components": "6.1.19",
     "tsconfig": "workspace:*",
     "typescript-cookie": "^1.0.6",
