@@ -1,4 +1,4 @@
 export { Head } from "./Header";
-export { Purposes } from "./Purposes";
+export { IntendedUses } from "./IntendedUses";
 export { SearchGuides } from "./SearchGuides";
 export { Units } from "./Units";

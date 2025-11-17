@@ -33,7 +33,7 @@ const Top = styled(Flex).attrs({
   }
 `;
 
-const PurposeContainer = styled(ShowAllContainer)`
+const IntendedUseContainer = styled(ShowAllContainer)`
   width: 100%;
 
   .ShowAllContainer__Content {
@@ -43,7 +43,7 @@ const PurposeContainer = styled(ShowAllContainer)`
   }
 `;
 
-const PurposeItem = styled(Flex).attrs({
+const IntendedUseItem = styled(Flex).attrs({
   $gap: "xs",
 })`
   &:hover {
@@ -51,7 +51,7 @@ const PurposeItem = styled(Flex).attrs({
   }
 `;
 
-const PurposeLink = styled(Link)`
+const IntendedUseLink = styled(Link)`
   ${focusStyles}
   ${anchorStyles}
 `;
@@ -66,10 +66,10 @@ const Image = styled.img`
 `;
 
 type Props = {
-  purposes: IntendedUseCardFragment[];
+  intendedUses: IntendedUseCardFragment[];
 };
 
-export function Purposes({ purposes }: Props): JSX.Element {
+export function IntendedUses({ intendedUses }: Props): JSX.Element {
   const { t, i18n } = useTranslation(["home", "common"]);
   const isMobile = useMedia(`(max-width: ${breakpoints.s})`, false);
   const itemLimit = useMemo(() => (isMobile ? 4 : 8), [isMobile]);
@@ -82,10 +82,10 @@ export function Purposes({ purposes }: Props): JSX.Element {
     return getTranslationSafe(item, "name", lang);
   };
 
-  const getSearchLink = (purpose: IntendedUseCardFragment): string => {
+  const getSearchLink = (intendedUse: IntendedUseCardFragment): string => {
     const params = new URLSearchParams();
     // next/link so it's safer to return invalid search params than empty link
-    params.set("purposes", purpose.pk?.toString() ?? "");
+    params.set("intendedUses", intendedUse.pk?.toString() ?? "");
     return `${getSingleSearchPath(params)}#content`;
   };
 
@@ -94,29 +94,29 @@ export function Purposes({ purposes }: Props): JSX.Element {
     <>
       <Top>
         <H3 as="h2" $noMargin>
-          {t("purposesHeading")}
+          {t("intendedUsesHeading")}
         </H3>
         <ReservationUnitSearch />
       </Top>
-      <PurposeContainer
+      <IntendedUseContainer
         showAllLabel={t("common:showMore")}
         showLessLabel={t("common:showLess")}
         maximumNumber={itemLimit}
         alignButton="right"
-        data-testid="front-page__purposes"
+        data-testid="front-page__intended-uses"
       >
-        {purposes.map((item) => (
-          <PurposeLink key={item.pk} href={getSearchLink(item)}>
-            <PurposeItem data-testid="front-page__purposes--purpose">
+        {intendedUses.map((item) => (
+          <IntendedUseLink key={item.pk} href={getSearchLink(item)}>
+            <IntendedUseItem data-testid="front-page__intended-uses__intended-use">
               <Image src={getImg(item)} alt="" aria-hidden="true" />
               <Flex $direction="row" $gap="xs" $alignItems="center">
                 <span>{getName(item)} </span>
                 <IconArrowRight size={IconSize.Small} />
               </Flex>
-            </PurposeItem>
-          </PurposeLink>
+            </IntendedUseItem>
+          </IntendedUseLink>
         ))}
-      </PurposeContainer>
+      </IntendedUseContainer>
     </>
   );
 }
