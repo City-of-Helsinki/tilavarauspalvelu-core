@@ -32,8 +32,8 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
-  const commonProps = getCommonServerSideProps();
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const { apiBaseUrl } = getCommonServerSideProps();
+  const apolloClient = createApolloClient(apiBaseUrl, ctx);
 
   const { data } = await apolloClient.query<FrontPageQuery, FrontPageQueryVariables>({
     query: FrontPageDocument,
@@ -48,7 +48,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      ...commonProps,
       intendedUses,
       units,
       ...(await serverSideTranslations(locale ?? "fi")),

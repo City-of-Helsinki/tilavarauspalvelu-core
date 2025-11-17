@@ -217,8 +217,8 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
   const [reservationUnitPkStr, path, reservationPkStr] = params?.params ?? [];
-  const commonProps = getCommonServerSideProps();
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const { apiBaseUrl } = getCommonServerSideProps();
+  const apolloClient = createApolloClient(apiBaseUrl, ctx);
 
   const reservationPk = toNumber(reservationPkStr);
   const reservationUnitPk = toNumber(reservationUnitPkStr);
@@ -231,7 +231,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       props: {
         // have to double up notFound inside the props to get TS types dynamically
         notFound: true,
-        ...commonProps,
         ...(await serverSideTranslations(locale ?? "fi")),
       },
       notFound: true,
@@ -275,7 +274,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      ...commonProps,
       reservation,
       options,
       ...(await serverSideTranslations(locale ?? "fi")),

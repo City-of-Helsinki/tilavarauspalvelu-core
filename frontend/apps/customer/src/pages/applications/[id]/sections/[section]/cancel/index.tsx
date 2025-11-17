@@ -221,8 +221,8 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
 
-  const commonProps = getCommonServerSideProps();
-  const client = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const { apiBaseUrl } = getCommonServerSideProps();
+  const client = createApolloClient(apiBaseUrl, ctx);
 
   const pk = toNumber(ignoreMaybeArray(params?.section));
   if (Number.isFinite(Number(pk))) {
@@ -245,7 +245,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     if (canCancel) {
       return {
         props: {
-          ...commonProps,
           ...(await serverSideTranslations(locale ?? "fi")),
           applicationSection: section,
         },
@@ -268,7 +267,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     notFound: true,
     props: {
       notFound: true,
-      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

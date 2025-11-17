@@ -23,8 +23,8 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const now = new Date();
   const { locale } = ctx;
-  const commonProps = getCommonServerSideProps();
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const { apiBaseUrl } = getCommonServerSideProps();
+  const apolloClient = createApolloClient(apiBaseUrl, ctx);
 
   const { data } = await apolloClient.query<ApplicationRoundsUiQuery, ApplicationRoundsUiQueryVariables>({
     query: ApplicationRoundsUiDocument,
@@ -41,7 +41,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      ...commonProps,
       applicationRounds: filteredApplicationRounds,
       ...(await serverSideTranslations(locale ?? "fi")),
     },

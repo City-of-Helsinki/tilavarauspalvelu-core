@@ -96,13 +96,12 @@ function Criteria({ applicationRound }: Readonly<PropsNarrowed>): JSX.Element | 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
   const pk = toNumber(ignoreMaybeArray(params?.id));
-  const commonProps = getCommonServerSideProps();
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const { apiBaseUrl } = getCommonServerSideProps();
+  const apolloClient = createApolloClient(apiBaseUrl, ctx);
 
   const notFound = {
     notFound: true,
     props: {
-      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
       notFound: true,
     },
@@ -124,7 +123,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   }
   return {
     props: {
-      ...commonProps,
       applicationRound,
       ...(await serverSideTranslations(locale ?? "fi")),
     },

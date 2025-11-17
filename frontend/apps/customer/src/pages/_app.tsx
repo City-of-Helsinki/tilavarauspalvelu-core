@@ -2,14 +2,16 @@ import React, { useEffect, useState, type FC } from "react";
 import { ApolloProvider } from "@apollo/client";
 import { CookieBanner, CookieConsentContextProvider } from "hds-react";
 import { appWithTranslation, useTranslation } from "next-i18next";
-import type { AppProps } from "next/app";
+import App, { type AppContext, type AppInitialProps, type AppProps } from "next/app";
 import { ToastContainer } from "ui/src/components/toast";
 import "ui/src/styles/global.scss";
 import { getLocalizationLang } from "@ui/modules/helpers";
 import { ExternalScripts } from "@/components/ExternalScripts";
 import { PageWrapper } from "@/components/PageWrapper";
+import { EnvContextProvider } from "@/context/EnvContext";
 import { createApolloClient } from "@/modules/apolloClient";
 import { ANALYTICS_COOKIE_GROUP_NAME, isBrowser } from "@/modules/const";
+import { type CustomerEnvConfig, getCommonServerSideProps } from "@/modules/serverUtils";
 import { TrackingWrapper } from "@/modules/tracking";
 import { updateSentryConfig } from "../../instrumentation-client";
 import "../styles/global.scss";
@@ -53,8 +55,9 @@ function useHasUserAcceptedStatistics() {
   };
 }
 
-function MyApp({ Component, pageProps }: AppProps) {
-  const { hotjarEnabled, matomoEnabled, apiBaseUrl, sentryDsn, sentryEnvironment } = pageProps;
+function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
+  const { Component, envConfig, pageProps } = props;
+  const { hotjarEnabled, matomoEnabled, apiBaseUrl, sentryDsn, sentryEnvironment } = envConfig;
   useEffect(() => {
     if (sentryDsn) {
       updateSentryConfig(sentryDsn, sentryEnvironment);
@@ -80,18 +83,34 @@ function MyApp({ Component, pageProps }: AppProps) {
     >
       <TrackingWrapper matomoEnabled={enableMatomo}>
         {/* TODO is this ever called on the server? then the ctx is not undefined */}
-        <ApolloProvider client={client}>
-          <PageWrapper {...pageProps}>
-            <Component {...pageProps} />
-            <CookieBanner />
-          </PageWrapper>
-          <ToastContainer />
-        </ApolloProvider>
+        <EnvContextProvider env={envConfig}>
+          <ApolloProvider client={client}>
+            <PageWrapper
+              apiBaseUrl={apiBaseUrl}
+              profileLink={envConfig.profileLink}
+              feedbackUrl={envConfig.feedbackUrl}
+              version={envConfig.version}
+            >
+              <Component {...pageProps} />
+              <CookieBanner />
+            </PageWrapper>
+            <ToastContainer />
+          </ApolloProvider>
+        </EnvContextProvider>
       </TrackingWrapper>
       <ExternalScripts enableMatomo={enableMatomo} enableHotjar={enableHotjar} />
     </CookieConsentContextProvider>
   );
 }
+
+type AppOwnProps = {
+  envConfig: CustomerEnvConfig;
+};
+MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppInitialProps> => {
+  const ctx = await App.getInitialProps(context);
+  const commonProps = getCommonServerSideProps();
+  return { ...ctx, envConfig: commonProps };
+};
 
 // NOTE infered type problem so casting to FC
 export default appWithTranslation(MyApp) as FC;

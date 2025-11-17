@@ -141,9 +141,7 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const commonProps = getCommonServerSideProps();
   const { locale, query } = ctx;
-
   const pk = toNumber(ignoreMaybeArray(query.id));
   const notFound = {
     notFound: true,
@@ -155,7 +153,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   if (pk == null || !(pk > 0)) {
     return notFound;
   }
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+
+  const { apiBaseUrl } = getCommonServerSideProps();
+  const apolloClient = createApolloClient(apiBaseUrl, ctx);
   const { data } = await apolloClient.query<ApplicationPage3Query, ApplicationPage3QueryVariables>({
     query: ApplicationPage3Document,
     variables: { id: createNodeId("ApplicationNode", pk) },
@@ -168,7 +168,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return {
     props: {
       application,
-      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

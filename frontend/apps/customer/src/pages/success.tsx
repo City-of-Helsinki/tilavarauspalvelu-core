@@ -16,13 +16,12 @@ import { OrderStatus, ReservationStateChoice, ReservationStateQuery, useReservat
 // we can't tie this to a reservationPk because it's used as a return page from webstore
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, query } = ctx;
-  const commonProps = getCommonServerSideProps();
+  const { apiBaseUrl } = getCommonServerSideProps();
 
   const orderId = ignoreMaybeArray(query.orderId);
   const notFoundValue = {
     notFound: true,
     props: {
-      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
       notFound: true,
     },
@@ -32,7 +31,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFoundValue;
   }
 
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(apiBaseUrl, ctx);
   // The reservation exists already if the orderUuid is valid
   const reservation = await getReservationByOrderUuid(apolloClient, orderId);
 
@@ -57,7 +56,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return {
     props: {
       reservation,
-      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

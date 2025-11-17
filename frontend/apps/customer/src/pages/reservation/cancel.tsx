@@ -5,6 +5,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ignoreMaybeArray } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { useEnvContext } from "@/context/EnvContext";
 import { CancelledLinkSet } from "@/lib/reservation/[id]/cancel";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
@@ -23,8 +24,9 @@ import {
 // compromise would be to use reservations/cancelled without the id (and staticly render the same page with no queries)
 // this would allow refresh that page (and remove the cancel?orderId=... from the url)
 // since this callback page should not be accessed by users in any case (nor left in the browser history)
-function Cancel({ apiBaseUrl }: NarrowedProps): JSX.Element {
+function Cancel(_props: NarrowedProps): JSX.Element {
   const { t } = useTranslation();
+  const { env } = useEnvContext();
   const routes = [
     {
       slug: reservationsPrefix,
@@ -39,20 +41,19 @@ function Cancel({ apiBaseUrl }: NarrowedProps): JSX.Element {
     <>
       <Breadcrumb routes={routes} />
       <H1 $noMargin>{t("reservations:reservationCancelledTitle")}</H1>
-      <CancelledLinkSet apiBaseUrl={apiBaseUrl} />
+      <CancelledLinkSet apiBaseUrl={env.apiBaseUrl} />
     </>
   );
 }
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, query } = ctx;
-  const commonProps = getCommonServerSideProps();
+  const { apiBaseUrl } = getCommonServerSideProps();
   const orderId = ignoreMaybeArray(query.orderId);
 
   const notFoundValue = {
     notFound: true,
     props: {
-      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
       notFound: true,
     },
@@ -62,7 +63,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFoundValue;
   }
 
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const apolloClient = createApolloClient(apiBaseUrl, ctx);
   const reservation = await getReservationByOrderUuid(apolloClient, orderId);
 
   if (reservation?.pk == null) {
@@ -108,7 +109,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      ...getCommonServerSideProps(),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

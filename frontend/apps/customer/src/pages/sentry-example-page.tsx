@@ -1,15 +1,11 @@
 import * as Sentry from "@sentry/nextjs";
 import Head from "next/head";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 export function getServerSideProps() {
-  const commonProps = getCommonServerSideProps();
   return {
-    props: {
-      ...commonProps,
-    },
+    props: {},
   };
 }
 

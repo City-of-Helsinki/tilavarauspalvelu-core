@@ -1,4 +1,4 @@
-import { CommonEnvConfig } from "@ui/types";
+import { type CommonEnvConfig } from "@ui/types";
 import { getVersion } from "@/modules/baseUtils";
 
 // only used for context creation

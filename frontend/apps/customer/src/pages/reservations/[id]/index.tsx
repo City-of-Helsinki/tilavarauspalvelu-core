@@ -33,6 +33,7 @@ import {
   SummaryGeneralFields,
   SummaryReserveeFields,
 } from "@/components/reservation";
+import { useEnvContext } from "@/context/EnvContext";
 import { PaymentNotification, TermsInfoSection, Instructions, NotModifiableReason } from "@/lib/reservation/[id]";
 import { createApolloClient } from "@/modules/apolloClient";
 import { queryOptions } from "@/modules/queryOptions";
@@ -168,12 +169,8 @@ function convertNotify(str: string | null): ReservationNotifications | null {
 function Reservation({
   termsOfUse,
   reservation,
-  feedbackUrl,
-  apiBaseUrl,
   options,
-}: Readonly<
-  Pick<PropsNarrowed, "termsOfUse" | "reservation" | "feedbackUrl" | "options" | "apiBaseUrl">
->): React.ReactElement | null {
+}: Readonly<Pick<PropsNarrowed, "termsOfUse" | "reservation" | "options">>): React.ReactElement | null {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   const params = useSearchParams();
@@ -196,6 +193,7 @@ function Reservation({
 
   const normalizedOrderStatus = getNormalizedReservationOrderStatus(reservation);
 
+  const { env } = useEnvContext();
   useToastIfQueryParam({
     key: "timeUpdated",
     message: t("reservations:saveNewTimeSuccess"),
@@ -232,7 +230,7 @@ function Reservation({
   const isBeingHandled = reservation.state === ReservationStateChoice.RequiresHandling;
   const isCancellable = isReservationCancellable(reservation);
 
-  const paymentUrl = getPaymentUrl(reservation, lang, apiBaseUrl);
+  const paymentUrl = getPaymentUrl(reservation, lang, env.apiBaseUrl);
   const hasCheckoutUrl = paymentUrl != null;
   const isWaitingForPayment = reservation.state === ReservationStateChoice.WaitingForPayment;
 
@@ -371,13 +369,13 @@ function Reservation({
               reservation={reservation}
               paymentOrder={reservation.paymentOrder}
               appliedPricing={reservation.appliedPricing}
-              apiBaseUrl={apiBaseUrl}
+              apiBaseUrl={env.apiBaseUrl}
             />
           )}
           <Instructions reservation={reservation} />
           <SummaryGeneralFields reservation={reservation} options={options} />
           <SummaryReserveeFields reservation={reservation} options={options} />
-          {shouldShowAccessCode && <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={feedbackUrl} />}
+          {shouldShowAccessCode && <AccessCodeInfo pindoraInfo={pindoraInfo} feedbackUrl={env.feedbackUrl} />}
           <TermsInfoSection reservation={reservation} termsOfUse={termsOfUse} />
           <AddressSection
             title={getTranslation(reservation.reservationUnit, "name", lang)}
@@ -389,12 +387,8 @@ function Reservation({
   );
 }
 
-function AccessCodeInfo({
-  pindoraInfo,
-  feedbackUrl,
-}: Readonly<
-  Pick<NonNullable<AccessCodeQuery["reservation"]>, "pindoraInfo"> & Pick<PropsNarrowed, "feedbackUrl">
->): React.ReactElement {
+type AccessCodeInfoProps = Pick<NonNullable<AccessCodeQuery["reservation"]>, "pindoraInfo"> & { feedbackUrl: string };
+function AccessCodeInfo({ pindoraInfo, feedbackUrl }: Readonly<AccessCodeInfoProps>): React.ReactElement {
   const { t, i18n } = useTranslation();
   return (
     <div>
@@ -433,15 +427,14 @@ function AccessCodeInfo({
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
   const pk = toNumber(ignoreMaybeArray(params?.id));
-  const commonProps = getCommonServerSideProps();
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const { apiBaseUrl } = getCommonServerSideProps();
+  const apolloClient = createApolloClient(apiBaseUrl, ctx);
 
   const notFound = {
     notFound: true,
     props: {
       // have to double up notFound inside the props to get TS types dynamically
       notFound: true,
-      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
@@ -482,7 +475,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       const options = await queryOptions(apolloClient, locale ?? "");
       return {
         props: {
-          ...commonProps,
           ...(await serverSideTranslations(locale ?? "fi")),
           options: {
             ...options,

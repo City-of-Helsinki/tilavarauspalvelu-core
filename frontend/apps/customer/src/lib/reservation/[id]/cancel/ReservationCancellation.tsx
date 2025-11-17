@@ -31,7 +31,6 @@ const StyledReservationInfoCard = styled(ReservationInfoCard)`
 
 type NodeT = ReservationCancelPageQuery["reservation"];
 type CancellationProps = {
-  apiBaseUrl: string;
   reservation: NonNullable<NodeT>;
 };
 

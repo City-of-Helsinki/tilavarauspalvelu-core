@@ -32,6 +32,7 @@ import { Breadcrumb } from "@/components/Breadcrumb";
 import InfoDialog from "@/components/InfoDialog";
 import { LoginFragment } from "@/components/LoginFragment";
 import { QuickReservation } from "@/components/QuickReservation";
+import { useEnvContext } from "@/context/EnvContext";
 import { useAvailableTimes, useBlockingReservations, useRemoveStoredReservation, useReservableTimes } from "@/hooks";
 import {
   EquipmentList,
@@ -69,18 +70,17 @@ import {
 } from "@gql/gql-types";
 
 function SubmitFragment({
-  apiBaseUrl,
   focusSlot,
   buttonText,
   loadingText,
   reservationForm,
 }: Readonly<{
   focusSlot: FocusTimeSlot;
-  apiBaseUrl: string;
   reservationForm: UseFormReturn<PendingReservationFormType>;
   loadingText: string;
   buttonText: string;
 }>): JSX.Element {
+  const { env } = useEnvContext();
   const returnToUrl = useMemo(() => {
     if (!focusSlot.isReservable) {
       return;
@@ -95,10 +95,11 @@ function SubmitFragment({
 
   const { isReservable } = focusSlot;
   const { isSubmitting } = reservationForm.formState;
+
   return (
     <LoginFragment
       isActionDisabled={!isReservable}
-      apiBaseUrl={apiBaseUrl}
+      apiBaseUrl={env.apiBaseUrl}
       type="reservation"
       componentIfAuthenticated={
         <SubmitButton
@@ -135,7 +136,6 @@ const StyledRelatedUnits = styled(RelatedUnits)`
 
 function ReservationUnit({
   reservationUnit,
-  apiBaseUrl,
   queryParams: { searchDuration, searchDate, searchTime },
   mutationErrors,
 }: Readonly<PropsNarrowed>): JSX.Element | null {
@@ -287,13 +287,12 @@ function ReservationUnit({
     () => (
       <SubmitFragment
         focusSlot={focusSlot}
-        apiBaseUrl={apiBaseUrl}
         reservationForm={reservationForm}
         loadingText={t("reservationCalendar:makeReservationLoading")}
         buttonText={t("reservationCalendar:makeReservation")}
       />
     ),
-    [apiBaseUrl, focusSlot, reservationForm, t]
+    [focusSlot, reservationForm, t]
   );
 
   useToastIfQueryParam({
@@ -420,12 +419,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { params, query, locale } = ctx;
   const pk = toNumber(ignoreMaybeArray(params?.id));
   const uuid = query.ru;
-  const commonProps = getCommonServerSideProps();
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const { apiBaseUrl } = getCommonServerSideProps();
+  const apolloClient = createApolloClient(apiBaseUrl, ctx);
 
   const notFound = {
     props: {
-      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
       notFound: true, // required for type narrowing
     },
@@ -518,7 +516,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
     return {
       props: {
-        ...commonProps,
         ...(await serverSideTranslations(locale ?? "fi")),
         reservationUnit,
         queryParams: {
