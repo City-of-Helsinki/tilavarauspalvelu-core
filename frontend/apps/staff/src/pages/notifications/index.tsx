@@ -141,7 +141,7 @@ function Notifications({ notifications: notificationsOriginal }: PageProps) {
     <>
       <TitleSection>
         <div>
-          <H1 $noMargin>{t("notification:pageTitle")}</H1>
+          <H1 $marginTop="none">{t("notification:pageTitle")}</H1>
           <p style={{ maxWidth: "var(--prose-width)" }}>{t("notification:pageDescription")}</p>
         </div>
         <ButtonLikeLink variant="primary" size="large" href={`${getNotificationListUrl()}/new`}>
