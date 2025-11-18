@@ -6,7 +6,7 @@
   },
   "403": {
     "heading": "Ei käyttöoikeuksia sivulle",
-    "body": "Voit nähdä sivun sisällön, jos kirjaudut sisään ja sinulla on riittävät käyttö-oikeudet.",
+    "body": "Voit nähdä sivun sisällön, jos kirjaudut sisään ja sinulla on riittävät käyttöoikeudet.",
     "body2": "Esihenkilö tai toimipisteesi pääkäyttäjä voi pyytää sinulle käyttöoikeudet Varaamon asiakaspalvelusta."
   },
   "404": {
@@ -87,7 +87,7 @@
       "RESERVATION_UNIT_MISSING_RESERVATION_UNIT_TYPE": "Varausyksiköllä ei ole varausyksikkötyyppiä",
       "RESERVATION_UNIT_MISSING_SPACES_OR_RESOURCES": "Varausyksiköllä ei ole tiloja tai resursseja",
       "RESERVATION_UNIT_MISSING_TRANSLATIONS": "Varausyksiköllä puuttuu käännökset",
-      "RESERVATION_UNIT_NOT_FOUND_IN_PINDORA": "Tilaan pääsyssä ei voida käyttää ovikoodia, koska varausyksikköä ei ole luotu Pindoraan.",
+      "RESERVATION_UNIT_NOT_FOUND_IN_PINDORA": "Kulkutavaksi ei voi valita ovikoodia, koska varausyksikköä ei ole luotu Pindoraan.",
       "RESERVATION_UNIT_PRICINGS_DUPLICATE_DATE": "Päivämäärä on jo käytössä",
       "RESERVATION_UNIT_PRICINGS_INVALID_PRICES": "Hinnoittelussa on virheellisiä hintoja",
       "RESERVATION_UNIT_PRICINGS_MISSING": "Varausyksiköllä ei ole hinnoittelua",

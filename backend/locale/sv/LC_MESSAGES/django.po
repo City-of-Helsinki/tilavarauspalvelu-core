@@ -814,7 +814,7 @@ msgstr ""
 #: tilavarauspalvelu/admin/application_section/form.py
 #: tilavarauspalvelu/admin/reservation_series/filters.py
 #: tilavarauspalvelu/admin/reservation_series/form.py
-msgid "Should have active access code"
+msgid "Should have active door code"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
@@ -853,7 +853,7 @@ msgid "Purpose for this section."
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
-msgid "Should this application section have an active access code?"
+msgid "Should this application section have an active door code?"
 msgstr ""
 
 #: tilavarauspalvelu/admin/banner_notification/admin.py
@@ -1135,7 +1135,7 @@ msgid "Paid reservation"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/filters.py
-msgid "access code generated"
+msgid "door code generated"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -1186,15 +1186,15 @@ msgid "Access type"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Access code is active"
+msgid "Door code is active"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Access code should be active"
+msgid "Door code should be active"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Access code generated at"
+msgid "Door code generated at"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -1518,7 +1518,7 @@ msgid "Age group for this reservation series"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_series/form.py
-msgid "Should this reservation series have an active access code?"
+msgid "Should this reservation series have an active door code?"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_series/form.py
@@ -2822,7 +2822,7 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessType"
-msgid "access code"
+msgid "door code"
 msgstr "dörrkod"
 
 #: tilavarauspalvelu/enums.py
@@ -2847,17 +2847,17 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessCodeState"
-msgid "Access code not required"
+msgid "Door code not required"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessCodeState"
-msgid "Access code created"
+msgid "Door code created"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessCodeState"
-msgid "Access code pending"
+msgid "Door code pending"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
@@ -3363,7 +3363,7 @@ msgstr "Logga in i tjänsten på"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation access code changed"
+msgid "Reservation door code changed"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
@@ -3418,7 +3418,7 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation access code changed"
+msgid "Seasonal Reservation door code changed"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
@@ -3758,7 +3758,7 @@ msgid "reservations"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation/model.py
-msgid "Reservation cannot have active access code if one is not generated"
+msgid "Reservation cannot have active door code if one is not generated"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation/model.py

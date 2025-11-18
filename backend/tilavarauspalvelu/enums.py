@@ -1202,7 +1202,7 @@ class LoginMethod(enum.Enum):
 class AccessType(models.TextChoices):
     """How is the reservee able to enter the space in their reservation unit?"""
 
-    ACCESS_CODE = "ACCESS_CODE", pgettext_lazy("AccessType", "access code")
+    ACCESS_CODE = "ACCESS_CODE", pgettext_lazy("AccessType", "door code")
     OPENED_BY_STAFF = "OPENED_BY_STAFF", pgettext_lazy("AccessType", "staff")
     PHYSICAL_KEY = "PHYSICAL_KEY", pgettext_lazy("AccessType", "key")
     UNRESTRICTED = "UNRESTRICTED", pgettext_lazy("AccessType", "direct access")
@@ -1214,7 +1214,7 @@ class AccessTypeWithMultivalued(models.TextChoices):
     for series and seasonal bookings where access type between reservations varies.
     """
 
-    ACCESS_CODE = "ACCESS_CODE", pgettext_lazy("AccessType", "access code")
+    ACCESS_CODE = "ACCESS_CODE", pgettext_lazy("AccessType", "door code")
     OPENED_BY_STAFF = "OPENED_BY_STAFF", pgettext_lazy("AccessType", "staff")
     PHYSICAL_KEY = "PHYSICAL_KEY", pgettext_lazy("AccessType", "key")
     UNRESTRICTED = "UNRESTRICTED", pgettext_lazy("AccessType", "direct access")
@@ -1231,6 +1231,6 @@ class AccessTypeWithMultivalued(models.TextChoices):
 class AccessCodeState(models.TextChoices):
     """The state of the access code."""
 
-    ACCESS_CODE_NOT_REQUIRED = "ACCESS_CODE_NOT_REQUIRED", pgettext_lazy("AccessCodeState", "Access code not required")
-    ACCESS_CODE_CREATED = "ACCESS_CODE_CREATED", pgettext_lazy("AccessCodeState", "Access code created")
-    ACCESS_CODE_PENDING = "ACCESS_CODE_PENDING", pgettext_lazy("AccessCodeState", "Access code pending")
+    ACCESS_CODE_NOT_REQUIRED = "ACCESS_CODE_NOT_REQUIRED", pgettext_lazy("AccessCodeState", "Door code not required")
+    ACCESS_CODE_CREATED = "ACCESS_CODE_CREATED", pgettext_lazy("AccessCodeState", "Door code created")
+    ACCESS_CODE_PENDING = "ACCESS_CODE_PENDING", pgettext_lazy("AccessCodeState", "Door code pending")

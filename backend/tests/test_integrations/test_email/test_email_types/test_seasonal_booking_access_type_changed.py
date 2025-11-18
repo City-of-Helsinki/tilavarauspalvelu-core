@@ -85,7 +85,7 @@ LANGUAGE_CONTEXT = {
                         "end_date": "31.5.2023",
                     },
                     {
-                        "access_type": "access code",
+                        "access_type": "door code",
                         "begin_date": "1.6.2023",
                         "end_date": "31.12.2023",
                     },
@@ -300,7 +300,7 @@ def test_seasonal_booking_access_type_changed__get_context__instance__access_cod
                 "unit_name": "[TOIMIPISTEEN NIMI]",
                 "access_types": [
                     {
-                        "access_type": "access code",
+                        "access_type": "door code",
                         "begin_date": "1.1.2024",
                         "end_date": None,
                     },
@@ -345,7 +345,7 @@ def test_seasonal_booking_access_type_changed__get_context__multiple(email_reser
                         "end_date": "31.1.2024",
                     },
                     {
-                        "access_type": "access code",
+                        "access_type": "door code",
                         "begin_date": "1.2.2024",
                         "end_date": None,
                     },
@@ -390,7 +390,7 @@ def test_seasonal_booking_access_type_changed__render__text():
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Access to the space:
         * staff: 1.1.2023 - 31.5.2023
-        * access code: 1.6.2023 - 31.12.2023
+        * door code: 1.6.2023 - 31.12.2023
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
@@ -438,7 +438,7 @@ def test_seasonal_booking_access_type_changed__render__text__access_code():
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Access to the space:
         * staff: 1.1.2023 - 31.5.2023
-        * access code: 1.6.2023 - 31.12.2023
+        * door code: 1.6.2023 - 31.12.2023
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
@@ -482,7 +482,7 @@ def test_seasonal_booking_access_type_changed__render__html():
         Access to the space:
 
         * staff: 1.1.2023 - 31.5.2023
-        * access code: 1.6.2023 - 31.12.2023
+        * door code: 1.6.2023 - 31.12.2023
 
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
@@ -530,7 +530,7 @@ def test_seasonal_booking_access_type_changed__render__html__access_code():
         Access to the space:
 
         * staff: 1.1.2023 - 31.5.2023
-        * access code: 1.6.2023 - 31.12.2023
+        * door code: 1.6.2023 - 31.12.2023
 
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]

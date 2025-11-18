@@ -357,7 +357,7 @@ def test_reservation_access_code_changed__send_email__no_recipients(outbox):
     assert len(outbox) == 0
 
     assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'reservation access code changed' email"
+    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'Reservation door code changed' email"
 
 
 @pytest.mark.django_db

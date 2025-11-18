@@ -78,11 +78,11 @@ CONTEXT_ACCESS_CODE = {
     },
     "fi": {
         "text_reservation_modified": (
-            "Sisäänpääsy tilaan muuttuu 1.1.2024 alkaen. Pääset tilaan ovikoodilla, jonka löydät "
+            "Kulkutapa tilaan muuttuu 1.1.2024 alkaen. Pääset tilaan ovikoodilla, jonka löydät "
             "'Omat Varaukset' (https://fake.varaamo.hel.fi/reservations) -sivulta."
         ),
         "text_reservation_modified_html": (
-            "Sisäänpääsy tilaan muuttuu 1.1.2024 alkaen. Pääset tilaan ovikoodilla, jonka löydät "
+            "Kulkutapa tilaan muuttuu 1.1.2024 alkaen. Pääset tilaan ovikoodilla, jonka löydät "
             '<a href="https://fake.varaamo.hel.fi/reservations">'
             "'Omat Varaukset'</a> -sivulta."
         ),
@@ -112,8 +112,8 @@ CONTEXT_OPENED_BY_STAFF = {
         ),
     },
     "fi": {
-        "text_reservation_modified": "Sisäänpääsy tilaan muuttuu 1.1.2024 alkaen. Henkilökunta avaa tilan oven.",
-        "text_reservation_modified_html": "Sisäänpääsy tilaan muuttuu 1.1.2024 alkaen. Henkilökunta avaa tilan oven.",
+        "text_reservation_modified": "Kulkutapa tilaan muuttuu 1.1.2024 alkaen. Henkilökunta avaa tilan oven.",
+        "text_reservation_modified_html": "Kulkutapa tilaan muuttuu 1.1.2024 alkaen. Henkilökunta avaa tilan oven.",
     },
     "sv": {
         "text_reservation_modified": (
@@ -138,10 +138,10 @@ CONTEXT_PHYSICAL_KEY = {
     },
     "fi": {
         "text_reservation_modified": (
-            "Sisäänpääsy tilaan muuttuu 1.1.2024 alkaen. Sovi henkilökunnan kanssa avaimen noudosta."
+            "Kulkutapa tilaan muuttuu 1.1.2024 alkaen. Sovi henkilökunnan kanssa avaimen noudosta."
         ),
         "text_reservation_modified_html": (
-            "Sisäänpääsy tilaan muuttuu 1.1.2024 alkaen. Sovi henkilökunnan kanssa avaimen noudosta."
+            "Kulkutapa tilaan muuttuu 1.1.2024 alkaen. Sovi henkilökunnan kanssa avaimen noudosta."
         ),
     },
     "sv": {
@@ -164,8 +164,8 @@ CONTEXT_UNRESTRICTED = {
         ),
     },
     "fi": {
-        "text_reservation_modified": "Sisäänpääsy tilaan muuttuu 1.1.2024 alkaen. Tilaan on suora pääsy.",
-        "text_reservation_modified_html": "Sisäänpääsy tilaan muuttuu 1.1.2024 alkaen. Tilaan on suora pääsy.",
+        "text_reservation_modified": "Kulkutapa tilaan muuttuu 1.1.2024 alkaen. Tilaan on suora pääsy.",
+        "text_reservation_modified_html": "Kulkutapa tilaan muuttuu 1.1.2024 alkaen. Tilaan on suora pääsy.",
     },
     "sv": {
         "text_reservation_modified": (
@@ -190,7 +190,7 @@ LANGUAGE_CONTEXT = {
         **COMMON_CONTEXT,
     },
     "fi": {
-        "title": "Sisäänpääsy tilaan on muuttunut",
+        "title": "Kulkutapa tilaan on muuttunut",
         **CONTEXT_ACCESS_CODE["fi"],
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,

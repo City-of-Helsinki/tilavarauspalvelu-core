@@ -419,7 +419,7 @@ class EmailType(_EmailTypeOptions):
     # Reservation
 
     RESERVATION_ACCESS_CODE_CHANGED = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Reservation access code changed"),
+        label=pgettext_lazy("EmailType", "Reservation door code changed"),
         get_email_context=get_context_for_reservation_access_code_changed,
         context_variables=list(ReservationAccessCodeChangedContext.__annotations__),
     )
@@ -477,7 +477,7 @@ class EmailType(_EmailTypeOptions):
     # Seasonal booking
 
     SEASONAL_BOOKING_ACCESS_CODE_CHANGED = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Seasonal reservation access code changed"),
+        label=pgettext_lazy("EmailType", "Seasonal Reservation door code changed"),
         get_email_context=get_context_for_seasonal_booking_access_code_changed,
         context_variables=list(SeasonalBookingAccessCodeChangedContext.__annotations__),
     )

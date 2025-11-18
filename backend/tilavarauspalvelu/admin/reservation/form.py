@@ -50,9 +50,9 @@ class ReservationAdminForm(forms.ModelForm):
             "created_at": _("Created at"),
             #
             "access_type": _("Access type"),
-            "access_code_is_active": _("Access code is active"),
-            "access_code_should_be_active": _("Access code should be active"),
-            "access_code_generated_at": _("Access code generated at"),
+            "access_code_is_active": _("Door code is active"),
+            "access_code_should_be_active": _("Door code should be active"),
+            "access_code_generated_at": _("Door code generated at"),
             #
             "price": _("Price"),
             "price_net": _("Price net"),
@@ -103,9 +103,9 @@ class ReservationAdminForm(forms.ModelForm):
             "created_at": _("When this reservation was created"),
             #
             "access_type": _("Access type"),
-            "access_code_is_active": _("Access code is active"),
-            "access_code_should_be_active": _("Access code should be active"),
-            "access_code_generated_at": _("Access code generated at"),
+            "access_code_is_active": _("Door code is active"),
+            "access_code_should_be_active": _("Door code should be active"),
+            "access_code_generated_at": _("Door code generated at"),
             #
             "price": _("The price of this particular reservation including VAT"),
             "price_net": _("The price of this particular reservation excluding VAT"),

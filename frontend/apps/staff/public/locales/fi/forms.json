@@ -50,8 +50,8 @@
     "reservationBeginsDate must be before end": "Varausajan tulee alkaa ennen kuin se päättyy.",
     "duration can't be less than reservation start interval": "Kesto ei voi olla pienempi kuin varauksen alkamisväli.",
     "duration must be a multiple of the reservation start interval": "Keston on oltava varauksen alkamisvälin kerrannainen",
-    "access type duplicate beginDate": "Tilaan pääsyillä on oltava eri alkamisajat",
-    "access type invalid beginDate": "Tilaan pääsyillä on virheellinen alkamisaika",
-    "access types are required for publish": "Varausyksikölle täytyy määrittää vähintään yksi tilaan pääsy ennen julkaisua"
+    "access type duplicate beginDate": "Kulkutavoilla on oltava eri alkamisajat",
+    "access type invalid beginDate": "Kulkutavalla on virheellinen alkamisaika",
+    "access types are required for publish": "Varausyksikölle täytyy määrittää vähintään yksi kulkutapa ennen julkaisua"
   }
 }
