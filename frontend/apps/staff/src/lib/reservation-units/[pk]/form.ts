@@ -1,6 +1,5 @@
 import { addDays, endOfDay } from "date-fns";
 import { z } from "zod";
-import { cleanHtmlContent } from "ui/src/components/Sanitize";
 import { WEEKDAYS_SORTED } from "ui/src/modules/const";
 import { getIntervalMinutes } from "ui/src/modules/conversion";
 import {
@@ -12,7 +11,7 @@ import {
   formatDate,
   formatTime,
 } from "ui/src/modules/date-utils";
-import { convertTime, filterNonNullable, toNumber } from "ui/src/modules/helpers";
+import { cleanHtmlContent, convertTime, filterNonNullable, toNumber } from "ui/src/modules/helpers";
 import { checkLengthWithoutHtml, checkTimeStringFormat } from "ui/src/schemas/schemaCommon";
 import {
   AccessType,

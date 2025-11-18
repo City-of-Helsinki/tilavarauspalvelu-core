@@ -10,14 +10,13 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { z } from "zod";
-import { cleanHtmlContent } from "ui/src/components/Sanitize";
 import { ControlledDateInput } from "ui/src/components/form";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { BannerNotificationStatusLabel } from "ui/src/components/statuses";
 import { successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { parseUIDate, fromUIDateTime, formatDate, formatTime } from "ui/src/modules/date-utils";
-import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { cleanHtmlContent, createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import {
   checkValidDate,
   checkValidFutureDate,
