@@ -2837,7 +2837,7 @@ msgstr "nyckel"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessType"
-msgid "unrestricted"
+msgid "direct access"
 msgstr "direkt tillgång"
 
 #: tilavarauspalvelu/enums.py

@@ -1205,7 +1205,7 @@ class AccessType(models.TextChoices):
     ACCESS_CODE = "ACCESS_CODE", pgettext_lazy("AccessType", "access code")
     OPENED_BY_STAFF = "OPENED_BY_STAFF", pgettext_lazy("AccessType", "opened by staff")
     PHYSICAL_KEY = "PHYSICAL_KEY", pgettext_lazy("AccessType", "physical key")
-    UNRESTRICTED = "UNRESTRICTED", pgettext_lazy("AccessType", "unrestricted")
+    UNRESTRICTED = "UNRESTRICTED", pgettext_lazy("AccessType", "direct access")
 
 
 class AccessTypeWithMultivalued(models.TextChoices):
@@ -1217,7 +1217,7 @@ class AccessTypeWithMultivalued(models.TextChoices):
     ACCESS_CODE = "ACCESS_CODE", pgettext_lazy("AccessType", "access code")
     OPENED_BY_STAFF = "OPENED_BY_STAFF", pgettext_lazy("AccessType", "opened by staff")
     PHYSICAL_KEY = "PHYSICAL_KEY", pgettext_lazy("AccessType", "physical key")
-    UNRESTRICTED = "UNRESTRICTED", pgettext_lazy("AccessType", "unrestricted")
+    UNRESTRICTED = "UNRESTRICTED", pgettext_lazy("AccessType", "direct access")
 
     # Should not be settable to models, only available in API responses.
     MULTIVALUED = "MULTIVALUED", pgettext_lazy("AccessType", "multi-valued")

@@ -97,7 +97,7 @@ LANGUAGE_CONTEXT = {
                 "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
                 "access_types": [
                     {
-                        "access_type": "unrestricted",
+                        "access_type": "direct access",
                         "begin_date": "1.2.2023",
                         "end_date": None,
                     },
@@ -395,7 +395,7 @@ def test_seasonal_booking_access_type_changed__render__text():
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Access to the space:
-        * unrestricted: 1.2.2023 -
+        * direct access: 1.2.2023 -
 
         You can check your booking details at: {url}
 
@@ -443,7 +443,7 @@ def test_seasonal_booking_access_type_changed__render__text__access_code():
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Access to the space:
-        * unrestricted: 1.2.2023 -
+        * direct access: 1.2.2023 -
 
         You can check your booking details at: {url}
 
@@ -488,7 +488,7 @@ def test_seasonal_booking_access_type_changed__render__html():
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Access to the space:
 
-        * unrestricted: 1.2.2023 -
+        * direct access: 1.2.2023 -
 
         You can check your booking details at: [varaamo.hel.fi]({url})
 
@@ -536,7 +536,7 @@ def test_seasonal_booking_access_type_changed__render__html__access_code():
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         Access to the space:
 
-        * unrestricted: 1.2.2023 -
+        * direct access: 1.2.2023 -
 
         You can check your booking details at: [varaamo.hel.fi]({url})
 
