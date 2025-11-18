@@ -65,15 +65,15 @@ const PricingFormSchema = z.object({
   hasMaterialPrice: z.boolean(),
   materialPriceDescriptionFi: z
     .string()
-    .refine((x) => stripHtml(x).length <= 500)
+    .refine((x) => stripHtml(x).length <= 500, { message: "Too big. expected string to have <=500 characters" })
     .transform(cleanHtmlContent),
   materialPriceDescriptionEn: z
     .string()
-    .refine((x) => stripHtml(x).length <= 500)
+    .refine((x) => stripHtml(x).length <= 500, { message: "Too big. expected string to have <=500 characters" })
     .transform(cleanHtmlContent),
   materialPriceDescriptionSv: z
     .string()
-    .refine((x) => stripHtml(x).length <= 500)
+    .refine((x) => stripHtml(x).length <= 500, { message: "Too big. expected string to have <=500 characters" })
     .transform(cleanHtmlContent),
 });
 
@@ -434,26 +434,71 @@ export const ReservationUnitEditSchema = z
     reservationsMinDaysBefore: z.number(),
     reservationsMaxDaysBefore: z.number(),
     reservationKind: z.enum(ReservationKind),
-    contactInformation: z.string(),
-    reservationPendingInstructionsFi: z.string().transform(cleanHtmlContent),
-    reservationPendingInstructionsEn: z.string().transform(cleanHtmlContent),
-    reservationPendingInstructionsSv: z.string().transform(cleanHtmlContent),
-    reservationConfirmedInstructionsFi: z.string().transform(cleanHtmlContent),
-    reservationConfirmedInstructionsEn: z.string().transform(cleanHtmlContent),
-    reservationConfirmedInstructionsSv: z.string().transform(cleanHtmlContent),
-    reservationCancelledInstructionsFi: z.string().transform(cleanHtmlContent),
-    reservationCancelledInstructionsEn: z.string().transform(cleanHtmlContent),
-    reservationCancelledInstructionsSv: z.string().transform(cleanHtmlContent),
-    descriptionFi: z.string().max(4000).transform(cleanHtmlContent),
-    descriptionEn: z.string().max(4000).transform(cleanHtmlContent),
-    descriptionSv: z.string().max(4000).transform(cleanHtmlContent),
+    contactInformation: z.string().max(500, { message: "Too big. expected string to have <=500 characters" }),
+    reservationPendingInstructionsFi: z
+      .string()
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
+      .transform(cleanHtmlContent),
+    reservationPendingInstructionsEn: z
+      .string()
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
+      .transform(cleanHtmlContent),
+    reservationPendingInstructionsSv: z
+      .string()
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
+      .transform(cleanHtmlContent),
+    reservationConfirmedInstructionsFi: z
+      .string()
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
+      .transform(cleanHtmlContent),
+    reservationConfirmedInstructionsEn: z
+      .string()
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
+      .transform(cleanHtmlContent),
+    reservationConfirmedInstructionsSv: z
+      .string()
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
+      .transform(cleanHtmlContent),
+    reservationCancelledInstructionsFi: z
+      .string()
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
+      .transform(cleanHtmlContent),
+    reservationCancelledInstructionsEn: z
+      .string()
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
+      .transform(cleanHtmlContent),
+    reservationCancelledInstructionsSv: z
+      .string()
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
+      .transform(cleanHtmlContent),
+    descriptionFi: z
+      .string()
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
+      .transform(cleanHtmlContent),
+    descriptionEn: z
+      .string()
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
+      .transform(cleanHtmlContent),
+    descriptionSv: z
+      .string()
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
+      .transform(cleanHtmlContent),
     nameFi: z.string().min(1, { message: "Required" }).max(80),
     nameEn: z.string().max(80),
     nameSv: z.string().max(80),
     // backend allows nulls but not empty strings, these are not required though
-    notesWhenApplyingFi: z.string().max(2000).transform(cleanHtmlContent),
-    notesWhenApplyingEn: z.string().max(2000).transform(cleanHtmlContent),
-    notesWhenApplyingSv: z.string().max(2000).transform(cleanHtmlContent),
+    notesWhenApplyingFi: z
+      .string()
+      .refine((x) => stripHtml(x).length <= 2000, { message: "Too big. expected string to have <=2000 characters" })
+      .transform(cleanHtmlContent),
+    notesWhenApplyingEn: z
+      .string()
+      .refine((x) => stripHtml(x).length <= 2000, { message: "Too big. expected string to have <=2000 characters" })
+      .transform(cleanHtmlContent),
+    notesWhenApplyingSv: z
+      .string()
+      .refine((x) => stripHtml(x).length <= 2000, { message: "Too big. expected string to have <=2000 characters" })
+      .transform(cleanHtmlContent),
     spaces: z.array(z.number()),
     resources: z.array(z.number()),
     equipments: z.array(z.number()),
@@ -543,14 +588,14 @@ export const ReservationUnitEditSchema = z
       }
     }
 
-    if (!v.isDraft || v.pricings.length) {
+    if (v.isDraft) {
+      return;
+    }
+
+    if (v.pricings.length) {
       for (let i = 0; i < v.pricings.length; i++) {
         validatePricing(v.pricings[i], ctx, `pricings.${i}`);
       }
-    }
-
-    if (v.isDraft) {
-      return;
     }
 
     if (v.accessTypes.length === 0) {
@@ -679,7 +724,7 @@ export const ReservationUnitEditSchema = z
         ctx.addIssue({
           code: "custom",
           path: [fieldName],
-          message: `${fieldName ?? "Message"} cannot be shorter than 1 characters`,
+          message: "Message cannot be shorter than 1 characters",
         });
       }
     });
