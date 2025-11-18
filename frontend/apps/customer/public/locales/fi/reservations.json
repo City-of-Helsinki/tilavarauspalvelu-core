@@ -36,7 +36,7 @@
       "UNSUITABLE_SPACE": "Tila ei sovellu käyttötarkoituksiini",
       "PROCESSING_TIME_TOO_LONG": "Varauksen käsittelyaika on liian pitkä",
       "OTHER": "Muu syy",
-      "NOT_PAID": "Varausta ei maksettu tai laskua valittu maksutavaksi määräpäivään mennessä"
+      "NOT_PAID": "Varausta ei maksettu tai laskua valittu maksutavaksi määräaikaan mennessä"
     }
   },
   "cancelSection": {
