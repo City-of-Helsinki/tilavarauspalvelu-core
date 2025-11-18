@@ -10,6 +10,7 @@ from rest_framework.fields import DateTimeField, IntegerField
 
 from tilavarauspalvelu.enums import AccessType, PaymentType
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.helsinki_profile.typing import ReservationPrefillInfo
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnit
@@ -120,7 +121,13 @@ class ReservationCreateSerializer(NestingModelSerializer):
         # use the prefill info stored in the session.
         reservation_prefill_info = prefill_info or request.session.get("reservation_prefill_info")
         if reservation_prefill_info is not None:
-            data.update({key: value for key, value in reservation_prefill_info.items() if value is not None})
+            # Validate cached keys before updating the data, in case the data has keys from older incompatible version.
+            prefill_valid_keys = list(ReservationPrefillInfo.__annotations__)
+            data.update({
+                key: value
+                for key, value in reservation_prefill_info.items()
+                if value is not None and key in prefill_valid_keys
+            })
 
     def create(self, validated_data: ReservationCreateData) -> Reservation:
         reservation: Reservation = super().create(validated_data)
