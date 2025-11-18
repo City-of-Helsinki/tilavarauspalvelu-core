@@ -16,13 +16,8 @@ import { BannerNotificationStatusLabel } from "ui/src/components/statuses";
 import { successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { parseUIDate, fromUIDateTime, formatDate, formatTime } from "ui/src/modules/date-utils";
-import { cleanHtmlContent, createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import {
-  checkValidDate,
-  checkValidFutureDate,
-  checkTimeStringFormat,
-  checkLengthWithoutHtml,
-} from "ui/src/schemas/schemaCommon";
+import { cleanHtmlContent, createNodeId, ignoreMaybeArray, stripHtml, toNumber } from "ui/src/modules/helpers";
+import { checkValidDate, checkValidFutureDate, checkTimeStringFormat } from "ui/src/schemas/schemaCommon";
 import { CenterSpinner, Flex, TitleSection, H1 } from "ui/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
@@ -88,8 +83,11 @@ function getHTMLMessageSchema(minLength: number, maxLength: number) {
     .string()
     .max(1000)
     .transform(cleanHtmlContent)
-    .superRefine((x, ctx) => {
-      checkLengthWithoutHtml(x, ctx, "", minLength, maxLength);
+    .refine((x) => stripHtml(x).length < minLength, {
+      message: `Message cannot be shorter than ${minLength} characters`,
+    })
+    .refine((x) => stripHtml(x).length > maxLength, {
+      message: `Message cannot be longer than ${maxLength} characters`,
     });
 }
 

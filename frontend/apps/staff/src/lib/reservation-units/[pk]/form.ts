@@ -65,15 +65,15 @@ const PricingFormSchema = z.object({
   hasMaterialPrice: z.boolean(),
   materialPriceDescriptionFi: z
     .string()
-    .refine((x) => x.length <= 500)
+    .refine((x) => stripHtml(x).length <= 500)
     .transform(cleanHtmlContent),
   materialPriceDescriptionEn: z
     .string()
-    .refine((x) => x.length <= 500)
+    .refine((x) => stripHtml(x).length <= 500)
     .transform(cleanHtmlContent),
   materialPriceDescriptionSv: z
     .string()
-    .refine((x) => x.length <= 500)
+    .refine((x) => stripHtml(x).length <= 500)
     .transform(cleanHtmlContent),
 });
 
@@ -164,7 +164,7 @@ function validatePricing(data: PricingFormValues | undefined, ctx: z.RefinementC
     if (data.hasMaterialPrice) {
       (["materialPriceDescriptionFi", "materialPriceDescriptionSv", "materialPriceDescriptionEn"] as const).map(
         (fieldName) => {
-          if (!data[fieldName]) {
+          if (!(stripHtml(data[fieldName]).length > 0)) {
             ctx.addIssue({
               message: "Required",
               path: [`${path}.${fieldName}`],

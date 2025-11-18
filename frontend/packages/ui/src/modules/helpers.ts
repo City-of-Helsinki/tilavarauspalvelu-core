@@ -3,10 +3,10 @@ import { type OptionInProps } from "hds-react";
 import { type TFunction } from "i18next";
 import sanitizeHtml from "sanitize-html";
 import {
-  ReservationUnitImageType,
-  type PricingFieldsFragment,
   type ImageFragment,
   type Maybe,
+  type PricingFieldsFragment,
+  ReservationUnitImageType,
   type SuitableTimeFragment,
 } from "../../gql/gql-types";
 import { pixel } from "./const";
@@ -315,6 +315,37 @@ export function getTranslation<K extends PossibleKeys, T extends string | null>(
   }
   // never
   throw new Error(`Object is missing translation for ${key}`);
+}
+
+/**
+ * Strips all HTML tags from a string and decodes HTML entities
+ * @param html - String containing HTML tags and entities
+ * @returns Plain text with tags removed and entities decoded
+ * @example
+ * stripHtml("<p>Hello &amp; <strong>world</strong>!</p>")
+ * // Returns: "Hello & world!"
+ */
+export function stripHtml(html: string): string {
+  if (typeof window === "undefined") {
+    // Server-side: use regex-based approach
+    return html
+      .replace(/<[^>]*>/g, "") // Remove HTML tags
+      .replace(/&nbsp;/g, "\u00A0") // Decode non-breaking space
+      .replace(/&amp;/g, "&") // Decode ampersand
+      .replace(/&lt;/g, "<") // Decode less than
+      .replace(/&gt;/g, ">") // Decode greater than
+      .replace(/&quot;/g, '"') // Decode double quote
+      .replace(/&#39;/g, "'") // Decode single quote
+      .replace(/&apos;/g, "'") // Decode apostrophe
+      .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(Number(dec))) // Decode numeric entities
+      .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(Number.parseInt(hex, 16))) // Decode hex entities
+      .trim();
+  }
+
+  // Client-side: use browser's built-in HTML parser
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  return doc.body.textContent?.trim() || "";
+}
 
 export const sanitizeConfig = {
   allowedTags: [
