@@ -2827,8 +2827,8 @@ msgstr "dörrkod"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessType"
-msgid "opened by staff"
-msgstr "öppnades av personalen"
+msgid "staff"
+msgstr "personalen"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessType"
