@@ -618,7 +618,7 @@ def _create_paid_reservation_units(
                 payment_type=data.payment_type_info.payment_type.name,
                 tax_percentage=data.tax_percentage_info.name,
                 metadata_set=set_name.value,
-                access_type="physical key",
+                access_type="key",
             )
             .build()
         )
@@ -699,7 +699,7 @@ def _create_seasonal_bookable_reservation_units(
     ]
     access_type_choices: list[AccessTypeInfo] = [
         AccessTypeInfo(name="direct access", value=AccessType.UNRESTRICTED),
-        AccessTypeInfo(name="physical key", value=AccessType.PHYSICAL_KEY),
+        AccessTypeInfo(name="key", value=AccessType.PHYSICAL_KEY),
         AccessTypeInfo(name="access code", value=AccessType.ACCESS_CODE),
     ]
 
@@ -756,7 +756,7 @@ def _create_seasonal_bookable_reservation_units(
             # Otherwise use switch to physical key
             else:
                 access_type = AccessType.PHYSICAL_KEY
-                access_type_label = "physical key"
+                access_type_label = "key"
                 reservation_uuid = uuid.uuid4()
         else:
             reservation_uuid = uuid.uuid4()

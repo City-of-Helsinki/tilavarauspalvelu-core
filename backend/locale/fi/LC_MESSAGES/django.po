@@ -2915,7 +2915,7 @@ msgstr "henkilökunta avaa"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessType"
-msgid "physical key"
+msgid "key"
 msgstr "avain"
 
 #: tilavarauspalvelu/enums.py

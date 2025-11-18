@@ -263,7 +263,7 @@ def test_seasonal_booking_access_type_changed__get_context__instance(email_reser
                 "unit_name": "[TOIMIPISTEEN NIMI]",
                 "access_types": [
                     {
-                        "access_type": "physical key",
+                        "access_type": "key",
                         "begin_date": "1.1.2024",
                         "end_date": None,
                     },
@@ -340,7 +340,7 @@ def test_seasonal_booking_access_type_changed__get_context__multiple(email_reser
                 "unit_name": "[TOIMIPISTEEN NIMI]",
                 "access_types": [
                     {
-                        "access_type": "physical key",
+                        "access_type": "key",
                         "begin_date": "1.1.2024",
                         "end_date": "31.1.2024",
                     },
