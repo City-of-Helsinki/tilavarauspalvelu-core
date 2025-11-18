@@ -2832,7 +2832,7 @@ msgstr "öppnades av personalen"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessType"
-msgid "physical key"
+msgid "key"
 msgstr "nyckel"
 
 #: tilavarauspalvelu/enums.py
