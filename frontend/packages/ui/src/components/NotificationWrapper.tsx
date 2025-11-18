@@ -11,9 +11,13 @@ const StyledNotification = styled(Notification)`
     max-width: var(--tilavaraus-page-max-width);
     margin: 0 auto;
     & p {
+      /* make the notification slimmer */
       &:first-of-type {
         margin-top: 0;
       }
+
+      /* close button should not overlap text */
+      padding-right: var(--spacing-m);
       font-size: var(--fontsize-body-s);
     }
   }
