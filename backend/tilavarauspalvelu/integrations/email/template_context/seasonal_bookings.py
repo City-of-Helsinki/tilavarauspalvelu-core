@@ -135,7 +135,7 @@ def get_context_for_seasonal_booking_access_type_changed(
         "application_section_name": data["application_section_name"],
         "application_round_name": data["application_round_name"],
         "reservation_units": data["reservation_units"],
-        "access_types_label": pgettext("Email", "Access types"),
+        "access_types_label": pgettext("Email", "Access to the space"),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_seasonal_reservation_check_details_url(
             language=language,

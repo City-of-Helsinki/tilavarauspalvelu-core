@@ -3244,8 +3244,8 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
-msgid "Access types"
-msgstr "Tillträdet"
+msgid "Access to the space"
+msgstr "Tillträde till utrymmet"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 #, python-format
