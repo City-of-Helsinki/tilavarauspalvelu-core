@@ -2920,7 +2920,7 @@ msgstr "avain"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessType"
-msgid "unrestricted"
+msgid "direct access"
 msgstr "suora pääsy"
 
 #: tilavarauspalvelu/enums.py

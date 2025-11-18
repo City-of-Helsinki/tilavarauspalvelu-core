@@ -245,7 +245,7 @@ def _create_free_reservation_units(
         HandlingInfo(name="yes", handling_required=True),
     ]
     access_type_choices: list[AccessTypeInfo] = [
-        AccessTypeInfo(name="unrestricted", value=AccessType.UNRESTRICTED),
+        AccessTypeInfo(name="direct access", value=AccessType.UNRESTRICTED),
         AccessTypeInfo(name="access type", value=AccessType.ACCESS_CODE),
     ]
     material_price_choices: list[MaterialPriceInfo] = [
@@ -325,7 +325,7 @@ def _create_free_reservation_units(
             # Otherwise use switch to unrestricted
             else:
                 access_type = AccessType.UNRESTRICTED
-                access_type_label = "unrestricted"
+                access_type_label = "direct access"
                 reservation_uuid = uuid.uuid4()
         else:
             reservation_uuid = uuid.uuid4()
@@ -698,7 +698,7 @@ def _create_seasonal_bookable_reservation_units(
         ReservationKindInfo(name="direct and seasonal", value=ReservationKind.DIRECT_AND_SEASON),
     ]
     access_type_choices: list[AccessTypeInfo] = [
-        AccessTypeInfo(name="unrestricted", value=AccessType.UNRESTRICTED),
+        AccessTypeInfo(name="direct access", value=AccessType.UNRESTRICTED),
         AccessTypeInfo(name="physical key", value=AccessType.PHYSICAL_KEY),
         AccessTypeInfo(name="access code", value=AccessType.ACCESS_CODE),
     ]
