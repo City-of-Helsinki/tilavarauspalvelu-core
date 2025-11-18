@@ -1,6 +1,6 @@
 import { type TFunction } from "i18next";
-import { describe, test, expect } from "vitest";
-import { formatApiTimeInterval, formatListToCSV, getTranslation } from "./helpers";
+import { describe, test, expect, it } from "vitest";
+import { formatApiTimeInterval, formatListToCSV, getTranslation, stripHtml } from "./helpers";
 
 describe("formatApiTimeInterval", () => {
   test("should properly format api time interval", () => {
@@ -148,5 +148,55 @@ describe("getTranslation", () => {
   test("undefined is an error", () => {
     // @ts-expect-error -- enforce that this will not compile
     expect(() => getTranslation(undefined, "name", "fi")).toThrow();
+  });
+});
+
+describe("stripHtml", () => {
+  it("should remove simple HTML tags", () => {
+    expect(stripHtml("<p>Hello world</p>")).toBe("Hello world");
+    expect(stripHtml("<strong>Bold text</strong>")).toBe("Bold text");
+    expect(stripHtml("<div><span>Nested</span></div>")).toBe("Nested");
+  });
+
+  it("should decode common HTML entities", () => {
+    expect(stripHtml("Hello &amp; world")).toBe("Hello & world");
+    expect(stripHtml("&lt;tag&gt;")).toBe("<tag>");
+    expect(stripHtml("&quot;quoted&quot;")).toBe('"quoted"');
+    expect(stripHtml("&apos;apostrophe&apos;")).toBe("'apostrophe'");
+    // Note: &nbsp; decodes to non-breaking space (U+00A0), not regular space
+    expect(stripHtml("Non&nbsp;breaking&nbsp;space")).toBe("Non\u00A0breaking\u00A0space");
+  });
+
+  it("should handle numeric HTML entities", () => {
+    expect(stripHtml("&#65;&#66;&#67;")).toBe("ABC");
+    expect(stripHtml("&#x41;&#x42;&#x43;")).toBe("ABC");
+  });
+
+  it("should handle complex HTML with tags and entities", () => {
+    expect(stripHtml("<p>Hello &amp; <strong>world</strong>!</p>")).toBe("Hello & world!");
+    expect(stripHtml("<div>Test &lt;code&gt; &amp; text</div>")).toBe("Test <code> & text");
+  });
+
+  it("should handle empty strings", () => {
+    expect(stripHtml("")).toBe("");
+  });
+
+  it("should handle strings without HTML", () => {
+    expect(stripHtml("Plain text")).toBe("Plain text");
+  });
+
+  it("should handle self-closing tags", () => {
+    expect(stripHtml("Line 1<br/>Line 2")).toBe("Line 1Line 2");
+    expect(stripHtml("Image here: <img src='test.jpg' />")).toBe("Image here:");
+  });
+
+  it("should handle multiple nested tags", () => {
+    expect(stripHtml("<div><p>Paragraph <strong>with <em>nested</em> tags</strong></p></div>")).toBe(
+      "Paragraph with nested tags"
+    );
+  });
+
+  it("should decode entities and remove tags in one pass", () => {
+    expect(stripHtml('<a href="test">Link &amp; text &lt;here&gt;</a>')).toBe("Link & text <here>");
   });
 });
