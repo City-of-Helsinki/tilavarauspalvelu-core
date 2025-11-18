@@ -2910,8 +2910,8 @@ msgstr "ovikoodi"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessType"
-msgid "opened by staff"
-msgstr "henkilökunta avaa"
+msgid "staff"
+msgstr "henkilökunta"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessType"
