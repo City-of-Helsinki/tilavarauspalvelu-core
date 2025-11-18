@@ -33,6 +33,7 @@
 gql-pluck-output/
 
 # local config
+**/.env
 **/.env.local
 **/.local
 **/.idea
