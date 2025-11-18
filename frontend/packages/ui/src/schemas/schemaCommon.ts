@@ -1,5 +1,4 @@
 import { subDays } from "date-fns";
-import sanitizeHtml from "sanitize-html";
 import { z } from "zod";
 import { parseUIDate } from "../modules/date-utils";
 
@@ -73,32 +72,6 @@ export function checkTimeStringFormat(data: string | undefined, ctx: z.Refinemen
       code: "custom",
       path: [path],
       message: `${errorKey ?? path} can't be more than 24 hours.`,
-    });
-  }
-}
-
-export function checkLengthWithoutHtml(
-  str: string,
-  ctx: z.RefinementCtx,
-  path: string,
-  min?: number,
-  max?: number,
-  name?: string
-) {
-  const stripped = sanitizeHtml(str, { allowedTags: [] });
-
-  if (min != null && stripped.length < min) {
-    ctx.addIssue({
-      code: "custom",
-      path: [path],
-      message: `${name ?? "Message"} cannot be shorter than ${min} characters`,
-    });
-  }
-  if (max != null && stripped.length > max) {
-    ctx.addIssue({
-      code: "custom",
-      path: [path],
-      message: `${name ?? "Message"} cannot be longer than ${max} characters`,
     });
   }
 }

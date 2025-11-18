@@ -11,8 +11,8 @@ import {
   formatDate,
   formatTime,
 } from "ui/src/modules/date-utils";
-import { cleanHtmlContent, convertTime, filterNonNullable, toNumber } from "ui/src/modules/helpers";
-import { checkLengthWithoutHtml, checkTimeStringFormat } from "ui/src/schemas/schemaCommon";
+import { cleanHtmlContent, convertTime, filterNonNullable, stripHtml, toNumber } from "ui/src/modules/helpers";
+import { checkTimeStringFormat } from "ui/src/schemas/schemaCommon";
 import {
   AccessType,
   AuthenticationType,
@@ -673,9 +673,16 @@ export const ReservationUnitEditSchema = z
         path: ["nameSv"],
       });
     }
-    checkLengthWithoutHtml(v.descriptionEn, ctx, "descriptionEn", 1, undefined, "description");
-    checkLengthWithoutHtml(v.descriptionFi, ctx, "descriptionFi", 1, undefined, "description");
-    checkLengthWithoutHtml(v.descriptionSv, ctx, "descriptionSv", 1, undefined, "description");
+    (["descriptionFi", "descriptionSv", "descriptionEn"] as const).map((fieldName) => {
+      const stripped = stripHtml(v[fieldName]);
+      if (stripped.length < 1) {
+        ctx.addIssue({
+          code: "custom",
+          path: [fieldName],
+          message: `${fieldName ?? "Message"} cannot be shorter than 1 characters`,
+        });
+      }
+    });
 
     if (v.maxPersons && v.minPersons) {
       if (v.maxPersons < v.minPersons) {
