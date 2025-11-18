@@ -64,14 +64,23 @@ const PricingFormSchema = z.object({
   // frontend only value, this is used to control if we should show price section
   isPaid: z.boolean(),
   hasMaterialPrice: z.boolean(),
-  materialPriceDescriptionFi: z.string().max(500),
-  materialPriceDescriptionEn: z.string().max(500),
-  materialPriceDescriptionSv: z.string().max(500),
+  materialPriceDescriptionFi: z
+    .string()
+    .refine((x) => x.length <= 500)
+    .transform(cleanHtmlContent),
+  materialPriceDescriptionEn: z
+    .string()
+    .refine((x) => x.length <= 500)
+    .transform(cleanHtmlContent),
+  materialPriceDescriptionSv: z
+    .string()
+    .refine((x) => x.length <= 500)
+    .transform(cleanHtmlContent),
 });
 
 type PricingFormValues = z.infer<typeof PricingFormSchema>;
 
-function refinePricing(data: PricingFormValues | undefined, ctx: z.RefinementCtx, path: string) {
+function validatePricing(data: PricingFormValues | undefined, ctx: z.RefinementCtx, path: string) {
   if (data == null) {
     return;
   }
@@ -151,6 +160,20 @@ function refinePricing(data: PricingFormValues | undefined, ctx: z.RefinementCtx
         path: [`${path}.paymentType`],
         code: "custom",
       });
+    }
+
+    if (data.hasMaterialPrice) {
+      (["materialPriceDescriptionFi", "materialPriceDescriptionSv", "materialPriceDescriptionEn"] as const).map(
+        (fieldName) => {
+          if (!data[fieldName]) {
+            ctx.addIssue({
+              message: "Required",
+              path: [`${path}.${fieldName}`],
+              code: "custom",
+            });
+          }
+        }
+      );
     }
   }
 }
@@ -523,7 +546,7 @@ export const ReservationUnitEditSchema = z
 
     if (!v.isDraft || v.pricings.length) {
       for (let i = 0; i < v.pricings.length; i++) {
-        refinePricing(v.pricings[i], ctx, `pricings.${i}`);
+        validatePricing(v.pricings[i], ctx, `pricings.${i}`);
       }
     }
 
