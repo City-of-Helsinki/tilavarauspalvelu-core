@@ -2595,7 +2595,7 @@ msgid ""
 "The booking was not paid for or invoice was not selected as the payment "
 "method by the deadline."
 msgstr ""
-"Varausta ei maksettu tai laskua valittu maksutavaksi määräpäivään mennessä"
+"Varausta ei maksettu tai laskua valittu maksutavaksi määräaikaan mennessä"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationKind"
