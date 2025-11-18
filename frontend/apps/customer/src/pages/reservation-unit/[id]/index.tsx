@@ -9,7 +9,7 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { cleanHtmlContent, Sanitize } from "ui/src/components/Sanitize";
+import { Sanitize } from "ui/src/components/Sanitize";
 import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
 import { errorToast } from "ui/src/components/toast";
 import { useDisplayError, useToastIfQueryParam } from "ui/src/hooks";
@@ -19,6 +19,7 @@ import { breakpoints } from "ui/src/modules/const";
 import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "ui/src/modules/date-utils";
 import {
   capitalize,
+  cleanHtmlContent,
   createNodeId,
   filterNonNullable,
   getLocalizationLang,

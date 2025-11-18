@@ -1,6 +1,7 @@
 import React from "react";
 import sanitizeHtml from "sanitize-html";
 import styled from "styled-components";
+import { sanitizeConfig } from "@ui/modules/helpers";
 
 type Props = {
   html: string;
@@ -20,45 +21,6 @@ const StyledContent = styled.div`
     }
   }
 `;
-
-/// Remove unwanted tags from content
-/// Turns all empty content (even with empty tags) to empty string
-export function cleanHtmlContent(html: string): string {
-  if (html === "") {
-    return "";
-  }
-  if (sanitizeHtml(html, { allowedTags: [] }) === "") {
-    return "";
-  }
-  return sanitizeHtml(html, sanitizeConfig);
-}
-
-const sanitizeConfig = {
-  allowedTags: [
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
-    "p",
-    "br",
-    "div",
-    "span",
-    "ol",
-    "ul",
-    "li",
-    "strong",
-    "em",
-    "u",
-    "a",
-    "pre",
-  ],
-  allowedAttributes: {
-    a: ["href", "target", "rel"],
-    "*": ["style"],
-  },
-};
 
 export function Sanitize({ html }: Props): JSX.Element | null {
   if (!html) {

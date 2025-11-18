@@ -1,6 +1,7 @@
 import { isAfter, isBefore } from "date-fns";
 import { type OptionInProps } from "hds-react";
 import { type TFunction } from "i18next";
+import sanitizeHtml from "sanitize-html";
 import {
   ReservationUnitImageType,
   type PricingFieldsFragment,
@@ -314,4 +315,42 @@ export function getTranslation<K extends PossibleKeys, T extends string | null>(
   }
   // never
   throw new Error(`Object is missing translation for ${key}`);
+
+export const sanitizeConfig = {
+  allowedTags: [
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "p",
+    "br",
+    "div",
+    "span",
+    "ol",
+    "ul",
+    "li",
+    "strong",
+    "em",
+    "u",
+    "a",
+    "pre",
+  ],
+  allowedAttributes: {
+    a: ["href", "target", "rel"],
+    "*": ["style"],
+  },
+};
+
+/// Remove unwanted tags from content
+/// Turns all empty content (even with empty tags) to empty string
+export function cleanHtmlContent(html: string): string {
+  if (html === "") {
+    return "";
+  }
+  if (sanitizeHtml(html, { allowedTags: [] }) === "") {
+    return "";
+  }
+  return sanitizeHtml(html, sanitizeConfig);
 }
