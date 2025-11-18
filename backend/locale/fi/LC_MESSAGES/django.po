@@ -841,7 +841,7 @@ msgstr "Käyttötarkoitus"
 #: tilavarauspalvelu/admin/application_section/form.py
 #: tilavarauspalvelu/admin/reservation_series/filters.py
 #: tilavarauspalvelu/admin/reservation_series/form.py
-msgid "Should have active access code"
+msgid "Should have active door code"
 msgstr "Pitäisi olla aktiivinen pääsykoodi"
 
 #: tilavarauspalvelu/admin/application_section/form.py
@@ -881,7 +881,7 @@ msgid "Purpose for this section."
 msgstr "Hakemuksen osan käyttötarkoitus."
 
 #: tilavarauspalvelu/admin/application_section/form.py
-msgid "Should this application section have an active access code?"
+msgid "Should this application section have an active door code?"
 msgstr "Tulisiko tässä hakemuksen osassa olla aktiivista pääsykoodia?"
 
 #: tilavarauspalvelu/admin/banner_notification/admin.py
@@ -1180,7 +1180,7 @@ msgid "Paid reservation"
 msgstr "Maksullinen varaus"
 
 #: tilavarauspalvelu/admin/reservation/filters.py
-msgid "access code generated"
+msgid "door code generated"
 msgstr "ovikoodi generoitu"
 
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -1228,18 +1228,18 @@ msgstr "Vahvistettu"
 #: tilavarauspalvelu/admin/reservation_series/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Access type"
-msgstr "Kulkuoikeus"
+msgstr "Pääsy tilaan"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Access code is active"
+msgid "Door code is active"
 msgstr "Ovikoodi on aktiivinen"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Access code should be active"
+msgid "Door code should be active"
 msgstr "Ovikoodi tulisi olla aktiivinen"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Access code generated at"
+msgid "Door code generated at"
 msgstr "Ovikoodi generoitu"
 
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -1517,7 +1517,7 @@ msgstr "Jaettu vuoro"
 
 #: tilavarauspalvelu/admin/reservation_series/form.py
 msgid "Used access types"
-msgstr "Käytetyt kulkuoikeudet"
+msgstr "Käytetyt kulkutavat"
 
 #: tilavarauspalvelu/admin/reservation_series/form.py
 msgid "Name of the reservation series"
@@ -1568,7 +1568,7 @@ msgid "Age group for this reservation series"
 msgstr "Toistuvan varauksen ikäryhmä"
 
 #: tilavarauspalvelu/admin/reservation_series/form.py
-msgid "Should this reservation series have an active access code?"
+msgid "Should this reservation series have an active door code?"
 msgstr "Tulisiko tässä toistuvassa varauksessa olla aktiivista pääsykoodia?"
 
 #: tilavarauspalvelu/admin/reservation_series/form.py
@@ -2905,7 +2905,7 @@ msgstr "Aktiivinen"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessType"
-msgid "access code"
+msgid "door code"
 msgstr "ovikoodi"
 
 #: tilavarauspalvelu/enums.py
@@ -2930,17 +2930,17 @@ msgstr "moniarvoinen"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessCodeState"
-msgid "Access code not required"
+msgid "Door code not required"
 msgstr "Ei tarvitse ovikoodia"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessCodeState"
-msgid "Access code created"
+msgid "Door code created"
 msgstr "Ovikoodi luotu"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "AccessCodeState"
-msgid "Access code pending"
+msgid "Door code pending"
 msgstr "Ovikoodia luodaan"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
@@ -3163,13 +3163,13 @@ msgstr "Varauksesi ovikoodi on vaihtunut"
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
 msgid "Access to the space has changed"
-msgstr "Sisäänpääsy tilaan on muuttunut"
+msgstr "Kulkutapa tilaan on muuttunut"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
 msgctxt "Email"
 msgid "Access to the space will change starting from %(date)s"
-msgstr "Sisäänpääsy tilaan muuttuu %(date)s alkaen"
+msgstr "Kulkutapa tilaan muuttuu %(date)s alkaen"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
@@ -3445,7 +3445,7 @@ msgstr "Kirjaudu palveluun osoitteessa"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation access code changed"
+msgid "Reservation door code changed"
 msgstr "Varauksen ovikoodi vaihtunut"
 
 #: tilavarauspalvelu/integrations/email/typing.py
@@ -3500,7 +3500,7 @@ msgstr "Varauksen aikaa muutettu"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation access code changed"
+msgid "Seasonal Reservation door code changed"
 msgstr "Kausivarauksen ovikoodi vaihtunut"
 
 #: tilavarauspalvelu/integrations/email/typing.py
@@ -3845,7 +3845,7 @@ msgid "reservations"
 msgstr "varaukset"
 
 #: tilavarauspalvelu/models/reservation/model.py
-msgid "Reservation cannot have active access code if one is not generated"
+msgid "Reservation cannot have active door code if one is not generated"
 msgstr "Varauksella ei voi olla aktiivista ovikoodia jota ei ole luotu"
 
 #: tilavarauspalvelu/models/reservation/model.py

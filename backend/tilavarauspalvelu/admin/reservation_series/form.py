@@ -46,7 +46,7 @@ class ReservationSeriesAdminForm(forms.ModelForm):
             "reservation_unit": _("Reservation unit"),
             "allocated_time_slot": _("Allocated time slot"),
             "age_group": _("Age group"),
-            "should_have_active_access_code": _("Should have active access code"),
+            "should_have_active_access_code": _("Should have active door code"),
             "access_type": _("Access type"),
             "used_access_types": _("Used access types"),
         }
@@ -64,7 +64,7 @@ class ReservationSeriesAdminForm(forms.ModelForm):
             "reservation_unit": _("Reservation unit for this reservation series"),
             "allocated_time_slot": _("Allocated time slot this reservation series is for"),
             "age_group": _("Age group for this reservation series"),
-            "should_have_active_access_code": _("Should this reservation series have an active access code?"),
+            "should_have_active_access_code": _("Should this reservation series have an active door code?"),
             "access_type": _(
                 "Access type for the reservations in this reservation series (if unambiguous), "
                 "otherwise access type will be 'multi-valued'"

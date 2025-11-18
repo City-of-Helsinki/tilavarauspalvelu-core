@@ -69,7 +69,7 @@ class ReservationUnitFilter(MultiSelectRelatedDropdownFilter, MultiSelectRelated
 
 
 class AccessCodeGeneratedFilter(admin.SimpleListFilter):
-    title = _("access code generated")
+    title = _("door code generated")
     parameter_name = "access_code_generated"
 
     def lookups(self, *args: Any) -> list[tuple[str, str]]:

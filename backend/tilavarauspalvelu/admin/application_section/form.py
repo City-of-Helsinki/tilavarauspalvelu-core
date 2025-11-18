@@ -134,7 +134,7 @@ class ApplicationSectionAdminForm(forms.ModelForm):
             "application": _("Application"),
             "age_group": _("Age group"),
             "purpose": _("Purpose"),
-            "should_have_active_access_code": _("Should have active access code"),
+            "should_have_active_access_code": _("Should have active door code"),
         }
         help_texts = {
             "ext_uuid": _("ID for external systems to use"),
@@ -148,7 +148,7 @@ class ApplicationSectionAdminForm(forms.ModelForm):
             "application": _("Application this section is in."),
             "age_group": _("Age group for this section."),
             "purpose": _("Purpose for this section."),
-            "should_have_active_access_code": _("Should this application section have an active access code?"),
+            "should_have_active_access_code": _("Should this application section have an active door code?"),
         }
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:

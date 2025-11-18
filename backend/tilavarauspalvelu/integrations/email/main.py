@@ -62,7 +62,7 @@ class EmailService:
         recipients = get_reservation_email_recipients(reservation=reservation)
         if not recipients:
             SentryLogger.log_message(
-                "No recipients for the 'reservation access code changed' email",
+                "No recipients for the 'Reservation door code changed' email",
                 details={"reservation": reservation.pk},
             )
             return

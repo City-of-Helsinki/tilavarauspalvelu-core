@@ -700,7 +700,7 @@ def _create_seasonal_bookable_reservation_units(
     access_type_choices: list[AccessTypeInfo] = [
         AccessTypeInfo(name="direct access", value=AccessType.UNRESTRICTED),
         AccessTypeInfo(name="key", value=AccessType.PHYSICAL_KEY),
-        AccessTypeInfo(name="access code", value=AccessType.ACCESS_CODE),
+        AccessTypeInfo(name="door code", value=AccessType.ACCESS_CODE),
     ]
 
     # These are pre-set in Pindora ("Varaamon lokaali testidata #6 - #10")

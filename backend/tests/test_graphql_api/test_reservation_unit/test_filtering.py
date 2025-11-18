@@ -862,7 +862,7 @@ def test_reservation_unit__filter__by_access_type(graphql):
 
     # Access type something other
     ReservationUnitFactory.create(name="unrestricted", access_types__access_type=AccessType.UNRESTRICTED)
-    ReservationUnitFactory.create(name="access code", access_types__access_type=AccessType.ACCESS_CODE)
+    ReservationUnitFactory.create(name="door code", access_types__access_type=AccessType.ACCESS_CODE)
     ReservationUnitFactory.create(name="staff", access_types__access_type=AccessType.OPENED_BY_STAFF)
 
     query = reservation_units_query(

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class ShouldHaveActiveAccessCodeFilter(admin.SimpleListFilter):
-    title = _("Should have active access code")
+    title = _("Should have active door code")
     parameter_name = "should_have_active_access_code"
 
     def lookups(self, *args: Any) -> list[tuple[str, str]]:
