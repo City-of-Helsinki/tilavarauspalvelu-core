@@ -3327,8 +3327,8 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 msgctxt "Email"
-msgid "Access types"
-msgstr "Kulkutavat"
+msgid "Access to the space"
+msgstr "Pääsy tilaan"
 
 #: tilavarauspalvelu/integrations/email/template_context/seasonal_bookings.py
 #, python-format

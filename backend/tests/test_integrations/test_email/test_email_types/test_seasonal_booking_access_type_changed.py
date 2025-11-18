@@ -108,7 +108,7 @@ LANGUAGE_CONTEXT = {
         **KEYLESS_ENTRY_CONTEXT_EN,
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
         **COMMON_CONTEXT,
-        "access_types_label": "Access types",
+        "access_types_label": "Access to the space",
     },
     "fi": {
         "title": "Kausivarauksesi kulkutapa muuttuu",
@@ -158,7 +158,7 @@ LANGUAGE_CONTEXT = {
         **KEYLESS_ENTRY_CONTEXT_FI,
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
         **COMMON_CONTEXT,
-        "access_types_label": "Kulkutavat",
+        "access_types_label": "Pääsy tilaan",
     },
     "sv": {
         "title": "Tillträdet till din säsongsbokning håller på att ändras",
@@ -208,7 +208,7 @@ LANGUAGE_CONTEXT = {
         **KEYLESS_ENTRY_CONTEXT_SV,
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
         **COMMON_CONTEXT,
-        "access_types_label": "Tillträdet",
+        "access_types_label": "Tillträde till utrymmet",
     },
 }
 
@@ -388,13 +388,13 @@ def test_seasonal_booking_access_type_changed__render__text():
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
-        Access types:
+        Access to the space:
         * opened by staff: 1.1.2023 - 31.5.2023
         * access code: 1.6.2023 - 31.12.2023
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
-        Access types:
+        Access to the space:
         * unrestricted: 1.2.2023 -
 
         You can check your booking details at: {url}
@@ -436,13 +436,13 @@ def test_seasonal_booking_access_type_changed__render__text__access_code():
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
-        Access types:
+        Access to the space:
         * opened by staff: 1.1.2023 - 31.5.2023
         * access code: 1.6.2023 - 31.12.2023
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
-        Access types:
+        Access to the space:
         * unrestricted: 1.2.2023 -
 
         You can check your booking details at: {url}
@@ -479,14 +479,14 @@ def test_seasonal_booking_access_type_changed__render__html():
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
-        Access types:
+        Access to the space:
 
         * opened by staff: 1.1.2023 - 31.5.2023
         * access code: 1.6.2023 - 31.12.2023
 
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
-        Access types:
+        Access to the space:
 
         * unrestricted: 1.2.2023 -
 
@@ -527,14 +527,14 @@ def test_seasonal_booking_access_type_changed__render__html__access_code():
         Door code: 123456
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
-        Access types:
+        Access to the space:
 
         * opened by staff: 1.1.2023 - 31.5.2023
         * access code: 1.6.2023 - 31.12.2023
 
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI], [TOIMIPISTEEN OSOITE], [KAUPUNKI]
-        Access types:
+        Access to the space:
 
         * unrestricted: 1.2.2023 -
 
