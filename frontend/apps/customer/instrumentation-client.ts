@@ -2,10 +2,8 @@
 // The config you add here will be used whenever a page is visited.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 import * as Sentry from "@sentry/nextjs";
-import { env } from "@/env.mjs";
 import { getVersion } from "@/modules/serverUtils";
 
-const { SENTRY_ENVIRONMENT } = env;
 const VERSION = getVersion();
 const APP_NAME = "tilavarauspalvelu-ui";
 
@@ -23,23 +21,19 @@ const config = {
   replaysOnErrorSampleRate: 1,
 };
 
-Sentry.init({
-  ...config,
-  dsn: "",
-  environment: SENTRY_ENVIRONMENT,
-});
-
-/// updateSentryConfig
-/// @param dsn string
-/// @param environment string
-/// @returns void
-/// @description Since client has no access to env variables (outside of build time), we need to set the dns during runtime.
+/// @name updateSentryConfig
+/// @description client has no access to env variables (outside of build time), we need to set the dns during runtime.
+/// @param {string} [dsn] sentry dns
+/// @param {string} [environment] environment we are running in
+/// @returns {void}
 export function updateSentryConfig(dsn: string, environment: string) {
-  Sentry.init({
-    ...config,
-    dsn,
-    environment,
-  });
+  if (!Sentry.isInitialized()) {
+    Sentry.init({
+      ...config,
+      dsn,
+      environment,
+    });
+  }
 }
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
