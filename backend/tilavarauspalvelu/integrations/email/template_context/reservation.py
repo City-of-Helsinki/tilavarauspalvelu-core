@@ -30,8 +30,8 @@ if TYPE_CHECKING:
         EmailType,
         ReservationAccessCodeChangedContext,
         ReservationAccessTypeChangedContext,
-        ReservationApprovedContext,
         ReservationCancelledContext,
+        ReservationConfirmedContext,
         ReservationCreatedContext,
         ReservationCreatedStaffNotificationContext,
         ReservationDeniedContext,
@@ -47,8 +47,8 @@ if TYPE_CHECKING:
 __all__ = [
     "get_context_for_reservation_access_code_changed",
     "get_context_for_reservation_access_type_changed",
-    "get_context_for_reservation_approved",
     "get_context_for_reservation_cancelled",
+    "get_context_for_reservation_confirmed",
     "get_context_for_reservation_created",
     "get_context_for_reservation_created_staff_notification",
     "get_context_for_reservation_denied",
@@ -144,12 +144,12 @@ def get_context_for_reservation_access_type_changed(
 
 
 @get_translated
-def get_context_for_reservation_approved(
+def get_context_for_reservation_confirmed(
     reservation: Reservation | None = None,
     *,
     language: Lang,
-    **data: Unpack[ReservationApprovedContext],
-) -> Annotated[EmailContext, EmailType.RESERVATION_APPROVED]:
+    **data: Unpack[ReservationConfirmedContext],
+) -> Annotated[EmailContext, EmailType.RESERVATION_CONFIRMED]:
     if reservation is not None:
         data["email_recipient_name"] = reservation.actions.get_email_reservee_name()
         data["non_subsidised_price"] = reservation.non_subsidised_price
@@ -159,7 +159,7 @@ def get_context_for_reservation_approved(
         data |= params_for_price_info(reservation=reservation)
         data |= params_for_access_code_reservation(reservation=reservation)
 
-    text_reservation_approved = (
+    text_reservation_confirmed = (
         pgettext("Email", "Your booking has been confirmed with the following discount:")
         if data["price"] < data["non_subsidised_price"]
         else pgettext("Email", "Your booking is now confirmed")
@@ -167,7 +167,7 @@ def get_context_for_reservation_approved(
 
     return {
         "title": pgettext("Email", "Your booking is confirmed"),
-        "text_reservation_approved": text_reservation_approved,
+        "text_reservation_confirmed": text_reservation_confirmed,
         "instructions_confirmed_html": data["instructions_confirmed"],
         "instructions_confirmed_text": convert_html_to_text(data["instructions_confirmed"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),

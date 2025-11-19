@@ -3,8 +3,8 @@ from __future__ import annotations
 from .reservation import (
     get_context_for_reservation_access_code_changed,
     get_context_for_reservation_access_type_changed,
-    get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
+    get_context_for_reservation_confirmed,
     get_context_for_reservation_created,
     get_context_for_reservation_created_staff_notification,
     get_context_for_reservation_denied,
@@ -32,8 +32,8 @@ from .user import get_context_for_user_anonymization, get_context_for_user_permi
 __all__ = [
     "get_context_for_reservation_access_code_changed",
     "get_context_for_reservation_access_type_changed",
-    "get_context_for_reservation_approved",
     "get_context_for_reservation_cancelled",
+    "get_context_for_reservation_confirmed",
     "get_context_for_reservation_created",
     "get_context_for_reservation_created_staff_notification",
     "get_context_for_reservation_denied",

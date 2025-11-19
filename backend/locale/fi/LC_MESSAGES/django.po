@@ -3455,13 +3455,13 @@ msgstr "Varauksen kulkutapa on muuttunut"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation approved"
-msgstr "Varaus hyväksytty"
+msgid "Reservation cancelled"
+msgstr "Varaus peruttu"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation cancelled"
-msgstr "Varaus peruttu"
+msgid "Reservation confirmed"
+msgstr "Varaus hyväksytty"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"

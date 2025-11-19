@@ -1,4 +1,4 @@
-# type: EmailType.RESERVATION_APPROVED
+# type: EmailType.RESERVATION_CONFIRMED
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_approved
+from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_confirmed
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -64,7 +64,7 @@ COMMON_CONTEXT = {
 LANGUAGE_CONTEXT = {
     "en": {
         "title": "Your booking is confirmed",
-        "text_reservation_approved": "Your booking is now confirmed",
+        "text_reservation_confirmed": "Your booking is now confirmed",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
@@ -74,7 +74,7 @@ LANGUAGE_CONTEXT = {
     },
     "fi": {
         "title": "Varauksesi on vahvistettu",
-        "text_reservation_approved": "Varauksesi on nyt vahvistettu",
+        "text_reservation_confirmed": "Varauksesi on nyt vahvistettu",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
         **RESERVATION_PRICE_INFO_CONTEXT_FI,
@@ -84,7 +84,7 @@ LANGUAGE_CONTEXT = {
     },
     "sv": {
         "title": "Din bokning är bekräftad",
-        "text_reservation_approved": "Din bokning har bekräftats",
+        "text_reservation_confirmed": "Din bokning har bekräftats",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **RESERVATION_PRICE_INFO_CONTEXT_SV,
@@ -94,37 +94,37 @@ LANGUAGE_CONTEXT = {
     },
 }
 LANGUAGE_DISCOUNT_CONTEXT = {
-    "en": {"text_reservation_approved": "Your booking has been confirmed with the following discount:"},
-    "fi": {"text_reservation_approved": "Varauksesi on hyväksytty, ja varaukseen on myönnetty seuraava alennus:"},
-    "sv": {"text_reservation_approved": "Din bokning har bekräftats med följande rabatt:"},
+    "en": {"text_reservation_confirmed": "Your booking has been confirmed with the following discount:"},
+    "fi": {"text_reservation_confirmed": "Varauksesi on hyväksytty, ja varaukseen on myönnetty seuraava alennus:"},
+    "sv": {"text_reservation_confirmed": "Din bokning har bekräftats med följande rabatt:"},
 }
 
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_reservation_approved__get_context(lang: Lang):
+def test_reservation_confirmed__get_context(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
-        context = get_context_for_reservation_approved(**get_mock_params(language=lang))
+        context = get_context_for_reservation_confirmed(**get_mock_params(language=lang))
 
     assert context == expected
 
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_reservation_approved__get_context__get_mock_data(lang: Lang):
+def test_reservation_confirmed__get_context__get_mock_data(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
-        context = get_mock_data(email_type=EmailType.RESERVATION_APPROVED, language=lang)
+        context = get_mock_data(email_type=EmailType.RESERVATION_CONFIRMED, language=lang)
 
     assert context == expected
 
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_reservation_approved__get_context__discount(lang: Lang):
+def test_reservation_confirmed__get_context__discount(lang: Lang):
     expected = {**LANGUAGE_CONTEXT[lang], **LANGUAGE_DISCOUNT_CONTEXT[lang]}
 
     with TranslationsFromPOFiles():
@@ -133,7 +133,7 @@ def test_reservation_approved__get_context__discount(lang: Lang):
             non_subsidised_price=Decimal("14.30"),
             language=lang,
         )
-        context = get_context_for_reservation_approved(**params)
+        context = get_context_for_reservation_confirmed(**params)
 
     assert context == expected
 
@@ -141,7 +141,7 @@ def test_reservation_approved__get_context__discount(lang: Lang):
 @patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info())
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_approved__get_context__access_code(email_reservation):
+def test_reservation_confirmed__get_context__access_code(email_reservation):
     expected = {
         **LANGUAGE_CONTEXT["en"],
         **KEYLESS_ENTRY_ACCESS_CODE_IS_USED_CONTEXT,
@@ -154,7 +154,7 @@ def test_reservation_approved__get_context__access_code(email_reservation):
             reservation_id=email_reservation.id,
             language="en",
         )
-        context = get_context_for_reservation_approved(**params)
+        context = get_context_for_reservation_confirmed(**params)
 
     assert context == expected
 
@@ -162,7 +162,7 @@ def test_reservation_approved__get_context__access_code(email_reservation):
 @patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info(access_code_is_active=False))
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_approved__get_context__access_code__inactive(email_reservation):
+def test_reservation_confirmed__get_context__access_code__inactive(email_reservation):
     expected = {
         **LANGUAGE_CONTEXT["en"],
         **KEYLESS_ENTRY_ACCESS_CODE_NOT_USED_CONTEXT,
@@ -175,14 +175,14 @@ def test_reservation_approved__get_context__access_code__inactive(email_reservat
             reservation_id=email_reservation.id,
             language="en",
         )
-        context = get_context_for_reservation_approved(**params)
+        context = get_context_for_reservation_confirmed(**params)
 
     assert context == expected
 
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_approved__get_context__instance(email_reservation):
+def test_reservation_confirmed__get_context__instance(email_reservation):
     instructions_html = '<p>[HYVÄKSYTYN VARAUKSEN OHJEET] <a href="https://foo.bar" rel="">LINK</a></p>'
     instructions_text = "[HYVÄKSYTYN VARAUKSEN OHJEET] LINK <https://foo.bar>"
 
@@ -197,7 +197,7 @@ def test_reservation_approved__get_context__instance(email_reservation):
     }
 
     with TranslationsFromPOFiles():
-        context = get_context_for_reservation_approved(reservation=email_reservation, language="en")
+        context = get_context_for_reservation_confirmed(reservation=email_reservation, language="en")
 
     assert context == expected
 
@@ -205,7 +205,7 @@ def test_reservation_approved__get_context__instance(email_reservation):
 @patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info())
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_approved__get_context__instance__access_code(email_reservation):
+def test_reservation_confirmed__get_context__instance__access_code(email_reservation):
     email_reservation.access_type = AccessType.ACCESS_CODE
     email_reservation.save()
 
@@ -216,7 +216,7 @@ def test_reservation_approved__get_context__instance__access_code(email_reservat
     }
 
     with TranslationsFromPOFiles():
-        context = get_context_for_reservation_approved(reservation=email_reservation, language="en")
+        context = get_context_for_reservation_confirmed(reservation=email_reservation, language="en")
 
     assert context == expected
 
@@ -224,7 +224,7 @@ def test_reservation_approved__get_context__instance__access_code(email_reservat
 @patch_method(PindoraService.get_access_code, return_value=pindora_reservation_info(access_code_is_active=False))
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_approved__get_context__instance__access_code__inactive(email_reservation):
+def test_reservation_confirmed__get_context__instance__access_code__inactive(email_reservation):
     email_reservation.access_type = AccessType.ACCESS_CODE
     email_reservation.save()
 
@@ -236,7 +236,7 @@ def test_reservation_approved__get_context__instance__access_code__inactive(emai
     }
 
     with TranslationsFromPOFiles():
-        context = get_context_for_reservation_approved(reservation=email_reservation, language="en")
+        context = get_context_for_reservation_confirmed(reservation=email_reservation, language="en")
 
     assert context == expected
 
@@ -245,12 +245,12 @@ def test_reservation_approved__get_context__instance__access_code__inactive(emai
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_approved__render__text():
+def test_reservation_confirmed__render__text():
     context = get_mock_data(
-        email_type=EmailType.RESERVATION_APPROVED,
+        email_type=EmailType.RESERVATION_CONFIRMED,
         language="en",
     )
-    text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
+    text_content = render_text(email_type=EmailType.RESERVATION_CONFIRMED, context=context)
 
     assert text_content == cleandoc(
         f"""
@@ -280,14 +280,14 @@ def test_reservation_approved__render__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_approved__render__text__discount():
+def test_reservation_confirmed__render__text__discount():
     context = get_mock_data(
-        email_type=EmailType.RESERVATION_APPROVED,
+        email_type=EmailType.RESERVATION_CONFIRMED,
         language="en",
         price=Decimal("12.30"),
         non_subsidised_price=Decimal("15.30"),
     )
-    text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
+    text_content = render_text(email_type=EmailType.RESERVATION_CONFIRMED, context=context)
 
     assert text_content == cleandoc(
         f"""
@@ -317,13 +317,13 @@ def test_reservation_approved__render__text__discount():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_approved__render__text__access_code():
+def test_reservation_confirmed__render__text__access_code():
     context = get_mock_data(
-        email_type=EmailType.RESERVATION_APPROVED,
+        email_type=EmailType.RESERVATION_CONFIRMED,
         language="en",
         access_code_is_used=True,
     )
-    text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
+    text_content = render_text(email_type=EmailType.RESERVATION_CONFIRMED, context=context)
 
     assert text_content == cleandoc(
         f"""
@@ -357,15 +357,15 @@ def test_reservation_approved__render__text__access_code():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_approved__render__text__access_code_error():
+def test_reservation_confirmed__render__text__access_code_error():
     context = get_mock_data(
-        email_type=EmailType.RESERVATION_APPROVED,
+        email_type=EmailType.RESERVATION_CONFIRMED,
         language="en",
         access_code_is_used=True,
         access_code="",
         access_code_validity_period="",
     )
-    text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
+    text_content = render_text(email_type=EmailType.RESERVATION_CONFIRMED, context=context)
 
     access_code_error = (
         "You can see the door code on the 'My bookings' (https://fake.varaamo.hel.fi/en/reservations) page at Varaamo. "
@@ -406,14 +406,14 @@ def test_reservation_approved__render__text__access_code_error():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_approved__render__html():
+def test_reservation_confirmed__render__html():
     context = get_mock_data(
-        email_type=EmailType.RESERVATION_APPROVED,
+        email_type=EmailType.RESERVATION_CONFIRMED,
         language="en",
         price=Decimal("12.30"),
         non_subsidised_price=Decimal("12.30"),
     )
-    html_content = render_html(email_type=EmailType.RESERVATION_APPROVED, context=context)
+    html_content = render_html(email_type=EmailType.RESERVATION_CONFIRMED, context=context)
     text_content = html_email_to_text(html_content)
 
     assert text_content == cleandoc(
@@ -444,14 +444,14 @@ def test_reservation_approved__render__html():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_approved__render__html__discount():
+def test_reservation_confirmed__render__html__discount():
     context = get_mock_data(
-        email_type=EmailType.RESERVATION_APPROVED,
+        email_type=EmailType.RESERVATION_CONFIRMED,
         language="en",
         price=Decimal("12.30"),
         non_subsidised_price=Decimal("15.30"),
     )
-    html_content = render_html(email_type=EmailType.RESERVATION_APPROVED, context=context)
+    html_content = render_html(email_type=EmailType.RESERVATION_CONFIRMED, context=context)
     text_content = html_email_to_text(html_content)
 
     assert text_content == cleandoc(
@@ -482,13 +482,13 @@ def test_reservation_approved__render__html__discount():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_approved__render__html__access_code():
+def test_reservation_confirmed__render__html__access_code():
     context = get_mock_data(
-        email_type=EmailType.RESERVATION_APPROVED,
+        email_type=EmailType.RESERVATION_CONFIRMED,
         language="en",
         access_code_is_used=True,
     )
-    html_content = render_html(email_type=EmailType.RESERVATION_APPROVED, context=context)
+    html_content = render_html(email_type=EmailType.RESERVATION_CONFIRMED, context=context)
     text_content = html_email_to_text(html_content)
 
     assert text_content == cleandoc(
@@ -522,15 +522,15 @@ def test_reservation_approved__render__html__access_code():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_approved__render__html__access_code_error():
+def test_reservation_confirmed__render__html__access_code_error():
     context = get_mock_data(
-        email_type=EmailType.RESERVATION_APPROVED,
+        email_type=EmailType.RESERVATION_CONFIRMED,
         language="en",
         access_code_is_used=True,
         access_code="",
         access_code_validity_period="",
     )
-    html_content = render_html(email_type=EmailType.RESERVATION_APPROVED, context=context)
+    html_content = render_html(email_type=EmailType.RESERVATION_CONFIRMED, context=context)
     text_content = html_email_to_text(html_content)
 
     access_code_text = (
@@ -573,7 +573,7 @@ def test_reservation_approved__render__html__access_code_error():
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_approved__send_email(outbox):
+def test_reservation_confirmed__send_email(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="reservee@email.com",
@@ -583,7 +583,7 @@ def test_reservation_approved__send_email(outbox):
         ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
-    EmailService.send_reservation_approved_email(reservation)
+    EmailService.send_reservation_confirmed_email(reservation)
 
     assert len(outbox) == 1
 
@@ -597,7 +597,7 @@ def test_reservation_approved__send_email(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_approved__send_email__wrong_state(outbox):
+def test_reservation_confirmed__send_email__wrong_state(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CANCELLED,
         reservee_email="reservee@email.com",
@@ -607,7 +607,7 @@ def test_reservation_approved__send_email__wrong_state(outbox):
         ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
-    EmailService.send_reservation_approved_email(reservation)
+    EmailService.send_reservation_confirmed_email(reservation)
 
     assert len(outbox) == 0
 
@@ -616,7 +616,7 @@ def test_reservation_approved__send_email__wrong_state(outbox):
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(SentryLogger.log_message)
-def test_reservation_approved__send_email__no_recipients(outbox):
+def test_reservation_confirmed__send_email__no_recipients(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="",
@@ -626,18 +626,18 @@ def test_reservation_approved__send_email__no_recipients(outbox):
         ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
-    EmailService.send_reservation_approved_email(reservation)
+    EmailService.send_reservation_confirmed_email(reservation)
 
     assert len(outbox) == 0
 
     assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'reservation approved' email"
+    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'Reservation confirmed' email"
 
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-02")
-def test_reservation_approved__send_email__reservation_in_the_past(outbox):
+def test_reservation_confirmed__send_email__reservation_in_the_past(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="reservee@email.com",
@@ -647,6 +647,6 @@ def test_reservation_approved__send_email__reservation_in_the_past(outbox):
         ends_at=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
-    EmailService.send_reservation_approved_email(reservation)
+    EmailService.send_reservation_confirmed_email(reservation)
 
     assert len(outbox) == 0

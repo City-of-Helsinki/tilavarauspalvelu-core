@@ -12,8 +12,8 @@ from .rendering import render_html, render_text
 from .template_context import (
     get_context_for_reservation_access_code_changed,
     get_context_for_reservation_access_type_changed,
-    get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
+    get_context_for_reservation_confirmed,
     get_context_for_reservation_created,
     get_context_for_reservation_created_staff_notification,
     get_context_for_reservation_denied,
@@ -53,8 +53,8 @@ __all__ = [
     "EmailType",
     "ReservationAccessCodeChangedContext",
     "ReservationAccessTypeChangedContext",
-    "ReservationApprovedContext",
     "ReservationCancelledContext",
+    "ReservationConfirmedContext",
     "ReservationCreatedContext",
     "ReservationCreatedStaffNotificationContext",
     "ReservationDeniedContext",
@@ -145,7 +145,22 @@ class ReservationAccessCodeChangedContext(TypedDict, total=False):
     access_code_validity_period: str
 
 
-class ReservationApprovedContext(TypedDict, total=False):
+class ReservationCancelledContext(TypedDict, total=False):
+    email_recipient_name: str
+    cancel_reason: str
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+    price: Decimal
+    tax_percentage: Decimal
+    reservation_id: int
+    instructions_cancelled: str
+    handled_payment_due_by: datetime.datetime | None
+
+
+class ReservationConfirmedContext(TypedDict, total=False):
     email_recipient_name: str
     reservation_unit_name: str
     unit_name: str
@@ -160,21 +175,6 @@ class ReservationApprovedContext(TypedDict, total=False):
     access_code_is_used: bool
     access_code: str
     access_code_validity_period: str
-
-
-class ReservationCancelledContext(TypedDict, total=False):
-    email_recipient_name: str
-    cancel_reason: str
-    reservation_unit_name: str
-    unit_name: str
-    unit_location: str
-    begin_datetime: datetime.datetime
-    end_datetime: datetime.datetime
-    price: Decimal
-    tax_percentage: Decimal
-    reservation_id: int
-    instructions_cancelled: str
-    handled_payment_due_by: datetime.datetime | None
 
 
 class ReservationCreatedContext(TypedDict, total=False):
@@ -428,15 +428,15 @@ class EmailType(_EmailTypeOptions):
         get_email_context=get_context_for_reservation_access_type_changed,
         context_variables=list(ReservationAccessTypeChangedContext.__annotations__),
     )
-    RESERVATION_APPROVED = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Reservation approved"),
-        get_email_context=get_context_for_reservation_approved,
-        context_variables=list(ReservationApprovedContext.__annotations__),
-    )
     RESERVATION_CANCELLED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation cancelled"),
         get_email_context=get_context_for_reservation_cancelled,
         context_variables=list(ReservationCancelledContext.__annotations__),
+    )
+    RESERVATION_CONFIRMED = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Reservation confirmed"),
+        get_email_context=get_context_for_reservation_confirmed,
+        context_variables=list(ReservationConfirmedContext.__annotations__),
     )
     RESERVATION_CREATED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation created"),

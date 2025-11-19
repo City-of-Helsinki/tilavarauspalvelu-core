@@ -135,7 +135,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
         if settings.PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED and instance.is_handled_paid:
             EmailService.send_reservation_requires_payment_email(reservation=instance)
         else:
-            EmailService.send_reservation_approved_email(reservation=instance)
+            EmailService.send_reservation_confirmed_email(reservation=instance)
 
         EmailService.send_reservation_created_staff_notification_email(reservation=instance)
 
