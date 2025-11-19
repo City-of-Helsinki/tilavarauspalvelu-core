@@ -3505,7 +3505,7 @@ msgstr "Kausivarauksen ovikoodi vaihtunut"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation access type changed"
+msgid "Seasonal reservation access type is changing"
 msgstr "Kausivarauksen kulkutapa on muuttunut"
 
 #: tilavarauspalvelu/integrations/email/typing.py

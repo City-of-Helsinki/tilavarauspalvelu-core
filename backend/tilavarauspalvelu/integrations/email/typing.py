@@ -482,7 +482,7 @@ class EmailType(_EmailTypeOptions):
         context_variables=list(SeasonalBookingAccessCodeChangedContext.__annotations__),
     )
     SEASONAL_BOOKING_ACCESS_TYPE_CHANGED = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Seasonal reservation access type changed"),
+        label=pgettext_lazy("EmailType", "Seasonal reservation access type is changing"),
         get_email_context=get_context_for_seasonal_booking_access_type_changed,
         context_variables=list(SeasonalBookingAccessTypeChangedContext.__annotations__),
     )
