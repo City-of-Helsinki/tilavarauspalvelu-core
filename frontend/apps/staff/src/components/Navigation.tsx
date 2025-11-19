@@ -29,17 +29,13 @@ type Props = {
 
 const BackgroundHeader = styled(Header)`
   && {
-    --header-color: black;
     --actionbar-background-color: var(--color-bus-dark);
     --notification-bubble-background-color: var(--tilavaraus-admin-handling-count-color);
+    --action-bar-item-title-font-color: white;
 
-    [class^="HeaderActionBarItem-module_container"] {
-      > button span {
-        color: white !important;
-        svg {
-          color: white;
-        }
-      }
+    [class^="HeaderActionBarItem-module_dropdown"],
+    #hds-mobile-menu {
+      --action-bar-item-title-font-color: black;
     }
 
     /* retain text-decoration: underline on the plain text in navigation items, but disable it in the notificationBubble */
@@ -55,30 +51,8 @@ const BackgroundHeader = styled(Header)`
         }
       }
     }
-    #user-menu-dropdown {
-      color: black;
-      button,
-      span,
-      div {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-      }
-      svg {
-        color: var(--header-color);
-      }
-    }
-    #user-menu {
-      > button span {
-        color: white !important;
-        svg {
-          color: white;
-        }
-      }
-    }
     #hds-mobile-menu {
       #user-menu * {
-        color: var(--header-color) !important;
         box-sizing: border-box;
         button {
           padding-inline: var(--spacing-s);
@@ -107,12 +81,7 @@ const BackgroundHeader = styled(Header)`
 `;
 
 const ActionBar = styled(Header.ActionBar)`
-  [class*="HeaderActionBar-module_title"] {
-    color: white;
-  }
-  [class*="icon_hds-icon"] {
-    color: white;
-  }
+  --header-color: white;
 `;
 
 const NavigationMenuWrapper = styled.div`
@@ -269,9 +238,6 @@ export function Navigation({ apiBaseUrl }: Props) {
   const lastName = user?.lastName?.trim() ?? "";
   const name = `${firstName} ${lastName}`.trim() || t("navigation:noName");
   const { handlingCount, hasOwnUnits } = useHandling();
-  if (!user) {
-    return null;
-  }
 
   const hasPerms = (perm: UserPermissionChoice, onlyGeneral?: boolean) => {
     return hasSomePermission(user, perm, onlyGeneral);
@@ -327,21 +293,23 @@ export function Navigation({ apiBaseUrl }: Props) {
           />
         )}
       </ActionBar>
-      <NavigationMenuWrapper>
-        <Header.NavigationMenu>
-          {menuItemList.map((item) => (
-            // FIXME: Warning: validateDOMNesting(...): <li> cannot appear as a descendant of <li>
-            <NavigationLink
-              key={item.routes && item.routes[0]}
-              title={item.title}
-              routes={item.routes ?? []}
-              exact={item.exact}
-              exclude={item.excludeRoutes}
-              count={handlingCount}
-            />
-          ))}
-        </Header.NavigationMenu>
-      </NavigationMenuWrapper>
+      {menuItemList.length > 0 && (
+        <NavigationMenuWrapper>
+          <Header.NavigationMenu>
+            {menuItemList.map((item) => (
+              // FIXME: Warning: validateDOMNesting(...): <li> cannot appear as a descendant of <li>
+              <NavigationLink
+                key={item.routes && item.routes[0]}
+                title={item.title}
+                routes={item.routes ?? []}
+                exact={item.exact}
+                exclude={item.excludeRoutes}
+                count={handlingCount}
+              />
+            ))}
+          </Header.NavigationMenu>
+        </NavigationMenuWrapper>
+      )}
     </BackgroundHeader>
   );
 }
