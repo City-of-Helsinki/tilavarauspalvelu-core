@@ -4,8 +4,6 @@ export type LocalizationLanguages = "fi" | "sv" | "en";
 /// Returns url for graphql endpoint
 /// @param apiUrl - base url for api (hostname typically)
 /// @returns url for graphql endpoint
-/// only needed on server side, only needed on localhost
-/// this will not work with authentication so remove if adding session cookies to SSR requests
 export function buildGraphQLUrl(apiUrl: string) {
   return `${apiUrl}${apiUrl.endsWith("/") ? "" : "/"}graphql/`;
 }

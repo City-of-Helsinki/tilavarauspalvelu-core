@@ -6,70 +6,16 @@
 // that libraries are not imported in the middleware.
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { isPageRequest, redirectCsrfToken } from "ui/src/middlewareHelpers";
+import { gqlQueryFetch, isPageRequest, redirectCsrfToken } from "ui/src/middlewareHelpers";
+import type { GqlQuery } from "ui/src/middlewareHelpers";
 import { createNodeId, getLocalizationLang } from "ui/src/modules/helpers";
-import { buildGraphQLUrl, getSignInUrl } from "ui/src/modules/urlBuilder";
+import { getSignInUrl } from "ui/src/modules/urlBuilder";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { env } from "@/env.mjs";
 import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import { getReservationInProgressPath } from "./modules/urls";
 
 const API_BASE_URL = env.TILAVARAUS_API_URL ?? "";
-
-type QqlQuery = {
-  query: string;
-  // TODO don't type to unknown (undefined and Date break JSON.stringify)
-  variables: Record<string, unknown>;
-};
-
-/// Fetch a query from the backend
-/// @param req - NextRequest used to copy headers etc.
-/// @param query - Query object with query and variables
-/// @returns Promise<Response>
-/// custom function so we don't have to import apollo client in middleware
-function gqlQueryFetch(req: NextRequest, query: QqlQuery) {
-  const { cookies, headers } = req;
-  // TODO this is copy to the createApolloClient function but different header types
-  // NextRequest vs. RequestInit
-  const newHeaders = new Headers({
-    ...headers,
-    "Content-Type": "application/json",
-  });
-
-  const sessionid = cookies.get("sessionid");
-  const csrfToken = cookies.get("csrftoken");
-
-  if (csrfToken == null) {
-    return new Response("missing csrf token", {
-      status: 400,
-      statusText: "Bad Request",
-    });
-  }
-
-  newHeaders.append("X-Csrftoken", csrfToken.value);
-  newHeaders.append("Cookie", `csrftoken=${csrfToken.value}`);
-  // queries can be made both with and without sessionid
-  if (sessionid != null) {
-    newHeaders.append("Cookie", `sessionid=${sessionid.value}`);
-  }
-
-  const proto = headers.get("x-forwarded-proto") ?? "http";
-  const hostname = headers.get("x-forwarded-host") ?? headers.get("host") ?? "";
-  const requestUrl = new URL(req.url).pathname;
-  const referer = `${proto}://${hostname}${requestUrl}`;
-  newHeaders.append("Referer", referer);
-  // Use of fetch requires a string body (vs. gql query object)
-  // the request returns either a valid user (e.g. pk) or null if user was not found
-  const body: string = JSON.stringify(query);
-
-  return fetch({
-    method: "POST",
-    url: buildGraphQLUrl(API_BASE_URL),
-    headers: newHeaders,
-    // @ts-expect-error -- something broken in node types, body can be a string
-    body,
-  });
-}
 
 type User = {
   pk: number;
@@ -120,15 +66,10 @@ async function fetchUserData(
   }
 ): Promise<Data | null> {
   const { cookies } = req;
-  const hasSession = cookies.has("sessionid");
-  if (!hasSession) {
-    return null;
-  }
 
   const sessionid = cookies.get("sessionid");
-  const csrfToken = cookies.get("csrftoken");
 
-  if (csrfToken == null || sessionid == null) {
+  if (sessionid == null) {
     return null;
   }
 
@@ -144,7 +85,7 @@ ${applicationId ? "$applicationId: ID!" : ""}
 )`
       : "";
 
-  const query: QqlQuery = {
+  const query: GqlQuery = {
     query: `
       query GetCurrentUser ${params} {
         currentUser {
@@ -158,7 +99,7 @@ ${applicationId ? "$applicationId: ID!" : ""}
       ...(applicationId != null ? { applicationId } : {}),
     },
   };
-  const res = await gqlQueryFetch(req, query);
+  const res = await gqlQueryFetch(req, query, API_BASE_URL);
 
   if (!res.ok) {
     const text = await res.text();
@@ -315,7 +256,7 @@ async function maybeSaveUserLanguage(req: NextRequest, user: User | null): Promi
       return;
     }
 
-    const query: QqlQuery = {
+    const query: GqlQuery = {
       query: `
         mutation SaveUserLanguage($preferredLanguage: Language!) {
           updateCurrentUser(
@@ -331,7 +272,7 @@ async function maybeSaveUserLanguage(req: NextRequest, user: User | null): Promi
       },
     };
 
-    const res = await gqlQueryFetch(req, query);
+    const res = await gqlQueryFetch(req, query, API_BASE_URL);
     if (res.ok) {
       return language;
     }
@@ -503,8 +444,8 @@ export async function middleware(req: NextRequest) {
   } catch {
     // NOTE all backend errors will return the 503 page
     // if the middleware request fails there is no way to recover
-    const redirectUrl = new URL(`${langPrefix}/503`, req.url);
-    return NextResponse.rewrite(redirectUrl);
+    const rewriteUrl = new URL(`${langPrefix}/503`, req.url);
+    return NextResponse.rewrite(rewriteUrl);
   }
 }
 
@@ -512,6 +453,6 @@ export const config = {
   /* i18n locale router and middleware have a bug in nextjs, matcher breaks the router
   matcher: undefined
   */
-  // TODO nodejs runtime doesn't work for some reason
+  // undici has some weird behaviour with URLs so nodejs runtime doesn't work
   // runtime: "nodejs",
 };
