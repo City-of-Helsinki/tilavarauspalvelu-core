@@ -3373,12 +3373,12 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation approved"
+msgid "Reservation cancelled"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation cancelled"
+msgid "Reservation confirmed"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py

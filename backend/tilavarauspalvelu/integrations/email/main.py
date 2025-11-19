@@ -116,38 +116,6 @@ class EmailService:
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
-    def send_reservation_approved_email(reservation: Reservation, *, language: Lang | None = None) -> None:
-        """Sends an email to the reservee when their reservation has been approved in handling."""
-        if reservation.state != ReservationStateChoice.CONFIRMED:
-            return
-
-        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
-            return
-
-        recipients = get_reservation_email_recipients(reservation=reservation)
-        if not recipients:
-            SentryLogger.log_message(
-                "No recipients for the 'reservation approved' email",
-                details={"reservation": reservation.pk},
-            )
-            return
-
-        if language is None:
-            language = get_reservation_email_language(reservation=reservation)
-
-        email_type = EmailType.RESERVATION_APPROVED
-        context = email_type.get_email_context(reservation, language=language)
-        attachment = get_reservation_ical_attachment(reservation)
-        email = EmailData.build(
-            recipients,
-            context,
-            email_type,
-            valid_until=reservation.ends_at,
-            attachment=attachment,
-        )
-        send_emails_in_batches_task.delay(email_data=email)
-
-    @staticmethod
     def send_reservation_cancelled_email(reservation: Reservation, *, language: Lang | None = None) -> None:
         """Sends an email to the reservee when they have cancelled their reservation."""
         if reservation.type == ReservationTypeChoice.SEASONAL:
@@ -174,6 +142,38 @@ class EmailService:
         email_type = EmailType.RESERVATION_CANCELLED
         context = email_type.get_email_context(reservation, language=language)
         email = EmailData.build(recipients, context, email_type, valid_until=reservation.ends_at)
+        send_emails_in_batches_task.delay(email_data=email)
+
+    @staticmethod
+    def send_reservation_confirmed_email(reservation: Reservation, *, language: Lang | None = None) -> None:
+        """Sends an email to the reservee when their reservation has been approved in handling."""
+        if reservation.state != ReservationStateChoice.CONFIRMED:
+            return
+
+        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+            return
+
+        recipients = get_reservation_email_recipients(reservation=reservation)
+        if not recipients:
+            SentryLogger.log_message(
+                "No recipients for the 'Reservation confirmed' email",
+                details={"reservation": reservation.pk},
+            )
+            return
+
+        if language is None:
+            language = get_reservation_email_language(reservation=reservation)
+
+        email_type = EmailType.RESERVATION_CONFIRMED
+        context = email_type.get_email_context(reservation, language=language)
+        attachment = get_reservation_ical_attachment(reservation)
+        email = EmailData.build(
+            recipients,
+            context,
+            email_type,
+            valid_until=reservation.ends_at,
+            attachment=attachment,
+        )
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
