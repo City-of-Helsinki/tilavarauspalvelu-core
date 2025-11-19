@@ -55,7 +55,7 @@ def email_tester_admin_redirect_view(request: WSGIRequest, email_type: str | Non
     return HttpResponseRedirect(
         reverse(
             "admin:email_tester",
-            kwargs={"email_type": email_type or EmailType.RESERVATION_CONFIRMED.value},
+            kwargs={"email_type": email_type or EmailType.RESERVATION_CREATED.value},
             current_app=admin_data_settings.NAME,
         )
     )

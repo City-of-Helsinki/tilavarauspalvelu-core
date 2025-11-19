@@ -23,7 +23,7 @@ pytestmark = [
 
 
 @patch_method(EmailService.send_reservation_approved_email)
-@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
 def test_reservation__approve__free(graphql):
     reservation_unit = ReservationUnitFactory.create_free()
 
@@ -42,11 +42,11 @@ def test_reservation__approve__free(graphql):
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
     assert EmailService.send_reservation_approved_email.called is True
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
+    assert EmailService.send_reservation_created_staff_notification_email.called is True
 
 
 @patch_method(EmailService.send_reservation_approved_email)
-@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
 def test_reservation__approve__paid__on_site(graphql):
     reservation_unit = ReservationUnitFactory.create_paid_on_site()
 
@@ -66,11 +66,11 @@ def test_reservation__approve__paid__on_site(graphql):
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
     assert EmailService.send_reservation_approved_email.called is True
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
+    assert EmailService.send_reservation_created_staff_notification_email.called is True
 
 
 @patch_method(EmailService.send_reservation_requires_payment_email)
-@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_reservation__approve__paid__in_webshop(graphql):
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
@@ -90,7 +90,7 @@ def test_reservation__approve__paid__in_webshop(graphql):
     assert response.has_errors is False, response.errors
 
     assert EmailService.send_reservation_requires_payment_email.called is True
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
+    assert EmailService.send_reservation_created_staff_notification_email.called is True
 
     reservation.refresh_from_db()
 
@@ -153,7 +153,7 @@ def test_reservation__approve__paid__in_webshop__close_to_begin_date(graphql):
 
 
 @patch_method(EmailService.send_reservation_approved_email)
-@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_reservation__approve__paid__in_webshop__paid_on_site_since_begin_too_close(graphql):
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
@@ -170,7 +170,7 @@ def test_reservation__approve__paid__in_webshop__paid_on_site_since_begin_too_cl
     response = graphql(APPROVE_MUTATION, input_data=data)
 
     assert EmailService.send_reservation_approved_email.called is True
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
+    assert EmailService.send_reservation_created_staff_notification_email.called is True
 
     assert response.has_errors is False, response.errors
 

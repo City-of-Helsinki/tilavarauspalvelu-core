@@ -32,8 +32,8 @@ if TYPE_CHECKING:
         ReservationAccessTypeChangedContext,
         ReservationApprovedContext,
         ReservationCancelledContext,
-        ReservationConfirmedContext,
-        ReservationConfirmedStaffNotificationContext,
+        ReservationCreatedContext,
+        ReservationCreatedStaffNotificationContext,
         ReservationDeniedContext,
         ReservationRequiresHandlingContext,
         ReservationRequiresHandlingStaffNotificationContext,
@@ -49,8 +49,8 @@ __all__ = [
     "get_context_for_reservation_access_type_changed",
     "get_context_for_reservation_approved",
     "get_context_for_reservation_cancelled",
-    "get_context_for_reservation_confirmed",
-    "get_context_for_reservation_confirmed_staff_notification",
+    "get_context_for_reservation_created",
+    "get_context_for_reservation_created_staff_notification",
     "get_context_for_reservation_denied",
     "get_context_for_reservation_requires_handling",
     "get_context_for_reservation_requires_handling_staff_notification",
@@ -242,12 +242,12 @@ def get_context_for_reservation_cancelled(
 
 
 @get_translated
-def get_context_for_reservation_confirmed(
+def get_context_for_reservation_created(
     reservation: Reservation | None = None,
     *,
     language: Lang,
-    **data: Unpack[ReservationConfirmedContext],
-) -> Annotated[EmailContext, EmailType.RESERVATION_CONFIRMED]:
+    **data: Unpack[ReservationCreatedContext],
+) -> Annotated[EmailContext, EmailType.RESERVATION_CREATED]:
     if reservation is not None:
         data["email_recipient_name"] = reservation.actions.get_email_reservee_name()
         data["instructions_confirmed"] = reservation.actions.get_instructions(kind="confirmed", language=language)
@@ -258,7 +258,7 @@ def get_context_for_reservation_confirmed(
 
     return {
         "title": pgettext("Email", "Thank you for your booking at Varaamo"),
-        "text_reservation_confirmed": pgettext("Email", "You have made a new booking"),
+        "text_reservation_created": pgettext("Email", "You have made a new booking"),
         "instructions_confirmed_html": data["instructions_confirmed"],
         "instructions_confirmed_text": convert_html_to_text(data["instructions_confirmed"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
@@ -285,12 +285,12 @@ def get_context_for_reservation_confirmed(
 
 
 @get_translated
-def get_context_for_reservation_confirmed_staff_notification(
+def get_context_for_reservation_created_staff_notification(
     reservation: Reservation | None = None,
     *,
     language: Lang,
-    **data: Unpack[ReservationConfirmedStaffNotificationContext],
-) -> Annotated[EmailContext, EmailType.RESERVATION_CONFIRMED_STAFF_NOTIFICATION]:
+    **data: Unpack[ReservationCreatedStaffNotificationContext],
+) -> Annotated[EmailContext, EmailType.RESERVATION_CREATED_STAFF_NOTIFICATION]:
     if reservation is not None:
         data["reservee_name"] = reservation.actions.get_email_reservee_name()
         data["reservation_name"] = reservation.name

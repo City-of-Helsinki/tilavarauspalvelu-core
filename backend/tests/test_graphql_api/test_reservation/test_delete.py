@@ -152,7 +152,7 @@ def test_reservation__delete__confirmed__cannot_delete_when_status_not_created_n
 
 @patch_method(VerkkokauppaAPIClient.get_payment, PaymentFactory.create(status=WebShopPaymentStatus.PAID_ONLINE.value))
 @patch_method(VerkkokauppaAPIClient.cancel_order)
-@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_reservation_created_email)
 def test_reservation__delete__reservation_is_in_draft_state_but_paid_in_verkkokauppa(graphql):
     reservation = ReservationFactory.create_for_delete(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
     payment_order = PaymentOrderFactory.create(
@@ -174,7 +174,7 @@ def test_reservation__delete__reservation_is_in_draft_state_but_paid_in_verkkoka
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PAID
 
-    assert EmailService.send_reservation_confirmed_email.called is True
+    assert EmailService.send_reservation_created_email.called is True
 
 
 @override_settings(MOCK_VERKKOKAUPPA_API_ENABLED=True)

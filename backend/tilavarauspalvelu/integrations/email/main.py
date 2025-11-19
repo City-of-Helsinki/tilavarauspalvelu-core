@@ -177,7 +177,7 @@ class EmailService:
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
-    def send_reservation_confirmed_email(reservation: Reservation, *, language: Lang | None = None) -> None:
+    def send_reservation_created_email(reservation: Reservation, *, language: Lang | None = None) -> None:
         """Sends an email to the reservee when their reservation has been confirmed after checkout or payment."""
         if reservation.state != ReservationStateChoice.CONFIRMED:
             return
@@ -193,7 +193,7 @@ class EmailService:
         if language is None:
             language = get_reservation_email_language(reservation=reservation)
 
-        email_type = EmailType.RESERVATION_CONFIRMED
+        email_type = EmailType.RESERVATION_CREATED
         context = email_type.get_email_context(reservation, language=language)
         attachment = get_reservation_ical_attachment(reservation)
         email = EmailData.build(
@@ -206,7 +206,7 @@ class EmailService:
         send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
-    def send_reservation_confirmed_staff_notification_email(reservation: Reservation) -> None:
+    def send_reservation_created_staff_notification_email(reservation: Reservation) -> None:
         """
         Sends an email to staff when a new reservation has been made
         in a reservation unit they are responsible for.
@@ -217,13 +217,13 @@ class EmailService:
         recipients_by_language = get_reservation_staff_notification_recipients_by_language(reservation)
         if not recipients_by_language:
             SentryLogger.log_message(
-                "No recipients for the 'reservation confirmed staff notification' email",
+                "No recipients for the 'Reservation created staff notification' email",
                 details={"reservation": reservation.pk},
             )
             return
 
         emails: list[EmailData] = []
-        email_type = EmailType.RESERVATION_CONFIRMED_STAFF_NOTIFICATION
+        email_type = EmailType.RESERVATION_CREATED_STAFF_NOTIFICATION
 
         for language, recipients in recipients_by_language.items():
             context = email_type.get_email_context(reservation, language=language)

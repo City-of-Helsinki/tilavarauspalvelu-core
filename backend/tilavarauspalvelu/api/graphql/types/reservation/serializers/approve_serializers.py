@@ -137,7 +137,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
         else:
             EmailService.send_reservation_approved_email(reservation=instance)
 
-        EmailService.send_reservation_confirmed_staff_notification_email(reservation=instance)
+        EmailService.send_reservation_created_staff_notification_email(reservation=instance)
 
         return instance
 
