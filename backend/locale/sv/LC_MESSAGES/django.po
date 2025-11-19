@@ -3423,7 +3423,7 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Seasonal reservation access type changed"
+msgid "Seasonal reservation access type is changing"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
