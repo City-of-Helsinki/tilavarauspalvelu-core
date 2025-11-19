@@ -3465,12 +3465,12 @@ msgstr "Varaus peruttu"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation confirmed"
+msgid "Reservation created"
 msgstr "Varaus vahvistettu"
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation confirmed staff notification"
+msgid "Reservation created staff notification"
 msgstr "Varaus vahvistettu käsittelijän ilmoitus"
 
 #: tilavarauspalvelu/integrations/email/typing.py

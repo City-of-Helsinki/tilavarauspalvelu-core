@@ -1,6 +1,6 @@
 {{ salutation | safe }} {{ email_recipient_name | safe }},
 
-{{ text_reservation_confirmed | sentence | safe }}{% if access_code_is_used and access_code %} {{ text_access_code_confirmed | sentence | safe }}{% endif %}
+{{ text_reservation_created | sentence | safe }}{% if access_code_is_used and access_code %} {{ text_access_code_confirmed | sentence | safe }}{% endif %}
 
 {% include "email/text/partials/reservation_basic_info.jinja" %}
 

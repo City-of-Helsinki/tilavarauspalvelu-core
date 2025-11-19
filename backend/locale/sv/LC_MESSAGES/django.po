@@ -3383,12 +3383,12 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation confirmed"
+msgid "Reservation created"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py
 msgctxt "EmailType"
-msgid "Reservation confirmed staff notification"
+msgid "Reservation created staff notification"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/typing.py

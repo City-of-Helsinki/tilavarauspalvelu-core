@@ -1,4 +1,4 @@
-# type: EmailType.RESERVATION_CONFIRMED_STAFF_NOTIFICATION
+# type: EmailType.RESERVATION_CREATED_STAFF_NOTIFICATION
 
 from __future__ import annotations
 
@@ -13,9 +13,7 @@ from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock
 from tilavarauspalvelu.enums import ReservationNotification, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-from tilavarauspalvelu.integrations.email.template_context import (
-    get_context_for_reservation_confirmed_staff_notification,
-)
+from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_created_staff_notification
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
@@ -77,29 +75,29 @@ LANGUAGE_CONTEXT = {
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_reservation_confirmed_staff_notification__get_context(lang: Lang):
+def test_reservation_created_staff_notification__get_context(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
-        context = get_context_for_reservation_confirmed_staff_notification(**get_mock_params(language=lang))
+        context = get_context_for_reservation_created_staff_notification(**get_mock_params(language=lang))
 
     assert context == expected
 
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_reservation_confirmed_staff_notification__get_context__get_mock_data(lang: Lang):
+def test_reservation_created_staff_notification__get_context__get_mock_data(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
-        mock_context = get_mock_data(email_type=EmailType.RESERVATION_CONFIRMED_STAFF_NOTIFICATION, language=lang)
+        mock_context = get_mock_data(email_type=EmailType.RESERVATION_CREATED_STAFF_NOTIFICATION, language=lang)
 
     assert mock_context == expected
 
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_confirmed_staff_notification__get_context__instance(email_reservation):
+def test_reservation_created_staff_notification__get_context__instance(email_reservation):
     expected = {
         **LANGUAGE_CONTEXT["en"],
         "staff_reservations_ext_link": f"https://fake.varaamo.hel.fi/kasittely/reservations/{email_reservation.id}",
@@ -112,7 +110,7 @@ def test_reservation_confirmed_staff_notification__get_context__instance(email_r
     }
 
     with TranslationsFromPOFiles():
-        context = get_context_for_reservation_confirmed_staff_notification(reservation=email_reservation, language="en")
+        context = get_context_for_reservation_created_staff_notification(reservation=email_reservation, language="en")
 
     assert context == expected
 
@@ -121,9 +119,9 @@ def test_reservation_confirmed_staff_notification__get_context__instance(email_r
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_reservation_confirmed_staff_notification__render__text():
-    context = get_mock_data(email_type=EmailType.RESERVATION_CONFIRMED_STAFF_NOTIFICATION, language="en")
-    text_content = render_text(email_type=EmailType.RESERVATION_CONFIRMED_STAFF_NOTIFICATION, context=context)
+def test_reservation_reservation_created_staff_notification__render__text():
+    context = get_mock_data(email_type=EmailType.RESERVATION_CREATED_STAFF_NOTIFICATION, language="en")
+    text_content = render_text(email_type=EmailType.RESERVATION_CREATED_STAFF_NOTIFICATION, context=context)
 
     assert text_content == cleandoc(
         """
@@ -156,9 +154,9 @@ def test_reservation_reservation_confirmed_staff_notification__render__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_reservation_confirmed_staff_notification__render__html():
-    context = get_mock_data(email_type=EmailType.RESERVATION_CONFIRMED_STAFF_NOTIFICATION, language="en")
-    html_content = render_html(email_type=EmailType.RESERVATION_CONFIRMED_STAFF_NOTIFICATION, context=context)
+def test_reservation_reservation_created_staff_notification__render__html():
+    context = get_mock_data(email_type=EmailType.RESERVATION_CREATED_STAFF_NOTIFICATION, language="en")
+    html_content = render_html(email_type=EmailType.RESERVATION_CREATED_STAFF_NOTIFICATION, context=context)
     text_content = html_email_to_text(html_content)
 
     assert text_content == cleandoc(
@@ -197,7 +195,7 @@ def test_reservation_reservation_confirmed_staff_notification__render__html():
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_reservation_confirmed_staff_notification__send_email(outbox):
+def test_reservation_created_staff_notification__send_email(outbox):
     unit = UnitFactory.create(name_en="foo")
 
     UserFactory.create_with_unit_role(
@@ -212,7 +210,7 @@ def test_reservation_confirmed_staff_notification__send_email(outbox):
         reservation_unit__unit=unit,
     )
 
-    EmailService.send_reservation_confirmed_staff_notification_email(reservation)
+    EmailService.send_reservation_created_staff_notification_email(reservation)
 
     assert len(outbox) == 1
 
@@ -223,7 +221,7 @@ def test_reservation_confirmed_staff_notification__send_email(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @patch_method(SentryLogger.log_message)
-def test_reservation_confirmed_staff_notification__send_email__no_recipients(outbox):
+def test_reservation_created_staff_notification__send_email__no_recipients(outbox):
     unit = UnitFactory.create(name="foo")
 
     reservation = ReservationFactory.create(
@@ -231,19 +229,19 @@ def test_reservation_confirmed_staff_notification__send_email__no_recipients(out
         reservation_unit__unit=unit,
     )
 
-    EmailService.send_reservation_confirmed_staff_notification_email(reservation)
+    EmailService.send_reservation_created_staff_notification_email(reservation)
 
     assert len(outbox) == 0
 
     assert SentryLogger.log_message.call_count == 1
     assert SentryLogger.log_message.call_args.args[0] == (
-        "No recipients for the 'reservation confirmed staff notification' email"
+        "No recipients for the 'Reservation created staff notification' email"
     )
 
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_reservation_confirmed_staff_notification__send_email__wrong_state(outbox):
+def test_reservation_created_staff_notification__send_email__wrong_state(outbox):
     unit = UnitFactory.create(name="foo")
 
     UserFactory.create_with_unit_role(
@@ -257,14 +255,14 @@ def test_reservation_confirmed_staff_notification__send_email__wrong_state(outbo
         reservation_unit__unit=unit,
     )
 
-    EmailService.send_reservation_confirmed_staff_notification_email(reservation)
+    EmailService.send_reservation_created_staff_notification_email(reservation)
 
     assert len(outbox) == 0
 
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_reservation_confirmed_staff_notification__send_email__multiple_recipients(outbox):
+def test_reservation_created_staff_notification__send_email__multiple_recipients(outbox):
     unit = UnitFactory.create(name="foo", name_en="foo")
 
     UserFactory.create_with_unit_role(
@@ -287,7 +285,7 @@ def test_reservation_confirmed_staff_notification__send_email__multiple_recipien
     )
 
     with TranslationsFromPOFiles():
-        EmailService.send_reservation_confirmed_staff_notification_email(reservation)
+        EmailService.send_reservation_created_staff_notification_email(reservation)
 
     assert len(outbox) == 2
 

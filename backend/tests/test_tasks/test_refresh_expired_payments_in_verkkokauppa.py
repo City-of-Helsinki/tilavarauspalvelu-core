@@ -98,8 +98,8 @@ def test_refresh_expired_payments_in_verkkokauppa__direct_payment__expired__not_
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(EmailService.send_reservation_confirmed_email)
-@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
+@patch_method(EmailService.send_reservation_created_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_refresh_expired_payments_in_verkkokauppa__direct_payment__paid(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
@@ -126,13 +126,13 @@ def test_refresh_expired_payments_in_verkkokauppa__direct_payment__paid(settings
 
     assert VerkkokauppaAPIClient.get_payment.called is True
 
-    assert EmailService.send_reservation_confirmed_email.called is True
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
+    assert EmailService.send_reservation_created_email.called is True
+    assert EmailService.send_reservation_created_staff_notification_email.called is True
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(EmailService.send_reservation_confirmed_email)
-@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
+@patch_method(EmailService.send_reservation_created_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_refresh_expired_payments_in_verkkokauppa__direct_payment__paid_with_invoice(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
@@ -160,13 +160,13 @@ def test_refresh_expired_payments_in_verkkokauppa__direct_payment__paid_with_inv
 
     assert VerkkokauppaAPIClient.get_payment.called is True
 
-    assert EmailService.send_reservation_confirmed_email.called is True
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
+    assert EmailService.send_reservation_created_email.called is True
+    assert EmailService.send_reservation_created_staff_notification_email.called is True
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(EmailService.send_reservation_confirmed_email)
-@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
+@patch_method(EmailService.send_reservation_created_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
 @patch_method(PindoraService.activate_access_code)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_refresh_expired_payments_in_verkkokauppa__direct_payment__paid__has_access_code(settings):
@@ -199,8 +199,8 @@ def test_refresh_expired_payments_in_verkkokauppa__direct_payment__paid__has_acc
 
     assert VerkkokauppaAPIClient.get_payment.called is True
 
-    assert EmailService.send_reservation_confirmed_email.called is True
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
+    assert EmailService.send_reservation_created_email.called is True
+    assert EmailService.send_reservation_created_staff_notification_email.called is True
     assert PindoraService.activate_access_code.called is True
 
 
@@ -407,8 +407,8 @@ def test_refresh_expired_payments_in_verkkokauppa__handled_payment__payment_expi
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(EmailService.send_reservation_confirmed_email)
-@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
+@patch_method(EmailService.send_reservation_created_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_refresh_expired_payments_in_verkkokauppa__handled_payment__paid(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
@@ -433,13 +433,13 @@ def test_refresh_expired_payments_in_verkkokauppa__handled_payment__paid(setting
 
     assert VerkkokauppaAPIClient.get_payment.called is True
 
-    assert EmailService.send_reservation_confirmed_email.called is False
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is False
+    assert EmailService.send_reservation_created_email.called is False
+    assert EmailService.send_reservation_created_staff_notification_email.called is False
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(EmailService.send_reservation_confirmed_email)
-@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
+@patch_method(EmailService.send_reservation_created_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_refresh_expired_payments_in_verkkokauppa__handled_payment__paid_with_invoice(settings):
     settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
@@ -465,13 +465,13 @@ def test_refresh_expired_payments_in_verkkokauppa__handled_payment__paid_with_in
 
     assert VerkkokauppaAPIClient.get_payment.called is True
 
-    assert EmailService.send_reservation_confirmed_email.called is False
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is False
+    assert EmailService.send_reservation_created_email.called is False
+    assert EmailService.send_reservation_created_staff_notification_email.called is False
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(EmailService.send_reservation_confirmed_email)
-@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
+@patch_method(EmailService.send_reservation_created_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
 @patch_method(PindoraService.activate_access_code)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_refresh_expired_payments_in_verkkokauppa__handled_payment__paid__has_access_code(settings):
@@ -502,14 +502,14 @@ def test_refresh_expired_payments_in_verkkokauppa__handled_payment__paid__has_ac
 
     assert VerkkokauppaAPIClient.get_payment.called is True
 
-    assert EmailService.send_reservation_confirmed_email.called is False
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is False
+    assert EmailService.send_reservation_created_email.called is False
+    assert EmailService.send_reservation_created_staff_notification_email.called is False
     assert PindoraService.activate_access_code.called is True
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(EmailService.send_reservation_confirmed_email)
-@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
+@patch_method(EmailService.send_reservation_created_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
 @patch_method(PindoraService.activate_access_code)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_refresh_expired_payments_in_verkkokauppa__handled_payment__paid__has_access_code__already_active(settings):
@@ -540,8 +540,8 @@ def test_refresh_expired_payments_in_verkkokauppa__handled_payment__paid__has_ac
 
     assert VerkkokauppaAPIClient.get_payment.called is True
 
-    assert EmailService.send_reservation_confirmed_email.called is False
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is False
+    assert EmailService.send_reservation_created_email.called is False
+    assert EmailService.send_reservation_created_staff_notification_email.called is False
     assert PindoraService.activate_access_code.called is False
 
 

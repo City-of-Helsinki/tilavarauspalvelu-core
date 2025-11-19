@@ -14,8 +14,8 @@ from .template_context import (
     get_context_for_reservation_access_type_changed,
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
-    get_context_for_reservation_confirmed,
-    get_context_for_reservation_confirmed_staff_notification,
+    get_context_for_reservation_created,
+    get_context_for_reservation_created_staff_notification,
     get_context_for_reservation_denied,
     get_context_for_reservation_requires_handling,
     get_context_for_reservation_requires_handling_staff_notification,
@@ -55,8 +55,8 @@ __all__ = [
     "ReservationAccessTypeChangedContext",
     "ReservationApprovedContext",
     "ReservationCancelledContext",
-    "ReservationConfirmedContext",
-    "ReservationConfirmedStaffNotificationContext",
+    "ReservationCreatedContext",
+    "ReservationCreatedStaffNotificationContext",
     "ReservationDeniedContext",
     "ReservationRequiresHandlingContext",
     "ReservationRequiresHandlingStaffNotificationContext",
@@ -177,7 +177,7 @@ class ReservationCancelledContext(TypedDict, total=False):
     handled_payment_due_by: datetime.datetime | None
 
 
-class ReservationConfirmedContext(TypedDict, total=False):
+class ReservationCreatedContext(TypedDict, total=False):
     email_recipient_name: str
     reservation_unit_name: str
     unit_name: str
@@ -193,7 +193,7 @@ class ReservationConfirmedContext(TypedDict, total=False):
     access_code_validity_period: str
 
 
-class ReservationConfirmedStaffNotificationContext(TypedDict, total=False):
+class ReservationCreatedStaffNotificationContext(TypedDict, total=False):
     reservee_name: str
     reservation_name: str
     reservation_unit_name: str
@@ -438,15 +438,15 @@ class EmailType(_EmailTypeOptions):
         get_email_context=get_context_for_reservation_cancelled,
         context_variables=list(ReservationCancelledContext.__annotations__),
     )
-    RESERVATION_CONFIRMED = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Reservation confirmed"),
-        get_email_context=get_context_for_reservation_confirmed,
-        context_variables=list(ReservationConfirmedContext.__annotations__),
+    RESERVATION_CREATED = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Reservation created"),
+        get_email_context=get_context_for_reservation_created,
+        context_variables=list(ReservationCreatedContext.__annotations__),
     )
-    RESERVATION_CONFIRMED_STAFF_NOTIFICATION = EmailTemplateType(
-        label=pgettext_lazy("EmailType", "Reservation confirmed staff notification"),
-        get_email_context=get_context_for_reservation_confirmed_staff_notification,
-        context_variables=list(ReservationConfirmedStaffNotificationContext.__annotations__),
+    RESERVATION_CREATED_STAFF_NOTIFICATION = EmailTemplateType(
+        label=pgettext_lazy("EmailType", "Reservation created staff notification"),
+        get_email_context=get_context_for_reservation_created_staff_notification,
+        context_variables=list(ReservationCreatedStaffNotificationContext.__annotations__),
     )
     RESERVATION_DENIED = EmailTemplateType(
         label=pgettext_lazy("EmailType", "Reservation denied"),

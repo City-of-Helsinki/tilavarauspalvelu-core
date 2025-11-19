@@ -91,8 +91,8 @@ class ReservationConfirmSerializer(NestingModelSerializer):
                 except ExternalServiceError as error:
                     SentryLogger.log_exception(error, details=f"Reservation: {instance.pk}")
 
-            EmailService.send_reservation_confirmed_email(reservation=instance)
-            EmailService.send_reservation_confirmed_staff_notification_email(reservation=instance)
+            EmailService.send_reservation_created_email(reservation=instance)
+            EmailService.send_reservation_created_staff_notification_email(reservation=instance)
 
         elif instance.state == ReservationStateChoice.REQUIRES_HANDLING:
             EmailService.send_reservation_requires_handling_email(reservation=instance)

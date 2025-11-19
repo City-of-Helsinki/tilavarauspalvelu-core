@@ -22,8 +22,8 @@ pytestmark = [
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(EmailService.send_reservation_confirmed_email)
-@patch_method(EmailService.send_reservation_confirmed_staff_notification_email)
+@patch_method(EmailService.send_reservation_created_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
 def test_order_payment_webhook__success(api_client, settings):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
@@ -60,8 +60,8 @@ def test_order_payment_webhook__success(api_client, settings):
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
-    assert EmailService.send_reservation_confirmed_email.called is True
-    assert EmailService.send_reservation_confirmed_staff_notification_email.called is True
+    assert EmailService.send_reservation_created_email.called is True
+    assert EmailService.send_reservation_created_staff_notification_email.called is True
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
