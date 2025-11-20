@@ -6,6 +6,7 @@ import zoneinfo
 from pathlib import Path
 
 import dj_database_url
+from django.http import response as http_response
 from django.utils.translation import gettext_lazy as _
 from env_config import Environment, values
 from env_config.decorators import classproperty
@@ -30,6 +31,15 @@ try:
 except ImportError:
 
     class LocalMixin: ...
+
+
+# refs. https://github.com/goauthentik/authentik/commit/6a13b38740f92d8003e51fe2225513d1369e3e44
+# Django 5.1.14 & 5.2.8 and CVE-2025-64458 added a strong enforcement of 2048 characters
+# as the maximum for a URL to redirect to, mostly for running on windows.
+# However our URLs can easily exceed that with OAuth/SAML Query parameters or hash values
+# 8192 should cover most cases.
+# NOTE: Can be removed if Django increases this: https://github.com/django/django/blob/main/django/utils/http.py#L41
+http_response.MAX_URL_LENGTH = 8192
 
 
 class Common(Environment):
