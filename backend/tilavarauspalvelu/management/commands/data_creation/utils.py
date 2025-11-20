@@ -9,8 +9,11 @@ import operator
 import random
 from enum import StrEnum
 from functools import wraps
+from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any, Literal, NamedTuple, TypeVar
 
+import requests
+from django.conf import settings
 from django.db import models
 from django.test import override_settings
 
@@ -376,3 +379,62 @@ class IntendedUseData:
     image_url: str
     image_filename: str
     extension: str = ".jpg"
+
+
+def get_image_path(image_url: str, filename: str, extension: str = ".jpg") -> str | None:
+    """
+    Build a new reservation unit image using the image from the given URL.
+    Save image using the given filename and extension. If this function is called later for the same filename,
+    and that file already exists, use the existing file instead of downloading the image again.
+    """
+    # Don't create images during tests, since it's slow.
+    if not settings.DOWNLOAD_IMAGES_FOR_TEST_DATA:
+        return None
+
+    if not settings.MEDIA_ROOT:
+        msg = f"Media root not set. Cannot save image from '{image_url}'."
+        print(msg)  # noqa: T201, RUF100
+        return None
+
+    path = Path(settings.MEDIA_ROOT) / settings.RESERVATION_UNIT_IMAGES_ROOT / filename
+    path = path.with_suffix(extension)
+
+    if not path.exists():
+        fetch_image(image_url, path)
+
+    return f"{settings.RESERVATION_UNIT_IMAGES_ROOT}/{filename}{extension}"
+
+
+def fetch_image(image_url: str, path: Path) -> None:
+    """
+    Fetch image from the internet and save it to the given path (including filename).
+    Validate that the downloaded image is a known image format, and that it matches file extension
+    in the given path.
+    """
+    if not path.suffix:
+        msg = "Path must be a path to a file, not a directory."
+        raise RuntimeError(msg)
+
+    try:
+        response = requests.get(image_url, timeout=8)
+        response.raise_for_status()
+    except Exception as e:  # noqa: BLE001
+        msg = f"Could not download image from '{image_url}': {e}"
+        print(msg)  # noqa: T201, RUF100
+        return
+
+    content_type = response.headers.get("Content-Type")
+    if content_type == "image/jpeg":
+        assert path.suffix == ".jpg", f"Mismatching file extension '{path.suffix}' and content type '{content_type}'"
+
+    elif content_type == "image/png":
+        assert path.suffix == ".png", f"Mismatching file extension '{path.suffix}' and content type '{content_type}'"
+
+    else:
+        msg = f"Unknown content type: {content_type}"
+        print(msg)  # noqa: T201, RUF100
+        return
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open(mode="wb") as handler:
+        handler.write(response.content)
