@@ -16,12 +16,14 @@ export function useSession() {
 
   // setup polling
   useEffect(() => {
-    const id = setInterval(() => {
-      if (isWindowVisible()) {
-        refetch();
-      }
-    }, CURRENT_USER_POLL_INTERVAL_MS);
-    return () => clearInterval(id);
+    if (CURRENT_USER_POLL_INTERVAL_MS > 0) {
+      const id = setInterval(() => {
+        if (isWindowVisible()) {
+          refetch();
+        }
+      }, CURRENT_USER_POLL_INTERVAL_MS);
+      return () => clearTimeout(id);
+    }
   }, [refetch]);
 
   const user = data?.currentUser ?? null;
