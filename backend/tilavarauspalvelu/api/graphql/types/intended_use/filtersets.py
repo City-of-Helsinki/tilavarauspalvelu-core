@@ -9,6 +9,13 @@ __all__ = [
     "IntendedUseFilterSet",
 ]
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from django.db import models
+
+    from tilavarauspalvelu.models.intended_use.queryset import IntendedUseQuerySet
+
 
 class IntendedUseFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
@@ -26,3 +33,11 @@ class IntendedUseFilterSet(ModelFilterSet):
             "name_en",
             "name_sv",
         ]
+
+    @staticmethod
+    def order_by_name_sv(qs: IntendedUseQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="sv", desc=desc)
+
+    @staticmethod
+    def order_by_name_en(qs: IntendedUseQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="en", desc=desc)

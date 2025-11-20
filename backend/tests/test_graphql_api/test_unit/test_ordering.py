@@ -38,6 +38,33 @@ def test_units__order__by_name_fi(graphql):
     assert response.node(2) == {"pk": unit_1.pk}
 
 
+def test_units__order__by_name_en(graphql):
+    """Test ordering by name in English, with fallback to Finnish if English name is not set."""
+    unit_1 = UnitFactory.create(name_fi="Unit 1", name_en="Unit 4")
+    unit_2 = UnitFactory.create(name_fi="Unit 2", name_en="Unit 5")
+    unit_3 = UnitFactory.create(name_fi="Unit 3", name_en="")  # Fallback to fi
+
+    graphql.login_with_superuser()
+
+    # Ascending
+    response = graphql(units_query(order_by="nameEnAsc"))
+
+    assert response.has_errors is False
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": unit_3.pk}
+    assert response.node(1) == {"pk": unit_1.pk}
+    assert response.node(2) == {"pk": unit_2.pk}
+
+    # Descending
+    response = graphql(units_query(order_by="nameEnDesc"))
+
+    assert response.has_errors is False
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": unit_2.pk}
+    assert response.node(1) == {"pk": unit_1.pk}
+    assert response.node(2) == {"pk": unit_3.pk}
+
+
 def test_units__order__by_reservations_count(graphql):
     units = {
         0: UnitFactory.create(name="1"),  # 4 Reservations in 2 ReservationUnits

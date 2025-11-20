@@ -9,6 +9,13 @@ __all__ = [
     "EquipmentFilterSet",
 ]
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from django.db import models
+
+    from tilavarauspalvelu.models.equipment.queryset import EquipmentQuerySet
+
 
 class EquipmentFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
@@ -31,6 +38,14 @@ class EquipmentFilterSet(ModelFilterSet):
             ("category__rank", "category_rank"),
         ]
 
+    @staticmethod
+    def order_by_name_sv(qs: EquipmentQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="sv", desc=desc)
+
+    @staticmethod
+    def order_by_name_en(qs: EquipmentQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="en", desc=desc)
+
 
 class EquipmentAllFilterSet(ModelFilterSet):
     class Meta:
@@ -42,3 +57,11 @@ class EquipmentAllFilterSet(ModelFilterSet):
             "name_sv",
             ("category__rank", "category_rank"),
         ]
+
+    @staticmethod
+    def order_by_name_sv(qs: EquipmentQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="sv", desc=desc)
+
+    @staticmethod
+    def order_by_name_en(qs: EquipmentQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="en", desc=desc)

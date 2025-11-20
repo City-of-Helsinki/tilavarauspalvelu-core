@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal, Self
 
+from django.db import models
 from django.db.models import QuerySet
+from django.db.models.functions import Coalesce
 from django.db.models.manager import BaseManager
 from mptt.managers import TreeManager
 from mptt.querysets import TreeQuerySet
@@ -14,6 +16,7 @@ __all__ = [
     "ModelTreeManager",
     "ModelTreeQuerySet",
     "OneToManyRelatedManager",
+    "TranslatedModelQuerySet",
 ]
 
 
@@ -22,6 +25,17 @@ __all__ = [
 
 class ModelQuerySet(QuerySet):
     """QuerySet class that offers better typing than a regular QuerySet."""
+
+
+class TranslatedModelQuerySet(QuerySet):
+    def order_by_translated(self, *, field: str, language: Literal["en", "sv"], desc: bool = False) -> Self:
+        """Order by field in the given language, falling back to Finnish if the field in the given language is empty."""
+        return self.order_by(
+            models.OrderBy(
+                Coalesce(models.F(f"{field}_{language}"), models.F(f"{field}_fi")),
+                descending=desc,
+            )
+        )
 
 
 class ModelManager(BaseManager):

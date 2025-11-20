@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from tilavarauspalvelu.models import Resource
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models._base import ModelManager, TranslatedModelQuerySet
 
 __all__ = [
     "ResourceManager",
@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-class ResourceQuerySet(ModelQuerySet[Resource]): ...
+class ResourceQuerySet(TranslatedModelQuerySet[Resource]): ...
 
 
 class ResourceManager(ModelManager[Resource, ResourceQuerySet]): ...

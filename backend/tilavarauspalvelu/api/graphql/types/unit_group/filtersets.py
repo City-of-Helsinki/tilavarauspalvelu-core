@@ -13,6 +13,7 @@ from tilavarauspalvelu.models import UnitGroup
 if TYPE_CHECKING:
     from django.db import models
 
+    from tilavarauspalvelu.models.unit_group.queryset import UnitGroupQuerySet
     from tilavarauspalvelu.typing import AnyUser
 
 
@@ -41,6 +42,14 @@ class UnitGroupFilterSet(ModelFilterSet):
             "name_en",
             "name_sv",
         ]
+
+    @staticmethod
+    def order_by_name_sv(qs: UnitGroupQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="sv", desc=desc)
+
+    @staticmethod
+    def order_by_name_en(qs: UnitGroupQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="en", desc=desc)
 
     def filter_by_only_with_permission(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
         """

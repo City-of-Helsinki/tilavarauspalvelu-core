@@ -102,6 +102,9 @@ class ModelQuerySet(QuerySet[_TModel], Generic[_TModel]):  # noqa: UP046
     def only(self, *fields: Any) -> Self: ...
     def using(self, alias: str | None) -> Self: ...
 
+class TranslatedModelQuerySet(ModelQuerySet[_TModel]):
+    def order_by_translated(self, *, field: str, language: Literal["en", "sv"], desc: bool = False) -> Self: ...
+
 class ModelManager(BaseManager[_TModel], Generic[_TModel, _TQuerySet]):  # noqa: UP046
     model: type[_TModel]
     name: str

@@ -5,7 +5,7 @@ from typing import Literal, Self
 from django.db import models
 
 from tilavarauspalvelu.models import Reservation, ReservationUnit, Unit, UnitGroup
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models._base import ModelManager, TranslatedModelQuerySet
 from utils.db import SubqueryCount
 
 __all__ = [
@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-class UnitQuerySet(ModelQuerySet[Unit]):
+class UnitQuerySet(TranslatedModelQuerySet[Unit]):
     def order_by_unit_group_name(self, *, language: Literal["fi", "en", "sv"], desc: bool = False) -> Self:
         return self.alias(**{
             f"unit_group_name_{language}": models.Subquery(

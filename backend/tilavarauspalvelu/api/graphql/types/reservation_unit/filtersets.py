@@ -228,6 +228,14 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
         return qs.visible() if value else qs.hidden()
 
     @staticmethod
+    def order_by_name_sv(qs: ReservationUnitQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="sv", desc=desc)
+
+    @staticmethod
+    def order_by_name_en(qs: ReservationUnitQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="en", desc=desc)
+
+    @staticmethod
     def filter_by_reservation_kind(qs: ReservationUnitQuerySet, name: str, value: str) -> QuerySet:
         match value:
             case ReservationKind.DIRECT:
@@ -332,3 +340,11 @@ class ReservationUnitAllFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin)
             "name_sv",
             "rank",
         ]
+
+    @staticmethod
+    def order_by_name_sv(qs: ReservationUnitQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="sv", desc=desc)
+
+    @staticmethod
+    def order_by_name_en(qs: ReservationUnitQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="en", desc=desc)

@@ -12,6 +12,11 @@ __all__ = [
     "SpaceFilterSet",
 ]
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models.space.queryset import SpaceQuerySet
+
 
 class SpaceFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
@@ -51,3 +56,11 @@ class SpaceFilterSet(ModelFilterSet):
             models.Q(unit__in=u_ids)  #
             | models.Q(unit__unit_groups__in=g_ids),
         ).distinct()
+
+    @staticmethod
+    def order_by_name_sv(qs: SpaceQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="sv", desc=desc)
+
+    @staticmethod
+    def order_by_name_en(qs: SpaceQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="en", desc=desc)
