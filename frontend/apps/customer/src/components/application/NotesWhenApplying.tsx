@@ -2,8 +2,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { breakpoints } from "ui/src/modules/const";
-import { getLocalizationLang } from "ui/src/modules/helpers";
-import { getTranslation } from "ui/src/modules/util";
+import { getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { H4 } from "ui/src/styled";
 import { ApplicationRoundNode } from "@gql/gql-types";
 

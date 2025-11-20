@@ -6,9 +6,8 @@ import Link from "next/link";
 import styled from "styled-components";
 import { IconButton } from "ui/src/components";
 import { breakpoints } from "ui/src/modules/const";
-import { getTranslation } from "ui/src/modules/util";
 import { Flex, H3, anchorStyles, focusStyles } from "ui/src/styled";
-import { getLocalizationLang } from "@ui/modules/helpers";
+import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { singleSearchPrefix } from "@/modules/urls";
 import type { UnitListFieldsFragment } from "@gql/gql-types";
 

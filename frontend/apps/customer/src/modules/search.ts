@@ -9,13 +9,13 @@ import {
   filterEmptyArray,
   filterNonNullable,
   getLocalizationLang,
+  getTranslation,
   ignoreMaybeArray,
   mapParamToInteger,
   toNumber,
 } from "ui/src/modules/helpers";
 import { type OptionsListT, type OptionT } from "ui/src/modules/search";
 import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { getTranslation } from "ui/src/modules/util";
 import {
   EquipmentOrderingChoices,
   IntendedUseOrderingChoices,

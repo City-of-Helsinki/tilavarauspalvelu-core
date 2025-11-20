@@ -5,9 +5,8 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconButton } from "ui/src/components";
 import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { getTranslation } from "ui/src/modules/util";
 import { Flex, H4, fontMedium } from "ui/src/styled";
-import { getLocalizationLang } from "@ui/modules/helpers";
+import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { mapUrlPrefix } from "@/modules/const";
 import type { Maybe, LocationFieldsI18nFragment, AddressFieldsFragment } from "@gql/gql-types";
 

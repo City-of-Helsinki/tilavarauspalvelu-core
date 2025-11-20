@@ -7,8 +7,7 @@ import { Card } from "ui/src/components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { formatDateTime, formatDate } from "ui/src/modules/date-utils";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { getTranslation } from "ui/src/modules/util";
-import { getLocalizationLang } from "@ui/modules/helpers";
+import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { getApplicationRoundPath } from "@/modules/urls";
 import { type ApplicationRoundCardFragment, ApplicationRoundStatusChoice } from "@gql/gql-types";
 

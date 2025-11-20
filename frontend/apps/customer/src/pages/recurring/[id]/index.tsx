@@ -13,6 +13,7 @@ import {
   ignoreMaybeArray,
   type ReadonlyDeep,
   toNumber,
+  getTranslation,
 } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -24,7 +25,6 @@ import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { StartApplicationBar, RecurringCard } from "@/lib/recurring/[id]";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getSearchOptions, processVariables } from "@/modules/search";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath, seasonalPrefix } from "@/modules/urls";
@@ -83,7 +83,7 @@ function SeasonalSearch({ apiBaseUrl, applicationRound, options }: Readonly<Seas
       title: t("breadcrumb:recurring"),
     },
     {
-      title: getApplicationRoundName(applicationRound, lang),
+      title: getTranslation(applicationRound, "name", lang),
     },
   ] as const;
 

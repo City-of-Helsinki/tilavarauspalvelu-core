@@ -19,6 +19,7 @@ import { getIntervalMinutes } from "@ui/modules/conversion";
 import { formatApiDate, timeToMinutes } from "@ui/modules/date-utils";
 import {
   capitalize,
+  getTranslation,
   dayMax,
   dayMin,
   filterNonNullable,
@@ -27,7 +28,6 @@ import {
   type ReadonlyDeep,
 } from "@ui/modules/helpers";
 import { type LocalizationLanguages } from "@ui/modules/urlBuilder";
-import { getTranslation } from "@ui/modules/util";
 import {
   dateToKey,
   isRangeReservable,

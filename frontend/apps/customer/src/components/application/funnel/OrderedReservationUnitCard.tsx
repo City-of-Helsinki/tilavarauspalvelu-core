@@ -6,8 +6,7 @@ import styled from "styled-components";
 import Card from "ui/src/components/Card";
 import { ErrorText } from "ui/src/components/ErrorText";
 import { breakpoints } from "ui/src/modules/const";
-import { getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
-import { getTranslation } from "ui/src/modules/util";
+import { getImageSource, getLocalizationLang, getTranslation, getMainImage } from "ui/src/modules/helpers";
 import { Flex, H6, fontBold, fontMedium, fontRegular } from "ui/src/styled";
 import type { OrderedReservationUnitCardFragment } from "@gql/gql-types";
 

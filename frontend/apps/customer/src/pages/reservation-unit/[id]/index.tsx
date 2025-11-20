@@ -22,10 +22,10 @@ import {
   createNodeId,
   filterNonNullable,
   getLocalizationLang,
+  getTranslation,
   ignoreMaybeArray,
   toNumber,
 } from "ui/src/modules/helpers";
-import { getTranslation } from "ui/src/modules/util";
 import { Flex, H4 } from "ui/src/styled";
 import { AddressSection } from "@/components/AddressSection";
 import { Breadcrumb } from "@/components/Breadcrumb";

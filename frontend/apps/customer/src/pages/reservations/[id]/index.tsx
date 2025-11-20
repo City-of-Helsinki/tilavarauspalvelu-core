@@ -14,8 +14,14 @@ import StatusLabel from "ui/src/components/StatusLabel";
 import { useToastIfQueryParam } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDateTimeRange } from "ui/src/modules/date-utils";
-import { createNodeId, capitalize, getLocalizationLang, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { getTranslation } from "ui/src/modules/util";
+import {
+  createNodeId,
+  capitalize,
+  getLocalizationLang,
+  getTranslation,
+  ignoreMaybeArray,
+  toNumber,
+} from "ui/src/modules/helpers";
 import { Flex, fontRegular, H1, H4, NoWrap } from "ui/src/styled";
 import { AddressSection } from "@/components/AddressSection";
 import { Breadcrumb } from "@/components/Breadcrumb";

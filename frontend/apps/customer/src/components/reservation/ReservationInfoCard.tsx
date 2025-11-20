@@ -7,8 +7,14 @@ import { Card } from "@ui/components";
 import { formatters as getFormatters } from "@ui/index";
 import { breakpoints } from "@ui/modules/const";
 import { formatDateTimeRange, formatDuration } from "@ui/modules/date-utils";
-import { createNodeId, capitalize, getImageSource, getLocalizationLang, getMainImage } from "@ui/modules/helpers";
-import { getTranslation } from "@ui/modules/util";
+import {
+  createNodeId,
+  capitalize,
+  getImageSource,
+  getLocalizationLang,
+  getTranslation,
+  getMainImage,
+} from "@ui/modules/helpers";
 import { Flex, fontMedium, Strong } from "@ui/styled";
 import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
