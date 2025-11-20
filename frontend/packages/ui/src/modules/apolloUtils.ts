@@ -10,7 +10,8 @@ import { print } from "graphql";
 import { Roarr as log } from "roarr";
 import { getCookie } from "typescript-cookie";
 import { toast } from "../components/toast";
-import { isBrowser } from "./helpers";
+import { getLocalizationLang, isBrowser } from "./helpers";
+import type { LocalizationLanguages } from "./urlBuilder";
 
 // TODO narrow down the error codes and transform unknowns to catch all
 type ErrorCode = string;
@@ -356,18 +357,28 @@ function isCSRFError(error: Error | ServerParseError | ServerError): boolean {
   return false;
 }
 
-function toastNetworkError(error: Error | ServerParseError | ServerError) {
+const NETWORK_ERROR_TRANSLATIONS: Record<LocalizationLanguages, string> = {
+  en: "Network error",
+  fi: "Verkkovirhe",
+  sv: "Nätverksfel",
+};
+
+function toastNetworkError(error: Error | ServerParseError | ServerError): void {
+  if (!isBrowser) {
+    return;
+  }
   // don't toast CSRF errors
   if (isCSRFError(error)) {
     return;
   }
+  const lang = getLocalizationLang(document.documentElement.lang);
+  let errorMsg = NETWORK_ERROR_TRANSLATIONS[lang];
 
   const errorToastId = "network_error";
 
   // don't create multiple toasts
   if (!document.querySelector(`#${errorToastId}`)) {
     // Not translated because of how difficult it is to pass the translation function here
-    let errorMsg = "Network error";
     if ("statusCode" in error) {
       errorMsg += `: ${error.statusCode}`;
     }
