@@ -1,3 +1,6 @@
+# NOTE: Do not use factory or any files that use factories to create test data for robot tests,
+# as factory-boy is not installed on the test environment, which causes ModuleNotFoundError.
+
 from __future__ import annotations
 
 import datetime
@@ -24,14 +27,15 @@ from tilavarauspalvelu.enums import (
     ReservationStartInterval,
     ReservationStateChoice,
     ReservationTypeChoice,
+    ReservationUnitImageType,
     TermsOfUseTypeChoices,
     UserRoleChoice,
     Weekday,
 )
-from tilavarauspalvelu.management.commands.data_creation.create_reservation_related_things import (
-    _fetch_and_build_reservation_unit_image,
+from tilavarauspalvelu.management.commands.data_creation.utils import (
+    defer_reservation_unit_create_operations,
+    get_image_path,
 )
-from tilavarauspalvelu.management.commands.data_creation.utils import defer_reservation_unit_create_operations
 from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
     Application,
@@ -53,6 +57,7 @@ from tilavarauspalvelu.models import (
     ReservationUnit,
     ReservationUnitAccessType,
     ReservationUnitCancellationRule,
+    ReservationUnitImage,
     ReservationUnitOption,
     ReservationUnitPricing,
     ReservationUnitType,
@@ -1314,13 +1319,16 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         begin_date=local_date(2025, 6, 6),
         access_type=AccessType.UNRESTRICTED,
     )
-    _maksuton_mankeli_image = _fetch_and_build_reservation_unit_image(
-        reservation_unit=_maksuton_mankeli,
+    _maksuton_mankeli_image_path = get_image_path(
         image_url="https://i.postimg.cc/y8gtchXQ/maksuton-mankeli.jpg",
         filename="maksuton-mankeli",
     )
-    if _maksuton_mankeli_image is not None:
-        _maksuton_mankeli_image.save()
+    if _maksuton_mankeli_image_path:
+        ReservationUnitImage.objects.create(
+            reservation_unit=_maksuton_mankeli,
+            image=_maksuton_mankeli_image_path,
+            image_type=ReservationUnitImageType.MAIN,
+        )
 
     _aina_maksullinen_aitio = ReservationUnit.objects.create(
         #
