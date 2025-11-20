@@ -1,9 +1,8 @@
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import { Sanitize } from "ui/src/components/Sanitize";
-import { getTranslation } from "ui/src/modules/util";
 import { H4 } from "ui/src/styled";
-import { getLocalizationLang } from "@ui/modules/helpers";
+import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { type InstructionsFragment, type Maybe, ReservationStateChoice } from "@gql/gql-types";
 
 type Props = {

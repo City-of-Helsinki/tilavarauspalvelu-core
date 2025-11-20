@@ -10,8 +10,7 @@ import {
   useShowNotificationsListQuery,
   type ShowNotificationFieldsFragment,
 } from "../../gql/gql-types";
-import { filterNonNullable, getLocalizationLang } from "../modules/helpers";
-import { getTranslation } from "../modules/util";
+import { filterNonNullable, getLocalizationLang, getTranslation } from "../modules/helpers";
 import { ClientOnly } from "./ClientOnly";
 import NotificationWrapper from "./NotificationWrapper";
 import { Sanitize } from "./Sanitize";

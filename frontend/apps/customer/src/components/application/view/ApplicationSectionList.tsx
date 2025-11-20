@@ -4,8 +4,7 @@ import { useTranslation } from "next-i18next";
 import StatusLabel, { type StatusLabelType } from "ui/src/components/StatusLabel";
 import { WEEKDAYS } from "ui/src/modules/const";
 import { formatDurationRange, formatDate, setMondayFirst } from "ui/src/modules/date-utils";
-import { filterNonNullable, formatDayTimes, getLocalizationLang } from "ui/src/modules/helpers";
-import { getTranslation } from "ui/src/modules/util";
+import { filterNonNullable, formatDayTimes, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { NoWrap } from "ui/src/styled";
 import {
   ApplicationInfoContainer,

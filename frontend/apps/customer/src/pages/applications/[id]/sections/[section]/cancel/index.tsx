@@ -16,10 +16,10 @@ import {
   filterNonNullable,
   formatApiTimeInterval,
   getLocalizationLang,
+  getTranslation,
   ignoreMaybeArray,
   toNumber,
 } from "ui/src/modules/helpers";
-import { getTranslation } from "ui/src/modules/util";
 import { H1 } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";

@@ -6,8 +6,13 @@ import { useTranslation } from "next-i18next";
 import { Card } from "ui/src/components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { breakpoints } from "ui/src/modules/const";
-import { filterNonNullable, getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
-import { getTranslation } from "ui/src/modules/util";
+import {
+  filterNonNullable,
+  getImageSource,
+  getLocalizationLang,
+  getMainImage,
+  getTranslation,
+} from "ui/src/modules/helpers";
 import { H3 } from "ui/src/styled";
 import Carousel from "@/components/Carousel";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";

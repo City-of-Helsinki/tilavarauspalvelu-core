@@ -1,8 +1,7 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import { Sanitize } from "ui/src/components/Sanitize";
-import { getTranslation } from "ui/src/modules/util";
-import { getLocalizationLang } from "@ui/modules/helpers";
+import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import { getServerSideProps } from "@/pages/reservations/[id]";

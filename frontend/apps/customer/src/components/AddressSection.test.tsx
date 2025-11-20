@@ -1,7 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { getLocalizationLang } from "ui/src/modules/helpers";
-import { getTranslation } from "ui/src/modules/util";
+import { getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { AddressFieldsFragment } from "@gql/gql-types";
 import { AddressSection, createAccessibilityUrl, createGoogleUrl, createHslUrl, createMapUrl } from "./AddressSection";
 

@@ -16,14 +16,18 @@ import styled from "styled-components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import Card from "ui/src/components/Card";
 import { breakpoints } from "ui/src/modules/const";
-import { filterNonNullable, getImageSource, getLocalizationLang, getMainImage } from "ui/src/modules/helpers";
+import {
+  filterNonNullable,
+  getImageSource,
+  getLocalizationLang,
+  getTranslation,
+  getMainImage,
+} from "ui/src/modules/helpers";
 import { type OptionsListT } from "ui/src/modules/search";
-import { getTranslation } from "ui/src/modules/util";
 import { CenterSpinner, Flex, H3 } from "ui/src/styled";
 import { type SearchFormValues, SeasonalSearchForm } from "@/components/SeasonalSearchForm";
 import { useSearchQuery } from "@/hooks";
 import { useSearchModify } from "@/hooks/useSearchValues";
-import { getApplicationRoundName } from "@/modules/applicationRound";
 import { processVariables } from "@/modules/search";
 import { getReservationUnitPath } from "@/modules/urls";
 import {
@@ -156,7 +160,7 @@ export function ReservationUnitModalContent({
 
   return (
     <Flex>
-      <H3 as="p">{getApplicationRoundName(applicationRound, lang)}</H3>
+      <H3 as="p">{getTranslation(applicationRound, "name", lang)}</H3>
       <SeasonalSearchForm isLoading={isLoading} options={options} handleSearch={onSearch} />
       {isLoading ? (
         <CenterSpinner />

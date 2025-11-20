@@ -36,9 +36,15 @@ import {
   setMondayFirst,
   formatApiDate,
 } from "ui/src/modules/date-utils";
-import { filterNonNullable, formatApiTimeInterval, getLocalizationLang, sort, toNumber } from "ui/src/modules/helpers";
+import {
+  filterNonNullable,
+  formatApiTimeInterval,
+  getLocalizationLang,
+  getTranslation,
+  sort,
+  toNumber,
+} from "ui/src/modules/helpers";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { getTranslation } from "ui/src/modules/util";
 import {
   fontBold,
   fontMedium,

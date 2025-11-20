@@ -8,8 +8,14 @@ import { useGenericTerms } from "@ui/hooks";
 import { formatters as getFormatters } from "@ui/index";
 import { breakpoints } from "@ui/modules/const";
 import { formatDate, formatTimeRange, timeToMinutes } from "@ui/modules/date-utils";
-import { filterNonNullable, formatListToCSV, getLocalizationLang, isPriceFree, toNumber } from "@ui/modules/helpers";
-import { getTranslation } from "@ui/modules/util";
+import {
+  filterNonNullable,
+  formatListToCSV,
+  getLocalizationLang,
+  getTranslation,
+  isPriceFree,
+  toNumber,
+} from "@ui/modules/helpers";
 import { AddressSection } from "@/components/AddressSection";
 import { Map as MapComponent } from "@/components/Map";
 import { getFuturePricing, getPriceString } from "@/modules/reservationUnit";

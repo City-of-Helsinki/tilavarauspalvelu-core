@@ -9,8 +9,7 @@ import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { ApplicationStatusLabel } from "ui/src/components/statuses";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
-import { getLocalizationLang } from "@ui/modules/helpers";
-import { getApplicationRoundName } from "@/modules/applicationRound";
+import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { getApplicationPath } from "@/modules/urls";
 import {
   type ApplicationCardFragment,
@@ -120,7 +119,7 @@ export function ApplicationCard({ application, actionCallback }: Props): JSX.Ele
 
   return (
     <Card
-      heading={getApplicationRoundName(application.applicationRound, lang)}
+      heading={getTranslation(application.applicationRound, "name", lang)}
       headingLevel={3}
       text={formatApplicant(t, application)}
       tags={tags}

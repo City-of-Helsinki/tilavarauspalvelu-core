@@ -6,8 +6,14 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { Sanitize } from "@ui/components/Sanitize";
 import { breakpoints } from "@ui/modules/const";
-import { createNodeId, capitalize, ignoreMaybeArray, toNumber, getLocalizationLang } from "@ui/modules/helpers";
-import { getTranslation } from "@ui/modules/util";
+import {
+  createNodeId,
+  capitalize,
+  ignoreMaybeArray,
+  toNumber,
+  getLocalizationLang,
+  getTranslation,
+} from "@ui/modules/helpers";
 import { Flex, H1 } from "@ui/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { NotesWhenApplying } from "@/components/application";
