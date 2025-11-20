@@ -301,7 +301,9 @@ export const errorLink = onError(({ graphQLErrors, networkError, operation }) =>
   if (graphQLErrors == null && networkError != null && isBrowser) {
     toastNetworkError(networkError);
   }
-
+  const errors = transformApolloError(new ApolloError({ graphQLErrors, networkError }));
+  logGraphQLError(errors);
+  // graphQLErrors
   // TODO rewrite using the new transform function
   if (graphQLErrors) {
     for (const error of graphQLErrors) {
@@ -315,7 +317,7 @@ export const errorLink = onError(({ graphQLErrors, networkError, operation }) =>
         JSON.stringify(error)
       );
     }
-  } else if (networkError) {
+  } else if (networkError && errors.type === "NETWORK_ERROR" && errors.code !== "ECONREFUSED") {
     if (isCSRFError(networkError)) {
       // don't log CSRF errors to console
       return;
@@ -475,15 +477,10 @@ export function logGraphQLQuery(
   );
 }
 
-export function transformQueryError(error: unknown): QueryErrorT {
-  // TODO don't let these fall through
-  // check the error code and return 503 page
-  // need
-  // - a conversion function to create more complex error type with
-  //  - code (ours, enum)
-  //  - message
-  // - check the code
-  // -> log to sentry based on it
+// TODO this eats errors (since GraphQL can have both networkErrors and graphqlErrors at the same time)
+// TODO need to add operation / document info to this
+function transformApolloError(error: ApolloError): QueryErrorT {
+  // TODO this should be cleaner (break down the individual graphQL errors)
   const gqlErrors = getApiErrors(error);
   if (gqlErrors.length > 0) {
     const codes = new Set(gqlErrors.map((e) => e.code));
@@ -492,7 +489,7 @@ export function transformQueryError(error: unknown): QueryErrorT {
       message: `Graphql VALIDATION errors: ${codes.keys().toArray()}`,
       details: gqlErrors,
     };
-  } else if (error instanceof ApolloError && error.networkError != null) {
+  } else if (error.networkError != null) {
     const { cause } = error.networkError;
     if (
       typeof cause === "object" &&
@@ -501,11 +498,11 @@ export function transformQueryError(error: unknown): QueryErrorT {
       cause.code != null &&
       typeof cause.code === "string"
     ) {
-      // The backend is down
+      // The backend is down (nodejs version)
       if (cause.code === "ECONNREFUSED") {
         return {
           type: "NETWORK_ERROR",
-          code: "ECONREFUSE",
+          code: "ECONREFUSED",
           message: "Connection refused (backend down).",
         };
       }
@@ -514,12 +511,48 @@ export function transformQueryError(error: unknown): QueryErrorT {
         code: cause.code,
         message: `${cause.code} fetch error`,
       };
+    } else if (cause == null) {
+      if (error.networkError instanceof TypeError) {
+        const terror = error.networkError;
+        // Browser errors have zero info why it failed outside of message
+        const BROWSER_ECONREFUSED_MSG = "Failed to fetch";
+        if (terror.message.startsWith(BROWSER_ECONREFUSED_MSG)) {
+          return {
+            type: "NETWORK_ERROR",
+            code: "ECONREFUSED",
+            message: "Connection refused (backend down).",
+          };
+        }
+        return {
+          type: "NETWORK_ERROR",
+          code: "UNKNOWN",
+          message: `${terror.name} fetch error with message ${terror.message}`,
+        };
+      }
+      return {
+        type: "NETWORK_ERROR",
+        code: "UNKNOWN",
+        message: `Unknown fetch error without a cause "${error.networkError}"`,
+      };
     }
     return {
       type: "NETWORK_ERROR",
-      code: "UNKNOWN", //cause.code,
-      message: `Unknown fetch error with cause "${cause?.toString()}"`,
+      code: "UNKNOWN",
+      message: `Unknown fetch error with cause "${cause.toString()}"`,
     };
+  }
+  return {
+    type: "GRAPHQL_ERROR",
+    message: "GraphQL error",
+    // TODO how to add details
+    details: [],
+    // details: graphQLErrors
+  };
+}
+
+export function transformQueryError(error: unknown): QueryErrorT {
+  if (error instanceof ApolloError) {
+    return transformApolloError(error);
   }
   return {
     type: "NON_API_ERROR",
