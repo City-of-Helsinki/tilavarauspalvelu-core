@@ -11,6 +11,7 @@ from tilavarauspalvelu.enums import UserRoleChoice
 from tilavarauspalvelu.models import Resource, Space
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.models.resource.queryset import ResourceQuerySet
     from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
@@ -59,3 +60,11 @@ class ResourceFilterSet(ModelFilterSet):
                 )
             )
         ).distinct()
+
+    @staticmethod
+    def order_by_name_sv(qs: ResourceQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="sv", desc=desc)
+
+    @staticmethod
+    def order_by_name_en(qs: ResourceQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="en", desc=desc)

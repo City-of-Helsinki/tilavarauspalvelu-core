@@ -169,6 +169,14 @@ class UnitFilterSet(ModelFilterSet, UnitFilterSetMixin):
         ]
 
     @staticmethod
+    def order_by_name_sv(qs: UnitQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="sv", desc=desc)
+
+    @staticmethod
+    def order_by_name_en(qs: UnitQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="en", desc=desc)
+
+    @staticmethod
     def order_by_reservation_units_count(qs: UnitQuerySet, desc: bool) -> models.QuerySet:
         return qs.order_by_reservation_units_count(desc=desc)
 
@@ -218,3 +226,11 @@ class UnitAllFilterSet(ModelFilterSet, UnitFilterSetMixin):
             "name_sv",
             "rank",
         ]
+
+    @staticmethod
+    def order_by_name_sv(qs: UnitQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="sv", desc=desc)
+
+    @staticmethod
+    def order_by_name_en(qs: UnitQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="en", desc=desc)

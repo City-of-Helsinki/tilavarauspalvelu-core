@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from tilavarauspalvelu.models import UnitGroup
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models._base import ModelManager, TranslatedModelQuerySet
 
 __all__ = [
     "UnitGroupManager",
@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-class UnitGroupQuerySet(ModelQuerySet[UnitGroup]): ...
+class UnitGroupQuerySet(TranslatedModelQuerySet[UnitGroup]): ...
 
 
 class UnitGroupManager(ModelManager[UnitGroup, UnitGroupQuerySet]): ...

@@ -9,6 +9,13 @@ __all__ = [
     "ReservationPurposeFilterSet",
 ]
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from django.db import models
+
+    from tilavarauspalvelu.models.reservation_purpose.queryset import ReservationPurposeQuerySet
+
 
 class ReservationPurposeFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
@@ -26,3 +33,11 @@ class ReservationPurposeFilterSet(ModelFilterSet):
             "name_en",
             "name_sv",
         ]
+
+    @staticmethod
+    def order_by_name_sv(qs: ReservationPurposeQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="sv", desc=desc)
+
+    @staticmethod
+    def order_by_name_en(qs: ReservationPurposeQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_translated(field="name", language="en", desc=desc)

@@ -10,7 +10,7 @@ from django.db.models import Q, prefetch_related_objects
 from lookup_property import L
 
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models._base import ModelManager, TranslatedModelQuerySet
 from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
 from utils.date_utils import local_date
 from utils.db import ArrayUnnest, Now, SubqueryArray
@@ -33,7 +33,7 @@ __all__ = [
 type ReservationUnitPK = int
 
 
-class ReservationUnitQuerySet(ModelQuerySet[ReservationUnit]):
+class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
     def with_first_reservable_time(
         self,
         *,
