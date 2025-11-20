@@ -5,10 +5,10 @@ import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDateRange, formatDateTime, formatDuration, formatDate } from "ui/src/modules/date-utils";
-import { filterNonNullable, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
+import { filterNonNullable, getLocalizationLang, getTranslation, stripHtml } from "ui/src/modules/helpers";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { Flex, H1, H3 } from "ui/src/styled";
-import { cleanHtmlContent, Sanitize } from "@ui/components/Sanitize";
+import { Sanitize } from "@ui/components/Sanitize";
 import { IconWithText } from "@/components/IconWithText";
 import {
   getActivePricing,
@@ -117,7 +117,7 @@ const IconListWrapper = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
 `;
 
-const AccessTypeTooltipWrapper = styled.div`
+const TooltipWrapper = styled.div`
   display: flex;
   width: 100%;
   gap: var(--spacing-xs);
@@ -241,25 +241,23 @@ function IconList({
         switch (key) {
           case "accessType":
             return (
-              <AccessTypeTooltipWrapper key={key}>
+              <TooltipWrapper key={key}>
                 <IconWithText icon={icon} text={text} />
                 {reservationUnit.accessTypes.length > 1 && (
                   <AccessTypeTooltip accessTypes={reservationUnit.accessTypes} />
                 )}
-              </AccessTypeTooltipWrapper>
+              </TooltipWrapper>
             );
           case "unitPrice":
             return (
-              <AccessTypeTooltipWrapper key={key}>
+              <TooltipWrapper key={key}>
                 <IconWithText icon={icon} text={text} />
-                {activePricing &&
-                  cleanHtmlContent(getTranslation(activePricing, "materialPriceDescription", lang)).trim().length >
-                    0 && (
-                    <Tooltip>
-                      <Sanitize html={getTranslation(activePricing, "materialPriceDescription", lang)} />
-                    </Tooltip>
-                  )}
-              </AccessTypeTooltipWrapper>
+                {activePricing && stripHtml(getTranslation(activePricing, "materialPriceDescription", lang)) !== "" && (
+                  <Tooltip>
+                    <Sanitize html={getTranslation(activePricing, "materialPriceDescription", lang)} />
+                  </Tooltip>
+                )}
+              </TooltipWrapper>
             );
           default:
             return <IconWithText key={key} icon={icon} text={text} />;
