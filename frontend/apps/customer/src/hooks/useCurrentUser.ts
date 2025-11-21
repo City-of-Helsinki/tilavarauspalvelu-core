@@ -3,8 +3,12 @@ import type { ApolloError } from "@apollo/client";
 import { useCurrentUserQuery } from "@gql/gql-types";
 import type { CurrentUserQuery } from "@gql/gql-types";
 
-// TODO this should be replaced with SSR current user in most cases.
-// Causes a flash of unauthenticated content on page load.
+/**
+ * Hook that fetches the current authenticated user from the API
+ * @deprecated This should be replaced with SSR current user in most cases
+ * @returns Object containing currentUser data, error state, and loading flag
+ * @note Causes a flash of unauthenticated content on page load
+ */
 export function useCurrentUser(): {
   currentUser?: CurrentUserQuery["currentUser"] | undefined;
   error: ApolloError | undefined;
