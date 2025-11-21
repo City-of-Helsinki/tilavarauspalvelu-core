@@ -15,60 +15,16 @@ updates:
         patterns:
           - "*"
 
-  # Manual updates for npm dependencies that break the app or types.
-  # Why? because we want separate limits of open PRs for those that require manual intervention.
-  # https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#open-pull-requests-limit
-  # description of the workaround: https://github.com/dependabot/dependabot-core/issues/1778#issuecomment-1814577069
-  - package-ecosystem: "npm"
-    schedule:
-      interval: "weekly"
-    directory: "/"
-    pull-request-branch-name:
-      separator: "-"
-    labels:
-      - "dependencies"
-      - "javascript"
-    allow:
-      # major updates that break the app
-      - dependency-name: "react"
-      - dependency-name: "react-dom"
-      - dependency-name: "@types/react"
-      - dependency-name: "nuka-carousel"
-    ignore:
-      - dependency-name: "react"
-        update-types:
-          ["version-update:semver-minor", "version-update:semver-patch"]
-      - dependency-name: "react-dom"
-        update-types:
-          ["version-update:semver-minor", "version-update:semver-patch"]
-      - dependency-name: "@types/react"
-        update-types:
-          ["version-update:semver-minor", "version-update:semver-patch"]
-      - dependency-name: "@types/react-dom"
-        update-types:
-          ["version-update:semver-minor", "version-update:semver-patch"]
-      - dependency-name: "nuka-carousel"
-        update-types:
-          ["version-update:semver-minor", "version-update:semver-patch"]
-    groups:
-      react:
-        patterns:
-          - "react"
-          - "react-dom"
-          - "@types/react"
-          - "@types/react-dom"
-
-  # npm dependencies that pass without manual intervention
+  # Update frontend dependencies
   - package-ecosystem: "npm"
     # required for double configuration of the same package ecosystem
     target-branch: "main"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     pull-request-branch-name:
       separator: "-"
     ignore:
-      # types break requiring manual updates
       # major update of React requires a manual review (even if it would pass all checks)
       - dependency-name: "@types/react"
         update-types: ["version-update:semver-major"]
@@ -78,8 +34,13 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "react-dom"
         update-types: ["version-update:semver-major"]
-      # complete rewrite from v7 to v8
+      # nuka-carousel requires a complete rewrite from v7 to v8
       - dependency-name: "nuka-carousel"
+        update-types: ["version-update:semver-major"]
+      # apollo requires manual migration to hooks
+      - dependency-name: "@apollo/client"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "apollo-upload-client"
         update-types: ["version-update:semver-major"]
     # NOTE can't do a single group for all it will fail to update
     # either just accept multiple PRs or do fine grained groups manually
