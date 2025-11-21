@@ -2,6 +2,11 @@ import { ReadonlyURLSearchParams } from "next/navigation";
 import { type Maybe, ApplicationStatusChoice } from "@gql/gql-types";
 import { isBrowser } from "./const";
 
+/**
+ * Generates a URL for redirecting after login, preserving current path and adding parameters
+ * @param params - Optional URL search parameters to append to the current URL
+ * @returns URL string with isPostLogin parameter set, or undefined if called on server
+ */
 export function getPostLoginUrl(params: Readonly<URLSearchParams> = new ReadonlyURLSearchParams()): string | undefined {
   if (!isBrowser) {
     return undefined;
@@ -15,6 +20,11 @@ export function getPostLoginUrl(params: Readonly<URLSearchParams> = new Readonly
   return `${origin}${pathname}?${p.toString()}`;
 }
 
+/**
+ * Checks if an application has been sent (submitted) based on its status
+ * @param status - Application status choice
+ * @returns True if application status indicates it has been sent (Received, ResultsSent, Handled, or InAllocation), false otherwise
+ */
 export function isSent(status: Maybe<ApplicationStatusChoice> | undefined): boolean {
   if (status == null) {
     return false;
