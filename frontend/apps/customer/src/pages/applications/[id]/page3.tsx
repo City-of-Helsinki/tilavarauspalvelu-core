@@ -48,10 +48,13 @@ function Page3Form(): JSX.Element | null {
       unregister("organisationStreetAddress");
       unregister("organisationCity");
       unregister("organisationPostCode");
+      register("additionalInformation");
     } else if (type === ReserveeType.Company || hasRegistration) {
       register("organisationIdentifier", { required: true });
+      unregister("additionalInformation");
     } else {
       unregister("organisationIdentifier");
+      unregister("additionalInformation");
     }
   }, [hasRegistration, type, register, unregister, setValue]);
 
