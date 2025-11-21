@@ -314,7 +314,7 @@ export function BottomButtonsStripe({
   );
 }
 
-gql`
+export const ARCHIVE_RESERVATION_UNIT_MUTATION = gql`
   mutation ArchiveReservationUnit($input: ReservationUnitArchiveMutationInput!) {
     archiveReservationUnit(input: $input) {
       pk
