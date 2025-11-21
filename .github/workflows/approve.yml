@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: "Check out repository"
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: "Approve a pull request and set to auto rebase-merge if tests pass"
         # Only approve the PR if it's not already approved to avoid email spam.
