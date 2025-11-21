@@ -14,6 +14,11 @@ import {
 } from "../../gql/gql-types";
 import type { DayT } from "./const";
 
+/**
+ * Converts a day number to GraphQL Weekday enum
+ * @param d - Day number (0 = Monday, 6 = Sunday)
+ * @returns Weekday enum value
+ */
 export function transformWeekday(d: DayT): Weekday {
   switch (d) {
     case 0:
@@ -33,6 +38,11 @@ export function transformWeekday(d: DayT): Weekday {
   }
 }
 
+/**
+ * Converts GraphQL Weekday enum to day number
+ * @param d - Weekday enum value
+ * @returns Day number (0 = Monday, 6 = Sunday)
+ */
 export function convertWeekday(d: Weekday): DayT {
   switch (d) {
     case Weekday.Monday:
@@ -52,7 +62,11 @@ export function convertWeekday(d: Weekday): DayT {
   }
 }
 
-// safe coercion for day
+/**
+ * Safely converts a number to DayT type with validation
+ * @param day - Number to convert (must be 0-6)
+ * @returns Day number as DayT type, or null if invalid
+ */
 export function numberToDayT(day: number): DayT | null {
   if (day === 0 || day === 1 || day === 2 || day === 3 || day === 4 || day === 5 || day === 6) {
     return day;
@@ -60,6 +74,11 @@ export function numberToDayT(day: number): DayT | null {
   return null;
 }
 
+/**
+ * Safely converts a string to ReservationTypeChoice enum
+ * @param d - String value to convert
+ * @returns ReservationTypeChoice enum value, or null if invalid
+ */
 export function transformReservationType(d: string): ReservationTypeChoice | null {
   switch (d) {
     case ReservationTypeChoice.Staff:
@@ -77,6 +96,13 @@ export function transformReservationType(d: string): ReservationTypeChoice | nul
   }
 }
 
+/**
+ * Converts a string to ReservationTypeChoice enum without validation
+ * WARNING: Throws error if value is invalid - use transformReservationType for safe conversion
+ * @param type - String value to convert
+ * @returns ReservationTypeChoice enum value
+ * @throws Error if string doesn't match a valid enum value
+ */
 export function transformReservationTypeUnsafe(type: string): ReservationTypeChoice {
   const t = transformReservationType(type);
   if (t == null) {
