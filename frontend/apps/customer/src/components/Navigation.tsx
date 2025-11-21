@@ -32,7 +32,6 @@ import { type CurrentUserQuery } from "@gql/gql-types";
 type HeaderProps = {
   apiBaseUrl: string;
   profileLink: string;
-  languageOptions?: LanguageOption[];
 };
 
 const Wrapper = styled.div`
@@ -229,7 +228,7 @@ function NavigationMenu({ user }: { user: CurrentUserQuery["currentUser"] }) {
   );
 }
 
-function ActionBar({ apiBaseUrl, profileLink, languageOptions }: Readonly<HeaderProps>) {
+function ActionBar({ apiBaseUrl, profileLink }: Readonly<HeaderProps>) {
   const { t, i18n } = useTranslation();
   const { isAuthenticated, user } = useSession();
   const { firstName, lastName } = user ?? {};
@@ -249,7 +248,7 @@ function ActionBar({ apiBaseUrl, profileLink, languageOptions }: Readonly<Header
       logoAriaLabel={t("common:helsinkiCity")}
       menuButtonLabel={t("navigation:navigation")}
     >
-      <Header.LanguageSelector languages={languageOptions} ariaLabel={t("navigation:languageSelection")} />
+      <Header.LanguageSelector aria-label={t("navigation:languageSelection")} />
       {isAuthenticated ? (
         <Header.ActionBarItem fixedRightPosition id="user-menu" label={userName} avatar={userInitials ?? <IconUser />}>
           {!user?.isAdAuthenticated && (
@@ -284,7 +283,7 @@ function ActionBar({ apiBaseUrl, profileLink, languageOptions }: Readonly<Header
   );
 }
 
-function Navigation({ apiBaseUrl, profileLink }: HeaderProps) {
+function Navigation({ apiBaseUrl, profileLink }: Readonly<HeaderProps>) {
   const { t, i18n } = useTranslation();
   const { user } = useSession();
   const router = useRouter();
@@ -303,7 +302,7 @@ function Navigation({ apiBaseUrl, profileLink }: HeaderProps) {
   return (
     <Wrapper>
       <Header onDidChangeLanguage={languageChangeHandler} defaultLanguage={router.locale} languages={languageOptions}>
-        <ActionBar apiBaseUrl={apiBaseUrl} profileLink={profileLink} languageOptions={languageOptions} />
+        <ActionBar apiBaseUrl={apiBaseUrl} profileLink={profileLink} />
         <NavigationMenu user={user ?? null} />
       </Header>
     </Wrapper>
