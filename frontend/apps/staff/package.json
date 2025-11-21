@@ -30,7 +30,7 @@
     "i18next": "^25.6.3",
     "import-in-the-middle": "^1.15.0",
     "lodash-es": "^4.17.21",
-    "next": "16.0.1",
+    "next": "16.0.3",
     "next-i18next": "^15.4.2",
     "prettier-config": "workspace:*",
     "quill": "^2.0.3",
