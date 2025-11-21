@@ -8,7 +8,7 @@ import { TimeInput } from "ui/src/components/form/TimeInput";
 import { breakpoints, WEEKDAYS_SORTED } from "ui/src/modules/const";
 import { fontBold } from "ui/src/styled";
 import { Accordion } from "@/components/Accordion";
-import { getTranslatedError } from "@/modules/util";
+import { getTranslatedError } from "@/modules/helpers";
 import { ReservationUnitEditFormValues } from "./form";
 
 const SeasonRowWrapper = styled.div`

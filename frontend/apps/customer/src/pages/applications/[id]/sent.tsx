@@ -10,9 +10,9 @@ import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers
 import { H1 } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { createApolloClient } from "@/modules/apolloClient";
+import { isSent } from "@/modules/helpers";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { applicationsPath, applicationsPrefix, getApplicationPath } from "@/modules/urls";
-import { isSent } from "@/modules/util";
 import { ApplicationSentPageDocument, type ApplicationSentPageQuery } from "@gql/gql-types";
 
 const Paragraph = styled.p`

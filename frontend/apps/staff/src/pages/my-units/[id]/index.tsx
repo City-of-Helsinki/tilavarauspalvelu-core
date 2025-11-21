@@ -20,10 +20,10 @@ import { getFilterOptions } from "@/hooks/useFilterOptions";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { createClient } from "@/modules/apolloClient";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { formatAddress } from "@/modules/helpers";
 import { hasPermission } from "@/modules/permissionHelper";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getReservationSeriesUrl } from "@/modules/urls";
-import { formatAddress } from "@/modules/util";
 import {
   FilterOptionsDocument,
   type FilterOptionsQuery,

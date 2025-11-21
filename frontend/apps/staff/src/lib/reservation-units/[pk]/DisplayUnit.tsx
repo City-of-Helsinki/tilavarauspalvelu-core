@@ -5,7 +5,7 @@ import {
   ReservationUnitReservationStatusLabel,
 } from "ui/src/components/statuses";
 import { Flex, fontBold, H1, TitleSection } from "ui/src/styled";
-import { formatAddress } from "@/modules/util";
+import { formatAddress } from "@/modules/helpers";
 import {
   ReservationUnitPublishingState,
   ReservationUnitReservationState,

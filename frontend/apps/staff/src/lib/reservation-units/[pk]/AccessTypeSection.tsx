@@ -8,7 +8,7 @@ import { ControlledDateInput, ControlledSelect } from "ui/src/components/form";
 import { formatDate, parseUIDate, parseValidDateObject } from "ui/src/modules/date-utils";
 import { AutoGrid, Flex, H6 } from "ui/src/styled";
 import { NotificationInline } from "@/components/NotificationInline";
-import { getTranslatedError } from "@/modules/util";
+import { getTranslatedError } from "@/modules/helpers";
 import { KVWrapper, Label, Value } from "@/styled";
 import { AccessType, ReservationUnitEditQuery } from "@gql/gql-types";
 import { type ReservationUnitEditFormValues } from "./form";

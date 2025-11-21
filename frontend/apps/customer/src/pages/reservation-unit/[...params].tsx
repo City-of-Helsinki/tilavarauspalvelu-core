@@ -27,7 +27,7 @@ import {
   getSingleSearchPath,
 } from "@/modules/urls";
 import { ReservationPageWrapper, ReservationTitleSection, PinkBox as PinkBoxBase } from "@/styled/reservation";
-import { StyledStepper } from "@/styled/util";
+import { StyledStepper } from "@/styled/utils";
 import {
   ReservationDocument,
   type ReservationQuery,

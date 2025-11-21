@@ -10,7 +10,7 @@ import { breakpoints } from "ui/src/modules/const";
 import { getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { Flex, H3, anchorStyles, focusStyles } from "ui/src/styled";
 import { getSingleSearchPath } from "@/modules/urls";
-import { pixel } from "@/styled/util";
+import { pixel } from "@/styled/utils";
 import type { IntendedUseCardFragment } from "@gql/gql-types";
 import { ReservationUnitSearch } from "./ReservationUnitSearch";
 

@@ -4,7 +4,7 @@ import { IconLocation } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Flex, H1, fontMedium } from "ui/src/styled";
-import { formatAddress } from "@/modules/util";
+import { formatAddress } from "@/modules/helpers";
 import { type UnitSubpageHeadFragment } from "@gql/gql-types";
 
 interface IProps {

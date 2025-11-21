@@ -8,7 +8,7 @@ import { enGB } from "date-fns/locale/en-GB";
 import { fi } from "date-fns/locale/fi";
 import { sv } from "date-fns/locale/sv";
 import styled from "styled-components";
-import { unavailableBackgroundSVG } from "@ui/components/calendar/util";
+import { unavailableBackgroundSVG } from "@ui/components/calendar/utils";
 import { dateToMinutes, formatTimeRange } from "@ui/modules/date-utils";
 import type { LocalizationLanguages } from "@ui/modules/urlBuilder";
 

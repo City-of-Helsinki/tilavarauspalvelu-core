@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 import { breakpoints } from "../modules/const";
-import { type SpacingSize } from "./util";
+import { type SpacingSize } from "./utils";
 
 export const fontRegular = css`
   font-family: var(--font-regular);

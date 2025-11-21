@@ -9,14 +9,14 @@ import { CalendarEvent } from "ui/src/components/calendar/Calendar";
 import { breakpoints } from "ui/src/modules/const";
 import { formatTimeRange, timeForInput, timeToMinutes } from "ui/src/modules/date-utils";
 import { focusStyles } from "ui/src/styled";
-import { isCellOverlappingSpan, TimeSpanType } from "@ui/components/calendar/util";
+import { isCellOverlappingSpan, TimeSpanType } from "@ui/components/calendar/utils";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { EVENT_BUFFER, NOT_RESERVABLE } from "@/modules/calendarStyling";
-import { getReserveeName } from "@/modules/util";
+import { getReserveeName } from "@/modules/helpers";
 import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { ReservationPopupContent } from "./ReservationPopupContent";
-import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
 import eventStyleGetter from "./eventStyleGetter";
+import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./utils";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 type Resource = {

@@ -9,7 +9,7 @@ import {
   constructReservationFieldLabel,
   translateReserveeFormError,
   RESERVATION_FIELD_MAX_TEXT_LENGTH,
-} from "./util";
+} from "./utils";
 
 type Props = {
   field: keyof ReservationFormValueT;

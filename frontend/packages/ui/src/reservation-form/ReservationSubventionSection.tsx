@@ -11,7 +11,7 @@ import {
   constructReservationFieldLabel,
   RESERVATION_FIELD_MAX_TEXT_LENGTH,
   translateReserveeFormError,
-} from "./util";
+} from "./utils";
 
 const Subheading = styled(Strongish)`
   display: block;

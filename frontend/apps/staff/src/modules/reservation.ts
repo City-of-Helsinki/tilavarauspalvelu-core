@@ -16,8 +16,7 @@ import {
 } from "ui/src/modules/date-utils";
 import { filterNonNullable, sort, toNumber } from "ui/src/modules/helpers";
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
-import { getReserveeTypeTranslationKey } from "@/modules/helpers";
-import { getReserveeName } from "@/modules/util";
+import { getReserveeName, getReserveeTypeTranslationKey } from "@/modules/helpers";
 import {
   type CreateTagStringFragment,
   ReserveeType,

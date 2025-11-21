@@ -7,9 +7,8 @@ import { OrderStatusLabel, ReservationStatusLabel } from "ui/src/components/stat
 import { formatDateTime, formatDateTimeRange, parseValidDateObject } from "ui/src/modules/date-utils";
 import { CustomTable } from "@/components/Table";
 import { MAX_NAME_LENGTH } from "@/modules/const";
-import { truncate } from "@/modules/helpers";
+import { getReserveeName, truncate } from "@/modules/helpers";
 import { getReservationUrl } from "@/modules/urls";
-import { getReserveeName } from "@/modules/util";
 import { TableLink } from "@/styled";
 import { ReservationStateChoice, type ReservationTableElementFragment } from "@gql/gql-types";
 

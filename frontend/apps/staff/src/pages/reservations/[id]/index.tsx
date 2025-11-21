@@ -23,6 +23,7 @@ import { useModal } from "@/context/ModalContext";
 import { useSession } from "@/hooks";
 import { createClient } from "@/modules/apolloClient";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { formatAgeGroup } from "@/modules/helpers";
 import { hasPermission } from "@/modules/permissionHelper";
 import {
   createTagString,
@@ -33,7 +34,6 @@ import {
   translateReservationCustomerType,
 } from "@/modules/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { formatAgeGroup } from "@/modules/util";
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
 import {
   ReserveeType,

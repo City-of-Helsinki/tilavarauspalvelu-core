@@ -45,6 +45,7 @@ import {
 } from "@/lib/reservation-unit/[id]/";
 import { isReservationQuotaReached } from "@/lib/reservation-unit/[id]/ReservationUnitCalendarSection";
 import { createApolloClient } from "@/modules/apolloClient";
+import { getPostLoginUrl } from "@/modules/helpers";
 import { clampDuration, getMaxReservationDuration, getMinReservationDuration } from "@/modules/reservable";
 import {
   convertFormToFocustimeSlot,
@@ -57,9 +58,8 @@ import { PendingReservationFormSchema, type PendingReservationFormType } from "@
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { JustForDesktop } from "@/modules/style/layout";
 import { getReservationInProgressPath, getSingleSearchPath } from "@/modules/urls";
-import { getPostLoginUrl } from "@/modules/util";
 import { ReservationUnitPageWrapper } from "@/styled/reservation";
-import { SubmitButton } from "@/styled/util";
+import { SubmitButton } from "@/styled/utils";
 import {
   CreateReservationDocument,
   type CreateReservationMutation,

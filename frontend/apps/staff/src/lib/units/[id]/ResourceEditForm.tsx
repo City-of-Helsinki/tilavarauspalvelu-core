@@ -1,7 +1,7 @@
 import { UseFormReturn, Controller } from "react-hook-form";
 import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { getTranslatedError } from "@/modules/util";
+import { getTranslatedError } from "@/modules/helpers";
 import { ParentSelector } from "./ParentSelector";
 import { EditorColumns, type ResourceUpdateForm } from "./modules/resourceEditor";
 

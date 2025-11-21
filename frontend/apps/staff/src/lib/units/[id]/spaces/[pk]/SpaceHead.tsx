@@ -5,8 +5,8 @@ import Link from "next/link";
 import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";
 import { Flex, fontMedium, H1 } from "ui/src/styled";
+import { formatAddress } from "@/modules/helpers";
 import { getUnitUrl } from "@/modules/urls";
-import { formatAddress } from "@/modules/util";
 import type { Maybe, SpaceQuery } from "@gql/gql-types";
 
 interface IProps {

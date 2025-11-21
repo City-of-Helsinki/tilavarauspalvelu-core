@@ -13,7 +13,7 @@ import {
   ControlledCheckbox,
 } from "ui/src/components/form";
 import { AutoGrid, Flex, HR } from "ui/src/styled";
-import { getTranslatedError } from "@/modules/util";
+import { getTranslatedError } from "@/modules/helpers";
 import { PaymentType, PriceUnit } from "@gql/gql-types";
 import { FieldGroup } from "./FieldGroup";
 import { ReservationUnitEditFormValues } from "./form";

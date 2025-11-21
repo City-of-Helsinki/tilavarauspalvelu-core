@@ -20,7 +20,7 @@ import {
   translateReserveeFormError,
   getReservationFormFields,
   getFilteredGeneralFields,
-} from "./util";
+} from "./utils";
 
 interface CommonWithFields {
   reservationUnit: Pick<ReservationUnitNode, "reservationForm" | "minPersons" | "maxPersons">;

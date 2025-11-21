@@ -7,7 +7,6 @@ import { ControlledDateInput } from "ui/src/components/form";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { breakpoints } from "ui/src/modules/const";
 import { parseUIDate, formatDate } from "ui/src/modules/date-utils";
-import { chunkArray } from "ui/src/modules/util";
 import { Flex, fontMedium, H4, NoWrap } from "ui/src/styled";
 import Carousel from "@/components/Carousel";
 import { type FocusTimeSlot } from "@/modules/reservation";
@@ -202,6 +201,18 @@ export function QuickReservation({
       </Flex>
     </Form>
   );
+}
+
+function chunkArray<T>(array: T[], size: number): T[][] {
+  const result = [];
+  let index = 0;
+
+  while (index < array.length) {
+    result.push(array.slice(index, size + index));
+    index += size;
+  }
+
+  return result;
 }
 
 function TimeChunkSection({
