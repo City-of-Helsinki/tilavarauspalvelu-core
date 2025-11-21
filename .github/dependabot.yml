@@ -17,9 +17,7 @@ updates:
 
   # Update frontend dependencies
   - package-ecosystem: "npm"
-    # required for double configuration of the same package ecosystem
-    target-branch: "main"
-    directory: "/"
+    directory: "/frontend/"
     schedule:
       interval: "daily"
     pull-request-branch-name:
