@@ -315,8 +315,7 @@ export function ApplicationPage1SchemaRefined(round: { begin: Date; end: Date })
   });
 }
 
-// if applicantType === Organisation | Company => organisation.identifier is required
-// if hasBillingAddress || applicantType === Individual => billingAddress is required
+// use optionals for unregistering fields that are only required for some Applicant types (doesn't require superRefine)
 export const ApplicationPage3Schema = z
   .object({
     pk: z.number(),
@@ -341,7 +340,7 @@ export const ApplicationPage3Schema = z
     hasBillingAddress: z.boolean(),
     // not submitted
     isRegisteredAssociation: z.boolean(),
-    additionalInformation: z.string().max(255).optional(),
+    additionalInformation: z.string().min(1, { error: "Required" }).max(255).optional(),
     // municipality is only for Organisations
     municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]).optional(),
   })
@@ -540,7 +539,7 @@ export function convertApplicationPage3(app: Maybe<ApplicantFieldsFragment>): Ap
     billingCity: hasBillingAddress ? app?.billingCity : undefined,
     billingPostCode: hasBillingAddress ? app?.billingPostCode : undefined,
 
-    additionalInformation: app?.additionalInformation ?? "",
+    additionalInformation: app?.additionalInformation || undefined,
     municipality: app?.municipality ?? undefined,
   };
 }
