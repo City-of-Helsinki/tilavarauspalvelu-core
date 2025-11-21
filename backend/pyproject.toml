@@ -83,7 +83,7 @@ pytest-xdist = "3.8.0"
 [tool.poetry.group.lint.dependencies]
 # Dependencies only required for linting.
 pre-commit = "4.4.0"
-ruff = "0.14.5"
+ruff = "0.14.6"
 mypy = "1.18.2"
 django-stubs = { version = "5.2.7", extras = ["compatible-mypy"] }
 
