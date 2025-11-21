@@ -33,17 +33,32 @@ const nextConfig = {
   i18n,
   basePath: env.NEXT_PUBLIC_BASE_URL,
   // eslint-disable-next-line require-await
-  async rewrites() {
+  async redirects() {
     return [
-      {
-        source: "/reservation/confirmation/:id",
-        destination: "/reservations/:id/confirmation",
-      },
-      // old series/:reservation cancel url
       {
         // Old search url
         source: "/search/single",
         destination: "/search",
+        permanent: true,
+      },
+    ];
+  },
+  // eslint-disable-next-line require-await
+  async rewrites() {
+    return [
+      {
+        // webstore callback
+        source: "/reservation/cancel",
+        destination: "/callbacks/webstore/cancel",
+      },
+      {
+        // webstore callback
+        source: "/success",
+        destination: "/callbacks/webstore/success",
+      },
+      {
+        source: "/reservation/confirmation/:id",
+        destination: "/reservations/:id/confirmation",
       },
       {
         source: "/applications/:id/view/:reservationId/cancel",
