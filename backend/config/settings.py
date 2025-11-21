@@ -585,9 +585,10 @@ class Common(Environment):
         "pre",
     }
     NH3_ALLOWED_ATTRIBUTES = {
-        "a": {"href", "target"},
+        "a": {"href", "target", "rel"},
         "*": {"style"},
     }
+    NH3_ALLOWED_URL_SCHEMES = {"http", "https"}
 
 
 class EmptyDefaults:

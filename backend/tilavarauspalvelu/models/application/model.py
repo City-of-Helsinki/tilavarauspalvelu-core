@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, ClassVar
 from django.db import models
 from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
-from django_nh3.models import Nh3Field
+from django_nh3.models import Nh3TextField
 from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 
@@ -45,12 +45,12 @@ class Application(SerializableModelMixin, models.Model):
 
     # Basic information
     applicant_type: ReserveeType | None = TextChoicesField(enum=ReserveeType, null=True, blank=True)
-    additional_information: str = Nh3Field(blank=True, default="")
+    additional_information: str = Nh3TextField(blank=True, default="")
 
     # Handling data
     cancelled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    working_memo: str = Nh3Field(blank=True, default="")
+    working_memo: str = Nh3TextField(blank=True, default="")
 
     # Email notification flags
     in_allocation_notification_sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
@@ -73,7 +73,7 @@ class Application(SerializableModelMixin, models.Model):
     organisation_identifier: str = models.CharField(max_length=255, blank=True, default="")
     organisation_year_established: int | None = models.PositiveIntegerField(null=True, blank=True)
     organisation_active_members: int | None = models.PositiveIntegerField(null=True, blank=True)
-    organisation_core_business: str = Nh3Field(blank=True, default="")
+    organisation_core_business: str = Nh3TextField(blank=True, default="")
     organisation_street_address: str = models.CharField(max_length=255, blank=True, default="")
     organisation_post_code: str = models.CharField(max_length=255, blank=True, default="")
     organisation_city: str = models.CharField(max_length=255, blank=True, default="")
