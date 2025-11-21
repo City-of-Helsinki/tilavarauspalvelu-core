@@ -22,7 +22,7 @@
     "date-fns": "^4.1.0",
     "focus-trap-react": "^11.0.4",
     "graphql": "^16.11.0",
-    "hds-react": "^4.7.1",
+    "hds-react": "^4.8.1",
     "i18next": "^25.6.0",
     "lodash-es": "^4.17.21",
     "prettier-config": "workspace:*",
