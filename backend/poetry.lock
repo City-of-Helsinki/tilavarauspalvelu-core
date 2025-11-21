@@ -1128,18 +1128,20 @@ tests = ["coverage[toml]", "mock-django"]
 
 [[package]]
 name = "django-nh3"
-version = "0.1.1"
+version = "0.2.1"
 description = "Django integration with for nh3, Python binding to Ammonia HTML sanitizer Rust crate."
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "django_nh3-0.1.1-py3-none-any.whl", hash = "sha256:10df44fd9c1d1bc5d88739094826c636c2c256ba9d89d17e4356280bb8e159a0"},
+    {file = "django_nh3-0.2.1-py3-none-any.whl", hash = "sha256:0f99cb6ea099d76a9e401cdc09ec10e001204562230bd5a3b0e6f27bccd69178"},
+    {file = "django_nh3-0.2.1.tar.gz", hash = "sha256:de453061c16c12fa5ebfcc6d0691d35ca1802cc477632ed504a2f21ac878a4a8"},
 ]
 
 [package.dependencies]
-Django = ">=3.2"
+django = ">=3.2"
 nh3 = "*"
+typing-extensions = "*"
 
 [[package]]
 name = "django-redis"
@@ -3644,4 +3646,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "805528fef7d3d71a748567e45196df7d53b13f477dd6da4dc162f02337146314"
+content-hash = "75a2a8ebba3d7d413de9e82acc5f827dd67864c97730a5b444dad92ab5a87d62"

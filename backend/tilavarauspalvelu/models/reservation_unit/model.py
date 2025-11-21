@@ -10,7 +10,7 @@ from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.db.models import Subquery
 from django.utils.translation import gettext_lazy as _
-from django_nh3.models import Nh3Field
+from django_nh3.models import Nh3CharField
 from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 
@@ -88,45 +88,45 @@ class ReservationUnit(models.Model):
     # Strings
 
     name: str = models.CharField(max_length=255)
-    description: str = Nh3Field(
+    description: str = Nh3CharField(
         blank=True,
         default="",
         max_length=8000,  # Double of the limit of 4000 chars in order to accommodate HTML tags
-        tags=settings.NH3_ALLOWED_TAGS,
-        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+        allowed_tags=settings.NH3_ALLOWED_TAGS,
+        allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
-    contact_information: str = Nh3Field(
+    contact_information: str = Nh3CharField(
         blank=True,
         default="",
         max_length=1000,  # Double of the limit of 500 chars in order to accommodate HTML tags
     )
-    notes_when_applying: str | None = Nh3Field(
+    notes_when_applying: str | None = Nh3CharField(
         null=True,
         blank=True,
         max_length=4000,  # Double of the limit of 2000 chars in order to accommodate HTML tags
-        tags=settings.NH3_ALLOWED_TAGS,
-        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+        allowed_tags=settings.NH3_ALLOWED_TAGS,
+        allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
-    reservation_pending_instructions: str = Nh3Field(
+    reservation_pending_instructions: str = Nh3CharField(
         blank=True,
         default="",
         max_length=8000,  # Double of the limit of 8000 chars in order to accommodate HTML tags
-        tags=settings.NH3_ALLOWED_TAGS,
-        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+        allowed_tags=settings.NH3_ALLOWED_TAGS,
+        allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
-    reservation_confirmed_instructions: str = Nh3Field(
+    reservation_confirmed_instructions: str = Nh3CharField(
         blank=True,
         default="",
         max_length=8000,  # Double of the limit of 8000 chars in order to accommodate HTML tags
-        tags=settings.NH3_ALLOWED_TAGS,
-        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+        allowed_tags=settings.NH3_ALLOWED_TAGS,
+        allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
-    reservation_cancelled_instructions: str = Nh3Field(
+    reservation_cancelled_instructions: str = Nh3CharField(
         blank=True,
         default="",
         max_length=8000,  # Double of the limit of 8000 chars in order to accommodate HTML tags
-        tags=settings.NH3_ALLOWED_TAGS,
-        attributes=settings.NH3_ALLOWED_ATTRIBUTES,
+        allowed_tags=settings.NH3_ALLOWED_TAGS,
+        allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
 
     # Integers

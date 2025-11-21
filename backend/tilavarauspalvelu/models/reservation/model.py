@@ -9,7 +9,7 @@ from django.db import models
 from django.db.models.functions import Concat, Trim
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django_nh3.models import Nh3Field
+from django_nh3.models import Nh3TextField
 from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 
@@ -74,11 +74,11 @@ class Reservation(SerializableModelMixin, models.Model):
         null=True,
         blank=True,
     )
-    handling_details: str = Nh3Field(blank=True, default="")
-    working_memo: str = Nh3Field(blank=True, default="")
+    handling_details: str = Nh3TextField(blank=True, default="")
+    working_memo: str = Nh3TextField(blank=True, default="")
 
     # Cancellation information
-    cancel_details: str = Nh3Field(blank=True, default="")
+    cancel_details: str = Nh3TextField(blank=True, default="")
     cancel_reason: ReservationCancelReasonChoice | None = TextChoicesField(
         enum=ReservationCancelReasonChoice,
         null=True,
@@ -107,7 +107,7 @@ class Reservation(SerializableModelMixin, models.Model):
 
     # Free of charge information
     applying_for_free_of_charge: bool = models.BooleanField(default=False, blank=True)
-    free_of_charge_reason: str | None = Nh3Field(null=True, blank=True)
+    free_of_charge_reason: str | None = Nh3TextField(null=True, blank=True)
 
     # Reservee information
     reservee_identifier: str = models.CharField(max_length=255, blank=True, default="")
