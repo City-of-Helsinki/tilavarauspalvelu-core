@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: "Checkout code"
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: "Set up python"
         id: setup-python
@@ -127,7 +127,7 @@ jobs:
 
     steps:
       - name: "Checkout code"
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: "Set up python"
         id: setup-python
@@ -186,7 +186,7 @@ jobs:
 
     steps:
       - name: "Checkout code"
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           # Disable shallow cloning to improve relevancy of reporting in SonarCloud
           fetch-depth: 0
