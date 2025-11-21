@@ -3,6 +3,7 @@
 import React, { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
 import { IconAlertCircleFill, Tooltip } from "hds-react";
 import Quill from "quill";
+import "quill/dist/quill.snow.css";
 import styled from "styled-components";
 import { Flex } from "ui/src/styled";
 
