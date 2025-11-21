@@ -52,6 +52,8 @@
     }
   },
   "reservationCancelledTitle": "Varauksesi on peruttu!",
+  "cancelReservationNotFoundTitle": "Varausta ei löytynyt",
+  "cancelReservationErrorTitle": "Varauksen peruminen epäonnistui",
   "redoReservation": "Varaa uudelleen",
   "upcomingReservations": "Tulevat",
   "pastReservations": "Menneet",

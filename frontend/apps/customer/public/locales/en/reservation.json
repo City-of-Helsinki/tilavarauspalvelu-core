@@ -52,6 +52,8 @@
     }
   },
   "reservationCancelledTitle": "Your booking has been cancelled!",
+  "cancelReservationNotFoundTitle": "Booking could not be found",
+  "cancelReservationErrorTitle": "Failed to cancel the booking",
   "redoReservation": "Make a new booking",
   "upcomingReservations": "Upcoming",
   "pastReservations": "Past",
