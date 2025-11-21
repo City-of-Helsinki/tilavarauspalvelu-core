@@ -4,6 +4,7 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ignoreMaybeArray } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
+import { getApiErrors } from "@ui/modules/apolloUtils";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { useEnvContext } from "@/context/EnvContext";
 import { CancelledLinkSet } from "@/lib/reservation/[id]/cancel";
@@ -24,13 +25,13 @@ import {
 // compromise would be to use reservations/cancelled without the id (and staticly render the same page with no queries)
 // this would allow refresh that page (and remove the cancel?orderId=... from the url)
 // since this callback page should not be accessed by users in any case (nor left in the browser history)
-function Cancel(_props: NarrowedProps): JSX.Element {
+function Cancel({ state }: NarrowedProps): JSX.Element {
   const { t } = useTranslation();
   const { env } = useEnvContext();
   const routes = [
     {
       slug: reservationsPrefix,
-      title: t("breadcrumb:reservation"),
+      title: t("breadcrumb:reservations"),
     },
     {
       title: t("reservation:cancel.reservation"),
@@ -40,7 +41,13 @@ function Cancel(_props: NarrowedProps): JSX.Element {
   return (
     <>
       <Breadcrumb routes={routes} />
-      <H1 $noMargin>{t("reservations:reservationCancelledTitle")}</H1>
+      <H1 $noMargin>
+        {state === "cancelled"
+          ? t("reservation:reservationCancelledTitle")
+          : state === "not-found"
+            ? t("reservation:cancelReservationNotFoundTitle")
+            : t("reservation:cancelReservationErrorTitle")}
+      </H1>
       <CancelledLinkSet apiBaseUrl={env.apiBaseUrl} />
     </>
   );
@@ -54,7 +61,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const notFoundValue = {
     notFound: true,
     props: {
-      ...(await serverSideTranslations(locale ?? "fi")),
       notFound: true,
     },
   };
@@ -64,54 +70,50 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   }
 
   const apolloClient = createApolloClient(apiBaseUrl, ctx);
-  const reservation = await getReservationByOrderUuid(apolloClient, orderId);
+  try {
+    const reservation = await getReservationByOrderUuid(apolloClient, orderId);
 
-  if (reservation?.pk == null) {
-    return notFoundValue;
-  }
+    if (reservation?.pk == null) {
+      return notFoundValue;
+    }
 
-  if (reservation?.state !== ReservationStateChoice.WaitingForPayment) {
-    return {
-      redirect: {
-        destination: getReservationPath(reservation.pk),
-        permanent: false,
+    if (reservation?.state !== ReservationStateChoice.WaitingForPayment) {
+      return {
+        redirect: {
+          destination: getReservationPath(reservation.pk),
+          permanent: false,
+        },
+        props: {
+          notFound: true,
+        },
+      };
+    }
+
+    await apolloClient.mutate<DeleteReservationMutation, DeleteReservationMutationVariables>({
+      mutation: DeleteReservationDocument,
+      variables: {
+        input: {
+          pk: reservation.pk.toString(),
+        },
       },
+    });
+
+    return {
       props: {
-        notFound: true,
+        state: "cancelled" as const,
+        ...(await serverSideTranslations(locale ?? "fi")),
+      },
+    };
+  } catch (e) {
+    const errors = getApiErrors(e);
+    const notFoundError = errors.find((e) => e.code === "NOT_FOUND");
+    return {
+      props: {
+        state: notFoundError != null ? ("not-found" as const) : ("error" as const),
+        ...(await serverSideTranslations(locale ?? "fi")),
       },
     };
   }
-
-  const { errors } = await apolloClient.mutate<DeleteReservationMutation, DeleteReservationMutationVariables>({
-    mutation: DeleteReservationDocument,
-    variables: {
-      input: {
-        pk: reservation.pk.toString(),
-      },
-    },
-  });
-
-  if (errors != null) {
-    // eslint-disable-next-line no-console
-    console.error("Delete mutation failed with: ", errors);
-    // TODO improve the error page (or redirect to home page alternatvely or to users own reservations or this reservation?)
-    // if the reservation is deleted it will not show up anywhere (it's deleted from the database also)
-    return {
-      redirect: {
-        destination: "/error",
-        permanent: false,
-      },
-      props: {
-        notFound: true,
-      },
-    };
-  }
-
-  return {
-    props: {
-      ...(await serverSideTranslations(locale ?? "fi")),
-    },
-  };
 }
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];

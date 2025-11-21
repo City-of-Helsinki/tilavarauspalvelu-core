@@ -52,6 +52,8 @@
     }
   },
   "reservationCancelledTitle": "Din bokning har avbokats!",
+  "cancelReservationNotFoundTitle": "Bokningen kunde inte hittas",
+  "cancelReservationErrorTitle": "Misslyckades med att avboka bokningen",
   "redoReservation": "Boka på nytt",
   "upcomingReservations": "Kommande",
   "pastReservations": "Tidigare",
