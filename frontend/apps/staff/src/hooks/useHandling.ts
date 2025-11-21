@@ -5,6 +5,12 @@ import { formatApiDate } from "ui/src/modules/date-utils";
 import { useSession } from "@/hooks";
 import { useHandlingDataQuery, ReservationStateChoice } from "@gql/gql-types";
 
+/**
+ * Hook that fetches reservations requiring handling and units with permissions
+ * Only executes query when user is authenticated
+ * @returns Object containing handlingCount (number of reservations requiring handling),
+ *          hasOwnUnits (whether user has units), and refetch function
+ */
 export function useHandling() {
   const { isAuthenticated } = useSession();
 

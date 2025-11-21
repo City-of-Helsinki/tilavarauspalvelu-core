@@ -2,6 +2,13 @@ import { gql } from "@apollo/client";
 import type { UserPermissionChoice } from "@gql/gql-types";
 import { useCheckPermissionsQuery } from "@gql/gql-types";
 
+/**
+ * Hook that checks if the user has a specific permission for given units
+ * @param units - Array of unit IDs to check permissions for
+ * @param permission - Permission type to check
+ * @param requireAll - If true, requires permission on all units; if false, requires permission on at least one unit
+ * @returns Object containing hasPermission flag, isLoading state, and error
+ */
 export function useCheckPermission({
   units,
   permission,

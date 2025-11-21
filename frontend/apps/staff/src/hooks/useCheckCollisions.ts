@@ -7,6 +7,17 @@ import { createNodeId } from "ui/src/modules/helpers";
 import { combineAffectingReservations, doesIntervalCollide, reservationToInterval } from "@/modules/helpers";
 import { ReservationTypeChoice, useReservationsByReservationUnitQuery } from "@gql/gql-types";
 
+/**
+ * Hook that checks for reservation collisions within a time range
+ * Fetches existing reservations and checks if they overlap with the specified time range
+ * @param reservationPk - Current reservation primary key (excluded from collision check)
+ * @param reservationUnitPk - Reservation unit to check collisions for
+ * @param start - Start date/time of the reservation
+ * @param end - End date/time of the reservation
+ * @param buffers - Buffer times before and after the reservation
+ * @param reservationType - Type of reservation being checked
+ * @returns Object containing isLoading flag and hasCollisions boolean
+ */
 export function useCheckCollisions({
   reservationPk,
   reservationUnitPk,
