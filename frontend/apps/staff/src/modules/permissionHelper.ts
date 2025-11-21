@@ -41,6 +41,14 @@ export const CURRENT_USER = gql`
 
 type UserNode = CurrentUserQuery["currentUser"];
 
+/**
+ * Checks if user has a specific permission for a given unit
+ * Checks both direct unit permissions and unit group permissions
+ * @param permission - Permission to check for
+ * @param unitPk - Unit primary key
+ * @param user - Current user object
+ * @returns True if user has the permission for the unit, false otherwise
+ */
 function hasUnitPermission(permission: UserPermissionChoice, unitPk: number, user: UserNode): boolean {
   const unitRoles = filterNonNullable(user?.unitRoles);
 
@@ -63,13 +71,26 @@ function hasUnitPermission(permission: UserPermissionChoice, unitPk: number, use
   return false;
 }
 
+/**
+ * Checks if user has a general (non-unit-specific) permission
+ * @param permission - Permission to check for
+ * @param user - Current user object
+ * @returns True if user has the general permission, false otherwise
+ */
 function hasGeneralPermission(permission: UserPermissionChoice, user: UserNode) {
   const roles = filterNonNullable(user?.generalRoles);
   return roles.find((x) => x.permissions?.find((y) => y === permission) != null);
 }
 
-/// Check if the user has a specific permission in any of their roles
-/// If a unitPk is provided, check if the user has that permission for that specific unit, otherwise check for any units
+/**
+ * Checks if user has a specific permission in any of their roles
+ * If unitPk is provided, checks permission for that specific unit
+ * If unitPk is null/undefined, checks for general permission or any unit permission
+ * @param user - Current user object
+ * @param permissionName - Permission to check for
+ * @param unitPk - Optional unit primary key to check permission for specific unit
+ * @returns True if user has the permission, false otherwise
+ */
 export function hasPermission(
   user: CurrentUserQuery["currentUser"],
   permissionName: UserPermissionChoice,
@@ -88,15 +109,20 @@ export function hasPermission(
   if (unitPk && hasUnitPermission(permissionName, unitPk, user)) {
     return true;
   }
-  if (!unitPk && hasSomePermission(user, permissionName)) {
-    return true;
-  }
-
-  return false;
+  return !unitPk && hasSomePermission(user, permissionName);
 }
 
-/// Returns true if the user if the user is allowed to perform what the permission is for
-/// e.g. if the user allowed to view some reservations but not all this will return true
+/**
+ * Checks if user has a specific permission for at least some entities (not necessarily all)
+ * Returns true if user is allowed to perform the action for any units or generally
+ * @param user - Current user object
+ * @param permission - Permission to check for
+ * @param onlyGeneral - If true, only checks general permissions (ignores unit-specific permissions)
+ * @returns True if user has the permission for at least some context, false otherwise
+ * @example
+ * // User can view some reservations (but not necessarily all)
+ * hasSomePermission(user, UserPermissionChoice.CanViewReservations) // returns true
+ */
 export function hasSomePermission(
   user: CurrentUserQuery["currentUser"],
   permission: UserPermissionChoice,
@@ -122,7 +148,12 @@ export function hasSomePermission(
 const hasPerm = (role: Pick<NonNullable<UserNode>["unitRoles"][0], "permissions">) =>
   role.permissions != null && role.permissions.length > 0;
 
-/// Returns true if the user has any kind of access to the system
+/**
+ * Checks if user has any kind of access/permissions in the system
+ * Returns true if user has any permissions (general or unit-specific)
+ * @param user - Current user object
+ * @returns True if user has any permissions, false otherwise
+ */
 export function hasAnyPermission(user: UserNode): boolean {
   if (!user) {
     return false;
