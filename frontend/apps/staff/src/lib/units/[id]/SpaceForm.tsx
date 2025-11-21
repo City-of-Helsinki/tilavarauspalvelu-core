@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { z } from "zod";
 import { ControlledNumberInput } from "ui/src/components/form";
 import { breakpoints } from "ui/src/modules/const";
-import { getTranslatedError } from "@/modules/util";
+import { getTranslatedError } from "@/modules/helpers";
 
 const EditorColumns = styled.div`
   display: grid;

@@ -6,23 +6,22 @@ import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ReservableTimeSpanType } from "ui/gql/gql-types";
 import CommonCalendar, { type SlotProps } from "ui/src/components/calendar/Calendar";
+import { errorToast } from "ui/src/components/toast";
+import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
+import { formatApiDate } from "ui/src/modules/date-utils";
+import { createNodeId, filterNonNullable } from "ui/src/modules/helpers";
 import {
   getBuffersFromEvents,
   isCellOverlappingSpan,
   ReservationEventType,
   TimeSpanType,
-} from "ui/src/components/calendar/util";
-import { errorToast } from "ui/src/components/toast";
-import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
-import { formatApiDate } from "ui/src/modules/date-utils";
-import { createNodeId, filterNonNullable } from "ui/src/modules/helpers";
+} from "@ui/components/calendar/utils";
 import { Legend, LegendsWrapper } from "@/components/Legend";
 import { useSession } from "@/hooks";
 import { EVENT_BUFFER, HDS_CLOCK_ICON_SVG, NOT_RESERVABLE } from "@/modules/calendarStyling";
-import { combineAffectingReservations } from "@/modules/helpers";
+import { combineAffectingReservations, getReserveeName } from "@/modules/helpers";
 import { hasPermission } from "@/modules/permissionHelper";
 import { getReservationUrl } from "@/modules/urls";
-import { getReserveeName } from "@/modules/util";
 import {
   ReservationTypeChoice,
   type ReservationUnitCalendarQuery,

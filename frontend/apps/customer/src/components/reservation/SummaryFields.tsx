@@ -4,7 +4,7 @@ import {
   formContainsField,
   type FormField,
   getExtendedGeneralFormFields,
-} from "@ui/reservation-form/util";
+} from "@ui/reservation-form/utils";
 import { AutoGrid, H4 } from "@ui/styled";
 import { type OptionsRecord } from "@ui/types";
 import { LabelValuePair } from "@/components/LabelValuePair";

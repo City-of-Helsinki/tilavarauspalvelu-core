@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled, { css, RuleSet } from "styled-components";
 import { Flex, truncatedText } from "ui/src/styled";
-import { unavailableBackgroundSVG } from "@ui/components/calendar/util";
+import { unavailableBackgroundSVG } from "@ui/components/calendar/utils";
 
 type LegendItemT = {
   title: string;

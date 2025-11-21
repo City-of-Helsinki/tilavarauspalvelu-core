@@ -5,11 +5,10 @@ import styled from "styled-components";
 import { dateToMinutes, formatTimeRange, parseValidDateObject } from "ui/src/modules/date-utils";
 import { Flex } from "ui/src/styled";
 import VisibleIfPermission from "@/components/VisibleIfPermission";
-import { truncate } from "@/modules/helpers";
+import { getReserveeName, truncate } from "@/modules/helpers";
 import { getReservationUrl } from "@/modules/urls";
-import { getReserveeName } from "@/modules/util";
 import { type ReservationUnitReservationsFragment, UserPermissionChoice } from "@gql/gql-types";
-import { CELL_BORDER } from "./const";
+import { CELL_BORDER } from "./utils";
 
 const MAX_POPOVER_COMMENT_LENGTH = 140;
 const POPOVER_MAX_WIDTH = 300;

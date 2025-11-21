@@ -19,7 +19,7 @@ import { PendingReservationFormSchema, type PendingReservationFormType } from "@
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
 import { ReservationPageWrapper, ReservationTitleSection } from "@/styled/reservation";
-import { StyledStepper } from "@/styled/util";
+import { StyledStepper } from "@/styled/utils";
 import {
   type ReservationEditPageQuery,
   type ReservationEditPageQueryVariables,

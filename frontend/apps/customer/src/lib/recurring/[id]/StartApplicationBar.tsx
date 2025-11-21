@@ -12,8 +12,8 @@ import { Flex, NoWrap, WhiteButton, pageSideMargins } from "ui/src/styled";
 import { LoginFragment } from "@/components/LoginFragment";
 import { useReservationUnitList } from "@/hooks";
 import { isBrowser } from "@/modules/const";
+import { getPostLoginUrl } from "@/modules/helpers";
 import { getApplicationPath } from "@/modules/urls";
-import { getPostLoginUrl } from "@/modules/util";
 import { type ApplicationCreateMutationInput, ReservationUnitNode, useCreateApplicationMutation } from "@gql/gql-types";
 
 const SpaceWrapper = styled.div`

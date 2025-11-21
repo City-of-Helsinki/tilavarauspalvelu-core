@@ -13,7 +13,7 @@ import { isNotFoundError } from "@ui/modules/apolloUtils";
 import { transformMunicipality } from "@ui/modules/conversion";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/reservation-form";
-import { getExtendedGeneralFormFields } from "@ui/reservation-form/util";
+import { getExtendedGeneralFormFields } from "@ui/reservation-form/utils";
 import { getReservationFormSchema, ReservationFormValues, type ReservationFormValueT } from "@ui/schemas";
 import { Flex, LinkLikeButton } from "@ui/styled";
 import { type OptionsRecord } from "@ui/types";

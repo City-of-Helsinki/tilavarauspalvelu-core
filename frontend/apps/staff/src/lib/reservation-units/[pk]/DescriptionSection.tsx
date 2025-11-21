@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { ControlledSelect } from "ui/src/components/form";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { AutoGrid } from "ui/src/styled";
-import { getTranslatedError } from "@/modules/util";
+import { getTranslatedError } from "@/modules/helpers";
 import type { ReservationUnitEditorParametersQuery } from "@gql/gql-types";
 import { ImageEditor } from "./ImageEditor";
 import type { ReservationUnitEditFormValues } from "./form";

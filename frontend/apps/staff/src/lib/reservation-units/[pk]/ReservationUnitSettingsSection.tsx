@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { ControlledSelect, ControlledCheckbox, DateTimeInput } from "ui/src/components/form";
 import { sort } from "ui/src/modules/helpers";
 import { AutoGrid, Flex } from "ui/src/styled";
-import { getTranslatedError } from "@/modules/util";
+import { getTranslatedError } from "@/modules/helpers";
 import { AuthenticationType, ReservationFormType, ReservationStartInterval } from "@gql/gql-types";
 import { CustomNumberInput } from "./CustomNumberInput";
 import { FieldGroup } from "./FieldGroup";

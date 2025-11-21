@@ -12,10 +12,10 @@ import Calendar, {
   SlotProps,
 } from "ui/src/components/calendar/Calendar";
 import { Toolbar } from "ui/src/components/calendar/Toolbar";
-import { getEventBuffers } from "ui/src/components/calendar/util";
 import { breakpoints, RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { formatApiDate, formatDate, formatDuration, formatTime, parseUIDate } from "ui/src/modules/date-utils";
 import { filterNonNullable, getLocalizationLang } from "ui/src/modules/helpers";
+import { getEventBuffers } from "@ui/components/calendar/utils";
 import { Legend } from "@/components/calendar/Legend";
 import { useCurrentUser } from "@/hooks";
 import { eventStyleGetter } from "@/modules/eventStyleGetter";

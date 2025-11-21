@@ -25,8 +25,7 @@ import { ValueBox } from "@/components/ValueBox";
 import { ApplicationWorkingMemo } from "@/components/WorkingMemo";
 import { useCheckPermission } from "@/hooks";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { getApplicantName, translateReserveeType } from "@/modules/helpers";
-import { formatAgeGroup, formatNumber } from "@/modules/util";
+import { formatAgeGroup, formatNumber, getApplicantName, translateReserveeType } from "@/modules/helpers";
 import { ApplicationDatas, Summary } from "@/styled";
 import {
   type ApplicationAdminQuery,

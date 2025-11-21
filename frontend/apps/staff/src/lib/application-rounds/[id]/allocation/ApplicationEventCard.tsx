@@ -10,9 +10,8 @@ import { convertWeekday } from "ui/src/modules/conversion";
 import { filterNonNullable, truncate } from "ui/src/modules/helpers";
 import { fontMedium, SemiBold } from "ui/src/styled";
 import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/modules/const";
-import { getApplicantName } from "@/modules/helpers";
+import { formatAgeGroup, getApplicantName } from "@/modules/helpers";
 import { getApplicationUrl } from "@/modules/urls";
-import { formatAgeGroup } from "@/modules/util";
 import {
   type ApplicationSectionAllocationsQuery,
   type Maybe,

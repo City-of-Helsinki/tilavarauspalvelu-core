@@ -14,8 +14,8 @@ import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { Error404 } from "@/components/Error404";
 import { ExternalLink } from "@/components/ExternalLink";
 import { PUBLIC_URL, NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { formatAddress } from "@/modules/helpers";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/modules/urls";
-import { formatAddress } from "@/modules/util";
 import { UserPermissionChoice, useUnitPageQuery } from "@gql/gql-types";
 
 const Image = styled.img`
