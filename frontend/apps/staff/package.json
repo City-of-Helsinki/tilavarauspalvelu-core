@@ -17,7 +17,7 @@
     "tsc:clean": "tsc --build --clean"
   },
   "dependencies": {
-    "@apollo/client": "^3.13.8",
+    "@apollo/client": "^3.14.0",
     "@hookform/resolvers": "5.2.2",
     "@sentry/nextjs": "^10.22.0",
     "apollo-upload-client": "18.0.1",
