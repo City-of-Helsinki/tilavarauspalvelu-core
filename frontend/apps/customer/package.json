@@ -35,7 +35,7 @@
     "prettier-config": "workspace:*",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "react-hook-form": "7.65.0",
+    "react-hook-form": "7.66.1",
     "react-transition-group": "^4.4.5",
     "react-use": "^17.6.0",
     "styled-components": "6.1.19",
