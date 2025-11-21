@@ -21,6 +21,11 @@ export interface CustomerEnvConfig extends CommonEnvConfig {
   profileLink: string;
 }
 
+/**
+ * Returns default server-side props with empty/false values
+ * Used as fallback when environment variables are not available
+ * @returns CustomerEnvConfig with default values
+ */
 export function getDefaultServerSideProps(): CustomerEnvConfig {
   return {
     apiBaseUrl: "",
@@ -34,6 +39,11 @@ export function getDefaultServerSideProps(): CustomerEnvConfig {
   };
 }
 
+/**
+ * Returns common server-side props populated from environment variables
+ * @returns CustomerEnvConfig with values from environment variables or defaults
+ * @note Returns null or empty strings instead of undefined to avoid breaking JSON.stringify in getServerSideProps
+ */
 export function getCommonServerSideProps(): CustomerEnvConfig {
   // NOTE don't return undefined here, it breaks JSON.stringify used by getServerSideProps
   // use null or default value instead
@@ -59,6 +69,12 @@ export function getCommonServerSideProps(): CustomerEnvConfig {
 }
 
 type GetGenericTermsReturn = TermsOfUseFieldsFragment | null;
+/**
+ * Fetches generic booking terms of use from the API on the server side
+ * @param apolloClient - Apollo Client instance for making GraphQL queries
+ * @returns Generic terms of use fragment or null if not found
+ * @note Logs error to console if terms are missing but does not throw
+ */
 export async function getGenericTerms(apolloClient: ApolloClient<unknown>): Promise<GetGenericTermsReturn> {
   const { data: tosData } = await apolloClient.query<TermsOfUseQuery, TermsOfUseQueryVariables>({
     query: TermsOfUseDocument,
@@ -80,8 +96,14 @@ export async function getGenericTerms(apolloClient: ApolloClient<unknown>): Prom
   return tos;
 }
 
-// TODO narrow down the errors properly and show the user the real reason
-// requires refactoring error pages to display GQL errors
+/**
+ * Fetches a reservation by order UUID from the API on the server side
+ * @param apolloClient - Apollo Client instance for making GraphQL queries
+ * @param uuid - Order UUID to look up
+ * @returns Reservation object if found, null otherwise
+ * @todo Narrow down errors properly and show user the real reason - requires refactoring error pages
+ * @todo Retry once if not found (or increase timeout so webhook from store has fired)
+ */
 export async function getReservationByOrderUuid(
   apolloClient: ApolloClient<NormalizedCacheObject>,
   uuid: string
