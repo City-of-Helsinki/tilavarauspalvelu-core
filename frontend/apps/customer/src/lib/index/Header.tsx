@@ -9,7 +9,7 @@ interface HeadProps {
 export function Head(props: HeadProps): JSX.Element {
   return (
     <div>
-      <H1 $large $marginBottom="none" $marginTop="m">
+      <H1 $large $marginTop="m">
         {props.heading}
       </H1>
       <p>{props.text}</p>

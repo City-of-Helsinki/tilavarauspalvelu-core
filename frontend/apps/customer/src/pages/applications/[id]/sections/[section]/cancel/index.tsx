@@ -123,7 +123,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
       <Breadcrumb routes={routes} />
       <ReservationPageWrapper>
         <div>
-          <H1 $noMargin>{title}</H1>
+          <H1 $marginTop="none">{title}</H1>
           <p>{ingress}</p>
           <p>{infoBody}</p>
         </div>

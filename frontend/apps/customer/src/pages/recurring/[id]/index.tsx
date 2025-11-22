@@ -93,7 +93,7 @@ function SeasonalSearch({ applicationRound, options }: Readonly<SeasonalSearchPr
     <>
       <Breadcrumb routes={routes} />
       <div>
-        <H1 $noMargin>{t("applicationRound:search.title")}</H1>
+        <H1 $marginTop="none">{t("applicationRound:search.title")}</H1>
         <p>{t("applicationRound:search.subtitle")}</p>
       </div>
       {error ? (
