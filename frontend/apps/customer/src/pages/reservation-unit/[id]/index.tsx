@@ -224,7 +224,8 @@ function ReservationUnit({
       endsAt: end.toISOString(),
       reservationUnit: reservationUnit.pk,
     };
-    return await createReservation(input);
+    const awaitedMutation = await createReservation(input);
+    return awaitedMutation;
   };
 
   const reservableTimes = useReservableTimes(reservationUnit);

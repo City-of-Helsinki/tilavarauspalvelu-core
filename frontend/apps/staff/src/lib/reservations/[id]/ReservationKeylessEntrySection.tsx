@@ -137,7 +137,7 @@ function ReservationKeylessEntrySingle({
 
       <DataWrapper label={t("accessType:validity.label")}>
         {reservation.pindoraInfo
-          ? `${formatTimeRange(dateToMinutes(pindoraAccessCodeBegins), dateToMinutes(pindoraAccessCodeEnds))}`
+          ? formatTimeRange(dateToMinutes(pindoraAccessCodeBegins), dateToMinutes(pindoraAccessCodeEnds))
           : "-"}
       </DataWrapper>
 
@@ -186,7 +186,10 @@ function ReservationKeylessEntryRecurring({
         <DataWrapper label={t("accessType:validity.label")}>
           <NoWrap>
             {validityBeginsTime
-              ? `${formatTimeRange(dateToMinutes(parseValidDateObject(validityBeginsTime)), dateToMinutes(parseValidDateObject(validityEndsTime ?? "")))}`
+              ? formatTimeRange(
+                  dateToMinutes(parseValidDateObject(validityBeginsTime)),
+                  dateToMinutes(parseValidDateObject(validityEndsTime ?? ""))
+                )
               : "-"}
           </NoWrap>
         </DataWrapper>

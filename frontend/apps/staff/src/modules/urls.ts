@@ -103,7 +103,7 @@ export function getReservationSeriesUrl(
 }
 
 export function getNotificationListUrl(): string {
-  return `${BANNER_NOTIFICATIONS_URL_PREFIX}`;
+  return BANNER_NOTIFICATIONS_URL_PREFIX;
 }
 
 export function getNotificationUrl(pk: Maybe<number> | undefined): string {

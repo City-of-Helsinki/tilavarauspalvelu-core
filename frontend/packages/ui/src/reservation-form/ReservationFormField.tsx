@@ -28,7 +28,7 @@ export function ReservationFormField({ field, reserveeType, form }: Props): Reac
   } = form;
 
   const label = constructReservationFieldLabel(t, reserveeType, field);
-  const errorText = translateReserveeFormError(t, label, errors[`${field}`]);
+  const errorText = translateReserveeFormError(t, label, errors[field]);
 
   switch (field) {
     case "reserveeIdentifier": {
@@ -62,9 +62,8 @@ export function ReservationFormField({ field, reserveeType, form }: Props): Reac
     case "reserveePhone":
     case "reserveeLastName":
     case "reserveeFirstName":
-    case "reserveeOrganisationName": 
+    case "reserveeOrganisationName":
       return <ReservationTextInput label={label} name={field} register={register} errorText={errorText} />;
-    
   }
 }
 

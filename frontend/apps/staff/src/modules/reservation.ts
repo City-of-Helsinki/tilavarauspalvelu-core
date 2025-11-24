@@ -216,7 +216,9 @@ function createRecurringTagString(reservation: CreateTagStringFragment, t: TFunc
     return "";
   }
 
-  const recurringTag = `${formatDateRange(parseValidDateObject(beginDate), parseValidDateObject(endDate), { includeWeekday: false })}`;
+  const recurringTag = formatDateRange(parseValidDateObject(beginDate), parseValidDateObject(endDate), {
+    includeWeekday: false,
+  });
   const unitTag = reservationUnitName(reservation.reservationUnit);
 
   const begin = fromApiDateTime(beginDate, beginTime);

@@ -150,7 +150,7 @@ function AccessTypeTooltip({ accessTypes }: Pick<ReservationUnitHeadFragment, "a
             <span>
               {accessTypeDuration.endDate != null
                 ? formatDateRange(accessTypeDuration.beginDate, accessTypeDuration.endDate, { includeWeekday: false })
-                : `${t("common:dateGte", { value: formatDate(accessTypeDuration.beginDate) })}`}
+                : t("common:dateGte", { value: formatDate(accessTypeDuration.beginDate) })}
             </span>
           </li>
         ))}

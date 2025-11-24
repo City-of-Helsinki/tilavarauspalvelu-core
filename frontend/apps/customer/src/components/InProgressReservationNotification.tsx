@@ -67,7 +67,7 @@ function ReservationNotification({
 
   const translateKey = isCreated ? "notification:createdReservation" : "notification:waitingForPayment";
   const title = t(`${translateKey}.title`);
-  const submitButtonText = t(`${translateKey}${".continueButton"}`);
+  const submitButtonText = t(`${translateKey}.continueButton`);
   const text = t(`${translateKey}.body`, {
     time: remainingMinutes,
   });

@@ -143,11 +143,11 @@ function getFieldValue(fieldObject: any): string {
   if (!fieldObject) return "";
   switch (fieldObject[0]) {
     case "purpose":
-      return `${(fieldObject[1] as { nameFi: string })?.nameFi}`;
+      return (fieldObject[1] as { nameFi: string })?.nameFi;
     case "ageGroup":
       return `${fieldObject[1]?.minimum} - ${fieldObject[1]?.maximum}`;
     default:
-      return `${fieldObject[1]}`;
+      return fieldObject[1];
   }
 }
 
@@ -162,7 +162,7 @@ function createMockWithMissingField({
 }): ReservationFormFieldsFragment {
   return {
     ...mock,
-    [`${missingField}`]: emptyValue,
+    [missingField]: emptyValue,
   };
 }
 
