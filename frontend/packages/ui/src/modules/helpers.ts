@@ -294,10 +294,9 @@ type Lang = Capitalize<LocalizationLanguages>;
 type RecordWithTranslation<K extends PossibleKeys, T extends string | null> = {
   // enforce {K}Fi | {K}En | {K}Sv to exist in the record
   [Property in `${K}${Lang}`]: T;
-} & {
+} &
   // allow any other keys we don't care about
-  [key: string]: unknown;
-};
+  Record<string, unknown>;
 
 function getTranslationFallback<K extends PossibleKeys, T extends string | null>(
   dict: RecordWithTranslation<K, T>,
