@@ -83,11 +83,11 @@ function getHTMLMessageSchema(minLength: number, maxLength: number) {
     .string()
     .max(1000)
     .transform(cleanHtmlContent)
-    .refine((x) => stripHtml(x).length < minLength, {
-      message: `Message cannot be shorter than ${minLength} characters`,
+    .refine((x) => stripHtml(x).length >= minLength, {
+      error: `Required`,
     })
-    .refine((x) => stripHtml(x).length > maxLength, {
-      message: `Message cannot be longer than ${maxLength} characters`,
+    .refine((x) => stripHtml(x).length <= maxLength, {
+      error: `Message cannot be longer than ${maxLength} characters`,
     });
 }
 
