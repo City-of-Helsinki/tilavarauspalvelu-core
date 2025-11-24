@@ -15,8 +15,8 @@ import { successToast } from "ui/src/components/toast";
 import { convertWeekday } from "ui/src/modules/conversion";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { AutoGrid, Flex } from "ui/src/styled";
+import { TimePreview } from "@/components/application/funnel/TimePreview";
 import type { TimeSelectorFragment } from "@gql/gql-types";
-import { TimePreview } from ".";
 import type { ApplicationPage2FormValues } from "./form";
 import { aesToCells, covertCellsToTimeRange } from "./timeSelectorModule";
 

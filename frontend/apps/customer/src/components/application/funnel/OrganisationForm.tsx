@@ -4,7 +4,9 @@ import { useTranslation } from "next-i18next";
 import { ControlledCheckbox, ControlledSelect } from "ui/src/components/form";
 import { FormSubHeading } from "@/styled/application";
 import { MunicipalityChoice } from "@gql/gql-types";
-import { ApplicationFormTextInput, BillingAddress, ContactPersonSection } from ".";
+import { ApplicationFormTextInput } from "./ApplicationFormTextInput";
+import { BillingAddress } from "./BillingAddress";
+import { ContactPersonSection } from "./CompanyForm";
 import type { ApplicationPage3FormValues } from "./form";
 
 export function OrganisationForm(): JSX.Element {

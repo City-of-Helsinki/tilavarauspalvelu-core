@@ -11,9 +11,10 @@ import { getLocalizationLang } from "ui/src/modules/helpers";
 import type { OptionsListT } from "ui/src/modules/search";
 import { AutoGrid, Flex, H4 } from "ui/src/styled";
 import { Accordion } from "@/components/Accordion";
+import { ApplicationSectionSummary } from "@/components/application/funnel/ApplicationSectionSummary";
+import { ReservationUnitList } from "@/components/application/funnel/ReservationUnitList";
 import { getDurationOptions } from "@/modules/const";
 import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
-import { ApplicationSectionSummary, ReservationUnitList } from ".";
 import type { ApplicationPage1FormValues } from "./form";
 
 type Props = Readonly<{

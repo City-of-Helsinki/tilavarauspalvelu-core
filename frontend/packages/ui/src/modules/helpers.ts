@@ -2,6 +2,7 @@ import { isAfter, isBefore } from "date-fns";
 import type { OptionInProps } from "hds-react";
 import type { TFunction } from "i18next";
 import sanitizeHtml from "sanitize-html";
+import { minutesToHoursString, timeToMinutes } from "@ui/modules/date-utils";
 import {
   type ImageFragment,
   type Maybe,
@@ -11,7 +12,6 @@ import {
 } from "../../gql/gql-types";
 import { pixel } from "./const";
 import { convertWeekday } from "./conversion";
-import { minutesToHoursString, timeToMinutes } from "./date-utils";
 import type { LocalizationLanguages } from "./urlBuilder";
 
 /// Enforce readonly on all nested properties
@@ -20,7 +20,9 @@ export type ReadonlyDeep<T> = {
   readonly [P in keyof T]: ReadonlyDeep<T[P]>;
 };
 
-export function filterNonNullable<T>(arr: Maybe<Readonly<Array<Maybe<T | undefined>>>> | undefined): Array<NonNullable<T>> {
+export function filterNonNullable<T>(
+  arr: Maybe<Readonly<Array<Maybe<T | undefined>>>> | undefined
+): Array<NonNullable<T>> {
   return arr?.filter((n): n is NonNullable<T> => n != null) ?? [];
 }
 
@@ -204,7 +206,10 @@ export function formatApiTimeInterval({
   return `${btime}–${etime}`;
 }
 
-export function formatDayTimes(schedule: Array<Omit<SuitableTimeFragment, "pk" | "id" | "priority">>, day: number): string {
+export function formatDayTimes(
+  schedule: Array<Omit<SuitableTimeFragment, "pk" | "id" | "priority">>,
+  day: number
+): string {
   return schedule
     .filter((s) => convertWeekday(s.dayOfTheWeek) === day)
     .map((s) => formatApiTimeInterval(s))
@@ -258,7 +263,7 @@ export function formatListToCSV(t: TFunction, list: Readonly<Array<Readonly<stri
     return list[0];
   }
   const lastItem = list[list.length - 1];
-  return list.slice(0, - 1).join(", ") + ` ${t("common:and")} ${lastItem}`;
+  return list.slice(0, -1).join(", ") + ` ${t("common:and")} ${lastItem}`;
 }
 
 /// @description Converts time struct to string

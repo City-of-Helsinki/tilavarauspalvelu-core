@@ -1,7 +1,7 @@
 import { parse, set } from "date-fns";
-import { toNumber } from "../helpers";
-import { parseUIDate, parseApiDate, isValidDate } from "./conversion";
-import { UI_DATE_FORMAT, UI_TIME_FORMAT } from "./index";
+import { parseUIDate, parseApiDate, isValidDate } from "@ui/modules/date-utils/conversion";
+import { UI_DATE_FORMAT, UI_TIME_FORMAT } from "@ui/modules/date-utils/formatting";
+import { toNumber } from "@ui/modules/helpers";
 import type { TimeStruct } from "./types";
 
 /**

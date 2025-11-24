@@ -2,8 +2,9 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { ControlledCheckbox } from "ui/src/components/form";
+import { ApplicationFormTextInput } from "@/components/application/funnel/ApplicationFormTextInput";
 import { FormSubHeading } from "@/styled/application";
-import { ApplicationFormTextInput, BillingAddress } from ".";
+import { BillingAddress } from "./BillingAddress";
 import type { ApplicationPage3FormValues } from "./form";
 
 export function CompanyForm(): JSX.Element {

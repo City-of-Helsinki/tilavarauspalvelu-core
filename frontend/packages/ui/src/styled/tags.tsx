@@ -1,6 +1,6 @@
 import { Tag } from "hds-react";
 import styled from "styled-components";
-import { Flex } from "./index";
+import { Flex } from "@ui/styled/utils";
 
 export const SearchTagContainer = styled(Flex).attrs({
   $gap: "s",
