@@ -83,7 +83,7 @@ const nextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: CSP_HEADER.replace(/\n/g, ""),
+            value: CSP_HEADER.replaceAll("\\n", ""),
           },
         ],
       },

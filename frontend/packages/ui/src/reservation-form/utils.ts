@@ -89,7 +89,7 @@ function getFormFields(type: ReservationFormType): FormFieldArray {
 
 export function formContainsField(type: ReservationFormType, fieldName: keyof ReservationFormFieldsFragment): boolean {
   const fields = getFormFields(type);
-  return fields.find((k) => k === fieldName) != null;
+  return fields.some((k) => k === fieldName) != null;
 }
 
 // TODO refactor so the fieldLabel is not already translated

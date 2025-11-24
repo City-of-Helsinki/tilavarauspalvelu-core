@@ -69,9 +69,9 @@ export function parseValidDateObject(date?: Date | string | null): Date | null {
   const parsedDate = new Date(date);
   if (isValidDate(parsedDate)) {
     return parsedDate;
-  } else {
-    return null;
   }
+    return null;
+  
 }
 
 /**

@@ -248,9 +248,9 @@ function formatReservationTimes(t: TFunction, aes: ApplicationSectionReservation
 function accessCodeSafe(pindoraInfo: PindoraSectionFragment | null, t: TFunction) {
   if (!pindoraInfo?.accessCode) {
     return t("reservation:contactSupport");
-  } else {
-    return pindoraInfo.accessCode;
   }
+    return pindoraInfo.accessCode;
+  
 }
 
 export function ApprovedReservations({ application, applicationRound }: Readonly<Props>) {
@@ -578,8 +578,7 @@ function getReservationSeriesAccessText(reservationUnit: ReservationSeriesTableE
     case AccessTypeWithMultivalued.Multivalued:
       if (usedAccessTypes.includes(AccessType.AccessCode)) {
         return `${t("reservationUnit:accessTypes." + AccessType.AccessCode)}: ${accessCodeSafe(pindoraInfo, t)}`;
-      } else
-        return usedAccessTypes
+      }return usedAccessTypes
           .filter((aT) => aT != null && aT !== AccessType.Unrestricted)
           .map((aT) => t(`reservationUnit:accessTypes.${aT}`))
           .join(" / ");
@@ -1002,7 +1001,7 @@ export function ApplicationSection({
     // NOTE we need to slice even if backend returns only 20 of each
     // because we want to keep the total at 20
     .slice(0, N_RESERVATIONS_TO_SHOW);
-  const hasCancellableReservations = !!sectionToreservations(t, applicationSection).find(
+  const hasCancellableReservations = !!sectionToreservations(t, applicationSection).some(
     (r) => r.isCancellableReason === ""
   );
   return (

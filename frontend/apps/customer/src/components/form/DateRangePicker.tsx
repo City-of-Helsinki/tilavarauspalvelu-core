@@ -108,11 +108,17 @@ export function DateRangePicker({
     }
 
     // If both dates are valid, check that end date is not before start date
-    if (!isStartDateEmpty && !isEndDateEmpty && ed != null && sd != null && isValidDate(ed) && isValidDate(sd)) {
-      if (isBefore(ed, sd)) {
-        setEndDateError(t("dateSelector:errors.endDateBeforeStartDate"));
-        onChangeEndDate(null);
-      }
+    if (
+      !isStartDateEmpty &&
+      !isEndDateEmpty &&
+      ed != null &&
+      sd != null &&
+      isValidDate(ed) &&
+      isValidDate(sd) &&
+      isBefore(ed, sd)
+    ) {
+      setEndDateError(t("dateSelector:errors.endDateBeforeStartDate"));
+      onChangeEndDate(null);
     }
   };
 

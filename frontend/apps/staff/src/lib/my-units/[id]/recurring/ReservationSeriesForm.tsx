@@ -38,7 +38,7 @@ const InnerTextInput = styled(TextInput)`
 const TRANS_PREFIX = "myUnits:ReservationSeriesForm";
 
 function filterOutRemovedReservations(items: NewReservationListItem[], removedReservations: NewReservationListItem[]) {
-  return items.filter((x) => !removedReservations.find((y) => isReservationEq(x, y)));
+  return items.filter((x) => !removedReservations.some((y) => isReservationEq(x, y)));
 }
 
 interface SeriesProps {

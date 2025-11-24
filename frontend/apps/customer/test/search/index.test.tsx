@@ -225,7 +225,7 @@ describe("SearchSingle read query params", () => {
       if (field instanceof HTMLInputElement) {
         expect(field.value).toBe(formFieldText ?? "");
       } else {
-        throw new Error();
+        throw new TypeError();
       }
     }
   );
@@ -256,7 +256,7 @@ describe("SearchSingle read query params", () => {
       if (field instanceof HTMLInputElement) {
         expect(field.value).toBe(formFieldText ?? "");
       } else {
-        throw new Error();
+        throw new TypeError();
       }
     }
   );

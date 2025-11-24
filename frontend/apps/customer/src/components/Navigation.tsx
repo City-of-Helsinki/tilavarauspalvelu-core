@@ -207,7 +207,7 @@ function NavigationMenu({ user }: { user: CurrentUserQuery["currentUser"] }) {
           return null;
         }
         if (!pathname) {
-          return;
+          return undefined;
         }
         const localisationString = i18n.language === "fi" ? "" : getLocalizationLang(i18n.language);
 

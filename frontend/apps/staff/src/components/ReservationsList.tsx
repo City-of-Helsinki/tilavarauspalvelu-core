@@ -112,11 +112,11 @@ function getStatus(x: NewReservationListItem) {
     const overlapErrorMsg = /Overlapping reservations are not allowed/;
     const reservationInPastErrorMsg = /ApolloError: Reservation new begin cannot be in the past/;
     let errorCode = "default";
-    if (x.error.match(intervalErrorMsg)) {
+    if (intervalErrorMsg.test(x.error)) {
       errorCode = "interval";
-    } else if (x.error.match(overlapErrorMsg)) {
+    } else if (overlapErrorMsg.test(x.error)) {
       errorCode = "overlap";
-    } else if (x.error.match(reservationInPastErrorMsg)) {
+    } else if (reservationInPastErrorMsg.test(x.error)) {
       errorCode = "reservationInPast";
     }
 

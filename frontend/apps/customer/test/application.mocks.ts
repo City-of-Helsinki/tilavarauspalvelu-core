@@ -109,10 +109,8 @@ function createMockApplicationSection({
           ],
   };
 
-  if (page !== "page0" && page !== "page1") {
-    if (page2Data.suitableTimeRanges.length === 0) {
-      throw new Error("SuitableTimeRanges must be filled for page2");
-    }
+  if (page !== "page0" && page !== "page1" && page2Data.suitableTimeRanges.length === 0) {
+    throw new Error("SuitableTimeRanges must be filled for page2");
   }
 
   return {

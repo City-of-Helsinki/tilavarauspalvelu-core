@@ -325,7 +325,7 @@ function isRangeReservable_({
   const slots = generateSlots(start, end, ReservationStartInterval.Interval_15Minutes);
 
   const res = slots.map((slot) => areReservableTimesAvailable(reservableTimes, slot));
-  if (!res.every((val) => val)) {
+  if (!res.every(Boolean)) {
     return false;
   }
 
@@ -440,7 +440,7 @@ function isSlotWithinTimeframe(
 }
 
 function doesSlotCollideWithApplicationRounds(slot: Date, rounds: readonly RoundPeriod[]): boolean {
-  if (rounds.length < 1) return false;
+  if (rounds.length === 0) return false;
 
   return rounds.some((round) =>
     isWithinInterval(slot, {

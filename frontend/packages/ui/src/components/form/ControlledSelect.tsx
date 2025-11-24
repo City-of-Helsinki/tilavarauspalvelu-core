@@ -89,7 +89,7 @@ export function ControlledSelect<T extends FieldValues>({
       onChange(v);
       afterChange?.(v ?? undefined);
     } else {
-      throw new Error("Invalid selection");
+      throw new TypeError("Invalid selection");
     }
   };
 

@@ -162,9 +162,9 @@ function validatePricing(data: PricingFormValues | undefined, ctx: z.RefinementC
     }
 
     if (data.hasMaterialPrice) {
-      (["materialPriceDescriptionFi", "materialPriceDescriptionSv", "materialPriceDescriptionEn"] as const).map(
+      (["materialPriceDescriptionFi", "materialPriceDescriptionSv", "materialPriceDescriptionEn"] as const).forEach(
         (fieldName) => {
-          if (!(stripHtml(data[fieldName]).length > 0)) {
+          if (stripHtml(data[fieldName]).length === 0) {
             ctx.addIssue({
               message: "Required",
               path: [`${path}.${fieldName}`],
@@ -541,14 +541,16 @@ export const ReservationUnitEditSchema = z
 
     // Drafts require this validation, but only if it's directly bookable
     if (v.reservationKind !== ReservationKind.Season) {
-      if (v.minReservationDuration != null && v.maxReservationDuration != null) {
-        if (v.minReservationDuration > v.maxReservationDuration) {
-          ctx.addIssue({
-            code: "custom",
-            message: "Min reservation duration must be less than max duration",
-            path: ["maxReservationDuration"],
-          });
-        }
+      if (
+        v.minReservationDuration != null &&
+        v.maxReservationDuration != null &&
+        v.minReservationDuration > v.maxReservationDuration
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Min reservation duration must be less than max duration",
+          path: ["maxReservationDuration"],
+        });
       }
 
       if (v.minReservationDuration != null) {
@@ -592,7 +594,7 @@ export const ReservationUnitEditSchema = z
       return;
     }
 
-    if (v.pricings.length) {
+    if (v.pricings.length > 0) {
       for (let i = 0; i < v.pricings.length; i++) {
         validatePricing(v.pricings[i], ctx, `pricings.${i}`);
       }
@@ -718,9 +720,9 @@ export const ReservationUnitEditSchema = z
         path: ["nameSv"],
       });
     }
-    (["descriptionFi", "descriptionSv", "descriptionEn"] as const).map((fieldName) => {
+    (["descriptionFi", "descriptionSv", "descriptionEn"] as const).forEach((fieldName) => {
       const stripped = stripHtml(v[fieldName]);
-      if (stripped.length < 1) {
+      if (stripped.length === 0) {
         ctx.addIssue({
           code: "custom",
           path: [fieldName],
@@ -729,14 +731,12 @@ export const ReservationUnitEditSchema = z
       }
     });
 
-    if (v.maxPersons && v.minPersons) {
-      if (v.maxPersons < v.minPersons) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Max persons must be greater than min persons",
-          path: ["maxPersons"],
-        });
-      }
+    if (v.maxPersons && v.minPersons && v.maxPersons < v.minPersons) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Max persons must be greater than min persons",
+        path: ["maxPersons"],
+      });
     }
 
     // TODO if it includes futurePricing check that the futurePrice date is in the future (is today ok?)
@@ -989,7 +989,7 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
   const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) => t && t.begin && t.end;
   // NOTE mutation doesn't support pks (even if changing not adding) unlike other mutations
   const applicationRoundTimeSlots: UpdateApplicationRoundTimeSlotSerializerInput[] = seasons
-    .filter((s) => s.reservableTimes.filter(isReservableTime).length > 0 || s.closed)
+    .filter((s) => s.reservableTimes.some(isReservableTime) || s.closed)
     .map((s) => ({
       weekday: s.weekday,
       isClosed: s.closed,
