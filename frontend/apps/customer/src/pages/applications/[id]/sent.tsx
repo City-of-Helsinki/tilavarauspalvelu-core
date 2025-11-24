@@ -40,7 +40,7 @@ function Sent({ pk }: PropsNarrowed): JSX.Element {
     <>
       <Breadcrumb routes={routes} />
       <div>
-        <H1 $noMargin>{t("application:sent.heading")}</H1>
+        <H1 $marginTop="none">{t("application:sent.heading")}</H1>
         <Paragraph>{t("application:sent.subHeading")}</Paragraph>
       </div>
       <Paragraph>{t("application:sent.body")}</Paragraph>
