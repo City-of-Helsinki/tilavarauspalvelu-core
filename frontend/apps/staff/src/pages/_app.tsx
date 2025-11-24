@@ -160,7 +160,6 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
   } catch (err) {
     const error = transformQueryError(err);
     logGraphQLError(error);
-    // FIXME there is no sentry error for this (this doesn't use the nextjs _error component)
   }
 
   return { ...ctx, envConfig: commonProps, currentUser: null, handlingData: null, notificationsData: null };
