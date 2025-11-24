@@ -8,6 +8,7 @@ import { relayStylePagination } from "@apollo/client/utilities";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { enchancedFetch, errorLink } from "ui/src/modules/apolloUtils";
 import { buildGraphQLUrl } from "ui/src/modules/urlBuilder";
+import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
 
 if (process.env.NODE_ENV === "development") {
   loadDevMessages();
@@ -24,6 +25,7 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
   };
 
   const uploadLink: ApolloLink = createUploadLink(uploadLinkOptions);
+  const sentryLink = new SentryContextLink();
   const httpLink = new HttpLink({
     uri,
     // TODO this might be useless
@@ -33,7 +35,7 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
 
   return new ApolloClient({
     ssrMode: isServer,
-    link: isServer ? from([errorLink, httpLink]) : from([errorLink, uploadLink]),
+    link: from([sentryLink, errorLink, isServer ? httpLink : uploadLink]),
     defaultOptions: {
       query: {
         fetchPolicy: isServer ? "no-cache" : "cache-first",
