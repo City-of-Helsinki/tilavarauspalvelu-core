@@ -55,7 +55,7 @@ const Anchor = styled(Link)<{ $current?: boolean; $isMobile?: boolean }>`
             color: var(--color-black);
             text-decoration: underline;
           `;
-    }}}
+    }}
   }
 `;
 
