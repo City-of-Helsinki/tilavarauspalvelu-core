@@ -119,6 +119,15 @@ const NoTimes = styled(Flex).attrs({
   margin: var(--spacing-s) 0 calc(var(--spacing-s) * -1) 0;
 `;
 
+// Make the slots fit a ~320px wide view
+const SlotContainer = styled.div`
+  @media (max-width: 350px) {
+    position: relative;
+    width: 120%;
+    left: -10%;
+  }
+`;
+
 export function QuickReservation({
   reservationUnit,
   subventionSuffix,
@@ -180,14 +189,14 @@ export function QuickReservation({
       </Selects>
 
       <Subheading>{t("reservationCalendar:quickReservation.subheading")}</Subheading>
-      <div>
+      <SlotContainer>
         <TimeChunkSection
           startingTimeOptions={startingTimeOptions}
           reservationForm={reservationForm}
           nextAvailableTime={nextAvailableTime}
           durationString={durationOptions.find((opt) => opt.value === duration)?.label ?? ""}
         />
-      </div>
+      </SlotContainer>
       <Flex $direction="row" $justifyContent="space-between">
         <Price data-testid="quick-reservation__price">
           {focusSlot?.isReservable && (
