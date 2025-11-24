@@ -30,7 +30,8 @@ import type {
   ReservableTimeSpanType,
   Maybe,
   ReservationUnitNode,
- BlockingReservationFieldsFragment } from "@gql/gql-types";
+  BlockingReservationFieldsFragment,
+} from "@gql/gql-types";
 
 export type RoundPeriod = {
   reservationPeriodBeginDate: string;
@@ -347,7 +348,7 @@ function getBufferedEventTimes(
   end: Date,
   bufferTimeBefore: number,
   bufferTimeAfter: number,
-  isBlocked?: Maybe<boolean> | undefined
+  isBlocked?: Maybe<boolean>
 ): { start: Date; end: Date } {
   if (isBlocked) {
     return { start, end };
