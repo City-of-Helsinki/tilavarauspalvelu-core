@@ -13,6 +13,7 @@ import {
   IconInfoCircle,
   IconLinkExternal,
   IconLocation,
+  IconLock,
   IconPen,
   Table,
   Tooltip,
@@ -171,7 +172,7 @@ const TableWrapper = styled.div`
         }
         /* remove the whole td element if the child is hidden
          * NOTE this will remove the element if any child is hidden */
-        :has(.hide-on-mobile) {
+        &:has(.hide-on-mobile) {
           display: none;
         }
       }
@@ -772,7 +773,12 @@ function ReservationsTable({
       headerName: t("application:view.reservationsTab.reservationUnit"),
       isSortable: false,
       transform: (elem: ReservationsTableElem) => (
-        <IconTextWrapper className="last-on-mobile" aria-label={t("application:view.reservationsTab.reservationUnit")}>
+        <IconTextWrapper
+          // unless there is an accessType to display this is the last item shown on mobile
+          className={elem.accessType == null ? "last-on-mobile" : ""}
+          aria-label={t("application:view.reservationsTab.reservationUnit")}
+          style={{ maxWidth: "300px" }}
+        >
           <IconLocation />
           {createReservationUnitLink({
             reservationUnit: elem.reservationUnit,
@@ -790,7 +796,8 @@ function ReservationsTable({
           return "";
         }
         return (
-          <IconTextWrapper>
+          <IconTextWrapper className="last-on-mobile">
+            <IconLock />
             {t(`reservationUnit:accessTypes.${elem.accessType}`)}
             {elem.accessTypeChanged && <StyledTooltip>{t("reservation:accessTypeChanged")}</StyledTooltip>}
           </IconTextWrapper>
