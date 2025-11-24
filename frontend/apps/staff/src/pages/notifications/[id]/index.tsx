@@ -19,6 +19,7 @@ import { parseUIDate, fromUIDateTime, formatDate, formatTime } from "ui/src/modu
 import { cleanHtmlContent, createNodeId, ignoreMaybeArray, stripHtml, toNumber } from "ui/src/modules/helpers";
 import { checkValidDate, checkValidFutureDate, checkTimeStringFormat } from "ui/src/schemas/schemaCommon";
 import { CenterSpinner, Flex, TitleSection, H1 } from "ui/src/styled";
+import { breakpoints } from "@ui/modules/const";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { ControlledTimeInput } from "@/components/ControlledTimeInput";
@@ -43,17 +44,42 @@ const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {
 const ButtonContainerCommon = styled(Flex).attrs({
   $justifyContent: "space-between",
   $alignItems: "center",
-  $gap: "l",
-  $direction: "row",
-})``;
+})`
+  flex-direction: row;
+  gap: var(--spacing-l);
+  @media (max-width: ${breakpoints.s}) {
+    gap: var(--spacing-s);
+    flex-direction: column;
+    a,
+    button {
+      width: 100%;
+      padding-block: var(--spacing-s);
+    }
+  }
+`;
 
 const ButtonContainer = styled(ButtonContainerCommon)`
   grid-column: 1 / -1;
+  &.delete-button {
+    margin-top: 2rem;
+    justify-content: flex-start;
+  }
+  @media (max-width: ${breakpoints.s}) {
+    &:last-child {
+      margin-top: var(--spacing-s);
+    }
+    > div {
+      width: 100%;
+    }
+    &.delete-button {
+      margin-top: calc(var(--spacing-xs) * -1);
+    }
+  }
 `;
 
 const InnerButtons = styled(ButtonContainerCommon)`
   flex-grow: 1;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
 `;
 
 function checkStartIsBeforeEnd(
@@ -140,6 +166,10 @@ const GridForm = styled.form`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-l);
+  @media (max-width: ${breakpoints.s}) {
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 /// @brief This is the create / edit page for a single notification.
@@ -472,7 +502,7 @@ function LoadedContent({
       </TitleSection>
       {(notification || isNew) && <NotificationForm notification={notification ?? undefined} />}
       {notification && (
-        <ButtonContainer style={{ marginTop: "2rem", justifyContent: "flex-start" }}>
+        <ButtonContainer className="delete-button">
           <Button onClick={removeNotification} variant={ButtonVariant.Secondary}>
             {t("notification:deleteButton")}
           </Button>
