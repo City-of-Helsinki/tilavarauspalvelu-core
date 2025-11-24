@@ -15,7 +15,7 @@ function customRender() {
       reservation={reservation}
       paymentOrder={paymentOrder}
       appliedPricing={appliedPricing}
-      apiBaseUrl={"http://localhost:8000"}
+      apiBaseUrl="http://localhost:8000"
     />
   );
 }

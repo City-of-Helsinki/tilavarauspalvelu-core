@@ -44,8 +44,8 @@ function getFormatLocaleObject(locale?: LocalizationLanguages): { locale: Locale
       return { locale: sv, weekStartsOn: 1 };
     case "en":
       return { locale: enGB, weekStartsOn: 1 };
-    default:
     case "fi":
+    default:
       return { locale: fi, weekStartsOn: 1 };
   }
 }
@@ -70,8 +70,7 @@ export function parseValidDateObject(date?: Date | string | null): Date | null {
   if (isValidDate(parsedDate)) {
     return parsedDate;
   }
-    return null;
-  
+  return null;
 }
 
 /**

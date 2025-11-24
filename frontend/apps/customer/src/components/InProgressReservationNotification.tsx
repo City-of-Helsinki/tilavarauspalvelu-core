@@ -201,10 +201,10 @@ export function InProgressReservationNotification(): React.ReactElement {
           text: t("notification:reservationCancelledTitle"),
         });
       }
-    } catch (e) {
+    } catch (err) {
       // silently ignore NOT_FOUND (just refresh query cache)
-      if (!isNotFoundError(e)) {
-        displayError(e);
+      if (!isNotFoundError(err)) {
+        displayError(err);
       }
     } finally {
       if (shouldRedirectAfterDelete(reservation.pk, router.pathname, router.query)) {

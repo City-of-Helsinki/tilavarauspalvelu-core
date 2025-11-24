@@ -185,7 +185,7 @@ export function createTagString(reservation: CreateTagStringFragment, t: TFuncti
       return createRecurringTagString(reservation, t);
     }
     return createSingleTagString(reservation, t);
-  } catch (_) {
+  } catch {
     return "";
   }
 }

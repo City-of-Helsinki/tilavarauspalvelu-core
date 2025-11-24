@@ -5,7 +5,7 @@ const trackPageView = () => {
   try {
     const _paq = (window._paq = window._paq || []);
     _paq.push(["trackPageView"]);
-  } catch (_) {
+  } catch {
     // ignore
   }
 };

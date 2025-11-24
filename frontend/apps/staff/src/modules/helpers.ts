@@ -116,7 +116,7 @@ export function combineAffectingReservations<T extends AffectedReservations>(
   const affectingReservations = filterNonNullable(data.affectingReservations).filter((y) =>
     isAffecting(y, reservationUnitPk)
   );
-  const reservationSet = filterNonNullable(data?.reservationUnit?.reservations).concat(affectingReservations);
+  const reservationSet = [...filterNonNullable(data?.reservationUnit?.reservations), ...affectingReservations];
   return filterNonNullable(reservationSet);
 }
 

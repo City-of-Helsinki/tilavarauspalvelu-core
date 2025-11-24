@@ -135,7 +135,7 @@ const QuillEditor = forwardRef<Quill | null, QuillEditorProps>(({ id, value, def
     }
   }, [value]);
 
-  return <div id={id} ref={containerRef}></div>;
+  return <div id={id} ref={containerRef} />;
 });
 
 type RichTextProps = {

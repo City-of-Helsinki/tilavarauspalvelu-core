@@ -249,7 +249,7 @@ function generateFocusedSlots(focusedAes: SectionNodeT, day: DayT): Slot[] {
   }
 
   const tmp = filterNonNullable(focusedAllocatedTimeSlots);
-  return focusedSlots.concat(generateAllocatedSlots(tmp, day));
+  return [...focusedSlots, ...generateAllocatedSlots(tmp, day)];
 }
 
 function isInRange(ae: SectionNodeT, cell: Cell, day: DayT): boolean {

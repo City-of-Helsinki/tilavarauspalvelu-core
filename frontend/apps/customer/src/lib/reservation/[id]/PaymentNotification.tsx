@@ -68,7 +68,7 @@ export const PaymentNotification = ({
   const paymentUrl = getPaymentUrl(reservation, lang, apiBaseUrl);
   return (
     <Notification data-testid="reservation__payment-notification" type="alert" label={t(`${translationPath}.title`)}>
-      <Flex $direction={"column"} $gap={"2-xs"}>
+      <Flex $direction="column" $gap="2-xs">
         {t(`${translationPath}.description`)}
         <PriceDetails>
           <div data-testid="reservation__payment-notification__price">

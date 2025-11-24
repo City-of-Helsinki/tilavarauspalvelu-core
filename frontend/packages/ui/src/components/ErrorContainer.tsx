@@ -74,7 +74,7 @@ function constructFeedbackUrl(i18n: { language: string }, feedbackUrl?: string |
     const url = new URL(feedbackUrl);
     url.searchParams.set("lang", i18n.language);
     return url.toString();
-  } catch (_) {
+  } catch {
     return null;
   }
 }
@@ -134,7 +134,7 @@ export function ErrorContainer({
       />
       <TextContent>
         {children || statusCodeText({ statusCode, title, body, t })}
-        <Flex $direction={"column"} $gap="xs">
+        <Flex $direction="column" $gap="xs">
           <IconButton
             label={t("buttons.contact")}
             icon={<IconArrowRight />}

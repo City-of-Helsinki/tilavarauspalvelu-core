@@ -264,17 +264,15 @@ export function createMockReservation(
   } as const;
 }
 
-export function createTermsOfUseMock(empty: boolean = false) {
+export function createTermsOfUseMock() {
   return {
-    genericTerms: empty
-      ? null
-      : {
-          id: createNodeId("TermsOfUseNode", 1),
-          pk: "1",
-          termsType: TermsOfUseTypeChoices.Generic,
-          ...generateNameFragment("TermsOfUse name"),
-          ...generateTextFragment("Test terms of use"),
-        },
+    genericTerms: {
+      id: createNodeId("TermsOfUseNode", 1),
+      pk: "1",
+      termsType: TermsOfUseTypeChoices.Generic,
+      ...generateNameFragment("TermsOfUse name"),
+      ...generateTextFragment("Test terms of use"),
+    },
   };
 }
 

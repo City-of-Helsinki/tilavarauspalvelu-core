@@ -90,17 +90,16 @@ export function getFilterOptions(
     label: t(`applicationSection:priority.${n}`),
   }));
 
-  const orderOptions = Array.from(Array(10).keys())
-    .map((n) => ({
+  const orderOptions = [
+    ...[...Array(10).keys()].map((n) => ({
       value: n,
       label: `${n + 1}. ${t("filters:reservationUnitApplication")}`,
-    }))
-    .concat([
-      {
-        value: 11,
-        label: t("filters:reservationUnitApplicationOthers"),
-      },
-    ]);
+    })),
+    {
+      value: 11,
+      label: t("filters:reservationUnitApplicationOthers"),
+    },
+  ];
 
   return {
     reservationUnitTypes,

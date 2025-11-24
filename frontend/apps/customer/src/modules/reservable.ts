@@ -52,7 +52,7 @@ type BufferCollideCheckReservation = Pick<
 // TODO values should be { hour, minute } not Date objects
 // TODO provide serialization and deserialization functions (that have format checkers)
 export type ReservableMapKey = string; // format: "yyyy-mm-dd"
-export type ReservableMap = Map<ReservableMapKey, Array<{ start: Date; end: Date }>>;
+export type ReservableMap = Map<ReservableMapKey, { start: Date; end: Date }[]>;
 
 export function dateToKey(date: Date): ReservableMapKey {
   return formatApiDateUnsafe(date);

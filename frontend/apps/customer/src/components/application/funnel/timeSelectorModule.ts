@@ -129,7 +129,7 @@ function combineTimespans(prev: TimeSpan[], current: TimeSpan): TimeSpan[] {
   }
   if (prevCell.end === current.begin && prevCell.priority === current.priority) {
     return [
-      ...prev.slice(0, prev.length - 1),
+      ...prev.slice(0, - 1),
       {
         begin: prevCell.begin,
         end: prevCell.end + 1,

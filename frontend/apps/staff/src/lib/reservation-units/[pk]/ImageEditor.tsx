@@ -126,7 +126,7 @@ export function ImageEditor({ images, setImages, style, className }: Props): JSX
       bytes: files[0],
     };
     fakePk -= 1;
-    setImages([newImage].concat(images));
+    setImages([newImage, ...images]);
   };
 
   const deleteImage = (pk: number) => {

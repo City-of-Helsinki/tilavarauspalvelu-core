@@ -3,7 +3,7 @@ import { createMockReservation, createTermsOfUseMock, generateTextFragment } fro
 import { generateNameFragment } from "@test/test.gql.utils";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import type { ReservationPageQuery } from "@gql/gql-types";
+import { ReservationPageQuery } from "@gql/gql-types";
 import { TermsInfoSection } from "./TermsInfoSection";
 
 type NodeT = NonNullable<ReservationPageQuery["reservation"]>;
@@ -118,7 +118,7 @@ describe("Component: Reservation page terms info section", () => {
 
     it("should contain only service specific terms if only it exists (no terms of use)", () => {
       const reservation = createMockReservation({});
-      const emptyTOS = createTermsOfUseMock(true);
+      const emptyTOS = { genericTerms: null };
       customRender(reservation, emptyTOS);
       expect(
         screen.getByText(reservation.reservationUnit.serviceSpecificTerms?.textFi ?? "Test service specific terms FI")

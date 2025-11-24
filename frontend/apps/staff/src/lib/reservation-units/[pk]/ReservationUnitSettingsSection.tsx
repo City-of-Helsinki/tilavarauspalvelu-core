@@ -79,7 +79,7 @@ export function ReservationUnitSettingsSection({
   cancellationRuleOptions,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  cancellationRuleOptions: Array<{ value: number; label: string }>;
+  cancellationRuleOptions: { value: number; label: string }[];
 }) {
   const { t } = useTranslation();
   const { control, watch, formState } = form;
@@ -117,16 +117,17 @@ export function ReservationUnitSettingsSection({
     errors.maxReservationDuration != null ||
     errors.minReservationDuration != null;
 
-  const durationOptions = bufferTimeOptions.concat(
-    Array.from({ length: (23 - 2) * 2 + 1 })
+  const durationOptions = [
+    ...bufferTimeOptions,
+    ...Array.from({ length: (23 - 2) * 2 + 1 })
       .map((_v, i) => 3600 * 2 + i * 1800)
       .map((v) => ({
         value: v,
         label: t("reservationUnitEditor:durationHours", {
           hours: (v / 3600).toLocaleString("fi"),
         }),
-      }))
-  );
+      })),
+  ];
 
   return (
     <EditAccordion open={hasErrors} heading={t("reservationUnitEditor:settings")}>

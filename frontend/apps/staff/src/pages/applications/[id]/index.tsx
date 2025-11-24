@@ -316,7 +316,7 @@ function ReservationUnitOptionsSection({
 }) {
   const { t } = useTranslation();
 
-  const cols: Array<ColumnType> = [
+  const cols: ColumnType[] = [
     {
       key: "index",
       transform: (d: DataType) => d.index.toString(),

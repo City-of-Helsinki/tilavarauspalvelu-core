@@ -125,8 +125,8 @@ export function EditStep1({ reservation, options, onBack, form }: Props): JSX.El
         },
       });
       router.push(`${getReservationPath(reservation.pk)}?timeUpdated=true`);
-    } catch (e) {
-      displayError(e);
+    } catch (err) {
+      displayError(err);
     }
   };
 

@@ -8,7 +8,7 @@ import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
 type SelectFilterProps = {
   name: string;
-  options: Readonly<Array<{ label: string; value: string | number }>>;
+  options: Readonly<{ label: string; value: string | number }[]>;
   sort?: boolean;
   clearable?: boolean;
   enableSearch?: boolean;

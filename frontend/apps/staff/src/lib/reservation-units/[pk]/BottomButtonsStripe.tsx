@@ -190,8 +190,8 @@ export function BottomButtonsStripe({
     setValue("isDraft", false);
     try {
       await handleSubmit(onSubmit)();
-    } catch (error) {
-      displayError(error);
+    } catch (err) {
+      displayError(err);
     }
   };
 
@@ -199,8 +199,8 @@ export function BottomButtonsStripe({
     setValue("isDraft", true);
     try {
       await handleSubmit(onSubmit)();
-    } catch (error) {
-      displayError(error);
+    } catch (err) {
+      displayError(err);
     }
   };
 
@@ -213,8 +213,8 @@ export function BottomButtonsStripe({
       await archiveMutation({ variables: { input: { pk: reservationUnit.pk } } });
       successToast({ text: t("reservationUnitEditor:ArchiveDialog.success") });
       router.push(getUnitUrl(unit?.pk));
-    } catch (e) {
-      displayError(e);
+    } catch (err) {
+      displayError(err);
     }
   };
 
