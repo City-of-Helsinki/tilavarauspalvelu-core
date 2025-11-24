@@ -92,7 +92,7 @@ export function getFilterOptions(
   }));
 
   const orderOptions = [
-    ...[...Array(10).keys()].map((n) => ({
+    ...[...Array.from({ length: 10 }).keys()].map((n) => ({
       value: n,
       label: `${n + 1}. ${t("filters:reservationUnitApplication")}`,
     })),

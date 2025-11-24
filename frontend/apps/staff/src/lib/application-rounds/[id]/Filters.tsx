@@ -102,7 +102,7 @@ export function Filters({
     value: s,
   }));
 
-  const weekdayOptions = [...Array(7)].map((_, i) => ({
+  const weekdayOptions = Array.from({ length: 7 }).map((_, i) => ({
     label: t(`translation:dayLong.${i}`),
     value: i,
   }));

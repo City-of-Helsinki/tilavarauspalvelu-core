@@ -131,7 +131,9 @@ function generateFuzzyIntegers(
   exclusionList: ReadonlyArray<number>
 ): number[] {
   const set = new Set(exclusionList);
-  return [...Array(count)].map((_) => getRandomInt(start, end)).filter((x) => !set.has(x));
+  return Array.from({ length: count })
+    .map((_) => getRandomInt(start, end))
+    .filter((x) => !set.has(x));
 }
 
 function getRandomInt(min: number, max: number): number {

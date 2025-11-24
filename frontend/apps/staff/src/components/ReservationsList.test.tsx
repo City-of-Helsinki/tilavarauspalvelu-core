@@ -22,12 +22,12 @@ describe("ReservationsList", () => {
     const dstring = formatDate(today);
     expect(await screen.findByText(/19:00/)).toBeInTheDocument();
     expect(await screen.findByText(/20:00/)).toBeInTheDocument();
-    expect(await screen.findByText(RegExp(dstring))).toBeInTheDocument();
+    expect(await screen.findByText(new RegExp(dstring))).toBeInTheDocument();
   });
 
   test("Render reservations list", async () => {
     const N_DAYS = 5;
-    const items = [...Array(N_DAYS)].map((_, i) => ({
+    const items = Array.from({ length: N_DAYS }).map((_, i) => ({
       date: addDays(new Date(), i),
       startTime: "19:00",
       endTime: "20:00",
@@ -38,7 +38,7 @@ describe("ReservationsList", () => {
     const dstring = formatDate(today);
     expect(await screen.findAllByText(/19:00/)).toHaveLength(N_DAYS);
     expect(await screen.findAllByText(/20:00/)).toHaveLength(N_DAYS);
-    expect(await screen.findByText(RegExp(dstring))).toBeInTheDocument();
+    expect(await screen.findByText(new RegExp(dstring))).toBeInTheDocument();
   });
 
   test("Error message is translated correctly", async () => {

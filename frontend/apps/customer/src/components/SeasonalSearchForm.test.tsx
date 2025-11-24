@@ -33,7 +33,7 @@ vi.mock("next/router", () => ({
 }));
 
 function constructOption(label: string, n: number) {
-  return [...Array(n)]
+  return Array.from({ length: n })
     .map((_, i) => i + 1)
     .map((i) => ({
       value: i,
