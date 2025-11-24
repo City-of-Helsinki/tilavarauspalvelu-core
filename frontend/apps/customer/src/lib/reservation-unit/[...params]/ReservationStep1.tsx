@@ -8,7 +8,7 @@ import { useDisplayError } from "@ui/hooks";
 import { isNotFoundError } from "@ui/modules/apolloUtils";
 import { getLocalizationLang } from "@ui/modules/helpers";
 import { Flex } from "@ui/styled";
-import { type OptionsRecord } from "@ui/types";
+import type { OptionsRecord } from "@ui/types";
 import { AcceptTerms } from "@/components/AcceptTerms";
 import { SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
 import { getCheckoutUrl } from "@/modules/reservation";

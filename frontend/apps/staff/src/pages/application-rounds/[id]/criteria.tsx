@@ -1,7 +1,7 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import { TimeframeStatus } from "@lib/application-rounds";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";

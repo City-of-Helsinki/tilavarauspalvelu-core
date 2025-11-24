@@ -1,5 +1,5 @@
 import React from "react";
-import { type UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
@@ -12,7 +12,7 @@ import { ButtonLikeExternalLink, Flex, pageSideMargins, WhiteButton } from "@ui/
 import { useModal } from "@/context/ModalContext";
 import { getUnitUrl } from "@/modules/urls";
 import { ReservationUnitEditQuery, UnitSubpageHeadFragment, useArchiveReservationUnitMutation } from "@gql/gql-types";
-import { type ReservationUnitEditFormValues } from "./form";
+import type { ReservationUnitEditFormValues } from "./form";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;

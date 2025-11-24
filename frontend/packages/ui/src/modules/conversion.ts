@@ -12,7 +12,7 @@ import {
   ReserveeType,
   Weekday,
 } from "../../gql/gql-types";
-import { type DayT } from "./const";
+import type { DayT } from "./const";
 
 export function transformWeekday(d: DayT): Weekday {
   switch (d) {

@@ -15,7 +15,7 @@ import VisibleIfPermission from "@/components/VisibleIfPermission";
 import { useModal } from "@/context/ModalContext";
 import { useReservationCalendarData, useReservationSeries } from "@/hooks";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { type CalendarEventType, type EventType } from "@/modules/reservation";
+import type { CalendarEventType, EventType } from "@/modules/reservation";
 import { isPossibleToEdit } from "@/modules/reservationModificationRules";
 import { Accordion } from "@/styled";
 import {

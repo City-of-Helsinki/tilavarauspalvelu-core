@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
 import { addMinutes, addSeconds, isAfter, roundToNearestMinutes, differenceInMinutes, set } from "date-fns";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { getIntervalMinutes } from "ui/src/modules/conversion";
 import { formatTime, parseUIDate, isValidDate, timeToMinutes, formatDate } from "ui/src/modules/date-utils";
-import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
+import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import {
   type ReservationNode,
   ReservationStartInterval,

@@ -146,7 +146,7 @@ export function ReservationInfoCard({
           {taxPercentageValue &&
             shouldDisplayTaxPercentage &&
             `(${t("common:inclTax", {
-              taxPercentage: formatters.strippedDecimal?.format(parseFloat(taxPercentageValue)),
+              taxPercentage: formatters.strippedDecimal?.format(Number.parseFloat(taxPercentageValue)),
             })})`}
         </div>
         {reservation.accessType !== AccessType.Unrestricted && (

@@ -4,7 +4,7 @@ import { selectOption } from "@test/test.utils";
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
-import { type OpenHoursState } from "ui/src/components/ApplicationTimeSelector";
+import type { OpenHoursState } from "ui/src/components/ApplicationTimeSelector";
 import { type DayT, WEEKDAYS_SORTED } from "ui/src/modules/const";
 import { transformWeekday } from "ui/src/modules/conversion";
 import { formatApiTimeUnsafe } from "ui/src/modules/date-utils";

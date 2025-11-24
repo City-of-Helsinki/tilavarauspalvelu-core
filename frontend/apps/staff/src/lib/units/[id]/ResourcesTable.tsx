@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { gql } from "@apollo/client";
 import { trim } from "lodash-es";
 import { useTranslation } from "next-i18next";
-import { type TFunction } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { useRouter } from "next/router";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { PopupMenu } from "ui/src/components/PopupMenu";

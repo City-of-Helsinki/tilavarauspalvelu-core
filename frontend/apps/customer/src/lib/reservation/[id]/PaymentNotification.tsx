@@ -50,8 +50,8 @@ export const PaymentNotification = ({
   const { t, i18n } = useTranslation();
   const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
   const formatter = formatters["currencyWithDecimals"];
-  const price = formatter?.format(parseFloat(reservation.price ?? "") ?? 0);
-  const taxPercentage = formatters.strippedDecimal?.format(parseFloat(appliedPricing?.taxPercentage ?? "")) ?? "0";
+  const price = formatter?.format(Number.parseFloat(reservation.price ?? "") ?? 0);
+  const taxPercentage = formatters.strippedDecimal?.format(Number.parseFloat(appliedPricing?.taxPercentage ?? "")) ?? "0";
 
   const deadline =
     paymentOrder?.handledPaymentDueBy != null

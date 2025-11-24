@@ -1,6 +1,6 @@
-import { type DocumentNode } from "graphql";
+import type { DocumentNode } from "graphql";
 import { createNodeId, filterNonNullable } from "ui/src/modules/helpers";
-import { type OptionsListT } from "ui/src/modules/search";
+import type { OptionsListT } from "ui/src/modules/search";
 import { translateOption } from "@/modules/search";
 import { MunicipalityChoice, type OptionsQuery, type ReservationUnitTypeNode } from "@gql/gql-types";
 

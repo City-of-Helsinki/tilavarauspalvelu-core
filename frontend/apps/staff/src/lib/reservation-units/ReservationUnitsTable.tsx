@@ -17,7 +17,7 @@ import { isBrowser, MAX_NAME_LENGTH } from "@/modules/const";
 import { truncate } from "@/modules/helpers";
 import { getOpeningHoursUrl, getReservationUnitUrl } from "@/modules/urls";
 import { TableLink } from "@/styled";
-import { type ReservationUnitTableElementFragment } from "@gql/gql-types";
+import type { ReservationUnitTableElementFragment } from "@gql/gql-types";
 
 type ReservationUnitsTableProps = {
   sort: string;
@@ -142,7 +142,7 @@ function ActionButtons({ selectedRows }: ActionButtonsProps): React.ReactElement
   const { env } = useEnvContext();
   const { t } = useTranslation();
 
-  const selectedPks = selectedRows.map((id) => Number(id)).filter((id) => !isNaN(id));
+  const selectedPks = selectedRows.map((id) => Number(id)).filter((id) => !Number.isNaN(id));
   const redirectOnErrorUrl = isBrowser ? window.location.href : undefined;
   const openingHoursUrl = getOpeningHoursUrl(env.apiBaseUrl, selectedPks, redirectOnErrorUrl);
   const editLink = openingHoursUrl !== "" ? openingHoursUrl : undefined;

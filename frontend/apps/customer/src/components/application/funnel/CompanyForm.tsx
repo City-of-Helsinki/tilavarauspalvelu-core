@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { ControlledCheckbox } from "ui/src/components/form";
 import { FormSubHeading } from "@/styled/application";
 import { ApplicationFormTextInput, BillingAddress } from ".";
-import { type ApplicationPage3FormValues } from "./form";
+import type { ApplicationPage3FormValues } from "./form";
 
 export function CompanyForm(): JSX.Element {
   const { t } = useTranslation();

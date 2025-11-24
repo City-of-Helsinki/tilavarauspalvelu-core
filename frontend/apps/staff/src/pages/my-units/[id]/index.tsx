@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 import { CreateReservationModal, ReservationUnitCalendarView, UnitReservations } from "@lib/my-units/[id]/";
 import { addMinutes } from "date-fns";
 import { Button, ButtonSize, ButtonVariant, Tabs } from "hds-react";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useSearchParams } from "next/navigation";

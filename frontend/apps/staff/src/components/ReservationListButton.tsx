@@ -9,7 +9,7 @@ import {
   IconCross,
   IconPen,
 } from "hds-react";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 
 /// NOTE don't use hooks here; buttons are dynamically added to arrays (so the amount of hooks can change)
 /// TODO can we change this? so it returns a list of button props instead of the JSX?

@@ -2,7 +2,7 @@ import React, { createRef } from "react";
 import { gql } from "@apollo/client";
 import { ResourcesTable, SubPageHead, SpacesTable, NewSpaceModal, NewResourceModal } from "@lib/units/[id]/";
 import { Button, ButtonVariant, IconPlusCircleFill } from "hds-react";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";

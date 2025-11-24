@@ -1,7 +1,7 @@
 import { createOptionMock } from "@test/test.gql.utils";
 import { render, within } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
-import { type OptionsListT } from "ui/src/modules/search";
+import type { OptionsListT } from "ui/src/modules/search";
 import SearchSingle from "@/pages/search";
 import { AccessType } from "@gql/gql-types";
 import { createGraphQLMocks } from "../gql.mocks";

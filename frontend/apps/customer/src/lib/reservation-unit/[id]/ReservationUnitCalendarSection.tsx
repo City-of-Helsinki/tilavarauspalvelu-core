@@ -1,18 +1,18 @@
 import React from "react";
-import { type UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { Flex, H4 } from "ui/src/styled";
 import { ReservationTimePicker } from "@/components/reservation";
-import { type ReservationTimePickerProps } from "@/components/reservation/ReservationTimePicker";
+import type { ReservationTimePickerProps } from "@/components/reservation/ReservationTimePicker";
 import { useReservableTimes } from "@/hooks";
-import { type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import {
-  type ReservationQuotaReachedFragment,
-  type ReservationUnitNode,
-  type ReservationUnitPageQuery,
+import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import type {
+  ReservationQuotaReachedFragment,
+  ReservationUnitNode,
+  ReservationUnitPageQuery,
 } from "@gql/gql-types";
 
 type ReservationUnitT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;

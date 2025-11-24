@@ -2,11 +2,11 @@ import React from "react";
 import { StepState } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import { type ReadonlyDeep } from "ui/src/modules/helpers";
+import type { ReadonlyDeep } from "ui/src/modules/helpers";
 import { isSent } from "@/modules/helpers";
 import { getApplicationPath } from "@/modules/urls";
 import { StyledStepper } from "@/styled/utils";
-import { type ApplicationFormFragment } from "@gql/gql-types";
+import type { ApplicationFormFragment } from "@gql/gql-types";
 import { validateApplication } from "./form";
 
 // Ordered list of steps by page slug

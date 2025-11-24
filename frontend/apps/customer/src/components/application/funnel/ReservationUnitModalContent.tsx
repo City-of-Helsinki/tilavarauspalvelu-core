@@ -23,7 +23,7 @@ import {
   getTranslation,
   getMainImage,
 } from "ui/src/modules/helpers";
-import { type OptionsListT } from "ui/src/modules/search";
+import type { OptionsListT } from "ui/src/modules/search";
 import { CenterSpinner, Flex, H3 } from "ui/src/styled";
 import { type SearchFormValues, SeasonalSearchForm } from "@/components/SeasonalSearchForm";
 import { useSearchQuery } from "@/hooks";

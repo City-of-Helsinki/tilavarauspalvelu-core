@@ -7,7 +7,7 @@ import { useModal } from "@/context/ModalContext";
 import { useReservationSeries } from "@/hooks";
 import { isPossibleToDeny } from "@/modules/reservationModificationRules";
 import { getReservationUrl } from "@/modules/urls";
-import { type ReservationSeriesNode } from "@gql/gql-types";
+import type { ReservationSeriesNode } from "@gql/gql-types";
 
 type Props = {
   reservationSeries: Pick<ReservationSeriesNode, "pk">;

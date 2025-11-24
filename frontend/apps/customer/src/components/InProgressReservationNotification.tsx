@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { type ParsedUrlQuery } from "querystring";
+import type { ParsedUrlQuery } from "node:querystring";
 import { gql, useApolloClient } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";

@@ -1,6 +1,6 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { memoize } from "lodash-es";
 import { useTranslation } from "next-i18next";
 import { OrderStatusLabel, ReservationStatusLabel } from "ui/src/components/statuses";

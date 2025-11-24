@@ -1,4 +1,4 @@
-import { type Control, type FieldValues, type Path, type UseControllerProps } from "react-hook-form";
+import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
 import styled from "styled-components";
 import { ControlledNumberFilter } from "./NumberFilter";
 

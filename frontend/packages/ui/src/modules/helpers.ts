@@ -1,6 +1,6 @@
 import { isAfter, isBefore } from "date-fns";
-import { type OptionInProps } from "hds-react";
-import { type TFunction } from "i18next";
+import type { OptionInProps } from "hds-react";
+import type { TFunction } from "i18next";
 import sanitizeHtml from "sanitize-html";
 import {
   type ImageFragment,
@@ -12,7 +12,7 @@ import {
 import { pixel } from "./const";
 import { convertWeekday } from "./conversion";
 import { minutesToHoursString, timeToMinutes } from "./date-utils";
-import { type LocalizationLanguages } from "./urlBuilder";
+import type { LocalizationLanguages } from "./urlBuilder";
 
 /// Enforce readonly on all nested properties
 /// only single level deep i.e. {a: {b: {c: string}}} -> {readonly a: {b: {c: string}}}

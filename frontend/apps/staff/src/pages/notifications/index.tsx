@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { gql, useApolloClient } from "@apollo/client";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { type TFunction, useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { BannerNotificationStatusLabel } from "ui/src/components/statuses";

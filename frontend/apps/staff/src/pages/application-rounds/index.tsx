@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 import { ApplicationRoundCard } from "@lib/application-rounds";
 import { Accordion } from "hds-react";
 import { orderBy } from "lodash-es";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";

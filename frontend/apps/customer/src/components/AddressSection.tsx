@@ -4,7 +4,7 @@ import { IconLinkExternal } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconButton } from "ui/src/components";
-import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
+import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { Flex, H4, fontMedium } from "ui/src/styled";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { mapUrlPrefix } from "@/modules/const";

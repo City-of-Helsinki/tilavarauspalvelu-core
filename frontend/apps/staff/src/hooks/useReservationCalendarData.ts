@@ -3,7 +3,7 @@ import { errorToast } from "ui/src/components/toast";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
 import { combineAffectingReservations } from "@/modules/helpers";
-import { type CalendarEventType } from "@/modules/reservation";
+import type { CalendarEventType } from "@/modules/reservation";
 import {
   type CalendarReservationFragment,
   type Maybe,

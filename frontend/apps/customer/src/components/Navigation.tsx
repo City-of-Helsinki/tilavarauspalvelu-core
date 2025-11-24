@@ -27,7 +27,7 @@ import {
   seasonalPrefix,
   singleSearchPrefix,
 } from "@/modules/urls";
-import { type CurrentUserQuery } from "@gql/gql-types";
+import type { CurrentUserQuery } from "@gql/gql-types";
 
 type HeaderProps = {
   apiBaseUrl: string;

@@ -13,7 +13,7 @@ import { DayNavigation } from "@/components/QueryParamFilters/DayNavigation";
 import { SearchTags } from "@/components/SearchTags";
 import { useUnitResources, useGetFilterSearchParams } from "@/hooks";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { type ReservationUnitOption } from "@/hooks/useUnitResources";
+import type { ReservationUnitOption } from "@/hooks/useUnitResources";
 import { TagOptionsList, translateTag } from "@/modules/search";
 import { UnitCalendar } from "./UnitCalendar";
 import { legend } from "./eventStyleGetter";

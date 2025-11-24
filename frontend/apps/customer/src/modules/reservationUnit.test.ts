@@ -1,9 +1,9 @@
-import { type DeepRequired } from "react-hook-form";
+import type { DeepRequired } from "react-hook-form";
 import { createMockIsReservableFieldsFragment } from "@test/reservation-unit.mocks";
 import { generateNameFragment } from "@test/test.gql.utils";
 import { TIMERS_TO_FAKE } from "@test/test.utils";
 import { addDays, addHours, addMonths, endOfDay, getHours, set, startOfDay, startOfToday } from "date-fns";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { get as mockGet } from "lodash-es";
 import { vi, describe, test, expect, beforeEach, afterEach, beforeAll, afterAll } from "vitest";
 import { formatApiDateUnsafe } from "ui/src/modules/date-utils";

@@ -6,7 +6,7 @@ import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { addYears } from "date-fns";
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
-import { type OptionsListT } from "ui/src/modules/search";
+import type { OptionsListT } from "ui/src/modules/search";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import { getApplicationPath } from "@/modules/urls";
 import SeasonalSearch from "@/pages/recurring/[id]";

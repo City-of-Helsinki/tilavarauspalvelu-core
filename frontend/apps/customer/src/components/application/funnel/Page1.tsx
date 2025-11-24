@@ -3,10 +3,10 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconPlus } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "ui/src/modules/helpers";
-import { type OptionsListT } from "ui/src/modules/search";
+import type { OptionsListT } from "ui/src/modules/search";
 import { ButtonContainer } from "ui/src/styled";
 import { useReservationUnitList } from "@/hooks";
-import { type ApplicationRoundForApplicationFragment } from "@gql/gql-types";
+import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { ApplicationSectionPage1 } from ".";
 import { type ApplicationPage1FormValues, createDefaultPage1Section } from "./form";
 

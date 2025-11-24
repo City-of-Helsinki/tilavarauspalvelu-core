@@ -6,7 +6,7 @@ import { selectFirstOption } from "@test/test.utils";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, expect, test, describe } from "vitest";
-import { type OptionsListT } from "ui/src/modules/search";
+import type { OptionsListT } from "ui/src/modules/search";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import Page1 from "@/pages/applications/[id]/page1";
 

@@ -1,5 +1,5 @@
 import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";

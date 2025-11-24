@@ -7,9 +7,9 @@ import { filterNonNullable, getLocalizationLang, getTranslation } from "ui/src/m
 import { ButtonContainer } from "ui/src/styled";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { getApplicationPath } from "@/modules/urls";
-import { type ApplicationPage2Query } from "@gql/gql-types";
+import type { ApplicationPage2Query } from "@gql/gql-types";
 import { TimeSelectorForm } from ".";
-import { type ApplicationPage2FormValues } from "./form";
+import type { ApplicationPage2FormValues } from "./form";
 
 type Node = NonNullable<ApplicationPage2Query["application"]>;
 type Props = {

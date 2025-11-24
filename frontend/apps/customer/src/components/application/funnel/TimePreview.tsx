@@ -1,7 +1,7 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { ApplicationTimePreview } from "ui/src/components/ApplicationTimePreview";
-import { type ApplicationPage2FormValues } from "./form";
+import type { ApplicationPage2FormValues } from "./form";
 
 type Props = {
   index: number;

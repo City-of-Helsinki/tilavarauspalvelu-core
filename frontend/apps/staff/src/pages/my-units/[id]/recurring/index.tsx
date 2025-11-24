@@ -1,7 +1,7 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import { ReservationSeriesForm } from "@lib/my-units/[id]/recurring/ReservationSeriesForm";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import TimeZoneNotification from "ui/src/components/TimeZoneNotification";

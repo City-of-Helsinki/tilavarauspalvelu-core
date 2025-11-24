@@ -1,5 +1,5 @@
 import React from "react";
-import { type UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";

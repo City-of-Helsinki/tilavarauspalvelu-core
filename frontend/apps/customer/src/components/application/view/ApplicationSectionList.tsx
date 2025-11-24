@@ -23,7 +23,7 @@ import {
   type ApplicationViewFragment,
   type SuitableTimeFragment,
 } from "@gql/gql-types";
-import { type SuitableTimeRangeFormValues } from "../funnel/form";
+import type { SuitableTimeRangeFormValues } from "../funnel/form";
 
 function ageGroupToString(ag: Maybe<AgeGroupNode> | undefined): string {
   if (!ag) {

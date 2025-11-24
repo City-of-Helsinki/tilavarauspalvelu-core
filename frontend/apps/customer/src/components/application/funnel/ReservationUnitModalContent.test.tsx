@@ -1,6 +1,6 @@
 import { createMockApplicationRound } from "@test/application.mocks";
 import { createGraphQLMocks } from "@test/gql.mocks";
-import { type CreateGraphQLMockProps } from "@test/test.gql.utils";
+import type { CreateGraphQLMockProps } from "@test/test.gql.utils";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

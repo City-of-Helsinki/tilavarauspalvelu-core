@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { gql } from "@apollo/client";
-import { type ApolloQueryResult } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import { Button, ButtonVariant, LoadingSpinner, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";

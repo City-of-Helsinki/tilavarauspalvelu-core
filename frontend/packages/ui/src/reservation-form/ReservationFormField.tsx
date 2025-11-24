@@ -1,8 +1,8 @@
 import React from "react";
-import { type UseFormReturn, type UseFormRegister } from "react-hook-form";
+import type { UseFormReturn, UseFormRegister } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { ReserveeType } from "../../gql/gql-types";
-import { type ReservationFormValueT } from "../schemas";
+import type { ReservationFormValueT } from "../schemas";
 import { StyledTextInput } from "./styled";
 import {
   constructReservationFieldId,

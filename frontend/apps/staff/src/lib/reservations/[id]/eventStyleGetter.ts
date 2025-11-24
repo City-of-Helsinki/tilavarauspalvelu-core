@@ -9,7 +9,7 @@ import {
   STAFF_RESERVATION,
   WAITING_PAYMENT,
 } from "@/modules/calendarStyling";
-import { type CalendarEventType, type EventType } from "@/modules/reservation";
+import type { CalendarEventType, EventType } from "@/modules/reservation";
 import {
   type EventStyleReservationFieldsFragment,
   ReservationStateChoice,

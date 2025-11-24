@@ -6,7 +6,7 @@ import {
   getExtendedGeneralFormFields,
 } from "@ui/reservation-form/utils";
 import { AutoGrid, H4 } from "@ui/styled";
-import { type OptionsRecord } from "@ui/types";
+import type { OptionsRecord } from "@ui/types";
 import { LabelValuePair } from "@/components/LabelValuePair";
 import { MunicipalityChoice, type ReservationFormFieldsFragment } from "@gql/gql-types";
 

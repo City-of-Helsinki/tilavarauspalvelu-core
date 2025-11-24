@@ -1,4 +1,4 @@
-import { type ParsedUrlQueryInput } from "node:querystring";
+import type { ParsedUrlQueryInput } from "node:querystring";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { ignoreMaybeArray } from "ui/src/modules/helpers";

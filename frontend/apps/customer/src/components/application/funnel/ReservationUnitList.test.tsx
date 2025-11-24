@@ -7,7 +7,7 @@ import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { createNodeId } from "ui/src/modules/helpers";
-import { type ApplicationReservationUnitListFragment } from "@gql/gql-types";
+import type { ApplicationReservationUnitListFragment } from "@gql/gql-types";
 import { ReservationUnitList } from "./ReservationUnitList";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {

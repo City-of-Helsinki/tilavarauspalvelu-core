@@ -12,7 +12,7 @@ import {
   startOfDay,
   sub,
 } from "date-fns";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { trim, uniq } from "lodash-es";
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
 import { getIntervalMinutes } from "@ui/modules/conversion";
@@ -27,7 +27,7 @@ import {
   isPriceFree,
   type ReadonlyDeep,
 } from "@ui/modules/helpers";
-import { type LocalizationLanguages } from "@ui/modules/urlBuilder";
+import type { LocalizationLanguages } from "@ui/modules/urlBuilder";
 import {
   dateToKey,
   isRangeReservable,
@@ -241,8 +241,8 @@ export function getPriceString(props: GetPriceType): string {
   }
 
   const volume = getReservationVolume(minutes, pricing.priceUnit);
-  const highestPrice = parseFloat(pricing.highestPrice) * volume;
-  const lowestPrice = parseFloat(pricing.lowestPrice) * volume;
+  const highestPrice = Number.parseFloat(pricing.highestPrice) * volume;
+  const lowestPrice = Number.parseFloat(pricing.lowestPrice) * volume;
   const priceString =
     lowestPrice === highestPrice
       ? formatPrice(lowestPrice, true)
