@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ReserveeType } from "../../gql/gql-types";
 import { ErrorText } from "../components/ErrorText";
-import IconPremises from "../icons/IconPremises";
+import { SvgComponent } from "../icons/IconPremises";
 import { Flex, FullRow } from "../styled";
 import { RadioButtonWithImage } from "./RadioButtonWithImage";
 
@@ -30,7 +30,7 @@ const RESERVEE_OPTIONS = [
   },
   {
     id: ReserveeType.Company,
-    icon: <IconPremises width="24" height="24" aria-hidden />,
+    icon: <SvgComponent width="24" height="24" aria-hidden />,
   },
 ];
 

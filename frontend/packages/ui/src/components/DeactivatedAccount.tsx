@@ -12,7 +12,7 @@ const Email = styled.a`
   ${fontBold}
 `;
 
-const DeactivatedAccount = ({ feedbackUrl, imgSrc }: { feedbackUrl: string; imgSrc: string }) => {
+export const DeactivatedAccount = ({ feedbackUrl, imgSrc }: { feedbackUrl: string; imgSrc: string }) => {
   const { t } = useTranslation();
   return (
     <ErrorContainer feedbackUrl={feedbackUrl} imgSrc={imgSrc}>
@@ -25,5 +25,3 @@ const DeactivatedAccount = ({ feedbackUrl, imgSrc }: { feedbackUrl: string; imgS
     </ErrorContainer>
   );
 };
-
-export default DeactivatedAccount;

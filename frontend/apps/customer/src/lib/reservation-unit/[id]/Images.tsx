@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";
 import { getImageSource } from "ui/src/modules/helpers";
 import { focusStyles, removeButtonStyles } from "ui/src/styled";
-import Carousel from "@/components/Carousel";
+import { Carousel } from "@/components/Carousel";
 import { FixedDialog } from "@/styled/FixedDialog";
 import type { ImageFragment } from "@gql/gql-types";
 

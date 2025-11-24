@@ -14,7 +14,7 @@ import { ignoreMaybeArray, mapParamToInteger, toNumber } from "ui/src/modules/he
 import type { OptionsListT } from "ui/src/modules/search";
 import { Flex } from "ui/src/styled";
 import { FilterTagList } from "@/components/FilterTagList";
-import SingleLabelInputGroup from "@/components/SingleLabelInputGroup";
+import { SingleLabelInputGroup } from "@/components/SingleLabelInputGroup";
 import { DateRangePicker } from "@/components/form";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { getDurationOptions } from "@/modules/const";

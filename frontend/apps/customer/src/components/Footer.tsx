@@ -2,7 +2,7 @@ import React from "react";
 import { Footer as HDSFooter, IconLinkExternal, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import Logo from "ui/src/components/Logo";
+import { Logo } from "ui/src/components/Logo";
 import { getFeedbackUrl } from "@/modules/urls";
 
 const Wrapper = styled(HDSFooter)`
@@ -19,7 +19,7 @@ const Wrapper = styled(HDSFooter)`
   }
 `;
 
-function Footer({ feedbackUrl }: { feedbackUrl: string }) {
+export function Footer({ feedbackUrl }: { feedbackUrl: string }) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === "fi" ? "" : `/${i18n.language}`;
   const languageUrl = getFeedbackUrl(feedbackUrl, i18n);
@@ -71,5 +71,3 @@ function ExternalLinkIcon({ size = "s" }: { size?: "s" | "xs" }): JSX.Element {
   const s = size === "xs" ? IconSize.ExtraSmall : IconSize.Small;
   return <IconLinkExternal size={s} aria-hidden="true" />;
 }
-
-export default Footer;

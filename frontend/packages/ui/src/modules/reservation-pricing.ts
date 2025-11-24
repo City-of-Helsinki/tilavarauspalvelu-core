@@ -1,6 +1,6 @@
 import { type Maybe, PriceUnit } from "../../gql/gql-types";
 import { toNumber } from "./helpers";
-import formatters from "./number-formatters";
+import { formatters } from "./number-formatters";
 
 function getPriceUnitMinutes(unit: PriceUnit): number {
   switch (unit) {

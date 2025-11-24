@@ -2,7 +2,7 @@ import React from "react";
 import { Button, IconArrowRight, IconGroup, IconLinkExternal } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import IconButton from "ui/src/components/IconButton";
+import { IconButton } from "ui/src/components/IconButton";
 import { signIn } from "ui/src/modules/browserHelpers";
 import { breakpoints } from "ui/src/modules/const";
 import { getLocalizationLang } from "ui/src/modules/helpers";

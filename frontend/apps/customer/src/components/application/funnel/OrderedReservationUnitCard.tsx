@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 import { IconArrowDown, IconArrowUp, ButtonSize, ButtonVariant, Button, ButtonPresetTheme } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import Card from "ui/src/components/Card";
+import { Card } from "ui/src/components/Card";
 import { ErrorText } from "ui/src/components/ErrorText";
 import { breakpoints } from "ui/src/modules/const";
 import { getImageSource, getLocalizationLang, getTranslation, getMainImage } from "ui/src/modules/helpers";

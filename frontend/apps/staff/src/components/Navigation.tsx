@@ -4,7 +4,7 @@ import { Header, IconLinkExternal, IconSignout, IconStar, IconUser, LogoSize, Ti
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import Logo from "ui/src/components/Logo";
+import { Logo } from "ui/src/components/Logo";
 import { signIn, signOut } from "ui/src/modules/browserHelpers";
 import { getLocalizationLang } from "ui/src/modules/helpers";
 import { env } from "@/env.mjs";

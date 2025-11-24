@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { Sanitize } from "ui/src/components/Sanitize";
-import TermsBox from "ui/src/components/TermsBox";
+import { TermsBox } from "ui/src/components/TermsBox";
 import { ControlledSelect } from "ui/src/components/form";
 import { breakpoints } from "ui/src/modules/const";
 import { AutoGrid, ButtonContainer, Flex, fontMedium } from "ui/src/styled";

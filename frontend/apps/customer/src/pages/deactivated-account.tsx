@@ -1,7 +1,7 @@
 import React from "react";
 import { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import DeactivatedAccount from "ui/src/components/DeactivatedAccount";
+import { DeactivatedAccount } from "ui/src/components/DeactivatedAccount";
 import { useEnvContext } from "@/context/EnvContext";
 
 export async function getServerSideProps({ locale }: GetServerSidePropsContext) {

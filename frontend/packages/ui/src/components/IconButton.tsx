@@ -164,7 +164,7 @@ function IconButtonImpl({
  *  right of the `label` text. Can also be used as a non-link button via the `onClick` attribute (still renders an
  *  `<a>` element). Accepts other parameters through `...rest` - for id's, aria-attributes, testing etc.
  */
-function IconButton(props: IconButtonProps): JSX.Element {
+export function IconButton(props: IconButtonProps): JSX.Element {
   return (
     // Wrap inside a block so the inner element doesn't respond to clicks outside the content
     <div>
@@ -172,5 +172,3 @@ function IconButton(props: IconButtonProps): JSX.Element {
     </div>
   );
 }
-
-export default IconButton;

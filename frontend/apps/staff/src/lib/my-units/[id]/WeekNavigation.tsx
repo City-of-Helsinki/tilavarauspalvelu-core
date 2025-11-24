@@ -17,7 +17,7 @@ type Props = {
   onPrev: () => void;
 };
 
-function WeekNavigation({ date, onNext, onPrev }: Props): JSX.Element {
+export function WeekNavigation({ date, onNext, onPrev }: Props): JSX.Element {
   const d = new Date(date);
   const { t } = useTranslation();
 
@@ -49,5 +49,3 @@ function WeekNavigation({ date, onNext, onPrev }: Props): JSX.Element {
     </Flex>
   );
 }
-
-export default WeekNavigation;

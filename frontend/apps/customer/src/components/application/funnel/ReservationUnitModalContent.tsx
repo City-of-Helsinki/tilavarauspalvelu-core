@@ -14,7 +14,7 @@ import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
-import Card from "ui/src/components/Card";
+import { Card } from "ui/src/components/Card";
 import { breakpoints } from "ui/src/modules/const";
 import {
   filterNonNullable,

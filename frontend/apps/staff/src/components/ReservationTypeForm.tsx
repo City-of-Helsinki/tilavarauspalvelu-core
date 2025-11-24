@@ -13,7 +13,7 @@ import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { Element } from "@/styled";
 import { AuthenticationType, ReservationTypeChoice, type ReservationTypeFormFieldsFragment } from "@gql/gql-types";
 import { BufferToggles } from "./BufferToggles";
-import ShowTOS from "./ShowTOS";
+import { ShowTOS } from "./ShowTOS";
 
 const CommentsTextArea = styled(TextArea)`
   grid-column: 1 / -1;

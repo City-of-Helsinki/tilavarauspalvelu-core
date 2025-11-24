@@ -2,7 +2,7 @@ import { Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { EXPECTED_TIMEZONE } from "../modules/const";
 
-function TimeZoneNotification() {
+export function TimeZoneNotification() {
   const { t } = useTranslation();
   if (Intl.DateTimeFormat().resolvedOptions().timeZone === EXPECTED_TIMEZONE) {
     return null;
@@ -13,5 +13,3 @@ function TimeZoneNotification() {
     </Notification>
   );
 }
-
-export default TimeZoneNotification;

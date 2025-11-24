@@ -4,7 +4,7 @@ import { ButtonVariant, IconArrowRight, IconCross, IconEuroSign, IconLock } from
 import { trim } from "lodash-es";
 import { useTranslation } from "next-i18next";
 import { ButtonLikeExternalLink, ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
-import Card from "ui/src/components/Card";
+import { Card } from "ui/src/components/Card";
 import { ReservationStatusLabel, OrderStatusLabel } from "ui/src/components/statuses";
 import { formatDateTimeRange } from "ui/src/modules/date-utils";
 import { capitalize, getImageSource, getLocalizationLang, getTranslation, getMainImage } from "ui/src/modules/helpers";

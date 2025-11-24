@@ -5,7 +5,7 @@ import { get } from "lodash-es";
 import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ReservableTimeSpanType } from "ui/gql/gql-types";
-import CommonCalendar, { type SlotProps } from "ui/src/components/calendar/Calendar";
+import { Calendar as CommonCalendar, type SlotProps } from "ui/src/components/calendar/Calendar";
 import { errorToast } from "ui/src/components/toast";
 import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { formatApiDate } from "ui/src/modules/date-utils";
@@ -28,7 +28,7 @@ import {
   useReservationUnitCalendarQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import eventStyleGetter, { legend } from "./eventStyleGetter";
+import { eventStyleGetter, legend } from "./eventStyleGetter";
 
 type Props = {
   begin: string;

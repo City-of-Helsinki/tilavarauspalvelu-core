@@ -5,7 +5,8 @@ import { gql } from "@apollo/client";
 import { addMinutes, differenceInMinutes } from "date-fns";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import Calendar, {
+import {
+  Calendar,
   type CalendarEvent,
   type CalendarEventBuffer,
   type SlotClickProps,

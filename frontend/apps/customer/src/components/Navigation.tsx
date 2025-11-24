@@ -13,7 +13,7 @@ import {
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import Logo from "ui/src/components/Logo";
+import { Logo } from "ui/src/components/Logo";
 import { signIn, signOut } from "ui/src/modules/browserHelpers";
 import { breakpoints } from "ui/src/modules/const";
 import { getLocalizationLang } from "ui/src/modules/helpers";
@@ -283,7 +283,7 @@ function ActionBar({ apiBaseUrl, profileLink }: Readonly<HeaderProps>) {
   );
 }
 
-function Navigation({ apiBaseUrl, profileLink }: Readonly<HeaderProps>) {
+export function Navigation({ apiBaseUrl, profileLink }: Readonly<HeaderProps>) {
   const { t, i18n } = useTranslation();
   const { user } = useSession();
   const router = useRouter();
@@ -308,5 +308,3 @@ function Navigation({ apiBaseUrl, profileLink }: Readonly<HeaderProps>) {
     </Wrapper>
   );
 }
-
-export default Navigation;

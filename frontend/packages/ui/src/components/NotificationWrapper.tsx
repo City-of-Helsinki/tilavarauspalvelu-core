@@ -23,7 +23,11 @@ const StyledNotification = styled(Notification)`
   }
 `;
 
-function NotificationWrapper({ centered, onClose, ...rest }: NotificationPropsWithCentering): JSX.Element | null {
+export function NotificationWrapper({
+  centered,
+  onClose,
+  ...rest
+}: NotificationPropsWithCentering): JSX.Element | null {
   const [isVisible, setIsVisible] = useState(true);
 
   if (!isVisible) {
@@ -39,5 +43,3 @@ function NotificationWrapper({ centered, onClose, ...rest }: NotificationPropsWi
     />
   );
 }
-
-export default NotificationWrapper;
