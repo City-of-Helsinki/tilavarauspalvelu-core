@@ -63,7 +63,7 @@ export function SearchGuides(): JSX.Element {
     <OuterWrapper>
       <StyledImageWithCard color="primary" src="images/guide-recurring.png">
         <InfoContainer data-testid="search-guide__recurring">
-          <H3 as="h2" $noMargin>
+          <H3 as="h2" $marginTop="none">
             {t("infoRecurring.heading")}
           </H3>
           <p>{t("infoRecurring.text")}</p>
