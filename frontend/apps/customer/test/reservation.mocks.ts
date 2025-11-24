@@ -117,7 +117,7 @@ export function createMockReservation(
     isHandled = true,
     paymentOrder = {
       id: "1",
-      reservationPk: `${1}`,
+      reservationPk: "1",
       status: OrderStatus.PaidManually,
       paymentType: PaymentType.OnSite,
       receiptUrl: "https://example.com/receipt",

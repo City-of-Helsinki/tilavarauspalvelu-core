@@ -1,8 +1,7 @@
-import type { ParsedUrlQuery } from "node:querystring";
-import { ApolloClient, HttpLink, InMemoryCache, from } from "@apollo/client";
-import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
+import { ApolloClient, from, HttpLink, InMemoryCache } from "@apollo/client";
+import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { relayStylePagination } from "@apollo/client/utilities";
-import type { GetServerSidePropsContext, PreviewData } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { enchancedFetch, errorLink } from "ui/src/modules/apolloUtils";
 import { buildGraphQLUrl } from "ui/src/modules/urlBuilder";
 import { isBrowser } from "./const";
@@ -13,7 +12,7 @@ if (process.env.NODE_ENV === "development") {
   loadErrorMessages();
 }
 
-export function createApolloClient(hostUrl: string, ctx?: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>) {
+export function createApolloClient(hostUrl: string, ctx?: GetServerSidePropsContext) {
   const isServer = typeof window === "undefined";
   const uri = buildGraphQLUrl(hostUrl);
   const httpLink = new HttpLink({

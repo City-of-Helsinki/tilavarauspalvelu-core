@@ -424,7 +424,7 @@ export function formatApiDate(date: Date): string | null {
 export function formatApiDateUnsafe(date: Date): string {
   const apiDate = formatApiDate(date);
   if (apiDate == null) {
-    throw new Error("Invalid date: " + date);
+    throw new Error(`Invalid date: ${date}`);
   }
   return apiDate;
 }

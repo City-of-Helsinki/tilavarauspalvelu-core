@@ -104,7 +104,7 @@ function getTimeLabel(selection: string[], t: TFunction): string {
     return "";
   }
 
-  const dayString = `${t(`translation:dayLong.${day}`)}`;
+  const dayString = t(`translation:dayLong.${day}`);
 
   const beginMinutes = startHour * 60 + startMinute;
   // since all slots are 30 minutes, we add 30 minutes to the end time

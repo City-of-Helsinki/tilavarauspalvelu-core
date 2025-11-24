@@ -279,7 +279,7 @@ function Cell({
     setParams(params);
   };
 
-  const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     handleOpenModal();
   };

@@ -4,7 +4,6 @@
     "plugins": [{ "name": "next" }],
     "module": "esnext",
     "moduleResolution": "bundler",
-    "baseUrl": ".",
     "paths": {
       "@ui/*": ["./src/*"]
     }
