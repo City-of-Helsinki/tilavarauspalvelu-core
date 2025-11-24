@@ -24,7 +24,7 @@ interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
   required?: boolean;
   placeholder?: string;
   error?: string;
-  validate?: { [key: string]: (val: string) => boolean };
+  validate?: Record<string, (val: string) => boolean>;
   style?: React.CSSProperties;
   className?: string;
   clearable?: boolean;

@@ -64,6 +64,7 @@
     "eslint/no-constant-binary-expression": "error",
     "eslint/no-constant-condition": "error",
     "eslint/no-constructor-return": "error",
+    "eslint/no-continue": "off",
     "eslint/no-control-regex": "error",
     "eslint/no-debugger": "error",
     "eslint/no-delete-var": "error",
@@ -99,6 +100,8 @@
     "eslint/no-magic-numbers": "off",
     "eslint/no-multi-assign": "error",
     "eslint/no-multi-str": "error",
+    "eslint/no-negated-condition": "off",
+    "eslint/no-nested-ternary": "off",
     "eslint/no-new": "error",
     "eslint/no-new-func": "error",
     "eslint/no-new-native-nonconstructor": "error",
@@ -123,6 +126,7 @@
     "eslint/no-template-curly-in-string": "error",
     "eslint/no-ternary": "off",
     "eslint/no-this-before-super": "error",
+    "eslint/no-throw-literal": "error",
     "eslint/no-undefined": "off",
     "eslint/no-unexpected-multiline": "off",
     "eslint/no-unneeded-ternary": "error",
@@ -186,8 +190,19 @@
     "import/no-mutable-exports": "error",
     "import/no-named-as-default": "off",
     "import/no-named-as-default-member": "error",
+    "import/no-named-default": "error",
+    "import/no-namespace": [
+      "error",
+      {
+        "ignore": [
+          "@sentry/nextjs"
+        ]
+      }
+    ],
     "import/no-self-import": "error",
+    "import/no-unassigned-import": "off",
     "import/no-webpack-loader-syntax": "error",
+    "import/prefer-default-export": "off",
     "import/unambiguous": "error",
     "jsx_a11y/alt-text": "error",
     "jsx_a11y/anchor-has-content": "error",
@@ -260,9 +275,15 @@
     "oxc/number-arg-out-of-range": "error",
     "oxc/only-used-in-recursion": "error",
     "oxc/uninvoked-array-callback": "error",
+    "promise/avoid-new": "error",
     "promise/no-callback-in-promise": "error",
+    "promise/no-nesting": "error",
     "promise/no-new-statics": "error",
     "promise/no-promise-in-callback": "error",
+    "promise/no-return-wrap": "error",
+    "promise/param-names": "error",
+    "promise/prefer-await-to-then": "error",
+    "promise/prefer-catch": "error",
     "promise/valid-params": "error",
     "react/button-has-type": "error",
     "react/exhaustive-deps": "error",
@@ -312,6 +333,10 @@
     "react/self-closing-comp": "error",
     "react/style-prop-object": "error",
     "react/void-dom-elements-no-children": "error",
+    "react_perf/jsx-no-jsx-as-prop": "error",
+    "react_perf/jsx-no-new-array-as-prop": "error",
+    "react_perf/jsx-no-new-function-as-prop": "error",
+    "react_perf/jsx-no-new-object-as-prop": "error",
     "typescript/adjacent-overload-signatures": "error",
     "typescript/array-type": [
       "error",
@@ -322,7 +347,10 @@
     ],
     "typescript/await-thenable": "error",
     "typescript/ban-ts-comment": "error",
+    "typescript/ban-tslint-comment": "error",
+    "typescript/ban-types": "error",
     "typescript/consistent-generic-constructors": "error",
+    "typescript/consistent-indexed-object-style": "error",
     "typescript/consistent-type-definitions": "off",
     "typescript/explicit-function-return-type": "off",
     "typescript/explicit-module-boundary-types": "off",
@@ -363,7 +391,9 @@
     "typescript/no-useless-empty-export": "error",
     "typescript/no-var-requires": "error",
     "typescript/no-wrapper-object-types": "error",
+    "typescript/non-nullable-type-assertion-style": "error",
     "typescript/prefer-as-const": "error",
+    "typescript/prefer-enum-initializers": "error",
     "typescript/prefer-for-of": "error",
     "typescript/prefer-function-type": "error",
     "typescript/prefer-literal-enum-member": "error",
@@ -371,6 +401,7 @@
     "typescript/prefer-promise-reject-errors": "error",
     "typescript/prefer-reduce-type-parameter": "error",
     "typescript/prefer-return-this-type": "error",
+    "typescript/promise-function-async": "off",
     "typescript/related-getter-setter-pairs": "error",
     "typescript/require-array-sort-compare": "error",
     "typescript/restrict-plus-operands": "error",
@@ -454,7 +485,7 @@
     "unicorn/prefer-modern-math-apis": "error",
     "unicorn/prefer-native-coercion-functions": "error",
     "unicorn/prefer-negative-index": "error",
-    "unicorn/prefer-node-protocol": "error",
+    "unicorn/prefer-node-protocol": "off",
     "unicorn/prefer-number-properties": "error",
     "unicorn/prefer-object-from-entries": "error",
     "unicorn/prefer-optional-catch-binding": "error",
@@ -497,10 +528,12 @@
   "overrides": [
     {
       "files": [
-        "instrumentation-client.ts"
+        "instrumentation-client.ts",
+        "next.config.ts"
       ],
       "rules": {
-        "import/namespace": "off"
+        "import/namespace": "off",
+        "import/no-namespace": "off"
       }
     },
     {
@@ -547,10 +580,38 @@
     },
     {
       "files": [
-        "**/*.test.tsx"
+        "**/*.test.ts*",
+        "**/vitest.setup.ts"
       ],
       "rules": {
-        "unicorn/error-message": "off"
+        "promise/avoid-new": "off",
+        "unicorn/error-message": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-type-assertion": "off",
+        "typescript/restrict-template-expressions": "off"
+      }
+    },
+    {
+      "files": [
+        "**/sentry.*.config.ts",
+        "**/apolloClient.ts"
+      ],
+      "rules": {
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-member-access": "off"
+      }
+    },
+    {
+      "files": [
+        "**/pages/**.tsx"
+      ],
+      "rules": {
+        "unicorn/filename-case": [
+          "error",
+          {
+            "case": "kebabCase"
+          }
+        ]
       }
     }
   ]
