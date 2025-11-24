@@ -35,8 +35,8 @@ export function ResourceEditorFields({
       />
       {(["nameFi", "nameEn", "nameSv"] as const).map((fieldName) => (
         <TextInput
-          {...register(fieldName)}
           key={fieldName}
+          {...register(fieldName)}
           required={fieldName === "nameFi"}
           id={fieldName}
           maxLength={80}

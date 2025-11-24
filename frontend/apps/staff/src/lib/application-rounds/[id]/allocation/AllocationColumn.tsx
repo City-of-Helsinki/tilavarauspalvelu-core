@@ -401,12 +401,19 @@ export function AllocationColumn({
         <TimeSelection />
       </StyledShowAllContainer>
       {allocatedData.map((props) => (
-        <AllocatedCard {...props} key={props.key} refetchApplicationEvents={refetchApplicationEvents} />
+        <AllocatedCard
+          key={props.key}
+          applicationSection={props.applicationSection}
+          allocatedTimeSlot={props.allocatedTimeSlot}
+          refetchApplicationEvents={refetchApplicationEvents}
+        />
       ))}
       {suitableData.map((props) => (
         <SuitableTimeCard
-          {...props}
           key={props.key}
+          applicationSection={props.applicationSection}
+          timeSlot={props.timeSlot}
+          reservationUnitOptionPk={props.reservationUnitOptionPk}
           selection={selection ?? []}
           isAllocationEnabled={canAllocate}
           refetchApplicationEvents={refetchApplicationEvents}
