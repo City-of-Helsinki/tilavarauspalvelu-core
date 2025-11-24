@@ -1,4 +1,5 @@
-import React, { type ElementType } from "react";
+import React from "react";
+import type { ElementType } from "react";
 import Link from "next/link";
 import styled from "styled-components";
 import { breakpoints } from "../modules/const";

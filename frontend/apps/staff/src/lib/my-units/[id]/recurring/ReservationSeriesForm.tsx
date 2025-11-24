@@ -26,9 +26,11 @@ import { WeekdaysSelector } from "@/components/WeekdaysSelector";
 import { useCreateReservationSeries, useFilteredReservationList, useMultipleReservation } from "@/hooks";
 import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
 import { getMyUnitUrl, getReservationSeriesUrl } from "@/modules/urls";
-import { type ReservationSeriesFormValues, getReservationSeriesSchema } from "@/schemas";
+import { getReservationSeriesSchema } from "@/schemas";
+import type { ReservationSeriesFormValues } from "@/schemas";
 import { Element } from "@/styled";
-import { type CreateStaffReservationFragment, type Maybe, useReservationUnitQuery } from "@gql/gql-types";
+import { useReservationUnitQuery } from "@gql/gql-types";
+import type { CreateStaffReservationFragment, Maybe } from "@gql/gql-types";
 
 const InnerTextInput = styled(TextInput)`
   grid-column: 1 / -1;

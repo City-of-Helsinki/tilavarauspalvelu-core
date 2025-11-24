@@ -29,13 +29,15 @@ import { hasPermission as hasUnitPermission } from "@/modules/permissionHelper";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   ApplicationRoundFilterDocument,
-  type ApplicationRoundFilterQuery,
-  type ApplicationRoundFilterQueryVariables,
-  type ApplicationRoundFilterUnitFragment,
-  type ApplicationSectionAllocationsQueryVariables,
   useAllApplicationEventsQuery,
   useApplicationSectionAllocationsQuery,
   UserPermissionChoice,
+} from "@gql/gql-types";
+import type {
+  ApplicationRoundFilterQuery,
+  ApplicationRoundFilterQueryVariables,
+  ApplicationRoundFilterUnitFragment,
+  ApplicationSectionAllocationsQueryVariables,
 } from "@gql/gql-types";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;

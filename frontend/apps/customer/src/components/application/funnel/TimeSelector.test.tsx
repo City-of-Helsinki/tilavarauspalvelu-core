@@ -1,17 +1,22 @@
 import { FormProvider, useForm } from "react-hook-form";
-import { createMockApplicationFragment, type CreateMockApplicationFragmentProps } from "@test/application.mocks";
+import { createMockApplicationFragment } from "@test/application.mocks";
+import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
 import { selectOption } from "@test/test.utils";
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 import type { OpenHoursState } from "ui/src/components/ApplicationTimeSelector";
-import { type DayT, WEEKDAYS_SORTED } from "ui/src/modules/const";
+import { WEEKDAYS_SORTED } from "ui/src/modules/const";
+import type { DayT } from "ui/src/modules/const";
 import { transformWeekday } from "ui/src/modules/conversion";
 import { formatApiTimeUnsafe } from "ui/src/modules/date-utils";
 import { createNodeId, formatTimeStruct } from "ui/src/modules/helpers";
-import { type ApplicationPage2Query, Priority, type TimeSelectorFragment, Weekday } from "@gql/gql-types";
-import { TimeSelectorForm, type TimeSelectorProps } from "./TimeSelector";
-import { type ApplicationPage2FormValues, convertApplicationPage2 } from "./form";
+import { Priority, Weekday } from "@gql/gql-types";
+import type { ApplicationPage2Query, TimeSelectorFragment } from "@gql/gql-types";
+import { TimeSelectorForm } from "./TimeSelector";
+import type { TimeSelectorProps } from "./TimeSelector";
+import { convertApplicationPage2 } from "./form";
+import type { ApplicationPage2FormValues } from "./form";
 
 type ApplicationPage2 = NonNullable<ApplicationPage2Query["application"]>;
 

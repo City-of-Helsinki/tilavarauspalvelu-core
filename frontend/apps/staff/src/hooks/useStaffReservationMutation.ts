@@ -2,14 +2,12 @@ import { ApolloError, gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import { successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
-import {
-  type Maybe,
-  type ReservationSeriesUpdateMutationInput,
-  ReserveeType,
-  type UpdateStaffReservationMutationVariables,
-  type UseStaffReservationFragment,
-  useUpdateReservationSeriesMutation,
-  useUpdateStaffReservationMutation,
+import { ReserveeType, useUpdateReservationSeriesMutation, useUpdateStaffReservationMutation } from "@gql/gql-types";
+import type {
+  Maybe,
+  ReservationSeriesUpdateMutationInput,
+  UpdateStaffReservationMutationVariables,
+  UseStaffReservationFragment,
 } from "@gql/gql-types";
 
 type InputT = UpdateStaffReservationMutationVariables["input"];

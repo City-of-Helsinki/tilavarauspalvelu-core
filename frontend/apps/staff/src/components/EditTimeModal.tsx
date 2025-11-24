@@ -5,7 +5,8 @@ import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { differenceInMinutes } from "date-fns";
 import { Button, ButtonSize, ButtonVariant, Dialog, Notification, NotificationSize } from "hds-react";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import styled from "styled-components";
 import { z } from "zod";
 import { ControlledDateInput } from "ui/src/components/form";
@@ -28,13 +29,12 @@ import { useModal } from "@/context/ModalContext";
 import { useCheckCollisions } from "@/hooks";
 import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
 import {
-  type ChangeReservationTimeFragment,
-  type ReservationSeriesAddMutationInput,
   ReservationTypeChoice,
   useAddReservationToSeriesMutation,
   useStaffAdjustReservationTimeMutation,
   Weekday,
 } from "@gql/gql-types";
+import type { ChangeReservationTimeFragment, ReservationSeriesAddMutationInput } from "@gql/gql-types";
 
 const StyledForm = styled.form`
   margin-top: var(--spacing-m);

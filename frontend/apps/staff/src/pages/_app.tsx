@@ -1,26 +1,31 @@
-import React, { useEffect, type FC } from "react";
+import React, { useEffect } from "react";
+import type { FC } from "react";
 import { ApolloProvider } from "@apollo/client";
 import { appWithTranslation } from "next-i18next";
-import App, { type AppContext, type AppInitialProps, type AppProps } from "next/app";
+import App from "next/app";
+import type { AppContext, AppInitialProps, AppProps } from "next/app";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import "ui/src/styles/global.scss";
 import { PageWrapper } from "@/components/PageWrapper";
 import { EnvContextProvider } from "@/context/EnvContext";
 import { ModalContextProvider } from "@/context/ModalContext";
 import { createClient } from "@/modules/apolloClient";
-import { type StaffEnvConfig, getCommonServerSideProps } from "@/modules/serverUtils";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import type { StaffEnvConfig } from "@/modules/serverUtils";
 import {
   BannerNotificationTarget,
   CurrentUserDocument,
-  type CurrentUserQuery,
-  type CurrentUserQueryVariables,
   HandlingDataDocument,
-  type HandlingDataQuery,
-  type HandlingDataQueryVariables,
   ReservationStateChoice,
   ShowNotificationsListDocument,
-  type ShowNotificationsListQuery,
-  type ShowNotificationsListQueryVariables,
+} from "@gql/gql-types";
+import type {
+  CurrentUserQuery,
+  CurrentUserQueryVariables,
+  HandlingDataQuery,
+  HandlingDataQueryVariables,
+  ShowNotificationsListQuery,
+  ShowNotificationsListQueryVariables,
 } from "@gql/gql-types";
 import { updateSentryConfig } from "../../instrumentation-client";
 import "../styles/global.scss";

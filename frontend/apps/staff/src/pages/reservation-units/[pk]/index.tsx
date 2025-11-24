@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
-import { useForm, type UseFormReturn } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { ApolloError, gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   convertReservationUnit,
-  type ImageFormType,
-  type ReservationUnitEditFormValues,
   ReservationUnitEditSchema,
   transformReservationUnit,
   SeasonalSection,
@@ -21,6 +20,7 @@ import {
   PricingSection,
   ErrorInfo,
 } from "@lib/reservation-units/[pk]/";
+import type { ImageFormType, ReservationUnitEditFormValues } from "@lib/reservation-units/[pk]/";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -42,8 +42,6 @@ import {
   EquipmentOrderingChoices,
   ReservationUnitImageType,
   ReservationKind,
-  type ReservationUnitEditorParametersQuery,
-  type ReservationUnitEditQuery,
   TermsOfUseTypeChoices,
   useCreateImageMutation,
   useCreateReservationUnitMutation,
@@ -55,6 +53,7 @@ import {
   useUpdateReservationUnitMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
+import type { ReservationUnitEditorParametersQuery, ReservationUnitEditQuery } from "@gql/gql-types";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;

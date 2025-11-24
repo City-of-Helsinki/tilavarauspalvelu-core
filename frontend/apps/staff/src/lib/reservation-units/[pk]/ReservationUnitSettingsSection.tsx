@@ -1,5 +1,6 @@
 import React from "react";
-import { type FieldValues, useController, type UseControllerProps, UseFormReturn } from "react-hook-form";
+import { useController, UseFormReturn } from "react-hook-form";
+import type { FieldValues, UseControllerProps } from "react-hook-form";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";

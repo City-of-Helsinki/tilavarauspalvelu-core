@@ -5,7 +5,8 @@ import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
-import { ReservationUnitModalContent, type ReservationUnitModalProps } from "./ReservationUnitModalContent";
+import { ReservationUnitModalContent } from "./ReservationUnitModalContent";
+import type { ReservationUnitModalProps } from "./ReservationUnitModalContent";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
   const params = vi.fn();

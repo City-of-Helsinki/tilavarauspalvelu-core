@@ -1,4 +1,5 @@
-import React, { type HTMLAttributes, useState } from "react";
+import React, { useState } from "react";
+import type { HTMLAttributes } from "react";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import styled from "styled-components";
 import { AutoGrid, Flex } from "../styled";

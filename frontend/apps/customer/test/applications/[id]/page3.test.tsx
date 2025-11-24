@@ -1,4 +1,5 @@
-import { createMockApplicationFragment, type CreateMockApplicationFragmentProps } from "@test/application.mocks";
+import { createMockApplicationFragment } from "@test/application.mocks";
+import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { render, within } from "@testing-library/react";

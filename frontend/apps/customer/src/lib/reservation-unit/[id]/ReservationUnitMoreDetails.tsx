@@ -20,12 +20,12 @@ import { AddressSection } from "@/components/AddressSection";
 import { Map as MapComponent } from "@/components/Map";
 import { getFuturePricing, getPriceString } from "@/modules/reservationUnit";
 import { JustForMobile } from "@/modules/style/layout";
-import {
-  type ApplicationRoundTimeSlotFieldsFragment,
-  type NoticeWhenReservingFragment,
-  type ReservationUnitMoreDetailsFragment,
-  TimeSlotType,
-  type PricingFieldsFragment,
+import { TimeSlotType } from "@gql/gql-types";
+import type {
+  ApplicationRoundTimeSlotFieldsFragment,
+  NoticeWhenReservingFragment,
+  ReservationUnitMoreDetailsFragment,
+  PricingFieldsFragment,
 } from "@gql/gql-types";
 import { ReservationInfoSection } from "./ReservationInfoSection";
 

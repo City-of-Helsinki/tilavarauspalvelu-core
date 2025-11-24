@@ -5,7 +5,8 @@ import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId, filterNonNullable } from "ui/src/modules/helpers";
 import type { OptionT } from "ui/src/modules/search";
-import { AuthenticationType, type ReservationUnitsByUnitQuery, useReservationUnitsByUnitQuery } from "@gql/gql-types";
+import { AuthenticationType, useReservationUnitsByUnitQuery } from "@gql/gql-types";
+import type { ReservationUnitsByUnitQuery } from "@gql/gql-types";
 
 export interface ReservationUnitOption extends OptionT {
   isDraft: boolean;

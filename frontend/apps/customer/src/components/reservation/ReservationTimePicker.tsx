@@ -5,13 +5,8 @@ import { gql } from "@apollo/client";
 import { addMinutes, differenceInMinutes } from "date-fns";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import {
-  Calendar,
-  type CalendarEvent,
-  type CalendarEventBuffer,
-  type SlotClickProps,
-  SlotProps,
-} from "ui/src/components/calendar/Calendar";
+import { Calendar, SlotProps } from "ui/src/components/calendar/Calendar";
+import type { CalendarEvent, CalendarEventBuffer, SlotClickProps } from "ui/src/components/calendar/Calendar";
 import { Toolbar } from "ui/src/components/calendar/Toolbar";
 import { breakpoints, RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { formatApiDate, formatDate, formatDuration, formatTime, parseUIDate } from "ui/src/modules/date-utils";
@@ -20,12 +15,8 @@ import { getEventBuffers } from "@ui/components/calendar/utils";
 import { Legend } from "@/components/calendar/Legend";
 import { useCurrentUser } from "@/hooks";
 import { eventStyleGetter } from "@/modules/eventStyleGetter";
-import {
-  type ReservableMap,
-  getBoundCheckedReservation,
-  getSlotPropGetter,
-  isRangeReservable,
-} from "@/modules/reservable";
+import { getBoundCheckedReservation, getSlotPropGetter, isRangeReservable } from "@/modules/reservable";
+import type { ReservableMap } from "@/modules/reservable";
 import {
   SLOTS_EVERY_HOUR,
   convertFormToFocustimeSlot,
@@ -33,13 +24,8 @@ import {
   getNewReservation,
 } from "@/modules/reservation";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import {
-  type BlockingReservationFieldsFragment,
-  ReservationNode,
-  type ReservationTimePickerFieldsFragment,
-  ReservationTypeChoice,
-  useListReservationsQuery,
-} from "@gql/gql-types";
+import { ReservationNode, ReservationTypeChoice, useListReservationsQuery } from "@gql/gql-types";
+import type { BlockingReservationFieldsFragment, ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
 
 type WeekOptions = "day" | "week" | "month";

@@ -9,16 +9,19 @@ import { Flex, fontMedium, H5, SemiBold, Strong } from "ui/src/styled";
 import { Accordion } from "@/components/Accordion";
 import { NotificationInline } from "@/components/NotificationInline";
 import { getApplicantName } from "@/modules/helpers";
-import { type ApplicationSectionAllocationsQuery, Priority } from "@gql/gql-types";
+import { Priority } from "@gql/gql-types";
+import type { ApplicationSectionAllocationsQuery } from "@gql/gql-types";
 import { useAcceptSlotMutation, useRefreshApplications, useRemoveAllocation } from "./hooks";
 import {
-  type AllocatedTimeSlotNodeT,
   createDurationString,
   decodeTimeSlot,
   formatSuitableTimeRange,
   formatTimeRangeList,
-  type SectionNodeT,
-  type SuitableTimeRangeNodeT,
+} from "./modules/applicationRoundAllocation";
+import type {
+  AllocatedTimeSlotNodeT,
+  SectionNodeT,
+  SuitableTimeRangeNodeT,
 } from "./modules/applicationRoundAllocation";
 
 type Props = {

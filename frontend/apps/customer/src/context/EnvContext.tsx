@@ -1,5 +1,6 @@
 import React, { createContext, useContext } from "react";
-import { type CustomerEnvConfig, getDefaultServerSideProps } from "@/modules/serverUtils";
+import { getDefaultServerSideProps } from "@/modules/serverUtils";
+import type { CustomerEnvConfig } from "@/modules/serverUtils";
 
 type EnvContextProps = {
   env: CustomerEnvConfig;

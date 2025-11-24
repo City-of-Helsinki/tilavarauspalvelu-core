@@ -15,14 +15,8 @@ import {
   ScheduleDay,
   RegularText,
 } from "@/styled/application";
-import {
-  type AgeGroupNode,
-  type Maybe,
-  Priority,
-  ApplicationSectionStatusChoice,
-  type ApplicationViewFragment,
-  type SuitableTimeFragment,
-} from "@gql/gql-types";
+import { Priority, ApplicationSectionStatusChoice } from "@gql/gql-types";
+import type { AgeGroupNode, Maybe, ApplicationViewFragment, SuitableTimeFragment } from "@gql/gql-types";
 import type { SuitableTimeRangeFormValues } from "../funnel/form";
 
 function ageGroupToString(ag: Maybe<AgeGroupNode> | undefined): string {

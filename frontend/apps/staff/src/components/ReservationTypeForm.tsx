@@ -6,12 +6,14 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ShowAllContainer } from "@ui/components";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/reservation-form";
-import { type CreateStaffReservationFormValues, ReservationTypes } from "@ui/schemas";
+import { ReservationTypes } from "@ui/schemas";
+import type { CreateStaffReservationFormValues } from "@ui/schemas";
 import { HR } from "@ui/styled";
 import type { OptionsRecord } from "@ui/types";
 import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { Element } from "@/styled";
-import { AuthenticationType, ReservationTypeChoice, type ReservationTypeFormFieldsFragment } from "@gql/gql-types";
+import { AuthenticationType, ReservationTypeChoice } from "@gql/gql-types";
+import type { ReservationTypeFormFieldsFragment } from "@gql/gql-types";
 import { BufferToggles } from "./BufferToggles";
 import { ShowTOS } from "./ShowTOS";
 

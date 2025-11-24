@@ -10,12 +10,14 @@ import { ApplicationRoundCard } from "@/lib/recurring";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
-  type ApplicationRoundFieldsFragment,
   ApplicationRoundOrderingChoices,
   ApplicationRoundStatusChoice,
   ApplicationRoundsUiDocument,
-  type ApplicationRoundsUiQuery,
-  type ApplicationRoundsUiQueryVariables,
+} from "@gql/gql-types";
+import type {
+  ApplicationRoundFieldsFragment,
+  ApplicationRoundsUiQuery,
+  ApplicationRoundsUiQueryVariables,
 } from "@gql/gql-types";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];

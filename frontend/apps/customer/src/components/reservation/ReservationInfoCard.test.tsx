@@ -1,18 +1,13 @@
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { future1hReservation } from "@test/reservation.mocks";
-import { type CreateGraphQLMockProps, generateNameFragment } from "@test/test.gql.utils";
+import { generateNameFragment } from "@test/test.gql.utils";
+import type { CreateGraphQLMockProps } from "@test/test.gql.utils";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createNodeId } from "ui/src/modules/helpers";
-import {
-  AccessType,
-  ReservationUnitImageType,
-  PaymentType,
-  PriceUnit,
-  type ReservationInfoCardFragment,
-  ReservationStateChoice,
-} from "@gql/gql-types";
+import { AccessType, ReservationUnitImageType, PaymentType, PriceUnit, ReservationStateChoice } from "@gql/gql-types";
+import type { ReservationInfoCardFragment } from "@gql/gql-types";
 import { ReservationInfoCard } from "./";
 
 interface CustomRenderProps extends CreateGraphQLMockProps {

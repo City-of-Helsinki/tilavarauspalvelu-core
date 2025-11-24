@@ -6,13 +6,10 @@ import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { isValidDate, formatApiDate, timeToMinutes } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
 import type { NewReservationListItem } from "@/components/ReservationsList";
-import {
-  type CollisionInterval,
-  combineAffectingReservations,
-  doesIntervalCollide,
-  reservationToInterval,
-} from "@/modules/helpers";
-import { ReservationTypeChoice, type Maybe, useReservationsByReservationUnitQuery } from "@gql/gql-types";
+import { combineAffectingReservations, doesIntervalCollide, reservationToInterval } from "@/modules/helpers";
+import type { CollisionInterval } from "@/modules/helpers";
+import { ReservationTypeChoice, useReservationsByReservationUnitQuery } from "@gql/gql-types";
+import type { Maybe } from "@gql/gql-types";
 
 function useReservationsInInterval({
   begin,

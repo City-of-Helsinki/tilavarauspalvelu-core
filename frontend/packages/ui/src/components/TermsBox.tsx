@@ -1,4 +1,5 @@
-import React, { type HTMLAttributes } from "react";
+import React from "react";
+import type { HTMLAttributes } from "react";
 import { Checkbox, IconLinkExternal } from "hds-react";
 import Link from "next/link";
 import styled from "styled-components";

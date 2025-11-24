@@ -11,22 +11,18 @@ import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/
 import { Flex } from "ui/src/styled";
 import { ApplicationFunnelWrapper, Page1 as Page1Impl } from "@/components/application/funnel";
 import {
-  type ApplicationPage1FormValues,
   ApplicationPage1SchemaRefined,
   transformApplicationPage1,
   convertApplicationPage1,
 } from "@/components/application/funnel/form";
+import type { ApplicationPage1FormValues } from "@/components/application/funnel/form";
 import { useReservationUnitList } from "@/hooks";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getSearchOptions } from "@/modules/search";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
-import {
-  ApplicationPage1Document,
-  useUpdateApplicationMutation,
-  type ApplicationPage1Query,
-  type ApplicationPage1QueryVariables,
-} from "@gql/gql-types";
+import { ApplicationPage1Document, useUpdateApplicationMutation } from "@gql/gql-types";
+import type { ApplicationPage1Query, ApplicationPage1QueryVariables } from "@gql/gql-types";
 
 function Page1({ application, options: optionsOrig }: Pick<PropsNarrowed, "application" | "options">): JSX.Element {
   const router = useRouter();

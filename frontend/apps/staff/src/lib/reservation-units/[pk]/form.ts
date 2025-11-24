@@ -22,11 +22,13 @@ import {
   ReservationFormType,
   ReservationKind,
   ReservationStartInterval,
-  type ReservationUnitEditQuery,
-  type ReservationUnitPricingSerializerInput,
-  type UpdateApplicationRoundTimeSlotSerializerInput,
-  type ReservationUnitAccessTypeSerializerInput,
   Weekday,
+} from "@gql/gql-types";
+import type {
+  ReservationUnitEditQuery,
+  ReservationUnitPricingSerializerInput,
+  UpdateApplicationRoundTimeSlotSerializerInput,
+  ReservationUnitAccessTypeSerializerInput,
 } from "@gql/gql-types";
 import type { TaxOption } from "./PricingSection";
 

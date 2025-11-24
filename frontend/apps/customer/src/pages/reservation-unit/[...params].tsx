@@ -28,13 +28,8 @@ import {
 } from "@/modules/urls";
 import { ReservationPageWrapper, ReservationTitleSection, PinkBox as PinkBoxBase } from "@/styled/reservation";
 import { StyledStepper } from "@/styled/utils";
-import {
-  ReservationDocument,
-  type ReservationQuery,
-  type ReservationQueryVariables,
-  ReservationStateChoice,
-  useDeleteReservationMutation,
-} from "@gql/gql-types";
+import { ReservationDocument, ReservationStateChoice, useDeleteReservationMutation } from "@gql/gql-types";
+import type { ReservationQuery, ReservationQueryVariables } from "@gql/gql-types";
 
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
   grid-column: 1 / -1;

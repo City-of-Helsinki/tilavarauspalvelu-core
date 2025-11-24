@@ -1,11 +1,7 @@
 import { createNodeId } from "ui/src/modules/helpers";
 import { useReservationSeries } from "@/hooks";
-import {
-  type Maybe,
-  type ReservationEditPageQuery,
-  ReservationStateChoice,
-  useReservationEditPageQuery,
-} from "@gql/gql-types";
+import { ReservationStateChoice, useReservationEditPageQuery } from "@gql/gql-types";
+import type { Maybe, ReservationEditPageQuery } from "@gql/gql-types";
 
 type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
 

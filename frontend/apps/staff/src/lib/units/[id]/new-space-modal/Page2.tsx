@@ -4,7 +4,8 @@ import { Button, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hd
 import { useTranslation } from "next-i18next";
 import { FormErrorSummary } from "@/components/FormErrorSummary";
 import { DialogActionsButtons } from "@/styled";
-import { SpaceForm, type SpaceUpdateForm } from "../SpaceForm";
+import { SpaceForm } from "../SpaceForm";
+import type { SpaceUpdateForm } from "../SpaceForm";
 import { StyledTag } from "./modules/newSpaceModal";
 
 type Props = {

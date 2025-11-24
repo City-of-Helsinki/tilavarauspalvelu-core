@@ -7,12 +7,8 @@ import { getLocalizationLang, getTranslation, ignoreMaybeArray } from "ui/src/mo
 import { H1 } from "ui/src/styled";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import {
-  TermsOfUseDocument,
-  type TermsOfUseQuery,
-  type TermsOfUseQueryVariables,
-  TermsOfUseTypeChoices,
-} from "@gql/gql-types";
+import { TermsOfUseDocument, TermsOfUseTypeChoices } from "@gql/gql-types";
+import type { TermsOfUseQuery, TermsOfUseQueryVariables } from "@gql/gql-types";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

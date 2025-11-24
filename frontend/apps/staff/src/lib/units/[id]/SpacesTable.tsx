@@ -16,7 +16,8 @@ import { MAX_NAME_LENGTH } from "@/modules/const";
 import { getSpaceUrl } from "@/modules/urls";
 import { TableLink } from "@/styled";
 import { FixedDialog } from "@/styled/FixedDialog";
-import { type Maybe, type SpacesTableFragment, useDeleteSpaceMutation } from "@gql/gql-types";
+import { useDeleteSpaceMutation } from "@gql/gql-types";
+import type { Maybe, SpacesTableFragment } from "@gql/gql-types";
 import { NewSpaceModal } from "./new-space-modal/NewSpaceModal";
 
 type SpaceT = SpacesTableFragment["spaces"][0];

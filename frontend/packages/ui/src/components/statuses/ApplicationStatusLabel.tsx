@@ -9,9 +9,11 @@ import {
   IconQuestionCircle,
 } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { ApplicationStatusChoice, type Maybe } from "../../../gql/gql-types";
+import { ApplicationStatusChoice } from "../../../gql/gql-types";
+import type { Maybe } from "../../../gql/gql-types";
 import type { UserTypeChoice } from "../../modules/urlBuilder";
-import { StatusLabel, type StatusLabelType } from "../StatusLabel";
+import { StatusLabel } from "../StatusLabel";
+import type { StatusLabelType } from "../StatusLabel";
 
 function getAdminApplicationStatusLabelProps(status: ApplicationStatusChoice): {
   type: StatusLabelType;

@@ -1,14 +1,16 @@
-import { type TFunction, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import {
   getReservationFormReserveeFields,
   formContainsField,
-  type FormField,
   getExtendedGeneralFormFields,
 } from "@ui/reservation-form/utils";
+import type { FormField } from "@ui/reservation-form/utils";
 import { AutoGrid, H4 } from "@ui/styled";
 import type { OptionsRecord } from "@ui/types";
 import { LabelValuePair } from "@/components/LabelValuePair";
-import { MunicipalityChoice, type ReservationFormFieldsFragment } from "@gql/gql-types";
+import { MunicipalityChoice } from "@gql/gql-types";
+import type { ReservationFormFieldsFragment } from "@gql/gql-types";
 
 type SummaryReserveeFieldsProps = {
   reservation: ReservationFormFieldsFragment;

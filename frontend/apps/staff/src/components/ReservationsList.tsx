@@ -11,7 +11,8 @@ import { NewReservationModal } from "@/components/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
 import { useSession } from "@/hooks";
 import { hasPermission } from "@/modules/permissionHelper";
-import { RejectionReadinessChoice, type ReservationToCopyFragment, UserPermissionChoice } from "@gql/gql-types";
+import { RejectionReadinessChoice, UserPermissionChoice } from "@gql/gql-types";
+import type { ReservationToCopyFragment } from "@gql/gql-types";
 
 export type NewReservationListItem = {
   date: Date;

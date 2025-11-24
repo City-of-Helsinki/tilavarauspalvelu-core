@@ -10,7 +10,8 @@ import { MAX_NAME_LENGTH } from "@/modules/const";
 import { getReserveeName, truncate } from "@/modules/helpers";
 import { getReservationUrl } from "@/modules/urls";
 import { TableLink } from "@/styled";
-import { ReservationStateChoice, type ReservationTableElementFragment } from "@gql/gql-types";
+import { ReservationStateChoice } from "@gql/gql-types";
+import type { ReservationTableElementFragment } from "@gql/gql-types";
 
 type ReservationTableColumn = {
   headerName: string;

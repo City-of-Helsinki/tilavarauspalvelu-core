@@ -10,12 +10,8 @@ import { AllReservations } from "@/components/application/ApprovedReservations";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { applicationsPrefix, getApplicationPath } from "@/modules/urls";
-import {
-  ApplicationSectionViewDocument,
-  type ApplicationSectionViewQuery,
-  type ApplicationSectionViewQueryVariables,
-  ApplicationStatusChoice,
-} from "@gql/gql-types";
+import { ApplicationSectionViewDocument, ApplicationStatusChoice } from "@gql/gql-types";
+import type { ApplicationSectionViewQuery, ApplicationSectionViewQueryVariables } from "@gql/gql-types";
 
 function ViewAll({ applicationSection }: PropsNarrowed): JSX.Element {
   const { t, i18n } = useTranslation();

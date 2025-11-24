@@ -1,9 +1,5 @@
-import {
-  type AvailableTimesProps,
-  getNextAvailableTime,
-  getPossibleTimesForDay,
-  type GetPossibleTimesForDayProps,
-} from "@/modules/reservationUnit";
+import { getNextAvailableTime, getPossibleTimesForDay } from "@/modules/reservationUnit";
+import type { AvailableTimesProps, GetPossibleTimesForDayProps } from "@/modules/reservationUnit";
 
 export function useAvailableTimes({
   date: focusDate,

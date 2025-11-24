@@ -1,9 +1,11 @@
 import React from "react";
-import { type SubmitHandler, useForm, Controller } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import type { SubmitHandler } from "react-hook-form";
 import { addYears, startOfDay } from "date-fns";
 import { Checkbox, TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { ShowAllContainer } from "ui/src/components";
 import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";

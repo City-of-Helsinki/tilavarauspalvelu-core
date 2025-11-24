@@ -1,4 +1,5 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { isPageRequest, redirectCsrfToken } from "ui/src/middlewareHelpers";
 import { env } from "@/env.mjs";
 

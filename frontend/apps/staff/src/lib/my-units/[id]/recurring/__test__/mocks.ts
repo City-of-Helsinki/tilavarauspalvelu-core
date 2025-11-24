@@ -9,22 +9,24 @@ import {
   ReservationTypeChoice,
   CreateStaffReservationDocument,
   ReservationUnitDocument,
-  type ReservationUnitQuery,
   CreateReservationSeriesDocument,
-  type CreateStaffReservationFragment,
   CurrentUserDocument,
-  type CurrentUserQuery,
   FilterOptionsDocument,
-  type FilterOptionsQuery,
   TermsOfUseDocument,
-  type TermsOfUseQuery,
   CalendarReservationFragment,
   AccessType,
   ReservationStateChoice,
-  type ReservationsByReservationUnitQueryVariables,
   ReservationsByReservationUnitDocument,
-  type ReservationsByReservationUnitQuery,
   ReservationFormType,
+} from "@gql/gql-types";
+import type {
+  ReservationUnitQuery,
+  CreateStaffReservationFragment,
+  CurrentUserQuery,
+  FilterOptionsQuery,
+  TermsOfUseQuery,
+  ReservationsByReservationUnitQueryVariables,
+  ReservationsByReservationUnitQuery,
 } from "@gql/gql-types";
 
 export function createReservationUnits(): CreateStaffReservationFragment[] {

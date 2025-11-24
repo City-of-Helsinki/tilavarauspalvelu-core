@@ -1,5 +1,6 @@
 import React, { createContext, useContext } from "react";
-import { type StaffEnvConfig, getDefaultServerSideProps } from "@/modules/serverUtils";
+import { getDefaultServerSideProps } from "@/modules/serverUtils";
+import type { StaffEnvConfig } from "@/modules/serverUtils";
 
 type EnvContextProps = {
   env: StaffEnvConfig;

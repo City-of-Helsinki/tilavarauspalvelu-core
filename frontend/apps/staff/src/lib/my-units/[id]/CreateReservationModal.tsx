@@ -1,4 +1,5 @@
-import React, { type RefObject, useEffect } from "react";
+import React, { useEffect } from "react";
+import type { RefObject } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
 import { gql } from "@apollo/client";
@@ -13,7 +14,8 @@ import { useDisplayError } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { fromUIDateTimeUnsafe, formatDate, formatTime, fromUIDateTime } from "ui/src/modules/date-utils";
 import { createNodeId, toNumber } from "ui/src/modules/helpers";
-import { type CreateStaffReservationFormValues, getCreateStaffReservationFormSchema } from "ui/src/schemas";
+import { getCreateStaffReservationFormSchema } from "ui/src/schemas";
+import type { CreateStaffReservationFormValues } from "ui/src/schemas";
 import { CenterSpinner, Flex } from "ui/src/styled";
 import { ControlledTimeInput } from "@/components/ControlledTimeInput";
 import { SelectFilter } from "@/components/QueryParamFilters";
@@ -22,12 +24,8 @@ import { useModal } from "@/context/ModalContext";
 import { useCheckCollisions } from "@/hooks";
 import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
 import { FixedDialog } from "@/styled/FixedDialog";
-import {
-  type CreateStaffReservationFragment,
-  type ReservationStaffCreateMutationInput,
-  useCreateStaffReservationMutation,
-  useReservationUnitQuery,
-} from "@gql/gql-types";
+import { useCreateStaffReservationMutation, useReservationUnitQuery } from "@gql/gql-types";
+import type { CreateStaffReservationFragment, ReservationStaffCreateMutationInput } from "@gql/gql-types";
 
 // NOTE HDS forces buttons over each other on mobile, we want them side-by-side
 const ActionButtons = styled(Dialog.ActionButtons)`

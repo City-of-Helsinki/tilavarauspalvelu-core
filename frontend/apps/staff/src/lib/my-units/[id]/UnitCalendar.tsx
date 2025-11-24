@@ -1,8 +1,10 @@
-import React, { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import Popup from "reactjs-popup";
 import { addMinutes, differenceInMinutes, isToday, setHours, setMinutes, startOfDay } from "date-fns";
 import { IconClock } from "hds-react";
-import { type TFunction, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import styled, { css } from "styled-components";
 import { CalendarEvent } from "ui/src/components/calendar/Calendar";
@@ -13,7 +15,8 @@ import { isCellOverlappingSpan, TimeSpanType } from "@ui/components/calendar/uti
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { EVENT_BUFFER, NOT_RESERVABLE } from "@/modules/calendarStyling";
 import { getReserveeName } from "@/modules/helpers";
-import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
+import { ReservationTypeChoice } from "@gql/gql-types";
+import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { ReservationPopupContent } from "./ReservationPopupContent";
 import { eventStyleGetter } from "./eventStyleGetter";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./utils";

@@ -3,7 +3,8 @@ import { describe, test, expect } from "vitest";
 import { ReservationStartInterval, ReservationTypeChoice } from "../../gql/gql-types";
 import { formatApiTimeUnsafe, formatDate } from "../modules/date-utils";
 import type { TimeStruct } from "../modules/date-utils/types";
-import { type CreateStaffReservationFormSchema, getCreateStaffReservationFormSchema } from "./reservation";
+import { getCreateStaffReservationFormSchema } from "./reservation";
+import type { CreateStaffReservationFormSchema } from "./reservation";
 
 function createInput({
   date,
@@ -123,7 +124,12 @@ describe("CreateStaffReservation schema", () => {
   });
 });
 
-function generateFuzzyIntegers(count: number, start: number, end: number, exclusionList: ReadonlyArray<number>): number[] {
+function generateFuzzyIntegers(
+  count: number,
+  start: number,
+  end: number,
+  exclusionList: ReadonlyArray<number>
+): number[] {
   const set = new Set(exclusionList);
   return [...Array(count)].map((_) => getRandomInt(start, end)).filter((x) => !set.has(x));
 }

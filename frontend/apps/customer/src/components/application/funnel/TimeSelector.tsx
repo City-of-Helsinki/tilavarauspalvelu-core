@@ -3,12 +3,8 @@ import { useFormContext } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, Notification, NotificationSize } from "hds-react";
 import { useTranslation } from "next-i18next";
-import {
-  ApplicationTimeSelector,
-  type Cell,
-  type CellState,
-  isCellEqual,
-} from "ui/src/components/ApplicationTimeSelector";
+import { ApplicationTimeSelector, isCellEqual } from "ui/src/components/ApplicationTimeSelector";
+import type { Cell, CellState } from "ui/src/components/ApplicationTimeSelector";
 import { ErrorText } from "ui/src/components/ErrorText";
 import { ControlledSelect } from "ui/src/components/form";
 import { successToast } from "ui/src/components/toast";

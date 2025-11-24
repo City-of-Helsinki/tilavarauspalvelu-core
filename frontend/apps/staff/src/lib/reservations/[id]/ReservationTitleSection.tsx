@@ -10,11 +10,8 @@ import { useSession } from "@/hooks";
 import { hasPermission } from "@/modules/permissionHelper";
 import { getName } from "@/modules/reservation";
 import { getApplicationUrl } from "@/modules/urls";
-import {
-  type ReservationTitleSectionFieldsFragment,
-  useReservationApplicationLinkQuery,
-  UserPermissionChoice,
-} from "@gql/gql-types";
+import { useReservationApplicationLinkQuery, UserPermissionChoice } from "@gql/gql-types";
+import type { ReservationTitleSectionFieldsFragment } from "@gql/gql-types";
 
 type Props = Readonly<{
   reservation: ReservationTitleSectionFieldsFragment;

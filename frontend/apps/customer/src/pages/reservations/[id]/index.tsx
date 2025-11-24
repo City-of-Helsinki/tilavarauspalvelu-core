@@ -43,24 +43,26 @@ import {
   getFeedbackUrl,
   getReservationPath,
   getReservationUnitPath,
-  type ReservationNotifications,
   reservationsPrefix,
 } from "@/modules/urls";
+import type { ReservationNotifications } from "@/modules/urls";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import {
-  type AccessCodeQuery,
   ApplicationReservationSeriesDocument,
-  type ApplicationReservationSeriesQuery,
-  type ApplicationReservationSeriesQueryVariables,
   MunicipalityChoice,
   OrderStatus,
   AccessType,
   ReservationCancelReasonChoice,
   ReservationPageDocument,
-  type ReservationPageQuery,
-  type ReservationPageQueryVariables,
   ReservationStateChoice,
   useAccessCodeQuery,
+} from "@gql/gql-types";
+import type {
+  AccessCodeQuery,
+  ApplicationReservationSeriesQuery,
+  ApplicationReservationSeriesQueryVariables,
+  ReservationPageQuery,
+  ReservationPageQueryVariables,
 } from "@gql/gql-types";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];

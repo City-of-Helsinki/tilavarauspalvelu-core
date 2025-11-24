@@ -1,5 +1,6 @@
 import React from "react";
-import { type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
+import type { FieldValues, Path, UseControllerProps } from "react-hook-form";
 import { startOfDay } from "date-fns/startOfDay";
 import { DateInput } from "hds-react";
 import { useTranslation } from "next-i18next";

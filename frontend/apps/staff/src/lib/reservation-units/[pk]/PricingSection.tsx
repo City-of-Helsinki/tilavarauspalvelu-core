@@ -1,5 +1,6 @@
 import React from "react";
-import { type Control, Controller, UseFormReturn } from "react-hook-form";
+import { Controller, UseFormReturn } from "react-hook-form";
+import type { Control } from "react-hook-form";
 import { addDays, startOfDay } from "date-fns";
 import { IconAlertCircleFill, RadioButton } from "hds-react";
 import { capitalize } from "lodash-es";

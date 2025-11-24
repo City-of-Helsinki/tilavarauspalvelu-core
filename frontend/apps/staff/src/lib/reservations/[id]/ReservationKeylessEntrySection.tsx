@@ -14,13 +14,13 @@ import { hasPermission } from "@/modules/permissionHelper";
 import { Accordion } from "@/styled";
 import {
   AccessType,
-  type ReservationKeylessEntryFragment,
   useChangeReservationAccessCodeSeriesMutation,
   useChangeReservationAccessCodeSingleMutation,
   useRepairReservationAccessCodeSeriesMutation,
   useRepairReservationAccessCodeSingleMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
+import type { ReservationKeylessEntryFragment } from "@gql/gql-types";
 import { DataWrapper } from "./DataWrapper";
 
 const SummaryHorizontal = styled.div<{

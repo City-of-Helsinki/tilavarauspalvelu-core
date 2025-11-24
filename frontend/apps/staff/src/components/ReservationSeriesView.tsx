@@ -10,7 +10,8 @@ import { useModal } from "@/context/ModalContext";
 import { useReservationSeries, useSession } from "@/hooks";
 import { hasPermission } from "@/modules/permissionHelper";
 import { isPossibleToDeny, isPossibleToEdit } from "@/modules/reservationModificationRules";
-import { ReservationStateChoice, type ReservationToCopyFragment, UserPermissionChoice } from "@gql/gql-types";
+import { ReservationStateChoice, UserPermissionChoice } from "@gql/gql-types";
+import type { ReservationToCopyFragment } from "@gql/gql-types";
 
 type Props = {
   reservationSeriesPk: number;

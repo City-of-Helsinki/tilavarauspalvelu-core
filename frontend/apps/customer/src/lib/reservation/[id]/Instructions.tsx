@@ -3,7 +3,8 @@ import { useTranslation } from "next-i18next";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { H4 } from "ui/src/styled";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
-import { type InstructionsFragment, type Maybe, ReservationStateChoice } from "@gql/gql-types";
+import { ReservationStateChoice } from "@gql/gql-types";
+import type { InstructionsFragment, Maybe } from "@gql/gql-types";
 
 type Props = {
   reservation: InstructionsFragment;

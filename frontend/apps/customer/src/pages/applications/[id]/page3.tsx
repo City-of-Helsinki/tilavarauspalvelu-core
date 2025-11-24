@@ -18,22 +18,17 @@ import {
   OrganisationForm,
 } from "@/components/application/funnel/";
 import {
-  type ApplicationPage3FormValues,
   ApplicationPage3Schema,
   convertApplicationPage3,
   transformPage3Application,
 } from "@/components/application/funnel/form";
+import type { ApplicationPage3FormValues } from "@/components/application/funnel/form";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
 import { FormSubHeading } from "@/styled/application";
-import {
-  ApplicationPage3Document,
-  type ApplicationPage3Query,
-  type ApplicationPage3QueryVariables,
-  ReserveeType,
-  useUpdateApplicationMutation,
-} from "@gql/gql-types";
+import { ApplicationPage3Document, ReserveeType, useUpdateApplicationMutation } from "@gql/gql-types";
+import type { ApplicationPage3Query, ApplicationPage3QueryVariables } from "@gql/gql-types";
 
 function Page3Form(): JSX.Element | null {
   const { watch, unregister, register, setValue } = useFormContext<ApplicationPage3FormValues>();

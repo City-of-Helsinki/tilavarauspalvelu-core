@@ -1,5 +1,6 @@
 import React from "react";
-import { type TFunction, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";
 import type { ReadonlyDeep } from "ui/src/modules/helpers";

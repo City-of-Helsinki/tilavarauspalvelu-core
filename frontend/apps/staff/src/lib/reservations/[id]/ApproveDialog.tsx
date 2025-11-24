@@ -10,11 +10,8 @@ import { toNumber } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
 import { useModal } from "@/context/ModalContext";
 import { getReservationPriceDetails } from "@/modules/reservation";
-import {
-  type ApprovalDialogFieldsFragment,
-  useApproveReservationMutation,
-  type ReservationApproveMutationInput,
-} from "@gql/gql-types";
+import { useApproveReservationMutation } from "@gql/gql-types";
+import type { ApprovalDialogFieldsFragment, ReservationApproveMutationInput } from "@gql/gql-types";
 
 const Label = styled.p`
   color: var(--color-black-70);

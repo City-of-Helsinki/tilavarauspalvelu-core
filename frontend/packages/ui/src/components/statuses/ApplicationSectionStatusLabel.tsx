@@ -3,7 +3,8 @@ import { IconArrowBottomRight, IconCheck, IconCogwheel, IconCross, IconQuestionC
 import { useTranslation } from "next-i18next";
 import { ApplicationSectionStatusChoice } from "../../../gql/gql-types";
 import { UserTypeChoice } from "../../modules/urlBuilder";
-import { StatusLabel, type StatusLabelType } from "../StatusLabel";
+import { StatusLabel } from "../StatusLabel";
+import type { StatusLabelType } from "../StatusLabel";
 
 type StatusProps = { type: StatusLabelType; icon: React.ReactElement };
 function getStaffLabelProps(status: ApplicationSectionStatusChoice): StatusProps {

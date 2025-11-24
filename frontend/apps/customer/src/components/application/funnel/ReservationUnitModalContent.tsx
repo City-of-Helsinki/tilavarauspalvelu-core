@@ -25,17 +25,14 @@ import {
 } from "ui/src/modules/helpers";
 import type { OptionsListT } from "ui/src/modules/search";
 import { CenterSpinner, Flex, H3 } from "ui/src/styled";
-import { type SearchFormValues, SeasonalSearchForm } from "@/components/SeasonalSearchForm";
+import { SeasonalSearchForm } from "@/components/SeasonalSearchForm";
+import type { SearchFormValues } from "@/components/SeasonalSearchForm";
 import { useSearchQuery } from "@/hooks";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { processVariables } from "@/modules/search";
 import { getReservationUnitPath } from "@/modules/urls";
-import {
-  type ApplicationReservationUnitListFragment,
-  type Maybe,
-  type RecurringCardFragment,
-  ReservationKind,
-} from "@gql/gql-types";
+import { ReservationKind } from "@gql/gql-types";
+import type { ApplicationReservationUnitListFragment, Maybe, RecurringCardFragment } from "@gql/gql-types";
 
 const ImageSizeWrapper = styled.div`
   @media (min-width: ${breakpoints.m}) {

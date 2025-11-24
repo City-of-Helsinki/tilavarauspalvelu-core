@@ -3,11 +3,8 @@ import { useForm } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDisplayError } from "ui/src/hooks";
-import {
-  type NewResourceUnitFieldsFragment,
-  useCreateSpaceMutation,
-  type SpaceCreateMutationInput,
-} from "@gql/gql-types";
+import { useCreateSpaceMutation } from "@gql/gql-types";
+import type { NewResourceUnitFieldsFragment, SpaceCreateMutationInput } from "@gql/gql-types";
 import { SpaceUpdateSchema, SpaceUpdateForm } from "../SpaceForm";
 import { UnitInfo } from "../UnitInfo";
 import { Page1 } from "./Page1";

@@ -3,7 +3,8 @@ import { render } from "@testing-library/react";
 import { addDays, addMinutes } from "date-fns";
 import { describe, expect, test, vi } from "vitest";
 import { createNodeId } from "ui/src/modules/helpers";
-import { type ApprovalButtonsFragment, ReservationStateChoice } from "@gql/gql-types";
+import { ReservationStateChoice } from "@gql/gql-types";
+import type { ApprovalButtonsFragment } from "@gql/gql-types";
 import { ApprovalButtons } from "./ApprovalButtons";
 
 const wrappedRender = (reservation: ApprovalButtonsFragment) => {

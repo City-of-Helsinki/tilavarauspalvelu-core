@@ -11,7 +11,8 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
-import { ReservationChangeFormSchema, type ReservationChangeFormType } from "ui/src/schemas";
+import { ReservationChangeFormSchema } from "ui/src/schemas";
+import type { ReservationChangeFormType } from "ui/src/schemas";
 import { ButtonContainer, CenterSpinner, Flex, HR } from "ui/src/styled";
 import { Error403 } from "@/components/Error403";
 import { LinkPrev } from "@/components/LinkPrev";
@@ -22,14 +23,12 @@ import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { hasPermission } from "@/modules/permissionHelper";
 import { createTagString } from "@/modules/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import {
-  type Maybe,
-  type ReservationEditPageQuery,
-  ReservationPermissionsDocument,
-  type ReservationPermissionsQuery,
-  type ReservationPermissionsQueryVariables,
-  UserPermissionChoice,
-  ReserveeType,
+import { ReservationPermissionsDocument, UserPermissionChoice, ReserveeType } from "@gql/gql-types";
+import type {
+  Maybe,
+  ReservationEditPageQuery,
+  ReservationPermissionsQuery,
+  ReservationPermissionsQueryVariables,
 } from "@gql/gql-types";
 
 type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;

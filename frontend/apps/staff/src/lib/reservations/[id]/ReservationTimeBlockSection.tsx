@@ -1,4 +1,5 @@
-import React, { forwardRef, type Ref, useEffect, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
+import type { Ref } from "react";
 import { gql } from "@apollo/client";
 import { add, startOfISOWeek } from "date-fns";
 import { useTranslation } from "next-i18next";
@@ -18,12 +19,8 @@ import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import type { CalendarEventType, EventType } from "@/modules/reservation";
 import { isPossibleToEdit } from "@/modules/reservationModificationRules";
 import { Accordion } from "@/styled";
-import {
-  ReservationStateChoice,
-  ReservationTypeChoice,
-  type TimeBlockSectionFragment,
-  UserPermissionChoice,
-} from "@gql/gql-types";
+import { ReservationStateChoice, ReservationTypeChoice, UserPermissionChoice } from "@gql/gql-types";
+import type { TimeBlockSectionFragment } from "@gql/gql-types";
 import { eventStyleGetter, legend } from "./eventStyleGetter";
 
 const Container = styled.div`

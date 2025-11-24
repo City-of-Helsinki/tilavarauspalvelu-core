@@ -4,10 +4,12 @@
 // This app is not edge compatible, but it's impossible to disable the checks.
 // Workaround as long as the function isn't needed is to split imports in such a way
 // that libraries are not imported in the middleware.
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { isPageRequest, redirectCsrfToken } from "ui/src/middlewareHelpers";
 import { createNodeId, getLocalizationLang } from "ui/src/modules/helpers";
-import { buildGraphQLUrl, getSignInUrl, type LocalizationLanguages } from "ui/src/modules/urlBuilder";
+import { buildGraphQLUrl, getSignInUrl } from "ui/src/modules/urlBuilder";
+import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { env } from "@/env.mjs";
 import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import { getReservationInProgressPath } from "./modules/urls";

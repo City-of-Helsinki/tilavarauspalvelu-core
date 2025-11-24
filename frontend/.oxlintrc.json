@@ -173,6 +173,7 @@
     "eslint/use-isnan": "error",
     "eslint/valid-typeof": "error",
     "eslint/yoda": "error",
+    "import/consistent-type-specifier-style": "error",
     "import/default": "error",
     "import/extensions": "error",
     "import/first": "error",

@@ -1,7 +1,8 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import { Select } from "hds-react";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { createNodeId, convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";
 import { UnitSpacesQuery, useUnitSpacesQuery } from "@gql/gql-types";
 

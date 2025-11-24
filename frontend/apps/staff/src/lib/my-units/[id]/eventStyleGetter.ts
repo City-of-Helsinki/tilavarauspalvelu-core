@@ -10,11 +10,8 @@ import {
   UNCONFIRMED,
   WAITING_PAYMENT,
 } from "@/modules/calendarStyling";
-import {
-  ReservationStateChoice,
-  ReservationTypeChoice,
-  type ReservationUnitReservationsFragment,
-} from "@gql/gql-types";
+import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
+import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
 
 const selected_legends = new Set([
   "CONFIRMED",

@@ -13,7 +13,8 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { isSent } from "@/modules/helpers";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { applicationsPath, applicationsPrefix, getApplicationPath } from "@/modules/urls";
-import { ApplicationSentPageDocument, type ApplicationSentPageQuery } from "@gql/gql-types";
+import { ApplicationSentPageDocument } from "@gql/gql-types";
+import type { ApplicationSentPageQuery } from "@gql/gql-types";
 
 const Paragraph = styled.p`
   max-width: var(--prose-width);

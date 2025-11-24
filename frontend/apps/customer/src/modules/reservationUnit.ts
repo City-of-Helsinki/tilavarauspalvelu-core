@@ -25,33 +25,30 @@ import {
   filterNonNullable,
   formatTimeStruct,
   isPriceFree,
-  type ReadonlyDeep,
 } from "@ui/modules/helpers";
+import type { ReadonlyDeep } from "@ui/modules/helpers";
 import type { LocalizationLanguages } from "@ui/modules/urlBuilder";
+import { dateToKey, isRangeReservable, isSlotWithinReservationTime } from "@/modules/reservable";
+import type { ReservableMap, RoundPeriod } from "@/modules/reservable";
 import {
-  dateToKey,
-  isRangeReservable,
-  isSlotWithinReservationTime,
-  type ReservableMap,
-  type RoundPeriod,
-} from "@/modules/reservable";
-import {
-  type AvailableTimesReservationUnitFieldsFragment,
-  type BlockingReservationFieldsFragment,
-  type EquipmentFieldsFragment,
-  type IsReservableFieldsFragment,
-  type NotReservableFieldsFragment,
-  type PriceReservationUnitFieldsFragment,
   PriceUnit,
-  type PricingFieldsFragment,
   ReservationKind,
-  type ReservationPriceFieldsFragment,
   ReservationStartInterval,
   ReservationStateChoice,
-  type ReservationUnitAccessTypeNode,
-  type ReservationUnitNode,
   ReservationUnitPublishingState,
   ReservationUnitReservationState,
+} from "@gql/gql-types";
+import type {
+  AvailableTimesReservationUnitFieldsFragment,
+  BlockingReservationFieldsFragment,
+  EquipmentFieldsFragment,
+  IsReservableFieldsFragment,
+  NotReservableFieldsFragment,
+  PriceReservationUnitFieldsFragment,
+  PricingFieldsFragment,
+  ReservationPriceFieldsFragment,
+  ReservationUnitAccessTypeNode,
+  ReservationUnitNode,
 } from "@gql/gql-types";
 
 export function isReservationUnitPublished(reservationUnit: Pick<ReservationUnitNode, "publishingState">): boolean {

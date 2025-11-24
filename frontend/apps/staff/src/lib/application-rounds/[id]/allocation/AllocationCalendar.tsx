@@ -2,26 +2,26 @@ import React, { useState } from "react";
 import { IconCheck, IconCross } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled, { css } from "styled-components";
-import { breakpoints, type DayT, WEEKDAYS } from "ui/src/modules/const";
+import { breakpoints, WEEKDAYS } from "ui/src/modules/const";
+import type { DayT } from "ui/src/modules/const";
 import { transformWeekday } from "ui/src/modules/conversion";
 import { timeToMinutes } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { fontMedium } from "ui/src/styled";
 import { useGetFilterSearchParams } from "@/hooks";
 import { ALLOCATION_CALENDAR_TIMES } from "@/modules/const";
-import { ApplicationSectionStatusChoice, type SuitableTimeRangeNode } from "@gql/gql-types";
+import { ApplicationSectionStatusChoice } from "@gql/gql-types";
+import type { SuitableTimeRangeNode } from "@gql/gql-types";
 import { useFocusAllocatedSlot, useFocusApplicationEvent, useSlotSelection } from "./hooks";
 import {
   applicationEventSchedulesToCells,
   getTimeSeries,
   timeSlotKeyToTime,
-  type Cell,
   encodeTimeSlot,
-  type RelatedSlot,
   isInsideCell,
-  type SectionNodeT,
   ReservationUnitOptionNodeT,
 } from "./modules/applicationRoundAllocation";
+import type { Cell, RelatedSlot, SectionNodeT } from "./modules/applicationRoundAllocation";
 
 type Props = {
   applicationSections: SectionNodeT[];

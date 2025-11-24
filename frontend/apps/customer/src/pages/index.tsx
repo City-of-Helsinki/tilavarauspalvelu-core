@@ -7,13 +7,8 @@ import { filterNonNullable } from "@ui/modules/helpers";
 import { Head, IntendedUses, SearchGuides, Units } from "@/lib/index";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import {
-  IntendedUseOrderingChoices,
-  UnitOrderingChoices,
-  type FrontPageQuery,
-  type FrontPageQueryVariables,
-  FrontPageDocument,
-} from "@gql/gql-types";
+import { IntendedUseOrderingChoices, UnitOrderingChoices, FrontPageDocument } from "@gql/gql-types";
+import type { FrontPageQuery, FrontPageQueryVariables } from "@gql/gql-types";
 
 function Home({ intendedUses, units }: Props): JSX.Element {
   const { t } = useTranslation(["home", "common"]);

@@ -24,14 +24,12 @@ import { formatAddress } from "@/modules/helpers";
 import { hasPermission } from "@/modules/permissionHelper";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getReservationSeriesUrl } from "@/modules/urls";
-import {
-  FilterOptionsDocument,
-  type FilterOptionsQuery,
-  type FilterOptionsQueryVariables,
-  UnitViewDocument,
-  type UnitViewQuery,
-  type UnitViewQueryVariables,
-  UserPermissionChoice,
+import { FilterOptionsDocument, UnitViewDocument, UserPermissionChoice } from "@gql/gql-types";
+import type {
+  FilterOptionsQuery,
+  FilterOptionsQueryVariables,
+  UnitViewQuery,
+  UnitViewQueryVariables,
 } from "@gql/gql-types";
 
 const LocationOnlyOnDesktop = styled.p`

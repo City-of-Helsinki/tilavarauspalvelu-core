@@ -32,10 +32,8 @@ import type { TagOptionsList } from "@/modules/search";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationRoundUrl } from "@/modules/urls";
 import {
-  type ApplicationRoundAdminFragment,
   ApplicationRoundStatusChoice,
   CurrentUserQuery,
-  type Maybe,
   useApplicationRoundQuery,
   UserPermissionChoice,
   ApplicationRoundQuery,
@@ -45,9 +43,13 @@ import {
   CheckPermissionsQueryVariables,
   CheckPermissionsDocument,
   FilterOptionsDocument,
-  type FilterOptionsQuery,
-  type FilterOptionsQueryVariables,
   CurrentUserDocument,
+} from "@gql/gql-types";
+import type {
+  ApplicationRoundAdminFragment,
+  Maybe,
+  FilterOptionsQuery,
+  FilterOptionsQueryVariables,
 } from "@gql/gql-types";
 
 const TabContent = styled(Flex).attrs({

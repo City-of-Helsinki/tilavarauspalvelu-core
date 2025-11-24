@@ -1,7 +1,8 @@
 import type { ApolloClient } from "@apollo/client";
 import { filterNonNullable, getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import type { OptionsRecord } from "@ui/types";
-import { OptionsDocument, type OptionsQueryVariables, type OptionsQuery } from "@gql/gql-types";
+import { OptionsDocument } from "@gql/gql-types";
+import type { OptionsQueryVariables, OptionsQuery } from "@gql/gql-types";
 
 export async function queryOptions(
   apolloClient: ApolloClient<unknown>,

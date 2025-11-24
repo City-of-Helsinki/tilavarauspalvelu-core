@@ -5,13 +5,8 @@ import type { DayT } from "ui/src/modules/const";
 import { convertWeekday, transformWeekday } from "ui/src/modules/conversion";
 import { formatDuration, formatTimeRange, timeToMinutes } from "ui/src/modules/date-utils";
 import { filterNonNullable, sort, toNumber } from "ui/src/modules/helpers";
-import {
-  type SuitableTimeRangeNode,
-  type ApplicationSectionNode,
-  Priority,
-  Weekday,
-  type ApplicationSectionAllocationsQuery,
-} from "@gql/gql-types";
+import { Priority, Weekday } from "@gql/gql-types";
+import type { SuitableTimeRangeNode, ApplicationSectionNode, ApplicationSectionAllocationsQuery } from "@gql/gql-types";
 
 // TODO use a fragment
 type QueryT = NonNullable<ApplicationSectionAllocationsQuery["applicationSections"]>;

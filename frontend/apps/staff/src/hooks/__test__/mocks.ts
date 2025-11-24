@@ -3,7 +3,6 @@ import { GraphQLError } from "graphql";
 import { createNodeId } from "ui/src/modules/helpers";
 import {
   ReservationSeriesDocument,
-  type ReservationSeriesQuery,
   ReservationStartInterval,
   ReservationStateChoice,
   ReservationTypeChoice,
@@ -11,6 +10,7 @@ import {
   UpdateReservationSeriesDocument,
   UpdateStaffReservationDocument,
 } from "@gql/gql-types";
+import type { ReservationSeriesQuery } from "@gql/gql-types";
 
 export const CHANGED_WORKING_MEMO = "Sisaisen kommentti";
 

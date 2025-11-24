@@ -1,10 +1,12 @@
-import React, { type ReactNode } from "react";
+import React from "react";
+import type { ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ApolloError, gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonVariant, RadioButton, SelectionGroup, TextInput } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
@@ -33,9 +35,9 @@ import {
   useBannerNotificationUpdateMutation,
   useBannerNotificationCreateMutation,
   useBannerNotificationPageQuery,
-  type BannerNotificationPageQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
+import type { BannerNotificationPageQuery } from "@gql/gql-types";
 
 const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {
   ssr: false,

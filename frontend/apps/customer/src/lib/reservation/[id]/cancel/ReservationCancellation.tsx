@@ -11,11 +11,13 @@ import { formatDate, applicationReservationDateTime } from "ui/src/modules/date-
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { H1 } from "ui/src/styled";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
-import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";
+import { CancellationForm } from "@/components/CancellationForm";
+import type { CancelFormValues } from "@/components/CancellationForm";
 import { ReservationInfoCard } from "@/components/reservation";
 import { getApplicationPath, getReservationPath } from "@/modules/urls";
 import { ReservationPageWrapper } from "@/styled/reservation";
-import { type ReservationCancelPageQuery, useCancelReservationMutation } from "@gql/gql-types";
+import { useCancelReservationMutation } from "@gql/gql-types";
+import type { ReservationCancelPageQuery } from "@gql/gql-types";
 
 const infoCss = css`
   @media (min-width: ${breakpoints.m}) {

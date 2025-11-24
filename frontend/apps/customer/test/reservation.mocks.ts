@@ -3,20 +3,18 @@ import { createNodeId } from "ui/src/modules/helpers";
 import {
   AccessType,
   ReservationUnitImageType,
-  type ReservationFormFieldsFragment,
   MunicipalityChoice,
   OrderStatus,
-  type PaymentOrderNode,
   PaymentType,
   PriceUnit,
   ReservationCancelReasonChoice,
-  type ReservationPageQuery,
   ReservationStateChoice,
   ReservationTypeChoice,
   ReserveeType,
   TermsOfUseTypeChoices,
   ReservationFormType,
 } from "@gql/gql-types";
+import type { ReservationFormFieldsFragment, PaymentOrderNode, ReservationPageQuery } from "@gql/gql-types";
 
 export function generateTextFragment(text: string) {
   return {

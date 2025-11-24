@@ -1,6 +1,7 @@
 /// This file contains the search query for reservation units
 /// e.g. the common search pages (both seasonal and single)
-import { gql, type ApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import type { ApolloClient } from "@apollo/client";
 import { startOfDay } from "date-fns";
 import type { ReadonlyURLSearchParams } from "next/navigation";
 import { transformAccessTypeSafe } from "ui/src/modules/conversion";
@@ -19,17 +20,14 @@ import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import {
   EquipmentOrderingChoices,
   IntendedUseOrderingChoices,
-  type Maybe,
   MunicipalityChoice,
   OptionsDocument,
-  type OptionsQuery,
-  type OptionsQueryVariables,
-  type QueryReservationUnitsArgs,
   ReservationKind,
   ReservationUnitOrderingChoices,
   ReservationUnitTypeOrderingChoices,
   UnitOrderingChoices,
 } from "@gql/gql-types";
+import type { Maybe, OptionsQuery, OptionsQueryVariables, QueryReservationUnitsArgs } from "@gql/gql-types";
 import { SEARCH_PAGING_LIMIT } from "./const";
 
 function transformOrderByName(desc: boolean, language: LocalizationLanguages) {

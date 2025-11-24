@@ -18,12 +18,8 @@ import {
 import { Flex, fontMedium, Strong } from "@ui/styled";
 import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
-import {
-  AccessType,
-  type ReservationInfoCardFragment,
-  ReservationStateChoice,
-  useAccessCodeQuery,
-} from "@gql/gql-types";
+import { AccessType, ReservationStateChoice, useAccessCodeQuery } from "@gql/gql-types";
+import type { ReservationInfoCardFragment } from "@gql/gql-types";
 
 const InfoCard = styled(Card)`
   && h2 {

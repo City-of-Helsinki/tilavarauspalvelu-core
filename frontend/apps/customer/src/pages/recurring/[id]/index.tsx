@@ -11,14 +11,15 @@ import {
   filterNonNullable,
   getLocalizationLang,
   ignoreMaybeArray,
-  type ReadonlyDeep,
   toNumber,
   getTranslation,
 } from "ui/src/modules/helpers";
+import type { ReadonlyDeep } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ListWithPagination } from "@/components/ListWithPagination";
-import { type SearchFormValues, SeasonalSearchForm } from "@/components/SeasonalSearchForm";
+import { SeasonalSearchForm } from "@/components/SeasonalSearchForm";
+import type { SearchFormValues } from "@/components/SeasonalSearchForm";
 import { SortingComponent } from "@/components/SortingComponent";
 import { useEnvContext } from "@/context/EnvContext";
 import { useReservationUnitList } from "@/hooks";
@@ -30,17 +31,19 @@ import { getSearchOptions, processVariables } from "@/modules/search";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath, seasonalPrefix } from "@/modules/urls";
 import {
-  type ApplicationCreateMutationInput,
   ApplicationRoundDocument,
-  type ApplicationRoundQuery,
-  type ApplicationRoundQueryVariables,
   ApplicationRoundStatusChoice,
   CreateApplicationDocument,
-  type CreateApplicationMutation,
-  type CreateApplicationMutationVariables,
   CurrentUserDocument,
-  type CurrentUserQuery,
   ReservationKind,
+} from "@gql/gql-types";
+import type {
+  ApplicationCreateMutationInput,
+  ApplicationRoundQuery,
+  ApplicationRoundQueryVariables,
+  CreateApplicationMutation,
+  CreateApplicationMutationVariables,
+  CurrentUserQuery,
 } from "@gql/gql-types";
 
 type SeasonalSearchProps = ReadonlyDeep<Pick<NarrowedProps, "applicationRound" | "options">>;

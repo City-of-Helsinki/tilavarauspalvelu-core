@@ -11,18 +11,16 @@ import { createNodeId, ReadonlyDeep } from "ui/src/modules/helpers";
 import {
   PriceUnit,
   ReservationUnitPublishingState,
-  type ReservationUnitNode,
   ReservationKind,
   ReservationStartInterval,
   ReservationUnitReservationState,
-  type PriceReservationUnitFieldsFragment,
-  type EquipmentFieldsFragment,
   PaymentType,
 } from "@gql/gql-types";
+import type { ReservationUnitNode, PriceReservationUnitFieldsFragment, EquipmentFieldsFragment } from "@gql/gql-types";
 import mockTranslations from ".././../public/locales/fi/prices.json";
-import { type ReservableMap, dateToKey, type RoundPeriod } from "./reservable";
+import { dateToKey } from "./reservable";
+import type { ReservableMap, RoundPeriod } from "./reservable";
 import {
-  type GetReservationUnitPriceProps,
   getDayIntervals,
   getEquipmentCategories,
   getEquipmentList,
@@ -32,14 +30,17 @@ import {
   getReservationUnitPrice,
   isReservationUnitPublished,
   isReservationUnitReservable,
-  type GetPriceType,
-  type NotReservableFieldsFragmentNarrow,
-  type GetPossibleTimesForDayProps,
-  type LastPossibleReservationDateProps,
   getLastPossibleReservationDate,
-  type AvailableTimesProps,
   getNextAvailableTime,
   formatNDays,
+} from "./reservationUnit";
+import type {
+  GetReservationUnitPriceProps,
+  GetPriceType,
+  NotReservableFieldsFragmentNarrow,
+  GetPossibleTimesForDayProps,
+  LastPossibleReservationDateProps,
+  AvailableTimesProps,
 } from "./reservationUnit";
 
 // Turn into describe block and spec the tests
