@@ -1,7 +1,7 @@
 import { isValid, isAfter, parse } from "date-fns";
-import type { DayT } from "../const";
+import type { DayT } from "@ui/modules/const";
+import { UI_DATE_FORMAT, API_DATE_FORMAT } from "@ui/modules/date-utils/formatting";
 import { formatDate, formatTime } from "./formatting";
-import { UI_DATE_FORMAT, API_DATE_FORMAT } from "./index";
 
 /**
  * API/UI date format conversion utilities

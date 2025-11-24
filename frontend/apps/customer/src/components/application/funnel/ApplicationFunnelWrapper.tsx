@@ -5,10 +5,10 @@ import { breakpoints } from "ui/src/modules/const";
 import type { ReadonlyDeep } from "ui/src/modules/helpers";
 import { H2, HR } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { ApplicationHead } from "@/components/application";
+import { ApplicationStepper } from "@/components/application/funnel/ApplicationStepper";
 import { applicationsPrefix } from "@/modules/urls";
 import type { ApplicationFormFragment } from "@gql/gql-types";
-import { ApplicationStepper } from ".";
-import { ApplicationHead } from "..";
 import { NotesWhenApplying } from "../NotesWhenApplying";
 
 const InnerContainer = styled.div`

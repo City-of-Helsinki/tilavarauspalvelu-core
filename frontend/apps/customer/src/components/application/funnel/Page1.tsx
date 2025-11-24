@@ -5,9 +5,9 @@ import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import type { OptionsListT } from "ui/src/modules/search";
 import { ButtonContainer } from "ui/src/styled";
+import { ApplicationSectionPage1 } from "@/components/application/funnel/ApplicationSectionPage1";
 import { useReservationUnitList } from "@/hooks";
 import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
-import { ApplicationSectionPage1 } from ".";
 import { type ApplicationPage1FormValues, createDefaultPage1Section } from "./form";
 
 type Page1Props = Readonly<{
