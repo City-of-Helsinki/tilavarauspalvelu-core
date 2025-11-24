@@ -164,7 +164,7 @@ export function ImageEditor({ images, setImages, style, className }: Props): JSX
             label={t("reservationUnitEditor:ImageEditor.label")}
             language="fi"
             dragAndDropInputLabel=" "
-            maxSize={5242880}
+            maxSize={5_242_880}
             onChange={(files) => addImage(files)}
             tooltipText={t("reservationUnitEditor:ImageEditor.tooltip")}
           />
