@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ignoreMaybeArray } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
-import { getApiErrors } from "@ui/modules/apolloUtils";
+import { getApiErrors } from "@ui/modules/apollo/helpers";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { useEnvContext } from "@/context/EnvContext";
 import { CancelledLinkSet } from "@/lib/reservation/[id]/cancel";
