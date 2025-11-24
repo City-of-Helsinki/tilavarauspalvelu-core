@@ -7,7 +7,7 @@ import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 interface SearchTagsProps {
   translateTag: (key: string, val: string) => string;
   hide?: Readonly<string[]>;
-  defaultTags?: Readonly<Array<{ key: string; value: string | string[] }>>;
+  defaultTags?: Readonly<{ key: string; value: string | string[] }[]>;
   clearButtonLabel?: string;
   clearButtonAriaLabel?: string;
 }

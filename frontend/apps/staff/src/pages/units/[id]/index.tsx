@@ -68,7 +68,7 @@ function Unit({ unitPk }: { unitPk: number }): JSX.Element {
   });
 
   const { unit } = data ?? {};
-  const hasSpacesResources = Boolean(unit?.spaces?.length > 0);
+  const hasSpacesResources = !!unit?.spaces?.length;
 
   if (isLoading) {
     return <CenterSpinner />;

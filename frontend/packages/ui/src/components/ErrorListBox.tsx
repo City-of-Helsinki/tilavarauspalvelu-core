@@ -14,7 +14,7 @@ export function ErrorListBox({
   errors,
 }: {
   label: string;
-  errors: Array<{ key: string; label: string }>;
+  errors: { key: string; label: string }[];
 }): React.ReactElement {
   return (
     <Notification label={label} type="error">

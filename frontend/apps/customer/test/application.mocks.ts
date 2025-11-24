@@ -68,7 +68,7 @@ function createMockReservationUnits({
   nReservationUnits = 1,
 }: {
   nReservationUnits?: number;
-}): Array<ReservationUnitNode> {
+}): ReservationUnitNode[] {
   return Array.from({ length: nReservationUnits }, (_, i) => createMockReservationUnit({ pk: i + 1 }));
 }
 

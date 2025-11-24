@@ -13,7 +13,7 @@ function eachDayOfInterval(start: number, end: number, stepDays = 1) {
   }
   const daysWithoutCeil = (end - start) / (MILLISECONDS_IN_DAY * stepDays);
   const days = Math.ceil(daysWithoutCeil);
-  return Array.from(Array(days)).map((_, i) => i * (MILLISECONDS_IN_DAY * stepDays) + start);
+  return [...Array(days)].map((_, i) => i * (MILLISECONDS_IN_DAY * stepDays) + start);
 }
 
 // epoch is Thue (4)
@@ -76,9 +76,9 @@ export function generateReservations(props: TimeSelectionFormValues) {
         endTime,
       }))
       .sort((a, b) => a.date.getTime() - b.date.getTime());
-  } catch (e) {
+  } catch (err) {
     // eslint-disable-next-line no-console
-    console.warn("exception: ", e);
+    console.warn("exception:", err);
     // Date throws => don't crash
   }
 

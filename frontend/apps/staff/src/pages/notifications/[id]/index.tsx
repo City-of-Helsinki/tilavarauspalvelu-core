@@ -250,8 +250,8 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
         }),
       });
       router.push(getNotificationListUrl());
-    } catch (e) {
-      displayError(e);
+    } catch (err) {
+      displayError(err);
     }
   };
 
@@ -472,8 +472,8 @@ function useRemoveNotification({ notification }: { notification?: BannerNotifica
 
       successToast({ text: t("notification:success.removed") });
       router.replace(getNotificationListUrl());
-    } catch (e) {
-      displayError(e);
+    } catch (err) {
+      displayError(err);
     }
   };
 

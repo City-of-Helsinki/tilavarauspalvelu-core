@@ -87,7 +87,7 @@ export function RecurringCard({
       iconEnd={isSelected ? <IconCheck /> : <IconPlus />}
       onClick={toggleSelect}
       data-testid="recurring-card__button--toggle"
-      key={"common:selectReservationUnit"}
+      key="common:selectReservationUnit"
     >
       {isSelected ? t("common:removeReservationUnit") : t("common:selectReservationUnit")}
     </Button>

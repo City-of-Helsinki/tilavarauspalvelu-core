@@ -130,7 +130,7 @@ export function ReservationReserveeDetailsSection({
     <ReserveeDetailsAccordion id="reservation__reservee-details" heading={t("reservation:reserveeDetails")}>
       {gqlError && (
         <Notification
-          type={"alert"}
+          type="alert"
           size={NotificationSize.Large}
           label={<H5 $noMargin>{t("reservation:reserveeUnableToShowData")}</H5>}
         >

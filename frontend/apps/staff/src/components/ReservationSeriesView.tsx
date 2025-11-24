@@ -119,7 +119,7 @@ export function ReservationSeriesView({
     };
   });
 
-  const items = forDisplay.concat(rejected).sort((a, b) => a.date.getTime() - b.date.getTime());
+  const items = [...forDisplay, ...rejected].sort((a, b) => a.date.getTime() - b.date.getTime());
 
   return (
     <ReservationList

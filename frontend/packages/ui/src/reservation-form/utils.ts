@@ -67,7 +67,7 @@ export function getReservationFormFields({
 // TODO rename these fields they are the ReservationNode fields that store form input data
 // not form fields (they map to backend / query types, not frontend form)
 export type FormField = keyof Omit<ReservationFormFieldsFragment, "id" | "reservationUnit">;
-export type FormFieldArray = ReadonlyArray<FormField>;
+export type FormFieldArray = readonly FormField[];
 
 export function getReservationFormReserveeFields({ reserveeType }: { reserveeType: ReserveeType | null }) {
   const baseFields = RESERVATION_FIELDS[convertTypeToKey(reserveeType ?? ReserveeType.Individual)];

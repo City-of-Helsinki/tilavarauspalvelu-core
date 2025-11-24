@@ -345,7 +345,7 @@ export function convertFormToFocustimeSlot({
   activeApplicationRounds: readonly RoundPeriod[];
   blockingReservations: readonly BlockingReservationFieldsFragment[];
 }): FocusTimeSlot | { isReservable: false } {
-  const [hours, minutes]: Array<number | undefined> = data.time
+  const [hours, minutes]: (number | undefined)[] = data.time
     .split(":")
     .map(Number)
     .filter((n) => Number.isFinite(n));
@@ -487,9 +487,9 @@ function getCheckoutRedirectUrl(pk: number, lang: LocalizationLanguages, apiBase
     searchParams.set("lang", lang);
     searchParams.set("redirect_on_error", errorUrl.toString());
     return url.toString();
-  } catch (e) {
+  } catch (err) {
     // eslint-disable-next-line no-console
-    console.error(e);
+    console.error(err);
   }
   return "";
 }
@@ -512,9 +512,9 @@ export function getCheckoutUrl(
     const baseUrl = `${origin}${pathname}`;
     searchParams.set("lang", lang);
     return `${baseUrl}${baseUrl.endsWith("/") ? "" : "/"}paymentmethod?${searchParams.toString()}`;
-  } catch (e) {
+  } catch (err) {
     // eslint-disable-next-line no-console
-    console.error(e);
+    console.error(err);
   }
   return undefined;
 }

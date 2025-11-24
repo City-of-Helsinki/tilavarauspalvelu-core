@@ -170,9 +170,9 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
   const onSubmit = async ({ enableBufferTimeBefore, enableBufferTimeAfter, ...data }: ReservationSeriesFormValues) => {
     setLocalError(null);
 
-    const skipDates = removedReservations
-      .concat(checkedReservations.reservations.filter((x) => x.isOverlapping))
-      .map((x) => x.date);
+    const skipDates = [...removedReservations, ...checkedReservations.reservations.filter((x) => x.isOverlapping)].map(
+      (x) => x.date
+    );
 
     if (checkedReservations.reservations.length - skipDates.length === 0) {
       errorToast({ text: t(translateError("noReservations")) });
@@ -198,8 +198,8 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
       });
 
       router.push(getReservationSeriesUrl(unitPk, recurringPk, "completed"));
-    } catch (e) {
-      const errs = getSeriesOverlapErrors(e);
+    } catch (err) {
+      const errs = getSeriesOverlapErrors(err);
       if (errs.length > 0) {
         const overlaps = errs.flatMap((x) => x.overlapping);
         // TODO would be better if we highlighted the new ones in the list (different style)
@@ -210,7 +210,7 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
         setLocalError(t("myUnits:ReservationSeriesForm.newOverlapError", { count }));
         document.getElementById("create-recurring__reservations-list")?.scrollIntoView();
       } else {
-        displayError(e);
+        displayError(err);
         // on exception in ReservationSeries (because we are catching the individual errors)
         // We don't need to cleanup the ReservationSeries that has zero connections.
         // Based on documentation backend will do this for us.

@@ -8,7 +8,7 @@ import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
 interface MultiSelectFilterProps {
   name: string;
-  options: Readonly<Array<{ label: string; value: string | number }>>;
+  options: Readonly<{ label: string; value: string | number }[]>;
   style?: React.CSSProperties;
   className?: string;
   enableSearch?: boolean;
@@ -39,7 +39,7 @@ export function MultiSelectFilter(props: MultiSelectFilterProps): JSX.Element {
 
 interface BaseMultiSelectFilterProps extends MultiSelectFilterProps {
   filter: string[];
-  setFilter: (value: Array<string>) => void;
+  setFilter: (value: string[]) => void;
   enableSearch?: boolean;
 }
 

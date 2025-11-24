@@ -498,7 +498,7 @@ export async function middleware(req: NextRequest) {
       return n;
     }
     return NextResponse.next();
-  } catch (_) {
+  } catch {
     // NOTE all backend errors will return the 503 page
     // if the middleware request fails there is no way to recover
     const redirectUrl = new URL(`${langPrefix}/503`, req.url);

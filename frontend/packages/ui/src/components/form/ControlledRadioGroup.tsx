@@ -7,7 +7,7 @@ import { filterEmpty } from "../../modules/helpers";
 interface RadioGroupProps<T extends FieldValues> extends UseControllerProps<T> {
   name: Path<T>;
   control: Control<T>;
-  options: Array<{ label: string; value: string | number }>;
+  options: { label: string; value: string | number }[];
   direction?: "horizontal" | "vertical";
   required?: boolean;
   tooltip?: string;

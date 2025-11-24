@@ -62,9 +62,9 @@ export function ReservationFormField({ field, reserveeType, form }: Props): Reac
     case "reserveePhone":
     case "reserveeLastName":
     case "reserveeFirstName":
-    case "reserveeOrganisationName": {
+    case "reserveeOrganisationName": 
       return <ReservationTextInput label={label} name={field} register={register} errorText={errorText} />;
-    }
+    
   }
 }
 

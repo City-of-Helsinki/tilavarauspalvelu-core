@@ -104,8 +104,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         ...(await serverSideTranslations(locale ?? "fi")),
       },
     };
-  } catch (e) {
-    const errors = getApiErrors(e);
+  } catch (err) {
+    const errors = getApiErrors(err);
     const notFoundError = errors.find((e) => e.code === "NOT_FOUND");
     return {
       props: {

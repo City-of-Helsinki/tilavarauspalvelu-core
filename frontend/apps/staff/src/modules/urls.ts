@@ -150,9 +150,9 @@ export function getOpeningHoursUrl(
       searchParams.set("redirect_on_error", errorUrl);
     }
     return url.toString();
-  } catch (e) {
+  } catch (err) {
     // eslint-disable-next-line no-console
-    console.error(e);
+    console.error(err);
   }
   return "";
 }

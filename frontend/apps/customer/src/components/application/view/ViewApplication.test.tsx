@@ -12,7 +12,7 @@ function customRender({ children, ...props }: RenderProps = {}): ReturnType<type
     props.page = "page3";
   }
   const application = createMockApplicationViewFragment(props);
-  return render(<ViewApplication application={application}>{children ?? <div></div>}</ViewApplication>);
+  return render(<ViewApplication application={application}>{children ?? <div />}</ViewApplication>);
 }
 
 describe("ViewApplication", () => {
