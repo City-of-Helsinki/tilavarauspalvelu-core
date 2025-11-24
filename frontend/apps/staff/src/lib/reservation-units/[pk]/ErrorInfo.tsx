@@ -66,7 +66,7 @@ export function ErrorInfo({ form }: { form: UseFormReturn<ReservationUnitEditFor
       .filter((x): x is string => x != null)
   );
 
-  const errorsToPrint: { key: string; label: string }[] = [
+  const errorsToPrint: Array<{ key: string; label: string }> = [
     ...Object.entries(otherErrors).map(([key, value]) => ({
       key,
       label: `${t(`reservationUnitEditor:label.${key}`)}: ${getTranslatedError(t, value?.message)}`,

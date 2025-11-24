@@ -21,7 +21,7 @@ export function getFilterSearchParams({
   unitOptions = [],
 }: {
   searchParams: ReadonlyURLSearchParams;
-  unitOptions?: { label: string; value: number }[];
+  unitOptions?: Array<{ label: string; value: number }>;
 }) {
   // If unitParam is empty, use all units the user has permission to as the filter
   // This is required on some endpoints, in case the user is missing permissions for some units
@@ -115,7 +115,7 @@ function transformPriorityFilter(values: string[]): Priority[] {
 
 export function useGetFilterSearchParams({
   unitOptions = [],
-}: { unitOptions?: { label: string; value: number }[] } = {}) {
+}: { unitOptions?: Array<{ label: string; value: number }> } = {}) {
   // Process search params from the URL to get filter values used in the application review data loaders
   const searchParams = useSearchParams();
 

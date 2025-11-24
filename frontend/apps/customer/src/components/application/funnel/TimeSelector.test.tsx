@@ -63,7 +63,7 @@ function WrapTimeSelector({ onSubmit = vi.fn(), reservationUnitOpeningHours = []
 }
 
 function createMockSubmitValues(
-  vals: { pk?: number; day: DayT; start: number; end: number }[]
+  vals: Array<{ pk?: number; day: DayT; start: number; end: number }>
 ): ApplicationPage2FormValues {
   const suitableTimeRanges = vals.map((val) => ({
     beginTime: formatTimeStruct({ hour: val.start, minute: 0 }),

@@ -37,7 +37,7 @@ function ApplicationGroups({
   applications,
   actionCallback,
 }: {
-  applications: NonNullable<NonNullable<NonNullable<ApplicationsQuery["applications"]>["edges"][0]>["node"]>[];
+  applications: Array<NonNullable<NonNullable<NonNullable<ApplicationsQuery["applications"]>["edges"][0]>["node"]>>;
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 }) {
   const { t } = useTranslation();

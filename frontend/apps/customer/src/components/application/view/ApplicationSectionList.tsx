@@ -50,8 +50,8 @@ function SingleApplicationSection({
   secondaryTimes,
 }: {
   aes: SingleApplicationSectionT;
-  primaryTimes: Omit<SuitableTimeRangeFormValues, "pk">[];
-  secondaryTimes: Omit<SuitableTimeRangeFormValues, "pk">[];
+  primaryTimes: Array<Omit<SuitableTimeRangeFormValues, "pk">>;
+  secondaryTimes: Array<Omit<SuitableTimeRangeFormValues, "pk">>;
 }) {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);

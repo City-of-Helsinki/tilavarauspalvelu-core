@@ -16,13 +16,13 @@ type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
 
 // default is 20 if no spaces selected
-function getMaxPersons(spaceList: Pick<Node, "maxPersons">[]) {
+function getMaxPersons(spaceList: Array<Pick<Node, "maxPersons">>) {
   const persons = spaceList.map((s) => s.maxPersons ?? 0).reduce((a, x) => a + x, 0) || 20;
   return Math.floor(persons);
 }
 
 // default is 1 if no spaces selected
-function getMinSurfaceArea(spaceList: Pick<Node, "surfaceArea">[]) {
+function getMinSurfaceArea(spaceList: Array<Pick<Node, "surfaceArea">>) {
   const area = spaceList.map((s) => s.surfaceArea ?? 0).reduce((a, x) => a + x, 0) || 1;
   return Math.floor(area);
 }

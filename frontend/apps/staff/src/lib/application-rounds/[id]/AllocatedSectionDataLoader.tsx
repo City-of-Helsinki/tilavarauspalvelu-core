@@ -18,7 +18,7 @@ import { AllocatedSectionsTable, SORT_KEYS } from "./AllocatedSectionsTable";
 
 type Props = {
   applicationRoundPk: number;
-  unitOptions: { label: string; value: number }[];
+  unitOptions: Array<{ label: string; value: number }>;
 };
 
 export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): JSX.Element {

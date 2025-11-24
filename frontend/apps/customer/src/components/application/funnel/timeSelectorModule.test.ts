@@ -15,7 +15,7 @@ import {
 
 function createDayCells(
   day: Weekday,
-  openRanges: { begin: number; end: number }[] = [] as const,
+  openRanges: Array<{ begin: number; end: number }> = [] as const,
   selectedRange: TimeSpan[] = [] as const
 ): Cell[] {
   const dayStart = 7;

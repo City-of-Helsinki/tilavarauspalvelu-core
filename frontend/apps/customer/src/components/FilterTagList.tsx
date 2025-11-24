@@ -6,9 +6,9 @@ import { SearchTagContainer, SearchTag, TagResetButton } from "ui/src/styled/tag
 import { useSearchModify } from "@/hooks/useSearchValues";
 
 type FilterTagProps = {
-  filters: readonly string[];
-  multiSelectFilters: readonly string[];
-  hideList: readonly string[];
+  filters: ReadonlyArray<string>;
+  multiSelectFilters: ReadonlyArray<string>;
+  hideList: ReadonlyArray<string>;
   translateTag: (key: string, value: string) => string | undefined;
 };
 

@@ -7,7 +7,7 @@ import { type ApplicationRoundTimeSlotNode, Priority, SuitableTimeFragment, Week
 import type { SuitableTimeRangeFormValues } from "./form";
 
 export type DailyOpeningHours = Readonly<
-  Pick<ApplicationRoundTimeSlotNode, "weekday" | "isClosed" | "reservableTimes">[]
+  Array<Pick<ApplicationRoundTimeSlotNode, "weekday" | "isClosed" | "reservableTimes">>
 >;
 
 type SchedulesT = Omit<SuitableTimeFragment, "pk" | "id">;

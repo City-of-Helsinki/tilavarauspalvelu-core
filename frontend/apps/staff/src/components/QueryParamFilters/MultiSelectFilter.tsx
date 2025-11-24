@@ -8,7 +8,7 @@ import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
 interface MultiSelectFilterProps {
   name: string;
-  options: Readonly<{ label: string; value: string | number }[]>;
+  options: Readonly<Array<{ label: string; value: string | number }>>;
   style?: React.CSSProperties;
   className?: string;
   enableSearch?: boolean;

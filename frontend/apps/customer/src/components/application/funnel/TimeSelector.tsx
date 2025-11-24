@@ -22,7 +22,7 @@ import { aesToCells, covertCellsToTimeRange } from "./timeSelectorModule";
 
 export type TimeSelectorProps = {
   index: number;
-  reservationUnitOptions: { label: string; value: number }[];
+  reservationUnitOptions: Array<{ label: string; value: number }>;
   reservationUnitOpeningHours: Readonly<TimeSelectorFragment[]>;
 };
 
@@ -34,7 +34,7 @@ export function TimeSelectorForm({
   const { t } = useTranslation();
   const { setValue, watch } = useFormContext<ApplicationPage2FormValues>();
 
-  const setSelectorData = (index: number, selected: Readonly<Readonly<Cell[]>[]>) => {
+  const setSelectorData = (index: number, selected: Readonly<Array<Readonly<Cell[]>>>) => {
     const formVals = covertCellsToTimeRange(selected);
     setValue(`applicationSections.${index}.suitableTimeRanges`, formVals, {
       shouldDirty: true,

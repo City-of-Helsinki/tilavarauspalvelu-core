@@ -3,7 +3,7 @@ import { filterNonNullable } from "ui/src/modules/helpers";
 import type { ReservationUnitNode } from "@gql/gql-types";
 import { useSearchModify } from "./useSearchValues";
 
-type NodeList = Pick<ReservationUnitNode, "pk">[];
+type NodeList = Array<Pick<ReservationUnitNode, "pk">>;
 type Node = NonNullable<NodeList>[0];
 type ReservationUnitList = {
   getReservationUnits: () => number[];

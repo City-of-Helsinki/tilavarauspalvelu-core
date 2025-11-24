@@ -94,7 +94,7 @@ describe("getPossibleTimesForDay", () => {
     const date = startOfToday();
     const hour = getHours(new Date());
     const input = createInput({ date });
-    const output: { label: string; value: string }[] = [];
+    const output: Array<{ label: string; value: string }> = [];
     for (let i = hour; i < 24; i++) {
       // now is not in the set
       if (i !== hour) {
@@ -112,7 +112,7 @@ describe("getPossibleTimesForDay", () => {
       date,
       interval: ReservationStartInterval.Interval_60Minutes,
     });
-    const output: { label: string; value: string }[] = [];
+    const output: Array<{ label: string; value: string }> = [];
     for (let i = hour; i < 24; i++) {
       output.push({ label: `${i}:00`, value: `${i}:00` });
     }
@@ -126,7 +126,7 @@ describe("getPossibleTimesForDay", () => {
       date,
       interval: ReservationStartInterval.Interval_120Minutes,
     });
-    const output: { label: string; value: string }[] = [];
+    const output: Array<{ label: string; value: string }> = [];
     for (let i = hour; i < 24; i += 2) {
       output.push({ label: `${i}:00`, value: `${i}:00` });
     }
@@ -461,7 +461,7 @@ describe("getEquipmentList", () => {
   });
 
   test("with equipment in predefined order", () => {
-    const equipment: ReadonlyDeep<DeepRequired<EquipmentFieldsFragment>>[] = [
+    const equipment: Array<ReadonlyDeep<DeepRequired<EquipmentFieldsFragment>>> = [
       createMockEquipment({ name: "Item A", categoryName: "Liittimet" }),
       createMockEquipment({ name: "Item B", categoryName: "Keittiö" }),
       createMockEquipment({ name: "Item C 2", categoryName: "Foobar" }),
@@ -491,7 +491,7 @@ describe("getFuturePricing", () => {
   }: {
     reservationBeginsAt?: Date;
     reservationEndsAt?: Date;
-    days: readonly Date[];
+    days: ReadonlyArray<Date>;
   }) {
     return {
       id: "1",
@@ -507,7 +507,7 @@ describe("getFuturePricing", () => {
     };
   }
 
-  const DAYS: readonly Date[] = [addDays(new Date(), 10), addDays(new Date(), 20), addDays(new Date(), 5)];
+  const DAYS: ReadonlyArray<Date> = [addDays(new Date(), 10), addDays(new Date(), 20), addDays(new Date(), 5)];
 
   test.for([
     { days: DAYS, expectedIndex: 2 },
@@ -819,7 +819,7 @@ describe("getDayIntervals", () => {
       endTime: { h: 17, m: 0 },
       interval: ReservationStartInterval.Interval_30Minutes,
     };
-    const output: { h: number; m: number }[] = [];
+    const output: Array<{ h: number; m: number }> = [];
     for (let i = 9; i < 17; i++) {
       output.push({ h: i, m: 0 });
       output.push({ h: i, m: 30 });
@@ -833,7 +833,7 @@ describe("getDayIntervals", () => {
       endTime: { h: 17, m: 0 },
       interval: ReservationStartInterval.Interval_15Minutes,
     };
-    const output: { h: number; m: number }[] = [];
+    const output: Array<{ h: number; m: number }> = [];
     for (let i = 9; i < 17; i++) {
       output.push({ h: i, m: 0 });
       output.push({ h: i, m: 15 });
@@ -849,7 +849,7 @@ describe("getDayIntervals", () => {
       endTime: { h: 17, m: 0 },
       interval: ReservationStartInterval.Interval_60Minutes,
     };
-    const output: { h: number; m: number }[] = [];
+    const output: Array<{ h: number; m: number }> = [];
     for (let i = 9; i < 17; i++) {
       output.push({ h: i, m: 0 });
     }
@@ -862,7 +862,7 @@ describe("getDayIntervals", () => {
       endTime: { h: 24, m: 0 },
       interval: ReservationStartInterval.Interval_30Minutes,
     };
-    const output: { h: number; m: number }[] = [];
+    const output: Array<{ h: number; m: number }> = [];
     for (let i = 0; i < 24; i++) {
       output.push({ h: i, m: 0 });
       output.push({ h: i, m: 30 });
@@ -894,7 +894,7 @@ describe("getDayIntervals", () => {
       endTime: { h: 17, m: 20 },
       interval: ReservationStartInterval.Interval_30Minutes,
     };
-    const output: { h: number; m: number }[] = [];
+    const output: Array<{ h: number; m: number }> = [];
     for (let i = 9; i < 17; i++) {
       output.push({ h: i, m: 20 });
       output.push({ h: i, m: 50 });
@@ -908,7 +908,7 @@ describe("getDayIntervals", () => {
       endTime: { h: 17, m: 0 },
       interval: ReservationStartInterval.Interval_30Minutes,
     };
-    const output: { h: number; m: number }[] = [];
+    const output: Array<{ h: number; m: number }> = [];
     for (let i = 9; i < 17; i++) {
       output.push({ h: i, m: 20 });
       if (i < 16) {
@@ -936,10 +936,10 @@ describe("getLastPossibleReservationDate", () => {
     reservationEndsAt,
   }: {
     reservationsMaxDaysBefore?: number | null;
-    reservableTimeSpans?: {
+    reservableTimeSpans?: Array<{
       begin: Date;
       end: Date;
-    }[];
+    }>;
     reservationEndsAt?: Date;
   }): LastPossibleReservationDateProps {
     return {
@@ -1062,7 +1062,7 @@ describe("getNextAvailableTime", () => {
     ]);
   });
 
-  function mockOpenTimes(start: Date, days: number, data?: { start: Date; end: Date }[]) {
+  function mockOpenTimes(start: Date, days: number, data?: Array<{ start: Date; end: Date }>) {
     for (let i = 0; i < days; i++) {
       reservableTimes.set(
         dateToKey(addDays(start, i)),

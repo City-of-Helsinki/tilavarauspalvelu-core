@@ -51,8 +51,7 @@ function customRender(): ReturnType<typeof render> {
 
 describe("SearchSingle read query params", () => {
   function selectFilterParamsForTest(
-    keys: (
-      | "textSearch"
+    keys: Array<| "textSearch"
       | "startDate"
       | "endDate"
       | "intendedUses"
@@ -63,8 +62,7 @@ describe("SearchSingle read query params", () => {
       | "timeEnd"
       | "duration"
       | "personsAllowed"
-      | "accessTypes"
-    )[]
+      | "accessTypes">
   ) {
     // Helper to return a list of objects to be used in "test.for([...])"
     const filterParams = {
