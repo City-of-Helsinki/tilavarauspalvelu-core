@@ -2,9 +2,9 @@ import { ApolloClient, from, HttpLink, InMemoryCache } from "@apollo/client";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { relayStylePagination } from "@apollo/client/utilities";
 import type { GetServerSidePropsContext } from "next";
-import { enchancedFetch, errorLink } from "ui/src/modules/apolloUtils";
-import { buildGraphQLUrl } from "ui/src/modules/urlBuilder";
+import { enchancedFetch, errorLink } from "@ui/modules/apollo/helpers";
 import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
+import { buildGraphQLUrl } from "@ui/modules/urlBuilder";
 
 if (process.env.NODE_ENV === "development") {
   loadDevMessages();

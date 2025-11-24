@@ -5,7 +5,7 @@ import { Button, ButtonVariant, IconArrowLeft, LoadingSpinner } from "hds-react"
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { useDisplayError } from "@ui/hooks";
-import { isNotFoundError } from "@ui/modules/apolloUtils";
+import { isNotFoundError } from "@ui/modules/apollo/helpers";
 import { getLocalizationLang } from "@ui/modules/helpers";
 import { Flex } from "@ui/styled";
 import type { OptionsRecord } from "@ui/types";
