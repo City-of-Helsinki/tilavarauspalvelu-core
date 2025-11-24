@@ -12,8 +12,8 @@ import { validateApplication } from "./form";
 // Ordered list of steps by page slug
 export const PAGES_WITH_STEPPER = ["page1", "page2", "page3", "page4"] as const;
 
-function getStep(slug: string) {
-  const index = PAGES_WITH_STEPPER.findIndex((x) => x === slug);
+function getStep(slug: (typeof PAGES_WITH_STEPPER)[number]) {
+  const index = PAGES_WITH_STEPPER.indexOf(slug);
   if (index === -1) {
     return 0;
   }
@@ -65,7 +65,7 @@ export function ApplicationStepper({ application }: Readonly<StepperProps>): JSX
     push(getApplicationPath(application?.pk, targetPage));
   };
 
-  const selectedStep = getStep(pathname.split("/").pop() ?? "page1");
+  const selectedStep = getStep((pathname.split("/").pop() as (typeof PAGES_WITH_STEPPER)[number]) ?? "page1");
 
   return (
     <StyledStepper
