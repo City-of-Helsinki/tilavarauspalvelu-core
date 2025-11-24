@@ -79,7 +79,7 @@ describe("Component: ReservationInfoCard", () => {
       screen.getByText((_, element) => {
         return (
           element?.textContent?.trim() ===
-          "common:price: 10,00 € + prices:materialPrice (common:inclTax" + ' {"taxPercentage":"25,5"})'
+          'common:price: 10,00 € + prices:materialPrice (common:inclTax {"taxPercentage":"25,5"})'
         );
       })
     ).toBeInTheDocument();
