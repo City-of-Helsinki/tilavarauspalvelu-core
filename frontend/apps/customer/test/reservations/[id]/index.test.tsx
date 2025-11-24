@@ -164,7 +164,7 @@ describe("Page: View reservation", () => {
     });
   });
 
-  const shouldHaveReceiptButton = [OrderStatus.Paid, OrderStatus.PaidByInvoice, OrderStatus.Refunded];
+  const shouldHaveReceiptButton = new Set([OrderStatus.Paid, OrderStatus.PaidByInvoice, OrderStatus.Refunded]);
 
   describe("Sidebar", () => {
     it("should render a 'Save to calendar'-button when the reservation state is CONFIRMED", () => {
@@ -172,7 +172,7 @@ describe("Page: View reservation", () => {
       expect(view.getByTestId("reservation__button--calendar-link")).toBeInTheDocument();
     });
 
-    it.for(Object.entries(OrderStatus).filter((status, _idx) => shouldHaveReceiptButton.includes(status[1])))(
+    it.for(Object.entries(OrderStatus).filter((status, _idx) => shouldHaveReceiptButton.has(status[1])))(
       "should show a receipt button for a %s payment order",
       ([_, status]) => {
         customRender(reservationRenderProps("default", status));
@@ -180,7 +180,7 @@ describe("Page: View reservation", () => {
       }
     );
 
-    it.for(Object.entries(OrderStatus).filter((status) => !shouldHaveReceiptButton.includes(status[1])))(
+    it.for(Object.entries(OrderStatus).filter((status) => !shouldHaveReceiptButton.has(status[1])))(
       "should not show a receipt button for a %s payment order",
       ([_, status]) => {
         customRender(reservationRenderProps("default", status));
