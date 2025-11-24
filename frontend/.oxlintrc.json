@@ -428,6 +428,7 @@
     "unicorn/escape-case": "error",
     "unicorn/explicit-length-check": "error",
     "unicorn/filename-case": "off",
+    "unicorn/new-for-builtins": "error",
     "unicorn/no-abusive-eslint-disable": "error",
     "unicorn/no-accessor-recursion": "error",
     "unicorn/no-anonymous-default-export": "error",

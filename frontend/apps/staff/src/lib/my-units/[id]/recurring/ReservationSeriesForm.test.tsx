@@ -121,13 +121,13 @@ test("Render recurring reservation form with all but unit field disabled", async
 
   const selectorFields = ["repeatPattern"];
   for (const f of selectorFields) {
-    const el = view.getByRole("combobox", { name: RegExp(f) });
+    const el = view.getByRole("combobox", { name: new RegExp(f) });
     expect(el).toBeInTheDocument();
     expect(el).toHaveAttribute("aria-disabled", "true");
   }
   const dateFields = ["startingDate", "endingDate"];
   for (const f of dateFields) {
-    const labelElem = view.getByRole("textbox", { name: RegExp(f) });
+    const labelElem = view.getByRole("textbox", { name: new RegExp(f) });
     expect(labelElem).toBeInTheDocument();
     expect(labelElem).toBeDisabled();
   }
@@ -159,13 +159,13 @@ describe("With unit selected", () => {
 
     await waitForFormToBeEnabled();
 
-    const labelElem = view.getByRole("combobox", { name: RegExp(/repeatPattern/) });
+    const labelElem = view.getByRole("combobox", { name: new RegExp(/repeatPattern/) });
     expect(labelElem).toBeInTheDocument();
     expect(labelElem).not.toBeDisabled();
 
     const dateFields = ["startingDate", "endingDate"];
     for (const f of dateFields) {
-      const labelElem = view.getByRole("textbox", { name: RegExp(f) });
+      const labelElem = view.getByRole("textbox", { name: new RegExp(f) });
       expect(labelElem).toBeInTheDocument();
       expect(labelElem).not.toBeDisabled();
     }
