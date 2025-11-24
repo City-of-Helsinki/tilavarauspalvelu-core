@@ -11,7 +11,6 @@ import { useRouter } from "next/router";
 import { ControlledDateInput, TimeInput } from "ui/src/components/form";
 import { errorToast, successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
-import { getSeriesOverlapErrors } from "ui/src/modules/apolloUtils";
 import {
   parseApiDate,
   fromApiDateTime,
@@ -23,6 +22,7 @@ import {
 } from "ui/src/modules/date-utils";
 import { calculateMedian, createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { AutoGrid, ButtonContainer, CenterSpinner, H1, Strong } from "ui/src/styled";
+import { getSeriesOverlapErrors } from "@ui/modules/apollo/helpers";
 import { BufferToggles } from "@/components/BufferToggles";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { Error403 } from "@/components/Error403";
