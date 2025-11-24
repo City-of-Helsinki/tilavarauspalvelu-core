@@ -27,16 +27,16 @@ import { IconButton } from "ui/src/components";
 import { ButtonLikeExternalLink, ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { PopupMenu } from "ui/src/components/PopupMenu";
 import { Sanitize } from "ui/src/components/Sanitize";
-import { StatusLabel } from "ui/src/components/StatusLabel";
 import type { StatusLabelType } from "ui/src/components/StatusLabel";
+import { StatusLabel } from "ui/src/components/StatusLabel";
 import { breakpoints } from "ui/src/modules/const";
 import { convertWeekday } from "ui/src/modules/conversion";
 import {
+  applicationReservationDateTime,
+  formatApiDate,
   formatDate,
   formatDateRange,
-  applicationReservationDateTime,
   setMondayFirst,
-  formatApiDate,
 } from "ui/src/modules/date-utils";
 import {
   filterNonNullable,
@@ -48,32 +48,32 @@ import {
 } from "ui/src/modules/helpers";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import {
+  ButtonContainer,
+  CenterSpinner,
+  Flex,
   fontBold,
   fontMedium,
   fontRegular,
-  ButtonContainer,
-  Flex,
-  LinkLikeButton,
   H5,
-  CenterSpinner,
+  LinkLikeButton,
 } from "ui/src/styled";
 import { AccordionWithIcons } from "@/components/AccordionWithIcons";
 import { isReservationCancellableReason, ReservationCancellableReason } from "@/modules/reservation";
 import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 import { getApplicationReservationPath, getApplicationSectionPath, getReservationUnitPath } from "@/modules/urls";
+import type { ApplicationNode, ApplicationSectionReservationFragment } from "@gql/gql-types";
 import {
-  useApplicationReservationsQuery,
-  ReservationStateChoice,
   AccessType,
-  ApplicationSectionReservationUnitFragment,
   AccessTypeWithMultivalued,
-  PindoraSectionFragment,
-  PindoraReservationFragment,
-  ReservationUnitAccessTypeNode,
-  Maybe,
   ApplicationRoundNode,
+  ApplicationSectionReservationUnitFragment,
+  Maybe,
+  PindoraReservationFragment,
+  PindoraSectionFragment,
+  ReservationStateChoice,
+  ReservationUnitAccessTypeNode,
+  useApplicationReservationsQuery,
 } from "@gql/gql-types";
-import type { ApplicationSectionReservationFragment, ApplicationNode } from "@gql/gql-types";
 
 const N_RESERVATIONS_TO_SHOW = 20;
 
@@ -108,13 +108,16 @@ const TableWrapper = styled.div`
       padding-top: 0;
       padding-bottom: 0;
     }
+
     & > div {
       overflow-x: auto;
+
       > table {
         width: max-content;
         min-width: 100%;
       }
     }
+
     .hide-on-desktop {
       display: none;
     }
@@ -128,10 +131,13 @@ const TableWrapper = styled.div`
       border-bottom: var(--border-width) solid var(--border-color);
 
       /* No heading, cards have their own headings */
+
       & thead {
         display: none;
       }
+
       /* absolute positioning of status tags */
+
       & tr {
         position: relative;
       }
@@ -141,6 +147,7 @@ const TableWrapper = styled.div`
         border: var(--border-width) solid var(--border-color);
         border-bottom: none;
         border-top: none;
+
         &:first-child {
           border-top: var(--border-width) solid var(--border-color);
         }
@@ -151,6 +158,7 @@ const TableWrapper = styled.div`
       }
 
       /* card padding has to be implemented with tds because we can't style tr */
+
       & td:first-of-type {
         padding-top: var(--spacing-s);
         font-size: var(--fontsize-heading-xs);
@@ -158,24 +166,30 @@ const TableWrapper = styled.div`
       }
 
       /* last-of-type is not enough because we are hiding some rows on mobile */
+
       & td:last-of-type,
       & td > *.last-on-mobile {
         padding-bottom: var(--spacing-s);
       }
 
       /* stylelint-disable no-descending-specificity */
+
       & > thead > tr > th,
       & > tbody > tr > td {
         display: flex;
+
         &:empty {
           display: none;
         }
+
         /* remove the whole td element if the child is hidden
          * NOTE this will remove the element if any child is hidden */
+
         &:has(.hide-on-mobile) {
           display: none;
         }
       }
+
       /* stylelint-enable no-descending-specificity */
     }
   }
@@ -228,20 +242,19 @@ function formatReservationTimes(t: TFunction, aes: ApplicationSectionReservation
     day: number;
     label: string;
   };
-  const times: TimeLabel[] = atsList.reduce<TimeLabel[]>((acc, ats) => {
+  const times: TimeLabel[] = [];
+  for (const ats of atsList) {
     if (ats.reservationSeries == null) {
-      return acc;
+      continue;
     }
     const { dayOfTheWeek } = ats;
     const day = convertWeekday(dayOfTheWeek);
     const time = formatApiTimeInterval(ats.reservationSeries);
-    // NOTE our translations are sunday first
-    // using enum translations is bad because we need to sort by day of the week
     const tday = t(`weekDay.${setMondayFirst(day)}`);
-    return [...acc, { day, label: `${tday} ${time}` }];
-  }, []);
-  times.sort((a, b) => a.day - b.day);
+    times.push({ day, label: `${tday} ${time}` });
+  }
 
+  times.sort((a, b) => a.day - b.day);
   return times.map((x) => x.label).join(" / ") || "-";
 }
 
@@ -331,9 +344,11 @@ const IconTextWrapper = styled.span`
   gap: var(--spacing-3-xs);
 
   /* mobile uses icons instead of header text */
+
   > svg {
     display: inline;
   }
+
   @media (min-width: ${BREAKPOINT}) {
     > svg {
       display: none;
@@ -363,6 +378,7 @@ const TooltipIconWrapper = styled.span`
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-3-xs);
+
   > div {
     justify-self: center;
   }
@@ -497,11 +513,14 @@ const AccessTypeList = styled.ul`
   margin: 0;
   padding: 0;
   list-style-type: none;
+
   li {
     display: flex;
+
     span {
       width: 50%;
     }
+
     &:first-child {
       ${fontBold}
     }
@@ -621,6 +640,7 @@ const ReservationUnitLink = styled(IconButton)`
   }
 
   /* table hides icons by default, override this behaviour */
+
   &&& svg {
     display: inline;
   }
@@ -930,16 +950,14 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
     }, []);
   }
 
-  return (
-    reservationSeries
-      .reduce<ReservationsTableElem[]>((acc, r) => {
-        const rejected = getRejected(r);
-        const expanded: ReservationsTableElem[] = getReservations(r);
-        return [...acc, ...expanded, ...rejected];
-      }, [])
-      // NOTE have to sort here because we are combining two lists
-      .sort((a, b) => a.date.getTime() - b.date.getTime())
-  );
+  const combinedReservations: ReservationsTableElem[] = [];
+  for (const r of reservationSeries) {
+    const rejected = getRejected(r);
+    const expanded: ReservationsTableElem[] = getReservations(r);
+    combinedReservations.push(...expanded, ...rejected);
+  }
+  // NOTE have to sort here because we are combining two lists
+  return combinedReservations.sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 
 function sectionToReservationUnits(t: TFunction, section: ApplicationSectionT): ReservationSeriesTableElem[] {
