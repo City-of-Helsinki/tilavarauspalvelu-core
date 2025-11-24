@@ -13,5 +13,3 @@ export function ClientOnly({ children }: { children: React.ReactNode }): JSX.Ele
   // eslint-disable-next-line react/jsx-no-useless-fragment -- return type issues
   return <>{children}</>;
 }
-
-export default ClientOnly;

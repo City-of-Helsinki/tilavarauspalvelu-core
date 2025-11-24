@@ -4,7 +4,7 @@ import Link from "next/link";
 import styled from "styled-components";
 import { dateToMinutes, formatTimeRange, parseValidDateObject } from "ui/src/modules/date-utils";
 import { Flex } from "ui/src/styled";
-import VisibleIfPermission from "@/components/VisibleIfPermission";
+import { VisibleIfPermission } from "@/components/VisibleIfPermission";
 import { getReserveeName, truncate } from "@/modules/helpers";
 import { getReservationUrl } from "@/modules/urls";
 import { type ReservationUnitReservationsFragment, UserPermissionChoice } from "@gql/gql-types";

@@ -10,7 +10,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { Sanitize } from "ui/src/components/Sanitize";
-import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
+import { TimeZoneNotification } from "ui/src/components/TimeZoneNotification";
 import { errorToast } from "ui/src/components/toast";
 import { useDisplayError, useToastIfQueryParam } from "ui/src/hooks";
 import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
@@ -30,7 +30,7 @@ import {
 import { Flex, H4 } from "ui/src/styled";
 import { AddressSection } from "@/components/AddressSection";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import InfoDialog from "@/components/InfoDialog";
+import { InfoDialog } from "@/components/InfoDialog";
 import { LoginFragment } from "@/components/LoginFragment";
 import { QuickReservation } from "@/components/QuickReservation";
 import { useEnvContext } from "@/context/EnvContext";

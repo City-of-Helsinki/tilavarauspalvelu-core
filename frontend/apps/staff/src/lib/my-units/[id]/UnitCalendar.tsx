@@ -15,7 +15,7 @@ import { EVENT_BUFFER, NOT_RESERVABLE } from "@/modules/calendarStyling";
 import { getReserveeName } from "@/modules/helpers";
 import { ReservationTypeChoice, type ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { ReservationPopupContent } from "./ReservationPopupContent";
-import eventStyleGetter from "./eventStyleGetter";
+import { eventStyleGetter } from "./eventStyleGetter";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./utils";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;

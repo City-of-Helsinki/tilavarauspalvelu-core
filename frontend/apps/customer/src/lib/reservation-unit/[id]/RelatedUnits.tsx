@@ -14,7 +14,7 @@ import {
   getTranslation,
 } from "ui/src/modules/helpers";
 import { H3 } from "ui/src/styled";
-import Carousel from "@/components/Carousel";
+import { Carousel } from "@/components/Carousel";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
 import { type Maybe, useRelatedReservationUnitsQuery, type RelatedUnitCardFieldsFragment } from "@gql/gql-types";

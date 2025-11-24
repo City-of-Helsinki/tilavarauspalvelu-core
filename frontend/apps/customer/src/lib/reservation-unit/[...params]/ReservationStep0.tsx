@@ -17,7 +17,7 @@ import { getExtendedGeneralFormFields } from "@ui/reservation-form/utils";
 import { getReservationFormSchema, ReservationFormValues, type ReservationFormValueT } from "@ui/schemas";
 import { Flex, LinkLikeButton } from "@ui/styled";
 import type { OptionsRecord } from "@ui/types";
-import InfoDialog from "@/components/InfoDialog";
+import { InfoDialog } from "@/components/InfoDialog";
 import { getReservationInProgressPath, getReservationUnitPath } from "@/modules/urls";
 import { ActionContainer, NewReservationForm } from "@/styled/reservation";
 import {

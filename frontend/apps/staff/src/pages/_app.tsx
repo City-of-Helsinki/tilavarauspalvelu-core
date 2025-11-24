@@ -4,7 +4,7 @@ import { appWithTranslation } from "next-i18next";
 import App, { type AppContext, type AppInitialProps, type AppProps } from "next/app";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import "ui/src/styles/global.scss";
-import PageWrapper from "@/components/PageWrapper";
+import { PageWrapper } from "@/components/PageWrapper";
 import { EnvContextProvider } from "@/context/EnvContext";
 import { ModalContextProvider } from "@/context/ModalContext";
 import { createClient } from "@/modules/apolloClient";

@@ -6,7 +6,7 @@ import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import NotificationWrapper from "ui/src/components/NotificationWrapper";
+import { NotificationWrapper } from "ui/src/components/NotificationWrapper";
 import { errorToast, successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { isNotFoundError } from "ui/src/modules/apolloUtils";

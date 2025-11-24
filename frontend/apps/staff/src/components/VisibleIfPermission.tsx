@@ -4,7 +4,7 @@ import { useSession } from "@/hooks";
 import { hasPermission } from "@/modules/permissionHelper";
 import { UserPermissionChoice, type VisibleIfPermissionFieldsFragment } from "@gql/gql-types";
 
-function VisibleIfPermission({
+export function VisibleIfPermission({
   reservation,
   permission,
   children,
@@ -28,8 +28,6 @@ function VisibleIfPermission({
   // eslint-disable-next-line react/jsx-no-useless-fragment -- return type issues
   return <>{children}</>;
 }
-
-export default VisibleIfPermission;
 
 export const VISIBLE_IF_PERMISSION_FRAGMENT = gql`
   fragment VisibleIfPermissionFields on ReservationNode {

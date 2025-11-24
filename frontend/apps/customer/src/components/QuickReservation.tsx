@@ -8,7 +8,7 @@ import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { breakpoints } from "ui/src/modules/const";
 import { parseUIDate, formatDate } from "ui/src/modules/date-utils";
 import { Flex, fontMedium, H4, NoWrap } from "ui/src/styled";
-import Carousel from "@/components/Carousel";
+import { Carousel } from "@/components/Carousel";
 import type { FocusTimeSlot } from "@/modules/reservation";
 import {
   getLastPossibleReservationDate,

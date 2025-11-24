@@ -5,7 +5,7 @@ import { onError } from "@apollo/client/link/error";
 import * as Sentry from "@sentry/nextjs";
 import type { GraphQLFormattedError } from "graphql";
 import { getCookie } from "typescript-cookie";
-import toast from "../components/toast";
+import { toast } from "../components/toast";
 import { isBrowser } from "./helpers";
 
 // TODO narrow down the error codes and transform unknowns to catch all

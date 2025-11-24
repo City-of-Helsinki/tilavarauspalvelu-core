@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { ButtonLikeLink, ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
-import IconButton from "ui/src/components/IconButton";
+import { IconButton } from "ui/src/components/IconButton";
 import { AccessCodeStatusLabel, OrderStatusLabel, ReservationStatusLabel } from "ui/src/components/statuses";
 import { useToastIfQueryParam } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";

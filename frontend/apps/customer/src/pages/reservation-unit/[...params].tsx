@@ -8,7 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { Sanitize } from "ui/src/components/Sanitize";
-import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
+import { TimeZoneNotification } from "ui/src/components/TimeZoneNotification";
 import { breakpoints } from "ui/src/modules/const";
 import { createNodeId, getLocalizationLang, getTranslation, toNumber } from "ui/src/modules/helpers";
 import { H1, H4 } from "ui/src/styled";

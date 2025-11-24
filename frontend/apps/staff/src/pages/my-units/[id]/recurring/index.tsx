@@ -4,7 +4,7 @@ import { ReservationSeriesForm } from "@lib/my-units/[id]/recurring/ReservationS
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
+import { TimeZoneNotification } from "ui/src/components/TimeZoneNotification";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";

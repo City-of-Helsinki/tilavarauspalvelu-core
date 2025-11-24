@@ -8,7 +8,7 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
-import TimeZoneNotification from "ui/src/components/TimeZoneNotification";
+import { TimeZoneNotification } from "ui/src/components/TimeZoneNotification";
 import { breakpoints } from "ui/src/modules/const";
 import { parseUIDate } from "ui/src/modules/date-utils";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";

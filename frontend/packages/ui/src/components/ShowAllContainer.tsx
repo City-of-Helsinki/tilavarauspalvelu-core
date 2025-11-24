@@ -2,7 +2,7 @@ import React, { type HTMLAttributes, useState } from "react";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import styled from "styled-components";
 import { AutoGrid, Flex } from "../styled";
-import IconButton from "./IconButton";
+import { IconButton } from "./IconButton";
 
 export interface ShowAllContainerProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   // Label-text for the "show all" toggle-button

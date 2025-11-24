@@ -17,7 +17,7 @@ import { ButtonContainer } from "ui/src/styled";
 import { Error403 } from "@/components/Error403";
 import { ShowWhenTargetInvisible } from "@/components/ShowWhenTargetInvisible";
 import { StickyHeader } from "@/components/StickyHeader";
-import VisibleIfPermission from "@/components/VisibleIfPermission";
+import { VisibleIfPermission } from "@/components/VisibleIfPermission";
 import { ReservationWorkingMemo } from "@/components/WorkingMemo";
 import { useModal } from "@/context/ModalContext";
 import { useSession } from "@/hooks";

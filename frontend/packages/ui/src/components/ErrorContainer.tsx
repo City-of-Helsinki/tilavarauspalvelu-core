@@ -5,7 +5,7 @@ import Image from "next/image";
 import styled from "styled-components";
 import { breakpoints } from "../modules/const";
 import { Flex, H1 } from "../styled";
-import IconButton from "./IconButton";
+import { IconButton } from "./IconButton";
 
 const IMAGE_WIDTH = "418";
 const IMAGE_HEIGHT = "350";
