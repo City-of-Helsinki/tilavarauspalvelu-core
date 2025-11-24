@@ -125,7 +125,7 @@ export type ReservationUnitModalProps = Readonly<{
   applicationRound: AppRoundNode;
   handleAdd: (ru: Pick<RecurringCardFragment, "pk">) => void;
   handleRemove: (ru: Pick<RecurringCardFragment, "pk">) => void;
-  currentReservationUnits: Pick<RecurringCardFragment, "pk">[];
+  currentReservationUnits: Array<Pick<RecurringCardFragment, "pk">>;
   options: Pick<OptionsListT, "intendedUses" | "reservationUnitTypes" | "units">;
 }>;
 

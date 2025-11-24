@@ -42,7 +42,7 @@ export type SlotClickProps = {
 };
 
 type Props<T> = {
-  events: (CalendarEvent<T> | CalendarEventBuffer)[];
+  events: Array<CalendarEvent<T> | CalendarEventBuffer>;
   begin: Date;
   eventStyleGetter: ({ event }: CalendarEvent<T>) => {
     style: React.CSSProperties;

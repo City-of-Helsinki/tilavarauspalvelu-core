@@ -123,7 +123,7 @@ describe("CreateStaffReservation schema", () => {
   });
 });
 
-function generateFuzzyIntegers(count: number, start: number, end: number, exclusionList: readonly number[]): number[] {
+function generateFuzzyIntegers(count: number, start: number, end: number, exclusionList: ReadonlyArray<number>): number[] {
   const set = new Set(exclusionList);
   return [...Array(count)].map((_) => getRandomInt(start, end)).filter((x) => !set.has(x));
 }

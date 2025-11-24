@@ -13,7 +13,7 @@ export interface ReservationUnitOption extends OptionT {
 interface UseUnitResourcesProps {
   begin: Date;
   unitPk: number;
-  reservationUnitOptions: readonly ReservationUnitOption[];
+  reservationUnitOptions: ReadonlyArray<ReservationUnitOption>;
   reservationUnitTypeFilter?: number[];
 }
 

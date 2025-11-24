@@ -157,7 +157,7 @@ function formatButtonAriaLabel(t: TFunction, cell: Cell, weekday: string): strin
 }
 
 interface ApplicationTimeSelectorProps extends HTMLAttributes<HTMLDivElement> {
-  cells: Readonly<Readonly<Cell[]>[]>;
+  cells: Readonly<Array<Readonly<Cell[]>>>;
   onCellUpdate?: (selection: Cell, value: CellState) => void;
   selectedPriority?: CellState;
 }

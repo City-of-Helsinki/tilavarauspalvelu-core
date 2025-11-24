@@ -516,7 +516,7 @@ function ReservationUnitAccessTypeList({
   roundReservationBegin,
   roundReservationEnd,
 }: Readonly<{
-  accessTypes: Readonly<Pick<ReservationUnitAccessTypeNode, "pk" | "beginDate" | "accessType">[]>;
+  accessTypes: Readonly<Array<Pick<ReservationUnitAccessTypeNode, "pk" | "beginDate" | "accessType">>>;
   reservationUnits: ReservationSeriesTableElem[];
   pk: number | null | undefined;
   roundReservationBegin: Date;

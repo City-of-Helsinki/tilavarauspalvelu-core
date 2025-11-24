@@ -8,7 +8,7 @@ export type OptionsListT = Readonly<{
   reservationPurposes: Readonly<OptionT[]>;
   reservationUnitTypes: Readonly<OptionT[]>;
   ageGroups: Readonly<OptionT[]>;
-  municipalities: Readonly<{ value: MunicipalityChoice; label: string }[]>;
+  municipalities: Readonly<Array<{ value: MunicipalityChoice; label: string }>>;
 }>;
 
 export function mapFormToSearchParams<T extends object>(data: T): URLSearchParams {

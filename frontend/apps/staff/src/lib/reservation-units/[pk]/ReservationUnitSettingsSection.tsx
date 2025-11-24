@@ -79,7 +79,7 @@ export function ReservationUnitSettingsSection({
   cancellationRuleOptions,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  cancellationRuleOptions: { value: number; label: string }[];
+  cancellationRuleOptions: Array<{ value: number; label: string }>;
 }) {
   const { t } = useTranslation();
   const { control, watch, formState } = form;

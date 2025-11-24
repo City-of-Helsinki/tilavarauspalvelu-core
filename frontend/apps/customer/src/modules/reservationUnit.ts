@@ -76,11 +76,11 @@ const equipmentCategoryOrder = [
   "Muu",
 ] as const;
 
-export function getEquipmentCategories(equipment: Readonly<Pick<EquipmentFieldsFragment, "category">[]>): string[] {
+export function getEquipmentCategories(equipment: Readonly<Array<Pick<EquipmentFieldsFragment, "category">>>): string[] {
   if (!equipment || equipment.length === 0) {
     return [];
   }
-  const categories: (typeof equipmentCategoryOrder)[number][] = filterNonNullable(
+  const categories: Array<(typeof equipmentCategoryOrder)[number]> = filterNonNullable(
     equipment.map((n) => {
       const index = equipmentCategoryOrder.findIndex((order) => order === n.category?.nameFi);
       if (index === -1) {
@@ -397,7 +397,7 @@ export function getDayIntervals(
   startTime: { h: number; m: number },
   endTime: { h: number; m: number },
   interval: ReservationStartInterval
-): { h: number; m: number }[] {
+): Array<{ h: number; m: number }> {
   // normalize end time to allow comparison
   const nEnd = endTime.h === 0 && endTime.m === 0 ? { h: 23, m: 59 } : endTime;
   const iMins = getIntervalMinutes(interval);
@@ -408,7 +408,7 @@ export function getDayIntervals(
   const startMins = start.h * 60 + start.m;
   const endMins = end.h * 60 + end.m;
 
-  const intervals: { h: number; m: number }[] = [];
+  const intervals: Array<{ h: number; m: number }> = [];
   for (let i = startMins; i < endMins; i += iMins) {
     // don't allow interval overflow but handle 0:00 as 23:59
     if (i + iMins > endMins + 1) {
@@ -424,9 +424,9 @@ export function getDayIntervals(
 export type PossibleTimesCommonProps = Readonly<{
   reservableTimes: Readonly<ReservableMap>;
   reservationUnit: Omit<IsReservableFieldsFragment, "reservableTimeSpans">;
-  activeApplicationRounds: readonly RoundPeriod[];
+  activeApplicationRounds: ReadonlyArray<RoundPeriod>;
   duration: number;
-  blockingReservations: readonly BlockingReservationFieldsFragment[];
+  blockingReservations: ReadonlyArray<BlockingReservationFieldsFragment>;
 }>;
 export type GetPossibleTimesForDayProps = {
   date: Readonly<Date>;
@@ -441,9 +441,9 @@ export function getPossibleTimesForDay({
   activeApplicationRounds,
   duration,
   blockingReservations,
-}: GetPossibleTimesForDayProps): { label: string; value: string }[] {
+}: GetPossibleTimesForDayProps): Array<{ label: string; value: string }> {
   const interval = reservationUnit.reservationStartInterval;
-  const allTimes: { h: number; m: number }[] = [];
+  const allTimes: Array<{ h: number; m: number }> = [];
   const slotsForDay = reservableTimes.get(dateToKey(date)) ?? [];
   for (const slot of slotsForDay) {
     const startDate = slot.start;
@@ -538,8 +538,8 @@ export type AvailableTimesProps = {
   duration: number;
   reservationUnit: AvailableTimesReservationUnitFieldsFragment;
   reservableTimes: ReservableMap;
-  activeApplicationRounds: readonly RoundPeriod[];
-  blockingReservations: readonly BlockingReservationFieldsFragment[];
+  activeApplicationRounds: ReadonlyArray<RoundPeriod>;
+  blockingReservations: ReadonlyArray<BlockingReservationFieldsFragment>;
   fromStartOfDay?: boolean;
 };
 

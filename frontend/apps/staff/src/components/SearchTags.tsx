@@ -7,7 +7,7 @@ import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 interface SearchTagsProps {
   translateTag: (key: string, val: string) => string;
   hide?: Readonly<string[]>;
-  defaultTags?: Readonly<{ key: string; value: string | string[] }[]>;
+  defaultTags?: Readonly<Array<{ key: string; value: string | string[] }>>;
   clearButtonLabel?: string;
   clearButtonAriaLabel?: string;
 }
@@ -59,7 +59,7 @@ export function SearchTags({
     setParams(newParams);
   };
 
-  const tags: { key: string; value: string; tr: string }[] = [];
+  const tags: Array<{ key: string; value: string; tr: string }> = [];
   for (const [key, value] of params) {
     if (hide.includes(key) || value === "") {
       continue;

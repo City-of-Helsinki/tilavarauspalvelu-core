@@ -246,7 +246,7 @@ export async function getSearchOptions(
 }
 
 type AgeGroup = NonNullable<NonNullable<OptionsQuery["ageGroups"]>["edges"][0]>["node"];
-function sortAgeGroups(ageGroups: AgeGroup[]): NonNullable<AgeGroup>[] {
+function sortAgeGroups(ageGroups: AgeGroup[]): Array<NonNullable<AgeGroup>> {
   return filterNonNullable(ageGroups).sort((a, b) => {
     const order = ["1-99"];
     const strA = `${a.minimum || ""}-${a.maximum || ""}`;

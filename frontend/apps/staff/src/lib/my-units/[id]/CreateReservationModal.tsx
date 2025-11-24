@@ -71,7 +71,7 @@ const StyledNotification = styled(Notification)`
 `;
 
 type CreateReservationModalProps = {
-  reservationUnitOptions: { label: string; value: number }[];
+  reservationUnitOptions: Array<{ label: string; value: number }>;
   onClose: () => void;
   start?: Date;
   focusAfterCloseRef: RefObject<HTMLElement>;

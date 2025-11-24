@@ -22,7 +22,7 @@ export interface ValidationError extends ApiError {
 }
 
 export interface OverlappingError extends ApiError {
-  overlapping: { begin: string; end: string }[];
+  overlapping: Array<{ begin: string; end: string }>;
 }
 
 function mapValidationError(gqlError: GraphQLFormattedError): ValidationError[] {
@@ -166,7 +166,7 @@ export function getSeriesOverlapErrors(error: unknown): OverlappingError[] {
   return [];
 }
 
-function mapGraphQLErrors(graphQLErrors: readonly Readonly<GraphQLFormattedError>[]): ApiError[] {
+function mapGraphQLErrors(graphQLErrors: ReadonlyArray<Readonly<GraphQLFormattedError>>): ApiError[] {
   if (graphQLErrors.length > 0) {
     return graphQLErrors.flatMap((err) => {
       const code = getExtensionCode(err);

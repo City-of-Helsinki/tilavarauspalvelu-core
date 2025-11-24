@@ -441,7 +441,7 @@ const InfoItem = styled(Flex).attrs({
 function Infos({
   infos,
 }: Readonly<{
-  infos?: { value: string; icon?: JSX.Element; testId?: string }[];
+  infos?: Array<{ value: string; icon?: JSX.Element; testId?: string }>;
 }>) {
   if (!infos) return null;
   return (

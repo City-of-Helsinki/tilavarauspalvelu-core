@@ -22,8 +22,8 @@ type Props = {
   reservationUnit: ReservationTimePickerFieldsFragment;
   subventionSuffix: JSX.Element | undefined;
   reservationForm: UseFormReturn<PendingReservationFormType>;
-  durationOptions: { label: string; value: number }[];
-  startingTimeOptions: { label: string; value: string }[];
+  durationOptions: Array<{ label: string; value: number }>;
+  startingTimeOptions: Array<{ label: string; value: string }>;
   focusSlot: FocusTimeSlot | null;
   nextAvailableTime: Date | null;
   submitReservation: SubmitHandler<PendingReservationFormType>;
