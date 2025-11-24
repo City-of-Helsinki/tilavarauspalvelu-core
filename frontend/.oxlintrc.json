@@ -2,7 +2,7 @@
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": [
     "import",
-    "jsx_a11y",
+    "jsx-a11y",
     "nextjs",
     "oxc",
     "promise",
@@ -422,6 +422,7 @@
     "unicorn/consistent-date-clone": "error",
     "unicorn/consistent-empty-array-spread": "error",
     "unicorn/consistent-existence-index-check": "error",
+    "unicorn/consistent-function-scoping": "error",
     "unicorn/empty-brace-spaces": "error",
     "unicorn/error-message": "error",
     "unicorn/escape-case": "error",
@@ -587,12 +588,13 @@
         "**/mocks.ts"
       ],
       "rules": {
+        "oxc/no-accumulating-spread": "off",
         "promise/avoid-new": "off",
-        "unicorn/error-message": "off",
         "typescript/no-unsafe-member-access": "off",
         "typescript/no-unsafe-type-assertion": "off",
         "typescript/restrict-template-expressions": "off",
-        "oxc/no-accumulating-spread": "off"
+        "unicorn/consistent-function-scoping": "off",
+        "unicorn/error-message": "off"
       }
     },
     {

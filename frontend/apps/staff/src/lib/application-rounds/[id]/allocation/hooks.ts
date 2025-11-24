@@ -65,6 +65,35 @@ export function useFocusAllocatedSlot(): [
   return [allocatedPk, setAllocated];
 }
 
+// generate a list of strings for each slot based on the interval
+const generateSelection = (selectionRange: TimeSlotRange): string[] => {
+  const { day, ends, begins } = selectionRange;
+  const beginHour = Math.floor(begins);
+  const beginMinute = Math.round((begins - beginHour) * 60);
+  const endHour = Math.floor(ends);
+  const endMinute = Math.round((ends - endHour) * 60);
+
+  const slots = [];
+  if (day == null || beginHour == null || beginMinute == null || endHour == null || endMinute == null) {
+    return [];
+  }
+  // NOTE: parseInt returns NaN for invalid => the loop checks will fail and return []
+  for (let hour = beginHour; hour <= endHour; hour++) {
+    for (let minute = 0; minute < 60; minute += 30) {
+      if (hour === beginHour && minute < beginMinute) {
+        continue;
+      }
+      if (hour === endHour && minute > endMinute) {
+        break;
+      }
+      // garbage format: hours have no leading zero, minutes have to have it
+      const minuteString = minute < 10 ? `0${minute}` : `${minute}`;
+      slots.push(`${day}-${hour}-${minuteString}`);
+    }
+  }
+  return slots;
+};
+
 /// Allow selecting a continuous block on a single day
 /// state is saved in the URL as selectionBegin and selectionEnd parameters
 /// TODO rework the interface, accepts string[] for compatibility, not because it's desired
@@ -92,35 +121,6 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
         day,
       });
     }
-  };
-
-  // generate a list of strings for each slot based on the interval
-  const generateSelection = (selectionRange: TimeSlotRange): string[] => {
-    const { day, ends, begins } = selectionRange;
-    const beginHour = Math.floor(begins);
-    const beginMinute = Math.round((begins - beginHour) * 60);
-    const endHour = Math.floor(ends);
-    const endMinute = Math.round((ends - endHour) * 60);
-
-    const slots = [];
-    if (day == null || beginHour == null || beginMinute == null || endHour == null || endMinute == null) {
-      return [];
-    }
-    // NOTE: parseInt returns NaN for invalid => the loop checks will fail and return []
-    for (let hour = beginHour; hour <= endHour; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        if (hour === beginHour && minute < beginMinute) {
-          continue;
-        }
-        if (hour === endHour && minute > endMinute) {
-          break;
-        }
-        // garbage format: hours have no leading zero, minutes have to have it
-        const minuteString = minute < 10 ? `0${minute}` : `${minute}`;
-        slots.push(`${day}-${hour}-${minuteString}`);
-      }
-    }
-    return slots;
   };
 
   const getSelection = (): string[] => {

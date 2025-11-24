@@ -954,6 +954,8 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
   };
 }
 
+const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) => t && t.begin && t.end;
+
 // Too hard to type this because of two separate mutations that have optional fields in them
 export function transformReservationUnit(values: ReservationUnitEditFormValues, taxPercentageOptions: TaxOption[]) {
   // Convert from form values to API data
@@ -993,7 +995,6 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
     ...vals
   } = values;
 
-  const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) => t && t.begin && t.end;
   // NOTE mutation doesn't support pks (even if changing not adding) unlike other mutations
   const applicationRoundTimeSlots: UpdateApplicationRoundTimeSlotSerializerInput[] = seasons
     .filter((s) => s.reservableTimes.some(isReservableTime) || s.closed)

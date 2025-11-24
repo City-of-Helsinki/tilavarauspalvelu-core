@@ -6,24 +6,26 @@ import type { TFunction } from "next-i18next";
 import { createNodeId, convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";
 import { UnitSpacesQuery, useUnitSpacesQuery } from "@gql/gql-types";
 
+type AllSpaces = NonNullable<UnitSpacesQuery["unit"]>["spaces"];
+type SpaceNode = AllSpaces[0];
+
+function recurse(parent: SpaceNode, spaces: SpaceNode[], depth: number, pad: string): SpaceNode[] {
+  const newParent = {
+    ...parent,
+    nameFi: "".padStart(depth, pad) + (parent.nameFi ?? "-"),
+  };
+
+  const children = spaces.filter((e) => e.parent?.pk === parent.pk);
+
+  if (children.length === 0) {
+    return [newParent];
+  }
+  const c = children.flatMap((space) => recurse(space, spaces, depth + 1, pad));
+  return [newParent, ...c];
+}
+
 function spacesAsHierarchy(unit: UnitSpacesQuery["unit"] | undefined, paddingChar: string) {
   const allSpaces = filterNonNullable(unit?.spaces);
-  type SpaceNode = (typeof allSpaces)[0];
-
-  function recurse(parent: SpaceNode, spaces: SpaceNode[], depth: number, pad: string): SpaceNode[] {
-    const newParent = {
-      ...parent,
-      nameFi: "".padStart(depth, pad) + (parent.nameFi ?? "-"),
-    };
-
-    const children = spaces.filter((e) => e.parent?.pk === parent.pk);
-
-    if (children.length === 0) {
-      return [newParent];
-    }
-    const c = children.flatMap((space) => recurse(space, spaces, depth + 1, pad));
-    return [newParent, ...c];
-  }
 
   const roots = allSpaces.filter((e) => e.parent == null);
   return roots.flatMap((rootSpace) => recurse(rootSpace, allSpaces, 0, paddingChar));

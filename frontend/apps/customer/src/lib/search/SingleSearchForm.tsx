@@ -90,6 +90,9 @@ type SingleSearchFormProps = {
   isLoading: boolean;
 };
 
+// Handle possible number / string comparison
+const compFn = (a: { value: unknown }, b: string) => a != null && String(a.value) === b;
+
 // TODO rewrite this without the form state (use query params directly, but don't refresh the page)
 export function SingleSearchForm({
   options: { reservationUnitTypes, intendedUses, units, equipments },
@@ -112,9 +115,6 @@ export function SingleSearchForm({
   }));
 
   const translateTag = (key: string, value: string): string | undefined => {
-    // Handle possible number / string comparison
-    const compFn = (a: { value: unknown }, b: string) => a != null && String(a.value) === b;
-
     // TODO should rework the find matcher (typing issues) (it works but it's confusing)
     switch (key) {
       case "units":

@@ -167,6 +167,11 @@ export function AllocationPageContent({
   );
 }
 
+// allocations are not specific to the reservation unit
+const isAllocated = (section: ApplicationEventsProps["applicationSections"][0]) => {
+  return section.allocations != null && section.allocations > 0;
+};
+
 function ApplicationSectionColumn({
   applicationSections,
   reservationUnit,
@@ -176,9 +181,6 @@ function ApplicationSectionColumn({
   const { t } = useTranslation();
 
   const sections = filterNonNullable(applicationSections);
-
-  // allocations are not specific to the reservation unit
-  const isAllocated = (as: (typeof sections)[0]) => as.allocations != null && as.allocations > 0;
 
   const isAllocatedToThisUnit = (as: (typeof sections)[0]) =>
     as.reservationUnitOptions

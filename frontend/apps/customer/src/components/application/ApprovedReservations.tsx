@@ -880,6 +880,16 @@ function getReservationStatusChoice(
   }
 }
 
+function getAccessCodeValidThru(pindoraInfo: PindoraReservationFragment | undefined | null) {
+  if (!pindoraInfo) {
+    return null;
+  }
+  return {
+    beginsAt: pindoraInfo.accessCodeBeginsAt,
+    endsAt: pindoraInfo.accessCodeEndsAt,
+  };
+}
+
 function sectionToreservations(t: TFunction, section: ApplicationSectionReservationFragment): ReservationsTableElem[] {
   const reservationSeries = filterNonNullable(
     section.reservationUnitOptions.flatMap((ruo) =>
@@ -910,16 +920,6 @@ function sectionToreservations(t: TFunction, section: ApplicationSectionReservat
         pk: 0,
       };
     });
-  }
-
-  function getAccessCodeValidThru(pindoraInfo: PindoraReservationFragment | undefined | null) {
-    if (!pindoraInfo) {
-      return null;
-    }
-    return {
-      beginsAt: pindoraInfo.accessCodeBeginsAt,
-      endsAt: pindoraInfo.accessCodeEndsAt,
-    };
   }
 
   function getReservations(r: (typeof reservationSeries)[0]): ReservationsTableElem[] {

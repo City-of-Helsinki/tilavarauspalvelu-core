@@ -5,7 +5,12 @@ import styled from "styled-components";
 import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
-import { useReservationDateOfBirthQuery, useApplicationDateOfBirthQuery } from "@gql/gql-types";
+import {
+  useReservationDateOfBirthQuery,
+  useApplicationDateOfBirthQuery,
+  ReservationDateOfBirthQuery,
+  ApplicationDateOfBirthQuery,
+} from "@gql/gql-types";
 
 // NOTE separate query because all requests for dateOfBirth are logged
 // so don't make them automatically or inside other queries
@@ -30,6 +35,19 @@ const Button = styled.button`
   color: var(--color-bus);
   text-decoration: underline;
 `;
+
+function getUser(d: ReservationDateOfBirthQuery | ApplicationDateOfBirthQuery | undefined) {
+  if (d == null) {
+    return null;
+  }
+  if ("reservation" in d) {
+    return d.reservation?.user;
+  }
+  if ("application" in d) {
+    return d.application?.user;
+  }
+  return null;
+}
 
 type Props =
   | {
@@ -79,19 +97,6 @@ export function BirthDate(props: Props): JSX.Element {
   const data = "reservationPk" in props ? dataReservation : dataApplication;
   const isLoading = "reservationPk" in props ? isReservationLoading : isApplicationLoading;
   const error = "reservationPk" in props ? errorReservation : errorApplication;
-
-  function getUser(d: typeof data) {
-    if (d == null) {
-      return null;
-    }
-    if ("reservation" in d) {
-      return d.reservation?.user;
-    }
-    if ("application" in d) {
-      return d.application?.user;
-    }
-    return null;
-  }
 
   const user = getUser(data);
   const dateOfBirth = user?.dateOfBirth;

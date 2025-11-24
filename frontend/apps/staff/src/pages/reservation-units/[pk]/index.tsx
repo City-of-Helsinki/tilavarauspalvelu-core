@@ -52,8 +52,13 @@ import {
   useUpdateImageMutation,
   useUpdateReservationUnitMutation,
   UserPermissionChoice,
+  UpdateReservationUnitMutation,
 } from "@gql/gql-types";
-import type { ReservationUnitEditorParametersQuery, ReservationUnitEditQuery } from "@gql/gql-types";
+import type {
+  CreateReservationUnitMutation,
+  ReservationUnitEditorParametersQuery,
+  ReservationUnitEditQuery,
+} from "@gql/gql-types";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
@@ -155,6 +160,19 @@ const ReservationUnitForm = styled.form`
   padding-bottom: var(--spacing-3-xl);
 `;
 
+const getPk = (d: UpdateReservationUnitMutation | CreateReservationUnitMutation | null | undefined) => {
+  if (d == null) {
+    return null;
+  }
+  if ("updateReservationUnit" in d) {
+    return d.updateReservationUnit?.pk ?? null;
+  }
+  if ("createReservationUnit" in d) {
+    return d.createReservationUnit?.pk ?? null;
+  }
+  return null;
+};
+
 function ReservationUnitEditor({
   reservationUnit,
   form,
@@ -252,18 +270,6 @@ function ReservationUnitEditor({
       });
     }
 
-    const getPk = (d: typeof data) => {
-      if (d == null) {
-        return null;
-      }
-      if ("updateReservationUnit" in d) {
-        return d.updateReservationUnit?.pk ?? null;
-      }
-      if ("createReservationUnit" in d) {
-        return d.createReservationUnit?.pk ?? null;
-      }
-      return null;
-    };
     const upPk = getPk(data);
 
     // crude way to handle different logic for archive vs save (avoids double toast)
