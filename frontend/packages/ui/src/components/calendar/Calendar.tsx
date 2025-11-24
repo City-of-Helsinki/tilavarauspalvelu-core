@@ -185,7 +185,6 @@ const StyledCalendar = styled(BigCalendar)<{
       switch (step) {
         case 15:
           return "23px";
-        case 30:
         default:
           return "40px";
       }
