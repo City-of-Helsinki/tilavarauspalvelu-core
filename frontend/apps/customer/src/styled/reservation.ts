@@ -16,6 +16,10 @@ export const ReservationPageWrapper = styled.div<{ $nRows?: number }>`
   @media (min-width: ${breakpoints.m}) {
     grid-template-columns: 1fr ${CARD_COLUMN_SIZE}px;
   }
+  @media (max-width: ${breakpoints.s}) {
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 // Larger breakpoint for reservation unit page because Calendar takes more space.
