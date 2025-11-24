@@ -1,6 +1,6 @@
 import type { IncomingMessage, IncomingHttpHeaders } from "node:http";
 import qs from "node:querystring";
-import type { ServerError, ServerParseError } from "@apollo/client";
+import type { ServerError, ServerParseError, Operation } from "@apollo/client";
 import { ApolloError } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import { getOperationName } from "@apollo/client/utilities";
@@ -39,9 +39,17 @@ export type QueryErrorT =
     }
   | {
       type: "NETWORK_ERROR";
-      code: string; // ECONREFUSE (others?)
+      code: string;
       message: string;
       ctx?: Record<string, unknown>;
+    }
+  | {
+      type: "ECONNREFUSED"; // separate connection refused since it has different handling
+      message: string;
+    }
+  | {
+      type: "CSRF_ERROR";
+      message: string;
     }
   | {
       type: "NON_API_ERROR";
@@ -254,86 +262,17 @@ function getExtensionCode(e: GraphQLFormattedError): string | null {
   return null;
 }
 
-function extractErrorCode(error: ApiError): string | string[] {
-  if ("validation_code" in error && error.validation_code != null && typeof error.validation_code === "string") {
-    return [error.code, error.validation_code];
-  }
-  if (error.code != null) {
-    return error.code;
-  }
-  return [];
-}
-
 /// Capture all graphql errors as warnings in Sentry
 /// if some errors are properly handled in the UI add filter here
 /// During development log to console
 export const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
-  // TODO improve this by
-  // - finding all unique error codes
-  // - take the operationName
-  //
-  // add the following context to all errors
-  // - error code <-> path
-  // - operationName
-  // - query document
-  // - variables? (can this be PII so we shouldn't log it?)
-  //
-  // - one function to transform the error (handles the different cases with network errors)
-  // - then a single log function (for now it can both send to sentry and local logger)
-  //   - create a fingerprint that is bit more specific than currently, but most of the info (query etc. should go to
-  //   context)
-
-  // NOTE in case we have multiple errors in the response this will create separate buckets for those
-  const apiErrors = mapGraphQLErrors(graphQLErrors ?? []);
-  const apiErrorCodes = apiErrors.flatMap((e) => extractErrorCode(e));
-  const context = {
-    level: "warning" as const,
-    // have to encode the errors [Object Object] otherwise
-    extra: {
-      ...(graphQLErrors != null ? { graphQLErrors: JSON.stringify(graphQLErrors) } : {}),
-      ...(networkError != null ? { networkError: JSON.stringify(networkError) } : {}),
-    },
-    fingerprint: ["graphql_error", ...apiErrorCodes],
-  };
-  Sentry.captureMessage(`GraphQL error: ${apiErrorCodes.join(",")}`, context);
-
   // graphQLError can also raise 400 network error
   // don't toast that, but allow 400 errors in case they are not graphql errors
   if (graphQLErrors == null && networkError != null && isBrowser) {
     toastNetworkError(networkError);
   }
   const errors = transformApolloError(new ApolloError({ graphQLErrors, networkError }));
-  logGraphQLError(errors);
-  // graphQLErrors
-  // TODO rewrite using the new transform function
-  if (graphQLErrors) {
-    for (const error of graphQLErrors) {
-      log.error(
-        {
-          type: "GRAPHQL_ERROR",
-          operationName: operation.operationName,
-          query: print(operation.query),
-          variables: JSON.stringify(operation.variables),
-        },
-        JSON.stringify(error)
-      );
-    }
-  } else if (networkError && errors.type === "NETWORK_ERROR" && errors.code !== "ECONREFUSED") {
-    if (isCSRFError(networkError)) {
-      // don't log CSRF errors to console
-      return;
-    }
-    // TODO this is not a proper way of transforming the errors (network at least)
-    log.error(
-      {
-        type: "GRAPHQL_NETWORK_ERROR",
-        operationName: operation.operationName,
-        query: print(operation.query),
-        variables: JSON.stringify(operation.variables),
-      },
-      `NETWORK_ERROR: ${JSON.stringify(networkError)}`
-    );
-  }
+  logGraphQLError(errors, operation);
 });
 
 // helper to ignore 403 CSRF errors
@@ -457,17 +396,102 @@ export function enchancedFetch(req?: IncomingMessage) {
   };
 }
 
-export function logGraphQLError(error: QueryErrorT): void {
-  if (error.type === "GRAPHQL_ERROR") {
-    const permissionError = error.details.find((x) => isPermissionError(x.code));
-    if (permissionError) {
-      log.error(`graphql permission error: ${JSON.stringify(permissionError)}`);
-    } else {
-      log.error(`graphql errors: ${JSON.stringify(error)}`);
-    }
-  } else {
-    log.error(`other errors: ${JSON.stringify(error)}`);
+export function logGraphQLError(error: QueryErrorT, operation?: Operation): void {
+  // TODO improve this by
+  // - finding all unique error codes
+  // - take the operationName
+  //
+  // add the following context to all errors
+  // - error code <-> path
+  // - operationName
+  // - query document
+  // - variables? (can this be PII so we shouldn't log it?)
+  //
+  // - one function to transform the error (handles the different cases with network errors)
+  // - then a single log function (for now it can both send to sentry and local logger)
+  //   - create a fingerprint that is bit more specific than currently, but most of the info (query etc. should go to
+  //   context)
+
+  type SentryCtx = {
+    level: "warning";
+    fingerprint?: string[];
+    extra?: Record<string, string>;
+  };
+  // NOTE in case we have multiple errors in the response this will create separate buckets for those
+  // const apiErrors = mapGraphQLErrors(graphQLErrors ?? []);
+  // const apiErrorCodes = apiErrors.map((e) => extractErrorCode(e)).flat();
+  const context: SentryCtx = {
+    level: "warning" as const,
+    // have to encode the errors [Object Object] otherwise
+    /*
+    extra: {
+      ...(graphQLErrors != null ? { graphQLErrors: JSON.stringify(graphQLErrors) } : {}),
+      ...(networkError != null ? { networkError: JSON.stringify(networkError) } : {}),
+    },
+    fingerprint: ["graphql_error", ...apiErrorCodes],
+    */
+  };
+  let errorName = "Unknown";
+
+  switch (error.type) {
+    case "GRAPHQL_ERROR":
+      {
+        const permissionError = error.details.find((x) => isPermissionError(x.code));
+        if (permissionError) {
+          log.error(`graphql permission error: ${JSON.stringify(permissionError)}`);
+        } else {
+          log.error(`graphql errors: ${JSON.stringify(error)}`);
+        }
+        const codes = new Set(error.details.map((x) => x.code)).keys().toArray();
+        // TODO missing operationName / query / variables
+        context.extra = {
+          details: JSON.stringify(error),
+        };
+        context.fingerprint = ["graphql_error", ...codes];
+        errorName = `GraphQL error: ${codes.join(",")}`;
+      }
+      break;
+    case "NETWORK_ERROR":
+      log.error(`network error: ${JSON.stringify(error)}`);
+      errorName = "NETWORK_ERROR";
+      context.extra = {
+        details: JSON.stringify(error),
+      };
+      context.fingerprint = ["network_error", error.code];
+      break;
+    case "ECONNREFUSED":
+      log.error(`connection refused`);
+      errorName = "ECONNREFUSED";
+      context.extra = {
+        details: JSON.stringify(error),
+      };
+      context.fingerprint = ["connection_refused"];
+      break;
+    case "NON_API_ERROR":
+      log.error(`other errors: ${JSON.stringify(error)}`);
+      errorName = "NON_API_ERROR";
+      context.extra = {
+        details: JSON.stringify(error),
+      };
+      context.fingerprint = ["non_api_error"];
+      break;
+    case "CSRF_ERROR":
+      log.error(`csrf error: ${error.message}`);
+      errorName = "CSRF_ERROR";
+      context.fingerprint = ["csrf_error"];
   }
+  // TODO this should be superflous since they should be in the context already (at least in the logger context)
+  context.extra = {
+    ...context.extra,
+    ...(operation != null
+      ? {
+          operationName: operation.operationName,
+          query: print(operation.query),
+          variables: JSON.stringify(operation.variables),
+        }
+      : {}),
+  };
+  Sentry.captureMessage(errorName, context);
 }
 
 export function logGraphQLQuery(
@@ -475,7 +499,9 @@ export function logGraphQLQuery(
   url: string | undefined,
   documents: DocumentNode | DocumentNode[]
 ): void {
-  const operationName = Array.isArray(documents) ? documents.map(getOperationName) : getOperationName(documents);
+  const operationName = Array.isArray(documents)
+    ? documents.map(getOperationName).map((x) => x ?? "")
+    : (getOperationName(documents) ?? "");
   const t = Math.round(timeMs);
   // TODO should log if it's a mutation / query (though we probably aren't logging mutations)
   log.info(
@@ -494,13 +520,23 @@ function transformApolloError(error: ApolloError): QueryErrorT {
   // TODO this should be cleaner (break down the individual graphQL errors)
   const gqlErrors = getApiErrors(error);
   if (gqlErrors.length > 0) {
-    const codes = new Set(gqlErrors.map((e) => e.code));
+    const codes = new Set(gqlErrors.map((e) => e.code)).keys().toArray();
+    const hasCode = codes.some((x) => x !== "UNKNOWN");
+    const ERROR_400_STRING = "Response not successful: Received status code 400";
+    const isUserError = error.message.includes(ERROR_400_STRING);
+    const message = hasCode ? `Graphql VALIDATION errors: ${codes}` : error.message;
     return {
       type: "GRAPHQL_ERROR",
-      message: `Graphql VALIDATION errors: ${codes.keys().toArray()}`,
-      details: gqlErrors,
+      message,
+      details: hasCode ? gqlErrors : isUserError ? [{ code: "INVALID_GRAPHQL_QUERY" }] : [],
     };
   } else if (error.networkError != null) {
+    if (isCSRFError(error.networkError)) {
+      return {
+        type: "CSRF_ERROR",
+        message: "CSRF verfiication failed.",
+      };
+    }
     const { cause } = error.networkError;
     if (
       typeof cause === "object" &&
@@ -512,8 +548,7 @@ function transformApolloError(error: ApolloError): QueryErrorT {
       // The backend is down (nodejs version)
       if (cause.code === "ECONNREFUSED") {
         return {
-          type: "NETWORK_ERROR",
-          code: "ECONREFUSED",
+          type: "ECONNREFUSED",
           message: "Connection refused (backend down).",
         };
       }
@@ -529,8 +564,8 @@ function transformApolloError(error: ApolloError): QueryErrorT {
         const BROWSER_ECONREFUSED_MSG = "Failed to fetch";
         if (terror.message.startsWith(BROWSER_ECONREFUSED_MSG)) {
           return {
-            type: "NETWORK_ERROR",
-            code: "ECONREFUSED",
+            // type: "NETWORK_ERROR",
+            type: "ECONNREFUSED",
             message: "Connection refused (backend down).",
           };
         }
