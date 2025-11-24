@@ -477,6 +477,7 @@
     "unicorn/prefer-array-find": "error",
     "unicorn/prefer-array-flat": "error",
     "unicorn/prefer-array-flat-map": "error",
+    "unicorn/prefer-array-index-of": "error",
     "unicorn/prefer-array-some": "error",
     "unicorn/prefer-blob-reading-methods": "error",
     "unicorn/prefer-code-point": "error",

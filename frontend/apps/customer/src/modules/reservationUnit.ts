@@ -85,7 +85,8 @@ export function getEquipmentCategories(
   }
   const categories: Array<(typeof equipmentCategoryOrder)[number]> = filterNonNullable(
     equipment.map((n) => {
-      const index = equipmentCategoryOrder.findIndex((order) => order === n.category?.nameFi);
+      const categoryName = n.category?.nameFi as (typeof equipmentCategoryOrder)[number];
+      const index = equipmentCategoryOrder.indexOf(categoryName);
       if (index === -1) {
         return "Muu";
       }
