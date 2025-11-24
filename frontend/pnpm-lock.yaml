@@ -43,7 +43,10 @@ importers:
         version: 0.12.2
       oxlint:
         specifier: ^1.29.0
-        version: 1.29.0
+        version: 1.29.0(oxlint-tsgolint@0.8.2)
+      oxlint-tsgolint:
+        specifier: ^0.8.2
+        version: 0.8.2
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.10.1)(typescript@5.9.3)
@@ -170,7 +173,10 @@ importers:
         version: 20.0.10
       oxlint:
         specifier: ^1.29.0
-        version: 1.29.0
+        version: 1.29.0(oxlint-tsgolint@0.8.2)
+      oxlint-tsgolint:
+        specifier: ^0.8.2
+        version: 0.8.2
       postcss-styled-syntax:
         specifier: ^0.7.1
         version: 0.7.1(postcss@8.5.6)
@@ -327,7 +333,10 @@ importers:
         version: 20.0.10
       oxlint:
         specifier: ^1.29.0
-        version: 1.29.0
+        version: 1.29.0(oxlint-tsgolint@0.8.2)
+      oxlint-tsgolint:
+        specifier: ^0.8.2
+        version: 0.8.2
       postcss-styled-syntax:
         specifier: ^0.7.1
         version: 0.7.1(postcss@8.5.6)
@@ -475,7 +484,10 @@ importers:
         version: 15.4.2(i18next@25.6.3(typescript@5.9.3))(next@16.0.3(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.93.2))(react-i18next@16.3.5(i18next@25.6.3(typescript@5.9.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3))(react@18.3.1)
       oxlint:
         specifier: ^1.29.0
-        version: 1.29.0
+        version: 1.29.0(oxlint-tsgolint@0.8.2)
+      oxlint-tsgolint:
+        specifier: ^0.8.2
+        version: 0.8.2
       postcss-styled-syntax:
         specifier: ^0.7.1
         version: 0.7.1(postcss@8.5.6)
@@ -2168,6 +2180,36 @@ packages:
     engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
+
+  '@oxlint-tsgolint/darwin-arm64@0.8.2':
+    resolution: {integrity: sha512-n01FG9eE1OvufW7OXC7VcILwnerEHsy0lDGBcr+ax8n/AV17A/Wksw6qyK74n19T5Xh5f6s2B/FvJo8N5Bhc8w==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@oxlint-tsgolint/darwin-x64@0.8.2':
+    resolution: {integrity: sha512-BNjkcVWqvuQNDIZGJvISRyY6sRUWsH3GMJ69tbSviA3nk7zg2dkJcwDqVkfAN21xKPtZ2em34qHPLrTSN60Y2A==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@oxlint-tsgolint/linux-arm64@0.8.2':
+    resolution: {integrity: sha512-r2ootVnS7HAy6JmLgxXshAvWyzVlmnjp/5bV68/DTq7OiC2Lua1iaIKVivD6NhzcGIsHU38aFueYg9L7v8e74Q==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@oxlint-tsgolint/linux-x64@0.8.2':
+    resolution: {integrity: sha512-7I+oZKDPIweok/5LFcBig3x7wcby4htcEq/jreeq7C5Vir4sCL/xxRm5VPBtQyTwlhLTk6/HXJXlzeVqXCUOQA==}
+    cpu: [x64]
+    os: [linux]
+
+  '@oxlint-tsgolint/win32-arm64@0.8.2':
+    resolution: {integrity: sha512-kOpbYaMxEqztyY5tvXWOKqRCKa03a+CbbrbgUF/ALLG3QpHl0YwxW4v2g6waCJ3Ghy8jKkqXeaYTYm/RbQMwFQ==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@oxlint-tsgolint/win32-x64@0.8.2':
+    resolution: {integrity: sha512-8BMc67feBJusts9F2hWrc6xnPE9CFQD5+j1k9dDHx418GSyJY/bjumPfneZtWB9qk55nEhzC3trvL8HtuIz2RA==}
+    cpu: [x64]
+    os: [win32]
 
   '@oxlint/darwin-arm64@1.29.0':
     resolution: {integrity: sha512-XYsieDAI0kXJyvayHnmOW1qVydqklRRVT4O5eZmO/rdNCku5CoXsZvBvkPc3U8/9V1mRuen1sxbM9T5JsZqhdA==}
@@ -4804,6 +4846,10 @@ packages:
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
+
+  oxlint-tsgolint@0.8.2:
+    resolution: {integrity: sha512-a60T/kPH09rroGNz1GtTWnzWANRBNS6XkoULwzgIqjNgrtxm5lKMKrFsPk7g+yKWteuGho7+JLvvLjtbl/WbEg==}
+    hasBin: true
 
   oxlint@1.29.0:
     resolution: {integrity: sha512-YqUVUhTYDqazV2qu3QSQn/H4Z1OP+fTnedgZWDk1/lDZxGfR0b1MqRVaEm3rRjBMLHP0zXlriIWUx+DD6UMaPA==}
@@ -8075,6 +8121,24 @@ snapshots:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
 
+  '@oxlint-tsgolint/darwin-arm64@0.8.2':
+    optional: true
+
+  '@oxlint-tsgolint/darwin-x64@0.8.2':
+    optional: true
+
+  '@oxlint-tsgolint/linux-arm64@0.8.2':
+    optional: true
+
+  '@oxlint-tsgolint/linux-x64@0.8.2':
+    optional: true
+
+  '@oxlint-tsgolint/win32-arm64@0.8.2':
+    optional: true
+
+  '@oxlint-tsgolint/win32-x64@0.8.2':
+    optional: true
+
   '@oxlint/darwin-arm64@1.29.0':
     optional: true
 
@@ -10802,7 +10866,16 @@ snapshots:
       type-check: 0.4.0
       word-wrap: 1.2.5
 
-  oxlint@1.29.0:
+  oxlint-tsgolint@0.8.2:
+    optionalDependencies:
+      '@oxlint-tsgolint/darwin-arm64': 0.8.2
+      '@oxlint-tsgolint/darwin-x64': 0.8.2
+      '@oxlint-tsgolint/linux-arm64': 0.8.2
+      '@oxlint-tsgolint/linux-x64': 0.8.2
+      '@oxlint-tsgolint/win32-arm64': 0.8.2
+      '@oxlint-tsgolint/win32-x64': 0.8.2
+
+  oxlint@1.29.0(oxlint-tsgolint@0.8.2):
     optionalDependencies:
       '@oxlint/darwin-arm64': 1.29.0
       '@oxlint/darwin-x64': 1.29.0
@@ -10812,6 +10885,7 @@ snapshots:
       '@oxlint/linux-x64-musl': 1.29.0
       '@oxlint/win32-arm64': 1.29.0
       '@oxlint/win32-x64': 1.29.0
+      oxlint-tsgolint: 0.8.2
 
   p-limit@2.3.0:
     dependencies:
