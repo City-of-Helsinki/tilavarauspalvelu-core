@@ -99,8 +99,9 @@ export function Toolbar({ onNavigate, onView, view, date, children }: Readonly<T
       title = format(date, dateStr, culture);
       break;
     }
-    case "week":
-    default: {
+    case "month":
+    case "work_week":
+    case "agenda": {
       const start = startOfWeek(date, culture);
       const end = endOfWeek(date, culture);
       const startDay = format(start, "d", culture);
