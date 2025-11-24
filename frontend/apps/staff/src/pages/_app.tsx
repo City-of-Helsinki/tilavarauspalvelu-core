@@ -7,7 +7,7 @@ import type { AppContext, AppInitialProps, AppProps } from "next/app";
 import type { Router } from "next/router";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import "ui/src/styles/global.scss";
-import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apolloUtils";
+import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apollo/helpers";
 import { initialiseLogWrite } from "@ui/modules/browserHelpers";
 import { PageWrapper } from "@/components/PageWrapper";
 import { EnvContextProvider } from "@/context/EnvContext";

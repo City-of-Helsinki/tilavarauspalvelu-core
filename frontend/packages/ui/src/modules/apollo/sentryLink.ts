@@ -1,4 +1,4 @@
-import type { FetchResult, NextLink, Operation, Observable } from "@apollo/client";
+import type { FetchResult, NextLink, Observable, Operation } from "@apollo/client";
 import { ApolloLink } from "@apollo/client";
 import * as Sentry from "@sentry/nextjs";
 

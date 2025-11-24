@@ -6,9 +6,9 @@ import { relayStylePagination } from "@apollo/client/utilities";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore -- types require nodenext which breaks bundler option that breaks the build
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
-import { enchancedFetch, errorLink } from "ui/src/modules/apolloUtils";
-import { buildGraphQLUrl } from "ui/src/modules/urlBuilder";
+import { enchancedFetch, errorLink } from "@ui/modules/apollo/helpers";
 import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
+import { buildGraphQLUrl } from "@ui/modules/urlBuilder";
 
 if (process.env.NODE_ENV === "development") {
   loadDevMessages();

@@ -3,7 +3,7 @@ import type { NextPage } from "next";
 import Error from "next/error";
 import type { ErrorProps } from "next/error";
 import { ErrorContainer } from "ui/src/components";
-import { getApiErrors } from "ui/src/modules/apolloUtils";
+import { getApiErrors } from "@ui/modules/apollo/helpers";
 import { env } from "@/env.mjs";
 
 const CustomErrorComponent: NextPage<ErrorProps> = (props) => {

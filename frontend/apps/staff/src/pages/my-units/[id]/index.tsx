@@ -13,7 +13,7 @@ import { breakpoints } from "ui/src/modules/const";
 import { parseUIDate } from "ui/src/modules/date-utils";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex, H1, TabWrapper, TitleSection } from "ui/src/styled";
-import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apolloUtils";
+import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apollo/helpers";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { useModal } from "@/context/ModalContext";
 import { useSession } from "@/hooks";

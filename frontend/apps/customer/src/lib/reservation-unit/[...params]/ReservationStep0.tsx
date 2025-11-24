@@ -10,7 +10,7 @@ import styled from "styled-components";
 import { ReservationStateChoice } from "ui/gql/gql-types";
 import { ErrorListBox } from "@ui/components/ErrorListBox";
 import { useDisplayError } from "@ui/hooks";
-import { isNotFoundError } from "@ui/modules/apolloUtils";
+import { isNotFoundError } from "@ui/modules/apollo/helpers";
 import { transformMunicipality } from "@ui/modules/conversion";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/reservation-form";

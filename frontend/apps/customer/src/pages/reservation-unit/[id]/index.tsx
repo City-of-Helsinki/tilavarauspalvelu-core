@@ -16,8 +16,6 @@ import { TimeZoneNotification } from "ui/src/components/TimeZoneNotification";
 import { errorToast } from "ui/src/components/toast";
 import { useDisplayError, useToastIfQueryParam } from "ui/src/hooks";
 import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
-import { getApiErrors, logGraphQLQuery } from "ui/src/modules/apolloUtils";
-import type { ApiError } from "ui/src/modules/apolloUtils";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "ui/src/modules/date-utils";
 import {
@@ -31,6 +29,8 @@ import {
   toNumber,
 } from "ui/src/modules/helpers";
 import { Flex, H4 } from "ui/src/styled";
+import { getApiErrors, logGraphQLQuery } from "@ui/modules/apollo/helpers";
+import type { ApiError } from "@ui/modules/apollo/helpers";
 import { AddressSection } from "@/components/AddressSection";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { InfoDialog } from "@/components/InfoDialog";

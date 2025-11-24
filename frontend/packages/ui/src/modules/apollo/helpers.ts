@@ -9,9 +9,9 @@ import type { GraphQLFormattedError, DocumentNode } from "graphql";
 import { print } from "graphql";
 import { Roarr as log } from "roarr";
 import { getCookie } from "typescript-cookie";
-import { toast } from "../components/toast";
-import { getLocalizationLang, isBrowser } from "./helpers";
-import type { LocalizationLanguages } from "./urlBuilder";
+import { toast } from "../../components/toast";
+import { getLocalizationLang, isBrowser } from "../helpers";
+import type { LocalizationLanguages } from "../urlBuilder";
 
 // TODO narrow down the error codes and transform unknowns to catch all
 type ErrorCode = string;
