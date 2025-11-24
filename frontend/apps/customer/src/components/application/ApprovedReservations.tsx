@@ -249,8 +249,7 @@ function accessCodeSafe(pindoraInfo: PindoraSectionFragment | null, t: TFunction
   if (!pindoraInfo?.accessCode) {
     return t("reservation:contactSupport");
   }
-    return pindoraInfo.accessCode;
-  
+  return pindoraInfo.accessCode;
 }
 
 export function ApprovedReservations({ application, applicationRound }: Readonly<Props>) {
@@ -578,13 +577,17 @@ function getReservationSeriesAccessText(reservationUnit: ReservationSeriesTableE
     case AccessTypeWithMultivalued.Multivalued:
       if (usedAccessTypes.includes(AccessType.AccessCode)) {
         return `${t("reservationUnit:accessTypes." + AccessType.AccessCode)}: ${accessCodeSafe(pindoraInfo, t)}`;
-      }return usedAccessTypes
-          .filter((aT) => aT != null && aT !== AccessType.Unrestricted)
-          .map((aT) => t(`reservationUnit:accessTypes.${aT}`))
-          .join(" / ");
+      }
+      return usedAccessTypes
+        .filter((aT) => aT != null && aT !== AccessType.Unrestricted)
+        .map((aT) => t(`reservationUnit:accessTypes.${aT}`))
+        .join(" / ");
     case AccessTypeWithMultivalued.AccessCode:
       return `${t("reservationUnit:accessTypes." + accessType)}: ${accessCodeSafe(pindoraInfo, t)}`;
-    default:
+    case AccessTypeWithMultivalued.OpenedByStaff:
+    case AccessTypeWithMultivalued.PhysicalKey:
+    case AccessTypeWithMultivalued.Unrestricted:
+    case null:
       return t(`reservationUnit:accessTypes.${accessType}`);
   }
 }
@@ -672,7 +675,7 @@ function getStatusLabelProps(status: ApprovedReservationStatus): {
     case "modified":
       return { icon: <IconPen />, type: "neutral" };
     case "rejected":
-    default:
+    case "":
       return { icon: <IconCross />, type: "error" };
   }
 }
@@ -847,7 +850,12 @@ function getReservationStatusChoice(
       return "rejected";
     case ReservationStateChoice.Cancelled:
       return "cancelled";
-    default:
+    case ReservationStateChoice.Confirmed:
+    case ReservationStateChoice.Created:
+    case ReservationStateChoice.RequiresHandling:
+    case ReservationStateChoice.WaitingForPayment:
+    case null:
+    case undefined:
       return isModified ? "modified" : "";
   }
 }

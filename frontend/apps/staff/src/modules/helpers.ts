@@ -154,7 +154,8 @@ export function getReserveeTypeTranslationKey(
         return "translation:reserveeType.NONPROFIT_REGISTERED";
       }
       return "translation:reserveeType.NONPROFIT_UNREGISTERED";
-    default:
+    case null:
+    case undefined:
       return null;
   }
 }

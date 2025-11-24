@@ -102,7 +102,6 @@ function ApplicationsPage({ data: initialData }: PropsNarrowed): JSX.Element | n
       case "error":
         errorToast({ text: t("applicationCard:cancelFailed") });
         break;
-      default:
     }
   };
 

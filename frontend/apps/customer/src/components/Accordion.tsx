@@ -46,7 +46,6 @@ const HeadingButton = styled.button<{ theme: Theme }>`
               font-weight: 500;
             `;
           case "default":
-          default:
             return `
               font-size: var(--fontsize-heading-m);
               font-family: var(--font-bold);

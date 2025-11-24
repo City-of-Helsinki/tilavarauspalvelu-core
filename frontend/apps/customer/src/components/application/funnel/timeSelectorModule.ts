@@ -104,7 +104,7 @@ function transformCellType(cellType: CellState): Priority {
       return Priority.Primary;
     case "secondary":
       return Priority.Secondary;
-    default:
+    case "none":
       throw new Error(`Unknown cell type: ${cellType}`);
   }
 }
@@ -129,7 +129,7 @@ function combineTimespans(prev: TimeSpan[], current: TimeSpan): TimeSpan[] {
   }
   if (prevCell.end === current.begin && prevCell.priority === current.priority) {
     return [
-      ...prev.slice(0, - 1),
+      ...prev.slice(0, -1),
       {
         begin: prevCell.begin,
         end: prevCell.end + 1,

@@ -47,7 +47,7 @@ const borderCss = css<{ $type: AllocationApplicationSectionCardType }>`
         return "4px solid var(--color-success)";
       case "partial":
         return "4px solid var(--color-alert-dark)";
-      default:
+      case "unallocated":
         return "1px solid var(--color-black-10)";
     }
   }};

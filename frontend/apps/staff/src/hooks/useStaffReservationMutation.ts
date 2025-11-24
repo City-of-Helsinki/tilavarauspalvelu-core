@@ -101,8 +101,6 @@ function convertReserveeType(type?: Maybe<ReserveeType>): ReserveeType | undefin
       return ReserveeType.Individual;
     case ReserveeType.Nonprofit:
       return ReserveeType.Nonprofit;
-    default:
-      return undefined;
   }
 }
 

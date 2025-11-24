@@ -25,7 +25,10 @@ function getCustomerLabelProps(status: ApplicationSectionStatusChoice): StatusPr
       return { type: "success", icon: <IconCheck /> };
     case ApplicationSectionStatusChoice.Rejected:
       return { type: "error", icon: <IconCross /> };
-    default:
+    case ApplicationSectionStatusChoice.InAllocation:
+    case ApplicationSectionStatusChoice.Unallocated:
+    case undefined:
+    case null:
       return { type: "info", icon: <IconQuestionCircleFill /> };
   }
 }

@@ -51,7 +51,7 @@ function getFormatLocaleObject(locale?: LocalizationLanguages): { locale: Locale
     case "en":
       return { locale: enGB, weekStartsOn: 1 };
     case "fi":
-    default:
+    case undefined:
       return { locale: fi, weekStartsOn: 1 };
   }
 }

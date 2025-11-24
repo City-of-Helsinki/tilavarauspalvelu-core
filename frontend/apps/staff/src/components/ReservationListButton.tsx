@@ -57,7 +57,5 @@ export function ReservationListButton({
           {t("reservation:SeriesView.changeTime")}
         </Button>
       );
-    default:
-      return null;
   }
 }
