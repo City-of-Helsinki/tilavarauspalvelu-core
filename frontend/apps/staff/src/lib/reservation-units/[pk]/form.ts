@@ -162,17 +162,19 @@ function validatePricing(data: PricingFormValues | undefined, ctx: z.RefinementC
     }
 
     if (data.hasMaterialPrice) {
-      (["materialPriceDescriptionFi", "materialPriceDescriptionSv", "materialPriceDescriptionEn"] as const).forEach(
-        (fieldName) => {
-          if (stripHtml(data[fieldName]).length === 0) {
-            ctx.addIssue({
-              message: "Required",
-              path: [`${path}.${fieldName}`],
-              code: "custom",
-            });
-          }
+      for (const fieldName of [
+        "materialPriceDescriptionFi",
+        "materialPriceDescriptionSv",
+        "materialPriceDescriptionEn",
+      ] as const) {
+        if (stripHtml(data[fieldName]).length === 0) {
+          ctx.addIssue({
+            message: "Required",
+            path: [`${path}.${fieldName}`],
+            code: "custom",
+          });
         }
-      );
+      }
     }
   }
 }
@@ -216,7 +218,8 @@ export type AccessTypesFormType = z.infer<typeof AccessTypesFormSchema>;
 function validateAccessTypes(accessTypes: AccessTypesFormType[], ctx: z.RefinementCtx): void {
   const seenDates: string[] = [];
 
-  accessTypes.forEach((at, index) => {
+  for (const at of accessTypes) {
+    const index = accessTypes.indexOf(at);
     if (parseUIDate(at.beginDate) == null) {
       ctx.addIssue({
         code: "custom",
@@ -233,27 +236,29 @@ function validateAccessTypes(accessTypes: AccessTypesFormType[], ctx: z.Refineme
       });
     }
     seenDates.push(at.beginDate);
-  });
+  }
 }
 
 function validateSeasonalTimes(data: SeasonalFormType[], ctx: z.RefinementCtx): void {
-  data.forEach((season, index) => {
+  for (const season of data) {
+    const index = data.indexOf(season);
     // closed don't need validation (time is not saved)
     if (season.closed) {
-      return;
+      continue;
     }
     // pass empties and "" because they are never sent
     let lastEnd: number | null = null;
-    season.reservableTimes.forEach((reservableTime, i) => {
+    for (const reservableTime of season.reservableTimes) {
+      const i = season.reservableTimes.indexOf(reservableTime);
       if (reservableTime == null) {
-        return;
+        continue;
       }
       // check both begin and end
       if (reservableTime.begin == null && reservableTime.end == null) {
-        return;
+        continue;
       }
       if (reservableTime.begin === "" && reservableTime.end === "") {
-        return;
+        continue;
       }
       const path = `seasons[${index}].reservableTimes[${i}]`;
       checkTimeStringFormat(reservableTime?.begin, ctx, `${path}.begin`, "time");
@@ -318,8 +323,8 @@ function validateSeasonalTimes(data: SeasonalFormType[], ctx: z.RefinementCtx): 
       }
 
       lastEnd = endTimeMinutes;
-    });
-  });
+    }
+  }
 }
 
 function validateDateTimeInterval({
@@ -720,7 +725,7 @@ export const ReservationUnitEditSchema = z
         path: ["nameSv"],
       });
     }
-    (["descriptionFi", "descriptionSv", "descriptionEn"] as const).forEach((fieldName) => {
+    for (const fieldName of ["descriptionFi", "descriptionSv", "descriptionEn"] as const) {
       const stripped = stripHtml(v[fieldName]);
       if (stripped.length === 0) {
         ctx.addIssue({
@@ -729,7 +734,7 @@ export const ReservationUnitEditSchema = z
           message: "Message cannot be shorter than 1 characters",
         });
       }
-    });
+    }
 
     if (v.maxPersons && v.minPersons && v.maxPersons < v.minPersons) {
       ctx.addIssue({

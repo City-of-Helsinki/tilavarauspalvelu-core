@@ -40,7 +40,12 @@
     "eslint/func-names": "error",
     "eslint/id-length": "off",
     "eslint/max-classes-per-file": "error",
-    "eslint/max-depth": "error",
+    "eslint/max-depth": [
+      "error",
+      {
+        "max": 5
+      }
+    ],
     "eslint/max-lines": "off",
     "eslint/max-lines-per-function": "off",
     "eslint/max-nested-callbacks": "error",
@@ -391,7 +396,9 @@
     "unicorn/no-abusive-eslint-disable": "error",
     "unicorn/no-accessor-recursion": "error",
     "unicorn/no-anonymous-default-export": "error",
+    "unicorn/no-array-for-each": "error",
     "unicorn/no-array-method-this-argument": "error",
+    "unicorn/no-array-reduce": "off",
     "unicorn/no-await-expression-member": "off",
     "unicorn/no-await-in-promise-methods": "error",
     "unicorn/no-console-spaces": "error",
