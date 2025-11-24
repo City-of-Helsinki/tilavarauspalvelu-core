@@ -1,16 +1,13 @@
 import React, { useState } from "react";
-import { gql, type FetchResult } from "@apollo/client";
+import { gql } from "@apollo/client";
+import type { FetchResult } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, TextArea } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { ButtonContainer } from "ui/src/styled";
-import {
-  useUpdateApplicationWorkingMemoMutation,
-  useUpdateReservationWorkingMemoMutation,
-  type UpdateReservationWorkingMemoMutation,
-  type UpdateApplicationWorkingMemoMutation,
-} from "@gql/gql-types";
+import { useUpdateApplicationWorkingMemoMutation, useUpdateReservationWorkingMemoMutation } from "@gql/gql-types";
+import type { UpdateReservationWorkingMemoMutation, UpdateApplicationWorkingMemoMutation } from "@gql/gql-types";
 
 function WorkingMemo({
   initialValue,

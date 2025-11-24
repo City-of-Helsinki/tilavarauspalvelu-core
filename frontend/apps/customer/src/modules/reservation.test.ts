@@ -3,14 +3,12 @@ import type { TFunction } from "i18next";
 import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
-import {
-  ReservationStateChoice,
-  ReservationStartInterval,
-  OrderStatus,
-  type ReservationOrderStatusFragment,
-  type CanUserCancelReservationFragment,
-  type PaymentOrderNode,
-  type CanReservationBeChangedFragment,
+import { ReservationStateChoice, ReservationStartInterval, OrderStatus } from "@gql/gql-types";
+import type {
+  ReservationOrderStatusFragment,
+  CanUserCancelReservationFragment,
+  PaymentOrderNode,
+  CanReservationBeChangedFragment,
 } from "@gql/gql-types";
 import { isSlotWithinReservationTime } from "./reservable";
 import {
@@ -19,8 +17,8 @@ import {
   getDurationOptions,
   getNormalizedReservationOrderStatus,
   isReservationEditable,
-  type CanReservationBeChangedProps,
 } from "./reservation";
+import type { CanReservationBeChangedProps } from "./reservation";
 
 function createMockCancellationRule({
   canBeCancelledTimeBefore = 0,

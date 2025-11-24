@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
-import { type ApolloQueryResult, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import {
   ApprovalButtons,
   ApprovalButtonsRecurring,
@@ -37,12 +38,12 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
 import {
   ReserveeType,
-  type ReservationPageQuery,
   ReservationStateChoice,
   UserPermissionChoice,
   ReservationPageDocument,
   useReservationPageLazyQuery,
 } from "@gql/gql-types";
+import type { ReservationPageQuery } from "@gql/gql-types";
 
 type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 

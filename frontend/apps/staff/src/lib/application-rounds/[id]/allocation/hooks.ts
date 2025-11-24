@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ApolloError, gql, type ApolloQueryResult } from "@apollo/client";
+import { ApolloError, gql } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import { errorToast, successToast } from "ui/src/components/toast";
@@ -7,19 +8,15 @@ import { useDisplayError } from "ui/src/hooks";
 import { numberToDayT } from "ui/src/modules/conversion";
 import { toNumber } from "ui/src/modules/helpers";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import {
-  type AllocatedTimeSlotCreateMutationInput,
-  useCreateAllocatedTimeSlotMutation,
-  useDeleteAllocatedTimeSlotMutation,
-  type ApplicationSectionAllocationsQuery,
-} from "@gql/gql-types";
-import { type TimeSlotRange, useSelectedSlots } from "./SelectedSlotsContext";
-import {
-  type AllocatedTimeSlotNodeT,
-  decodeTimeSlot,
-  type SectionNodeT,
-  type SuitableTimeRangeNodeT,
-  timeSlotKeyToScheduleTime,
+import { useCreateAllocatedTimeSlotMutation, useDeleteAllocatedTimeSlotMutation } from "@gql/gql-types";
+import type { AllocatedTimeSlotCreateMutationInput, ApplicationSectionAllocationsQuery } from "@gql/gql-types";
+import { useSelectedSlots } from "./SelectedSlotsContext";
+import type { TimeSlotRange } from "./SelectedSlotsContext";
+import { decodeTimeSlot, timeSlotKeyToScheduleTime } from "./modules/applicationRoundAllocation";
+import type {
+  AllocatedTimeSlotNodeT,
+  SectionNodeT,
+  SuitableTimeRangeNodeT,
 } from "./modules/applicationRoundAllocation";
 
 export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT) => void] {

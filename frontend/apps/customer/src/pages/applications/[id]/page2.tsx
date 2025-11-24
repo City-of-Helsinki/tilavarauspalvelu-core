@@ -10,20 +10,16 @@ import { useDisplayError } from "ui/src/hooks";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { ApplicationFunnelWrapper, Page2 as Page2Impl } from "@/components/application/funnel";
 import {
-  type ApplicationPage2FormValues,
   transformApplicationPage2,
   convertApplicationPage2,
   ApplicationPage2Schema,
 } from "@/components/application/funnel/form";
+import type { ApplicationPage2FormValues } from "@/components/application/funnel/form";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
-import {
-  ApplicationPage2Document,
-  useUpdateApplicationMutation,
-  type ApplicationPage2Query,
-  type ApplicationPage2QueryVariables,
-} from "@gql/gql-types";
+import { ApplicationPage2Document, useUpdateApplicationMutation } from "@gql/gql-types";
+import type { ApplicationPage2Query, ApplicationPage2QueryVariables } from "@gql/gql-types";
 
 function Page2({ application }: Pick<PropsNarrowed, "application">): JSX.Element {
   const router = useRouter();

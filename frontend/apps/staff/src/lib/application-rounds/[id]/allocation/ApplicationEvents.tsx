@@ -6,21 +6,19 @@ import { breakpoints } from "ui/src/modules/const";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { Flex, H4, fontMedium } from "ui/src/styled";
 import { Accordion } from "@/components/Accordion";
-import {
-  type ApplicationRoundStatusChoice,
-  ApplicationSectionStatusChoice,
-  type ApplicationSectionAllocationsQuery,
-  type ReservationUnitNode,
+import { ApplicationSectionStatusChoice } from "@gql/gql-types";
+import type {
+  ApplicationRoundStatusChoice,
+  ApplicationSectionAllocationsQuery,
+  ReservationUnitNode,
 } from "@gql/gql-types";
 import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";
-import { type AllocationApplicationSectionCardType, ApplicationSectionCard } from "./ApplicationEventCard";
+import { ApplicationSectionCard } from "./ApplicationEventCard";
+import type { AllocationApplicationSectionCardType } from "./ApplicationEventCard";
 import { SelectedSlotsContextProvider } from "./SelectedSlotsContext";
-import {
-  type AllocatedTimeSlotNodeT,
-  getRelatedTimeSlots,
-  type SectionNodeT,
-} from "./modules/applicationRoundAllocation";
+import { getRelatedTimeSlots } from "./modules/applicationRoundAllocation";
+import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
 
 // TODO max-width for the grid columns (315px, 480px, 332px)
 // TODO not perfect (aligment issues with the last columns and grid end),

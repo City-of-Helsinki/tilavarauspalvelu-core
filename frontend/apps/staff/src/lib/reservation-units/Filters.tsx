@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { ShowAllContainer } from "ui/src/components";
 import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
@@ -15,7 +16,8 @@ import {
 import { SearchTags } from "@/components/SearchTags";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { type TagOptionsList, translateTag } from "@/modules/search";
+import { translateTag } from "@/modules/search";
+import type { TagOptionsList } from "@/modules/search";
 import { ReservationUnitPublishingState } from "@gql/gql-types";
 
 const MoreWrapper = styled(ShowAllContainer)`

@@ -4,7 +4,8 @@ import userEvent from "@testing-library/user-event";
 import { vi, describe, test, expect } from "vitest";
 import { createNodeId } from "ui/src/modules/helpers";
 import { getReservationUnitPath } from "@/modules/urls";
-import { AccessType, type RecurringCardFragment } from "@gql/gql-types";
+import { AccessType } from "@gql/gql-types";
+import type { RecurringCardFragment } from "@gql/gql-types";
 import { RecurringCard } from "./RecurringCard";
 
 describe("RecurringCard", () => {

@@ -11,7 +11,8 @@ import { capitalize, getImageSource, getLocalizationLang, getTranslation, getMai
 import { getNormalizedReservationOrderStatus, getPaymentUrl, isReservationCancellable } from "@/modules/reservation";
 import { getPrice } from "@/modules/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
-import { type ReservationCardFragment, ReservationStateChoice } from "@gql/gql-types";
+import { ReservationStateChoice } from "@gql/gql-types";
+import type { ReservationCardFragment } from "@gql/gql-types";
 
 type CardType = "upcoming" | "past" | "cancelled";
 

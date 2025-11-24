@@ -19,12 +19,8 @@ import { ViewApplication } from "@/components/application/view/ViewApplication";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
 import { applicationsPrefix } from "@/modules/urls";
-import {
-  ApplicationStatusChoice,
-  ApplicationViewDocument,
-  type ApplicationViewQueryVariables,
-  type ApplicationViewQuery,
-} from "@gql/gql-types";
+import { ApplicationStatusChoice, ApplicationViewDocument } from "@gql/gql-types";
+import type { ApplicationViewQueryVariables, ApplicationViewQuery } from "@gql/gql-types";
 
 const TabPanel = styled(Tabs.TabPanel)`
   && {

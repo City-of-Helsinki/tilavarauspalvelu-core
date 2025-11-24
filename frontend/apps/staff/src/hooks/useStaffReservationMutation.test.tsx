@@ -6,7 +6,8 @@ import { vi, describe, test, expect, beforeEach } from "vitest";
 import { createNodeId } from "ui/src/modules/helpers";
 import type { UseStaffReservationFragment } from "@gql/gql-types";
 import { MUTATION_DATA, createMocks } from "./__test__/mocks";
-import { type MutationInputParams, useStaffReservationMutation } from "./useStaffReservationMutation";
+import { useStaffReservationMutation } from "./useStaffReservationMutation";
+import type { MutationInputParams } from "./useStaffReservationMutation";
 
 export function createMockReservation({ pk }: { pk: number }): UseStaffReservationFragment {
   return {

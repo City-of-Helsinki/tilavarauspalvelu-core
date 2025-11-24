@@ -9,11 +9,7 @@ import { ReservationTimePicker } from "@/components/reservation";
 import type { ReservationTimePickerProps } from "@/components/reservation/ReservationTimePicker";
 import { useReservableTimes } from "@/hooks";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import type {
-  ReservationQuotaReachedFragment,
-  ReservationUnitNode,
-  ReservationUnitPageQuery,
-} from "@gql/gql-types";
+import type { ReservationQuotaReachedFragment, ReservationUnitNode, ReservationUnitPageQuery } from "@gql/gql-types";
 
 type ReservationUnitT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 

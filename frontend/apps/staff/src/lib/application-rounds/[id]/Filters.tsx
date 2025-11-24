@@ -12,7 +12,8 @@ import { SearchTags } from "@/components/SearchTags";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
-import { type TagOptionsList, translateTag } from "@/modules/search";
+import { translateTag } from "@/modules/search";
+import type { TagOptionsList } from "@/modules/search";
 import { AccessCodeState, ApplicationSectionStatusChoice, ApplicationStatusChoice, ReserveeType } from "@gql/gql-types";
 
 interface FilterProps {

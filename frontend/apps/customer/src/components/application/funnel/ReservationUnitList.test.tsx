@@ -1,7 +1,9 @@
-import { type SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import type { SubmitHandler } from "react-hook-form";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { createMockReservationUnit } from "@test/reservation-unit.mocks";
-import { type CreateGraphQLMockProps, generateNameFragment } from "@test/test.gql.utils";
+import { generateNameFragment } from "@test/test.gql.utils";
+import type { CreateGraphQLMockProps } from "@test/test.gql.utils";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

@@ -4,13 +4,8 @@ import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
 import { combineAffectingReservations } from "@/modules/helpers";
 import type { CalendarEventType } from "@/modules/reservation";
-import {
-  type CalendarReservationFragment,
-  type Maybe,
-  ReservationStateChoice,
-  ReservationTypeChoice,
-  useReservationsByReservationUnitQuery,
-} from "@gql/gql-types";
+import { ReservationStateChoice, ReservationTypeChoice, useReservationsByReservationUnitQuery } from "@gql/gql-types";
+import type { CalendarReservationFragment, Maybe } from "@gql/gql-types";
 
 // TODO there is an issue here with denied "Blocked" reservations shown in the Calendar as regular "Blocked" reservations
 // so it looks confusing. It works properly if we want to show the reservation itself even if it's denied, but there should

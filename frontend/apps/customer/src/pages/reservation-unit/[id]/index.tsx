@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useForm, type UseFormReturn } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addYears } from "date-fns";
@@ -14,7 +15,8 @@ import { TimeZoneNotification } from "ui/src/components/TimeZoneNotification";
 import { errorToast } from "ui/src/components/toast";
 import { useDisplayError, useToastIfQueryParam } from "ui/src/hooks";
 import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
-import { type ApiError, getApiErrors } from "ui/src/modules/apolloUtils";
+import { getApiErrors } from "ui/src/modules/apolloUtils";
+import type { ApiError } from "ui/src/modules/apolloUtils";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "ui/src/modules/date-utils";
 import {
@@ -47,14 +49,11 @@ import { isReservationQuotaReached } from "@/lib/reservation-unit/[id]/Reservati
 import { createApolloClient } from "@/modules/apolloClient";
 import { getPostLoginUrl } from "@/modules/helpers";
 import { clampDuration, getMaxReservationDuration, getMinReservationDuration } from "@/modules/reservable";
-import {
-  convertFormToFocustimeSlot,
-  createDateTime,
-  type FocusTimeSlot,
-  getDurationOptions,
-} from "@/modules/reservation";
+import { convertFormToFocustimeSlot, createDateTime, getDurationOptions } from "@/modules/reservation";
+import type { FocusTimeSlot } from "@/modules/reservation";
 import { getActivePricing, isReservationUnitPublished, isReservationUnitReservable } from "@/modules/reservationUnit";
-import { PendingReservationFormSchema, type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import { PendingReservationFormSchema } from "@/modules/schemas/reservationUnit";
+import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { JustForDesktop } from "@/modules/style/layout";
 import { getReservationInProgressPath, getSingleSearchPath } from "@/modules/urls";
@@ -62,14 +61,16 @@ import { ReservationUnitPageWrapper } from "@/styled/reservation";
 import { SubmitButton } from "@/styled/utils";
 import {
   CreateReservationDocument,
-  type CreateReservationMutation,
-  type CreateReservationMutationVariables,
-  type ReservationCreateMutationInput,
   ReservationUnitPageDocument,
-  type ReservationUnitPageQuery,
-  type ReservationUnitPageQueryVariables,
   useCreateReservationMutation,
   useReservationQuotaReachedQuery,
+} from "@gql/gql-types";
+import type {
+  CreateReservationMutation,
+  CreateReservationMutationVariables,
+  ReservationCreateMutationInput,
+  ReservationUnitPageQuery,
+  ReservationUnitPageQueryVariables,
 } from "@gql/gql-types";
 
 function SubmitFragment({

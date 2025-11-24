@@ -6,24 +6,27 @@ import { formatTime, parseUIDate, isValidDate, timeToMinutes, formatDate } from 
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import {
-  type ReservationNode,
   ReservationStartInterval,
-  type Maybe,
-  type ListReservationsQuery,
-  type IsReservableFieldsFragment,
   ReservationStateChoice,
-  type ReservationUnitNode,
   OrderStatus,
-  type ReservationOrderStatusFragment,
-  type CancellationRuleFieldsFragment,
-  type BlockingReservationFieldsFragment,
-  type CanUserCancelReservationFragment,
-  type CanReservationBeChangedFragment,
-  type PaymentOrderNode,
   ReservationCancelReasonChoice,
-  type ReservationPaymentUrlFragment,
 } from "@gql/gql-types";
-import { type ReservableMap, type RoundPeriod, isRangeReservable } from "./reservable";
+import type {
+  ReservationNode,
+  Maybe,
+  ListReservationsQuery,
+  IsReservableFieldsFragment,
+  ReservationUnitNode,
+  ReservationOrderStatusFragment,
+  CancellationRuleFieldsFragment,
+  BlockingReservationFieldsFragment,
+  CanUserCancelReservationFragment,
+  CanReservationBeChangedFragment,
+  PaymentOrderNode,
+  ReservationPaymentUrlFragment,
+} from "@gql/gql-types";
+import { isRangeReservable } from "./reservable";
+import type { ReservableMap, RoundPeriod } from "./reservable";
 
 // TimeSlots change the Calendar view. How many intervals are shown i.e. every half an hour, every hour
 // we use every hour only => 2

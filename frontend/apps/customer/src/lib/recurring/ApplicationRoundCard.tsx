@@ -2,14 +2,16 @@ import React from "react";
 import { gql } from "@apollo/client";
 import { isValid } from "date-fns";
 import { IconArrowRight, IconLinkExternal } from "hds-react";
-import { type TFunction, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { Card } from "ui/src/components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { formatDateTime, formatDate } from "ui/src/modules/date-utils";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { getApplicationRoundPath } from "@/modules/urls";
-import { type ApplicationRoundCardFragment, ApplicationRoundStatusChoice } from "@gql/gql-types";
+import { ApplicationRoundStatusChoice } from "@gql/gql-types";
+import type { ApplicationRoundCardFragment } from "@gql/gql-types";
 
 interface CardProps {
   applicationRound: ApplicationRoundCardFragment;

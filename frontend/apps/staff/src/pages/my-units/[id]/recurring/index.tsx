@@ -12,12 +12,8 @@ import { LinkPrev } from "@/components/LinkPrev";
 import { createClient } from "@/modules/apolloClient";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import {
-  SeriesReservationUnitDocument,
-  UserPermissionChoice,
-  type SeriesReservationUnitQuery,
-  type SeriesReservationUnitQueryVariables,
-} from "@gql/gql-types";
+import { SeriesReservationUnitDocument, UserPermissionChoice } from "@gql/gql-types";
+import type { SeriesReservationUnitQuery, SeriesReservationUnitQueryVariables } from "@gql/gql-types";
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;

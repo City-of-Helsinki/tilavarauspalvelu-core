@@ -17,7 +17,8 @@ import { H3 } from "ui/src/styled";
 import { Carousel } from "@/components/Carousel";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
-import { type Maybe, useRelatedReservationUnitsQuery, type RelatedUnitCardFieldsFragment } from "@gql/gql-types";
+import { useRelatedReservationUnitsQuery } from "@gql/gql-types";
+import type { Maybe, RelatedUnitCardFieldsFragment } from "@gql/gql-types";
 
 type RelatedUnitsProps = {
   thisReservationUnitPk: Maybe<number>;

@@ -11,11 +11,8 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { isReservationCancellable } from "@/modules/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
-import {
-  ReservationCancelPageDocument,
-  type ReservationCancelPageQuery,
-  type ReservationCancelPageQueryVariables,
-} from "@gql/gql-types";
+import { ReservationCancelPageDocument } from "@gql/gql-types";
+import type { ReservationCancelPageQuery, ReservationCancelPageQueryVariables } from "@gql/gql-types";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { gql, useApolloClient } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
-import { type TFunction, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { BannerNotificationStatusLabel } from "ui/src/components/statuses";
 import { formatDate, formatTime } from "ui/src/modules/date-utils";
@@ -18,12 +19,14 @@ import { getNotificationListUrl, getNotificationUrl } from "@/modules/urls";
 import { TableLink } from "@/styled";
 import {
   BannerNotificationOrderingChoices,
-  type BannerNotificationTableElementFragment,
   UserPermissionChoice,
   BannerNotificationsListDocument,
-  type BannerNotificationsListQueryVariables,
-  type BannerNotificationsListQuery,
   useBannerNotificationsListQuery,
+} from "@gql/gql-types";
+import type {
+  BannerNotificationTableElementFragment,
+  BannerNotificationsListQueryVariables,
+  BannerNotificationsListQuery,
 } from "@gql/gql-types";
 
 // Tila, Nimi, Voimassa alk, Voimassa asti, Kohderyhmä, Tyyppi

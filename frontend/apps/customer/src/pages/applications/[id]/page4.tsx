@@ -17,12 +17,8 @@ import { ViewApplication } from "@/components/application/view";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
-import {
-  ApplicationPage4Document,
-  type ApplicationPage4Query,
-  type ApplicationPage4QueryVariables,
-  useSendApplicationMutation,
-} from "@gql/gql-types";
+import { ApplicationPage4Document, useSendApplicationMutation } from "@gql/gql-types";
+import type { ApplicationPage4Query, ApplicationPage4QueryVariables } from "@gql/gql-types";
 
 // User has to accept the terms of service then on submit we change the application status
 // This uses separate Send mutation (not update) so no onNext like the other pages

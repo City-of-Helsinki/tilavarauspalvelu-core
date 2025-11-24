@@ -3,13 +3,8 @@ import type { OptionInProps } from "hds-react";
 import type { TFunction } from "i18next";
 import sanitizeHtml from "sanitize-html";
 import { minutesToHoursString, timeToMinutes } from "@ui/modules/date-utils";
-import {
-  type ImageFragment,
-  type Maybe,
-  type PricingFieldsFragment,
-  ReservationUnitImageType,
-  type SuitableTimeFragment,
-} from "../../gql/gql-types";
+import { ReservationUnitImageType } from "../../gql/gql-types";
+import type { ImageFragment, Maybe, PricingFieldsFragment, SuitableTimeFragment } from "../../gql/gql-types";
 import { pixel } from "./const";
 import { convertWeekday } from "./conversion";
 import type { LocalizationLanguages } from "./urlBuilder";

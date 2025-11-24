@@ -1,4 +1,5 @@
-import React, { type HTMLAttributes } from "react";
+import React from "react";
+import type { HTMLAttributes } from "react";
 import { Control, useController } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import dynamic from "next/dynamic";

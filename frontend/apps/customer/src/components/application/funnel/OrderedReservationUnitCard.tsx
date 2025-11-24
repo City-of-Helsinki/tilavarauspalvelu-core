@@ -1,4 +1,5 @@
-import React, { type HTMLAttributes } from "react";
+import React from "react";
+import type { HTMLAttributes } from "react";
 import { gql } from "@apollo/client";
 import { IconArrowDown, IconArrowUp, ButtonSize, ButtonVariant, Button, ButtonPresetTheme } from "hds-react";
 import { useTranslation } from "next-i18next";

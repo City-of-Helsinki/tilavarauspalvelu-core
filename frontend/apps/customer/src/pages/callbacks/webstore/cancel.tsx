@@ -11,12 +11,8 @@ import { CancelledLinkSet } from "@/lib/reservation/[id]/cancel";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
-import {
-  DeleteReservationDocument,
-  type DeleteReservationMutation,
-  type DeleteReservationMutationVariables,
-  ReservationStateChoice,
-} from "@gql/gql-types";
+import { DeleteReservationDocument, ReservationStateChoice } from "@gql/gql-types";
+import type { DeleteReservationMutation, DeleteReservationMutationVariables } from "@gql/gql-types";
 
 // This is the callback page from webstore if user cancels the order
 // TODO this would be nicer if we could use a reservation/[id]/cancelled page (or reservation/[id])

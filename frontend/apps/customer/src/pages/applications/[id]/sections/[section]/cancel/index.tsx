@@ -22,18 +22,15 @@ import {
 } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
-import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";
+import { CancellationForm } from "@/components/CancellationForm";
+import type { CancelFormValues } from "@/components/CancellationForm";
 import { createApolloClient } from "@/modules/apolloClient";
 import { isReservationCancellable } from "@/modules/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
 import { ReservationPageWrapper } from "@/styled/reservation";
-import {
-  ApplicationSectionCancelDocument,
-  useCancelApplicationSectionMutation,
-  type ApplicationSectionCancelQuery,
-  type ApplicationSectionCancelQueryVariables,
-} from "@gql/gql-types";
+import { ApplicationSectionCancelDocument, useCancelApplicationSectionMutation } from "@gql/gql-types";
+import type { ApplicationSectionCancelQuery, ApplicationSectionCancelQueryVariables } from "@gql/gql-types";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 

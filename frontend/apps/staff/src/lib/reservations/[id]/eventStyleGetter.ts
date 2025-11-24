@@ -10,11 +10,8 @@ import {
   WAITING_PAYMENT,
 } from "@/modules/calendarStyling";
 import type { CalendarEventType, EventType } from "@/modules/reservation";
-import {
-  type EventStyleReservationFieldsFragment,
-  ReservationStateChoice,
-  ReservationTypeChoice,
-} from "@gql/gql-types";
+import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
+import type { EventStyleReservationFieldsFragment } from "@gql/gql-types";
 
 const SELECTED = {
   style: {

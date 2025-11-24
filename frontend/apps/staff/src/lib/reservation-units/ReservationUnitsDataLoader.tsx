@@ -1,4 +1,5 @@
-import React, { type Dispatch, type SetStateAction, useState } from "react";
+import React, { useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import { errorToast } from "ui/src/components/toast";

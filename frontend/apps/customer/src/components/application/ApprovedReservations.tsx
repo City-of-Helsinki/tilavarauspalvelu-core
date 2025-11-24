@@ -27,7 +27,8 @@ import { IconButton } from "ui/src/components";
 import { ButtonLikeExternalLink, ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { PopupMenu } from "ui/src/components/PopupMenu";
 import { Sanitize } from "ui/src/components/Sanitize";
-import { StatusLabel, type StatusLabelType } from "ui/src/components/StatusLabel";
+import { StatusLabel } from "ui/src/components/StatusLabel";
+import type { StatusLabelType } from "ui/src/components/StatusLabel";
 import { breakpoints } from "ui/src/modules/const";
 import { convertWeekday } from "ui/src/modules/conversion";
 import {
@@ -61,11 +62,9 @@ import { isReservationCancellableReason, ReservationCancellableReason } from "@/
 import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 import { getApplicationReservationPath, getApplicationSectionPath, getReservationUnitPath } from "@/modules/urls";
 import {
-  type ApplicationSectionReservationFragment,
   useApplicationReservationsQuery,
   ReservationStateChoice,
   AccessType,
-  type ApplicationNode,
   ApplicationSectionReservationUnitFragment,
   AccessTypeWithMultivalued,
   PindoraSectionFragment,
@@ -74,6 +73,7 @@ import {
   Maybe,
   ApplicationRoundNode,
 } from "@gql/gql-types";
+import type { ApplicationSectionReservationFragment, ApplicationNode } from "@gql/gql-types";
 
 const N_RESERVATIONS_TO_SHOW = 20;
 

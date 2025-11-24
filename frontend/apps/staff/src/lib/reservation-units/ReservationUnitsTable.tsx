@@ -1,7 +1,9 @@
-import React, { type Dispatch, type SetStateAction } from "react";
+import React from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { gql } from "@apollo/client";
 import { IconInfoCircle, IconLinkExternal, IconSize } from "hds-react";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import styled from "styled-components";
 import { ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
 import {

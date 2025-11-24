@@ -3,7 +3,8 @@ import { DayT, WEEKDAYS, WEEKDAYS_SORTED } from "ui/src/modules/const";
 import { convertWeekday, transformWeekday } from "ui/src/modules/conversion";
 import { timeToMinutes } from "ui/src/modules/date-utils";
 import { filterNonNullable, formatTimeStruct } from "ui/src/modules/helpers";
-import { type ApplicationRoundTimeSlotNode, Priority, SuitableTimeFragment, Weekday } from "@gql/gql-types";
+import { Priority, SuitableTimeFragment, Weekday } from "@gql/gql-types";
+import type { ApplicationRoundTimeSlotNode } from "@gql/gql-types";
 import type { SuitableTimeRangeFormValues } from "./form";
 
 export type DailyOpeningHours = Readonly<

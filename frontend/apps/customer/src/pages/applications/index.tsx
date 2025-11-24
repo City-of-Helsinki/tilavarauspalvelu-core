@@ -13,14 +13,12 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   ApplicationStatusChoice,
-  type ApplicationsQuery,
   useApplicationsLazyQuery,
   ApplicationsDocument,
-  type ApplicationsQueryVariables,
   CurrentUserDocument,
-  type CurrentUserQuery,
   ApplicationOrderingChoices,
 } from "@gql/gql-types";
+import type { ApplicationsQuery, ApplicationsQueryVariables, CurrentUserQuery } from "@gql/gql-types";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

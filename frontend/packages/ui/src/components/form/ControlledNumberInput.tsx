@@ -1,6 +1,7 @@
 // Wrapper around NumberInput so it sends nulls instead of NaNs
 import React from "react";
-import { type FieldValues, useController, UseControllerProps } from "react-hook-form";
+import { useController, UseControllerProps } from "react-hook-form";
+import type { FieldValues } from "react-hook-form";
 import { NumberInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { filterEmpty, toNumber } from "../../modules/helpers";

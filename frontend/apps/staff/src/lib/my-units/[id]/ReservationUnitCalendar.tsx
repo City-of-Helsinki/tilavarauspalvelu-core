@@ -2,10 +2,12 @@ import React from "react";
 import { gql } from "@apollo/client";
 import { addDays, addHours, addMinutes, endOfISOWeek, startOfDay, startOfISOWeek } from "date-fns";
 import { get } from "lodash-es";
-import { type TFunction, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import styled from "styled-components";
 import { ReservableTimeSpanType } from "ui/gql/gql-types";
-import { Calendar as CommonCalendar, type SlotProps } from "ui/src/components/calendar/Calendar";
+import { Calendar as CommonCalendar } from "ui/src/components/calendar/Calendar";
+import type { SlotProps } from "ui/src/components/calendar/Calendar";
 import { errorToast } from "ui/src/components/toast";
 import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { formatApiDate } from "ui/src/modules/date-utils";
@@ -22,12 +24,8 @@ import { EVENT_BUFFER, HDS_CLOCK_ICON_SVG, NOT_RESERVABLE } from "@/modules/cale
 import { combineAffectingReservations, getReserveeName } from "@/modules/helpers";
 import { hasPermission } from "@/modules/permissionHelper";
 import { getReservationUrl } from "@/modules/urls";
-import {
-  ReservationTypeChoice,
-  type ReservationUnitCalendarQuery,
-  useReservationUnitCalendarQuery,
-  UserPermissionChoice,
-} from "@gql/gql-types";
+import { ReservationTypeChoice, useReservationUnitCalendarQuery, UserPermissionChoice } from "@gql/gql-types";
+import type { ReservationUnitCalendarQuery } from "@gql/gql-types";
 import { eventStyleGetter, legend } from "./eventStyleGetter";
 
 type Props = {

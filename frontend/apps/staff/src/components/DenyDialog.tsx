@@ -11,14 +11,16 @@ import { CenterSpinner, Flex } from "ui/src/styled";
 import { useModal } from "@/context/ModalContext";
 import { useDenyReasonOptions } from "@/hooks";
 import {
-  type ReservationDenyMutationInput,
-  type ReservationRefundMutationInput,
   useDenyReservationMutation,
   useRefundReservationMutation,
-  type ReservationSeriesDenyMutationInput,
   useDenyReservationSeriesMutation,
   OrderStatus,
-  type DenyDialogFieldsFragment,
+} from "@gql/gql-types";
+import type {
+  ReservationDenyMutationInput,
+  ReservationRefundMutationInput,
+  ReservationSeriesDenyMutationInput,
+  DenyDialogFieldsFragment,
 } from "@gql/gql-types";
 
 const ActionButtons = styled(Dialog.ActionButtons)`

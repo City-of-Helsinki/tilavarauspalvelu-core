@@ -3,13 +3,11 @@ import type { TFunction } from "i18next";
 import { describe, expect, test } from "vitest";
 import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
-import {
-  type CreateTagStringFragment,
-  PaymentType,
-  PriceUnit,
-  type PricingFieldsFragment,
-  type ReservationUnitPricingFieldsFragment,
-  Weekday,
+import { PaymentType, PriceUnit, Weekday } from "@gql/gql-types";
+import type {
+  CreateTagStringFragment,
+  PricingFieldsFragment,
+  ReservationUnitPricingFieldsFragment,
 } from "@gql/gql-types";
 import { createTagString, getReservationUnitPricing } from "./reservation";
 

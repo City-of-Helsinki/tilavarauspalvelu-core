@@ -1,10 +1,12 @@
 import React, { useMemo } from "react";
-import { type SubmitHandler, useController, type UseFormReturn } from "react-hook-form";
+import { useController } from "react-hook-form";
+import type { SubmitHandler, UseFormReturn } from "react-hook-form";
 import { Transition } from "react-transition-group";
 import { useMedia } from "react-use";
 import { Button, ButtonVariant, IconAngleDown, IconAngleUp, IconCross, IconSize } from "hds-react";
 import { maxBy } from "lodash-es";
-import { type TFunction, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import styled from "styled-components";
 import { ControlledDateInput } from "ui/src/components/form";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";

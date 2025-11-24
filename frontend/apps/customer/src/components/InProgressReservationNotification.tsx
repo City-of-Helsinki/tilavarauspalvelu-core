@@ -17,7 +17,6 @@ import { useCurrentUser } from "@/hooks";
 import { getCheckoutUrl } from "@/modules/reservation";
 import { getReservationInProgressPath } from "@/modules/urls";
 import {
-  type ReservationNotificationFragment,
   ReservationOrderingChoices,
   ReservationStateChoice,
   ReservationTypeChoice,
@@ -25,6 +24,7 @@ import {
   useListInProgressReservationsQuery,
   useReservationStateLazyQuery,
 } from "@gql/gql-types";
+import type { ReservationNotificationFragment } from "@gql/gql-types";
 
 const BodyText = styled.p`
   margin: 0;

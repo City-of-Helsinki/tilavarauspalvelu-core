@@ -9,12 +9,8 @@ import { formatDateTime, parseValidDateObject } from "@ui/modules/date-utils";
 import { getLocalizationLang } from "@ui/modules/helpers";
 import { Flex, fontMedium } from "@ui/styled";
 import { getPaymentUrl } from "@/modules/reservation";
-import {
-  ReservationCancelReasonChoice,
-  type ReservationPaymentUrlFragment,
-  type ReservationPriceFieldsFragment,
-  ReservationStateChoice,
-} from "@gql/gql-types";
+import { ReservationCancelReasonChoice, ReservationStateChoice } from "@gql/gql-types";
+import type { ReservationPaymentUrlFragment, ReservationPriceFieldsFragment } from "@gql/gql-types";
 
 type PaymentNotificationProps = {
   reservation: ReservationPaymentUrlFragment & Pick<ReservationPriceFieldsFragment, "price">;
@@ -51,7 +47,8 @@ export const PaymentNotification = ({
   const formatters = useMemo(() => getFormatters(i18n.language), [i18n.language]);
   const formatter = formatters["currencyWithDecimals"];
   const price = formatter?.format(Number.parseFloat(reservation.price ?? "") ?? 0);
-  const taxPercentage = formatters.strippedDecimal?.format(Number.parseFloat(appliedPricing?.taxPercentage ?? "")) ?? "0";
+  const taxPercentage =
+    formatters.strippedDecimal?.format(Number.parseFloat(appliedPricing?.taxPercentage ?? "")) ?? "0";
 
   const deadline =
     paymentOrder?.handledPaymentDueBy != null

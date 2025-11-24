@@ -14,7 +14,8 @@ import { SummaryGeneralFields, SummaryReserveeFields } from "@/components/reserv
 import { getCheckoutUrl } from "@/modules/reservation";
 import { getReservationInProgressPath, getReservationPath, getReservationUnitPath } from "@/modules/urls";
 import { ActionContainer, NewReservationForm } from "@/styled/reservation";
-import { type ReservationQuery, ReservationStateChoice, useConfirmReservationMutation } from "@gql/gql-types";
+import { ReservationStateChoice, useConfirmReservationMutation } from "@gql/gql-types";
+import type { ReservationQuery } from "@gql/gql-types";
 
 type NodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {

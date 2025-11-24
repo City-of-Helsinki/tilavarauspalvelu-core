@@ -1,7 +1,8 @@
 import { getCookie } from "typescript-cookie";
 import { z } from "zod";
 import { isBrowser } from "./helpers";
-import { getSignOutUrl, getSignInUrl, type LocalizationLanguages, type UserTypeChoice } from "./urlBuilder";
+import { getSignOutUrl, getSignInUrl } from "./urlBuilder";
+import type { LocalizationLanguages, UserTypeChoice } from "./urlBuilder";
 
 // TODO add wrapper a that blocks importing on nodejs
 

@@ -8,7 +8,8 @@ import { ButtonContainer } from "ui/src/styled";
 import { ApplicationSectionPage1 } from "@/components/application/funnel/ApplicationSectionPage1";
 import { useReservationUnitList } from "@/hooks";
 import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
-import { type ApplicationPage1FormValues, createDefaultPage1Section } from "./form";
+import { createDefaultPage1Section } from "./form";
+import type { ApplicationPage1FormValues } from "./form";
 
 type Page1Props = Readonly<{
   applicationRound: Readonly<ApplicationRoundForApplicationFragment>;

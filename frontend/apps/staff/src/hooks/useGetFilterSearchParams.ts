@@ -1,4 +1,5 @@
-import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import type { DayT } from "ui/src/modules/const";
 import {
   transformAccessCodeState,

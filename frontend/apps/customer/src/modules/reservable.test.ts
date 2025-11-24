@@ -2,19 +2,10 @@ import { createMockIsReservableFieldsFragment, createMockReservableTimes } from 
 import { addDays, addHours, endOfDay, startOfDay, startOfToday } from "date-fns";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { createNodeId, toNumber } from "ui/src/modules/helpers";
-import {
-  type BlockingReservationFieldsFragment,
-  type IsReservableFieldsFragment,
-  ReservationStartInterval,
-  ReservationStateChoice,
-} from "@gql/gql-types";
-import {
-  type ReservableMap,
-  type RoundPeriod,
-  generateReservableMap,
-  isRangeReservable,
-  isStartTimeValid,
-} from "./reservable";
+import { ReservationStartInterval, ReservationStateChoice } from "@gql/gql-types";
+import type { BlockingReservationFieldsFragment, IsReservableFieldsFragment } from "@gql/gql-types";
+import { generateReservableMap, isRangeReservable, isStartTimeValid } from "./reservable";
+import type { ReservableMap, RoundPeriod } from "./reservable";
 
 describe("generateReservableMap", () => {
   beforeEach(() => {

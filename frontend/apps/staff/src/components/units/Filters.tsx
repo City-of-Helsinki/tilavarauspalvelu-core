@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
 import { mapParamToInteger } from "ui/src/modules/helpers";
 import { mapFormToSearchParams } from "ui/src/modules/search";

@@ -43,18 +43,20 @@ import { getRescheduleReservationSeriesSchema, RescheduleReservationSeriesForm }
 import { Element } from "@/styled";
 import {
   ReservationPermissionsDocument,
-  type ReservationPermissionsQuery,
-  type ReservationPermissionsQueryVariables,
   ReservationSeriesDocument,
-  type ReservationSeriesQuery,
-  type ReservationSeriesQueryVariables,
   ReservationSeriesRescheduleMutationInput,
   ReservationStartInterval,
   ReservationTypeChoice,
-  type SeriesPageQuery,
   useRescheduleReservationSeriesMutation,
   UserPermissionChoice,
   useSeriesPageQuery,
+} from "@gql/gql-types";
+import type {
+  ReservationPermissionsQuery,
+  ReservationPermissionsQueryVariables,
+  ReservationSeriesQuery,
+  ReservationSeriesQueryVariables,
+  SeriesPageQuery,
 } from "@gql/gql-types";
 
 type NodeT = NonNullable<SeriesPageQuery["reservation"]>["reservationSeries"];

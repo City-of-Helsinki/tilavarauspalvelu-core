@@ -16,7 +16,8 @@ import { ReservationInfoCard, SummaryGeneralFields, SummaryReserveeFields } from
 import { convertReservationFormToApi } from "@/modules/reservation";
 import { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
-import { type EditPageReservationFragment, useAdjustReservationTimeMutation } from "@gql/gql-types";
+import { useAdjustReservationTimeMutation } from "@gql/gql-types";
+import type { EditPageReservationFragment } from "@gql/gql-types";
 
 type Props = {
   reservation: EditPageReservationFragment;

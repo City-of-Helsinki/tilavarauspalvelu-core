@@ -3,7 +3,8 @@ import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQ
 import { useTranslation } from "next-i18next";
 import { ReservationUnitPublishingState, ReservationUnitReservationState } from "../../../gql/gql-types";
 import { NoWrap } from "../../styled";
-import { StatusLabel, type StatusLabelType } from "../StatusLabel";
+import { StatusLabel } from "../StatusLabel";
+import type { StatusLabelType } from "../StatusLabel";
 
 type StatusPropsType = {
   type: StatusLabelType;

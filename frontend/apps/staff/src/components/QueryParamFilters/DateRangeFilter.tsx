@@ -1,5 +1,7 @@
-import React, { type ReactElement } from "react";
-import { type Control, type FieldValues, type Path, useController, type UseControllerProps } from "react-hook-form";
+import React from "react";
+import type { ReactElement } from "react";
+import { useController } from "react-hook-form";
+import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
 import { DateInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";

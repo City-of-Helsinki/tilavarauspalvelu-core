@@ -23,15 +23,13 @@ import type { SlotProps } from "ui/src/components/calendar/Calendar";
 import { getIntervalMinutes } from "ui/src/modules/conversion";
 import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
 import { dayMax, dayMin } from "ui/src/modules/helpers";
-import {
-  ReservationStartInterval,
-  type ReservationNode,
-  type IsReservableFieldsFragment,
-  type ReservableTimeSpanType,
-  ReservationStateChoice,
-  type Maybe,
-  BlockingReservationFieldsFragment,
-  type ReservationUnitNode,
+import { ReservationStartInterval, ReservationStateChoice, BlockingReservationFieldsFragment } from "@gql/gql-types";
+import type {
+  ReservationNode,
+  IsReservableFieldsFragment,
+  ReservableTimeSpanType,
+  Maybe,
+  ReservationUnitNode,
 } from "@gql/gql-types";
 
 export type RoundPeriod = {

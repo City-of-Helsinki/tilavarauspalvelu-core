@@ -16,13 +16,8 @@ import { CustomTable } from "@/components/Table";
 import { truncate } from "@/modules/helpers";
 import { getApplicationRoundUrl } from "@/modules/urls";
 import { TableLink } from "@/styled";
-import {
-  ApplicationRoundStatusChoice,
-  type ApplicationRoundNode,
-  useApplicationRoundListQuery,
-  type ApplicationRoundListElementFragment,
-  UserPermissionChoice,
-} from "@gql/gql-types";
+import { ApplicationRoundStatusChoice, useApplicationRoundListQuery, UserPermissionChoice } from "@gql/gql-types";
+import type { ApplicationRoundNode, ApplicationRoundListElementFragment } from "@gql/gql-types";
 
 const AccordionWithoutTopPadding = styled(Accordion).attrs({
   closeButton: false,

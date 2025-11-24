@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { type ApolloQueryResult, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import { IconAngleDown, IconAngleUp, IconLinkExternal, IconSize, RadioButton } from "hds-react";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
@@ -12,19 +13,11 @@ import { fontMedium, SemiBold } from "ui/src/styled";
 import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/modules/const";
 import { formatAgeGroup, getApplicantName } from "@/modules/helpers";
 import { getApplicationUrl } from "@/modules/urls";
-import {
-  type ApplicationSectionAllocationsQuery,
-  type Maybe,
-  type ReservationUnitNode,
-  useRejectRestMutation,
-} from "@gql/gql-types";
+import { useRejectRestMutation } from "@gql/gql-types";
+import type { ApplicationSectionAllocationsQuery, Maybe, ReservationUnitNode } from "@gql/gql-types";
 import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
-import {
-  type AllocatedTimeSlotNodeT,
-  createDurationString,
-  formatSuitableTimeRange,
-  type SectionNodeT,
-} from "./modules/applicationRoundAllocation";
+import { createDurationString, formatSuitableTimeRange } from "./modules/applicationRoundAllocation";
+import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
 
 export type AllocationApplicationSectionCardType = "unallocated" | "allocated" | "partial" | "declined";
 

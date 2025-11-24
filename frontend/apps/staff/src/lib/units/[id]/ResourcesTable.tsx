@@ -14,7 +14,8 @@ import { CustomTable } from "@/components/Table";
 import { MAX_NAME_LENGTH } from "@/modules/const";
 import { getResourceUrl } from "@/modules/urls";
 import { TableLink } from "@/styled";
-import { useDeleteResourceMutation, type Maybe, type ResourceTableFragment } from "@gql/gql-types";
+import { useDeleteResourceMutation } from "@gql/gql-types";
+import type { Maybe, ResourceTableFragment } from "@gql/gql-types";
 
 interface IProps {
   unit: ResourceTableFragment;

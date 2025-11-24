@@ -1,9 +1,12 @@
-import React, { type ReactNode, useRef } from "react";
-import { type ApolloQueryResult, gql } from "@apollo/client";
+import React, { useRef } from "react";
+import type { ReactNode } from "react";
+import { gql } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, IconArrowRedo, IconCross, LoadingSpinner, Tag } from "hds-react";
 import { isEqual, trim } from "lodash-es";
 import { GetServerSidePropsContext } from "next";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { ApplicationTimePreview } from "ui/src/components/ApplicationTimePreview";
@@ -28,12 +31,7 @@ import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { formatAgeGroup, formatNumber, getApplicantName, translateReserveeType } from "@/modules/helpers";
 import { ApplicationDatas, Summary } from "@/styled";
 import {
-  type ApplicationAdminQuery,
-  type ApplicationPageFieldsFragment,
-  type ApplicationPageSectionFragment,
   ApplicationStatusChoice,
-  type Maybe,
-  type ReservationUnitOptionFieldsFragment,
   ReserveeType,
   useApplicationAdminQuery,
   useRejectAllApplicationOptionsMutation,
@@ -42,6 +40,13 @@ import {
   useRestoreAllApplicationOptionsMutation,
   useRestoreAllSectionOptionsMutation,
   UserPermissionChoice,
+} from "@gql/gql-types";
+import type {
+  ApplicationAdminQuery,
+  ApplicationPageFieldsFragment,
+  ApplicationPageSectionFragment,
+  Maybe,
+  ReservationUnitOptionFieldsFragment,
 } from "@gql/gql-types";
 
 const Value = styled.span`

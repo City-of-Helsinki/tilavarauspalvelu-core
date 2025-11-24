@@ -20,11 +20,8 @@ import { NotesWhenApplying } from "@/components/application";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationRoundPath, seasonalPrefix } from "@/modules/urls";
-import {
-  ApplicationRoundCriteriaDocument,
-  type ApplicationRoundCriteriaQuery,
-  type ApplicationRoundCriteriaQueryVariables,
-} from "@gql/gql-types";
+import { ApplicationRoundCriteriaDocument } from "@gql/gql-types";
+import type { ApplicationRoundCriteriaQuery, ApplicationRoundCriteriaQueryVariables } from "@gql/gql-types";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

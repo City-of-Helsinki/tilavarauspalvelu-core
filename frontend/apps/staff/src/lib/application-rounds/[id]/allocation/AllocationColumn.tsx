@@ -2,7 +2,8 @@ import React, { useCallback } from "react";
 import type { ApolloQueryResult } from "@apollo/client";
 import { addMinutes, startOfDay } from "date-fns";
 import { IconCross, Option, Select } from "hds-react";
-import { useTranslation, type TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import styled from "styled-components";
 import { ShowAllContainer } from "ui/src/components";
 import type { DayT } from "ui/src/modules/const";
@@ -11,17 +12,11 @@ import { timeToMinutes, formatTimeRange } from "ui/src/modules/date-utils";
 import { convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";
 import { fontMedium } from "ui/src/styled";
 import { ALLOCATION_CALENDAR_TIMES } from "@/modules/const";
-import {
-  ApplicationRoundStatusChoice,
-  ApplicationSectionStatusChoice,
-  type ApplicationSectionAllocationsQuery,
-  Weekday,
-  type ReservationUnitNode,
-} from "@gql/gql-types";
+import { ApplicationRoundStatusChoice, ApplicationSectionStatusChoice, Weekday } from "@gql/gql-types";
+import type { ApplicationSectionAllocationsQuery, ReservationUnitNode } from "@gql/gql-types";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
 import {
-  type RelatedSlot,
   decodeTimeSlot,
   getTimeSlotOptions,
   isInsideSelection,
@@ -29,6 +24,7 @@ import {
   AllocatedTimeSlotNodeT,
   SuitableTimeRangeNodeT,
 } from "./modules/applicationRoundAllocation";
+import type { RelatedSlot } from "./modules/applicationRoundAllocation";
 
 type Props = {
   applicationSections: SectionNodeT[] | null;

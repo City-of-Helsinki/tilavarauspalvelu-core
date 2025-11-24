@@ -1,5 +1,6 @@
 import React from "react";
-import { type ApolloError, gql } from "@apollo/client";
+import { gql } from "@apollo/client";
+import type { ApolloError } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import { errorToast } from "ui/src/components/toast";
 import { getPermissionErrors } from "ui/src/modules/apolloUtils";

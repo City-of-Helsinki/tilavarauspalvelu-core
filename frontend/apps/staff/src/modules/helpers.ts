@@ -4,19 +4,21 @@ import { trim } from "lodash-es";
 import type { TFunction } from "next-i18next";
 import { filterNonNullable, truncate } from "ui/src/modules/helpers";
 import {
-  type ApplicantNameFieldsFragment,
-  type ApplicationRoundNode,
   ApplicationRoundReservationCreationStatusChoice,
   ApplicationRoundStatusChoice,
-  type CalendarReservationFragment,
-  type CombineAffectedReservationsFragment,
-  type LocationFieldsFragment,
-  type Maybe,
-  type ReservationCommonFieldsFragment,
-  type ReservationNode,
   ReservationStartInterval,
   ReservationTypeChoice,
   ReserveeType,
+} from "@gql/gql-types";
+import type {
+  ApplicantNameFieldsFragment,
+  ApplicationRoundNode,
+  CalendarReservationFragment,
+  CombineAffectedReservationsFragment,
+  LocationFieldsFragment,
+  Maybe,
+  ReservationCommonFieldsFragment,
+  ReservationNode,
 } from "@gql/gql-types";
 
 export { truncate } from "ui/src/modules/helpers";

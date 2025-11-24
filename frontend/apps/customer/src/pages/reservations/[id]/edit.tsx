@@ -15,17 +15,14 @@ import { EditStep0, EditStep1 } from "@/lib/reservation/[id]/edit";
 import { createApolloClient } from "@/modules/apolloClient";
 import { queryOptions } from "@/modules/queryOptions";
 import { isReservationEditable, transformReservation } from "@/modules/reservation";
-import { PendingReservationFormSchema, type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import { PendingReservationFormSchema } from "@/modules/schemas/reservationUnit";
+import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
 import { ReservationPageWrapper, ReservationTitleSection } from "@/styled/reservation";
 import { StyledStepper } from "@/styled/utils";
-import {
-  type ReservationEditPageQuery,
-  type ReservationEditPageQueryVariables,
-  ReservationEditPageDocument,
-  MunicipalityChoice,
-} from "@gql/gql-types";
+import { ReservationEditPageDocument, MunicipalityChoice } from "@gql/gql-types";
+import type { ReservationEditPageQuery, ReservationEditPageQueryVariables } from "@gql/gql-types";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

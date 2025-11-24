@@ -1,6 +1,9 @@
-import React, { type HTMLAttributes, useState } from "react";
-import { type TFunction, useTranslation } from "next-i18next";
-import styled, { css, type RuleSet } from "styled-components";
+import React, { useState } from "react";
+import type { HTMLAttributes } from "react";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
+import styled, { css } from "styled-components";
+import type { RuleSet } from "styled-components";
 import { Weekday } from "../../gql/gql-types";
 import { isTouchDevice } from "../modules/browserHelpers";
 import { WEEKDAYS_SORTED } from "../modules/const";

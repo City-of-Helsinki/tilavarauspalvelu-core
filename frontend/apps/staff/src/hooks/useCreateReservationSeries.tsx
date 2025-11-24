@@ -6,9 +6,11 @@ import {
   ReservationStateChoice,
   ReservationTypeChoice,
   ReservationTypeStaffChoice,
-  type ReservationSeriesCreateMutationInput,
   useCreateReservationSeriesMutation,
-  type ReservationSeriesReservationCreateSerializerInput,
+} from "@gql/gql-types";
+import type {
+  ReservationSeriesCreateMutationInput,
+  ReservationSeriesReservationCreateSerializerInput,
 } from "@gql/gql-types";
 
 // Not all choices are valid for reservation series (the ui should not allow these)

@@ -2,13 +2,8 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  SubPageHead,
-  ResourceEditorFields,
-  Editor,
-  ResourceUpdateSchema,
-  type ResourceUpdateForm,
-} from "@lib/units/[id]";
+import { SubPageHead, ResourceEditorFields, Editor, ResourceUpdateSchema } from "@lib/units/[id]";
+import type { ResourceUpdateForm } from "@lib/units/[id]";
 import { Button, ButtonVariant } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -20,12 +15,8 @@ import { Error404 } from "@/components/Error404";
 import { FormErrorSummary } from "@/components/FormErrorSummary";
 import { LinkPrev } from "@/components/LinkPrev";
 import { getUnitUrl } from "@/modules/urls";
-import {
-  type ResourceUpdateMutationInput,
-  ResourceLocationType,
-  useUpdateResourceMutation,
-  useResourceQuery,
-} from "@gql/gql-types";
+import { ResourceLocationType, useUpdateResourceMutation, useResourceQuery } from "@gql/gql-types";
+import type { ResourceUpdateMutationInput } from "@gql/gql-types";
 
 type Props = {
   resourcePk?: number;

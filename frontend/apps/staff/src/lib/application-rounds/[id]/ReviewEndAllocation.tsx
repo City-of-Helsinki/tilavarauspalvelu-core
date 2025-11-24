@@ -11,13 +11,12 @@ import { useCheckPermission } from "@/hooks";
 import { isApplicationRoundInProgress } from "@/modules/helpers";
 import {
   ApplicationRoundStatusChoice,
-  type ApplicationRoundAdminFragment,
   useEndAllocationMutation,
   ApplicationRoundReservationCreationStatusChoice,
-  type ApplicationRoundQuery,
   UserPermissionChoice,
   useSendResultsMutation,
 } from "@gql/gql-types";
+import type { ApplicationRoundAdminFragment, ApplicationRoundQuery } from "@gql/gql-types";
 
 const StyledNotification = styled(Notification)`
   margin-right: auto;

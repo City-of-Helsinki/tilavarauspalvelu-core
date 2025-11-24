@@ -1,4 +1,5 @@
-import { useController, type Control, type FieldValues, type Path, type UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
+import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
 import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 

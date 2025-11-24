@@ -16,7 +16,8 @@ import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { translateTag } from "@/modules/search";
-import { type ApplicationRoundFilterUnitFragment, MunicipalityChoice, Priority, ReserveeType } from "@gql/gql-types";
+import { MunicipalityChoice, Priority, ReserveeType } from "@gql/gql-types";
+import type { ApplicationRoundFilterUnitFragment } from "@gql/gql-types";
 
 type UnitFilterQueryType = ApplicationRoundFilterUnitFragment;
 

@@ -1,6 +1,7 @@
 import { useTranslation } from "next-i18next";
 import { ReservationListButton } from "@/components/ReservationListButton";
-import { ReservationList, type NewReservationListItem } from "@/components/ReservationsList";
+import { ReservationList } from "@/components/ReservationsList";
+import type { NewReservationListItem } from "@/components/ReservationsList";
 
 type ReservationListEditorProps = {
   items: { reservations: NewReservationListItem[]; refetch: () => void };

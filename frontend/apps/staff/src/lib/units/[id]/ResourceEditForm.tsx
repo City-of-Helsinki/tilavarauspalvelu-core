@@ -3,7 +3,8 @@ import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { getTranslatedError } from "@/modules/helpers";
 import { ParentSelector } from "./ParentSelector";
-import { EditorColumns, type ResourceUpdateForm } from "./modules/resourceEditor";
+import { EditorColumns } from "./modules/resourceEditor";
+import type { ResourceUpdateForm } from "./modules/resourceEditor";
 
 export function ResourceEditorFields({
   form,

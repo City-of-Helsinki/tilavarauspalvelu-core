@@ -7,12 +7,8 @@ import { useTranslation } from "next-i18next";
 import { useDisplayError } from "ui/src/hooks";
 import { FormErrorSummary } from "@/components/FormErrorSummary";
 import { DialogActionsButtons } from "@/styled";
-import {
-  ResourceLocationType,
-  type ResourceCreateMutationInput,
-  type NewResourceUnitFieldsFragment,
-  useCreateResourceMutation,
-} from "@gql/gql-types";
+import { ResourceLocationType, useCreateResourceMutation } from "@gql/gql-types";
+import type { ResourceCreateMutationInput, NewResourceUnitFieldsFragment } from "@gql/gql-types";
 import { ResourceEditorFields } from "./ResourceEditForm";
 import { UnitInfo } from "./UnitInfo";
 import { Editor, ResourceUpdateForm, ResourceUpdateSchema } from "./modules/resourceEditor";

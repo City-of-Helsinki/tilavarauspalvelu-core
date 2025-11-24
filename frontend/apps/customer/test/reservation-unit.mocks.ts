@@ -1,20 +1,23 @@
 import { addDays, addYears, endOfDay, startOfDay, startOfToday } from "date-fns";
 import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
-import { ReservableMap, type RoundPeriod } from "@/modules/reservable";
+import { ReservableMap } from "@/modules/reservable";
+import type { RoundPeriod } from "@/modules/reservable";
 import {
-  type ApplicationRoundTimeSlotNode,
   AuthenticationType,
   ReservationUnitImageType,
-  type IsReservableFieldsFragment,
   ReservationFormType,
   ReservationKind,
   ReservationStartInterval,
-  type ReservationUnitNode,
   ReservationUnitPublishingState,
   ReservationUnitReservationState,
-  type UnitNode,
   Weekday,
+} from "@gql/gql-types";
+import type {
+  ApplicationRoundTimeSlotNode,
+  IsReservableFieldsFragment,
+  ReservationUnitNode,
+  UnitNode,
 } from "@gql/gql-types";
 import { createMockReservationUnitType, generateDescriptionFragment, generateNameFragment } from "./test.gql.utils";
 
