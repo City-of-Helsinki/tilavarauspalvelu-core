@@ -10,10 +10,7 @@ export const applicationsPath = `${applicationsPrefix}/`;
 export const reservationsPath = `${reservationsPrefix}/`;
 
 type ApplicationRoundPages = "criteria";
-export function getApplicationRoundPath(
-  pk: Maybe<number> | undefined,
-  page?: ApplicationRoundPages | undefined
-): string {
+export function getApplicationRoundPath(pk: Maybe<number> | undefined, page?: ApplicationRoundPages): string {
   if (pk == null) {
     return "";
   }
@@ -31,7 +28,7 @@ export function getSingleSearchPath(params?: URLSearchParams): string {
 }
 
 type ApplicationPages = "page1" | "page2" | "page3" | "page4" | "view" | "sent";
-export function getApplicationPath(pk: Maybe<number> | undefined, page?: ApplicationPages | undefined): string {
+export function getApplicationPath(pk: Maybe<number> | undefined, page?: ApplicationPages): string {
   if (pk == null) {
     return "";
   }
@@ -66,8 +63,8 @@ type ReservationPages = "cancel" | "edit";
 export type ReservationNotifications = "requires_handling" | "confirmed" | "paid" | "polling_timeout";
 export function getReservationPath(
   pk: Maybe<number> | undefined,
-  page?: ReservationPages | undefined,
-  notify?: ReservationNotifications | undefined
+  page?: ReservationPages,
+  notify?: ReservationNotifications
 ): string {
   if (pk == null) {
     return "";

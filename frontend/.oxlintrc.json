@@ -362,6 +362,7 @@
     "typescript/no-confusing-non-null-assertion": "error",
     "typescript/no-confusing-void-expression": "off",
     "typescript/no-duplicate-enum-values": "error",
+    "typescript/no-duplicate-type-constituents": "error",
     "typescript/no-dynamic-delete": "error",
     "typescript/no-empty-interface": "error",
     "typescript/no-empty-object-type": "error",

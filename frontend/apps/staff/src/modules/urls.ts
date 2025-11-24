@@ -34,7 +34,7 @@ export function getReservationUrl(pk: Maybe<number> | undefined, includePrefix =
   return `${prefix}${RESERVATIONS_URL_PREFIX}/${pk}`;
 }
 
-export function getApplicationUrl(pk: Maybe<number> | undefined, sectionPk?: Maybe<number> | undefined): string {
+export function getApplicationUrl(pk: Maybe<number> | undefined, sectionPk?: Maybe<number>): string {
   if (pk == null || !(pk > 0)) {
     return "";
   }
@@ -90,7 +90,7 @@ export function getMyUnitUrl(unitPk: Maybe<number> | undefined): string {
 type SeriesPage = "completed";
 export function getReservationSeriesUrl(
   unitPk: Maybe<number> | undefined,
-  seriesPk?: Maybe<number> | undefined,
+  seriesPk?: Maybe<number>,
   page?: SeriesPage
 ): string {
   if (unitPk == null || !(Number(unitPk) > 0)) {
