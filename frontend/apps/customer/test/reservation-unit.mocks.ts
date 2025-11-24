@@ -1,8 +1,7 @@
 import { addDays, addYears, endOfDay, startOfDay, startOfToday } from "date-fns";
 import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
-import { ReservableMap } from "@/modules/reservable";
-import type { RoundPeriod } from "@/modules/reservable";
+import type { RoundPeriod, ReservableMap } from "@/modules/reservable";
 import {
   AuthenticationType,
   ReservationUnitImageType,

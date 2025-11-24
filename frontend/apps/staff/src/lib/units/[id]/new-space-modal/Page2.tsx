@@ -1,5 +1,5 @@
 import React from "react";
-import { UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { Button, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { FormErrorSummary } from "@/components/FormErrorSummary";

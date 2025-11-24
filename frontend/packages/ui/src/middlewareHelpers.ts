@@ -1,5 +1,5 @@
 /// NOTE don't include nodejs packages (like node:* or lodash) this requires edge runtime due to NextJs design
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 /// Check if the request is a page request
 /// @param url - URL

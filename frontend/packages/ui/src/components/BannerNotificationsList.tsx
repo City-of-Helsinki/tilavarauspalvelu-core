@@ -1,11 +1,11 @@
 import React from "react";
 import { useLocalStorage } from "react-use";
 import { gql } from "@apollo/client";
-import { NotificationType } from "hds-react";
+import type { NotificationType } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { BannerNotificationLevel, BannerNotificationTarget, useShowNotificationsListQuery } from "../../gql/gql-types";
-import type { ShowNotificationFieldsFragment } from "../../gql/gql-types";
+import { BannerNotificationLevel, useShowNotificationsListQuery } from "../../gql/gql-types";
+import type { ShowNotificationFieldsFragment, BannerNotificationTarget } from "../../gql/gql-types";
 import { filterNonNullable, getLocalizationLang, getTranslation } from "../modules/helpers";
 import { ClientOnly } from "./ClientOnly";
 import { NotificationWrapper } from "./NotificationWrapper";

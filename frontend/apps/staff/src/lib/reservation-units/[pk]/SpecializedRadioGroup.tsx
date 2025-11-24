@@ -1,5 +1,6 @@
 import React from "react";
-import { Control, useController } from "react-hook-form";
+import type { Control } from "react-hook-form";
+import { useController } from "react-hook-form";
 import { useMedia } from "react-use";
 import { useTranslation } from "next-i18next";
 import { ControlledRadioGroup } from "ui/src/components/form";

@@ -16,7 +16,7 @@ import { capitalize, getLocalizationLang } from "ui/src/modules/helpers";
 import { Flex, fontBold, fontMedium, fontRegular, SemiBold } from "ui/src/styled";
 import type { FocusTimeSlot } from "@/modules/reservation";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
-import { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 
 type CommonProps = {

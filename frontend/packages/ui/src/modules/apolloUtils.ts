@@ -1,6 +1,7 @@
 import type { IncomingMessage, IncomingHttpHeaders } from "node:http";
 import qs from "node:querystring";
-import { ApolloError, ServerError, ServerParseError } from "@apollo/client";
+import type { ServerError, ServerParseError } from "@apollo/client";
+import { ApolloError } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import * as Sentry from "@sentry/nextjs";
 import type { GraphQLFormattedError } from "graphql";

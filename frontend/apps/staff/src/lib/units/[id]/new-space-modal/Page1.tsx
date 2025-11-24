@@ -1,12 +1,13 @@
 import React from "react";
-import { Controller, UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { Button, ButtonVariant, Dialog, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { H4 } from "ui/src/styled";
 import { DialogActionsButtons } from "@/styled";
 import type { UnitPageQuery } from "@gql/gql-types";
 import { ParentSelector } from "../ParentSelector";
-import { SpaceUpdateForm } from "../SpaceForm";
+import type { SpaceUpdateForm } from "../SpaceForm";
 import { StyledTag } from "./modules/newSpaceModal";
 
 type Props = {

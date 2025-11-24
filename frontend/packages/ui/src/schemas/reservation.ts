@@ -1,12 +1,6 @@
 import { z } from "zod";
-import {
-  MunicipalityChoice,
-  ReservationFormType,
-  ReservationStartInterval,
-  ReservationTypeChoice,
-  ReservationUnitNode,
-  ReserveeType,
-} from "../../gql/gql-types";
+import type { ReservationStartInterval, ReservationUnitNode } from "../../gql/gql-types";
+import { MunicipalityChoice, ReservationFormType, ReservationTypeChoice, ReserveeType } from "../../gql/gql-types";
 import { getIntervalMinutes } from "../modules/conversion";
 import { parseUIDate } from "../modules/date-utils";
 import { checkTimeStringFormat, checkValidFutureDate, emailField, optionalEmailField } from "./schemaCommon";

@@ -1,12 +1,13 @@
 import React from "react";
-import { UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { ControlledSelect } from "ui/src/components/form";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { AutoGrid, FullRow } from "ui/src/styled";
 import { getTranslatedError } from "@/modules/helpers";
-import { ReservationKind, ReservationUnitEditQuery, ReservationUnitEditUnitFragment } from "@gql/gql-types";
+import type { ReservationUnitEditQuery, ReservationUnitEditUnitFragment } from "@gql/gql-types";
+import { ReservationKind } from "@gql/gql-types";
 import { CustomNumberInput } from "./CustomNumberInput";
 import { SpecializedRadioGroup } from "./SpecializedRadioGroup";
 import type { ReservationUnitEditFormValues } from "./form";

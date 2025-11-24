@@ -1,5 +1,6 @@
 import type { IncomingMessage } from "node:http";
-import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, NormalizedCacheObject, from } from "@apollo/client";
+import type { ApolloLink, NormalizedCacheObject } from "@apollo/client";
+import { ApolloClient, HttpLink, InMemoryCache, from } from "@apollo/client";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 import { relayStylePagination } from "@apollo/client/utilities";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

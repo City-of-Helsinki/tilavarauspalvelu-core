@@ -4,7 +4,7 @@ import { Sanitize } from "ui/src/components/Sanitize";
 import { breakpoints } from "ui/src/modules/const";
 import { getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { H4 } from "ui/src/styled";
-import { ApplicationRoundNode } from "@gql/gql-types";
+import type { ApplicationRoundNode } from "@gql/gql-types";
 
 const NotesBox = styled.div`
   box-sizing: border-box;

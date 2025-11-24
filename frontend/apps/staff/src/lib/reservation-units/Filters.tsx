@@ -18,7 +18,7 @@ import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { translateTag } from "@/modules/search";
 import type { TagOptionsList } from "@/modules/search";
-import { ReservationUnitPublishingState } from "@gql/gql-types";
+import type { ReservationUnitPublishingState } from "@gql/gql-types";
 
 const MoreWrapper = styled(ShowAllContainer)`
   .ShowAllContainer__ToggleButton {

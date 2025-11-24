@@ -1,4 +1,5 @@
-import { UseFormReturn, Controller } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { getTranslatedError } from "@/modules/helpers";

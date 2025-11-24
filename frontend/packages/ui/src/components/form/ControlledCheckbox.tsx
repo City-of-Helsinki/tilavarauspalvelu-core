@@ -1,5 +1,6 @@
 import React from "react";
-import { Control, FieldValues, Path, PathValue, useController, UseControllerProps } from "react-hook-form";
+import type { Control, FieldValues, Path, PathValue, UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
 import { Checkbox } from "hds-react";
 import styled from "styled-components";
 import { filterEmpty } from "../../modules/helpers";

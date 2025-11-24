@@ -5,7 +5,7 @@ import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ReservationTitleSection } from "@lib/reservations/[id]";
 import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";

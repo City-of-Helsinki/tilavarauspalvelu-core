@@ -5,8 +5,13 @@ import { gql } from "@apollo/client";
 import { addMinutes, differenceInMinutes } from "date-fns";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { Calendar, SlotProps } from "ui/src/components/calendar/Calendar";
-import type { CalendarEvent, CalendarEventBuffer, SlotClickProps } from "ui/src/components/calendar/Calendar";
+import { Calendar } from "ui/src/components/calendar/Calendar";
+import type {
+  CalendarEvent,
+  CalendarEventBuffer,
+  SlotClickProps,
+  SlotProps,
+} from "ui/src/components/calendar/Calendar";
 import { Toolbar } from "ui/src/components/calendar/Toolbar";
 import { breakpoints, RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { formatApiDate, formatDate, formatDuration, formatTime, parseUIDate } from "ui/src/modules/date-utils";
@@ -24,8 +29,12 @@ import {
   getNewReservation,
 } from "@/modules/reservation";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import { ReservationNode, ReservationTypeChoice, useListReservationsQuery } from "@gql/gql-types";
-import type { BlockingReservationFieldsFragment, ReservationTimePickerFieldsFragment } from "@gql/gql-types";
+import { ReservationTypeChoice, useListReservationsQuery } from "@gql/gql-types";
+import type {
+  BlockingReservationFieldsFragment,
+  ReservationTimePickerFieldsFragment,
+  ReservationNode,
+} from "@gql/gql-types";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
 
 type WeekOptions = "day" | "week" | "month";

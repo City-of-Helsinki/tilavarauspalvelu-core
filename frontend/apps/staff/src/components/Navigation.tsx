@@ -238,7 +238,7 @@ function NavigationLink({
     if (route != null) {
       // NOTE: this is a workaround for the HDS Header component not closing the mobile menu on navigation, if there isn't a page reload
       // TODO: remove this when HDS Header is fixed
-      document.getElementById("Menu")?.querySelector("button")?.click();
+      document.querySelector("#Menu")?.querySelector("button")?.click();
       router.push(route);
     }
   };

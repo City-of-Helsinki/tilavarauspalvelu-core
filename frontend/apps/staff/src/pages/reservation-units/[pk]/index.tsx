@@ -52,12 +52,12 @@ import {
   useUpdateImageMutation,
   useUpdateReservationUnitMutation,
   UserPermissionChoice,
-  UpdateReservationUnitMutation,
 } from "@gql/gql-types";
 import type {
   CreateReservationUnitMutation,
   ReservationUnitEditorParametersQuery,
   ReservationUnitEditQuery,
+  UpdateReservationUnitMutation,
 } from "@gql/gql-types";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];

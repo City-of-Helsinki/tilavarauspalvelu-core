@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
-import { DayT } from "ui/src/modules/const";
+import type { DayT } from "ui/src/modules/const";
 import { convertWeekday } from "ui/src/modules/conversion";
 import { mapFormToSearchParams } from "ui/src/modules/search";
 import { AutoGrid, Flex, HR } from "ui/src/styled";
@@ -14,7 +15,8 @@ import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
 import { translateTag } from "@/modules/search";
 import type { TagOptionsList } from "@/modules/search";
-import { AccessCodeState, ApplicationSectionStatusChoice, ApplicationStatusChoice, ReserveeType } from "@gql/gql-types";
+import type { ApplicationStatusChoice } from "@gql/gql-types";
+import { AccessCodeState, ApplicationSectionStatusChoice, ReserveeType } from "@gql/gql-types";
 
 interface FilterProps {
   options: TagOptionsList;

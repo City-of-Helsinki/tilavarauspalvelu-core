@@ -2,7 +2,7 @@ import type { TFunction } from "next-i18next";
 import { parseUIDate, isValidDate } from "ui/src/modules/date-utils";
 import { toNumber } from "ui/src/modules/helpers";
 import type { OptionsListT, OptionT } from "ui/src/modules/search";
-import {
+import type {
   OrderStatusWithFree,
   Priority,
   ReservationStateChoice,

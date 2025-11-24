@@ -1,5 +1,5 @@
 import React from "react";
-import { UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ControlledSelect } from "ui/src/components/form";

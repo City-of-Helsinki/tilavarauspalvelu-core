@@ -9,7 +9,8 @@ import {
   ReservationTypeSchema,
   ReservationFormMetaSchema,
 } from "ui/src/schemas";
-import { ReservationStartInterval, Weekday } from "@gql/gql-types";
+import type { ReservationStartInterval } from "@gql/gql-types";
+import { Weekday } from "@gql/gql-types";
 
 // NOTE schema refinement is quirky since zod objects can't be merged after it
 // always use the exact refined scheme for validation and displaying errors to the user

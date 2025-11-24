@@ -3,8 +3,7 @@ import type { ReactNode } from "react";
 import { gql } from "@apollo/client";
 import { useSession } from "@/hooks";
 import { hasPermission } from "@/modules/permissionHelper";
-import { UserPermissionChoice } from "@gql/gql-types";
-import type { VisibleIfPermissionFieldsFragment } from "@gql/gql-types";
+import type { UserPermissionChoice, VisibleIfPermissionFieldsFragment } from "@gql/gql-types";
 
 export function VisibleIfPermission({
   reservation,

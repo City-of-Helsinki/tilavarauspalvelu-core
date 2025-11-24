@@ -1,8 +1,8 @@
 /**
  * Display formatting functions, with i18n.t and/or date-fns format
  */
-import { Day, format, isBefore, isSameDay } from "date-fns";
-import type { Locale } from "date-fns";
+import { format, isBefore, isSameDay } from "date-fns";
+import type { Locale, Day } from "date-fns";
 import { enGB, fi, sv } from "date-fns/locale";
 import type { TFunction } from "next-i18next";
 import {

@@ -4,7 +4,7 @@ import { gql } from "@apollo/client";
 import type { ApolloQueryResult } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, IconArrowRedo, IconCross, LoadingSpinner, Tag } from "hds-react";
 import { isEqual, trim } from "lodash-es";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";

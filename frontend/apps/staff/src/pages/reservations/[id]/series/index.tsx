@@ -29,7 +29,7 @@ import { Error403 } from "@/components/Error403";
 import { Error404 } from "@/components/Error404";
 import { LinkPrev } from "@/components/LinkPrev";
 import { ReservationListEditor } from "@/components/ReservationListEditor";
-import { NewReservationListItem } from "@/components/ReservationsList";
+import type { NewReservationListItem } from "@/components/ReservationsList";
 import { WeekdaysSelector } from "@/components/WeekdaysSelector";
 import { useFilteredReservationList, useMultipleReservation, useSession } from "@/hooks";
 import { createClient } from "@/modules/apolloClient";
@@ -39,12 +39,12 @@ import { getBufferTime } from "@/modules/helpers";
 import { hasPermission } from "@/modules/permissionHelper";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getReservationUrl } from "@/modules/urls";
-import { getRescheduleReservationSeriesSchema, RescheduleReservationSeriesForm } from "@/schemas";
+import type { RescheduleReservationSeriesForm } from "@/schemas";
+import { getRescheduleReservationSeriesSchema } from "@/schemas";
 import { Element } from "@/styled";
 import {
   ReservationPermissionsDocument,
   ReservationSeriesDocument,
-  ReservationSeriesRescheduleMutationInput,
   ReservationStartInterval,
   ReservationTypeChoice,
   useRescheduleReservationSeriesMutation,
@@ -57,6 +57,7 @@ import type {
   ReservationSeriesQuery,
   ReservationSeriesQueryVariables,
   SeriesPageQuery,
+  ReservationSeriesRescheduleMutationInput,
 } from "@gql/gql-types";
 
 type NodeT = NonNullable<SeriesPageQuery["reservation"]>["reservationSeries"];
@@ -270,7 +271,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
         if (count > 0) {
           checkedReservations.refetch();
           setLocalError(t("myUnits:ReservationSeriesForm.newOverlapError", { count }));
-          document.getElementById("edit-recurring__reservations-list")?.scrollIntoView();
+          document.querySelector("#edit-recurring__reservations-list")?.scrollIntoView();
         } else {
           displayError(err);
         }

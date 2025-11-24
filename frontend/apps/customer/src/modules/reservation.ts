@@ -5,12 +5,7 @@ import { getIntervalMinutes } from "ui/src/modules/conversion";
 import { formatTime, parseUIDate, isValidDate, timeToMinutes, formatDate } from "ui/src/modules/date-utils";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import {
-  ReservationStartInterval,
-  ReservationStateChoice,
-  OrderStatus,
-  ReservationCancelReasonChoice,
-} from "@gql/gql-types";
+import { ReservationStateChoice, OrderStatus, ReservationCancelReasonChoice } from "@gql/gql-types";
 import type {
   ReservationNode,
   Maybe,
@@ -24,6 +19,7 @@ import type {
   CanReservationBeChangedFragment,
   PaymentOrderNode,
   ReservationPaymentUrlFragment,
+  ReservationStartInterval,
 } from "@gql/gql-types";
 import { isRangeReservable } from "./reservable";
 import type { ReservableMap, RoundPeriod } from "./reservable";

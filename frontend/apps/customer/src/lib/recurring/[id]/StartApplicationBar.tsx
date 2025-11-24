@@ -14,8 +14,8 @@ import { useReservationUnitList } from "@/hooks";
 import { isBrowser } from "@/modules/const";
 import { getPostLoginUrl } from "@/modules/helpers";
 import { getApplicationPath } from "@/modules/urls";
-import { ReservationUnitNode, useCreateApplicationMutation } from "@gql/gql-types";
-import type { ApplicationCreateMutationInput } from "@gql/gql-types";
+import { useCreateApplicationMutation } from "@gql/gql-types";
+import type { ApplicationCreateMutationInput, ReservationUnitNode } from "@gql/gql-types";
 
 const SpaceWrapper = styled.div`
   height: 76px;

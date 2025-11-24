@@ -1,6 +1,6 @@
 import React from "react";
-import { useController, UseFormReturn } from "react-hook-form";
-import type { FieldValues, UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
+import type { FieldValues, UseControllerProps, UseFormReturn } from "react-hook-form";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -12,7 +12,8 @@ import { AuthenticationType, ReservationFormType, ReservationStartInterval } fro
 import { CustomNumberInput } from "./CustomNumberInput";
 import { FieldGroup } from "./FieldGroup";
 import { SpecializedRadioGroup } from "./SpecializedRadioGroup";
-import { BUFFER_TIME_OPTIONS, ReservationUnitEditFormValues } from "./form";
+import type { ReservationUnitEditFormValues } from "./form";
+import { BUFFER_TIME_OPTIONS } from "./form";
 import { EditAccordion } from "./styled";
 
 const Indent = styled.div<{ $noIndent: boolean }>`
