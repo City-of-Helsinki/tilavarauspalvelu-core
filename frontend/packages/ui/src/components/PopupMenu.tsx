@@ -95,7 +95,7 @@ export function PopupMenu({ items, style, className }: PopupMenuProps): JSX.Elem
     document.removeEventListener("click", closePopup);
   };
 
-  const disabled = items.length === 0 || items.every((i) => i.disabled);
+  const disabled = items.every((i) => i.disabled); // returns `true` for an empty array
 
   return (
     <Container ref={buttonRef} style={style} className={className}>
