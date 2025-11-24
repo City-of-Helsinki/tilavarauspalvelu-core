@@ -301,12 +301,13 @@ export function isInsideCell(
 }
 
 export function convertPriorityFilter(values: number[]): Priority[] {
-  return values.reduce<Priority[]>((acc, x) => {
-    if (x === 200) {
-      return [...acc, Priority.Secondary];
-    } else if (x === 300) {
-      return [...acc, Priority.Primary];
+  const result: Priority[] = [];
+  for (const x of values) {
+    if (x === 300) {
+      result.push(Priority.Primary);
+    } else if (x === 200) {
+      result.push(Priority.Secondary);
     }
-    return acc;
-  }, []);
+  }
+  return result;
 }

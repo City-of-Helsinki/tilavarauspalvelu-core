@@ -192,15 +192,14 @@ function SeriesPageInner({ pk }: { pk: number }) {
 
   const onSubmit = async (values: RescheduleReservationSeriesForm) => {
     setLocalError(null);
-    const skipDates = [...removedReservations, ...checkedReservations.reservations.filter((x) => x.isOverlapping)]
-      .map((x) => x.date)
-      // NOTE the data includes the same date multiple times (for some reason)
-      .reduce<Date[]>((acc, x) => {
-        if (!acc.some((y) => isSameDay(y, x))) {
-          return [...acc, x];
-        }
-        return acc;
-      }, []);
+    const skipDates: Date[] = [];
+    for (const date of [...removedReservations, ...checkedReservations.reservations.filter((x) => x.isOverlapping)].map(
+      (x) => x.date
+    )) {
+      if (!skipDates.some((y) => isSameDay(y, date))) {
+        skipDates.push(date);
+      }
+    }
 
     if (checkedReservations.reservations.length - skipDates.length === 0) {
       errorToast({ text: t("reservationForm:errors.noReservations") });

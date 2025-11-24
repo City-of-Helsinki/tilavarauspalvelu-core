@@ -104,14 +104,15 @@ function convertRecurringParam(recurring: string | null): "only" | "onlyNot" | u
 }
 
 function transformPriorityFilter(values: string[]): Priority[] {
-  return values.reduce<Priority[]>((acc, x) => {
-    if (x === Priority.Secondary) {
-      return [...acc, Priority.Secondary];
-    } else if (x === Priority.Primary) {
-      return [...acc, Priority.Primary];
+  const result: Priority[] = [];
+  for (const x of values) {
+    if (x === Priority.Primary) {
+      result.push(Priority.Primary);
+    } else if (x === Priority.Secondary) {
+      result.push(Priority.Secondary);
     }
-    return acc;
-  }, []);
+  }
+  return result;
 }
 
 export function useGetFilterSearchParams({
