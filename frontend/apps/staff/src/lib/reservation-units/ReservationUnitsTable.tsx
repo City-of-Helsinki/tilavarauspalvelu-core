@@ -123,7 +123,7 @@ export function ReservationUnitsTable({
       selectAllRowsText={t("common:selectAllRows")}
       clearSelectionsText={t("common:clearAllSelections")}
       setSelectedRows={setSelectedRows}
-      customActionButtons={[<ActionButtons selectedRows={selectedRows}></ActionButtons>]}
+      customActionButtons={[<ActionButtons key="1" selectedRows={selectedRows}></ActionButtons>]}
     />
   );
 }
