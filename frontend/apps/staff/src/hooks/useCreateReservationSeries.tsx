@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { parseUIDateUnsafe, formatApiDateUnsafe } from "ui/src/modules/date-utils";
 import { useSession } from "@/hooks";
-import { type ReservationSeriesFormValues } from "@/schemas";
+import type { ReservationSeriesFormValues } from "@/schemas";
 import {
   ReservationStateChoice,
   ReservationTypeChoice,

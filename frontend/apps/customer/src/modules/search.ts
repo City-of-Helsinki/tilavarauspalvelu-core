@@ -2,7 +2,7 @@
 /// e.g. the common search pages (both seasonal and single)
 import { gql, type ApolloClient } from "@apollo/client";
 import { startOfDay } from "date-fns";
-import { type ReadonlyURLSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import { transformAccessTypeSafe } from "ui/src/modules/conversion";
 import { parseUIDate, formatApiDate } from "ui/src/modules/date-utils";
 import {
@@ -14,8 +14,8 @@ import {
   mapParamToInteger,
   toNumber,
 } from "ui/src/modules/helpers";
-import { type OptionsListT, type OptionT } from "ui/src/modules/search";
-import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
+import type { OptionsListT, OptionT } from "ui/src/modules/search";
+import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import {
   EquipmentOrderingChoices,
   IntendedUseOrderingChoices,

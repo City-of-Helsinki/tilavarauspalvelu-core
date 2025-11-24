@@ -1,5 +1,5 @@
 import React from "react";
-import { type UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
 import { Button, ButtonVariant, IconArrowRight, IconCross } from "hds-react";
@@ -24,7 +24,7 @@ import {
   isReservationEditable,
 } from "@/modules/reservation";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
-import { type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
 import { PinkBox as PinkBoxBase } from "@/styled/reservation";
 import type { EditPageReservationFragment } from "@gql/gql-types";

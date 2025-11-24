@@ -1,5 +1,5 @@
 import React, { Children, cloneElement, useEffect, useMemo, useState } from "react";
-import { type UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { useMedia } from "react-use";
 import { gql } from "@apollo/client";
 import { addMinutes, differenceInMinutes } from "date-fns";
@@ -31,7 +31,7 @@ import {
   getDurationOptions,
   getNewReservation,
 } from "@/modules/reservation";
-import { type PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import {
   type BlockingReservationFieldsFragment,
   ReservationNode,

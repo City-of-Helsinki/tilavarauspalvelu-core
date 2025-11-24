@@ -1,4 +1,4 @@
-import { type Maybe } from "@gql/gql-types";
+import type { Maybe } from "@gql/gql-types";
 import { isBrowser, PUBLIC_URL } from "./const";
 
 export const APPLICATIONS_URL_PREFIX = "/applications";

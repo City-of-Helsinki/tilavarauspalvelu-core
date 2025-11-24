@@ -1,11 +1,11 @@
 import React, { useCallback } from "react";
-import { type ApolloQueryResult } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import { addMinutes, startOfDay } from "date-fns";
 import { IconCross, Option, Select } from "hds-react";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import { ShowAllContainer } from "ui/src/components";
-import { type DayT } from "ui/src/modules/const";
+import type { DayT } from "ui/src/modules/const";
 import { numberToDayT, transformWeekday } from "ui/src/modules/conversion";
 import { timeToMinutes, formatTimeRange } from "ui/src/modules/date-utils";
 import { convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";

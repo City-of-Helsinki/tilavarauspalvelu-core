@@ -1,9 +1,9 @@
-import { type IncomingMessage, type IncomingHttpHeaders } from "node:http";
-import qs from "querystring";
+import type { IncomingMessage, IncomingHttpHeaders } from "node:http";
+import qs from "node:querystring";
 import { ApolloError, ServerError, ServerParseError } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import * as Sentry from "@sentry/nextjs";
-import { type GraphQLFormattedError } from "graphql";
+import type { GraphQLFormattedError } from "graphql";
 import { getCookie } from "typescript-cookie";
 import toast from "../components/toast";
 import { isBrowser } from "./helpers";

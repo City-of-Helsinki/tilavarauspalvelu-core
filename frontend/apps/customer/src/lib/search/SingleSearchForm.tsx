@@ -11,7 +11,7 @@ import { ControlledNumberInput, TimeRangePicker } from "ui/src/components/form";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { formatDate, parseUIDate } from "ui/src/modules/date-utils";
 import { ignoreMaybeArray, mapParamToInteger, toNumber } from "ui/src/modules/helpers";
-import { type OptionsListT } from "ui/src/modules/search";
+import type { OptionsListT } from "ui/src/modules/search";
 import { Flex } from "ui/src/styled";
 import { FilterTagList } from "@/components/FilterTagList";
 import SingleLabelInputGroup from "@/components/SingleLabelInputGroup";

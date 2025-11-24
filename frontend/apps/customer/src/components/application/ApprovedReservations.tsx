@@ -18,7 +18,7 @@ import {
   Table,
   Tooltip,
 } from "hds-react";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";

@@ -1,7 +1,7 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { type TFunction } from "i18next";
-import { type GetServerSidePropsContext } from "next";
+import type { TFunction } from "i18next";
+import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";

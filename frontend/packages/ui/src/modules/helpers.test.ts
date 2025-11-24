@@ -1,4 +1,4 @@
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { describe, test, expect, it } from "vitest";
 import { formatApiTimeInterval, formatListToCSV, getTranslation, stripHtml } from "./helpers";
 

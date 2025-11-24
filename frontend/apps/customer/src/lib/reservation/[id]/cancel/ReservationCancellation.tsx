@@ -8,7 +8,7 @@ import { Card } from "ui/src/components";
 import { useDisplayError } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDate, applicationReservationDateTime } from "ui/src/modules/date-utils";
-import { type LocalizationLanguages } from "ui/src/modules/urlBuilder";
+import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { H1 } from "ui/src/styled";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { type CancelFormValues, CancellationForm } from "@/components/CancellationForm";

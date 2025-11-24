@@ -19,7 +19,7 @@ import {
   addMilliseconds,
   differenceInMinutes,
 } from "date-fns";
-import { type SlotProps } from "ui/src/components/calendar/Calendar";
+import type { SlotProps } from "ui/src/components/calendar/Calendar";
 import { getIntervalMinutes } from "ui/src/modules/conversion";
 import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
 import { dayMax, dayMin } from "ui/src/modules/helpers";

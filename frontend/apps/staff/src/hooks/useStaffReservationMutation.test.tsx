@@ -4,7 +4,7 @@ import { render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, test, expect, beforeEach } from "vitest";
 import { createNodeId } from "ui/src/modules/helpers";
-import { type UseStaffReservationFragment } from "@gql/gql-types";
+import type { UseStaffReservationFragment } from "@gql/gql-types";
 import { MUTATION_DATA, createMocks } from "./__test__/mocks";
 import { type MutationInputParams, useStaffReservationMutation } from "./useStaffReservationMutation";
 

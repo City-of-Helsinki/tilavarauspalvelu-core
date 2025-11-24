@@ -1,5 +1,5 @@
 import React from "react";
-import { type ApolloQueryResult } from "@apollo/client";
+import type { ApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";

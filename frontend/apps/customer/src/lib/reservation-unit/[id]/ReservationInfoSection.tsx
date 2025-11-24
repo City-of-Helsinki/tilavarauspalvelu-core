@@ -6,7 +6,7 @@ import { formatDurationRange, formatDateTime, parseValidDateObject } from "ui/sr
 import { getLocalizationLang } from "ui/src/modules/helpers";
 import { H4, Strong } from "ui/src/styled";
 import { formatNDays } from "@/modules/reservationUnit";
-import { type ReservationInfoSectionFragment } from "@gql/gql-types";
+import type { ReservationInfoSectionFragment } from "@gql/gql-types";
 
 const Subheading = styled(H4).attrs({ as: "h2", $noMargin: true })`
   border-bottom: 1px solid var(--color-black-50);

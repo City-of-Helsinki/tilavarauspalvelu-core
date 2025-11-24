@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
 import type { TFunction } from "i18next";
-import { type CalendarEvent } from "ui/src/components/calendar/Calendar";
+import type { CalendarEvent } from "ui/src/components/calendar/Calendar";
 import { convertWeekday } from "ui/src/modules/conversion";
 import {
   dateToMinutes,

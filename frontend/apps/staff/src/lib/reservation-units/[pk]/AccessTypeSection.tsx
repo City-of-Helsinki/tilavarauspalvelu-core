@@ -11,7 +11,7 @@ import { NotificationInline } from "@/components/NotificationInline";
 import { getTranslatedError } from "@/modules/helpers";
 import { KVWrapper, Label, Value } from "@/styled";
 import { AccessType, ReservationUnitEditQuery } from "@gql/gql-types";
-import { type ReservationUnitEditFormValues } from "./form";
+import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];

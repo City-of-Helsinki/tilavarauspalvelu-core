@@ -16,7 +16,7 @@ import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import { ErrorText } from "ui/src/components/ErrorText";
 import { filterNonNullable } from "ui/src/modules/helpers";
-import { type OptionsListT } from "ui/src/modules/search";
+import type { OptionsListT } from "ui/src/modules/search";
 import { Flex } from "ui/src/styled";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { FixedDialog } from "@/styled/FixedDialog";

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { type UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { Button, ButtonVariant, IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
@@ -10,7 +10,7 @@ import { ButtonLikeLink } from "@ui/components/ButtonLikeLink";
 import { errorToast } from "@ui/components/toast";
 import { useDisplayError } from "@ui/hooks";
 import { breakpoints } from "@ui/modules/const";
-import { type OptionsRecord } from "@ui/types";
+import type { OptionsRecord } from "@ui/types";
 import { AcceptTerms } from "@/components/AcceptTerms";
 import { ReservationInfoCard, SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
 import { convertReservationFormToApi } from "@/modules/reservation";

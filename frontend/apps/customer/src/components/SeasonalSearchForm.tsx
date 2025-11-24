@@ -7,7 +7,7 @@ import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchBut
 import { ControlledNumberInput } from "ui/src/components/form";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { mapParamToInteger, toNumber } from "ui/src/modules/helpers";
-import { type OptionsListT } from "ui/src/modules/search";
+import type { OptionsListT } from "ui/src/modules/search";
 import { AutoGrid, Flex } from "ui/src/styled";
 import { AccessType } from "@gql/gql-types";
 import { FilterTagList } from "./FilterTagList";

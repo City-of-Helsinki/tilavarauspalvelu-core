@@ -11,7 +11,7 @@ import { getImageSource, getLocalizationLang, getTranslation, getMainImage } fro
 import { isBrowser } from "@/modules/const";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
-import { type SingleSearchCardFragment } from "@gql/gql-types";
+import type { SingleSearchCardFragment } from "@gql/gql-types";
 
 function StatusTag(props: Pick<SingleSearchCardFragment, "isClosed" | "firstReservableDatetime">): JSX.Element {
   const { t } = useTranslation();

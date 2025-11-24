@@ -9,7 +9,7 @@ import { formatDateRange, parseValidDateObject } from "ui/src/modules/date-utils
 import { Flex, fontMedium } from "ui/src/styled";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { getApplicationRoundUrl } from "@/modules/urls";
-import { type ApplicationRoundCardFragment } from "@gql/gql-types";
+import type { ApplicationRoundCardFragment } from "@gql/gql-types";
 import { TimeframeStatus } from "./TimeframeStatus";
 
 const Times = styled(Flex).attrs({

@@ -3,7 +3,7 @@ import { Controller, useForm } from "react-hook-form";
 import { ApolloError, gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonVariant, RadioButton, SelectionGroup, TextInput } from "hds-react";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useTranslation, type TFunction } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import dynamic from "next/dynamic";

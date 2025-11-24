@@ -168,7 +168,7 @@ export function minutesToHoursString(minutes: number, trailingMinutes = false): 
  */
 export function timeToMinutes(time: string): number {
   const [hours, minutes] = time.split(":").map(Number);
-  if (hours != null && minutes != null && isFinite(hours) && isFinite(minutes)) {
+  if (hours != null && minutes != null && Number.isFinite(hours) && Number.isFinite(minutes)) {
     return hours * 60 + minutes;
   }
   return 0;

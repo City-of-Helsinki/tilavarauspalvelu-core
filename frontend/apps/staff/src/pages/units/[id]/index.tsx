@@ -2,7 +2,7 @@ import React from "react";
 import { gql } from "@apollo/client";
 import { ReservationUnitList } from "@lib/units/[id]/ReservationUnitList";
 import { Button, ButtonVariant, IconPlusCircleFill, Notification, NotificationSize } from "hds-react";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Link from "next/link";

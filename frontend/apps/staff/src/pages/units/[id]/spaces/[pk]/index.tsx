@@ -1,6 +1,6 @@
 import React from "react";
 import { SpaceEditor } from "@lib/units/[id]/spaces/[pk]/SpaceEditor";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";

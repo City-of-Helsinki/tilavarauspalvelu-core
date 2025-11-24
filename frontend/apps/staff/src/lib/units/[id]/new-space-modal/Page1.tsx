@@ -4,7 +4,7 @@ import { Button, ButtonVariant, Dialog, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { H4 } from "ui/src/styled";
 import { DialogActionsButtons } from "@/styled";
-import { type UnitPageQuery } from "@gql/gql-types";
+import type { UnitPageQuery } from "@gql/gql-types";
 import { ParentSelector } from "../ParentSelector";
 import { SpaceUpdateForm } from "../SpaceForm";
 import { StyledTag } from "./modules/newSpaceModal";

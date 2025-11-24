@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { type TFunction, useTranslation } from "next-i18next";
 import { filterNonNullable, sort } from "ui/src/modules/helpers";
-import { type TagOptionsList } from "@/modules/search";
+import type { TagOptionsList } from "@/modules/search";
 import {
   MunicipalityChoice,
   OrderStatusWithFree,

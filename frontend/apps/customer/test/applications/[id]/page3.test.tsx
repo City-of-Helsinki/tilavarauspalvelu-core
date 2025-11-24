@@ -6,7 +6,7 @@ import userEvent from "@testing-library/user-event";
 import { vi, expect, test, describe } from "vitest";
 import { getApplicationPath } from "@/modules/urls";
 import Page3 from "@/pages/applications/[id]/page3";
-import { type ApplicationPage3Query } from "@gql/gql-types";
+import type { ApplicationPage3Query } from "@gql/gql-types";
 
 const { mockedRouterPush, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();

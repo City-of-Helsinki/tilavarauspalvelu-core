@@ -1,5 +1,5 @@
 import React from "react";
-import { type TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import { SearchTagContainer, SearchTag, TagResetButton } from "ui/src/styled/tags";

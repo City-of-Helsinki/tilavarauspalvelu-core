@@ -8,13 +8,13 @@ import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { ControlledNumberInput, ControlledSelect } from "ui/src/components/form";
 import { formatDate, formatDateRange } from "ui/src/modules/date-utils";
 import { getLocalizationLang } from "ui/src/modules/helpers";
-import { type OptionsListT } from "ui/src/modules/search";
+import type { OptionsListT } from "ui/src/modules/search";
 import { AutoGrid, Flex, H4 } from "ui/src/styled";
 import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
 import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { ApplicationSectionSummary, ReservationUnitList } from ".";
-import { type ApplicationPage1FormValues } from "./form";
+import type { ApplicationPage1FormValues } from "./form";
 
 type Props = Readonly<{
   index: number;

@@ -28,7 +28,7 @@ import {
   type ReservationUnitAccessTypeSerializerInput,
   Weekday,
 } from "@gql/gql-types";
-import { type TaxOption } from "./PricingSection";
+import type { TaxOption } from "./PricingSection";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;

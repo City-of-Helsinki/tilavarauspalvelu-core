@@ -4,7 +4,7 @@ import { IconCheck } from "hds-react";
 import styled from "styled-components";
 import { fontMedium, Flex } from "ui/src/styled";
 import { formatAddress } from "@/modules/helpers";
-import { type UnitResourceInfoFieldsFragment } from "@gql/gql-types";
+import type { UnitResourceInfoFieldsFragment } from "@gql/gql-types";
 
 const UnitInfoWrapper = styled(Flex).attrs({
   $gap: "2-xs",

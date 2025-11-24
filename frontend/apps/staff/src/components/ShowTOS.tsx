@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { useGenericTerms } from "ui/src/hooks/useGenericTerms";
-import { type Maybe, type TermsOfUseTextFieldsFragment } from "@gql/gql-types";
+import type { Maybe, TermsOfUseTextFieldsFragment } from "@gql/gql-types";
 
 // NOTE This is partial duplicate from ui/application/Preview.tsx
 // see if we can combine them (and other Terms later with parameters)

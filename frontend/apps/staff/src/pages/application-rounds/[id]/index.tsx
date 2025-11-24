@@ -28,7 +28,7 @@ import { createClient } from "@/modules/apolloClient";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { isApplicationRoundInProgress } from "@/modules/helpers";
 import { hasPermission } from "@/modules/permissionHelper";
-import { type TagOptionsList } from "@/modules/search";
+import type { TagOptionsList } from "@/modules/search";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationRoundUrl } from "@/modules/urls";
 import {

@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { ControlledSelect } from "ui/src/components/form";
 import { AutoGrid } from "ui/src/styled";
 import { ControlledRichTextInput } from "./ControlledRichTextInput";
-import { type ReservationUnitEditFormValues } from "./form";
+import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 
 type OptionType = { value: string; label: string };

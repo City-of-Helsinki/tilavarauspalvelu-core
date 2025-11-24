@@ -12,7 +12,7 @@ import {
   isPossibleToReturn,
 } from "@/modules/reservationModificationRules";
 import { getReservationUrl } from "@/modules/urls";
-import { type ApprovalButtonsFragment } from "@gql/gql-types";
+import type { ApprovalButtonsFragment } from "@gql/gql-types";
 import { ApproveDialog } from "./ApproveDialog";
 import { ReturnToRequiresHandlingDialog } from "./ReturnToRequiresHandlingDialog";
 

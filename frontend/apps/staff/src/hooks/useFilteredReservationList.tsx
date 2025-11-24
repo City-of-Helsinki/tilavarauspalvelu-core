@@ -5,7 +5,7 @@ import { errorToast } from "ui/src/components/toast";
 import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { isValidDate, formatApiDate, timeToMinutes } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
-import { type NewReservationListItem } from "@/components/ReservationsList";
+import type { NewReservationListItem } from "@/components/ReservationsList";
 import {
   type CollisionInterval,
   combineAffectingReservations,

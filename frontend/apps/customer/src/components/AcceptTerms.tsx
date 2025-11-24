@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { Sanitize } from "ui/src/components/Sanitize";
 import TermsBox from "ui/src/components/TermsBox";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
-import { type TermsOfUseTextFieldsFragment, type Maybe, type TermsOfUseFragment } from "@gql/gql-types";
+import type { TermsOfUseTextFieldsFragment, Maybe, TermsOfUseFragment } from "@gql/gql-types";
 
 export function AcceptTerms({
   reservationUnit,

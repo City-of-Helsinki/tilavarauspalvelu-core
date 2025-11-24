@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, LinkSize } from "hds-react";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H1, HR } from "ui/src/styled";

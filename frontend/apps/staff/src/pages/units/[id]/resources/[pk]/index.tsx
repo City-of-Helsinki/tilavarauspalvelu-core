@@ -1,6 +1,6 @@
 import React from "react";
 import { ResourceEditor } from "@lib/units/[id]/resources/[pk]/ResourceEditor";
-import { type GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
