@@ -287,6 +287,7 @@ export function filterEmptyArray<T>(param: T[]): T[] | undefined {
 
 type PossibleKeys = string;
 type Lang = Capitalize<LocalizationLanguages>;
+// extend an arbitrary record to always have all language variants for the "key" (user defined)
 type RecordWithTranslation<K extends PossibleKeys, T extends string | null> = {
   // enforce {K}Fi | {K}En | {K}Sv to exist in the record
   [Property in `${K}${Lang}`]: T;
@@ -295,26 +296,48 @@ type RecordWithTranslation<K extends PossibleKeys, T extends string | null> = {
   [key: string]: unknown;
 };
 
-/// Find a translation from a gql query result
+function getTranslationFallback<K extends PossibleKeys, T extends string | null>(
+  dict: RecordWithTranslation<K, T>,
+  key: K
+): string {
+  const val = dict[`${key}Fi`];
+  return cleanTranslatedValue(val, key);
+}
+
+/// helper for type narrowing translated fields from arbitrary records
+function cleanTranslatedValue<K extends PossibleKeys, T extends string | null>(
+  value:
+    | RecordWithTranslation<K, T>[`${K}Fi`]
+    | RecordWithTranslation<K, T>[`${K}Sv`]
+    | RecordWithTranslation<K, T>[`${K}En`],
+  key: PossibleKeys
+): string {
+  // type guard for return type (type enforcement checks that the Keys map to strings)
+  if (typeof value === "string") {
+    return value;
+  }
+  // oxlint-disable-next-line eqeqeq -- undefined never because of the type checker -> throw for it
+  if (value === null) {
+    return "";
+  }
+  // never
+  throw new Error(`Object is missing translation for ${key}`);
+}
+
+/// Pick the correct translation from a GraphQL result type safely.
+/// @param dict - GraphQL node (can be arbitrary record) will be type checked for key
+/// @key - record key we want the localised version (without the localisation postfix e.g. Fi)
 /// @param lang - language to use, use useTranslation hook in get the current language inside a component
-/// grpaphql schema allows for nulls for translated fields -> treat them as empty strings
+/// GrpaphQL schema allows for nulls for translated fields -> treat them as empty strings.
+/// Fallback to Finnish translations if localisation is empty (undefined / missing is an error).
 export function getTranslation<K extends PossibleKeys, T extends string | null>(
   dict: RecordWithTranslation<K, T>,
   key: K,
   lang: LocalizationLanguages
 ): string {
   const localKey: `${K}${Lang}` = `${key}${capitalize(lang)}`;
-  const val = dict[localKey];
-  // type guard for return type (type enforcement checks that the Keys map to strings)
-  if (typeof val === "string") {
-    return val;
-  }
-  // oxlint-disable-next-line eqeqeq -- don't allow undefined here
-  if (val === null) {
-    return "";
-  }
-  // never
-  throw new Error(`Object is missing translation for ${key}`);
+  const value = cleanTranslatedValue(dict[localKey], key);
+  return value || getTranslationFallback(dict, key);
 }
 
 /**
