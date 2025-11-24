@@ -69,7 +69,6 @@ export const getStatusBorderColor = ($type: StatusLabelType) => {
     case "draft":
       return "var(--color-suomenlinna)";
     case "neutral":
-    default:
       return "var(--color-silver-dark)";
   }
 };
@@ -87,7 +86,6 @@ export const getStatusBackgroundColor = ($type: StatusLabelType) => {
     case "draft":
       return "var(--color-suomenlinna-medium-light)";
     case "neutral":
-    default:
       return "var(--color-silver)";
   }
 };

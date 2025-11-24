@@ -48,17 +48,14 @@ const Anchor = styled(Link)<{ $current?: boolean; $isMobile?: boolean }>`
     max-width: ${LIMIT_DEFAULT_CH}ch;
     ${truncatedText}
     ${({ $current }) => {
-      switch ($current) {
-        case true:
-          return currentCss;
-        case false:
-        default:
-          return `
+      if ($current) {
+        return currentCss;
+      }
+      return `
             color: var(--color-black);
             text-decoration: underline;
           `;
-      }
-    }}
+    }}}
   }
 `;
 

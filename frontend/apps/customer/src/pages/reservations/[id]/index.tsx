@@ -132,7 +132,8 @@ function shouldShowStatusNotification(
         (reservation.paymentOrder?.status === OrderStatus.Paid ||
           reservation.paymentOrder?.status === OrderStatus.PaidByInvoice)
       );
-    default:
+    case "polling_timeout":
+    case null:
       return false;
   }
 }
@@ -148,14 +149,16 @@ function shouldShowPaymentNotification(reservation: Pick<PropsNarrowed, "reserva
 
 /// Type safe "notify" query param converter
 function convertNotify(str: string | null): ReservationNotifications | null {
-  switch (str) {
-    case "requires_handling":
-    case "confirmed":
-    case "paid":
-      return str;
-    default:
-      return null;
+  if (str == null) {
+    return null;
   }
+
+  const allowedNotifications = ["requires_handling", "confirmed", "paid"];
+  if (allowedNotifications.includes(str)) {
+    return str as ReservationNotifications;
+  }
+
+  return null;
 }
 
 // TODO add a state check => if state is Created redirect to the reservation funnel

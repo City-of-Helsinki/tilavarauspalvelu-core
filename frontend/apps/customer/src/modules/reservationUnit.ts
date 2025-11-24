@@ -61,7 +61,11 @@ export function isReservationUnitPublished(reservationUnit: Pick<ReservationUnit
     case ReservationUnitPublishingState.Published:
     case ReservationUnitPublishingState.ScheduledHiding:
       return true;
-    default:
+    case ReservationUnitPublishingState.Archived:
+    case ReservationUnitPublishingState.Draft:
+    case ReservationUnitPublishingState.Hidden:
+    case ReservationUnitPublishingState.ScheduledPeriod:
+    case ReservationUnitPublishingState.ScheduledPublishing:
       return false;
   }
 }
@@ -76,7 +80,9 @@ const equipmentCategoryOrder = [
   "Muu",
 ] as const;
 
-export function getEquipmentCategories(equipment: Readonly<Array<Pick<EquipmentFieldsFragment, "category">>>): string[] {
+export function getEquipmentCategories(
+  equipment: Readonly<Array<Pick<EquipmentFieldsFragment, "category">>>
+): string[] {
   if (!equipment || equipment.length === 0) {
     return [];
   }

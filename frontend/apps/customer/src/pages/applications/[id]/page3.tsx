@@ -74,7 +74,7 @@ function Page3Form(): JSX.Element | null {
       return <OrganisationForm />;
     case ReserveeType.Company:
       return <CompanyForm />;
-    default:
+    case undefined:
       // TODO should we return disabled form here?
       return null;
   }

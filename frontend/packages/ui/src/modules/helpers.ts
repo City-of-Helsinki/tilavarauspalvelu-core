@@ -144,8 +144,6 @@ function getImageSourceWithoutDefault(
       return image.mediumUrl;
     case "full":
       return image.imageUrl;
-    default:
-      return null;
   }
 }
 

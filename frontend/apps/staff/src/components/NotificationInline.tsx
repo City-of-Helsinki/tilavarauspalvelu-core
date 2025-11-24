@@ -38,7 +38,7 @@ function getIcon(type: NotificationProps["type"]): React.ReactNode {
       return InfoIcon;
     case "error":
       return ErrorIcon;
-    default:
+    case undefined:
       return undefined;
   }
 }

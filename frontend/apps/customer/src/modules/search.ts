@@ -61,16 +61,10 @@ function transformOrderBy(
   desc: boolean,
   language: LocalizationLanguages
 ): ReservationUnitOrderingChoices | null {
-  switch (orderBy) {
-    case "name":
-      return transformOrderByName(desc, language);
-    case "unitName":
-      return transformOrderByUnitName(desc, language);
-    case "typeRank":
-      return transformOrderByTypeRank(desc, language);
-    default:
-      return null;
-  }
+  if (orderBy === "name") return transformOrderByName(desc, language);
+  if (orderBy === "unitName") return transformOrderByUnitName(desc, language);
+  if (orderBy === "typeRank") return transformOrderByTypeRank(desc, language);
+  return null;
 }
 
 /// Defaults to name sorting
@@ -185,12 +179,12 @@ export function translateOption(
 
 function getUnitsOrderBy(lang: LocalizationLanguages) {
   switch (lang) {
+    case "fi":
+      return UnitOrderingChoices.NameFiAsc;
     case "sv":
       return UnitOrderingChoices.NameSvAsc;
     case "en":
       return UnitOrderingChoices.NameEnAsc;
-    default:
-      return UnitOrderingChoices.NameFiAsc;
   }
 }
 

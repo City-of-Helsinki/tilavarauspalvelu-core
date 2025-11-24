@@ -78,8 +78,10 @@ function getRedirectUrl(reservation: RedirectProps): string | null {
       return getReservationPath(reservation.pk, undefined, "paid");
     case ReservationStateChoice.WaitingForPayment:
       return null;
+    case ReservationStateChoice.Cancelled:
     case ReservationStateChoice.Created:
-    default:
+    case ReservationStateChoice.Denied:
+    case null:
       // TODO what is this error? or the query param, is it really used for something
       // also why not redirect to the reservation page? it shows the payment status and a link to the payment page
       return "/reservations?error=order1";
