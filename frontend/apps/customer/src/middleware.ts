@@ -6,6 +6,7 @@
 // that libraries are not imported in the middleware.
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import z from "zod";
 import { gqlQueryFetch, isPageRequest, redirectCsrfToken } from "ui/src/middlewareHelpers";
 import type { GqlQuery } from "ui/src/middlewareHelpers";
 import { createNodeId, getLocalizationLang } from "ui/src/modules/helpers";
@@ -29,6 +30,30 @@ type Data = {
   } | null;
   user: User;
 };
+
+const CurrentUserSchema = z.object({
+  pk: z.number(),
+});
+const ReservationSchema = z.object({
+  type: z.enum(ReservationTypeChoice),
+  state: z.enum(ReservationStateChoice),
+  user: CurrentUserSchema,
+  reservationUnit: z.object({
+    pk: z.number(),
+  }),
+});
+const ApplicationSchema = z.object({
+  id: z.string(),
+  user: CurrentUserSchema,
+});
+const QueryResultSchema = z.object({
+  currentUser: CurrentUserSchema.nullable(),
+  reservation: ReservationSchema.nullish(),
+  application: ApplicationSchema.nullish(),
+});
+const MiddlewareQuerySchema = z.object({
+  data: QueryResultSchema,
+});
 
 const RESERVATION_QUERY = `
   reservation(id: $reservationId) {
@@ -110,114 +135,31 @@ ${applicationId ? "$applicationId: ID!" : ""}
   }
 
   const data: unknown = await res.json();
-  if (typeof data !== "object" || data == null || !("data" in data)) {
-    // eslint-disable-next-line no-console
-    console.warn("Middleware: no data in response");
+
+  try {
+    const parsed = MiddlewareQuerySchema.parse(data);
+    const res = parsed.data;
+    if (res.currentUser == null) {
+      return null;
+    }
+
+    const userPkToCheck = res.reservation?.user.pk || res.application?.user.pk;
+    return {
+      reservation: {
+        state: res.reservation?.state,
+        type: res.reservation?.type,
+        resUnitPk: res.reservation?.reservationUnit.pk ?? null,
+      },
+      user: {
+        pk: res.currentUser.pk,
+        hasAccess: userPkToCheck == null || res.currentUser.pk === userPkToCheck,
+      },
+    };
+  } catch (err) {
+    // oxlint-disable-next-line no-console
+    console.error("Failed to parse graphql response:", err);
     return null;
   }
-
-  const user = parseUserGQLquery(data.data, reservationId, applicationId);
-  if (user == null) {
-    return null;
-  }
-
-  return {
-    reservation: parseReservationGQLquery(data.data),
-    user,
-  };
-}
-
-/// return reservation data from the gql query or null if it's not found
-function parseReservationGQLquery(data: unknown): Data["reservation"] | null {
-  if (data != null && typeof data === "object" && "reservation" in data) {
-    const { reservation } = data;
-
-    if (reservation != null && typeof reservation === "object") {
-      let type: ReservationTypeChoice | null = null;
-      if ("type" in reservation && reservation.type != null && typeof reservation.type === "string") {
-        type = reservation.type as ReservationTypeChoice;
-      }
-
-      let state: ReservationStateChoice | null = null;
-      if ("state" in reservation && reservation.state != null && typeof reservation.state === "string") {
-        state = reservation.state as ReservationStateChoice;
-      }
-
-      let resUnitPk: number | null = null;
-      if (
-        "reservationUnit" in reservation &&
-        reservation.reservationUnit != null &&
-        typeof reservation.reservationUnit === "object" &&
-        "pk" in reservation.reservationUnit &&
-        typeof reservation.reservationUnit.pk === "number"
-      ) {
-        resUnitPk = reservation.reservationUnit.pk;
-      }
-      return { state, type, resUnitPk };
-    }
-  }
-
-  return null;
-}
-
-function parseUserGQLquery(data: unknown, reservationId: string | null, applicationId: string | null): User | null {
-  let userPk = null;
-  let hasAccess = reservationId == null && applicationId == null;
-  if (typeof data !== "object" || data == null) {
-    return null;
-  }
-
-  if ("currentUser" in data) {
-    const { currentUser } = data;
-    if (typeof currentUser === "object" && currentUser != null && "pk" in currentUser) {
-      userPk = typeof currentUser.pk === "number" ? currentUser.pk : null;
-    }
-  }
-
-  if ("reservation" in data) {
-    const { reservation } = data;
-
-    // Reservation doesn't exist or user has no access to it
-    // have to handle like this otherwise we can't redirect out of the funnel if the reservation was deleted
-    if (reservationId != null && reservation == null) {
-      hasAccess = true;
-    } else if (
-      reservation != null &&
-      typeof reservation === "object" &&
-      "user" in reservation &&
-      reservation.user != null &&
-      typeof reservation.user === "object" &&
-      "pk" in reservation.user
-    ) {
-      const { pk } = reservation.user;
-
-      if (pk != null && typeof pk === "number") {
-        hasAccess = pk === userPk;
-      }
-    }
-  }
-
-  if ("application" in data) {
-    const { application } = data;
-    if (
-      application != null &&
-      typeof application === "object" &&
-      "user" in application &&
-      application.user != null &&
-      typeof application.user === "object" &&
-      "pk" in application.user
-    ) {
-      const { pk } = application.user;
-      if (pk != null && typeof pk === "number") {
-        hasAccess = pk === userPk;
-      }
-    }
-  }
-
-  if (userPk != null) {
-    return { pk: userPk, hasAccess };
-  }
-  return null;
 }
 
 /// Get language code from the url
