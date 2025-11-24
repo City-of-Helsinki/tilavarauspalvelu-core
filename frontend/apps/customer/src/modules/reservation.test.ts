@@ -159,7 +159,7 @@ describe("getDurationOptions", () => {
   test("values for 90 min intervals", () => {
     const input = {
       minReservationDuration: 1800,
-      maxReservationDuration: 30600,
+      maxReservationDuration: 30_600,
       reservationStartInterval: ReservationStartInterval.Interval_90Minutes,
     } as const;
     expect(getDurationOptions(input, mockT).map((x) => x.value)).toEqual([90, 180, 270, 360, 450]);

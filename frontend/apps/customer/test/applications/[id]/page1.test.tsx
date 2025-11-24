@@ -169,7 +169,7 @@ describe("Page1", () => {
     await user.click(submitBtn);
     expect(view.queryAllByText(/application:validation/)).toStrictEqual([]);
     expect(mockedRouterPush).toHaveBeenCalled();
-  }, 10000);
+  }, 10_000);
 
   test("applied events over 7 should be invalid", async () => {
     const view = customRender();
