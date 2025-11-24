@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import type { RefObject } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonVariant, Dialog, LoadingSpinner, Notification, NotificationSize } from "hds-react";

@@ -13,7 +13,6 @@ import {
   CurrentUserDocument,
   FilterOptionsDocument,
   TermsOfUseDocument,
-  CalendarReservationFragment,
   AccessType,
   ReservationStateChoice,
   ReservationsByReservationUnitDocument,
@@ -27,6 +26,7 @@ import type {
   TermsOfUseQuery,
   ReservationsByReservationUnitQueryVariables,
   ReservationsByReservationUnitQuery,
+  CalendarReservationFragment,
 } from "@gql/gql-types";
 
 export function createReservationUnits(): CreateStaffReservationFragment[] {

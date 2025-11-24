@@ -6,11 +6,8 @@ import {
 } from "ui/src/components/statuses";
 import { Flex, fontBold, H1, TitleSection } from "ui/src/styled";
 import { formatAddress } from "@/modules/helpers";
-import {
-  ReservationUnitPublishingState,
-  ReservationUnitReservationState,
-  UnitSubpageHeadFragment,
-} from "@gql/gql-types";
+import type { ReservationUnitPublishingState, UnitSubpageHeadFragment } from "@gql/gql-types";
+import { ReservationUnitReservationState } from "@gql/gql-types";
 
 const UnitInformationWrapper = styled.div`
   font-size: var(--fontsize-heading-s);

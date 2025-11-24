@@ -4,7 +4,8 @@ import { Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
 import { createNodeId, convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";
-import { UnitSpacesQuery, useUnitSpacesQuery } from "@gql/gql-types";
+import type { UnitSpacesQuery } from "@gql/gql-types";
+import { useUnitSpacesQuery } from "@gql/gql-types";
 
 type AllSpaces = NonNullable<UnitSpacesQuery["unit"]>["spaces"];
 type SpaceNode = AllSpaces[0];

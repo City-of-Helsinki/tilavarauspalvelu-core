@@ -11,7 +11,7 @@ import {
 } from "@lib/application-rounds/[id]";
 import { Button, Tabs } from "hds-react";
 import { uniqBy } from "lodash-es";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Link from "next/link";
@@ -33,14 +33,9 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationRoundUrl } from "@/modules/urls";
 import {
   ApplicationRoundStatusChoice,
-  CurrentUserQuery,
   useApplicationRoundQuery,
   UserPermissionChoice,
-  ApplicationRoundQuery,
-  ApplicationRoundQueryVariables,
   ApplicationRoundDocument,
-  CheckPermissionsQuery,
-  CheckPermissionsQueryVariables,
   CheckPermissionsDocument,
   FilterOptionsDocument,
   CurrentUserDocument,
@@ -50,6 +45,11 @@ import type {
   Maybe,
   FilterOptionsQuery,
   FilterOptionsQueryVariables,
+  CurrentUserQuery,
+  ApplicationRoundQuery,
+  ApplicationRoundQueryVariables,
+  CheckPermissionsQuery,
+  CheckPermissionsQueryVariables,
 } from "@gql/gql-types";
 
 const TabContent = styled(Flex).attrs({

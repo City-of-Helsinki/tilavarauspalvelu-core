@@ -33,7 +33,6 @@ import type { ReservableMap, RoundPeriod } from "@/modules/reservable";
 import {
   PriceUnit,
   ReservationKind,
-  ReservationStartInterval,
   ReservationStateChoice,
   ReservationUnitPublishingState,
   ReservationUnitReservationState,
@@ -49,6 +48,7 @@ import type {
   ReservationPriceFieldsFragment,
   ReservationUnitAccessTypeNode,
   ReservationUnitNode,
+  ReservationStartInterval,
 } from "@gql/gql-types";
 
 export function isReservationUnitPublished(reservationUnit: Pick<ReservationUnitNode, "publishingState">): boolean {

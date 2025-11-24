@@ -14,7 +14,7 @@ import type { OptionsRecord } from "@ui/types";
 import { AcceptTerms } from "@/components/AcceptTerms";
 import { ReservationInfoCard, SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
 import { convertReservationFormToApi } from "@/modules/reservation";
-import { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
 import { useAdjustReservationTimeMutation } from "@gql/gql-types";
 import type { EditPageReservationFragment } from "@gql/gql-types";

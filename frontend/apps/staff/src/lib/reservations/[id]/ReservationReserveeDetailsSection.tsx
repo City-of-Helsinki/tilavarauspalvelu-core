@@ -22,8 +22,8 @@ import { H5 } from "ui/src/styled";
 import { breakpoints } from "@ui/modules/const";
 import { useSession } from "@/hooks";
 import { Accordion, ApplicationDatas } from "@/styled";
+import type { ReservationPageQuery } from "@gql/gql-types";
 import {
-  ReservationPageQuery,
   useReservationDateOfBirthQuery,
   useReservationProfileDataContactInfoQuery,
   useReservationProfileDataSsnQuery,

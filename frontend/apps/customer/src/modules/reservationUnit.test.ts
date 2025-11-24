@@ -7,7 +7,8 @@ import type { TFunction } from "i18next";
 import { get as mockGet } from "lodash-es";
 import { vi, describe, test, expect, beforeEach, afterEach, beforeAll, afterAll } from "vitest";
 import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
-import { createNodeId, ReadonlyDeep } from "ui/src/modules/helpers";
+import type { ReadonlyDeep } from "ui/src/modules/helpers";
+import { createNodeId } from "ui/src/modules/helpers";
 import {
   PriceUnit,
   ReservationUnitPublishingState,

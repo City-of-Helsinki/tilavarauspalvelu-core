@@ -1,6 +1,6 @@
 import React from "react";
-import { Controller, UseFormReturn } from "react-hook-form";
-import type { Control } from "react-hook-form";
+import { Controller } from "react-hook-form";
+import type { Control, UseFormReturn } from "react-hook-form";
 import { addDays, startOfDay } from "date-fns";
 import { IconAlertCircleFill, RadioButton } from "hds-react";
 import { capitalize } from "lodash-es";
@@ -17,7 +17,7 @@ import { AutoGrid, Flex, HR } from "ui/src/styled";
 import { getTranslatedError } from "@/modules/helpers";
 import { PaymentType, PriceUnit } from "@gql/gql-types";
 import { FieldGroup } from "./FieldGroup";
-import { ReservationUnitEditFormValues } from "./form";
+import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 
 const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {

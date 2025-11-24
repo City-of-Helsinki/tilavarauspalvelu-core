@@ -10,8 +10,7 @@ import { MAX_APPLICATION_ROUND_NAME_LENGTH } from "@/modules/const";
 import { getApplicantName, truncate } from "@/modules/helpers";
 import { getApplicationUrl } from "@/modules/urls";
 import { ExternalTableLink } from "@/styled";
-import { ApplicationSectionStatusChoice } from "@gql/gql-types";
-import type { ApplicationSectionTableElementFragment } from "@gql/gql-types";
+import type { ApplicationSectionStatusChoice, ApplicationSectionTableElementFragment } from "@gql/gql-types";
 import { calculateAppliedReservationTime, formatAppliedReservationTime } from "./utils";
 
 const unitsTruncateLen = 23;

@@ -2,11 +2,10 @@ import { createNodeId } from "ui/src/modules/helpers";
 import {
   CurrentUserDocument,
   OptionsDocument,
-  OptionsQuery,
   ReservationPurposeOrderingChoices,
   ReservationUnitTypeOrderingChoices,
 } from "@gql/gql-types";
-import type { CurrentUserQuery } from "@gql/gql-types";
+import type { CurrentUserQuery, OptionsQuery } from "@gql/gql-types";
 import { createApplicationMutationMocks } from "./application.mocks";
 import { createSearchQueryMocks } from "./search.mocks";
 import { createOptionQueryMock } from "./test.gql.utils";

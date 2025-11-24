@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
+import type { EventStyleType } from "@/modules/calendarStyling";
 import {
   CALENDAR_EVENT_BASE_STYLE,
   CALENDAR_LEGENDS,
   CONFIRMED,
   EVENT_BUFFER,
-  EventStyleType,
   REST,
   STAFF_RESERVATION,
   WAITING_PAYMENT,

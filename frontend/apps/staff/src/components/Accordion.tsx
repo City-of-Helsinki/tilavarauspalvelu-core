@@ -1,4 +1,5 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import React, { useEffect, useState } from "react";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";

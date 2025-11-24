@@ -1,10 +1,10 @@
 import type { CalendarEvent } from "ui/src/components/calendar/Calendar";
+import type { EventStyleType } from "@/modules/calendarStyling";
 import {
   BLOCKED,
   CALENDAR_LEGENDS,
   CONFIRMED,
   CALENDAR_EVENT_BASE_STYLE,
-  EventStyleType,
   INTERSECTING_RESERVATION_UNIT,
   STAFF_RESERVATION,
   UNCONFIRMED,

@@ -11,7 +11,8 @@ import { breakpoints } from "@ui/modules/const";
 import { ButtonLikeExternalLink, Flex, pageSideMargins, WhiteButton } from "@ui/styled";
 import { useModal } from "@/context/ModalContext";
 import { getUnitUrl } from "@/modules/urls";
-import { ReservationUnitEditQuery, UnitSubpageHeadFragment, useArchiveReservationUnitMutation } from "@gql/gql-types";
+import type { ReservationUnitEditQuery, UnitSubpageHeadFragment } from "@gql/gql-types";
+import { useArchiveReservationUnitMutation } from "@gql/gql-types";
 import type { ReservationUnitEditFormValues } from "./form";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];

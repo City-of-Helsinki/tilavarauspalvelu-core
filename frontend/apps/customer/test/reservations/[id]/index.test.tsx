@@ -11,7 +11,8 @@ import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Reservation from "@/pages/reservations/[id]";
-import { OrderStatus, ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
+import type { ReservationTypeChoice } from "@gql/gql-types";
+import { OrderStatus, ReservationStateChoice } from "@gql/gql-types";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
   const params = vi.fn();

@@ -1,7 +1,7 @@
 import { ReservationKind, ReservationUnitOrderingChoices, SearchReservationUnitsDocument } from "@gql/gql-types";
 import type { SearchReservationUnitsQuery, SearchReservationUnitsQueryVariables } from "@gql/gql-types";
 import { createMockReservationUnit } from "./reservation-unit.mocks";
-import { CreateGraphQLMocksReturn, ICreateGraphQLMock } from "./test.gql.utils";
+import type { CreateGraphQLMocksReturn, ICreateGraphQLMock } from "./test.gql.utils";
 
 interface SearchQueryProps extends ICreateGraphQLMock {
   isSearchError: boolean;

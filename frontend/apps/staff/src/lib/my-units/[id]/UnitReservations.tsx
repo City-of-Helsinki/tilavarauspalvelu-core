@@ -14,7 +14,8 @@ import { SearchTags } from "@/components/SearchTags";
 import { useUnitResources, useGetFilterSearchParams } from "@/hooks";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import type { ReservationUnitOption } from "@/hooks/useUnitResources";
-import { TagOptionsList, translateTag } from "@/modules/search";
+import type { TagOptionsList } from "@/modules/search";
+import { translateTag } from "@/modules/search";
 import { UnitCalendar } from "./UnitCalendar";
 import { legend } from "./eventStyleGetter";
 

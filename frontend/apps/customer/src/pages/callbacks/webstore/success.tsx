@@ -9,7 +9,8 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { WEBSTORE_SUCCESS_POLL_INTERVAL_MS, WEBSTORE_SUCCESS_POLL_TIMEOUT_MS } from "@/modules/const";
 import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath } from "@/modules/urls";
-import { OrderStatus, ReservationStateChoice, ReservationStateQuery, useReservationStateQuery } from "@gql/gql-types";
+import type { ReservationStateQuery } from "@gql/gql-types";
+import { OrderStatus, ReservationStateChoice, useReservationStateQuery } from "@gql/gql-types";
 
 // TODO should be moved to /reservations/success
 // but because this is webstore callback page we need to leave the url (use an url rewrite)

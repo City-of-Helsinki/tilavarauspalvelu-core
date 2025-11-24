@@ -1,5 +1,6 @@
 import React, { Fragment } from "react";
-import { Controller, useFieldArray, UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
+import { Controller, useFieldArray } from "react-hook-form";
 import { Button, ButtonVariant, Checkbox, IconMinus, IconPlus } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled, { css } from "styled-components";
@@ -9,7 +10,7 @@ import { breakpoints, WEEKDAYS_SORTED } from "ui/src/modules/const";
 import { fontBold } from "ui/src/styled";
 import { Accordion } from "@/components/Accordion";
 import { getTranslatedError } from "@/modules/helpers";
-import { ReservationUnitEditFormValues } from "./form";
+import type { ReservationUnitEditFormValues } from "./form";
 
 const SeasonRowWrapper = styled.div`
   display: grid;

@@ -1,5 +1,6 @@
 import React from "react";
-import { IconSize, IconSortAscending, IconSortDescending, Option, Select } from "hds-react";
+import type { Option } from "hds-react";
+import { IconSize, IconSortAscending, IconSortDescending, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";

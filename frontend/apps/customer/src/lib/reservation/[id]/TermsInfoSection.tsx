@@ -4,7 +4,7 @@ import { Sanitize } from "ui/src/components/Sanitize";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
-import { getServerSideProps } from "@/pages/reservations/[id]";
+import type { getServerSideProps } from "@/pages/reservations/[id]";
 import type { ReservationPageQuery } from "@gql/gql-types";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];

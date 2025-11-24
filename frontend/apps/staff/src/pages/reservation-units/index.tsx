@@ -11,12 +11,8 @@ import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { getFilterOptions } from "@/hooks/useFilterOptions";
 import { createClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import {
-  FilterOptionsDocument,
-  FilterOptionsQuery,
-  FilterOptionsQueryVariables,
-  UserPermissionChoice,
-} from "@gql/gql-types";
+import type { FilterOptionsQuery, FilterOptionsQueryVariables } from "@gql/gql-types";
+import { FilterOptionsDocument, UserPermissionChoice } from "@gql/gql-types";
 
 function ReservationUnits({ optionsData }: { optionsData: PageProps["optionsData"] }): JSX.Element {
   const { t } = useTranslation();

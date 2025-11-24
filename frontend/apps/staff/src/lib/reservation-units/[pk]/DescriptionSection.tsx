@@ -1,5 +1,6 @@
 import React from "react";
-import { Controller, UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import dynamic from "next/dynamic";
 import { ControlledSelect } from "ui/src/components/form";

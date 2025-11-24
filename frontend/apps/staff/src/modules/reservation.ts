@@ -17,20 +17,17 @@ import {
 import { filterNonNullable, sort, toNumber } from "ui/src/modules/helpers";
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
 import { getReserveeName, getReserveeTypeTranslationKey } from "@/modules/helpers";
-import {
-  ReserveeType,
-  PriceUnit,
-  ReservationPriceDetailsFieldsFragment,
-  ReservationTypeChoice,
-  ReservationUnitPricingFieldsFragment,
-  EventStyleReservationFieldsFragment,
-} from "@gql/gql-types";
+import { PriceUnit, ReservationTypeChoice } from "@gql/gql-types";
 import type {
   CreateTagStringFragment,
   Maybe,
   PricingFieldsFragment,
   ReservationNode,
   ReservationPageQuery,
+  ReserveeType,
+  ReservationPriceDetailsFieldsFragment,
+  ReservationUnitPricingFieldsFragment,
+  EventStyleReservationFieldsFragment,
 } from "@gql/gql-types";
 
 export type EventType = EventStyleReservationFieldsFragment;

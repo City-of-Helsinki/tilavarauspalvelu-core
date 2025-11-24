@@ -1,5 +1,5 @@
-import { gql, NormalizedCacheObject } from "@apollo/client";
-import type { ApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
+import type { ApolloClient, NormalizedCacheObject } from "@apollo/client";
 import type { CommonEnvConfig } from "@ui/types";
 import { env } from "@/env.mjs";
 import { TermsOfUseTypeChoices, TermsOfUseDocument, OrderDocument } from "@gql/gql-types";

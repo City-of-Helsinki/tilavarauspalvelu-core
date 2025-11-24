@@ -58,20 +58,24 @@ import {
   LinkLikeButton,
 } from "ui/src/styled";
 import { AccordionWithIcons } from "@/components/AccordionWithIcons";
-import { isReservationCancellableReason, ReservationCancellableReason } from "@/modules/reservation";
+import type { ReservationCancellableReason } from "@/modules/reservation";
+import { isReservationCancellableReason } from "@/modules/reservation";
 import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 import { getApplicationReservationPath, getApplicationSectionPath, getReservationUnitPath } from "@/modules/urls";
-import type { ApplicationNode, ApplicationSectionReservationFragment } from "@gql/gql-types";
-import {
-  AccessType,
-  AccessTypeWithMultivalued,
+import type {
+  ApplicationNode,
+  ApplicationSectionReservationFragment,
   ApplicationRoundNode,
   ApplicationSectionReservationUnitFragment,
   Maybe,
   PindoraReservationFragment,
   PindoraSectionFragment,
-  ReservationStateChoice,
   ReservationUnitAccessTypeNode,
+} from "@gql/gql-types";
+import {
+  AccessType,
+  AccessTypeWithMultivalued,
+  ReservationStateChoice,
   useApplicationReservationsQuery,
 } from "@gql/gql-types";
 

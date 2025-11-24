@@ -1,4 +1,5 @@
-import React, { ReactElement } from "react";
+import type { ReactElement } from "react";
+import React from "react";
 import styled from "styled-components";
 import { Flex, focusStyles } from "../styled";
 

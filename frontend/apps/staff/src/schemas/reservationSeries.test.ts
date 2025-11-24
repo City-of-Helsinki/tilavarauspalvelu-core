@@ -2,7 +2,8 @@ import { addDays } from "date-fns";
 import { expect, test } from "vitest";
 import { formatDate } from "ui/src/modules/date-utils";
 import { ReservationStartInterval, ReservationTypeChoice, Weekday } from "@gql/gql-types";
-import { getReservationSeriesSchema, ReservationSeriesFormValues } from "./reservationSeries";
+import type { ReservationSeriesFormValues } from "./reservationSeries";
+import { getReservationSeriesSchema } from "./reservationSeries";
 
 const tomorrow = addDays(new Date(), 1);
 const interval = ReservationStartInterval.Interval_15Minutes;

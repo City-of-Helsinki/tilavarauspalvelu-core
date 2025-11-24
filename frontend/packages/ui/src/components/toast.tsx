@@ -1,6 +1,6 @@
 import React from "react";
-import { ToastContainer as TC, toast as toastFn, ToastOptions } from "react-toastify";
-import type { Id } from "react-toastify";
+import { ToastContainer as TC, toast as toastFn } from "react-toastify";
+import type { Id, ToastOptions } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { IconCheckCircleFill, IconErrorFill, IconInfoCircleFill, Notification } from "hds-react";
 import styled from "styled-components";

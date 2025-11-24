@@ -1,7 +1,8 @@
 import React from "react";
 import { useController } from "react-hook-form";
 import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
-import { defaultFilter, Option, Select, Tooltip } from "hds-react";
+import type { Option } from "hds-react";
+import { defaultFilter, Select, Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { convertOptionToHDS, filterNonNullable, getLocalizationLang, toNumber } from "../../modules/helpers";

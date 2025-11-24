@@ -1,5 +1,5 @@
 import React from "react";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { DeactivatedAccount } from "ui/src/components/DeactivatedAccount";
 import { useEnvContext } from "@/context/EnvContext";

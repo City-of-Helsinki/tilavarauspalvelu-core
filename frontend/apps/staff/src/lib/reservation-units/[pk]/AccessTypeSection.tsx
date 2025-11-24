@@ -1,5 +1,6 @@
 import React from "react";
-import { useFieldArray, UseFormReturn } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
+import { useFieldArray } from "react-hook-form";
 import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -10,7 +11,8 @@ import { AutoGrid, Flex, H6 } from "ui/src/styled";
 import { NotificationInline } from "@/components/NotificationInline";
 import { getTranslatedError } from "@/modules/helpers";
 import { KVWrapper, Label, Value } from "@/styled";
-import { AccessType, ReservationUnitEditQuery } from "@gql/gql-types";
+import type { ReservationUnitEditQuery } from "@gql/gql-types";
+import { AccessType } from "@gql/gql-types";
 import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 

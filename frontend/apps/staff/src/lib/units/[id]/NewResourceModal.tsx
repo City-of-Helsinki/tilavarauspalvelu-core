@@ -11,7 +11,8 @@ import { ResourceLocationType, useCreateResourceMutation } from "@gql/gql-types"
 import type { ResourceCreateMutationInput, NewResourceUnitFieldsFragment } from "@gql/gql-types";
 import { ResourceEditorFields } from "./ResourceEditForm";
 import { UnitInfo } from "./UnitInfo";
-import { Editor, ResourceUpdateForm, ResourceUpdateSchema } from "./modules/resourceEditor";
+import type { ResourceUpdateForm } from "./modules/resourceEditor";
+import { Editor, ResourceUpdateSchema } from "./modules/resourceEditor";
 
 interface ModalProps {
   unit: NewResourceUnitFieldsFragment;

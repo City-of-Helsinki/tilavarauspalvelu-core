@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
-import { Control, FieldValues, Path, useController, UseControllerProps } from "react-hook-form";
+import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
+import { useController } from "react-hook-form";
 import { gql } from "@apollo/client";
 import {
   Button,

@@ -1,6 +1,7 @@
 import React from "react";
 import { IconArrowRight } from "hds-react";
-import { TFunction, useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import styled from "styled-components";
 import { breakpoints } from "../modules/const";
