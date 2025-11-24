@@ -73,12 +73,12 @@ export const H2 = styled.h2<{
   }
 `;
 
-export const H3 = styled.h3<{ $noMargin?: boolean }>`
+export const H3 = styled.h3<{ $noMargin?: boolean; $marginTop?: SpacingSize }>`
   font-size: var(--fontsize-heading-s);
   ${fontRegular};
   line-height: 2rem;
   margin-bottom: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-m)`)};
-  margin-top: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-s)`)};
+  margin-top: ${({ $noMargin, $marginTop }) => ($noMargin ? `0` : `var(--spacing-${$marginTop ?? "s"})`)};
 
   @media (min-width: ${breakpoints.s}) {
     font-size: var(--fontsize-heading-m);
