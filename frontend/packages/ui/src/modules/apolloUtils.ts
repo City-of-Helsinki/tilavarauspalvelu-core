@@ -280,14 +280,16 @@ export const errorLink = onError(({ graphQLErrors, networkError }) => {
 function isCSRFError(error: Error | ServerParseError | ServerError): boolean {
   const statusCode = "statusCode" in error ? error.statusCode : null;
 
-  if (statusCode === 403) {
-    if ("result" in error && error.result != null) {
-      if (typeof error.result === "object" && "code" in error.result) {
-        const code = error.result.code;
-        if (code === "CSRF_FAILURE") {
-          return true;
-        }
-      }
+  if (
+    statusCode === 403 &&
+    "result" in error &&
+    error.result != null &&
+    typeof error.result === "object" &&
+    "code" in error.result
+  ) {
+    const code = error.result.code;
+    if (code === "CSRF_FAILURE") {
+      return true;
     }
   }
   return false;

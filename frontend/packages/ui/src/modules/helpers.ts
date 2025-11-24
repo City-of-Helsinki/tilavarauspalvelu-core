@@ -112,7 +112,7 @@ export async function hash(val: string): Promise<string> {
 }
 
 export function truncate(val: string, maxLen: number): string {
-  return val.length > maxLen ? `${val.substring(0, maxLen - 1)}…` : val;
+  return val.length > maxLen ? `${val.slice(0, maxLen - 1)}…` : val;
 }
 
 /// Always return an image because the Design and process should not allow imageless reservation units
@@ -352,16 +352,16 @@ export function stripHtml(html: string): string {
   if (typeof window === "undefined") {
     // Server-side: use regex-based approach
     return html
-      .replace(/<[^>]*>/g, "") // Remove HTML tags
-      .replace(/&nbsp;/g, "\u00A0") // Decode non-breaking space
-      .replace(/&amp;/g, "&") // Decode ampersand
-      .replace(/&lt;/g, "<") // Decode less than
-      .replace(/&gt;/g, ">") // Decode greater than
-      .replace(/&quot;/g, '"') // Decode double quote
-      .replace(/&#39;/g, "'") // Decode single quote
-      .replace(/&apos;/g, "'") // Decode apostrophe
-      .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(Number(dec))) // Decode numeric entities
-      .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(Number.parseInt(hex, 16))) // Decode hex entities
+      .replaceAll(/<[^>]*>/g, "") // Remove HTML tags
+      .replaceAll("&nbsp;", "\u00A0") // Decode non-breaking space
+      .replaceAll("&amp;", "&") // Decode ampersand
+      .replaceAll("&lt;", "<") // Decode less than
+      .replaceAll("&gt;", ">") // Decode greater than
+      .replaceAll("&quot;", '"') // Decode double quote
+      .replaceAll("&#39;", "'") // Decode single quote
+      .replaceAll("&apos;", "'") // Decode apostrophe
+      .replaceAll(/&#(\d+);/g, (_, dec) => String.fromCodePoint(Number(dec))) // Decode numeric entities
+      .replaceAll(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(Number.parseInt(hex, 16))) // Decode hex entities
       .trim();
   }
 

@@ -28,7 +28,7 @@ vi.mock("next-i18next", () => ({
         changeLanguage: () => new Promise(() => {}),
         language: "fi",
         exists: (str: string) => {
-          if (str.match(/failExistsOnPurpose/i)) {
+          if (/failExistsOnPurpose/i.test(str)) {
             return false;
           }
           return true;

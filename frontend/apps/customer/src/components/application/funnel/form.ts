@@ -121,7 +121,7 @@ const ApplicationSectionPage2Schema = z
   })
   .superRefine((s, ctx) => {
     const rangesPerWeek = s.suitableTimeRanges.reduce<typeof s.suitableTimeRanges>((acc, tr) => {
-      if (acc.find((x) => x.dayOfTheWeek === tr.dayOfTheWeek)) {
+      if (acc.some((x) => x.dayOfTheWeek === tr.dayOfTheWeek)) {
         return acc;
       }
       return [...acc, tr];
@@ -357,14 +357,12 @@ export const ApplicationPage3Schema = z
         });
       }
     }
-    if (val.applicantType === ReserveeType.Nonprofit) {
-      if (!val.municipality) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["municipality"],
-          message: "Required",
-        });
-      }
+    if (val.applicantType === ReserveeType.Nonprofit && !val.municipality) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["municipality"],
+        message: "Required",
+      });
     }
   });
 

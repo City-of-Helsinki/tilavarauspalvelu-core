@@ -117,7 +117,7 @@ export function getEquipmentList(
           n.category?.nameFi === category ||
           (category === "Muu" &&
             n.category?.nameFi &&
-            !equipmentCategoryOrder.find((order) => order === n.category.nameFi))
+            !equipmentCategoryOrder.some((order) => order === n.category.nameFi))
       )
       .sort((a, b) => (a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0))
   );
@@ -371,7 +371,7 @@ export function isReservationUnitPaid(pricings: Readonly<PricingFieldsFragment[]
           const start = new Date(p.begins);
           return start <= date;
         });
-  return d.filter((p) => !isPriceFree(p)).length > 0;
+  return d.some((p) => !isPriceFree(p)).length > 0;
 }
 
 /// Returns true if the given time is 'inside' the time span
@@ -558,7 +558,7 @@ function getAvailableTimesForDay({
   }
   const [timeHours, timeMinutesRaw] = [0, 0];
 
-  const timeMinutes = timeMinutesRaw > 59 ? 59 : timeMinutesRaw;
+  const timeMinutes = Math.min(59, timeMinutesRaw);
   return getPossibleTimesForDay({
     reservableTimes,
     date: start,

@@ -69,8 +69,7 @@ export function generateReservations(props: TimeSelectionFormValues) {
 
     return firstWeek
       .filter((time) => repeatOnDays.includes(dayOfWeek(time)))
-      .map((x) => eachDayOfInterval(x, eDay, repeatPattern === "weekly" ? 7 : 14))
-      .reduce((acc, x) => [...acc, ...x], [])
+      .flatMap((x) => eachDayOfInterval(x, eDay, repeatPattern === "weekly" ? 7 : 14))
       .map((day) => ({
         date: new Date(day),
         startTime,

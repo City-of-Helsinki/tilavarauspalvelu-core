@@ -70,7 +70,7 @@ function EventGroupList({
   type: AllocationApplicationSectionCardType;
   refetch: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
 }): JSX.Element {
-  if (applicationSections.length < 1) {
+  if (applicationSections.length === 0) {
     return <div>-</div>;
   }
 
@@ -216,7 +216,7 @@ function ApplicationSectionColumn({
 
   // locked or rejected but not in the allocated list
   const locked = sections
-    .filter((x) => allocated.find((y) => x.pk === y.pk) == null)
+    .filter((x) => allocated.some((y) => x.pk === y.pk))
     .filter((as) => isLocked(as) || isRejected(as));
 
   // take certain states and omit colliding application events

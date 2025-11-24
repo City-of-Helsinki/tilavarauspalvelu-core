@@ -14,7 +14,7 @@ export async function queryOptions(
 
   const reservationPurposes = filterNonNullable(data.reservationPurposes?.edges?.map((e) => e?.node));
   const ageGroups = filterNonNullable(data.ageGroups?.edges?.map((e) => e?.node));
-  if (!ageGroups || ageGroups.length < 1) {
+  if (!ageGroups || ageGroups.length === 0) {
     // eslint-disable-next-line no-console
     console.warn("No ageGroups received!");
   }

@@ -142,7 +142,7 @@ function ActionButtons({ selectedRows }: ActionButtonsProps): React.ReactElement
   const { env } = useEnvContext();
   const { t } = useTranslation();
 
-  const selectedPks = selectedRows.map((id) => Number(id)).filter((id) => !Number.isNaN(id));
+  const selectedPks = selectedRows.map(Number).filter((id) => !Number.isNaN(id));
   const redirectOnErrorUrl = isBrowser ? window.location.href : undefined;
   const openingHoursUrl = getOpeningHoursUrl(env.apiBaseUrl, selectedPks, redirectOnErrorUrl);
   const editLink = openingHoursUrl !== "" ? openingHoursUrl : undefined;

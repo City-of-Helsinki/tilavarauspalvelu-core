@@ -257,7 +257,7 @@ function isInRange(ae: SectionNodeT, cell: Cell, day: DayT): boolean {
 }
 
 function isAllocated(ae: ReservationUnitOptionNodeT, cell: Cell, day: DayT): boolean {
-  return ae.allocatedTimeSlots.map((tr) => isInsideCell(day, cell, tr)).some((x) => x);
+  return ae.allocatedTimeSlots.map((tr) => isInsideCell(day, cell, tr)).some(Boolean);
 }
 
 function usePriorityFilteredApplicationSections(aes: Props["applicationSections"]): SectionNodeT[] {

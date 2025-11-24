@@ -120,7 +120,7 @@ interface AesType extends TimeSpan {
 }
 
 function combineTimespans(prev: TimeSpan[], current: TimeSpan): TimeSpan[] {
-  if (!prev.length) {
+  if (prev.length === 0) {
     return [current];
   }
   const prevCell = prev[prev.length - 1];

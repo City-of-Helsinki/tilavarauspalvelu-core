@@ -97,7 +97,7 @@ function useQueryVariables(
 
   const includePreferredOrder10OrHigher =
     preferredOrderFilter != null && preferredOrderFilter.length > 0
-      ? preferredOrderFilter.filter((x) => x > 10).length > 0
+      ? preferredOrderFilter.some((x) => x > 10).length > 0
       : null;
   const selectedReservationUnit = reservationUnitFilter?.[0] ?? defaultReservationUnitPk;
 
@@ -249,7 +249,7 @@ function ApplicationRoundAllocation({
   const applicationSections = filterNonNullable(appEventsData?.applicationSections?.edges.map((e) => e?.node))
     .filter((section) => {
       const opts = section.reservationUnitOptions.filter((r) => {
-        if (r.allocatedTimeSlots.filter((ats) => ats.reservationUnitOption.pk === r.pk).length > 0) {
+        if (r.allocatedTimeSlots.some((ats) => ats.reservationUnitOption.pk === r.pk).length > 0) {
           return true;
         }
 
@@ -324,7 +324,7 @@ function ApplicationRoundAllocation({
        * remount causes flickering but HDS doesn't allow programmatically changing the active tab
        */}
       <TabWrapper>
-        <Tabs initiallyActiveTab={initiallyActiveTab >= 0 ? initiallyActiveTab : 0} key={unitFilter ?? "unit-none"}>
+        <Tabs initiallyActiveTab={Math.max(initiallyActiveTab, 0)} key={unitFilter ?? "unit-none"}>
           <TabList>
             {unitReservationUnits.map((ru) => (
               <Tab onClick={() => setSelectedReservationUnit(ru.pk)} key={ru?.pk}>

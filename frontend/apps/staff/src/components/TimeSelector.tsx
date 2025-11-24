@@ -38,8 +38,8 @@ function timeRangeToCell(timeRanges: SuitableTimeRangeType[]): Cell[][] {
   for (const timeRange of timeRanges) {
     const { dayOfTheWeek, beginTime, endTime, priority } = timeRange;
     // TODO conversion functions from API time to frontend format
-    const hourBegin = Number(beginTime.substring(0, 2)) - firstSlotStart;
-    const hourEnd = (Number(endTime.substring(0, 2)) || 24) - firstSlotStart;
+    const hourBegin = Number(beginTime.slice(0, 2)) - firstSlotStart;
+    const hourEnd = (Number(endTime.slice(0, 2)) || 24) - firstSlotStart;
 
     const day = convertWeekday(dayOfTheWeek);
     for (let h = hourBegin; h < hourEnd; h += 1) {

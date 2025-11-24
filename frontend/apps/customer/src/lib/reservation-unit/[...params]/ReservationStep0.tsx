@@ -232,7 +232,7 @@ function FormErrors<T extends FieldValues>({
 
   const errorList = Object.keys(errors).map((key) => {
     const parentTrKey =
-      generalFields.find((x) => x === key) != null || key === "reserveeType"
+      key === "reserveeType" || generalFields.some((x) => x === key)
         ? "common"
         : reserveeType?.toLocaleLowerCase() || "individual";
     const label = t(`reservationApplication:label.${parentTrKey}.${key}`);

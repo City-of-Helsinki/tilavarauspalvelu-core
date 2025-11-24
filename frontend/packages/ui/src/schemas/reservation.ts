@@ -97,7 +97,7 @@ export function checkReservationInterval(
   path: string,
   interval: number
 ): undefined {
-  if (time && Number(time.substring(3)) % interval !== 0) {
+  if (time && Number(time.slice(3)) % interval !== 0) {
     ctx.addIssue({
       code: "custom",
       path: [path],
