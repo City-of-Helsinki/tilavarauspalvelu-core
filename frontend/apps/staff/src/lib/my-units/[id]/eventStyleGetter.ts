@@ -16,7 +16,7 @@ import {
   type ReservationUnitReservationsFragment,
 } from "@gql/gql-types";
 
-const selected_legends = [
+const selected_legends = new Set([
   "CONFIRMED",
   "WAITING_PAYMENT",
   "UNCONFIRMED",
@@ -28,8 +28,8 @@ const selected_legends = [
   "RESERVABLE",
   "RESERVATION_UNIT_RELEASED",
   "RESERVATION_UNIT_DRAFT",
-];
-export const legend: EventStyleType[] = CALENDAR_LEGENDS.filter((x) => selected_legends.includes(x.key));
+]);
+export const legend: EventStyleType[] = CALENDAR_LEGENDS.filter((x) => selected_legends.has(x.key));
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 // TODO: TODO merge this with eventStyleGetter in admin-ui/src/lib/reservations/[id]/eventStyleGetter.ts

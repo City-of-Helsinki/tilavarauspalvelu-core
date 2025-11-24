@@ -23,8 +23,8 @@ const SELECTED = {
   },
 };
 
-const selected_legends = ["CONFIRMED", "WAITING_PAYMENT", "UNCONFIRMED", "STAFF_RESERVATION", "REST"];
-export const legend: EventStyleType[] = CALENDAR_LEGENDS.filter((x) => selected_legends.includes(x.key));
+const selected_legends = new Set(["CONFIRMED", "WAITING_PAYMENT", "UNCONFIRMED", "STAFF_RESERVATION", "REST"]);
+export const legend: EventStyleType[] = CALENDAR_LEGENDS.filter((x) => selected_legends.has(x.key));
 
 export const EVENT_STYLE_RESERVATION_FRAGMENT = gql`
   fragment EventStyleReservationFields on ReservationNode {

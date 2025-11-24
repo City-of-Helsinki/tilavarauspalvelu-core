@@ -237,7 +237,7 @@ function extractErrorCode(error: ApiError): string | string[] {
 export const errorLink = onError(({ graphQLErrors, networkError }) => {
   // NOTE in case we have multiple errors in the response this will create separate buckets for those
   const apiErrors = mapGraphQLErrors(graphQLErrors ?? []);
-  const apiErrorCodes = apiErrors.map((e) => extractErrorCode(e)).flat();
+  const apiErrorCodes = apiErrors.flatMap((e) => extractErrorCode(e));
   const context = {
     level: "warning" as const,
     // have to encode the errors [Object Object] otherwise
