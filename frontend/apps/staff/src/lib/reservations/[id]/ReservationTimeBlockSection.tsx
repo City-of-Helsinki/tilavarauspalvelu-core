@@ -42,6 +42,8 @@ type CalendarProps = {
   events: CalendarEventType[];
 };
 
+const isInsideCalendarRange = (x: { start: Date; end: Date }) => x.end.getHours() > 6;
+
 /// @param reservation the current reservation to show in calendar
 /// @param selected (for recurring only) different styling
 /// @param focusDate date to show in the calendar
@@ -59,7 +61,7 @@ const Calendar = forwardRef(function Calendar(
   const selectedEvent = eventsAll.find((e) => e.event?.pk === selected);
 
   // Because the calendar is fixed to 6 - 24 interval anything outside it causes rendering artefacts.
-  const isInsideCalendarRange = (x: { start: Date; end: Date }) => x.end.getHours() > 6;
+
   const events = eventsAll.filter(isInsideCalendarRange);
 
   const handleEditAccept = () => {

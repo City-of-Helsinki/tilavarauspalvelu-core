@@ -120,6 +120,9 @@ export function hasSomePermission(
   return someUnitRoles && !onlyGeneral;
 }
 
+const hasPerm = (role: Pick<NonNullable<UserNode>["unitRoles"][0], "permissions">) =>
+  role.permissions != null && role.permissions.length > 0;
+
 /// Returns true if the user has any kind of access to the system
 export function hasAnyPermission(user: UserNode): boolean {
   if (!user) {
@@ -128,9 +131,6 @@ export function hasAnyPermission(user: UserNode): boolean {
   if (user.isSuperuser) {
     return true;
   }
-
-  const hasPerm = (role: Pick<(typeof user.unitRoles)[0], "permissions">) =>
-    role.permissions != null && role.permissions.length > 0;
 
   const someUnitRoles = user.unitRoles.some(hasPerm);
   const someGeneralRoles = user.generalRoles.some(hasPerm);

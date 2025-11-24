@@ -35,6 +35,17 @@ export interface ReservationUnitListProps<T extends FieldValues> extends UseCont
   error?: string;
 }
 
+const move = (units: number[], from: number, to: number): number[] => {
+  const i = units[from];
+  if (i == null) {
+    return units;
+  }
+  const copy = [...units];
+  copy.splice(from, 1);
+  copy.splice(to, 0, i);
+  return copy;
+};
+
 // selected reservation units are applicationEvent.eventReservationUnits
 // available reservation units are applicationRound.reservationUnits
 export function ReservationUnitList<T extends FieldValues>({
@@ -72,17 +83,6 @@ export function ReservationUnitList<T extends FieldValues>({
       return;
     }
     onChange([...value, ru.pk]);
-  };
-
-  const move = (units: number[], from: number, to: number): number[] => {
-    const i = units[from];
-    if (i == null) {
-      return units;
-    }
-    const copy = [...units];
-    copy.splice(from, 1);
-    copy.splice(to, 0, i);
-    return copy;
   };
 
   const handleRemove = (ru: ReservationUnitType) => {

@@ -31,6 +31,10 @@ const Btn = styled.button`
   ${focusStyles}
 `;
 
+const handleClick = () => {
+  window.scroll({ top: 0, left: 0, behavior: "smooth" });
+};
+
 export function ScrollToTop(): JSX.Element | null {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
@@ -45,10 +49,6 @@ export function ScrollToTop(): JSX.Element | null {
     }, POLL_INTERVAL);
     return () => clearInterval(timer);
   }, []);
-
-  const handleClick = () => {
-    window.scroll({ top: 0, left: 0, behavior: "smooth" });
-  };
 
   if (!isVisible) {
     return null;

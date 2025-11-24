@@ -22,6 +22,10 @@ function dayOfWeek(time: number): Weekday {
   return transformWeekday(setMondayFirst(weekdayNumber));
 }
 
+const min = (a: number, b: number) => (a < b ? a : b);
+const max = (a: number, b: number) => (a > b ? a : b);
+const utcDate = (d: Date) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+
 export function generateReservations(props: TimeSelectionFormValues) {
   const vals = props;
 
@@ -41,10 +45,6 @@ export function generateReservations(props: TimeSelectionFormValues) {
   if (repeatOnDays.length === 0) {
     return [];
   }
-
-  const utcDate = (d: Date) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
-  const min = (a: number, b: number) => (a < b ? a : b);
-  const max = (a: number, b: number) => (a > b ? a : b);
 
   try {
     const rawStartingDate = parseUIDateUnsafe(startingDate);
