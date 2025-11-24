@@ -4,6 +4,7 @@ import { relayStylePagination } from "@apollo/client/utilities";
 import type { GetServerSidePropsContext } from "next";
 import { enchancedFetch, errorLink } from "ui/src/modules/apolloUtils";
 import { buildGraphQLUrl } from "ui/src/modules/urlBuilder";
+import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
 
 if (process.env.NODE_ENV === "development") {
   loadDevMessages();
@@ -20,9 +21,11 @@ export function createApolloClient(hostUrl: string, ctx?: GetServerSidePropsCont
     fetch: enchancedFetch(ctx?.req),
   });
 
+  const sentryLink = new SentryContextLink();
+
   return new ApolloClient({
     ssrMode: isServer,
-    link: from([errorLink, httpLink]),
+    link: from([sentryLink, errorLink, httpLink]),
     defaultOptions: {
       query: {
         fetchPolicy: isServer ? "no-cache" : "cache-first",
