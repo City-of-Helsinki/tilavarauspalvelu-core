@@ -21,6 +21,8 @@ const COMMON_RESERVEE_FIELDS = [
   "municipality",
 ] as const;
 
+export { COMMON_RESERVEE_FIELDS as RESERVEE_PI_FIELDS };
+
 const ORGANISATION_FIELDS = [...COMMON_RESERVEE_FIELDS, "reserveeOrganisationName", "reserveeIdentifier"] as const;
 
 // reservation fields is always shown first
