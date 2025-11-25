@@ -9,6 +9,7 @@ import type { GraphQLFormattedError, DocumentNode } from "graphql";
 import { print } from "graphql";
 import { Roarr as log } from "roarr";
 import { getCookie } from "typescript-cookie";
+import { RESERVEE_PI_FIELDS } from "@ui/components/reservation-form/utils";
 import { toast } from "../../components/toast";
 import { getLocalizationLang, isBrowser } from "../helpers";
 import type { LocalizationLanguages } from "../urlBuilder";
@@ -35,13 +36,13 @@ export type QueryErrorT =
       type: "GRAPHQL_ERROR";
       message: string;
       details: ApiError[];
-      ctx?: Record<string, unknown>;
+      errors?: GraphQLFormattedError[];
     }
   | {
       type: "NETWORK_ERROR";
       code: string;
       message: string;
-      ctx?: Record<string, unknown>;
+      details?: string;
     }
   | {
       type: "ECONNREFUSED"; // separate connection refused since it has different handling
@@ -54,7 +55,7 @@ export type QueryErrorT =
   | {
       type: "NON_API_ERROR";
       message: string;
-      ctx?: Record<string, unknown>;
+      details?: string;
     };
 
 function mapValidationError(gqlError: GraphQLFormattedError): ValidationError[] {
@@ -297,9 +298,9 @@ function isCSRFError(error: Error | ServerParseError | ServerError): boolean {
 }
 
 const NETWORK_ERROR_TRANSLATIONS: Record<LocalizationLanguages, string> = {
-  en: "Network error",
-  fi: "Verkkovirhe",
-  sv: "Nätverksfel",
+  en: "Unable to connect to the service. Please try again.",
+  fi: "Palveluun ei saada yhteyttä, yritä uudelleen.",
+  sv: "Det går inte att ansluta till tjänsten. Försök igen.",
 };
 
 function toastNetworkError(error: Error | ServerParseError | ServerError): void {
@@ -396,17 +397,16 @@ export function enchancedFetch(req?: IncomingMessage) {
   };
 }
 
+function extractErrorCode(error: ApiError): string | string[] {
+  if ("validation_code" in error && error.validation_code != null && typeof error.validation_code === "string") {
+    return [error.code, error.validation_code];
+  }
+  if (error.code != null) {
+    return error.code;
+  }
+  return [];
+}
 export function logGraphQLError(error: QueryErrorT, operation?: Operation): void {
-  // TODO improve this by
-  // - finding all unique error codes
-  // - take the operationName
-  //
-  // add the following context to all errors
-  // - error code <-> path
-  // - operationName
-  // - query document
-  // - variables? (can this be PII so we shouldn't log it?)
-  //
   // - one function to transform the error (handles the different cases with network errors)
   // - then a single log function (for now it can both send to sentry and local logger)
   //   - create a fingerprint that is bit more specific than currently, but most of the info (query etc. should go to
@@ -417,19 +417,8 @@ export function logGraphQLError(error: QueryErrorT, operation?: Operation): void
     fingerprint?: string[];
     extra?: Record<string, string>;
   };
-  // NOTE in case we have multiple errors in the response this will create separate buckets for those
-  // const apiErrors = mapGraphQLErrors(graphQLErrors ?? []);
-  // const apiErrorCodes = apiErrors.map((e) => extractErrorCode(e)).flat();
   const context: SentryCtx = {
     level: "warning" as const,
-    // have to encode the errors [Object Object] otherwise
-    /*
-    extra: {
-      ...(graphQLErrors != null ? { graphQLErrors: JSON.stringify(graphQLErrors) } : {}),
-      ...(networkError != null ? { networkError: JSON.stringify(networkError) } : {}),
-    },
-    fingerprint: ["graphql_error", ...apiErrorCodes],
-    */
   };
   let errorName = "Unknown";
 
@@ -442,13 +431,14 @@ export function logGraphQLError(error: QueryErrorT, operation?: Operation): void
         } else {
           log.error(`graphql errors: ${JSON.stringify(error)}`);
         }
-        const codes = new Set(error.details.map((x) => x.code)).keys().toArray();
-        // TODO missing operationName / query / variables
+        // NOTE in case we have multiple errors in the response this will create separate buckets for those
+        const apiErrorCodes = error.details.flatMap((e) => extractErrorCode(e));
+        const codes = new Set(apiErrorCodes).keys().toArray();
         context.extra = {
           details: JSON.stringify(error),
         };
-        context.fingerprint = ["graphql_error", ...codes];
-        errorName = `GraphQL error: ${codes.join(",")}`;
+        context.fingerprint = ["graphql_error", ...(operation != null ? [operation?.operationName] : []), ...codes];
+        errorName = `GraphQL error: ${operation?.operationName ?? ""} ${codes.join(",")}`;
       }
       break;
     case "NETWORK_ERROR":
@@ -473,25 +463,38 @@ export function logGraphQLError(error: QueryErrorT, operation?: Operation): void
       context.extra = {
         details: JSON.stringify(error),
       };
-      context.fingerprint = ["non_api_error"];
+      context.fingerprint = ["non_api_error", error.message];
       break;
     case "CSRF_ERROR":
       log.error(`csrf error: ${error.message}`);
       errorName = "CSRF_ERROR";
       context.fingerprint = ["csrf_error"];
   }
-  // TODO this should be superflous since they should be in the context already (at least in the logger context)
   context.extra = {
     ...context.extra,
     ...(operation != null
       ? {
           operationName: operation.operationName,
           query: print(operation.query),
-          variables: JSON.stringify(operation.variables),
+          variables: JSON.stringify(removePi(operation.variables)),
         }
       : {}),
   };
   Sentry.captureMessage(errorName, context);
+}
+
+function removePi(dict: Record<string, unknown>): Record<string, unknown> {
+  for (const field of RESERVEE_PI_FIELDS) {
+    if (dict[field] != null) {
+      dict[field] = "*****";
+    }
+    const input = dict["input"];
+    if (typeof input === "object" && input != null && field in input) {
+      const iDict = input as Record<string, unknown>;
+      iDict[field] = "*****";
+    }
+  }
+  return dict;
 }
 
 export function logGraphQLQuery(
@@ -514,29 +517,42 @@ export function logGraphQLQuery(
   );
 }
 
-// TODO this eats errors (since GraphQL can have both networkErrors and graphqlErrors at the same time)
-// TODO need to add operation / document info to this
+// This only returns one error from the ApolloError, technically it could include both network and graphql errors
+// but in what case that would happen? a fetch fail + parse error maybe.
 function transformApolloError(error: ApolloError): QueryErrorT {
-  // TODO this should be cleaner (break down the individual graphQL errors)
+  const { graphQLErrors } = error;
+  const ERROR_400_STRING = "Response not successful: Received status code 400";
+  const isUserError = error.message.includes(ERROR_400_STRING);
+  if (isUserError) {
+    return {
+      type: "GRAPHQL_ERROR",
+      message: error.message,
+      details: [{ code: "INVALID_GRAPHQL_QUERY" }],
+      errors: [...graphQLErrors],
+    };
+  }
   const gqlErrors = getApiErrors(error);
   if (gqlErrors.length > 0) {
     const codes = new Set(gqlErrors.map((e) => e.code)).keys().toArray();
     const hasCode = codes.some((x) => x !== "UNKNOWN");
-    const ERROR_400_STRING = "Response not successful: Received status code 400";
-    const isUserError = error.message.includes(ERROR_400_STRING);
     const message = hasCode ? `Graphql VALIDATION errors: ${codes}` : error.message;
     return {
       type: "GRAPHQL_ERROR",
       message,
-      details: hasCode ? gqlErrors : isUserError ? [{ code: "INVALID_GRAPHQL_QUERY" }] : [],
+      details: hasCode ? gqlErrors : [],
+      errors: [...graphQLErrors],
     };
-  } else if (error.networkError != null) {
+  }
+
+  // NOTE have to process GraphQL errors first becasue they might raise 400 user error
+  if (error.networkError != null) {
     if (isCSRFError(error.networkError)) {
       return {
         type: "CSRF_ERROR",
         message: "CSRF verfiication failed.",
       };
     }
+    const { networkError } = error;
     const { cause } = error.networkError;
     if (
       typeof cause === "object" &&
@@ -558,13 +574,12 @@ function transformApolloError(error: ApolloError): QueryErrorT {
         message: `${cause.code} fetch error`,
       };
     } else if (cause == null) {
-      if (error.networkError instanceof TypeError) {
-        const terror = error.networkError;
+      if (networkError instanceof TypeError) {
+        const terror = networkError;
         // Browser errors have zero info why it failed outside of message
         const BROWSER_ECONREFUSED_MSG = "Failed to fetch";
         if (terror.message.startsWith(BROWSER_ECONREFUSED_MSG)) {
           return {
-            // type: "NETWORK_ERROR",
             type: "ECONNREFUSED",
             message: "Connection refused (backend down).",
           };
@@ -575,30 +590,47 @@ function transformApolloError(error: ApolloError): QueryErrorT {
           message: `${terror.name} fetch error with message ${terror.message}`,
         };
       }
+      if ("statusCode" in networkError) {
+        return {
+          type: "NETWORK_ERROR",
+          code: String(networkError.statusCode),
+          message: `${networkError.statusCode} fetch error ""`,
+          details: JSON.stringify(networkError),
+        };
+      }
       return {
         type: "NETWORK_ERROR",
         code: "UNKNOWN",
-        message: `Unknown fetch error without a cause "${error.networkError}"`,
+        message: `Unknown fetch error without a cause`,
+        details: JSON.stringify(networkError),
       };
     }
     return {
       type: "NETWORK_ERROR",
       code: "UNKNOWN",
       message: `Unknown fetch error with cause "${cause.toString()}"`,
+      details: JSON.stringify(networkError),
     };
   }
+
   return {
     type: "GRAPHQL_ERROR",
     message: "GraphQL error",
-    // TODO how to add details
     details: [],
-    // details: graphQLErrors
+    errors: [...graphQLErrors],
   };
 }
 
 export function transformQueryError(error: unknown): QueryErrorT {
   if (error instanceof ApolloError) {
     return transformApolloError(error);
+  }
+  if (typeof error === "object" && error != null && "message" in error && typeof error.message === "string") {
+    return {
+      type: "NON_API_ERROR",
+      message: error.message,
+      details: JSON.stringify(error),
+    };
   }
   return {
     type: "NON_API_ERROR",
