@@ -12,7 +12,6 @@ import { errorToast } from "ui/src/components/toast";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "ui/src/modules/helpers";
 import { CenterSpinner, fontMedium, H1, Strong, TabWrapper } from "ui/src/styled";
 import { useVisibilityChange } from "@ui/hooks";
-import { disablePollIfHidden } from "@ui/modules/browserHelpers";
 import { Error403 } from "@/components/Error403";
 import { LinkPrev } from "@/components/LinkPrev";
 import { useGetFilterSearchParams, useSession } from "@/hooks";
@@ -172,7 +171,7 @@ function ApplicationRoundAllocation({
   const query = useApplicationSectionAllocationsQuery({
     // On purpose skip if the reservation unit is not selected (it is required)
     skip: queryVariables.reservationUnit === 0,
-    pollInterval: disablePollIfHidden(ALLOCATION_POLL_INTERVAL_MS),
+    pollInterval: ALLOCATION_POLL_INTERVAL_MS,
     // NOTE required otherwise this returns stale data when filters change
     // there is an issue with the caches (sometimes returns incorrect data, not stale but incorrect)
     fetchPolicy: "network-only",
