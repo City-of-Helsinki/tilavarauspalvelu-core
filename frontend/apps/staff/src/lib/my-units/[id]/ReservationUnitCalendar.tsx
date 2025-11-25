@@ -114,9 +114,9 @@ function useSlotPropGetter(
     }
 
     // Cell is closed, if it doesn't overlap with any reservable time span
-    const isClosed =
-      reservableTimeSpanDates.length > 0 &&
-      !reservableTimeSpanDates.some((span) => isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end));
+    const isClosed = !reservableTimeSpanDates.some((span) =>
+      isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end)
+    );
     if (isClosed) return { style: NOT_RESERVABLE.style };
 
     return {};
