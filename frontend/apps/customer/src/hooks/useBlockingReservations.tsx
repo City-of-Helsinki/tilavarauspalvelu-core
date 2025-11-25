@@ -4,7 +4,6 @@ import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { useVisibilityChange } from "@ui/hooks";
-import { disablePollIfHidden } from "@ui/modules/browserHelpers";
 import { BLOCKING_RESERVATIONS_POLL_INTERVAL_MS } from "@/modules/const";
 import { useAffectingReservationsQuery } from "@gql/gql-types";
 
@@ -24,7 +23,7 @@ export function useBlockingReservations(
   const begin = beginDate ?? new Date();
   const end = endDate ?? addYears(new Date(), 2);
   const { data, ...rest } = useAffectingReservationsQuery({
-    pollInterval: disablePollIfHidden(BLOCKING_RESERVATIONS_POLL_INTERVAL_MS),
+    pollInterval: BLOCKING_RESERVATIONS_POLL_INTERVAL_MS,
     skip: reservationUnitPk == null || reservationUnitPk < 1,
     // no-cache because we are polling and have no pagination
     // Apollo cant automatically merge when reservation is deleted

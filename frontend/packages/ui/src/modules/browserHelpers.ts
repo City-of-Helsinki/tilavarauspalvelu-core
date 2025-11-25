@@ -87,14 +87,6 @@ function addFormParam(form: HTMLFormElement, name: string, value: string): void 
   form.appendChild(input);
 }
 
-// should not be called on SSR => fallback to disable poll
-export function disablePollIfHidden(pollInterval: number): number {
-  if (isWindowVisible()) {
-    return 0;
-  }
-  return pollInterval;
-}
-
 export function isWindowVisible(): boolean {
   return isBrowser && document.visibilityState === "visible";
 }
