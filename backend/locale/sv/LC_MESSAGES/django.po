@@ -29,7 +29,7 @@ msgstr ""
 
 #: templates/admin/deny_reservation_confirmation.html
 #: templates/admin/reset_allocation_confirmation.html
-#: templates/email/email_tester.html
+#: templates/auditlog/object_history.html templates/email/email_tester.html
 msgid "Home"
 msgstr ""
 
@@ -73,6 +73,26 @@ msgstr ""
 
 #: templates/admin/reset_allocation_confirmation.html
 msgid "Reset allocations"
+msgstr ""
+
+#: templates/auditlog/entry_detail.html
+msgid "system"
+msgstr ""
+
+#: templates/auditlog/entry_detail.html
+msgid "No field changes"
+msgstr ""
+
+#: templates/auditlog/object_history.html
+msgid "Audit log"
+msgstr ""
+
+#: templates/auditlog/object_history.html
+msgid "No log entries found."
+msgstr ""
+
+#: templates/auditlog/pagination.html
+msgid "entries"
 msgstr ""
 
 #: templates/email/email_tester.html
@@ -156,6 +176,7 @@ msgid "Allocated end time."
 msgstr ""
 
 #: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/log_entry/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Created at"
@@ -905,6 +926,33 @@ msgstr ""
 msgid "Search by username, email, first name or last name"
 msgstr ""
 
+#: tilavarauspalvelu/admin/log_entry/admin.py
+msgid "Actor"
+msgstr ""
+
+#: tilavarauspalvelu/admin/log_entry/admin.py
+msgid "Changes"
+msgstr ""
+
+#: tilavarauspalvelu/admin/log_entry/admin.py
+#: tilavarauspalvelu/admin/reservation_series/form.py
+msgid "Created"
+msgstr ""
+
+#: tilavarauspalvelu/admin/log_entry/admin.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_series/form.py
+msgid "User"
+msgstr ""
+
+#: tilavarauspalvelu/admin/log_entry/admin.py
+msgid "Resource"
+msgstr ""
+
+#: tilavarauspalvelu/admin/log_entry/mixins.py
+msgid "Audit logs"
+msgstr ""
+
 #: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
 msgid ""
 "OriginHaukiResources with this specific hash never have any opening hours."
@@ -1258,11 +1306,6 @@ msgid "Type of reservee"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_series/form.py
-msgid "User"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Recurring reservation"
 msgstr ""
 
@@ -1455,10 +1498,6 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_series/form.py
 msgid "Recurrence in days"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_series/form.py
-msgid "Created"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_series/form.py

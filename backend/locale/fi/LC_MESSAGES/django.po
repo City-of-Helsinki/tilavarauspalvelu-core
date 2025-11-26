@@ -29,7 +29,7 @@ msgstr "Kirjaudu ulos"
 
 #: templates/admin/deny_reservation_confirmation.html
 #: templates/admin/reset_allocation_confirmation.html
-#: templates/email/email_tester.html
+#: templates/auditlog/object_history.html templates/email/email_tester.html
 msgid "Home"
 msgstr "Koti"
 
@@ -74,6 +74,26 @@ msgstr "Ei, vie minut takaisin"
 #: templates/admin/reset_allocation_confirmation.html
 msgid "Reset allocations"
 msgstr "Nollaa allokoinnit"
+
+#: templates/auditlog/entry_detail.html
+msgid "system"
+msgstr "järjestelmä"
+
+#: templates/auditlog/entry_detail.html
+msgid "No field changes"
+msgstr "Ei kenttien muutoksia"
+
+#: templates/auditlog/object_history.html
+msgid "Audit log"
+msgstr "Lokimerkinnät"
+
+#: templates/auditlog/object_history.html
+msgid "No log entries found."
+msgstr "Ei lokimerkintöjä."
+
+#: templates/auditlog/pagination.html
+msgid "entries"
+msgstr "kirjausta"
 
 #: templates/email/email_tester.html
 msgid "Email Template Testing"
@@ -158,6 +178,7 @@ msgid "Allocated end time."
 msgstr "Allokoitu lopetusaika"
 
 #: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/log_entry/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Created at"
@@ -939,6 +960,33 @@ msgstr "Testisähköposti %(email_type)s' lähetetty onnistuneesti."
 msgid "Search by username, email, first name or last name"
 msgstr "Etsi käyttäjänimellä, sähköpostilla, etu- tai sukunimellä"
 
+#: tilavarauspalvelu/admin/log_entry/admin.py
+msgid "Actor"
+msgstr "Toimija"
+
+#: tilavarauspalvelu/admin/log_entry/admin.py
+msgid "Changes"
+msgstr "Muutokset"
+
+#: tilavarauspalvelu/admin/log_entry/admin.py
+#: tilavarauspalvelu/admin/reservation_series/form.py
+msgid "Created"
+msgstr "Luotu"
+
+#: tilavarauspalvelu/admin/log_entry/admin.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_series/form.py
+msgid "User"
+msgstr "Käyttäjä"
+
+#: tilavarauspalvelu/admin/log_entry/admin.py
+msgid "Resource"
+msgstr "Resurssi"
+
+#: tilavarauspalvelu/admin/log_entry/mixins.py
+msgid "Audit logs"
+msgstr "Lokimerkinnät"
+
 #: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
 msgid ""
 "OriginHaukiResources with this specific hash never have any opening hours."
@@ -1303,11 +1351,6 @@ msgid "Type of reservee"
 msgstr "Varaajan tyyppi"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_series/form.py
-msgid "User"
-msgstr "Käyttäjä"
-
-#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Recurring reservation"
 msgstr "Toistuva varaus"
 
@@ -1506,10 +1549,6 @@ msgstr "Päättymispäivä"
 #: tilavarauspalvelu/admin/reservation_series/form.py
 msgid "Recurrence in days"
 msgstr "Toistoväli päivissä"
-
-#: tilavarauspalvelu/admin/reservation_series/form.py
-msgid "Created"
-msgstr "Luotu"
 
 #: tilavarauspalvelu/admin/reservation_series/form.py
 msgid "Allocated time slot"
