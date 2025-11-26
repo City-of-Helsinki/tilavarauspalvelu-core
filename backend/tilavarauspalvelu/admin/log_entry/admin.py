@@ -57,6 +57,7 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
     list_display = [
         "created",
         "resource_url",
+        "object_id",
         "action",
         "msg_short",
         "user_url",
@@ -65,6 +66,7 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
     search_fields = [
         "timestamp",
         "object_repr",
+        "object_id",
         "changes",
         "actor__first_name",
         "actor__last_name",
