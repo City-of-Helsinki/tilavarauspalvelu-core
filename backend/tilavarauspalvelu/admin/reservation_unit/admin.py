@@ -9,6 +9,7 @@ from lookup_property import L
 from modeltranslation.admin import TabbedTranslationAdmin
 
 from tilavarauspalvelu.admin.application_round_time_slot.admin import ApplicationRoundTimeSlotInline
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.admin.reservation_unit_image.admin import ReservationUnitImageInline
 from tilavarauspalvelu.enums import AccessType, ReservationKind
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
@@ -43,7 +44,7 @@ class CurrentAccessTypeFilter(admin.SimpleListFilter):
 
 
 @admin.register(ReservationUnit)
-class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
+class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, TabbedTranslationAdmin):
     # Functions
     actions = ["export_to_csv"]
     search_fields = [
