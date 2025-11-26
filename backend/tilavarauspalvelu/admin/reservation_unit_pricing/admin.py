@@ -7,6 +7,7 @@ from modeltranslation.admin import TabbedTranslationAdmin
 from more_admin_filters.filters import MultiSelectRelatedOnlyDropdownFilter
 from rangefilter.filters import DateRangeFilterBuilder
 
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.admin.reservation_unit_pricing.form import ReservationUnitPricingAdminForm
 from tilavarauspalvelu.models import ReservationUnitPricing
 from utils.decimal_utils import round_decimal
@@ -18,7 +19,7 @@ class ReservationUnitFilter(MultiSelectRelatedOnlyDropdownFilter):
 
 
 @admin.register(ReservationUnitPricing)
-class ReservationUnitPricingAdmin(TabbedTranslationAdmin):
+class ReservationUnitPricingAdmin(TVPAuditlogHistoryAdminMixin, TabbedTranslationAdmin):
     # List
     list_display = [
         "id",
