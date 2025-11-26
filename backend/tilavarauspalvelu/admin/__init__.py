@@ -11,6 +11,7 @@ from .equipment.admin import EquipmentAdmin
 from .equipment_category.admin import EquipmentCategoryAdmin
 from .general_role.admin import GeneralRoleAdmin
 from .intended_use.admin import IntendedUseAdmin
+from .log_entry.admin import LogEntryAdmin
 from .origin_hauki_resource.admin import OriginHaukiResourceAdmin
 from .payment_accounting.admin import PaymentAccountingAdmin
 from .payment_merchant.admin import PaymentMerchantAdmin
@@ -51,6 +52,7 @@ __all__ = [
     "EquipmentCategoryAdmin",
     "GeneralRoleAdmin",
     "IntendedUseAdmin",
+    "LogEntryAdmin",
     "OriginHaukiResourceAdmin",
     "PaymentAccountingAdmin",
     "PaymentMerchantAdmin",
