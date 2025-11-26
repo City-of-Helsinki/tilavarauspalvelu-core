@@ -8,6 +8,7 @@ from auditlog.models import LogEntry
 from dateutil.relativedelta import relativedelta
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from rangefilter.filters import DateRangeFilterBuilder
 
 from utils.date_utils import local_datetime
 
@@ -38,6 +39,13 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
         "actor__username",
     ]
     list_filter = [
+        (
+            "timestamp",
+            DateRangeFilterBuilder(
+                title=_("Created at"),
+                default_start=local_datetime() - relativedelta(years=2),  # Default value in field (not applied on load)
+            ),
+        ),
         "action",
         ResourceTypeFilter,
         CIDFilter,
