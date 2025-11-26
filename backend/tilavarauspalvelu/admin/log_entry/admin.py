@@ -1,10 +1,18 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from auditlog.admin import LogEntryAdmin as OriginalLogEntryAdmin
 from auditlog.filters import CIDFilter, ResourceTypeFilter
 from auditlog.models import LogEntry
+from dateutil.relativedelta import relativedelta
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+
+from utils.date_utils import local_datetime
+
+if TYPE_CHECKING:
+    from django.db import models
 
 admin.site.unregister(LogEntry)
 
@@ -45,3 +53,8 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
         (None, {"fields": ["created", "user_url", "resource_url", "cid"]}),
         (_("Changes"), {"fields": ["action", "msg"]}),
     ]
+
+    def get_queryset(self, request) -> models.QuerySet[LogEntry]:
+        self.request = request
+        cutoff_date = local_datetime() - relativedelta(years=2)  # Don't show records older than 2 years
+        return super().get_queryset(request=request).filter(timestamp__gte=cutoff_date)
