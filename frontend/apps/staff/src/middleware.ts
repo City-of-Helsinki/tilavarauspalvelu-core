@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { isPageRequest, redirectCsrfToken } from "ui/src/middlewareHelpers";
 import { env } from "@/env.mjs";
+import { PUBLIC_URL } from "./modules/const";
 
 const API_BASE_URL = env.TILAVARAUS_API_URL ?? "";
 
 export function middleware(req: NextRequest) {
-  if (!isPageRequest(new URL(req.url))) {
+  if (!isPageRequest(new URL(req.url), PUBLIC_URL)) {
     return NextResponse.next();
   }
 
@@ -31,7 +32,6 @@ export const config = {
       source: "/:path*",
       missing: [{ type: "cookie", key: "csrftoken" }],
     },
-    // no 401 / 403 redirects because we have to fetch currentUser in SSR anyway
   ],
   runtime: "nodejs",
 };
