@@ -539,6 +539,7 @@ class Common(Environment):
     ROBOT_TEST_DATA_CREATION_RATE_LIMIT_SECONDS = values.IntegerValue(default=60)
     ROBOT_TEST_DATA_RATE_LIMIT_KEY = "robot-test-data-create-view-rate-limit"
     ROBOT_TEST_DATA_LOCK_KEY = "robot-test-data-create-view-lock"
+    ROBOT_TEST_DATA_USER_PASSWORD = values.StringValue(default="robot-test-password")
     # Emails to these addresses will be cached, so that robot tests can verify the email contents.
     ROBOT_EMAIL_ADDRESSES = values.ListValue(default=[])
     ROBOT_EMAIL_CACHE_KEY = "robot-emails"
