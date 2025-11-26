@@ -3,16 +3,16 @@ import type { NextRequest } from "next/server";
 
 /// Check if the request is a page request
 /// @param url - URL
-export function isPageRequest(url: URL): boolean {
+export function isPageRequest(url: URL, basePath = ""): boolean {
   if (
     // ignore healthcheck because it's for automated test suite that can't do redirects
-    url.pathname.startsWith("/healthcheck") ||
-    url.pathname.startsWith("/api/healthcheck") ||
-    url.pathname.startsWith("/_next") ||
+    url.pathname.startsWith(`${basePath}/healthcheck`) ||
+    url.pathname.startsWith(`${basePath}/api/healthcheck`) ||
+    url.pathname.startsWith(`${basePath}/_next`) ||
     url.pathname.match(/\.(webmanifest|js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf|pdf)$/) ||
-    url.pathname.startsWith("/503") ||
-    url.pathname.startsWith("/en/503") ||
-    url.pathname.startsWith("/sv/503")
+    url.pathname.startsWith(`${basePath}/503`) ||
+    url.pathname.startsWith(`${basePath}/en/503`) ||
+    url.pathname.startsWith(`${basePath}/sv/503`)
   ) {
     return false;
   }
