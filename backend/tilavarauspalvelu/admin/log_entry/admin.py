@@ -95,6 +95,18 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
         (_("Changes"), {"fields": ["action", "msg"]}),
     ]
 
+    @admin.display(description=_("Created"), ordering="timestamp")  # Override to add ordering
+    def created(self, obj) -> str:
+        return super().created(obj)
+
+    @admin.display(description=_("User"), ordering="actor__id")  # Override to add ordering
+    def user_url(self, obj) -> str:
+        return super().user_url(obj)
+
+    @admin.display(description=_("Resource"), ordering="content_type__model")  # Override to add ordering
+    def resource_url(self, obj) -> str:
+        return super().resource_url(obj)
+
     def get_queryset(self, request) -> models.QuerySet[LogEntry]:
         self.request = request
         cutoff_date = local_datetime() - relativedelta(years=2)  # Don't show records older than 2 years
