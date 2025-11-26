@@ -62,7 +62,7 @@ const EditorContainer = styled.div<{
   }
 `;
 
-const toolbarOptions = ["bold", "link"];
+const TOOLBAR_OPTIONS = ["bold", "link"];
 
 interface QuillEditorProps {
   onTextChange: (source: string) => void;
@@ -88,9 +88,10 @@ const QuillEditor = forwardRef<Quill | null, QuillEditorProps>(({ id, value, def
     const editorContainer = container.appendChild(container.ownerDocument.createElement("div"));
     const quill = new Quill(editorContainer, {
       theme: "snow",
-      formats: toolbarOptions,
+      // formats has to be permissive to match Django editor / sanitize rules (otherwise quill will remove the elements)
+      formats: null,
       modules: {
-        toolbar: toolbarOptions,
+        toolbar: TOOLBAR_OPTIONS,
       },
     });
 
@@ -170,7 +171,7 @@ function RichTextInput({
         {tooltipText && <Tooltip>{tooltipText}</Tooltip>}
       </Flex>
       <EditorContainer $error={errorText !== undefined}>
-        <QuillEditor value={value} defaultValue={value} onTextChange={onChange} />
+        <QuillEditor value={removeLineFeeds(value)} defaultValue={removeLineFeeds(value)} onTextChange={onChange} />
       </EditorContainer>
       {errorText ? (
         <Flex $alignItems="center" $direction="row" $gap="xs">
@@ -183,6 +184,10 @@ function RichTextInput({
       {helperText ? <HelperText>{helperText}</HelperText> : ""}
     </Container>
   );
+}
+
+function removeLineFeeds(str: string): string {
+  return str.replaceAll(/\n|\r/g, "");
 }
 
 export default RichTextInput;
