@@ -11,6 +11,7 @@ from django.urls import reverse
 from modeltranslation.admin import TranslationAdmin
 from tinymce.widgets import TinyMCE
 
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.models import TermsOfUse
 
 if TYPE_CHECKING:
@@ -35,7 +36,7 @@ class TermsOfUseAdminForm(ModelForm):
 
 
 @admin.register(TermsOfUse)
-class TermsOfUseAdmin(ExtraButtonsMixin, TranslationAdmin):
+class TermsOfUseAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, TranslationAdmin):
     # List
     list_display = [
         "id",
