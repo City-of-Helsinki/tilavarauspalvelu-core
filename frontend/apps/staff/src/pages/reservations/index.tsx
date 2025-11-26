@@ -6,6 +6,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import { formatDate } from "ui/src/modules/date-utils";
 import { H1 } from "ui/src/styled";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
 export default function ListReservationsPage(): JSX.Element {
@@ -31,7 +32,7 @@ export default function ListReservationsPage(): JSX.Element {
   ];
 
   return (
-    <>
+    <AuthorizationChecker>
       <div>
         <H1 $marginTop="l">{t("reservation:allListHeading")}</H1>
         <p>{t("reservation:allListDescription")}</p>
@@ -42,7 +43,7 @@ export default function ListReservationsPage(): JSX.Element {
         clearButtonAriaLabel={t("common:defaultTags")}
       />
       <ReservationsDataLoader />
-    </>
+    </AuthorizationChecker>
   );
 }
 
