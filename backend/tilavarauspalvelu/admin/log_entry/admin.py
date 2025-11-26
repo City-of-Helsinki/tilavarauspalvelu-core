@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from auditlog.admin import LogEntryAdmin as OriginalLogEntryAdmin
-from auditlog.filters import CIDFilter, ResourceTypeFilter
+from auditlog.filters import ResourceTypeFilter
 from auditlog.models import LogEntry
 from dateutil.relativedelta import relativedelta
 from django.contrib import admin
@@ -61,7 +61,6 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
         "action",
         "msg_short",
         "user_url",
-        "cid_url",
     ]
     search_fields = [
         "timestamp",
@@ -83,7 +82,6 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
         "action",
         ActorFilter,
         ResourceTypeFilter,
-        CIDFilter,
     ]
     readonly_fields = [
         "created",
@@ -93,7 +91,7 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
         "msg",
     ]
     fieldsets = [
-        (None, {"fields": ["created", "user_url", "resource_url", "cid"]}),
+        (None, {"fields": ["created", "user_url", "resource_url"]}),
         (_("Changes"), {"fields": ["action", "msg"]}),
     ]
 
