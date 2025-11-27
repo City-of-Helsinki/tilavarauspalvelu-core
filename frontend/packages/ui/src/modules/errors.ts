@@ -1,4 +1,6 @@
 // oxlint-disable max-classes-per-file
+import * as Sentry from "@sentry/nextjs";
+import { Roarr as log } from "roarr";
 import type { GqlQuery } from "@ui/middlewareHelpers";
 
 export class EconnRefusedError extends Error {
@@ -25,5 +27,22 @@ export class GraphQLFetchError extends Error {
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, GraphQLFetchError);
     }
+  }
+}
+
+export function logError(err: unknown) {
+  if (err instanceof GraphQLFetchError) {
+    const ctx_extra = {
+      data: JSON.stringify(err.data),
+      operation: JSON.stringify(err.operation),
+    };
+    log.error(ctx_extra, err.name);
+    Sentry.captureException(err, { extra: ctx_extra });
+  } else if (typeof err === "string") {
+    log.error(err);
+    Sentry.captureMessage(err, "error");
+  } else {
+    log.error(`Exception: ${err}`);
+    Sentry.captureException(err);
   }
 }

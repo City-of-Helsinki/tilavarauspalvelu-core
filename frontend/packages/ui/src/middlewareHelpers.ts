@@ -1,5 +1,6 @@
 /// NOTE don't include nodejs packages (like node:* or lodash) this requires edge runtime due to NextJs design
 import type { NextRequest } from "next/server";
+import { EconnRefusedError, GraphQLFetchError } from "./modules/errors";
 import { buildGraphQLUrl } from "./modules/urlBuilder";
 
 /// Check if the request is a page request
@@ -58,7 +59,7 @@ export type GqlQuery = {
 /// @param query - Query object with query and variables
 /// @returns Promise<Response>
 /// custom function so we don't have to import apollo client in middleware
-export function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: string) {
+export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: string): Promise<unknown> {
   const { cookies, headers } = req;
   // TODO this is copy to the createApolloClient function but different header types
   // NextRequest vs. RequestInit
@@ -94,11 +95,32 @@ export function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: string)
   // the request returns either a valid user (e.g. pk) or null if user was not found
   const body: string = JSON.stringify(query);
 
-  return fetch({
-    method: "POST",
-    url: buildGraphQLUrl(apiUrl),
-    headers: newHeaders,
-    // @ts-expect-error -- something broken in node types, body can be a string
-    body,
-  });
+  try {
+    const res = await fetch({
+      method: "POST",
+      url: buildGraphQLUrl(apiUrl),
+      headers: newHeaders,
+      // @ts-expect-error -- something broken in node types, body can be a string
+      body,
+    });
+
+    const data: unknown = await res.json();
+
+    if (!res.ok) {
+      const { status, statusText } = res;
+      throw new GraphQLFetchError(status, statusText, query, data);
+    }
+    return data;
+  } catch (err) {
+    if (
+      err instanceof TypeError &&
+      typeof err.cause === "object" &&
+      err.cause != null &&
+      "code" in err.cause &&
+      err.cause?.code === "ECONNREFUSED"
+    ) {
+      throw new EconnRefusedError(err.message);
+    }
+    throw err;
+  }
 }
