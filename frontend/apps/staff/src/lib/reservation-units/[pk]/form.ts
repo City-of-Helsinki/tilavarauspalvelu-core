@@ -52,10 +52,10 @@ const PricingFormSchema = z.object({
   taxPercentage: z.number(),
   // TODO could remove the net value and keep only the gross price
   // the net is never sent to backend (but we want to keep it in the UI)
-  lowestPrice: z.number(),
-  lowestPriceNet: z.number(),
-  highestPrice: z.number(),
-  highestPriceNet: z.number(),
+  lowestPrice: z.number({ error: "Required" }),
+  lowestPriceNet: z.number({ error: "Required" }),
+  highestPrice: z.number({ error: "Required" }),
+  highestPriceNet: z.number({ error: "Required" }),
   priceUnit: z.enum(PriceUnit).nullable(),
   paymentType: z.enum(PaymentType).nullable(),
   // NOTE this has to be a string because of HDS date input in ui format: "d.M.yyyy"
@@ -439,7 +439,7 @@ export const ReservationUnitEditSchema = z
     requireReservationHandling: z.boolean(),
     reservationStartInterval: z.enum(ReservationStartInterval),
     canApplyFreeOfCharge: z.boolean(),
-    reservationsMinDaysBefore: z.number(),
+    reservationsMinDaysBefore: z.number({ error: "Required" }),
     reservationsMaxDaysBefore: z.number(),
     reservationKind: z.enum(ReservationKind),
     contactInformation: z.string().max(500, { message: "Too big. expected string to have <=500 characters" }),
@@ -522,7 +522,7 @@ export const ReservationUnitEditSchema = z
     cancellationTerms: z.string().nullable(),
     serviceSpecificTerms: z.string().nullable(),
     reservationForm: z.enum(ReservationFormType).optional(),
-    surfaceArea: z.number(),
+    surfaceArea: z.number({ error: "Required" }),
     images: z.array(ImageFormSchema),
     // internal values
     isDraft: z.boolean(),
