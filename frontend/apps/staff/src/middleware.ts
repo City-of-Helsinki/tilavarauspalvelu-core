@@ -1,8 +1,10 @@
+import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import z from "zod";
 import { isPageRequest, gqlQueryFetch, redirectCsrfToken } from "ui/src/middlewareHelpers";
 import type { GqlQuery } from "ui/src/middlewareHelpers";
+import { GraphQLFetchError, EconnRefusedError } from "@ui/modules/errors";
 import { env } from "@/env.mjs";
 import { PUBLIC_URL } from "./modules/const";
 
@@ -38,13 +40,28 @@ async function fetchUserData(req: NextRequest): Promise<QueryResultType | null> 
     variables: {},
   };
 
-  const res = await gqlQueryFetch(req, userQuery, API_BASE_URL);
-  if (!res.ok) {
-    throw new Error(res.statusText);
-  }
+  try {
+    const res = await gqlQueryFetch(req, userQuery, API_BASE_URL);
+    const data: unknown = await res.json();
 
-  const data: unknown = await res.json();
-  return CurrentUserQuerySchema.parse(data).data;
+    if (!res.ok) {
+      const { status, statusText } = res;
+      throw new GraphQLFetchError(status, statusText, userQuery, data);
+    }
+
+    return CurrentUserQuerySchema.parse(data).data;
+  } catch (err) {
+    if (
+      err instanceof TypeError &&
+      typeof err.cause === "object" &&
+      err.cause != null &&
+      "code" in err.cause &&
+      err.cause?.code === "ECONNREFUSED"
+    ) {
+      throw new EconnRefusedError(err.message);
+    }
+    throw err;
+  }
 }
 
 export async function middleware(req: NextRequest) {
@@ -56,8 +73,7 @@ export async function middleware(req: NextRequest) {
   if (csrfRedirectUrl) {
     // block infinite redirect loop (there is no graceful way to handle this)
     if (req.url.includes("redirect_to")) {
-      // eslint-disable-next-line no-console
-      console.error("Middleware: Infinite redirect loop detected");
+      Sentry.captureMessage("Middleware: Infinite redirect loop detected", "error");
       return NextResponse.next();
     }
     return NextResponse.redirect(csrfRedirectUrl);
@@ -71,9 +87,17 @@ export async function middleware(req: NextRequest) {
     res.headers.set("x-session-is-valid", String(data?.currentUser?.pk != null));
     return res;
     // TODO could add check here to rewrite the main page (instead of returning it from the React component)
-  } catch {
+  } catch (err) {
+    if (err instanceof GraphQLFetchError) {
+      const ctx_extra = {
+        data: JSON.stringify(err.data),
+        operation: JSON.stringify(err.operation),
+      };
+      Sentry.captureException(err, { extra: ctx_extra });
+    } else {
+      Sentry.captureException(err);
+    }
     // TODO check for GraphQL errors vs. network errors (e.g. Connection refused / 503)
-    // TODO report to sentry any GraphQL errors (not connection refused)
     const rewriteUrl = new URL(`${env.NEXT_PUBLIC_BASE_URL ?? ""}/503`, req.url);
     return NextResponse.rewrite(rewriteUrl);
   }
