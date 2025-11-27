@@ -1,7 +1,7 @@
 import React from "react";
 import { IconLinkExternal } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { isBrowser } from "ui/src/modules/helpers";
 import { AutoGrid } from "ui/src/styled";
 import { getOpeningHoursUrl } from "@/modules/urls";
@@ -36,17 +36,19 @@ export function OpeningHoursSection({
       {reservationUnit?.haukiUrl ? (
         <AutoGrid $alignCenter>
           <p style={{ gridColumn: "1 / -1" }}>{t("reservationUnitEditor:openingHoursHelperTextHasLink")}</p>
-          <ButtonLikeExternalLink
+          <ButtonLikeLink
+            external
             disabled={!editUrl}
-            href={editUrl}
+            href={editUrl ?? ""}
             target="_blank"
             fontSize="small"
             rel="noopener noreferrer"
           >
             {t("reservationUnitEditor:openingTimesExternalLink")}
             <IconLinkExternal style={{ marginLeft: "var(--spacing-xs)" }} />
-          </ButtonLikeExternalLink>
-          <ButtonLikeExternalLink
+          </ButtonLikeLink>
+          <ButtonLikeLink
+            external
             disabled={previewDisabled}
             href={previewUrl}
             target="_blank"
@@ -55,7 +57,7 @@ export function OpeningHoursSection({
           >
             {t("reservationUnitEditor:previewCalendarLink")}
             <IconLinkExternal style={{ marginLeft: "var(--spacing-xs)" }} />
-          </ButtonLikeExternalLink>
+          </ButtonLikeLink>
         </AutoGrid>
       ) : (
         <p>{t("reservationUnitEditor:openingHoursHelperTextNoLink")}</p>

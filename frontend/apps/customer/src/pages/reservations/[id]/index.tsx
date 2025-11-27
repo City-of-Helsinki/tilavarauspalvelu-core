@@ -8,7 +8,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
-import { ButtonLikeLink, ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { IconButton } from "ui/src/components/IconButton";
 import { AccessCodeStatusLabel, OrderStatusLabel, ReservationStatusLabel } from "ui/src/components/statuses";
 import { useToastIfQueryParam } from "ui/src/hooks";
@@ -290,7 +290,8 @@ function Reservation({
           <ReservationInfoCard reservation={reservation} />
           <SecondaryActions>
             {reservation.state === ReservationStateChoice.Confirmed && (
-              <ButtonLikeExternalLink
+              <ButtonLikeLink
+                external
                 size="large"
                 disabled={!reservation.calendarUrl}
                 data-testid="reservation__button--calendar-link"
@@ -299,10 +300,11 @@ function Reservation({
               >
                 {t("reservation:saveToCalendar")}
                 <IconCalendar />
-              </ButtonLikeExternalLink>
+              </ButtonLikeLink>
             )}
             {hasReceipt && (
-              <ButtonLikeExternalLink
+              <ButtonLikeLink
+                external
                 size="large"
                 data-testid="reservation__confirmation--button__receipt-link"
                 href={`${reservation.paymentOrder?.receiptUrl}&lang=${lang}`}
@@ -311,23 +313,24 @@ function Reservation({
               >
                 {t("reservation:downloadReceipt")}
                 <IconLinkExternal />
-              </ButtonLikeExternalLink>
+              </ButtonLikeLink>
             )}
           </SecondaryActions>
         </div>
         <div>
           <Actions>
             {isWaitingForPayment && (
-              <ButtonLikeExternalLink
+              <ButtonLikeLink
+                external
                 size="large"
                 disabled={!hasCheckoutUrl}
-                href={paymentUrl}
+                href={paymentUrl ?? ""}
                 data-testid="reservation-detail__button--checkout"
                 role="button"
               >
                 {t("reservation:payReservation")}
                 <IconArrowRight />
-              </ButtonLikeExternalLink>
+              </ButtonLikeLink>
             )}
             {canTimeBeModified && (
               <ButtonLikeLink
