@@ -15,7 +15,7 @@ jobs:
 
     services:
       postgres:
-        image: postgis/postgis:13-3.3-alpine
+        image: postgis/postgis:17-3.5-alpine
         env:
           POSTGRES_USER: tvp
           POSTGRES_PASSWORD: tvp
