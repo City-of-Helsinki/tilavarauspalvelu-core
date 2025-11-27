@@ -126,7 +126,7 @@ export function BasicSection({
           tooltip={t("reservationUnitEditor:tooltip.resources")}
           enableSearch
         />
-        <CustomNumberInput name="surfaceArea" min={minSurfaceArea} max={undefined} form={form} />
+        <CustomNumberInput name="surfaceArea" min={minSurfaceArea} max={undefined} form={form} required />
         <CustomNumberInput name="maxPersons" min={0} max={maxPersons} form={form} />
         <CustomNumberInput name="minPersons" min={0} max={watch("maxPersons") || 1} form={form} />
       </AutoGrid>
