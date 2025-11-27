@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
+from auditlog.render import render_logentry_changes_html as render_changes
 from django import template
 from django_jinja import library
 
 from utils.decimal_utils import round_decimal
+
+if TYPE_CHECKING:
+    from auditlog.models import LogEntry
 
 register = template.Library()
 
@@ -28,3 +33,17 @@ def format_sentence(text: str) -> str:
     if text[-1] in {".", "!", "?", ":"}:
         return text
     return f"{text}."
+
+
+# Note: Can be removed when a new django-auditlog version is released with a fix for templates missing.
+# See: https://github.com/jazzband/django-auditlog/issues/767
+# Also templates/auditlog/ templates can be removed then.
+@register.filter
+def render_logentry_changes_html(log_entry: LogEntry) -> str:
+    """
+    Format LogEntry changes as HTML.
+
+    Usage in template:
+    {{ log_entry_object|render_logentry_changes_html|safe }}
+    """
+    return render_changes(log_entry)

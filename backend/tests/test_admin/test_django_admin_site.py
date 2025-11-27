@@ -89,7 +89,7 @@ def test_django_admin_site__pages_load__model_admins(create_all_models):
             # Skipped views
             elif (
                 # History & Redirect to Edit view
-                url_pattern.lookup_str.endswith((".history_view", ".RedirectView"))
+                url_pattern.lookup_str.endswith((".history_view", ".auditlog_history_view", ".RedirectView"))
                 # Custom views
                 or url_pattern.lookup_str.startswith((
                     "adminsortable2.",  # Updating the rank field order when moving instances in the list view
@@ -99,7 +99,7 @@ def test_django_admin_site__pages_load__model_admins(create_all_models):
             ):
                 continue
             else:
-                pytest.fail(f"Unknown lookup_str = {url_pattern}")
+                pytest.fail(f"Unknown lookup_str={url_pattern.lookup_str} ({url_pattern.name}) [{url_pattern.pattern}]")
 
 
 @pytest.mark.slow

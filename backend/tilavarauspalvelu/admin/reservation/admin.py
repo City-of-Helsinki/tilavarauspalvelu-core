@@ -10,6 +10,7 @@ from lookup_property import L
 from more_admin_filters import MultiSelectFilter
 from rangefilter.filters import DateRangeFilterBuilder
 
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation, ReservationDenyReason
@@ -35,7 +36,7 @@ if TYPE_CHECKING:
 
 
 @admin.register(Reservation)
-class ReservationAdmin(admin.ModelAdmin):
+class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Functions
     actions = [
         "deny_reservations_without_refund",

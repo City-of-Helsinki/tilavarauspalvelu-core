@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.models import GeneralRole
 
 if TYPE_CHECKING:
@@ -19,7 +20,7 @@ __all__ = [
 
 
 @admin.register(GeneralRole)
-class GeneralRoleAdmin(admin.ModelAdmin):
+class GeneralRoleAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Functions
     search_fields = [
         "user__username",
