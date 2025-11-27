@@ -12,6 +12,7 @@ import type { GqlQuery } from "ui/src/middlewareHelpers";
 import { createNodeId, getLocalizationLang } from "ui/src/modules/helpers";
 import { getSignInUrl } from "ui/src/modules/urlBuilder";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
+import { logError } from "@ui/modules/errors";
 import { env } from "@/env.mjs";
 import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import { getReservationInProgressPath } from "./modules/urls";
@@ -112,7 +113,7 @@ ${applicationId ? "$applicationId: ID!" : ""}
 
   const query: GqlQuery = {
     query: `
-      query GetCurrentUser ${params} {
+      query MiddlewareQuery ${params} {
         currentUser {
           pk
         }
@@ -124,42 +125,26 @@ ${applicationId ? "$applicationId: ID!" : ""}
       ...(applicationId != null ? { applicationId } : {}),
     },
   };
-  const res = await gqlQueryFetch(req, query, API_BASE_URL);
+  const data = await gqlQueryFetch(req, query, API_BASE_URL);
 
-  if (!res.ok) {
-    const text = await res.text();
-    // eslint-disable-next-line no-console
-    console.warn(`Middleware: request failed: ${res.status} with message: ${text}`);
-    // prefer throw here because we want all query failures -> end in same fail state
-    throw new Error(res.statusText);
-  }
-
-  const data: unknown = await res.json();
-
-  try {
-    const parsed = MiddlewareQuerySchema.parse(data);
-    const res = parsed.data;
-    if (res.currentUser == null) {
-      return null;
-    }
-
-    const userPkToCheck = res.reservation?.user.pk || res.application?.user.pk;
-    return {
-      reservation: {
-        state: res.reservation?.state,
-        type: res.reservation?.type,
-        resUnitPk: res.reservation?.reservationUnit.pk ?? null,
-      },
-      user: {
-        pk: res.currentUser.pk,
-        hasAccess: userPkToCheck == null || res.currentUser.pk === userPkToCheck,
-      },
-    };
-  } catch (err) {
-    // oxlint-disable-next-line no-console
-    console.error("Failed to parse graphql response:", err);
+  const parsed = MiddlewareQuerySchema.parse(data);
+  const res = parsed.data;
+  if (res.currentUser == null) {
     return null;
   }
+
+  const userPkToCheck = res.reservation?.user.pk || res.application?.user.pk;
+  return {
+    reservation: {
+      state: res.reservation?.state,
+      type: res.reservation?.type,
+      resUnitPk: res.reservation?.reservationUnit.pk ?? null,
+    },
+    user: {
+      pk: res.currentUser.pk,
+      hasAccess: userPkToCheck == null || res.currentUser.pk === userPkToCheck,
+    },
+  };
 }
 
 /// Get language code from the url
@@ -214,12 +199,8 @@ async function maybeSaveUserLanguage(req: NextRequest, user: User | null): Promi
       },
     };
 
-    const res = await gqlQueryFetch(req, query, API_BASE_URL);
-    if (res.ok) {
-      return language;
-    }
-    // eslint-disable-next-line no-console
-    console.warn("failed to save user language", res.status, await res.text());
+    await gqlQueryFetch(req, query, API_BASE_URL);
+    return language;
   }
 }
 
@@ -291,8 +272,7 @@ export async function middleware(req: NextRequest) {
   if (csrfRedirectUrl) {
     // block infinite redirect loop (there is no graceful way to handle this)
     if (req.url.includes("redirect_to")) {
-      // eslint-disable-next-line no-console
-      console.error("Middleware: Infinite redirect loop detected");
+      logError("Middleware: Infinite redirect loop detected");
       return NextResponse.next();
     }
     return NextResponse.redirect(csrfRedirectUrl);
@@ -308,10 +288,7 @@ export async function middleware(req: NextRequest) {
     if (pk > 0) {
       reservationPk = pk;
     } else if (id != null && id !== "") {
-      // can be either an url issues (user error) or a bug in our matcher
-      // fall through empty for listing page
-      // eslint-disable-next-line no-console
-      console.error("Middleware: Invalid reservation id");
+      logError(`Middleware: Invalid reservation id: ${id}`);
     }
   }
   if (APPLICATION_ROUTES.some((route) => doesUrlMatch(req.url, route))) {
@@ -320,10 +297,7 @@ export async function middleware(req: NextRequest) {
     if (pk > 0) {
       applicationPk = pk;
     } else if (id == null && id !== "") {
-      // can be either an url issues (user error) or a bug in our matcher
-      // fall through empty for listing page
-      // eslint-disable-next-line no-console
-      console.error("Middleware: Invalid application id");
+      logError(`Middleware: Invalid application id: ${id}`);
     }
   }
 
@@ -375,16 +349,21 @@ export async function middleware(req: NextRequest) {
       }
     }
 
-    const lang = await maybeSaveUserLanguage(req, user);
+    // App is fully functional even if this fails
+    try {
+      const lang = await maybeSaveUserLanguage(req, user);
 
-    if (lang != null) {
-      const n = NextResponse.next();
-      n.cookies.set("language", lang);
-      return n;
+      if (lang != null) {
+        const n = NextResponse.next();
+        n.cookies.set("language", lang);
+        return n;
+      }
+    } catch (err) {
+      logError(err);
     }
     return NextResponse.next();
-  } catch {
-    // FIXME this should push the error to Sentry?
+  } catch (err) {
+    logError(err);
     // NOTE all backend errors will return the 503 page
     // if the middleware request fails there is no way to recover
     const rewriteUrl = new URL(`${langPrefix}/503`, req.url);
