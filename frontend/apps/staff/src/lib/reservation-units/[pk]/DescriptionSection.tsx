@@ -37,7 +37,7 @@ export function DescriptionSection({
     label: n.nameFi ?? "no-name",
   }));
 
-  const purposeOptions = filterNonNullable(intendedUses?.edges.map((n) => n?.node)).map((n) => ({
+  const intendedUsesOptions = filterNonNullable(intendedUses?.edges.map((n) => n?.node)).map((n) => ({
     value: n.pk ?? -1,
     label: n.nameFi ?? "no-name",
   }));
@@ -73,9 +73,10 @@ export function DescriptionSection({
           multiselect
           label={t("reservationUnitEditor:intendedUsesLabel")}
           placeholder={t("reservationUnitEditor:intendedUsesPlaceholder")}
-          options={purposeOptions}
+          options={intendedUsesOptions}
           tooltip={t("reservationUnitEditor:tooltip.intendedUses")}
           enableSearch
+          clearable
         />
         <ControlledSelect
           control={control}
@@ -86,6 +87,7 @@ export function DescriptionSection({
           options={equipmentOptions}
           tooltip={t("reservationUnitEditor:tooltip.equipments")}
           enableSearch
+          clearable
         />
         {(["descriptionFi", "descriptionEn", "descriptionSv"] as const).map((fieldName) => (
           <Controller
