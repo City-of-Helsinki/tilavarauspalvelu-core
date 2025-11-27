@@ -37,6 +37,7 @@
     "materialPriceDescriptionEn": "Materiaalimaksun tiedot en",
     "materialPriceDescriptionHelperText": "Kerro hinta ja mahdolliset lisätiedot (max 500 merkkiä).",
     "canApplyFreeOfCharge": "Asiakas voi pyytää hinnan alennusta tai maksuttomuutta",
+    "isActivatedOnBegins": "Hinnoittelu ei koske ennakkomaksuja",
     "pricings": "Hinnoittelu",
     "reservationForm": "Varauslomake",
     "notesWhenApplyingFi": "Huomioi varatessa fi",
@@ -124,7 +125,8 @@
     "reservationPendingInstructionsFi": "Tämä varausvahvistus lähetetään asiakkaalle sähköpostilla, kun varaus on lähetetty  käsittelyyn.\nVoit täydentää automaattista varausvahvistusta toimipisteen tiedoilla.",
     "reservationConfirmedInstructionsFi": "Tämä varausvahvistus lähetetään asiakkaalle sähköpostilla, kun varaus on hyväksytty.\nVoit täydentää automaattista varausvahvistusta toimipisteen tiedoilla.",
     "reservationCancelledInstructionsFi": "Tämä varausvahvistus lähetetään asiakkaalle sähköpostilla, kun varaus on hylätty tai peruutettu.\nVoit täydentää automaattista varausvahvistusta toimipisteen tiedoilla.",
-    "contactInformation": "Lisää nimesi ja yhteystietosi, jotta palvelusi tuoteomistaja tai Varaamon ylläpito tietää kehen tarvittaessa yhteyttä."
+    "contactInformation": "Lisää nimesi ja yhteystietosi, jotta palvelusi tuoteomistaja tai Varaamon ylläpito tietää kehen tarvittaessa yhteyttä.",
+    "isActivatedOnBegins": "Hinnoittelu päivittyy vuorokauden vaihtuessa valittuna päivänä."
   },
   "closed": "Suljettu",
   "seasonalTimesTitle": "Kausivarattavat ajat",
