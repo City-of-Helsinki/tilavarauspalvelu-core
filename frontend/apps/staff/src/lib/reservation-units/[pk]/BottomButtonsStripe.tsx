@@ -5,10 +5,11 @@ import { Button, ButtonSize, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinne
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
+import { ButtonLikeLink } from "@ui/components/ButtonLikeLink";
 import { successToast } from "@ui/components/toast";
 import { useDisplayError } from "@ui/hooks";
 import { breakpoints } from "@ui/modules/const";
-import { ButtonLikeExternalLink, Flex, pageSideMargins, WhiteButton } from "@ui/styled";
+import { Flex, pageSideMargins, WhiteButton } from "@ui/styled";
 import { useModal } from "@/context/ModalContext";
 import { getUnitUrl } from "@/modules/urls";
 import type { ReservationUnitEditQuery, UnitSubpageHeadFragment } from "@gql/gql-types";
@@ -278,17 +279,18 @@ export function BottomButtonsStripe({
         {t("reservationUnitEditor:archive")}
       </WhiteButton>
 
-      <ButtonLikeExternalLink
+      <ButtonLikeLink
+        external
         target="_blank"
         rel="noopener noreferrer"
         className="preview-link"
-        href={previewUrl}
+        href={previewUrl ?? ""}
         disabled={previewUrl == null}
         variant="inverted"
         title={previewTitle}
       >
         <span>{t("reservationUnitEditor:preview")}</span>
-      </ButtonLikeExternalLink>
+      </ButtonLikeLink>
 
       <WhiteButton
         size={ButtonSize.Small}

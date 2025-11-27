@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { ButtonLikeExternalLink } from "@ui/components/ButtonLikeLink";
+import { ButtonLikeLink } from "@ui/components/ButtonLikeLink";
 import { formatters as getFormatters } from "@ui/index";
 import { breakpoints } from "@ui/modules/const";
 import { formatDateTime, parseValidDateObject } from "@ui/modules/date-utils";
@@ -76,9 +76,9 @@ export const PaymentNotification = ({
             {t("common:deadline")}: {deadline}
           </div>
           {!isExpired && (
-            <ButtonLikeExternalLink href={paymentUrl} disabled={!paymentUrl} variant="primary">
+            <ButtonLikeLink href={paymentUrl ?? ""} disabled={!paymentUrl} variant="primary" external>
               {t("reservation:payReservation")}
-            </ButtonLikeExternalLink>
+            </ButtonLikeLink>
           )}
         </PriceDetails>
       </Flex>
