@@ -70,6 +70,7 @@ export function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: string)
   const sessionid = cookies.get("sessionid");
   const csrfToken = cookies.get("csrftoken");
 
+  // TODO throw instead
   if (csrfToken == null) {
     return new Response("missing csrf token", {
       status: 400,

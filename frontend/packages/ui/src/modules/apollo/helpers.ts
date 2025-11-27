@@ -1,5 +1,4 @@
 import type { IncomingMessage, IncomingHttpHeaders } from "node:http";
-import qs from "node:querystring";
 import type { ServerError, ServerParseError, Operation } from "@apollo/client";
 import { ApolloError } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
@@ -335,16 +334,12 @@ function getServerCookie(headers: IncomingHttpHeaders | undefined, name: string)
   if (cookie == null) {
     return null;
   }
-  const decoded = qs.decode(cookie, "; ");
-  const token = decoded[name];
-  if (token == null) {
+  const decoded = cookie.split(";").map((x) => x.trim().split("="));
+  const line = decoded.find((x) => x[0] === name);
+  if (line == null) {
     return null;
   }
-  if (Array.isArray(token)) {
-    // eslint-disable-next-line no-console
-    console.warn(`multiple ${name} in cookies`, token);
-    return token[0];
-  }
+  const token = line[1];
   return token;
 }
 
