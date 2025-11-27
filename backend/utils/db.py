@@ -196,7 +196,7 @@ class NowTT(Func):  # TT = Time Travel, as in "time travel tests"
         """
         with get_connection(using).cursor() as cursor:
             cursor.execute(
-                "UPDATE testing_configurations SET global_time_offset_seconds = %s WHERE id = 1;",
+                "UPDATE public.testing_configurations SET global_time_offset_seconds = %s WHERE id = 1;",
                 params=[str(seconds)],
             )
 
@@ -208,12 +208,13 @@ class NowTT(Func):  # TT = Time Travel, as in "time travel tests"
     def __forward_sql(cls) -> str:
         return cleandoc(
             """
-            CREATE TABLE IF NOT EXISTS testing_configurations (
+            CREATE TABLE IF NOT EXISTS public.testing_configurations (
                 id BIGSERIAL PRIMARY KEY NOT NULL,
                 global_time_offset_seconds BIGINT NOT NULL
             );
 
-            INSERT INTO testing_configurations (id, global_time_offset_seconds) VALUES (1, 0) ON CONFLICT DO NOTHING;
+            INSERT INTO public.testing_configurations (id, global_time_offset_seconds)
+            VALUES (1, 0) ON CONFLICT DO NOTHING;
 
             -- Gets the current time in the database's, but can be offset during testing.
             CREATE OR REPLACE FUNCTION NOW_TT()
@@ -224,7 +225,7 @@ class NowTT(Func):  # TT = Time Travel, as in "time travel tests"
                 -- See `django.db.models.functions.datetime.Now.as_postgresql`
                 RETURN STATEMENT_TIMESTAMP() + (
                     select global_time_offset_seconds
-                    from testing_configurations
+                    from public.testing_configurations
                     limit 1
                 ) * interval '1 second';
             END;
@@ -237,7 +238,7 @@ class NowTT(Func):  # TT = Time Travel, as in "time travel tests"
     def __reverse_sql(cls) -> str:
         return cleandoc(
             """
-            DROP TABLE IF EXISTS testing_configurations;
+            DROP TABLE IF EXISTS public.testing_configurations;
             DROP FUNCTION IF EXISTS NOW_TT;
             """
         )
