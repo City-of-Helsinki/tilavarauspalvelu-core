@@ -5,7 +5,7 @@ import { IconInfoCircle, IconLinkExternal, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
 import styled from "styled-components";
-import { ButtonLikeExternalLink } from "ui/src/components/ButtonLikeLink";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import {
   ReservationUnitPublishingStatusLabel,
   ReservationUnitReservationStatusLabel,
@@ -160,10 +160,10 @@ function ActionButtons({ selectedRows }: ActionButtonsProps): React.ReactElement
           <IconInfoCircle size={IconSize.Medium} />
           <div>{t("reservationUnit:editInfoText")}</div>
         </Flex>
-        <ButtonLikeExternalLink disabled={!editLink} href={editLink} target="_blank">
+        <ButtonLikeLink external disabled={!editLink} href={editLink ?? ""} target="_blank">
           {t("reservationUnit:goToMassEdit")}
           <IconLinkExternal />
-        </ButtonLikeExternalLink>
+        </ButtonLikeLink>
       </Flex>
     </Spacer>
   );
