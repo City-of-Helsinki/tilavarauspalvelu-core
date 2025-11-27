@@ -193,6 +193,13 @@ function PaidPricingPart({
         tooltip={t("tooltip.paymentType")}
         error={getTranslatedError(t, errors.pricings?.[index]?.paymentType?.message)}
       />
+      <ControlledCheckbox
+        name={`pricings.${index}.isActivatedOnBegins`}
+        control={control}
+        label={t("label.isActivatedOnBegins")}
+        tooltip={t("tooltip.isActivatedOnBegins")}
+        style={{ marginTop: "var(--spacing-s)" }}
+      />
     </>
   );
 }
