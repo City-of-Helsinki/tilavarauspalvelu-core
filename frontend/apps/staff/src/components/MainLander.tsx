@@ -12,7 +12,7 @@ import { HERO_IMAGE_URL } from "@/modules/const";
 import { getAccessibilityTermsUrl } from "@/modules/urls";
 import { KorosHeading, Heading } from "./KorosHeading";
 
-const LoginBtn = styled(Button)`
+const LargeLoginBtn = styled(Button)`
   --background-color: var(--color-white);
   --background-color-focus: var(--color-bus-dark);
   --background-color-hover: var(--color-bus-dark);
@@ -58,7 +58,7 @@ export function MainLander(): React.ReactElement {
     <>
       <KorosHeading heroImage={HERO_IMAGE_URL}>
         <Heading>{t("common:applicationName")}</Heading>
-        <LoginBtn
+        <LargeLoginBtn
           iconStart={<IconGroup />}
           iconEnd={<IconArrowRight />}
           onClick={() =>
@@ -70,10 +70,10 @@ export function MainLander(): React.ReactElement {
           }
         >
           {t("navigation:login")}
-        </LoginBtn>
+        </LargeLoginBtn>
       </KorosHeading>
       <Content>
-        <Ingress as="p">{t("translation:MainLander.ingress")}</Ingress>
+        <Ingress as="p">{t("mainLander:ingress")}</Ingress>
         <IconButton
           label={t("navigation:a11yTerms")}
           icon={<IconLinkExternal />}
