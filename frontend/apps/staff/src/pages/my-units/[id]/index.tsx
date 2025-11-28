@@ -13,7 +13,7 @@ import { breakpoints } from "ui/src/modules/const";
 import { parseUIDate } from "ui/src/modules/date-utils";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex, H1, TabWrapper, TitleSection } from "ui/src/styled";
-import { logGraphQLQuery } from "@ui/modules/apolloUtils";
+import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apolloUtils";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { useModal } from "@/context/ModalContext";
 import { useSession } from "@/hooks";
@@ -187,35 +187,42 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
   }
   const start = performance.now();
   const { apiBaseUrl } = await getCommonServerSideProps();
-  const apolloClient = createClient(apiBaseUrl, req);
-  const unitQuery = apolloClient.query<UnitViewQuery, UnitViewQueryVariables>({
-    query: UnitViewDocument,
-    variables: { id: createNodeId("UnitNode", pk) },
-  });
-  const optionsQuery = apolloClient.query<FilterOptionsQuery, FilterOptionsQueryVariables>({
-    query: FilterOptionsDocument,
-  });
+  try {
+    const apolloClient = createClient(apiBaseUrl, req);
+    const unitQuery = apolloClient.query<UnitViewQuery, UnitViewQueryVariables>({
+      query: UnitViewDocument,
+      variables: { id: createNodeId("UnitNode", pk) },
+    });
+    const optionsQuery = apolloClient.query<FilterOptionsQuery, FilterOptionsQueryVariables>({
+      query: FilterOptionsDocument,
+    });
 
-  const [unitQueryRes, optionsQueryRes] = await Promise.all([unitQuery, optionsQuery]);
-  const { data } = unitQueryRes;
-  const { data: optionsData } = optionsQueryRes;
+    const [unitQueryRes, optionsQueryRes] = await Promise.all([unitQuery, optionsQuery]);
+    const { data } = unitQueryRes;
+    const { data: optionsData } = optionsQueryRes;
 
-  const end = performance.now();
-  const timeMs = Math.round(end - start);
-  logGraphQLQuery(timeMs, req.url, [UnitViewDocument, FilterOptionsDocument]);
+    const end = performance.now();
+    const timeMs = Math.round(end - start);
+    logGraphQLQuery(timeMs, req.url, [UnitViewDocument, FilterOptionsDocument]);
 
-  const { unit } = data;
-  if (unit == null) {
-    return NOT_FOUND_SSR_VALUE;
+    const { unit } = data;
+    if (unit == null) {
+      return NOT_FOUND_SSR_VALUE;
+    }
+
+    return {
+      props: {
+        unit,
+        optionsData,
+        ...(await serverSideTranslations(locale ?? "fi")),
+      },
+    };
+  } catch (err) {
+    const error = transformQueryError(err);
+    logGraphQLError(error);
   }
 
-  return {
-    props: {
-      unit,
-      optionsData,
-      ...(await serverSideTranslations(locale ?? "fi")),
-    },
-  };
+  return NOT_FOUND_SSR_VALUE;
 }
 
 export const UNIT_VIEW_QUERY = gql`
