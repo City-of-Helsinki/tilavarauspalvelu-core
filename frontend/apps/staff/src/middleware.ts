@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import z from "zod";
 import { isPageRequest, gqlQueryFetch, redirectCsrfToken } from "ui/src/middlewareHelpers";
 import type { GqlQuery } from "ui/src/middlewareHelpers";
 import { env } from "@/env.mjs";
@@ -7,14 +8,19 @@ import { PUBLIC_URL } from "./modules/const";
 
 const API_BASE_URL = env.TILAVARAUS_API_URL ?? "";
 
-type User = {
-  pk: number;
-};
-type Data = {
-  user: User;
-};
+const CurrentUserSchema = z.object({
+  pk: z.number(),
+});
+const QueryResultSchema = z.object({
+  currentUser: CurrentUserSchema.nullable(),
+});
+const CurrentUserQuerySchema = z.object({
+  data: QueryResultSchema,
+});
 
-async function fetchUserData(req: NextRequest): Promise<Data | null> {
+type QueryResultType = z.infer<typeof QueryResultSchema>;
+
+async function fetchUserData(req: NextRequest): Promise<QueryResultType | null> {
   const { cookies } = req;
   const sessionid = cookies.get("sessionid");
 
@@ -38,22 +44,7 @@ async function fetchUserData(req: NextRequest): Promise<Data | null> {
   }
 
   const data: unknown = await res.json();
-  if (typeof data !== "object" || data == null) {
-    return null;
-  }
-
-  if ("currentUser" in data) {
-    const { currentUser } = data;
-    if (
-      typeof currentUser === "object" &&
-      currentUser != null &&
-      "pk" in currentUser &&
-      typeof currentUser.pk === "number"
-    ) {
-      return { user: { pk: currentUser.pk } };
-    }
-  }
-  return null;
+  return CurrentUserQuerySchema.parse(data).data;
 }
 
 export async function middleware(req: NextRequest) {
@@ -73,9 +64,12 @@ export async function middleware(req: NextRequest) {
   }
 
   // Do a user query to check that backend is alive
-  // => if it's not return 503 page instead of 500 (uncaught exception)
+  // => if it's not return a 503 page instead of 500 (uncaught exception)
   try {
-    const _user = await fetchUserData(req);
+    const data = await fetchUserData(req);
+    const res = NextResponse.next();
+    res.headers.set("x-session-is-valid", String(data?.currentUser?.pk != null));
+    return res;
     // TODO could add check here to rewrite the main page (instead of returning it from the React component)
   } catch {
     // TODO check for GraphQL errors vs. network errors (e.g. Connection refused / 503)
@@ -83,8 +77,6 @@ export async function middleware(req: NextRequest) {
     const rewriteUrl = new URL(`${env.NEXT_PUBLIC_BASE_URL ?? ""}/503`, req.url);
     return NextResponse.rewrite(rewriteUrl);
   }
-
-  return NextResponse.next();
 }
 
 export const config = {
