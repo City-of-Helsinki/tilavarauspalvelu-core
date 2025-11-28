@@ -14,7 +14,7 @@ export const HR = styled.hr<{
   width: 100%;
 `;
 
-interface AutoGridProps {
+export interface AutoGridProps {
   $minWidth?: string;
   $alignCenter?: boolean;
   $gap?: SpacingSize;

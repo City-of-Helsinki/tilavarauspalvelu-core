@@ -6,14 +6,14 @@ import styled from "styled-components";
 import { ControlledCheckbox, ControlledNumberInput, ControlledSelect } from "@ui/components/form";
 import { isNumPersonsRequired } from "@ui/schemas";
 import type { ReservationFormValueT } from "@ui/schemas";
-import { AutoGrid, H4, H5 } from "@ui/styled";
+import { H4, H5 } from "@ui/styled";
 import type { OptionsRecord } from "@ui/types";
 import { MunicipalityChoice, ReserveeType } from "../../gql/gql-types";
 import type { ReservationUnitNode } from "../../gql/gql-types";
 import { CustomerTypeSelector } from "./CustomerTypeSelector";
 import { ReservationFormField } from "./ReservationFormField";
 import { ReservationSubventionSection } from "./ReservationSubventionSection";
-import { StyledCheckboxWrapper, StyledTextArea, StyledTextInput } from "./styled";
+import { StyledAutoGrid, StyledCheckboxWrapper, StyledTextArea, StyledTextInput } from "./styled";
 import {
   constructReservationFieldId,
   constructReservationFieldLabel,
@@ -95,7 +95,7 @@ export function ReservationFormGeneralSection({
   const numPersonRequired = isNumPersonsRequired(reservationUnit.reservationForm);
 
   return (
-    <AutoGrid>
+    <StyledAutoGrid>
       <Subheading>{t("reservationCalendar:reservationInfo")}</Subheading>
       {hasName && (
         <StyledTextInput
@@ -160,7 +160,7 @@ export function ReservationFormGeneralSection({
         />
       )}
       {data?.enableSubvention && <ReservationSubventionSection termsForDiscount={data.termsForDiscount} form={form} />}
-    </AutoGrid>
+    </StyledAutoGrid>
   );
 }
 
@@ -211,7 +211,7 @@ export function ReservationFormReserveeSection({
   const isOrganisation = reserveeType === ReserveeType.Nonprofit || reserveeType === ReserveeType.Company;
 
   return (
-    <AutoGrid data-testid="reservation__form--reservee-info" className={className} style={style}>
+    <StyledAutoGrid data-testid="reservation__form--reservee-info" className={className} style={style}>
       <Subheading>{t("reservationCalendar:reserverInfo")}</Subheading>
       {isTypeSelectable && (
         <CustomerTypeSelector name="reserveeType" control={control} required error={reserveeTypeError} />
@@ -271,7 +271,7 @@ export function ReservationFormReserveeSection({
           strongLabel
         />
       )}
-    </AutoGrid>
+    </StyledAutoGrid>
   );
 }
 
