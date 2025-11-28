@@ -32,44 +32,6 @@ const config = {
     locales: ["fi"],
     defaultLocale: "fi",
   },
-  // eslint-disable-next-line require-await
-  async rewrites() {
-    return [
-      {
-        source: "/units/:id/reservation-units/new",
-        destination: "/reservation-units/new?id=:id",
-      },
-      // secondary route when accessed through unit pages
-      {
-        source: "/units/:id/reservation-units/:any*",
-        destination: "/reservation-units/:any*",
-      },
-      // old notifications route
-      {
-        source: "/messaging/notifications/:any*",
-        destination: "/notifications/:any*",
-      },
-      // old all reservations route
-      {
-        source: "/reservations/all",
-        destination: "/reservations",
-      },
-      // Fix missing 's' in resources and spaces
-      {
-        source: "/units/:id/resource/:any*",
-        destination: "/units/:id/resources/:any*",
-      },
-      {
-        source: "/units/:id/space/:any*",
-        destination: "/units/:id/spaces/:any*",
-      },
-      // healthcheck should be a simple 200 response with no resource loading
-      {
-        source: "/healthcheck",
-        destination: "/api/healthcheck",
-      },
-    ];
-  },
   // oxlint-disable-next-line require-await
   async headers() {
     // path-to-regex has some weird matching for the base path
@@ -82,6 +44,54 @@ const config = {
         },
       ],
     }));
+  },
+  // oxlint-disable-next-line require-await
+  async redirects() {
+    return [
+      // old notifications route
+      {
+        source: "/messaging/notifications/:any*",
+        destination: "/notifications/:any*",
+        permanent: true,
+      },
+      // old all reservations route
+      {
+        source: "/reservations/all",
+        destination: "/reservations",
+        permanent: true,
+      },
+      // Fix missing 's' in resources and spaces
+      {
+        source: "/units/:id/resource/:any*",
+        destination: "/units/:id/resources/:any*",
+        permanent: true,
+      },
+    ];
+  },
+  // oxlint-disable-next-line require-await
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: "/units/:id/reservation-units/new",
+          destination: "/reservation-units/new?id=:id",
+        },
+        // secondary route when accessed through unit pages
+        {
+          source: "/units/:id/reservation-units/:any*",
+          destination: "/reservation-units/:any*",
+        },
+        {
+          source: "/units/:id/space/:any*",
+          destination: "/units/:id/spaces/:any*",
+        },
+        // healthcheck should be a simple 200 response with no resource loading
+        {
+          source: "/healthcheck",
+          destination: "/api/healthcheck",
+        },
+      ],
+    };
   },
   // NOTE sentry/nextjs doesn't have options to bundle static/chunks
   // widenClientFileUpload should enable them but it doesn't
