@@ -1,16 +1,11 @@
 import React, { useState } from "react";
 import { addDays, formatISO, startOfDay, subDays } from "date-fns";
 import { useSearchParams } from "next/navigation";
-import styled from "styled-components";
 import { toNumber } from "ui/src/modules/helpers";
 import { AutoGrid, Flex } from "ui/src/styled";
 import { SelectFilter } from "@/components/QueryParamFilters";
 import { ReservationUnitCalendar } from "./ReservationUnitCalendar";
 import { WeekNavigation } from "./WeekNavigation";
-
-const SelectFilterStyled = styled(SelectFilter)`
-  z-index: var(--tilavaraus-admin-stack-select-over-calendar);
-`;
 
 export function ReservationUnitCalendarView({
   reservationUnitOptions,
@@ -28,7 +23,13 @@ export function ReservationUnitCalendarView({
   return (
     <>
       <AutoGrid>
-        <SelectFilterStyled name="reservationUnit" clearable={false} options={reservationUnitOptions} enableSearch />
+        <SelectFilter
+          name="reservationUnit"
+          style={{ zIndex: "var(--tilavaraus-admin-stack-select-over-calendar)" }}
+          clearable={false}
+          options={reservationUnitOptions}
+          enableSearch
+        />
       </AutoGrid>
       <Flex $justifyContent="center" $direction="row">
         <WeekNavigation
