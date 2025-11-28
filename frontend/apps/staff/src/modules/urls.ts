@@ -1,3 +1,4 @@
+import { logError } from "@ui/modules/errors";
 import type { Maybe } from "@gql/gql-types";
 import { isBrowser, PUBLIC_URL } from "./const";
 
@@ -151,8 +152,7 @@ export function getOpeningHoursUrl(
     }
     return url.toString();
   } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error(err);
+    logError(err);
   }
   return "";
 }

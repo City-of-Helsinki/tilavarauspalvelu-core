@@ -16,6 +16,7 @@ import { breakpoints } from "ui/src/modules/const";
 import { formatDateRange, formatDateTime, formatDuration, parseValidDateObject } from "ui/src/modules/date-utils";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { CenterSpinner, Flex, fontMedium, H1, H3, H4, TitleSection } from "ui/src/styled";
+import { logError } from "@ui/modules/errors";
 import { Accordion as AccordionBase } from "@/components/Accordion";
 import { BirthDate } from "@/components/BirthDate";
 import { Error403 } from "@/components/Error403";
@@ -232,8 +233,7 @@ function RejectAllOptionsButton({
 
   // codegen types allow undefined so have to do this for debugging
   if (section.allocations == null) {
-    // eslint-disable-next-line no-console
-    console.warn("section.allocations is null", section);
+    logError(`section.allocations is null: ${JSON.stringify(section)}`);
   }
 
   const inAllocation =
@@ -486,17 +486,6 @@ function RejectApplicationButton({
     }
   };
 
-  if (application.applicationSections == null) {
-    // eslint-disable-next-line no-console
-    console.warn("application.applicationSections is null", application);
-  }
-
-  if (application.pk == null) {
-    // eslint-disable-next-line no-console
-    console.warn("application.pk is null", application);
-    return null;
-  }
-
   const handleRejectAll = () => {
     return updateApplication(application.pk, true);
   };
@@ -504,16 +493,6 @@ function RejectApplicationButton({
   const handleRestoreAll = () => {
     return updateApplication(application.pk, false);
   };
-
-  // codegen types allow undefined so have to do this for debugging
-  if (application.applicationSections == null) {
-    // eslint-disable-next-line no-console
-    console.warn("application.applicationSections is null", application);
-  }
-  if (application.status == null) {
-    // eslint-disable-next-line no-console
-    console.warn("application.status is null", application);
-  }
 
   const isInAllocation =
     application.status === ApplicationStatusChoice.InAllocation ||
