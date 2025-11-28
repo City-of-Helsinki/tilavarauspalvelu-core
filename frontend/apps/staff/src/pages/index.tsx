@@ -17,7 +17,7 @@ const Ingress = styled(H2)`
 `;
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-export default function Index(_props: PageProps) {
+export default function Index({ rand }: PageProps) {
   const { t } = useTranslation();
 
   const { user } = useSession();
@@ -25,7 +25,7 @@ export default function Index(_props: PageProps) {
   let headingStr = t("translation:MainLander.welcome");
   if (
     user?.username === "u-gptwmnqqnjahlfj2uas2glyx5a" &&
-    Math.random() < 0.1 // 10% chance
+    rand < 0.1 // 10% chance
   ) {
     headingStr = t("translation:MainLander.welcomeCustom");
   }
@@ -48,6 +48,7 @@ export default function Index(_props: PageProps) {
 export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
+      rand: Math.random(),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

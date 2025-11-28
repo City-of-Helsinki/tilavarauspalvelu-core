@@ -231,10 +231,6 @@ function getIsCellClosed(offset: number, reservableTimeSpans: TimeSpanType[], se
   // causes an API request and `reservableTimeSpans` contains `previousData`, but `selectedDate` has already changed
   const reservableStartTimeDate = reservableTimeSpans[0]?.start ?? selectedDate;
 
-  if (reservableTimeSpans.length === 0 || !reservableTimeSpans[0]?.start) {
-    return false; // Don't show as closed if reservable time spans are not yet loaded
-  }
-
   const isOpen = reservableTimeSpans.some((span) => {
     // Cell start is at e.g. 8:00 for offset 16, 8:30 for offset 17
     // Cell end is at e.g. 8:30 for offset 16, 9:00 for offset 17
