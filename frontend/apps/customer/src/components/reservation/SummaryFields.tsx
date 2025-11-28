@@ -6,6 +6,7 @@ import {
   getExtendedGeneralFormFields,
 } from "@ui/components/reservation-form/utils";
 import type { FormField } from "@ui/components/reservation-form/utils";
+import { logError } from "@ui/modules/errors";
 import { AutoGrid, H4 } from "@ui/styled";
 import type { OptionsRecord } from "@ui/types";
 import { LabelValuePair } from "@/components/LabelValuePair";
@@ -111,15 +112,13 @@ function convertMaybeOptionValue(
   if (key in extendedOptions) {
     const optionsKey = key as keyof OptionsType;
     if (rawValue == null) {
-      // eslint-disable-next-line no-console
-      console.warn("convertMaybeOptionValue: rawValue is not object:", rawValue);
+      logError(`convertMaybeOptionValue: rawValue is not object: ${rawValue}`);
     } else if (typeof rawValue === "object" && "pk" in rawValue && typeof rawValue.pk === "number") {
       return extendedOptions[optionsKey].find((option) => option.value === rawValue.pk)?.label ?? "";
     } else if (typeof rawValue === "string" && rawValue !== "") {
       return extendedOptions[optionsKey].find((option) => option.value === rawValue)?.label ?? "";
     }
-    // eslint-disable-next-line no-console
-    console.warn("convertMaybeOptionValue: rawValue is not pk, but object:", rawValue);
+    logError(`convertMaybeOptionValue: rawValue is not pk, but object: ${rawValue}`);
     return "unknown";
   } else if (typeof rawValue === "boolean") {
     return t(`common:${String(rawValue)}`);

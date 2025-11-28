@@ -142,19 +142,7 @@ export function ApplicationSectionCard({
   const [focused, setFocusedApplicationSection] = useFocusApplicationEvent();
   const isActive = applicationSection.pk === focused;
 
-  const application = applicationSection.application ?? null;
-
-  // TODO can we pass through without application?
-  if (application?.pk == null) {
-    // eslint-disable-next-line no-console
-    console.warn("ApplicationSectionCard: application is missing");
-    return null;
-  }
-  if (!applicationSection) {
-    // eslint-disable-next-line no-console
-    console.warn("ApplicationSectionCard: applicationSection is missing");
-    return null;
-  }
+  const application = applicationSection.application;
 
   const applicantName = getApplicantName(application);
   const durationString = createDurationString(applicationSection, t);

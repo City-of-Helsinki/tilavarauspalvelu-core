@@ -339,11 +339,6 @@ export function EditTimeModal({
 
   const interval = getNormalizedInterval(reservationUnit.reservationStartInterval);
 
-  if (reservation.pk == null) {
-    // eslint-disable-next-line no-console
-    console.warn("EditTimeModal: pk missing");
-  }
-
   const form = useForm<EditFormValueType>({
     resolver: zodResolver(getTimeChangeFormSchemaRefined(interval)),
     mode: "onChange",

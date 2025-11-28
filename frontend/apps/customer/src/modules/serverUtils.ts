@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import type { ApolloClient, NormalizedCacheObject } from "@apollo/client";
+import { logError } from "@ui/modules/errors";
 import type { CommonEnvConfig } from "@ui/types";
 import { env } from "@/env.mjs";
 import { TermsOfUseTypeChoices, TermsOfUseDocument, OrderDocument } from "@gql/gql-types";
@@ -75,8 +76,7 @@ export async function getGenericTerms(apolloClient: ApolloClient<unknown>): Prom
   // NOTE there is no error reporting in the Pages even though this is required data
   // so Pages / Components might return null if tos is missing
   if (tos == null) {
-    // eslint-disable-next-line no-console
-    console.error("No terms of use found");
+    logError(`No terms of use found for slug "${genericTermsVariant.BOOKING}"`);
   }
 
   return tos;

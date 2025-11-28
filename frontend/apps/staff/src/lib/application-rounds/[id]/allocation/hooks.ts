@@ -7,6 +7,7 @@ import { errorToast, successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { numberToDayT } from "ui/src/modules/conversion";
 import { toNumber } from "ui/src/modules/helpers";
+import { logError } from "@ui/modules/errors";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { useCreateAllocatedTimeSlotMutation, useDeleteAllocatedTimeSlotMutation } from "@gql/gql-types";
 import type { AllocatedTimeSlotCreateMutationInput, ApplicationSectionAllocationsQuery } from "@gql/gql-types";
@@ -178,7 +179,6 @@ export function useAcceptSlotMutation({
   timeRange,
   applicationSection,
   reservationUnitOptionPk,
-  // TODO await instead of calling a callback (alternatively chain a callback to the handle function but it's already red)
   refresh,
 }: AcceptSlotMutationProps): HookReturnValue {
   const { t } = useTranslation();
@@ -186,30 +186,22 @@ export function useAcceptSlotMutation({
   const [acceptApplicationEvent, { loading: isLoading }] = useCreateAllocatedTimeSlotMutation();
   const displayError = useDisplayError();
 
-  if (!reservationUnitOptionPk) {
-    // eslint-disable-next-line no-console
-    console.error("Invalid reservationUnitOptionPk:", reservationUnitOptionPk);
-  }
-
   const handleAcceptSlot = async () => {
     if (selection.length === 0) {
-      // eslint-disable-next-line no-console
-      console.error("Invalid selection");
+      logError("Invalid selection", "warning");
     }
     if (timeRange == null) {
-      // eslint-disable-next-line no-console
-      console.error("Invalid timeRange for section:", applicationSection);
+      logError(`Invalid timeRange for section ${JSON.stringify(applicationSection)}`, "warning");
     }
-    if (selection.length === 0 || timeRange == null) {
+    if (reservationUnitOptionPk < 1) {
+      logError(`Invalid reservation unit pk ${reservationUnitOptionPk}`, "warning");
+    }
+    if (selection.length === 0 || timeRange == null || reservationUnitOptionPk < 1) {
       errorToast({ text: t("allocation:errors.accepting.generic") });
       return;
     }
     const allocatedBegin = timeSlotKeyToScheduleTime(selection[0]);
     const allocatedEnd = timeSlotKeyToScheduleTime(selection[selection.length - 1], true);
-    if (!reservationUnitOptionPk) {
-      errorToast({ text: t("allocation:errors.accepting.generic") });
-      return;
-    }
 
     // NOTE the pk is an update pk that matches AllocatedTimeSlot (not the applicationSection)
     // TODO check the inputs

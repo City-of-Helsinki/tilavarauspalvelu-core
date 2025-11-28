@@ -30,19 +30,19 @@ export class GraphQLFetchError extends Error {
   }
 }
 
-export function logError(err: unknown) {
+export function logError(err: unknown, level: "warning" | "error" = "error") {
   if (err instanceof GraphQLFetchError) {
     const ctx_extra = {
       data: JSON.stringify(err.data),
       operation: JSON.stringify(err.operation),
     };
-    log.error(ctx_extra, err.name);
-    Sentry.captureException(err, { extra: ctx_extra });
+    log({ ...ctx_extra, logLevel: level }, err.name);
+    Sentry.captureException(err, { extra: ctx_extra, level });
   } else if (typeof err === "string") {
-    log.error(err);
-    Sentry.captureMessage(err, "error");
+    log({ logLevel: level }, err);
+    Sentry.captureMessage(err, level);
   } else {
-    log.error(`Exception: ${err}`);
-    Sentry.captureException(err);
+    log({ logLevel: level }, `Exception: ${err}`);
+    Sentry.captureException(err, { level });
   }
 }
