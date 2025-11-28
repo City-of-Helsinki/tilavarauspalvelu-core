@@ -14,13 +14,12 @@ import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers
 import { ReservationChangeFormSchema } from "ui/src/schemas";
 import type { ReservationChangeFormType } from "ui/src/schemas";
 import { ButtonContainer, CenterSpinner, Flex, HR } from "ui/src/styled";
-import { Error403 } from "@/components/Error403";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { LinkPrev } from "@/components/LinkPrev";
 import { ReservationTypeForm } from "@/components/ReservationTypeForm";
-import { useReservationEditData, useSession, useStaffReservationMutation } from "@/hooks";
+import { useReservationEditData, useStaffReservationMutation } from "@/hooks";
 import { createClient } from "@/modules/apolloClient";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { hasPermission } from "@/modules/permissionHelper";
 import { createTagString } from "@/modules/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { ReservationPermissionsDocument, UserPermissionChoice, ReserveeType } from "@gql/gql-types";
@@ -180,12 +179,11 @@ function EditPage({ pk }: { pk: number }): JSX.Element {
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 export default function Page({ pk, unitPk }: PropsNarrowed): JSX.Element {
-  const { user } = useSession();
-  const hasAccess = hasPermission(user, UserPermissionChoice.CanManageReservations, unitPk);
-  if (!hasAccess) {
-    return <Error403 />;
-  }
-  return <EditPage pk={pk} />;
+  return (
+    <AuthorizationChecker permission={UserPermissionChoice.CanManageReservations} unitPk={unitPk}>
+      <EditPage pk={pk} />
+    </AuthorizationChecker>
+  );
 }
 
 export async function getServerSideProps({ locale, query, req }: GetServerSidePropsContext) {

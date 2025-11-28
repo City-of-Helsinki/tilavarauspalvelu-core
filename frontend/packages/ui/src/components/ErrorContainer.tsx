@@ -122,6 +122,7 @@ export function ErrorContainer({
   return (
     <ErrorWrapper>
       <Img
+        loading="eager"
         src={
           imgSrc ??
           (STATUS_CODES_WITH_NONGENERIC_CONTENT.has(statusCode ?? 0)

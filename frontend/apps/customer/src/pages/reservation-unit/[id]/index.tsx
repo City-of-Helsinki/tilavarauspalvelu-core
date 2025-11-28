@@ -15,8 +15,6 @@ import { TimeZoneNotification } from "ui/src/components/TimeZoneNotification";
 import { errorToast } from "ui/src/components/toast";
 import { useDisplayError, useToastIfQueryParam } from "ui/src/hooks";
 import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
-import { getApiErrors } from "ui/src/modules/apolloUtils";
-import type { ApiError } from "ui/src/modules/apolloUtils";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDate, formatTime, parseUIDate, isValidDate, formatApiDate } from "ui/src/modules/date-utils";
 import {
@@ -30,6 +28,9 @@ import {
   toNumber,
 } from "ui/src/modules/helpers";
 import { Flex, H4 } from "ui/src/styled";
+import { getApiErrors, logGraphQLQuery } from "@ui/modules/apollo/helpers";
+import type { ApiError } from "@ui/modules/apollo/helpers";
+import { logError } from "@ui/modules/errors";
 import { AddressSection } from "@/components/AddressSection";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { InfoDialog } from "@/components/InfoDialog";
@@ -284,8 +285,7 @@ function ReservationUnit({
   // store reservation unit overall reservability to use in JSX and pass to some child elements
   const { isReservable: reservationUnitIsReservable, reason } = isReservationUnitReservable(reservationUnit);
   if (!reservationUnitIsReservable) {
-    // eslint-disable-next-line no-console
-    console.warn("not reservable because:", reason);
+    logError(`not reservable because: ${reason}`, "warning");
   }
 
   const equipment = filterNonNullable(reservationUnit.equipments);
@@ -435,7 +435,7 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { params, query, locale } = ctx;
+  const { params, query, locale, req } = ctx;
   const pk = toNumber(ignoreMaybeArray(params?.id));
   const uuid = query.ru;
   const { apiBaseUrl } = getCommonServerSideProps();
@@ -451,12 +451,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const startTime = performance.now();
 
-  const isPostLogin = query.isPostLogin === "true";
-
   let mutationErrors: ApiError[] | null = null;
   if (pk != null && pk > 0) {
     const beginsAt = ignoreMaybeArray(query.begin);
     const endsAt = ignoreMaybeArray(query.end);
+    const isPostLogin = query.isPostLogin === "true";
+
     if (isPostLogin && beginsAt != null && endsAt != null) {
       const input: ReservationCreateMutationInput = {
         beginsAt,
@@ -491,8 +491,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const startDate = today;
     const endDate = addYears(today, 2);
 
-    let innerStartTime = performance.now();
-    // This takes 400ms+ on local server
     const { data: reservationUnitData } = await apolloClient.query<
       ReservationUnitPageQuery,
       ReservationUnitPageQueryVariables
@@ -504,9 +502,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         endDate: formatApiDate(endDate) ?? "",
       },
     });
-    let innerEndTime = performance.now();
-    // oxlint-disable-next-line no-console
-    console.log("Fetch reservationUnit took:", innerEndTime - innerStartTime, "ms");
+
+    logGraphQLQuery(performance.now() - startTime, req.url, ReservationUnitPageDocument);
 
     const { reservationUnit } = reservationUnitData;
 
@@ -520,6 +517,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     }
 
     const isDraft = reservationUnit?.isDraft;
+
     if (isDraft && !previewPass) {
       return notFound;
     }
@@ -528,10 +526,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const searchDate = queryParams.get("date") ?? null;
     const searchTime = queryParams.get("time") ?? null;
     const searchDuration = toNumber(ignoreMaybeArray(queryParams.get("duration")));
-
-    const endTime = performance.now();
-    // oxlint-disable-next-line no-console
-    console.log("SSR fetches took in total:", endTime - startTime, "ms");
 
     return {
       props: {

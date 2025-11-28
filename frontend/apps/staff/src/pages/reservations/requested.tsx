@@ -6,6 +6,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import { formatDate } from "ui/src/modules/date-utils";
 import { H1, HR } from "ui/src/styled";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { ReservationStateChoice } from "@gql/gql-types";
 
@@ -45,7 +46,7 @@ export default function RequestedListingPage(_props: PageProps) {
   ];
 
   return (
-    <>
+    <AuthorizationChecker>
       <div>
         <H1 $marginTop="l">{t("reservation:listHeading")}</H1>
         <p>{t("reservation:listDescription")}</p>
@@ -57,7 +58,7 @@ export default function RequestedListingPage(_props: PageProps) {
       />
       <HR />
       <ReservationsDataLoader />
-    </>
+    </AuthorizationChecker>
   );
 }
 

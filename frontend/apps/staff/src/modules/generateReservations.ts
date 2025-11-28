@@ -1,5 +1,6 @@
 import { transformWeekday } from "ui/src/modules/conversion";
 import { parseUIDateUnsafe, timeToMinutes, setMondayFirst } from "ui/src/modules/date-utils";
+import { logError } from "@ui/modules/errors";
 import type { TimeSelectionFormValues } from "@/schemas";
 import type { Weekday } from "@gql/gql-types";
 
@@ -77,8 +78,7 @@ export function generateReservations(props: TimeSelectionFormValues) {
       }))
       .sort((a, b) => a.date.getTime() - b.date.getTime());
   } catch (err) {
-    // eslint-disable-next-line no-console
-    console.warn("exception:", err);
+    logError(err);
     // Date throws => don't crash
   }
 

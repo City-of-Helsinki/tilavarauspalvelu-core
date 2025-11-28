@@ -6,70 +6,18 @@
 // that libraries are not imported in the middleware.
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { isPageRequest, redirectCsrfToken } from "ui/src/middlewareHelpers";
+import z from "zod";
+import { gqlQueryFetch, isPageRequest, redirectCsrfToken } from "ui/src/middlewareHelpers";
+import type { GqlQuery } from "ui/src/middlewareHelpers";
 import { createNodeId, getLocalizationLang } from "ui/src/modules/helpers";
-import { buildGraphQLUrl, getSignInUrl } from "ui/src/modules/urlBuilder";
+import { getSignInUrl } from "ui/src/modules/urlBuilder";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
+import { logError } from "@ui/modules/errors";
 import { env } from "@/env.mjs";
 import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import { getReservationInProgressPath } from "./modules/urls";
 
 const API_BASE_URL = env.TILAVARAUS_API_URL ?? "";
-
-type QqlQuery = {
-  query: string;
-  // TODO don't type to unknown (undefined and Date break JSON.stringify)
-  variables: Record<string, unknown>;
-};
-
-/// Fetch a query from the backend
-/// @param req - NextRequest used to copy headers etc.
-/// @param query - Query object with query and variables
-/// @returns Promise<Response>
-/// custom function so we don't have to import apollo client in middleware
-function gqlQueryFetch(req: NextRequest, query: QqlQuery) {
-  const { cookies, headers } = req;
-  // TODO this is copy to the createApolloClient function but different header types
-  // NextRequest vs. RequestInit
-  const newHeaders = new Headers({
-    ...headers,
-    "Content-Type": "application/json",
-  });
-
-  const sessionid = cookies.get("sessionid");
-  const csrfToken = cookies.get("csrftoken");
-
-  if (csrfToken == null) {
-    return new Response("missing csrf token", {
-      status: 400,
-      statusText: "Bad Request",
-    });
-  }
-
-  newHeaders.append("X-Csrftoken", csrfToken.value);
-  newHeaders.append("Cookie", `csrftoken=${csrfToken.value}`);
-  // queries can be made both with and without sessionid
-  if (sessionid != null) {
-    newHeaders.append("Cookie", `sessionid=${sessionid.value}`);
-  }
-
-  const proto = headers.get("x-forwarded-proto") ?? "http";
-  const hostname = headers.get("x-forwarded-host") ?? headers.get("host") ?? "";
-  const requestUrl = new URL(req.url).pathname;
-  const referer = `${proto}://${hostname}${requestUrl}`;
-  newHeaders.append("Referer", referer);
-  // Use of fetch requires a string body (vs. gql query object)
-  // the request returns either a valid user (e.g. pk) or null if user was not found
-  const body: string = JSON.stringify(query);
-
-  return fetch({
-    method: "POST",
-    url: buildGraphQLUrl(API_BASE_URL),
-    headers: newHeaders,
-    // @ts-expect-error -- something broken in node types, body can be a string
-    body,
-  });
-}
 
 type User = {
   pk: number;
@@ -83,6 +31,30 @@ type Data = {
   } | null;
   user: User;
 };
+
+const CurrentUserSchema = z.object({
+  pk: z.number(),
+});
+const ReservationSchema = z.object({
+  type: z.enum(ReservationTypeChoice),
+  state: z.enum(ReservationStateChoice),
+  user: CurrentUserSchema,
+  reservationUnit: z.object({
+    pk: z.number(),
+  }),
+});
+const ApplicationSchema = z.object({
+  id: z.string(),
+  user: CurrentUserSchema,
+});
+const QueryResultSchema = z.object({
+  currentUser: CurrentUserSchema.nullable(),
+  reservation: ReservationSchema.nullish(),
+  application: ApplicationSchema.nullish(),
+});
+const MiddlewareQuerySchema = z.object({
+  data: QueryResultSchema,
+});
 
 const RESERVATION_QUERY = `
   reservation(id: $reservationId) {
@@ -120,15 +92,10 @@ async function fetchUserData(
   }
 ): Promise<Data | null> {
   const { cookies } = req;
-  const hasSession = cookies.has("sessionid");
-  if (!hasSession) {
-    return null;
-  }
 
   const sessionid = cookies.get("sessionid");
-  const csrfToken = cookies.get("csrftoken");
 
-  if (csrfToken == null || sessionid == null) {
+  if (sessionid == null) {
     return null;
   }
 
@@ -144,9 +111,9 @@ ${applicationId ? "$applicationId: ID!" : ""}
 )`
       : "";
 
-  const query: QqlQuery = {
+  const query: GqlQuery = {
     query: `
-      query GetCurrentUser ${params} {
+      query MiddlewareQuery ${params} {
         currentUser {
           pk
         }
@@ -158,125 +125,26 @@ ${applicationId ? "$applicationId: ID!" : ""}
       ...(applicationId != null ? { applicationId } : {}),
     },
   };
-  const res = await gqlQueryFetch(req, query);
+  const data = await gqlQueryFetch(req, query, API_BASE_URL);
 
-  if (!res.ok) {
-    const text = await res.text();
-    // eslint-disable-next-line no-console
-    console.warn(`Middleware: request failed: ${res.status} with message: ${text}`);
-    // prefer throw here because we want all query failures -> end in same fail state
-    throw new Error(res.statusText);
-  }
-
-  const data: unknown = await res.json();
-  if (typeof data !== "object" || data == null || !("data" in data)) {
-    // eslint-disable-next-line no-console
-    console.warn("Middleware: no data in response");
+  const parsed = MiddlewareQuerySchema.parse(data);
+  const res = parsed.data;
+  if (res.currentUser == null) {
     return null;
   }
 
-  const user = parseUserGQLquery(data.data, reservationId, applicationId);
-  if (user == null) {
-    return null;
-  }
-
+  const userPkToCheck = res.reservation?.user.pk || res.application?.user.pk;
   return {
-    reservation: parseReservationGQLquery(data.data),
-    user,
+    reservation: {
+      state: res.reservation?.state,
+      type: res.reservation?.type,
+      resUnitPk: res.reservation?.reservationUnit.pk ?? null,
+    },
+    user: {
+      pk: res.currentUser.pk,
+      hasAccess: userPkToCheck == null || res.currentUser.pk === userPkToCheck,
+    },
   };
-}
-
-/// return reservation data from the gql query or null if it's not found
-function parseReservationGQLquery(data: unknown): Data["reservation"] | null {
-  if (data != null && typeof data === "object" && "reservation" in data) {
-    const { reservation } = data;
-
-    if (reservation != null && typeof reservation === "object") {
-      let type: ReservationTypeChoice | null = null;
-      if ("type" in reservation && reservation.type != null && typeof reservation.type === "string") {
-        type = reservation.type as ReservationTypeChoice;
-      }
-
-      let state: ReservationStateChoice | null = null;
-      if ("state" in reservation && reservation.state != null && typeof reservation.state === "string") {
-        state = reservation.state as ReservationStateChoice;
-      }
-
-      let resUnitPk: number | null = null;
-      if (
-        "reservationUnit" in reservation &&
-        reservation.reservationUnit != null &&
-        typeof reservation.reservationUnit === "object" &&
-        "pk" in reservation.reservationUnit &&
-        typeof reservation.reservationUnit.pk === "number"
-      ) {
-        resUnitPk = reservation.reservationUnit.pk;
-      }
-      return { state, type, resUnitPk };
-    }
-  }
-
-  return null;
-}
-
-function parseUserGQLquery(data: unknown, reservationId: string | null, applicationId: string | null): User | null {
-  let userPk = null;
-  let hasAccess = reservationId == null && applicationId == null;
-  if (typeof data !== "object" || data == null) {
-    return null;
-  }
-
-  if ("currentUser" in data) {
-    const { currentUser } = data;
-    if (typeof currentUser === "object" && currentUser != null && "pk" in currentUser) {
-      userPk = typeof currentUser.pk === "number" ? currentUser.pk : null;
-    }
-  }
-
-  if ("reservation" in data) {
-    const { reservation } = data;
-
-    // Reservation doesn't exist or user has no access to it
-    // have to handle like this otherwise we can't redirect out of the funnel if the reservation was deleted
-    if (reservationId != null && reservation == null) {
-      hasAccess = true;
-    } else if (
-      reservation != null &&
-      typeof reservation === "object" &&
-      "user" in reservation &&
-      reservation.user != null &&
-      typeof reservation.user === "object" &&
-      "pk" in reservation.user
-    ) {
-      const { pk } = reservation.user;
-
-      if (pk != null && typeof pk === "number") {
-        hasAccess = pk === userPk;
-      }
-    }
-  }
-
-  if ("application" in data) {
-    const { application } = data;
-    if (
-      application != null &&
-      typeof application === "object" &&
-      "user" in application &&
-      application.user != null &&
-      typeof application.user === "object" &&
-      "pk" in application.user
-    ) {
-      const { pk } = application.user;
-      if (pk != null && typeof pk === "number") {
-        hasAccess = pk === userPk;
-      }
-    }
-  }
-
-  if (userPk != null) {
-    return { pk: userPk, hasAccess };
-  }
-  return null;
 }
 
 /// Get language code from the url
@@ -315,7 +183,7 @@ async function maybeSaveUserLanguage(req: NextRequest, user: User | null): Promi
       return;
     }
 
-    const query: QqlQuery = {
+    const query: GqlQuery = {
       query: `
         mutation SaveUserLanguage($preferredLanguage: Language!) {
           updateCurrentUser(
@@ -331,12 +199,8 @@ async function maybeSaveUserLanguage(req: NextRequest, user: User | null): Promi
       },
     };
 
-    const res = await gqlQueryFetch(req, query);
-    if (res.ok) {
-      return language;
-    }
-    // eslint-disable-next-line no-console
-    console.warn("failed to save user language", res.status, await res.text());
+    await gqlQueryFetch(req, query, API_BASE_URL);
+    return language;
   }
 }
 
@@ -408,8 +272,7 @@ export async function middleware(req: NextRequest) {
   if (csrfRedirectUrl) {
     // block infinite redirect loop (there is no graceful way to handle this)
     if (req.url.includes("redirect_to")) {
-      // eslint-disable-next-line no-console
-      console.error("Middleware: Infinite redirect loop detected");
+      logError("Middleware: Infinite redirect loop detected");
       return NextResponse.next();
     }
     return NextResponse.redirect(csrfRedirectUrl);
@@ -425,10 +288,7 @@ export async function middleware(req: NextRequest) {
     if (pk > 0) {
       reservationPk = pk;
     } else if (id != null && id !== "") {
-      // can be either an url issues (user error) or a bug in our matcher
-      // fall through empty for listing page
-      // eslint-disable-next-line no-console
-      console.error("Middleware: Invalid reservation id");
+      logError(`Middleware: Invalid reservation id: ${id}`);
     }
   }
   if (APPLICATION_ROUTES.some((route) => doesUrlMatch(req.url, route))) {
@@ -437,10 +297,7 @@ export async function middleware(req: NextRequest) {
     if (pk > 0) {
       applicationPk = pk;
     } else if (id == null && id !== "") {
-      // can be either an url issues (user error) or a bug in our matcher
-      // fall through empty for listing page
-      // eslint-disable-next-line no-console
-      console.error("Middleware: Invalid application id");
+      logError(`Middleware: Invalid application id: ${id}`);
     }
   }
 
@@ -492,19 +349,25 @@ export async function middleware(req: NextRequest) {
       }
     }
 
-    const lang = await maybeSaveUserLanguage(req, user);
+    // App is fully functional even if this fails
+    try {
+      const lang = await maybeSaveUserLanguage(req, user);
 
-    if (lang != null) {
-      const n = NextResponse.next();
-      n.cookies.set("language", lang);
-      return n;
+      if (lang != null) {
+        const n = NextResponse.next();
+        n.cookies.set("language", lang);
+        return n;
+      }
+    } catch (err) {
+      logError(err);
     }
     return NextResponse.next();
-  } catch {
+  } catch (err) {
+    logError(err);
     // NOTE all backend errors will return the 503 page
     // if the middleware request fails there is no way to recover
-    const redirectUrl = new URL(`${langPrefix}/503`, req.url);
-    return NextResponse.rewrite(redirectUrl);
+    const rewriteUrl = new URL(`${langPrefix}/503`, req.url);
+    return NextResponse.rewrite(rewriteUrl);
   }
 }
 
@@ -512,6 +375,6 @@ export const config = {
   /* i18n locale router and middleware have a bug in nextjs, matcher breaks the router
   matcher: undefined
   */
-  // TODO nodejs runtime doesn't work for some reason
+  // undici has some weird behaviour with URLs so nodejs runtime doesn't work
   // runtime: "nodejs",
 };

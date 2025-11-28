@@ -6,12 +6,11 @@ import { relayStylePagination } from "@apollo/client/utilities";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore -- types require nodenext which breaks bundler option that breaks the build
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
-import { enchancedFetch, errorLink } from "ui/src/modules/apolloUtils";
-import { buildGraphQLUrl } from "ui/src/modules/urlBuilder";
-import { isBrowser } from "./const";
+import { enchancedFetch, errorLink } from "@ui/modules/apollo/helpers";
+import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
+import { buildGraphQLUrl } from "@ui/modules/urlBuilder";
 
-if (process.env.NODE_ENV !== "production") {
-  // Adds messages only in a dev environment
+if (process.env.NODE_ENV === "development") {
   loadDevMessages();
   loadErrorMessages();
 }
@@ -26,6 +25,7 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
   };
 
   const uploadLink: ApolloLink = createUploadLink(uploadLinkOptions);
+  const sentryLink = new SentryContextLink();
   const httpLink = new HttpLink({
     uri,
     // TODO this might be useless
@@ -35,10 +35,10 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
 
   return new ApolloClient({
     ssrMode: isServer,
-    link: isServer ? from([errorLink, httpLink]) : from([errorLink, uploadLink]),
+    link: from([sentryLink, errorLink, isServer ? httpLink : uploadLink]),
     defaultOptions: {
       query: {
-        fetchPolicy: isBrowser ? "cache-first" : "no-cache",
+        fetchPolicy: isServer ? "no-cache" : "cache-first",
       },
     },
     cache: new InMemoryCache({
