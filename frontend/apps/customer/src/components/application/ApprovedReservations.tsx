@@ -24,7 +24,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { IconButton } from "ui/src/components";
-import { ButtonLikeExternalLink, ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { PopupMenu } from "ui/src/components/PopupMenu";
 import { Sanitize } from "ui/src/components/Sanitize";
 import type { StatusLabelType } from "ui/src/components/StatusLabel";
@@ -1051,17 +1051,16 @@ export function ApplicationSection({
           {t("application:view.reservationsTab.showAllReservations")}
           <IconLinkExternal />
         </ButtonLikeLink>
-        <ButtonLikeExternalLink
+        <ButtonLikeLink
           href={
-            hasCancellableReservations
-              ? getApplicationSectionPath(applicationSection.pk, application.pk, "cancel")
-              : undefined
+            hasCancellableReservations ? getApplicationSectionPath(applicationSection.pk, application.pk, "cancel") : ""
           }
           disabled={!hasCancellableReservations}
+          external
         >
           {t("application:view.reservationsTab.cancelApplication")}
           <IconCross />
-        </ButtonLikeExternalLink>
+        </ButtonLikeLink>
       </ButtonContainer>
     </Flex>
   );

@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 import { ButtonVariant, IconArrowRight, IconCross, IconEuroSign, IconLock } from "hds-react";
 import { trim } from "lodash-es";
 import { useTranslation } from "next-i18next";
-import { ButtonLikeExternalLink, ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
+import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { Card } from "ui/src/components/Card";
 import { ReservationStatusLabel, OrderStatusLabel } from "ui/src/components/statuses";
 import { formatDateTimeRange } from "ui/src/modules/date-utils";
@@ -96,16 +96,17 @@ export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<Prop
   const paymentUrl = getPaymentUrl(reservation, lang, apiBaseUrl);
   if (paymentUrl) {
     buttons.push(
-      <ButtonLikeExternalLink
+      <ButtonLikeLink
         variant={ButtonVariant.Primary}
         href={paymentUrl}
         data-testid="reservation-card__button--goto-payment"
         key="payment"
         width="full"
+        external
       >
         {t("reservation:payReservation")}
         <IconArrowRight />
-      </ButtonLikeExternalLink>
+      </ButtonLikeLink>
     );
   }
   return (
