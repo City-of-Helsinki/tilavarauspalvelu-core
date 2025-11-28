@@ -72,11 +72,6 @@
     "numResults": "{{count}} tulosta {{totalCount}} tuloksesta näytetty",
     "allResults": "Kaikki {{totalCount}} tulosta näytetty"
   },
-  "MainLander": {
-    "ingress": "Tässä palvelussa voit käsitellä Helsingin kaupungin tilavaraushakemuksia sekä asettaa tiloja ja laitteita varattaviksi.",
-    "welcome": "Tervetuloa",
-    "welcomeCustom": "Moro nääs"
-  },
   "ApplicationSectionStatusChoice": {
     "HANDLED": "Hyväksytty",
     "IN_ALLOCATION": "Käsittelyssä",

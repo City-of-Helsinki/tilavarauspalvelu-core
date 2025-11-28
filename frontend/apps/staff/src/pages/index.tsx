@@ -5,6 +5,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { H2 } from "ui/src/styled";
 import { KorosHeading, Heading } from "@/components/KorosHeading";
+import { MainLander } from "@/components/MainLander";
 import { useSession } from "@/hooks";
 import { HERO_IMAGE_URL } from "@/modules/const";
 
@@ -22,12 +23,12 @@ export default function Index({ rand }: PageProps) {
 
   const { user } = useSession();
 
-  let headingStr = t("translation:MainLander.welcome");
+  let headingStr = t("mainLander:welcome");
   if (
     user?.username === "u-gptwmnqqnjahlfj2uas2glyx5a" &&
     rand < 0.1 // 10% chance
   ) {
-    headingStr = t("translation:MainLander.welcomeCustom");
+    headingStr = t("mainLander:welcomeCustom");
   }
 
   const name = user?.firstName;
@@ -35,12 +36,16 @@ export default function Index({ rand }: PageProps) {
     headingStr += `, ${name}`;
   }
 
+  if (user == null) {
+    return <MainLander />;
+  }
+
   return (
     <div>
       <KorosHeading heroImage={HERO_IMAGE_URL}>
         <Heading>{headingStr}!</Heading>
       </KorosHeading>
-      <Ingress as="p">{t("translation:MainLander.ingress")}</Ingress>
+      <Ingress as="p">{t("mainLander:ingress")}</Ingress>
     </div>
   );
 }
