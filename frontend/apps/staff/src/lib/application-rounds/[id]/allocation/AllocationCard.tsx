@@ -102,12 +102,6 @@ export function AllocatedCard({
 }: Omit<Props, "timeSlot" | "selection" | "isAllocationEnabled" | "reservationUnitOptionPk">): JSX.Element {
   const { t } = useTranslation();
 
-  // TODO refactor so it is mandatory
-  if (allocatedTimeSlot == null) {
-    // eslint-disable-next-line no-console
-    console.warn("MANDATORY: No allocated time slot");
-  }
-
   const [refresh, isRefreshLoading] = useRefreshApplications(refetchApplicationEvents);
 
   const [handleRemoveAllocation, { isLoading: isResetLoading }] = useRemoveAllocation({
@@ -192,17 +186,6 @@ export function SuitableTimeCard({
   timeSlot,
 }: Omit<Props, "allocatedTimeSlot">): JSX.Element {
   const { t } = useTranslation();
-
-  // TODO should cause a type error if both are null
-  if (timeSlot == null) {
-    // eslint-disable-next-line no-console
-    console.warn("MANDATORY: No time slot or allocated time slot");
-  }
-
-  if (reservationUnitOptionPk === 0) {
-    // eslint-disable-next-line no-console
-    console.warn("Invalid reservation unit option: missing pk");
-  }
 
   const [refresh, isRefreshLoading] = useRefreshApplications(refetchApplicationEvents);
 

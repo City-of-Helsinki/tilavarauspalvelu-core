@@ -12,6 +12,7 @@ import { errorToast } from "ui/src/components/toast";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "ui/src/modules/helpers";
 import { CenterSpinner, fontMedium, H1, Strong, TabWrapper } from "ui/src/styled";
 import { useVisibilityChange } from "@ui/hooks";
+import { logError } from "@ui/modules/errors";
 import { Error403 } from "@/components/Error403";
 import { LinkPrev } from "@/components/LinkPrev";
 import { useGetFilterSearchParams, useSession } from "@/hooks";
@@ -204,8 +205,7 @@ function ApplicationRoundAllocation({
 
   const selectedReservationUnit = queryVariables.reservationUnit;
   if (selectedReservationUnit === 0) {
-    // eslint-disable-next-line no-console -- TODO use logger
-    console.warn("Skipping allocation query because reservation unit");
+    logError("Skipping allocation query because reservation unit", "warning");
   }
 
   const affectingAllocations = filterNonNullable(data?.affectingAllocatedTimeSlots);
@@ -232,10 +232,8 @@ function ApplicationRoundAllocation({
     (allEventsData ?? allEventsPreviousData)?.applicationSections?.edges.map((e) => e?.node)
   );
   if (allEvents.length !== totalCount && totalCount < 100) {
-    // eslint-disable-next-line no-console -- TODO use logger
-    console.warn(
-      `Total count of application sections "${totalCount}" does not match array length "${allEvents.length}"`
-    );
+    const msg = `Total count of application sections "${totalCount}" does not match array length "${allEvents.length}"`;
+    logError(msg, "warning");
   }
   const totalNumberOfEvents = totalCount;
 

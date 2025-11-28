@@ -4,6 +4,7 @@ import type { TFunction } from "i18next";
 import { getIntervalMinutes } from "ui/src/modules/conversion";
 import { formatTime, parseUIDate, isValidDate, timeToMinutes, formatDate } from "ui/src/modules/date-utils";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
+import { logError } from "@ui/modules/errors";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { ReservationStateChoice, OrderStatus, ReservationCancelReasonChoice } from "@gql/gql-types";
 import type {
@@ -487,8 +488,7 @@ function getCheckoutRedirectUrl(pk: number, lang: LocalizationLanguages, apiBase
     searchParams.set("redirect_on_error", errorUrl.toString());
     return url.toString();
   } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error(err);
+    logError(err);
   }
   return "";
 }
@@ -512,8 +512,7 @@ export function getCheckoutUrl(
     searchParams.set("lang", lang);
     return `${baseUrl}${baseUrl.endsWith("/") ? "" : "/"}paymentmethod?${searchParams.toString()}`;
   } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error(err);
+    logError(err);
   }
   return undefined;
 }

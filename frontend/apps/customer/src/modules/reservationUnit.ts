@@ -17,6 +17,7 @@ import { trim, uniq } from "lodash-es";
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
 import { getIntervalMinutes } from "@ui/modules/conversion";
 import { formatApiDate, timeToMinutes } from "@ui/modules/date-utils";
+import { logError } from "@ui/modules/errors";
 import {
   capitalize,
   getTranslation,
@@ -272,8 +273,8 @@ export type GetReservationUnitPriceProps = {
 export function getReservationUnitPrice(props: GetReservationUnitPriceProps): string | null {
   const { t, reservationUnit: ru, pricingDate, minutes } = props;
   if (Number.isNaN(pricingDate.getTime())) {
-    // eslint-disable-next-line no-console
-    console.warn("Invalid pricing date", pricingDate);
+    logError(`Invalid pricing date ${JSON.stringify(props)}`);
+    return null;
   }
 
   const futurePricing = getFuturePricing(ru, [], pricingDate);

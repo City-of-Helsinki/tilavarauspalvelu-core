@@ -8,6 +8,7 @@ import { IconButton } from "ui/src/components";
 import { TimeInput } from "ui/src/components/form/TimeInput";
 import { breakpoints, WEEKDAYS_SORTED } from "ui/src/modules/const";
 import { fontBold } from "ui/src/styled";
+import { logError } from "@ui/modules/errors";
 import { Accordion } from "@/components/Accordion";
 import { getTranslatedError } from "@/modules/helpers";
 import type { ReservationUnitEditFormValues } from "./form";
@@ -279,8 +280,7 @@ export function SeasonalSection({ form }: { form: UseFormReturn<ReservationUnitE
   const { fields: days, replace } = useFieldArray({ control, name: "seasons" });
 
   if (days.length !== 7) {
-    // eslint-disable-next-line no-console
-    console.warn("Seasons should always have 7 days");
+    logError("Seasons should always have 7 days");
   }
 
   const handleClear = () => {
