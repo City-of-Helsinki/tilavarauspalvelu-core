@@ -290,7 +290,12 @@ export function createMockApplicationRound({
     criteriaSv: null, // Maybe<Scalars["String"]["output"]>;
     handledAt: null, // Maybe<Scalars["DateTime"]["output"]>;
     isSettingHandledAllowed: false, // Scalars["Boolean"]["output"];
-    purposes: [] as const, // ReadonlyArray<ReservationIntendedUseNode>;
+    purposes: [1, 2, 3, 4, 5].map((x) => ({
+      id: createNodeId("PurposeNode", x),
+      pk: x,
+      rank: x,
+      ...generateNameFragment(`ReservationPurposeNode ${x}`),
+    })),
     reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice.NotCompleted,
     reservationUnitCount: 10, // Scalars["Int"]["output"];
     sentAt: null, // Maybe<Scalars["DateTime"]["output"]>;

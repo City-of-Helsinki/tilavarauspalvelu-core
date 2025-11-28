@@ -7,7 +7,7 @@ import { useTranslation } from "next-i18next";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { ControlledNumberInput, ControlledSelect } from "ui/src/components/form";
 import { formatDate, formatDateRange } from "ui/src/modules/date-utils";
-import { getLocalizationLang } from "ui/src/modules/helpers";
+import { getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import type { OptionsListT } from "ui/src/modules/search";
 import { AutoGrid, Flex, H4 } from "ui/src/styled";
 import { Accordion } from "@/components/Accordion";
@@ -25,7 +25,7 @@ type Props = Readonly<{
 }>;
 
 function ApplicationSectionInner({ index, applicationRound, options, onDeleteEvent }: Props): JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const form = useFormContext<ApplicationPage1FormValues>();
   const {
     control,
@@ -91,6 +91,12 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
     value: x.value * 60,
   }));
 
+  const lang = getLocalizationLang(i18n.language);
+  const purposesOptions = applicationRound.purposes.map((x) => ({
+    value: x.pk ?? 0,
+    label: getTranslation(x, "name", lang),
+  }));
+
   return (
     <Flex $gap="s" $marginTop="s" data-testid={`application__applicationSection_${index}`}>
       <H4 as="h3">{t("application:Page1.basicInformationSubHeading")}</H4>
@@ -120,7 +126,7 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
         />
         <ControlledSelect
           control={control}
-          options={options.reservationPurposes}
+          options={purposesOptions}
           name={`applicationSections.${index}.purpose`}
           label={t("application:Page1.purpose")}
           required
@@ -312,6 +318,13 @@ export function ApplicationSectionPage1(props: Props): JSX.Element {
 export const APPLICATION_ROUND_FRAGMENT = gql`
   fragment ApplicationRoundForApplication on ApplicationRoundNode {
     ...ApplicationReservationUnitList
+    purposes {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
     reservationPeriodBeginDate
     reservationPeriodEndDate
   }
