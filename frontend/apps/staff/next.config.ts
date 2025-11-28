@@ -78,7 +78,7 @@ const config = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: CSP_HEADER.replaceAll("\\n", ""),
+            value: CSP_HEADER.replaceAll(/\n|\r/g, ""),
           },
         ],
       },
