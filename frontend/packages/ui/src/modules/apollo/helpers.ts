@@ -402,20 +402,15 @@ function extractErrorCode(error: ApiError): string | string[] {
   return [];
 }
 export function logGraphQLError(error: QueryErrorT, operation?: Operation): void {
-  // - one function to transform the error (handles the different cases with network errors)
-  // - then a single log function (for now it can both send to sentry and local logger)
-  //   - create a fingerprint that is bit more specific than currently, but most of the info (query etc. should go to
-  //   context)
-
   type SentryCtx = {
-    level: "warning";
+    level: "error";
     fingerprint?: string[];
     extra?: Record<string, string>;
   };
   const context: SentryCtx = {
-    level: "warning" as const,
+    level: "error" as const,
   };
-  let errorName = "Unknown";
+  let errorName: string = error.type;
 
   switch (error.type) {
     case "GRAPHQL_ERROR":
@@ -446,7 +441,6 @@ export function logGraphQLError(error: QueryErrorT, operation?: Operation): void
       break;
     case "ECONNREFUSED":
       log.error(`connection refused`);
-      errorName = "ECONNREFUSED";
       context.extra = {
         details: JSON.stringify(error),
       };
@@ -454,7 +448,6 @@ export function logGraphQLError(error: QueryErrorT, operation?: Operation): void
       break;
     case "NON_API_ERROR":
       log.error(`other errors: ${JSON.stringify(error)}`);
-      errorName = "NON_API_ERROR";
       context.extra = {
         details: JSON.stringify(error),
       };
@@ -462,7 +455,6 @@ export function logGraphQLError(error: QueryErrorT, operation?: Operation): void
       break;
     case "CSRF_ERROR":
       log.error(`csrf error: ${error.message}`);
-      errorName = "CSRF_ERROR";
       context.fingerprint = ["csrf_error"];
   }
   context.extra = {
