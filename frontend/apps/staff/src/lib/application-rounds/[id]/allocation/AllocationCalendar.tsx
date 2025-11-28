@@ -8,6 +8,7 @@ import { transformWeekday } from "ui/src/modules/conversion";
 import { timeToMinutes } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { fontMedium } from "ui/src/styled";
+import { logError } from "@ui/modules/errors";
 import { useGetFilterSearchParams } from "@/hooks";
 import { ALLOCATION_CALENDAR_TIMES } from "@/modules/const";
 import { ApplicationSectionStatusChoice } from "@gql/gql-types";
@@ -412,10 +413,8 @@ function CalendarDay({
   // NOTE this should already be filtered by day
   const focused = focusedSlots.filter((x) => x.day === day);
 
-  // debug checks
   if (focused.length !== focusedSlots.length) {
-    // eslint-disable-next-line no-console
-    console.warn("focused slots is not prefiltered by day");
+    logError("focused slots is not prefiltered by day");
   }
 
   return (

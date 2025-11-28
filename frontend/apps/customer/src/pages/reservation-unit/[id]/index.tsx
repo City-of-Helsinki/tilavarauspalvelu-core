@@ -9,7 +9,6 @@ import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
-import { Roarr as log } from "roarr";
 import styled from "styled-components";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { TimeZoneNotification } from "ui/src/components/TimeZoneNotification";
@@ -31,6 +30,7 @@ import {
 import { Flex, H4 } from "ui/src/styled";
 import { getApiErrors, logGraphQLQuery } from "@ui/modules/apollo/helpers";
 import type { ApiError } from "@ui/modules/apollo/helpers";
+import { logError } from "@ui/modules/errors";
 import { AddressSection } from "@/components/AddressSection";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { InfoDialog } from "@/components/InfoDialog";
@@ -285,8 +285,7 @@ function ReservationUnit({
   // store reservation unit overall reservability to use in JSX and pass to some child elements
   const { isReservable: reservationUnitIsReservable, reason } = isReservationUnitReservable(reservationUnit);
   if (!reservationUnitIsReservable) {
-    // TODO should be logged to sentry or no? (as info or something)
-    log.warn(`not reservable because: ${reason}`);
+    logError(`not reservable because: ${reason}`, "warning");
   }
 
   const equipment = filterNonNullable(reservationUnit.equipments);

@@ -1,10 +1,10 @@
 import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import * as Sentry from "@sentry/nextjs";
 import styled from "styled-components";
 import { BannerNotificationsList } from "ui/src/components";
 import { ToastContainer } from "ui/src/components/toast";
 import { mainStyles } from "ui/src/styled";
+import { logError } from "@ui/modules/errors";
 import { ErrorGeneric } from "@/components/ErrorGeneric";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { useEnvContext } from "@/context/EnvContext";
@@ -22,9 +22,7 @@ const Content = styled.main`
 `;
 
 const FallbackComponent = (err: unknown) => {
-  // eslint-disable-next-line no-console
-  console.error(err);
-  Sentry.captureException(err);
+  logError(err);
   return <ErrorGeneric />;
 };
 
