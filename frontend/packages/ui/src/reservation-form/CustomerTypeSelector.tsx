@@ -10,7 +10,7 @@ import { SvgComponent } from "../icons/IconPremises";
 import { Flex, FullRow } from "../styled";
 import { RadioButtonWithImage } from "./RadioButtonWithImage";
 
-const TypeLabel = styled(FullRow).attrs({ as: "p" })`
+const TypeLabel = styled(FullRow).attrs({ as: "label" })`
   margin: 0;
 `;
 
