@@ -1,9 +1,13 @@
 import { gql } from "@apollo/client";
+import type { InteropApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
 import { filterNonNullable, sortAgeGroups } from "ui/src/modules/helpers";
+import type { createClient } from "@/modules/apolloClient";
 import type { TagOptionsList } from "@/modules/search";
+import type { FilterOptionsQuery, FilterOptionsQueryVariables } from "@gql/gql-types";
 import {
+  FilterOptionsDocument,
   MunicipalityChoice,
   OrderStatusWithFree,
   Priority,
@@ -16,7 +20,7 @@ import {
 
 export function getFilterOptions(
   t: TFunction,
-  queryResult: ReturnType<typeof useFilterOptionsQuery>["data"]
+  queryResult: NonNullable<ReturnType<typeof useFilterOptionsQuery>["data"]> | null
 ): TagOptionsList {
   const data = queryResult;
   const reservationUnitTypes = filterNonNullable(data?.reservationUnitTypes?.edges.map((e) => e?.node)).map((type) => ({
@@ -131,8 +135,25 @@ export function useFilterOptions(unitFilter?: number[]): TagOptionsList {
       unit: unitFilter,
     },
   });
-  const data = freshData ?? previousData;
+  const data = freshData ?? previousData ?? null;
   return getFilterOptions(t, data);
+}
+
+/// Safe (never throw) variant of filter options query
+/// Used to fetch possible options for selects in SSR. Failure is non critical and we never want SSR to have uncaught exceptions.
+export async function fetchFilterOptionsSafe(
+  client: ReturnType<typeof createClient>,
+  variables: FilterOptionsQueryVariables = {}
+): Promise<InteropApolloQueryResult<FilterOptionsQuery> | null> {
+  try {
+    const options = await client.query<FilterOptionsQuery, FilterOptionsQueryVariables>({
+      query: FilterOptionsDocument,
+      variables,
+    });
+    return options;
+  } catch {
+    return null;
+  }
 }
 
 export const FILTER_OPTIONS_QUERY = gql`

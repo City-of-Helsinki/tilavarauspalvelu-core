@@ -17,7 +17,7 @@ import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modul
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { useModal } from "@/context/ModalContext";
 import { useSession } from "@/hooks";
-import { getFilterOptions } from "@/hooks/useFilterOptions";
+import { fetchFilterOptionsSafe, getFilterOptions } from "@/hooks/useFilterOptions";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { createClient } from "@/modules/apolloClient";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
@@ -26,12 +26,7 @@ import { hasPermission } from "@/modules/permissionHelper";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getReservationSeriesUrl } from "@/modules/urls";
 import { FilterOptionsDocument, UnitViewDocument, UserPermissionChoice } from "@gql/gql-types";
-import type {
-  FilterOptionsQuery,
-  FilterOptionsQueryVariables,
-  UnitViewQuery,
-  UnitViewQueryVariables,
-} from "@gql/gql-types";
+import type { UnitViewQuery, UnitViewQueryVariables } from "@gql/gql-types";
 
 const LocationOnlyOnDesktop = styled.p`
   display: none;
@@ -193,19 +188,16 @@ export async function getServerSideProps({ req, locale, query }: GetServerSidePr
       query: UnitViewDocument,
       variables: { id: createNodeId("UnitNode", pk) },
     });
-    const optionsQuery = apolloClient.query<FilterOptionsQuery, FilterOptionsQueryVariables>({
-      query: FilterOptionsDocument,
-    });
+    const optionsQuery = fetchFilterOptionsSafe(apolloClient);
 
     const [unitQueryRes, optionsQueryRes] = await Promise.all([unitQuery, optionsQuery]);
-    const { data } = unitQueryRes;
-    const { data: optionsData } = optionsQueryRes;
+    const unit = unitQueryRes.data.unit;
+    const optionsData = optionsQueryRes?.data ?? null;
 
     const end = performance.now();
     const timeMs = Math.round(end - start);
     logGraphQLQuery(timeMs, req.url, [UnitViewDocument, FilterOptionsDocument]);
 
-    const { unit } = data;
     if (unit == null) {
       return NOT_FOUND_SSR_VALUE;
     }

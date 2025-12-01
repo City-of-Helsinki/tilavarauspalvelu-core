@@ -8,11 +8,10 @@ import { useSearchParams } from "next/navigation";
 import { useToastIfQueryParam } from "ui/src/hooks";
 import { H1, HR } from "ui/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
-import { getFilterOptions } from "@/hooks/useFilterOptions";
+import { fetchFilterOptionsSafe, getFilterOptions } from "@/hooks/useFilterOptions";
 import { createClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import type { FilterOptionsQuery, FilterOptionsQueryVariables } from "@gql/gql-types";
-import { FilterOptionsDocument, UserPermissionChoice } from "@gql/gql-types";
+import { UserPermissionChoice } from "@gql/gql-types";
 
 function ReservationUnits({ optionsData }: { optionsData: PageProps["optionsData"] }): JSX.Element {
   const { t } = useTranslation();
@@ -58,12 +57,10 @@ export async function getServerSideProps({ locale, req }: GetServerSidePropsCont
   const { apiBaseUrl } = await getCommonServerSideProps();
   const apolloClient = createClient(apiBaseUrl, req);
 
-  const options = await apolloClient.query<FilterOptionsQuery, FilterOptionsQueryVariables>({
-    query: FilterOptionsDocument,
-  });
+  const options = await fetchFilterOptionsSafe(apolloClient);
   return {
     props: {
-      optionsData: options.data,
+      optionsData: options?.data ?? null,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
