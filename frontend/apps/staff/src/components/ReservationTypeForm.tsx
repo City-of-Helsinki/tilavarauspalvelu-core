@@ -5,7 +5,7 @@ import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ShowAllContainer } from "@ui/components";
-import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/reservation-form";
+import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/components/reservation-form";
 import { ReservationTypes } from "@ui/schemas";
 import type { CreateStaffReservationFormValues } from "@ui/schemas";
 import { HR } from "@ui/styled";
