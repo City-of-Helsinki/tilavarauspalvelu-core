@@ -14,13 +14,23 @@ from tilavarauspalvelu.management.commands.create_robot_test_data import create_
 from tilavarauspalvelu.models import (
     Application,
     ApplicationRound,
+    Equipment,
+    EquipmentCategory,
     GeneralRole,
+    IntendedUse,
+    OriginHaukiResource,
+    PaymentAccounting,
+    PaymentProduct,
     Reservation,
+    ReservationMetadataSet,
     ReservationSeries,
     ReservationUnit,
     ReservationUnitAccessType,
+    ReservationUnitCancellationRule,
     ReservationUnitPricing,
     Space,
+    TaxPercentage,
+    TermsOfUse,
     Unit,
     UnitGroup,
     UnitRole,
@@ -32,7 +42,6 @@ from tests.factories import (
     ApplicationFactory,
     ApplicationRoundFactory,
     ReservationFactory,
-    ReservationSeriesFactory,
     ReservationUnitFactory,
     UnitFactory,
     UserFactory,
@@ -235,14 +244,7 @@ def test_create_robot_test_data__users_can_exist_before_run():
 @pytest.mark.slow
 @pytest.mark.django_db
 def test_remove_existing_data():
-    harakka = UnitFactory.create(name="Harakka, piilokoju", tprek_id="71677")
-    mankeli = ReservationUnitFactory.create(name="Maksuton Mankeli (AUTOMAATIOTESTI ÄLÄ POISTA)", unit=harakka)
-    kausi = ApplicationRoundFactory.create(name="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA)")
-
-    ReservationFactory.create(reservation_unit=mankeli)
-    ReservationSeriesFactory.create(reservation_unit=mankeli)
-    ApplicationFactory.create(application_round=kausi)
-
+    create_robot_test_data()
     remove_existing_data()
 
     assert Unit.objects.count() == 0
@@ -253,6 +255,21 @@ def test_remove_existing_data():
     assert ApplicationRound.objects.count() == 0
     assert Reservation.objects.count() == 0
     assert ReservationSeries.objects.count() == 0
+    assert GeneralRole.objects.count() == 0
+    assert UnitRole.objects.count() == 0
+
+    # Not everything is removed
+    assert ReservationMetadataSet.objects.count() == 6
+    assert ReservationUnitCancellationRule.objects.count() == 2
+    assert TermsOfUse.objects.count() == 14
+    assert IntendedUse.objects.count() == 8
+    assert EquipmentCategory.objects.count() == 6
+    assert Equipment.objects.count() == 29
+    assert TaxPercentage.objects.count() == 2
+    assert OriginHaukiResource.objects.count() == 14
+    assert PaymentProduct.objects.count() == 5
+    assert PaymentAccounting.objects.count() == 1
+    assert User.objects.count() == 39  # Users are not removed
 
 
 # Helpers

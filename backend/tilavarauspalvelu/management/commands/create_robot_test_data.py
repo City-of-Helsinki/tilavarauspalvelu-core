@@ -152,6 +152,11 @@ def remove_existing_data() -> None:
 
     UnitGroup.objects.filter(name_fi="Automaatiotestit (Älä poista)").delete()
 
+    GeneralRole.objects.filter(user__username="u-ftm3qi35knfdxoysmn24qpz3ce").delete()
+    UnitRole.objects.filter(
+        user__username__in=["u-hzt64qcjsbb2lnmk7li7tqc4ve", "u-lloau4zl65c3lpbpgamxa3edoa"]
+    ).delete()
+
 
 def create_reservation_units() -> None:  # noqa: PLR0915
     # ------------------------------------------------------------------------------------------------------------
