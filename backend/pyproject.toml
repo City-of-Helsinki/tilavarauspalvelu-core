@@ -62,7 +62,7 @@ django-tinymce = "5.0.0"
 
 [tool.poetry.group.celery.dependencies]
 # Dependencies related to Celery tasks.
-celery = { version = "5.5.3", extras = ["redis"] }
+celery = { version = "5.6.0", extras = ["redis"] }
 django-celery-beat = "2.8.1"
 django-celery-results = "2.6.0"
 
@@ -83,9 +83,9 @@ pytest-xdist = "3.8.0"
 [tool.poetry.group.lint.dependencies]
 # Dependencies only required for linting.
 pre-commit = "4.5.0"
-ruff = "0.14.6"
+ruff = "0.14.7"
 mypy = "1.18.2"
-django-stubs = { version = "5.2.7", extras = ["compatible-mypy"] }
+django-stubs = { version = "5.2.8", extras = ["compatible-mypy"] }
 
 [project.entry-points.pytest11]
 tilavarauspalvelu = "tests.plugins"
