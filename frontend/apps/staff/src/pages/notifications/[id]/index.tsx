@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ApolloError, gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, ButtonVariant, RadioButton, SelectionGroup, TextInput } from "hds-react";
+import { Button, ButtonVariant, RadioButton, SelectionGroup } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
@@ -21,6 +21,7 @@ import { parseUIDate, fromUIDateTime, formatDate, formatTime } from "ui/src/modu
 import { cleanHtmlContent, createNodeId, ignoreMaybeArray, stripHtml, toNumber } from "ui/src/modules/helpers";
 import { checkValidDate, checkValidFutureDate, checkTimeStringFormat } from "ui/src/schemas/schemaCommon";
 import { CenterSpinner, Flex, TitleSection, H1 } from "ui/src/styled";
+import { ControlledTextInput } from "@ui/components/form/ControlledTextInput";
 import { breakpoints } from "@ui/modules/const";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
@@ -42,6 +43,8 @@ import type { BannerNotificationPageQuery } from "@gql/gql-types";
 const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {
   ssr: false,
 });
+
+const MAX_MESSAGE_LENGTH = 500;
 
 const ButtonContainerCommon = styled(Flex).attrs({
   $justifyContent: "space-between",
@@ -109,7 +112,7 @@ function checkStartIsBeforeEnd(
 function getHTMLMessageSchema(minLength: number, maxLength: number) {
   return z
     .string()
-    .max(1000)
+    .max(1000, { message: `Message cannot be longer than ${maxLength} characters` })
     .transform(cleanHtmlContent)
     .refine((x) => stripHtml(x).length >= minLength, {
       error: `Required`,
@@ -131,9 +134,9 @@ const NotificationFormSchema = z
     // NOTE max length is because backend doesn't allow over 1000 characters
     // strip HTML when validating string length
     // for now only finnish is mandatory but all have max length
-    messageFi: getHTMLMessageSchema(1, 500),
-    messageEn: getHTMLMessageSchema(0, 500),
-    messageSv: getHTMLMessageSchema(0, 500),
+    messageFi: getHTMLMessageSchema(1, MAX_MESSAGE_LENGTH),
+    messageEn: getHTMLMessageSchema(0, MAX_MESSAGE_LENGTH),
+    messageSv: getHTMLMessageSchema(0, MAX_MESSAGE_LENGTH),
     // refinement is not empty for these two (not having empty as an option forces a default value)
     targetGroup: z.enum(BannerNotificationTarget, { error: "Required" }),
     level: z.enum(BannerNotificationLevel, { error: "Required" }),
@@ -188,7 +191,6 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
 
   const {
     handleSubmit,
-    register,
     control,
     formState: { errors },
     watch,
@@ -330,15 +332,16 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
         error={translateError(errors.activeUntilTime?.message)}
         required
       />
-      <TextInput
+      <ControlledTextInput
         id="notification-name"
-        {...register("name")}
-        placeholder={t("form.namePlaceholder")}
+        name="name"
+        control={control}
         required
         label={t("headings.name")}
         style={{ gridColumn: "1 / -1" }}
         errorText={translateError(errors.name?.message)}
         data-testid="Notification__Page--name-input"
+        max={100}
       />
       <ControlledSelect
         control={control}
@@ -371,6 +374,7 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
             errorText={errors.messageFi?.message ? translateError(errors.messageFi.message) : undefined}
             required
             data-testid="Notification__Page--message-fi-input"
+            maxLength={MAX_MESSAGE_LENGTH}
           />
         )}
       />
@@ -386,6 +390,7 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
             errorText={errors.messageEn?.message ? translateError(errors.messageEn.message) : undefined}
             value={value}
             data-testid="Notification__Page--message-en-input"
+            maxLength={MAX_MESSAGE_LENGTH}
           />
         )}
       />
@@ -401,6 +406,7 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
             errorText={errors.messageSv?.message ? translateError(errors.messageSv.message) : undefined}
             value={value}
             data-testid="Notification__Page--message-sv-input"
+            maxLength={MAX_MESSAGE_LENGTH}
           />
         )}
       />

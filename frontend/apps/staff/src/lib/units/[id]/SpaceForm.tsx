@@ -6,6 +6,7 @@ import styled from "styled-components";
 import { z } from "zod";
 import { ControlledNumberInput } from "ui/src/components/form";
 import { breakpoints } from "ui/src/modules/const";
+import { ControlledTextInput } from "@ui/components/form/ControlledTextInput";
 import { getTranslatedError } from "@/modules/helpers";
 
 const EditorColumns = styled.div`
@@ -59,13 +60,14 @@ export function SpaceForm({ form }: Props): JSX.Element {
     <div>
       <EditorRows>
         {(["nameFi", "nameEn", "nameSv"] as const).map((fieldName) => (
-          <TextInput
+          <ControlledTextInput
+            control={control}
             key={fieldName}
-            {...register(fieldName)}
+            name={fieldName}
             required={fieldName === "nameFi"}
             id={fieldName}
             label={t(`spaces:SpaceEditor.label.${fieldName}`)}
-            maxLength={80}
+            max={80}
             errorText={getTranslatedError(t, errors[fieldName]?.message)}
             invalid={errors[fieldName]?.message != null}
           />

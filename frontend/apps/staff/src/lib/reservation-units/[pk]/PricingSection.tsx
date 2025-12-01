@@ -332,6 +332,7 @@ function MaterialPricingDescription({ control, language, index, helperText }: De
           required
           label={label}
           helperText={helperText}
+          maxLength={500}
         />
       )}
     />

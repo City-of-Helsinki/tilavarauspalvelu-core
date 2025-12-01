@@ -1,7 +1,7 @@
 import type { UseFormReturn } from "react-hook-form";
 import { Controller } from "react-hook-form";
-import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { ControlledTextInput } from "@ui/components/form/ControlledTextInput";
 import { getTranslatedError } from "@/modules/helpers";
 import { ParentSelector } from "./ParentSelector";
 import { EditorColumns } from "./modules/resourceEditor";
@@ -14,7 +14,7 @@ export function ResourceEditorFields({
   form: UseFormReturn<ResourceUpdateForm>;
   unitPk: number;
 }): JSX.Element {
-  const { control, register, formState } = form;
+  const { control, formState } = form;
   const { errors } = formState;
   const { t } = useTranslation();
 
@@ -36,12 +36,13 @@ export function ResourceEditorFields({
         )}
       />
       {(["nameFi", "nameEn", "nameSv"] as const).map((fieldName) => (
-        <TextInput
+        <ControlledTextInput
+          control={control}
+          name={fieldName}
           key={fieldName}
-          {...register(fieldName)}
           required={fieldName === "nameFi"}
           id={fieldName}
-          maxLength={80}
+          max={80}
           label={t(`spaces:ResourceEditor.label.${fieldName}`)}
           errorText={getTranslatedError(t, errors[fieldName]?.message)}
           invalid={form.formState.errors[fieldName]?.message != null}

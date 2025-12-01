@@ -64,7 +64,7 @@ export function TermsSection({
           />
         ))}
         {(["notesWhenApplyingFi", "notesWhenApplyingEn", "notesWhenApplyingSv"] as const).map((n) => (
-          <StyledRichTextInput control={control} fieldName={n} key={n} />
+          <StyledRichTextInput control={control} fieldName={n} key={n} maxLength={2000} />
         ))}
       </AutoGrid>
     </EditAccordion>

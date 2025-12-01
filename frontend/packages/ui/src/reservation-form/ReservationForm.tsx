@@ -1,9 +1,11 @@
 import React, { Fragment } from "react";
+import type { CSSProperties } from "react";
 import { useFormContext } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ControlledCheckbox, ControlledNumberInput, ControlledSelect } from "@ui/components/form";
+import { CharacterCounter } from "@ui/components/form/CharacterCounter";
 import { isNumPersonsRequired } from "@ui/schemas";
 import type { ReservationFormValueT } from "@ui/schemas";
 import { H4, H5 } from "@ui/styled";
@@ -55,6 +57,18 @@ const Subheading = styled(H4).attrs({ as: "h2" })`
   grid-column: 1 / -1;
   margin: 0;
 `;
+
+const DescriptionWrapper = styled.div`
+  position: relative;
+  grid-column: 1 / -1;
+`;
+
+const charCountStyle = {
+  position: "absolute",
+  top: "0",
+  right: "var(--spacing-2-xs)",
+  color: "var(--color-black-50)",
+} satisfies CSSProperties;
 
 export function ReservationFormGeneralSection({
   reservationUnit,
@@ -147,17 +161,24 @@ export function ReservationFormGeneralSection({
         />
       )}
       {hasDescription && (
-        <StyledTextArea
-          id={constructReservationFieldId("description")}
-          label={createLabel("description")}
-          {...register("description")}
-          errorText={getFieldError("description")}
-          invalid={getFieldError("description") != null}
-          required
-          maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
-          $isWide
-          $height="119px"
-        />
+        <DescriptionWrapper>
+          <StyledTextArea
+            id={constructReservationFieldId("description")}
+            label={createLabel("description")}
+            {...register("description")}
+            errorText={getFieldError("description")}
+            invalid={getFieldError("description") != null}
+            required
+            maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
+            $isWide
+            $height="119px"
+          />
+          <CharacterCounter
+            value={form.watch("description") ?? ""}
+            maxLength={RESERVATION_FIELD_MAX_TEXT_LENGTH}
+            style={charCountStyle}
+          />
+        </DescriptionWrapper>
       )}
       {data?.enableSubvention && <ReservationSubventionSection termsForDiscount={data.termsForDiscount} form={form} />}
     </StyledAutoGrid>

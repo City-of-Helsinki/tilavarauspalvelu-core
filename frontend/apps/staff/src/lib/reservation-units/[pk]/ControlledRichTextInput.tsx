@@ -29,6 +29,7 @@ type FieldName =
 interface ControlledRichTextInputProps extends HTMLAttributes<HTMLDivElement> {
   control: Control<ReservationUnitEditFormValues>;
   fieldName: FieldName;
+  maxLength?: number;
 }
 
 export function ControlledRichTextInput({

@@ -9,5 +9,6 @@
     "errorsTitle": "Täytä puuttuvat tiedot",
     "errorsSubtitle": "Täytä seuraavat kohdat tehdäksesi varauksen:"
   },
-  "mandatoryFieldsText": "* Tähdellä merkityt syötekentät ovat pakollisia."
+  "mandatoryFieldsText": "* Tähdellä merkityt syötekentät ovat pakollisia.",
+  "characters": "merkkiä"
 }
