@@ -57,6 +57,7 @@ def test_reservation_unit_export(api_client, settings):
         "is_reservation_unit_archived",
         "is_this_in_draft_state",
         "lowest_price",
+        "material_price_description",
         "maximum_number_of_active_reservations_per_user",
         "maximum_number_of_days_before_reservations_can_be_made",
         "maximum_number_of_persons",

@@ -48,6 +48,7 @@ def test_reservation_unit_export_multiple():
         reservation_unit_type__name="Normal",
         pricings__highest_price=Decimal(20),
         pricings__payment_type=PaymentType.ONLINE,
+        pricings__material_price_description="Material price description",
         access_types__access_type=AccessType.UNRESTRICTED,
     )
 
@@ -103,6 +104,7 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.pricings.first().lowest_price
     assert row_2[next(index)] == reservation_unit_1.pricings.first().highest_price
     assert row_2[next(index)] == reservation_unit_1.pricings.first().tax_percentage
+    assert row_2[next(index)] == reservation_unit_1.pricings.first().material_price_description
     assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_begins_at)
     assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_ends_at)
     assert row_2[next(index)] == reservation_unit_1.reservation_form
