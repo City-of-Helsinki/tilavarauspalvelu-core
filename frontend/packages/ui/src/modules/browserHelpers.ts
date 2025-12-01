@@ -54,7 +54,7 @@ export const isTouchDevice = (): boolean => isBrowser && window?.matchMedia("(an
 /// @param appUrlBasePath - base path for the app (only required if next app is not in host root)
 export function signOut(apiBaseUrl: string, appUrlBasePath = "") {
   if (!isBrowser) {
-    throw new Error("signIn can only be called in the browser");
+    throw new Error("signOut can only be called in the browser");
   }
   const url = new URL(window.location.href);
   const logoutUrl = getSignOutUrl(apiBaseUrl);
