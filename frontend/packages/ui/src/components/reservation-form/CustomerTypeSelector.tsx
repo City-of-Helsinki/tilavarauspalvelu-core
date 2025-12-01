@@ -4,10 +4,10 @@ import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-
 import { IconGroup, IconUser } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { ReserveeType } from "../../gql/gql-types";
-import { ErrorText } from "../components/ErrorText";
-import { SvgComponent } from "../icons/IconPremises";
-import { Flex, FullRow } from "../styled";
+import { ReserveeType } from "../../../gql/gql-types";
+import { SvgComponent } from "../../icons/IconPremises";
+import { Flex, FullRow } from "../../styled";
+import { ErrorText } from "../ErrorText";
 import { RadioButtonWithImage } from "./RadioButtonWithImage";
 
 const TypeLabel = styled(FullRow).attrs({ as: "label" })`

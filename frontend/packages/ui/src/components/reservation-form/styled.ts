@@ -1,7 +1,7 @@
 import { TextArea, TextInput } from "hds-react";
 import styled from "styled-components";
-import type { AutoGridProps } from "../styled";
-import { AutoGrid, fontMedium } from "../styled";
+import type { AutoGridProps } from "../../styled";
+import { AutoGrid, fontMedium } from "../../styled";
 
 export const StyledCheckboxWrapper = styled.div<{
   $isWide?: boolean;

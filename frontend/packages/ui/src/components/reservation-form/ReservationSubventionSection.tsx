@@ -2,9 +2,9 @@ import React from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { ControlledCheckbox } from "../components/form";
-import type { ReservationFormValueT } from "../schemas";
-import { Strongish } from "../styled";
+import type { ReservationFormValueT } from "../../schemas";
+import { Strongish } from "../../styled";
+import { ControlledCheckbox } from "../form";
 import { StyledCheckboxWrapper, StyledTextArea } from "./styled";
 import {
   constructReservationFieldId,

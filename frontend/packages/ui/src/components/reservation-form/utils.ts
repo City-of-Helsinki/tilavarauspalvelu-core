@@ -1,10 +1,10 @@
 import type { FieldError } from "react-hook-form";
 import type { TFunction } from "next-i18next";
-import { ReserveeType } from "../../gql/gql-types";
-import type { ReservationFormFieldsFragment, ReservationFormType } from "../../gql/gql-types";
-import { filterEmpty } from "../modules/helpers";
-import { getReservationSchemaBase } from "../schemas";
-import type { ReservationFormValueT } from "../schemas";
+import { ReserveeType } from "../../../gql/gql-types";
+import type { ReservationFormFieldsFragment, ReservationFormType } from "../../../gql/gql-types";
+import { filterEmpty } from "../../modules/helpers";
+import { getReservationSchemaBase } from "../../schemas";
+import type { ReservationFormValueT } from "../../schemas";
 
 /* NOTE: backend returns validation errors if text fields are too long
  * remove maxlength after adding proper schema validation
