@@ -72,17 +72,16 @@ const config = {
   },
   // oxlint-disable-next-line require-await
   async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers: [
-          {
-            key: "Content-Security-Policy",
-            value: CSP_HEADER.replaceAll(/\n|\r/g, ""),
-          },
-        ],
-      },
-    ];
+    // path-to-regex has some weird matching for the base path
+    return ["/", "/(.*)"].map((source) => ({
+      source,
+      headers: [
+        {
+          key: "Content-Security-Policy",
+          value: CSP_HEADER.replaceAll(/\n|\r/g, ""),
+        },
+      ],
+    }));
   },
   // NOTE sentry/nextjs doesn't have options to bundle static/chunks
   // widenClientFileUpload should enable them but it doesn't
