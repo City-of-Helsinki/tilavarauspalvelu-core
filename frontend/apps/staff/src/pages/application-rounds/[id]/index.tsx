@@ -22,7 +22,7 @@ import { errorToast } from "ui/src/components/toast";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "ui/src/styled";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
-import { getFilterOptions } from "@/hooks/useFilterOptions";
+import { fetchFilterOptionsSafe, getFilterOptions } from "@/hooks/useFilterOptions";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { createClient } from "@/modules/apolloClient";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
@@ -37,14 +37,11 @@ import {
   UserPermissionChoice,
   ApplicationRoundDocument,
   CheckPermissionsDocument,
-  FilterOptionsDocument,
   CurrentUserDocument,
 } from "@gql/gql-types";
 import type {
   ApplicationRoundAdminFragment,
   Maybe,
-  FilterOptionsQuery,
-  FilterOptionsQueryVariables,
   CurrentUserQuery,
   ApplicationRoundQuery,
   ApplicationRoundQueryVariables,
@@ -253,12 +250,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
   const canSeePage =
     viewPermissionData.checkPermissions?.hasPermission || managePermissionData.checkPermissions?.hasPermission;
 
-  const options = await client.query<FilterOptionsQuery, FilterOptionsQueryVariables>({
-    query: FilterOptionsDocument,
-    variables: {
-      applicationRound: pk,
-    },
-  });
+  const options = await fetchFilterOptionsSafe(client, { applicationRound: pk });
 
   // User might have permissions to see the page, but not to see any units in the application round
   const user = await client.query<CurrentUserQuery>({
@@ -273,7 +265,7 @@ export async function getServerSideProps({ locale, query, req }: GetServerSidePr
   return {
     props: {
       pk,
-      optionsData: options.data,
+      optionsData: options?.data ?? null,
       unitOptions,
       applicationRound,
       ...(await serverSideTranslations(locale ?? "fi")),
