@@ -122,38 +122,41 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
   try {
     const startTime = performance.now();
     const urlPathString = formatUrlPath(context.router);
-    const { data } = await client.query<CurrentUserQuery, CurrentUserQueryVariables>({
+    const userPromise = client.query<CurrentUserQuery, CurrentUserQueryVariables>({
       query: CurrentUserDocument,
     });
-    logGraphQLQuery(performance.now() - startTime, urlPathString, CurrentUserDocument);
 
     // Need to fetch all data required by the Navigation component otherwise it flashes
-    const handlingTime = performance.now();
-    const { data: handlingData } = await client.query<HandlingDataQuery, HandlingDataQueryVariables>({
+    const handlingPromise = client.query<HandlingDataQuery, HandlingDataQueryVariables>({
       query: HandlingDataDocument,
       variables: {
         beginDate: formatApiDate(new Date()) ?? "",
         state: ReservationStateChoice.RequiresHandling,
       },
     });
-    logGraphQLQuery(performance.now() - handlingTime, urlPathString, HandlingDataDocument);
 
-    const notificationTime = performance.now();
-    const { data: notificationsData } = await client.query<
-      ShowNotificationsListQuery,
-      ShowNotificationsListQueryVariables
-    >({
+    const notificationPromise = client.query<ShowNotificationsListQuery, ShowNotificationsListQueryVariables>({
       query: ShowNotificationsListDocument,
       variables: {
         target: BannerNotificationTarget.Staff,
       },
     });
-    logGraphQLQuery(performance.now() - notificationTime, urlPathString, ShowNotificationsListDocument);
+
+    const resolved = await Promise.all([userPromise, handlingPromise, notificationPromise]);
+    logGraphQLQuery(performance.now() - startTime, urlPathString, [
+      CurrentUserDocument,
+      HandlingDataDocument,
+      ShowNotificationsListDocument,
+    ]);
+
+    const { data: currentUserData } = resolved[0];
+    const { data: handlingData } = resolved[1];
+    const { data: notificationsData } = resolved[2];
 
     return {
       ...ctx,
       envConfig: commonProps,
-      currentUser: data.currentUser,
+      currentUser: currentUserData.currentUser,
       handlingData,
       notificationsData: notificationsData,
     };
