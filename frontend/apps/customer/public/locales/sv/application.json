@@ -70,7 +70,7 @@
     }
   },
   "Page2": {
-    "heading": "Välj bokningens tidpunkt",
+    "subHeading": "Välj bokningens tidpunkt",
     "info": "Välj både de tider som du i första hand önskar och också tider som alternativt passar för dig. Att ange flera önskemål om lokaler och tider förbättrar dina chanser att få de lokaler och tider du vill ha.",
     "copyTimes": "Kopiera tiderna till alla önskemål",
     "resetTimes": "Töm kalendern",
