@@ -108,7 +108,7 @@ const COLS = [
     ),
   },
   {
-    headerTKey: "applicationSection:schedule..headings.occurrenceTime",
+    headerTKey: "applicationSection:schedule.headings.occurrenceTime",
     isSortable: true,
     key: "time_of_occurrence",
     transform: ({ time, link }: RejectedOccurrencesView) => {
