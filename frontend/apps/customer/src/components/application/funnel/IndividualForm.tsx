@@ -6,7 +6,6 @@ import { FormSubHeading, SpanFullRow } from "@/styled/application";
 
 export function IndividualForm(): JSX.Element {
   const { t } = useTranslation();
-
   return (
     <>
       <ApplicationFormTextInput name="contactPersonFirstName" />
@@ -16,7 +15,7 @@ export function IndividualForm(): JSX.Element {
       <ApplicationFormTextInput name="contactPersonPhoneNumber" />
       <ApplicationFormTextInput name="contactPersonEmail" />
       <SpanFullRow>
-        <ApplicationFormTextInput name="additionalInformation" />
+        <ApplicationFormTextInput name="additionalInformation" maxLength={255} />
       </SpanFullRow>
     </>
   );

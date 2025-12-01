@@ -10,6 +10,7 @@
   },
   "invalidEmail": "Sähköpostin tulee olla oikeassa muodossa (sisältäen @-merkin)",
   "mandatoryFieldsText": "* Tähdellä merkityt syötekentät ovat pakollisia.",
+  "characters": "merkkiä",
   "errors": {
     "Required": "Pakollinen",
     "Invalid date": "Virheellinen päivämäärä",

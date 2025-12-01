@@ -1,9 +1,9 @@
 import React from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Flex, fontMedium, H4 } from "ui/src/styled";
+import { ControlledTextInput } from "@ui/components/form/ControlledTextInput";
 import { ControlledRichTextInput } from "./ControlledRichTextInput";
 import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
@@ -40,7 +40,7 @@ const SubAccordion = styled(EditAccordion)`
 
 export function CommunicationSection({ form }: { form: UseFormReturn<ReservationUnitEditFormValues> }) {
   const { t } = useTranslation();
-  const { control, register } = form;
+  const { control } = form;
 
   // NOTE no required fields
   return (
@@ -82,12 +82,14 @@ export function CommunicationSection({ form }: { form: UseFormReturn<Reservation
             <ControlledRichTextInput control={control} fieldName={n} key={n} />
           ))}
         </SubAccordion>
-        <TextInput
-          {...register("contactInformation")}
+        <ControlledTextInput
+          control={control}
+          name="contactInformation"
           id="contactInformation"
           label={t("reservationUnitEditor:contactInformationLabel")}
           helperText={t("reservationUnitEditor:contactInformationHelperText")}
           tooltipText={getTranslatedTooltipTex(t, "contactInformation")}
+          max={500}
         />
       </Flex>
     </EditAccordion>

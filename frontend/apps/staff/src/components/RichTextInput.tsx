@@ -1,13 +1,16 @@
 /// NOTE client only
 /// Quill is not SSR compatible
 import React, { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
+import type { CSSProperties } from "react";
 import { IconAlertCircleFill, Tooltip } from "hds-react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import styled from "styled-components";
 import { Flex } from "ui/src/styled";
+import { CharacterCounter } from "@ui/components/form/CharacterCounter";
 
 const Container = styled.div<{ $disabled: boolean }>`
+  position: relative;
   .ql-toolbar {
     border: none !important;
     ${({ $disabled }) => ($disabled ? "background-color: var(--color-black-10);" : "")}
@@ -61,6 +64,14 @@ const EditorContainer = styled.div<{
     }
   }
 `;
+
+const characterCounterStyle = {
+  position: "absolute",
+  top: "var(--spacing-xl)",
+  right: "var(--spacing-s)",
+  marginLeft: "var(--spacing-s)",
+  color: "var(--color-black-40)",
+} satisfies CSSProperties;
 
 const TOOLBAR_OPTIONS = ["bold", "link"];
 
@@ -148,6 +159,7 @@ type RichTextProps = {
   errorText?: string;
   tooltipText?: string;
   helperText?: string;
+  maxLength?: number;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 function RichTextInput({
@@ -160,6 +172,7 @@ function RichTextInput({
   tooltipText,
   helperText,
   onChange,
+  maxLength,
   ...rest
 }: RichTextProps): JSX.Element {
   return (
@@ -167,6 +180,7 @@ function RichTextInput({
       <Flex $justifyContent="space-between" $direction="row">
         <Label htmlFor={id}>
           {label} {required ? <Asterix>*</Asterix> : null}
+          {maxLength && <CharacterCounter value={value} maxLength={maxLength} style={characterCounterStyle} />}
         </Label>
         {tooltipText && <Tooltip>{tooltipText}</Tooltip>}
       </Flex>

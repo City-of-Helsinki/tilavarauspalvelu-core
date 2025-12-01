@@ -426,3 +426,12 @@ export function sortAgeGroups(ageGroups: ReadonlyArray<AgeGroup>): AgeGroup[] {
     return a.minimum - b.minimum;
   });
 }
+
+export function charCount(value: string, maxLength = 0) {
+  const pureString = stripHtml(cleanHtmlContent(value));
+  const amount = pureString.length;
+  return {
+    amount,
+    tooLong: maxLength > 0 && length > maxLength,
+  };
+}

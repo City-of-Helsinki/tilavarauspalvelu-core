@@ -101,6 +101,7 @@ export function DescriptionSection({
                 label={t(`reservationUnitEditor:label.${fieldName}`)}
                 errorText={getTranslatedError(t, errors[fieldName]?.message)}
                 tooltipText={getTranslatedTooltipTex(t, fieldName)}
+                maxLength={4000}
               />
             )}
           />
