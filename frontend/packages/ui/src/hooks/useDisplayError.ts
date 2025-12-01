@@ -4,9 +4,13 @@ import { errorToast } from "../components/toast";
 import { getApiErrors } from "../modules/apolloUtils";
 import type { ApiError } from "../modules/apolloUtils";
 
-/// formatErrorMessage
-/// this should not check for missing keys
-/// reason: if the key is missing it's a bug
+/**
+ * Converts a backend API error to a user-friendly translated message
+ * Note: This should not check for missing translation keys - if the key is missing it's a bug
+ * @param t - Translation function from i18next
+ * @param err - API error object containing error code and optional validation code
+ * @returns Translated error message string
+ */
 export function formatErrorMessage(t: TFunction, err: ApiError): string {
   if (err.code === "MUTATION_VALIDATION_ERROR") {
     const validation_code =
@@ -17,11 +21,19 @@ export function formatErrorMessage(t: TFunction, err: ApiError): string {
   return t(`errors:api.${err.code}`);
 }
 
-/// useDisplayError
-/// convert backend error code to user friendly message and toast it
-/// only usable for mutations
-/// you can pass the error object directly from the catch block
-/// NOTE don't use this for queries (they don't return an error code)
+/**
+ * Hook that provides a function to display backend errors as toast notifications
+ * Converts backend error codes to user-friendly translated messages
+ * Only usable for mutations - queries don't return error codes
+ * @returns Function that accepts an error and displays it as a toast
+ * @example
+ * const displayError = useDisplayError();
+ * try {
+ *   await mutate();
+ * } catch (error) {
+ *   displayError(error);
+ * }
+ */
 export function useDisplayError() {
   const { t } = useTranslation();
 

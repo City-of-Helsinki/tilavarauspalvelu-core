@@ -3,6 +3,20 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { toast } from "../components/toast";
 
+/**
+ * Hook that displays a toast notification when specific query parameters are present in the URL
+ * Automatically removes the query parameter after showing the toast
+ * @param key - Query parameter name(s) to check for. If array, all keys must be present
+ * @param message - Toast message text or function that returns the message
+ * @param type - Toast notification type (success, error, or alert)
+ * @param title - Optional toast title text or function that returns the title
+ * @example
+ * useToastIfQueryParam({
+ *   key: "updated",
+ *   message: "Reservation updated successfully",
+ *   type: "success"
+ * });
+ */
 export function useToastIfQueryParam({
   key,
   message,
@@ -18,6 +32,9 @@ export function useToastIfQueryParam({
   const { t } = useTranslation();
 
   useEffect(() => {
+    /**
+     * Removes the query parameter(s) from the URL without page reload
+     */
     const removeTimeUpdatedParam = () => {
       // TODO this could be changed to useSearchParams instead of router
       const { pathname, query } = router;

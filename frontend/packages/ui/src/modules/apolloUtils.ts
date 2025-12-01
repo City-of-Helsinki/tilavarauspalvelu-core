@@ -26,6 +26,11 @@ export interface OverlappingError extends ApiError {
   overlapping: Array<{ begin: string; end: string }>;
 }
 
+/**
+ * Maps GraphQL validation errors from the API response to structured ValidationError objects
+ * @param gqlError - GraphQL formatted error from the API response
+ * @returns Array of structured validation errors with code, message, field, and validation_code
+ */
 function mapValidationError(gqlError: GraphQLFormattedError): ValidationError[] {
   const { extensions } = gqlError;
   const code = getExtensionCode(gqlError);
@@ -118,6 +123,12 @@ extensions: {
   overlapping : [{…}]
 }
 */
+/**
+ * Maps GraphQL reservation overlap errors from the API response
+ * Extracts overlapping time ranges from the error extensions
+ * @param gqlError - GraphQL formatted error from the API response
+ * @returns Object containing overlap details and error code, or empty array if no overlaps found
+ */
 function mapOverlapError(gqlError: GraphQLFormattedError) {
   const { extensions } = gqlError;
 
@@ -167,6 +178,12 @@ export function getSeriesOverlapErrors(error: unknown): OverlappingError[] {
   return [];
 }
 
+/**
+ * Maps an array of GraphQL errors to structured API error objects
+ * Handles different error types (validation, overlap, generic) and extracts relevant data
+ * @param graphQLErrors - Array of GraphQL formatted errors from the API response
+ * @returns Array of structured API error objects
+ */
 function mapGraphQLErrors(graphQLErrors: ReadonlyArray<Readonly<GraphQLFormattedError>>): ApiError[] {
   if (graphQLErrors.length > 0) {
     return graphQLErrors.flatMap((err) => {
@@ -208,6 +225,12 @@ export function isNotFoundError(e: unknown): boolean {
   return false;
 }
 
+/**
+ * Extracts the error code from a GraphQL error's extensions
+ * Supports both new (error_code) and old (code) extension formats
+ * @param e - GraphQL formatted error
+ * @returns Error code string or null if not found
+ */
 function getExtensionCode(e: GraphQLFormattedError): string | null {
   if (e.extensions == null) {
     return null;
@@ -222,6 +245,12 @@ function getExtensionCode(e: GraphQLFormattedError): string | null {
   return null;
 }
 
+/**
+ * Extracts error code(s) from an API error object
+ * For validation errors, returns both the main code and validation_code
+ * @param error - API error object
+ * @returns Single error code string, array of codes [main, validation], or empty array
+ */
 function extractErrorCode(error: ApiError): string | string[] {
   if ("validation_code" in error && error.validation_code != null && typeof error.validation_code === "string") {
     return [error.code, error.validation_code];
@@ -275,9 +304,13 @@ export const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
-// helper to ignore 403 CSRF errors
-// admin ui has no middleware that could redirect to backend when it's missing
-// in practice this is not a problem because login sets the CSRF token and login page is static
+/**
+ * Checks if a network error is a CSRF failure (403 with CSRF_FAILURE code)
+ * Helper to ignore CSRF errors that occur when middleware is missing
+ * In practice not a problem because login sets the CSRF token and login page is static
+ * @param error - Network error from Apollo Client
+ * @returns True if error is a CSRF failure, false otherwise
+ */
 function isCSRFError(error: Error | ServerParseError | ServerError): boolean {
   const statusCode = "statusCode" in error ? error.statusCode : null;
 
@@ -296,6 +329,11 @@ function isCSRFError(error: Error | ServerParseError | ServerError): boolean {
   return false;
 }
 
+/**
+ * Displays a toast notification for network errors
+ * Skips CSRF errors to avoid unnecessary notifications
+ * @param error - Network error from Apollo Client
+ */
 function toastNetworkError(error: Error | ServerParseError | ServerError) {
   // don't toast CSRF errors
   if (isCSRFError(error)) {

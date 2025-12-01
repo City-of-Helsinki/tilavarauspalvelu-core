@@ -15,6 +15,13 @@ export type ReadonlyDeep<T> = {
   readonly [P in keyof T]: ReadonlyDeep<T[P]>;
 };
 
+/**
+ * Filters out null and undefined values from an array
+ * @param arr - Array that may contain null or undefined values
+ * @returns Array with all null and undefined values removed
+ * @example
+ * filterNonNullable([1, null, 2, undefined, 3]) // Returns: [1, 2, 3]
+ */
 export function filterNonNullable<T>(
   arr: Maybe<Readonly<Array<Maybe<T | undefined>>>> | undefined
 ): Array<NonNullable<T>> {
@@ -22,10 +29,24 @@ export function filterNonNullable<T>(
 }
 
 type SortFunc<T> = (a: T, b: T) => number;
+/**
+ * Creates a sorted copy of an array using a custom comparison function
+ * Does not mutate the original array
+ * @param arr - Array to sort
+ * @param func - Comparison function for sorting
+ * @returns New sorted array
+ */
 export function sort<T>(arr: Readonly<T[]>, func: SortFunc<T>): T[] {
   return [...arr].sort((a, b) => func(a, b));
 }
 
+/**
+ * Capitalizes the first letter of a string
+ * @param s - String to capitalize
+ * @returns String with first letter capitalized
+ * @example
+ * capitalize("hello") // Returns: "Hello"
+ */
 export function capitalize<T extends string>(s: T): Capitalize<T> {
   return (s.charAt(0).toUpperCase() + s.slice(1)) as Capitalize<T>;
 }
@@ -85,6 +106,11 @@ export function getLocalizationLang(code?: string): LocalizationLanguages {
 
 export const isBrowser = typeof window !== "undefined";
 
+/**
+ * Base64 encodes a string in both browser and Node.js environments
+ * @param str - String to encode
+ * @returns Base64 encoded string
+ */
 function base64encode(str: string) {
   if (isBrowser) {
     return window.btoa(str);
@@ -126,6 +152,12 @@ export function getImageSource(
   return getImageSourceWithoutDefault(image, size) || image?.imageUrl || pixel;
 }
 
+/**
+ * Gets the image URL for a specific size without fallback to default pixel
+ * @param image - Image fragment from GraphQL query
+ * @param size - Desired image size
+ * @returns Image URL or null if not available for the requested size
+ */
 function getImageSourceWithoutDefault(
   image: ImageFragment,
   size: "small" | "large" | "medium" | "full"
@@ -142,6 +174,11 @@ function getImageSourceWithoutDefault(
   }
 }
 
+/**
+ * Finds the main image from a reservation unit's image array
+ * @param ru - Object containing images array
+ * @returns The main image or null if not found
+ */
 export function getMainImage(ru?: { images: Readonly<ImageFragment[]> }): ImageFragment | null {
   return ru?.images.find((img) => img.imageType === ReservationUnitImageType.Main) ?? null;
 }
@@ -153,6 +190,13 @@ export function isPriceFree(pricing: Pick<PricingFieldsFragment, "highestPrice">
   return price == null || price === 0;
 }
 
+/**
+ * Picks one of two potentially undefined dates based on a comparison function
+ * @param a - First date or undefined
+ * @param b - Second date or undefined
+ * @param compF - Comparison function that returns true if first date should be picked
+ * @returns The picked date or undefined if both are undefined
+ */
 function pickMaybeDay(
   a: Date | undefined,
   b: Date | undefined,
@@ -167,13 +211,22 @@ function pickMaybeDay(
   return compF(a, b) ? a : b;
 }
 
-// Returns a Date object with the first day of the given array of Dates
+/**
+ * Finds the earliest date from an array of dates
+ * @param days - Array of dates (may contain undefined values)
+ * @returns The earliest date or undefined if array is empty or all values are undefined
+ */
 export function dayMin(days: Readonly<Array<Readonly<Date | undefined>>>): Date | undefined {
   return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
     return pickMaybeDay(acc, day, isBefore);
   }, undefined);
 }
 
+/**
+ * Finds the latest date from an array of dates
+ * @param days - Array of dates (may contain undefined values)
+ * @returns The latest date or undefined if array is empty or all values are undefined
+ */
 export function dayMax(days: Array<Date | undefined>): Date | undefined {
   return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
     return pickMaybeDay(acc, day, isAfter);
@@ -199,6 +252,14 @@ export function formatApiTimeInterval({
   return `${btime}–${etime}`;
 }
 
+/**
+ * Formats all time ranges for a specific day from a schedule
+ * @param schedule - Array of suitable time fragments
+ * @param day - Day number (0-6, where 0 is Sunday)
+ * @returns Comma-separated list of time ranges for the day
+ * @example
+ * formatDayTimes(schedule, 1) // Returns: "10:00–12:00, 14:00–16:00"
+ */
 export function formatDayTimes(
   schedule: Array<Omit<SuitableTimeFragment, "pk" | "id" | "priority">>,
   day: number
@@ -222,6 +283,14 @@ export function convertTime(t: Maybe<string> | undefined): string {
   return `${h ?? "00"}:${m ?? "00"}`;
 }
 
+/**
+ * Calculates the median value from an array of numbers
+ * @param numbers - Array of numbers
+ * @returns The median value, or 0 if array is empty
+ * @example
+ * calculateMedian([1, 2, 3, 4, 5]) // Returns: 3
+ * calculateMedian([1, 2, 3, 4]) // Returns: 2.5
+ */
 export function calculateMedian(numbers: number[]): number {
   const sorted = [...numbers].sort((a, b) => a - b);
   const middle = Math.floor(sorted.length / 2);
@@ -236,10 +305,20 @@ export function calculateMedian(numbers: number[]): number {
   return sorted[middle] ?? 0;
 }
 
+/**
+ * Extracts the first element if value is an array, otherwise returns the value itself
+ * @param value - Single value or array of values
+ * @returns First element if array, the value itself otherwise, or null if array is empty
+ */
 export function ignoreMaybeArray<T>(value: T | T[]): T | null {
   return Array.isArray(value) ? (value[0] ?? null) : value;
 }
 
+/**
+ * Converts an option object to Helsinki Design System (HDS) option format
+ * @param option - Option with label and value
+ * @returns HDS-compatible option object with stringified value
+ */
 export function convertOptionToHDS(option: { label: string; value: string | number }): OptionInProps {
   return {
     label: option.label,
@@ -367,6 +446,10 @@ export function stripHtml(html: string): string {
   return doc.body.textContent?.trim() || "";
 }
 
+/**
+ * Configuration for HTML sanitization
+ * Specifies which HTML tags and attributes are allowed in sanitized content
+ */
 export const sanitizeConfig = {
   allowedTags: [
     "h1",
@@ -394,8 +477,15 @@ export const sanitizeConfig = {
   },
 };
 
-/// Remove unwanted tags from content
-/// Turns all empty content (even with empty tags) to empty string
+/**
+ * Removes unwanted HTML tags from content while preserving allowed tags
+ * Returns empty string for content that is empty or contains only empty tags
+ * @param html - HTML string to clean
+ * @returns Sanitized HTML string with only allowed tags, or empty string
+ * @example
+ * cleanHtmlContent("<script>alert('xss')</script><p>Safe content</p>")
+ * // Returns: "<p>Safe content</p>"
+ */
 export function cleanHtmlContent(html: string): string {
   if (html === "") {
     return "";

@@ -6,7 +6,12 @@ import type { LocalizationLanguages, UserTypeChoice } from "./urlBuilder";
 
 // TODO add wrapper a that blocks importing on nodejs
 
-/// NOTE have to cleanup because HDS components might be passing event here
+/**
+ * Validates and cleans a URL parameter
+ * Note: HDS components might pass event objects here, so we need to validate the type
+ * @param url - URL string to validate (or any other value to handle HDS components)
+ * @returns Validated URL string or undefined if invalid
+ */
 function cleanupUrlParam(url: unknown): string | undefined {
   if (typeof url === "string" && url.length > 0) {
     return z.string().url().parse(url);
@@ -14,9 +19,15 @@ function cleanupUrlParam(url: unknown): string | undefined {
   return undefined;
 }
 
-// Redirect the user to the sign in dialog and return to returnUrl (or
-// current url if none is provided) after sign in
-/// Throws if called on the server
+/**
+ * Redirects the user to the sign-in dialog
+ * After sign-in, user is redirected to returnUrl or current page if not provided
+ * @param apiBaseUrl - Base URL for the API
+ * @param language - UI language for the sign-in page
+ * @param client - User type (customer or admin)
+ * @param returnUrl - Optional URL to return to after sign-in
+ * @throws Error if called on the server (must be browser-only)
+ */
 export function signIn({
   apiBaseUrl,
   language,
@@ -42,10 +53,20 @@ export function signIn({
   });
 }
 
+/**
+ * Removes trailing slash from a URL string if present
+ * @param url - URL string to process
+ * @returns URL string without trailing slash
+ */
 function removeTrailingSlash(url: string): string {
   return url.endsWith("/") ? url.slice(0, -1) : url;
 }
 
+/**
+ * Detects if the current device is a touch device
+ * Uses media query to check if device supports touch-only input
+ * @returns True if touch device, false otherwise (or false on server)
+ */
 export const isTouchDevice = (): boolean => isBrowser && window?.matchMedia("(any-hover: none)").matches;
 
 /// Sign the user out and redirect to route /auth/logout/ after the session is destroyed
@@ -80,6 +101,12 @@ export function signOut(apiBaseUrl: string, appUrlBasePath = "") {
   document.body.removeChild(form);
 }
 
+/**
+ * Adds a hidden input field to a form element
+ * @param form - HTML form element to add the input to
+ * @param name - Name attribute for the input field
+ * @param value - Value for the input field
+ */
 function addFormParam(form: HTMLFormElement, name: string, value: string): void {
   const input = document.createElement("input");
   input.type = "hidden";
@@ -88,7 +115,13 @@ function addFormParam(form: HTMLFormElement, name: string, value: string): void 
   form.appendChild(input);
 }
 
-// should not be called on SSR => fallback to disable poll
+/**
+ * Disables polling by returning 0 if window is hidden, otherwise returns the original interval
+ * Used to prevent unnecessary API calls when user is not viewing the page
+ * Should not be called on SSR - falls back to disabling poll
+ * @param pollInterval - Original polling interval in milliseconds
+ * @returns 0 if window is hidden, otherwise the original pollInterval
+ */
 export function disablePollIfHidden(pollInterval: number): number {
   if (isWindowVisible()) {
     return 0;
@@ -96,6 +129,10 @@ export function disablePollIfHidden(pollInterval: number): number {
   return pollInterval;
 }
 
+/**
+ * Checks if the browser window/tab is currently visible to the user
+ * @returns True if window is visible, false otherwise (or false on server)
+ */
 export function isWindowVisible(): boolean {
   return isBrowser && document.visibilityState === "visible";
 }
