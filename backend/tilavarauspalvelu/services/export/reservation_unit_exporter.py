@@ -61,6 +61,7 @@ class ReservationUnitExportRow(BaseExportRow):
     lowest_price: str = ""
     highest_price: str = ""
     tax_percentage: str = ""
+    material_price_description: str = ""
     reservation_begins_at: str = ""
     reservation_ends_at: str = ""
     reservation_form: str = ""
@@ -182,6 +183,7 @@ class ReservationUnitExporter(BaseCSVExporter):
                 lowest_price="Lowest price",
                 highest_price="Highest price",
                 tax_percentage="Tax percentage",
+                material_price_description="Material price description",
                 reservation_begins_at="Reservation begins",
                 reservation_ends_at="Reservation ends",
                 reservation_form="Reservation form",
@@ -281,6 +283,7 @@ class ReservationUnitExporter(BaseCSVExporter):
                 lowest_price=getattr(pricing, "lowest_price", ""),
                 highest_price=getattr(pricing, "highest_price", ""),
                 tax_percentage=getattr(pricing, "tax_percentage", ""),
+                material_price_description=getattr(pricing, "material_price_description", ""),  # Includes any HTML tags
                 reservation_begins_at=self.format_datetime(instance.reservation_begins_at),
                 reservation_ends_at=self.format_datetime(instance.reservation_ends_at),
                 reservation_form=getattr(instance, "reservation_form", ""),
