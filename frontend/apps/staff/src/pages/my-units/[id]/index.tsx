@@ -224,7 +224,7 @@ export const UNIT_VIEW_QUERY = gql`
       pk
       nameFi
       ...LocationFields
-      reservationUnits {
+      reservationUnits(orderBy: nameFiAsc) {
         id
         pk
         nameFi
