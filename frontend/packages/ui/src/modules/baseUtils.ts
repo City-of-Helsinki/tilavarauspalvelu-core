@@ -11,7 +11,7 @@ export function getVersion(branch?: string, sha?: string) {
 const isDev = process.env.NODE_ENV === "development";
 export const CSP_HEADER = `
   base-uri 'self';
-  form-action 'self';
+  form-action 'self' ${isDev ? "*" : ""};
   default-src 'self';
   font-src 'self' data:
     makasiini.hel.ninja
