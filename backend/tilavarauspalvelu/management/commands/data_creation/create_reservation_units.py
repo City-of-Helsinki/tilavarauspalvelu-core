@@ -337,7 +337,6 @@ def _create_free_reservation_units(
                 unit=unit,
                 ext_uuid=reservation_uuid,
                 origin_hauki_resource=random.choice(hauki_resources),
-                allow_reservations_without_opening_hours=True,
                 reservations_min_days_before=data.reservable_window_info.minimum,
                 reservations_max_days_before=data.reservable_window_info.maximum,
                 min_reservation_duration=data.duration_info.minimum,
@@ -566,7 +565,6 @@ def _create_paid_reservation_units(
                 payment_merchant=merchant,
                 payment_accounting=accounting,
                 origin_hauki_resource=random.choice(hauki_resources),
-                allow_reservations_without_opening_hours=True,
                 reservations_min_days_before=0,
                 reservations_max_days_before=14,
                 min_reservation_duration=data.duration_info.minimum,
@@ -772,7 +770,6 @@ def _create_seasonal_bookable_reservation_units(
                 ext_uuid=reservation_uuid,
                 unit=unit,
                 origin_hauki_resource=random.choice(hauki_resources),
-                allow_reservations_without_opening_hours=True,
                 reservations_min_days_before=0,
                 reservations_max_days_before=14,
                 min_reservation_duration=data.duration_info.minimum,
@@ -1805,7 +1802,6 @@ def _get_base_reservation_unit_builder(
 ) -> ReservationUnitBuilder:
     return ReservationUnitBuilder().set(  # type: ignore[return-value]
         origin_hauki_resource=random.choice(hauki_resources),
-        allow_reservations_without_opening_hours=True,
         reservations_min_days_before=0,
         reservations_max_days_before=14,
         min_reservation_duration=datetime.timedelta(hours=1),

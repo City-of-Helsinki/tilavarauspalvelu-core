@@ -119,7 +119,6 @@ class ReservationUnitNode(DjangoNode):
             "require_reservation_handling",
             "reservation_block_whole_day",
             "can_apply_free_of_charge",
-            "allow_reservations_without_opening_hours",
             #
             # Enums
             "authentication",

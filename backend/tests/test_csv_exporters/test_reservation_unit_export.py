@@ -134,7 +134,6 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.reservations_max_days_before
     assert row_2[next(index)] == reservation_unit_1.reservations_min_days_before
     assert row_2[next(index)] == reservation_unit_1.max_reservations_per_user
-    assert row_2[next(index)] == reservation_unit_1.allow_reservations_without_opening_hours
     assert row_2[next(index)] == reservation_unit_1.is_archived
     assert row_2[next(index)] == reservation_unit_1.intended_uses.first().name_fi
     assert row_2[next(index)] == reservation_unit_1.equipments.first().name_fi

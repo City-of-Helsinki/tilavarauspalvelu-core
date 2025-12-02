@@ -784,7 +784,6 @@ type ReservationUnitNode implements Node {
   requireReservationHandling: Boolean!
   reservationBlockWholeDay: Boolean!
   canApplyFreeOfCharge: Boolean!
-  allowReservationsWithoutOpeningHours: Boolean!
   authentication: AuthenticationType!
   reservationStartInterval: ReservationStartInterval!
   reservationKind: ReservationKind!
@@ -3858,7 +3857,6 @@ type ReservationUnitCreateMutationPayload {
   requireReservationHandling: Boolean
   reservationBlockWholeDay: Boolean
   canApplyFreeOfCharge: Boolean
-  allowReservationsWithoutOpeningHours: Boolean
   authentication: AuthenticationType
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
@@ -3928,7 +3926,6 @@ input ReservationUnitCreateMutationInput {
   requireReservationHandling: Boolean
   reservationBlockWholeDay: Boolean
   canApplyFreeOfCharge: Boolean
-  allowReservationsWithoutOpeningHours: Boolean
   authentication: AuthenticationType
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
@@ -4042,7 +4039,6 @@ type ReservationUnitUpdateMutationPayload {
   requireReservationHandling: Boolean
   reservationBlockWholeDay: Boolean
   canApplyFreeOfCharge: Boolean
-  allowReservationsWithoutOpeningHours: Boolean
   authentication: AuthenticationType
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind
@@ -4112,7 +4108,6 @@ input ReservationUnitUpdateMutationInput {
   requireReservationHandling: Boolean
   reservationBlockWholeDay: Boolean
   canApplyFreeOfCharge: Boolean
-  allowReservationsWithoutOpeningHours: Boolean
   authentication: AuthenticationType
   reservationStartInterval: ReservationStartInterval
   reservationKind: ReservationKind

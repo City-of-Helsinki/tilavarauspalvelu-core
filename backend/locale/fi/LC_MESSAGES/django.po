@@ -1893,10 +1893,6 @@ msgid "Can apply free of charge"
 msgstr "Alennuskelpoinen"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Allow reservations without opening hours"
-msgstr "Salli varaukset ilman aukioloaikoja"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Is archived"
 msgstr "Arkistoitu"
 
@@ -2070,13 +2066,6 @@ msgstr "Minkä tyyppisiä varauksia voidaan tehdä tämän varausyksikön kautta
 msgid ""
 "Can reservations to this reservation unit be able to apply free of charge."
 msgstr "Voivatko tämän varausyksikön varaukset olla alennuskelpoisia."
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid ""
-"Is it possible to reserve this reservation unit when opening hours are not "
-"defined."
-msgstr ""
-"Onko tämä varausyksikkö varattavissa, kun aukioloaikoja ei ole saatavilla."
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Is reservation unit archived."

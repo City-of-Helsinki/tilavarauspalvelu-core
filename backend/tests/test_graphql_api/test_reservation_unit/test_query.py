@@ -137,7 +137,6 @@ def test_reservation_unit__query__all_fields(graphql):
         requireReservationHandling
         reservationBlockWholeDay
         canApplyFreeOfCharge
-        allowReservationsWithoutOpeningHours
 
         authentication
         reservationStartInterval
@@ -214,7 +213,6 @@ def test_reservation_unit__query__all_fields(graphql):
         "requireReservationHandling": reservation_unit.require_reservation_handling,
         "reservationBlockWholeDay": reservation_unit.reservation_block_whole_day,
         "canApplyFreeOfCharge": reservation_unit.can_apply_free_of_charge,
-        "allowReservationsWithoutOpeningHours": reservation_unit.allow_reservations_without_opening_hours,
         #
         "authentication": reservation_unit.authentication.upper(),
         "reservationStartInterval": reservation_unit.reservation_start_interval.upper(),

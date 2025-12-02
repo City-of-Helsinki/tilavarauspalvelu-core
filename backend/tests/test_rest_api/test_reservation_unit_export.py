@@ -38,7 +38,6 @@ def test_reservation_unit_export(api_client, settings):
         "additional_instructions_for_pending_reservation_en",
         "additional_instructions_for_pending_reservation_fi",
         "additional_instructions_for_pending_reservation_sv",
-        "allow_reservations_without_opening_hours",
         "authentication",
         "buffer_time_after_reservation",
         "buffer_time_before_reservation",
