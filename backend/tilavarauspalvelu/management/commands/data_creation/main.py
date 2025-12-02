@@ -11,7 +11,6 @@ from .create_reservation_related_things import (
     _create_age_groups,
     _create_cancellation_rules,
     _create_hauki_resources,
-    _create_reservation_metadata_sets,
     _create_reservation_purposes,
     _create_specific_terms_of_use,
     _create_tax_percentages,
@@ -34,12 +33,10 @@ def create_test_data(*, flush: bool = True) -> None:
 
     hauki_resources = _create_hauki_resources()
     terms_of_use = _create_specific_terms_of_use()
-    metadata_sets = _create_reservation_metadata_sets()
     cancellation_rules = _create_cancellation_rules()
     tax_percentages = _create_tax_percentages()
 
     _create_reservation_units(
-        metadata_sets=metadata_sets,
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,
         hauki_resources=hauki_resources,
@@ -55,7 +52,6 @@ def create_test_data(*, flush: bool = True) -> None:
     )
 
     _create_reservation_series(
-        metadata_sets=metadata_sets,
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,
         hauki_resources=hauki_resources,

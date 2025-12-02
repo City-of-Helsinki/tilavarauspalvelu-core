@@ -49,7 +49,6 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import (
         AgeGroup,
         OriginHaukiResource,
-        ReservationMetadataSet,
         ReservationPurpose,
         ReservationSeries,
         ReservationUnitCancellationRule,
@@ -57,8 +56,6 @@ if TYPE_CHECKING:
         TermsOfUse,
     )
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
-
-    from .utils import SetName
 
 
 @with_logs
@@ -654,7 +651,6 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
 
 @with_logs
 def _create_reservation_series(
-    metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     cancellation_rules: list[ReservationUnitCancellationRule],
     hauki_resources: list[OriginHaukiResource],
@@ -665,7 +661,6 @@ def _create_reservation_series(
     user = User.objects.get(username="tvp")
 
     reservation_unit = _create_reservation_unit_for_reservation_series(
-        metadata_sets=metadata_sets,
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,
         hauki_resources=hauki_resources,

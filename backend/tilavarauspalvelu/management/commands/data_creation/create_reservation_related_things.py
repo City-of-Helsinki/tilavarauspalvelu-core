@@ -20,8 +20,6 @@ from tilavarauspalvelu.models import (
     PaymentMerchant,
     ReservableTimeSpan,
     ReservationDenyReason,
-    ReservationMetadataField,
-    ReservationMetadataSet,
     ReservationPurpose,
     ReservationUnitCancellationRule,
     TaxPercentage,
@@ -39,8 +37,6 @@ from tests.factories import (
     PaymentMerchantFactory,
     ReservableTimeSpanFactory,
     ReservationDenyReasonFactory,
-    ReservationMetadataFieldFactory,
-    ReservationMetadataSetFactory,
     ReservationPurposeFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitImageFactory,
@@ -48,7 +44,7 @@ from tests.factories import (
     TermsOfUseFactory,
 )
 
-from .utils import FieldCombination, IntendedUseData, SetName, fetch_image, get_image_path, with_logs
+from .utils import IntendedUseData, fetch_image, get_image_path, with_logs
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit, ReservationUnitImage
@@ -310,215 +306,6 @@ def _create_cancellation_rules() -> list[ReservationUnitCancellationRule]:
         for i in range(2)
     ]
     return ReservationUnitCancellationRule.objects.bulk_create(non_handling_rules)
-
-
-@with_logs
-def _create_reservation_metadata_sets() -> dict[SetName, ReservationMetadataSet]:
-    metadata_fields = {field.field_name: field for field in _create_metadata_fields()}
-
-    field_combinations: dict[SetName, FieldCombination] = {
-        SetName.set_1: FieldCombination(
-            supported=[
-                "reservee_first_name",
-                "reservee_last_name",
-                "reservee_email",
-                "reservee_phone",
-            ],
-            required=[
-                "reservee_first_name",
-                "reservee_last_name",
-                "reservee_email",
-                "reservee_phone",
-            ],
-        ),
-        SetName.set_2: FieldCombination(
-            supported=[
-                "description",
-                "num_persons",
-                "reservee_email",
-                "reservee_first_name",
-                "reservee_identifier",
-                "reservee_last_name",
-                "reservee_organisation_name",
-                "reservee_phone",
-                "reservee_type",
-            ],
-            required=[
-                "description",
-                "reservee_email",
-                "reservee_first_name",
-                "reservee_identifier",
-                "reservee_last_name",
-                "reservee_organisation_name",
-                "reservee_phone",
-                "reservee_type",
-            ],
-        ),
-        SetName.set_3: FieldCombination(
-            supported=[
-                "description",
-                "municipality",
-                "name",
-                "num_persons",
-                "purpose",
-                "reservee_email",
-                "reservee_first_name",
-                "reservee_identifier",
-                "reservee_last_name",
-                "reservee_organisation_name",
-                "reservee_phone",
-                "reservee_type",
-            ],
-            required=[
-                "description",
-                "municipality",
-                "num_persons",
-                "purpose",
-                "reservee_email",
-                "reservee_first_name",
-                "reservee_identifier",
-                "reservee_last_name",
-                "reservee_organisation_name",
-                "reservee_phone",
-                "reservee_type",
-            ],
-        ),
-        SetName.set_4: FieldCombination(
-            supported=[
-                "age_group",
-                "description",
-                "municipality",
-                "name",
-                "num_persons",
-                "purpose",
-                "reservee_email",
-                "reservee_first_name",
-                "reservee_identifier",
-                "reservee_last_name",
-                "reservee_organisation_name",
-                "reservee_phone",
-                "reservee_type",
-            ],
-            required=[
-                "age_group",
-                "description",
-                "municipality",
-                "num_persons",
-                "purpose",
-                "reservee_email",
-                "reservee_first_name",
-                "reservee_identifier",
-                "reservee_last_name",
-                "reservee_organisation_name",
-                "reservee_phone",
-                "reservee_type",
-            ],
-        ),
-        SetName.set_5: FieldCombination(
-            supported=[
-                "applying_for_free_of_charge",
-                "description",
-                "municipality",
-                "name",
-                "num_persons",
-                "purpose",
-                "reservee_email",
-                "reservee_first_name",
-                "reservee_identifier",
-                "reservee_last_name",
-                "reservee_organisation_name",
-                "reservee_phone",
-                "reservee_type",
-            ],
-            required=[
-                "description",
-                "municipality",
-                "num_persons",
-                "purpose",
-                "reservee_email",
-                "reservee_first_name",
-                "reservee_identifier",
-                "reservee_last_name",
-                "reservee_organisation_name",
-                "reservee_phone",
-                "reservee_type",
-            ],
-        ),
-        SetName.set_6: FieldCombination(
-            supported=[
-                "age_group",
-                "applying_for_free_of_charge",
-                "description",
-                "municipality",
-                "name",
-                "num_persons",
-                "purpose",
-                "reservee_email",
-                "reservee_first_name",
-                "reservee_identifier",
-                "reservee_last_name",
-                "reservee_organisation_name",
-                "reservee_phone",
-                "reservee_type",
-            ],
-            required=[
-                "age_group",
-                "description",
-                "municipality",
-                "num_persons",
-                "purpose",
-                "reservee_email",
-                "reservee_first_name",
-                "reservee_identifier",
-                "reservee_last_name",
-                "reservee_organisation_name",
-                "reservee_phone",
-                "reservee_type",
-            ],
-        ),
-    }
-
-    metadata_sets = [
-        ReservationMetadataSetFactory.build(name=name.value)  #
-        for name in field_combinations
-    ]
-    metadata_sets = ReservationMetadataSet.objects.bulk_create(metadata_sets)
-
-    for metadata_set in metadata_sets:
-        fields = field_combinations[SetName(metadata_set.name)]
-        supported = [metadata_fields[field] for field in fields.supported]
-        required = [metadata_fields[field] for field in fields.required]
-        metadata_set.supported_fields.add(*supported)
-        metadata_set.required_fields.add(*required)
-
-    return {SetName(metadata_set.name): metadata_set for metadata_set in metadata_sets}
-
-
-@with_logs
-def _create_metadata_fields() -> list[ReservationMetadataField]:
-    form_fields: list[str] = [
-        "reservee_type",
-        "reservee_first_name",
-        "reservee_last_name",
-        "reservee_organisation_name",
-        "reservee_phone",
-        "reservee_email",
-        "reservee_identifier",
-        "reservee_address_zip",
-        "age_group",
-        "applying_for_free_of_charge",
-        "free_of_charge_reason",
-        "name",
-        "description",
-        "num_persons",
-        "purpose",
-        "municipality",
-    ]
-    metadata_fields = [
-        ReservationMetadataFieldFactory.build(field_name=field_name)  #
-        for field_name in form_fields
-    ]
-    return ReservationMetadataField.objects.bulk_create(metadata_fields)
 
 
 @with_logs
