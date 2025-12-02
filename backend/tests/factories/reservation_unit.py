@@ -125,7 +125,6 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     origin_hauki_resource = ForeignKeyFactory("tests.factories.OriginHaukiResourceFactory")
     reservation_unit_type = ForeignKeyFactory("tests.factories.ReservationUnitTypeFactory", required=True)
     cancellation_rule = ForeignKeyFactory("tests.factories.ReservationUnitCancellationRuleFactory")
-    metadata_set = ForeignKeyFactory("tests.factories.ReservationMetadataSetFactory")
     cancellation_terms = ForeignKeyFactory("tests.factories.TermsOfUseFactory")
     service_specific_terms = ForeignKeyFactory("tests.factories.TermsOfUseFactory")
     pricing_terms = ForeignKeyFactory("tests.factories.TermsOfUseFactory")
@@ -222,7 +221,6 @@ class ReservationUnitBuilder(ModelFactoryBuilder[ReservationUnit]):
         pricing: str,
         payment_type: str,
         tax_percentage: str,
-        metadata_set: str,
         access_type: str,
         **kwargs: Any,
     ) -> Self:
@@ -240,7 +238,6 @@ class ReservationUnitBuilder(ModelFactoryBuilder[ReservationUnit]):
                 f"Pricing: <b>{pricing}</b>",
                 f"Payment type: <b>{payment_type}</b>",
                 f"Tax percentage: <b>{tax_percentage}</b>",
-                f"Metadata set: <b>{metadata_set}</b>",
                 f"Access type: <b>{access_type}</b>",
             ],
         )

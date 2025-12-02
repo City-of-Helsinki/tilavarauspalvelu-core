@@ -83,7 +83,6 @@ if TYPE_CHECKING:
         OriginHaukiResource,
         PaymentAccounting,
         PaymentMerchant,
-        ReservationMetadataSet,
         ReservationUnitCancellationRule,
         ReservationUnitType,
         TaxPercentage,
@@ -95,7 +94,6 @@ if TYPE_CHECKING:
 
 @with_logs
 def _create_reservation_units(
-    metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     cancellation_rules: list[ReservationUnitCancellationRule],
     hauki_resources: list[OriginHaukiResource],
@@ -111,7 +109,6 @@ def _create_reservation_units(
     _create_free_reservation_units(
         cancellation_rules,
         hauki_resources,
-        metadata_sets,
         terms_of_use,
         tax_percentages,
     )
@@ -119,7 +116,6 @@ def _create_reservation_units(
     _create_paid_reservation_units(
         cancellation_rules,
         hauki_resources,
-        metadata_sets,
         terms_of_use,
         tax_percentages,
         merchants,
@@ -129,21 +125,18 @@ def _create_reservation_units(
     _create_seasonal_bookable_reservation_units(
         cancellation_rules,
         hauki_resources,
-        metadata_sets,
         terms_of_use,
         tax_percentages,
     )
 
     _create_empty_reservation_units(
         cancellation_rules,
-        metadata_sets,
         terms_of_use,
         tax_percentages,
     )
 
     _create_archived_reservation_units(
         cancellation_rules,
-        metadata_sets,
         terms_of_use,
         hauki_resources,
         tax_percentages,
@@ -151,7 +144,6 @@ def _create_reservation_units(
 
     _create_single_reservation_per_user_reservation_units(
         cancellation_rules,
-        metadata_sets,
         terms_of_use,
         hauki_resources,
         tax_percentages,
@@ -159,7 +151,6 @@ def _create_reservation_units(
 
     _create_full_day_reservation_units(
         cancellation_rules,
-        metadata_sets,
         terms_of_use,
         hauki_resources,
         tax_percentages,
@@ -167,7 +158,6 @@ def _create_reservation_units(
 
     _create_reservation_units_in_space_hierarchies(
         cancellation_rules,
-        metadata_sets,
         terms_of_use,
         hauki_resources,
         tax_percentages,
@@ -175,7 +165,6 @@ def _create_reservation_units(
 
     _create_reservation_units_in_resource_hierarchies(
         cancellation_rules,
-        metadata_sets,
         terms_of_use,
         hauki_resources,
         tax_percentages,
@@ -201,7 +190,6 @@ def _create_reservation_units(
 def _create_free_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
     hauki_resources: list[OriginHaukiResource],
-    metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     tax_percentages: dict[Percentage, TaxPercentage],
 ) -> None:
@@ -364,7 +352,6 @@ def _create_free_reservation_units(
                 reservation_kind=reservation_kind,
                 cancellation_rule=random.choice(data.cancellation_rule_info.value),
                 require_reservation_handling=data.handling_info.handling_required,
-                metadata_set=metadata_sets[set_name],
                 reservation_form=set_name.reservation_form,
                 reservation_begins_at=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
                 cancellation_terms=terms_of_use[TermsOfUseTypeChoices.CANCELLATION],
@@ -385,7 +372,6 @@ def _create_free_reservation_units(
                 pricing="free",
                 payment_type="none",
                 tax_percentage="0%",
-                metadata_set=set_name.value,
                 can_apply_free_of_charge="no need",
                 access_type=access_type_label,
             )
@@ -440,7 +426,6 @@ def _create_free_reservation_units(
 def _create_paid_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
     hauki_resources: list[OriginHaukiResource],
-    metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     tax_percentages: dict[Percentage, TaxPercentage],
     merchants: list[PaymentMerchant],
@@ -596,7 +581,6 @@ def _create_paid_reservation_units(
                 reservation_kind=reservation_kind,
                 cancellation_rule=random.choice(data.cancellation_rule_info.value),
                 require_reservation_handling=data.handling_info.handling_required,
-                metadata_set=metadata_sets[set_name],
                 reservation_form=set_name.reservation_form,
                 reservation_begins_at=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
                 cancellation_terms=terms_of_use[TermsOfUseTypeChoices.CANCELLATION],
@@ -617,7 +601,6 @@ def _create_paid_reservation_units(
                 pricing=data.price_info.name,
                 payment_type=data.payment_type_info.payment_type.name,
                 tax_percentage=data.tax_percentage_info.name,
-                metadata_set=set_name.value,
                 access_type="key",
             )
             .build()
@@ -671,7 +654,6 @@ def _create_paid_reservation_units(
 def _create_seasonal_bookable_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
     hauki_resources: list[OriginHaukiResource],
-    metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     tax_percentages: dict[Percentage, TaxPercentage],
 ) -> None:
@@ -805,7 +787,6 @@ def _create_seasonal_bookable_reservation_units(
                 reservation_kind=data.reservation_kind_info.value,
                 cancellation_rule=random.choice(data.cancellation_rule_info.value),
                 require_reservation_handling=False,
-                metadata_set=metadata_sets[set_name],
                 reservation_form=set_name.reservation_form,
                 reservation_begins_at=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
                 cancellation_terms=terms_of_use[TermsOfUseTypeChoices.CANCELLATION],
@@ -826,7 +807,6 @@ def _create_seasonal_bookable_reservation_units(
                 pricing="free",
                 payment_type="none",
                 tax_percentage="0%",
-                metadata_set=set_name.value,
                 access_type=access_type_label,
             )
             .build()
@@ -872,7 +852,6 @@ def _create_seasonal_bookable_reservation_units(
 @with_logs
 def _create_empty_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
-    metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     tax_percentages: dict[Percentage, TaxPercentage],
 ) -> None:
@@ -895,7 +874,6 @@ def _create_empty_reservation_units(
 
     reservation_unit = _get_base_reservation_unit_builder(
         reservation_unit_type=reservation_unit_type,
-        metadata_sets=metadata_sets,
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,
     ).create(
@@ -935,7 +913,6 @@ def _create_empty_reservation_units(
 @with_logs
 def _create_archived_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
-    metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     hauki_resources: list[OriginHaukiResource],
     tax_percentages: dict[Percentage, TaxPercentage],
@@ -968,7 +945,6 @@ def _create_archived_reservation_units(
     reservation_unit = (
         _get_base_reservation_unit_builder(
             reservation_unit_type=reservation_unit_type,
-            metadata_sets=metadata_sets,
             terms_of_use=terms_of_use,
             cancellation_rules=cancellation_rules,
             hauki_resources=hauki_resources,
@@ -999,7 +975,6 @@ def _create_archived_reservation_units(
 @with_logs
 def _create_single_reservation_per_user_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
-    metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     hauki_resources: list[OriginHaukiResource],
     tax_percentages: dict[Percentage, TaxPercentage],
@@ -1032,7 +1007,6 @@ def _create_single_reservation_per_user_reservation_units(
     reservation_unit = (
         _get_base_reservation_unit_builder(
             reservation_unit_type=reservation_unit_type,
-            metadata_sets=metadata_sets,
             terms_of_use=terms_of_use,
             cancellation_rules=cancellation_rules,
             hauki_resources=hauki_resources,
@@ -1071,7 +1045,6 @@ def _create_single_reservation_per_user_reservation_units(
 @with_logs
 def _create_full_day_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
-    metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     hauki_resources: list[OriginHaukiResource],
     tax_percentages: dict[Percentage, TaxPercentage],
@@ -1115,7 +1088,6 @@ def _create_full_day_reservation_units(
         reservation_unit = (
             _get_base_reservation_unit_builder(
                 reservation_unit_type=reservation_unit_type,
-                metadata_sets=metadata_sets,
                 terms_of_use=terms_of_use,
                 cancellation_rules=cancellation_rules,
                 hauki_resources=hauki_resources,
@@ -1171,7 +1143,6 @@ def _create_full_day_reservation_units(
 @with_logs
 def _create_reservation_units_in_space_hierarchies(
     cancellation_rules: list[ReservationUnitCancellationRule],
-    metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     hauki_resources: list[OriginHaukiResource],
     tax_percentages: dict[Percentage, TaxPercentage],
@@ -1215,7 +1186,6 @@ def _create_reservation_units_in_space_hierarchies(
 
     reservation_unit_base: ReservationUnitBuilder = _get_base_reservation_unit_builder(  # type: ignore[assignment]
         reservation_unit_type=reservation_unit_type,
-        metadata_sets=metadata_sets,
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,
         hauki_resources=hauki_resources,
@@ -1543,7 +1513,6 @@ def _create_reservation_units_in_space_hierarchies(
 @with_logs
 def _create_reservation_units_in_resource_hierarchies(
     cancellation_rules: list[ReservationUnitCancellationRule],
-    metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     hauki_resources: list[OriginHaukiResource],
     tax_percentages: dict[Percentage, TaxPercentage],
@@ -1599,7 +1568,6 @@ def _create_reservation_units_in_resource_hierarchies(
 
     reservation_unit_base: ReservationUnitBuilder = _get_base_reservation_unit_builder(  # type: ignore[assignment]
         reservation_unit_type=reservation_unit_type,
-        metadata_sets=metadata_sets,
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,
         hauki_resources=hauki_resources,
@@ -1761,7 +1729,6 @@ def _create_reservation_units_in_resource_hierarchies(
 
 @with_logs
 def _create_reservation_unit_for_reservation_series(
-    metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     cancellation_rules: list[ReservationUnitCancellationRule],
     hauki_resources: list[OriginHaukiResource],
@@ -1792,7 +1759,6 @@ def _create_reservation_unit_for_reservation_series(
     reservation_unit = (
         _get_base_reservation_unit_builder(
             reservation_unit_type=reservation_unit_type,
-            metadata_sets=metadata_sets,
             terms_of_use=terms_of_use,
             cancellation_rules=cancellation_rules,
             hauki_resources=hauki_resources,
@@ -1833,7 +1799,6 @@ def _create_reservation_unit_for_reservation_series(
 def _get_base_reservation_unit_builder(
     *,
     reservation_unit_type: ReservationUnitType,
-    metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     cancellation_rules: list[ReservationUnitCancellationRule] = (None,),
     hauki_resources: list[OriginHaukiResource] = (None,),
@@ -1855,7 +1820,6 @@ def _get_base_reservation_unit_builder(
         reservation_kind=ReservationKind.DIRECT,
         cancellation_rule=random.choice(cancellation_rules),
         require_reservation_handling=False,
-        metadata_set=metadata_sets[SetName.set_1],
         reservation_form=SetName.set_1.reservation_form,
         reservation_begins_at=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
         cancellation_terms=terms_of_use[TermsOfUseTypeChoices.CANCELLATION],

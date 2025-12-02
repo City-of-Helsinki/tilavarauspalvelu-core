@@ -22,7 +22,6 @@ from tilavarauspalvelu.models import (
     PaymentAccounting,
     PaymentProduct,
     Reservation,
-    ReservationMetadataSet,
     ReservationSeries,
     ReservationUnit,
     ReservationUnitAccessType,
@@ -259,7 +258,6 @@ def test_remove_existing_data():
     assert UnitRole.objects.count() == 0
 
     # Not everything is removed
-    assert ReservationMetadataSet.objects.count() == 6
     assert ReservationUnitCancellationRule.objects.count() == 2
     assert TermsOfUse.objects.count() == 14
     assert IntendedUse.objects.count() == 8

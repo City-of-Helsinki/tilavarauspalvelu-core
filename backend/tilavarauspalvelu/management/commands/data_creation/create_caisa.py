@@ -12,7 +12,7 @@ from tilavarauspalvelu.enums import (
     ReservationUnitImageType,
     TermsOfUseTypeChoices,
 )
-from tilavarauspalvelu.models import ReservableTimeSpan, ReservationMetadataSet
+from tilavarauspalvelu.models import ReservableTimeSpan
 from utils.date_utils import DEFAULT_TIMEZONE, local_date
 
 from tests.factories import (
@@ -56,14 +56,6 @@ def _create_caisa() -> None:
         web_page="http://www.caisa.fi/",  # NOSONAR
         phone="+358 9 310 37500",
     )
-
-    ###########################################################################################################
-    # Get metadata sets
-    ###########################################################################################################
-
-    metadata_sets: dict[SetName, ReservationMetadataSet] = {
-        SetName(meta.name): meta for meta in ReservationMetadataSet.objects.all()
-    }
 
     ###########################################################################################################
     # Create tax percentages and payment types
@@ -706,7 +698,6 @@ def _create_caisa() -> None:
         service_specific_terms=service_terms_youth,
         pricing_terms=pricing_terms_youth,
         cancellation_rule=cancel_rule_14_days,
-        metadata_set=metadata_sets[SetName.set_4],
         reservation_form=SetName.set_4.reservation_form,
         payment_merchant=payment_merchant_library_pih,
         payment_accounting=payment_accounting_library_pih,
@@ -818,7 +809,6 @@ def _create_caisa() -> None:
         cancellation_terms=cancel_terms_zero_days,
         service_specific_terms=service_terms_gadgets,
         cancellation_rule=cancel_rule_until_begin,
-        metadata_set=metadata_sets[SetName.set_1],
         reservation_form=SetName.set_1.reservation_form,
         origin_hauki_resource=maksuton_mankeli_hauki,
     )
@@ -936,7 +926,6 @@ def _create_caisa() -> None:
         cancellation_terms=cancel_terms_14_days,
         service_specific_terms=service_terms_oodi,
         cancellation_rule=cancel_rule_until_begin,
-        metadata_set=metadata_sets[SetName.set_3],
         reservation_form=SetName.set_3.reservation_form,
         payment_merchant=payment_merchant_library_ita,
         payment_accounting=payment_accounting_library_ita,
@@ -1048,7 +1037,6 @@ def _create_caisa() -> None:
         service_specific_terms=service_terms_youth,
         pricing_terms=pricing_terms_youth,
         cancellation_rule=cancel_rule_14_days,
-        metadata_set=metadata_sets[SetName.set_6],
         reservation_form=SetName.set_6.reservation_form,
         payment_merchant=payment_merchant_library_pih,
         payment_accounting=payment_accounting_library_pih,
@@ -1150,7 +1138,6 @@ def _create_caisa() -> None:
         payment_terms=payment_terms_free_of_charge,
         cancellation_terms=cancel_terms_cannot_cancel,
         service_specific_terms=service_terms_library,
-        metadata_set=metadata_sets[SetName.set_2],
         reservation_form=SetName.set_2.reservation_form,
         origin_hauki_resource=perumiskelvoton_parveke_hauki,
     )
@@ -1234,7 +1221,6 @@ def _create_caisa() -> None:
         payment_terms=payment_terms_1,
         cancellation_terms=cancel_terms_cannot_cancel,
         service_specific_terms=service_terms_library,
-        metadata_set=metadata_sets[SetName.set_3],
         reservation_form=SetName.set_3.reservation_form,
         payment_merchant=payment_merchant_library_pih,
         origin_hauki_resource=perumiskelvoton_patio_hauki,
@@ -1343,7 +1329,6 @@ def _create_caisa() -> None:
         cancellation_terms=cancel_terms_14_days,
         service_specific_terms=service_terms_library,
         cancellation_rule=cancel_rule_14_days,
-        metadata_set=metadata_sets[SetName.set_2],
         reservation_form=SetName.set_2.reservation_form,
         origin_hauki_resource=toistuvien_varausten_toimisto_hauki,
     )
@@ -1445,7 +1430,6 @@ def _create_caisa() -> None:
         cancellation_terms=cancel_terms_zero_days,
         service_specific_terms=service_terms_library,
         cancellation_rule=cancel_rule_until_begin,
-        metadata_set=metadata_sets[SetName.set_2],
         reservation_form=SetName.set_2.reservation_form,
         origin_hauki_resource=tauotettu_takkahuone_hauki,
     )
@@ -1548,8 +1532,6 @@ def _create_caisa() -> None:
         cancellation_terms=cancel_terms_zero_days,
         service_specific_terms=service_terms_library,
         cancellation_rule=cancel_rule_until_begin,
-        metadata_set=metadata_sets[SetName.set_3],
-        reservation_form=SetName.set_3.reservation_form,
         origin_hauki_resource=aina_kasiteltava_kammio_hauki,
     )
     aina_kasiteltava_kammio.spaces.add(
