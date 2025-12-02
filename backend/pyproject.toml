@@ -47,6 +47,7 @@ stamina = "25.1.0"
 uWSGI = { version = "2.0.31", markers = "sys_platform != 'win32'" }
 whitenoise = "6.11.0"
 xhtml2pdf = "0.2.17"
+django-csp = "4.0"
 
 [tool.poetry.group.admin.dependencies]
 # Dependencies related to the admin panel or other "administrative" tasks.
