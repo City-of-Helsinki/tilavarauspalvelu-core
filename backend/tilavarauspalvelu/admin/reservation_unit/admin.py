@@ -94,7 +94,6 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
                     "min_persons",
                     "surface_area",
                     "cancellation_rule",
-                    "metadata_set",
                     "origin_hauki_resource",
                     "allow_reservations_without_opening_hours",
                     "require_adult_reservee",

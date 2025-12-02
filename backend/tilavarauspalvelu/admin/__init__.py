@@ -19,8 +19,6 @@ from .payment_order.admin import PaymentOrderAdmin
 from .rejected_occurrence.admin import RejectedOccurrenceAdmin
 from .reservation.admin import ReservationAdmin
 from .reservation_deny_reason.admin import ReservationDenyReasonAdmin
-from .reservation_metadata_field.admin import ReservationMetadataFieldAdmin
-from .reservation_metadata_set.admin import ReservationMetadataSetAdmin
 from .reservation_purpose.admin import ReservationPurposeAdmin
 from .reservation_series.admin import ReservationSeriesAdmin
 from .reservation_statistic.admin import ReservationStatisticAdmin
@@ -60,8 +58,6 @@ __all__ = [
     "RejectedOccurrenceAdmin",
     "ReservationAdmin",
     "ReservationDenyReasonAdmin",
-    "ReservationMetadataFieldAdmin",
-    "ReservationMetadataSetAdmin",
     "ReservationPurposeAdmin",
     "ReservationSeriesAdmin",
     "ReservationStatisticAdmin",

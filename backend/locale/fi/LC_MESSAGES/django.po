@@ -1512,10 +1512,6 @@ msgstr "Varaajan kotikunta"
 msgid "Age group of the group or association"
 msgstr "Ikäryhmä tälle ryhmälle tai yhdistykselle"
 
-#: tilavarauspalvelu/admin/reservation_metadata_set/admin.py
-msgid "Required fields must be a subset of supported fields"
-msgstr "Vaadittujen kenttien täytyy olla tuettujen kenttien alijoukko"
-
 #: tilavarauspalvelu/admin/reservation_series/admin.py
 msgid ""
 "Search by name, user's first name or last name, description, external ID, "
@@ -1865,10 +1861,6 @@ msgid "Publish ends"
 msgstr "Julkaisu päättyy"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Reservation metadata set"
-msgstr "Varauslomake"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Reservation form"
 msgstr "Varauslomake"
 
@@ -2043,14 +2035,6 @@ msgid "Time after this reservation unit should not be publicly visible in UI."
 msgstr ""
 "Aika, jonka jälkeen tämä varausyksikkö ei enää ole julkisesti näkyvillä "
 "käyttöliittymässä."
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid ""
-"Reservation metadata set that defines the set of supported and required form "
-"fields for this reservation unit."
-msgstr ""
-"Varauslomake, joka määrittelee tuetut ja vaaditut lomakkeen kentät tälle "
-"varausyksikölle."
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Which reservation form is used for this reservation unit?"
