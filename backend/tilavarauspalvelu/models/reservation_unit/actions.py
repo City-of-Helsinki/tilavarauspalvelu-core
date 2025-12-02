@@ -357,9 +357,6 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         return possible_start_times
 
     def is_open(self, start_datetime: datetime.datetime, end_datetime: datetime.datetime) -> bool:
-        if self.reservation_unit.allow_reservations_without_opening_hours:
-            return True
-
         origin_hauki_resource = self.reservation_unit.origin_hauki_resource
         if not origin_hauki_resource:
             return False

@@ -95,7 +95,6 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
                     "surface_area",
                     "cancellation_rule",
                     "origin_hauki_resource",
-                    "allow_reservations_without_opening_hours",
                     "require_adult_reservee",
                     "require_reservation_handling",
                     "reservation_block_whole_day",

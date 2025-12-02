@@ -109,7 +109,6 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     require_reservation_handling = False
     reservation_block_whole_day = False
     can_apply_free_of_charge = False
-    allow_reservations_without_opening_hours = False
 
     # Enums
     authentication = AuthenticationType.WEAK.value

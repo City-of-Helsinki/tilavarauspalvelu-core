@@ -114,8 +114,6 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     ] as const,
     accessTypes: [],
     // Everything below is only for completeness of the mock type (not used for application tests)
-    // TODO this can be removed
-    allowReservationsWithoutOpeningHours: false,
     // applicationRoundTimeSlots: [] as const, // ReadonlyArray<ApplicationRoundTimeSlotNode>;
     applicationRoundTimeSlots: [timeSelector],
     applicationRounds: [] as const, // ReadonlyArray<ApplicationRoundNode>;

@@ -32,7 +32,6 @@ from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local
 
 from tests.factories import (
     ApplicationRoundFactory,
-    OriginHaukiResourceFactory,
     ReservationFactory,
     ReservationUnitFactory,
     ReservationUnitPricingFactory,
@@ -181,23 +180,6 @@ def test_reservation__create__reservation_unit_closed(graphql):
     assert response.field_error_messages() == ["Reservation unit is not open within desired reservation time."]
 
 
-def test_reservation__create__reservation_unit_closed__allow_reservations_without_opening_hours(graphql):
-    reservation_unit = ReservationUnitFactory.create(
-        allow_reservations_without_opening_hours=True,
-        pricings__lowest_price=0,
-        pricings__highest_price=0,
-    )
-
-    graphql.login_with_superuser()
-    data = get_create_data(reservation_unit)
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
-    assert reservation.state == ReservationStateChoice.CREATED
-
-
 def test_reservation__create__reservation_unit_in_open_application_round(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
@@ -249,33 +231,6 @@ def test_reservation__create__reservation_unit_min_reservation_duration_subceede
     assert response.field_error_messages() == [
         "Reservation duration is less than the reservation unit's minimum allowed duration."
     ]
-
-
-@pytest.mark.parametrize("allow_reservations_without_opening_hours", [True, False])
-def test_reservation__create__start_time_does_not_match_reservation_start_interval(
-    graphql,
-    allow_reservations_without_opening_hours,
-):
-    reservation_unit = ReservationUnitFactory.create_reservable_now(
-        allow_reservations_without_opening_hours=allow_reservations_without_opening_hours
-    )
-
-    begin = next_hour(plus_hours=1, plus_minutes=1)  # NOTE! 1 minute after the next hour
-    end = begin + datetime.timedelta(hours=1)
-
-    graphql.login_with_superuser()
-    data = get_create_data(reservation_unit, begins_at=begin, ends_at=end)
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    if allow_reservations_without_opening_hours:
-        # Reservation should be allowed regardless of if the start time matches the interval
-        assert response.has_errors is False, response.errors
-        reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
-        assert reservation.state == ReservationStateChoice.CREATED
-    else:
-        assert response.field_error_messages() == [
-            "Reservation start time does not match the reservation unit's allowed start interval."
-        ]
 
 
 def test_reservation__create__reservation_unit_is_archived(graphql):
@@ -639,7 +594,6 @@ def test_reservation__create__price_calculation__free_reservation_unit(graphql):
 
 def test_reservation__create__pricing_requires_payment_type(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        allow_reservations_without_opening_hours=True,
         pricings__lowest_price=Decimal(10),
         pricings__highest_price=Decimal(20),
         pricings__price_unit=PriceUnit.FIXED,
@@ -659,7 +613,6 @@ def test_reservation__create__pricing_requires_payment_type(graphql):
 
 def test_reservation__create__price_calculation__fixed_price_reservation_unit(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        allow_reservations_without_opening_hours=True,
         pricings__lowest_price=Decimal(10),
         pricings__highest_price=Decimal(20),
         pricings__price_unit=PriceUnit.FIXED,
@@ -685,7 +638,6 @@ def test_reservation__create__price_calculation__fixed_price_reservation_unit(gr
 
 def test_reservation__create__price_calculation__time_based_price(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        allow_reservations_without_opening_hours=True,
         pricings__lowest_price=Decimal(10),
         pricings__highest_price=Decimal(20),
         pricings__price_unit=PriceUnit.PER_15_MINS,
@@ -707,10 +659,9 @@ def test_reservation__create__price_calculation__time_based_price(graphql):
 
 
 def test_reservation__create__price_calculation__future_pricing(graphql):
-    now = local_datetime()
+    now = local_start_of_day()
 
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        allow_reservations_without_opening_hours=True,
         payment_product__id=uuid.uuid4(),
         # Current pricing
         pricings__begins=now,
@@ -746,7 +697,6 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
 
 def test_reservation__create__price_calculation__on_site_doesnt_require_payment_product(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        allow_reservations_without_opening_hours=True,
         pricings__lowest_price=Decimal(10),
         pricings__highest_price=Decimal(20),
         pricings__price_unit=PriceUnit.FIXED,
@@ -979,23 +929,15 @@ def test_reservation__create__prefilled_with_profile_data__ad_login(graphql, set
 
 @freezegun.freeze_time("2021-01-01")
 def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_filled_by_buffers(graphql):
-    reservation_unit = ReservationUnitFactory.create(
-        allow_reservations_without_opening_hours=True,
-        origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
         reservation_block_whole_day=True,
-        spaces=[SpaceFactory.create()],
-        pricings__lowest_price=Decimal(5),
-        pricings__highest_price=Decimal(6),
-        pricings__tax_percentage__value=Decimal(24),
-        pricings__payment_type=PaymentType.ONLINE,
-        payment_product__id=uuid.uuid4(),
     )
 
     graphql.login_with_regular_user()
 
     input_data = {
-        "beginsAt": datetime.datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
-        "endsAt": datetime.datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "beginsAt": datetime.datetime(2021, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "endsAt": datetime.datetime(2021, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
         "reservationUnit": reservation_unit.pk,
     }
 
@@ -1004,31 +946,23 @@ def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_
 
     reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
-    assert reservation.begins_at == datetime.datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.ends_at == datetime.datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.begins_at == datetime.datetime(2021, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.ends_at == datetime.datetime(2021, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.buffer_time_before == datetime.timedelta(hours=12)
     assert reservation.buffer_time_after == datetime.timedelta(hours=11)
 
 
 @freezegun.freeze_time("2021-01-01")
 def test_reservation__create__reservation_block_whole_day__start_and_end_at_midnight_has_no_buffers(graphql):
-    reservation_unit = ReservationUnitFactory.create(
-        allow_reservations_without_opening_hours=True,
-        origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
         reservation_block_whole_day=True,
-        spaces=[SpaceFactory.create()],
-        pricings__lowest_price=Decimal(5),
-        pricings__highest_price=Decimal(6),
-        pricings__tax_percentage__value=Decimal(24),
-        pricings__payment_type=PaymentType.ONLINE,
-        payment_product__id=uuid.uuid4(),
     )
 
     graphql.login_with_regular_user()
 
     input_data = {
-        "beginsAt": datetime.datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
-        "endsAt": datetime.datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "beginsAt": datetime.datetime(2021, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "endsAt": datetime.datetime(2021, 1, 3, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
         "reservationUnit": reservation_unit.pk,
     }
 
@@ -1037,8 +971,8 @@ def test_reservation__create__reservation_block_whole_day__start_and_end_at_midn
 
     reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
-    assert reservation.begins_at == datetime.datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.ends_at == datetime.datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.begins_at == datetime.datetime(2021, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.ends_at == datetime.datetime(2021, 1, 3, hour=0, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.buffer_time_before == datetime.timedelta(hours=0)
     assert reservation.buffer_time_after == datetime.timedelta(hours=0)
 
@@ -1056,16 +990,8 @@ def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_
     new_reservation_begin_delta,
     error_message,
 ):
-    reservation_unit = ReservationUnitFactory.create(
-        allow_reservations_without_opening_hours=True,
-        origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
         reservation_block_whole_day=True,
-        spaces=[SpaceFactory.create()],
-        pricings__lowest_price=Decimal(5),
-        pricings__highest_price=Decimal(6),
-        pricings__tax_percentage__value=Decimal(24),
-        pricings__payment_type=PaymentType.ONLINE,
-        payment_product__id=uuid.uuid4(),
     )
 
     begin = next_hour(plus_hours=5)

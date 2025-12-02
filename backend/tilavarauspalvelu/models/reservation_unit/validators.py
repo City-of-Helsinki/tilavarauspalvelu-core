@@ -86,9 +86,6 @@ class ReservationUnitValidator:
             msg = "Reservation cannot begin in the past."
             raise ValidationError(msg, code=error_codes.RESERVATION_BEGIN_IN_PAST)
 
-        if self.reservation_unit.allow_reservations_without_opening_hours:
-            return
-
         possible_start_times = self.reservation_unit.actions.get_possible_start_times(begin.date())
 
         if begin.time() not in possible_start_times:
@@ -149,9 +146,6 @@ class ReservationUnitValidator:
             raise ValidationError(msg, code=error_codes.RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE)
 
     def validate_reservation_unit_is_open(self, begin: datetime.datetime, end: datetime.datetime) -> None:
-        if self.reservation_unit.allow_reservations_without_opening_hours:
-            return
-
         if not self.reservation_unit.actions.is_open(begin, end):
             msg = "Reservation unit is not open within desired reservation time."
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NOT_RESERVABLE)

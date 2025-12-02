@@ -162,7 +162,6 @@ class ReservationUnit(models.Model):
     require_reservation_handling: bool = models.BooleanField(default=False, blank=True)
     reservation_block_whole_day: bool = models.BooleanField(default=False, blank=True)
     can_apply_free_of_charge: bool = models.BooleanField(default=False, blank=True)
-    allow_reservations_without_opening_hours: bool = models.BooleanField(default=False)
 
     # Enums
 

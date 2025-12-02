@@ -92,7 +92,6 @@ class ReservationUnitExportRow(BaseExportRow):
     maximum_number_of_days_before_reservations_can_be_made: str | int = ""
     minimum_days_before_reservations_can_be_made: str | int = ""
     maximum_number_of_active_reservations_per_user: str | int = ""
-    allow_reservations_without_opening_hours: str | bool = ""
     is_reservation_unit_archived: str | bool = ""
     intended_uses: str = ""
     equipments: str = ""
@@ -232,7 +231,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 ),
                 minimum_days_before_reservations_can_be_made="Minimum days before reservations can be made",
                 maximum_number_of_active_reservations_per_user="Maximum number of active reservations per user",
-                allow_reservations_without_opening_hours="Allow reservations without opening hours",
                 is_reservation_unit_archived="Is reservation unit archived",
                 intended_uses="Intended Uses",
                 equipments="Equipments",
@@ -311,7 +309,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 maximum_number_of_days_before_reservations_can_be_made=instance.reservations_max_days_before,
                 minimum_days_before_reservations_can_be_made=instance.reservations_min_days_before,
                 maximum_number_of_active_reservations_per_user=instance.max_reservations_per_user,
-                allow_reservations_without_opening_hours=instance.allow_reservations_without_opening_hours,
                 is_reservation_unit_archived=instance.is_archived,
                 intended_uses=", ".join(intended_use.name_fi for intended_use in instance.intended_uses.all()),
                 equipments=", ".join(equipment.name_fi for equipment in instance.equipments.all()),

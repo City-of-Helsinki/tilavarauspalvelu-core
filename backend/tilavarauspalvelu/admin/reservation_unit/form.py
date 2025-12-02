@@ -281,7 +281,6 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "reservation_kind": _("Reservation kind"),
             "reservation_block_whole_day": _("Reservation block whole day"),
             "can_apply_free_of_charge": _("Can apply free of charge"),
-            "allow_reservations_without_opening_hours": _("Allow reservations without opening hours"),
             "is_archived": _("Is archived"),
             "rank": _("Order number"),
             "payment_merchant": _("Payment merchant"),
@@ -360,9 +359,6 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "reservation_kind": _("What kind of reservations are to be booked with this reservation unit."),
             "reservation_block_whole_day": _("Reservation block whole day"),
             "can_apply_free_of_charge": _("Can reservations to this reservation unit be able to apply free of charge."),
-            "allow_reservations_without_opening_hours": _(
-                "Is it possible to reserve this reservation unit when opening hours are not defined."
-            ),
             "is_archived": _("Is reservation unit archived."),
             "rank": _("Order number to be use in api sorting."),
             "payment_merchant": _("Merchant used for payments"),
