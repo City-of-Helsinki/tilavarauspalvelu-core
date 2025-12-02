@@ -28,7 +28,6 @@ from .types.rejected_occurrence.types import RejectedOccurrenceNode
 from .types.reservation.types import ReservationNode
 from .types.reservation_cancel_reason.types import ReservationCancelReasonType
 from .types.reservation_deny_reason.types import ReservationDenyReasonNode
-from .types.reservation_metadata.types import ReservationMetadataFieldNode, ReservationMetadataSetNode
 from .types.reservation_purpose.types import ReservationPurposeNode
 from .types.reservation_series.types import ReservationSeriesNode
 from .types.reservation_unit.types import ReservationUnitAllNode, ReservationUnitNode
@@ -69,8 +68,6 @@ __all__ = [
     "RejectedOccurrenceNode",
     "ReservationCancelReasonType",
     "ReservationDenyReasonNode",
-    "ReservationMetadataFieldNode",
-    "ReservationMetadataSetNode",
     "ReservationNode",
     "ReservationPurposeNode",
     "ReservationSeriesNode",

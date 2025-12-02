@@ -11,6 +11,7 @@ from tilavarauspalvelu.enums import (
     AccessType,
     OrderStatus,
     PaymentType,
+    ReservationFormType,
     ReservationNotification,
     ReservationStateChoice,
     ReserveeType,
@@ -22,13 +23,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateO
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import PaymentOrder
 
-from tests.factories import (
-    OrderFactory,
-    PaymentOrderFactory,
-    ReservationFactory,
-    ReservationMetadataSetFactory,
-    UserFactory,
-)
+from tests.factories import OrderFactory, PaymentOrderFactory, ReservationFactory, UserFactory
 from tests.helpers import patch_method
 
 from .helpers import CONFIRM_MUTATION, get_confirm_data
@@ -181,7 +176,7 @@ def test_reservation__confirm__updates_confirmed_at(graphql):
 
 def test_reservation__confirm__succeeds_if_reservation_has_all_required_fields(graphql):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_unit__metadata_set=ReservationMetadataSetFactory.create_basic(),
+        reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value,
         reservee_first_name="John",
         reservee_last_name="Doe",
         reservee_email="foo@email.com",
@@ -200,7 +195,7 @@ def test_reservation__confirm__succeeds_if_reservation_has_all_required_fields(g
 
 def test_reservation__confirm__fails_if_any_required_field_are_missing(graphql):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_unit__metadata_set=ReservationMetadataSetFactory.create_basic(),
+        reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value,
         reservee_first_name="John",
         reservee_last_name="Doe",
         reservee_email=None,

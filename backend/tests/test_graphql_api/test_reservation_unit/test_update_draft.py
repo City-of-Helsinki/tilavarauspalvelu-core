@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.enums import AccessType, AuthenticationType, TermsOfUseTypeChoices
+from tilavarauspalvelu.enums import AccessType, AuthenticationType, ReservationFormType, TermsOfUseTypeChoices
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.typing import error_codes
 from utils.auditlog_util import AuditLogger
 
-from tests.factories import ReservationMetadataSetFactory, ReservationUnitFactory, TermsOfUseFactory
+from tests.factories import ReservationUnitFactory, TermsOfUseFactory
 
 from .helpers import UPDATE_MUTATION, get_draft_update_input_data
 
@@ -34,31 +34,28 @@ def test_reservation_unit__update__name(graphql):
     assert reservation_unit.name_fi == "foo"
 
 
-def test_reservation_unit__update__metadata_set(graphql):
+def test_reservation_unit__update__reservation_form(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    metadata_set = ReservationMetadataSetFactory.create()
-    data = get_draft_update_input_data(reservation_unit, metadataSet=metadata_set.pk)
+    data = get_draft_update_input_data(reservation_unit, reservationForm=ReservationFormType.AGE_GROUP_FORM.value)
 
     response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
 
     reservation_unit.refresh_from_db()
-    assert reservation_unit.metadata_set == metadata_set
+    assert reservation_unit.reservation_form == ReservationFormType.AGE_GROUP_FORM
 
 
-def test_reservation_unit__update__metadata_set__null(graphql):
+def test_reservation_unit__update__reservation_form__null(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_draft_update_input_data(reservation_unit, metadataSet=None)
+    data = get_draft_update_input_data(reservation_unit, reservationForm=None)
 
     response = graphql(UPDATE_MUTATION, input_data=data)
-    assert response.has_errors is False, response
-
-    reservation_unit.refresh_from_db()
-    assert reservation_unit.metadata_set is None
+    assert response.has_errors is True, response
+    assert response.error_message() == "Mutation was unsuccessful."
 
 
 def test_reservation_unit__update__terms_of_use(graphql):

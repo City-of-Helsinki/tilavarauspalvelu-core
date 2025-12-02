@@ -4,15 +4,10 @@ import datetime
 
 import pytest
 
-from tilavarauspalvelu.enums import MunicipalityChoice, ReservationTypeChoice, ReserveeType
+from tilavarauspalvelu.enums import MunicipalityChoice, ReservationFormType, ReservationTypeChoice, ReserveeType
 from utils.date_utils import local_datetime
 
-from tests.factories import (
-    AgeGroupFactory,
-    ReservationFactory,
-    ReservationMetadataSetFactory,
-    ReservationPurposeFactory,
-)
+from tests.factories import AgeGroupFactory, ReservationFactory, ReservationPurposeFactory
 
 from .helpers import UPDATE_MUTATION, get_update_data, mock_profile_reader
 
@@ -123,9 +118,8 @@ def test_reservation__update__regular_user(graphql):
 
 
 def test_reservation__update__all_required_fields_are_filled(graphql):
-    metadata_set = ReservationMetadataSetFactory.create_basic()
     reservation = ReservationFactory.create_for_update(
-        reservation_unit__metadata_set=metadata_set,
+        reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value,
     )
 
     data = get_update_data(reservation)
@@ -147,20 +141,8 @@ def test_reservation__update__all_required_fields_are_filled(graphql):
 
 
 def test_reservation__update__missing_reservee_id(graphql):
-    metadata_set = ReservationMetadataSetFactory.create_basic(
-        supported_fields=[
-            "reservee_first_name",
-            "reservee_last_name",
-            "reservee_identifier",
-        ],
-        required_fields=[
-            "reservee_first_name",
-            "reservee_last_name",
-            "reservee_identifier",
-        ],
-    )
     reservation = ReservationFactory.create_for_update(
-        reservation_unit__metadata_set=metadata_set,
+        reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value,
         reservee_identifier="",
     )
 
@@ -180,22 +162,8 @@ def test_reservation__update__missing_reservee_id(graphql):
 
 
 def test_reservation__update__missing_reservee_id_for_individual(graphql):
-    metadata_set = ReservationMetadataSetFactory.create_basic(
-        supported_fields=[
-            "reservee_first_name",
-            "reservee_last_name",
-            "reservee_type",
-            "reservee_identifier",
-        ],
-        required_fields=[
-            "reservee_first_name",
-            "reservee_last_name",
-            "reservee_type",
-            "reservee_identifier",
-        ],
-    )
     reservation = ReservationFactory.create_for_update(
-        reservation_unit__metadata_set=metadata_set,
+        reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value,
         reservee_identifier="",
     )
 
@@ -217,22 +185,8 @@ def test_reservation__update__missing_reservee_id_for_individual(graphql):
 
 
 def test_reservation__update__missing_reservee_organisation_name_for_individual(graphql):
-    metadata_set = ReservationMetadataSetFactory.create_basic(
-        supported_fields=[
-            "reservee_first_name",
-            "reservee_last_name",
-            "reservee_type",
-            "reservee_organisation_name",
-        ],
-        required_fields=[
-            "reservee_first_name",
-            "reservee_last_name",
-            "reservee_type",
-            "reservee_organisation_name",
-        ],
-    )
     reservation = ReservationFactory.create_for_update(
-        reservation_unit__metadata_set=metadata_set,
+        reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value,
         reservee_organisation_name="",
     )
 
@@ -254,8 +208,10 @@ def test_reservation__update__missing_reservee_organisation_name_for_individual(
 
 
 def test_reservation__update__some_required_fields_are_missing(graphql):
-    metadata_set = ReservationMetadataSetFactory.create_basic()
-    reservation = ReservationFactory.create_for_update(reservation_unit__metadata_set=metadata_set, reservee_phone="")
+    reservation = ReservationFactory.create_for_update(
+        reservation_unit__reservation_form=ReservationFormType.CONTACT_INFO_FORM.value,
+        reservee_phone="",
+    )
 
     data = get_update_data(reservation)
     data["reserveeFirstName"] = "John"
