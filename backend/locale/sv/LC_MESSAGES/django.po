@@ -1467,10 +1467,6 @@ msgstr ""
 msgid "Age group of the group or association"
 msgstr ""
 
-#: tilavarauspalvelu/admin/reservation_metadata_set/admin.py
-msgid "Required fields must be a subset of supported fields"
-msgstr ""
-
 #: tilavarauspalvelu/admin/reservation_series/admin.py
 msgid ""
 "Search by name, user's first name or last name, description, external ID, "
@@ -1806,10 +1802,6 @@ msgid "Publish ends"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Reservation metadata set"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Reservation form"
 msgstr ""
 
@@ -1974,12 +1966,6 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Time after this reservation unit should not be publicly visible in UI."
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid ""
-"Reservation metadata set that defines the set of supported and required form "
-"fields for this reservation unit."
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py

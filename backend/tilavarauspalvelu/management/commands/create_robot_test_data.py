@@ -171,7 +171,6 @@ def create_reservation_units() -> None:  # noqa: PLR0915
         },
     )
 
-
     peruutus_alkuun_asti, _ = ReservationUnitCancellationRule.objects.get_or_create(
         name="Varauksen alkuun asti",
         defaults={
