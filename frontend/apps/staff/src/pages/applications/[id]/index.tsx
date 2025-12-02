@@ -310,6 +310,17 @@ const TableWrapper = styled.div`
   overflow-x: auto;
 `;
 
+/// check if the reservation unit option is fully rejected (neither allocated nor possible to allocate here)
+/// rejected -> it was denied on application level
+/// locked -> it was maybe allocated but can not be allocated here anymore
+function isOptionFullyRejected(option: ReservationUnitOptionFieldsFragment): boolean {
+  const { isRejected, isLocked, allocatedTimeSlots } = option;
+  if (isRejected) {
+    return true;
+  }
+  return isLocked && allocatedTimeSlots.length === 0;
+}
+
 function ReservationUnitOptionsSection({
   section,
   refetch,
@@ -317,7 +328,7 @@ function ReservationUnitOptionsSection({
 }: {
   section: Pick<ApplicationPageSectionFragment, "reservationUnitOptions">;
   refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
-  applicationStatus: Maybe<ApplicationStatusChoice>;
+  applicationStatus: ApplicationStatusChoice;
 }) {
   const { t } = useTranslation();
 
@@ -338,20 +349,16 @@ function ReservationUnitOptionsSection({
     },
     {
       key: "status",
-      transform: ({ isRejected, isLocked }: ReservationUnitOptionFieldsFragment) => {
-        if (isRejected || isLocked) {
-          return <DeclinedTag iconStart={<IconCross />}>{t("application:rejected")}</DeclinedTag>;
-        }
-      },
+      transform: (option: ReservationUnitOptionFieldsFragment) =>
+        isOptionFullyRejected(option) ? (
+          <DeclinedTag iconStart={<IconCross />}>{t("application:rejected")}</DeclinedTag>
+        ) : undefined,
     },
     {
       key: "reject",
-      transform: (option: ReservationUnitOptionFieldsFragment) => {
-        if (applicationStatus == null) {
-          return null;
-        }
-        return <RejectOptionButton option={option} applicationStatus={applicationStatus} refetch={refetch} />;
-      },
+      transform: (option: ReservationUnitOptionFieldsFragment) => (
+        <RejectOptionButton option={option} applicationStatus={applicationStatus} refetch={refetch} />
+      ),
     },
   ];
 
@@ -419,11 +426,7 @@ function ApplicationSectionDetails({
           </ApplicationDatas>
           <Flex $justifyContent="space-between" $direction="row" $alignItems="center">
             <H4 as="h3">{t("applicationSection:requestedReservationUnits")}</H4>
-            <RejectAllOptionsButton
-              section={section}
-              refetch={refetch}
-              applicationStatus={application.status ?? ApplicationStatusChoice.Draft}
-            />
+            <RejectAllOptionsButton section={section} refetch={refetch} applicationStatus={application.status} />
           </Flex>
           <ReservationUnitOptionsSection section={section} refetch={refetch} applicationStatus={application.status} />
           <H4 as="h3">{t("applicationSection:requestedTimes")}</H4>
