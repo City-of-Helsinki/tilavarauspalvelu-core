@@ -56,6 +56,7 @@
     "HELSINKI_PROFILE_PERMISSION_DENIED": "Käyttöoikeutesi eivät riitä henkilötietojen näyttämiseen",
     "HELSINKI_PROFILE_USER_MISSING_PROFILE_ID": "Varauksen luoneen käyttäjän Helsinki-profiilin tunniste puuttuu.",
     "CREATE_PERMISSION_DENIED": "Ei oikeuksia",
+    "UPDATE_PERMISSION_DENIED": "Ei oikeutta muokata.",
     "validation": {
       "ALLOCATION_APPLICATION_STATUS_NOT_ALLOWED": "Vuoroa ei voi jakaa, koska hakemuksen tila ei ole sallittu.",
       "ALLOCATION_APPLIED_RESERVATIONS_PER_WEEK_EXCEEDED": "Hakemukselle on jo jaettu maksimi määrä vuoroja.",
@@ -93,7 +94,6 @@
       "RESERVATION_UNIT_PRICINGS_MISSING": "Varausyksiköllä ei ole hinnoittelua",
       "RESERVATION_UNIT_PRICINGS_NO_ACTIVE_PRICINGS": "Varausyksiköllä ei ole aktiivisia hinnoitteluita",
       "RESERVATION_WRONG_ACCESS_TYPE": "Toimintoa ei voida suorittaa, koska varaus ei käytä ovikoodia",
-      "UPDATE_PERMISSION_DENIED": "Ei oikeutta muokata.",
       "unique": "Nimi on jo käytössä.",
       "invalid": "Virheellinen arvo.",
       "generic_validation_error": "Tapahtui virhe."
