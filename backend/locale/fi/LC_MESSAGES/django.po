@@ -3883,22 +3883,6 @@ msgstr "varauksen hylkäyksen syy"
 msgid "reservation deny reasons"
 msgstr "varauksen hylkäyksen syyt"
 
-#: tilavarauspalvelu/models/reservation_metadata_field/model.py
-msgid "reservation metadata field"
-msgstr "varauslomakkeen kenttä"
-
-#: tilavarauspalvelu/models/reservation_metadata_field/model.py
-msgid "reservation metadata fields"
-msgstr "varauslomakkeen kentät"
-
-#: tilavarauspalvelu/models/reservation_metadata_set/model.py
-msgid "reservation metadata set"
-msgstr "varauslomake"
-
-#: tilavarauspalvelu/models/reservation_metadata_set/model.py
-msgid "reservation metadata sets"
-msgstr "varauslomakkeet"
-
 #: tilavarauspalvelu/models/reservation_purpose/model.py
 msgid "reservation purpose"
 msgstr "varaustarkoitus"
