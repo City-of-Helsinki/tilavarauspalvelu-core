@@ -136,7 +136,6 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     isDraft: false,
     maxReservationDuration: null, // Maybe<Scalars["Duration"]["output"]>;
     maxReservationsPerUser: null, //Maybe<Scalars["Int"]["output"]>;
-    metadataSet: null, //Maybe<ReservationMetadataSetNode>;
     minPersons: null, //Maybe<Scalars["Int"]["output"]>;
     minReservationDuration: null, // Maybe<Scalars["Duration"]["output"]>;
     numActiveUserReservations: 0, // Scalars["Int"]["output"];
