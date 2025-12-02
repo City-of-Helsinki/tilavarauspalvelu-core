@@ -3798,22 +3798,6 @@ msgstr ""
 msgid "reservation deny reasons"
 msgstr ""
 
-#: tilavarauspalvelu/models/reservation_metadata_field/model.py
-msgid "reservation metadata field"
-msgstr ""
-
-#: tilavarauspalvelu/models/reservation_metadata_field/model.py
-msgid "reservation metadata fields"
-msgstr ""
-
-#: tilavarauspalvelu/models/reservation_metadata_set/model.py
-msgid "reservation metadata set"
-msgstr ""
-
-#: tilavarauspalvelu/models/reservation_metadata_set/model.py
-msgid "reservation metadata sets"
-msgstr ""
-
 #: tilavarauspalvelu/models/reservation_purpose/model.py
 msgid "reservation purpose"
 msgstr ""
