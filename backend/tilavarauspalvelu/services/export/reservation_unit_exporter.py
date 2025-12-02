@@ -65,7 +65,6 @@ class ReservationUnitExportRow(BaseExportRow):
     reservation_begins_at: str = ""
     reservation_ends_at: str = ""
     reservation_form: str = ""
-    reservation_metadata_set: str = ""
     require_a_handling: str | bool = ""
     authentication: str = ""
     reservation_kind: str = ""
@@ -122,7 +121,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 "origin_hauki_resource",
                 "reservation_unit_type",
                 "cancellation_rule",
-                "metadata_set",
                 "cancellation_terms",
                 "service_specific_terms",
                 "pricing_terms",
@@ -187,7 +185,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 reservation_begins_at="Reservation begins",
                 reservation_ends_at="Reservation ends",
                 reservation_form="Reservation form",
-                reservation_metadata_set="Reservation metadata set",
                 require_a_handling="Require a handling",
                 authentication="Authentication",
                 reservation_kind="Reservation kind",
@@ -287,7 +284,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 reservation_begins_at=self.format_datetime(instance.reservation_begins_at),
                 reservation_ends_at=self.format_datetime(instance.reservation_ends_at),
                 reservation_form=getattr(instance, "reservation_form", ""),
-                reservation_metadata_set=getattr(instance.metadata_set, "name", ""),
                 require_a_handling=instance.require_reservation_handling,
                 authentication=str(AuthenticationType(instance.authentication).label),
                 reservation_kind=str(ReservationKind(instance.reservation_kind).label),

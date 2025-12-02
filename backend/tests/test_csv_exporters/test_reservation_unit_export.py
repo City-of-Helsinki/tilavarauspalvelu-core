@@ -44,7 +44,6 @@ def test_reservation_unit_export_multiple():
         service_specific_terms__name="Service specific terms",
         pricing_terms__name="Pricing terms",
         cancellation_rule__name="Cancellation rule",
-        metadata_set__name="Metadata set",
         reservation_unit_type__name="Normal",
         pricings__highest_price=Decimal(20),
         pricings__payment_type=PaymentType.ONLINE,
@@ -108,7 +107,6 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_begins_at)
     assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_ends_at)
     assert row_2[next(index)] == reservation_unit_1.reservation_form
-    assert row_2[next(index)] == reservation_unit_1.metadata_set.name
     assert row_2[next(index)] == reservation_unit_1.require_reservation_handling
     assert row_2[next(index)] == AuthenticationType(reservation_unit_1.authentication).label
     assert row_2[next(index)] == ReservationKind(reservation_unit_1.reservation_kind).label
@@ -187,10 +185,6 @@ def test_reservation_unit_export_multiple():
                 missing=Missing(deleted=["cancellation_rule__name"]),
                 column_value_mapping={"Cancellation rule": ""},
             ),
-            "Missing Reservation metadata set": MissingParams(
-                missing=Missing(deleted=["metadata_set__name"]),
-                column_value_mapping={"Reservation metadata set": ""},
-            ),
             "Missing Pricing": MissingParams(
                 missing=Missing(deleted=["pricings__highest_price"]),
                 column_value_mapping={
@@ -234,7 +228,6 @@ def test_reservation_unit_export_missing_relations(column_value_mapping, missing
         "service_specific_terms__name": "Service specific terms",
         "pricing_terms__name": "Pricing terms",
         "cancellation_rule__name": "Cancellation rule",
-        "metadata_set__name": "Metadata set",
         "pricings__highest_price": Decimal(20),
         "access_types__access_type": AccessType.UNRESTRICTED,
     }
