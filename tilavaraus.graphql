@@ -379,7 +379,6 @@ type Query {
     """Ordering"""
     orderBy: [TaxPercentageOrderingChoices]
   ): TaxPercentageNodeConnection
-  metadataSets(first: Int, last: Int, offset: Int, after: String, before: String): ReservationMetadataSetNodeConnection
   intendedUses(
     first: Int
     last: Int
@@ -794,7 +793,6 @@ type ReservationUnitNode implements Node {
   unit: UnitNode!
   reservationUnitType: ReservationUnitTypeNode
   cancellationRule: ReservationUnitCancellationRuleNode
-  metadataSet: ReservationMetadataSetNode
   cancellationTerms: TermsOfUseNode
   serviceSpecificTerms: TermsOfUseNode
   pricingTerms: TermsOfUseNode
@@ -1346,24 +1344,6 @@ type ReservationUnitCancellationRuleNode implements Node {
   nameEn: String
   nameSv: String
   canBeCancelledTimeBefore: Duration
-
-  """The ID of the object"""
-  id: ID!
-  pk: Int
-}
-
-type ReservationMetadataSetNode implements Node {
-  name: String!
-  supportedFields: [ReservationMetadataFieldNode!]!
-  requiredFields: [ReservationMetadataFieldNode!]!
-
-  """The ID of the object"""
-  id: ID!
-  pk: Int
-}
-
-type ReservationMetadataFieldNode implements Node {
-  fieldName: String!
 
   """The ID of the object"""
   id: ID!
@@ -2808,24 +2788,6 @@ enum TaxPercentageOrderingChoices {
   isEnabledDesc
 }
 
-type ReservationMetadataSetNodeConnection {
-  """Pagination data for this connection."""
-  pageInfo: PageInfo!
-
-  """Contains the nodes in this connection."""
-  edges: [ReservationMetadataSetNodeEdge]!
-  totalCount: Int
-}
-
-"""A Relay edge containing a `ReservationMetadataSetNode` and its cursor."""
-type ReservationMetadataSetNodeEdge {
-  """The item at the end of the edge"""
-  node: ReservationMetadataSetNode
-
-  """A cursor for use in pagination"""
-  cursor: String!
-}
-
 type IntendedUseNodeConnection {
   """Pagination data for this connection."""
   pageInfo: PageInfo!
@@ -3906,7 +3868,6 @@ type ReservationUnitCreateMutationPayload {
   unit: Int
   reservationUnitType: Int
   cancellationRule: Int
-  metadataSet: Int
   cancellationTerms: String
   serviceSpecificTerms: String
   pricingTerms: String
@@ -3976,7 +3937,6 @@ input ReservationUnitCreateMutationInput {
   unit: Int!
   reservationUnitType: Int
   cancellationRule: Int
-  metadataSet: Int
   cancellationTerms: String
   serviceSpecificTerms: String
   pricingTerms: String
@@ -4092,7 +4052,6 @@ type ReservationUnitUpdateMutationPayload {
   unit: Int
   reservationUnitType: Int
   cancellationRule: Int
-  metadataSet: Int
   cancellationTerms: String
   serviceSpecificTerms: String
   pricingTerms: String
@@ -4162,7 +4121,6 @@ input ReservationUnitUpdateMutationInput {
   unit: Int
   reservationUnitType: Int
   cancellationRule: Int
-  metadataSet: Int
   cancellationTerms: String
   serviceSpecificTerms: String
   pricingTerms: String
