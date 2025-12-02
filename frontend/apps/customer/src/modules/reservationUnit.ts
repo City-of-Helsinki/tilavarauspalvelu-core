@@ -103,6 +103,16 @@ export function getEquipmentCategories(
   return uniq(categories);
 }
 
+function equipmentFilterFunc(n: EquipmentFieldsFragment, category: string): boolean {
+  if (n.category.nameFi == null) {
+    return false;
+  }
+  if (n.category.nameFi === category) {
+    return true;
+  }
+  return category === "Muu" && !equipmentCategoryOrder.some((order) => order === n.category.nameFi);
+}
+
 // Why are we doing complex frontend sorting? and always in finnish?
 export function getEquipmentList(
   equipments: Readonly<EquipmentFieldsFragment[]>,
@@ -116,13 +126,7 @@ export function getEquipmentList(
 
   const sortedEquipment = categories.flatMap((category) =>
     equipments
-      .filter(
-        (n) =>
-          n.category?.nameFi === category ||
-          (category === "Muu" &&
-            n.category?.nameFi &&
-            !equipmentCategoryOrder.some((order) => order === n.category.nameFi))
-      )
+      .filter((n) => equipmentFilterFunc(n, category))
       .sort((a, b) => (a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0))
   );
 
