@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
-import { filterNonNullable, sort } from "ui/src/modules/helpers";
+import { filterNonNullable, sortAgeGroups } from "ui/src/modules/helpers";
 import type { TagOptionsList } from "@/modules/search";
 import {
   MunicipalityChoice,
@@ -29,11 +29,9 @@ export function getFilterOptions(
       value: purpose.pk ?? 0,
     })
   );
-  const ageGroups = sort(
-    filterNonNullable(data?.ageGroups?.edges.map((e) => e?.node)),
-    (a, b) => a.minimum - b.minimum
-  ).map((group) => ({
-    label: `${group.minimum}-${group.maximum || ""}`,
+  const ageGroupNodes = filterNonNullable(data?.ageGroups?.edges.map((e) => e?.node));
+  const ageGroups = sortAgeGroups(ageGroupNodes).map((group) => ({
+    label: `${group.minimum} - ${group.maximum ?? ""}`,
     value: group.pk ?? 0,
   }));
   const units = filterNonNullable(data?.unitsAll).map((unit) => ({

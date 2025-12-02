@@ -13,6 +13,7 @@ import {
   getTranslation,
   ignoreMaybeArray,
   mapParamToInteger,
+  sortAgeGroups,
   toNumber,
 } from "ui/src/modules/helpers";
 import type { OptionsListT, OptionT } from "ui/src/modules/search";
@@ -213,9 +214,10 @@ export async function getSearchOptions(
 
   const equipments = filterNonNullable(optionsData?.equipmentsAll).map((n) => translateOption(n, lang));
   const units = filterNonNullable(optionsData?.unitsAll).map((n) => translateOption(n, lang));
-  const ageGroups = sortAgeGroups(optionsData?.ageGroups?.edges?.map((edge) => edge?.node ?? null) ?? []).map((n) => ({
+  const ageGroupNodes = filterNonNullable(optionsData.ageGroups?.edges?.map((edge) => edge?.node));
+  const ageGroups = sortAgeGroups(ageGroupNodes).map((n) => ({
     value: n.pk ?? 0,
-    label: `${n.minimum || ""} - ${n.maximum || ""}`,
+    label: `${n.minimum} - ${n.maximum ?? ""}`,
   }));
   const reservationPurposes = filterNonNullable(optionsData?.reservationPurposes?.edges?.map((edge) => edge?.node)).map(
     (n) => translateOption(n, lang)
@@ -235,19 +237,6 @@ export async function getSearchOptions(
     ageGroups,
     municipalities,
   };
-}
-
-type AgeGroup = NonNullable<NonNullable<OptionsQuery["ageGroups"]>["edges"][0]>["node"];
-function sortAgeGroups(ageGroups: AgeGroup[]): Array<NonNullable<AgeGroup>> {
-  return filterNonNullable(ageGroups).sort((a, b) => {
-    const order = ["1-99"];
-    const strA = `${a.minimum || ""}-${a.maximum || ""}`;
-    const strB = `${b.minimum || ""}-${b.maximum || ""}`;
-
-    return order.includes(strA) || order.includes(strB)
-      ? order.indexOf(strA) - order.indexOf(strB)
-      : a.minimum - b.minimum;
-  });
 }
 
 // There is a duplicate in admin-ui but it doesn't have translations
