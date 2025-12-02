@@ -391,9 +391,13 @@ def params_for_access_type_change_section(*, section: ApplicationSection) -> dic
             Prefetch(
                 "access_types",
                 queryset=(
+                    # Access types that are valid from now until the end of the reservation period of the section
                     ReservationUnitAccessType.objects.all()
                     .annotate(end_date=L("end_date"))
-                    .on_period(begin_date=section.reservations_begin_date, end_date=section.reservations_end_date)
+                    .on_period(
+                        begin_date=local_datetime(),
+                        end_date=section.reservations_end_date,
+                    )
                 ),
             ),
         )
