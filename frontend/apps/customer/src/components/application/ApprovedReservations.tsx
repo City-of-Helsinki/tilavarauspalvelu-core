@@ -1031,7 +1031,7 @@ export function ApplicationSection({
     // NOTE we need to slice even if backend returns only 20 of each
     // because we want to keep the total at 20
     .slice(0, N_RESERVATIONS_TO_SHOW);
-  const hasCancellableReservations = !!sectionToreservations(t, applicationSection).some(
+  const hasCancellableReservations = sectionToreservations(t, applicationSection).some(
     (r) => r.isCancellableReason === ""
   );
   return (
