@@ -324,6 +324,13 @@ def test_seasonal_booking_access_type_changed__get_context__multiple(email_reser
 
     email_reservation.reservation_unit.access_types.update(access_type=AccessType.PHYSICAL_KEY)
 
+    # Past access type, should not be included in the context
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=email_reservation.reservation_unit,
+        access_type=AccessType.ACCESS_CODE,
+        begin_date=datetime.date(2023, 12, 30),
+    )
+
     ReservationUnitAccessTypeFactory.create(
         reservation_unit=email_reservation.reservation_unit,
         access_type=AccessType.ACCESS_CODE,
