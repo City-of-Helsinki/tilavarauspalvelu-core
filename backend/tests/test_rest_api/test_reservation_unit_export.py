@@ -84,7 +84,6 @@ def test_reservation_unit_export(api_client, settings):
         "reservation_ends_at",
         "reservation_form",
         "reservation_kind",
-        "reservation_metadata_set",
         "reservation_start_interval",
         "reservation_state",
         "reservation_unit_id",
