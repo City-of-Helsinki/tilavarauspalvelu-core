@@ -19,7 +19,6 @@ from utils.date_utils import local_date, local_datetime
 
 from tests.factories import (
     PaymentProductFactory,
-    ReservationMetadataSetFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
@@ -64,7 +63,6 @@ def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:
     resource = ResourceFactory.create(space=space)
     reservation_unit_type = ReservationUnitTypeFactory.create()
     rule = ReservationUnitCancellationRuleFactory.create()
-    metadata_set = ReservationMetadataSetFactory.create()
     tax_percentage = TaxPercentageFactory.create()
 
     today = local_date()
@@ -95,7 +93,6 @@ def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:
         "publishEndsAt": "2021-05-03T00:00:00+00:00",
         "reservationBeginsAt": "2021-05-03T00:00:00+00:00",
         "reservationEndsAt": "2021-05-03T00:00:00+00:00",
-        "metadataSet": metadata_set.pk,
         "maxReservationsPerUser": 2,
         "requireReservationHandling": True,
         "authentication": AuthenticationType.STRONG.name,

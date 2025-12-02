@@ -101,7 +101,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "unit",
             "reservation_unit_type",
             "cancellation_rule",
-            "metadata_set",
             "cancellation_terms",
             "service_specific_terms",
             "pricing_terms",

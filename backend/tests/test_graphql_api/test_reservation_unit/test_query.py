@@ -22,7 +22,6 @@ from tests.factories import (
     PaymentMerchantFactory,
     PaymentProductFactory,
     ReservationFactory,
-    ReservationMetadataSetFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
     ResourceFactory,
@@ -240,9 +239,6 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
         cancellationRule {
             nameFi
         }
-        metadataSet {
-            name
-        }
         cancellationTerms {
             termsType
         }
@@ -265,7 +261,6 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
 
     reservation_unit = ReservationUnitFactory.create(
         cancellation_rule=ReservationUnitCancellationRuleFactory.create(),
-        metadata_set=ReservationMetadataSetFactory.create(),
         cancellation_terms=TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION),
         service_specific_terms=TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.SERVICE),
         pricing_terms=TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING),
@@ -288,9 +283,6 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
         },
         "cancellationRule": {
             "nameFi": reservation_unit.cancellation_rule.name_fi,
-        },
-        "metadataSet": {
-            "name": reservation_unit.metadata_set.name,
         },
         "cancellationTerms": {
             "termsType": reservation_unit.cancellation_terms.terms_type.upper(),
