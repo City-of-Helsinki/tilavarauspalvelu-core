@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+from csp.constants import SELF, UNSAFE_INLINE
+from csp.decorators import csp_replace
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -23,6 +27,13 @@ from tilavarauspalvelu.api.rest.views import (
 )
 from tilavarauspalvelu.api.webhooks.urls import webhook_router
 
+if TYPE_CHECKING:
+    from django.http import HttpRequest, HttpResponseBase
+
+
+# --- Update Admin site context --------------------------------------------------------------------------------------
+
+
 # Mock the `each_context` method to add some custom context variables.
 original_each_context = admin.site.each_context
 admin.site.each_context = lambda request: original_each_context(request) | {
@@ -36,8 +47,34 @@ admin.site.each_context = lambda request: original_each_context(request) | {
     "helsinki_logout_url": reverse("helusers:auth_logout"),
 }
 
+
+# --- CSP Overrides --------------------------------------------------------------------------------------------------
+
+
+# Note: These are needed by GraphiQL interface
+@csp_replace({
+    "script-src": [SELF, UNSAFE_INLINE, "blob:", "https://cdn.jsdelivr.net;"],
+    "style-src": [SELF, UNSAFE_INLINE, "https://cdn.jsdelivr.net;"],
+    "connect-src": [SELF, "https://cdn.jsdelivr.net;"],
+})
+def graphql_view_with_csp_decorator(request: HttpRequest) -> HttpResponseBase:
+    return FileUploadGraphQLView.as_view(graphiql=settings.DEBUG)(request)
+
+
+# Note: UNSAFE_INLINE is needed for inline styles added by `django-helusers` to `base_admin_site.html`
+@csp_replace({
+    "style-src": [SELF, UNSAFE_INLINE],
+})
+def login_view_with_csp_decorator(request: HttpRequest) -> HttpResponseBase:
+    return admin.site.login(request)
+
+
+# --- URL Patterns ---------------------------------------------------------------------------------------------------
+
+
 urlpatterns = [
-    path("graphql/", FileUploadGraphQLView.as_view(graphiql=settings.DEBUG)),
+    path("graphql/", graphql_view_with_csp_decorator),
+    path("admin/login/", login_view_with_csp_decorator),
     path("admin/", admin.site.urls),
     path("v1/reservation_calendar/<int:pk>/", reservation_ical, name="reservation_calendar"),
     path(

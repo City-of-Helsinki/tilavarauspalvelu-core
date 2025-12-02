@@ -6,6 +6,7 @@ import zoneinfo
 from pathlib import Path
 
 import dj_database_url
+from csp.constants import NONE, SELF
 from django.http import response as http_response
 from django.utils.translation import gettext_lazy as _
 from env_config import Environment, values
@@ -79,6 +80,7 @@ class Common(Environment):
         "adminsortable2",
         "auditlog",
         "corsheaders",
+        "csp",
         "django_celery_beat",
         "django_celery_results",
         "django_extensions",
@@ -104,6 +106,7 @@ class Common(Environment):
     MIDDLEWARE = [
         "config.middleware.MultipleProxyMiddleware",
         "corsheaders.middleware.CorsMiddleware",
+        "csp.middleware.CSPMiddleware",
         "django.middleware.security.SecurityMiddleware",
         # Keep this after security middleware, correct place according to whitenoise documentation
         "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -136,6 +139,24 @@ class Common(Environment):
     CORS_ALLOWED_ORIGIN_REGEXES = values.ListValue(default=[])
     CORS_ALLOW_CREDENTIALS = True
     CSRF_FAILURE_VIEW = "tilavarauspalvelu.api.rest.views.csrf_failure_view"
+
+    # --- Content Security Policy settings ---------------------------------------------------------------------------
+
+    CONTENT_SECURITY_POLICY = {
+        "DIRECTIVES": {
+            "base-uri": [SELF],
+            "form-action": [SELF],
+            "default-src": [SELF],
+            "style-src": [SELF],
+            "font-src": [SELF, "data:"],
+            "img-src": [SELF, "data:", "blob:"],
+            "script-src": [SELF, "blob:"],
+            "object-src": [NONE],
+            "frame-src": [NONE],
+            "frame-ancestors": [NONE],
+            "upgrade-insecure-requests": True,
+        }
+    }
 
     # --- Proxy settings ---------------------------------------------------------------------------------------------
 
