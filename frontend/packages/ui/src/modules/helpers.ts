@@ -4,7 +4,13 @@ import type { TFunction } from "i18next";
 import sanitizeHtml from "sanitize-html";
 import { minutesToHoursString, timeToMinutes } from "@ui/modules/date-utils";
 import { ReservationUnitImageType } from "../../gql/gql-types";
-import type { ImageFragment, Maybe, PricingFieldsFragment, SuitableTimeFragment } from "../../gql/gql-types";
+import type {
+  AgeGroupNode,
+  ImageFragment,
+  Maybe,
+  PricingFieldsFragment,
+  SuitableTimeFragment,
+} from "../../gql/gql-types";
 import { pixel } from "./const";
 import { convertWeekday } from "./conversion";
 import type { LocalizationLanguages } from "./urlBuilder";
@@ -404,4 +410,19 @@ export function cleanHtmlContent(html: string): string {
     return "";
   }
   return sanitizeHtml(html, sanitizeConfig);
+}
+
+type AgeGroup = AgeGroupNode;
+export function sortAgeGroups(ageGroups: ReadonlyArray<AgeGroup>): AgeGroup[] {
+  return sort(ageGroups, (a, b) => {
+    // special case of 1-99 -> move to last
+    if (a.minimum === 1 && a.maximum === 99) {
+      return 1;
+    } else if (b.minimum === 1 && b.maximum === 99) {
+      return -1;
+    } else if (a.minimum - b.minimum === 0) {
+      return (a.maximum ?? 0) - (b.maximum ?? 0);
+    }
+    return a.minimum - b.minimum;
+  });
 }

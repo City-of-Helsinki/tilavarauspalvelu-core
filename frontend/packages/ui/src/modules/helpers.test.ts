@@ -1,6 +1,7 @@
 import type { TFunction } from "i18next";
 import { describe, test, expect, it } from "vitest";
-import { formatApiTimeInterval, formatListToCSV, getTranslation, stripHtml } from "./helpers";
+import type { AgeGroupNode } from "../../gql/gql-types";
+import { formatApiTimeInterval, formatListToCSV, getTranslation, sortAgeGroups, stripHtml } from "./helpers";
 
 describe("formatApiTimeInterval", () => {
   test("should properly format api time interval", () => {
@@ -198,5 +199,84 @@ describe("stripHtml", () => {
 
   it("should decode entities and remove tags in one pass", () => {
     expect(stripHtml('<a href="test">Link &amp; text &lt;here&gt;</a>')).toBe("Link & text <here>");
+  });
+});
+
+describe("sortAgeGroups", () => {
+  function createAgeGroup({ min, max = null }: { min: number; max?: number | null }): AgeGroupNode {
+    return {
+      minimum: min,
+      maximum: max,
+      id: "",
+      pk: 1,
+    };
+  }
+  test("handles minimal case", () => {
+    const input = [
+      { min: 1, max: 9 },
+      { min: 2, max: 5 },
+    ].map(createAgeGroup);
+    const reversed = [...input].reverse();
+    expect(sortAgeGroups(input)).toStrictEqual(input);
+    expect(reversed).not.toStrictEqual(input);
+    expect(sortAgeGroups(reversed)).toStrictEqual(input);
+  });
+
+  test("handles minimal special case", () => {
+    const input = [
+      { min: 3, max: 5 },
+      { min: 1, max: 99 },
+    ].map(createAgeGroup);
+    const reversed = [...input].reverse();
+    expect(sortAgeGroups(input)).toStrictEqual(input);
+    expect(reversed).not.toStrictEqual(input);
+    expect(sortAgeGroups(reversed)).toStrictEqual(input);
+  });
+
+  test("handles zeros", () => {
+    const input = [{ min: 0, max: 9 }, { min: 10 }].map(createAgeGroup);
+    const reversed = [...input].reverse();
+    expect(sortAgeGroups(input)).toStrictEqual(input);
+    expect(reversed).not.toStrictEqual(input);
+    expect(sortAgeGroups(reversed)).toStrictEqual(input);
+  });
+
+  test("handles zeros with special case", () => {
+    const input = [{ min: 0, max: 9 }, { min: 10 }, { min: 1, max: 99 }].map(createAgeGroup);
+    const reversed = [...input].reverse();
+    expect(sortAgeGroups(input)).toStrictEqual(input);
+    expect(reversed).not.toStrictEqual(input);
+    expect(sortAgeGroups(reversed)).toStrictEqual(input);
+  });
+
+  test("use max for sorting if min is equal", () => {
+    const input = [
+      { min: 5, max: 7 },
+      { min: 5, max: 9 },
+    ].map(createAgeGroup);
+    const reversed = [...input].reverse();
+    expect(sortAgeGroups(input)).toStrictEqual(input);
+    expect(reversed).not.toStrictEqual(input);
+    expect(sortAgeGroups(reversed)).toStrictEqual(input);
+  });
+
+  test("empty max is sorted before non empty", () => {
+    const input = [{ min: 5 }, { min: 5, max: 9 }].map(createAgeGroup);
+    const reversed = [...input].reverse();
+    expect(sortAgeGroups(input)).toStrictEqual(input);
+    expect(reversed).not.toStrictEqual(input);
+    expect(sortAgeGroups(reversed)).toStrictEqual(input);
+  });
+
+  test("handles long special case", () => {
+    const input = [
+      ...Array.from({ length: 10 })
+        .keys()
+        .map((n) => ({ min: n, max: 5 * n })),
+      { min: 1, max: 99 },
+    ].map(createAgeGroup);
+    const reversed = [...input].reverse();
+    expect(reversed).not.toStrictEqual(input);
+    expect(sortAgeGroups(reversed)).toStrictEqual(input);
   });
 });
