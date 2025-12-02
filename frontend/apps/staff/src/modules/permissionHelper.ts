@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { filterNonNullable } from "ui/src/modules/helpers";
 import type { CurrentUserQuery, UserPermissionChoice } from "@gql/gql-types";
 
 export const CURRENT_USER = gql`
@@ -41,21 +40,19 @@ export const CURRENT_USER = gql`
 
 type UserNode = CurrentUserQuery["currentUser"];
 
-function hasUnitPermission(permission: UserPermissionChoice, unitPk: number, user: UserNode): boolean {
-  const unitRoles = filterNonNullable(user?.unitRoles);
-
-  for (const role of unitRoles) {
-    const perms = filterNonNullable(role.permissions?.map((x) => x));
-    if (perms.some((x) => x === permission) == null) {
+function hasUnitPermission(permission: UserPermissionChoice, unitPk: number, user: NonNullable<UserNode>): boolean {
+  for (const role of user.unitRoles) {
+    const perms = role.permissions.map((x) => x);
+    if (!perms.some((x) => x === permission)) {
       continue;
     }
-    const unitsInGroups = filterNonNullable(role.unitGroups?.flatMap((x) => x.units.map((y) => y.pk)));
-    if (unitsInGroups.some((x) => x === unitPk)) {
+    const unitPksInGroups = role.unitGroups.flatMap((x) => x.units.map((y) => y.pk));
+    if (unitPksInGroups.some((x) => x === unitPk)) {
       return true;
     }
 
     // Check unit specific permissions
-    if (role.units?.find((x) => x?.pk === unitPk)) {
+    if (role.units.some((x) => x.pk === unitPk)) {
       return true;
     }
   }
@@ -63,16 +60,16 @@ function hasUnitPermission(permission: UserPermissionChoice, unitPk: number, use
   return false;
 }
 
-function hasGeneralPermission(permission: UserPermissionChoice, user: UserNode) {
-  const roles = filterNonNullable(user?.generalRoles);
-  return roles.find((x) => x.permissions?.find((y) => y === permission) != null);
+function hasGeneralPermission(permission: UserPermissionChoice, user: NonNullable<UserNode>): boolean {
+  const roles = user.generalRoles;
+  return roles.some((x) => x.permissions.some((y) => y === permission));
 }
 
 /// Check if the user has a specific permission in any of their roles
 /// If a unitPk is provided, check if the user has that permission for that specific unit, otherwise check for any units
 export function hasPermission(
   user: CurrentUserQuery["currentUser"],
-  permissionName: UserPermissionChoice,
+  permission: UserPermissionChoice,
   unitPk?: number | null
 ): boolean {
   if (!user) {
@@ -81,14 +78,14 @@ export function hasPermission(
   if (user.isSuperuser) {
     return true;
   }
-  if (hasGeneralPermission(permissionName, user)) {
+  if (hasGeneralPermission(permission, user)) {
     return true;
   }
 
-  if (unitPk && hasUnitPermission(permissionName, unitPk, user)) {
+  if (unitPk && hasUnitPermission(permission, unitPk, user)) {
     return true;
   }
-  if (!unitPk && hasSomePermission(user, permissionName)) {
+  if (!unitPk && hasSomePermission(user, permission)) {
     return true;
   }
 
@@ -109,18 +106,19 @@ export function hasSomePermission(
     return true;
   }
 
-  const someGeneralRoles = user?.generalRoles?.some((r) => r.permissions?.some((x) => x === permission));
+  const someGeneralRoles = user.generalRoles.some((r) => r.permissions.some((x) => x === permission));
   if (someGeneralRoles) {
     return true;
   }
 
-  const someUnitRoles = user?.unitRoles?.some((role) => role.permissions?.some((p) => p === permission));
+  const someUnitRoles = user.unitRoles.some((role) => role.permissions.some((p) => p === permission));
 
   return someUnitRoles && !onlyGeneral;
 }
 
-const hasPerm = (role: Pick<NonNullable<UserNode>["unitRoles"][0], "permissions">) =>
-  role.permissions != null && role.permissions.length > 0;
+function hasPerm(role: Pick<NonNullable<UserNode>["unitRoles"][0], "permissions">): boolean {
+  return role.permissions != null && role.permissions.length > 0;
+}
 
 /// Returns true if the user has any kind of access to the system
 export function hasAnyPermission(user: UserNode): boolean {
