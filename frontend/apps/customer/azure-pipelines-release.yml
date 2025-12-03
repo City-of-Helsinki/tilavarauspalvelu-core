@@ -37,4 +37,4 @@ pool: Default
 
 extends:
   # Filename for pipeline to extend from the Azure DevOps Repository.
-  template: ui-build-release.yml@tilavarauspalvelu-pipelines
+  template: customer-ui-build-release.yml@tilavarauspalvelu-pipelines
