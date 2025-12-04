@@ -21,8 +21,8 @@ pytestmark = [
 @dataclasses.dataclass
 class SearchableData:
     name: str = "-"
-    name_en: str = "-"
-    name_sv: str = "-"
+    name_en: str | None = "-"
+    name_sv: str | None = "-"
     description: str = "-"
     description_en: str = "-"
     description_sv: str = "-"
@@ -78,9 +78,19 @@ class Params(NamedTuple):
         ),
         "dont match different language name": Params(
             text_search="foo",
-            reservation_unit_data=SearchableData(name="foo"),
+            reservation_unit_data=SearchableData(name="foo", name_sv="bar"),
             language="sv",
             has_results=False,
+        ),
+        "match different language name if missing none": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(name="foo", name_sv=None),
+            language="sv",
+        ),
+        "match different language name if missing empty": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(name="foo", name_sv=""),
+            language="sv",
         ),
         "match name prefix": Params(
             text_search="post",
@@ -124,6 +134,17 @@ class Params(NamedTuple):
         "match unit name sv": Params(
             text_search="foo",
             reservation_unit_data=SearchableData(unit__name_sv="foo"),
+            language="sv",
+        ),
+        "dont match unit different language name": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(unit__name="foo", unit__name_sv="bar"),
+            language="sv",
+            has_results=False,
+        ),
+        "match unit different language name if missing": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(unit__name="foo", unit__name_sv=""),
             language="sv",
         ),
         "match reservation unit type name fi": Params(

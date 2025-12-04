@@ -13,7 +13,7 @@ from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType
 from tilavarauspalvelu.models._base import ModelManager, TranslatedModelQuerySet
 from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
 from utils.date_utils import local_date
-from utils.db import ArrayUnnest, Now, SubqueryArray
+from utils.db import ArrayUnnest, CoalesceEmpty, Now, SubqueryArray
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -31,6 +31,10 @@ __all__ = [
 
 
 type ReservationUnitPK = int
+
+
+def _get_vector_translation_fallback(obj: models.Model, lang: str) -> str:
+    return getattr(obj, f"name_{lang}", "") or getattr(obj, "name_fi", "")
 
 
 class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
@@ -187,8 +191,18 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
                     f"search_vector_{lang}",
                     SearchVector(
                         models.F("pk"),
-                        models.F(f"name_{lang}"),
-                        models.F(f"description_{lang}"),
+                        #
+                        # Use translated fields with fallback to Finnish if empty
+                        CoalesceEmpty(
+                            models.F(f"name_{lang}"),
+                            models.F("name_fi"),
+                            output_field=models.CharField(),
+                        ),
+                        CoalesceEmpty(
+                            models.F(f"description_{lang}"),
+                            models.F("description_fi"),
+                            output_field=models.CharField(),
+                        ),
                         #
                         # Additional search terms
                         models.Value(
@@ -202,18 +216,18 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
                         #
                         # Joins are not allowed in search vectors, so we compute them as values beforehand.
                         models.Value(
-                            getattr(reservation_unit.unit, f"name_{lang}", "") or "",
+                            _get_vector_translation_fallback(reservation_unit.unit, lang),
                             output_field=models.CharField(),
                         ),
                         models.Value(
-                            getattr(reservation_unit.reservation_unit_type, f"name_{lang}", "") or "",
+                            _get_vector_translation_fallback(reservation_unit.reservation_unit_type, lang),
                             output_field=models.CharField(),
                         ),
                         models.Value(
                             " ".join(
                                 name
                                 for inst in reservation_unit.spaces.all()
-                                if (name := getattr(inst, f"name_{lang}", ""))
+                                if (name := _get_vector_translation_fallback(inst, lang))
                             ),
                             output_field=models.CharField(),
                         ),
@@ -221,7 +235,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
                             " ".join(
                                 name
                                 for inst in reservation_unit.resources.all()
-                                if (name := getattr(inst, f"name_{lang}", ""))
+                                if (name := _get_vector_translation_fallback(inst, lang))
                             ),
                             output_field=models.CharField(),
                         ),
@@ -229,7 +243,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
                             " ".join(
                                 name
                                 for inst in reservation_unit.intended_uses.all()
-                                if (name := getattr(inst, f"name_{lang}", ""))
+                                if (name := _get_vector_translation_fallback(inst, lang))
                             ),
                             output_field=models.CharField(),
                         ),
@@ -237,7 +251,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
                             " ".join(
                                 name
                                 for inst in reservation_unit.equipments.all()
-                                if (name := getattr(inst, f"name_{lang}", ""))
+                                if (name := _get_vector_translation_fallback(inst, lang))
                             ),
                             output_field=models.CharField(),
                         ),
