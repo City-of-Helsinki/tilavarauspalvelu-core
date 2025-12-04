@@ -255,7 +255,6 @@ class ReservationNode(DjangoNode):
                 if field
                 in {
                     # STAFF FIELDS
-                    "type",
                     "handling_details",
                     "working_memo",
                     "handled_at",
