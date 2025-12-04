@@ -961,10 +961,6 @@ msgid "Search by username, email, first name or last name"
 msgstr "Etsi käyttäjänimellä, sähköpostilla, etu- tai sukunimellä"
 
 #: tilavarauspalvelu/admin/log_entry/admin.py
-msgid "Actor"
-msgstr "Toimija"
-
-#: tilavarauspalvelu/admin/log_entry/admin.py
 msgid "Changes"
 msgstr "Muutokset"
 

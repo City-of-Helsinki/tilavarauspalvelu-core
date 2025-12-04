@@ -1,16 +1,14 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from auditlog.admin import LogEntryAdmin as OriginalLogEntryAdmin
 from auditlog.filters import ResourceTypeFilter
 from auditlog.models import LogEntry
 from dateutil.relativedelta import relativedelta
 from django.contrib import admin
-from django.contrib.admin import SimpleListFilter
-from django.db.models import CharField, Value
-from django.db.models.functions import Concat, Trim
 from django.utils.translation import gettext_lazy as _
+from more_admin_filters import MultiSelectRelatedDropdownFilter, MultiSelectRelatedOnlyFilter
 from rangefilter.filters import DateRangeFilterBuilder
 
 from utils.date_utils import local_datetime
@@ -18,36 +16,13 @@ from utils.date_utils import local_datetime
 if TYPE_CHECKING:
     from django.db import models
 
-    from tilavarauspalvelu.typing import WSGIRequest
 
 admin.site.unregister(LogEntry)
 
 
-class ActorFilter(SimpleListFilter):
-    title = _("Actor")
-    parameter_name = "actor"
-
-    def lookups(self, request: WSGIRequest, model_admin: LogEntryAdmin) -> list[tuple[int, str]]:
-        qs = model_admin.get_queryset(request)
-        types = qs.annotate(
-            actor_full_name=Trim(
-                Concat(
-                    "actor__first_name",
-                    Value(" "),
-                    "actor__last_name",
-                    Value(" ("),
-                    "actor__email",
-                    Value(")"),
-                    output_field=CharField(),
-                )
-            )
-        ).values_list("actor__id", "actor_full_name")
-        return list(types.order_by("actor__id").distinct())
-
-    def queryset(self, request: WSGIRequest, queryset: models.QuerySet[LogEntry]) -> models.QuerySet[LogEntry]:
-        if self.value() is None:
-            return queryset
-        return queryset.filter(actor=self.value())
+class ActorFilter(MultiSelectRelatedDropdownFilter, MultiSelectRelatedOnlyFilter):
+    def field_admin_ordering(self, *args: Any, **kwargs: Any) -> list[str]:
+        return ["last_name", "first_name", "email"]
 
 
 @admin.register(LogEntry)
@@ -80,8 +55,8 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
             ),
         ),
         "action",
-        ActorFilter,
         ResourceTypeFilter,
+        ("actor", ActorFilter),
     ]
     readonly_fields = [
         "created",
