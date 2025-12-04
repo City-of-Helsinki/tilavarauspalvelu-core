@@ -927,10 +927,6 @@ msgid "Search by username, email, first name or last name"
 msgstr ""
 
 #: tilavarauspalvelu/admin/log_entry/admin.py
-msgid "Actor"
-msgstr ""
-
-#: tilavarauspalvelu/admin/log_entry/admin.py
 msgid "Changes"
 msgstr ""
 
