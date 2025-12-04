@@ -9,7 +9,8 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.db import migrations, models
-from django.db.models import Func
+from django.db.models import Func, Value
+from django.db.models.functions import Coalesce, NullIf
 from django.db.models.functions import Now as NowDB  # noqa: TID251
 from django.db.transaction import get_connection
 from lookup_property import State
@@ -178,6 +179,19 @@ class ArrayUnnest(models.Func):
 
     function = "UNNEST"
     arity = 1
+
+
+class CoalesceEmpty(Coalesce):
+    """
+    A custom Coalesce function that treats Empty Strings ("") as NULLs.
+    Usage: CoalesceEmpty("name_en", "name_fi", Value("Fallback"))
+    """
+
+    def __init__(self, *expressions: Any, **extra: Any) -> None:
+        # Wrap every expression in NullIf(expression, "")
+        # This ensures that both NULL and "" are treated the same.
+        wrapped_expressions = [NullIf(expr, Value("")) for expr in expressions]
+        super().__init__(*wrapped_expressions, **extra)
 
 
 class NowTT(Func):  # TT = Time Travel, as in "time travel tests"
