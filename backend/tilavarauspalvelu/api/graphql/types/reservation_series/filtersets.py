@@ -3,11 +3,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import django_filters
+from django.db import models
 from django.db.models import Q
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from tilavarauspalvelu.models import ReservationSeries, ReservationUnit, ReservationUnitType, Unit, User
+from utils.db import CoalesceEmpty
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -69,19 +71,21 @@ class ReservationSeriesFilterSet(ModelFilterSet):
         value: str,
     ) -> QuerySet[ReservationSeries]:
         language = name[-2:]
+
+        qs = qs.annotate(**{
+            f"reservation_unit_name_{language}_translated": CoalesceEmpty(
+                models.F(f"reservation_unit__name_{language}"),
+                models.F("reservation_unit__name_fi"),
+                output_field=models.CharField(),
+            )
+        })
+
+        q = Q()
         words = value.split(",")
-
-        query = Q()
         for word in words:
-            word = word.strip()  # noqa: PLW2901
-            if language == "en":
-                query |= Q(reservation_unit__name_en__istartswith=word)
-            elif language == "sv":
-                query |= Q(reservation_unit__name_sv__istartswith=word)
-            else:
-                query |= Q(reservation_unit__name_fi__istartswith=word)
+            q |= Q(**{f"reservation_unit_name_{language}_translated__istartswith": word.strip()})
 
-        return qs.filter(query).distinct()
+        return qs.filter(q).distinct()
 
     def get_unit(
         self,

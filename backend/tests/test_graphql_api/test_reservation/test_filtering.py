@@ -340,6 +340,22 @@ def test_reservation__filter__by_reservation_unit_name(graphql, field, search):
     assert response.node(0) == {"pk": reservation.pk}
 
 
+def test_reservation__filter__by_reservation_unit_name__translation_missing_use_fallback(graphql):
+    reservation = ReservationFactory.create(
+        reservation_unit__name_fi="koirankoppi",
+        reservation_unit__name_en="doghouse",
+        reservation_unit__name_sv="",
+    )
+
+    graphql.login_with_superuser()
+    query = reservations_query(reservation_unit_name_sv="koi")
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation.pk}
+
+
 @pytest.mark.parametrize(
     ("field", "search"),
     [
