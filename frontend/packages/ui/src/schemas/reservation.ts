@@ -166,8 +166,8 @@ const ReserveeInfoFormSchema = (params: SchemaParams) =>
       reserveeType: z.enum(ReserveeType, { error: "Required" }),
       description: z
         .string()
-        .refine((x) => x.length >= 3, { message: "Required" })
-        .transform(formatWhitespace),
+        .transform(formatWhitespace)
+        .refine((x) => x.length >= 3, { message: "Required" }),
       numPersons: z
         .number()
         .min(params.minPersons, "Too small")
