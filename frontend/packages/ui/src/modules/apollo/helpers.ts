@@ -401,6 +401,7 @@ function extractErrorCode(error: ApiError): string | string[] {
   }
   return [];
 }
+
 export function logGraphQLError(error: QueryErrorT, operation?: Operation): void {
   type SentryCtx = {
     level: "error";
@@ -493,7 +494,6 @@ export function logGraphQLQuery(
     ? documents.map(getOperationName).map((x) => x ?? "")
     : (getOperationName(documents) ?? "");
   const t = Math.round(timeMs);
-  // TODO should log if it's a mutation / query (though we probably aren't logging mutations)
   log.info(
     {
       timeMs: t,
