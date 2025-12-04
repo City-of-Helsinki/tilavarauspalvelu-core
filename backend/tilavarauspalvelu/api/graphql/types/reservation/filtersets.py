@@ -4,6 +4,7 @@ import re
 from typing import TYPE_CHECKING
 
 import django_filters
+from django.db import models
 from django.db.models import Q
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
@@ -11,7 +12,7 @@ from lookup_property import L
 
 from tilavarauspalvelu.enums import OrderStatusWithFree, ReservationStateChoice, ReservationTypeChoice, UserRoleChoice
 from tilavarauspalvelu.models import Reservation
-from utils.db import text_search
+from utils.db import CoalesceEmpty, text_search
 from utils.fields.filters import TimezoneAwareDateFilter
 from utils.utils import log_text_search
 
@@ -154,16 +155,18 @@ class ReservationFilterSet(ModelFilterSet):
     @staticmethod
     def filter_by_reservation_unit_name(qs: QuerySet, name: str, value: str) -> QuerySet:
         language = name[-2:]
-        words = value.split(",")
+        qs = qs.annotate(**{
+            f"reservation_unit_name_{language}_translated": CoalesceEmpty(
+                models.F(f"reservation_unit__name_{language}"),
+                models.F("reservation_unit__name_fi"),
+                output_field=models.CharField(),
+            )
+        })
+
         q = Q()
+        words = value.split(",")
         for word in words:
-            word = word.strip()  # noqa: PLW2901
-            if language == "en":
-                q |= Q(reservation_unit__name_en__istartswith=word)
-            elif language == "sv":
-                q |= Q(reservation_unit__name_sv__istartswith=word)
-            else:
-                q |= Q(reservation_unit__name_fi__istartswith=word)
+            q |= Q(**{f"reservation_unit_name_{language}_translated__istartswith": word.strip()})
 
         return qs.filter(q).distinct()
 
