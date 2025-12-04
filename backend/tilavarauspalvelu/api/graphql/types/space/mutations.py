@@ -43,3 +43,7 @@ class SpaceDeleteMutation(DeleteMutation):
         if in_active_round:
             msg = "Space occurs in active application round."
             raise ValidationError(msg)
+
+        if instance.reservation_units.exists():
+            msg = "Cannot delete space which has associated reservation units"
+            raise ValidationError(msg)

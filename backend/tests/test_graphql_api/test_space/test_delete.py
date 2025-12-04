@@ -5,7 +5,7 @@ import pytest
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import Space
 
-from tests.factories import ApplicationRoundFactory, SpaceFactory
+from tests.factories import ApplicationRoundFactory, ReservationUnitFactory, SpaceFactory
 
 from .helpers import DELETE_MUTATION
 
@@ -65,3 +65,15 @@ def test_space_not_deleted_because_in_active_application_round(graphql, status):
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == ["Space occurs in active application round."]
     assert Space.objects.filter(pk=pk).exists() is True
+
+
+def test_delete_space__delete__in_use(graphql):
+    space = SpaceFactory.create()
+    ReservationUnitFactory.create(spaces=[space])
+    graphql.login_with_superuser()
+
+    response = graphql(DELETE_MUTATION, input_data={"pk": space.pk})
+
+    assert response.has_errors is True
+
+    assert Space.objects.count() == 1

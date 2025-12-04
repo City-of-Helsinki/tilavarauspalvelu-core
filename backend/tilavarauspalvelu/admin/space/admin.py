@@ -64,3 +64,9 @@ class SpaceAdmin(TranslationAdmin, MPTTModelAdmin):
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
         return super().get_queryset(request).select_related("unit", "parent")
+
+    def has_delete_permission(self, request: WSGIRequest, obj: Space | None = None) -> bool:
+        if obj is not None and obj.reservation_units.exists():
+            return False
+
+        return super().has_delete_permission(request, obj=obj)
