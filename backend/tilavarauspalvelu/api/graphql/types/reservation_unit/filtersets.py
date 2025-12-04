@@ -25,6 +25,7 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.models import ReservationUnit
 from utils.db import build_search
+from utils.fields.filters import TranslatedCharFilter
 from utils.utils import get_text_search_language
 
 if TYPE_CHECKING:
@@ -109,9 +110,13 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
 
     application_round = IntMultipleChoiceFilter(field_name="application_rounds")
 
-    name_fi = django_filters.CharFilter(field_name="name_fi", lookup_expr="istartswith")
-    name_en = django_filters.CharFilter(field_name="name_en", lookup_expr="istartswith")
-    name_sv = django_filters.CharFilter(field_name="name_sv", lookup_expr="istartswith")
+    name_fi = TranslatedCharFilter(field_name="name_fi", lookup_expr="istartswith")
+    name_en = TranslatedCharFilter(field_name="name_en", lookup_expr="istartswith")
+    name_sv = TranslatedCharFilter(field_name="name_sv", lookup_expr="istartswith")
+
+    description_fi = TranslatedCharFilter(field_name="description_fi", lookup_expr="istartswith")
+    description_en = TranslatedCharFilter(field_name="description_en", lookup_expr="istartswith")
+    description_sv = TranslatedCharFilter(field_name="description_sv", lookup_expr="istartswith")
 
     surface_area_gte = IntChoiceFilter(field_name="surface_area", lookup_expr="gte")
     surface_area_lte = IntChoiceFilter(field_name="surface_area", lookup_expr="lte")
@@ -326,6 +331,10 @@ class ReservationUnitAllFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin)
     unit = IntMultipleChoiceFilter()
     only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
     only_with_manage_permission = django_filters.BooleanFilter(method="get_only_with_manage_permission")
+
+    name_fi = TranslatedCharFilter(field_name="name_fi", lookup_expr="istartswith")
+    name_en = TranslatedCharFilter(field_name="name_en", lookup_expr="istartswith")
+    name_sv = TranslatedCharFilter(field_name="name_sv", lookup_expr="istartswith")
 
     class Meta:
         model = ReservationUnit

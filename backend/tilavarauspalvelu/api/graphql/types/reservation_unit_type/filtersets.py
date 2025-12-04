@@ -6,6 +6,7 @@ from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from tilavarauspalvelu.models import ReservationUnitType
+from utils.fields.filters import TranslatedCharFilter
 
 if TYPE_CHECKING:
     from django.db import models
@@ -21,6 +22,9 @@ __all__ = [
 
 class ReservationUnitTypeFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
+    name_fi = TranslatedCharFilter(field_name="name_fi", lookup_expr="istartswith")
+    name_en = TranslatedCharFilter(field_name="name_en", lookup_expr="istartswith")
+    name_sv = TranslatedCharFilter(field_name="name_sv", lookup_expr="istartswith")
 
     class Meta:
         model = ReservationUnitType

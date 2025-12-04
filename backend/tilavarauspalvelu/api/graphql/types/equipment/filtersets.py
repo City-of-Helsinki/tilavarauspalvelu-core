@@ -11,6 +11,8 @@ __all__ = [
 
 from typing import TYPE_CHECKING
 
+from utils.fields.filters import TranslatedCharFilter
+
 if TYPE_CHECKING:
     from django.db import models
 
@@ -19,19 +21,20 @@ if TYPE_CHECKING:
 
 class EquipmentFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
+    name_fi = TranslatedCharFilter(field_name="name_fi", lookup_expr="istartswith")
+    name_en = TranslatedCharFilter(field_name="name_en", lookup_expr="istartswith")
+    name_sv = TranslatedCharFilter(field_name="name_sv", lookup_expr="istartswith")
     rank_gte = IntChoiceFilter(field_name="category__rank", lookup_expr="gte")
     rank_lte = IntChoiceFilter(field_name="category__rank", lookup_expr="lte")
 
     class Meta:
         model = Equipment
         fields = {
-            "name": ["exact", "icontains", "istartswith"],
             "name_fi": ["exact", "icontains", "istartswith"],
             "name_sv": ["exact", "icontains", "istartswith"],
             "name_en": ["exact", "icontains", "istartswith"],
         }
         order_by = [
-            "name",
             "name_fi",
             "name_en",
             "name_sv",
@@ -51,7 +54,6 @@ class EquipmentAllFilterSet(ModelFilterSet):
     class Meta:
         model = Equipment
         order_by = [
-            "name",
             "name_fi",
             "name_en",
             "name_sv",

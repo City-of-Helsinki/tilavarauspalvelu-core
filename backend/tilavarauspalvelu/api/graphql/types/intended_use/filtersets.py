@@ -11,6 +11,8 @@ __all__ = [
 
 from typing import TYPE_CHECKING
 
+from utils.fields.filters import TranslatedCharFilter
+
 if TYPE_CHECKING:
     from django.db import models
 
@@ -19,6 +21,9 @@ if TYPE_CHECKING:
 
 class IntendedUseFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
+    name_fi = TranslatedCharFilter(field_name="name_fi", lookup_expr="istartswith")
+    name_en = TranslatedCharFilter(field_name="name_en", lookup_expr="istartswith")
+    name_sv = TranslatedCharFilter(field_name="name_sv", lookup_expr="istartswith")
 
     class Meta:
         model = IntendedUse
