@@ -285,6 +285,7 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         reserveePhone
         reserveeType
         taxPercentageValue
+        type
         unitPrice
         user { email }
     """
@@ -318,5 +319,6 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
     assert response.node(0)["reserveePhone"] is not None, "field not found"
     assert response.node(0)["reserveeType"] is not None, "field not found"
     assert response.node(0)["taxPercentageValue"] is not None, "field not found"
+    assert response.node(0)["type"] is not None, "field not found"
     assert response.node(0)["unitPrice"] is not None, "field not found"
     assert response.node(0)["user"] is not None, "field not found"
