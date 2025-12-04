@@ -61,20 +61,11 @@ def graphql_view_with_csp_decorator(request: HttpRequest) -> HttpResponseBase:
     return FileUploadGraphQLView.as_view(graphiql=settings.DEBUG)(request)
 
 
-# Note: UNSAFE_INLINE is needed for inline styles added by `django-helusers` to `base_admin_site.html`
-@csp_replace({
-    "style-src": [SELF, UNSAFE_INLINE],
-})
-def login_view_with_csp_decorator(request: HttpRequest) -> HttpResponseBase:
-    return admin.site.login(request)
-
-
 # --- URL Patterns ---------------------------------------------------------------------------------------------------
 
 
 urlpatterns = [
     path("graphql/", graphql_view_with_csp_decorator),
-    path("admin/login/", login_view_with_csp_decorator),
     path("admin/", admin.site.urls),
     path("v1/reservation_calendar/<int:pk>/", reservation_ical, name="reservation_calendar"),
     path(
