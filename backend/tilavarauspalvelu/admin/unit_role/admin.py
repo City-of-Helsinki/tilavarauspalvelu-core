@@ -6,6 +6,7 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
+from tilavarauspalvelu.admin.unit_role.form import UnitRoleAdminForm
 from tilavarauspalvelu.models import UnitRole
 
 if TYPE_CHECKING:
@@ -50,6 +51,7 @@ class UnitRoleAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     ]
 
     # Form
+    form = UnitRoleAdminForm
     fields = [
         "is_role_active",
         "role",
