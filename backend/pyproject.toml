@@ -14,7 +14,7 @@ dynamic = ["dependencies"]  # Use tool.poetry for dependency management
 requires-poetry = ">=2.0"
 
 [tool.poetry.dependencies]
-Django = "5.2.8"
+Django = "5.2.9"
 django-auditlog = "3.3.0"
 django-cors-headers = "4.9.0"
 django-environment-config = { version = "0.2.3", extras = ["db"] }
