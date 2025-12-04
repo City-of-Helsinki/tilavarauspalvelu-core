@@ -39,6 +39,22 @@ def test_units__filter__by_name(graphql, gql_query):
 
 
 @pytest.mark.parametrize("gql_query", [units_query, units_all_query])
+def test_units__filter__by_name__translation_missing_fallback_to_fi(graphql, gql_query):
+    UnitFactory.create(name_fi="1111", name_sv="")
+    UnitFactory.create(name_fi="2222", name_sv="1111")
+    UnitFactory.create(name_fi="3333", name_en="1111")
+    graphql.login_with_superuser()
+    response = graphql(gql_query(nameSv="111"))
+
+    assert response.has_errors is False, response.errors
+
+    if gql_query == units_query:
+        assert len(response.edges) == 2
+    else:
+        assert len(response.first_query_object) == 2
+
+
+@pytest.mark.parametrize("gql_query", [units_query, units_all_query])
 def test_units__filter__by_unit_group(graphql, gql_query):
     unit_group = UnitGroupFactory.create()
     unit = UnitFactory.create(unit_groups=[unit_group])

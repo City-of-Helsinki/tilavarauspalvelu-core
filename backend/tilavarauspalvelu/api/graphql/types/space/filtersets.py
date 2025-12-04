@@ -14,12 +14,17 @@ __all__ = [
 
 from typing import TYPE_CHECKING
 
+from utils.fields.filters import TranslatedCharFilter
+
 if TYPE_CHECKING:
     from tilavarauspalvelu.models.space.queryset import SpaceQuerySet
 
 
 class SpaceFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
+    name_fi = TranslatedCharFilter(field_name="name_fi", lookup_expr="istartswith")
+    name_en = TranslatedCharFilter(field_name="name_en", lookup_expr="istartswith")
+    name_sv = TranslatedCharFilter(field_name="name_sv", lookup_expr="istartswith")
     only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
 
     class Meta:
