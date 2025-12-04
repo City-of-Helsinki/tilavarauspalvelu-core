@@ -95,9 +95,9 @@ export function isWindowVisible(): boolean {
 export function initialiseLogWrite() {
   // browser logger doesn't work on node (use a proper transport)
   if (typeof window !== "undefined") {
-    // @ts-expect-error -- FIXME (or this is fine)
+    // @ts-expect-error -- this is fine
     globalThis.ROARR = globalThis.ROARR ?? {};
-    // @ts-expect-error -- FIXME (or this is fine)
+    // @ts-expect-error -- this is fine
     globalThis.ROARR.write = (message: string) => {
       const res = LogMessageSchema.safeParse(JSON.parse(message));
       if (res.success) {

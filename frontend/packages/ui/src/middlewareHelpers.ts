@@ -61,8 +61,6 @@ export type GqlQuery = {
 /// custom function so we don't have to import apollo client in middleware
 export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: string): Promise<unknown> {
   const { cookies, headers } = req;
-  // TODO this is copy to the createApolloClient function but different header types
-  // NextRequest vs. RequestInit
   const newHeaders = new Headers({
     ...headers,
     "Content-Type": "application/json",
@@ -71,7 +69,6 @@ export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: s
   const sessionid = cookies.get("sessionid");
   const csrfToken = cookies.get("csrftoken");
 
-  // TODO throw instead
   if (csrfToken == null) {
     return new Response("missing csrf token", {
       status: 400,
@@ -100,7 +97,7 @@ export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: s
       method: "POST",
       url: buildGraphQLUrl(apiUrl),
       headers: newHeaders,
-      // @ts-expect-error -- something broken in node types, body can be a string
+      // @ts-expect-error -- types are broken because we use nextjs edge fetch not nodejs fetch
       body,
     });
 
