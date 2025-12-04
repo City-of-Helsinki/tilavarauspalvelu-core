@@ -6,7 +6,7 @@ import zoneinfo
 from pathlib import Path
 
 import dj_database_url
-from csp.constants import NONE, SELF
+from csp.constants import NONE, SELF, UNSAFE_INLINE
 from django.http import response as http_response
 from django.utils.translation import gettext_lazy as _
 from env_config import Environment, values
@@ -147,10 +147,10 @@ class Common(Environment):
             "base-uri": [SELF],
             "form-action": [SELF],
             "default-src": [SELF],
-            "style-src": [SELF],
+            "style-src": [SELF, UNSAFE_INLINE],
             "font-src": [SELF, "data:"],
             "img-src": [SELF, "data:", "blob:"],
-            "script-src": [SELF, "blob:"],
+            "script-src": [SELF, UNSAFE_INLINE, "blob:", "https://ajax.googleapis.com;"],
             "object-src": [NONE],
             "frame-src": [NONE],
             "frame-ancestors": [NONE],
