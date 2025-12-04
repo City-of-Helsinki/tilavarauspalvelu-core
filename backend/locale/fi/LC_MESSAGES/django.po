@@ -91,10 +91,6 @@ msgstr "Lokimerkinnät"
 msgid "No log entries found."
 msgstr "Ei lokimerkintöjä."
 
-#: templates/auditlog/pagination.html
-msgid "entries"
-msgstr "kirjausta"
-
 #: templates/email/email_tester.html
 msgid "Email Template Testing"
 msgstr "Email-pohjan testaus"

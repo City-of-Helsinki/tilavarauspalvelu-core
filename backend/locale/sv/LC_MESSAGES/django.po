@@ -91,10 +91,6 @@ msgstr ""
 msgid "No log entries found."
 msgstr ""
 
-#: templates/auditlog/pagination.html
-msgid "entries"
-msgstr ""
-
 #: templates/email/email_tester.html
 msgid "Email Template Testing"
 msgstr ""
