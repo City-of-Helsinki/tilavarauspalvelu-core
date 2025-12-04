@@ -424,7 +424,7 @@ export function charCount(value: string, maxLength = 0) {
 
 export function formatWhitespace(value: string | null | undefined): string {
   if (!value) return "";
-  return value.trim().replaceAll(/\s{2,}/g, " ");
+  return value.replaceAll(/\s{2,}/g, " ").trim();
 }
 
 type AgeGroup = AgeGroupNode;

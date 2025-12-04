@@ -363,7 +363,7 @@ export const ApplicationPage3Schema = z
       });
     }
     if (val.applicantType === ReserveeType.Individual) {
-      if (formatWhitespace(val.additionalInformation).length <= 1)
+      if (formatWhitespace(val.additionalInformation).length === 0)
         ctx.addIssue({
           code: "custom",
           path: ["additionalInformation"],

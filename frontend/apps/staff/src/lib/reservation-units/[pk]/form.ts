@@ -79,16 +79,16 @@ const PricingFormSchema = z.object({
   isActivatedOnBegins: z.boolean(),
   materialPriceDescriptionFi: z
     .string()
-    .refine((x) => stripHtml(x).length <= 500, { message: "Too big. expected string to have <=500 characters" })
-    .transform(cleanHtmlWhitespace),
+    .transform(cleanHtmlWhitespace)
+    .refine((x) => stripHtml(x).length <= 500, { message: "Too big. expected string to have <=500 characters" }),
   materialPriceDescriptionEn: z
     .string()
-    .refine((x) => stripHtml(x).length <= 500, { message: "Too big. expected string to have <=500 characters" })
-    .transform(cleanHtmlWhitespace),
+    .transform(cleanHtmlWhitespace)
+    .refine((x) => stripHtml(x).length <= 500, { message: "Too big. expected string to have <=500 characters" }),
   materialPriceDescriptionSv: z
     .string()
-    .refine((x) => stripHtml(x).length <= 500, { message: "Too big. expected string to have <=500 characters" })
-    .transform(cleanHtmlWhitespace),
+    .transform(cleanHtmlWhitespace)
+    .refine((x) => stripHtml(x).length <= 500, { message: "Too big. expected string to have <=500 characters" }),
 });
 
 type PricingFormValues = z.infer<typeof PricingFormSchema>;
@@ -456,68 +456,68 @@ export const ReservationUnitEditSchema = z
     contactInformation: z.string().max(500, { message: "Too big. expected string to have <=500 characters" }),
     reservationPendingInstructionsFi: z
       .string()
-      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
-      .transform(cleanHtmlWhitespace),
+      .transform(cleanHtmlWhitespace)
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" }),
     reservationPendingInstructionsEn: z
       .string()
-      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
-      .transform(cleanHtmlWhitespace),
+      .transform(cleanHtmlWhitespace)
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" }),
     reservationPendingInstructionsSv: z
       .string()
-      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
-      .transform(cleanHtmlWhitespace),
+      .transform(cleanHtmlWhitespace)
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" }),
     reservationConfirmedInstructionsEn: z
       .string()
-      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
-      .transform(cleanHtmlWhitespace),
+      .transform(cleanHtmlWhitespace)
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" }),
     reservationConfirmedInstructionsFi: z
       .string()
-      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
-      .transform(cleanHtmlWhitespace),
+      .transform(cleanHtmlWhitespace)
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" }),
     reservationConfirmedInstructionsSv: z
       .string()
-      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
-      .transform(cleanHtmlWhitespace),
+      .transform(cleanHtmlWhitespace)
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" }),
     reservationCancelledInstructionsFi: z
       .string()
-      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
-      .transform(cleanHtmlWhitespace),
+      .transform(cleanHtmlWhitespace)
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" }),
     reservationCancelledInstructionsEn: z
       .string()
-      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
-      .transform(cleanHtmlWhitespace),
+      .transform(cleanHtmlWhitespace)
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" }),
     reservationCancelledInstructionsSv: z
       .string()
-      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
-      .transform(cleanHtmlWhitespace),
+      .transform(cleanHtmlWhitespace)
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" }),
     descriptionFi: z
       .string()
-      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
-      .transform(cleanHtmlWhitespace),
+      .transform(cleanHtmlWhitespace)
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" }),
     descriptionEn: z
       .string()
-      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
-      .transform(cleanHtmlWhitespace),
+      .transform(cleanHtmlWhitespace)
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" }),
     descriptionSv: z
       .string()
-      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" })
-      .transform(cleanHtmlWhitespace),
+      .transform(cleanHtmlWhitespace)
+      .refine((x) => stripHtml(x).length <= 4000, { message: "Too big. expected string to have <=4000 characters" }),
     nameFi: z.string().min(1, { message: "Required" }).max(80),
     nameEn: z.string().max(80),
     nameSv: z.string().max(80),
     // backend allows nulls but not empty strings, these are not required though
     notesWhenApplyingFi: z
       .string()
-      .refine((x) => stripHtml(x).length <= 2000, { message: "Too big. expected string to have <=2000 characters" })
-      .transform(cleanHtmlWhitespace),
+      .transform(cleanHtmlWhitespace)
+      .refine((x) => stripHtml(x).length <= 2000, { message: "Too big. expected string to have <=2000 characters" }),
     notesWhenApplyingEn: z
       .string()
-      .refine((x) => stripHtml(x).length <= 2000, { message: "Too big. expected string to have <=2000 characters" })
-      .transform(cleanHtmlWhitespace),
+      .transform(cleanHtmlWhitespace)
+      .refine((x) => stripHtml(x).length <= 2000, { message: "Too big. expected string to have <=2000 characters" }),
     notesWhenApplyingSv: z
       .string()
-      .refine((x) => stripHtml(x).length <= 2000, { message: "Too big. expected string to have <=2000 characters" })
-      .transform(cleanHtmlWhitespace),
+      .transform(cleanHtmlWhitespace)
+      .refine((x) => stripHtml(x).length <= 2000, { message: "Too big. expected string to have <=2000 characters" }),
     spaces: z.array(z.number()),
     resources: z.array(z.number()),
     equipments: z.array(z.number()),
