@@ -56,45 +56,39 @@ def register_lazy[TOpt: type[TranslationOptions]](model: type[models.Model]) -> 
     return register(model)
 
 
-@register_lazy(TermsOfUse)
-class TermsOfUseTranslationOptions(TranslationOptions):
-    fields = ["name", "text"]
+@register_lazy(ApplicationRound)
+class ApplicationRoundTranslationOptions(TranslationOptions):
+    fields = ["name", "criteria", "notes_when_applying"]
 
 
-@register_lazy(Resource)
-class ResourceTranslationOptions(TranslationOptions):
+@register_lazy(BannerNotification)
+class BannerNotificationTranslationOptions(TranslationOptions):
+    fields = ["message"]
+
+
+@register_lazy(Equipment)
+class EquipmentTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-@register_lazy(Space)
-class SpaceTranslationOptions(TranslationOptions):
+@register_lazy(EquipmentCategory)
+class EquipmentCategoryTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-@register_lazy(UnitGroup)
-class UnitGroupTranslationOptions(TranslationOptions):
-    fields = ["name"]
-
-
-@register_lazy(Unit)
-class UnitTranslationOptions(TranslationOptions):
-    fields = [
-        "name",
-        "description",
-        "short_description",
-        "address_street",
-        "address_city",
-    ]
-
-
-@register_lazy(ReservationPurpose)
-class ReservationPurposeTranslationOptions(TranslationOptions):
+@register_lazy(IntendedUse)
+class IntendedUseTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
 @register_lazy(ReservationDenyReason)
 class ReservationDenyReasonTranslationOptions(TranslationOptions):
     fields = ["reason"]
+
+
+@register_lazy(ReservationPurpose)
+class ReservationPurposeTranslationOptions(TranslationOptions):
+    fields = ["name"]
 
 
 @register_lazy(ReservationUnit)
@@ -109,44 +103,50 @@ class ReservationUnitTranslationOptions(TranslationOptions):
     ]
 
 
-@register_lazy(ReservationUnitType)
-class ReservationUnitTypeTranslationOptions(TranslationOptions):
-    fields = ["name"]
-
-
-@register_lazy(IntendedUse)
-class IntendedUseTranslationOptions(TranslationOptions):
-    fields = ["name"]
-
-
-@register_lazy(Equipment)
-class EquipmentTranslationOptions(TranslationOptions):
-    fields = ["name"]
-
-
-@register_lazy(EquipmentCategory)
-class EquipmentCategoryTranslationOptions(TranslationOptions):
-    fields = ["name"]
-
-
 @register_lazy(ReservationUnitCancellationRule)
 class ReservationUnitCancellationRuleTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-@register_lazy(ApplicationRound)
-class ApplicationRoundTranslationOptions(TranslationOptions):
-    fields = ["name", "criteria", "notes_when_applying"]
-
-
-@register_lazy(BannerNotification)
-class BannerNotificationTranslationOptions(TranslationOptions):
-    fields = ["message"]
+@register_lazy(ReservationUnitType)
+class ReservationUnitTypeTranslationOptions(TranslationOptions):
+    fields = ["name"]
 
 
 @register_lazy(ReservationUnitPricing)
 class ReservationUnitPricingTranslationOptions(TranslationOptions):
     fields = ["material_price_description"]
+
+
+@register_lazy(Resource)
+class ResourceTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register_lazy(Space)
+class SpaceTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register_lazy(TermsOfUse)
+class TermsOfUseTranslationOptions(TranslationOptions):
+    fields = ["name", "text"]
+
+
+@register_lazy(Unit)
+class UnitTranslationOptions(TranslationOptions):
+    fields = [
+        "name",
+        "description",
+        "short_description",
+        "address_street",
+        "address_city",
+    ]
+
+
+@register_lazy(UnitGroup)
+class UnitGroupTranslationOptions(TranslationOptions):
+    fields = ["name"]
 
 
 def get_translated[**P, R](func: Callable[P, R]) -> Callable[P, R]:
