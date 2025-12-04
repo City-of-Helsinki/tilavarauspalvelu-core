@@ -36,7 +36,8 @@ const CurrentUserSchema = z.object({
   pk: z.number(),
 });
 const ReservationSchema = z.object({
-  type: z.enum(ReservationTypeChoice),
+  // has to be nullable because permissions issues (backend removes type if user has no elevated permissions)
+  type: z.enum(ReservationTypeChoice).nullable(),
   state: z.enum(ReservationStateChoice),
   user: CurrentUserSchema,
   reservationUnit: z.object({
