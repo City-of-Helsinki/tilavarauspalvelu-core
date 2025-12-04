@@ -2,7 +2,7 @@ import { startOfDay } from "date-fns";
 import { z } from "zod";
 import { CELL_STATES } from "ui/src/components/ApplicationTimeSelector";
 import { parseUIDate, timeToMinutes, formatApiDate, formatDate } from "ui/src/modules/date-utils";
-import { filterNonNullable } from "ui/src/modules/helpers";
+import { filterNonNullable, formatWhitespace } from "ui/src/modules/helpers";
 import type { ReadonlyDeep } from "ui/src/modules/helpers";
 import { checkValidDateOnly, emailField, lessThanMaybeDate } from "ui/src/schemas/schemaCommon";
 import { MunicipalityChoice, Priority, ReserveeType, Weekday } from "@gql/gql-types";
@@ -338,7 +338,7 @@ export const ApplicationPage3Schema = z
     hasBillingAddress: z.boolean(),
     // not submitted
     isRegisteredAssociation: z.boolean(),
-    additionalInformation: z.string().min(1, { error: "Required" }).max(255).optional(),
+    additionalInformation: z.string().transform(formatWhitespace).optional(),
     // municipality is only for Organisations
     municipality: z.enum([MunicipalityChoice.Helsinki, MunicipalityChoice.Other]).optional(),
   })
@@ -361,6 +361,20 @@ export const ApplicationPage3Schema = z
         path: ["municipality"],
         message: "Required",
       });
+    }
+    if (val.applicantType === ReserveeType.Individual) {
+      if (formatWhitespace(val.additionalInformation).length <= 1)
+        ctx.addIssue({
+          code: "custom",
+          path: ["additionalInformation"],
+          message: "Required",
+        });
+      if (formatWhitespace(val.additionalInformation).length >= 255)
+        ctx.addIssue({
+          code: "custom",
+          path: ["additionalInformation"],
+          message: "Too big. expected string to have <=255 characters",
+        });
     }
   });
 
