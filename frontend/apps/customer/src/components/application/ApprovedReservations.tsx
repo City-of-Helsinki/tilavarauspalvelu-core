@@ -37,6 +37,7 @@ import {
   formatDate,
   formatDateRange,
   setMondayFirst,
+  setSundayFirst,
 } from "ui/src/modules/date-utils";
 import {
   filterNonNullable,
@@ -989,7 +990,7 @@ function sectionToReservationUnits(t: TFunction, section: ApplicationSectionT): 
     return {
       reservationUnit,
       // NOTE our translations are sunday first
-      dateOfWeek: t(`weekDayLong.${setMondayFirst(day)}`),
+      dateOfWeek: t(`weekDayLong.${setSundayFirst(day)}`),
       time,
       accessType: reservationSeries.accessType,
       usedAccessTypes: filterNonNullable(reservationSeries.usedAccessTypes),
