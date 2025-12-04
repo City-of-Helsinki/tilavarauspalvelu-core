@@ -29,17 +29,19 @@ export const ApplicationSection = styled.section`
 `;
 
 export const ApplicationSectionHeader = styled.h2`
+  position: relative;
   display: flex;
   justify-content: space-between;
   width: calc(100% - 2 * var(--spacing-m));
-  height: 26px;
   margin: 0 var(--spacing-m);
   padding: var(--spacing-m) 0;
   border-bottom: var(--application-content-border);
   font-size: var(--fontsize-heading-s);
   [class*="statusLabel__"] {
-    position: relative;
-    transform: translateY(-4px);
+    position: absolute;
+    top: var(--spacing-m);
+    right: 0;
+    height: 26px;
     ${fontRegular};
   }
 `;
