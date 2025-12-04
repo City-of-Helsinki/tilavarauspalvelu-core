@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { formatWhitespace } from "@ui/modules/helpers";
 import type { ReservationStartInterval, ReservationUnitNode } from "../../gql/gql-types";
 import { MunicipalityChoice, ReservationFormType, ReservationTypeChoice, ReserveeType } from "../../gql/gql-types";
 import { getIntervalMinutes } from "../modules/conversion";
@@ -163,7 +164,10 @@ const ReserveeInfoFormSchema = (params: SchemaParams) =>
   z
     .object({
       reserveeType: z.enum(ReserveeType, { error: "Required" }),
-      description: z.string().min(3, "Required"),
+      description: z
+        .string()
+        .refine((x) => x.length >= 3, { message: "Required" })
+        .transform(formatWhitespace),
       numPersons: z
         .number()
         .min(params.minPersons, "Too small")

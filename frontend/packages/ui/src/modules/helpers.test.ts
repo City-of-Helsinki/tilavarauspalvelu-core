@@ -1,7 +1,14 @@
 import type { TFunction } from "i18next";
 import { describe, test, expect, it } from "vitest";
 import type { AgeGroupNode } from "../../gql/gql-types";
-import { formatApiTimeInterval, formatListToCSV, getTranslation, sortAgeGroups, stripHtml } from "./helpers";
+import {
+  formatWhitespace,
+  formatApiTimeInterval,
+  formatListToCSV,
+  getTranslation,
+  sortAgeGroups,
+  stripHtml,
+} from "./helpers";
 
 describe("formatApiTimeInterval", () => {
   test("should properly format api time interval", () => {
@@ -199,6 +206,18 @@ describe("stripHtml", () => {
 
   it("should decode entities and remove tags in one pass", () => {
     expect(stripHtml('<a href="test">Link &amp; text &lt;here&gt;</a>')).toBe("Link & text <here>");
+  });
+});
+
+describe("formatWhitespace", () => {
+  it("should trim the value and combine two or more spaces into a single one", () => {
+    expect(formatWhitespace("  test    case ")).toBe("test case");
+  });
+  it("should return an empty string if given undefined as the value", () => {
+    expect(formatWhitespace(undefined)).toBe("");
+  });
+  it("should return an empty string if given null as the value", () => {
+    expect(formatWhitespace(null)).toBe("");
   });
 });
 

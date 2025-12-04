@@ -18,7 +18,14 @@ import { BannerNotificationStatusLabel } from "ui/src/components/statuses";
 import { successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { parseUIDate, fromUIDateTime, formatDate, formatTime } from "ui/src/modules/date-utils";
-import { cleanHtmlContent, createNodeId, ignoreMaybeArray, stripHtml, toNumber } from "ui/src/modules/helpers";
+import {
+  cleanHtmlContent,
+  createNodeId,
+  formatWhitespace,
+  ignoreMaybeArray,
+  stripHtml,
+  toNumber,
+} from "ui/src/modules/helpers";
 import { checkValidDate, checkValidFutureDate, checkTimeStringFormat } from "ui/src/schemas/schemaCommon";
 import { CenterSpinner, Flex, TitleSection, H1 } from "ui/src/styled";
 import { ControlledTextInput } from "@ui/components/form/ControlledTextInput";
@@ -112,14 +119,14 @@ function checkStartIsBeforeEnd(
 function getHTMLMessageSchema(minLength: number, maxLength: number) {
   return z
     .string()
-    .max(1000, { message: `Message cannot be longer than ${maxLength} characters` })
-    .transform(cleanHtmlContent)
     .refine((x) => stripHtml(x).length >= minLength, {
       error: `Required`,
     })
     .refine((x) => stripHtml(x).length <= maxLength, {
       error: `Message cannot be longer than ${maxLength} characters`,
-    });
+    })
+    .transform(formatWhitespace)
+    .transform(cleanHtmlContent);
 }
 
 const NotificationFormSchema = z

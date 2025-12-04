@@ -354,23 +354,24 @@ export function getTranslation<K extends PossibleKeys, T extends string | null>(
 export function stripHtml(html: string): string {
   if (typeof window === "undefined") {
     // Server-side: use regex-based approach
-    return html
-      .replaceAll(/<[^>]*>/g, "") // Remove HTML tags
-      .replaceAll("&nbsp;", "\u00A0") // Decode non-breaking space
-      .replaceAll("&amp;", "&") // Decode ampersand
-      .replaceAll("&lt;", "<") // Decode less than
-      .replaceAll("&gt;", ">") // Decode greater than
-      .replaceAll("&quot;", '"') // Decode double quote
-      .replaceAll("&#39;", "'") // Decode single quote
-      .replaceAll("&apos;", "'") // Decode apostrophe
-      .replaceAll(/&#(\d+);/g, (_, dec) => String.fromCodePoint(Number(dec))) // Decode numeric entities
-      .replaceAll(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(Number.parseInt(hex, 16))) // Decode hex entities
-      .trim();
+    return formatWhitespace(
+      html
+        .replaceAll(/<[^>]*>/g, "") // Remove HTML tags
+        .replaceAll("&nbsp;", "\u00A0") // Decode non-breaking space
+        .replaceAll("&amp;", "&") // Decode ampersand
+        .replaceAll("&lt;", "<") // Decode less than
+        .replaceAll("&gt;", ">") // Decode greater than
+        .replaceAll("&quot;", '"') // Decode double quote
+        .replaceAll("&#39;", "'") // Decode single quote
+        .replaceAll("&apos;", "'") // Decode apostrophe
+        .replaceAll(/&#(\d+);/g, (_, dec) => String.fromCodePoint(Number(dec))) // Decode numeric entities
+        .replaceAll(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(Number.parseInt(hex, 16))) // Decode hex entities
+    );
   }
 
   // Client-side: use browser's built-in HTML parser
   const doc = new DOMParser().parseFromString(html, "text/html");
-  return doc.body.textContent?.trim() || "";
+  return formatWhitespace(doc.body.textContent) || "";
 }
 
 export const sanitizeConfig = {
@@ -412,6 +413,20 @@ export function cleanHtmlContent(html: string): string {
   return sanitizeHtml(html, sanitizeConfig);
 }
 
+export function charCount(value: string, maxLength = 0) {
+  const pureString = stripHtml(cleanHtmlContent(value));
+  const amount = pureString.length;
+  return {
+    amount,
+    tooLong: maxLength > 0 && length > maxLength,
+  };
+}
+
+export function formatWhitespace(value: string | null | undefined): string {
+  if (!value) return "";
+  return value.trim().replaceAll(/\s{2,}/g, " ");
+}
+
 type AgeGroup = AgeGroupNode;
 export function sortAgeGroups(ageGroups: ReadonlyArray<AgeGroup>): AgeGroup[] {
   return sort(ageGroups, (a, b) => {
@@ -425,13 +440,4 @@ export function sortAgeGroups(ageGroups: ReadonlyArray<AgeGroup>): AgeGroup[] {
     }
     return a.minimum - b.minimum;
   });
-}
-
-export function charCount(value: string, maxLength = 0) {
-  const pureString = stripHtml(cleanHtmlContent(value));
-  const amount = pureString.length;
-  return {
-    amount,
-    tooLong: maxLength > 0 && length > maxLength,
-  };
 }
