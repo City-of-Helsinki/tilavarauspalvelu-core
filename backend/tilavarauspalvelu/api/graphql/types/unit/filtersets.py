@@ -10,6 +10,7 @@ from graphene_django_extensions.filters import IntMultipleChoiceFilter
 from tilavarauspalvelu.enums import ReservationKind, UserRoleChoice
 from tilavarauspalvelu.models import Unit
 from utils.date_utils import local_datetime
+from utils.fields.filters import TranslatedCharFilter
 
 if TYPE_CHECKING:
     from django.db import models
@@ -136,9 +137,9 @@ class UnitFilterSet(ModelFilterSet, UnitFilterSetMixin):
     pk = IntMultipleChoiceFilter()
     unit_group = IntMultipleChoiceFilter(field_name="unit_groups")
 
-    name_fi = django_filters.CharFilter(field_name="name_fi", lookup_expr="istartswith")
-    name_en = django_filters.CharFilter(field_name="name_en", lookup_expr="istartswith")
-    name_sv = django_filters.CharFilter(field_name="name_sv", lookup_expr="istartswith")
+    name_fi = TranslatedCharFilter(field_name="name_fi", lookup_expr="istartswith")
+    name_en = TranslatedCharFilter(field_name="name_en", lookup_expr="istartswith")
+    name_sv = TranslatedCharFilter(field_name="name_sv", lookup_expr="istartswith")
 
     only_with_permission = django_filters.BooleanFilter(method="filter_by_only_with_permission")
 
@@ -201,9 +202,9 @@ class UnitAllFilterSet(ModelFilterSet, UnitFilterSetMixin):
     unit = IntMultipleChoiceFilter()
     unit_group = IntMultipleChoiceFilter(field_name="unit_groups")
 
-    name_fi = django_filters.CharFilter(field_name="name_fi", lookup_expr="istartswith")
-    name_en = django_filters.CharFilter(field_name="name_en", lookup_expr="istartswith")
-    name_sv = django_filters.CharFilter(field_name="name_sv", lookup_expr="istartswith")
+    name_fi = TranslatedCharFilter(field_name="name_fi", lookup_expr="istartswith")
+    name_en = TranslatedCharFilter(field_name="name_en", lookup_expr="istartswith")
+    name_sv = TranslatedCharFilter(field_name="name_sv", lookup_expr="istartswith")
 
     only_with_permission = django_filters.BooleanFilter(method="filter_by_only_with_permission")
 

@@ -9,6 +9,7 @@ from graphene_django_extensions.filters import IntChoiceFilter, IntMultipleChoic
 
 from tilavarauspalvelu.enums import UserRoleChoice
 from tilavarauspalvelu.models import UnitGroup
+from utils.fields.filters import TranslatedCharFilter
 
 if TYPE_CHECKING:
     from django.db import models
@@ -20,9 +21,9 @@ if TYPE_CHECKING:
 class UnitGroupFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
 
-    name_fi = django_filters.CharFilter(field_name="name_fi", lookup_expr="istartswith")
-    name_en = django_filters.CharFilter(field_name="name_en", lookup_expr="istartswith")
-    name_sv = django_filters.CharFilter(field_name="name_sv", lookup_expr="istartswith")
+    name_fi = TranslatedCharFilter(field_name="name_fi", lookup_expr="istartswith")
+    name_en = TranslatedCharFilter(field_name="name_en", lookup_expr="istartswith")
+    name_sv = TranslatedCharFilter(field_name="name_sv", lookup_expr="istartswith")
 
     only_with_permission = django_filters.BooleanFilter(method="filter_by_only_with_permission")
     application_round = IntChoiceFilter(
