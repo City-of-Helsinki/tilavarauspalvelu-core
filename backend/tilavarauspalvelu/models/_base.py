@@ -4,10 +4,11 @@ from typing import Any, Literal, Self
 
 from django.db import models
 from django.db.models import QuerySet
-from django.db.models.functions import Coalesce
 from django.db.models.manager import BaseManager
 from mptt.managers import TreeManager
 from mptt.querysets import TreeQuerySet
+
+from utils.db import CoalesceEmpty
 
 __all__ = [
     "ManyToManyRelatedManager",
@@ -32,7 +33,7 @@ class TranslatedModelQuerySet(QuerySet):
         """Order by field in the given language, falling back to Finnish if the field in the given language is empty."""
         return self.order_by(
             models.OrderBy(
-                Coalesce(models.F(f"{field}_{language}"), models.F(f"{field}_fi")),
+                CoalesceEmpty(models.F(f"{field}_{language}"), models.F(f"{field}_fi")),
                 descending=desc,
             )
         )
