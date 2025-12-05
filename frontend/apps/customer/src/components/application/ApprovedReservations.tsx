@@ -36,7 +36,6 @@ import {
   formatApiDate,
   formatDate,
   formatDateRange,
-  setMondayFirst,
   setSundayFirst,
 } from "ui/src/modules/date-utils";
 import {
@@ -255,7 +254,7 @@ function formatReservationTimes(t: TFunction, aes: ApplicationSectionReservation
     const { dayOfTheWeek } = ats;
     const day = convertWeekday(dayOfTheWeek);
     const time = formatApiTimeInterval(ats.reservationSeries);
-    const tday = t(`weekDay.${setMondayFirst(day)}`);
+    const tday = t(`weekDay.${setSundayFirst(day)}`);
     times.push({ day, label: `${tday} ${time}` });
   }
 
