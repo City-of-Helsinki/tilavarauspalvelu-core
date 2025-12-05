@@ -3644,7 +3644,7 @@ def create_users() -> None:
 
     # admin-test-data-set-4: Timo Nieminen (Django admin)
     User.objects.update_or_create(
-        username="Timo",
+        username="u-ztjwmkfnabdghga73muxgh7bua",
         defaults={
             "first_name": "Timo",
             "last_name": "Nieminen",
