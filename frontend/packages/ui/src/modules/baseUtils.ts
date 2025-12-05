@@ -9,9 +9,9 @@ export function getVersion(branch?: string, sha?: string) {
 }
 
 const isDev = process.env.NODE_ENV === "development";
+// no form-action directive because it breaks redirects on chrome
 export const CSP_HEADER = `
   base-uri 'self';
-  form-action 'self' ${isDev ? "*" : ""};
   default-src 'self';
   font-src 'self' data:
     makasiini.hel.ninja
