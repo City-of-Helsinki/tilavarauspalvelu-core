@@ -969,18 +969,23 @@ function sectionToReservationUnits(t: TFunction, section: ApplicationSectionT): 
     section.reservationUnitOptions
       .flatMap((ruo) => ruo.allocatedTimeSlots.map((ats) => ats))
       .map((ats) => {
-        const { reservationSeries: r, dayOfTheWeek } = ats;
-        if (r == null) {
+        const { reservationSeries: series, dayOfTheWeek } = ats;
+        // if the series has been moved after allocation dayOfTheWeek is incorrect
+        // series weekdays are only updated when the whole series is move (not when single reservation is moved)
+        // series created for applications don't have multiple weekdays attached to them (so taking only first is fine)
+        const d = series?.weekdays[0] ?? dayOfTheWeek;
+
+        if (series == null) {
           return null;
         }
-        const { reservationUnit } = r;
-        const day = convertWeekday(dayOfTheWeek);
+        const { reservationUnit } = series;
+        const day = convertWeekday(d);
         return {
           reservationUnit,
           // NOTE monday first for sorting
           day,
-          reservationSeries: r,
-          time: formatApiTimeInterval(r),
+          reservationSeries: series,
+          time: formatApiTimeInterval(series),
         };
       })
   );
