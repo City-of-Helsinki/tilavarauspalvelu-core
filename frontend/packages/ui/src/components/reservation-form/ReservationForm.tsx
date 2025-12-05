@@ -100,11 +100,11 @@ export function ReservationFormGeneralSection({
     });
   };
 
-  const hasPurpose = fields.some((x) => x === "purpose") != null;
-  const hasAgeGroup = fields.some((x) => x === "ageGroup") != null;
-  const hasName = fields.some((x) => x === "name") != null;
-  const hasDescription = fields.some((x) => x === "description") != null;
-  const hasNumPersons = fields.some((x) => x === "numPersons") != null;
+  const hasPurpose = fields.some((x) => x === "purpose");
+  const hasAgeGroup = fields.some((x) => x === "ageGroup");
+  const hasName = fields.some((x) => x === "name");
+  const hasDescription = fields.some((x) => x === "description");
+  const hasNumPersons = fields.some((x) => x === "numPersons");
 
   const numPersonRequired = isNumPersonsRequired(reservationUnit.reservationForm);
 
@@ -227,7 +227,7 @@ export function ReservationFormReserveeSection({
   const organisationOnlySet = new Set(["reserveeIdentifier", "reserveeOrganisationName"]);
   const organisationFields = fields.filter((x) => organisationOnlySet.has(x));
   const otherFields = fields.filter((x) => !organisationOnlySet.has(x));
-  const showMunicipality = otherFields.some((x) => x === "municipality") != null;
+  const showMunicipality = otherFields.some((x) => x === "municipality");
   // default to non orgs (e.g. if no reserveeType is selected)
   const isOrganisation = reserveeType === ReserveeType.Nonprofit || reserveeType === ReserveeType.Company;
 
