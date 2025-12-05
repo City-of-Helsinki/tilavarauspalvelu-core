@@ -135,7 +135,6 @@ class Common(Environment):
     CONTENT_SECURITY_POLICY = {
         "DIRECTIVES": {
             "base-uri": [SELF],
-            "form-action": [SELF],
             "default-src": [SELF],
             "style-src": [SELF, UNSAFE_INLINE],
             "font-src": [SELF, "data:", "https://makasiini.hel.ninja"],
