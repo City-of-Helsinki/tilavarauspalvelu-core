@@ -55,13 +55,29 @@ def test_equipment__order__by_category_rank(graphql):
     }
 
 
+def test_equipment__filter__by_name_use_fallback(graphql):
+    equipment_1 = EquipmentFactory.create(name_fi="1111", name_sv="")
+    equipment_2 = EquipmentFactory.create(name_fi="2222", name_sv="1111")
+    EquipmentFactory.create(name_fi="3333", name_en="1111")
+
+    graphql.login_with_superuser()
+    query = equipments_query(nameSv="111")
+    response = graphql(query)
+
+    assert response.has_errors is False
+    assert len(response.edges) == 2
+
+    assert response.node(0)["pk"] == equipment_1.pk
+    assert response.node(1)["pk"] == equipment_2.pk
+
+
 def test_equipment__filter__by_category_rank(graphql):
     equipment_1 = EquipmentFactory.create(name="1", category__rank=2)
     equipment_2 = EquipmentFactory.create(name="2", category__rank=1)
     EquipmentFactory.create(name="3", category__rank=3)
 
     graphql.login_with_superuser()
-    query = equipments_query(fields="nameFi category { nameFi }", rank_gte=1, rank_lte=2, order_by="nameAsc")
+    query = equipments_query(fields="nameFi category { nameFi }", rank_gte=1, rank_lte=2, order_by="nameFiAsc")
     response = graphql(query)
 
     assert response.has_errors is False

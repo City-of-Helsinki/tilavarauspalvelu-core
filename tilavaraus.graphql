@@ -210,9 +210,6 @@ type Query {
     offset: Int
     after: String
     before: String
-    name: String
-    name_Icontains: String
-    name_Istartswith: String
     nameFi: String
     nameFi_Icontains: String
     nameFi_Istartswith: String
@@ -840,9 +837,6 @@ type ReservationUnitNode implements Node {
     orderBy: [IntendedUseOrderingChoices]
   ): [IntendedUseNode!]!
   equipments(
-    name: String
-    name_Icontains: String
-    name_Istartswith: String
     nameFi: String
     nameFi_Icontains: String
     nameFi_Istartswith: String
@@ -1440,8 +1434,6 @@ type EquipmentCategoryNode implements Node {
 
 """Ordering fields for the 'Equipment' model."""
 enum EquipmentOrderingChoices {
-  nameAsc
-  nameDesc
   nameFiAsc
   nameFiDesc
   nameEnAsc

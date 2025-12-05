@@ -9,6 +9,7 @@ from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from tilavarauspalvelu.enums import UserRoleChoice
 from tilavarauspalvelu.models import Resource, Space
+from utils.fields.filters import TranslatedCharFilter
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models.resource.queryset import ResourceQuerySet
@@ -21,6 +22,9 @@ __all__ = [
 
 class ResourceFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
+    name_fi = TranslatedCharFilter(field_name="name_fi", lookup_expr="istartswith")
+    name_en = TranslatedCharFilter(field_name="name_en", lookup_expr="istartswith")
+    name_sv = TranslatedCharFilter(field_name="name_sv", lookup_expr="istartswith")
     only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
 
     class Meta:

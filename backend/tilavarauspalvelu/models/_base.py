@@ -4,10 +4,11 @@ from typing import Any, Literal, Self
 
 from django.db import models
 from django.db.models import QuerySet
-from django.db.models.functions import Coalesce
 from django.db.models.manager import BaseManager
 from mptt.managers import TreeManager
 from mptt.querysets import TreeQuerySet
+
+from utils.db import CoalesceEmpty
 
 __all__ = [
     "ManyToManyRelatedManager",
@@ -28,11 +29,29 @@ class ModelQuerySet(QuerySet):
 
 
 class TranslatedModelQuerySet(QuerySet):
+    def annotate_fallback_translation(self, *, field: str) -> Self:
+        """
+        Annotate a field in the given language, falling back to Finnish if the translation is empty.
+
+        Example:
+            qs = qs.annotate_fallback_translation(field="name_en")
+            qs[0].name_en_translated  # Will be "name_en" if not empty, otherwise "name_fi"
+        """
+        base_field_name = field[:-3]  # name_en -> name
+        language = field[-2:]  # name_en -> en
+        return self.annotate(**{
+            f"{field}_translated": CoalesceEmpty(
+                models.F(f"{base_field_name}_{language}"),
+                models.F(f"{base_field_name}_fi"),
+                output_field=models.CharField(),
+            )
+        })
+
     def order_by_translated(self, *, field: str, language: Literal["en", "sv"], desc: bool = False) -> Self:
         """Order by field in the given language, falling back to Finnish if the field in the given language is empty."""
         return self.order_by(
             models.OrderBy(
-                Coalesce(models.F(f"{field}_{language}"), models.F(f"{field}_fi")),
+                CoalesceEmpty(models.F(f"{field}_{language}"), models.F(f"{field}_fi")),
                 descending=desc,
             )
         )

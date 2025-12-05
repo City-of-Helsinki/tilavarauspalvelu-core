@@ -3,12 +3,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import django_filters
+from django_filters.constants import EMPTY_VALUES
 
 from utils.fields.forms import TextChoicesFormField, TextMultipleChoiceFormField, TimezoneAwareDateField
 
 if TYPE_CHECKING:
     from django.db import models
 
+    from tilavarauspalvelu.models._base import TranslatedModelQuerySet
 
 __all__ = [
     "TextChoiceFilter",
@@ -44,3 +46,17 @@ class TextMultipleChoiceFilter(TextChoiceFilterMixin, django_filters.TypedMultip
     """Same as above but supports multiple choices."""
 
     field_class = TextMultipleChoiceFormField
+
+
+class TranslatedCharFilter(django_filters.CharFilter):
+    """CharFilter that for translated fields, with a fallback to default language if needed."""
+
+    def filter(self, qs: TranslatedModelQuerySet, value: Any) -> models.QuerySet:
+        if value in EMPTY_VALUES:
+            return qs
+        if self.distinct:
+            qs = qs.distinct()
+
+        qs = qs.annotate_fallback_translation(field=self.field_name)
+        lookup = f"{self.field_name}_translated__{self.lookup_expr}"
+        return self.get_method(qs)(**{lookup: value})
