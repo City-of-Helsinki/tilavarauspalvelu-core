@@ -30,6 +30,7 @@ import { Sanitize } from "ui/src/components/Sanitize";
 import type { StatusLabelType } from "ui/src/components/StatusLabel";
 import { StatusLabel } from "ui/src/components/StatusLabel";
 import { breakpoints } from "ui/src/modules/const";
+import type { DayT } from "ui/src/modules/const";
 import { convertWeekday } from "ui/src/modules/conversion";
 import {
   applicationReservationDateTime,
@@ -240,6 +241,17 @@ function formatNumberOfReservations(t: TFunction, aes: ApplicationSectionReserva
   return `${count} ${t("application:view.reservationsTab.reservationCountPostfix")}`;
 }
 
+// if the series has been moved after allocation dayOfTheWeek is incorrect
+// series weekdays are only updated when the whole series is move (not when single reservation is moved)
+// series created for applications don't have multiple weekdays attached to them (so taking only first is fine)
+function getSeriesWeekday(
+  ats: ApplicationSectionReservationFragment["reservationUnitOptions"][0]["allocatedTimeSlots"][0]
+): DayT {
+  const { reservationSeries: series, dayOfTheWeek } = ats;
+  const d = series?.weekdays[0] ?? dayOfTheWeek;
+  return convertWeekday(d);
+}
+
 function formatReservationTimes(t: TFunction, aes: ApplicationSectionReservationFragment): string {
   const atsList = filterNonNullable(aes.reservationUnitOptions.flatMap((ruo) => ruo.allocatedTimeSlots.map((a) => a)));
   type TimeLabel = {
@@ -248,14 +260,14 @@ function formatReservationTimes(t: TFunction, aes: ApplicationSectionReservation
   };
   const times: TimeLabel[] = [];
   for (const ats of atsList) {
-    if (ats.reservationSeries == null) {
+    const { reservationSeries: series } = ats;
+    if (series == null) {
       continue;
     }
-    const { dayOfTheWeek } = ats;
-    const day = convertWeekday(dayOfTheWeek);
-    const time = formatApiTimeInterval(ats.reservationSeries);
-    const tday = t(`weekDay.${setSundayFirst(day)}`);
-    times.push({ day, label: `${tday} ${time}` });
+    const day = getSeriesWeekday(ats);
+    const time = formatApiTimeInterval(series);
+    const dayString = t(`weekDay.${setSundayFirst(day)}`);
+    times.push({ day, label: `${dayString} ${time}` });
   }
 
   times.sort((a, b) => a.day - b.day);
@@ -969,21 +981,15 @@ function sectionToReservationUnits(t: TFunction, section: ApplicationSectionT): 
     section.reservationUnitOptions
       .flatMap((ruo) => ruo.allocatedTimeSlots.map((ats) => ats))
       .map((ats) => {
-        const { reservationSeries: series, dayOfTheWeek } = ats;
-        // if the series has been moved after allocation dayOfTheWeek is incorrect
-        // series weekdays are only updated when the whole series is move (not when single reservation is moved)
-        // series created for applications don't have multiple weekdays attached to them (so taking only first is fine)
-        const d = series?.weekdays[0] ?? dayOfTheWeek;
-
+        const { reservationSeries: series } = ats;
         if (series == null) {
           return null;
         }
         const { reservationUnit } = series;
-        const day = convertWeekday(d);
         return {
           reservationUnit,
           // NOTE monday first for sorting
-          day,
+          day: getSeriesWeekday(ats),
           reservationSeries: series,
           time: formatApiTimeInterval(series),
         };
