@@ -518,7 +518,7 @@ export const ReservationUnitEditSchema = z
       .string()
       .transform(cleanHtmlWhitespace)
       .refine((x) => stripHtml(x).length <= 2000, { message: "Too big. expected string to have <=2000 characters" }),
-    spaces: z.array(z.number()),
+    spaces: z.array(z.number()).refine((x) => x.length > 0, { message: "Required" }),
     resources: z.array(z.number()),
     equipments: z.array(z.number()),
     intendedUses: z.array(z.number()),

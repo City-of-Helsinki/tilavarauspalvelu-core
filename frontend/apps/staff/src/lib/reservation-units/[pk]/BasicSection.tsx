@@ -113,6 +113,7 @@ export function BasicSection({
           error={getTranslatedError(t, errors.spaces?.message)}
           tooltip={t("reservationUnitEditor:tooltip.spaces")}
           enableSearch
+          clearable
         />
         <ControlledSelect
           control={control}
@@ -125,6 +126,7 @@ export function BasicSection({
           error={getTranslatedError(t, errors.resources?.message)}
           tooltip={t("reservationUnitEditor:tooltip.resources")}
           enableSearch
+          clearable
         />
         <CustomNumberInput name="surfaceArea" min={minSurfaceArea} max={undefined} form={form} required />
         <CustomNumberInput name="maxPersons" min={0} max={maxPersons} form={form} />
