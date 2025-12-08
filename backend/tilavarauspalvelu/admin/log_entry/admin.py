@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from auditlog.admin import LogEntryAdmin as OriginalLogEntryAdmin
 from auditlog.filters import ResourceTypeFilter
@@ -8,7 +8,6 @@ from auditlog.models import LogEntry
 from dateutil.relativedelta import relativedelta
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from more_admin_filters import MultiSelectRelatedDropdownFilter, MultiSelectRelatedOnlyFilter
 from rangefilter.filters import DateRangeFilterBuilder
 
 from utils.date_utils import local_datetime
@@ -18,11 +17,6 @@ if TYPE_CHECKING:
 
 
 admin.site.unregister(LogEntry)
-
-
-class ActorFilter(MultiSelectRelatedDropdownFilter, MultiSelectRelatedOnlyFilter):
-    def field_admin_ordering(self, *args: Any, **kwargs: Any) -> list[str]:
-        return ["last_name", "first_name", "email"]
 
 
 @admin.register(LogEntry)
@@ -56,7 +50,6 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
         ),
         "action",
         ResourceTypeFilter,
-        ("actor", ActorFilter),
     ]
     readonly_fields = [
         "created",
