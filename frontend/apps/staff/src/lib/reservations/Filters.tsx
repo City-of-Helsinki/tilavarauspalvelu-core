@@ -160,6 +160,7 @@ export function Filters({
           name="reservationUnitType"
           multiselect
           enableSearch
+          clearable
         />
         <ControlledRangeNumberFilter
           control={control}
