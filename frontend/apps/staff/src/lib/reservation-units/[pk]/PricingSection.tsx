@@ -373,7 +373,6 @@ export function PricingSection({
               name="pricingTerms"
               label={t("label.pricingTerms")}
               required
-              clearable
               options={pricingTermsOptions}
               error={getTranslatedError(t, errors.pricingTerms?.message)}
               tooltip={t("tooltip.pricingTerms")}
