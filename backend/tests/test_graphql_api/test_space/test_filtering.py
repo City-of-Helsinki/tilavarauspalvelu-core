@@ -12,7 +12,7 @@ pytestmark = [
 ]
 
 
-def test_regular_user__only_with_permissions(graphql):
+def test_space__filter__only_with_permissions__regular_user(graphql):
     # given:
     # - There are two spaces in the database
     # - A regular user is using the system
@@ -29,7 +29,7 @@ def test_regular_user__only_with_permissions(graphql):
     assert len(response.edges) == 0
 
 
-def test_general_admin__only_with_permissions(graphql):
+def test_space__filter__only_with_permissions__general_admin(graphql):
     # given:
     # - There are two spaces in the database
     # - A general admin is using the system
@@ -47,7 +47,7 @@ def test_general_admin__only_with_permissions(graphql):
     assert len(response.edges) == 2
 
 
-def test_unit_admin__only_with_permissions(graphql):
+def test_space__filter__only_with_permissions__unit_admin(graphql):
     # given:
     # - There are two spaces in the database
     # - A unit admin for one of the space's unit's is using the system

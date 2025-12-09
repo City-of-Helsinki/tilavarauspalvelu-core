@@ -22,8 +22,6 @@ def test_query_spaces__all_fields(graphql):
     fields = """
         pk
         nameFi
-        nameSv
-        nameEn
         surfaceArea
         maxPersons
         code
@@ -52,8 +50,6 @@ def test_query_spaces__all_fields(graphql):
     assert response.node(0) == {
         "pk": space.pk,
         "nameFi": space.name_fi,
-        "nameSv": space.name_sv,
-        "nameEn": space.name_en,
         "surfaceArea": space.surface_area,
         "maxPersons": space.max_persons,
         "code": space.code,

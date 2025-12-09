@@ -188,12 +188,6 @@ type Query {
     nameFi: String
     nameFi_Icontains: String
     nameFi_Istartswith: String
-    nameSv: String
-    nameSv_Icontains: String
-    nameSv_Istartswith: String
-    nameEn: String
-    nameEn_Icontains: String
-    nameEn_Istartswith: String
     pk: [Int]
     onlyWithPermission: Boolean
 
@@ -799,12 +793,6 @@ type ReservationUnitNode implements Node {
     nameFi: String
     nameFi_Icontains: String
     nameFi_Istartswith: String
-    nameSv: String
-    nameSv_Icontains: String
-    nameSv_Istartswith: String
-    nameEn: String
-    nameEn_Icontains: String
-    nameEn_Istartswith: String
     pk: [Int]
     onlyWithPermission: Boolean
 
@@ -1071,12 +1059,6 @@ type UnitNode implements Node {
     nameFi: String
     nameFi_Icontains: String
     nameFi_Istartswith: String
-    nameSv: String
-    nameSv_Icontains: String
-    nameSv_Istartswith: String
-    nameEn: String
-    nameEn_Icontains: String
-    nameEn_Istartswith: String
     pk: [Int]
     onlyWithPermission: Boolean
 
@@ -1206,12 +1188,6 @@ type SpaceNode implements Node {
     nameFi: String
     nameFi_Icontains: String
     nameFi_Istartswith: String
-    nameSv: String
-    nameSv_Icontains: String
-    nameSv_Istartswith: String
-    nameEn: String
-    nameEn_Icontains: String
-    nameEn_Istartswith: String
     pk: [Int]
     onlyWithPermission: Boolean
 
@@ -1252,6 +1228,8 @@ enum ResourceOrderingChoices {
 enum SpaceOrderingChoices {
   pkAsc
   pkDesc
+  nameFiAsc
+  nameFiDesc
 }
 
 type UnitGroupNode implements Node {
