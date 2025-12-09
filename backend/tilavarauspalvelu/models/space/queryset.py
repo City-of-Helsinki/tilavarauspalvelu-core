@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Self
 from django.db import models
 
 from tilavarauspalvelu.models import Space
-from tilavarauspalvelu.models._base import ModelTreeManager, ModelTreeQuerySet, TranslatedModelQuerySet
+from tilavarauspalvelu.models._base import ModelTreeManager, ModelTreeQuerySet
 from utils.db import SubqueryArray
 
 if TYPE_CHECKING:
@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 
-class SpaceQuerySet(ModelTreeQuerySet[Space], TranslatedModelQuerySet[Space]):
+class SpaceQuerySet(ModelTreeQuerySet[Space]):
     def all_space_ids_though_hierarchy(self) -> set[int]:
         """
         Get ids for all spaces that are accessible though the space hierarchy

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import django_filters
 from django.db import models
+from django_filters import CharFilter
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
@@ -14,28 +15,23 @@ __all__ = [
 
 from typing import TYPE_CHECKING
 
-from utils.fields.filters import TranslatedCharFilter
-
 if TYPE_CHECKING:
     from tilavarauspalvelu.models.space.queryset import SpaceQuerySet
 
 
 class SpaceFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
-    name_fi = TranslatedCharFilter(field_name="name_fi", lookup_expr="istartswith")
-    name_en = TranslatedCharFilter(field_name="name_en", lookup_expr="istartswith")
-    name_sv = TranslatedCharFilter(field_name="name_sv", lookup_expr="istartswith")
+    name_fi = CharFilter(field_name="name_fi", lookup_expr="istartswith")
     only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
 
     class Meta:
         model = Space
         fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
-            "name_sv": ["exact", "icontains", "istartswith"],
-            "name_en": ["exact", "icontains", "istartswith"],
         }
         order_by = [
             "pk",
+            "name_fi",
         ]
 
     def get_only_with_permission(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
