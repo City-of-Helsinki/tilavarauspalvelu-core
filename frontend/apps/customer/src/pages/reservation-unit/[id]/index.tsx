@@ -30,7 +30,6 @@ import {
 import { Flex, H4 } from "ui/src/styled";
 import { getApiErrors, logGraphQLQuery } from "@ui/modules/apollo/helpers";
 import type { ApiError } from "@ui/modules/apollo/helpers";
-import { logError } from "@ui/modules/errors";
 import { AddressSection } from "@/components/AddressSection";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { InfoDialog } from "@/components/InfoDialog";
@@ -283,10 +282,7 @@ function ReservationUnit({
   };
 
   // store reservation unit overall reservability to use in JSX and pass to some child elements
-  const { isReservable: reservationUnitIsReservable, reason } = isReservationUnitReservable(reservationUnit);
-  if (!reservationUnitIsReservable) {
-    logError(`not reservable because: ${reason}`, "warning");
-  }
+  const { isReservable: reservationUnitIsReservable } = isReservationUnitReservable(reservationUnit);
 
   const equipment = filterNonNullable(reservationUnit.equipments);
 
