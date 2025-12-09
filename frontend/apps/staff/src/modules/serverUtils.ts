@@ -18,7 +18,7 @@ export async function getCommonServerSideProps(): Promise<StaffEnvConfig> {
   const { env } = await import("@/env.mjs");
   return {
     apiBaseUrl: env.TILAVARAUS_API_URL ?? "",
-    feedbackUrl: env.EMAIL_VARAAMO_EXT_LINK ?? "",
+    feedbackUrl: env.FEEDBACK_URL ?? "",
     isConsoleLoggingEnabled: env.ENABLE_CONSOLE_LOGGING ?? false,
     reservationUnitPreviewUrl: env.RESERVATION_UNIT_PREVIEW_URL_PREFIX ?? "",
     sentryDsn: env.SENTRY_DSN ?? "",

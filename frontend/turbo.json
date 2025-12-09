@@ -5,7 +5,7 @@
       "env": [
         "SENTRY_*",
         "SKIP_ENV_VALIDATION",
-        "EMAIL_VARAAMO_EXT_LINK"
+        "FEEDBACK_URL"
       ],
       "dependsOn": [
         "^build"

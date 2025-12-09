@@ -5,10 +5,6 @@ import { env } from "../env.mjs";
 
 export function Error404(): JSX.Element {
   return (
-    <ErrorContainer
-      statusCode={404}
-      feedbackUrl={env.EMAIL_VARAAMO_EXT_LINK}
-      imgSrc={`${PUBLIC_URL}/images/404-error.png`}
-    />
+    <ErrorContainer statusCode={404} feedbackUrl={env.FEEDBACK_URL} imgSrc={`${PUBLIC_URL}/images/404-error.png`} />
   );
 }
