@@ -10,6 +10,7 @@ import { Roarr as log } from "roarr";
 import { getCookie } from "typescript-cookie";
 import { RESERVEE_PI_FIELDS } from "@ui/components/reservation-form/utils";
 import { toast } from "../../components/toast";
+import { CsrfTokenNotFound } from "../errors";
 import { getLocalizationLang, isBrowser } from "../helpers";
 import type { LocalizationLanguages } from "../urlBuilder";
 
@@ -363,7 +364,7 @@ export function enchancedFetch(req?: IncomingMessage) {
         throw new Error("request headers must be defined for server-side fetch");
       }
       if (csrfToken == null) {
-        throw new Error("csrftoken not found in cookies");
+        throw new CsrfTokenNotFound();
       }
       headers.append("Set-Cookie", `csrftoken=${csrfToken}`);
       headers.append("Cookie", `csrftoken=${csrfToken}`);
