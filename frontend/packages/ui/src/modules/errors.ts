@@ -30,6 +30,28 @@ export class GraphQLFetchError extends Error {
   }
 }
 
+export class CsrfTokenNotFound extends Error {
+  constructor(message: string = "") {
+    super(message);
+    this.name = "CSRF Token not found";
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, CsrfTokenNotFound);
+    }
+  }
+}
+
+export class NotBrowserError extends Error {
+  constructor(message: string = "") {
+    super(message);
+    this.name = "Not browser environment";
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, NotBrowserError);
+    }
+  }
+}
+
 export function logError(err: unknown, level: "warning" | "error" = "error") {
   if (err instanceof GraphQLFetchError) {
     const ctx_extra = {

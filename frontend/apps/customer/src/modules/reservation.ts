@@ -4,7 +4,7 @@ import type { TFunction } from "i18next";
 import { getIntervalMinutes } from "ui/src/modules/conversion";
 import { formatTime, parseUIDate, isValidDate, timeToMinutes, formatDate } from "ui/src/modules/date-utils";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { logError } from "@ui/modules/errors";
+import { logError, NotBrowserError } from "@ui/modules/errors";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { ReservationStateChoice, OrderStatus, ReservationCancelReasonChoice } from "@gql/gql-types";
 import type {
@@ -22,6 +22,7 @@ import type {
   ReservationPaymentUrlFragment,
   ReservationStartInterval,
 } from "@gql/gql-types";
+import { isBrowser } from "./const";
 import { isRangeReservable } from "./reservable";
 import type { ReservableMap, RoundPeriod } from "./reservable";
 
@@ -476,8 +477,8 @@ export function getPaymentUrl(
 /// Get the pending payment url for a reservation (handled reservations)
 /// browser only
 function getCheckoutRedirectUrl(pk: number, lang: LocalizationLanguages, apiBaseUrl: string): string {
-  if (window?.location == null) {
-    throw new Error("window.location is not available, cannot build redirect url");
+  if (!isBrowser) {
+    throw new NotBrowserError("getCheckoutRedirectUrlrequires window.location.origin");
   }
   const langPrefix = lang !== "fi" ? `/${lang}` : "";
   const errorUrl = new URL(`${langPrefix}/reservations/${pk}`, window.location.origin);

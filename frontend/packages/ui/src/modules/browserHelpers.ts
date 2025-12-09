@@ -1,15 +1,14 @@
 import { getCookie } from "typescript-cookie";
 import { z } from "zod";
+import { CsrfTokenNotFound, NotBrowserError } from "./errors";
 import { isBrowser } from "./helpers";
 import { getSignOutUrl, getSignInUrl } from "./urlBuilder";
 import type { LocalizationLanguages, UserTypeChoice } from "./urlBuilder";
 
-// TODO add wrapper a that blocks importing on nodejs
-
 /// NOTE have to cleanup because HDS components might be passing event here
 function cleanupUrlParam(url: unknown): string | undefined {
   if (typeof url === "string" && url.length > 0) {
-    return z.string().url().parse(url);
+    return z.url().safeParse(url).data ?? undefined;
   }
   return undefined;
 }
@@ -29,7 +28,7 @@ export function signIn({
   returnUrl?: unknown;
 }) {
   if (!isBrowser) {
-    throw new Error("signIn can only be called in the browser");
+    throw new NotBrowserError("singIn requires window.location.href");
   }
   const returnUrlParam = cleanupUrlParam(returnUrl);
   // encode otherwise backend will drop the query params
@@ -54,7 +53,7 @@ export const isTouchDevice = (): boolean => isBrowser && window?.matchMedia("(an
 /// @param appUrlBasePath - base path for the app (only required if next app is not in host root)
 export function signOut(apiBaseUrl: string, appUrlBasePath = "") {
   if (!isBrowser) {
-    throw new Error("signOut can only be called in the browser");
+    throw new NotBrowserError("singOut requires window.location.href");
   }
   const url = new URL(window.location.href);
   const logoutUrl = getSignOutUrl(apiBaseUrl);
@@ -64,7 +63,7 @@ export function signOut(apiBaseUrl: string, appUrlBasePath = "") {
   const returnUrlBase = `${removeTrailingSlash(origin)}${removeTrailingSlash(appUrlBasePath)}`;
   const returnUrl = `${returnUrlBase}${logoutPath}`;
   if (!csrfToken) {
-    throw new Error("csrf token not found");
+    throw new CsrfTokenNotFound();
   }
 
   // NOTE dynamically create a form and submit it so this function can be used anywhere
