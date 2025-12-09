@@ -31,7 +31,7 @@ jobs:
       NEXT_PUBLIC_BASE_URL: ${{ inputs.base-url }}
       # required because error pages use build time env vars, not runtime env vars
       # it's the same on every environment
-      EMAIL_VARAAMO_EXT_LINK: "https://lomake.hel.fi/varaamo-palaute"
+      FEEDBACK_URL: "https://lomake.hel.fi/varaamo-palaute"
       # TODO this should only be ran for release tags (v*, hotfix-*, release-*), but {{ github.event.release.tag_name }} is not correct during a run
       SENTRY_ENABLE_SOURCE_MAPS: true
       SENTRY_URL: "https://sentry.hel.fi"
@@ -115,7 +115,7 @@ jobs:
         build-args: |
           APP=${{ env.BUILD_APP }}
           NEXT_PUBLIC_BASE_URL=${{ env.NEXT_PUBLIC_BASE_URL }}
-          EMAIL_VARAAMO_EXT_LINK=${{ env.EMAIL_VARAAMO_EXT_LINK }}
+          FEEDBACK_URL=${{ env.FEEDBACK_URL }}
           NEXT_PUBLIC_SOURCE_VERSION=${{ github.sha }}
           NEXT_PUBLIC_SOURCE_BRANCH_NAME=${{ github.ref_name }}
           CI=true

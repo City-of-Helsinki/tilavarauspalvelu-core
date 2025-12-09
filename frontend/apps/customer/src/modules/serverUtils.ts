@@ -43,7 +43,7 @@ export function getCommonServerSideProps(): CustomerEnvConfig {
   const isHotjarEnabled = env.HOTJAR_ENABLED ?? false;
   const profileLink = env.PROFILE_UI_URL ?? "";
   const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
-  const feedbackUrl = env.EMAIL_VARAAMO_EXT_LINK ?? "";
+  const feedbackUrl = env.FEEDBACK_URL ?? "";
   const sentryDsn = env.SENTRY_DSN ?? "";
   const sentryEnvironment = env.SENTRY_ENVIRONMENT ?? "";
   const version = getVersion();

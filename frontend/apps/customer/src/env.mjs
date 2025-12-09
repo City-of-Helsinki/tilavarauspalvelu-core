@@ -9,7 +9,6 @@ const coerceBoolean = z
   .transform((value) => value == "true" || value == "1");
 
 const optionalUrl = z
-  .string()
   .url()
   .optional()
   .or(z.literal("").transform((_) => undefined));
@@ -17,6 +16,7 @@ const optionalUrl = z
 // Same as UI envs, Azure has prefix on the server variables
 const ServerSchema = z.object({
   ENABLE_CONSOLE_LOGGING: coerceBoolean,
+  FEEDBACK_URL: optionalUrl,
   // Uploading sourcemaps to Sentry requires an auth token - Required on CI
   SENTRY_AUTH_TOKEN: z.string().optional(),
   // Sentry DSN is used for error tracking - Required during runtime
@@ -29,8 +29,7 @@ const ServerSchema = z.object({
   PROFILE_UI_URL: optionalUrl,
   // mandatory because the SSR can't connect to the API without it
   // frontend SSR is running on a different host than the backend
-  TILAVARAUS_API_URL: z.string().url(),
-  EMAIL_VARAAMO_EXT_LINK: optionalUrl,
+  TILAVARAUS_API_URL: z.url(),
 });
 
 // NOTE if you add a new variable to client it will be fixed in the build
