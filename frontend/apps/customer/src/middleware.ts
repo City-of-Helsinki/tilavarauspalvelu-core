@@ -25,8 +25,8 @@ type User = {
 };
 type Data = {
   reservation: {
-    state: ReservationStateChoice | undefined | null;
-    type: ReservationTypeChoice | undefined | null;
+    state: ReservationStateChoice | null;
+    type: ReservationTypeChoice | null;
     resUnitPk: number | null;
   } | null;
   user: User;
@@ -36,9 +36,10 @@ const CurrentUserSchema = z.object({
   pk: z.number(),
 });
 const ReservationSchema = z.object({
-  type: z.enum(ReservationTypeChoice),
-  state: z.enum(ReservationStateChoice),
-  user: CurrentUserSchema,
+  // allow nulls for permission reasons (no permissions results in a null)
+  type: z.enum(ReservationTypeChoice).nullable(),
+  state: z.enum(ReservationStateChoice).nullable(),
+  user: CurrentUserSchema.nullable(),
   reservationUnit: z.object({
     pk: z.number(),
   }),
@@ -133,11 +134,11 @@ ${applicationId ? "$applicationId: ID!" : ""}
     return null;
   }
 
-  const userPkToCheck = res.reservation?.user.pk || res.application?.user.pk;
+  const userPkToCheck = res.reservation?.user?.pk || res.application?.user.pk;
   return {
     reservation: {
-      state: res.reservation?.state,
-      type: res.reservation?.type,
+      state: res.reservation?.state ?? null,
+      type: res.reservation?.type ?? null,
       resUnitPk: res.reservation?.reservationUnit.pk ?? null,
     },
     user: {
