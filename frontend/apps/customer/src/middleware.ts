@@ -273,7 +273,7 @@ export async function middleware(req: NextRequest) {
   if (csrfRedirectUrl) {
     // block infinite redirect loop (there is no graceful way to handle this)
     if (req.url.includes("redirect_to")) {
-      logError("Middleware: Infinite redirect loop detected");
+      logError(`Middleware: Infinite redirect loop detected at ${req.url}`);
       return NextResponse.next();
     }
     return NextResponse.redirect(csrfRedirectUrl);
@@ -289,7 +289,7 @@ export async function middleware(req: NextRequest) {
     if (pk > 0) {
       reservationPk = pk;
     } else if (id != null && id !== "") {
-      logError(`Middleware: Invalid reservation id: ${id}`);
+      logError(`Middleware: Invalid reservation id: ${id} of type ${typeof id} at path ${url.pathname}`, "warning");
     }
   }
   if (APPLICATION_ROUTES.some((route) => doesUrlMatch(req.url, route))) {
@@ -298,7 +298,7 @@ export async function middleware(req: NextRequest) {
     if (pk > 0) {
       applicationPk = pk;
     } else if (id == null && id !== "") {
-      logError(`Middleware: Invalid application id: ${id}`);
+      logError(`Middleware: Invalid application id: ${id} of type ${typeof id} at path ${url.pathname}`, "warning");
     }
   }
 
