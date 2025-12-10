@@ -10,7 +10,7 @@ from django.core.cache import cache
 from django.urls import reverse
 from freezegun import freeze_time
 
-from tilavarauspalvelu.management.commands.create_robot_test_data import create_robot_test_data, remove_existing_data
+from tilavarauspalvelu.management.commands.data_creation.create_robot_test_data import remove_existing_data
 from tilavarauspalvelu.models import (
     Application,
     ApplicationRound,
@@ -35,6 +35,7 @@ from tilavarauspalvelu.models import (
     UnitRole,
     User,
 )
+from tilavarauspalvelu.tasks import create_robot_test_data_task
 from utils.date_utils import local_datetime
 
 from tests.factories import (
@@ -174,7 +175,7 @@ def test_robot_test_data_create_view__lock(api_client, settings):
 @pytest.mark.slow
 @pytest.mark.django_db
 def test_create_robot_test_data():
-    create_robot_test_data()
+    create_robot_test_data_task.delay()
 
     assert Unit.objects.count() == 1
     assert UnitGroup.objects.count() == 1
@@ -212,7 +213,7 @@ def test_create_robot_test_data__remove_existing_data_between_runs():
     ApplicationFactory.create(application_round=kausi, user=user)
     other_application = ApplicationFactory.create(user=user)
 
-    create_robot_test_data()
+    create_robot_test_data_task.delay()
 
     assert Unit.objects.count() == 1 + 1  # +1 unit for 'other_reservation'
     assert ReservationUnit.objects.count() == 23 + 1  # +1 reservation unit for 'other_reservation'
@@ -235,7 +236,7 @@ def test_create_robot_test_data__remove_existing_data_between_runs():
 def test_create_robot_test_data__users_can_exist_before_run():
     UserFactory.create(username="u-5ubvcxgrxzdf5nj7y4sbjnvyeq")
 
-    create_robot_test_data()
+    create_robot_test_data_task.delay()
 
     assert User.objects.count() == 39
 
@@ -243,7 +244,7 @@ def test_create_robot_test_data__users_can_exist_before_run():
 @pytest.mark.slow
 @pytest.mark.django_db
 def test_remove_existing_data():
-    create_robot_test_data()
+    create_robot_test_data_task.delay()
     remove_existing_data()
 
     assert Unit.objects.count() == 0
@@ -275,6 +276,6 @@ def test_remove_existing_data():
 
 @contextmanager
 def mock_data_generation() -> Generator[NonCallableMock]:
-    path = "tilavarauspalvelu.api.rest.views.create_robot_test_data"
+    path = "tilavarauspalvelu.api.rest.views.create_robot_test_data_task.delay"
     with patch(path) as mock:
         yield mock

@@ -8,13 +8,12 @@ import os
 import uuid
 from contextlib import contextmanager
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Literal
 
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.gis.geos import Point
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist, ValidationError
-from django.core.management import BaseCommand
 from django.db import models, transaction
 from django.db.models import Subquery
 
@@ -73,17 +72,6 @@ from utils.date_utils import local_date, local_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Generator
-
-__all__ = [
-    "create_robot_test_data",
-]
-
-
-class Command(BaseCommand):
-    help = "Creates test data for robotframework tests."
-
-    def handle(self, *args: Any, **options: Any) -> None:
-        create_robot_test_data()
 
 
 @contextmanager
@@ -157,7 +145,7 @@ def remove_existing_data() -> None:
     ).delete()
 
 
-def create_reservation_units() -> None:  # noqa: PLR0915
+def create_reservation_units() -> None:
     # ------------------------------------------------------------------------------------------------------------
     # Fetch existing objects
     # ------------------------------------------------------------------------------------------------------------
