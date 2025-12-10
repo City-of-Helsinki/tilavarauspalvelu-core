@@ -29,7 +29,7 @@ msgstr ""
 
 #: templates/admin/deny_reservation_confirmation.html
 #: templates/admin/reset_allocation_confirmation.html
-#: templates/auditlog/object_history.html templates/email/email_tester.html
+#: templates/email/email_tester.html
 msgid "Home"
 msgstr ""
 
@@ -73,22 +73,6 @@ msgstr ""
 
 #: templates/admin/reset_allocation_confirmation.html
 msgid "Reset allocations"
-msgstr ""
-
-#: templates/auditlog/entry_detail.html
-msgid "system"
-msgstr ""
-
-#: templates/auditlog/entry_detail.html
-msgid "No field changes"
-msgstr ""
-
-#: templates/auditlog/object_history.html
-msgid "Audit log"
-msgstr ""
-
-#: templates/auditlog/object_history.html
-msgid "No log entries found."
 msgstr ""
 
 #: templates/email/email_tester.html
