@@ -23,10 +23,10 @@ from rest_framework.exceptions import ValidationError as DRFValidationError
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
-from tilavarauspalvelu.management.commands.create_robot_test_data import create_robot_test_data
 from tilavarauspalvelu.models import ReservableTimeSpan, Reservation, ReservationStatistic, ReservationUnit, TermsOfUse
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 from tilavarauspalvelu.services.pdf import render_to_pdf
+from tilavarauspalvelu.tasks import create_robot_test_data_task
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.utils import comma_sep_str, ical_hmac_signature, update_query_params
 
@@ -569,28 +569,12 @@ def robot_test_data_create_view(request: WSGIRequest) -> HttpResponse:
 
     cache.set(key=rate_limit_key, value=now, timeout=None)
 
-    lock_key = settings.ROBOT_TEST_DATA_LOCK_KEY
-
-    lock = bool(cache.get(key=lock_key))
+    lock = bool(cache.get(key=settings.ROBOT_TEST_DATA_LOCK_KEY))
     if lock:
         detail = {"detail": "Robot test data creation is already in progress", "code": "too_early"}
         return JsonResponse(detail, status=HTTPStatus.TOO_EARLY)
 
-    try:
-        cache.set(key=lock_key, value=True, timeout=None)
-
-        try:
-            create_robot_test_data()
-
-        except ValidationError:
-            raise
-
-        except Exception as error:
-            msg = f"Failed to create robot test data: {error}"
-            raise ValidationError(msg, code="failed_to_create_robot_test_data") from error
-
-    finally:
-        cache.delete(lock_key)
+    create_robot_test_data_task.delay()
 
     return HttpResponse(status=204)
 

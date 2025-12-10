@@ -7,12 +7,14 @@ from decimal import Decimal
 from functools import wraps
 from typing import TYPE_CHECKING
 
+from django.conf import settings
 from django.core.cache import cache
 from django.db import transaction
 
 from config.celery import app
 from tilavarauspalvelu.enums import ReservationTypeChoice
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.management.commands.data_creation.create_robot_test_data import create_robot_test_data
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     Application,
@@ -45,6 +47,7 @@ if TYPE_CHECKING:
 __all__ = [
     "anonymize_old_users_task",
     "create_missing_pindora_reservations_task",
+    "create_robot_test_data_task",
     "deactivate_old_permissions_task",
     "delete_expired_applications_task",
     "delete_pindora_reservation_task",
@@ -614,3 +617,17 @@ def notify_reservation_on_access_type_change_task(reservation_pks: list[int]) ->
 
     for section in sections:
         EmailService.send_seasonal_booking_access_type_changed_email(section)
+
+
+@app.task(name="create_robot_test_data")
+def create_robot_test_data_task() -> None:
+    """
+    Creates test data for robotframework tests.
+    This is a task due to the amount of data created and time it takes when run on the test server.
+    """
+    try:
+        cache.set(key=settings.ROBOT_TEST_DATA_LOCK_KEY, value=True, timeout=None)
+
+        create_robot_test_data()
+    finally:
+        cache.delete(settings.ROBOT_TEST_DATA_LOCK_KEY)
