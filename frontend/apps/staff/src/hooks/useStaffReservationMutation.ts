@@ -77,7 +77,7 @@ export function useStaffReservationMutation({ reservation, onSuccess }: Props) {
             workingMemo,
           },
         };
-        mutation({ variables });
+        await mutation({ variables });
         handleSuccess(false);
       }
     } catch (err) {
