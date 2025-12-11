@@ -70,27 +70,23 @@ describe("edit mutation hook single reservation", () => {
     await waitFor(() => expect(successCb).toHaveBeenCalled());
   });
 
-  // FIXME fails with missing pk 111 in the mocks
-  test.skip("reservation failing with GQL error", async () => {
+  test("reservation failing with GQL error", async () => {
     const view = wrappedRender(111, successCb);
     const btn = view.getByRole("button", { name: /mutate/i });
     expect(btn).toBeInTheDocument();
     const user = userEvent.setup();
     await user.click(btn);
 
-    // TODO should check the error message also
     expect(successCb).not.toHaveBeenCalled();
   });
 
-  // FIXME fails with missing pk 666 in the mocks
-  test.skip("reservation 666 doesn't exist causes an Error", async () => {
+  test("reservation 666 doesn't exist causes an Error", async () => {
     const view = wrappedRender(666, successCb);
     const btn = view.getByRole("button", { name: /mutate/i });
     expect(btn).toBeInTheDocument();
     const user = userEvent.setup();
     await user.click(btn);
 
-    // TODO should check the error message also
     expect(successCb).not.toHaveBeenCalled();
   });
 });
