@@ -1,3 +1,5 @@
+# Don't allow dependencies to be used before they have been released for at least 2 weeks
+minimumReleaseAge: 20160
 packages:
   - apps/*
   - packages/*
