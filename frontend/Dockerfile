@@ -53,7 +53,7 @@ WORKDIR /app
 COPY --from=builder /app/scripts/ /app/scripts
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Build the project
 COPY --from=builder /app/out/full/ .
