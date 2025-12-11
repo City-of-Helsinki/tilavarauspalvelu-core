@@ -111,7 +111,6 @@ describe("generateReservableMap", () => {
     }
   });
 
-  // TODO test with same time range but different days
   test("24h day range continues to next day", () => {
     const start = addDays(addHours(startOfToday(), 9), 0);
     const end = addDays(addHours(startOfToday(), 9), 1);
@@ -184,7 +183,6 @@ describe("generateReservableMap", () => {
     for (const [key, value] of times) {
       expect(value.length).toBe(1);
       const { y, m, d } = splitDateKey(key);
-      // TODO what is the logic here and is it sound?
       const date = new Date(y, m - 1, d, 0, 0, 0);
       const start = value[0]?.start;
       const end = value[0]?.end;
@@ -215,7 +213,6 @@ describe("generateReservableMap", () => {
 });
 
 describe("isStartTimeValid", () => {
-  // TODO fuzzy this
   test("YES for 15 min intervals", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const start = addHours(date, 9);
@@ -223,7 +220,6 @@ describe("isStartTimeValid", () => {
     const reservableTimes = createMockReservableTimes();
     expect(isStartTimeValid(start, reservableTimes, interval)).toBe(true);
   });
-  // TODO fuzzy
   test("YES for 30 min intervals", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const start = addHours(date, 9);
@@ -262,8 +258,6 @@ describe("isStartTimeValid", () => {
 });
 
 describe("isRangeReservable", () => {
-  // TODO mock time
-
   function createInput({
     start,
     end,
@@ -673,12 +667,6 @@ describe("isRangeReservable", () => {
       expect(isRangeReservable(input)).toBe(true);
     });
   });
-
-  // TODO these have complex rules: states of the application rounds, times
-  // an application round should only block within reservable times
-  // an application round should only block if it's state is active (what are these states)
-  // an application round that has been finalized should not block (it's converted into reservations)
-  // But they can't be checked here because the state of the application rounds is not known.
   test("NO if the reservation would overlap with an application round", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const input = createInput({

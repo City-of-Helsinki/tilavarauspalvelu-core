@@ -2,8 +2,6 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { afterAll, beforeAll, vi, afterEach } from "vitest";
 
-// TODO add vitest-axe
-
 beforeAll(() => {
   // Workaround react-testing-library hard coding to jest.useFakeTimers
   vi.stubGlobal("jest", {

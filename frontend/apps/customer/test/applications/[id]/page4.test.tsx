@@ -51,7 +51,6 @@ vi.mock("next/router", () => ({
 }));
 
 function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnType<typeof render> {
-  // TODO need a graphql mutation mock (but have to have separate error / success cases)
   if (props.page == null) {
     props.page = "page3";
   }
@@ -77,8 +76,6 @@ function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnTyp
 
 describe("Application Page4", () => {
   test("smoke", () => {
-    // TODO some of this is common to all application funnel pages
-    // we could just remove it (it's tested by the ApplicationFunnel tests)
     const view = customRender();
     expect(view.getByRole("heading", { name: "application:preview.subHeading" })).toBeInTheDocument();
     expect(view.getByRole("button", { name: "common:submit" }));
@@ -118,15 +115,10 @@ describe("Application Page4", () => {
     await user.click(checkbox2);
     expect(checkbox2).toBeChecked();
     expect(submitButton).not.toBeDisabled();
-    // TODO what happens when we click the submit button?
-    // FIXME need to mock the sendApplication mutation
-    // expect url push to getApplicationPath(resPk, "sent")
-    // expect(mockedRouterPush).toHaveBeenCalledWith(getApplicationPath(1, "sent"));
   });
   test.todo("should show error if sendApplication fails and not url push");
 });
 
-// TODO have to move these back to page4 test because we refactored the ViewApplication
 describe("Terms of Use", () => {
   test("should show terms of use", () => {
     const checkTerms = vi.fn();
@@ -150,7 +142,6 @@ describe("Terms of Use", () => {
     expect(checkbox2).toBeInTheDocument();
     expect(checkbox2).not.toBeChecked();
     expect(checkTerms).not.toHaveBeenCalled();
-    // TODO check that we have the terms of use text
   });
 
   test.todo("what happens if we have empty generic terms?");

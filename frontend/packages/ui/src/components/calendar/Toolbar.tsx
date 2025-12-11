@@ -35,7 +35,6 @@ const Label = styled(NoWrap)`
   font-size: var(--fontsize-body-l);
 `;
 
-/* TODO rewrite this to use inheritable button styles (or HDS buttons) */
 export const ToolbarBtn = styled.button.attrs({ type: "button" })<{
   $borderless?: boolean;
   $active?: boolean;

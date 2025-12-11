@@ -68,7 +68,6 @@ const PreCard = styled.div`
 `;
 
 // the default HDS tag css can't align icons properly so we have to do this
-// TODO reusable Tags that allow setting both the background and optional Icon
 const DeclinedTag = styled(Tag)`
   background-color: var(--color-metro-medium-light);
 
@@ -573,10 +572,6 @@ export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | nu
     : "-";
   const customerName = getApplicantName(application);
 
-  // TODO (test these and either change the query to do the sorting or sort on the client)
-  // sort reservationUnitOptions by priority
-  // sort applicationSections by "begin" date (test case would be to have the second section begin before the first)
-
   const applicationSections = application.applicationSections ?? [];
 
   return (
@@ -735,7 +730,6 @@ export const APPLICATION_PAGE_FRAGMENT = gql`
   }
 `;
 
-// TODO this is not a good fragment, match a component / function not just create them for tab count
 export const RESERVATION_UNIT_OPTION_FRAGMENT = gql`
   fragment ReservationUnitOptionFields on ReservationUnitOptionNode {
     id

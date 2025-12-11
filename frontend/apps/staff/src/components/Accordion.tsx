@@ -42,7 +42,6 @@ const Content = styled.div`
   padding-bottom: var(--spacing-unit);
 `;
 
-// TODO add animation to the open/close toggle (ex. keyframe visiblity)
 const Wrapper = styled.div<{ $open: boolean }>`
   --header-font-size: var(--fontsize-heading-m);
   --button-size: var(--fontsize-heading-m);
@@ -77,8 +76,6 @@ const StyledH2 = styled(H2)`
 
 /// HDS Accordion doesn't update when it's initiallyOpen prop changes
 /// so we can't programmatically open it (for example from validation errors)
-/// TODO styling is bit off
-/// TODO seems like this affected MainMenu link styling
 /// @param open programmaticaly open the accordion (overrides user state temporarily)
 /// @param initiallyOpen set the default open state (overrides user state permanently)
 export function Accordion({

@@ -41,7 +41,6 @@ export function NewResourceModal({ unit, closeModal, refetch, spacePk }: ModalPr
   const { handleSubmit, formState } = form;
   const { errors, isDirty } = formState;
 
-  // TODO this is duplicate code in ResourceEditor
   const onSubmit = async (values: ResourceUpdateForm) => {
     try {
       const { pk, ...rest } = values;

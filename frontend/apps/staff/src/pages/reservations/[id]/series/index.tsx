@@ -137,7 +137,6 @@ function SeriesPageInner({ pk }: { pk: number }) {
   const interval = reservation?.reservationUnit.reservationStartInterval ?? ReservationStartInterval.Interval_15Minutes;
 
   const form = useForm<RescheduleReservationSeriesForm>({
-    // FIXME there is no validation here (schema is incomplete, need to run the same refinements as in the create form)
     resolver: zodResolver(getRescheduleReservationSeriesSchema(interval)),
     values: convertToForm(reservationSeries),
   });
@@ -358,7 +357,6 @@ function SeriesPageInner({ pk }: { pk: number }) {
             </Element>
 
             <Element $wide id="edit-recurring__reservations-list" $unlimitedMaxWidth>
-              {/* TODO can we refactor this part (the name + count) into the ReservationListEditor */}
               <Strong>
                 {t(`myUnits:ReservationSeriesForm.reservationsList`, {
                   count: reservationsCount,
@@ -390,8 +388,6 @@ function SeriesPageInner({ pk }: { pk: number }) {
   );
 }
 
-// TODO can we make ReservationSeries fragment smaller?
-// it has paymentOrder and reservationUnit for each reservation (not necessary)
 export const SERIES_PAGE_QUERY = gql`
   query SeriesPage($id: ID!) {
     reservation(id: $id) {

@@ -117,8 +117,7 @@ function WrappedRender({
     },
   });
   const { handleSubmit, control } = form;
-  // NOTE required to bridge react-hook-form and vitest mock fn
-  // otherwise we get html in the mock fn call
+  // NOTE required to bridge react-hook-form and vitest mock fn otherwise we get html in the mock fn call
   const onSubmitWrapper = (data: FormValues) => {
     onSubmit(data);
   };
@@ -130,8 +129,7 @@ function WrappedRender({
   );
 }
 
-// These tests can be written without opening the modal
-// by mocking the initial form data
+// These tests can be written without opening the modal by mocking the initial form data
 describe("reservation unit list render", () => {
   test("sanity", () => {
     const view = customRender({});
@@ -144,10 +142,6 @@ describe("reservation unit list render", () => {
     const notis = view.getAllByText("reservationUnitList:infoReservationUnits");
     expect(notis.length).toBe(2);
   });
-
-  // add reservation unit button (opens a modal)
-  test.todo("empty should have an add reservation unit button");
-  test.todo("should have an add reservation unit button");
 
   test("should render one reservation unit card", () => {
     const view = customRender({});
@@ -165,7 +159,6 @@ describe("reservation unit list render", () => {
   });
 
   // list of reservation units (ordered, with order buttons)
-  // TODO cards should have correct order with number labels
   test("render multiple reservation unit cards", () => {
     const view = customRender({ nReservationUnits: 3 });
 
@@ -196,15 +189,6 @@ describe("reservation unit list render", () => {
     const errorNotification = view.queryByTestId("ReservationUnitList__error");
     expect(errorNotification).not.toBeInTheDocument();
   });
-
-  // per reservation unit cards
-  // case: run a for loop with
-  // - no min size
-  // - min size 10
-  // - min size 2
-  // expect value is a list of card pks to show error messages in
-  // (need to wrap the error message inside the Card component)
-  test.todo("should show too small space error message");
 });
 
 describe("up / down buttons", () => {
@@ -271,15 +255,4 @@ describe("up / down buttons", () => {
       reservationUnits: [2, 1, 3],
     });
   });
-
-  test.todo("up button should be disabled when first unit is selected");
-  test.todo("should move reservation unit down");
-  test.todo("down button should be disabled when last unit is selected");
-});
-
-describe("Application: reservation unit list modal integration", () => {
-  test.todo("should open modal");
-  test.todo("should close modal");
-  test.todo("should add reservation unit");
-  test.todo("should remove reservation unit");
 });

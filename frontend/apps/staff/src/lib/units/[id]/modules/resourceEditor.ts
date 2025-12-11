@@ -3,10 +3,9 @@ import { z } from "zod";
 
 export const ResourceUpdateSchema = z.object({
   nameFi: z.string().max(80).min(1),
-  // TODO check that empty is valid
   nameSv: z.string().max(80).nullish(),
   nameEn: z.string().max(80).nullish(),
-  // optional because of TS, update requires it, create can't have it
+  // optional because of types. update mutation requires it, create mutation can't have it
   pk: z.number().min(1).optional(),
   space: z.number().min(1),
 });

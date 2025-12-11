@@ -148,7 +148,6 @@ describe("createCells", () => {
   ])("open time with gaps", ({ times, expectedOpenCount }) => {
     const openTimes: DailyOpeningHours = [
       {
-        // TODO fuzzy the weekday
         weekday: Weekday.Monday,
         isClosed: false,
         reservableTimes: times,
@@ -305,9 +304,6 @@ describe("aesToCells", () => {
       expect(day).toEqual(expected[i]);
     }
   });
-
-  test.todo("test secondary selected schedule");
-  test.todo("test a mix with opening hours");
 });
 
 describe("covertCellsToTimeRange", () => {
@@ -369,8 +365,6 @@ describe("covertCellsToTimeRange", () => {
     ] as const;
     expect(res).toEqual(expected);
   });
-
-  test.todo("merging primary contiguous selection");
 
   test("secondary selection", () => {
     const cells: Cell[][] = [createDayCells(Weekday.Monday, [], [{ begin: 8, end: 12, priority: "secondary" }])];

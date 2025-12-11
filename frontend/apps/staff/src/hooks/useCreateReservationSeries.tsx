@@ -66,7 +66,6 @@ export function useCreateReservationSeries() {
     const name = data.type === "BLOCKED" ? "BLOCKED" : (seriesName ?? "");
 
     const reservationDetails: ReservationSeriesReservationCreateSerializerInput = {
-      // TODO don't use spread it breaks type checking for unknown fields
       ...rest,
       type: transformReservationTypeStaffChoice(type),
       reserveeIdentifier: !reserveeIsUnregisteredAssociation ? reserveeIdentifier : undefined,
@@ -75,7 +74,6 @@ export function useCreateReservationSeries() {
       bufferTimeAfter: buffers.after,
       workingMemo: comments,
       state: ReservationStateChoice.Confirmed,
-      // TODO why is this needed in the mutation?
       user: user.pk,
     };
 
@@ -83,7 +81,6 @@ export function useCreateReservationSeries() {
     const input: ReservationSeriesCreateMutationInput = {
       reservationDetails,
       skipDates,
-      // checkOpeningHours: true,
       ageGroup: !Number.isNaN(ageGroup) ? ageGroup : undefined,
       reservationUnit: reservationUnitPk,
       beginDate: formatApiDateUnsafe(parseUIDateUnsafe(startingDate)),

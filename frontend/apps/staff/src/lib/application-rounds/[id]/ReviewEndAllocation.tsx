@@ -51,7 +51,7 @@ export function ReviewEndAllocation({
     } catch (err) {
       displayError(err);
     }
-    // refetch even on errors (if somebody else has ended the allocation)
+    // refetch even on errors (someone else might have ended the allocation)
     refetch();
   };
 
@@ -73,8 +73,6 @@ export function ReviewEndAllocation({
   const isResultsSent = applicationRound.status === ApplicationRoundStatusChoice.ResultsSent;
 
   const showSendResults = isHandled && !isInProgress;
-  // TODO futher work: (separate spec)
-  // - what if results are sent? what should we show or not show?
   const modalTitle = showSendResults
     ? t("applicationRound:confirmation.sendResultsTitle")
     : t("applicationRound:confirmation.endAllocationTitle");
@@ -86,8 +84,6 @@ export function ReviewEndAllocation({
     : t("applicationRound:confirmation.endAllocationAccept");
   const moddalCancelLabel = t("applicationRound:confirmation.endAllocationCancel");
 
-  // TODO add resultsSentBody
-  // requires refoctoring this a bit so we don't do multiple ternaries
   const infoBody = showSendResults ? t("applicationRound:info.handledBody") : t("applicationRound:info.allocatedBody");
   const infoButton = hasFailed
     ? t("applicationRound:info.failedBtn")

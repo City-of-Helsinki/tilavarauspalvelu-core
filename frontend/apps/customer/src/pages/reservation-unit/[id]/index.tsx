@@ -157,8 +157,6 @@ function ReservationUnit({
   const maxReservationDurationMinutes = getMaxReservationDuration(reservationUnit);
 
   const searchUIDate = parseUIDate(searchDate ?? "");
-  // TODO should be the first reservable day (the reservableTimeSpans logic is too complex and needs refactoring)
-  // i.e. using a naive approach will return empty timespsans either reuse the logic for QuickReservation or refactor
   const defaultDate = new Date();
   const defaultDateString = formatDate(defaultDate);
   const defaultValues = {
@@ -231,10 +229,6 @@ function ReservationUnit({
 
   const reservableTimes = useReservableTimes(reservationUnit);
 
-  // TODO the use of focusSlot is weird it double's up for both
-  // calendar focus date and the reservation slot which causes issues
-  // the calendar focus date should always be defined but the form values should not have valid default values
-  // not having valid values will break other things so requires refactoring.
   const focusSlot: FocusTimeSlot | { isReservable: false } = useMemo(() => {
     const data = {
       date: dateValue,

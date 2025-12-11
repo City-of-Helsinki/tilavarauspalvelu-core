@@ -189,7 +189,6 @@ const isSlotLast = (selection: string[], slot: string): boolean => {
 };
 
 // Assume that this is already filtered by the day
-// TODO Not a good name it should match the Cell type (which isn't great either)
 type Slot = {
   day: DayT;
   cell: string;
@@ -370,10 +369,6 @@ function useSelection() {
   };
 }
 
-// TODO
-// the allocated / suitable should be filtered by day
-// focused should be filtered by day
-// remove day if possible (key's might require it)
 function CalendarDay({
   allocated,
   suitable,
@@ -428,7 +423,6 @@ function CalendarDay({
         const timeInMinutes = cell.hour * 60 + cell.minute;
         const focusedSlot = focused.find((x) => x.minutes === timeInMinutes);
         const isFocused = focusedSlot != null;
-        // TODO these don't look nice and don't work if the array is not presorted
         const isFocusedFirst = focused.length > 0 && focused[0]?.minutes === timeInMinutes;
         const isFocusedLast = focused.length > 0 && focused[focused.length - 1]?.minutes === timeInMinutes;
         const isInsideRelatedTimeSpan =

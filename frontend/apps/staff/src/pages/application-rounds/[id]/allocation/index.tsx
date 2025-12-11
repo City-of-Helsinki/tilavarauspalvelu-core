@@ -170,7 +170,7 @@ function ApplicationRoundAllocation({
 
   const queryVariables = useQueryVariables(applicationRound, unitReservationUnits[0]?.pk ?? 0);
   const query = useApplicationSectionAllocationsQuery({
-    // On purpose skip if the reservation unit is not selected (it is required)
+    // skip if the reservation unit is not selected (it is required)
     skip: queryVariables.reservationUnit === 0,
     pollInterval: ALLOCATION_POLL_INTERVAL_MS,
     // NOTE required otherwise this returns stale data when filters change
@@ -188,8 +188,6 @@ function ApplicationRoundAllocation({
     onShow: () => startPolling(ALLOCATION_POLL_INTERVAL_MS),
   });
 
-  // NOTE onComplete isn't called more than once
-  // how this interacts with the polling is unknown
   useEffect(() => {
     const { pageInfo } = refreshedData?.applicationSections ?? {};
     if (pageInfo?.hasNextPage) {
@@ -211,7 +209,6 @@ function ApplicationRoundAllocation({
   const affectingAllocations = filterNonNullable(data?.affectingAllocatedTimeSlots);
 
   // NOTE get the count of all application sections for the selected reservation unit
-  // TODO this can be combined with the above query (but requires casting the alias)
   const { data: allEventsData, previousData: allEventsPreviousData } = useAllApplicationEventsQuery({
     skip: selectedReservationUnit == null || unitFilter == null,
     variables: {
@@ -237,7 +234,6 @@ function ApplicationRoundAllocation({
   }
   const totalNumberOfEvents = totalCount;
 
-  // TODO show loading state somewhere down the line
   const appEventsData = data ?? previousData;
 
   // NOTE we can't filter the query because we need to show allocated in different units
@@ -348,13 +344,11 @@ function ApplicationRoundAllocation({
           </>
         )}
       </NumberOfResultsContainer>
-      {/* NOTE there is an effect inside this component that removes "aes" query param if we don't have data */}
       {reservationUnit ? (
         <AllocationPageContent
           applicationSections={applicationSections}
           reservationUnit={reservationUnit}
           relatedAllocations={affectingAllocations}
-          // TODO overly complicated but doesn't properly handle single failures
           refetchApplicationEvents={handleRefetchApplicationEvents}
           applicationRoundStatus={applicationRoundStatus}
         />
@@ -375,11 +369,7 @@ function useFilteredUnits(applicationRound: ApplicationRoundFilterQueryType | nu
   const resUnits = filterNonNullable(applicationRound?.reservationUnits).filter((ru) => canManageApplications(ru.unit));
   const units = uniqBy(filterNonNullable(resUnits.map((ru) => ru?.unit)), "pk");
 
-  const sortedUnits = sort(
-    units.filter(canManageApplications),
-    // TODO name sort fails with numbers because 11 < 2
-    (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0
-  );
+  const sortedUnits = sort(units.filter(canManageApplications), (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0);
 
   const reservationUnits = sort(uniqBy(resUnits, "pk"), (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0);
 
@@ -398,8 +388,6 @@ export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Elemen
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
   useEffect(() => {
-    // TODO need to add the side effect to the select filter
-    // or maybe not? an invalid value is going to get filtered here anyway and we use the first reservation unit
     const setUnitFilter = (value: number) => {
       // NOTE different logic because values are not atomic and we need to set two params
       const vals = new URLSearchParams(searchParams);

@@ -56,7 +56,6 @@ function BaseSelectFilter({
   const label = t(`filters:label.${name}`);
   const placeholder = t("common:select");
 
-  // TODO not a fan of frontend sorting (especially when it's prop toggled)
   const sortedOptions = useMemo(() => {
     const opts = [...options];
     if (sort) {

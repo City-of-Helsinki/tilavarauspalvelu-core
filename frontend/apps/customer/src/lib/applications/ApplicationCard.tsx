@@ -50,7 +50,6 @@ function isEditable(status: Maybe<ApplicationStatusChoice> | undefined): boolean
 
 type Props = {
   application: ApplicationCardFragment;
-  // TODO refactor the action callback (it's not a good idea in general, but especially error callback)
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 

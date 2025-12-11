@@ -27,7 +27,6 @@ export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT)
   const selectedAeasPk = toNumber(params.get("aes"));
 
   const setFocused = (aes?: SectionNodeT) => {
-    // TODO ?? if the applicationEvent is completely allocated => remove the selection
     const p = new URLSearchParams(params);
     if (aes?.pk != null) {
       p.set("aes", aes.pk.toString());
@@ -51,7 +50,6 @@ export function useFocusAllocatedSlot(): [
 
   const allocatedPk = params.get("allocated") ? Number(params.get("allocated")) : undefined;
 
-  // { pk?: number | null | undefined }) => {
   const setAllocated = (allocated?: Pick<AllocatedTimeSlotNodeT, "pk">) => {
     const p = new URLSearchParams(params);
     if (allocated?.pk != null) {
@@ -87,7 +85,7 @@ const generateSelection = (selectionRange: TimeSlotRange): string[] => {
       if (hour === endHour && minute > endMinute) {
         break;
       }
-      // garbage format: hours have no leading zero, minutes have to have it
+      // hours have no leading zero, minutes have to have it
       const minuteString = minute < 10 ? `0${minute}` : `${minute}`;
       slots.push(`${day}-${hour}-${minuteString}`);
     }
@@ -97,7 +95,6 @@ const generateSelection = (selectionRange: TimeSlotRange): string[] => {
 
 /// Allow selecting a continuous block on a single day
 /// state is saved in the URL as selectionBegin and selectionEnd parameters
-/// TODO rework the interface, accepts string[] for compatibility, not because it's desired
 export function useSlotSelection(): [string[], (slots: string[]) => void] {
   const { selection, setSelection } = useSelectedSlots();
 
@@ -140,8 +137,7 @@ export function useRefreshApplications(
 ): [(clearSelection?: boolean) => Promise<void>, boolean] {
   const [, setSelection] = useSlotSelection();
   const [isRefetchLoading, setIsRefetchLoading] = useState(false);
-  // TODO this should disable sibling cards allocation while this is loading
-  // atm one can try to allocate multiple cards at the same time and all except the first will fail
+
   const refresh = async (clearSelection = true) => {
     setIsRefetchLoading(true);
     await fetchCallback();
@@ -163,12 +159,8 @@ type AcceptSlotMutationProps = {
   refresh: (clearSelection?: boolean) => void;
 };
 
-// TODO make into more generic
-// MutationF
-// MutationParams
 type HookReturnValue = [
-  // TODO add the results to the promise
-  () => Promise<void>, //FetchResult<TData>>,
+  () => Promise<void>,
   {
     isLoading: boolean;
   },
@@ -204,7 +196,6 @@ export function useAcceptSlotMutation({
     const allocatedEnd = timeSlotKeyToScheduleTime(selection[selection.length - 1], true);
 
     // NOTE the pk is an update pk that matches AllocatedTimeSlot (not the applicationSection)
-    // TODO check the inputs
     const input: AllocatedTimeSlotCreateMutationInput = {
       reservationUnitOption: reservationUnitOptionPk,
       dayOfTheWeek: timeRange.dayOfTheWeek,
@@ -266,8 +257,6 @@ export function useRemoveAllocation({
           },
         },
       });
-      // TODO these should not happen (they should still go through the same process and get logged and maybe displayed)
-      // they are typed the same as other GraphQL errors so we can make a free function / hook for both
       if (errors != null && errors.length > 0) {
         throw new ApolloError({
           graphQLErrors: errors,

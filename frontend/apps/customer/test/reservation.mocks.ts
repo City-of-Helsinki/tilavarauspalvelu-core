@@ -481,7 +481,6 @@ export function createMetaFieldsFragment(type: ReserveeType = ReserveeType.Compa
   };
 }
 
-// TODO use ReservationFormType (getFormFields)
 export function createSupportedFieldsMock(type: ReserveeType | "reservation" = "reservation") {
   // We need to include the reserveeType field in the supported fields
   // so that the application fields can be rendered correctly.

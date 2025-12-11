@@ -28,8 +28,6 @@ const StyledCheckBox = styled(Checkbox)`
 `;
 
 type SearchFormValues = {
-  // TODO there is some confusion on the types of these
-  // they are actually an array of pks (number) but they are encoded as val1,val2,val3 string
   intendedUses: number[];
   units: number[];
   equipments: number[];
@@ -66,7 +64,6 @@ function mapQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   };
 }
 
-// TODO is this the full list? can we filter out all the rest? (i.e. remove the hideTagList)
 const filterOrder = [
   "textSearch",
   "timeBegin",
@@ -93,7 +90,6 @@ type SingleSearchFormProps = {
 // Handle possible number / string comparison
 const compFn = (a: { value: unknown }, b: string) => a != null && String(a.value) === b;
 
-// TODO rewrite this without the form state (use query params directly, but don't refresh the page)
 export function SingleSearchForm({
   options: { reservationUnitTypes, intendedUses, units, equipments },
   isLoading,
@@ -101,7 +97,6 @@ export function SingleSearchForm({
   const { handleSearch } = useSearchModify();
   const { t } = useTranslation();
   const searchValues = useSearchParams();
-  // TODO the users of this should be using watch
   const formValues = mapQueryToForm(searchValues);
   const form = useForm<SearchFormValues>({
     values: formValues,
@@ -115,7 +110,6 @@ export function SingleSearchForm({
   }));
 
   const translateTag = (key: string, value: string): string | undefined => {
-    // TODO should rework the find matcher (typing issues) (it works but it's confusing)
     switch (key) {
       case "units":
         return units.find((n) => compFn(n, value))?.label;
@@ -129,7 +123,6 @@ export function SingleSearchForm({
         return durationOptions.find((n) => compFn(n, value))?.label;
       case "accessTypes":
         return accessTypeOptions.find((n) => compFn(n, value))?.label;
-      // FIXME: Invalid date/time values are not validated and are shown in the tag list but not in the form
       case "startDate":
       case "endDate":
       case "timeBegin":

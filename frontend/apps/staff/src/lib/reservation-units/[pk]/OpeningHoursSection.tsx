@@ -16,7 +16,6 @@ export function OpeningHoursSection({
   previewUrlPrefix,
   apiBaseUrl,
 }: {
-  // TODO can we simplify this by passing the hauki url only?
   reservationUnit: Node | undefined;
   previewUrlPrefix: string;
   apiBaseUrl: string;

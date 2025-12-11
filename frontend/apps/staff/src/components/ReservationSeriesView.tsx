@@ -19,7 +19,7 @@ type Props = {
   onSelect?: (selected: number) => void;
   onChange?: () => Promise<unknown>;
   onReservationUpdated?: () => void;
-  // optional reservation to copy when creating a new reservation
+  // optional reservation to copy when creating a new reservation (e.g. one reservation from that series)
   // contains a lot more information than the ReservationSeriesQuery
   reservationToCopy?: ReservationToCopyFragment;
 };
@@ -48,14 +48,7 @@ export function ReservationSeriesView({
 
   const handleChange = (res: (typeof reservations)[0]) => {
     setModalContent(
-      <EditTimeModal
-        // TODO this was here already (so probably uses the undefineds on purpose)
-        // The correct way to deal with this would be either split
-        // the Edit modal into two parts or do a query using id inside it (if we need all the data).
-        reservation={res}
-        onAccept={handleChangeSuccess}
-        onClose={() => setModalContent(null)}
-      />
+      <EditTimeModal reservation={res} onAccept={handleChangeSuccess} onClose={() => setModalContent(null)} />
     );
   };
 

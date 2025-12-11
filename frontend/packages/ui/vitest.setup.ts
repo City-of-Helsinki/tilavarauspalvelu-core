@@ -2,8 +2,6 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { vi, afterEach } from "vitest";
 
-// TODO add vitest-axe
-
 // react-dom tests can't automatically cleanup without vitest globals
 afterEach(() => {
   cleanup();

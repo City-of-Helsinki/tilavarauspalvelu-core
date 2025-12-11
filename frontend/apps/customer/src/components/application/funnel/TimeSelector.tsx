@@ -47,11 +47,6 @@ export function TimeSelectorForm({
     if (tmp[dayNumber] == null) {
       throw new Error("day not found");
     }
-    // TODO this is confusing
-    //  the final conversion changes "open" to "unavailable" if needed but it's still confusing
-    //  and we rely on the conversion function here
-    //  problem: we don't known opening hours at this point
-    //  - would have to refactor the cell type to include the open state e.g. separate selection and open state
     const cellIndex = tmp[dayNumber].findIndex((cell) => isCellEqual(cell, selection));
     if (cellIndex === -1) {
       throw new Error("cell not found");

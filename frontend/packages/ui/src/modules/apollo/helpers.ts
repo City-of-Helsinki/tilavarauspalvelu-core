@@ -14,7 +14,6 @@ import { CsrfTokenNotFound } from "../errors";
 import { getLocalizationLang, isBrowser } from "../helpers";
 import type { LocalizationLanguages } from "../urlBuilder";
 
-// TODO narrow down the error codes and transform unknowns to catch all
 type ErrorCode = string;
 
 export interface ApiError {
@@ -102,7 +101,7 @@ const PERMISSION_ERROR_CODES = [
   "NODE_PERMISSION_DENIED",
   "FILTER_PERMISSION_DENIED",
 ];
-// TODO refactor users to use getApiErrors
+
 export function getPermissionErrors(error: unknown): ValidationError[] {
   if (error == null) {
     return [];
@@ -121,13 +120,11 @@ export function getPermissionErrors(error: unknown): ValidationError[] {
   return [];
 }
 
-// TODO refactor users to use getApiErrors
 export function getValidationErrors(error: unknown): ValidationError[] {
   if (error == null) {
     return [];
   }
 
-  // TODO separate validation errors: this is invalid form values (user error)
   const MUTATION_ERROR_CODE = "MUTATION_VALIDATION_ERROR";
 
   if (error instanceof ApolloError) {
@@ -143,14 +140,6 @@ export function getValidationErrors(error: unknown): ValidationError[] {
   return [];
 }
 
-// TODO write a zod schema for this instead
-/* here it's
-{
-extensions: {
-  code : "RESERVATION_SERIES_OVERLAPS"
-  overlapping : [{…}]
-}
-*/
 function mapOverlapError(gqlError: GraphQLFormattedError) {
   const { extensions } = gqlError;
 
@@ -179,8 +168,6 @@ function mapOverlapError(gqlError: GraphQLFormattedError) {
   return [];
 }
 
-// TODO refactor this to use any code to filter erros
-// TODO this should return flat array of overlaps not nested
 export function getSeriesOverlapErrors(error: unknown): OverlappingError[] {
   if (error == null) {
     return [];
@@ -215,7 +202,6 @@ function mapGraphQLErrors(graphQLErrors: ReadonlyArray<Readonly<GraphQLFormatted
         return mapValidationError(err);
       }
       if (isPermissionError(code)) {
-        // TODO improve mapping (it works for code, but other fields including message is null)
         return mapValidationError(err);
       }
       return {
@@ -226,8 +212,6 @@ function mapGraphQLErrors(graphQLErrors: ReadonlyArray<Readonly<GraphQLFormatted
   return [];
 }
 
-// TODO add non-graphql errors code
-// TODO add no-extension errors
 export function getApiErrors(error: unknown): ApiError[] {
   if (error == null) {
     return [];
@@ -350,12 +334,11 @@ export function enchancedFetch(req?: IncomingMessage) {
     const csrfToken = isServer ? getServerCookie(req?.headers, "csrftoken") : getCookie("csrftoken");
     const headers = new Headers({
       ...(init?.headers != null ? init.headers : {}),
-      // TODO missing csrf token is a non recoverable error
+      // missing csrf token is a non recoverable error
       ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
     });
 
     // NOTE server requests don't include cookies by default
-    // TODO do we want to copy request headers from client or no?
     if (isServer) {
       if (req == null) {
         throw new Error("request is required for server-side fetch");
@@ -371,11 +354,10 @@ export function enchancedFetch(req?: IncomingMessage) {
       // Django fails with 403 if there is no referer (only on Kubernetes)
       const requestUrl = req.url ?? "";
       const hostname = req.headers["x-forwarded-host"] ?? req.headers.host ?? "";
-      // NOTE not exactly correct
-      // For our case this is sufficent because we are always behind a proxy,
+      // NOTE 'proto' is not exactly correct
+      // For our case this is sufficent because we are always behind a gateway,
       // but technically there is a case where we are not behind a gateway and not localhost
       // so the proto would be https and no x-forwarded-proto set
-      // TODO we have .json blobs in the referer (translations), does it matter?
       const proto = req.headers["x-forwarded-proto"] ?? "http";
       headers.append("Referer", `${proto}://${hostname}${requestUrl}`);
 

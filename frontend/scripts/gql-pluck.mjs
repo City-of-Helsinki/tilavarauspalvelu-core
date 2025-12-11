@@ -11,9 +11,9 @@
  *
  * Output: `graphql/admin-queries.graphql` and `graphql/customer-queries.graphql`
  */
-import { gqlPluckFromCodeStringSync } from "@graphql-tools/graphql-tag-pluck";
 import { appendFileSync, readFileSync, mkdirSync, rmSync } from "node:fs";
 import path from "node:path";
+import { gqlPluckFromCodeStringSync } from "@graphql-tools/graphql-tag-pluck";
 import { glob } from "glob";
 
 const OUTPUT_DIR = "../gql-pluck-output";
@@ -52,7 +52,7 @@ function pluck(patterns, outputFile) {
 // Should we include .js{x} also?
 // No, since the project doesn't use those and they are not included in our query generation either.
 //
-// TODO these patterns are same as graphql.config.ts (but requires us setting up a common config file)
+// NOTE these patterns are same as graphql.config.ts
 const common_patterns = ["packages/ui/**/!(*.d|gql-types).{ts,tsx}"];
 const admin_patterns = ["apps/staff/**/!(*.d|gql-types).{ts,tsx}", ...common_patterns];
 const customer_patterns = ["apps/customer/**/!(*.d|gql-types).{ts,tsx}", ...common_patterns];

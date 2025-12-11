@@ -7,7 +7,6 @@ import type { Maybe, TermsOfUseTextFieldsFragment } from "@gql/gql-types";
 
 // NOTE This is partial duplicate from ui/application/Preview.tsx
 // see if we can combine them (and other Terms later with parameters)
-// TODO max height? is it 135px or 158px or perhaps a reasonable rem measure?
 const Terms = styled.div`
   border-top: 8px solid var(--color-bus);
   margin-top: var(--spacing-m);

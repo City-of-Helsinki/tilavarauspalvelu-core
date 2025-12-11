@@ -7,9 +7,6 @@ import type { CalendarEventType } from "@/modules/reservation";
 import { ReservationStateChoice, ReservationTypeChoice, useReservationsByReservationUnitQuery } from "@gql/gql-types";
 import type { CalendarReservationFragment, Maybe } from "@gql/gql-types";
 
-// TODO there is an issue here with denied "Blocked" reservations shown in the Calendar as regular "Blocked" reservations
-// so it looks confusing. It works properly if we want to show the reservation itself even if it's denied, but there should
-// be either different styling or handling of "Blocked" reservations that are denied.
 export function useReservationCalendarData({
   begin,
   end,
@@ -58,8 +55,6 @@ export function useReservationCalendarData({
   return { ...rest, events };
 }
 
-// TODO This would be better if we combined two GQL queries, one for the reservation itself
-// and other that includes the states (now we are fetching a lot of things we don't need)
 function shouldBeShownInTheCalendar(r: CalendarReservationFragment, ownPk: Maybe<number> | undefined) {
   return (
     r.state === ReservationStateChoice.Confirmed ||
@@ -68,13 +63,7 @@ function shouldBeShownInTheCalendar(r: CalendarReservationFragment, ownPk: Maybe
   );
 }
 
-function convertReservationToCalendarEvent(
-  // NOTE funky because we are converting affectedReservations also and they don't have reservationUnit
-  // but these are passed to event handlers that allow changing the reservation that requires a reservationUnit
-  // affected don't have event handlers so empty reservationUnit is fine
-  r: CalendarReservationFragment,
-  blockedName: string
-): CalendarEventType {
+function convertReservationToCalendarEvent(r: CalendarReservationFragment, blockedName: string): CalendarEventType {
   const title =
     getEventName({
       type: r.type,

@@ -80,7 +80,6 @@ type ReservationTypeFormProps = {
   disableTypeSelect?: boolean;
 };
 
-// TODO are buffers in different places for Recurring and Single reservations? Check the UI spec
 export function ReservationTypeForm({
   reservationUnit,
   children,

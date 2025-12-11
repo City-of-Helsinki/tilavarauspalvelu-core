@@ -1,13 +1,12 @@
 // @ts-check
 // NOTE don't move this file or use cjs / mjs extensions only .js works
 
-// TODO this doesn't work, it is supposed to enable fast refresh for json translations
-// but it doesn't hot reload nor does it seem to do anything even if doing a full page reload
+// NOTE this doesn't hot reload and the page has to be reloaded twice to get new translations
 const reloadOnPrerender = process.env.NODE_ENV === "development";
 
 /** @type {import('next-i18next').UserConfig} */
 module.exports = {
-  debug: false, // process.env.NODE_ENV === "development",
+  debug: false,
   i18n: {
     defaultLocale: "fi",
     locales: ["fi"],

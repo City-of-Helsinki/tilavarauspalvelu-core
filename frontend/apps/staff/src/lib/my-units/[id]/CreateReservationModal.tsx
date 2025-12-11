@@ -98,12 +98,6 @@ export function CreateReservationModal({
   const startDate = start ?? new Date();
   const form = useForm<FormValueType>({
     resolver: zodResolver(getCreateStaffReservationFormSchema(interval)),
-    // TODO onBlur or onChange? onChange is anoying because it highlights even untouched fields
-    // onBlur on the other hand does no validation on the focused field till it's blurred
-
-    // I want show errors for touched fields onBlur + clear errors onChange
-    // I guess I just have to write logic for it using isTouched + onChange
-
     mode: "onChange",
     defaultValues: {
       date: formatDate(startDate, {}),
@@ -188,7 +182,6 @@ function transformCreateReservationMutation(
   const bufferBefore = getBufferTime(reservationUnit.bufferTimeBefore, type, enableBufferTimeBefore);
   const bufferAfter = getBufferTime(reservationUnit.bufferTimeAfter, type, enableBufferTimeAfter);
   return {
-    // TODO don't use spread it allows passing unknown attributes to the object (even with Exact)
     ...rest,
     reservationUnit: reservationUnit.pk,
     type,
@@ -381,7 +374,6 @@ function ActionContainer({
   );
 }
 
-// TODO this is reused for create ReservationSeries also (though we have a common fragment)
 export const RESERVATION_UNIT_QUERY = gql`
   query ReservationUnit($id: ID!) {
     reservationUnit(id: $id) {

@@ -78,7 +78,6 @@ function ApplicationsPage({ data: initialData }: PropsNarrowed): JSX.Element | n
 
   const { currentUser } = useCurrentUser();
   // Requires a client side query because we can do modifications without leaving the page
-  // TODO better would be to hydrate the client and use refetch when modifying
   const [fetch, { data: appData }] = useApplicationsLazyQuery({
     fetchPolicy: "no-cache",
     variables: {

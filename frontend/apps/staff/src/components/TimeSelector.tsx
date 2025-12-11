@@ -15,8 +15,6 @@ type TimeSelectorProps = {
   applicationSection: ApplicationSectionType;
 };
 
-// TODO there is a form version of this in timeSelectorModule.tsx
-// the logic is the same (but types are different)
 function timeRangeToCell(timeRanges: SuitableTimeRangeType[]): Cell[][] {
   const firstSlotStart = 7;
   const lastSlotStart = 23;
@@ -30,7 +28,6 @@ function timeRangeToCell(timeRanges: SuitableTimeRangeType[]): Cell[][] {
         hour: i,
         weekday: transformWeekday(weekdayNumber),
         state: "none",
-        // TODO need open and close times for the reservation unit
         openState: "open",
       });
     }
@@ -39,7 +36,6 @@ function timeRangeToCell(timeRanges: SuitableTimeRangeType[]): Cell[][] {
 
   for (const timeRange of timeRanges) {
     const { dayOfTheWeek, beginTime, endTime, priority } = timeRange;
-    // TODO conversion functions from API time to frontend format
     const hourBegin = Number(beginTime.slice(0, 2)) - firstSlotStart;
     const hourEnd = (Number(endTime.slice(0, 2)) || 24) - firstSlotStart;
 

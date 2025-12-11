@@ -1,7 +1,6 @@
 @use "font";
 @use "variables";
 
-/* TODO is this correct? if it's it should be in common/styles/global.scss */
 a {
   &:visited {
     color: inherit;
@@ -12,7 +11,6 @@ a {
   text-decoration: none;
 }
 
-/* TODO is this correct? if it's it should be in common/styles/global.scss */
 ul {
   padding-left: var(--spacing-m);
 

@@ -28,7 +28,6 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
   const sentryLink = new SentryContextLink();
   const httpLink = new HttpLink({
     uri,
-    // TODO this might be useless
     credentials: "include",
     fetch: enchancedFetch(req),
   });

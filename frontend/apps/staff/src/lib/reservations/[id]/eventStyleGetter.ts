@@ -43,7 +43,7 @@ export const EVENT_STYLE_RESERVATION_FRAGMENT = gql`
 
 type CurrentReservationType = Pick<EventStyleReservationFieldsFragment, "pk" | "reservationSeries">;
 
-// TODO merge this with eventStyleGetter in admin-ui/src/lib/my-units/[id]/eventStyleGetter.ts
+// TODO: merge this with eventStyleGetter in admin-ui/src/lib/my-units/[id]/eventStyleGetter.ts
 const eventStyleGetter =
   (currentReservation: CurrentReservationType, selectedReservation: EventType | undefined) =>
   ({
@@ -61,7 +61,7 @@ const eventStyleGetter =
 
     const isBlocked = event?.type === ReservationTypeChoice.Blocked;
     const isStaff = event?.type === ReservationTypeChoice.Staff;
-    // @ts-expect-error: TODO: we are dynamically overriding an enum upstream
+    // @ts-expect-error: we are dynamically overriding an enum upstream
     const isBuffer = event?.state === "BUFFER";
 
     const style = {
@@ -84,7 +84,7 @@ const eventStyleGetter =
         color: "var(--color-black-10)",
       });
     } else {
-      Object.assign(style, REST.style); // TODO: Use UNCONFIRMED.style instead?
+      Object.assign(style, REST.style);
     }
 
     if (currentReservation?.pk === event?.pk || isPartOfRecurrence) {

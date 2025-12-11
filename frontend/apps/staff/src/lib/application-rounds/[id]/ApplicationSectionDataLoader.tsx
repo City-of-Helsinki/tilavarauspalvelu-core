@@ -41,7 +41,6 @@ export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): JSX
       errorToast({ text: t("errors:errorFetchingData") });
     },
     fetchPolicy: "cache-and-network",
-    // TODO enable or no?
     nextFetchPolicy: "cache-first",
   });
 

@@ -806,7 +806,6 @@ describe("isReservationUnitReservable", () => {
       reservationsMaxDaysBefore: 4,
       expected: false,
     },
-    // TODO add a few more cases, especially a positive one with buffers
   ])("returns correct value with buffer days", ({ expected, ...rest }) => {
     const input = constructReservationUnitNode(rest);
     const { isReservable: res1 } = isReservationUnitReservable(input);
@@ -1434,8 +1433,6 @@ describe("getNextAvailableTime", () => {
       expect(val).toBeNull();
     });
 
-    // TODO add more tests for application round
-    // block 12 months using activeApplicationRounds, measure the time it takes
     test("performance: finds the next available time after a long application round", () => {
       mockOpenTimes(new Date(), 2 * 365);
       const activeApplicationRounds: RoundPeriod[] = [

@@ -237,8 +237,6 @@ function getReservationVolume(minutes: number, unit: PriceUnit): number {
   return getUnRoundedReservationVolume(minutes, unit);
 }
 
-// TODO rewrite this return number normally
-// and a separate function to format it to string
 export function getPriceString(props: GetPriceType): string {
   const { t, pricing, minutes = 0 } = props;
 
@@ -319,7 +317,6 @@ export const RESERVATION_PRICE_FRAGMENT = gql`
   }
 `;
 
-// TODO why do we need both this and getPriceString?
 export function getPrice(
   t: TFunction,
   reservation: ReservationPriceFieldsFragment,
@@ -385,7 +382,6 @@ export function isReservationUnitPaid(pricings: Readonly<PricingFieldsFragment[]
 
 /// Returns true if the given time is 'inside' the time span
 /// inside in this case means it's either the same day or the time span is multiple days
-/// TODO should rewrite this to work on dates since we want to do that conversion first anyway
 export function isInTimeSpan(date: Date, timeSpan: NonNullable<ReservationUnitNode["reservableTimeSpans"]>[0]) {
   const { startDatetime, endDatetime } = timeSpan ?? {};
 
@@ -401,7 +397,6 @@ export function isInTimeSpan(date: Date, timeSpan: NonNullable<ReservationUnitNo
 }
 
 /// Generate a list of intervals for a day
-// TODO this can be moved to reservationUnit (not used here anymore)
 export function getDayIntervals(
   startTime: { h: number; m: number },
   endTime: { h: number; m: number },
@@ -440,9 +435,9 @@ export type PossibleTimesCommonProps = Readonly<{
 export type GetPossibleTimesForDayProps = {
   date: Readonly<Date>;
 } & PossibleTimesCommonProps;
+
 // Returns an timeslot array (in HH:mm format) with the time-slots that are
 // available for reservation on the given date
-// TODO should rewrite the timespans to be NonNullable and dates (and do the conversion early, not on each component render)
 export function getPossibleTimesForDay({
   reservableTimes,
   date,
@@ -494,7 +489,6 @@ export function getPossibleTimesForDay({
         });
         return isReservable;
       })
-      // TODO the conversion should be done in a separate function so we can reuse the logic without string conversion
       .map((time) => convertTimeToOptions(time))
   );
 }
@@ -553,7 +547,6 @@ export type AvailableTimesProps = {
 };
 
 // Returns an array of available times for the given duration and day
-// TODO this is really slow (especially if called from a loop)
 function getAvailableTimesForDay({
   start,
   duration,

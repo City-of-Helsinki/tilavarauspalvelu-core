@@ -23,22 +23,11 @@ function translateDuration(t: TFunction, duration: number): string {
 }
 
 /// Uses query params to display tags for the search form
-/// Generic enough to work for both reservation unit search pages but not tested for other use cases
+/// Generic enough to work for both reservation unit search pages
 /// @param filters - list of filters in the order they should be displayed
 /// @param multiSelectFilters - list of filters that can have multiple values
 /// @param hideList - list of filters that should not be displayed
 /// @param translateTag - function to translate the tag
-/// TODO hide list might also be superflous since we can check against the translation, an empty string should not be displayed
-/// TODO multiSelectFilters might be superflous since we can check array type => this would make all tags multi select automatically though
-/// but that might be a good thing, the single / multi filtering should be when the url is modified and rechecked when the API call is made
-/// silently ignore any invalid values when making API calls.
-/// Issue with this change is that all filters would move dynamically between single and multi select (does that matter?)
-/// This component should not care about the particulars of the structure, just about the query params
-/// (even if the user manually modifies the url to create invalid params or combinations),
-/// Which also supports removing the parameters and only using query string and the translation function.
-/// An invalid manually modified value (or mangled copy / link) would be ignore. Now it's printed out as a tag.
-/// Another thing about that is the translation function is generic enough to allow dynamic changes to the tags
-/// (so we can hide / show based on some other condition) of course such would require forcing a rerender with an url change or remounting this.
 export function FilterTagList({ filters, multiSelectFilters, hideList, translateTag }: Readonly<FilterTagProps>) {
   const { t } = useTranslation();
 
@@ -63,7 +52,6 @@ export function FilterTagList({ filters, multiSelectFilters, hideList, translate
       if (value == null || value === "") {
         return false;
       }
-      // TODO there should be a more universal way to check if a value is valid (or filter them out before we get here)
       if (key === "duration" && !(Number(value) > 0)) {
         return false;
       }
@@ -96,12 +84,10 @@ export function FilterTagList({ filters, multiSelectFilters, hideList, translate
                 value: translateTag(key, val),
               })}
             >
-              {/* TODO when can this return undefined? should we filter or remove the possibility? */}
               {translateTag(key, val) ?? ""}
             </SearchTag>
           ));
         }
-        // TODO why are these different? (multi select and single select)
         return (
           <SearchTag
             id={`filter-tag__${key}`}

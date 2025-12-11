@@ -68,8 +68,6 @@ export function getReservationFormFields({
   return RESERVATION_FIELDS[type].filter((field) => formContainsField(formType, field));
 }
 
-// TODO rename these fields they are the ReservationNode fields that store form input data
-// not form fields (they map to backend / query types, not frontend form)
 export type FormField = keyof Omit<ReservationFormFieldsFragment, "id" | "reservationUnit">;
 export type FormFieldArray = ReadonlyArray<FormField>;
 
@@ -96,7 +94,6 @@ export function formContainsField(type: ReservationFormType, fieldName: keyof Re
   return fields.some((k) => k === fieldName);
 }
 
-// TODO refactor so the fieldLabel is not already translated
 export function translateReserveeFormError(
   t: TFunction,
   fieldLabel: string,

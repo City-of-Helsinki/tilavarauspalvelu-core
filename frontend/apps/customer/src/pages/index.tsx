@@ -51,7 +51,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 export default Home;
 
-// TODO we can limit the number of intended uses and units fetched
 export const FRONT_PAGE_QUERY = gql`
   query FrontPage($orderBy: [IntendedUseOrderingChoices], $orderUnitsBy: [UnitOrderingChoices]) {
     intendedUses(orderBy: $orderBy) {

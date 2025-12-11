@@ -71,13 +71,3 @@ test(`time start after time end should fail`, () => {
 
   expect(res.success).toBeFalsy();
 });
-
-test.todo(`STAFF reservation should be a success`);
-
-test.todo(`start date cannot be in the past`);
-test.todo(`end date cannot be after start date`);
-test.todo(`start time can't be after end time`);
-test.todo("ReservationSeriesFormSchema checks for empty fields");
-test.todo("ReservationSeriesFormSchema passthrough unknown fields");
-// TODO should check the error types from failures also but need to think through those cases
-// for example missing type should still give a refinement error for dates

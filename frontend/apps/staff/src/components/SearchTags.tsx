@@ -16,8 +16,6 @@ interface SearchTagsProps {
 /// @param translateTag callback to format the tag
 /// @param hide list of search param keys that are not shown as tags
 /// @param defaultTags default optios to set when user clicks clear tags
-/// TODO create a wrapper that allows us switching the router (next / react-router)
-/// TODO translateTag should be string | null (to make non printed values explicit, though we will remove "" also)
 export function SearchTags({
   translateTag,
   hide = [],
@@ -46,7 +44,6 @@ export function SearchTags({
         newParams.append(key, value);
       }
     }
-    // TODO defaultTags and hide should never overlap
     for (const d of defaultTags) {
       if (Array.isArray(d.value)) {
         for (const v of d.value) {
@@ -70,7 +67,6 @@ export function SearchTags({
     }
   }
 
-  // TODO could be improved by comparing default values to current values
   const shouldShowResetButton = tags.length > 0 || defaultTags.length > 0;
 
   return (

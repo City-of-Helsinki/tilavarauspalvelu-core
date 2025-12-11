@@ -64,7 +64,6 @@ function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnTyp
 
 describe("Page1 common to all funnel pages", () => {
   test("should render empty application page", () => {
-    // TODO all of this is common to all application funnel pages
     const view = customRender();
     expect(view.getByRole("heading", { name: "application:Page1.subHeading" })).toBeInTheDocument();
     expect(view.getByRole("button", { name: "application:Page1.createNew" }));
@@ -125,12 +124,6 @@ describe("Page1", () => {
     expect(view.queryAllByText("application:validation.noReservationUnits")).toHaveLength(0);
   });
 
-  // clicking should fill the
-  // "application:Page1.periodEndDate" and "application:Page1.periodStartDate"
-  // checking these here is not necessary -> should write separate tests for these
-  test.todo("checking default period should fill the dates");
-  test.todo("changing dates should remove default period check");
-
   test("should allow filling the form", async () => {
     const params = new URLSearchParams();
     params.set(SEASONAL_SELECTED_PARAM_KEY, "1");
@@ -185,9 +178,6 @@ describe("Page1", () => {
     await user.click(submitBtn);
     expect(view.queryAllByText("application:validation.lte_7")).toHaveLength(1);
   });
-
-  // TODO should these be schema tests
-  test.todo("applied events less than 1 should be invalid");
 
   // requires form context because schema validators are for the full form only
   test("should show an error message for no reservation units", async () => {

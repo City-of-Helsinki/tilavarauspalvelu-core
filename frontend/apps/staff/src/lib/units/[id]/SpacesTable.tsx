@@ -22,9 +22,9 @@ import { NewSpaceModal } from "./new-space-modal/NewSpaceModal";
 
 type SpaceT = SpacesTableFragment["spaces"][0];
 
-function countSubSpaces(space: Pick<SpaceT, "pk" | "children">): number {
+function countSubSpaces(space: Pick<SpaceT, "id" | "children">): number {
   return (space.children || []).reduce(
-    // @ts-expect-error -- FIXME the recursive type is broken
+    // @ts-expect-error -- recursive graphql query doesn't work
     (p, c) => p + 1 + (c ? countSubSpaces(c) : 0),
     0
   );
@@ -114,7 +114,6 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     router.push(link);
   }
 
-  // TODO translation keys are wonky, yeah it's under a unit page but the table should be reusable
   const cols: SpacesTableColumn[] = [
     {
       headerName: t("spaces:headings.name"),
@@ -151,7 +150,6 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     {
       headerName: t("spaces:headings.maxPersons"),
       key: "maxPersons",
-      // TODO this is weird it creates both the max Persons and the buttons to the same cell
       transform: (space: SpaceT) => (
         <Flex $gap="none" $direction="row" $justifyContent={space.maxPersons != null ? "space-between" : "flex-end"}>
           {space.maxPersons != null && (
@@ -184,14 +182,12 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
 
   const ref = useRef(null);
 
-  const rows = unit?.spaces ?? [];
+  const rows = [...(unit?.spaces ?? [])];
 
-  // TODO add if no spaces => "Unit.noSpaces"
   return (
     <>
       <CustomTable
         indexKey="pk"
-        // @ts-expect-error -- Table expects mutable rows
         rows={rows}
         cols={cols}
         // no sort on purpose

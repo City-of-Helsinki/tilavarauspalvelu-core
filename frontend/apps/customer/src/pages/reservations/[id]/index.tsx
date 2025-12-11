@@ -68,9 +68,6 @@ import type {
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
-// TODO clean this up, way too much css
-// also this breaks way too early to two lines (should just have no-wrap on the two elements)
-// reason is the way the separator is added
 const SubHeading = styled(H4).attrs({
   as: "p",
   $noMargin: true,
@@ -79,15 +76,12 @@ const SubHeading = styled(H4).attrs({
     ${fontRegular}
   }
 
-  /* TODO make this into a css fragment */
-
   a,
   a:visited {
     color: var(--color-black);
     text-decoration: underline;
     display: block;
 
-    /* TODO the problem here is that it relies on the size of the window instead if we are splitting the line or not */
     @media (min-width: ${breakpoints.m}) {
       &:after {
         content: "|";
@@ -163,8 +157,6 @@ function convertNotify(str: string | null): ReservationNotifications | null {
   return null;
 }
 
-// TODO add a state check => if state is Created redirect to the reservation funnel
-// if state is Cancelled, Denied, WaitingForPayment what then?
 function Reservation({
   termsOfUse,
   reservation,
@@ -415,9 +407,6 @@ function AccessCodeInfo({ pindoraInfo, feedbackUrl }: Readonly<AccessCodeInfoPro
   );
 }
 
-// TODO this should return 500 if the backend query fails (not 404), or 400 if the query is incorrect etc.
-// typically 500 would be MAX_COMPLEXITY issue (could also make it 400 but 400 should be invalid query, not too complex)
-// 500 should not be if the backend is down (which one is that?)
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
   const pk = toNumber(ignoreMaybeArray(params?.id));

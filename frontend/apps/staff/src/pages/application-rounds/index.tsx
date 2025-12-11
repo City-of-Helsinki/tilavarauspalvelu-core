@@ -76,7 +76,6 @@ function RoundsAccordion({
 function AllApplicationRounds(): JSX.Element | null {
   const { t } = useTranslation();
 
-  // TODO pagination
   const { data, loading, error } = useApplicationRoundListQuery();
 
   const allApplicationRounds = filterNonNullable(data?.applicationRounds?.edges?.map((ar) => ar?.node));
@@ -86,7 +85,6 @@ function AllApplicationRounds(): JSX.Element | null {
   }
 
   if (allApplicationRounds == null || error != null) {
-    // TODO should be a different error page
     return <Error404 />;
   }
 

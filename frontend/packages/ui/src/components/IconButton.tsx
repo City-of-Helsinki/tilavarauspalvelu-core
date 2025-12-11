@@ -70,8 +70,6 @@ const Anchor = styled.a`
   ${visitedStyles}
 `;
 
-// TODO can't define padding for this otherwise it's not aligned properly since we have no border
-// but a bit of padding around the focus outline would be nice
 const Container = styled(Flex).attrs({
   $gap: "xs",
   $direction: "row",

@@ -29,7 +29,7 @@ const selected_legends = new Set([
 export const legend: EventStyleType[] = CALENDAR_LEGENDS.filter((x) => selected_legends.has(x.key));
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
-// TODO: TODO merge this with eventStyleGetter in admin-ui/src/lib/reservations/[id]/eventStyleGetter.ts
+// TODO: merge this with eventStyleGetter in admin-ui/src/lib/reservations/[id]/eventStyleGetter.ts
 export const eventStyleGetter =
   (currentReservationUnitPk: number) =>
   ({

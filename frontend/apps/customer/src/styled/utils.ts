@@ -23,7 +23,6 @@ export const SubmitButton = styled(Button)`
   flex-grow: 1;
 `;
 
-// TODO there should be other link styles combine this with them
 export const InlineStyledLink = styled(Link)`
   && {
     display: inline;

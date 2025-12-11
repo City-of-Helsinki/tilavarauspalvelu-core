@@ -75,7 +75,6 @@ export function ApplicationFunnelWrapper({ application, page, children }: Readon
       <HR />
       <InnerContainer>
         <>
-          {/* TODO preview / view should not maybe display these notes */}
           <StyledNotesWhenApplying applicationRound={application.applicationRound} />
           <ChildWrapper>{children}</ChildWrapper>
         </>

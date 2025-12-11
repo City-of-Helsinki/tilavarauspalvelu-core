@@ -93,7 +93,6 @@ export function ReservationUnitsDataReader({ selectedRows, setSelectedRows }: Pr
       errorToast({ text: t("errors:errorFetchingData") });
     },
     fetchPolicy: "cache-and-network",
-    // TODO enable or no?
     nextFetchPolicy: "cache-first",
   });
   const { fetchMore, loading, data, previousData } = query;

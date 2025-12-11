@@ -167,7 +167,6 @@ export const UPDATE_SPACE = gql`
   }
 `;
 
-// TODO why does this query parents up the tree?
 export const SPACE_QUERY = gql`
   query Space($id: ID!) {
     space(id: $id) {

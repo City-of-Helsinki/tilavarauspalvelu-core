@@ -76,7 +76,6 @@ export function ReservationStep0({ reservation, cancelReservation, options }: Pr
   const displayError = useDisplayError();
   const [updateReservation] = useUpdateReservationMutation();
 
-  // TODO move to free function but requires us to type the FT (using ReturnValue + infer probably)
   function transformReservationFom(values: ReservationFormValues): ReservationUpdateMutationInput {
     const {
       reserveeFirstName,
@@ -92,7 +91,6 @@ export function ReservationStep0({ reservation, cancelReservation, options }: Pr
     if (reservationPk == null) {
       throw new Error("Reservation pk should never be null");
     }
-    // TODO move to ts utilities
     type Writable<T> = {
       -readonly [K in keyof T]: T[K];
     };

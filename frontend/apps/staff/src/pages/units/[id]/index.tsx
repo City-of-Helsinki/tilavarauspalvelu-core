@@ -74,7 +74,6 @@ function Unit({ unitPk }: { unitPk: number }): JSX.Element {
     return <CenterSpinner />;
   }
 
-  // TODO separate invalid route and no unit found errors
   if (!unit) {
     return <Error404 />;
   }

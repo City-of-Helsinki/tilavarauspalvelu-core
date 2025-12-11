@@ -37,7 +37,6 @@ export function FormErrorSummary<T extends FieldValues>({ errors, fieldNamePrefi
 
   const cleanPrefix = cleanUpFieldName(fieldNamePrefix);
 
-  // TODO use a common translation key for these
   const prefix = cleanPrefix != null ? `${cleanPrefix}.` : "errors.";
 
   return (
@@ -48,7 +47,6 @@ export function FormErrorSummary<T extends FieldValues>({ errors, fieldNamePrefi
             const label = t(`ErrorSummary.errorLabel`, {
               index: index + 1,
             });
-            // TODO undefined should be filtered out
             const fieldName = t(`${prefix}${err?.message}`);
             return (
               <li key={keys[index]}>

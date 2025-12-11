@@ -7,7 +7,6 @@ type NodeList = Array<Pick<ReservationUnitNode, "pk">>;
 type Node = NonNullable<NodeList>[0];
 type ReservationUnitList = {
   getReservationUnits: () => number[];
-  // TODO refactor to use pk instead of Node
   selectReservationUnit: (ru: Node) => void;
   containsReservationUnit: (ru: Node) => boolean;
   removeReservationUnit: (ru: Node) => void;

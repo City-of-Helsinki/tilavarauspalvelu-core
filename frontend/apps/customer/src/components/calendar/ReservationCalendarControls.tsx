@@ -55,12 +55,6 @@ const Content = styled.div<{ $isAnimated: boolean }>`
   /* buttons and selects are different sizes, dont stretch them */
   align-items: end;
 
-  /* TODO not fan of the animation, it's jerky and the submit button disappears and reappears
-   * because it's rendered twice (inside and out of the accordion)
-   * cleaner would be to use visibility transition or custom transform-y to bring the new elements
-   * from the top while pushing the submit button down.
-   */
-
   ${({ $isAnimated }) =>
     $isAnimated &&
     `
@@ -162,8 +156,6 @@ export function ReservationCalendarControls({
       data-testid="reservation-unit__reservation-controls--wrapper"
     >
       <ControlledToggler form={reservationForm} focusSlot={focusSlot} price={price} durationOptions={durationOptions} />
-      {/* TODO the submit button part should be refactored so that we hide the other buttons instead of
-       * adding a second submit button */}
       {focusSlot.isReservable && !areControlsVisible && <Flex $alignItems="flex-end">{submitButton}</Flex>}
       <Transition mountOnEnter unmountOnExit timeout={isMobile ? 500 : 0} in={areControlsVisible}>
         {(state) => (

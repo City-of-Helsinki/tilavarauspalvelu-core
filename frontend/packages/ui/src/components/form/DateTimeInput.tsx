@@ -21,11 +21,6 @@ interface DateTimeProps<T extends FieldValues> extends Omit<UseControllerProps<T
   translateError?: (error?: string) => string | undefined;
 }
 
-/// or if not it's so dump it should be in the form itself
-/// NOTE HDS time component is utter garbage
-/// It can never be reseted after creation (value === defaultValue, and it doesn't allow for refs).
-/// Most apparent when async loading server data and then trying to reset the form.
-/// TODO rework the TimeInput (either custom component or HDS upgrade)
 export function DateTimeInput<T extends FieldValues>({
   control,
   name,
@@ -77,9 +72,6 @@ export function DateTimeInput<T extends FieldValues>({
         ref={timeField.ref}
         required={required}
         disabled={disabled}
-        // label={t("common.time")}
-        // hoursLabel="hours"
-        // minutesLabel="minutes"
         value={timeField.value}
         label={t("common:time")}
         onChange={handleTimeChange}

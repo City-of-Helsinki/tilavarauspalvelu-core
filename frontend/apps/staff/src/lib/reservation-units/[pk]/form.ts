@@ -61,8 +61,7 @@ const PricingFormSchema = z.object({
   // on the frontend pk <= 0 is a new pricing
   pk: z.number(),
   taxPercentage: z.number(),
-  // TODO could remove the net value and keep only the gross price
-  // the net is never sent to backend (but we want to keep it in the UI)
+  // net price is never sent to backend (but we want to keep it in the UI)
   lowestPrice: z.number({ error: "Required" }),
   lowestPriceNet: z.number({ error: "Required" }),
   highestPrice: z.number({ error: "Required" }),
@@ -425,8 +424,6 @@ export const BUFFER_TIME_OPTIONS = ["noBuffer", "bufferTimesSet"] as const;
 export const ReservationUnitEditSchema = z
   .object({
     authentication: z.enum(AuthenticationType),
-    // TODO these are optional (0 is bit different than not set)
-    // because if they are set (non undefined) we should show the active checkbox
     bufferTimeAfter: z.number(),
     bufferTimeBefore: z.number(),
     bufferType: bufferTimeSchema,
@@ -758,7 +755,6 @@ export const ReservationUnitEditSchema = z
       });
     }
 
-    // TODO if it includes futurePricing check that the futurePrice date is in the future (is today ok?)
     const isPaid = v.pricings.some((p) => p.highestPrice > 0);
     if (v.canApplyFreeOfCharge && isPaid && v.pricingTerms == null) {
       ctx.addIssue({

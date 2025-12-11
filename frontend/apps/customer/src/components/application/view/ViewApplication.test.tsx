@@ -47,15 +47,6 @@ describe("ViewApplication", () => {
   });
 });
 
-// TODO these can be moved to the ApplicationSectionList test file
-describe("ApplicationSectionList", () => {
-  test.todo("should render section infos correctly");
-  test.todo("should render multiple application sections");
-  test.todo("should render application sections with no reservation units");
-  test.todo("should render sections with reservation units");
-  test.todo("should render without applicationSections");
-});
-
 describe("Processing Notification", () => {
   test.for([
     [ApplicationStatusChoice.Cancelled, true],

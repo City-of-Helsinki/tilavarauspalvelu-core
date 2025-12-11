@@ -64,10 +64,8 @@ export async function middleware(req: NextRequest) {
     const res = NextResponse.next();
     res.headers.set("x-session-is-valid", String(data?.currentUser?.pk != null));
     return res;
-    // TODO could add check here to rewrite the main page (instead of returning it from the React component)
   } catch (err) {
     logError(err);
-    // TODO check for GraphQL errors vs. network errors (e.g. Connection refused / 503)
     const rewriteUrl = new URL(`${env.NEXT_PUBLIC_BASE_URL ?? ""}/503`, req.url);
     return NextResponse.rewrite(rewriteUrl);
   }

@@ -74,9 +74,8 @@ type TimeInputProps = {
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
 /// Custom component because
-/// HDS TimeInput can not be changed programmatically
-/// this breaks all react-hook-forms because they rely on resetting the value (both controlled / uncontrolled)
-/// TODO if you use this on ui side check accessibility
+/// HDS TimeInput can't be changed programmatically
+/// which breaks react-hook-forms because they rely on resetting the value (both controlled / uncontrolled)
 export const TimeInput = forwardRef(function TimeInput(
   { error, label, className, style, onChange, onKeyDown, ...props }: TimeInputProps,
   ref: Ref<HTMLInputElement>
@@ -107,7 +106,7 @@ export const TimeInput = forwardRef(function TimeInput(
         e.currentTarget.value = value.slice(0, 2);
       }
     } else if (e.key === "Delete") {
-      // TODO Same as backspace
+      // should be the same as backspace
     } else if (
       ((e.key === "v" || e.key === "z" || e.key === "x" || e.key === "c" || e.key === "a") && e.ctrlKey) ||
       e.metaKey

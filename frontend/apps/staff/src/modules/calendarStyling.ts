@@ -141,7 +141,7 @@ type EventKey =
   | "NOT_RESERVABLE"
   | "RESERVABLE"
   | "REST"
-  | "RESERVATION_UNIT_RELEASED" // TODO: Released -> Published
+  | "RESERVATION_UNIT_RELEASED" // Released === Published
   | "RESERVATION_UNIT_DRAFT";
 
 export type EventStyleType = {

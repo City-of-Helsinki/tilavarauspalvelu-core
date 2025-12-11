@@ -67,10 +67,9 @@ interface PopupMenuProps {
   className?: string;
 }
 
-// TODO now this is relative to the button, but that causes few other issues
+// This is relative to the button, but that causes few other issues
 // - the popup is forced to open on the left side so using it on the left of a page would cause an overflow
 // - the popup will expand containers the buttons are inside of (like <table>, not the cell)
-// These seem to be ok for this use case, but for others would need some more work.
 export function PopupMenu({ items, style, className }: PopupMenuProps): JSX.Element {
   const buttonRef = useRef<HTMLDivElement>(null);
   const firstMenuItemRef = useRef<HTMLButtonElement>(null);
@@ -120,7 +119,6 @@ export function PopupMenu({ items, style, className }: PopupMenuProps): JSX.Elem
   );
 }
 
-// TODO add loading indicator also
 function PopupContent({
   items,
   closePopup,

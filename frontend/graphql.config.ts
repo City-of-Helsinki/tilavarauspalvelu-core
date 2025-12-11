@@ -21,21 +21,18 @@ const scalars = {
 };
 
 const gqlConfig = {
-  // TODO should change to true, but requires refactoring (not just type changes)
-  // why avoidOptionals is good? because it doesn't allow passing an invalid query result / fragment to a component
-  // generated fragments helps a lot with that, but there are still cases where it fails.
-  // With this on you have to explicitly set the field to null to pass it to a component or
-  // you know, query it properly from the server like you should in 99% of cases.
+  // Avoid optionals is good because it removes undefined so objects have to be strict supersets
+  // e.g. { name: string | null, value: number | null } doesn't allow { name: "foo" } object
+  // with optionals { name: string | undefined, value: number | undefined }
+  // would allow { name: "foo" }
+  // or even { notName: "bar" } (or any object when all values are optional)
   avoidOptionals: {
     field: true,
-    // TODO mark the one that causes querys to enforce input parameters
     inputValue: false,
     object: false,
     defaultValue: false,
   },
   immutableTypes: true,
-  // TODO this would improve linting fragments but it causes some issues in type generation
-  // experimentalFragmentVariables: true,
   skipTypename: true,
   defaultScalarType: "unknown",
   strictScalars: true,

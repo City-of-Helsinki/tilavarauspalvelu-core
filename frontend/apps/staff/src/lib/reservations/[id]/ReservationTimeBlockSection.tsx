@@ -47,7 +47,6 @@ const isInsideCalendarRange = (x: { start: Date; end: Date }) => x.end.getHours(
 /// @param reservation the current reservation to show in calendar
 /// @param selected (for recurring only) different styling
 /// @param focusDate date to show in the calendar
-// TODO combine with the one in my-unit/ReservationUnitCalendar (without the time change button)
 const Calendar = forwardRef(function Calendar(
   { reservation, refetch, focusDate, events: eventsAll }: CalendarProps,
   ref: Ref<HTMLDivElement>
@@ -187,7 +186,6 @@ export function TimeBlockSection({
   }, [reservation, calendarRefetch]);
 
   const handleChanged = async (): Promise<unknown> => {
-    // TODO use allSettled
     await calendarRefetch();
     return onReservationUpdated();
   };

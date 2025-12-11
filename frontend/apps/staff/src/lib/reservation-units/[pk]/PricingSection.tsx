@@ -77,7 +77,6 @@ function PaidPricingPart({
   const { control, setValue, formState, watch } = form;
   const { errors } = formState;
 
-  // TODO this should be sorted (it's sorted in graphql schema, but codegen randomises the order)
   const unitPriceOptions = Object.values(PriceUnit).map((choice) => ({
     label: t(`translation:priceUnit.${choice}`),
     value: choice,
@@ -92,7 +91,6 @@ function PaidPricingPart({
   const taxPercentagePk = watch(`pricings.${index}.taxPercentage`);
   const taxPercentage = taxPercentageOptions.find((x) => x.pk === taxPercentagePk)?.value ?? 0;
 
-  // TODO mobile number keyboard?
   return (
     <>
       <ControlledSelect
@@ -211,7 +209,6 @@ export function PricingTypeView({ pk, form, taxPercentageOptions }: Props): JSX.
   const { errors } = formState;
 
   const index = watch("pricings").findIndex((pricing) => pricing.pk === pk);
-  // TODO better error handling for index === -1
   if (index === -1) {
     return null;
   }

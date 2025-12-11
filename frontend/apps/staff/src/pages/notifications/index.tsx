@@ -114,8 +114,6 @@ function NotificationsTable({
 
 /// @brief this is the listing page for all notifications.
 function Notifications({ notifications: notificationsOriginal }: PageProps) {
-  // TODO the default sort should be ["state", "-ends"] but the frontend sort doesn't support multiple options
-  // so either leave it with just state or do some custom magic for the initial sort
   const [sort, setSort] = useState<string>("state");
   const orderBy = transformSortString(sort);
 
@@ -252,7 +250,6 @@ export const BANNER_NOTIFICATIONS_TABLE_ELEMENT_FRAGMENT = gql`
   }
 `;
 
-// TODO reduce the size of the query (use a different fragment or no fragment at all)
 export const BANNER_NOTIFICATION_LIST_QUERY = gql`
   query BannerNotificationsList($first: Int, $after: String, $orderBy: [BannerNotificationOrderingChoices]) {
     bannerNotifications(first: $first, after: $after, orderBy: $orderBy) {

@@ -187,8 +187,6 @@ describe("With unit selected", () => {
 
     await waitForFormToBeEnabled();
 
-    // TODO check that the radio buttons are not selected by default
-    // this is because it's better for usability even if it causes acccessiblity issues
     const typeStaff = view.getByLabelText(/STAFF/);
     expect(typeStaff).toBeInTheDocument();
     const typeClosed = view.getByLabelText(/BLOCKED/);
@@ -209,9 +207,6 @@ describe("With unit selected", () => {
 
 test("Form doesn't have meta without a reservation unit.", () => {
   customRender();
-
-  // TODO check that there is no type of reservation
-
   // Reverse of meta field exists check
   const emailInput = screen.queryByLabelText(/reserveeEmail/);
   expect(emailInput).not.toBeInTheDocument();
@@ -230,9 +225,6 @@ describe("Filling the form", () => {
     params.set("reservationUnit", Number(1).toString());
     mockedSearchParams.mockReturnValue(params);
   });
-  // TODO replace screen with view that is passed in here
-  // TODO this is brittle to any changes in the form layout, should use labels to find the elements not tab
-  // TODO should break this function into smaller pieces and remove expects from it (otherwise we end up testing the test)
   async function fillForm({
     begin,
     end,
@@ -268,7 +260,6 @@ describe("Filling the form", () => {
     await user.tab();
     await user.tab();
     // Use default value: "weekly"
-    // TODO could make sure it's selected here
     await user.tab();
 
     await user.keyboard("10");
@@ -348,14 +339,6 @@ describe("Filling the form", () => {
     await user.click(submit);
 
     expect(view.queryByText(/required/)).not.toBeInTheDocument();
-    /* TODO submit checking doesn't work
-     * we either have to provide extra context (like router) to the component
-     * or refactor it so that we can check a mock callback
-     * or mock library calls
-     */
-    // TODO test submit and check both CREATE_RECURRING and CREATE_STAFF mutations get called
-    // we need to return the specific values from those mutations
-    // and check that the wanted 4 reservations were made (or if we want to test errors)
   });
 
   test("Form submission with a lot of blocking reservations", async () => {
@@ -398,8 +381,6 @@ describe("Filling the form", () => {
 
     const overlaps = within(list).queryAllByText(/overlapping/);
     expect(overlaps).toHaveLength(mondayMorningReservations.length);
-
-    // TODO test submit, but it doesn't work without extra context
   });
 
   test("Reservations can be removed and restored", async () => {
