@@ -258,7 +258,6 @@ export function OrderedReservationUnitCard({
   );
 }
 
-// TODO this is functioning as a base fragment for other cards, it should be renamed then
 export const ORDERED_RESERVATION_UNIT_CARD_FRAGMENT = gql`
   fragment OrderedReservationUnitCard on ReservationUnitNode {
     id

@@ -54,7 +54,6 @@ type Props = Omit<TableProps, "onSort"> & {
 };
 
 // @param isLoading - if true, table is rendered with a loading overlay
-// TODO overlay and spinner for loading would be preferable over colour switching
 export function CustomTable({ isLoading, setSort, enableFrontendSorting, ...props }: Props): JSX.Element {
   const [keyOverride, setKeyOverride] = useState<number>(0);
   const onSort = (order: "asc" | "desc", colKey: string) => {

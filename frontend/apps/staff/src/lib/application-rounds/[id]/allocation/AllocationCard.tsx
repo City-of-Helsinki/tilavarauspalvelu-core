@@ -29,10 +29,7 @@ type Props = {
   reservationUnitOptionPk: number;
   selection: string[];
   isAllocationEnabled: boolean;
-  // TODO better solution would be to have a query key (similar to tanstack/react-query) and invalidate the key
-  // so we don't have to prop drill the refetch
   refetchApplicationEvents: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
-  // TODO these should be mandatory (but requires refactoring the parent component a bit)
   timeSlot: SuitableTimeRangeNodeT;
   allocatedTimeSlot: AllocatedTimeSlotNodeT;
 };
@@ -117,7 +114,6 @@ export function AllocatedCard({
   const allocatedDurationMins = allocationEndMins - allocationBeginMins;
   const durationIsInvalid =
     allocatedDurationMins < minDurationSeconds / 60 || allocatedDurationMins > maxDurationSeconds / 60;
-  // TODO should compare the allocated to the suitable time ranges, not to selection
   const isTimeMismatch = false;
 
   const applicantName = getApplicantName(applicationSection.application);
@@ -133,8 +129,6 @@ export function AllocatedCard({
       <StyledAccordion heading={t("allocation:showTimeRequests")} headingLevel="h3">
         <TimeRequested applicationSection={applicationSection} />
       </StyledAccordion>
-      {/* TODO this could be abstracted into a common component (both cards use it, but use diferent error messages and durations
-       * a common error component, since there is also a third different error message (with "error" type) */}
       {isTimeMismatch ? (
         <NotificationInline type="alert">{t("allocation:errors.allocatedOutsideOfRequestedTimes")}</NotificationInline>
       ) : null}
@@ -156,7 +150,6 @@ export function AllocatedCard({
   );
 }
 
-// TODO this seems very similar to the AllocationCard and Column filter functions
 function isOutsideOfRequestedTimes(
   time: SuitableTimeRangeNodeT | AllocatedTimeSlotNodeT | null,
   beginHours: number,
@@ -205,8 +198,6 @@ export function SuitableTimeCard({
   const minDurationSeconds = applicationSection.reservationMinDuration ?? 0;
   const maxDurationSeconds = applicationSection.reservationMaxDuration ?? 0;
   const selectionDurationString = formatDuration(t, { minutes: selectionMins });
-  // TODO this should be cleaner, only pass things we need here
-  // TODO should not default to empty string (unless this is designed zero by default)
   const firstSelected = selection[0] ?? "";
   const lastSelected = selection[selection.length - 1] ?? "";
   const selectionBegin = decodeTimeSlot(firstSelected);
@@ -228,14 +219,6 @@ export function SuitableTimeCard({
       </H5>
       <Applicant>{applicantName}</Applicant>
       <TimeRequested applicationSection={applicationSection} />
-      {/* logic: if in edit mode / not allocated -> check against selection
-       * if allocated -> check against allocated time
-       * always show error
-       * TODO error should be shown for some cases where the selection is not valid
-       */}
-      {/*error ? (
-        <NotificationInline type="error">{error}</NotificationInline>
-      ) : null*/}
       {isTimeMismatch ? (
         <NotificationInline type="alert">{t("allocation:errors.selectionOutsideOfRequestedTimes")}</NotificationInline>
       ) : null}

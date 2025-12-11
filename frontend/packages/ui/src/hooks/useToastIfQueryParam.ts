@@ -19,7 +19,6 @@ export function useToastIfQueryParam({
 
   useEffect(() => {
     const removeTimeUpdatedParam = () => {
-      // TODO this could be changed to useSearchParams instead of router
       const { pathname, query } = router;
       // NOTE ParsedQuery is a Record<string, string>
       const params = new URLSearchParams(query as Record<string, string>);

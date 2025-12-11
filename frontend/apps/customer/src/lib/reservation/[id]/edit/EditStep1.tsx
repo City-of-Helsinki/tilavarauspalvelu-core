@@ -26,8 +26,6 @@ type Props = {
   form: UseFormReturn<PendingReservationFormType>;
 };
 
-// TODO move this to general styles: ButtonContainer
-// test different variantions of it (one, two, three buttons)
 const Actions = styled.div`
   display: flex;
   flex-flow: row wrap;

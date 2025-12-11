@@ -44,7 +44,6 @@ function timeSlotMapper(t: TFunction, slot: AllocatedSectionsTableElementFragmen
   const application = slot.reservationUnitOption.applicationSection?.application;
   const applicantName = getApplicantName(application);
 
-  // TODO should this check the state directly?
   const isAllocated = !slot.reservationUnitOption.isRejected;
 
   const day = convertWeekday(slot.dayOfTheWeek);

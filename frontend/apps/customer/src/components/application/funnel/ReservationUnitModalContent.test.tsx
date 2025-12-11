@@ -138,22 +138,11 @@ describe("Modal render", () => {
 });
 
 describe("Modal search", () => {
-  test.todo("sanity: should render search form");
-  test.todo("should render search form with no results");
-
   test("should show an error if query fails", async () => {
     const view = customRender({ isSearchError: true });
     await isReady(view);
     expect(view.getByText("errors:search")).toBeInTheDocument();
   });
-
-  test.todo("should search on button press");
-  test.todo("should allow setting search filters");
-
-  // TODO do we need to add this here? yes because the query is made from this component
-  // if we move the query somewhere else e.g. reuse it in a component shared by both the modal and recurring/[id] page
-  // we only need to test it once
-  test.todo("pagination should work");
 });
 
 describe("modal card actions", () => {
@@ -233,16 +222,8 @@ describe("modal card actions", () => {
   });
 });
 
-describe("modal actions", () => {
-  test.todo("should have a close modal");
-  test.todo("should have leave modal button");
-});
-
 // Client side query will return loading on first render
 // submit button in this case works as a proxy for the query loading state
-// TODO should create a utility that waits for loading-spinner to be hidden instead
-// this is too specific for search forms and is brittle in case we disable
-// submit for other reasons (like errors)
 async function isReady(view: ReturnType<typeof customRender>): Promise<HTMLElement> {
   const submitBtn = view.getByRole("button", {
     name: "searchForm:searchButton",

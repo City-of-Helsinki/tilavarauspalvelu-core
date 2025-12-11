@@ -14,7 +14,6 @@ export type TimeSpanType = Readonly<{
 }>;
 
 export function getEventBuffers(events: ReservationEventType[]): CalendarEventBuffer[] {
-  // TODO: Deprecate this and make buffers non-events, use useSlotPropGetter and getBuffersFromEvents instead
   const buffers: CalendarEventBuffer[] = [];
   for (const event of events) {
     if (!event.beginsAt || !event.endsAt) {

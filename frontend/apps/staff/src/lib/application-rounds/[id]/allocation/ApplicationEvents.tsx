@@ -20,11 +20,8 @@ import { SelectedSlotsContextProvider } from "./SelectedSlotsContext";
 import { getRelatedTimeSlots } from "./modules/applicationRoundAllocation";
 import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
 
-// TODO max-width for the grid columns (315px, 480px, 332px)
-// TODO not perfect (aligment issues with the last columns and grid end),
 // fit-content is rubbish (content change -> layout jumps),
 // fixed size is impossible unless we use calc
-// sub grid (for the center) not yet tried
 const Content = styled.div`
   font-size: var(--fontsize-body-s);
   line-height: var(--lineheight-xl);
@@ -87,7 +84,6 @@ function EventGroupList({
   );
 }
 
-// TODO combine this with the AllocationColumn Props type (it's more or less just passing it through)
 type ApplicationEventsProps = {
   applicationSections: SectionNodeT[];
   reservationUnit: Pick<ReservationUnitNode, "pk">;
@@ -96,7 +92,6 @@ type ApplicationEventsProps = {
   relatedAllocations: Array<Pick<AllocatedTimeSlotNodeT, "dayOfTheWeek" | "beginTime" | "endTime">>;
 };
 
-/// TODO rename to something more descriptive
 export function AllocationPageContent({
   applicationSections,
   reservationUnit,
@@ -104,28 +99,6 @@ export function AllocationPageContent({
   applicationRoundStatus,
   relatedAllocations,
 }: ApplicationEventsProps): JSX.Element {
-  /* FIXME this is dangerous and causes infinite loops
-   * change the architecture in such a way that we don't need to do this
-  const params = useSearchParams();
-  // TODO could also pass the applicationSections to the hook and let it handle the filtering
-  // and validating that the focused application event is in the list of application events
-  // could also add a reset toggle to the hook, and remove the effect from here
-  const [, setFocusedApplicationEvent] = useFocusApplicationEvent();
-
-  // When selected reservation unit changes, remove any focused application event that's not in the new reservation unit
-  // TODO could include it in the hook or wrap it inside it's own
-  useEffect(() => {
-    const selectedAesPk = toNumber(params.get("aes"));
-    if (selectedAesPk) {
-      const selectedAeas = applicationSections.find((ae) => ae.pk === selectedAesPk);
-      setFocusedApplicationEvent(selectedAeas);
-    } else {
-      setFocusedApplicationEvent(undefined);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- We only care if reservationUnit changes, and adding the rest causes an infinite loop
-  }, [reservationUnit, params]);
-  */
-
   const relatedSpacesTimeSlotsByDayReduced = getRelatedTimeSlots(relatedAllocations);
 
   // NOTE left hand cards include other reservation units as well (if they are allocated)
@@ -142,7 +115,6 @@ export function AllocationPageContent({
       reservationUnitOptions: ae.reservationUnitOptions?.filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk),
     }));
 
-  // TODO should use mobile menu layout if the screen is small (this page probably requires  >= 1200px)
   return (
     <SelectedSlotsContextProvider>
       <Content>
@@ -176,7 +148,6 @@ function ApplicationSectionColumn({
   applicationSections,
   reservationUnit,
   refetchApplicationEvents,
-  // TODO separate these types (use a union of two types or use Pick to define a new type)
 }: Pick<ApplicationEventsProps, "applicationSections" | "refetchApplicationEvents" | "reservationUnit">): JSX.Element {
   const { t } = useTranslation();
 
@@ -201,8 +172,8 @@ function ApplicationSectionColumn({
       .some(Boolean);
 
   // one of:
-  // - handled or
-  // - allocated and here and locked
+  // - handled
+  // - allocated here and locked
   const allocated = sections.filter(
     (as) =>
       as.status === ApplicationSectionStatusChoice.Handled ||

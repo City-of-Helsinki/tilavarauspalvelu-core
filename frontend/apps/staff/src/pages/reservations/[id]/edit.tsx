@@ -49,7 +49,6 @@ function EditReservation({
 
   const reservationUnit = reservation.reservationUnit;
 
-  // TODO recurring requires a description and a name box
   const form = useForm<ReservationChangeFormType>({
     resolver: zodResolver(ReservationChangeFormSchema),
     mode: "onChange",
@@ -86,7 +85,7 @@ function EditReservation({
     const { seriesName, comments, reserveeIsUnregisteredAssociation, reserveeIdentifier, ...rest } = values;
 
     const toSubmit = {
-      // TODO don't use spread it breaks type checking for unknown fields
+      // TODO: don't use spread it breaks type checking for unknown fields
       ...rest,
       seriesName,
       // force update to empty -> NA

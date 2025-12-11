@@ -51,7 +51,6 @@ vi.mock("next/router", () => ({
 
 type ApplicationPage3 = NonNullable<ApplicationPage3Query["application"]>;
 function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnType<typeof render> {
-  // TODO need a graphql mutation mock (but have to have separate error / success cases)
   if (props.page == null) {
     props.page = "page2";
   }
@@ -66,7 +65,6 @@ function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnTyp
 
 describe("Application Page3", () => {
   test("smoke: should render page with initial data", () => {
-    // TODO all of this is common to all application funnel pages
     const view = customRender();
     expect(view.getByRole("heading", { name: "application:Page3.subHeading" })).toBeInTheDocument();
     expect(view.getByRole("button", { name: "common:next" }));
@@ -76,20 +74,8 @@ describe("Application Page3", () => {
 
     const form = view.getByTestId("application__page3--form");
     expect(form).toBeInTheDocument();
-    // TODO this doesn't match getByRole("heading")
     expect(within(form).getByText("application:Page3.sectionHeadings.basicInfo"));
-    // TODO check that we have a single application section with the pick times calendar
   });
-
-  test.todo("new application should not have type selected");
-  test.todo("can't submit without selecting type");
-  test.todo("type: individual form should render correctly");
-  test.todo("type: organisation form should render correctly");
-  test.todo("type: company form should render correctly");
-  test.todo("toggling billing address should show/hide the section");
-  test.todo("organisation should allow toggling VAT number");
-  test.todo("individual should not have VAT number");
-  test.todo("company should not allow toggling VAT number");
 
   test("should send the form when clicking next", async () => {
     const view = customRender({ page: "page3" });
@@ -99,5 +85,4 @@ describe("Application Page3", () => {
     await userEvent.click(nextButton);
     expect(mockedRouterPush).toHaveBeenCalledWith(getApplicationPath(1, "page4"));
   });
-  test.todo("should fail to send if form is invalid");
 });

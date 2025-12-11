@@ -15,11 +15,6 @@ interface MultiSelectFilterProps {
   enableSearch?: boolean;
 }
 
-// TODO is the T param good enough for type safety?
-// arrays of unions can be broken (ex. pushing a number to string[])
-// Discriminated Union can't be broken, but are unwieldy to use in this case
-// We want any type compatible with string | number be accepted
-// but never accept a combination of any of those types ex. [{label: "foo", value: 1}, {label: "bar", value: "baz"}]
 export function MultiSelectFilter(props: MultiSelectFilterProps): JSX.Element {
   const { name } = props;
   const searchParams = useSearchParams();
@@ -68,7 +63,6 @@ function BaseMultiSelectFilter({
       noTags
       options={options.map(convertOptionToHDS)}
       disabled={options.length === 0}
-      // TODO this breaks form typing -> all values are converted to string no matter what the type is
       value={options.filter((v) => filter.includes(v.value.toString())).map(convertOptionToHDS)}
       onChange={(selected) => {
         const vals = selected.map((x) => x.value);

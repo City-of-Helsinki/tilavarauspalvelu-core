@@ -43,13 +43,6 @@ type BufferCollideCheckReservation = Pick<
   "beginsAt" | "endsAt" | "isBlocked" | "bufferTimeBefore" | "bufferTimeAfter"
 >;
 
-// TODO sub classing Map and overriding get would be a lot cleaner
-// because of the way get compares (===) the keys we have to serialize keys to strings
-// which removes all type information (and allows empty strings or malformed keys)
-// we want the key to be { year, month, day } and not a string
-// for now using "yyyy-mm-dd" as the key to test it, refactor later (using a subclass).
-// TODO values should be { hour, minute } not Date objects
-// TODO provide serialization and deserialization functions (that have format checkers)
 export type ReservableMapKey = string; // format: "yyyy-mm-dd"
 export type ReservableMap = Map<ReservableMapKey, Array<{ start: Date; end: Date }>>;
 
@@ -62,12 +55,6 @@ export function dateToKey(date: Date): ReservableMapKey {
 // - multiple time spans on the same day
 // - single time span spanning multiple days
 // - a time span that starts on the previous day and ends on the next day
-// TODO (later) this should reduce the amount of memory we use by
-// - storing only the times not date (and constructing the date from the key)
-// - store a smaller interval (like a month at a time, not the whole 2 years)
-// TODO splitting Date into actual Date and Time would make this a lot easier
-// because the key should only care about the Date part and we don't want
-// make stupid mistakes by using Map.get(new Date()) instead of Map.get(startOfDay(new Date()))
 export function generateReservableMap(reservableTimeSpans: ReadonlyArray<ReservableTimeSpanType>): ReservableMap {
   const converted = reservableTimeSpans
     .map((n) => {
@@ -179,8 +166,6 @@ export const IS_RESERVABLE_FRAGMENT = gql`
   }
 `;
 
-/// NOTE don't return [boolean, string] causes issues in TS / JS
-/// instead break this function into cleaner separate functions
 export function isRangeReservable({
   range,
   reservationUnit,
@@ -234,7 +219,6 @@ export function isRangeReservable({
     return false;
   }
 
-  // TODO what does this do?
   if (
     !isRangeReservable_({
       range: [start, end],
@@ -258,12 +242,6 @@ export function isRangeReservable({
   const others = blockingReservations.filter(shouldReservationBlock).filter((r) => {
     const rStart = new Date(r.beginsAt);
     const rEnd = new Date(r.endsAt);
-    // Performance optimization:
-    // (should be filtered outside of this function and cached per week, not calculated every time reservation time is selected)
-    // buffer is never greater than 24 hours (using real buffer time could work, but we'd have more complex rules)
-    // this is a noticable performance improvement when there are thousands of reservations
-    // 15 000ms -> 700 ms in click handler when changing days / weeks without caching.
-    // To get it below 100ms we need to move it out of this function.
     if (addDays(rEnd, 1) < start || addDays(rStart, -1) >= end) {
       return false;
     }
@@ -284,8 +262,7 @@ export function isRangeReservable({
 }
 
 export type TimeFrameSlot = { start: Date; end: Date };
-// checks that the start time is valid for the interval of the reservation unit
-// TODO should this be doing any checks for the date? or just the start time?
+/// checks that the start time is valid for the interval of the reservation unit
 export function isStartTimeValid(date: Date, timeSlots: ReservableMap, interval: ReservationStartInterval): boolean {
   const slotsForDay = timeSlots.get(dateToKey(date));
   if (slotsForDay == null) {
@@ -297,7 +274,6 @@ export function isStartTimeValid(date: Date, timeSlots: ReservableMap, interval:
     .some((x) => differenceInMinutes(date, x.start) % intervalMins === 0);
 }
 
-// TODO rename and rework this function
 function isRangeReservable_({
   range,
   reservableTimes,
@@ -320,7 +296,6 @@ function isRangeReservable_({
   if (!start || !end) {
     return false;
   }
-  // TODO we should be able to check the range without generating all the slots
   const slots = generateSlots(start, end, ReservationStartInterval.Interval_15Minutes);
 
   const res = slots.map((slot) => areReservableTimesAvailable(reservableTimes, slot));
@@ -399,8 +374,6 @@ function generateSlots(start: Date, end: Date, reservationStartInterval: Reserva
   const slots = [];
   const intervalMinutes = getIntervalMinutes(reservationStartInterval);
 
-  // TODO is there a reason to generate the last slot? if yes then we need to normalize it so it's 1ms before the actual end
-  // otherwise another check will fail
   for (let i = new Date(start); i < end; i = addMinutes(i, intervalMinutes)) {
     slots.push(i);
   }
@@ -409,7 +382,6 @@ function generateSlots(start: Date, end: Date, reservationStartInterval: Reserva
 }
 
 function areReservableTimesAvailable(reservableTimes: ReservableMap, slotDate: Date): boolean {
-  // TODO this should be done differently slots is kinda bad
   const reservableTimesForDay = reservableTimes.get(dateToKey(slotDate));
   if (reservableTimesForDay == null) {
     return false;
@@ -482,7 +454,6 @@ type PropGetterProps = {
   reservationBeginsAt?: Date;
   reservationEndsAt?: Date;
 };
-// TODO refactor this (it's way too complicated and passes all it's parameters to another function)
 export const getSlotPropGetter =
   ({
     reservableTimes,
@@ -541,8 +512,6 @@ export function getBoundCheckedReservation({
   // start time and duration needs to be snapped to the nearest interval
   // i.e. case where the options are 60 mins apart but the drag and drop allows 30 mins increments
   // this causes backend validation errors
-  // TODO need to redo the start snapping function
-  // needs to use isStartTimeValid or a similar method (that calculates the distance from reservableTimes)
   const interval = getIntervalMinutes(reservationStartInterval);
   const newStart = start;
   let duration = clampDuration(

@@ -43,8 +43,6 @@ const emptyTerms = {
   termsType: TermsOfUseTypeChoices.Payment,
 };
 
-// TODO remove and use fakeTimers with doNotFake option
-// requires refactoring the mocks to use constructors instead of static values
 export const YEAR = 2024;
 
 function createReservationUnitFragment({ pk, nameFi }: { pk: number; nameFi: string }): CreateStaffReservationFragment {
@@ -246,7 +244,6 @@ function createInIntervalQueryMock({ begin, end }: { begin: Date; end: Date }) {
   };
 }
 
-// TODO parametrize the mock generation
 export function createGraphQLMocks({ begin, end }: { begin: Date; end: Date }) {
   const now = new Date();
   return [

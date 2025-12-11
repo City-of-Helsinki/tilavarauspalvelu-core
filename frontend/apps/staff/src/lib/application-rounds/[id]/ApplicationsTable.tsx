@@ -168,7 +168,6 @@ export function ApplicationsTable({
       isLoading={isLoading}
       rows={rows}
       cols={cols}
-      // TODO refactor maybe so we can use a string, -field for desc, field for asc
       initialSortingColumnKey={sortField}
       initialSortingOrder={sortDirection}
     />

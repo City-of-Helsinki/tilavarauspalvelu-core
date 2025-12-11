@@ -88,7 +88,6 @@ export function IntendedUses({ intendedUses }: Props): JSX.Element {
     return `${getSingleSearchPath(params)}#content`;
   };
 
-  // TODO the search (the first section) doesn't belong here
   return (
     <>
       <Top>

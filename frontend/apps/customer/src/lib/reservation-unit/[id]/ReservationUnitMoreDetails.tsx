@@ -30,7 +30,6 @@ import type {
 import { ReservationInfoSection } from "./ReservationInfoSection";
 
 /// Below the fold content
-/// TODO use a client side fetch instead of passing data from SSR (requires more refactors)
 export function ReservationUnitMoreDetails({
   reservationUnit,
   isReservable,

@@ -74,8 +74,6 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
   const getTranslatedError = (field: FieldName): string | undefined => {
     const error = errors.applicationSections?.[index]?.[field];
     if (error?.message != null) {
-      // TODO this could be changed in the validation schema
-      // so it follows the same pattern as the other fields
       if (field === "reservationUnits" && error.type === "too_small") {
         return t("application:validation.noReservationUnits");
       }
@@ -290,7 +288,6 @@ export function ApplicationSectionPage1(props: Props): JSX.Element {
   const openByDefault = watch(`applicationSections`)?.length === 1;
   const isVisible = openByDefault || watch(`applicationSections.${index}.isAccordionOpen`);
 
-  // TODO requires us to use the accordion from admin-ui instead (or add force open)
   const hasErrors = errors.applicationSections?.[index] != null;
 
   const shouldRenderInner = isVisible || hasErrors;

@@ -69,9 +69,6 @@ function BreadcrumbImpl({ routes, isMobile }: Pick<Props, "routes"> & { isMobile
   const routesWithSlug = routes?.filter((n) => n.slug != null && n.slug !== "");
   const lastRoute = routes[routes.length - 1];
   const lastRouteWithSlug = routesWithSlug[routesWithSlug.length - 1];
-  // TODO why are we doing this? is there a case where we need to do this?
-  // or would it just be better to pass hideMobileBreadcrumb prop to the component
-  // instead of having hidden logic here?
   const isMobileEnabled =
     isMobile && routesWithSlug.length > 0 && lastRoute != null && lastRoute.slug !== lastRouteWithSlug?.slug;
 

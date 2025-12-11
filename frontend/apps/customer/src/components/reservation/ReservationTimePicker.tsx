@@ -72,7 +72,6 @@ export type ReservationTimePickerProps = Readonly<{
   reservationForm: UseFormReturn<PendingReservationFormType>;
   isReservationQuotaReached: boolean;
   submitReservation: (d: PendingReservationFormType) => void;
-  // TODO replace with mode selector
   loginAndSubmitButton?: JSX.Element;
   startingTimeOptions: Array<{ value: string; label: string }>;
 }>;
@@ -112,8 +111,6 @@ function useCalendarEventChange({
   blockingReservations: ReadonlyArray<BlockingReservationFieldsFragment>;
 }): Array<CalendarEventBuffer | CalendarEvent<ReservationNode>> {
   const { t } = useTranslation();
-  // TODO this doesn't optimize anything
-  // any change in the event will cause a full recalculation
   return useMemo(() => {
     const shouldDisplayFocusSlot = focusSlot.isReservable;
 
@@ -135,7 +132,6 @@ function useCalendarEventChange({
         start: new Date(n.beginsAt ?? ""),
         end: new Date(n.endsAt ?? ""),
         allDay: false,
-        // TODO refactor and remove modifying the state
         event: n as ReservationNode,
       };
 
@@ -210,7 +206,6 @@ export function ReservationTimePicker({
     reservationUnit,
   });
 
-  // TODO should come from SSR
   const { currentUser } = useCurrentUser();
 
   const durationOptions = getDurationOptions(reservationUnit, t);
@@ -249,8 +244,6 @@ export function ReservationTimePicker({
     }
 
     // Limit the duration to the max reservation duration
-    // TODO should be replaced with a utility function that is properly named
-    // TODO this can be removed? or at least we should calculate the new times before doing isReservable check
     const { begin } = getNewReservation({
       start: newStart,
       end: newEnd,
@@ -267,9 +260,6 @@ export function ReservationTimePicker({
     return true;
   };
 
-  // TODO combine the logic of this and the handleCalendarEventChange
-  // compared to handleDragEvent, this doesn't allow changing the duration (only the start time)
-  // if the duration is not possible, the event is not moved
   const handleSlotClick = (props: SlotClickProps): boolean => {
     const { start, end } = props;
     if (isReservationQuotaReached) {
@@ -305,7 +295,6 @@ export function ReservationTimePicker({
       return false;
     }
 
-    // TODO this seems superfluous
     const { begin } = getNewReservation({
       start: newStart,
       end: realEnd,
@@ -321,8 +310,6 @@ export function ReservationTimePicker({
     return true;
   };
 
-  // TODO add pagination
-  // TODO also combine with other instances of LIST_RESERVATIONS
   const { data } = useListReservationsQuery({
     fetchPolicy: "no-cache",
     skip: !currentUser || !reservationUnit.pk,
@@ -351,8 +338,7 @@ export function ReservationTimePicker({
 
   return (
     <>
-      {/* TODO is calendar ref necessary? */}
-      <div aria-hidden /* ref={calendarRef} */>
+      <div aria-hidden>
         <Calendar<ReservationNode>
           events={calendarEvents}
           begin={focusDate}
@@ -372,8 +358,6 @@ export function ReservationTimePicker({
           toolbarComponent={Toolbar}
           dateCellWrapperComponent={TouchCellWrapper}
           resizable={!isReservationQuotaReached}
-          // NOTE there was logic here to disable dragging on mobile
-          // it breaks SSR render because it swaps the whole Calendar component
           draggable
           onSelectSlot={handleSlotClick}
           onEventDrop={handleCalendarEventChange}
@@ -404,8 +388,6 @@ export function ReservationTimePicker({
   );
 }
 
-// TODO this could be narrowed down
-// (requires rethinking the utility functions to reduce the amount of fragments)
 export const RESERVATION_TIME_PICKER_FRAGMENT = gql`
   fragment ReservationTimePickerFields on ReservationUnitNode {
     id

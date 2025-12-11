@@ -32,7 +32,6 @@ export type NewReservationListItem = {
 };
 
 // In the UI spec parent container max height is 22rem, but overflow forces us to define child max-height
-// TODO can't be unlimited, because we might have a lot of reservations (like 200 - 400)
 const ListWrapper = styled.div<{ $isTall?: boolean }>`
   max-height: ${({ $isTall }) => ($isTall ? "48rem" : "18.5rem")};
   overflow: hidden auto;
@@ -74,9 +73,6 @@ const ErrorLabel = styled(StatusLabel)`
   margin-inline: -8px;
 `;
 
-// TODO this function should be refactored
-// all the messages and label types should be enum -> object mapping (or similar)
-// and they should be stored in a single field in the ListItem object
 function getStatus(x: NewReservationListItem) {
   if (x.isOverlapping) {
     return {
@@ -107,8 +103,7 @@ function getStatus(x: NewReservationListItem) {
     };
   }
   if (x.error) {
-    // TODO the error handling is really messy and it's impossible to get codes rather than the error message string
-    // also the i18n map is built stupidly so we can't use strings with spaces as keys
+    // NOTE the error handling is messy because impossible to get codes rather than the error message string
     const intervalErrorMsg = /ApolloError: Reservation start time does not match the allowed interval/;
     const overlapErrorMsg = /Overlapping reservations are not allowed/;
     const reservationInPastErrorMsg = /ApolloError: Reservation new begin cannot be in the past/;
@@ -202,7 +197,6 @@ type Props = {
 type ExtendedProps = AddNewReservationButtonProps & Props;
 
 /// Used by the ReservationSeries pages to show a list of reservations
-// TODO should be renamed / moved to signify that this is only for recurring reservations
 export function ReservationList(props: Props | ExtendedProps) {
   const { header, items, hasPadding, isTall } = props;
   if (items.length === 0) {
@@ -211,8 +205,6 @@ export function ReservationList(props: Props | ExtendedProps) {
 
   const hasReservation = "reservationToCopy" in props && !!props.reservationToCopy;
 
-  // NOTE this doesn't properly handle other reservation states than removed
-  // should drill the actual state in the props (not just the removed flag)
   const hasReservationsInFuture = items.some((item) => !item.isRemoved && item.date >= startOfDay(new Date()));
   const showNewReservationButton = hasReservation && hasReservationsInFuture;
 

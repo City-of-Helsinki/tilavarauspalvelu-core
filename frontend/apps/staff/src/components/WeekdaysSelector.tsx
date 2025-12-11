@@ -1,7 +1,3 @@
-/**
- * Selector component for weekdays
- * TODO this not accessible
- */
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -53,7 +49,6 @@ const ErrorText = styled.div`
   }
 `;
 
-// TODO this is not a label
 const Label = styled.p<{ $bold?: boolean }>`
   font-family: var(--fontsize-body-m);
   font-weight: ${({ $bold }) => ($bold ? "700" : "500")};
@@ -89,7 +84,6 @@ export function WeekdaysSelector({ label, value = [], disabled = false, onChange
     }
   };
 
-  // NOTE This is not accessible (even with the role="checkbox")
   return (
     <div>
       <Label>{label}</Label>

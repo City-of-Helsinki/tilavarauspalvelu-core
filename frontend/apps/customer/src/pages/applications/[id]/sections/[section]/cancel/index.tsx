@@ -229,14 +229,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const { applicationSection } = data || {};
     const section = applicationSection;
 
-    // TODO do we need a check for all sections? so do we have to query their reservations also?
-    // or is it just reservationUnit since the cancel reason is tied to the unit not the reservation
-    //
-    // TODO we should at least check if the section has any reservations and if any of them are cancellable
-    // but that requires we query the CancelFields for the reservations
-    // - should we disable the cancel button? probably
-    // - should we redirect here or show an error if the section can't be cancelled? (assuming url access)
-    const canCancel = section != null; // && isReservationCancellable(reservation);
+    const canCancel = section != null;
     if (canCancel) {
       return {
         props: {
@@ -244,18 +237,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
           applicationSection: section,
         },
       };
-    } /* TODO redirect if the applicationSection is already cancelled?
-    else if (reservation != null) {
-      return {
-        redirect: {
-          permanent: true,
-          destination: getReservationPath(reservation.pk),
-        },
-        props: {
-          notFound: true, // for prop narrowing
-        },
-      };
-    }*/
+    }
   }
 
   return {
@@ -269,8 +251,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 export default ReservationCancelPage;
 
-// TODO remove the extra reservationUnit fields (included in the CanUserCancelReservationFragment)
-// need to do frontend mods to call the function but the query is a lot simpler for backend
 export const APPLICATION_SECTION_CANCEL_QUERY = gql`
   query ApplicationSectionCancel($id: ID!) {
     applicationSection(id: $id) {

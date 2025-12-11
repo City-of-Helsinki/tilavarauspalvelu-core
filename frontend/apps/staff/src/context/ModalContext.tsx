@@ -18,7 +18,6 @@ type Props = {
   children: React.ReactNode;
 };
 
-// TODO non HDS modals should be deprecated (start by removing the default values)
 export const ModalContextProvider: React.FC<Props> = ({ children }: Props) => {
   const [modalContent, setModalContent] = useState<{
     content: JSX.Element | null;

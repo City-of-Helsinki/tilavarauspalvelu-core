@@ -41,7 +41,6 @@ type Props = {
   noParentless?: boolean;
   errorText?: string;
   selfPk?: number;
-  // TODO why is the label sent upstream?
   onChange: (val: number | null, name?: string) => void;
 };
 
@@ -73,8 +72,7 @@ export function ParentSelector({
 
   const unitSpaces = spacesAsHierarchy(data?.unit, "\u2007");
 
-  // NOTE there used to be children filtering, but it filtered out all possible options
-  // this handles the first level of children, but if it's a deeper hierarchy, it's not handled
+  // NOTE this handles the first level of children, but deeper hierarchy is not handled
   const opts = unitSpaces
     .filter((space) => selfPk == null || (space.pk !== selfPk && space.parent?.pk !== selfPk))
     .map((space) => ({

@@ -33,7 +33,7 @@ export function getSignInUrl({
   const loginUrl = new URL(`${buildAuthUrl(apiBaseUrl)}login/`);
 
   if (callBackUrl.includes(`/logout`)) {
-    // TODO this is unsound if the callback url is not a full url but this at least redirects to an error page
+    // NOTE this is unsound if the callback url is not a full url but at least it redirects to an error page
     loginUrl.searchParams.set("next", originOverride ?? new URL(callBackUrl).origin);
     return loginUrl.toString();
   }

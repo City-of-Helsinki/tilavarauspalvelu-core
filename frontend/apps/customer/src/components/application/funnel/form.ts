@@ -24,7 +24,6 @@ type SectionTypePage2 = NonNullable<NodePage2["applicationSections"]>[0];
 const SuitableTimeRangeFormTypeSchema = z.object({
   pk: z.number().optional(),
   priority: z.enum(Priority),
-  // TODO validate Time input string
   beginTime: z.string(),
   endTime: z.string(),
   dayOfTheWeek: z.enum(Weekday),
@@ -48,7 +47,6 @@ const ApplicationSectionPage1Schema = z
     appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }).max(7, { error: "lte_7" }),
     begin: z.string().min(1, { message: "Required" }),
     end: z.string().min(1, { message: "Required" }),
-    // TODO do we want to keep the pk of the options? so we can update them when the order changes and not recreate the whole list on save?
     reservationUnits: z.array(z.number()).min(1, { message: "Required" }),
     // frontend only props
     isAccordionOpen: z.boolean(),
@@ -84,7 +82,7 @@ export type ApplicationSectionPage1FormValues = z.infer<typeof ApplicationSectio
 
 export type ApplicationSectionPage2FormValues = z.infer<typeof ApplicationSectionPage2Schema>;
 
-// seconds
+/// @returns time range length in seconds
 function lengthOfTimeRange(timeRange: SuitableTimeRangeFormValues): number {
   const begin = timeToMinutes(timeRange.beginTime);
   const end = timeToMinutes(timeRange.endTime);
@@ -190,7 +188,6 @@ function convertApplicationSectionPage1(section: SectionType): ApplicationSectio
     maxDuration: section.reservationMaxDuration ?? 0,
     appliedReservationsPerWeek: section.appliedReservationsPerWeek,
     reservationUnits,
-    // TODO why do these default to undefined instead of empty string?
     begin: convertDate(section.reservationsBeginDate) ?? "",
     end: convertDate(section.reservationsEndDate) ?? "",
     isAccordionOpen: false,
@@ -200,7 +197,6 @@ function convertApplicationSectionPage1(section: SectionType): ApplicationSectio
 function convertTimeRange(timeRange: NonNullable<SectionType["suitableTimeRanges"][0]>): SuitableTimeRangeFormValues {
   return {
     pk: timeRange.pk ?? undefined,
-    // TODO pk should be sent if updating (otherwise it always creates new)
     beginTime: timeRange.beginTime ?? "",
     dayOfTheWeek: timeRange.dayOfTheWeek ?? 0,
     endTime: timeRange.endTime ?? "",
@@ -380,8 +376,6 @@ export const ApplicationPage3Schema = z
 
 export type ApplicationPage3FormValues = z.infer<typeof ApplicationPage3Schema>;
 
-/// form -> API transformers, enforce return types so API changes cause type errors
-
 function transformDateString(date?: string | null): string | null {
   if (date == null) {
     return null;
@@ -421,7 +415,6 @@ function transformApplicationSection(
     reservationMinDuration: ae.minDuration ?? 0, // "3600" == 1h
     reservationMaxDuration: ae.maxDuration ?? 0, // "7200" == 2h
     appliedReservationsPerWeek: ae.appliedReservationsPerWeek,
-    // TODO should validate that the units are on the application round
     reservationUnitOptions: ae.reservationUnits.map((ruo, ruoIndex) => transformEventReservationUnit(ruo, ruoIndex)),
   };
   if (ae.pk != null) {
@@ -443,7 +436,6 @@ export function transformApplicationPage2(values: ApplicationPage2FormValues): A
   };
 }
 
-// For page 1
 export function transformApplicationPage1(values: ApplicationPage1FormValues): ApplicationUpdateMutationInput {
   const { pk, applicantType } = values;
   const appEvents = filterNonNullable(values.applicationSections);
@@ -463,9 +455,9 @@ export function convertApplicationPage2(
   };
 }
 
+/// @param reservationUnits to have a default selection for a new application section
 export function convertApplicationPage1(
   app: ReadonlyDeep<ApplicationFormFragment>,
-  // We pass reservationUnits here so we have a default selection for a new application section
   reservationUnits: number[]
 ): ApplicationPage1FormValues {
   const formAes = filterNonNullable(app?.applicationSections).map((ae) => convertApplicationSectionPage1(ae));
@@ -480,12 +472,8 @@ export function convertApplicationPage1(
 export function createDefaultPage1Section(
   reservationUnits: number[]
 ): NonNullable<ApplicationPage1FormValues["applicationSections"]>[0] {
-  // TODO do we need to set default values?
   return {
     name: "",
-    // TODO this is not unique if the user adds multiple new sections
-    // it doesn't matter as long as any newly added sections have different keys
-    // would be better if this returned empty array and the form added single section on mount
     formKey: "event-NEW",
     numPersons: undefined,
     ageGroup: 0,

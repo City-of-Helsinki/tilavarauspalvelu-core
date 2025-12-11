@@ -126,10 +126,6 @@ const StyledLink = styled(Link)`
   }
 `;
 
-// TODO type is bad, it get's prop drilled and it should be gotten from applicationSection instead
-// if not it shold be renamed to status? "declined" | "allocated" | "unallocated" | "partiallyAllocated"
-// or variation since it's used only for styling
-// TODO rename, this is the Listing Card / Info Card, that doesn't have any functionality
 export function ApplicationSectionCard({
   applicationSection,
   reservationUnit,
@@ -163,7 +159,6 @@ export function ApplicationSectionCard({
   return (
     <Card $type={type}>
       <TitleWrapper>
-        {/* TODO Radio button can't be controlled, the typical hds problem, so if we use query params to make it active it doesn't work */}
         <StyledRadioButton
           id={`applicationSection-${applicationSection.pk}`}
           label={applicationSection.name}
@@ -343,8 +338,6 @@ const ScheduleCard = styled.div`
   text-align: left;
 `;
 
-// frontend modified the gql type so we have to do this magic
-// better would be to use fragments that are precise not the query types
 type AllocatedT = Omit<AllocatedTimeSlotNodeT, "reservationUnitOption"> & {
   reservationUnitOption: NonNullable<SectionNodeT["reservationUnitOptions"]>[0];
 };
@@ -376,7 +369,6 @@ function AllocatedScheduleSection({
   const combinedName = `${allocatedReservationUnit?.nameFi ?? "-"}, ${allocatedReservationUnit.unit?.nameFi ?? "-"}`;
   return (
     <ScheduleCard key={allocatedTimeSlot.pk}>
-      {/* TODO functionality for selecting the schedule vs. an applicationSection */}
       <StyledRadioButton
         id={`applicationSectionSchedule-${allocatedTimeSlot.pk}`}
         disabled={isInDifferentUnit}

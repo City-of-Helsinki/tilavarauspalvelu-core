@@ -192,7 +192,6 @@ function TimeSelection(): JSX.Element {
     const endTime = addMinutes(startOfDay(new Date()), minsEnd);
     const startIndex = timeSlotStartOptions.indexOf(val);
     // The select component completely breaks if the end time is before the start time
-    // TODO more robust solution that shows errors to the users without breaking the UI
     if (minsEnd <= minsStart && minsEnd !== 0) {
       return;
     }
@@ -315,7 +314,6 @@ export function AllocationColumn({
   const startHour = slots[0]?.hour ?? 0;
   const endHour = slots[slots.length - 1]?.hour ?? 0;
 
-  // TODO copy pasta from AllocationCalendar (the day part of this)
   const aes = applicationSections ?? [];
 
   // NOTE need to split the applicationSection into two props
@@ -385,7 +383,6 @@ export function AllocationColumn({
     })
   );
 
-  // TODO empty state when no selection (current is ok placeholder), don't remove from DOM
   return (
     <Wrapper>
       <CloseBtn type="button" onClick={() => setSelection([])}>

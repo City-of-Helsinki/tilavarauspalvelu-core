@@ -32,7 +32,6 @@ export type SearchFormValues = {
   accessTypes: string[];
 };
 
-// TODO combine as much as possible with the one in single-search (move them to a common place)
 function mapSeasonalQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   return {
     intendedUses: mapParamToInteger(params.getAll("intendedUses"), 1),

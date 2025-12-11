@@ -66,7 +66,6 @@ export function ReservationInfoSection({
   const isReservable =
     reservationUnit.reservationsMaxDaysBefore != null || reservationUnit.reservationsMinDaysBefore != null;
 
-  // TODO this should be a list
   return (
     <div data-testid="reservation-unit__reservation-info">
       <Subheading>{t("reservationCalendar:reservationInfo")}</Subheading>
@@ -112,8 +111,6 @@ function ReservationDuration({
 }: Pick<NodeT, "minReservationDuration" | "maxReservationDuration">): JSX.Element | null {
   const { t } = useTranslation();
 
-  // TODO why does this require both min and max?
-  // and is that a possible case for published reservation units? (or is it an error?)
   if (minReservationDuration == null || maxReservationDuration == null) {
     return null;
   }

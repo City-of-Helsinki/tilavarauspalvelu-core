@@ -51,7 +51,6 @@ vi.mock("next/router", () => ({
 
 type ApplicationPage2 = NonNullable<ApplicationPage2Query["application"]>;
 function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnType<typeof render> {
-  // TODO need a graphql mutation mock (but have to have separate error / success cases)
   if (props.page == null) {
     props.page = "page2";
   }
@@ -64,10 +63,8 @@ function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnTyp
   );
 }
 
-//
 describe("Application Page2", () => {
   test("should render page properly", () => {
-    // TODO all of this is common to all application funnel pages
     const view = customRender();
     expect(view.getByRole("heading", { name: "application:Page2.subHeading" })).toBeInTheDocument();
     expect(view.getByRole("button", { name: "common:next" }));
@@ -85,7 +82,6 @@ describe("Application Page2", () => {
         selector: "button",
       })
     ).toBeInTheDocument();
-    // TODO check that we have a single application section with the pick times calendar
   });
 
   test("back button should go back to page1", async () => {
@@ -115,13 +111,6 @@ describe("Application Page2", () => {
   });
 });
 
-describe("Application time selection", () => {
-  test.todo("should submit correct time ranges");
-  test.todo("should submit disjoint time ranges");
-  test.todo("should submit correct day");
-  test.todo("should submit correct priority");
-});
-
 // errors require form context so have to test on this level
 describe("Application page2 validation errors", () => {
   test("no error messages by default", () => {
@@ -129,9 +118,6 @@ describe("Application page2 validation errors", () => {
     const validationErrors = view.queryAllByText(/application:validation/);
     expect(validationErrors).toHaveLength(0);
   });
-
-  // TODO requires changing the mocks (allow override to add more weekly reservations)
-  test.todo("At least as many suitable time ranges as applied reservations per week");
 
   test("error message should be shown if times are not long enough", async () => {
     const user = userEvent.setup();
@@ -182,11 +168,4 @@ describe("Application page2 validation errors", () => {
     expect(view.queryAllByText(/application:validation/)).toHaveLength(0);
     expect(view.getByRole("button", { name: "common:next" })).not.toBeDisabled();
   });
-});
-
-describe("multiple application sections", () => {
-  test.todo("should have independent time selects");
-  test.todo("should have independent reservation unit selects");
-  test.todo("on invalid section should disable submit");
-  test.todo("selects are independent among multiple sections");
 });

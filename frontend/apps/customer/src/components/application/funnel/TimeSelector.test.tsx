@@ -155,8 +155,6 @@ describe("TimeSelector render single section", () => {
     expect(primary).toBeInTheDocument();
   });
 
-  // TODO how does this work with multiple different reservation units?
-  // - where is the logic for that?
   test.for([
     {
       label: "one on wednesday",
@@ -340,10 +338,6 @@ describe("TimeSelector time slot selecting", () => {
     const vals = createMockSubmitValues([{ pk: 1, day: 2, start: 8, end: 16 }]);
     expect(onSubmit).toHaveBeenLastCalledWith(vals);
   });
-
-  // TODO these requires having multiple application sections
-  test.todo("time slots can be copied");
-  test.todo("selected time slots should match the index");
 });
 
 describe("TimeSelector calendar select", () => {
@@ -359,13 +353,6 @@ describe("TimeSelector calendar select", () => {
     const vals = createMockSubmitValues([{ day: 1, start: 23, end: 0 }]);
     expect(onSubmit).toHaveBeenCalledWith(vals);
   });
-
-  test.todo("contiguous selection should be combined");
-  test.todo("can select multiple time slots");
-  test.todo("can select multiple days");
-  test.todo("can select all time slots");
-  test.todo("mouse enter should select like click");
-  test.todo("keyboard enter should select like click");
 });
 
 describe("TimeSelector priority select", () => {
@@ -385,18 +372,4 @@ describe("TimeSelector priority select", () => {
     });
     expect(selectBtn).toHaveTextContent("application:Page2.priorityLabels.secondary");
   });
-  // requires setting predata
-  test.todo("priority select doesn't change existing selection");
-  // requeires making a new selection
-  test.todo("priority select changes the next selection");
-  test.todo("two different priorities should not be combined");
-  test.todo("different priority select overrides existing selection");
-});
-
-describe("TimeSelector reservation unit times", () => {
-  test.todo("should have reservation unit select");
-  test.todo("should preselect first reservation unit");
-  test.todo("reservation unit times should render properly");
-  test.todo("by default first reservation unit option should be selected");
-  test.todo("allows selection of reservation unit");
 });

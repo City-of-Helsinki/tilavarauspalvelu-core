@@ -91,8 +91,7 @@ export function SummaryGeneralFields({
   );
 }
 
-/// Type safe conversion from key value maps for the metadata fields
-/// TODO this is pretty awful (dynamic type checking) but requires refactoring metafields more
+/// Type safe conversion from key value maps to reservation form fields
 function convertMaybeOptionValue(
   t: TFunction,
   key: FormField,

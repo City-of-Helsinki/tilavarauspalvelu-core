@@ -41,7 +41,6 @@ export function ApplicantInfoPreview({ application }: { application: ApplicantT 
   return (
     <ApplicationInfoContainer>
       {application.applicantType == null ? (
-        // TODO translate (though this is more a system error than a user error)
         <div style={{ gridColumn: "1 / -1" }}>ERROR: applicantType is null</div>
       ) : application.applicantType !== ReserveeType.Individual ? (
         <>

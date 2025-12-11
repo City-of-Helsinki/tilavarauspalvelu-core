@@ -102,7 +102,6 @@ export function Filters({
   const setSearchParams = useSetSearchParams();
   const searchParams = useSearchParams();
 
-  // TODO this only filters the options after a search, have to use form data if we want to filter without searching
   const unitFilter = mapParamToInteger(searchParams.getAll("unit"), 1);
   const options = useFilterOptions(unitFilter);
 

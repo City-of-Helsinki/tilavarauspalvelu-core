@@ -109,7 +109,6 @@ function checkStartIsBeforeEnd(
     ctx.addIssue({
       code: "custom",
       // NOTE Don't add to multiple paths, it hides the error message
-      // TODO this is problematic because it doesn't update if any of the other fields change
       path: ["activeUntil"],
       message: "End time needs to be after start time.",
     });
@@ -159,7 +158,6 @@ const NotificationFormSchema = z
     }
   })
   // End time can't be in the past unless it's a draft
-  // TODO future date check doesn't check for today time, so it's possible to set now() - 2h as the end time
   .superRefine((x, ctx) => {
     if (!x.isDraft && (x.activeUntil !== "" || x.activeUntilTime !== "")) {
       checkTimeStringFormat(x.activeUntilTime, ctx, "activeUntilTime");

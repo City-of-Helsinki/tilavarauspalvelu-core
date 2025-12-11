@@ -146,7 +146,6 @@ export function ReservationUnitSettingsSection({
               name="hasScheduledPublish"
             >
               <Flex $gap="xs">
-                {/* TODO the Two DateInputs need to touch each other to rerun common validation code */}
                 <ActivationGroup
                   label={t("reservationUnitEditor:publishBeginsAt")}
                   control={control}
@@ -191,7 +190,6 @@ export function ReservationUnitSettingsSection({
               control={control}
               name="hasScheduledReservation"
             >
-              {/* TODO the Two DateInputs need to touch each other to rerun common validation code */}
               <ActivationGroup
                 label={t("reservationUnitEditor:reservationBeginsAt")}
                 control={control}
@@ -287,8 +285,6 @@ export function ReservationUnitSettingsSection({
               control={control}
               noLabel
               noTooltip
-              // TODO do we need this? or do we just initialize the value in the form?
-              // defaultValue="no-buffer"
             />
             {watch("bufferType") === "bufferTimesSet" && (
               <>
@@ -361,7 +357,6 @@ export function ReservationUnitSettingsSection({
             />
             <CustomNumberInput name="maxReservationsPerUser" min={1} form={form} />
             <FieldGroup
-              // FIXME replace the text fields
               heading={t("reservationUnitEditor:requireAdultReserveeSettings")}
               tooltip={t("reservationUnitEditor:tooltip.requireAdultReservee")}
               style={{ gridColumn: "1 / -1" }}

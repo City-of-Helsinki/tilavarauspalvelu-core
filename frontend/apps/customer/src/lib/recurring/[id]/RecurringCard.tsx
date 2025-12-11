@@ -22,7 +22,6 @@ import type { RecurringCardFragment } from "@gql/gql-types";
 
 interface CardProps {
   reservationUnit: RecurringCardFragment;
-  // TODO all of these are accessible from a hook but does that make testing more difficult?
   selectReservationUnit: (reservationUnit: RecurringCardFragment) => void;
   containsReservationUnit: (reservationUnit: RecurringCardFragment) => boolean;
   removeReservationUnit: (reservationUnit: RecurringCardFragment) => void;

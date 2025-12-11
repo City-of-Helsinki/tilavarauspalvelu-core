@@ -40,7 +40,6 @@ function StatusTag(props: Pick<SingleSearchCardFragment, "isClosed" | "firstRese
   );
 }
 
-// TODO SSR version (and remove the use hook)
 function useConstructLink(reservationUnit: Pick<SingleSearchCardFragment, "pk">): string {
   const params = useSearchParams();
   const date = params.get("startDate");

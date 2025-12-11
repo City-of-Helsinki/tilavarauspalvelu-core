@@ -91,7 +91,6 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
       onChange={recheck}
     >
       <TrackingWrapper matomoEnabled={enableMatomo}>
-        {/* TODO is this ever called on the server? then the ctx is not undefined */}
         <EnvContextProvider env={envConfig}>
           <ApolloProvider client={client}>
             <PageWrapper

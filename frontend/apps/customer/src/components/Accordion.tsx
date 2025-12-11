@@ -16,7 +16,6 @@ type Props = {
   disableBottomMargin?: boolean;
 };
 
-// TODO should we remove the padding all together? having both seems really silly
 const AccordionElement = styled.div<{ $noBottomMargin?: boolean }>`
   padding-bottom: var(--spacing-xs);
   margin-bottom: ${({ $noBottomMargin }) => ($noBottomMargin ? "0" : "var(--spacing-layout-xs)")};

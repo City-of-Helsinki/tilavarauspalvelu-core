@@ -97,7 +97,6 @@ function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): JSX.E
       </Accordion>
       <Accordion heading={t("applicationRound:usedReservationUnits")} initiallyOpen>
         <ReservationUnits>
-          {/* TODO this should be a reduce where the unique key is the unit pk and under that is all the reservationUnits that belong to it */}
           {reservationUnits?.map((reservationUnit) => (
             <ReservationUnit key={reservationUnit.pk}>
               <div>

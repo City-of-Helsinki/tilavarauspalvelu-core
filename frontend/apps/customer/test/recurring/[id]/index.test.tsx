@@ -231,18 +231,6 @@ describe("Page: SeasonalSearch", () => {
   test.todo("pagination should work");
 });
 
-// TODO SSR tests are complicated because we need to mock the http response for Apollo client
-describe("SeasonalSearch Page SSR", () => {
-  test.todo("should return valid data");
-  // NaN, < 1
-  test.todo("invalid pk should return 404");
-  // valid but backend returns null?
-  test.todo("non existing application round should return 404");
-  // requires user to be logged in
-  test.todo("isPostLogin creates new application and redirects to it");
-  test.todo("isPostLogin param is ignored for non logged in users");
-});
-
 // Client side query will return loading on first render
 // submit button in this case works as a proxy for the query loading state
 async function isReady(view: ReturnType<typeof customRender>): Promise<HTMLElement> {

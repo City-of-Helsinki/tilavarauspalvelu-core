@@ -103,9 +103,8 @@ export const BREAKPOINT = breakpoints.m;
 // NOTE hide-on-desktop and hide-on-mobile function differently
 // - hide-on-desktop hides only the element
 // - hide-on-mobile hides the whole cell
-// they are needed for different use cases (e.g. on mobile empty cells create extra gaps)
+// They are used for different use cases (e.g. on mobile empty cells create extra gaps)
 const TableWrapper = styled.div`
-  /* TODO move this to a more general TableWrapper shared with admin-ui */
   /* Mobile uses cards, so no horizontal scroll */
   @media (min-width: ${BREAKPOINT}) {
     /* NOTE this requires using buttons (or other elements with padding) on every row */
@@ -383,7 +382,7 @@ type ReservationSeriesTableElem = {
 };
 
 /// Have to asign min-height on desktop otherwise the table rows are too small
-/// can't assign it on mobile because it's card (and 44px is too much)
+/// can't assign it on mobile because it's a card and 44px is too much
 const StyledLinkLikeButton = styled(LinkLikeButton)`
   @media (min-width: ${BREAKPOINT}) {
     min-height: 44px;
@@ -645,7 +644,6 @@ type ReservationsTableElem = {
   pk: number;
 };
 
-// TODO this should not wrap on mobile, use truncate instead (it looks better and should be a rare case)
 const ReservationUnitLink = styled(IconButton)`
   & span {
     display: inline-flex;

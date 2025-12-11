@@ -9,7 +9,6 @@ export const ALLOCATED_TIME_SLOT_FRAGMENT = gql`
   }
 `;
 
-// TODO don't use convenience fragments
 export const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
   fragment ApplicationSectionCommon on ApplicationSectionNode {
     id
@@ -98,9 +97,6 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
   }
 `;
 
-// TODO ReservationCommon has extra fields: [order, createdAt]
-// TODO do we still need the user here?
-// TODO what is the reservation name vs. reserveeName?
 export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
   fragment ReservationUnitReservations on ReservationNode {
     ...ReservationCommonFields
@@ -154,7 +150,6 @@ export const RECURRING_RESERVATION_FRAGMENT = gql`
   }
 `;
 
-// TODO don't use convenience fragments
 export const APPLICATION_ROUND_TIME_SLOTS_FRAGMENT = gql`
   fragment ApplicationRoundTimeSlots on ApplicationRoundTimeSlotNode {
     id

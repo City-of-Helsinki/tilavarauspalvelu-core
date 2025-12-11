@@ -87,7 +87,6 @@ function createReservation({
     reservationSeries: {
       id: createNodeId("ReservationSeriesNode", recurringPk),
       pk: recurringPk,
-      // TODO these should not be empty
       weekdays: [],
       beginDate: "",
       endDate: "",

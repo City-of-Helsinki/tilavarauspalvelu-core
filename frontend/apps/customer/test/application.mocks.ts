@@ -84,15 +84,12 @@ function createMockApplicationSection({
   pk?: number;
   nReservationUnitOptions?: number;
 } = {}): ApplicationSectionMockType {
-  // TODO parametrize so we can zero this for page0 (nothing filled yet)
-
   const reservationUnitOptions: ApplicationSectionMockType["reservationUnitOptions"] =
     page !== "page0"
       ? Array.from({ length: nReservationUnitOptions }).map((_, i) => createReservationUnitOption({ order: i + 1 }))
       : [];
 
   const page2Data = {
-    // TODO add other options
     suitableTimeRanges:
       page === "page0" || page === "page1"
         ? []
@@ -206,8 +203,6 @@ export function createMockApplicationFragment({
     id: createNodeId("ApplicationNode", pk),
     pk,
     status: page === "page4" ? ApplicationStatusChoice.Received : status,
-    // TODO this can't be combined with the other Fragment
-    // colliding with the same name (spread syntax)
     applicationSections:
       page === "page0"
         ? []

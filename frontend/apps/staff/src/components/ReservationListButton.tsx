@@ -12,8 +12,6 @@ import {
 import type { TFunction } from "i18next";
 
 /// NOTE don't use hooks here; buttons are dynamically added to arrays (so the amount of hooks can change)
-/// TODO can we change this? so it returns a list of button props instead of the JSX?
-/// so they are not dynamically created (maybe even turn it into a hook instead)
 export function ReservationListButton({
   type,
   callback,

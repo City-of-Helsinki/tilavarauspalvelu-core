@@ -75,7 +75,6 @@ afterEach(() => {
 describe("SeasonalSearchForm", () => {
   test("should render empty search form", () => {
     const view = render(<SeasonalSearchForm {...constructProps()} />);
-    // TODO check that all selects exist and are empty
     const searchBtn = view.getByRole("button", {
       name: "searchForm:searchButton",
     });
@@ -169,8 +168,6 @@ describe("SeasonalSearchForm", () => {
     await user.click(searchBtn);
     expect(handleSearch).toHaveBeenCalledTimes(1);
   });
-
-  test.todo("selecting participant count, waiting for refactor");
 });
 
 // Tags are based on the search params, but submit search operates on a callback
@@ -247,7 +244,6 @@ describe("Tags should modify search params", () => {
     expect(within(tags).getByText(`reservationUnitTypes ${selected2.value}`)).toBeInTheDocument();
   });
 
-  // TODO should test all multi select options in single for loop
   test("tags should be removable", async () => {
     const user = userEvent.setup();
     const handleSearch = vi.fn();
@@ -288,7 +284,6 @@ describe("Tags should modify search params", () => {
   test("all tags should be clearable at once", async () => {
     const user = userEvent.setup();
     const handleSearch = vi.fn();
-    // TODO add more tags
     const params = new URLSearchParams();
     const options = constructOptions();
     const selected = options.intendedUses[0] ?? { label: "", value: 0 };

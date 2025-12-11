@@ -20,7 +20,6 @@ const customRender = (
   }
 ) => {
   const renderReservation = reservation ?? createInfoCardReservationMock();
-  // TODO: replace with new helper
   return render(
     <MockedGraphQLProvider mocks={createGraphQLMocks(mockProps)}>
       <ReservationInfoCard reservation={renderReservation} />
@@ -79,10 +78,6 @@ describe("Component: ReservationInfoCard", () => {
       })
     ).toBeInTheDocument();
   });
-});
-
-describe("Access code", () => {
-  it.todo("should show the access code if the reservationType is ACCESS_CODE and it exists", () => {});
 });
 
 function createMockReservationInfoCard(price?: string): ReservationInfoCardFragment {

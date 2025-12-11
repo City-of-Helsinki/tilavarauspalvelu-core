@@ -50,7 +50,6 @@ export function redirectCsrfToken(req: NextRequest, apiBaseUrl: string): URL | u
 
 export type GqlQuery = {
   query: string;
-  // TODO don't type to unknown (undefined and Date break JSON.stringify)
   variables?: Record<string, unknown>;
 };
 

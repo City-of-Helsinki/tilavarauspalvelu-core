@@ -38,7 +38,6 @@ export function createMockReservableTimes(): ReservableMap {
   for (let i = 0; i < 30; i++) {
     const date = addDays(startOfToday(), i);
     const key = formatApiDateUnsafe(date);
-    // TODO need to have holes in this
     const value = [{ start: startOfDay(date), end: endOfDay(date) }];
     map.set(key, value);
   }
@@ -86,16 +85,13 @@ export function createMockReservationUnit({ pk }: { pk: number }): ReservationUn
     id: createNodeId("ReservationUnitNode", pk),
     pk,
     ...generateNameFragment(`ReservationUnit ${pk}`),
-    // TODO this is weird
     reservationBeginsAt: addYears(new Date(), -1 * pk).toISOString(),
     reservationEndsAt: addYears(new Date(), 1 * pk).toISOString(),
     isClosed: false,
-    // TODO implement though for Seasonal this doesn't matter
     firstReservableDatetime: null,
     currentAccessType: null,
     effectiveAccessType: null,
     maxPersons: null,
-    // TODO implement though for Seasonal this doesn't matter
     pricings: [],
     unit: createMockUnit({ pk }),
     reservationUnitType: createMockReservationUnitType({

@@ -105,7 +105,6 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
   const interval = getNormalizedInterval(reservationUnit?.reservationStartInterval);
 
   const form = useForm<ReservationSeriesFormValues>({
-    // TODO onBlur doesn't work properly we have to submit the form to get validation errors
     mode: "onBlur",
     defaultValues: {
       enableBufferTimeAfter: false,
@@ -204,18 +203,12 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
       const errs = getSeriesOverlapErrors(err);
       if (errs.length > 0) {
         const overlaps = errs.flatMap((x) => x.overlapping);
-        // TODO would be better if we highlighted the new ones in the list (different style)
-        // but this is also an edge case anyway (since the collisions are normally already removed)
-        // TODO show a temporary error message to the user but also refetch the collisions / remove the collisions
-        // or maybe we can just retry the mutation without the collisions and show them on the next page?
         const count = overlaps.length;
         setLocalError(t("myUnits:ReservationSeriesForm.newOverlapError", { count }));
         document.querySelector("#create-recurring__reservations-list")?.scrollIntoView();
       } else {
         displayError(err);
-        // on exception in ReservationSeries (because we are catching the individual errors)
-        // We don't need to cleanup the ReservationSeries that has zero connections.
-        // Based on documentation backend will do this for us.
+        // We don't need to cleanup the ReservationSeries that has zero connections backend will do this.
       }
       checkedReservations.refetch();
     }
@@ -235,7 +228,6 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <AutoGrid $gap="xl">
           <Element $start>
-            {/* TODO trigger end date validation when start date changes */}
             <ControlledDateInput
               name="startingDate"
               control={form.control}
@@ -247,7 +239,6 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
           </Element>
 
           <Element>
-            {/* TODO trigger start date validation when end date changes */}
             <ControlledDateInput
               name="endingDate"
               control={form.control}
@@ -272,7 +263,6 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
           </Element>
 
           <Element $start>
-            {/* TODO trigger end time validation when start time changes */}
             <ControlledTimeInput
               name="startTime"
               control={form.control}
@@ -283,7 +273,6 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
             />
           </Element>
           <Element>
-            {/* TODO trigger start time validation when end time changes */}
             <ControlledTimeInput
               name="endTime"
               control={form.control}
@@ -341,7 +330,6 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
           )}
 
           <ButtonContainer>
-            {/* cancel is disabled while sending because we have no rollback */}
             <ButtonLikeLink
               href={getMyUnitUrl(unitPk)}
               disabled={isSubmitting}

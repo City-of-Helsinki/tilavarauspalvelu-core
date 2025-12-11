@@ -52,8 +52,6 @@ export function NewSpaceModal({ unit, closeModal, refetch, parentSpacePk }: Prop
 
   const [page, setPage] = useState(0);
 
-  // TODO this is weird, what's the difference between fixed parent and a normal parent?
-  // i.e. this is set on creation but is it an important distinction to watch("parent")?
   const hasFixedParent = parentSpacePk != null;
   const { watch } = form;
 

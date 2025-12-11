@@ -87,7 +87,6 @@ export function ReservationsDataLoader(): JSX.Element {
     }
   };
 
-  // TODO the sort string should be in the url
   const orderBy = filterEmptyArray(transformSortString(sort));
   const searchParams = useSearchParams();
   const { fetchMore, loading, data, previousData } = useReservationListQuery({

@@ -297,7 +297,6 @@ export function Navigation({ apiBaseUrl }: Props) {
         <NavigationMenuWrapper>
           <Header.NavigationMenu>
             {menuItemList.map((item) => (
-              // FIXME: Warning: validateDOMNesting(...): <li> cannot appear as a descendant of <li>
               <NavigationLink
                 key={item.routes && item.routes[0]}
                 title={item.title}

@@ -31,10 +31,6 @@ describe("RecurringLander", () => {
     expect(view.queryByText("recurringLander:roundHeadings.past")).not.toBeInTheDocument();
   });
 
-  // TODO test frontend splitting and sorting of application rounds
-  // don't test the card rendering (separate component)
-  // so cases:
-  // - only active rounds (a few)
   test("should render recurring lander with only active roudns", () => {
     const rounds = [
       createMockApplicationRound({
@@ -76,7 +72,6 @@ describe("RecurringLander", () => {
       name: "applicationRound:card.criteria",
     });
     expect(criteriaLinks).toHaveLength(3);
-    // TODO check the sort order (based on applicationPeriodBeginsAt)
   });
 
   test("should render recurring lander with one of each status", () => {
@@ -120,9 +115,8 @@ describe("RecurringLander", () => {
       name: "applicationRound:card.criteria",
     });
     expect(criteriaLinks).toHaveLength(3);
-
-    // TODO check the split?
   });
+
   test.todo("should render recurring lander with only upcoming rounds");
   test.todo("should render recurring lander with only past rounds");
 });

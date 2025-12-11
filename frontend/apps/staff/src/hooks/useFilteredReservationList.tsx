@@ -32,7 +32,6 @@ function useReservationsInInterval({
 
   // NOTE unlike array fetches this fetches a single element with an included array
   // so it doesn't have the 100 limitation of array fetch nor does it have pagination
-  // NOTE Reuse the query (useCheckCollisions), even though it's a bit larger than we need
   const { loading, data, refetch } = useReservationsByReservationUnitQuery({
     skip: !isValidQuery,
     variables: {
@@ -55,8 +54,6 @@ function useReservationsInInterval({
   return { reservations, loading, refetch };
 }
 
-// Could also be reworked to work the other way around, return list of collisions, not list of items
-// TODO this should be debounced because keypress message handler is taking 200ms+
 export function useFilteredReservationList({
   items,
   reservationUnitPk,

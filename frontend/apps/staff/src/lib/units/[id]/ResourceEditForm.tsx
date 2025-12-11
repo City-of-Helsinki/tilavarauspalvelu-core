@@ -29,7 +29,6 @@ export function ResourceEditorFields({
             onChange={onChange}
             unitPk={unitPk}
             value={value}
-            // TODO this creates a bit weird translation (has to be > 0), because of the common translation key
             errorText={getTranslatedError(t, errors.space?.message)}
             noParentless
           />

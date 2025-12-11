@@ -187,7 +187,6 @@ function EditStep0({
   return (
     <>
       <StyledReservationInfoCard reservation={reservation} bgColor="gold" disableImage />
-      {/* TODO on mobile in the design this is after the calendar but before action buttons */}
       {notesWhenReserving !== "" && (
         <PinkBox>
           <H4 as="h2" $marginTop="none">

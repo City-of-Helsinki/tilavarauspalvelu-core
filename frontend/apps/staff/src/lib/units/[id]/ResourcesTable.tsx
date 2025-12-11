@@ -118,9 +118,6 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
 
   const rows = unit.spaces.flatMap((s) => s.resources);
 
-  // TODO add if no resources:
-  // const hasSpaces={Boolean(unit?.spaces?.length)}
-  // noResultsKey={hasSpaces ? "Unit.noResources" : "Unit.noResourcesSpaces"}
   return (
     <>
       <CustomTable indexKey="pk" rows={rows} cols={cols} />

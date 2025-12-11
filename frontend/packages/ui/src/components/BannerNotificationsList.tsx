@@ -82,7 +82,6 @@ function NotificationsListItem({ notification, closeFn, closedArray }: Notificat
 /// @param centered {boolean} - whether the notification should be centered when page width exceeds xl-breakpoint
 /// @return A list of banner notifications targeted to the specified targets, ordered by level (EXCEPTION, WARNING, NORMAL)
 /// @desc A component which returns a list of styled banner notifications, clipped at the specified amount, targeted to the specified targets and ordered by level
-/// TODO under testing: can't do target checks to the query because backend doesn't allow querying target without can_manage_notifications permission
 export const BannerNotificationsList = ({ target, displayAmount = 2 }: BannerNotificationListProps) => {
   const { data } = useShowNotificationsListQuery({
     variables: {

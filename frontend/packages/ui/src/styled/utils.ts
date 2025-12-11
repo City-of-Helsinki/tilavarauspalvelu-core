@@ -46,7 +46,6 @@ export const P = styled.p<{
 
 export type SpacingSize = "none" | "2-xs" | "xs" | "s" | "m" | "l" | "xl" | "2-xl";
 
-// TODO should allow for switching to smaller gap on mobile (scale down)
 export const Flex = styled.div<{
   $direction?: "row" | "column" | "row-reverse" | "column-reverse";
   $gap?: SpacingSize;
@@ -68,11 +67,6 @@ export const Flex = styled.div<{
   width: ${({ $width }) => ($width === "full" ? "100%" : "auto")};
 `;
 
-// TODO refactor this to have parameters for gap
-// use grid instead of flex
-// two buttons should be side-by-side on mobile (100% width total)
-// three buttons need a 1, 1/2, 1/2 layout on mobile (100% width total, two rows)
-// four buttons need 1/2, 1/2, 1/2, 1/2 layout on mobile (100% width total, two rows)
 export const ButtonContainer = styled.div<{
   $justifyContent?: "center" | "flex-start" | "flex-end" | "space-between" | "space-around" | "space-evenly";
   $marginTop?: SpacingSize;

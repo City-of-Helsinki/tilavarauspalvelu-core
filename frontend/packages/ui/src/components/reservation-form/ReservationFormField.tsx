@@ -17,7 +17,6 @@ type Props = {
   form: UseFormReturn<ReservationFormValueT>;
 };
 
-// TODO turn this into TextFields only now?
 export function ReservationFormField({ field, reserveeType, form }: Props): React.ReactElement | null {
   const { t } = useTranslation();
 

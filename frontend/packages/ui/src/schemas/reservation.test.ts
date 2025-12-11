@@ -34,7 +34,6 @@ describe("CreateStaffReservation schema", () => {
     expect(res.success).toBeTruthy();
   });
 
-  // TODO should mock time to avoid timezone issues
   test("can make a past reservation for today", () => {
     const today = new Date();
     const input = createInput({ date: today, start: { hours: 0 }, end: { hours: 5 } });
@@ -51,20 +50,12 @@ describe("CreateStaffReservation schema", () => {
     expect(res.success).toBeFalsy();
     if (!res.success) {
       expect(res.error.issues.filter((x) => x.path.includes("date"))).toHaveLength(1);
-      // TODO check error message
     }
   });
-
-  test.todo("can't make a reservation with invalid time");
-  test.todo("can make a reservation ending at midnight");
-
-  test.todo("end time < start time => error");
-  test.todo("end time | start time not a time => error");
 
   describe("15 min interval", () => {
     const possibleMinutes = [0, 15, 30, 45] as const;
     const schema = getCreateStaffReservationFormSchema(ReservationStartInterval.Interval_15Minutes);
-    // TODO could pick an end interval on random
     test.for(possibleMinutes)(`valid interval for %s minutes`, (start) => {
       const tomorrow = addDays(new Date(), 1);
       const input = createInput({
@@ -87,7 +78,6 @@ describe("CreateStaffReservation schema", () => {
       expect(res.success).toBeFalsy();
       if (!res.success) {
         expect(res.error.issues.filter((x) => x.path.includes("startTime"))).toHaveLength(1);
-        // TODO check error message
       }
     });
   });
@@ -118,7 +108,6 @@ describe("CreateStaffReservation schema", () => {
       expect(res.success).toBeFalsy();
       if (!res.success) {
         expect(res.error.issues.filter((x) => x.path.includes("startTime"))).toHaveLength(1);
-        // TODO check error message
       }
     });
   });

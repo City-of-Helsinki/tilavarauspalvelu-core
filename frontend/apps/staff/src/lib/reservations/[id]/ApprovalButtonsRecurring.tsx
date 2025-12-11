@@ -12,7 +12,6 @@ import type { ReservationSeriesNode } from "@gql/gql-types";
 type Props = {
   reservationSeries: Pick<ReservationSeriesNode, "pk">;
   handleClose: () => void;
-  // TODO weird name for the after deny callback
   handleAccept: () => void;
   disableNonEssentialButtons?: boolean;
 };
@@ -36,8 +35,6 @@ export function ApprovalButtonsRecurring({
     handleAccept();
   };
 
-  // TODO don't need to do this anymore we can just pass the first reservation here
-  // need to do get all data here otherwise totalCount is incorrect (filter here instead of in the query)
   const reservationsPossibleToDeny = reservations.filter((x) => isPossibleToDeny(x.state, new Date(x.beginsAt)));
 
   const reservation = reservationsPossibleToDeny.find(() => true);

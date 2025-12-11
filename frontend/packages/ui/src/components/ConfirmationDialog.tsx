@@ -17,7 +17,6 @@ type Props = {
   testId?: string;
 };
 
-// TODO opening the dialog scrolls the page to the top
 export function ConfirmationDialog(props: Props): JSX.Element | null {
   const { onAccept, onCancel, acceptIcon, variant, isOpen, testId: testIdOrig } = props;
   const testId = filterEmpty(testIdOrig);
@@ -31,7 +30,6 @@ export function ConfirmationDialog(props: Props): JSX.Element | null {
       variant={variant}
       isOpen={isOpen}
       id={id}
-      // TODO don't tie to id, use a proper translation key
       aria-labelledby={`${id}-header`}
       aria-describedby={`${id}-content`}
     >

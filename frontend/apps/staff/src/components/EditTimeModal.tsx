@@ -314,9 +314,6 @@ export function NewReservationModal({ reservationToCopy, onAccept, onClose }: Ne
   );
 }
 
-// TODO refactor so it doesnt require a reservation
-// use the same UI for new reservation creation (only requires unit or reservation unit?)
-// allow either a move or new (if / else if we have to)
 export function EditTimeModal({
   reservation,
   onAccept,

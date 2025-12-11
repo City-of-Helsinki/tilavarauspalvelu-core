@@ -7,9 +7,6 @@ interface SearchQueryProps extends ICreateGraphQLMock {
   isSearchError: boolean;
 }
 export function createSearchQueryMocks({ isSearchError }: SearchQueryProps): CreateGraphQLMocksReturn {
-  // TODO this should enforce non nullable for the query
-  // it can be null when the query is loading, but when we mock it it should be non nullable
-  // Q: what about failed queries? (though they should have different type)
   const SearchReservationUnitsQueryMock: SearchReservationUnitsQuery = {
     reservationUnits: {
       totalCount: 10,
@@ -17,7 +14,6 @@ export function createSearchQueryMocks({ isSearchError }: SearchQueryProps): Cre
         node: createMockReservationUnit({ pk }),
       })),
       pageInfo: {
-        // TOOD how to mock this?
         endCursor: null,
         hasNextPage: false,
       },
@@ -32,7 +28,6 @@ export function createSearchQueryMocks({ isSearchError }: SearchQueryProps): Cre
         },
       ],
       pageInfo: {
-        // TOOD how to mock this?
         endCursor: null,
         hasNextPage: false,
       },
@@ -78,11 +73,6 @@ function createSearchVariablesMock({
   textSearch = undefined,
 }: {
   textSearch?: string | null;
-  // TODO return type issues because all of them are optional (by backend)
-  // we'd need to match them to a Required return type that we actully use
-  // so what happens:
-  // a new query param is added but that is not reflected in the mock
-  // -> this is not a lint / type error but a runtime error in the tests
 } = {}): Readonly<SearchReservationUnitsQueryVariables> {
   return {
     textSearch,

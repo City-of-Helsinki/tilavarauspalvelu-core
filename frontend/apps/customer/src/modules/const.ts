@@ -52,24 +52,3 @@ export function getDurationOptions(t: TFunction): DurationOption[] {
   // we need to add the minute times to the beginning of the duration options
   return [...durationMinuteOptions(t), ...times];
 }
-
-// TODO the validation needs to go to env.mjs because this reloads the page constantly
-// TODO we should default to this host if the env variable is not set
-// allowing us to host the api and the frontend on the same host without rebuilding the Docker container
-// possible problem: SSR requires absolute url for the api (so get the host url?)
-/* TODO add checks back probably to env.mjs
-if (!isBrowser && !env.SKIP_ENV_VALIDATION) {
-  // Don't check validity because it should default to same address (both host + port)
-  // this could be a transformation on the base value in env.mjs and a warning
-  // throwing here because we'd have to fix all baseurls
-  if (
-    apiBaseUrl != null &&
-    (apiBaseUrl.match("localhost") || apiBaseUrl.match("127.0.0.1")) &&
-    apiBaseUrl.startsWith("https://")
-  ) {
-    throw new Error(
-      "NEXT_PUBLIC_TILAVARAUS_API_URL is not valid, don't use SSL (https) when using localhost"
-    );
-  }
-}
-*/

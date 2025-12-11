@@ -13,7 +13,6 @@ import type {
   Weekday,
 } from "@gql/gql-types";
 
-// TODO use a fragment
 type QueryT = NonNullable<ApplicationSectionAllocationsQuery["applicationSections"]>;
 type EdgeT = NonNullable<QueryT["edges"][0]>;
 export type SectionNodeT = NonNullable<EdgeT["node"]>;
@@ -32,7 +31,6 @@ export type Cell = {
   key: string;
 };
 
-// TODO why is there a similar function in ui?
 export function applicationEventSchedulesToCells(
   firstSlotStart: number | undefined,
   lastSlotStart: number | undefined
@@ -42,8 +40,6 @@ export function applicationEventSchedulesToCells(
     return cells;
   }
 
-  // TODO don't string encode
-  // if it's important then use a Map with { day: number, hour: number } as key
   for (let j = 0; j < 7; j += 1) {
     const day = [];
     for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
@@ -243,9 +239,6 @@ export function getRelatedTimeSlots(
     return acc;
   }, dayArray);
 
-  // TODO sort by beginTime
-  // TODO reduce the array to contiguous time slots
-
   return relatedSpacesTimeSlotsByDay;
 }
 
@@ -279,7 +272,6 @@ export function isInsideSelection(
   return true;
 }
 
-// TODO combine common functionaility with isInsideSelection
 export function isInsideCell(
   day: DayT,
   cell: Cell,

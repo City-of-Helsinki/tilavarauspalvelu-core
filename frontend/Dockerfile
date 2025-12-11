@@ -25,7 +25,6 @@ ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
 ARG FEEDBACK_URL
 ENV FEEDBACK_URL=$FEEDBACK_URL
 # Version information from build pipeline (pass it to sentry sourcemap upload)
-# TODO we can probably remove this and use github to create version tag for us
 ARG NEXT_PUBLIC_SOURCE_VERSION
 ARG NEXT_PUBLIC_SOURCE_BRANCH_NAME
 ENV NEXT_PUBLIC_SOURCE_VERSION=$NEXT_PUBLIC_SOURCE_VERSION

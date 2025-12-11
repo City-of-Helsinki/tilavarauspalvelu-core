@@ -47,9 +47,6 @@ export type CreateStaffReservationFormSchema = z.infer<typeof CreateStaffReserva
 type TimeFormValuesT = z.infer<typeof TimeFormSchema>;
 
 // Only used for admin forms
-// TODO should be combined with the new schemas, but should have partial
-// - note: email is gonna be a problem since partial doesn't allow empty strings
-// FIXME name is wrong (not Meta)
 export const ReservationFormMetaSchema = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
@@ -139,14 +136,9 @@ export const ReservationChangeFormSchema = z
 
 export type ReservationChangeFormType = z.infer<typeof ReservationChangeFormSchema>;
 
-// TODO combine with ReservationFormMetaSchema
-// but requires refactoring CreateStaff schemas
 const ContactInfoFormSchema = z.object({
-  // TODO could use transform / preprocessor to remove / flag empty strings
-  // the problem with setting min is that we can't disable it for admin
   reserveeFirstName: z.string().min(2, "Required"),
   reserveeLastName: z.string().min(2, "Required"),
-  // TODO check for valid characters (not regex, simpler)
   reserveePhone: z.string().min(3, "Required"),
   reserveeEmail: emailField,
   // Optional for all forms based on the reservationUnit settings (could be added dynamically)
@@ -253,8 +245,6 @@ type ReservationUnitForRefinement = Pick<ReservationUnitNode, "reservationForm" 
 // NOTE infered type is not exactly correct it doesn't create all four discrimating unions
 type ReservationSchemaT = ReturnType<typeof getReservationSchemaUnrefined> | typeof ContactInfoFormSchema;
 
-/// TODO this could use formContainsField helper to automatically construct the schema
-/// issue with this is that it removes the type narrowing provided by a switch.
 function getReservationFormSchemaImpl(reservationUnit: ReservationUnitForRefinement): ReservationSchemaT {
   if (reservationUnit.reservationForm === ReservationFormType.ContactInfoForm) {
     return ContactInfoFormSchema;

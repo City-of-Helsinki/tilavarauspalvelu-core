@@ -13,8 +13,6 @@ export const TIMERS_TO_FAKE = [
   "Date",
 ] as const;
 
-// TODO test if we can refactor this not to include any expect calls
-// use throws instead so the error bubbles to the caller
 export async function selectOption(
   view: ReturnType<typeof render> | ReturnType<typeof within>,
   listLabel: RegExp | string,

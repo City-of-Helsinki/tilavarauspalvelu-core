@@ -34,7 +34,6 @@ export const ExternalTableLink = styled(Link).attrs({
   }
 `;
 
-// TODO what is this for? and why is it different to other Modals
 export const DialogActionsButtons = styled(Dialog.ActionButtons)`
   justify-content: space-between;
 `;
@@ -72,7 +71,6 @@ export const Label = styled.div<{ $isSummary?: boolean }>`
     `};
 `;
 
-// TODO why is this <div> and not <span>
 export const Value = styled.div<{ $isSummary?: boolean }>`
   word-wrap: break-word;
   overflow-wrap: anywhere;

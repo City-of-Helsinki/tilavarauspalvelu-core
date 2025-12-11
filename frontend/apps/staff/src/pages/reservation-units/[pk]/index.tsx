@@ -65,7 +65,6 @@ type Node = NonNullable<QueryData>;
 
 // Override the Accordion style: force border even if the accordion is open
 // because the last section is not an accordion but a button and it looks funny otherwise
-// TODO should we limit the width of the text boxes? or the whole form?
 const StyledContainerMedium = styled(Flex)`
   & > div:nth-last-of-type(2) > div {
     /* stylelint-disable-next-line csstools/value-no-unknown-custom-properties */
@@ -595,7 +594,6 @@ export const CREATE_RESERVATION_UNIT = gql`
   }
 `;
 
-// TODO this allows for a pk input (is it for a change? i.e. not needing to delete and create a new one)
 export const CREATE_IMAGE = gql`
   mutation CreateImage($image: Upload!, $reservationUnit: Int!, $imageType: ReservationUnitImageType!) {
     createReservationUnitImage(input: { image: $image, reservationUnit: $reservationUnit, imageType: $imageType }) {

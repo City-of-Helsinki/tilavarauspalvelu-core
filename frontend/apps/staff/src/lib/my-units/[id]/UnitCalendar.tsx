@@ -548,7 +548,6 @@ export function UnitCalendar({
                 onComplete={refetch}
                 reservableTimeSpans={row.reservableTimeSpans}
               />
-              {/* TODO events should be over the cells (tabindex is not correct now) */}
               <Events events={row.events} styleGetter={eventStyleGetter(row.pk)} />
             </RowCalendarArea>
           </Row>

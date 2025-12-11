@@ -82,13 +82,10 @@ export async function getGenericTerms(apolloClient: ApolloClient<unknown>): Prom
   return tos;
 }
 
-// TODO narrow down the errors properly and show the user the real reason
-// requires refactoring error pages to display GQL errors
 export async function getReservationByOrderUuid(
   apolloClient: ApolloClient<NormalizedCacheObject>,
   uuid: string
 ): Promise<NonNullable<NonNullable<OrderQuery["order"]>["reservation"]> | null> {
-  // TODO retry once if not found (or increase the timeout so the webhook from store has fired)
   const { data } = await apolloClient.query<OrderQuery, OrderQueryVariables>({
     query: OrderDocument,
     variables: { orderUuid: uuid },
