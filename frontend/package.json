@@ -46,5 +46,8 @@
     "ts-node": "^10.9.2",
     "turbo": "^2.6.1"
   },
+  "engines": {
+    "npm": "pnpm"
+  },
   "packageManager": "pnpm@10.23.0"
 }
