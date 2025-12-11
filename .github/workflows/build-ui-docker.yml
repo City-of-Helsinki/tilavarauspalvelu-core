@@ -57,7 +57,7 @@ jobs:
 
     - name: Install dependencies
       working-directory: frontend
-      run: pnpm install --frozen-lockfile
+      run: pnpm install --frozen-lockfile --ignore-scripts
 
     - uses: dtinth/setup-github-actions-caching-for-turbo@v1
 

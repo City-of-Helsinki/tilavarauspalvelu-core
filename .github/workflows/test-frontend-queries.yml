@@ -83,7 +83,7 @@ jobs:
 
       - name: "Install frontend dependencies"
         working-directory: frontend
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: "Pick queries from frontend files"
         working-directory: frontend
