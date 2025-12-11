@@ -9,8 +9,7 @@ interface SearchFilterProps {
 }
 
 interface ControlledSearchFilterProps<T extends FieldValues>
-  extends UseControllerProps<T>,
-    Omit<SearchFilterProps, "name"> {
+  extends UseControllerProps<T>, Omit<SearchFilterProps, "name"> {
   name: Path<T>;
   control: Control<T>;
 }

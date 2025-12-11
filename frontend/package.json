@@ -41,8 +41,8 @@
     "graphql-config": "^5.1.5",
     "husky": "^9.1.7",
     "npkill": "^0.12.2",
-    "oxlint": "^1.29.0",
-    "oxlint-tsgolint": "^0.8.2",
+    "oxlint": "^1.30.0",
+    "oxlint-tsgolint": "^0.8.3",
     "ts-node": "^10.9.2",
     "turbo": "^2.6.1"
   },

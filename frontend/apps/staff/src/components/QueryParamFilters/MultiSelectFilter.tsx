@@ -79,8 +79,7 @@ function BaseMultiSelectFilter({
 }
 
 interface ControlledMultiSelectProps<T extends FieldValues>
-  extends UseControllerProps<T>,
-    Omit<MultiSelectFilterProps, "name"> {
+  extends UseControllerProps<T>, Omit<MultiSelectFilterProps, "name"> {
   name: Path<T>;
   control: Control<T>;
   enableSearch?: boolean;
