@@ -24,8 +24,7 @@ function RangeWrapper({ label, children }: { label: string; children: React.Reac
 }
 
 interface ControlledRangeNumberFilterProps<T extends FieldValues>
-  extends Omit<UseControllerProps<T>, "name">,
-    Omit<RangeNumberFilterProps, "minName" | "maxName"> {
+  extends Omit<UseControllerProps<T>, "name">, Omit<RangeNumberFilterProps, "minName" | "maxName"> {
   minName: Path<T>;
   maxName: Path<T>;
   control: Control<T>;
