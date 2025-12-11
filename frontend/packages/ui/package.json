@@ -60,7 +60,7 @@
     "@types/react-big-calendar": "^1.16.3",
     "@types/react-dom": "^18.3.7",
     "@types/sanitize-html": "^2.16.0",
-    "@vitejs/plugin-react": "^5.1.0",
+    "@vitejs/plugin-react": "^5.1.1",
     "happy-dom": "^20.0.10",
     "next": "16.0.7",
     "next-i18next": "^15.4.2",
@@ -74,6 +74,6 @@
     "typescript": "^5.9.3",
     "typescript-cookie": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^4.0.6"
+    "vitest": "^4.0.14"
   }
 }
