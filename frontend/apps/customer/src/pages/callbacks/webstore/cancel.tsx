@@ -15,12 +15,6 @@ import { DeleteReservationDocument, ReservationStateChoice } from "@gql/gql-type
 import type { DeleteReservationMutation, DeleteReservationMutationVariables } from "@gql/gql-types";
 
 // This is the callback page from webstore if user cancels the order
-// TODO this would be nicer if we could use a reservation/[id]/cancelled page (or reservation/[id])
-// but deleted reservations are not stored in the database so we can't show them
-// also the page hierarchy is not clear
-// compromise would be to use reservations/cancelled without the id (and staticly render the same page with no queries)
-// this would allow refresh that page (and remove the cancel?orderId=... from the url)
-// since this callback page should not be accessed by users in any case (nor left in the browser history)
 function Cancel({ state }: NarrowedProps): JSX.Element {
   const { t } = useTranslation();
   const { env } = useEnvContext();

@@ -118,10 +118,6 @@ describe("Application Page4", () => {
     await user.click(checkbox2);
     expect(checkbox2).toBeChecked();
     expect(submitButton).not.toBeDisabled();
-    // TODO what happens when we click the submit button?
-    // FIXME need to mock the sendApplication mutation
-    // expect url push to getApplicationPath(resPk, "sent")
-    // expect(mockedRouterPush).toHaveBeenCalledWith(getApplicationPath(1, "sent"));
   });
   test.todo("should show error if sendApplication fails and not url push");
 });

@@ -22,9 +22,9 @@ import { NewSpaceModal } from "./new-space-modal/NewSpaceModal";
 
 type SpaceT = SpacesTableFragment["spaces"][0];
 
-function countSubSpaces(space: Pick<SpaceT, "pk" | "children">): number {
+function countSubSpaces(space: Pick<SpaceT, "id" | "children">): number {
   return (space.children || []).reduce(
-    // @ts-expect-error -- FIXME the recursive type is broken
+    // @ts-expect-error -- recursive graphql query doesn't work
     (p, c) => p + 1 + (c ? countSubSpaces(c) : 0),
     0
   );

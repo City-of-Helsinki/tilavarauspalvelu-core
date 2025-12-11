@@ -231,10 +231,6 @@ function ReservationUnit({
 
   const reservableTimes = useReservableTimes(reservationUnit);
 
-  // TODO the use of focusSlot is weird it double's up for both
-  // calendar focus date and the reservation slot which causes issues
-  // the calendar focus date should always be defined but the form values should not have valid default values
-  // not having valid values will break other things so requires refactoring.
   const focusSlot: FocusTimeSlot | { isReservable: false } = useMemo(() => {
     const data = {
       date: dateValue,

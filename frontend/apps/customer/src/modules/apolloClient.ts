@@ -16,7 +16,6 @@ export function createApolloClient(hostUrl: string, ctx?: GetServerSidePropsCont
   const uri = buildGraphQLUrl(hostUrl);
   const httpLink = new HttpLink({
     uri,
-    // TODO this might be useless
     credentials: "include",
     fetch: enchancedFetch(ctx?.req),
   });

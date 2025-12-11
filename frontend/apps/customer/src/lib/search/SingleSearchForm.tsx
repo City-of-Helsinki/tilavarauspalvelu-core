@@ -129,7 +129,6 @@ export function SingleSearchForm({
         return durationOptions.find((n) => compFn(n, value))?.label;
       case "accessTypes":
         return accessTypeOptions.find((n) => compFn(n, value))?.label;
-      // FIXME: Invalid date/time values are not validated and are shown in the tag list but not in the form
       case "startDate":
       case "endDate":
       case "timeBegin":

@@ -88,9 +88,6 @@ const RescheduleReservationSeriesFormSchema = z
 
 export type RescheduleReservationSeriesForm = z.infer<typeof RescheduleReservationSeriesFormSchema>;
 
-// TODO schema refinements should be looked over and refactored so they can be reused easily
-// TODO neither of them validates the end date =< 2 years from now (causes a backend error, that is toasted to the user)
-
 export function getRescheduleReservationSeriesSchema(interval: ReservationStartInterval) {
   return (
     RescheduleReservationSeriesFormSchema

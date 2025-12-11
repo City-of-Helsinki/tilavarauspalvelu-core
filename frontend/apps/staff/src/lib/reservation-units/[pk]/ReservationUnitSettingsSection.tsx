@@ -361,7 +361,6 @@ export function ReservationUnitSettingsSection({
             />
             <CustomNumberInput name="maxReservationsPerUser" min={1} form={form} />
             <FieldGroup
-              // FIXME replace the text fields
               heading={t("reservationUnitEditor:requireAdultReserveeSettings")}
               tooltip={t("reservationUnitEditor:tooltip.requireAdultReservee")}
               style={{ gridColumn: "1 / -1" }}

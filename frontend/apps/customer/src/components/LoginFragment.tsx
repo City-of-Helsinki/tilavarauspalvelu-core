@@ -20,7 +20,6 @@ export function LoginFragment({
   returnUrl,
   type,
 }: Readonly<Props>): JSX.Element {
-  // TODO pass the isAuthenticated from SSR and remove the hook
   const { isAuthenticated } = useSession();
   const { t, i18n } = useTranslation();
 

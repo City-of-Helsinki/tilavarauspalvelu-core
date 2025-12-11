@@ -237,8 +237,6 @@ function getReservationVolume(minutes: number, unit: PriceUnit): number {
   return getUnRoundedReservationVolume(minutes, unit);
 }
 
-// TODO rewrite this return number normally
-// and a separate function to format it to string
 export function getPriceString(props: GetPriceType): string {
   const { t, pricing, minutes = 0 } = props;
 

@@ -567,7 +567,6 @@ export function Calendar<T extends Record<string, unknown>>({
   underlineEvents = false,
   isLoading,
 }: Props<T>): JSX.Element {
-  // FIXME this breaks TS type ckecking => replace with prop spreading
   const Component: React.ElementType = draggable ? StyledCalendarDND : StyledCalendar;
 
   return (

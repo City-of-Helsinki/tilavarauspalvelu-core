@@ -139,8 +139,6 @@ export function isReservationCancellableReason(
   if (reservationUnit?.cancellationRule == null) {
     return "CANCELLATION_NOT_ALLOWED";
   }
-  // TODO why isn't user allowed to cancel waiting for payment?
-  // TODO why can't user cancel if the reservation is waiting for handling?
   if (reservation.state !== ReservationStateChoice.Confirmed) {
     return "CANCELLATION_NOT_ALLOWED";
   }

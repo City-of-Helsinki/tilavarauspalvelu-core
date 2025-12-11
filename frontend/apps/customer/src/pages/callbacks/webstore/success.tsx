@@ -12,9 +12,8 @@ import { getReservationPath } from "@/modules/urls";
 import type { ReservationStateQuery } from "@gql/gql-types";
 import { OrderStatus, ReservationStateChoice, useReservationStateQuery } from "@gql/gql-types";
 
-// TODO should be moved to /reservations/success
-// but because this is webstore callback page we need to leave the url (use an url rewrite)
-// we can't tie this to a reservationPk because it's used as a return page from webstore
+// This is webstore callback page for successful payments
+// this can't be tied to a reservationPk because webstore doesn't have that information
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, query } = ctx;
   const { apiBaseUrl } = getCommonServerSideProps();
@@ -83,8 +82,6 @@ function getRedirectUrl(reservation: RedirectProps): string | null {
     case ReservationStateChoice.Created:
     case ReservationStateChoice.Denied:
     case null:
-      // TODO what is this error? or the query param, is it really used for something
-      // also why not redirect to the reservation page? it shows the payment status and a link to the payment page
       return "/reservations?error=order1";
   }
 }

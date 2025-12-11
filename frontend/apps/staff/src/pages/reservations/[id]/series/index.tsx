@@ -137,7 +137,6 @@ function SeriesPageInner({ pk }: { pk: number }) {
   const interval = reservation?.reservationUnit.reservationStartInterval ?? ReservationStartInterval.Interval_15Minutes;
 
   const form = useForm<RescheduleReservationSeriesForm>({
-    // FIXME there is no validation here (schema is incomplete, need to run the same refinements as in the create form)
     resolver: zodResolver(getRescheduleReservationSeriesSchema(interval)),
     values: convertToForm(reservationSeries),
   });

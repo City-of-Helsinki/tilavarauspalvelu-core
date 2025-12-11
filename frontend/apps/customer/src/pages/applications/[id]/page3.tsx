@@ -70,7 +70,6 @@ function Page3Form(): JSX.Element | null {
     case ReserveeType.Company:
       return <CompanyForm />;
     case undefined:
-      // TODO should we return disabled form here?
       return null;
   }
 }

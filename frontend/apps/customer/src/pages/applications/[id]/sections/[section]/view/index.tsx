@@ -46,7 +46,6 @@ function ViewAll({ applicationSection }: PropsNarrowed): JSX.Element {
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
-// TODO should have a relay query for application sections
 export const APPLICATION_SECTION_VIEW_QUERY = gql`
   query ApplicationSectionView($pk: Int!, $beginDate: Date = null) {
     applicationSections(pk: [$pk]) {

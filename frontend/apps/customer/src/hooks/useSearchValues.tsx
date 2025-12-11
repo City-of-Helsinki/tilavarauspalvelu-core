@@ -23,7 +23,6 @@ export function useSearchModify() {
     }
   };
 
-  // TODO type this properly (not a Record)
   const handleSearch = (criteria: Record<string, unknown>, force: boolean) => {
     const { sort, order, ref } = router.query;
     const newSort = sort != null && !Array.isArray(sort) ? sort : null;
@@ -36,7 +35,6 @@ export function useSearchModify() {
     const v = Number(ref) > 0 ? Number(ref) : null;
     const nextRef = v != null ? v + 1 : 1;
 
-    // TODO can this be refactored to use the URLSearchParams object?
     const newValues = {
       ...criteria,
       sort: newSort,

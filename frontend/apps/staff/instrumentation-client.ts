@@ -11,15 +11,7 @@ const config = {
   tracesSampleRate: 0.2,
   debug: false,
   release: `${APP_NAME}@${VERSION}`,
-  // NOTE for some reason this file is imported on the server side also
-  // replay is client side exclusive
-  // FIXME replay doesn't work (requires different import / plugin)
-  // integrations: isBrowser ? [Sentry.replayIntegration()] : [],
-  // Define how likely Replay events are sampled.
-  // This sets the sample rate to be 10%. You may want this to be 100% while
-  // in development and sample at a lower rate in production
   replaysSessionSampleRate: 0.1,
-  // Define how likely Replay events are sampled when an error occurs.
   replaysOnErrorSampleRate: 1,
 };
 

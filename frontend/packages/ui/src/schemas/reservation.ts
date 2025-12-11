@@ -47,9 +47,6 @@ export type CreateStaffReservationFormSchema = z.infer<typeof CreateStaffReserva
 type TimeFormValuesT = z.infer<typeof TimeFormSchema>;
 
 // Only used for admin forms
-// TODO should be combined with the new schemas, but should have partial
-// - note: email is gonna be a problem since partial doesn't allow empty strings
-// FIXME name is wrong (not Meta)
 export const ReservationFormMetaSchema = z.object({
   name: z.string().optional(),
   description: z.string().optional(),

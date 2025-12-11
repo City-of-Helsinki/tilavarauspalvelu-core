@@ -54,8 +54,7 @@ function SearchSingle({ options }: Readonly<Props>): JSX.Element {
 
   const content = useRef<HTMLElement>(null);
 
-  // TODO this is hackish, but the purpose is to scroll to the list (esp on mobile)
-  // if the search options were selected on the front page already (and the search is automatic).
+  // scroll on mobile if the search options were selected on the front page already -> we search on landing here
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   useEffect(() => {
     if (
@@ -106,7 +105,6 @@ function SearchSingle({ options }: Readonly<Props>): JSX.Element {
 
 export default SearchSingle;
 
-// TODO why isDraft and isVisible are options here?
 export const SEARCH_RESERVATION_UNITS = gql`
   query SearchReservationUnits(
     $textSearch: String
