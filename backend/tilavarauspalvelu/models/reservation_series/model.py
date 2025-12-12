@@ -55,7 +55,7 @@ class ReservationSeries(models.Model):
     end_date: datetime.date = models.DateField()
     end_time: datetime.time = models.TimeField()
 
-    recurrence_in_days: int | None = models.PositiveIntegerField(null=True, blank=True)  # TODO: Nullable?
+    recurrence_in_days: int | None = models.PositiveIntegerField(null=True, blank=True)
 
     weekdays: list[Weekday] = ArrayField(TextChoicesField(enum=Weekday), size=7, default=list)
 

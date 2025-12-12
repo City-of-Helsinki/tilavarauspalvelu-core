@@ -636,7 +636,6 @@ class EmailService:
         if series.allocated_time_slot is None:
             return
 
-        # TODO: Is this ok?
         if not series.reservations.exists():
             return
 
@@ -700,7 +699,6 @@ class EmailService:
         if series.allocated_time_slot is None:
             return
 
-        # TODO: Is this ok?
         if not series.reservations.exists():
             return
 

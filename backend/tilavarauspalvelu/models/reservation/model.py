@@ -66,7 +66,7 @@ class Reservation(SerializableModelMixin, models.Model):
     type: ReservationTypeChoice | None = TextChoicesField(
         enum=ReservationTypeChoice,
         default=ReservationTypeChoice.NORMAL,
-        null=True,  # TODO: Nullable?
+        null=True,
         blank=False,
     )
     municipality: MunicipalityChoice | None = TextChoicesField(
