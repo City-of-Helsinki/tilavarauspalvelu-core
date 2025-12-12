@@ -17,16 +17,9 @@ env:
   PNPM_VERSION: 10
 
 jobs:
-  # Disabled because it broke, and no idea why.
-  #changed-packages:
-  #  name: Determine which apps changed
-  #  uses: ./.github/reusable/changed-packages.yml
-
-  lint-admin-ui:
-    name: Lint admin ui
+  lint-staff-ui:
+    name: Staff ui lint
     runs-on: ubuntu-latest
-    #needs: [changed-packages]
-    # if: needs.changed-packages.outputs.admin_changed == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -47,7 +40,7 @@ jobs:
 
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
 
-      - name: Lint admin ui
+      - name: Lint staff ui
         working-directory: frontend
         run: |
           pnpm codegen
@@ -56,11 +49,9 @@ jobs:
           pnpm lint:css --filter=staff...
           pnpm format:check --filter=staff...
 
-  test-admin-ui:
-    name: Test admin ui
+  test-staff-ui:
+    name: Staff ui unit test
     runs-on: ubuntu-latest
-    # needs: [changed-packages]
-    # if: needs.changed-packages.outputs.admin_changed == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -81,17 +72,15 @@ jobs:
 
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
 
-      - name: Test admin ui
+      - name: Test staff ui
         working-directory: frontend
         run: |
           pnpm codegen
           pnpm test --filter=staff...
 
-  lint-ui:
-    name: Lint ui
+  lint-customer-ui:
+    name: Customer ui lint
     runs-on: ubuntu-latest
-    # needs: [changed-packages]
-    # if: needs.changed-packages.outputs.ui_changed == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -121,11 +110,9 @@ jobs:
           pnpm lint:css --filter=customer...
           pnpm format:check --filter=customer...
 
-  test-ui:
-    name: Unit tests ui
+  test-customer-ui:
+    name: Customer ui unit tests
     runs-on: ubuntu-latest
-    # needs: [changed-packages]
-    # if: needs.changed-packages.outputs.ui_changed == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v6

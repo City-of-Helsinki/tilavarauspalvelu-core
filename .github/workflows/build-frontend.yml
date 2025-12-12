@@ -20,7 +20,7 @@ concurrency:
 jobs:
   # Build both ui and admin-ui dockers
   build-ui-docker:
-    name: "Build ui docker"
+    name: "Build customer ui docker"
     uses: ./.github/workflows/build-ui-docker.yml
     with:
       app-name: "customer"
@@ -28,7 +28,7 @@ jobs:
     secrets: inherit
 
   build-admin-ui-docker:
-    name: "Build admin ui docker"
+    name: "Build staff ui docker"
     uses: ./.github/workflows/build-ui-docker.yml
     with:
       app-name: "staff"
