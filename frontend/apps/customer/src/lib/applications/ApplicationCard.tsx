@@ -91,7 +91,7 @@ export function ApplicationCard({ application, actionCallback }: Props): JSX.Ele
       disabled={!editable || isLoading}
       key="cancel"
     >
-      {t("applicationCard:cancel")}
+      {t("common:cancel")}
     </StyledButton>,
     <ButtonLikeLink
       disabled={!editable || application.pk == null || isLoading}
@@ -99,7 +99,7 @@ export function ApplicationCard({ application, actionCallback }: Props): JSX.Ele
       key="edit"
       width="full"
     >
-      {t("applicationCard:edit")}
+      {t("common:actions.edit")}
       <IconPen />
     </ButtonLikeLink>,
     <ButtonLikeLink

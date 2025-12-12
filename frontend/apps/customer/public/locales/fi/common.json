@@ -145,5 +145,12 @@
   "municipalities": {
     "HELSINKI": "Helsinki",
     "OTHER": "Muu"
+  },
+  "actions": {
+    "save": "Tallenna",
+    "edit": "Muokkaa",
+    "delete": "Poista",
+    "back": "Takaisin",
+    "backTo": "Takaisin {{destination}}"
   }
 }

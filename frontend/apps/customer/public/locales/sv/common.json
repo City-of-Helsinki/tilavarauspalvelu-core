@@ -145,5 +145,12 @@
   "municipalities": {
     "HELSINKI": "Helsinki",
     "OTHER": "Andra"
+  },
+  "actions": {
+    "save": "Spara",
+    "edit": "Redigera",
+    "delete": "Radera",
+    "back": "Tillbaka",
+    "backTo": "Tillbaka till {{destination}}"
   }
 }

@@ -145,5 +145,12 @@
   "municipalities": {
     "HELSINKI": "Helsinki",
     "OTHER": "Other"
+  },
+  "actions": {
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back",
+    "backTo": "Back to {{destination}}"
   }
 }
