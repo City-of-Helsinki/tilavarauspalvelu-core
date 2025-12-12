@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { gql } from "@apollo/client";
 import { addDays } from "date-fns";
 import { Tabs, TabList, Tab, TabPanel } from "hds-react";
-import type { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
@@ -12,6 +12,7 @@ import { formatApiDate } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { TabWrapper, H1, CenterSpinner } from "ui/src/styled";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { useEnvContext } from "@/context/EnvContext";
 import { useSession } from "@/hooks";
 import { ReservationCard } from "@/lib/reservation";
 import {
@@ -32,7 +33,7 @@ const EmptyMessage = styled.div`
   margin-left: var(--spacing-xl);
 `;
 
-function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
+function Reservations(_props: InferGetServerSidePropsType<typeof getServerSideProps>): React.ReactElement {
   const router = useRouter();
   const { t } = useTranslation();
   const { isAuthenticated, user: currentUser } = useSession();
@@ -76,7 +77,9 @@ function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
     }
   }, [routerError, t]);
 
-  // NOTE should never happen since we do an SSR redirect
+  const { env } = useEnvContext();
+
+  // NOTE should never happen since the middleware should redirect
   if (!isAuthenticated) {
     return <div>{t("common:error.notAuthenticated")}</div>;
   }
@@ -112,7 +115,7 @@ function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
                   key={reservation.pk}
                   reservation={reservation}
                   type="upcoming"
-                  apiBaseUrl={props.apiBaseUrl}
+                  apiBaseUrl={env.apiBaseUrl}
                 />
               ))
             )}
@@ -128,7 +131,7 @@ function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
                   key={reservation.pk}
                   reservation={reservation}
                   type="past"
-                  apiBaseUrl={props.apiBaseUrl}
+                  apiBaseUrl={env.apiBaseUrl}
                 />
               ))
             )}
@@ -144,7 +147,7 @@ function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
                   key={reservation.pk}
                   reservation={reservation}
                   type="cancelled"
-                  apiBaseUrl={props.apiBaseUrl}
+                  apiBaseUrl={env.apiBaseUrl}
                 />
               ))
             )}
@@ -155,9 +158,7 @@ function Reservations(props: { apiBaseUrl: string }): JSX.Element | null {
   );
 }
 
-export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { locale } = ctx;
-
+export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
       ...(await serverSideTranslations(locale ?? "fi")),
