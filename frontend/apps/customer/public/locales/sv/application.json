@@ -130,10 +130,10 @@
   "preview": {
     "subHeading": "Kontrollera och lämna in ansökan",
     "applicantType": {
-      "community": "Oregistrerad förening",
-      "company": "Företag",
-      "individual": "Privatkund",
-      "association": "Registrerad förening"
+      "COMMUNITY": "Oregistrerad förening",
+      "COMPANY": "Företag",
+      "INDIVIDUAL": "Privatkund",
+      "ASSOCIATION": "Registrerad förening"
     },
     "municipality": "Hemort",
     "text": "Sammandrag av din ansökan",

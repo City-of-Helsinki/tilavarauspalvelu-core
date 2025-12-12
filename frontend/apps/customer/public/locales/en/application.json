@@ -130,10 +130,10 @@
   "preview": {
     "heading": "Review and submit the application",
     "applicantType": {
-      "community": "Unregistered association",
-      "company": "Company",
-      "individual": "Private customer",
-      "association": "Registered association"
+      "COMMUNITY": "Unregistered association",
+      "COMPANY": "Company",
+      "INDIVIDUAL": "Private customer",
+      "ASSOCIATION": "Registered association"
     },
     "municipality": "City",
     "basicInfoSubHeading": "Applicant details",
