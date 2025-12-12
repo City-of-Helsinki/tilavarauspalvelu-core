@@ -567,7 +567,7 @@ cd frontend
 # customer
 cd apps/customer
 pnpm test
-# admin
+# staff
 cd apps/staff
 pnpm test
 # common
