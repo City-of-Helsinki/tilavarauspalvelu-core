@@ -45,6 +45,6 @@ stop:
 	@docker compose stop
 
 codegen:
-	@pnpm codegen:common
-	@pnpm codegen:ui
-	@pnpm codegen:admin
+  @pnpm --dir frontend codegen:ui
+	@pnpm --dir frontend codegen:customer
+	@pnpm --dir frontend codegen:staff
