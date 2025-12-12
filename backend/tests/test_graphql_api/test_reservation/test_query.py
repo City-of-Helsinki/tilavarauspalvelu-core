@@ -88,7 +88,7 @@ def test_reservation__query__all_fields(graphql):
         isHandled
         name
         numPersons
-        paymentOrder { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }
+        paymentOrder { orderUuid status paymentType receiptUrl checkoutUrl refundUuid expiresInMinutes }
         price
         priceNet
         purpose { nameFi }
@@ -375,9 +375,12 @@ def test_reservation__query__order__all_fields(graphql):
         remote_id="b3fef99e-6c18-422e-943d-cf00702af53e",
     )
 
-    fields = (
-        "paymentOrder { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }"
-    )
+    fields = """
+        paymentOrder {
+            orderUuid status paymentType receiptUrl checkoutUrl refundUuid expiresInMinutes
+            reservation { pk }
+        }
+    """
     query = reservations_query(fields=fields)
 
     graphql.login_with_superuser()
@@ -386,7 +389,7 @@ def test_reservation__query__order__all_fields(graphql):
     assert response.has_errors is False, response
     assert response.node(0) == {
         "paymentOrder": {
-            "reservationPk": str(reservation.pk),
+            "reservation": {"pk": reservation.pk},
             "checkoutUrl": None,
             "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
             "paymentType": "ONLINE",

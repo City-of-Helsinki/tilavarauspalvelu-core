@@ -34,12 +34,6 @@ class PaymentOrderNode(DjangoNode):
     expires_in_minutes = MultiField(graphene.Int, fields=["status", "created_at"])
     processed_at = graphene.DateTime()
 
-    reservation_pk = MultiField(
-        graphene.String,
-        fields=["reservation_id"],
-        deprecation_reason="Use `reservation` instead.",
-    )
-
     class Meta:
         model = PaymentOrder
         fields = [
@@ -51,7 +45,6 @@ class PaymentOrderNode(DjangoNode):
             "receipt_url",
             "expires_in_minutes",
             "processed_at",
-            "reservation_pk",
             "reservation",
             "handled_payment_due_by",
         ]

@@ -30,7 +30,7 @@ def test_order__query(graphql):
         "paymentType": str(order.payment_type),
         "receiptUrl": order.receipt_url,
         "checkoutUrl": order.checkout_url,
-        "reservationPk": str(order.reservation.pk),
+        "reservation": {"pk": order.reservation.pk},
         "refundUuid": str(order.refund_id),
         "expiresInMinutes": 5,
     }

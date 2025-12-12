@@ -2242,7 +2242,6 @@ type PaymentOrderNode implements Node {
   orderUuid: UUID
   refundUuid: UUID
   expiresInMinutes: Int
-  reservationPk: String @deprecated(reason: "Use `reservation` instead.")
 }
 
 """An enumeration."""
