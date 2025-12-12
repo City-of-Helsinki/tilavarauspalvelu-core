@@ -44,6 +44,11 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
+// mocking nextjs useRouter doesn't propagate to other packages so we have to mock the hook using it
+vi.mock("ui/src/hooks/useToastIfQueryParam", () => ({
+  useToastIfQueryParam: vi.fn(),
+}));
+
 beforeEach(() => {
   vi.useFakeTimers({
     now: new Date(2024, 0, 1, 0, 0, 0),
