@@ -13,12 +13,10 @@ trigger:
   # wait for it to complete and then run all other changes in a batch.
   batch: true
   tags:
-    # Trigger when creating tags like v1.0.0, release-1.0.0, hotfix-1.0.0, v1.0.0-ui, v1.0.0-customer,
+    # Trigger when creating tags like v1.0.0, v1.0.0-ui, v1.0.0-customer,
     # but not when creating tags like v1.0.0-staff, v1.0.0-core, etc.
     include:
       - "v*"
-      - "release-*"
-      - "hotfix-*"
     exclude:
       - "*-staff"
       - "*-core"
