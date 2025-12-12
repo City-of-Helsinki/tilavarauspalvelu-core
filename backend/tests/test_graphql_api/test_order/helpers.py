@@ -20,9 +20,9 @@ order_query = partial(
         paymentType
         receiptUrl
         checkoutUrl
-        reservationPk
         refundUuid
         expiresInMinutes
+        reservation { pk }
     """,
 )
 

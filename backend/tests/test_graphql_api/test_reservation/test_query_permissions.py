@@ -271,7 +271,7 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         isHandled
         name
         numPersons
-        paymentOrder { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }
+        paymentOrder { orderUuid status paymentType receiptUrl checkoutUrl refundUuid expiresInMinutes reservation {pk}}
         price
         priceNet
         purpose { nameFi }
