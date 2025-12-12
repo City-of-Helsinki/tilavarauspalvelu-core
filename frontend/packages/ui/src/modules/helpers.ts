@@ -399,6 +399,7 @@ export const sanitizeConfig = {
     a: ["href", "target", "rel"],
     "*": ["style"],
   },
+  allowedSchemes: ["http", "https", "mailto"],
 };
 
 /// Remove unwanted tags from content
