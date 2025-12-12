@@ -2,7 +2,6 @@
   "reservationName": "Varaus {{id}}",
   "reservationNumber": "Varausnumero",
   "subHeading": "Hallinnoi omia varauksiasi",
-  "back": "Takaisin Omat hakemukset",
   "info": "Varauksesi on vahvistettu seuraaville ajankohdille",
   "titleResolution": "Varausvahvistus",
   "resultWithReservations": "Varauksesi on vahvistettu seuraaville ajankohdille.",
@@ -62,7 +61,6 @@
   "pastSlug": "Mennyt",
   "payReservation": "Maksa varaus",
   "modifyReservationTime": "Muuta aikaa",
-  "modifyApplication": "Muokkaa hakemusta",
   "backToReservations": "Palaa Omiin varauksiin",
   "showCancellationTerms": "Näytä peruutusehdot",
   "hideCancellationTerms": "Piilota peruutusehdot",
@@ -129,11 +127,11 @@
     "FREE": "Maksuton"
   },
   "reservationEditFailed": "Varauksen muokkaaminen epäonnistui",
-  "backToReservationUnit": "Palaa kohteen sivulle",
+  "reservationUnitPage": "kohteen sivulle",
   "reservationExpired": "Varauksesi on vanhentunut",
   "reservationExpiredDescription": "Varauksesi ehti vanhentua ennen maksamista. Ole hyvä ja tee varaus uudelleen.",
   "orderInvalid": "Virheellinen tilausnumero",
-  "backToSearch": "Palaa hakusivulle",
+  "searchPage": "hakusivulle",
   "confirmationError": {
     "heading": "Maksu odottaa vahvistusta",
     "body": "Maksuasi ei voitu vielä vahvistaa. Tarkista varauksen tila hetken kuluttua Omat varaukset -sivulta. Jos varaus ei onnistunut, ole hyvä ja tee uusi varaus. Asiakaspalvelumme auttaa tarvittaessa."

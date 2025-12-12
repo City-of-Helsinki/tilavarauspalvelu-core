@@ -2,7 +2,6 @@
   "reservationName": "Bokning {{id}}",
   "reservationNumber": "Bokningsnummer",
   "subHeading": "Administrera dina bokningar",
-  "back": "Tillbaka till Mina ansökningar",
   "info": "Din bokning är bekräftad för följande tidpunkter",
   "titleResolution": "Bokningsbekräftelse",
   "resultWithReservations": "Din bokning är bekräftad för följande tidpunkter.",
@@ -62,7 +61,6 @@
   "payReservation": "Betala",
   "pastSlug": "Tidigare",
   "modifyReservationTime": "Ändra tid",
-  "modifyApplication": "Redigera ansökan",
   "backToReservations": "Gå till Mina bokningar",
   "showCancellationTerms": "Visa avbokningsvillkoren",
   "hideCancellationTerms": "Dölj avbokningsvillkoren",
@@ -133,11 +131,11 @@
     "FREE": "Gratis"
   },
   "reservationEditFailed": "Det gick inte att redigera bokningen",
-  "backToReservationUnit": "Tillbaka till objektets sida",
+  "reservationUnitPage": "objektets sida",
   "reservationExpired": "Bokningen har gått ut",
   "reservationExpiredDescription": "Din bokning gick ut innan betalningen behandlades. Vänligen upprepa bokningsprocessen.",
   "orderInvalid": "Ordernummer ogiltigt",
-  "backToSearch": "Tillbaka till sökningen",
+  "searchPage": "sökningen",
   "confirmationError": {
     "heading": "Väntar på betalning",
     "body": "Din betalning kunde inte bekräftas. Vänligen kontrollera efter en stund statusen för bokningen från Dina bokningar sidan. Om bokningen misslyckades, vänligen upprepa bokningsprocessen. Vår kundtjänst hjälper dig vid behov."

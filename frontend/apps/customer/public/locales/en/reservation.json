@@ -2,7 +2,6 @@
   "reservationName": "Booking {{id}}",
   "reservationNumber": "Booking number",
   "subHeading": "Manage your bookings",
-  "back": "Back to My applications",
   "info": "Your booking is confirmed for the following times",
   "titleResolution": "Booking confirmation",
   "resultWithReservations": "Your booking is confirmed for the following times.",
@@ -133,11 +132,11 @@
     "FREE": "Free"
   },
   "reservationEditFailed": "Failed to edit the booking",
-  "backToReservationUnit": "Back to destination page",
+  "reservationUnitPage": "destination page",
   "reservationExpired": "Booking has expired",
   "reservationExpiredDescription": "Your booking expired before the payment was processed. Please, repeat the booking process.",
   "orderInvalid": "Order number invalid",
-  "backToSearch": "Return to search",
+  "searchPage": "search",
   "confirmationError": {
     "heading": "Awaiting for payment",
     "body": "Your payment could not be confirmed. Please check the status of your booking in a moment from Your bookings -page. If the booking was unsuccessful, please repeat the booking process. Our customer service will provide assistance if necessary."

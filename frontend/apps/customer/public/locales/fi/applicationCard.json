@@ -3,8 +3,6 @@
   "cancelContent": "Jos perut hakemuksen, et voi enää muokata tai lähettää sitä.",
   "cancelFailed": "Hakemuksen peruminen epäonnistui",
   "cancelled": "Hakemus on peruutettu onnistuneesti.",
-  "edit": "Muokkaa",
-  "cancel": "Peru",
   "view": "Näytä",
   "saved": "Viimeksi tallennettu:"
 }
