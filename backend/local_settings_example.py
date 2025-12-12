@@ -18,7 +18,15 @@ class LocalMixin:
     CELERY_TASK_ALWAYS_EAGER = True
 
     MOCK_VERKKOKAUPPA_API_ENABLED = True
+    PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED = True
+    VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 10000
+
     PINDORA_MOCK_ENABLED = True
+
+    EMAIL_VARAAMO_EXT_LINK = "http://localhost:8000"
+    EMAIL_FEEDBACK_EXT_LINK = "http://localhost:8000/feedback"
+
+    PREFILL_RESERVATION_WITH_PROFILE_DATA = True
 
 
 class DockerMixin:
@@ -36,3 +44,7 @@ class AutomatedTestMixin:
 
     # Might be required depending on your database setup
     # DATABASES = values.DatabaseURLValue(default="postgis://localhost:5432/tvp")
+
+    # On macOS, you might need to set these paths manually (https://gis.stackexchange.com/a/416882)
+    # GDAL_LIBRARY_PATH = "/opt/homebrew/lib/libgdal.dylib"
+    # GEOS_LIBRARY_PATH = "/opt/homebrew/lib/libgeos_c.dylib"
