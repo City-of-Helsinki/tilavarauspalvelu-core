@@ -46,7 +46,6 @@ from .mutations import (
     ReservationCancellationMutation,
     ReservationConfirmMutation,
     ReservationCreateMutation,
-    ReservationDeleteMutation,
     ReservationDeleteTentativeMutation,
     ReservationDenyMutation,
     ReservationRefundMutation,
@@ -358,9 +357,6 @@ class Mutation(graphene.ObjectType):
     confirm_reservation = ReservationConfirmMutation.Field()
     cancel_reservation = ReservationCancellationMutation.Field()
     deny_reservation = ReservationDenyMutation.Field()
-    delete_reservation = ReservationDeleteMutation.Field(  # TODO: Remove this after frontend is updated.
-        deprecation_reason="Renamed to 'deleteTentativeReservation'."
-    )
     delete_tentative_reservation = ReservationDeleteTentativeMutation.Field()
     approve_reservation = ReservationApproveMutation.Field()
     refund_reservation = ReservationRefundMutation.Field()

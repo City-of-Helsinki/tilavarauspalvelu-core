@@ -95,7 +95,7 @@ export type MockReservationProps = {
 
 export type ReservationPaymentOrderFragment = Pick<
   PaymentOrderNode,
-  "id" | "reservationPk" | "status" | "paymentType" | "receiptUrl" | "checkoutUrl"
+  "id" | "reservation" | "status" | "paymentType" | "receiptUrl" | "checkoutUrl"
 >;
 
 export function createMockReservation(
@@ -115,7 +115,7 @@ export function createMockReservation(
     isHandled = true,
     paymentOrder = {
       id: "1",
-      reservationPk: "1",
+      reservation: null,
       status: OrderStatus.PaidManually,
       paymentType: PaymentType.OnSite,
       receiptUrl: "https://example.com/receipt",
@@ -344,7 +344,7 @@ export const reservationRenderProps = (
         price: "40.0",
         paymentOrder: {
           id: "1",
-          reservationPk: "1",
+          reservation: null,
           status: paymentStatus,
           paymentType: PaymentType.OnlineOrInvoice,
           receiptUrl: receiptUrl,
@@ -365,7 +365,7 @@ export const reservationRenderProps = (
         cancellable: false,
         paymentOrder: {
           id: "1",
-          reservationPk: "1",
+          reservation: null,
           status: paymentStatus,
           paymentType: PaymentType.OnlineOrInvoice,
           receiptUrl: receiptUrl,

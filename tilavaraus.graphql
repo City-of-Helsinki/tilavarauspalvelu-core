@@ -2242,7 +2242,6 @@ type PaymentOrderNode implements Node {
   orderUuid: UUID
   refundUuid: UUID
   expiresInMinutes: Int
-  reservationPk: String @deprecated(reason: "Use `reservation` instead.")
 }
 
 """An enumeration."""
@@ -3132,7 +3131,6 @@ type Mutation {
   confirmReservation(input: ReservationConfirmMutationInput!): ReservationConfirmMutationPayload
   cancelReservation(input: ReservationCancellationMutationInput!): ReservationCancellationMutationPayload
   denyReservation(input: ReservationDenyMutationInput!): ReservationDenyMutationPayload
-  deleteReservation(input: ReservationDeleteMutationInput!): ReservationDeleteMutationPayload @deprecated(reason: "Renamed to 'deleteTentativeReservation'.")
 
   """Used only for deleting a reservation before it is confirmed."""
   deleteTentativeReservation(input: ReservationDeleteTentativeMutationInput!): ReservationDeleteTentativeMutationPayload
@@ -4350,14 +4348,6 @@ input ReservationDenyMutationInput {
   pk: Int!
   denyReason: Int!
   handlingDetails: String!
-}
-
-type ReservationDeleteMutationPayload {
-  deleted: Boolean
-}
-
-input ReservationDeleteMutationInput {
-  pk: ID!
 }
 
 """Used only for deleting a reservation before it is confirmed."""

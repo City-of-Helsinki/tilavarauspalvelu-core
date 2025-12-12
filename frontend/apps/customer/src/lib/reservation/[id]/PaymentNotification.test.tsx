@@ -62,7 +62,6 @@ function createPaymentOrderMock(): PaymentOrderNode {
     receiptUrl: "https://example.com/receipt",
     refundUuid: "123",
     reservation: null,
-    reservationPk: "1",
     id: "paymentOrderId",
     status: OrderStatus.Pending,
   };
