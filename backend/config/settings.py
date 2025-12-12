@@ -599,7 +599,7 @@ class Common(Environment):
         "a": {"href", "target", "rel"},
         "*": {"style"},
     }
-    NH3_ALLOWED_URL_SCHEMES = {"http", "https"}
+    NH3_ALLOWED_URL_SCHEMES = {"http", "https", "mailto"}
 
 
 class EmptyDefaults:
