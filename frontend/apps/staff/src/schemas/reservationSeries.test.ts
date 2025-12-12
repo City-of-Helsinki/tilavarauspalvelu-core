@@ -17,28 +17,25 @@ function createInput({
   startTime = "09:00",
   endTime = "10:15",
   seriesName = "name",
-}: Partial<ReservationSeriesFormValues>) {
+  enableBufferTimeAfter = false,
+  enableBufferTimeBefore = false,
+}: Partial<ReservationSeriesFormValues>): ReservationSeriesFormValues {
   return {
     type,
     startingDate,
     endingDate,
     repeatOnDays,
     repeatPattern,
+    enableBufferTimeAfter,
+    enableBufferTimeBefore,
+    comments: "",
     startTime,
     endTime,
     seriesName,
   };
 }
 
-// Tests timeSelectionSchema instead of the form schema because of refinements
-
-// TODO need to make more complex
-// so the basic form validation test is first week (today -> week)
-// with start time / end time
-// with reservation unit
-// no metadata
-// type? BLOCKED or STAFF
-test.skip("one week blocked reservation on a single day is valid", () => {
+test("one week blocked reservation on a single day is valid", () => {
   const res = getReservationSeriesSchema(interval).safeParse(createInput({}));
   expect(res.success).toBeTruthy();
 });

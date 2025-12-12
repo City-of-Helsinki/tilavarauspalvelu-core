@@ -519,9 +519,7 @@
       "avoid"
     ],
     "unicorn/text-encoding-identifier-case": "error",
-    "unicorn/throw-new-error": "error",
-    "vitest/no-conditional-tests": "error",
-    "vitest/require-local-test-context-for-concurrent-snapshots": "error"
+    "unicorn/throw-new-error": "error"
   },
   "ignorePatterns": [
     "node_modules/",
@@ -602,7 +600,11 @@
         "typescript/no-unsafe-type-assertion": "off",
         "typescript/restrict-template-expressions": "off",
         "unicorn/consistent-function-scoping": "off",
-        "unicorn/error-message": "off"
+        "unicorn/error-message": "off",
+        "vitest/no-conditional-tests": "error",
+        "vitest/no-disabled-tests": "error",
+        "vitest/no-focused-tests": "error",
+        "vitest/require-local-test-context-for-concurrent-snapshots": "error"
       }
     },
     {
