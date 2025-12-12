@@ -4,7 +4,7 @@ name: "Build UI docker image"
 on:
   workflow_call:
     inputs:
-      # Docker build arg / package name suffix: valid values are "admin-ui" or "ui"
+      # Docker build arg / package name suffix: valid values are "staff" or "customer"
       app-name:
         required: true
         type: string
@@ -32,7 +32,7 @@ jobs:
       # required because error pages use build time env vars, not runtime env vars
       # it's the same on every environment
       FEEDBACK_URL: "https://lomake.hel.fi/varaamo-palaute"
-      # TODO this should only be ran for release tags (v*, hotfix-*, release-*), but {{ github.event.release.tag_name }} is not correct during a run
+      # NOTE this should only be ran for release tags (v*), but {{ github.event.release.tag_name }} is not correct during a run
       SENTRY_ENABLE_SOURCE_MAPS: true
       SENTRY_URL: "https://sentry.hel.fi"
       SENTRY_ORG: "city-of-helsinki"

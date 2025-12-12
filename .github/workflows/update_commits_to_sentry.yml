@@ -47,8 +47,8 @@ jobs:
           ignore_missing: true
           release: ${{ steps.release.outputs.release }}
 
-  upload-admin-sentry-sourcemaps:
-    name: "Upload admin ui sentry sourcemaps"
+  upload-staff-sentry-sourcemaps:
+    name: "Upload staff ui sentry sourcemaps"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
