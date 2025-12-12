@@ -1,10 +1,11 @@
 import React from "react";
 import { ErrorContainer } from "ui/src/components";
+import { useEnvContext } from "@/context/EnvContext";
 import { PUBLIC_URL } from "@/modules/const";
-import { env } from "../env.mjs";
 
-export function Error404(): JSX.Element {
+export function Error404(): React.ReactElement {
+  const { env } = useEnvContext();
   return (
-    <ErrorContainer statusCode={404} feedbackUrl={env.FEEDBACK_URL} imgSrc={`${PUBLIC_URL}/images/404-error.png`} />
+    <ErrorContainer statusCode={404} feedbackUrl={env.feedbackUrl} imgSrc={`${PUBLIC_URL}/images/404-error.png`} />
   );
 }
