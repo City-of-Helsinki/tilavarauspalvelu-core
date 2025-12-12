@@ -359,7 +359,6 @@ def test__merge_overlapping_time_span_elements__buffers__fully_inside__buffers_a
 
 
 def test__merge_overlapping_time_span_elements__buffers__fully_inside__buffer_are_adjusted():
-    # TODO: Add images to tests
     time_span_elements = [
         TimeSpanElement(
             start_datetime=_get_date(hour=10),
