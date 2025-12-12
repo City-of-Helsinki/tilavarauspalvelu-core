@@ -1,8 +1,14 @@
-# Don't allow dependencies to be used before they have been released for at least 2 weeks
-minimumReleaseAge: 20160
 packages:
   - apps/*
   - packages/*
+
+# Don't allow dependencies to be used before they have been released for at least 2 weeks
+minimumReleaseAge: 20160
+# Add any security exceptions here and bump them manually
+minimumReleaseAgeExclude:
+  - next@16.0.10
+  - '@next/env@16.0.10'
+  - '@types/node@24.10.3'
 
 ignoredBuiltDependencies:
   - '@parcel/watcher'
