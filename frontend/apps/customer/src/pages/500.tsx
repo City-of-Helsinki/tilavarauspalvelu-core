@@ -2,8 +2,7 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ErrorContainer } from "ui/src/components";
-
-// TODO this is a copy of 404.tsx, but with 500 instead of 404
+import { useEnvContext } from "@/context/EnvContext";
 
 /// next doesn't allow getServersideProps in 500.tsx (you have to use app router for that)
 export async function getStaticProps({ locale }: GetServerSidePropsContext) {
@@ -14,14 +13,9 @@ export async function getStaticProps({ locale }: GetServerSidePropsContext) {
   };
 }
 
-type Props = {
-  feedbackUrl: string;
-  title?: string;
-  body?: string;
-};
-
-function Page500({ title, body, feedbackUrl }: Readonly<Props>): JSX.Element {
-  return <ErrorContainer statusCode={500} title={title} body={body} feedbackUrl={feedbackUrl} />;
+function Page500(): React.ReactElement {
+  const { env } = useEnvContext();
+  return <ErrorContainer statusCode={500} feedbackUrl={env.feedbackUrl} />;
 }
 
 export default Page500;

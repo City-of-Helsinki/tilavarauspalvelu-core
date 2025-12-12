@@ -2,6 +2,7 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ErrorContainer } from "ui/src/components";
+import { useEnvContext } from "@/context/EnvContext";
 
 /// next doesn't allow getServersideProps in 404.tsx (you have to use app router for that)
 /// so all props are build time not runtime (e.g. no dynamic environment variables)
@@ -15,14 +16,9 @@ export async function getStaticProps({ locale }: GetServerSidePropsContext) {
   };
 }
 
-type Props = {
-  feedbackUrl: string;
-  title?: string;
-  body?: string;
-};
-
-function Page404({ title, body, feedbackUrl }: Readonly<Props>): JSX.Element {
-  return <ErrorContainer statusCode={404} title={title} body={body} feedbackUrl={feedbackUrl} />;
+function Page404(): React.ReactElement {
+  const { env } = useEnvContext();
+  return <ErrorContainer statusCode={404} feedbackUrl={env.feedbackUrl} />;
 }
 
 export default Page404;
