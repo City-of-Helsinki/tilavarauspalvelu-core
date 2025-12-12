@@ -42,7 +42,7 @@ python-dateutil = "2.9.0.post0"
 redis = { version = "6.4.0", extras = ["hiredis"] }
 sentry-sdk = "2.47.0"
 social-auth-app-django = "5.6.0"
-stamina = "25.1.0"
+stamina = "25.2.0"
 # Skip installation on Windows as uWSGI does not support it without Cygwin.
 uWSGI = { version = "2.0.31", markers = "sys_platform != 'win32'" }
 whitenoise = "6.11.0"
@@ -84,7 +84,7 @@ pytest-xdist = "3.8.0"
 [tool.poetry.group.lint.dependencies]
 # Dependencies only required for linting.
 pre-commit = "4.5.0"
-ruff = "0.14.8"
+ruff = "0.14.9"
 mypy = "1.19.0"
 django-stubs = { version = "5.2.8", extras = ["compatible-mypy"] }
 
