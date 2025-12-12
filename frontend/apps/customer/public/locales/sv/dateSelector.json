@@ -13,11 +13,6 @@
     "dateIsTooSmall": "Datumet måste vara efter {{minDate}}",
     "dateIsTooBig": "Datumet måste vara före {{maxDate}}"
   },
-  "menu": {
-    "buttonBack": "Tillbaka",
-    "buttonClose": "Stäng",
-    "buttonCustom": "Välj dagar"
-  },
   "title": "Välj tid",
   "accessibility": {
     "chooseDayPrefix": "Välj",

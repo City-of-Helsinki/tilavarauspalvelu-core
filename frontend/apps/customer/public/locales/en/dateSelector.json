@@ -13,11 +13,6 @@
     "dateIsTooSmall": "The date must be after {{minDate}}",
     "dateIsTooBig": "The date must be before {{maxDate}}"
   },
-  "menu": {
-    "buttonBack": "Back",
-    "buttonClose": "Close",
-    "buttonCustom": "Select dates"
-  },
   "title": "Select time",
   "accessibility": {
     "chooseDayPrefix": "Select",
