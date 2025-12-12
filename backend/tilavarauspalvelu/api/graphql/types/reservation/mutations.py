@@ -52,7 +52,6 @@ __all__ = [
     "ReservationCancellationMutation",
     "ReservationConfirmMutation",
     "ReservationCreateMutation",
-    "ReservationDeleteMutation",
     "ReservationDeleteTentativeMutation",
     "ReservationDenyMutation",
     "ReservationRefundMutation",
@@ -171,13 +170,6 @@ class ReservationDeleteTentativeMutation(DeleteMutation):
                 pass
             except Exception:  # noqa: BLE001
                 delete_pindora_reservation_task.delay(str(reservation.ext_uuid))
-
-
-class ReservationDeleteMutation(ReservationDeleteTentativeMutation):
-    # TODO: Remove after frontend is updated to use ReservationDeleteTentativeMutation
-    class Meta:
-        model = Reservation
-        permission_classes = [ReservationPermission]
 
 
 # Staff mutations
