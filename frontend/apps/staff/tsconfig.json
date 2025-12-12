@@ -8,7 +8,9 @@
       "@/*": ["./src/*"],
       "@lib/*": ["./src/lib/*"],
       "@gql/*": ["./gql/*"],
-      "@ui/*": ["../../packages/ui/src/*"]
+      "@ui/*": ["../../packages/ui/src/*"],
+      "next": ["./node_modules/next"],
+      "next-i18next": ["./node_modules/next-i18next"]
     }
   },
   "exclude": ["node_modules"],
