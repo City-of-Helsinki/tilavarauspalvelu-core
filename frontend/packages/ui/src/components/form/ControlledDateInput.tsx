@@ -5,7 +5,7 @@ import { addYears } from "date-fns";
 import { startOfDay } from "date-fns/startOfDay";
 import { DateInput } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { filterEmpty } from "../../modules/helpers";
+import { filterEmpty, getLocalizationLang } from "../../modules/helpers";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   error?: string;
@@ -37,7 +37,7 @@ export function ControlledDateInput<T extends FieldValues>({
   const {
     field: { value, onChange },
   } = useController({ control, name, rules: { required } });
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
     <DateInput
@@ -48,7 +48,7 @@ export function ControlledDateInput<T extends FieldValues>({
       maxDate={maxDate ?? addYears(new Date(), 2)}
       initialMonth={initialMonth}
       disableConfirmation={disableConfirmation ?? false}
-      language="fi"
+      language={getLocalizationLang(i18n.language)}
       value={value}
       errorText={filterEmpty(error) ?? undefined}
       invalid={filterEmpty(error) != null}
