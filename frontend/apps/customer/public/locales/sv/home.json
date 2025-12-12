@@ -13,16 +13,6 @@
     "heading": "Om Varaamo",
     "body": "Varaamo är en nättjänst som upprätthålls av Helsingfors stad, genom vilken du kan boka stadens offentliga lokaler samt arbetspunkter för ditt bruk. \n\nDen förnyade lokalbokningstjänsten befinner sig i testskedet. De nya egenskaperna och funktionerna tas i användning så småningom."
   },
-  "shortcutsHeading": "",
-  "shortcuts": {
-    "organizeEvent": "",
-    "pictureOrSound": "",
-    "sports": "",
-    "tutoring": "",
-    "working": "",
-    "sauna": "",
-    "workshop": ""
-  },
   "intendedUsesHeading": "Vad vill du göra?",
   "unitsHeading": "Var vill du boka en lokal eller utrustning?",
   "recommendations": "Rekommendationer"
