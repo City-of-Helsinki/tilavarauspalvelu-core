@@ -170,7 +170,7 @@ jobs:
           )" >> $GITHUB_OUTPUT
 
       - name: "Upload coverage artifact"
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: cov-${{ steps.artifact.outputs.artifact }}-${{ matrix.group }}
           path: ./backend/.coverage.${{ matrix.group }}
@@ -200,7 +200,7 @@ jobs:
           )" >> $GITHUB_OUTPUT
 
       - name: "Download coverage artifacts"
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           path: ./backend
           pattern: cov-${{ steps.artifact.outputs.artifact }}-*
@@ -224,7 +224,7 @@ jobs:
           sed -i 's@<source>@<source>backend/@g' coverage.xml
 
       - name: "SonarCloud Scan"
-        uses: SonarSource/sonarqube-scan-action@v6
+        uses: SonarSource/sonarqube-scan-action@v7
         with:
           projectBaseDir: ./backend
         # Skip analysis for all bots in pull requests
