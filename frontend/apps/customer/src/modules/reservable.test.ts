@@ -69,8 +69,6 @@ describe("generateReservableMap", () => {
   test("7 days multiple ranges per day", () => {
     const startHour = [9, 13];
     const endHour = [12, 17];
-    // eslint-disable-next-line no-console
-    console.assert(startHour.length === endHour.length);
     const data: Array<{ start: Date; end: Date }> = [];
     for (let i = 0; i < 7; i++) {
       for (let j = 0; j < startHour.length; j++) {

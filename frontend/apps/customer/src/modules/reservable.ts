@@ -94,8 +94,6 @@ export function generateReservableMap(reservableTimeSpans: ReadonlyArray<Reserva
         const day = dateToKey(i);
         const start_ = dayMax([n.start, i]);
         const end_ = dayMin([n.end, endOfDay(i)]);
-        // eslint-disable-next-line no-console
-        console.assert(start_ != null && end_ != null);
         if (start_ == null || end_ == null) {
           continue;
         }
@@ -103,8 +101,6 @@ export function generateReservableMap(reservableTimeSpans: ReadonlyArray<Reserva
           start: start_,
           end: end_,
         };
-        // eslint-disable-next-line no-console
-        console.assert(val.start.getDate() === val.end.getDate());
         const arr = map.get(day) ?? [];
         arr.push(val);
         map.set(day, arr);
