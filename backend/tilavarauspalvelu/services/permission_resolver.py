@@ -113,7 +113,8 @@ class PermissionResolver:
             unit_ids = list(self.user.active_unit_roles.keys())
             unit_group_ids = list(self.user.active_unit_group_roles.keys())
             units = (
-                Unit.objects.filter(Q(pk__in=unit_ids) | Q(unit_groups__pk__in=unit_group_ids))
+                Unit.objects
+                .filter(Q(pk__in=unit_ids) | Q(unit_groups__pk__in=unit_group_ids))
                 .prefetch_related("unit_groups")
                 .distinct()
             )
@@ -168,7 +169,8 @@ class PermissionResolver:
             unit_ids = list(self.user.active_unit_permissions.keys())
             unit_group_ids = list(self.user.active_unit_group_permissions.keys())
             units = (
-                Unit.objects.filter(Q(pk__in=unit_ids) | Q(unit_groups__pk__in=unit_group_ids))
+                Unit.objects
+                .filter(Q(pk__in=unit_ids) | Q(unit_groups__pk__in=unit_group_ids))
                 .prefetch_related("unit_groups")
                 .distinct()
             )

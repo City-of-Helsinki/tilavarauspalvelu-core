@@ -58,7 +58,8 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
             return
 
         units = (
-            Unit.objects.prefetch_related("unit_groups")
+            Unit.objects
+            .prefetch_related("unit_groups")
             .filter(reservation_units__reservations__in=items)
             .annotate(
                 reservation_ids=Coalesce(
@@ -89,7 +90,8 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
     def filter_buffered_reservations_period(self, start_date: datetime.date, end_date: datetime.date) -> Self:
         """Filter reservations that are on the given period."""
         return (
-            self.with_buffered_begin_and_end()
+            self
+            .with_buffered_begin_and_end()
             .filter(
                 buffered_begins_at__date__lte=end_date,
                 buffered_ends_at__date__gte=start_date,
@@ -100,7 +102,8 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
 
     def total_duration(self) -> datetime.timedelta:
         return (
-            self.annotate(duration=models.F("ends_at") - models.F("begins_at"))
+            self
+            .annotate(duration=models.F("ends_at") - models.F("begins_at"))
             .aggregate(total_duration=models.Sum("duration"))
             .get("total_duration")
         ) or datetime.timedelta()
@@ -150,7 +153,8 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
             buffer_time_after = reservation_unit.actions.get_actual_after_buffer(end)
 
         qs = (
-            self.with_buffered_begin_and_end()
+            self
+            .with_buffered_begin_and_end()
             .going_to_occur()
             .filter(
                 # In any reservation unit related through the reservation unit hierarchy
@@ -344,7 +348,8 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
 
     def cancellable_reservations_in_section(self, ref: ApplicationSection | models.OuterRef) -> Self:
         return (
-            self.future_reservations_in_section(ref)
+            self
+            .future_reservations_in_section(ref)
             .filter(
                 type=ReservationTypeChoice.SEASONAL,
                 state=ReservationStateChoice.CONFIRMED,

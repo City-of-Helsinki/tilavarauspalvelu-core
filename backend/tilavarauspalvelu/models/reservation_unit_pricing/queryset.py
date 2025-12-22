@@ -27,7 +27,8 @@ class ReservationUnitPricingQuerySet(ModelQuerySet[ReservationUnitPricing]):
 
         return self.alias(
             reservation_unit_active_pricing_begins_date=models.Subquery(
-                self.model.objects.filter(
+                self.model.objects
+                .filter(
                     reservation_unit=models.OuterRef("reservation_unit"),
                     begins__lte=today,
                 )
@@ -50,7 +51,8 @@ class ReservationUnitPricingQuerySet(ModelQuerySet[ReservationUnitPricing]):
     def active(self, from_date: datetime.date | models.F | None = None) -> Self:
         """Get only active pricings for each reservation unit."""
         return (
-            self.past_or_active(from_date=from_date)
+            self
+            .past_or_active(from_date=from_date)
             .alias(
                 row_number=models.Window(
                     expression=RowNumber(),
@@ -64,7 +66,8 @@ class ReservationUnitPricingQuerySet(ModelQuerySet[ReservationUnitPricing]):
     def latest_pricings_for_tax_update(self, change_date: datetime.date, ignored_company_codes: list[str]) -> Self:
         """Get last pricing for each reservation unit before the change date"""
         return (
-            self.filter(
+            self
+            .filter(
                 models.Q(begins__lte=change_date, highest_price=0)  # Ignore FREE pricings after the change date
                 | models.Q(highest_price__gt=0)
             )

@@ -72,7 +72,8 @@ class AllocatedTimeSlotQuerySet(ModelQuerySet[AllocatedTimeSlot]):
     ) -> bool:
         """Check existing allocations for overlapping time slots."""
         time_slots: list[TimeSlot] = list(
-            self.filter(
+            self
+            .filter(
                 day_of_the_week=day_of_the_week,
                 reservation_unit_option__application_section__reservations_begin_date__lt=end_date,
                 reservation_unit_option__application_section__reservations_end_date__gt=begin_date,
@@ -91,7 +92,8 @@ class AllocatedTimeSlotQuerySet(ModelQuerySet[AllocatedTimeSlot]):
 
     def affecting_allocations(self, reservation_unit: int, begin_date: datetime.date, end_date: datetime.date) -> Self:
         return (
-            self.distinct()
+            self
+            .distinct()
             .alias(
                 affected_reservation_unit_ids=models.Subquery(
                     queryset=ReservationUnit.objects.filter(id=reservation_unit).affected_reservation_unit_ids,

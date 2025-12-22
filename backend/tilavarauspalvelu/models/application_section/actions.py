@@ -25,9 +25,8 @@ class ApplicationSectionActions:
 
     def get_reservation_series(self) -> ReservationSeriesQuerySet:
         return (
-            ReservationSeries.objects.filter(
-                allocated_time_slot__reservation_unit_option__application_section=self.application_section
-            )
+            ReservationSeries.objects
+            .filter(allocated_time_slot__reservation_unit_option__application_section=self.application_section)
             .prefetch_related("reservations")
             .order_by("begin_date")
         )
@@ -39,7 +38,8 @@ class ApplicationSectionActions:
         return ReservationUnit.objects.filter(
             pk__in=models.Subquery(
                 queryset=(
-                    ReservationSeries.objects.all()
+                    ReservationSeries.objects
+                    .all()
                     .filter(allocated_time_slot__reservation_unit_option__application_section=self.application_section)
                     .values("reservation_unit_id")
                 ),

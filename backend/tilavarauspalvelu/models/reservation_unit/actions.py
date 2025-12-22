@@ -305,7 +305,8 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             return set()
 
         time_spans: list[TimeSpan] = list(
-            self.reservation_unit.origin_hauki_resource.reservable_time_spans.filter(
+            self.reservation_unit.origin_hauki_resource.reservable_time_spans
+            .filter(
                 start_datetime__date__lte=on_date,
                 end_datetime__date__gte=on_date,
             )
@@ -366,7 +367,8 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         from tilavarauspalvelu.models import ApplicationRound
 
         return (
-            ApplicationRound.objects.filter(
+            ApplicationRound.objects
+            .filter(
                 reservation_units=self.reservation_unit,
                 reservation_period_end_date__gte=start_date,
                 reservation_period_begin_date__lte=end_date,
@@ -438,7 +440,8 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         access_types_by_date: dict[datetime.date, AccessType] = {}
 
         access_types: list[ReservationUnitAccessType] = list(
-            self.reservation_unit.access_types.all()
+            self.reservation_unit.access_types
+            .all()
             .on_period(begin_date=begin_date, end_date=end_date)
             .order_by("begin_date")
         )
@@ -515,7 +518,8 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
 
         # Update all future or ongoing reservations in the reservation unit to their current access types
         qs = (
-            Reservation.objects.filter(reservation_unit=self.reservation_unit, ends_at__gt=now)
+            Reservation.objects
+            .filter(reservation_unit=self.reservation_unit, ends_at__gt=now)
             .annotate(
                 new_access_type=models.Case(
                     *whens,

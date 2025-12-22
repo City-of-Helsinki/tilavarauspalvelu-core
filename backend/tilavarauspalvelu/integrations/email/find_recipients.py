@@ -114,7 +114,8 @@ def get_reservation_staff_notification_recipients_by_language(
     users = users.exclude(pk=reservation.user.pk)
 
     units = (
-        Unit.objects.filter(reservation_units__in=[reservation.reservation_unit])
+        Unit.objects
+        .filter(reservation_units__in=[reservation.reservation_unit])
         .prefetch_related("unit_groups")
         .distinct()
     )
@@ -150,7 +151,8 @@ def get_application_section_staff_notification_recipients_by_language(
     users = users.exclude(pk=application_section.application.user.pk)
 
     units = (
-        Unit.objects.prefetch_related("unit_groups")
+        Unit.objects
+        .prefetch_related("unit_groups")
         .filter(
             # The ReservationUnits must be fetched through AllocatedTimeSlot, since ReservationUnitOptions may contain
             # ReservationUnits which has not been allocated any slots in application handling

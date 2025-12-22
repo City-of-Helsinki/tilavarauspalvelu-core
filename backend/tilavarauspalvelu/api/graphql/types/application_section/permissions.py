@@ -60,7 +60,8 @@ class UpdateAllSectionOptionsPermission(BasePermission):
         from tilavarauspalvelu.models import Unit
 
         units = (
-            Unit.objects.filter(reservation_units__reservation_unit_options__application_section=instance)
+            Unit.objects
+            .filter(reservation_units__reservation_unit_options__application_section=instance)
             .prefetch_related("unit_groups")
             .distinct()
         )

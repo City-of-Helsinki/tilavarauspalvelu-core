@@ -429,7 +429,8 @@ class FirstReservableTimeHelper:
         return (
             # "Reset" queryset by removing prefetch_related, select_related, and deferred fields
             # added by the optimizer. Leaves any filters and ordering intact.
-            self.original_reservation_unit_queryset.defer(None)
+            self.original_reservation_unit_queryset
+            .defer(None)
             .select_related(None)
             .prefetch_related(None)
             .prefetch_related(
@@ -494,7 +495,8 @@ class FirstReservableTimeHelper:
         """
         pks: list[ReservationUnitPK] = [result.pk for result in reservation_units]
         results = (
-            AffectingTimeSpan.objects.filter(
+            AffectingTimeSpan.objects
+            .filter(
                 affected_reservation_unit_ids__overlap=pks,
                 buffered_start_datetime__date__lte=self.filter_date_end,
                 buffered_end_datetime__date__gte=self.filter_date_start,

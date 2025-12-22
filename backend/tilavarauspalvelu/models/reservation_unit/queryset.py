@@ -80,7 +80,8 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
         >>> qs.annotate(affected=SubqueryArray(sq.affected_reservation_unit_ids, agg_field="ids", distinct=True))
         """
         return (
-            self.annotate(ids=ArrayUnnest("reservation_unit_hierarchy__related_reservation_unit_ids"))
+            self
+            .annotate(ids=ArrayUnnest("reservation_unit_hierarchy__related_reservation_unit_ids"))
             .values("ids")
             .distinct()
         )
@@ -127,7 +128,8 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
         return self.annotate(
             available_access_types=SubqueryArray(
                 queryset=(
-                    ReservationUnitAccessType.objects.filter(reservation_unit=models.OuterRef("pk"))
+                    ReservationUnitAccessType.objects
+                    .filter(reservation_unit=models.OuterRef("pk"))
                     .filter(L(end_date__gt=period_start) & models.Q(begin_date__lte=period_end))
                     .values("access_type")
                 ),

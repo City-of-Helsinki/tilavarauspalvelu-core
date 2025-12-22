@@ -761,7 +761,8 @@ class EmailService:
     def send_user_permissions_deactivation_emails() -> None:
         """Sends an email to users whose permissions are about to be deactivated."""
         users = (
-            User.objects.should_deactivate_permissions(in_days=settings.PERMISSION_NOTIFICATION_BEFORE_DAYS)
+            User.objects
+            .should_deactivate_permissions(in_days=settings.PERMISSION_NOTIFICATION_BEFORE_DAYS)
             .exclude(models.Q(email="") | models.Q(sent_email_about_deactivating_permissions=True))
             .order_by("last_login")
         )
@@ -787,7 +788,8 @@ class EmailService:
     def send_user_anonymization_emails() -> None:
         """Sends an email to users whose data is about to be anonymized."""
         users = (
-            User.objects.should_anonymize_users(in_days=settings.ANONYMIZATION_NOTIFICATION_BEFORE_DAYS)
+            User.objects
+            .should_anonymize_users(in_days=settings.ANONYMIZATION_NOTIFICATION_BEFORE_DAYS)
             .exclude(models.Q(email="") | models.Q(sent_email_about_anonymization=True))
             .order_by("last_login")
         )

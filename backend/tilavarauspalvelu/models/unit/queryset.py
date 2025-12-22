@@ -20,7 +20,8 @@ class UnitQuerySet(TranslatedModelQuerySet[Unit]):
             f"unit_group_name_{language}": models.Subquery(
                 queryset=(
                     # Use the name of the linked unit group which is first alphabetically
-                    UnitGroup.objects.filter(units=models.OuterRef("pk"))
+                    UnitGroup.objects
+                    .filter(units=models.OuterRef("pk"))
                     .order_by(f"name_{language}")
                     .values(f"name_{language}")[:1]
                 ),

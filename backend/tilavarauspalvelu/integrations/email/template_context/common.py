@@ -385,14 +385,16 @@ def params_for_access_code_section(*, section: ApplicationSection) -> dict[str, 
 
 def params_for_access_type_change_section(*, section: ApplicationSection) -> dict[str, Any]:
     reservation_units: Iterable[ReservationUnit] = (
-        section.actions.get_reservation_units()
+        section.actions
+        .get_reservation_units()
         .select_related("unit")
         .prefetch_related(
             Prefetch(
                 "access_types",
                 queryset=(
                     # Access types that are valid from now until the end of the reservation period of the section
-                    ReservationUnitAccessType.objects.all()
+                    ReservationUnitAccessType.objects
+                    .all()
                     .annotate(end_date=L("end_date"))
                     .on_period(
                         begin_date=local_datetime(),

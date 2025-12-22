@@ -36,16 +36,19 @@ if TYPE_CHECKING:
 
 # Mock the `each_context` method to add some custom context variables.
 original_each_context = admin.site.each_context
-admin.site.each_context = lambda request: original_each_context(request) | {
-    "version": settings.APP_VERSION,
-    # The helauth variables need to be added, since we subclass `helusers.tunnistamo_oidc.TunnistamoOIDCAuth`
-    # with `config.auth.ProxyTunnistamoOIDCAuthBackend` for optimizing request user fetching.
-    # `helusers.admin_site.AdminSite.each_context` refers to the original backend by
-    # string reference, so subclasses won't have the login/logout urls added.
-    "helsinki_provider_installed": True,
-    "helsinki_login_url": reverse("helusers:auth_login"),
-    "helsinki_logout_url": reverse("helusers:auth_logout"),
-}
+admin.site.each_context = lambda request: (
+    original_each_context(request)
+    | {
+        "version": settings.APP_VERSION,
+        # The helauth variables need to be added, since we subclass `helusers.tunnistamo_oidc.TunnistamoOIDCAuth`
+        # with `config.auth.ProxyTunnistamoOIDCAuthBackend` for optimizing request user fetching.
+        # `helusers.admin_site.AdminSite.each_context` refers to the original backend by
+        # string reference, so subclasses won't have the login/logout urls added.
+        "helsinki_provider_installed": True,
+        "helsinki_login_url": reverse("helusers:auth_login"),
+        "helsinki_logout_url": reverse("helusers:auth_logout"),
+    }
+)
 
 
 # --- CSP Overrides --------------------------------------------------------------------------------------------------

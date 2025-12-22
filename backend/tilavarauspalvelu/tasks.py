@@ -591,7 +591,8 @@ def notify_reservation_on_access_type_change_task(reservation_pks: list[int]) ->
     now = local_datetime()
 
     reservations: Iterable[Reservation] = (
-        Reservation.objects.all()
+        Reservation.objects
+        .all()
         .filter(
             pk__in=reservation_pks,
             # Still only send email for reservations that are ongoing or in the future
@@ -602,7 +603,8 @@ def notify_reservation_on_access_type_change_task(reservation_pks: list[int]) ->
 
     # Fetch application sections separately so that we don't send multiple emails for the same section
     sections: Iterable[ApplicationSection] = (
-        ApplicationSection.objects.all()
+        ApplicationSection.objects
+        .all()
         .filter(
             reservation_unit_options__allocated_time_slots__reservation_series__reservations__in=reservation_pks,
             # Still only send email for sections that have reservations that are ongoing or in the future

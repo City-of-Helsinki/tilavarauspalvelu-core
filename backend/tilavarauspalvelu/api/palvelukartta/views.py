@@ -16,7 +16,8 @@ if TYPE_CHECKING:
 @csrf_exempt  # NOSONAR
 def palvelukartta_reservation_units(request: WSGIRequest, tprek_id: str) -> JsonResponse:
     reservation_units = list(
-        ReservationUnit.objects.filter(unit__tprek_id=tprek_id)
+        ReservationUnit.objects
+        .filter(unit__tprek_id=tprek_id)
         .visible()
         .order_by("pk")
         .values("pk", "name_fi", "name_en", "name_sv")

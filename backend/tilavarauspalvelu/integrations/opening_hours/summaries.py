@@ -18,7 +18,8 @@ def get_resources_total_hours_per_resource(
     origin_hauki_resources = OriginHaukiResource.objects.filter(id__in=hauki_resource_ids).annotate(
         duration=Coalesce(
             SubquerySum(
-                ReservableTimeSpan.objects.filter(resource_id=OuterRef("id"))
+                ReservableTimeSpan.objects
+                .filter(resource_id=OuterRef("id"))
                 .truncated_start_and_end_datetimes_for_period(start=period_start_date, end=period_end_date)
                 .annotate(duration=F("truncated_end_datetime") - F("truncated_start_datetime"))
                 .values("duration"),

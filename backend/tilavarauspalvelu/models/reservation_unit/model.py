@@ -350,7 +350,8 @@ class ReservationUnit(models.Model):
 
         return models.Subquery(  # type: ignore[return-value]
             queryset=(
-                ReservationUnitPricing.objects.filter(reservation_unit=models.OuterRef("pk"))
+                ReservationUnitPricing.objects
+                .filter(reservation_unit=models.OuterRef("pk"))
                 .active()
                 .values("highest_price")[:1]
             ),
@@ -557,7 +558,8 @@ class ReservationUnit(models.Model):
 
         sq = Subquery(
             queryset=(
-                ReservationUnitAccessType.objects.filter(reservation_unit=models.OuterRef("pk"))
+                ReservationUnitAccessType.objects
+                .filter(reservation_unit=models.OuterRef("pk"))
                 .active()
                 .values("access_type")[:1]
             ),

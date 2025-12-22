@@ -149,7 +149,8 @@ class ReservationSeries(models.Model):
 
         sq = SubqueryArray(
             (
-                Reservation.objects.going_to_occur()
+                Reservation.objects
+                .going_to_occur()
                 .filter(reservation_series=models.OuterRef("pk"))
                 .values("access_type")
             ),

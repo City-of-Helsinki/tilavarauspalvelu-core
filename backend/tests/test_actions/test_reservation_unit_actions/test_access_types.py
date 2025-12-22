@@ -56,7 +56,8 @@ def test_reservation_unit__access_types__active():
     )
 
     qs = (
-        reservation_unit.access_types.active()
+        reservation_unit.access_types
+        .active()
         .annotate(end_date=L("end_date"))
         .order_by("begin_date")
         .values("access_type", "begin_date", "end_date")

@@ -383,7 +383,8 @@ class ReservationActions:
         """Find all reservations that overlap with this reservation."""
         reservation_unit = self.reservation.reservation_unit
         return (
-            Reservation.objects.all()
+            Reservation.objects
+            .all()
             .overlapping_reservations(
                 reservation_unit=reservation_unit,
                 begin=self.reservation.begins_at,
@@ -423,7 +424,8 @@ class ReservationActions:
     def get_applying_reservation_unit_access_type(self) -> ReservationUnitAccessType | None:
         """Get the reservation unit access type that is currently being applied to the reservation."""
         return (
-            self.reservation.reservation_unit.access_types.all()
+            self.reservation.reservation_unit.access_types
+            .all()
             .filter(begin_date__lte=self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date())
             .order_by("-begin_date")
             .first()

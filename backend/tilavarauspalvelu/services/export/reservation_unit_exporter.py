@@ -115,7 +115,8 @@ class ReservationUnitExporter(BaseCSVExporter):
     @property
     def queryset(self) -> models.QuerySet:
         return (
-            self._queryset.select_related(
+            self._queryset
+            .select_related(
                 "unit",
                 "origin_hauki_resource",
                 "reservation_unit_type",

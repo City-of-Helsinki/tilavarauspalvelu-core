@@ -132,7 +132,8 @@ class ApplicationSection(SerializableModelMixin, models.Model):
     @property
     def suitable_days_of_the_week(self) -> list[Weekday]:
         suitable = (
-            self.suitable_time_ranges.distinct()
+            self.suitable_time_ranges
+            .distinct()
             .order_by(OrderBy(L("day_of_the_week_number")))
             .values_list("day_of_the_week", flat=True)
         )
@@ -243,7 +244,8 @@ class ApplicationSection(SerializableModelMixin, models.Model):
         return Coalesce(  # type: ignore[return-value]
             SubqueryCount(
                 queryset=(
-                    ReservationUnitOption.objects.filter(application_section=models.OuterRef("pk"))
+                    ReservationUnitOption.objects
+                    .filter(application_section=models.OuterRef("pk"))
                     .filter(is_rejected=False, is_locked=False)
                     .values("id")
                 )
@@ -285,7 +287,8 @@ class ApplicationSection(SerializableModelMixin, models.Model):
 
         exists = Exists(
             queryset=(
-                Reservation.objects.all()
+                Reservation.objects
+                .all()
                 .for_application_section(models.OuterRef("pk"))
                 .filter(L(access_code_should_be_active=True))
             ),
@@ -315,7 +318,8 @@ class ApplicationSection(SerializableModelMixin, models.Model):
         from tilavarauspalvelu.models import Reservation
 
         return (
-            not Reservation.objects.for_application_section(self)
+            not Reservation.objects
+            .for_application_section(self)
             .filter(L(is_access_code_is_active_correct=False))
             .exists()
         )

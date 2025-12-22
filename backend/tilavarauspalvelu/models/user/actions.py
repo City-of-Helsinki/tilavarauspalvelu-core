@@ -151,7 +151,8 @@ class UserActions:
         month_ago = local_datetime() - relativedelta(months=1)
 
         has_open_reservations = (
-            self.user.reservations.filter(ends_at__gte=month_ago)
+            self.user.reservations
+            .filter(ends_at__gte=month_ago)
             .exclude(state__in=ReservationStateChoice.doesnt_block_anonymization)
             .exists()
         )
@@ -211,7 +212,8 @@ class UserActions:
         """
         identifier = "__VARAAMO__"
         ad_group_names: set[str] = set(
-            self.user.ad_groups.filter(name__icontains=identifier)
+            self.user.ad_groups
+            .filter(name__icontains=identifier)
             .annotate(upper_name=Upper("name"))
             .values_list("upper_name", flat=True)
         )

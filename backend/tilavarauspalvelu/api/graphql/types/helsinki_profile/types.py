@@ -115,7 +115,8 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
     @classmethod
     def get_user_from_application(cls, application_pk: int, info: GQLInfo) -> User:
         application: Application | None = (
-            Application.objects.select_related("user")  #
+            Application.objects
+            .select_related("user")  #
             .filter(pk=application_pk)
             .with_permissions()
             .first()
@@ -133,7 +134,8 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
     @classmethod
     def get_user_from_reservation(cls, application_pk: int, info: GQLInfo) -> User:
         reservation: Reservation | None = (
-            Reservation.objects.select_related("user")  #
+            Reservation.objects
+            .select_related("user")  #
             .filter(pk=application_pk)
             .with_permissions()
             .first()
