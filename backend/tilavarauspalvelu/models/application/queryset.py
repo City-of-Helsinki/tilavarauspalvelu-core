@@ -37,7 +37,8 @@ class ApplicationQuerySet(ModelQuerySet[Application]):
             **{
                 f"preferred_unit_name_{lang}": Subquery(
                     queryset=(
-                        ApplicationSection.objects.all()
+                        ApplicationSection.objects
+                        .all()
                         .preferred_unit_name_alias(lang=lang)
                         .annotate(preferred_unit_name=models.F(f"preferred_unit_name_{lang}"))
                         .filter(application=models.OuterRef("pk"))
@@ -84,7 +85,8 @@ class ApplicationQuerySet(ModelQuerySet[Application]):
             return
 
         units = (
-            Unit.objects.prefetch_related("unit_groups")
+            Unit.objects
+            .prefetch_related("unit_groups")
             .filter(reservation_units__reservation_unit_options__application_section__application__in=items)
             .annotate(
                 application_ids=Coalesce(

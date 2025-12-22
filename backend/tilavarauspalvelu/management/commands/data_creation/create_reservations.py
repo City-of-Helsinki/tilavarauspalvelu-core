@@ -97,7 +97,8 @@ def _create_normal_reservations(
     - Don't already have a reservations
     """
     reservation_units: list[ReservationUnit] = list(
-        ReservationUnit.objects.filter(
+        ReservationUnit.objects
+        .filter(
             is_archived=False,
             spaces__isnull=False,
             max_reservations_per_user=None,
@@ -419,7 +420,8 @@ def _create_full_day_reservations(
     Keep all the other restrictions on reservation units the same as in the '_create_normal_reservations' method.
     """
     reservation_units: list[ReservationUnit] = list(
-        ReservationUnit.objects.filter(
+        ReservationUnit.objects
+        .filter(
             is_archived=False,
             spaces__isnull=False,
             max_reservations_per_user=None,
@@ -515,7 +517,8 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
     Keep all the other restrictions on reservation units the same as in the '_create_normal_reservations' method.
     """
     base_qs = (
-        ReservationUnit.objects.filter(
+        ReservationUnit.objects
+        .filter(
             is_archived=False,
             spaces__isnull=False,
             max_reservations_per_user=None,

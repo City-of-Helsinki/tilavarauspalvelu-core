@@ -614,7 +614,8 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
     ) -> PindoraSeasonalBookingResponse:
         """Create a new seasonal booking in Pindora."""
         reservations: list[Reservation] = list(
-            section.actions.get_reservations()
+            section.actions
+            .get_reservations()
             .requires_active_access_code()
             .select_related("reservation_series__reservation_unit")
         )
@@ -654,7 +655,8 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
         """Reschedule a seasonal booking in Pindora."""
         # This only selects confirmed non-blocking reservations.
         reservations: list[Reservation] = list(
-            section.actions.get_reservations()
+            section.actions
+            .get_reservations()
             .requires_active_access_code()
             .select_related("reservation_series__reservation_unit")
         )

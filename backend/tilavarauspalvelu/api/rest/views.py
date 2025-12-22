@@ -485,7 +485,8 @@ def redirect_to_hauki(request: WSGIRequest) -> HttpResponseRedirect:
         raise ValidationError(msg, code="HAUKI_MISSING_RESERVATION_UNITS")
 
     reservation_units: list[ReservationUnit] = list(
-        ReservationUnit.objects.all()
+        ReservationUnit.objects
+        .all()
         .filter(pk__in=given_pks)
         .select_related(
             "origin_hauki_resource",

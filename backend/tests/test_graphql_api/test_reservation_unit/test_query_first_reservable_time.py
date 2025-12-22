@@ -78,7 +78,8 @@ def frt(response: GQLResponse, *, node: int = 0) -> str | None:
     if first_reservable_time is None:
         return None
     return (
-        datetime.datetime.fromisoformat(first_reservable_time)
+        datetime.datetime
+        .fromisoformat(first_reservable_time)
         .astimezone(DEFAULT_TIMEZONE)
         .isoformat(timespec="seconds")
     )

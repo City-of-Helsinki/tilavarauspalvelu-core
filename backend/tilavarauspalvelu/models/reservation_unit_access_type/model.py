@@ -61,7 +61,8 @@ class ReservationUnitAccessType(models.Model):
         sq = Coalesce(
             models.Subquery(
                 queryset=(
-                    ReservationUnitAccessType.objects.filter(
+                    ReservationUnitAccessType.objects
+                    .filter(
                         begin_date__gt=models.OuterRef("begin_date"),
                         reservation_unit=models.OuterRef("reservation_unit"),
                     )

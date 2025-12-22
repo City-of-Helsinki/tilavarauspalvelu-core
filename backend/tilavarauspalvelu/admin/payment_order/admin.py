@@ -58,7 +58,8 @@ class ReservationUnitFilter(admin.SimpleListFilter):
 
     def lookups(self, *args: Any) -> list[tuple[int, str]]:
         return (
-            ReservationUnit.objects.filter(pricings__lowest_price__gt=0)
+            ReservationUnit.objects
+            .filter(pricings__lowest_price__gt=0)
             .distinct()
             .order_by("unit__name", "name")
             .values_list("id", "name")

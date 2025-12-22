@@ -75,7 +75,8 @@ class UserQuerySet(ModelQuerySet[User]):
         # All users who haven't logged in in a while but haven't been anonymized yet.
         # If user doesn't have a last login, we use the date they joined the system.
         return (
-            self.exclude(
+            self
+            .exclude(
                 first_name=ANONYMIZED_FIRST_NAME,
                 last_name=ANONYMIZED_LAST_NAME,
             )

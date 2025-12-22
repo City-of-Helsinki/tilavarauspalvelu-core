@@ -41,7 +41,8 @@ def test_reservation_units_with_common_hierarchy__queryset(query_counter):
     def get_affecting(pks: list[int]) -> list[int]:
         with query_counter() as counter:
             ids = list(
-                ReservationUnit.objects.filter(pk__in=pks)
+                ReservationUnit.objects
+                .filter(pk__in=pks)
                 .reservation_units_with_common_hierarchy()
                 .order_by("pk")
                 .values_list("pk", flat=True)

@@ -40,7 +40,8 @@ class ApplicationRoundQuerySet(ModelQuerySet[ApplicationRound]):
             return
 
         units = (
-            Unit.objects.prefetch_related("unit_groups")
+            Unit.objects
+            .prefetch_related("unit_groups")
             .filter(reservation_units__application_rounds__in=items)
             .annotate(
                 application_round_ids=Coalesce(

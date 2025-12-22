@@ -344,7 +344,8 @@ class ReservationNode(DjangoNode):
     def optimize_applied_pricing(queryset: ReservationQuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
         optimizer.annotations["applied_pricing"] = models.Subquery(
             queryset=(
-                ReservationUnitPricing.objects.filter(
+                ReservationUnitPricing.objects
+                .filter(
                     reservation_unit=models.OuterRef("reservation_unit"),
                 )
                 .active(from_date=models.OuterRef("begins_at__date"))

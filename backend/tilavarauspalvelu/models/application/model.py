@@ -227,7 +227,8 @@ class Application(SerializableModelMixin, models.Model):
     @all_sections_allocated.override
     def _(self) -> bool:
         return (
-            not self.application_sections.alias(status=L("status"))
+            not self.application_sections
+            .alias(status=L("status"))
             .filter(
                 status__in=[
                     ApplicationSectionStatusChoice.UNALLOCATED.value,
@@ -288,7 +289,8 @@ class Application(SerializableModelMixin, models.Model):
             return self._units_for_permissions
 
         self._units_for_permissions = list(
-            Unit.objects.prefetch_related("unit_groups")
+            Unit.objects
+            .prefetch_related("unit_groups")
             .filter(reservation_units__reservation_unit_options__application_section__application=self)
             .distinct()
         )

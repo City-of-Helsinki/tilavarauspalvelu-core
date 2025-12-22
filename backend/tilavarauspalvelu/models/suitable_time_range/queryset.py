@@ -37,7 +37,8 @@ class SuitableTimeRangeQuerySet(ModelQuerySet[SuitableTimeRange]):
         end_time: datetime.time,
     ) -> bool:
         time_ranges: list[TimeSlot] = list(
-            self.filter(
+            self
+            .filter(
                 application_section=application_section,
                 day_of_the_week=day_of_the_week,
             )

@@ -91,7 +91,8 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter):
     @property
     def queryset(self) -> ApplicationSectionQuerySet:
         return (
-            ApplicationSection.objects.annotate(
+            ApplicationSection.objects
+            .annotate(
                 # Annotate statuses for performance
                 application_status=L("application__status"),
                 status=L("status"),

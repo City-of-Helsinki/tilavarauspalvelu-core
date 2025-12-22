@@ -137,7 +137,8 @@ def test_application_section__allocations():
     AllocatedTimeSlotFactory.create(reservation_unit_option=option_3, day_of_the_week=Weekday.TUESDAY)
 
     section = (
-        ApplicationSection.objects.annotate(allocations=L("allocations"))
+        ApplicationSection.objects
+        .annotate(allocations=L("allocations"))
         .filter(reservation_unit_options__reservation_unit__name__startswith="foo")
         .order_by("pk")
         .first()

@@ -143,14 +143,16 @@ class ApplicationSectionSerializer(NestingModelSerializer):
                 application_round = application_round.pk
 
             reservation_period = (
-                ApplicationRound.objects.filter(pk=application_round)
+                ApplicationRound.objects
+                .filter(pk=application_round)
                 .values("reservation_period_begin_date", "reservation_period_end_date")
                 .first()
             )
 
         else:
             reservation_period: dict[str, datetime.date] = (
-                Application.objects.select_related("application_round")
+                Application.objects
+                .select_related("application_round")
                 .filter(pk=application.pk)
                 .annotate(
                     reservation_period_begin_date=models.F("application_round__reservation_period_begin_date"),
@@ -255,7 +257,8 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
         )
 
         cancellable_reservations: ReservationQuerySet = (
-            future_reservations.filter(
+            future_reservations
+            .filter(
                 type=ReservationTypeChoice.SEASONAL,
                 state=ReservationStateChoice.CONFIRMED,
                 price=0,

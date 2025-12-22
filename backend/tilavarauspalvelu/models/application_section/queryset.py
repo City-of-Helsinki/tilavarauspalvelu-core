@@ -60,7 +60,8 @@ class ApplicationSectionQuerySet(ModelQuerySet[ApplicationSection]):
         return self.alias(
             has_missing_access_codes=models.Exists(
                 queryset=(
-                    Reservation.objects.all()
+                    Reservation.objects
+                    .all()
                     .for_application_section(models.OuterRef("pk"))
                     .filter(
                         state=ReservationStateChoice.CONFIRMED,
@@ -80,7 +81,8 @@ class ApplicationSectionQuerySet(ModelQuerySet[ApplicationSection]):
         return self.alias(
             has_incorrect_access_codes=models.Exists(
                 queryset=(
-                    Reservation.objects.all()
+                    Reservation.objects
+                    .all()
                     .for_application_section(models.OuterRef("pk"))
                     .filter(
                         (
