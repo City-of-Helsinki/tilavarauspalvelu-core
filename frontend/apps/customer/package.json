@@ -30,7 +30,7 @@
     "lodash-es": "^4.17.21",
     "next": "16.0.10",
     "next-compose-plugins": "^2.2.1",
-    "next-i18next": "^15.4.2",
+    "next-i18next": "^15.4.3",
     "nuka-carousel": "^7.0.0",
     "prettier-config": "workspace:*",
     "react": "18.3.1",
