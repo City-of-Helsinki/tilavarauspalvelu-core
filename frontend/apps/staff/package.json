@@ -31,7 +31,7 @@
     "import-in-the-middle": "^1.15.0",
     "lodash-es": "^4.17.21",
     "next": "16.0.10",
-    "next-i18next": "^15.4.2",
+    "next-i18next": "^15.4.3",
     "prettier-config": "workspace:*",
     "quill": "^2.0.3",
     "react": "^18.3.1",
