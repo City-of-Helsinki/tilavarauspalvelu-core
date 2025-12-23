@@ -56,7 +56,7 @@
     "@types/react": "^18.3.27",
     "@types/react-dom": "^18.3.7",
     "@types/react-transition-group": "^4.4.12",
-    "@vitejs/plugin-react": "^5.1.1",
+    "@vitejs/plugin-react": "^5.1.2",
     "happy-dom": "^20.0.11",
     "oxlint": "^1.30.0",
     "oxlint-tsgolint": "^0.8.3",
