@@ -63,17 +63,17 @@ django-tinymce = "5.0.0"
 
 [tool.poetry.group.celery.dependencies]
 # Dependencies related to Celery tasks.
-celery = { version = "5.6.0", extras = ["redis"] }
+celery = { version = "5.6.2", extras = ["redis"] }
 django-celery-beat = "2.8.1"
 django-celery-results = "2.6.0"
 
 [tool.poetry.group.test.dependencies]
 # Dependencies only required for running tests.
 factory-boy = "3.3.3"
-faker = "39.1.0"
+faker = "40.1.0"
 freezegun = "1.5.5"
 polib = "1.2.0"
-pyinstrument = "5.1.1"
+pyinstrument = "5.1.2"
 pypdf = "6.5.0"
 pytest = "8.4.2"
 pytest-cov = "7.0.0"
