@@ -27,7 +27,7 @@
     "hds-core": "^4.8.1",
     "hds-react": "^4.8.1",
     "i18n-iso-countries": "^7.14.0",
-    "i18next": "^25.6.3",
+    "i18next": "^25.7.3",
     "import-in-the-middle": "^1.15.0",
     "lodash-es": "^4.17.21",
     "next": "16.0.10",
