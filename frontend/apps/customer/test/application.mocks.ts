@@ -71,6 +71,13 @@ function createMockReservationUnits({ nReservationUnits = 1 }: { nReservationUni
   return Array.from({ length: nReservationUnits }, (_, i) => createMockReservationUnit({ pk: i + 1 }));
 }
 
+// Create a stable "now" date with zeroed time for deterministic tests
+function getTestBaseDate(): Date {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return now;
+}
+
 type ApplicationMockType = NonNullable<ApplicationPage2Query["application"]>;
 type ApplicationSectionMockType = NonNullable<ApplicationMockType["applicationSections"]>[number];
 
@@ -109,6 +116,10 @@ function createMockApplicationSection({
     throw new Error("SuitableTimeRanges must be filled for page2");
   }
 
+  // Reservation dates must fall within the application round's reservation period
+  // The round's reservationPeriodBeginDate is 1 month from now, so we use dates relative to that
+  const reservationPeriodStart = addMonths(getTestBaseDate(), 1);
+
   return {
     id: createNodeId("ApplicationSectionNode", pk),
     pk,
@@ -118,8 +129,8 @@ function createMockApplicationSection({
     reservationMinDuration: 2 * 60 * 60,
     reservationMaxDuration: 4 * 60 * 60,
     numPersons: 1,
-    reservationsBeginDate: addDays(new Date(), 1).toISOString(),
-    reservationsEndDate: addDays(new Date(), 30 + 1).toISOString(),
+    reservationsBeginDate: addDays(reservationPeriodStart, 1).toISOString(),
+    reservationsEndDate: addDays(reservationPeriodStart, 30 + 1).toISOString(),
     appliedReservationsPerWeek: 1,
     ageGroup: createMockAgeGroupNode(),
     purpose: createMockIntendedUseNode(),
@@ -245,14 +256,14 @@ export function createMockApplicationRound({
   pk = 1,
   notesWhenApplying,
   status = ApplicationRoundStatusChoice.Open,
-  applicationPeriodEndsAt = new Date(2024, 0, 1, 0, 0, 0),
-  applicationPeriodBeginsAt = addYears(new Date(2024, 0, 1, 0, 0, 0), 1),
+  applicationPeriodBeginsAt = getTestBaseDate(),
+  applicationPeriodEndsAt = addYears(getTestBaseDate(), 1),
 }: {
   pk?: number;
   status?: ApplicationRoundStatusChoice;
   notesWhenApplying?: string | null;
-  applicationPeriodEndsAt?: Date;
   applicationPeriodBeginsAt?: Date;
+  applicationPeriodEndsAt?: Date;
 } = {}): ApplicationRoundNode {
   // There is an implicit relation between reservationPeriodBeginDate and SearchQuery
   // so not mocking reservationPeriodBeginDate will break search query mock
