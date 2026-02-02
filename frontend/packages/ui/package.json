@@ -69,7 +69,7 @@
     "postcss-styled-syntax": "^0.7.1",
     "prettier": "^3.7.1",
     "stylelint": "^16.26.1",
-    "stylelint-config-standard": "^39.0.1",
+    "stylelint-config-standard": "^40.0.0",
     "stylelint-config-styled-components": "^0.1.1",
     "typescript": "^5.9.3",
     "typescript-cookie": "^1.0.6",
