@@ -14,6 +14,8 @@ updates:
       github-actions-dependencies:
         patterns:
           - "*"
+    # Disable version updates and only allow security updates
+    open-pull-requests-limit: 0
 
   # Update frontend dependencies
   - package-ecosystem: "npm"
@@ -93,6 +95,8 @@ updates:
           - "@testing-library*"
           - "@vitejs-*"
           - "vite-*"
+    # Disable version updates and only allow security updates
+    open-pull-requests-limit: 0
 
   # Update Poetry dependencies
   - package-ecosystem: "pip" # yes, this is correct
@@ -105,6 +109,8 @@ updates:
       python-dependencies:
         patterns:
           - "*"
+    # Disable version updates and only allow security updates
+    open-pull-requests-limit: 0
 
   # Update Docker dependencies
   - package-ecosystem: "docker"
@@ -117,3 +123,5 @@ updates:
       docker-dependencies:
         patterns:
           - "*"
+    # Disable version updates and only allow security updates
+    open-pull-requests-limit: 0
