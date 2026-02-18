@@ -7,7 +7,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     pull-request-branch-name:
       separator: "-"
     groups:
@@ -21,7 +21,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/frontend/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     pull-request-branch-name:
       separator: "-"
     ignore:
@@ -102,7 +102,7 @@ updates:
   - package-ecosystem: "pip" # yes, this is correct
     directory: "/backend/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     pull-request-branch-name:
       separator: "-"
     groups:
@@ -116,7 +116,7 @@ updates:
   - package-ecosystem: "docker"
     directory: "/backend/docker/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     pull-request-branch-name:
       separator: "-"
     groups:
