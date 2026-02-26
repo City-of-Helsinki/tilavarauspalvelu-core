@@ -2,10 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar
 
-from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from easy_thumbnails.fields import ThumbnailerImageField
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
@@ -31,7 +29,6 @@ class IntendedUse(models.Model):
     name: str = models.CharField(max_length=200)
 
     image: ThumbnailerImageFieldFile | None
-    image = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT, null=True, blank=True)
 
     # Translated field hints
     name_fi: str | None
