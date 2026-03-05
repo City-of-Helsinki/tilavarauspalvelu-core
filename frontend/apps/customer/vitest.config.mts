@@ -7,5 +7,11 @@ export default defineConfig({
   test: {
     environment: "happy-dom",
     setupFiles: ["./vitest.setup.ts"],
+    reporters: ["verbose"],
+    coverage: {
+      reporter: ["clover", "json", "lcov", "text"],
+      include: ["src/**/*"],
+      provider: "istanbul",
+    },
   },
 });

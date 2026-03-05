@@ -7,6 +7,12 @@ export default defineConfig({
   test: {
     environment: "happy-dom",
     setupFiles: ["./vitest.setup.ts"],
+    reporters: ["verbose"],
+    coverage: {
+      reporter: ["clover", "json", "lcov", "text"],
+      include: ["src/**/*"],
+      provider: "istanbul",
+    },
     onConsoleLog(log: string, type: "stdout" | "stderr"): boolean | void {
       const msg = "All radio buttons in a SelectionGroup are unchecked. One radio button should be checked by default.";
       if (log.includes(msg) && type === "stderr") {
