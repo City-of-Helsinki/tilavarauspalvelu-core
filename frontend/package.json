@@ -20,6 +20,7 @@
     "format:check": "turbo format:check",
     "format:staged": "prettier --ignore-path \"./.prettierignore\" --write --experimental-cli --config-path \"./packages/prettier-config/prettier.mjs\"",
     "test": "turbo test",
+    "test:coverage": "turbo test:coverage",
     "tsc:check": "turbo tsc:check",
     "tsc:clean": "turbo tsc:clean",
     "gql-pluck": "node scripts/gql-pluck.mjs",
