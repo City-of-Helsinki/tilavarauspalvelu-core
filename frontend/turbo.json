@@ -43,6 +43,13 @@
         "test/**/*.tsx"
       ]
     },
+    "test:coverage": {
+      "cache": false,
+      "env": [
+        "CI",
+        "SKIP_ENV_VALIDATION"
+      ]
+    },
     "dev": {
       "cache": false,
       "persistent": true
