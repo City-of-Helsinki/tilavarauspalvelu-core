@@ -76,7 +76,15 @@ jobs:
         working-directory: frontend
         run: |
           pnpm codegen
-          pnpm test --filter=staff...
+          pnpm test:coverage --filter=staff...
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: cov-staff-${{ github.run_id }}
+          path: ./frontend/apps/staff/coverage/lcov.info
+          if-no-files-found: error
+          retention-days: 1
 
   lint-customer-ui:
     name: Customer ui lint
@@ -137,4 +145,60 @@ jobs:
         working-directory: frontend
         run: |
           pnpm codegen
-          pnpm test --filter=customer...
+          pnpm test:coverage --filter=customer...
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: cov-customer-${{ github.run_id }}
+          path: ./frontend/apps/customer/coverage/lcov.info
+          if-no-files-found: error
+          retention-days: 1
+
+  sonarcloud-staff:
+    needs: test-staff-ui
+    name: "SonarCloud scan (staff)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: cov-staff-${{ github.run_id }}
+          path: ./frontend/apps/staff/coverage
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        with:
+          projectBaseDir: ./frontend/apps/staff
+        if: ${{ github.event_name != 'pull_request' || (! contains(fromJSON(vars.BOTS), github.event.pull_request.user.login)) }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  sonarcloud-customer:
+    needs: test-customer-ui
+    name: "SonarCloud scan (customer)"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: cov-customer-${{ github.run_id }}
+          path: ./frontend/apps/customer/coverage
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        with:
+          projectBaseDir: ./frontend/apps/customer
+        if: ${{ github.event_name != 'pull_request' || (! contains(fromJSON(vars.BOTS), github.event.pull_request.user.login)) }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
