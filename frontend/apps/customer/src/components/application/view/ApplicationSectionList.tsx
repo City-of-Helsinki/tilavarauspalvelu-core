@@ -3,7 +3,7 @@ import { Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { ApplicationSectionStatusLabel } from "ui/src/components/statuses";
 import { WEEKDAYS } from "ui/src/modules/const";
-import { formatDurationRange, formatDate, setMondayFirst } from "ui/src/modules/date-utils";
+import { formatDurationRange, formatDate, parseApiDate, setMondayFirst } from "ui/src/modules/date-utils";
 import { filterNonNullable, formatDayTimes, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { NoWrap } from "ui/src/styled";
 import {
@@ -63,8 +63,8 @@ function SingleApplicationSection({
   const shouldShowStatusLabel =
     aes.status === ApplicationSectionStatusChoice.Rejected || aes.status === ApplicationSectionStatusChoice.Handled;
 
-  const reservationsBegin = formatDate(new Date(aes.reservationsBeginDate));
-  const reservationsEnd = formatDate(new Date(aes.reservationsEndDate));
+  const reservationsBegin = formatDate(parseApiDate(aes.reservationsBeginDate));
+  const reservationsEnd = formatDate(parseApiDate(aes.reservationsEndDate));
   const duration = formatDurationRange({
     t,
     minDuration: { seconds: aes.reservationMinDuration },

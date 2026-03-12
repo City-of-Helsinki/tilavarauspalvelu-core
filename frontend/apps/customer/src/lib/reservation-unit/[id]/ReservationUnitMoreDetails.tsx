@@ -7,7 +7,7 @@ import { Sanitize } from "@ui/components/Sanitize";
 import { useGenericTerms } from "@ui/hooks";
 import { formatters as getFormatters } from "@ui/index";
 import { breakpoints } from "@ui/modules/const";
-import { formatDate, formatTimeRange, timeToMinutes } from "@ui/modules/date-utils";
+import { formatDate, formatTimeRange, parseApiDate, timeToMinutes } from "@ui/modules/date-utils";
 import {
   filterNonNullable,
   formatListToCSV,
@@ -150,7 +150,7 @@ function PriceChangeNotice({ futurePricing }: { futurePricing: PricingFieldsFrag
 
   const isPaid = !isPriceFree(futurePricing);
   const taxPercentage = toNumber(futurePricing.taxPercentage.value) ?? 0;
-  const begins = new Date(futurePricing.begins);
+  const begins = parseApiDate(futurePricing.begins);
   const priceString = getPriceString({
     t,
     pricing: futurePricing,

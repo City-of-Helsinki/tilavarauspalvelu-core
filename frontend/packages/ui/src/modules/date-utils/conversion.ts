@@ -1,14 +1,18 @@
 import { isValid, isAfter, parse } from "date-fns";
+import { fromZonedTime } from "date-fns-tz";
 import type { DayT } from "@ui/modules/const";
-import { UI_DATE_FORMAT, API_DATE_FORMAT } from "@ui/modules/date-utils/formatting";
+import { UI_DATE_FORMAT } from "@ui/modules/date-utils/formatting";
 import { formatDate, formatTime } from "./formatting";
+
+const HELSINKI_TIMEZONE = "Europe/Helsinki";
+const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
  * API/UI date format conversion utilities
  */
 
 /**
- * Converts an API date string (yyyy-MM-dd) to Date object
+ * Converts an API date string (yyyy-MM-dd) to Date object and ensures it is in Helsinki timezone
  * @param date - API date string
  * @returns Date object or null if invalid
  * @example parseApiDate("2023-12-25") // Date object for Dec 25, 2023
@@ -17,7 +21,10 @@ export function parseApiDate(date: string): Date | null {
   if (!date) return null;
 
   try {
-    const parsedDate = parse(date, API_DATE_FORMAT, new Date());
+    // check that there is no time component in the string, if there is, parse as ISO string
+    const parsedDate = DATE_ONLY_REGEX.test(date)
+      ? fromZonedTime(`${date}T00:00:00`, HELSINKI_TIMEZONE)
+      : new Date(date);
     return isValidDate(parsedDate) ? parsedDate : null;
   } catch {
     return null;

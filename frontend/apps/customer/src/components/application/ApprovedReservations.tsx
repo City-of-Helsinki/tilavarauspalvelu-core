@@ -37,6 +37,7 @@ import {
   formatApiDate,
   formatDate,
   formatDateRange,
+  parseApiDate,
   setSundayFirst,
 } from "ui/src/modules/date-utils";
 import {
@@ -505,8 +506,8 @@ function ReservationSeriesTable({
               accessTypes={modal.accessTypes}
               reservationUnits={reservationUnits}
               pk={modal?.pk}
-              roundReservationBegin={new Date(applicationRound.reservationPeriodBeginDate)}
-              roundReservationEnd={new Date(applicationRound.reservationPeriodEndDate)}
+              roundReservationBegin={parseApiDate(applicationRound.reservationPeriodBeginDate) ?? new Date()}
+              roundReservationEnd={parseApiDate(applicationRound.reservationPeriodEndDate) ?? new Date()}
             />
           )}
         </Dialog.Content>

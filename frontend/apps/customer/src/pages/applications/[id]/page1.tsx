@@ -7,6 +7,7 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import { useDisplayError } from "ui/src/hooks";
+import { parseApiDate } from "ui/src/modules/date-utils";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
 import { ApplicationFunnelWrapper, Page1 as Page1Impl } from "@/components/application/funnel";
@@ -53,8 +54,8 @@ function Page1({ application, options: optionsOrig }: Pick<PropsNarrowed, "appli
   };
   const { getReservationUnits } = useReservationUnitList(applicationRound);
 
-  const begin = new Date(applicationRound.reservationPeriodBeginDate);
-  const end = new Date(applicationRound.reservationPeriodEndDate);
+  const begin = parseApiDate(applicationRound.reservationPeriodBeginDate) ?? new Date();
+  const end = parseApiDate(applicationRound.reservationPeriodEndDate) ?? new Date();
   const form = useForm<ApplicationPage1FormValues>({
     mode: "onChange",
     defaultValues: convertApplicationPage1(application, getReservationUnits()),
