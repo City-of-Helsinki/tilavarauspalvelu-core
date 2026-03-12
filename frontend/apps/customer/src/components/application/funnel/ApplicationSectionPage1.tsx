@@ -6,7 +6,7 @@ import { Button, ButtonSize, ButtonVariant, Checkbox, DateInput, TextInput } fro
 import { useTranslation } from "next-i18next";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { ControlledNumberInput, ControlledSelect } from "ui/src/components/form";
-import { formatDate, formatDateRange } from "ui/src/modules/date-utils";
+import { formatDate, formatDateRange, parseApiDate } from "ui/src/modules/date-utils";
 import { getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import type { OptionsListT } from "ui/src/modules/search";
 import { AutoGrid, Flex, H4 } from "ui/src/styled";
@@ -39,8 +39,8 @@ function ApplicationSectionInner({ index, applicationRound, options, onDeleteEve
 
   const [isWaitingForDelete, setIsWaitingForDelete] = useState(false);
 
-  const periodStartDate = new Date(applicationRound.reservationPeriodBeginDate);
-  const periodEndDate = new Date(applicationRound.reservationPeriodEndDate);
+  const periodStartDate = parseApiDate(applicationRound.reservationPeriodBeginDate) ?? new Date();
+  const periodEndDate = parseApiDate(applicationRound.reservationPeriodEndDate) ?? new Date();
 
   const selectDefaultPeriod = (): void => {
     clearErrors([`applicationSections.${index}.begin`, `applicationSections.${index}.end`]);

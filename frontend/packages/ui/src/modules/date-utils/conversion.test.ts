@@ -34,6 +34,18 @@ describe("conversion", () => {
     it("handles malformed date string", () => {
       expect(parseApiDate("2023-13-45")).toBeNull();
     });
+
+    it("parses ISO datetime strings", () => {
+      const result = parseApiDate("2026-03-12T10:30:00Z");
+      expect(result).toBeInstanceOf(Date);
+      expect(result?.toISOString()).toBe("2026-03-12T10:30:00.000Z");
+    });
+
+    it("interprets date-only strings as Helsinki midnight", () => {
+      const result = parseApiDate("2026-01-15");
+      expect(result).toBeInstanceOf(Date);
+      expect(result?.toISOString()).toBe("2026-01-14T22:00:00.000Z");
+    });
   });
 
   describe("fromUIDate", () => {

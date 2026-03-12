@@ -1,7 +1,7 @@
 import { startOfDay } from "date-fns";
 import { z } from "zod";
 import { CELL_STATES } from "ui/src/components/ApplicationTimeSelector";
-import { parseUIDate, timeToMinutes, formatApiDate, formatDate } from "ui/src/modules/date-utils";
+import { parseApiDate, parseUIDate, timeToMinutes, formatApiDate, formatDate } from "ui/src/modules/date-utils";
 import { filterNonNullable, formatWhitespace } from "ui/src/modules/helpers";
 import type { ReadonlyDeep } from "ui/src/modules/helpers";
 import { checkValidDateOnly, emailField, lessThanMaybeDate } from "ui/src/schemas/schemaCommon";
@@ -208,7 +208,7 @@ function convertDate(date: string | null | undefined): string | undefined {
   if (date == null) {
     return undefined;
   }
-  return formatDate(new Date(date)) || undefined;
+  return formatDate(parseApiDate(date)) || undefined;
 }
 
 const ApplicantTypeSchema = z.enum([ReserveeType.Individual, ReserveeType.Company, ReserveeType.Nonprofit]);
@@ -610,8 +610,11 @@ export function validateApplication(
   application: ApplicationFormFragment
 ): { valid: true } | { valid: false; page: 1 | 2 | 3 } {
   const { applicationRound } = application;
-  const begin = new Date(applicationRound.reservationPeriodBeginDate);
-  const end = new Date(applicationRound.reservationPeriodEndDate);
+  const begin = parseApiDate(applicationRound.reservationPeriodBeginDate);
+  const end = parseApiDate(applicationRound.reservationPeriodEndDate);
+  if (begin == null || end == null) {
+    return { valid: false, page: 1 };
+  }
   const schema = ApplicationPage1SchemaRefined({ begin, end });
   const page1 = schema.safeParse(convertApplicationPage1(application, []));
   if (!page1.success) {

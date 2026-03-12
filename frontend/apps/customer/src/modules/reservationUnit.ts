@@ -16,7 +16,7 @@ import type { TFunction } from "i18next";
 import { trim, uniq } from "lodash-es";
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
 import { getIntervalMinutes } from "@ui/modules/conversion";
-import { formatApiDate, timeToMinutes } from "@ui/modules/date-utils";
+import { formatApiDate, parseApiDate, timeToMinutes } from "@ui/modules/date-utils";
 import { logError } from "@ui/modules/errors";
 import {
   capitalize,
@@ -135,11 +135,13 @@ export function getEquipmentList(
 }
 
 function isActivePricing(pricing: PricingFieldsFragment): boolean {
-  return new Date(pricing.begins) <= new Date();
+  const begins = parseApiDate(pricing.begins);
+  return begins != null && begins <= new Date();
 }
 
 function isFuturePricing(pricing: PricingFieldsFragment): boolean {
-  return new Date(pricing.begins) > new Date();
+  const begins = parseApiDate(pricing.begins);
+  return begins != null && begins > new Date();
 }
 
 export function getActivePricing(
@@ -181,22 +183,29 @@ export function getFuturePricing(
 
   const futurePricings = pricings
     .filter((p) => isFuturePricing(p))
-    .filter((fp) =>
-      isSlotWithinReservationTime({
-        start: new Date(fp.begins),
+    .filter((fp) => {
+      const fpBegin = parseApiDate(fp.begins);
+      if (fpBegin == null) {
+        return false;
+      }
+      return isSlotWithinReservationTime({
+        start: fpBegin,
         reservationBeginsAt: begin,
         reservationEndsAt: end,
-      })
-    )
+      });
+    })
     .filter((futurePricing) => {
       return !applicationRounds.some((applicationRound) => {
         const { reservationPeriodBeginDate, reservationPeriodEndDate } = applicationRound;
         if (!reservationPeriodBeginDate || !reservationPeriodEndDate) {
           return false;
         }
-        const begins = new Date(futurePricing.begins);
-        const periodStart = new Date(reservationPeriodBeginDate);
-        const periodEnd = new Date(reservationPeriodEndDate);
+        const begins = parseApiDate(futurePricing.begins);
+        const periodStart = parseApiDate(reservationPeriodBeginDate);
+        const periodEnd = parseApiDate(reservationPeriodEndDate);
+        if (begins == null || periodStart == null || periodEnd == null) {
+          return false;
+        }
         return begins >= periodStart && begins <= periodEnd;
       });
     })
@@ -374,8 +383,8 @@ export function isReservationUnitPaid(pricings: Readonly<PricingFieldsFragment[]
     date == null
       ? active
       : [...active, ...future].filter((p) => {
-          const start = new Date(p.begins);
-          return start <= date;
+          const start = parseApiDate(p.begins);
+          return start != null && start <= date;
         });
   return d.some((p) => !isPriceFree(p));
 }
@@ -609,8 +618,11 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
     if (round.reservationPeriodEndDate == null) {
       return acc;
     }
-    const end = new Date(round.reservationPeriodEndDate);
-    const begin = new Date(round.reservationPeriodBeginDate);
+    const end = parseApiDate(round.reservationPeriodEndDate);
+    const begin = parseApiDate(round.reservationPeriodBeginDate);
+    if (end == null || begin == null) {
+      return acc;
+    }
     if (isBefore(end, minReservationDate)) {
       return acc;
     }
@@ -621,7 +633,7 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
     if (startOfDay(begin) > startOfDay(acc)) {
       return acc;
     }
-    return dayMax([acc, new Date(round.reservationPeriodEndDate)]);
+    return dayMax([acc, end]);
   }, undefined);
 
   let minDay = new Date(dayMax([minReservationDate, start, openAfterRound]) ?? minReservationDate);
@@ -782,12 +794,20 @@ export function getReservationUnitAccessPeriods(
     array: AccessTypeDurationsExtended[];
   };
   // map the access type periods to a list of objects with the begin and end dates in Date format
-  const accessTypeDurationDates = accessTypes.map((aT) => ({
-    type: aT.accessType,
-    pk: aT.pk,
-    begin: new Date(aT.beginDate),
-    end: null,
-  }));
+  const accessTypeDurationDates = filterNonNullable(
+    accessTypes.map((aT) => {
+      const begin = parseApiDate(aT.beginDate);
+      if (begin == null) {
+        return null;
+      }
+      return {
+        type: aT.accessType,
+        pk: aT.pk,
+        begin,
+        end: null as Date | null,
+      };
+    })
+  );
 
   return accessTypeDurationDates.reduceRight<nextEndDateIterator>(
     (acc, aT) => {

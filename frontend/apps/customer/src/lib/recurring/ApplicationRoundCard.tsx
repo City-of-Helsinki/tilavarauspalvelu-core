@@ -6,7 +6,7 @@ import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
 import { Card } from "ui/src/components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
-import { formatDateTime, formatDate } from "ui/src/modules/date-utils";
+import { formatDateTime, formatDate, parseApiDate } from "ui/src/modules/date-utils";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { getApplicationRoundPath } from "@/modules/urls";
@@ -50,8 +50,8 @@ export function ApplicationRoundCard({ applicationRound }: Readonly<CardProps>):
 
   const name = getTranslation(applicationRound, "name", lang);
   const timeString = translateRoundDate(t, lang, applicationRound);
-  const begin = new Date(applicationRound.reservationPeriodBeginDate);
-  const end = new Date(applicationRound.reservationPeriodEndDate);
+  const begin = parseApiDate(applicationRound.reservationPeriodBeginDate);
+  const end = parseApiDate(applicationRound.reservationPeriodEndDate);
   const reservationPeriodBeginDate = formatDate(begin);
   const reservationPeriodEndDate = formatDate(end);
 

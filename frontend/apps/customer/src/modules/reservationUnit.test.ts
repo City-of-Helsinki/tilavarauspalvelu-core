@@ -486,6 +486,19 @@ describe("getEquipmentList", () => {
 });
 
 describe("getFuturePricing", () => {
+  const NOW = new Date(2024, 0, 1, 10, 0, 0);
+
+  beforeEach(() => {
+    vi.useFakeTimers({
+      toFake: [...TIMERS_TO_FAKE],
+      now: NOW,
+    });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   function constructInput({
     reservationBeginsAt,
     reservationEndsAt,
@@ -509,13 +522,13 @@ describe("getFuturePricing", () => {
     };
   }
 
-  const DAYS: ReadonlyArray<Date> = [addDays(new Date(), 10), addDays(new Date(), 20), addDays(new Date(), 5)];
+  const DAYS: ReadonlyArray<Date> = [addDays(NOW, 10), addDays(NOW, 20), addDays(NOW, 5)];
 
   test.for([
     { days: DAYS, expectedIndex: 2 },
     { days: DAYS.toReversed(), expectedIndex: 0 },
-    { days: [...DAYS, addDays(new Date(), 1)], expectedIndex: 3 },
-    { days: [addDays(new Date(), 1), ...DAYS], expectedIndex: 0 },
+    { days: [...DAYS, addDays(NOW, 1)], expectedIndex: 3 },
+    { days: [addDays(NOW, 1), ...DAYS], expectedIndex: 0 },
   ])("should sort items correctly", ({ days, expectedIndex }) => {
     const input = constructInput({ days });
     expect(getFuturePricing(input)).toEqual(input.pricings[expectedIndex]);
@@ -525,15 +538,15 @@ describe("getFuturePricing", () => {
     const d1 = constructInput({ days: DAYS });
     expect(getFuturePricing(d1)).toEqual(d1.pricings[2]);
     const d2 = constructInput({
-      days: [addDays(new Date(), -1)],
+      days: [addDays(NOW, -1)],
     });
     expect(getFuturePricing(d2)).toBeNull();
   });
 
   test.for([
     { begin: undefined, index: 2 },
-    { begin: addDays(new Date(), 19), index: 1 },
-    { begin: addDays(new Date(), 20), index: null },
+    { begin: addDays(NOW, 19), index: 1 },
+    { begin: addDays(NOW, 20), index: null },
   ])("with reservation begin time", ({ begin, index }) => {
     const data = constructInput({ days: DAYS, reservationBeginsAt: begin });
     const val = index != null ? data.pricings[index] : null;
@@ -546,7 +559,7 @@ describe("getFuturePricing", () => {
     { endDays: 5, index: 2 },
   ])("with reservation end time", ({ endDays, index }) => {
     const data = constructInput({
-      reservationEndsAt: endDays ? addDays(new Date(), endDays + 1) : undefined,
+      reservationEndsAt: endDays ? addDays(NOW, endDays + 1) : undefined,
       days: DAYS,
     });
     const val = index != null ? data.pricings[index] : null;
@@ -560,19 +573,19 @@ describe("getFuturePricing", () => {
   ])("with both reservation times", ({ begin, end, index }) => {
     const data = constructInput({
       days: DAYS,
-      reservationBeginsAt: begin ? addDays(new Date(), begin) : undefined,
-      reservationEndsAt: end ? addDays(new Date(), end) : undefined,
+      reservationBeginsAt: begin ? addDays(NOW, begin) : undefined,
+      reservationEndsAt: end ? addDays(NOW, end) : undefined,
     });
     const val = index != null ? data.pricings[index] : null;
     expect(getFuturePricing(data)).toEqual(val);
   });
 
   test.for([
-    { begin: addDays(new Date(), 1), end: null, index: 2 },
-    { begin: addDays(new Date(), 1), end: addDays(new Date(), 19), index: 1 },
+    { begin: addDays(NOW, 1), end: null, index: 2 },
+    { begin: addDays(NOW, 1), end: addDays(NOW, 19), index: 1 },
     {
-      begin: addDays(new Date(), 1),
-      end: addDays(new Date(), 20),
+      begin: addDays(NOW, 1),
+      end: addDays(NOW, 20),
       index: 9999,
     },
   ])("handles active application rounds", ({ begin, end, index }) => {
@@ -588,9 +601,9 @@ describe("getFuturePricing", () => {
   });
 
   test.for([
-    { date: addDays(new Date(), 15), index: 0 },
-    { date: addDays(new Date(), 5), index: 2 },
-    { date: addDays(new Date(), 20), index: 1 },
+    { date: addDays(NOW, 15), index: 0 },
+    { date: addDays(NOW, 5), index: 2 },
+    { date: addDays(NOW, 20), index: 1 },
   ])("handles date lookups", ({ date, index }) => {
     const data = constructInput({ days: DAYS });
     expect(getFuturePricing(data, [], date)).toEqual(data.pricings[index]);
