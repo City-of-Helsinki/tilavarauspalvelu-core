@@ -317,6 +317,9 @@ class Common(Environment):
     SESSION_ENGINE = "django.contrib.sessions.backends.cache"
     SESSION_CACHE_ALIAS = "default"
 
+    # Disable password authentication of the default ProxyModelBackend, which uses HelusersModelBackend.
+    HELUSERS_PASSWORD_LOGIN_DISABLED = values.BooleanValue(default=False)
+
     # --- Helsinki profile settings ----------------------------------------------------------------------------------
 
     OPEN_CITY_PROFILE_SCOPE = values.StringValue()

@@ -19,14 +19,6 @@ msgstr ""
 msgid "Swedish"
 msgstr ""
 
-#: templates/admin/base_site.html
-msgid "Change password"
-msgstr ""
-
-#: templates/admin/base_site.html templates/admin/hel_login.html
-msgid "Log out"
-msgstr ""
-
 #: templates/admin/deny_reservation_confirmation.html
 #: templates/admin/reset_allocation_confirmation.html
 #: templates/email/email_tester.html

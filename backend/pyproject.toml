@@ -20,7 +20,7 @@ django-cors-headers = "4.9.0"
 django-environment-config = { version = "0.2.3", extras = ["db"] }
 django-filter = "25.2"
 django-health-check = "3.20.8"
-django-helusers = "0.14.4"
+django-helusers = "1.0.0"
 django-jinja = "2.11.0"
 django-lazy-managers = "0.0.1"
 django-lookup-property = "0.2.2"
