@@ -4,7 +4,7 @@ from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
-from django.contrib.auth.backends import ModelBackend
+from helusers.auth import HelusersModelBackend
 from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
 
 from tilavarauspalvelu.models import User
@@ -96,7 +96,7 @@ class ProxyTunnistamoOIDCAuthBackend(TunnistamoOIDCAuth):
             return super().request_access_token(*args, **kwargs)
 
 
-class ProxyModelBackend(ModelBackend):
+class ProxyModelBackend(HelusersModelBackend):
     """
     Enables configuring the Model backend directly (used for django-admin login).
     `AUTHENTICATION_BACKENDS` setting points to this.
