@@ -31,7 +31,6 @@ services:
 
   backend:
     container_name: tvp-core
-    image: tvp-core
     build:
       context: backend/
       dockerfile: docker/Dockerfile
@@ -54,7 +53,6 @@ services:
 
   worker:
     container_name: tvp-worker
-    image: tvp-worker
     depends_on:
       backend:
         condition: service_started
@@ -73,7 +71,6 @@ services:
 
   scheduler:
     container_name: tvp-scheduler
-    image: tvp-scheduler
     depends_on:
       backend:
         condition: service_started
