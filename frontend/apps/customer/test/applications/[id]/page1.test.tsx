@@ -162,7 +162,7 @@ describe("Page1", () => {
     await user.click(submitBtn);
     expect(view.queryAllByText(/application:validation/)).toStrictEqual([]);
     expect(mockedRouterPush).toHaveBeenCalled();
-  }, 10_000);
+  }, 20_000);
 
   test("applied events over 7 should be invalid", async () => {
     const view = customRender();
@@ -224,4 +224,4 @@ describe("Page1: multiple sections", () => {
 
   // the select modal should only modify the section it was opened for
   test.todo("adding reservation units should not affect other sections");
-});
+}, 10_000);

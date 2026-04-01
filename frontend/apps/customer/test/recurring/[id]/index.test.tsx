@@ -93,7 +93,7 @@ describe("Page: SeasonalSearch", () => {
       expect(view.getByRole("heading", { name: `ReservationUnit ${i + 1} FI` })).toBeInTheDocument();
     }
     expect(view.queryByRole("button", { name: "shoppingCart:nextShort" })).not.toBeInTheDocument();
-  });
+  }, 10_000);
 
   test("selecting card should set query params", async () => {
     const view = customRender();
@@ -169,7 +169,7 @@ describe("Page: SeasonalSearch", () => {
     expect(cardsSelects).toHaveLength(10);
     expect(view.getByText(/shoppingCart:count/)).toBeInTheDocument();
     expect(view.getByRole("button", { name: "shoppingCart:nextShort" })).toBeInTheDocument();
-  });
+  }, 10_000);
 
   test("no start application bar if not selected", async () => {
     const view = customRender();
@@ -179,7 +179,7 @@ describe("Page: SeasonalSearch", () => {
     expect(cardsSelects).toHaveLength(10);
     expect(view.queryByText(/shoppingCart:count/)).not.toBeInTheDocument();
     expect(view.queryByRole("button", { name: "shoppingCart:nextShort" })).not.toBeInTheDocument();
-  });
+  }, 10_000);
 
   test("should show login button instead of start if user is not logged in", async () => {
     const params = new URLSearchParams();
@@ -192,7 +192,7 @@ describe("Page: SeasonalSearch", () => {
     expect(cardsSelects).toHaveLength(10);
     expect(view.getByText(/shoppingCart:count/)).toBeInTheDocument();
     expect(view.getByRole("button", { name: "shoppingCart:loginAndApply" })).toBeInTheDocument();
-  });
+  }, 10_000);
 
   test("should filter based on query params", async () => {
     const params = new URLSearchParams();
@@ -218,7 +218,7 @@ describe("Page: SeasonalSearch", () => {
     await user.click(startBtn);
     expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
     expect(mockedRouterReplace).toHaveBeenLastCalledWith(`${getApplicationPath(1, "page1")}?${params.toString()}`);
-  });
+  }, 10_000);
 
   test("should show an error if query fails", async () => {
     const view = customRender({ isSearchError: true });

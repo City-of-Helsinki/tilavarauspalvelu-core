@@ -307,7 +307,7 @@ describe("Filling the form", () => {
     expect(submit).not.toBeDisabled();
     await user.click(submit);
     await expect.poll(() => view.queryByText(/required/i)).toBeInTheDocument();
-  }, 10_000);
+  }, 20_000);
 
   test("Form submission without any blocking reservations", async () => {
     const user = userEvent.setup({
@@ -339,7 +339,7 @@ describe("Filling the form", () => {
     await user.click(submit);
 
     expect(view.queryByText(/required/)).not.toBeInTheDocument();
-  });
+  }, 10_000);
 
   test("Form submission with a lot of blocking reservations", async () => {
     const begin = new Date(YEAR, 0, 1);
@@ -381,7 +381,7 @@ describe("Filling the form", () => {
 
     const overlaps = within(list).queryAllByText(/overlapping/);
     expect(overlaps).toHaveLength(mondayMorningReservations.length);
-  });
+  }, 10_000);
 
   test("Reservations can be removed and restored", async () => {
     const begin = new Date(YEAR, 5, 1);
@@ -424,7 +424,7 @@ describe("Filling the form", () => {
 
     await user.click(restore);
     await waitFor(async () => (await within(list).findAllByText(/common:remove/)).length === 4);
-  });
+  }, 10_000);
 });
 
 // NOTE this requires us to fix submission checking

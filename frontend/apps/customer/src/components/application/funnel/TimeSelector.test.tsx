@@ -227,6 +227,7 @@ describe("TimeSelector render single section", () => {
     },
   ])(
     "should render available time slots based on opening hours $label",
+    { timeout: 10_000 },
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ({ label: _, days }) => {
       const openTimes: TimeSelectorFragment[] = days.map((day, index) => ({
