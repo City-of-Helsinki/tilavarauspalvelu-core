@@ -6,9 +6,9 @@ packages:
 minimumReleaseAge: 20160
 # Add any security exceptions here and bump them manually
 minimumReleaseAgeExclude:
-  - next@16.0.10
-  - '@next/env@16.0.10'
-  - '@types/node@24.10.3'
+  # happy-dom: GHSA-w4gp-fjgq-3q4g (needs >=20.8.9)
+  - 'happy-dom@20.8.9'
+  - '@happy-dom/jest-environment@20.8.9'
 
 ignoredBuiltDependencies:
   - '@parcel/watcher'

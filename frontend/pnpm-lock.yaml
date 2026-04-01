@@ -139,8 +139,8 @@ importers:
         version: 4.1.13
     devDependencies:
       '@happy-dom/jest-environment':
-        specifier: ^20.0.11
-        version: 20.0.11(@jest/environment@29.7.0)(@jest/fake-timers@29.7.0)(@jest/types@29.6.3)(jest-mock@29.7.0)(jest-util@29.7.0)
+        specifier: ^20.8.9
+        version: 20.8.9(@jest/environment@29.7.0)(@jest/fake-timers@29.7.0)(@jest/types@29.6.3)(jest-mock@29.7.0)(jest-util@29.7.0)
       '@testing-library/dom':
         specifier: ^10.4.1
         version: 10.4.1
@@ -173,10 +173,10 @@ importers:
         version: 5.1.2(vite@7.2.4(@types/node@24.10.3)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1))
       '@vitest/coverage-istanbul':
         specifier: ^4.0.18
-        version: 4.0.18(vitest@4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.10.3)(happy-dom@20.0.11)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1))
+        version: 4.0.18(vitest@4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.10.3)(happy-dom@20.8.9)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1))
       happy-dom:
-        specifier: ^20.0.11
-        version: 20.0.11
+        specifier: ^20.8.9
+        version: 20.8.9
       oxlint:
         specifier: ^1.30.0
         version: 1.30.0(oxlint-tsgolint@0.8.3)
@@ -206,7 +206,7 @@ importers:
         version: 5.1.4(typescript@5.9.3)(vite@7.2.4(@types/node@24.10.3)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1))
       vitest:
         specifier: ^4.0.14
-        version: 4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.10.3)(happy-dom@20.0.11)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1)
+        version: 4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.10.3)(happy-dom@20.8.9)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1)
 
   apps/staff:
     dependencies:
@@ -305,8 +305,8 @@ importers:
         version: 4.1.13
     devDependencies:
       '@happy-dom/jest-environment':
-        specifier: ^20.0.11
-        version: 20.0.11(@jest/environment@29.7.0)(@jest/fake-timers@29.7.0)(@jest/types@29.6.3)(jest-mock@29.7.0)(jest-util@29.7.0)
+        specifier: ^20.8.9
+        version: 20.8.9(@jest/environment@29.7.0)(@jest/fake-timers@29.7.0)(@jest/types@29.6.3)(jest-mock@29.7.0)(jest-util@29.7.0)
       '@testing-library/dom':
         specifier: ^10.4.1
         version: 10.4.1
@@ -339,10 +339,10 @@ importers:
         version: 5.1.2(vite@7.2.4(@types/node@24.10.3)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1))
       '@vitest/coverage-istanbul':
         specifier: ^4.0.18
-        version: 4.0.18(vitest@4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.10.3)(happy-dom@20.0.11)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1))
+        version: 4.0.18(vitest@4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.10.3)(happy-dom@20.8.9)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1))
       happy-dom:
-        specifier: ^20.0.11
-        version: 20.0.11
+        specifier: ^20.8.9
+        version: 20.8.9
       oxlint:
         specifier: ^1.30.0
         version: 1.30.0(oxlint-tsgolint@0.8.3)
@@ -372,7 +372,7 @@ importers:
         version: 5.1.4(typescript@5.9.3)(vite@7.2.4(@types/node@24.10.3)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1))
       vitest:
         specifier: ^4.0.14
-        version: 4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.10.3)(happy-dom@20.0.11)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1)
+        version: 4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.10.3)(happy-dom@20.8.9)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1)
 
   packages/prettier-config:
     devDependencies:
@@ -456,8 +456,8 @@ importers:
         specifier: ^3.14.0
         version: 3.14.0(@types/react@18.3.27)(graphql-ws@6.0.6(graphql@16.12.0)(ws@8.19.0))(graphql@16.12.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@happy-dom/jest-environment':
-        specifier: ^20.0.11
-        version: 20.0.11(@jest/environment@29.7.0)(@jest/fake-timers@29.7.0)(@jest/types@29.6.3)(jest-mock@29.7.0)(jest-util@29.7.0)
+        specifier: ^20.8.9
+        version: 20.8.9(@jest/environment@29.7.0)(@jest/fake-timers@29.7.0)(@jest/types@29.6.3)(jest-mock@29.7.0)(jest-util@29.7.0)
       '@sentry/nextjs':
         specifier: ^10.27.0
         version: 10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(next@16.2.0(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3))(react@18.3.1)(webpack@5.94.0)
@@ -492,8 +492,8 @@ importers:
         specifier: ^5.1.2
         version: 5.1.2(vite@7.2.4(@types/node@24.12.0)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1))
       happy-dom:
-        specifier: ^20.0.11
-        version: 20.0.11
+        specifier: ^20.8.9
+        version: 20.8.9
       next:
         specifier: 16.2.0
         version: 16.2.0(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.97.3)
@@ -532,7 +532,7 @@ importers:
         version: 5.1.4(typescript@5.9.3)(vite@7.2.4(@types/node@24.12.0)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1))
       vitest:
         specifier: ^4.0.14
-        version: 4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.12.0)(happy-dom@20.0.11)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1)
+        version: 4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.12.0)(happy-dom@20.8.9)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1)
 
 packages:
 
@@ -1469,8 +1469,8 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
-  '@happy-dom/jest-environment@20.0.11':
-    resolution: {integrity: sha512-gsd01XEvkP290xE29Se2hCzXh0V+9CoKfBZ1RsDPjWd80xmiYuVdpzrnxjAl3MvM5z/YPaMNQCIJizEdu7uWsg==}
+  '@happy-dom/jest-environment@20.8.9':
+    resolution: {integrity: sha512-E0E7+n/BuyongNR+jLExaAeXs50lYBVD/QJYYpi2+qLFt2PxQtjknw/26YDIWjP/nwFDlCY3/P0YCSFCQ68Zxw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@jest/environment': '>=25.0.0'
@@ -2878,9 +2878,6 @@ packages:
   '@types/mysql@2.15.27':
     resolution: {integrity: sha512-YfWiV16IY0OeBfBCk8+hXKmdTKrKlwKN1MNKAPBu5JYxLwBEZl7QzeEpGnlZb3VMGJrrGmB84gXiH+ofs/TezA==}
 
-  '@types/node@20.19.25':
-    resolution: {integrity: sha512-ZsJzA5thDQMSQO788d7IocwwQbI8B5OPzmqNvpf3NY/+MHDAS759Wo0gd2WQeXYt5AAAQjzcrTVC6SKCuYgoCQ==}
-
   '@types/node@24.10.3':
     resolution: {integrity: sha512-gqkrWUsS8hcm0r44yn7/xZeV1ERva/nLgrLxFRUGb7aoNMIJfZJ3AC261zDQuOAKC7MiXai1WCpYc48jAHoShQ==}
 
@@ -3678,6 +3675,10 @@ packages:
     resolution: {integrity: sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g==}
     engines: {node: '>=0.12'}
 
+  entities@7.0.1:
+    resolution: {integrity: sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA==}
+    engines: {node: '>=0.12'}
+
   env-paths@2.2.1:
     resolution: {integrity: sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==}
     engines: {node: '>=6'}
@@ -4067,8 +4068,8 @@ packages:
     resolution: {integrity: sha512-DKKrynuQRne0PNpEbzuEdHlYOMksHSUI8Zc9Unei5gTsMNA2/vMpoMz/yKba50pejK56qj98qM0SjYxAKi13gQ==}
     engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
 
-  happy-dom@20.0.11:
-    resolution: {integrity: sha512-QsCdAUHAmiDeKeaNojb1OHOPF7NjcWPBR7obdu3NwH2a/oyQaLg5d0aaCy/9My6CdPChYF07dvz5chaXBGaD4g==}
+  happy-dom@20.8.9:
+    resolution: {integrity: sha512-Tz23LR9T9jOGVZm2x1EPdXqwA37G/owYMxRwU0E4miurAtFsPMQ1d2Jc2okUaSjZqAFz2oEn3FLXC5a0a+siyA==}
     engines: {node: '>=20.0.0'}
 
   has-flag@4.0.0:
@@ -5691,9 +5692,6 @@ packages:
     peerDependencies:
       react: '>=15.0.0'
 
-  undici-types@6.21.0:
-    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
-
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
@@ -5936,18 +5934,6 @@ packages:
   write-file-atomic@5.0.1:
     resolution: {integrity: sha512-+QU2zd6OTD8XWIJCbffaiQeH9U73qIqafo1x6V1snCWYGJf6cVE0cDR4D8xRzcEnfI21IFrUPzPGtcPf8AC+Rw==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
-
-  ws@8.18.3:
-    resolution: {integrity: sha512-PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
 
   ws@8.19.0:
     resolution: {integrity: sha512-blAT2mjOEIi0ZzruJfIhb3nps74PRWTCz1IjglWEEpQl5XS/UNama6u2/rjFkDDouqr4L67ry+1aGIALViWjDg==}
@@ -6973,10 +6959,10 @@ snapshots:
       '@graphql-tools/utils': 10.11.0(graphql@16.12.0)
       '@whatwg-node/disposablestack': 0.0.6
       graphql: 16.12.0
-      graphql-ws: 6.0.6(graphql@16.12.0)(ws@8.18.3)
-      isomorphic-ws: 5.0.0(ws@8.18.3)
+      graphql-ws: 6.0.6(graphql@16.12.0)(ws@8.19.0)
+      isomorphic-ws: 5.0.0(ws@8.19.0)
       tslib: 2.8.1
-      ws: 8.18.3
+      ws: 8.19.0
     transitivePeerDependencies:
       - '@fastify/websocket'
       - bufferutil
@@ -6990,10 +6976,10 @@ snapshots:
       '@graphql-tools/utils': 10.11.0(graphql@16.12.0)
       '@whatwg-node/disposablestack': 0.0.6
       graphql: 16.12.0
-      graphql-ws: 6.0.6(graphql@16.12.0)(ws@8.18.3)
-      isows: 1.0.7(ws@8.18.3)
+      graphql-ws: 6.0.6(graphql@16.12.0)(ws@8.19.0)
+      isows: 1.0.7(ws@8.19.0)
       tslib: 2.8.1
-      ws: 8.18.3
+      ws: 8.19.0
     transitivePeerDependencies:
       - '@fastify/websocket'
       - bufferutil
@@ -7036,9 +7022,9 @@ snapshots:
       '@graphql-tools/utils': 10.11.0(graphql@16.12.0)
       '@types/ws': 8.18.1
       graphql: 16.12.0
-      isomorphic-ws: 5.0.0(ws@8.18.3)
+      isomorphic-ws: 5.0.0(ws@8.19.0)
       tslib: 2.8.1
-      ws: 8.18.3
+      ws: 8.19.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -7182,10 +7168,10 @@ snapshots:
       '@whatwg-node/fetch': 0.10.13
       '@whatwg-node/promise-helpers': 1.3.2
       graphql: 16.12.0
-      isomorphic-ws: 5.0.0(ws@8.18.3)
+      isomorphic-ws: 5.0.0(ws@8.19.0)
       sync-fetch: 0.6.0-2
       tslib: 2.8.1
-      ws: 8.18.3
+      ws: 8.19.0
     transitivePeerDependencies:
       - '@fastify/websocket'
       - '@types/node'
@@ -7205,10 +7191,10 @@ snapshots:
       '@whatwg-node/fetch': 0.10.13
       '@whatwg-node/promise-helpers': 1.3.2
       graphql: 16.12.0
-      isomorphic-ws: 5.0.0(ws@8.18.3)
+      isomorphic-ws: 5.0.0(ws@8.19.0)
       sync-fetch: 0.6.0-2
       tslib: 2.8.1
-      ws: 8.18.3
+      ws: 8.19.0
     transitivePeerDependencies:
       - '@fastify/websocket'
       - '@types/node'
@@ -7253,14 +7239,17 @@ snapshots:
     dependencies:
       graphql: 16.12.0
 
-  '@happy-dom/jest-environment@20.0.11(@jest/environment@29.7.0)(@jest/fake-timers@29.7.0)(@jest/types@29.6.3)(jest-mock@29.7.0)(jest-util@29.7.0)':
+  '@happy-dom/jest-environment@20.8.9(@jest/environment@29.7.0)(@jest/fake-timers@29.7.0)(@jest/types@29.6.3)(jest-mock@29.7.0)(jest-util@29.7.0)':
     dependencies:
       '@jest/environment': 29.7.0
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      happy-dom: 20.0.11
+      happy-dom: 20.8.9
       jest-mock: 29.7.0
       jest-util: 29.7.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   '@hookform/resolvers@2.9.11(react-hook-form@7.66.1(react@18.3.1))':
     dependencies:
@@ -8537,7 +8526,7 @@ snapshots:
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 24.10.3
+      '@types/node': 24.12.0
 
   '@types/cookie@0.4.1': {}
 
@@ -8574,11 +8563,7 @@ snapshots:
 
   '@types/mysql@2.15.27':
     dependencies:
-      '@types/node': 24.10.3
-
-  '@types/node@20.19.25':
-    dependencies:
-      undici-types: 6.21.0
+      '@types/node': 24.12.0
 
   '@types/node@24.10.3':
     dependencies:
@@ -8594,7 +8579,7 @@ snapshots:
 
   '@types/pg@8.15.6':
     dependencies:
-      '@types/node': 24.10.3
+      '@types/node': 24.12.0
       pg-protocol: 1.10.3
       pg-types: 2.2.0
 
@@ -8629,7 +8614,7 @@ snapshots:
 
   '@types/tedious@4.0.14':
     dependencies:
-      '@types/node': 24.10.3
+      '@types/node': 24.12.0
 
   '@types/warning@3.0.3': {}
 
@@ -8637,7 +8622,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 24.10.3
+      '@types/node': 24.12.0
 
   '@types/yargs-parser@21.0.3': {}
 
@@ -8709,7 +8694,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/coverage-istanbul@4.0.18(vitest@4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.10.3)(happy-dom@20.0.11)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1))':
+  '@vitest/coverage-istanbul@4.0.18(vitest@4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.10.3)(happy-dom@20.8.9)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1))':
     dependencies:
       '@istanbuljs/schema': 0.1.3
       '@jridgewell/gen-mapping': 0.3.13
@@ -8721,7 +8706,7 @@ snapshots:
       magicast: 0.5.2
       obug: 2.1.1
       tinyrainbow: 3.0.3
-      vitest: 4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.10.3)(happy-dom@20.0.11)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1)
+      vitest: 4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.10.3)(happy-dom@20.8.9)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -9456,6 +9441,8 @@ snapshots:
   entities@6.0.1:
     optional: true
 
+  entities@7.0.1: {}
+
   env-paths@2.2.1: {}
 
   environment@1.1.0: {}
@@ -9882,26 +9869,25 @@ snapshots:
       graphql: 16.12.0
       tslib: 2.8.1
 
-  graphql-ws@6.0.6(graphql@16.12.0)(ws@8.18.3):
-    dependencies:
-      graphql: 16.12.0
-    optionalDependencies:
-      ws: 8.18.3
-
   graphql-ws@6.0.6(graphql@16.12.0)(ws@8.19.0):
     dependencies:
       graphql: 16.12.0
     optionalDependencies:
       ws: 8.19.0
-    optional: true
 
   graphql@16.12.0: {}
 
-  happy-dom@20.0.11:
+  happy-dom@20.8.9:
     dependencies:
-      '@types/node': 20.19.25
+      '@types/node': 24.12.0
       '@types/whatwg-mimetype': 3.0.2
+      '@types/ws': 8.18.1
+      entities: 7.0.1
       whatwg-mimetype: 3.0.0
+      ws: 8.19.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   has-flag@4.0.0: {}
 
@@ -10154,13 +10140,13 @@ snapshots:
 
   isexe@2.0.0: {}
 
-  isomorphic-ws@5.0.0(ws@8.18.3):
+  isomorphic-ws@5.0.0(ws@8.19.0):
     dependencies:
-      ws: 8.18.3
+      ws: 8.19.0
 
-  isows@1.0.7(ws@8.18.3):
+  isows@1.0.7(ws@8.19.0):
     dependencies:
-      ws: 8.18.3
+      ws: 8.19.0
 
   istanbul-lib-coverage@3.2.2: {}
 
@@ -11614,8 +11600,6 @@ snapshots:
       react: 18.3.1
       react-lifecycles-compat: 3.0.4
 
-  undici-types@6.21.0: {}
-
   undici-types@7.16.0: {}
 
   unicode-emoji-modifier-base@1.0.0: {}
@@ -11717,7 +11701,7 @@ snapshots:
       terser: 5.46.0
       yaml: 2.8.1
 
-  vitest@4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.10.3)(happy-dom@20.0.11)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1):
+  vitest@4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.10.3)(happy-dom@20.8.9)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1):
     dependencies:
       '@vitest/expect': 4.0.14
       '@vitest/mocker': 4.0.14(vite@7.2.4(@types/node@24.10.3)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1))
@@ -11742,7 +11726,7 @@ snapshots:
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
       '@types/node': 24.10.3
-      happy-dom: 20.0.11
+      happy-dom: 20.8.9
       jsdom: 26.0.0
     transitivePeerDependencies:
       - jiti
@@ -11757,7 +11741,7 @@ snapshots:
       - tsx
       - yaml
 
-  vitest@4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.12.0)(happy-dom@20.0.11)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1):
+  vitest@4.0.14(@opentelemetry/api@1.9.0)(@types/node@24.12.0)(happy-dom@20.8.9)(jiti@2.6.1)(jsdom@26.0.0)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1):
     dependencies:
       '@vitest/expect': 4.0.14
       '@vitest/mocker': 4.0.14(vite@7.2.4(@types/node@24.12.0)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(yaml@2.8.1))
@@ -11782,7 +11766,7 @@ snapshots:
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
       '@types/node': 24.12.0
-      happy-dom: 20.0.11
+      happy-dom: 20.8.9
       jsdom: 26.0.0
     transitivePeerDependencies:
       - jiti
@@ -11924,10 +11908,7 @@ snapshots:
       imurmurhash: 0.1.4
       signal-exit: 4.1.0
 
-  ws@8.18.3: {}
-
-  ws@8.19.0:
-    optional: true
+  ws@8.19.0: {}
 
   xml-name-validator@5.0.0:
     optional: true
