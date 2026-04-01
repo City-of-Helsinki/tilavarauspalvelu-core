@@ -3,7 +3,7 @@ import { Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { ApplicationSectionStatusLabel } from "ui/src/components/statuses";
 import { WEEKDAYS } from "ui/src/modules/const";
-import { formatDurationRange, formatDate, parseApiDate, setMondayFirst } from "ui/src/modules/date-utils";
+import { formatDurationRange, formatDate, parseApiDate, setSundayFirst } from "ui/src/modules/date-utils";
 import { filterNonNullable, formatDayTimes, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { NoWrap } from "ui/src/styled";
 import {
@@ -177,7 +177,7 @@ function Weekdays({ primary, secondary }: { primary: SchedulesT[]; secondary: Sc
     <>
       {WEEKDAYS.map((day) => (
         <ScheduleDay key={day}>
-          <span>{t(`common:weekDay.${setMondayFirst(day)}`)}</span>
+          <span>{t(`common:weekDay.${setSundayFirst(day)}`)}</span>
           <span>{formatDayTimes(primary, day) || "-"}</span>
           <span>{formatDayTimes(secondary, day) ? `(${formatDayTimes(secondary, day)})` : "-"}</span>
         </ScheduleDay>
