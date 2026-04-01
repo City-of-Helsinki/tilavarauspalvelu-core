@@ -11,6 +11,8 @@ minimumReleaseAgeExclude:
   - '@happy-dom/jest-environment@20.8.9'
   # picomatch: GHSA-3v7f-55p6-f55p, GHSA-c2c7-rcm5-vvqj (needs >=2.3.2 and >=4.0.4)
   - picomatch
+  # yaml: GHSA-48c2-rrv3-qjmp (needs >=2.8.3)
+  - yaml@2.8.3
 
 ignoredBuiltDependencies:
   - '@parcel/watcher'
