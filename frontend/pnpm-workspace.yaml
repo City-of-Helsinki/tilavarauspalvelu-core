@@ -6,6 +6,8 @@ packages:
 minimumReleaseAge: 20160
 # Add any security exceptions here and bump them manually
 minimumReleaseAgeExclude:
+  # brace-expansion: GHSA-f886-m6hf-6m8v (needs >=1.1.13 and >=2.0.3)
+  - brace-expansion
   # happy-dom: GHSA-w4gp-fjgq-3q4g (needs >=20.8.9)
   - 'happy-dom@20.8.9'
   - '@happy-dom/jest-environment@20.8.9'
