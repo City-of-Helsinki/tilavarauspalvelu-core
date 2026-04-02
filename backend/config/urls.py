@@ -9,6 +9,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path, re_path, reverse
 from graphene_django_extensions import FileUploadGraphQLView
+from health_check.views import HealthCheckView
 
 from tilavarauspalvelu.api.gdpr.views import TilavarauspalveluGDPRAPIView
 from tilavarauspalvelu.api.rest.views import (
@@ -91,7 +92,17 @@ urlpatterns = [
     ),
     path("tinymce/", include("tinymce.urls")),
     path("csrf/", csrf_view),
-    path("monitoring/system-status/", include("health_check.urls", namespace="health_check")),
+    path(
+        "monitoring/system-status/",
+        HealthCheckView.as_view(
+            checks=[
+                "health_check.Cache",
+                "health_check.Database",
+                "health_check.contrib.celery.Ping",
+            ]
+        ),
+        name="health_check",
+    ),
     path("monitoring/liveness/", liveness_check, name="liveness_check"),
     path("monitoring/readiness/", readiness_check, name="readiness_check"),
     path("v1/reports/reservation-units/", reservation_unit_export, name="reservation_unit_export"),

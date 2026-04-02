@@ -86,9 +86,6 @@ class Common(Environment):
         "subforms",
         # Health check
         "health_check",
-        "health_check.db",
-        "health_check.cache",
-        "health_check.contrib.celery",
         # Our app
         "tilavarauspalvelu",
     ]
