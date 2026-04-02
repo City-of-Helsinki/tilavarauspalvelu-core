@@ -141,7 +141,7 @@ jobs:
           python-version: ${{ steps.setup-python.outputs.python-version }}
 
       - name: "Download test durations artifact"
-        uses: dawidd6/action-download-artifact@v12
+        uses: dawidd6/action-download-artifact@v19
         with:
           workflow: update_test_durations.yml
           name: test_durations
@@ -170,7 +170,7 @@ jobs:
           )" >> $GITHUB_OUTPUT
 
       - name: "Upload coverage artifact"
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: cov-${{ steps.artifact.outputs.artifact }}-${{ matrix.group }}
           path: ./backend/.coverage.${{ matrix.group }}
@@ -200,7 +200,7 @@ jobs:
           )" >> $GITHUB_OUTPUT
 
       - name: "Download coverage artifacts"
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: ./backend
           pattern: cov-${{ steps.artifact.outputs.artifact }}-*
