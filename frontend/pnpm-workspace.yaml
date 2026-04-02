@@ -11,6 +11,9 @@ minimumReleaseAgeExclude:
   # happy-dom: GHSA-w4gp-fjgq-3q4g (needs >=20.8.9)
   - 'happy-dom@20.8.9'
   - '@happy-dom/jest-environment@20.8.9'
+  # lodash: GHSA-4mwj-38mr-27j5, GHSA-jf85-cpcp-j695, GHSA-35jh-r3h4-6jhm, GHSA-nxhq-r7db-7g3t (needs >=4.18.1)
+  - lodash@4.18.1
+  - lodash-es@4.18.1
   # picomatch: GHSA-3v7f-55p6-f55p, GHSA-c2c7-rcm5-vvqj (needs >=2.3.2 and >=4.0.4)
   - picomatch
   # yaml: GHSA-48c2-rrv3-qjmp (needs >=2.8.3)
