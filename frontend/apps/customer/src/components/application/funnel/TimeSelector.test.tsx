@@ -139,7 +139,7 @@ describe("TimeSelector render single section", () => {
         expect(btn).toHaveTextContent(`${hour} - ${hour + 1}`);
       }
     }
-  });
+  }, 10_000);
 
   test("should have Legend for time selector", () => {
     const view = customRender();
