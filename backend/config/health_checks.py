@@ -36,10 +36,13 @@ class RedisSentinelHealthCheck(HealthCheck):
             with connection_factory.connect(url=url) as conn:
                 conn.ping()  # exceptions may be raised upon ping
         except ConnectionRefusedError as error:
-            raise ServiceUnavailable("Unable to connect to Redis: Connection was refused.") from error
+            msg = "Unable to connect to Redis: Connection was refused."
+            raise ServiceUnavailable(msg) from error
         except exceptions.TimeoutError as error:
-            raise ServiceUnavailable("Unable to connect to Redis: Timeout.") from error
+            msg = "Unable to connect to Redis: Timeout."
+            raise ServiceUnavailable(msg) from error
         except exceptions.ConnectionError as error:
-            raise ServiceUnavailable("Unable to connect to Redis: Connection Error") from error
+            msg = "Unable to connect to Redis: Connection Error"
+            raise ServiceUnavailable(msg) from error
         else:
             logger.debug("Connection established. Redis sentinel is healthy.")
