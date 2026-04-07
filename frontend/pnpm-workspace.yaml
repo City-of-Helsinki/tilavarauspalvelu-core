@@ -16,6 +16,8 @@ minimumReleaseAgeExclude:
   - lodash-es@4.18.1
   # picomatch: GHSA-3v7f-55p6-f55p, GHSA-c2c7-rcm5-vvqj (needs >=2.3.2 and >=4.0.4)
   - picomatch
+  # vite: GHSA-p9ff-h696-f583, GHSA-v2wj-q39q-566r, GHSA-4w7w-66w2-5vf9 (needs >=7.3.2)
+  - vite@7.3.2
   # yaml: GHSA-48c2-rrv3-qjmp (needs >=2.8.3)
   - yaml@2.8.3
 
