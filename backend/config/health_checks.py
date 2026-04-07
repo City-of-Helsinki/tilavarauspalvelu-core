@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import dataclasses
 import logging
 from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django_redis.pool import get_connection_factory
-from health_check.backends import BaseHealthCheckBackend
+from health_check.base import HealthCheck
 from health_check.exceptions import ServiceUnavailable
 from redis import exceptions
 
@@ -16,11 +17,12 @@ logger = logging.getLogger(__name__)
 
 
 # Adapted from `health_check.contrib.redis.backends.RedisHealthCheck`
-class RedisSentinelHealthCheck(BaseHealthCheckBackend):
+@dataclasses.dataclass
+class RedisSentinelHealthCheck(HealthCheck):
     """Health check for Redis using a sentinel."""
 
-    def check_status(self) -> None:
-        """Check the connectio to Redis using a sentinel."""
+    def run(self) -> None:
+        """Check the connection to Redis using a sentinel."""
         logger.debug("Creating connection factory for Redis sentinel...")
 
         url = settings.CACHES["default"]["LOCATION"]
@@ -34,12 +36,10 @@ class RedisSentinelHealthCheck(BaseHealthCheckBackend):
             with connection_factory.connect(url=url) as conn:
                 conn.ping()  # exceptions may be raised upon ping
         except ConnectionRefusedError as error:
-            self.add_error(ServiceUnavailable("Unable to connect to Redis: Connection was refused."), error)
+            raise ServiceUnavailable("Unable to connect to Redis: Connection was refused.") from error
         except exceptions.TimeoutError as error:
-            self.add_error(ServiceUnavailable("Unable to connect to Redis: Timeout."), error)
+            raise ServiceUnavailable("Unable to connect to Redis: Timeout.") from error
         except exceptions.ConnectionError as error:
-            self.add_error(ServiceUnavailable("Unable to connect to Redis: Connection Error"), error)
-        except BaseException as error:  # noqa: BLE001
-            self.add_error(ServiceUnavailable("Unknown error"), error)
+            raise ServiceUnavailable("Unable to connect to Redis: Connection Error") from error
         else:
             logger.debug("Connection established. Redis sentinel is healthy.")
