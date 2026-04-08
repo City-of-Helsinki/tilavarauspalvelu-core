@@ -7,6 +7,7 @@ import { Sanitize } from "@ui/components/Sanitize";
 import { useGenericTerms } from "@ui/hooks";
 import { formatters as getFormatters } from "@ui/index";
 import { breakpoints } from "@ui/modules/const";
+import { convertWeekday } from "@ui/modules/conversion";
 import { formatDate, formatTimeRange, parseApiDate, timeToMinutes } from "@ui/modules/date-utils";
 import {
   filterNonNullable,
@@ -44,7 +45,11 @@ export function ReservationUnitMoreDetails({
 
   const activeApplicationRounds = reservationUnit.applicationRounds;
   const showApplicationRoundTimeSlots = activeApplicationRounds.length > 0;
-  const applicationRoundTimeSlots = reservationUnit.applicationRoundTimeSlots;
+  const applicationRoundTimeSlots = useMemo(() => {
+    return [...(reservationUnit.applicationRoundTimeSlots ?? [])].sort(
+      (a, b) => convertWeekday(a.weekday) - convertWeekday(b.weekday)
+    );
+  }, [reservationUnit.applicationRoundTimeSlots]);
   const shouldDisplayPricingTerms = useMemo(() => {
     const pricings = filterNonNullable(reservationUnit?.pricings);
     if (pricings.length === 0) {
@@ -119,9 +124,9 @@ export function ReservationUnitMoreDetails({
 }
 function NoticeWhenReservingSection({
   reservationUnit,
-}: {
+}: Readonly<{
   reservationUnit: NoticeWhenReservingFragment;
-}): JSX.Element | null {
+}>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   const notesWhenReserving = getTranslation(reservationUnit, "notesWhenApplying", lang);
@@ -145,7 +150,7 @@ function NoticeWhenReservingSection({
   );
 }
 
-function PriceChangeNotice({ futurePricing }: { futurePricing: PricingFieldsFragment }): JSX.Element {
+function PriceChangeNotice({ futurePricing }: Readonly<{ futurePricing: PricingFieldsFragment }>): JSX.Element {
   const { t, i18n } = useTranslation();
 
   const isPaid = !isPriceFree(futurePricing);
