@@ -6,10 +6,31 @@ import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { selectFirstOption } from "@test/test.utils";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { vi, expect, test, describe } from "vitest";
+import { vi, expect, test, describe, beforeEach } from "vitest";
 import type { OptionsListT } from "ui/src/modules/search";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import Page1 from "@/pages/applications/[id]/page1";
+
+const { isSavingRef, mutateFn } = vi.hoisted(() => {
+  const isSavingRef = { current: false };
+  const mutateFn = vi.fn().mockResolvedValue({ data: { updateApplication: { pk: 1 } } });
+  return { isSavingRef, mutateFn };
+});
+
+vi.mock("@gql/gql-types", async (importOriginal) => {
+  const mod: unknown = await importOriginal();
+  return {
+    ...(mod as Record<string, unknown>),
+    useUpdateApplicationMutation: () => [
+      mutateFn,
+      {
+        get loading() {
+          return isSavingRef.current;
+        },
+      },
+    ],
+  };
+});
 
 const { mockedRouterPush, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -62,6 +83,11 @@ function customRender(props: CreateMockApplicationFragmentProps = {}): ReturnTyp
   );
 }
 
+beforeEach(() => {
+  isSavingRef.current = false;
+  mutateFn.mockClear();
+});
+
 describe("Page1 common to all funnel pages", () => {
   test("should render empty application page", () => {
     const view = customRender();
@@ -81,6 +107,13 @@ describe("Page1 common to all funnel pages", () => {
 });
 
 describe("Page1", () => {
+  test("disables next and add-section while saving", () => {
+    isSavingRef.current = true;
+    const view = customRender();
+    expect(view.getByRole("button", { name: "common:next" })).toBeDisabled();
+    expect(view.getByRole("button", { name: "application:Page1.createNew" })).toBeDisabled();
+  });
+
   // this case only happens if user manually removes the last section
   test("empty application should not allow submitting", async () => {
     const view = customRender();

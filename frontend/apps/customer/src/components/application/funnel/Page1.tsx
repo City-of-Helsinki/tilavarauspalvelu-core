@@ -13,10 +13,11 @@ import type { ApplicationPage1FormValues } from "./form";
 
 type Page1Props = Readonly<{
   applicationRound: Readonly<ApplicationRoundForApplicationFragment>;
+  isSaving: boolean;
   options: Readonly<OptionsListT>;
 }>;
 
-export function Page1({ applicationRound, options }: Page1Props): JSX.Element | null {
+export function Page1({ applicationRound, isSaving, options }: Page1Props): JSX.Element | null {
   const { t } = useTranslation();
 
   // get the user selected defaults for reservationUnits field
@@ -55,6 +56,7 @@ export function Page1({ applicationRound, options }: Page1Props): JSX.Element | 
           id="addApplicationEvent"
           variant={ButtonVariant.Secondary}
           iconStart={<IconPlus />}
+          disabled={isSaving}
           onClick={handleAddNewApplicationEvent}
           size={ButtonSize.Small}
         >
@@ -64,7 +66,7 @@ export function Page1({ applicationRound, options }: Page1Props): JSX.Element | 
           id="button__application--next"
           iconEnd={<IconArrowRight />}
           size={ButtonSize.Small}
-          disabled={submitDisabled}
+          disabled={submitDisabled || isSaving}
           type="submit"
         >
           {t("common:next")}

@@ -28,7 +28,7 @@ import type { ApplicationPage1Query, ApplicationPage1QueryVariables } from "@gql
 function Page1({ application, options: optionsOrig }: Pick<PropsNarrowed, "application" | "options">): JSX.Element {
   const router = useRouter();
   const dislayError = useDisplayError();
-  const [mutate] = useUpdateApplicationMutation();
+  const [mutate, { loading: isSaving }] = useUpdateApplicationMutation();
 
   const saveAndNavigate = async (values: ApplicationPage1FormValues) => {
     try {
@@ -72,7 +72,7 @@ function Page1({ application, options: optionsOrig }: Pick<PropsNarrowed, "appli
     <FormProvider {...form}>
       <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)}>
         <ApplicationFunnelWrapper page="page1" application={application}>
-          <Page1Impl applicationRound={applicationRound} options={options} />
+          <Page1Impl applicationRound={applicationRound} isSaving={isSaving} options={options} />
         </ApplicationFunnelWrapper>
       </Flex>
     </FormProvider>
