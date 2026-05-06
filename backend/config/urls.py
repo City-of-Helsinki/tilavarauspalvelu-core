@@ -98,7 +98,7 @@ urlpatterns = [
             checks=[
                 "health_check.Cache",
                 "health_check.Database",
-                "health_check.contrib.celery.Ping",
+                "config.health_checks.CeleryHealthCheck",
                 "config.health_checks.RedisSentinelHealthCheck",
             ]
         ),
