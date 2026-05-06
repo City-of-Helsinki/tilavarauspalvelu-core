@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django_redis.pool import get_connection_factory
 from health_check.base import HealthCheck
+from health_check.contrib.celery import Ping
 from health_check.exceptions import ServiceUnavailable
 from redis import exceptions
 
@@ -46,3 +47,25 @@ class RedisSentinelHealthCheck(HealthCheck):
             raise ServiceUnavailable(msg) from error
         else:
             logger.debug("Connection established. Redis sentinel is healthy.")
+
+
+@dataclasses.dataclass
+class CeleryHealthCheck(Ping):
+    """Celery health check using a dedicated broker connection for queue inspection."""
+
+    def check_active_queues(self, *active_workers: str) -> None:
+        try:
+            defined_queues = {queue.name for queue in self.app.conf.task_queues}
+        except TypeError:
+            defined_queues = {self.app.conf.task_default_queue}
+
+        with self.app.connection_for_read() as conn:
+            active_queues = {
+                queue.get("name")
+                for queues in self.app.control.inspect(active_workers, connection=conn).active_queues().values()
+                for queue in queues
+            }
+
+        for queue in defined_queues - active_queues:
+            msg = f"No worker for Celery task queue {queue}"
+            raise ServiceUnavailable(msg)
