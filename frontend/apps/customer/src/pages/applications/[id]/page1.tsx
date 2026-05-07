@@ -38,7 +38,8 @@ function Page1({ application, options: optionsOrig }: Pick<PropsNarrowed, "appli
       if (pk == null) {
         throw new Error("Failed to save application");
       }
-      router.push(getApplicationPath(pk, "page2"));
+      // Await navigation so the UI stays disabled until the route transition completes.
+      await router.push(getApplicationPath(pk, "page2"));
     } catch (err) {
       dislayError(err);
     }
@@ -64,15 +65,17 @@ function Page1({ application, options: optionsOrig }: Pick<PropsNarrowed, "appli
 
   const { handleSubmit } = form;
 
-  const onSubmit = (values: ApplicationPage1FormValues) => {
-    saveAndNavigate(values);
-  };
+  const onSubmit = (values: ApplicationPage1FormValues) => saveAndNavigate(values);
 
   return (
     <FormProvider {...form}>
       <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)}>
         <ApplicationFunnelWrapper page="page1" application={application}>
-          <Page1Impl applicationRound={applicationRound} isSaving={isSaving} options={options} />
+          <Page1Impl
+            applicationRound={applicationRound}
+            isSaving={isSaving || form.formState.isSubmitting}
+            options={options}
+          />
         </ApplicationFunnelWrapper>
       </Flex>
     </FormProvider>

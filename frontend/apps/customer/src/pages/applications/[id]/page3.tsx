@@ -85,9 +85,10 @@ export default function Page3({ application }: Pick<PropsNarrowed, "application"
   });
 
   const { handleSubmit } = form;
+  const { isSubmitting } = form.formState;
 
   const { t } = useTranslation();
-  const [mutate] = useUpdateApplicationMutation();
+  const [mutate, { loading: isSaving }] = useUpdateApplicationMutation();
   const displayError = useDisplayError();
 
   const onSubmit = async (values: ApplicationPage3FormValues) => {
@@ -98,13 +99,15 @@ export default function Page3({ application }: Pick<PropsNarrowed, "application"
       if (pk == null) {
         throw new Error("Failed to save application");
       }
-      router.push(getApplicationPath(pk, "page4"));
+      // Await navigation so the form stays "submitting" until the transition completes.
+      await router.push(getApplicationPath(pk, "page4"));
     } catch (err) {
       displayError(err);
     }
   };
 
   const onPrev = () => router.push(getApplicationPath(application.pk, "page2"));
+  const disableNav = isSubmitting || isSaving;
 
   return (
     <FormProvider {...form}>
@@ -121,10 +124,17 @@ export default function Page3({ application }: Pick<PropsNarrowed, "application"
               iconStart={<IconArrowLeft />}
               size={ButtonSize.Small}
               onClick={onPrev}
+              disabled={disableNav}
             >
               {t("common:prev")}
             </Button>
-            <Button id="button__application--next" iconEnd={<IconArrowRight />} size={ButtonSize.Small} type="submit">
+            <Button
+              id="button__application--next"
+              iconEnd={<IconArrowRight />}
+              size={ButtonSize.Small}
+              type="submit"
+              disabled={disableNav}
+            >
               {t("common:next")}
             </Button>
           </ButtonContainer>
