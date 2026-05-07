@@ -45,7 +45,8 @@ function Page2({ application }: Pick<PropsNarrowed, "application">): JSX.Element
       if (pk == null) {
         throw new Error("Failed to save application");
       }
-      router.push(getApplicationPath(pk, "page3"));
+      // Await navigation so form "submitting" state covers the full transition.
+      await router.push(getApplicationPath(pk, "page3"));
     } catch (err) {
       displayError(err);
     }

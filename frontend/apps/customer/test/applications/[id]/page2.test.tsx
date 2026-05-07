@@ -9,6 +9,16 @@ import { getApplicationPath } from "@/modules/urls";
 import Page2 from "@/pages/applications/[id]/page2";
 import type { ApplicationPage2Query } from "@gql/gql-types";
 
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((_resolve, _reject) => {
+    resolve = _resolve;
+    reject = _reject;
+  });
+  return { promise, resolve, reject };
+}
+
 const { mockedRouterPush, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
   const mockedRouterPush = vi.fn();
@@ -100,6 +110,22 @@ describe("Application Page2", () => {
     });
     await userEvent.click(nextButton);
     expect(mockedRouterPush).toHaveBeenCalledWith(getApplicationPath(1, "page3"));
+  });
+
+  test("keeps next disabled until navigation completes", async () => {
+    const nav = deferred<boolean>();
+    mockedRouterPush.mockReturnValueOnce(nav.promise);
+    const user = userEvent.setup();
+    const view = customRender({ page: "page2" });
+    const nextButton = await view.findByRole("button", { name: "common:next" });
+
+    expect(nextButton).not.toBeDisabled();
+    await user.click(nextButton);
+    expect(mockedRouterPush).toHaveBeenCalledWith(getApplicationPath(1, "page3"));
+    expect(nextButton).toBeDisabled();
+
+    nav.resolve(true);
+    await nav.promise;
   });
 
   test("submit button is disabled without selection", async () => {

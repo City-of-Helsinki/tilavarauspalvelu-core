@@ -64,7 +64,8 @@ function Page4({ application, tos }: Pick<PropsNarrowed, "application" | "tos">)
         throw new Error("no pk in response");
       }
 
-      router.push(getApplicationPath(resPk, "sent"));
+      // Await navigation so submit stays disabled until the transition completes.
+      await router.push(getApplicationPath(resPk, "sent"));
     } catch (err) {
       dislayError(err);
     }

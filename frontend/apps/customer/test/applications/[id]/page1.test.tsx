@@ -11,6 +11,16 @@ import type { OptionsListT } from "ui/src/modules/search";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import Page1 from "@/pages/applications/[id]/page1";
 
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((_resolve, _reject) => {
+    resolve = _resolve;
+    reject = _reject;
+  });
+  return { promise, resolve, reject };
+}
+
 const { isSavingRef, mutateFn } = vi.hoisted(() => {
   const isSavingRef = { current: false };
   const mutateFn = vi.fn().mockResolvedValue({ data: { updateApplication: { pk: 1 } } });
@@ -113,6 +123,47 @@ describe("Page1", () => {
     expect(view.getByRole("button", { name: "common:next" })).toBeDisabled();
     expect(view.getByRole("button", { name: "application:Page1.createNew" })).toBeDisabled();
   });
+
+  test("keeps buttons disabled until navigation completes", async () => {
+    const params = new URLSearchParams();
+    params.set(SEASONAL_SELECTED_PARAM_KEY, "1");
+    mockedSearchParams.mockReturnValue(params);
+    const nav = deferred<boolean>();
+    mockedRouterPush.mockReturnValueOnce(nav.promise);
+
+    const view = customRender();
+    const user = userEvent.setup();
+
+    const section = view.getByTestId("application__applicationSection_0");
+    const name = within(section).getByLabelText(/application:Page1.name/);
+    await user.type(name, "Test section name");
+    await selectFirstOption(within(section), /application:Page1.ageGroup/);
+    await selectFirstOption(within(section), /application:Page1.purpose/);
+    const groupSize = within(section).getByLabelText(/application:Page1.groupSize/, { selector: "input" });
+    await user.type(groupSize, "1");
+    const checkDefaultPeriod = within(section).getByRole("checkbox", {
+      name: /application:Page1.defaultPeriodPrefix/,
+    });
+    await user.click(checkDefaultPeriod);
+    await selectFirstOption(within(section), /application:Page1.minDuration/);
+    await selectFirstOption(within(section), /application:Page1.maxDuration/);
+    const eventsPerWeek = within(section).getByLabelText(/application:Page1.eventsPerWeek/, { selector: "input" });
+    await user.clear(eventsPerWeek);
+    await user.type(eventsPerWeek, "1");
+
+    const addSectionBtn = view.getByRole("button", { name: "application:Page1.createNew" });
+    const submitBtn = view.getByRole("button", { name: "common:next" });
+    expect(addSectionBtn).not.toBeDisabled();
+    expect(submitBtn).not.toBeDisabled();
+
+    await user.click(submitBtn);
+
+    expect(submitBtn).toBeDisabled();
+    expect(addSectionBtn).toBeDisabled();
+
+    nav.resolve(true);
+    await nav.promise;
+  }, 20_000);
 
   // this case only happens if user manually removes the last section
   test("empty application should not allow submitting", async () => {
