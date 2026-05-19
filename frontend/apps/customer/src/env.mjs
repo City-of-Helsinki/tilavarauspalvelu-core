@@ -19,10 +19,9 @@ const ServerSchema = z.object({
   FEEDBACK_URL: optionalUrl,
   // Uploading sourcemaps to Sentry requires an auth token - Required on CI
   SENTRY_AUTH_TOKEN: z.string().optional(),
-  // Sentry DSN is used for error tracking - Required during runtime
-  SENTRY_DSN: z.string().optional(),
-  SENTRY_ENVIRONMENT: z.string().optional(),
   SENTRY_ENABLE_SOURCE_MAPS: coerceBoolean,
+  SENTRY_ORG: z.string().optional(),
+  SENTRY_PROJECT: z.string().optional(),
   SKIP_ENV_VALIDATION: coerceBoolean,
   HOTJAR_ENABLED: coerceBoolean,
   MATOMO_ENABLED: coerceBoolean,
@@ -38,6 +37,13 @@ const ClientSchema = z.object({
   NEXT_PUBLIC_BASE_URL: z.string().optional(),
   NEXT_PUBLIC_SOURCE_BRANCH_NAME: z.string().optional(),
   NEXT_PUBLIC_SOURCE_VERSION: z.string().optional(),
+  NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
+  NEXT_PUBLIC_SENTRY_ENVIRONMENT: z.string().optional(),
+  NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: z.string().optional(),
+  NEXT_PUBLIC_SENTRY_TRACE_PROPAGATION_TARGETS: z.string().optional(),
+  NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE: z.string().optional(),
+  NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE: z.string().optional(),
+  NEXT_PUBLIC_SENTRY_PROJECT: z.string().optional(),
 });
 
 function createEnv() {
@@ -61,6 +67,13 @@ function createEnv() {
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_SOURCE_BRANCH_NAME: process.env.NEXT_PUBLIC_SOURCE_BRANCH_NAME,
     NEXT_PUBLIC_SOURCE_VERSION: process.env.NEXT_PUBLIC_SOURCE_VERSION,
+    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    NEXT_PUBLIC_SENTRY_ENVIRONMENT: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
+    NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE,
+    NEXT_PUBLIC_SENTRY_TRACE_PROPAGATION_TARGETS: process.env.NEXT_PUBLIC_SENTRY_TRACE_PROPAGATION_TARGETS,
+    NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE: process.env.NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE,
+    NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE: process.env.NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE,
+    NEXT_PUBLIC_SENTRY_PROJECT: process.env.NEXT_PUBLIC_SENTRY_PROJECT,
   });
 
   if (!clientConfig.success) {

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import type { FC } from "react";
 import { ApolloProvider } from "@apollo/client";
 import { appWithTranslation } from "next-i18next";
@@ -30,7 +30,6 @@ import type {
   ShowNotificationsListQuery,
   ShowNotificationsListQueryVariables,
 } from "@gql/gql-types";
-import { updateSentryConfig } from "../../instrumentation-client";
 import "../styles/global.scss";
 import Layout from "./layout";
 
@@ -39,12 +38,7 @@ if (typeof window === "undefined") React.useLayoutEffect = () => {};
 
 function MyApp<T>(props: AppProps<T> & AppOwnProps): JSX.Element {
   const { Component, pageProps, currentUser, handlingData, notificationsData, envConfig } = props;
-  const { apiBaseUrl, isConsoleLoggingEnabled, sentryDsn, sentryEnvironment, version } = envConfig;
-  useEffect(() => {
-    if (sentryDsn) {
-      updateSentryConfig(sentryDsn, sentryEnvironment);
-    }
-  }, [sentryDsn, sentryEnvironment]);
+  const { apiBaseUrl, isConsoleLoggingEnabled, version } = envConfig;
 
   if (isConsoleLoggingEnabled) {
     initialiseLogWrite();

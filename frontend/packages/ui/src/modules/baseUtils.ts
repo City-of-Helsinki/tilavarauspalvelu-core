@@ -31,7 +31,8 @@ export const CSP_HEADER = `
     https://webanalytics.digiaiiris.com
     https://*.hotjar.com https://*.hotjar.io wss://*.hotjar.com
     https://sentry.test.hel.ninja
-    https://sentry.hel.fi;
+    https://sentry.hel.fi
+    https://city-of-helsinki.sentry.io;
   object-src 'none';
   frame-src https://palvelukartta.hel.fi;
   frame-ancestors 'none';

@@ -18,7 +18,7 @@ concurrency:
 env:
   SKIP_ENV_VALIDATION: "true"
   SENTRY_ORG: "city-of-helsinki"
-  SENTRY_URL: "https://sentry.hel.fi/"
+  SENTRY_URL: "https://city-of-helsinki.sentry.io"
 
 jobs:
   upload-customer-sentry-sourcemaps:
@@ -32,7 +32,7 @@ jobs:
       - name: "Create release name"
         id: release
         run: >-
-          echo "release=tilavarauspalvelu-ui@$(
+          echo "release=tilavarauspalvelu-customer-ui@$(
             echo ${{ github.ref_name || github.sha }} | tr '/' '-'
           )" >> $GITHUB_OUTPUT
       - name: Print release
@@ -41,9 +41,9 @@ jobs:
         uses: getsentry/action-release@v3
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_PROJECT: "tilavarauspalvelu-ui"
+          SENTRY_PROJECT: "tilavarauspalvelu-customer-ui"
         with:
-          environment: "prod"
+          environment: "production"
           ignore_missing: true
           release: ${{ steps.release.outputs.release }}
 
@@ -59,7 +59,7 @@ jobs:
       - name: "Create release name"
         id: release
         run: >-
-          echo "release=tilavarauspalvelu-admin-ui@$(
+          echo "release=tilavarauspalvelu-staff-ui@$(
             echo ${{ github.ref_name || github.sha }} | tr '/' '-'
           )" >> $GITHUB_OUTPUT
       - name: Print release
@@ -68,8 +68,8 @@ jobs:
         uses: getsentry/action-release@v3
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_PROJECT: "tilavarauspalvelu-admin-ui"
+          SENTRY_PROJECT: "tilavarauspalvelu-staff-ui"
         with:
-          environment: "prod"
+          environment: "production"
           ignore_missing: true
           release: ${{ steps.release.outputs.release }}

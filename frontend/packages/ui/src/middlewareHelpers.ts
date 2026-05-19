@@ -53,6 +53,10 @@ export type GqlQuery = {
   variables?: Record<string, unknown>;
 };
 
+export function removeTrailingSlash(url: string): string {
+  return url.endsWith("/") ? url.slice(0, -1) : url;
+}
+
 /// Fetch a query from the backend
 /// @param req - NextRequest used to copy headers etc.
 /// @param query - Query object with query and variables

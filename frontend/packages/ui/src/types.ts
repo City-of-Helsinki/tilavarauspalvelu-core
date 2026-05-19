@@ -11,7 +11,5 @@ export interface CommonEnvConfig {
   apiBaseUrl: string;
   feedbackUrl: string;
   isConsoleLoggingEnabled: boolean;
-  sentryDsn: string;
-  sentryEnvironment: string;
   version: string;
 }

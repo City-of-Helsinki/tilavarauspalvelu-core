@@ -24,6 +24,7 @@ jobs:
     uses: ./.github/workflows/build-ui-docker.yml
     with:
       app-name: "customer"
+      sentry-project: "tilavarauspalvelu-customer-ui"
       base-url: ""
     secrets: inherit
 
@@ -32,5 +33,6 @@ jobs:
     uses: ./.github/workflows/build-ui-docker.yml
     with:
       app-name: "staff"
+      sentry-project: "tilavarauspalvelu-staff-ui"
       base-url: "/kasittely"
     secrets: inherit

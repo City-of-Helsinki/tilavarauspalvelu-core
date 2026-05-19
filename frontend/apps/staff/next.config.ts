@@ -4,7 +4,7 @@ import * as url from "node:url";
 import { withSentryConfig } from "@sentry/nextjs";
 import { CSP_HEADER } from "ui/src/modules/baseUtils";
 import { env } from "./src/env.mjs";
-import { getVersion } from "./src/modules/baseUtils";
+import { getStaffRelease } from "./src/modules/baseUtils";
 
 // NOTE required for next-i18next to find the config file (when not .js)
 // required to be cjs because they don't support esm
@@ -93,18 +93,9 @@ const config = {
       ],
     };
   },
-  // NOTE sentry/nextjs doesn't have options to bundle static/chunks
-  // widenClientFileUpload should enable them but it doesn't
-  // the only option is custom webpack configuration to add SSR sourcemaps
+  // Sentry upload options don't fully control all emitted chunk sourcemaps.
+  // In this app, sourcemap generation is controlled via Next.js/Turbopack config.
   productionBrowserSourceMaps: env.SENTRY_ENABLE_SOURCE_MAPS,
-  webpack: (config: { devtool: string }, { isServer }: { isServer: boolean }) => {
-    if (isServer && env.SENTRY_ENABLE_SOURCE_MAPS) {
-      // oxlint-disable-next-line no-console
-      console.log("Server build: adding sourcemaps");
-      config.devtool = "source-map";
-    }
-    return config;
-  },
   basePath: env.NEXT_PUBLIC_BASE_URL,
   compiler: {
     styledComponents: {
@@ -115,10 +106,10 @@ const config = {
 };
 
 export default withSentryConfig(config, {
-  org: "city-of-helsinki",
-  project: "tilavarauspalvelu-admin-ui",
-  sentryUrl: "",
-  authToken: "",
+  // org and project are injected via SENTRY_ORG and SENTRY_PROJECT env variables in CI/CD workflows.
+  // Do not hard-code them here to avoid mismatches between build and deployment.
+
+  // Suppress all logs from SentryWebpackPlugin during local builds. In CI, logs are enabled for troubleshooting.
   silent: !process.env.CI,
   // Automatically tree-shake Sentry logger statements to reduce bundle size
   disableLogger: true,
@@ -129,7 +120,7 @@ export default withSentryConfig(config, {
     enabled: true,
   },
   release: {
-    name: getVersion().replace("/", "-"),
+    name: getStaffRelease(),
   },
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   tunnelRoute: "/monitoring",

@@ -17,7 +17,6 @@ import { ANALYTICS_COOKIE_GROUP_NAME, isBrowser } from "@/modules/const";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import type { CustomerEnvConfig } from "@/modules/serverUtils";
 import { TrackingWrapper } from "@/modules/tracking";
-import { updateSentryConfig } from "../../instrumentation-client";
 import "../styles/global.scss";
 import sitesettings from "./sitesettings.json";
 
@@ -61,13 +60,7 @@ function useHasUserAcceptedStatistics() {
 
 function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
   const { Component, envConfig, pageProps } = props;
-  const { isHotjarEnabled, isMatomoEnabled, isConsoleLoggingEnabled, apiBaseUrl, sentryDsn, sentryEnvironment } =
-    envConfig;
-  useEffect(() => {
-    if (sentryDsn) {
-      updateSentryConfig(sentryDsn, sentryEnvironment);
-    }
-  }, [sentryDsn, sentryEnvironment]);
+  const { isHotjarEnabled, isMatomoEnabled, isConsoleLoggingEnabled, apiBaseUrl } = envConfig;
 
   if (isConsoleLoggingEnabled) {
     initialiseLogWrite();

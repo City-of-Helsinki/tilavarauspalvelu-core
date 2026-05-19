@@ -8,8 +8,6 @@ export function getDefaultServerSideProps(): StaffEnvConfig {
     feedbackUrl: "",
     isConsoleLoggingEnabled: true,
     reservationUnitPreviewUrl: "",
-    sentryDsn: "",
-    sentryEnvironment: "",
     version: getVersion(),
   };
 }
@@ -21,8 +19,6 @@ export async function getCommonServerSideProps(): Promise<StaffEnvConfig> {
     feedbackUrl: env.FEEDBACK_URL ?? "",
     isConsoleLoggingEnabled: env.ENABLE_CONSOLE_LOGGING ?? false,
     reservationUnitPreviewUrl: env.RESERVATION_UNIT_PREVIEW_URL_PREFIX ?? "",
-    sentryDsn: env.SENTRY_DSN ?? "",
-    sentryEnvironment: env.SENTRY_ENVIRONMENT ?? "",
     version: getVersion(),
   };
 }

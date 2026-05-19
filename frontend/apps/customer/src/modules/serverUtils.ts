@@ -30,8 +30,6 @@ export function getDefaultServerSideProps(): CustomerEnvConfig {
     isMatomoEnabled: false,
     profileLink: "",
     feedbackUrl: "",
-    sentryDsn: "",
-    sentryEnvironment: "",
     version: getVersion(),
   };
 }
@@ -44,8 +42,6 @@ export function getCommonServerSideProps(): CustomerEnvConfig {
   const profileLink = env.PROFILE_UI_URL ?? "";
   const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
   const feedbackUrl = env.FEEDBACK_URL ?? "";
-  const sentryDsn = env.SENTRY_DSN ?? "";
-  const sentryEnvironment = env.SENTRY_ENVIRONMENT ?? "";
   const version = getVersion();
 
   return {
@@ -55,8 +51,6 @@ export function getCommonServerSideProps(): CustomerEnvConfig {
     isMatomoEnabled,
     profileLink,
     feedbackUrl,
-    sentryDsn,
-    sentryEnvironment,
     version,
   };
 }

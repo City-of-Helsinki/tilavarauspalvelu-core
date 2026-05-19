@@ -3,7 +3,7 @@ import { join } from "node:path";
 import * as url from "node:url";
 import { withSentryConfig } from "@sentry/nextjs";
 import { CSP_HEADER } from "@ui/modules/baseUtils";
-import { getVersion } from "@/modules/baseUtils";
+import { getCustomerRelease } from "@/modules/baseUtils";
 import i18nconfig from "./next-i18next.config.cjs";
 import { env } from "./src/env.mjs";
 
@@ -88,18 +88,9 @@ const nextConfig = {
       ],
     }));
   },
-  // NOTE sentry/nextjs doesn't have options to bundle static/chunks
-  // widenClientFileUpload should enable them but it doesn't
-  // the only option is custom webpack configuration to add SSR sourcemaps
+  // Sentry upload options don't fully control all emitted chunk sourcemaps.
+  // In this app, sourcemap generation is controlled via Next.js/Turbopack config.
   productionBrowserSourceMaps: env.SENTRY_ENABLE_SOURCE_MAPS,
-  webpack: (config: { devtool: string }, { isServer }: { isServer: boolean }) => {
-    if (isServer && env.SENTRY_ENABLE_SOURCE_MAPS) {
-      // oxlint-disable-next-line no-console
-      console.log("Adding sourcemaps to server build");
-      config.devtool = "source-map";
-    }
-    return config;
-  },
   // NOTE webpack.experimental.topLevelAwait breaks middleware (it hangs forever)
   compiler: {
     styledComponents: {
@@ -110,10 +101,10 @@ const nextConfig = {
 };
 
 export default withSentryConfig(nextConfig, {
-  org: "city-of-helsinki",
-  project: "tilavarauspalvelu-ui",
-  sentryUrl: "",
-  authToken: "",
+  // org and project are injected via SENTRY_ORG and SENTRY_PROJECT env variables in CI/CD workflows.
+  // Do not hard-code them here to avoid mismatches between build and deployment.
+
+  // Suppress all logs from SentryWebpackPlugin during local builds. In CI, logs are enabled for troubleshooting.
   silent: !process.env.CI,
   // For all available options, see:
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
@@ -126,10 +117,12 @@ export default withSentryConfig(nextConfig, {
     enabled: true,
   },
   release: {
-    name: getVersion().replace("/", "-"),
+    name: getCustomerRelease(),
   },
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   tunnelRoute: "/monitoring",
+  // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
+  automaticVercelMonitors: false,
   // Disable sourcemaps because we use nextjs configuration for it
   sourcemaps: {
     disable: true,
