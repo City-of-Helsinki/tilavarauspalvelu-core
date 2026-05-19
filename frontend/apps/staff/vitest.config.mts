@@ -11,6 +11,7 @@ export default defineConfig({
     coverage: {
       reporter: ["clover", "json", "lcov", "text"],
       include: ["src/**/*"],
+      exclude: ["src/instrumentation-client.ts", "src/middleware.ts", "src/pages/_app.tsx"],
       provider: "istanbul",
     },
     onConsoleLog(log: string, type: "stdout" | "stderr"): boolean | void {

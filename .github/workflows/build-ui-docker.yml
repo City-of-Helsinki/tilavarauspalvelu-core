@@ -8,6 +8,10 @@ on:
       app-name:
         required: true
         type: string
+      # Sentry project name, e.g. tilavarauspalvelu-customer-ui or tilavarauspalvelu-staff-ui
+      sentry-project:
+        required: true
+        type: string
       # Root url for the application relative to hostname
       base-url:
         required: true
@@ -34,8 +38,9 @@ jobs:
       FEEDBACK_URL: "https://lomake.hel.fi/varaamo-palaute"
       # NOTE this should only be ran for release tags (v*), but {{ github.event.release.tag_name }} is not correct during a run
       SENTRY_ENABLE_SOURCE_MAPS: true
-      SENTRY_URL: "https://sentry.hel.fi"
+      SENTRY_URL: "https://city-of-helsinki.sentry.io"
       SENTRY_ORG: "city-of-helsinki"
+      SENTRY_PROJECT: ${{ inputs.sentry-project }}
 
     permissions:
       contents: read
@@ -68,7 +73,7 @@ jobs:
     - name: "Create release name"
       id: release
       run: >-
-        echo "release=tilavarauspalvelu-$(echo ${{ inputs.app-name }})@$(
+        echo "release=${{ inputs.sentry-project }}@$(
           echo ${{ github.ref_name || github.sha }} | tr '/' '-'
         )" >> $GITHUB_OUTPUT
 
@@ -121,7 +126,7 @@ jobs:
           CI=true
           SENTRY_ENABLE_SOURCE_MAPS=${{ env.SENTRY_ENABLE_SOURCE_MAPS }}
           RELEASE_NAME=${{ steps.release.outputs.release }}
-          SENTRY_PROJECT=tilavarauspalvelu-${{ inputs.app-name }}
+          SENTRY_PROJECT=${{ env.SENTRY_PROJECT }}
           SENTRY_URL=${{ env.SENTRY_URL }}
           SENTRY_ORG=${{ env.SENTRY_ORG }}
         secrets: |
