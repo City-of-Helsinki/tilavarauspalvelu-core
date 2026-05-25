@@ -17,7 +17,7 @@ concurrency:
 env:
   PYTHON_VERSION: 3.13
   NODE_VERSION: 24
-  PNPM_VERSION: 10
+  PNPM_VERSION: 11.3.0
 
 jobs:
 
@@ -70,7 +70,7 @@ jobs:
           python-version: ${{ steps.setup-python.outputs.python-version }}
 
       - name: "Install pnpm"
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@v6
         with:
           version: ${{ env.PNPM_VERSION }}
 
