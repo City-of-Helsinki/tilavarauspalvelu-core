@@ -70,6 +70,6 @@
     "stylelint-config-styled-components": "^0.1.1",
     "typescript": "^5.9.3",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.0.14"
+    "vitest": "^4.1.0"
   }
 }
