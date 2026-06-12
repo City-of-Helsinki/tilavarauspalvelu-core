@@ -17,7 +17,7 @@ import type { StatusLabelType } from "../StatusLabel";
 
 function getAdminApplicationStatusLabelProps(status: ApplicationStatusChoice): {
   type: StatusLabelType;
-  icon: JSX.Element;
+  icon: React.ReactElement;
 } {
   switch (status) {
     case ApplicationStatusChoice.Draft:
@@ -38,7 +38,7 @@ function getAdminApplicationStatusLabelProps(status: ApplicationStatusChoice): {
 
 function getCustomerApplicationStatusLabelProps(status: ApplicationStatusChoice): {
   type: StatusLabelType;
-  icon: JSX.Element;
+  icon: React.ReactElement;
 } {
   switch (status) {
     case ApplicationStatusChoice.Draft:
@@ -69,7 +69,7 @@ type Props = {
  *  @param slim - Optional boolean for table version.
  *  @param user - The type of user viewing the label.
  * */
-export function ApplicationStatusLabel({ status, testId, slim, user }: Props): JSX.Element | null {
+export function ApplicationStatusLabel({ status, testId, slim, user }: Props): React.ReactElement | null {
   const { t } = useTranslation();
   if (!status) {
     return null;

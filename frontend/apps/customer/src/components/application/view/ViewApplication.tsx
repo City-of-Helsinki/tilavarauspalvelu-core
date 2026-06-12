@@ -9,10 +9,10 @@ import { ApplicationSectionList } from "./ApplicationSectionList";
 
 type ViewApplicationProps = {
   application: ApplicationViewFragment;
-  children: JSX.Element;
+  children: React.ReactElement;
 };
 
-export function ViewApplication({ application, children }: ViewApplicationProps): JSX.Element {
+export function ViewApplication({ application, children }: ViewApplicationProps): React.ReactElement {
   const { t } = useTranslation();
   const shouldShowNotification = application.status !== ApplicationStatusChoice.ResultsSent;
   return (

@@ -49,7 +49,7 @@ function getBreadcrumbs(t: TFunction, reservation: PropsNarrowed["reservation"])
   ] as const;
 }
 
-function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
+function ReservationCancelPage(props: PropsNarrowed): React.ReactElement {
   const { t } = useTranslation();
   const { reservation } = props;
   const routes = getBreadcrumbs(t, reservation);

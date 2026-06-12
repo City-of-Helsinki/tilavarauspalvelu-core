@@ -2,10 +2,10 @@ import React, { useEffect, useRef } from "react";
 
 interface Props {
   hash: string;
-  children: JSX.Element;
+  children: React.ReactElement;
 }
 
-export function ScrollIntoView({ hash, children }: Props): JSX.Element {
+export function ScrollIntoView({ hash, children }: Props): React.ReactElement {
   const selfRef = useRef<HTMLDivElement | null>(null);
 
   const isMatch = hash === document.location.hash?.slice(1);

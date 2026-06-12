@@ -2,7 +2,7 @@ import { isAfter, isBefore } from "date-fns";
 import type { OptionInProps } from "hds-react";
 import type { TFunction } from "i18next";
 import sanitizeHtml from "sanitize-html";
-import { minutesToHoursString, timeToMinutes } from "@ui/modules/date-utils";
+import { minutesToHoursString, timeToMinutes } from "@ui/modules/date-utils/conversion";
 import { ReservationUnitImageType } from "../../gql/gql-types";
 import type {
   AgeGroupNode,
@@ -277,7 +277,7 @@ export function mapParamToInteger(param: string[], min?: number): number[] {
   return min != null ? numbers.filter((n) => n >= min) : numbers;
 }
 
-export function filterEmpty<S, T extends Array<S> | string>(val: T | null | undefined): T | null {
+export function filterEmpty<S, T extends S[] | string>(val: T | null | undefined): T | null {
   if (val == null || val.length === 0) {
     return null;
   }
@@ -291,10 +291,7 @@ export function filterEmptyArray<T>(param: T[]): T[] | undefined {
 type PossibleKeys = string;
 type Lang = Capitalize<LocalizationLanguages>;
 // extend an arbitrary record to always have all language variants for the "key" (user defined)
-type RecordWithTranslation<K extends PossibleKeys, T extends string | null> = {
-  // enforce {K}Fi | {K}En | {K}Sv to exist in the record
-  [Property in `${K}${Lang}`]: T;
-} &
+type RecordWithTranslation<K extends PossibleKeys, T extends string | null> = Record<`${K}${Lang}`, T> &
   // allow any other keys we don't care about
   Record<string, unknown>;
 

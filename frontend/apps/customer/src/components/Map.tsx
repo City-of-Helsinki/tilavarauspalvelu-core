@@ -7,7 +7,7 @@ type Props = {
   height?: string;
 };
 
-export const Map = ({ tprekId, height = "480px" }: Props): JSX.Element | null => {
+export const Map = ({ tprekId, height = "480px" }: Props): React.ReactElement | null => {
   const { t, i18n } = useTranslation();
   const mapUrl = `${mapUrlPrefix}${i18n.language}/embed/unit/${tprekId}`;
   return (

@@ -55,7 +55,7 @@ const OuterWrapper = styled.div`
   }
 `;
 
-export function SearchGuides(): JSX.Element {
+export function SearchGuides(): React.ReactElement {
   const { t } = useTranslation("home");
   const router = useRouter();
 

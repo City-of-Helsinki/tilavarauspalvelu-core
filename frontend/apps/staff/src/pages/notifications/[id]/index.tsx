@@ -529,7 +529,7 @@ function LoadedContent({
 /// @param pk: primary key of the notification to edit, null for new notification, NaN for error
 /// Client only: uses hooks, window, and react-router-dom
 /// We don't have proper layouts yet, so just separate the container stuff here
-function PageWrapped({ pk }: { pk?: number }): JSX.Element {
+function PageWrapped({ pk }: { pk?: number }): React.ReactElement {
   const { data, loading: isLoading } = useBannerNotificationPageQuery({
     skip: !pk,
     variables: { id: createNodeId("BannerNotificationNode", pk ?? 0) },
@@ -544,7 +544,7 @@ function PageWrapped({ pk }: { pk?: number }): JSX.Element {
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page({ pk }: PropsNarrowed): JSX.Element {
+export default function Page({ pk }: PropsNarrowed): React.ReactElement {
   return (
     <AuthorizationChecker permission={UserPermissionChoice.CanManageNotifications}>
       <PageWrapped pk={pk} />

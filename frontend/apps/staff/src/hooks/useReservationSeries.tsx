@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import { errorToast } from "ui/src/components/toast";
@@ -11,15 +12,17 @@ import type { Maybe } from "@gql/gql-types";
 export function useReservationSeries(recurringPk: Maybe<number> | undefined) {
   const { t } = useTranslation();
 
-  const { data, loading, refetch } = useReservationSeriesQuery({
+  const { data, loading, refetch, error } = useReservationSeriesQuery({
     skip: !recurringPk,
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
     variables: { id: createNodeId("ReservationSeriesNode", recurringPk ?? 0) },
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
   });
+
+  useEffect(() => {
+    if (error == null) return;
+    errorToast({ text: t("errors:errorFetchingData") });
+  }, [error, t]);
 
   const { reservationSeries } = data ?? {};
   const reservations = filterNonNullable(reservationSeries?.reservations);

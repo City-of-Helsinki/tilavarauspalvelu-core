@@ -40,7 +40,7 @@ export function ReservationPopupContent({
   reservation,
 }: {
   reservation: ReservationUnitReservationsFragment;
-}): JSX.Element {
+}): React.ReactElement {
   const { t } = useTranslation();
 
   const startMins = dateToMinutes(parseValidDateObject(reservation.beginsAt));

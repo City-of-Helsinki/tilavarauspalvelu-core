@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { parseUIDateUnsafe, formatApiDateUnsafe } from "ui/src/modules/date-utils";
+/* eslint-disable-next-line import/no-cycle */
 import { useSession } from "@/hooks";
 import type { ReservationSeriesFormValues } from "@/schemas";
 import {

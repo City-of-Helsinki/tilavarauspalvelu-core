@@ -12,7 +12,7 @@ const StyledImage = styled.img`
   object-fit: cover;
 `;
 
-function RUImage({ image }: { image: ImageFormType }): JSX.Element {
+function RUImage({ image }: { image: ImageFormType }): React.ReactElement {
   // medium url seems to work when deployed but locally it's not available
   const [imageUrl, setImageUrl] = useState<string>(image.mediumUrl || image.imageUrl || "");
 
@@ -114,7 +114,7 @@ type Props = {
   className?: string;
 };
 
-export function ImageEditor({ images, setImages, style, className }: Props): JSX.Element {
+export function ImageEditor({ images, setImages, style, className }: Props): React.ReactElement {
   const { t } = useTranslation();
 
   const addImage = (files: File[]) => {
@@ -166,7 +166,6 @@ export function ImageEditor({ images, setImages, style, className }: Props): JSX
             dragAndDropInputLabel=" "
             maxSize={5_242_880}
             onChange={(files) => addImage(files)}
-            tooltipText={t("reservationUnitEditor:ImageEditor.tooltip")}
           />
         </FileInputContainer>
       </div>

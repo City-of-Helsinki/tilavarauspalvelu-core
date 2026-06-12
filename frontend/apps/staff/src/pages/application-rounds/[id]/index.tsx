@@ -62,7 +62,7 @@ export default function ApplicationRound({
   applicationRound: applicationRoundOriginal,
   optionsData,
   unitOptions,
-}: PropsNarrowed): JSX.Element {
+}: PropsNarrowed): React.ReactElement {
   const { t } = useTranslation();
   const [isInProgress, setIsInProgress] = useState(false);
 

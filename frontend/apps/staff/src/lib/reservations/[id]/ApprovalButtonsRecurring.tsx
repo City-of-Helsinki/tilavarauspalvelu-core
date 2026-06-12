@@ -22,7 +22,7 @@ export function ApprovalButtonsRecurring({
   handleClose,
   handleAccept,
   disableNonEssentialButtons,
-}: Readonly<Props>): JSX.Element | null {
+}: Readonly<Props>): React.ReactElement | null {
   const { setModalContent } = useModal();
   const denyRecurringButtonRef = useRef<HTMLButtonElement>(null);
   const { t } = useTranslation();
@@ -49,7 +49,7 @@ export function ApprovalButtonsRecurring({
         onReject={handleReject}
         onClose={handleClose}
         title={t("reservation:ApprovalButtons.recurring.DenyDialog.title")}
-        focusAfterCloseRef={denyRecurringButtonRef}
+        focusAfterCloseRef={denyRecurringButtonRef as React.RefObject<HTMLElement>}
       />
     );
   };

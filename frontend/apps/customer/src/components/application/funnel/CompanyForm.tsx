@@ -7,7 +7,7 @@ import { FormSubHeading } from "@/styled/application";
 import { BillingAddress } from "./BillingAddress";
 import type { ApplicationPage3FormValues } from "./form";
 
-export function CompanyForm(): JSX.Element {
+export function CompanyForm(): React.ReactElement {
   const { t } = useTranslation();
 
   const { watch, control } = useFormContext<ApplicationPage3FormValues>();
@@ -35,7 +35,7 @@ export function CompanyForm(): JSX.Element {
   );
 }
 
-export function ContactPersonSection(): JSX.Element {
+export function ContactPersonSection(): React.ReactElement {
   const { t } = useTranslation();
 
   return (

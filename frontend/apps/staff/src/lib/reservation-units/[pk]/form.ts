@@ -966,6 +966,11 @@ export function convertReservationUnit(data?: Node): ReservationUnitEditFormValu
 
 const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) => t && t.begin && t.end;
 
+function maybeToApiDateTime(date: string, time: string): string | null {
+  const d = fromUIDateTime(date, time);
+  return d != null ? d.toISOString() : null;
+}
+
 // Too hard to type this because of two separate mutations that have optional fields in them
 export function transformReservationUnit(values: ReservationUnitEditFormValues, taxPercentageOptions: TaxOption[]) {
   // Convert from form values to API data
@@ -1014,10 +1019,6 @@ export function transformReservationUnit(values: ReservationUnitEditFormValues, 
       reservableTimes: !s.closed ? filterNonNullable(s.reservableTimes.filter(isReservableTime)) : [],
     }));
 
-  function maybeToApiDateTime(date: string, time: string): string | null {
-    const d = fromUIDateTime(date, time);
-    return d != null ? d.toISOString() : null;
-  }
   const accessTypes: ReservationUnitAccessTypeSerializerInput[] = filterNonNullable(
     accessTypesForm.map((at) => ({
       pk: at.pk,

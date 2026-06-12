@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { gql } from "@apollo/client";
 import { addDays, addHours, addMinutes, endOfISOWeek, startOfDay, startOfISOWeek } from "date-fns";
 import { get } from "lodash-es";
@@ -123,7 +123,7 @@ function useSlotPropGetter(
   };
 }
 
-export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Props): JSX.Element {
+export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Props): React.ReactElement {
   const { t } = useTranslation();
   const { user } = useSession();
 
@@ -132,7 +132,11 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
   const calendarEventExcludedLegends = new Set(["RESERVATION_UNIT_RELEASED", "RESERVATION_UNIT_DRAFT"]);
 
   const beginDate = new Date(begin);
-  const { data, loading: isLoading } = useReservationUnitCalendarQuery({
+  const {
+    data,
+    loading: isLoading,
+    error,
+  } = useReservationUnitCalendarQuery({
     fetchPolicy: "network-only",
     skip: reservationUnitPk === 0,
     variables: {
@@ -142,12 +146,15 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
       beginDate: formatApiDate(startOfISOWeek(beginDate)) ?? "",
       endDate: formatApiDate(addDays(endOfISOWeek(beginDate), 1)) ?? "",
     },
-    onError: () => {
-      errorToast({
-        text: t("errors:errorFetchingData"),
-      });
-    },
   });
+
+  useEffect(() => {
+    if (error == null) return;
+
+    errorToast({
+      text: t("errors:errorFetchingData"),
+    });
+  }, [error, t]);
 
   const reservations = combineAffectingReservations(data, reservationUnitPk);
 

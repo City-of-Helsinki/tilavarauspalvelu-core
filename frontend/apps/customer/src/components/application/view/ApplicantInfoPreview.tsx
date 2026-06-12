@@ -25,7 +25,7 @@ const LabelValue = ({
 
 type ApplicantT = Omit<ApplicantFieldsFragment, "municipality" | "additionalInformation">;
 
-export function ApplicantInfoPreview({ application }: { application: ApplicantT }): JSX.Element {
+export function ApplicantInfoPreview({ application }: { application: ApplicantT }): React.ReactElement {
   const { t } = useTranslation();
   const applicant = {
     name: `${application.contactPersonFirstName} ${application.contactPersonLastName}`,

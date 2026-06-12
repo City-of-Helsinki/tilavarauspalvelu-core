@@ -100,7 +100,7 @@ const ProfileMenuLink = styled.div`
 
 interface IMenuChild {
   title: string;
-  icon?: JSX.Element;
+  icon?: React.ReactElement;
   routes?: string[];
   excludeRoutes?: string[];
   exact?: boolean;

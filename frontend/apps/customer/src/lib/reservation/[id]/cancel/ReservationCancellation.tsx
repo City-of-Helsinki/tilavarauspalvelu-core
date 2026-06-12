@@ -35,7 +35,7 @@ type CancellationProps = {
   reservation: NonNullable<NodeT>;
 };
 
-export function ReservationCancellation(props: CancellationProps): JSX.Element {
+export function ReservationCancellation(props: CancellationProps): React.ReactElement {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const displayError = useDisplayError();

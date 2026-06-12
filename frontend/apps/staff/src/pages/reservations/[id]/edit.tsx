@@ -143,7 +143,7 @@ function EditReservation({
   );
 }
 
-function EditPage({ pk }: { pk: number }): JSX.Element {
+function EditPage({ pk }: { pk: number }): React.ReactElement {
   const { t } = useTranslation("reservation", {
     keyPrefix: "EditPage",
   });
@@ -177,7 +177,7 @@ function EditPage({ pk }: { pk: number }): JSX.Element {
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page({ pk, unitPk }: PropsNarrowed): JSX.Element {
+export default function Page({ pk, unitPk }: PropsNarrowed): React.ReactElement {
   return (
     <AuthorizationChecker permission={UserPermissionChoice.CanManageReservations} unitPk={unitPk}>
       <EditPage pk={pk} />

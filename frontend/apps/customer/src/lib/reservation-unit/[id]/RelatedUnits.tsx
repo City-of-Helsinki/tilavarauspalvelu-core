@@ -33,7 +33,7 @@ export function RelatedUnits({
   unitPk,
   style,
   className,
-}: RelatedUnitsProps): JSX.Element | null {
+}: RelatedUnitsProps): React.ReactElement | null {
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   const isWideMobile = useMedia(`(max-width: ${breakpoints.l})`, false);
@@ -73,7 +73,7 @@ export function RelatedUnits({
   );
 }
 
-function RelatedUnitCard({ reservationUnit }: { reservationUnit: RelatedUnitCardFieldsFragment }): JSX.Element {
+function RelatedUnitCard({ reservationUnit }: { reservationUnit: RelatedUnitCardFieldsFragment }): React.ReactElement {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
 

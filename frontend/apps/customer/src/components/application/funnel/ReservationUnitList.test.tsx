@@ -100,7 +100,7 @@ function WrappedRender({
   nReservationUnitOptions: number;
   onSubmit: SubmitHandler<FormValues>;
   applicationRound: ApplicationReservationUnitListFragment;
-}): JSX.Element {
+}): React.ReactElement {
   const options = {
     units: [],
     equipments: [],

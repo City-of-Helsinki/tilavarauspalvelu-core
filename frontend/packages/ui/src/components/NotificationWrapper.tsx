@@ -28,7 +28,7 @@ export function NotificationWrapper({
   centered,
   onClose,
   ...rest
-}: NotificationPropsWithCentering): JSX.Element | null {
+}: NotificationPropsWithCentering): React.ReactElement | null {
   const [isVisible, setIsVisible] = useState(true);
 
   if (!isVisible) {

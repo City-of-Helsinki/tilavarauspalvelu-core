@@ -17,7 +17,7 @@ export function ApplicationTerms({
   serviceTos,
   isTermsAccepted,
   setIsTermsAccepted,
-}: ApplicationTermsProps): JSX.Element {
+}: ApplicationTermsProps): React.ReactElement {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   return (

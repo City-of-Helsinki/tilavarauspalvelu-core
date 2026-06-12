@@ -203,7 +203,7 @@ function transformSortString(sort: string | null): BannerNotificationOrderingCho
 }
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-export default function ApplicationRoundRouted(props: PageProps): JSX.Element {
+export default function ApplicationRoundRouted(props: PageProps): React.ReactElement {
   // Manually cache SSR query so we get proper pagination and sorting
   // while still maintaining full initial page loads
   // useEffect causes the page to redraw, so we pass the data to the Page component also

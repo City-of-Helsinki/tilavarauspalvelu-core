@@ -22,7 +22,7 @@ export function SearchTags({
   defaultTags = [],
   clearButtonLabel,
   clearButtonAriaLabel,
-}: Readonly<SearchTagsProps>): JSX.Element {
+}: Readonly<SearchTagsProps>): React.ReactElement {
   const { t } = useTranslation();
   const params = useSearchParams();
   const setParams = useSetSearchParams();

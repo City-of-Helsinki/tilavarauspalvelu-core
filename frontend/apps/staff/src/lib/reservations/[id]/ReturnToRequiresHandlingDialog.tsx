@@ -14,10 +14,10 @@ type Props = {
   reservation: ReservationType;
   onClose: () => void;
   onAccept: () => void;
-  focusAfterCloseRef: RefObject<HTMLButtonElement>;
+  focusAfterCloseRef: RefObject<HTMLElement>;
 };
 
-function DialogContent({ reservation, onClose, onAccept }: Omit<Props, "focusAfterCloseRef">): JSX.Element {
+function DialogContent({ reservation, onClose, onAccept }: Omit<Props, "focusAfterCloseRef">): React.ReactElement {
   const { t } = useTranslation();
   const displayError = useDisplayError();
 
@@ -59,7 +59,7 @@ export function ReturnToRequiresHandlingDialog({
   onClose,
   onAccept,
   focusAfterCloseRef,
-}: Readonly<Props>): JSX.Element {
+}: Readonly<Props>): React.ReactElement {
   const { isOpen } = useModal();
   const { t } = useTranslation();
 

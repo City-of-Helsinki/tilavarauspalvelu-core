@@ -25,7 +25,7 @@ const StyledLink = styled(Link)<{ $isBold?: boolean }>`
   }
 `;
 
-export function ExternalLink({ children, href, size, isBold = false }: Props): JSX.Element | null {
+export function ExternalLink({ children, href, size, isBold = false }: Props): React.ReactElement | null {
   return (
     <StyledLink href={href} target="_blank" rel="noopener noreferrer" $isBold={isBold}>
       <span>{children}</span>

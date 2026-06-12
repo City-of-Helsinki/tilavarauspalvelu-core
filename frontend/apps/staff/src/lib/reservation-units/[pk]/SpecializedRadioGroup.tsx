@@ -19,14 +19,14 @@ export function SpecializedRadioGroup({
   noTranslation,
 }: {
   name: "reservationKind" | "bufferType" | "cancellationRule";
-  options: readonly string[] | readonly { label: string; value: number }[];
+  options: ReadonlyArray<string> | ReadonlyArray<{ label: string; value: number }>;
   control: Control<ReservationUnitEditFormValues>;
   direction?: "horizontal" | "vertical";
   required?: boolean;
   noLabel?: boolean;
   noTooltip?: boolean;
   noTranslation?: boolean;
-}): JSX.Element {
+}): React.ReactElement {
   const { t } = useTranslation();
   const { fieldState } = useController({ name, control });
   const { error } = fieldState;

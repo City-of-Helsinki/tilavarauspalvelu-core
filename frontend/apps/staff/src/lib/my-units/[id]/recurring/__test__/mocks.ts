@@ -178,6 +178,7 @@ const otherMocks = [
       query: TermsOfUseDocument,
       variables: {
         termsType: TermsOfUseTypeChoices.Generic,
+        pk: "booking",
       },
     },
     result: {

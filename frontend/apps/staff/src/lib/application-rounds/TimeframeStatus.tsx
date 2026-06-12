@@ -23,7 +23,7 @@ export function TimeframeStatus({
   applicationPeriodEndsAt = "",
   isResolved,
   resolutionDate,
-}: IProps): JSX.Element {
+}: IProps): React.ReactElement {
   const { t } = useTranslation();
 
   const dateBegin = new Date(applicationPeriodBeginsAt);

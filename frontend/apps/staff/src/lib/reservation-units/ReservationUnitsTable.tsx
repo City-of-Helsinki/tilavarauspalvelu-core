@@ -100,7 +100,7 @@ export function ReservationUnitsTable({
   isLoading,
   selectedRows,
   setSelectedRows,
-}: ReservationUnitsTableProps): JSX.Element {
+}: ReservationUnitsTableProps): React.ReactElement {
   const { t } = useTranslation();
 
   const cols = getColConfig(t);

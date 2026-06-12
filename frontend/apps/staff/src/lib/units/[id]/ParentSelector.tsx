@@ -61,7 +61,7 @@ export function ParentSelector({
   selfPk,
   helperText,
   errorText,
-}: Props): JSX.Element {
+}: Props): React.ReactElement {
   const { data } = useUnitSpacesQuery({
     fetchPolicy: "no-cache",
     variables: { id: createNodeId("UnitNode", unitPk) },

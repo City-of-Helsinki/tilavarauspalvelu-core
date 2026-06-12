@@ -40,7 +40,7 @@ function UnitReservationsInner({
   unitPk,
   reservationUnitOptions,
   canCreateReservations,
-}: Omit<UnitReservationsProps, "tagOptions">): JSX.Element {
+}: Omit<UnitReservationsProps, "tagOptions">): React.ReactElement {
   const searchParams = useSearchParams();
   const { t } = useTranslation();
   const { reservationUnitTypeFilter } = useGetFilterSearchParams();
@@ -77,7 +77,7 @@ function UnitReservationsInner({
   );
 }
 
-export function UnitReservations({ tagOptions, ...props }: UnitReservationsProps): JSX.Element {
+export function UnitReservations({ tagOptions, ...props }: UnitReservationsProps): React.ReactElement {
   const { t } = useTranslation();
 
   const searchParams = useSearchParams();

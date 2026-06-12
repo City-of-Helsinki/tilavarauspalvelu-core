@@ -56,7 +56,7 @@ function getStatus(reservationUnit: Pick<NodeT, "reservationBeginsAt" | "reserva
 export function ReservationInfoSection({
   reservationUnit,
   reservationUnitIsReservable,
-}: ReservationInfoSectionProps): JSX.Element | null {
+}: ReservationInfoSectionProps): React.ReactElement | null {
   const { t } = useTranslation();
 
   if (!reservationUnitIsReservable) {
@@ -108,7 +108,7 @@ function ReservationMinMaxDaysBefore(props: Pick<NodeT, "reservationsMaxDaysBefo
 function ReservationDuration({
   minReservationDuration,
   maxReservationDuration,
-}: Pick<NodeT, "minReservationDuration" | "maxReservationDuration">): JSX.Element | null {
+}: Pick<NodeT, "minReservationDuration" | "maxReservationDuration">): React.ReactElement | null {
   const { t } = useTranslation();
 
   if (minReservationDuration == null || maxReservationDuration == null) {
@@ -130,7 +130,7 @@ function ReservationDuration({
 
 function ReservationMaxReservationsPerUser({
   maxReservationsPerUser,
-}: Pick<NodeT, "maxReservationsPerUser">): JSX.Element | null {
+}: Pick<NodeT, "maxReservationsPerUser">): React.ReactElement | null {
   const { t } = useTranslation();
   if (maxReservationsPerUser == null) {
     return null;
@@ -151,7 +151,7 @@ function ReservationStatus({
   reservationUnit,
 }: {
   reservationUnit: Pick<NodeT, "reservationEndsAt" | "reservationBeginsAt">;
-}): JSX.Element | null {
+}): React.ReactElement | null {
   const { t, i18n } = useTranslation();
   const locale = getLocalizationLang(i18n.language);
   const reservationStatus = getStatus(reservationUnit);

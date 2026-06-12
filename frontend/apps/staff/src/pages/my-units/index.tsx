@@ -7,7 +7,7 @@ import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { Filters, UnitsDataLoader } from "@/components/units";
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-export default function Page(_props: PageProps): JSX.Element {
+export default function Page(_props: PageProps): React.ReactElement {
   const { t } = useTranslation();
 
   return (

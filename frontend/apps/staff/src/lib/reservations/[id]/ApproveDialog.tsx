@@ -30,7 +30,7 @@ type Props = {
   onClose: () => void;
   onAccept: () => void;
   isFree?: boolean;
-  focusAfterCloseRef?: React.RefObject<HTMLButtonElement>;
+  focusAfterCloseRef?: React.RefObject<HTMLElement>;
 };
 
 const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
@@ -133,7 +133,13 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
   );
 };
 
-export function ApproveDialog({ reservation, isFree, onClose, onAccept, focusAfterCloseRef }: Props): JSX.Element {
+export function ApproveDialog({
+  reservation,
+  isFree,
+  onClose,
+  onAccept,
+  focusAfterCloseRef,
+}: Props): React.ReactElement {
   const { isOpen } = useModal();
   const { t } = useTranslation();
 

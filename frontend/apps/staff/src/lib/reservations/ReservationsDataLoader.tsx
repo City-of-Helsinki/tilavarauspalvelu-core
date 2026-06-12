@@ -76,7 +76,7 @@ function mapFilterParams(searchParams: ReadonlyURLSearchParams): ReservationList
   };
 }
 
-export function ReservationsDataLoader(): JSX.Element {
+export function ReservationsDataLoader(): React.ReactElement {
   const { t } = useTranslation();
   const [sort, setSort] = useState<string>("-state");
   const onSortChanged = (sortField: string) => {

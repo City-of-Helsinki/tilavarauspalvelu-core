@@ -65,7 +65,7 @@ function filterStep(step: number | null): 0 | 1 {
 // - using back multiple times breaks the confirmation hook (bypassing it or blocking the navigation while deleting the reservation)
 // - requires complex logic to handle the steps and keep the url in sync with what's on the page
 // - forward / backward navigation work differently
-function NewReservation(props: PropsNarrowed): JSX.Element | null {
+function NewReservation(props: PropsNarrowed): React.ReactElement | null {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
@@ -177,7 +177,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   );
 }
 
-function NewReservationWrapper(props: PropsNarrowed): JSX.Element | null {
+function NewReservationWrapper(props: PropsNarrowed): React.ReactElement | null {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   const { reservation } = props;

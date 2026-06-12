@@ -18,7 +18,7 @@ type Props = {
   onNextPage: () => void;
   children: React.ReactNode;
 };
-export function Page1({ unit, closeModal, hasFixedParent, form, onNextPage, children }: Props): JSX.Element {
+export function Page1({ unit, closeModal, hasFixedParent, form, onNextPage, children }: Props): React.ReactElement {
   const { t } = useTranslation();
   const { control } = form;
 

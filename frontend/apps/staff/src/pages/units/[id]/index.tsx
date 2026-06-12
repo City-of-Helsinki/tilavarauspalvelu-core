@@ -58,7 +58,7 @@ const EmptyContainer = styled(Flex).attrs({
   min-height: 20rem;
 `;
 
-function Unit({ unitPk }: { unitPk: number }): JSX.Element {
+function Unit({ unitPk }: { unitPk: number }): React.ReactElement {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -134,7 +134,7 @@ function Unit({ unitPk }: { unitPk: number }): JSX.Element {
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page({ pk }: PropsNarrowed): JSX.Element {
+export default function Page({ pk }: PropsNarrowed): React.ReactElement {
   return (
     <AuthorizationChecker permission={UserPermissionChoice.CanManageReservationUnits}>
       <Unit unitPk={pk} />

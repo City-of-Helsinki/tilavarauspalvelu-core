@@ -20,7 +20,10 @@ type SummaryReserveeFieldsProps = {
 
 /// Component to show the application fields in the reservation confirmation
 /// This requires the reservation to be finalized (reserveeType is set)
-export function SummaryReserveeFields({ reservation, options }: Readonly<SummaryReserveeFieldsProps>): JSX.Element {
+export function SummaryReserveeFields({
+  reservation,
+  options,
+}: Readonly<SummaryReserveeFieldsProps>): React.ReactElement {
   const { t } = useTranslation();
   const formType = reservation.reservationUnit.reservationForm;
 
@@ -65,7 +68,7 @@ export function SummaryGeneralFields({
 }: {
   reservation: ReservationFormFieldsFragment;
   options: OptionsRecord;
-}): JSX.Element | null {
+}): React.ReactElement | null {
   const { t } = useTranslation();
 
   const generalFields = getExtendedGeneralFormFields();

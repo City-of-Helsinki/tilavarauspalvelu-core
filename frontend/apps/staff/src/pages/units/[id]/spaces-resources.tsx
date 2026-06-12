@@ -25,7 +25,7 @@ const ActionButton = styled(Button)`
 `;
 
 /// The unit specific space and resources listing
-function SpacesResources({ unitPk }: { unitPk: number }): JSX.Element {
+function SpacesResources({ unitPk }: { unitPk: number }): React.ReactElement {
   const { t } = useTranslation();
 
   const newSpacesButtonRef = createRef<HTMLButtonElement>();
@@ -60,7 +60,7 @@ function SpacesResources({ unitPk }: { unitPk: number }): JSX.Element {
         id="space-modal"
         isOpen
         close={() => setModalContent(null)}
-        focusAfterCloseRef={newSpacesButtonRef}
+        focusAfterCloseRef={newSpacesButtonRef as React.RefObject<HTMLElement>}
         closeButtonLabelText={t("common:close")}
         aria-labelledby="modal-header"
       >
@@ -75,7 +75,7 @@ function SpacesResources({ unitPk }: { unitPk: number }): JSX.Element {
         id="resource-modal"
         isOpen
         close={() => setModalContent(null)}
-        focusAfterCloseRef={newResourceButtonRef}
+        focusAfterCloseRef={newResourceButtonRef as React.RefObject<HTMLElement>}
         closeButtonLabelText={t("common:close")}
         aria-labelledby="modal-header"
       >
@@ -118,7 +118,7 @@ function SpacesResources({ unitPk }: { unitPk: number }): JSX.Element {
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page(props: PropsNarrowed): JSX.Element {
+export default function Page(props: PropsNarrowed): React.ReactElement {
   return (
     <AuthorizationChecker permission={UserPermissionChoice.CanManageReservationUnits}>
       <SpacesResources unitPk={props.pk} />

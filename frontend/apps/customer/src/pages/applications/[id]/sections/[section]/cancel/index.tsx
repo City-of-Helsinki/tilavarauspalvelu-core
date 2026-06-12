@@ -34,7 +34,7 @@ import type { ApplicationSectionCancelQuery, ApplicationSectionCancelQueryVariab
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
-function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
+function ReservationCancelPage(props: PropsNarrowed): React.ReactElement {
   const { t, i18n } = useTranslation();
   const { applicationSection } = props;
   const applicationPk = applicationSection?.application?.pk;

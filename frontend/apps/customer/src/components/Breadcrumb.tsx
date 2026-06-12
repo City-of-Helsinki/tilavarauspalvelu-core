@@ -65,7 +65,10 @@ const Slug = styled.span<{ $current?: boolean }>`
   max-width: ${LIMIT_DEFAULT_CH}ch;
 `;
 
-function BreadcrumbImpl({ routes, isMobile }: Pick<Props, "routes"> & { isMobile: boolean }): JSX.Element | null {
+function BreadcrumbImpl({
+  routes,
+  isMobile,
+}: Pick<Props, "routes"> & { isMobile: boolean }): React.ReactElement | null {
   const routesWithSlug = routes?.filter((n) => n.slug != null && n.slug !== "");
   const lastRoute = routes[routes.length - 1];
   const lastRouteWithSlug = routesWithSlug[routesWithSlug.length - 1];
@@ -107,7 +110,7 @@ function BreadcrumbImpl({ routes, isMobile }: Pick<Props, "routes"> & { isMobile
   );
 }
 
-export function Breadcrumb({ routes }: Readonly<Props>): JSX.Element {
+export function Breadcrumb({ routes }: Readonly<Props>): React.ReactElement {
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 

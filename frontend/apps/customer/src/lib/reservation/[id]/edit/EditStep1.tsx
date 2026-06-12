@@ -79,7 +79,7 @@ const StyledForm = styled.form`
   }
 `;
 
-export function EditStep1({ reservation, options, onBack, form }: Props): JSX.Element {
+export function EditStep1({ reservation, options, onBack, form }: Props): React.ReactElement {
   const { t } = useTranslation();
 
   const reservationUnit = reservation.reservationUnit;

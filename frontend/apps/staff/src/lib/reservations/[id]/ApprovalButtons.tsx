@@ -53,7 +53,7 @@ export function ApprovalButtons({ isFree, reservation, handleClose, handleAccept
         reservation={reservation}
         onReject={handleAccept}
         onClose={handleClose}
-        focusAfterCloseRef={denyButtonRef}
+        focusAfterCloseRef={denyButtonRef as React.RefObject<HTMLElement>}
       />
     );
   };
@@ -64,7 +64,7 @@ export function ApprovalButtons({ isFree, reservation, handleClose, handleAccept
         reservation={reservation}
         onAccept={handleAccept}
         onClose={handleClose}
-        focusAfterCloseRef={returnToHandlingButtonRef}
+        focusAfterCloseRef={returnToHandlingButtonRef as React.RefObject<HTMLElement>}
       />
     );
   };
@@ -76,7 +76,7 @@ export function ApprovalButtons({ isFree, reservation, handleClose, handleAccept
         reservation={reservation}
         onAccept={handleAccept}
         onClose={handleClose}
-        focusAfterCloseRef={approvalButtonRef}
+        focusAfterCloseRef={approvalButtonRef as React.RefObject<HTMLElement>}
       />
     );
   };

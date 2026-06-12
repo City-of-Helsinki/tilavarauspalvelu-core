@@ -24,7 +24,7 @@ type Props = {
   requiresPayment: boolean;
 };
 
-export function ReservationStep1({ reservation, options, requiresPayment }: Props): JSX.Element {
+export function ReservationStep1({ reservation, options, requiresPayment }: Props): React.ReactElement {
   const { t, i18n } = useTranslation();
   // empty react-hook-form on purpose (still using old useState for data)
   const {

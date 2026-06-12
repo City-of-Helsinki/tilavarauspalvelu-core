@@ -9,7 +9,7 @@ import type { InstructionsFragment, Maybe } from "@gql/gql-types";
 type Props = {
   reservation: InstructionsFragment;
 };
-export function Instructions({ reservation }: Props): JSX.Element | null {
+export function Instructions({ reservation }: Props): React.ReactElement | null {
   const { t, i18n } = useTranslation();
 
   const lang = getLocalizationLang(i18n.language);

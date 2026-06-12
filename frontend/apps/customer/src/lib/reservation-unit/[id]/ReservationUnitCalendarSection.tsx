@@ -27,7 +27,7 @@ export function ReservationUnitCalendarSection({
 } & Pick<
   ReservationTimePickerProps,
   "startingTimeOptions" | "blockingReservations" | "loginAndSubmitButton" | "submitReservation"
->): JSX.Element {
+>): React.ReactElement {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   const reservableTimes = useReservableTimes(reservationUnit);
@@ -67,7 +67,7 @@ export const RESERVATION_QUOTA_REACHED_QUERY = gql`
   }
 `;
 
-function ReservationQuotaReached(props: ReservationQuotaReachedFragment): JSX.Element | null {
+function ReservationQuotaReached(props: ReservationQuotaReachedFragment): React.ReactElement | null {
   const { t } = useTranslation("reservationCalendar", {
     keyPrefix: "reservationQuota",
   });

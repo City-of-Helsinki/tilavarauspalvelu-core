@@ -17,7 +17,7 @@ type Props = {
   onPrev: () => void;
 };
 
-export function WeekNavigation({ date, onNext, onPrev }: Props): JSX.Element {
+export function WeekNavigation({ date, onNext, onPrev }: Props): React.ReactElement {
   const d = new Date(date);
   const { t } = useTranslation();
 

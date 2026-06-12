@@ -97,7 +97,7 @@ export function Filters({
   defaultFilters = [],
   clearButtonLabel,
   clearButtonAriaLabel,
-}: Readonly<FilterProps>): JSX.Element {
+}: Readonly<FilterProps>): React.ReactElement {
   const { t } = useTranslation();
   const setSearchParams = useSetSearchParams();
   const searchParams = useSearchParams();

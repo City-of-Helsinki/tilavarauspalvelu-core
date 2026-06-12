@@ -21,7 +21,7 @@ type Props = {
 type ColumnType = {
   headerName: string;
   key: string;
-  transform?: (unit: UnitTableElementFragment) => JSX.Element | string;
+  transform?: (unit: UnitTableElementFragment) => React.ReactElement | string;
   width: string;
   isSortable: boolean;
 };
@@ -57,7 +57,13 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
   ];
 }
 
-export function UnitsTable({ sort, sortChanged: onSortChanged, units, isMyUnits, isLoading }: Props): JSX.Element {
+export function UnitsTable({
+  sort,
+  sortChanged: onSortChanged,
+  units,
+  isMyUnits,
+  isLoading,
+}: Props): React.ReactElement {
   const { t } = useTranslation();
 
   const cols = memoize(() => getColConfig(t, isMyUnits))();

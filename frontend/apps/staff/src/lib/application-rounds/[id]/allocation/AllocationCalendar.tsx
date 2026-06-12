@@ -259,6 +259,8 @@ function isAllocated(ae: ReservationUnitOptionNodeT, cell: Cell, day: DayT): boo
   return ae.allocatedTimeSlots.map((tr) => isInsideCell(day, cell, tr)).some(Boolean);
 }
 
+const isNotHandled = (ae: SectionNodeT) => ae.status !== ApplicationSectionStatusChoice.Handled;
+
 function usePriorityFilteredApplicationSections(aes: Props["applicationSections"]): SectionNodeT[] {
   const { priorityFilter } = useGetFilterSearchParams();
 
@@ -275,7 +277,7 @@ function usePriorityFilteredApplicationSections(aes: Props["applicationSections"
   });
 }
 
-export function AllocationCalendar({ applicationSections, relatedAllocations }: Props): JSX.Element {
+export function AllocationCalendar({ applicationSections, relatedAllocations }: Props): React.ReactElement {
   const [cells] = useState(
     applicationEventSchedulesToCells(ALLOCATION_CALENDAR_TIMES[0], ALLOCATION_CALENDAR_TIMES[1])
   );
@@ -285,8 +287,6 @@ export function AllocationCalendar({ applicationSections, relatedAllocations }: 
   const [focusedAllocated] = useFocusAllocatedSlot();
 
   const data = WEEKDAYS.map((day) => {
-    const isNotHandled = (ae: (typeof aes)[0]) => ae.status !== ApplicationSectionStatusChoice.Handled;
-
     // Only show allocated that match the unit and day
     const timeslots = filterNonNullable(aes)
       .filter(isNotHandled)
@@ -383,7 +383,7 @@ function CalendarDay({
   cells: Cell[];
   focusedSlots: Slot[];
   relatedTimeSpans: RelatedSlot[];
-}): JSX.Element {
+}): React.ReactElement {
   const { t } = useTranslation();
 
   const { selection, setSelection, isSelecting, handleFinishSelection, handleStartSelection } = useSelection();

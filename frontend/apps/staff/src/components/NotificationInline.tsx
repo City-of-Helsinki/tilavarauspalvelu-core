@@ -45,7 +45,7 @@ function getIcon(type: NotificationProps["type"]): React.ReactNode {
 /// Inline replacement for HDS Notification component.
 /// Without this the inline icon is not aligned properly.
 /// Doesn't include the title (label) prop of HDS Notification.
-export function NotificationInline({ children, type }: Props): JSX.Element {
+export function NotificationInline({ children, type }: Props): React.ReactElement {
   return (
     <StyledNotification type={type}>
       {getIcon(type)}

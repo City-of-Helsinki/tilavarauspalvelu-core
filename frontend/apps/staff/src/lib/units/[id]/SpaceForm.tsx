@@ -50,7 +50,7 @@ type Props = {
   form: UseFormReturn<SpaceUpdateForm>;
 };
 
-export function SpaceForm({ form }: Props): JSX.Element {
+export function SpaceForm({ form }: Props): React.ReactElement {
   const { t } = useTranslation();
 
   const { control, register, formState } = form;

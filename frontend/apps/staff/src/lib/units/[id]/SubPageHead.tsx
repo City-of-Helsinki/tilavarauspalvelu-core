@@ -17,7 +17,7 @@ const Name = styled.p`
   margin: 0;
 `;
 
-export function SubPageHead({ title, unit }: IProps): JSX.Element {
+export function SubPageHead({ title, unit }: IProps): React.ReactElement {
   const { t } = useTranslation();
 
   return (

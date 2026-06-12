@@ -20,7 +20,7 @@ const Paragraph = styled.p`
   max-width: var(--prose-width);
 `;
 
-function Sent({ pk }: PropsNarrowed): JSX.Element {
+function Sent({ pk }: PropsNarrowed): React.ReactElement {
   const { t } = useTranslation();
 
   const routes = [

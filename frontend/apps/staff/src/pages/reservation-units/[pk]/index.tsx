@@ -186,7 +186,7 @@ function ReservationUnitEditor({
   previewUrlPrefix: string;
   unitPk: number;
   apiBaseUrl: string;
-}): JSX.Element | null {
+}): React.ReactElement | null {
   // ----------------------------- State and Hooks ----------------------------
   const { t } = useTranslation();
   const router = useRouter();
@@ -359,7 +359,7 @@ type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 
 /// Wrap the editor so we never reset the form after async loading (because of HDS TimeInput bug)
-export default function EditorPage(props: PropsNarrowed): JSX.Element {
+export default function EditorPage(props: PropsNarrowed): React.ReactElement {
   const { reservationUnitPk, unitPk } = props;
   const {
     data,

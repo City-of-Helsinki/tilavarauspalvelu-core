@@ -96,7 +96,7 @@ export function AllocatedCard({
   applicationSection,
   refetchApplicationEvents,
   allocatedTimeSlot,
-}: Omit<Props, "timeSlot" | "selection" | "isAllocationEnabled" | "reservationUnitOptionPk">): JSX.Element {
+}: Omit<Props, "timeSlot" | "selection" | "isAllocationEnabled" | "reservationUnitOptionPk">): React.ReactElement {
   const { t } = useTranslation();
 
   const [refresh, isRefreshLoading] = useRefreshApplications(refetchApplicationEvents);
@@ -177,7 +177,7 @@ export function SuitableTimeCard({
   isAllocationEnabled,
   refetchApplicationEvents,
   timeSlot,
-}: Omit<Props, "allocatedTimeSlot">): JSX.Element {
+}: Omit<Props, "allocatedTimeSlot">): React.ReactElement {
   const { t } = useTranslation();
 
   const [refresh, isRefreshLoading] = useRefreshApplications(refetchApplicationEvents);

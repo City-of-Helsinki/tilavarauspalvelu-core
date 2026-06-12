@@ -35,7 +35,7 @@ const handleClick = () => {
   window.scroll({ top: 0, left: 0, behavior: "smooth" });
 };
 
-export function ScrollToTop(): JSX.Element | null {
+export function ScrollToTop(): React.ReactElement | null {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
 

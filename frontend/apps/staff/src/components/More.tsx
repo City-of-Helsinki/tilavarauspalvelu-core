@@ -12,7 +12,7 @@ type Props = {
   fetchMore: (cursor: string) => Promise<ApolloQueryResult<Query>>;
 };
 
-export function More({ count, totalCount, pageInfo, fetchMore }: Props): JSX.Element {
+export function More({ count, totalCount, pageInfo, fetchMore }: Props): React.ReactElement {
   const { t } = useTranslation();
   const [isFetching, setIsFetching] = useState(false);
 

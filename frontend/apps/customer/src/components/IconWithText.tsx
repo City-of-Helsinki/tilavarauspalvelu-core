@@ -2,11 +2,11 @@ import React from "react";
 import { Flex } from "ui/src/styled";
 
 type IconWithTextProps = {
-  icon: JSX.Element;
-  text: string | JSX.Element;
+  icon: React.ReactElement;
+  text: string | React.ReactElement;
 };
 
-export function IconWithText({ icon, text, ...rest }: IconWithTextProps): JSX.Element {
+export function IconWithText({ icon, text, ...rest }: IconWithTextProps): React.ReactElement {
   return (
     <Flex
       $gap="xs"

@@ -45,7 +45,7 @@ function TouchCellWrapper({
   value,
   onSelectSlot,
 }: // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO Calendar prop typing
-any): JSX.Element {
+any): React.ReactElement {
   return cloneElement(Children.only(children), {
     onTouchEnd: () => onSelectSlot({ action: "click", slots: [value] }),
   });
@@ -72,7 +72,7 @@ export type ReservationTimePickerProps = Readonly<{
   reservationForm: UseFormReturn<PendingReservationFormType>;
   isReservationQuotaReached: boolean;
   submitReservation: (d: PendingReservationFormType) => void;
-  loginAndSubmitButton?: JSX.Element;
+  loginAndSubmitButton?: React.ReactElement;
   startingTimeOptions: Array<{ value: string; label: string }>;
 }>;
 
@@ -172,7 +172,7 @@ export function ReservationTimePicker({
   submitReservation,
   startingTimeOptions,
   blockingReservations,
-}: ReservationTimePickerProps): JSX.Element {
+}: ReservationTimePickerProps): React.ReactElement {
   const { t, i18n } = useTranslation();
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
   const { watch, setValue } = reservationForm;

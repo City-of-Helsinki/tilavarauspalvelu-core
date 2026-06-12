@@ -131,7 +131,7 @@ export function ApplicationSectionCard({
   reservationUnit,
   type,
   refetch,
-}: Props): JSX.Element | null {
+}: Props): React.ReactElement | null {
   const { t } = useTranslation();
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -240,7 +240,7 @@ function SchedulesList({
   section: SectionNodeT;
   eventsPerWeek: number;
   refetch: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
-}): JSX.Element {
+}): React.ReactElement {
   const { t } = useTranslation();
 
   // NOTE we want only the allocated slots here, but we need the information about which reservation unit it's allocated to
@@ -348,7 +348,7 @@ function AllocatedScheduleSection({
 }: {
   allocatedTimeSlot: AllocatedT;
   currentReservationUnit: ReservationUnitT;
-}): JSX.Element {
+}): React.ReactElement {
   const { t } = useTranslation();
   const [focused, setFocused] = useFocusAllocatedSlot();
   const isActive = allocatedTimeSlot.pk === focused;

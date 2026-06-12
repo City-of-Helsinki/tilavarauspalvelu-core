@@ -48,7 +48,7 @@ import type {
 
 type SeasonalSearchProps = ReadonlyDeep<Pick<NarrowedProps, "applicationRound" | "options">>;
 
-function SeasonalSearch({ applicationRound, options }: Readonly<SeasonalSearchProps>): JSX.Element {
+function SeasonalSearch({ applicationRound, options }: Readonly<SeasonalSearchProps>): React.ReactElement {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   const searchValues = useSearchParams();

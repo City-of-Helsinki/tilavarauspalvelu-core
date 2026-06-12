@@ -74,7 +74,7 @@ const StyledCheckbox = styled(Checkbox)`
 export interface TermBoxProps extends HTMLAttributes<HTMLDivElement> {
   id?: string;
   heading?: string;
-  body: string | JSX.Element;
+  body: string | React.ReactElement;
   links?: LinkT[];
   acceptLabel?: string;
   accepted?: boolean;
@@ -90,7 +90,7 @@ export function TermsBox({
   accepted,
   setAccepted,
   ...rest
-}: TermBoxProps): JSX.Element {
+}: TermBoxProps): React.ReactElement {
   const canAccept = Boolean(acceptLabel) && setAccepted != null;
 
   return (

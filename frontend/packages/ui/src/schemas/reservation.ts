@@ -247,7 +247,13 @@ type ReservationSchemaT = ReturnType<typeof getReservationSchemaUnrefined> | typ
 
 function getReservationFormSchemaImpl(reservationUnit: ReservationUnitForRefinement): ReservationSchemaT {
   if (reservationUnit.reservationForm === ReservationFormType.ContactInfoForm) {
-    return ContactInfoFormSchema;
+    return ContactInfoFormSchema.refine(
+      (val) => !val.applyingForFreeOfCharge || (val.freeOfChargeReason != null && val.freeOfChargeReason.length > 0),
+      {
+        path: ["freeOfChargeReason"],
+        message: "Required",
+      }
+    );
   }
   return getReservationSchemaUnrefined(reservationUnit)
     .refine((val) => val.reserveeType === ReserveeType.Individual || val.reserveeOrganisationName.length > 0, {
@@ -263,18 +269,19 @@ function getReservationFormSchemaImpl(reservationUnit: ReservationUnitForRefinem
         path: ["reserveeIdentifier"],
         message: "Required",
       }
+    )
+    .refine(
+      (val) => !val.applyingForFreeOfCharge || (val.freeOfChargeReason != null && val.freeOfChargeReason.length > 0),
+      {
+        path: ["freeOfChargeReason"],
+        message: "Required",
+      }
     );
 }
 
 /// Get the schema that matches the selected FormType
 export function getReservationFormSchema(reservationUnit: ReservationUnitForRefinement): ReservationSchemaT {
-  return getReservationFormSchemaImpl(reservationUnit).refine(
-    (val) => !val.applyingForFreeOfCharge || (val.freeOfChargeReason != null && val.freeOfChargeReason.length > 0),
-    {
-      path: ["freeOfChargeReason"],
-      message: "Required",
-    }
-  );
+  return getReservationFormSchemaImpl(reservationUnit);
 }
 
 export type ReservationFormValues = z.infer<ReservationSchemaT>;

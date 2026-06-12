@@ -134,7 +134,7 @@ export function ReservationUnitModalContent({
   handleRemove,
   currentReservationUnits,
   options,
-}: ReservationUnitModalProps): JSX.Element {
+}: ReservationUnitModalProps): React.ReactElement {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
 

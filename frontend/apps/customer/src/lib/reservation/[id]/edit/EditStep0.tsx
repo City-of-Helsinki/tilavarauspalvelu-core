@@ -92,7 +92,7 @@ type EditStep0Props = {
 };
 
 // Non null assertion to simplify types
-function EditStep0Wrapped(props: EditStep0Props): JSX.Element {
+function EditStep0Wrapped(props: EditStep0Props): React.ReactElement {
   const reservationUnit = props.reservation.reservationUnit;
   if (reservationUnit == null) {
     return <ErrorComponent statusCode={404} />;
@@ -109,7 +109,7 @@ function EditStep0({
   nextStep,
 }: EditStep0Props & {
   reservationUnit: ReservationUnitT;
-}): JSX.Element | null {
+}): React.ReactElement | null {
   const { t, i18n } = useTranslation();
   const activeApplicationRounds = reservationUnit.applicationRounds;
   const originalBegin = new Date(reservation.beginsAt);

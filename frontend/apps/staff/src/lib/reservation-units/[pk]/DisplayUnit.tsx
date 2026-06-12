@@ -36,7 +36,7 @@ export function DisplayUnit({
   unit?: UnitSubpageHeadFragment | null;
   unitState?: ReservationUnitPublishingState;
   reservationState?: ReservationUnitReservationState;
-}): JSX.Element {
+}): React.ReactElement {
   return (
     <>
       <TitleSection>

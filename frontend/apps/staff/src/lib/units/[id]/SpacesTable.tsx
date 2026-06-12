@@ -34,7 +34,7 @@ type SpacesTableColumn = {
   headerName: string;
   key: string;
   isSortable: boolean;
-  transform?: (space: SpaceT) => JSX.Element | string;
+  transform?: (space: SpaceT) => React.ReactElement | string;
 };
 
 interface IProps {
@@ -42,7 +42,7 @@ interface IProps {
   refetch: () => Promise<unknown>;
 }
 
-export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
+export function SpacesTable({ unit, refetch }: IProps): React.ReactElement {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
 
@@ -97,7 +97,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
         id="spaces-table-modal-id"
         isOpen
         close={closeModal}
-        focusAfterCloseRef={ref}
+        focusAfterCloseRef={ref as React.RefObject<HTMLElement>}
         closeButtonLabelText={t("common:close")}
         aria-labelledby="modal-header"
       >
@@ -180,7 +180,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     },
   ];
 
-  const ref = useRef(null);
+  const ref = useRef<HTMLElement>(null);
 
   const rows = [...(unit?.spaces ?? [])];
 

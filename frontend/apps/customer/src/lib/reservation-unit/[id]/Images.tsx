@@ -53,7 +53,7 @@ const LargeImage = styled.img`
   max-width: 100%;
 `;
 
-export function Images({ images, contextName }: Props): JSX.Element {
+export function Images({ images, contextName }: Props): React.ReactElement {
   const { t } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
   const [showModal, setShowModal] = useState(false);
@@ -94,7 +94,7 @@ export function Images({ images, contextName }: Props): JSX.Element {
         id="reservation-unit-images-modal"
         close={() => setShowModal(false)}
         isOpen={showModal}
-        focusAfterCloseRef={ref}
+        focusAfterCloseRef={ref as React.RefObject<HTMLElement>}
         closeButtonLabelText={t("common:close")}
         aria-labelledby="modal-header"
       >

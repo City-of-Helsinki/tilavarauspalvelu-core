@@ -42,7 +42,7 @@ function ActivationGroup<T extends FieldValues>({
   noMargin = false,
   style,
   className,
-}: ControllerProps<T>): JSX.Element {
+}: ControllerProps<T>): React.ReactElement {
   const {
     field: { value, onChange },
   } = useController({ control, name });

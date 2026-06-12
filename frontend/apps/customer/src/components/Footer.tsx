@@ -67,7 +67,7 @@ export function Footer({ feedbackUrl }: { feedbackUrl: string }) {
   );
 }
 
-function ExternalLinkIcon({ size = "s" }: { size?: "s" | "xs" }): JSX.Element {
+function ExternalLinkIcon({ size = "s" }: { size?: "s" | "xs" }): React.ReactElement {
   const s = size === "xs" ? IconSize.ExtraSmall : IconSize.Small;
   return <IconLinkExternal size={s} aria-hidden="true" />;
 }

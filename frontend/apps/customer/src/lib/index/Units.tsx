@@ -51,7 +51,7 @@ type Props = {
   units: Readonly<UnitListFieldsFragment[]>;
 };
 
-export function Units({ units }: Props): JSX.Element | null {
+export function Units({ units }: Props): React.ReactElement | null {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
 

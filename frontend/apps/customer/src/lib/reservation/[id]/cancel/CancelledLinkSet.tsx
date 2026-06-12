@@ -15,7 +15,7 @@ type Props =
       apiBaseUrl: string;
     };
 
-function BaseLinkSet(props: Props): JSX.Element {
+function BaseLinkSet(props: Props): React.ReactElement {
   const { apiBaseUrl } = props;
   const { t } = useTranslation();
   const resUnitUrl = "reservationUnitHome" in props ? props.reservationUnitHome : null;
@@ -53,6 +53,6 @@ export function CancelledLinkSet({ apiBaseUrl }: Props) {
   return <BaseLinkSet apiBaseUrl={apiBaseUrl} />;
 }
 
-export function BackLinkList(props: { reservationUnitHome: string; apiBaseUrl: string }): JSX.Element {
+export function BackLinkList(props: { reservationUnitHome: string; apiBaseUrl: string }): React.ReactElement {
   return <BaseLinkSet {...props} />;
 }

@@ -44,7 +44,7 @@ type Props = {
   buttons?: React.ReactNode;
 };
 
-export function StickyHeader({ name, tagline, buttons }: Props): JSX.Element {
+export function StickyHeader({ name, tagline, buttons }: Props): React.ReactElement {
   return (
     <Sticky>
       <StickyContent>

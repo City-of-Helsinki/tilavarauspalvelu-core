@@ -272,7 +272,7 @@ function RequestedReservation({
 }: {
   reservation: ReservationType;
   refetch: () => Promise<ApolloQueryResult<ReservationPageQuery>>;
-}): JSX.Element | null {
+}): React.ReactElement | null {
   const { t } = useTranslation();
 
   const ref = useRef<HTMLHeadingElement>(null);
@@ -285,7 +285,7 @@ function RequestedReservation({
 
   return (
     <>
-      <ShowWhenTargetInvisible target={ref}>
+      <ShowWhenTargetInvisible target={ref as React.RefObject<HTMLHeadingElement>}>
         <StickyHeader
           name={getName(reservation, t)}
           tagline={reservationTagline}
@@ -328,7 +328,7 @@ function RequestedReservation({
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page({ reservation }: PropsNarrowed): JSX.Element {
+export default function Page({ reservation }: PropsNarrowed): React.ReactElement {
   const [_fetch, query] = useReservationPageLazyQuery({
     // NOTE have to be no-cache because we have some key collisions (tag line disappears if cached)
     fetchPolicy: "no-cache",

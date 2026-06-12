@@ -133,7 +133,7 @@ export function ApplicationSectionsTable({
   sortChanged: onSortChanged,
   applicationSections,
   isLoading,
-}: Props): JSX.Element {
+}: Props): React.ReactElement {
   const { t } = useTranslation();
 
   const views = applicationSections.map((ae) => sectionMapper(ae));

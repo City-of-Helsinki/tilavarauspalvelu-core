@@ -22,7 +22,10 @@ interface SearchButtonProps {
   isLoading?: boolean;
 }
 
-export function SearchButton({ isLoading = false, labelKey = "filters:searchButton" }: SearchButtonProps): JSX.Element {
+export function SearchButton({
+  isLoading = false,
+  labelKey = "filters:searchButton",
+}: SearchButtonProps): React.ReactElement {
   const { t } = useTranslation();
   return (
     <Flex $direction="row" $justifyContent="flex-end">

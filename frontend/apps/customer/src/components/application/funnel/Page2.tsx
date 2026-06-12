@@ -17,7 +17,7 @@ type Props = {
   onNext: (appToSave: ApplicationPage2FormValues) => void;
 };
 
-export function Page2({ application, onNext }: Props): JSX.Element {
+export function Page2({ application, onNext }: Props): React.ReactElement {
   const { t } = useTranslation();
   const router = useRouter();
   const { watch, handleSubmit, formState } = useFormContext<ApplicationPage2FormValues>();
@@ -69,7 +69,7 @@ function ApplicationSectionTimePicker({
 }: {
   index: number;
   section: NonNullable<Node["applicationSections"]>[0] | undefined;
-}): JSX.Element {
+}): React.ReactElement {
   const { watch } = useFormContext<ApplicationPage2FormValues>();
 
   const { i18n } = useTranslation();

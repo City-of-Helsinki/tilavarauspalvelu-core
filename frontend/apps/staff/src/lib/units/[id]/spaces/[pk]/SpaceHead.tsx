@@ -42,7 +42,7 @@ const Value = styled(Flex).attrs({
   ${({ $disabled }) => $disabled && "opacity: 0.4;"}
 `;
 
-export function SpaceHead({ title, space, surfaceArea, maxPersons }: IProps): JSX.Element {
+export function SpaceHead({ title, space, surfaceArea, maxPersons }: IProps): React.ReactElement {
   const { unit } = space || {};
   const { t } = useTranslation();
 

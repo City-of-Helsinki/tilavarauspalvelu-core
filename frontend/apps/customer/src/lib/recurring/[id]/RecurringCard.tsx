@@ -32,7 +32,7 @@ export function RecurringCard({
   selectReservationUnit,
   containsReservationUnit,
   removeReservationUnit,
-}: Readonly<CardProps>): JSX.Element {
+}: Readonly<CardProps>): React.ReactElement {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
 
@@ -79,7 +79,7 @@ export function RecurringCard({
     }
   };
 
-  const buttons: JSX.Element[] = [];
+  const buttons: React.ReactElement[] = [];
   buttons.push(
     <Button
       size={ButtonSize.Small}

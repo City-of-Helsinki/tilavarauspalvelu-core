@@ -18,7 +18,7 @@ export function ControlledSearchFilter<T extends FieldValues>({
   name,
   labelKey,
   control,
-}: ControlledSearchFilterProps<T>): JSX.Element {
+}: ControlledSearchFilterProps<T>): React.ReactElement {
   const {
     field: { value, onChange },
   } = useController({ name, control });

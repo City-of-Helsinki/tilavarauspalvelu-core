@@ -20,9 +20,9 @@ export interface ShowAllContainerProps extends Omit<HTMLAttributes<HTMLDivElemen
   // Should the component be open on initial render
   initiallyOpen?: boolean;
   // Extra content to show next to the "Show all" button, e.g. checkbox filter
-  extraShowMoreContent?: JSX.Element;
+  extraShowMoreContent?: React.ReactElement;
   // All the elements to show, when "show all" is toggled
-  children: JSX.Element[] | JSX.Element;
+  children: React.ReactElement[] | React.ReactElement;
 }
 
 // styled component so we can use "as" to cast the html element

@@ -11,7 +11,7 @@ type Props = {
   onClose: () => void;
 };
 
-export function InfoDialog({ id, heading, text, isOpen, onClose }: Props): JSX.Element {
+export function InfoDialog({ id, heading, text, isOpen, onClose }: Props): React.ReactElement {
   const { t } = useTranslation();
 
   return (

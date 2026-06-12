@@ -162,6 +162,10 @@ export const IS_RESERVABLE_FRAGMENT = gql`
   }
 `;
 
+const shouldReservationBlock = (r: Pick<ReservationNode, "state">) => {
+  return r.state !== ReservationStateChoice.Denied && r.state !== ReservationStateChoice.Cancelled;
+};
+
 export function isRangeReservable({
   range,
   reservationUnit,
@@ -228,10 +232,6 @@ export function isRangeReservable({
   ) {
     return false;
   }
-
-  const shouldReservationBlock = (r: Pick<ReservationNode, "state">) => {
-    return r.state !== ReservationStateChoice.Denied && r.state !== ReservationStateChoice.Cancelled;
-  };
 
   // This is the slowest part of the function => run it last
   // because the reservationSet includes every reservation not just for the selected day

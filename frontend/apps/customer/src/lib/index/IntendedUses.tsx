@@ -68,24 +68,25 @@ type Props = {
   intendedUses: IntendedUseCardFragment[];
 };
 
-export function IntendedUses({ intendedUses }: Props): JSX.Element {
+const getImg = (item: Pick<IntendedUseCardFragment, "smallUrl" | "imageUrl">) => {
+  return item.smallUrl || item.imageUrl || pixel;
+};
+
+const getSearchLink = (intendedUse: IntendedUseCardFragment): string => {
+  const params = new URLSearchParams();
+  // next/link so it's safer to return invalid search params than empty link
+  params.set("intendedUses", intendedUse.pk?.toString() ?? "");
+  return `${getSingleSearchPath(params)}#content`;
+};
+
+export function IntendedUses({ intendedUses }: Props): React.ReactElement {
   const { t, i18n } = useTranslation(["home", "common"]);
   const isMobile = useMedia(`(max-width: ${breakpoints.s})`, false);
   const itemLimit = useMemo(() => (isMobile ? 4 : 8), [isMobile]);
 
-  const getImg = (item: Pick<IntendedUseCardFragment, "smallUrl" | "imageUrl">) => {
-    return item.smallUrl || item.imageUrl || pixel;
-  };
   const lang = getLocalizationLang(i18n.language);
   const getName = (item: Pick<IntendedUseCardFragment, "nameFi" | "nameEn" | "nameSv">) => {
     return getTranslation(item, "name", lang);
-  };
-
-  const getSearchLink = (intendedUse: IntendedUseCardFragment): string => {
-    const params = new URLSearchParams();
-    // next/link so it's safer to return invalid search params than empty link
-    params.set("intendedUses", intendedUse.pk?.toString() ?? "");
-    return `${getSingleSearchPath(params)}#content`;
   };
 
   return (

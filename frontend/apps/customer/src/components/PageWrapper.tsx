@@ -21,7 +21,13 @@ const Main = styled.main`
   ${mainStyles}
 `;
 
-export function PageWrapper({ apiBaseUrl, profileLink, feedbackUrl, children, version }: PageProps): JSX.Element {
+export function PageWrapper({
+  apiBaseUrl,
+  profileLink,
+  feedbackUrl,
+  children,
+  version,
+}: PageProps): React.ReactElement {
   return (
     <>
       <Head>

@@ -14,7 +14,7 @@ export function DataWrapper({
   isWide?: boolean;
   isSummary?: boolean;
   isLoading?: boolean;
-}>): JSX.Element {
+}>): React.ReactElement {
   const testSection = isSummary ? "summary" : "info";
   const testId = `reservation__${testSection}--${label}`;
   return (

@@ -202,7 +202,7 @@ function PaidPricingPart({
   );
 }
 
-export function PricingTypeView({ pk, form, taxPercentageOptions }: Props): JSX.Element | null {
+export function PricingTypeView({ pk, form, taxPercentageOptions }: Props): React.ReactElement | null {
   const { t } = useTranslation();
 
   const { control, formState, watch } = form;

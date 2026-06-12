@@ -150,7 +150,7 @@ export function AllocatedSectionsTable({
   sortChanged: onSortChanged,
   schedules,
   isLoading,
-}: Readonly<Props>): JSX.Element {
+}: Readonly<Props>): React.ReactElement {
   const { t } = useTranslation();
 
   const views = schedules.map((aes) => timeSlotMapper(t, aes));

@@ -9,7 +9,7 @@ import { UserPermissionChoice } from "@gql/gql-types";
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page({ spacePk, unitPk }: PropsNarrowed): JSX.Element {
+export default function Page({ spacePk, unitPk }: PropsNarrowed): React.ReactElement {
   return (
     <AuthorizationChecker permission={UserPermissionChoice.CanManageReservationUnits}>
       <SpaceEditor space={spacePk} unit={unitPk} />

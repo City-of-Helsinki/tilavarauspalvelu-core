@@ -36,7 +36,7 @@ function ReservationPeriod({
 }: {
   reservationPeriodBeginDate: string;
   reservationPeriodEndDate: string;
-}): JSX.Element {
+}): React.ReactElement {
   return (
     <Flex $gap="xs" $direction="row" $alignItems="center">
       <IconCalendar size={IconSize.ExtraSmall} />
@@ -51,7 +51,7 @@ function ReservationPeriod({
   );
 }
 
-function Stat({ value, label }: { value: number; label: string }): JSX.Element {
+function Stat({ value, label }: { value: number; label: string }): React.ReactElement {
   return (
     <div>
       <Number>{value}</Number>
@@ -64,7 +64,7 @@ interface ApplicationCardProps {
   applicationRound: NonNullable<ApplicationRoundCardFragment>;
 }
 
-export function ApplicationRoundCard({ applicationRound }: ApplicationCardProps): JSX.Element {
+export function ApplicationRoundCard({ applicationRound }: ApplicationCardProps): React.ReactElement {
   const { t } = useTranslation();
 
   const name = applicationRound.nameFi;

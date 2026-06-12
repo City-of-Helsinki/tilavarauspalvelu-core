@@ -49,7 +49,7 @@ type Props = {
   name: string;
 };
 
-export function DayNavigation({ name }: Props): JSX.Element {
+export function DayNavigation({ name }: Props): React.ReactElement {
   if (name.length === 0) {
     throw new Error("name must not be empty");
   }

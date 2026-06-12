@@ -13,7 +13,7 @@ type ToastProps<T = unknown> = {
   duration?: number;
   dataTestId?: string;
   options?: ToastOptions<T>;
-  icon?: JSX.Element;
+  icon?: React.ReactElement;
 };
 
 const Container = styled(TC)`
@@ -139,7 +139,14 @@ export function toast({
 }
 
 // This component is used to render the toast content, in our case it's a HDS Notification
-function ToastNotification({ type, text, label, duration, ariaLabel, dataTestId }: Readonly<ToastProps>): JSX.Element {
+function ToastNotification({
+  type,
+  text,
+  label,
+  duration,
+  ariaLabel,
+  dataTestId,
+}: Readonly<ToastProps>): React.ReactElement {
   return (
     <HDSNotification
       type={type}
@@ -158,7 +165,7 @@ function ToastNotification({ type, text, label, duration, ariaLabel, dataTestId 
   );
 }
 
-function ToastContainer(): JSX.Element {
+function ToastContainer(): React.ReactElement {
   return (
     <Container
       position="top-right"

@@ -10,7 +10,7 @@ type Props = {
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 
-export function ApplicationsGroup({ name, applications, actionCallback }: Props): JSX.Element | null {
+export function ApplicationsGroup({ name, applications, actionCallback }: Props): React.ReactElement | null {
   if (applications.length === 0) {
     return null;
   }

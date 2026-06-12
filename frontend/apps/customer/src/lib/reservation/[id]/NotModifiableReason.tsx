@@ -12,7 +12,7 @@ const Reasons = styled.p`
   color: var(--color-black-70);
 `;
 
-export function NotModifiableReason(reservation: CanReservationBeChangedFragment): JSX.Element | null {
+export function NotModifiableReason(reservation: CanReservationBeChangedFragment): React.ReactElement | null {
   const { t } = useTranslation();
   const modifyTimeReason = getWhyReservationCantBeChanged(reservation);
   const isCancellationAllowed = isReservationCancellable(reservation);

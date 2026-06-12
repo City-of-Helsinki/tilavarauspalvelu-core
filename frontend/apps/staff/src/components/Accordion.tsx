@@ -89,7 +89,7 @@ export function Accordion({
   style,
   ...rest
 }: {
-  heading: string | JSX.Element | null;
+  heading: string | React.ReactElement | null;
   initiallyOpen?: boolean;
   open?: boolean;
   children: ReactNode;
@@ -97,7 +97,7 @@ export function Accordion({
   disabled?: boolean;
   className?: string;
   style?: React.CSSProperties;
-}): JSX.Element {
+}): React.ReactElement {
   const [accordionOpenState, toggleOpenState] = useState(initiallyOpen);
 
   const { t } = useTranslation();

@@ -77,7 +77,7 @@ const DeclinedTag = styled(Tag)`
   }
 `;
 
-const KV = ({ k, v, dataId }: { k: string; v?: string; dataId?: string }): JSX.Element => (
+const KV = ({ k, v, dataId }: { k: string; v?: string; dataId?: string }): React.ReactElement => (
   <div key={k}>
     <span id={k}>{k}</span>:{" "}
     <Value aria-labelledby={k} data-testid={dataId}>
@@ -391,7 +391,7 @@ function ApplicationSectionDetails({
   section: ApplicationPageSectionFragment;
   application: ApplicationPageFieldsFragment;
   refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
-}): JSX.Element {
+}): React.ReactElement {
   const { t } = useTranslation();
 
   const minDuration = section.reservationMinDuration;
@@ -445,7 +445,7 @@ function RejectApplicationButton({
 }: {
   application: ApplicationPageFieldsFragment;
   refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
-}): JSX.Element | null {
+}): React.ReactElement | null {
   const { t } = useTranslation();
   const units = filterNonNullable(
     application.applicationSections?.flatMap((section) =>
@@ -527,7 +527,7 @@ function RejectApplicationButton({
   );
 }
 
-export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | null {
+export default function ApplicationPage({ pk }: PropsNarrowed): React.ReactElement | null {
   const ref = useRef<HTMLHeadingElement>(null);
   const { t } = useTranslation();
 
@@ -576,7 +576,7 @@ export default function ApplicationPage({ pk }: PropsNarrowed): JSX.Element | nu
 
   return (
     <>
-      <ShowWhenTargetInvisible target={ref}>
+      <ShowWhenTargetInvisible target={ref as React.RefObject<HTMLHeadingElement>}>
         <StickyHeader name={customerName} tagline={`${t("application:id")}: ${application.pk}`} />
       </ShowWhenTargetInvisible>
       <>

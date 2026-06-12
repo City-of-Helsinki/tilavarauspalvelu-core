@@ -13,7 +13,7 @@ import { createClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { UserPermissionChoice } from "@gql/gql-types";
 
-function ReservationUnits({ optionsData }: { optionsData: PageProps["optionsData"] }): JSX.Element {
+function ReservationUnits({ optionsData }: { optionsData: PageProps["optionsData"] }): React.ReactElement {
   const { t } = useTranslation();
   const options = getFilterOptions(t, optionsData);
   const [selectedRows, setSelectedRows] = useState<SelectedRow[]>([]);
@@ -45,7 +45,7 @@ function ReservationUnits({ optionsData }: { optionsData: PageProps["optionsData
 }
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-export default function Page({ optionsData }: PageProps): JSX.Element {
+export default function Page({ optionsData }: PageProps): React.ReactElement {
   return (
     <AuthorizationChecker permission={UserPermissionChoice.CanManageReservationUnits}>
       <ReservationUnits optionsData={optionsData} />

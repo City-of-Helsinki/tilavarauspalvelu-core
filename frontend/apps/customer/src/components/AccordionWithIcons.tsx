@@ -114,7 +114,7 @@ export function AccordionWithIcons({
   children,
   shouldScrollIntoView,
   ...rest
-}: Props): JSX.Element {
+}: Props): React.ReactElement {
   const { isOpen, openAccordion, closeAccordion } = useAccordion({
     initiallyOpen,
   });

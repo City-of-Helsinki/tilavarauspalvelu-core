@@ -22,7 +22,7 @@ const StyledContent = styled.div`
   }
 `;
 
-export function Sanitize({ html }: Props): JSX.Element | null {
+export function Sanitize({ html }: Props): React.ReactElement | null {
   if (!html) {
     return null;
   }

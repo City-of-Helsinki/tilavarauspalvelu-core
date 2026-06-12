@@ -22,7 +22,7 @@ type Props = {
   unitOptions: Array<{ label: string; value: number }>;
 };
 
-export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): JSX.Element {
+export function TimeSlotDataLoader({ unitOptions, applicationRoundPk }: Props): React.ReactElement {
   const { t } = useTranslation();
 
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);

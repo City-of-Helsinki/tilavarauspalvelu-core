@@ -29,7 +29,7 @@ export const LegendsWrapper = styled(Flex).attrs({
   padding: var(--spacing-m) 0;
 `;
 
-export function Legend({ label, style }: Props): JSX.Element {
+export function Legend({ label, style }: Props): React.ReactElement {
   return (
     <Container>
       <Box style={style} />

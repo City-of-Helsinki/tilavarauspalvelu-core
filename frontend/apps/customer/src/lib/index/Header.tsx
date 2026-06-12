@@ -6,7 +6,7 @@ interface HeadProps {
   text: string;
 }
 
-export function Head(props: HeadProps): JSX.Element {
+export function Head(props: HeadProps): React.ReactElement {
   return (
     <div>
       <H1 $large $marginTop="m">

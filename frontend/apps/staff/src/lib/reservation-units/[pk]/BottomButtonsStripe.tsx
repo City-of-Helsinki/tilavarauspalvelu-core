@@ -71,7 +71,7 @@ function DialogContent({
   onAccept: () => void;
   description: string;
   acceptLabel: string;
-}): JSX.Element {
+}): React.ReactElement {
   const { t } = useTranslation();
 
   return (
@@ -103,7 +103,7 @@ function GenericDialog({
   title: string;
   description: string;
   acceptLabel: string;
-}): JSX.Element {
+}): React.ReactElement {
   const { isOpen } = useModal();
 
   return (
@@ -128,7 +128,7 @@ function ArchiveDialog({
   reservationUnit: Pick<Node, "nameFi">;
   onClose: () => void;
   onAccept: () => void;
-}): JSX.Element {
+}): React.ReactElement {
   const { t } = useTranslation();
 
   return (
@@ -144,7 +144,13 @@ function ArchiveDialog({
   );
 }
 
-function DiscardChangesDialog({ onClose, onAccept }: { onClose: () => void; onAccept: () => void }): JSX.Element {
+function DiscardChangesDialog({
+  onClose,
+  onAccept,
+}: {
+  onClose: () => void;
+  onAccept: () => void;
+}): React.ReactElement {
   const { t } = useTranslation();
 
   return (
@@ -169,10 +175,10 @@ export function BottomButtonsStripe({
   reservationUnit: Node | undefined;
   unit?: UnitSubpageHeadFragment | null;
   previewUrlPrefix: string;
-  setModalContent: (content: JSX.Element | null) => void;
+  setModalContent: (content: React.ReactElement | null) => void;
   onSubmit: (formValues: ReservationUnitEditFormValues) => Promise<number>;
   form: UseFormReturn<ReservationUnitEditFormValues>;
-}): JSX.Element {
+}): React.ReactElement {
   const { t } = useTranslation();
   const displayError = useDisplayError();
   const router = useRouter();

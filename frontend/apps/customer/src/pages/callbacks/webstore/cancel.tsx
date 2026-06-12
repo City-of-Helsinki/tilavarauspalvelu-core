@@ -15,7 +15,7 @@ import { DeleteReservationDocument, ReservationStateChoice } from "@gql/gql-type
 import type { DeleteReservationMutation, DeleteReservationMutationVariables } from "@gql/gql-types";
 
 // This is the callback page from webstore if user cancels the order
-function Cancel({ state }: NarrowedProps): JSX.Element {
+function Cancel({ state }: NarrowedProps): React.ReactElement {
   const { t } = useTranslation();
   const { env } = useEnvContext();
   const routes = [

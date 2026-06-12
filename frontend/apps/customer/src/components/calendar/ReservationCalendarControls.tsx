@@ -30,7 +30,7 @@ type CommonProps = {
 type Props =
   | (CommonProps & {
       mode: "create";
-      submitButton: JSX.Element;
+      submitButton: React.ReactElement;
     })
   | (CommonProps & {
       mode: "edit";
@@ -122,7 +122,7 @@ export function ReservationCalendarControls({
   startingTimeOptions,
   submitReservation,
   ...rest
-}: Props): JSX.Element {
+}: Props): React.ReactElement {
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
@@ -227,7 +227,7 @@ function ControlledToggler({
   focusSlot: FocusTimeSlot;
   price: string | null;
   durationOptions: Array<{ label: string; value: number }>;
-}): JSX.Element {
+}): React.ReactElement {
   const { t, i18n } = useTranslation();
   const { control, watch } = form;
 

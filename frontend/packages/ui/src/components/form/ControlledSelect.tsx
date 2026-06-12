@@ -40,6 +40,20 @@ interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
   strongLabel?: boolean;
 }
 
+const toHDSValue = (
+  opts: Readonly<Array<{ label: string; value: string | number }>>,
+  val: string | number | Array<string | number> | undefined
+): Array<Partial<Option>> => {
+  if (val == null) {
+    return [];
+  }
+  if (Array.isArray(val)) {
+    const keyVals = filterNonNullable(val.map((v) => opts.find((o) => o.value === v)));
+    return keyVals.map(convertOptionToHDS);
+  }
+  return opts.filter((o) => o.value === val).map(convertOptionToHDS);
+};
+
 export function ControlledSelect<T extends FieldValues>({
   name,
   label,
@@ -60,7 +74,7 @@ export function ControlledSelect<T extends FieldValues>({
   enableSearch,
   strongLabel,
   ...rest
-}: SelectProps<T>): JSX.Element {
+}: SelectProps<T>): React.ReactElement {
   const { t, i18n } = useTranslation(["common"]);
   const language = getLocalizationLang(i18n.language);
 
@@ -94,20 +108,6 @@ export function ControlledSelect<T extends FieldValues>({
       throw new TypeError("Invalid selection");
     }
   };
-
-  function toHDSValue(
-    opts: Readonly<Array<{ label: string; value: string | number }>>,
-    val: string | number | Array<string | number> | undefined
-  ): Array<Partial<Option>> {
-    if (val == null) {
-      return [];
-    }
-    if (Array.isArray(val)) {
-      const keyVals = filterNonNullable(val.map((v) => opts.find((o) => o.value === v)));
-      return keyVals.map(convertOptionToHDS);
-    }
-    return opts.filter((o) => o.value === val).map(convertOptionToHDS);
-  }
 
   return (
     <StyledControlledSelect

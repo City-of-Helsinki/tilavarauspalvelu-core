@@ -32,7 +32,7 @@ type Props = {
   options: OptionsRecord;
 };
 
-export function ReservationStep0({ reservation, cancelReservation, options }: Props): JSX.Element {
+export function ReservationStep0({ reservation, cancelReservation, options }: Props): React.ReactElement {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 

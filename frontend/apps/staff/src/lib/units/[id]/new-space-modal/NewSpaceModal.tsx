@@ -18,7 +18,7 @@ type Props = {
   refetch: () => Promise<unknown>;
 };
 
-export function NewSpaceModal({ unit, closeModal, refetch, parentSpacePk }: Props): JSX.Element | null {
+export function NewSpaceModal({ unit, closeModal, refetch, parentSpacePk }: Props): React.ReactElement | null {
   const [mutation] = useCreateSpaceMutation();
 
   const createSpace = (input: SpaceCreateMutationInput) => mutation({ variables: { input } });

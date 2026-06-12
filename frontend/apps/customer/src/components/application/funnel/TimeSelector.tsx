@@ -26,7 +26,7 @@ export function TimeSelectorForm({
   index,
   reservationUnitOptions,
   reservationUnitOpeningHours,
-}: TimeSelectorProps): JSX.Element | null {
+}: TimeSelectorProps): React.ReactElement | null {
   const { t } = useTranslation();
   const { setValue, watch } = useFormContext<ApplicationPage2FormValues>();
 
@@ -139,7 +139,7 @@ function OptionSelector({
   );
 }
 
-function ErrorMessage({ index }: { index: number }): JSX.Element | null {
+function ErrorMessage({ index }: { index: number }): React.ReactElement | null {
   const { t } = useTranslation();
   const fieldName = `applicationSections.${index}.suitableTimeRanges` as const;
   const { getFieldState } = useFormContext<ApplicationPage2FormValues>();

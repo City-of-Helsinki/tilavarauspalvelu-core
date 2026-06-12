@@ -15,12 +15,12 @@ const Value = styled.div`
 
 interface IValueBoxProps {
   label: string;
-  value: string | undefined | null | JSX.Element;
+  value: string | undefined | null | React.ReactElement;
   style?: React.CSSProperties;
   className?: string;
 }
 
-export function ValueBox({ label, value, ...rest }: IValueBoxProps): JSX.Element {
+export function ValueBox({ label, value, ...rest }: IValueBoxProps): React.ReactElement {
   return (
     <div {...rest}>
       <Label>{label}</Label>

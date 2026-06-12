@@ -56,7 +56,7 @@ export function ReservationUnitList<T extends FieldValues>({
   options,
   minSize,
   error,
-}: Readonly<ReservationUnitListProps<T>>): JSX.Element {
+}: Readonly<ReservationUnitListProps<T>>): React.ReactElement {
   const { t } = useTranslation();
   const ref = useRef<HTMLButtonElement>(null);
   const { handleRouteChange } = useSearchModify();
@@ -156,7 +156,7 @@ export function ReservationUnitList<T extends FieldValues>({
         close={() => setShowModal(false)}
         $fixedHeight
         $maxWidth="xl"
-        focusAfterCloseRef={ref}
+        focusAfterCloseRef={ref as React.RefObject<HTMLElement>}
         scrollable
         closeButtonLabelText={t("common:close")}
         aria-labelledby="modal-header"

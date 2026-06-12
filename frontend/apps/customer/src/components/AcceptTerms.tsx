@@ -13,7 +13,7 @@ export function AcceptTerms({
   reservationUnit: Pick<TermsOfUseFragment, "cancellationTerms" | "paymentTerms" | "serviceSpecificTerms">;
   isTermsAccepted: { space: boolean; service: boolean };
   setIsTermsAccepted: (key: "space" | "service", val: boolean) => void;
-}): JSX.Element {
+}): React.ReactElement {
   const { t } = useTranslation();
 
   const { cancellationTerms, paymentTerms, serviceSpecificTerms } = reservationUnit;
@@ -80,7 +80,7 @@ function SanitizedTerms({
 }: {
   terms: Maybe<TermsOfUseTextFieldsFragment> | undefined;
   returnEmpty?: boolean;
-}): JSX.Element | null {
+}): React.ReactElement | null {
   const { i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
 

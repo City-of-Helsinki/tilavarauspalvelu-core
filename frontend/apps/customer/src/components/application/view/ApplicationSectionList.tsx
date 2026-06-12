@@ -26,7 +26,7 @@ function ageGroupToString(ag: Maybe<AgeGroupNode> | undefined): string {
   return `${ag.minimum} - ${ag.maximum}`;
 }
 
-function InfoListItem({ label, value }: { label: string; value: string | JSX.Element }) {
+function InfoListItem({ label, value }: { label: string; value: string | React.ReactElement }) {
   return (
     <li>
       <h4>{`${label}: `}</h4>
@@ -153,7 +153,7 @@ function SingleApplicationSection({
 const filterPrimary = (n: { priority: Priority }) => n.priority === Priority.Primary;
 const filterSecondary = (n: { priority: Priority }) => n.priority === Priority.Secondary;
 
-export function ApplicationSectionList({ application }: { application: ApplicationT }): JSX.Element {
+export function ApplicationSectionList({ application }: { application: ApplicationT }): React.ReactElement {
   const sections = filterNonNullable(application.applicationSections);
   return (
     <>

@@ -23,7 +23,7 @@ import type { ApplicationPage4Query, ApplicationPage4QueryVariables } from "@gql
 // User has to accept the terms of service then on submit we change the application status
 // This uses separate Send mutation (not update) so no onNext like the other pages
 // we could also remove the FormContext here
-function Page4({ application, tos }: Pick<PropsNarrowed, "application" | "tos">): JSX.Element {
+function Page4({ application, tos }: Pick<PropsNarrowed, "application" | "tos">): React.ReactElement {
   const router = useRouter();
   const dislayError = useDisplayError();
   const { t } = useTranslation();

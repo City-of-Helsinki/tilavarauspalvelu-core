@@ -11,7 +11,7 @@ interface ControlledNumberFilterProps<T extends FieldValues> extends UseControll
 export function ControlledNumberFilter<T extends FieldValues>({
   name,
   control,
-}: ControlledNumberFilterProps<T>): JSX.Element {
+}: ControlledNumberFilterProps<T>): React.ReactElement {
   const { t } = useTranslation();
   const {
     field: { value, onChange },

@@ -14,7 +14,7 @@ interface RangeNumberFilterProps {
   maxName: string;
 }
 
-function RangeWrapper({ label, children }: { label: string; children: React.ReactNode }): JSX.Element {
+function RangeWrapper({ label, children }: { label: string; children: React.ReactNode }): React.ReactElement {
   return (
     <div>
       <div>{label}</div>
@@ -35,7 +35,7 @@ export function ControlledRangeNumberFilter<T extends FieldValues>({
   minName,
   maxName,
   control,
-}: ControlledRangeNumberFilterProps<T>): JSX.Element {
+}: ControlledRangeNumberFilterProps<T>): React.ReactElement {
   return (
     <RangeWrapper label={label}>
       <ControlledNumberFilter name={minName} control={control} />

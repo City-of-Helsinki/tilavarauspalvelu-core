@@ -13,7 +13,7 @@ export function ReservationUnitCalendarView({
 }: {
   reservationUnitOptions: Array<{ label: string; value: number }>;
   unitPk: number;
-}): JSX.Element {
+}): React.ReactElement {
   const params = useSearchParams();
   const reservationUnitPk = toNumber(params.get("reservationUnit")) ?? reservationUnitOptions[0]?.value;
   const today = formatISO(startOfDay(new Date()));

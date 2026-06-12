@@ -44,7 +44,7 @@ function translateRoundDate(
   }
 }
 
-export function ApplicationRoundCard({ applicationRound }: Readonly<CardProps>): JSX.Element {
+export function ApplicationRoundCard({ applicationRound }: Readonly<CardProps>): React.ReactElement {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
 

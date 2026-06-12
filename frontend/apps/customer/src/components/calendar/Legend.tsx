@@ -106,7 +106,7 @@ const defaultItems: LegendItemT[] = [
   },
 ] as const;
 
-export function Legend({ items = defaultItems }: Props): JSX.Element {
+export function Legend({ items = defaultItems }: Props): React.ReactElement {
   const { t } = useTranslation();
 
   return (

@@ -41,7 +41,7 @@ function DayColumn({
   // use undefined to disable painting
   updateCell?: (cell: Cell, value: CellState) => void;
   selectedPriority?: CellState;
-}>): JSX.Element {
+}>): React.ReactElement {
   const { t } = useTranslation();
   const [paintState, setPaintState] = useState<CellState | false>(false); // toggle value true = set, false = clear: ;
   const [painting, setPainting] = useState(false); // is painting 'on'
@@ -172,7 +172,7 @@ export function ApplicationTimeSelector({
   onCellUpdate,
   selectedPriority,
   ...rest
-}: Readonly<ApplicationTimeSelectorProps>): JSX.Element {
+}: Readonly<ApplicationTimeSelectorProps>): React.ReactElement {
   return (
     <>
       <CalendarContainer {...rest} role="table">

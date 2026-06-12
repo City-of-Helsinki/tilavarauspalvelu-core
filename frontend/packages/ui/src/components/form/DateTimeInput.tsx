@@ -28,7 +28,7 @@ export function DateTimeInput<T extends FieldValues>({
   minDate,
   disabled,
   translateError,
-}: DateTimeProps<T>): JSX.Element {
+}: DateTimeProps<T>): React.ReactElement {
   const { t } = useTranslation();
 
   const { field: dateField, fieldState: dateFieldState } = useController({

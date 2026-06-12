@@ -51,7 +51,7 @@ function BaseSelectFilter({
   clearable = false,
   enableSearch = false,
   style,
-}: BaseSelectFilterProps): JSX.Element {
+}: BaseSelectFilterProps): React.ReactElement {
   const { t } = useTranslation();
   const label = t(`filters:label.${name}`);
   const placeholder = t("common:select");
@@ -98,7 +98,7 @@ interface ControlledSelectProps<T extends FieldValues> extends UseControllerProp
 export function ControlledSelectFilter<T extends FieldValues>({
   control,
   ...props
-}: ControlledSelectProps<T>): JSX.Element {
+}: ControlledSelectProps<T>): React.ReactElement {
   const { name, enableSearch } = props;
   const {
     field: { value, onChange },

@@ -68,7 +68,7 @@ function populateTimes(populateTimesProps?: PopulateTimesProps): Option[] {
  *  @param {begin?: string, end?: string} [label] - the label text for the begin and/or end times (optional)
  *  @param {begin?: boolean, end?: boolean} [placeholder] - a function to execute upon clicking the button (optional)
  *  @param {begin?: boolean, end?: boolean} [clearable] -
- *  @returns {JSX.Element} Two `<Select>` components for selecting a begin and end time, populated by options from
+ *  @returns {React.ReactElement} Two `<Select>` components for selecting a begin and end time, populated by options from
  *  00:00 to 23:59 in 30min intervals. If the end time is before the begin time, an error message is displayed (the
  *  error is internal, and does not trigger invaliditiy of parent form). Returned elements don't have a wrapping
  *  element, so wrap the component in the parent form if needed.
@@ -80,7 +80,7 @@ export function TimeRangePicker<T extends FieldValues>({
   labels,
   placeholders,
   clearable,
-}: TimeRangePickerProps<T>): JSX.Element | null {
+}: TimeRangePickerProps<T>): React.ReactElement | null {
   const { field: beginField } = useController({
     control,
     name: names?.begin,

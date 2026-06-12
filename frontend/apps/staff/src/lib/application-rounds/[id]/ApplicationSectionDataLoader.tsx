@@ -15,7 +15,7 @@ type Props = {
   applicationRoundPk: number;
 };
 
-export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): JSX.Element {
+export function ApplicationSectionDataLoader({ applicationRoundPk }: Props): React.ReactElement {
   const { t } = useTranslation();
 
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
