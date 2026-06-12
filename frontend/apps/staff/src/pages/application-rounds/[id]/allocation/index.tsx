@@ -138,7 +138,7 @@ function ApplicationRoundAllocation({
   applicationRound,
   units,
   reservationUnits,
-}: ApplicationRoundAllocationProps): JSX.Element {
+}: ApplicationRoundAllocationProps): React.ReactElement {
   const { t } = useTranslation();
 
   const searchParams = useSearchParams();
@@ -381,7 +381,7 @@ type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
 // NOTE any use of searchParams does a full "redraw" though React is smart enough that components
 // are not actually remounted, but all hooks are re-evaluated
 // so every apollo query is sent to the server (including user query, filter query, etc.)
-export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Element {
+export default function ApplicationRoundRouted(props: PropsNarrowed): React.ReactElement {
   const { applicationRound } = props;
 
   const [filteredUnits, resUnits] = useFilteredUnits(applicationRound);

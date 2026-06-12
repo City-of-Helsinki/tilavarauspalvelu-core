@@ -25,7 +25,7 @@ function mapSearchParamsToForm(searchParams: ReadonlyURLSearchParams): SearchFor
   };
 }
 
-export function Filters(): JSX.Element {
+export function Filters(): React.ReactElement {
   const { t } = useTranslation();
   const setSearchParams = useSetSearchParams();
   const searchParams = useSearchParams();

@@ -29,7 +29,7 @@ const StyledTextInput = styled(TextInput)`
   }
 `;
 
-export function ReservationUnitSearch(): JSX.Element {
+export function ReservationUnitSearch(): React.ReactElement {
   const { t } = useTranslation();
   const router = useRouter();
 

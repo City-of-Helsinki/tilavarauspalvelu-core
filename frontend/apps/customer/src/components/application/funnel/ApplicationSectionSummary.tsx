@@ -38,7 +38,7 @@ type SectionFormValues = Pick<
   "begin" | "end" | "appliedReservationsPerWeek" | "minDuration" | "maxDuration" | "numPersons"
 >;
 
-export function ApplicationSectionSummary({ applicationSection, name }: Props): JSX.Element | null {
+export function ApplicationSectionSummary({ applicationSection, name }: Props): React.ReactElement | null {
   const { t } = useTranslation();
 
   if (!applicationSection) {

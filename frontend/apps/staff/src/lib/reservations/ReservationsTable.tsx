@@ -17,7 +17,7 @@ type ReservationTableColumn = {
   headerName: string;
   key: string;
   isSortable: boolean;
-  transform?: (reservationtype: ReservationTableElementFragment) => JSX.Element | string;
+  transform?: (reservationtype: ReservationTableElementFragment) => React.ReactElement | string;
 };
 
 type Props = {
@@ -96,7 +96,7 @@ export function ReservationsTable({
   sortChanged: onSortChanged,
   isLoading,
   reservations,
-}: Readonly<Props>): JSX.Element {
+}: Readonly<Props>): React.ReactElement {
   const { t } = useTranslation();
 
   const cols = memoize(() => getColConfig(t))();

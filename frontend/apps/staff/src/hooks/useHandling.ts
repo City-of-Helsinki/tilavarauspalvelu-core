@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { gql } from "@apollo/client";
 import { startOfDay } from "date-fns";
 import { formatApiDate } from "ui/src/modules/date-utils";
+/* eslint-disable-next-line import/no-cycle */
 import { useSession } from "@/hooks";
 import { useHandlingDataQuery, ReservationStateChoice } from "@gql/gql-types";
 

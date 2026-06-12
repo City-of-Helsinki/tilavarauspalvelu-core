@@ -30,7 +30,7 @@ import { FormSubHeading } from "@/styled/application";
 import { ApplicationPage3Document, ReserveeType, useUpdateApplicationMutation } from "@gql/gql-types";
 import type { ApplicationPage3Query, ApplicationPage3QueryVariables } from "@gql/gql-types";
 
-function Page3Form(): JSX.Element | null {
+function Page3Form(): React.ReactElement | null {
   const { watch, unregister, register, setValue } = useFormContext<ApplicationPage3FormValues>();
   const type = watch("applicantType");
 
@@ -74,7 +74,7 @@ function Page3Form(): JSX.Element | null {
   }
 }
 
-export default function Page3({ application }: Pick<PropsNarrowed, "application">): JSX.Element {
+export default function Page3({ application }: Pick<PropsNarrowed, "application">): React.ReactElement {
   const router = useRouter();
 
   const form = useForm<ApplicationPage3FormValues>({

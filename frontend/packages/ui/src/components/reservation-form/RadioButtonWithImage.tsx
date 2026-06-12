@@ -61,7 +61,7 @@ const Label = styled.span`
   text-align: center;
 `;
 
-export function RadioButtonWithImage({ id, icon, label, checked, onClick }: Props): JSX.Element {
+export function RadioButtonWithImage({ id, icon, label, checked, onClick }: Props): React.ReactElement {
   const clickHandler = (e: React.MouseEvent) => {
     e.preventDefault();
     onClick();

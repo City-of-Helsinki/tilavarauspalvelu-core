@@ -52,7 +52,11 @@ type ApplicationPageProps = {
 /// Page wrapper for application funnel pages (steps 1, 2, 3, 4)
 /// Includes general structure like breadcrumb and title
 /// and specific funnel elements like stepper and notes
-export function ApplicationFunnelWrapper({ application, page, children }: Readonly<ApplicationPageProps>): JSX.Element {
+export function ApplicationFunnelWrapper({
+  application,
+  page,
+  children,
+}: Readonly<ApplicationPageProps>): React.ReactElement {
   const { t } = useTranslation();
   const routes = [
     {

@@ -8,7 +8,7 @@ export function ApplicationHead({
 }: {
   status: Maybe<ApplicationStatusChoice> | undefined;
   title: string;
-}): JSX.Element {
+}): React.ReactElement {
   return (
     <Flex $direction="row" $alignItems="flex-start" $justifyContent="space-between" $wrap="wrap">
       <H1 $noMargin>{title}</H1>

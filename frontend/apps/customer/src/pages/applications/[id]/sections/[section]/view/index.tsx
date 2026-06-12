@@ -13,7 +13,7 @@ import { applicationsPrefix, getApplicationPath } from "@/modules/urls";
 import { ApplicationSectionViewDocument, ApplicationStatusChoice } from "@gql/gql-types";
 import type { ApplicationSectionViewQuery, ApplicationSectionViewQueryVariables } from "@gql/gql-types";
 
-function ViewAll({ applicationSection }: PropsNarrowed): JSX.Element {
+function ViewAll({ applicationSection }: PropsNarrowed): React.ReactElement {
   const { t, i18n } = useTranslation();
   const headingPrefix = t("application:view.allReservations");
   const heading = `${applicationSection.name} - ${headingPrefix}`;

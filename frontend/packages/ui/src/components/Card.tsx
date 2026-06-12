@@ -9,7 +9,7 @@ type CardVariant = "default" | "vertical";
 
 export type CardInfoItem = {
   value: string;
-  icon?: JSX.Element;
+  icon?: React.ReactElement;
   testId?: string;
 };
 
@@ -25,9 +25,9 @@ export type CardProps = {
   link?: string;
   imageSrc?: string;
   imageAlt?: string;
-  tags?: JSX.Element[];
+  tags?: React.ReactElement[];
   infos?: CardInfoItem[];
-  buttons?: JSX.Element[];
+  buttons?: React.ReactElement[];
   children?: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
@@ -162,11 +162,11 @@ function WrapWithLink({
   focusable = true,
   LinkComponent,
 }: Readonly<{
-  content: JSX.Element;
+  content: React.ReactElement;
   link?: string;
   focusable?: boolean;
   LinkComponent?: LinkComponent;
-}>): JSX.Element {
+}>): React.ReactElement {
   if (!link) {
     return content;
   }
@@ -198,15 +198,15 @@ function WrapWithLink({
  * @param {string} [link] - The URL to navigate to when the card is clicked.
  * @param {string} [imageSrc] - The URL of the image to display in the card.
  * @param {string} [imageAlt=""] - The alt text of the image.
- * @param {Array<JSX.Element>} [tags] - An array of JSX elements (should be either Tag or StatusLabel) to display in the card.
- * @param {Array<{ value: string; icon?: JSX.Element, testId?: string }>} [infos] - An array of info objects (icon & text) to display in the card.
- * @param {Array<JSX.Element>} [buttons] - An array of button elements to display in the card.
+ * @param {Array<React.ReactElement>} [tags] - An array of JSX elements (should be either Tag or StatusLabel) to display in the card.
+ * @param {Array<{ value: string; icon?: React.ReactElement, testId?: string }>} [infos] - An array of info objects (icon & text) to display in the card.
+ * @param {Array<React.ReactElement>} [buttons] - An array of button elements to display in the card.
  * @param {ReactNode} [children] - Additional children elements to render in the card, after the main text.
  * @param {string} [className] - Additional class names to apply to the card.
  * @param {React.CSSProperties} [style] - Additional styles to apply to the card.
  * @param {React.ReactElement} [LinkComponent] - A custom Link component to use instead of the next Link.
  *
- * @returns {JSX.Element} The rendered Card component.
+ * @returns {React.ReactElement} The rendered Card component.
  */
 export function Card({
   heading,
@@ -227,7 +227,7 @@ export function Card({
   className,
   style,
   LinkComponent,
-}: Readonly<CardProps>): JSX.Element {
+}: Readonly<CardProps>): React.ReactElement {
   const wrapperClasses = [`card--${variant ?? "default"}`];
   let itemCount = 1; // Texts are always present
   if (imageSrc) wrapperClasses.push("card--with-image");
@@ -421,7 +421,7 @@ function Texts({
   );
 }
 
-function Tags({ tags }: Readonly<{ tags?: JSX.Element[] }>) {
+function Tags({ tags }: Readonly<{ tags?: React.ReactElement[] }>) {
   if (!tags) return null;
   return <TagContainer data-testid="card__tags">{tags}</TagContainer>;
 }
@@ -442,7 +442,7 @@ const InfoItem = styled(Flex).attrs({
 function Infos({
   infos,
 }: Readonly<{
-  infos?: Array<{ value: string; icon?: JSX.Element; testId?: string }>;
+  infos?: Array<{ value: string; icon?: React.ReactElement; testId?: string }>;
 }>) {
   if (!infos) return null;
   return (
@@ -454,7 +454,7 @@ function Infos({
   );
 }
 
-function Info({ value, icon, ...rest }: Readonly<{ value: string; icon?: JSX.Element }>) {
+function Info({ value, icon, ...rest }: Readonly<{ value: string; icon?: React.ReactElement }>) {
   return (
     <InfoItem {...rest}>
       {icon}
@@ -463,7 +463,7 @@ function Info({ value, icon, ...rest }: Readonly<{ value: string; icon?: JSX.Ele
   );
 }
 
-function Buttons({ buttons }: Readonly<{ buttons?: JSX.Element[] }>) {
+function Buttons({ buttons }: Readonly<{ buttons?: React.ReactElement[] }>) {
   if (!buttons) return null;
   return <ButtonContainer>{buttons}</ButtonContainer>;
 }

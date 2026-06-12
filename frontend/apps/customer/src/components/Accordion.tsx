@@ -87,7 +87,7 @@ export function Accordion({
   theme = "default",
   disableBottomMargin,
   ...rest
-}: Props): JSX.Element {
+}: Props): React.ReactElement {
   const { isOpen, openAccordion, closeAccordion } = useAccordion({
     initiallyOpen: open,
   });
@@ -115,7 +115,7 @@ export function Accordion({
   );
 }
 
-export function AccordionWithState({ open: initiallyOpen, ...rest }: Props): JSX.Element {
+export function AccordionWithState({ open: initiallyOpen, ...rest }: Props): React.ReactElement {
   const [open, setOpen] = useState(initiallyOpen);
 
   return <Accordion onToggle={() => setOpen(!open)} {...rest} open={open} />;

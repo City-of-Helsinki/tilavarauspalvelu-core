@@ -41,7 +41,7 @@ export function CancellationForm(props: {
   backLink: string;
   isLoading?: boolean;
   isDisabled?: boolean;
-}): JSX.Element {
+}): React.ReactElement {
   const { onNext, isLoading, isDisabled, cancellationTerms, backLink } = props;
   const { t } = useTranslation();
 

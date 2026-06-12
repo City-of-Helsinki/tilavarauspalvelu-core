@@ -37,7 +37,7 @@ interface ReservationFormGeneralSectionProps extends CommonWithFields {
         enableSubvention: false;
       }
     | {
-        termsForDiscount: JSX.Element | string;
+        termsForDiscount: React.ReactElement | string;
         enableSubvention: true;
       };
 }

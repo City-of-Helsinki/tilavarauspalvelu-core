@@ -134,7 +134,7 @@ type DialogContentProps = {
   onClose: () => void;
   onReject: (vars: DenyVariables) => void;
   disabled?: boolean;
-  children?: JSX.Element;
+  children?: React.ReactElement;
 };
 
 function DialogContent({
@@ -143,7 +143,7 @@ function DialogContent({
   onReject,
   disabled,
   children,
-}: Readonly<DialogContentProps>): JSX.Element {
+}: Readonly<DialogContentProps>): React.ReactElement {
   const { t } = useTranslation();
 
   const [handlingDetails, setHandlingDetails] = useState<string>(initialHandlingDetails);
@@ -212,11 +212,11 @@ function DenyDialogWrapper({
   onClose,
   focusAfterCloseRef,
 }: Readonly<{
-  children: JSX.Element;
+  children: React.ReactElement;
   title?: string;
   onClose: () => void;
-  focusAfterCloseRef?: React.RefObject<HTMLButtonElement>;
-}>): JSX.Element {
+  focusAfterCloseRef?: React.RefObject<HTMLElement>;
+}>): React.ReactElement {
   const { isOpen } = useModal();
   const { t } = useTranslation();
 
@@ -250,8 +250,8 @@ export function DenyDialog({
   onClose: () => void;
   onReject: () => void;
   title?: string;
-  focusAfterCloseRef?: React.RefObject<HTMLButtonElement>;
-}>): JSX.Element {
+  focusAfterCloseRef?: React.RefObject<HTMLElement>;
+}>): React.ReactElement {
   const { t } = useTranslation();
   const [denyReservationMutation] = useDenyReservationMutation();
   const [refundReservationMutation] = useRefundReservationMutation();
@@ -336,8 +336,8 @@ export function DenyDialogSeries({
   onReject: () => void;
   initialHandlingDetails: string;
   reservationSeries: { pk: number | null };
-  focusAfterCloseRef?: React.RefObject<HTMLButtonElement>;
-}>): JSX.Element {
+  focusAfterCloseRef?: React.RefObject<HTMLElement>;
+}>): React.ReactElement {
   const { t } = useTranslation();
   const [denyMutation] = useDenyReservationSeriesMutation();
   const displayError = useDisplayError();

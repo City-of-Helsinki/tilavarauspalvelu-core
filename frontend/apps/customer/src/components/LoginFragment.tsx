@@ -7,7 +7,7 @@ import { useSession } from "@/hooks";
 
 type Props = {
   apiBaseUrl: string;
-  componentIfAuthenticated: JSX.Element;
+  componentIfAuthenticated: React.ReactElement;
   isActionDisabled?: boolean;
   returnUrl?: string;
   type: "application" | "reservation";
@@ -19,7 +19,7 @@ export function LoginFragment({
   isActionDisabled,
   returnUrl,
   type,
-}: Readonly<Props>): JSX.Element {
+}: Readonly<Props>): React.ReactElement {
   const { isAuthenticated } = useSession();
   const { t, i18n } = useTranslation();
 

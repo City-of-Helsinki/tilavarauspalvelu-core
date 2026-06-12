@@ -28,7 +28,7 @@ type ResourcesTableColumn = {
   headerName: string;
   key: string;
   isSortable: boolean;
-  transform?: (resource: ResourceT) => JSX.Element | string;
+  transform?: (resource: ResourceT) => React.ReactElement | string;
 };
 
 function getColConfig({
@@ -68,7 +68,7 @@ function getColConfig({
   ];
 }
 
-export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
+export function ResourcesTable({ unit, refetch }: IProps): React.ReactElement {
   const [deleteResourceMutation] = useDeleteResourceMutation();
 
   const deleteResource = (pk: number) => deleteResourceMutation({ variables: { input: { pk: String(pk) } } });

@@ -1,4 +1,5 @@
 import React from "react";
+import type { ReactElement } from "react";
 import { MockedProvider } from "@apollo/client/testing";
 import { render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -25,7 +26,7 @@ function TestComponent({
   reservation: UseStaffReservationFragment;
   onSuccess: () => void;
   seriesName?: string;
-}): JSX.Element {
+}): ReactElement {
   const mutationFn = useStaffReservationMutation({
     reservation,
     onSuccess,
@@ -54,7 +55,7 @@ describe("edit mutation hook single reservation", () => {
   const wrappedRender = (pk: number, onSuccess: () => void) => {
     const reservation = createMockReservation({ pk });
     return render(
-      <MockedProvider mocks={createMocks()} addTypename={false}>
+      <MockedProvider mocks={createMocks()}>
         <TestComponent reservation={reservation} onSuccess={onSuccess} />
       </MockedProvider>
     );

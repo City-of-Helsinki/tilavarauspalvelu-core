@@ -40,7 +40,7 @@ const ReservationUnit = styled.div`
   }
 `;
 
-function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): JSX.Element {
+function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): React.ReactElement {
   const { t } = useTranslation();
 
   const { data, loading } = useApplicationRoundCriteriaQuery({
@@ -113,7 +113,7 @@ function Criteria({ applicationRoundPk }: { applicationRoundPk: number }): JSX.E
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function ApplicationRoundRouted(props: PropsNarrowed): JSX.Element {
+export default function ApplicationRoundRouted(props: PropsNarrowed): React.ReactElement {
   return (
     <AuthorizationChecker permission={UserPermissionChoice.CanManageApplications}>
       <Criteria applicationRoundPk={props.pk} />

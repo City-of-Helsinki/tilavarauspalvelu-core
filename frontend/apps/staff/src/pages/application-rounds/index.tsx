@@ -56,8 +56,8 @@ function RoundsAccordion({
   hideIfEmpty?: boolean;
   name: string;
   initiallyOpen?: boolean;
-  emptyContent?: JSX.Element;
-}): JSX.Element | null {
+  emptyContent?: React.ReactElement;
+}): React.ReactElement | null {
   if (rounds.length === 0 && hideIfEmpty) {
     return null;
   }
@@ -73,7 +73,7 @@ function RoundsAccordion({
   );
 }
 
-function AllApplicationRounds(): JSX.Element | null {
+function AllApplicationRounds(): React.ReactElement | null {
   const { t } = useTranslation();
 
   const { data, loading, error } = useApplicationRoundListQuery();
@@ -188,7 +188,7 @@ function AllApplicationRounds(): JSX.Element | null {
 }
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-export default function Page(_props: PageProps): JSX.Element {
+export default function Page(_props: PageProps): React.ReactElement {
   return (
     <AuthorizationChecker permission={UserPermissionChoice.CanManageApplications}>
       <AllApplicationRounds />

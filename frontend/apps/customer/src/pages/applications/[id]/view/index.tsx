@@ -31,7 +31,7 @@ const TabPanel = styled(Tabs.TabPanel)`
   }
 `;
 
-function View({ application, tos }: Readonly<Pick<PropsNarrowed, "application" | "tos">>): JSX.Element {
+function View({ application, tos }: Readonly<Pick<PropsNarrowed, "application" | "tos">>): React.ReactElement {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 

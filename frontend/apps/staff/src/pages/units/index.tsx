@@ -8,7 +8,7 @@ import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { Filters, UnitsDataLoader } from "@/components/units";
 import { UserPermissionChoice } from "@gql/gql-types";
 
-function Units(): JSX.Element {
+function Units(): React.ReactElement {
   const { t } = useTranslation();
 
   return (
@@ -30,7 +30,7 @@ function Units(): JSX.Element {
 }
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-export default function Page(_props: PageProps): JSX.Element {
+export default function Page(_props: PageProps): React.ReactElement {
   return (
     <AuthorizationChecker permission={UserPermissionChoice.CanManageReservationUnits}>
       <Units />

@@ -1,4 +1,5 @@
 import { createNodeId } from "ui/src/modules/helpers";
+/* eslint-disable-next-line import/no-cycle */
 import { useReservationSeries } from "@/hooks";
 import { ReservationStateChoice, useReservationEditPageQuery } from "@gql/gql-types";
 import type { Maybe, ReservationEditPageQuery } from "@gql/gql-types";

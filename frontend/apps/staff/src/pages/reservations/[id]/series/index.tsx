@@ -86,7 +86,7 @@ function convertToForm(value: NodeT): RescheduleReservationSeriesForm {
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function SeriesPage({ pk, unitPk }: PropsNarrowed): JSX.Element {
+export default function SeriesPage({ pk, unitPk }: PropsNarrowed): React.ReactElement {
   const { user } = useSession();
   const hasAccess = hasPermission(user, UserPermissionChoice.CanCreateStaffReservations, unitPk);
   if (!hasAccess) {

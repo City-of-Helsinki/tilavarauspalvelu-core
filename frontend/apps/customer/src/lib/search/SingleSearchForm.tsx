@@ -93,7 +93,7 @@ const compFn = (a: { value: unknown }, b: string) => a != null && String(a.value
 export function SingleSearchForm({
   options: { reservationUnitTypes, intendedUses, units, equipments },
   isLoading,
-}: Readonly<SingleSearchFormProps>): JSX.Element | null {
+}: Readonly<SingleSearchFormProps>): React.ReactElement | null {
   const { handleSearch } = useSearchModify();
   const { t } = useTranslation();
   const searchValues = useSearchParams();

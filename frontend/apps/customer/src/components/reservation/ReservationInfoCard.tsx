@@ -65,7 +65,7 @@ export function ReservationInfoCard({
   disableImage = false,
   className,
   style,
-}: Readonly<Props>): JSX.Element | null {
+}: Readonly<Props>): React.ReactElement | null {
   const { t, i18n } = useTranslation();
   const reservationUnit = reservation.reservationUnit;
   const { data: accessCodeData } = useAccessCodeQuery({

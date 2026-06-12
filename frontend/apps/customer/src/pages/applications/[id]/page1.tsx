@@ -25,7 +25,10 @@ import { getApplicationPath } from "@/modules/urls";
 import { ApplicationPage1Document, useUpdateApplicationMutation } from "@gql/gql-types";
 import type { ApplicationPage1Query, ApplicationPage1QueryVariables } from "@gql/gql-types";
 
-function Page1({ application, options: optionsOrig }: Pick<PropsNarrowed, "application" | "options">): JSX.Element {
+function Page1({
+  application,
+  options: optionsOrig,
+}: Pick<PropsNarrowed, "application" | "options">): React.ReactElement {
   const router = useRouter();
   const dislayError = useDisplayError();
   const [mutate, { loading: isSaving }] = useUpdateApplicationMutation();

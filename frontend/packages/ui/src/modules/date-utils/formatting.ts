@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /**
  * Display formatting functions, with i18n.t and/or date-fns format
  */

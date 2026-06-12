@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { addDays, addMinutes, startOfDay } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { errorToast } from "ui/src/components/toast";
@@ -32,7 +32,7 @@ function useReservationsInInterval({
 
   // NOTE unlike array fetches this fetches a single element with an included array
   // so it doesn't have the 100 limitation of array fetch nor does it have pagination
-  const { loading, data, refetch } = useReservationsByReservationUnitQuery({
+  const { loading, data, refetch, error } = useReservationsByReservationUnitQuery({
     skip: !isValidQuery,
     variables: {
       id: createNodeId("ReservationUnitNode", reservationUnitPk ?? 0),
@@ -42,10 +42,12 @@ function useReservationsInInterval({
       endDate: apiEnd ?? "",
     },
     fetchPolicy: "no-cache",
-    onError: () => {
-      errorToast({ text: t("errors:errorFetchingData") });
-    },
   });
+
+  useEffect(() => {
+    if (error == null) return;
+    errorToast({ text: t("errors:errorFetchingData") });
+  }, [error, t]);
 
   const reservations = combineAffectingReservations(data, reservationUnitPk)
     .map((x) => reservationToInterval(x, reservationType))

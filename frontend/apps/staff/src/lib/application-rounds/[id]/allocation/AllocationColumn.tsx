@@ -125,7 +125,7 @@ function deserializeSlot(slot: string): { day: DayT; hour: number; mins: number 
   return { day: day, hour, mins };
 }
 
-function TimeSelection(): JSX.Element {
+function TimeSelection(): React.ReactElement {
   const { t } = useTranslation();
   const [selection, setSelection] = useSlotSelection();
 
@@ -302,7 +302,7 @@ export function AllocationColumn({
   refetchApplicationEvents,
   applicationRoundStatus,
   relatedAllocations,
-}: Props): JSX.Element | null {
+}: Props): React.ReactElement | null {
   const { t } = useTranslation();
   const [selection, setSelection] = useSlotSelection();
 

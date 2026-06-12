@@ -1,7 +1,8 @@
 import React from "react";
+import type { ReactElement } from "react";
 import { useController } from "react-hook-form";
 import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
-import { RadioButton, SelectionGroup } from "hds-react";
+import { RadioButton, SelectionGroup, Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { filterEmpty } from "../../modules/helpers";
 
@@ -24,16 +25,22 @@ export function ControlledRadioGroup<T extends FieldValues>({
   direction,
   required,
   label,
-  tooltip,
   noTranslation,
+  tooltip,
   error,
-}: RadioGroupProps<T>): JSX.Element {
+}: RadioGroupProps<T>): ReactElement {
   const { t } = useTranslation();
   const { field } = useController({ name, control });
 
   const errorText = filterEmpty(error) ?? undefined;
   return (
-    <SelectionGroup label={label} tooltipText={tooltip} required={required} direction={direction} errorText={errorText}>
+    <SelectionGroup
+      label={label}
+      required={required}
+      direction={direction}
+      errorText={errorText}
+      tooltip={tooltip != null && tooltip !== "" ? <Tooltip>{tooltip}</Tooltip> : undefined}
+    >
       {options.map((opt) => (
         <RadioButton
           id={`${name}.${opt.label}`}

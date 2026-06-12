@@ -670,7 +670,7 @@ function createReservationUnitLink({
     ApplicationSectionReservationUnitFragment,
     "nameSv" | "nameFi" | "nameEn" | "id" | "pk" | "unit"
   >;
-}): JSX.Element {
+}): React.ReactElement {
   const { pk } = reservationUnit;
   const name = getTranslation(reservationUnit, "name", lang);
   const unit = reservationUnit.unit ? `, ${getTranslation(reservationUnit.unit, "name", lang)}` : "";
@@ -701,7 +701,7 @@ const StyledStatusLabel = styled(StatusLabel)`
 `;
 
 function getStatusLabelProps(status: ApprovedReservationStatus): {
-  icon: JSX.Element;
+  icon: React.ReactElement;
   type: StatusLabelType;
 } {
   switch (status) {

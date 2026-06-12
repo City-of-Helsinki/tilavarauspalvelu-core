@@ -51,7 +51,7 @@ function timeRangeToCell(timeRanges: SuitableTimeRangeType[]): Cell[][] {
   return cells;
 }
 
-export function TimeSelector({ applicationSection }: TimeSelectorProps): JSX.Element {
+export function TimeSelector({ applicationSection }: TimeSelectorProps): React.ReactElement {
   const { t } = useTranslation();
   const schedules = filterNonNullable(applicationSection.suitableTimeRanges);
   const cells = timeRangeToCell(schedules);

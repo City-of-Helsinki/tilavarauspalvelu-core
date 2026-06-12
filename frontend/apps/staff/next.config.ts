@@ -11,11 +11,13 @@ import { getStaffRelease } from "./src/modules/baseUtils";
 process.env.I18NEXT_DEFAULT_CONFIG_PATH = "./next-i18next.config.cjs";
 
 const ROOT_PATH = url.fileURLToPath(new URL(".", import.meta.url));
+const HDS_COOKIE_CONSENT_IMPORT = "hds-core/lib/components/cookie-consent/cookieConsent";
+const HDS_COOKIE_CONSENT_TARGET = "hds-core/lib/components/cookie-consent/cookieConsent.ts";
 
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
-  transpilePackages: ["ui"],
+  transpilePackages: ["ui", "hds-core", "hds-react"],
   // create a smaller bundle
   output: "standalone",
   // this includes files from the monorepo base two directories up
@@ -23,6 +25,11 @@ const config = {
   // don't block builds use a separate CI step for this
   typescript: {
     ignoreBuildErrors: true,
+  },
+  turbopack: {
+    resolveAlias: {
+      [HDS_COOKIE_CONSENT_IMPORT]: HDS_COOKIE_CONSENT_TARGET,
+    },
   },
   sassOptions: {
     includePaths: [join(ROOT_PATH, "src")],
@@ -96,6 +103,25 @@ const config = {
   // Sentry upload options don't fully control all emitted chunk sourcemaps.
   // In this app, sourcemap generation is controlled via Next.js/Turbopack config.
   productionBrowserSourceMaps: env.SENTRY_ENABLE_SOURCE_MAPS,
+  webpack: (
+    config: { devtool: string; resolve?: { alias?: Record<string, string> } },
+    { isServer }: { isServer: boolean }
+  ) => {
+    if (isServer && env.SENTRY_ENABLE_SOURCE_MAPS) {
+      // oxlint-disable-next-line no-console
+      console.log("Server build: adding sourcemaps");
+      config.devtool = "source-map";
+    }
+    // Fix HDS 6 import resolution issue with hds-core
+    if (!config.resolve) {
+      config.resolve = {};
+    }
+    if (!config.resolve.alias) {
+      config.resolve.alias = {};
+    }
+    config.resolve.alias[HDS_COOKIE_CONSENT_IMPORT] = HDS_COOKIE_CONSENT_TARGET;
+    return config;
+  },
   basePath: env.NEXT_PUBLIC_BASE_URL,
   compiler: {
     styledComponents: {

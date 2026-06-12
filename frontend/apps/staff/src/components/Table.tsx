@@ -54,7 +54,7 @@ type Props = Omit<TableProps, "onSort"> & {
 };
 
 // @param isLoading - if true, table is rendered with a loading overlay
-export function CustomTable({ isLoading, setSort, enableFrontendSorting, ...props }: Props): JSX.Element {
+export function CustomTable({ isLoading, setSort, enableFrontendSorting, ...props }: Props): React.ReactElement {
   const [keyOverride, setKeyOverride] = useState<number>(0);
   const onSort = (order: "asc" | "desc", colKey: string) => {
     const field = order === "asc" ? colKey : `-${colKey}`;

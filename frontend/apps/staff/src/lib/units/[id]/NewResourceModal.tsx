@@ -21,7 +21,7 @@ interface ModalProps {
   refetch: () => Promise<unknown>;
 }
 
-export function NewResourceModal({ unit, closeModal, refetch, spacePk }: ModalProps): JSX.Element | null {
+export function NewResourceModal({ unit, closeModal, refetch, spacePk }: ModalProps): React.ReactElement | null {
   const { t } = useTranslation();
   const displayError = useDisplayError();
 

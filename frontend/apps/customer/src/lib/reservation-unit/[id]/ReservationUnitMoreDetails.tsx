@@ -126,7 +126,7 @@ function NoticeWhenReservingSection({
   reservationUnit,
 }: Readonly<{
   reservationUnit: NoticeWhenReservingFragment;
-}>): JSX.Element | null {
+}>): React.ReactElement | null {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   const notesWhenReserving = getTranslation(reservationUnit, "notesWhenApplying", lang);
@@ -150,7 +150,7 @@ function NoticeWhenReservingSection({
   );
 }
 
-function PriceChangeNotice({ futurePricing }: Readonly<{ futurePricing: PricingFieldsFragment }>): JSX.Element {
+function PriceChangeNotice({ futurePricing }: Readonly<{ futurePricing: PricingFieldsFragment }>): React.ReactElement {
   const { t, i18n } = useTranslation();
 
   const isPaid = !isPriceFree(futurePricing);

@@ -72,7 +72,7 @@ export function Filters({
 }: {
   options: TagOptionsList;
   onChangedCriteria: () => void;
-}): JSX.Element {
+}): React.ReactElement {
   const { t } = useTranslation();
   const setSearchParams = useSetSearchParams();
   const searchParams = useSearchParams();

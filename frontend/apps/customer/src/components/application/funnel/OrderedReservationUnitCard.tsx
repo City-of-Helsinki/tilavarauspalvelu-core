@@ -197,7 +197,7 @@ export function OrderedReservationUnitCard({
   onMoveDown,
   error,
   ...rest
-}: Readonly<Props>): JSX.Element {
+}: Readonly<Props>): React.ReactElement {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
 

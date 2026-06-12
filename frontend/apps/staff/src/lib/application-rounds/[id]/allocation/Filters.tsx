@@ -38,7 +38,7 @@ type SearchFormValues = {
   purpose: number[];
 };
 
-export function Filters({ hideSearchTags, units, isLoading }: FilterProps): JSX.Element {
+export function Filters({ hideSearchTags, units, isLoading }: FilterProps): React.ReactElement {
   const { t } = useTranslation();
   const setSearchParams = useSetSearchParams();
   const searchParams = useSearchParams();

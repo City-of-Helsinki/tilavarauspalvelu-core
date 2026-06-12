@@ -17,7 +17,7 @@ type Page1Props = Readonly<{
   options: Readonly<OptionsListT>;
 }>;
 
-export function Page1({ applicationRound, isSaving, options }: Page1Props): JSX.Element | null {
+export function Page1({ applicationRound, isSaving, options }: Page1Props): React.ReactElement | null {
   const { t } = useTranslation();
 
   // get the user selected defaults for reservationUnits field

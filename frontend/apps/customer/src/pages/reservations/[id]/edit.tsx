@@ -27,7 +27,7 @@ import type { ReservationEditPageQuery, ReservationEditPageQueryVariables } from
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
-function ReservationEditPage(props: PropsNarrowed): JSX.Element {
+function ReservationEditPage(props: PropsNarrowed): React.ReactElement {
   const { t, i18n } = useTranslation();
   const { reservation } = props;
 
@@ -91,7 +91,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   );
 }
 
-function ReservationEditPageWrapper(props: PropsNarrowed): JSX.Element {
+function ReservationEditPageWrapper(props: PropsNarrowed): React.ReactElement {
   const { t } = useTranslation();
 
   const { reservation } = props;

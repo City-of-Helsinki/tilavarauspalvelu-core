@@ -70,7 +70,7 @@ interface PopupMenuProps {
 // This is relative to the button, but that causes few other issues
 // - the popup is forced to open on the left side so using it on the left of a page would cause an overflow
 // - the popup will expand containers the buttons are inside of (like <table>, not the cell)
-export function PopupMenu({ items, style, className }: PopupMenuProps): JSX.Element {
+export function PopupMenu({ items, style, className }: PopupMenuProps): React.ReactElement {
   const buttonRef = useRef<HTMLDivElement>(null);
   const firstMenuItemRef = useRef<HTMLButtonElement>(null);
 
@@ -126,7 +126,7 @@ function PopupContent({
 }: {
   items: PopupMenuProps["items"];
   closePopup: () => void;
-  firstMenuItemRef: React.RefObject<HTMLButtonElement>;
+  firstMenuItemRef: React.RefObject<HTMLButtonElement | null>;
 }) {
   const canBeTrapped = items.some((i) => !i.disabled);
   return (

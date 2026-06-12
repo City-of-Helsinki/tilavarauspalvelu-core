@@ -58,7 +58,6 @@ function customRender(
   return render(
     <MockedProvider
       mocks={mocks}
-      addTypename={false}
       // Have to cache bypass (setting cache to InMemoryCache is not enough)
       // NOTE if copying this approach any override in the query will take precedence
       // so for query specific fetchPolicies an alternative approach to cache is required

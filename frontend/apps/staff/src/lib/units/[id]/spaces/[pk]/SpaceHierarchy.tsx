@@ -29,7 +29,7 @@ function getParents(root: SpaceNode | null | undefined, spaces?: SpaceNode[], hi
 }
 
 // This doesn't work properly because we can't do a recursive query
-export function SpaceHierarchy({ space }: Props): JSX.Element {
+export function SpaceHierarchy({ space }: Props): React.ReactElement {
   const unitSpaces = space?.unit?.spaces ?? [];
   // @ts-expect-error -- this wasn't working before either, the tree raversal is broken
   const tree = getParents(space, unitSpaces, []).reverse();

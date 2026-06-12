@@ -6,7 +6,7 @@ import { ApplicationStatusChoice } from "@gql/gql-types";
 import { ViewApplication } from "./ViewApplication";
 
 interface RenderProps extends CreateMockApplicationFragmentProps {
-  children?: JSX.Element;
+  children?: React.ReactElement;
 }
 function customRender({ children, ...props }: RenderProps = {}): ReturnType<typeof render> {
   if (props.page == null) {

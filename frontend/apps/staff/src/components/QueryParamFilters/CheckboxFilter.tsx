@@ -22,7 +22,7 @@ function BaseCheckboxFilter({
   name: string;
   checked: boolean;
   onChange: (val: boolean) => void;
-}): JSX.Element {
+}): React.ReactElement {
   const { t } = useTranslation();
   return (
     <CenteredCheckbox
@@ -41,7 +41,7 @@ interface ControlledCheckboxFilterProps<T extends FieldValues> extends UseContro
 export function ControlledCheckboxFilter<T extends FieldValues>({
   name,
   control,
-}: ControlledCheckboxFilterProps<T>): JSX.Element {
+}: ControlledCheckboxFilterProps<T>): React.ReactElement {
   const {
     field: { value: checked, onChange },
   } = useController({ name, control });

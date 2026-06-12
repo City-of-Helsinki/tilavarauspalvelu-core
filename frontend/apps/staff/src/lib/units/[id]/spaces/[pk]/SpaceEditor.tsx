@@ -32,7 +32,7 @@ type Props = {
   unit: number;
 };
 
-export function SpaceEditor({ space, unit }: Props): JSX.Element {
+export function SpaceEditor({ space, unit }: Props): React.ReactElement {
   const router = useRouter();
   const { t } = useTranslation();
   const [mutation, { loading: isMutationLoading }] = useUpdateSpaceMutation();

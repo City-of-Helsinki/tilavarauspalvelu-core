@@ -15,7 +15,7 @@ interface MultiSelectFilterProps {
   enableSearch?: boolean;
 }
 
-export function MultiSelectFilter(props: MultiSelectFilterProps): JSX.Element {
+export function MultiSelectFilter(props: MultiSelectFilterProps): React.ReactElement {
   const { name } = props;
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
@@ -46,7 +46,7 @@ function BaseMultiSelectFilter({
   setFilter,
   enableSearch,
   ...rest
-}: BaseMultiSelectFilterProps): JSX.Element {
+}: BaseMultiSelectFilterProps): React.ReactElement {
   const { t } = useTranslation();
   const label = t(`filters:label.${name}`);
   const placeholder = t(`filters:placeholder.${name}`);
@@ -87,7 +87,7 @@ export function ControlledMultiSelectFilter<T extends FieldValues>({
   style,
   className,
   enableSearch = false,
-}: ControlledMultiSelectProps<T>): JSX.Element {
+}: ControlledMultiSelectProps<T>): React.ReactElement {
   const {
     field: { value, onChange },
   } = useController({ name, control });

@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useMemo, useState } from "react";
 
 type ModalContextProps = {
-  modalContent: { content: JSX.Element | null };
-  setModalContent: (content: JSX.Element | null) => void;
+  modalContent: { content: React.ReactElement | null };
+  setModalContent: (content: React.ReactElement | null) => void;
   isOpen: boolean;
 };
 
@@ -20,10 +20,10 @@ type Props = {
 
 export const ModalContextProvider: React.FC<Props> = ({ children }: Props) => {
   const [modalContent, setModalContent] = useState<{
-    content: JSX.Element | null;
+    content: React.ReactElement | null;
   }>({ content: null });
 
-  const toggleModal = (content: JSX.Element | null): void => {
+  const toggleModal = (content: React.ReactElement | null): void => {
     setModalContent({ content });
   };
 

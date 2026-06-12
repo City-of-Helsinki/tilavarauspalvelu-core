@@ -9,7 +9,7 @@ type Props = {
 
 /// Renders the time preview for the application section based on form data.
 /// Requires react-hook-form context to access the form values.
-export function TimePreview({ index }: Props): JSX.Element {
+export function TimePreview({ index }: Props): React.ReactElement {
   const { watch } = useFormContext<ApplicationPage2FormValues>();
   const schedules = watch(`applicationSections.${index}.suitableTimeRanges`);
   return <ApplicationTimePreview schedules={schedules} />;

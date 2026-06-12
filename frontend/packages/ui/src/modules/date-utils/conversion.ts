@@ -1,7 +1,9 @@
 import { isValid, isAfter, parse } from "date-fns";
 import { fromZonedTime } from "date-fns-tz";
 import type { DayT } from "@ui/modules/const";
+/* eslint-disable-next-line import/no-cycle */
 import { UI_DATE_FORMAT } from "@ui/modules/date-utils/formatting";
+/* eslint-disable-next-line import/no-cycle */
 import { formatDate, formatTime } from "./formatting";
 
 const HELSINKI_TIMEZONE = "Europe/Helsinki";

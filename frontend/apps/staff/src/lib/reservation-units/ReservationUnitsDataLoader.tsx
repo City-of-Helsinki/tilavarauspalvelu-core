@@ -49,7 +49,7 @@ function transformSortString(orderBy: string | null): ReservationUnitOrderingCho
   return [];
 }
 
-export function ReservationUnitsDataReader({ selectedRows, setSelectedRows }: Props): JSX.Element {
+export function ReservationUnitsDataReader({ selectedRows, setSelectedRows }: Props): React.ReactElement {
   const [sort, setSort] = useState<string>("");
   const onSortChanged = (sortField: string) => {
     if (sort === sortField) {

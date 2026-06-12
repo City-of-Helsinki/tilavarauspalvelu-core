@@ -1,4 +1,5 @@
 import React from "react";
+import type { ReactElement } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
@@ -56,7 +57,6 @@ function TypeSelect({ isDisabled }: { isDisabled?: boolean }) {
           disabled={isDisabled}
           label={t("reservationApplication:type")}
           errorText={errors.type?.message != null ? t(`reservationForm:errors.${errors.type?.message}`) : ""}
-          tooltipText={t("reservationApplication:typeSelection.tooltip")}
         >
           {allowedTypesChoices.map((v) => (
             <RadioButton
@@ -85,7 +85,7 @@ export function ReservationTypeForm({
   children,
   disableBufferToggle,
   disableTypeSelect,
-}: ReservationTypeFormProps): JSX.Element | null {
+}: ReservationTypeFormProps): ReactElement | null {
   const { t } = useTranslation();
 
   const {

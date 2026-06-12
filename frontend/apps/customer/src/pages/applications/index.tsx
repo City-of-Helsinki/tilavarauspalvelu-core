@@ -73,7 +73,7 @@ function ApplicationGroups({
   );
 }
 
-function ApplicationsPage({ data: initialData }: PropsNarrowed): JSX.Element | null {
+function ApplicationsPage({ data: initialData }: PropsNarrowed): React.ReactElement | null {
   const { t } = useTranslation();
 
   const { currentUser } = useCurrentUser();

@@ -85,7 +85,7 @@ function SubmitFragment({
   loadingText: string;
   buttonText: string;
   isQuotaReached: boolean;
-}>): JSX.Element {
+}>): React.ReactElement {
   const { env } = useEnvContext();
   const returnToUrl = useMemo(() => {
     if (!focusSlot.isReservable) {
@@ -144,7 +144,7 @@ function ReservationUnit({
   reservationUnit,
   queryParams: { searchDuration, searchDate, searchTime },
   mutationErrors,
-}: Readonly<PropsNarrowed>): JSX.Element | null {
+}: Readonly<PropsNarrowed>): React.ReactElement | null {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   const router = useRouter();

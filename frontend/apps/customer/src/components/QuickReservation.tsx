@@ -20,7 +20,7 @@ import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 
 type Props = {
   reservationUnit: ReservationTimePickerFieldsFragment;
-  subventionSuffix: JSX.Element | undefined;
+  subventionSuffix: React.ReactElement | undefined;
   reservationForm: UseFormReturn<PendingReservationFormType>;
   durationOptions: Array<{ label: string; value: number }>;
   startingTimeOptions: Array<{ label: string; value: string }>;
@@ -140,7 +140,7 @@ export function QuickReservation({
   LoginAndSubmit,
   className,
   style,
-}: Readonly<Props>): JSX.Element | null {
+}: Readonly<Props>): React.ReactElement | null {
   const { t } = useTranslation();
   const { control, watch, handleSubmit } = reservationForm;
   const formDate = watch("date");

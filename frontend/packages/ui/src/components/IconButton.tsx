@@ -134,7 +134,7 @@ function IconButtonImpl({
   href,
   openInNewTab = !!href && href.startsWith("http"), // open external links in a new tab by default
   ...rest
-}: IconButtonProps): JSX.Element {
+}: IconButtonProps): React.ReactElement {
   if (href == null || href === "") {
     return (
       <StyledLinkButton type="button" {...rest}>
@@ -159,11 +159,11 @@ function IconButtonImpl({
  *  @prop {string} [href] - the link URI (optional) if none is provided, renders a non-link button
  *  @prop {boolean} [openInNewTab] - should the link open in a new tab (optional, default true if href begins "http...")
  *  @prop {function} [onClick] - a function to execute upon clicking the button (optional)
- *  @returns {JSX.Element} A `<Link>` for internal or an `<a>` for external `href`s, with the `icon` aligned to the
+ *  @returns {React.ReactElement} A `<Link>` for internal or an `<a>` for external `href`s, with the `icon` aligned to the
  *  right of the `label` text. Can also be used as a non-link button via the `onClick` attribute (still renders an
  *  `<a>` element). Accepts other parameters through `...rest` - for id's, aria-attributes, testing etc.
  */
-export function IconButton(props: IconButtonProps): JSX.Element {
+export function IconButton(props: IconButtonProps): React.ReactElement {
   return (
     // Wrap inside a block so the inner element doesn't respond to clicks outside the content
     <div>

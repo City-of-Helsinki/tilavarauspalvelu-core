@@ -7,7 +7,7 @@ import type { StatusLabelType } from "../StatusLabel";
 
 type RoundStatus = {
   type: StatusLabelType;
-  icon: JSX.Element;
+  icon: React.ReactElement;
 };
 
 export function getApplicationRoundStatus(status: ApplicationRoundStatusChoice): RoundStatus {

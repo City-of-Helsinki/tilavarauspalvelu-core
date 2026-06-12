@@ -13,7 +13,7 @@ import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
 import type { SingleSearchCardFragment } from "@gql/gql-types";
 
-function StatusTag(props: Pick<SingleSearchCardFragment, "isClosed" | "firstReservableDatetime">): JSX.Element {
+function StatusTag(props: Pick<SingleSearchCardFragment, "isClosed" | "firstReservableDatetime">): React.ReactElement {
   const { t } = useTranslation();
   const { isClosed, firstReservableDatetime } = props;
 
@@ -65,7 +65,7 @@ interface PropsT {
   reservationUnit: SingleSearchCardFragment;
 }
 
-export function SingleSearchCard({ reservationUnit }: PropsT): JSX.Element {
+export function SingleSearchCard({ reservationUnit }: PropsT): React.ReactElement {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   const name = getTranslation(reservationUnit, "name", lang);

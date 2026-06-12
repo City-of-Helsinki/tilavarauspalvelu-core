@@ -2,7 +2,7 @@ import React from "react";
 import type { CSSProperties } from "react";
 import type { FieldValues, UseControllerProps } from "react-hook-form";
 import { useController } from "react-hook-form";
-import { TextInput } from "hds-react";
+import { TextInput, Tooltip } from "hds-react";
 import styled from "styled-components";
 import { CharacterCounter } from "@ui/components/form/CharacterCounter";
 import { Flex } from "@ui/styled";
@@ -65,10 +65,10 @@ export function ControlledTextInput<T extends FieldValues>({
         min={min}
         max={max}
         placeholder={placeholder}
-        tooltipText={tooltipText}
         helperText={helperText}
         errorText={errorText}
         invalid={invalid}
+        tooltip={tooltipText != null && tooltipText !== "" ? <Tooltip>{tooltipText}</Tooltip> : undefined}
       />
       {max ? (
         <CharacterCounter value={value} maxLength={max} style={characterCounterStyle(!!tooltipText)} {...rest} />

@@ -81,7 +81,7 @@ export function CreateReservationModal({
   start,
   onClose,
   focusAfterCloseRef,
-}: CreateReservationModalProps): JSX.Element {
+}: CreateReservationModalProps): React.ReactElement {
   const { t } = useTranslation();
   const { isOpen } = useModal();
   const params = useSearchParams();

@@ -64,7 +64,7 @@ function EventGroupList({
   reservationUnit: Pick<ReservationUnitNode, "pk">;
   type: AllocationApplicationSectionCardType;
   refetch: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
-}): JSX.Element {
+}): React.ReactElement {
   if (applicationSections.length === 0) {
     return <div>-</div>;
   }
@@ -98,7 +98,7 @@ export function AllocationPageContent({
   refetchApplicationEvents,
   applicationRoundStatus,
   relatedAllocations,
-}: ApplicationEventsProps): JSX.Element {
+}: ApplicationEventsProps): React.ReactElement {
   const relatedSpacesTimeSlotsByDayReduced = getRelatedTimeSlots(relatedAllocations);
 
   // NOTE left hand cards include other reservation units as well (if they are allocated)
@@ -148,7 +148,10 @@ function ApplicationSectionColumn({
   applicationSections,
   reservationUnit,
   refetchApplicationEvents,
-}: Pick<ApplicationEventsProps, "applicationSections" | "refetchApplicationEvents" | "reservationUnit">): JSX.Element {
+}: Pick<
+  ApplicationEventsProps,
+  "applicationSections" | "refetchApplicationEvents" | "reservationUnit"
+>): React.ReactElement {
   const { t } = useTranslation();
 
   const sections = filterNonNullable(applicationSections);

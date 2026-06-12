@@ -14,7 +14,7 @@ type Props = {
   isMyUnits?: boolean;
 };
 
-export function UnitsDataLoader({ isMyUnits }: Props): JSX.Element {
+export function UnitsDataLoader({ isMyUnits }: Props): React.ReactElement {
   const [sort, setSort] = useState<string>("nameFi");
   const handleSortChanged = (sortField: string) => {
     if (sort === sortField) {

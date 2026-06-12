@@ -176,7 +176,7 @@ const ErrorWrapper = styled.div`
 `;
 
 // Smaller version of Error for this component (the standard HDS doubles the size of this component for no reason)
-function FormErrorText({ children }: { children: string }): JSX.Element {
+function FormErrorText({ children }: { children: string }): React.ReactElement {
   return (
     <ErrorWrapper>
       <div>

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import type { FieldErrors, FieldValues } from "react-hook-form";
-import { ErrorSummary } from "hds-react";
+import { Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 
@@ -23,25 +23,32 @@ function cleanUpFieldName(fieldName?: string): string | null {
   return fieldName;
 }
 
-export function FormErrorSummary<T extends FieldValues>({ errors, fieldNamePrefix }: Props<T>): JSX.Element | null {
+export function FormErrorSummary<T extends FieldValues>({
+  errors,
+  fieldNamePrefix,
+}: Props<T>): React.ReactElement | null {
   const { t } = useTranslation("forms");
+  const summaryRef = useRef<HTMLDivElement>(null);
 
   const keys: string[] = [];
   for (const err in errors) {
     keys.push(err);
   }
 
+  useEffect(() => {
+    summaryRef.current?.focus();
+  }, []);
+
   if (Object.keys(errors).length === 0) {
     return null;
   }
 
   const cleanPrefix = cleanUpFieldName(fieldNamePrefix);
-
   const prefix = cleanPrefix != null ? `${cleanPrefix}.` : "errors.";
 
   return (
-    <Wrapper>
-      <ErrorSummary label={t("ErrorSummary.label")} autofocus>
+    <Wrapper ref={summaryRef} tabIndex={-1}>
+      <Notification type="alert" label={t("ErrorSummary.label")}>
         <ul>
           {Object.values(errors).map((err, index: number) => {
             const label = t(`ErrorSummary.errorLabel`, {
@@ -57,7 +64,7 @@ export function FormErrorSummary<T extends FieldValues>({ errors, fieldNamePrefi
             );
           })}
         </ul>
-      </ErrorSummary>
+      </Notification>
     </Wrapper>
   );
 }

@@ -24,7 +24,7 @@ type Props = Readonly<{
   onDeleteEvent: () => void;
 }>;
 
-function ApplicationSectionInner({ index, applicationRound, options, onDeleteEvent }: Props): JSX.Element {
+function ApplicationSectionInner({ index, applicationRound, options, onDeleteEvent }: Props): React.ReactElement {
   const { t, i18n } = useTranslation();
   const form = useFormContext<ApplicationPage1FormValues>();
   const {
@@ -212,7 +212,7 @@ function ApplicationDateRangePicker({
   index: number;
   minDate: Date;
   maxDate: Date;
-}): JSX.Element {
+}): React.ReactElement {
   const { t, i18n } = useTranslation();
   const form = useFormContext<ApplicationPage1FormValues>();
   const { register, getValues, setValue, clearErrors, trigger, getFieldState } = form;
@@ -271,7 +271,7 @@ function ApplicationDateRangePicker({
   );
 }
 
-export function ApplicationSectionPage1(props: Props): JSX.Element {
+export function ApplicationSectionPage1(props: Props): React.ReactElement {
   const { index } = props;
 
   const { t } = useTranslation();

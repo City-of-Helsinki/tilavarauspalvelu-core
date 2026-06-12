@@ -7,7 +7,7 @@ type Props = {
   enableHotjar: boolean;
 };
 
-export function ExternalScripts({ enableMatomo, enableHotjar }: Props): JSX.Element | null {
+export function ExternalScripts({ enableMatomo, enableHotjar }: Props): React.ReactElement | null {
   if (!isBrowser) {
     return null;
   }
@@ -23,11 +23,11 @@ export function ExternalScripts({ enableMatomo, enableHotjar }: Props): JSX.Elem
   );
 }
 
-function MatomoScript(): JSX.Element {
+function MatomoScript(): React.ReactElement {
   return <Script id="matomo" strategy="afterInteractive" src="/scripts/init-matomo.cjs" />;
 }
 
-function HotjarScript(): JSX.Element {
+function HotjarScript(): React.ReactElement {
   return (
     <Script
       id="hotjar"

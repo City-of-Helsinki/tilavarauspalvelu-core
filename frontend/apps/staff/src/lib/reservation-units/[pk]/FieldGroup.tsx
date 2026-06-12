@@ -30,7 +30,7 @@ export function FieldGroup({
   className?: string;
   style?: React.CSSProperties;
   required?: boolean;
-}): JSX.Element {
+}): React.ReactElement {
   return (
     <div className={className} style={style}>
       <FieldGroupWrapper>

@@ -21,7 +21,7 @@ import { getApplicationPath } from "@/modules/urls";
 import { ApplicationPage2Document, useUpdateApplicationMutation } from "@gql/gql-types";
 import type { ApplicationPage2Query, ApplicationPage2QueryVariables } from "@gql/gql-types";
 
-function Page2({ application }: Pick<PropsNarrowed, "application">): JSX.Element {
+function Page2({ application }: Pick<PropsNarrowed, "application">): React.ReactElement {
   const router = useRouter();
   const [mutate] = useUpdateApplicationMutation();
   const displayError = useDisplayError();

@@ -9,7 +9,7 @@ import { H1 } from "ui/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 
-export default function ListReservationsPage(): JSX.Element {
+export default function ListReservationsPage(): React.ReactElement {
   const { t } = useTranslation();
 
   const today = useMemo(() => new Date(), []);

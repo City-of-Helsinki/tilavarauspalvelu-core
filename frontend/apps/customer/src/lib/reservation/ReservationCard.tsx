@@ -22,7 +22,7 @@ interface PropsT {
   apiBaseUrl: string;
 }
 
-export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<PropsT>): JSX.Element | null {
+export function ReservationCard({ reservation, type, apiBaseUrl }: Readonly<PropsT>): React.ReactElement | null {
   const { t, i18n } = useTranslation();
 
   const reservationUnit = reservation.reservationUnit;

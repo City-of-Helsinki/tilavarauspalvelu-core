@@ -22,7 +22,7 @@ export function ReservationSubventionSection({
   termsForDiscount,
   form,
 }: {
-  termsForDiscount: JSX.Element | string;
+  termsForDiscount: React.ReactElement | string;
   form: UseFormReturn<ReservationFormValueT>;
 }): React.ReactElement {
   const { t } = useTranslation();

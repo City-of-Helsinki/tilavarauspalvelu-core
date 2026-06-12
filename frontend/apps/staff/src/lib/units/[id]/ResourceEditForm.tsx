@@ -13,7 +13,7 @@ export function ResourceEditorFields({
 }: {
   form: UseFormReturn<ResourceUpdateForm>;
   unitPk: number;
-}): JSX.Element {
+}): React.ReactElement {
   const { control, formState } = form;
   const { errors } = formState;
   const { t } = useTranslation();

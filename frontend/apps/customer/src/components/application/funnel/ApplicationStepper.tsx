@@ -43,7 +43,7 @@ function calculateAvailableStep(application: ReadonlyDeep<ApplicationFormFragmen
 type StepperProps = {
   application: ReadonlyDeep<ApplicationFormFragment>;
 };
-export function ApplicationStepper({ application }: Readonly<StepperProps>): JSX.Element {
+export function ApplicationStepper({ application }: Readonly<StepperProps>): React.ReactElement {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 

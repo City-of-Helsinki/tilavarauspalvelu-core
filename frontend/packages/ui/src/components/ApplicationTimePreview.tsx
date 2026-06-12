@@ -52,7 +52,7 @@ const Heading = styled.p.attrs({ as: "h4" })`
 
 type SchedulesT = Omit<SuitableTimeFragment, "pk" | "id">;
 
-export function ApplicationTimePreview({ schedules }: { schedules: ReadonlyArray<SchedulesT> }): JSX.Element {
+export function ApplicationTimePreview({ schedules }: { schedules: ReadonlyArray<SchedulesT> }): React.ReactElement {
   const { t } = useTranslation();
 
   const primary = schedules.filter((n) => n.priority === Priority.Primary);

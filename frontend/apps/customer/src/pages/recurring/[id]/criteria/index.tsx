@@ -52,7 +52,7 @@ const ContentWrapper = styled.div`
   }
 `;
 
-function Criteria({ applicationRound }: Readonly<PropsNarrowed>): JSX.Element | null {
+function Criteria({ applicationRound }: Readonly<PropsNarrowed>): React.ReactElement | null {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   const name = getTranslation(applicationRound, "name", lang);

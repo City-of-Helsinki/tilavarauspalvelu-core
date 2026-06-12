@@ -58,7 +58,7 @@ type Props =
 /// @param reservationPk - the pk of the reservation
 /// @param applicationPk - the pk of the application
 /// Only makes the query if the user clicks the show button to minimise logging
-export function BirthDate(props: Props): JSX.Element {
+export function BirthDate(props: Props): React.ReactElement {
   const [visible, setVisible] = useState(false);
 
   const reservationPk = "reservationPk" in props ? props.reservationPk : null;

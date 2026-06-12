@@ -16,7 +16,7 @@ export function JustForMobile({
   children: React.ReactNode;
   customBreakpoint?: string;
   style?: React.CSSProperties;
-}): JSX.Element {
+}): React.ReactElement {
   return (
     <MobileWrapper $breakpoint={customBreakpoint} style={style}>
       {children}
@@ -38,7 +38,7 @@ export function JustForDesktop({
   children: React.ReactNode;
   customBreakpoint?: string;
   style?: React.CSSProperties;
-}): JSX.Element {
+}): React.ReactElement {
   return (
     <DesktopWrapper $breakpoint={customBreakpoint} style={style}>
       {children}

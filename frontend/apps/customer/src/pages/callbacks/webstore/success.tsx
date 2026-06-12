@@ -92,7 +92,7 @@ type NarrowedProps = Exclude<Props, { notFound: boolean }>;
 /// Show loading page if the reservation is still waiting for payment
 /// assuming the user landed here correctly from the webstore callback
 /// the reservation is paid and confirmed but our backend hasn't updated the state yet
-export default function Page({ reservation }: NarrowedProps): JSX.Element {
+export default function Page({ reservation }: NarrowedProps): React.ReactElement {
   // is there a point where we stop polling and return an error to the user?
   const { data, stopPolling } = useReservationStateQuery({
     variables: {

@@ -64,9 +64,9 @@ type Props<T> = {
   max?: Date;
   draggableAccessor?: (event: CalendarEvent<T>) => boolean;
   resizableAccessor?: (event: CalendarEvent<T>) => boolean;
-  toolbarComponent?: (props: ToolbarProps) => JSX.Element | React.ReactNode;
-  eventWrapperComponent?: (props: unknown) => JSX.Element | React.ReactNode;
-  dateCellWrapperComponent?: (props: unknown) => JSX.Element | React.ReactNode;
+  toolbarComponent?: (props: ToolbarProps) => React.ReactElement | React.ReactNode;
+  eventWrapperComponent?: (props: unknown) => React.ReactElement | React.ReactNode;
+  dateCellWrapperComponent?: (props: unknown) => React.ReactElement | React.ReactNode;
   showToolbar?: boolean;
   reservable?: boolean;
   draggable?: boolean;
@@ -566,7 +566,7 @@ export function Calendar<T extends Record<string, unknown>>({
   longPressThreshold = 250,
   underlineEvents = false,
   isLoading,
-}: Props<T>): JSX.Element {
+}: Props<T>): React.ReactElement {
   const Component: React.ElementType = draggable ? StyledCalendarDND : StyledCalendar;
 
   return (

@@ -17,7 +17,7 @@ type Props = {
   testId?: string;
 };
 
-export function ConfirmationDialog(props: Props): JSX.Element | null {
+export function ConfirmationDialog(props: Props): React.ReactElement | null {
   const { onAccept, onCancel, acceptIcon, variant, isOpen, testId: testIdOrig } = props;
   const testId = filterEmpty(testIdOrig);
   const { acceptLabel, cancelLabel, heading, content } = props;

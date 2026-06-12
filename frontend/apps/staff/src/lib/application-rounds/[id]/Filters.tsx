@@ -71,7 +71,7 @@ export function Filters({
   enableWeekday = false,
   enableReservationUnit = false,
   enableAccessCodeState = false,
-}: FilterProps): JSX.Element {
+}: FilterProps): React.ReactElement {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const setSearchParams = useSetSearchParams();

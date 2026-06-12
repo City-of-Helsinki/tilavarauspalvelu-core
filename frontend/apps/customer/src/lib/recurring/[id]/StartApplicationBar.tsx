@@ -57,7 +57,7 @@ type Props = {
   apiBaseUrl: string;
 };
 
-export function StartApplicationBar({ apiBaseUrl, applicationRound }: Readonly<Props>): JSX.Element {
+export function StartApplicationBar({ apiBaseUrl, applicationRound }: Readonly<Props>): React.ReactElement {
   const { t } = useTranslation();
   const router = useRouter();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);

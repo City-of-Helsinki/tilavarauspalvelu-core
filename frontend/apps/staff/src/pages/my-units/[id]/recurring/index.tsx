@@ -17,7 +17,7 @@ import type { SeriesReservationUnitQuery, SeriesReservationUnitQueryVariables } 
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;
-export default function Page({ unitPk, reservationUnits }: PropsNarrowed): JSX.Element {
+export default function Page({ unitPk, reservationUnits }: PropsNarrowed): React.ReactElement {
   const { t } = useTranslation();
 
   const reservationUnitOptions = reservationUnits.map((unit) => ({

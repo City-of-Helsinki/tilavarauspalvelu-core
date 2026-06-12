@@ -15,7 +15,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-export function Page2({ onPrevPage, hasFixedParent, form, children }: Props): JSX.Element {
+export function Page2({ onPrevPage, hasFixedParent, form, children }: Props): React.ReactElement {
   const { t } = useTranslation();
   const { formState } = form;
   const { errors, isDirty, isSubmitting } = formState;

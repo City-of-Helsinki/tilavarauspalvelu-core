@@ -1,6 +1,7 @@
 import { parse, set } from "date-fns";
 import { parseUIDate, parseApiDate, isValidDate } from "@ui/modules/date-utils/conversion";
 import { UI_DATE_FORMAT, UI_TIME_FORMAT } from "@ui/modules/date-utils/formatting";
+/* eslint-disable-next-line import/no-cycle */
 import { toNumber } from "@ui/modules/helpers";
 import type { TimeStruct } from "./types";
 

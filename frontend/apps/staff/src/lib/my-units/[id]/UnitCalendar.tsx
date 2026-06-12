@@ -205,7 +205,7 @@ const CellStyled = styled.div`
   }
 `;
 
-function RowCells({ hasPermission, cols, ...rest }: CellProps): JSX.Element {
+function RowCells({ hasPermission, cols, ...rest }: CellProps): React.ReactElement {
   const testId = `UnitCalendar__RowCalendar--cells-${rest.reservationUnitPk}`;
 
   return (
@@ -255,7 +255,7 @@ function Cell({
   hasPermission,
   reservationUnitPk,
   reservableTimeSpans,
-}: { offset: number } & Omit<CellProps, "cols">): JSX.Element {
+}: { offset: number } & Omit<CellProps, "cols">): React.ReactElement {
   const ref = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
@@ -311,7 +311,7 @@ function PreBuffer({
   event: CalendarEventType;
   hourPercent: number;
   left: string;
-}): JSX.Element | null {
+}): React.ReactElement | null {
   const { t } = useTranslation();
 
   const buffer = event.event?.bufferTimeBefore;
@@ -342,7 +342,7 @@ function PostBuffer({
   event: CalendarEventType;
   hourPercent: number;
   right: string;
-}): JSX.Element | null {
+}): React.ReactElement | null {
   const { t } = useTranslation();
 
   const buffer = event.event?.bufferTimeAfter;
@@ -384,7 +384,13 @@ const EventTriggerButton = () => (
   />
 );
 
-function Event({ event, styleGetter }: { event: CalendarEventType; styleGetter: EventStyleGetter }): JSX.Element {
+function Event({
+  event,
+  styleGetter,
+}: {
+  event: CalendarEventType;
+  styleGetter: EventStyleGetter;
+}): React.ReactElement {
   const { t } = useTranslation();
 
   const title = getEventTitle({ reservation: event, t });
@@ -489,13 +495,13 @@ export function UnitCalendar({
   refetch,
   canCreateReservations = false,
   isLoading,
-}: UnitCalendarProps): JSX.Element {
+}: UnitCalendarProps): React.ReactElement {
   const calendarRef = useRef<HTMLDivElement>(null);
   const orderedResources = sortByDraftStatusAndTitle([...resources]);
   const startDate = startOfDay(date);
 
   const scrollCalendar = useCallback(() => {
-    scrollCalendarToCurrentTime(calendarRef, date);
+    scrollCalendarToCurrentTime(calendarRef as React.RefObject<HTMLDivElement>, date);
   }, [date]);
 
   useEffect(() => {

@@ -45,7 +45,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   };
 };
 
-function GenericTerms({ genericTerms }: PropsNarrowed): JSX.Element {
+function GenericTerms({ genericTerms }: PropsNarrowed): React.ReactElement {
   const { i18n } = useTranslation();
 
   const lang = getLocalizationLang(i18n.language);

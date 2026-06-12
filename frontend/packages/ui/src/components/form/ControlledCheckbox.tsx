@@ -1,7 +1,7 @@
 import React from "react";
 import type { Control, FieldValues, Path, PathValue, UseControllerProps } from "react-hook-form";
 import { useController } from "react-hook-form";
-import { Checkbox } from "hds-react";
+import { Checkbox, Tooltip } from "hds-react";
 import styled from "styled-components";
 import { filterEmpty } from "../../modules/helpers";
 import { fontRegular } from "../../styled";
@@ -46,7 +46,7 @@ export function ControlledCheckbox<T extends FieldValues>({
   error,
   tooltip,
   ...props
-}: CheckboxProps<T>): JSX.Element {
+}: CheckboxProps<T>): React.ReactElement {
   const {
     field: { value, onChange },
   } = useController({ control, name, defaultValue, rules: { required } });
@@ -64,7 +64,7 @@ export function ControlledCheckbox<T extends FieldValues>({
       defaultChecked={typeof defaultValue === "boolean" ? defaultValue : undefined}
       label={label}
       errorText={filterEmpty(error) ?? undefined}
-      tooltipText={tooltip}
+      tooltip={tooltip != null && tooltip !== "" ? <Tooltip>{tooltip}</Tooltip> : undefined}
     />
   );
 }

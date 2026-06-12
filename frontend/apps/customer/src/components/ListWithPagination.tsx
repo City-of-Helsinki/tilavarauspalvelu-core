@@ -16,11 +16,11 @@ function Content({
   fetchMore,
   showMore,
 }: {
-  items: JSX.Element[];
+  items: React.ReactElement[];
   loadingMore: boolean;
   fetchMore: () => void;
   showMore: boolean;
-}): JSX.Element | null {
+}): React.ReactElement | null {
   const { t } = useTranslation();
 
   const hitCountSummary = t("searchResultList:paginationSummary", {
@@ -57,7 +57,7 @@ const NoResults = styled.div`
 `;
 
 type Props = {
-  items: JSX.Element[];
+  items: React.ReactElement[];
   fetchMore: (cursor: string) => Promise<ApolloQueryResult<SearchReservationUnitsQuery>>;
   pageInfo?: Pick<PageInfo, "endCursor">;
   hasMoreData: boolean;
@@ -72,7 +72,7 @@ export function ListWithPagination({
   hasMoreData,
   pageInfo,
   sortingComponent,
-}: Props): JSX.Element {
+}: Props): React.ReactElement {
   const { t } = useTranslation();
   const { endCursor } = pageInfo ?? {};
   const handleFetchMore = async () => {

@@ -93,7 +93,7 @@ export const Carousel = forwardRef(function Carousel(
     ...rest
   }: Readonly<Props>,
   ref: Ref<HTMLDivElement>
-): JSX.Element {
+): React.ReactElement {
   const { t } = useTranslation();
 
   return (

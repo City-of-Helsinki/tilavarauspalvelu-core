@@ -18,7 +18,7 @@ type Props = {
   unitOptions: Array<{ label: string; value: number }>;
 };
 
-export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions }: Props): JSX.Element {
+export function RejectedOccurrencesDataLoader({ applicationRoundPk, unitOptions }: Props): React.ReactElement {
   const { t } = useTranslation();
 
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);

@@ -40,7 +40,10 @@ const TabPanel = styled(Tabs.TabPanel)`
   padding-block: var(--spacing-m);
 `;
 
-export default function MyUnitsPage({ unit, optionsData }: Pick<PropsNarrowed, "unit" | "optionsData">): JSX.Element {
+export default function MyUnitsPage({
+  unit,
+  optionsData,
+}: Pick<PropsNarrowed, "unit" | "optionsData">): React.ReactElement {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
 
@@ -69,7 +72,7 @@ export default function MyUnitsPage({ unit, optionsData }: Pick<PropsNarrowed, "
     isDraft,
   }));
 
-  const modalCloseRef = useRef<HTMLInputElement | null>(null);
+  const modalCloseRef = useRef<HTMLInputElement>(null);
 
   // Find the calendar cell used to open the modal, so it can be focused after closing the modal
   useEffect(() => {
@@ -98,7 +101,7 @@ export default function MyUnitsPage({ unit, optionsData }: Pick<PropsNarrowed, "
     setModalContent(
       <CreateReservationModal
         start={new Date()}
-        focusAfterCloseRef={createReservationBtnRef}
+        focusAfterCloseRef={createReservationBtnRef as React.RefObject<HTMLElement>}
         reservationUnitOptions={reservationUnitOptions}
         onClose={() => setModalContent(null)}
       />
@@ -157,7 +160,7 @@ export default function MyUnitsPage({ unit, optionsData }: Pick<PropsNarrowed, "
       {isModalOpen && (
         <CreateReservationModal
           reservationUnitOptions={reservationUnitOptions}
-          focusAfterCloseRef={modalCloseRef}
+          focusAfterCloseRef={modalCloseRef as React.RefObject<HTMLElement>}
           start={addMinutes(selectedDate, timeOffset * 30)}
           onClose={() => {
             const params = new URLSearchParams(searchParams);

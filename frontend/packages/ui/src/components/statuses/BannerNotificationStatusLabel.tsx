@@ -13,7 +13,7 @@ const StyledStatusLabel = styled(StatusLabel)`
 
 type NotificationStatus = {
   type: StatusLabelType;
-  icon: JSX.Element;
+  icon: React.ReactElement;
 };
 
 function getStatusLabelProps(state: BannerNotificationState): NotificationStatus {

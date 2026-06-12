@@ -7,7 +7,7 @@ interface IProps {
   unitPk: number;
 }
 
-export function ReservationUnitList({ reservationUnits, unitPk }: IProps): JSX.Element {
+export function ReservationUnitList({ reservationUnits, unitPk }: IProps): React.ReactElement {
   return (
     <>
       {reservationUnits.map((resUnit) => (

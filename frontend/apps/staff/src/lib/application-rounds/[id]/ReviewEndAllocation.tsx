@@ -29,7 +29,7 @@ export function ReviewEndAllocation({
 }: {
   applicationRound: ApplicationRoundAdminFragment;
   refetch: () => Promise<ApolloQueryResult<ApplicationRoundQuery>>;
-}): JSX.Element {
+}): React.ReactElement {
   const [waitingForHandle, setWaitingForHandle] = useState(false);
 
   const isInProgress = isApplicationRoundInProgress(applicationRound);

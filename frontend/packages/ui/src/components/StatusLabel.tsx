@@ -5,7 +5,7 @@ import styled from "styled-components";
 
 type StatusLabelProps = {
   type: StatusLabelType;
-  icon?: JSX.Element;
+  icon?: React.ReactElement;
   slim?: boolean;
   children: React.ReactNode;
   className?: string;
@@ -33,13 +33,19 @@ const ColoredLabel = styled(HDSStatusLabel)<{
 /* @name StatusLabel
  * @description StatusLabel component (extends HDS StatusLabel with "draft" type)
  * @param {StatusLabelWithDraftType} type - StatusLabel type (neutral, info, alert, success, error, draft)
- * @param {JSX.Element} icon - Icon element
+ * @param {React.ReactElement} icon - Icon element
  * @param {boolean} slim - Toggle slim mode, for use in tight layouts (e.g. tables) (uses negative block margins)
  * @param {string} dataTestId - Test id
  * @param {React.ReactNode} children - Label text
- * @returns {JSX.Element} - Rendered StatusLabel component
+ * @returns {React.ReactElement} - Rendered StatusLabel component
  */
-export function StatusLabel({ type, icon, slim = false, children, ...rest }: Readonly<StatusLabelProps>): JSX.Element {
+export function StatusLabel({
+  type,
+  icon,
+  slim = false,
+  children,
+  ...rest
+}: Readonly<StatusLabelProps>): React.ReactElement {
   return (
     <ColoredLabel
       {...rest}

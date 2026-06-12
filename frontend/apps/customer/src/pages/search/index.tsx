@@ -35,7 +35,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-function SearchSingle({ options }: Readonly<Props>): JSX.Element {
+function SearchSingle({ options }: Readonly<Props>): React.ReactElement {
   const { t, i18n } = useTranslation();
 
   const searchValues = useSearchParams();

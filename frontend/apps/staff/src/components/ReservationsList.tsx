@@ -196,6 +196,9 @@ type Props = {
 };
 type ExtendedProps = AddNewReservationButtonProps & Props;
 
+const formatReservationSlot = (item: NewReservationListItem) =>
+  `${formatDate(item.date, { includeWeekday: true })}, ${item.startTime}-${item.endTime}`;
+
 /// Used by the ReservationSeries pages to show a list of reservations
 export function ReservationList(props: Props | ExtendedProps) {
   const { header, items, hasPadding, isTall } = props;
@@ -210,8 +213,7 @@ export function ReservationList(props: Props | ExtendedProps) {
 
   const removed = items.filter((x) => x.isRemoved).length;
   const count = items.length - removed;
-  const formatReservationSlot = (item: NewReservationListItem) =>
-    `${formatDate(item.date, { includeWeekday: true })}, ${item.startTime}-${item.endTime}`;
+
   return (
     <ListWrapper data-testid="reservations-list" $isTall={isTall}>
       <TitleWrapper>

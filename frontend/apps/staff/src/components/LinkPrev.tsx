@@ -30,7 +30,7 @@ type Props = {
   className?: string;
 };
 
-function LinkPrevInner({ route, style, className }: Props): JSX.Element {
+function LinkPrevInner({ route, style, className }: Props): React.ReactElement {
   const { t } = useTranslation();
   const router = useRouter();
   const handleClick = () => {
@@ -53,7 +53,7 @@ const PreviousLinkWrapper = styled.div`
   padding: var(--spacing-s) 0 0;
 `;
 
-export function LinkPrev(props: Props): JSX.Element {
+export function LinkPrev(props: Props): React.ReactElement {
   return (
     <PreviousLinkWrapper>
       <LinkPrevInner {...props} />

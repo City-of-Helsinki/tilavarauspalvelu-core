@@ -14,7 +14,7 @@ interface IProps {
   unitPk: number;
 }
 
-export function ReservationUnitCard({ reservationUnit, unitPk }: Readonly<IProps>): JSX.Element {
+export function ReservationUnitCard({ reservationUnit, unitPk }: Readonly<IProps>): React.ReactElement {
   const { t } = useTranslation();
 
   const image = getMainImage(reservationUnit);

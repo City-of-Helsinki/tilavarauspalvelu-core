@@ -148,7 +148,7 @@ function SeasonRow({
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
   index: number;
-}): JSX.Element {
+}): React.ReactElement {
   const { t } = useTranslation();
   const { control, trigger, watch, formState } = form;
   const { errors } = formState;
@@ -271,7 +271,7 @@ const SeasonalInnerWrapper = styled.div`
   }
 `;
 
-export function SeasonalSection({ form }: { form: UseFormReturn<ReservationUnitEditFormValues> }): JSX.Element {
+export function SeasonalSection({ form }: { form: UseFormReturn<ReservationUnitEditFormValues> }): React.ReactElement {
   const { t } = useTranslation();
   const {
     control,

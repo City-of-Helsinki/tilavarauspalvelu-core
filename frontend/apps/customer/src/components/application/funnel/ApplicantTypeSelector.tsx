@@ -12,7 +12,7 @@ const Label = styled.p`
   margin: 0;
 `;
 
-export function ApplicantTypeSelector(): JSX.Element {
+export function ApplicantTypeSelector(): React.ReactElement {
   const { t } = useTranslation();
 
   const {

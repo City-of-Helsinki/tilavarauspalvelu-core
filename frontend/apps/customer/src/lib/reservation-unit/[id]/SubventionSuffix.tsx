@@ -20,7 +20,7 @@ const StyledSubventionButton = styled.button`
   cursor: pointer;
 `;
 
-export function SubventionSuffix({ setIsDialogOpen }: Props): JSX.Element {
+export function SubventionSuffix({ setIsDialogOpen }: Props): React.ReactElement {
   const { t } = useTranslation();
 
   return (

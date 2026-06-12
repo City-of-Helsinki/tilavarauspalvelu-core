@@ -9,7 +9,7 @@ import { BillingAddress } from "./BillingAddress";
 import { ContactPersonSection } from "./CompanyForm";
 import type { ApplicationPage3FormValues } from "./form";
 
-export function OrganisationForm(): JSX.Element {
+export function OrganisationForm(): React.ReactElement {
   const { t } = useTranslation();
   const {
     control,

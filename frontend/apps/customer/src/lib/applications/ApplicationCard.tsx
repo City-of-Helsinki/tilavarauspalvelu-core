@@ -53,7 +53,7 @@ type Props = {
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 
-export function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
+export function ApplicationCard({ application, actionCallback }: Props): React.ReactElement {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
 

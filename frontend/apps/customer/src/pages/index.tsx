@@ -10,7 +10,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { IntendedUseOrderingChoices, UnitOrderingChoices, FrontPageDocument } from "@gql/gql-types";
 import type { FrontPageQuery, FrontPageQueryVariables } from "@gql/gql-types";
 
-function Home({ intendedUses, units }: Props): JSX.Element {
+function Home({ intendedUses, units }: Props): React.ReactElement {
   const { t } = useTranslation(["home", "common"]);
 
   return (

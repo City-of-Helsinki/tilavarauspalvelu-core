@@ -53,7 +53,7 @@ export function SeasonalSearchForm({
   isLoading,
   options,
   handleSearch,
-}: Readonly<SearchFormProps>): JSX.Element | null {
+}: Readonly<SearchFormProps>): React.ReactElement | null {
   const { t } = useTranslation();
   const searchValues = useSearchParams();
   const { control, register, handleSubmit } = useForm<SearchFormValues>({

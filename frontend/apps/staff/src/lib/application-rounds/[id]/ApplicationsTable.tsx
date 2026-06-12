@@ -148,7 +148,7 @@ export function ApplicationsTable({
   sortChanged: onSortChanged,
   applications,
   isLoading,
-}: ApplicationsTableProps): JSX.Element {
+}: ApplicationsTableProps): React.ReactElement {
   const { t } = useTranslation();
 
   const cols = memoize(() => getColConfig(t))();

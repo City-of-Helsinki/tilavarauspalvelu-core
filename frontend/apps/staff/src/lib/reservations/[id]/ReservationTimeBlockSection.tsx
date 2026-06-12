@@ -50,7 +50,7 @@ const isInsideCalendarRange = (x: { start: Date; end: Date }) => x.end.getHours(
 const Calendar = forwardRef(function Calendar(
   { reservation, refetch, focusDate, events: eventsAll }: CalendarProps,
   ref: Ref<HTMLDivElement>
-): JSX.Element {
+): React.ReactElement {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
@@ -127,7 +127,7 @@ export function TimeBlockSection({
 }: Readonly<{
   reservation: TimeBlockSectionFragment;
   onReservationUpdated: () => Promise<unknown>;
-}>): JSX.Element {
+}>): React.ReactElement {
   const { t } = useTranslation();
 
   // date focus rules for Calendar

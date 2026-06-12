@@ -4,7 +4,7 @@ import { ApplicationFormTextInput } from "@/components/application/funnel/Applic
 import { BillingAddress } from "@/components/application/funnel/BillingAddress";
 import { FormSubHeading, SpanFullRow } from "@/styled/application";
 
-export function IndividualForm(): JSX.Element {
+export function IndividualForm(): React.ReactElement {
   const { t } = useTranslation();
   return (
     <>

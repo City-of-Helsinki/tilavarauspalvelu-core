@@ -28,7 +28,7 @@ export function ApplicationFormTextInput({
   name: TextFields;
   disabled?: boolean;
   maxLength?: number;
-}): JSX.Element {
+}): React.ReactElement {
   const { t } = useTranslation();
   const { control, getFieldState, formState } = useFormContext<ApplicationPage3FormValues>();
   // NOTE getFieldState does not update unless we extract formState also

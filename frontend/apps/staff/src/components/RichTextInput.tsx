@@ -174,7 +174,7 @@ function RichTextInput({
   onChange,
   maxLength,
   ...rest
-}: RichTextProps): JSX.Element {
+}: RichTextProps): React.ReactElement {
   return (
     <Container {...rest} $disabled={disabled} id={`${id}-container`}>
       <Flex $justifyContent="space-between" $direction="row">

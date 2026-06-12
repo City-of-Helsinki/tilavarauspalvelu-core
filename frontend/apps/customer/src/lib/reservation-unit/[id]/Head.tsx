@@ -24,7 +24,7 @@ import { Images } from "./Images";
 interface HeadProps {
   reservationUnit: ReservationUnitHeadFragment;
   reservationUnitIsReservable?: boolean;
-  subventionSuffix?: JSX.Element;
+  subventionSuffix?: React.ReactElement;
 }
 
 const NotificationWrapper = styled.div`
@@ -86,7 +86,7 @@ export function Head({
   reservationUnit,
   reservationUnitIsReservable,
   subventionSuffix,
-}: Readonly<HeadProps>): JSX.Element {
+}: Readonly<HeadProps>): React.ReactElement {
   const { i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   const reservationUnitName = getTranslation(reservationUnit, "name", lang);
@@ -136,7 +136,7 @@ const TooltipWrapper = styled.div`
   }
 `;
 
-function AccessTypeTooltip({ accessTypes }: Pick<ReservationUnitHeadFragment, "accessTypes">): JSX.Element {
+function AccessTypeTooltip({ accessTypes }: Pick<ReservationUnitHeadFragment, "accessTypes">): React.ReactElement {
   const { t } = useTranslation();
 
   const accessTypeDurations = getReservationUnitAccessPeriods(accessTypes);
@@ -164,7 +164,7 @@ function AccessTypeTooltip({ accessTypes }: Pick<ReservationUnitHeadFragment, "a
 function IconList({
   reservationUnit,
   subventionSuffix,
-}: Readonly<Pick<HeadProps, "reservationUnit" | "subventionSuffix">>): JSX.Element {
+}: Readonly<Pick<HeadProps, "reservationUnit" | "subventionSuffix">>): React.ReactElement {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
   const minDur = reservationUnit.minReservationDuration ?? 0;
@@ -178,8 +178,8 @@ function IconList({
 
   type IconTextType = ReadonlyArray<{
     key: string;
-    icon: Readonly<JSX.Element>;
-    text: Readonly<string | JSX.Element>;
+    icon: Readonly<React.ReactElement>;
+    text: Readonly<string | React.ReactElement>;
   }>;
 
   const iconsTexts: IconTextType = filterNonNullable([

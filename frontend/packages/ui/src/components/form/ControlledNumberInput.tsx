@@ -2,7 +2,7 @@
 import React from "react";
 import { useController } from "react-hook-form";
 import type { FieldValues, UseControllerProps } from "react-hook-form";
-import { NumberInput } from "hds-react";
+import { NumberInput, Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { filterEmpty, toNumber } from "../../modules/helpers";
 
@@ -29,12 +29,12 @@ export function ControlledNumberInput<T extends FieldValues>({
   max,
   required,
   label,
-  tooltipText,
   helperText,
   errorText,
   afterChange,
   style,
   className,
+  tooltipText,
 }: ControllerProps<T>) {
   const {
     field: { value, onChange },
@@ -64,9 +64,9 @@ export function ControlledNumberInput<T extends FieldValues>({
       helperText={helperText}
       errorText={filterEmpty(errorText) ?? undefined}
       invalid={filterEmpty(errorText) != null}
-      tooltipText={tooltipText}
       style={style}
       className={className}
+      tooltip={tooltipText != null && tooltipText !== "" ? <Tooltip>{tooltipText}</Tooltip> : undefined}
     />
   );
 }

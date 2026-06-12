@@ -49,7 +49,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-function RecurringLander({ applicationRounds }: Readonly<Pick<Props, "applicationRounds">>): JSX.Element {
+function RecurringLander({ applicationRounds }: Readonly<Pick<Props, "applicationRounds">>): React.ReactElement {
   const { t } = useTranslation();
 
   const active = applicationRounds
