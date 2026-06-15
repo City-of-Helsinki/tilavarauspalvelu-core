@@ -57,7 +57,7 @@ ARG DEPS=main,admin,celery
 # - curl: for installing poetry
 # - libpcre2-dev & libpcre3 & libpcre3-dev: for uWSGI internal routing support
 # - libpq-dev: for building psycopg2
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
       build-essential \
       curl \
       libpcre2-dev \
