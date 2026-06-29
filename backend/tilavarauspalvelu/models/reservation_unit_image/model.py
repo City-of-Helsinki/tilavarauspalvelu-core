@@ -2,10 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar
 
-from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from easy_thumbnails.fields import ThumbnailerImageField
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.enums import ReservationUnitImageType
@@ -33,7 +31,6 @@ class ReservationUnitImage(models.Model):
     )
 
     image: ThumbnailerImageFieldFile | None
-    image = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_IMAGES_ROOT, null=True, blank=True)
     image_type: ReservationUnitImageType = TextChoicesField(enum=ReservationUnitImageType)
 
     large_url: str = models.URLField(max_length=255, default="", blank=True)
