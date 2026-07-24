@@ -114,7 +114,7 @@ importers:
         specifier: ^4.18.1
         version: 4.18.1
       next:
-        specifier: 16.2.11
+        specifier: ^16.2.11
         version: 16.2.11(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.100.0)
       next-compose-plugins:
         specifier: ^2.2.1
@@ -277,7 +277,7 @@ importers:
         specifier: ^4.18.1
         version: 4.18.1
       next:
-        specifier: 16.2.11
+        specifier: ^16.2.11
         version: 16.2.11(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.100.0)
       next-i18next:
         specifier: ^15.4.3
@@ -525,7 +525,7 @@ importers:
         specifier: ^20.8.9
         version: 20.10.1
       next:
-        specifier: 16.2.11
+        specifier: ^16.2.11
         version: 16.2.11(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.100.0)
       next-i18next:
         specifier: ^15.4.3
