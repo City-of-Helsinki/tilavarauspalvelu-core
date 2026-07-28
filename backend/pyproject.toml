@@ -94,7 +94,7 @@ tilavarauspalvelu = "tests.plugins"
 
 [tool.ruff]
 fix = true
-unsafe-fixes = true
+unsafe-fixes = false
 line-length = 120
 target-version = "py313"
 extend-exclude = [
