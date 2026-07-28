@@ -30,8 +30,9 @@ class IntendedUse(models.Model):
 
     name: str = models.CharField(max_length=200)
 
-    image: ThumbnailerImageFieldFile | None
-    image = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT, null=True, blank=True)
+    image: ThumbnailerImageFieldFile | None = ThumbnailerImageField(
+        upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT, null=True, blank=True
+    )
 
     # Translated field hints
     name_fi: str | None
