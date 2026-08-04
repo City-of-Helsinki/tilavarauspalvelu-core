@@ -171,9 +171,11 @@ def test_send_application__section_suitable_time_range_too_short(graphql):
 
     assert response.has_errors is True
     assert response.field_error_messages() == [
-        f"Suitable time ranges for Monday in application section {section.pk} "
-        f"do not contain a contiguous time range that is at least as long as the "
-        f"requested minimum reservation duration of 2 h."
+        (
+            f"Suitable time ranges for Monday in application section {section.pk} "
+            f"do not contain a contiguous time range that is at least as long as the "
+            f"requested minimum reservation duration of 2 h."
+        )
     ]
 
 
@@ -230,9 +232,11 @@ def test_send_application__section_suitable_time_range__not_contiguous(graphql):
 
     assert response.has_errors is True
     assert response.field_error_messages() == [
-        f"Suitable time ranges for Monday in application section {section.pk} "
-        f"do not contain a contiguous time range that is at least as long as the "
-        f"requested minimum reservation duration of 2 h."
+        (
+            f"Suitable time ranges for Monday in application section {section.pk} "
+            f"do not contain a contiguous time range that is at least as long as the "
+            f"requested minimum reservation duration of 2 h."
+        )
     ]
 
 
@@ -261,13 +265,17 @@ def test_send_application__section_suitable_time_range__different_days(graphql):
 
     assert response.has_errors is True
     assert response.field_error_messages() == [
-        f"Suitable time ranges for Monday in application section {section.pk} "
-        f"do not contain a contiguous time range that is at least as long as the "
-        f"requested minimum reservation duration of 2 h.",
+        (
+            f"Suitable time ranges for Monday in application section {section.pk} "
+            f"do not contain a contiguous time range that is at least as long as the "
+            f"requested minimum reservation duration of 2 h."
+        ),
         #
-        f"Suitable time ranges for Tuesday in application section {section.pk} "
-        f"do not contain a contiguous time range that is at least as long as the "
-        f"requested minimum reservation duration of 2 h.",
+        (
+            f"Suitable time ranges for Tuesday in application section {section.pk} "
+            f"do not contain a contiguous time range that is at least as long as the "
+            f"requested minimum reservation duration of 2 h."
+        ),
     ]
 
 
@@ -282,8 +290,10 @@ def test_send_application__section_suitable_time_range__not_enough_suitable_rang
 
     assert response.has_errors is True
     assert response.field_error_messages() == [
-        f"Application section {section.pk} must have suitable time ranges on at least as many days "
-        f"as requested reservations per week. Counted 1 but expected at least 2."
+        (
+            f"Application section {section.pk} must have suitable time ranges on at least as many days "
+            f"as requested reservations per week. Counted 1 but expected at least 2."
+        )
     ]
 
 
@@ -312,8 +322,10 @@ def test_send_application__section_suitable_time_range__only_count_different_day
 
     assert response.has_errors is True
     assert response.field_error_messages() == [
-        f"Application section {section.pk} must have suitable time ranges on at least as many days "
-        f"as requested reservations per week. Counted 1 but expected at least 2."
+        (
+            f"Application section {section.pk} must have suitable time ranges on at least as many days "
+            f"as requested reservations per week. Counted 1 but expected at least 2."
+        )
     ]
 
 
