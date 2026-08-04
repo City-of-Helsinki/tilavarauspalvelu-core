@@ -10,13 +10,14 @@ from django.utils.html import format_html
 
 from tilavarauspalvelu.enums import AccessType, ReservationCancelReasonChoice, Weekday
 from tilavarauspalvelu.integrations.email.template_context.common import get_staff_reservations_ext_link
-from tilavarauspalvelu.integrations.email.typing import EmailTemplateType, EmailType
+from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.translation import get_translated
 from utils.date_utils import local_date, local_datetime
 
 if TYPE_CHECKING:
     from django.utils.safestring import SafeString
 
+    from tilavarauspalvelu.integrations.email.typing import EmailTemplateType
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 
