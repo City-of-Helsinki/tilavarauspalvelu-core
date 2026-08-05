@@ -142,8 +142,10 @@ def test_application_section__update__two_reservation_unit_options_with_same_pre
     # then:
     # - The response contains errors about duplicate preferred order
     assert response.field_error_messages() == [
-        f"Reservation Unit Option {option_2.pk} has duplicate 'preferred_order' 0 "
-        f"with these Reservation Unit Options: {option_1.pk}",
+        (
+            f"Reservation Unit Option {option_2.pk} has duplicate 'preferred_order' 0 "
+            f"with these Reservation Unit Options: {option_1.pk}"
+        ),
     ], response
 
 
