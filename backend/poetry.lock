@@ -733,14 +733,14 @@ Django = ">=4.2"
 
 [[package]]
 name = "django"
-version = "5.2.15"
+version = "5.2.16"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 optional = false
 python-versions = ">=3.10"
 groups = ["main", "admin", "celery", "lint"]
 files = [
-    {file = "django-5.2.15-py3-none-any.whl", hash = "sha256:0eb4a9bb1853a35b0286dbc6d916bd352c8c2687195a7f2d6f80cefd840e4970"},
-    {file = "django-5.2.15.tar.gz", hash = "sha256:5154a9bf84ac01dde011e367f355c07dbb329532e06810dcf3ef2af269e236e7"},
+    {file = "django-5.2.16-py3-none-any.whl", hash = "sha256:04f354bf9d807a86ad1a8392fe3808d362358a8eafc322848e0e43e59b24371d"},
+    {file = "django-5.2.16.tar.gz", hash = "sha256:59ea02020c3136fce14bef0bbece21a10a4febef5eed1c51c22ae468efa22200"},
 ]
 
 [package.dependencies]
@@ -3731,4 +3731,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "95910f5f42017c459764f03abe1a06bb1b674b8aac545dd4f4c430321da1c5b1"
+content-hash = "d3420695768252d1777c7b0947795f94daf7cbadbba62071457597b0e65661a4"
