@@ -4,7 +4,7 @@ import pytest
 
 from tilavarauspalvelu.enums import ResourceLocationType
 
-from tests.factories import ResourceFactory
+from tests.factories import ResourceFactory, SpaceFactory
 
 from .helpers import UPDATE_MUTATION
 
@@ -16,6 +16,7 @@ pytestmark = [
 
 def test_resource__update(graphql):
     resource = ResourceFactory.create()
+    space = SpaceFactory.create()
     graphql.login_with_superuser()
 
     data = {
@@ -23,7 +24,7 @@ def test_resource__update(graphql):
         "nameFi": "a",
         "nameEn": "b",
         "nameSv": "c",
-        "space": resource.space.pk,
+        "space": space.pk,
         "locationType": ResourceLocationType.FIXED.value.upper(),
     }
     response = graphql(UPDATE_MUTATION, input_data=data)
@@ -34,7 +35,7 @@ def test_resource__update(graphql):
     assert resource.name_fi == "a"
     assert resource.name_en == "b"
     assert resource.name_sv == "c"
-    assert resource.space.pk == resource.space.pk
+    assert resource.space.pk == space.pk
     assert resource.location_type == ResourceLocationType.FIXED.value
 
 
