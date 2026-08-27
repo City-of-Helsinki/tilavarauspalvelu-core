@@ -43,6 +43,7 @@ backend/.env
 backend/pytest.ini
 .claude/
 CLAUDE.md
+.github/skills/
 
 # misc
 **/.DS_Store
