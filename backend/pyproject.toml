@@ -461,10 +461,13 @@ filterwarnings = [
 [tool.coverage.run]
 relative_files = true
 branch = true
-source = [
-    "tilavarauspalvelu/",
-    "config/",
-    "utils/",
+# Use packages instead of directories, since multiple source directories make
+# coverage.xml filenames relative to each directory, e.g. 'config/__init__.py'
+# becomes '__init__.py', which SonarCloud cannot resolve.
+source_pkgs = [
+    "tilavarauspalvelu",
+    "config",
+    "utils",
 ]
 
 [tool.coverage.report]

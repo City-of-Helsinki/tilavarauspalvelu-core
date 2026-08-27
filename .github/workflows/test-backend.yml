@@ -221,7 +221,6 @@ jobs:
         run: |
           coverage combine
           coverage xml
-          sed -i 's@<source>@<source>backend/@g' coverage.xml
 
       - name: "SonarCloud Scan"
         uses: SonarSource/sonarqube-scan-action@v7
