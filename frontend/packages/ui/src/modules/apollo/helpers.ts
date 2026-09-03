@@ -474,7 +474,7 @@ export function logGraphQLQuery(
   documents: DocumentNode | DocumentNode[]
 ): void {
   const operationName = Array.isArray(documents)
-    ? documents.map(getOperationName).map((x) => x ?? "")
+    ? documents.map((doc) => getOperationName(doc)).map((x) => x ?? "")
     : (getOperationName(documents) ?? "");
   const t = Math.round(timeMs);
   log.info(

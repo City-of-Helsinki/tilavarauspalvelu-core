@@ -803,7 +803,7 @@ function convertPricing(p?: PricingNode): PricingFormValues {
 
 function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
   // NOTE Even though the frontend doesn't support adding more than two prices we can show / save more
-  const convertedPrices = pricings.map(convertPricing);
+  const convertedPrices = pricings.map((pricing) => convertPricing(pricing));
   const activePrices = convertedPrices.filter((p) => !p.isFuture);
   const futurePrices = convertedPrices.filter((p) => p.isFuture);
 

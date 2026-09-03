@@ -136,7 +136,9 @@ export function processVariables({
   const reservableDateEnd = filterEmpty(reservableDateEndCleaned);
   const timeEnd = filterEmpty(ignoreMaybeArray(values.getAll("timeEnd")));
   const timeBegin = filterEmpty(ignoreMaybeArray(values.getAll("timeBegin")));
-  const accessType = filterEmptyArray(filterNonNullable(values.getAll("accessTypes").map(transformAccessTypeSafe)));
+  const accessType = filterEmptyArray(
+    filterNonNullable(values.getAll("accessTypes").map((value) => transformAccessTypeSafe(value)))
+  );
 
   return {
     textSearch: filterEmpty(textSearch),

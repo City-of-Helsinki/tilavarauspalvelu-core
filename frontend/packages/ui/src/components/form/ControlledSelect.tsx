@@ -49,9 +49,9 @@ const toHDSValue = (
   }
   if (Array.isArray(val)) {
     const keyVals = filterNonNullable(val.map((v) => opts.find((o) => o.value === v)));
-    return keyVals.map(convertOptionToHDS);
+    return keyVals.map((option) => convertOptionToHDS(option));
   }
-  return opts.filter((o) => o.value === val).map(convertOptionToHDS);
+  return opts.filter((o) => o.value === val).map((option) => convertOptionToHDS(option));
 };
 
 export function ControlledSelect<T extends FieldValues>({
@@ -128,7 +128,7 @@ export function ControlledSelect<T extends FieldValues>({
       }}
       tooltip={tooltip != null && tooltip !== "" ? <Tooltip>{tooltip}</Tooltip> : undefined}
       value={toHDSValue(options, value)}
-      options={options.map(convertOptionToHDS)}
+      options={options.map((option) => convertOptionToHDS(option))}
       onChange={handleChange}
       invalid={Boolean(error)}
       disabled={disabled ?? options.length === 0}

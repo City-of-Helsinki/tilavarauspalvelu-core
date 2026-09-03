@@ -140,7 +140,7 @@ function transformApplicationSectionPage2(
   // NOTE: there is a type issue somewhere that causes this to be a string for some cases
   return {
     pk: Number(values.pk),
-    suitableTimeRanges: values.suitableTimeRanges.map(transformSuitableTimeRange),
+    suitableTimeRanges: values.suitableTimeRanges.map((timeRange) => transformSuitableTimeRange(timeRange)),
   };
 }
 
@@ -451,7 +451,7 @@ export function convertApplicationPage2(
 ): ApplicationPage2FormValues {
   return {
     pk: app?.pk ?? 0,
-    applicationSections: app.applicationSections?.map(convertApplicationSectionPage2) ?? [],
+    applicationSections: app.applicationSections?.map((section) => convertApplicationSectionPage2(section)) ?? [],
   };
 }
 

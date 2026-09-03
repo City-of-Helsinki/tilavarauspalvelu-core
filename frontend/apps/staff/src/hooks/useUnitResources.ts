@@ -60,7 +60,8 @@ export function useUnitResources({
 
   const { affectingReservations, unit } = data ?? previousData ?? {};
 
-  let reservationUnits = unit?.reservationUnits ?? reservationUnitOptions.map(createDummyReservationUnit);
+  let reservationUnits =
+    unit?.reservationUnits ?? reservationUnitOptions.map((option) => createDummyReservationUnit(option));
   if (reservationUnitTypeFilter?.length) {
     reservationUnits = reservationUnits.filter(
       (ru) => ru.reservationUnitType?.pk != null && reservationUnitTypeFilter.includes(ru.reservationUnitType.pk)
