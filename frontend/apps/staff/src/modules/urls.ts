@@ -133,11 +133,11 @@ export function getOpeningHoursUrl(
 ): string {
   let reservationUnitsParam = "";
   if (Array.isArray(reservationUnitPk)) {
-    reservationUnitPk.filter((pk) => pk > 0);
-    if (reservationUnitPk.length === 0) {
+    const validPks = reservationUnitPk.filter((pk) => pk > 0);
+    if (validPks.length === 0) {
       return "";
     }
-    reservationUnitsParam = reservationUnitPk.join(",");
+    reservationUnitsParam = validPks.join(",");
   } else if (reservationUnitPk == null || !(reservationUnitPk > 0)) {
     return "";
   } else {
