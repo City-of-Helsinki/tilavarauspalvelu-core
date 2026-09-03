@@ -61,7 +61,7 @@ export function applicationEventSchedulesToCells(
 }
 
 export function timeSlotKeyToTime(slot: string): number {
-  const [, hours, minutes] = slot.split("-").map(toNumber);
+  const [, hours, minutes] = slot.split("-").map((part) => toNumber(part));
   if (hours == null || minutes == null) {
     return 0;
   }
@@ -106,7 +106,7 @@ export function getTimeSlotOptions(
 type TimeSlot = { day: number; hour: number };
 
 export function decodeTimeSlot(slot: string): TimeSlot {
-  const [day, hour, min] = slot.split("-").map(toNumber);
+  const [day, hour, min] = slot.split("-").map((part) => toNumber(part));
   return { day: day ?? 0, hour: (hour ?? 0) + (min ?? 0) / 60 };
 }
 
@@ -125,8 +125,8 @@ function constructTimeSlot(day: number, begin: string): TimeSlot | null {
 }
 
 export function getTimeSeries(day: string, begin: string, end: string): string[] {
-  const [, startHours, startMinutes] = begin.split("-").map(toNumber);
-  const [, endHours, endMinutes] = end.split("-").map(toNumber);
+  const [, startHours, startMinutes] = begin.split("-").map((part) => toNumber(part));
+  const [, endHours, endMinutes] = end.split("-").map((part) => toNumber(part));
   const timeSlots: string[] = [];
   if (startHours == null || startMinutes == null || endHours == null) {
     return timeSlots;
@@ -181,7 +181,7 @@ export function formatTimeRangeList(
 }
 
 export function timeSlotKeyToScheduleTime(slot: string | undefined, padEnd = false): string {
-  let [, hours, minutes] = slot?.split("-").map(toNumber) ?? [];
+  let [, hours, minutes] = slot?.split("-").map((part) => toNumber(part)) ?? [];
   if (hours == null || minutes == null) {
     return "";
   }

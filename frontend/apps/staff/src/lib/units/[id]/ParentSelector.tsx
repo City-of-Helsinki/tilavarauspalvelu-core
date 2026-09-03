@@ -82,7 +82,7 @@ export function ParentSelector({
 
   const options = noParentless ? opts : [...opts, parentLessOption(t)];
 
-  const hdsOptions = options.map(convertOptionToHDS);
+  const hdsOptions = options.map((option) => convertOptionToHDS(option));
   return (
     <Select
       id="parentSelector"

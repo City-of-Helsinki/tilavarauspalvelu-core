@@ -93,8 +93,8 @@ function getTimeLabel(selection: string[], t: TFunction): string {
   if (!selectionStart || !selectionEnd) {
     return "";
   }
-  const [day, startHour, startMinute] = selectionStart.split("-").map(toNumber);
-  const [, endHour, endMinute] = selectionEnd.split("-").map(toNumber);
+  const [day, startHour, startMinute] = selectionStart.split("-").map((part) => toNumber(part));
+  const [, endHour, endMinute] = selectionEnd.split("-").map((part) => toNumber(part));
   if (day == null || startHour == null || startMinute == null || endHour == null || endMinute == null) {
     return "";
   }
@@ -109,7 +109,7 @@ function getTimeLabel(selection: string[], t: TFunction): string {
 }
 
 function deserializeSlot(slot: string): { day: DayT; hour: number; mins: number } | null {
-  const res = slot.split("-").map(toNumber);
+  const res = slot.split("-").map((part) => toNumber(part));
   if (res.length !== 3) {
     return null;
   }
@@ -240,11 +240,13 @@ function TimeSelection(): React.ReactElement {
     return endTime <= startTime && minsEnd !== 0;
   };
 
-  const startTimeOptions = timeSlotStartOptions.map(convertOptionToHDS);
-  const endTimeOptions = timeSlotEndOptions.map(convertOptionToHDS).map((n) => ({
-    ...n,
-    disabled: isOptionDisabled(n),
-  }));
+  const startTimeOptions = timeSlotStartOptions.map((option) => convertOptionToHDS(option));
+  const endTimeOptions = timeSlotEndOptions
+    .map((option) => convertOptionToHDS(option))
+    .map((n) => ({
+      ...n,
+      disabled: isOptionDisabled(n),
+    }));
 
   return (
     <TimeSelectWrapper>

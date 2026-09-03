@@ -290,7 +290,7 @@ function toOption(
 function getRoundReservationUnitOptions(
   applicationRound: Maybe<Pick<ApplicationRoundAdminFragment, "reservationUnits">> | undefined
 ) {
-  return filterNonNullable(applicationRound?.reservationUnits.map(toOption));
+  return filterNonNullable(applicationRound?.reservationUnits.map((reservationUnit) => toOption(reservationUnit)));
 }
 
 function getRoundUnitOptions(reservationUnits: ApplicationRoundAdminFragment["reservationUnits"]) {

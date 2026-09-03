@@ -79,7 +79,7 @@ function BaseSelectFilter({
         label,
         placeholder,
       }}
-      options={sortedOptions.map(convertOptionToHDS)}
+      options={sortedOptions.map((option) => convertOptionToHDS(option))}
       onChange={(sel) => handleChange(sel)}
       value={options.find((x) => x.value.toString() === value?.toString())?.value?.toString()}
       clearable={clearable ?? false}

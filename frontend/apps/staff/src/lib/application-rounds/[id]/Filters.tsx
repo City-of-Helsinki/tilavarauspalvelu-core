@@ -58,7 +58,7 @@ function mapParamsToForm(params: ReadonlyURLSearchParams): SearchFormValues {
     status: applicationStatusFilter ?? [],
     reservationUnit: reservationUnitFilter ?? [],
     applicant: applicantTypeFilter ?? [],
-    weekday: (weekDayFilter ?? []).map(convertWeekday),
+    weekday: (weekDayFilter ?? []).map((weekday) => convertWeekday(weekday)),
     accessCodeState: accessCodeStateFilter ?? [],
     search: textFilter ?? "",
   };

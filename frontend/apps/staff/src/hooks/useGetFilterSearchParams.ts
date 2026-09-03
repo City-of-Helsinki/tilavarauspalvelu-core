@@ -34,7 +34,9 @@ export function getFilterSearchParams({
     searchParams.getAll("applicantType").length > 0
       ? searchParams.getAll("applicantType")
       : searchParams.getAll("applicant");
-  const applicantTypeFilter = filterEmptyArray(filterNonNullable(applicantTypeParam.map(transformReserveeType)));
+  const applicantTypeFilter = filterEmptyArray(
+    filterNonNullable(applicantTypeParam.map((reserveeType) => transformReserveeType(reserveeType)))
+  );
 
   const priorityFilter = filterEmptyArray(transformPriorityFilter(searchParams.getAll("priority")));
   const orderFilter = filterEmptyArray(mapParamToInteger(searchParams.getAll("order")));
@@ -48,30 +50,32 @@ export function getFilterSearchParams({
     reservationUnitTypeFilter: filterEmptyArray(mapParamToInteger(searchParams.getAll("reservationUnitType"), 1)),
     applicationStatusFilter: filterEmptyArray(transformApplicationStatusList(searchParams.getAll("status"))),
     reservationStatusFilter: filterEmptyArray(
-      filterNonNullable(searchParams.getAll("state").map(transformReservationState))
+      filterNonNullable(searchParams.getAll("state").map((state) => transformReservationState(state)))
     ),
     sectionStatusFilter: filterEmptyArray(
-      filterNonNullable(searchParams.getAll("sectionStatus").map(transformApplicationSectionStatus))
+      filterNonNullable(searchParams.getAll("sectionStatus").map((status) => transformApplicationSectionStatus(status)))
     ),
     applicantTypeFilter,
     accessCodeStateFilter: filterEmptyArray(
-      filterNonNullable(searchParams.getAll("accessCodeState").map(transformAccessCodeState))
+      filterNonNullable(searchParams.getAll("accessCodeState").map((state) => transformAccessCodeState(state)))
     ),
     reservationTypeFilter: filterEmptyArray(
-      filterNonNullable(searchParams.getAll("reservationType").map(transformReservationType))
+      filterNonNullable(searchParams.getAll("reservationType").map((type) => transformReservationType(type)))
     ),
     orderStatusFilter: filterEmptyArray(
-      filterNonNullable(searchParams.getAll("orderStatus").map(transformPaymentStatus))
+      filterNonNullable(searchParams.getAll("orderStatus").map((status) => transformPaymentStatus(status)))
     ),
     reservationUnitStateFilter: filterEmptyArray(
-      filterNonNullable(searchParams.getAll("reservationUnitState").map(transformReservationUnitState))
+      filterNonNullable(
+        searchParams.getAll("reservationUnitState").map((state) => transformReservationUnitState(state))
+      )
     ),
     recurringFilter: convertRecurringParam(searchParams.get("recurring")),
     priorityFilter,
     orderFilter,
     ageGroupFilter,
     municipalityFilter: filterEmptyArray(
-      filterNonNullable(searchParams.getAll("municipality").map(transformMunicipality))
+      filterNonNullable(searchParams.getAll("municipality").map((municipality) => transformMunicipality(municipality)))
     ),
     purposeFilter,
     // backend error if these are floats
@@ -90,7 +94,7 @@ export function getFilterSearchParams({
     weekDayFilter: filterEmptyArray(
       mapParamToInteger(searchParams.getAll("weekday"))
         .filter((n): n is DayT => n >= 0 && n <= 6)
-        .map(transformWeekday)
+        .map((weekday) => transformWeekday(weekday))
     ),
   };
 }
@@ -126,7 +130,7 @@ export function useGetFilterSearchParams({
 }
 
 function transformApplicationStatusList(filters: string[]): ApplicationStatusChoice[] {
-  const vals = filterNonNullable(filters.map(transformApplicationStatus));
+  const vals = filterNonNullable(filters.map((status) => transformApplicationStatus(status)));
   if (vals.length === 0) {
     return VALID_ALLOCATION_APPLICATION_STATUSES;
   }
