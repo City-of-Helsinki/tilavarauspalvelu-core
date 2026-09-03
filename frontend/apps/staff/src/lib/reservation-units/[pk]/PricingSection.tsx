@@ -29,7 +29,7 @@ const FuturePricingContainer = styled(Flex)<{ $toggled: boolean }>`
   ${({ $toggled }) => $toggled && "background: var(--color-black-5);"}
 `;
 
-const Error = styled.div`
+const ErrorText = styled.div`
   margin-top: var(--spacing-3-xs);
   color: var(--color-error);
   display: flex;
@@ -255,10 +255,10 @@ export function PricingTypeView({ pk, form, taxPercentageOptions }: Props): Reac
         )}
       />
       {errors.pricings?.message != null && (
-        <Error>
+        <ErrorText>
           <IconAlertCircleFill />
           <span>{getTranslatedError(t, errors.pricings.message)}</span>
-        </Error>
+        </ErrorText>
       )}
       {isPaid && <PaidPricingPart form={form} index={index} taxPercentageOptions={taxPercentageOptions} />}
     </AutoGrid>

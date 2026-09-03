@@ -18,7 +18,7 @@ import {
   toNumber,
 } from "@ui/modules/helpers";
 import { AddressSection } from "@/components/AddressSection";
-import { Map as MapComponent } from "@/components/Map";
+import { UnitMap } from "@/components/UnitMap";
 import { getFuturePricing, getPriceString } from "@/modules/reservationUnit";
 import { JustForMobile } from "@/modules/style/layout";
 import type {
@@ -89,7 +89,7 @@ export function ReservationUnitMoreDetails({
           <JustForMobile customBreakpoint={breakpoints.l}>
             <AddressSection unit={reservationUnit.unit} title={getTranslation(reservationUnit, "name", lang) ?? "-"} />
           </JustForMobile>
-          <MapComponent tprekId={reservationUnit.unit?.tprekId ?? ""} />
+          <UnitMap tprekId={reservationUnit.unit?.tprekId ?? ""} />
         </Accordion>
       )}
       {(paymentTermsContent || cancellationTermsContent) && (

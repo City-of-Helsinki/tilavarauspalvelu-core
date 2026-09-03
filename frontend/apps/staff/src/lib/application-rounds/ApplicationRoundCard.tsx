@@ -21,7 +21,7 @@ const Times = styled(Flex).attrs({
   padding-bottom: var(--spacing-s);
 `;
 
-const Number = styled.span`
+const StatValue = styled.span`
   font-size: var(--fontsize-body-xl);
   ${fontMedium}
 `;
@@ -54,7 +54,7 @@ function ReservationPeriod({
 function Stat({ value, label }: { value: number; label: string }): React.ReactElement {
   return (
     <div>
-      <Number>{value}</Number>
+      <StatValue>{value}</StatValue>
       <Label> {label}</Label>
     </div>
   );
