@@ -177,7 +177,7 @@ function DialogContent({
               label: t("reservation:DenyDialog.denyReason"),
               assistive: t("reservation:DenyDialog.denyReasonHelper"),
             }}
-            options={options.map(convertOptionToHDS)}
+            options={options.map((option) => convertOptionToHDS(option))}
             value={denyReasonPk ? denyReasonPk.toString() : undefined}
             onChange={(selected) => {
               const v = selected.find(() => true)?.value;

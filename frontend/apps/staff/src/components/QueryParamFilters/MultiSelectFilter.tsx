@@ -61,9 +61,9 @@ function BaseMultiSelectFilter({
         placeholder,
       }}
       noTags
-      options={options.map(convertOptionToHDS)}
+      options={options.map((option) => convertOptionToHDS(option))}
       disabled={options.length === 0}
-      value={options.filter((v) => filter.includes(v.value.toString())).map(convertOptionToHDS)}
+      value={options.filter((v) => filter.includes(v.value.toString())).map((option) => convertOptionToHDS(option))}
       onChange={(selected) => {
         const vals = selected.map((x) => x.value);
         setFilter(vals);

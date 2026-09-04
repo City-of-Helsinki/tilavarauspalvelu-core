@@ -89,7 +89,7 @@ export function SortingComponent() {
   const sortingOptions = SORTING_OPTIONS.map((option) => ({
     label: t(option.label),
     value: option.value,
-  })).map(convertOptionToHDS);
+  })).map((option) => convertOptionToHDS(option));
 
   const isOrderingAsc = searchValues.get("order") !== "desc";
   const value = validateSorting(searchValues.get("sort"));
