@@ -17,7 +17,6 @@ from utils.date_utils import local_date, local_datetime
 if TYPE_CHECKING:
     from django.utils.safestring import SafeString
 
-    from tilavarauspalvelu.integrations.email.typing import EmailTemplateType
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 
