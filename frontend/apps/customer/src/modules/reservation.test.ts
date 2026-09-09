@@ -1,22 +1,32 @@
-import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
+import { addDays, addHours, addMinutes, startOfDay, startOfToday } from "date-fns";
 import type { TFunction } from "i18next";
 import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
-import { ReservationStateChoice, ReservationStartInterval, OrderStatus } from "@gql/gql-types";
+import { ReservationStateChoice, ReservationStartInterval, OrderStatus, ReservationCancelReasonChoice } from "@gql/gql-types";
 import type {
   ReservationOrderStatusFragment,
   CanUserCancelReservationFragment,
   PaymentOrderNode,
   CanReservationBeChangedFragment,
+  ReservationPaymentUrlFragment,
 } from "@gql/gql-types";
+import { createMockIsReservableFieldsFragment, createMockReservableTimes } from "@test/reservation-unit.mocks";
 import { isSlotWithinReservationTime } from "./reservable";
 import {
+  convertFormToFocustimeSlot,
+  convertReservationFormToApi,
+  createDateTime,
   isReservationCancellable,
+  isReservationCancellableReason,
   getCheckoutUrl,
+  getNewReservation,
+  getPaymentUrl,
   getDurationOptions,
   getNormalizedReservationOrderStatus,
+  getWhyReservationCantBeChanged,
   isReservationEditable,
+  transformReservation,
 } from "./reservation";
 import type { CanReservationBeChangedProps } from "./reservation";
 
@@ -248,6 +258,36 @@ describe("isReservationCancellable", () => {
   });
 });
 
+describe("isReservationCancellableReason", () => {
+  test("returns reason codes for main failure paths", () => {
+    expect(
+      isReservationCancellableReason(
+        createMockCanUserCancelReservation({
+          beginsAt: addDays(new Date(), -1),
+        })
+      )
+    ).toBe("RESERVATION_BEGIN_IN_PAST");
+
+    expect(
+      isReservationCancellableReason({
+        ...createMockCanUserCancelReservation({
+          beginsAt: addDays(new Date(), 1),
+        }),
+        reservationUnit: null,
+      })
+    ).toBe("CANCELLATION_NOT_ALLOWED");
+
+    expect(
+      isReservationCancellableReason(
+        createMockCanUserCancelReservation({
+          beginsAt: addDays(new Date(), 1),
+          state: ReservationStateChoice.Cancelled,
+        })
+      )
+    ).toBe("ALREADY_CANCELLED");
+  });
+});
+
 function createReservationOrderStatusFragment({
   orderStatus,
   state,
@@ -380,6 +420,215 @@ describe("isReservationEditable", () => {
       cancellationBuffer: 24 * 60 * 60 + 1,
     });
     expect(isReservationEditable(input)).toBe(false);
+  });
+});
+
+describe("getWhyReservationCantBeChanged", () => {
+  test("returns null for editable reservations", () => {
+    expect(
+      getWhyReservationCantBeChanged(
+        createMockReservation({
+          beginsAt: addHours(new Date(), 24),
+          price: "0",
+        })
+      )
+    ).toBeNull();
+  });
+
+  test("rejects priced reservations even if cancellable", () => {
+    expect(
+      getWhyReservationCantBeChanged(
+        createMockReservation({
+          beginsAt: addHours(new Date(), 24),
+          price: "12.5",
+        })
+      )
+    ).toBe("RESERVATION_MODIFICATION_NOT_ALLOWED");
+  });
+});
+
+describe("getNewReservation", () => {
+  test("uses the minimum duration when dragged selection is too short", () => {
+    const start = addHours(startOfDay(addDays(new Date(), 1)), 10);
+    expect(
+      getNewReservation({
+        start,
+        end: addMinutes(start, 10),
+        reservationUnit: {
+          minReservationDuration: 30 * 60,
+          reservationStartInterval: ReservationStartInterval.Interval_30Minutes,
+        },
+      })
+    ).toEqual({
+      begin: start,
+      end: addMinutes(start, 30),
+    });
+  });
+
+  test("rounds the end time down to the nearest valid interval", () => {
+    const start = addHours(startOfDay(addDays(new Date(), 1)), 10);
+    expect(
+      getNewReservation({
+        start,
+        end: addMinutes(start, 65),
+        reservationUnit: {
+          minReservationDuration: 15 * 60,
+          reservationStartInterval: ReservationStartInterval.Interval_30Minutes,
+        },
+      })
+    ).toEqual({
+      begin: start,
+      end: addMinutes(start, 60),
+    });
+  });
+});
+
+describe("reservation form transformations", () => {
+  test("convertFormToFocustimeSlot returns a reservable slot", () => {
+    const start = new Date(2026, 8, 10);
+    expect(
+      convertFormToFocustimeSlot({
+        data: {
+          date: "10.9.2026",
+          duration: 60,
+          time: "10:00",
+          isControlsVisible: false,
+        },
+        reservationUnit: createMockIsReservableFieldsFragment({
+          interval: ReservationStartInterval.Interval_30Minutes,
+          minReservationDuration: 0,
+          maxReservationDuration: 4 * 60 * 60,
+        }),
+        reservableTimes: createMockReservableTimes(),
+        activeApplicationRounds: [],
+        blockingReservations: [],
+      })
+    ).toMatchObject({
+      isReservable: true,
+      durationMinutes: 60,
+      start: addHours(startOfDay(start), 10),
+      end: addHours(startOfDay(start), 11),
+    });
+  });
+
+  test("convertFormToFocustimeSlot rejects malformed values", () => {
+    expect(
+      convertFormToFocustimeSlot({
+        data: {
+          date: "not-a-date",
+          duration: 60,
+          time: "oops",
+          isControlsVisible: false,
+        },
+        reservationUnit: createMockIsReservableFieldsFragment({}),
+        reservableTimes: createMockReservableTimes(),
+        activeApplicationRounds: [],
+        blockingReservations: [],
+      })
+    ).toEqual({ isReservable: false });
+  });
+
+  test("convertReservationFormToApi serializes valid values", () => {
+    const formValues = {
+      date: "2.1.2024",
+      time: "10:30",
+      duration: 90,
+      isControlsVisible: false,
+    };
+    expect(convertReservationFormToApi(formValues)).toEqual({
+      beginsAt: "2024-01-02T08:30:00.000Z",
+      endsAt: "2024-01-02T10:00:00.000Z",
+    });
+    expect(
+      convertReservationFormToApi({
+        ...formValues,
+        time: "",
+      })
+    ).toBeNull();
+  });
+
+  test("transformReservation preserves local date, time and duration", () => {
+    const begin = new Date(2024, 0, 2, 10, 30);
+    const end = new Date(2024, 0, 2, 12, 0);
+    expect(
+      transformReservation({
+        beginsAt: begin.toISOString(),
+        endsAt: end.toISOString(),
+      })
+    ).toEqual({
+      date: "2.1.2024",
+      duration: 90,
+      time: "10:30",
+      isControlsVisible: false,
+    });
+  });
+});
+
+describe("createDateTime", () => {
+  test("combines UI date and time into a datetime", () => {
+    expect(createDateTime("2.1.2024", "10:30")).toEqual(new Date(2024, 0, 2, 10, 30));
+  });
+});
+
+describe("getPaymentUrl", () => {
+  function createPaymentReservation(
+    overrides: Partial<ReservationPaymentUrlFragment> = {}
+  ): ReservationPaymentUrlFragment {
+    return {
+      id: "ReservationNode:1",
+      pk: 1,
+      state: ReservationStateChoice.WaitingForPayment,
+      cancelReason: null,
+      paymentOrder: {
+        id: "PaymentOrderNode:1",
+        status: OrderStatus.Draft,
+        handledPaymentDueBy: null,
+        checkoutUrl: "https://checkout.url/path?user=1111-2222-3333-4444",
+      },
+      ...overrides,
+    };
+  }
+
+  test("returns webstore checkout url for direct payments", () => {
+    expect(getPaymentUrl(createPaymentReservation(), "fi", "https://api.example")).toBe(
+      "https://checkout.url/path/paymentmethod?user=1111-2222-3333-4444&lang=fi"
+    );
+  });
+
+  test("returns handled payment redirect url when payment is pending", () => {
+    const origin = window.location.origin;
+    expect(
+      getPaymentUrl(
+        createPaymentReservation({
+          state: ReservationStateChoice.Confirmed,
+          paymentOrder: {
+            id: "PaymentOrderNode:1",
+            status: OrderStatus.Pending,
+            handledPaymentDueBy: addDays(new Date(), 1).toISOString(),
+            checkoutUrl: null,
+          },
+        }),
+        "sv",
+        "https://api.example"
+      )
+    ).toBe(
+      `https://api.example/v1/pay_pending_reservation/1/?lang=sv&redirect_on_error=${encodeURIComponent(
+        `${origin}/sv/reservations/1`
+      )}`
+    );
+  });
+
+  test("returns undefined for expired not-paid reservations", () => {
+    expect(
+      getPaymentUrl(
+        createPaymentReservation({
+          state: ReservationStateChoice.Cancelled,
+          cancelReason: ReservationCancelReasonChoice.NotPaid,
+        }),
+        "fi",
+        "https://api.example"
+      )
+    ).toBeUndefined();
   });
 });
 
