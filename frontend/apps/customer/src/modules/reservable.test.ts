@@ -1,10 +1,19 @@
 import { createMockIsReservableFieldsFragment, createMockReservableTimes } from "@test/reservation-unit.mocks";
-import { addDays, addHours, endOfDay, startOfDay, startOfToday } from "date-fns";
+import { addDays, addHours, addMinutes, endOfDay, startOfDay, startOfToday } from "date-fns";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { createNodeId, toNumber } from "ui/src/modules/helpers";
 import { ReservationStartInterval, ReservationStateChoice } from "@gql/gql-types";
 import type { BlockingReservationFieldsFragment, IsReservableFieldsFragment } from "@gql/gql-types";
-import { generateReservableMap, isRangeReservable, isStartTimeValid } from "./reservable";
+import {
+  clampDuration,
+  generateReservableMap,
+  getBoundCheckedReservation,
+  getMaxReservationDuration,
+  getMinReservationDuration,
+  getSlotPropGetter,
+  isRangeReservable,
+  isStartTimeValid,
+} from "./reservable";
 import type { ReservableMap, RoundPeriod } from "./reservable";
 
 describe("generateReservableMap", () => {
@@ -692,5 +701,99 @@ describe("isRangeReservable", () => {
       ],
     });
     expect(isRangeReservable(input)).toBe(true);
+  });
+});
+
+describe("getSlotPropGetter", () => {
+  function createGetter({
+    customValidation,
+    reservableTimes = createMockReservableTimes(),
+  }: {
+    customValidation?: (date: Date) => boolean;
+    reservableTimes?: ReservableMap;
+  } = {}) {
+    return getSlotPropGetter({
+      reservableTimes,
+      activeApplicationRounds: [],
+      reservationsMinDaysBefore: 0,
+      reservationsMaxDaysBefore: 0,
+      customValidation,
+    });
+  }
+
+  test("returns empty props for a reservable slot", () => {
+    const date = addHours(startOfDay(addDays(new Date(), 1)), 10);
+    expect(createGetter()(date)).toEqual({});
+  });
+
+  test("returns inactive class when slot is not reservable", () => {
+    const date = addHours(startOfDay(addDays(new Date(), 40)), 10);
+    expect(createGetter()(date)).toEqual({
+      className: "rbc-timeslot-inactive",
+    });
+  });
+
+  test("returns inactive class when custom validation fails", () => {
+    const date = addHours(startOfDay(addDays(new Date(), 1)), 10);
+    expect(createGetter({ customValidation: () => false })(date)).toEqual({
+      className: "rbc-timeslot-inactive",
+    });
+  });
+});
+
+describe("getBoundCheckedReservation", () => {
+  test("extends short reservations to the minimum duration", () => {
+    const start = addHours(startOfDay(addDays(new Date(), 1)), 10);
+    const end = addMinutes(start, 10);
+    const reservation = getBoundCheckedReservation({
+      start,
+      end,
+      reservationUnit: {
+        minReservationDuration: 30 * 60,
+        maxReservationDuration: 4 * 60 * 60,
+        reservationStartInterval: ReservationStartInterval.Interval_30Minutes,
+      },
+      durationOptions: [{ label: "30 min", value: 30 }],
+    });
+    expect(reservation).toEqual({
+      start,
+      end: addMinutes(start, 30),
+    });
+  });
+
+  test("rounds duration up to the nearest interval", () => {
+    const start = addHours(startOfDay(addDays(new Date(), 1)), 10);
+    const end = addMinutes(start, 70);
+    const reservation = getBoundCheckedReservation({
+      start,
+      end,
+      reservationUnit: {
+        minReservationDuration: 30 * 60,
+        maxReservationDuration: 4 * 60 * 60,
+        reservationStartInterval: ReservationStartInterval.Interval_60Minutes,
+      },
+      durationOptions: [{ label: "30 min", value: 30 }],
+    });
+    expect(reservation).toEqual({
+      start,
+      end: addMinutes(start, 120),
+    });
+  });
+});
+
+describe("duration helpers", () => {
+  test("getMinReservationDuration defaults to 30 minutes", () => {
+    expect(getMinReservationDuration({ minReservationDuration: null })).toBe(30);
+    expect(getMinReservationDuration({ minReservationDuration: 90 * 60 })).toBe(90);
+  });
+
+  test("getMaxReservationDuration defaults to max safe integer", () => {
+    expect(getMaxReservationDuration({ maxReservationDuration: null })).toBe(Number.MAX_SAFE_INTEGER);
+    expect(getMaxReservationDuration({ maxReservationDuration: 90 * 60 })).toBe(90);
+  });
+
+  test("clampDuration respects default option floor and maximum", () => {
+    expect(clampDuration(10, 0, 120, [{ label: "30 min", value: 30 }])).toBe(30);
+    expect(clampDuration(150, 30, 120, [{ label: "30 min", value: 30 }])).toBe(120);
   });
 });

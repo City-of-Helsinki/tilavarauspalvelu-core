@@ -14,6 +14,7 @@ import {
   ReservationUnitPublishingState,
   ReservationKind,
   ReservationStartInterval,
+  ReservationStateChoice,
   ReservationUnitReservationState,
   PaymentType,
 } from "@gql/gql-types";
@@ -22,13 +23,19 @@ import mockTranslations from ".././../public/locales/fi/prices.json";
 import { dateToKey } from "./reservable";
 import type { ReservableMap, RoundPeriod } from "./reservable";
 import {
+  getActivePricing,
   getDayIntervals,
   getEquipmentCategories,
   getEquipmentList,
   getFuturePricing,
+  getPrice,
   getPossibleTimesForDay,
   getPriceString,
   getReservationUnitPrice,
+  getReservationUnitAccessPeriods,
+  isInTimeSpan,
+  isReservationUnitFreeOfCharge,
+  isReservationUnitPaid,
   isReservationUnitPublished,
   isReservationUnitReservable,
   getLastPossibleReservationDate,
@@ -649,6 +656,88 @@ describe("getReservationUnitPrice", () => {
       now: new Date(2024, 0, 1, 10, 0, 0),
     });
   });
+
+  describe("pricing helpers", () => {
+    test("getActivePricing returns currently active pricing", () => {
+      const activePricing = constructPricing({
+        begins: addDays(new Date(), -1),
+        highestPrice: 20,
+      });
+      const futurePricing = constructPricing({
+        begins: addDays(new Date(), 1),
+        highestPrice: 30,
+      });
+      expect(
+        getActivePricing({
+          pricings: [futurePricing, activePricing],
+        })
+      ).toEqual(activePricing);
+    });
+
+    test("isReservationUnitPaid and free-of-charge respect historical lookup dates", () => {
+      const pricings = [
+        constructPricing({
+          begins: addDays(new Date(), -10),
+          highestPrice: 0,
+        }),
+        constructPricing({
+          begins: addDays(new Date(), 10),
+          highestPrice: 15,
+        }),
+      ];
+      expect(isReservationUnitPaid(pricings)).toBe(false);
+      expect(isReservationUnitPaid(pricings, addDays(new Date(), 20))).toBe(true);
+      expect(isReservationUnitFreeOfCharge(pricings, addDays(new Date(), 20))).toBe(false);
+    });
+
+    test("getPrice shows reservation unit pricing for pending subvention and material-only pricing", () => {
+      const activePricing = constructPricing({
+        begins: addDays(new Date(), -1),
+        highestPrice: 20,
+        lowestPrice: 20,
+      });
+      const pricedReservation = {
+        id: "1",
+        beginsAt: addHours(new Date(), 1).toISOString(),
+        endsAt: addHours(new Date(), 2).toISOString(),
+        price: "0",
+        state: ReservationStateChoice.RequiresHandling,
+        applyingForFreeOfCharge: true,
+        appliedPricing: {
+          highestPrice: "20",
+          taxPercentage: {
+            id: "1",
+            pk: 1,
+            value: "24",
+          },
+        },
+        reservationUnit: {
+          id: "ru-1",
+          reservationBeginsAt: null,
+          reservationEndsAt: null,
+          pricings: [activePricing],
+        },
+      };
+      expect(getPrice(mockT as TFunction, pricedReservation, "fi")).toBe("20,00 €");
+
+      const materialPricing = {
+        ...activePricing,
+        highestPrice: "0",
+        lowestPrice: "0",
+        materialPriceDescriptionFi: "Material fee",
+      };
+      const materialReservation = {
+        ...pricedReservation,
+        state: ReservationStateChoice.Confirmed,
+        applyingForFreeOfCharge: false,
+        reservationUnit: {
+          ...pricedReservation.reservationUnit,
+          pricings: [materialPricing],
+        },
+      };
+      expect(getPrice(mockT as TFunction, materialReservation, "fi")).toBe("Materiaalimaksu");
+    });
+  });
   afterEach(() => {
     vi.useRealTimers();
   });
@@ -823,6 +912,37 @@ describe("isReservationUnitReservable", () => {
     const input = constructReservationUnitNode(rest);
     const { isReservable: res1 } = isReservationUnitReservable(input);
     expect(res1).toBe(expected);
+  });
+
+  test("returns a reason when min/max durations are missing", () => {
+    expect(
+      isReservationUnitReservable(
+        constructReservationUnitNode({
+          reservableTimeSpans: defaultTimeSpans,
+          minReservationDuration: 0,
+          maxReservationDuration: 0,
+          reservationBeginsAt: addDays(new Date(), -1),
+        })
+      )
+    ).toEqual({
+      isReservable: false,
+      reason: "reservationUnit has no min/max reservation duration",
+    });
+  });
+
+  test("returns a reason for seasonal-only reservation units", () => {
+    expect(
+      isReservationUnitReservable({
+        ...constructReservationUnitNode({
+          reservableTimeSpans: defaultTimeSpans,
+          reservationBeginsAt: addDays(new Date(), -1),
+        }),
+        reservationKind: ReservationKind.Season,
+      })
+    ).toEqual({
+      isReservable: false,
+      reason: "reservationUnit is only available for seasonal booking",
+    });
   });
 });
 
@@ -1522,5 +1642,69 @@ describe("formatNDays", () => {
   test("formats negative days as empty string", () => {
     const res = formatNDays(mockT, -5);
     expect(res).toBe("");
+  });
+});
+
+describe("isInTimeSpan", () => {
+  const start = new Date("2024-01-10T10:00:00.000Z");
+  const end = new Date("2024-01-12T10:00:00.000Z");
+  const timeSpan = {
+    startDatetime: start.toISOString(),
+    endDatetime: end.toISOString(),
+  };
+
+  test("accepts days inside the timespan and rejects days outside it", () => {
+    expect(isInTimeSpan(new Date("2024-01-10T12:00:00.000Z"), timeSpan)).toBe(true);
+    expect(isInTimeSpan(new Date("2024-01-11T12:00:00.000Z"), timeSpan)).toBe(true);
+    expect(isInTimeSpan(new Date("2024-01-09T12:00:00.000Z"), timeSpan)).toBe(false);
+    expect(isInTimeSpan(new Date("2024-01-13T12:00:00.000Z"), timeSpan)).toBe(false);
+  });
+
+  test("returns false for incomplete timespans", () => {
+    expect(isInTimeSpan(new Date(), { startDatetime: null, endDatetime: null })).toBe(false);
+  });
+});
+
+describe("getReservationUnitAccessPeriods", () => {
+  test("builds end dates from the next period begin dates", () => {
+    const periods = getReservationUnitAccessPeriods([
+      {
+        pk: 1,
+        accessType: "open",
+        beginDate: "2024-01-01",
+      },
+      {
+        pk: 2,
+        accessType: "restricted",
+        beginDate: "2024-01-10",
+      },
+      {
+        pk: 3,
+        accessType: "closed",
+        beginDate: "invalid-date",
+      },
+    ]);
+
+    expect(
+      periods.map(({ accessType, pk, beginDate, endDate }) => ({
+        accessType,
+        pk,
+        beginDate: formatApiDateUnsafe(beginDate),
+        endDate: endDate ? formatApiDateUnsafe(endDate) : null,
+      }))
+    ).toEqual([
+      {
+        accessType: "open",
+        pk: 1,
+        beginDate: "2024-01-01",
+        endDate: "2024-01-09",
+      },
+      {
+        accessType: "restricted",
+        pk: 2,
+        beginDate: "2024-01-10",
+        endDate: null,
+      },
+    ]);
   });
 });
