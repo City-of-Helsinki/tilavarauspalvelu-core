@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { createNodeId } from "@ui/modules/helpers";
 import { UserPermissionChoice, UserRoleChoice } from "@gql/gql-types";
 import type { CurrentUserQuery } from "@gql/gql-types";
-import { hasPermission } from "./permissionHelper";
+import { hasPermission, hasSomePermission } from "./permissionHelper";
 
 function getPermissionsForRole(role: UserRoleChoice): UserPermissionChoice[] {
   switch (role) {
@@ -160,5 +160,54 @@ describe("hasPermission", () => {
       });
       expect(hasPermission(user, permission, 100)).toBe(isAllowed);
     });
+  });
+
+  test("returns false for null user", () => {
+    expect(hasPermission(null, UserPermissionChoice.CanCreateStaffReservations)).toBe(false);
+  });
+
+  test("returns false when checking undefined unitPk without general roles", () => {
+    const user = createUser({ unitRoles: [{ role: UserRoleChoice.Handler, units: [1] }] });
+    expect(hasPermission(user, UserPermissionChoice.CanCreateStaffReservations, undefined)).toBe(true);
+  });
+});
+
+describe("hasSomePermission", () => {
+  test("returns true for superuser", () => {
+    const user = createUser({ isSuperuser: true });
+    expect(hasSomePermission(user, UserPermissionChoice.CanCreateStaffReservations)).toBe(true);
+  });
+
+  test("returns true when user has general permission", () => {
+    const user = createUser({ generalRoles: [UserRoleChoice.Handler] });
+    expect(hasSomePermission(user, UserPermissionChoice.CanCreateStaffReservations)).toBe(true);
+  });
+
+  test("returns true when user has unit permission", () => {
+    const user = createUser({
+      unitRoles: [{ role: UserRoleChoice.Handler, units: [1, 2, 3] }],
+    });
+    expect(hasSomePermission(user, UserPermissionChoice.CanCreateStaffReservations)).toBe(true);
+  });
+
+  test("returns false when user has no permission", () => {
+    const user = createUser({ generalRoles: [UserRoleChoice.Viewer] });
+    expect(hasSomePermission(user, UserPermissionChoice.CanManageNotifications)).toBe(false);
+  });
+
+  test("returns false for null user", () => {
+    expect(hasSomePermission(null, UserPermissionChoice.CanCreateStaffReservations)).toBe(false);
+  });
+
+  test("returns false when onlyGeneral is true and no general roles", () => {
+    const user = createUser({
+      unitRoles: [{ role: UserRoleChoice.Handler, units: [1] }],
+    });
+    expect(hasSomePermission(user, UserPermissionChoice.CanCreateStaffReservations, true)).toBe(false);
+  });
+
+  test("returns true when onlyGeneral is true and user has general role", () => {
+    const user = createUser({ generalRoles: [UserRoleChoice.Handler] });
+    expect(hasSomePermission(user, UserPermissionChoice.CanCreateStaffReservations, true)).toBe(true);
   });
 });
