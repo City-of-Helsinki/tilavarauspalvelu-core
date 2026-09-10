@@ -27,12 +27,21 @@ function QuickReservationWrapper({
   focusSlot,
   showSubmit = true,
 }: {
-  focusSlot: { isReservable: boolean };
+  focusSlot?: { isReservable: boolean };
   showSubmit?: boolean;
 }) {
   const form = useForm<PendingReservationFormType>({
     defaultValues: { date: "", duration: 60, time: "" },
   });
+
+  const resolvedFocusSlot = focusSlot?.isReservable
+    ? {
+        start: new Date(),
+        end: new Date(Date.now() + 3_600_000),
+        durationMinutes: 60,
+        isReservable: true as const,
+      }
+    : { isReservable: false as const };
 
   return (
     <QuickReservation
@@ -46,7 +55,7 @@ function QuickReservationWrapper({
           { label: "10:00", value: "10:00" },
         ] : []
       }
-      focusSlot={focusSlot}
+      focusSlot={resolvedFocusSlot}
       nextAvailableTime={null}
       submitReservation={vi.fn()}
       LoginAndSubmit={<button type="submit">Submit</button>}

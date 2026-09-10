@@ -162,7 +162,7 @@ describe("formatReservationPrice", () => {
   test("formats reservation price correctly", () => {
     const mockReservation = {
       price: "100.00",
-    } as unknown as ReservationPageQuery["reservation"];
+    } as unknown as NonNullable<ReservationPageQuery["reservation"]>;
 
     const result = formatReservationPrice(mockT, mockReservation);
     expect(typeof result).toBe("string");
@@ -175,7 +175,7 @@ describe("formatReservationPriceLong", () => {
       price: "100.00",
       paymentOrder: null,
       applyingForFreeOfCharge: false,
-    } as unknown as ReservationPageQuery["reservation"];
+    } as unknown as NonNullable<ReservationPageQuery["reservation"]>;
 
     const result = formatReservationPriceLong(mockT, mockReservation);
     expect(typeof result).toBe("string");
@@ -186,7 +186,7 @@ describe("formatReservationPriceLong", () => {
       price: "100.00",
       paymentOrder: null,
       applyingForFreeOfCharge: true,
-    } as unknown as ReservationPageQuery["reservation"];
+    } as unknown as NonNullable<ReservationPageQuery["reservation"]>;
 
     const result = formatReservationPriceLong(mockT, mockReservation);
     expect(typeof result).toBe("string");

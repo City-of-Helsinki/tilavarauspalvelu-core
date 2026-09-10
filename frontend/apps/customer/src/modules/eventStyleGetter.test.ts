@@ -11,12 +11,19 @@ function createCalendarEvent({
   state?: string;
   isBlocked?: boolean;
 }) {
+  const start = new Date();
+  const end = new Date(start.getTime() + 3_600_000);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const event: any = {
+    id: `reservation-${pk}`,
+    pk,
+    state,
+    isBlocked,
+  };
   return {
-    event: {
-      pk,
-      state,
-      isBlocked,
-    },
+    event,
+    start,
+    end,
   };
 }
 

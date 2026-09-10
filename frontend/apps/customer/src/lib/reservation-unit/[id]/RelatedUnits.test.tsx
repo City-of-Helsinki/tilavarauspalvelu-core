@@ -10,7 +10,7 @@ vi.mock("@/components/Carousel", () => ({
   Carousel: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-const { mockedUseMedia } = vi.hoisted(() => ({ mockedUseMedia: vi.fn(() => false) }));
+const { mockedUseMedia } = vi.hoisted(() => ({ mockedUseMedia: vi.fn((_query: string) => false) }));
 vi.mock("react-use", () => ({ useMedia: mockedUseMedia }));
 
 function createRelatedUnit(overrides: Partial<RelatedUnitCardFieldsFragment> = {}): RelatedUnitCardFieldsFragment {

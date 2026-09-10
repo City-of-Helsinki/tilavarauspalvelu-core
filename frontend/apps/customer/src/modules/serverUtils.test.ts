@@ -116,12 +116,12 @@ describe("serverUtils", () => {
         }),
     } satisfies Pick<ApolloClient<unknown>, "query">;
 
-    expect(await getGenericTerms(apolloClient as ApolloClient<unknown>)).toMatchObject({
+    expect(await getGenericTerms(apolloClient as unknown as ApolloClient<unknown>)).toMatchObject({
       pk: "booking",
       nameEn: "Terms",
     });
 
-    expect(await getGenericTerms(apolloClient as ApolloClient<unknown>)).toBeNull();
+    expect(await getGenericTerms(apolloClient as unknown as ApolloClient<unknown>)).toBeNull();
     expect(logErrorMock).toHaveBeenCalledWith('No terms of use found for slug "booking"');
   });
 
@@ -155,9 +155,9 @@ describe("serverUtils", () => {
         }),
     } satisfies Pick<ApolloClient<NormalizedCacheObject>, "query">;
 
-    expect(await getReservationByOrderUuid(apolloClient as ApolloClient<NormalizedCacheObject>, "uuid-1")).toMatchObject({
+    expect(await getReservationByOrderUuid(apolloClient as unknown as ApolloClient<NormalizedCacheObject>, "uuid-1")).toMatchObject({
       pk: 8,
     });
-    expect(await getReservationByOrderUuid(apolloClient as ApolloClient<NormalizedCacheObject>, "uuid-2")).toBeNull();
+    expect(await getReservationByOrderUuid(apolloClient as unknown as ApolloClient<NormalizedCacheObject>, "uuid-2")).toBeNull();
   });
 });

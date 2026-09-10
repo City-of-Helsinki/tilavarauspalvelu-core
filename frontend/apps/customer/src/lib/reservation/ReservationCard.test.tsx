@@ -49,7 +49,7 @@ function createMockReservation(
     beginsAt: "2026-09-15T10:00:00Z",
     endsAt: "2026-09-15T11:00:00Z",
     state: ReservationStateChoice.Confirmed,
-    accessType: AccessType.Public,
+    accessType: AccessType.Unrestricted,
     reservationUnit: {
       id: "ru-1",
       nameFi: "Test Unit",
@@ -140,7 +140,7 @@ describe("ReservationCard", () => {
   });
 
   test("returns null when reservation unit is missing", () => {
-    const mockReservation = createMockReservation({ reservationUnit: null });
+    const mockReservation = createMockReservation({ reservationUnit: null } as unknown as Partial<ReservationCardFragment>);
 
     const { container } = render(
       <ReservationCard
