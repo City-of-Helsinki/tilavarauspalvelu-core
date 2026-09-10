@@ -65,7 +65,8 @@ beforeEach(() => {
 function renderCard(
   section: SectionNodeT,
   type: "unallocated" | "allocated" | "partial" | "declined",
-  mocks: ReadonlyArray<MockedResponse> = []
+  mocks: ReadonlyArray<MockedResponse> = [],
+  refetch = vi.fn()
 ) {
   return render(
     <MockedProvider mocks={mocks}>
@@ -73,7 +74,7 @@ function renderCard(
         applicationSection={section}
         reservationUnit={reservationUnit}
         type={type}
-        refetch={vi.fn()}
+        refetch={refetch}
       />
     </MockedProvider>
   );
@@ -226,19 +227,23 @@ describe("SchedulesList (via ApplicationSectionCard)", () => {
 
   it("locks the option and refetches on success", async () => {
     const section = createSection({ appliedReservationsPerWeek: 1 });
+    const mockRefetch = vi.fn();
     const mocks = [
       {
         request: { query: RejectRestDocument, variables: { input: { pk: 100, isLocked: true } } },
         result: { data: { updateReservationUnitOption: { pk: 100, isRejected: false, isLocked: true } } },
       },
     ];
-    renderCard(section, "unallocated", mocks);
+    renderCard(section, "unallocated", mocks, mockRefetch);
 
     const user = await expandDetails();
     await user.click(screen.getByRole("button", { name: "common:show" }));
     await user.click(screen.getByRole("button", { name: "allocation:lockOptions" }));
 
-    await waitFor(() => expect(screen.queryByText("allocation:lockOptions")).not.toBeInTheDocument());
+    await waitFor(() => {
+      expect(screen.queryByText("allocation:lockOptions")).not.toBeInTheDocument();
+      expect(mockRefetch).toHaveBeenCalled();
+    });
   });
 
   it("displays an error toast-equivalent path when the lock mutation fails", async () => {
