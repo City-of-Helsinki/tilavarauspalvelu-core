@@ -142,13 +142,14 @@ describe("BottomButtonsStripe", () => {
   it("opens an archive confirmation dialog and archives on accept", async () => {
     const setModalContent = vi.fn();
     const reservationUnit = createReservationUnit();
+    const unit = { id: "unit-1", pk: 10, nameFi: "Test unit" } as UnitSubpageHeadFragment;
     const mocks = [
       {
         request: { query: ArchiveReservationUnitDocument, variables: { input: { pk: 5 } } },
         result: { data: { archiveReservationUnit: { pk: 5 } } },
       },
     ];
-    render(<Harness reservationUnit={reservationUnit} setModalContent={setModalContent} mocks={mocks} />);
+    render(<Harness reservationUnit={reservationUnit} unit={unit} setModalContent={setModalContent} mocks={mocks} />);
     const user = userEvent.setup();
 
     await user.click(screen.getByRole("button", { name: "reservationUnitEditor:archive" }));
@@ -161,7 +162,8 @@ describe("BottomButtonsStripe", () => {
     await waitFor(() =>
       expect(mockSuccessToast).toHaveBeenCalledWith({ text: "reservationUnitEditor:ArchiveDialog.success" })
     );
-    expect(mockPush).toHaveBeenCalledWith(getUnitUrl(undefined));
+    expect(mockPush).toHaveBeenCalledWith(getUnitUrl(unit.pk));
+    expect(mockPush).toHaveBeenCalledWith("/units/10/");
     expect(setModalContent).toHaveBeenLastCalledWith(null);
   });
 

@@ -81,10 +81,16 @@ export function getResourceUrl(resourcePk: Maybe<number> | undefined, unitPk: Ma
 
 type UnitPage = "spaces-resources" | "";
 export function getUnitUrl(unitPk: Maybe<number> | undefined, page?: UnitPage): string {
+  if (unitPk == null || !(unitPk > 0)) {
+    return "";
+  }
   return `${UNITS_URL_PREFIX}/${unitPk}/${page ?? ""}`;
 }
 
 export function getMyUnitUrl(unitPk: Maybe<number> | undefined): string {
+  if (unitPk == null || !(unitPk > 0)) {
+    return "";
+  }
   return `${MY_UNITS_URL_PREFIX}/${unitPk}`;
 }
 

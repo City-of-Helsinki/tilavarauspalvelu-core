@@ -172,6 +172,13 @@ describe("URL generation functions", () => {
   });
 
   describe("getUnitUrl", () => {
+    it("returns empty string for null or invalid ID", () => {
+      expect(getUnitUrl(null)).toBe("");
+      expect(getUnitUrl(undefined)).toBe("");
+      expect(getUnitUrl(0)).toBe("");
+      expect(getUnitUrl(-1)).toBe("");
+    });
+
     it("builds URL with unit ID only", () => {
       expect(getUnitUrl(5)).toBe("/units/5/");
     });
@@ -179,19 +186,18 @@ describe("URL generation functions", () => {
     it("appends page parameter when provided", () => {
       expect(getUnitUrl(5, "spaces-resources")).toBe("/units/5/spaces-resources");
     });
-
-    it("handles undefined unit ID", () => {
-      expect(getUnitUrl(undefined)).toContain("/units/");
-    });
   });
 
   describe("getMyUnitUrl", () => {
-    it("builds URL with unit ID", () => {
-      expect(getMyUnitUrl(5)).toBe("/my-units/5");
+    it("returns empty string for null or invalid ID", () => {
+      expect(getMyUnitUrl(null)).toBe("");
+      expect(getMyUnitUrl(undefined)).toBe("");
+      expect(getMyUnitUrl(0)).toBe("");
+      expect(getMyUnitUrl(-1)).toBe("");
     });
 
-    it("handles undefined unit ID", () => {
-      expect(getMyUnitUrl(undefined)).toContain("/my-units/");
+    it("builds URL with unit ID", () => {
+      expect(getMyUnitUrl(5)).toBe("/my-units/5");
     });
   });
 

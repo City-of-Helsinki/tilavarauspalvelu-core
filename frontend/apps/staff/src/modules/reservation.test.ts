@@ -341,9 +341,8 @@ describe("reservationToInterval", () => {
 
     const result = reservationToInterval(res as never, ReservationTypeChoice.Normal);
     expect(result).not.toBeNull();
-    // Note: getBufferTime is called without enabled parameter, so buffers are 0
-    expect(result?.buffers.before).toBe(0);
-    expect(result?.buffers.after).toBe(0);
+    expect(result?.buffers.before).toBe(600);
+    expect(result?.buffers.after).toBe(600);
   });
 
   test("handles blocked reservation type", () => {

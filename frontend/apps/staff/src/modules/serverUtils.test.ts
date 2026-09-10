@@ -88,34 +88,32 @@ describe("serverUtils", () => {
     });
 
     it("returns empty strings when env variables are not set", async () => {
-      // Test the fallback behavior
-      const mockEnv = {
-        TILAVARAUS_API_URL: undefined,
-        FEEDBACK_URL: undefined,
-        ENABLE_CONSOLE_LOGGING: undefined,
-        RESERVATION_UNIT_PREVIEW_URL_PREFIX: undefined,
-      };
-
+      vi.resetModules();
       vi.doMock("@/env.mjs", () => ({
-        env: mockEnv,
+        env: {
+          TILAVARAUS_API_URL: undefined,
+          FEEDBACK_URL: undefined,
+          ENABLE_CONSOLE_LOGGING: undefined,
+          RESERVATION_UNIT_PREVIEW_URL_PREFIX: undefined,
+        },
       }));
 
-      // Since we can't easily control the mocked env in the test,
-      // we just verify the structure is correct
-      const props = await getCommonServerSideProps();
-      expect(typeof props.apiBaseUrl).toBe("string");
-      expect(typeof props.feedbackUrl).toBe("string");
-      expect(typeof props.reservationUnitPreviewUrl).toBe("string");
+      const { getCommonServerSideProps: getPropsWithEmptyEnv } = await import("./serverUtils");
+      const props = await getPropsWithEmptyEnv();
+
+      expect(props.apiBaseUrl).toBe("");
+      expect(props.feedbackUrl).toBe("");
+      expect(props.isConsoleLoggingEnabled).toBe(false);
+      expect(props.reservationUnitPreviewUrl).toBe("");
     });
 
     it("respects env configuration when provided", async () => {
-      // The actual env values depend on the mock setup in beforeEach
       const props = await getCommonServerSideProps();
 
-      // At minimum, the function should return valid props
-      expect(props.apiBaseUrl !== undefined).toBe(true);
-      expect(props.feedbackUrl !== undefined).toBe(true);
-      expect(props.reservationUnitPreviewUrl !== undefined).toBe(true);
+      expect(props.apiBaseUrl).toBe("https://api.example.com");
+      expect(props.feedbackUrl).toBe("https://feedback.example.com");
+      expect(props.isConsoleLoggingEnabled).toBe(true);
+      expect(props.reservationUnitPreviewUrl).toBe("https://preview.example.com");
     });
   });
 
