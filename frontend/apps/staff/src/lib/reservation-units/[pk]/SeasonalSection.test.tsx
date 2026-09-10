@@ -94,6 +94,7 @@ describe("SeasonalSection", () => {
     expect(screen.getAllByRole("button", { name: "reservationUnitEditor:addSeasonalTime" })).toHaveLength(7);
   }, 10_000);
 
+  // Several sequential HDS interactions; give it headroom over the 5s default under parallel test load.
   it("resets all days to default when Clear is clicked", async () => {
     render(<Harness />);
     const user = await openAccordion();
@@ -108,5 +109,5 @@ describe("SeasonalSection", () => {
     const [firstClosedCheckboxAfterClear] = screen.getAllByRole("checkbox");
     expect(firstClosedCheckboxAfterClear).not.toBeChecked();
     expect(screen.getAllByPlaceholderText("tt:mm")).toHaveLength(14);
-  });
+  }, 10_000);
 });
