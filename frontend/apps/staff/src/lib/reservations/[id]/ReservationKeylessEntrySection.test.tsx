@@ -164,6 +164,7 @@ describe("ReservationKeylessEntry", () => {
     await user.click(screen.getByTestId("AccessCodeChangeRepairButton__ConfirmationDialog--cancel"));
 
     expect(mockSuccessToast).not.toHaveBeenCalled();
+    expect(screen.queryByTestId("AccessCodeChangeRepairButton__ConfirmationDialog--cancel")).not.toBeInTheDocument();
   });
 
   it("shows an error toast when the mutation fails", async () => {

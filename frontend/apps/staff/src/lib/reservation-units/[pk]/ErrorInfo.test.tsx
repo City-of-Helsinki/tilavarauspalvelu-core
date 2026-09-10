@@ -62,9 +62,15 @@ describe("ErrorInfo", () => {
   });
 
   it("renders an accessTypes.root error (added then removed access type)", async () => {
-    render(
-      <Harness apply={(form) => form.setError("accessTypes" as const, { type: "custom", message: "Required" })} />
-    );
+    // NOTE `accessTypes.root` is a valid runtime error path for array fields (see FieldErrorsImpl in
+    // react-hook-form), but it isn't part of the typed `setError` name union, hence the cast below.
+    const setAccessTypesRootError = (form: UseFormReturn<ReservationUnitEditFormValues>) =>
+      (form.setError as unknown as (name: string, error: { type: string; message: string }) => void)(
+        "accessTypes.root",
+        { type: "custom", message: "Required" }
+      );
+
+    render(<Harness apply={setAccessTypesRootError} />);
 
     expect(
       await screen.findByText("reservationUnitEditor:label.accessTypes : forms:errors.Required")
