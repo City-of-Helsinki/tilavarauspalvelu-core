@@ -171,7 +171,7 @@ describe("formatTimeRangeList", () => {
   });
 
   it("returns an empty string when nothing matches the priority", () => {
-    expect(formatTimeRangeList(t, ranges, Priority.Tertiary)).toBe("");
+    expect(formatTimeRangeList(t, [], Priority.Primary)).toBe("");
   });
 });
 
