@@ -120,5 +120,7 @@ describe("Navigation", () => {
 
     // Navigation header should still be present
     expect(screen.getByRole("banner")).toBeInTheDocument();
+    // My Units menu item should be absent
+    expect(screen.queryByText("navigation:myUnits")).not.toBeInTheDocument();
   });
 });
