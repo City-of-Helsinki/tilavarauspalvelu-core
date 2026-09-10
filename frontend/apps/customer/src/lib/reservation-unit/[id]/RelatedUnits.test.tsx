@@ -6,8 +6,12 @@ import { PaymentType, PriceUnit, RelatedReservationUnitsDocument } from "@gql/gq
 import type { RelatedUnitCardFieldsFragment } from "@gql/gql-types";
 import { RelatedUnits } from "./RelatedUnits";
 
+const { mockedCarouselProps } = vi.hoisted(() => ({ mockedCarouselProps: vi.fn() }));
 vi.mock("@/components/Carousel", () => ({
-  Carousel: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Carousel: ({ children, ...props }: { children: React.ReactNode }) => {
+    mockedCarouselProps(props);
+    return <div>{children}</div>;
+  },
 }));
 
 const { mockedUseMedia } = vi.hoisted(() => ({ mockedUseMedia: vi.fn((_query: string) => false) }));
@@ -138,5 +142,6 @@ describe("RelatedUnits", () => {
     mockedUseMedia.mockImplementation((query: string) => query.includes("max-width"));
     renderWithMocks();
     expect(await screen.findByRole("heading", { name: "Related Unit" })).toBeInTheDocument();
+    expect(mockedCarouselProps).toHaveBeenCalledWith(expect.objectContaining({ slidesToShow: 1 }));
   });
 });

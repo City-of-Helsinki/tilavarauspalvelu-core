@@ -34,7 +34,13 @@ const { mockedRouterPush, useRouter } = vi.hoisted(() => {
   };
 });
 
+const { mockedDisplayError } = vi.hoisted(() => ({ mockedDisplayError: vi.fn() }));
+
 vi.mock("next/router", () => ({ useRouter }));
+vi.mock("@ui/hooks", async (importOriginal) => ({
+  ...(await importOriginal()),
+  useDisplayError: () => mockedDisplayError,
+}));
 
 function buildReservation(): EditPageReservationFragment {
   const base = createMockReservation({ pk: 1 });
@@ -115,6 +121,7 @@ function customRender({
 
 beforeEach(() => {
   mockedRouterPush.mockReset();
+  mockedDisplayError.mockReset();
 });
 
 describe("EditStep1", () => {
@@ -168,10 +175,9 @@ describe("EditStep1", () => {
     customRender({ reservation, mocks });
 
     await acceptAllTerms();
-    const continueButton = screen.getByTestId("reservation__button--continue");
-    await userEvent.click(continueButton);
+    await userEvent.click(screen.getByTestId("reservation__button--continue"));
 
-    await waitFor(() => expect(continueButton).not.toBeDisabled());
+    await waitFor(() => expect(mockedDisplayError).toHaveBeenCalled());
     expect(mockedRouterPush).not.toHaveBeenCalled();
   });
 });

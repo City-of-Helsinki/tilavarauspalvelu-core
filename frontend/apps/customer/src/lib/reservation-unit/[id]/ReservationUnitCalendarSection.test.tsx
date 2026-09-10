@@ -6,6 +6,13 @@ import type { PendingReservationFormType } from "@/modules/schemas/reservationUn
 import type { ReservationQuotaReachedFragment, ReservationUnitPageQuery } from "@gql/gql-types";
 import { ReservationUnitCalendarSection, isReservationQuotaReached } from "./ReservationUnitCalendarSection";
 
+vi.mock("next-i18next", () => ({
+  useTranslation: vi.fn(() => ({
+    t: vi.fn((key, opts) => (opts?.title ? `${key}: ${opts.title}` : key)),
+    i18n: { language: "fi" },
+  })),
+}));
+
 vi.mock("@/hooks", () => ({ useReservableTimes: vi.fn(() => new Map()) }));
 
 vi.mock("@/components/reservation", () => ({
@@ -59,7 +66,7 @@ describe("ReservationUnitCalendarSection", () => {
   test("renders the heading with the reservation unit name and the time picker", () => {
     render(<Wrapper refreshedQuotaReservationUnit={createRefreshedQuotaReservationUnit()} />);
 
-    expect(screen.getByText(/reservation:reservationCalendar/)).toBeInTheDocument();
+    expect(screen.getByText(/Test Reservation Unit/)).toBeInTheDocument();
     expect(screen.getByTestId("reservation-time-picker-stub")).toBeInTheDocument();
   });
 
