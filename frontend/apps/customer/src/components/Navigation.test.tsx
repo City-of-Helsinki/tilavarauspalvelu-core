@@ -117,6 +117,12 @@ describe("Navigation", () => {
     expect(screen.queryByText("navigation:Item.reservations")).not.toBeInTheDocument();
   });
 
+  test("shows reservations link when authenticated", () => {
+    render(<Navigation apiBaseUrl="http://localhost:3000" profileLink="http://profile.example.com" />);
+
+    expect(screen.getByText("navigation:Item.reservations")).toBeInTheDocument();
+  });
+
   test("shows applications link only when authenticated", () => {
     mockUseSession.mockReturnValue({
       user: null,
@@ -126,5 +132,11 @@ describe("Navigation", () => {
     render(<Navigation apiBaseUrl="http://localhost:3000" profileLink="http://profile.example.com" />);
 
     expect(screen.queryByText("navigation:Item.applications")).not.toBeInTheDocument();
+  });
+
+  test("shows applications link when authenticated", () => {
+    render(<Navigation apiBaseUrl="http://localhost:3000" profileLink="http://profile.example.com" />);
+
+    expect(screen.getByText("navigation:Item.applications")).toBeInTheDocument();
   });
 });

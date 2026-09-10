@@ -166,6 +166,10 @@ describe("Head", () => {
   });
 
   test("shows the access type and its tooltip only when there are multiple access periods", () => {
+    vi.mocked(getReservationUnitAccessPeriods).mockReturnValue([
+      { accessType: AccessType.AccessCode, pk: 1, beginDate: new Date(2024, 0, 1), endDate: null },
+    ]);
+
     render(
       <ReservationUnitHead
         reservationUnit={createReservationUnit({
