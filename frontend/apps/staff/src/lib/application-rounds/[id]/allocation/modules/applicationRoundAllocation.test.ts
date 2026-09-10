@@ -166,8 +166,12 @@ describe("formatTimeRangeList", () => {
     expect(result).toBe("translation:dayShort.0 10:00–11:00, translation:dayShort.2 12:00–13:00");
   });
 
-  it("returns an empty string when nothing matches the priority", () => {
+  it("filters by Secondary priority", () => {
     expect(formatTimeRangeList(t, ranges, Priority.Secondary)).toBe("translation:dayShort.0 8:00–9:00");
+  });
+
+  it("returns an empty string when nothing matches the priority", () => {
+    expect(formatTimeRangeList(t, ranges, Priority.Tertiary)).toBe("");
   });
 });
 
