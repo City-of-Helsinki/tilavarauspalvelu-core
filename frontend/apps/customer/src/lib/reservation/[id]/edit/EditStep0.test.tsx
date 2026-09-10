@@ -151,7 +151,8 @@ describe("EditStep0", () => {
     expect(form).toBeInTheDocument();
     form?.requestSubmit();
 
-    await waitFor(() => expect(mockIsRangeReservable).not.toHaveBeenCalled());
+    await waitFor(() => expect(mockIsReservationEditable).toHaveBeenCalled());
+    expect(mockIsRangeReservable).not.toHaveBeenCalled();
     expect(nextStep).not.toHaveBeenCalled();
   });
 
