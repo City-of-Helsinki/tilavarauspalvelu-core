@@ -110,8 +110,8 @@ describe("ApplicationCard", () => {
     );
 
     expect(screen.getByRole("button", { name: "common:cancel" })).toBeInTheDocument();
-    const links = screen.getAllByRole("link");
-    expect(links.length).toBeGreaterThan(0);
+    const editLink = screen.getByRole("link", { name: /common:actions.edit/i });
+    expect(editLink).toHaveAttribute("href", "/applications/1/page1");
   });
 
   test("disables cancel button when application is not editable", () => {
