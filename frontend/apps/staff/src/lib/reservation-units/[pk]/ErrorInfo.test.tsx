@@ -3,15 +3,11 @@ import type { UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { ErrorInfo } from "./ErrorInfo";
 import { convertReservationUnit } from "./form";
 import type { ReservationUnitEditFormValues } from "./form";
-import { ErrorInfo } from "./ErrorInfo";
 
-function Harness({
-  apply,
-}: {
-  apply?: (form: UseFormReturn<ReservationUnitEditFormValues>) => void;
-}) {
+function Harness({ apply }: { apply?: (form: UseFormReturn<ReservationUnitEditFormValues>) => void }) {
   const form = useForm<ReservationUnitEditFormValues>({
     defaultValues: convertReservationUnit(undefined),
   });
@@ -31,9 +27,7 @@ describe("ErrorInfo", () => {
   });
 
   it("renders a plain field error", async () => {
-    render(
-      <Harness apply={(form) => form.setError("nameFi", { type: "custom", message: "Required" })} />
-    );
+    render(<Harness apply={(form) => form.setError("nameFi", { type: "custom", message: "Required" })} />);
 
     expect(await screen.findByText("forms:ErrorSummary.label")).toBeInTheDocument();
     expect(screen.getByText("reservationUnitEditor:label.nameFi: forms:errors.Required")).toBeInTheDocument();
@@ -41,9 +35,7 @@ describe("ErrorInfo", () => {
 
   it("renders pricing errors from the pricings field array", async () => {
     render(
-      <Harness
-        apply={(form) => form.setError("pricings.0.lowestPrice", { type: "custom", message: "Required" })}
-      />
+      <Harness apply={(form) => form.setError("pricings.0.lowestPrice", { type: "custom", message: "Required" })} />
     );
 
     expect(
@@ -53,9 +45,7 @@ describe("ErrorInfo", () => {
 
   it("renders per-item access type errors", async () => {
     render(
-      <Harness
-        apply={(form) => form.setError("accessTypes.0.accessType", { type: "custom", message: "Required" })}
-      />
+      <Harness apply={(form) => form.setError("accessTypes.0.accessType", { type: "custom", message: "Required" })} />
     );
 
     expect(
@@ -64,9 +54,7 @@ describe("ErrorInfo", () => {
   });
 
   it("renders a top-level accessTypes error", async () => {
-    render(
-      <Harness apply={(form) => form.setError("accessTypes", { type: "custom", message: "Required" })} />
-    );
+    render(<Harness apply={(form) => form.setError("accessTypes", { type: "custom", message: "Required" })} />);
 
     expect(
       await screen.findByText("reservationUnitEditor:label.accessTypes : forms:errors.Required")
@@ -95,11 +83,7 @@ describe("ErrorInfo", () => {
     );
 
     expect(await screen.findByText("reservationUnitEditor:label.nameFi: forms:errors.Required")).toBeInTheDocument();
-    expect(
-      screen.getByText("reservationUnitEditor:label.lowestPrice : forms:errors.Required")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("reservationUnitEditor:label.accessTypes : forms:errors.Required")
-    ).toBeInTheDocument();
+    expect(screen.getByText("reservationUnitEditor:label.lowestPrice : forms:errors.Required")).toBeInTheDocument();
+    expect(screen.getByText("reservationUnitEditor:label.accessTypes : forms:errors.Required")).toBeInTheDocument();
   });
 });

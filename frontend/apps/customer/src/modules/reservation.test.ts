@@ -1,9 +1,15 @@
+import { createMockIsReservableFieldsFragment, createMockReservableTimes } from "@test/reservation-unit.mocks";
 import { addDays, addHours, addMinutes, startOfDay, startOfToday } from "date-fns";
 import type { TFunction } from "i18next";
 import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
-import { ReservationStateChoice, ReservationStartInterval, OrderStatus, ReservationCancelReasonChoice } from "@gql/gql-types";
+import {
+  ReservationStateChoice,
+  ReservationStartInterval,
+  OrderStatus,
+  ReservationCancelReasonChoice,
+} from "@gql/gql-types";
 import type {
   ReservationOrderStatusFragment,
   CanUserCancelReservationFragment,
@@ -11,7 +17,6 @@ import type {
   CanReservationBeChangedFragment,
   ReservationPaymentUrlFragment,
 } from "@gql/gql-types";
-import { createMockIsReservableFieldsFragment, createMockReservableTimes } from "@test/reservation-unit.mocks";
 import { isSlotWithinReservationTime } from "./reservable";
 import {
   convertFormToFocustimeSlot,
@@ -273,7 +278,9 @@ describe("isReservationCancellableReason", () => {
         ...createMockCanUserCancelReservation({
           beginsAt: addDays(new Date(), 1),
         }),
-        reservationUnit: null as unknown as NonNullable<ReturnType<typeof createMockCanUserCancelReservation>>["reservationUnit"],
+        reservationUnit: null as unknown as NonNullable<
+          ReturnType<typeof createMockCanUserCancelReservation>
+        >["reservationUnit"],
       })
     ).toBe("CANCELLATION_NOT_ALLOWED");
 

@@ -5,9 +5,9 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getReservationInProgressPath, getReservationUnitPath } from "@/modules/urls";
 import { ReservationStateChoice, ReserveeType, UpdateReservationDocument } from "@gql/gql-types";
 import type { ReservationQuery, ReservationUpdateMutationInput } from "@gql/gql-types";
-import { getReservationInProgressPath, getReservationUnitPath } from "@/modules/urls";
 import { ReservationStep0 } from "./ReservationStep0";
 
 // The general/reservee form sections render the full metadata-set driven UI

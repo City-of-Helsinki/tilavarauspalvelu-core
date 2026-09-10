@@ -3,10 +3,10 @@ import { useForm } from "react-hook-form";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { convertReservationUnit } from "./form";
-import type { ReservationUnitEditFormValues } from "./form";
 import { PricingSection } from "./PricingSection";
 import type { TaxOption } from "./PricingSection";
+import { convertReservationUnit } from "./form";
+import type { ReservationUnitEditFormValues } from "./form";
 
 const TAX_OPTIONS: TaxOption[] = [{ label: "25.5 %", pk: 1, value: 25.5 }];
 const PRICING_TERMS_OPTIONS = [{ value: "terms-1", label: "Terms 1" }];
@@ -114,7 +114,9 @@ describe("PricingSection", () => {
     render(<Harness />);
     const user = await openAccordion();
 
-    expect(screen.queryByRole("textbox", { name: nameLike("reservationUnitEditor:label.begins") })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("textbox", { name: nameLike("reservationUnitEditor:label.begins") })
+    ).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("checkbox", { name: "label.hasFuturePrice" }));
 

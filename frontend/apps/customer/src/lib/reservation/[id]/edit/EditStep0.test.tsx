@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { MockedProvider } from "@apollo/client/testing";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { createMockReservation } from "@test/reservation.mocks";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -165,5 +165,4 @@ describe("EditStep0", () => {
     await waitFor(() => expect(mockIsRangeReservable).toHaveBeenCalled());
     expect(nextStep).not.toHaveBeenCalled();
   });
-
 });

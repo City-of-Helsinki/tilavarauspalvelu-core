@@ -10,13 +10,13 @@ import type {
   ReservationUnitPricingFieldsFragment,
   ReservationPageQuery,
 } from "@gql/gql-types";
+import { doesIntervalCollide, getBufferTime, reservationToInterval } from "./helpers";
 import {
   createTagString,
   getReservationUnitPricing,
   formatReservationPrice,
   formatReservationPriceLong,
 } from "./reservation";
-import { doesIntervalCollide, getBufferTime, reservationToInterval } from "./helpers";
 
 const mockT = ((x: string) => x) as TFunction;
 

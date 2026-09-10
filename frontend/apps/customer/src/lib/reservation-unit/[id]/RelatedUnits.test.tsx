@@ -24,7 +24,12 @@ function createRelatedUnit(overrides: Partial<RelatedUnitCardFieldsFragment> = {
     reservationUnitType: null,
     pricings: [],
     images: [],
-    unit: { id: "unit-2", nameFi: "Related Unit's Unit", nameSv: "Related Unit's Unit SV", nameEn: "Related Unit's Unit EN" },
+    unit: {
+      id: "unit-2",
+      nameFi: "Related Unit's Unit",
+      nameSv: "Related Unit's Unit SV",
+      nameEn: "Related Unit's Unit EN",
+    },
     ...overrides,
   };
 }
@@ -88,7 +93,13 @@ describe("RelatedUnits", () => {
       relatedUnits: [
         createRelatedUnit({
           maxPersons: 8,
-          reservationUnitType: { id: "type-1", pk: 1, nameFi: "Meeting room", nameEn: "Meeting room", nameSv: "Meeting room" },
+          reservationUnitType: {
+            id: "type-1",
+            pk: 1,
+            nameFi: "Meeting room",
+            nameEn: "Meeting room",
+            nameSv: "Meeting room",
+          },
           pricings: [
             {
               id: "pricing-1",

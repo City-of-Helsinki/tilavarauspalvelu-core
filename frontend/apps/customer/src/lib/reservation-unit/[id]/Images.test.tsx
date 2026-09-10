@@ -31,7 +31,10 @@ describe("Images", () => {
   });
 
   test("renders a carousel image per image using the large size and alt text", () => {
-    const images = [createImage({ id: "1", largeUrl: "https://example.com/large-1.jpg" }), createImage({ id: "2", largeUrl: "https://example.com/large-2.jpg" })];
+    const images = [
+      createImage({ id: "1", largeUrl: "https://example.com/large-1.jpg" }),
+      createImage({ id: "2", largeUrl: "https://example.com/large-2.jpg" }),
+    ];
     render(<Images images={images} contextName="Test Space" />);
 
     const carouselImages = screen.getAllByAltText(/common:imgAltForSpace/);
@@ -79,8 +82,16 @@ describe("Images", () => {
   test("switches the large image when a thumbnail is clicked", async () => {
     const user = userEvent.setup();
     const images = [
-      createImage({ id: "1", largeUrl: "https://example.com/large-1.jpg", smallUrl: "https://example.com/small-1.jpg" }),
-      createImage({ id: "2", largeUrl: "https://example.com/large-2.jpg", smallUrl: "https://example.com/small-2.jpg" }),
+      createImage({
+        id: "1",
+        largeUrl: "https://example.com/large-1.jpg",
+        smallUrl: "https://example.com/small-1.jpg",
+      }),
+      createImage({
+        id: "2",
+        largeUrl: "https://example.com/large-2.jpg",
+        smallUrl: "https://example.com/small-2.jpg",
+      }),
     ];
     render(<Images images={images} contextName="Test Space" />);
 

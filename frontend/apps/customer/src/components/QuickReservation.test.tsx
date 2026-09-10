@@ -1,7 +1,7 @@
 import React from "react";
+import { useForm } from "react-hook-form";
 import { render, screen } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { useForm } from "react-hook-form";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { QuickReservation } from "./QuickReservation";
@@ -50,10 +50,12 @@ function QuickReservationWrapper({
       reservationForm={form}
       durationOptions={[{ label: "60 min", value: 60 }]}
       startingTimeOptions={
-        showSubmit ? [
-          { label: "09:00", value: "09:00" },
-          { label: "10:00", value: "10:00" },
-        ] : []
+        showSubmit
+          ? [
+              { label: "09:00", value: "09:00" },
+              { label: "10:00", value: "10:00" },
+            ]
+          : []
       }
       focusSlot={resolvedFocusSlot}
       nextAvailableTime={null}

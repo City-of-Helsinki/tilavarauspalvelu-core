@@ -29,9 +29,7 @@ vi.mock("ui/src/components/toast", () => ({
   successToast: (...args: unknown[]) => mockSuccessToast(...args),
 }));
 
-function createReservation(
-  overrides: Partial<ChangeReservationTimeFragment> = {}
-): ChangeReservationTimeFragment {
+function createReservation(overrides: Partial<ChangeReservationTimeFragment> = {}): ChangeReservationTimeFragment {
   // NOTE: use a date well in the future (relative to "now") and at fixed local
   // wall-clock hours so the date/time validation schema (which rejects past
   // dates) always passes regardless of when the test suite runs.
@@ -118,7 +116,16 @@ describe("EditTimeModal", () => {
             },
           },
         },
-        result: { data: { staffAdjustReservationTime: { pk: 1, beginsAt: reservation.beginsAt, endsAt: reservation.endsAt, state: "CONFIRMED" } } },
+        result: {
+          data: {
+            staffAdjustReservationTime: {
+              pk: 1,
+              beginsAt: reservation.beginsAt,
+              endsAt: reservation.endsAt,
+              state: "CONFIRMED",
+            },
+          },
+        },
       },
     ];
 

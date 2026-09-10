@@ -51,10 +51,7 @@ vi.mock("@/components/ReservationSeriesView", () => ({
 }));
 
 vi.mock("ui/src/components/calendar/Calendar", () => ({
-  Calendar: (props: {
-    toolbarComponent?: (p: unknown) => React.ReactNode;
-    onNavigate?: (d: Date) => void;
-  }) => (
+  Calendar: (props: { toolbarComponent?: (p: unknown) => React.ReactNode; onNavigate?: (d: Date) => void }) => (
     <div data-testid="mock-calendar">
       {props.toolbarComponent?.({})}
       <button type="button" data-testid="mock-navigate" onClick={() => props.onNavigate?.(addDays(new Date(), 90))}>
@@ -125,7 +122,7 @@ describe("TimeBlockSection", () => {
 
   it("renders the recurring section wired to the series when part of one", () => {
     const reservation = createReservation({
-      reservationSeries: { id: "series-1", pk: 42, weekdays: [], beginDate: "2026-01-01", endDate: "2026-12-31" }
+      reservationSeries: { id: "series-1", pk: 42, weekdays: [], beginDate: "2026-01-01", endDate: "2026-12-31" },
     });
     render(<TimeBlockSection reservation={reservation} onReservationUpdated={vi.fn()} />);
 
@@ -165,7 +162,7 @@ describe("TimeBlockSection", () => {
 
   it("hides the edit-time button when the reservation is part of a series", () => {
     const reservation = createReservation({
-      reservationSeries: { id: "series-1", pk: 42, weekdays: [], beginDate: "2026-01-01", endDate: "2026-12-31" }
+      reservationSeries: { id: "series-1", pk: 42, weekdays: [], beginDate: "2026-01-01", endDate: "2026-12-31" },
     });
     render(<TimeBlockSection reservation={reservation} onReservationUpdated={vi.fn()} />);
 

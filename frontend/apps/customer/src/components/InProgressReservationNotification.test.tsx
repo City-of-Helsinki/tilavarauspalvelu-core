@@ -198,9 +198,7 @@ describe("InProgressReservationNotification", () => {
     mockReservations([createReservation({ pk: 3 })]);
     render(<InProgressReservationNotification />);
     await userEvent.click(screen.getByTestId("reservation-notification__button--checkout"));
-    await waitFor(() =>
-      expect(mockRouterPush).toHaveBeenCalledWith(expect.stringContaining("/paymentmethod?lang=fi"))
-    );
+    await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith(expect.stringContaining("/paymentmethod?lang=fi")));
   });
 
   it("disables checkout when there is no checkout URL", () => {

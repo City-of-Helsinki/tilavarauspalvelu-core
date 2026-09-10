@@ -1,6 +1,6 @@
-import { describe, expect, test, vi } from "vitest";
 import type { ApolloClient } from "@apollo/client";
 import type { ReadonlyURLSearchParams } from "next/navigation";
+import { describe, expect, test, vi } from "vitest";
 import { AccessType, ReservationKind, ReservationUnitOrderingChoices, UnitOrderingChoices } from "@gql/gql-types";
 import type { OptionsQuery } from "@gql/gql-types";
 import { getSearchOptions, processVariables, translateOption } from "./search";
