@@ -98,6 +98,7 @@ describe("PricingSection", () => {
     ).toBeInTheDocument();
   });
 
+  // Several sequential HDS interactions; give it headroom over the 5s default under parallel test load.
   it("shows the pricingTerms select once canApplyFreeOfCharge is checked while paid", async () => {
     render(<Harness />);
     const user = await openAccordion();
@@ -108,7 +109,7 @@ describe("PricingSection", () => {
     await user.click(screen.getByRole("checkbox", { name: "label.canApplyFreeOfCharge" }));
 
     expect(screen.getByRole("button", { name: /^label\.pricingTerms/ })).toBeInTheDocument();
-  });
+  }, 10_000);
 
   it("reveals the future pricing section (with a begins date) when hasFuturePricing is toggled", async () => {
     render(<Harness />);
