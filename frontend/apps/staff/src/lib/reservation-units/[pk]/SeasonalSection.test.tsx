@@ -4,20 +4,16 @@ import { useForm } from "react-hook-form";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { SeasonalSection } from "./SeasonalSection";
 import { convertReservationUnit } from "./form";
 import type { ReservationUnitEditFormValues } from "./form";
-import { SeasonalSection } from "./SeasonalSection";
 
 const mockLogError = vi.fn();
 vi.mock("@ui/modules/errors", () => ({
   logError: (...args: unknown[]) => mockLogError(...args),
 }));
 
-function Harness({
-  overrideSeasons,
-}: {
-  overrideSeasons?: ReservationUnitEditFormValues["seasons"];
-}) {
+function Harness({ overrideSeasons }: { overrideSeasons?: ReservationUnitEditFormValues["seasons"] }) {
   const base = convertReservationUnit(undefined);
   const form: UseFormReturn<ReservationUnitEditFormValues> = useForm<ReservationUnitEditFormValues>({
     defaultValues: {
@@ -74,33 +70,29 @@ describe("SeasonalSection", () => {
   });
 
   // Several sequential HDS interactions; give it headroom over the 5s default under parallel test load.
-  it(
-    "adds and removes a second reservable time slot for a day",
-    async () => {
-      render(<Harness />);
-      const user = await openAccordion();
+  it("adds and removes a second reservable time slot for a day", async () => {
+    render(<Harness />);
+    const user = await openAccordion();
 
-      const [addButtonForMonday] = screen.getAllByRole("button", { name: "reservationUnitEditor:addSeasonalTime" });
-      expect(addButtonForMonday).toBeDefined();
-      if (!addButtonForMonday) throw new Error("expected an add button");
+    const [addButtonForMonday] = screen.getAllByRole("button", { name: "reservationUnitEditor:addSeasonalTime" });
+    expect(addButtonForMonday).toBeDefined();
+    if (!addButtonForMonday) throw new Error("expected an add button");
 
-      await user.click(addButtonForMonday);
+    await user.click(addButtonForMonday);
 
-      expect(screen.getAllByPlaceholderText("tt:mm")).toHaveLength(16);
-      expect(screen.getAllByRole("button", { name: "reservationUnitEditor:addSeasonalTime" })).toHaveLength(6);
-      const [removeButtonForMonday] = screen.getAllByRole("button", {
-        name: "reservationUnitEditor:removeSeasonalTime",
-      });
-      expect(removeButtonForMonday).toBeDefined();
-      if (!removeButtonForMonday) throw new Error("expected a remove button");
+    expect(screen.getAllByPlaceholderText("tt:mm")).toHaveLength(16);
+    expect(screen.getAllByRole("button", { name: "reservationUnitEditor:addSeasonalTime" })).toHaveLength(6);
+    const [removeButtonForMonday] = screen.getAllByRole("button", {
+      name: "reservationUnitEditor:removeSeasonalTime",
+    });
+    expect(removeButtonForMonday).toBeDefined();
+    if (!removeButtonForMonday) throw new Error("expected a remove button");
 
-      await user.click(removeButtonForMonday);
+    await user.click(removeButtonForMonday);
 
-      expect(screen.getAllByPlaceholderText("tt:mm")).toHaveLength(14);
-      expect(screen.getAllByRole("button", { name: "reservationUnitEditor:addSeasonalTime" })).toHaveLength(7);
-    },
-    10_000
-  );
+    expect(screen.getAllByPlaceholderText("tt:mm")).toHaveLength(14);
+    expect(screen.getAllByRole("button", { name: "reservationUnitEditor:addSeasonalTime" })).toHaveLength(7);
+  }, 10_000);
 
   it("resets all days to default when Clear is clicked", async () => {
     render(<Harness />);

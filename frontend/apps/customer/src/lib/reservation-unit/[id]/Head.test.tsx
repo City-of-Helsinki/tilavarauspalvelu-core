@@ -1,7 +1,7 @@
 import React from "react";
-import { addDays } from "date-fns";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { addDays } from "date-fns";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { getActivePricing, getReservationUnitAccessPeriods, isReservationUnitPaid } from "@/modules/reservationUnit";
@@ -125,7 +125,13 @@ describe("Head", () => {
     render(
       <ReservationUnitHead
         reservationUnit={createReservationUnit({
-          reservationUnitType: { id: "type-1", pk: 1, nameFi: "Meeting room", nameEn: "Meeting room", nameSv: "Meeting room" },
+          reservationUnitType: {
+            id: "type-1",
+            pk: 1,
+            nameFi: "Meeting room",
+            nameEn: "Meeting room",
+            nameSv: "Meeting room",
+          },
           maxPersons: 10,
           minPersons: 2,
           minReservationDuration: 3600,

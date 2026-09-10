@@ -159,7 +159,9 @@ describe("ReservationUnitMoreDetails", () => {
   test("shows a future price-change notice with a tax notice when the tax rate is above zero", () => {
     vi.mocked(getFuturePricing).mockReturnValue({ ...pricing, taxPercentage: { id: "tax-1", pk: 1, value: "24" } });
 
-    render(<ReservationUnitMoreDetails reservationUnit={createReservationUnit({ pricings: [pricing] })} isReservable />);
+    render(
+      <ReservationUnitMoreDetails reservationUnit={createReservationUnit({ pricings: [pricing] })} isReservable />
+    );
 
     const noticeAccordion = screen.getByTestId("reservation-unit__reservation-notice");
     expect(noticeAccordion).toHaveTextContent("reservationUnit:futurePricingNotice");
@@ -170,7 +172,9 @@ describe("ReservationUnitMoreDetails", () => {
     vi.mocked(getFuturePricing).mockReturnValue({ ...pricing, taxPercentage: { id: "tax-1", pk: 1, value: "0" } });
     vi.mocked(getPriceString).mockReturnValue("Free");
 
-    render(<ReservationUnitMoreDetails reservationUnit={createReservationUnit({ pricings: [pricing] })} isReservable />);
+    render(
+      <ReservationUnitMoreDetails reservationUnit={createReservationUnit({ pricings: [pricing] })} isReservable />
+    );
 
     const noticeAccordion = screen.getByTestId("reservation-unit__reservation-notice");
     expect(noticeAccordion).toHaveTextContent("reservationUnit:futurePricingNotice");
@@ -186,9 +190,16 @@ describe("ReservationUnitMoreDetails", () => {
     render(
       <ReservationUnitMoreDetails
         reservationUnit={createReservationUnit({
-          applicationRounds: [{ id: "round-1", reservationPeriodBeginDate: "2024-01-01", reservationPeriodEndDate: "2024-12-31" }],
+          applicationRounds: [
+            { id: "round-1", reservationPeriodBeginDate: "2024-01-01", reservationPeriodEndDate: "2024-12-31" },
+          ],
           applicationRoundTimeSlots: [
-            { id: "slot-wed", weekday: Weekday.Wednesday, isClosed: false, reservableTimes: [{ begin: "08:00", end: "16:00" }] },
+            {
+              id: "slot-wed",
+              weekday: Weekday.Wednesday,
+              isClosed: false,
+              reservableTimes: [{ begin: "08:00", end: "16:00" }],
+            },
             { id: "slot-mon", weekday: Weekday.Monday, isClosed: true, reservableTimes: [] },
           ],
         })}
@@ -250,7 +261,11 @@ describe("ReservationUnitMoreDetails", () => {
   test("hides the pricing terms accordion when the unit cannot apply free-of-charge", () => {
     render(
       <ReservationUnitMoreDetails
-        reservationUnit={createReservationUnit({ canApplyFreeOfCharge: false, pricingTerms: termsOfUseText, pricings: [pricing] })}
+        reservationUnit={createReservationUnit({
+          canApplyFreeOfCharge: false,
+          pricingTerms: termsOfUseText,
+          pricings: [pricing],
+        })}
         isReservable
       />
     );
@@ -260,7 +275,11 @@ describe("ReservationUnitMoreDetails", () => {
   test("shows the pricing terms accordion when the unit can apply free-of-charge on a paid pricing", () => {
     render(
       <ReservationUnitMoreDetails
-        reservationUnit={createReservationUnit({ canApplyFreeOfCharge: true, pricingTerms: termsOfUseText, pricings: [pricing] })}
+        reservationUnit={createReservationUnit({
+          canApplyFreeOfCharge: true,
+          pricingTerms: termsOfUseText,
+          pricings: [pricing],
+        })}
         isReservable
       />
     );

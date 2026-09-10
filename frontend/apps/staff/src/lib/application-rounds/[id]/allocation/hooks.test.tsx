@@ -6,7 +6,6 @@ import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CreateAllocatedTimeSlotDocument, DeleteAllocatedTimeSlotDocument, Weekday } from "@gql/gql-types";
-import type { AllocatedTimeSlotNodeT, SectionNodeT, SuitableTimeRangeNodeT } from "./modules/applicationRoundAllocation";
 import { SelectedSlotsContextProvider } from "./SelectedSlotsContext";
 import {
   useAcceptSlotMutation,
@@ -16,6 +15,11 @@ import {
   useRemoveAllocation,
   useSlotSelection,
 } from "./hooks";
+import type {
+  AllocatedTimeSlotNodeT,
+  SectionNodeT,
+  SuitableTimeRangeNodeT,
+} from "./modules/applicationRoundAllocation";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
   const params = vi.fn();
@@ -335,10 +339,7 @@ describe("useRemoveAllocation", () => {
 
     const view = render(
       <MockedProvider mocks={mocks}>
-        <RemoveAllocationTestComponent
-          allocatedTimeSlot={{ pk: 5 } as AllocatedTimeSlotNodeT}
-          refresh={refresh}
-        />
+        <RemoveAllocationTestComponent allocatedTimeSlot={{ pk: 5 } as AllocatedTimeSlotNodeT} refresh={refresh} />
       </MockedProvider>
     );
     const user = userEvent.setup();

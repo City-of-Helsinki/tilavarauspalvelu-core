@@ -1,10 +1,10 @@
 import React from "react";
-import { addDays } from "date-fns";
 import { render, screen } from "@testing-library/react";
+import { addDays } from "date-fns";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import { getActivePricing } from "@/modules/reservationUnit";
 import { AccessType } from "@gql/gql-types";
 import type { SingleSearchCardFragment } from "@gql/gql-types";
-import { getActivePricing } from "@/modules/reservationUnit";
 import { SingleSearchCard } from "./SingleSearchCard";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
@@ -170,9 +170,7 @@ describe("SingleSearchCard", () => {
     expect(screen.getByText("reservationUnitCard:noTimes")).toBeInTheDocument();
     unmount();
 
-    render(
-      <SingleSearchCard reservationUnit={createMockReservationUnit({ firstReservableDatetime: "not-a-date" })} />
-    );
+    render(<SingleSearchCard reservationUnit={createMockReservationUnit({ firstReservableDatetime: "not-a-date" })} />);
     expect(screen.getByText("reservationUnitCard:noTimes")).toBeInTheDocument();
   });
 

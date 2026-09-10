@@ -28,9 +28,7 @@ vi.mock("ui/src/components/ConfirmationDialog", () => ({
     isOpen ? <div>{heading}</div> : null,
 }));
 
-function createMockApplication(
-  overrides: Partial<ApplicationCardFragment> = {}
-): ApplicationCardFragment {
+function createMockApplication(overrides: Partial<ApplicationCardFragment> = {}): ApplicationCardFragment {
   return {
     id: "app-1",
     pk: 1,

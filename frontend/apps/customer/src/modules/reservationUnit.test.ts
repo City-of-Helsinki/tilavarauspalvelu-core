@@ -9,7 +9,12 @@ import { vi, describe, test, expect, beforeEach, afterEach, beforeAll, afterAll 
 import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
 import type { ReadonlyDeep } from "ui/src/modules/helpers";
 import { createNodeId } from "ui/src/modules/helpers";
-import type { AccessType, ReservationUnitNode, PriceReservationUnitFieldsFragment, EquipmentFieldsFragment } from "@gql/gql-types";
+import type {
+  AccessType,
+  ReservationUnitNode,
+  PriceReservationUnitFieldsFragment,
+  EquipmentFieldsFragment,
+} from "@gql/gql-types";
 import {
   PriceUnit,
   ReservationUnitPublishingState,
@@ -1657,7 +1662,11 @@ describe("isInTimeSpan", () => {
   });
 
   test("returns false for incomplete timespans", () => {
-    expect(isInTimeSpan(new Date(), { startDatetime: null, endDatetime: null } as unknown as NonNullable<ReservationUnitNode["reservableTimeSpans"]>[0])).toBe(false);
+    expect(
+      isInTimeSpan(new Date(), { startDatetime: null, endDatetime: null } as unknown as NonNullable<
+        ReservationUnitNode["reservableTimeSpans"]
+      >[0])
+    ).toBe(false);
   });
 });
 

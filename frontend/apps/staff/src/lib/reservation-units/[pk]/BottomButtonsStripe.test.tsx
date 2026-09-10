@@ -9,9 +9,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getUnitUrl } from "@/modules/urls";
 import { ArchiveReservationUnitDocument } from "@gql/gql-types";
 import type { ReservationUnitEditQuery, UnitSubpageHeadFragment } from "@gql/gql-types";
+import { BottomButtonsStripe } from "./BottomButtonsStripe";
 import { convertReservationUnit } from "./form";
 import type { ReservationUnitEditFormValues } from "./form";
-import { BottomButtonsStripe } from "./BottomButtonsStripe";
 
 type Node = NonNullable<ReservationUnitEditQuery["reservationUnit"]>;
 

@@ -1,9 +1,9 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
+import { isReservationCancellable } from "@/modules/reservation";
 import { AccessType, ReservationStateChoice } from "@gql/gql-types";
 import type { ReservationCardFragment } from "@gql/gql-types";
-import { isReservationCancellable } from "@/modules/reservation";
 import { ReservationCard } from "./ReservationCard";
 
 vi.mock("@/modules/reservation", () => ({
@@ -21,9 +21,7 @@ vi.mock("@/modules/urls", () => ({
 }));
 
 vi.mock("ui/src/components/statuses", () => ({
-  ReservationStatusLabel: ({ state }: { state: ReservationStateChoice }) => (
-    <span>ReservationStatus: {state}</span>
-  ),
+  ReservationStatusLabel: ({ state }: { state: ReservationStateChoice }) => <span>ReservationStatus: {state}</span>,
   OrderStatusLabel: () => <span>OrderStatus</span>,
 }));
 
@@ -41,9 +39,7 @@ vi.mock("ui/src/modules/helpers", () => ({
   getMainImage: vi.fn(() => null),
 }));
 
-function createMockReservation(
-  overrides: Partial<ReservationCardFragment> = {}
-): ReservationCardFragment {
+function createMockReservation(overrides: Partial<ReservationCardFragment> = {}): ReservationCardFragment {
   return {
     pk: 1,
     beginsAt: "2026-09-15T10:00:00Z",
@@ -75,12 +71,7 @@ describe("ReservationCard", () => {
   test("renders reservation card with reservation unit name", () => {
     const mockReservation = createMockReservation();
 
-    render(
-      <ReservationCard
-        reservation={mockReservation}
-        apiBaseUrl="http://localhost:3000"
-      />
-    );
+    render(<ReservationCard reservation={mockReservation} apiBaseUrl="http://localhost:3000" />);
 
     expect(screen.getByText("Test Unit, Test Space")).toBeInTheDocument();
   });
@@ -88,27 +79,15 @@ describe("ReservationCard", () => {
   test("renders reservation status label", () => {
     const mockReservation = createMockReservation();
 
-    render(
-      <ReservationCard
-        reservation={mockReservation}
-        apiBaseUrl="http://localhost:3000"
-      />
-    );
+    render(<ReservationCard reservation={mockReservation} apiBaseUrl="http://localhost:3000" />);
 
-    expect(
-      screen.getByText(`ReservationStatus: ${ReservationStateChoice.Confirmed}`)
-    ).toBeInTheDocument();
+    expect(screen.getByText(`ReservationStatus: ${ReservationStateChoice.Confirmed}`)).toBeInTheDocument();
   });
 
   test("renders show button", () => {
     const mockReservation = createMockReservation();
 
-    render(
-      <ReservationCard
-        reservation={mockReservation}
-        apiBaseUrl="http://localhost:3000"
-      />
-    );
+    render(<ReservationCard reservation={mockReservation} apiBaseUrl="http://localhost:3000" />);
 
     expect(screen.getByRole("link", { name: /common:show/i })).toBeInTheDocument();
   });
@@ -116,12 +95,7 @@ describe("ReservationCard", () => {
   test("renders price icon with aria label", () => {
     const mockReservation = createMockReservation();
 
-    render(
-      <ReservationCard
-        reservation={mockReservation}
-        apiBaseUrl="http://localhost:3000"
-      />
-    );
+    render(<ReservationCard reservation={mockReservation} apiBaseUrl="http://localhost:3000" />);
 
     expect(screen.getByLabelText("common:price")).toBeInTheDocument();
   });
@@ -129,25 +103,17 @@ describe("ReservationCard", () => {
   test("renders access type icon with aria label", () => {
     const mockReservation = createMockReservation();
 
-    render(
-      <ReservationCard
-        reservation={mockReservation}
-        apiBaseUrl="http://localhost:3000"
-      />
-    );
+    render(<ReservationCard reservation={mockReservation} apiBaseUrl="http://localhost:3000" />);
 
     expect(screen.getByLabelText("reservationUnit:accessType")).toBeInTheDocument();
   });
 
   test("returns null when reservation unit is missing", () => {
-    const mockReservation = createMockReservation({ reservationUnit: null } as unknown as Partial<ReservationCardFragment>);
+    const mockReservation = createMockReservation({
+      reservationUnit: null,
+    } as unknown as Partial<ReservationCardFragment>);
 
-    const { container } = render(
-      <ReservationCard
-        reservation={mockReservation}
-        apiBaseUrl="http://localhost:3000"
-      />
-    );
+    const { container } = render(<ReservationCard reservation={mockReservation} apiBaseUrl="http://localhost:3000" />);
 
     expect(container.firstChild).toBeNull();
   });
@@ -156,13 +122,7 @@ describe("ReservationCard", () => {
     vi.mocked(isReservationCancellable).mockReturnValue(true);
     const mockReservation = createMockReservation();
 
-    render(
-      <ReservationCard
-        reservation={mockReservation}
-        type="upcoming"
-        apiBaseUrl="http://localhost:3000"
-      />
-    );
+    render(<ReservationCard reservation={mockReservation} type="upcoming" apiBaseUrl="http://localhost:3000" />);
 
     expect(
       screen.getByRole("link", {
@@ -174,13 +134,7 @@ describe("ReservationCard", () => {
   test("does not render cancel button when type is past", () => {
     const mockReservation = createMockReservation();
 
-    render(
-      <ReservationCard
-        reservation={mockReservation}
-        type="past"
-        apiBaseUrl="http://localhost:3000"
-      />
-    );
+    render(<ReservationCard reservation={mockReservation} type="past" apiBaseUrl="http://localhost:3000" />);
 
     expect(
       screen.queryByRole("link", {

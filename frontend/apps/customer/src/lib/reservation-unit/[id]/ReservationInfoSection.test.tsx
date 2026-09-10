@@ -1,6 +1,6 @@
 import React from "react";
-import { addDays, subDays } from "date-fns";
 import { render, screen } from "@testing-library/react";
+import { addDays, subDays } from "date-fns";
 import { describe, test, expect } from "vitest";
 import type { ReservationInfoSectionFragment } from "@gql/gql-types";
 import { ReservationInfoSection } from "./ReservationInfoSection";

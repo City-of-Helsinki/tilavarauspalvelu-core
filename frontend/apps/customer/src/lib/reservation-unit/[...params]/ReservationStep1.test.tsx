@@ -5,10 +5,10 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ConfirmReservationDocument, ReservationStateChoice } from "@gql/gql-types";
-import type { ReservationQuery } from "@gql/gql-types";
 import { getCheckoutUrl } from "@/modules/reservation";
 import { getReservationInProgressPath, getReservationPath, getReservationUnitPath } from "@/modules/urls";
+import { ConfirmReservationDocument, ReservationStateChoice } from "@gql/gql-types";
+import type { ReservationQuery } from "@gql/gql-types";
 import { ReservationStep1 } from "./ReservationStep1";
 
 // SummaryGeneralFields/SummaryReserveeFields are already covered by their own

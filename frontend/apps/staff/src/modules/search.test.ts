@@ -1,6 +1,5 @@
-import { describe, expect, it } from "vitest";
 import type { TFunction } from "next-i18next";
-import type { TagOptionsList } from "./search";
+import { describe, expect, it } from "vitest";
 import {
   ApplicationSectionStatusChoice,
   ApplicationStatusChoice,
@@ -12,6 +11,7 @@ import {
   ReservationUnitPublishingState,
   ReserveeType,
 } from "@gql/gql-types";
+import type { TagOptionsList } from "./search";
 import { translateTag } from "./search";
 
 const mockT = ((key: string, options?: Record<string, unknown>) => {
@@ -151,9 +151,7 @@ describe("translateTag", () => {
 
     it("translates sectionStatus tag", () => {
       const result = translate("sectionStatus", ApplicationSectionStatusChoice.Handled);
-      expect(result).toBe(
-        `translation:ApplicationSectionStatusChoice.${ApplicationSectionStatusChoice.Handled}`
-      );
+      expect(result).toBe(`translation:ApplicationSectionStatusChoice.${ApplicationSectionStatusChoice.Handled}`);
     });
 
     it("translates accessCodeState tag", () => {

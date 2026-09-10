@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, test, vi } from "vitest";
 import type { ApolloClient, NormalizedCacheObject } from "@apollo/client";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { TermsOfUseTypeChoices } from "@gql/gql-types";
 import {
   getCommonServerSideProps,
@@ -155,9 +155,13 @@ describe("serverUtils", () => {
         }),
     } satisfies Pick<ApolloClient<NormalizedCacheObject>, "query">;
 
-    expect(await getReservationByOrderUuid(apolloClient as unknown as ApolloClient<NormalizedCacheObject>, "uuid-1")).toMatchObject({
+    expect(
+      await getReservationByOrderUuid(apolloClient as unknown as ApolloClient<NormalizedCacheObject>, "uuid-1")
+    ).toMatchObject({
       pk: 8,
     });
-    expect(await getReservationByOrderUuid(apolloClient as unknown as ApolloClient<NormalizedCacheObject>, "uuid-2")).toBeNull();
+    expect(
+      await getReservationByOrderUuid(apolloClient as unknown as ApolloClient<NormalizedCacheObject>, "uuid-2")
+    ).toBeNull();
   });
 });

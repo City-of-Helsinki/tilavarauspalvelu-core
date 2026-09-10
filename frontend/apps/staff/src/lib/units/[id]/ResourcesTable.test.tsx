@@ -26,9 +26,7 @@ function createUnit(overrides: Partial<ResourceTableFragment> = {}): ResourceTab
     spaces: [
       {
         id: "space-1",
-        resources: [
-          { id: "resource-1", pk: 20, nameFi: "Resource one", locationType: ResourceLocationType.Fixed },
-        ],
+        resources: [{ id: "resource-1", pk: 20, nameFi: "Resource one", locationType: ResourceLocationType.Fixed }],
       },
     ],
     ...overrides,
@@ -51,8 +49,14 @@ describe("ResourcesTable", () => {
   it("renders resource rows from all spaces, with name link and location type", () => {
     const unit = createUnit({
       spaces: [
-        { id: "space-1", resources: [{ id: "r1", pk: 20, nameFi: "Resource one", locationType: ResourceLocationType.Fixed }] },
-        { id: "space-2", resources: [{ id: "r2", pk: 21, nameFi: "Resource two", locationType: ResourceLocationType.Movable }] },
+        {
+          id: "space-1",
+          resources: [{ id: "r1", pk: 20, nameFi: "Resource one", locationType: ResourceLocationType.Fixed }],
+        },
+        {
+          id: "space-2",
+          resources: [{ id: "r2", pk: 21, nameFi: "Resource two", locationType: ResourceLocationType.Movable }],
+        },
       ],
     });
     render(
@@ -72,7 +76,12 @@ describe("ResourcesTable", () => {
       <MockedProvider mocks={[]}>
         <ResourcesTable
           unit={createUnit({
-            spaces: [{ id: "space-1", resources: [{ id: "r1", pk: 20, nameFi: null, locationType: ResourceLocationType.Fixed }] }],
+            spaces: [
+              {
+                id: "space-1",
+                resources: [{ id: "r1", pk: 20, nameFi: null, locationType: ResourceLocationType.Fixed }],
+              },
+            ],
           })}
           refetch={vi.fn()}
         />

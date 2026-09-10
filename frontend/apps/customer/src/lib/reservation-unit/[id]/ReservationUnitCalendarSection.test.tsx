@@ -77,9 +77,7 @@ describe("ReservationUnitCalendarSection", () => {
         })}
       />
     );
-    expect(screen.getByTestId("reservation-unit--notification__reservation-quota")).toHaveTextContent(
-      "some.text"
-    );
+    expect(screen.getByTestId("reservation-unit--notification__reservation-quota")).toHaveTextContent("some.text");
   });
 
   test("shows an alert notification when the quota is fully used", () => {
@@ -91,9 +89,7 @@ describe("ReservationUnitCalendarSection", () => {
         })}
       />
     );
-    expect(screen.getByTestId("reservation-unit--notification__reservation-quota")).toHaveTextContent(
-      "full.text"
-    );
+    expect(screen.getByTestId("reservation-unit--notification__reservation-quota")).toHaveTextContent("full.text");
   });
 });
 
