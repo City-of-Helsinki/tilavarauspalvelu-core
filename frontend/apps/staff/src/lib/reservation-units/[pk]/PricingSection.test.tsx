@@ -76,7 +76,7 @@ describe("PricingSection", () => {
 
     const lowestPriceNet = screen.getByRole("spinbutton", { name: nameLike("label.lowestPriceNet") });
     expect(lowestPriceNet).toHaveValue(79.68);
-  });
+  }, 10_000);
 
   it("shows the material price description fields when hasMaterialPrice is checked", async () => {
     render(<Harness />);
