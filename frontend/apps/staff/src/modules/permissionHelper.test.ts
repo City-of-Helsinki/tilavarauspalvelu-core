@@ -166,7 +166,7 @@ describe("hasPermission", () => {
     expect(hasPermission(null, UserPermissionChoice.CanCreateStaffReservations)).toBe(false);
   });
 
-  test("returns false when checking undefined unitPk without general roles", () => {
+  test("returns true when omitting unitPk (checks all units) and permission exists in any unit", () => {
     const user = createUser({ unitRoles: [{ role: UserRoleChoice.Handler, units: [1] }] });
     expect(hasPermission(user, UserPermissionChoice.CanCreateStaffReservations, undefined)).toBe(true);
   });
