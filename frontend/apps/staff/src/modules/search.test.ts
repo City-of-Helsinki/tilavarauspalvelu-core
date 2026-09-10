@@ -48,7 +48,7 @@ const mockOptions: TagOptionsList = {
   ],
   orderStatus: [
     { value: OrderStatusWithFree.Paid, label: "Paid" },
-    { value: OrderStatusWithFree.Unpaid, label: "Unpaid" },
+    { value: OrderStatusWithFree.Free, label: "Free" },
   ],
   reservationTypeChoices: [
     { value: ReservationTypeChoice.Normal, label: "Normal" },
@@ -62,6 +62,12 @@ const mockOptions: TagOptionsList = {
     { value: ReserveeType.Individual, label: "Individual" },
     { value: ReserveeType.Company, label: "Company" },
   ],
+  units: [
+    { value: 1, label: "Unit 1" },
+    { value: 2, label: "Unit 2" },
+  ],
+  equipments: [],
+  intendedUses: [],
   reservationPurposes: [
     { value: 1, label: "Purpose 1" },
     { value: 2, label: "Purpose 2" },
@@ -74,10 +80,7 @@ const mockOptions: TagOptionsList = {
     { value: 1, label: "Type 1" },
     { value: 2, label: "Type 2" },
   ],
-  units: [
-    { value: 1, label: "Unit 1" },
-    { value: 2, label: "Unit 2" },
-  ],
+  municipalities: [],
 };
 
 describe("translateTag", () => {

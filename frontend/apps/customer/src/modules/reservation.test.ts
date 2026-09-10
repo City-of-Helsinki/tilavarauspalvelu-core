@@ -273,7 +273,7 @@ describe("isReservationCancellableReason", () => {
         ...createMockCanUserCancelReservation({
           beginsAt: addDays(new Date(), 1),
         }),
-        reservationUnit: null,
+        reservationUnit: null as unknown as NonNullable<ReturnType<typeof createMockCanUserCancelReservation>>["reservationUnit"],
       })
     ).toBe("CANCELLATION_NOT_ALLOWED");
 

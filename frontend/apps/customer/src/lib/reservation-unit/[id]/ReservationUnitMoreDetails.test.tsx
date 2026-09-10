@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, test, expect, vi } from "vitest";
 import { useGenericTerms } from "@ui/hooks";
 import { getFuturePricing, getPriceString } from "@/modules/reservationUnit";
-import { PaymentType, PriceUnit, Weekday } from "@gql/gql-types";
+import { PaymentType, PriceUnit, TermsOfUseTypeChoices, Weekday } from "@gql/gql-types";
 import type { ReservationUnitMoreDetailsFragment } from "@gql/gql-types";
 import { ReservationUnitMoreDetails } from "./ReservationUnitMoreDetails";
 
@@ -40,7 +40,17 @@ vi.mock("@/components/UnitMap", () => ({
   UnitMap: () => <div data-testid="unit-map-stub" />,
 }));
 
-const termsOfUseText = { id: "terms-1", textFi: "Service terms", textEn: "Service terms", textSv: "Service terms" };
+const termsOfUseText = {
+  id: "terms-1",
+  pk: "terms-pk",
+  textFi: "Service terms",
+  textEn: "Service terms",
+  textSv: "Service terms",
+  termsType: TermsOfUseTypeChoices.Generic,
+  nameFi: null,
+  nameEn: null,
+  nameSv: null,
+};
 
 const pricing = {
   id: "pricing-1",
@@ -109,9 +119,14 @@ describe("ReservationUnitMoreDetails", () => {
   test("shows generic terms of use from useGenericTerms and service-specific terms when present", () => {
     vi.mocked(useGenericTerms).mockReturnValue({
       id: "generic-1",
+      pk: "generic-pk",
       textFi: "Generic terms",
       textEn: "Generic terms",
       textSv: "Generic terms",
+      termsType: TermsOfUseTypeChoices.Generic,
+      nameFi: null,
+      nameEn: null,
+      nameSv: null,
     });
 
     render(

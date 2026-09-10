@@ -17,8 +17,8 @@ import {
 
 function createValidPage1Section() {
   return {
-    ...createDefaultPage1Section([7, 9]),
     name: "Choir rehearsal",
+    formKey: "event-NEW",
     numPersons: 25,
     ageGroup: 1,
     purpose: 2,
@@ -26,6 +26,8 @@ function createValidPage1Section() {
     maxDuration: 7200,
     begin: "2.2.2099",
     end: "3.2.2099",
+    appliedReservationsPerWeek: 1,
+    reservationUnits: [7, 9],
     isAccordionOpen: false,
   };
 }
@@ -154,7 +156,7 @@ describe("page 1 conversions", () => {
     const convertedExisting = convertApplicationPage1(
       {
         ...application,
-        applicationSections: application.applicationSections?.map((section, index) =>
+        applicationSections: (application.applicationSections ?? []).map((section, index) =>
           index === 0 && reorderedOptions != null ? { ...section, reservationUnitOptions: reorderedOptions } : section
         ),
       },
@@ -245,7 +247,7 @@ describe("page 2 conversions", () => {
           name: "foobar",
           minDuration: 3600,
           reservationUnitPk: 1,
-          priority: "primary",
+          priority: "primary" as const,
           appliedReservationsPerWeek: 1,
           suitableTimeRanges: [
             {

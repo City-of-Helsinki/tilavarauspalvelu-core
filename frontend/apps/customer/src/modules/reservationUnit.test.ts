@@ -9,6 +9,7 @@ import { vi, describe, test, expect, beforeEach, afterEach, beforeAll, afterAll 
 import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
 import type { ReadonlyDeep } from "ui/src/modules/helpers";
 import { createNodeId } from "ui/src/modules/helpers";
+import type { AccessType, ReservationUnitNode, PriceReservationUnitFieldsFragment, EquipmentFieldsFragment } from "@gql/gql-types";
 import {
   PriceUnit,
   ReservationUnitPublishingState,
@@ -18,7 +19,6 @@ import {
   ReservationUnitReservationState,
   PaymentType,
 } from "@gql/gql-types";
-import type { ReservationUnitNode, PriceReservationUnitFieldsFragment, EquipmentFieldsFragment } from "@gql/gql-types";
 import mockTranslations from ".././../public/locales/fi/prices.json";
 import { dateToKey } from "./reservable";
 import type { ReservableMap, RoundPeriod } from "./reservable";
@@ -705,11 +705,7 @@ describe("getReservationUnitPrice", () => {
         applyingForFreeOfCharge: true,
         appliedPricing: {
           highestPrice: "20",
-          taxPercentage: {
-            id: "1",
-            pk: 1,
-            value: "24",
-          },
+          taxPercentage: "24",
         },
         reservationUnit: {
           id: "ru-1",
@@ -1661,7 +1657,7 @@ describe("isInTimeSpan", () => {
   });
 
   test("returns false for incomplete timespans", () => {
-    expect(isInTimeSpan(new Date(), { startDatetime: null, endDatetime: null })).toBe(false);
+    expect(isInTimeSpan(new Date(), { startDatetime: null, endDatetime: null } as unknown as NonNullable<ReservationUnitNode["reservableTimeSpans"]>[0])).toBe(false);
   });
 });
 
@@ -1670,17 +1666,17 @@ describe("getReservationUnitAccessPeriods", () => {
     const periods = getReservationUnitAccessPeriods([
       {
         pk: 1,
-        accessType: "open",
+        accessType: "open" as unknown as AccessType,
         beginDate: "2024-01-01",
       },
       {
         pk: 2,
-        accessType: "restricted",
+        accessType: "restricted" as unknown as AccessType,
         beginDate: "2024-01-10",
       },
       {
         pk: 3,
-        accessType: "closed",
+        accessType: "closed" as unknown as AccessType,
         beginDate: "invalid-date",
       },
     ]);

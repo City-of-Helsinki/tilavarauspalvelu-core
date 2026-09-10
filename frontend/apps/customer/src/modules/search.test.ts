@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 import type { ApolloClient } from "@apollo/client";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import { AccessType, ReservationKind, ReservationUnitOrderingChoices, UnitOrderingChoices } from "@gql/gql-types";
 import type { OptionsQuery } from "@gql/gql-types";
 import { getSearchOptions, processVariables, translateOption } from "./search";
@@ -28,7 +29,7 @@ describe("processVariables", () => {
 
     expect(
       processVariables({
-        values: params,
+        values: params as unknown as ReadonlyURLSearchParams,
         language: "sv",
         kind: ReservationKind.Direct,
       })
@@ -66,7 +67,7 @@ describe("processVariables", () => {
 
     expect(
       processVariables({
-        values: params,
+        values: params as unknown as ReadonlyURLSearchParams,
         language: "en",
         kind: ReservationKind.Season,
         applicationRound: 15,
@@ -101,7 +102,7 @@ describe("processVariables", () => {
 
     expect(
       processVariables({
-        values: params,
+        values: params as unknown as ReadonlyURLSearchParams,
         language: "fi",
         kind: ReservationKind.Direct,
       }).orderBy
@@ -136,12 +137,12 @@ describe("getSearchOptions", () => {
     } satisfies Pick<ApolloClient<unknown>, "query">;
 
     return {
-      apolloClient: client as ApolloClient<unknown>,
+      apolloClient: client as unknown as ApolloClient<unknown>,
       query,
     };
   }
 
-  const optionsData: OptionsQuery = {
+  const optionsData = {
     reservationUnitTypes: {
       edges: [
         {

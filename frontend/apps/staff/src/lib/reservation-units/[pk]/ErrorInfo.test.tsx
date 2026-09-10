@@ -75,7 +75,7 @@ describe("ErrorInfo", () => {
 
   it("renders an accessTypes.root error (added then removed access type)", async () => {
     render(
-      <Harness apply={(form) => form.setError("accessTypes.root", { type: "custom", message: "Required" })} />
+      <Harness apply={(form) => form.setError("accessTypes" as const, { type: "custom", message: "Required" })} />
     );
 
     expect(

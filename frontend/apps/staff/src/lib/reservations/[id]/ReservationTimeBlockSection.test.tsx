@@ -124,7 +124,9 @@ describe("TimeBlockSection", () => {
   });
 
   it("renders the recurring section wired to the series when part of one", () => {
-    const reservation = createReservation({ reservationSeries: { id: "series-1", pk: 42 } });
+    const reservation = createReservation({
+      reservationSeries: { id: "series-1", pk: 42, weekdays: [], beginDate: "2026-01-01", endDate: "2026-12-31" }
+    });
     render(<TimeBlockSection reservation={reservation} onReservationUpdated={vi.fn()} />);
 
     expect(screen.getByText("reservation:recurring")).toBeInTheDocument();
@@ -162,7 +164,9 @@ describe("TimeBlockSection", () => {
   });
 
   it("hides the edit-time button when the reservation is part of a series", () => {
-    const reservation = createReservation({ reservationSeries: { id: "series-1", pk: 42 } });
+    const reservation = createReservation({
+      reservationSeries: { id: "series-1", pk: 42, weekdays: [], beginDate: "2026-01-01", endDate: "2026-12-31" }
+    });
     render(<TimeBlockSection reservation={reservation} onReservationUpdated={vi.fn()} />);
 
     expect(screen.queryByTestId("mock-edit-time-button")).not.toBeInTheDocument();

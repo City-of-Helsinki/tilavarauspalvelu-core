@@ -87,10 +87,16 @@ describe("Images", () => {
     await user.click(screen.getByAltText(/common:imgAltForSpace.*#1/));
     const dialog = screen.getByRole("dialog");
     // buttons: [close, thumbnail-1, thumbnail-2]
-    const secondThumbnailButton = within(dialog).getAllByRole("button")[2];
+    const buttons = within(dialog).getAllByRole("button");
+    expect(buttons.length).toBeGreaterThan(2);
+    const secondThumbnailButton = buttons[2];
+    if (!secondThumbnailButton) throw new Error("Second thumbnail button not found");
     await user.click(secondThumbnailButton);
 
-    const [largeImage] = within(dialog).getAllByAltText("common:imgAltForSpace");
+    const largeImages = within(dialog).getAllByAltText("common:imgAltForSpace");
+    expect(largeImages.length).toBeGreaterThan(0);
+    const largeImage = largeImages[0];
+    if (!largeImage) throw new Error("Large image not found");
     expect(largeImage).toHaveAttribute("src", "https://example.com/large-2.jpg");
   });
 

@@ -117,7 +117,7 @@ describe("ApplicationCard", () => {
   });
 
   test("disables cancel button when application is not editable", () => {
-    const mockApp = createMockApplication({ status: ApplicationStatusChoice.InReview });
+    const mockApp = createMockApplication({ status: ApplicationStatusChoice.Handled });
 
     render(
       <MockedProvider>
