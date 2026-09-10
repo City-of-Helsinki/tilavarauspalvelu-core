@@ -14,9 +14,10 @@ vi.mock("next/router", () => ({
 }));
 
 const mockSuccessToast = vi.fn();
+const mockErrorToast = vi.fn();
 vi.mock("ui/src/components/toast", () => ({
   successToast: (...args: unknown[]) => mockSuccessToast(...args),
-  errorToast: vi.fn(),
+  errorToast: (...args: unknown[]) => mockErrorToast(...args),
 }));
 
 function createUnit(overrides: Partial<ResourceTableFragment> = {}): ResourceTableFragment {
@@ -36,6 +37,7 @@ function createUnit(overrides: Partial<ResourceTableFragment> = {}): ResourceTab
 beforeEach(() => {
   mockPush.mockReset();
   mockSuccessToast.mockReset();
+  mockErrorToast.mockReset();
 });
 
 async function openPopupMenu() {
@@ -174,7 +176,8 @@ describe("ResourcesTable", () => {
     const dialog = screen.getByRole("dialog");
     await user.click(within(dialog).getByText("spaces:ResourceTable.removeConfirmationAccept"));
 
-    await waitFor(() => expect(screen.queryByRole("dialog")).toBeInTheDocument());
+    await waitFor(() => expect(mockErrorToast).toHaveBeenCalled());
+    expect(screen.queryByRole("dialog")).toBeInTheDocument();
     expect(refetch).not.toHaveBeenCalled();
   });
 });

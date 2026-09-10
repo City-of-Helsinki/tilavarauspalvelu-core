@@ -159,18 +159,36 @@ describe("createTag", () => {
 });
 
 describe("formatReservationPrice", () => {
-  test("formats reservation price correctly", () => {
+  test("formats paid reservation price", () => {
     const mockReservation = {
       price: "100.00",
     } as unknown as NonNullable<ReservationPageQuery["reservation"]>;
 
     const result = formatReservationPrice(mockT, mockReservation);
-    expect(typeof result).toBe("string");
+    expect(result).toContain("100");
+  });
+
+  test("formats free reservation price with fallback text", () => {
+    const mockReservation = {
+      price: "0.00",
+    } as unknown as NonNullable<ReservationPageQuery["reservation"]>;
+
+    const result = formatReservationPrice(mockT, mockReservation);
+    expect(result).toBe("reservation:noPrice");
+  });
+
+  test("handles null price with fallback text", () => {
+    const mockReservation = {
+      price: null,
+    } as unknown as NonNullable<ReservationPageQuery["reservation"]>;
+
+    const result = formatReservationPrice(mockT, mockReservation);
+    expect(result).toBe("reservation:noPrice");
   });
 });
 
 describe("formatReservationPriceLong", () => {
-  test("formats price with due date and subvention info", () => {
+  test("formats price without subvention when not applicable", () => {
     const mockReservation = {
       price: "100.00",
       paymentOrder: null,
@@ -178,7 +196,8 @@ describe("formatReservationPriceLong", () => {
     } as unknown as NonNullable<ReservationPageQuery["reservation"]>;
 
     const result = formatReservationPriceLong(mockT, mockReservation);
-    expect(typeof result).toBe("string");
+    expect(result).toContain("100");
+    expect(result).not.toContain("reservation:appliesSubvention");
   });
 
   test("includes subvention text when applicable", () => {
@@ -189,7 +208,38 @@ describe("formatReservationPriceLong", () => {
     } as unknown as NonNullable<ReservationPageQuery["reservation"]>;
 
     const result = formatReservationPriceLong(mockT, mockReservation);
-    expect(typeof result).toBe("string");
+    expect(result).toContain("100");
+    expect(result).toContain("reservation:appliesSubvention");
+  });
+
+  test("includes due date when payment order exists", () => {
+    const mockReservation = {
+      price: "100.00",
+      paymentOrder: {
+        handledPaymentDueBy: "2024-12-31T23:59:59Z",
+      },
+      applyingForFreeOfCharge: false,
+    } as unknown as NonNullable<ReservationPageQuery["reservation"]>;
+
+    const result = formatReservationPriceLong(mockT, mockReservation);
+    expect(result).toContain("100");
+    expect(result).toContain("reservation:dueBy");
+    expect(result).not.toContain("reservation:appliesSubvention");
+  });
+
+  test("includes both due date and subvention when both applicable", () => {
+    const mockReservation = {
+      price: "100.00",
+      paymentOrder: {
+        handledPaymentDueBy: "2024-12-31T23:59:59Z",
+      },
+      applyingForFreeOfCharge: true,
+    } as unknown as NonNullable<ReservationPageQuery["reservation"]>;
+
+    const result = formatReservationPriceLong(mockT, mockReservation);
+    expect(result).toContain("100");
+    expect(result).toContain("reservation:dueBy");
+    expect(result).toContain("reservation:appliesSubvention");
   });
 });
 
