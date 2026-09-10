@@ -73,8 +73,8 @@ export function reservationToInterval(
     start: new Date(x.beginsAt),
     end: new Date(x.endsAt),
     buffers: {
-      before: getBufferTime(x.bufferTimeBefore, t),
-      after: getBufferTime(x.bufferTimeAfter, t),
+      before: getBufferTime(x.bufferTimeBefore, t, true),
+      after: getBufferTime(x.bufferTimeAfter, t, true),
     },
     reservationSeriesPk: x.reservationSeries?.pk ?? undefined,
     type: x.type ?? undefined,
