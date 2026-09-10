@@ -1,5 +1,5 @@
 import { createMockIsReservableFieldsFragment, createMockReservableTimes } from "@test/reservation-unit.mocks";
-import { addDays, addHours, addMinutes, startOfDay, startOfToday } from "date-fns";
+import { addDays, addHours, addMinutes, format, startOfDay, startOfToday } from "date-fns";
 import type { TFunction } from "i18next";
 import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
 import { formatApiDate } from "ui/src/modules/date-utils";
@@ -492,11 +492,11 @@ describe("getNewReservation", () => {
 
 describe("reservation form transformations", () => {
   test("convertFormToFocustimeSlot returns a reservable slot", () => {
-    const start = new Date(2026, 8, 10);
+    const start = addDays(startOfToday(), 1);
     expect(
       convertFormToFocustimeSlot({
         data: {
-          date: "10.9.2026",
+          date: format(start, "d.M.yyyy"),
           duration: 60,
           time: "10:00",
           isControlsVisible: false,
