@@ -90,11 +90,11 @@ describe("SpacesTable", () => {
           maxPersons: 10,
           nameFi: "Space one",
           resources: [],
-          // @ts-expect-error -- recursive graphql query doesn't work, matches component's own cast
           children: [
             { id: "c1", children: [{ id: "c2", children: [] }] },
             { id: "c3", children: [] },
-          ],
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ] as any,
         },
       ],
     });
