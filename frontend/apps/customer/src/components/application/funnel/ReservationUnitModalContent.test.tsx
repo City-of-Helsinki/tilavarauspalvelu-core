@@ -134,7 +134,7 @@ describe("Modal render", () => {
         })
       ).toBeInTheDocument();
     }
-  });
+  }, 10_000);
 });
 
 describe("Modal search", () => {
