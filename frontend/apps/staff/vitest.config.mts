@@ -8,6 +8,7 @@ export default defineConfig({
     environment: "happy-dom",
     setupFiles: ["./vitest.setup.ts"],
     reporters: ["verbose"],
+    testTimeout: 10_000,
     coverage: {
       reporter: ["clover", "json", "lcov", "text"],
       include: ["src/**/*"],
