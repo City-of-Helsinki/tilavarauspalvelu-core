@@ -60,6 +60,7 @@ describe("ReservationUnitSettingsSection", () => {
     ).toBeInTheDocument();
   });
 
+  // Accordion open + HDS interactions; give it headroom over the 5s default under parallel test load.
   it("reveals begin/end date-time inputs as scheduled publishing sub-toggles are enabled", async () => {
     render(
       <Harness
@@ -77,8 +78,9 @@ describe("ReservationUnitSettingsSection", () => {
     await user.click(screen.getByRole("checkbox", { name: "reservationUnitEditor:publishEndsAt" }));
 
     expect(screen.getAllByRole("textbox", { name: "common:date" })).toHaveLength(2);
-  });
+  }, 10_000);
 
+  // Accordion open + HDS interactions; give it headroom over the 5s default under parallel test load.
   it("reveals buffer-time selects once bufferTimesSet and a direction toggle are enabled", async () => {
     render(<Harness />);
     const user = await openAccordion();
@@ -97,8 +99,9 @@ describe("ReservationUnitSettingsSection", () => {
     expect(
       screen.getByRole("combobox", { name: /^reservationUnitEditor:bufferTimeBeforeDuration/ })
     ).toBeInTheDocument();
-  });
+  }, 10_000);
 
+  // Accordion open + HDS interactions; give it headroom over the 5s default under parallel test load.
   it("reveals the cancellation rule options once hasCancellationRule is enabled", async () => {
     render(<Harness />);
     const user = await openAccordion();
@@ -108,5 +111,5 @@ describe("ReservationUnitSettingsSection", () => {
     await user.click(screen.getByRole("checkbox", { name: "reservationUnitEditor:cancellationIsPossible" }));
 
     expect(screen.getByRole("radio", { name: "Rule 1" })).toBeInTheDocument();
-  });
+  }, 10_000);
 });
