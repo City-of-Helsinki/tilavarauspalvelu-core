@@ -97,6 +97,7 @@ beforeEach(() => {
 describe("RejectedOccurrencesDataLoader", () => {
   it("shows the loading spinner until the query resolves", () => {
     renderLoader([listMock([createRejectedOccurrence()], 1)]);
+    // Table is not rendered while loading (spinner is shown instead)
     expect(screen.queryByTestId("hds-table-sorting-header-applicant")).not.toBeInTheDocument();
   });
 
@@ -122,12 +123,18 @@ describe("RejectedOccurrencesDataLoader", () => {
       listMock([createRejectedOccurrence(), createRejectedOccurrence({ pk: 2 })], 2),
     ]);
 
-    expect(await screen.findByRole("button", { name: "common:showMore" })).toBeInTheDocument();
+    // Wait for table to render with first page
+    expect(await screen.findByTestId("hds-table-sorting-header-applicant")).toBeInTheDocument();
     const moreButton = screen.getByRole("button", { name: "common:showMore" });
+    expect(moreButton).toBeInTheDocument();
 
+    // Click More to fetch second page
     await user.click(moreButton);
 
-    await waitFor(() => expect(moreButton).not.toBeDisabled());
+    // After clicking More, pagination should complete and button should be responsive
+    await waitFor(() => {
+      expect(moreButton).not.toBeDisabled();
+    });
   });
 
   it("shows the all-results message when every rejected occurrence has been loaded", async () => {

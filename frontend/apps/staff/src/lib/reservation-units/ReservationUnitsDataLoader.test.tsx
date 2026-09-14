@@ -153,12 +153,82 @@ describe("ReservationUnitsDataReader", () => {
 
   it("toggles the sort field for every sortable column when its header is clicked", async () => {
     const user = userEvent.setup();
-    const sortKeys = ["nameFi", "unitNameFi", "typeFi", "maxPersons", "surfaceArea"];
-    renderLoader(Array.from({ length: sortKeys.length + 1 }, () => listMock([createReservationUnit()], 1)));
 
+    // Map sort keys to their enum values (transformOrderBy logic)
+    const sortMap: Record<string, [string, string]> = {
+      nameFi: ["NameFiAsc", "NameFiDesc"],
+      unitNameFi: ["UnitNameFiAsc", "UnitNameFiDesc"],
+      typeFi: ["TypeFiAsc", "TypeFiDesc"],
+      maxPersons: ["MaxPersonsAsc", "MaxPersonsDesc"],
+      surfaceArea: ["SurfaceAreaAsc", "SurfaceAreaDesc"],
+    };
+
+    // Create mocks for initial load + each column's ascending and descending orders
+    const mocks: MockedResponse[] = [
+      {
+        request: { query: SearchReservationUnitsDocument },
+        variableMatcher: (vars: Record<string, unknown>) => {
+          const orderBy = vars.orderBy as string[] | undefined;
+          return !orderBy || orderBy.length === 0;
+        },
+        result: {
+          data: {
+            reservationUnits: {
+              __typename: "ReservationUnitNodeConnection",
+              edges: [{ __typename: "ReservationUnitNodeEdge", node: createReservationUnit() }],
+              pageInfo: { __typename: "PageInfo", endCursor: "cursor-1", hasNextPage: false },
+              totalCount: 1,
+            },
+          },
+        },
+      },
+      ...Object.entries(sortMap).flatMap(([_key, [asc, desc]]) => [
+        {
+          request: { query: SearchReservationUnitsDocument },
+          variableMatcher: (vars: Record<string, unknown>) => {
+            const orderBy = vars.orderBy as string[] | undefined;
+            return orderBy?.[0] === asc;
+          },
+          result: {
+            data: {
+              reservationUnits: {
+                __typename: "ReservationUnitNodeConnection",
+                edges: [{ __typename: "ReservationUnitNodeEdge", node: createReservationUnit() }],
+                pageInfo: { __typename: "PageInfo", endCursor: "cursor-1", hasNextPage: false },
+                totalCount: 1,
+              },
+            },
+          },
+        },
+        {
+          request: { query: SearchReservationUnitsDocument },
+          variableMatcher: (vars: Record<string, unknown>) => {
+            const orderBy = vars.orderBy as string[] | undefined;
+            return orderBy?.[0] === desc;
+          },
+          result: {
+            data: {
+              reservationUnits: {
+                __typename: "ReservationUnitNodeConnection",
+                edges: [{ __typename: "ReservationUnitNodeEdge", node: createReservationUnit() }],
+                pageInfo: { __typename: "PageInfo", endCursor: "cursor-1", hasNextPage: false },
+                totalCount: 1,
+              },
+            },
+          },
+        },
+      ]),
+    ];
+
+    renderLoader(mocks);
     expect(await screen.findByText("Reservation Unit 1")).toBeInTheDocument();
 
-    for (const key of sortKeys) {
+    for (const key of Object.keys(sortMap)) {
+      // Click for ascending order
+      // eslint-disable-next-line no-await-in-loop
+      await user.click(screen.getByTestId(`hds-table-sorting-header-${key}`));
+
+      // Click for descending order
       // eslint-disable-next-line no-await-in-loop
       await user.click(screen.getByTestId(`hds-table-sorting-header-${key}`));
     }
