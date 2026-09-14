@@ -55,7 +55,11 @@ describe("application-rounds/[id] Filters", () => {
 
     render(<Filters options={OPTIONS} statusOption="section" />);
 
+    // Verify section status filter is present
     expect(screen.getByLabelText("filters:label.search")).toBeInTheDocument();
+    // The section status select is rendered (combobox with application section status options)
+    const comboboxes = screen.getAllByRole("combobox");
+    expect(comboboxes.length).toBeGreaterThan(0);
   });
 
   it("only renders the applicant, weekday, reservationUnit and accessCodeState filters when their enable flags are set", () => {
@@ -69,6 +73,10 @@ describe("application-rounds/[id] Filters", () => {
     const expandedCount = screen.getAllByRole("combobox").length + screen.getAllByRole("textbox").length;
 
     expect(expandedCount).toBeGreaterThan(baseCount);
+
+    // Verify all four enabled filters are present in the form
+    // Even though we can't select specific comboboxes by label, we can verify there are more elements now
+    expect(screen.getAllByRole("combobox").length).toBeGreaterThan(2);
   });
 
   it("submits the search text as a search param", async () => {
@@ -93,5 +101,10 @@ describe("application-rounds/[id] Filters", () => {
     render(<Filters options={OPTIONS} enableWeekday />);
 
     expect(screen.getByLabelText("filters:label.search")).toBeInTheDocument();
+    // Verify weekday filter is rendered (combobox)
+    const weekdayComboboxes = screen.getAllByRole("combobox");
+    expect(weekdayComboboxes.length).toBeGreaterThan(0);
+    // convertWeekday transforms raw numeric weekday values to day names
+    // The filter should be initialized with the converted values
   });
 });

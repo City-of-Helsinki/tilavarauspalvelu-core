@@ -19,7 +19,7 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
-const mockErrorToast = vi.fn();
+const { mockErrorToast } = vi.hoisted(() => ({ mockErrorToast: vi.fn() }));
 vi.mock("ui/src/components/toast", () => ({
   errorToast: (...args: unknown[]) => mockErrorToast(...args),
 }));
