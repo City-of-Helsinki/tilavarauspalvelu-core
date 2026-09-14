@@ -22,7 +22,7 @@ vi.mock("next/router", () => ({
   useRouter: () => ({ push: vi.fn(), asPath: "/" }),
 }));
 
-const mockErrorToast = vi.fn();
+const { mockErrorToast } = vi.hoisted(() => ({ mockErrorToast: vi.fn() }));
 vi.mock("ui/src/components/toast", () => ({
   errorToast: (...args: unknown[]) => mockErrorToast(...args),
 }));
