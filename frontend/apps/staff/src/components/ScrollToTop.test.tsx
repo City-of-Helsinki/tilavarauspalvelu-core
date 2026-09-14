@@ -144,20 +144,22 @@ describe("ScrollToTop", () => {
     mockInnerHeight.mockRestore();
   });
 
-  it("uses 300ms polling interval", () => {
-    vi.spyOn(window, "scrollY", "get").mockReturnValue(0);
+  it("uses 300ms polling interval", async () => {
+    let scrollValue = 0;
+    vi.spyOn(window, "scrollY", "get").mockImplementation(() => scrollValue);
     vi.spyOn(window, "innerHeight", "get").mockReturnValue(800);
 
     render(<ScrollToTop />);
 
-    const timerIdBefore = vi.getTimerCount();
+    // After 299ms, button should not appear (polling hasn't fired yet)
+    scrollValue = 1000;
     vi.advanceTimersByTime(299);
-    const timerIdAfter = vi.getTimerCount();
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
 
-    // Should only have one timer
-    expect(timerIdBefore - timerIdAfter).toBe(0);
-
+    // After 1ms more (total 300ms), button should appear (polling fires)
     vi.advanceTimersByTime(1);
-    expect(vi.getTimerCount()).toBeGreaterThan(0);
+    await waitFor(() => {
+      expect(screen.getByRole("button")).toBeInTheDocument();
+    });
   });
 });

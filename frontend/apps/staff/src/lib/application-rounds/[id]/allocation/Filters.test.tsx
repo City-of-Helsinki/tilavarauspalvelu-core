@@ -55,6 +55,9 @@ describe("application-rounds/[id]/allocation Filters", () => {
 
     expect(screen.getByLabelText("filters:label.search")).toBeInTheDocument();
     expect(screen.getByTestId("searchButton")).toBeInTheDocument();
+    // Unit form field defaults to first unit (pk 1)
+    const comboboxes = screen.getAllByRole("combobox");
+    expect(comboboxes.length).toBeGreaterThan(0);
   });
 
   it("shows a loading spinner on the search button when isLoading is true", () => {
@@ -92,19 +95,41 @@ describe("application-rounds/[id]/allocation Filters", () => {
     expect(params.get("unit")).toBe("1");
   });
 
-  it("falls back to unit pk 0 when there are no units to select from", () => {
+  it("falls back to unit pk 0 when there are no units to select from", async () => {
+    const user = userEvent.setup();
+    const setSearchParams = vi.fn();
     mockUseSearchParams.mockReturnValue(new URLSearchParams(""));
+    mockUseSetSearchParams.mockReturnValue(setSearchParams);
 
     render(<Filters hideSearchTags={[]} units={[]} />);
 
     expect(screen.getByLabelText("filters:label.search")).toBeInTheDocument();
+
+    // Submit with no units available
+    await user.click(screen.getByTestId("searchButton"));
+
+    // Should default to unit pk 0
+    expect(setSearchParams).toHaveBeenCalledTimes(1);
+    const params = setSearchParams.mock.calls[0]?.[0] as URLSearchParams;
+    expect(params.get("unit")).toBe("0");
   });
 
-  it("re-reads the unit from search params when a unit filter is already set", () => {
+  it("re-reads the unit from search params when a unit filter is already set", async () => {
+    const user = userEvent.setup();
+    const setSearchParams = vi.fn();
+    // URL has unit=2, should restore Unit 2 selection
     mockUseSearchParams.mockReturnValue(new URLSearchParams("unit=2"));
+    mockUseSetSearchParams.mockReturnValue(setSearchParams);
 
     render(<Filters hideSearchTags={[]} units={UNITS} />);
 
     expect(screen.getByLabelText("filters:label.search")).toBeInTheDocument();
+
+    // Submitting should preserve the unit=2 selection from URL
+    await user.click(screen.getByTestId("searchButton"));
+
+    expect(setSearchParams).toHaveBeenCalledTimes(1);
+    const params = setSearchParams.mock.calls[0]?.[0] as URLSearchParams;
+    expect(params.get("unit")).toBe("2");
   });
 });
