@@ -196,8 +196,8 @@ importers:
         specifier: ^5.1.2
         version: 5.2.0(vite@7.3.2(@types/node@24.13.0)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3))
       '@vitest/coverage-istanbul':
-        specifier: ^4.1.0
-        version: 4.1.8(vitest@4.1.11)
+        specifier: ^4.1.11
+        version: 4.1.11(vitest@4.1.11)
       happy-dom:
         specifier: ^20.8.9
         version: 20.10.1
@@ -230,7 +230,7 @@ importers:
         version: 6.1.1(typescript@5.9.3)(vite@7.3.2(@types/node@24.13.0)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3))
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.13.0)(@vitest/coverage-istanbul@4.1.8)(happy-dom@20.10.1)(vite@7.3.2(@types/node@24.13.0)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3))
+        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.13.0)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.2(@types/node@24.13.0)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3))
 
   apps/staff:
     dependencies:
@@ -365,8 +365,8 @@ importers:
         specifier: ^5.1.2
         version: 5.2.0(vite@7.3.2(@types/node@24.13.0)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3))
       '@vitest/coverage-istanbul':
-        specifier: ^4.1.0
-        version: 4.1.8(vitest@4.1.11)
+        specifier: ^4.1.11
+        version: 4.1.11(vitest@4.1.11)
       happy-dom:
         specifier: ^20.8.9
         version: 20.10.1
@@ -399,7 +399,7 @@ importers:
         version: 5.1.4(typescript@5.9.3)(vite@7.3.2(@types/node@24.13.0)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3))
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.13.0)(@vitest/coverage-istanbul@4.1.8)(happy-dom@20.10.1)(vite@7.3.2(@types/node@24.13.0)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3))
+        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.13.0)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.2(@types/node@24.13.0)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3))
 
   packages/prettier-config:
     devDependencies:
@@ -562,7 +562,7 @@ importers:
         version: 5.1.4(typescript@5.9.3)(vite@7.3.2(@types/node@24.13.5)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3))
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.13.5)(happy-dom@20.10.1)(vite@7.3.2(@types/node@24.13.5)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3))
+        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.13.5)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.2(@types/node@24.13.5)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3))
 
 packages:
 
@@ -2609,10 +2609,10 @@ packages:
     peerDependencies:
       vite: 7.3.2
 
-  '@vitest/coverage-istanbul@4.1.8':
-    resolution: {integrity: sha512-/h514nMZMKI6foh21mVgO1zlCH6pdDamwKMbla1uLU2GMxTlfp0PQMxovWozmzQdCIQYZ2XXEzg2zNZom2zAOg==}
+  '@vitest/coverage-istanbul@4.1.11':
+    resolution: {integrity: sha512-pK9LJtOS534bmUwdwLpGD9qL52DeqVWSInrXFMNqrvWLbbAhuIPAlRup3UbsjFOMqCC/p3MmmX7uXV7ZTkcFfQ==}
     peerDependencies:
-      vitest: 4.1.8
+      vitest: 4.1.11
 
   '@vitest/expect@4.1.11':
     resolution: {integrity: sha512-VX2x5vNJXET47KAFzwERI+KRMtTTCSWTfSMKsW7JsUsXV4psq++e3DvZpuTDOpHcxytiDs6p2nhVb2tVDiiUYw==}
@@ -4141,9 +4141,6 @@ packages:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
     engines: {node: '>=0.10.0'}
 
-  obug@2.1.1:
-    resolution: {integrity: sha512-uTqF9MuPraAQ+IsnPf366RG4cP9RtUi7MLO1N3KEc+wb0a6yKpeL0lmk2IB1jY5KHPAlTc6T/JRdC/YqxHNwkQ==}
-
   obug@2.2.1:
     resolution: {integrity: sha512-XrsrhT5sybtKI6wakr2SPOlGZWWYbUXZ7a0jT8/QOeAPau+1X/bSegNe5YR75oJmEZQbKningirmGOEJCIk61Q==}
     engines: {node: '>=12.20.0'}
@@ -4859,10 +4856,6 @@ packages:
   tinyglobby@0.2.17:
     resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
     engines: {node: '>=12.0.0'}
-
-  tinyrainbow@3.1.0:
-    resolution: {integrity: sha512-Bf+ILmBgretUrdJxzXM0SgXLZ3XfiaUuOj/IKQHuTXip+05Xn+uyEYdVg0kYDipTBcLrCVyUzAPz7QmArb0mmw==}
-    engines: {node: '>=14.0.0'}
 
   tinyrainbow@3.1.1:
     resolution: {integrity: sha512-yau8yJdTt989Mm0Bd/236QnzEiPf2xLLTqUZRUJOo/3CB078LSwzei343DgtJVmfJKJE3TMINY1u42SQsP6mXw==}
@@ -6228,7 +6221,7 @@ snapshots:
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/sourcemap-codec': 1.6.0
       '@jridgewell/trace-mapping': 0.3.31
 
   '@jridgewell/remapping@2.3.5':
@@ -6250,7 +6243,7 @@ snapshots:
   '@jridgewell/trace-mapping@0.3.31':
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
-      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/sourcemap-codec': 1.6.0
 
   '@jridgewell/trace-mapping@0.3.9':
     dependencies:
@@ -7129,7 +7122,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/coverage-istanbul@4.1.8(vitest@4.1.11)':
+  '@vitest/coverage-istanbul@4.1.11(vitest@4.1.11)':
     dependencies:
       '@babel/core': 7.29.7
       '@istanbuljs/schema': 0.1.6
@@ -7139,9 +7132,9 @@ snapshots:
       istanbul-lib-report: 3.0.1
       istanbul-reports: 3.2.0
       magicast: 0.5.3
-      obug: 2.1.1
-      tinyrainbow: 3.1.0
-      vitest: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.13.0)(@vitest/coverage-istanbul@4.1.8)(happy-dom@20.10.1)(vite@7.3.2(@types/node@24.13.0)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3))
+      obug: 2.2.1
+      tinyrainbow: 3.1.1
+      vitest: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.13.0)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.2(@types/node@24.13.0)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3))
     transitivePeerDependencies:
       - supports-color
 
@@ -8656,8 +8649,6 @@ snapshots:
 
   object-assign@4.1.1: {}
 
-  obug@2.1.1: {}
-
   obug@2.2.1: {}
 
   oidc-client-ts@2.5.0:
@@ -9491,8 +9482,6 @@ snapshots:
       fdir: 6.5.0(picomatch@4.0.4)
       picomatch: 4.0.4
 
-  tinyrainbow@3.1.0: {}
-
   tinyrainbow@3.1.1: {}
 
   title-case@3.0.3:
@@ -9678,7 +9667,7 @@ snapshots:
       terser: 5.51.2
       yaml: 2.8.3
 
-  vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.13.0)(@vitest/coverage-istanbul@4.1.8)(happy-dom@20.10.1)(vite@7.3.2(@types/node@24.13.0)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3)):
+  vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.13.0)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.2(@types/node@24.13.0)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3)):
     dependencies:
       '@vitest/expect': 4.1.11
       '@vitest/mocker': 4.1.11(vite@7.3.2(@types/node@24.13.0)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3))
@@ -9703,12 +9692,12 @@ snapshots:
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
       '@types/node': 24.13.0
-      '@vitest/coverage-istanbul': 4.1.8(vitest@4.1.11)
+      '@vitest/coverage-istanbul': 4.1.11(vitest@4.1.11)
       happy-dom: 20.10.1
     transitivePeerDependencies:
       - msw
 
-  vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.13.5)(happy-dom@20.10.1)(vite@7.3.2(@types/node@24.13.5)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3)):
+  vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.13.5)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.2(@types/node@24.13.5)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3)):
     dependencies:
       '@vitest/expect': 4.1.11
       '@vitest/mocker': 4.1.11(vite@7.3.2(@types/node@24.13.5)(jiti@2.7.0)(sass@1.100.0)(terser@5.51.2)(yaml@2.8.3))
@@ -9733,6 +9722,7 @@ snapshots:
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
       '@types/node': 24.13.5
+      '@vitest/coverage-istanbul': 4.1.11(vitest@4.1.11)
       happy-dom: 20.10.1
     transitivePeerDependencies:
       - msw
