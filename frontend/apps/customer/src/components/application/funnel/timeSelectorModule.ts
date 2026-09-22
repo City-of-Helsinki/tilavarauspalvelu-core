@@ -156,7 +156,7 @@ function cellsToSections(cells: WeekCells): AesType[] {
         end: cell.hour + 1,
         priority: cell.state,
       }))
-      .reduce<TimeSpan[]>(combineTimespans, [])
+      .reduce<TimeSpan[]>((prev, current) => combineTimespans(prev, current), [])
       .map(({ end, ...span }) => ({
         ...span,
         end: end % 24,

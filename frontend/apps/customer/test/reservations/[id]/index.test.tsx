@@ -8,7 +8,7 @@ import {
 import type { ReservationPaymentOrderFragment } from "@test/reservation.mocks";
 import type { CreateGraphQLMockProps } from "@test/test.gql.utils";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Reservation from "@/pages/reservations/[id]";
 import type { ReservationTypeChoice } from "@gql/gql-types";
@@ -206,6 +206,6 @@ describe("Page: View reservation", () => {
 // waiting for this is a proxy that the query has finished
 async function waitForAddressSection(view: ReturnType<typeof customRender>): Promise<HTMLElement> {
   const addressSection = view.getByTestId("reservation-unit__address--container");
-  await expect.poll(() => addressSection).toBeInTheDocument();
+  await waitFor(() => expect(addressSection).toBeInTheDocument());
   return addressSection;
 }

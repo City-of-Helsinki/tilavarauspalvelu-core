@@ -19,7 +19,7 @@
     "format": "turbo format",
     "format:check": "turbo format:check",
     "format:staged": "prettier --ignore-path \"./.prettierignore\" --write --experimental-cli --config-path \"./packages/prettier-config/prettier.mjs\"",
-    "test": "turbo test",
+    "test": "turbo test --concurrency=1",
     "test:coverage": "turbo test:coverage",
     "tsc:check": "turbo tsc:check",
     "tsc:clean": "turbo tsc:clean",

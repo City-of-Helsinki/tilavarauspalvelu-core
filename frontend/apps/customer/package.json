@@ -7,7 +7,7 @@
     "dev": "ROARR_LOG=true next dev -p 3000 --turbopack",
     "build": "SKIP_ENV_VALIDATION=true next build",
     "start": "next start",
-    "test": "SKIP_ENV_VALIDATION=true TZ=Europe/Helsinki vitest",
+    "test": "SKIP_ENV_VALIDATION=true TZ=Europe/Helsinki vitest run",
     "test:coverage": "CI=true pnpm test --coverage",
     "lint": "oxlint . -c ../../.oxlintrc.json --type-aware",
     "lint:fix": "oxlint . --fix -c ../../.oxlintrc.json --type-aware",
@@ -30,7 +30,7 @@
     "i18next": "^25.6.3",
     "import-in-the-middle": "^1.15.0",
     "lodash-es": "^4.18.1",
-    "next": "^16.3.3",
+    "next": "^16.3.5",
     "next-compose-plugins": "^2.2.1",
     "next-i18next": "^15.4.3",
     "nuka-carousel": "^7.0.0",
@@ -69,6 +69,7 @@
     "stylelint-config-standard": "^39.0.1",
     "stylelint-config-styled-components": "^0.1.1",
     "typescript": "^5.9.3",
+    "vite": "^7.3.5",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.11"
   }
