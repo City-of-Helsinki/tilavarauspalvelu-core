@@ -12,7 +12,7 @@
     "lint:css": "stylelint './src/**/*.tsx'",
     "format:check": "prettier --ignore-path \"../../.prettierignore\" --check --experimental-cli .",
     "format": "prettier --ignore-path \"../../.prettierignore\" --write --experimental-cli .",
-    "test": "SKIP_ENV_VALIDATION=true TZ=Europe/Helsinki vitest",
+    "test": "SKIP_ENV_VALIDATION=true TZ=Europe/Helsinki vitest run",
     "test:coverage": "CI=true pnpm test --coverage",
     "tsc:check": "tsc --noEmit --project tsconfig.json",
     "tsc:clean": "tsc --build --clean"
@@ -32,7 +32,7 @@
     "i18next": "^25.6.3",
     "import-in-the-middle": "^1.15.0",
     "lodash-es": "^4.18.1",
-    "next": "^16.3.3",
+    "next": "^16.3.5",
     "next-i18next": "^15.4.3",
     "prettier-config": "workspace:*",
     "quill": "^2.0.3",
@@ -73,7 +73,8 @@
     "stylelint-config-standard": "^39.0.1",
     "stylelint-config-styled-components": "^0.1.1",
     "typescript": "^5.9.3",
-    "vite-tsconfig-paths": "^5.1.4",
+    "vite": "^7.3.5",
+    "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.11"
   }
 }

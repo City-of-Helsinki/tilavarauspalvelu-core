@@ -305,7 +305,7 @@ describe("Filling the form", () => {
     expect(submit).toBeInTheDocument();
     expect(submit).not.toBeDisabled();
     await user.click(submit);
-    await expect.poll(() => view.queryByText(/required/i)).toBeInTheDocument();
+    await waitFor(() => expect(view.queryByText(/required/i)).toBeInTheDocument());
   }, 20_000);
 
   test("Form submission without any blocking reservations", async () => {
@@ -443,5 +443,5 @@ test.todo("If BLOCKED form has no metafields or seriesName");
 
 // Have to await because of gql query
 async function waitForFormToBeEnabled() {
-  await expect.poll(() => screen.findByLabelText(/ReservationSeriesForm.name/)).toBeInTheDocument();
+  await waitFor(() => expect(screen.getByLabelText(/ReservationSeriesForm.name/)).toBeInTheDocument());
 }

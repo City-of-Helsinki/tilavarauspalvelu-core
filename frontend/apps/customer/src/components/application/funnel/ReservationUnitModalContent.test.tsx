@@ -2,7 +2,7 @@ import { createMockApplicationRound } from "@test/application.mocks";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import type { CreateGraphQLMockProps } from "@test/test.gql.utils";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
-import { render, within } from "@testing-library/react";
+import { render, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { ReservationUnitModalContent } from "./ReservationUnitModalContent";
@@ -229,6 +229,6 @@ async function isReady(view: ReturnType<typeof customRender>): Promise<HTMLEleme
     name: "searchForm:searchButton",
   });
   expect(submitBtn).toBeInTheDocument();
-  await expect.poll(() => submitBtn).not.toBeDisabled();
+  await waitFor(() => expect(submitBtn).not.toBeDisabled());
   return submitBtn;
 }
