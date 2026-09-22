@@ -80,6 +80,7 @@ class Common(Environment):
         "import_export",
         "mptt",
         "rangefilter",
+        "resilient_logger",
         "rest_framework",
         "social_django",
         "tinymce",
@@ -271,6 +272,36 @@ class Common(Environment):
         }
 
     AUDIT_LOGGING_ENABLED = values.BooleanValue(default=False)
+
+    AUDIT_LOG_ENV = values.StringValue(default="")
+    AUDIT_LOG_ES_URL = values.StringValue(default="")
+    AUDIT_LOG_ES_USERNAME = values.StringValue(default="")
+    AUDIT_LOG_ES_PASSWORD = values.StringValue(default="")
+    AUDIT_LOG_ES_INDEX = values.StringValue(default="")
+
+    @classproperty
+    def RESILIENT_LOGGER(cls):
+        return {
+            "origin": "tilavarauspalvelu-core",
+            "environment": cls.AUDIT_LOG_ENV,
+            "sources": [
+                {
+                    "class": "resilient_logger.sources.DjangoAuditLogSource",
+                },
+            ],
+            "targets": [
+                {
+                    "class": "resilient_logger.targets.ElasticsearchLogTarget",
+                    "es_url": cls.AUDIT_LOG_ES_URL,
+                    "es_username": cls.AUDIT_LOG_ES_USERNAME,
+                    "es_password": cls.AUDIT_LOG_ES_PASSWORD,
+                    "es_index": cls.AUDIT_LOG_ES_INDEX,
+                    "required": True,
+                },
+            ],
+            "submit_unsent_entries": True,
+            "clear_sent_entries": True,
+        }
 
     QUERY_LOGGING_ENABLED = values.BooleanValue(default=False)
     QUERY_LOGGING_SKIP_ROUTES = values.ListValue(default=[])
