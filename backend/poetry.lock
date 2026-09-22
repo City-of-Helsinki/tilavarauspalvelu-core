@@ -1176,6 +1176,28 @@ redis = ">=4.0.2"
 hiredis = ["redis[hiredis] (>=4.0.2)"]
 
 [[package]]
+name = "django-resilient-logger"
+version = "3.0.0"
+description = "A module that provides django-specific resilient logger module."
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "django_resilient_logger-3.0.0-py2.py3-none-any.whl", hash = "sha256:04e8294917f844502ac6e752fbb043651d57aae41d1665174b7c87c5d3ca13ed"},
+    {file = "django_resilient_logger-3.0.0.tar.gz", hash = "sha256:e1708dbb7c3ffc9f5a575115967b1002d2f5fd76e1712f918b19b805473c3cdc"},
+]
+
+[package.dependencies]
+django = ">=5.2"
+elasticsearch8 = "*"
+
+[package.extras]
+all = ["coverage[toml]", "django-auditlog", "django-logger-extra", "pytest", "pytest-django", "pytest-randomly"]
+auditlog = ["django-auditlog"]
+logger-extra = ["django-logger-extra"]
+test = ["coverage[toml]", "pytest", "pytest-django", "pytest-randomly"]
+
+[[package]]
 name = "django-settings-holder"
 version = "0.3.0"
 description = "Object that allows settings to be accessed with attributes."
@@ -1367,6 +1389,51 @@ six = ">=1.9.0"
 [package.extras]
 gmpy = ["gmpy"]
 gmpy2 = ["gmpy2"]
+
+[[package]]
+name = "elastic-transport"
+version = "8.19.0"
+description = "Transport classes and utilities shared among Python Elastic client libraries"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "elastic_transport-8.19.0-py3-none-any.whl", hash = "sha256:97ab35de878c7f4c7ebf8840cbc8ff1ff01d9dbc0e977e52d82715b155678b4f"},
+    {file = "elastic_transport-8.19.0.tar.gz", hash = "sha256:32afed2a70dad80511476c821b2cf823f35a82153289765f6b2e2eb8cb0de099"},
+]
+
+[package.dependencies]
+certifi = "*"
+urllib3 = ">=1.26.2,<3"
+
+[package.extras]
+develop = ["aiohttp", "furo", "httpx", "opentelemetry-api", "opentelemetry-sdk", "orjson", "pytest", "pytest-asyncio", "pytest-cov", "pytest-httpbin", "pytest-httpserver", "pytest-mock", "requests", "respx", "sphinx (>2)", "sphinx-autodoc-typehints", "trustme"]
+
+[[package]]
+name = "elasticsearch8"
+version = "8.19.3"
+description = "Python client for Elasticsearch"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "elasticsearch8-8.19.3-py3-none-any.whl", hash = "sha256:4b52e59e68aea6f59bf37c28f6f4512333302dd8a52e26c17d0f10c076d833a1"},
+    {file = "elasticsearch8-8.19.3.tar.gz", hash = "sha256:7effe95b360241b6d56ef68219037a90ad0f56723614db54bbe57d33058402f4"},
+]
+
+[package.dependencies]
+elastic-transport = ">=8.15.1,<9"
+python-dateutil = "*"
+typing-extensions = "*"
+
+[package.extras]
+async = ["aiohttp (>=3,<4)"]
+dev = ["aiohttp", "black", "build", "coverage", "isort", "jinja2", "mapbox-vector-tile", "mypy", "nox", "numpy", "orjson", "pandas", "pyarrow ; python_version < \"3.14\"", "pyright", "pytest", "pytest-asyncio", "pytest-cov", "pytest-mock", "python-dateutil", "pyyaml (>=5.4)", "requests (>=2,<3)", "simsimd", "tqdm", "twine", "types-python-dateutil", "types-tqdm", "unasync"]
+docs = ["sphinx", "sphinx-autodoc-typehints", "sphinx-rtd-theme (>=2.0)"]
+orjson = ["orjson (>=3)"]
+pyarrow = ["pyarrow (>=1)"]
+requests = ["requests (>=2.4.0,!=2.32.2,<3.0.0)"]
+vectorstore-mmr = ["numpy (>=1)", "simsimd (>=3)"]
 
 [[package]]
 name = "execnet"
@@ -1824,7 +1891,7 @@ files = [
 [package.dependencies]
 amqp = ">=5.1.1,<6.0.0"
 packaging = "*"
-redis = {version = ">=4.5.2,<4.5.5 || >4.5.5,<5.0.2 || >5.0.2,<6.5", optional = true, markers = "extra == \"redis\""}
+redis = {version = ">=4.5.2,!=4.5.5,!=5.0.2,<6.5", optional = true, markers = "extra == \"redis\""}
 tzdata = {version = ">=2025.2", markers = "python_version >= \"3.9\""}
 vine = "5.1.0"
 
@@ -3075,7 +3142,7 @@ files = [
 [package.dependencies]
 ecdsa = "!=0.15"
 pyasn1 = ">=0.5.0"
-rsa = ">=4.0,<4.1.1 || >4.1.1,<4.4 || >4.4,<5.0"
+rsa = ">=4.0,!=4.1.1,!=4.4,<5.0"
 
 [package.extras]
 cryptography = ["cryptography (>=3.4.0)"]
@@ -3732,4 +3799,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "ef5d176a772230e14f503a92c1c77bfb8b85349ae3967bd3bdd3e120d4f1f1da"
+content-hash = "ba4c40ec870af29a535aa6ddcb3fd7caaefe5dab047d4755352b2294bc30a426"
