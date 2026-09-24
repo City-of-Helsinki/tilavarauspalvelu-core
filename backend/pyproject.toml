@@ -42,7 +42,7 @@ Pillow = "12.3.0"
 psycopg2 = "2.9.11"
 python-dateutil = "2.9.0.post0"
 redis = { version = "6.4.0", extras = ["hiredis"] }
-sentry-sdk = "2.57.0"
+sentry-sdk = "2.70.0"
 social-auth-app-django = "5.7.0"
 stamina = "25.2.0"
 # Skip installation on Windows as uWSGI does not support it without Cygwin.
