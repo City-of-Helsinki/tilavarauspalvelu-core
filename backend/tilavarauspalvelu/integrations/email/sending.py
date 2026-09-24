@@ -45,7 +45,7 @@ def send_emails_in_batches_task(email_data: EmailData) -> None:
 
     db_email_message: EmailMessage | None = None
 
-    for batch in batched(email_data.recipients, settings.EMAIL_MAX_RECIPIENTS, strict=False):
+    for batch in batched(email_data.recipients, settings.EMAIL_MAX_RECIPIENTS):
         if db_email_message is not None:
             db_email_message.recipients.extend(batch)
             continue
