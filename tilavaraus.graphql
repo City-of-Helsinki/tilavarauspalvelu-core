@@ -2191,7 +2191,7 @@ enum ReservationOrderingChoices {
   orderStatusDesc
 }
 
-"\nSame as AccessType, but includes the 'MULTIVALUED' option\nfor series and seasonal bookings where access type between reservations varies.\n"
+"\n    Same as AccessType, but includes the 'MULTIVALUED' option\n    for series and seasonal bookings where access type between reservations varies.\n    "
 enum AccessTypeWithMultivalued {
   ACCESS_CODE
   OPENED_BY_STAFF
