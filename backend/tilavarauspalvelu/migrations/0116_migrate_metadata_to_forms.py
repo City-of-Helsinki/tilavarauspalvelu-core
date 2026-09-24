@@ -46,7 +46,7 @@ def migrate_metadata_to_forms(apps, schema_editor):
         .iterator(chunk_size=chunk_size)
     )
 
-    for reservations_batch in itertools.batched(reservation_units, chunk_size, strict=False):
+    for reservations_batch in itertools.batched(reservation_units, chunk_size):
         pks = set()
         whens = []
 
