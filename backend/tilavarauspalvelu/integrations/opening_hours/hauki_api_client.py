@@ -66,7 +66,7 @@ class HaukiAPIClient(BaseExternalServiceClient):
         # the limit is around 8k bytes. Assuming 7 char resource ids separated by a comma
         # ('%2C' url-encoded) -> 10 chars per resource id ->  8k / 10 = 800 resources per batch.
         # Should set limit lower for future proofing.
-        for resources in itertools.batched(hauki_resource_ids, batch_size, strict=False):
+        for resources in itertools.batched(hauki_resource_ids, batch_size):
             results = cls._get_resources_batch(hauki_resource_ids=resources, **kwargs)
             fetched_hauki_resources.extend(results)
 

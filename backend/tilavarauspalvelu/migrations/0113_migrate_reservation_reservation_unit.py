@@ -22,7 +22,7 @@ def migrate_reservation_reservation_unit(apps, schema_editor):
     chunk_size = 10_000
     reservations = Reservation.objects.values("pk", "reservation_units__id").iterator(chunk_size=chunk_size)
 
-    for reservations_batch in itertools.batched(reservations, chunk_size, strict=False):
+    for reservations_batch in itertools.batched(reservations, chunk_size):
         pks = set()
         whens = []
 
