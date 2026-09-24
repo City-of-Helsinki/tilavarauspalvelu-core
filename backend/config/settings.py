@@ -4,13 +4,18 @@ from __future__ import annotations
 import os
 import zoneinfo
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import dj_database_url
+from corsheaders.defaults import default_headers
 from csp.constants import NONE, SELF, UNSAFE_INLINE
 from django.utils.translation import gettext_lazy as _
 from env_config import Environment, values
 from env_config.decorators import classproperty
 from helusers.defaults import SOCIAL_AUTH_PIPELINE
+
+if TYPE_CHECKING:
+    from sentry_sdk.types import SamplingContext
 
 try:
     from local_settings import AutomatedTestMixin
@@ -125,6 +130,7 @@ class Common(Environment):
     CORS_ALLOWED_ORIGINS = values.ListValue()
     CSRF_TRUSTED_ORIGINS = values.ListValue()
     CORS_ALLOWED_ORIGIN_REGEXES = values.ListValue(default=[])
+    CORS_ALLOW_HEADERS = (*default_headers, "baggage", "sentry-trace")
     CORS_ALLOW_CREDENTIALS = True
     CSRF_FAILURE_VIEW = "tilavarauspalvelu.api.rest.views.csrf_failure_view"
 
@@ -1000,6 +1006,20 @@ class CI(EmptyDefaults, Common, use_environ=True):
     DATABASES = values.DatabaseURLValue()
 
 
+def sentry_traces_sampler(sampling_context: SamplingContext) -> float:
+    # Respect a parent sampling decision, as recommended by Sentry.
+    if (parent_sampled := sampling_context.get("parent_sampled")) is not None:
+        return float(parent_sampled)
+
+    from django.conf import settings
+
+    path = sampling_context.get("wsgi_environ", {}).get("PATH_INFO", "")
+    if path in settings.SENTRY_TRACES_IGNORE_PATHS:
+        return 0.0
+
+    return settings.SENTRY_TRACES_SAMPLE_RATE or 0.0
+
+
 class Platta(Common, use_environ=True):
     """Common settings for platta environments. Not to be used directly."""
 
@@ -1019,8 +1039,20 @@ class Platta(Common, use_environ=True):
 
     # --- Sentry -----------------------------------------------------------------------------------------------------
 
-    SENTRY_DSN: str = values.StringValue()
-    SENTRY_ENVIRONMENT: str = values.StringValue()
+    SENTRY_DSN: str = values.StringValue(default="")
+    SENTRY_ENVIRONMENT: str = values.StringValue(default="local")
+    SENTRY_PROFILE_SESSION_SAMPLE_RATE: float | None = values.FloatValue(default=None)
+    SENTRY_RELEASE: str | None = values.StringValue(default=None)
+    SENTRY_TRACES_SAMPLE_RATE: float | None = values.FloatValue(default=None)
+    SENTRY_TRACES_IGNORE_PATHS: list[str] = values.ListValue(
+        default=[
+            "/healthz",
+            "/readiness",
+            "/monitoring/liveness/",
+            "/monitoring/readiness/",
+            "/monitoring/system-status/",
+        ]
+    )
 
     # --- Redis settings ---------------------------------------------------------------------------------------------
 
@@ -1071,14 +1103,20 @@ class Platta(Common, use_environ=True):
 
     @classmethod
     def post_setup(cls) -> None:
+        if not cls.SENTRY_DSN:
+            return
+
         import sentry_sdk
         from sentry_sdk.integrations.django import DjangoIntegration
 
         sentry_sdk.init(
             dsn=cls.SENTRY_DSN,
             environment=cls.SENTRY_ENVIRONMENT,
-            release=cls.APP_VERSION,  # type: ignore
+            release=cls.SENTRY_RELEASE,
             integrations=[DjangoIntegration()],
+            traces_sampler=sentry_traces_sampler,
+            profile_session_sample_rate=cls.SENTRY_PROFILE_SESSION_SAMPLE_RATE,
+            profile_lifecycle="trace",
         )
 
 
