@@ -1814,6 +1814,7 @@ files = [
 
 [package.dependencies]
 python-dateutil = "*"
+typing-extensions = {version = ">=4.10,<5.0", markers = "python_version < \"3.13\""}
 tzdata = ">=2025.3"
 
 [[package]]
@@ -1891,7 +1892,7 @@ files = [
 [package.dependencies]
 amqp = ">=5.1.1,<6.0.0"
 packaging = "*"
-redis = {version = ">=4.5.2,!=4.5.5,!=5.0.2,<6.5", optional = true, markers = "extra == \"redis\""}
+redis = {version = ">=4.5.2,<4.5.5 || >4.5.5,<5.0.2 || >5.0.2,<6.5", optional = true, markers = "extra == \"redis\""}
 tzdata = {version = ">=2025.2", markers = "python_version >= \"3.9\""}
 vine = "5.1.0"
 
@@ -3142,7 +3143,7 @@ files = [
 [package.dependencies]
 ecdsa = "!=0.15"
 pyasn1 = ">=0.5.0"
-rsa = ">=4.0,!=4.1.1,!=4.4,<5.0"
+rsa = ">=4.0,<4.1.1 || >4.1.1,<4.4 || >4.4,<5.0"
 
 [package.extras]
 cryptography = ["cryptography (>=3.4.0)"]
@@ -3798,5 +3799,5 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.13,<3.14"
-content-hash = "a98740b943ca5b029946094a8e19b197e36455a0f9f544ac8334e162e00229ff"
+python-versions = ">=3.12,<3.14"
+content-hash = "5d134b17f0423a6d3196b5cfae84492ff2401176c2f1dc63f6c8236007b86a80"

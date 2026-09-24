@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/python:3.13-slim-bullseye AS base
+FROM helsinki.azurecr.io/ubi9/python-312-gdal AS base
 
 # Make sure we build as the root user.
 USER root
@@ -17,16 +17,14 @@ ARG MEDIA_ROOT=/media
 
 # Setup common dependencies and create required directories.
 RUN echo "Install common dependencies" \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
-      gdal-bin \
+    && dnf update -y \
+    && dnf install -y \
       gettext \
-      libcurl4 \
-      libpq5 \
-      postgresql-client \
+      libpq \
+      postgresql \
       make \
       rsync \
-    && apt-get clean \
+    && dnf clean all \
     && echo "Create project directory" \
     && mkdir -p "$PROJECT_ROOT" \
     && chmod g=u "$PROJECT_ROOT" \
@@ -39,9 +37,9 @@ RUN echo "Install common dependencies" \
     && mkdir -p /broker \
     && mkdir -p /broker/queue \
     && mkdir -p /broker/processed \
-    && chmod g+rw /broker \
-    && chmod g+rw /broker/queue \
-    && chmod g+rw /broker/processed \
+    && chmod g+rwx /broker \
+    && chmod g+rwx /broker/queue \
+    && chmod g+rwx /broker/processed \
     && echo "Done"
 
 
@@ -53,20 +51,15 @@ ARG PROJECT_ROOT=/tvp
 ARG VENV_ROOT=$PROJECT_ROOT/venv
 ARG DEPS=main,admin,celery
 
-# Install build dependencies
-# - build-essential: for building uWSGI
-# - curl: for installing poetry
-# - libpcre2-dev & libpcre3 & libpcre3-dev: for uWSGI internal routing support
-# - libpq-dev: for building psycopg2
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      build-essential \
-      curl \
-      libcurl4-openssl-dev \
-      libpcre2-dev \
-      libpcre3 \
-      libpcre3-dev \
-      libpq-dev \
-    && apt-get clean
+# Install build dependencies, then remove the package-manager cache.
+RUN dnf install -y \
+    gcc \
+    gcc-c++ \
+    libcurl-devel \
+    pcre2-devel \
+    postgresql-devel \
+    python3.12-devel \
+    && dnf clean all
 
 # Setup environment variables for poetry.
 ENV POETRY_HOME=/usr/pypoetry
@@ -133,9 +126,9 @@ WORKDIR $PROJECT_ROOT
 # Copy project files, virtualenv, and static files.
 # Give ownership and permissions to root group to support running with arbitrary user IDs.
 # https://docs.openshift.com/container-platform/4.11/openshift_images/create-images.html#:~:text=Support%20arbitrary%20user%20ids
-COPY --chown=root:root --chmod=774 . .
-COPY --chown=root:root --chmod=774 --from=builder $VENV_ROOT $VENV_ROOT
-COPY --chown=root:root --chmod=774 --from=build-static $STATIC_ROOT $STATIC_ROOT
+COPY --chown=root:root --chmod=755 . .
+COPY --chown=root:root --chmod=755 --from=builder $VENV_ROOT $VENV_ROOT
+COPY --chown=root:root --chmod=755 --from=build-static $STATIC_ROOT $STATIC_ROOT
 COPY --from=builder /tmp/sentry_plugin.so /tvp/sentry_plugin.so
 
 # Activate virtualenv by setting some environment variables.
@@ -146,6 +139,8 @@ ENV PATH=$VENV_ROOT/bin:$PATH \
 RUN \
     DJANGO_SETTINGS_ENVIRONMENT="Build" \
     python manage.py compilemessages -l fi -l sv -x "$VENV_ROOT"
+
+USER default
 
 # Expose port for uWSGI.
 EXPOSE 8000
