@@ -20,6 +20,16 @@ uwsgi:
   enable-threads: true
   py-call-uwsgi-fork-hooks: true
 
+  # Send uWSGI alarms to Sentry only when a DSN is configured.
+  if-env: SENTRY_DSN
+  print: Enabled sentry logging for uWSGI
+  plugin: /tvp/sentry_plugin.so
+  alarm: "logsentry sentry:dsn=$(SENTRY_DSN),logger=uwsgi.sentry"
+  alarm-backlog: logsentry
+  alarm-segfault: logsentry
+  alarm-log: "logsentry HARAKIRI \\[core.*\\]"
+  endif:
+
   # Workload settings
   # Automatically scales up worker count when application is under load.
   master: true

@@ -21,6 +21,7 @@ RUN echo "Install common dependencies" \
     && apt-get install -y --no-install-recommends \
       gdal-bin \
       gettext \
+      libcurl4 \
       libpq5 \
       postgresql-client \
       make \
@@ -60,6 +61,7 @@ ARG DEPS=main,admin,celery
 RUN apt-get update && apt-get install -y --no-install-recommends \
       build-essential \
       curl \
+      libcurl4-openssl-dev \
       libpcre2-dev \
       libpcre3 \
       libpcre3-dev \
@@ -74,7 +76,7 @@ ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 ENV POETRY_INSTALLER_PARALLEL=false
 
 # Install poetry.
-RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=2.2.0 python -
+RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=2.4.1 python -
 
 # Copy poetry files.
 COPY poetry.lock pyproject.toml /
@@ -88,6 +90,9 @@ ENV PATH=$VENV_ROOT/bin:$PATH \
 
 # Install production dependencies (to previously created virtualenv).
 RUN poetry install --no-root --only "$DEPS"
+
+# Build the uWSGI Sentry alarm plugin against the installed uWSGI binary.
+RUN cd /tmp && "$VENV_ROOT/bin/uwsgi" --build-plugin https://github.com/City-of-Helsinki/uwsgi-sentry
 
 
 FROM base AS build-static
@@ -131,6 +136,7 @@ WORKDIR $PROJECT_ROOT
 COPY --chown=root:root --chmod=774 . .
 COPY --chown=root:root --chmod=774 --from=builder $VENV_ROOT $VENV_ROOT
 COPY --chown=root:root --chmod=774 --from=build-static $STATIC_ROOT $STATIC_ROOT
+COPY --from=builder /tmp/sentry_plugin.so /tvp/sentry_plugin.so
 
 # Activate virtualenv by setting some environment variables.
 ENV PATH=$VENV_ROOT/bin:$PATH \
