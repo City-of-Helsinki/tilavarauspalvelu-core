@@ -35,7 +35,7 @@ vi.mock("@ui/modules/apollo/helpers", () => ({
 }));
 
 function createRejectedOccurrence(
-  overrides: Partial<RejectedOccurrencesTableElementFragment> = {},
+  overrides: Partial<RejectedOccurrencesTableElementFragment> = {}
 ): RejectedOccurrencesTableElementFragment {
   return {
     __typename: "RejectedOccurrenceNode",
@@ -55,7 +55,7 @@ function createRejectedOccurrence(
 function listMock(
   rejectedOccurrences: RejectedOccurrencesTableElementFragment[],
   totalCount: number,
-  hasNextPage = false,
+  hasNextPage = false
 ): MockedResponse {
   return {
     request: { query: RejectedOccurrencesDocument },
@@ -106,7 +106,7 @@ function renderLoader(mocks: MockedResponse[]) {
   return render(
     <MockedProvider mocks={mocks} cache={createCache()}>
       <RejectedOccurrencesDataLoader applicationRoundPk={1} unitOptions={[]} />
-    </MockedProvider>,
+    </MockedProvider>
   );
 }
 
@@ -118,23 +118,17 @@ describe("RejectedOccurrencesDataLoader", () => {
   it("shows the loading spinner until the query resolves", () => {
     renderLoader([listMock([createRejectedOccurrence()], 1)]);
     // Table is not rendered while loading (spinner is shown instead)
-    expect(
-      screen.queryByTestId("hds-table-sorting-header-applicant"),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId("hds-table-sorting-header-applicant")).not.toBeInTheDocument();
   });
 
   it("renders the rejected occurrences table once the query resolves", async () => {
     renderLoader([listMock([createRejectedOccurrence()], 1)]);
-    expect(
-      await screen.findByTestId("hds-table-sorting-header-applicant"),
-    ).toBeInTheDocument();
+    expect(await screen.findByTestId("hds-table-sorting-header-applicant")).toBeInTheDocument();
   });
 
   it("shows the empty state when there are no rejected occurrences", async () => {
     renderLoader([listMock([], 0)]);
-    expect(
-      await screen.findByText("common:noFilteredResults"),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("common:noFilteredResults")).toBeInTheDocument();
   });
 
   it("shows an error toast when the query returns a GraphQL error", async () => {
@@ -142,7 +136,7 @@ describe("RejectedOccurrencesDataLoader", () => {
     await waitFor(() =>
       expect(mockErrorToast).toHaveBeenCalledWith({
         text: "errors:errorFetchingData",
-      }),
+      })
     );
   });
 
@@ -158,9 +152,7 @@ describe("RejectedOccurrencesDataLoader", () => {
     ]);
 
     // Wait for table to render with first page
-    expect(
-      await screen.findByTestId("hds-table-sorting-header-applicant"),
-    ).toBeInTheDocument();
+    expect(await screen.findByTestId("hds-table-sorting-header-applicant")).toBeInTheDocument();
     const moreButton = screen.getByRole("button", { name: "common:showMore" });
     expect(moreButton).toBeInTheDocument();
 
@@ -169,16 +161,12 @@ describe("RejectedOccurrencesDataLoader", () => {
 
     // fetchMore should request the next page using the cursor returned by the first page
     await waitFor(() => {
-      expect(secondPageMatcher).toHaveBeenCalledWith(
-        expect.objectContaining({ after: "cursor-1" }),
-      );
+      expect(secondPageMatcher).toHaveBeenCalledWith(expect.objectContaining({ after: "cursor-1" }));
     });
   });
 
   it("shows the all-results message when every rejected occurrence has been loaded", async () => {
     renderLoader([listMock([createRejectedOccurrence()], 1, false)]);
-    expect(
-      await screen.findByText("translation:paging.allResults"),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("translation:paging.allResults")).toBeInTheDocument();
   });
 });
