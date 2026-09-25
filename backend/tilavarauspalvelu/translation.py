@@ -40,7 +40,6 @@ if TYPE_CHECKING:
 __all__ = [
     "get_attr_by_language",
     "get_translated",
-    "get_translated",
     "translate_for_user",
     "translated",
 ]
