@@ -1,6 +1,8 @@
 import React from "react";
+import { InMemoryCache } from "@apollo/client";
 import { MockedProvider } from "@apollo/client/testing";
 import type { MockedResponse } from "@apollo/client/testing";
+import { relayStylePagination } from "@apollo/client/utilities";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
@@ -33,7 +35,7 @@ vi.mock("@ui/modules/apollo/helpers", () => ({
 }));
 
 function createRejectedOccurrence(
-  overrides: Partial<RejectedOccurrencesTableElementFragment> = {}
+  overrides: Partial<RejectedOccurrencesTableElementFragment> = {},
 ): RejectedOccurrencesTableElementFragment {
   return {
     __typename: "RejectedOccurrenceNode",
@@ -53,7 +55,7 @@ function createRejectedOccurrence(
 function listMock(
   rejectedOccurrences: RejectedOccurrencesTableElementFragment[],
   totalCount: number,
-  hasNextPage = false
+  hasNextPage = false,
 ): MockedResponse {
   return {
     request: { query: RejectedOccurrencesDocument },
@@ -66,7 +68,11 @@ function listMock(
             __typename: "RejectedOccurrenceNodeEdge",
             node,
           })),
-          pageInfo: { __typename: "PageInfo", endCursor: "cursor-1", hasNextPage },
+          pageInfo: {
+            __typename: "PageInfo",
+            endCursor: "cursor-1",
+            hasNextPage,
+          },
           totalCount,
         },
       },
@@ -82,11 +88,25 @@ function errorMock(): MockedResponse {
   };
 }
 
+// Mirrors the `rejectedOccurrences` merge policy from src/modules/apolloClient.ts so
+// fetchMore pagination behaves the same way in tests as it does in the app.
+function createCache(): InMemoryCache {
+  return new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          rejectedOccurrences: relayStylePagination(),
+        },
+      },
+    },
+  });
+}
+
 function renderLoader(mocks: MockedResponse[]) {
   return render(
-    <MockedProvider mocks={mocks}>
+    <MockedProvider mocks={mocks} cache={createCache()}>
       <RejectedOccurrencesDataLoader applicationRoundPk={1} unitOptions={[]} />
-    </MockedProvider>
+    </MockedProvider>,
   );
 }
 
@@ -98,47 +118,67 @@ describe("RejectedOccurrencesDataLoader", () => {
   it("shows the loading spinner until the query resolves", () => {
     renderLoader([listMock([createRejectedOccurrence()], 1)]);
     // Table is not rendered while loading (spinner is shown instead)
-    expect(screen.queryByTestId("hds-table-sorting-header-applicant")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("hds-table-sorting-header-applicant"),
+    ).not.toBeInTheDocument();
   });
 
   it("renders the rejected occurrences table once the query resolves", async () => {
     renderLoader([listMock([createRejectedOccurrence()], 1)]);
-    expect(await screen.findByTestId("hds-table-sorting-header-applicant")).toBeInTheDocument();
+    expect(
+      await screen.findByTestId("hds-table-sorting-header-applicant"),
+    ).toBeInTheDocument();
   });
 
   it("shows the empty state when there are no rejected occurrences", async () => {
     renderLoader([listMock([], 0)]);
-    expect(await screen.findByText("common:noFilteredResults")).toBeInTheDocument();
+    expect(
+      await screen.findByText("common:noFilteredResults"),
+    ).toBeInTheDocument();
   });
 
   it("shows an error toast when the query returns a GraphQL error", async () => {
     renderLoader([errorMock()]);
-    await waitFor(() => expect(mockErrorToast).toHaveBeenCalledWith({ text: "errors:errorFetchingData" }));
+    await waitFor(() =>
+      expect(mockErrorToast).toHaveBeenCalledWith({
+        text: "errors:errorFetchingData",
+      }),
+    );
   });
 
   it("shows the More button when there are more results, and fetches the next page on click", async () => {
     const user = userEvent.setup();
+    const secondPageMatcher = vi.fn().mockReturnValue(true);
     renderLoader([
-      listMock([createRejectedOccurrence()], 2, true),
-      listMock([createRejectedOccurrence(), createRejectedOccurrence({ pk: 2 })], 2),
+      listMock([createRejectedOccurrence({ pk: 1 })], 2, true),
+      {
+        ...listMock([createRejectedOccurrence({ pk: 2 })], 2),
+        variableMatcher: secondPageMatcher,
+      },
     ]);
 
     // Wait for table to render with first page
-    expect(await screen.findByTestId("hds-table-sorting-header-applicant")).toBeInTheDocument();
+    expect(
+      await screen.findByTestId("hds-table-sorting-header-applicant"),
+    ).toBeInTheDocument();
     const moreButton = screen.getByRole("button", { name: "common:showMore" });
     expect(moreButton).toBeInTheDocument();
 
     // Click More to fetch second page
     await user.click(moreButton);
 
-    // After clicking More, pagination should complete and button should be responsive
+    // fetchMore should request the next page using the cursor returned by the first page
     await waitFor(() => {
-      expect(moreButton).not.toBeDisabled();
+      expect(secondPageMatcher).toHaveBeenCalledWith(
+        expect.objectContaining({ after: "cursor-1" }),
+      );
     });
   });
 
   it("shows the all-results message when every rejected occurrence has been loaded", async () => {
     renderLoader([listMock([createRejectedOccurrence()], 1, false)]);
-    expect(await screen.findByText("translation:paging.allResults")).toBeInTheDocument();
+    expect(
+      await screen.findByText("translation:paging.allResults"),
+    ).toBeInTheDocument();
   });
 });
