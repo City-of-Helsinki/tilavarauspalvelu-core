@@ -5,7 +5,10 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { SearchReservationUnitsDocument } from "@gql/gql-types";
+import {
+  ReservationUnitOrderingChoices,
+  SearchReservationUnitsDocument,
+} from "@gql/gql-types";
 import type { ReservationUnitTableElementFragment } from "@gql/gql-types";
 import { ReservationUnitsDataReader } from "./ReservationUnitsDataLoader";
 
@@ -24,8 +27,12 @@ vi.mock("@/context/EnvContext", () => ({
 }));
 
 vi.mock("ui/src/components/statuses", () => ({
-  ReservationUnitPublishingStatusLabel: ({ state }: { state: string }) => <span>{state}</span>,
-  ReservationUnitReservationStatusLabel: ({ state }: { state: string }) => <span>{state}</span>,
+  ReservationUnitPublishingStatusLabel: ({ state }: { state: string }) => (
+    <span>{state}</span>
+  ),
+  ReservationUnitReservationStatusLabel: ({ state }: { state: string }) => (
+    <span>{state}</span>
+  ),
 }));
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
@@ -40,7 +47,7 @@ vi.mock("ui/src/components/toast", () => ({
 }));
 
 function createReservationUnit(
-  overrides: Partial<ReservationUnitTableElementFragment> = {}
+  overrides: Partial<ReservationUnitTableElementFragment> = {},
 ): ReservationUnitTableElementFragment {
   return {
     __typename: "ReservationUnitNode",
@@ -68,7 +75,7 @@ function createReservationUnit(
 function listMock(
   reservationUnits: ReservationUnitTableElementFragment[],
   totalCount: number,
-  hasNextPage = false
+  hasNextPage = false,
 ): MockedResponse {
   return {
     request: { query: SearchReservationUnitsDocument },
@@ -77,8 +84,15 @@ function listMock(
       data: {
         reservationUnits: {
           __typename: "ReservationUnitNodeConnection",
-          edges: reservationUnits.map((node) => ({ __typename: "ReservationUnitNodeEdge", node })),
-          pageInfo: { __typename: "PageInfo", endCursor: "cursor-1", hasNextPage },
+          edges: reservationUnits.map((node) => ({
+            __typename: "ReservationUnitNodeEdge",
+            node,
+          })),
+          pageInfo: {
+            __typename: "PageInfo",
+            endCursor: "cursor-1",
+            hasNextPage,
+          },
           totalCount,
         },
       },
@@ -96,14 +110,19 @@ function errorMock(): MockedResponse {
 
 function Wrapper() {
   const [selectedRows, setSelectedRows] = useState<Array<number | string>>([]);
-  return <ReservationUnitsDataReader selectedRows={selectedRows} setSelectedRows={setSelectedRows} />;
+  return (
+    <ReservationUnitsDataReader
+      selectedRows={selectedRows}
+      setSelectedRows={setSelectedRows}
+    />
+  );
 }
 
 function renderLoader(mocks: MockedResponse[]) {
   return render(
     <MockedProvider mocks={mocks}>
       <Wrapper />
-    </MockedProvider>
+    </MockedProvider>,
   );
 }
 
@@ -126,17 +145,26 @@ describe("ReservationUnitsDataReader", () => {
 
   it("shows the empty state when there are no reservation units", async () => {
     renderLoader([listMock([], 0)]);
-    expect(await screen.findByText("common:noFilteredResults")).toBeInTheDocument();
+    expect(
+      await screen.findByText("common:noFilteredResults"),
+    ).toBeInTheDocument();
   });
 
   it("shows an error toast when the query returns a GraphQL error", async () => {
     renderLoader([errorMock()]);
-    await waitFor(() => expect(mockErrorToast).toHaveBeenCalledWith({ text: "errors:errorFetchingData" }));
+    await waitFor(() =>
+      expect(mockErrorToast).toHaveBeenCalledWith({
+        text: "errors:errorFetchingData",
+      }),
+    );
   });
 
   it("shows the More button when there are more results, and fetches the next page on click", async () => {
     const user = userEvent.setup();
-    renderLoader([listMock([createReservationUnit()], 2, true), listMock([createReservationUnit()], 2)]);
+    renderLoader([
+      listMock([createReservationUnit()], 2, true),
+      listMock([createReservationUnit()], 2),
+    ]);
 
     expect(await screen.findByText("Reservation Unit 1")).toBeInTheDocument();
     const moreButton = screen.getByRole("button", { name: "common:showMore" });
@@ -148,19 +176,39 @@ describe("ReservationUnitsDataReader", () => {
 
   it("shows the all-results message when every reservation unit has been loaded", async () => {
     renderLoader([listMock([createReservationUnit()], 1, false)]);
-    expect(await screen.findByText("translation:paging.allResults")).toBeInTheDocument();
+    expect(
+      await screen.findByText("translation:paging.allResults"),
+    ).toBeInTheDocument();
   });
 
   it("toggles the sort field for every sortable column when its header is clicked", async () => {
     const user = userEvent.setup();
 
     // Map sort keys to their enum values (transformOrderBy logic)
-    const sortMap: Record<string, [string, string]> = {
-      nameFi: ["NameFiAsc", "NameFiDesc"],
-      unitNameFi: ["UnitNameFiAsc", "UnitNameFiDesc"],
-      typeFi: ["TypeFiAsc", "TypeFiDesc"],
-      maxPersons: ["MaxPersonsAsc", "MaxPersonsDesc"],
-      surfaceArea: ["SurfaceAreaAsc", "SurfaceAreaDesc"],
+    const sortMap: Record<
+      string,
+      [ReservationUnitOrderingChoices, ReservationUnitOrderingChoices]
+    > = {
+      nameFi: [
+        ReservationUnitOrderingChoices.NameFiAsc,
+        ReservationUnitOrderingChoices.NameFiDesc,
+      ],
+      unitNameFi: [
+        ReservationUnitOrderingChoices.UnitNameFiAsc,
+        ReservationUnitOrderingChoices.UnitNameFiDesc,
+      ],
+      typeFi: [
+        ReservationUnitOrderingChoices.TypeFiAsc,
+        ReservationUnitOrderingChoices.TypeFiDesc,
+      ],
+      maxPersons: [
+        ReservationUnitOrderingChoices.MaxPersonsAsc,
+        ReservationUnitOrderingChoices.MaxPersonsDesc,
+      ],
+      surfaceArea: [
+        ReservationUnitOrderingChoices.SurfaceAreaAsc,
+        ReservationUnitOrderingChoices.SurfaceAreaDesc,
+      ],
     };
 
     // Create mocks for initial load + each column's ascending and descending orders
@@ -175,8 +223,17 @@ describe("ReservationUnitsDataReader", () => {
           data: {
             reservationUnits: {
               __typename: "ReservationUnitNodeConnection",
-              edges: [{ __typename: "ReservationUnitNodeEdge", node: createReservationUnit() }],
-              pageInfo: { __typename: "PageInfo", endCursor: "cursor-1", hasNextPage: false },
+              edges: [
+                {
+                  __typename: "ReservationUnitNodeEdge",
+                  node: createReservationUnit(),
+                },
+              ],
+              pageInfo: {
+                __typename: "PageInfo",
+                endCursor: "cursor-1",
+                hasNextPage: false,
+              },
               totalCount: 1,
             },
           },
@@ -193,8 +250,17 @@ describe("ReservationUnitsDataReader", () => {
             data: {
               reservationUnits: {
                 __typename: "ReservationUnitNodeConnection",
-                edges: [{ __typename: "ReservationUnitNodeEdge", node: createReservationUnit() }],
-                pageInfo: { __typename: "PageInfo", endCursor: "cursor-1", hasNextPage: false },
+                edges: [
+                  {
+                    __typename: "ReservationUnitNodeEdge",
+                    node: createReservationUnit(),
+                  },
+                ],
+                pageInfo: {
+                  __typename: "PageInfo",
+                  endCursor: "cursor-1",
+                  hasNextPage: false,
+                },
                 totalCount: 1,
               },
             },
@@ -210,8 +276,17 @@ describe("ReservationUnitsDataReader", () => {
             data: {
               reservationUnits: {
                 __typename: "ReservationUnitNodeConnection",
-                edges: [{ __typename: "ReservationUnitNodeEdge", node: createReservationUnit() }],
-                pageInfo: { __typename: "PageInfo", endCursor: "cursor-1", hasNextPage: false },
+                edges: [
+                  {
+                    __typename: "ReservationUnitNodeEdge",
+                    node: createReservationUnit(),
+                  },
+                ],
+                pageInfo: {
+                  __typename: "PageInfo",
+                  endCursor: "cursor-1",
+                  hasNextPage: false,
+                },
                 totalCount: 1,
               },
             },
