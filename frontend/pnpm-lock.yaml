@@ -170,8 +170,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       zod:
-        specifier: ^4.1.13
-        version: 4.4.3
+        specifier: ^4.6.5
+        version: 4.6.5
     devDependencies:
       '@happy-dom/jest-environment':
         specifier: ^20.8.9
@@ -330,8 +330,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       zod:
-        specifier: ^4.1.13
-        version: 4.4.3
+        specifier: ^4.6.5
+        version: 4.6.5
     devDependencies:
       '@happy-dom/jest-environment':
         specifier: ^20.8.9
@@ -460,8 +460,8 @@ importers:
         specifier: workspace:*
         version: link:../tsconfig
       zod:
-        specifier: ^4.1.13
-        version: 4.4.3
+        specifier: ^4.6.5
+        version: 4.6.5
     devDependencies:
       '@apollo/client':
         specifier: ^3.14.0
@@ -5522,8 +5522,8 @@ packages:
   zen-observable@0.8.15:
     resolution: {integrity: sha512-PQ2PC7R9rslx84ndNBZB/Dkv8V8fZEpk83RLgXtYd0fwUgEjseMn1Dgajh2x6S8QbZAFa9p2qVCEuYZNgve0dQ==}
 
-  zod@4.4.3:
-    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
+  zod@4.6.5:
+    resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
 
 snapshots:
 
@@ -10365,4 +10365,4 @@ snapshots:
 
   zen-observable@0.8.15: {}
 
-  zod@4.4.3: {}
+  zod@4.6.5: {}
