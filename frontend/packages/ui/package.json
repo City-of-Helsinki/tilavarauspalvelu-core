@@ -9,8 +9,8 @@
   "main": "./src/index.ts",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "lint": "oxlint . -c ../../.oxlintrc.json --type-aware --type-check",
-    "lint:fix": "oxlint . --fix -c ../../.oxlintrc.json --type-aware --type-check",
+    "lint": "oxlint --type-aware --type-check",
+    "lint:fix": "oxlint --type-aware --type-check --fix",
     "lint:css": "stylelint './src/**/*.tsx'",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
