@@ -79,7 +79,7 @@ function createReservation(overrides: Partial<ReservationNotificationFragment> =
       pk: 10,
     },
     ...overrides,
-  } as ReservationNotificationFragment;
+  };
 }
 
 function mockReservations(reservations: ReadonlyArray<ReservationNotificationFragment>): void {

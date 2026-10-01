@@ -48,7 +48,7 @@ function createUnit(overrides: Partial<SpacesTableFragment> = {}): SpacesTableFr
       },
     ],
     ...overrides,
-  } as SpacesTableFragment;
+  };
 }
 
 beforeEach(() => {

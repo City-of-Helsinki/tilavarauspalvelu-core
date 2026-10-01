@@ -55,7 +55,7 @@ function createReservation(overrides: Partial<ChangeReservationTimeFragment> = {
       reservationStartInterval: ReservationStartInterval.Interval_15Minutes,
     },
     ...overrides,
-  } as ChangeReservationTimeFragment;
+  };
 }
 
 beforeEach(() => {
