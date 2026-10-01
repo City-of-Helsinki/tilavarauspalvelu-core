@@ -60,8 +60,6 @@
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/coverage-istanbul": "^4.1.11",
     "happy-dom": "^20.8.9",
-    "oxlint": "^1.85.0",
-    "oxlint-tsgolint": "^7.0.2003",
     "postcss-styled-syntax": "^0.7.1",
     "stylelint": "^16.26.1",
     "stylelint-config-standard": "^39.0.1",
