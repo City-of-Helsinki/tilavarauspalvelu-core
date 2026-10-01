@@ -33,17 +33,17 @@
     "@graphql-codegen/typescript": "^5.0.5",
     "@graphql-codegen/typescript-operations": "^5.0.5",
     "@graphql-codegen/typescript-react-apollo": "^4.3.3",
-    "@graphql-tools/graphql-tag-pluck": "^8.3.26",
-    "@parcel/watcher": "^2.5.1",
+    "@graphql-tools/graphql-tag-pluck": "^8.3.37",
+    "@parcel/watcher": "^2.6.0",
     "glob": "^13.0.0",
-    "graphql-config": "^5.1.5",
+    "graphql-config": "^5.1.7",
     "husky": "^9.1.7",
     "npkill": "^0.12.2",
     "oxfmt": "^0.70.0",
     "oxlint": "^1.85.0",
     "oxlint-tsgolint": "^7.0.2003",
     "ts-node": "^10.9.2",
-    "turbo": "^2.6.1"
+    "turbo": "^2.11.3"
   },
   "engines": {
     "npm": "pnpm"
