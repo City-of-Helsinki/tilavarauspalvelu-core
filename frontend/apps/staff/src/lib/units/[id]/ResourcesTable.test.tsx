@@ -31,7 +31,7 @@ function createUnit(overrides: Partial<ResourceTableFragment> = {}): ResourceTab
       },
     ],
     ...overrides,
-  } as ResourceTableFragment;
+  };
 }
 
 beforeEach(() => {

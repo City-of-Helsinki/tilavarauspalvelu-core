@@ -1,7 +1,6 @@
 // This file configures the initialization of Sentry on the client.
 // The added config here will be used whenever a users loads a page in their browser.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
-import type { IntegrationFn } from "@sentry/core";
 import { thirdPartyErrorFilterIntegration } from "@sentry/core";
 import * as Sentry from "@sentry/nextjs";
 import { captureRouterTransitionStart, replayIntegration } from "@sentry/nextjs";
@@ -22,7 +21,7 @@ if (env.NEXT_PUBLIC_SENTRY_DSN) {
       thirdPartyErrorFilterIntegration({
         filterKeys: env.NEXT_PUBLIC_SENTRY_PROJECT ? [env.NEXT_PUBLIC_SENTRY_PROJECT] : [],
         behaviour: "drop-error-if-contains-third-party-frames",
-      }) as IntegrationFn,
+      }),
     ],
     dsn: env.NEXT_PUBLIC_SENTRY_DSN,
     environment: env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,

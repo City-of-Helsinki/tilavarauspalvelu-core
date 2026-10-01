@@ -43,7 +43,7 @@ function createReservation(overrides: Partial<DenyDialogFieldsFragment> = {}): D
     price: "0",
     paymentOrder: null,
     ...overrides,
-  } as DenyDialogFieldsFragment;
+  };
 }
 
 async function selectDenyReason(label = "Reason one") {
