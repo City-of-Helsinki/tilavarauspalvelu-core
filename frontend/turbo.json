@@ -6,12 +6,6 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
-    "tsc:check": {
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/ui/**/*/*.ts", "$TURBO_ROOT$/packages/ui/**/*.tsx"]
-    },
-    "tsc:clean": {
-      "cache": false
-    },
     "lint:css": {},
     "format": {
       "cache": false

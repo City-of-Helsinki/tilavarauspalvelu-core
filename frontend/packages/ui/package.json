@@ -14,9 +14,7 @@
     "lint:css": "stylelint './src/**/*.tsx'",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "test": "SKIP_ENV_VALIDATION=true TZ=Europe/Helsinki vitest run",
-    "tsc:check": "tsc --noEmit --project tsconfig.json",
-    "tsc:clean": "tsc --build --clean"
+    "test": "SKIP_ENV_VALIDATION=true TZ=Europe/Helsinki vitest run"
   },
   "dependencies": {
     "@sentry/core": "^10.51.0",

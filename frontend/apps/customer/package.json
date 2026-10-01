@@ -13,9 +13,7 @@
     "lint:fix": "oxlint --type-aware --type-check --fix",
     "lint:css": "stylelint '**/*.tsx'",
     "format": "oxfmt",
-    "format:check": "oxfmt --check",
-    "tsc:check": "tsc --noEmit --project tsconfig.json",
-    "tsc:clean": "tsc --build --clean"
+    "format:check": "oxfmt --check"
   },
   "dependencies": {
     "@apollo/client": "^3.14.0",
