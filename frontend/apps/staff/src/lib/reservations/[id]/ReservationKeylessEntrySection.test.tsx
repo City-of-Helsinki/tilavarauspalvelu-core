@@ -29,7 +29,7 @@ function createUser(overrides: Partial<UserNode> = {}): UserNode {
     unitRoles: [],
     generalRoles: [],
     ...overrides,
-  } as UserNode;
+  };
 }
 
 const mockUseSession = vi.fn();
@@ -63,7 +63,7 @@ function createReservation(overrides: Partial<ReservationKeylessEntryFragment> =
     },
     reservationSeries: null,
     ...overrides,
-  } as ReservationKeylessEntryFragment;
+  };
 }
 
 beforeEach(() => {
