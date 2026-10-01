@@ -710,7 +710,7 @@ version = "0.4.0"
 description = "Distribution utilities"
 optional = false
 python-versions = "*"
-groups = ["lint"]
+groups = ["dev", "lint"]
 files = [
     {file = "distlib-0.4.0-py2.py3-none-any.whl", hash = "sha256:9659f7d87e46584a30b5780e43ac7a2143098441670ff0a49d5f9034c54a6c16"},
     {file = "distlib-0.4.0.tar.gz", hash = "sha256:feec40075be03a04501a973d81f633735b4b69f98b05450592310c0f401a4e0d"},
@@ -1493,7 +1493,7 @@ version = "3.25.2"
 description = "A platform independent file lock."
 optional = false
 python-versions = ">=3.10"
-groups = ["lint"]
+groups = ["dev", "lint"]
 files = [
     {file = "filelock-3.25.2-py3-none-any.whl", hash = "sha256:ca8afb0da15f229774c9ad1b455ed96e85a81373065fb10446672f64444ddf70"},
     {file = "filelock-3.25.2.tar.gz", hash = "sha256:b64ece2b38f4ca29dd3e810287aa8c48182bbecd1ae6e9ae126c9b35f1382694"},
@@ -2526,7 +2526,7 @@ version = "4.4.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
 optional = false
 python-versions = ">=3.9"
-groups = ["lint"]
+groups = ["dev", "lint"]
 files = [
     {file = "platformdirs-4.4.0-py3-none-any.whl", hash = "sha256:abd01743f24e5287cd7a5db3752faf1a2d65353f38ec26d98e25a6db65958c85"},
     {file = "platformdirs-4.4.0.tar.gz", hash = "sha256:ca753cf4d81dc309bc67b0ea38fd15dc97bc30ce419a7f58d13eb3bf14c4febf"},
@@ -3094,23 +3094,18 @@ six = ">=1.5"
 
 [[package]]
 name = "python-discovery"
-version = "1.2.1"
+version = "1.6.1"
 description = "Python interpreter discovery"
 optional = false
 python-versions = ">=3.8"
-groups = ["lint"]
+groups = ["dev", "lint"]
 files = [
-    {file = "python_discovery-1.2.1-py3-none-any.whl", hash = "sha256:b6a957b24c1cd79252484d3566d1b49527581d46e789aaf43181005e56201502"},
-    {file = "python_discovery-1.2.1.tar.gz", hash = "sha256:180c4d114bff1c32462537eac5d6a332b768242b76b69c0259c7d14b1b680c9e"},
+    {file = "python_discovery-1.6.1-py3-none-any.whl", hash = "sha256:d43fcdef879fe795352bd13ccf8d185ba5a9f86f36cfcd00529f596e737442b3"},
+    {file = "python_discovery-1.6.1.tar.gz", hash = "sha256:cf87d3627dfb4412437fdd5b13eae402607722998d21567993aedbc59b23c15e"},
 ]
 
 [package.dependencies]
 filelock = ">=3.15.4"
-platformdirs = ">=4.3.6,<5"
-
-[package.extras]
-docs = ["furo (>=2025.12.19)", "sphinx (>=9.1)", "sphinx-autodoc-typehints (>=3.6.3)", "sphinxcontrib-mermaid (>=2)"]
-testing = ["covdefaults (>=2.3)", "coverage (>=7.5.4)", "pytest (>=8.3.5)", "pytest-mock (>=3.14)", "setuptools (>=75.1)"]
 
 [[package]]
 name = "python-dotenv"
@@ -3711,21 +3706,21 @@ files = [
 
 [[package]]
 name = "virtualenv"
-version = "21.2.0"
+version = "21.7.12"
 description = "Virtual Python Environment builder"
 optional = false
-python-versions = ">=3.8"
-groups = ["lint"]
+python-versions = ">=3.9"
+groups = ["dev", "lint"]
 files = [
-    {file = "virtualenv-21.2.0-py3-none-any.whl", hash = "sha256:1bd755b504931164a5a496d217c014d098426cddc79363ad66ac78125f9d908f"},
-    {file = "virtualenv-21.2.0.tar.gz", hash = "sha256:1720dc3a62ef5b443092e3f499228599045d7fea4c79199770499df8becf9098"},
+    {file = "virtualenv-21.7.12-py3-none-any.whl", hash = "sha256:3572a2e13deac1c2727e48ec43dc962f698c453c5c90eb2bd737c81bcd2ac0b0"},
+    {file = "virtualenv-21.7.12.tar.gz", hash = "sha256:5b6576455f10637067cc20c3f9f7c677575eecaa8c95fc049db2f650652befd5"},
 ]
 
 [package.dependencies]
 distlib = ">=0.3.7,<1"
 filelock = {version = ">=3.24.2,<4", markers = "python_version >= \"3.10\""}
 platformdirs = ">=3.9.1,<5"
-python-discovery = ">=1"
+python-discovery = ">=1.6"
 
 [[package]]
 name = "wcwidth"
