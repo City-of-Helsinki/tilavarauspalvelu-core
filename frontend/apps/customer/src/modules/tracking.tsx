@@ -2,9 +2,12 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 
 const trackPageView = () => {
+  if (typeof window === "undefined") {
+    return;
+  }
   try {
-    const _paq = (window._paq = window._paq || []);
-    _paq.push(["trackPageView"]);
+    window._paq = window._paq || [];
+    window._paq.push(["trackPageView"]);
   } catch {
     // ignore
   }

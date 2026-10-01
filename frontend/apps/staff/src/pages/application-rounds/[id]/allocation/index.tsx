@@ -144,17 +144,17 @@ function ApplicationRoundAllocation({
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
 
-  const setSelectedReservationUnit = (value: number | null) => {
-    const setSingleValueSearchParam = (param: string, value: string | null) => {
-      const vals = new URLSearchParams(searchParams);
-      if (value == null) {
-        vals.delete(param);
-      } else {
-        vals.set(param, value);
-      }
-      setParams(vals);
-    };
+  const setSingleValueSearchParam = (param: string, value: string | null) => {
+    const vals = new URLSearchParams(searchParams);
+    if (value == null) {
+      vals.delete(param);
+    } else {
+      vals.set(param, value);
+    }
+    setParams(vals);
+  };
 
+  const setSelectedReservationUnit = (value: number | null) => {
     setSingleValueSearchParam("reservationUnit", value?.toString() ?? null);
   };
 
