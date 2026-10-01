@@ -79,7 +79,6 @@ __all__ = [
     "ReservationUnitImage",
     "ReservationUnitOption",
     "ReservationUnitPricing",
-    "ReservationUnitPricing",
     "ReservationUnitType",
     "Resource",
     "Space",
