@@ -12,10 +12,10 @@
     "lint": "oxlint . -c ../../.oxlintrc.json --type-aware --type-check",
     "lint:fix": "oxlint . --fix -c ../../.oxlintrc.json --type-aware --type-check",
     "lint:css": "stylelint '**/*.tsx'",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "tsc:check": "tsc --noEmit --project tsconfig.json",
-    "tsc:clean": "tsc --build --clean",
-    "format:check": "prettier --ignore-path \"../../.prettierignore\" --check --experimental-cli .",
-    "format": "prettier --ignore-path \"../../.prettierignore\" --write --experimental-cli ."
+    "tsc:clean": "tsc --build --clean"
   },
   "dependencies": {
     "@apollo/client": "^3.14.0",
@@ -34,7 +34,6 @@
     "next-compose-plugins": "^2.2.1",
     "next-i18next": "^15.4.3",
     "nuka-carousel": "^7.0.0",
-    "prettier-config": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "7.66.1",
@@ -64,7 +63,6 @@
     "oxlint": "^1.85.0",
     "oxlint-tsgolint": "^7.0.2003",
     "postcss-styled-syntax": "^0.7.1",
-    "prettier": "^3.7.1",
     "stylelint": "^16.26.1",
     "stylelint-config-standard": "^39.0.1",
     "stylelint-config-styled-components": "^0.1.1",
