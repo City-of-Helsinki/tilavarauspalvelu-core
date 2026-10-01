@@ -1,16 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "import",
-    "jsx-a11y",
-    "nextjs",
-    "oxc",
-    "promise",
-    "react",
-    "typescript",
-    "unicorn",
-    "vitest"
-  ],
+  "plugins": ["import", "jsx-a11y", "nextjs", "oxc", "promise", "react", "typescript", "unicorn", "vitest"],
   "categories": {
     "correctness": "off"
   },
@@ -195,9 +185,7 @@
     "import/no-namespace": [
       "error",
       {
-        "ignore": [
-          "@sentry/nextjs"
-        ]
+        "ignore": ["@sentry/nextjs"]
       }
     ],
     "import/no-self-import": "error",
@@ -303,10 +291,7 @@
     "react/jsx-filename-extension": [
       "error",
       {
-        "extensions": [
-          ".jsx",
-          ".tsx"
-        ]
+        "extensions": [".jsx", ".tsx"]
       }
     ],
     "react/jsx-key": "error",
@@ -514,10 +499,7 @@
     "unicorn/require-array-join-separator": "error",
     "unicorn/require-number-to-fixed-digits-argument": "error",
     "unicorn/require-post-message-target-origin": "error",
-    "unicorn/switch-case-braces": [
-      "error",
-      "avoid"
-    ],
+    "unicorn/switch-case-braces": ["error", "avoid"],
     "unicorn/text-encoding-identifier-case": "error",
     "unicorn/throw-new-error": "error"
   },
@@ -536,30 +518,20 @@
   ],
   "overrides": [
     {
-      "files": [
-        "instrumentation-client.ts",
-        "next.config.ts"
-      ],
+      "files": ["instrumentation-client.ts", "next.config.ts"],
       "rules": {
         "import/namespace": "off",
         "import/no-namespace": "off"
       }
     },
     {
-      "files": [
-        "next-env.d.ts"
-      ],
+      "files": ["next-env.d.ts"],
       "rules": {
         "import/extensions": "off"
       }
     },
     {
-      "files": [
-        "**/*.ts",
-        "**/*.tsx",
-        "**/*.mts",
-        "**/*.cts"
-      ],
+      "files": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
       "rules": {
         "no-class-assign": "off",
         "no-const-assign": "off",
@@ -580,19 +552,13 @@
       }
     },
     {
-      "files": [
-        "**/next-env.d.ts"
-      ],
+      "files": ["**/next-env.d.ts"],
       "rules": {
         "triple-slash-reference": "off"
       }
     },
     {
-      "files": [
-        "**/*.test.ts*",
-        "**/vitest.setup.ts",
-        "**/mocks.ts"
-      ],
+      "files": ["**/*.test.ts*", "**/vitest.setup.ts", "**/mocks.ts"],
       "rules": {
         "oxc/no-accumulating-spread": "off",
         "promise/avoid-new": "off",
@@ -608,10 +574,7 @@
       }
     },
     {
-      "files": [
-        "**/*.config.*",
-        "**/apolloClient.ts"
-      ],
+      "files": ["**/*.config.*", "**/apolloClient.ts"],
       "rules": {
         "typescript/no-unsafe-call": "off",
         "typescript/no-unsafe-member-access": "off",
@@ -619,9 +582,7 @@
       }
     },
     {
-      "files": [
-        "**/pages/**"
-      ],
+      "files": ["**/pages/**"],
       "rules": {
         "import/no-default-export": "off",
         "unicorn/filename-case": [
@@ -633,9 +594,7 @@
       }
     },
     {
-      "files": [
-        "**/RichTextInput.tsx"
-      ],
+      "files": ["**/RichTextInput.tsx"],
       "rules": {
         "import/no-default-export": "off"
       }
