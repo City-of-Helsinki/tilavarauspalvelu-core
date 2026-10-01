@@ -14,5 +14,4 @@ export default defineConfig({
     "^@gql/(.*)$",
     "^[./]",
   ],
-  ignorePatterns: ["**.json"],
 });
