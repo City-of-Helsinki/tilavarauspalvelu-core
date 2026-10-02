@@ -65,6 +65,10 @@ export function removeTrailingSlash(url: string): string {
 export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: string): Promise<unknown> {
   const { cookies, headers } = req;
   const newHeaders = new Headers({
+    // TODO: spreading headers doesn't copy them but have to test it in OpenShift
+    // headers.entries().toArray() gives all the values, but we shouldn't forward all of them.
+    // Not changing this now but it should either copy all the headers or be removed completely
+    // oxlint-disable-next-line typescript/no-misused-spread -- TODO: header copy should be more intentional
     ...headers,
     "Content-Type": "application/json",
   });
