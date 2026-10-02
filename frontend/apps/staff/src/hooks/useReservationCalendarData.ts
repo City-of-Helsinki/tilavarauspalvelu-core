@@ -86,7 +86,7 @@ function convertReservationToCalendarEvent(r: CalendarReservationFragment, block
 function getEventName({
   type,
   title,
-  blockedName = null,
+  blockedName,
 }: {
   type: Maybe<ReservationTypeChoice>;
   title: string;
