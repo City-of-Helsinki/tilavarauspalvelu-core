@@ -123,7 +123,7 @@ export function EditStep1({ reservation, options, onBack, form }: Props): React.
           input,
         },
       });
-      router.push(`${getReservationPath(reservation.pk)}?timeUpdated=true`);
+      await router.push(`${getReservationPath(reservation.pk)}?timeUpdated=true`);
     } catch (err) {
       displayError(err);
     }

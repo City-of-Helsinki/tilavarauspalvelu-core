@@ -269,7 +269,7 @@ function ReservationUnit({
       if (pk == null) {
         throw new Error("Reservation creation failed");
       }
-      router.push(getReservationInProgressPath(reservationUnit.pk, pk));
+      await router.push(getReservationInProgressPath(reservationUnit.pk, pk));
     } catch (err) {
       displayError(err);
     }

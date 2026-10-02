@@ -82,8 +82,8 @@ export function Filters({
   });
 
   const { handleSubmit, control, reset } = form;
-  const onSubmit = (data: SearchFormValues) => {
-    setSearchParams(mapFormToSearchParams(data));
+  const onSubmit: (data: SearchFormValues) => Promise<void> = async (data) => {
+    await setSearchParams(mapFormToSearchParams(data));
   };
   useEffect(() => {
     reset(mapParamsToForm(searchParams));

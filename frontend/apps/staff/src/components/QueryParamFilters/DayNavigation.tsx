@@ -58,14 +58,14 @@ export function DayNavigation({ name }: Props): React.ReactElement {
   const searchParams = useSearchParams();
   const setSearchParams = useSetSearchParams();
 
-  const handleChange = (value: string) => {
+  const handleChange: (value: string) => Promise<void> = async (value) => {
     const params = new URLSearchParams(searchParams);
     if (value.length > 0) {
       params.set(name, value);
     } else {
       params.delete(name);
     }
-    setSearchParams(params);
+    await setSearchParams(params);
   };
 
   const uiDate = searchParams.get(name) ?? "";
@@ -73,10 +73,10 @@ export function DayNavigation({ name }: Props): React.ReactElement {
   const d = parseUIDate(uiDate) ?? new Date();
 
   const onPreviousDay = () => {
-    handleChange(formatDate(subDays(d, 1)));
+    void handleChange(formatDate(subDays(d, 1)));
   };
   const onNextDay = () => {
-    handleChange(formatDate(addDays(d, 1)));
+    void handleChange(formatDate(addDays(d, 1)));
   };
 
   // unsafe is fine here d is a valid date and getDay has only 6 possible values

@@ -18,7 +18,7 @@ type Props = {
   reservationSeriesPk: number;
   onSelect?: (selected: number) => void;
   onChange?: () => Promise<unknown>;
-  onReservationUpdated?: () => void;
+  onReservationUpdated?: () => Promise<unknown>;
   // optional reservation to copy when creating a new reservation (e.g. one reservation from that series)
   // contains a lot more information than the ReservationSeriesQuery
   reservationToCopy?: ReservationToCopyFragment;
@@ -40,10 +40,10 @@ export function ReservationSeriesView({
     return <CenterSpinner />;
   }
 
-  const handleChangeSuccess = () => {
+  const handleChangeSuccess: () => Promise<void> = async () => {
     setModalContent(null);
-    refetch();
-    onChange?.();
+    await refetch();
+    void onChange?.();
   };
 
   const handleChange = (res: (typeof reservations)[0]) => {
@@ -60,9 +60,9 @@ export function ReservationSeriesView({
     setModalContent(
       <DenyDialog
         reservation={res}
-        onReject={() => {
-          refetch();
-          onReservationUpdated?.();
+        onReject={async () => {
+          await refetch();
+          await onReservationUpdated?.();
           handleCloseRemoveDialog();
         }}
         onClose={handleCloseRemoveDialog}

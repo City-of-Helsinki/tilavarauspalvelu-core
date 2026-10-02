@@ -24,7 +24,7 @@ export function useSort(validSortKeys: string[]): [string | null, (field: string
   const orderBy = validSort(validSortKeys, sort) ? sort : null;
 
   // Only supports a single sort key
-  const handleSortChanged = (field: string) => {
+  const handleSortChanged: (field: string) => Promise<void> = async (field) => {
     const params = new URLSearchParams(searchParams);
     if (field === orderBy) {
       // Handle combined keys (e.g. application_id,pk)
@@ -34,7 +34,7 @@ export function useSort(validSortKeys: string[]): [string | null, (field: string
     } else {
       params.set("orderBy", field);
     }
-    setParams(params);
+    await setParams(params);
   };
 
   return [orderBy, handleSortChanged];

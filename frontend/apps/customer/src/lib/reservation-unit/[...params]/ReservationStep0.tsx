@@ -150,7 +150,7 @@ export function ReservationStep0({ reservation, cancelReservation, options }: Pr
     } catch (err) {
       // NOT_FOUND is non-recoverable so redirect to the reservation unit page
       if (isNotFoundError(err)) {
-        router.push(getReservationUnitPath(reservation.reservationUnit?.pk));
+        await router.push(getReservationUnitPath(reservation.reservationUnit?.pk));
       }
       displayError(err);
     }

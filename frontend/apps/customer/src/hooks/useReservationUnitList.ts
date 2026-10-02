@@ -27,28 +27,28 @@ export function useReservationUnitList(round: HookVars | undefined): Reservation
   const searchValues = useSearchParams();
   const { handleRouteChange } = useSearchModify();
 
-  const selectReservationUnit = (ru: Node) => {
+  const selectReservationUnit: (ru: Node) => Promise<void> = async (ru) => {
     if (ru.pk == null) {
       return;
     }
     const vals = new URLSearchParams(searchValues);
     vals.append(SEASONAL_SELECTED_PARAM_KEY, ru.pk.toString());
-    handleRouteChange(vals);
+    await handleRouteChange(vals);
   };
 
-  const removeReservationUnit = (ru: Node) => {
+  const removeReservationUnit: (ru: Node) => Promise<void> = async (ru) => {
     if (!ru.pk) {
       return;
     }
     const vals = new URLSearchParams(searchValues);
     vals.delete(SEASONAL_SELECTED_PARAM_KEY, ru.pk.toString());
-    handleRouteChange(vals);
+    await handleRouteChange(vals);
   };
 
-  const clearSelections = () => {
+  const clearSelections: () => Promise<void> = async () => {
     const vals = new URLSearchParams(searchValues);
     vals.delete(SEASONAL_SELECTED_PARAM_KEY);
-    handleRouteChange(vals);
+    await handleRouteChange(vals);
   };
 
   const containsReservationUnit = (ru: Node): boolean => {

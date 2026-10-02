@@ -238,10 +238,10 @@ function ApplicationDateRangePicker({
         language={lang}
         id={beginField}
         label={t("application:Page1.periodStartDate")}
-        onChange={(v) => {
+        onChange={async (v) => {
           clearErrors([beginField, endField]);
           setValue(beginField, v);
-          trigger([beginField, endField]);
+          await trigger([beginField, endField]);
         }}
         value={getValues(beginField)}
         required
@@ -255,10 +255,10 @@ function ApplicationDateRangePicker({
         language={lang}
         id={endField}
         label={t("application:Page1.periodEndDate")}
-        onChange={(v) => {
+        onChange={async (v) => {
           clearErrors([beginField, endField]);
           setValue(endField, v);
-          trigger([beginField, endField]);
+          await trigger([beginField, endField]);
         }}
         value={getValues(endField)}
         required

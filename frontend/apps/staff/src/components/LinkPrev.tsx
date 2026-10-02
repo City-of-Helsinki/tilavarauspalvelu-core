@@ -33,9 +33,9 @@ type Props = {
 function LinkPrevInner({ route, style, className }: Props): React.ReactElement {
   const { t } = useTranslation();
   const router = useRouter();
-  const handleClick = () => {
+  const handleClick: () => Promise<void> = async () => {
     if (route) {
-      router.replace(route);
+      await router.replace(route);
     } else {
       router.back();
     }

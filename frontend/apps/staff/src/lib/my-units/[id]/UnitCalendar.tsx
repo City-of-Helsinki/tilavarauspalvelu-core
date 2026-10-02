@@ -267,7 +267,7 @@ function Cell({
 
   const isClosed = getIsCellClosed(offset, reservableTimeSpans, date);
 
-  const handleOpenModal = () => {
+  const handleOpenModal: () => Promise<void> = async () => {
     if (!hasPermission) {
       return;
     }
@@ -276,18 +276,18 @@ function Cell({
     params.set("isModalOpen", "true");
     params.set("timeOffset", offset.toString());
     params.set("cellId", cellId);
-    setParams(params);
+    await setParams(params);
   };
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
-    handleOpenModal();
+    void handleOpenModal();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      handleOpenModal();
+      void handleOpenModal();
     }
   };
 

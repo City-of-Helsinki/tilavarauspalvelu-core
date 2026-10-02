@@ -151,11 +151,11 @@ export function TimeBlockSection({
   const searchParams = useSearchParams();
   const setSearchParams = useSetSearchParams();
 
-  const setSelected = (pk: number) => {
+  const setSelected: (pk: number) => Promise<void> = async (pk) => {
     const params = new URLSearchParams(searchParams);
     if (pk > 0) {
       params.set("selected", pk.toString());
-      setSearchParams(params);
+      await setSearchParams(params);
       const selectedReservation = reservations.find((x) => x.pk === pk);
       if (selectedReservation) {
         setFocusDate(new Date(selectedReservation.beginsAt));
@@ -163,7 +163,7 @@ export function TimeBlockSection({
       }
     } else {
       params.delete("selected");
-      setSearchParams(params);
+      await setSearchParams(params);
     }
   };
 
@@ -181,7 +181,7 @@ export function TimeBlockSection({
   // so update the calendar when that happens.
   useEffect(() => {
     if (reservation != null) {
-      calendarRefetch();
+      void calendarRefetch();
     }
   }, [reservation, calendarRefetch]);
 
@@ -213,11 +213,11 @@ export function TimeBlockSection({
           ref={calendarRef}
           reservation={reservation}
           focusDate={focusDate}
-          refetch={(d) => {
-            onReservationUpdated();
+          refetch={async (d) => {
+            await onReservationUpdated();
             // NOTE setting focus date refetches calendar data, don't double refetch
             if (!d || focusDate === d) {
-              calendarRefetch();
+              await calendarRefetch();
             } else {
               setFocusDate(d);
             }

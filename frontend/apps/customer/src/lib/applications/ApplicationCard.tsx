@@ -71,9 +71,9 @@ export function ApplicationCard({ application, actionCallback }: Props): React.R
     try {
       await mutation();
       setIsWaitingForDelete(false);
-      actionCallback("cancel");
+      await actionCallback("cancel");
     } catch {
-      actionCallback("error");
+      await actionCallback("error");
     }
   };
 

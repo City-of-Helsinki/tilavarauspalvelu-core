@@ -133,10 +133,10 @@ export function SingleSearchForm({
     }
   };
 
-  const onSearch: SubmitHandler<SearchFormValues> = (criteria: SearchFormValues) => {
+  const onSearch: SubmitHandler<SearchFormValues> = async (criteria: SearchFormValues) => {
     // We need to pass all form values, even empty ones, to the search handler
     // to ensure that all search params are updated/cleared correctly
-    handleSearch(criteria, true);
+    await handleSearch(criteria, true);
   };
 
   // All fields that are normally initially hidden
@@ -180,9 +180,9 @@ export function SingleSearchForm({
           label={t("searchForm:labels.textSearch")}
           placeholder={t("searchForm:placeholders.textSearch")}
           {...register("textSearch")}
-          onKeyDown={(e) => {
+          onKeyDown={async (e) => {
             if (e.key === "Enter") {
-              handleSubmit(onSearch)();
+              await handleSubmit(onSearch)();
             }
           }}
         />

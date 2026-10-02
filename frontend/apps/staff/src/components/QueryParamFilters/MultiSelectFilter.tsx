@@ -22,13 +22,13 @@ export function MultiSelectFilter(props: MultiSelectFilterProps): React.ReactEle
 
   const filter = searchParams.getAll(name);
 
-  const setFilter = (value: string[]) => {
+  const setFilter: (value: string[]) => Promise<void> = async (value) => {
     const params = new URLSearchParams(searchParams);
     params.delete(name);
     for (const v of value) {
       params.append(name, v);
     }
-    setParams(params);
+    await setParams(params);
   };
   return <BaseMultiSelectFilter {...props} filter={filter} setFilter={setFilter} />;
 }

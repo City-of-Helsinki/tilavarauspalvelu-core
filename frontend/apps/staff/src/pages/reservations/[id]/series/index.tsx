@@ -260,15 +260,15 @@ function SeriesPageInner({ pk }: { pk: number }) {
           reservationUnit: reservationUnit.nameFi,
         }),
       });
-      refetch();
-      router.push(getReservationUrl(first.pk));
+      await refetch();
+      await router.push(getReservationUrl(first.pk));
     } catch (err) {
       if (err instanceof ApolloError) {
         const errs = getSeriesOverlapErrors(err);
         const overlaps = errs.flatMap((x) => x.overlapping);
         const count = overlaps.length;
         if (count > 0) {
-          checkedReservations.refetch();
+          await checkedReservations.refetch();
           setLocalError(t("myUnits:ReservationSeriesForm.newOverlapError", { count }));
           document.querySelector("#edit-recurring__reservations-list")?.scrollIntoView();
         } else {
