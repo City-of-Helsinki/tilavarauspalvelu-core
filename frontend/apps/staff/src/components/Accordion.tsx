@@ -93,7 +93,7 @@ export function Accordion({
   style,
   ...rest
 }: {
-  heading: string | React.ReactElement | null;
+  heading: string;
   initiallyOpen?: boolean;
   open?: boolean;
   children: ReactNode;

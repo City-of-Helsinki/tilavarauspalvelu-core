@@ -7,7 +7,7 @@ import { ApplicationRoundCard } from "./ApplicationRoundCard";
 
 function createApplicationRoundCard({
   status = ApplicationRoundStatusChoice.Open,
-  name = "Test",
+  name,
 }: {
   status?: ApplicationRoundStatusChoice;
   name: string;

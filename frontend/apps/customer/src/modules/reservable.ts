@@ -279,7 +279,7 @@ function isRangeReservable_({
   reservationEndsAt,
   reservationsMinDaysBefore = 0,
   reservationsMaxDaysBefore = 0,
-  activeApplicationRounds = [],
+  activeApplicationRounds,
 }: {
   range: Date[];
   reservableTimes: ReservableMap;

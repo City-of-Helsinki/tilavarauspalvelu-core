@@ -64,7 +64,7 @@ export function logError(err: unknown, level: "warning" | "error" = "error") {
     log({ logLevel: level }, err);
     Sentry.captureMessage(err, level);
   } else {
-    log({ logLevel: level }, `Exception: ${err}`);
+    log({ logLevel: level }, `Exception: ${String(err)}`);
     Sentry.captureException(err, { level });
   }
 }
