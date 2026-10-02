@@ -208,17 +208,17 @@ export function InProgressReservationNotification(): React.ReactElement {
       }
     } finally {
       if (shouldRedirectAfterDelete(reservation.pk, router.pathname, router.query)) {
-        router.push("/");
+        await router.push("/");
       } else {
         await refreshQueryCache();
       }
     }
   };
 
-  const handleCheckout = (reservation: ReservationNotificationFragment) => {
+  const handleCheckout = async (reservation: ReservationNotificationFragment) => {
     const checkoutUrl = getCheckoutUrl(reservation.paymentOrder, lang);
     if (checkoutUrl) {
-      router.push(checkoutUrl);
+      await router.push(checkoutUrl);
     }
   };
 
@@ -240,7 +240,7 @@ export function InProgressReservationNotification(): React.ReactElement {
       return;
     }
     const url = getReservationInProgressPath(reservation.reservationUnit.pk, reservation.pk);
-    router.push(url);
+    await router.push(url);
   };
 
   // We want to only show the most recent reservation one of each type

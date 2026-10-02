@@ -44,7 +44,7 @@ export function NewSpaceModal({ unit, closeModal, refetch, parentSpacePk }: Prop
         name: values.nameFi,
       });
       closeModal();
-      refetch();
+      await refetch();
     } catch (err) {
       displayError(err);
     }

@@ -53,7 +53,7 @@ export function ApplicationStepper({ application }: Readonly<StepperProps>): Rea
     state: calculateAvailableStep(application, i),
   }));
 
-  const handleStepClick = (i: number) => {
+  const handleStepClick = async (i: number) => {
     const targetPage = PAGES_WITH_STEPPER[i];
     if (targetPage == null) {
       return;
@@ -62,7 +62,7 @@ export function ApplicationStepper({ application }: Readonly<StepperProps>): Rea
       return; // already on the page, so do nothing
     }
 
-    push(getApplicationPath(application?.pk, targetPage));
+    await push(getApplicationPath(application?.pk, targetPage));
   };
 
   const selectedStep = getStep((pathname.split("/").pop() as (typeof PAGES_WITH_STEPPER)[number]) ?? "page1");

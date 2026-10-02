@@ -30,8 +30,8 @@ export function ApprovalButtonsRecurring({
   // check if there are any reservations that can be deleted
   const { loading, reservations, refetch } = useReservationSeries(reservationSeries.pk ?? undefined);
 
-  const handleReject = () => {
-    refetch();
+  const handleReject: () => Promise<void> = async () => {
+    await refetch();
     handleAccept();
   };
 

@@ -104,13 +104,13 @@ function NewReservation(props: PropsNarrowed): React.ReactElement | null {
   const pageTitle =
     step === 0 ? t("reservationCalendar:heading.newReservation") : t("reservationCalendar:heading.pendingReservation");
 
-  const cancelReservation = () => {
+  const cancelReservation = async () => {
     try {
       const input = { pk: reservation?.pk?.toString() ?? "" };
-      deleteReservation({ variables: { input } });
+      await deleteReservation({ variables: { input } });
     } finally {
       // ignore errors
-      router.push(getReservationUnitPath(reservationUnit?.pk));
+      void router.push(getReservationUnitPath(reservationUnit?.pk));
     }
   };
 

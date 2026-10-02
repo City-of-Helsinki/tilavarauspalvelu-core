@@ -149,8 +149,8 @@ export function ReservationUnitModalContent({
   const query = useSearchQuery(variables);
   const { data, isLoading, error } = query;
   const { handleSearch } = useSearchModify();
-  const onSearch = (criteria: SearchFormValues) => {
-    handleSearch(criteria, true);
+  const onSearch: (criteria: SearchFormValues) => Promise<void> = async (criteria) => {
+    await handleSearch(criteria, true);
   };
 
   const reservationUnits = filterNonNullable(data?.reservationUnits?.edges.map((n) => n?.node));

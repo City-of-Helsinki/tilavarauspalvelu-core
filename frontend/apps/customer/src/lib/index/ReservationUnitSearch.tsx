@@ -35,11 +35,11 @@ export function ReservationUnitSearch(): React.ReactElement {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSubmit = (event: React.FormEvent | React.MouseEvent) => {
+  const handleSubmit = async (event: React.FormEvent | React.MouseEvent) => {
     event.preventDefault();
     const params = new URLSearchParams();
     params.set("textSearch", searchTerm);
-    router.push(getSingleSearchPath(params));
+    await router.push(getSingleSearchPath(params));
   };
 
   return (

@@ -220,7 +220,7 @@ export function BottomButtonsStripe({
       }
       await archiveMutation({ variables: { input: { pk: reservationUnit.pk } } });
       successToast({ text: t("reservationUnitEditor:ArchiveDialog.success") });
-      router.push(getUnitUrl(unit?.pk));
+      await router.push(getUnitUrl(unit?.pk));
     } catch (err) {
       displayError(err);
     }

@@ -201,14 +201,14 @@ function NavigationLink({
   }
   const shouldDisplayCount = title === "navigation:requestedReservations" && count && count > 0;
 
-  const handleClick = (evt: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleClick: (evt: React.MouseEvent<HTMLAnchorElement>) => Promise<void> = async (evt) => {
     evt.preventDefault();
     const route = routes[0];
     if (route != null) {
       // NOTE: this is a workaround for the HDS Header component not closing the mobile menu on navigation, if there isn't a page reload
       // TODO: remove this when HDS Header is fixed
       document.querySelector("#Menu")?.querySelector("button")?.click();
-      router.push(route);
+      await router.push(route);
     }
   };
 

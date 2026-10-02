@@ -66,7 +66,7 @@ export function SpacesTable({ unit, refetch }: IProps): React.ReactElement {
       }
       if (res.data?.deleteSpace?.deleted) {
         setSpaceWaitingForDelete(null);
-        refetch();
+        await refetch();
       } else {
         errorToast({ text: t("spaces:SpaceTable.removeFailed") });
       }
@@ -106,12 +106,12 @@ export function SpacesTable({ unit, refetch }: IProps): React.ReactElement {
     );
   }
 
-  function handleEditSpace(space: SpaceT) {
+  async function handleEditSpace(space: SpaceT): Promise<void> {
     const link = getSpaceUrl(space.pk, unit?.pk);
     if (link === "") {
       return;
     }
-    router.push(link);
+    await router.push(link);
   }
 
   const cols: SpacesTableColumn[] = [
@@ -203,8 +203,8 @@ export function SpacesTable({ unit, refetch }: IProps): React.ReactElement {
           acceptLabel={t("spaces:SpaceTable.removeConfirmationAccept")}
           cancelLabel={t("spaces:SpaceTable.removeConfirmationCancel")}
           onCancel={() => setSpaceWaitingForDelete(null)}
-          onAccept={() => {
-            deleteSpace(spaceWaitingForDelete.pk);
+          onAccept={async () => {
+            await deleteSpace(spaceWaitingForDelete.pk);
           }}
         />
       )}

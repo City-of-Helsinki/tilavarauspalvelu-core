@@ -58,10 +58,10 @@ export default function MyUnitsPage({
   const selectedTab = searchParams.get("tab") ?? "unit";
   const activeTab = selectedTab === "reservation-unit" ? 1 : 0;
 
-  const handleTabChange = (tab: "unit" | "reservation-unit") => {
+  const handleTabChange: (tab: "unit" | "reservation-unit") => Promise<void> = async (tab) => {
     const vals = new URLSearchParams(searchParams);
     vals.set("tab", tab);
-    setSearchParams(vals);
+    await setSearchParams(vals);
   };
 
   const recurringReservationUrl = getReservationSeriesUrl(unit.pk);
@@ -162,12 +162,12 @@ export default function MyUnitsPage({
           reservationUnitOptions={reservationUnitOptions}
           focusAfterCloseRef={modalCloseRef as React.RefObject<HTMLElement>}
           start={addMinutes(selectedDate, timeOffset * 30)}
-          onClose={() => {
+          onClose={async () => {
             const params = new URLSearchParams(searchParams);
             params.delete("isModalOpen");
             params.delete("timeOffset");
             params.delete("cellId");
-            setSearchParams(params);
+            await setSearchParams(params);
           }}
         />
       )}

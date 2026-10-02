@@ -27,17 +27,17 @@ export function SearchTags({
   const params = useSearchParams();
   const setParams = useSetSearchParams();
 
-  const handleDelete = (tag: { key: string; value: string }) => {
+  const handleDelete: (tag: { key: string; value: string }) => Promise<void> = async (tag) => {
     const vals = new URLSearchParams(params);
     vals.delete(tag.key, tag.value);
     // Use an empty proxy so default values don't override user choices
     if (!vals.has(tag.key) && defaultTags.some((d) => d.key === tag.key)) {
       vals.set(tag.key, "");
     }
-    setParams(vals);
+    await setParams(vals);
   };
 
-  const handleReset = () => {
+  const handleReset: () => Promise<void> = async () => {
     const newParams = new URLSearchParams();
     for (const [key, value] of params) {
       if (hide.includes(key) && value !== "") {
@@ -53,7 +53,7 @@ export function SearchTags({
         newParams.set(d.key, d.value);
       }
     }
-    setParams(newParams);
+    await setParams(newParams);
   };
 
   const tags: Array<{ key: string; value: string; tr: string }> = [];

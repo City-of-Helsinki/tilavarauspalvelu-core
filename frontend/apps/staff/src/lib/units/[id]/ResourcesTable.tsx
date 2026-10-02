@@ -80,11 +80,11 @@ export function ResourcesTable({ unit, refetch }: IProps): React.ReactElement {
     null
   );
 
-  function handleEditResource(pk: Maybe<number> | undefined) {
+  async function handleEditResource(pk: Maybe<number> | undefined): Promise<void> {
     if (pk == null || unit?.pk == null) {
       return;
     }
-    router.push(getResourceUrl(pk, unit.pk));
+    await router.push(getResourceUrl(pk, unit.pk));
   }
 
   function handleDeleteResource(resource: Pick<ResourceT, "pk" | "nameFi">) {
@@ -102,7 +102,7 @@ export function ResourcesTable({ unit, refetch }: IProps): React.ReactElement {
   });
   const displayError = useDisplayError();
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete: () => Promise<void> = async () => {
     if (resourceWaitingForDelete?.pk == null) {
       return;
     }
@@ -110,7 +110,7 @@ export function ResourcesTable({ unit, refetch }: IProps): React.ReactElement {
       await deleteResource(resourceWaitingForDelete.pk);
       successToast({ text: t("spaces:ResourceTable.removeSuccess") });
       setResourceWaitingForDelete(null);
-      refetch();
+      await refetch();
     } catch (err) {
       displayError(err);
     }
@@ -132,7 +132,7 @@ export function ResourcesTable({ unit, refetch }: IProps): React.ReactElement {
           acceptLabel={t("spaces:ResourceTable.removeConfirmationAccept")}
           cancelLabel={t("spaces:ResourceTable.removeConfirmationCancel")}
           onCancel={() => setResourceWaitingForDelete(null)}
-          onAccept={handleConfirmDelete}
+          onAccept={() => void handleConfirmDelete()}
         />
       )}
     </>

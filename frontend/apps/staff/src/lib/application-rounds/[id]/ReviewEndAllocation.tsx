@@ -52,7 +52,7 @@ export function ReviewEndAllocation({
       displayError(err);
     }
     // refetch even on errors (someone else might have ended the allocation)
-    refetch();
+    await refetch();
   };
 
   const handleSendResults = async () => {
@@ -63,7 +63,7 @@ export function ReviewEndAllocation({
     } catch (err) {
       displayError(err);
     }
-    refetch();
+    await refetch();
   };
 
   const hasFailed =

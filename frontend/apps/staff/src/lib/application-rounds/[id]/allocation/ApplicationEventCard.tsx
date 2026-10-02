@@ -280,7 +280,7 @@ function SchedulesList({
           },
         },
       });
-      refetch();
+      await refetch();
     } catch (err) {
       displayError(err);
     }

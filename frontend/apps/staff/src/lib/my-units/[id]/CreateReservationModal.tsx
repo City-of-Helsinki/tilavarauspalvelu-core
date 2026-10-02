@@ -218,7 +218,7 @@ function DialogContent({
   // show errors if the clicked start date is invalid (both previous day and today but in the past)
   useEffect(() => {
     if (startDate < new Date()) {
-      trigger();
+      void trigger();
     }
   }, [startDate, trigger]);
 
@@ -227,7 +227,7 @@ function DialogContent({
   useEffect(() => {
     // Is touched is always false with controller
     if (getFieldState("date").isDirty) {
-      trigger();
+      void trigger();
     }
   }, [formDate, trigger, getFieldState]);
 
@@ -236,7 +236,7 @@ function DialogContent({
   useEffect(() => {
     // Is touched is always false with controller
     if (getFieldState("endTime").isDirty) {
-      trigger("endTime");
+      void trigger("endTime");
     }
   }, [formStartTime, trigger, getFieldState]);
 
@@ -356,8 +356,8 @@ function ActionContainer({
         type="button"
         iconStart={isSubmitting ? <LoadingSpinner small /> : undefined}
         disabled={isDisabled}
-        onClick={() => {
-          handleSubmit(onSubmit)();
+        onClick={async () => {
+          await handleSubmit(onSubmit)();
         }}
         data-testid="CreateReservationModal__accept-reservation"
       >

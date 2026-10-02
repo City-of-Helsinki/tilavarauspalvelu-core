@@ -7,23 +7,25 @@ export function useSearchModify() {
   const router = useRouter();
   const searchValues = useSearchParams();
 
-  const handleRouteChange = (query: URLSearchParams | ParsedUrlQueryInput) => {
+  const handleRouteChange: (query: URLSearchParams | ParsedUrlQueryInput) => Promise<boolean> = (query) => {
     if (query instanceof URLSearchParams) {
       // [id] param is not included in the URLSearchParams object but required when routing
       const id = ignoreMaybeArray(router.query.id);
       if (id) {
         query.set("id", id);
       }
-      router.replace({ query: query.toString() }, undefined, {
+      return router.replace({ query: query.toString() }, undefined, {
         shallow: true,
         scroll: false,
       });
-    } else {
-      router.replace({ query }, undefined, { shallow: true, scroll: false });
     }
+    return router.replace({ query }, undefined, { shallow: true, scroll: false });
   };
 
-  const handleSearch = (criteria: Record<string, unknown>, force: boolean) => {
+  const handleSearch: (criteria: Record<string, unknown>, force: boolean) => Promise<void> = async (
+    criteria,
+    force
+  ) => {
     const { sort, order, ref } = router.query;
     const newSort = sort != null && !Array.isArray(sort) ? sort : null;
     const newOrder = order != null && !Array.isArray(order) ? order : null;
@@ -46,11 +48,11 @@ export function useSearchModify() {
       ...router.query,
       ...newValues,
     };
-    handleRouteChange(query);
+    await handleRouteChange(query);
   };
 
   /// @param hideList - list of keys to ignore when resetting the query
-  const handleResetTags = (hideList: ReadonlyArray<string>) => {
+  const handleResetTags = async (hideList: ReadonlyArray<string>) => {
     const params = new URLSearchParams();
     for (const key of hideList) {
       const values = searchValues.getAll(key);
@@ -59,10 +61,10 @@ export function useSearchModify() {
       }
     }
 
-    handleRouteChange(params);
+    await handleRouteChange(params);
   };
 
-  const handleRemoveTag = (key: string, value?: string) => {
+  const handleRemoveTag = async (key: string, value?: string) => {
     // Forbidding resetting all filters (need to rework this so we always remove a single value)
     if (key.length === 0) {
       throw new Error("key must have at least one value");
@@ -86,7 +88,7 @@ export function useSearchModify() {
       newValues.delete(key);
     }
 
-    handleRouteChange(newValues);
+    await handleRouteChange(newValues);
   };
 
   return { handleSearch, handleRemoveTag, handleResetTags, handleRouteChange };
