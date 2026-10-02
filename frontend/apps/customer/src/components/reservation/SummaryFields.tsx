@@ -120,7 +120,7 @@ function convertMaybeOptionValue(
     } else if (typeof rawValue === "string" && rawValue !== "") {
       return extendedOptions[optionsKey].find((option) => option.value === rawValue)?.label ?? "";
     }
-    logError(`convertMaybeOptionValue: rawValue is not pk, but object: ${rawValue}`);
+    logError(`convertMaybeOptionValue: rawValue is not pk, but object: ${rawValue?.toString()}`);
     return "unknown";
   } else if (typeof rawValue === "boolean") {
     return t(`common:${String(rawValue)}`);
