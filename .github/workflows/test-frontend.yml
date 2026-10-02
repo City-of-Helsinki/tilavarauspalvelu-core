@@ -44,10 +44,9 @@ jobs:
         working-directory: frontend
         run: |
           pnpm codegen
-          pnpm tsc:check --filter=staff...
-          pnpm lint
-          pnpm lint:css --filter=staff...
-          pnpm format:check --filter=staff...
+          pnpm --filter=staff... lint
+          pnpm --filter=staff... lint:css
+          pnpm --filter=staff... format:check
 
   test-staff-ui:
     name: Staff ui unit test
@@ -76,7 +75,7 @@ jobs:
         working-directory: frontend
         run: |
           pnpm codegen
-          pnpm test:coverage --filter=staff...
+          pnpm --filter=staff... test:coverage
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v7
@@ -113,10 +112,9 @@ jobs:
         working-directory: frontend
         run: |
           pnpm codegen
-          pnpm tsc:check --filter=customer...
-          pnpm lint
-          pnpm lint:css --filter=customer...
-          pnpm format:check --filter=customer...
+          pnpm --filter=customer... lint
+          pnpm --filter=customer... lint:css
+          pnpm --filter=customer... format:check
 
   test-customer-ui:
     name: Customer ui unit tests
@@ -145,7 +143,7 @@ jobs:
         working-directory: frontend
         run: |
           pnpm codegen
-          pnpm test:coverage --filter=customer...
+          pnpm --filter=customer... test:coverage
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v7

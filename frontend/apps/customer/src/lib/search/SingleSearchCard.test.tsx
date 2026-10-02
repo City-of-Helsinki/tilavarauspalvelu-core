@@ -34,8 +34,7 @@ vi.mock("@/modules/urls", () => ({
 
 vi.mock("ui/src/modules/helpers", () => ({
   getLocalizationLang: () => "fi",
-  getTranslation: (obj: unknown) =>
-    typeof obj === "object" && obj != null && "nameFi" in obj ? (obj as { nameFi: unknown }).nameFi : null,
+  getTranslation: (obj: unknown) => (typeof obj === "object" && obj != null && "nameFi" in obj ? obj.nameFi : null),
   getImageSource: (img: unknown) => (img ? "https://example.com/image.jpg" : undefined),
   getMainImage: (ru: { images?: ReadonlyArray<unknown> }) => ru?.images?.[0] ?? null,
 }));
@@ -65,7 +64,7 @@ function createMockReservationUnit(overrides: Partial<SingleSearchCardFragment> 
       nameSv: "Test Unit Name",
     },
     ...overrides,
-  } as SingleSearchCardFragment;
+  };
 }
 
 describe("SingleSearchCard", () => {

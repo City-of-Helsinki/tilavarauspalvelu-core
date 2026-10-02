@@ -2,28 +2,9 @@
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "build": {
-      "env": [
-        "SENTRY_*",
-        "SKIP_ENV_VALIDATION",
-        "FEEDBACK_URL"
-      ],
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
-      ]
-    },
-    "tsc:check": {
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "$TURBO_ROOT$/packages/ui/**/*/*.ts",
-        "$TURBO_ROOT$/packages/ui/**/*.tsx"
-      ]
-    },
-    "tsc:clean": {
-      "cache": false
+      "env": ["SENTRY_*", "SKIP_ENV_VALIDATION", "FEEDBACK_URL"],
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint:css": {},
     "format": {
@@ -33,22 +14,12 @@
       "cache": false
     },
     "test": {
-      "env": [
-        "SKIP_ENV_VALIDATION"
-      ],
-      "inputs": [
-        "**/*.tsx",
-        "**/*.ts",
-        "test/**/*.ts",
-        "test/**/*.tsx"
-      ]
+      "env": ["SKIP_ENV_VALIDATION"],
+      "inputs": ["**/*.tsx", "**/*.ts", "test/**/*.ts", "test/**/*.tsx"]
     },
     "test:coverage": {
       "cache": false,
-      "env": [
-        "CI",
-        "SKIP_ENV_VALIDATION"
-      ]
+      "env": ["CI", "SKIP_ENV_VALIDATION"]
     },
     "dev": {
       "cache": false,
