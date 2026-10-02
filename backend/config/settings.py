@@ -343,6 +343,7 @@ class Common(Environment):
 
     SESSION_SERIALIZER = "helusers.sessions.TunnistamoOIDCSerializer"
     SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    ENGINE = "django.contrib.gis.db.backends.postgis"
     SESSION_CACHE_ALIAS = "default"
 
     # Disable password authentication of the default ProxyModelBackend, which uses HelusersModelBackend.
