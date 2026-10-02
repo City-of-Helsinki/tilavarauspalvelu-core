@@ -26,7 +26,7 @@ export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT)
 
   const selectedAeasPk = toNumber(params.get("aes"));
 
-  const setFocused = (aes?: SectionNodeT) => {
+  const setFocused: (aes?: SectionNodeT) => Promise<void> = async (aes) => {
     const p = new URLSearchParams(params);
     if (aes?.pk != null) {
       p.set("aes", aes.pk.toString());
@@ -34,7 +34,7 @@ export function useFocusApplicationEvent(): [number | null, (aes?: SectionNodeT)
     } else {
       p.delete("aes");
     }
-    setParams(p);
+    await setParams(p);
   };
 
   return [selectedAeasPk, setFocused];
@@ -50,7 +50,7 @@ export function useFocusAllocatedSlot(): [
 
   const allocatedPk = params.get("allocated") ? Number(params.get("allocated")) : undefined;
 
-  const setAllocated = (allocated?: Pick<AllocatedTimeSlotNodeT, "pk">) => {
+  const setAllocated: (allocated?: Pick<AllocatedTimeSlotNodeT, "pk">) => Promise<void> = async (allocated) => {
     const p = new URLSearchParams(params);
     if (allocated?.pk != null) {
       p.set("allocated", allocated.pk.toString());
@@ -58,7 +58,7 @@ export function useFocusAllocatedSlot(): [
     } else {
       p.delete("allocated");
     }
-    setParams(p);
+    await setParams(p);
   };
 
   return [allocatedPk, setAllocated];

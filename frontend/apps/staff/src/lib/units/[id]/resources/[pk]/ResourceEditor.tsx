@@ -91,8 +91,8 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
       successToast({
         text: t("spaces:resourceUpdatedNotification"),
       });
-      refetch();
-      router.replace(getUnitUrl(unit.pk, "spaces-resources"));
+      await refetch();
+      await router.replace(getUnitUrl(unit.pk, "spaces-resources"));
     } catch (err) {
       displayError(err);
     }

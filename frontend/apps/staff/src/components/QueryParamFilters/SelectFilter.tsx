@@ -22,14 +22,14 @@ export function SelectFilter(props: SelectFilterProps) {
   const searchParams = useSearchParams();
   const setParams = useSetSearchParams();
 
-  const onChange = (value: string | number | null | undefined) => {
+  const onChange: (value: string | number | null | undefined) => Promise<void> = async (value) => {
     const params = new URLSearchParams(searchParams);
     if (value != null) {
       params.set(name, value.toString());
     } else {
       params.delete(name);
     }
-    setParams(params);
+    await setParams(params);
   };
 
   const value = searchParams.get(name) ?? "";

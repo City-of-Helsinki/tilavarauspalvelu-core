@@ -94,30 +94,30 @@ export function SortingComponent() {
   const isOrderingAsc = searchValues.get("order") !== "desc";
   const value = validateSorting(searchValues.get("sort"));
 
-  const handleSort = (sort: string) => {
+  const handleSort: (sort: string) => Promise<void> = async (sort) => {
     const params = new URLSearchParams(searchValues);
     params.set("sort", sort);
-    handleRouteChange(params);
+    await handleRouteChange(params);
   };
 
-  const handleOrderChange = (order: "asc" | "desc") => {
+  const handleOrderChange: (order: "asc" | "desc") => Promise<void> = async (order) => {
     const params = new URLSearchParams(searchValues);
     params.set("order", order);
-    handleRouteChange(params);
+    await handleRouteChange(params);
   };
 
-  const handleSelect = (options: Option[]) => {
+  const handleSelect: (options: Option[]) => void = (options) => {
     const val = options.find((option) => option.selected)?.value;
     if (val != null) {
-      handleSort(val);
+      void handleSort(val);
     }
   };
 
-  const toggleOrder = () => {
+  const toggleOrder: () => Promise<void> = async () => {
     if (isOrderingAsc) {
-      handleOrderChange("desc");
+      await handleOrderChange("desc");
     } else {
-      handleOrderChange("asc");
+      await handleOrderChange("asc");
     }
   };
   const sortValue = sortingOptions.find((option) => option.value === value)?.value;

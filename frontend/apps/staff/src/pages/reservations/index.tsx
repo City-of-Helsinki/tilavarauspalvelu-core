@@ -19,7 +19,7 @@ export default function ListReservationsPage(): React.ReactElement {
     if (params.size === 0) {
       const p = new URLSearchParams(params);
       p.set("dateGte", formatDate(today));
-      setParams(p);
+      void setParams(p);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only on page load
   }, []);

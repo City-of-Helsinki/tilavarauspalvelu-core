@@ -19,7 +19,7 @@ export function useSession() {
     if (CURRENT_USER_POLL_INTERVAL_MS > 0) {
       const id = setInterval(() => {
         if (isWindowVisible()) {
-          refetch();
+          void refetch();
         }
       }, CURRENT_USER_POLL_INTERVAL_MS);
       return () => clearTimeout(id);

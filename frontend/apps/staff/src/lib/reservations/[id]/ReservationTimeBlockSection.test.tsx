@@ -156,7 +156,7 @@ describe("TimeBlockSection", () => {
     dialog.props.onAccept();
 
     expect(onReservationUpdated).toHaveBeenCalledTimes(1);
-    expect(refetch).toHaveBeenCalledTimes(2);
+    expect(refetch).toHaveBeenCalledTimes(1);
     expect(mockSetModalContent).toHaveBeenLastCalledWith(null);
   });
 

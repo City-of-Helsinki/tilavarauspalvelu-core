@@ -193,9 +193,9 @@ function SeasonRow({
                 render={({ field: { onBlur, ...field } }) => (
                   <StyledTimeInput
                     {...field}
-                    onBlur={() => {
+                    onBlur={async () => {
                       onBlur();
-                      trigger();
+                      await trigger();
                     }}
                     disabled={isClosed}
                     label={t("reservationUnitEditor:label.openingTime")}
@@ -209,9 +209,9 @@ function SeasonRow({
                 render={({ field: { onBlur, ...field } }) => (
                   <StyledTimeInput
                     {...field}
-                    onBlur={() => {
+                    onBlur={async () => {
                       onBlur();
-                      trigger();
+                      await trigger();
                     }}
                     disabled={isClosed}
                     label={t("reservationUnitEditor:label.closingTime")}
@@ -233,10 +233,10 @@ function SeasonRow({
               id={`seasons.${index}.closed`}
               label={t("reservationUnitEditor:closed")}
               checked={value}
-              onChange={(e) => {
+              onChange={async (e) => {
                 onChange(e.target.checked);
                 // need to trigger validation manually because this affects the whole day row
-                form.trigger();
+                await trigger();
               }}
               onBlur={onBlur}
             />

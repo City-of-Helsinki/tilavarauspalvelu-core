@@ -86,7 +86,7 @@ function ReservationCancelPage(props: PropsNarrowed): React.ReactElement {
         if (res) {
           const { future, cancelled } = res;
           const url = `${backLink}?cancelled=${cancelled}&future=${future}`;
-          router.push(url);
+          await router.push(url);
         }
       }
     } catch (err) {

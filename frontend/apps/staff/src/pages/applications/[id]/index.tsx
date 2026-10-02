@@ -138,7 +138,7 @@ function RejectOptionButton({
           },
         },
       });
-      refetch();
+      await refetch();
     } catch (err) {
       displayError(err);
     }
@@ -216,7 +216,7 @@ function RejectAllOptionsButton({
           },
         },
       });
-      refetch();
+      await refetch();
     } catch (err) {
       displayError(err);
     }
@@ -482,7 +482,7 @@ function RejectApplicationButton({
           },
         },
       });
-      refetch();
+      await refetch();
     } catch (err) {
       displayError(err);
     }

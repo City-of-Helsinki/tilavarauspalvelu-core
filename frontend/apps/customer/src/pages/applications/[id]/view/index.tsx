@@ -68,22 +68,22 @@ function View({ application, tos }: Readonly<Pick<PropsNarrowed, "application" |
 
   const searchParams = useSearchParams();
 
-  const handleRouteChange = (query: URLSearchParams) => {
+  const handleRouteChange: (query: URLSearchParams) => Promise<boolean> = (query) => {
     // [id] param is not included in the URLSearchParams object but required when routing
     const id = ignoreMaybeArray(router.query.id);
     if (id != null) {
       query.set("id", id);
     }
-    router.replace({ query: query.toString() }, undefined, {
+    return router.replace({ query: query.toString() }, undefined, {
       shallow: true,
       scroll: false,
     });
   };
 
-  const handleTabChange = (tab_: TabOptions) => {
+  const handleTabChange = async (tab_: TabOptions) => {
     const params = new URLSearchParams(searchParams);
     params.set("tab", tab_);
-    handleRouteChange(params);
+    await handleRouteChange(params);
   };
 
   const tab = searchParams.get("tab") === "application" ? "application" : "reservations";

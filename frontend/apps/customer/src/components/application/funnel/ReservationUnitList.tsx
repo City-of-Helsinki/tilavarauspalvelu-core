@@ -69,14 +69,14 @@ export function ReservationUnitList<T extends FieldValues>({
   const { value, onChange } = field;
 
   const showModal = searchValues.get("modalShown") === name;
-  const setShowModal = (show: boolean) => {
+  const setShowModal: (show: boolean) => Promise<void> = async (show) => {
     const params = new URLSearchParams(searchValues);
     if (show) {
       params.set("modalShown", name);
     } else {
       params.delete("modalShown");
     }
-    handleRouteChange(params);
+    await handleRouteChange(params);
   };
 
   const handleAdd = (ru: ReservationUnitType) => {

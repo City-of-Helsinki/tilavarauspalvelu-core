@@ -314,10 +314,10 @@ function AccessCodeChangeRepairButton({
       <Button
         size={ButtonSize.Small}
         data-testid="AccessCodeChangeRepairButton--open-dialog"
-        onClick={() => {
+        onClick={async () => {
           if (!reservation.isAccessCodeIsActiveCorrect) {
             // if access code is broken, execute mutation immediately, no need to confirm
-            handleExecuteMutation();
+            await handleExecuteMutation();
           } else {
             // Otherwise open confirmation dialog
             setIsModalOpen(true);
@@ -330,7 +330,7 @@ function AccessCodeChangeRepairButton({
       </Button>
       <ConfirmationDialog
         isOpen={isModalOpen}
-        onAccept={() => handleExecuteMutation()}
+        onAccept={() => void handleExecuteMutation()}
         onCancel={() => setIsModalOpen(false)}
         heading={t(`accessType:actions.change${reservation.reservationSeries ? "Multiple" : ""}`)}
         content={t(`accessType:actions.changeConfirmation${reservation.reservationSeries ? "Multiple" : ""}`)}

@@ -91,14 +91,14 @@ export function SeasonalSearchForm({
     <Flex
       as="form"
       noValidate
-      onSubmit={(evt) => {
+      onSubmit={async (evt) => {
         // React.createPortal does not stop propagation
         // the only way to handle nested forms in React is to move Modals out of the JSX tree (and vdom)
         // e.g. use context with a list of elements to render that moves the JSX out of the main tree
         // portal only moves the DOM element, while propagation works on the vdom
         evt.stopPropagation();
         evt.preventDefault();
-        handleSubmit(onSubmit)();
+        await handleSubmit(onSubmit)();
       }}
     >
       <AutoGrid>
@@ -107,9 +107,9 @@ export function SeasonalSearchForm({
           label={t("searchForm:labels.textSearch")}
           {...register("textSearch")}
           placeholder={t("searchForm:placeholders.textSearch")}
-          onKeyDown={(e) => {
+          onKeyDown={async (e) => {
             if (e.key === "Enter") {
-              handleSubmit(onSubmit)();
+              await handleSubmit(onSubmit)();
             }
           }}
         />

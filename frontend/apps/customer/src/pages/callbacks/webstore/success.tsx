@@ -103,9 +103,9 @@ export default function Page({ reservation }: NarrowedProps): React.ReactElement
 
   const router = useRouter();
   useEffect(() => {
-    const endPolling = setTimeout(() => {
+    const endPolling = setTimeout(async () => {
       stopPolling();
-      router.replace(getReservationPath(reservation.pk, undefined, "polling_timeout"));
+      await router.replace(getReservationPath(reservation.pk, undefined, "polling_timeout"));
     }, WEBSTORE_SUCCESS_POLL_TIMEOUT_MS);
     return () => clearTimeout(endPolling);
   }, [stopPolling, reservation.pk, router]);
@@ -122,7 +122,7 @@ export default function Page({ reservation }: NarrowedProps): React.ReactElement
     const redirectUrl = getRedirectUrl(reservation);
     if (redirectUrl != null) {
       stopPolling();
-      router.replace(redirectUrl);
+      void router.replace(redirectUrl);
     }
   }, [data, router, stopPolling]);
 

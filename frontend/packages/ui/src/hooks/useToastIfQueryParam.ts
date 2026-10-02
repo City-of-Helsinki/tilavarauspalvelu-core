@@ -18,7 +18,7 @@ export function useToastIfQueryParam({
   const { t } = useTranslation();
 
   useEffect(() => {
-    const removeTimeUpdatedParam = () => {
+    const removeTimeUpdatedParam: () => Promise<boolean> = () => {
       const { pathname, query } = router;
       // NOTE ParsedQuery is a Record<string, string>
       const params = new URLSearchParams(query as Record<string, string>);
@@ -30,7 +30,7 @@ export function useToastIfQueryParam({
         params.delete(key);
       }
 
-      router.replace(
+      return router.replace(
         {
           pathname,
           query: params.toString(),
@@ -46,20 +46,20 @@ export function useToastIfQueryParam({
 
     const titleText = title ? (typeof title === "string" ? title : title()) : undefined;
     const text = typeof message === "string" ? message : message();
-    const handle = () => {
+    const handle = async () => {
       toast({
         text,
         type,
         label: titleText,
       });
-      removeTimeUpdatedParam();
+      await removeTimeUpdatedParam();
     };
     if (Array.isArray(key)) {
       if (key.every((k) => q[k])) {
-        handle();
+        void handle();
       }
     } else if (q[key]) {
-      handle();
+      void handle();
     }
   }, [router, t, key, message, type, title]);
 }

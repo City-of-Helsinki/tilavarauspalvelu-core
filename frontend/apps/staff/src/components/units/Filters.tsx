@@ -42,8 +42,8 @@ export function Filters(): React.ReactElement {
     reset(mapSearchParamsToForm(searchParams));
   }, [reset, searchParams]);
 
-  const onSubmit = (data: SearchFormValues) => {
-    setSearchParams(mapFormToSearchParams(data));
+  const onSubmit: (data: SearchFormValues) => Promise<void> = async (data) => {
+    await setSearchParams(mapFormToSearchParams(data));
   };
 
   return (

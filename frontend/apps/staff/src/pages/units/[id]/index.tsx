@@ -114,8 +114,8 @@ function Unit({ unitPk }: { unitPk: number }): React.ReactElement {
           disabled={!hasSpacesResources}
           variant={ButtonVariant.Supplementary}
           iconStart={<IconPlusCircleFill />}
-          onClick={() => {
-            router.push(getReservationUnitUrl(unitPk));
+          onClick={async () => {
+            await router.push(getReservationUnitUrl(unitPk));
           }}
         >
           {t("unit:reservationUnitCreate")}
