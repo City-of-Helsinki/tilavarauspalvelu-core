@@ -230,7 +230,7 @@ export function ReservationList(props: Props | ExtendedProps) {
       </TitleWrapper>
       <StyledList $hasPadding={hasPadding ?? false}>
         {items.map((item) => (
-          <StyledListItem key={`${item.date}-${item.startTime}-${item.endTime}`}>
+          <StyledListItem key={`${item.date.toString()}-${item.startTime}-${item.endTime}`}>
             <TextWrapper $failed={!!item.error}>
               <DateElement $isRemoved={(item.isRemoved || item.isOverlapping || item.isCancelled) ?? false}>
                 {formatReservationSlot(item)}

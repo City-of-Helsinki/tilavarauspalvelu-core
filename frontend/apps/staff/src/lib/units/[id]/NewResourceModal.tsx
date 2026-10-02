@@ -50,7 +50,7 @@ export function NewResourceModal({ unit, closeModal, refetch, spacePk }: ModalPr
         locationType: ResourceLocationType.Fixed,
       });
       closeModal();
-      refetch();
+      await refetch();
     } catch (err) {
       displayError(err);
     }

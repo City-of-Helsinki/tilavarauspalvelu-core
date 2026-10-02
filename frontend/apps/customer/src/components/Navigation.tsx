@@ -187,9 +187,9 @@ function NavigationMenu({ user }: { user: CurrentUserQuery["currentUser"] }) {
   const { pathname } = useLocation();
   const router = useRouter();
 
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    router.push(e.currentTarget.href);
+    await router.push(e.currentTarget.href);
   };
 
   return (
@@ -286,9 +286,9 @@ export function Navigation({ apiBaseUrl, profileLink }: Readonly<HeaderProps>) {
     { label: t("navigation:languages.en"), value: getLocalizationLang("en") },
   ];
 
-  const languageChangeHandler = (language: string) => {
-    i18n.changeLanguage(language);
-    router.push(router.pathname, router.asPath, { locale: language });
+  const languageChangeHandler = async (language: string) => {
+    await i18n.changeLanguage(language);
+    await router.push(router.pathname, router.asPath, { locale: language });
   };
 
   return (

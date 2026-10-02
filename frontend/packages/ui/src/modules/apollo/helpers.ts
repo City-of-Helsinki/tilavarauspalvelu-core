@@ -11,7 +11,7 @@ import { getCookie } from "typescript-cookie";
 import { RESERVEE_PI_FIELDS } from "@ui/components/reservation-form/utils";
 import { toast } from "../../components/toast";
 import { CsrfTokenNotFound } from "../errors";
-import { getLocalizationLang, isBrowser } from "../helpers";
+import { getLocalizationLang, ignoreMaybeArray, isBrowser } from "../helpers";
 import type { LocalizationLanguages } from "../urlBuilder";
 
 type ErrorCode = string;
@@ -114,7 +114,7 @@ export function getPermissionErrors(error: unknown): ValidationError[] {
         const code = getExtensionCode(e);
         return PERMISSION_ERROR_CODES.some((x) => x === code);
       };
-      return graphQLErrors.filter(hasExtension).flatMap(mapValidationError);
+      return graphQLErrors.filter((err) => hasExtension(err)).flatMap((err) => mapValidationError(err));
     }
   }
   return [];
@@ -134,7 +134,7 @@ export function getValidationErrors(error: unknown): ValidationError[] {
         const code = getExtensionCode(e);
         return code === MUTATION_ERROR_CODE;
       };
-      return graphQLErrors.filter(isMutationError).flatMap(mapValidationError);
+      return graphQLErrors.filter((err) => isMutationError(err)).flatMap((err) => mapValidationError(err));
     }
   }
   return [];
@@ -181,7 +181,7 @@ export function getSeriesOverlapErrors(error: unknown): OverlappingError[] {
         const code = getExtensionCode(e);
         return code === CODE;
       };
-      return graphQLErrors.filter(isSpecificError).flatMap(mapOverlapError);
+      return graphQLErrors.filter((err) => isSpecificError(err)).flatMap((err) => mapOverlapError(err));
     }
   }
   return [];
@@ -332,11 +332,10 @@ export function enchancedFetch(req?: IncomingMessage) {
   return (url: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const isServer = typeof window === "undefined";
     const csrfToken = isServer ? getServerCookie(req?.headers, "csrftoken") : getCookie("csrftoken");
-    const headers = new Headers({
-      ...(init?.headers != null ? init.headers : {}),
-      // missing csrf token is a non recoverable error
-      ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
-    });
+    const headers = new Headers(init?.headers);
+    if (csrfToken != null) {
+      headers.append("X-Csrftoken", csrfToken);
+    }
 
     // NOTE server requests don't include cookies by default
     if (isServer) {
@@ -353,12 +352,12 @@ export function enchancedFetch(req?: IncomingMessage) {
       headers.append("Cookie", `csrftoken=${csrfToken}`);
       // Django fails with 403 if there is no referer (only on Kubernetes)
       const requestUrl = req.url ?? "";
-      const hostname = req.headers["x-forwarded-host"] ?? req.headers.host ?? "";
+      const hostname = ignoreMaybeArray(req.headers["x-forwarded-host"] ?? req.headers.host) ?? "";
       // NOTE 'proto' is not exactly correct
       // For our case this is sufficent because we are always behind a gateway,
       // but technically there is a case where we are not behind a gateway and not localhost
       // so the proto would be https and no x-forwarded-proto set
-      const proto = req.headers["x-forwarded-proto"] ?? "http";
+      const proto = ignoreMaybeArray(req.headers["x-forwarded-proto"]) ?? "http";
       headers.append("Referer", `${proto}://${hostname}${requestUrl}`);
 
       const sessionCookie = getServerCookie(req?.headers, "sessionid");
@@ -477,13 +476,14 @@ export function logGraphQLQuery(
     ? documents.map((doc) => getOperationName(doc)).map((x) => x ?? "")
     : (getOperationName(documents) ?? "");
   const t = Math.round(timeMs);
+  const queryName = Array.isArray(operationName) ? operationName.join(",") : operationName;
   log.info(
     {
       timeMs: t,
       url,
       operationName,
     },
-    `GQL query ${operationName} took: ${t} ms`
+    `GQL query ${queryName} took: ${t} ms`
   );
 }
 
@@ -505,7 +505,7 @@ function transformApolloError(error: ApolloError): QueryErrorT {
   if (gqlErrors.length > 0) {
     const codes = new Set(gqlErrors.map((e) => e.code)).keys().toArray();
     const hasCode = codes.some((x) => x !== "UNKNOWN");
-    const message = hasCode ? `Graphql VALIDATION errors: ${codes}` : error.message;
+    const message = hasCode ? `Graphql VALIDATION errors: ${codes.join(",")}` : error.message;
     return {
       type: "GRAPHQL_ERROR",
       message,

@@ -198,7 +198,7 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
         buffers,
       });
 
-      router.push(getReservationSeriesUrl(unitPk, recurringPk, "completed"));
+      await router.push(getReservationSeriesUrl(unitPk, recurringPk, "completed"));
     } catch (err) {
       const errs = getSeriesOverlapErrors(err);
       if (errs.length > 0) {
@@ -210,7 +210,7 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
         displayError(err);
         // We don't need to cleanup the ReservationSeries that has zero connections backend will do this.
       }
-      checkedReservations.refetch();
+      await checkedReservations.refetch();
     }
   };
 

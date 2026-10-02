@@ -95,8 +95,8 @@ export function SpaceEditor({ space, unit }: Props): React.ReactElement {
       successToast({
         text: t("spaces:SpaceEditor.spaceUpdatedNotification"),
       });
-      refetch();
-      router.replace(getUnitUrl(unit, "spaces-resources"));
+      await refetch();
+      await router.replace(getUnitUrl(unit, "spaces-resources"));
     } catch (err) {
       displayError(err);
     }

@@ -46,10 +46,10 @@ export function ReservationCancellation(props: CancellationProps): React.ReactEl
 
   const backLink = getBackPath(reservation);
 
-  const handleNext = () => {
+  const handleNext: () => Promise<void> = async () => {
     const queryParam = isPartOfApplication(reservation) ? `deletedReservationPk=${reservation.pk}` : "deleted=true";
     if (backLink) {
-      router.push(`${backLink}?${queryParam}`);
+      await router.push(`${backLink}?${queryParam}`);
     }
   };
 
@@ -67,7 +67,7 @@ export function ReservationCancellation(props: CancellationProps): React.ReactEl
           },
         },
       });
-      handleNext();
+      await handleNext();
     } catch (err: unknown) {
       displayError(err);
     }

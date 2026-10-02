@@ -54,11 +54,11 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
   const hasPrice = reservation.price != null && Number(reservation.price) > 0;
   const priceIsValid = !hasPrice || !Number.isNaN(price);
 
-  const handleApprove = () => {
+  const handleApprove: () => Promise<void> = async () => {
     if (reservation.pk == null) {
       throw new Error("Reservation pk is missing");
     }
-    approveReservation({
+    await approveReservation({
       pk: reservation.pk,
       price: price.toString(),
       handlingDetails,

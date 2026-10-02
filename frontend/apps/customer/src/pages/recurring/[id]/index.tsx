@@ -56,8 +56,8 @@ function SeasonalSearch({ applicationRound, options }: Readonly<SeasonalSearchPr
 
   const { handleSearch } = useSearchModify();
 
-  const onSearch = (criteria: SearchFormValues) => {
-    handleSearch(criteria, true);
+  const onSearch: (criteria: SearchFormValues) => Promise<void> = async (criteria) => {
+    await handleSearch(criteria, true);
   };
 
   const {

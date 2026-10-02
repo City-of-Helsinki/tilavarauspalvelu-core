@@ -98,7 +98,7 @@ export default function ApplicationRound({
         for (const u of filteredUnits) {
           p.append("unit", u);
         }
-        setParams(p);
+        void setParams(p);
       }
     }
   }, [unitOptions, searchParams, setParams]);
@@ -114,10 +114,10 @@ export default function ApplicationRound({
 
   const selectedTab = searchParams.get("tab") ?? "applications";
   const activeTabIndex = selectedTab === "sections" ? 1 : selectedTab === "allocated" ? 2 : 0;
-  const handleTabChange = (tab: string) => {
+  const handleTabChange: (tab: string) => Promise<void> = async (tab) => {
     const params = new URLSearchParams(searchParams);
     params.set("tab", tab);
-    setParams(params);
+    await setParams(params);
   };
 
   const isApplicationRoundEnded = hasApplicationRoundEnded(applicationRound);

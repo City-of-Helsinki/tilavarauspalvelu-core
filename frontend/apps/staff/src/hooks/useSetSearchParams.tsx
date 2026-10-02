@@ -3,7 +3,7 @@ import { ignoreMaybeArray } from "ui/src/modules/helpers";
 
 /// @param keysToCopy - copy these from the original query. required because of the way Next.js route params work
 /// ex. without keys a path with [id] param turns .../8 into .../[id]. there is no automatic substitution
-export function useSetSearchParams(keysToCopy: string[] = ["id", "pk"]): (params: URLSearchParams) => void {
+export function useSetSearchParams(keysToCopy: string[] = ["id", "pk"]): (params: URLSearchParams) => Promise<boolean> {
   const router = useRouter();
 
   return (params: URLSearchParams) => {
@@ -16,7 +16,7 @@ export function useSetSearchParams(keysToCopy: string[] = ["id", "pk"]): (params
       }
     }
 
-    router.replace(
+    return router.replace(
       {
         pathname,
         query: params.toString(),

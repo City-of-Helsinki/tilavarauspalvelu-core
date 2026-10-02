@@ -54,7 +54,9 @@ export function FormErrorSummary<T extends FieldValues>({
             const label = t(`ErrorSummary.errorLabel`, {
               index: index + 1,
             });
-            const fieldName = t(`${prefix}${err?.message}`);
+            // TODO: this is a massive hack, but the whole component is outdated
+            // since the spaces pages should be rewritten using new styles.
+            const fieldName = typeof err?.message === "string" ? t(`${prefix}${err?.message}`) : "";
             return (
               <li key={keys[index]}>
                 <span>{label}</span>

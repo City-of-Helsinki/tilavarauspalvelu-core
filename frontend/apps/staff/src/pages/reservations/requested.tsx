@@ -29,7 +29,7 @@ export default function RequestedListingPage(_props: PageProps) {
       for (const state of defaultStates) {
         p.append("state", state);
       }
-      setParams(p);
+      void setParams(p);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only on page load
   }, []);

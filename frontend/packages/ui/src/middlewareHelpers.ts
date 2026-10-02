@@ -64,10 +64,8 @@ export function removeTrailingSlash(url: string): string {
 /// custom function so we don't have to import apollo client in middleware
 export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: string): Promise<unknown> {
   const { cookies, headers } = req;
-  const newHeaders = new Headers({
-    ...headers,
-    "Content-Type": "application/json",
-  });
+  const newHeaders = new Headers(headers);
+  newHeaders.set("Content-Type", "application/json");
 
   const sessionid = cookies.get("sessionid");
   const csrfToken = cookies.get("csrftoken");

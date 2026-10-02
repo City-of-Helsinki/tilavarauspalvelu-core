@@ -258,7 +258,7 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
           state: data.pk === 0 ? t("form.created") : t("form.updated"),
         }),
       });
-      router.push(getNotificationListUrl());
+      await router.push(getNotificationListUrl());
     } catch (err) {
       displayError(err);
     }
@@ -428,9 +428,9 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
           <Button
             variant={ButtonVariant.Secondary}
             type="button"
-            onClick={() => {
+            onClick={async () => {
               setValue("isDraft", true);
-              handleSubmit(onSubmit)();
+              await handleSubmit(onSubmit)();
             }}
             data-testid="Notification__Page--save-draft-button"
           >
@@ -484,7 +484,7 @@ function useRemoveNotification({ notification }: { notification?: BannerNotifica
       }
 
       successToast({ text: t("notification:success.removed") });
-      router.replace(getNotificationListUrl());
+      await router.replace(getNotificationListUrl());
     } catch (err) {
       displayError(err);
     }

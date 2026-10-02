@@ -151,7 +151,7 @@ function ApplicationRoundAllocation({
     } else {
       vals.set(param, value);
     }
-    setParams(vals);
+    void setParams(vals);
   };
 
   const setSelectedReservationUnit = (value: number | null) => {
@@ -191,7 +191,7 @@ function ApplicationRoundAllocation({
   useEffect(() => {
     const { pageInfo } = refreshedData?.applicationSections ?? {};
     if (pageInfo?.hasNextPage) {
-      fetchMore({
+      void fetchMore({
         variables: {
           after: pageInfo.endCursor,
         },
@@ -286,7 +286,7 @@ function ApplicationRoundAllocation({
         newParams.append(key, value);
       }
     }
-    setParams(newParams);
+    void setParams(newParams);
   };
 
   const handleRefetchApplicationEvents = async () => {
@@ -369,7 +369,10 @@ function useFilteredUnits(applicationRound: ApplicationRoundFilterQueryType | nu
   const resUnits = filterNonNullable(applicationRound?.reservationUnits).filter((ru) => canManageApplications(ru.unit));
   const units = uniqBy(filterNonNullable(resUnits.map((ru) => ru?.unit)), "pk");
 
-  const sortedUnits = sort(units.filter(canManageApplications), (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0);
+  const sortedUnits = sort(
+    units.filter((x) => canManageApplications(x)),
+    (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0
+  );
 
   const reservationUnits = sort(uniqBy(resUnits, "pk"), (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0);
 
@@ -393,7 +396,7 @@ export default function ApplicationRoundRouted(props: PropsNarrowed): React.Reac
       const vals = new URLSearchParams(searchParams);
       vals.set("unit", value.toString());
       vals.delete("reservationUnit");
-      setParams(vals);
+      void setParams(vals);
     };
     const unitFilter = toNumber(searchParams.get("unit"));
     if (filteredUnits.length > 0 && (unitFilter == null || unitFilter < 1)) {
@@ -408,7 +411,7 @@ export default function ApplicationRoundRouted(props: PropsNarrowed): React.Reac
     if (unit != null && !filteredUnits.some((u) => u.pk === unit)) {
       const p = new URLSearchParams(searchParams);
       p.delete("unit");
-      setParams(p);
+      void setParams(p);
     }
   }, [filteredUnits, searchParams, setParams]);
 

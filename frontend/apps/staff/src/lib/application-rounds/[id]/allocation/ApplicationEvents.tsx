@@ -186,7 +186,7 @@ function ApplicationSectionColumn({
   const isPartiallyAllocated = (as: (typeof sections)[0]) =>
     as.status !== ApplicationSectionStatusChoice.Handled && isAllocated(as) && !isLocked(as) && !isRejected(as);
 
-  const partiallyAllocated = sections.filter(isPartiallyAllocated);
+  const partiallyAllocated = sections.filter((sec) => isPartiallyAllocated(sec));
 
   // locked or rejected but not in the allocated list
   const locked = sections

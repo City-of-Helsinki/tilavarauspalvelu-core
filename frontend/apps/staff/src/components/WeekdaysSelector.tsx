@@ -71,7 +71,7 @@ type Props = {
   errorText?: string;
 };
 
-export function WeekdaysSelector({ label, value = [], disabled = false, onChange, errorText }: Props) {
+export function WeekdaysSelector({ label, value, disabled = false, onChange, errorText }: Props) {
   const { t } = useTranslation();
 
   const handleDayToggle = (day: Weekday) => {

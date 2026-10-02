@@ -90,7 +90,7 @@ export function StartApplicationBar({ apiBaseUrl, applicationRound }: Readonly<P
           forwardParams.append(PARAM_NAME, s);
         }
         const url = `${getApplicationPath(pk, "page1")}?${forwardParams.toString()}`;
-        router.replace(url);
+        await router.replace(url);
       } else {
         throw new Error("create application mutation failed");
       }
@@ -99,10 +99,10 @@ export function StartApplicationBar({ apiBaseUrl, applicationRound }: Readonly<P
     }
   };
 
-  const onNext = () => {
+  const onNext: () => Promise<void> = async () => {
     const applicationRoundPk = toNumber(ignoreMaybeArray(router.query.id));
     if (applicationRoundPk) {
-      createNewApplication(applicationRoundPk);
+      await createNewApplication(applicationRoundPk);
     } else {
       throw new Error("Application round id is missing");
     }

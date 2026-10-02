@@ -83,15 +83,15 @@ export function UnitReservations({ tagOptions, ...props }: UnitReservationsProps
   const searchParams = useSearchParams();
   const setSearchParams = useSetSearchParams();
 
-  const handleTodayClick = () => {
+  const handleTodayClick: () => Promise<void> = async () => {
     const p = new URLSearchParams(searchParams);
     p.set("date", formatDate(new Date()));
-    setSearchParams(p);
+    await setSearchParams(p);
   };
 
   useEffect(() => {
     if (searchParams.get("date") == null) {
-      handleTodayClick();
+      void handleTodayClick();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only on page load
   }, []);

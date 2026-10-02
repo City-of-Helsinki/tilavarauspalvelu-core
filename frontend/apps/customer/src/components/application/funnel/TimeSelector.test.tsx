@@ -41,8 +41,8 @@ function WrapTimeSelector({ onSubmit = vi.fn(), reservationUnitOpeningHours = []
   });
 
   // wrap handler to match the only form values
-  const onSubmitHandler = (data: ApplicationPage2FormValues) => {
-    onSubmit(data);
+  const onSubmitHandler = async (data: ApplicationPage2FormValues) => {
+    await onSubmit(data);
   };
   const { handleSubmit } = form;
 

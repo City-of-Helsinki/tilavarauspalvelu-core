@@ -34,7 +34,7 @@ export function useSearchQuery(variables: SearchReservationUnitsQueryVariables) 
 
     const { ref } = router.query;
     const version = toNumber(ignoreMaybeArray(ref));
-    check(variables, version ?? 0);
+    void check(variables, version ?? 0);
   }, [variables, varhash, router.query]);
 
   useEffect(() => {

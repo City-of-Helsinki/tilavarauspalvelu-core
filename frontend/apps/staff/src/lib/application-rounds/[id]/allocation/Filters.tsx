@@ -53,8 +53,8 @@ export function Filters({ hideSearchTags, units, isLoading }: FilterProps): Reac
     reset(newValues);
   }, [reset, searchParams, units]);
 
-  const onSubmit = (values: SearchFormValues) => {
-    setSearchParams(mapFormToSearchParams(values));
+  const onSubmit: (values: SearchFormValues) => Promise<void> = async (values) => {
+    await setSearchParams(mapFormToSearchParams(values));
   };
 
   const originalOptions = useFilterOptions();

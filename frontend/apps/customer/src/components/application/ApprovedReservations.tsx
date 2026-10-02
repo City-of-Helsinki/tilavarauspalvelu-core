@@ -747,8 +747,8 @@ function ReservationsTable({
   const lang = getLocalizationLang(i18n.language);
   const router = useRouter();
 
-  const handleCancel = (pk: number) => {
-    router.push(getApplicationReservationPath(application.pk, pk));
+  const handleCancel: (pk: number) => Promise<void> = async (pk) => {
+    await router.push(getApplicationReservationPath(application.pk, pk));
   };
 
   const cols = [

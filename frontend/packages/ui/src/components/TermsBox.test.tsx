@@ -82,7 +82,7 @@ describe("TermsBox", () => {
     expect(checkbox).not.toBeInTheDocument();
   });
 
-  test.for([[true], [false]] as const)("should toggle acceptance callback ", async ([accepted]) => {
+  test.for([[true], [false]] as const)("should toggle acceptance callback", async ([accepted]) => {
     const user = userEvent.setup();
     const setAccepted = vi.fn();
     const view = renderComponent({ ...defaultProps, setAccepted, accepted });
