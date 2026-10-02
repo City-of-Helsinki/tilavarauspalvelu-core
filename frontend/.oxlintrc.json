@@ -378,6 +378,7 @@
     "typescript/no-unsafe-declaration-merging": "error",
     "typescript/no-unsafe-function-type": "error",
     "typescript/no-unsafe-unary-minus": "error",
+    "typescript/no-useless-default-assignment": "error",
     "typescript/no-useless-empty-export": "error",
     "typescript/no-var-requires": "error",
     "typescript/no-wrapper-object-types": "error",
