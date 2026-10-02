@@ -289,7 +289,7 @@ export function AllocationCalendar({ applicationSections, relatedAllocations }: 
   const data = WEEKDAYS.map((day) => {
     // Only show allocated that match the unit and day
     const timeslots = filterNonNullable(aes)
-      .filter(isNotHandled)
+      .filter((ae) => isNotHandled(ae))
       .filter((ae) => ae.suitableTimeRanges?.some((tr) => isDay(tr, day)));
 
     const resUnits = aes.flatMap((ae) => ae.reservationUnitOptions);

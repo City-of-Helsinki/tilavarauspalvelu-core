@@ -369,7 +369,10 @@ function useFilteredUnits(applicationRound: ApplicationRoundFilterQueryType | nu
   const resUnits = filterNonNullable(applicationRound?.reservationUnits).filter((ru) => canManageApplications(ru.unit));
   const units = uniqBy(filterNonNullable(resUnits.map((ru) => ru?.unit)), "pk");
 
-  const sortedUnits = sort(units.filter(canManageApplications), (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0);
+  const sortedUnits = sort(
+    units.filter((x) => canManageApplications(x)),
+    (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0
+  );
 
   const reservationUnits = sort(uniqBy(resUnits, "pk"), (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0);
 

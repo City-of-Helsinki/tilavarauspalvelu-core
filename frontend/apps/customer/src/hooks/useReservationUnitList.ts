@@ -59,7 +59,10 @@ export function useReservationUnitList(round: HookVars | undefined): Reservation
   };
 
   const getReservationUnits = (): number[] => {
-    const pks = searchValues.getAll(SEASONAL_SELECTED_PARAM_KEY).map(Number).filter(Number.isInteger);
+    const pks = searchValues
+      .getAll(SEASONAL_SELECTED_PARAM_KEY)
+      .map(Number)
+      .filter((x) => Number.isInteger(x));
     if (round) {
       const roundRuPks = filterNonNullable(round.reservationUnits?.map((ru) => ru.pk));
       return pks.filter((pk) => roundRuPks.includes(pk));

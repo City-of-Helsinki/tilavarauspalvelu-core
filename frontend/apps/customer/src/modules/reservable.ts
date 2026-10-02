@@ -235,14 +235,16 @@ export function isRangeReservable({
 
   // This is the slowest part of the function => run it last
   // because the reservationSet includes every reservation not just for the selected day
-  const others = blockingReservations.filter(shouldReservationBlock).filter((r) => {
-    const rStart = new Date(r.beginsAt);
-    const rEnd = new Date(r.endsAt);
-    if (addDays(rEnd, 1) < start || addDays(rStart, -1) >= end) {
-      return false;
-    }
-    return true;
-  });
+  const others = blockingReservations
+    .filter((x) => shouldReservationBlock(x))
+    .filter((r) => {
+      const rStart = new Date(r.beginsAt);
+      const rEnd = new Date(r.endsAt);
+      if (addDays(rEnd, 1) < start || addDays(rStart, -1) >= end) {
+        return false;
+      }
+      return true;
+    });
   const reservation = {
     start,
     end,
