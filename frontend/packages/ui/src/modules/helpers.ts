@@ -273,7 +273,7 @@ export function formatTimeStruct({ hour, minute }: { hour: number; minute: numbe
 }
 
 export function mapParamToInteger(param: string[], min?: number): number[] {
-  const numbers = param.map(Number).filter(Number.isInteger);
+  const numbers = param.map(Number).filter((x) => Number.isInteger(x));
   return min != null ? numbers.filter((n) => n >= min) : numbers;
 }
 

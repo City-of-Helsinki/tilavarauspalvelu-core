@@ -53,15 +53,15 @@ function RecurringLander({ applicationRounds }: Readonly<Pick<Props, "applicatio
   const { t } = useTranslation();
 
   const active = applicationRounds
-    .filter(isActiveRound)
+    .filter((x) => isActiveRound(x))
     .sort((a, b) => compTimeStrings(a.applicationPeriodEndsAt, b.applicationPeriodEndsAt));
 
   const upcoming = applicationRounds
-    .filter(isFutureRound)
+    .filter((x) => isFutureRound(x))
     .sort((a, b) => compTimeStrings(a.applicationPeriodBeginsAt, b.applicationPeriodBeginsAt));
 
   const past = applicationRounds
-    .filter(isPastRound)
+    .filter((x) => isPastRound(x))
     .sort((a, b) => compTimeStrings(a.applicationPeriodEndsAt, b.applicationPeriodEndsAt));
 
   const routes = [
