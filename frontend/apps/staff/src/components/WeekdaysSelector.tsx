@@ -65,7 +65,8 @@ const WarningIcon = () => (
 
 type Props = {
   label: string;
-  value: Weekday[];
+  // NOTE: react-hook-form Controller might pass undefined here without type errors so provide a default
+  value?: Weekday[];
   disabled?: boolean;
   onChange: (value: Weekday[]) => void;
   errorText?: string;
