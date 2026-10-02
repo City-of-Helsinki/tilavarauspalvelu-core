@@ -114,7 +114,7 @@ export function getPermissionErrors(error: unknown): ValidationError[] {
         const code = getExtensionCode(e);
         return PERMISSION_ERROR_CODES.some((x) => x === code);
       };
-      return graphQLErrors.filter(hasExtension).flatMap(mapValidationError);
+      return graphQLErrors.filter((err) => hasExtension(err)).flatMap((err) => mapValidationError(err));
     }
   }
   return [];
@@ -134,7 +134,7 @@ export function getValidationErrors(error: unknown): ValidationError[] {
         const code = getExtensionCode(e);
         return code === MUTATION_ERROR_CODE;
       };
-      return graphQLErrors.filter(isMutationError).flatMap(mapValidationError);
+      return graphQLErrors.filter((err) => isMutationError(err)).flatMap((err) => mapValidationError(err));
     }
   }
   return [];
@@ -181,7 +181,7 @@ export function getSeriesOverlapErrors(error: unknown): OverlappingError[] {
         const code = getExtensionCode(e);
         return code === CODE;
       };
-      return graphQLErrors.filter(isSpecificError).flatMap(mapOverlapError);
+      return graphQLErrors.filter((err) => isSpecificError(err)).flatMap((err) => mapOverlapError(err));
     }
   }
   return [];
