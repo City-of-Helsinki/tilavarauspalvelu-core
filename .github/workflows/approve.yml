@@ -25,14 +25,16 @@ jobs:
         # Don't auto-merge PRs for frontend as they are not tests automatically.
         run: |
           gh pr checkout "$PR_URL"
+          if [ "$(gh pr status --json labels -q .currentBranch.labels[].name | grep -c "javascript")" -eq 1 ];
+            then echo "Dependabot PRs for frontend are not auto-merged."
+            exit 0
+          fi
           if [ "$(gh pr status --json reviewDecision -q .currentBranch.reviewDecision)" == "APPROVED" ];
             then echo "PR already approved."
-          elif [ "$(gh pr status --json labels -q .currentBranch.labels[].name | grep -c "javascript")" -eq 1 ];
-            then echo "Dependabot PRs for frontend are not auto-merged."
           else
             gh pr review --approve "$PR_URL";
-            gh pr merge --auto --rebase "$PR_URL"
           fi
+          gh pr merge --auto --rebase "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
