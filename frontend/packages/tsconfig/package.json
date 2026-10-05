@@ -8,6 +8,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.8"
+    "@tsconfig/node24": "^24.0.5",
+    "@types/node": "^24.19.0"
   }
 }
