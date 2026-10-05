@@ -1,0 +1,71 @@
+# List all available commands
+help:
+    @just --list
+
+# Run a local celery worker and beat scheduler
+celery:
+    @celery -A config worker --beat --loglevel=INFO --scheduler=django
+
+# Check if translations are up to date
+check-translations:
+    @python -m config.hooks.translations_done
+
+# Reset database
+clear-db schema='public':
+    @python manage.py dbshell -- -c "DROP SCHEMA {{ schema }} CASCADE;CREATE SCHEMA {{ schema }};"
+
+# Run local backend
+dev:
+    @python manage.py runserver localhost:8000
+
+# Flush database
+flush-db:
+    @python manage.py flush --no-input
+
+# Generate test data via a script
+generate:
+    @python manage.py create_test_data
+
+# Add pre-commit hooks
+hooks:
+    @pre-commit install
+
+# Run pre-commit hooks
+lint:
+    @pre-commit run --all-files
+
+# Run database migrations
+migrate:
+    @python manage.py migrate
+
+# Compile database migrations
+migrations:
+    @python manage.py makemigrations
+
+# Run a local celery beat scheduler
+scheduler:
+    @celery -A config beat --loglevel=INFO --scheduler=config.celery.beat:VaraamoDatabaseScheduler
+
+# Update the GraphQL schema file
+schema:
+    @python manage.py update_graphql_schema
+
+# Compile translation strings
+translate:
+    @echo ""
+    @echo Compiling translations...
+    @python manage.py compilemessages
+    @echo ""
+    @echo Done!
+
+# Fetch all translation strings under ./locale/
+translations:
+    @echo ""
+    @echo Making translations...
+    @python manage.py maketranslations -l fi -l sv --no-obsolete --omit-header --add-location file
+    @echo ""
+    @echo Done!
+
+# Run a local celery worker
+worker:
+    @celery -A config worker --loglevel=INFO

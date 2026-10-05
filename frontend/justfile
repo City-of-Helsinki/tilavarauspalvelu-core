@@ -1,0 +1,94 @@
+# Make binaries from node_modules available to recipes
+export PATH := module_directory() + "/node_modules/.bin:" + env("PATH")
+
+# List all available commands
+help:
+    @just --list
+
+# Run browser tests in CI mode
+test-browser-ci:
+    @cd apps/ui && pnpm run test:browser:ci
+
+# Run dev server for tests
+dev-test:
+    @cd apps/ui && pnpm run dev:test
+
+# Remove node_modules directories
+clean:
+    @npkill
+
+# Run all apps in development mode
+dev:
+    @turbo dev
+
+# Build all apps
+build:
+    @turbo build
+
+# Run linter
+lint:
+    @oxlint --type-aware
+
+# Run linter and fix issues
+lint-fix:
+    @oxlint --fix --type-aware
+
+# Run CSS linter
+lint-css:
+    @turbo lint:css
+
+# Run linter and fix issues on given files
+lint-staged *files:
+    @oxlint --fix --type-aware {{ files }}
+
+# Format code
+format:
+    @turbo format
+
+# Check code formatting
+format-check:
+    @turbo format:check
+
+# Format given files
+format-staged *files:
+    @prettier --ignore-path "./.prettierignore" --write --experimental-cli --config-path "./packages/prettier-config/prettier.mjs" {{ files }}
+
+# Run tests
+test:
+    @turbo test --concurrency=1
+
+# Run tests with coverage
+test-coverage:
+    @turbo test:coverage
+
+# Run type checks
+tsc-check:
+    @turbo tsc:check
+
+# Clean type check output
+tsc-clean:
+    @turbo tsc:clean
+
+# Pluck GraphQL queries from source files
+gql-pluck:
+    @node scripts/gql-pluck.mjs
+
+# Generate GraphQL types for staff app
+codegen-staff *args:
+    @graphql-codegen --project staff {{ args }}
+
+# Generate GraphQL types for customer app
+codegen-customer *args:
+    @graphql-codegen --project customer {{ args }}
+
+# Generate GraphQL types for ui package
+codegen-ui *args:
+    @graphql-codegen --project ui {{ args }}
+
+# Generate all GraphQL types
+[parallel]
+codegen: codegen-staff codegen-customer codegen-ui
+
+# Generate all GraphQL types in watch mode
+codegen-watch:
+    @graphql-codegen --project staff --watch & graphql-codegen --project customer --watch & graphql-codegen --project ui --watch
