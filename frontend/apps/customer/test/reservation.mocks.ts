@@ -313,6 +313,7 @@ export const reservationRenderProps = (
         state: ReservationStateChoice.Confirmed,
         ...future1hReservation(),
         isHandled: false,
+        cancellable: true,
         type: ReservationTypeChoice.Normal,
         price: "0",
       };

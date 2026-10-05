@@ -10,6 +10,7 @@
       "createReservation": "Tee varaus",
       "reservationSeries": "Tee toistuva varaus"
     },
+    "popUpLabel": "Varauksen {{name}} tiedot",
     "legend": {
       "confirmed": "Hyväksytty varaus",
       "unconfirmed": "Varaustoive",

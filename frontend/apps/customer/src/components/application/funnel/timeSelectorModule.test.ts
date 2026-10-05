@@ -249,7 +249,7 @@ describe("aesToCells", () => {
     }
   });
 
-  test("test primary selection inside opening hours", () => {
+  test("primary selection inside opening hours", () => {
     const schedule: SuitableTimeRangeFormValues[] = [
       {
         priority: Priority.Primary,

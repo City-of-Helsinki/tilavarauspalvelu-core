@@ -371,18 +371,22 @@ function getEventTitle({ reservation: { title, event }, t }: { reservation: Cale
   return title;
 }
 
-const EventTriggerButton = () => (
-  <button
-    type="button"
-    style={{
-      background: "transparent",
-      cursor: "pointer",
-      border: 0,
-      width: "100%",
-      height: "100%",
-    }}
-  />
-);
+function EventTriggerButton({ name }: { name: string }): React.ReactElement {
+  const { t } = useTranslation();
+  return (
+    <button
+      type="button"
+      aria-label={t("myUnits:Calendar.popUpLabel", { name })}
+      style={{
+        background: "transparent",
+        cursor: "pointer",
+        border: 0,
+        width: "100%",
+        height: "100%",
+      }}
+    />
+  );
+}
 
 function Event({
   event,
@@ -425,7 +429,7 @@ function Event({
           <p>{timeRange}</p>
           <p>{title}</p>
           {/* NOTE don't set position on Popup it breaks responsiveness */}
-          <Popup trigger={EventTriggerButton}>
+          <Popup trigger={<EventTriggerButton name={`${timeRange} ${title ?? ""}`} />}>
             {reservation && <ReservationPopupContent reservation={reservation} />}
           </Popup>
         </EventContent>
