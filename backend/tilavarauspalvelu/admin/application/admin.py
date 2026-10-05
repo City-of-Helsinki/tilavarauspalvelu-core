@@ -16,6 +16,7 @@ from tilavarauspalvelu.admin.application.filters import (
 )
 from tilavarauspalvelu.admin.application.form import ApplicationAdminForm
 from tilavarauspalvelu.admin.application_section.admin import ApplicationSectionInline
+from tilavarauspalvelu.enums import ApplicationStatusChoice
 from tilavarauspalvelu.models import Application
 
 if TYPE_CHECKING:
@@ -178,6 +179,18 @@ class ApplicationAdmin(admin.ModelAdmin):
         # Coming from confirmation page, perform the action
         if request.POST.get("confirmed"):
             application: Application
+
+            proceed = True
+            for application in queryset:
+                status = ApplicationStatusChoice(application.status)
+                if not status.can_reset:
+                    msg = f"Application {application.pk} is in status {status.value!r} and cannot be reset."
+                    self.message_user(request, msg, level=messages.ERROR)
+                    proceed = False
+
+            if not proceed:
+                return None
+
             for application in queryset:
                 application.actions.reset_application_allocation()
 
