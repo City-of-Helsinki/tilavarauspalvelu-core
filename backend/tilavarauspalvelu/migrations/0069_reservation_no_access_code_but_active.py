@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="reservation",
             constraint=models.CheckConstraint(
-                check=~models.Q(("access_code_generated_at", None), ("access_code_is_active", True)),
+                condition=~models.Q(("access_code_generated_at", None), ("access_code_is_active", True)),
                 name="no_access_code_but_active",
                 violation_error_message="Reservation cannot have active door code if one is not generated",
             ),

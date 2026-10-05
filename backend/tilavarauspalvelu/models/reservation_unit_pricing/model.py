@@ -80,7 +80,7 @@ class ReservationUnitPricing(models.Model):
         constraints = [
             models.CheckConstraint(
                 name="lower_price_greater_than_highest_price",
-                check=models.Q(lowest_price__lte=models.F("highest_price")),
+                condition=models.Q(lowest_price__lte=models.F("highest_price")),
                 violation_error_message="Lowest price can not be greater than highest price.",
             ),
             models.UniqueConstraint(

@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="paymentorder",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     models.Q(("status", "PENDING"), _negated=True),
                     models.Q(("status", "PENDING"), ("handled_payment_due_by__isnull", False)),
                     _connector="OR",

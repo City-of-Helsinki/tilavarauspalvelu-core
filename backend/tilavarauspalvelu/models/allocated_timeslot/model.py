@@ -58,7 +58,7 @@ class AllocatedTimeSlot(models.Model):
         ordering = ["pk"]
         constraints = [
             models.CheckConstraint(
-                check=(
+                condition=(
                     models.Q(begin_time__lt=models.F("end_time"))  # begin before end
                     | (
                         models.Q(end_time__hour=0)  # end at midnight, but start not

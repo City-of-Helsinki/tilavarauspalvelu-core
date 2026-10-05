@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="paymentaccounting",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     models.Q(
                         ("product_invoicing_material", ""),
                         ("product_invoicing_order_type", ""),

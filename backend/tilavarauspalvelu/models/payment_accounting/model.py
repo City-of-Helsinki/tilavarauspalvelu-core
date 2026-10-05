@@ -86,7 +86,7 @@ class PaymentAccounting(models.Model):
         ordering = ["pk"]
         constraints = [
             models.CheckConstraint(
-                check=(
+                condition=(
                     models.Q(
                         product_invoicing_sales_org="",
                         product_invoicing_sales_office="",
@@ -104,14 +104,14 @@ class PaymentAccounting(models.Model):
                 violation_error_message="Must fill all product invoicing fields or none of them",
             ),
             models.CheckConstraint(
-                check=~models.Q(project="") | ~models.Q(profit_center="") | ~models.Q(internal_order=""),
+                condition=~models.Q(project="") | ~models.Q(profit_center="") | ~models.Q(internal_order=""),
                 name="internal_order_profit_center_or_project_required",
                 violation_error_message=(
                     "At least one of the following fields must be filled: 'internal_order', 'profit_center', 'project'"
                 ),
             ),
             models.CheckConstraint(
-                check=models.Q(profit_center="") | models.Q(internal_order=""),
+                condition=models.Q(profit_center="") | models.Q(internal_order=""),
                 name="either_internal_order_or_profit_center",
                 violation_error_message="Can fill either 'internal_order' or 'profit_center'",
             ),

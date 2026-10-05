@@ -52,7 +52,7 @@ class ReservableTimeSpan(models.Model):
         constraints = [
             models.CheckConstraint(
                 name="reservable_time_span_start_before_end",
-                check=models.Q(start_datetime__lt=models.F("end_datetime")),
+                condition=models.Q(start_datetime__lt=models.F("end_datetime")),
                 violation_error_message=_("`start_datetime` must be before `end_datetime`."),
             ),
         ]

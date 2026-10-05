@@ -92,22 +92,22 @@ class ApplicationSection(SerializableModelMixin, models.Model):
         ordering = ["pk"]
         constraints = [
             models.CheckConstraint(
-                check=models.Q(reservations_begin_date__lte=models.F("reservations_end_date")),
+                condition=models.Q(reservations_begin_date__lte=models.F("reservations_end_date")),
                 name="begin_date_before_end_date",
                 violation_error_message=_("Reservations begin date must be before reservations end date."),
             ),
             models.CheckConstraint(
-                check=models.Q(reservation_min_duration__lte=models.F("reservation_max_duration")),
+                condition=models.Q(reservation_min_duration__lte=models.F("reservation_max_duration")),
                 name="min_duration_not_greater_than_max_duration",
                 violation_error_message=_("Reservation min duration cannot be greater than reservation max duration."),
             ),
             models.CheckConstraint(
-                check=models.Q(applied_reservations_per_week__gte=1, applied_reservations_per_week__lte=7),
+                condition=models.Q(applied_reservations_per_week__gte=1, applied_reservations_per_week__lte=7),
                 name="applied_reservations_per_week_from_1_to_7",
                 violation_error_message=_("Can only apply from 1 to 7 reservations per week."),
             ),
             models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     # 1440 minutes = 24 hours (1 extra minute to include 24 hours exactly)
                     reservation_min_duration__in=[
                         datetime.timedelta(minutes=minutes) for minutes in range(30, 1441, 30)
