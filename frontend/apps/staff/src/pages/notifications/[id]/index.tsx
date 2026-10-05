@@ -1,6 +1,6 @@
 import React from "react";
 import type { ReactNode } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { ApolloError, gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonVariant, RadioButton, SelectionGroup } from "hds-react";
@@ -198,7 +198,6 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
     handleSubmit,
     control,
     formState: { errors },
-    watch,
     setValue,
   } = useForm<NotificationFormType>({
     reValidateMode: "onChange",
@@ -275,6 +274,8 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
     label: t(`target.${x}`),
   }));
 
+  const inFuture = useWatch({ control, name: "inFuture" });
+
   return (
     <GridForm onSubmit={handleSubmit(onSubmit)} noValidate>
       <Controller
@@ -301,7 +302,7 @@ const NotificationForm = ({ notification }: { notification?: BannerNotificationP
           </SelectionGroup>
         )}
       />
-      {watch("inFuture") && (
+      {inFuture && (
         <>
           <ControlledDateInput
             id="notification-active-from"

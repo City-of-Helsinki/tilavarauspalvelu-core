@@ -1,6 +1,6 @@
 import React from "react";
 import type { ReactElement } from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
 import { useTranslation } from "next-i18next";
@@ -89,11 +89,11 @@ export function ReservationTypeForm({
   const { t } = useTranslation();
 
   const {
-    watch,
+    control,
     register,
     formState: { errors },
   } = useFormContext<CreateStaffReservationFormValues>();
-  const type = watch("type");
+  const type = useWatch({ control, name: "type" });
 
   const { ageGroups, reservationPurposes } = useFilterOptions();
 

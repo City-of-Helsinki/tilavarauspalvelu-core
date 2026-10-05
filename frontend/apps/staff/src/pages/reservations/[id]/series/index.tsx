@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { ApolloError, gql, useApolloClient } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isSameDay } from "date-fns";
@@ -141,7 +141,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
     values: convertToForm(reservationSeries),
   });
 
-  const { control, formState, reset, handleSubmit, watch } = form;
+  const { control, formState, reset, handleSubmit } = form;
   const { errors } = formState;
   useEffect(() => {
     if (reservationSeries) {
@@ -149,10 +149,11 @@ function SeriesPageInner({ pk }: { pk: number }) {
     }
   }, [reservationSeries, reset]);
   const reservationUnit = reservation?.reservationUnit ?? null;
+  const values = useWatch({ control });
 
   const [removedReservations, setRemovedReservations] = useState<NewReservationListItem[]>([]);
   const newReservations = useMultipleReservation({
-    values: watch(),
+    values,
     reservationUnit,
   });
 
@@ -178,10 +179,10 @@ function SeriesPageInner({ pk }: { pk: number }) {
   const checkedReservations = useFilteredReservationList({
     items: newReservations,
     reservationUnitPk: reservationUnit?.pk ?? 0,
-    begin: parseUIDate(watch("startingDate")) ?? new Date(),
-    end: parseUIDate(watch("endingDate")) ?? new Date(),
-    startTime: watch("startTime"),
-    endTime: watch("endTime"),
+    begin: parseUIDate(values.startingDate ?? "") ?? new Date(),
+    end: parseUIDate(values.endingDate ?? "") ?? new Date(),
+    startTime: values.startTime ?? "",
+    endTime: values.endTime ?? "",
     reservationType: reservation?.type ?? ReservationTypeChoice.Staff,
     existingReservationSeriesPk: reservationSeries?.pk,
   });

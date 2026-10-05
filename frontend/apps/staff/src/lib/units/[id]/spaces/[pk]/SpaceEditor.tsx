@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ParentSelector, SpaceForm, SpaceUpdateSchema } from "@lib/units/[id]";
@@ -53,8 +53,11 @@ export function SpaceEditor({ space, unit }: Props): React.ReactElement {
     resolver: zodResolver(SpaceUpdateSchema),
     mode: "onChange",
   });
-  const { control, handleSubmit, reset, formState, watch } = form;
+  const { control, handleSubmit, reset, formState } = form;
   const { errors, isDirty } = formState;
+
+  const maxPersons = useWatch({ control, name: "maxPersons" });
+  const surfaceArea = useWatch({ control, name: "surfaceArea" });
 
   useEffect(() => {
     if (data?.space != null) {
@@ -108,8 +111,8 @@ export function SpaceEditor({ space, unit }: Props): React.ReactElement {
       <SpaceHead
         title={data?.space?.parent?.nameFi || t("spaces:noParent")}
         space={data?.space}
-        maxPersons={watch("maxPersons")}
-        surfaceArea={watch("surfaceArea")}
+        maxPersons={maxPersons}
+        surfaceArea={surfaceArea}
       />
       <H2 $noMargin>{t("spaces:SpaceEditor.details")}</H2>
       <Form noValidate onSubmit={handleSubmit(onSubmit)}>

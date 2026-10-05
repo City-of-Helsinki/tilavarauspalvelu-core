@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonVariant, LoadingSpinner, Notification, TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
@@ -118,7 +118,6 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
     handleSubmit,
     control,
     register,
-    watch,
     formState: { errors, isSubmitting },
   } = form;
 
@@ -134,12 +133,17 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
 
   // Reset removed when time change (infi loop if array is unwrapped)
 
-  const startTime = watch("startTime");
-  const endTime = watch("endTime");
-  const startDate = watch("startingDate");
-  const endDate = watch("endingDate");
-  const repeatOnDays = watch("repeatOnDays");
-  const repeatPattern = watch("repeatPattern");
+  const values = useWatch({ control });
+  const startTime = useWatch({ control, name: "startTime" });
+  const endTime = useWatch({ control, name: "endTime" });
+  const startDate = useWatch({ control, name: "startingDate" });
+  const endDate = useWatch({ control, name: "endingDate" });
+  const repeatOnDays = useWatch({ control, name: "repeatOnDays" });
+  const repeatPattern = useWatch({ control, name: "repeatPattern" });
+  const startingDate = useWatch({ control, name: "startingDate" });
+  const endingDate = useWatch({ control, name: "endingDate" });
+  const reservationType = useWatch({ control, name: "type" });
+
   useEffect(() => {
     setRemovedReservations([]);
     setLocalError(null);
@@ -151,18 +155,18 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
   const translateError = (errorMsg?: string) => (errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "");
 
   const newReservations = useMultipleReservation({
-    values: watch(),
+    values,
     reservationUnit,
   });
 
   const checkedReservations = useFilteredReservationList({
     items: newReservations,
     reservationUnitPk: reservationUnit?.pk ?? 0,
-    begin: parseUIDate(watch("startingDate")) ?? new Date(),
-    end: parseUIDate(watch("endingDate")) ?? new Date(),
+    begin: parseUIDate(startingDate) ?? new Date(),
+    end: parseUIDate(endingDate) ?? new Date(),
     startTime,
     endTime,
-    reservationType: watch("type"),
+    reservationType,
   });
 
   const router = useRouter();

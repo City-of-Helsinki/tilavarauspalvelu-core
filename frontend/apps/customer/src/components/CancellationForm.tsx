@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { Button, ButtonVariant, IconCross, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -25,7 +25,7 @@ const Form = styled.form`
 `;
 
 export type CancelFormValues = {
-  reason: ReservationCancelReasonChoice;
+  reason?: ReservationCancelReasonChoice;
 };
 
 const FormWrapper = styled(Flex)`
@@ -53,7 +53,8 @@ export function CancellationForm(props: {
     .filter((r) => r.value !== ReservationCancelReasonChoice.NotPaid);
 
   const form = useForm<CancelFormValues>();
-  const { handleSubmit, watch, control } = form;
+  const { handleSubmit, control } = form;
+  const userReason = useWatch({ control, name: "reason" });
 
   return (
     <FormWrapper>
@@ -82,7 +83,7 @@ export function CancellationForm(props: {
               type="submit"
               variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Primary}
               iconStart={isLoading ? <LoadingSpinner small /> : undefined}
-              disabled={isDisabled || isLoading || !watch("reason")}
+              disabled={isDisabled || isLoading || !userReason}
               data-testid="reservation-cancel__button--cancel"
             >
               {t("reservation:cancel.reservation")}

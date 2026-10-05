@@ -1,6 +1,7 @@
 import { generateReservations } from "@/modules/generateReservations";
 import { getBufferTime } from "@/modules/helpers";
 import type { RescheduleReservationSeriesForm } from "@/schemas";
+import { ReservationTypeChoice } from "@gql/gql-types";
 import type { Maybe } from "@gql/gql-types";
 
 type ReservationUnitBufferType = {
@@ -9,7 +10,7 @@ type ReservationUnitBufferType = {
 };
 
 interface GenerateReservationsProps {
-  values: RescheduleReservationSeriesForm;
+  values: Partial<RescheduleReservationSeriesForm>;
   reservationUnit: Maybe<ReservationUnitBufferType>;
 }
 
@@ -18,19 +19,20 @@ interface GenerateReservationsProps {
 function useGenerateReservations({ values, reservationUnit }: GenerateReservationsProps) {
   // NOTE useMemo is useless here, watcher already filters out unnecessary runs
   const result = generateReservations({
-    startingDate: values.startingDate,
-    endingDate: values.endingDate,
-    startTime: values.startTime,
-    endTime: values.endTime,
-    repeatPattern: values.repeatPattern,
-    repeatOnDays: values.repeatOnDays,
+    startingDate: values.startingDate ?? "",
+    endingDate: values.endingDate ?? "",
+    startTime: values.startTime ?? "",
+    endTime: values.endTime ?? "",
+    repeatPattern: values.repeatPattern ?? "weekly",
+    repeatOnDays: values.repeatOnDays ?? [],
   });
 
+  const type = values.type ?? ReservationTypeChoice.Staff;
   return result.map((item) => ({
     ...item,
     buffers: {
-      before: getBufferTime(reservationUnit?.bufferTimeBefore, values.type, values.enableBufferTimeBefore),
-      after: getBufferTime(reservationUnit?.bufferTimeBefore, values.type, values.enableBufferTimeAfter),
+      before: getBufferTime(reservationUnit?.bufferTimeBefore, type, values.enableBufferTimeBefore),
+      after: getBufferTime(reservationUnit?.bufferTimeBefore, type, values.enableBufferTimeAfter),
     },
   }));
 }
