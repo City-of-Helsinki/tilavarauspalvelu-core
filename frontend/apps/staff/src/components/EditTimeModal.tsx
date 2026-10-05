@@ -1,7 +1,7 @@
 import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import type { UseFormReturn } from "react-hook-form";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { differenceInMinutes } from "date-fns";
@@ -144,14 +144,13 @@ function DialogContent({
     handleSubmit,
     control,
     formState: { errors, isDirty, isValid },
-    watch,
   } = form;
 
-  const formDate = watch("date");
-  const formEndTime = watch("endTime");
-  const formStartTime = watch("startTime");
-  const formPks = watch("pk");
-  const formType = watch("type");
+  const formDate = useWatch({ control, name: "date" });
+  const formEndTime = useWatch({ control, name: "endTime" });
+  const formStartTime = useWatch({ control, name: "startTime" });
+  const formPks = useWatch({ control, name: "pk" });
+  const formType = useWatch({ control, name: "type" });
 
   const start = fromUIDateTime(formDate, formStartTime);
   const end = fromUIDateTime(formDate, formEndTime);

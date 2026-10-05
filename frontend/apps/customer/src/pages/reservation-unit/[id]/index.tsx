@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import type { UseFormReturn } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -176,12 +176,11 @@ function ReservationUnit({
     mode: "onChange",
     resolver: zodResolver(PendingReservationFormSchema),
   });
+  const { control } = reservationForm;
 
-  const { watch } = reservationForm;
-
-  const durationValue = watch("duration");
-  const dateValue = watch("date");
-  const timeValue = watch("time");
+  const durationValue = useWatch({ control, name: "duration" });
+  const dateValue = useWatch({ control, name: "date" });
+  const timeValue = useWatch({ control, name: "time" });
 
   const displayError = useDisplayError();
 

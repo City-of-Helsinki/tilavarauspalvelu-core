@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, useWatch } from "react-hook-form";
 import type { UseFormReturn, FieldValues } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -67,10 +67,12 @@ export function ReservationStep0({ reservation, cancelReservation, options }: Pr
     resolver: zodResolver(formSchema),
   });
   const {
-    watch,
+    control,
     formState: { isSubmitting },
     handleSubmit,
   } = form;
+
+  const reserveeType = useWatch({ control, name: "reserveeType" });
 
   const { pk: reservationPk } = reservation || {};
   const displayError = useDisplayError();
@@ -155,8 +157,6 @@ export function ReservationStep0({ reservation, cancelReservation, options }: Pr
       displayError(err);
     }
   };
-
-  const reserveeType = watch("reserveeType");
 
   const lang = getLocalizationLang(i18n.language);
   const pricingTerms = reservation.reservationUnit.pricingTerms

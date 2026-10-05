@@ -293,7 +293,7 @@
         "extensions": [".jsx", ".tsx"]
       }
     ],
-    "react/incompatible-library": "off",
+    "react/incompatible-library": "error",
     "react/jsx-key": "error",
     "react/jsx-no-comment-textnodes": "error",
     "react/jsx-no-duplicate-props": "error",

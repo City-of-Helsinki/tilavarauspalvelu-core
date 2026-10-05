@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDisplayError } from "ui/src/hooks";
@@ -53,9 +53,9 @@ export function NewSpaceModal({ unit, closeModal, refetch, parentSpacePk }: Prop
   const [page, setPage] = useState(0);
 
   const hasFixedParent = parentSpacePk != null;
-  const { watch } = form;
+  const { control } = form;
+  const parentPk = useWatch({ control, name: "parent" });
 
-  const parentPk = watch("parent");
   const parentName = unit?.spaces.find((space) => space.pk === parentPk)?.nameFi ?? null;
 
   return (

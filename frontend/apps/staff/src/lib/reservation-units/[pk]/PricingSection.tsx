@@ -1,5 +1,5 @@
 import React from "react";
-import { Controller } from "react-hook-form";
+import { Controller, useWatch } from "react-hook-form";
 import type { Control, UseFormReturn } from "react-hook-form";
 import { addDays, startOfDay } from "date-fns";
 import { IconAlertCircleFill, RadioButton } from "hds-react";
@@ -346,10 +346,12 @@ export function PricingSection({
   pricingTermsOptions: Array<{ value: string; label: string }>;
 }) {
   const { t } = useTranslation("reservationUnitEditor");
-  const { control, watch, formState } = form;
+  const { control, formState } = form;
   const { errors } = formState;
+  const pricings = useWatch({ control, name: "pricings" });
+  const hasFuturePricing = useWatch({ control, name: "hasFuturePricing" });
+  const canApplyFreeOfCharge = useWatch({ control, name: "canApplyFreeOfCharge" });
 
-  const pricings = watch("pricings");
   const isPaid = pricings.some((p) => p.isPaid);
   const hasErrors = errors.pricings != null;
 
@@ -364,7 +366,7 @@ export function PricingSection({
             tooltip={t("tooltip.canApplyFreeOfCharge")}
             disabled={!isPaid}
           />
-          {watch("canApplyFreeOfCharge") && isPaid && (
+          {canApplyFreeOfCharge && isPaid && (
             <ControlledSelect
               control={control}
               name="pricingTerms"
@@ -378,7 +380,7 @@ export function PricingSection({
           )}
           <HR />
         </Flex>
-        {watch("pricings")
+        {pricings
           .filter((p) => !p.isFuture)
           .map((pricing) => (
             <PricingControl
@@ -388,10 +390,10 @@ export function PricingSection({
               taxPercentageOptions={taxPercentageOptions}
             />
           ))}
-        <FuturePricingContainer $gap="s" $toggled={watch("hasFuturePricing")}>
+        <FuturePricingContainer $gap="s" $toggled={hasFuturePricing}>
           <ControlledCheckbox control={control} name="hasFuturePricing" label={t("label.hasFuturePrice")} />
-          {watch("hasFuturePricing") &&
-            watch("pricings")
+          {hasFuturePricing &&
+            pricings
               .filter((p) => p.isFuture)
               .map((pricing) => (
                 <PricingControl
