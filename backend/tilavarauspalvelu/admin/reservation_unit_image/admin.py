@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from django.contrib import admin
+from django.db import models
 
 from tilavarauspalvelu.models import ReservationUnitImage
 
@@ -21,3 +22,8 @@ class ReservationUnitImageAdmin(admin.ModelAdmin):
     list_filter = [
         "image_type",
     ]
+
+    # Form
+    formfield_overrides = {
+        models.URLField: {"assume_scheme": "https"},
+    }
