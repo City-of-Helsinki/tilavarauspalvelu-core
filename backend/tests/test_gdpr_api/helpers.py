@@ -6,9 +6,9 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal
 from unittest.mock import MagicMock, patch
 
+import jwt
 from helusers.settings import api_token_auth_settings
-from jose import jwk, jwt
-from jose.constants import ALGORITHMS
+from jwt.algorithms import RSAAlgorithm
 
 from utils.date_utils import local_datetime
 
@@ -47,7 +47,7 @@ def get_gdpr_auth_header(user: User, *, scopes: list[str], loa: Literal["substan
         "loa": loa,
         "authorization": {"permissions": [{"scopes": scopes}]},
     }
-    encoded_jwt = jwt.encode(jwt_data, key=RSA.private_key_pem, algorithm=RSA.jose_algorithm)
+    encoded_jwt = jwt.encode(jwt_data, key=RSA.private_key_pem, algorithm=RSA.algorithm)
     return f"{api_token_auth_settings.AUTH_SCHEME} {encoded_jwt}"
 
 
@@ -56,27 +56,22 @@ def get_gdpr_auth_header(user: User, *, scopes: list[str], loa: Literal["substan
 
 @dataclass
 class Key:
-    jose_algorithm: str
+    algorithm: str
     private_key_pem: str
     public_key_pem: str
     public_key: dict
 
 
 def _build_key(private_pem: str, public_pem: str) -> Key:
-    key = Key(
-        jose_algorithm=ALGORITHMS.RS256,
+    public_key = RSAAlgorithm.to_jwk(RSAAlgorithm(RSAAlgorithm.SHA256).prepare_key(public_pem), as_dict=True)
+    public_key["alg"] = "RS256"
+
+    return Key(
+        algorithm="RS256",
         private_key_pem=private_pem,
         public_key_pem=public_pem,
-        public_key=jwk.construct(public_pem, ALGORITHMS.RS256).to_dict(),
+        public_key=public_key,
     )
-
-    # Ensure values are strings and not bytes
-    for name in ["n", "e"]:
-        value = key.public_key[name]
-        if isinstance(value, bytes):
-            key.public_key[name] = value.decode("utf-8")
-
-    return key
 
 
 RSA_PRIVATE_KEY = """-----BEGIN PRIVATE KEY-----
