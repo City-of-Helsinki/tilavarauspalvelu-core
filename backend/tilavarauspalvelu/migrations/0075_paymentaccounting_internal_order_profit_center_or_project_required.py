@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="paymentaccounting",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     models.Q(("project", ""), _negated=True),
                     models.Q(("profit_center", ""), _negated=True),
                     models.Q(("internal_order", ""), _negated=True),

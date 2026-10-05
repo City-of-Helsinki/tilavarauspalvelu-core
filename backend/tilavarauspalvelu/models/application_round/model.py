@@ -117,27 +117,27 @@ class ApplicationRound(models.Model):
         ordering = ["pk"]
         constraints = [
             models.CheckConstraint(
-                check=models.Q(application_period_begins_at__lt=models.F("application_period_ends_at")),
+                condition=models.Q(application_period_begins_at__lt=models.F("application_period_ends_at")),
                 name="application_period_begin_before_end",
                 violation_error_message="Application period must begin before it ends",
             ),
             models.CheckConstraint(
-                check=models.Q(reservation_period_begin_date__lt=models.F("reservation_period_end_date")),
+                condition=models.Q(reservation_period_begin_date__lt=models.F("reservation_period_end_date")),
                 name="reservation_period_begin_before_end",
                 violation_error_message="Reservation period must begin before it ends",
             ),
             models.CheckConstraint(
-                check=models.Q(public_display_begins_at__lt=models.F("public_display_ends_at")),
+                condition=models.Q(public_display_begins_at__lt=models.F("public_display_ends_at")),
                 name="public_display_begin_before_end",
                 violation_error_message="Public display period must begin before it ends",
             ),
             models.CheckConstraint(
-                check=models.Q(application_period_ends_at__date__lt=models.F("reservation_period_begin_date")),
+                condition=models.Q(application_period_ends_at__date__lt=models.F("reservation_period_begin_date")),
                 name="applications_end_before_reservation_period_begins",
                 violation_error_message="Application period must end before reservation period begins",
             ),
             models.CheckConstraint(
-                check=(
+                condition=(
                     models.Q(handled_at__isnull=True, sent_at__isnull=True)
                     | models.Q(handled_at__isnull=False, sent_at__isnull=True)
                     | models.Q(handled_at__lte=models.F("sent_at"))
@@ -146,7 +146,7 @@ class ApplicationRound(models.Model):
                 violation_error_message="Application round must be handled before it can be sent",
             ),
             models.CheckConstraint(
-                check=(
+                condition=(
                     models.Q(handled_at=None) | models.Q(application_period_ends_at__date__lt=models.F("handled_at"))
                 ),
                 name="handling_after_application_period_end",

@@ -59,7 +59,7 @@ class ApplicationRoundTimeSlot(models.Model):
                 deferrable=models.Deferrable.DEFERRED,
             ),
             models.CheckConstraint(
-                check=(
+                condition=(
                     (models.Q(is_closed=True) & models.Q(reservable_times__len=0))
                     | (models.Q(is_closed=False) & ~models.Q(reservable_times__len=0))
                 ),

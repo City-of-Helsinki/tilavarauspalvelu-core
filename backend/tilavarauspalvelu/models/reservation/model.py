@@ -177,7 +177,7 @@ class Reservation(SerializableModelMixin, models.Model):
         ordering = ["begins_at"]
         constraints = [
             models.CheckConstraint(
-                check=~models.Q(access_code_generated_at=None, access_code_is_active=True),
+                condition=~models.Q(access_code_generated_at=None, access_code_is_active=True),
                 name="no_access_code_but_active",
                 violation_error_message=_("Reservation cannot have active door code if one is not generated"),
             ),

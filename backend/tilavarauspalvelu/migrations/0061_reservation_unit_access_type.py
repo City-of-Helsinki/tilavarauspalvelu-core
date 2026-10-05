@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="reservationunit",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("access_type_start_date__isnull", True),
                     ("access_type_end_date__isnull", True),
                     ("access_type_start_date__lte", models.F("access_type_end_date")),

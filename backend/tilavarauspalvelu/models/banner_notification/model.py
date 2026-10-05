@@ -59,7 +59,7 @@ class BannerNotification(models.Model):
         constraints = [
             models.CheckConstraint(
                 name="non_draft_notifications_must_have_active_period_and_message",
-                check=(
+                condition=(
                     models.Q(draft=True)
                     | (
                         models.Q(draft=False)
@@ -72,7 +72,7 @@ class BannerNotification(models.Model):
             ),
             models.CheckConstraint(
                 name="active_period_not_set_or_active_until_after_active_from",
-                check=(
+                condition=(
                     (models.Q(active_from__isnull=True) & models.Q(active_until__isnull=True))
                     | (
                         models.Q(active_from__isnull=False)

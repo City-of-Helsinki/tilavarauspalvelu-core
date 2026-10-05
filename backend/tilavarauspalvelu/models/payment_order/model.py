@@ -70,7 +70,7 @@ class PaymentOrder(models.Model):
         ordering = ["pk"]
         constraints = [
             models.CheckConstraint(
-                check=(
+                condition=(
                     ~models.Q(status=OrderStatus.PENDING)
                     | (models.Q(status=OrderStatus.PENDING) & models.Q(handled_payment_due_by__isnull=False))
                 ),

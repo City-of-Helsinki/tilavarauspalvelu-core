@@ -79,7 +79,7 @@ class Migration(migrations.Migration):
                 "base_manager_name": "objects",
                 "constraints": [
                     models.CheckConstraint(
-                        check=models.Q(
+                        condition=models.Q(
                             models.Q(("fixed_by__isnull", True), ("fixed_at__isnull", True)),
                             models.Q(("fixed_by__isnull", False), ("fixed_at__isnull", False)),
                             _connector="OR",

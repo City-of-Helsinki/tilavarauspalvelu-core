@@ -51,7 +51,7 @@ class SuitableTimeRange(models.Model):
         ordering = ["pk"]
         constraints = [
             models.CheckConstraint(
-                check=(
+                condition=(
                     models.Q(begin_time__lt=models.F("end_time"))  # begin before end
                     | (
                         models.Q(end_time__hour=0)  # end at midnight, but start not
@@ -62,7 +62,7 @@ class SuitableTimeRange(models.Model):
                 violation_error_message=_("Begin time must be before end time."),
             ),
             models.CheckConstraint(
-                check=models.Q(begin_time__minute=0, end_time__minute=0),
+                condition=models.Q(begin_time__minute=0, end_time__minute=0),
                 name="begin_and_end_time_multiple_of_60_minutes_suitable",
                 violation_error_message=_("Begin and end times must be a multiples of 60 minutes."),
             ),
