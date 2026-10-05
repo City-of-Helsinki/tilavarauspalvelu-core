@@ -43,7 +43,7 @@
     "oxlint": "^1.85.0",
     "oxlint-tsgolint": "^7.0.2003",
     "ts-node": "^10.9.2",
-    "turbo": "^2.11.3"
+    "turbo": "^2.11.5"
   },
   "engines": {
     "npm": "pnpm"
