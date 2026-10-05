@@ -180,12 +180,8 @@ def test_reservation_unit__update__timeslots__begin_before_end(graphql):
     # - The response contains no errors about end time being before begin time
     assert response.has_errors is True, response
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("applicationRoundTimeSlots") == [
-        {
-            "reservableTimes": [
-                "Timeslot 1 begin time must be before end time.",
-            ],
-        }
+    assert response.field_error_messages("applicationRoundTimeSlots.0.reservableTimes") == [
+        "Timeslot 1 begin time must be before end time.",
     ]
 
 
@@ -219,12 +215,8 @@ def test_reservation_unit__update__timeslots__overlapping_reservable_times(graph
     # - The response contains no errors about overlapping reservable times
     assert response.has_errors is True, response
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("applicationRoundTimeSlots") == [
-        {
-            "reservableTimes": [
-                "Timeslot 1 (10:00:00 - 12:00:00) overlaps with timeslot 2 (11:00:00 - 15:00:00).",
-            ],
-        }
+    assert response.field_error_messages("applicationRoundTimeSlots.0.reservableTimes") == [
+        "Timeslot 1 (10:00:00 - 12:00:00) overlaps with timeslot 2 (11:00:00 - 15:00:00).",
     ]
 
 

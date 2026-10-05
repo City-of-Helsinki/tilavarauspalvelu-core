@@ -273,8 +273,8 @@ def test_reservation_unit__create__pricing__cannot_use_disabled_tax_percentage(g
 
     # Since "Pricing <-> Tax Percentage" relation has the "limit_choices_to" constraint,
     # disabled pricings are treated as not existing in serializers.
-    assert response.field_error_messages("pricings") == [
-        {"taxPercentage": [f'Invalid pk "{tax_percentage.pk}" - object does not exist.']},
+    assert response.field_error_messages("pricings.0.taxPercentage") == [
+        f'Invalid pk "{tax_percentage.pk}" - object does not exist.',
     ]
 
     assert ReservationUnit.objects.count() == 0
@@ -541,6 +541,6 @@ def test_reservation_unit__update__pricing__cannot_use_disabled_tax_percentage(g
 
     # Since "Pricing <-> Tax Percentage" relation has the "limit_choices_to" constraint,
     # disabled pricings are treated as not existing in serializers.
-    assert response.field_error_messages("pricings") == [
-        {"taxPercentage": [f'Invalid pk "{tax_percentage.pk}" - object does not exist.']},
+    assert response.field_error_messages("pricings.0.taxPercentage") == [
+        f'Invalid pk "{tax_percentage.pk}" - object does not exist.',
     ]
