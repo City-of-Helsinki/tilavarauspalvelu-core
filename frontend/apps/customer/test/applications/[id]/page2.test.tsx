@@ -77,7 +77,7 @@ describe("Application Page2", () => {
   test("should render page properly", () => {
     const view = customRender();
     expect(view.getByRole("heading", { name: "application:Page2.subHeading" })).toBeInTheDocument();
-    expect(view.getByRole("button", { name: "common:next" }));
+    expect(view.getByRole("button", { name: "common:next" })).toBeInTheDocument();
     expect(view.getByRole("link", { name: "breadcrumb:applications" })).toBeInTheDocument();
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
     expect(view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })).toBeInTheDocument();
@@ -150,12 +150,12 @@ describe("Application page2 validation errors", () => {
     const view = customRender({ page: "page1" });
     const select = view.getByTestId("time-selector__button--TUESDAY-14");
     await user.click(select);
-    expect(view.getByText("application:validation.calendar.title"));
+    expect(view.getByText("application:validation.calendar.title")).toBeInTheDocument();
     expect(
       view.getByText(
         "application:validation.calendar.Suitable time range must be at least as long as the minimum duration"
       )
-    );
+    ).toBeInTheDocument();
     const validationErrors = view.getAllByText(/application:validation/);
     // title + message nothing else
     expect(validationErrors).toHaveLength(2);
