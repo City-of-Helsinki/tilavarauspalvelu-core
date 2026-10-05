@@ -56,7 +56,7 @@ ARG DEPS=main,admin,celery
 # Install build dependencies
 # - build-essential: for building uWSGI
 # - curl: for installing poetry
-# - libpcre2-dev & libpcre3 & libpcre3-dev: for uWSGI internal routing support
+# - libpcre2-dev: for uWSGI internal routing support
 # - libpq-dev: for building psycopg2
 RUN apt-get update && apt-get install -y --no-install-recommends \
       build-essential \
@@ -64,8 +64,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       git \
       libcurl4-openssl-dev \
       libpcre2-dev \
-      libpcre3 \
-      libpcre3-dev \
       libpq-dev \
     && apt-get clean
 
