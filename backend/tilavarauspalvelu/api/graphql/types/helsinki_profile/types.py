@@ -62,7 +62,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         id_token = user.id_token
 
         # Allow some information to be queried from non-helsinki profile users
-        if id_token is None or not id_token.is_profile_login:
+        if not user.actions.is_profile_user:
             return UserProfileInfo(
                 pk=user.pk,
                 first_name=user.first_name,
