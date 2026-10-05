@@ -2,7 +2,7 @@
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["import", "jsx-a11y", "nextjs", "oxc", "promise", "react", "typescript", "unicorn", "vitest"],
   "categories": {
-    "correctness": "off"
+    "correctness": "warn"
   },
   "env": {
     "builtin": true,
@@ -293,6 +293,7 @@
         "extensions": [".jsx", ".tsx"]
       }
     ],
+    "react/incompatible-library": "off",
     "react/jsx-key": "error",
     "react/jsx-no-comment-textnodes": "error",
     "react/jsx-no-duplicate-props": "error",
@@ -314,9 +315,12 @@
     "react/no-string-refs": "error",
     "react/no-unknown-property": "error",
     "react/prefer-es6-class": "error",
+    "react/preserve-manual-memoization": "off",
     "react/react-in-jsx-scope": "off",
+    "react/refs": "off",
     "react/rules-of-hooks": "error",
     "react/self-closing-comp": "error",
+    "react/set-state-in-effect": "off",
     "react/style-prop-object": "error",
     "react/void-dom-elements-no-children": "error",
     "react_perf/jsx-no-jsx-as-prop": "error",
@@ -408,7 +412,7 @@
         "name": "err"
       }
     ],
-    "unicorn/no-array-callback-reference": "error",
+
     "unicorn/consistent-assert": "error",
     "unicorn/consistent-date-clone": "error",
     "unicorn/consistent-empty-array-spread": "error",
@@ -423,6 +427,7 @@
     "unicorn/no-abusive-eslint-disable": "error",
     "unicorn/no-accessor-recursion": "error",
     "unicorn/no-anonymous-default-export": "error",
+    "unicorn/no-array-callback-reference": "error",
     "unicorn/no-array-for-each": "error",
     "unicorn/no-array-method-this-argument": "error",
     "unicorn/no-array-reduce": "off",
@@ -505,7 +510,17 @@
     "unicorn/require-post-message-target-origin": "error",
     "unicorn/switch-case-braces": ["error", "avoid"],
     "unicorn/text-encoding-identifier-case": "error",
-    "unicorn/throw-new-error": "error"
+    "unicorn/throw-new-error": "error",
+    "vitest/expect-expect": "off",
+    "vitest/no-conditional-expect": "off",
+    "vitest/no-conditional-tests": "error",
+    "vitest/no-disabled-tests": "error",
+    "vitest/no-focused-tests": "error",
+    "vitest/require-local-test-context-for-concurrent-snapshots": "error",
+    "vitest/require-mock-type-parameters": "off",
+    "vitest/require-to-throw-message": "off",
+    "vitest/valid-expect": "off",
+    "vitest/warn-todo": "off"
   },
   "ignorePatterns": [
     "node_modules/",
@@ -562,7 +577,7 @@
       }
     },
     {
-      "files": ["**/*.test.ts*", "**/vitest.setup.ts", "**/mocks.ts"],
+      "files": ["**/*.test.{ts,tsx}", "**/vitest.setup.ts", "**/mocks.ts"],
       "rules": {
         "oxc/no-accumulating-spread": "off",
         "promise/avoid-new": "off",
@@ -571,11 +586,8 @@
         "typescript/restrict-template-expressions": "off",
         "unicorn/consistent-function-scoping": "off",
         "unicorn/error-message": "off",
-        "vitest/no-conditional-tests": "error",
-        "vitest/no-disabled-tests": "error",
-        "vitest/no-focused-tests": "error",
-        "vitest/require-local-test-context-for-concurrent-snapshots": "error",
-        "unicorn/no-array-callback-reference": "off"
+        "unicorn/no-array-callback-reference": "off",
+        "react/purity": "off"
       }
     },
     {

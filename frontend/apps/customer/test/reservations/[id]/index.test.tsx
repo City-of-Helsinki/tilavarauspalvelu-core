@@ -144,9 +144,14 @@ describe("Page: View reservation", () => {
       await waitForAddressSection(view);
 
       const buttonSection = view.getByTestId("reservation__content").childNodes[2] as HTMLElement;
-      expect.poll(() => within(buttonSection).getByText("reservation:modifyReservationTime"));
-      expect.poll(() => within(buttonSection).getByTestId("reservation-detail__button--edit"));
+      await waitFor(() =>
+        expect(within(buttonSection).queryByTestId("reservation-detail__button--edit")).toBeInTheDocument()
+      );
+      await waitFor(() =>
+        expect(within(buttonSection).queryByText("reservation:modifyReservationTime")).toBeInTheDocument()
+      );
     });
+
     it("Should show the pay button if the reservation is waiting for payment", async () => {
       const view = customRender(reservationRenderProps("waitingForPayment"));
       await waitForAddressSection(view);
