@@ -14,24 +14,16 @@ from tilavarauspalvelu.api.graphql.types.reservation_unit_option.serializers imp
     ReservationUnitOptionApplicantSerializer,
 )
 from tilavarauspalvelu.api.graphql.types.suitable_time_range.serializers import SuitableTimeRangeSerializer
-from tilavarauspalvelu.enums import (
-    ApplicationRoundStatusChoice,
-    ReservationCancelReasonChoice,
-    ReservationStateChoice,
-    ReservationTypeChoice,
-)
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ReservationCancelReasonChoice, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ApplicationRound, ApplicationSection, Reservation
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import local_datetime
-from utils.db import Now
 from utils.utils import comma_sep_str
 
 if TYPE_CHECKING:
     import datetime
 
-    from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
 
 __all__ = [
     "ApplicationSectionSerializer",
@@ -251,27 +243,12 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
         return data
 
     def save(self, **kwargs: Any) -> CancellationOutput:
-        future_reservations = Reservation.objects.for_application_section(self.instance).filter(
+        future_reservations = Reservation.objects.future_reservations_in_section(self.instance).filter(
             user=self.instance.application.user,
-            begins_at__gt=local_datetime(),
         )
 
-        cancellable_reservations: ReservationQuerySet = (
-            future_reservations
-            .filter(
-                type=ReservationTypeChoice.SEASONAL,
-                state=ReservationStateChoice.CONFIRMED,
-                price=0,
-                reservation_unit__cancellation_rule__isnull=False,
-            )
-            .alias(
-                cancellation_time=models.F("reservation_unit__cancellation_rule__can_be_cancelled_time_before"),
-                cancellation_cutoff=Now() + models.F("cancellation_time"),
-            )
-            .filter(
-                begins_at__gt=models.F("cancellation_cutoff"),
-            )
-            .distinct()
+        cancellable_reservations = Reservation.objects.cancellable_reservations_in_section(self.instance).filter(
+            user=self.instance.application.user,
         )
 
         has_access_code = cancellable_reservations.requires_active_access_code().exists()
