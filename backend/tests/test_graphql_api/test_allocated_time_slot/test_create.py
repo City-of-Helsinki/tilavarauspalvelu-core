@@ -494,8 +494,10 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation_for_sa
     # then:
     # - The response complains about the there being another allocation already.
     assert response.field_error_messages() == [
-        "Given time slot has already been allocated for another application section "
-        "with a related reservation unit or resource.",
+        (
+            "Given time slot has already been allocated for another application section "
+            "with a related reservation unit or resource."
+        ),
     ]
 
 
@@ -549,6 +551,8 @@ def test_allocated_time_slot__create__overlapping_in_related_reservation_unit(gr
     # then:
     # - The response complains about the there being another allocation already.
     assert response.field_error_messages() == [
-        "Given time slot has already been allocated for another application section "
-        "with a related reservation unit or resource.",
+        (
+            "Given time slot has already been allocated for another application section "
+            "with a related reservation unit or resource."
+        ),
     ]
