@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self
 
-from django.db import models
 from lookup_property import L
 
 from tilavarauspalvelu.enums import BannerNotificationTarget
@@ -27,9 +26,7 @@ class BannerNotificationQuerySet(ModelQuerySet[BannerNotification]):
 
     def visible(self, user: AnyUser) -> Self:
         if user.is_anonymous:
-            return self.active().filter(
-                models.Q(target=BannerNotificationTarget.USER) | models.Q(target=BannerNotificationTarget.ALL),
-            )
+            return self.active().filter(target__in=BannerNotificationTarget.for_customers)
 
         if user.permissions.can_manage_notifications():
             return self.active()
@@ -37,9 +34,7 @@ class BannerNotificationQuerySet(ModelQuerySet[BannerNotification]):
         if user.permissions.has_any_role():
             return self.active().filter(target__in=BannerNotificationTarget.for_staff)
 
-        return self.active().filter(
-            models.Q(target=BannerNotificationTarget.USER) | models.Q(target=BannerNotificationTarget.ALL),
-        )
+        return self.active().filter(target__in=BannerNotificationTarget.for_customers)
 
     def hidden(self, user: AnyUser) -> Self:
         if user.is_anonymous:
