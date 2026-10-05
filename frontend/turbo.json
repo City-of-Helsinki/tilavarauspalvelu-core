@@ -4,6 +4,7 @@
     "build": {
       "env": [
         "SENTRY_*",
+        "NEXT_PUBLIC_SENTRY_*",
         "SKIP_ENV_VALIDATION",
         "FEEDBACK_URL"
       ],
