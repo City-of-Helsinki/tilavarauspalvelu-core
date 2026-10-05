@@ -77,14 +77,14 @@ describe("Application Page3", () => {
   test("smoke: should render page with initial data", () => {
     const view = customRender();
     expect(view.getByRole("heading", { name: "application:Page3.subHeading" })).toBeInTheDocument();
-    expect(view.getByRole("button", { name: "common:next" }));
+    expect(view.getByRole("button", { name: "common:next" })).toBeInTheDocument();
     expect(view.getByRole("link", { name: "breadcrumb:applications" })).toBeInTheDocument();
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
     expect(view.getByRole("heading", { name: "applicationRound:notesWhenApplying" })).toBeInTheDocument();
 
     const form = view.getByTestId("application__page3--form");
     expect(form).toBeInTheDocument();
-    expect(within(form).getByText("application:Page3.sectionHeadings.basicInfo"));
+    expect(within(form).getByText("application:Page3.sectionHeadings.basicInfo")).toBeInTheDocument();
   });
 
   test("should send the form when clicking next", async () => {

@@ -43,7 +43,7 @@ describe("Component: Instructions", () => {
     // check that the heading is present...
     expect(view.queryByText("reservation:reservationInfo")).toBeInTheDocument();
     // ...and that the text matches with the query result
-    expect(view.getByText(instructionsText));
+    expect(view.getByText(instructionsText)).toBeInTheDocument();
   });
 
   it.for([ReservationStateChoice.Denied, ReservationStateChoice.WaitingForPayment])(

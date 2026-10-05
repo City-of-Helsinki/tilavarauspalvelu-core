@@ -102,8 +102,8 @@ describe("Page1 common to all funnel pages", () => {
   test("should render empty application page", () => {
     const view = customRender();
     expect(view.getByRole("heading", { name: "application:Page1.subHeading" })).toBeInTheDocument();
-    expect(view.getByRole("button", { name: "application:Page1.createNew" }));
-    expect(view.getByRole("button", { name: "common:next" }));
+    expect(view.getByRole("button", { name: "application:Page1.createNew" })).toBeInTheDocument();
+    expect(view.getByRole("button", { name: "common:next" })).toBeInTheDocument();
     expect(view.getByRole("link", { name: "breadcrumb:applications" })).toBeInTheDocument();
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
   });

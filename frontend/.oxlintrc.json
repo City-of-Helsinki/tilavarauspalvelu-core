@@ -519,7 +519,6 @@
     "vitest/require-local-test-context-for-concurrent-snapshots": "error",
     "vitest/require-mock-type-parameters": "off",
     "vitest/require-to-throw-message": "off",
-    "vitest/valid-expect": "off",
     "vitest/warn-todo": "off"
   },
   "ignorePatterns": [

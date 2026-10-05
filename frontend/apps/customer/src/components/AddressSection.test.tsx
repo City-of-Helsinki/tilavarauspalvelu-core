@@ -68,9 +68,8 @@ describe("Component: AddressSection | With proper content", () => {
     const view = customRender();
     const streetText = `${createAddressSectionMock()?.addressStreetFi}`;
     const cityText = `, ${createAddressSectionMock()?.addressZip} ${createAddressSectionMock()?.addressCityFi}`;
-    // expect(view.getByRole("heading", { name: "Test unit 1" }));
-    expect(view.getByText(streetText));
-    expect(view.getByText(cityText));
+    expect(view.getByText(streetText)).toBeInTheDocument();
+    expect(view.getByText(cityText)).toBeInTheDocument();
   });
   it.for(Object.entries(linkUrls))("should render %o link with correct href", ([key, value]) => {
     const view = customRender();
