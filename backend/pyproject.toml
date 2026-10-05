@@ -220,6 +220,9 @@ ignore = [
 
     # Allow empty comments. We use emtpy comments for forcing better code formatting.
     "PLR2044",  # empty-comment
+
+    # Allow type comments for now, since they are useful for documenting types.
+    "PYI033",   # legacy-type-comment
 ]
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^options$|^info$|^name$|^obj$|^request$|^user|^view$|^input_data$|^filters$"
 task-tags = ["TODO", "FIXME", "XXX", "type"]
