@@ -35,9 +35,7 @@ class BannerNotificationQuerySet(ModelQuerySet[BannerNotification]):
             return self.active()
 
         if user.permissions.has_any_role():
-            return self.active().filter(
-                models.Q(target=BannerNotificationTarget.STAFF) | models.Q(target=BannerNotificationTarget.ALL),
-            )
+            return self.active().filter(target__in=BannerNotificationTarget.for_staff)
 
         return self.active().filter(
             models.Q(target=BannerNotificationTarget.USER) | models.Q(target=BannerNotificationTarget.ALL),
