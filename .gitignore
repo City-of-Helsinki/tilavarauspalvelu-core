@@ -17,6 +17,9 @@
 # local certs
 **/certificates
 
+# nextjs generated types
+**/next-env.d.ts
+
 # caches
 **/.turbo
 **/.next
