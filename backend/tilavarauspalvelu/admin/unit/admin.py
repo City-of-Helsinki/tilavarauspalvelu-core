@@ -6,6 +6,7 @@ from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TabbedTranslationAdmin
 
@@ -62,6 +63,9 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
 
     # Form
     form = UnitAdminForm
+    formfield_overrides = {
+        models.URLField: {"assume_scheme": "https"},
+    }
     fieldsets = [
         [
             _("Basic information"),

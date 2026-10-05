@@ -80,7 +80,7 @@ class AllocationForm(forms.Form):
     weekday_value = forms.CharField(widget=text_widget)
     time_value = forms.CharField(widget=text_widget)
     access_code_validity_period = forms.CharField(widget=text_widget)
-    series_url = forms.URLField(widget=url_widget)
+    series_url = forms.URLField(widget=url_widget, assume_scheme="https")
     unit_name = forms.CharField(widget=text_widget)
     unit_location = forms.CharField(widget=text_widget)
     reservation_unit_name = forms.CharField(widget=text_widget)
