@@ -24,7 +24,7 @@ RUN echo "Install common dependencies" \
       libcurl4 \
       libpq5 \
       postgresql-client \
-      make \
+      just \
       rsync \
     && apt-get clean \
     && echo "Create project directory" \

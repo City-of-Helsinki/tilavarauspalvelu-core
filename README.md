@@ -81,10 +81,10 @@ see the [backend](#backend) section.
   - Ubuntu: https://github.com/nvm-sh/nvm
   - Mac: `brew install nvm`
   - Windows: https://github.com/coreybutler/nvm-windows
-- Make
-  - Ubuntu: `sudo apt-get install make`
-  - Mac: `brew install make`
-  - Windows: `choco install make` (using [chocolatey])
+- just
+  - Ubuntu: `sudo apt-get install just` (Ubuntu 24.04 or newer)
+  - Mac: `brew install just`
+  - Windows: `choco install just` (using [chocolatey])
 
 [chocolatey]: https://chocolatey.org/install
 
@@ -99,7 +99,7 @@ cp backend/.env.example backend/.env
 2. Build and run backend with Docker.
 
 ```sh
-make run
+just run
 ```
 
 You should now be able to open Django admin panel at `localhost:8000/admin/`.
@@ -110,13 +110,13 @@ To generate test data, follow the steps below.
 1. Connect to running container.
 
 ```sh
-make bash
+just bash
 ```
 
 2. Generate test data.
 
 ```sh
-make generate
+just generate
 ```
 
 ### Setup frontend
@@ -164,7 +164,7 @@ pnpm codegen
 
 Without GNU parallel (e.g. Windows users)
 ```sh
-make codegen
+just codegen
 ```
 
 7. Start the frontend.
@@ -368,7 +368,7 @@ Scheduled & background tasks are run with [Celery].
 
 [Celery]: https://github.com/celery/
 
-When developing locally, you can run these tasks in a Celery worker with `make celery`.
+When developing locally, you can run these tasks in a Celery worker with `just be celery`.
 This uses the filesystem as the message broker.
 You'll need to create queue and processed folders according to the
 `CELERY_QUEUE_FOLDER_OUT`, `CELERY_QUEUE_FOLDER_IN`, `CELERY_PROCESSED_FOLDER`
@@ -422,9 +422,9 @@ In settings there are four configurations:
 Translations are handled by Django's built-in translation system.
 GitHub Actions CI will check that all translations are up-to-date during PRs.
 
-To update translations, run `make translations`. This will add any missing translations
+To update translations, run `just be translations`. This will add any missing translations
 and remove any removed translations from the `.po` files located in the `locale` directory.
-After filling in the translations, run `make translate` to compile the `.po` files to `.mo` files.
+After filling in the translations, run `just be translate` to compile the `.po` files to `.mo` files.
 The `.mo` will be used by Django to display translations. This compilation step is part of the
 Dockerfile build process, so you don't need to commit the `.mo` files.
 
@@ -486,7 +486,7 @@ pnpm codegen
 
 Without GNU parallel (e.g. on Windows)
 ```sh
-make codegen
+just codegen
 ```
 
 Run in [watch mode](https://the-guild.dev/graphql/codegen/docs/getting-started/development-workflow#watch-mode) for all apps.
@@ -694,6 +694,6 @@ Check the console logs in the terminal where `pnpm dev` is running.
 
 Adding a new relation or a fragment to a graphql query often requires modifiying the backend allowed complexity for that
 endpoint. Find the `max_complexity` for that specific endpoint in the backend code and increase it by one till it doesn't error anymore.
-Remember to run backend in watch mode or `make run` after each change.
+Remember to run backend in watch mode or `just run` after each change.
 
 Max complexity is a security measure, but the default `10` is low compared to the complexity of a lot of the frontend queries.
