@@ -54,25 +54,22 @@ export function DateTimeInput<T extends FieldValues>({
   return (
     <DateTimeWrapper>
       <DateInput
+        {...dateField}
         language="fi"
-        ref={dateField.ref}
         required={required}
         disabled={disabled}
         minDate={minDate && startOfDay(minDate)}
         disableConfirmation
         label={t("common:date")}
         id={name.date}
-        value={dateField.value}
-        onChange={(v) => dateField.onChange(v)}
         errorText={translateError?.(dateError?.message) ?? dateError?.message}
         invalid={!!dateError?.message}
       />
       <TimeInput
+        {...timeField}
         name={name.time}
-        ref={timeField.ref}
         required={required}
         disabled={disabled}
-        value={timeField.value}
         label={t("common:time")}
         onChange={handleTimeChange}
         error={translateError?.(timeError?.message) ?? timeError?.message}

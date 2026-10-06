@@ -69,7 +69,7 @@ function SearchSingle({ options }: Readonly<Props>): React.ReactElement {
         behavior: "smooth",
       });
     }
-  }, [content?.current?.offsetTop, currData?.reservationUnits, isMobile]);
+  }, [currData?.reservationUnits, isMobile]);
 
   const routes = [
     {

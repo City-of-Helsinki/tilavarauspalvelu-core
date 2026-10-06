@@ -83,6 +83,13 @@ export function PopupMenu({ items, style, className }: PopupMenuProps): React.Re
   });
 
   const [isOpen, setIsOpen] = useState(false);
+  const [containerDiv, setContainerDiv] = useState<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (buttonRef.current) {
+      setContainerDiv(buttonRef.current);
+    }
+  }, []);
 
   const openPopup = () => {
     setIsOpen(true);
@@ -109,10 +116,10 @@ export function PopupMenu({ items, style, className }: PopupMenuProps): React.Re
       >
         <IconMenuDots />
       </ToggleButton>
-      {isOpen && buttonRef.current
+      {isOpen
         ? createPortal(
             <PopupContent items={items} closePopup={closePopup} firstMenuItemRef={firstMenuItemRef} />,
-            buttonRef.current
+            containerDiv ?? document.body
           )
         : null}
     </Container>
