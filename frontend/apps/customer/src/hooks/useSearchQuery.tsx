@@ -1,6 +1,3 @@
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { hash, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { SEARCH_PAGING_LIMIT } from "@/modules/const";
 import { useSearchReservationUnitsQuery } from "@gql/gql-types";
 import type { SearchReservationUnitsQueryVariables } from "@gql/gql-types";
@@ -15,36 +12,11 @@ export function useSearchQuery(variables: SearchReservationUnitsQueryVariables) 
     notifyOnNetworkStatusChange: true,
   });
 
-  const [hasMoreData, setHasMoreData] = useState(true);
-  const [varhash, setVarhash] = useState("");
   const { fetchMore } = query;
 
-  const router = useRouter();
-
-  // clear the showMore state if the variables change
-  useEffect(() => {
-    async function check(v: typeof variables, version: number): Promise<void> {
-      // use hash to make sure we don't reset unnecessarily
-      const hashed = await hash(JSON.stringify({ ...v, version }));
-      if (hashed !== varhash) {
-        setVarhash(hashed);
-        setHasMoreData(true);
-      }
-    }
-
-    const { ref } = router.query;
-    const version = toNumber(ignoreMaybeArray(ref));
-    void check(variables, version ?? 0);
-  }, [variables, varhash, router.query]);
-
-  useEffect(() => {
-    if (query.data) {
-      const edgeLength = query.data.reservationUnits?.edges.length;
-      if (!edgeLength || edgeLength === 0 || edgeLength < SEARCH_PAGING_LIMIT) {
-        setHasMoreData(false);
-      }
-    }
-  }, [query.data]);
+  const edgeLength = query.data?.reservationUnits?.edges.length;
+  const endReached = edgeLength == null || edgeLength < SEARCH_PAGING_LIMIT;
+  const hasMoreData = !endReached;
 
   // NOTE fetchMore doesn't update the pageInfo cache if the result is empty
   // so we need to track if we have hit the end of the list.
@@ -57,11 +29,6 @@ export function useSearchQuery(variables: SearchReservationUnitsQueryVariables) 
         after: endCursor,
       },
     });
-    const edgeLength = res.data.reservationUnits?.edges.length;
-
-    if (!edgeLength || edgeLength === 0 || edgeLength < SEARCH_PAGING_LIMIT) {
-      setHasMoreData(false);
-    }
     return res;
   };
 
