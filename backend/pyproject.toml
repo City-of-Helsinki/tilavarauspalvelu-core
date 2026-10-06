@@ -196,6 +196,7 @@ extend-select = [
     "RUF047",   # needless-else
     "RUF055",   # unnecessary-regular-expression
     "RUF056",   # falsy-dict-get-fallback
+    "RUF070",   # unnecessary-assign-before-yield
     "TC008",    # quoted-type-alias
 ]
 ignore = [
