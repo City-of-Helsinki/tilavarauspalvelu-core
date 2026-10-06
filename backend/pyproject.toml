@@ -148,6 +148,8 @@ select = [
     "LOG",      # flake8-logging
     "N",        # pep8-naming
     "PERF",     # Perflint
+    "PGH004",   # pygrep-hooks: Use specific rule codes when using `noqa`
+    "PGH005",   # pygrep-hooks: Mock methods should be called
     "PIE",      # flake8-pie
     "PL",       # pylint
     "PT",       # flake8-pytest-style
@@ -160,6 +162,7 @@ select = [
     "S",        # flake8-bandit
     "SIM",      # flake8-simplify
     "SLF",      # flake8-self
+    "T10",      # flake8-debugger
     "T20",      # flake8-print
     "TC",       # flake8-type-checking
     "TID",      # flake8-tidy-imports
@@ -169,35 +172,60 @@ select = [
 ]
 # Preview rules
 extend-select = [
+    "B043",     # del-attr-with-constant
     "B901",     # return-in-generator
     "B903",     # class-as-data-structure
     "B909",     # loop-iterator-mutation
     "E262",     # no-space-after-inline-comment
+    "FURB101",  # read-whole-file
     "FURB103",  # write-whole-file
     "FURB113",  # repeated-append
     "FURB131",  # delete-full-slice
     "FURB142",  # for-loop-set-mutations
     "FURB145",  # slice-copy
     "FURB148",  # unnecessary-enumerate
+    "FURB152",  # math-constant
+    "FURB154",  # repeated-global
+    "FURB180",  # meta-class-abc-meta
     "FURB189",  # subclass-builtin
     "PLC1901",  # compare-to-empty-string
     "PLC2701",  # import-private-name
     "PLC2801",  # unnecessary-dunder-call
     "PLE1141",  # dict-iter-missing-items
     "PLE4703",  # modified-iterating-set
+    "PLR0202",  # no-classmethod-decorator
+    "PLR0203",  # no-staticmethod-decorator
     "PLR0916",  # too-many-boolean-expressions
     "PLR1702",  # too-many-nested-blocks
+    "PLR1712",  # swap-with-temporary-variable
     "PLR6104",  # non-augmented-assignment
     "PLR6201",  # literal-membership
+    "PLW0244",  # redefined-slots-in-subclass
     "PLW1514",  # unspecified-encoding
+    "PT029",    # pytest-warns-without-warning
     "RUF027",   # missing-f-string-syntax
+    "RUF029",   # unused-async
     "RUF031",   # incorrectly-parenthesized-tuple-in-subscript
+    "RUF038",   # redundant-bool-literal
+    "RUF039",   # unraw-re-pattern
     "RUF045",   # implicit-class-var-in-dataclass
     "RUF047",   # needless-else
+    "RUF050",   # unnecessary-if
     "RUF055",   # unnecessary-regular-expression
     "RUF056",   # falsy-dict-get-fallback
+    "RUF065",   # logging-eager-conversion
+    "RUF066",   # property-without-return
     "RUF070",   # unnecessary-assign-before-yield
+    "RUF071",   # os-path-commonprefix
+    "RUF072",   # useless-finally
+    "RUF073",   # f-string-percent-format
+    "RUF074",   # incorrect-decorator-order
+    "RUF075",   # fallible-context-manager
+    "RUF077",   # method-receiver-default
     "TC008",    # quoted-type-alias
+    "UP048",    # while-one
+    "UP051",    # deprecated-abc-decorator
+    "UP052",    # context-manager-iterator
 ]
 ignore = [
     # Conflicting with ruff-format, code style preference
