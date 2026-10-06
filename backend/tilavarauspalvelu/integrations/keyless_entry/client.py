@@ -197,10 +197,6 @@ class PindoraReservationUnitClient(BasePindoraClient):
         return cls._parse_reservation_unit_response(data)
 
     @classmethod
-    def _clear_cached_reservation_unit_response(cls, *, ext_uuid: uuid.UUID) -> bool:
-        return cls._clear_cached_response(ext_uuid=ext_uuid, prefix="reservation-unit")
-
-    @classmethod
     def _parse_reservation_unit_response(cls, data: dict[str, Any]) -> PindoraReservationUnitResponse:
         try:
             return PindoraReservationUnitResponse(
