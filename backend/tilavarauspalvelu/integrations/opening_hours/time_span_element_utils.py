@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import bisect
 from copy import copy
 from itertools import chain
 from typing import TYPE_CHECKING
@@ -7,6 +8,7 @@ from typing import TYPE_CHECKING
 from utils.utils import with_indices
 
 if TYPE_CHECKING:
+    import datetime
     from collections.abc import Iterable
 
     from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
@@ -202,3 +204,31 @@ def override_reservable_with_closed_time_spans(
     )
 
     return reservable_time_spans
+
+
+def find_time_spans_near_period(
+    time_spans: list[TimeSpanElement],
+    *,
+    start_datetime: datetime.datetime,
+    end_datetime: datetime.datetime,
+    longest_buffer: datetime.timedelta,
+) -> list[TimeSpanElement]:
+    """
+    Return the time spans that can overlap the given period when their buffers are included.
+
+    The result can also contain time spans that do not overlap, so callers must still check for overlaps.
+    `time_spans` must come from `merge_overlapping_time_span_elements`, so that both their start and end
+    times are in chronological order. `longest_buffer` must be at least as long as any buffer in the
+    time spans or in the period.
+    """
+    first_index = bisect.bisect_right(
+        time_spans,
+        start_datetime - longest_buffer,
+        key=lambda time_span: time_span.end_datetime,
+    )
+    last_index = bisect.bisect_left(
+        time_spans,
+        end_datetime + longest_buffer,
+        key=lambda time_span: time_span.start_datetime,
+    )
+    return time_spans[first_index:last_index]
