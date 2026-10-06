@@ -36,11 +36,11 @@ gh pr view <number> --repo City-of-Helsinki/tilavarauspalvelu-core --json number
 Fetch the line-specific review comments separately:
 
 ```bash
-gh api repos/City-of-Helsinki/tilavarauspalvelu-core/pulls/<number>/comments --jq '[.[] | {author: .user.login, at: .created_at, file: .path, line: (.line // .original_line), body}]'
+gh api repos/City-of-Helsinki/tilavarauspalvelu-core/pulls/<number>/comments --paginate --jq '[.[] | {author: .user.login, at: .created_at, file: .path, line: (.line // .original_line), body}]'
 ```
 
 General PR-level comments, not tied to a diff line, come from the issue comments endpoint:
 
 ```bash
-gh api repos/City-of-Helsinki/tilavarauspalvelu-core/issues/<number>/comments --jq '[.[] | {author: .user.login, at: .created_at, body}]'
+gh api repos/City-of-Helsinki/tilavarauspalvelu-core/issues/<number>/comments --paginate --jq '[.[] | {author: .user.login, at: .created_at, body}]'
 ```
