@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self
 
-from django.db import models
-
 from tilavarauspalvelu.models import ReservableTimeSpan
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from utils.date_utils import normalize_as_datetime
@@ -72,39 +70,6 @@ class ReservableTimeSpanQuerySet(ModelQuerySet[ReservableTimeSpan]):
         start: datetime = normalize_as_datetime(start)
         end: datetime = normalize_as_datetime(end, timedelta_days=1)
         return self.filter(start_datetime__lte=start, end_datetime__gte=end)
-
-    def truncated_start_and_end_datetimes_for_period(
-        self,
-        start: datetime.datetime | datetime.date,
-        end: datetime.datetime | datetime.date,
-    ) -> Self:
-        """
-        Annotate truncated start and end datetimes for reservable time spans that overlap with the given period.
-
-        If the time span starts before the period, the start time is set to the period start.
-        If the time span ends after the period, the end time is set to the period end (start of next day).
-        """
-        start = normalize_as_datetime(start)
-        end = normalize_as_datetime(end, timedelta_days=1)
-        return self.overlapping_with_period(
-            start=start,
-            end=end,
-        ).annotate(
-            truncated_start_datetime=models.Case(
-                models.When(
-                    condition=models.Q(start_datetime__lt=start),
-                    then=models.Value(start),
-                ),
-                default="start_datetime",
-            ),
-            truncated_end_datetime=models.Case(
-                models.When(
-                    condition=models.Q(end_datetime__gt=end),
-                    then=models.Value(end),
-                ),
-                default="end_datetime",
-            ),
-        )
 
 
 class ReservableTimeSpanManager(ModelManager[ReservableTimeSpan, ReservableTimeSpanQuerySet]): ...
