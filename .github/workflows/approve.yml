@@ -3,6 +3,7 @@ name: "Auto approve PRs by bots"
 on:
   # Trigger when any action on a pull request is taken.
   pull_request_target:
+    types: [opened, synchronize, reopened]
 
 jobs:
   approve:
@@ -12,24 +13,23 @@ jobs:
       pull-requests: write  # Allows approving the PR.
       contents: write  # Allows merging the PR.
 
-    # Only run if one of the defined bots is the pull request author.
+    # Only run if one of the defined bots is the pull request author,
+    # and the same bot triggered the event (e.g. not a human pushing to a bot's branch).
     # https://github.com/City-of-Helsinki/tilavarauspalvelu-core/settings/variables/actions
-    if: contains(fromJSON(vars.BOTS), github.event.pull_request.user.login)
+    if: >-
+      contains(fromJSON(vars.BOTS), github.event.pull_request.user.login) &&
+      github.actor == github.event.pull_request.user.login
 
     steps:
-      - name: "Check out repository"
-        uses: actions/checkout@v6
-
       - name: "Approve a pull request and set to auto rebase-merge if tests pass"
         # Only approve the PR if it's not already approved to avoid email spam.
         # Don't auto-merge PRs for frontend as they are not tests automatically.
         run: |
-          gh pr checkout "$PR_URL"
-          if [ "$(gh pr status --json labels -q .currentBranch.labels[].name | grep -c "javascript")" -eq 1 ];
+          if [ "$(gh pr view "$PR_URL" --json labels -q '.labels[].name' | grep -c "javascript")" -eq 1 ];
             then echo "Dependabot PRs for frontend are not auto-merged."
             exit 0
           fi
-          if [ "$(gh pr status --json reviewDecision -q .currentBranch.reviewDecision)" == "APPROVED" ];
+          if [ "$(gh pr view "$PR_URL" --json reviewDecision -q .reviewDecision)" == "APPROVED" ];
             then echo "PR already approved."
           else
             gh pr review --approve "$PR_URL";

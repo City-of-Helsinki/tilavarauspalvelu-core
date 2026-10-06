@@ -51,8 +51,8 @@ backend/
 │   │   │   │       ├── permissions.py
 │   │   │   │       ├── serializers.py
 │   │   │   │       └── types.py
-│   │   │   ├── mutations.py            # Import every mutation class here, see it's docstring for details
-│   │   │   ├── queries.py              # Import every node here, see it's docstring for details
+│   │   │   ├── mutations.py            # Import every mutation class here, see its docstring for details
+│   │   │   ├── queries.py              # Import every node here, see its docstring for details
 │   │   │   └── schema.py               # Root query and mutation types
 │   │   ├── rest/                       # See `REST endpoints`
 │   │   ├── webhooks/                   # Endpoints that external services call
