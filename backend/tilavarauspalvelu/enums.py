@@ -896,6 +896,8 @@ class Weekday(models.TextChoices):
                 return Weekday.FRIDAY
             case 6:
                 return Weekday.SATURDAY
+            case 7:
+                return Weekday.SUNDAY
             case _:  # pragma: no cover
                 msg = f"Invalid weekday: {weekday}."
                 raise ValueError(msg)
