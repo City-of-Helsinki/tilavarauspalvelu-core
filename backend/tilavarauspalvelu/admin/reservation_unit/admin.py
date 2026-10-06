@@ -220,7 +220,7 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
 
     @admin.display(description=_("Current access type"), ordering=L("current_access_type"))
     def current_access_type(self, obj: ReservationUnit) -> AccessType | None:
-        return obj.current_access_type  #  type: ignore[return-value]
+        return obj.current_access_type  # type: ignore[return-value]
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet[ReservationUnit]:
         return (
