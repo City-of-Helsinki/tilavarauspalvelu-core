@@ -46,6 +46,20 @@ const ClientSchema = z.object({
   NEXT_PUBLIC_SENTRY_PROJECT: z.string().optional(),
 });
 
+/**
+ * @param {string} key
+ * @param {string | undefined} buildValue
+ */
+function getPublicEnv(key, buildValue) {
+  if (typeof window !== "undefined") {
+    return window.__RUNTIME_CONFIG__?.[key] ?? buildValue;
+  }
+
+  // Dynamic lookup is intentional: unlike direct NEXT_PUBLIC_* access, this
+  // reads the container's environment when the Next.js server is running.
+  return process.env[key] ?? buildValue;
+}
+
 function createEnv() {
   const skipValidation = coerceBoolean.parse(process.env.SKIP_ENV_VALIDATION);
   const isServer = typeof window === "undefined";
@@ -67,13 +81,28 @@ function createEnv() {
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_SOURCE_BRANCH_NAME: process.env.NEXT_PUBLIC_SOURCE_BRANCH_NAME,
     NEXT_PUBLIC_SOURCE_VERSION: process.env.NEXT_PUBLIC_SOURCE_VERSION,
-    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
-    NEXT_PUBLIC_SENTRY_ENVIRONMENT: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
-    NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE,
-    NEXT_PUBLIC_SENTRY_TRACE_PROPAGATION_TARGETS: process.env.NEXT_PUBLIC_SENTRY_TRACE_PROPAGATION_TARGETS,
-    NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE: process.env.NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE,
-    NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE: process.env.NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE,
-    NEXT_PUBLIC_SENTRY_PROJECT: process.env.NEXT_PUBLIC_SENTRY_PROJECT,
+    NEXT_PUBLIC_SENTRY_DSN: getPublicEnv("NEXT_PUBLIC_SENTRY_DSN", process.env.NEXT_PUBLIC_SENTRY_DSN),
+    NEXT_PUBLIC_SENTRY_ENVIRONMENT: getPublicEnv(
+      "NEXT_PUBLIC_SENTRY_ENVIRONMENT",
+      process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT
+    ),
+    NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: getPublicEnv(
+      "NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE",
+      process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE
+    ),
+    NEXT_PUBLIC_SENTRY_TRACE_PROPAGATION_TARGETS: getPublicEnv(
+      "NEXT_PUBLIC_SENTRY_TRACE_PROPAGATION_TARGETS",
+      process.env.NEXT_PUBLIC_SENTRY_TRACE_PROPAGATION_TARGETS
+    ),
+    NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE: getPublicEnv(
+      "NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE",
+      process.env.NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE
+    ),
+    NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE: getPublicEnv(
+      "NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE",
+      process.env.NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE
+    ),
+    NEXT_PUBLIC_SENTRY_PROJECT: getPublicEnv("NEXT_PUBLIC_SENTRY_PROJECT", process.env.NEXT_PUBLIC_SENTRY_PROJECT),
   });
 
   if (!clientConfig.success) {

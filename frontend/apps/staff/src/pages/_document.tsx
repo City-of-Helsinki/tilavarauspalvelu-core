@@ -3,6 +3,7 @@ import React from "react";
 import { getCriticalHdsRules, hdsStyles } from "hds-react";
 import type { DocumentContext } from "next/document";
 import Document, { Html, Head, Main, NextScript } from "next/document";
+import Script from "next/script";
 import { ServerStyleSheet } from "styled-components";
 import { env } from "@/env.mjs";
 
@@ -39,6 +40,7 @@ export default class MyDocument extends Document {
     return (
       <Html lang={locale}>
         <Head>
+          <Script src={`${basePath}/env-config.js`} strategy="beforeInteractive" />
           <style
             data-used-styles
             // eslint-disable-next-line react/no-danger -- this is safe
