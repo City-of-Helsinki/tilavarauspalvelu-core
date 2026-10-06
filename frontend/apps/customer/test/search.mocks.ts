@@ -253,7 +253,14 @@ function createDirectSearchVariablesMock({
     reservationKind: ReservationKind.Direct,
   };
 
-  if (textSearch != null) variables.textSearch = textSearch;
+  if (textSearch != null) {
+    variables.textSearch = textSearch;
+    variables.orderBy = [
+      ReservationUnitOrderingChoices.SearchRankDesc,
+      ReservationUnitOrderingChoices.NameFiAsc,
+      ReservationUnitOrderingChoices.PkAsc,
+    ];
+  }
   if (unit != null) variables.unit = unit;
   if (reservationUnitType != null) variables.reservationUnitType = reservationUnitType;
   if (intendedUses != null) variables.intendedUses = intendedUses;
@@ -283,6 +290,13 @@ function createSeasonSearchVariablesMock({
     orderBy: [ReservationUnitOrderingChoices.NameFiAsc, ReservationUnitOrderingChoices.PkAsc],
     reservationKind: ReservationKind.Season,
   };
-  if (textSearch != null) variables.textSearch = textSearch;
+  if (textSearch != null) {
+    variables.textSearch = textSearch;
+    variables.orderBy = [
+      ReservationUnitOrderingChoices.SearchRankDesc,
+      ReservationUnitOrderingChoices.NameFiAsc,
+      ReservationUnitOrderingChoices.PkAsc,
+    ];
+  }
   return variables;
 }

@@ -10,6 +10,7 @@
     "ascendingLabel": "Nouseva järjestys",
     "descendingLabel": "Laskeva järjestys",
     "label": {
+      "relevance": "Osuvuuden mukaan",
       "name": "Nimen mukaan",
       "type": "Tyypin mukaan",
       "unit": "Toimipisteen mukaan"

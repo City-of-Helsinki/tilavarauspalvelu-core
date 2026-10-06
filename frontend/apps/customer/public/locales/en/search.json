@@ -10,6 +10,7 @@
     "ascendingLabel": "Ascending order",
     "descendingLabel": "Descending order",
     "label": {
+      "relevance": "Relevance",
       "name": "Name",
       "type": "Type",
       "unit": "Location"

@@ -66,17 +66,28 @@ function transformOrderBy(
   return null;
 }
 
-/// Defaults to name sorting
+/// Defaults to relevance sorting with a text search, and to name sorting without one
 function transformSortString(
   orderBy: string | null,
   language: string,
-  desc: boolean
+  desc: boolean,
+  hasTextSearch: boolean
 ): ReservationUnitOrderingChoices[] {
   const lang = getLocalizationLang(language);
-  const transformed = transformOrderBy(orderBy ?? "name", desc, lang) ?? transformOrderByName(false, lang);
   // NOTE a weird backend issue that requires two orderBy params (otherwise 2nd+ page is sometimes incorrect)
   const sec = desc ? ReservationUnitOrderingChoices.PkDesc : ReservationUnitOrderingChoices.PkAsc;
-  return [transformed, sec];
+  const transformed = transformOrderBy(orderBy, desc, lang);
+  if (transformed != null) {
+    return [transformed, sec];
+  }
+  // Empty and unknown values (e.g. "sort=" after a search form submit) use the default, same as SortingComponent
+  if (orderBy === "relevance" || hasTextSearch) {
+    // Ascending order shows the most relevant results first. Results with the same rank,
+    // or all results without a text search, are sorted by name.
+    const rank = desc ? ReservationUnitOrderingChoices.SearchRankAsc : ReservationUnitOrderingChoices.SearchRankDesc;
+    return [rank, transformOrderByName(desc, lang), sec];
+  }
+  return [transformOrderByName(desc, lang), sec];
 }
 
 function filterEmpty<T>(val: T | null | undefined): T | undefined {
@@ -110,16 +121,16 @@ export function processVariables({
   kind,
   ...rest
 }: ProcessVariablesParams): QueryReservationUnitsArgs {
+  const textSearch = filterEmpty(values.get("textSearch"));
   const sortCriteria = values.getAll("sort");
   const desc = values.getAll("order").includes("desc");
-  const orderBy = transformSortString(ignoreMaybeArray(sortCriteria), language, desc);
+  const orderBy = transformSortString(ignoreMaybeArray(sortCriteria), language, desc, textSearch != null);
 
   const today = startOfDay(new Date());
 
   const dur = toNumber(ignoreMaybeArray(values.getAll("duration")));
   const duration = dur != null && dur > 0 ? dur : undefined;
   const isSeasonal = kind === ReservationKind.Season;
-  const textSearch = filterEmpty(values.get("textSearch"));
   const personsAllowed = filterEmpty(toNumber(values.get("personsAllowed")));
   const intendedUses = filterEmptyArray(mapParamToInteger(values.getAll("intendedUses"), 1));
   const unit = filterEmptyArray(mapParamToInteger(values.getAll("units"), 1));
