@@ -10,7 +10,7 @@ from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_rese
     ReservableTimeSpanFirstReservableTimeHelper,
 )
 from tilavarauspalvelu.services.first_reservable_time.utils import ReservableTimeOutput
-from utils.date_utils import local_datetime, local_datetime_max, local_datetime_min, local_start_of_day
+from utils.date_utils import local_datetime_max, local_datetime_min, local_start_of_day
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.enums import AccessType
@@ -230,7 +230,7 @@ class ReservationUnitFirstReservableTimeHelper:
         - reservation_unit.reservations_min_days_before
         - reservation_unit.reservations_max_days_before
         """
-        now = local_datetime()
+        now = self.parent.now
         reservation_unit_closed_time_spans: list[TimeSpanElement] = []
 
         if self.reservation_unit.reservations_min_days_before:
