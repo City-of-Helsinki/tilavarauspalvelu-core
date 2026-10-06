@@ -1073,10 +1073,6 @@ class ApplicationStatusChoice(models.TextChoices):
     """Application cancelled by user"""
 
     @enum.property
-    def can_decline(self) -> bool:
-        return self == ApplicationStatusChoice.IN_ALLOCATION
-
-    @enum.property
     def can_allocate(self) -> bool:
         return self == ApplicationStatusChoice.IN_ALLOCATION
 
@@ -1092,14 +1088,6 @@ class ApplicationStatusChoice(models.TextChoices):
         return self in {
             ApplicationStatusChoice.DRAFT,
             ApplicationStatusChoice.RECEIVED,
-        }
-
-    @enum.property
-    def can_flag(self) -> bool:
-        return self in {
-            ApplicationStatusChoice.IN_ALLOCATION,
-            ApplicationStatusChoice.HANDLED,
-            ApplicationStatusChoice.RESULTS_SENT,
         }
 
     @enum.property
