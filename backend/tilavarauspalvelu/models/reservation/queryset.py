@@ -111,26 +111,6 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
     def total_seconds(self) -> int:
         return int(self.total_duration().total_seconds())
 
-    def within_application_round_period(self, app_round: ApplicationRound) -> Self:
-        return self.within_period(
-            app_round.reservation_period_begin_date,
-            app_round.reservation_period_end_date,
-        )
-
-    def within_period(self, period_start: datetime.date, period_end: datetime.date) -> Self:
-        """All reservation fully withing a period."""
-        return self.filter(
-            begins_at__date__gte=period_start,
-            ends_at__date__lte=period_end,
-        )
-
-    def overlapping_period(self, period_start: datetime.date, period_end: datetime.date) -> Self:
-        """All reservations that overlap with a period, even partially."""
-        return self.filter(
-            begins_at__date__lte=period_end,
-            ends_at__date__gte=period_start,
-        )
-
     def overlapping_reservations(
         self,
         reservation_unit: ReservationUnit,
@@ -234,9 +214,6 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
 
     def requires_active_access_code(self) -> Self:
         return self.filter(L(access_code_should_be_active=True))
-
-    def dont_require_active_access_code(self) -> Self:
-        return self.filter(~L(access_code_should_be_active=True))
 
     def update_access_code_info(
         self,
