@@ -2919,3 +2919,27 @@ def test__reservation_unit__first_reservable_time__access_type(graphql, reservat
     assert response.has_errors is False, response
     assert frt(response) is None
     assert frt_access_type(response) == AccessType.OPENED_BY_STAFF
+
+
+def test__reservation_unit__first_reservable_time__access_type__frt_after_filter_start(graphql, reservation_unit):
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(day=12),
+        end_datetime=_datetime(day=18),
+    )
+
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.ACCESS_CODE,
+        begin_date=_date(day=5),
+    )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.PHYSICAL_KEY,
+        begin_date=_date(day=10),
+    )
+
+    response = graphql(reservation_units_reservable_query_access_type(reservable_date_start=_date(day=1).isoformat()))
+    assert response.has_errors is False, response
+    assert frt(response) == dt(day=12)
+    assert frt_access_type(response) == AccessType.PHYSICAL_KEY

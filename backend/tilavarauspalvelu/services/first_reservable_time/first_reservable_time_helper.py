@@ -454,7 +454,7 @@ class FirstReservableTimeHelper:
                     ReservationUnitAccessType.objects.filter(
                         models.Q(begin_date__lte=self.filter_date_end)  #
                         & L(end_date__gt=self.filter_date_start),
-                    ).order_by("begin_date"),  # REVERSE order is needed to find the access type active at the FRT
+                    ).order_by("-begin_date"),  # REVERSE order is needed to find the access type active at the FRT
                 ),
             )
         )
