@@ -4,7 +4,7 @@ import base64
 from typing import TYPE_CHECKING, Any
 
 import django_filters
-from django.contrib.postgres.search import SearchQuery
+from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.db import models
 from django.db.models import Q
 from graphene_django_extensions import ModelFilterSet
@@ -187,6 +187,7 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
             "surface_area",
             "rank",
             ("reservation_unit_type__rank", "type_rank"),
+            "search_rank",
         ]
 
     def get_text_search(self, qs: ReservationUnitQuerySet, name: str, value: str) -> QuerySet:
@@ -208,6 +209,31 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
                     terms_filter &= models.Q(search_vector_sv=search_query) | models.Q(name_sv__icontains=term)
 
         return qs.filter(terms_filter)
+
+    def order_by_search_rank(self, qs: ReservationUnitQuerySet, desc: bool) -> models.QuerySet:
+        value: str = self.form.cleaned_data.get("text_search", "")
+        if not value:
+            # The ordering filter adds the ordering of the returned queryset, so clear it to use the next ordering.
+            return qs.order_by()
+
+        language = get_text_search_language(self.request)
+
+        # Rank with "or", so that a result that matches more search terms ranks higher.
+        # A term that only matches the name by containment doesn't add to the rank.
+        search = build_search(value, separator="|")
+        search_query = SearchQuery(value=search, config=language, search_type="raw")
+        match language:
+            case "finnish":
+                search_rank = SearchRank(models.F("search_vector_fi"), search_query)
+            case "english":
+                search_rank = SearchRank(models.F("search_vector_en"), search_query)
+            case "swedish":
+                search_rank = SearchRank(models.F("search_vector_sv"), search_query)
+
+        qs = qs.alias(search_rank=search_rank)
+        if desc:
+            return qs.order_by(models.F("search_rank").desc())
+        return qs.order_by(models.F("search_rank").asc())
 
     @staticmethod
     def get_max_persons_gte(qs: ReservationUnitQuerySet, name: str, value: int) -> QuerySet:

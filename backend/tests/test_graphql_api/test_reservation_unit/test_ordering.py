@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import pytest
 
+from tilavarauspalvelu.models import ReservationUnit
+
 from tests.factories import ReservationUnitFactory
 
 from .helpers import reservation_units_query
@@ -295,3 +297,57 @@ def test_reservation_unit__order__by_type_rank(graphql):
     assert response.node(0) == {"pk": reservation_unit_2.pk}
     assert response.node(1) == {"pk": reservation_unit_3.pk}
     assert response.node(2) == {"pk": reservation_unit_1.pk}
+
+
+def test_reservation_unit__order__by_search_rank(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create(name="bar", unit__name="bar", description="foo")
+    reservation_unit_2 = ReservationUnitFactory.create(name="foo", unit__name="bar", description="bar")
+    reservation_unit_3 = ReservationUnitFactory.create(name="bar", unit__name="foo", description="bar")
+
+    ReservationUnit.objects.update_search_vectors()
+
+    query = reservation_units_query(text_search="foo", order_by="searchRankDesc")
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": reservation_unit_2.pk}
+    assert response.node(1) == {"pk": reservation_unit_3.pk}
+    assert response.node(2) == {"pk": reservation_unit_1.pk}
+
+    query = reservation_units_query(text_search="foo", order_by="searchRankAsc")
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_3.pk}
+    assert response.node(2) == {"pk": reservation_unit_2.pk}
+
+
+def test_reservation_unit__order__by_search_rank__same_rank_uses_next_ordering(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create(name="foo 2")
+    reservation_unit_2 = ReservationUnitFactory.create(name="foo 1")
+
+    ReservationUnit.objects.update_search_vectors()
+
+    query = reservation_units_query(text_search="foo", order_by=["searchRankDesc", "nameFiAsc"])
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_unit_2.pk}
+    assert response.node(1) == {"pk": reservation_unit_1.pk}
+
+
+def test_reservation_unit__order__by_search_rank__without_text_search(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create(name="2")
+    reservation_unit_2 = ReservationUnitFactory.create(name="1")
+
+    query = reservation_units_query(order_by=["searchRankDesc", "nameFiAsc"])
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_unit_2.pk}
+    assert response.node(1) == {"pk": reservation_unit_1.pk}
