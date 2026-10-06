@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.exceptions import FirstReservableTimeError
 from tilavarauspalvelu.integrations.opening_hours.time_span_element_utils import (
+    find_time_spans_near_period,
     override_reservable_with_closed_time_spans,
 )
 from tilavarauspalvelu.services.first_reservable_time.utils import ReservableTimeOutput
@@ -59,17 +60,23 @@ class ReservableTimeSpanFirstReservableTimeHelper:
 
         # At this point we have removed all the closed time spans from the reservable time span.
         # Finally, try to find the first reservable time span from the left over reservable time spans.
+        nearby_reservation_time_spans = self._find_closed_time_spans_near_reservable_time_span(
+            self.parent.reservation_closed_time_spans,
+        )
         first_reservable_time: datetime.datetime | None = self._find_first_reservable_time_span(
             normalised_reservable_time_spans=normalised_time_spans,
-            reservation_time_spans=self.parent.reservation_closed_time_spans,
+            reservation_time_spans=nearby_reservation_time_spans,
         )
 
         return ReservableTimeOutput(is_closed=False, first_reservable_time=first_reservable_time)
 
     def _hard_normalise_time_span(self, current_time_span: TimeSpanElement) -> list[TimeSpanElement]:
         """Remove Hard-Closed time spans from a TimeSpanElement."""
+        nearby_hard_closed_time_spans = self._find_closed_time_spans_near_reservable_time_span(
+            self.parent.hard_closed_time_spans,
+        )
         combined_hard_closed_time_spans: list[TimeSpanElement] = (
-            self.parent.hard_closed_time_spans
+            nearby_hard_closed_time_spans
             + current_time_span.generate_closed_time_spans_outside_filter(
                 filter_time_start=self.parent.parent.filter_time_start,
                 filter_time_end=self.parent.parent.filter_time_end,
@@ -83,9 +90,27 @@ class ReservableTimeSpanFirstReservableTimeHelper:
 
     def _soft_normalise_time_span(self, hard_normalised_time_spans: list[TimeSpanElement]) -> list[TimeSpanElement]:
         """Remove Soft-Closed time spans from the reservable time span."""
+        nearby_soft_closed_time_spans = self._find_closed_time_spans_near_reservable_time_span(
+            self.parent.soft_closed_time_spans,
+        )
         return override_reservable_with_closed_time_spans(
             reservable_time_spans=hard_normalised_time_spans,
-            closed_time_spans=self.parent.soft_closed_time_spans,
+            closed_time_spans=nearby_soft_closed_time_spans,
+        )
+
+    def _find_closed_time_spans_near_reservable_time_span(
+        self,
+        closed_time_spans: list[TimeSpanElement],
+    ) -> list[TimeSpanElement]:
+        """
+        Skip the closed time spans that cannot affect this reservable time span.
+        A busy reservation unit can have thousands of closed time spans, but only a few are near each day.
+        """
+        return find_time_spans_near_period(
+            closed_time_spans,
+            start_datetime=self.reservable_time_span.start_datetime,
+            end_datetime=self.reservable_time_span.end_datetime,
+            longest_buffer=self.parent.longest_buffer,
         )
 
     def _find_first_reservable_time_span(

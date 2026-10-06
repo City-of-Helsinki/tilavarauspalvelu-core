@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from itertools import chain
 from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
@@ -47,6 +48,9 @@ class ReservationUnitFirstReservableTimeHelper:
     # [ ] Can overlap with buffers
     reservation_closed_time_spans: list[TimeSpanElement]
 
+    # Closed time spans further than this from a reservable time span cannot affect it
+    longest_buffer: datetime.timedelta
+
     # Minimum duration in minutes for the ReservationUnit
     minimum_duration_minutes: int
 
@@ -71,6 +75,24 @@ class ReservationUnitFirstReservableTimeHelper:
             self._get_soft_closed_time_spans(),
             self.reservation_closed_time_spans,
             self.blocking_reservation_closed_time_spans,
+        )
+
+        # Merging the hard and soft closed time spans later does not make any buffer longer than this.
+        closed_time_spans = chain(
+            self.hard_closed_time_spans,
+            self.soft_closed_time_spans,
+            self.reservation_closed_time_spans,
+        )
+        closed_time_span_buffers = (
+            buffer
+            for time_span in closed_time_spans
+            for buffer in (time_span.buffer_time_before, time_span.buffer_time_after)
+            if buffer is not None
+        )
+        self.longest_buffer = max(
+            reservation_unit.buffer_time_before,
+            reservation_unit.buffer_time_after,
+            *closed_time_span_buffers,
         )
 
         start_interval_minutes = reservation_unit.actions.start_interval_minutes
