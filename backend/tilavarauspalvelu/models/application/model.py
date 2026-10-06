@@ -301,11 +301,3 @@ class Application(SerializableModelMixin, models.Model):
         # The setter is used by ApplicationQuerySet to pre-evaluate units for multiple Applications.
         # Should not be used by anything else!
         self._units_for_permissions = value
-
-    @property
-    def full_billing_address(self) -> str:
-        return f"{self.billing_street_address}, {self.billing_post_code} {self.billing_city}"
-
-    @property
-    def full_organisation_address(self) -> str:
-        return f"{self.organisation_street_address}, {self.organisation_post_code} {self.organisation_city}"
