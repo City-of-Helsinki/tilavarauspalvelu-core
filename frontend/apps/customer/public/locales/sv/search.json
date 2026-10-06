@@ -10,6 +10,7 @@
     "ascendingLabel": "Stigande ordning",
     "descendingLabel": "Sjunkande ordning",
     "label": {
+      "relevance": "Relevans",
       "name": "Namn",
       "type": "Typ",
       "unit": "Verksamhetsställe"

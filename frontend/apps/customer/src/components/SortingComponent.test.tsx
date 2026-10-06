@@ -55,6 +55,15 @@ describe("SortingComponent", () => {
     expect(view.getByText(nameLabel)).toBeInTheDocument();
   });
 
+  test("sort component should default to by relevance with a text search", () => {
+    const params = new URLSearchParams();
+    params.set("textSearch", "sauna");
+    mockedSearchParams.mockReturnValue(params);
+    const view = render(<SortingComponent />);
+    const relevanceLabel = /sorting.label.relevance/;
+    expect(view.getByText(relevanceLabel)).toBeInTheDocument();
+  });
+
   test("should respond to order asc/desc", async () => {
     const view = render(<SortingComponent />);
     const orderBtn = view.getByRole("button", {
