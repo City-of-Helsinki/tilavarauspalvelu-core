@@ -402,7 +402,7 @@ class ValidatedGenericFactory[T](GenericFactory[T]):
         try:
             is_correct_type = isinstance(value, origin_type)
         except TypeError as err:
-            logger.exception(f"Failed to check type of {value!r} for {field!r}", exc_info=err)
+            logger.exception("Failed to check type of %r for %r", value, field, exc_info=err)
             return
 
         if not is_correct_type:

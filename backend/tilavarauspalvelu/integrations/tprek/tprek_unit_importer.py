@@ -36,7 +36,7 @@ class TprekUnitImporter:
         - This method could be optimized for less API requests by first fetching all units with a department_id
           in batches, and then fetching all units without a department_id individually.
         """
-        logger.info(f"Started importing TPREK info for {len(units)} units...")
+        logger.info("Started importing TPREK info for %s units...", len(units))
 
         for unit in units:
             if unit.tprek_id is None:
@@ -56,7 +56,7 @@ class TprekUnitImporter:
             ):
                 self._update_unit(unit, tprek_unit_data, tprek_location_data)
 
-        logger.info(f"Updated {self.updated_units_count} from TPREK.")
+        logger.info("Updated %s from TPREK.", self.updated_units_count)
 
         if self.units_for_hauki_import:
             tprek_hauki_resource_importer = TprekUnitHaukiResourceIdImporter()
@@ -83,7 +83,7 @@ class TprekUnitHaukiResourceIdImporter:
     def import_hauki_resources_for_units(cls, units: list[Unit]) -> None:
         hauki_resource_id_map = cls._fetch_hauki_resource_ids(units)
 
-        logger.info(f"Importing Hauki resources for {len(units)} units...")
+        logger.info("Importing Hauki resources for %s units...", len(units))
 
         updated_units_count = 0
         created_resources_count = 0
@@ -98,8 +98,10 @@ class TprekUnitHaukiResourceIdImporter:
                     created_resources_count += 1
 
         logger.info(
-            f"Saved Hauki resources for {updated_units_count}/{len(units)} units. "
-            f"Created {created_resources_count} new OriginHaukiResources."
+            "Saved Hauki resources for %s/%s units. Created %s new OriginHaukiResources.",
+            updated_units_count,
+            len(units),
+            created_resources_count,
         )
 
     @classmethod
