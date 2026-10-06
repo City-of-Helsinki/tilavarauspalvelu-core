@@ -124,9 +124,9 @@ export const toggleButtonCss = css`
   gap: var(--spacing-2-xs);
 
   :not(:disabled) {
+    cursor: pointer;
     :hover {
       background-color: var(--color-black-10);
-      cursor: pointer;
     }
     :focus {
       outline: none;
