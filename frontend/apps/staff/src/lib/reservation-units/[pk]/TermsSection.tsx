@@ -48,7 +48,7 @@ export function TermsSection({
   ] as const;
 
   return (
-    <EditAccordion open={hasErrors} heading={t("reservationUnitEditor:termsInstructions")}>
+    <EditAccordion forceOpen={hasErrors} heading={t("reservationUnitEditor:termsInstructions")}>
       <AutoGrid $minWidth="20rem">
         {(["serviceSpecificTerms", "paymentTerms", "cancellationTerms"] as const).map((name) => (
           <ControlledSelect

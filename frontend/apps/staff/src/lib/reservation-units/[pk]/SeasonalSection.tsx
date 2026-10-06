@@ -296,7 +296,7 @@ export function SeasonalSection({ form }: { form: UseFormReturn<ReservationUnitE
   };
 
   return (
-    <Accordion open={errors.seasons != null} heading={t("reservationUnitEditor:seasonalTimesTitle")}>
+    <Accordion forceOpen={errors.seasons != null} heading={t("reservationUnitEditor:seasonalTimesTitle")}>
       <SeasonalInnerWrapper>
         <p>{t("reservationUnitEditor:seasonalTimesDescription")}</p>
 

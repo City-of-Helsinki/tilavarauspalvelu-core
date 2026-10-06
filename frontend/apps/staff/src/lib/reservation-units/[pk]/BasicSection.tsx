@@ -66,7 +66,7 @@ export function BasicSection({
     errors.nameSv != null;
 
   return (
-    <EditAccordion initiallyOpen open={hasErrors} heading={t("reservationUnitEditor:basicInformation")}>
+    <EditAccordion initiallyOpen forceOpen={hasErrors} heading={t("reservationUnitEditor:basicInformation")}>
       <AutoGrid>
         <FullRow>
           <SpecializedRadioGroup

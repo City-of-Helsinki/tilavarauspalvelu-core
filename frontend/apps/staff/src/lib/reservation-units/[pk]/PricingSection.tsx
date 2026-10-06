@@ -356,7 +356,7 @@ export function PricingSection({
   const hasErrors = errors.pricings != null;
 
   return (
-    <EditAccordion open={hasErrors} heading={t("label.pricings")}>
+    <EditAccordion forceOpen={hasErrors} heading={t("label.pricings")}>
       <Flex $gap="s">
         <Flex $direction="column" $gap="s">
           <ControlledCheckbox

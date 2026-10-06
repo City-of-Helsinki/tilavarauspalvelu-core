@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -86,7 +86,7 @@ export function Accordion({
   heading,
   headingLevel = "h2",
   initiallyOpen = false,
-  open,
+  forceOpen = false,
   children,
   disabled = false,
   className,
@@ -95,7 +95,7 @@ export function Accordion({
 }: {
   heading: string;
   initiallyOpen?: boolean;
-  open?: boolean;
+  forceOpen?: boolean;
   children: ReactNode;
   headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   disabled?: boolean;
@@ -106,11 +106,7 @@ export function Accordion({
 
   const { t } = useTranslation();
 
-  useEffect(() => {
-    toggleOpenState(initiallyOpen);
-  }, [initiallyOpen]);
-
-  const isAccordionOpen = open || accordionOpenState;
+  const isAccordionOpen = forceOpen || accordionOpenState;
   const buttonAriaLabel = isAccordionOpen
     ? `${t("common:close")} ${t("common:accordion")} "${heading}"`
     : `${t("common:open")} ${t("common:accordion")} "${heading}"`;

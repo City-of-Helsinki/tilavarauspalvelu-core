@@ -53,7 +53,7 @@ export function DescriptionSection({
     errors.descriptionSv != null;
 
   return (
-    <EditAccordion open={hasErrors} heading={t("reservationUnitEditor:typesProperties")}>
+    <EditAccordion forceOpen={hasErrors} heading={t("reservationUnitEditor:typesProperties")}>
       <AutoGrid $minWidth="20rem">
         <ControlledSelect
           control={control}

@@ -145,10 +145,13 @@ function ReservationSeriesForm({ reservationUnit, unitPk }: ReservationSeriesFor
   const reservationType = useWatch({ control, name: "type" });
 
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect -- should be refactored
     setRemovedReservations([]);
+    // oxlint-disable-next-line react/set-state-in-effect -- should be refactored
     setLocalError(null);
   }, [startTime, endTime, reservationUnit]);
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect -- should be refactored
     setLocalError(null);
   }, [startDate, endDate, repeatOnDays, repeatPattern]);
 
