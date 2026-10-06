@@ -5,11 +5,8 @@ from typing import TYPE_CHECKING, ClassVar
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
-from lookup_property import lookup_property
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
-
-from utils.db import SubqueryArray
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit, Resource, Unit
@@ -76,25 +73,3 @@ class Space(MPTTModel):
         if self.unit is not None:
             value += f", {self.unit!s}"
         return value
-
-    @lookup_property(skip_codegen=True)
-    def family() -> list[int]:
-        """Return space ids of all spaces that are either the space itself, its descendants or its ancestors."""
-        ancestors = models.Q(
-            lft__lte=models.OuterRef("lft"),
-            rght__gte=models.OuterRef("rght"),
-            tree_id=models.OuterRef("tree_id"),
-        )
-        descendants = models.Q(
-            lft__gte=models.OuterRef("lft"),
-            rght__lte=models.OuterRef("rght"),
-            tree_id=models.OuterRef("tree_id"),
-        )
-        return SubqueryArray(  # type: ignore[return-value]
-            queryset=Space.objects.filter(ancestors | descendants).values("id"),
-            agg_field="id",
-        )
-
-    @family.override
-    def _(self) -> list[int]:
-        return self.get_family().values_list("id", flat=True)
