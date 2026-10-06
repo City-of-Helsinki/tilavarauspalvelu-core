@@ -21,7 +21,6 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import local_start_of_day
-from utils.utils import as_p_tags
 
 from ._base import (
     FakerEN,
@@ -223,8 +222,9 @@ class ReservationUnitBuilder(ModelFactoryBuilder[ReservationUnit]):
         access_type: str,
         **kwargs: Any,
     ) -> Self:
-        self.kwargs["description"] = as_p_tags(
-            [
+        self.kwargs["description"] = "".join(
+            f"<p>{text}</p>"
+            for text in [
                 f"Buffer time: <b>{buffer_time}</b>",
                 f"Reservation time: <b>{reservation_time}</b>",
                 f"Reservable window: <b>{reservable_window}</b>",
@@ -238,7 +238,7 @@ class ReservationUnitBuilder(ModelFactoryBuilder[ReservationUnit]):
                 f"Payment type: <b>{payment_type}</b>",
                 f"Tax percentage: <b>{tax_percentage}</b>",
                 f"Access type: <b>{access_type}</b>",
-            ],
+            ]
         )
         self.kwargs["description_fi"] = self.kwargs["description"]
         self.kwargs["description_en"] = self.kwargs["description"]

@@ -222,10 +222,6 @@ def get_query_params(url: str) -> dict[str, str]:
     return dict(urllib.parse.parse_qsl(url_parts["query"]))
 
 
-def as_p_tags(texts: Iterable[str]) -> str:
-    return "".join(f"<p>{p}</p>" for p in texts)
-
-
 class VaraamoHTML2Text(HTML2Text):
     def handle(self, data: str) -> str:
         # Replace &section with $section and then back to prevent html2text from converting it to a section symbol (§)
