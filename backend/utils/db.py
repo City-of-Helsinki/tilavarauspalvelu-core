@@ -323,8 +323,11 @@ def build_search(text: str, *, separator: Literal["|", "&", "<->"] = "|") -> str
     Replace single quotes and hyphens in words with spaces so they are treated as whitespace in the search,
     e.g. "Moe's" becomes "Moe s" and "3D-printer" becomes "3D printer".
 
+    Also replace backslashes with spaces. Inside a quoted term, a backslash escapes the next character,
+    so a trailing backslash would escape the closing quote and cause a tsquery syntax error.
+
     Ref. https://www.postgresql.org/docs/current/datatype-textsearch.html#DATATYPE-TSQUERY
     """
-    text = text.replace("'", " ").replace("-", " ")
+    text = text.replace("'", " ").replace("-", " ").replace("\\", " ")
     search_terms: list[str] = [f"'{value}':*" for value in text.split(" ") if value]
     return f" {separator} ".join(search_terms)
