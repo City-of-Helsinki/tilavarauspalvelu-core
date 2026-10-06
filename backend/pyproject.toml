@@ -172,6 +172,7 @@ extend-select = [
     "B901",     # return-in-generator
     "B903",     # class-as-data-structure
     "B909",     # loop-iterator-mutation
+    "E262",     # no-space-after-inline-comment
     "FURB113",  # repeated-append
     "FURB131",  # delete-full-slice
     "FURB142",  # for-loop-set-mutations
