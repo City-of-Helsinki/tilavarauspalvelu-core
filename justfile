@@ -12,7 +12,7 @@ help:
 # Setup environment variables
 setup:
     @-cp -n frontend/apps/customer/.env.example frontend/apps/customer/.env.local
-    @-cp -n frontend/apps/employee/.env.example frontend/apps/employee/.env.local
+    @-cp -n frontend/apps/staff/.env.example frontend/apps/staff/.env.local
 
 # Create symlinks for Claude Code (AGENTS.md and skills)
 claude-setup:
