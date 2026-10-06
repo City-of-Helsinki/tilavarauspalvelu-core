@@ -100,6 +100,14 @@ class Params(NamedTuple):
             text_search="room",
             reservation_unit_data=SearchableData(name="workroom"),
         ),
+        "match name with trailing backslash": Params(
+            text_search="foo\\",
+            reservation_unit_data=SearchableData(name="foo"),
+        ),
+        "match name with backslash between words": Params(
+            text_search="foo\\bar",
+            reservation_unit_data=SearchableData(name="foo bar"),
+        ),
         "match description fi": Params(
             text_search="kuvaus",
             reservation_unit_data=SearchableData(description="Tässä on kuvaus minun yksikkööni"),

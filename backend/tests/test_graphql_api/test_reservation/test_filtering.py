@@ -672,6 +672,18 @@ def test_reservation__filter__by_text_search__reservation_series_name(graphql):
     assert response.node(0) == {"pk": reservation.pk}
 
 
+def test_reservation__filter__by_text_search__trailing_backslash(graphql):
+    reservation = ReservationFactory.create(name="foobar")
+
+    graphql.login_with_superuser()
+    query = reservations_query(text_search="foobar\\")
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation.pk}
+
+
 def test_reservation__filter__by_text_search__email_pattern(graphql):
     reservation_1 = ReservationFactory.create(reservee_email="foo@email.com")
     reservation_2 = ReservationFactory.create(user__email="bar@email.com")
