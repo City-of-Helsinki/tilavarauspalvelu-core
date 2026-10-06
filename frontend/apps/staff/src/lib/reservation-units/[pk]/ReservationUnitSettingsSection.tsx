@@ -132,7 +132,7 @@ export function ReservationUnitSettingsSection({
   ];
 
   return (
-    <EditAccordion open={hasErrors} heading={t("reservationUnitEditor:settings")}>
+    <EditAccordion forceOpen={hasErrors} heading={t("reservationUnitEditor:settings")}>
       <AutoGrid $minWidth="18rem">
         {isDirect && (
           <FieldGroup

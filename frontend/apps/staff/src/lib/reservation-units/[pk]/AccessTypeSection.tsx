@@ -153,7 +153,7 @@ export function AccessTypeSection({
   };
 
   return (
-    <EditAccordion heading={t("accessType:accessTypeLabel")} open={!!errors?.accessTypes}>
+    <EditAccordion heading={t("accessType:accessTypeLabel")} forceOpen={!!errors?.accessTypes}>
       <WidthLimitedContainer>
         <CurrentAccessType currentAccessType={accessTypes[0]} />
 
