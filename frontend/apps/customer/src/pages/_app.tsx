@@ -50,6 +50,7 @@ function hasUserAcceptedStatistics(): boolean {
 function useHasUserAcceptedStatistics() {
   const [analyticsAccepted, setAnalyticsAccepted] = useState(false);
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect -- hydration issues unless we add cookie check on SSR
     setAnalyticsAccepted(hasUserAcceptedStatistics());
   }, [setAnalyticsAccepted]);
   return {

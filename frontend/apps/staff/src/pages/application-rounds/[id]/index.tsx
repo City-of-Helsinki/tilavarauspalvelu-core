@@ -83,6 +83,7 @@ export default function ApplicationRound({
   // NOTE: useEffect works, onCompleted does not work with refetch
   useEffect(() => {
     if (data) {
+      // oxlint-disable-next-line react/set-state-in-effect -- this is correct if we poll
       setIsInProgress(isApplicationRoundInProgress(data.applicationRound));
     }
   }, [data]);

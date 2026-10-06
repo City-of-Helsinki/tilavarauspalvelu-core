@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 
-export function ClientOnly({ children }: { children: React.ReactNode }): React.ReactElement | null {
+export function ClientOnly({ children }: { children: React.ReactNode }): React.ReactNode {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect -- hydration bypass
     setMounted(true);
   }, []);
+
   if (!mounted) {
     return null;
   }
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment -- return type issues
-  return <>{children}</>;
+  return children;
 }
