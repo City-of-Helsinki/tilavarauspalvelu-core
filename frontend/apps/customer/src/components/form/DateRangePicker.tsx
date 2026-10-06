@@ -123,6 +123,7 @@ export function DateRangePicker({
   };
 
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect -- should be refactored
     setInternalStartDateString(formatDate(startDate));
     setInternalEndDateString(formatDate(endDate));
     setStartDateError(null);

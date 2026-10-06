@@ -173,6 +173,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
     };
     const result = generateReservations(vals);
     const removed = result.filter((x) => compareList?.find((y) => isSameDay(y, x.date)) == null);
+    // oxlint-disable-next-line react/set-state-in-effect -- should be refactored
     setRemovedReservations(removed);
   }, [reservationSeries]);
 

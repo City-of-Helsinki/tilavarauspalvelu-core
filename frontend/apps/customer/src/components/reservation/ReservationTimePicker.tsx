@@ -185,6 +185,7 @@ export function ReservationTimePicker({
 
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect -- doesn't work without async update
     setCalendarViewType(isMobile ? "day" : "week");
   }, [isMobile]);
 

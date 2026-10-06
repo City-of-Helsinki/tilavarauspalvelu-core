@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import Popup from "reactjs-popup";
 import { addMinutes, differenceInMinutes, isToday, setHours, setMinutes, startOfDay } from "date-fns";
@@ -10,6 +10,7 @@ import styled, { css } from "styled-components";
 import type { CalendarEvent } from "ui/src/components/calendar/Calendar";
 import { breakpoints } from "ui/src/modules/const";
 import { formatTimeRange, timeForInput, timeToMinutes } from "ui/src/modules/date-utils";
+import { useWindowHeight } from "ui/src/hooks";
 import { focusStyles } from "ui/src/styled";
 import type { TimeSpanType } from "@ui/components/calendar/utils";
 import { isCellOverlappingSpan } from "@ui/components/calendar/utils";
@@ -462,26 +463,25 @@ function sortByDraftStatusAndTitle(resources: Resource[]) {
   });
 }
 
-function scrollCalendarToCurrentTime(calendarRef: React.RefObject<HTMLDivElement>, date: Date) {
-  // scroll to around 9 - 17 on load
-  const ref = calendarRef.current;
-
-  if (!ref) {
+/// Scroll the horizontal calendar to current time instead of defaulting to midnight
+function scrollCalendarToCurrentTime(ref: React.RefObject<HTMLDivElement | null>, date: Date) {
+  const calendarEl = ref?.current;
+  if (!calendarEl) {
     return;
   }
 
   const FIRST_HOUR = 7;
   const now = new Date();
   const cellToScroll = isToday(date) ? Math.min(now.getHours(), 24) : Math.min(FIRST_HOUR, 24);
-  const firstElementOfHeader = ref.querySelector(`.calendar-header > div:nth-of-type(${cellToScroll})`);
+  const firstElementOfHeader = calendarEl.querySelector(`.calendar-header > div:nth-of-type(${cellToScroll})`);
   // horizontal scroll the calendar element
   // NOTE Don't use scrollIntoView because it changes focus on Chrome
-  if (firstElementOfHeader && ref.parentElement) {
+  if (firstElementOfHeader && calendarEl.parentElement) {
     const elementPos = firstElementOfHeader.getBoundingClientRect().left;
     // move a bit backwards to handle row title on mobile
     const x = elementPos - 35;
-    const originalScrollLeft = ref.parentElement.scrollLeft;
-    ref.parentElement.scrollTo(x + originalScrollLeft, 0);
+    const originalScrollLeft = calendarEl.parentElement.scrollLeft;
+    calendarEl.parentElement.scrollTo(x + originalScrollLeft, 0);
   }
 }
 
@@ -505,7 +505,9 @@ export function UnitCalendar({
   const startDate = startOfDay(date);
 
   const scrollCalendar = useCallback(() => {
-    scrollCalendarToCurrentTime(calendarRef as React.RefObject<HTMLDivElement>, date);
+    if (calendarRef != null) {
+      scrollCalendarToCurrentTime(calendarRef, date);
+    }
   }, [date]);
 
   useEffect(() => {
@@ -513,18 +515,7 @@ export function UnitCalendar({
   }, [scrollCalendar]);
 
   // Sticky time header requires fixed height, so track the window height and adjust the calendar height accordingly
-  const [windowHeight, setWindowHeight] = useState(0);
-  useEffect(() => {
-    // SSR doesn't have window, so set it inside a hook
-    setWindowHeight(window.innerHeight);
-
-    function updateSize() {
-      setWindowHeight(window.innerHeight);
-    }
-
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
+  const windowHeight = useWindowHeight();
 
   const margins = windowHeight < MOBILE_CUTOFF ? MOBILE_MARGIN : DESKTOP_MARGIN;
   const containerHeight = windowHeight - margins;
