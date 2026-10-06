@@ -280,12 +280,6 @@ class FirstReservableTimeHelper:
         # fill the page size.
         qs = self.optimized_reservation_unit_queryset
 
-        # TODO: Disabled for now, since it might contribute to timeouts in production.
-        #  Refresh still happens on a background task every 2 minutes.
-        #  if not AffectingTimeSpan.is_valid():
-        #      AffectingTimeSpan.refresh()  # noqa: ERA001,RUF100
-        #      cache.delete(self.cache_key)  # noqa: ERA001,RUF100
-
         has_valid_results_for_previous_pages = self._read_cached_results()
         if has_valid_results_for_previous_pages:
             # If we already have cached FRT results for enough reservation units to fill the page
@@ -482,12 +476,10 @@ class FirstReservableTimeHelper:
         2. From: The filter date end or now (whichever is earlier)
            To: The end of the universe
         """
-        now = local_datetime()
-
         return [
             TimeSpanElement(
                 start_datetime=local_datetime_min(),
-                end_datetime=max(local_start_of_day(self.filter_date_start), now),
+                end_datetime=max(local_start_of_day(self.filter_date_start), self.now),
                 is_reservable=False,
             ),
             TimeSpanElement(
