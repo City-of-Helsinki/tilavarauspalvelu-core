@@ -23,9 +23,6 @@ __all__ = [
 
 
 class ApplicationQuerySet(ModelQuerySet[Application]):
-    def has_status(self, status: ApplicationStatusChoice) -> Self:
-        return self.filter(L(status=status.value))
-
     def has_status_in(self, statuses: list[str]) -> Self:
         return self.filter(L(status__in=statuses))
 
