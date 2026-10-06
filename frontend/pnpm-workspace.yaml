@@ -45,18 +45,16 @@ minimumReleaseAge: 10080
 
 # Add minimumReleaseAge exceptions here (security or intentionally pinned versions) and bump them manually
 minimumReleaseAgeExclude:
-  - "@types/node@24.13.5"
-  - baseline-browser-mapping@2.11.24
-  - browserslist@4.29.0
-  - electron-to-chromium@1.5.430
-  - enhanced-resolve@5.25.1
+  - caniuse-lite@1.0.30001814
+  - enhanced-resolve@5.26.0
   - fast-uri@3.1.8
   - node-releases@2.0.55
+  - nanoid@3.3.19
   - obug@2.2.1
   - react-is@19.3.0
   - schema-utils@4.5.0
+  - source-map-js@1.2.2
   - update-browserslist-db@1.3.3
-  - nanoid@3.3.19
 
 peerDependencyRules:
   allowedVersions:
