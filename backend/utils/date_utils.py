@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import datetime
-import zoneinfo
 from typing import TYPE_CHECKING, Literal, TypedDict
 
 from django.utils.timezone import get_default_timezone
 
 if TYPE_CHECKING:
+    import zoneinfo
     from collections.abc import Generator
 
     from tilavarauspalvelu.enums import Weekday
@@ -15,8 +15,6 @@ if TYPE_CHECKING:
 __all__ = [
     "DEFAULT_TIMEZONE",
     "combine",
-    "compare_datetimes",
-    "compare_times",
     "get_date_range",
     "get_periods_between",
     "get_time_range",
@@ -56,79 +54,6 @@ __all__ = [
 
 
 DEFAULT_TIMEZONE = get_default_timezone()
-
-
-class _TZComparator[TCanHaveTZ: (datetime.datetime, datetime.time), TValid: (datetime.datetime, datetime.time)]:  # noqa: N801, RUF100
-    def __init__(self, _input_1: TCanHaveTZ, _input_2: TCanHaveTZ) -> None:
-        self._input_1 = self._validate_input(_input_1, name="Input 1")
-        self._input_2 = self._validate_input(_input_2, name="Input 2")
-
-    def __bool__(self) -> bool:
-        msg = f"Cannot compare '{self.__class__.__name__}' object directly. Did you forget to call a comparison method?"
-        raise RuntimeError(msg)
-
-    @staticmethod
-    def _validate_input(_input: TCanHaveTZ, *, name: str) -> TValid:
-        raise NotImplementedError
-
-    def is_lte(self) -> bool:
-        return self._input_1 <= self._input_2
-
-    def is_gte(self) -> bool:
-        return self._input_1 >= self._input_2
-
-    def is_lt(self) -> bool:
-        return self._input_1 < self._input_2
-
-    def is_gt(self) -> bool:
-        return self._input_1 > self._input_2
-
-    def is_equal(self) -> bool:
-        return self._input_1 == self._input_2
-
-    def is_not_equal(self) -> bool:
-        return self._input_1 != self._input_2
-
-
-class compare_datetimes(_TZComparator[datetime.datetime, datetime.datetime]):  # noqa: N801, RUF100
-    @staticmethod
-    def _validate_input(_input: datetime.datetime, *, name: str) -> datetime.datetime:
-        if not isinstance(_input, datetime.datetime):
-            msg = f"{name} must be a `datetime.datetime` object."
-            raise TypeError(msg)
-
-        if not (_input.tzinfo == datetime.UTC or isinstance(_input.tzinfo, zoneinfo.ZoneInfo)):
-            msg = f"{name} must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
-            raise ValueError(msg)
-
-        return _input
-
-
-class compare_times(_TZComparator[datetime.datetime | datetime.time, datetime.time]):  # noqa: N801, RUF100
-    @staticmethod
-    def _validate_input(_input: datetime.datetime | datetime.time, *, name: str) -> datetime.time:
-        if not isinstance(_input, datetime.datetime | datetime.time):
-            msg = f"{name} must be a `datetime.datetime` or `datetime.time` object."
-            raise TypeError(msg)
-
-        if not (_input.tzinfo == datetime.UTC or isinstance(_input.tzinfo, zoneinfo.ZoneInfo)):
-            msg = f"{name} must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
-            raise ValueError(msg)
-
-        if isinstance(_input, datetime.time):
-            if _input.tzinfo == datetime.UTC:
-                _input = _input.replace(tzinfo=None)
-
-            if isinstance(_input.tzinfo, zoneinfo.ZoneInfo):
-                msg = (
-                    f"{name} cannot be a timezone-aware time using `zoneinfo.ZoneInfo` objects, "
-                    f"since there is no way to know if the time is in daylight savings time or not."
-                )
-                raise TypeError(msg)
-
-        if isinstance(_input, datetime.datetime):
-            _input = _input.astimezone(datetime.UTC).time()
-        return _input
 
 
 ### LOCAL TIME ###########################################################################################

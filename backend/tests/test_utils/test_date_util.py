@@ -12,8 +12,6 @@ from graphene_django_extensions.testing import parametrize_helper
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
     combine,
-    compare_datetimes,
-    compare_times,
     get_periods_between,
     local_date,
     local_datetime,
@@ -67,101 +65,6 @@ def test_localized_short_weekday_en() -> None:
     assert localized_short_weekday(4, lang_code) == "Fr"
     assert localized_short_weekday(5, lang_code) == "Sa"
     assert localized_short_weekday(6, lang_code) == "Su"
-
-
-# The following tests demonstrate some bugs between `datetime.timezone` and `zoneinfo.ZoneInfo` when
-# with comparing timezone-aware and timezone-naive datetimes/times. The date utils are needed because
-# of these bugs, so check that they still hold true. If they start failing, the helpers might
-# have become unnecessary.
-
-
-def test_compare_datetimes():
-    dt_zi = datetime.datetime(2024, 1, 1, tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
-    dt_utc = datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC)
-    dt_naive = datetime.datetime(2024, 1, 1)
-
-    # Comparing equals and not equals with datetime naive object
-    # does not raise an error, but comparing lt/gt/lte/gte does.
-    assert dt_zi != dt_naive
-    assert dt_utc != dt_naive
-    assert not (dt_zi == dt_naive)  # noqa: SIM201
-    assert not (dt_utc == dt_naive)  # noqa: SIM201
-
-    msg = "can't compare offset-naive and offset-aware datetimes"
-    with pytest.raises(TypeError, match=re.escape(msg)):
-        assert dt_zi > dt_naive
-
-    with pytest.raises(TypeError, match=re.escape(msg)):
-        assert dt_utc > dt_naive
-
-    # This comparison object will complain about mixing timezone-aware and timezone-naive datetimes.
-    msg = "Input 1 must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
-    with pytest.raises(ValueError, match=re.escape(msg)):
-        assert compare_datetimes(dt_naive, dt_utc)
-
-    msg = "Input 2 must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
-    with pytest.raises(ValueError, match=re.escape(msg)):
-        assert compare_datetimes(dt_zi, dt_naive)
-
-    msg = "Input 2 must be a `datetime.datetime` object."
-    with pytest.raises(TypeError, match=re.escape(msg)):
-        assert compare_datetimes(dt_utc, None)
-
-    # Check for safeguards against comparing the comparison object directly.
-    msg = "Cannot compare 'compare_datetimes' object directly. Did you forget to call a comparison method?"
-    with pytest.raises(RuntimeError, match=re.escape(msg)):
-        assert compare_datetimes(dt_utc, dt_zi)
-
-
-def test_compare_times():
-    t_zi = datetime.time(tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
-    t_utc = datetime.time(tzinfo=datetime.UTC)
-    t_naive = datetime.time()
-
-    # Comparing equals and not equals with datetime naive object
-    # does not raise an error, but comparing lt/gt/lte/gte does.
-    assert t_zi == t_naive
-    assert t_utc != t_naive
-    assert not (t_zi != t_naive)  # noqa: SIM202
-    assert not (t_utc == t_naive)  # noqa: SIM201
-
-    # Comparing lt/gt/lte/gte with datetime naive object and zoneinfo.ZoneInfo object
-    # does not raise an error, but comparing lt/gt/lte/gte with datetime naive object
-    # and datetime.UTC does.
-    assert t_zi >= t_naive
-    msg = "can't compare offset-naive and offset-aware times"
-    with pytest.raises(TypeError, match=re.escape(msg)):
-        assert t_utc >= t_naive
-
-    # This comparison object will complain about mixing timezone-aware and timezone-naive datetimes.
-    msg = "Input 1 must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
-    with pytest.raises(ValueError, match=re.escape(msg)):
-        assert compare_times(t_naive, t_utc)
-
-    msg = "Input 2 must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
-    with pytest.raises(ValueError, match=re.escape(msg)):
-        assert compare_times(t_utc, t_naive)
-
-    msg = (
-        "Input 1 cannot be a timezone-aware time using `zoneinfo.ZoneInfo` objects, "
-        "since there is no way to know if the time is in daylight savings time or not."
-    )
-    with pytest.raises(TypeError, match=re.escape(msg)):
-        assert compare_times(t_zi, t_utc)
-
-    msg = "Input 2 must be a `datetime.datetime` or `datetime.time` object."
-    with pytest.raises(TypeError, match=re.escape(msg)):
-        assert compare_times(t_utc, None)
-
-    # Check that datetime objects can also be used
-    msg = "Input 2 must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
-    with pytest.raises(ValueError, match=re.escape(msg)):
-        assert compare_times(t_utc, datetime.datetime.now())
-
-    # Check for safeguards against comparing the comparison object directly.
-    msg = "Cannot compare 'compare_times' object directly. Did you forget to call a comparison method?"
-    with pytest.raises(RuntimeError, match=re.escape(msg)):
-        assert compare_times(t_utc, t_utc)
 
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
