@@ -119,6 +119,7 @@ select = [
     "A",        # flake8-builtins
     "ANN",      # flake8-annotations
     "ARG",      # flake8-unused-arguments
+    "ASYNC",    # flake8-async
     "B",        # flake8-bugbear
     "BLE",      # flake8-blind-except
     "C4",       # flake8-comprehensions
@@ -162,6 +163,7 @@ select = [
     "S",        # flake8-bandit
     "SIM",      # flake8-simplify
     "SLF",      # flake8-self
+    "SLOT",     # flake8-slots
     "T10",      # flake8-debugger
     "T20",      # flake8-print
     "TC",       # flake8-type-checking
@@ -215,6 +217,7 @@ extend-select = [
     "RUF056",   # falsy-dict-get-fallback
     "RUF065",   # logging-eager-conversion
     "RUF066",   # property-without-return
+    "RUF069",   # float-equality-comparison
     "RUF070",   # unnecessary-assign-before-yield
     "RUF071",   # os-path-commonprefix
     "RUF072",   # useless-finally
@@ -223,6 +226,8 @@ extend-select = [
     "RUF075",   # fallible-context-manager
     "RUF077",   # method-receiver-default
     "TC008",    # quoted-type-alias
+    "TID254",   # lazy-import-mismatch
+    "TID255",   # lazy-import-immediately-resolved
     "UP048",    # while-one
     "UP051",    # deprecated-abc-decorator
     "UP052",    # context-manager-iterator
@@ -290,6 +295,7 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
     "PLR0915",  # Can have as many statements as needed.
     "PLR0917",  # Allow as many positional arguments as needed in tests
     "PLR2004",  # Magic value comparisons are allowed in tests.
+    "RUF069",   # Exact float comparisons are fine in tests.
     "S101",     # Obviousle asserts are fine in tests
     "S105",     # Hardcoded passwords are fine in tests
     "S106",     # Hardcoded passwords are fine in tests
