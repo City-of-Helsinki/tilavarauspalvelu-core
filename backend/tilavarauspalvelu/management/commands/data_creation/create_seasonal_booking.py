@@ -768,7 +768,7 @@ def _create_reservation_unit_options_for_section(
     reservation_units: list[ReservationUnit],
 ) -> Generator[ReservationUnitOption]:
     for i in range(option_info.number):
-        option = (
+        yield (
             ReservationUnitOptionBuilder()
             .in_application_section(section)
             .build(
@@ -776,7 +776,6 @@ def _create_reservation_unit_options_for_section(
                 reservation_unit=random.choice(reservation_units),
             )
         )
-        yield option
 
 
 def _create_allocated_time_slots_for_section(
