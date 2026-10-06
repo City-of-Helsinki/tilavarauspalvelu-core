@@ -36,7 +36,7 @@ class HaukiResourceHashUpdater:
     def run(self, *, force_refetch: bool = False) -> None:
         fetched_hauki_resources = HaukiAPIClient.get_resources_all_pages(hauki_resource_ids=self.hauki_resource_ids)
 
-        logger.info(f"Fetched {len(fetched_hauki_resources)} hauki resources for hash update.")
+        logger.info("Fetched %s hauki resources for hash update.", len(fetched_hauki_resources))
         if not fetched_hauki_resources:
             return
 
@@ -49,17 +49,17 @@ class HaukiResourceHashUpdater:
         if not self.resources_updated:
             logger.info("There was no need to update any OriginHaukiResource hashes.")
             return
-        logger.info(f"Updated hashes for {len(self.resources_updated)} origin hauki resources.")
+        logger.info("Updated hashes for %s origin hauki resources.", len(self.resources_updated))
 
         if self.total_time_spans_created:
-            logger.info(f"Created {self.total_time_spans_created} new reservable time spans in total.")
+            logger.info("Created %s new reservable time spans in total.", self.total_time_spans_created)
         else:
             logger.info("No reservable time spans created.")
 
     def _process_single_hauki_resource(self, resource: HaukiAPIResource, *, force_refetch: bool = False) -> None:
         origin_hauki_resource = OriginHaukiResource.objects.filter(id=resource["id"]).first()
         if origin_hauki_resource is None:
-            logger.warning(f"OriginHaukiResource with ID '{resource['id']}' was not found.")
+            logger.warning("OriginHaukiResource with ID '%s' was not found.", resource["id"])
             return
 
         should_update_resource = (
@@ -69,7 +69,7 @@ class HaukiResourceHashUpdater:
         if not should_update_resource:
             return
 
-        logger.debug(f"Updating 'Opening Hours Hash' for resource '{resource['id']}'.")
+        logger.debug("Updating 'Opening Hours Hash' for resource '%s'.", resource["id"])
 
         with transaction.atomic():
             if origin_hauki_resource.opening_hours_hash != resource["date_periods_hash"]:
@@ -86,6 +86,10 @@ class HaukiResourceHashUpdater:
         except (ReservableTimeSpanClientValueError, ReservableTimeSpanClientNothingToDoError):
             return
 
-        logger.info(f"Created {num_created_time_spans} reservable time spans for resource {origin_hauki_resource.id}.")
+        logger.info(
+            "Created %s reservable time spans for resource %s.",
+            num_created_time_spans,
+            origin_hauki_resource.id,
+        )
 
         self.total_time_spans_created += num_created_time_spans
