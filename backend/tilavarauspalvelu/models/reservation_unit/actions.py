@@ -9,12 +9,7 @@ from django.conf import settings
 from django.db import models
 from lookup_property import L
 
-from tilavarauspalvelu.enums import (
-    AccessType,
-    ApplicationRoundStatusChoice,
-    ReservationStartInterval,
-    ReservationTypeChoice,
-)
+from tilavarauspalvelu.enums import AccessType, ApplicationRoundStatusChoice, ReservationStartInterval
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiTranslatedField
@@ -234,52 +229,6 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             qs = qs.exclude(pk__in=ignore_ids)
 
         return qs.exists()
-
-    def get_next_reservation(
-        self,
-        *,
-        end_time: datetime.datetime,
-        reservation: Reservation | None = None,
-        exclude_blocked: bool = False,
-    ) -> Reservation | None:
-        from tilavarauspalvelu.enums import ReservationStateChoice
-        from tilavarauspalvelu.models import Reservation
-
-        qs = Reservation.objects.filter(
-            reservation_unit__in=self.reservation_units_with_common_hierarchy,
-            begins_at__gte=end_time,
-        ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
-
-        if reservation:
-            qs = qs.exclude(id=reservation.id)
-
-        if exclude_blocked:
-            qs = qs.exclude(type=ReservationTypeChoice.BLOCKED)
-
-        return qs.order_by("begins_at").first()
-
-    def get_previous_reservation(
-        self,
-        *,
-        start_time: datetime.datetime,
-        reservation: Reservation | None = None,
-        exclude_blocked: bool = False,
-    ) -> Reservation | None:
-        from tilavarauspalvelu.enums import ReservationStateChoice
-        from tilavarauspalvelu.models import Reservation
-
-        qs = Reservation.objects.filter(
-            reservation_unit__in=self.reservation_units_with_common_hierarchy,
-            ends_at__lte=start_time,
-        ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
-
-        if reservation:
-            qs = qs.exclude(id=reservation.id)
-
-        if exclude_blocked:
-            qs = qs.exclude(type=ReservationTypeChoice.BLOCKED)
-
-        return qs.order_by("-ends_at").first()
 
     @property
     def reservation_units_with_common_hierarchy(self) -> models.QuerySet:
