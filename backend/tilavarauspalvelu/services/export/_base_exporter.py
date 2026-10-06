@@ -11,13 +11,7 @@ from typing import TYPE_CHECKING, Any, Literal, Self
 
 from django.http import FileResponse
 
-from utils.date_utils import (
-    DEFAULT_TIMEZONE,
-    local_date_string,
-    local_datetime_string,
-    local_time_string,
-    local_timedelta_string,
-)
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime_string, local_timedelta_string
 from utils.utils import to_ascii
 
 if TYPE_CHECKING:
@@ -117,22 +111,6 @@ class BaseCSVExporter(ABC):
         if self.datetime_format == "ISO":
             return value.astimezone(DEFAULT_TIMEZONE).isoformat(timespec="seconds")
         return local_datetime_string(value)
-
-    def format_date(self, value: datetime.date | None) -> str | None:
-        """Format a date as string in the given format."""
-        if not value:
-            return None
-        if self.datetime_format == "ISO":
-            return value.isoformat()
-        return local_date_string(value)
-
-    def format_time(self, value: datetime.time | None) -> str | None:
-        """Format a time as string in the given format."""
-        if not value:
-            return None
-        if self.datetime_format == "ISO":
-            return value.replace(tzinfo=DEFAULT_TIMEZONE).isoformat(timespec="seconds")
-        return local_time_string(value.replace(tzinfo=DEFAULT_TIMEZONE))
 
     def format_timedelta(self, value: datetime.timedelta | None) -> str | int | None:
         """Format a timedelta as string in the given format."""
