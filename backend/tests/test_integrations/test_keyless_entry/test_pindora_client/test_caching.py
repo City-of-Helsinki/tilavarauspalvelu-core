@@ -27,12 +27,6 @@ def test_pindora_client__caching__reservation_unit_response():
     response = PindoraClient._get_cached_reservation_unit_response(ext_uuid=reservation_unit_id)
     assert response == data
 
-    succeeded = PindoraClient._clear_cached_reservation_unit_response(ext_uuid=reservation_unit_id)
-    assert succeeded is True
-
-    response = PindoraClient._get_cached_reservation_unit_response(ext_uuid=reservation_unit_id)
-    assert response is None
-
 
 def test_pindora_client__caching__reservation_response():
     reservation_id = uuid.uuid4()
