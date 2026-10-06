@@ -15,6 +15,7 @@ from tilavarauspalvelu.enums import AccessType, ApplicationRoundStatusChoice
 from tilavarauspalvelu.exceptions import FirstReservableTimeError
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.integrations.opening_hours.time_span_element_utils import merge_overlapping_time_span_elements
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import AffectingTimeSpan, ApplicationRound, ReservableTimeSpan, ReservationUnitAccessType
 from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_reservation_unit_helper import (
     ReservationUnitFirstReservableTimeHelper,
@@ -314,7 +315,19 @@ class FirstReservableTimeHelper:
         results: int = 0
         for reservation_unit in qs.hooked_iterator(self._get_affecting_time_spans, chunk_size=self.chunk_size):
             helper = ReservationUnitFirstReservableTimeHelper(parent=self, reservation_unit=reservation_unit)
-            is_closed, first_reservable_time = helper.calculate_first_reservable_time()
+            try:
+                is_closed, first_reservable_time = helper.calculate_first_reservable_time()
+            except FirstReservableTimeError as error:
+                # One reservation unit with inconsistent data should not fail the whole search.
+                # The error is raised only after the hard closed time spans are removed, so the unit is open.
+                SentryLogger.log_exception(
+                    error,
+                    details="Failed to calculate first reservable time for a reservation unit.",
+                    reservation_unit_pk=reservation_unit.pk,
+                )
+                is_closed = False
+                first_reservable_time = None
+
             frt_access_type = helper.get_access_type_for_date(is_closed, first_reservable_time)
 
             self.reservation_unit_closed_statuses[reservation_unit.pk] = is_closed
