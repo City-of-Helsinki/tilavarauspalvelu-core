@@ -173,6 +173,7 @@ extend-select = [
     "B903",     # class-as-data-structure
     "B909",     # loop-iterator-mutation
     "E262",     # no-space-after-inline-comment
+    "FURB103",  # write-whole-file
     "FURB113",  # repeated-append
     "FURB131",  # delete-full-slice
     "FURB142",  # for-loop-set-mutations
