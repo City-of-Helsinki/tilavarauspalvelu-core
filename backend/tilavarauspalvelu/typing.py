@@ -453,12 +453,6 @@ class PostSaveKwargs[TModel: models.Model](TypedDict):
     update_fields: list[str] | None
 
 
-class PreDeleteKwargs[TModel: models.Model](TypedDict):
-    instance: TModel
-    using: str | None
-    origin: TModel | models.QuerySet[TModel] | None
-
-
 class PostDeleteKwargs[TModel: models.Model](TypedDict):
     instance: TModel
     using: str | None
