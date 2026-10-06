@@ -191,74 +191,83 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
                 setattr(
                     reservation_unit,
                     f"search_vector_{lang}",
-                    SearchVector(
-                        models.F("pk"),
-                        #
-                        # Use translated fields with fallback to Finnish if empty
-                        CoalesceEmpty(
-                            models.F(f"name_{lang}"),
-                            models.F("name_fi"),
-                            output_field=models.CharField(),
-                        ),
-                        CoalesceEmpty(
-                            models.F(f"description_{lang}"),
-                            models.F("description_fi"),
-                            output_field=models.CharField(),
-                        ),
-                        #
-                        # Additional search terms
-                        models.Value(
-                            " ".join(term for term in reservation_unit.search_terms),
-                            output_field=models.CharField(),
-                        ),
-                        models.Value(
-                            " ".join(term for term in reservation_unit.unit.search_terms),
-                            output_field=models.CharField(),
-                        ),
-                        #
-                        # Joins are not allowed in search vectors, so we compute them as values beforehand.
-                        models.Value(
-                            _get_vector_translation_fallback(reservation_unit.unit, lang),
-                            output_field=models.CharField(),
-                        ),
-                        models.Value(
-                            _get_vector_translation_fallback(reservation_unit.reservation_unit_type, lang),
-                            output_field=models.CharField(),
-                        ),
-                        models.Value(
-                            " ".join(
-                                name
-                                for inst in reservation_unit.spaces.all()
-                                if (name := _get_vector_translation_fallback(inst, lang))
+                    # The weights rank matches in the name highest when ordering by search rank.
+                    (
+                        SearchVector(
+                            # Use translated fields with fallback to Finnish if empty
+                            CoalesceEmpty(
+                                models.F(f"name_{lang}"),
+                                models.F("name_fi"),
+                                output_field=models.CharField(),
                             ),
-                            output_field=models.CharField(),
-                        ),
-                        models.Value(
-                            " ".join(
-                                name
-                                for inst in reservation_unit.resources.all()
-                                if (name := _get_vector_translation_fallback(inst, lang))
+                            config=config,
+                            weight="A",
+                        )
+                        + SearchVector(
+                            # Joins are not allowed in search vectors, so we compute them as values beforehand.
+                            models.Value(
+                                _get_vector_translation_fallback(reservation_unit.unit, lang),
+                                output_field=models.CharField(),
                             ),
-                            output_field=models.CharField(),
-                        ),
-                        models.Value(
-                            " ".join(
-                                name
-                                for inst in reservation_unit.intended_uses.all()
-                                if (name := _get_vector_translation_fallback(inst, lang))
+                            models.Value(
+                                _get_vector_translation_fallback(reservation_unit.reservation_unit_type, lang),
+                                output_field=models.CharField(),
                             ),
-                            output_field=models.CharField(),
-                        ),
-                        models.Value(
-                            " ".join(
-                                name
-                                for inst in reservation_unit.equipments.all()
-                                if (name := _get_vector_translation_fallback(inst, lang))
+                            #
+                            # Additional search terms
+                            models.Value(
+                                " ".join(term for term in reservation_unit.search_terms),
+                                output_field=models.CharField(),
                             ),
-                            output_field=models.CharField(),
-                        ),
-                        #
-                        config=config,
+                            models.Value(
+                                " ".join(term for term in reservation_unit.unit.search_terms),
+                                output_field=models.CharField(),
+                            ),
+                            config=config,
+                            weight="B",
+                        )
+                        + SearchVector(
+                            models.F("pk"),
+                            CoalesceEmpty(
+                                models.F(f"description_{lang}"),
+                                models.F("description_fi"),
+                                output_field=models.CharField(),
+                            ),
+                            models.Value(
+                                " ".join(
+                                    name
+                                    for inst in reservation_unit.spaces.all()
+                                    if (name := _get_vector_translation_fallback(inst, lang))
+                                ),
+                                output_field=models.CharField(),
+                            ),
+                            models.Value(
+                                " ".join(
+                                    name
+                                    for inst in reservation_unit.resources.all()
+                                    if (name := _get_vector_translation_fallback(inst, lang))
+                                ),
+                                output_field=models.CharField(),
+                            ),
+                            models.Value(
+                                " ".join(
+                                    name
+                                    for inst in reservation_unit.intended_uses.all()
+                                    if (name := _get_vector_translation_fallback(inst, lang))
+                                ),
+                                output_field=models.CharField(),
+                            ),
+                            models.Value(
+                                " ".join(
+                                    name
+                                    for inst in reservation_unit.equipments.all()
+                                    if (name := _get_vector_translation_fallback(inst, lang))
+                                ),
+                                output_field=models.CharField(),
+                            ),
+                            config=config,
+                            weight="C",
+                        )
                     ),
                 )
 
