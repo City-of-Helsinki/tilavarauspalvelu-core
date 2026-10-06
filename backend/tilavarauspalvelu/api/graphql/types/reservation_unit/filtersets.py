@@ -191,19 +191,23 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
 
     def get_text_search(self, qs: ReservationUnitQuerySet, name: str, value: str) -> QuerySet:
         language = get_text_search_language(self.request)
-        search = build_search(value, separator="&")
-        query = SearchQuery(value=search, config=language, search_type="raw")
-        match language:
-            # Do search mostly with full text search, but also search some columns with containment search.
-            # PostgreSQL full text search doesn't support postfix searching, so things like "room" won't find
-            # reservation units with names like "workroom" or "bathroom". Don't do this for all fields to keep
-            # performance reasonable.
-            case "finnish":
-                return qs.filter(models.Q(search_vector_fi=query) | models.Q(name_fi__icontains=value))
-            case "english":
-                return qs.filter(models.Q(search_vector_en=query) | models.Q(name_en__icontains=value))
-            case "swedish":
-                return qs.filter(models.Q(search_vector_sv=query) | models.Q(name_sv__icontains=value))
+
+        # Full text search doesn't match postfixes, e.g. "room" doesn't find "workroom", so also search the name
+        # by containment. Match each term separately, so "room kallio" can match "room" in "workroom" and
+        # "kallio" in the search vector.
+        terms_filter = models.Q()
+        for term in value.split():
+            search = build_search(term, separator="&")
+            search_query = SearchQuery(value=search, config=language, search_type="raw")
+            match language:
+                case "finnish":
+                    terms_filter &= models.Q(search_vector_fi=search_query) | models.Q(name_fi__icontains=term)
+                case "english":
+                    terms_filter &= models.Q(search_vector_en=search_query) | models.Q(name_en__icontains=term)
+                case "swedish":
+                    terms_filter &= models.Q(search_vector_sv=search_query) | models.Q(name_sv__icontains=term)
+
+        return qs.filter(terms_filter)
 
     @staticmethod
     def get_max_persons_gte(qs: ReservationUnitQuerySet, name: str, value: int) -> QuerySet:
