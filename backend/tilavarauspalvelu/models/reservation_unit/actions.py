@@ -236,7 +236,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         Find all "related" ReservationUnits where any one of these is true:
         1) There are common resources
         2) There are spaces belonging to the same "family"/hierarchy
-           (see. `spaces.querysets.space.SpaceQuerySet.all_space_ids_though_hierarchy`)
+           (see. `tilavarauspalvelu.models.reservation_unit_hierarchy.model.ReservationUnitHierarchy`)
 
         This method is used for finding all ReservationUnits that influence the availability of this ReservationUnit.
 
