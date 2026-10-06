@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import dataclasses
-from itertools import chain
 from typing import TYPE_CHECKING, Any, Literal
 
 from tilavarauspalvelu.enums import ADLoginAMR, ProfileLoginAMR
@@ -152,7 +151,3 @@ class ReservationSeriesCalculationResults:
     @property
     def possible(self) -> Iterable[ReservationPeriod]:
         return self.non_overlapping
-
-    @property
-    def not_possible(self) -> Iterable[ReservationPeriod]:
-        return chain(self.overlapping, self.not_reservable, self.invalid_start_interval)
