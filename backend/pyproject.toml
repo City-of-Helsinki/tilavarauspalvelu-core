@@ -129,7 +129,7 @@ select = [
     "D209",     # pydocstyle: Multi-line docstring closing quotes should be on a separate line
     "D213",     # pydocstyle: Multi-line docstring summary should start at the second line
     "DJ",       # flake8-django
-    #"DTZ",     # flake8-datetimez  # TODO: Enable this and fix (52) issues
+    #"DTZ",     # flake8-datetimez  # TODO: Enable this and fix (101) issues
     "E",        # pycodestyle errors
     "EM",       # flake8-errmsg
     "ERA",      # eradicate
@@ -152,7 +152,6 @@ select = [
     "PTH",      # flake8-use-pathlib
     "PYI",      # flake8-pyi
     "Q",        # flake8-quotes
-    "R",        # Refactor
     "RET",      # flake8-return
     "RSE",      # flake8-raise
     "RUF",      # ruff-specific rules
@@ -171,40 +170,29 @@ extend-select = [
     "B901",     # return-in-generator
     "B903",     # class-as-data-structure
     "B909",     # loop-iterator-mutation
-    "FURB110",  # if-exp-instead-of-or-operator
     "FURB113",  # repeated-append
     "FURB131",  # delete-full-slice
     "FURB142",  # for-loop-set-mutations
     "FURB145",  # slice-copy
     "FURB148",  # unnecessary-enumerate
-    "FURB171",  # single-item-membership-test
     "FURB189",  # subclass-builtin
-    "FURB192",  # sorted-min-max
-    "LOG004",   # log-exception-outside-except-handler
     "PLC1901",  # compare-to-empty-string
     "PLC2701",  # import-private-name
     "PLC2801",  # unnecessary-dunder-call
     "PLE1141",  # dict-iter-missing-items
-    "PLE1141",  # dict-iter-missing-items
     "PLE4703",  # modified-iterating-set
     "PLR0916",  # too-many-boolean-expressions
-    "PLR0917",  # too-many-positional-arguments
     "PLR1702",  # too-many-nested-blocks
     "PLR6104",  # non-augmented-assignment
     "PLR6201",  # literal-membership
-    "PLW0108",  # unnecessary-lambda
     "PLW1514",  # unspecified-encoding
     "RUF027",   # missing-f-string-syntax
     "RUF031",   # incorrectly-parenthesized-tuple-in-subscript
-    "RUF036",   # none-not-at-end-of-union
     "RUF045",   # implicit-class-var-in-dataclass
     "RUF047",   # needless-else
     "RUF055",   # unnecessary-regular-expression
     "RUF056",   # falsy-dict-get-fallback
-    "RUF060",   # in-empty-collection
-    "RUF102",   # invalid-rule-code
     "TC008",    # quoted-type-alias
-    "UP042",    # replace-str-enum
 ]
 ignore = [
     # Conflicting with ruff-format, code style preference
@@ -234,27 +222,14 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
     "ERA001",   # Commented code is fine here.
     "I002"      # missing-required-import
 ]
-"config/settings.py" = [
-    "ANN",      # No need to annotate settings
-    "ARG",      # Allow unused arguments allowed in settings
-    "S101",     # Asserts are fine in settings
-]
 "utils/date_utils.py" = [
     "PLR0917",  # Can have as many positional arguments as needed.
     "TID251"    # Can use banned imports here (e.g. datetime.datetime.now)
-]
-"tilavarauspalvelu/migrations/*.py" = [
-    "ANN",      # No need to annotate migrations
-    "ARG",      # Allow unused arguments allowed in migrations
-]
-"tilavarauspalvelu/models/*/actions.py" = [
-    "B903",     # Don't complain about converting ModelActions to a dataclass
 ]
 "tilavarauspalvelu/signals.py" = [
     "ARG001",   # Signals can have unused "sender" argument.
 ]
 "tilavarauspalvelu/management/commands/data_creation/*.py" = [
-    "PLR0913",  # Can take as many arguments as needed.
     "PLR0915",  # Can have as many statements as needed.
     "PLR0917",  # Can have as many positional arguments as needed.
     "S101",     # Asserts are fine in test data creation.
@@ -263,9 +238,6 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
 "tilavarauspalvelu/api/webhooks/serializers.py" = [
     "N802",     # Allow non-lowercase function names for webhook serializers.
     "N815",     # Allow mixedCase variables for webhook serializers.
-]
-"tilavarauspalvelu/api/graphql/extensions/error_codes.py" = [
-    "ERA001",   # Commented code is fine here.
 ]
 "tilavarauspalvelu/api/graphql/types/*/filtersets.py" = [
     "FBT001",   # Filtersets filter_* methods require three positional arguments, last one being boolean.
@@ -288,7 +260,6 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
     "S101",     # Obviousle asserts are fine in tests
     "S105",     # Hardcoded passwords are fine in tests
     "S106",     # Hardcoded passwords are fine in tests
-    "S108",     # No need to care about insecure temp file usages in tests
     "S311",     # Pseudo-random generators are fine here.
     "SLF",      # Allow accessing private members in tests
     "TID251"    # Can use banned imports here (e.g. datetime.datetime.now)
@@ -424,9 +395,6 @@ max-returns = 8
 max-positional-args = 5
 max-args = 10
 max-bool-expr = 6
-
-[tool.ruff.lint.mccabe]
-max-complexity = 10
 
 [tool.bandit]
 exclude_dirs = [
