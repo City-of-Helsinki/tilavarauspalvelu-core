@@ -10,7 +10,7 @@ import random
 from enum import StrEnum
 from functools import wraps
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, Any, Literal, NamedTuple, TypeVar
+from typing import TYPE_CHECKING, Annotated, Any, Literal, TypeVar
 
 import requests
 from django.conf import settings
@@ -155,11 +155,6 @@ class SetName(StrEnum):
             case _:
                 msg = f"Unknown reservation form for {self}"
                 raise ValueError(msg)
-
-
-class FieldCombination(NamedTuple):
-    supported: list[str]
-    required: list[str]
 
 
 def get_combinations[T](
