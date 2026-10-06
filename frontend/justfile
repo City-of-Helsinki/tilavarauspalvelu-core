@@ -7,11 +7,11 @@ help:
 
 # Run browser tests in CI mode
 test-browser-ci:
-    @cd apps/ui && pnpm run test:browser:ci
+    @cd apps/customer && pnpm run test:browser:ci
 
 # Run dev server for tests
 dev-test:
-    @cd apps/ui && pnpm run dev:test
+    @cd apps/customer && pnpm run dev:test
 
 # Remove node_modules directories
 clean:
