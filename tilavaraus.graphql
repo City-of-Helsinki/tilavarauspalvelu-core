@@ -1157,6 +1157,8 @@ enum ReservationUnitOrderingChoices {
   rankDesc
   typeRankAsc
   typeRankDesc
+  searchRankAsc
+  searchRankDesc
 }
 
 type SpaceNode implements Node {
