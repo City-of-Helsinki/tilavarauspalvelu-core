@@ -231,8 +231,21 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
 
         language = get_text_search_language(self.request)
 
+        # Full text search doesn't match postfixes, so a name like "workroom" gets no rank for "room".
+        # Count the terms that the name contains, and order by that count before the rank.
+        name_match_count: models.Expression = models.Value(0)
+        for term in value.split():
+            match language:
+                case "finnish":
+                    name_match = models.When(name_fi__icontains=term, then=models.Value(1))
+                case "english":
+                    name_match = models.When(name_en__icontains=term, then=models.Value(1))
+                case "swedish":
+                    name_match = models.When(name_sv__icontains=term, then=models.Value(1))
+
+            name_match_count += models.Case(name_match, default=models.Value(0))
+
         # Rank with "or", so that a result that matches more search terms ranks higher.
-        # A term that only matches the name by containment doesn't add to the rank.
         search = build_search(value, separator="|")
         search_query = SearchQuery(value=search, config=language, search_type="raw")
         match language:
@@ -243,10 +256,10 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
             case "swedish":
                 search_rank = SearchRank(models.F("search_vector_sv"), search_query)
 
-        qs = qs.alias(search_rank=search_rank)
+        qs = qs.alias(name_match_count=name_match_count, search_rank=search_rank)
         if desc:
-            return qs.order_by(models.F("search_rank").desc())
-        return qs.order_by(models.F("search_rank").asc())
+            return qs.order_by(models.F("name_match_count").desc(), models.F("search_rank").desc())
+        return qs.order_by(models.F("name_match_count").asc(), models.F("search_rank").asc())
 
     @staticmethod
     def get_max_persons_gte(qs: ReservationUnitQuerySet, name: str, value: int) -> QuerySet:
