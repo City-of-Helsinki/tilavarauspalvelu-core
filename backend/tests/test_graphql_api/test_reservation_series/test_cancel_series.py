@@ -13,6 +13,7 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.models import ReservationStatistic
 from utils.date_utils import local_date, local_datetime
 
 from tests.factories import AllocatedTimeSlotFactory, ApplicationRoundFactory, UserFactory
@@ -65,6 +66,52 @@ def test_reservation_series__cancel_section_series__cancel_whole_remaining(graph
 
     assert EmailService.send_seasonal_booking_cancelled_all_email.called is True
     assert EmailService.send_seasonal_booking_cancelled_all_staff_notification_email.called is True
+
+
+@patch_method(EmailService.send_seasonal_booking_cancelled_all_email)
+@patch_method(EmailService.send_seasonal_booking_cancelled_all_staff_notification_email)
+@freeze_time(local_datetime(year=2024, month=1, day=1))
+def test_reservation_series__cancel_section_series__update_statistics(graphql, settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    user = UserFactory.create()
+
+    reservation_series = create_reservation_series(
+        user=user,
+        reservations__type=ReservationTypeChoice.SEASONAL,
+        reservations__price=0,
+        reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(),
+    )
+    reservation_series.reservations.upsert_statistics()
+
+    application_round = ApplicationRoundFactory.create_in_status_results_sent()
+    allocation = AllocatedTimeSlotFactory.create(
+        reservation_unit_option__application_section__application__user=user,
+        reservation_unit_option__application_section__application__application_round=application_round,
+    )
+    section = allocation.reservation_unit_option.application_section
+
+    reservation_series.allocated_time_slot = allocation
+    reservation_series.save()
+
+    data = {
+        "pk": section.pk,
+        "cancelReason": ReservationCancelReasonChoice.CHANGE_OF_PLANS,
+    }
+
+    graphql.force_login(user)
+    response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    future_statistics = ReservationStatistic.objects.filter(begin__gt=local_datetime())
+    past_statistics = ReservationStatistic.objects.filter(begin__lte=local_datetime())
+
+    assert future_statistics.count() == 5
+    assert all(statistic.state == ReservationStateChoice.CANCELLED for statistic in future_statistics)
+
+    assert past_statistics.count() == 4
+    assert all(statistic.state != ReservationStateChoice.CANCELLED for statistic in past_statistics)
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))

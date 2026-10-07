@@ -63,6 +63,9 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
 
         has_access_code = reservations.requires_active_access_code().exists()
 
+        # Evaluate before the update, since denied reservations no longer match the filter.
+        reservation_pks = list(reservations.values_list("pk", flat=True))
+
         with transaction.atomic():
             reservations.update(
                 state=ReservationStateChoice.DENIED,
@@ -87,9 +90,7 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
         #      update_affecting_time_spans_task.delay()  # noqa: ERA001,RUF100
 
         if settings.SAVE_RESERVATION_STATISTICS:
-            create_statistics_for_reservations_task.delay(
-                reservation_pks=[reservation.pk for reservation in reservations],
-            )
+            create_statistics_for_reservations_task.delay(reservation_pks=reservation_pks)
 
         if instance.allocated_time_slot is not None:
             EmailService.send_seasonal_booking_denied_series_email(instance)

@@ -28,6 +28,7 @@ from tilavarauspalvelu.models import (
     ApplicationSection,
     Reservation,
     ReservationSeries,
+    ReservationStatistic,
     ReservationUnitOption,
 )
 from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
@@ -74,7 +75,12 @@ class ApplicationRoundActions:
 
                 # Remove all reservation series, and set application round back to HANDLED
                 # NOTE: This triggers _a lot_ of `post_delete` signals fo reservations.
-                Reservation.objects.all().for_application_round(self.application_round).delete()
+                reservations = Reservation.objects.all().for_application_round(self.application_round)
+
+                # Statistics are kept when a reservation is deleted, but these reservations are created again
+                # when the round is handled again, which would leave duplicate statistics.
+                ReservationStatistic.objects.filter(reservation__in=reservations).delete()
+                reservations.delete()
                 ReservationSeries.objects.all().for_application_round(self.application_round).delete()
 
                 self.application_round.handled_at = None
