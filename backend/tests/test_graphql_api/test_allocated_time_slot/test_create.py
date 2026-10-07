@@ -436,6 +436,7 @@ def test_allocated_time_slot__create__reservation_unit_locked(graphql, force):
 def test_allocated_time_slot__create__two_allocations_for_same_day(graphql, force):
     # given:
     # - There is an allocatable reservation unit option
+    # - The application section already has an allocation on Monday
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation(applied_reservations_per_week=2)
     section = application.application_sections.first()
@@ -451,8 +452,7 @@ def test_allocated_time_slot__create__two_allocations_for_same_day(graphql, forc
     graphql.login_with_superuser()
 
     # when:
-    # - The user tries to make an allocation for a reservation unit option,
-    #   but allocation is on the same day as another allocation for the same section.
+    # - The user tries to make another allocation for the same section on Monday
     input_data = allocation_create_data(
         option,
         day_of_the_week=Weekday.MONDAY,
@@ -463,10 +463,12 @@ def test_allocated_time_slot__create__two_allocations_for_same_day(graphql, forc
     response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
-    # - The response complains about the allocations being on the same day of the week
-    assert response.field_error_messages() == [
-        "Cannot make multiple allocations on the same day of the week for one application section."
-    ]
+    # - There are no errors in the response
+    # - The application section is now HANDLED
+    assert response.has_errors is False, response
+
+    section.refresh_from_db()
+    assert section.status == ApplicationSectionStatusChoice.HANDLED
 
 
 @pytest.mark.parametrize("force", [True, False])
