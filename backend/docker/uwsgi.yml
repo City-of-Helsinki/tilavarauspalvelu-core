@@ -28,7 +28,7 @@ uwsgi:
   alarm-backlog: logsentry
   alarm-segfault: logsentry
   alarm-log: "logsentry HARAKIRI \\[core.*\\]"
-  endif:
+  endif: true
 
   # Workload settings
   # Automatically scales up worker count when application is under load.
