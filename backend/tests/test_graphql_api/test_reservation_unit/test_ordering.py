@@ -325,6 +325,29 @@ def test_reservation_unit__order__by_search_rank(graphql):
     assert response.node(2) == {"pk": reservation_unit_2.pk}
 
 
+def test_reservation_unit__order__by_search_rank__name_postfix_before_description(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create(name="bar", description="room")
+    reservation_unit_2 = ReservationUnitFactory.create(name="workroom", description="bar")
+
+    ReservationUnit.objects.update_search_vectors()
+
+    query = reservation_units_query(text_search="room", order_by="searchRankDesc")
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_unit_2.pk}
+    assert response.node(1) == {"pk": reservation_unit_1.pk}
+
+    query = reservation_units_query(text_search="room", order_by="searchRankAsc")
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+
+
 def test_reservation_unit__order__by_search_rank__same_rank_uses_next_ordering(graphql):
     reservation_unit_1 = ReservationUnitFactory.create(name="foo 2")
     reservation_unit_2 = ReservationUnitFactory.create(name="foo 1")
