@@ -18,39 +18,34 @@ gh auth status
 If not installed, stop and ask the user to install `gh`.
 If not logged in, stop and ask the user to run `gh auth login`.
 
-## 2. Parse the id
+## 2. Fetch the run or job
 
-Case 1: User says "run 123" or "check run #123" → run id=123
+Run the script from the repository root. Give it the id or the URL from the user as is.
+Put a URL in single quotes. A hook blocks the command if it is in any other form.
+Run it as a single command, without pipes.
 
-Case 2: User says "job 456" or "check job #456" → job id=456
+If the user gives a job id or a URL with `/job/<id>`, skip to step 3.
 
-Case 3: User gives a URL:
-
-1. `https://github.com/City-of-Helsinki/tilavarauspalvelu-core/actions/runs/123` → run id=123
-2. `https://github.com/City-of-Helsinki/tilavarauspalvelu-core/actions/runs/123/job/456` → job id=456
-
-## 3. Find the job id
-
-If you have a job id, skip to step 4.
-
-If you have a run id, list only the failed jobs in the run:
+If the user gives a run id or a run URL, list the failed jobs in the run:
 
 ```bash
-gh run view <run_id> --repo City-of-Helsinki/tilavarauspalvelu-core --json databaseId,status,conclusion,url,jobs --jq '{run: {id: .databaseId, status, conclusion, url}, jobs: [.jobs[] | select(.conclusion=="failure") | {id: .databaseId, name, status, conclusion, url}]}'
+.agents/skills/github-job/github-job run 123
+.agents/skills/github-job/github-job run 'https://github.com/City-of-Helsinki/tilavarauspalvelu-core/actions/runs/123'
 ```
 
 Take the id of the job that needs attention (`conclusion: "failure"`).
 
-## 4. Fetch the log
+## 3. Fetch the log
 
 ```bash
-gh run view --job <job_id> --repo City-of-Helsinki/tilavarauspalvelu-core --log
+.agents/skills/github-job/github-job log 456
+.agents/skills/github-job/github-job log 'https://github.com/City-of-Helsinki/tilavarauspalvelu-core/actions/runs/123/job/456'
 ```
 
-## 5. Fetch job metadata (only if needed)
+## 4. Fetch job metadata (only if needed)
 
 Fetch this only if the log is empty or you cannot determine the failure from it.
 
 ```bash
-gh api repos/City-of-Helsinki/tilavarauspalvelu-core/actions/jobs/<job_id> --jq '{id, name, status, conclusion, started_at, completed_at, html_url}'
+.agents/skills/github-job/github-job info 456
 ```

@@ -15,10 +15,18 @@ setup:
     @[ -f frontend/apps/staff/.env.local ] || cp frontend/apps/staff/.env.example frontend/apps/staff/.env.local
 
 # Create symlinks for Claude Code (AGENTS.md and skills)
-claude-setup:
+claude-setup: claude-hooks
     @ln -sf AGENTS.md CLAUDE.md
     @mkdir -p .claude
     @ln -sf ../.agents/skills .claude/skills
+
+# Create Claude Code hooks from .agents/hooks. Run again after claude-hooks.json changes.
+claude-hooks:
+    @mkdir -p .claude
+    @ln -sfn ../.agents/hooks .claude/hooks
+    @[ -f .claude/settings.json ] || echo '{}' > .claude/settings.json
+    @jq --slurpfile hooks .agents/hooks/claude-hooks.json '.hooks = $hooks[0]' .claude/settings.json > .claude/settings.json.tmp
+    @mv .claude/settings.json.tmp .claude/settings.json
 
 # Open bash in backend container
 bash:
