@@ -177,6 +177,11 @@ def _create_handled_application_rounds(
             primary_applied_weekdays=[Weekday.TUESDAY, Weekday.WEDNESDAY, Weekday.FRIDAY],
             applied_reservations_per_week=2,
         ),
+        SuitableTimeInfo(
+            name="Morning and evening on the same weekday",
+            primary_applied_weekdays=[Weekday.TUESDAY, Weekday.THURSDAY],
+            applied_morning_and_evening=True,
+        ),
     ]
     section_number_choices: list[SectionInfo] = [
         SectionInfo(name="Single", number=1, allocations=True),
@@ -313,6 +318,11 @@ def _create_application_round_in_allocations(
             name="Multiple weekdays, less applied reservations per week",
             primary_applied_weekdays=[Weekday.TUESDAY, Weekday.WEDNESDAY, Weekday.FRIDAY],
             applied_reservations_per_week=2,
+        ),
+        SuitableTimeInfo(
+            name="Morning and evening on the same weekday",
+            primary_applied_weekdays=[Weekday.TUESDAY, Weekday.THURSDAY],
+            applied_morning_and_evening=True,
         ),
     ]
     section_number_choices: list[SectionInfo] = [
@@ -761,6 +771,21 @@ def _create_suitable_time_ranges_for_section(
             )
             yield suitable
 
+            begin_time = end_time
+
+        if suitable_time_info.applied_morning_and_evening and weekday in suitable_time_info.primary_applied_weekdays:
+            begin_time = begin_time.replace(hour=max(17, begin_time.hour))
+            end_time = begin_time.replace(hour=min(23, begin_time.hour + random.randint(1, 4)))
+
+            suitable = SuitableTimeRangeBuilder().build(
+                priority=Priority.PRIMARY,
+                day_of_the_week=weekday,
+                begin_time=begin_time,
+                end_time=end_time,
+                application_section=section,
+            )
+            yield suitable
+
 
 def _create_reservation_unit_options_for_section(
     section: ApplicationSection,
@@ -796,13 +821,15 @@ def _create_allocated_time_slots_for_section(
     - Allocate for primary suitable time ranges first, then secondary ones
     - Allocate for reservation unit options in the user's preferred order
     - Check previous allocations for the same reservation unit, and don't allow overlapping ones
-    - Don't allocate for the same weekday twice
+    - Check previous allocations for the same application section, and don't allow overlapping ones
+    - Allocate only once per weekday, or twice if the applicant applied for morning and evening
     - If enough allocations cannot be made, mark all reservation unit options as locked
 
     Note that in actual allocation process there are more rules regarding the order
     in which allocations are made, which is not implemented here.
     """
-    allocated_days: list[Weekday] = []
+    section_allocations: dict[Weekday, list[AllocationTime]] = {}
+    allocations_per_weekday = 2 if suitable_time_info.applied_morning_and_evening else 1
     duration_hours = int(duration.total_seconds() // 3600)
 
     # Sort suitable time ranges by priority so that primary ones are used first
@@ -815,8 +842,8 @@ def _create_allocated_time_slots_for_section(
         allocations = allocation_info.allocations.setdefault(option.reservation_unit.pk, [])
 
         for suitable in suitable_time_ranges:
-            # Cannot make allocation for the same weekday in the same application section twice
-            if Weekday(suitable.day_of_the_week) in allocated_days:
+            day_allocations = section_allocations.setdefault(Weekday(suitable.day_of_the_week), [])
+            if len(day_allocations) >= allocations_per_weekday:
                 continue
 
             # For simplicity, allocate on even hours only.
@@ -826,19 +853,20 @@ def _create_allocated_time_slots_for_section(
                 first_overlapping_allocation = next(
                     (
                         allocation
-                        for allocation in allocations
+                        for allocation in allocations + day_allocations
                         if begin_time < allocation.end_time and end_time > allocation.begin_time
                     ),
                     None,
                 )
 
-                # If there are any existing allocations for this reservation unt that overlap with
-                # a new allocation beginning at the given time, skip to the next hour.
+                # If there are any existing allocations for this reservation unit or this section that
+                # overlap with a new allocation beginning at the given time, skip to the next hour.
                 if first_overlapping_allocation is not None:
                     continue
 
-                allocations.append(AllocationTime(begin_time=begin_time, end_time=end_time))
-                allocated_days.append(Weekday(suitable.day_of_the_week))
+                allocation_time = AllocationTime(begin_time=begin_time, end_time=end_time)
+                allocations.append(allocation_time)
+                day_allocations.append(allocation_time)
 
                 yield AllocatedTimeSlotFactory.build(
                     day_of_the_week=suitable.day_of_the_week,
@@ -847,10 +875,11 @@ def _create_allocated_time_slots_for_section(
                     reservation_unit_option=option,
                 )
 
-                if len(allocated_days) >= suitable_time_info.applied_reservations_per_week:
+                number_of_allocations = sum(len(times) for times in section_allocations.values())
+                if number_of_allocations >= suitable_time_info.applied_reservations_per_week:
                     return
 
-                # Stop allocating on this day.
+                # Stop allocating on this suitable time range.
                 break
 
     # If we get here, we haven't found enough slots to make allocations at.
