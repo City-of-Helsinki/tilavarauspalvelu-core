@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Fetch a GitHub pull request with its review comments and general comments.
+# Usage: github-pr <number or URL>, e.g. github-pr 99
+set -euo pipefail
+
+usage() {
+  echo "Usage: github-pr <number or URL>, e.g. github-pr 99" >&2
+  exit 2
+}
+[[ $# -eq 1 ]] || usage
+
+repo="City-of-Helsinki/tilavarauspalvelu-core"
+
+if [[ "$1" =~ ^([0-9]+)$ ]]; then
+  number="${BASH_REMATCH[1]}"
+elif [[ "$1" =~ ^https://github\.com/City-of-Helsinki/tilavarauspalvelu-core/pull/([0-9]+)([/?#].*)?$ ]]; then
+  number="${BASH_REMATCH[1]}"
+else
+  echo "Not a pull request number or URL: $1" >&2
+  usage
+fi
+
+pr="$(gh pr view "$number" --repo "$repo" \
+  --json number,title,state,author,baseRefName,headRefName,url,isDraft,body \
+  --jq '{number, title, state, author: .author.login, source_branch: .headRefName, target_branch: .baseRefName, web_url: .url, draft: .isDraft, description: .body}')"
+
+# Line-specific review comments.
+review_comments="$(gh api "repos/$repo/pulls/$number/comments" --paginate \
+  --jq '.[] | {id, author: .user.login, at: .created_at, file: .path, line: (.line // .original_line), in_reply_to: .in_reply_to_id, body}' \
+  | jq --slurp .)"
+
+# General comments, not tied to a diff line.
+comments="$(gh api "repos/$repo/issues/$number/comments" --paginate \
+  --jq '.[] | {author: .user.login, at: .created_at, body}' \
+  | jq --slurp .)"
+
+jq --slurp '.[0] + {review_comments: .[1], comments: .[2]}' \
+  <(printf '%s' "$pr") <(printf '%s' "$review_comments") <(printf '%s' "$comments")

@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# PreToolUse hook for Bash. Blocks calls to skill scripts that the shell could expand.
+# A skill script is an executable file in .agents/skills/<skill>/.
+# A call is allowed only as the script path from the repository root, followed by arguments
+# that are single-quoted without a quote inside, or that use only safe characters.
+set -euo pipefail
+
+command="$(jq -r '.tool_input.command // empty')"
+root="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+
+safe_arg="('[^']*'|[A-Za-z0-9_.:/=-]+)"
+
+for script in "$root"/.agents/skills/*/*; do
+  [[ -f "$script" && -x "$script" ]] || continue
+  name="$(basename "$script")"
+  skill="$(basename "$(dirname "$script")")"
+
+  [[ "$command" == *"$skill/$name"* || "$command" == *"./$name"* ]] || continue
+
+  allowed="^(\.agents|\.claude)/skills/$skill/$name( +$safe_arg)* *\$"
+  if [[ ! "$command" =~ $allowed ]]; then
+    {
+      echo "Blocked: run the skill script as a single command from the repository root:"
+      echo "  .agents/skills/$skill/$name <arguments>"
+      echo "Put URLs in single quotes. Do not pipe, chain or redirect the command."
+    } >&2
+    exit 2
+  fi
+done

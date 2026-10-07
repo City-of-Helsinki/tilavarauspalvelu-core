@@ -19,28 +19,19 @@ gh auth status
 If not installed, stop and ask the user to install `gh`.
 If not logged in, stop and ask the user to run `gh auth login`.
 
-## 2. Parse the number
+## 2. Fetch the pull request
 
-Case 1: User says "PR 99" or "pull request #99" → number=99
-
-Case 2: User says "Fetch <URL>":
-
-`https://github.com/City-of-Helsinki/tilavarauspalvelu-core/pull/99` → number=99
-
-## 3. Call the API
+Run the script from the repository root. Give it the number or the URL from the user as is.
+Put a URL in single quotes:
 
 ```bash
-gh pr view <number> --repo City-of-Helsinki/tilavarauspalvelu-core --json number,title,state,author,baseRefName,headRefName,url,isDraft,body --jq '{number, title, state, author: .author.login, source_branch: .headRefName, target_branch: .baseRefName, web_url: .url, draft: .isDraft, description: .body}'
+.agents/skills/github-pr/github-pr 99
+.agents/skills/github-pr/github-pr 'https://github.com/City-of-Helsinki/tilavarauspalvelu-core/pull/99'
 ```
 
-Fetch the line-specific review comments separately:
+The script validates the number. It prints the pull request with two lists of comments:
 
-```bash
-gh api repos/City-of-Helsinki/tilavarauspalvelu-core/pulls/<number>/comments --paginate --jq '[.[] | {author: .user.login, at: .created_at, file: .path, line: (.line // .original_line), body}]'
-```
+- `review_comments` are tied to a file and a line. A URL with `#discussion_r<id>` points to the review comment with that `id`.
+- `comments` are general comments on the pull request.
 
-General PR-level comments, not tied to a diff line, come from the issue comments endpoint:
-
-```bash
-gh api repos/City-of-Helsinki/tilavarauspalvelu-core/issues/<number>/comments --paginate --jq '[.[] | {author: .user.login, at: .created_at, body}]'
-```
+A hook blocks the command if it is in any other form. Run it as a single command, without pipes.

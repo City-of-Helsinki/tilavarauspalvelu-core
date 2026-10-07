@@ -9,7 +9,7 @@ How to fetch a Jira issue for implementation details, either to show or implemen
 
 ## 1. Authentication
 
-The `jira-api` script next to this file reads the credentials from 1Password with `op read`.
+The `jira-issue` script next to this file reads the credentials from 1Password with `op read`.
 1Password asks the user to unlock. Wait for it.
 
 The script needs this setup. If a call fails because of it, stop and tell the user which part is missing:
@@ -27,31 +27,17 @@ The script needs this setup. If a call fails because of it, stop and tell the us
 
 Never print the credentials or call `op` for them yourself. Use only the script.
 
-## 2. Parse the key
+## 2. Fetch the issue
 
-Case 1: User says "Fetch TILA-123" or "Implement TILA-123" → key=TILA-123
-
-Case 2: User says "Fetch <URL>":
-
-`https://helsinkisolutionoffice.atlassian.net/browse/TILA-123` → key=TILA-123
-
-`https://helsinkisolutionoffice.atlassian.net/jira/software/c/projects/TILA/boards/247/backlog?selectedIssue=TILA-123` → key=TILA-123.
-
-Take the key from the `selectedIssue` query parameter. Ignore the other parameters.
-
-## 3. Call the API
-
-Run from the repository root:
+Run the script from the repository root. Give it the key or the URL from the user as is.
+Put a URL in single quotes:
 
 ```bash
-.agents/skills/jira-issue/jira-api 'rest/api/2/issue/<key>?fields=summary,status,issuetype,priority,assignee,reporter,labels,parent,created,updated,description,comment' | jq '{key, url: "https://helsinkisolutionoffice.atlassian.net/browse/\(.key)", summary: .fields.summary, type: .fields.issuetype.name, status: .fields.status.name, priority: .fields.priority.name, assignee: .fields.assignee.displayName, reporter: .fields.reporter.displayName, labels: .fields.labels, parent: .fields.parent.key, created: .fields.created, updated: .fields.updated, description: .fields.description, comment_total: .fields.comment.total, comments: [.fields.comment.comments[] | {author: .author.displayName, at: .created, body}]}'
+.agents/skills/jira-issue/jira-issue TILA-123
+.agents/skills/jira-issue/jira-issue 'https://helsinkisolutionoffice.atlassian.net/browse/TILA-123'
 ```
 
-If `comment_total` is larger than the number of `comments`, the response has only the first page.
-Fetch the rest with `startAt` set to the number of comments you already have. Repeat until you have all of them:
+The script validates the key and fetches the issue with all its comments.
+A hook blocks the command if it is in any other form. Run it as a single command, without pipes.
 
-```bash
-.agents/skills/jira-issue/jira-api 'rest/api/2/issue/<key>/comment?startAt=<count>' | jq '{total, comments: [.comments[] | {author: .author.displayName, at: .created, body}]}'
-```
-
-API v2 returns the description and comments as plain wiki markup text. Issues are often in Finnish.
+The description and comments are plain wiki markup text. Issues are often in Finnish.
