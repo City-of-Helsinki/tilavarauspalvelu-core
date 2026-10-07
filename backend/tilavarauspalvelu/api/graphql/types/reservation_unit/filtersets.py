@@ -7,6 +7,7 @@ import django_filters
 from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.db import models
 from django.db.models import Q
+from django.db.models.lookups import Exact
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import (
     EnumChoiceFilter,
@@ -200,13 +201,25 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
         for term in value.split():
             search = build_search(term, separator="&")
             search_query = SearchQuery(value=search, config=language, search_type="raw")
+
+            # A term with no lexemes, such as the stop word "the" or a lone backslash, becomes an empty query.
+            # An empty query matches nothing, so let such a term match every row.
+            query_node_count = models.Func(search_query, function="numnode", output_field=models.IntegerField())
+            has_no_lexemes = Exact(query_node_count, 0)
+
             match language:
                 case "finnish":
-                    terms_filter &= models.Q(search_vector_fi=search_query) | models.Q(name_fi__icontains=term)
+                    terms_filter &= (
+                        models.Q(search_vector_fi=search_query) | models.Q(name_fi__icontains=term) | has_no_lexemes
+                    )
                 case "english":
-                    terms_filter &= models.Q(search_vector_en=search_query) | models.Q(name_en__icontains=term)
+                    terms_filter &= (
+                        models.Q(search_vector_en=search_query) | models.Q(name_en__icontains=term) | has_no_lexemes
+                    )
                 case "swedish":
-                    terms_filter &= models.Q(search_vector_sv=search_query) | models.Q(name_sv__icontains=term)
+                    terms_filter &= (
+                        models.Q(search_vector_sv=search_query) | models.Q(name_sv__icontains=term) | has_no_lexemes
+                    )
 
         return qs.filter(terms_filter)
 

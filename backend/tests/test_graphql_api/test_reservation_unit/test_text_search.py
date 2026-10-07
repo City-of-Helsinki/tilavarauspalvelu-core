@@ -126,6 +126,19 @@ class Params(NamedTuple):
             text_search="foo\\bar",
             reservation_unit_data=SearchableData(name="foo bar"),
         ),
+        "match name with a standalone backslash": Params(
+            text_search="foo \\",
+            reservation_unit_data=SearchableData(name="foo"),
+        ),
+        "match name with a stop word en": Params(
+            text_search="the foo",
+            reservation_unit_data=SearchableData(name_en="foo"),
+            language="en",
+        ),
+        "match name with a stop word fi": Params(
+            text_search="foo ja bar",
+            reservation_unit_data=SearchableData(name="foo", unit__name="bar"),
+        ),
         "match description fi": Params(
             text_search="kuvaus",
             reservation_unit_data=SearchableData(description="Tässä on kuvaus minun yksikkööni"),
