@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import itertools
 from typing import TYPE_CHECKING, Self
 
 from django.conf import settings
@@ -452,6 +453,13 @@ class ReservationManager(SerializableModelManagerMixin, ModelManager[Reservation
 
             EmailService.send_reservation_cancelled_email(reservation=reservation)
 
-    def create_missing_statistics(self) -> None:
-        """Create missing statistics for reservations that don't have any."""
-        self.all().filter(reservation_statistic__isnull=True).upsert_statistics()
+    def create_missing_statistics(self, *, limit: int, batch_size: int) -> None:
+        """
+        Create missing statistics for at most `limit` reservations that don't have any.
+        Each batch is saved in its own transaction, so a failed batch does not lose the others.
+        """
+        missing_statistics = self.all().filter(reservation_statistic__isnull=True).order_by("pk")
+        reservation_pks = list(missing_statistics.values_list("pk", flat=True)[:limit])
+
+        for batch in itertools.batched(reservation_pks, batch_size, strict=False):
+            self.model.objects.filter(pk__in=batch).upsert_statistics()
