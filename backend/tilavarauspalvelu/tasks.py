@@ -248,9 +248,17 @@ def prune_reservation_statistics_task() -> None:
     ReservationStatistic.objects.delete_expired_statistics()
 
 
-@app.task(name="create_missing_reservation_statistics")
+@app.task(
+    name="create_missing_reservation_statistics",
+    tvp_auto_create_name="Luo puuttuvat varaustilastot",
+    tvp_auto_create_description=(
+        "Luo varaustilastot varauksille, joilla ei ole vielä tilastoa. (Tietomalli ReservationStatistic)."
+    ),
+    tvp_auto_create_schedule=CeleryAutoCreateTaskSchedule(hour="2", minute="0"),
+)
 def create_missing_reservation_statistics_task() -> None:
-    Reservation.objects.create_missing_statistics()
+    # Limited so that the task finishes within `CELERY_TASK_TIME_LIMIT`. Larger gaps are filled over several runs.
+    Reservation.objects.create_missing_statistics(limit=5_000, batch_size=500)
 
 
 @app.task(
