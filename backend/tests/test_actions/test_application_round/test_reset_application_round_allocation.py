@@ -9,7 +9,13 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.models import AllocatedTimeSlot, Reservation, ReservationSeries, ReservationUnitOption
+from tilavarauspalvelu.models import (
+    AllocatedTimeSlot,
+    Reservation,
+    ReservationSeries,
+    ReservationStatistic,
+    ReservationUnitOption,
+)
 
 from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationRoundFactory, ReservationFactory
 from tests.helpers import patch_method
@@ -84,6 +90,30 @@ def test_reset_application_round_allocation__handled():
     assert Reservation.objects.count() == 0
     assert ReservationUnitOption.objects.filter(is_locked=True).count() == 1
     assert application_round.handled_at is None
+
+
+def test_reset_application_round_allocation__handled__delete_statistics():
+    application_round = ApplicationRoundFactory.create_in_status_handled()
+
+    allocation = AllocatedTimeSlotFactory.create(
+        reservation_unit_option__application_section__application__application_round=application_round,
+    )
+    ReservationFactory.create(
+        type=ReservationTypeChoice.SEASONAL,
+        reservation_series__allocated_time_slot=allocation,
+    )
+    other_reservation = ReservationFactory.create()
+
+    Reservation.objects.upsert_statistics()
+
+    assert ReservationStatistic.objects.count() == 2
+
+    application_round.actions.reset_application_round_allocation()
+
+    statistics = list(ReservationStatistic.objects.all())
+
+    assert len(statistics) == 1
+    assert statistics[0].reservation == other_reservation
 
 
 @patch_method(PindoraService.delete_access_code)

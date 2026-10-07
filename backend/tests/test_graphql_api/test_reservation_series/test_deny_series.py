@@ -9,6 +9,7 @@ from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
+from tilavarauspalvelu.models import ReservationStatistic
 from utils.date_utils import local_datetime
 
 from tests.factories import AllocatedTimeSlotFactory, ReservationDenyReasonFactory
@@ -62,6 +63,36 @@ def test_reservation_series__deny_series(graphql):
     assert all(reservation.handled_at is None for reservation in past_reservations)
 
     assert EmailService.send_seasonal_booking_denied_series_email.called is False
+
+
+@freeze_time(local_datetime(year=2024, month=1, day=1))
+def test_reservation_series__deny_series__update_statistics(graphql, settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    reason = ReservationDenyReasonFactory.create()
+
+    reservation_series = create_reservation_series()
+    reservation_series.reservations.upsert_statistics()
+
+    data = {
+        "pk": reservation_series.pk,
+        "denyReason": reason.pk,
+    }
+
+    graphql.login_with_superuser()
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    future_statistics = ReservationStatistic.objects.filter(begin__gt=local_datetime())
+    past_statistics = ReservationStatistic.objects.filter(begin__lte=local_datetime())
+
+    assert future_statistics.count() == 5
+    assert all(statistic.state == ReservationStateChoice.DENIED for statistic in future_statistics)
+    assert all(statistic.deny_reason == reason.pk for statistic in future_statistics)
+
+    assert past_statistics.count() == 4
+    assert all(statistic.state != ReservationStateChoice.DENIED for statistic in past_statistics)
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
