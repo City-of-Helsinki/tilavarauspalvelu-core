@@ -279,25 +279,7 @@ def test_send_application__section_suitable_time_range__different_days(graphql):
     ]
 
 
-def test_send_application__section_suitable_time_range__not_enough_suitable_ranges(graphql):
-    application = ApplicationFactory.create_application_ready_for_sending(
-        application_sections__applied_reservations_per_week=2,
-    )
-    section = application.application_sections.first()
-
-    graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
-
-    assert response.has_errors is True
-    assert response.field_error_messages() == [
-        (
-            f"Application section {section.pk} must have suitable time ranges on at least as many days "
-            f"as requested reservations per week. Counted 1 but expected at least 2."
-        )
-    ]
-
-
-def test_send_application__section_suitable_time_range__only_count_different_days(graphql):
+def test_send_application__section_suitable_time_range__more_reservations_than_suitable_days(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         application_sections__applied_reservations_per_week=2,
         application_sections__suitable_time_ranges=[],
@@ -307,26 +289,23 @@ def test_send_application__section_suitable_time_range__only_count_different_day
     SuitableTimeRangeFactory.create(
         application_section=section,
         day_of_the_week=Weekday.MONDAY,
-        begin_time=local_time(10, 0),
-        end_time=local_time(11, 0),
+        begin_time=local_time(8, 0),
+        end_time=local_time(9, 0),
     )
     SuitableTimeRangeFactory.create(
         application_section=section,
         day_of_the_week=Weekday.MONDAY,
-        begin_time=local_time(11, 0),
-        end_time=local_time(12, 0),
+        begin_time=local_time(18, 0),
+        end_time=local_time(19, 0),
     )
 
     graphql.login_with_superuser()
     response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
 
-    assert response.has_errors is True
-    assert response.field_error_messages() == [
-        (
-            f"Application section {section.pk} must have suitable time ranges on at least as many days "
-            f"as requested reservations per week. Counted 1 but expected at least 2."
-        )
-    ]
+    assert response.has_errors is False, response.errors
+
+    application.refresh_from_db()
+    assert application.sent_at is not None
 
 
 def test_send_application__contact_person_first_name_missing(graphql):
