@@ -1,7 +1,7 @@
 import React from "react";
+import { useTranslation } from "next-i18next";
 import { isPast, isFuture, isToday } from "date-fns";
 import { IconClock, IconSize } from "hds-react";
-import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
 

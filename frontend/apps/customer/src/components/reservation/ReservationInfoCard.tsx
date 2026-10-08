@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
-import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Card } from "@ui/components";
 import { formatters as getFormatters } from "@ui/index";
@@ -16,10 +16,10 @@ import {
   getMainImage,
 } from "@ui/modules/helpers";
 import { Flex, fontMedium, Strong } from "@ui/styled";
-import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
-import { getReservationUnitPath } from "@/modules/urls";
 import { AccessType, ReservationStateChoice, useAccessCodeQuery } from "@gql/gql-types";
 import type { ReservationInfoCardFragment } from "@gql/gql-types";
+import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
+import { getReservationUnitPath } from "@/modules/urls";
 
 const InfoCard = styled(Card)`
   && h2 {

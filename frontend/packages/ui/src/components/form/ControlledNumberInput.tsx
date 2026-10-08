@@ -2,8 +2,8 @@
 import React from "react";
 import { useController } from "react-hook-form";
 import type { FieldValues, UseControllerProps } from "react-hook-form";
-import { NumberInput, Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { NumberInput, Tooltip } from "hds-react";
 import { filterEmpty, toNumber } from "../../modules/helpers";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {

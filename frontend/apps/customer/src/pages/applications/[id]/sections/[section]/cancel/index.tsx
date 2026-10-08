@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { ApolloError, gql } from "@apollo/client";
-import { IconCalendarEvent, IconClock, IconLocation, IconTrash } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { ApolloError, gql } from "@apollo/client";
+import { IconCalendarEvent, IconClock, IconLocation, IconTrash } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import styled from "styled-components";
@@ -21,6 +21,8 @@ import {
   toNumber,
 } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
+import { ApplicationSectionCancelDocument, useCancelApplicationSectionMutation } from "@gql/gql-types";
+import type { ApplicationSectionCancelQuery, ApplicationSectionCancelQueryVariables } from "@gql/gql-types";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { CancellationForm } from "@/components/CancellationForm";
 import type { CancelFormValues } from "@/components/CancellationForm";
@@ -29,8 +31,6 @@ import { isReservationCancellable } from "@/modules/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
 import { ReservationPageWrapper } from "@/styled/reservation";
-import { ApplicationSectionCancelDocument, useCancelApplicationSectionMutation } from "@gql/gql-types";
-import type { ApplicationSectionCancelQuery, ApplicationSectionCancelQueryVariables } from "@gql/gql-types";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 

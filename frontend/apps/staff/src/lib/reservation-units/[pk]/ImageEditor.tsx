@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { FileInput } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { FileInput } from "hds-react";
 import styled from "styled-components";
 import { AutoGrid, Flex, focusStyles, removeButtonStyles } from "ui/src/styled";
 import { ReservationUnitImageType } from "@gql/gql-types";

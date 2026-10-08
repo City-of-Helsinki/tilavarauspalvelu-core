@@ -1,16 +1,16 @@
 import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import styled from "styled-components";
+import { logError } from "@ui/modules/errors";
 import { BannerNotificationsList } from "ui/src/components";
 import { ToastContainer } from "ui/src/components/toast";
 import { mainStyles } from "ui/src/styled";
-import { logError } from "@ui/modules/errors";
+import { BannerNotificationTarget } from "@gql/gql-types";
 import { ErrorGeneric } from "@/components/ErrorGeneric";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { useEnvContext } from "@/context/EnvContext";
 import { useModal } from "@/context/ModalContext";
 import { useSession } from "@/hooks";
-import { BannerNotificationTarget } from "@gql/gql-types";
 import { Navigation } from "./Navigation";
 
 type Props = {

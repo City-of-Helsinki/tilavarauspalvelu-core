@@ -1,8 +1,8 @@
 import React from "react";
 import type { UseFormReturn } from "react-hook-form";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { ButtonLikeLink } from "@ui/components/ButtonLikeLink";
@@ -10,10 +10,10 @@ import { successToast } from "@ui/components/toast";
 import { useDisplayError } from "@ui/hooks";
 import { breakpoints } from "@ui/modules/const";
 import { Flex, pageSideMargins, WhiteButton } from "@ui/styled";
+import { useArchiveReservationUnitMutation } from "@gql/gql-types";
+import type { ReservationUnitEditQuery, UnitSubpageHeadFragment } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { getUnitUrl } from "@/modules/urls";
-import type { ReservationUnitEditQuery, UnitSubpageHeadFragment } from "@gql/gql-types";
-import { useArchiveReservationUnitMutation } from "@gql/gql-types";
 import type { ReservationUnitEditFormValues } from "./form";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];

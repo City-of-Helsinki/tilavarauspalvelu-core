@@ -1,9 +1,9 @@
 import React from "react";
 import { createPortal } from "react-dom";
-import { gql } from "@apollo/client";
-import { Notification, NotificationSize } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
+import { Notification, NotificationSize } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import {
@@ -16,20 +16,6 @@ import {
 } from "ui/src/modules/helpers";
 import type { ReadonlyDeep } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
-import { Breadcrumb } from "@/components/Breadcrumb";
-import { ListWithPagination } from "@/components/ListWithPagination";
-import { SeasonalSearchForm } from "@/components/SeasonalSearchForm";
-import type { SearchFormValues } from "@/components/SeasonalSearchForm";
-import { SortingComponent } from "@/components/SortingComponent";
-import { useEnvContext } from "@/context/EnvContext";
-import { useReservationUnitList } from "@/hooks";
-import { useSearchQuery } from "@/hooks/useSearchQuery";
-import { useSearchModify } from "@/hooks/useSearchValues";
-import { StartApplicationBar, RecurringCard } from "@/lib/recurring/[id]";
-import { createApolloClient } from "@/modules/apolloClient";
-import { getSearchOptions, processVariables } from "@/modules/search";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { getApplicationPath, seasonalPrefix } from "@/modules/urls";
 import {
   ApplicationRoundDocument,
   ApplicationRoundStatusChoice,
@@ -45,6 +31,20 @@ import type {
   CreateApplicationMutationVariables,
   CurrentUserQuery,
 } from "@gql/gql-types";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { ListWithPagination } from "@/components/ListWithPagination";
+import { SeasonalSearchForm } from "@/components/SeasonalSearchForm";
+import type { SearchFormValues } from "@/components/SeasonalSearchForm";
+import { SortingComponent } from "@/components/SortingComponent";
+import { useEnvContext } from "@/context/EnvContext";
+import { useReservationUnitList } from "@/hooks";
+import { useSearchQuery } from "@/hooks/useSearchQuery";
+import { useSearchModify } from "@/hooks/useSearchValues";
+import { StartApplicationBar, RecurringCard } from "@/lib/recurring/[id]";
+import { createApolloClient } from "@/modules/apolloClient";
+import { getSearchOptions, processVariables } from "@/modules/search";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getApplicationPath, seasonalPrefix } from "@/modules/urls";
 
 type SeasonalSearchProps = ReadonlyDeep<Pick<NarrowedProps, "applicationRound" | "options">>;
 

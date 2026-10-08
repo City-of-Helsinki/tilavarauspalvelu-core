@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
-import type { UserPermissionChoice } from "@gql/gql-types";
 import { useCheckPermissionsQuery } from "@gql/gql-types";
+import type { UserPermissionChoice } from "@gql/gql-types";
 
 export function useCheckPermission({
   units,

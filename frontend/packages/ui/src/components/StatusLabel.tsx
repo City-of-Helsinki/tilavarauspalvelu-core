@@ -1,7 +1,7 @@
 import React from "react";
-import type { StatusLabelType as HDSStatusLabelType } from "hds-react";
 import { StatusLabel as HDSStatusLabel } from "hds-react";
 import styled from "styled-components";
+import type { StatusLabelType as HDSStatusLabelType } from "hds-react";
 
 type StatusLabelProps = {
   type: StatusLabelType;

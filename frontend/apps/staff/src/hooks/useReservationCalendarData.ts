@@ -2,10 +2,10 @@ import { useTranslation } from "next-i18next";
 import { errorToast } from "ui/src/components/toast";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
-import { combineAffectingReservations } from "@/modules/helpers";
-import type { CalendarEventType } from "@/modules/reservation";
 import { ReservationStateChoice, ReservationTypeChoice, useReservationsByReservationUnitQuery } from "@gql/gql-types";
 import type { CalendarReservationFragment, Maybe } from "@gql/gql-types";
+import { combineAffectingReservations } from "@/modules/helpers";
+import type { CalendarEventType } from "@/modules/reservation";
 
 export function useReservationCalendarData({
   begin,

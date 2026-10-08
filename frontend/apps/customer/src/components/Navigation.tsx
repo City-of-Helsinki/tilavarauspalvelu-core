@@ -1,15 +1,16 @@
 import React from "react";
 import { useLocation } from "react-use";
-import { Header, IconKey, IconLinkExternal, IconSignout, IconUser, LogoSize, TitleStyleType } from "hds-react";
-import type { LanguageOption } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { Header, IconKey, IconLinkExternal, IconSignout, IconUser, LogoSize, TitleStyleType } from "hds-react";
 import { useRouter } from "next/router";
 import styled from "styled-components";
+import type { LanguageOption } from "hds-react";
 import { Logo } from "ui/src/components/Logo";
 import { signIn, signOut } from "ui/src/modules/browserHelpers";
 import { breakpoints } from "ui/src/modules/const";
 import { getLocalizationLang } from "ui/src/modules/helpers";
 import { fontBold, fontMedium } from "ui/src/styled";
+import type { CurrentUserQuery } from "@gql/gql-types";
 import { env } from "@/env.mjs";
 import { useSession } from "@/hooks";
 import {
@@ -19,7 +20,6 @@ import {
   seasonalPrefix,
   singleSearchPrefix,
 } from "@/modules/urls";
-import type { CurrentUserQuery } from "@gql/gql-types";
 
 type HeaderProps = {
   apiBaseUrl: string;

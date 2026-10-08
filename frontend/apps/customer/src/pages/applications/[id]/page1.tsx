@@ -1,15 +1,17 @@
 import React from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import type { GetServerSidePropsContext } from "next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uniq } from "lodash-es";
-import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import { useDisplayError } from "ui/src/hooks";
 import { parseApiDate } from "ui/src/modules/date-utils";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
+import { ApplicationPage1Document, useUpdateApplicationMutation } from "@gql/gql-types";
+import type { ApplicationPage1Query, ApplicationPage1QueryVariables } from "@gql/gql-types";
 import { ApplicationFunnelWrapper, Page1 as Page1Impl } from "@/components/application/funnel";
 import {
   ApplicationPage1SchemaRefined,
@@ -22,8 +24,6 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { getSearchOptions } from "@/modules/search";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
-import { ApplicationPage1Document, useUpdateApplicationMutation } from "@gql/gql-types";
-import type { ApplicationPage1Query, ApplicationPage1QueryVariables } from "@gql/gql-types";
 
 function Page1({
   application,

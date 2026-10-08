@@ -1,15 +1,13 @@
 import React, { useState } from "react";
+import { useTranslation } from "next-i18next";
 import { ApolloError, gql } from "@apollo/client";
 import { isBefore } from "date-fns";
 import { Button, ButtonVariant, Dialog, RadioButton, Select, SelectionGroup, TextArea } from "hds-react";
-import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { convertOptionToHDS, toNumber } from "ui/src/modules/helpers";
 import { CenterSpinner, Flex } from "ui/src/styled";
-import { useModal } from "@/context/ModalContext";
-import { useDenyReasonOptions } from "@/hooks";
 import {
   useDenyReservationMutation,
   useRefundReservationMutation,
@@ -22,6 +20,8 @@ import type {
   ReservationSeriesDenyMutationInput,
   DenyDialogFieldsFragment,
 } from "@gql/gql-types";
+import { useModal } from "@/context/ModalContext";
+import { useDenyReasonOptions } from "@/hooks";
 
 const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;

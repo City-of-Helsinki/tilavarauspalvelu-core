@@ -1,15 +1,17 @@
 import React from "react";
-import { gql } from "@apollo/client";
-import { IconClock, IconGroup, IconEuroSign, IconHome, IconSize, IconLock, Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
+import { gql } from "@apollo/client";
+import { IconClock, IconGroup, IconEuroSign, IconHome, IconSize, IconLock, Tooltip } from "hds-react";
 import styled from "styled-components";
+import { Sanitize } from "@ui/components/Sanitize";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDateRange, formatDateTime, formatDuration, formatDate } from "ui/src/modules/date-utils";
 import { filterNonNullable, getLocalizationLang, getTranslation, stripHtml } from "ui/src/modules/helpers";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { Flex, H1, H3 } from "ui/src/styled";
-import { Sanitize } from "@ui/components/Sanitize";
+import { ReservationKind } from "@gql/gql-types";
+import type { ReservationUnitHeadFragment } from "@gql/gql-types";
 import { IconWithText } from "@/components/IconWithText";
 import {
   getActivePricing,
@@ -17,8 +19,6 @@ import {
   getReservationUnitAccessPeriods,
   isReservationUnitPaid,
 } from "@/modules/reservationUnit";
-import { ReservationKind } from "@gql/gql-types";
-import type { ReservationUnitHeadFragment } from "@gql/gql-types";
 import { Images } from "./Images";
 
 interface HeadProps {

@@ -5,11 +5,11 @@ import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";
 import type { ReadonlyDeep } from "ui/src/modules/helpers";
 import { H2, HR } from "ui/src/styled";
-import { Breadcrumb } from "@/components/Breadcrumb";
+import type { ApplicationFormFragment } from "@gql/gql-types";
 import { ApplicationHead } from "@/components/application";
 import { ApplicationStepper } from "@/components/application/funnel/ApplicationStepper";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { applicationsPrefix } from "@/modules/urls";
-import type { ApplicationFormFragment } from "@gql/gql-types";
 import { NotesWhenApplying } from "../NotesWhenApplying";
 
 const InnerContainer = styled.div`

@@ -1,9 +1,9 @@
 import React from "react";
 import type { ReactElement } from "react";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
-import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { ShowAllContainer } from "@ui/components";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/components/reservation-form";
@@ -11,10 +11,10 @@ import { ReservationTypes } from "@ui/schemas";
 import type { CreateStaffReservationFormValues } from "@ui/schemas";
 import { HR } from "@ui/styled";
 import type { OptionsRecord } from "@ui/types";
-import { useFilterOptions } from "@/hooks/useFilterOptions";
-import { Element } from "@/styled";
 import { AuthenticationType, ReservationTypeChoice } from "@gql/gql-types";
 import type { ReservationTypeFormFieldsFragment } from "@gql/gql-types";
+import { useFilterOptions } from "@/hooks/useFilterOptions";
+import { Element } from "@/styled";
 import { BufferToggles } from "./BufferToggles";
 import { ShowTOS } from "./ShowTOS";
 

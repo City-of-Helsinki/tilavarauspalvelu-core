@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "next-i18next";
 import {
   IconArrowBottomRight,
   IconArrowTopRight,
@@ -8,7 +9,6 @@ import {
   IconPen,
   IconQuestionCircle,
 } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { ApplicationStatusChoice } from "../../../gql/gql-types";
 import type { Maybe } from "../../../gql/gql-types";
 import type { UserTypeChoice } from "../../modules/urlBuilder";

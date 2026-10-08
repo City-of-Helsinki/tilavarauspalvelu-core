@@ -1,21 +1,21 @@
 import React, { createRef } from "react";
-import { gql } from "@apollo/client";
-import { ResourcesTable, SubPageHead, SpacesTable, NewSpaceModal, NewResourceModal } from "@lib/units/[id]/";
-import { Button, ButtonVariant, IconPlusCircleFill } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
+import { Button, ButtonVariant, IconPlusCircleFill } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { errorToast } from "ui/src/components/toast";
 import { createNodeId, toNumber, ignoreMaybeArray } from "ui/src/modules/helpers";
 import { fontBold, H2, CenterSpinner, Flex } from "ui/src/styled";
+import { UserPermissionChoice, useSpacesResourcesQuery } from "@gql/gql-types";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { Error404 } from "@/components/Error404";
 import { LinkPrev } from "@/components/LinkPrev";
 import { useModal } from "@/context/ModalContext";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { FixedDialog } from "@/styled/FixedDialog";
-import { UserPermissionChoice, useSpacesResourcesQuery } from "@gql/gql-types";
+import { ResourcesTable, SubPageHead, SpacesTable, NewSpaceModal, NewResourceModal } from "@lib/units/[id]/";
 
 const ActionButton = styled(Button)`
   span {

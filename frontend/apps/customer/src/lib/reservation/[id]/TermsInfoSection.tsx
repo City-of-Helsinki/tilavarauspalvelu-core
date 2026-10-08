@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
-import { Sanitize } from "ui/src/components/Sanitize";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
+import { Sanitize } from "ui/src/components/Sanitize";
+import type { ReservationPageQuery } from "@gql/gql-types";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import type { getServerSideProps } from "@/pages/reservations/[id]";
-import type { ReservationPageQuery } from "@gql/gql-types";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

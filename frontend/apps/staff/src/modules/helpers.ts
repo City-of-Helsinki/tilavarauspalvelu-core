@@ -1,7 +1,7 @@
+import type { TFunction } from "next-i18next";
 import { gql } from "@apollo/client";
 import { addSeconds } from "date-fns";
 import { trim } from "lodash-es";
-import type { TFunction } from "next-i18next";
 import { filterNonNullable, truncate } from "ui/src/modules/helpers";
 import {
   ApplicationRoundReservationCreationStatusChoice,

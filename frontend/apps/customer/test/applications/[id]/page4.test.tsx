@@ -1,14 +1,14 @@
-import { createMockApplicationViewFragment } from "@test/application.mocks";
-import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
-import { createGraphQLMocks } from "@test/gql.mocks";
-import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, expect, test, describe } from "vitest";
 import { createNodeId } from "ui/src/modules/helpers";
-import Page4 from "@/pages/applications/[id]/page4";
 import { TermsOfUseTypeChoices } from "@gql/gql-types";
 import type { TermsOfUseFieldsFragment } from "@gql/gql-types";
+import Page4 from "@/pages/applications/[id]/page4";
+import { createMockApplicationViewFragment } from "@test/application.mocks";
+import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
+import { createGraphQLMocks } from "@test/gql.mocks";
+import { MockedGraphQLProvider } from "@test/test.react.utils";
 
 const { useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();

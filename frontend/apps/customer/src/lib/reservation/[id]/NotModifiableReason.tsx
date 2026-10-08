@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { getWhyReservationCantBeChanged, isReservationCancellable } from "@/modules/reservation";
 import type { CanReservationBeChangedFragment } from "@gql/gql-types";
+import { getWhyReservationCantBeChanged, isReservationCancellable } from "@/modules/reservation";
 
 const Reasons = styled.p`
   &:empty {

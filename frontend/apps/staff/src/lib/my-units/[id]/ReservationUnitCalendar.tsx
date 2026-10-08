@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { gql } from "@apollo/client";
 import { addDays, addHours, addMinutes, endOfISOWeek, startOfDay, startOfISOWeek } from "date-fns";
 import { get } from "lodash-es";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import styled from "styled-components";
+import { getBuffersFromEvents, isCellOverlappingSpan } from "@ui/components/calendar/utils";
+import type { ReservationEventType, TimeSpanType } from "@ui/components/calendar/utils";
 import type { ReservableTimeSpanType } from "ui/gql/gql-types";
 import { Calendar as CommonCalendar } from "ui/src/components/calendar/Calendar";
 import type { SlotProps } from "ui/src/components/calendar/Calendar";
@@ -12,16 +14,14 @@ import { errorToast } from "ui/src/components/toast";
 import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId, filterNonNullable } from "ui/src/modules/helpers";
-import type { ReservationEventType, TimeSpanType } from "@ui/components/calendar/utils";
-import { getBuffersFromEvents, isCellOverlappingSpan } from "@ui/components/calendar/utils";
+import { ReservationTypeChoice, useReservationUnitCalendarQuery, UserPermissionChoice } from "@gql/gql-types";
+import type { ReservationUnitCalendarQuery } from "@gql/gql-types";
 import { Legend, LegendsWrapper } from "@/components/Legend";
 import { useSession } from "@/hooks";
 import { EVENT_BUFFER, HDS_CLOCK_ICON_SVG, NOT_RESERVABLE } from "@/modules/calendarStyling";
 import { combineAffectingReservations, getReserveeName } from "@/modules/helpers";
 import { hasPermission } from "@/modules/permissionHelper";
 import { getReservationUrl } from "@/modules/urls";
-import { ReservationTypeChoice, useReservationUnitCalendarQuery, UserPermissionChoice } from "@gql/gql-types";
-import type { ReservationUnitCalendarQuery } from "@gql/gql-types";
 import { eventStyleGetter, legend } from "./eventStyleGetter";
 
 type Props = {

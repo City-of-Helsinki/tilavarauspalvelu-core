@@ -1,13 +1,15 @@
 import React, { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import type { GetServerSidePropsContext } from "next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Sentry from "@sentry/nextjs";
-import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import { useDisplayError } from "ui/src/hooks";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { ApplicationPage2Document, useUpdateApplicationMutation } from "@gql/gql-types";
+import type { ApplicationPage2Query, ApplicationPage2QueryVariables } from "@gql/gql-types";
 import { ApplicationFunnelWrapper, Page2 as Page2Impl } from "@/components/application/funnel";
 import {
   transformApplicationPage2,
@@ -18,8 +20,6 @@ import type { ApplicationPage2FormValues } from "@/components/application/funnel
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
-import { ApplicationPage2Document, useUpdateApplicationMutation } from "@gql/gql-types";
-import type { ApplicationPage2Query, ApplicationPage2QueryVariables } from "@gql/gql-types";
 
 function Page2({ application }: Pick<PropsNarrowed, "application">): React.ReactElement {
   const router = useRouter();

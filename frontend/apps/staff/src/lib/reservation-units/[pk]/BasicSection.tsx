@@ -1,16 +1,16 @@
 import React from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { TextInput } from "hds-react";
 import { ControlledSelect } from "ui/src/components/form";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { AutoGrid, FullRow } from "ui/src/styled";
-import { getTranslatedError } from "@/modules/helpers";
-import type { ReservationUnitEditQuery, ReservationUnitEditUnitFragment } from "@gql/gql-types";
 import { ReservationKind } from "@gql/gql-types";
+import type { ReservationUnitEditQuery, ReservationUnitEditUnitFragment } from "@gql/gql-types";
+import { getTranslatedError } from "@/modules/helpers";
 import { CustomNumberInput } from "./CustomNumberInput";
-import { SpecializedRadioGroup } from "./SpecializedRadioGroup";
 import type { ReservationUnitEditFormValues } from "./form";
+import { SpecializedRadioGroup } from "./SpecializedRadioGroup";
 import { EditAccordion } from "./styled";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];

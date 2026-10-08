@@ -1,6 +1,5 @@
-import type { ReadonlyURLSearchParams } from "next/navigation";
 import { describe, expect, it } from "vitest";
-import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import {
   AccessCodeState,
   ApplicationSectionStatusChoice,
@@ -13,6 +12,7 @@ import {
   ReserveeType,
   Weekday,
 } from "@gql/gql-types";
+import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
 import { getFilterSearchParams } from "./useGetFilterSearchParams";
 
 function toSearchParams(init: Array<[string, string]>): ReadonlyURLSearchParams {

@@ -1,11 +1,11 @@
-import type { UseFormReturn } from "react-hook-form";
 import { Controller } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import { ControlledTextInput } from "@ui/components/form/ControlledTextInput";
 import { getTranslatedError } from "@/modules/helpers";
-import { ParentSelector } from "./ParentSelector";
 import { EditorColumns } from "./modules/resourceEditor";
 import type { ResourceUpdateForm } from "./modules/resourceEditor";
+import { ParentSelector } from "./ParentSelector";
 
 export function ResourceEditorFields({
   form,

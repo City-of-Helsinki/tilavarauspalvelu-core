@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import type { UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { ErrorInfo } from "./ErrorInfo";

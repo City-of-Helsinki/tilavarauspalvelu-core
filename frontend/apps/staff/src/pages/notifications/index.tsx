@@ -1,22 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { gql, useApolloClient } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
+import { gql, useApolloClient } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { BannerNotificationStatusLabel } from "ui/src/components/statuses";
 import { formatDate, formatTime } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { CenterSpinner, TitleSection, H1 } from "ui/src/styled";
-import { AuthorizationChecker } from "@/components/AuthorizationChecker";
-import { ButtonLikeLink } from "@/components/ButtonLikeLink";
-import { More } from "@/components/More";
-import { CustomTable } from "@/components/Table";
-import { createClient } from "@/modules/apolloClient";
-import { GQL_MAX_RESULTS_PER_QUERY } from "@/modules/const";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { getNotificationListUrl, getNotificationUrl } from "@/modules/urls";
-import { TableLink } from "@/styled";
 import {
   BannerNotificationOrderingChoices,
   UserPermissionChoice,
@@ -28,6 +19,15 @@ import type {
   BannerNotificationsListQueryVariables,
   BannerNotificationsListQuery,
 } from "@gql/gql-types";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
+import { More } from "@/components/More";
+import { CustomTable } from "@/components/Table";
+import { createClient } from "@/modules/apolloClient";
+import { GQL_MAX_RESULTS_PER_QUERY } from "@/modules/const";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getNotificationListUrl, getNotificationUrl } from "@/modules/urls";
+import { TableLink } from "@/styled";
 
 // Tila, Nimi, Voimassa alk, Voimassa asti, Kohderyhmä, Tyyppi
 const getColConfig = (t: TFunction) => [

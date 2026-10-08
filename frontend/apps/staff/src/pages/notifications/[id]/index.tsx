@@ -1,17 +1,19 @@
 import React from "react";
 import type { ReactNode } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
-import { ApolloError, gql } from "@apollo/client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, ButtonVariant, RadioButton, SelectionGroup } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
+import { ApolloError, gql } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, ButtonVariant, RadioButton, SelectionGroup } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { z } from "zod";
+import { ControlledTextInput } from "@ui/components/form/ControlledTextInput";
+import { breakpoints } from "@ui/modules/const";
 import { ControlledDateInput } from "ui/src/components/form";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { BannerNotificationStatusLabel } from "ui/src/components/statuses";
@@ -28,13 +30,6 @@ import {
 } from "ui/src/modules/helpers";
 import { checkValidDate, checkValidFutureDate, checkTimeStringFormat } from "ui/src/schemas/schemaCommon";
 import { CenterSpinner, Flex, TitleSection, H1 } from "ui/src/styled";
-import { ControlledTextInput } from "@ui/components/form/ControlledTextInput";
-import { breakpoints } from "@ui/modules/const";
-import { AuthorizationChecker } from "@/components/AuthorizationChecker";
-import { ButtonLikeLink } from "@/components/ButtonLikeLink";
-import { ControlledTimeInput } from "@/components/ControlledTimeInput";
-import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { getNotificationListUrl } from "@/modules/urls";
 import {
   BannerNotificationState,
   BannerNotificationLevel,
@@ -46,6 +41,11 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import type { BannerNotificationPageQuery } from "@gql/gql-types";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
+import { ControlledTimeInput } from "@/components/ControlledTimeInput";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { getNotificationListUrl } from "@/modules/urls";
 
 const RichTextInput = dynamic(() => import("@/components/RichTextInput"), {
   ssr: false,

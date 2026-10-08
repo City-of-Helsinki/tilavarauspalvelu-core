@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import type { EventStyleType } from "@/modules/calendarStyling";
+import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
+import type { EventStyleReservationFieldsFragment } from "@gql/gql-types";
 import {
   CALENDAR_EVENT_BASE_STYLE,
   CALENDAR_LEGENDS,
@@ -9,9 +10,8 @@ import {
   STAFF_RESERVATION,
   WAITING_PAYMENT,
 } from "@/modules/calendarStyling";
+import type { EventStyleType } from "@/modules/calendarStyling";
 import type { CalendarEventType, EventType } from "@/modules/reservation";
-import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
-import type { EventStyleReservationFieldsFragment } from "@gql/gql-types";
 
 const SELECTED = {
   style: {

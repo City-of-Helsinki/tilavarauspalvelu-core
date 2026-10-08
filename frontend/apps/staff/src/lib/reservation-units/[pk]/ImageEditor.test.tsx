@@ -3,8 +3,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { ReservationUnitImageType } from "@gql/gql-types";
-import { ImageEditor } from "./ImageEditor";
 import type { ImageFormType } from "./form";
+import { ImageEditor } from "./ImageEditor";
 
 const MAIN_IMAGE: ImageFormType = {
   pk: 1,

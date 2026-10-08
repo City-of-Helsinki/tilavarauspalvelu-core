@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonVariant, IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
-import { useTranslation } from "next-i18next";
 import ErrorComponent from "next/error";
 import { useRouter } from "next/router";
 import styled from "styled-components";
@@ -11,13 +11,13 @@ import { errorToast } from "@ui/components/toast";
 import { useDisplayError } from "@ui/hooks";
 import { breakpoints } from "@ui/modules/const";
 import type { OptionsRecord } from "@ui/types";
+import { useAdjustReservationTimeMutation } from "@gql/gql-types";
+import type { EditPageReservationFragment } from "@gql/gql-types";
 import { AcceptTerms } from "@/components/AcceptTerms";
 import { ReservationInfoCard, SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
 import { convertReservationFormToApi } from "@/modules/reservation";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
-import { useAdjustReservationTimeMutation } from "@gql/gql-types";
-import type { EditPageReservationFragment } from "@gql/gql-types";
 
 type Props = {
   reservation: EditPageReservationFragment;

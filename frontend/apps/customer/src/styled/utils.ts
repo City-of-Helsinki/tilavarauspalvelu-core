@@ -1,8 +1,8 @@
 import { Button, Stepper } from "hds-react";
 import Link from "next/link";
 import styled from "styled-components";
-import { fontMedium, fontRegular } from "ui/src/styled";
 import { breakpoints, pixel as pixelBase } from "@ui/modules/const";
+import { fontMedium, fontRegular } from "ui/src/styled";
 
 export const pixel = pixelBase;
 

@@ -1,8 +1,8 @@
 import React, { Fragment } from "react";
 import type { CSSProperties } from "react";
 import { useFormContext } from "react-hook-form";
-import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import styled from "styled-components";
 import { ControlledCheckbox, ControlledNumberInput, ControlledSelect } from "@ui/components/form";
 import { CharacterCounter } from "@ui/components/form/CharacterCounter";

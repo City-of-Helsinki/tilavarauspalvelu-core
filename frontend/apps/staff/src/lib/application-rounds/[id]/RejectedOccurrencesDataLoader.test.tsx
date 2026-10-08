@@ -1,12 +1,12 @@
 import React from "react";
 import { InMemoryCache } from "@apollo/client";
 import { MockedProvider } from "@apollo/client/testing";
-import type { MockedResponse } from "@apollo/client/testing";
 import { relayStylePagination } from "@apollo/client/utilities";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { MockedResponse } from "@apollo/client/testing";
 import { RejectedOccurrencesDocument } from "@gql/gql-types";
 import type { RejectedOccurrencesTableElementFragment } from "@gql/gql-types";
 import { RejectedOccurrencesDataLoader } from "./RejectedOccurrencesDataLoader";

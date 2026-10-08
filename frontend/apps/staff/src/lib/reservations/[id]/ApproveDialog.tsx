@@ -1,17 +1,17 @@
 import React, { useState } from "react";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonVariant, Checkbox, Dialog, Notification, NumberInput, TextArea } from "hds-react";
 import { trim } from "lodash-es";
-import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { toNumber } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
-import { useModal } from "@/context/ModalContext";
-import { getReservationPriceDetails } from "@/modules/reservation";
 import { useApproveReservationMutation } from "@gql/gql-types";
 import type { ApprovalDialogFieldsFragment, ReservationApproveMutationInput } from "@gql/gql-types";
+import { useModal } from "@/context/ModalContext";
+import { getReservationPriceDetails } from "@/modules/reservation";
 
 const Label = styled.p`
   color: var(--color-black-70);

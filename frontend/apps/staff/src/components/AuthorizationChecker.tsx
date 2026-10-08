@@ -1,8 +1,8 @@
 import React from "react";
+import type { UserPermissionChoice } from "@gql/gql-types";
 import { MainLander } from "@/components/MainLander";
 import { useSession } from "@/hooks";
 import { hasAnyPermission, hasPermission } from "@/modules/permissionHelper";
-import type { UserPermissionChoice } from "@gql/gql-types";
 import { Error403 } from "./Error403";
 
 interface BaseProps {

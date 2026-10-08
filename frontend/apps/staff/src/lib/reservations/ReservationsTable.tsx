@@ -1,17 +1,17 @@
 import React from "react";
-import { gql } from "@apollo/client";
-import type { TFunction } from "i18next";
-import { memoize } from "lodash-es";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
+import { memoize } from "lodash-es";
+import type { TFunction } from "i18next";
 import { OrderStatusLabel, ReservationStatusLabel } from "ui/src/components/statuses";
 import { formatDateTime, formatDateTimeRange, parseValidDateObject } from "ui/src/modules/date-utils";
+import { ReservationStateChoice } from "@gql/gql-types";
+import type { ReservationTableElementFragment } from "@gql/gql-types";
 import { CustomTable } from "@/components/Table";
 import { MAX_NAME_LENGTH } from "@/modules/const";
 import { getReserveeName, truncate } from "@/modules/helpers";
 import { getReservationUrl } from "@/modules/urls";
 import { TableLink } from "@/styled";
-import { ReservationStateChoice } from "@gql/gql-types";
-import type { ReservationTableElementFragment } from "@gql/gql-types";
 
 type ReservationTableColumn = {
   headerName: string;

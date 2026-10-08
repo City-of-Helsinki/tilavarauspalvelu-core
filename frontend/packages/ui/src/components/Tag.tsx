@@ -1,8 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import { SearchTag } from "../styled";
-import type { StatusLabelType } from "./StatusLabel";
 import { getStatusBackgroundColor, getStatusBorderColor } from "./StatusLabel";
+import type { StatusLabelType } from "./StatusLabel";
 
 type TagPropsType = {
   ariaLabel?: string;

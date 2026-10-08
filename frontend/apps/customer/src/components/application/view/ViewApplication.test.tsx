@@ -1,8 +1,8 @@
-import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
-import { createMockApplicationViewFragment } from "@test/application.mocks";
 import { render } from "@testing-library/react";
 import { expect, test, describe } from "vitest";
 import { ApplicationStatusChoice } from "@gql/gql-types";
+import { createMockApplicationViewFragment } from "@test/application.mocks";
+import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
 import { ViewApplication } from "./ViewApplication";
 
 interface RenderProps extends CreateMockApplicationFragmentProps {

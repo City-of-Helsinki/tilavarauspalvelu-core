@@ -1,17 +1,17 @@
 import React from "react";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconLinkExternal, IconSize, Tooltip } from "hds-react";
 import { memoize } from "lodash-es";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import styled from "styled-components";
 import { convertWeekday } from "ui/src/modules/conversion";
 import { timeToMinutes, formatTimeRange } from "ui/src/modules/date-utils";
+import type { AllocatedSectionsTableElementFragment } from "@gql/gql-types";
 import { CustomTable } from "@/components/Table";
 import { getApplicantName, truncate } from "@/modules/helpers";
 import { getApplicationUrl, getReservationUrl } from "@/modules/urls";
 import { ExternalTableLink, TableLink } from "@/styled";
-import type { AllocatedSectionsTableElementFragment } from "@gql/gql-types";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;

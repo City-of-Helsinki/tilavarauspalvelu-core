@@ -5,13 +5,13 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex, H1, P } from "ui/src/styled";
+import { UserPermissionChoice } from "@gql/gql-types";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { ReservationSeriesView } from "@/components/ReservationSeriesView";
 import { useReservationSeries } from "@/hooks";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { getMyUnitUrl, getReservationUrl } from "@/modules/urls";
-import { UserPermissionChoice } from "@gql/gql-types";
 
 function ReservationSeriesDoneInner({ recurringPk }: { recurringPk: number }) {
   const { t } = useTranslation("myUnits", {

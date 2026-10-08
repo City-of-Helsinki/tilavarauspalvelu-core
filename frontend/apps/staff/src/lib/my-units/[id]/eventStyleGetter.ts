@@ -1,5 +1,6 @@
 import type { CalendarEvent } from "ui/src/components/calendar/Calendar";
-import type { EventStyleType } from "@/modules/calendarStyling";
+import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
+import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
 import {
   BLOCKED,
   CALENDAR_LEGENDS,
@@ -10,8 +11,7 @@ import {
   UNCONFIRMED,
   WAITING_PAYMENT,
 } from "@/modules/calendarStyling";
-import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
-import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
+import type { EventStyleType } from "@/modules/calendarStyling";
 
 const selected_legends = new Set([
   "CONFIRMED",

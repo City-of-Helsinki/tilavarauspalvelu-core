@@ -1,6 +1,6 @@
+import type { TFunction } from "next-i18next";
 import { set } from "date-fns";
 import { padStart } from "lodash-es";
-import type { TFunction } from "next-i18next";
 import type { DayT } from "ui/src/modules/const";
 import { convertWeekday, transformWeekday } from "ui/src/modules/conversion";
 import { formatDuration, formatTimeRange, timeToMinutes } from "ui/src/modules/date-utils";

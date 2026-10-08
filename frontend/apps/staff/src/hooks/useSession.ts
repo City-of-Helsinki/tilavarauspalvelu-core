@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { isWindowVisible } from "@ui/modules/browserHelpers";
-import { CURRENT_USER_POLL_INTERVAL_MS } from "@/modules/const";
 import { useCurrentUserQuery } from "@gql/gql-types";
+import { CURRENT_USER_POLL_INTERVAL_MS } from "@/modules/const";
 
 // Use manual polling
 // SSR writes the query result to cache so refetch only after an interval

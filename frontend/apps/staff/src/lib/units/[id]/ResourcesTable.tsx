@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react";
-import { gql } from "@apollo/client";
-import { trim } from "lodash-es";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
+import { gql } from "@apollo/client";
+import { trim } from "lodash-es";
 import { useRouter } from "next/router";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { PopupMenu } from "ui/src/components/PopupMenu";
@@ -10,12 +10,12 @@ import { successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { truncate } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
+import { useDeleteResourceMutation } from "@gql/gql-types";
+import type { Maybe, ResourceTableFragment } from "@gql/gql-types";
 import { CustomTable } from "@/components/Table";
 import { MAX_NAME_LENGTH } from "@/modules/const";
 import { getResourceUrl } from "@/modules/urls";
 import { TableLink } from "@/styled";
-import { useDeleteResourceMutation } from "@gql/gql-types";
-import type { Maybe, ResourceTableFragment } from "@gql/gql-types";
 
 interface IProps {
   unit: ResourceTableFragment;

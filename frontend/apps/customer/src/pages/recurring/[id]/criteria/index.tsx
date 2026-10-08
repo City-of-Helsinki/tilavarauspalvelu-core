@@ -1,7 +1,7 @@
 import React from "react";
-import { gql } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { Sanitize } from "@ui/components/Sanitize";
@@ -15,13 +15,13 @@ import {
   getTranslation,
 } from "@ui/modules/helpers";
 import { Flex, H1 } from "@ui/styled";
-import { Breadcrumb } from "@/components/Breadcrumb";
+import { ApplicationRoundCriteriaDocument } from "@gql/gql-types";
+import type { ApplicationRoundCriteriaQuery, ApplicationRoundCriteriaQueryVariables } from "@gql/gql-types";
 import { NotesWhenApplying } from "@/components/application";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationRoundPath, seasonalPrefix } from "@/modules/urls";
-import { ApplicationRoundCriteriaDocument } from "@gql/gql-types";
-import type { ApplicationRoundCriteriaQuery, ApplicationRoundCriteriaQueryVariables } from "@gql/gql-types";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

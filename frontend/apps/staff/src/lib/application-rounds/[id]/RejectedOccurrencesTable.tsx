@@ -1,16 +1,16 @@
 import React from "react";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconLinkExternal, IconSize } from "hds-react";
 import { memoize } from "lodash-es";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import { formatDate, formatTime, parseValidDateObject } from "ui/src/modules/date-utils";
 import { truncate } from "ui/src/modules/helpers";
+import type { RejectedOccurrencesTableElementFragment } from "@gql/gql-types";
 import { CustomTable } from "@/components/Table";
 import { getApplicantName } from "@/modules/helpers";
 import { getApplicationUrl, getReservationUrl } from "@/modules/urls";
 import { ExternalTableLink } from "@/styled";
-import type { RejectedOccurrencesTableElementFragment } from "@gql/gql-types";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;

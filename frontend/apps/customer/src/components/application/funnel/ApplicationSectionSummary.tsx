@@ -1,7 +1,7 @@
 import React from "react";
+import { Trans, useTranslation } from "next-i18next";
 import { differenceInWeeks } from "date-fns";
 import { IconCalendar, IconClock, IconGroup } from "hds-react";
-import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { formatDuration, parseUIDate } from "ui/src/modules/date-utils";
 import { Flex, H4 } from "ui/src/styled";

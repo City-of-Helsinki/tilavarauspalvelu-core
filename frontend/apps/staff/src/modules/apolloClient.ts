@@ -1,11 +1,11 @@
 import type { IncomingMessage } from "node:http";
-import type { ApolloLink, NormalizedCacheObject } from "@apollo/client";
 import { ApolloClient, HttpLink, InMemoryCache, from } from "@apollo/client";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 import { relayStylePagination } from "@apollo/client/utilities";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore -- types require nodenext which breaks bundler option that breaks the build
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
+import type { ApolloLink, NormalizedCacheObject } from "@apollo/client";
 import { enchancedFetch, errorLink } from "@ui/modules/apollo/helpers";
 import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
 import { buildGraphQLUrl } from "@ui/modules/urlBuilder";

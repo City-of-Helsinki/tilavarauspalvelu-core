@@ -1,6 +1,6 @@
 import React from "react";
-import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { IconCheck, IconCogwheel, IconCross, IconEuroSign, IconPen } from "hds-react";
 import { ReservationStateChoice } from "../../../gql/gql-types";
 import { StatusLabel } from "../StatusLabel";
 import type { StatusLabelType } from "../StatusLabel";

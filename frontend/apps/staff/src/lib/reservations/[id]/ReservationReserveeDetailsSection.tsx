@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import {
   Button,
@@ -13,21 +14,20 @@ import {
 import { getName as getCountryName, registerLocale as registerCountryLocale } from "i18n-iso-countries";
 import countriesJson from "i18n-iso-countries/langs/fi.json";
 import { trim } from "lodash-es";
-import { useTranslation } from "next-i18next";
 import styled from "styled-components";
+import { getApiErrors } from "@ui/modules/apollo/helpers";
+import { breakpoints } from "@ui/modules/const";
 import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
 import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
 import { H5 } from "ui/src/styled";
-import { getApiErrors } from "@ui/modules/apollo/helpers";
-import { breakpoints } from "@ui/modules/const";
-import { useSession } from "@/hooks";
-import { Accordion, ApplicationDatas } from "@/styled";
-import type { ReservationPageQuery } from "@gql/gql-types";
 import {
   useReservationDateOfBirthQuery,
   useReservationProfileDataContactInfoQuery,
   useReservationProfileDataSsnQuery,
 } from "@gql/gql-types";
+import type { ReservationPageQuery } from "@gql/gql-types";
+import { useSession } from "@/hooks";
+import { Accordion, ApplicationDatas } from "@/styled";
 import { DataWrapper } from "./DataWrapper";
 
 registerCountryLocale(countriesJson);

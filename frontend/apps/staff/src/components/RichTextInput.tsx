@@ -6,8 +6,8 @@ import { IconAlertCircleFill, Tooltip } from "hds-react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import styled from "styled-components";
-import { Flex } from "ui/src/styled";
 import { CharacterCounter } from "@ui/components/form/CharacterCounter";
+import { Flex } from "ui/src/styled";
 
 const Container = styled.div<{ $disabled: boolean }>`
   position: relative;

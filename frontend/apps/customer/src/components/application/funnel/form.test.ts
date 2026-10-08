@@ -1,6 +1,6 @@
-import { createMockApplicationFragment } from "@test/application.mocks";
 import { describe, expect, test } from "vitest";
 import { MunicipalityChoice, Priority, ReserveeType, Weekday } from "@gql/gql-types";
+import { createMockApplicationFragment } from "@test/application.mocks";
 import {
   ApplicationPage2Schema,
   ApplicationPage3Schema,

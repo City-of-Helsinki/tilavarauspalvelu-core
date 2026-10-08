@@ -1,11 +1,11 @@
 import React from "react";
-import { ResourceEditor } from "@lib/units/[id]/resources/[pk]/ResourceEditor";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { UserPermissionChoice } from "@gql/gql-types";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { UserPermissionChoice } from "@gql/gql-types";
+import { ResourceEditor } from "@lib/units/[id]/resources/[pk]/ResourceEditor";
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<PageProps, { notFound: boolean }>;

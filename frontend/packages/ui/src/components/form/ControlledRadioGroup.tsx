@@ -2,8 +2,8 @@ import React from "react";
 import type { ReactElement } from "react";
 import { useController } from "react-hook-form";
 import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
-import { RadioButton, SelectionGroup, Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { RadioButton, SelectionGroup, Tooltip } from "hds-react";
 import { filterEmpty } from "../../modules/helpers";
 
 interface RadioGroupProps<T extends FieldValues> extends UseControllerProps<T> {

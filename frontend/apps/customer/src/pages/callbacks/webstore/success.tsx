@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
-import { gql } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
+import { gql } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import { ignoreMaybeArray } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";
+import { OrderStatus, ReservationStateChoice, useReservationStateQuery } from "@gql/gql-types";
+import type { ReservationStateQuery } from "@gql/gql-types";
 import { createApolloClient } from "@/modules/apolloClient";
 import { WEBSTORE_SUCCESS_POLL_INTERVAL_MS, WEBSTORE_SUCCESS_POLL_TIMEOUT_MS } from "@/modules/const";
 import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath } from "@/modules/urls";
-import type { ReservationStateQuery } from "@gql/gql-types";
-import { OrderStatus, ReservationStateChoice, useReservationStateQuery } from "@gql/gql-types";
 
 // This is webstore callback page for successful payments
 // this can't be tied to a reservationPk because webstore doesn't have that information

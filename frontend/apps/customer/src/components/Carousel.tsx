@@ -1,7 +1,7 @@
 import React, { forwardRef } from "react";
 import type { Ref } from "react";
-import { IconAngleLeft, IconAngleRight, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { IconAngleLeft, IconAngleRight, IconSize } from "hds-react";
 import NukaCarousel from "nuka-carousel";
 import styled from "styled-components";
 import { focusStyles } from "ui/src/styled";

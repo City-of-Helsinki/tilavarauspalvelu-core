@@ -1,19 +1,20 @@
 import React, { useEffect, useRef } from "react";
-import { gql } from "@apollo/client";
-import { CreateReservationModal, ReservationUnitCalendarView, UnitReservations } from "@lib/my-units/[id]/";
-import { addMinutes } from "date-fns";
-import { Button, ButtonSize, ButtonVariant, Tabs } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
+import { addMinutes } from "date-fns";
+import { Button, ButtonSize, ButtonVariant, Tabs } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
+import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apollo/helpers";
 import { TimeZoneNotification } from "ui/src/components/TimeZoneNotification";
 import { breakpoints } from "ui/src/modules/const";
 import { parseUIDate } from "ui/src/modules/date-utils";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex, H1, TabWrapper, TitleSection } from "ui/src/styled";
-import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apollo/helpers";
+import { FilterOptionsDocument, UnitViewDocument, UserPermissionChoice } from "@gql/gql-types";
+import type { UnitViewQuery, UnitViewQueryVariables } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { useModal } from "@/context/ModalContext";
 import { useSession } from "@/hooks";
@@ -25,8 +26,7 @@ import { formatAddress } from "@/modules/helpers";
 import { hasPermission } from "@/modules/permissionHelper";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getReservationSeriesUrl } from "@/modules/urls";
-import { FilterOptionsDocument, UnitViewDocument, UserPermissionChoice } from "@gql/gql-types";
-import type { UnitViewQuery, UnitViewQueryVariables } from "@gql/gql-types";
+import { CreateReservationModal, ReservationUnitCalendarView, UnitReservations } from "@lib/my-units/[id]/";
 
 const LocationOnlyOnDesktop = styled.p`
   display: none;

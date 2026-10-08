@@ -1,20 +1,20 @@
 import React from "react";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import type { ApolloError } from "@apollo/client";
-import { useTranslation } from "next-i18next";
+import { getPermissionErrors } from "@ui/modules/apollo/helpers";
 import { errorToast } from "ui/src/components/toast";
 import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";
-import { getPermissionErrors } from "@ui/modules/apollo/helpers";
-import { More } from "@/components/More";
-import { useGetFilterSearchParams } from "@/hooks";
-import { useSort } from "@/hooks/useSort";
-import { LIST_PAGE_SIZE } from "@/modules/const";
 import {
   AllocatedTimeSlotOrderingChoices,
   ApplicationSectionStatusChoice,
   useAllocatedTimeSlotsQuery,
 } from "@gql/gql-types";
+import { More } from "@/components/More";
+import { useGetFilterSearchParams } from "@/hooks";
+import { useSort } from "@/hooks/useSort";
+import { LIST_PAGE_SIZE } from "@/modules/const";
 import { AllocatedSectionsTable, SORT_KEYS } from "./AllocatedSectionsTable";
 
 type Props = {

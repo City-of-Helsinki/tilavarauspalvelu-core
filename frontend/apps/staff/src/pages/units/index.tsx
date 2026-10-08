@@ -1,12 +1,12 @@
 import React from "react";
-import { Link, LinkSize } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { Link, LinkSize } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H1, HR } from "ui/src/styled";
+import { UserPermissionChoice } from "@gql/gql-types";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { Filters, UnitsDataLoader } from "@/components/units";
-import { UserPermissionChoice } from "@gql/gql-types";
 
 function Units(): React.ReactElement {
   const { t } = useTranslation();

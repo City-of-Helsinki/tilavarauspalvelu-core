@@ -1,6 +1,6 @@
 import React from "react";
-import { Button, ButtonVariant, Dialog, IconAlertCircleFill, IconQuestionCircle } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { Button, ButtonVariant, Dialog, IconAlertCircleFill, IconQuestionCircle } from "hds-react";
 import { filterEmpty } from "../modules/helpers";
 
 type Props = {

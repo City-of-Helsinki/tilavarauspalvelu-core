@@ -3,8 +3,8 @@ import Head from "next/head";
 import styled from "styled-components";
 import { BannerNotificationsList } from "ui/src/components";
 import { mainStyles } from "ui/src/styled";
-import { InProgressReservationNotification } from "@/components/InProgressReservationNotification";
 import { BannerNotificationTarget } from "@gql/gql-types";
+import { InProgressReservationNotification } from "@/components/InProgressReservationNotification";
 import { Footer } from "./Footer";
 import { Navigation } from "./Navigation";
 

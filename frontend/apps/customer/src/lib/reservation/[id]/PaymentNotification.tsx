@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
-import { Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { Notification } from "hds-react";
 import styled from "styled-components";
 import { ButtonLikeLink } from "@ui/components/ButtonLikeLink";
 import { formatters as getFormatters } from "@ui/index";
@@ -8,9 +8,9 @@ import { breakpoints } from "@ui/modules/const";
 import { formatDateTime, parseValidDateObject } from "@ui/modules/date-utils";
 import { getLocalizationLang } from "@ui/modules/helpers";
 import { Flex, fontMedium } from "@ui/styled";
-import { getPaymentUrl } from "@/modules/reservation";
 import { ReservationCancelReasonChoice, ReservationStateChoice } from "@gql/gql-types";
 import type { ReservationPaymentUrlFragment, ReservationPriceFieldsFragment } from "@gql/gql-types";
+import { getPaymentUrl } from "@/modules/reservation";
 
 type PaymentNotificationProps = {
   reservation: ReservationPaymentUrlFragment & Pick<ReservationPriceFieldsFragment, "price">;

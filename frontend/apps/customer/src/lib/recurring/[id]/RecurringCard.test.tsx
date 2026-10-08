@@ -1,11 +1,11 @@
-import { createMockReservationUnitType, generateNameFragment } from "@test/test.gql.utils";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, test, expect } from "vitest";
 import { createNodeId } from "ui/src/modules/helpers";
-import { getReservationUnitPath } from "@/modules/urls";
 import { AccessType } from "@gql/gql-types";
 import type { RecurringCardFragment } from "@gql/gql-types";
+import { getReservationUnitPath } from "@/modules/urls";
+import { createMockReservationUnitType, generateNameFragment } from "@test/test.gql.utils";
 import { RecurringCard } from "./RecurringCard";
 
 describe("RecurringCard", () => {

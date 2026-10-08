@@ -6,7 +6,6 @@ import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CreateAllocatedTimeSlotDocument, DeleteAllocatedTimeSlotDocument, Weekday } from "@gql/gql-types";
-import { SelectedSlotsContextProvider } from "./SelectedSlotsContext";
 import {
   useAcceptSlotMutation,
   useFocusAllocatedSlot,
@@ -20,6 +19,7 @@ import type {
   SectionNodeT,
   SuitableTimeRangeNodeT,
 } from "./modules/applicationRoundAllocation";
+import { SelectedSlotsContextProvider } from "./SelectedSlotsContext";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
   const params = vi.fn();

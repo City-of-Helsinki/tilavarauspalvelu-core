@@ -4,9 +4,9 @@ import userEvent from "@testing-library/user-event";
 import { addDays } from "date-fns";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { formatApiDate } from "ui/src/modules/date-utils";
-import { getActivePricing, getReservationUnitAccessPeriods, isReservationUnitPaid } from "@/modules/reservationUnit";
 import { AccessType, PaymentType, PriceUnit, ReservationKind } from "@gql/gql-types";
 import type { ReservationUnitHeadFragment } from "@gql/gql-types";
+import { getActivePricing, getReservationUnitAccessPeriods, isReservationUnitPaid } from "@/modules/reservationUnit";
 import { Head as ReservationUnitHead } from "./Head";
 
 vi.mock("./Images", () => ({

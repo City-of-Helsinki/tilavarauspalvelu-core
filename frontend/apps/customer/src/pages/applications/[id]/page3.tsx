@@ -1,15 +1,17 @@
 import React, { useEffect } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import type { GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from "hds-react";
-import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import { useDisplayError } from "ui/src/hooks";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { AutoGrid, ButtonContainer, Flex } from "ui/src/styled";
+import { ApplicationPage3Document, ReserveeType, useUpdateApplicationMutation } from "@gql/gql-types";
+import type { ApplicationPage3Query, ApplicationPage3QueryVariables } from "@gql/gql-types";
 import {
   ApplicantTypeSelector,
   ApplicationFunnelWrapper,
@@ -27,8 +29,6 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath } from "@/modules/urls";
 import { FormSubHeading } from "@/styled/application";
-import { ApplicationPage3Document, ReserveeType, useUpdateApplicationMutation } from "@gql/gql-types";
-import type { ApplicationPage3Query, ApplicationPage3QueryVariables } from "@gql/gql-types";
 
 function Page3Form(): React.ReactElement | null {
   const { watch, unregister, register, setValue } = useFormContext<ApplicationPage3FormValues>();

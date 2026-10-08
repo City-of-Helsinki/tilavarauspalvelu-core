@@ -2,14 +2,14 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { MockedProvider } from "@apollo/client/testing";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createMockReservation } from "@test/reservation.mocks";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { EditPageReservationFragment } from "@gql/gql-types";
 import { transformReservation } from "@/modules/reservation";
 import { PendingReservationFormSchema } from "@/modules/schemas/reservationUnit";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import type { EditPageReservationFragment } from "@gql/gql-types";
+import { createMockReservation } from "@test/reservation.mocks";
 import { EditStep0 } from "./EditStep0";
 
 // Heavy calendar/quick-reservation UI + polling hook are covered elsewhere -

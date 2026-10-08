@@ -1,23 +1,23 @@
 import React from "react";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconClock, IconLocation } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled, { css } from "styled-components";
+import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { Card } from "ui/src/components";
 import { useDisplayError } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDate, applicationReservationDateTime } from "ui/src/modules/date-utils";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { H1 } from "ui/src/styled";
-import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
+import { useCancelReservationMutation } from "@gql/gql-types";
+import type { ReservationCancelPageQuery } from "@gql/gql-types";
 import { CancellationForm } from "@/components/CancellationForm";
 import type { CancelFormValues } from "@/components/CancellationForm";
 import { ReservationInfoCard } from "@/components/reservation";
 import { getApplicationPath, getReservationPath } from "@/modules/urls";
 import { ReservationPageWrapper } from "@/styled/reservation";
-import { useCancelReservationMutation } from "@gql/gql-types";
-import type { ReservationCancelPageQuery } from "@gql/gql-types";
 
 const infoCss = css`
   @media (min-width: ${breakpoints.m}) {

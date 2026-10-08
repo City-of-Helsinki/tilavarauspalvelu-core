@@ -1,9 +1,9 @@
 import React from "react";
-import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, test, expect, vi } from "vitest";
 import { PaymentType, PriceUnit, RelatedReservationUnitsDocument } from "@gql/gql-types";
 import type { RelatedUnitCardFieldsFragment } from "@gql/gql-types";
+import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { RelatedUnits } from "./RelatedUnits";
 
 const { mockedCarouselProps } = vi.hoisted(() => ({ mockedCarouselProps: vi.fn() }));

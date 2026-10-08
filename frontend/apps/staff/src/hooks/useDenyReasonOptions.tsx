@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import { errorToast } from "ui/src/components/toast";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { useReservationDenyReasonsQuery, ReservationDenyReasonOrderingChoices } from "@gql/gql-types";

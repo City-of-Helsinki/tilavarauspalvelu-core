@@ -1,18 +1,29 @@
 import React, { useEffect } from "react";
-import { gql } from "@apollo/client";
-import { AllocationPageContent } from "@lib/application-rounds/[id]/allocation";
-import { Tabs } from "hds-react";
-import { uniqBy } from "lodash-es";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
+import { Tabs } from "hds-react";
+import { uniqBy } from "lodash-es";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
+import { useVisibilityChange } from "@ui/hooks";
+import { logError } from "@ui/modules/errors";
 import { errorToast } from "ui/src/components/toast";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, sort, toNumber } from "ui/src/modules/helpers";
 import { CenterSpinner, fontMedium, H1, Strong, TabWrapper } from "ui/src/styled";
-import { useVisibilityChange } from "@ui/hooks";
-import { logError } from "@ui/modules/errors";
+import {
+  ApplicationRoundFilterDocument,
+  useAllApplicationEventsQuery,
+  useApplicationSectionAllocationsQuery,
+  UserPermissionChoice,
+} from "@gql/gql-types";
+import type {
+  ApplicationRoundFilterQuery,
+  ApplicationRoundFilterQueryVariables,
+  ApplicationRoundFilterUnitFragment,
+  ApplicationSectionAllocationsQueryVariables,
+} from "@gql/gql-types";
 import { Error403 } from "@/components/Error403";
 import { LinkPrev } from "@/components/LinkPrev";
 import { useGetFilterSearchParams, useSession } from "@/hooks";
@@ -27,18 +38,7 @@ import {
 import { truncate } from "@/modules/helpers";
 import { hasPermission as hasUnitPermission } from "@/modules/permissionHelper";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import {
-  ApplicationRoundFilterDocument,
-  useAllApplicationEventsQuery,
-  useApplicationSectionAllocationsQuery,
-  UserPermissionChoice,
-} from "@gql/gql-types";
-import type {
-  ApplicationRoundFilterQuery,
-  ApplicationRoundFilterQueryVariables,
-  ApplicationRoundFilterUnitFragment,
-  ApplicationSectionAllocationsQueryVariables,
-} from "@gql/gql-types";
+import { AllocationPageContent } from "@lib/application-rounds/[id]/allocation";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
 

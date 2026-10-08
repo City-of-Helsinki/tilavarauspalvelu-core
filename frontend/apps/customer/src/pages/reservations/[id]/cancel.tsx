@@ -1,18 +1,18 @@
 import React from "react";
-import { gql } from "@apollo/client";
-import type { TFunction } from "i18next";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import type { TFunction } from "i18next";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
+import { ReservationCancelPageDocument } from "@gql/gql-types";
+import type { ReservationCancelPageQuery, ReservationCancelPageQueryVariables } from "@gql/gql-types";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ReservationCancellation } from "@/lib/reservation/[id]/cancel";
 import { createApolloClient } from "@/modules/apolloClient";
 import { isReservationCancellable } from "@/modules/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getApplicationPath, getReservationPath, reservationsPrefix } from "@/modules/urls";
-import { ReservationCancelPageDocument } from "@gql/gql-types";
-import type { ReservationCancelPageQuery, ReservationCancelPageQueryVariables } from "@gql/gql-types";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 

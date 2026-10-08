@@ -1,10 +1,10 @@
-import { createReservationPageMock } from "@test/reservation.mocks";
 import { render, screen } from "@testing-library/react";
-import type { TFunction } from "i18next";
 import { describe, it, expect } from "vitest";
+import type { TFunction } from "i18next";
 import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
-import type { PaymentOrderNode } from "@gql/gql-types";
 import { OrderStatus, PaymentType, PriceUnit } from "@gql/gql-types";
+import type { PaymentOrderNode } from "@gql/gql-types";
+import { createReservationPageMock } from "@test/reservation.mocks";
 import { PaymentNotification } from "./PaymentNotification";
 
 function customRender() {

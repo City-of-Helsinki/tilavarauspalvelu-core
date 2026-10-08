@@ -1,8 +1,8 @@
+import { logError } from "@ui/modules/errors";
 import { transformWeekday } from "ui/src/modules/conversion";
 import { parseUIDateUnsafe, timeToMinutes, setMondayFirst } from "ui/src/modules/date-utils";
-import { logError } from "@ui/modules/errors";
-import type { TimeSelectionFormValues } from "@/schemas";
 import type { Weekday } from "@gql/gql-types";
+import type { TimeSelectionFormValues } from "@/schemas";
 
 // NOTE Custom UTC date code because taking only the date part of Date results
 // in the previous date in UTC+2 timezone
