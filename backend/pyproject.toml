@@ -304,7 +304,7 @@ ignore = [
     # Allow type comments for now, since they are useful for documenting types.
     "PYI033",   # legacy-type-comment
 ]
-dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^options$|^info$|^name$|^obj$|^request$|^user|^view$|^input_data$|^filters$"
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^options$|^info$|^name$|^obj$|^request$|^user$|^view$|^input_data$|^filters$"
 task-tags = ["TODO", "FIXME", "XXX", "type"]
 
 [tool.ruff.lint.extend-per-file-ignores]
@@ -324,6 +324,7 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
     "ARG001",   # Signals can have unused "sender" argument.
 ]
 "tilavarauspalvelu/management/commands/data_creation/*.py" = [
+    "PLR0913",  # Can have as many arguments as needed.
     "PLR0915",  # Can have as many statements as needed.
     "PLR0917",  # Can have as many positional arguments as needed.
     "S101",     # Asserts are fine in test data creation.
