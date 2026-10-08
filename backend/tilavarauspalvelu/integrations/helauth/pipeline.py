@@ -71,7 +71,7 @@ def update_user_from_profile(request: WSGIRequest, *, user: User | None = None) 
         return
 
     # Update the user only if it's missing profile info
-    if not user.profile_id or user.date_of_birth:
+    if not user.profile_id or not user.date_of_birth:
         if after_login_additional_info["id"] is not None:
             user.profile_id = after_login_additional_info["id"]
         if after_login_additional_info["birthday"] is not None:
