@@ -52,6 +52,14 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
             end_time=data["end_time"],
             option=data["reservation_unit_option"],
         )
+        self.validate_times_are_multiples_of_15_minutes(
+            begin_time=data["begin_time"],
+            end_time=data["end_time"],
+        )
+        self.validate_begin_time_matches_start_interval(
+            option=data["reservation_unit_option"],
+            begin_time=data["begin_time"],
+        )
 
         if not force:
             self.validate_duration(
@@ -131,6 +139,24 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
             raise ValidationError(msg, code=error_codes.ALLOCATION_APPLIED_RESERVATIONS_PER_WEEK_EXCEEDED)
 
     @staticmethod
+    def validate_times_are_multiples_of_15_minutes(begin_time: datetime.time, end_time: datetime.time) -> None:
+        is_valid_begin_time = begin_time.minute % 15 == 0 and begin_time.second == 0 and begin_time.microsecond == 0
+        is_valid_end_time = end_time.minute % 15 == 0 and end_time.second == 0 and end_time.microsecond == 0
+
+        if not is_valid_begin_time or not is_valid_end_time:
+            msg = "Allocation begin and end times must be multiples of 15 minutes."
+            raise ValidationError(msg, code=error_codes.ALLOCATION_TIME_NOT_A_MULTIPLE_OF_15_MINUTES)
+
+    @staticmethod
+    def validate_begin_time_matches_start_interval(option: ReservationUnitOption, begin_time: datetime.time) -> None:
+        # Reservation series generated from allocations reject reservations that do not match this interval.
+        is_valid_start_interval = option.reservation_unit.actions.is_valid_staff_start_interval(begin_time)
+
+        if not is_valid_start_interval:
+            msg = "Allocation begin time does not match the allowed start interval of the reservation unit."
+            raise ValidationError(msg, code=error_codes.ALLOCATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL)
+
+    @staticmethod
     def validate_duration(
         section: ApplicationSection,
         begin_time: datetime.time,
@@ -157,10 +183,6 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
                 f"while given duration is {given_duration}."
             )
             raise ValidationError(msg, code=error_codes.ALLOCATION_DURATION_TOO_LONG)
-
-        if duration.total_seconds() % 1800 != 0:
-            msg = "Allocation duration must be a multiple of 30 minutes."
-            raise ValidationError(msg, code=error_codes.ALLOCATION_DURATION_NOT_A_MULTIPLE_OF_30_MINUTES)
 
     @staticmethod
     def validate_day_of_the_week_is_suitable(section: ApplicationSection, day_of_the_week: Weekday) -> None:
