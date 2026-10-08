@@ -10,6 +10,7 @@ from django.core.cache import cache
 from django.urls import reverse
 from freezegun import freeze_time
 
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.management.commands.data_creation.create_robot_test_data import remove_existing_data
 from tilavarauspalvelu.models import (
     Application,
@@ -36,7 +37,7 @@ from tilavarauspalvelu.models import (
     User,
 )
 from tilavarauspalvelu.tasks import create_robot_test_data_task
-from utils.date_utils import local_datetime
+from utils.date_utils import local_date, local_datetime
 
 from tests.factories import (
     ApplicationFactory,
@@ -188,6 +189,27 @@ def test_create_robot_test_data():
     assert Reservation.objects.count() == 2
     assert UnitRole.objects.count() == 2
     assert GeneralRole.objects.count() == 1
+
+
+@pytest.mark.slow
+@pytest.mark.django_db
+@freeze_time(local_datetime(2030, 1, 1, 12))
+def test_create_robot_test_data__application_round_is_open():
+    create_robot_test_data_task.delay()
+
+    application_round = ApplicationRound.objects.get(name="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA)")
+
+    # Application round is open for two years from the moment the data is created.
+    assert application_round.status == ApplicationRoundStatusChoice.OPEN
+    assert application_round.application_period_begins_at == local_datetime(2029, 12, 31, 12)
+    assert application_round.application_period_ends_at == local_datetime(2032, 1, 1, 12)
+
+    # Reservation period begins after the application period has ended.
+    assert application_round.reservation_period_begin_date == local_date(2032, 1, 2)
+    assert application_round.reservation_period_end_date == local_date(2035, 1, 1)
+
+    assert application_round.public_display_begins_at == local_datetime(2029, 12, 31, 12)
+    assert application_round.public_display_ends_at == local_datetime(2035, 1, 2, 12)
 
 
 @pytest.mark.slow
