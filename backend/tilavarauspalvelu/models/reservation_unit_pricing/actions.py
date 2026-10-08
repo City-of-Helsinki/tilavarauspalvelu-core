@@ -63,8 +63,12 @@ class ReservationUnitPricingActions:
                 begins=change_date,
                 tax_percentage=future_tax_percentage,
                 price_unit=pricing.price_unit,
+                payment_type=pricing.payment_type,
                 lowest_price=pricing.lowest_price,
                 highest_price=pricing.highest_price,
+                material_price_description_fi=pricing.material_price_description_fi,
+                material_price_description_en=pricing.material_price_description_en,
+                material_price_description_sv=pricing.material_price_description_sv,
                 reservation_unit=pricing.reservation_unit,
                 is_activated_on_begins=True,
             )

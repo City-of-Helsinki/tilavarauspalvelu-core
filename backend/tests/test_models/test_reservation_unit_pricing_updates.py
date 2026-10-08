@@ -5,6 +5,7 @@ from decimal import Decimal
 
 import pytest
 
+from tilavarauspalvelu.enums import PaymentType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ReservationUnitPricing
 from tilavarauspalvelu.tasks import update_reservation_unit_pricings_tax_percentage_task
@@ -41,6 +42,26 @@ def test_reservation_unit__update_pricings__tax_percentage__no_future_pricing():
     assert active_pricing.tax_percentage.value == CURRENT_TAX  # Active pricing should not be changed
 
     assert SentryLogger.log_message.call_count == 1
+
+
+@patch_method(SentryLogger.log_message)
+def test_reservation_unit__update_pricings__tax_percentage__copies_payment_type_and_material_price_description():
+    ReservationUnitPricingFactory.create(
+        begins=datetime.date(2024, 1, 1),
+        tax_percentage__value=CURRENT_TAX,
+        payment_type=PaymentType.ONLINE_OR_INVOICE,
+        material_price_description_fi="Materiaalit",
+        material_price_description_en="Materials",
+        material_price_description_sv="Material",
+    )
+
+    update_reservation_unit_pricings_tax_percentage_task(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
+
+    future_pricing = ReservationUnitPricing.objects.get(begins=TAX_CHANGE_DATE)
+    assert future_pricing.payment_type == PaymentType.ONLINE_OR_INVOICE
+    assert future_pricing.material_price_description_fi == "Materiaalit"
+    assert future_pricing.material_price_description_en == "Materials"
+    assert future_pricing.material_price_description_sv == "Material"
 
 
 @patch_method(SentryLogger.log_message)
