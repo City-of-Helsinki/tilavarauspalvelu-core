@@ -1,18 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { gql } from "@apollo/client";
-import { TimeframeStatus } from "@lib/application-rounds";
-import {
-  ReviewEndAllocation,
-  ApplicationDataLoader,
-  Filters,
-  ApplicationSectionDataLoader,
-  TimeSlotDataLoader,
-  RejectedOccurrencesDataLoader,
-} from "@lib/application-rounds/[id]";
-import { Button, Tabs } from "hds-react";
-import { uniqBy } from "lodash-es";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
+import { Button, Tabs } from "hds-react";
+import { uniqBy } from "lodash-es";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -21,16 +12,6 @@ import { ApplicationRoundStatusLabel } from "ui/src/components/statuses";
 import { errorToast } from "ui/src/components/toast";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex, H1, NoWrap, TabWrapper, TitleSection } from "ui/src/styled";
-import { ButtonLikeLink } from "@/components/ButtonLikeLink";
-import { fetchFilterOptionsSafe, getFilterOptions } from "@/hooks/useFilterOptions";
-import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import { createClient } from "@/modules/apolloClient";
-import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { isApplicationRoundInProgress } from "@/modules/helpers";
-import { hasPermission } from "@/modules/permissionHelper";
-import type { TagOptionsList } from "@/modules/search";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { getApplicationRoundUrl } from "@/modules/urls";
 import {
   ApplicationRoundStatusChoice,
   useApplicationRoundQuery,
@@ -48,6 +29,25 @@ import type {
   CheckPermissionsQuery,
   CheckPermissionsQueryVariables,
 } from "@gql/gql-types";
+import { ButtonLikeLink } from "@/components/ButtonLikeLink";
+import { fetchFilterOptionsSafe, getFilterOptions } from "@/hooks/useFilterOptions";
+import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { createClient } from "@/modules/apolloClient";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { isApplicationRoundInProgress } from "@/modules/helpers";
+import { hasPermission } from "@/modules/permissionHelper";
+import type { TagOptionsList } from "@/modules/search";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { getApplicationRoundUrl } from "@/modules/urls";
+import { TimeframeStatus } from "@lib/application-rounds";
+import {
+  ReviewEndAllocation,
+  ApplicationDataLoader,
+  Filters,
+  ApplicationSectionDataLoader,
+  TimeSlotDataLoader,
+  RejectedOccurrencesDataLoader,
+} from "@lib/application-rounds/[id]";
 
 const TabContent = styled(Flex).attrs({
   $direction: "column",

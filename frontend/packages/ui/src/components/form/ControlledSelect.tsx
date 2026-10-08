@@ -1,10 +1,10 @@
 import React from "react";
 import { useController } from "react-hook-form";
 import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
-import type { Option } from "hds-react";
-import { defaultFilter, Select, Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { defaultFilter, Select, Tooltip } from "hds-react";
 import styled from "styled-components";
+import type { Option } from "hds-react";
 import { convertOptionToHDS, filterNonNullable, getLocalizationLang, toNumber } from "../../modules/helpers";
 import { fontMedium } from "../../styled";
 

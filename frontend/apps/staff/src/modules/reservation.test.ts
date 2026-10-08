@@ -1,6 +1,6 @@
 import { addHours, addMonths } from "date-fns";
-import type { TFunction } from "i18next";
 import { describe, expect, test } from "vitest";
+import type { TFunction } from "i18next";
 import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
 import { PaymentType, PriceUnit, Weekday, ReservationTypeChoice } from "@gql/gql-types";

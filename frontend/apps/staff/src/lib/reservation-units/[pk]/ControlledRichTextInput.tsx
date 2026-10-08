@@ -1,7 +1,7 @@
 import React from "react";
 import type { HTMLAttributes } from "react";
-import type { Control } from "react-hook-form";
 import { useController } from "react-hook-form";
+import type { Control } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import dynamic from "next/dynamic";
 import { getTranslatedError } from "@/modules/helpers";

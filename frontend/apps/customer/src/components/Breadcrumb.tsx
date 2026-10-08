@@ -1,7 +1,7 @@
 import React from "react";
 import { useMedia } from "react-use";
-import { IconAngleLeft, IconAngleRight, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { IconAngleLeft, IconAngleRight, IconSize } from "hds-react";
 import Link from "next/link";
 import styled, { css } from "styled-components";
 import { breakpoints } from "ui/src/modules/const";

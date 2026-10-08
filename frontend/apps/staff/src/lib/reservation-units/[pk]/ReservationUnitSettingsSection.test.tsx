@@ -4,9 +4,9 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { ReservationKind } from "@gql/gql-types";
-import { ReservationUnitSettingsSection } from "./ReservationUnitSettingsSection";
 import { convertReservationUnit } from "./form";
 import type { ReservationUnitEditFormValues } from "./form";
+import { ReservationUnitSettingsSection } from "./ReservationUnitSettingsSection";
 
 const CANCELLATION_RULE_OPTIONS = [{ value: 1, label: "Rule 1" }];
 

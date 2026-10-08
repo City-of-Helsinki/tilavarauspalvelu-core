@@ -1,14 +1,14 @@
 import React from "react";
-import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import { errorToast } from "ui/src/components/toast";
 import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";
+import { ApplicationOrderingChoices, useApplicationsQuery } from "@gql/gql-types";
 import { More } from "@/components/More";
 import { useGetFilterSearchParams } from "@/hooks";
 import { useSort } from "@/hooks/useSort";
 import { LIST_PAGE_SIZE } from "@/modules/const";
-import { ApplicationOrderingChoices, useApplicationsQuery } from "@gql/gql-types";
 import { ApplicationsTable, SORT_KEYS } from "./ApplicationsTable";
 
 type Props = {

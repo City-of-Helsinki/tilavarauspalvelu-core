@@ -1,7 +1,7 @@
 import React from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { Button, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { Button, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hds-react";
 import { FormErrorSummary } from "@/components/FormErrorSummary";
 import { DialogActionsButtons } from "@/styled";
 import { SpaceForm } from "../SpaceForm";

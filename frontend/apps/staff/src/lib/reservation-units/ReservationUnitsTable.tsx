@@ -1,9 +1,9 @@
 import React from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { gql } from "@apollo/client";
-import { IconInfoCircle, IconLinkExternal, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
+import { gql } from "@apollo/client";
+import { IconInfoCircle, IconLinkExternal, IconSize } from "hds-react";
 import styled from "styled-components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import {
@@ -12,6 +12,7 @@ import {
 } from "ui/src/components/statuses";
 import { breakpoints } from "ui/src/modules/const";
 import { Flex } from "ui/src/styled";
+import type { ReservationUnitTableElementFragment } from "@gql/gql-types";
 import { CustomTable } from "@/components/Table";
 import { useEnvContext } from "@/context/EnvContext";
 import type { SelectedRow } from "@/lib/reservation-units";
@@ -19,7 +20,6 @@ import { isBrowser, MAX_NAME_LENGTH } from "@/modules/const";
 import { truncate } from "@/modules/helpers";
 import { getOpeningHoursUrl, getReservationUnitUrl } from "@/modules/urls";
 import { TableLink } from "@/styled";
-import type { ReservationUnitTableElementFragment } from "@gql/gql-types";
 
 type ReservationUnitsTableProps = {
   sort: string;

@@ -1,12 +1,12 @@
 import React from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { Button, ButtonVariant, IconCross, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { Button, ButtonVariant, IconCross, LoadingSpinner } from "hds-react";
 import styled from "styled-components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
+import { ControlledSelect } from "ui/src/components/form";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { TermsBox } from "ui/src/components/TermsBox";
-import { ControlledSelect } from "ui/src/components/form";
 import { breakpoints } from "ui/src/modules/const";
 import { AutoGrid, ButtonContainer, Flex, fontMedium } from "ui/src/styled";
 import { ReservationCancelReasonChoice } from "@gql/gql-types";

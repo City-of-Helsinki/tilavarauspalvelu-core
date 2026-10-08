@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { IconAngleDown, IconAngleUp, useAccordion } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { IconAngleDown, IconAngleUp, useAccordion } from "hds-react";
 import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";
 import { Flex, toggleButtonCss, truncatedText } from "ui/src/styled";

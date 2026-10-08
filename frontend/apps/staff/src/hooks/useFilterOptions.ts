@@ -1,11 +1,8 @@
-import { gql } from "@apollo/client";
-import type { InteropApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
+import { gql } from "@apollo/client";
+import type { InteropApolloQueryResult } from "@apollo/client";
 import { filterNonNullable, sortAgeGroups } from "ui/src/modules/helpers";
-import type { createClient } from "@/modules/apolloClient";
-import type { TagOptionsList } from "@/modules/search";
-import type { FilterOptionsQuery, FilterOptionsQueryVariables } from "@gql/gql-types";
 import {
   FilterOptionsDocument,
   MunicipalityChoice,
@@ -17,6 +14,9 @@ import {
   ReserveeType,
   useFilterOptionsQuery,
 } from "@gql/gql-types";
+import type { FilterOptionsQuery, FilterOptionsQueryVariables } from "@gql/gql-types";
+import type { createClient } from "@/modules/apolloClient";
+import type { TagOptionsList } from "@/modules/search";
 
 export function getFilterOptions(
   t: TFunction,

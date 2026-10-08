@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
-import { gql } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import NextError from "next/error";
 import { useSearchParams } from "next/navigation";
@@ -12,6 +12,8 @@ import { TimeZoneNotification } from "ui/src/components/TimeZoneNotification";
 import { breakpoints } from "ui/src/modules/const";
 import { createNodeId, getLocalizationLang, getTranslation, toNumber } from "ui/src/modules/helpers";
 import { H1, H4 } from "ui/src/styled";
+import { ReservationDocument, ReservationStateChoice, useDeleteReservationMutation } from "@gql/gql-types";
+import type { ReservationQuery, ReservationQueryVariables } from "@gql/gql-types";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
@@ -28,8 +30,6 @@ import {
 } from "@/modules/urls";
 import { ReservationPageWrapper, ReservationTitleSection, PinkBox as PinkBoxBase } from "@/styled/reservation";
 import { StyledStepper } from "@/styled/utils";
-import { ReservationDocument, ReservationStateChoice, useDeleteReservationMutation } from "@gql/gql-types";
-import type { ReservationQuery, ReservationQueryVariables } from "@gql/gql-types";
 
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
   grid-column: 1 / -1;

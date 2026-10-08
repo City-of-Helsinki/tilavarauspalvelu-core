@@ -5,16 +5,16 @@
 // Workaround as long as the function isn't needed is to split imports in such a way
 // that libraries are not imported in the middleware.
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 import z from "zod";
+import type { NextRequest } from "next/server";
+import { logError } from "@ui/modules/errors";
 import { gqlQueryFetch, isPageRequest, redirectCsrfToken, removeTrailingSlash } from "ui/src/middlewareHelpers";
 import type { GqlQuery } from "ui/src/middlewareHelpers";
 import { createNodeId, getLocalizationLang } from "ui/src/modules/helpers";
 import { getSignInUrl } from "ui/src/modules/urlBuilder";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { logError } from "@ui/modules/errors";
-import { env } from "@/env.mjs";
 import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
+import { env } from "@/env.mjs";
 import { getReservationInProgressPath } from "./modules/urls";
 
 const API_BASE_URL = env.TILAVARAUS_API_URL ?? "";

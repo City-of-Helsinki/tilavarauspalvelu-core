@@ -1,13 +1,13 @@
 import React from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconPlus } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconPlus } from "hds-react";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import type { OptionsListT } from "ui/src/modules/search";
 import { ButtonContainer } from "ui/src/styled";
+import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { ApplicationSectionPage1 } from "@/components/application/funnel/ApplicationSectionPage1";
 import { useReservationUnitList } from "@/hooks";
-import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { createDefaultPage1Section } from "./form";
 import type { ApplicationPage1FormValues } from "./form";
 

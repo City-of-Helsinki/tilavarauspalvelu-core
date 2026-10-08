@@ -1,13 +1,13 @@
+import { render, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { vi, expect, test, describe } from "vitest";
+import type { ApplicationPage3Query } from "@gql/gql-types";
+import { getApplicationPath } from "@/modules/urls";
+import Page3 from "@/pages/applications/[id]/page3";
 import { createMockApplicationFragment } from "@test/application.mocks";
 import type { CreateMockApplicationFragmentProps } from "@test/application.mocks";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
-import { render, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { vi, expect, test, describe } from "vitest";
-import { getApplicationPath } from "@/modules/urls";
-import Page3 from "@/pages/applications/[id]/page3";
-import type { ApplicationPage3Query } from "@gql/gql-types";
 
 function deferred<T>() {
   let resolve!: (value: T) => void;

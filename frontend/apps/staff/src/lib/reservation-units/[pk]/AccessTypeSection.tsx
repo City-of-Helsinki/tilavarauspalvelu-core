@@ -1,18 +1,18 @@
 import React from "react";
-import type { UseFormReturn } from "react-hook-form";
 import { useFieldArray } from "react-hook-form";
-import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";
+import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "next-i18next";
+import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";
 import styled from "styled-components";
-import { StatusLabel } from "ui/src/components/StatusLabel";
 import { ControlledDateInput, ControlledSelect } from "ui/src/components/form";
+import { StatusLabel } from "ui/src/components/StatusLabel";
 import { formatDate, parseUIDate, parseValidDateObject } from "ui/src/modules/date-utils";
 import { AutoGrid, Flex, H6 } from "ui/src/styled";
+import { AccessType } from "@gql/gql-types";
+import type { ReservationUnitEditQuery } from "@gql/gql-types";
 import { NotificationInline } from "@/components/NotificationInline";
 import { getTranslatedError } from "@/modules/helpers";
 import { KVWrapper, Label, Value } from "@/styled";
-import type { ReservationUnitEditQuery } from "@gql/gql-types";
-import { AccessType } from "@gql/gql-types";
 import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";
 

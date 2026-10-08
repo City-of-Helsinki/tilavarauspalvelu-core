@@ -1,12 +1,12 @@
 import React from "react";
-import type { UseFormReturn } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { SeasonalSection } from "./SeasonalSection";
 import { convertReservationUnit } from "./form";
 import type { ReservationUnitEditFormValues } from "./form";
+import { SeasonalSection } from "./SeasonalSection";
 
 const mockLogError = vi.fn();
 vi.mock("@ui/modules/errors", () => ({

@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
-import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
 import { useController } from "react-hook-form";
+import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import {
   Button,
@@ -13,17 +14,16 @@ import {
   Notification,
   NotificationSize,
 } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import { ErrorText } from "ui/src/components/ErrorText";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import type { OptionsListT } from "ui/src/modules/search";
 import { Flex } from "ui/src/styled";
+import type { ApplicationReservationUnitListFragment, OrderedReservationUnitCardFragment } from "@gql/gql-types";
 import { OrderedReservationUnitCard } from "@/components/application/funnel/OrderedReservationUnitCard";
 import { ReservationUnitModalContent } from "@/components/application/funnel/ReservationUnitModalContent";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { FixedDialog } from "@/styled/FixedDialog";
-import type { ApplicationReservationUnitListFragment, OrderedReservationUnitCardFragment } from "@gql/gql-types";
 
 type ReservationUnitType = Pick<OrderedReservationUnitCardFragment, "pk">;
 

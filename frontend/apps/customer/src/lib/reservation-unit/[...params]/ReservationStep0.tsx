@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useForm, FormProvider, useWatch } from "react-hook-form";
 import type { UseFormReturn, FieldValues } from "react-hook-form";
+import { Trans, useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonVariant, IconArrowRight, IconCross, LoadingSpinner } from "hds-react";
-import { Trans, useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { ReservationStateChoice } from "ui/gql/gql-types";
 import { ErrorListBox } from "@ui/components/ErrorListBox";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/components/reservation-form";
 import { getExtendedGeneralFormFields } from "@ui/components/reservation-form/utils";
@@ -19,11 +18,12 @@ import { getReservationFormSchema } from "@ui/schemas";
 import type { ReservationFormValueT, ReservationFormValues } from "@ui/schemas";
 import { Flex, LinkLikeButton } from "@ui/styled";
 import type { OptionsRecord } from "@ui/types";
+import { ReservationStateChoice } from "ui/gql/gql-types";
+import { ReserveeType, useUpdateReservationMutation } from "@gql/gql-types";
+import type { ReservationQuery, ReservationUpdateMutationInput } from "@gql/gql-types";
 import { InfoDialog } from "@/components/InfoDialog";
 import { getReservationInProgressPath, getReservationUnitPath } from "@/modules/urls";
 import { ActionContainer, NewReservationForm } from "@/styled/reservation";
-import { ReserveeType, useUpdateReservationMutation } from "@gql/gql-types";
-import type { ReservationQuery, ReservationUpdateMutationInput } from "@gql/gql-types";
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {

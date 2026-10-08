@@ -1,5 +1,5 @@
-import type { ApolloClient } from "@apollo/client";
 import { describe, test, expect, vi } from "vitest";
+import type { ApolloClient } from "@apollo/client";
 import type { OptionsQuery } from "@gql/gql-types";
 import { queryOptions } from "./queryOptions";
 

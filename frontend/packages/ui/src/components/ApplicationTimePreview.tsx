@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import type { SuitableTimeFragment } from "../../gql/gql-types";
 import { Priority } from "../../gql/gql-types";
+import type { SuitableTimeFragment } from "../../gql/gql-types";
 import { WEEKDAYS } from "../modules/const";
 import { setSundayFirst } from "../modules/date-utils";
 import { formatDayTimes } from "../modules/helpers";

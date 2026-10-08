@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import type { RefObject } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import type { UseFormReturn } from "react-hook-form";
 import { useForm, FormProvider } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonVariant, Dialog, LoadingSpinner, Notification, NotificationSize } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { ControlledDateInput } from "ui/src/components/form";
@@ -18,6 +18,8 @@ import { createNodeId, toNumber } from "ui/src/modules/helpers";
 import { getCreateStaffReservationFormSchema } from "ui/src/schemas";
 import type { CreateStaffReservationFormValues } from "ui/src/schemas";
 import { CenterSpinner, Flex } from "ui/src/styled";
+import { useCreateStaffReservationMutation, useReservationUnitQuery } from "@gql/gql-types";
+import type { CreateStaffReservationFragment, ReservationStaffCreateMutationInput } from "@gql/gql-types";
 import { ControlledTimeInput } from "@/components/ControlledTimeInput";
 import { SelectFilter } from "@/components/QueryParamFilters";
 import { ReservationTypeForm } from "@/components/ReservationTypeForm";
@@ -25,8 +27,6 @@ import { useModal } from "@/context/ModalContext";
 import { useCheckCollisions } from "@/hooks";
 import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
 import { FixedDialog } from "@/styled/FixedDialog";
-import { useCreateStaffReservationMutation, useReservationUnitQuery } from "@gql/gql-types";
-import type { CreateStaffReservationFragment, ReservationStaffCreateMutationInput } from "@gql/gql-types";
 
 // NOTE HDS forces buttons over each other on mobile, we want them side-by-side
 const ActionButtons = styled(Dialog.ActionButtons)`

@@ -9,9 +9,9 @@ import type { FormField } from "@ui/components/reservation-form/utils";
 import { logError } from "@ui/modules/errors";
 import { AutoGrid, H4 } from "@ui/styled";
 import type { OptionsRecord } from "@ui/types";
-import { LabelValuePair } from "@/components/LabelValuePair";
 import { MunicipalityChoice } from "@gql/gql-types";
 import type { ReservationFormFieldsFragment } from "@gql/gql-types";
+import { LabelValuePair } from "@/components/LabelValuePair";
 
 type SummaryReserveeFieldsProps = {
   reservation: ReservationFormFieldsFragment;

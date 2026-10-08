@@ -1,20 +1,20 @@
 import React from "react";
-import { gql } from "@apollo/client";
-import { IconAngleRight } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
+import { IconAngleRight } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
+import { ApplicationSentPageDocument } from "@gql/gql-types";
+import type { ApplicationSentPageQuery } from "@gql/gql-types";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { createApolloClient } from "@/modules/apolloClient";
 import { isSent } from "@/modules/helpers";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { applicationsPath, applicationsPrefix, getApplicationPath } from "@/modules/urls";
-import { ApplicationSentPageDocument } from "@gql/gql-types";
-import type { ApplicationSentPageQuery } from "@gql/gql-types";
 
 const Paragraph = styled.p`
   max-width: var(--prose-width);

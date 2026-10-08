@@ -2,17 +2,17 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { getApiErrors } from "@ui/modules/apollo/helpers";
 import { ignoreMaybeArray } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
-import { getApiErrors } from "@ui/modules/apollo/helpers";
+import { DeleteReservationDocument, ReservationStateChoice } from "@gql/gql-types";
+import type { DeleteReservationMutation, DeleteReservationMutationVariables } from "@gql/gql-types";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { useEnvContext } from "@/context/EnvContext";
 import { CancelledLinkSet } from "@/lib/reservation/[id]/cancel";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps, getReservationByOrderUuid } from "@/modules/serverUtils";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
-import { DeleteReservationDocument, ReservationStateChoice } from "@gql/gql-types";
-import type { DeleteReservationMutation, DeleteReservationMutationVariables } from "@gql/gql-types";
 
 // This is the callback page from webstore if user cancels the order
 function Cancel({ state }: NarrowedProps): React.ReactElement {

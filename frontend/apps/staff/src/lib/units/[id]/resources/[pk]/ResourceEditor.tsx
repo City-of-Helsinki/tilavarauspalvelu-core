@@ -1,22 +1,22 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SubPageHead, ResourceEditorFields, Editor, ResourceUpdateSchema } from "@lib/units/[id]";
-import type { ResourceUpdateForm } from "@lib/units/[id]";
 import { Button, ButtonVariant } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { errorToast, successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { createNodeId } from "ui/src/modules/helpers";
 import { ButtonContainer, CenterSpinner } from "ui/src/styled";
+import { ResourceLocationType, useUpdateResourceMutation, useResourceQuery } from "@gql/gql-types";
+import type { ResourceUpdateMutationInput } from "@gql/gql-types";
 import { Error404 } from "@/components/Error404";
 import { FormErrorSummary } from "@/components/FormErrorSummary";
 import { LinkPrev } from "@/components/LinkPrev";
 import { getUnitUrl } from "@/modules/urls";
-import { ResourceLocationType, useUpdateResourceMutation, useResourceQuery } from "@gql/gql-types";
-import type { ResourceUpdateMutationInput } from "@gql/gql-types";
+import { SubPageHead, ResourceEditorFields, Editor, ResourceUpdateSchema } from "@lib/units/[id]";
+import type { ResourceUpdateForm } from "@lib/units/[id]";
 
 type Props = {
   resourcePk?: number;

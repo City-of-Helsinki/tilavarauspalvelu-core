@@ -1,10 +1,10 @@
 import React from "react";
 import { useController } from "react-hook-form";
 import type { FieldValues, UseControllerProps } from "react-hook-form";
+import { useTranslation } from "next-i18next";
 import { addYears } from "date-fns";
 import { startOfDay } from "date-fns/startOfDay";
 import { DateInput } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { filterEmpty, getLocalizationLang } from "../../modules/helpers";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {

@@ -1,13 +1,14 @@
 import React, { useMemo } from "react";
 import type { SubmitHandler, UseFormReturn } from "react-hook-form";
-import { Button } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { Button } from "hds-react";
 import styled from "styled-components";
 import { ControlledDateInput } from "ui/src/components/form";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { breakpoints } from "ui/src/modules/const";
 import { parseUIDate, formatDate } from "ui/src/modules/date-utils";
 import { Flex, fontMedium, H4, NoWrap } from "ui/src/styled";
+import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { Carousel } from "@/components/Carousel";
 import type { FocusTimeSlot } from "@/modules/reservation";
 import {
@@ -16,7 +17,6 @@ import {
   isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
-import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 
 type Props = {
   reservationUnit: ReservationTimePickerFieldsFragment;

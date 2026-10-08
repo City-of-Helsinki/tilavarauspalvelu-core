@@ -1,24 +1,24 @@
 import React from "react";
-import type { ApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
+import type { ApolloQueryResult } from "@apollo/client";
 import { breakpoints } from "ui/src/modules/const";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { Flex, H4, fontMedium } from "ui/src/styled";
-import { Accordion } from "@/components/Accordion";
 import { ApplicationSectionStatusChoice } from "@gql/gql-types";
 import type {
   ApplicationRoundStatusChoice,
   ApplicationSectionAllocationsQuery,
   ReservationUnitNode,
 } from "@gql/gql-types";
+import { Accordion } from "@/components/Accordion";
 import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";
 import { ApplicationSectionCard } from "./ApplicationEventCard";
 import type { AllocationApplicationSectionCardType } from "./ApplicationEventCard";
-import { SelectedSlotsContextProvider } from "./SelectedSlotsContext";
 import { getRelatedTimeSlots } from "./modules/applicationRoundAllocation";
 import type { AllocatedTimeSlotNodeT, SectionNodeT } from "./modules/applicationRoundAllocation";
+import { SelectedSlotsContextProvider } from "./SelectedSlotsContext";
 
 // fit-content is rubbish (content change -> layout jumps),
 // fixed size is impossible unless we use calc

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonSize, IconAlertCircleFill, IconRefresh, Tooltip } from "hds-react";
-import { useTranslation } from "next-i18next";
 import styled, { css } from "styled-components";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { successToast } from "ui/src/components/toast";
@@ -9,9 +9,6 @@ import { useDisplayError } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { dateToMinutes, formatDate, formatTimeRange, parseValidDateObject } from "ui/src/modules/date-utils";
 import { ButtonContainer, Flex, NoWrap } from "ui/src/styled";
-import { useSession } from "@/hooks";
-import { hasPermission } from "@/modules/permissionHelper";
-import { Accordion } from "@/styled";
 import {
   AccessType,
   useChangeReservationAccessCodeSeriesMutation,
@@ -21,6 +18,9 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import type { ReservationKeylessEntryFragment } from "@gql/gql-types";
+import { useSession } from "@/hooks";
+import { hasPermission } from "@/modules/permissionHelper";
+import { Accordion } from "@/styled";
 import { DataWrapper } from "./DataWrapper";
 
 const SummaryHorizontal = styled.div<{

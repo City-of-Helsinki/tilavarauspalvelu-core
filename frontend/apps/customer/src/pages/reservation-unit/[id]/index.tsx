@@ -1,15 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type { UseFormReturn } from "react-hook-form";
+import type { GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addYears } from "date-fns";
 import { ButtonVariant, LoadingSpinner } from "hds-react";
-import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import styled from "styled-components";
+import { getApiErrors, logGraphQLQuery } from "@ui/modules/apollo/helpers";
+import type { ApiError } from "@ui/modules/apollo/helpers";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { TimeZoneNotification } from "ui/src/components/TimeZoneNotification";
 import { errorToast } from "ui/src/components/toast";
@@ -28,8 +30,19 @@ import {
   toNumber,
 } from "ui/src/modules/helpers";
 import { Flex, H4 } from "ui/src/styled";
-import { getApiErrors, logGraphQLQuery } from "@ui/modules/apollo/helpers";
-import type { ApiError } from "@ui/modules/apollo/helpers";
+import {
+  CreateReservationDocument,
+  ReservationUnitPageDocument,
+  useCreateReservationMutation,
+  useReservationQuotaReachedQuery,
+} from "@gql/gql-types";
+import type {
+  CreateReservationMutation,
+  CreateReservationMutationVariables,
+  ReservationCreateMutationInput,
+  ReservationUnitPageQuery,
+  ReservationUnitPageQueryVariables,
+} from "@gql/gql-types";
 import { AddressSection } from "@/components/AddressSection";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { InfoDialog } from "@/components/InfoDialog";
@@ -59,19 +72,6 @@ import { JustForDesktop } from "@/modules/style/layout";
 import { getReservationInProgressPath, getSingleSearchPath } from "@/modules/urls";
 import { ReservationUnitPageWrapper } from "@/styled/reservation";
 import { SubmitButton } from "@/styled/utils";
-import {
-  CreateReservationDocument,
-  ReservationUnitPageDocument,
-  useCreateReservationMutation,
-  useReservationQuotaReachedQuery,
-} from "@gql/gql-types";
-import type {
-  CreateReservationMutation,
-  CreateReservationMutationVariables,
-  ReservationCreateMutationInput,
-  ReservationUnitPageQuery,
-  ReservationUnitPageQueryVariables,
-} from "@gql/gql-types";
 
 function SubmitFragment({
   focusSlot,

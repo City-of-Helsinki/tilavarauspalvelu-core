@@ -1,21 +1,21 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonVariant, IconArrowLeft, LoadingSpinner } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { useDisplayError } from "@ui/hooks";
 import { isNotFoundError } from "@ui/modules/apollo/helpers";
 import { getLocalizationLang } from "@ui/modules/helpers";
 import { Flex } from "@ui/styled";
 import type { OptionsRecord } from "@ui/types";
+import { ReservationStateChoice, useConfirmReservationMutation } from "@gql/gql-types";
+import type { ReservationQuery } from "@gql/gql-types";
 import { AcceptTerms } from "@/components/AcceptTerms";
 import { SummaryGeneralFields, SummaryReserveeFields } from "@/components/reservation";
 import { getCheckoutUrl } from "@/modules/reservation";
 import { getReservationInProgressPath, getReservationPath, getReservationUnitPath } from "@/modules/urls";
 import { ActionContainer, NewReservationForm } from "@/styled/reservation";
-import { ReservationStateChoice, useConfirmReservationMutation } from "@gql/gql-types";
-import type { ReservationQuery } from "@gql/gql-types";
 
 type NodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {

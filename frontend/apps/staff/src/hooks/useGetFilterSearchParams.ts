@@ -14,9 +14,9 @@ import {
   transformWeekday,
 } from "ui/src/modules/conversion";
 import { filterEmptyArray, filterNonNullable, mapParamToInteger, toInteger, toNumber } from "ui/src/modules/helpers";
-import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
-import type { ApplicationStatusChoice } from "@gql/gql-types";
 import { Priority } from "@gql/gql-types";
+import type { ApplicationStatusChoice } from "@gql/gql-types";
+import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/modules/const";
 
 export function getFilterSearchParams({
   searchParams,

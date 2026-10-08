@@ -1,14 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import { useMedia } from "react-use";
-import { gql } from "@apollo/client";
-import { Notification, NotificationSize } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
+import { Notification, NotificationSize } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import { breakpoints } from "ui/src/modules/const";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { Flex, H1 } from "ui/src/styled";
+import { ReservationKind } from "@gql/gql-types";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ListWithPagination } from "@/components/ListWithPagination";
 import { SortingComponent } from "@/components/SortingComponent";
@@ -17,7 +18,6 @@ import { SingleSearchCard, SingleSearchForm } from "@/lib/search";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getSearchOptions, processVariables } from "@/modules/search";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { ReservationKind } from "@gql/gql-types";
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;

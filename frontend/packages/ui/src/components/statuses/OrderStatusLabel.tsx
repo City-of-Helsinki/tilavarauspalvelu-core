@@ -1,6 +1,6 @@
 import React from "react";
-import { IconEuroSign } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { IconEuroSign } from "hds-react";
 import { OrderStatus } from "../../../gql/gql-types";
 import { StatusLabel } from "../StatusLabel";
 import type { StatusLabelType } from "../StatusLabel";

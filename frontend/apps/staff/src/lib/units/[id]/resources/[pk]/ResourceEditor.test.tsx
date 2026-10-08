@@ -1,10 +1,10 @@
 import React from "react";
 import { MockedProvider } from "@apollo/client/testing";
-import type { MockedResponse } from "@apollo/client/testing";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { MockedResponse } from "@apollo/client/testing";
 import { createNodeId } from "ui/src/modules/helpers";
 import { ResourceDocument, ResourceLocationType, UnitSpacesDocument, UpdateResourceDocument } from "@gql/gql-types";
 import { ResourceEditor } from "./ResourceEditor";

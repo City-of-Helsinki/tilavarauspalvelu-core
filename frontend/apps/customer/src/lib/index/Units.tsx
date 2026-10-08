@@ -1,15 +1,15 @@
 import React from "react";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconArrowRight, IconSize } from "hds-react";
-import { useTranslation } from "next-i18next";
 import Link from "next/link";
 import styled from "styled-components";
+import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { IconButton } from "ui/src/components";
 import { breakpoints } from "ui/src/modules/const";
 import { Flex, H3, anchorStyles, focusStyles } from "ui/src/styled";
-import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
-import { singleSearchPrefix } from "@/modules/urls";
 import type { UnitListFieldsFragment } from "@gql/gql-types";
+import { singleSearchPrefix } from "@/modules/urls";
 
 const ITEM_LIMIT = 8;
 

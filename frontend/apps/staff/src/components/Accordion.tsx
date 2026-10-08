@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
 import React, { useState } from "react";
-import { IconAngleDown, IconAngleUp } from "hds-react";
+import type { ReactNode } from "react";
 import { useTranslation } from "next-i18next";
+import { IconAngleDown, IconAngleUp } from "hds-react";
 import styled from "styled-components";
 import { Flex, H2 } from "ui/src/styled";
 

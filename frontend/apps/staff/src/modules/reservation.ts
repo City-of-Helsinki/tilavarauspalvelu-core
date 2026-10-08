@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
 import type { TFunction } from "i18next";
+import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
 import type { CalendarEvent } from "ui/src/components/calendar/Calendar";
 import { convertWeekday } from "ui/src/modules/conversion";
 import {
@@ -15,8 +16,6 @@ import {
   formatDateTime,
 } from "ui/src/modules/date-utils";
 import { filterNonNullable, sort, toNumber } from "ui/src/modules/helpers";
-import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
-import { getReserveeName, getReserveeTypeTranslationKey } from "@/modules/helpers";
 import { PriceUnit, ReservationTypeChoice } from "@gql/gql-types";
 import type {
   CreateTagStringFragment,
@@ -29,6 +28,7 @@ import type {
   ReservationUnitPricingFieldsFragment,
   EventStyleReservationFieldsFragment,
 } from "@gql/gql-types";
+import { getReserveeName, getReserveeTypeTranslationKey } from "@/modules/helpers";
 
 export type EventType = EventStyleReservationFieldsFragment;
 export type CalendarEventType = CalendarEvent<EventType>;

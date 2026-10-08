@@ -1,9 +1,9 @@
 import React from "react";
-import type { Option } from "hds-react";
-import { IconSize, IconSortAscending, IconSortDescending, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { IconSize, IconSortAscending, IconSortDescending, Select } from "hds-react";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
+import type { Option } from "hds-react";
 import { breakpoints } from "ui/src/modules/const";
 import { convertOptionToHDS, getLocalizationLang } from "ui/src/modules/helpers";
 import { Flex, fontMedium, focusStyles } from "ui/src/styled";

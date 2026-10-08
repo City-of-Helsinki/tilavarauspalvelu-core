@@ -1,15 +1,15 @@
 import React from "react";
-import type { UseFormReturn } from "react-hook-form";
 import { Controller } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import dynamic from "next/dynamic";
 import { ControlledSelect } from "ui/src/components/form";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { AutoGrid } from "ui/src/styled";
-import { getTranslatedError } from "@/modules/helpers";
 import type { ReservationUnitEditorParametersQuery } from "@gql/gql-types";
-import { ImageEditor } from "./ImageEditor";
+import { getTranslatedError } from "@/modules/helpers";
 import type { ReservationUnitEditFormValues } from "./form";
+import { ImageEditor } from "./ImageEditor";
 import { EditAccordion } from "./styled";
 import { getTranslatedTooltipTex } from "./utils";
 

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "next-i18next";
 import { isBefore } from "date-fns";
 import { startOfDay } from "date-fns/startOfDay";
 import { DateInput } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { parseUIDate, isValidDate, formatDate } from "ui/src/modules/date-utils";
 import { getLocalizationLang } from "ui/src/modules/helpers";
 

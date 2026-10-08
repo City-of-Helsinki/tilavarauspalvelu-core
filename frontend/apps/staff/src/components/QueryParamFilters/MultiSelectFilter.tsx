@@ -1,8 +1,8 @@
 import React from "react";
 import { useController } from "react-hook-form";
 import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
-import { defaultFilter, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { defaultFilter, Select } from "hds-react";
 import { useSearchParams } from "next/navigation";
 import { convertOptionToHDS, filterNonNullable, toNumber } from "ui/src/modules/helpers";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";

@@ -1,10 +1,10 @@
 import React from "react";
 import { Controller, useWatch } from "react-hook-form";
 import type { Control, UseFormReturn } from "react-hook-form";
+import { useTranslation } from "next-i18next";
 import { addDays, startOfDay } from "date-fns";
 import { IconAlertCircleFill, RadioButton } from "hds-react";
 import { capitalize } from "lodash-es";
-import { useTranslation } from "next-i18next";
 import dynamic from "next/dynamic";
 import styled from "styled-components";
 import {
@@ -14,8 +14,8 @@ import {
   ControlledCheckbox,
 } from "ui/src/components/form";
 import { AutoGrid, Flex, HR } from "ui/src/styled";
-import { getTranslatedError } from "@/modules/helpers";
 import { PaymentType, PriceUnit } from "@gql/gql-types";
+import { getTranslatedError } from "@/modules/helpers";
 import { FieldGroup } from "./FieldGroup";
 import type { ReservationUnitEditFormValues } from "./form";
 import { EditAccordion } from "./styled";

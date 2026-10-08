@@ -1,9 +1,9 @@
 import React from "react";
 import { MockedProvider } from "@apollo/client/testing";
-import type { MockedResponse } from "@apollo/client/testing";
 import { render, screen, waitFor } from "@testing-library/react";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { MockedResponse } from "@apollo/client/testing";
 import { AllocatedTimeSlotsDocument } from "@gql/gql-types";
 import type { AllocatedSectionsTableElementFragment } from "@gql/gql-types";
 import { TimeSlotDataLoader } from "./AllocatedSectionDataLoader";

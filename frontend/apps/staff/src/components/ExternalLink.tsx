@@ -1,8 +1,8 @@
 import React from "react";
-import type { IconSize } from "hds-react";
 import { IconLinkExternal } from "hds-react";
 import Link from "next/link";
 import styled from "styled-components";
+import type { IconSize } from "hds-react";
 import { fontMedium } from "ui/src/styled";
 
 type Props = {

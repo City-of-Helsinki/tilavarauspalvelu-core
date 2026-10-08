@@ -6,8 +6,8 @@ import { addDays } from "date-fns";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { formatDate } from "ui/src/modules/date-utils";
 import { Weekday } from "@gql/gql-types";
-import { ReservationSeriesForm } from "./ReservationSeriesForm";
 import { createGraphQLMocks, createReservationUnits, mondayMorningReservations, YEAR } from "./__test__/mocks";
+import { ReservationSeriesForm } from "./ReservationSeriesForm";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
   const params = vi.fn();

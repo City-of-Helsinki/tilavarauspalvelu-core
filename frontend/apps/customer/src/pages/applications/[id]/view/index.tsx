@@ -1,8 +1,8 @@
 import React from "react";
-import { gql } from "@apollo/client";
-import { Tabs } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
+import { Tabs } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
@@ -11,16 +11,16 @@ import { useToastIfQueryParam } from "ui/src/hooks";
 import { formatDateTime } from "ui/src/modules/date-utils";
 import { createNodeId, getLocalizationLang, getTranslation, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
-import { Breadcrumb } from "@/components/Breadcrumb";
+import { ApplicationStatusChoice, ApplicationViewDocument } from "@gql/gql-types";
+import type { ApplicationViewQueryVariables, ApplicationViewQuery } from "@gql/gql-types";
 import { ApplicationHead } from "@/components/application/ApplicationHead";
 import { ApplicationTerms } from "@/components/application/ApplicationTerms";
 import { ApprovedReservations, BREAKPOINT } from "@/components/application/ApprovedReservations";
 import { ViewApplication } from "@/components/application/view/ViewApplication";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps, getGenericTerms } from "@/modules/serverUtils";
 import { applicationsPrefix } from "@/modules/urls";
-import { ApplicationStatusChoice, ApplicationViewDocument } from "@gql/gql-types";
-import type { ApplicationViewQueryVariables, ApplicationViewQuery } from "@gql/gql-types";
 
 const TabPanel = styled(Tabs.TabPanel)`
   && {

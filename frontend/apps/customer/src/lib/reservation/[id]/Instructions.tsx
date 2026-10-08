@@ -1,8 +1,8 @@
-import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
+import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { H4 } from "ui/src/styled";
-import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { ReservationStateChoice } from "@gql/gql-types";
 import type { InstructionsFragment, Maybe } from "@gql/gql-types";
 

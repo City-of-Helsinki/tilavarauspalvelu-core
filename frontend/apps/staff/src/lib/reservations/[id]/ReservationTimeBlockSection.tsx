@@ -1,14 +1,16 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import type { Ref } from "react";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { add, startOfISOWeek } from "date-fns";
-import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
+import { getEventBuffers } from "@ui/components/calendar/utils";
 import { Calendar as CommonCalendar } from "ui/src/components/calendar/Calendar";
 import { Toolbar, ToolbarBtn } from "ui/src/components/calendar/Toolbar";
 import { filterNonNullable, toNumber } from "ui/src/modules/helpers";
-import { getEventBuffers } from "@ui/components/calendar/utils";
+import { ReservationStateChoice, ReservationTypeChoice, UserPermissionChoice } from "@gql/gql-types";
+import type { TimeBlockSectionFragment } from "@gql/gql-types";
 import { EditTimeModal } from "@/components/EditTimeModal";
 import { Legend, LegendsWrapper } from "@/components/Legend";
 import { ReservationSeriesView } from "@/components/ReservationSeriesView";
@@ -19,8 +21,6 @@ import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import type { CalendarEventType, EventType } from "@/modules/reservation";
 import { isPossibleToEdit } from "@/modules/reservationModificationRules";
 import { Accordion } from "@/styled";
-import { ReservationStateChoice, ReservationTypeChoice, UserPermissionChoice } from "@gql/gql-types";
-import type { TimeBlockSectionFragment } from "@gql/gql-types";
 import { eventStyleGetter, legend } from "./eventStyleGetter";
 
 const Container = styled.div`

@@ -1,13 +1,13 @@
 import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import type { UseFormReturn } from "react-hook-form";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
+import { useTranslation } from "next-i18next";
+import type { TFunction } from "next-i18next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { differenceInMinutes } from "date-fns";
 import { Button, ButtonSize, ButtonVariant, Dialog, Notification, NotificationSize } from "hds-react";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import styled from "styled-components";
 import type { z } from "zod";
 import { ControlledDateInput } from "ui/src/components/form";
@@ -23,19 +23,19 @@ import {
   formatDate,
 } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
-import type { TimeFormSchema } from "ui/src/schemas";
 import { getTimeChangeFormSchemaRefined } from "ui/src/schemas";
-import { BufferToggles } from "@/components/BufferToggles";
-import { ControlledTimeInput } from "@/components/ControlledTimeInput";
-import { useModal } from "@/context/ModalContext";
-import { useCheckCollisions } from "@/hooks";
-import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
+import type { TimeFormSchema } from "ui/src/schemas";
 import {
   ReservationTypeChoice,
   useAddReservationToSeriesMutation,
   useStaffAdjustReservationTimeMutation,
 } from "@gql/gql-types";
 import type { ChangeReservationTimeFragment, ReservationSeriesAddMutationInput, Weekday } from "@gql/gql-types";
+import { BufferToggles } from "@/components/BufferToggles";
+import { ControlledTimeInput } from "@/components/ControlledTimeInput";
+import { useModal } from "@/context/ModalContext";
+import { useCheckCollisions } from "@/hooks";
+import { getBufferTime, getNormalizedInterval } from "@/modules/helpers";
 
 const StyledForm = styled.form`
   margin-top: var(--spacing-m);

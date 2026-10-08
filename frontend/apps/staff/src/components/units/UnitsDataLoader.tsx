@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import { useSearchParams } from "next/navigation";
 import { errorToast } from "ui/src/components/toast";
 import { filterEmptyArray, filterNonNullable, mapParamToInteger } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";
+import { UnitOrderingChoices, useUnitListQuery } from "@gql/gql-types";
 import { More } from "@/components/More";
 import { LARGE_LIST_PAGE_SIZE } from "@/modules/const";
-import { UnitOrderingChoices, useUnitListQuery } from "@gql/gql-types";
 import { UnitsTable } from "./UnitsTable";
 
 type Props = {

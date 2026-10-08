@@ -1,6 +1,6 @@
 import React from "react";
-import { Button, IconArrowRight, ImageWithCard } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { Button, IconArrowRight, ImageWithCard } from "hds-react";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";

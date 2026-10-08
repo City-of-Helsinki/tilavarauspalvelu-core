@@ -1,5 +1,5 @@
-import type { TFunction } from "i18next";
 import { describe, test, expect, it } from "vitest";
+import type { TFunction } from "i18next";
 import type { AgeGroupNode } from "../../gql/gql-types";
 import {
   formatWhitespace,

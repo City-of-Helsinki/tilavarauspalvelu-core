@@ -1,12 +1,12 @@
 import React from "react";
-import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import styled from "styled-components";
 import { formatDurationRange, formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
 import { getLocalizationLang } from "ui/src/modules/helpers";
 import { H4, Strong } from "ui/src/styled";
-import { formatNDays } from "@/modules/reservationUnit";
 import type { ReservationInfoSectionFragment } from "@gql/gql-types";
+import { formatNDays } from "@/modules/reservationUnit";
 
 const Subheading = styled(H4).attrs({ as: "h2", $noMargin: true })`
   border-bottom: 1px solid var(--color-black-50);

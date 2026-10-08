@@ -1,6 +1,6 @@
 import type { Cell, CellState } from "ui/src/components/ApplicationTimeSelector";
-import type { DayT } from "ui/src/modules/const";
 import { WEEKDAYS, WEEKDAYS_SORTED } from "ui/src/modules/const";
+import type { DayT } from "ui/src/modules/const";
 import { convertWeekday, transformWeekday } from "ui/src/modules/conversion";
 import { timeToMinutes } from "ui/src/modules/date-utils";
 import { filterNonNullable, formatTimeStruct } from "ui/src/modules/helpers";

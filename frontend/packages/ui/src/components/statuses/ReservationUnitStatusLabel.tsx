@@ -1,6 +1,6 @@
 import React from "react";
-import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQuestionCircle } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { IconCheck, IconClock, IconEye, IconEyeCrossed, IconLock, IconPen, IconQuestionCircle } from "hds-react";
 import { ReservationUnitPublishingState, ReservationUnitReservationState } from "../../../gql/gql-types";
 import { NoWrap } from "../../styled";
 import { StatusLabel } from "../StatusLabel";

@@ -1,8 +1,8 @@
+import { ReservationTypeChoice } from "@gql/gql-types";
+import type { Maybe } from "@gql/gql-types";
 import { generateReservations } from "@/modules/generateReservations";
 import { getBufferTime } from "@/modules/helpers";
 import type { RescheduleReservationSeriesForm } from "@/schemas";
-import { ReservationTypeChoice } from "@gql/gql-types";
-import type { Maybe } from "@gql/gql-types";
 
 type ReservationUnitBufferType = {
   bufferTimeBefore: number;

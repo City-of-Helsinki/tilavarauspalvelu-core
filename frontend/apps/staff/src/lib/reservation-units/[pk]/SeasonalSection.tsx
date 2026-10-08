@@ -1,14 +1,14 @@
 import React, { Fragment } from "react";
-import type { UseFormReturn } from "react-hook-form";
 import { Controller, useFieldArray } from "react-hook-form";
-import { Button, ButtonVariant, Checkbox, IconMinus, IconPlus } from "hds-react";
+import type { UseFormReturn } from "react-hook-form";
 import { useTranslation } from "next-i18next";
+import { Button, ButtonVariant, Checkbox, IconMinus, IconPlus } from "hds-react";
 import styled, { css } from "styled-components";
+import { logError } from "@ui/modules/errors";
 import { IconButton } from "ui/src/components";
 import { TimeInput } from "ui/src/components/form/TimeInput";
 import { breakpoints, WEEKDAYS_SORTED } from "ui/src/modules/const";
 import { fontBold } from "ui/src/styled";
-import { logError } from "@ui/modules/errors";
 import { Accordion } from "@/components/Accordion";
 import { getTranslatedError } from "@/modules/helpers";
 import type { ReservationUnitEditFormValues } from "./form";

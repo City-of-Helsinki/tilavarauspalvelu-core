@@ -1,9 +1,9 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { isReservationCancellable } from "@/modules/reservation";
 import { AccessType, ReservationStateChoice } from "@gql/gql-types";
 import type { ReservationCardFragment } from "@gql/gql-types";
+import { isReservationCancellable } from "@/modules/reservation";
 import { ReservationCard } from "./ReservationCard";
 
 vi.mock("@/modules/reservation", () => ({

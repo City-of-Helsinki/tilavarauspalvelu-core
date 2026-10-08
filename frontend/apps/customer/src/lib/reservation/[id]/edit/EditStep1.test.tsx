@@ -1,18 +1,18 @@
 import { useForm } from "react-hook-form";
 import { MockedProvider } from "@apollo/client/testing";
-import type { MockedResponse } from "@apollo/client/testing";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createMockReservation, createOptionsMock } from "@test/reservation.mocks";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { MockedResponse } from "@apollo/client/testing";
+import { AdjustReservationTimeDocument } from "@gql/gql-types";
+import type { EditPageReservationFragment } from "@gql/gql-types";
 import { transformReservation } from "@/modules/reservation";
 import { PendingReservationFormSchema } from "@/modules/schemas/reservationUnit";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
-import { AdjustReservationTimeDocument } from "@gql/gql-types";
-import type { EditPageReservationFragment } from "@gql/gql-types";
+import { createMockReservation, createOptionsMock } from "@test/reservation.mocks";
 import { EditStep1 } from "./EditStep1";
 
 // SummaryGeneralFields/SummaryReserveeFields are already covered by

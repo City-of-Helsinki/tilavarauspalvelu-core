@@ -1,16 +1,11 @@
 import React from "react";
-import { gql } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { errorToast, successToast } from "ui/src/components/toast";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
-import { Breadcrumb } from "@/components/Breadcrumb";
-import { useCurrentUser } from "@/hooks";
-import { ApplicationsGroup } from "@/lib/applications";
-import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   ApplicationStatusChoice,
   useApplicationsLazyQuery,
@@ -19,6 +14,11 @@ import {
   ApplicationOrderingChoices,
 } from "@gql/gql-types";
 import type { ApplicationsQuery, ApplicationsQueryVariables, CurrentUserQuery } from "@gql/gql-types";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { useCurrentUser } from "@/hooks";
+import { ApplicationsGroup } from "@/lib/applications";
+import { createApolloClient } from "@/modules/apolloClient";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

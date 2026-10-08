@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
+import { useTranslation } from "next-i18next";
 import { startOfDay } from "date-fns";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";
@@ -14,10 +14,10 @@ import { SearchTags } from "@/components/SearchTags";
 import { useUnitResources, useGetFilterSearchParams } from "@/hooks";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import type { ReservationUnitOption } from "@/hooks/useUnitResources";
-import type { TagOptionsList } from "@/modules/search";
 import { translateTag } from "@/modules/search";
-import { UnitCalendar } from "./UnitCalendar";
+import type { TagOptionsList } from "@/modules/search";
 import { legend } from "./eventStyleGetter";
+import { UnitCalendar } from "./UnitCalendar";
 
 const LegendContainer = styled.div`
   max-width: 100%;

@@ -1,7 +1,6 @@
-import { createMockIsReservableFieldsFragment, createMockReservableTimes } from "@test/reservation-unit.mocks";
 import { addDays, addHours, addMinutes, format, startOfDay, startOfToday } from "date-fns";
-import type { TFunction } from "i18next";
 import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
+import type { TFunction } from "i18next";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
 import {
@@ -17,6 +16,7 @@ import type {
   CanReservationBeChangedFragment,
   ReservationPaymentUrlFragment,
 } from "@gql/gql-types";
+import { createMockIsReservableFieldsFragment, createMockReservableTimes } from "@test/reservation-unit.mocks";
 import { isSlotWithinReservationTime } from "./reservable";
 import {
   convertFormToFocustimeSlot,

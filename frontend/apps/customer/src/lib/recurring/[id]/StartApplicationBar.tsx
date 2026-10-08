@@ -1,7 +1,7 @@
 import React from "react";
 import { useMedia } from "react-use";
-import { ButtonSize, ButtonVariant, IconArrowRight, IconCross } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { ButtonSize, ButtonVariant, IconArrowRight, IconCross } from "hds-react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import styled from "styled-components";
@@ -9,13 +9,13 @@ import { useDisplayError } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex, NoWrap, WhiteButton, pageSideMargins } from "ui/src/styled";
+import { useCreateApplicationMutation } from "@gql/gql-types";
+import type { ApplicationCreateMutationInput, ReservationUnitNode } from "@gql/gql-types";
 import { LoginFragment } from "@/components/LoginFragment";
 import { useReservationUnitList } from "@/hooks";
 import { isBrowser } from "@/modules/const";
 import { getPostLoginUrl } from "@/modules/helpers";
 import { getApplicationPath } from "@/modules/urls";
-import { useCreateApplicationMutation } from "@gql/gql-types";
-import type { ApplicationCreateMutationInput, ReservationUnitNode } from "@gql/gql-types";
 
 const SpaceWrapper = styled.div`
   height: 76px;

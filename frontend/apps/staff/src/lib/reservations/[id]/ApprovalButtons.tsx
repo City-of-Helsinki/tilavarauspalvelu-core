@@ -1,7 +1,8 @@
 import React, { useRef } from "react";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
-import { useTranslation } from "next-i18next";
+import type { ApprovalButtonsFragment } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { DenyDialog } from "@/components/DenyDialog";
 import { useModal } from "@/context/ModalContext";
@@ -12,7 +13,6 @@ import {
   isPossibleToReturn,
 } from "@/modules/reservationModificationRules";
 import { getReservationUrl } from "@/modules/urls";
-import type { ApprovalButtonsFragment } from "@gql/gql-types";
 import { ApproveDialog } from "./ApproveDialog";
 import { ReturnToRequiresHandlingDialog } from "./ReturnToRequiresHandlingDialog";
 

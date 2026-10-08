@@ -1,6 +1,6 @@
 import React from "react";
-import { IconCheck, IconClock, IconPen } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { IconCheck, IconClock, IconPen } from "hds-react";
 import styled from "styled-components";
 import { BannerNotificationState } from "../../../gql/gql-types";
 import { StatusLabel } from "../StatusLabel";

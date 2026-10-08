@@ -1,9 +1,9 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import type { RuleSet } from "styled-components";
 import styled, { css } from "styled-components";
-import { Flex, truncatedText } from "ui/src/styled";
+import type { RuleSet } from "styled-components";
 import { unavailableBackgroundSVG } from "@ui/components/calendar/utils";
+import { Flex, truncatedText } from "ui/src/styled";
 
 type LegendItemT = {
   title: string;

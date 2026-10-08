@@ -1,12 +1,13 @@
 import React from "react";
 import { useLocation } from "react-use";
-import { Header, IconLinkExternal, IconSignout, IconStar, IconUser, LogoSize, TitleStyleType } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { Header, IconLinkExternal, IconSignout, IconStar, IconUser, LogoSize, TitleStyleType } from "hds-react";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { Logo } from "ui/src/components/Logo";
 import { signIn, signOut } from "ui/src/modules/browserHelpers";
 import { getLocalizationLang } from "ui/src/modules/helpers";
+import { UserPermissionChoice } from "@gql/gql-types";
 import { env } from "@/env.mjs";
 import { useSession, useHandling } from "@/hooks";
 import { PUBLIC_URL } from "@/modules/const";
@@ -21,7 +22,6 @@ import {
   REQUESTED_RESERVATIONS_URL_PREFIX,
   getAccessibilityTermsUrl,
 } from "@/modules/urls";
-import { UserPermissionChoice } from "@gql/gql-types";
 
 type Props = {
   apiBaseUrl: string;

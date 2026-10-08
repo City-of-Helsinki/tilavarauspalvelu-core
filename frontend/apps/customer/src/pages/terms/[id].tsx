@@ -5,10 +5,10 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { getLocalizationLang, getTranslation, ignoreMaybeArray } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
-import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { TermsOfUseDocument, TermsOfUseTypeChoices } from "@gql/gql-types";
 import type { TermsOfUseQuery, TermsOfUseQueryVariables } from "@gql/gql-types";
+import { createApolloClient } from "@/modules/apolloClient";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

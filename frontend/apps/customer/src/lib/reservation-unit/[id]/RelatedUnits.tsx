@@ -1,8 +1,8 @@
 import React from "react";
 import { useMedia } from "react-use";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconArrowRight, IconEuroSign, IconGroup, IconHome } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { Card } from "ui/src/components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { breakpoints } from "ui/src/modules/const";
@@ -14,11 +14,11 @@ import {
   getTranslation,
 } from "ui/src/modules/helpers";
 import { H3 } from "ui/src/styled";
+import { useRelatedReservationUnitsQuery } from "@gql/gql-types";
+import type { Maybe, RelatedUnitCardFieldsFragment } from "@gql/gql-types";
 import { Carousel } from "@/components/Carousel";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
-import { useRelatedReservationUnitsQuery } from "@gql/gql-types";
-import type { Maybe, RelatedUnitCardFieldsFragment } from "@gql/gql-types";
 
 type RelatedUnitsProps = {
   thisReservationUnitPk: Maybe<number>;

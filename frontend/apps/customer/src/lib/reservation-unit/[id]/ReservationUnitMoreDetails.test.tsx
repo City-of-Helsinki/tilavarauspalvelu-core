@@ -2,9 +2,9 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, test, expect, vi } from "vitest";
 import { useGenericTerms } from "@ui/hooks";
-import { getFuturePricing, getPriceString } from "@/modules/reservationUnit";
 import { PaymentType, PriceUnit, TermsOfUseTypeChoices, Weekday } from "@gql/gql-types";
 import type { ReservationUnitMoreDetailsFragment } from "@gql/gql-types";
+import { getFuturePricing, getPriceString } from "@/modules/reservationUnit";
 import { ReservationUnitMoreDetails } from "./ReservationUnitMoreDetails";
 
 vi.mock("next-i18next", async (importOriginal) => ({

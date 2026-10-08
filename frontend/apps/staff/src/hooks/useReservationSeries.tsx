@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import { errorToast } from "ui/src/components/toast";
 import { createNodeId, filterNonNullable } from "ui/src/modules/helpers";
 import { useReservationSeriesQuery } from "@gql/gql-types";

@@ -1,6 +1,6 @@
-import { SEARCH_PAGING_LIMIT } from "@/modules/const";
 import { useSearchReservationUnitsQuery } from "@gql/gql-types";
 import type { SearchReservationUnitsQueryVariables } from "@gql/gql-types";
+import { SEARCH_PAGING_LIMIT } from "@/modules/const";
 
 /* Wrap the search query with a custom hook
  * because we can't trust the query.loading nor totalCount nor hasNextPage

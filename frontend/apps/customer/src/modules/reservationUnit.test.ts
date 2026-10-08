@@ -1,20 +1,11 @@
 import type { DeepRequired } from "react-hook-form";
-import { createMockIsReservableFieldsFragment } from "@test/reservation-unit.mocks";
-import { generateNameFragment } from "@test/test.gql.utils";
-import { TIMERS_TO_FAKE } from "@test/test.utils";
 import { addDays, addHours, addMonths, endOfDay, getHours, set, startOfDay, startOfToday } from "date-fns";
-import type { TFunction } from "i18next";
 import { get as mockGet } from "lodash-es";
 import { vi, describe, test, expect, beforeEach, afterEach, beforeAll, afterAll } from "vitest";
+import type { TFunction } from "i18next";
 import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
-import type { ReadonlyDeep } from "ui/src/modules/helpers";
 import { createNodeId } from "ui/src/modules/helpers";
-import type {
-  AccessType,
-  ReservationUnitNode,
-  PriceReservationUnitFieldsFragment,
-  EquipmentFieldsFragment,
-} from "@gql/gql-types";
+import type { ReadonlyDeep } from "ui/src/modules/helpers";
 import {
   PriceUnit,
   ReservationUnitPublishingState,
@@ -24,6 +15,15 @@ import {
   ReservationUnitReservationState,
   PaymentType,
 } from "@gql/gql-types";
+import type {
+  AccessType,
+  ReservationUnitNode,
+  PriceReservationUnitFieldsFragment,
+  EquipmentFieldsFragment,
+} from "@gql/gql-types";
+import { createMockIsReservableFieldsFragment } from "@test/reservation-unit.mocks";
+import { generateNameFragment } from "@test/test.gql.utils";
+import { TIMERS_TO_FAKE } from "@test/test.utils";
 import mockTranslations from ".././../public/locales/fi/prices.json";
 import { dateToKey } from "./reservable";
 import type { ReservableMap, RoundPeriod } from "./reservable";

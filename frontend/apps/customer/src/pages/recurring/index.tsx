@@ -1,14 +1,10 @@
 import React from "react";
-import { gql } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { Flex, H1, H2 } from "ui/src/styled";
-import { Breadcrumb } from "@/components/Breadcrumb";
-import { ApplicationRoundCard } from "@/lib/recurring";
-import { createApolloClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
 import {
   ApplicationRoundOrderingChoices,
   ApplicationRoundStatusChoice,
@@ -19,6 +15,10 @@ import type {
   ApplicationRoundsUiQuery,
   ApplicationRoundsUiQueryVariables,
 } from "@gql/gql-types";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { ApplicationRoundCard } from "@/lib/recurring";
+import { createApolloClient } from "@/modules/apolloClient";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 

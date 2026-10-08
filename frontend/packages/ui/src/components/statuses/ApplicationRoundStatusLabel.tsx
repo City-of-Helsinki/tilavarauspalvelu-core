@@ -1,6 +1,6 @@
 import React from "react";
-import { IconArrowTopRight, IconCheck, IconClock, IconCogwheel, IconEnvelope } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { IconArrowTopRight, IconCheck, IconClock, IconCogwheel, IconEnvelope } from "hds-react";
 import { ApplicationRoundStatusChoice } from "../../../gql/gql-types";
 import { StatusLabel } from "../StatusLabel";
 import type { StatusLabelType } from "../StatusLabel";

@@ -1,9 +1,9 @@
 import React from "react";
 import { useController } from "react-hook-form";
 import type { FieldValues, Path, UseControllerProps } from "react-hook-form";
+import { useTranslation } from "next-i18next";
 import { startOfDay } from "date-fns/startOfDay";
 import { DateInput } from "hds-react";
-import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { TimeInput } from "./TimeInput";
 

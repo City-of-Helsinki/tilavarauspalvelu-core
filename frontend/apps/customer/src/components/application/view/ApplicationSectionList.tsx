@@ -1,11 +1,13 @@
 import React from "react";
-import { Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { Tooltip } from "hds-react";
 import { ApplicationSectionStatusLabel } from "ui/src/components/statuses";
 import { WEEKDAYS } from "ui/src/modules/const";
 import { formatDurationRange, formatDate, parseApiDate, setSundayFirst } from "ui/src/modules/date-utils";
 import { filterNonNullable, formatDayTimes, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { NoWrap } from "ui/src/styled";
+import { Priority, ApplicationSectionStatusChoice } from "@gql/gql-types";
+import type { AgeGroupNode, Maybe, ApplicationViewFragment, SuitableTimeFragment } from "@gql/gql-types";
 import {
   ApplicationInfoContainer,
   ApplicationSection,
@@ -15,8 +17,6 @@ import {
   ScheduleDay,
   RegularText,
 } from "@/styled/application";
-import { Priority, ApplicationSectionStatusChoice } from "@gql/gql-types";
-import type { AgeGroupNode, Maybe, ApplicationViewFragment, SuitableTimeFragment } from "@gql/gql-types";
 import type { SuitableTimeRangeFormValues } from "../funnel/form";
 
 function ageGroupToString(ag: Maybe<AgeGroupNode> | undefined): string {

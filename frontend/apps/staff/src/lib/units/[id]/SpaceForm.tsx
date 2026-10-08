@@ -1,12 +1,12 @@
 import React from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { TextInput } from "hds-react";
 import styled from "styled-components";
 import { z } from "zod";
+import { ControlledTextInput } from "@ui/components/form/ControlledTextInput";
 import { ControlledNumberInput } from "ui/src/components/form";
 import { breakpoints } from "ui/src/modules/const";
-import { ControlledTextInput } from "@ui/components/form/ControlledTextInput";
 import { getTranslatedError } from "@/modules/helpers";
 
 const EditorColumns = styled.div`

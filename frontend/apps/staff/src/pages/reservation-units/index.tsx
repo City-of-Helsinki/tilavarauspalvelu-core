@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import { ReservationUnitsDataReader, Filters } from "@lib/reservation-units/";
-import type { SelectedRow } from "@lib/reservation-units/";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import { useToastIfQueryParam } from "ui/src/hooks";
 import { H1, HR } from "ui/src/styled";
+import { UserPermissionChoice } from "@gql/gql-types";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { fetchFilterOptionsSafe, getFilterOptions } from "@/hooks/useFilterOptions";
 import { createClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { UserPermissionChoice } from "@gql/gql-types";
+import { ReservationUnitsDataReader, Filters } from "@lib/reservation-units/";
+import type { SelectedRow } from "@lib/reservation-units/";
 
 function ReservationUnits({ optionsData }: { optionsData: PageProps["optionsData"] }): React.ReactElement {
   const { t } = useTranslation();

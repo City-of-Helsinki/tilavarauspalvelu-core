@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useMedia } from "react-use";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { isBefore } from "date-fns";
 import {
@@ -18,17 +19,16 @@ import {
   Table,
   Tooltip,
 } from "hds-react";
-import type { TFunction } from "i18next";
-import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import styled from "styled-components";
+import type { TFunction } from "i18next";
 import { IconButton } from "ui/src/components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { PopupMenu } from "ui/src/components/PopupMenu";
 import { Sanitize } from "ui/src/components/Sanitize";
-import type { StatusLabelType } from "ui/src/components/StatusLabel";
 import { StatusLabel } from "ui/src/components/StatusLabel";
+import type { StatusLabelType } from "ui/src/components/StatusLabel";
 import { breakpoints } from "ui/src/modules/const";
 import type { DayT } from "ui/src/modules/const";
 import { convertWeekday } from "ui/src/modules/conversion";
@@ -59,11 +59,12 @@ import {
   H5,
   LinkLikeButton,
 } from "ui/src/styled";
-import { AccordionWithIcons } from "@/components/AccordionWithIcons";
-import type { ReservationCancellableReason } from "@/modules/reservation";
-import { isReservationCancellableReason } from "@/modules/reservation";
-import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
-import { getApplicationReservationPath, getApplicationSectionPath, getReservationUnitPath } from "@/modules/urls";
+import {
+  AccessType,
+  AccessTypeWithMultivalued,
+  ReservationStateChoice,
+  useApplicationReservationsQuery,
+} from "@gql/gql-types";
 import type {
   ApplicationNode,
   ApplicationSectionReservationFragment,
@@ -74,12 +75,11 @@ import type {
   PindoraSectionFragment,
   ReservationUnitAccessTypeNode,
 } from "@gql/gql-types";
-import {
-  AccessType,
-  AccessTypeWithMultivalued,
-  ReservationStateChoice,
-  useApplicationReservationsQuery,
-} from "@gql/gql-types";
+import { AccordionWithIcons } from "@/components/AccordionWithIcons";
+import { isReservationCancellableReason } from "@/modules/reservation";
+import type { ReservationCancellableReason } from "@/modules/reservation";
+import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
+import { getApplicationReservationPath, getApplicationSectionPath, getReservationUnitPath } from "@/modules/urls";
 
 const N_RESERVATIONS_TO_SHOW = 20;
 

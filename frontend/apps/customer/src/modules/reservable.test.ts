@@ -1,9 +1,9 @@
-import { createMockIsReservableFieldsFragment, createMockReservableTimes } from "@test/reservation-unit.mocks";
 import { addDays, addHours, addMinutes, endOfDay, startOfDay, startOfToday } from "date-fns";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { createNodeId, toNumber } from "ui/src/modules/helpers";
 import { ReservationStartInterval, ReservationStateChoice } from "@gql/gql-types";
 import type { BlockingReservationFieldsFragment, IsReservableFieldsFragment } from "@gql/gql-types";
+import { createMockIsReservableFieldsFragment, createMockReservableTimes } from "@test/reservation-unit.mocks";
 import {
   clampDuration,
   generateReservableMap,

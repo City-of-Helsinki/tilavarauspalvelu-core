@@ -12,8 +12,8 @@ import {
   startOfDay,
   sub,
 } from "date-fns";
-import type { TFunction } from "i18next";
 import { trim, uniq } from "lodash-es";
+import type { TFunction } from "i18next";
 import { formatters as getFormatters, getReservationPrice, getUnRoundedReservationVolume } from "@ui/index";
 import { getIntervalMinutes } from "@ui/modules/conversion";
 import { formatApiDate, parseApiDate, timeToMinutes } from "@ui/modules/date-utils";
@@ -29,8 +29,6 @@ import {
 } from "@ui/modules/helpers";
 import type { ReadonlyDeep } from "@ui/modules/helpers";
 import type { LocalizationLanguages } from "@ui/modules/urlBuilder";
-import { dateToKey, isRangeReservable, isSlotWithinReservationTime } from "@/modules/reservable";
-import type { ReservableMap, RoundPeriod } from "@/modules/reservable";
 import {
   PriceUnit,
   ReservationKind,
@@ -51,6 +49,8 @@ import type {
   ReservationUnitNode,
   ReservationStartInterval,
 } from "@gql/gql-types";
+import { dateToKey, isRangeReservable, isSlotWithinReservationTime } from "@/modules/reservable";
+import type { ReservableMap, RoundPeriod } from "@/modules/reservable";
 
 export function isReservationUnitPublished(reservationUnit: Pick<ReservationUnitNode, "publishingState">): boolean {
   const { publishingState } = reservationUnit;

@@ -1,6 +1,6 @@
-import type { FetchResult, NextLink, Operation } from "@apollo/client";
 import { ApolloLink, Observable } from "@apollo/client";
 import * as Sentry from "@sentry/nextjs";
+import type { FetchResult, NextLink, Operation } from "@apollo/client";
 
 export class SentryContextLink extends ApolloLink {
   request(operation: Operation, forward?: NextLink): Observable<FetchResult> | null {
