@@ -75,8 +75,8 @@ class AllocatedTimeSlotQuerySet(ModelQuerySet[AllocatedTimeSlot]):
             self
             .filter(
                 day_of_the_week=day_of_the_week,
-                reservation_unit_option__application_section__reservations_begin_date__lt=end_date,
-                reservation_unit_option__application_section__reservations_end_date__gt=begin_date,
+                reservation_unit_option__application_section__reservations_begin_date__lte=end_date,
+                reservation_unit_option__application_section__reservations_end_date__gte=begin_date,
                 reservation_unit_option__reservation_unit__in=(
                     reservation_unit_option.reservation_unit.actions.reservation_units_with_common_hierarchy
                 ),
