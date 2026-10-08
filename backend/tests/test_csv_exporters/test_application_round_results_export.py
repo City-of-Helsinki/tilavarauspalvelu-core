@@ -180,9 +180,9 @@ def test_application_round_results_export__reservation_unit_option_ordering(grap
     writes = mock_writer.get_writes()
     assert len(writes) == 4
 
-    assert ApplicationSectionExportRow(*writes[1]).reservation_unit_name == "one"  # type: ignore
-    assert ApplicationSectionExportRow(*writes[2]).reservation_unit_name == "two"  # type: ignore
-    assert ApplicationSectionExportRow(*writes[3]).reservation_unit_name == "three"  # type: ignore
+    assert ApplicationSectionExportRow(*writes[1]).reservation_unit_name == "one"
+    assert ApplicationSectionExportRow(*writes[2]).reservation_unit_name == "two"
+    assert ApplicationSectionExportRow(*writes[3]).reservation_unit_name == "three"
 
 
 def test_application_round_results_export__allocated_slot_ordering(graphql):

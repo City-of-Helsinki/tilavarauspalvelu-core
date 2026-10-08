@@ -172,6 +172,7 @@ select = [
     "LOG",      # flake8-logging
     "N",        # pep8-naming
     "PERF",     # Perflint
+    "PGH003",   # pygrep-hooks: Use specific rule codes when ignoring type issues
     "PGH004",   # pygrep-hooks: Use specific rule codes when using `noqa`
     "PGH005",   # pygrep-hooks: Mock methods should be called
     "PIE",      # flake8-pie

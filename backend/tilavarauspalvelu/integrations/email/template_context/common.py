@@ -323,7 +323,7 @@ def params_for_access_code_series(*, series: ReservationSeries) -> dict[str, Any
     params["access_code"] = response.access_code
 
     # All reservations in the series should start at the same time, so we can just use the first one.
-    validity = next(iter(response.access_code_validity), None)  # type: ignore
+    validity = next(iter(response.access_code_validity), None)
     if validity is not None:
         begin_time = local_time_string(validity.access_code_begins_at.time())
         end_time = local_time_string(validity.access_code_ends_at.time())

@@ -375,9 +375,9 @@ class ReserveeType(models.TextChoices):
 
     @classproperty
     def organisation_types(cls) -> list[str]:
-        return [  # type: ignore
-            ReserveeType.COMPANY.value,  # type: ignore
-            ReserveeType.NONPROFIT.value,  # type: ignore
+        return [
+            ReserveeType.COMPANY.value,
+            ReserveeType.NONPROFIT.value,
         ]
 
 
