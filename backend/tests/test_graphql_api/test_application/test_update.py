@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tilavarauspalvelu.enums import Priority, Weekday
-from tilavarauspalvelu.models import ApplicationSection, SuitableTimeRange
+from tilavarauspalvelu.models import Application, ApplicationSection, SuitableTimeRange
 from utils.date_utils import local_date, local_time
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory, ApplicationSectionFactory
@@ -37,6 +37,40 @@ def test_update_application__single_field(graphql):
     assert response.has_errors is False, response
     application.refresh_from_db()
     assert application.additional_information == "bar"
+
+
+def test_update_application__applicant__resets_sent_at(graphql):
+    application = ApplicationFactory.create_in_status_received()
+    graphql.force_login(application.user)
+
+    input_data = {
+        "pk": application.pk,
+        "additionalInformation": "bar",
+    }
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response
+
+    application = Application.objects.get(pk=application.pk)
+    assert application.sent_at is None
+
+
+def test_update_application__staff__does_not_reset_sent_at(graphql):
+    application = ApplicationFactory.create_in_status_received()
+    sent_at = application.sent_at
+    graphql.login_with_superuser()
+
+    input_data = {
+        "pk": application.pk,
+        "additionalInformation": "bar",
+    }
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response
+
+    application = Application.objects.get(pk=application.pk)
+    assert application.additional_information == "bar"
+    assert application.sent_at == sent_at
 
 
 def test_update_application__application_sections__replace(graphql):

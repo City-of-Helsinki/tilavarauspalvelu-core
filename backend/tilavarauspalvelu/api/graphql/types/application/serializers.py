@@ -4,6 +4,7 @@ import operator
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any
 
+from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import IntegerPrimaryKeyField
 from rest_framework import serializers
@@ -21,7 +22,7 @@ from utils.fields.serializer import CurrentUserDefaultNullable
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationRound, ApplicationSection, User
-    from tilavarauspalvelu.typing import ErrorList
+    from tilavarauspalvelu.typing import AnyUser, ErrorList
 
 __all__ = [
     "ApplicationCancelSerializer",
@@ -127,9 +128,13 @@ class ApplicationUpdateSerializer(ApplicationCreateSerializer):
         return data
 
     def update(self, instance: Application, validated_data: dict[str, Any]) -> Application:
-        # If a sent application is updated, it needs to be sent and validated again
-        instance.sent_at = None
-        return super().update(instance, validated_data)
+        user: AnyUser = self.context["request"].user
+
+        with transaction.atomic():
+            instance = super().update(instance, validated_data)
+            instance.actions.reset_sent_at_if_changed_by_applicant(user=user)
+
+        return instance
 
 
 class ApplicationWorkingMemoSerializer(NestingModelSerializer):
