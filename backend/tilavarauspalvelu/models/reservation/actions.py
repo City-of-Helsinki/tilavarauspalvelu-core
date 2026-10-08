@@ -367,7 +367,7 @@ class ReservationActions:
 
         invoicing_date: datetime.date | None = None
         if self.should_offer_invoicing():
-            invoicing_date = self.reservation.begins_at.date()
+            invoicing_date = self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
 
         order_params = get_verkkokauppa_order_params(self.reservation, invoicing_date=invoicing_date)
 
@@ -408,7 +408,8 @@ class ReservationActions:
 
         reservation_unit: ReservationUnit = self.reservation.reservation_unit
 
-        pricing = reservation_unit.actions.get_active_pricing(by_date=self.reservation.begins_at.date())
+        begin_date = self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
+        pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
         if pricing is None:
             return False
 
