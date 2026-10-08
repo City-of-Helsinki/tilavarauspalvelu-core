@@ -404,17 +404,20 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
 class ReservationManager(SerializableModelManagerMixin, ModelManager[Reservation, ReservationQuerySet]):
     def delete_unfinished(self) -> None:
         """Delete any reservations that have not completed checkout in time. Handle required integrations."""
-        qs = self.all().unfinished()
+        with transaction.atomic():
+            # Lock the rows, so that a checkout that completes at the same time is not deleted.
+            qs = self.all().unfinished().select_for_update(of=("self",))
+            reservations: list[Reservation] = list(qs)
 
-        reservation: Reservation
-        for reservation in qs:
+            pks = [reservation.pk for reservation in reservations]
+            self.filter(pk__in=pks).delete()
+
+        for reservation in reservations:
             if reservation.access_code_generated_at is not None:
                 try:
-                    PindoraClient.delete_reservation(reservation=reservation)
+                    PindoraClient.delete_reservation(reservation=reservation.ext_uuid)
                 except Exception:  # noqa: BLE001
                     delete_pindora_reservation_task.delay(str(reservation.ext_uuid))
-
-            reservation.delete()
 
     def cancel_handled_with_payment_overdue(self) -> None:
         """Cancel all unpaid handled reservations that were not paid on time. Handle required integrations."""
