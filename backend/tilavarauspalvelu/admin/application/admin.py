@@ -197,6 +197,15 @@ class ApplicationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     self.message_user(request, msg, level=messages.ERROR)
                     proceed = False
 
+                # Reservations have been generated from the allocations, and only a round reset removes them.
+                elif application.application_round.handled_at is not None:
+                    msg = (
+                        f"Application {application.pk} is in a handled application round. "
+                        "Reset the application round instead."
+                    )
+                    self.message_user(request, msg, level=messages.ERROR)
+                    proceed = False
+
             if not proceed:
                 return None
 
