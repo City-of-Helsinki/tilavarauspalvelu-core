@@ -695,6 +695,31 @@ def test_reservation__create__price_calculation__time_based_price(graphql):
     assert reservation.tax_percentage_value == Decimal(10)
 
 
+@freeze_time(local_datetime(2026, 10, 24, 12))
+def test_reservation__create__price_calculation__time_based_price__daylight_saving_time_ends(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        pricings__lowest_price=Decimal(10),
+        pricings__highest_price=Decimal(10),
+        pricings__price_unit=PriceUnit.PER_HOUR,
+        pricings__tax_percentage__value=Decimal(10),
+        pricings__payment_type=PaymentType.ONLINE,
+        payment_product__id=uuid.uuid4(),
+    )
+
+    # Clocks are turned back from 04:00 to 03:00 on this night, so the reservation lasts 7 hours.
+    begins_at = local_datetime(2026, 10, 25, 1)
+    ends_at = local_datetime(2026, 10, 25, 7)
+
+    graphql.login_with_superuser()
+    data = get_create_data(reservation_unit, begins_at=begins_at, ends_at=ends_at)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    assert reservation.price == Decimal(70)
+
+
 def test_reservation__create__price_calculation__future_pricing(graphql):
     now = local_start_of_day()
 
