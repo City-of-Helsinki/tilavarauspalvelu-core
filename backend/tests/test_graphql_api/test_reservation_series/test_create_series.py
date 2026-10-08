@@ -553,6 +553,50 @@ def test_reservation_series__create_series__overlapping_reservations(graphql):
     assert Reservation.objects.count() == 1  # The overlapping reservation still exists
 
 
+def test_reservation_series__create_series__overlapping_reservations__ends_at_midnight(graphql):
+    space = SpaceFactory.create()
+    reservation_unit = ReservationUnitFactory.create(spaces=[space])
+
+    ReservationUnitHierarchy.refresh()
+
+    user = graphql.login_with_superuser()
+    next_year = local_date().year + 1
+
+    start = datetime.date(next_year, 1, 1)
+    end = datetime.date(next_year, 1, 8)
+    reservation_begin = datetime.datetime.combine(end, datetime.time(21), tzinfo=DEFAULT_TIMEZONE)
+    reservation_end = datetime.datetime.combine(end, datetime.time(22), tzinfo=DEFAULT_TIMEZONE)
+
+    ReservationFactory.create(
+        reservation_unit=reservation_unit,
+        begins_at=reservation_begin,
+        ends_at=reservation_end,
+        state=ReservationStateChoice.CONFIRMED,
+    )
+
+    data = get_minimal_series_data(
+        reservation_unit,
+        user,
+        weekdays=[Weekday.from_week_day(start.weekday())],
+        beginDate=start.isoformat(),
+        endDate=end.isoformat(),
+        beginTime=datetime.time(20).isoformat(),
+        endTime=datetime.time(0).isoformat(),
+    )
+    response = graphql(CREATE_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is True
+    assert response.error_message() == "Not all reservations can be made due to overlapping reservations."
+    assert response.errors[0]["extensions"]["overlapping"] == [
+        {
+            "begin": f"{next_year}-01-08T20:00:00+02:00",
+            "end": f"{next_year}-01-09T00:00:00+02:00",
+        },
+    ]
+
+    assert ReservationSeries.objects.count() == 0
+
+
 def test_reservation_series__create_series__block_whole_day(graphql):
     reservation_unit = ReservationUnitFactory.create(reservation_block_whole_day=True)
     user = graphql.login_with_superuser()
