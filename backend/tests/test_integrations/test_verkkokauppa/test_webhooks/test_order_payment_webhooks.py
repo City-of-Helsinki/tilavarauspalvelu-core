@@ -65,6 +65,7 @@ def test_order_payment_webhook__success(api_client, settings):
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(SentryLogger.log_message)
 def test_order_payment_webhook__success__no_reservation(api_client, settings):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
@@ -95,6 +96,50 @@ def test_order_payment_webhook__success__no_reservation(api_client, settings):
     assert payment_order.status == OrderStatus.PAID
     assert payment_order.payment_id
     assert payment_order.processed_at is not None
+
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args[0] == (
+        "Verkkokauppa: Order was paid, but its reservation does not exist or will not happen. Refund it manually."
+    )
+
+
+@patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(SentryLogger.log_message)
+@pytest.mark.parametrize("state", [ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
+def test_order_payment_webhook__success__reservation_will_not_happen(api_client, settings, state):
+    order_id = uuid.uuid4()
+    payment_id = uuid.uuid4()
+
+    reservation = ReservationFactory.create(state=state)
+    PaymentOrderFactory.create(
+        reservation=reservation,
+        remote_id=order_id,
+        status=OrderStatus.EXPIRED,
+        payment_id="",
+        processed_at=None,
+    )
+
+    data = {
+        "orderId": str(order_id),
+        "paymentId": f"{payment_id}_at_20231101-083021",
+        "namespace": settings.VERKKOKAUPPA_NAMESPACE,
+        "eventType": "PAYMENT_PAID",
+    }
+    url = reverse("payment-list")
+
+    VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
+
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == 200, response.data
+
+    reservation.refresh_from_db()
+    assert reservation.state == state
+
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args[0] == (
+        "Verkkokauppa: Order was paid, but its reservation does not exist or will not happen. Refund it manually."
+    )
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
