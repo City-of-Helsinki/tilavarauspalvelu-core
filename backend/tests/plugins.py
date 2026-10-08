@@ -27,8 +27,9 @@ def setup_now_tt():
             """Called when 'freeze_time' is started."""
             from utils.db import NowTT
 
-            # Calculate offset for time travel.
-            delta = self.time_to_freeze - datetime.datetime.now()
+            # Calculate offset for time travel. Freezegun stores 'time_to_freeze' as naive UTC.
+            time_to_freeze = self.time_to_freeze.replace(tzinfo=datetime.UTC)
+            delta = time_to_freeze - datetime.datetime.now(tz=datetime.UTC)
             offset = int(delta.total_seconds())
 
             # Set offset for to database, but ignore errors if test doesn't have database access.
