@@ -486,7 +486,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         qs.update(access_type=models.F("new_access_type"))
 
         # Send emails to reservations that have changed their access type
-        notify_reservation_on_access_type_change_task.delay(reservation_pks=updated_reservations)
+        notify_reservation_on_access_type_change_task.delay_on_commit(reservation_pks=updated_reservations)
 
     def refresh_reservation_unit_product_mapping(self) -> None:
         payment_merchant = self.get_merchant()

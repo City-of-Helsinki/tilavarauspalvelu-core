@@ -30,7 +30,7 @@ def mock_notify_reservation_on_access_type_change_task() -> Generator[NonCallabl
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_unit_update_access_types_for_reservations():
+def test_reservation_unit_update_access_types_for_reservations(django_capture_on_commit_callbacks):
     reservation_unit = ReservationUnitFactory.create()
 
     ReservationUnitAccessTypeFactory.create(
@@ -69,7 +69,10 @@ def test_reservation_unit_update_access_types_for_reservations():
         access_type=AccessType.UNRESTRICTED,
     )
 
-    with mock_notify_reservation_on_access_type_change_task() as mock:
+    with (
+        mock_notify_reservation_on_access_type_change_task() as mock,
+        django_capture_on_commit_callbacks(execute=True),
+    ):
         reservation_unit.actions.update_access_types_for_reservations()
 
     assert mock.call_count == 1
@@ -81,3 +84,29 @@ def test_reservation_unit_update_access_types_for_reservations():
 
     reservation_2.refresh_from_db()
     assert reservation_2.access_type == AccessType.OPENED_BY_STAFF
+
+
+@pytest.mark.django_db
+@freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation_unit_update_access_types_for_reservations__notify_after_commit(django_capture_on_commit_callbacks):
+    reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitAccessTypeFactory.create(
+        begin_date=local_date(2024, 1, 1),
+        reservation_unit=reservation_unit,
+        access_type=AccessType.OPENED_BY_STAFF,
+    )
+    ReservationFactory.create(
+        reservation_unit=reservation_unit,
+        state=ReservationStateChoice.CONFIRMED,
+        begins_at=local_datetime(2024, 1, 1, 14),
+        ends_at=local_datetime(2024, 1, 1, 15),
+        access_type=AccessType.UNRESTRICTED,
+    )
+
+    with mock_notify_reservation_on_access_type_change_task() as task:
+        with django_capture_on_commit_callbacks(execute=True):
+            reservation_unit.actions.update_access_types_for_reservations()
+
+            assert task.call_count == 0
+
+        assert task.call_count == 1

@@ -15,11 +15,12 @@ pytestmark = [
 ]
 
 
-def test_reservation_statistics_export(api_client, settings):
+def test_reservation_statistics_export(api_client, settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    reservation_1 = ReservationFactory.create()
-    reservation_2 = ReservationFactory.create()
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation_1 = ReservationFactory.create()
+        reservation_2 = ReservationFactory.create()
 
     url = reverse("reservation_statistics_export")
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
@@ -91,11 +92,12 @@ def test_reservation_statistics_export(api_client, settings):
     assert data[1]["reservation_uuid"] == str(reservation_2.ext_uuid)
 
 
-def test_reservation_statistics_export__missing_auth(api_client, settings):
+def test_reservation_statistics_export__missing_auth(api_client, settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    ReservationFactory.create()
-    ReservationFactory.create()
+    with django_capture_on_commit_callbacks(execute=True):
+        ReservationFactory.create()
+        ReservationFactory.create()
 
     url = reverse("reservation_statistics_export")
     response = api_client.get(url)
@@ -104,11 +106,12 @@ def test_reservation_statistics_export__missing_auth(api_client, settings):
     assert response.content.decode() == "Not authorized to export reservation statistics."
 
 
-def test_reservation_statistics_export__incorrect_auth(api_client, settings):
+def test_reservation_statistics_export__incorrect_auth(api_client, settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    ReservationFactory.create()
-    ReservationFactory.create()
+    with django_capture_on_commit_callbacks(execute=True):
+        ReservationFactory.create()
+        ReservationFactory.create()
 
     settings.EXPORT_AUTHORIZATION_TOKEN = "CORRECT_TOKEN"
 
@@ -119,11 +122,12 @@ def test_reservation_statistics_export__incorrect_auth(api_client, settings):
     assert response.content.decode() == "Not authorized to export reservation statistics."
 
 
-def test_reservation_statistics_export__only_one(api_client, settings):
+def test_reservation_statistics_export__only_one(api_client, settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    reservation = ReservationFactory.create()
-    ReservationFactory.create()
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create()
+        ReservationFactory.create()
 
     url = reverse("reservation_statistics_export") + f"?only={reservation.ext_uuid}"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
@@ -135,11 +139,12 @@ def test_reservation_statistics_export__only_one(api_client, settings):
     assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
 
 
-def test_reservation_statistics_export__only_two(api_client, settings):
+def test_reservation_statistics_export__only_two(api_client, settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    reservation_1 = ReservationFactory.create()
-    reservation_2 = ReservationFactory.create()
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation_1 = ReservationFactory.create()
+        reservation_2 = ReservationFactory.create()
 
     url = reverse("reservation_statistics_export") + f"?only={reservation_1.ext_uuid},{reservation_2.ext_uuid}"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
@@ -152,11 +157,12 @@ def test_reservation_statistics_export__only_two(api_client, settings):
     assert data[1]["reservation_uuid"] == str(reservation_2.ext_uuid)
 
 
-def test_reservation_statistics_export__tprek_id(api_client, settings):
+def test_reservation_statistics_export__tprek_id(api_client, settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    reservation = ReservationFactory.create(reservation_unit__unit__tprek_id="1")
-    ReservationFactory.create(reservation_unit__unit__tprek_id="2")
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create(reservation_unit__unit__tprek_id="1")
+        ReservationFactory.create(reservation_unit__unit__tprek_id="2")
 
     url = reverse("reservation_statistics_export") + "?tprek_id=1"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
@@ -168,14 +174,15 @@ def test_reservation_statistics_export__tprek_id(api_client, settings):
     assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
 
 
-def test_reservation_statistics_export__begins_after(api_client, settings):
+def test_reservation_statistics_export__begins_after(api_client, settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     begin_1 = local_datetime(2022, 1, 2, 12)
     begin_2 = begin_1 - datetime.timedelta(days=1)
 
-    reservation = ReservationFactory.create(begins_at=begin_1)
-    ReservationFactory.create(begins_at=begin_2)
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create(begins_at=begin_1)
+        ReservationFactory.create(begins_at=begin_2)
 
     url = reverse("reservation_statistics_export") + f"?begins_after={begin_1.isoformat()}"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
@@ -187,14 +194,15 @@ def test_reservation_statistics_export__begins_after(api_client, settings):
     assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
 
 
-def test_reservation_statistics_export__begins_before(api_client, settings):
+def test_reservation_statistics_export__begins_before(api_client, settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     begin_1 = local_datetime(2022, 1, 2, 12)
     begin_2 = begin_1 - datetime.timedelta(days=1)
 
-    ReservationFactory.create(begins_at=begin_1)
-    reservation = ReservationFactory.create(begins_at=begin_2)
+    with django_capture_on_commit_callbacks(execute=True):
+        ReservationFactory.create(begins_at=begin_1)
+        reservation = ReservationFactory.create(begins_at=begin_2)
 
     url = reverse("reservation_statistics_export") + f"?begins_before={begin_1.isoformat()}"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
@@ -206,11 +214,12 @@ def test_reservation_statistics_export__begins_before(api_client, settings):
     assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
 
 
-def test_reservation_statistics_export__start(api_client, settings):
+def test_reservation_statistics_export__start(api_client, settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    ReservationFactory.create()
-    reservation = ReservationFactory.create()
+    with django_capture_on_commit_callbacks(execute=True):
+        ReservationFactory.create()
+        reservation = ReservationFactory.create()
 
     url = reverse("reservation_statistics_export") + "?start=1"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
@@ -222,11 +231,12 @@ def test_reservation_statistics_export__start(api_client, settings):
     assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
 
 
-def test_reservation_statistics_export__stop(api_client, settings):
+def test_reservation_statistics_export__stop(api_client, settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    reservation = ReservationFactory.create()
-    ReservationFactory.create()
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create()
+        ReservationFactory.create()
 
     url = reverse("reservation_statistics_export") + "?stop=1"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
@@ -239,10 +249,11 @@ def test_reservation_statistics_export__stop(api_client, settings):
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_statistics_export__updated_after(api_client, settings):
+def test_reservation_statistics_export__updated_after(api_client, settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    reservation = ReservationFactory.create()
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create()
 
     url = reverse("reservation_statistics_export") + "?updated_after=2024-01-01T00:00:00+02:00"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
@@ -255,10 +266,13 @@ def test_reservation_statistics_export__updated_after(api_client, settings):
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_statistics_export__updated_after__not_in_range(api_client, settings):
+def test_reservation_statistics_export__updated_after__not_in_range(
+    api_client, settings, django_capture_on_commit_callbacks
+):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    ReservationFactory.create()
+    with django_capture_on_commit_callbacks(execute=True):
+        ReservationFactory.create()
 
     url = reverse("reservation_statistics_export") + "?updated_after=2024-01-02T00:00:00+02:00"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
@@ -270,10 +284,11 @@ def test_reservation_statistics_export__updated_after__not_in_range(api_client, 
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_statistics_export__updated_before(api_client, settings):
+def test_reservation_statistics_export__updated_before(api_client, settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    reservation = ReservationFactory.create()
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create()
 
     url = reverse("reservation_statistics_export") + "?updated_before=2024-01-02T00:00:00+02:00"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
@@ -286,10 +301,13 @@ def test_reservation_statistics_export__updated_before(api_client, settings):
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation_statistics_export__updated_before__not_in_range(api_client, settings):
+def test_reservation_statistics_export__updated_before__not_in_range(
+    api_client, settings, django_capture_on_commit_callbacks
+):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    ReservationFactory.create()
+    with django_capture_on_commit_callbacks(execute=True):
+        ReservationFactory.create()
 
     url = reverse("reservation_statistics_export") + "?updated_before=2024-01-01T00:00:00+02:00"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})

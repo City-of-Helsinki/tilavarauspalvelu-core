@@ -29,37 +29,38 @@ pytestmark = [
 ]
 
 
-def test_statistics__create__reservation_creation_creates_statistics(settings):
+def test_statistics__create__reservation_creation_creates_statistics(settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reservation_unit = ReservationUnitFactory.create(name="resu", unit=UnitFactory(name="mesta", tprek_id="1234"))
     reservation_series = ReservationSeriesFactory.create(
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
-    reservation = ReservationFactory.create(
-        age_group=AgeGroup.objects.create(minimum=18, maximum=30),
-        applying_for_free_of_charge=True,
-        begins_at=datetime.datetime(2020, 1, 1, 12, 0, tzinfo=DEFAULT_TIMEZONE),
-        description="movies&popcorn",
-        ends_at=datetime.datetime(2020, 1, 1, 14, 0, tzinfo=DEFAULT_TIMEZONE),
-        free_of_charge_reason="This is some reason.",
-        municipality=MunicipalityChoice.HELSINKI,
-        name="movies",
-        non_subsidised_price=Decimal("11.00"),
-        price=10,
-        purpose=ReservationPurposeFactory(name="PurpleChoice"),
-        reservation_series=reservation_series,
-        reservation_unit=reservation_unit,
-        reservee_address_zip="12345",
-        reservee_identifier="123456789",
-        reservee_organisation_name="Test organisation",
-        reservee_type=ReserveeType.INDIVIDUAL,
-        state=ReservationStateChoice.CREATED.value,
-        tax_percentage_value=24,
-        unit_price=10,
-        working_memo="its like that",
-        user__preferred_language="fi",
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create(
+            age_group=AgeGroup.objects.create(minimum=18, maximum=30),
+            applying_for_free_of_charge=True,
+            begins_at=datetime.datetime(2020, 1, 1, 12, 0, tzinfo=DEFAULT_TIMEZONE),
+            description="movies&popcorn",
+            ends_at=datetime.datetime(2020, 1, 1, 14, 0, tzinfo=DEFAULT_TIMEZONE),
+            free_of_charge_reason="This is some reason.",
+            municipality=MunicipalityChoice.HELSINKI,
+            name="movies",
+            non_subsidised_price=Decimal("11.00"),
+            price=10,
+            purpose=ReservationPurposeFactory(name="PurpleChoice"),
+            reservation_series=reservation_series,
+            reservation_unit=reservation_unit,
+            reservee_address_zip="12345",
+            reservee_identifier="123456789",
+            reservee_organisation_name="Test organisation",
+            reservee_type=ReserveeType.INDIVIDUAL,
+            state=ReservationStateChoice.CREATED.value,
+            tax_percentage_value=24,
+            unit_price=10,
+            working_memo="its like that",
+            user__preferred_language="fi",
+        )
 
     reservation_unit = reservation.reservation_unit
     reservation_series = reservation.reservation_series
@@ -115,100 +116,121 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     assert stat.tax_percentage_value == reservation.tax_percentage_value
 
 
-def test_statistics__update__reservee_address_zip__has_profile_id(settings):
+def test_statistics__create__after_commit(settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    reservation = ReservationFactory.create(
-        user__profile_id="123456789",
-        reservee_address_zip="12345",
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create()
+
+        assert ReservationStatistic.objects.filter(reservation=reservation).exists() is False
+
+    assert ReservationStatistic.objects.filter(reservation=reservation).exists() is True
+
+
+def test_statistics__update__reservee_address_zip__has_profile_id(settings, django_capture_on_commit_callbacks):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create(
+            user__profile_id="123456789",
+            reservee_address_zip="12345",
+        )
 
     stat = ReservationStatistic.objects.first()
     assert stat.reservee_address_zip == reservation.reservee_address_zip
 
 
-def test_statistics__update__reservee_address_zip__no_profile_id(settings):
+def test_statistics__update__reservee_address_zip__no_profile_id(settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    ReservationFactory.create(
-        user__profile_id="",
-        reservee_address_zip="12345",
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        ReservationFactory.create(
+            user__profile_id="",
+            reservee_address_zip="12345",
+        )
 
     stat = ReservationStatistic.objects.first()
     assert stat.reservee_address_zip == ""
 
 
-def test_statistics__update__org_info_for_company(settings):
+def test_statistics__update__org_info_for_company(settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    reservation = ReservationFactory.create(
-        reservee_type=ReserveeType.COMPANY,
-        reservee_organisation_name="Test organisation",
-        reservee_identifier="123456789",
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create(
+            reservee_type=ReserveeType.COMPANY,
+            reservee_organisation_name="Test organisation",
+            reservee_identifier="123456789",
+        )
 
     stat = ReservationStatistic.objects.first()
     assert stat.reservee_organisation_name == reservation.reservee_organisation_name
     assert stat.reservee_id == reservation.reservee_identifier
 
 
-def test_statistics__update__no_org_info_for_individual(settings):
+def test_statistics__update__no_org_info_for_individual(settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    ReservationFactory.create(
-        reservee_type=ReserveeType.INDIVIDUAL,
-        reservee_organisation_name="Test organisation",
-        reservee_identifier="123456789",
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        ReservationFactory.create(
+            reservee_type=ReserveeType.INDIVIDUAL,
+            reservee_organisation_name="Test organisation",
+            reservee_identifier="123456789",
+        )
 
     stat = ReservationStatistic.objects.first()
     assert stat.reservee_organisation_name == ""
     assert stat.reservee_id == ""
 
 
-def test_statistics__update__purpose(settings):
+def test_statistics__update__purpose(settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    reservation = ReservationFactory.create()
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create()
 
     stat = ReservationStatistic.objects.first()
     assert stat.purpose is None
 
     reservation.purpose = ReservationPurposeFactory.create(name="Syy")
-    reservation.save()
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation.save()
 
     stat = ReservationStatistic.objects.first()
     assert stat.purpose == reservation.purpose.id
 
 
-def test_statistics__update__cancel_reason_text(settings):
+def test_statistics__update__cancel_reason_text(settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
-    reservation = ReservationFactory.create()
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create()
 
     stat = ReservationStatistic.objects.first()
     assert stat.cancel_reason_text == ""
 
     reservation.cancel_reason = ReservationCancelReasonChoice.CHANGE_OF_PLANS
-    reservation.save()
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation.save()
 
     stat = ReservationStatistic.objects.first()
     assert stat.cancel_reason_text == "My plans have changed"
 
 
-def test_statistics__update__reservation_unit_updates_statistics(settings):
+def test_statistics__update__reservation_unit_updates_statistics(settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reservation_unit = ReservationUnitFactory.create(name="Test reservation unit", unit__name="Test unit")
-    reservation = ReservationFactory.create(name="Test reservation", reservation_unit=reservation_unit)
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create(name="Test reservation", reservation_unit=reservation_unit)
 
     statistics = ReservationStatistic.objects.first()
     assert statistics.primary_reservation_unit == reservation_unit.id
 
     new_reservation_unit = ReservationUnitFactory.create(name="Another reservation unit", unit__name="Another unit")
     reservation.reservation_unit = new_reservation_unit
-    reservation.save()
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation.save()
 
     statistics = ReservationStatistic.objects.first()
     assert statistics.reservation == reservation
