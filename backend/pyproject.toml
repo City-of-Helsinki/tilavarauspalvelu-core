@@ -214,6 +214,7 @@ extend-select = [
     "DOC403",   # docstring-extraneous-yields
     "DOC502",   # docstring-extraneous-exception
     "E262",     # no-space-after-inline-comment
+    "E266",     # multiple-leading-hashes-for-block-comment
     "FURB101",  # read-whole-file
     "FURB103",  # write-whole-file
     "FURB113",  # repeated-append

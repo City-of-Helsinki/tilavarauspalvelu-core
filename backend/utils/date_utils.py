@@ -56,7 +56,7 @@ __all__ = [
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-### LOCAL TIME ###########################################################################################
+# LOCAL TIME ###########################################################################################
 
 
 def local_datetime(
@@ -215,7 +215,7 @@ def next_hour(*, plus_minutes: int = 0, plus_hours: int = 0, plus_days: int = 0)
     return start_of_hour + datetime.timedelta(hours=1 + plus_hours, minutes=plus_minutes, days=plus_days)
 
 
-### UTC TIME #############################################################################################
+# UTC TIME #############################################################################################
 
 
 def utc_datetime(
@@ -302,7 +302,7 @@ def utc_iso_format(_datetime: datetime.datetime, /) -> str:
     return _datetime.astimezone(datetime.UTC).isoformat(timespec="seconds")
 
 
-### COMMON UTILS #########################################################################################
+# COMMON UTILS #########################################################################################
 
 
 def combine(
