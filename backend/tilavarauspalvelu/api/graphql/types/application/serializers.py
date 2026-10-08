@@ -208,6 +208,17 @@ class ApplicationSendSerializer(NestingModelSerializer):
                 error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_RESERVATION_UNIT_OPTIONS_MISSING)
                 errors.append(error)
 
+            options_outside_round = section.reservation_unit_options.exclude(
+                reservation_unit__in=self.instance.application_round.reservation_units.all()
+            ).order_by("reservation_unit_id")
+            for option in options_outside_round:
+                msg = (
+                    f"Application section {section.pk} has reservation unit {option.reservation_unit_id} "
+                    "that is not in the application round."
+                )
+                code = error_codes.APPLICATION_SECTION_RESERVATION_UNIT_NOT_IN_APPLICATION_ROUND
+                errors.append(ValidationError(msg, code=code))
+
     def validate_suitable_time_ranges(self, section: ApplicationSection, errors: ErrorList) -> None:
         time_ranges = section.suitable_time_ranges.all()
 

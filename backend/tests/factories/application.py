@@ -7,13 +7,13 @@ from django.utils.timezone import now
 from factory import fuzzy
 
 from tilavarauspalvelu.enums import ApplicationStatusChoice, MunicipalityChoice, Priority, ReserveeType, Weekday
-from tilavarauspalvelu.models import Application
+from tilavarauspalvelu.models import Application, ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_time
 
 from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseForeignKeyFactory
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationRound, ReservationUnit
+    from tilavarauspalvelu.models import ApplicationRound
 
 __all__ = [
     "ApplicationBuilder",
@@ -195,7 +195,13 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
                 defaults.setdefault("application_sections__suitable_time_ranges__begin_time", local_time(10, 0))
                 defaults.setdefault("application_sections__suitable_time_ranges__end_time", local_time(11, 0))
 
-        return cls.create(**defaults)
+        application = cls.create(**defaults)
+
+        reservation_units = ReservationUnit.objects.filter(
+            reservation_unit_options__application_section__application=application,
+        )
+        application_round.reservation_units.add(*reservation_units)
+        return application
 
     @classmethod
     def create_application_ready_for_allocation(
