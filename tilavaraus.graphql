@@ -542,10 +542,6 @@ type Query {
   ): ReservationPurposeNodeConnection
   ageGroups(first: Int, last: Int, offset: Int, after: String, before: String): AgeGroupNodeConnection
   order(orderUuid: String!): PaymentOrderNode
-  user(
-    """The ID of the object"""
-    id: ID!
-  ): UserNode
   currentUser: UserNode
   checkPermissions(permission: UserPermissionChoice!, units: [Int!], requireAll: Boolean = false): PermissionCheckerType
 
