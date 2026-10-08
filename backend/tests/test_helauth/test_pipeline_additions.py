@@ -219,7 +219,7 @@ def test_migrate_from_tunnistamo_to_keycloak():
         date_joined=local_datetime(2022, 1, 1),
     )
 
-    migrate_from_tunnistamo_to_keycloak(email=new_user.email)
+    migrate_from_tunnistamo_to_keycloak(user=new_user, email=new_user.email)
 
     application.refresh_from_db()
     reservation.refresh_from_db()
@@ -247,3 +247,40 @@ def test_migrate_from_tunnistamo_to_keycloak():
 
     assert oldest_user.is_active is False
     assert oldest_user.last_name == "Oldest EXPIRED"
+
+
+def test_migrate_from_tunnistamo_to_keycloak__newer_account_is_not_the_logged_in_user():
+    ad_user = UserFactory.create(
+        last_name="AD",
+        email="foo@example.com",
+        profile_id="",
+        is_staff=True,
+        is_superuser=True,
+        is_active=True,
+        date_joined=local_datetime(2022, 1, 1),
+    )
+    unit_role = UnitRoleFactory.create(user=ad_user)
+
+    newer_user = UserFactory.create(
+        last_name="Newer",
+        email="foo@example.com",
+        profile_id="",
+        is_staff=False,
+        is_superuser=False,
+        is_active=True,
+        date_joined=local_datetime(2023, 1, 1),
+    )
+
+    migrate_from_tunnistamo_to_keycloak(user=ad_user, email=ad_user.email)
+
+    unit_role.refresh_from_db()
+    ad_user.refresh_from_db()
+    newer_user.refresh_from_db()
+
+    assert unit_role.user == ad_user
+
+    assert ad_user.is_active is True
+    assert ad_user.is_superuser is True
+
+    assert newer_user.is_active is True
+    assert newer_user.is_superuser is False
