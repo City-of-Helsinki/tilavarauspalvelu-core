@@ -70,6 +70,34 @@ def test_notify_reservation_on_access_type_change_task__dont_send_for_past_reser
 
 @pytest.mark.django_db
 @freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.parametrize(
+    "state",
+    [
+        ReservationStateChoice.CANCELLED,
+        ReservationStateChoice.DENIED,
+        ReservationStateChoice.CREATED,
+        ReservationStateChoice.WAITING_FOR_PAYMENT,
+        ReservationStateChoice.REQUIRES_HANDLING,
+    ],
+)
+@patch_method(EmailService.send_reservation_access_type_changed_email)
+@patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
+def test_notify_reservation_on_access_type_change_task__dont_send_for_unconfirmed_reservations(state):
+    reservation = ReservationFactory.create(
+        state=state,
+        begins_at=local_datetime(2024, 1, 1, 14),
+        ends_at=local_datetime(2024, 1, 1, 15),
+        access_type=AccessType.OPENED_BY_STAFF,
+    )
+
+    notify_reservation_on_access_type_change_task(reservation_pks=[reservation.pk])
+
+    assert EmailService.send_reservation_access_type_changed_email.call_count == 0
+    assert EmailService.send_seasonal_booking_access_type_changed_email.call_count == 0
+
+
+@pytest.mark.django_db
+@freeze_time(local_datetime(2024, 1, 1, 12))
 @patch_method(EmailService.send_reservation_access_type_changed_email)
 @patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
 def test_notify_reservation_on_access_type_change_task__seasonal_bookings():
@@ -136,6 +164,28 @@ def test_notify_reservation_on_access_type_change_task__seasonal_bookings__dont_
 
     assert EmailService.send_reservation_access_type_changed_email.call_count == 0
     assert EmailService.send_seasonal_booking_access_type_changed_email.call_count == 1
+
+
+@pytest.mark.django_db
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@patch_method(EmailService.send_reservation_access_type_changed_email)
+@patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
+def test_notify_reservation_on_access_type_change_task__seasonal_bookings__dont_send_for_cancelled_reservations():
+    section = ApplicationSectionFactory.create()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.CANCELLED,
+        type=ReservationTypeChoice.SEASONAL,
+        begins_at=local_datetime(2024, 1, 1, 14),
+        ends_at=local_datetime(2024, 1, 1, 15),
+        access_type=AccessType.OPENED_BY_STAFF,
+        reservation_series__allocated_time_slot__reservation_unit_option__application_section=section,
+    )
+
+    notify_reservation_on_access_type_change_task(reservation_pks=[reservation.pk])
+
+    assert EmailService.send_reservation_access_type_changed_email.call_count == 0
+    assert EmailService.send_seasonal_booking_access_type_changed_email.call_count == 0
 
 
 @pytest.mark.django_db
