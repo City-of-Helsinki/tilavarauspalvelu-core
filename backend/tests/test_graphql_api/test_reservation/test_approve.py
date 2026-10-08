@@ -188,6 +188,8 @@ def test_reservation__approve__paid__in_webshop__paid_on_site_since_begin_too_cl
     assert payment_order.status == OrderStatus.PAID_MANUALLY
 
 
+@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_reservation_requires_payment_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_same_price(graphql):
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
@@ -207,6 +209,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_
         price_net=Decimal("8.44"),
         price_vat=Decimal("2.15"),
         price_total=Decimal("10.59"),
+        handled_payment_due_by=local_datetime(2023, 12, 30, 12),
     )
 
     graphql.login_with_superuser()
@@ -223,6 +226,9 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_
     # Same payment order should be reused
     assert hasattr(reservation, "payment_order")
     assert reservation.payment_order == payment_order
+
+    assert EmailService.send_reservation_confirmed_email.call_count == 1
+    assert EmailService.send_reservation_requires_payment_email.call_count == 0
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
