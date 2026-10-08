@@ -7,9 +7,9 @@ import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import PriceUnit
-from utils.date_utils import local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
-from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory, ReservationUnitPricingFactory
 
 # Applied to all tests
 pytestmark = [
@@ -86,6 +86,24 @@ def test_calculate_reservation_price__pricing_is_fixed_even_when_duration_is_dou
     price = pricing.actions.calculate_reservation_price(duration=end - begin)
 
     assert price == pricing.lowest_price
+
+
+def test_calculate_full_price__duration_over_daylight_saving_time_change():
+    reservation_unit = ReservationUnitFactory.create(
+        pricings__price_unit=PriceUnit.PER_HOUR,
+        pricings__lowest_price=Decimal(5),
+        pricings__highest_price=Decimal(10),
+    )
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
+
+    begin = datetime.datetime(2026, 10, 25, 1, 0, tzinfo=DEFAULT_TIMEZONE)
+    end = datetime.datetime(2026, 10, 25, 7, 0, tzinfo=DEFAULT_TIMEZONE)
+
+    price = reservation.actions.calculate_full_price(begin, end)
+
+    pricing = reservation_unit.pricings.get()
+    price_for_seven_hours = pricing.actions.calculate_reservation_price(duration=datetime.timedelta(hours=7))
+    assert price == price_for_seven_hours
 
 
 def test_get_active_pricing__future_has_same_tax_percentage():

@@ -230,6 +230,28 @@ def test_reservation__adjust_time__new_time_duration_over_max_duration(graphql):
     ]
 
 
+@freezegun.freeze_time(local_datetime(2026, 10, 24, 12))
+def test_reservation__adjust_time__new_time_duration_over_max_duration__daylight_saving_time_ends(graphql):
+    reservation = ReservationFactory.create_for_time_adjustment(
+        reservation_unit__max_reservation_duration=datetime.timedelta(hours=6, minutes=30),
+    )
+
+    graphql.login_with_superuser()
+
+    # Clocks are turned back from 04:00 to 03:00 on this night, so the new time lasts 7 hours.
+    data = get_adjust_data(
+        reservation,
+        beginsAt=local_datetime(2026, 10, 25, 1).isoformat(),
+        endsAt=local_datetime(2026, 10, 25, 7).isoformat(),
+    )
+    response = graphql(ADJUST_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation duration exceeds reservation unit's maximum allowed duration."
+    ]
+
+
 def test_reservation__adjust_time__overlaps_with_buffer_time(graphql):
     reservation = ReservationFactory.create_for_time_adjustment()
 
