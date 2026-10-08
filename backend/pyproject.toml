@@ -101,7 +101,6 @@ target-version = "py313"
 extend-exclude = [
     "local_settings.py",
     "migrations",
-    "config/settings.py",
 ]
 
 [tool.ruff.format]
@@ -313,6 +312,9 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
 "local_settings*.py" = [
     "ERA001",   # Commented code is fine here.
     "I002"      # missing-required-import
+]
+"config/settings.py" = [
+    "S101",     # Asserts validate the local settings.
 ]
 "utils/date_utils.py" = [
     "PLR0917",  # Can have as many positional arguments as needed.

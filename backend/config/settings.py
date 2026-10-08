@@ -4,7 +4,7 @@ from __future__ import annotations
 import os
 import zoneinfo
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import dj_database_url
 from corsheaders.defaults import default_headers
@@ -241,7 +241,7 @@ class Common(Environment):
     APP_LOGGING_LEVEL = values.StringValue(default="WARNING")
 
     @classproperty
-    def LOGGING(cls):
+    def LOGGING(cls) -> dict[str, Any]:
         return {
             "version": 1,
             "disable_existing_loggers": False,
@@ -286,7 +286,7 @@ class Common(Environment):
     AUDIT_LOG_ES_INDEX = values.StringValue(default="")
 
     @classproperty
-    def RESILIENT_LOGGER(cls):
+    def RESILIENT_LOGGER(cls) -> dict[str, Any]:
         return {
             "origin": "tilavarauspalvelu-core",
             "environment": cls.AUDIT_LOG_ENV,
@@ -383,14 +383,14 @@ class Common(Environment):
     )
 
     @classproperty
-    def OIDC_AUTH(cls):
+    def OIDC_AUTH(cls) -> dict[str, Any]:
         # See 'oidc_auth/settings.py'
         return {
             "OIDC_LEEWAY": cls.OIDC_LEEWAY,
         }
 
     @classproperty
-    def OIDC_API_TOKEN_AUTH(cls):
+    def OIDC_API_TOKEN_AUTH(cls) -> dict[str, Any]:
         # See 'helusers/settings.py'
         return {
             "API_AUTHORIZATION_FIELD": "authorization.permissions.scopes",
@@ -492,7 +492,7 @@ class Common(Environment):
         return "filesystem://"
 
     @classproperty
-    def CELERY_BROKER_TRANSPORT_OPTIONS(cls):
+    def CELERY_BROKER_TRANSPORT_OPTIONS(cls) -> dict[str, Any]:
         # Use filesystem as message broker
         return {
             "data_folder_out": cls.CELERY_QUEUE_FOLDER_OUT,
@@ -506,7 +506,7 @@ class Common(Environment):
     REDIS_URL = values.StringValue()
 
     @classproperty
-    def CACHES(cls):
+    def CACHES(cls) -> dict[str, Any]:
         return {
             "default": {
                 "BACKEND": "django_redis.cache.RedisCache",
@@ -825,11 +825,11 @@ class Docker(Common, overrides_from=DockerMixin):
     AUTO_CREATE_CELERY_TASKS = True
 
     @classproperty
-    def CELERY_BROKER_URL(cls):
+    def CELERY_BROKER_URL(cls) -> str:
         return cls.REDIS_URL
 
     @classproperty
-    def CELERY_BROKER_TRANSPORT_OPTIONS(cls):
+    def CELERY_BROKER_TRANSPORT_OPTIONS(cls) -> dict[str, Any]:
         return {}
 
     HAUKI_API_KEY = values.StringValue(default=None)
@@ -1026,7 +1026,7 @@ class Platta(Common, use_environ=True):
     # --- Database settings ------------------------------------------------------------------------------------------
 
     @classproperty
-    def DATABASES(cls):
+    def DATABASES(cls) -> dict[str, Any]:
         database_url = os.environ["DATABASE_URL"]
         config = dj_database_url.parse(database_url)
         config["CONN_MAX_AGE"] = int(os.getenv("CONN_MAX_AGE", "0"))
@@ -1066,7 +1066,7 @@ class Platta(Common, use_environ=True):
     # --- Misc settings ----------------------------------------------------------------------------------------------
 
     @classproperty
-    def CACHES(cls):
+    def CACHES(cls) -> dict[str, Any]:
         sentinel_host, sentinel_port = cls.REDIS_SENTINEL_SERVICE.split(":")
         return {
             "default": {
@@ -1090,7 +1090,7 @@ class Platta(Common, use_environ=True):
         return f"sentinel://:{cls.REDIS_PASSWORD}@{cls.REDIS_SENTINEL_SERVICE}"
 
     @classproperty
-    def CELERY_BROKER_TRANSPORT_OPTIONS(cls):
+    def CELERY_BROKER_TRANSPORT_OPTIONS(cls) -> dict[str, Any]:
         # Use redis as message broker
         return {
             "master_name": cls.REDIS_MASTER.removeprefix("redis://"),
@@ -1131,7 +1131,7 @@ class MidHook(EmptyDefaults, Platta, use_environ=True):
     DEBUG = True
 
     @classproperty
-    def DATABASES(cls):
+    def DATABASES(cls) -> dict[str, Any]:
         database_url = os.environ["DATABASE_URL"]
         config = dj_database_url.parse(database_url)
         config["CONN_MAX_AGE"] = int(os.getenv("CONN_MAX_AGE", "0"))
