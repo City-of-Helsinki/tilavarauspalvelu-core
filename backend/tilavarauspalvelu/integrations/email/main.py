@@ -534,11 +534,8 @@ class EmailService:
         if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
             return
 
-        reservation = application_section.actions.get_last_reservation()
+        reservation = application_section.actions.get_last_cancelled_reservation()
         if reservation is None:
-            return
-
-        if reservation.cancel_reason is None:
             return
 
         recipients = get_application_email_recipients(application=application_section.application)
@@ -567,11 +564,8 @@ class EmailService:
         if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
             return
 
-        reservation = application_section.actions.get_last_reservation()
+        reservation = application_section.actions.get_last_cancelled_reservation()
         if reservation is None:
-            return
-
-        if reservation.cancel_reason is None:
             return
 
         recipients_by_language = get_application_section_staff_notification_recipients_by_language(application_section)

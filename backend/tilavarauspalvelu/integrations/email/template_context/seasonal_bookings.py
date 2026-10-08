@@ -231,7 +231,7 @@ def get_context_for_seasonal_booking_cancelled_all(
     **data: Unpack[SeasonalBookingCancelledAllContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_CANCELLED_ALL]:
     if section is not None:
-        reservation: Reservation = section.actions.get_last_reservation()
+        reservation: Reservation = section.actions.get_last_cancelled_reservation()
         application_round = section.application.application_round
 
         cancel_reason = ReservationCancelReasonChoice(reservation.cancel_reason)
@@ -265,7 +265,7 @@ def get_context_for_seasonal_booking_cancelled_all_staff_notification(
     **data: Unpack[SeasonalBookingCancelledAllStaffNotificationContext],
 ) -> Annotated[EmailContext, EmailType.SEASONAL_BOOKING_CANCELLED_ALL_STAFF_NOTIFICATION]:
     if section is not None:
-        reservation: Reservation = section.actions.get_last_reservation()
+        reservation: Reservation = section.actions.get_last_cancelled_reservation()
         application_round = section.application.application_round
 
         cancel_reason = ReservationCancelReasonChoice(reservation.cancel_reason)
