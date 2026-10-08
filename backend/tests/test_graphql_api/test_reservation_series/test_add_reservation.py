@@ -40,6 +40,10 @@ def test_reservation_series__add_reservation(graphql):
 
     assert series.reservations.count() == 10
 
+    reservation: Reservation = series.reservations.order_by("pk").last()
+    assert reservation.begins_at == datetime.datetime(2024, 1, 2, 10, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.ends_at == datetime.datetime(2024, 1, 2, 12, tzinfo=DEFAULT_TIMEZONE)
+
 
 @freeze_time(local_datetime(2024, 1, 1))
 def test_reservation_series__add_reservation__overlapping(graphql):
