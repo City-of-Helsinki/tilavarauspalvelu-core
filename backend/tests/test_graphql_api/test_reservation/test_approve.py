@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from decimal import Decimal
 
 import pytest
@@ -222,6 +223,38 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_
     # Same payment order should be reused
     assert hasattr(reservation, "payment_order")
     assert reservation.payment_order == payment_order
+
+
+@freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation__approve__paid__in_webshop__has_payment__paid_online__refund_in_progress(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 2, 12),
+        ends_at=local_datetime(2024, 1, 2, 13),
+    )
+
+    PaymentOrderFactory.create(
+        reservation=reservation,
+        payment_type=PaymentType.ONLINE,
+        status=OrderStatus.PAID,
+        refund_id=uuid.uuid4(),
+        price_net=Decimal("8.44"),
+        price_vat=Decimal("2.15"),
+        price_total=Decimal("10.59"),
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation, price="10.59")
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation has a payment order with a refund in progress."]
+
+    reservation = Reservation.objects.get(pk=reservation.pk)
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
