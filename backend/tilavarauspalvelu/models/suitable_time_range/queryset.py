@@ -7,7 +7,7 @@ from lookup_property import L
 
 from tilavarauspalvelu.models import SuitableTimeRange
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
-from utils.date_utils import merge_time_slots
+from utils.date_utils import end_time_as_timedelta, merge_time_slots
 
 if TYPE_CHECKING:
     import datetime
@@ -49,7 +49,10 @@ class SuitableTimeRangeQuerySet(ModelQuerySet[SuitableTimeRange]):
 
         # If the given time slot fits fully in any of the existing merged time ranges,
         # it can be allocated. Otherwise, it cannot be allocated.
-        return any(begin_time >= slot["begin_time"] and end_time <= slot["end_time"] for slot in merged)
+        end = end_time_as_timedelta(end_time)
+        return any(
+            begin_time >= slot["begin_time"] and end <= end_time_as_timedelta(slot["end_time"]) for slot in merged
+        )
 
     def fulfilled(self, *, value: bool) -> Self:
         return self.filter(L(fulfilled=value))

@@ -401,6 +401,7 @@ def merge_time_slots(time_slots: list[TimeSlot]) -> list[TimeSlot]:
     """
     Merge time slots that overlap or touch each other.
     Time slots should be in chronological order, and on the same day.
+    An end time of 00:00 is the end of the day.
     """
     merged_slots = time_slots[:1]
 
@@ -408,8 +409,8 @@ def merge_time_slots(time_slots: list[TimeSlot]) -> list[TimeSlot]:
     for period in time_slots[1:]:
         last_period = merged_slots[-1]
         # If time periods overlap, or are next to each other -> merge them and continue.
-        if last_period["end_time"] >= period["begin_time"]:
-            last_period["end_time"] = max(period["end_time"], last_period["end_time"])
+        if end_time_as_timedelta(last_period["end_time"]) >= time_as_timedelta(period["begin_time"]):
+            last_period["end_time"] = max(period["end_time"], last_period["end_time"], key=end_time_as_timedelta)
             continue
 
         # Otherwise the periods are not contiguous -> append the period and continue.

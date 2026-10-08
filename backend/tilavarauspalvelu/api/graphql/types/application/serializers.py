@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import operator
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any
 
@@ -224,7 +225,8 @@ class ApplicationSendSerializer(NestingModelSerializer):
             time_slots[weekday].append(timeslot)
 
         for weekday in list(time_slots):
-            time_slots[weekday] = merge_time_slots(time_slots[weekday])
+            ordered_time_slots = sorted(time_slots[weekday], key=operator.itemgetter("begin_time"))
+            time_slots[weekday] = merge_time_slots(ordered_time_slots)
 
         # Check that each weekday has a contiguous time range long enough for an allocation.
         for weekday, timeslots in time_slots.items():
