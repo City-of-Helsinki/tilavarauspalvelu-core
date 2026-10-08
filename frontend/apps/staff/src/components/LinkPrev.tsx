@@ -1,6 +1,6 @@
 import React from "react";
-import { IconAngleLeft, IconSize } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { IconAngleLeft, IconSize } from "hds-react";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { focusStyles, removeButtonStyles } from "ui/src/styled";

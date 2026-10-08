@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
+import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { TermsBox } from "ui/src/components/TermsBox";
-import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import type { TermsOfUseTextFieldsFragment, Maybe, TermsOfUseFragment } from "@gql/gql-types";
 
 export function AcceptTerms({

@@ -1,7 +1,7 @@
 import React from "react";
-import type { NotificationProps } from "hds-react";
 import { IconAlertCircleFill, IconErrorFill, IconSize, Notification } from "hds-react";
 import styled from "styled-components";
+import type { NotificationProps } from "hds-react";
 
 type Props = {
   children: React.ReactNode;

@@ -1,28 +1,10 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import type { UseFormReturn } from "react-hook-form";
-import { ApolloError, gql } from "@apollo/client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  convertReservationUnit,
-  ReservationUnitEditSchema,
-  transformReservationUnit,
-  SeasonalSection,
-  DisplayUnit,
-  BottomButtonsStripe,
-  BasicSection,
-  TermsSection,
-  DescriptionSection,
-  OpeningHoursSection,
-  CommunicationSection,
-  AccessTypeSection,
-  ReservationUnitSettingsSection,
-  PricingSection,
-  ErrorInfo,
-} from "@lib/reservation-units/[pk]/";
-import type { ImageFormType, ReservationUnitEditFormValues } from "@lib/reservation-units/[pk]/";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { ApolloError, gql } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
@@ -32,12 +14,6 @@ import { useToastIfQueryParam } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
-import { AuthorizationChecker } from "@/components/AuthorizationChecker";
-import { Error404 } from "@/components/Error404";
-import { useEnvContext } from "@/context/EnvContext";
-import { useModal } from "@/context/ModalContext";
-import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { getReservationUnitUrl } from "@/modules/urls";
 import {
   EquipmentOrderingChoices,
   ReservationUnitImageType,
@@ -59,6 +35,30 @@ import type {
   ReservationUnitEditQuery,
   UpdateReservationUnitMutation,
 } from "@gql/gql-types";
+import { AuthorizationChecker } from "@/components/AuthorizationChecker";
+import { Error404 } from "@/components/Error404";
+import { useEnvContext } from "@/context/EnvContext";
+import { useModal } from "@/context/ModalContext";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { getReservationUnitUrl } from "@/modules/urls";
+import {
+  convertReservationUnit,
+  ReservationUnitEditSchema,
+  transformReservationUnit,
+  SeasonalSection,
+  DisplayUnit,
+  BottomButtonsStripe,
+  BasicSection,
+  TermsSection,
+  DescriptionSection,
+  OpeningHoursSection,
+  CommunicationSection,
+  AccessTypeSection,
+  ReservationUnitSettingsSection,
+  PricingSection,
+  ErrorInfo,
+} from "@lib/reservation-units/[pk]/";
+import type { ImageFormType, ReservationUnitEditFormValues } from "@lib/reservation-units/[pk]/";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;

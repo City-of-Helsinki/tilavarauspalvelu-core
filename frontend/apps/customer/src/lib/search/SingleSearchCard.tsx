@@ -1,17 +1,17 @@
 import React from "react";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { isToday, isTomorrow, isValid } from "date-fns";
 import { IconArrowRight, IconEuroSign, IconGroup, IconHome, IconLock, IconSize } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
 import { Card, Tag } from "ui/src/components/";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { formatDate, formatTime } from "ui/src/modules/date-utils";
 import { getImageSource, getLocalizationLang, getTranslation, getMainImage } from "ui/src/modules/helpers";
+import type { SingleSearchCardFragment } from "@gql/gql-types";
 import { isBrowser } from "@/modules/const";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
-import type { SingleSearchCardFragment } from "@gql/gql-types";
 
 function StatusTag(props: Pick<SingleSearchCardFragment, "isClosed" | "firstReservableDatetime">): React.ReactElement {
   const { t } = useTranslation();

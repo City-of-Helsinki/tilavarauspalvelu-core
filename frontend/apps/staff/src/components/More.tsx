@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import type { ApolloQueryResult } from "@apollo/client";
-import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
+import type { ApolloQueryResult } from "@apollo/client";
 import { Flex } from "ui/src/styled";
 import type { PageInfo, Query } from "@gql/gql-types";
 

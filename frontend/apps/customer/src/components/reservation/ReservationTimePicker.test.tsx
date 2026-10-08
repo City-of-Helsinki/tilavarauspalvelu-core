@@ -1,12 +1,12 @@
 import React from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { createMockReservableTimes, createMockReservationUnit } from "@test/reservation-unit.mocks";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { formatDate, formatTime } from "ui/src/modules/date-utils";
-import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import type { BlockingReservationFieldsFragment, ReservationTimePickerFieldsFragment } from "@gql/gql-types";
+import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
+import { createMockReservableTimes, createMockReservationUnit } from "@test/reservation-unit.mocks";
 import { ReservationTimePicker } from "./ReservationTimePicker";
 
 const {

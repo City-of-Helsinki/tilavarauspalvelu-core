@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react";
+import { useTranslation } from "next-i18next";
 import { ApolloError, gql } from "@apollo/client";
 import { IconGroup } from "hds-react";
 import { trim } from "lodash-es";
-import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { PopupMenu } from "ui/src/components/PopupMenu";
@@ -10,14 +10,14 @@ import { errorToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { truncate } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
+import { useDeleteSpaceMutation } from "@gql/gql-types";
+import type { Maybe, SpacesTableFragment } from "@gql/gql-types";
 import { CustomTable } from "@/components/Table";
 import { useModal } from "@/context/ModalContext";
 import { MAX_NAME_LENGTH } from "@/modules/const";
 import { getSpaceUrl } from "@/modules/urls";
 import { TableLink } from "@/styled";
 import { FixedDialog } from "@/styled/FixedDialog";
-import { useDeleteSpaceMutation } from "@gql/gql-types";
-import type { Maybe, SpacesTableFragment } from "@gql/gql-types";
 import { NewSpaceModal } from "./new-space-modal/NewSpaceModal";
 
 type SpaceT = SpacesTableFragment["spaces"][0];

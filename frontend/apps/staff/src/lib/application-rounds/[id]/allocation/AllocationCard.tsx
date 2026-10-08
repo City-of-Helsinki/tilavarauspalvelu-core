@@ -1,16 +1,16 @@
 import React from "react";
-import type { ApolloQueryResult } from "@apollo/client";
-import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import styled from "styled-components";
+import type { ApolloQueryResult } from "@apollo/client";
 import { formatDuration, timeToMinutes } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { Flex, fontMedium, H5, SemiBold, Strong } from "ui/src/styled";
+import { Priority } from "@gql/gql-types";
+import type { ApplicationSectionAllocationsQuery } from "@gql/gql-types";
 import { Accordion } from "@/components/Accordion";
 import { NotificationInline } from "@/components/NotificationInline";
 import { getApplicantName } from "@/modules/helpers";
-import { Priority } from "@gql/gql-types";
-import type { ApplicationSectionAllocationsQuery } from "@gql/gql-types";
 import { useAcceptSlotMutation, useRefreshApplications, useRemoveAllocation } from "./hooks";
 import {
   createDurationString,

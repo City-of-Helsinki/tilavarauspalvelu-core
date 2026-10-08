@@ -1,8 +1,7 @@
 import React from "react";
-import { gql } from "@apollo/client";
-import { TimeframeStatus } from "@lib/application-rounds";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { errorToast } from "ui/src/components/toast";
@@ -10,10 +9,11 @@ import { breakpoints } from "ui/src/modules/const";
 import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { H1, H3, SemiBold, Strong, CenterSpinner, Flex, TitleSection } from "ui/src/styled";
+import { useApplicationRoundCriteriaQuery, UserPermissionChoice } from "@gql/gql-types";
 import { Accordion as AccordionBase } from "@/components/Accordion";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { useApplicationRoundCriteriaQuery, UserPermissionChoice } from "@gql/gql-types";
+import { TimeframeStatus } from "@lib/application-rounds";
 
 const Accordion = styled(AccordionBase)`
   && > div > h2 {

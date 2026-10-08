@@ -1,17 +1,17 @@
 import React, { forwardRef } from "react";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconSize } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { ReservationStatusLabel, OrderStatusLabel } from "ui/src/components/statuses";
 import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
 import { Flex, TitleSection, H1 } from "ui/src/styled";
+import { useReservationApplicationLinkQuery, UserPermissionChoice } from "@gql/gql-types";
+import type { ReservationTitleSectionFieldsFragment } from "@gql/gql-types";
 import { ExternalLink } from "@/components/ExternalLink";
 import { useSession } from "@/hooks";
 import { hasPermission } from "@/modules/permissionHelper";
 import { getName } from "@/modules/reservation";
 import { getApplicationUrl } from "@/modules/urls";
-import { useReservationApplicationLinkQuery, UserPermissionChoice } from "@gql/gql-types";
-import type { ReservationTitleSectionFieldsFragment } from "@gql/gql-types";
 
 type Props = Readonly<{
   reservation: ReservationTitleSectionFieldsFragment;

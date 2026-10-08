@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import type { GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addYears } from "date-fns";
 import { StepState } from "hds-react";
-import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
+import { ReservationEditPageDocument, MunicipalityChoice } from "@gql/gql-types";
+import type { ReservationEditPageQuery, ReservationEditPageQueryVariables } from "@gql/gql-types";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { EditStep0, EditStep1 } from "@/lib/reservation/[id]/edit";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -21,8 +23,6 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
 import { ReservationPageWrapper, ReservationTitleSection } from "@/styled/reservation";
 import { StyledStepper } from "@/styled/utils";
-import { ReservationEditPageDocument, MunicipalityChoice } from "@gql/gql-types";
-import type { ReservationEditPageQuery, ReservationEditPageQueryVariables } from "@gql/gql-types";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

@@ -1,5 +1,5 @@
-import type { ApolloClient, NormalizedCacheObject } from "@apollo/client";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import type { ApolloClient, NormalizedCacheObject } from "@apollo/client";
 import { TermsOfUseTypeChoices } from "@gql/gql-types";
 import {
   getCommonServerSideProps,

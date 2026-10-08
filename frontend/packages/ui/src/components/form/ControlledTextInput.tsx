@@ -1,7 +1,7 @@
 import React from "react";
 import type { CSSProperties } from "react";
-import type { FieldValues, UseControllerProps } from "react-hook-form";
 import { useController } from "react-hook-form";
+import type { FieldValues, UseControllerProps } from "react-hook-form";
 import { TextInput, Tooltip } from "hds-react";
 import styled from "styled-components";
 import { CharacterCounter } from "@ui/components/form/CharacterCounter";

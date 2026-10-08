@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from "react";
 import type { ParsedUrlQuery } from "node:querystring";
+import { useTranslation } from "next-i18next";
 import { gql, useApolloClient } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
+import { isNotFoundError } from "@ui/modules/apollo/helpers";
 import { NotificationWrapper } from "ui/src/components/NotificationWrapper";
 import { errorToast, successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId, filterNonNullable, getLocalizationLang } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
-import { isNotFoundError } from "@ui/modules/apollo/helpers";
-import { useCurrentUser } from "@/hooks";
-import { getCheckoutUrl } from "@/modules/reservation";
-import { getReservationInProgressPath } from "@/modules/urls";
 import {
   ReservationOrderingChoices,
   ReservationStateChoice,
@@ -25,6 +22,9 @@ import {
   useReservationStateLazyQuery,
 } from "@gql/gql-types";
 import type { ReservationNotificationFragment } from "@gql/gql-types";
+import { useCurrentUser } from "@/hooks";
+import { getCheckoutUrl } from "@/modules/reservation";
+import { getReservationInProgressPath } from "@/modules/urls";
 
 const BodyText = styled.p`
   margin: 0;

@@ -1,14 +1,14 @@
 import { MockedProvider } from "@apollo/client/testing";
-import type { MockedResponse } from "@apollo/client/testing";
-import { createMockReservation, createOptionsMock } from "@test/reservation.mocks";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getCheckoutUrl } from "@/modules/reservation";
-import { getReservationInProgressPath, getReservationPath, getReservationUnitPath } from "@/modules/urls";
+import type { MockedResponse } from "@apollo/client/testing";
 import { ConfirmReservationDocument, ReservationStateChoice } from "@gql/gql-types";
 import type { ReservationQuery } from "@gql/gql-types";
+import { getCheckoutUrl } from "@/modules/reservation";
+import { getReservationInProgressPath, getReservationPath, getReservationUnitPath } from "@/modules/urls";
+import { createMockReservation, createOptionsMock } from "@test/reservation.mocks";
 import { ReservationStep1 } from "./ReservationStep1";
 
 // SummaryGeneralFields/SummaryReserveeFields are already covered by their own

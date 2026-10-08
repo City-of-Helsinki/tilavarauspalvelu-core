@@ -1,8 +1,8 @@
 import React from "react";
 import { useController } from "react-hook-form";
 import type { Control, FieldValues, Path, UseControllerProps } from "react-hook-form";
-import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { Checkbox } from "hds-react";
 import styled from "styled-components";
 
 // "&& > *" needed to position the checkbox and label correctly in the grid block

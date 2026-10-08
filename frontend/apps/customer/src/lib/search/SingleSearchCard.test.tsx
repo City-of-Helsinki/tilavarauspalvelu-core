@@ -2,9 +2,9 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { addDays } from "date-fns";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import { getActivePricing } from "@/modules/reservationUnit";
 import { AccessType } from "@gql/gql-types";
 import type { SingleSearchCardFragment } from "@gql/gql-types";
+import { getActivePricing } from "@/modules/reservationUnit";
 import { SingleSearchCard } from "./SingleSearchCard";
 
 const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {

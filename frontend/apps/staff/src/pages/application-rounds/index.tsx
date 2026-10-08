@@ -1,23 +1,23 @@
 import React from "react";
-import { gql } from "@apollo/client";
-import { ApplicationRoundCard } from "@lib/application-rounds";
-import { Accordion } from "hds-react";
-import { orderBy } from "lodash-es";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
+import { Accordion } from "hds-react";
+import { orderBy } from "lodash-es";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { CenterSpinner, Flex, H1 } from "ui/src/styled";
+import { ApplicationRoundStatusChoice, useApplicationRoundListQuery, UserPermissionChoice } from "@gql/gql-types";
+import type { ApplicationRoundNode, ApplicationRoundListElementFragment } from "@gql/gql-types";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { Error404 } from "@/components/Error404";
 import { CustomTable } from "@/components/Table";
 import { truncate } from "@/modules/helpers";
 import { getApplicationRoundUrl } from "@/modules/urls";
 import { TableLink } from "@/styled";
-import { ApplicationRoundStatusChoice, useApplicationRoundListQuery, UserPermissionChoice } from "@gql/gql-types";
-import type { ApplicationRoundNode, ApplicationRoundListElementFragment } from "@gql/gql-types";
+import { ApplicationRoundCard } from "@lib/application-rounds";
 
 const AccordionWithoutTopPadding = styled(Accordion).attrs({
   closeButton: false,

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useTranslation } from "next-i18next";
 import { FocusTrap } from "focus-trap-react";
 import { IconMenuDots } from "hds-react";
-import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Flex, toggleButtonCss } from "../styled";
 

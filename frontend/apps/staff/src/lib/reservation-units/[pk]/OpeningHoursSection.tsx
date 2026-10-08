@@ -1,11 +1,11 @@
 import React from "react";
-import { IconLinkExternal } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { IconLinkExternal } from "hds-react";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { isBrowser } from "ui/src/modules/helpers";
 import { AutoGrid } from "ui/src/styled";
-import { getOpeningHoursUrl } from "@/modules/urls";
 import type { ReservationUnitEditQuery } from "@gql/gql-types";
+import { getOpeningHoursUrl } from "@/modules/urls";
 import { EditAccordion } from "./styled";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];

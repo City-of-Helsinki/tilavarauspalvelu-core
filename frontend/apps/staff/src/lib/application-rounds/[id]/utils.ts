@@ -1,8 +1,8 @@
 import { differenceInWeeks } from "date-fns";
-import { parseApiDate } from "ui/src/modules/date-utils";
 import { formatters as getFormatters } from "@ui/index";
-import { formatNumber } from "@/modules/helpers";
+import { parseApiDate } from "ui/src/modules/date-utils";
 import type { ApplicationSectionNode } from "@gql/gql-types";
+import { formatNumber } from "@/modules/helpers";
 
 export function calculateAppliedReservationTime(
   ae: Pick<

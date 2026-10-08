@@ -1,6 +1,6 @@
-import { createMockApplicationFragment } from "@test/application.mocks";
 import { render } from "@testing-library/react";
 import { vi, expect, test, describe } from "vitest";
+import { createMockApplicationFragment } from "@test/application.mocks";
 import { ApplicationFunnelWrapper } from ".";
 
 const { useRouter } = vi.hoisted(() => {

@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import styled from "styled-components";
 import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
 import { Flex } from "ui/src/styled";
-import type { ReservationDateOfBirthQuery, ApplicationDateOfBirthQuery } from "@gql/gql-types";
 import { useReservationDateOfBirthQuery, useApplicationDateOfBirthQuery } from "@gql/gql-types";
+import type { ReservationDateOfBirthQuery, ApplicationDateOfBirthQuery } from "@gql/gql-types";
 
 // NOTE separate query because all requests for dateOfBirth are logged
 // so don't make them automatically or inside other queries

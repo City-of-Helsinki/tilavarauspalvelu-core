@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import type { FC } from "react";
+import { appWithTranslation, useTranslation } from "next-i18next";
 import { ApolloProvider } from "@apollo/client";
 import { CookieBanner, CookieConsentContextProvider } from "hds-react";
-import { appWithTranslation, useTranslation } from "next-i18next";
 import App from "next/app";
 import type { AppContext, AppInitialProps, AppProps } from "next/app";
-import { ToastContainer } from "ui/src/components/toast";
-import "ui/src/styles/global.scss";
 import { initialiseLogWrite } from "@ui/modules/browserHelpers";
+import "ui/src/styles/global.scss";
 import { getLocalizationLang } from "@ui/modules/helpers";
+import { ToastContainer } from "ui/src/components/toast";
 import { ExternalScripts } from "@/components/ExternalScripts";
 import { PageWrapper } from "@/components/PageWrapper";
 import { EnvContextProvider } from "@/context/EnvContext";

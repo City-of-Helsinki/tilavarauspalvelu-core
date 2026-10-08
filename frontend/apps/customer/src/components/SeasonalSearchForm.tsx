@@ -1,13 +1,13 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
-import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { TextInput } from "hds-react";
 import { useSearchParams } from "next/navigation";
 import type { ReadonlyURLSearchParams } from "next/navigation";
-import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
 import { ControlledNumberInput } from "ui/src/components/form";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
+import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
 import { mapParamToInteger, toNumber } from "ui/src/modules/helpers";
 import type { OptionsListT } from "ui/src/modules/search";
 import { AutoGrid, Flex } from "ui/src/styled";

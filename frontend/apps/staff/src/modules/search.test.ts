@@ -11,8 +11,8 @@ import {
   ReservationUnitPublishingState,
   ReserveeType,
 } from "@gql/gql-types";
-import type { TagOptionsList } from "./search";
 import { translateTag } from "./search";
+import type { TagOptionsList } from "./search";
 
 const mockT = ((key: string, options?: Record<string, unknown>) => {
   if (options) {

@@ -1,20 +1,14 @@
 import React from "react";
 import type { FC } from "react";
-import { ApolloProvider } from "@apollo/client";
 import { appWithTranslation } from "next-i18next";
+import { ApolloProvider } from "@apollo/client";
 import App from "next/app";
 import type { AppContext, AppInitialProps, AppProps } from "next/app";
 import type { Router } from "next/router";
-import { formatApiDate } from "ui/src/modules/date-utils";
-import "ui/src/styles/global.scss";
 import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apollo/helpers";
+import "ui/src/styles/global.scss";
 import { initialiseLogWrite } from "@ui/modules/browserHelpers";
-import { PageWrapper } from "@/components/PageWrapper";
-import { EnvContextProvider } from "@/context/EnvContext";
-import { ModalContextProvider } from "@/context/ModalContext";
-import { createClient } from "@/modules/apolloClient";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
-import type { StaffEnvConfig } from "@/modules/serverUtils";
+import { formatApiDate } from "ui/src/modules/date-utils";
 import {
   BannerNotificationTarget,
   CurrentUserDocument,
@@ -30,6 +24,12 @@ import type {
   ShowNotificationsListQuery,
   ShowNotificationsListQueryVariables,
 } from "@gql/gql-types";
+import { PageWrapper } from "@/components/PageWrapper";
+import { EnvContextProvider } from "@/context/EnvContext";
+import { ModalContextProvider } from "@/context/ModalContext";
+import { createClient } from "@/modules/apolloClient";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import type { StaffEnvConfig } from "@/modules/serverUtils";
 import "../styles/global.scss";
 import Layout from "./layout";
 

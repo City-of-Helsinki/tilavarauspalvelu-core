@@ -1,18 +1,18 @@
 import React from "react";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { startOfDay } from "date-fns";
 import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
-import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { StatusLabel } from "ui/src/components/StatusLabel";
 import { formatDate } from "ui/src/modules/date-utils";
 import { H6 } from "ui/src/styled";
+import { UserPermissionChoice } from "@gql/gql-types";
+import type { ReservationToCopyFragment, RejectionReadinessChoice } from "@gql/gql-types";
 import { NewReservationModal } from "@/components/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
 import { useSession } from "@/hooks";
 import { hasPermission } from "@/modules/permissionHelper";
-import { UserPermissionChoice } from "@gql/gql-types";
-import type { ReservationToCopyFragment, RejectionReadinessChoice } from "@gql/gql-types";
 
 export type NewReservationListItem = {
   date: Date;

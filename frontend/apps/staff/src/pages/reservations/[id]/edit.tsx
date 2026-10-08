@@ -1,12 +1,11 @@
 import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { FormProvider, useForm } from "react-hook-form";
-import { gql } from "@apollo/client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ReservationTitleSection } from "@lib/reservations/[id]";
-import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import styled from "styled-components";
@@ -14,6 +13,13 @@ import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers
 import { ReservationChangeFormSchema } from "ui/src/schemas";
 import type { ReservationChangeFormType } from "ui/src/schemas";
 import { ButtonContainer, CenterSpinner, Flex, HR } from "ui/src/styled";
+import { ReservationPermissionsDocument, UserPermissionChoice, ReserveeType } from "@gql/gql-types";
+import type {
+  Maybe,
+  ReservationEditPageQuery,
+  ReservationPermissionsQuery,
+  ReservationPermissionsQueryVariables,
+} from "@gql/gql-types";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { LinkPrev } from "@/components/LinkPrev";
 import { ReservationTypeForm } from "@/components/ReservationTypeForm";
@@ -22,13 +28,7 @@ import { createClient } from "@/modules/apolloClient";
 import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
 import { createTagString } from "@/modules/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { ReservationPermissionsDocument, UserPermissionChoice, ReserveeType } from "@gql/gql-types";
-import type {
-  Maybe,
-  ReservationEditPageQuery,
-  ReservationPermissionsQuery,
-  ReservationPermissionsQueryVariables,
-} from "@gql/gql-types";
+import { ReservationTitleSection } from "@lib/reservations/[id]";
 
 type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
 const InnerTextInput = styled(TextInput)`

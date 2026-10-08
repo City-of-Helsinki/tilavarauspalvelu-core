@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
+import { Trans, useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Accordion } from "hds-react";
-import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Sanitize } from "@ui/components/Sanitize";
 import { useGenericTerms } from "@ui/hooks";
@@ -17,10 +17,6 @@ import {
   isPriceFree,
   toNumber,
 } from "@ui/modules/helpers";
-import { AddressSection } from "@/components/AddressSection";
-import { UnitMap } from "@/components/UnitMap";
-import { getFuturePricing, getPriceString } from "@/modules/reservationUnit";
-import { JustForMobile } from "@/modules/style/layout";
 import type {
   ApplicationRoundTimeSlotFieldsFragment,
   NoticeWhenReservingFragment,
@@ -28,6 +24,10 @@ import type {
   PricingFieldsFragment,
   TimeSlotType,
 } from "@gql/gql-types";
+import { AddressSection } from "@/components/AddressSection";
+import { UnitMap } from "@/components/UnitMap";
+import { getFuturePricing, getPriceString } from "@/modules/reservationUnit";
+import { JustForMobile } from "@/modules/style/layout";
 import { ReservationInfoSection } from "./ReservationInfoSection";
 
 /// Below the fold content

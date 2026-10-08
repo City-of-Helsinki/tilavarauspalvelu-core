@@ -1,13 +1,13 @@
 import React from "react";
-import { IconGroup, IconLocation } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { IconGroup, IconLocation } from "hds-react";
 import Link from "next/link";
 import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";
 import { Flex, fontMedium, H1 } from "ui/src/styled";
+import type { Maybe, SpaceQuery } from "@gql/gql-types";
 import { formatAddress } from "@/modules/helpers";
 import { getUnitUrl } from "@/modules/urls";
-import type { Maybe, SpaceQuery } from "@gql/gql-types";
 
 interface IProps {
   title: string;

@@ -1,20 +1,20 @@
 import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { startOfDay } from "date-fns/startOfDay";
 import { Button, ButtonSize, ButtonVariant, Checkbox, DateInput, TextInput } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { ControlledNumberInput, ControlledSelect } from "ui/src/components/form";
 import { formatDate, formatDateRange, parseApiDate } from "ui/src/modules/date-utils";
 import { getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import type { OptionsListT } from "ui/src/modules/search";
 import { AutoGrid, Flex, H4 } from "ui/src/styled";
+import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { Accordion } from "@/components/Accordion";
 import { ApplicationSectionSummary } from "@/components/application/funnel/ApplicationSectionSummary";
 import { ReservationUnitList } from "@/components/application/funnel/ReservationUnitList";
 import { getDurationOptions } from "@/modules/const";
-import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import type { ApplicationPage1FormValues } from "./form";
 
 type Props = Readonly<{

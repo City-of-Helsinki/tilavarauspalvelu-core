@@ -1,10 +1,10 @@
+import { render, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { createMockApplicationRound } from "@test/application.mocks";
 import { createGraphQLMocks } from "@test/gql.mocks";
 import type { CreateGraphQLMockProps } from "@test/test.gql.utils";
 import { MockedGraphQLProvider } from "@test/test.react.utils";
-import { render, waitFor, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { ReservationUnitModalContent } from "./ReservationUnitModalContent";
 import type { ReservationUnitModalProps } from "./ReservationUnitModalContent";
 

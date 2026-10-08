@@ -1,18 +1,18 @@
 import React from "react";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { ButtonVariant, IconArrowRight, IconCross, IconEuroSign, IconLock } from "hds-react";
 import { trim } from "lodash-es";
-import { useTranslation } from "next-i18next";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { Card } from "ui/src/components/Card";
 import { ReservationStatusLabel, OrderStatusLabel } from "ui/src/components/statuses";
 import { formatDateTimeRange } from "ui/src/modules/date-utils";
 import { capitalize, getImageSource, getLocalizationLang, getTranslation, getMainImage } from "ui/src/modules/helpers";
+import { ReservationStateChoice } from "@gql/gql-types";
+import type { ReservationCardFragment } from "@gql/gql-types";
 import { getNormalizedReservationOrderStatus, getPaymentUrl, isReservationCancellable } from "@/modules/reservation";
 import { getPrice } from "@/modules/reservationUnit";
 import { getReservationPath } from "@/modules/urls";
-import { ReservationStateChoice } from "@gql/gql-types";
-import type { ReservationCardFragment } from "@gql/gql-types";
 
 type CardType = "upcoming" | "past" | "cancelled";
 

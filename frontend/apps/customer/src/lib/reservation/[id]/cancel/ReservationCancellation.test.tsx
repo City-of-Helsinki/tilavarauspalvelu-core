@@ -1,13 +1,13 @@
 import { MockedProvider } from "@apollo/client/testing";
-import type { MockedResponse } from "@apollo/client/testing";
-import { createMockReservation } from "@test/reservation.mocks";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getApplicationPath, getReservationPath } from "@/modules/urls";
+import type { MockedResponse } from "@apollo/client/testing";
 import { CancelReservationDocument, ReservationCancelReasonChoice } from "@gql/gql-types";
 import type { CancelReservationMutationVariables, ReservationCancelPageQuery } from "@gql/gql-types";
+import { getApplicationPath, getReservationPath } from "@/modules/urls";
+import { createMockReservation } from "@test/reservation.mocks";
 import { ReservationCancellation } from "./ReservationCancellation";
 
 const { mockedRouterPush, useRouter, mockDisplayError } = vi.hoisted(() => {

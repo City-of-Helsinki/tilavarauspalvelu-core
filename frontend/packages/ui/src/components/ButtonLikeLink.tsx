@@ -1,8 +1,8 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import styled, { css } from "styled-components";
-import type { ButtonStyleProps } from "../styled";
 import { fontMedium, ButtonCss } from "../styled";
+import type { ButtonStyleProps } from "../styled";
 
 type ButtonLikeLinkProps = {
   href: string;

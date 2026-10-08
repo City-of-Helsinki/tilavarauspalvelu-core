@@ -1,17 +1,17 @@
 import React, { useMemo } from "react";
 import { useMedia } from "react-use";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconArrowRight, IconSize } from "hds-react";
-import { useTranslation } from "next-i18next";
 import Link from "next/link";
 import styled from "styled-components";
 import { ShowAllContainer } from "ui/src/components";
 import { breakpoints } from "ui/src/modules/const";
 import { getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { Flex, H3, anchorStyles, focusStyles } from "ui/src/styled";
+import type { IntendedUseCardFragment } from "@gql/gql-types";
 import { getSingleSearchPath } from "@/modules/urls";
 import { pixel } from "@/styled/utils";
-import type { IntendedUseCardFragment } from "@gql/gql-types";
 import { ReservationUnitSearch } from "./ReservationUnitSearch";
 
 const Top = styled(Flex).attrs({

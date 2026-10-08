@@ -1,11 +1,10 @@
 import { gql } from "@apollo/client";
 import { addMinutes, addSeconds, isAfter, roundToNearestMinutes, differenceInMinutes, set } from "date-fns";
 import type { TFunction } from "i18next";
+import { logError, NotBrowserError } from "@ui/modules/errors";
 import { getIntervalMinutes } from "ui/src/modules/conversion";
 import { formatTime, parseUIDate, isValidDate, timeToMinutes, formatDate } from "ui/src/modules/date-utils";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
-import { logError, NotBrowserError } from "@ui/modules/errors";
-import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { ReservationStateChoice, OrderStatus, ReservationCancelReasonChoice } from "@gql/gql-types";
 import type {
   ReservationNode,
@@ -22,6 +21,7 @@ import type {
   ReservationPaymentUrlFragment,
   ReservationStartInterval,
 } from "@gql/gql-types";
+import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { isBrowser } from "./const";
 import { isRangeReservable } from "./reservable";
 import type { ReservableMap, RoundPeriod } from "./reservable";

@@ -1,9 +1,9 @@
 import React from "react";
 import { useLocalStorage } from "react-use";
-import { gql } from "@apollo/client";
-import type { NotificationType } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import styled from "styled-components";
+import type { NotificationType } from "hds-react";
 import { BannerNotificationLevel, useShowNotificationsListQuery } from "../../gql/gql-types";
 import type { ShowNotificationFieldsFragment, BannerNotificationTarget } from "../../gql/gql-types";
 import { filterNonNullable, getLocalizationLang, getTranslation } from "../modules/helpers";

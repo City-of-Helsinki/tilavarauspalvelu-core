@@ -1,12 +1,13 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
-import type { ReadonlyURLSearchParams } from "next/navigation";
+import { gql } from "@apollo/client";
 import { useSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import { ShowAllContainer } from "ui/src/components";
 import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
 import { mapFormToSearchParams } from "ui/src/modules/search";
+import type { ApplicationRoundFilterUnitFragment, MunicipalityChoice, Priority, ReserveeType } from "@gql/gql-types";
 import {
   ControlledMultiSelectFilter,
   ControlledSearchFilter,
@@ -17,7 +18,6 @@ import { useFilterOptions } from "@/hooks/useFilterOptions";
 import { getFilterSearchParams } from "@/hooks/useGetFilterSearchParams";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import { translateTag } from "@/modules/search";
-import type { ApplicationRoundFilterUnitFragment, MunicipalityChoice, Priority, ReserveeType } from "@gql/gql-types";
 
 type UnitFilterQueryType = ApplicationRoundFilterUnitFragment;
 

@@ -1,7 +1,7 @@
 import { isAfter, isBefore } from "date-fns";
+import sanitizeHtml from "sanitize-html";
 import type { OptionInProps } from "hds-react";
 import type { TFunction } from "i18next";
-import sanitizeHtml from "sanitize-html";
 import { minutesToHoursString, timeToMinutes } from "@ui/modules/date-utils/conversion";
 import { ReservationUnitImageType } from "../../gql/gql-types";
 import type {

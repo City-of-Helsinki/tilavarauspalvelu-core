@@ -2,8 +2,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { render, screen } from "@testing-library/react";
 import { describe, test, expect, vi } from "vitest";
-import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import type { ReservationQuotaReachedFragment, ReservationUnitPageQuery } from "@gql/gql-types";
+import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { ReservationUnitCalendarSection, isReservationQuotaReached } from "./ReservationUnitCalendarSection";
 
 vi.mock("next-i18next", () => ({

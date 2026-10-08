@@ -1,8 +1,8 @@
-import { createMockReservation } from "@test/reservation.mocks";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { ReservationStateChoice } from "@gql/gql-types";
 import type { InstructionsFragment } from "@gql/gql-types";
+import { createMockReservation } from "@test/reservation.mocks";
 import { Instructions } from "./Instructions";
 
 const customRender = (reservation: InstructionsFragment): ReturnType<typeof render> =>

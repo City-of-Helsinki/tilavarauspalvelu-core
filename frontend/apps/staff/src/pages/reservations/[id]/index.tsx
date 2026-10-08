@@ -1,20 +1,19 @@
 import React, { useRef } from "react";
-import { gql } from "@apollo/client";
-import type { ApolloQueryResult } from "@apollo/client";
-import {
-  ApprovalButtons,
-  ApprovalButtonsRecurring,
-  ReservationTitleSection,
-  ReservationKeylessEntry,
-  TimeBlockSection,
-  ReservationReserveeDetailsSection,
-  DataWrapper,
-} from "@lib/reservations/[id]/";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import type { ApolloQueryResult } from "@apollo/client";
 import { createNodeId, ignoreMaybeArray, isPriceFree, toNumber } from "ui/src/modules/helpers";
 import { ButtonContainer } from "ui/src/styled";
+import {
+  ReserveeType,
+  ReservationStateChoice,
+  UserPermissionChoice,
+  ReservationPageDocument,
+  useReservationPageLazyQuery,
+} from "@gql/gql-types";
+import type { ReservationPageQuery } from "@gql/gql-types";
 import { Error403 } from "@/components/Error403";
 import { ShowWhenTargetInvisible } from "@/components/ShowWhenTargetInvisible";
 import { StickyHeader } from "@/components/StickyHeader";
@@ -37,13 +36,14 @@ import {
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Accordion, ApplicationDatas, Summary } from "@/styled";
 import {
-  ReserveeType,
-  ReservationStateChoice,
-  UserPermissionChoice,
-  ReservationPageDocument,
-  useReservationPageLazyQuery,
-} from "@gql/gql-types";
-import type { ReservationPageQuery } from "@gql/gql-types";
+  ApprovalButtons,
+  ApprovalButtonsRecurring,
+  ReservationTitleSection,
+  ReservationKeylessEntry,
+  TimeBlockSection,
+  ReservationReserveeDetailsSection,
+  DataWrapper,
+} from "@lib/reservations/[id]/";
 
 type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 

@@ -4,11 +4,11 @@ import Link from "next/link";
 import styled from "styled-components";
 import { dateToMinutes, formatTimeRange, parseValidDateObject } from "ui/src/modules/date-utils";
 import { Flex } from "ui/src/styled";
+import { UserPermissionChoice } from "@gql/gql-types";
+import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { VisibleIfPermission } from "@/components/VisibleIfPermission";
 import { getReserveeName, truncate } from "@/modules/helpers";
 import { getReservationUrl } from "@/modules/urls";
-import { UserPermissionChoice } from "@gql/gql-types";
-import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { CELL_BORDER } from "./utils";
 
 const MAX_POPOVER_COMMENT_LENGTH = 140;

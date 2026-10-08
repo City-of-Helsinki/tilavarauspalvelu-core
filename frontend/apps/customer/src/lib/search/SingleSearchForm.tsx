@@ -1,26 +1,26 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
+import { useTranslation } from "next-i18next";
 import { addYears, startOfDay } from "date-fns";
 import { Checkbox, TextInput } from "hds-react";
-import { useTranslation } from "next-i18next";
 import { useSearchParams } from "next/navigation";
-import type { ReadonlyURLSearchParams } from "next/navigation";
 import styled from "styled-components";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import { ShowAllContainer } from "ui/src/components";
-import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
 import { ControlledNumberInput, TimeRangePicker } from "ui/src/components/form";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
+import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
 import { formatDate, parseUIDate } from "ui/src/modules/date-utils";
 import { ignoreMaybeArray, mapParamToInteger, toNumber } from "ui/src/modules/helpers";
 import type { OptionsListT } from "ui/src/modules/search";
 import { Flex } from "ui/src/styled";
+import { AccessType } from "@gql/gql-types";
 import { FilterTagList } from "@/components/FilterTagList";
-import { SingleLabelInputGroup } from "@/components/SingleLabelInputGroup";
 import { DateRangePicker } from "@/components/form";
+import { SingleLabelInputGroup } from "@/components/SingleLabelInputGroup";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { getDurationOptions } from "@/modules/const";
-import { AccessType } from "@gql/gql-types";
 
 const StyledCheckBox = styled(Checkbox)`
   margin: 0 !important;

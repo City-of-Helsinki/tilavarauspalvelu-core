@@ -1,9 +1,9 @@
 import React from "react";
+import type { GetServerSidePropsContext } from "next";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { isBefore, sub } from "date-fns";
 import { IconArrowRight, IconCalendar, IconCross, IconLinkExternal, Notification } from "hds-react";
-import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -23,6 +23,23 @@ import {
   toNumber,
 } from "ui/src/modules/helpers";
 import { Flex, fontRegular, H1, H4, NoWrap } from "ui/src/styled";
+import {
+  ApplicationReservationSeriesDocument,
+  MunicipalityChoice,
+  OrderStatus,
+  AccessType,
+  ReservationCancelReasonChoice,
+  ReservationPageDocument,
+  ReservationStateChoice,
+  useAccessCodeQuery,
+} from "@gql/gql-types";
+import type {
+  AccessCodeQuery,
+  ApplicationReservationSeriesQuery,
+  ApplicationReservationSeriesQueryVariables,
+  ReservationPageQuery,
+  ReservationPageQueryVariables,
+} from "@gql/gql-types";
 import { AddressSection } from "@/components/AddressSection";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { LabelValuePair } from "@/components/LabelValuePair";
@@ -47,23 +64,6 @@ import {
 } from "@/modules/urls";
 import type { ReservationNotifications } from "@/modules/urls";
 import { ReservationPageWrapper } from "@/styled/reservation";
-import {
-  ApplicationReservationSeriesDocument,
-  MunicipalityChoice,
-  OrderStatus,
-  AccessType,
-  ReservationCancelReasonChoice,
-  ReservationPageDocument,
-  ReservationStateChoice,
-  useAccessCodeQuery,
-} from "@gql/gql-types";
-import type {
-  AccessCodeQuery,
-  ApplicationReservationSeriesQuery,
-  ApplicationReservationSeriesQueryVariables,
-  ReservationPageQuery,
-  ReservationPageQueryVariables,
-} from "@gql/gql-types";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

@@ -1,6 +1,6 @@
 import React from "react";
-import { IconArrowBottomRight, IconCheck, IconCogwheel, IconCross, IconQuestionCircleFill } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { IconArrowBottomRight, IconCheck, IconCogwheel, IconCross, IconQuestionCircleFill } from "hds-react";
 import { ApplicationSectionStatusChoice } from "../../../gql/gql-types";
 import type { UserTypeChoice } from "../../modules/urlBuilder";
 import { StatusLabel } from "../StatusLabel";

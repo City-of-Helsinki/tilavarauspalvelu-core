@@ -1,14 +1,15 @@
 import React, { useRef } from "react";
 import type { ReactNode } from "react";
-import { gql } from "@apollo/client";
-import type { ApolloQueryResult } from "@apollo/client";
-import { Button, ButtonSize, ButtonVariant, IconArrowRedo, IconCross, LoadingSpinner, Tag } from "hds-react";
-import { isEqual, trim } from "lodash-es";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
+import { gql } from "@apollo/client";
+import { Button, ButtonSize, ButtonVariant, IconArrowRedo, IconCross, LoadingSpinner, Tag } from "hds-react";
+import { isEqual, trim } from "lodash-es";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
+import type { ApolloQueryResult } from "@apollo/client";
+import { logError } from "@ui/modules/errors";
 import { ApplicationTimePreview } from "ui/src/components/ApplicationTimePreview";
 import { ApplicationStatusLabel } from "ui/src/components/statuses";
 import { useDisplayError } from "ui/src/hooks";
@@ -16,21 +17,6 @@ import { breakpoints } from "ui/src/modules/const";
 import { formatDateRange, formatDateTime, formatDuration, parseValidDateObject } from "ui/src/modules/date-utils";
 import { createNodeId, filterNonNullable, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { CenterSpinner, Flex, fontMedium, H1, H3, H4, TitleSection } from "ui/src/styled";
-import { logError } from "@ui/modules/errors";
-import { Accordion as AccordionBase } from "@/components/Accordion";
-import { BirthDate } from "@/components/BirthDate";
-import { Error403 } from "@/components/Error403";
-import { Error404 } from "@/components/Error404";
-import { ScrollIntoView } from "@/components/ScrollIntoView";
-import { ShowWhenTargetInvisible } from "@/components/ShowWhenTargetInvisible";
-import { StickyHeader } from "@/components/StickyHeader";
-import { TimeSelector } from "@/components/TimeSelector";
-import { ValueBox } from "@/components/ValueBox";
-import { ApplicationWorkingMemo } from "@/components/WorkingMemo";
-import { useCheckPermission } from "@/hooks";
-import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
-import { formatAgeGroup, formatNumber, getApplicantName, translateReserveeType } from "@/modules/helpers";
-import { ApplicationDatas, Summary } from "@/styled";
 import {
   ApplicationStatusChoice,
   ReserveeType,
@@ -49,6 +35,20 @@ import type {
   Maybe,
   ReservationUnitOptionFieldsFragment,
 } from "@gql/gql-types";
+import { Accordion as AccordionBase } from "@/components/Accordion";
+import { BirthDate } from "@/components/BirthDate";
+import { Error403 } from "@/components/Error403";
+import { Error404 } from "@/components/Error404";
+import { ScrollIntoView } from "@/components/ScrollIntoView";
+import { ShowWhenTargetInvisible } from "@/components/ShowWhenTargetInvisible";
+import { StickyHeader } from "@/components/StickyHeader";
+import { TimeSelector } from "@/components/TimeSelector";
+import { ValueBox } from "@/components/ValueBox";
+import { ApplicationWorkingMemo } from "@/components/WorkingMemo";
+import { useCheckPermission } from "@/hooks";
+import { NOT_FOUND_SSR_VALUE } from "@/modules/const";
+import { formatAgeGroup, formatNumber, getApplicantName, translateReserveeType } from "@/modules/helpers";
+import { ApplicationDatas, Summary } from "@/styled";
 
 const Value = styled.span`
   ${fontMedium}

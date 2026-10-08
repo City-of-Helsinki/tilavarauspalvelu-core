@@ -1,10 +1,10 @@
 import React from "react";
 // @ts-expect-error: this works in ui/pages/_document.js for some reason
 import { getCriticalHdsRules, hdsStyles } from "hds-react";
-import type { DocumentContext } from "next/document";
 import Document, { Html, Head, Main, NextScript } from "next/document";
 import Script from "next/script";
 import { ServerStyleSheet } from "styled-components";
+import type { DocumentContext } from "next/document";
 import { env } from "@/env.mjs";
 
 export default class MyDocument extends Document {

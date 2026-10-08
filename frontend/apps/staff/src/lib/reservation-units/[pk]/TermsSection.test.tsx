@@ -3,9 +3,9 @@ import { useForm } from "react-hook-form";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { TermsSection } from "./TermsSection";
 import { convertReservationUnit } from "./form";
 import type { ReservationUnitEditFormValues } from "./form";
+import { TermsSection } from "./TermsSection";
 
 const OPTIONS = {
   service: [{ value: "service-1", label: "Service terms 1" }],

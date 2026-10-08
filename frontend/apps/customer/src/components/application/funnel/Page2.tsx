@@ -1,14 +1,14 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from "hds-react";
 import { useRouter } from "next/router";
 import { filterNonNullable, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { ButtonContainer } from "ui/src/styled";
+import type { ApplicationPage2Query } from "@gql/gql-types";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { TimeSelectorForm } from "@/components/application/funnel/TimeSelector";
 import { getApplicationPath } from "@/modules/urls";
-import type { ApplicationPage2Query } from "@gql/gql-types";
 import type { ApplicationPage2FormValues } from "./form";
 
 type Node = NonNullable<ApplicationPage2Query["application"]>;

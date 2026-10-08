@@ -1,5 +1,5 @@
-import type { ReactNode, RefObject } from "react";
 import React, { useEffect, useState } from "react";
+import type { ReactNode, RefObject } from "react";
 
 type Props = {
   target: RefObject<HTMLElement>;

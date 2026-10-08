@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import type { FieldErrors, FieldValues } from "react-hook-form";
-import { Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { Notification } from "hds-react";
 import styled from "styled-components";
 
 type Props<T extends FieldValues> = {

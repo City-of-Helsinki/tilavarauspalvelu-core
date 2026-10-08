@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo } from "react";
-import { Filters, ReservationsDataLoader } from "@lib/reservations";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -8,6 +7,7 @@ import { formatDate } from "ui/src/modules/date-utils";
 import { H1 } from "ui/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
+import { Filters, ReservationsDataLoader } from "@lib/reservations";
 
 export default function ListReservationsPage(): React.ReactElement {
   const { t } = useTranslation();

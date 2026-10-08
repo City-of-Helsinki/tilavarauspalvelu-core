@@ -1,9 +1,9 @@
 import React from "react";
 import type { NavigateAction, View } from "react-big-calendar";
+import { useTranslation } from "next-i18next";
 import { endOfWeek, format, startOfWeek } from "date-fns";
 import { fi } from "date-fns/locale/fi";
 import { IconAngleLeft, IconAngleRight, IconCalendarRecurring } from "hds-react";
-import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "@ui/modules/const";
 import { Flex, fontMedium, NoWrap } from "@ui/styled";

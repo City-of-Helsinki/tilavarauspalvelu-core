@@ -1,9 +1,9 @@
 import React from "react";
 import { MockedProvider } from "@apollo/client/testing";
-import type { MockedResponse } from "@apollo/client/testing";
 import { render, screen, waitFor } from "@testing-library/react";
 import { GraphQLError } from "graphql";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { MockedResponse } from "@apollo/client/testing";
 import { ApplicationSectionsDocument } from "@gql/gql-types";
 import type { ApplicationSectionTableElementFragment } from "@gql/gql-types";
 import { ApplicationSectionDataLoader } from "./ApplicationSectionDataLoader";

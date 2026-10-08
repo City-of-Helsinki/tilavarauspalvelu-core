@@ -1,7 +1,6 @@
 import { addDays, addYears, endOfDay, startOfDay, startOfToday } from "date-fns";
 import { formatApiDateUnsafe } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";
-import type { RoundPeriod, ReservableMap } from "@/modules/reservable";
 import {
   AuthenticationType,
   ReservationUnitImageType,
@@ -18,6 +17,7 @@ import type {
   ReservationUnitNode,
   UnitNode,
 } from "@gql/gql-types";
+import type { RoundPeriod, ReservableMap } from "@/modules/reservable";
 import { createMockReservationUnitType, generateDescriptionFragment, generateNameFragment } from "./test.gql.utils";
 
 type ReservationUnitType = Omit<IsReservableFieldsFragment, "reservableTimeSpans">;

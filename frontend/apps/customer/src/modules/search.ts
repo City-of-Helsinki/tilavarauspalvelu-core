@@ -1,8 +1,8 @@
 /// This file contains the search query for reservation units
 /// e.g. the common search pages (both seasonal and single)
 import { gql } from "@apollo/client";
-import type { ApolloClient } from "@apollo/client";
 import { startOfDay } from "date-fns";
+import type { ApolloClient } from "@apollo/client";
 import type { ReadonlyURLSearchParams } from "next/navigation";
 import { transformAccessTypeSafe } from "ui/src/modules/conversion";
 import { parseUIDate, formatApiDate } from "ui/src/modules/date-utils";

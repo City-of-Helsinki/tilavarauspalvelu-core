@@ -1,8 +1,3 @@
-import { createMockApplicationRound } from "@test/application.mocks";
-import { createGraphQLMocks } from "@test/gql.mocks";
-import { createOptionMock } from "@test/test.gql.utils";
-import type { CreateGraphQLMockProps } from "@test/test.gql.utils";
-import { MockedGraphQLProvider } from "@test/test.react.utils";
 import { render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { addYears } from "date-fns";
@@ -11,6 +6,11 @@ import type { OptionsListT } from "ui/src/modules/search";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import { getApplicationPath } from "@/modules/urls";
 import SeasonalSearch from "@/pages/recurring/[id]";
+import { createMockApplicationRound } from "@test/application.mocks";
+import { createGraphQLMocks } from "@test/gql.mocks";
+import { createOptionMock } from "@test/test.gql.utils";
+import type { CreateGraphQLMockProps } from "@test/test.gql.utils";
+import { MockedGraphQLProvider } from "@test/test.react.utils";
 
 const { mockedRouterReplace, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();

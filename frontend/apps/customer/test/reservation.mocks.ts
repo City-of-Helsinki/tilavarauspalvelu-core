@@ -1,4 +1,3 @@
-import { generateNameFragment } from "@test/test.gql.utils";
 import { createNodeId } from "ui/src/modules/helpers";
 import {
   AccessType,
@@ -15,6 +14,7 @@ import {
   ReservationFormType,
 } from "@gql/gql-types";
 import type { ReservationFormFieldsFragment, PaymentOrderNode, ReservationPageQuery } from "@gql/gql-types";
+import { generateNameFragment } from "@test/test.gql.utils";
 
 export function generateTextFragment(text: string) {
   return {

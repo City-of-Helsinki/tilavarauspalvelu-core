@@ -1,8 +1,8 @@
 import React from "react";
 import type { HTMLAttributes } from "react";
+import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconArrowDown, IconArrowUp, ButtonSize, ButtonVariant, Button, ButtonPresetTheme } from "hds-react";
-import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Card } from "ui/src/components/Card";
 import { ErrorText } from "ui/src/components/ErrorText";
