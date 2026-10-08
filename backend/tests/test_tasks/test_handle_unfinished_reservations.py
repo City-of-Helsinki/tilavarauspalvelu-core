@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from contextlib import contextmanager
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from unittest import mock
 
 import pytest
@@ -110,6 +110,42 @@ def test_handle_unfinished_reservations__direct__free__delete_from_pindora__call
 
     assert PindoraClient.delete_reservation.called is True
     assert task.called is True
+
+
+def test_handle_unfinished_reservations__direct__free__delete_from_pindora_after_deleting_reservations(settings):
+    settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
+
+    first_reservation = ReservationFactory.create(
+        created_at=local_datetime() - datetime.timedelta(minutes=20),
+        begins_at=local_datetime() + datetime.timedelta(days=1),
+        ends_at=local_datetime() + datetime.timedelta(days=1, hours=1),
+        state=ReservationStateChoice.CREATED,
+        access_type=AccessType.ACCESS_CODE,
+        access_code_generated_at=local_datetime(),
+    )
+    second_reservation = ReservationFactory.create(
+        created_at=local_datetime() - datetime.timedelta(minutes=20),
+        begins_at=local_datetime() + datetime.timedelta(days=2),
+        ends_at=local_datetime() + datetime.timedelta(days=2, hours=1),
+        state=ReservationStateChoice.CREATED,
+        access_type=AccessType.ACCESS_CODE,
+        access_code_generated_at=local_datetime(),
+    )
+
+    reservations_left_at_pindora_calls: list[bool] = []
+
+    def check_reservations_left(**kwargs: Any) -> None:
+        reservations_exist = Reservation.objects.exists()
+        reservations_left_at_pindora_calls.append(reservations_exist)
+
+    with patch_method(PindoraClient.delete_reservation, side_effect=check_reservations_left):
+        handle_unfinished_reservations_task()
+
+        called_uuids = {call.kwargs["reservation"] for call in PindoraClient.delete_reservation.call_args_list}
+
+    assert Reservation.objects.exists() is False
+    assert reservations_left_at_pindora_calls == [False, False]
+    assert called_uuids == {first_reservation.ext_uuid, second_reservation.ext_uuid}
 
 
 # --- Paid directly -------------------------------------------------------------------------------------------
