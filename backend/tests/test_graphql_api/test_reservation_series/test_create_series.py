@@ -509,6 +509,26 @@ def test_reservation_series__create_series__check_opening_hours__skip_dates_wher
     assert reservations[0].ends_at.astimezone(DEFAULT_TIMEZONE) == end
 
 
+def test_reservation_series__create_series__end_time_before_begin_time__different_days(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    user = graphql.login_with_superuser()
+
+    data = get_minimal_series_data(
+        reservation_unit,
+        user,
+        beginDate=datetime.date(2024, 1, 1).isoformat(),
+        endDate=datetime.date(2024, 1, 31).isoformat(),
+        beginTime=datetime.time(22).isoformat(),
+        endTime=datetime.time(2).isoformat(),
+    )
+    response = graphql(CREATE_SERIES_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Begin time cannot be after end time."]
+
+    assert ReservationSeries.objects.count() == 0
+
+
 def test_reservation_series__create_series__overlapping_reservations(graphql):
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])

@@ -368,7 +368,7 @@ def test_frontend_queries__customer_ui__CreateReservationSeries(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     begin = next_hour()
-    end = begin + datetime.timedelta(days=20)
+    end = begin + datetime.timedelta(days=20, hours=1)
 
     variables = deepcopy(query_info.variables)
     variables["input"] = {
