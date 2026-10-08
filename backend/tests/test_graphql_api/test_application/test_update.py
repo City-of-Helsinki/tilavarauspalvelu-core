@@ -6,7 +6,7 @@ from tilavarauspalvelu.enums import Priority, Weekday
 from tilavarauspalvelu.models import ApplicationSection, SuitableTimeRange
 from utils.date_utils import local_date, local_time
 
-from tests.factories import ApplicationFactory, ApplicationRoundFactory
+from tests.factories import ApplicationFactory, ApplicationRoundFactory, ApplicationSectionFactory
 
 from .helpers import UPDATE_MUTATION
 
@@ -128,6 +128,28 @@ def test_update_application__application_sections__not_deleted_if_not_given(grap
 
     suitable = section.suitable_time_ranges.first()
     assert suitable.pk == old_range_pk
+
+
+def test_update_application__application_sections__section_of_another_application(graphql):
+    application = ApplicationFactory.create_in_status_draft()
+    other_section = ApplicationSectionFactory.create_in_status_unallocated()
+    other_application_pk = other_section.application.pk
+
+    graphql.force_login(application.user)
+
+    input_data = {
+        "pk": application.pk,
+        "applicationSections": [{"pk": other_section.pk}],
+    }
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationSections.0.nonFieldErrors") == [
+        f"Application section {other_section.pk} does not belong to this application.",
+    ]
+
+    other_section = ApplicationSection.objects.get(pk=other_section.pk)
+    assert other_section.application.pk == other_application_pk
 
 
 def test_update_application__application_sections__too_many(graphql, settings):
