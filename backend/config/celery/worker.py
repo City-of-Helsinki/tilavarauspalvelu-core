@@ -43,7 +43,7 @@ class LivenessProbe(bootsteps.StartStopStep):
 
     def start(self, worker: WorkController) -> None:
         """Called when the worker is started."""
-        timer: Timer = worker.timer  # type: ignore
+        timer: Timer = worker.timer  # type: ignore[attr-defined]
         self.schedule_entry = timer.call_repeatedly(
             secs=self.period_seconds,
             fun=self.health_check,

@@ -48,7 +48,7 @@ def get_context_for_user_anonymization(
 def get_context_for_user_permissions_deactivation(
     *,
     language: Lang,
-) -> Annotated[EmailContext, EmailType.USER_PERMISSIONS_DEACTIVATION]:  # type: ignore
+) -> Annotated[EmailContext, EmailType.USER_PERMISSIONS_DEACTIVATION]:
     link = get_staff_login_link()
     link_tag = create_anchor_tag(link=link)
 

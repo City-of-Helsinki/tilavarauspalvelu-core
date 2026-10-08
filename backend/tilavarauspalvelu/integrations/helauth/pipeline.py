@@ -83,7 +83,7 @@ def update_user_from_profile(request: WSGIRequest, *, user: User | None = None) 
     # so that it can be used later when creating the reservation.
     # Extract only the prefill info from the response and store it in the session
     request.session["reservation_prefill_info"] = ReservationPrefillInfo(**{
-        k: after_login_additional_info[k]  # type: ignore
+        k: after_login_additional_info[k]  # type: ignore[literal-required]
         for k in list(ReservationPrefillInfo.__annotations__)
     })
 
