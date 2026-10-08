@@ -4,7 +4,7 @@ import pytest
 
 from tilavarauspalvelu.models import Space
 
-from tests.factories import UnitFactory
+from tests.factories import SpaceFactory, UnitFactory, UserFactory
 
 from .helpers import CREATE_MUTATION
 
@@ -28,6 +28,25 @@ def test_create_space(graphql):
 
     assert response.has_errors is False, response
     assert Space.objects.count() == 1
+
+
+def test_create_space__unit_admin_cannot_create_space_under_space_of_other_unit(graphql):
+    unit = UnitFactory.create()
+    other_space = SpaceFactory.create()
+    admin = UserFactory.create_with_unit_role(units=[unit])
+    graphql.force_login(admin)
+
+    data = {
+        "name": "foo",
+        "unit": unit.pk,
+        "parent": other_space.pk,
+    }
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Parent space must be in the same unit."]
+
+    assert Space.objects.filter(parent=other_space).exists() is False
 
 
 def test_create_space__name_is_required(graphql):
