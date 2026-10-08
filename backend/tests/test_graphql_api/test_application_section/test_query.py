@@ -4,9 +4,10 @@ from typing import TYPE_CHECKING
 
 import pytest
 from freezegun import freeze_time
+from graphene_django_extensions.testing import build_query
 from graphql_relay import to_global_id
 
-from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice, UserRoleChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.keyless_entry.typing import (
@@ -20,6 +21,7 @@ from tests.factories import (
     ReservationFactory,
     ReservationSeriesFactory,
     SuitableTimeRangeFactory,
+    UnitFactory,
     UserFactory,
 )
 from tests.helpers import patch_method
@@ -317,6 +319,86 @@ def test_application_section__query__pindora_info__access_code_not_active(graphq
         assert response.first_query_object["pindoraInfo"] is None
     else:
         assert response.first_query_object["pindoraInfo"] is not None
+
+
+@freeze_time(local_datetime(2022, 1, 1))
+def test_application_section__query__pindora_info__as_reservee__results_sent(graphql):
+    user = UserFactory.create()
+    section = ApplicationSectionFactory.create_in_status_unallocated(
+        application__user=user,
+        application__application_round__sent_at=local_datetime(2021, 12, 1),
+        reservations_begin_date=local_date(2022, 1, 1),
+        reservations_end_date=local_date(2022, 1, 1),
+    )
+    series = ReservationSeriesFactory.create(
+        allocated_time_slot__reservation_unit_option__application_section=section,
+    )
+    ReservationFactory.create(
+        user=user,
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
+        begins_at=local_datetime(2022, 1, 1, 12),
+        ends_at=local_datetime(2022, 1, 1, 13),
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    query = pindora_query(section)
+
+    graphql.force_login(user)
+
+    data = pindora_response(series.reservation_unit)
+
+    with patch_method(PindoraClient.get_seasonal_booking, return_value=data):
+        response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+
+    assert response.first_query_object["pindoraInfo"]["accessCode"] == "1234"
+
+
+@freeze_time(local_datetime(2022, 1, 1))
+def test_application_section__query__pindora_info__through_allocation__viewer_in_other_unit(graphql):
+    user = UserFactory.create()
+    section = ApplicationSectionFactory.create_in_status_unallocated(
+        application__user=user,
+        application__application_round__sent_at=local_datetime(2021, 12, 1),
+        reservations_begin_date=local_date(2022, 1, 1),
+        reservations_end_date=local_date(2022, 1, 1),
+    )
+    series = ReservationSeriesFactory.create(
+        allocated_time_slot__reservation_unit_option__application_section=section,
+    )
+    ReservationFactory.create(
+        user=user,
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
+        begins_at=local_datetime(2022, 1, 1, 12),
+        ends_at=local_datetime(2022, 1, 1, 13),
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    query = build_query(
+        "allocatedTimeSlots",
+        connection=True,
+        fields="reservationUnitOption { applicationSection { pindoraInfo { accessCode } } }",
+    )
+
+    other_unit = UnitFactory.create()
+    viewer = UserFactory.create_with_unit_role(units=[other_unit], role=UserRoleChoice.VIEWER)
+    graphql.force_login(viewer)
+
+    data = pindora_response(series.reservation_unit)
+
+    with patch_method(PindoraClient.get_seasonal_booking, return_value=data):
+        response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+
+    assert response.node(0)["reservationUnitOption"]["applicationSection"]["pindoraInfo"] is None
 
 
 @freeze_time(local_datetime(2022, 1, 1))
