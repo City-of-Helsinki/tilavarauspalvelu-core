@@ -328,9 +328,9 @@ def timedelta_to_json(delta: datetime.timedelta, *, timespec: Literal["minutes",
 
 def timedelta_from_json(delta: str) -> datetime.timedelta:
     try:
-        time_ = datetime.datetime.strptime(delta, "%H:%M:%S")
+        time_ = datetime.datetime.strptime(delta, "%H:%M:%S")  # noqa: DTZ007
     except ValueError:
-        time_ = datetime.datetime.strptime(delta, "%H:%M")
+        time_ = datetime.datetime.strptime(delta, "%H:%M")  # noqa: DTZ007
 
     return datetime.timedelta(hours=time_.hour, minutes=time_.minute, seconds=time_.second)
 

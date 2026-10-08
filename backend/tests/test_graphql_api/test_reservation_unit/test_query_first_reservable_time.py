@@ -20,7 +20,7 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnitHierarchy
 from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import CachedReservableTime
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from tests.factories import (
     ApplicationRoundFactory,
@@ -55,7 +55,7 @@ reservation_units_reservable_query_access_type = partial(
     fields="pk isClosed firstReservableDatetime effectiveAccessType",
     calculate_first_reservable_time=True,
 )
-NEXT_YEAR = datetime.date.today().year + 1
+NEXT_YEAR = local_date().year + 1
 
 
 def _datetime(year=NEXT_YEAR, month=1, day=1, hour=0, minute=0) -> datetime.datetime:
