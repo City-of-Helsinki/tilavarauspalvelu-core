@@ -207,6 +207,33 @@ def test_send_application__section_suitable_time_range__combined_are_long_enough
     assert response.has_errors is False, response.errors
 
 
+@pytest.mark.parametrize("created_in_order", [True, False])
+def test_send_application__section_suitable_time_range__combined_end_at_midnight(graphql, created_in_order):
+    application = ApplicationFactory.create_application_ready_for_sending(
+        application_sections__reservation_min_duration=datetime.timedelta(hours=3),
+        application_sections__reservation_max_duration=datetime.timedelta(hours=3),
+        application_sections__suitable_time_ranges=[],
+    )
+    section = application.application_sections.first()
+
+    time_ranges = [(datetime.time(20, 0), datetime.time(22, 0)), (datetime.time(22, 0), datetime.time(0, 0))]
+    if not created_in_order:
+        time_ranges.reverse()
+
+    for begin_time, end_time in time_ranges:
+        SuitableTimeRangeFactory.create(
+            application_section=section,
+            day_of_the_week=Weekday.MONDAY,
+            begin_time=begin_time,
+            end_time=end_time,
+        )
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+
+    assert response.has_errors is False, response.errors
+
+
 def test_send_application__section_suitable_time_range__not_contiguous(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         application_sections__reservation_min_duration=datetime.timedelta(hours=2),
