@@ -211,6 +211,29 @@ def test_reservation__delete__delete_from_pindora__call_succeeds(graphql):
     assert PindoraService.delete_access_code.called is True
 
 
+@patch_method(
+    VerkkokauppaAPIClient.get_payment,
+    return_value=PaymentFactory.create(status=WebShopPaymentStatus.CANCELLED.value),
+)
+@patch_method(PindoraService.delete_access_code)
+@pytest.mark.parametrize("order_status", [OrderStatus.CANCELLED, OrderStatus.REFUNDED])
+def test_reservation__delete__delete_from_pindora__order_not_cancellable(graphql, order_status):
+    reservation = ReservationFactory.create_for_delete(
+        state=ReservationStateChoice.WAITING_FOR_PAYMENT,
+        access_type=AccessType.ACCESS_CODE,
+    )
+    PaymentOrderFactory.create(remote_id=uuid.uuid4(), reservation=reservation, status=order_status)
+
+    graphql.login_with_superuser()
+    data = get_delete_data(reservation)
+    response = graphql(DELETE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+    assert Reservation.objects.filter(pk=reservation.pk).exists() is False
+
+    assert PindoraService.delete_access_code.called is True
+
+
 @contextmanager
 def mock_delete_pindora_reservation_task() -> Generator[NonCallableMock]:
     path = "tilavarauspalvelu.api.graphql.types.reservation.mutations."
