@@ -259,7 +259,7 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
             price__gt=0,
             payment_order__isnull=False,
             payment_order__status=OrderStatus.PAID_BY_INVOICE,
-            begins_at__date__lte=local_date(),
+            begins_at__date__gte=local_date(),
         ).count()
 
         deny_reasons = ReservationDenyReason.objects.all().order_by("reason")
@@ -353,7 +353,7 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
             price__gt=0,
             payment_order__isnull=False,
             payment_order__status=OrderStatus.PAID_BY_INVOICE,
-            begins_at__date__lte=local_date(),
+            begins_at__date__gte=local_date(),
         )
         for reservation in cancel_queryset:
             payment_order = reservation.payment_order
