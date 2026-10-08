@@ -137,7 +137,11 @@ class ReservationApproveSerializer(NestingModelSerializer):
             except ExternalServiceError as error:
                 SentryLogger.log_exception(error, details=f"Reservation: {instance.pk}")
 
-        if settings.PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED and instance.is_handled_paid:
+        if (
+            settings.PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED
+            and instance.is_handled_paid
+            and instance.payment_order.status not in OrderStatus.paid_in_webshop
+        ):
             EmailService.send_reservation_requires_payment_email(reservation=instance)
         else:
             EmailService.send_reservation_confirmed_email(reservation=instance)
