@@ -124,8 +124,31 @@ select = [
     "D200",     # pydocstyle: One-line docstring should fit on one line
     "D201",     # pydocstyle: No blank lines allowed before function docstring (found {num_lines})
     "D202",     # pydocstyle: No blank lines allowed after function docstring (found {num_lines})
+    "D204",     # pydocstyle: 1 blank line required after class docstring
+    "D207",     # pydocstyle: Docstring is under-indented
+    "D208",     # pydocstyle: Docstring is over-indented
     "D209",     # pydocstyle: Multi-line docstring closing quotes should be on a separate line
+    "D210",     # pydocstyle: No whitespaces allowed surrounding docstring text
+    "D211",     # pydocstyle: No blank lines allowed before class docstring
     "D213",     # pydocstyle: Multi-line docstring summary should start at the second line
+    "D214",     # pydocstyle: Section is over-indented ("{name}")
+    "D215",     # pydocstyle: Section underline is over-indented ("{name}")
+    "D301",     # pydocstyle: Use `r"""` if any backslashes in a docstring
+    "D402",     # pydocstyle: First line should not be the function's signature
+    "D403",     # pydocstyle: First word of the docstring should be capitalized: `{}` -> `{}`
+    "D405",     # pydocstyle: Section name should be properly capitalized ("{name}")
+    "D406",     # pydocstyle: Section name should end with a newline ("{name}")
+    "D407",     # pydocstyle: Missing dashed underline after section ("{name}")
+    "D408",     # pydocstyle: Section underline should be in the line following the section's name ("{name}")
+    "D409",     # pydocstyle: Section underline should match the length of its name ("{name}")
+    "D410",     # pydocstyle: Missing blank line after section ("{name}")
+    "D411",     # pydocstyle: Missing blank line before section ("{name}")
+    "D412",     # pydocstyle: No blank lines allowed between a section header and its content ("{name}")
+    "D414",     # pydocstyle: Section has no content ("{name}")
+    "D416",     # pydocstyle: Section name should end with a colon ("{name}")
+    "D417",     # pydocstyle: Missing argument description in the docstring for `{definition}`: `{name}`
+    "D418",     # pydocstyle: Function decorated with `@overload` shouldn't contain a docstring
+    "D419",     # pydocstyle: Docstring is empty
     "DJ",       # flake8-django
     #"DTZ",     # flake8-datetimez  # TODO: Enable this and fix (101) issues
     "E",        # pycodestyle errors
@@ -135,6 +158,9 @@ select = [
     "F",        # pyflakes
     "FA",       # flake8-future-annotations
     "FBT",      # flake8-boolean-trap
+    "FIX001",   # flake8-fixme: Line contains FIXME
+    "FIX003",   # flake8-fixme: Line contains XXX
+    "FIX004",   # flake8-fixme: Line contains HACK
     "FLY",      # flynt
     "FURB",     # refurb
     "G",        # flake8-logging-format
@@ -164,22 +190,35 @@ select = [
     "T10",      # flake8-debugger
     "T20",      # flake8-print
     "TC",       # flake8-type-checking
+    "TD001",    # flake8-todos: Invalid TODO tag
+    "TD004",    # flake8-todos: Missing colon in TODO
+    "TD005",    # flake8-todos: Missing issue description after `TODO`
+    "TD006",    # flake8-todos: Invalid TODO capitalization
+    "TD007",    # flake8-todos: Missing space after colon in TODO
     "TID",      # flake8-tidy-imports
     "TRY",      # tryceratops
     "UP",       # pyupgrade
     "W",        # pycodestyle warnings
+    "YTT",      # flake8-2020
 ]
 # Preview rules
 extend-select = [
+    "ASYNC119", # yield-in-context-manager-in-async-generator
     "B043",     # del-attr-with-constant
     "B901",     # return-in-generator
     "B903",     # class-as-data-structure
     "B909",     # loop-iterator-mutation
+    "D420",     # incorrect-section-order
+    "DOC102",   # docstring-extraneous-parameter
+    "DOC202",   # docstring-extraneous-returns
+    "DOC403",   # docstring-extraneous-yields
+    "DOC502",   # docstring-extraneous-exception
     "E262",     # no-space-after-inline-comment
     "FURB101",  # read-whole-file
     "FURB103",  # write-whole-file
     "FURB113",  # repeated-append
     "FURB131",  # delete-full-slice
+    "FURB140",  # reimplemented-starmap
     "FURB142",  # for-loop-set-mutations
     "FURB145",  # slice-copy
     "FURB148",  # unnecessary-enumerate
@@ -210,6 +249,7 @@ extend-select = [
     "RUF045",   # implicit-class-var-in-dataclass
     "RUF047",   # needless-else
     "RUF050",   # unnecessary-if
+    "RUF054",   # indented-form-feed
     "RUF055",   # unnecessary-regular-expression
     "RUF056",   # falsy-dict-get-fallback
     "RUF065",   # logging-eager-conversion
@@ -222,12 +262,26 @@ extend-select = [
     "RUF074",   # incorrect-decorator-order
     "RUF075",   # fallible-context-manager
     "RUF077",   # method-receiver-default
+    "S401",     # suspicious-telnetlib-import
+    "S402",     # suspicious-ftplib-import
+    "S403",     # suspicious-pickle-import
+    "S404",     # suspicious-subprocess-import
+    "S405",     # suspicious-xml-etree-import
+    "S406",     # suspicious-xml-sax-import
+    "S407",     # suspicious-xml-expat-import
+    "S408",     # suspicious-xml-minidom-import
+    "S409",     # suspicious-xml-pulldom-import
+    "S411",     # suspicious-xmlrpc-import
+    "S412",     # suspicious-httpoxy-import
+    "S413",     # suspicious-pycrypto-import
+    "S415",     # suspicious-pyghmi-import
     "TC008",    # quoted-type-alias
     "TID254",   # lazy-import-mismatch
     "TID255",   # lazy-import-immediately-resolved
     "UP048",    # while-one
     "UP051",    # deprecated-abc-decorator
     "UP052",    # context-manager-iterator
+    "W391",     # too-many-newlines-at-end-of-file
 ]
 ignore = [
     # Conflicting with ruff-format, code style preference
