@@ -61,7 +61,18 @@ class ApplicationSectionSerializer(NestingModelSerializer):
 
         # Using serializer as a sub-serializer, and trying to reuse the same object.
         if "pk" in data and not self.instance:
-            self.instance = ApplicationSection.objects.get(pk=data["pk"])
+            parent_application = self.parent.parent.instance if self.parent is not None else None
+            self.instance = ApplicationSection.objects.filter(pk=data["pk"], application=parent_application).first()
+            if self.instance is None:
+                msg = f"Application section {data['pk']} does not belong to this application."
+                raise ValidationError(msg)
+
+        application: Application | None = data.get("application")
+        if self.instance is not None and application is not None and application.pk != self.instance.application_id:
+            msg = "Application section cannot be moved to another application."
+            raise ValidationError(msg)
+
+        self.validate_nested_items_belong_to_section(data, errors)
 
         if "reservation_unit_options" in data:
             self.validate_option_preferred_ordering(data["reservation_unit_options"], errors)
@@ -72,6 +83,26 @@ class ApplicationSectionSerializer(NestingModelSerializer):
             raise ValidationError(errors)
 
         return data
+
+    def validate_nested_items_belong_to_section(self, data: dict[str, Any], errors: list[str]) -> None:
+        option_pks = {option["pk"] for option in data.get("reservation_unit_options", []) if "pk" in option}
+        time_range_pks = {time_range["pk"] for time_range in data.get("suitable_time_ranges", []) if "pk" in time_range}
+
+        own_option_pks: set[int] = set()
+        own_time_range_pks: set[int] = set()
+        if self.instance is not None:
+            own_option_pks = set(self.instance.reservation_unit_options.values_list("pk", flat=True))
+            own_time_range_pks = set(self.instance.suitable_time_ranges.values_list("pk", flat=True))
+
+        other_option_pks = sorted(option_pks - own_option_pks)
+        errors.extend(
+            f"Reservation unit option {pk} does not belong to this application section." for pk in other_option_pks
+        )
+
+        other_time_range_pks = sorted(time_range_pks - own_time_range_pks)
+        errors.extend(
+            f"Suitable time range {pk} does not belong to this application section." for pk in other_time_range_pks
+        )
 
     def validate_option_preferred_ordering(self, data: list[dict[str, Any]], errors: list[str]) -> None:
         from tilavarauspalvelu.models import ReservationUnitOption
