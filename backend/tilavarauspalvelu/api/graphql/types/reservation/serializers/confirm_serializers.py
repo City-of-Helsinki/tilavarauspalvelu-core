@@ -48,6 +48,7 @@ class ReservationConfirmSerializer(NestingModelSerializer):
         self.instance.validators.validate_can_change_reservation()
         self.instance.validators.validate_no_payment_order()
         self.instance.validators.validate_required_metadata_fields()
+        self.instance.validators.validate_free_of_charge_arguments()
 
         data["confirmed_at"] = local_datetime()
 
