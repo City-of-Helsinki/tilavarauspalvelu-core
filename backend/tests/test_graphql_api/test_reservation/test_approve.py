@@ -10,6 +10,7 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.models import PaymentOrder, Reservation
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
@@ -223,7 +224,8 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation__approve__paid__in_webshop__has_payment__paid_online__different_price(graphql):
+@pytest.mark.parametrize("price", ["10.59", "0"])
+def test_reservation__approve__paid__in_webshop__has_payment__paid_online__different_price(graphql, price):
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     reservation = ReservationFactory.create(
@@ -243,7 +245,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__diffe
     )
 
     graphql.login_with_superuser()
-    data = get_approve_data(reservation, price="10.59")
+    data = get_approve_data(reservation, price=price)
     response = graphql(APPROVE_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
@@ -293,6 +295,44 @@ def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online(gr
     assert new_payment_order.price_net == Decimal("8.44")
     assert new_payment_order.price_vat == Decimal("2.15")
     assert new_payment_order.price_total == Decimal("10.59")
+
+
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.parametrize("status", [OrderStatus.CANCELLED, OrderStatus.EXPIRED])
+def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online__price_zero(graphql, status):
+    reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 5, 12),
+        ends_at=local_datetime(2024, 1, 5, 13),
+    )
+
+    PaymentOrderFactory.create(
+        reservation=reservation,
+        payment_type=PaymentType.ONLINE,
+        status=status,
+        price_net=Decimal("10.0"),
+        price_vat=Decimal("2.0"),
+        price_total=Decimal("12.0"),
+        handled_payment_due_by=local_datetime(2024, 1, 2, 12),
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation, price="0")
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    assert PaymentOrder.objects.filter(reservation=reservation).exists() is False
+
+    with freeze_time(local_datetime(2024, 1, 3, 12)):
+        Reservation.objects.cancel_handled_with_payment_overdue()
+
+    reservation = Reservation.objects.get(pk=reservation.pk)
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+    assert reservation.price == Decimal(0)
 
 
 @patch_method(PindoraService.activate_access_code)
