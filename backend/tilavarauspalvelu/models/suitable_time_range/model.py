@@ -62,9 +62,9 @@ class SuitableTimeRange(models.Model):
                 violation_error_message=_("Begin time must be before end time."),
             ),
             models.CheckConstraint(
-                check=models.Q(begin_time__minute=0, end_time__minute=0),
-                name="begin_and_end_time_multiple_of_60_minutes_suitable",
-                violation_error_message=_("Begin and end times must be a multiples of 60 minutes."),
+                check=models.Q(begin_time__minute__in=[0, 15, 30, 45], end_time__minute__in=[0, 15, 30, 45]),
+                name="begin_and_end_time_multiple_of_15_minutes_suitable",
+                violation_error_message=_("Begin and end times must be multiples of 15 minutes."),
             ),
         ]
 

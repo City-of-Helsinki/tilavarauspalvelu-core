@@ -97,6 +97,51 @@ def test_application_section__create__duration_not_multiple_of_30(graphql):
     ]
 
 
+def test_application_section__create__suitable_time_range_at_15_minute_steps(graphql):
+    # given:
+    # - There is draft application in an open application round
+    # - The owner of the application is using the system
+    application = ApplicationFactory.create_in_status_draft_no_sections()
+    graphql.force_login(application.user)
+
+    # when:
+    # - User tries to create a new application section with a suitable time range at 15 minute steps
+    data = get_application_section_create_data(application=application)
+    data["suitableTimeRanges"][0]["beginTime"] = datetime.time(10, 15).isoformat()
+    data["suitableTimeRanges"][0]["endTime"] = datetime.time(11, 45).isoformat()
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    # then:
+    # - The response contains no errors
+    # - The suitable time range is saved with the given times
+    assert response.has_errors is False, response
+
+    section = ApplicationSection.objects.get()
+    time_range = section.suitable_time_ranges.get()
+    assert time_range.begin_time == datetime.time(10, 15)
+    assert time_range.end_time == datetime.time(11, 45)
+
+
+def test_application_section__create__suitable_time_range_not_multiple_of_15(graphql):
+    # given:
+    # - There is draft application in an open application round
+    # - The owner of the application is using the system
+    application = ApplicationFactory.create_in_status_draft_no_sections()
+    graphql.force_login(application.user)
+
+    # when:
+    # - User tries to create a new application section with a suitable time range not at 15 minute steps
+    data = get_application_section_create_data(application=application)
+    data["suitableTimeRanges"][0]["beginTime"] = datetime.time(10, 10).isoformat()
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    # then:
+    # - The response contains an error about the suitable time range
+    assert response.field_error_messages() == [
+        "Begin and end times must be multiples of 15 minutes.",
+    ]
+
+
 def test_application_section__create__two_reservation_unit_options_with_same_preferred_order(graphql):
     # given:
     # - There is draft application in an open application round

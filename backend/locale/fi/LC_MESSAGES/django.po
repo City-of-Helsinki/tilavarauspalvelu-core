@@ -3949,8 +3949,8 @@ msgid "suitable time ranges"
 msgstr "sopivat aikavälit"
 
 #: tilavarauspalvelu/models/suitable_time_range/model.py
-msgid "Begin and end times must be a multiples of 60 minutes."
-msgstr "Alku- ja lopetusaikojen tulee olla 60 minuutin monikertoja."
+msgid "Begin and end times must be multiples of 15 minutes."
+msgstr "Alku- ja lopetusaikojen tulee olla 15 minuutin monikertoja."
 
 #: tilavarauspalvelu/models/tax_percentage/model.py
 msgid "tax percentage"

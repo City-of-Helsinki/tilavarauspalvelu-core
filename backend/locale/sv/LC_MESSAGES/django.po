@@ -3865,7 +3865,7 @@ msgid "suitable time ranges"
 msgstr ""
 
 #: tilavarauspalvelu/models/suitable_time_range/model.py
-msgid "Begin and end times must be a multiples of 60 minutes."
+msgid "Begin and end times must be multiples of 15 minutes."
 msgstr ""
 
 #: tilavarauspalvelu/models/tax_percentage/model.py
