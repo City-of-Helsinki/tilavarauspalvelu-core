@@ -15,7 +15,7 @@ from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from tilavarauspalvelu.models.reservation.actions import ReservationActions
 from utils.date_utils import local_datetime
 
-from tests.factories import ReservationFactory, ReservationUnitFactory, UserFactory
+from tests.factories import ReservationFactory, ReservationSeriesFactory, ReservationUnitFactory, UserFactory
 from tests.helpers import patch_method
 
 from .helpers import REQUIRE_HANDLING_MUTATION, get_require_handling_data
@@ -85,6 +85,29 @@ def test_reservation__requires_handling__disallowed_states(graphql, state):
 
     reservation.refresh_from_db()
     assert reservation.state == state
+
+
+@patch_method(PindoraService.deactivate_access_code)
+def test_reservation__requires_handling__in_reservation_series(graphql):
+    reservation = ReservationFactory.create_for_requires_handling(
+        state=ReservationStateChoice.CONFIRMED,
+        access_type=AccessType.ACCESS_CODE,
+        access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
+        reservation_series=ReservationSeriesFactory.create(),
+    )
+
+    graphql.login_with_superuser()
+    input_data = get_require_handling_data(reservation)
+    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation cannot be in a reservation series."]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+
+    assert PindoraService.deactivate_access_code.call_count == 0
 
 
 @patch_method(PindoraService.deactivate_access_code)

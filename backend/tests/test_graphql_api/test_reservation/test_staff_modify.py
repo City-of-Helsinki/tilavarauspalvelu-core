@@ -10,7 +10,7 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIEr
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime, next_hour
 
-from tests.factories import ReservationFactory
+from tests.factories import ReservationFactory, ReservationSeriesFactory
 from tests.helpers import patch_method
 
 from .helpers import UPDATE_STAFF_MUTATION, get_staff_modify_data
@@ -225,6 +225,45 @@ def test_reservation__staff_modify__staff_reservation_to_blocked(graphql):
     assert reservation.access_code_is_active is False
 
     assert PindoraService.deactivate_access_code.call_count == 0
+
+
+@patch_method(PindoraService.deactivate_access_code)
+def test_reservation__staff_modify__staff_reservation_to_blocked__in_reservation_series(graphql):
+    reservation = ReservationFactory.create_for_staff_update(
+        type=ReservationTypeChoice.STAFF,
+        access_type=AccessType.ACCESS_CODE,
+        access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
+        reservation_series=ReservationSeriesFactory.create(),
+    )
+
+    graphql.login_with_superuser()
+    data = get_staff_modify_data(reservation, type=ReservationTypeChoice.BLOCKED)
+    response = graphql(UPDATE_STAFF_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation cannot be in a reservation series."]
+
+    reservation.refresh_from_db()
+    assert reservation.type == ReservationTypeChoice.STAFF
+
+    assert PindoraService.deactivate_access_code.call_count == 0
+
+
+def test_reservation__staff_modify__in_reservation_series__same_type(graphql):
+    reservation = ReservationFactory.create_for_staff_update(
+        type=ReservationTypeChoice.STAFF,
+        reservation_series=ReservationSeriesFactory.create(),
+    )
+
+    graphql.login_with_superuser()
+    data = get_staff_modify_data(reservation, type=ReservationTypeChoice.STAFF)
+    response = graphql(UPDATE_STAFF_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.name == "foo"
 
 
 @patch_method(PindoraService.deactivate_access_code)
