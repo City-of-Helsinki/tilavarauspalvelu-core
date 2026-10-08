@@ -80,7 +80,7 @@ def comma_sep_str(values: Iterable[Any], *, last_sep: str = "&", quote: bool = F
     return string
 
 
-class with_indices[T]:  # noqa: N801, RUF100
+class with_indices[T]:  # noqa: N801
     """
     Iterate list items with indexes in a way that is safe for deletion.
     This can be used as a deletion safe replacement for `enumerate()`.

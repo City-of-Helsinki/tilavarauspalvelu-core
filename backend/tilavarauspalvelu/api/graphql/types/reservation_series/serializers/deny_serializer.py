@@ -83,8 +83,8 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
         # Must refresh the materialized view since reservations state changed to 'DENIED'
         # TODO: Disabled for now, since it might contribute to timeouts in production.
         #  Refresh still happens on a background task every 2 minutes.
-        #  if settings.UPDATE_AFFECTING_TIME_SPANS:  # noqa: ERA001,RUF100
-        #      update_affecting_time_spans_task.delay()  # noqa: ERA001,RUF100
+        #  if settings.UPDATE_AFFECTING_TIME_SPANS:
+        #      update_affecting_time_spans_task.delay()  # noqa: ERA001
 
         if settings.SAVE_RESERVATION_STATISTICS:
             create_statistics_for_reservations_task.delay(

@@ -1,4 +1,4 @@
-# ruff: noqa: T201, RUF100
+# ruff: noqa: T201
 from __future__ import annotations
 
 import dataclasses

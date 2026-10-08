@@ -111,8 +111,8 @@ def _reservation_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Reservat
 
     # TODO: Disabled for now, since it might contribute to timeouts in production.
     #  Refresh still happens on a background task every 2 minutes.
-    #  if settings.UPDATE_AFFECTING_TIME_SPANS:  # noqa: ERA001,RUF100
-    #      update_affecting_time_spans_task.delay(using=using)  # noqa: ERA001,RUF100
+    #  if settings.UPDATE_AFFECTING_TIME_SPANS:
+    #      update_affecting_time_spans_task.delay(using=using)  # noqa: ERA001
 
 
 @receiver(post_save, sender=ReservationUnit, dispatch_uid="reservation_unit_post_save")
@@ -179,8 +179,8 @@ def _reservation_post_delete(sender: Any, **kwargs: Unpack[PostDeleteKwargs[Rese
 
     # TODO: Disabled for now, since it might contribute to timeouts in production.
     #  Refresh still happens on a background task every 2 minutes.
-    #  if settings.UPDATE_AFFECTING_TIME_SPANS:  # noqa: ERA001,RUF100
-    #      update_affecting_time_spans_task.delay(using=using)  # noqa: ERA001,RUF100
+    #  if settings.UPDATE_AFFECTING_TIME_SPANS:
+    #      update_affecting_time_spans_task.delay(using=using)  # noqa: ERA001
 
 
 @receiver(post_delete, sender=ReservationUnit, dispatch_uid="reservation_unit_post_delete")
