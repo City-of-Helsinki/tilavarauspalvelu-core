@@ -9,7 +9,13 @@ from tilavarauspalvelu.enums import Priority, ReserveeType, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from utils.date_utils import local_datetime, local_start_of_day, local_time
 
-from tests.factories import ApplicationFactory, SuitableTimeRangeFactory, UserFactory
+from tests.factories import (
+    ApplicationFactory,
+    ReservationUnitFactory,
+    ReservationUnitOptionFactory,
+    SuitableTimeRangeFactory,
+    UserFactory,
+)
 from tests.helpers import patch_method
 
 from .helpers import SEND_MUTATION
@@ -132,6 +138,29 @@ def test_send_application__no_reservation_unit_options(graphql):
     assert response.has_errors is True
     assert response.field_error_messages() == [
         f"Application section {section.pk} must have at least one reservation unit option selected."
+    ]
+
+
+def test_send_application__reservation_unit_not_in_application_round(graphql):
+    application = ApplicationFactory.create_application_ready_for_sending()
+    section = application.application_sections.first()
+
+    other_reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitOptionFactory.create(
+        application_section=section,
+        reservation_unit=other_reservation_unit,
+        preferred_order=2,
+    )
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+
+    assert response.has_errors is True
+    assert response.field_error_messages() == [
+        (
+            f"Application section {section.pk} has reservation unit {other_reservation_unit.pk} "
+            "that is not in the application round."
+        ),
     ]
 
 
