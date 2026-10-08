@@ -4,6 +4,7 @@ import datetime
 import hmac
 import io
 import json
+import operator
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urlparse
@@ -598,7 +599,7 @@ def robot_email_cache(request: WSGIRequest) -> HttpResponse:
     robot_email_data = cache.get_many(cache.keys(cache_key_template))
 
     return JsonResponse(
-        sorted(robot_email_data.values(), key=lambda item: item["timestamp"], reverse=True),
+        sorted(robot_email_data.values(), key=operator.itemgetter("timestamp"), reverse=True),
         safe=False,
         status=200,
     )
