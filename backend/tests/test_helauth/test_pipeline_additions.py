@@ -123,6 +123,24 @@ def test_update_user_from_profile__store_prefill_info_in_session_storage():
     }
 
 
+@patch_method(HelsinkiProfileClient.get_token, return_value="foo")
+@patch_method(HelsinkiProfileClient.request)
+def test_update_user_from_profile__has_profile_id__missing_date_of_birth():
+    user = UserFactory.create(profile_id="foo", date_of_birth=None)
+
+    profile_data = MyProfileDataFactory.create_basic(
+        id="foo",
+        verifiedPersonalInformation__nationalIdentificationNumber="010101A1234",
+    )
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+
+    request = mock_request(user)
+    update_user_from_profile(request)
+
+    user.refresh_from_db()
+    assert user.date_of_birth == datetime.date(2001, 1, 1)
+
+
 @patch_method(HelsinkiProfileClient.get_token, return_value=None)
 @patch_method(HelsinkiProfileClient.request, return_value=ResponseMock(json_data={}))
 @patch_method(SentryLogger.log_message)
