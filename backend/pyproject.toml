@@ -96,15 +96,12 @@ tilavarauspalvelu = "tests.plugins"
 
 [tool.ruff]
 fix = true
-unsafe-fixes = false
 line-length = 120
 target-version = "py313"
 extend-exclude = [
-    "build",
     "local_settings.py",
     "migrations",
     "config/settings.py",
-    "venv",
 ]
 
 [tool.ruff.format]
@@ -245,7 +242,7 @@ ignore = [
     # Allow importing inside functions, this is useful for avoiding circular imports.
     "PLC0415",  # import-outside-top-level
 
-    # Allow empty comments. We use emtpy comments for forcing better code formatting.
+    # Allow empty comments. We use empty comments for forcing better code formatting.
     "PLR2044",  # empty-comment
 
     # Allow type comments for now, since they are useful for documenting types.
@@ -296,7 +293,7 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
     "PLR0917",  # Allow as many positional arguments as needed in tests
     "PLR2004",  # Magic value comparisons are allowed in tests.
     "RUF069",   # Exact float comparisons are fine in tests.
-    "S101",     # Obviousle asserts are fine in tests
+    "S101",     # Obviously asserts are fine in tests
     "S105",     # Hardcoded passwords are fine in tests
     "S106",     # Hardcoded passwords are fine in tests
     "S311",     # Pseudo-random generators are fine here.
@@ -306,18 +303,9 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
 
 
 [tool.ruff.lint.isort]
-combine-as-imports = false
 split-on-trailing-comma = false
 required-imports = [
     "from __future__ import annotations",
-]
-known-third-party = [
-    "django",
-]
-known-first-party = [
-    "config",
-    "tilavarauspalvelu",
-    "utils",
 ]
 section-order = [
     "future",
@@ -336,7 +324,6 @@ suppress-dummy-args = true
 
 [tool.ruff.lint.flake8-type-checking]
 strict = true
-quote-annotations = false
 exempt-modules = [
     "typing",
     "ast",
@@ -344,16 +331,6 @@ exempt-modules = [
     "graphql",
     "graphene_django",
     "graphene_django_extensions",
-    "tilavarauspalvelu.api.graphql",
-]
-
-[tool.ruff.lint.flake8-builtins]
-builtins-allowed-modules = [
-    "types",
-    "typing",
-    "logging",
-    "resource",
-    "dataclasses",
 ]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
@@ -402,10 +379,7 @@ banned-from = [
 
 [tool.ruff.lint.flake8-self]
 extend-ignore-names = [
-    "_base_manager",
-    "_default_manager",
     "_meta",
-    "_mptt_meta",
     "_defaults",
     "_errors",
 ]
@@ -431,18 +405,8 @@ extend-ignore-names = [
 
 [tool.ruff.lint.pylint]
 max-returns = 8
-max-positional-args = 5
 max-args = 10
 max-bool-expr = 6
-
-[tool.bandit]
-exclude_dirs = [
-    "tests",
-]
-skips = [
-    "B101",     # Assert is fine.
-    "B311",     # Random is fine.
-]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
@@ -452,22 +416,10 @@ markers = [
     "frontend_query: Marks a frontend query test."
 ]
 python_files = [
-    "tests.py",
     "test_*.py",
-    "*_tests.py",
-]
-norecursedirs = [
-    ".git",
-    "venv",
-    "build",
 ]
 filterwarnings = [
-    "ignore:.*collections.*:DeprecationWarning:graphene",
-    "ignore:.*ugettext_lazy.*::recurrence",
     "ignore:.*No directory at.*:UserWarning:whitenoise",
-    "ignore:.*ugettext_lazy.*::auditlog",
-    "ignore:.*smart_text.*::auditlog",
-    "ignore:.*ugettext_lazy.*::jsonfield",
 ]
 
 [tool.coverage.run]
@@ -485,7 +437,6 @@ source_pkgs = [
 [tool.coverage.report]
 omit = [
     "*migrations*",
-    "*tests*",
 ]
 exclude_also = [
     "if TYPE_CHECKING:",
