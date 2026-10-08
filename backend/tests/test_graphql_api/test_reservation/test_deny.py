@@ -14,6 +14,7 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIEr
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.types import WebShopPaymentStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from tilavarauspalvelu.models import PaymentOrder
 from utils.date_utils import local_datetime
 
 from tests.factories import PaymentFactory, ReservationFactory
@@ -253,6 +254,36 @@ def test_reservation__deny__delete_from_pindora__call_fails(graphql):
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+
+
+@patch_method(PindoraService.delete_access_code, side_effect=PindoraAPIError("Pindora Error"))
+@patch_method(VerkkokauppaAPIClient.get_payment, return_value=None)
+@patch_method(VerkkokauppaAPIClient.cancel_order)
+def test_reservation__deny__delete_from_pindora__call_fails__webshop_order_not_cancelled(graphql):
+    reservation = ReservationFactory.create_for_deny(
+        access_type=AccessType.ACCESS_CODE,
+        access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
+        payment_order__remote_id=uuid.uuid4(),
+        payment_order__status=OrderStatus.PENDING,
+        payment_order__handled_payment_due_by=local_datetime() + datetime.timedelta(days=1),
+        payment_order__payment_type=PaymentType.ONLINE,
+    )
+
+    graphql.login_with_superuser()
+    input_data = get_deny_data(reservation)
+    response = graphql(DENY_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Pindora Error"]
+
+    assert VerkkokauppaAPIClient.cancel_order.called is False
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+
+    payment_order = PaymentOrder.objects.get(reservation=reservation)
+    assert payment_order.status == OrderStatus.PENDING
 
 
 @patch_method(PindoraService.delete_access_code, side_effect=PindoraNotFoundError("Error"))
