@@ -71,7 +71,7 @@ class TimeSpanElement:
         start_time: datetime.time = (
             datetime.time()
             if full_day or time_element["start_time"] is None
-            else datetime.datetime.strptime(time_element["start_time"], "%H:%M:%S").time()
+            else datetime.time.fromisoformat(time_element["start_time"])
         )
 
         start_datetime = datetime.datetime.combine(date, start_time, tzinfo=timezone)
@@ -82,7 +82,7 @@ class TimeSpanElement:
         end_time: datetime.time = (
             datetime.time()
             if full_day or time_element["end_time"] is None
-            else datetime.datetime.strptime(time_element["end_time"], "%H:%M:%S").time()
+            else datetime.time.fromisoformat(time_element["end_time"])
         )
 
         end_datetime = datetime.datetime.combine(date, end_time, tzinfo=timezone)
@@ -274,7 +274,7 @@ class TimeSpanElement:
         for day in self.get_dates_range():
             # Add closed time spans for the time range outside the given filter range
             # e.g. Filter time range is 10:00-14:00, add closed time spans for 00:00-10:00 and 14:00-00:00
-            if filter_time_start and filter_time_start != datetime.datetime.min:
+            if filter_time_start:
                 closed_time_spans.append(
                     TimeSpanElement(
                         start_datetime=local_start_of_day(day),
@@ -286,7 +286,7 @@ class TimeSpanElement:
                         is_reservable=False,
                     )
                 )
-            if filter_time_end and filter_time_end != datetime.datetime.min:
+            if filter_time_end:
                 closed_time_spans.append(
                     TimeSpanElement(
                         start_datetime=datetime.datetime.combine(

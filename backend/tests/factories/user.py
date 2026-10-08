@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import base64
-import datetime
 import json
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Any, Literal
@@ -147,7 +146,7 @@ def get_extra_data(instance: UserSocialAuth, **kwargs: Any) -> dict[str, Any]:
     return {
         "id": str(uuid4()),
         "id_token": get_id_token(instance, **kwargs),
-        "auth_time": int(datetime.datetime.now().timestamp()),
+        "auth_time": int(local_datetime().timestamp()),
         "token_type": "bearer",
         "access_token": uuid4().hex,
         "refresh_token": uuid4().hex,
@@ -180,9 +179,9 @@ def get_id_token(
                         aud="tilavaraus-test",
                         jti=uuid4().hex,
                         typ="ID",
-                        exp=int(datetime.datetime.now().timestamp()),
-                        iat=int(datetime.datetime.now().timestamp()),
-                        auth_time=int(datetime.datetime.now().timestamp()),
+                        exp=int(local_datetime().timestamp()),
+                        iat=int(local_datetime().timestamp()),
+                        auth_time=int(local_datetime().timestamp()),
                         nonce=get_random_string(64),
                         at_hash=uuid4().hex,
                         name=instance.user.username,

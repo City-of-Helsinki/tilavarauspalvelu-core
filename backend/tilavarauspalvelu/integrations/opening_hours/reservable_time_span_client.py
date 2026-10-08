@@ -98,7 +98,7 @@ class ReservableTimeSpanClient:
         for day in opening_hours_response["opening_hours"]:
             for time_element in day["times"]:
                 time_span_element = TimeSpanElement.create_from_time_element(
-                    date=datetime.datetime.strptime(day["date"], "%Y-%m-%d").date(),
+                    date=datetime.date.fromisoformat(day["date"]),
                     timezone=resource_timezone,
                     time_element=time_element,
                 )
