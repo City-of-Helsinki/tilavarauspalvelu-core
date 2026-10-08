@@ -15,14 +15,15 @@ pytestmark = [
 ]
 
 
-def test_prune_reservation_statistics__deletes_in_the_given_time(settings):
+def test_prune_reservation_statistics__deletes_in_the_given_time(settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     five_years_ago = local_datetime() - relativedelta(years=5)
     four_years_ago = local_datetime() - relativedelta(years=4)
 
-    delete = ReservationFactory.create(created_at=five_years_ago, name="DELETE ME")
-    keep = ReservationFactory.create(created_at=four_years_ago, name="KEEP ME")
+    with django_capture_on_commit_callbacks(execute=True):
+        delete = ReservationFactory.create(created_at=five_years_ago, name="DELETE ME")
+        keep = ReservationFactory.create(created_at=four_years_ago, name="KEEP ME")
 
     prune_reservation_statistics_task()
 

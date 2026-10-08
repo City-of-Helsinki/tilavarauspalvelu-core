@@ -98,7 +98,7 @@ def _space_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Space]]) -> No
         Space.objects.rebuild()
 
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY:
-        update_reservation_unit_hierarchy_task.delay(using=using)
+        update_reservation_unit_hierarchy_task.delay_on_commit(using=using)
 
 
 @receiver(post_save, sender=Reservation, dispatch_uid="reservation_post_save")
@@ -107,7 +107,7 @@ def _reservation_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Reservat
     _using = kwargs["using"]
 
     if settings.SAVE_RESERVATION_STATISTICS:
-        create_statistics_for_reservations_task.delay(reservation_pks=[instance.pk])
+        create_statistics_for_reservations_task.delay_on_commit(reservation_pks=[instance.pk])
 
     # TODO: Disabled for now, since it might contribute to timeouts in production.
     #  Refresh still happens on a background task every 2 minutes.
@@ -125,7 +125,7 @@ def _reservation_unit_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Res
         refresh_reservation_unit_product_mapping_task.delay(instance.pk)
 
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and created:
-        update_reservation_unit_hierarchy_task.delay(using=using)
+        update_reservation_unit_hierarchy_task.delay_on_commit(using=using)
 
     if settings.UPDATE_SEARCH_VECTORS:
         update_reservation_unit_search_vectors_task.delay(pks=[instance.pk])
@@ -170,7 +170,7 @@ def _space_post_delete(sender: Any, **kwargs: Unpack[PostDeleteKwargs[Space]]) -
         Space.objects.rebuild()
 
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY:
-        update_reservation_unit_hierarchy_task.delay(using=using)
+        update_reservation_unit_hierarchy_task.delay_on_commit(using=using)
 
 
 @receiver(post_delete, sender=Reservation, dispatch_uid="reservation_post_delete")
@@ -188,7 +188,7 @@ def _reservation_unit_post_delete(sender: Any, **kwargs: Unpack[PostDeleteKwargs
     using = kwargs["using"]
 
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY:
-        update_reservation_unit_hierarchy_task.delay(using=using)
+        update_reservation_unit_hierarchy_task.delay_on_commit(using=using)
 
 
 # --- M2M changed signals -----------------------------------------------------------------------------------------
@@ -203,7 +203,7 @@ def _reservation_unit_spaces_m2m(sender: Any, **kwargs: Unpack[M2MChangedKwargs[
     post_modify = action in {"post_add", "post_remove", "post_clear"}
 
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and post_modify:
-        update_reservation_unit_hierarchy_task.delay(using=using)
+        update_reservation_unit_hierarchy_task.delay_on_commit(using=using)
 
     if settings.UPDATE_SEARCH_VECTORS and post_modify:
         update_reservation_unit_search_vectors_task.delay(pks=[instance.pk])
@@ -218,7 +218,7 @@ def _reservation_unit_resources_m2m(sender: Any, **kwargs: Unpack[M2MChangedKwar
     post_modify = action in {"post_add", "post_remove", "post_clear"}
 
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and post_modify:
-        update_reservation_unit_hierarchy_task.delay(using=using)
+        update_reservation_unit_hierarchy_task.delay_on_commit(using=using)
 
     if settings.UPDATE_SEARCH_VECTORS and post_modify:
         update_reservation_unit_search_vectors_task.delay(pks=[instance.pk])
