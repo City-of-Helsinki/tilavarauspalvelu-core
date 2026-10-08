@@ -12,7 +12,7 @@ from django.core.cache import cache
 from django.db import transaction
 
 from config.celery import app
-from tilavarauspalvelu.enums import ReservationTypeChoice
+from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.management.commands.data_creation.create_robot_test_data import create_robot_test_data
 from tilavarauspalvelu.models import (
@@ -605,6 +605,8 @@ def notify_reservation_on_access_type_change_task(reservation_pks: list[int]) ->
             pk__in=reservation_pks,
             # Still only send email for reservations that are ongoing or in the future
             ends_at__gt=now,
+            # Other reservations get the access information when they are confirmed
+            state=ReservationStateChoice.CONFIRMED,
         )
         .exclude(type=ReservationTypeChoice.SEASONAL)
     )
@@ -617,6 +619,9 @@ def notify_reservation_on_access_type_change_task(reservation_pks: list[int]) ->
             reservation_unit_options__allocated_time_slots__reservation_series__reservations__in=reservation_pks,
             # Still only send email for sections that have reservations that are ongoing or in the future
             reservation_unit_options__allocated_time_slots__reservation_series__reservations__ends_at__gt=now,
+            reservation_unit_options__allocated_time_slots__reservation_series__reservations__state=(
+                ReservationStateChoice.CONFIRMED
+            ),
         )
         .distinct()
         .select_related("application")
