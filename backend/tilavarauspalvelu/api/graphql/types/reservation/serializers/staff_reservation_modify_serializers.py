@@ -126,6 +126,11 @@ class StaffReservationModifySerializer(NestingModelSerializer):
         if reservation_type is not None:
             self.instance.validators.validate_reservation_type_allows_staff_edit(new_type=reservation_type)
 
+        # The type of a series reservation can only change for the whole series.
+        # Pindora has one access code for the series, so a change to or from BLOCKED would affect every reservation.
+        if reservation_type is not None and reservation_type != self.instance.type:
+            self.instance.validators.validate_not_in_reservation_series()
+
         return data
 
     def update(self, instance: Reservation, validated_data: StaffReservationData) -> Reservation:

@@ -59,6 +59,7 @@ class ReservationRequiresHandlingSerializer(NestingModelSerializer):
             reservation_unit.validators.validate_no_overlapping_reservations(begins_at=begin, ends_at=end)
 
         self.instance.validators.validate_reservation_state_allows_handling()
+        self.instance.validators.validate_not_in_reservation_series()
         data["state"] = ReservationStateChoice.REQUIRES_HANDLING
         return data
 
