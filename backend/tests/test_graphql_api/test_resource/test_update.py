@@ -3,8 +3,9 @@ from __future__ import annotations
 import pytest
 
 from tilavarauspalvelu.enums import ResourceLocationType
+from tilavarauspalvelu.models import Resource
 
-from tests.factories import ResourceFactory, SpaceFactory
+from tests.factories import ResourceFactory, SpaceFactory, UserFactory
 
 from .helpers import UPDATE_MUTATION
 
@@ -16,7 +17,7 @@ pytestmark = [
 
 def test_resource__update(graphql):
     resource = ResourceFactory.create()
-    space = SpaceFactory.create()
+    space = SpaceFactory.create(unit=resource.space.unit)
     graphql.login_with_superuser()
 
     data = {
@@ -37,6 +38,63 @@ def test_resource__update(graphql):
     assert resource.name_sv == "c"
     assert resource.space.pk == space.pk
     assert resource.location_type == ResourceLocationType.FIXED.value
+
+
+def test_resource__update__unit_admin__move_to_space_of_same_unit(graphql):
+    resource = ResourceFactory.create()
+    new_space = SpaceFactory.create(unit=resource.space.unit)
+    admin = UserFactory.create_with_unit_role(units=[resource.space.unit])
+    graphql.force_login(admin)
+
+    data = {
+        "pk": resource.pk,
+        "space": new_space.pk,
+    }
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response
+
+    resource = Resource.objects.get(pk=resource.pk)
+    assert resource.space == new_space
+
+
+def test_resource__update__unit_admin__move_to_space_of_other_unit(graphql):
+    resource = ResourceFactory.create()
+    original_space = resource.space
+    other_space = SpaceFactory.create()
+    admin = UserFactory.create_with_unit_role(units=[original_space.unit])
+    graphql.force_login(admin)
+
+    data = {
+        "pk": resource.pk,
+        "space": other_space.pk,
+    }
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("space") == ["Resource cannot be moved to a space in another unit."]
+
+    resource = Resource.objects.get(pk=resource.pk)
+    assert resource.space == original_space
+
+
+def test_resource__update__superuser__move_to_space_of_other_unit(graphql):
+    resource = ResourceFactory.create()
+    original_space = resource.space
+    other_space = SpaceFactory.create()
+    graphql.login_with_superuser()
+
+    data = {
+        "pk": resource.pk,
+        "space": other_space.pk,
+    }
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("space") == ["Resource cannot be moved to a space in another unit."]
+
+    resource = Resource.objects.get(pk=resource.pk)
+    assert resource.space == original_space
 
 
 def test_resource__update__remove_translations(graphql):

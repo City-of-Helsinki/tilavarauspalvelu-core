@@ -10,7 +10,7 @@ from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiA
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
 from tilavarauspalvelu.models import ReservationUnit
 
-from tests.factories import UnitFactory
+from tests.factories import ResourceFactory, SpaceFactory, UnitFactory, UserFactory
 from tests.helpers import patch_method
 
 from .helpers import CREATE_MUTATION, get_create_non_draft_input_data
@@ -38,6 +38,38 @@ def test_reservation_unit__create(graphql):
     reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
     assert reservation_unit.is_draft is True
     assert reservation_unit.unit == unit
+
+
+def test_reservation_unit__create__unit_admin__space_of_other_unit(graphql):
+    unit = UnitFactory.create()
+    other_space = SpaceFactory.create()
+    admin = UserFactory.create_with_unit_role(units=[unit])
+    graphql.force_login(admin)
+
+    data = {"isDraft": True, "name": "foo", "unit": unit.pk, "spaces": [other_space.pk]}
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("spaces") == ["Reservation unit can only have spaces of its own unit."]
+
+    assert ReservationUnit.objects.exists() is False
+
+
+def test_reservation_unit__create__unit_admin__resource_of_other_unit(graphql):
+    unit = UnitFactory.create()
+    other_resource = ResourceFactory.create()
+    admin = UserFactory.create_with_unit_role(units=[unit])
+    graphql.force_login(admin)
+
+    data = {"isDraft": True, "name": "foo", "unit": unit.pk, "resources": [other_resource.pk]}
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("resources") == [
+        "Reservation unit can only have resources in spaces of its own unit."
+    ]
+
+    assert ReservationUnit.objects.exists() is False
 
 
 @patch_method(HaukiAPIClient.get_resource, return_value=HaukiAPIResource(id=123))
