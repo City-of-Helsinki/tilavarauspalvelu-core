@@ -1,4 +1,5 @@
 // @ts-check
+import { availableParallelism } from "node:os";
 import { join } from "node:path";
 import * as url from "node:url";
 import { withSentryConfig } from "@sentry/nextjs";
@@ -20,6 +21,9 @@ const { i18n } = i18nconfig;
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // NOTE default worker count uses os.cpus() which ignores container CPU limits
+  // and spawns too many workers (OOM in memory limited containers)
+  experimental: { cpus: availableParallelism() },
   transpilePackages: ["ui", "hds-core", "hds-react"],
   // create a smaller bundle
   output: "standalone",
