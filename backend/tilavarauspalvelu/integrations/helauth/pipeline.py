@@ -102,24 +102,27 @@ def migrate_user_from_tunnistamo_to_keycloak(**kwargs: Unpack[PipelineArgs]) -> 
         and id_token.is_ad_login  # It is an AD login.
         and id_token.email not in {"", None}  # User has an email.
     ):
-        migrate_from_tunnistamo_to_keycloak(email=id_token.email)
+        migrate_from_tunnistamo_to_keycloak(user=user, email=id_token.email)
 
     return {"user": user}
 
 
 @SentryLogger.log_if_raises("Login: Failed to migrate user from tunnistamo to keycloak")
-def migrate_from_tunnistamo_to_keycloak(*, email: str) -> None:
-    # Look at the two most recent AD users with the same email address (no profile ID).
-    # There can be more, but the most recent one is the new Keycloak user and the other one
-    # is the old Tunnistamo user after the auth-migration (when auth moved to backend), which we want to migrate.
-    users: list[User] = list(
-        User.objects.filter(email__iexact=email, profile_id="", is_active=True).order_by("-date_joined")[:2]
+def migrate_from_tunnistamo_to_keycloak(*, user: User, email: str) -> None:
+    # The user logging in with Keycloak AD is the new user. The most recent older AD user with the same
+    # email address (no profile ID) is the old Tunnistamo user after the auth-migration (when auth moved
+    # to backend), which we want to migrate. Newer users with the same email are other accounts.
+    older_users = User.objects.filter(
+        email__iexact=email,
+        profile_id="",
+        is_active=True,
+        date_joined__lt=user.date_joined,
     )
-    if len(users) < 2:  # noqa: PLR2004
+    old_user = older_users.order_by("-date_joined").first()
+    if old_user is None:
         return
 
-    new_user = users[0]
-    old_user = users[1]
+    new_user = user
 
     # Migrate user properties.
     new_user.is_staff = old_user.is_staff
@@ -144,13 +147,7 @@ def migrate_from_tunnistamo_to_keycloak(*, email: str) -> None:
     old_user.save()
 
     # Also mark additional users older than these two as inactive, so that migration doesn't happen again.
-    User.objects.filter(
-        email__iexact=email,
-        profile_id="",
-        is_active=True,
-    ).exclude(
-        id=new_user.id,
-    ).update(
+    older_users.update(
         is_active=False,
         last_name=Concat(models.F("last_name"), models.Value(" EXPIRED")),
     )
