@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
+from freezegun import freeze_time
 from graphene_django_extensions.testing import build_mutation
 
 from tilavarauspalvelu.enums import (
@@ -22,8 +24,15 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import PaymentOrder
+from utils.date_utils import local_datetime
 
-from tests.factories import OrderFactory, PaymentOrderFactory, ReservationFactory, UserFactory
+from tests.factories import (
+    OrderFactory,
+    PaymentOrderFactory,
+    ReservationFactory,
+    ReservationUnitPricingFactory,
+    UserFactory,
+)
 from tests.helpers import patch_method
 
 from .helpers import CONFIRM_MUTATION, get_confirm_data
@@ -396,6 +405,56 @@ def test_reservation__confirm__default_payment_type__online_or_invoice(graphql):
     # 'invoicing_date' parameter is given so that invoicing is show in Verkkokauppa UI
     order_params: CreateOrderParams = VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"]
     assert order_params.items[0].invoicing_date is not None
+
+
+@freeze_time(local_datetime(2030, 1, 1, 12))
+def test_reservation__confirm__pricing_by_local_begin_date(graphql):
+    reservation = ReservationFactory.create_for_confirmation(
+        begins_at=local_datetime(2030, 1, 10, 1),
+        ends_at=local_datetime(2030, 1, 10, 2),
+        reservation_unit__pricings__payment_type=PaymentType.ONLINE,
+    )
+    ReservationUnitPricingFactory.create(
+        reservation_unit=reservation.reservation_unit,
+        begins=datetime.date(2030, 1, 10),
+        payment_type=PaymentType.ON_SITE,
+        highest_price=Decimal(20),
+    )
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    payment_order = PaymentOrder.objects.get(reservation=reservation)
+    assert payment_order.payment_type == PaymentType.ON_SITE
+
+
+@freeze_time(local_datetime(2030, 1, 1, 12))
+@patch_method(VerkkokauppaAPIClient.create_order)
+def test_reservation__confirm__invoicing_date_is_local_begin_date(graphql):
+    reservation = ReservationFactory.create_for_confirmation(
+        begins_at=local_datetime(2030, 1, 10, 1),
+        ends_at=local_datetime(2030, 1, 10, 2),
+        reservee_type=ReserveeType.COMPANY,
+        reservation_unit__pricings__payment_type=PaymentType.ONLINE_OR_INVOICE,
+        reservation_unit__payment_accounting__product_invoicing_sales_org="2900",
+        reservation_unit__payment_accounting__product_invoicing_sales_office="2911",
+        reservation_unit__payment_accounting__product_invoicing_material="12345678",
+        reservation_unit__payment_accounting__product_invoicing_order_type="ZTY1",
+    )
+
+    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    order_params: CreateOrderParams = VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"]
+    assert order_params.items[0].invoicing_date == datetime.date(2030, 1, 10)
 
 
 def test_reservation__confirm__cannot_confirm_if_order_exists(graphql):

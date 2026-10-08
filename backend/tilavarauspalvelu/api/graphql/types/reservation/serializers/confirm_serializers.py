@@ -13,7 +13,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -59,7 +59,8 @@ class ReservationConfirmSerializer(NestingModelSerializer):
             return data
 
         reservation_unit = self.instance.reservation_unit
-        pricing = reservation_unit.actions.get_active_pricing(by_date=self.instance.begins_at.date())
+        begin_date = self.instance.begins_at.astimezone(DEFAULT_TIMEZONE).date()
+        pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
 
         if pricing is None:
             msg = "No pricing found for the given date."
