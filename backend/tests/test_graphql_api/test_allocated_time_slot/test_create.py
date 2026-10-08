@@ -4,7 +4,12 @@ import datetime
 
 import pytest
 
-from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, ApplicationStatusChoice, Weekday
+from tilavarauspalvelu.enums import (
+    ApplicationSectionStatusChoice,
+    ApplicationStatusChoice,
+    ReservationStartInterval,
+    Weekday,
+)
 from tilavarauspalvelu.models import ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE
 
@@ -226,8 +231,29 @@ def test_allocated_time_slot__create__approve_duration_shorter_than_section_mini
         ]
 
 
+def test_allocated_time_slot__create__approve_times_at_15_minute_steps(graphql):
+    # given:
+    # - There is an allocatable reservation unit option for a reservation unit with a 15 minute start interval
+    # - A superuser is using the system
+    application = ApplicationFactory.create_application_ready_for_allocation()
+    section = application.application_sections.first()
+    option = section.reservation_unit_options.first()
+    option.reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_15_MINUTES
+    option.reservation_unit.save()
+    graphql.login_with_superuser()
+
+    # when:
+    # - The user tries to make an allocation that begins and ends at a quarter past the hour
+    input_data = allocation_create_data(option, begin_time=datetime.time(10, 15), end_time=datetime.time(11, 30))
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
+
+    # then:
+    # - The allocation is successful
+    assert response.has_errors is False, response
+
+
 @pytest.mark.parametrize("force", [True, False])
-def test_allocated_time_slot__create__approve_duration_not_multiple_of_30_minutes(graphql, force):
+def test_allocated_time_slot__create__approve_times_not_multiple_of_15_minutes(graphql, force):
     # given:
     # - There is an allocatable reservation unit option
     # - A superuser is using the system
@@ -238,18 +264,44 @@ def test_allocated_time_slot__create__approve_duration_not_multiple_of_30_minute
 
     # when:
     # - The user tries to make an allocation for a reservation unit option,
-    #   but not for a multiple of 30 minutes
-    input_data = allocation_create_data(option, end_time=datetime.time(11, 0, 1), force=force)
+    #   but the end time is not at a 15 minute step
+    input_data = allocation_create_data(option, end_time=datetime.time(11, 10), force=force)
     response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
-    # - If force=False -> The response complains about the duration being invalid
-    # - If force=True -> The allocation is successful
-    assert response.has_errors is (not force)
-    if not force:
-        assert response.field_error_messages() == [
-            "Allocation duration must be a multiple of 30 minutes.",
-        ]
+    # - The response complains about the times being invalid, even if forced
+    assert response.field_error_messages() == [
+        "Allocation begin and end times must be multiples of 15 minutes.",
+    ]
+
+
+@pytest.mark.parametrize("force", [True, False])
+def test_allocated_time_slot__create__approve_begin_time_not_matching_start_interval(graphql, force):
+    # given:
+    # - There is an allocatable reservation unit option for a reservation unit with a 30 minute start interval
+    # - A superuser is using the system
+    application = ApplicationFactory.create_application_ready_for_allocation()
+    section = application.application_sections.first()
+    option = section.reservation_unit_options.first()
+    option.reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES
+    option.reservation_unit.save()
+    graphql.login_with_superuser()
+
+    # when:
+    # - The user tries to make an allocation that begins at a quarter past the hour
+    input_data = allocation_create_data(
+        option,
+        begin_time=datetime.time(10, 15),
+        end_time=datetime.time(11, 15),
+        force=force,
+    )
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
+
+    # then:
+    # - The response complains about the begin time not matching the start interval, even if forced
+    assert response.field_error_messages() == [
+        "Allocation begin time does not match the allowed start interval of the reservation unit.",
+    ]
 
 
 @pytest.mark.parametrize("force", [True, False])
