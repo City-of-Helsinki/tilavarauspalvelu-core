@@ -977,6 +977,32 @@ def test_reservation__create__reservation_block_whole_day__start_and_end_at_midn
     assert reservation.buffer_time_after == datetime.timedelta(hours=0)
 
 
+@freezegun.freeze_time("2021-01-01")
+def test_reservation__create__reservation_block_whole_day__back_to_back_whole_days(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        reservation_block_whole_day=True,
+    )
+
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
+        begins_at=datetime.datetime(2021, 1, 3, hour=0, tzinfo=DEFAULT_TIMEZONE),
+        ends_at=datetime.datetime(2021, 1, 4, hour=0, tzinfo=DEFAULT_TIMEZONE),
+        state=ReservationStateChoice.CONFIRMED,
+    )
+    ReservationUnitHierarchy.refresh()
+
+    graphql.login_with_regular_user()
+
+    input_data = {
+        "beginsAt": datetime.datetime(2021, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "endsAt": datetime.datetime(2021, 1, 3, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "reservationUnit": reservation_unit.pk,
+    }
+
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+    assert response.has_errors is False, response.errors
+
+
 @freezegun.freeze_time("2021-01-01 12:00")
 @pytest.mark.parametrize(
     ("new_reservation_begin_delta", "error_message"),

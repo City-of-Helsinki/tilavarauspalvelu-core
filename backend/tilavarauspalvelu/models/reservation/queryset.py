@@ -24,7 +24,7 @@ from tilavarauspalvelu.models import Reservation, ReservationStatistic, Reservat
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from tilavarauspalvelu.models.reservation_statistic.queryset import statistics_retention_cutoff
 from tilavarauspalvelu.tasks import delete_pindora_reservation_task
-from utils.date_utils import local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.db import Now
 from utils.mixins import SerializableModelManagerMixin
 
@@ -127,13 +127,14 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
         All reservations that are going to occur in the given reservation unit
         that overlap with a period, even partially.
         """
+        # Whole-day buffers depend on the local time of day.
+        if buffer_time_before is None:
+            buffer_time_before = reservation_unit.actions.get_actual_before_buffer(begin.astimezone(DEFAULT_TIMEZONE))
+        if buffer_time_after is None:
+            buffer_time_after = reservation_unit.actions.get_actual_after_buffer(end.astimezone(DEFAULT_TIMEZONE))
+
         begin = begin.astimezone(datetime.UTC)
         end = end.astimezone(datetime.UTC)
-
-        if buffer_time_before is None:
-            buffer_time_before = reservation_unit.actions.get_actual_before_buffer(begin)
-        if buffer_time_after is None:
-            buffer_time_after = reservation_unit.actions.get_actual_after_buffer(end)
 
         qs = (
             self
