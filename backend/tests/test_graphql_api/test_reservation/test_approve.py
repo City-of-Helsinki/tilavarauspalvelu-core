@@ -4,17 +4,18 @@ from decimal import Decimal
 
 import pytest
 from freezegun import freeze_time
+from rest_framework.status import HTTP_204_NO_CONTENT
 
 from tilavarauspalvelu.enums import AccessType, OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import PaymentOrder, Reservation
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
-from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
-from tests.helpers import patch_method
+from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationSeriesFactory, ReservationUnitFactory
+from tests.helpers import ResponseMock, patch_method
 
 from .helpers import APPROVE_MUTATION, get_approve_data
 
@@ -394,6 +395,39 @@ def test_reservation__approve__pindora_api__call_fails(graphql):
     assert PindoraService.create_access_code.called is False
 
     assert SentryLogger.log_exception.called is True
+
+
+@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
+def test_reservation__approve__pindora_api__series__access_code_not_generated(graphql):
+    reservation_unit = ReservationUnitFactory.create_free(
+        access_types__access_type=AccessType.ACCESS_CODE,
+    )
+    series = ReservationSeriesFactory.create(reservation_unit=reservation_unit)
+
+    reservation = ReservationFactory.create(
+        reservation_unit=reservation_unit,
+        reservation_series=series,
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        access_type=AccessType.ACCESS_CODE,
+        access_code_is_active=False,
+        access_code_generated_at=None,
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
+        response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.get(pk=reservation.pk)
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+    assert reservation.access_code_is_active is False
+
+    assert EmailService.send_reservation_confirmed_email.called is True
+    assert EmailService.send_reservation_created_staff_notification_email.called is True
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
