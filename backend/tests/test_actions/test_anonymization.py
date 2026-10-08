@@ -201,8 +201,8 @@ def test_anonymization__can_anonymize__open_payments():
 
     PaymentOrderFactory.create(
         reservation__user=user,
-        reservation__begins_at=datetime.datetime(2022, 1, 1),
-        reservation__ends_at=datetime.datetime(2022, 1, 2),
+        reservation__begins_at=local_datetime(2022, 1, 1),
+        reservation__ends_at=local_datetime(2022, 1, 2),
         remote_id=uuid.uuid4(),
         status=OrderStatus.DRAFT,
     )

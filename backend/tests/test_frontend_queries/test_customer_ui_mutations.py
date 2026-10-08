@@ -226,7 +226,7 @@ def test_frontend_queries__customer_ui__CreateApplication(graphql):
     assert_no_undefined_variables(variables)
 
     query = query_info.query
-    graphql.login_with_superuser(date_of_birth=datetime.datetime(2000, 1, 1))
+    graphql.login_with_superuser(date_of_birth=datetime.date(2000, 1, 1))
 
     response = graphql(query, variables=variables)
 

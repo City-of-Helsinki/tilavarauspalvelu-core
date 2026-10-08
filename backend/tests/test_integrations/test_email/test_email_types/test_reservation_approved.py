@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import datetime
 from decimal import Decimal
 from inspect import cleandoc
 from typing import TYPE_CHECKING
@@ -19,6 +18,7 @@ from tilavarauspalvelu.integrations.email.template_context import get_context_fo
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
@@ -579,8 +579,8 @@ def test_reservation_confirmed__send_email(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
-        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=local_datetime(2024, 1, 1, 20, 0),
+        ends_at=local_datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_confirmed_email(reservation)
@@ -603,8 +603,8 @@ def test_reservation_confirmed__send_email__wrong_state(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
-        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=local_datetime(2024, 1, 1, 20, 0),
+        ends_at=local_datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_confirmed_email(reservation)
@@ -622,8 +622,8 @@ def test_reservation_confirmed__send_email__no_recipients(outbox):
         reservee_email="",
         user__email="",
         reservation_unit__name="foo",
-        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
-        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=local_datetime(2024, 1, 1, 20, 0),
+        ends_at=local_datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_confirmed_email(reservation)
@@ -643,8 +643,8 @@ def test_reservation_confirmed__send_email__reservation_in_the_past(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
-        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=local_datetime(2024, 1, 1, 20, 0),
+        ends_at=local_datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_confirmed_email(reservation)

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import datetime
 import uuid
 from copy import deepcopy
 from inspect import cleandoc
@@ -355,8 +354,8 @@ def test_seasonal_booking_access_code_changed__send_email(outbox):
         reservation_unit_code_validity=[
             PindoraSeasonalBookingAccessCodeValidity(
                 reservation_unit_id=ext_uuid,
-                begin=datetime.datetime(2024, 1, 1, 11),
-                end=datetime.datetime(2024, 1, 1, 15),
+                begin=local_datetime(2024, 1, 1, 11),
+                end=local_datetime(2024, 1, 1, 15),
                 access_code_valid_minutes_before=0,
                 access_code_valid_minutes_after=0,
             ),

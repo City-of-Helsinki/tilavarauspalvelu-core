@@ -304,9 +304,6 @@ ignore = [
 
     # Allow type comments for now, since they are useful for documenting types.
     "PYI033",   # legacy-type-comment
-
-    # TODO: Fix the issues and remove this ignore.
-    "DTZ001",   # call-datetime-without-tzinfo
 ]
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^options$|^info$|^name$|^obj$|^request$|^user|^view$|^input_data$|^filters$"
 task-tags = ["TODO", "FIXME", "XXX", "type"]

@@ -83,8 +83,8 @@ class ReservationActions:
         # Taken from outlook generated 'ical' files.
         # These assumptions are valid for timezone which observe European Summer Time
         # as currently defined (EU directive 2000/84/EC).
-        standard_start = datetime.datetime(1601, 10, 28, 4, 0, 0)
-        daylight_start = datetime.datetime(1601, 3, 25, 3, 0, 0)
+        standard_start = datetime.datetime(1601, 10, 28, 4, 0, 0)  # noqa: DTZ001
+        daylight_start = datetime.datetime(1601, 3, 25, 3, 0, 0)  # noqa: DTZ001
 
         standard = TimezoneStandard()
         standard.add(name=TimezoneRuleProperty.DTSTART, value=standard_start)

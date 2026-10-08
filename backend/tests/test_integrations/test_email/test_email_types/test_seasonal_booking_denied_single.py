@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import datetime
 from inspect import cleandoc
 from typing import TYPE_CHECKING
 
@@ -16,6 +15,7 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_seasonal_booking_denied_single
 from tilavarauspalvelu.integrations.email.typing import EmailType
+from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory
 from tests.helpers import TranslationsFromPOFiles
@@ -196,8 +196,8 @@ def test_seasonal_booking_denied_single__send_email(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
-        begins_at=datetime.datetime(2024, 1, 1, 20, 0),
-        ends_at=datetime.datetime(2024, 1, 1, 22, 0),
+        begins_at=local_datetime(2024, 1, 1, 20, 0),
+        ends_at=local_datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_seasonal_booking_denied_single_email(reservation)

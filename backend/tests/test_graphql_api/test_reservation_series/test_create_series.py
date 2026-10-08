@@ -17,7 +17,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationSeries, ReservationUnitHierarchy
-from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_end_of_day, local_start_of_day
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local_end_of_day, local_start_of_day
 
 from tests.factories import (
     AgeGroupFactory,
@@ -96,8 +96,8 @@ def test_reservation_series__create_series__reservation_details(graphql):
     data["reservationDetails"]["workingMemo"] = "memo"
     data["reservationDetails"]["bufferTimeBefore"] = 15 * 60  # 15 mins
     data["reservationDetails"]["bufferTimeAfter"] = 30 * 60  # 30 mins
-    data["reservationDetails"]["handledAt"] = datetime.datetime(2023, 1, 1).isoformat(timespec="seconds")
-    data["reservationDetails"]["confirmedAt"] = datetime.datetime(2023, 1, 2).isoformat(timespec="seconds")
+    data["reservationDetails"]["handledAt"] = local_datetime(2023, 1, 1).isoformat(timespec="seconds")
+    data["reservationDetails"]["confirmedAt"] = local_datetime(2023, 1, 2).isoformat(timespec="seconds")
     data["reservationDetails"]["applyingForFreeOfCharge"] = True
     data["reservationDetails"]["freeOfChargeReason"] = "reason"
     data["reservationDetails"]["reserveeIdentifier"] = "id"
