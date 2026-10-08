@@ -274,7 +274,7 @@ class TimeSpanElement:
         for day in self.get_dates_range():
             # Add closed time spans for the time range outside the given filter range
             # e.g. Filter time range is 10:00-14:00, add closed time spans for 00:00-10:00 and 14:00-00:00
-            if filter_time_start:
+            if filter_time_start and filter_time_start != datetime.time.min:
                 closed_time_spans.append(
                     TimeSpanElement(
                         start_datetime=local_start_of_day(day),
@@ -286,7 +286,7 @@ class TimeSpanElement:
                         is_reservable=False,
                     )
                 )
-            if filter_time_end:
+            if filter_time_end and filter_time_end != datetime.time.min:
                 closed_time_spans.append(
                     TimeSpanElement(
                         start_datetime=datetime.datetime.combine(

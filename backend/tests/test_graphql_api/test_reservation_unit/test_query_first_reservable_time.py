@@ -427,6 +427,16 @@ def test__reservation_unit__first_reservable_time__filters__too_strict_causes_no
                 time_end=datetime.time(hour=14),
             ),
         ),
+        "Basic | Only Time Start | Midnight": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(),
+            ),
+        ),
+        "Basic | Only Time End | Midnight": ReservableParams(
+            filters=ReservableFilters(
+                time_end=datetime.time(),
+            ),
+        ),
         "Basic | Start & End Time | Filters same as time span": ReservableParams(
             filters=ReservableFilters(
                 time_start=datetime.time(hour=13),
