@@ -629,6 +629,37 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation__ends_
     ]
 
 
+def test_allocated_time_slot__create__overlapping_with_another_allocation__sections_share_a_date(graphql):
+    shared_monday = datetime.date(2030, 1, 7)
+    reservation_unit = ReservationUnitFactory.create(spaces=[SpaceFactory.create()])
+    application = ApplicationFactory.create_application_ready_for_allocation(
+        reservation_unit=reservation_unit,
+        begin_date=shared_monday,
+        end_date=shared_monday + datetime.timedelta(days=7),
+    )
+    option = application.application_sections.first().reservation_unit_options.first()
+
+    ApplicationFactory.create_application_ready_for_allocation(
+        reservation_unit=reservation_unit,
+        begin_date=shared_monday - datetime.timedelta(days=7),
+        end_date=shared_monday,
+        pre_allocated=True,
+    )
+    ReservationUnitHierarchy.refresh()
+
+    graphql.login_with_superuser()
+
+    input_data = allocation_create_data(option)
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
+
+    assert response.field_error_messages() == [
+        (
+            "Given time slot has already been allocated for another application section "
+            "with a related reservation unit or resource."
+        ),
+    ]
+
+
 def test_allocated_time_slot__create__overlapping_with_another_allocation_for_different_reservation_unit(graphql):
     # given:
     # - There is an allocatable reservation unit option
