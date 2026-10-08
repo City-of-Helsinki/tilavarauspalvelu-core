@@ -45,6 +45,11 @@ describe("ViewApplication", () => {
       })
     ).toBeInTheDocument();
   });
+  test("should show unit name with applied spaces", () => {
+    const view = customRender({ nReservationUnitOptions: 2 });
+    expect(view.getByText("ReservationUnit 1 FI, Unit 1 FI")).toBeInTheDocument();
+    expect(view.getByText("ReservationUnit 2 FI, Unit 2 FI")).toBeInTheDocument();
+  });
 });
 
 describe("Processing Notification", () => {
