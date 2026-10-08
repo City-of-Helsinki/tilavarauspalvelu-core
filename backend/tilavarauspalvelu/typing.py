@@ -541,6 +541,7 @@ class error_codes(StrEnum):  # noqa: N801
     HELSINKI_PROFILE_USER_MISSING_PROFILE_ID = auto()
     NOT_FOUND = auto()
     ORDER_CANCELLATION_NOT_ALLOWED = auto()
+    ORDER_REFUND_IN_PROGRESS = auto()
     ORDER_REFUND_NOT_ALLOWED = auto()
     ORDER_STATUS_CHANGED = auto()
     OVERLAPPING_RESERVATIONS = auto()

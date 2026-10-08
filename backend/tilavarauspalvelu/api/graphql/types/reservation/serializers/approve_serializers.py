@@ -76,6 +76,11 @@ class ReservationApproveSerializer(NestingModelSerializer):
             data["should_delete_previous_payment_order"] = not paid_in_webshop
 
             if paid_in_webshop:
+                # A refunded order stays PAID until the refund webhook arrives.
+                if payment_order.refund_id is not None:
+                    msg = "Reservation has a payment order with a refund in progress."
+                    raise ValidationError(msg, code=error_codes.ORDER_REFUND_IN_PROGRESS)
+
                 if payment_order.price_total != data["price"]:
                     msg = "Reservation already has a paid payment order with a different price."
                     raise ValidationError(msg, code=error_codes.RESERVATION_PRICE_CANNOT_BE_CHANGED)
