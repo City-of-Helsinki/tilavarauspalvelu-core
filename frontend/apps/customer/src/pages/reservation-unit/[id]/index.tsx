@@ -168,7 +168,7 @@ function ReservationUnit({
       durationOptions
     ),
     time: searchTime ?? formatTime(defaultDate),
-    isControlsVisible: true,
+    isControlsVisible: false,
   };
 
   const reservationForm = useForm<PendingReservationFormType>({
