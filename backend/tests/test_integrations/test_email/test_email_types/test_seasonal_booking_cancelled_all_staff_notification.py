@@ -11,7 +11,7 @@ from django.test import override_settings
 from freezegun import freeze_time
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
-from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReservationNotification
+from tilavarauspalvelu.enums import ReservationCancelReasonChoice, ReservationNotification, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import (
@@ -294,3 +294,43 @@ def test_seasonal_booking_cancelled_all_staff_notification__send_email(outbox):
 
     assert outbox[1].subject == "The customer has canceled the seasonal booking"
     assert sorted(outbox[1].bcc) == ["admin2@email.com"]
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_seasonal_booking_cancelled_all_staff_notification__send_email__last_reservation_denied(outbox):
+    application = ApplicationFactory.create_in_status_results_sent(user__email="user@email.com")
+    application_section = application.application_sections.first()
+
+    reservation_unit = ReservationUnitFactory.create()
+
+    UserFactory.create_with_unit_role(
+        units=[reservation_unit.unit],
+        email="admin@email.com",
+        reservation_notification=ReservationNotification.ALL,
+        preferred_language="en",
+    )
+
+    series = create_reservation_series(
+        user=application.user,
+        reservation_unit=reservation_unit,
+        allocated_time_slot__reservation_unit_option__reservation_unit=reservation_unit,
+        allocated_time_slot__reservation_unit_option__application_section=application_section,
+        reservations__state=ReservationStateChoice.CANCELLED,
+        reservations__cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
+    )
+    last_reservation = series.reservations.order_by("begins_at").last()
+    last_reservation.state = ReservationStateChoice.DENIED
+    last_reservation.cancel_reason = None
+    last_reservation.save(update_fields=["state", "cancel_reason"])
+
+    with TranslationsFromPOFiles():
+        EmailService.send_seasonal_booking_cancelled_all_staff_notification_email(
+            application_section=application_section,
+        )
+
+    assert len(outbox) == 1
+
+    assert outbox[0].subject == "The customer has canceled the seasonal booking"
+    assert sorted(outbox[0].bcc) == ["admin@email.com"]
