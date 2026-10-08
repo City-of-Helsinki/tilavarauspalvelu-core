@@ -60,9 +60,6 @@ class ReservationApproveSerializer(NestingModelSerializer):
         data["state"] = ReservationStateChoice.CONFIRMED
         data["handled_at"] = local_datetime()
 
-        if data["price"] == 0:
-            return data
-
         if settings.PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED:
             return self.validate_payment_order(data)
 
@@ -85,6 +82,9 @@ class ReservationApproveSerializer(NestingModelSerializer):
 
                 # If price hasn't changed, we can just use the existing payment order.
                 return data
+
+        if data["price"] == 0:
+            return data
 
         reservation_unit = self.instance.reservation_unit
         begin = self.instance.begins_at.astimezone(DEFAULT_TIMEZONE)
@@ -142,13 +142,13 @@ class ReservationApproveSerializer(NestingModelSerializer):
         return instance
 
     def create_payment_order_if_required(self, validated_data: ReservationApproveData) -> None:
-        if validated_data["price"] == 0:
-            return
-
         # Delete any non-paid/refunded payment order
         if validated_data["should_delete_previous_payment_order"]:
             self.instance.payment_order.delete()
             self.instance.refresh_from_db()
+
+        if validated_data["price"] == 0:
+            return
 
         # If a payment order still exists, it should be paid and have the same price, so don't create a new one.
         if hasattr(self.instance, "payment_order"):
