@@ -345,6 +345,13 @@ def time_as_timedelta(_input: datetime.datetime | datetime.time, /) -> datetime.
     )
 
 
+def end_time_as_timedelta(_input: datetime.time, /) -> datetime.timedelta:
+    """Convert an end time to timedelta as measured from the start of the day. Midnight is the end of the day."""
+    if _input == datetime.time():
+        return datetime.timedelta(hours=24)
+    return time_as_timedelta(_input)
+
+
 def timedelta_as_time(_input: datetime.timedelta, /) -> datetime.time:
     """Convert timedelta to time as measured form the start of the day."""
     time_seconds = _input.total_seconds()
@@ -382,9 +389,7 @@ def datetime_range_as_string(*, start_datetime: datetime.datetime, end_datetime:
 
 def time_difference(_from: datetime.time, _to: datetime.time, /) -> datetime.timedelta:
     """Difference between two times as a timedelta."""
-    if _to == datetime.time():  # if end is at midnight
-        return datetime.timedelta(hours=24) - time_as_timedelta(_from)
-    return time_as_timedelta(_to) - time_as_timedelta(_from)
+    return end_time_as_timedelta(_to) - time_as_timedelta(_from)
 
 
 class TimeSlot(TypedDict):
