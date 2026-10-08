@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import operator
 from typing import TYPE_CHECKING
 
 import pytest
@@ -159,6 +160,31 @@ def test_query_current_user__general_roles(graphql):
             },
         ],
     }
+
+
+@patch_method(HelsinkiProfileClient.ensure_token_valid)
+def test_query_current_user__general_roles__permissions_are_for_each_role(graphql):
+    user = UserFactory.create()
+    GeneralRoleFactory.create(user=user, role=UserRoleChoice.RESERVER)
+    GeneralRoleFactory.create(user=user, role=UserRoleChoice.NOTIFICATION_MANAGER)
+    graphql.force_login(user)
+
+    fields = """
+        generalRoles {
+            role
+            permissions
+        }
+    """
+
+    response = graphql(current_user_query(fields=fields))
+
+    assert response.has_errors is False, response.errors
+
+    general_roles = sorted(response.first_query_object["generalRoles"], key=operator.itemgetter("role"))
+    assert general_roles == [
+        {"role": "NOTIFICATION_MANAGER", "permissions": ["CAN_MANAGE_NOTIFICATIONS"]},
+        {"role": "RESERVER", "permissions": ["CAN_CREATE_STAFF_RESERVATIONS"]},
+    ]
 
 
 @patch_method(HelsinkiProfileClient.ensure_token_valid)
