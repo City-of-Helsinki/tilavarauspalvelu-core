@@ -5,7 +5,8 @@ import datetime
 import pytest
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice
-from tilavarauspalvelu.models import ApplicationSection, ReservationUnitOption, SuitableTimeRange
+from tilavarauspalvelu.models import Application, ApplicationSection, ReservationUnitOption, SuitableTimeRange
+from utils.date_utils import local_datetime
 
 from tests.factories import (
     ApplicationFactory,
@@ -60,6 +61,51 @@ def test_application_section__update(graphql):
     assert section.reservation_unit_options.count() == 1
 
     assert section.status == ApplicationSectionStatusChoice.UNALLOCATED
+
+
+def test_application_section__update__resets_application_sent_at(graphql):
+    application_section = ApplicationSectionFactory.create_in_status_unallocated(application__sent_at=local_datetime())
+
+    graphql.force_login(application_section.application.user)
+
+    data = get_application_section_update_data(application_section=application_section)
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response
+
+    application = Application.objects.get(pk=application_section.application.pk)
+    assert application.sent_at is None
+
+
+def test_application_section__update__staff__does_not_reset_application_sent_at(graphql):
+    sent_at = local_datetime()
+    application_section = ApplicationSectionFactory.create_in_status_unallocated(application__sent_at=sent_at)
+
+    graphql.login_with_superuser()
+
+    data = get_application_section_update_data(application_section=application_section)
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response
+
+    application = Application.objects.get(pk=application_section.application.pk)
+    assert application.sent_at == sent_at
+
+
+def test_application_section__update__application_round_not_open(graphql):
+    application_section = ApplicationSectionFactory.create_in_status_in_allocation()
+    original_name = application_section.name
+
+    graphql.login_with_superuser()
+
+    data = get_application_section_update_data(application_section=application_section)
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Application round is not open for applications"]
+
+    application_section = ApplicationSection.objects.get(pk=application_section.pk)
+    assert application_section.name == original_name
 
 
 def test_application_section__update__move_to_another_application(graphql):

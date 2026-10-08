@@ -4,7 +4,7 @@ import operator
 from typing import TYPE_CHECKING, Any, TypedDict
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from graphene_django_extensions.serializers import NotProvided
@@ -25,6 +25,8 @@ from utils.utils import comma_sep_str
 
 if TYPE_CHECKING:
     import datetime
+
+    from tilavarauspalvelu.typing import AnyUser
 
 
 __all__ = [
@@ -72,6 +74,17 @@ class ApplicationSectionSerializer(NestingModelSerializer):
             msg = "Application section cannot be moved to another application."
             raise ValidationError(msg)
 
+        if application is None and self.instance is not None:
+            application = self.instance.application
+
+        # Sections created through an application are validated by the application serializer.
+        if application is not None:
+            application.application_round.validators.validate_open_for_applications()
+
+            if self.instance is None:
+                section_count = application.application_sections.count() + 1
+                Application.validators.validate_not_too_many_sections(section_count)
+
         self.validate_nested_items_belong_to_section(data, errors)
 
         if "reservation_unit_options" in data:
@@ -83,6 +96,24 @@ class ApplicationSectionSerializer(NestingModelSerializer):
             raise ValidationError(errors)
 
         return data
+
+    def create(self, validated_data: dict[str, Any]) -> ApplicationSection:
+        user: AnyUser = self.context["request"].user
+
+        with transaction.atomic():
+            instance = super().create(validated_data)
+            instance.application.actions.reset_sent_at_if_changed_by_applicant(user=user)
+
+        return instance
+
+    def update(self, instance: ApplicationSection, validated_data: dict[str, Any]) -> ApplicationSection:
+        user: AnyUser = self.context["request"].user
+
+        with transaction.atomic():
+            instance = super().update(instance, validated_data)
+            instance.application.actions.reset_sent_at_if_changed_by_applicant(user=user)
+
+        return instance
 
     def validate_nested_items_belong_to_section(self, data: dict[str, Any], errors: list[str]) -> None:
         option_pks = {option["pk"] for option in data.get("reservation_unit_options", []) if "pk" in option}
