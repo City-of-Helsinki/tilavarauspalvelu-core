@@ -94,6 +94,7 @@ def test_reservation__confirm__changes_state__requires_handling(graphql, outbox)
 @override_settings(SEND_EMAILS=True)
 def test_reservation__confirm__changes_state_to_requires_handling_on_subsidy_request(graphql, outbox):
     reservation = ReservationFactory.create_for_confirmation(
+        reservation_unit__can_apply_free_of_charge=True,
         applying_for_free_of_charge=True,
         free_of_charge_reason="foo",
     )
@@ -119,6 +120,24 @@ def test_reservation__confirm__changes_state_to_requires_handling_on_subsidy_req
     assert outbox[0].subject == "Your booking is waiting for processing"
     unit_name = reservation.reservation_unit.unit.name
     assert outbox[1].subject == f"New booking {reservation.id} requires handling at unit {unit_name}"
+
+
+def test_reservation__confirm__applying_for_free_of_charge_not_allowed_for_reservation_unit(graphql):
+    reservation = ReservationFactory.create_for_confirmation(
+        reservation_unit__can_apply_free_of_charge=False,
+        applying_for_free_of_charge=True,
+        free_of_charge_reason="foo",
+    )
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation unit does not allow applying for free of charge."]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CREATED
 
 
 def test_reservation__confirm__fails_if_state_is_not_created(graphql):
