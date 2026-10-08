@@ -78,7 +78,7 @@ __all__ = [
 
 def singleton_task[**P](task: Task) -> Task:
     """
-    Lock task execution to a single concurrent instance based on a lock set in cache.
+    Lock task execution to a single concurrent instance per task arguments based on a lock set in cache.
     Must be added on top of the `@app.task` decorator!
 
     See: https://docs.celeryq.dev/en/stable/tutorials/task-cookbook.html#ensuring-a-task-is-only-executed-one-at-a-time
@@ -91,7 +91,8 @@ def singleton_task[**P](task: Task) -> Task:
         timeout_leeway = 3  # Some leeway for cache operations
 
         timeout_at = time.monotonic() + lock_timeout - timeout_leeway
-        lock_id: str = task.name
+        arguments = [str(arg) for arg in args] + [f"{key}={value}" for key, value in sorted(kwargs.items())]
+        lock_id = ":".join([task.name, *arguments])
 
         # Assuming the operation here is atomic, or at least close enough to be safe.
         has_lock = cache.add(lock_id, 1, lock_timeout)
