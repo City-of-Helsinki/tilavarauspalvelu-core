@@ -49,17 +49,14 @@ function SingleApplicationSection({
 }) {
   const { t, i18n } = useTranslation();
   const lang = getLocalizationLang(i18n.language);
-  const reservationUnits = filterNonNullable(aes.reservationUnitOptions)
-    .map(({ reservationUnit }) => ({
+  const reservationUnits = filterNonNullable(aes.reservationUnitOptions).map(({ reservationUnit }) => {
+    const name = getTranslation(reservationUnit, "name", lang).trim();
+    const unitName = getTranslation(reservationUnit.unit, "name", lang).trim();
+    return {
       pk: reservationUnit.pk ?? 0,
-      nameFi: reservationUnit.nameFi,
-      nameSv: reservationUnit.nameSv,
-      nameEn: reservationUnit.nameEn,
-    }))
-    .map((ru) => ({
-      pk: ru.pk,
-      name: getTranslation(ru, "name", lang).trim(),
-    }));
+      name: `${name}, ${unitName}`,
+    };
+  });
   const shouldShowStatusLabel =
     aes.status === ApplicationSectionStatusChoice.Rejected || aes.status === ApplicationSectionStatusChoice.Handled;
 
