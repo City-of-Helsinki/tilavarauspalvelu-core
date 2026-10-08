@@ -254,8 +254,9 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
         """
         self.update(
             access_code_is_active=models.Case(
+                # A reservation without a generated access code cannot be active. See 'no_access_code_but_active'.
                 models.When(
-                    L(access_code_should_be_active=True),
+                    L(access_code_should_be_active=True) & models.Q(access_code_generated_at__isnull=False),
                     then=models.Value(True),  # noqa: FBT003
                 ),
                 default=models.Value(False),  # noqa: FBT003
