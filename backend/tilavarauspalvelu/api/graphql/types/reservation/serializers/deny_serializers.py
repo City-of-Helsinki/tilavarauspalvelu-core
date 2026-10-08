@@ -80,13 +80,6 @@ class ReservationDenySerializer(NestingModelSerializer):
 
     def update(self, instance: Reservation, validated_data: ReservationDenyData) -> Reservation:
         with transaction.atomic():
-            if hasattr(instance, "payment_order"):
-                payment_order: PaymentOrder = instance.payment_order
-
-                # Refunds are made optionally through the 'refundReservation' -mutation
-                if payment_order.actions.has_no_payment_through_webshop():
-                    payment_order.actions.cancel_together_with_verkkokauppa(cancel_on_error=True)
-
             instance = super().update(instance=instance, validated_data=validated_data)
 
             if instance.access_type == AccessType.ACCESS_CODE:
@@ -95,6 +88,14 @@ class ReservationDenySerializer(NestingModelSerializer):
                     suppress(PindoraNotFoundError),
                 ):
                     PindoraService.delete_access_code(obj=instance)
+
+        # Cancel the webshop order only after the deny is saved, since the webshop cancel cannot be rolled back.
+        if hasattr(instance, "payment_order"):
+            payment_order: PaymentOrder = instance.payment_order
+
+            # Refunds are made optionally through the 'refundReservation' -mutation
+            if payment_order.actions.has_no_payment_through_webshop():
+                payment_order.actions.cancel_together_with_verkkokauppa(cancel_on_error=True)
 
         EmailService.send_reservation_denied_email(reservation=instance)
         return instance
