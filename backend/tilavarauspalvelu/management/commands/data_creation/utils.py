@@ -86,9 +86,9 @@ def with_logs[**P, T](func: Callable[P, T]) -> Callable[P, T]:
 
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
-        print(text_entering)  # noqa: T201, RUF100
+        print(text_entering)  # noqa: T201
         return_value = func(*args, **kwargs)
-        print(text_exiting)  # noqa: T201, RUF100
+        print(text_exiting)  # noqa: T201
         return return_value
 
     return wrapper
@@ -109,11 +109,11 @@ def defer_reservation_unit_create_operations[**P](func: Callable[P, None]) -> Ca
             UPDATE_SEARCH_VECTORS=False,
         ):
             func(*args, **kwargs)
-            print("Refreshing reservation unit hierarchy...")  # noqa: T201, RUF100
+            print("Refreshing reservation unit hierarchy...")  # noqa: T201
             ReservationUnitHierarchy.refresh()
-            print("Refreshing affecting time spans...")  # noqa: T201, RUF100
+            print("Refreshing affecting time spans...")  # noqa: T201
             AffectingTimeSpan.refresh()
-            print("Refreshing search vectors...")  # noqa: T201, RUF100
+            print("Refreshing search vectors...")  # noqa: T201
             ReservationUnit.objects.all().update_search_vectors()
 
     return wrapper
@@ -388,7 +388,7 @@ def get_image_path(image_url: str, filename: str, extension: str = ".jpg") -> st
 
     if not settings.MEDIA_ROOT:
         msg = f"Media root not set. Cannot save image from '{image_url}'."
-        print(msg)  # noqa: T201, RUF100
+        print(msg)  # noqa: T201
         return None
 
     path = Path(settings.MEDIA_ROOT) / settings.RESERVATION_UNIT_IMAGES_ROOT / filename
@@ -415,7 +415,7 @@ def fetch_image(image_url: str, path: Path) -> None:
         response.raise_for_status()
     except Exception as e:  # noqa: BLE001
         msg = f"Could not download image from '{image_url}': {e}"
-        print(msg)  # noqa: T201, RUF100
+        print(msg)  # noqa: T201
         return
 
     content_type = response.headers.get("Content-Type")
@@ -427,7 +427,7 @@ def fetch_image(image_url: str, path: Path) -> None:
 
     else:
         msg = f"Unknown content type: {content_type}"
-        print(msg)  # noqa: T201, RUF100
+        print(msg)  # noqa: T201
         return
 
     path.parent.mkdir(parents=True, exist_ok=True)

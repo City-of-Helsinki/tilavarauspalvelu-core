@@ -136,17 +136,17 @@ def _run_translation_command() -> None:
 
 
 def _print_errors(missing: dict[str, MissingTranslations]) -> None:
-    print("\nIncomplete translations:")  # noqa: T201, RUF100
+    print("\nIncomplete translations:")  # noqa: T201
     for msg, info in missing.items():
-        print(f"  {msg}")  # noqa: T201, RUF100
+        print(f"  {msg}")  # noqa: T201
         if len(info.missing_languages) > 0:
-            print("    ↳ Empty:", ", ".join(sorted(info.missing_languages)))  # noqa: T201, RUF100
+            print("    ↳ Empty:", ", ".join(sorted(info.missing_languages)))  # noqa: T201
         if len(info.removed) > 0:
-            print("    ↳ Removed:", ", ".join(sorted(info.removed)))  # noqa: T201, RUF100
+            print("    ↳ Removed:", ", ".join(sorted(info.removed)))  # noqa: T201
         if len(info.not_included_previous) > 0:
-            print("    ↳ New:", ", ".join(sorted(info.not_included_previous)))  # noqa: T201, RUF100
+            print("    ↳ New:", ", ".join(sorted(info.not_included_previous)))  # noqa: T201
         if len(info.fuzzy) > 0:
-            print("    ↳ Fuzzy:", ", ".join(sorted(info.fuzzy)))  # noqa: T201, RUF100
+            print("    ↳ Fuzzy:", ", ".join(sorted(info.fuzzy)))  # noqa: T201
 
 
 if __name__ == "__main__":
