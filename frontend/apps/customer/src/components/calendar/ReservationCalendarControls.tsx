@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import { useController } from "react-hook-form";
 import type { SubmitHandler, UseFormReturn } from "react-hook-form";
 import { Transition } from "react-transition-group";
@@ -146,6 +146,8 @@ export function ReservationCalendarControls({
   const lastOpeningDate = maxBy(reservationUnit.reservableTimeSpans, (n) => n?.endDatetime);
 
   const areControlsVisible = watch("isControlsVisible");
+  // nodeRef avoids react-transition-group falling back to findDOMNode (removed in React 19)
+  const transitionRef = useRef<HTMLDivElement>(null);
 
   const submitButton = "submitButton" in rest ? rest.submitButton : null;
 
@@ -157,9 +159,15 @@ export function ReservationCalendarControls({
     >
       <ControlledToggler form={reservationForm} focusSlot={focusSlot} price={price} durationOptions={durationOptions} />
       {focusSlot.isReservable && !areControlsVisible && <Flex $alignItems="flex-end">{submitButton}</Flex>}
-      <Transition mountOnEnter unmountOnExit timeout={isMobile ? 500 : 0} in={areControlsVisible}>
+      <Transition
+        nodeRef={transitionRef}
+        mountOnEnter
+        unmountOnExit
+        timeout={isMobile ? 500 : 0}
+        in={areControlsVisible}
+      >
         {(state) => (
-          <Content className={state} $isAnimated={isMobile}>
+          <Content ref={transitionRef} className={state} $isAnimated={isMobile}>
             <ControlledDateInput
               name="date"
               control={control}
