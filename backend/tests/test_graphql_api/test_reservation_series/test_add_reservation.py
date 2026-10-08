@@ -6,13 +6,13 @@ from typing import TYPE_CHECKING
 import pytest
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import AccessType
+from tilavarauspalvelu.enums import AccessType, ReservationCancelReasonChoice, ReservationStateChoice
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
 from tilavarauspalvelu.integrations.keyless_entry.service import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
-from tests.factories import ReservationUnitAccessTypeFactory
+from tests.factories import ReservationDenyReasonFactory, ReservationUnitAccessTypeFactory
 from tests.helpers import patch_method
 
 from .helpers import ADD_RESERVATION_TO_SERIES_MUTATION, create_reservation_series, get_minimal_add_data
@@ -43,6 +43,30 @@ def test_reservation_series__add_reservation(graphql):
     reservation: Reservation = series.reservations.order_by("pk").last()
     assert reservation.begins_at == datetime.datetime(2024, 1, 2, 10, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.ends_at == datetime.datetime(2024, 1, 2, 12, tzinfo=DEFAULT_TIMEZONE)
+
+
+@freeze_time(local_datetime(2024, 1, 1))
+def test_reservation_series__add_reservation__last_reservation_denied(graphql):
+    series = create_reservation_series()
+
+    deny_reason = ReservationDenyReasonFactory.create()
+    last_reservation: Reservation = series.reservations.last()
+    last_reservation.state = ReservationStateChoice.DENIED
+    last_reservation.deny_reason = deny_reason
+    last_reservation.cancel_reason = ReservationCancelReasonChoice.CHANGE_OF_PLANS
+    last_reservation.save(update_fields=["state", "deny_reason", "cancel_reason"])
+
+    data = get_minimal_add_data(series)
+
+    graphql.login_with_superuser()
+    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False
+
+    reservation: Reservation = series.reservations.order_by("pk").last()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+    assert reservation.deny_reason is None
+    assert reservation.cancel_reason is None
 
 
 @freeze_time(local_datetime(2024, 1, 1))

@@ -114,6 +114,8 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         reservation.confirmed_at = now
         reservation.handling_details = ""
         reservation.cancel_details = ""
+        reservation.cancel_reason = None
+        reservation.deny_reason = None
 
         reservation.save()
 
