@@ -42,6 +42,10 @@ class ReservationValidator:
         applying = metadata.get("applying_for_free_of_charge", self.reservation.applying_for_free_of_charge)
         reason = metadata.get("free_of_charge_reason", self.reservation.free_of_charge_reason)
 
+        if applying and not self.reservation.reservation_unit.can_apply_free_of_charge:
+            msg = "Reservation unit does not allow applying for free of charge."
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_FREE_OF_CHARGE_NOT_ALLOWED)
+
         if applying and not reason:
             msg = "Free of charge reason is mandatory when applying for free of charge."
             raise ValidationError(msg, code=error_codes.REQUIRES_REASON_FOR_APPLYING_FREE_OF_CHARGE)
