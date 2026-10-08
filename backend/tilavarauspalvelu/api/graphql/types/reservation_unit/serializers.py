@@ -22,13 +22,15 @@ from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, Weekda
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing
+from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing, Resource, Space
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     import datetime
+
+    from tilavarauspalvelu.models import Unit
 
 __all__ = [
     "ReservationUnitArchiveSerializer",
@@ -121,6 +123,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         is_draft = self.get_or_default("is_draft", data)
 
+        self._validate_spaces_and_resources_in_unit(data)
         self._validate_reservation_duration_fields(data)
         self._validate_pricings(data)
         self._validate_access_types(access_types=data.get("access_types", []), is_draft=is_draft)
@@ -129,6 +132,39 @@ class ReservationUnitSerializer(NestingModelSerializer):
             self._validate_for_publish(data)
 
         return data
+
+    def validate_unit(self, unit: Unit) -> Unit:
+        if self.instance is not None and unit.pk != self.instance.unit_id:
+            msg = "Reservation unit cannot be moved to another unit."
+            raise ValidationError(msg)
+
+        return unit
+
+    def _validate_spaces_and_resources_in_unit(self, data: dict[str, Any]) -> None:
+        unit: Unit = self.get_or_default("unit", data)
+
+        current_space_pks: set[int] = set()
+        current_resource_pks: set[int] = set()
+        if self.instance is not None:
+            current_space_pks = set(self.instance.spaces.values_list("pk", flat=True))
+            current_resource_pks = set(self.instance.resources.values_list("pk", flat=True))
+
+        # Only new links are checked, so that reservation units that already use
+        # spaces or resources of another unit can still be saved.
+        new_space_pks = [space.pk for space in data.get("spaces", []) if space.pk not in current_space_pks]
+        new_resource_pks = [
+            resource.pk for resource in data.get("resources", []) if resource.pk not in current_resource_pks
+        ]
+
+        spaces_in_other_unit = Space.objects.filter(pk__in=new_space_pks).exclude(unit=unit)
+        if spaces_in_other_unit.exists():
+            msg = "Reservation unit can only have spaces of its own unit."
+            raise ValidationError({"spaces": msg})
+
+        resources_outside_unit = Resource.objects.filter(pk__in=new_resource_pks).exclude(space__unit=unit)
+        if resources_outside_unit.exists():
+            msg = "Reservation unit can only have resources in spaces of its own unit."
+            raise ValidationError({"resources": msg})
 
     def _validate_reservation_duration_fields(self, data: dict[str, Any]) -> None:
         """
