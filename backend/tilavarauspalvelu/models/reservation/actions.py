@@ -220,7 +220,8 @@ class ReservationActions:
             msg = "Reservation unit has no pricing information"
             raise ReservationPriceCalculationError(msg)
 
-        duration = end_datetime - begin_datetime
+        # Subtract in UTC, so that the duration is correct across a daylight saving time change.
+        duration = end_datetime.astimezone(datetime.UTC) - begin_datetime.astimezone(datetime.UTC)
         return pricing.actions.calculate_reservation_price(duration, subsidised=subsidised)
 
     def get_application_section(self) -> ApplicationSection | None:

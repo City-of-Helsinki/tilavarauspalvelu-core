@@ -127,6 +127,19 @@ def test_statistics__create__after_commit(settings, django_capture_on_commit_cal
     assert ReservationStatistic.objects.filter(reservation=reservation).exists() is True
 
 
+def test_statistics__create__duration_over_daylight_saving_time_change(settings, django_capture_on_commit_callbacks):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create(
+            begins_at=datetime.datetime(2026, 10, 25, 1, 0, tzinfo=DEFAULT_TIMEZONE),
+            ends_at=datetime.datetime(2026, 10, 25, 7, 0, tzinfo=DEFAULT_TIMEZONE),
+        )
+
+    stat = ReservationStatistic.objects.get(reservation=reservation)
+    assert stat.duration_minutes == 7 * 60
+
+
 def test_statistics__update__reservee_address_zip__has_profile_id(settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 

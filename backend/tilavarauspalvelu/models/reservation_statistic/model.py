@@ -145,7 +145,8 @@ class ReservationStatistic(models.Model):
         by_profile_user = bool(reservation.user.profile_id)
         begin = reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
         end = reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
-        duration = end - begin
+        # Subtract in UTC, so that the duration is correct across a daylight saving time change.
+        duration = end.astimezone(datetime.UTC) - begin.astimezone(datetime.UTC)
 
         # Don't care about existing statistics, we can use `bulk_create` with `update_conflicts=True`
         # to upsert the statistic based on which reservation it belongs to.

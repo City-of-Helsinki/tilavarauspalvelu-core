@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 from django.conf import settings
@@ -51,6 +52,8 @@ class ReservationCreateSerializer(NestingModelSerializer):
         reservation_unit = data["reservation_unit"]
         begins_at = data["begins_at"].astimezone(DEFAULT_TIMEZONE)
         ends_at = data["ends_at"].astimezone(DEFAULT_TIMEZONE)
+        # Subtract in UTC, so that the duration is correct across a daylight saving time change.
+        duration = ends_at.astimezone(datetime.UTC) - begins_at.astimezone(datetime.UTC)
 
         # Endpoint requires users to be logged in
         user: User = self.context["request"].user
@@ -63,7 +66,7 @@ class ReservationCreateSerializer(NestingModelSerializer):
         reservation_unit.validators.validate_user_is_adult_if_required(user=user)
         reservation_unit.validators.validate_user_has_not_exceeded_max_reservations(user=user)
         reservation_unit.validators.validate_begin_before_end(begin=begins_at, end=ends_at)
-        reservation_unit.validators.validate_duration_is_allowed(duration=ends_at - begins_at)
+        reservation_unit.validators.validate_duration_is_allowed(duration=duration)
         reservation_unit.validators.validate_reservation_days_before(begin=begins_at)
         reservation_unit.validators.validate_reservation_unit_is_open(begin=begins_at, end=ends_at)
         reservation_unit.validators.validate_not_in_open_application_round(begin=begins_at.date(), end=ends_at.date())
@@ -87,7 +90,7 @@ class ReservationCreateSerializer(NestingModelSerializer):
         data["user"] = user
         data["reservee_used_ad_login"] = getattr(user.id_token, "is_ad_login", False)
 
-        data["price"] = pricing.actions.calculate_reservation_price(duration=ends_at - begins_at)
+        data["price"] = pricing.actions.calculate_reservation_price(duration=duration)
         data["unit_price"] = pricing.highest_price
         data["tax_percentage_value"] = pricing.tax_percentage.value
         data["non_subsidised_price"] = data["price"]

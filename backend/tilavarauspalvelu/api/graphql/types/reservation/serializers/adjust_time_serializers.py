@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime
+
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError
@@ -51,6 +53,8 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
 
         begins_at = data["begins_at"].astimezone(DEFAULT_TIMEZONE)
         ends_at = data["ends_at"].astimezone(DEFAULT_TIMEZONE)
+        # Subtract in UTC, so that the duration is correct across a daylight saving time change.
+        duration = ends_at.astimezone(datetime.UTC) - begins_at.astimezone(datetime.UTC)
 
         current_begin = self.instance.begins_at.astimezone(DEFAULT_TIMEZONE)
 
@@ -60,7 +64,7 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
         reservation_unit.validators.validate_reservation_unit_is_published()
         reservation_unit.validators.validate_reservation_unit_is_reservable_at(begin=begins_at)
         reservation_unit.validators.validate_begin_before_end(begin=begins_at, end=ends_at)
-        reservation_unit.validators.validate_duration_is_allowed(duration=ends_at - begins_at)
+        reservation_unit.validators.validate_duration_is_allowed(duration=duration)
         reservation_unit.validators.validate_reservation_days_before(begin=begins_at)
         reservation_unit.validators.validate_reservation_unit_is_open(begin=begins_at, end=ends_at)
         reservation_unit.validators.validate_not_rescheduled_to_paid_date(begin=begins_at)
