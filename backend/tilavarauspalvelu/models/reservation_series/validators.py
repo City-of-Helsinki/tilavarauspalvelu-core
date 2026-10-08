@@ -9,7 +9,7 @@ from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import local_date, local_datetime
+from utils.date_utils import end_time_as_timedelta, local_date, local_datetime, time_as_timedelta
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.enums import ReservationStartInterval
@@ -46,8 +46,9 @@ class ReservationSeriesValidator:
             msg = "Cannot create reservations for more than 2 years in the future."
             raise ValidationError(msg, code=error_codes.RESERVATION_END_DATE_TOO_FAR)
 
-        if begin_date == end_date and end_time <= begin_time:
-            msg = "Begin time cannot be after end time if on the same day."
+        # Every reservation in the series begins and ends on the same day.
+        if end_time_as_timedelta(end_time) <= time_as_timedelta(begin_time):
+            msg = "Begin time cannot be after end time."
             raise ValidationError(msg, code=error_codes.RESERVATION_BEGIN_TIME_AFTER_END_TIME)
 
         # Staff reservations ignore start intervals longer than 30 minutes
