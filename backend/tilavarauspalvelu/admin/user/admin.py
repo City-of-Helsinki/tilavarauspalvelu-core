@@ -1,24 +1,32 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from urllib.parse import urlencode
 
 from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django.contrib import admin
+from django.contrib.admin.utils import unquote
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from social_django.models import UserSocialAuth
 
 from tilavarauspalvelu.enums import LoginMethod
 from tilavarauspalvelu.models import GeneralRole, UnitRole, User
+from tilavarauspalvelu.tasks import save_personal_info_view_log_task
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:
     from django.db import models
+    from django.http import HttpResponse
 
     from tilavarauspalvelu.typing import WSGIRequest
+
+
+# The social auth admin shows the Keycloak tokens of the user.
+admin.site.unregister(UserSocialAuth)
 
 
 class GeneralRoleInlineAdmin(admin.TabularInline):
@@ -171,8 +179,6 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
                     "login_method",
                     "is_strong_login",
                     "ad_groups",
-                    "access_token",
-                    "refresh_token",
                 ],
             },
         ],
@@ -209,8 +215,6 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         "session_state",
         "authentication_methods_reference",
         "level_of_assurance",
-        "access_token",
-        "refresh_token",
         "is_internal_user",
     ]
     inlines = [
@@ -236,6 +240,24 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         changelist_url = reverse("admin:tilavarauspalvelu_application_changelist")
         query_string = urlencode({"user__id__exact": pk})
         return HttpResponseRedirect(f"{changelist_url}?{query_string}")
+
+    def change_view(
+        self,
+        request: WSGIRequest,
+        object_id: str,
+        form_url: str = "",
+        extra_context: dict[str, Any] | None = None,
+    ) -> HttpResponse:
+        # The change page shows the date of birth, so log the view like the GraphQL API does.
+        user = self.get_object(request, unquote(object_id))
+        if request.method == "GET" and user is not None:
+            save_personal_info_view_log_task.delay(
+                user_id=user.pk,
+                viewer_user_id=request.user.pk,
+                field="User.date_of_birth",
+            )
+
+        return super().change_view(request, object_id, form_url, extra_context)
 
     @admin.action
     def anonymize_user_data(self, request: WSGIRequest, queryset: models.QuerySet) -> None:
