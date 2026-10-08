@@ -110,15 +110,15 @@ class ApplicationSection(SerializableModelMixin, models.Model):
                 check=models.Q(
                     # 1440 minutes = 24 hours (1 extra minute to include 24 hours exactly)
                     reservation_min_duration__in=[
-                        datetime.timedelta(minutes=minutes) for minutes in range(30, 1441, 30)
+                        datetime.timedelta(minutes=minutes) for minutes in range(15, 1441, 15)
                     ],
                     reservation_max_duration__in=[
-                        datetime.timedelta(minutes=minutes) for minutes in range(30, 1441, 30)
+                        datetime.timedelta(minutes=minutes) for minutes in range(15, 1441, 15)
                     ],
                 ),
-                name="durations_multiple_of_30_minutes_max_24_hours",
+                name="durations_multiple_of_15_minutes_max_24_hours",
                 violation_error_message=_(
-                    "Reservation min and max durations must be multiples of 30 minutes, up to a maximum of 24 hours."
+                    "Reservation min and max durations must be multiples of 15 minutes, up to a maximum of 24 hours."
                 ),
             ),
         ]
