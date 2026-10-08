@@ -5,6 +5,7 @@ import datetime
 import pytest
 
 from tilavarauspalvelu.enums import MunicipalityChoice, ReservationStateChoice, ReservationTypeChoice, ReserveeType
+from utils.date_utils import local_datetime
 
 from tests.factories import (
     AgeGroupFactory,
@@ -204,7 +205,7 @@ def test_reservation__query__fields_requiring_staff_permissions__regular_user(gr
         type=ReservationTypeChoice.STAFF,
         working_memo="foo",
         handling_details="bar",
-        handled_at=datetime.datetime(2022, 1, 1, 12),
+        handled_at=local_datetime(2022, 1, 1, 12),
     )
 
     fields = """

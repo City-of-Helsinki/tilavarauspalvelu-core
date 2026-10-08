@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 from http import HTTPStatus
 from typing import TYPE_CHECKING
 
@@ -12,6 +11,7 @@ from django.urls import reverse
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import EmailMessage, Reservation
+from utils.date_utils import local_datetime
 
 from tests import factories
 from tests.helpers import ResponseMock, patch_method
@@ -36,8 +36,8 @@ def create_all_models():
 
         if model_factory is factories.ReservableTimeSpanFactory:
             model_factory.create(
-                start_datetime=datetime.datetime(2024, 1, 1, 12),
-                end_datetime=datetime.datetime(2024, 1, 1, 22),
+                start_datetime=local_datetime(2024, 1, 1, 12),
+                end_datetime=local_datetime(2024, 1, 1, 22),
             )
         else:
             model_factory.create()

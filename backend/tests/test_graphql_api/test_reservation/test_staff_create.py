@@ -62,8 +62,8 @@ def test_reservation__staff_create__reservation_block_whole_day(graphql):
         "name": "foo",
         "description": "bar",
         "type": ReservationTypeChoice.STAFF.value,
-        "beginsAt": datetime.datetime(2023, 1, 1, hour=12).isoformat(),
-        "endsAt": datetime.datetime(2023, 1, 1, hour=13).isoformat(),
+        "beginsAt": local_datetime(2023, 1, 1, hour=12).isoformat(),
+        "endsAt": local_datetime(2023, 1, 1, hour=13).isoformat(),
         "reservationUnit": reservation_unit.pk,
     }
 
@@ -98,8 +98,8 @@ def test_reservation__staff_create__reservation_block_whole_day__ignore_given_bu
         "name": "foo",
         "description": "bar",
         "type": ReservationTypeChoice.STAFF.value,
-        "beginsAt": datetime.datetime(2023, 1, 1, hour=12).isoformat(),
-        "endsAt": datetime.datetime(2023, 1, 1, hour=13).isoformat(),
+        "beginsAt": local_datetime(2023, 1, 1, hour=12).isoformat(),
+        "endsAt": local_datetime(2023, 1, 1, hour=13).isoformat(),
         "reservationUnit": reservation_unit.pk,
         "bufferTimeBefore": int(datetime.timedelta(hours=1).total_seconds()),
         "bufferTimeAfter": int(datetime.timedelta(hours=1).total_seconds()),

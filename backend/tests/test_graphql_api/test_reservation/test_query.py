@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 import uuid
 from decimal import Decimal
 from typing import TYPE_CHECKING
@@ -336,7 +335,7 @@ def test_reservation__query__is_handled(graphql):
     assert len(response.edges) == 1
     assert response.node(0) == {"pk": reservation.pk, "isHandled": False}
 
-    reservation.handled_at = datetime.datetime(2022, 1, 1, 12)
+    reservation.handled_at = local_datetime(2022, 1, 1, 12)
     reservation.save()
 
     response = graphql(query)

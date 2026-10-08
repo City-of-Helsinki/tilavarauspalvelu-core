@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-import datetime
 from typing import Any, NamedTuple
 
 import pytest
 from django.db import IntegrityError
 from graphene_django_extensions.testing.utils import parametrize_helper
+
+from utils.date_utils import local_datetime
 
 from tests.factories import BannerNotificationFactory
 
@@ -31,8 +32,8 @@ class Params(NamedTuple):
             ),
             "Missing message": Params(
                 params={
-                    "active_from": datetime.datetime(2021, 1, 1),
-                    "active_until": datetime.datetime(2021, 1, 2),
+                    "active_from": local_datetime(2021, 1, 1),
+                    "active_until": local_datetime(2021, 1, 2),
                     "message": "",
                 },
             ),
@@ -62,14 +63,14 @@ def test_constraint_non_draft_notifications_must_have_active_period_and_message(
         {
             "Missing active until": Params(
                 params={
-                    "active_from": datetime.datetime(2021, 1, 1),
+                    "active_from": local_datetime(2021, 1, 1),
                     "active_until": None,
                 },
             ),
             "Missing active from": Params(
                 params={
                     "active_from": None,
-                    "active_until": datetime.datetime(2021, 1, 2),
+                    "active_until": local_datetime(2021, 1, 2),
                 },
             ),
         },

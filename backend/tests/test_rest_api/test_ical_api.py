@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 import io
 
 import pytest
@@ -37,8 +36,8 @@ def test_reservation_ical(api_client, settings):
     reservation_unit = ReservationUnitFactory.create(name="Aitio", unit=unit)
     reservation = ReservationFactory.create(
         reservation_unit=reservation_unit,
-        begins_at=datetime.datetime(2024, 1, 1, 12),
-        ends_at=datetime.datetime(2024, 1, 1, 14),
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 14),
         user=user,
     )
 
