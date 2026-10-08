@@ -20,7 +20,14 @@ from tilavarauspalvelu.models import AffectingTimeSpan, ApplicationRound, Reserv
 from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_reservation_unit_helper import (
     ReservationUnitFirstReservableTimeHelper,
 )
-from utils.date_utils import local_datetime, local_datetime_max, local_datetime_min, local_start_of_day
+from utils.date_utils import (
+    end_time_as_timedelta,
+    local_datetime,
+    local_datetime_max,
+    local_datetime_min,
+    local_start_of_day,
+    time_as_timedelta,
+)
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -197,7 +204,11 @@ class FirstReservableTimeHelper:
             msg = "'reservable_date_start' must be before 'reservable_date_end'."
             raise FirstReservableTimeError(msg)
 
-        if filter_time_start is not None and filter_time_end is not None and filter_time_start >= filter_time_end:
+        if (
+            filter_time_start is not None
+            and filter_time_end is not None
+            and time_as_timedelta(filter_time_start) >= end_time_as_timedelta(filter_time_end)
+        ):
             msg = "'reservable_time_start' must be before 'reservable_time_end'."
             raise FirstReservableTimeError(msg)
 
