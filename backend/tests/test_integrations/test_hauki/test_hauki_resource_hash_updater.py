@@ -11,11 +11,12 @@ from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.integrations.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ReservableTimeSpan
 from utils.date_utils import local_date, local_datetime
 
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory
-from tests.helpers import patch_method
+from tests.helpers import ResponseMock, patch_method
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import OriginHaukiResource
@@ -205,3 +206,40 @@ def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_updated_
 
     assert hash_updater.resources_updated == [hauki_resource]
     assert ReservableTimeSpanClient.run.call_count == 0  # Not called, due to hash being known to not have hours
+
+
+@freezegun.freeze_time("2020-01-01")
+@patch_method(HaukiAPIClient._get_resources)
+@patch_method(HaukiAPIClient.get)
+@patch_method(SentryLogger.log_exception)
+def test__HaukiResourceHashUpdater__failing_resource_does_not_stop_other_resources():
+    failing_resource = OriginHaukiResourceFactory.create(id=998, opening_hours_hash="OLD", latest_fetched_date=None)
+    working_resource = OriginHaukiResourceFactory.create(id=999, opening_hours_hash="OLD", latest_fetched_date=None)
+
+    HaukiAPIClient._get_resources.return_value = {
+        "results": [
+            {"id": 998, "date_periods_hash": "UPDATED"},
+            {"id": 999, "date_periods_hash": "UPDATED"},
+        ]
+    }
+    HaukiAPIClient.get.side_effect = [
+        ResponseMock(status_code=404, json_data={"detail": "Not found."}),
+        ResponseMock(
+            status_code=200,
+            json_data={"count": 1, "results": [{"resource": {"timezone": "Europe/Helsinki"}, "opening_hours": []}]},
+        ),
+    ]
+
+    hash_updater = HaukiResourceHashUpdater()
+    hash_updater.run()
+
+    failing_resource.refresh_from_db()
+    assert failing_resource.opening_hours_hash == "OLD"
+    assert failing_resource.latest_fetched_date is None
+
+    working_resource.refresh_from_db()
+    assert working_resource.opening_hours_hash == "UPDATED"
+    assert working_resource.latest_fetched_date == datetime.date(2021, 12, 31)
+
+    assert hash_updater.resources_updated == [working_resource]
+    assert SentryLogger.log_exception.call_count == 1
