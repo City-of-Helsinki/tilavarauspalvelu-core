@@ -11,7 +11,7 @@ from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitHa
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import UnitFactory
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, exact, patch_method
 from tests.test_integrations.test_tprek.helpers import SINGLE_TPREK_UNIT_JSON
 
 # Applied to all tests
@@ -25,7 +25,7 @@ def test_TprekUnitImporter__unit_tprek_id_missing():
     unit = UnitFactory.create(tprek_id=None)
 
     importer = TprekUnitImporter()
-    with pytest.raises(TPRekImportError):
+    with pytest.raises(TPRekImportError, match=exact(f"Unit TPREK ID is None: {unit.pk}")):
         importer.update_unit_from_tprek([unit])
 
     assert importer.updated_units_count == 0
