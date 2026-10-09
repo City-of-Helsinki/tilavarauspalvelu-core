@@ -18,9 +18,6 @@ def test_is_numeric():
         is_numeric("12A56")
 
     with pytest.raises(ValidationError):
-        is_numeric("12A56")
-
-    with pytest.raises(ValidationError):
         is_numeric("12356⁰")
 
 

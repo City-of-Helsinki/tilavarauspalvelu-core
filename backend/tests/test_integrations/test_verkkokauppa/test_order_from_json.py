@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import datetime
 import uuid
 from decimal import Decimal
@@ -84,7 +85,7 @@ def test_order_from_json():
 
 
 def test_order_from_json__missing_fields__phone():
-    data = order_json.copy()
+    data = copy.deepcopy(order_json)
     data["customer"].pop("phone")
     order = Order.from_json(data)
 
@@ -92,7 +93,7 @@ def test_order_from_json__missing_fields__phone():
 
 
 def test_order_from_json__missing_fields__subscription_id():
-    data = order_json.copy()
+    data = copy.deepcopy(order_json)
     data.pop("subscriptionId")
     order = Order.from_json(data)
 
@@ -101,7 +102,7 @@ def test_order_from_json__missing_fields__subscription_id():
 
 def test_order_from_json__created_at_no_milliseconds():
     """Verkkokauppa API does not return milliseconds in the createdAt field, if the seconds is zero."""
-    data = order_json.copy()
+    data = copy.deepcopy(order_json)
     data["createdAt"] = "2021-02-25T10:23:00"
     order = Order.from_json(data)
 
