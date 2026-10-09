@@ -18,7 +18,7 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "format:staged": "oxfmt --no-error-on-unmatched-pattern",
-    "test": "pnpm -r --workspace-concurrency=1 run test",
+    "test": "pnpm -r run test",
     "test:coverage": "pnpm -r run test:coverage",
     "gql-pluck": "node scripts/gql-pluck.mjs",
     "codegen:staff": "graphql-codegen --project staff",
