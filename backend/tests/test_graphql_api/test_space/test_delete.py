@@ -67,13 +67,13 @@ def test_space_not_deleted_because_in_active_application_round(graphql, status):
     assert Space.objects.filter(pk=pk).exists() is True
 
 
-def test_delete_space__delete__in_use(graphql):
+def test_delete_space__in_use(graphql):
     space = SpaceFactory.create()
     ReservationUnitFactory.create(spaces=[space])
     graphql.login_with_superuser()
 
     response = graphql(DELETE_MUTATION, input_data={"pk": space.pk})
 
-    assert response.has_errors is True
+    assert response.field_error_messages() == ["Cannot delete space which has associated reservation units"]
 
     assert Space.objects.count() == 1

@@ -547,7 +547,7 @@ def test_reservation__approve__price_missing(graphql):
     input_data.pop("price")
     response = graphql(APPROVE_MUTATION, input_data=input_data)
 
-    assert response.has_errors is True
+    assert response.has_schema_errors is True, response
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
@@ -566,7 +566,7 @@ def test_reservation__approve__handling_details_missing(graphql):
     input_data.pop("handlingDetails")
     response = graphql(APPROVE_MUTATION, input_data=input_data)
 
-    assert response.has_errors is True
+    assert response.has_schema_errors is True, response
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING

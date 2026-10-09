@@ -24,6 +24,9 @@ def test_reservation_unit__archive__general_admin(graphql):
     response = graphql(ARCHIVE_MUTATION, variables={"input": data})
     assert response.has_errors is False, response
 
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.is_archived is True
+
 
 def test_reservation_unit__archive__unit_admin(graphql):
     space = SpaceFactory.create()
@@ -36,6 +39,9 @@ def test_reservation_unit__archive__unit_admin(graphql):
 
     response = graphql(ARCHIVE_MUTATION, variables={"input": data})
     assert response.has_errors is False, response
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.is_archived is True
 
 
 def test_reservation_unit__archive__unit_admin__different_unit(graphql):
@@ -52,6 +58,9 @@ def test_reservation_unit__archive__unit_admin__different_unit(graphql):
     response = graphql(ARCHIVE_MUTATION, variables={"input": data})
     assert response.error_message() == "No permission to update."
 
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.is_archived is False
+
 
 def test_reservation_unit__archive__regular_user(graphql):
     space = SpaceFactory.create()
@@ -64,6 +73,9 @@ def test_reservation_unit__archive__regular_user(graphql):
     response = graphql(ARCHIVE_MUTATION, variables={"input": data})
     assert response.error_message() == "No permission to update."
 
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.is_archived is False
+
 
 def test_reservation_unit__archive__anonymous_user(graphql):
     space = SpaceFactory.create()
@@ -73,3 +85,6 @@ def test_reservation_unit__archive__anonymous_user(graphql):
 
     response = graphql(ARCHIVE_MUTATION, variables={"input": data})
     assert response.error_message() == "No permission to update."
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.is_archived is False

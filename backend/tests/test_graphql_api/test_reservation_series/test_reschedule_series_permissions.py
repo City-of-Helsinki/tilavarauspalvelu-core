@@ -4,7 +4,7 @@ import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import UserRoleChoice
-from utils.date_utils import local_datetime
+from utils.date_utils import local_datetime, local_time
 
 from tests.factories import GeneralRoleFactory, UnitRoleFactory, UserFactory
 
@@ -31,10 +31,13 @@ def test_reservation_series__reschedule_series__general_role(graphql, role, has_
     series = create_reservation_series()
     graphql.login_user_with_role(role=role)
 
-    data = get_minimal_reschedule_data(series)
+    data = get_minimal_reschedule_data(series, beginTime="08:00:00")
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is not has_permission
+
+    series.refresh_from_db()
+    assert series.begin_time == (local_time(hour=8) if has_permission else local_time(hour=10))
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))
@@ -44,10 +47,13 @@ def test_reservation_series__reschedule_series__general_reserver__own_reservatio
     GeneralRoleFactory.create(user=user, role=UserRoleChoice.RESERVER)
 
     graphql.force_login(user)
-    data = get_minimal_reschedule_data(series)
+    data = get_minimal_reschedule_data(series, beginTime="08:00:00")
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
+
+    series.refresh_from_db()
+    assert series.begin_time == local_time(hour=8)
 
 
 @pytest.mark.parametrize(
@@ -66,10 +72,13 @@ def test_reservation_series__reschedule_series__unit_role(graphql, role, has_per
     user = UserFactory.create_with_unit_role(role=role, units=[series.reservation_unit.unit])
 
     graphql.force_login(user)
-    data = get_minimal_reschedule_data(series)
+    data = get_minimal_reschedule_data(series, beginTime="08:00:00")
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is not has_permission
+
+    series.refresh_from_db()
+    assert series.begin_time == (local_time(hour=8) if has_permission else local_time(hour=10))
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))
@@ -79,7 +88,10 @@ def test_reservation_series__reschedule_series__unit_reserver__own_reservation(g
     UnitRoleFactory.create(user=user, role=UserRoleChoice.RESERVER, units=[series.reservation_unit.unit])
 
     graphql.force_login(user)
-    data = get_minimal_reschedule_data(series)
+    data = get_minimal_reschedule_data(series, beginTime="08:00:00")
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
+
+    series.refresh_from_db()
+    assert series.begin_time == local_time(hour=8)

@@ -703,7 +703,7 @@ def test_reservation_series__reschedule_series__create_statistics(graphql, setti
 
     # But those statistics should be for different reservations.
     after = list(ReservationStatistic.objects.order_by("reservation").values_list("reservation", flat=True))
-    assert before != after
+    assert set(before).isdisjoint(after)
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))  # Friday
@@ -729,9 +729,9 @@ def test_reservation_series__reschedule_series__create_statistics__partial(graph
     # After rescheduling, there should be 9 reservation statistics.
     assert ReservationStatistic.objects.count() == 9
 
-    # But those statistics should be for different reservations.
+    # Statistics of the 4 past reservations stay. The 5 future ones are for new reservations.
     after = list(ReservationStatistic.objects.order_by("reservation").values_list("reservation", flat=True))
-    assert before != after
+    assert len(set(before) & set(after)) == 4
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=4, hour=10, minute=30))  # Monday
