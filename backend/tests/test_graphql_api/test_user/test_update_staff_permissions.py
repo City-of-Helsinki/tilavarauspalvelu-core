@@ -41,6 +41,9 @@ def test_user__update__anonymous_user(graphql):
 
     assert response.error_message() == "No permission to update."
 
+    user.refresh_from_db()
+    assert user.reservation_notification == ReservationNotification.ONLY_HANDLING_REQUIRED
+
 
 def test_user__update__cannot_update_other_user(graphql):
     user = UserFactory.create_superuser(reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED)
@@ -54,6 +57,9 @@ def test_user__update__cannot_update_other_user(graphql):
 
     assert response.error_message() == "No permission to update."
 
+    user.refresh_from_db()
+    assert user.reservation_notification == ReservationNotification.ONLY_HANDLING_REQUIRED
+
 
 def test_user__update__regular_user(graphql):
     user = UserFactory.create(reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED)
@@ -66,6 +72,9 @@ def test_user__update__regular_user(graphql):
     response = graphql(STAFF_UPDATE_MUTATION, input_data=data)
 
     assert response.error_message() == "No permission to update."
+
+    user.refresh_from_db()
+    assert user.reservation_notification == ReservationNotification.ONLY_HANDLING_REQUIRED
 
 
 def test_user__update__admin_user(graphql):

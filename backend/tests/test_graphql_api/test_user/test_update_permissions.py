@@ -15,7 +15,7 @@ pytestmark = [
 
 
 def test_user__update__language__superuser(graphql):
-    user = UserFactory.create_superuser()
+    user = UserFactory.create_superuser(preferred_language=Language.EN.value)
 
     data = {
         "preferredLanguage": Language.FI.value.upper(),
@@ -25,10 +25,13 @@ def test_user__update__language__superuser(graphql):
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False
+
+    user.refresh_from_db()
+    assert user.preferred_language == Language.FI.value
 
 
 def test_user__update__language__regular_user(graphql):
-    user = UserFactory.create()
+    user = UserFactory.create(preferred_language=Language.EN.value)
 
     data = {
         "preferredLanguage": Language.FI.value.upper(),
@@ -38,10 +41,13 @@ def test_user__update__language__regular_user(graphql):
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False
+
+    user.refresh_from_db()
+    assert user.preferred_language == Language.FI.value
 
 
 def test_user__update__language__admin(graphql):
-    user = UserFactory.create_with_general_role()
+    user = UserFactory.create_with_general_role(preferred_language=Language.EN.value)
 
     data = {
         "preferredLanguage": Language.FI.value.upper(),
@@ -51,3 +57,6 @@ def test_user__update__language__admin(graphql):
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False
+
+    user.refresh_from_db()
+    assert user.preferred_language == Language.FI.value

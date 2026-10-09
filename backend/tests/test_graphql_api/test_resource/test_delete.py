@@ -32,6 +32,6 @@ def test_resource__delete__in_use(graphql):
 
     response = graphql(DELETE_MUTATION, input_data={"pk": resource.pk})
 
-    assert response.has_errors is True
+    assert response.field_error_messages() == ["Cannot delete resource which has associated reservation units"]
 
     assert Resource.objects.count() == 1

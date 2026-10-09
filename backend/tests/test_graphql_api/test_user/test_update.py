@@ -43,6 +43,9 @@ def test_user__update__language_not_available(graphql):
 
     assert response.has_schema_errors is True, response
 
+    user.refresh_from_db()
+    assert user.preferred_language == Language.EN.value
+
 
 def test_user__update__pk_user_not_an_input(graphql):
     user = UserFactory.create_superuser(preferred_language=Language.EN.value)

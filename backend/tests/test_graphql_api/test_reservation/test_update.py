@@ -92,7 +92,6 @@ def test_reservation__update__cannot_update_price(graphql):
     data = get_update_data(reservation, price=0)
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    # Actual error doesn't matter too much, as long as price can't be updated.
     assert response.has_schema_errors
 
 
@@ -103,7 +102,6 @@ def test_reservation__update__cannot_update_time(graphql):
     data = get_update_data(reservation, beginsAt=local_datetime().isoformat())
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    # Actual error doesn't matter too much, as long as price can't be updated.
     assert response.has_schema_errors
 
 
