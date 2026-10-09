@@ -110,7 +110,7 @@ def test_seasonal_booking_application_received__get_context__get_mock_data(lang:
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_application_received_email__render__text():
+def test_seasonal_booking_application_received__render__text():
     context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_RECEIVED, language="en")
     text_content = render_text(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_RECEIVED, context=context)
 
@@ -136,7 +136,7 @@ def test_seasonal_booking_application_received_email__render__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_application_received_email__render__html():
+def test_seasonal_booking_application_received__render__html():
     context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_RECEIVED, language="en")
     html_content = render_html(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_RECEIVED, context=context)
     text_content = html_email_to_text(html_content)

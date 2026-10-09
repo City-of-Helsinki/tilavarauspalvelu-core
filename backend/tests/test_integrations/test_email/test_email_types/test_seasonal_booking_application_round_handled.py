@@ -17,6 +17,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
 )
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from utils.date_utils import local_datetime
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
@@ -111,7 +112,7 @@ def test_seasonal_booking_application_round_handled__get_context__get_mock_data(
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_application_round_handled_email__render__text():
+def test_seasonal_booking_application_round_handled__render__text():
     context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_HANDLED, language="en")
     text_content = render_text(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_HANDLED, context=context)
 
@@ -137,7 +138,7 @@ def test_seasonal_booking_application_round_handled_email__render__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_application_round_handled_email__render__html():
+def test_seasonal_booking_application_round_handled__render__html():
     context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_HANDLED, language="en")
     html_content = render_html(email_type=EmailType.SEASONAL_BOOKING_APPLICATION_ROUND_HANDLED, context=context)
     text_content = html_email_to_text(html_content)
@@ -165,6 +166,7 @@ def test_seasonal_booking_application_round_handled_email__render__html():
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_seasonal_booking_application_round_handled__send_email(outbox):
     application_round = ApplicationRoundFactory.create_in_status_results_sent()
     application = ApplicationFactory.create_in_status_handled(application_round=application_round)
@@ -175,6 +177,9 @@ def test_seasonal_booking_application_round_handled__send_email(outbox):
 
     assert outbox[0].subject == "Your application has been processed"
     assert sorted(outbox[0].bcc) == sorted([application.user.email, application.contact_person_email])
+
+    application.refresh_from_db()
+    assert application.results_ready_notification_sent_at == local_datetime(2024, 1, 1, 12)
 
 
 @pytest.mark.django_db

@@ -95,7 +95,7 @@ def test_reservation_cancelled__get_context(lang: Lang):
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
 @freeze_time("2024-01-01T12:00:00+02:00")
-def test_reservation_cancelled__get_context__mock_data(lang: Lang):
+def test_reservation_cancelled__get_context__get_mock_data(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
