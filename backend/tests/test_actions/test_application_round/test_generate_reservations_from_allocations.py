@@ -145,7 +145,8 @@ def test_generate_reservation_series_from_allocations__individual():
 
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
-def test_generate_reservation_series_from_allocations__company():
+@pytest.mark.parametrize("reservee_type", [ReserveeType.COMPANY, ReserveeType.NONPROFIT])
+def test_generate_reservation_series_from_allocations__organisation_reservee(reservee_type):
     user = UserFactory.create()
     unit = UnitBuilder().with_hauki_resource().create()
     reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
@@ -167,7 +168,7 @@ def test_generate_reservation_series_from_allocations__company():
     )
 
     application: Application = application_round.applications.first()
-    application.applicant_type = ReserveeType.COMPANY
+    application.applicant_type = reservee_type
     application.save()
 
     application_round.actions.generate_reservations_from_allocations()
@@ -176,82 +177,7 @@ def test_generate_reservation_series_from_allocations__company():
     assert len(reservations) == 1
 
     assert reservations[0].description == application.organisation_core_business
-    assert reservations[0].reservee_type == ReserveeType.COMPANY
-    assert reservations[0].reservee_organisation_name == application.organisation_name
-    assert reservations[0].reservee_identifier == application.organisation_identifier
-    assert reservations[0].reservee_address_zip == application.organisation_post_code
-
-
-@freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
-def test_generate_reservation_series_from_allocations__association():
-    user = UserFactory.create()
-    unit = UnitBuilder().with_hauki_resource().create()
-    reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
-
-    next_monday = next_date_matching_weekday(local_date(), Weekday.MONDAY)
-
-    application_round = ApplicationRoundFactory.create_with_allocations(
-        allocations=[
-            Allocation(
-                reservation_unit=reservation_unit,
-                day_of_the_week=Weekday.MONDAY,
-                begin_time=local_time(12, 0),
-                end_time=local_time(14, 0),
-            ),
-        ],
-        reservation_period_begin_date=next_monday,
-        reservation_period_end_date=next_monday + datetime.timedelta(days=1),
-        user=user,
-    )
-
-    application: Application = application_round.applications.first()
-    application.applicant_type = ReserveeType.NONPROFIT
-    application.save()
-
-    application_round.actions.generate_reservations_from_allocations()
-
-    reservations: list[Reservation] = list(Reservation.objects.all())
-    assert len(reservations) == 1
-
-    assert reservations[0].description == application.organisation_core_business
-    assert reservations[0].reservee_type == ReserveeType.NONPROFIT
-    assert reservations[0].reservee_organisation_name == application.organisation_name
-    assert reservations[0].reservee_identifier == application.organisation_identifier
-    assert reservations[0].reservee_address_zip == application.organisation_post_code
-
-
-@freezegun.freeze_time(local_datetime(2024, 1, 1))  # Monday
-def test_generate_reservation_series_from_allocations__community():
-    user = UserFactory.create()
-    unit = UnitBuilder().with_hauki_resource().create()
-    reservation_unit = ReservationUnitBuilder().for_unit(unit).with_free_pricing().with_unrestricted_access().create()
-
-    next_monday = next_date_matching_weekday(local_date(), Weekday.MONDAY)
-
-    application_round = ApplicationRoundFactory.create_with_allocations(
-        allocations=[
-            Allocation(
-                reservation_unit=reservation_unit,
-                day_of_the_week=Weekday.MONDAY,
-                begin_time=local_time(12, 0),
-                end_time=local_time(14, 0),
-            ),
-        ],
-        reservation_period_begin_date=next_monday,
-        reservation_period_end_date=next_monday + datetime.timedelta(days=1),
-        user=user,
-    )
-
-    application: Application = application_round.applications.first()
-    application.applicant_type = ReserveeType.NONPROFIT
-    application.save()
-
-    application_round.actions.generate_reservations_from_allocations()
-
-    reservations: list[Reservation] = list(Reservation.objects.all())
-    assert len(reservations) == 1
-
-    assert reservations[0].reservee_type == ReserveeType.NONPROFIT
+    assert reservations[0].reservee_type == reservee_type
     assert reservations[0].reservee_organisation_name == application.organisation_name
     assert reservations[0].reservee_identifier == application.organisation_identifier
     assert reservations[0].reservee_address_zip == application.organisation_post_code
@@ -287,7 +213,7 @@ def test_generate_reservation_series_from_allocations__multiple_allocations():
 
     application_round.actions.generate_reservations_from_allocations()
 
-    reservations: list[Reservation] = list(Reservation.objects.all())
+    reservations: list[Reservation] = list(Reservation.objects.order_by("begins_at"))
 
     assert len(reservations) == 2
 
