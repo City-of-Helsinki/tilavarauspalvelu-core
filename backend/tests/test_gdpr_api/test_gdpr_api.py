@@ -327,7 +327,7 @@ def test_query_user_data__wrong_scope(api_client, settings):
     auth_header = get_gdpr_auth_header(user, scopes=["invalid"])
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
-    url = reverse("gdpr_v1", kwargs={"uuid": str(uuid.uuid4())})
+    url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
     with patch_oidc_config():
         response = api_client.get(url)
 
@@ -467,6 +467,7 @@ def test_delete_user_data__dont_anonymize_if_open_payments(api_client, settings)
     assert user.username == "foo"
 
 
+@freeze_time("2024-06-15T12:00:00")
 def test_delete_user_data__dont_anonymize_if_open_reservations(api_client, settings):
     user = UserFactory.create(username="foo")
     begin = local_datetime()
@@ -498,6 +499,7 @@ def test_delete_user_data__dont_anonymize_if_open_reservations(api_client, setti
     assert user.username == "foo"
 
 
+@freeze_time("2024-06-15T12:00:00")
 def test_delete_user_data__dont_anonymize_if_reservation_one_month_ago(api_client, settings):
     user = UserFactory.create(username="foo")
     begin = local_datetime() - relativedelta(months=1)
