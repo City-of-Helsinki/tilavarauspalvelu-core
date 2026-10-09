@@ -347,6 +347,10 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
         # Pagination arguments do not affect the calculated results (note: ordering does!).
         unaffecting = {"first", "last", "offset", "after", "before"}
         args = sorted(f"{key}={value}" for key, value in self.data.items() if key not in unaffecting)
+        if "text_search" in self.data:
+            # Text search results depend on the language of the request.
+            language = get_text_search_language(self.request)
+            args.append(f"text_search_language={language}")
         cache_key: str = base64.b64encode(",".join(args).encode()).decode()
 
         # Fetch the pagination information from the request.

@@ -18,7 +18,7 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnitHierarchy
+from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnit, ReservationUnitHierarchy
 from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import CachedReservableTime
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
@@ -38,7 +38,6 @@ from .helpers import reservation_units_query
 if TYPE_CHECKING:
     from graphene_django_extensions.testing.client import GQLResponse
 
-    from tilavarauspalvelu.models import ReservationUnit
 
 # Applied to all tests
 pytestmark = [
@@ -2770,6 +2769,58 @@ def test__reservation_unit__first_reservable_time__different_filters_dont_share_
 
     # We couldn't use the cached results, so make database queries as usual.
     response_2.assert_query_count(9)
+
+
+########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__different_text_search_languages_dont_share_cache(
+    graphql, reservation_unit
+):
+    reservation_unit.name_fi = "Sauna"
+    reservation_unit.name_en = "Cottage"
+    reservation_unit.save()
+
+    reservation_unit_2 = ReservationUnitFactory.create(
+        name_fi="Mökki",
+        name_en="Sauna",
+        origin_hauki_resource=reservation_unit.origin_hauki_resource,
+    )
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=10),
+        end_datetime=_datetime(hour=12),
+    )
+
+    ReservationUnit.objects.update_search_vectors()
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    query = reservation_units_reservable_query(
+        fields="pk isClosed firstReservableDatetime",
+        text_search="sauna",
+        order_by="nameFiAsc",
+        first=1,
+    )
+
+    graphql.login_with_superuser(preferred_language="fi")
+    response_1 = graphql(query)
+    assert response_1.has_errors is False, response_1
+
+    assert len(response_1) == 1
+    assert response_1.node(0)["pk"] == reservation_unit.pk
+    assert frt(response_1) == dt(hour=10)
+
+    graphql.login_with_superuser(username="english_admin", preferred_language="en")
+    response_2 = graphql(query)
+    assert response_2.has_errors is False, response_2
+
+    assert len(response_2) == 1
+    assert response_2.node(0)["pk"] == reservation_unit_2.pk
+    assert frt(response_2) == dt(hour=10)
+    assert is_closed(response_2) is False
 
 
 ########################################################################################################################
