@@ -16,8 +16,6 @@ const sentryEnv = {
   SENTRY_ENVIRONMENT: "runtime",
   SENTRY_TRACES_SAMPLE_RATE: "0.25",
   SENTRY_TRACE_PROPAGATION_TARGETS: "https://api.example.test",
-  SENTRY_REPLAYS_SESSION_SAMPLE_RATE: "0.1",
-  SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE: "1",
   SENTRY_PROJECT: "runtime-project",
 };
 
