@@ -15,7 +15,7 @@ import countriesJson from "i18n-iso-countries/langs/fi.json";
 import { trim } from "lodash-es";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
-import { getApiErrors } from "@ui/modules/apollo/helpers";
+import { getApiErrors } from "@ui/modules/apollo/errors";
 import { breakpoints } from "@ui/modules/const";
 import { formatErrorMessage } from "ui/src/hooks/useDisplayError";
 import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
