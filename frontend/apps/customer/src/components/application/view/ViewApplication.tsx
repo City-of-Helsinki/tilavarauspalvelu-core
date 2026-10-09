@@ -50,6 +50,12 @@ export const APPLICATION_VIEW_FRAGMENT = gql`
           nameFi
           nameEn
           nameSv
+          unit {
+            id
+            nameFi
+            nameEn
+            nameSv
+          }
         }
       }
     }
