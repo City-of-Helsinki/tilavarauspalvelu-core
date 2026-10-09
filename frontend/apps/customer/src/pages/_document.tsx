@@ -5,7 +5,7 @@ import Document, { Html, Head, Main, NextScript } from "next/document";
 import { ServerStyleSheet } from "styled-components";
 import type { DocumentContext } from "next/document";
 import { getRuntimeConfigScript } from "@ui/modules/runtimeEnv";
-import { env } from "@/env.mjs";
+import { env, RUNTIME_ENV_KEYS } from "@/env.mjs";
 
 export default class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
@@ -41,7 +41,7 @@ export default class MyDocument extends Document {
         <Head>
           <script
             // eslint-disable-next-line react/no-danger -- values are allowlisted and escaped
-            dangerouslySetInnerHTML={{ __html: getRuntimeConfigScript() }}
+            dangerouslySetInnerHTML={{ __html: getRuntimeConfigScript(RUNTIME_ENV_KEYS) }}
           />
           <style
             data-used-styles

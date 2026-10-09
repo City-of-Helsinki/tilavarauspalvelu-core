@@ -8,7 +8,7 @@ import { beforeSend, beforeSendTransaction, parseSampleRate } from "ui/src";
 import { env } from "@/env.mjs";
 import { getStaffRelease } from "./modules/baseUtils";
 
-if (env.NEXT_PUBLIC_SENTRY_DSN) {
+if (env.SENTRY_DSN) {
   const release = getStaffRelease();
 
   Sentry.init({
@@ -19,25 +19,25 @@ if (env.NEXT_PUBLIC_SENTRY_DSN) {
       replayIntegration(),
       Sentry.extraErrorDataIntegration({ depth: 3 }),
       thirdPartyErrorFilterIntegration({
-        filterKeys: env.NEXT_PUBLIC_SENTRY_PROJECT ? [env.NEXT_PUBLIC_SENTRY_PROJECT] : [],
+        filterKeys: env.SENTRY_PROJECT ? [env.SENTRY_PROJECT] : [],
         behaviour: "drop-error-if-contains-third-party-frames",
       }),
     ],
-    dsn: env.NEXT_PUBLIC_SENTRY_DSN,
-    environment: env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
+    dsn: env.SENTRY_DSN,
+    environment: env.SENTRY_ENVIRONMENT,
     release,
     ignoreErrors: [
       "ResizeObserver loop completed with undelivered notifications",
       "ResizeObserver loop limit exceeded",
     ],
-    tracesSampleRate: parseSampleRate(env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE),
-    tracePropagationTargets: env.NEXT_PUBLIC_SENTRY_TRACE_PROPAGATION_TARGETS
-      ? env.NEXT_PUBLIC_SENTRY_TRACE_PROPAGATION_TARGETS.split(",")
+    tracesSampleRate: parseSampleRate(env.SENTRY_TRACES_SAMPLE_RATE),
+    tracePropagationTargets: env.SENTRY_TRACE_PROPAGATION_TARGETS
+      ? env.SENTRY_TRACE_PROPAGATION_TARGETS.split(",")
           .map((target) => target.trim())
           .filter(Boolean)
       : [],
-    replaysSessionSampleRate: parseSampleRate(env.NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE),
-    replaysOnErrorSampleRate: parseSampleRate(env.NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE),
+    replaysSessionSampleRate: parseSampleRate(env.SENTRY_REPLAYS_SESSION_SAMPLE_RATE),
+    replaysOnErrorSampleRate: parseSampleRate(env.SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE),
     debug: false,
   });
 }
