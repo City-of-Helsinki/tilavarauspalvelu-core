@@ -79,7 +79,7 @@ def test_frontend_queries__admin_ui__tests_exist_for_all_mutations():
     assert not sorted_missing, "Some mutations not tested"
 
 
-def test_frontend_queries__customer_ui__AddReservationToSeries(graphql):
+def test_frontend_queries__admin_ui__AddReservationToSeries(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["AddReservationToSeries"]
 
@@ -113,7 +113,7 @@ def test_frontend_queries__customer_ui__AddReservationToSeries(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__ApproveReservation(graphql):
+def test_frontend_queries__admin_ui__ApproveReservation(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["ApproveReservation"]
 
@@ -140,7 +140,7 @@ def test_frontend_queries__customer_ui__ApproveReservation(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__ArchiveReservationUnit(graphql):
+def test_frontend_queries__admin_ui__ArchiveReservationUnit(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["ArchiveReservationUnit"]
 
@@ -164,7 +164,7 @@ def test_frontend_queries__customer_ui__ArchiveReservationUnit(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__BannerNotificationCreate(graphql):
+def test_frontend_queries__admin_ui__BannerNotificationCreate(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["BannerNotificationCreate"]
 
@@ -187,7 +187,7 @@ def test_frontend_queries__customer_ui__BannerNotificationCreate(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__BannerNotificationDelete(graphql):
+def test_frontend_queries__admin_ui__BannerNotificationDelete(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["BannerNotificationDelete"]
 
@@ -211,7 +211,7 @@ def test_frontend_queries__customer_ui__BannerNotificationDelete(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__BannerNotificationUpdate(graphql):
+def test_frontend_queries__admin_ui__BannerNotificationUpdate(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["BannerNotificationUpdate"]
 
@@ -243,7 +243,7 @@ def test_frontend_queries__customer_ui__BannerNotificationUpdate(graphql):
         access_code_is_active=True,
     ),
 )
-def test_frontend_queries__customer_ui__ChangeReservationAccessCodeSeries(graphql):
+def test_frontend_queries__admin_ui__ChangeReservationAccessCodeSeries(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["ChangeReservationAccessCodeSeries"]
 
@@ -279,7 +279,7 @@ def test_frontend_queries__customer_ui__ChangeReservationAccessCodeSeries(graphq
     ),
 )
 @patch_method(EmailService.send_reservation_access_code_changed_email)
-def test_frontend_queries__customer_ui__ChangeReservationAccessCodeSingle(graphql):
+def test_frontend_queries__admin_ui__ChangeReservationAccessCodeSingle(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["ChangeReservationAccessCodeSingle"]
 
@@ -305,7 +305,7 @@ def test_frontend_queries__customer_ui__ChangeReservationAccessCodeSingle(graphq
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__CreateAllocatedTimeSlot(graphql):
+def test_frontend_queries__admin_ui__CreateAllocatedTimeSlot(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["CreateAllocatedTimeSlot"]
 
@@ -334,7 +334,7 @@ def test_frontend_queries__customer_ui__CreateAllocatedTimeSlot(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__CreateImage(graphql, mock_png):
+def test_frontend_queries__admin_ui__CreateImage(graphql, mock_png):
     admin_factories = get_admin_query_info()
     factories = admin_factories["CreateImage"]
 
@@ -357,7 +357,7 @@ def test_frontend_queries__customer_ui__CreateImage(graphql, mock_png):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__CreateReservationSeries(graphql):
+def test_frontend_queries__admin_ui__CreateReservationSeries(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["CreateReservationSeries"]
 
@@ -367,7 +367,7 @@ def test_frontend_queries__customer_ui__CreateReservationSeries(graphql):
     user = UserFactory.create()
     reservation_unit = ReservationUnitFactory.create()
 
-    begin = next_hour()
+    begin = next_hour(plus_days=1).replace(hour=12)
     end = begin + datetime.timedelta(days=20, hours=1)
 
     variables = deepcopy(query_info.variables)
@@ -375,7 +375,7 @@ def test_frontend_queries__customer_ui__CreateReservationSeries(graphql):
         "beginDate": begin.date().isoformat(),
         "beginTime": begin.time().isoformat(),
         "endDate": end.date().isoformat(),
-        "endTime": end.time().isoformat(),
+        "endTime": (end + datetime.timedelta(hours=1)).time().isoformat(),
         "recurrenceInDays": 7,
         "reservationUnit": reservation_unit.pk,
         "weekdays": [Weekday.MONDAY],
@@ -394,7 +394,7 @@ def test_frontend_queries__customer_ui__CreateReservationSeries(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__CreateReservationUnit(graphql):
+def test_frontend_queries__admin_ui__CreateReservationUnit(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["CreateReservationUnit"]
 
@@ -419,7 +419,7 @@ def test_frontend_queries__customer_ui__CreateReservationUnit(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__CreateResource(graphql):
+def test_frontend_queries__admin_ui__CreateResource(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["CreateResource"]
 
@@ -441,7 +441,7 @@ def test_frontend_queries__customer_ui__CreateResource(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__CreateSpace(graphql):
+def test_frontend_queries__admin_ui__CreateSpace(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["CreateSpace"]
 
@@ -465,7 +465,7 @@ def test_frontend_queries__customer_ui__CreateSpace(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__CreateStaffReservation(graphql):
+def test_frontend_queries__admin_ui__CreateStaffReservation(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["CreateStaffReservation"]
 
@@ -494,7 +494,7 @@ def test_frontend_queries__customer_ui__CreateStaffReservation(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__DeleteAllocatedTimeSlot(graphql):
+def test_frontend_queries__admin_ui__DeleteAllocatedTimeSlot(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["DeleteAllocatedTimeSlot"]
 
@@ -521,7 +521,7 @@ def test_frontend_queries__customer_ui__DeleteAllocatedTimeSlot(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__DeleteImage(graphql):
+def test_frontend_queries__admin_ui__DeleteImage(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["DeleteImage"]
 
@@ -542,7 +542,7 @@ def test_frontend_queries__customer_ui__DeleteImage(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__DeleteResource(graphql):
+def test_frontend_queries__admin_ui__DeleteResource(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["DeleteResource"]
 
@@ -565,7 +565,7 @@ def test_frontend_queries__customer_ui__DeleteResource(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__DeleteSpace(graphql):
+def test_frontend_queries__admin_ui__DeleteSpace(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["DeleteSpace"]
 
@@ -588,7 +588,7 @@ def test_frontend_queries__customer_ui__DeleteSpace(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__DenyReservation(graphql):
+def test_frontend_queries__admin_ui__DenyReservation(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["DenyReservation"]
 
@@ -614,7 +614,7 @@ def test_frontend_queries__customer_ui__DenyReservation(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__DenyReservationSeries(graphql):
+def test_frontend_queries__admin_ui__DenyReservationSeries(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["DenyReservationSeries"]
 
@@ -643,7 +643,7 @@ def test_frontend_queries__customer_ui__DenyReservationSeries(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__EndAllocation(graphql):
+def test_frontend_queries__admin_ui__EndAllocation(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["EndAllocation"]
 
@@ -665,7 +665,7 @@ def test_frontend_queries__customer_ui__EndAllocation(graphql):
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=MagicMock(refund_id=uuid.uuid4()))
-def test_frontend_queries__customer_ui__RefundReservation(graphql):
+def test_frontend_queries__admin_ui__RefundReservation(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["RefundReservation"]
 
@@ -688,7 +688,7 @@ def test_frontend_queries__customer_ui__RefundReservation(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__RejectAllApplicationOptions(graphql):
+def test_frontend_queries__admin_ui__RejectAllApplicationOptions(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["RejectAllApplicationOptions"]
 
@@ -711,7 +711,7 @@ def test_frontend_queries__customer_ui__RejectAllApplicationOptions(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__RejectAllSectionOptions(graphql):
+def test_frontend_queries__admin_ui__RejectAllSectionOptions(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["RejectAllSectionOptions"]
 
@@ -734,7 +734,7 @@ def test_frontend_queries__customer_ui__RejectAllSectionOptions(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__RejectRest(graphql):
+def test_frontend_queries__admin_ui__RejectRest(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["RejectRest"]
 
@@ -759,7 +759,7 @@ def test_frontend_queries__customer_ui__RejectRest(graphql):
 
 
 @patch_method(PindoraService.sync_access_code)
-def test_frontend_queries__customer_ui__RepairReservationAccessCodeSeries(graphql):
+def test_frontend_queries__admin_ui__RepairReservationAccessCodeSeries(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["RepairReservationAccessCodeSeries"]
 
@@ -787,7 +787,7 @@ def test_frontend_queries__customer_ui__RepairReservationAccessCodeSeries(graphq
 
 
 @patch_method(PindoraService.sync_access_code)
-def test_frontend_queries__customer_ui__RepairReservationAccessCodeSingle(graphql):
+def test_frontend_queries__admin_ui__RepairReservationAccessCodeSingle(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["RepairReservationAccessCodeSingle"]
 
@@ -814,7 +814,7 @@ def test_frontend_queries__customer_ui__RepairReservationAccessCodeSingle(graphq
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__RequireHandling(graphql):
+def test_frontend_queries__admin_ui__RequireHandling(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["RequireHandling"]
 
@@ -837,7 +837,7 @@ def test_frontend_queries__customer_ui__RequireHandling(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__RescheduleReservationSeries(graphql):
+def test_frontend_queries__admin_ui__RescheduleReservationSeries(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["RescheduleReservationSeries"]
 
@@ -865,7 +865,7 @@ def test_frontend_queries__customer_ui__RescheduleReservationSeries(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__RestoreAllApplicationOptions(graphql):
+def test_frontend_queries__admin_ui__RestoreAllApplicationOptions(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["RestoreAllApplicationOptions"]
 
@@ -891,7 +891,7 @@ def test_frontend_queries__customer_ui__RestoreAllApplicationOptions(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__RestoreAllSectionOptions(graphql):
+def test_frontend_queries__admin_ui__RestoreAllSectionOptions(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["RestoreAllSectionOptions"]
 
@@ -917,7 +917,7 @@ def test_frontend_queries__customer_ui__RestoreAllSectionOptions(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__SendResults(graphql):
+def test_frontend_queries__admin_ui__SendResults(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["SendResults"]
 
@@ -938,7 +938,7 @@ def test_frontend_queries__customer_ui__SendResults(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__StaffAdjustReservationTime(graphql):
+def test_frontend_queries__admin_ui__StaffAdjustReservationTime(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["StaffAdjustReservationTime"]
 
@@ -963,7 +963,7 @@ def test_frontend_queries__customer_ui__StaffAdjustReservationTime(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__UpdateApplicationWorkingMemo(graphql):
+def test_frontend_queries__admin_ui__UpdateApplicationWorkingMemo(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["UpdateApplicationWorkingMemo"]
 
@@ -985,7 +985,7 @@ def test_frontend_queries__customer_ui__UpdateApplicationWorkingMemo(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__UpdateImage(graphql):
+def test_frontend_queries__admin_ui__UpdateImage(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["UpdateImage"]
 
@@ -1007,7 +1007,7 @@ def test_frontend_queries__customer_ui__UpdateImage(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__UpdateReservationSeries(graphql):
+def test_frontend_queries__admin_ui__UpdateReservationSeries(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["UpdateReservationSeries"]
 
@@ -1031,7 +1031,7 @@ def test_frontend_queries__customer_ui__UpdateReservationSeries(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__UpdateReservationUnit(graphql):
+def test_frontend_queries__admin_ui__UpdateReservationUnit(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["UpdateReservationUnit"]
 
@@ -1055,7 +1055,7 @@ def test_frontend_queries__customer_ui__UpdateReservationUnit(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__UpdateReservationWorkingMemo(graphql):
+def test_frontend_queries__admin_ui__UpdateReservationWorkingMemo(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["UpdateReservationWorkingMemo"]
 
@@ -1077,7 +1077,7 @@ def test_frontend_queries__customer_ui__UpdateReservationWorkingMemo(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__UpdateResource(graphql):
+def test_frontend_queries__admin_ui__UpdateResource(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["UpdateResource"]
 
@@ -1101,7 +1101,7 @@ def test_frontend_queries__customer_ui__UpdateResource(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__UpdateSpace(graphql):
+def test_frontend_queries__admin_ui__UpdateSpace(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["UpdateSpace"]
 
@@ -1125,7 +1125,7 @@ def test_frontend_queries__customer_ui__UpdateSpace(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_frontend_queries__customer_ui__UpdateStaffReservation(graphql):
+def test_frontend_queries__admin_ui__UpdateStaffReservation(graphql):
     admin_factories = get_admin_query_info()
     factories = admin_factories["UpdateStaffReservation"]
 
