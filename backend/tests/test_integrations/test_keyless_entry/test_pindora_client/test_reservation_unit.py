@@ -30,15 +30,22 @@ from tests.helpers import ResponseMock, exact, patch_method, use_retries
 from tests.test_integrations.test_keyless_entry.helpers import ErrorParams, default_reservation_unit_response
 
 
-def test_pindora_client__get_reservation_unit():
+def test_pindora_client__get_reservation_unit(settings):
     reservation_unit = ReservationUnitFactory.build()
 
     data = default_reservation_unit_response()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
         response = PindoraClient.get_reservation_unit(reservation_unit)
 
-    assert response["name"] == "foo"
+    assert response == PindoraReservationUnitResponse(
+        reservation_unit_id=uuid.UUID(data["reservation_unit_id"]),
+        name="foo",
+        keypad_url="https://example.com",
+    )
+
+    assert patch.call_args.kwargs["method"] == "get"
+    assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation-unit/{reservation_unit.ext_uuid}"
 
 
 def test_pindora_client__get_reservation_unit__missing_api_key(settings):
@@ -101,8 +108,9 @@ def test_pindora_client__get_reservation_unit__succeeds_after_retry():
     )
 
     with patch as magic_mock:
-        PindoraClient.get_reservation_unit(reservation_unit)
+        response = PindoraClient.get_reservation_unit(reservation_unit)
 
+    assert response["name"] == "foo"
     assert magic_mock.call_count == 3
 
 
@@ -111,27 +119,32 @@ def test_pindora_client__get_reservation_unit__succeeds_after_retry():
         "400": ErrorParams(
             status_code=HTTP_400_BAD_REQUEST,
             exception=PindoraBadRequestError,
+            error_msg="Invalid Pindora API request: error text.",
         ),
         "403": ErrorParams(
             status_code=HTTP_403_FORBIDDEN,
             exception=PindoraPermissionError,
+            error_msg="Pindora API key is invalid.",
         ),
         "404": ErrorParams(
             status_code=HTTP_404_NOT_FOUND,
             exception=PindoraNotFoundError,
+            error_msg="Reservation unit '<uuid>' not found from Pindora.",
         ),
         "non 200": ErrorParams(
             status_code=HTTP_418_IM_A_TEAPOT,
             exception=PindoraUnexpectedResponseError,
+            error_msg="Unexpected response from Pindora when fetching reservation unit '<uuid>': [418] error text",
         ),
     })
 )
 def test_pindora_client__get_reservation_unit__errors(status_code, exception, error_msg):
     reservation_unit = ReservationUnitFactory.build()
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
 
-    with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
+    msg = error_msg.replace("<uuid>", str(reservation_unit.ext_uuid))
+    with patch, pytest.raises(exception, match=exact(msg)):
         PindoraClient.get_reservation_unit(reservation_unit)
 
 
@@ -151,8 +164,7 @@ def test_pindora_client__get_reservation_unit__missing_key():
 def test_pindora_client__get_reservation_unit__invalid_data():
     reservation_unit = ReservationUnitFactory.build()
 
-    data = default_reservation_unit_response()
-    data["reservation_unit_id"] = str(reservation_unit.id)
+    data = default_reservation_unit_response(reservation_unit_id="not-a-uuid")
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
 
