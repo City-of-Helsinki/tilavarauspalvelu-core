@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import datetime
 from typing import Any, NamedTuple
 
@@ -113,5 +114,12 @@ def test__TimeSpanElement__copy():
         start_datetime=_get_date(day=1, hour=10),
         end_datetime=_get_date(day=2, hour=12),
         is_reservable=False,
+        buffer_time_before=datetime.timedelta(minutes=15),
+        buffer_time_after=datetime.timedelta(minutes=30),
     )
-    assert time_span.__copy__() == time_span  # noqa: PLC2801
+    copied = copy.copy(time_span)
+
+    assert copied is not time_span
+    assert copied == time_span
+    assert copied.buffer_time_before == datetime.timedelta(minutes=15)
+    assert copied.buffer_time_after == datetime.timedelta(minutes=30)

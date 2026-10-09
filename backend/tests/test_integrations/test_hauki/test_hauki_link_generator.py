@@ -39,7 +39,7 @@ def test__hauki__link_generation__params():
 
 
 @pytest.mark.parametrize("setting", ["HAUKI_ADMIN_UI_URL", "HAUKI_SECRET", "HAUKI_ORIGIN_ID"])
-def test__hauki__link_generation__missing_settings_values(setting):
+def test__hauki__link_generation__missing_settings_values(settings, setting):
     setattr(settings, setting, None)
 
     link = generate_hauki_link(reservation_unit_uuid="123", user_email="foo@bar.com", organization_id=ORGANIZATION)
