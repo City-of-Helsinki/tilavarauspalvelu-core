@@ -1,16 +1,18 @@
 import type { IncomingMessage, IncomingHttpHeaders } from "node:http";
 import { ApolloError } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
-import { getOperationName } from "@apollo/client/utilities";
+import { getMainDefinition, getOperationName } from "@apollo/client/utilities";
 import * as Sentry from "@sentry/nextjs";
-import { print } from "graphql";
+import { Kind, OperationTypeNode, print } from "graphql";
 import { Roarr as log } from "roarr";
 import { getCookie } from "typescript-cookie";
 import type { ServerError, ServerParseError, Operation } from "@apollo/client";
 import type { GraphQLFormattedError, DocumentNode } from "graphql";
 import { RESERVEE_PI_FIELDS } from "@ui/components/reservation-form/utils";
 import { toast } from "../../components/toast";
+import { CLIENT_FETCH_TIMEOUT_MS, CLIENT_UPLOAD_TIMEOUT_MS, SERVER_FETCH_TIMEOUT_MS } from "../const";
 import { CsrfTokenNotFound } from "../errors";
+import { fetchWithTimeout, isTimeoutError } from "../fetch";
 import { getLocalizationLang, isBrowser } from "../helpers";
 import { getClientOrigin } from "../urlBuilder";
 import type { LocalizationLanguages } from "../urlBuilder";
@@ -50,6 +52,10 @@ export type QueryErrorT =
     }
   | {
       type: "CSRF_ERROR";
+      message: string;
+    }
+  | {
+      type: "TIMEOUT";
       message: string;
     }
   | {
@@ -281,7 +287,7 @@ export const errorLink = onError(({ graphQLErrors, networkError, operation }) =>
   // graphQLError can also raise 400 network error
   // don't toast that, but allow 400 errors in case they are not graphql errors
   if (graphQLErrors == null && networkError != null && isBrowser) {
-    toastNetworkError(networkError);
+    toastNetworkError(networkError, operation);
   }
   const errors = transformApolloError(new ApolloError({ graphQLErrors, networkError }));
   if (isExpectedError(errors)) {
@@ -322,7 +328,19 @@ const NETWORK_ERROR_TRANSLATIONS: Record<LocalizationLanguages, string> = {
 /// Use it for any toast of such an error, so the user sees only one toast for them.
 export const NETWORK_ERROR_TOAST_ID = "network_error";
 
-function toastNetworkError(error: Error | ServerParseError | ServerError): void {
+// A mutation that timed out can still complete on the backend, so don't tell the user to try again
+const MUTATION_TIMEOUT_TRANSLATIONS: Record<LocalizationLanguages, string> = {
+  en: "The service did not respond in time. Your change can still be saved. Refresh the page before you try again.",
+  fi: "Palvelu ei vastannut ajoissa. Muutoksesi voi silti tallentua. Päivitä sivu ennen kuin yrität uudelleen.",
+  sv: "Tjänsten svarade inte i tid. Din ändring kan ändå sparas. Uppdatera sidan innan du försöker igen.",
+};
+
+function isMutation(operation: Operation): boolean {
+  const definition = getMainDefinition(operation.query);
+  return definition.kind === Kind.OPERATION_DEFINITION && definition.operation === OperationTypeNode.MUTATION;
+}
+
+function toastNetworkError(error: Error | ServerParseError | ServerError, operation: Operation): void {
   if (!isBrowser) {
     return;
   }
@@ -331,7 +349,8 @@ function toastNetworkError(error: Error | ServerParseError | ServerError): void 
     return;
   }
   const lang = getLocalizationLang(document.documentElement.lang);
-  let errorMsg = NETWORK_ERROR_TRANSLATIONS[lang];
+  const isMutationTimeout = isTimeoutError(error) && isMutation(operation);
+  let errorMsg = isMutationTimeout ? MUTATION_TIMEOUT_TRANSLATIONS[lang] : NETWORK_ERROR_TRANSLATIONS[lang];
 
   const errorToastId = NETWORK_ERROR_TOAST_ID;
 
@@ -363,7 +382,20 @@ function getServerCookie(headers: IncomingHttpHeaders | undefined, name: string)
   return token;
 }
 
-export function enchancedFetch(req?: IncomingMessage) {
+function getTimeoutMs(isServer: boolean, init: RequestInit | undefined, clientTimeoutMs: number): number {
+  if (isServer) {
+    return SERVER_FETCH_TIMEOUT_MS;
+  }
+  // The upload link sends files as multipart form data
+  if (init?.body instanceof FormData) {
+    return Math.max(clientTimeoutMs, CLIENT_UPLOAD_TIMEOUT_MS);
+  }
+  return clientTimeoutMs;
+}
+
+/// @param req - the incoming request, required on the server
+/// @param clientTimeoutMs - timeout in the browser, the server always uses SERVER_FETCH_TIMEOUT_MS
+export function enchancedFetch(req?: IncomingMessage, clientTimeoutMs: number = CLIENT_FETCH_TIMEOUT_MS) {
   return (url: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     const isServer = typeof window === "undefined";
     const csrfToken = isServer ? getServerCookie(req?.headers, "csrftoken") : getCookie("csrftoken");
@@ -408,10 +440,7 @@ export function enchancedFetch(req?: IncomingMessage) {
       }
     }
 
-    return fetch(url, {
-      ...init,
-      headers,
-    });
+    return fetchWithTimeout(url, { ...init, headers }, getTimeoutMs(isServer, init, clientTimeoutMs));
   };
 }
 
@@ -480,6 +509,12 @@ export function logGraphQLError(error: QueryErrorT, operation?: Operation): void
     case "CSRF_ERROR":
       log.error(`csrf error: ${error.message}`);
       context.fingerprint = ["csrf_error"];
+      break;
+    case "TIMEOUT":
+      log.error(`timeout: ${error.message}`);
+      context.fingerprint = ["timeout", ...(operation != null ? [operation.operationName] : [])];
+      errorName = `TIMEOUT: ${operation?.operationName ?? ""}`;
+      break;
   }
   context.extra = {
     ...context.extra,
@@ -561,6 +596,12 @@ function transformApolloError(error: ApolloError): QueryErrorT {
       return {
         type: "CSRF_ERROR",
         message: "CSRF verfiication failed.",
+      };
+    }
+    if (isTimeoutError(error.networkError)) {
+      return {
+        type: "TIMEOUT",
+        message: error.networkError.message,
       };
     }
     const { networkError } = error;

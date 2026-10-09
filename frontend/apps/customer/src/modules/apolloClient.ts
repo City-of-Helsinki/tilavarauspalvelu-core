@@ -7,6 +7,7 @@ import { enchancedFetch, errorLink } from "@ui/modules/apollo/helpers";
 import { keepLoadedPages, keyArgsWithoutPaging } from "@ui/modules/apollo/pagination";
 import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
 import { buildGraphQLUrl } from "@ui/modules/urlBuilder";
+import { env } from "@/env.mjs";
 
 /* The backend can't tell if a next page exists. It filters by reservability after paging,
  * so hasNextPage and totalCount are not reliable.
@@ -47,7 +48,7 @@ export function createApolloClient(hostUrl: string, ctx?: GetServerSidePropsCont
   const httpLink = new HttpLink({
     uri,
     credentials: "include",
-    fetch: enchancedFetch(ctx?.req),
+    fetch: enchancedFetch(ctx?.req, env.CLIENT_FETCH_TIMEOUT_MS),
   });
 
   const sentryLink = new SentryContextLink();
