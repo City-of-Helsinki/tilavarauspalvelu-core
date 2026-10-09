@@ -77,7 +77,7 @@ def _validate_time_spans(
     assert all_closed_time_spans.get(reservation_unit_id) == closed_time_spans
 
 
-def test__get_affecting_reservations__only_resources():
+def test_affecting_time_span__closed_time_spans__only_resources():
     # Resource 1 <- ReservationUnit 1, 2
     # Resource 2 <- ReservationUnit 3, 4
     # Resource 3 <- ReservationUnit 5
@@ -112,7 +112,7 @@ def test__get_affecting_reservations__only_resources():
     _validate_time_spans(all_closed_time_spans, reservation_unit_5.pk, [])
 
 
-def test__get_affecting_reservations__only_spaces():
+def test_affecting_time_span__closed_time_spans__only_spaces():
     # Space 1                    <- ReservationUnit 1, 8
     # ├── Space 1.1              <- ReservationUnit 2
     # │   ├── Space 1.1.1        <- ReservationUnit 4
@@ -230,7 +230,7 @@ def test__get_affecting_reservations__only_spaces():
     )
 
 
-def test__get_affecting_reservations__resources_and_spaces():
+def test_affecting_time_span__closed_time_spans__resources_and_spaces():
     # Space 1             <- ReservationUnit 5
     # ├── Space 1.1       <- ReservationUnit 1, 3
     # │   └── Space 1.1.1 <- ReservationUnit 4

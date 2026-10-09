@@ -76,7 +76,7 @@ def test_payment_accounting__webshop_sync_updates_reservation_units_under_units(
     assert mock.call_args.args == (reservation_unit.pk,)
 
 
-def test_payment_accounting__payment_accounting__webshop_sync_updates_all_unique_reservation_units(settings):
+def test_payment_accounting__webshop_sync_updates_all_unique_reservation_units(settings):
     settings.UPDATE_ACCOUNTING = True
 
     with mock_refresh_reservation_unit_accounting_task() as mock:
