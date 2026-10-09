@@ -95,11 +95,9 @@ export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: s
   const body: string = JSON.stringify(query);
 
   try {
-    const res = await fetch({
+    const res = await fetch(buildGraphQLUrl(apiUrl), {
       method: "POST",
-      url: buildGraphQLUrl(apiUrl),
       headers: newHeaders,
-      // @ts-expect-error -- types are broken because we use nextjs edge fetch not nodejs fetch
       body,
     });
 
