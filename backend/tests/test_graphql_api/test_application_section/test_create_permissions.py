@@ -13,27 +13,7 @@ pytestmark = [
 ]
 
 
-def test_application_owner_can_create_application_event(graphql):
-    # given:
-    # - There is draft application in an open application round
-    # - The owner of the application is using the system
-    application = ApplicationFactory.create_in_status_draft_no_sections()
-    graphql.force_login(application.user)
-
-    # when:
-    # - User tries to create a new application event
-    data = get_application_section_create_data(application=application)
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    # then:
-    # - The response contains no errors
-    # - The database contains the created application event
-    assert response.has_errors is False, response
-
-    assert ApplicationSection.objects.count() == 1
-
-
-def test_superuser_can_create_application_event(graphql):
+def test_application_section__create__permissions__superuser(graphql):
     # given:
     # - There is draft application in an open application round
     # - A superuser is using the system
@@ -41,19 +21,19 @@ def test_superuser_can_create_application_event(graphql):
     graphql.login_with_superuser()
 
     # when:
-    # - User tries to create a new application event
+    # - User tries to create a new application section
     data = get_application_section_create_data(application=application)
     response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors
-    # - The database contains the created application event
+    # - The database contains the created application section
     assert response.has_errors is False, response
 
     assert ApplicationSection.objects.count() == 1
 
 
-def test_other_user_cannot_create_application_event(graphql):
+def test_application_section__create__permissions__regular_user(graphql):
     # given:
     # - There is draft application in an open application round
     # - Someone other than the owner of the application is using the system
@@ -61,7 +41,7 @@ def test_other_user_cannot_create_application_event(graphql):
     graphql.login_with_regular_user()
 
     # when:
-    # - User tries to create a new application event
+    # - User tries to create a new application section
     data = get_application_section_create_data(application=application)
     response = graphql(CREATE_MUTATION, input_data=data)
 
@@ -72,7 +52,7 @@ def test_other_user_cannot_create_application_event(graphql):
     assert ApplicationSection.objects.count() == 0
 
 
-def test_general_admin_can_create_application_event(graphql):
+def test_application_section__create__permissions__general_admin(graphql):
     # given:
     # - There is draft application in an open application round
     # - A general admin with application permissions is using the system
@@ -81,13 +61,13 @@ def test_general_admin_can_create_application_event(graphql):
     graphql.force_login(general_admin)
 
     # when:
-    # - User tries to create a new application event
+    # - User tries to create a new application section
     data = get_application_section_create_data(application=application)
     response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors
-    # - The database contains the created application event
+    # - The database contains the created application section
     assert response.has_errors is False, response
 
     assert ApplicationSection.objects.count() == 1
