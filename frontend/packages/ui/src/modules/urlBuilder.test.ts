@@ -18,4 +18,22 @@ describe("getSignInUrl", () => {
     expect(url.searchParams.get("ui")).toBe("customer");
     expect(url.searchParams.get("lang")).toBe("fi");
   });
+
+  it.each([
+    ["https://example.com", "/reservations?x=1"],
+    ["https://example.com/", "/reservations?x=1"],
+    ["https://example.com", "reservations?x=1"],
+    ["https://example.com", "//reservations?x=1"],
+  ])("joins origin %s and path %s with one slash", (originOverride, callBackUrl) => {
+    const url = new URL(
+      getSignInUrl({
+        apiBaseUrl: "https://api.example.com",
+        callBackUrl,
+        language: "fi",
+        client: "customer",
+        originOverride,
+      })
+    );
+    expect(url.searchParams.get("next")).toBe("https://example.com/reservations?x=1");
+  });
 });
