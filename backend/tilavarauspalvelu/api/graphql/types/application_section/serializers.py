@@ -3,6 +3,7 @@ from __future__ import annotations
 import operator
 from typing import TYPE_CHECKING, Any, TypedDict
 
+from django.conf import settings
 from django.db import models
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
@@ -23,6 +24,7 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ApplicationRound, ApplicationSection, Reservation
+from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
 from tilavarauspalvelu.typing import error_codes
 from utils.date_utils import local_datetime
 from utils.db import Now
@@ -276,7 +278,10 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
 
         has_access_code = cancellable_reservations.requires_active_access_code().exists()
 
-        cancellable_reservations_count = cancellable_reservations.count()
+        # Evaluate before the update, since cancelled reservations no longer match the filter.
+        cancellable_reservation_pks = list(cancellable_reservations.values_list("pk", flat=True))
+
+        cancellable_reservations_count = len(cancellable_reservation_pks)
         future_reservations_count = future_reservations.count()
 
         data = CancellationOutput(
@@ -289,6 +294,9 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
             cancel_reason=self.validated_data["cancel_reason"],
             cancel_details=self.validated_data.get("cancel_details", ""),
         )
+
+        if settings.SAVE_RESERVATION_STATISTICS:
+            create_statistics_for_reservations_task.delay(reservation_pks=cancellable_reservation_pks)
 
         if cancellable_reservations_count:
             EmailService.send_seasonal_booking_cancelled_all_email(application_section=self.instance)
