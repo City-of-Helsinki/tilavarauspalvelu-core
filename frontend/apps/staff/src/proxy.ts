@@ -43,7 +43,7 @@ async function fetchUserData(req: NextRequest): Promise<QueryResultType | null> 
   return CurrentUserQuerySchema.parse(data).data;
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const basePath = removeTrailingSlash(env.NEXT_PUBLIC_BASE_URL ?? "");
   const sentryTunnelPath = `${basePath}/monitoring`;
@@ -87,6 +87,4 @@ export const config = {
       source: "/:path*",
     },
   ],
-  // undici has some weird behaviour with URLs so nodejs runtime doesn't work
-  // runtime: "nodejs",
 };
