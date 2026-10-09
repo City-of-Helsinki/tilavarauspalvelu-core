@@ -73,6 +73,7 @@ class ReservationUnitFirstReservableTimeHelper:
 
         self.soft_closed_time_spans = merge_overlapping_time_span_elements(
             self._get_soft_closed_time_spans(),
+            self._get_whole_day_reservation_closed_time_spans(),
             self.reservation_closed_time_spans,
             self.blocking_reservation_closed_time_spans,
         )
@@ -255,3 +256,31 @@ class ReservationUnitFirstReservableTimeHelper:
             )
 
         return reservation_unit_closed_time_spans
+
+    def _get_whole_day_reservation_closed_time_spans(self) -> list[TimeSpanElement]:
+        """
+        Get a list of closed time spans that cover every local day that has a reservation
+        in the same hierarchy, if the ReservationUnit blocks the whole day.
+
+        This matches the whole-day buffers that the overlap check of a new reservation uses.
+        """
+        if not self.reservation_unit.reservation_block_whole_day:
+            return []
+
+        whole_day_closed_time_spans: list[TimeSpanElement] = []
+
+        for time_span in self.reservation_closed_time_spans:
+            end_datetime = local_start_of_day(time_span.end_datetime)
+            if end_datetime < time_span.end_datetime:
+                next_date = end_datetime.date() + datetime.timedelta(days=1)
+                end_datetime = local_start_of_day(next_date)
+
+            whole_day_closed_time_spans.append(
+                TimeSpanElement(
+                    start_datetime=local_start_of_day(time_span.start_datetime),
+                    end_datetime=end_datetime,
+                    is_reservable=False,
+                )
+            )
+
+        return whole_day_closed_time_spans

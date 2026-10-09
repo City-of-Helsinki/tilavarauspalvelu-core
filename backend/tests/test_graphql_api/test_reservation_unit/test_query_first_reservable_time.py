@@ -1787,6 +1787,78 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
 
 
 @freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__reservations__in_common_hierarchy__block_whole_day(
+    graphql, reservation_unit
+):
+    """
+    A reservation unit that blocks the whole day cannot be reserved on a day that has a reservation
+    in a reservation unit in the same hierarchy. A reservation that ends at midnight does not block the next day.
+
+    ┌────────────────────────────────────────────────────┐
+    │ █ = Reservation                                    │
+    │ ░ = Not reservable                                 │
+    │ ▁ = Reservable                                     │
+    ├────────────────────────────────────────────────────┤
+    │ reservation_unit (blocks whole day)                │
+    │   0   2   4   6   8   10  12  14  16  18  20  22   │
+    │ 1 ░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+    │ 2 ░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+    │ 3 ░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+    ├────────────────────────────────────────────────────┤
+    │ reservation_unit_2                                 │
+    │   0   2   4   6   8   10  12  14  16  18  20  22   │
+    │ 1 ░░░░░░░░░░░░░░░░▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+    │ 2 ░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁████████ │
+    │ 3 ░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+    └────────────────────────────────────────────────────┘
+    """
+    reservation_unit_2: ReservationUnit = ReservationUnitFactory.create(
+        spaces=[SpaceFactory.create()],
+        origin_hauki_resource=reservation_unit.origin_hauki_resource,
+    )
+    reservation_unit.unit = reservation_unit_2.unit
+    reservation_unit.spaces.set(reservation_unit_2.spaces.all())
+    reservation_unit.reservation_block_whole_day = True
+    reservation_unit.save()
+
+    for day in (1, 2, 3):
+        ReservableTimeSpanFactory.create(
+            resource=reservation_unit.origin_hauki_resource,
+            start_datetime=_datetime(day=day, hour=8),
+            end_datetime=_datetime(day=day, hour=20),
+        )
+
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit_2,
+        begins_at=_datetime(day=1, hour=10),
+        ends_at=_datetime(day=1, hour=12),
+    )
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit_2,
+        begins_at=_datetime(day=2, hour=20),
+        ends_at=_datetime(day=3, hour=0),
+    )
+
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
+
+    assert response.has_errors is False, response
+
+    assert response.node(0)["pk"] == reservation_unit.pk
+    assert frt(response, node=0) == dt(day=3, hour=8)
+    assert is_closed(response, node=0) is False
+
+    assert response.node(1)["pk"] == reservation_unit_2.pk
+    assert frt(response, node=1) == dt(day=1, hour=8)
+    assert is_closed(response, node=1) is False
+
+
+########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_time(graphql, reservation_unit):
     """
     ReservationUnits before and after buffers should not affect reservability when the buffer is in a closed time span.
