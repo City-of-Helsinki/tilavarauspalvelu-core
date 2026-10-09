@@ -222,7 +222,7 @@ function getRedirectProtectedRoute(req: NextRequest, user: User | null): string 
     const origin = `${protocol}://${host}`;
     return getSignInUrl({
       apiBaseUrl: API_BASE_URL,
-      callBackUrl: url.pathname,
+      callBackUrl: `${url.pathname}${url.search}`,
       language: getLocalizationLang(getLocalizationFromUrl(url)),
       originOverride: origin,
       client: "customer",
