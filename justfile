@@ -45,7 +45,4 @@ stop:
     @docker compose stop
 
 # Generate GraphQL types for the frontend
-codegen:
-    @pnpm --dir frontend codegen:ui
-    @pnpm --dir frontend codegen:customer
-    @pnpm --dir frontend codegen:staff
+codegen: fe::codegen
