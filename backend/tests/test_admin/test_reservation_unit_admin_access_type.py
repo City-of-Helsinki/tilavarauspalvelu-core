@@ -49,7 +49,7 @@ def get_form_reservation_unit(**kwargs: Any) -> ReservationUnit:
     })
 
 
-def test_reservation_unit_admin__access_types(api_client):
+def test_reservation_unit_admin__access_types__add_first_access_type(api_client):
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
@@ -448,10 +448,7 @@ def test_reservation_unit_admin__access_types__set_new_access_type_to_reservatio
         **management_form_data("access_types", total_forms=2, initial_forms=1),
     }
 
-    errors: list[dict[str, Any]] = []
-
-    with collect_admin_form_errors(errors):
-        response = api_client.post(path=url, data=data)
+    response = api_client.post(path=url, data=data)
 
     # Response is a redirect to the list view
     assert response.status_code == 302, response.content
@@ -555,54 +552,6 @@ def test_reservation_unit_admin__access_types__new(api_client):
 
 
 def test_reservation_unit_admin__access_types__new__access_code(api_client):
-    user = UserFactory.create_superuser()
-    api_client.force_login(user)
-
-    pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
-    payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
-    cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
-    service_specific_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.SERVICE)
-
-    unit = UnitFactory.create()
-    reservation_unit = ReservationUnitFactory.build(
-        unit=unit,
-        reservation_kind=ReservationKind.SEASON,
-        payment_terms=payment_terms,
-        cancellation_terms=cancellation_terms,
-        service_specific_terms=service_specific_terms,
-        pricing_terms=pricing_terms,
-    )
-
-    url = reverse("admin:tilavarauspalvelu_reservationunit_add")
-    data = {
-        #
-        # Inline form data
-        "access_types-0-access_type": AccessType.ACCESS_CODE.value,
-        "access_types-0-begin_date": local_date().isoformat(),
-        #
-        # Required fields
-        **required_reservation_unit_form_data(reservation_unit),
-        **management_form_data("access_types", total_forms=1),
-    }
-
-    errors: list[dict[str, Any]] = []
-
-    with collect_admin_form_errors(errors):
-        response = api_client.post(path=url, data=data)
-
-    # There are errors in the form, so we stay on the form page
-    assert response.status_code == 200
-
-    assert errors == [
-        {
-            "code": "",
-            "message": "Cannot set access type to access code on reservation unit create.",
-        },
-    ]
-
-
-@patch_method(PindoraClient.get_reservation_unit)
-def test_reservation_unit_admin__access_types__new__cannot_be_access_type_on_create(api_client):
     user = UserFactory.create_superuser()
     api_client.force_login(user)
 
