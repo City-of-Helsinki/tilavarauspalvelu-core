@@ -80,7 +80,7 @@ class Params(NamedTuple):
         ),
         "CustomerType: NONPROFIT | reservee_organisation_name set": Params(
             fields={
-                "reservee_type": ReserveeType.COMPANY,
+                "reservee_type": ReserveeType.NONPROFIT,
                 "reservee_organisation_name": "Organisation",
                 "reservee_first_name": "First",
                 "reservee_last_name": "Last",

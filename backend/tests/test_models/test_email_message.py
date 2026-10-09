@@ -8,7 +8,7 @@ from tests.helpers import exact
 
 
 @pytest.mark.django_db
-def test_email_message__validate_email_attachments():
+def test_email_message__validate_email_attachments__valid_attachments_are_saved():
     email_message = EmailMessageFactory.build(
         attachments=[
             {
@@ -27,6 +27,12 @@ def test_email_message__validate_email_attachments():
     email_message.full_clean()
 
     email_message.save()
+
+    email_message.refresh_from_db()
+    assert email_message.attachments == [
+        {"filename": "file.txt", "content": "content", "mimetype": "text/plain"},
+        {"filename": "file.txt", "content": "content", "mimetype": "text/plain"},
+    ]
 
 
 @pytest.mark.django_db
