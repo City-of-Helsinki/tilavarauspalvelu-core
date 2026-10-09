@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationSectionStatusChoice
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
 
@@ -14,7 +14,7 @@ pytestmark = [
 ]
 
 
-def test_delete_allocated_time_slot(graphql):
+def test_allocated_time_slot__delete(graphql):
     # given:
     # - There is an allocated application
     # - A superuser is using the system
@@ -27,7 +27,7 @@ def test_delete_allocated_time_slot(graphql):
     slot = option.allocated_time_slots.first()
     graphql.login_with_superuser()
 
-    assert section.status == ApplicationStatusChoice.HANDLED
+    assert section.status == ApplicationSectionStatusChoice.HANDLED
 
     # when:
     # - User tries to delete an allocated time slot
@@ -42,7 +42,7 @@ def test_delete_allocated_time_slot(graphql):
     option.refresh_from_db()
     assert option.allocated_time_slots.count() == 0
 
-    assert section.status == ApplicationStatusChoice.IN_ALLOCATION
+    assert section.status == ApplicationSectionStatusChoice.IN_ALLOCATION
 
 
 @pytest.mark.parametrize(
@@ -79,3 +79,5 @@ def test_allocated_time_slot__delete__blocked_due_to_round_status(graphql, round
     assert response.field_error_messages() == [
         "Cannot delete allocations from an application round not in the allocation stage.",
     ]
+
+    assert option.allocated_time_slots.count() == 1

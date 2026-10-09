@@ -77,12 +77,13 @@ def test_allocated_time_slot__query__all_fields(graphql):
     }
 
 
-def test_affecting_allocated_time_slots__query(graphql):
+def test_allocated_time_slot__query__affecting_reservation_unit(graphql):
     # given:
     # - There is a timeslot in the system
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option__reservation_unit=reservation_unit)
+    AllocatedTimeSlotFactory.create()
     ReservationUnitHierarchy.refresh()
 
     graphql.login_with_superuser()
