@@ -42,7 +42,8 @@ export function redirectCsrfToken(req: NextRequest, apiBaseUrl: string): URL | u
   // a gateway so the public url doesn't match the internal url.
   const origin = requestUrl.origin;
   const hostPart = origin.includes("localhost") ? origin : "";
-  const next = `${hostPart}${requestUrl.pathname}`;
+  // Keep the query string. Pages like /search store their filters in it.
+  const next = `${hostPart}${requestUrl.pathname}${requestUrl.search}`;
   redirectUrl.searchParams.set("redirect_to", next);
 
   return redirectUrl;
@@ -52,10 +53,6 @@ export type GqlQuery = {
   query: string;
   variables?: Record<string, unknown>;
 };
-
-export function removeTrailingSlash(url: string): string {
-  return url.endsWith("/") ? url.slice(0, -1) : url;
-}
 
 /// Fetch a query from the backend
 /// @param req - NextRequest used to copy headers etc.

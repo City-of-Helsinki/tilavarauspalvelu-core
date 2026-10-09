@@ -2,7 +2,7 @@ import { getCookie } from "typescript-cookie";
 import { z } from "zod";
 import { CsrfTokenNotFound, NotBrowserError } from "./errors";
 import { isBrowser } from "./helpers";
-import { getSignOutUrl, getSignInUrl } from "./urlBuilder";
+import { getSignOutUrl, getSignInUrl, removeTrailingSlash } from "./urlBuilder";
 import type { LocalizationLanguages, UserTypeChoice } from "./urlBuilder";
 
 /// NOTE have to cleanup because HDS components might be passing event here
@@ -39,10 +39,6 @@ export function signIn({
     callBackUrl: returnTo,
     client,
   });
-}
-
-function removeTrailingSlash(url: string): string {
-  return url.endsWith("/") ? url.slice(0, -1) : url;
 }
 
 export const isTouchDevice = (): boolean => isBrowser && window?.matchMedia("(any-hover: none)").matches;

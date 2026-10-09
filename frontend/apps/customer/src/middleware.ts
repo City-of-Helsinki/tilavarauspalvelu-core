@@ -8,10 +8,10 @@ import { NextResponse } from "next/server";
 import z from "zod";
 import type { NextRequest } from "next/server";
 import { logError } from "@ui/modules/errors";
-import { gqlQueryFetch, isPageRequest, redirectCsrfToken, removeTrailingSlash } from "ui/src/middlewareHelpers";
+import { gqlQueryFetch, isPageRequest, redirectCsrfToken } from "ui/src/middlewareHelpers";
 import type { GqlQuery } from "ui/src/middlewareHelpers";
 import { createNodeId, getLocalizationLang } from "ui/src/modules/helpers";
-import { getSignInUrl } from "ui/src/modules/urlBuilder";
+import { getSignInUrl, removeTrailingSlash } from "ui/src/modules/urlBuilder";
 import type { LocalizationLanguages } from "ui/src/modules/urlBuilder";
 import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import { env } from "@/env.mjs";
@@ -222,7 +222,7 @@ function getRedirectProtectedRoute(req: NextRequest, user: User | null): string 
     const origin = `${protocol}://${host}`;
     return getSignInUrl({
       apiBaseUrl: API_BASE_URL,
-      callBackUrl: url.pathname,
+      callBackUrl: `${url.pathname}${url.search}`,
       language: getLocalizationLang(getLocalizationFromUrl(url)),
       originOverride: origin,
       client: "customer",

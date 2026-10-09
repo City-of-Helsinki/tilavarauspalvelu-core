@@ -8,6 +8,11 @@ export function buildGraphQLUrl(apiUrl: string) {
   return `${apiUrl}${apiUrl.endsWith("/") ? "" : "/"}graphql/`;
 }
 
+/// Works both in the browser and on the server (including middleware)
+export function removeTrailingSlash(url: string): string {
+  return url.endsWith("/") ? url.slice(0, -1) : url;
+}
+
 function buildAuthUrl(apiUrl: string) {
   return `${apiUrl}${apiUrl.endsWith("/") ? "" : "/"}helauth/`;
 }
@@ -41,7 +46,9 @@ export function getSignInUrl({
   if (client === "customer") {
     loginUrl.searchParams.set("lang", language);
   }
-  loginUrl.searchParams.set("next", originOverride != null ? `${originOverride}/${callBackUrl}` : callBackUrl);
+  const next =
+    originOverride != null ? `${removeTrailingSlash(originOverride)}/${callBackUrl.replace(/^\/+/, "")}` : callBackUrl;
+  loginUrl.searchParams.set("next", next);
   return loginUrl.toString();
 }
 
