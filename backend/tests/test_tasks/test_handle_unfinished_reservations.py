@@ -45,7 +45,7 @@ def mock_delete_pindora_reservation_task() -> Generator[NonCallableMock]:
         yield task
 
 
-# --- Free -----------------------------------------------------------------------------------------------------
+# ── Free ──
 
 
 def test_handle_unfinished_reservations__direct__free(settings):
@@ -148,7 +148,7 @@ def test_handle_unfinished_reservations__direct__free__delete_from_pindora_after
     assert called_uuids == {first_reservation.ext_uuid, second_reservation.ext_uuid}
 
 
-# --- Paid directly -------------------------------------------------------------------------------------------
+# ── Paid directly ──
 
 
 def test_handle_unfinished_reservations__direct__waiting_for_payment__expired(settings):
@@ -266,7 +266,7 @@ def test_handle_unfinished_reservations__direct__waiting_for_payment__delete_fro
     assert task.called is True
 
 
-# --- Paid after handling -------------------------------------------------------------------------------------
+# ── Paid after handling ──
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))

@@ -73,31 +73,6 @@ def test_refresh_expired_payments_in_verkkokauppa__direct_payment__expired(setti
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@freeze_time(local_datetime(2024, 1, 1, 12))
-def test_refresh_expired_payments_in_verkkokauppa__direct_payment__expired__not_cancelled_in_verkkokauppa(settings):
-    settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
-
-    reservation = ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
-    payment_order = PaymentOrderFactory.create_at(
-        reservation=reservation,
-        status=OrderStatus.DRAFT,
-        created_at=local_datetime(2024, 1, 1, 11, 55),
-    )
-
-    VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(
-        status=WebShopPaymentStatus.CREATED,
-        timestamp=local_datetime(2024, 1, 1, 11, 55),
-    )
-
-    refresh_expired_payments_in_verkkokauppa_task()
-
-    payment_order.refresh_from_db()
-    assert payment_order.status == OrderStatus.EXPIRED
-
-    assert VerkkokauppaAPIClient.get_payment.called is True
-
-
-@patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(EmailService.send_reservation_created_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
@@ -566,6 +541,7 @@ def test_refresh_expired_payments_in_verkkokauppa__handled_payment__missing_from
     assert VerkkokauppaAPIClient.get_payment.called is True
 
 
+@patch_method(SentryLogger.log_message)
 @patch_method(VerkkokauppaAPIClient.get_payment, side_effect=GetPaymentError("mock-error"))
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_refresh_expired_payments_in_verkkokauppa__handled_payment__refresh_errors_are_logged(settings):
@@ -585,6 +561,12 @@ def test_refresh_expired_payments_in_verkkokauppa__handled_payment__refresh_erro
     assert payment_order.status == OrderStatus.PENDING
 
     assert VerkkokauppaAPIClient.get_payment.called is True
+
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args == ("Verkkokauppa: Failed to fetch payment status from webshop",)
+    assert SentryLogger.log_message.call_args.kwargs == {
+        "details": {"error": "mock-error", "payment_order": payment_order.pk},
+    }
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)

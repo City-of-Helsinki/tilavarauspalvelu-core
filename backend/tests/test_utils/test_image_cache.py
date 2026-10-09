@@ -11,10 +11,10 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tests.helpers import patch_method
 
 
-@mock.patch("tilavarauspalvelu.integrations.image_cache.urljoin")
-def test_image_cache_purge__no_action_if_disabled(urljoin):
+@mock.patch("tilavarauspalvelu.integrations.image_cache.request")
+def test_image_cache_purge__no_action_if_disabled(mock_request):
     image_cache.purge("foo/bar.jpg")
-    assert urljoin.called is False
+    assert mock_request.called is False
 
 
 @override_settings(IMAGE_CACHE_ENABLED=True, IMAGE_CACHE_VARNISH_HOST="")
