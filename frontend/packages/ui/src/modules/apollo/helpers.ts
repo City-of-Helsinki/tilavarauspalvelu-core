@@ -333,15 +333,11 @@ export function enchancedFetch(req?: IncomingMessage) {
     const isServer = typeof window === "undefined";
     const csrfToken = isServer ? getServerCookie(req?.headers, "csrftoken") : getCookie("csrftoken");
 
-    const headers = new Headers({
-      // TODO: spreading headers doesn't copy them but have to test it in OpenShift
-      // headers.entries().toArray() gives all the values, but we shouldn't forward all of them.
-      // Not changing this now but it should either copy all the headers or be removed completely
-      // oxlint-disable-next-line typescript/no-misused-spread -- TODO: header copy should be more intentional
-      ...(init?.headers != null ? init.headers : {}),
-      // missing csrf token is a non recoverable error
-      ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
-    });
+    const headers = new Headers(init?.headers);
+    // missing csrf token is a non recoverable error
+    if (csrfToken != null) {
+      headers.set("X-Csrftoken", csrfToken);
+    }
 
     // NOTE server requests don't include cookies by default
     if (isServer) {
