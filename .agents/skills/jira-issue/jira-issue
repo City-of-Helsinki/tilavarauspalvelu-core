@@ -33,9 +33,14 @@ ref="op://$vault/$item"
 user="$(op read --account "$JIRA_ISSUE_OP_ACCOUNT" "$ref/username")"
 token="$(op read --account "$JIRA_ISSUE_OP_ACCOUNT" "$ref/credential")"
 
+# Escape backslashes and double quotes for the quoted value in the curl config.
+credentials="$user:$token"
+credentials="${credentials//\\/\\\\}"
+credentials="${credentials//\"/\\\"}"
+
 api() {
   # Pass credentials through stdin so they do not show up in the process list.
-  printf 'user = "%s:%s"\n' "$user" "$token" \
+  printf 'user = "%s"\n' "$credentials" \
     | curl --silent --show-error --fail-with-body --config - "$base_url/$1"
 }
 
