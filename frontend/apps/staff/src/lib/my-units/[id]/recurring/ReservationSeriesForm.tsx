@@ -6,7 +6,7 @@ import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { getSeriesOverlapErrors } from "@ui/modules/apollo/helpers";
+import { getSeriesOverlapErrors } from "@ui/modules/apollo/errors";
 import { ControlledDateInput } from "ui/src/components/form";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { errorToast } from "ui/src/components/toast";

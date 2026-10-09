@@ -9,7 +9,7 @@ import { Button, ButtonSize, Notification } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useRouter } from "next/router";
-import { getSeriesOverlapErrors } from "@ui/modules/apollo/helpers";
+import { getSeriesOverlapErrors } from "@ui/modules/apollo/errors";
 import { ControlledDateInput, TimeInput } from "ui/src/components/form";
 import { errorToast, successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
