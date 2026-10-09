@@ -14,13 +14,13 @@ dynamic = ["dependencies"]  # Use tool.poetry for dependency management
 requires-poetry = ">=2.0"
 
 [tool.poetry.dependencies]
-Django = "6.0.9"
+Django = "5.2.17"
 django-auditlog = "3.4.1"
 django-cors-headers = "4.9.0"
 django-environment-config = { version = "0.2.3", extras = ["db"] }
 django-filter = "26.2"
 django-health-check = "4.8.0"
-django-helusers = "1.3.0"
+django-helusers = "1.1.0"
 django-jinja = "2.11.0"
 django-lazy-managers = "0.0.1"
 django-lookup-property = "0.2.2"
@@ -41,9 +41,9 @@ mjml-python = "1.4.2"
 Pillow = "12.3.0"
 psycopg2 = "2.9.13"
 python-dateutil = "2.9.0.post0"
-redis = { version = "8.1.0", extras = ["hiredis"] }
+redis = { version = "6.4.0", extras = ["hiredis"] }
 sentry-sdk = "2.71.0"
-social-auth-app-django = "6.1.0"
+social-auth-app-django = "5.7.0"
 stamina = "26.1.0"
 # Skip installation on Windows as uWSGI does not support it without Cygwin.
 uWSGI = { version = "2.0.31", markers = "sys_platform != 'win32'" }
