@@ -517,10 +517,10 @@ class PindoraService:
                     elif not should_be_active and response["access_code_is_active"]:
                         cls.deactivate_access_code(obj=section)
 
-                    # User needs to be informed that their seasonal booking now has an access code,
-                    # since we previously thought there was no access code.
-                    if should_be_active:
-                        EmailService.send_seasonal_booking_access_type_changed_email(section)
+                # User needs to be informed that their seasonal booking now has an access code,
+                # since we previously thought there was no access code.
+                if should_be_active:
+                    EmailService.send_seasonal_booking_access_type_changed_email(section)
 
             except ExternalServiceError as error:
                 SentryLogger.log_exception(error, details=f"Application section: {section.pk}")
