@@ -350,7 +350,6 @@ export function enchancedFetch(req?: IncomingMessage) {
       if (csrfToken == null) {
         throw new CsrfTokenNotFound();
       }
-      headers.append("Set-Cookie", `csrftoken=${csrfToken}`);
       headers.append("Cookie", `csrftoken=${csrfToken}`);
       // Django fails with 403 if there is no referer (only on Kubernetes)
       const requestUrl = req.url ?? "";
@@ -365,7 +364,6 @@ export function enchancedFetch(req?: IncomingMessage) {
       const sessionCookie = getServerCookie(req?.headers, "sessionid");
       if (sessionCookie != null) {
         headers.append("Cookie", `sessionid=${sessionCookie}`);
-        headers.append("Set-Cookie", `sessionid=${sessionCookie}`);
       }
     }
 
