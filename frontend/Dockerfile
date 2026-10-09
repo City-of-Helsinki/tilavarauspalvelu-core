@@ -1,15 +1,5 @@
 FROM public.ecr.aws/docker/library/node:24-slim AS base
 
-# Generates a trimmed down version of the package list for installer
-# doesn't invalidate layer cache if the result from turbo prune stays the same.
-FROM base AS builder
-WORKDIR /app
-RUN npm install -g turbo
-COPY . .
-ARG APP
-RUN turbo prune --scope=$APP --docker
-
-# Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
 RUN apt-get update && \
   apt-get install -y --no-install-recommends dumb-init ca-certificates && \
@@ -57,15 +47,15 @@ ENV SENTRY_ORG=$SENTRY_ORG
 
 RUN npm install -g corepack@latest @sentry/cli && corepack enable
 WORKDIR /app
-COPY --from=builder /app/scripts/ /app/scripts
-COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
-RUN pnpm install --frozen-lockfile --ignore-scripts
+# Download packages from the lockfile only.
+# This layer stays cached until the lockfile or workspace settings change.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm fetch
 
 # Build the project
-COPY --from=builder /app/out/full/ .
-COPY turbo.json turbo.json
-RUN pnpm turbo run build --filter=$APP...
+COPY . .
+RUN pnpm install --offline --frozen-lockfile --ignore-scripts
+RUN pnpm --filter=$APP... run build
 
 # Only upload sourcemaps so they match the actual build
 # other artifacts like source code refs have to be added elsewhere

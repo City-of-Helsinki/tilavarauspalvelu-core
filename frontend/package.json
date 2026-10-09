@@ -10,16 +10,16 @@
     "test:browser:ci": "cd apps/ui && pnpm run test:browser:ci",
     "dev:test": "cd apps/ui && pnpm run dev:test",
     "clean": "npkill",
-    "dev": "turbo dev",
-    "build": "turbo build",
+    "dev": "pnpm -r --parallel run dev",
+    "build": "pnpm -r run build",
     "lint": "oxlint --type-aware --type-check",
     "lint:fix": "oxlint --fix --type-aware --type-check",
-    "lint:css": "turbo lint:css",
+    "lint:css": "pnpm -r run lint:css",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "format:staged": "oxfmt --no-error-on-unmatched-pattern",
-    "test": "turbo test --concurrency=1",
-    "test:coverage": "turbo test:coverage",
+    "test": "pnpm -r run test",
+    "test:coverage": "pnpm -r run test:coverage",
     "gql-pluck": "node scripts/gql-pluck.mjs",
     "codegen:staff": "graphql-codegen --project staff",
     "codegen:customer": "graphql-codegen --project customer",
@@ -42,8 +42,7 @@
     "oxfmt": "^0.70.0",
     "oxlint": "^1.85.0",
     "oxlint-tsgolint": "^7.0.2003",
-    "ts-node": "^10.9.2",
-    "turbo": "^2.11.5"
+    "ts-node": "^10.9.2"
   },
   "engines": {
     "npm": "pnpm"

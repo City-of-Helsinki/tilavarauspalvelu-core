@@ -38,8 +38,6 @@ jobs:
         working-directory: frontend
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
-
       - name: Lint staff ui
         working-directory: frontend
         run: |
@@ -68,8 +66,6 @@ jobs:
       - name: Install dependencies
         working-directory: frontend
         run: pnpm install --frozen-lockfile --ignore-scripts
-
-      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
 
       - name: Test staff ui
         working-directory: frontend
@@ -106,8 +102,6 @@ jobs:
         working-directory: frontend
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
-
       - name: Lint ui
         working-directory: frontend
         run: |
@@ -136,8 +130,6 @@ jobs:
       - name: Install dependencies
         working-directory: frontend
         run: pnpm install --frozen-lockfile --ignore-scripts
-
-      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
 
       - name: Test ui
         working-directory: frontend
