@@ -14,9 +14,9 @@ pytestmark = [
 ]
 
 
-def test_can_query_application__all_fields(graphql):
+def test_application__query__all_fields(graphql):
     # given:
-    # - There are two applications in the system, one with events and one without
+    # - There is a draft application in the system with one application section
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
     section = application.application_sections.first()
@@ -25,7 +25,6 @@ def test_can_query_application__all_fields(graphql):
     fields = """
         pk
         applicantType
-        additionalInformation
         additionalInformation
         municipality
         contactPersonFirstName
@@ -59,7 +58,7 @@ def test_can_query_application__all_fields(graphql):
     response = graphql(query)
 
     # then:
-    # - The response contains the selected fields from both applications
+    # - The response contains the selected fields from the application
     assert len(response.edges) == 1, response
     assert response.node(0) == {
         "pk": application.pk,
@@ -92,7 +91,7 @@ def test_can_query_application__all_fields(graphql):
     }
 
 
-def test_accessing_applicant_date_of_birth_creates_personal_info_view_log(graphql):
+def test_application__query__date_of_birth_creates_personal_info_view_log(graphql):
     # given:
     # - There is an application in the system
     # - A superuser is using the system

@@ -19,6 +19,7 @@ def test_application__filter__by_pk__single(graphql):
     # - There are two applications in the system
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
+    ApplicationFactory.create_in_status_draft()
     graphql.login_with_superuser()
 
     # when:

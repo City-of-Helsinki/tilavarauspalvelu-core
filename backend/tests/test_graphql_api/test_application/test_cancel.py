@@ -15,7 +15,7 @@ pytestmark = [
 ]
 
 
-def test_cancel_application(graphql):
+def test_application__cancel(graphql):
     # given:
     # - There is a draft application in an open application round with a single application section
     # - A superuser is using the system
@@ -28,7 +28,7 @@ def test_cancel_application(graphql):
 
     # then:
     # - The response contains no errors
-    # - The application has a send date
+    # - The application is cancelled
     assert response.has_errors is False, response
     application.refresh_from_db()
     assert application.cancelled_at is not None
@@ -44,7 +44,7 @@ def test_cancel_application(graphql):
         ApplicationStatusChoice.CANCELLED,
     ],
 )
-def test_cancel_application__wrong_status(graphql, status):
+def test_application__cancel__wrong_status(graphql, status):
     # given:
     # - There is a draft application in a certain status
     # - A superuser is using the system

@@ -58,8 +58,11 @@ def test_application__send__general_admin(graphql):
 
     assert response.has_errors is False, response
 
+    application.refresh_from_db()
+    assert application.sent_at is not None
 
-def test_application__update__unit_admin(graphql):
+
+def test_application__send__unit_admin(graphql):
     unit = UnitFactory.create()
     application = ApplicationFactory.create_application_ready_for_sending(
         application_sections__reservation_unit_options__reservation_unit__unit=unit,
@@ -70,3 +73,6 @@ def test_application__update__unit_admin(graphql):
     response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
 
     assert response.has_errors is False, response
+
+    application.refresh_from_db()
+    assert application.sent_at is not None
