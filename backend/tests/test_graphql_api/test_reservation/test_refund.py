@@ -144,6 +144,7 @@ def test_reservation__refund__payment_order_is_waiting_for_refund(graphql):
 
 
 @patch_method(VerkkokauppaAPIClient.cancel_order)
+@freeze_time(local_datetime(2021, 1, 1, hour=12))
 def test_reservation__refund__invoiced__cancel_if_paid_by_invoice(graphql):
     reservation = ReservationFactory.create_for_refund(
         payment_order__status=OrderStatus.PAID_BY_INVOICE,
