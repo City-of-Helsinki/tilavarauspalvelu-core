@@ -524,7 +524,6 @@
   "ignorePatterns": [
     "node_modules/",
     ".next/",
-    ".turbo/",
     "out/",
     "public/",
     "*.cjs",

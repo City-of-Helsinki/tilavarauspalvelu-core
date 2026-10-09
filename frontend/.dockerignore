@@ -1,0 +1,30 @@
+**/node_modules
+**/.next
+**/.env*
+**/coverage
+**/.pnpm-store/
+
+# tests
+**/__tests__
+**/__mocks__
+
+# pipelines
+**/*azure-pipelines*.yml
+
+# logs
+**/*.log
+
+# misc
+.husky
+justfile
+
+# configs
+**/oxfmt.config.ts
+**/.oxlintrc.json
+**/.prettierignore
+**/.eslintignore
+**/.lintstagedrc
+**/.prettierignore
+**/.huskyrc
+**/vitest.config.*
+**/vitest.setup.*

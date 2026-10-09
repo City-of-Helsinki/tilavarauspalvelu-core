@@ -21,7 +21,6 @@
 **/next-env.d.ts
 
 # caches
-**/.turbo
 **/.next
 **/__pycache__
 **/.cache
