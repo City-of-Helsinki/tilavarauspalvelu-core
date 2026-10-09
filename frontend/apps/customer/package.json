@@ -28,7 +28,7 @@
     "i18next": "^25.6.3",
     "import-in-the-middle": "^3.5.1",
     "lodash-es": "^4.18.1",
-    "next": "^16.3.6",
+    "next": "^16.3.8",
     "next-compose-plugins": "^2.2.1",
     "next-i18next": "^15.4.3",
     "nuka-carousel": "^7.0.0",
