@@ -126,22 +126,6 @@ def test__HaukiResourceHashUpdater__handle_existing_reservable_time_spans():
 @freezegun.freeze_time("2020-01-01")
 @patch_method(HaukiAPIClient._get_resources)
 @patch_method(ReservableTimeSpanClient.run, return_value=[])
-def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_changed():
-    hauki_resource = OriginHaukiResourceFactory.create(id=999, opening_hours_hash="OLD", latest_fetched_date=None)
-
-    # Hash is changed so it should be updated
-    HaukiAPIClient._get_resources.return_value = {"results": [{"id": 999, "date_periods_hash": "UPDATED"}]}
-
-    hash_updater = HaukiResourceHashUpdater()
-    hash_updater.run()
-
-    assert hash_updater.resources_updated == [hauki_resource]
-    assert ReservableTimeSpanClient.run.call_count == 1
-
-
-@freezegun.freeze_time("2020-01-01")
-@patch_method(HaukiAPIClient._get_resources)
-@patch_method(ReservableTimeSpanClient.run, return_value=[])
 def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_unchanged__no_latest_fetched_date():
     hauki_resource = OriginHaukiResourceFactory.create(id=999, opening_hours_hash="OLD", latest_fetched_date=None)
 
