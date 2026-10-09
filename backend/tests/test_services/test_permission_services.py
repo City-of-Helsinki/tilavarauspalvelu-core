@@ -17,7 +17,7 @@ pytestmark = [
 
 
 @freeze_time("2024-01-01 00:00:00")
-def test_deactivate_old_permissions__deactivates(settings):
+def test_deactivate_old_permissions__last_login_older_than_limit__deactivates_roles_and_staff_flags(settings):
     delta = 1
     settings.PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS = delta
     last_login = local_start_of_day() - datetime.timedelta(days=delta, seconds=1)
@@ -54,7 +54,7 @@ def test_deactivate_old_permissions__deactivates(settings):
 
 
 @freeze_time("2024-01-01 00:00:00")
-def test_deactivate_old_permissions__doesnt_deactivate(settings):
+def test_deactivate_old_permissions__last_login_at_limit__keeps_roles_and_staff_flags(settings):
     delta = 1
     settings.PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS = delta
     last_login = local_start_of_day() - datetime.timedelta(days=delta)

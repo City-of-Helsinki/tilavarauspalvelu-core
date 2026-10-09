@@ -19,7 +19,7 @@ pytestmark = [
 ]
 
 
-def test_cancel_payment_order_for_invoice__does_not_fail_when_reservation_is_missing():
+def test_cancel_payment_order_for_invoice__does_not_fail_when_payment_order_is_missing():
     cancel_payment_order_for_invoice_task(0)
 
 
