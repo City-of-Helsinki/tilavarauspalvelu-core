@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
+from tilavarauspalvelu.models import ReservationSeries
 
 from tests.factories import ReservationUnitFactory, UserFactory
 
@@ -32,6 +33,7 @@ def test_reservation_series__create_series__general_role(graphql, role, has_perm
     response = graphql(CREATE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is not has_permission
+    assert ReservationSeries.objects.count() == (1 if has_permission else 0)
 
 
 @pytest.mark.parametrize(
@@ -53,3 +55,4 @@ def test_reservation_series__create_series__unit_role(graphql, role, has_permiss
     response = graphql(CREATE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is not has_permission
+    assert ReservationSeries.objects.count() == (1 if has_permission else 0)
