@@ -54,11 +54,11 @@ jobs:
 
     steps:
       - name: "Checkout code"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: "Set up python"
         id: setup-python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -127,11 +127,11 @@ jobs:
 
     steps:
       - name: "Checkout code"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: "Set up python"
         id: setup-python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -141,7 +141,7 @@ jobs:
           python-version: ${{ steps.setup-python.outputs.python-version }}
 
       - name: "Download test durations artifact"
-        uses: dawidd6/action-download-artifact@v19
+        uses: dawidd6/action-download-artifact@v27
         with:
           workflow: update_test_durations.yml
           name: test_durations
@@ -186,7 +186,7 @@ jobs:
 
     steps:
       - name: "Checkout code"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # Disable shallow cloning to improve relevancy of reporting in SonarCloud
           fetch-depth: 0
@@ -208,7 +208,7 @@ jobs:
 
       - name: "Set up python"
         id: setup-python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -223,7 +223,7 @@ jobs:
           coverage xml
 
       - name: "SonarCloud Scan"
-        uses: SonarSource/sonarqube-scan-action@v7
+        uses: SonarSource/sonarqube-scan-action@v8
         with:
           projectBaseDir: ./backend
         # Skip analysis for all bots in pull requests
