@@ -28,12 +28,12 @@
     "codegen:watch": "pnpm codegen:staff --watch & pnpm codegen:customer --watch & pnpm codegen:ui --watch"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^6.1.0",
-    "@graphql-codegen/schema-ast": "^5.0.0",
-    "@graphql-codegen/typescript": "^5.0.5",
-    "@graphql-codegen/typescript-operations": "^5.0.5",
-    "@graphql-codegen/typescript-react-apollo": "^4.3.3",
-    "@graphql-tools/graphql-tag-pluck": "^8.3.37",
+    "@graphql-codegen/cli": "^7.4.3",
+    "@graphql-codegen/schema-ast": "^6.1.0",
+    "@graphql-codegen/typescript": "^6.1.0",
+    "@graphql-codegen/typescript-operations": "^6.1.9",
+    "@graphql-codegen/typescript-react-apollo": "^5.0.0",
+    "@graphql-tools/graphql-tag-pluck": "^8.3.39",
     "@parcel/watcher": "^2.6.0",
     "glob": "^13.0.0",
     "graphql-config": "^5.1.7",
