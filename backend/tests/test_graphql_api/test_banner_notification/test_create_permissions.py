@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget, UserRoleChoice
+from tilavarauspalvelu.models import BannerNotification
 
 from tests.test_graphql_api.test_banner_notification.helpers import CREATE_MUTATION
 
@@ -72,3 +73,7 @@ def test_banner_notification__create__notification_manager(graphql):
     )
 
     assert response.has_errors is False
+
+    notification = BannerNotification.objects.get(pk=response.first_query_object["pk"])
+    assert notification.name == "foo"
+    assert notification.message == "bar"

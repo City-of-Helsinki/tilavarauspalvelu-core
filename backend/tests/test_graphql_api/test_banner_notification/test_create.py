@@ -184,6 +184,5 @@ def test_user_creates_banner_notification_where_active_range_is_invalid(graphql,
     )
 
     # then:
-    # - The response has no errors
-    # - The banner notification was created
+    # - The response contains errors about the improper active period
     assert response.field_errors == expected
