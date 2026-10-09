@@ -2,9 +2,9 @@ import React from "react";
 // @ts-expect-error: this works in ui/pages/_document.js for some reason
 import { getCriticalHdsRules, hdsStyles } from "hds-react";
 import Document, { Html, Head, Main, NextScript } from "next/document";
-import Script from "next/script";
 import { ServerStyleSheet } from "styled-components";
 import type { DocumentContext } from "next/document";
+import { getRuntimeConfigScript } from "@ui/modules/runtimeEnv";
 import { env } from "@/env.mjs";
 
 export default class MyDocument extends Document {
@@ -40,7 +40,10 @@ export default class MyDocument extends Document {
     return (
       <Html lang={locale}>
         <Head>
-          <Script src={`${basePath}/env-config.js`} strategy="beforeInteractive" />
+          <script
+            // eslint-disable-next-line react/no-danger -- values are allowlisted and escaped
+            dangerouslySetInnerHTML={{ __html: getRuntimeConfigScript() }}
+          />
           <style
             data-used-styles
             // eslint-disable-next-line react/no-danger -- this is safe
