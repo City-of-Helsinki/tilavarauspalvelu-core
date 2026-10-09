@@ -7,6 +7,7 @@ import { relayStylePagination } from "@apollo/client/utilities";
 import UploadHttpLink from "apollo-upload-client/UploadHttpLink.mjs";
 import { enchancedFetch, errorLink } from "@ui/modules/apollo/helpers";
 import { keepLoadedPages, keyArgsWithoutPaging } from "@ui/modules/apollo/pagination";
+import { createRetryLink } from "@ui/modules/apollo/retryLink";
 import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
 import { buildGraphQLUrl } from "@ui/modules/urlBuilder";
 import { env } from "@/env.mjs";
@@ -32,7 +33,7 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
 
   return new ApolloClient({
     ssrMode: isServer,
-    link: ApolloLink.from([sentryLink, errorLink, isServer ? httpLink : uploadLink]),
+    link: ApolloLink.from([sentryLink, errorLink, createRetryLink(isServer), isServer ? httpLink : uploadLink]),
     defaultOptions: {
       query: {
         fetchPolicy: isServer ? "no-cache" : "cache-first",
