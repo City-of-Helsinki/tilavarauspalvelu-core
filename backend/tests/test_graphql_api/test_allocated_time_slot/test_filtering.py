@@ -341,7 +341,7 @@ def test_allocated_time_slot__filter__by_allocated_day__multiple(graphql):
     assert response.node(1) == {"pk": allocation_2.pk}
 
 
-def test_application__filter__by_text_search__section_id(graphql):
+def test_allocated_time_slot__filter__by_text_search__section_id(graphql):
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -380,7 +380,7 @@ def test_application__filter__by_text_search__section_id(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_application__filter__by_text_search__section_name(graphql):
+def test_allocated_time_slot__filter__by_text_search__section_name(graphql):
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -415,7 +415,7 @@ def test_application__filter__by_text_search__section_name(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_application__filter__by_text_search__application_id(graphql):
+def test_allocated_time_slot__filter__by_text_search__application_id(graphql):
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -455,7 +455,7 @@ def test_application__filter__by_text_search__application_id(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_application__filter__by_text_search__applicant__organisation_name(graphql):
+def test_allocated_time_slot__filter__by_text_search__applicant__organisation_name(graphql):
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -490,7 +490,7 @@ def test_application__filter__by_text_search__applicant__organisation_name(graph
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_application__filter__by_text_search__applicant__contact_person_first_name(graphql):
+def test_allocated_time_slot__filter__by_text_search__applicant__contact_person_first_name(graphql):
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -525,7 +525,7 @@ def test_application__filter__by_text_search__applicant__contact_person_first_na
     assert response.node(0) == {"pk": schedule.pk}
 
 
-def test_application__filter__by_text_search__applicant__contact_person_last_name(graphql):
+def test_allocated_time_slot__filter__by_text_search__applicant__contact_person_last_name(graphql):
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -560,7 +560,7 @@ def test_application__filter__by_text_search__applicant__contact_person_last_nam
     assert response.node(0) == {"pk": schedule.pk}
 
 
-def test_application__filter__by_text_search__applicant__user_first_name(graphql):
+def test_allocated_time_slot__filter__by_text_search__applicant__user_first_name(graphql):
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -595,7 +595,7 @@ def test_application__filter__by_text_search__applicant__user_first_name(graphql
     assert response.node(0) == {"pk": schedule.pk}
 
 
-def test_application__filter__by_text_search__applicant__user_last_name(graphql):
+def test_allocated_time_slot__filter__by_text_search__applicant__user_last_name(graphql):
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
@@ -630,7 +630,7 @@ def test_application__filter__by_text_search__applicant__user_last_name(graphql)
     assert response.node(0) == {"pk": schedule.pk}
 
 
-def test_application__filter__by_text_search__not_found(graphql):
+def test_allocated_time_slot__filter__by_text_search__not_found(graphql):
     # given:
     # - There are two allocated time slots
     # - A superuser is using the system
