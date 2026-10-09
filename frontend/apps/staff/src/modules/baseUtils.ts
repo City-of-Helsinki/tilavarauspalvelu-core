@@ -12,8 +12,8 @@ export function getVersion() {
  * @returns {string}
  */
 export function getStaffRelease() {
-  // Use NEXT_PUBLIC_SENTRY_PROJECT for consistency with Sentry config and runtime
-  const app = env.NEXT_PUBLIC_SENTRY_PROJECT || "tilavarauspalvelu-staff-ui";
+  // Use SENTRY_PROJECT for consistency with Sentry config and runtime
+  const app = env.SENTRY_PROJECT || "tilavarauspalvelu-staff-ui";
   const version = getVersion().replaceAll("/", "-");
   return `${app}@${version}`;
 }

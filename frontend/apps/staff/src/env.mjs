@@ -20,7 +20,6 @@ const ServerSchema = z.object({
   SENTRY_AUTH_TOKEN: z.string().optional(),
   SENTRY_ENABLE_SOURCE_MAPS: coerceBoolean,
   SENTRY_ORG: z.string().optional(),
-  SENTRY_PROJECT: z.string().optional(),
   SKIP_ENV_VALIDATION: coerceBoolean,
   RESERVATION_UNIT_PREVIEW_URL_PREFIX: optionalUrl,
   // mandatory because the SSR can't connect to the API without it
@@ -34,27 +33,29 @@ const ClientSchema = z.object({
   NEXT_PUBLIC_BASE_URL: z.string(),
   NEXT_PUBLIC_SOURCE_BRANCH_NAME: z.string().optional(),
   NEXT_PUBLIC_SOURCE_VERSION: z.string().optional(),
-  NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
-  NEXT_PUBLIC_SENTRY_ENVIRONMENT: z.string().optional(),
-  NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: z.string().optional(),
-  NEXT_PUBLIC_SENTRY_TRACE_PROPAGATION_TARGETS: z.string().optional(),
-  NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE: z.string().optional(),
-  NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE: z.string().optional(),
-  NEXT_PUBLIC_SENTRY_PROJECT: z.string().optional(),
 });
 
-/**
- * @param {string} key
- * @param {string | undefined} buildValue
- */
-function getPublicEnv(key, buildValue) {
-  if (typeof window !== "undefined") {
-    return window.__RUNTIME_CONFIG__?.[key] ?? buildValue;
-  }
+// Public settings that are read at runtime, so the same image runs in all environments.
+// The server reads them from process.env.
+// The browser reads them from window.__RUNTIME_CONFIG__, which _document renders.
+// Do not add secrets here. All values are sent to the browser.
+const RuntimeSchema = z.object({
+  SENTRY_DSN: z.string().optional(),
+  SENTRY_ENVIRONMENT: z.string().optional(),
+  SENTRY_TRACES_SAMPLE_RATE: z.string().optional(),
+  SENTRY_TRACE_PROPAGATION_TARGETS: z.string().optional(),
+  SENTRY_REPLAYS_SESSION_SAMPLE_RATE: z.string().optional(),
+  SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE: z.string().optional(),
+  SENTRY_PROJECT: z.string().optional(),
+});
 
-  // Dynamic lookup is intentional: unlike direct NEXT_PUBLIC_* access, this
-  // reads the container's environment when the Next.js server is running.
-  return process.env[key] ?? buildValue;
+const RUNTIME_ENV_KEYS = RuntimeSchema.keyof().options;
+
+function getRuntimeEnv() {
+  if (typeof window !== "undefined") {
+    return window.__RUNTIME_CONFIG__ ?? {};
+  }
+  return process.env;
 }
 
 function createEnv() {
@@ -78,28 +79,6 @@ function createEnv() {
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_SOURCE_BRANCH_NAME: process.env.NEXT_PUBLIC_SOURCE_BRANCH_NAME,
     NEXT_PUBLIC_SOURCE_VERSION: process.env.NEXT_PUBLIC_SOURCE_VERSION,
-    NEXT_PUBLIC_SENTRY_DSN: getPublicEnv("NEXT_PUBLIC_SENTRY_DSN", process.env.NEXT_PUBLIC_SENTRY_DSN),
-    NEXT_PUBLIC_SENTRY_ENVIRONMENT: getPublicEnv(
-      "NEXT_PUBLIC_SENTRY_ENVIRONMENT",
-      process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT
-    ),
-    NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE: getPublicEnv(
-      "NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE",
-      process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE
-    ),
-    NEXT_PUBLIC_SENTRY_TRACE_PROPAGATION_TARGETS: getPublicEnv(
-      "NEXT_PUBLIC_SENTRY_TRACE_PROPAGATION_TARGETS",
-      process.env.NEXT_PUBLIC_SENTRY_TRACE_PROPAGATION_TARGETS
-    ),
-    NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE: getPublicEnv(
-      "NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE",
-      process.env.NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE
-    ),
-    NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE: getPublicEnv(
-      "NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE",
-      process.env.NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE
-    ),
-    NEXT_PUBLIC_SENTRY_PROJECT: getPublicEnv("NEXT_PUBLIC_SENTRY_PROJECT", process.env.NEXT_PUBLIC_SENTRY_PROJECT),
   });
 
   if (!clientConfig.success) {
@@ -107,13 +86,20 @@ function createEnv() {
     console.error("Client env validation failed", clientConfig.error);
   }
 
+  const runtimeConfig = RuntimeSchema.safeParse(getRuntimeEnv());
+  if (!runtimeConfig.success) {
+    // eslint-disable-next-line no-console
+    console.error("Runtime env validation failed", runtimeConfig.error);
+  }
+
   return {
     ...(isServer && serverConfig?.success ? serverConfig.data : {}),
     ...(clientConfig.success ? clientConfig.data : {}),
+    ...(runtimeConfig.success ? runtimeConfig.data : {}),
     NEXT_ENV: process.env.NEXT_ENV,
   };
 }
 
 const env = createEnv();
 
-export { env };
+export { env, RUNTIME_ENV_KEYS };
