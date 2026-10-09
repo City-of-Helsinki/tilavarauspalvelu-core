@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import z from "zod";
 import type { NextRequest } from "next/server";
 import { logError } from "@ui/modules/errors";
-import { isPageRequest, gqlQueryFetch, redirectCsrfToken, removeTrailingSlash } from "ui/src/middlewareHelpers";
+import { isPageRequest, gqlQueryFetch, redirectCsrfToken } from "ui/src/middlewareHelpers";
 import type { GqlQuery } from "ui/src/middlewareHelpers";
+import { removeTrailingSlash } from "ui/src/modules/urlBuilder";
 import { env } from "@/env.mjs";
 import { PUBLIC_URL } from "./modules/const";
 
