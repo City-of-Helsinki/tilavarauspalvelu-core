@@ -29,6 +29,13 @@ jobs:
             then echo "Dependabot PRs for frontend are not auto-merged."
             exit 0
           fi
+          # Dependabot lists the update type of each package in the commit message.
+          # Stop if the query fails. Otherwise a major update could be approved.
+          commit_bodies=$(gh pr view "$PR_URL" --json commits -q '.commits[].messageBody') || exit 1
+          if printf '%s\n' "$commit_bodies" | grep -q "version-update:semver-major";
+            then echo "Major updates are not auto-approved or auto-merged."
+            exit 0
+          fi
           if [ "$(gh pr view "$PR_URL" --json reviewDecision -q .reviewDecision)" == "APPROVED" ];
             then echo "PR already approved."
           else
