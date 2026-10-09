@@ -45,10 +45,6 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
         self.validate_reservation_unit_option_available(
             option=data["reservation_unit_option"],
         )
-        self.validate_no_allocations_on_the_same_day(
-            section=section,
-            day_of_the_week=data["day_of_the_week"],
-        )
         self.validate_overlapping_allocations(
             section=section,
             day_of_the_week=data["day_of_the_week"],
@@ -122,17 +118,6 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
                 "with a related reservation unit or resource."
             )
             raise ValidationError(msg, code=error_codes.ALLOCATION_OVERLAPPING_ALLOCATIONS)
-
-    @staticmethod
-    def validate_no_allocations_on_the_same_day(section: ApplicationSection, day_of_the_week: Weekday) -> None:
-        allocation_for_day_already_exist = AllocatedTimeSlot.objects.filter(
-            reservation_unit_option__application_section=section,
-            day_of_the_week=day_of_the_week,
-        ).exists()
-
-        if allocation_for_day_already_exist:
-            msg = "Cannot make multiple allocations on the same day of the week for one application section."
-            raise ValidationError(msg, code=error_codes.ALLOCATION_NO_ALLOCATIONS_ON_THE_SAME_DAY)
 
     @staticmethod
     def validate_slots_per_week(section: ApplicationSection) -> None:

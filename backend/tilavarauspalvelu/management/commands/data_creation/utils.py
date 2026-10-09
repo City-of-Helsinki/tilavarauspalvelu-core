@@ -312,9 +312,13 @@ class SuitableTimeInfo:
     primary_applied_weekdays: list[Weekday] = dataclasses.field(default_factory=list)
     secondary_applied_weekdays: list[Weekday] = dataclasses.field(default_factory=list)
     applied_reservations_per_week: int = 0
+    # Adds an evening suitable time range on primary weekdays, so they can have two allocations.
+    applied_morning_and_evening: bool = False
 
     def __post_init__(self) -> None:
         maximum = len(set(self.primary_applied_weekdays) | set(self.secondary_applied_weekdays))
+        if self.applied_morning_and_evening:
+            maximum += len(self.primary_applied_weekdays)
         if self.applied_reservations_per_week <= 0:
             self.applied_reservations_per_week = maximum
         self.applied_reservations_per_week = min(self.applied_reservations_per_week, maximum)

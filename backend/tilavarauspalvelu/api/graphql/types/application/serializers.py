@@ -226,16 +226,6 @@ class ApplicationSendSerializer(NestingModelSerializer):
         for weekday in list(time_slots):
             time_slots[weekday] = merge_time_slots(time_slots[weekday])
 
-        number_of_suitable_weekdays = len(time_slots)
-        if number_of_suitable_weekdays < section.applied_reservations_per_week:
-            msg = (
-                f"Application section {section.pk} must have suitable time ranges on at least as many days "
-                f"as requested reservations per week. Counted {number_of_suitable_weekdays} but expected "
-                f"at least {section.applied_reservations_per_week}."
-            )
-            error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_FEW)
-            errors.append(error)
-
         # Check that each weekday has a contiguous time range long enough for an allocation.
         for weekday, timeslots in time_slots.items():
             for timeslot in timeslots:
