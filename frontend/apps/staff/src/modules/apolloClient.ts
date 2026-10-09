@@ -10,6 +10,7 @@ import { enchancedFetch, errorLink } from "@ui/modules/apollo/helpers";
 import { keepLoadedPages, keyArgsWithoutPaging } from "@ui/modules/apollo/pagination";
 import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
 import { buildGraphQLUrl } from "@ui/modules/urlBuilder";
+import { env } from "@/env.mjs";
 
 if (process.env.NODE_ENV === "development") {
   loadDevMessages();
@@ -22,7 +23,7 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
   const uploadLinkOptions = {
     uri,
     credentials: "include",
-    fetch: enchancedFetch(req),
+    fetch: enchancedFetch(req, env.CLIENT_FETCH_TIMEOUT_MS),
   };
 
   const uploadLink: ApolloLink = createUploadLink(uploadLinkOptions);
@@ -30,7 +31,7 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
   const httpLink = new HttpLink({
     uri,
     credentials: "include",
-    fetch: enchancedFetch(req),
+    fetch: enchancedFetch(req, env.CLIENT_FETCH_TIMEOUT_MS),
   });
 
   return new ApolloClient({
