@@ -11,7 +11,7 @@ pytestmark = [
 ]
 
 
-def test_units__filter__only_with_permission__regular_user(graphql):
+def test_unit_groups__filter__only_with_permission__regular_user(graphql):
     unit_group = UnitGroupFactory.create()
     UnitFactory.create(unit_groups=[unit_group])
 
@@ -24,7 +24,7 @@ def test_units__filter__only_with_permission__regular_user(graphql):
     assert response.error_message() == "No permission to access node."
 
 
-def test_units__filter__only_with_permission__general_admin(graphql):
+def test_unit_groups__filter__only_with_permission__general_admin(graphql):
     UnitFactory.create(unit_groups__name="Included")
 
     user = UserFactory.create_with_general_role()
@@ -37,7 +37,7 @@ def test_units__filter__only_with_permission__general_admin(graphql):
     assert len(response.edges) == 1
 
 
-def test_units__filter__only_with_permission__unit_group_admin(graphql):
+def test_unit_groups__filter__only_with_permission__unit_group_admin(graphql):
     UnitFactory.create(unit_groups__name="Excluded")
     unit_group = UnitGroupFactory.create()
     UnitFactory.create(unit_groups=[unit_group])
@@ -53,7 +53,7 @@ def test_units__filter__only_with_permission__unit_group_admin(graphql):
     assert response.node(0) == {"pk": unit_group.pk}
 
 
-def test_units__filter__only_with_permission__unit_admin(graphql):
+def test_unit_groups__filter__only_with_permission__unit_admin(graphql):
     UnitFactory.create(unit_groups__name="Excluded")
     unit_group = UnitGroupFactory.create()
     unit = UnitFactory.create(unit_groups=[unit_group])
@@ -69,7 +69,7 @@ def test_units__filter__only_with_permission__unit_admin(graphql):
     assert response.node(0) == {"pk": unit_group.pk}
 
 
-def test_units__filter__application_round(graphql):
+def test_unit_groups__filter__application_round(graphql):
     UnitFactory.create(unit_groups__name="Excluded")
     unit_group = UnitGroupFactory.create()
     application_round = ApplicationRoundFactory.create_in_status_in_allocation(

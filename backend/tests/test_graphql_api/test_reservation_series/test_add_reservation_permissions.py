@@ -18,7 +18,7 @@ pytestmark = [
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation_series__regular_user(graphql):
+def test_reservation_series__add_reservation__regular_user(graphql):
     reservation_series = create_reservation_series()
 
     assert reservation_series.reservations.count() == 9
@@ -32,7 +32,7 @@ def test_reservation_series__regular_user(graphql):
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation_series__unit_admin(graphql):
+def test_reservation_series__add_reservation__unit_admin(graphql):
     reservation_series = create_reservation_series()
 
     assert reservation_series.reservations.count() == 9
@@ -50,7 +50,7 @@ def test_reservation_series__unit_admin(graphql):
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation_series__general_admin(graphql):
+def test_reservation_series__add_reservation__general_admin(graphql):
     reservation_series = create_reservation_series()
 
     assert reservation_series.reservations.count() == 9

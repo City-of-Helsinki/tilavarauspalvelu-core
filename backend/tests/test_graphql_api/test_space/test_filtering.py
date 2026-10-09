@@ -66,7 +66,7 @@ def test_space__filter__only_with_permissions__unit_admin(graphql):
     assert response.node(0) == {"pk": space.pk}
 
 
-def test_unit_group_admin__only_with_permissions(graphql):
+def test_space__filter__only_with_permissions__unit_group_admin(graphql):
     # given:
     # - There are two spaces in the database
     # - A unit group admin for one of the space's unit's groups is using the system
