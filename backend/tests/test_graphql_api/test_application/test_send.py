@@ -27,7 +27,7 @@ pytestmark = [
 
 
 @patch_method(EmailService.send_seasonal_booking_application_received_email)
-def test_send_application__draft(graphql):
+def test_application__send__draft(graphql):
     application = ApplicationFactory.create_application_ready_for_sending()
 
     graphql.login_with_superuser()
@@ -42,8 +42,9 @@ def test_send_application__draft(graphql):
 
 
 @patch_method(EmailService.send_seasonal_booking_application_received_email)
-def test_send_application__sent(graphql):
-    application = ApplicationFactory.create_application_ready_for_sending(sent_at=local_datetime())
+def test_application__send__already_sent__updates_sent_at(graphql):
+    first_sent_at = local_datetime() - datetime.timedelta(days=1)
+    application = ApplicationFactory.create_application_ready_for_sending(sent_at=first_sent_at)
 
     graphql.login_with_superuser()
     response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
@@ -51,12 +52,12 @@ def test_send_application__sent(graphql):
     assert response.has_errors is False, response.errors
 
     application.refresh_from_db()
-    assert application.sent_at is not None
+    assert application.sent_at > first_sent_at
 
     assert EmailService.send_seasonal_booking_application_received_email.called is True
 
 
-def test_send_application__cancelled(graphql):
+def test_application__send__cancelled(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(cancelled_at=local_datetime())
 
     graphql.login_with_superuser()
@@ -66,7 +67,7 @@ def test_send_application__cancelled(graphql):
     assert response.field_error_messages() == ["Application in status 'CANCELLED' cannot be sent."]
 
 
-def test_send_application__expired(graphql):
+def test_application__send__expired(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         application_round__application_period_begins_at=local_start_of_day() - datetime.timedelta(days=4),
         application_round__application_period_ends_at=local_start_of_day() - datetime.timedelta(days=2),
@@ -79,7 +80,7 @@ def test_send_application__expired(graphql):
     assert response.field_error_messages() == ["Application in status 'EXPIRED' cannot be sent."]
 
 
-def test_send_application__no_sections(graphql):
+def test_application__send__no_sections(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(application_sections=[])
 
     graphql.login_with_superuser()
@@ -89,7 +90,7 @@ def test_send_application__no_sections(graphql):
     assert response.field_error_messages() == ["Application requires application sections before it can be sent."]
 
 
-def test_send_application__no_purpose(graphql):
+def test_application__send__no_purpose(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(application_sections__purpose=None)
     section = application.application_sections.first()
 
@@ -100,7 +101,7 @@ def test_send_application__no_purpose(graphql):
     assert response.field_error_messages() == [f"Application section {section.pk} must have its purpose set."]
 
 
-def test_send_application__no_age_group(graphql):
+def test_application__send__no_age_group(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(application_sections__age_group=None)
     section = application.application_sections.first()
 
@@ -111,7 +112,7 @@ def test_send_application__no_age_group(graphql):
     assert response.field_error_messages() == [f"Application section {section.pk} must have age group set."]
 
 
-def test_send_application__no_suitable_time_ranges(graphql):
+def test_application__send__no_suitable_time_ranges(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         application_sections__suitable_time_ranges=[],
     )
@@ -126,7 +127,7 @@ def test_send_application__no_suitable_time_ranges(graphql):
     ]
 
 
-def test_send_application__no_reservation_unit_options(graphql):
+def test_application__send__no_reservation_unit_options(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         application_sections__reservation_unit_options=[],
     )
@@ -141,7 +142,7 @@ def test_send_application__no_reservation_unit_options(graphql):
     ]
 
 
-def test_send_application__reservation_unit_not_in_application_round(graphql):
+def test_application__send__reservation_unit_not_in_application_round(graphql):
     application = ApplicationFactory.create_application_ready_for_sending()
     section = application.application_sections.first()
 
@@ -164,7 +165,7 @@ def test_send_application__reservation_unit_not_in_application_round(graphql):
     ]
 
 
-def test_send_application__section_empty_name(graphql):
+def test_application__send__section_empty_name(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(application_sections__name="")
     section = application.application_sections.first()
 
@@ -175,7 +176,7 @@ def test_send_application__section_empty_name(graphql):
     assert response.field_error_messages() == [f"Application section {section.pk} name cannot be empty."]
 
 
-def test_send_application__section_num_persons_zero(graphql):
+def test_application__send__section_num_persons_zero(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(application_sections__num_persons=0)
     section = application.application_sections.first()
 
@@ -186,7 +187,7 @@ def test_send_application__section_num_persons_zero(graphql):
     assert response.field_error_messages() == [f"Application section {section.pk} must be for at least one person."]
 
 
-def test_send_application__section_suitable_time_range_too_short(graphql):
+def test_application__send__section_suitable_time_range_too_short(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         application_sections__reservation_min_duration=datetime.timedelta(hours=2),
         application_sections__suitable_time_ranges__day_of_the_week=Weekday.MONDAY,
@@ -208,7 +209,7 @@ def test_send_application__section_suitable_time_range_too_short(graphql):
     ]
 
 
-def test_send_application__section_suitable_time_range__combined_are_long_enough(graphql):
+def test_application__send__section_suitable_time_range__combined_are_long_enough(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         application_sections__reservation_min_duration=datetime.timedelta(hours=2),
         application_sections__suitable_time_ranges=[],
@@ -235,9 +236,12 @@ def test_send_application__section_suitable_time_range__combined_are_long_enough
 
     assert response.has_errors is False, response.errors
 
+    application.refresh_from_db()
+    assert application.sent_at is not None
+
 
 @pytest.mark.parametrize("created_in_order", [True, False])
-def test_send_application__section_suitable_time_range__combined_end_at_midnight(graphql, created_in_order):
+def test_application__send__section_suitable_time_range__combined_end_at_midnight(graphql, created_in_order):
     application = ApplicationFactory.create_application_ready_for_sending(
         application_sections__reservation_min_duration=datetime.timedelta(hours=3),
         application_sections__reservation_max_duration=datetime.timedelta(hours=3),
@@ -262,8 +266,11 @@ def test_send_application__section_suitable_time_range__combined_end_at_midnight
 
     assert response.has_errors is False, response.errors
 
+    application.refresh_from_db()
+    assert application.sent_at is not None
 
-def test_send_application__section_suitable_time_range__not_contiguous(graphql):
+
+def test_application__send__section_suitable_time_range__not_contiguous(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         application_sections__reservation_min_duration=datetime.timedelta(hours=2),
         application_sections__suitable_time_ranges=[],
@@ -296,7 +303,7 @@ def test_send_application__section_suitable_time_range__not_contiguous(graphql):
     ]
 
 
-def test_send_application__section_suitable_time_range__different_days(graphql):
+def test_application__send__section_suitable_time_range__different_days(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         application_sections__reservation_min_duration=datetime.timedelta(hours=2),
         application_sections__suitable_time_ranges=[],
@@ -335,7 +342,7 @@ def test_send_application__section_suitable_time_range__different_days(graphql):
     ]
 
 
-def test_send_application__section_suitable_time_range__more_reservations_than_suitable_days(graphql):
+def test_application__send__section_suitable_time_range__two_ranges_on_same_day_are_enough(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         application_sections__applied_reservations_per_week=2,
         application_sections__suitable_time_ranges=[],
@@ -364,7 +371,7 @@ def test_send_application__section_suitable_time_range__more_reservations_than_s
     assert application.sent_at is not None
 
 
-def test_send_application__contact_person_first_name_missing(graphql):
+def test_application__send__contact_person_first_name_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(contact_person_first_name="")
 
     graphql.login_with_superuser()
@@ -374,7 +381,7 @@ def test_send_application__contact_person_first_name_missing(graphql):
     assert response.field_error_messages() == ["Application contact person first name missing."]
 
 
-def test_send_application__contact_person_last_name_missing(graphql):
+def test_application__send__contact_person_last_name_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(contact_person_last_name="")
 
     graphql.login_with_superuser()
@@ -384,7 +391,7 @@ def test_send_application__contact_person_last_name_missing(graphql):
     assert response.field_error_messages() == ["Application contact person last name missing."]
 
 
-def test_send_application__contact_person_email_missing(graphql):
+def test_application__send__contact_person_email_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(contact_person_email=None)
 
     graphql.login_with_superuser()
@@ -394,7 +401,7 @@ def test_send_application__contact_person_email_missing(graphql):
     assert response.field_error_messages() == ["Application contact person email address missing."]
 
 
-def test_send_application__contact_person_phone_number_missing(graphql):
+def test_application__send__contact_person_phone_number_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(contact_person_phone_number="")
 
     graphql.login_with_superuser()
@@ -404,7 +411,7 @@ def test_send_application__contact_person_phone_number_missing(graphql):
     assert response.field_error_messages() == ["Application contact person phone number missing."]
 
 
-def test_send_application__billing_address_street_address_missing(graphql):
+def test_application__send__billing_address_street_address_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(billing_street_address="")
 
     graphql.login_with_superuser()
@@ -414,7 +421,7 @@ def test_send_application__billing_address_street_address_missing(graphql):
     assert response.field_error_messages() == ["Application billing street address missing."]
 
 
-def test_send_application__billing_address_post_code_missing(graphql):
+def test_application__send__billing_address_post_code_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(billing_post_code="")
 
     graphql.login_with_superuser()
@@ -424,7 +431,7 @@ def test_send_application__billing_address_post_code_missing(graphql):
     assert response.field_error_messages() == ["Application billing post code missing."]
 
 
-def test_send_application__billing_address_city_missing(graphql):
+def test_application__send__billing_address_city_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(billing_city="")
 
     graphql.login_with_superuser()
@@ -435,7 +442,7 @@ def test_send_application__billing_address_city_missing(graphql):
 
 
 @patch_method(EmailService.send_seasonal_booking_application_received_email)
-def test_send_application__community_applicant(graphql):
+def test_application__send__community_applicant(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ReserveeType.NONPROFIT,
     )
@@ -451,7 +458,7 @@ def test_send_application__community_applicant(graphql):
     assert EmailService.send_seasonal_booking_application_received_email.called is True
 
 
-def test_send_application__community_applicant__org_name_missing(graphql):
+def test_application__send__community_applicant__org_name_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ReserveeType.NONPROFIT,
         organisation_name="",
@@ -464,7 +471,7 @@ def test_send_application__community_applicant__org_name_missing(graphql):
     assert response.field_error_messages() == ["Application organisation must have a name."]
 
 
-def test_send_application__community_applicant__org_core_business_missing(graphql):
+def test_application__send__community_applicant__org_core_business_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ReserveeType.NONPROFIT,
         organisation_core_business="",
@@ -477,7 +484,7 @@ def test_send_application__community_applicant__org_core_business_missing(graphq
     assert response.field_error_messages() == ["Application organisation must have a core business."]
 
 
-def test_send_application__community_applicant__missing_municipality(graphql):
+def test_application__send__community_applicant__missing_municipality(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ReserveeType.NONPROFIT,
         municipality=None,
@@ -490,7 +497,7 @@ def test_send_application__community_applicant__missing_municipality(graphql):
     assert response.field_error_messages() == ["Application municipality is required with organisation."]
 
 
-def test_send_application__community_applicant__organisation_street_address_missing(graphql):
+def test_application__send__community_applicant__organisation_street_address_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ReserveeType.NONPROFIT,
         organisation_street_address="",
@@ -503,7 +510,7 @@ def test_send_application__community_applicant__organisation_street_address_miss
     assert response.field_error_messages() == ["Application organisation street address missing."]
 
 
-def test_send_application__community_applicant__organisation_post_code_missing(graphql):
+def test_application__send__community_applicant__organisation_post_code_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ReserveeType.NONPROFIT,
         organisation_post_code="",
@@ -516,7 +523,7 @@ def test_send_application__community_applicant__organisation_post_code_missing(g
     assert response.field_error_messages() == ["Application organisation post code missing."]
 
 
-def test_send_application__community_applicant__organisation_city_missing(graphql):
+def test_application__send__community_applicant__organisation_city_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ReserveeType.NONPROFIT,
         organisation_city="",
@@ -529,7 +536,7 @@ def test_send_application__community_applicant__organisation_city_missing(graphq
     assert response.field_error_messages() == ["Application organisation city missing."]
 
 
-def test_send_application__community_applicant__billing_details_not_given(graphql):
+def test_application__send__community_applicant__billing_details_not_given(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ReserveeType.NONPROFIT,
         billing_street_address="",
@@ -542,8 +549,11 @@ def test_send_application__community_applicant__billing_details_not_given(graphq
 
     assert response.has_errors is False, response.errors
 
+    application.refresh_from_db()
+    assert application.sent_at is not None
 
-def test_send_application__community_applicant__billing_street_address_missing(graphql):
+
+def test_application__send__community_applicant__billing_street_address_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ReserveeType.NONPROFIT,
         billing_street_address="",
@@ -558,7 +568,7 @@ def test_send_application__community_applicant__billing_street_address_missing(g
     assert response.field_error_messages() == ["Application billing street address missing."]
 
 
-def test_send_application__community_applicant__billing_post_code_missing(graphql):
+def test_application__send__community_applicant__billing_post_code_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ReserveeType.NONPROFIT,
         billing_street_address="Billing address",
@@ -573,7 +583,7 @@ def test_send_application__community_applicant__billing_post_code_missing(graphq
     assert response.field_error_messages() == ["Application billing post code missing."]
 
 
-def test_send_application__community_applicant__billing_city_missing(graphql):
+def test_application__send__community_applicant__billing_city_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ReserveeType.NONPROFIT,
         billing_street_address="Billing address",
@@ -589,24 +599,7 @@ def test_send_application__community_applicant__billing_city_missing(graphql):
 
 
 @patch_method(EmailService.send_seasonal_booking_application_received_email)
-def test_send_application__association_applicant(graphql):
-    application = ApplicationFactory.create_application_ready_for_sending(
-        applicant_type=ReserveeType.NONPROFIT,
-    )
-
-    graphql.login_with_superuser()
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
-
-    assert response.has_errors is False, response.errors
-
-    application.refresh_from_db()
-    assert application.sent_at is not None
-
-    assert EmailService.send_seasonal_booking_application_received_email.called is True
-
-
-@patch_method(EmailService.send_seasonal_booking_application_received_email)
-def test_send_application__company_applicant(graphql):
+def test_application__send__company_applicant(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ReserveeType.COMPANY,
     )
@@ -622,7 +615,7 @@ def test_send_application__company_applicant(graphql):
     assert EmailService.send_seasonal_booking_application_received_email.called is True
 
 
-def test_send_application__company_applicant__identifier_missing(graphql):
+def test_application__send__company_applicant__identifier_missing(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         applicant_type=ReserveeType.COMPANY,
         organisation_identifier="",
@@ -636,7 +629,7 @@ def test_send_application__company_applicant__identifier_missing(graphql):
 
 
 @freeze_time("2024-01-01")
-def test_send_application__user_is_not_adult(graphql):
+def test_application__send__user_is_not_adult(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(
         user__date_of_birth=datetime.date(2020, 1, 1),
     )
@@ -648,7 +641,7 @@ def test_send_application__user_is_not_adult(graphql):
     assert response.field_error_messages() == ["User is not of age"]
 
 
-def test_send_application__is_ad_user__not_internal_user(graphql):
+def test_application__send__is_ad_user__not_internal_user(graphql):
     user = UserFactory.create_ad_user(
         date_of_birth=local_datetime(2006, 1, 1),
         email="test@example.com",
@@ -663,7 +656,7 @@ def test_send_application__is_ad_user__not_internal_user(graphql):
     assert response.field_error_messages() == ["AD user is not an internal user."]
 
 
-def test_send_application__is_ad_user__not_internal_user__is_superuser(graphql):
+def test_application__send__is_ad_user__not_internal_user__is_superuser(graphql):
     user = UserFactory.create_ad_user(
         is_superuser=True,
         date_of_birth=local_datetime(2006, 1, 1),
@@ -676,3 +669,6 @@ def test_send_application__is_ad_user__not_internal_user__is_superuser(graphql):
     response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
 
     assert response.has_errors is False, response.errors
+
+    application.refresh_from_db()
+    assert application.sent_at is not None

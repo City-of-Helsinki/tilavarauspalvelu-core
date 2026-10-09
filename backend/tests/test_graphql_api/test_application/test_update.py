@@ -16,7 +16,7 @@ pytestmark = [
 ]
 
 
-def test_update_application__single_field(graphql):
+def test_application__update__single_field(graphql):
     # given:
     # - There is a draft application in an open application round
     # - A superuser is using the system
@@ -39,7 +39,7 @@ def test_update_application__single_field(graphql):
     assert application.additional_information == "bar"
 
 
-def test_update_application__applicant__resets_sent_at(graphql):
+def test_application__update__applicant__resets_sent_at(graphql):
     application = ApplicationFactory.create_in_status_received()
     graphql.force_login(application.user)
 
@@ -56,7 +56,7 @@ def test_update_application__applicant__resets_sent_at(graphql):
     assert application.sent_at is None
 
 
-def test_update_application__staff__does_not_reset_sent_at(graphql):
+def test_application__update__staff__does_not_reset_sent_at(graphql):
     application = ApplicationFactory.create_in_status_received()
     sent_at = application.sent_at
     graphql.login_with_superuser()
@@ -74,7 +74,7 @@ def test_update_application__staff__does_not_reset_sent_at(graphql):
     assert application.sent_at == sent_at
 
 
-def test_update_application__application_sections__replace(graphql):
+def test_application__update__application_sections__replace(graphql):
     # given:
     # - There is a draft application in an open application round
     # - A superuser is using the system
@@ -130,7 +130,7 @@ def test_update_application__application_sections__replace(graphql):
     assert SuitableTimeRange.objects.filter(pk=old_range_pk).count() == 0
 
 
-def test_update_application__application_sections__not_deleted_if_not_given(graphql):
+def test_application__update__application_sections__not_deleted_if_not_given(graphql):
     # given:
     # - There is a draft application in an open application round
     # - A superuser is using the system
@@ -165,7 +165,7 @@ def test_update_application__application_sections__not_deleted_if_not_given(grap
     assert suitable.pk == old_range_pk
 
 
-def test_update_application__application_sections__section_of_another_application(graphql):
+def test_application__update__application_sections__section_of_another_application(graphql):
     application = ApplicationFactory.create_in_status_draft()
     other_section = ApplicationSectionFactory.create_in_status_unallocated()
     other_application_pk = other_section.application.pk
@@ -187,7 +187,7 @@ def test_update_application__application_sections__section_of_another_applicatio
     assert other_section.application.pk == other_application_pk
 
 
-def test_update_application__application_sections__too_many(graphql, settings):
+def test_application__update__application_sections__too_many(graphql, settings):
     settings.MAXIMUM_SECTIONS_PER_APPLICATION = 0
 
     application = ApplicationFactory.create_in_status_draft()
@@ -223,7 +223,7 @@ def test_update_application__application_sections__too_many(graphql, settings):
     ]
 
 
-def test_update_application__application_sections__deleted_if_empty(graphql):
+def test_application__update__application_sections__deleted_if_empty(graphql):
     # given:
     # - There is a draft application in an open application round
     # - A superuser is using the system
@@ -247,7 +247,7 @@ def test_update_application__application_sections__deleted_if_empty(graphql):
     assert section is None
 
 
-def test_update_application__user(graphql):
+def test_application__update__user(graphql):
     application = ApplicationFactory.create_in_status_draft()
     user = graphql.login_with_superuser()
 
@@ -261,14 +261,14 @@ def test_update_application__user(graphql):
     assert response.has_schema_errors is True, response
 
 
-def test_update_application__application_round(graphql):
+def test_application__update__application_round(graphql):
     application_round = ApplicationRoundFactory.create()
     application = ApplicationFactory.create_in_status_draft()
     graphql.login_with_superuser()
 
     input_data = {
         "pk": application.id,
-        "application_round": application_round.pk,
+        "applicationRound": application_round.pk,
     }
     response = graphql(UPDATE_MUTATION, input_data=input_data)
 
@@ -276,7 +276,7 @@ def test_update_application__application_round(graphql):
     assert response.has_schema_errors is True, response
 
 
-def test_update_application__sent_at(graphql):
+def test_application__update__sent_at(graphql):
     application = ApplicationFactory.create_in_status_draft()
     graphql.login_with_superuser()
 
@@ -290,7 +290,7 @@ def test_update_application__sent_at(graphql):
     assert response.has_schema_errors is True, response
 
 
-def test_update_application__working_memo(graphql):
+def test_application__update__working_memo(graphql):
     application = ApplicationFactory.create_in_status_draft()
     graphql.login_with_superuser()
 

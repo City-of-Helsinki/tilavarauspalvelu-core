@@ -12,7 +12,7 @@ pytestmark = [
 ]
 
 
-def test_application__update_working_memo__regular_user(graphql):
+def test_application__update_working_memo__application_owner(graphql):
     application = ApplicationFactory.create_in_status_draft(working_memo="foo")
 
     graphql.force_login(application.user)
@@ -24,6 +24,9 @@ def test_application__update_working_memo__regular_user(graphql):
     response = graphql(WORKING_MEMO_MUTATION, input_data=input_data)
 
     assert response.error_message() == "No permission to update."
+
+    application.refresh_from_db()
+    assert application.working_memo == "foo"
 
 
 def test_application__update_working_memo__general_admin(graphql):

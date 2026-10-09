@@ -12,7 +12,7 @@ pytestmark = [
 ]
 
 
-def test_application__anonymous_user(graphql):
+def test_application__query__permissions__anonymous_user(graphql):
     # given:
     # - There is an application in the system
     # - An anonymous user is using the system
@@ -27,7 +27,7 @@ def test_application__anonymous_user(graphql):
     assert response.error_message() == "No permission to access node."
 
 
-def test_application__regular_user__other_users_applications(graphql):
+def test_application__query__permissions__regular_user__other_users_applications(graphql):
     # given:
     # - There is an application in the system
     # - A regular user is using the system
@@ -44,7 +44,7 @@ def test_application__regular_user__other_users_applications(graphql):
     assert response.edges == []
 
 
-def test_application__regular_user__own_applications(graphql):
+def test_application__query__permissions__regular_user__own_applications(graphql):
     # given:
     # - There is an application in the system
     # - The application owner is using the system
@@ -62,7 +62,7 @@ def test_application__regular_user__own_applications(graphql):
     assert response.node(0) == {"pk": application.pk}
 
 
-def test_application__unit_admin(graphql):
+def test_application__query__permissions__unit_admin(graphql):
     # given:
     # - There is an application section in an application with an event reservation unit
     # - A unit admin for that unit is using the system
@@ -84,7 +84,7 @@ def test_application__unit_admin(graphql):
     assert response.node(0) == {"pk": section.application.pk}
 
 
-def test_application__unit_admin__other_units(graphql):
+def test_application__query__permissions__unit_admin__other_units(graphql):
     unit = UnitFactory.create(name="foo")
     ApplicationSectionFactory.create_in_status_unallocated(
         reservation_unit_options__reservation_unit__unit__name="bar",
@@ -98,7 +98,7 @@ def test_application__unit_admin__other_units(graphql):
     assert response.edges == []
 
 
-def test_application__unit_group_admin(graphql):
+def test_application__query__permissions__unit_group_admin(graphql):
     # given:
     # - There is an application section in an application with a reservation unit option
     # - A unit group admin for that unit's group is using the system
@@ -120,7 +120,7 @@ def test_application__unit_group_admin(graphql):
     assert response.node(0) == {"pk": event.application.pk}
 
 
-def test_application__unit_group_admin__other_unit_groups(graphql):
+def test_application__query__permissions__unit_group_admin__other_unit_groups(graphql):
     # given:
     # - There is an application section in an application with a reservation unit option
     # - A unit group admin for some other unit group is using the system
@@ -141,7 +141,7 @@ def test_application__unit_group_admin__other_unit_groups(graphql):
     assert response.edges == []
 
 
-def test_application__general_admin(graphql):
+def test_application__query__permissions__general_admin(graphql):
     # given:
     # - There is an application in the system
     # - The general admin is using the system
@@ -160,7 +160,7 @@ def test_application__general_admin(graphql):
     assert response.node(0) == {"pk": application.pk}
 
 
-def test_application__regular_user__working_memo(graphql):
+def test_application__query__permissions__regular_user__working_memo(graphql):
     # given:
     # - There is an application in the system
     # - The application user is using the system
@@ -176,7 +176,7 @@ def test_application__regular_user__working_memo(graphql):
     assert response.error_message("workingMemo") == "No permission to access field."
 
 
-def test_application__unit_admin__working_memo(graphql):
+def test_application__query__permissions__unit_admin__working_memo(graphql):
     # given:
     # - There is an application section in an application with a reservation unit option
     # - A unit admin for that unit is using the system
@@ -192,11 +192,13 @@ def test_application__unit_admin__working_memo(graphql):
     response = graphql(applications_query(fields="workingMemo"))
 
     # then:
-    # - The response has no errors
+    # - The response has no errors, and contains the working memo
     assert response.has_errors is False, response
+    assert len(response.edges) == 1
+    assert response.node(0) == {"workingMemo": section.application.working_memo}
 
 
-def test_application__unit_admin__user(graphql):
+def test_application__query__permissions__unit_admin__user(graphql):
     section = ApplicationSectionFactory.create_in_status_unallocated(
         reservation_unit_options__reservation_unit__unit__name="foo",
     )

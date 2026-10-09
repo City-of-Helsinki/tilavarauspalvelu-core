@@ -30,7 +30,10 @@ def test_application__restore_all_options(graphql):
 
 
 def test_application__restore_all_options__general_admin(graphql):
-    application = ApplicationFactory.create_in_status_in_allocation()
+    application = ApplicationFactory.create_in_status_in_allocation(
+        application_sections__reservation_unit_options__is_rejected=True,
+    )
+    option = application.application_sections.first().reservation_unit_options.first()
 
     admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
@@ -39,18 +42,24 @@ def test_application__restore_all_options__general_admin(graphql):
 
     assert response.has_errors is False
 
+    option.refresh_from_db()
+    assert option.is_rejected is False
+
 
 def test_application__restore_all_options__unit_admin(graphql):
-    application = ApplicationFactory.create_in_status_in_allocation()
-
-    section = application.application_sections.first()
-    unit = section.reservation_unit_options.first().reservation_unit.unit
-    admin = UserFactory.create_with_unit_role(units=[unit])
+    application = ApplicationFactory.create_in_status_in_allocation(
+        application_sections__reservation_unit_options__is_rejected=True,
+    )
+    option = application.application_sections.first().reservation_unit_options.first()
+    admin = UserFactory.create_with_unit_role(units=[option.reservation_unit.unit])
     graphql.force_login(admin)
 
     response = graphql(RESTORE_MUTATION, input_data={"pk": application.pk})
 
     assert response.has_errors is False
+
+    option.refresh_from_db()
+    assert option.is_rejected is False
 
 
 def test_application__restore_all_options__unit_admin__no_permission_for_all_units(graphql):
@@ -69,11 +78,13 @@ def test_application__restore_all_options__unit_admin__no_permission_for_all_uni
 
 
 def test_application__restore_all_options__unit_admin__has_permission_for_all_units(graphql):
-    application = ApplicationFactory.create_in_status_in_allocation()
+    application = ApplicationFactory.create_in_status_in_allocation(
+        application_sections__reservation_unit_options__is_rejected=True,
+    )
     section = application.application_sections.first()
 
     option_1 = section.reservation_unit_options.first()
-    option_2 = ReservationUnitOptionFactory.create(application_section=section)
+    option_2 = ReservationUnitOptionFactory.create(application_section=section, is_rejected=True)
 
     unit_1 = option_1.reservation_unit.unit
     unit_2 = option_2.reservation_unit.unit
@@ -84,3 +95,8 @@ def test_application__restore_all_options__unit_admin__has_permission_for_all_un
     response = graphql(RESTORE_MUTATION, input_data={"pk": application.pk})
 
     assert response.has_errors is False, response.errors
+
+    option_1.refresh_from_db()
+    option_2.refresh_from_db()
+    assert option_1.is_rejected is False
+    assert option_2.is_rejected is False

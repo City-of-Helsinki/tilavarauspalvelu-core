@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from tilavarauspalvelu.models import Application
 from utils.date_utils import local_datetime
 
 from tests.factories import ApplicationRoundFactory
@@ -28,6 +29,7 @@ def test_unauthenticated_cannot_create_application(graphql):
     # then:
     # - The response complains about missing permissions
     assert response.error_message() == "No permission to create."
+    assert Application.objects.count() == 0
 
 
 def test_regular_user_can_create_application(graphql):
@@ -35,7 +37,7 @@ def test_regular_user_can_create_application(graphql):
     # - There is an open application round
     # - A regular user is using the system
     application_round = ApplicationRoundFactory.create_in_status_open()
-    graphql.login_with_regular_user(date_of_birth=local_datetime(2006, 1, 1))
+    user = graphql.login_with_regular_user(date_of_birth=local_datetime(2006, 1, 1))
 
     # when:
     # - User tries to create a new application
@@ -44,4 +46,8 @@ def test_regular_user_can_create_application(graphql):
 
     # then:
     # - The response contains no errors
+    # - The application is created for the user
     assert response.has_errors is False, response
+
+    application = Application.objects.get()
+    assert application.user == user
