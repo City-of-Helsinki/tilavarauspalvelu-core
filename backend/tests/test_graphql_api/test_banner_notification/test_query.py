@@ -83,7 +83,7 @@ def test_filter_banner_notifications_by_target(graphql, value, expected):
     graphql.force_login(user)
 
     # when:
-    # - The user requests banner notifications filtered by is_active
+    # - The user requests banner notifications filtered by target
     response = graphql(
         f"""
         query {{
@@ -186,7 +186,7 @@ def test_filter_banner_notifications_by_is_visible(graphql, value, expected):
     graphql.force_login(user)
 
     # when:
-    # - The user requests banner notifications filtered by is_active
+    # - The user requests banner notifications filtered by is_visible
     response = graphql(
         """
         query BannerNotifications($isVisible: Boolean!) {
