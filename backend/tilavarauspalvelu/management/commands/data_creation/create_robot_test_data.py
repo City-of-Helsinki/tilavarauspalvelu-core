@@ -3733,6 +3733,11 @@ def create_application_rounds() -> None:
     kausivarausyksikko_malmi = ReservationUnit.objects.get(ext_uuid="52f16e97-4986-4c4e-8fc5-8fab4ab66933")
     kausivarausyksikko_keskusta = ReservationUnit.objects.get(ext_uuid="99c2f30e-40ad-4aca-aa78-01ac92a0b1ff")
 
+    # Dates are relative to the current date, so that the application round
+    # is always open for applications when robot tests are run.
+    now = local_datetime()
+    today = now.date()
+
     _kausivaraus_round = ApplicationRound.objects.create(
         name="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA)",
         name_en="Kausivaraus (AUTOMAATIO TESTI ÄLÄ POISTA) EN",
@@ -3743,12 +3748,12 @@ def create_application_rounds() -> None:
         notes_when_applying="Huomioi hakiessa (Suomeksi)",
         notes_when_applying_en="Huomioi hakiessa (Englanniksi)",
         notes_when_applying_sv="Huomioi hakiessa (Ruotsiksi)",
-        application_period_begins_at=local_datetime(2025, 6, 12),
-        application_period_ends_at=local_datetime(2026, 6, 13),
-        reservation_period_begin_date=local_date(2026, 6, 14),
-        reservation_period_end_date=local_date(2029, 6, 10),
-        public_display_begins_at=local_datetime(2025, 6, 12),
-        public_display_ends_at=local_datetime(2029, 6, 11),
+        application_period_begins_at=now - datetime.timedelta(days=1),
+        application_period_ends_at=now + datetime.timedelta(days=730),
+        reservation_period_begin_date=today + datetime.timedelta(days=731),
+        reservation_period_end_date=today + datetime.timedelta(days=1826),
+        public_display_begins_at=now - datetime.timedelta(days=1),
+        public_display_ends_at=now + datetime.timedelta(days=1827),
         handled_at=None,
         sent_at=None,
         terms_of_use=nupa_kausivarausehto,
