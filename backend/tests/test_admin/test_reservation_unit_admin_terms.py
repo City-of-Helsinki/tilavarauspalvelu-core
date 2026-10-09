@@ -232,7 +232,7 @@ def test_reservation_unit_admin__terms_validation__no_cancellation_terms_for_dir
     form = ReservationUnitModelForm(instance=reservation_unit, data=data)
 
     assert not form.is_valid()
-    assert form.errors["cancellation_terms"] != [
+    assert form.errors["cancellation_terms"] == [
         "Cancellation terms are required for direct booking",
     ]
 
@@ -263,7 +263,7 @@ def test_reservation_unit_admin__terms_validation__no_service_specific_terms_for
     form = ReservationUnitModelForm(instance=reservation_unit, data=data)
 
     assert not form.is_valid()
-    assert form.errors["service_specific_terms"] != [
+    assert form.errors["service_specific_terms"] == [
         "Service specific terms are required for direct booking",
     ]
 
