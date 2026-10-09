@@ -77,7 +77,26 @@ def test_application_section__create__smaller_max_duration_than_min_duration(gra
     ]
 
 
-def test_application_section__create__duration_not_multiple_of_30(graphql):
+def test_application_section__create__duration_at_15_minute_steps(graphql):
+    # given:
+    # - There is draft application in an open application round
+    # - The owner of the application is using the system
+    application = ApplicationFactory.create_in_status_draft_no_sections()
+    graphql.force_login(application.user)
+
+    # when:
+    # - User tries to create a new application section with durations at 15 minute steps
+    data = get_application_section_create_data(application=application)
+    data["reservationMinDuration"] = int(datetime.timedelta(minutes=45).total_seconds())
+    data["reservationMaxDuration"] = int(datetime.timedelta(hours=1, minutes=15).total_seconds())
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    # then:
+    # - The response contains no errors
+    assert response.has_errors is False, response
+
+
+def test_application_section__create__duration_not_multiple_of_15(graphql):
     # given:
     # - There is draft application in an open application round
     # - The owner of the application is using the system
@@ -85,15 +104,60 @@ def test_application_section__create__duration_not_multiple_of_30(graphql):
     graphql.force_login(application.user)
 
     # when:
-    # - User tries to create a new application event with a smaller max duration than min duration
+    # - User tries to create a new application section with a max duration that is not a multiple of 15 minutes
     data = get_application_section_create_data(application=application)
-    data["reservationMaxDuration"] = int(datetime.timedelta(hours=2, seconds=1).total_seconds())
+    data["reservationMaxDuration"] = int(datetime.timedelta(hours=1, minutes=50).total_seconds())
     response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains an error about the max duration
     assert response.field_error_messages() == [
-        "Reservation min and max durations must be multiples of 30 minutes, up to a maximum of 24 hours.",
+        "Reservation min and max durations must be multiples of 15 minutes, up to a maximum of 24 hours.",
+    ]
+
+
+def test_application_section__create__suitable_time_range_at_15_minute_steps(graphql):
+    # given:
+    # - There is draft application in an open application round
+    # - The owner of the application is using the system
+    application = ApplicationFactory.create_in_status_draft_no_sections()
+    graphql.force_login(application.user)
+
+    # when:
+    # - User tries to create a new application section with a suitable time range at 15 minute steps
+    data = get_application_section_create_data(application=application)
+    data["suitableTimeRanges"][0]["beginTime"] = datetime.time(10, 15).isoformat()
+    data["suitableTimeRanges"][0]["endTime"] = datetime.time(11, 45).isoformat()
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    # then:
+    # - The response contains no errors
+    # - The suitable time range is saved with the given times
+    assert response.has_errors is False, response
+
+    section = ApplicationSection.objects.get()
+    time_range = section.suitable_time_ranges.get()
+    assert time_range.begin_time == datetime.time(10, 15)
+    assert time_range.end_time == datetime.time(11, 45)
+
+
+def test_application_section__create__suitable_time_range_not_multiple_of_15(graphql):
+    # given:
+    # - There is draft application in an open application round
+    # - The owner of the application is using the system
+    application = ApplicationFactory.create_in_status_draft_no_sections()
+    graphql.force_login(application.user)
+
+    # when:
+    # - User tries to create a new application section with a suitable time range not at 15 minute steps
+    data = get_application_section_create_data(application=application)
+    data["suitableTimeRanges"][0]["beginTime"] = datetime.time(10, 10).isoformat()
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    # then:
+    # - The response contains an error about the suitable time range
+    assert response.field_error_messages() == [
+        "Begin and end times must be multiples of 15 minutes.",
     ]
 
 
