@@ -4,9 +4,10 @@ import base64
 from typing import TYPE_CHECKING, Any
 
 import django_filters
-from django.contrib.postgres.search import SearchQuery
+from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.db import models
 from django.db.models import Q
+from django.db.models.lookups import Exact
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import (
     EnumChoiceFilter,
@@ -187,23 +188,78 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
             "surface_area",
             "rank",
             ("reservation_unit_type__rank", "type_rank"),
+            "search_rank",
         ]
 
     def get_text_search(self, qs: ReservationUnitQuerySet, name: str, value: str) -> QuerySet:
         language = get_text_search_language(self.request)
-        search = build_search(value, separator="&")
-        query = SearchQuery(value=search, config=language, search_type="raw")
+
+        # Full text search doesn't match postfixes, e.g. "room" doesn't find "workroom", so also search the name
+        # by containment. Match each term separately, so "room kallio" can match "room" in "workroom" and
+        # "kallio" in the search vector.
+        terms_filter = models.Q()
+        for term in value.split():
+            search = build_search(term, separator="&")
+            search_query = SearchQuery(value=search, config=language, search_type="raw")
+
+            # A term with no lexemes, such as the stop word "the" or a lone backslash, becomes an empty query.
+            # An empty query matches nothing, so let such a term match every row.
+            query_node_count = models.Func(search_query, function="numnode", output_field=models.IntegerField())
+            has_no_lexemes = Exact(query_node_count, 0)
+
+            match language:
+                case "finnish":
+                    terms_filter &= (
+                        models.Q(search_vector_fi=search_query) | models.Q(name_fi__icontains=term) | has_no_lexemes
+                    )
+                case "english":
+                    terms_filter &= (
+                        models.Q(search_vector_en=search_query) | models.Q(name_en__icontains=term) | has_no_lexemes
+                    )
+                case "swedish":
+                    terms_filter &= (
+                        models.Q(search_vector_sv=search_query) | models.Q(name_sv__icontains=term) | has_no_lexemes
+                    )
+
+        return qs.filter(terms_filter)
+
+    def order_by_search_rank(self, qs: ReservationUnitQuerySet, desc: bool) -> models.QuerySet:
+        value: str = self.form.cleaned_data.get("text_search", "")
+        if not value:
+            # The ordering filter adds the ordering of the returned queryset, so clear it to use the next ordering.
+            return qs.order_by()
+
+        language = get_text_search_language(self.request)
+
+        # Full text search doesn't match postfixes, so a name like "workroom" gets no rank for "room".
+        # Count the terms that the name contains, and order by that count before the rank.
+        name_match_count: models.Expression = models.Value(0)
+        for term in value.split():
+            match language:
+                case "finnish":
+                    name_match = models.When(name_fi__icontains=term, then=models.Value(1))
+                case "english":
+                    name_match = models.When(name_en__icontains=term, then=models.Value(1))
+                case "swedish":
+                    name_match = models.When(name_sv__icontains=term, then=models.Value(1))
+
+            name_match_count += models.Case(name_match, default=models.Value(0))
+
+        # Rank with "or", so that a result that matches more search terms ranks higher.
+        search = build_search(value, separator="|")
+        search_query = SearchQuery(value=search, config=language, search_type="raw")
         match language:
-            # Do search mostly with full text search, but also search some columns with containment search.
-            # PostgreSQL full text search doesn't support postfix searching, so things like "room" won't find
-            # reservation units with names like "workroom" or "bathroom". Don't do this for all fields to keep
-            # performance reasonable.
             case "finnish":
-                return qs.filter(models.Q(search_vector_fi=query) | models.Q(name_fi__icontains=value))
+                search_rank = SearchRank(models.F("search_vector_fi"), search_query)
             case "english":
-                return qs.filter(models.Q(search_vector_en=query) | models.Q(name_en__icontains=value))
+                search_rank = SearchRank(models.F("search_vector_en"), search_query)
             case "swedish":
-                return qs.filter(models.Q(search_vector_sv=query) | models.Q(name_sv__icontains=value))
+                search_rank = SearchRank(models.F("search_vector_sv"), search_query)
+
+        qs = qs.alias(name_match_count=name_match_count, search_rank=search_rank)
+        if desc:
+            return qs.order_by(models.F("name_match_count").desc(), models.F("search_rank").desc())
+        return qs.order_by(models.F("name_match_count").asc(), models.F("search_rank").asc())
 
     @staticmethod
     def get_max_persons_gte(qs: ReservationUnitQuerySet, name: str, value: int) -> QuerySet:

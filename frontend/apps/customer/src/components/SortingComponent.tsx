@@ -11,6 +11,10 @@ import { useSearchModify } from "@/hooks/useSearchValues";
 
 export const SORTING_OPTIONS = [
   {
+    label: "search:sorting.label.relevance",
+    value: "relevance",
+  },
+  {
     label: "search:sorting.label.name",
     value: "name",
   },
@@ -24,11 +28,11 @@ export const SORTING_OPTIONS = [
   },
 ] as const;
 
-function validateSorting(value: string | null): (typeof SORTING_OPTIONS)[number]["value"] {
+function validateSorting(value: string | null, hasTextSearch: boolean): (typeof SORTING_OPTIONS)[number]["value"] {
   if (SORTING_OPTIONS?.some((option) => option.value === value)) {
     return value as (typeof SORTING_OPTIONS)[number]["value"];
   }
-  return "name";
+  return hasTextSearch ? "relevance" : "name";
 }
 
 const Wrapper = styled(Flex).attrs({
@@ -92,7 +96,8 @@ export function SortingComponent() {
   })).map((option) => convertOptionToHDS(option));
 
   const isOrderingAsc = searchValues.get("order") !== "desc";
-  const value = validateSorting(searchValues.get("sort"));
+  const hasTextSearch = (searchValues.get("textSearch") ?? "").trim() !== "";
+  const value = validateSorting(searchValues.get("sort"), hasTextSearch);
 
   const handleSort: (sort: string) => Promise<void> = async (sort) => {
     const params = new URLSearchParams(searchValues);

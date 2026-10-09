@@ -100,6 +100,45 @@ class Params(NamedTuple):
             text_search="room",
             reservation_unit_data=SearchableData(name="workroom"),
         ),
+        "match name postfix with another search term": Params(
+            text_search="room foo",
+            reservation_unit_data=SearchableData(name="workroom", unit__name="foo"),
+        ),
+        "match name postfix with another search term sv": Params(
+            text_search="rum foo",
+            reservation_unit_data=SearchableData(name_sv="arbetsrum", unit__name_sv="foo"),
+            language="sv",
+        ),
+        "match name postfix of a compound word with another search term": Params(
+            text_search="huone kallio",
+            reservation_unit_data=SearchableData(name="Kokoushuone", unit__name="Kallion nuorisotalo"),
+        ),
+        "dont match name postfix if another search term is not found": Params(
+            text_search="room foo",
+            reservation_unit_data=SearchableData(name="workroom"),
+            has_results=False,
+        ),
+        "match name with trailing backslash": Params(
+            text_search="foo\\",
+            reservation_unit_data=SearchableData(name="foo"),
+        ),
+        "match name with backslash between words": Params(
+            text_search="foo\\bar",
+            reservation_unit_data=SearchableData(name="foo bar"),
+        ),
+        "match name with a standalone backslash": Params(
+            text_search="foo \\",
+            reservation_unit_data=SearchableData(name="foo"),
+        ),
+        "match name with a stop word en": Params(
+            text_search="the foo",
+            reservation_unit_data=SearchableData(name_en="foo"),
+            language="en",
+        ),
+        "match name with a stop word fi": Params(
+            text_search="foo ja bar",
+            reservation_unit_data=SearchableData(name="foo", unit__name="bar"),
+        ),
         "match description fi": Params(
             text_search="kuvaus",
             reservation_unit_data=SearchableData(description="Tässä on kuvaus minun yksikkööni"),

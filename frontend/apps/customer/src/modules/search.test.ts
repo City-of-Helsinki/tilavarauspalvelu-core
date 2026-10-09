@@ -108,6 +108,78 @@ describe("processVariables", () => {
       }).orderBy
     ).toEqual([ReservationUnitOrderingChoices.TypeRankAsc, ReservationUnitOrderingChoices.PkAsc]);
   });
+
+  test("defaults to relevance sorting with a text search", () => {
+    const params = new URLSearchParams({
+      textSearch: "sauna",
+    });
+
+    expect(
+      processVariables({
+        values: params as unknown as ReadonlyURLSearchParams,
+        language: "fi",
+        kind: ReservationKind.Direct,
+      }).orderBy
+    ).toEqual([
+      ReservationUnitOrderingChoices.SearchRankDesc,
+      ReservationUnitOrderingChoices.NameFiAsc,
+      ReservationUnitOrderingChoices.PkAsc,
+    ]);
+  });
+
+  test("defaults to relevance sorting with a text search and an empty sort param", () => {
+    const params = new URLSearchParams({
+      textSearch: "sauna",
+      sort: "",
+      order: "",
+    });
+
+    expect(
+      processVariables({
+        values: params as unknown as ReadonlyURLSearchParams,
+        language: "fi",
+        kind: ReservationKind.Direct,
+      }).orderBy
+    ).toEqual([
+      ReservationUnitOrderingChoices.SearchRankDesc,
+      ReservationUnitOrderingChoices.NameFiAsc,
+      ReservationUnitOrderingChoices.PkAsc,
+    ]);
+  });
+
+  test("defaults to name sorting with an empty text search", () => {
+    const params = new URLSearchParams({
+      textSearch: "  ",
+    });
+
+    expect(
+      processVariables({
+        values: params as unknown as ReadonlyURLSearchParams,
+        language: "fi",
+        kind: ReservationKind.Direct,
+      }).orderBy
+    ).toEqual([ReservationUnitOrderingChoices.NameFiAsc, ReservationUnitOrderingChoices.PkAsc]);
+  });
+
+  test("supports descending relevance sorting in swedish", () => {
+    const params = new URLSearchParams({
+      textSearch: "bastu",
+      sort: "relevance",
+      order: "desc",
+    });
+
+    expect(
+      processVariables({
+        values: params as unknown as ReadonlyURLSearchParams,
+        language: "sv",
+        kind: ReservationKind.Direct,
+      }).orderBy
+    ).toEqual([
+      ReservationUnitOrderingChoices.SearchRankAsc,
+      ReservationUnitOrderingChoices.NameSvDesc,
+      ReservationUnitOrderingChoices.PkDesc,
+    ]);
+  });
 });
 
 describe("translateOption", () => {
