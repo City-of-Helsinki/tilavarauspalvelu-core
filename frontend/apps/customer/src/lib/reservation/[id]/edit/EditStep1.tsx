@@ -9,7 +9,7 @@ import styled from "styled-components";
 import { ButtonLikeLink } from "@ui/components/ButtonLikeLink";
 import { errorToast } from "@ui/components/toast";
 import { useDisplayError } from "@ui/hooks";
-import { getValidationErrors } from "@ui/modules/apollo/helpers";
+import { getValidationErrors } from "@ui/modules/apollo/errors";
 import { breakpoints } from "@ui/modules/const";
 import type { OptionsRecord } from "@ui/types";
 import { useAdjustReservationTimeMutation } from "@gql/gql-types";

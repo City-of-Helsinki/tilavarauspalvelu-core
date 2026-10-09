@@ -2,7 +2,7 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
-import { getApiErrors } from "@ui/modules/apollo/helpers";
+import { getApiErrors } from "@ui/modules/apollo/errors";
 import { ignoreMaybeArray } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";
 import { DeleteReservationDocument, ReservationStateChoice } from "@gql/gql-types";
