@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import pytest
 
-from tests.factories import ApplicationFactory, ApplicationSectionFactory
+from tilavarauspalvelu.enums import Weekday
+
+from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationSectionFactory
 from tests.test_graphql_api.test_application_section.helpers import sections_query
 
 # Applied to all tests
@@ -364,32 +366,46 @@ def test_application_section__order__by_has_allocations__desc(graphql):
 
 
 def test_application_section__order__by_allocations__asc(graphql):
+    section_3 = ApplicationSectionFactory.create_in_status_handled()
+    AllocatedTimeSlotFactory.create(
+        reservation_unit_option=section_3.reservation_unit_options.get(),
+        day_of_the_week=Weekday.TUESDAY,
+    )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated()
     section_2 = ApplicationSectionFactory.create_in_status_handled()
 
     assert section_1.allocations == 0
     assert section_2.allocations == 1
+    assert section_3.allocations == 2
 
     graphql.login_with_superuser()
     query = sections_query(order_by="allocationsAsc")
     response = graphql(query)
 
-    assert len(response.edges) == 2, response
+    assert len(response.edges) == 3, response
     assert response.node(0) == {"pk": section_1.pk}
     assert response.node(1) == {"pk": section_2.pk}
+    assert response.node(2) == {"pk": section_3.pk}
 
 
 def test_application_section__order__by_allocations__desc(graphql):
+    section_3 = ApplicationSectionFactory.create_in_status_handled()
+    AllocatedTimeSlotFactory.create(
+        reservation_unit_option=section_3.reservation_unit_options.get(),
+        day_of_the_week=Weekday.TUESDAY,
+    )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated()
     section_2 = ApplicationSectionFactory.create_in_status_handled()
 
     assert section_1.allocations == 0
     assert section_2.allocations == 1
+    assert section_3.allocations == 2
 
     graphql.login_with_superuser()
     query = sections_query(order_by="allocationsDesc")
     response = graphql(query)
 
-    assert len(response.edges) == 2, response
-    assert response.node(0) == {"pk": section_2.pk}
-    assert response.node(1) == {"pk": section_1.pk}
+    assert len(response.edges) == 3, response
+    assert response.node(0) == {"pk": section_3.pk}
+    assert response.node(1) == {"pk": section_2.pk}
+    assert response.node(2) == {"pk": section_1.pk}

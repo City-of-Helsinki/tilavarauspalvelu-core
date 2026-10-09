@@ -122,7 +122,7 @@ def test_application_section__create__smaller_max_duration_than_min_duration(gra
     graphql.force_login(application.user)
 
     # when:
-    # - User tries to create a new application event with a smaller max duration than min duration
+    # - User tries to create a new application section with a smaller max duration than min duration
     data = get_application_section_create_data(application=application)
     data["reservationMaxDuration"] = int(datetime.timedelta(minutes=30).total_seconds())
     response = graphql(CREATE_MUTATION, input_data=data)
@@ -208,7 +208,7 @@ def test_application_section__create__two_reservation_unit_options_with_same_pre
     graphql.force_login(application.user)
 
     # when:
-    # - User tries to update the application event, switching the preferred order of the event reservation units
+    # - User tries to create an application section with two reservation unit options with the same preferred order
     data = get_application_section_create_data(application=application)
     data["reservationUnitOptions"] = [
         {
@@ -268,7 +268,7 @@ def test_application_section__create__reservations_end_date_not_in_round_reserva
     response = graphql(CREATE_MUTATION, input_data=data)
 
     # then:
-    # - The response contains an error about the reservations begin date
+    # - The response contains an error about the reservations end date
     assert response.field_error_messages() == [
         "Reservations end date cannot be after the application round's reservation period end date.",
     ]
