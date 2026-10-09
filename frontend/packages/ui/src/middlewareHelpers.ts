@@ -1,4 +1,3 @@
-/// NOTE don't include nodejs packages (like node:* or lodash) this requires edge runtime due to NextJs design
 import type { NextRequest } from "next/server";
 import { EconnRefusedError, GraphQLFetchError } from "./modules/errors";
 import { buildGraphQLUrl } from "./modules/urlBuilder";
