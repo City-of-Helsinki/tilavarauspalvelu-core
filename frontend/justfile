@@ -19,11 +19,11 @@ clean:
 
 # Run all apps in development mode
 dev:
-    @turbo dev
+    @pnpm -r --parallel run dev
 
 # Build all apps
 build:
-    @turbo build
+    @pnpm -r run build
 
 # Run linter
 lint:
@@ -35,7 +35,7 @@ lint-fix:
 
 # Run CSS linter
 lint-css:
-    @turbo lint:css
+    @pnpm -r run lint:css
 
 # Run linter and fix issues on given files
 lint-staged *files:
@@ -43,11 +43,11 @@ lint-staged *files:
 
 # Format code
 format:
-    @turbo format
+    @pnpm -r run format
 
 # Check code formatting
 format-check:
-    @turbo format:check
+    @pnpm -r run format:check
 
 # Format given files
 format-staged *files:
@@ -55,19 +55,19 @@ format-staged *files:
 
 # Run tests
 test:
-    @turbo test --concurrency=1
+    @pnpm -r --workspace-concurrency=1 run test
 
 # Run tests with coverage
 test-coverage:
-    @turbo test:coverage
+    @pnpm -r run test:coverage
 
 # Run type checks
 tsc-check:
-    @turbo tsc:check
+    @pnpm -r run tsc:check
 
 # Clean type check output
 tsc-clean:
-    @turbo tsc:clean
+    @pnpm -r run tsc:clean
 
 # Pluck GraphQL queries from source files
 gql-pluck:

@@ -613,29 +613,19 @@ Translations are loaded using `next-i18next` that automatically picks the correc
 
 ### Scripts
 
-All available top level scripts are listed in the root `package.json`. Most of them use turborepo to run
+All available top level scripts are listed in the root `package.json`. Most of them use `pnpm -r` to run
 the same command in all packages. They can be run with `pnpm {command}`.
 
-Top level commands are ran parallel to all packages (that contain that command) and output
-to standard output. Normally this is what you want, but if you have 100 lint errors in both apps
-all the errors are going to be mixed together.
+Top level commands run in all packages that contain that command. The output goes to standard output.
+Normally this is what you want. But if you have 100 lint errors in both apps, the errors are mixed together.
 
-In these cases you can target commands to specific packages using the `--filter` flag. `{package_name}` is the subpath e.g. `staff` for `apps/staff`.
+In these cases you can run the package command directly with the `--filter` flag. `{package_name}` is the subpath e.g. `staff` for `apps/staff`.
 ```sh
 cd frontend
 # only that package
-pnpm {command} --filter {package_name}
-# only that package and it's dependencies
-pnpm {command} --filter {package_name}...
-```
-
-Turborepo uses aggressive caching for all commands. This can cause issues in situations where
-some files are read from cache. Typical cases are either during a rebase or stash popping.
-
-Force a run without reading from local cache.
-```sh
-cd frontend
-pnpm {cmd} --force
+pnpm --filter {package_name} run {command}
+# only that package and its dependencies
+pnpm --filter {package_name}... run {command}
 ```
 
 #### Other commands
@@ -662,7 +652,7 @@ pnpm start
 Production builds `pnpm build` breaks local caches. If restarting development server doesn't work then
 ```sh
 cd frontend
-rm -rf apps/customer/.next apps/customer/.turbo apps/staff/.next apps/staff/.turbo
+rm -rf apps/customer/.next apps/staff/.next
 ```
 
 #### Adding a new command
@@ -670,8 +660,7 @@ rm -rf apps/customer/.next apps/customer/.turbo apps/staff/.next apps/staff/.tur
 If the command should be run inside a package.
 
 - Add the command to all needed `package.json` of the individual packages.
-- Add the master command to `turbo.json`
-- Add `turbo $cmd` to `/package.json`
+- Add `pnpm -r run $cmd` to `/package.json`
 - Run the command `pnpm $cmd`
 
 If only needed on the root package.
