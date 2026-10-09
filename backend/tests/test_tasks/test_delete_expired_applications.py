@@ -4,6 +4,7 @@ import datetime
 
 import pytest
 from django.test import override_settings
+from freezegun import freeze_time
 
 from tilavarauspalvelu.models import Application
 from tilavarauspalvelu.tasks import delete_expired_applications_task
@@ -17,6 +18,7 @@ pytestmark = [
 
 
 @override_settings(REMOVE_EXPIRED_APPLICATIONS_OLDER_THAN_DAYS=365)
+@freeze_time(local_datetime(2024, 6, 1, 12))
 def test_delete_expired_applications():
     now = local_datetime()
     application_round_old = ApplicationRoundFactory.create_in_status_results_sent(
