@@ -170,7 +170,7 @@ def test_user_anonymization__render__html():
     ANONYMIZATION_NOTIFICATION_BEFORE_DAYS=5,
 )
 def test_user_anonymization__send_email(outbox):
-    UserFactory.create(
+    user = UserFactory.create(
         email="user@email.com",
         preferred_language=Language.EN.value,
         last_login=local_datetime() - datetime.timedelta(days=20),
@@ -182,6 +182,9 @@ def test_user_anonymization__send_email(outbox):
 
     assert outbox[0].subject == "Your user account in the Varaamo service is expiring"
     assert sorted(outbox[0].bcc) == ["user@email.com"]
+
+    user.refresh_from_db()
+    assert user.sent_email_about_anonymization is True
 
 
 @pytest.mark.django_db

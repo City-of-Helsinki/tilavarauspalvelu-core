@@ -119,7 +119,7 @@ def test_reservation_created_staff_notification__get_context__instance(email_res
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_reservation_created_staff_notification__render__text():
+def test_reservation_created_staff_notification__render__text():
     context = get_mock_data(email_type=EmailType.RESERVATION_CREATED_STAFF_NOTIFICATION, language="en")
     text_content = render_text(email_type=EmailType.RESERVATION_CREATED_STAFF_NOTIFICATION, context=context)
 
@@ -154,7 +154,7 @@ def test_reservation_reservation_created_staff_notification__render__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_reservation_reservation_created_staff_notification__render__html():
+def test_reservation_created_staff_notification__render__html():
     context = get_mock_data(email_type=EmailType.RESERVATION_CREATED_STAFF_NOTIFICATION, language="en")
     html_content = render_html(email_type=EmailType.RESERVATION_CREATED_STAFF_NOTIFICATION, context=context)
     text_content = html_email_to_text(html_content)
@@ -262,7 +262,7 @@ def test_reservation_created_staff_notification__send_email__wrong_state(outbox)
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_reservation_created_staff_notification__send_email__multiple_recipients(outbox):
+def test_reservation_created_staff_notification__send_email__multiple_languages(outbox):
     unit = UnitFactory.create(name="foo", name_en="foo")
 
     UserFactory.create_with_unit_role(
