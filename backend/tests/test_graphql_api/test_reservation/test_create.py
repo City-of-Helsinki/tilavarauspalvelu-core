@@ -508,6 +508,43 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
     assert Reservation.objects.count() == 2
 
 
+@patch_method(HelsinkiProfileClient.request, return_value=ResponseMock(status_code=500, json_data={}))
+def test_reservation__create__max_reservations_per_user__other_reservation_created_at_the_same_time(graphql, settings):
+    settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
+
+    reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
+    user = UserFactory.create_profile_user()
+    graphql.force_login(user)
+
+    begin = next_hour(plus_hours=1)
+    end = begin + datetime.timedelta(hours=1)
+
+    other_reservation: Reservation | None = None
+
+    def create_other_reservation(*args: Any, **kwargs: Any) -> str:
+        nonlocal other_reservation
+        other_reservation = ReservationFactory.create(
+            begins_at=begin + datetime.timedelta(hours=1),
+            ends_at=end + datetime.timedelta(hours=1),
+            state=ReservationStateChoice.CREATED,
+            reservation_unit=reservation_unit,
+            user=user,
+        )
+        return "foo"
+
+    data = get_create_data(reservation_unit, begins_at=begin, ends_at=end)
+
+    with patch_method(HelsinkiProfileClient.get_token, side_effect=create_other_reservation):
+        response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Maximum number of active reservations for this reservation unit exceeded."
+    ]
+
+    assert list(Reservation.objects.all()) == [other_reservation]
+
+
 class ReservationsMinMaxDaysParams(NamedTuple):
     reservation_days_delta: int
     reservations_max_days_before: int | None = None

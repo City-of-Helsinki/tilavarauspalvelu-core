@@ -141,6 +141,18 @@ class ReservationCreateSerializer(NestingModelSerializer):
             msg = "Overlapping reservations were created at the same time."
             raise ValidationError(msg, code=error_codes.OVERLAPPING_RESERVATIONS)
 
+        # Check the maximum number of reservations again for the same reason.
+        reservation_unit = reservation.reservation_unit
+        if reservation_unit.max_reservations_per_user is not None:
+            user_reservations = Reservation.objects.all().filter_for_user_num_active_reservations(
+                reservation_unit,
+                reservation.user,
+            )
+            if user_reservations.count() > reservation_unit.max_reservations_per_user:
+                reservation.delete()
+                msg = "Maximum number of active reservations for this reservation unit exceeded."
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED)
+
         # Pindora request must succeed, otherwise the reservation is removed.
         # Do this after the second overlapping reservation check, so that we don't need to
         # remove the access code in Pindora from the removed reservation.
