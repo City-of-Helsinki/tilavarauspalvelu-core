@@ -66,7 +66,44 @@ def test_application_round_applications_export__multiple_applications(graphql):
     header_rows = [list(row.as_row()) for row in exporter.get_header_rows()]
     assert writes[0] == header_rows[0]
     assert writes[1] == header_rows[1]
-    assert writes[2] == header_rows[2]
+    assert writes[2] == [
+        "hakemuksen numero",
+        "hakemuksen tila",
+        "hakija",
+        "y-tunnus",
+        "yhteyshenkilö etunimi",
+        "yhteyshenkilö sukunimi",
+        "sähköpostiosoite",
+        "yhteyshenkilön puh",
+        "hakemusosan numero",
+        "hakemusosan tila",
+        "varauksen nimi",
+        "hakijan ilmoittaman kauden alkupäivä",
+        "hakijan ilmoittaman kauden loppupäivä",
+        "kotikunta",
+        "vuoronkäyttötarkoitus",
+        "ikäryhmä",
+        "osallistujamäärä",
+        "hakijan tyyppi",
+        "vuoroja, kpl / vko",
+        "minimi aika",
+        "maksimi aika",
+        "ma",
+        "ti",
+        "ke",
+        "to",
+        "pe",
+        "la",
+        "su",
+        "ma",
+        "ti",
+        "ke",
+        "to",
+        "pe",
+        "la",
+        "su",
+        "tilatoive 1",
+    ]
 
     assert writes[3] == [
         *ApplicationExportRow(
@@ -273,7 +310,7 @@ def test_application_round_applications_export__no_reservation_unit_options(grap
     # given:
     # - There is a single application with no reservation unit options
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
-    application_1 = (
+    (
         ApplicationBuilder()
         .in_allocation(sections=False)
         .in_application_round(application_round)
@@ -282,7 +319,6 @@ def test_application_round_applications_export__no_reservation_unit_options(grap
             application_sections__reservation_unit_options=[],
         )
     )
-    application_1.application_sections.first()
 
     exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=application_round.id)
 
