@@ -2,7 +2,7 @@
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "build": {
-      "env": ["SENTRY_*", "NEXT_PUBLIC_SENTRY_*", "SKIP_ENV_VALIDATION", "FEEDBACK_URL"],
+      "env": ["SENTRY_*", "SKIP_ENV_VALIDATION", "FEEDBACK_URL"],
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**"]
     },

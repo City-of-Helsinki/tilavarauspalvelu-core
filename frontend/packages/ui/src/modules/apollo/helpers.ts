@@ -333,15 +333,11 @@ export function enchancedFetch(req?: IncomingMessage) {
     const isServer = typeof window === "undefined";
     const csrfToken = isServer ? getServerCookie(req?.headers, "csrftoken") : getCookie("csrftoken");
 
-    const headers = new Headers({
-      // TODO: spreading headers doesn't copy them but have to test it in OpenShift
-      // headers.entries().toArray() gives all the values, but we shouldn't forward all of them.
-      // Not changing this now but it should either copy all the headers or be removed completely
-      // oxlint-disable-next-line typescript/no-misused-spread -- TODO: header copy should be more intentional
-      ...(init?.headers != null ? init.headers : {}),
-      // missing csrf token is a non recoverable error
-      ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
-    });
+    const headers = new Headers(init?.headers);
+    // missing csrf token is a non recoverable error
+    if (csrfToken != null) {
+      headers.set("X-Csrftoken", csrfToken);
+    }
 
     // NOTE server requests don't include cookies by default
     if (isServer) {
@@ -354,7 +350,6 @@ export function enchancedFetch(req?: IncomingMessage) {
       if (csrfToken == null) {
         throw new CsrfTokenNotFound();
       }
-      headers.append("Set-Cookie", `csrftoken=${csrfToken}`);
       headers.append("Cookie", `csrftoken=${csrfToken}`);
       // Django fails with 403 if there is no referer (only on Kubernetes)
       const requestUrl = req.url ?? "";
@@ -365,11 +360,19 @@ export function enchancedFetch(req?: IncomingMessage) {
       // so the proto would be https and no x-forwarded-proto set
       const proto = ignoreMaybeArray(req.headers["x-forwarded-proto"]) ?? "http";
       headers.append("Referer", `${proto}://${hostname}${requestUrl}`);
+      // Forward the browser values, so backend logs and traces don't show the Node.js fetch defaults
+      const userAgent = req.headers["user-agent"];
+      if (userAgent != null) {
+        headers.set("User-Agent", userAgent);
+      }
+      const acceptLanguage = req.headers["accept-language"];
+      if (acceptLanguage != null) {
+        headers.set("Accept-Language", acceptLanguage);
+      }
 
       const sessionCookie = getServerCookie(req?.headers, "sessionid");
       if (sessionCookie != null) {
         headers.append("Cookie", `sessionid=${sessionCookie}`);
-        headers.append("Set-Cookie", `sessionid=${sessionCookie}`);
       }
     }
 

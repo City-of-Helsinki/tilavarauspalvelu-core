@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
 import z from "zod";
 import type { NextRequest } from "next/server";
@@ -43,7 +44,7 @@ async function fetchUserData(req: NextRequest): Promise<QueryResultType | null> 
   return CurrentUserQuerySchema.parse(data).data;
 }
 
-export async function middleware(req: NextRequest) {
+async function handleRequest(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const basePath = removeTrailingSlash(env.NEXT_PUBLIC_BASE_URL ?? "");
   const sentryTunnelPath = `${basePath}/monitoring`;
@@ -80,6 +81,10 @@ export async function middleware(req: NextRequest) {
   }
 }
 
+// Turbopack does not add the Sentry wrapper automatically.
+// The wrapper adds the request data to the middleware span and to errors.
+export const proxy = Sentry.wrapMiddlewareWithSentry(handleRequest);
+
 export const config = {
   matcher: [
     {
@@ -87,6 +92,4 @@ export const config = {
       source: "/:path*",
     },
   ],
-  // undici has some weird behaviour with URLs so nodejs runtime doesn't work
-  // runtime: "nodejs",
 };

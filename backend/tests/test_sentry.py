@@ -6,7 +6,7 @@ import pytest
 from django.test import override_settings
 from sentry_sdk.integrations.django import DjangoIntegration
 
-from config.settings import Platta, sentry_traces_sampler
+from config.settings import Platta, sentry_before_send_transaction, sentry_traces_sampler
 
 
 def test_sentry_traces_sampler_respects_parent_sampling_decision() -> None:
@@ -39,6 +39,40 @@ def test_sentry_traces_sampler_excludes_health_checks(path: str) -> None:
         assert sentry_traces_sampler({"wsgi_environ": {"PATH_INFO": path}}) == 0.0
 
 
+def test_sentry_before_send_transaction_copies_allowlisted_headers_to_trace_data() -> None:
+    event = {
+        "request": {
+            "headers": {
+                "Accept-Language": "fi",
+                "Content-Type": "application/json",
+                "Cookie": "",
+                "Origin": "https://varaamo.hel.fi",
+                "Referer": "https://varaamo.hel.fi/reservations/1",
+                "User-Agent": "node",
+                "X-Csrftoken": "secret-token",
+            },
+        },
+        "contexts": {"trace": {"data": {"http.request.method": "POST"}}},
+    }
+
+    result = sentry_before_send_transaction(event, {})
+
+    assert result["contexts"]["trace"]["data"] == {
+        "http.request.method": "POST",
+        "http.request.header.accept-language": "fi",
+        "http.request.header.content-type": "application/json",
+        "http.request.header.origin": "https://varaamo.hel.fi",
+        "http.request.header.referer": "https://varaamo.hel.fi/reservations/1",
+        "http.request.header.user-agent": "node",
+    }
+
+
+def test_sentry_before_send_transaction_accepts_event_without_request() -> None:
+    result = sentry_before_send_transaction({"transaction": "celery-task"}, {})
+
+    assert result == {"transaction": "celery-task", "contexts": {"trace": {"data": {}}}}
+
+
 def test_sentry_post_setup_initializes_sdk_with_configured_options() -> None:
     with (
         patch.object(Platta, "SENTRY_DSN", "https://public@example.ingest.sentry.io/1"),
@@ -56,6 +90,7 @@ def test_sentry_post_setup_initializes_sdk_with_configured_options() -> None:
     assert options["environment"] == "testing"
     assert options["release"] == "release-123"
     assert options["traces_sampler"] is sentry_traces_sampler
+    assert options["before_send_transaction"] is sentry_before_send_transaction
     assert options["profile_session_sample_rate"] == 0.1
     assert options["profile_lifecycle"] == "trace"
     assert len(options["integrations"]) == 1

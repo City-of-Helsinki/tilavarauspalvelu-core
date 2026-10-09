@@ -49,7 +49,7 @@ describe("getStaffRelease", () => {
   it("uses Sentry project override if set", async () => {
     await withMockedEnv(
       {
-        NEXT_PUBLIC_SENTRY_PROJECT: "custom-sentry-project",
+        SENTRY_PROJECT: "custom-sentry-project",
         NEXT_PUBLIC_SOURCE_BRANCH_NAME: "main",
         NEXT_PUBLIC_SOURCE_VERSION: "abcdef12",
       },
@@ -71,7 +71,7 @@ describe("getStaffRelease", () => {
     );
     await withMockedEnv(
       {
-        NEXT_PUBLIC_SENTRY_PROJECT: "custom-sentry-project",
+        SENTRY_PROJECT: "custom-sentry-project",
         NEXT_PUBLIC_SOURCE_BRANCH_NAME: "release/2026/05",
         NEXT_PUBLIC_SOURCE_VERSION: "abcdef12",
       },

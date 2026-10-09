@@ -20,7 +20,10 @@ const config = {
   reactStrictMode: true,
   // NOTE default worker count uses os.cpus() which ignores container CPU limits
   // and spawns too many workers (OOM in memory limited containers)
-  experimental: { cpus: availableParallelism() },
+  experimental: {
+    cpus: availableParallelism(),
+    serverSourceMaps: env.SENTRY_ENABLE_SOURCE_MAPS,
+  },
   transpilePackages: ["ui", "hds-core", "hds-react"],
   // create a smaller bundle
   output: "standalone",
@@ -107,25 +110,6 @@ const config = {
   // Sentry upload options don't fully control all emitted chunk sourcemaps.
   // In this app, sourcemap generation is controlled via Next.js/Turbopack config.
   productionBrowserSourceMaps: env.SENTRY_ENABLE_SOURCE_MAPS,
-  webpack: (
-    config: { devtool: string; resolve?: { alias?: Record<string, string> } },
-    { isServer }: { isServer: boolean }
-  ) => {
-    if (isServer && env.SENTRY_ENABLE_SOURCE_MAPS) {
-      // oxlint-disable-next-line no-console
-      console.log("Server build: adding sourcemaps");
-      config.devtool = "source-map";
-    }
-    // Fix HDS 6 import resolution issue with hds-core
-    if (!config.resolve) {
-      config.resolve = {};
-    }
-    if (!config.resolve.alias) {
-      config.resolve.alias = {};
-    }
-    config.resolve.alias[HDS_COOKIE_CONSENT_IMPORT] = HDS_COOKIE_CONSENT_TARGET;
-    return config;
-  },
   basePath: env.NEXT_PUBLIC_BASE_URL,
   compiler: {
     styledComponents: {
@@ -141,21 +125,13 @@ export default withSentryConfig(config, {
 
   // Suppress all logs from SentryWebpackPlugin during local builds. In CI, logs are enabled for troubleshooting.
   silent: !process.env.CI,
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
   // Upload a larger set of source maps for prettier stack traces (increases build time)
   widenClientFileUpload: true,
-  // Automatically annotate React components to show their full name in breadcrumbs and session replay
-  reactComponentAnnotation: {
-    enabled: true,
-  },
   release: {
     name: getStaffRelease(),
   },
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   tunnelRoute: "/monitoring",
-  // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-  automaticVercelMonitors: false,
   // Disable sourcemaps because we use nextjs configuration for it
   sourcemaps: {
     disable: true,

@@ -23,7 +23,10 @@ const nextConfig = {
   reactStrictMode: true,
   // NOTE default worker count uses os.cpus() which ignores container CPU limits
   // and spawns too many workers (OOM in memory limited containers)
-  experimental: { cpus: availableParallelism() },
+  experimental: {
+    cpus: availableParallelism(),
+    serverSourceMaps: env.SENTRY_ENABLE_SOURCE_MAPS,
+  },
   transpilePackages: ["ui", "hds-core", "hds-react"],
   // create a smaller bundle
   output: "standalone",
@@ -102,26 +105,6 @@ const nextConfig = {
   // Sentry upload options don't fully control all emitted chunk sourcemaps.
   // In this app, sourcemap generation is controlled via Next.js/Turbopack config.
   productionBrowserSourceMaps: env.SENTRY_ENABLE_SOURCE_MAPS,
-  webpack: (
-    config: { devtool: string; resolve?: { alias?: Record<string, string> } },
-    { isServer }: { isServer: boolean }
-  ) => {
-    if (isServer && env.SENTRY_ENABLE_SOURCE_MAPS) {
-      // oxlint-disable-next-line no-console
-      console.log("Adding sourcemaps to server build");
-      config.devtool = "source-map";
-    }
-    // Fix HDS 6 import resolution issue with hds-core
-    if (!config.resolve) {
-      config.resolve = {};
-    }
-    if (!config.resolve.alias) {
-      config.resolve.alias = {};
-    }
-    config.resolve.alias[HDS_COOKIE_CONSENT_IMPORT] = HDS_COOKIE_CONSENT_TARGET;
-    return config;
-  },
-  // NOTE webpack.experimental.topLevelAwait breaks middleware (it hangs forever)
   compiler: {
     styledComponents: {
       ssr: true,
@@ -138,21 +121,13 @@ export default withSentryConfig(nextConfig, {
   silent: !process.env.CI,
   // For all available options, see:
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
   // Upload a larger set of source maps for prettier stack traces (increases build time)
   widenClientFileUpload: true,
-  // Automatically annotate React components to show their full name in breadcrumbs and session replay
-  reactComponentAnnotation: {
-    enabled: true,
-  },
   release: {
     name: getCustomerRelease(),
   },
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   tunnelRoute: "/monitoring",
-  // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-  automaticVercelMonitors: false,
   // Disable sourcemaps because we use nextjs configuration for it
   sourcemaps: {
     disable: true,

@@ -40,14 +40,6 @@ ENV SENTRY_PROJECT=$SENTRY_PROJECT
 ARG RELEASE_NAME
 ARG SENTRY_ENABLE_SOURCE_MAPS
 ENV SENTRY_ENABLE_SOURCE_MAPS=$SENTRY_ENABLE_SOURCE_MAPS
-# Client-side Sentry settings are compiled into the Next.js bundle.
-ARG NEXT_PUBLIC_SENTRY_DSN
-ARG NEXT_PUBLIC_SENTRY_ENVIRONMENT
-ARG NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE
-ARG NEXT_PUBLIC_SENTRY_TRACE_PROPAGATION_TARGETS
-ARG NEXT_PUBLIC_SENTRY_REPLAYS_SESSION_SAMPLE_RATE
-ARG NEXT_PUBLIC_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE
-ARG NEXT_PUBLIC_SENTRY_PROJECT
 # Allow failure because we rather have builds without sourcemaps than no builds
 ENV SENTRY_ALLOW_FAILURE=true
 ARG SENTRY_URL
@@ -80,12 +72,12 @@ RUN find /app/apps/$APP/.next/ -name "*.map" -print0 | xargs -0 rm
 FROM base AS runner
 ARG APP
 COPY --from=installer /usr/bin/dumb-init /usr/bin/dumb-init
-COPY --from=installer /app/scripts/update-runtime-env.js /app/scripts/update-runtime-env.js
 WORKDIR /app
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs \
     && adduser --system --uid 1001 nextjs
+USER nextjs
 
 COPY --from=installer /app/apps/$APP/package.json .
 
@@ -96,10 +88,5 @@ COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP/.next/static ./apps/$
 COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP/public ./apps/$APP/public
 COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP/next-i18next.config.cjs ./apps/$APP/
 
-# Allow OpenShift/Azure-style arbitrary non-root UIDs (in group 0) to write the runtime config.
-RUN chgrp 0 /app/apps/$APP/public && chmod g=u /app/apps/$APP/public
-
-USER nextjs
-ENV APP=$APP
 ENV BIN="apps/$APP/server.js"
-CMD ["sh", "-c", "node scripts/update-runtime-env.js apps/$APP/public && exec dumb-init node $BIN"]
+CMD ["sh", "-c", "dumb-init node $BIN"]

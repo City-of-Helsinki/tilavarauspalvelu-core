@@ -1,4 +1,3 @@
-/// NOTE don't include nodejs packages (like node:* or lodash) this requires edge runtime due to NextJs design
 import type { NextRequest } from "next/server";
 import { EconnRefusedError, GraphQLFetchError } from "./modules/errors";
 import { buildGraphQLUrl } from "./modules/urlBuilder";
@@ -58,18 +57,13 @@ export function removeTrailingSlash(url: string): string {
 }
 
 /// Fetch a query from the backend
-/// @param req - NextRequest used to copy headers etc.
+/// @param req - NextRequest used to read cookies and the referer
 /// @param query - Query object with query and variables
 /// @returns Promise<Response>
 /// custom function so we don't have to import apollo client in middleware
 export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: string): Promise<unknown> {
   const { cookies, headers } = req;
   const newHeaders = new Headers({
-    // TODO: spreading headers doesn't copy them but have to test it in OpenShift
-    // headers.entries().toArray() gives all the values, but we shouldn't forward all of them.
-    // Not changing this now but it should either copy all the headers or be removed completely
-    // oxlint-disable-next-line typescript/no-misused-spread -- TODO: header copy should be more intentional
-    ...headers,
     "Content-Type": "application/json",
   });
 
@@ -95,16 +89,23 @@ export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: s
   const requestUrl = new URL(req.url).pathname;
   const referer = `${proto}://${hostname}${requestUrl}`;
   newHeaders.append("Referer", referer);
+  // Forward the browser values, so backend logs and traces don't show the Node.js fetch defaults
+  const userAgent = headers.get("user-agent");
+  if (userAgent != null) {
+    newHeaders.set("User-Agent", userAgent);
+  }
+  const acceptLanguage = headers.get("accept-language");
+  if (acceptLanguage != null) {
+    newHeaders.set("Accept-Language", acceptLanguage);
+  }
   // Use of fetch requires a string body (vs. gql query object)
   // the request returns either a valid user (e.g. pk) or null if user was not found
   const body: string = JSON.stringify(query);
 
   try {
-    const res = await fetch({
+    const res = await fetch(buildGraphQLUrl(apiUrl), {
       method: "POST",
-      url: buildGraphQLUrl(apiUrl),
       headers: newHeaders,
-      // @ts-expect-error -- types are broken because we use nextjs edge fetch not nodejs fetch
       body,
     });
 

@@ -1,9 +1,4 @@
-// Dynamic Code Evaluation
-// This is because Vercel doesn't support NodeJs as a runtime environment
-// and edge doesn't allow Dynamic Code Evaluation
-// This app is not edge compatible, but it's impossible to disable the checks.
-// Workaround as long as the function isn't needed is to split imports in such a way
-// that libraries are not imported in the middleware.
+import * as Sentry from "@sentry/nextjs";
 import { NextResponse } from "next/server";
 import z from "zod";
 import type { NextRequest } from "next/server";
@@ -263,7 +258,7 @@ function getLangPrefix(url: URL): "" | "en" | "sv" {
   return "";
 }
 
-export async function middleware(req: NextRequest) {
+async function handleRequest(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const basePath = removeTrailingSlash(env.NEXT_PUBLIC_BASE_URL ?? "");
   const sentryTunnelPath = `${basePath}/monitoring`;
@@ -381,10 +376,12 @@ export async function middleware(req: NextRequest) {
   }
 }
 
+// Turbopack does not add the Sentry wrapper automatically.
+// The wrapper adds the request data to the middleware span and to errors.
+export const proxy = Sentry.wrapMiddlewareWithSentry(handleRequest);
+
 export const config = {
   /* i18n locale router and middleware have a bug in nextjs, matcher breaks the router
   matcher: undefined
   */
-  // undici has some weird behaviour with URLs so nodejs runtime doesn't work
-  // runtime: "nodejs",
 };
