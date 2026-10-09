@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import re
 import zoneinfo
 from typing import TYPE_CHECKING, NamedTuple
 
@@ -30,6 +29,8 @@ from utils.date_utils import (
     utc_time_max,
     utc_time_min,
 )
+
+from tests.helpers import exact
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import Lang
@@ -147,7 +148,7 @@ def test_date_utils__combine():
     assert dt == datetime.datetime(2022, 1, 1, 10, 0, tzinfo=DEFAULT_TIMEZONE)
 
     msg = "Time must not be timezone-aware."
-    with pytest.raises(ValueError, match=re.escape(msg)):
+    with pytest.raises(ValueError, match=exact(msg)):
         combine(date, time_aware, astimezone=datetime.UTC)
 
 
@@ -267,7 +268,7 @@ def test_date_utils__get_periods_between__end_date_before_start_date():
     end_time = datetime.time(14, 0, 0)
 
     msg = "End date cannot be before start date."
-    with pytest.raises(ValueError, match=re.escape(msg)):
+    with pytest.raises(ValueError, match=exact(msg)):
         list(get_periods_between(start_date, end_date, start_time, end_time, tzinfo=DEFAULT_TIMEZONE))
 
 
@@ -278,16 +279,16 @@ def test_date_utils__get_periods_between__end_time_before_start_time():
     end_time = datetime.time(14, 0, 0)
 
     msg = "End time cannot be at or before start time if on the same day."
-    with pytest.raises(ValueError, match=re.escape(msg)):
+    with pytest.raises(ValueError, match=exact(msg)):
         list(get_periods_between(start_date, end_date, start_time, end_time, tzinfo=DEFAULT_TIMEZONE))
 
 
-def test_date_utils__get_periods_between__end_time_sames_as_start_time():
+def test_date_utils__get_periods_between__end_time_same_as_start_time():
     start_date = datetime.date(2024, 1, 1)
     end_date = datetime.date(2024, 1, 1)
     start_time = datetime.time(14, 0, 0)
     end_time = datetime.time(14, 0, 0)
 
     msg = "End time cannot be at or before start time if on the same day."
-    with pytest.raises(ValueError, match=re.escape(msg)):
+    with pytest.raises(ValueError, match=exact(msg)):
         list(get_periods_between(start_date, end_date, start_time, end_time, tzinfo=DEFAULT_TIMEZONE))

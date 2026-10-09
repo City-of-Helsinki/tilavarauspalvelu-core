@@ -100,7 +100,7 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_product_mappin
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     ReservationUnitPricingFactory.create(reservation_unit=reservation_unit)
     reservation_unit.payment_merchant = PaymentMerchantFactory.create()
-    reservation_unit.payment_accounting = None
+    reservation_unit.payment_accounting = PaymentAccountingFactory.create()
     reservation_unit.save()  # Trigger `refresh_reservation_unit_product_mapping` task
 
     reservation_unit.refresh_from_db()

@@ -18,7 +18,7 @@ pytestmark = [
 ]
 
 
-def test_refund_payment_order_for_webshop__does_not_fail_when_reservation_is_missing():
+def test_refund_payment_order_for_webshop__does_not_fail_when_payment_order_is_missing():
     refund_payment_order_for_webshop_task(0)
 
 
