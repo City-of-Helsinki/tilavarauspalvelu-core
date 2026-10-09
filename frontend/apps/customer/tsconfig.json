@@ -29,7 +29,6 @@
     "vitest.setup.ts",
     "stylelint.config.cjs",
     "sentry.server.config.ts",
-    "sentry.edge.config.ts",
     "sentry.client.config.ts"
   ]
 }
