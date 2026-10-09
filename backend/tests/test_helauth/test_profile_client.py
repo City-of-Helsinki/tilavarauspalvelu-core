@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 from typing import NamedTuple
 from unittest.mock import MagicMock
 
@@ -23,7 +22,7 @@ from tests.factories.helsinki_profile import (
     ProfileEmailFactory,
     ProfilePhoneFactory,
 )
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, exact, patch_method
 
 pytestmark = [
     pytest.mark.django_db,
@@ -202,19 +201,19 @@ def test_helsinki_profile_client__prefill_info__no_phone():
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 @pytest.mark.parametrize(
     **parametrize_helper({
-        "PERSONAL address": Params(
+        "PERSONAL email": Params(
             types=["NONE", "OTHER", "WORK", "PERSONAL"],
             select=-1,
         ),
-        "WORK address": Params(
+        "WORK email": Params(
             types=["NONE", "OTHER", "WORK"],
             select=-1,
         ),
-        "OTHER address": Params(
+        "OTHER email": Params(
             types=["NONE", "OTHER"],
             select=-1,
         ),
-        "NONE address": Params(
+        "NONE email": Params(
             types=["NONE"],
             select=-1,
         ),
@@ -278,7 +277,7 @@ def test_helsinki_profile_client__prefill_info__municipality_matching_municipali
 
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-def test_helsinki_profile_client__prefill_info__secondary_city():
+def test_helsinki_profile_client__prefill_info__unknown_municipality_is_other():
     profile_data = MyProfileDataFactory.create_basic(
         verifiedPersonalInformation__municipalityOfResidence="foo",
         verifiedPersonalInformation__municipalityOfResidenceNumber="bar",
@@ -294,9 +293,10 @@ def test_helsinki_profile_client__prefill_info__secondary_city():
 @patch_method(HelsinkiProfileClient.request)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 @patch_method(SentryLogger.log_message)
-def test_helsinki_profile_client__prefill_info__non_200_response():
+@pytest.mark.parametrize("status_code", [400, 500])
+def test_helsinki_profile_client__prefill_info__non_200_response(status_code):
     response = MagicMock()
-    response.status_code = 400
+    response.status_code = status_code
     response.request = MagicMock()
     response.request.method = "get"
     response.url = "example.com"
@@ -305,8 +305,8 @@ def test_helsinki_profile_client__prefill_info__non_200_response():
 
     user = UserFactory.create()
 
-    msg = "GET request to HELSINKI PROFILE (example.com) failed with status 400."
-    with pytest.raises(ExternalServiceRequestError, match=re.escape(msg)):
+    msg = f"GET request to HELSINKI PROFILE (example.com) failed with status {status_code}."
+    with pytest.raises(ExternalServiceRequestError, match=exact(msg)):
         HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert SentryLogger.log_message.call_count == 1
@@ -328,7 +328,7 @@ def test_helsinki_profile_client__prefill_info__contains_errors():
     user = UserFactory.create()
 
     msg = 'Helsinki profile: Response contains errors. [{"message": "foo"}]'
-    with pytest.raises(ExternalServiceError, match=re.escape(msg)):
+    with pytest.raises(ExternalServiceError, match=exact(msg)):
         HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert SentryLogger.log_message.call_count == 1
@@ -346,29 +346,8 @@ def test_helsinki_profile_client__prefill_info__json_decode_error():
     user = UserFactory.create()
 
     msg = "Parsing Helsinki Profile return data failed."
-    with pytest.raises(ExternalServiceParseJSONError, match=re.escape(msg)):
+    with pytest.raises(ExternalServiceParseJSONError, match=exact(msg)):
         HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
-
-
-@patch_method(HelsinkiProfileClient.request)
-@patch_method(HelsinkiProfileClient.get_token, return_value="foo")
-@patch_method(SentryLogger.log_message)
-def test_helsinki_profile_client__prefill_info__500_error():
-    response = MagicMock()
-    response.status_code = 500
-    response.request = MagicMock()
-    response.request.method = "get"
-    response.url = "example.com"
-
-    HelsinkiProfileClient.request.return_value = response
-
-    user = UserFactory.create()
-
-    msg = "GET request to HELSINKI PROFILE (example.com) failed with status 500."
-    with pytest.raises(ExternalServiceRequestError, match=re.escape(msg)):
-        HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
-
-    assert SentryLogger.log_message.call_count == 1
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value=None)

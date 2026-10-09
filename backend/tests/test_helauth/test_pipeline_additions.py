@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import re
 from typing import Any, NamedTuple
 
 import pytest
@@ -26,7 +25,7 @@ from tests.factories import (
     UserFactory,
 )
 from tests.factories.helsinki_profile import MyProfileDataFactory
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, exact, patch_method
 
 from .helpers import mock_request
 
@@ -165,8 +164,8 @@ def test_update_user_from_profile_logs_to_sentry_if_unsuccessful():
 def test_update_user_from_profile_logs_to_sentry_if_raises():
     user = UserFactory.create(profile_id="", date_of_birth=None)
 
-    msg = "Helsinki profile: Response contains errors."
-    with pytest.raises(ExternalServiceError, match=re.escape(msg)):
+    msg = 'Helsinki profile: Response contains errors. [{"message": "foo"}]'
+    with pytest.raises(ExternalServiceError, match=exact(msg)):
         update_user_from_profile(request=mock_request(user))
 
     assert SentryLogger.log_message.call_count == 1
