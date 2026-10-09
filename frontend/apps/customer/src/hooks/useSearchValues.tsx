@@ -3,11 +3,38 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { ignoreMaybeArray } from "ui/src/modules/helpers";
 
+function isEmptyParam(value: unknown): boolean {
+  return value == null || value === "";
+}
+
+/// Remove empty values so the url doesn't fill up with "key=" params
+export function removeEmptyParams(query: URLSearchParams): URLSearchParams;
+export function removeEmptyParams(query: ParsedUrlQueryInput): ParsedUrlQueryInput;
+export function removeEmptyParams(query: URLSearchParams | ParsedUrlQueryInput): URLSearchParams | ParsedUrlQueryInput;
+export function removeEmptyParams(query: URLSearchParams | ParsedUrlQueryInput): URLSearchParams | ParsedUrlQueryInput {
+  if (query instanceof URLSearchParams) {
+    return new URLSearchParams([...query.entries()].filter(([, value]) => !isEmptyParam(value)));
+  }
+  const cleaned: ParsedUrlQueryInput = {};
+  for (const [key, value] of Object.entries(query)) {
+    if (Array.isArray(value)) {
+      const values = value.filter((v: unknown) => !isEmptyParam(v));
+      if (values.length > 0) {
+        cleaned[key] = values;
+      }
+    } else if (!isEmptyParam(value)) {
+      cleaned[key] = value;
+    }
+  }
+  return cleaned;
+}
+
 export function useSearchModify() {
   const router = useRouter();
   const searchValues = useSearchParams();
 
-  const handleRouteChange: (query: URLSearchParams | ParsedUrlQueryInput) => Promise<boolean> = (query) => {
+  const handleRouteChange: (query: URLSearchParams | ParsedUrlQueryInput) => Promise<boolean> = (dirtyQuery) => {
+    const query = removeEmptyParams(dirtyQuery);
     if (query instanceof URLSearchParams) {
       // [id] param is not included in the URLSearchParams object but required when routing
       const id = ignoreMaybeArray(router.query.id);
