@@ -360,6 +360,15 @@ export function enchancedFetch(req?: IncomingMessage) {
       // so the proto would be https and no x-forwarded-proto set
       const proto = ignoreMaybeArray(req.headers["x-forwarded-proto"]) ?? "http";
       headers.append("Referer", `${proto}://${hostname}${requestUrl}`);
+      // Forward the browser values, so backend logs and traces don't show the Node.js fetch defaults
+      const userAgent = req.headers["user-agent"];
+      if (userAgent != null) {
+        headers.set("User-Agent", userAgent);
+      }
+      const acceptLanguage = req.headers["accept-language"];
+      if (acceptLanguage != null) {
+        headers.set("Accept-Language", acceptLanguage);
+      }
 
       const sessionCookie = getServerCookie(req?.headers, "sessionid");
       if (sessionCookie != null) {

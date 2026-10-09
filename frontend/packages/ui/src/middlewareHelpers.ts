@@ -89,6 +89,15 @@ export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: s
   const requestUrl = new URL(req.url).pathname;
   const referer = `${proto}://${hostname}${requestUrl}`;
   newHeaders.append("Referer", referer);
+  // Forward the browser values, so backend logs and traces don't show the Node.js fetch defaults
+  const userAgent = headers.get("user-agent");
+  if (userAgent != null) {
+    newHeaders.set("User-Agent", userAgent);
+  }
+  const acceptLanguage = headers.get("accept-language");
+  if (acceptLanguage != null) {
+    newHeaders.set("Accept-Language", acceptLanguage);
+  }
   // Use of fetch requires a string body (vs. gql query object)
   // the request returns either a valid user (e.g. pk) or null if user was not found
   const body: string = JSON.stringify(query);
