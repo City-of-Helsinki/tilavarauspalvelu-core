@@ -240,21 +240,21 @@ def test_user_permissions_on_banner_notifications_with_target_filter(graphql, ta
 @pytest.mark.parametrize(
     **parametrize_helper(
         {
-            "Anonymous user should not see any notifications": UserTypeParams(
+            "Anonymous user cannot read the target field, so visible notifications are null nodes": UserTypeParams(
                 user_type=UserType.ANONYMOUS,
                 expected=[
                     {"node": None},
                     {"node": None},
                 ],
             ),
-            "Regular user should not see any notifications": UserTypeParams(
+            "Regular user cannot read the target field, so visible notifications are null nodes": UserTypeParams(
                 user_type=UserType.REGULAR,
                 expected=[
                     {"node": None},
                     {"node": None},
                 ],
             ),
-            "Staff user should not see any notifications": UserTypeParams(
+            "Staff user cannot read the target field, so visible notifications are null nodes": UserTypeParams(
                 user_type=UserType.STAFF,
                 expected=[
                     {"node": None},

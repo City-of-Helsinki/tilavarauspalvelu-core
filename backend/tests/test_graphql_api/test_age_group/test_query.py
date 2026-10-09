@@ -70,10 +70,10 @@ def test_age_group__query__regular_user(graphql):
     assert response.node(1) == {"pk": group_2.pk}
 
 
-def test_age_group__query__anonymized(graphql):
+def test_age_group__query__anonymous_user(graphql):
     # given:
     # - There are two age groups in the database
-    # - An anonymized user is using the system
+    # - An anonymous user is using the system
     group_1 = AgeGroupFactory(minimum=18, maximum=30)
     group_2 = AgeGroupFactory(minimum=31, maximum=60)
 

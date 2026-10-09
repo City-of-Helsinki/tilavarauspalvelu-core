@@ -12,7 +12,7 @@ pytestmark = [
 ]
 
 
-def test_purpose__query(graphql):
+def test_intended_use__query(graphql):
     intended_use = IntendedUseFactory.create()
 
     graphql.login_with_superuser()
@@ -43,7 +43,7 @@ def test_purpose__query(graphql):
     }
 
 
-def test_purpose__order__by_rank(graphql):
+def test_intended_use__order__by_rank(graphql):
     intended_use_1 = IntendedUseFactory.create(rank=1)
     intended_use_2 = IntendedUseFactory.create(rank=3)
     intended_use_3 = IntendedUseFactory.create(rank=2)

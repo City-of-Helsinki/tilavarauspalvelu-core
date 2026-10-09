@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tilavarauspalvelu.enums import UserRoleChoice
+from tilavarauspalvelu.models import BannerNotification
 
 from tests.factories import BannerNotificationFactory
 
@@ -69,3 +70,4 @@ def test_banner_notification__delete__notification_manager(graphql):
     )
 
     assert response.has_errors is False
+    assert BannerNotification.objects.filter(pk=notification.pk).exists() is False

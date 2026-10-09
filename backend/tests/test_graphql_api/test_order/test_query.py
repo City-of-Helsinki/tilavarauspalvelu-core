@@ -107,7 +107,6 @@ def test_order__query__expires_in_minutes_keeps_updating_based_on_current_time(g
 
 @freezegun.freeze_time("2021-01-01T12:00:00Z")
 def test_order__query__reservation_is_deleted__nothing_returned(graphql):
-    """Order's reservation is deleted, so order can't be found even by superuser."""
     order = get_order()
     order.reservation.delete()
 
