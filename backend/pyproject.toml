@@ -43,7 +43,7 @@ psycopg2 = "2.9.13"
 python-dateutil = "2.9.0.post0"
 redis = { version = "8.1.0", extras = ["hiredis"] }
 sentry-sdk = "2.71.0"
-social-auth-app-django = "6.1.0"
+social-auth-app-django = "7.0.0"
 stamina = "26.1.0"
 # Skip installation on Windows as uWSGI does not support it without Cygwin.
 uWSGI = { version = "2.0.31", markers = "sys_platform != 'win32'" }
