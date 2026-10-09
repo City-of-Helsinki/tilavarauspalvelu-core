@@ -25,6 +25,11 @@ def test_application_admin__reset_applications__deletes_allocations(api_client):
 
     application = ApplicationFactory.create_application_ready_for_allocation(pre_allocated=True)
 
+    allocations = AllocatedTimeSlot.objects.filter(
+        reservation_unit_option__application_section__application=application,
+    )
+    assert allocations.exists() is True
+
     url = reverse("admin:tilavarauspalvelu_application_changelist")
     data = {
         "action": "reset_applications",
@@ -35,9 +40,6 @@ def test_application_admin__reset_applications__deletes_allocations(api_client):
 
     assert response.status_code == 302
 
-    allocations = AllocatedTimeSlot.objects.filter(
-        reservation_unit_option__application_section__application=application,
-    )
     assert allocations.exists() is False
 
 
