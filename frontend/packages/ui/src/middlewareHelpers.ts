@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { SERVER_FETCH_TIMEOUT_MS } from "./modules/const";
-import { EconnRefusedError, GraphQLFetchError } from "./modules/errors";
+import { GraphQLFetchError } from "./modules/errors";
 import { fetchWithTimeout } from "./modules/fetch";
 import { buildGraphQLUrl, getClientOrigin } from "./modules/urlBuilder";
 
@@ -112,34 +112,21 @@ export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: s
   // the request returns either a valid user (e.g. pk) or null if user was not found
   const body: string = JSON.stringify(query);
 
-  try {
-    const res = await fetchWithTimeout(
-      buildGraphQLUrl(apiUrl),
-      {
-        method: "POST",
-        headers: newHeaders,
-        body,
-      },
-      SERVER_FETCH_TIMEOUT_MS
-    );
+  const res = await fetchWithTimeout(
+    buildGraphQLUrl(apiUrl),
+    {
+      method: "POST",
+      headers: newHeaders,
+      body,
+    },
+    SERVER_FETCH_TIMEOUT_MS
+  );
 
-    const data: unknown = await res.json();
+  const data: unknown = await res.json();
 
-    if (!res.ok) {
-      const { status, statusText } = res;
-      throw new GraphQLFetchError(status, statusText, query, data);
-    }
-    return data;
-  } catch (err) {
-    if (
-      err instanceof TypeError &&
-      typeof err.cause === "object" &&
-      err.cause != null &&
-      "code" in err.cause &&
-      err.cause?.code === "ECONNREFUSED"
-    ) {
-      throw new EconnRefusedError(err.message);
-    }
-    throw err;
+  if (!res.ok) {
+    const { status, statusText } = res;
+    throw new GraphQLFetchError(status, statusText, query, data);
   }
+  return data;
 }

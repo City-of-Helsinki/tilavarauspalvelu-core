@@ -6,9 +6,11 @@ import App from "next/app";
 import type { AppContext, AppInitialProps, AppProps } from "next/app";
 import type { Router } from "next/router";
 import { ErrorTrigger, triggerServerError } from "@ui/components/ErrorTrigger";
-import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apollo/helpers";
+import { isRequestError } from "@ui/modules/apollo/errors";
+import { logGraphQLQuery } from "@ui/modules/apollo/helpers";
 import "ui/src/styles/global.scss";
 import { initialiseLogWrite } from "@ui/modules/browserHelpers";
+import { logError } from "@ui/modules/errors";
 import {
   BannerNotificationTarget,
   CurrentUserDocument,
@@ -187,8 +189,10 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
       notificationsData: notificationsData ?? null,
     };
   } catch (err) {
-    const error = transformQueryError(err);
-    logGraphQLError(error);
+    // the error link already logged the errors of the backend requests
+    if (!isRequestError(err)) {
+      logError(err);
+    }
   }
 
   return {
