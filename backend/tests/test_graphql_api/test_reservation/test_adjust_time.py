@@ -81,7 +81,7 @@ def test_reservation__adjust_time__new_reservation_begin_in_past(graphql):
     assert response.field_error_messages() == ["Reservation cannot begin in the past."]
 
 
-def test_reservation__adjust_time__reservation__adjust_time__reservation_begin_in_past(graphql):
+def test_reservation__adjust_time__reservation_already_began(graphql):
     now = local_datetime()
     reservation = ReservationFactory.create_for_time_adjustment(
         begins_at=now - datetime.timedelta(hours=1),

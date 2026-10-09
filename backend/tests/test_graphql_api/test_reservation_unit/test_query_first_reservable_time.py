@@ -303,7 +303,7 @@ def test__reservation_unit__first_reservable_time__filters__invalid_values(graph
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is True, response
-    assert result in response.error_message() == result
+    assert response.error_message() == result
 
 
 ########################################################################################################################
@@ -481,7 +481,7 @@ def test__reservation_unit__first_reservable_time__filters__too_strict_causes_no
     })
 )
 @freezegun.freeze_time(NOW)
-def test__query_reservation_unit_reservable__filters__should_not_exclude_time_span(
+def test__reservation_unit__first_reservable_time__filters__should_not_exclude_time_span(
     graphql, reservation_unit, filters, result
 ):
     """
@@ -2442,7 +2442,7 @@ def test__reservation_unit__first_reservable_time__blocked_type_reservation_can_
 
 
 @freezegun.freeze_time(datetime.datetime(NEXT_YEAR, 1, 1, hour=8, tzinfo=DEFAULT_TIMEZONE))
-def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffers_overlap(graphql, reservation_unit):
+def test__reservation_unit__first_reservable_time__duration_exactly_min_but_buffers_overlap(graphql, reservation_unit):
     """
     This is a regression test for a bug that was found during manual testing.
 

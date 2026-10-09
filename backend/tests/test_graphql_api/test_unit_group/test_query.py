@@ -43,7 +43,7 @@ def test_unit_groups__query(graphql):
     }
 
 
-def test_unit_groups__query__only_with_permission(graphql):
+def test_unit_groups__query__regular_user(graphql):
     UnitGroupFactory.create()
 
     graphql.login_with_regular_user()
