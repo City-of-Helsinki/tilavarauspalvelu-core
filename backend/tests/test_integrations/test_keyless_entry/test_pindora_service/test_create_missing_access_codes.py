@@ -6,6 +6,7 @@ import freezegun
 import pytest
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraConflictError
 from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraAccessCodeModifyResponse
@@ -339,6 +340,7 @@ def test_create_missing_access_codes__series__reschedule_if_exists__deactivate()
 
 
 @patch_method(PindoraService.create_access_code)
+@patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__seasonal_booking():
     user = UserFactory.create()
@@ -367,8 +369,11 @@ def test_create_missing_access_codes__seasonal_booking():
     assert PindoraService.create_access_code.call_args.kwargs["obj"] == section
     assert PindoraService.create_access_code.call_args.kwargs["is_active"] is True
 
+    assert EmailService.send_seasonal_booking_access_type_changed_email.call_count == 1
+
 
 @patch_method(PindoraService.create_access_code)
+@patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_create_missing_access_codes__seasonal_booking__as_inactive():
     user = UserFactory.create()
@@ -396,6 +401,8 @@ def test_create_missing_access_codes__seasonal_booking__as_inactive():
     assert PindoraService.create_access_code.called is True
     assert PindoraService.create_access_code.call_args.kwargs["obj"] == section
     assert PindoraService.create_access_code.call_args.kwargs["is_active"] is False
+
+    assert EmailService.send_seasonal_booking_access_type_changed_email.call_count == 0
 
 
 @patch_method(PindoraService.create_access_code)
