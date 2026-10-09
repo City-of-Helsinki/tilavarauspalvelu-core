@@ -3,7 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 import { thirdPartyErrorFilterIntegration } from "@sentry/core";
 import * as Sentry from "@sentry/nextjs";
-import { captureRouterTransitionStart, replayIntegration } from "@sentry/nextjs";
+import { captureRouterTransitionStart } from "@sentry/nextjs";
 import { beforeSend, beforeSendTransaction, parseSampleRate } from "ui/src";
 import { env } from "@/env.mjs";
 import { getCustomerRelease } from "@/modules/baseUtils";
@@ -15,8 +15,8 @@ if (env.SENTRY_DSN) {
     beforeSend,
     beforeSendTransaction,
     normalizeDepth: 3,
+    // Session replay is forbidden in the City's Sentry organisation. Do not add replayIntegration.
     integrations: [
-      replayIntegration(),
       Sentry.extraErrorDataIntegration({ depth: 3 }),
       thirdPartyErrorFilterIntegration({
         filterKeys: env.SENTRY_PROJECT ? [env.SENTRY_PROJECT] : [],
@@ -36,8 +36,6 @@ if (env.SENTRY_DSN) {
           .map((target) => target.trim())
           .filter(Boolean)
       : [],
-    replaysSessionSampleRate: parseSampleRate(env.SENTRY_REPLAYS_SESSION_SAMPLE_RATE),
-    replaysOnErrorSampleRate: parseSampleRate(env.SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE),
     debug: false,
   });
 }

@@ -44,8 +44,6 @@ const RuntimeSchema = z.object({
   SENTRY_ENVIRONMENT: z.string().optional(),
   SENTRY_TRACES_SAMPLE_RATE: z.string().optional(),
   SENTRY_TRACE_PROPAGATION_TARGETS: z.string().optional(),
-  SENTRY_REPLAYS_SESSION_SAMPLE_RATE: z.string().optional(),
-  SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE: z.string().optional(),
   SENTRY_PROJECT: z.string().optional(),
 });
 
