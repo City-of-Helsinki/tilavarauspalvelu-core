@@ -15,7 +15,7 @@ for script in "$root"/.agents/skills/*/*; do
   name="$(basename "$script")"
   skill="$(basename "$(dirname "$script")")"
 
-  [[ "$command" == *"$skill/$name"* || "$command" == *"./$name"* ]] || continue
+  [[ "$command" == *"$skill/"*"$name"* || "$command" == *"./$name"* ]] || continue
 
   allowed="^(\.agents|\.claude)/skills/$skill/$name( +$safe_arg)* *\$"
   if [[ ! "$command" =~ $allowed ]]; then
