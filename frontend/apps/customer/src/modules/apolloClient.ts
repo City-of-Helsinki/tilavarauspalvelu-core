@@ -49,7 +49,7 @@ export function createApolloClient(ctx?: GetServerSidePropsContext) {
   const httpLink = new HttpLink({
     uri,
     credentials: "include",
-    fetch: enchancedFetch(ctx?.req),
+    fetch: enchancedFetch(ctx?.req, env.CLIENT_FETCH_TIMEOUT_MS),
   });
 
   const sentryLink = new SentryContextLink();

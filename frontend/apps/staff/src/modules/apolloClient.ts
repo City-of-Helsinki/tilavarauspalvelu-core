@@ -23,7 +23,7 @@ export function createClient(req?: IncomingMessage): ApolloClient {
   const linkOptions: HttpLink.Options = {
     uri,
     credentials: "include",
-    fetch: enchancedFetch(req),
+    fetch: enchancedFetch(req, env.CLIENT_FETCH_TIMEOUT_MS),
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call -- no types, see the import
