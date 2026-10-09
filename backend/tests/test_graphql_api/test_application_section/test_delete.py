@@ -24,21 +24,23 @@ pytestmark = [
         ApplicationSectionStatusChoice.REJECTED,
     ],
 )
-def test_cannot_delete_application_event_not_unallocated(graphql, status):
+def test_application_section__delete__not_unallocated(graphql, status):
     # given:
-    # - There is an application event with the given status
+    # - There is an application section with the given status
     # - A superuser is using the system
     section = ApplicationSectionBuilder().with_status(status).create()
     graphql.login_with_superuser()
 
     # when:
-    # - User tries to delete an application event
+    # - User tries to delete an application section
     data = get_application_section_delete_data(section)
     response = graphql(DELETE_MUTATION, input_data=data)
 
     # then:
-    # - The response contains errors about modifying the event
+    # - The response contains errors about deleting the section
     assert response.field_error_messages() == ["Application section has been allocated and cannot be deleted anymore."]
+
+    assert ApplicationSection.objects.filter(pk=section.pk).exists() is True
 
 
 def test_application_section__delete__resets_application_sent_at(graphql):

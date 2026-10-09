@@ -13,7 +13,7 @@ pytestmark = [
 ]
 
 
-def test_application_owner_can_delete_application_event(graphql):
+def test_application_section__delete__permissions__application_owner(graphql):
     # given:
     # - There is an unallocated application section
     # - The owner of the application is using the system
@@ -21,20 +21,20 @@ def test_application_owner_can_delete_application_event(graphql):
     graphql.force_login(section.application.user)
 
     # when:
-    # - User tries to delete an application event
+    # - User tries to delete an application section
     data = get_application_section_delete_data(section)
     response = graphql(DELETE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors
-    # - The response indicates the application event has been deleted
+    # - The response indicates the application section has been deleted
     # - The application section no longer exists in the database
     assert response.has_errors is False, response
     assert response.first_query_object["deleted"] is True
     assert ApplicationSection.objects.filter(pk=section.pk).exists() is False
 
 
-def test_superuser_can_delete_application_event(graphql):
+def test_application_section__delete__permissions__superuser(graphql):
     # given:
     # - There is an unallocated application section
     # - A superuser is using the system
@@ -42,22 +42,22 @@ def test_superuser_can_delete_application_event(graphql):
     graphql.login_with_superuser()
 
     # when:
-    # - User tries to delete an application event
+    # - User tries to delete an application section
     data = get_application_section_delete_data(section)
     response = graphql(DELETE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors
-    # - The response indicates the application event has been deleted
+    # - The response indicates the application section has been deleted
     # - The application section no longer exists in the database
     assert response.has_errors is False, response
     assert response.first_query_object["deleted"] is True
     assert ApplicationSection.objects.filter(pk=section.pk).exists() is False
 
 
-def test_other_user_cannot_delete_application_event(graphql):
+def test_application_section__delete__permissions__regular_user(graphql):
     # given:
-    # - There is an unallocated application event
+    # - There is an unallocated application section
     # - Someone other than the owner of the application is using the system
     section = ApplicationSectionFactory.create_in_status_unallocated()
     graphql.login_with_regular_user()
