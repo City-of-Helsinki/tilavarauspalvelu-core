@@ -41,7 +41,9 @@ export function getSignInUrl({
   if (client === "customer") {
     loginUrl.searchParams.set("lang", language);
   }
-  loginUrl.searchParams.set("next", originOverride != null ? `${originOverride}/${callBackUrl}` : callBackUrl);
+  const next =
+    originOverride != null ? `${originOverride.replace(/\/+$/, "")}/${callBackUrl.replace(/^\/+/, "")}` : callBackUrl;
+  loginUrl.searchParams.set("next", next);
   return loginUrl.toString();
 }
 
