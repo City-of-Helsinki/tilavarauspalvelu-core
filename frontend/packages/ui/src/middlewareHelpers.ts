@@ -1,5 +1,7 @@
 import type { NextRequest } from "next/server";
+import { SERVER_FETCH_TIMEOUT_MS } from "./modules/const";
 import { EconnRefusedError, GraphQLFetchError } from "./modules/errors";
+import { fetchWithTimeout } from "./modules/fetch";
 import { buildGraphQLUrl, getClientOrigin } from "./modules/urlBuilder";
 
 /// Check if the request is a page request
@@ -111,11 +113,15 @@ export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: s
   const body: string = JSON.stringify(query);
 
   try {
-    const res = await fetch(buildGraphQLUrl(apiUrl), {
-      method: "POST",
-      headers: newHeaders,
-      body,
-    });
+    const res = await fetchWithTimeout(
+      buildGraphQLUrl(apiUrl),
+      {
+        method: "POST",
+        headers: newHeaders,
+        body,
+      },
+      SERVER_FETCH_TIMEOUT_MS
+    );
 
     const data: unknown = await res.json();
 
