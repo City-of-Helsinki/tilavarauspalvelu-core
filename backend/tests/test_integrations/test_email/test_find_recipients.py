@@ -133,13 +133,13 @@ def test_get_recipients_for_applications_by_language():
 
 
 def test_get_users_by_email_language():
-    applications = [
+    users = [
         UserFactory.create(email="user1@example.com", preferred_language=Language.FI.value),
         UserFactory.create(email="user2@example.com", preferred_language=Language.EN.value),
         UserFactory.create(email="user3@example.com", preferred_language=Language.EN.value),
     ]
 
-    result = get_users_by_email_language(applications)
+    result = get_users_by_email_language(users)
 
     assert sorted(result["fi"]) == ["user1@example.com"]
     assert sorted(result["en"]) == ["user2@example.com", "user3@example.com"]
@@ -161,8 +161,9 @@ def test_get_reservation_staff_notification_recipients__not_handling():
         reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED,
         preferred_language="en",
     )
-    UserFactory.create(
+    UserFactory.create_with_unit_role(
         email="admin3@example.com",
+        units=[reservation_unit.unit],
         reservation_notification=ReservationNotification.NONE,
         preferred_language="sv",
     )
@@ -188,8 +189,9 @@ def test_get_reservation_staff_notification_recipients__handling():
         reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED,
         preferred_language="en",
     )
-    UserFactory.create(
+    UserFactory.create_with_unit_role(
         email="admin3@example.com",
+        units=[reservation_unit.unit],
         reservation_notification=ReservationNotification.NONE,
         preferred_language="sv",
     )

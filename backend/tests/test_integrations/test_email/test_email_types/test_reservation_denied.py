@@ -262,7 +262,7 @@ def test_reservation_denied__send_email__reservation_in_the_past(outbox):
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-@freeze_time("2024-01-02")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_reservation_denied__send_email__no_normal_reservation(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.DENIED,

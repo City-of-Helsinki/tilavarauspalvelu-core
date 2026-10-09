@@ -269,3 +269,4 @@ def test_seasonal_booking_denied_series__send_email__no_recipients(outbox):
     assert len(outbox) == 0
 
     assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'seasonal booking deny series' email"

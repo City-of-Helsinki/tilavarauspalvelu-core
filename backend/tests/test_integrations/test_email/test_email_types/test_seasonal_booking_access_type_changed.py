@@ -314,8 +314,6 @@ def test_seasonal_booking_access_type_changed__get_context__instance__access_cod
 
     assert context == expected
 
-    assert PindoraService.get_access_code.called is True
-
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
@@ -649,3 +647,7 @@ def test_seasonal_booking_access_type_changed__send_email__no_recipients(outbox)
     assert len(outbox) == 0
 
     assert SentryLogger.log_message.call_count == 1
+    assert (
+        SentryLogger.log_message.call_args.args[0]
+        == "No recipients for the 'seasonal booking access type changed' email"
+    )

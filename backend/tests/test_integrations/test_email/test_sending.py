@@ -32,7 +32,7 @@ def test_send_emails_in_batches_task(outbox):
 
 
 @override_settings(SEND_EMAILS=False)
-def test_send_emails_in_batches_task__sent_emails_off(outbox):
+def test_send_emails_in_batches_task__send_emails_off(outbox):
     send_emails_in_batches_task(
         EmailData(
             recipients=["user@example.com"],
