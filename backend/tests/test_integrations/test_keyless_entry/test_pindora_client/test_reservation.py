@@ -29,7 +29,7 @@ from tilavarauspalvelu.integrations.keyless_entry.typing import (
     PindoraAccessCodeModifyResponse,
     PindoraReservationResponse,
 )
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_iso_format
 from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import ReservationFactory
@@ -41,15 +41,31 @@ from tests.test_integrations.test_keyless_entry.helpers import (
 )
 
 
-def test_pindora_client__get_reservation():
+def test_pindora_client__get_reservation(settings):
     reservation = ReservationFactory.build(created_at=local_datetime())
 
     data = default_reservation_response()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
         response = PindoraClient.get_reservation(reservation)
 
-    assert response["access_code"] == "13245#"
+    assert response == PindoraReservationResponse(
+        reservation_unit_id=uuid.UUID(data["reservation_unit_id"]),
+        access_code="13245#",
+        access_code_keypad_url="https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto",
+        access_code_phone_number="+358407089833",
+        access_code_sms_number="+358407089834",
+        access_code_sms_message="a13245",
+        access_code_valid_minutes_before=0,
+        access_code_valid_minutes_after=0,
+        access_code_generated_at=local_datetime(2022, 1, 1),
+        access_code_is_active=True,
+        begin=local_datetime(2022, 1, 1, 12),
+        end=local_datetime(2022, 1, 1, 14),
+    )
+
+    assert patch.call_args.kwargs["method"] == "get"
+    assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation/{reservation.ext_uuid}"
 
 
 @pytest.mark.parametrize(
@@ -57,27 +73,32 @@ def test_pindora_client__get_reservation():
         "400": ErrorParams(
             status_code=HTTP_400_BAD_REQUEST,
             exception=PindoraBadRequestError,
+            error_msg="Invalid Pindora API request: error text.",
         ),
         "403": ErrorParams(
             status_code=HTTP_403_FORBIDDEN,
             exception=PindoraPermissionError,
+            error_msg="Pindora API key is invalid.",
         ),
         "404": ErrorParams(
             status_code=HTTP_404_NOT_FOUND,
             exception=PindoraNotFoundError,
+            error_msg="Reservation '<uuid>' not found from Pindora.",
         ),
         "non 200": ErrorParams(
             status_code=HTTP_418_IM_A_TEAPOT,
             exception=PindoraUnexpectedResponseError,
+            error_msg="Unexpected response from Pindora when fetching reservation '<uuid>': [418] error text",
         ),
     })
 )
 def test_pindora_client__get_reservation__errors(status_code, exception, error_msg):
     reservation = ReservationFactory.build()
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
 
-    with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
+    msg = error_msg.replace("<uuid>", str(reservation.ext_uuid))
+    with patch, pytest.raises(exception, match=exact(msg)):
         PindoraClient.get_reservation(reservation)
 
 
@@ -97,8 +118,7 @@ def test_pindora_client__get_reservation__missing_key():
 def test_pindora_client__get_reservation__invalid_data():
     reservation = ReservationFactory.build(created_at=local_datetime())
 
-    data = default_reservation_response()
-    data["reservation_unit_id"] = str(reservation.id)
+    data = default_reservation_response(reservation_unit_id="not-a-uuid")
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
 
@@ -147,23 +167,34 @@ def test_pindora_client__get_reservation__retry__succeeds_after_retry():
     )
 
     with patch as magic_mock:
-        PindoraClient.get_reservation(reservation)
+        response = PindoraClient.get_reservation(reservation)
 
+    assert response["access_code"] == "13245#"
     assert magic_mock.call_count == 3
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("is_active", [True, False])
-def test_pindora_client__create_reservation(is_active):
+def test_pindora_client__create_reservation(settings, is_active):
     reservation = ReservationFactory.create(created_at=local_datetime(), reservation_unit__name="foo")
 
-    data = default_reservation_response()
-    data["access_code_is_active"] = is_active
+    data = default_reservation_response(access_code_is_active=is_active)
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
         response = PindoraClient.create_reservation(reservation, is_active=is_active)
 
     assert response["access_code"] == "13245#"
+    assert response["access_code_is_active"] is is_active
+
+    assert patch.call_args.kwargs["method"] == "post"
+    assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation"
+    assert patch.call_args.kwargs["json"] == {
+        "reservation_id": str(reservation.ext_uuid),
+        "reservation_unit_id": str(reservation.reservation_unit.ext_uuid),
+        "begin": local_iso_format(reservation.begins_at),
+        "end": local_iso_format(reservation.ends_at),
+        "is_active": is_active,
+    }
 
 
 @pytest.mark.parametrize(
@@ -171,22 +202,27 @@ def test_pindora_client__create_reservation(is_active):
         "400": ErrorParams(
             status_code=HTTP_400_BAD_REQUEST,
             exception=PindoraBadRequestError,
+            error_msg="Invalid Pindora API request: error text.",
         ),
         "403": ErrorParams(
             status_code=HTTP_403_FORBIDDEN,
             exception=PindoraPermissionError,
+            error_msg="Pindora API key is invalid.",
         ),
         "404": ErrorParams(
             status_code=HTTP_404_NOT_FOUND,
             exception=PindoraNotFoundError,
+            error_msg="Reservation '<uuid>' not found from Pindora.",
         ),
         "409": ErrorParams(
             status_code=HTTP_409_CONFLICT,
             exception=PindoraConflictError,
+            error_msg="Reservation '<uuid>' already exists in Pindora.",
         ),
         "non 200": ErrorParams(
             status_code=HTTP_418_IM_A_TEAPOT,
             exception=PindoraUnexpectedResponseError,
+            error_msg="Unexpected response from Pindora when creating reservation '<uuid>': [418] error text",
         ),
     })
 )
@@ -194,21 +230,32 @@ def test_pindora_client__create_reservation(is_active):
 def test_pindora_client__create_reservation__errors(status_code, exception, error_msg):
     reservation = ReservationFactory.create(created_at=local_datetime(), reservation_unit__name="foo")
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
 
-    with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
+    msg = error_msg.replace("<uuid>", str(reservation.ext_uuid))
+    with patch, pytest.raises(exception, match=exact(msg)):
         PindoraClient.create_reservation(reservation)
 
 
-def test_pindora_client__reschedule_reservation():
+def test_pindora_client__reschedule_reservation(settings):
     reservation = ReservationFactory.build()
 
     data = default_access_code_modify_response()
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
-        PindoraClient.reschedule_reservation(reservation)
+        response = PindoraClient.reschedule_reservation(reservation)
 
-    assert patch.call_count == 1
+    assert response == PindoraAccessCodeModifyResponse(
+        access_code_generated_at=local_datetime(2022, 1, 1),
+        access_code_is_active=True,
+    )
+
+    assert patch.call_args.kwargs["method"] == "put"
+    assert patch.call_args.kwargs["json"] == {
+        "begin": local_iso_format(reservation.begins_at),
+        "end": local_iso_format(reservation.ends_at),
+    }
+    assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation/reschedule/{reservation.ext_uuid}"
 
 
 @pytest.mark.parametrize(
@@ -216,37 +263,43 @@ def test_pindora_client__reschedule_reservation():
         "400": ErrorParams(
             status_code=HTTP_400_BAD_REQUEST,
             exception=PindoraBadRequestError,
+            error_msg="Invalid Pindora API request: error text.",
         ),
         "403": ErrorParams(
             status_code=HTTP_403_FORBIDDEN,
             exception=PindoraPermissionError,
+            error_msg="Pindora API key is invalid.",
         ),
         "404": ErrorParams(
             status_code=HTTP_404_NOT_FOUND,
             exception=PindoraNotFoundError,
+            error_msg="Reservation '<uuid>' not found from Pindora.",
         ),
-        "non 204": ErrorParams(
+        "non 200": ErrorParams(
             status_code=HTTP_418_IM_A_TEAPOT,
             exception=PindoraUnexpectedResponseError,
+            error_msg="Unexpected response from Pindora when rescheduling reservation '<uuid>': [418] error text",
         ),
     })
 )
 def test_pindora_client__reschedule_reservation__errors(status_code, exception, error_msg):
     reservation = ReservationFactory.build()
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
 
-    with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
+    msg = error_msg.replace("<uuid>", str(reservation.ext_uuid))
+    with patch, pytest.raises(exception, match=exact(msg)):
         PindoraClient.reschedule_reservation(reservation)
 
 
-def test_pindora_client__delete_reservation():
+def test_pindora_client__delete_reservation(settings):
     reservation = ReservationFactory.build()
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraClient.delete_reservation(reservation)
 
-    assert patch.call_count == 1
+    assert patch.call_args.kwargs["method"] == "delete"
+    assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation/{reservation.ext_uuid}"
 
 
 @pytest.mark.parametrize(
@@ -254,39 +307,53 @@ def test_pindora_client__delete_reservation():
         "400": ErrorParams(
             status_code=HTTP_400_BAD_REQUEST,
             exception=PindoraBadRequestError,
+            error_msg="Invalid Pindora API request: error text.",
         ),
         "403": ErrorParams(
             status_code=HTTP_403_FORBIDDEN,
             exception=PindoraPermissionError,
+            error_msg="Pindora API key is invalid.",
         ),
         "404": ErrorParams(
             status_code=HTTP_404_NOT_FOUND,
             exception=PindoraNotFoundError,
+            error_msg="Reservation '<uuid>' not found from Pindora.",
         ),
         "non 204": ErrorParams(
             status_code=HTTP_418_IM_A_TEAPOT,
             exception=PindoraUnexpectedResponseError,
+            error_msg="Unexpected response from Pindora when deleting reservation '<uuid>': [418] error text",
         ),
     })
 )
 def test_pindora_client__delete_reservation__errors(status_code, exception, error_msg):
     reservation = ReservationFactory.build()
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
 
-    with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
+    msg = error_msg.replace("<uuid>", str(reservation.ext_uuid))
+    with patch, pytest.raises(exception, match=exact(msg)):
         PindoraClient.delete_reservation(reservation)
 
 
-def test_pindora_client__change_reservation_access_code():
+def test_pindora_client__change_reservation_access_code(settings):
     reservation = ReservationFactory.build()
 
     data = default_access_code_modify_response()
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
-        PindoraClient.change_reservation_access_code(reservation)
+        response = PindoraClient.change_reservation_access_code(reservation)
 
-    assert patch.call_count == 1
+    assert response == PindoraAccessCodeModifyResponse(
+        access_code_generated_at=local_datetime(2022, 1, 1),
+        access_code_is_active=True,
+    )
+
+    assert patch.call_args.kwargs["method"] == "put"
+    assert (
+        patch.call_args.kwargs["url"]
+        == f"{settings.PINDORA_API_URL}/reservation/change-access-code/{reservation.ext_uuid}"
+    )
 
 
 @pytest.mark.parametrize(
@@ -294,37 +361,45 @@ def test_pindora_client__change_reservation_access_code():
         "400": ErrorParams(
             status_code=HTTP_400_BAD_REQUEST,
             exception=PindoraBadRequestError,
+            error_msg="Invalid Pindora API request: error text.",
         ),
         "403": ErrorParams(
             status_code=HTTP_403_FORBIDDEN,
             exception=PindoraPermissionError,
+            error_msg="Pindora API key is invalid.",
         ),
         "404": ErrorParams(
             status_code=HTTP_404_NOT_FOUND,
             exception=PindoraNotFoundError,
+            error_msg="Reservation '<uuid>' not found from Pindora.",
         ),
-        "non 204": ErrorParams(
+        "non 200": ErrorParams(
             status_code=HTTP_418_IM_A_TEAPOT,
             exception=PindoraUnexpectedResponseError,
+            error_msg=(
+                "Unexpected response from Pindora when changing access code for reservation '<uuid>': [418] error text"
+            ),
         ),
     })
 )
 def test_pindora_client__change_reservation_access_code__errors(status_code, exception, error_msg):
     reservation = ReservationFactory.build()
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
 
-    with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
+    msg = error_msg.replace("<uuid>", str(reservation.ext_uuid))
+    with patch, pytest.raises(exception, match=exact(msg)):
         PindoraClient.change_reservation_access_code(reservation)
 
 
-def test_pindora_client__activate_reservation_access_code():
+def test_pindora_client__activate_reservation_access_code(settings):
     reservation = ReservationFactory.build()
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraClient.activate_reservation_access_code(reservation)
 
-    assert patch.call_count == 1
+    assert patch.call_args.kwargs["method"] == "put"
+    assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation/activate/{reservation.ext_uuid}"
 
 
 @pytest.mark.parametrize(
@@ -332,37 +407,46 @@ def test_pindora_client__activate_reservation_access_code():
         "400": ErrorParams(
             status_code=HTTP_400_BAD_REQUEST,
             exception=PindoraBadRequestError,
+            error_msg="Invalid Pindora API request: error text.",
         ),
         "403": ErrorParams(
             status_code=HTTP_403_FORBIDDEN,
             exception=PindoraPermissionError,
+            error_msg="Pindora API key is invalid.",
         ),
         "404": ErrorParams(
             status_code=HTTP_404_NOT_FOUND,
             exception=PindoraNotFoundError,
+            error_msg="Reservation '<uuid>' not found from Pindora.",
         ),
         "non 204": ErrorParams(
             status_code=HTTP_418_IM_A_TEAPOT,
             exception=PindoraUnexpectedResponseError,
+            error_msg=(
+                "Unexpected response from Pindora when activating access code for reservation "
+                "'<uuid>': [418] error text"
+            ),
         ),
     })
 )
 def test_pindora_client__activate_reservation_access_code__errors(status_code, exception, error_msg):
     reservation = ReservationFactory.build()
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
 
-    with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
+    msg = error_msg.replace("<uuid>", str(reservation.ext_uuid))
+    with patch, pytest.raises(exception, match=exact(msg)):
         PindoraClient.activate_reservation_access_code(reservation)
 
 
-def test_pindora_client__deactivate_reservation_access_code():
+def test_pindora_client__deactivate_reservation_access_code(settings):
     reservation = ReservationFactory.build()
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraClient.deactivate_reservation_access_code(reservation)
 
-    assert patch.call_count == 1
+    assert patch.call_args.kwargs["method"] == "put"
+    assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation/deactivate/{reservation.ext_uuid}"
 
 
 @pytest.mark.parametrize(
@@ -370,27 +454,35 @@ def test_pindora_client__deactivate_reservation_access_code():
         "400": ErrorParams(
             status_code=HTTP_400_BAD_REQUEST,
             exception=PindoraBadRequestError,
+            error_msg="Invalid Pindora API request: error text.",
         ),
         "403": ErrorParams(
             status_code=HTTP_403_FORBIDDEN,
             exception=PindoraPermissionError,
+            error_msg="Pindora API key is invalid.",
         ),
         "404": ErrorParams(
             status_code=HTTP_404_NOT_FOUND,
             exception=PindoraNotFoundError,
+            error_msg="Reservation '<uuid>' not found from Pindora.",
         ),
         "non 204": ErrorParams(
             status_code=HTTP_418_IM_A_TEAPOT,
             exception=PindoraUnexpectedResponseError,
+            error_msg=(
+                "Unexpected response from Pindora when deactivating access code for reservation "
+                "'<uuid>': [418] error text"
+            ),
         ),
     })
 )
 def test_pindora_client__deactivate_reservation_access_code__errors(status_code, exception, error_msg):
     reservation = ReservationFactory.build()
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code, text="error text"))
 
-    with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
+    msg = error_msg.replace("<uuid>", str(reservation.ext_uuid))
+    with patch, pytest.raises(exception, match=exact(msg)):
         PindoraClient.deactivate_reservation_access_code(reservation)
 
 

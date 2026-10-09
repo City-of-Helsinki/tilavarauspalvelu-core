@@ -18,7 +18,7 @@ pytestmark = [
 ]
 
 
-def test_reschedule_access_code__reservation():
+def test_reschedule_access_code__reservation(settings):
     reservation = ReservationFactory.create(
         reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
@@ -33,7 +33,7 @@ def test_reschedule_access_code__reservation():
 
     data = default_access_code_modify_response()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
         response = PindoraService.reschedule_access_code(obj=reservation)
 
     assert response == PindoraAccessCodeModifyResponse(
@@ -45,8 +45,11 @@ def test_reschedule_access_code__reservation():
     assert reservation.access_code_generated_at == local_datetime(2022, 1, 1)
     assert reservation.access_code_is_active is True
 
+    assert patch.call_args.kwargs["method"] == "put"
+    assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation/reschedule/{reservation.ext_uuid}"
 
-def test_reschedule_access_code__reservation__in_series():
+
+def test_reschedule_access_code__reservation__in_series(settings):
     series = ReservationSeriesFactory.create()
     reservation_1 = ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -73,7 +76,7 @@ def test_reschedule_access_code__reservation__in_series():
 
     data = default_access_code_modify_response()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
         response = PindoraService.reschedule_access_code(obj=reservation_1)
 
     assert response == PindoraAccessCodeModifyResponse(
@@ -89,8 +92,13 @@ def test_reschedule_access_code__reservation__in_series():
     assert reservation_2.access_code_generated_at == local_datetime(2022, 1, 1)
     assert reservation_2.access_code_is_active is True
 
+    assert patch.call_args.kwargs["method"] == "put"
+    assert (
+        patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation-series/reschedule/{series.ext_uuid}"
+    )
 
-def test_reschedule_access_code__reservation__in_series__in_seasonal_booking():
+
+def test_reschedule_access_code__reservation__in_series__in_seasonal_booking(settings):
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -125,7 +133,7 @@ def test_reschedule_access_code__reservation__in_series__in_seasonal_booking():
 
     data = default_access_code_modify_response()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
         response = PindoraService.reschedule_access_code(obj=reservation_1)
 
     assert response == PindoraAccessCodeModifyResponse(
@@ -141,8 +149,11 @@ def test_reschedule_access_code__reservation__in_series__in_seasonal_booking():
     assert reservation_2.access_code_generated_at == local_datetime(2022, 1, 1)
     assert reservation_2.access_code_is_active is True
 
+    assert patch.call_args.kwargs["method"] == "put"
+    assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/seasonal-booking/reschedule/{section.ext_uuid}"
 
-def test_reschedule_access_code__series():
+
+def test_reschedule_access_code__series(settings):
     series = ReservationSeriesFactory.create()
     reservation_1 = ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -169,7 +180,7 @@ def test_reschedule_access_code__series():
 
     data = default_access_code_modify_response()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
         response = PindoraService.reschedule_access_code(obj=series)
 
     assert response == PindoraAccessCodeModifyResponse(
@@ -185,8 +196,13 @@ def test_reschedule_access_code__series():
     assert reservation_2.access_code_generated_at == local_datetime(2022, 1, 1)
     assert reservation_2.access_code_is_active is True
 
+    assert patch.call_args.kwargs["method"] == "put"
+    assert (
+        patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation-series/reschedule/{series.ext_uuid}"
+    )
 
-def test_reschedule_access_code__series__in_seasonal_booking():
+
+def test_reschedule_access_code__series__in_seasonal_booking(settings):
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -221,7 +237,7 @@ def test_reschedule_access_code__series__in_seasonal_booking():
 
     data = default_access_code_modify_response()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
         response = PindoraService.reschedule_access_code(obj=series)
 
     assert response == PindoraAccessCodeModifyResponse(
@@ -237,8 +253,11 @@ def test_reschedule_access_code__series__in_seasonal_booking():
     assert reservation_2.access_code_generated_at == local_datetime(2022, 1, 1)
     assert reservation_2.access_code_is_active is True
 
+    assert patch.call_args.kwargs["method"] == "put"
+    assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/seasonal-booking/reschedule/{section.ext_uuid}"
 
-def test_reschedule_access_code__seasonal_booking():
+
+def test_reschedule_access_code__seasonal_booking(settings):
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -273,7 +292,7 @@ def test_reschedule_access_code__seasonal_booking():
 
     data = default_access_code_modify_response()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
         response = PindoraService.reschedule_access_code(obj=section)
 
     assert response == PindoraAccessCodeModifyResponse(
@@ -288,3 +307,6 @@ def test_reschedule_access_code__seasonal_booking():
     reservation_2.refresh_from_db()
     assert reservation_2.access_code_generated_at == local_datetime(2022, 1, 1)
     assert reservation_2.access_code_is_active is True
+
+    assert patch.call_args.kwargs["method"] == "put"
+    assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/seasonal-booking/reschedule/{section.ext_uuid}"
