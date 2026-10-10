@@ -16,6 +16,8 @@ const optionalUrl = z
 // Same as UI envs, Azure has prefix on the server variables
 const ServerSchema = z.object({
   ENABLE_CONSOLE_LOGGING: coerceBoolean,
+  // Allows the ?throw query parameter that throws test errors. Keep it off in production.
+  ENABLE_ERROR_TRIGGER: coerceBoolean,
   FEEDBACK_URL: optionalUrl,
   SENTRY_AUTH_TOKEN: z.string().optional(),
   SENTRY_ENABLE_SOURCE_MAPS: coerceBoolean,

@@ -11,5 +11,6 @@ export interface CommonEnvConfig {
   apiBaseUrl: string;
   feedbackUrl: string;
   isConsoleLoggingEnabled: boolean;
+  isErrorTriggerEnabled: boolean;
   version: string;
 }
