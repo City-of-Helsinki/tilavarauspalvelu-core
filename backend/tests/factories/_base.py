@@ -15,6 +15,8 @@ from factory.base import BaseFactory
 from factory.django import DjangoModelFactory
 from factory.utils import import_object
 
+from utils.date_utils import DEFAULT_TIMEZONE
+
 from .providers import CUSTOM_PROVIDERS
 
 if TYPE_CHECKING:
@@ -577,5 +579,7 @@ class ManyToManyFactory[TModel: Model](_PostFactory[TModel]):
 
 def coerce_date(date: datetime.date | datetime.datetime) -> datetime.date:
     if isinstance(date, datetime.datetime):
+        if date.tzinfo is not None:
+            date = date.astimezone(DEFAULT_TIMEZONE)
         return date.date()
     return date
