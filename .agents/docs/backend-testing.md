@@ -59,6 +59,18 @@ errors during testing.
 Read a row back before asserting on it. A factory keeps the values it was seeded with,
 so it cannot show what the code under test changed.
 
+Permission tests must read the row back too. Check that an allowed call changed the data
+and that a denied call left it as it was. A check on `has_errors` alone is not enough.
+
+To run tests in parallel on one machine, give each run its own database.
+Set `TOX_PARALLEL_ENV=<name>` before `pytest`. The test database is then named `test_tvp_<name>`.
+Without it, two runs share `test_tvp` and one can drop the database under the other.
+
+Frontend query tests are skipped in a normal run. Run them as the CI does:
+run `just gql-pluck` in `frontend/`, then `poetry run python manage.py defragment_frontend_queries`
+in `backend/`, then `poetry run pytest --only-frontend-query-tests`.
+Old output from `gql-pluck` makes all of them fail. Run it again after you change a query.
+
 ## Mocking
 
 Mock at system boundaries only: external APIs, time, randomness, file system or databases
