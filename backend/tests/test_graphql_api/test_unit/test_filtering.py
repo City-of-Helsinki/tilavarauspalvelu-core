@@ -234,13 +234,17 @@ def test_units__filter__by_only_seasonal_bookable(graphql, gql_query):
 
 
 def test_unit_all__no_pagination_limit(graphql):
-    graphene_settings.RELAY_CONNECTION_MAX_LIMIT = 1
-
     UnitFactory.create_batch(2)
 
     graphql.login_with_superuser()
     query = units_all_query(fields="pk nameFi nameEn nameSv tprekId")
-    response = graphql(query)
+
+    original_max_limit = graphene_settings.RELAY_CONNECTION_MAX_LIMIT
+    graphene_settings.RELAY_CONNECTION_MAX_LIMIT = 1
+    try:
+        response = graphql(query)
+    finally:
+        graphene_settings.RELAY_CONNECTION_MAX_LIMIT = original_max_limit
 
     assert response.has_errors is False, response.errors
     assert len(response.first_query_object) == 2
