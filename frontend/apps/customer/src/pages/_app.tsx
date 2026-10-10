@@ -5,6 +5,7 @@ import { CookieBanner, CookieConsentContextProvider } from "hds-react";
 import { appWithTranslation, useTranslation } from "next-i18next/pages";
 import App from "next/app";
 import type { AppContext, AppInitialProps, AppProps } from "next/app";
+import { ErrorTrigger, triggerServerError } from "@ui/components/ErrorTrigger";
 import { initialiseLogWrite } from "@ui/modules/browserHelpers";
 import "ui/src/styles/global.scss";
 import { getLocalizationLang } from "@ui/modules/helpers";
@@ -96,6 +97,7 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
             >
               <Component {...pageProps} />
               <CookieBanner />
+              <ErrorTrigger enabled={envConfig.isErrorTriggerEnabled} />
             </PageWrapper>
             <ToastContainer />
           </ApolloProvider>
@@ -112,6 +114,7 @@ type AppOwnProps = {
 MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppInitialProps> => {
   const ctx = await App.getInitialProps(context);
   const commonProps = getCommonServerSideProps();
+  triggerServerError(commonProps.isErrorTriggerEnabled, context.ctx);
   return { ...ctx, envConfig: commonProps };
 };
 

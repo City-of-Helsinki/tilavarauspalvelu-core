@@ -5,6 +5,7 @@ import { appWithTranslation } from "next-i18next/pages";
 import App from "next/app";
 import type { AppContext, AppInitialProps, AppProps } from "next/app";
 import type { Router } from "next/router";
+import { ErrorTrigger, triggerServerError } from "@ui/components/ErrorTrigger";
 import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apollo/helpers";
 import "ui/src/styles/global.scss";
 import { initialiseLogWrite } from "@ui/modules/browserHelpers";
@@ -84,6 +85,7 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
             <PageWrapper>
               <Component {...pageProps} />
             </PageWrapper>
+            <ErrorTrigger enabled={envConfig.isErrorTriggerEnabled} />
           </Layout>
         </ModalContextProvider>
       </EnvContextProvider>
@@ -111,6 +113,7 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
   const ctx = await App.getInitialProps(context);
 
   const commonProps = await getCommonServerSideProps();
+  triggerServerError(commonProps.isErrorTriggerEnabled, context.ctx);
   const client = createClient(commonProps.apiBaseUrl, context.ctx.req);
 
   try {

@@ -7,6 +7,7 @@ export function getDefaultServerSideProps(): StaffEnvConfig {
     apiBaseUrl: "",
     feedbackUrl: "",
     isConsoleLoggingEnabled: true,
+    isErrorTriggerEnabled: false,
     reservationUnitPreviewUrl: "",
     version: getVersion(),
   };
@@ -18,6 +19,7 @@ export async function getCommonServerSideProps(): Promise<StaffEnvConfig> {
     apiBaseUrl: env.TILAVARAUS_API_URL ?? "",
     feedbackUrl: env.FEEDBACK_URL ?? "",
     isConsoleLoggingEnabled: env.ENABLE_CONSOLE_LOGGING ?? false,
+    isErrorTriggerEnabled: env.ENABLE_ERROR_TRIGGER ?? false,
     reservationUnitPreviewUrl: env.RESERVATION_UNIT_PREVIEW_URL_PREFIX ?? "",
     version: getVersion(),
   };

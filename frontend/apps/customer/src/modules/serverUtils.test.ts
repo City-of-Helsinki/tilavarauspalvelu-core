@@ -12,6 +12,7 @@ import {
 const { envMock, getVersionMock, logErrorMock } = vi.hoisted(() => ({
   envMock: {
     ENABLE_CONSOLE_LOGGING: false,
+    ENABLE_ERROR_TRIGGER: false,
     FEEDBACK_URL: "",
     HOTJAR_ENABLED: false,
     MATOMO_ENABLED: false,
@@ -39,6 +40,7 @@ afterEach(() => {
   getVersionMock.mockClear();
   Object.assign(envMock, {
     ENABLE_CONSOLE_LOGGING: false,
+    ENABLE_ERROR_TRIGGER: false,
     FEEDBACK_URL: "",
     HOTJAR_ENABLED: false,
     MATOMO_ENABLED: false,
@@ -53,6 +55,7 @@ describe("serverUtils", () => {
     expect(getDefaultServerSideProps()).toEqual({
       apiBaseUrl: "",
       isConsoleLoggingEnabled: true,
+      isErrorTriggerEnabled: false,
       isHotjarEnabled: false,
       isMatomoEnabled: false,
       profileLink: "",
@@ -64,6 +67,7 @@ describe("serverUtils", () => {
   test("reads common props from env with safe fallbacks", () => {
     Object.assign(envMock, {
       ENABLE_CONSOLE_LOGGING: true,
+      ENABLE_ERROR_TRIGGER: true,
       FEEDBACK_URL: "https://feedback.example",
       HOTJAR_ENABLED: true,
       MATOMO_ENABLED: true,
@@ -74,6 +78,7 @@ describe("serverUtils", () => {
     expect(getCommonServerSideProps()).toEqual({
       apiBaseUrl: "https://api.example",
       isConsoleLoggingEnabled: true,
+      isErrorTriggerEnabled: true,
       isHotjarEnabled: true,
       isMatomoEnabled: true,
       profileLink: "https://profile.example",

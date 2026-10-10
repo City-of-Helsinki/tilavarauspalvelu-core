@@ -26,6 +26,7 @@ export function getDefaultServerSideProps(): CustomerEnvConfig {
   return {
     apiBaseUrl: "",
     isConsoleLoggingEnabled: true,
+    isErrorTriggerEnabled: false,
     isHotjarEnabled: false,
     isMatomoEnabled: false,
     profileLink: "",
@@ -47,6 +48,7 @@ export function getCommonServerSideProps(): CustomerEnvConfig {
   return {
     apiBaseUrl,
     isConsoleLoggingEnabled: env.ENABLE_CONSOLE_LOGGING ?? false,
+    isErrorTriggerEnabled: env.ENABLE_ERROR_TRIGGER ?? false,
     isHotjarEnabled,
     isMatomoEnabled,
     profileLink,
