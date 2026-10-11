@@ -10,6 +10,7 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from easy_thumbnails.files import ThumbnailerImageFieldFile
+    from lazy_managers import LazyAttribute
 
     from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager
@@ -40,8 +41,8 @@ class IntendedUse(models.Model):
     name_sv: str | None
 
     objects: ClassVar[IntendedUseManager] = LazyModelManager.new()
-    actions: IntendedUseActions = LazyModelAttribute.new()
-    validators: IntendedUseValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[IntendedUseActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[IntendedUseValidator] = LazyModelAttribute.new()
 
     reservation_units: ManyToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
 

@@ -13,6 +13,8 @@ from utils.date_utils import local_datetime
 if TYPE_CHECKING:
     import datetime
 
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.typing import EmailAttachment
 
     from .actions import EmailMessageActions
@@ -46,8 +48,8 @@ class EmailMessage(models.Model):
     created_at: datetime.datetime = models.DateTimeField(blank=True, default=local_datetime, db_index=True)
 
     objects: ClassVar[EmailMessageManager] = LazyModelManager.new()
-    actions: EmailMessageActions = LazyModelAttribute.new()
-    validators: EmailMessageValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[EmailMessageActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[EmailMessageValidator] = LazyModelAttribute.new()
 
     class Meta:
         verbose_name = _("email message")

@@ -13,6 +13,8 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     import datetime
 
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import User
 
     from .actions import GeneralRoleActions
@@ -43,8 +45,8 @@ class GeneralRole(models.Model):
     is_role_active: bool = models.BooleanField(default=True)
 
     objects: ClassVar[GeneralRoleManager] = LazyModelManager.new()
-    actions: GeneralRoleActions = LazyModelAttribute.new()
-    validators: GeneralRoleValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[GeneralRoleActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[GeneralRoleValidator] = LazyModelAttribute.new()
 
     class Meta:
         db_table = "general_role"

@@ -7,6 +7,8 @@ from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ApplicationRound, ApplicationSection, Reservation
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager, OneToManyRelatedManager
     from tilavarauspalvelu.models.application_round.queryset import ApplicationRoundQuerySet
@@ -34,8 +36,8 @@ class ReservationPurpose(models.Model):
     name_en: str | None
 
     objects: ClassVar[ReservationPurposeManager] = LazyModelManager.new()
-    actions: ReservationPurposeActions = LazyModelAttribute.new()
-    validators: ReservationPurposeValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ReservationPurposeActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ReservationPurposeValidator] = LazyModelAttribute.new()
 
     reservations: OneToManyRelatedManager[Reservation, ReservationQuerySet]
     application_sections: OneToManyRelatedManager[ApplicationSection, ApplicationSectionQuerySet]

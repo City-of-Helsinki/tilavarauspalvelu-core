@@ -14,6 +14,8 @@ from utils.date_utils import DEFAULT_TIMEZONE
 if TYPE_CHECKING:
     from decimal import Decimal
 
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import Reservation
 
     from .actions import ReservationStatisticActions
@@ -111,8 +113,8 @@ class ReservationStatistic(models.Model):
     """Is the reservation done through application process."""
 
     objects: ClassVar[ReservationStatisticManager] = LazyModelManager.new()
-    actions: ReservationStatisticActions = LazyModelAttribute.new()
-    validators: ReservationStatisticValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ReservationStatisticActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ReservationStatisticValidator] = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservation_statistic"

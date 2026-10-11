@@ -12,6 +12,8 @@ from tilavarauspalvelu.validators import validate_reservable_times
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.typing import TimeSlotDB
 
@@ -37,8 +39,8 @@ class ApplicationRoundTimeSlot(models.Model):
     )
 
     objects: ClassVar[ApplicationRoundTimeSlotManager] = LazyModelManager.new()
-    actions: ApplicationRoundTimeSlotActions = LazyModelAttribute.new()
-    validators: ApplicationRoundTimeSlotValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ApplicationRoundTimeSlotActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ApplicationRoundTimeSlotValidator] = LazyModelAttribute.new()
 
     class Meta:
         db_table = "application_round_time_slot"

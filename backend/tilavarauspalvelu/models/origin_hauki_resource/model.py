@@ -11,6 +11,8 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 from utils.date_utils import local_date
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ReservableTimeSpan, ReservationUnit, Unit
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.reservable_time_span.queryset import ReservableTimeSpanQuerySet
@@ -36,8 +38,8 @@ class OriginHaukiResource(models.Model):
     latest_fetched_date: datetime.datetime.date | None = models.DateField(null=True, blank=True)
 
     objects: ClassVar[OriginHaukiResourceManager] = LazyModelManager.new()
-    actions: OriginHaukiResourceActions = LazyModelAttribute.new()
-    validators: OriginHaukiResourceValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[OriginHaukiResourceActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[OriginHaukiResourceValidator] = LazyModelAttribute.new()
 
     reservable_time_spans: OneToManyRelatedManager[ReservableTimeSpan, ReservableTimeSpanQuerySet]
     reservation_units: OneToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]

@@ -12,6 +12,8 @@ from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Priority, We
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ApplicationSection
 
     from .actions import SuitableTimeRangeActions
@@ -39,8 +41,8 @@ class SuitableTimeRange(models.Model):
     )
 
     objects: ClassVar[SuitableTimeRangeManager] = LazyModelManager.new()
-    actions: SuitableTimeRangeActions = LazyModelAttribute.new()
-    validators: SuitableTimeRangeValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[SuitableTimeRangeActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[SuitableTimeRangeValidator] = LazyModelAttribute.new()
 
     class Meta:
         db_table = "suitable_time_range"

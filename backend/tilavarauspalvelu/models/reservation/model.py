@@ -28,6 +28,8 @@ from utils.fields.model import TextChoicesField
 from utils.mixins import SerializableModelMixin
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
     from tilavarauspalvelu.models import (
         AffectingTimeSpan,
@@ -162,8 +164,8 @@ class Reservation(SerializableModelMixin, models.Model):
     )
 
     objects: ClassVar[ReservationManager] = LazyModelManager.new()
-    actions: ReservationActions = LazyModelAttribute.new()
-    validators: ReservationValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ReservationActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ReservationValidator] = LazyModelAttribute.new()
 
     payment_order: PaymentOrder | None  # Can be missing
     reservation_statistic: ReservationStatistic | None  # Can be missing

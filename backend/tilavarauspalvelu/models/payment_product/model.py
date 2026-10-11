@@ -9,6 +9,8 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 if TYPE_CHECKING:
     import uuid
 
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import PaymentMerchant, ReservationUnit
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
@@ -35,8 +37,8 @@ class PaymentProduct(models.Model):
     )
 
     objects: ClassVar[PaymentProductManager] = LazyModelManager.new()
-    actions: PaymentProductActions = LazyModelAttribute.new()
-    validators: PaymentProductValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[PaymentProductActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[PaymentProductValidator] = LazyModelAttribute.new()
 
     reservation_units: OneToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
 

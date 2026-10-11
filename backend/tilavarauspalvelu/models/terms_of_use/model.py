@@ -13,6 +13,8 @@ from utils.auditlog_util import AuditLogger
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ApplicationRound, ReservationUnit
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.application_round.queryset import ApplicationRoundQuerySet
@@ -51,8 +53,8 @@ class TermsOfUse(models.Model):
     text_sv: str | None
 
     objects: ClassVar[TermsOfUseManager] = LazyModelManager.new()
-    actions: TermsOfUseActions = LazyModelAttribute.new()
-    validators: TermsOfUseValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[TermsOfUseActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[TermsOfUseValidator] = LazyModelAttribute.new()
 
     application_rounds: OneToManyRelatedManager[ApplicationRound, ApplicationRoundQuerySet]
     cancellation_terms_reservation_units: OneToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]

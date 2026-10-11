@@ -13,6 +13,8 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     import datetime
 
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ReservationSeries
 
     from .actions import RejectedOccurrenceActions
@@ -38,8 +40,8 @@ class RejectedOccurrence(models.Model):
     )
 
     objects: ClassVar[RejectedOccurrenceManager] = LazyModelManager.new()
-    actions: RejectedOccurrenceActions = LazyModelAttribute.new()
-    validators: RejectedOccurrenceValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[RejectedOccurrenceActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[RejectedOccurrenceValidator] = LazyModelAttribute.new()
 
     class Meta:
         db_table = "rejected_occurrence"

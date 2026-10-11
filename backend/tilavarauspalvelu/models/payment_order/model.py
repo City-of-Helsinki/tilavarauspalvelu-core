@@ -17,6 +17,8 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     import uuid
 
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import Reservation
 
     from .actions import PaymentOrderActions
@@ -59,8 +61,8 @@ class PaymentOrder(models.Model):
     receipt_url: str = models.CharField(blank=True, default="", max_length=512)
 
     objects: ClassVar[PaymentOrderManager] = LazyModelManager.new()
-    actions: PaymentOrderActions = LazyModelAttribute.new()
-    validators: PaymentOrderValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[PaymentOrderActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[PaymentOrderValidator] = LazyModelAttribute.new()
 
     class Meta:
         db_table = "payment_order"

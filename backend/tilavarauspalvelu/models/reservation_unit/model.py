@@ -31,6 +31,8 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     from decimal import Decimal
 
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import (
         ApplicationRound,
         ApplicationRoundTimeSlot,
@@ -320,8 +322,8 @@ class ReservationUnit(models.Model):
     reservation_cancelled_instructions_en: str | None
 
     objects: ClassVar[ReservationUnitManager] = LazyModelManager.new()
-    actions: ReservationUnitActions = LazyModelAttribute.new()
-    validators: ReservationUnitValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ReservationUnitActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ReservationUnitValidator] = LazyModelAttribute.new()
 
     reservation_unit_hierarchy: ReservationUnitHierarchy | None  # Can be missing
     pricings: OneToManyRelatedManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]

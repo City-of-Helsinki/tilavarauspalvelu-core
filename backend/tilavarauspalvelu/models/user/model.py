@@ -22,6 +22,7 @@ from utils.utils import get_jwt_payload
 if TYPE_CHECKING:
     import datetime
 
+    from lazy_managers import LazyAttribute
     from social_django.models import UserSocialAuth
 
     from tilavarauspalvelu.enums import UserPermissionChoice
@@ -68,8 +69,8 @@ class User(AbstractUser):
     sent_email_about_anonymization = models.BooleanField(default=False, blank=True)
 
     objects: ClassVar[UserManager] = LazyModelManager.new()
-    actions: UserActions = LazyModelAttribute.new()
-    validators: UserValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[UserActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[UserValidator] = LazyModelAttribute.new()
     permissions = PermissionResolver()
 
     applications: OneToManyRelatedManager[Application, ApplicationQuerySet]

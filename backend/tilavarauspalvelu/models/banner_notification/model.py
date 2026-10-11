@@ -16,6 +16,8 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     import datetime
 
+    from lazy_managers import LazyAttribute
+
     from .actions import BannerNotificationActions
     from .queryset import BannerNotificationManager
     from .validators import BannerNotificationValidator
@@ -47,8 +49,8 @@ class BannerNotification(models.Model):
     message_en: str | None
 
     objects: ClassVar[BannerNotificationManager] = LazyModelManager.new()
-    actions: BannerNotificationActions = LazyModelAttribute.new()
-    validators: BannerNotificationValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[BannerNotificationActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[BannerNotificationValidator] = LazyModelAttribute.new()
 
     class Meta:
         db_table = "banner_notification"

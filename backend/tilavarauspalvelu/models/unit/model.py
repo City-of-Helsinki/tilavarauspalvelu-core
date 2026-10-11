@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     import datetime
 
     from django.contrib.gis.geos import Point
+    from lazy_managers import LazyAttribute
 
     from tilavarauspalvelu.models import ReservationUnit, Space, UnitGroup, UnitRole
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager, OneToManyRelatedManager
@@ -106,8 +107,8 @@ class Unit(models.Model):
     address_city_sv: str | None
 
     objects: ClassVar[UnitManager] = LazyModelManager.new()
-    actions: UnitActions = LazyModelAttribute.new()
-    validators: UnitValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[UnitActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[UnitValidator] = LazyModelAttribute.new()
 
     reservation_units: OneToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
     spaces: OneToManyRelatedManager[Space, SpaceQuerySet]

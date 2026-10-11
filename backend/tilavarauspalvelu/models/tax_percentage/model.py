@@ -8,6 +8,8 @@ from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ReservationUnitPricing
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.reservation_unit_pricing.queryset import ReservationUnitPricingQuerySet
@@ -26,8 +28,8 @@ class TaxPercentage(models.Model):
     is_enabled: bool = models.BooleanField(blank=True, default=True)
 
     objects: ClassVar[TaxPercentageManager] = LazyModelManager.new()
-    actions: TaxPercentageActions = LazyModelAttribute.new()
-    validators: TaxPercentageValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[TaxPercentageActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[TaxPercentageValidator] = LazyModelAttribute.new()
 
     reservation_unit_pricings: OneToManyRelatedManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]
 

@@ -7,6 +7,8 @@ from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import AllocatedTimeSlot, ApplicationSection, ReservationUnit
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.allocated_timeslot.queryset import AllocatedTimeSlotQuerySet
@@ -38,8 +40,8 @@ class ReservationUnitOption(models.Model):
     )
 
     objects: ClassVar[ReservationUnitOptionManager] = LazyModelManager.new()
-    actions: ReservationUnitOptionActions = LazyModelAttribute.new()
-    validators: ReservationUnitOptionValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ReservationUnitOptionActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ReservationUnitOptionValidator] = LazyModelAttribute.new()
 
     allocated_time_slots: OneToManyRelatedManager[AllocatedTimeSlot, AllocatedTimeSlotQuerySet]
 

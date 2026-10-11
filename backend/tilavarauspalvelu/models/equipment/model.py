@@ -7,6 +7,8 @@ from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import EquipmentCategory, ReservationUnit
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
@@ -35,8 +37,8 @@ class Equipment(models.Model):
     name_en: str | None
 
     objects: ClassVar[EquipmentManager] = LazyModelManager.new()
-    actions: EquipmentActions = LazyModelAttribute.new()
-    validators: EquipmentValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[EquipmentActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[EquipmentValidator] = LazyModelAttribute.new()
 
     reservation_units: ManyToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
 

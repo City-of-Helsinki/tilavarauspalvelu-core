@@ -19,6 +19,8 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     import datetime
 
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import (
         AgeGroup,
         AllocatedTimeSlot,
@@ -88,8 +90,8 @@ class ReservationSeries(models.Model):
     )
 
     objects: ClassVar[ReservationSeriesManager] = LazyModelManager.new()
-    actions: ReservationSeriesActions = LazyModelAttribute.new()
-    validators: ReservationSeriesValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ReservationSeriesActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ReservationSeriesValidator] = LazyModelAttribute.new()
 
     rejected_occurrences: OneToManyRelatedManager[RejectedOccurrence, RejectedOccurrenceQuerySet]
     reservations: OneToManyRelatedManager[Reservation, ReservationQuerySet]
