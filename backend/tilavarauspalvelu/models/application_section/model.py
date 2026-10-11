@@ -139,7 +139,7 @@ class ApplicationSection(SerializableModelMixin, models.Model):
         )
         return [Weekday(day) for day in suitable]
 
-    @lookup_property(joins=["application"], skip_codegen=True)
+    @lookup_property
     def status() -> ApplicationSectionStatusChoice:
         return models.Case(  # type: ignore[return-value]
             models.When(
@@ -211,7 +211,7 @@ class ApplicationSection(SerializableModelMixin, models.Model):
 
         return ApplicationSectionStatusChoice.IN_ALLOCATION
 
-    @lookup_property(skip_codegen=True)
+    @lookup_property
     def allocations() -> int:
         from tilavarauspalvelu.models import AllocatedTimeSlot
 
@@ -237,7 +237,7 @@ class ApplicationSection(SerializableModelMixin, models.Model):
             ).values_list("num_of_allocations", flat=True)
         )
 
-    @lookup_property(skip_codegen=True)
+    @lookup_property
     def usable_reservation_unit_options() -> int:
         from tilavarauspalvelu.models import ReservationUnitOption
 
@@ -280,7 +280,7 @@ class ApplicationSection(SerializableModelMixin, models.Model):
             output_field=models.IntegerField(),
         )
 
-    @lookup_property(skip_codegen=True)
+    @lookup_property
     def should_have_active_access_code() -> bool:
         """Should at least one reservation in this application section contain an active access code?"""
         from tilavarauspalvelu.models import Reservation
@@ -301,7 +301,7 @@ class ApplicationSection(SerializableModelMixin, models.Model):
 
         return Reservation.objects.for_application_section(self).filter(L(access_code_should_be_active=True)).exists()
 
-    @lookup_property(skip_codegen=True)
+    @lookup_property
     def is_access_code_is_active_correct() -> bool:
         """Check if all reservations in the section have their access code's "is_active" state correctly set."""
         from tilavarauspalvelu.models import Reservation

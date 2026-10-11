@@ -55,7 +55,7 @@ class ReservationUnitAccessType(models.Model):
     def __str__(self) -> str:
         return f"{AccessType(self.access_type).label} for {self.reservation_unit} from {self.begin_date.isoformat()}"
 
-    @lookup_property(skip_codegen=True)
+    @lookup_property
     def end_date() -> datetime.date:
         """End date of the access type (exclusive)."""
         sq = Coalesce(

@@ -130,7 +130,7 @@ class Application(SerializableModelMixin, models.Model):
     def __str__(self) -> str:
         return f"{self.user} ({self.created_at.date()})"
 
-    @lookup_property(joins=["application_round"], skip_codegen=True)
+    @lookup_property
     def status() -> ApplicationStatusChoice:
         return models.Case(  # type: ignore[return-value]
             models.When(
@@ -210,7 +210,7 @@ class Application(SerializableModelMixin, models.Model):
                 msg = f"Unknown application round status: {self.status}"
                 raise ValueError(msg)
 
-    @lookup_property(skip_codegen=True)
+    @lookup_property
     def all_sections_allocated() -> bool:
         from tilavarauspalvelu.models import ApplicationSection
 

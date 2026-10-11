@@ -221,7 +221,7 @@ class Reservation(SerializableModelMixin, models.Model):
     def non_subsidised_price_net(self) -> Decimal:
         return round_decimal(self.non_subsidised_price / (1 + self.tax_percentage_value / Decimal(100)), 2)
 
-    @lookup_property(joins=["reservation_series", "user"])
+    @lookup_property
     def reservee_name() -> str:
         return models.Case(  # type: ignore[return-value]
             # Blocking reservation
