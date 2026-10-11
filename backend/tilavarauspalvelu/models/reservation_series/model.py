@@ -108,7 +108,7 @@ class ReservationSeries(models.Model):
     def __str__(self) -> str:
         return f"{self.name}"
 
-    @lookup_property(skip_codegen=True)
+    @lookup_property
     def should_have_active_access_code() -> bool:
         """Should at least one reservation in this series contain an active access code?"""
         from tilavarauspalvelu.models import Reservation
@@ -125,7 +125,7 @@ class ReservationSeries(models.Model):
     def _(self) -> bool:
         return self.reservations.filter(L(access_code_should_be_active=True)).exists()
 
-    @lookup_property(skip_codegen=True)
+    @lookup_property
     def is_access_code_is_active_correct() -> bool:
         """Check if all reservations in the series have their access code's "is_active" state correctly set."""
         from tilavarauspalvelu.models import Reservation
@@ -142,7 +142,7 @@ class ReservationSeries(models.Model):
     def _(self) -> bool:
         return not self.reservations.filter(L(is_access_code_is_active_correct=False)).exists()
 
-    @lookup_property(skip_codegen=True)
+    @lookup_property
     def used_access_types() -> list[AccessType]:
         """List of all unique access types used in the reservations of this reservation series."""
         from tilavarauspalvelu.models import Reservation
@@ -168,7 +168,7 @@ class ReservationSeries(models.Model):
         )
         return [AccessType(access_type) for access_type in qs["used_access_types"]]
 
-    @lookup_property(joins=["reservations"], skip_codegen=True)
+    @lookup_property
     def access_type() -> AccessTypeWithMultivalued:
         """
         If reservations in this reservation series have different access types,

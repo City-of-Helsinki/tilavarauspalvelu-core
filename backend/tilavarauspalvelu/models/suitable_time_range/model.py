@@ -70,7 +70,7 @@ class SuitableTimeRange(models.Model):
     def __str__(self) -> str:
         return f"{self.day_of_the_week} {self.begin_time.isoformat()}-{self.end_time.isoformat()}"
 
-    @lookup_property(joins=["application_section"], skip_codegen=True)
+    @lookup_property
     def fulfilled() -> bool:
         from tilavarauspalvelu.models import AllocatedTimeSlot
 

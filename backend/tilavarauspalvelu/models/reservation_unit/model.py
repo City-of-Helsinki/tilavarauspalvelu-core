@@ -343,7 +343,7 @@ class ReservationUnit(models.Model):
     def __str__(self) -> str:
         return f"{self.name}, {getattr(self.unit, 'name', '')}"
 
-    @lookup_property(skip_codegen=True)
+    @lookup_property
     def active_pricing_price() -> Decimal | None:
         """Get the pricing type from the currently active pricing."""
         from tilavarauspalvelu.models import ReservationUnitPricing
@@ -551,7 +551,7 @@ class ReservationUnit(models.Model):
 
         return case  # type: ignore[return-value]  # noqa: RET504
 
-    @lookup_property(skip_codegen=True)
+    @lookup_property
     def current_access_type() -> AccessType | None:
         """The access type that is currently active for the reservation unit."""
         from tilavarauspalvelu.models import ReservationUnitAccessType

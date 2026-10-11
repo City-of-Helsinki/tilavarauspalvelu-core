@@ -157,7 +157,7 @@ class ApplicationRound(models.Model):
     def __str__(self) -> str:
         return f"{self.name} ({self.reservation_period_begin_date} - {self.reservation_period_end_date})"
 
-    @lookup_property(skip_codegen=True)
+    @lookup_property
     def status() -> ApplicationRoundStatusChoice:
         return models.Case(  # type: ignore[return-value]
             models.When(
@@ -193,7 +193,7 @@ class ApplicationRound(models.Model):
             return ApplicationRoundStatusChoice.OPEN
         return ApplicationRoundStatusChoice.IN_ALLOCATION
 
-    @lookup_property(skip_codegen=True)
+    @lookup_property
     def status_timestamp() -> datetime.datetime | None:
         return models.Case(  # type: ignore[return-value]
             models.When(
@@ -230,7 +230,7 @@ class ApplicationRound(models.Model):
             case ApplicationRoundStatusChoice.RESULTS_SENT:
                 return self.sent_at
 
-    @lookup_property(skip_codegen=True)
+    @lookup_property
     def is_setting_handled_allowed() -> bool:
         """
         Can this Application Round be set to HANDLED?
@@ -271,7 +271,7 @@ class ApplicationRound(models.Model):
 
         return not self.applications.filter(L(status=ApplicationStatusChoice.IN_ALLOCATION)).exists()
 
-    @lookup_property(skip_codegen=True)
+    @lookup_property
     def reservation_creation_status() -> ApplicationRoundReservationCreationStatusChoice:
         from tilavarauspalvelu.models import ReservationSeries
 
