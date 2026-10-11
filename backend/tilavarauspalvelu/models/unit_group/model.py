@@ -7,6 +7,8 @@ from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import Unit, UnitRole
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager
     from tilavarauspalvelu.models.unit.queryset import UnitQuerySet
@@ -36,8 +38,8 @@ class UnitGroup(models.Model):
     name_en: str | None
 
     objects: ClassVar[UnitGroupManager] = LazyModelManager.new()
-    actions: UnitGroupActions = LazyModelAttribute.new()
-    validators: UnitGroupValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[UnitGroupActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[UnitGroupValidator] = LazyModelAttribute.new()
 
     unit_roles: ManyToManyRelatedManager[UnitRole, UnitRoleQuerySet]
 

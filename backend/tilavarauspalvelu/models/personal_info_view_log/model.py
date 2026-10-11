@@ -9,6 +9,8 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 if TYPE_CHECKING:
     import datetime
 
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import User
 
     from .actions import PersonalInfoViewLogActions
@@ -47,8 +49,8 @@ class PersonalInfoViewLog(models.Model):
     )
 
     objects: ClassVar[PersonalInfoViewLogManager] = LazyModelManager.new()
-    actions: PersonalInfoViewLogActions = LazyModelAttribute.new()
-    validators: PersonalInfoViewLogValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[PersonalInfoViewLogActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[PersonalInfoViewLogValidator] = LazyModelAttribute.new()
 
     class Meta:
         db_table = "personal_info_view_log"

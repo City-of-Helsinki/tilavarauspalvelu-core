@@ -16,6 +16,8 @@ if TYPE_CHECKING:
     import datetime
     from decimal import Decimal
 
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ReservationUnit, TaxPercentage
 
     from .actions import ReservationUnitPricingActions
@@ -68,8 +70,8 @@ class ReservationUnitPricing(models.Model):
     material_price_description_sv: str | None
 
     objects: ClassVar[ReservationUnitPricingManager] = LazyModelManager.new()
-    actions: ReservationUnitPricingActions = LazyModelAttribute.new()
-    validators: ReservationUnitPricingValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ReservationUnitPricingActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ReservationUnitPricingValidator] = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservation_unit_pricing"

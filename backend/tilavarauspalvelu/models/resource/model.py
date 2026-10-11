@@ -10,6 +10,8 @@ from tilavarauspalvelu.enums import ResourceLocationType
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ReservationUnit, Space
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
@@ -46,8 +48,8 @@ class Resource(models.Model):
     name_en: str | None
 
     objects: ClassVar[ResourceManager] = LazyModelManager.new()
-    actions: ResourceActions = LazyModelAttribute.new()
-    validators: ResourceValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ResourceActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ResourceValidator] = LazyModelAttribute.new()
 
     reservation_units: ManyToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
 

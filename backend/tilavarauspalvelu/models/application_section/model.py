@@ -18,6 +18,8 @@ from utils.fields.model import TextChoicesField
 from utils.mixins import SerializableModelMixin
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import (
         AgeGroup,
         Application,
@@ -78,8 +80,8 @@ class ApplicationSection(SerializableModelMixin, models.Model):
     )
 
     objects: ClassVar[ApplicationSectionManager] = LazyModelManager.new()
-    actions: ApplicationSectionActions = LazyModelAttribute.new()
-    validators: ApplicationSectionValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ApplicationSectionActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ApplicationSectionValidator] = LazyModelAttribute.new()
 
     reservation_unit_options: OneToManyRelatedManager[ReservationUnitOption, ReservationUnitOptionQuerySet]
     suitable_time_ranges: OneToManyRelatedManager[SuitableTimeRange, SuitableTimeRangeQuerySet]

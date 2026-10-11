@@ -15,6 +15,8 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     import datetime
 
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ReservationSeries, ReservationUnitOption
 
     from .actions import AllocatedTimeSlotActions
@@ -45,8 +47,8 @@ class AllocatedTimeSlot(models.Model):
     )
 
     objects: ClassVar[AllocatedTimeSlotManager] = LazyModelManager.new()
-    actions: AllocatedTimeSlotActions = LazyModelAttribute.new()
-    validators: AllocatedTimeSlotValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[AllocatedTimeSlotActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[AllocatedTimeSlotValidator] = LazyModelAttribute.new()
 
     reservation_series: ReservationSeries | None  # Can be missing
 

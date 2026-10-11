@@ -23,6 +23,8 @@ from utils.mixins import SerializableModelMixin
 if TYPE_CHECKING:
     import datetime
 
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ApplicationRound, ApplicationSection, Unit, User
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
@@ -95,8 +97,8 @@ class Application(SerializableModelMixin, models.Model):
     )
 
     objects: ClassVar[ApplicationManager] = LazyModelManager.new()
-    actions: ApplicationActions = LazyModelAttribute.new()
-    validators: ApplicationValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ApplicationActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ApplicationValidator] = LazyModelAttribute.new()
 
     application_sections: OneToManyRelatedManager[ApplicationSection, ApplicationSectionQuerySet]
 

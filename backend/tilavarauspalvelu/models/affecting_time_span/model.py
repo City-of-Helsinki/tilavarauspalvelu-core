@@ -15,6 +15,8 @@ from utils.date_utils import DEFAULT_TIMEZONE, timedelta_to_json
 if TYPE_CHECKING:
     import datetime
 
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
     from tilavarauspalvelu.models import Reservation
 
@@ -54,8 +56,8 @@ class AffectingTimeSpan(models.Model):
     buffer_time_after: datetime.timedelta = models.DurationField()
 
     objects: ClassVar[AffectingTimeSpanManager] = LazyModelManager.new()
-    actions: AffectingTimeSpanActions = LazyModelAttribute.new()
-    validators: AffectingTimeSpanValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[AffectingTimeSpanActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[AffectingTimeSpanValidator] = LazyModelAttribute.new()
 
     class Meta:
         managed = False

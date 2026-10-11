@@ -13,6 +13,8 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     import datetime
 
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import Unit, UnitGroup, User
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager
     from tilavarauspalvelu.models.unit.queryset import UnitQuerySet
@@ -56,8 +58,8 @@ class UnitRole(models.Model):
     is_from_ad_group: bool = models.BooleanField(default=False)
 
     objects: ClassVar[UnitRoleManager] = LazyModelManager.new()
-    actions: UnitRoleActions = LazyModelAttribute.new()
-    validators: UnitRoleValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[UnitRoleActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[UnitRoleValidator] = LazyModelAttribute.new()
 
     class Meta:
         db_table = "unit_role"

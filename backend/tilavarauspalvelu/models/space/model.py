@@ -9,6 +9,8 @@ from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ReservationUnit, Resource, Unit
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager, OneToManyRelatedManager
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
@@ -55,8 +57,8 @@ class Space(MPTTModel):
     name_en: str | None
 
     objects: ClassVar[SpaceManager] = LazyModelManager.new()
-    actions: SpaceActions = LazyModelAttribute.new()
-    validators: SpaceValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[SpaceActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[SpaceValidator] = LazyModelAttribute.new()
 
     resources: OneToManyRelatedManager[Resource, ResourceQuerySet]
     reservation_units: ManyToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]

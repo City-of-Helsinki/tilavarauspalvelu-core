@@ -12,6 +12,8 @@ from utils.date_utils import DEFAULT_TIMEZONE
 if TYPE_CHECKING:
     import datetime
 
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import OriginHaukiResource
 
     from .actions import ReservableTimeSpanActions
@@ -36,8 +38,8 @@ class ReservableTimeSpan(models.Model):
     end_datetime: datetime.datetime = models.DateTimeField(null=False, blank=False)
 
     objects: ClassVar[ReservableTimeSpanManager] = LazyModelManager.new()
-    actions: ReservableTimeSpanActions = LazyModelAttribute.new()
-    validators: ReservableTimeSpanValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ReservableTimeSpanActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ReservableTimeSpanValidator] = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservable_time_span"

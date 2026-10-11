@@ -7,6 +7,8 @@ from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationSeries
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
@@ -27,8 +29,8 @@ class AgeGroup(models.Model):
     maximum: int | None = models.PositiveIntegerField(null=True, blank=True)
 
     objects: ClassVar[AgeGroupManager] = LazyModelManager.new()
-    actions: AgeGroupActions = LazyModelAttribute.new()
-    validators: AgeGroupValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[AgeGroupActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[AgeGroupValidator] = LazyModelAttribute.new()
 
     application_sections: OneToManyRelatedManager[ApplicationSection, ApplicationSectionQuerySet]
     reservations: OneToManyRelatedManager[Reservation, ReservationQuerySet]

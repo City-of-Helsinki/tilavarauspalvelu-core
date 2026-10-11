@@ -13,6 +13,8 @@ from tilavarauspalvelu.enums import AccessType
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ReservationUnit
 
     from .actions import ReservationUnitAccessTypeActions
@@ -35,8 +37,8 @@ class ReservationUnitAccessType(models.Model):
     begin_date: datetime.date = models.DateField()
 
     objects: ClassVar[ReservationUnitAccessTypeManager] = LazyModelManager.new()
-    actions: ReservationUnitAccessTypeActions = LazyModelAttribute.new()
-    validators: ReservationUnitAccessTypeValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ReservationUnitAccessTypeActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ReservationUnitAccessTypeValidator] = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservation_unit_access_type"

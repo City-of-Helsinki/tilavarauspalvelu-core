@@ -22,6 +22,8 @@ from utils.db import Now
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import Application, ReservationPurpose, ReservationUnit, TermsOfUse, Unit
     from tilavarauspalvelu.models._base import ManyToManyRelatedManager, OneToManyRelatedManager
     from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
@@ -93,8 +95,8 @@ class ApplicationRound(models.Model):
     )
 
     objects: ClassVar[ApplicationRoundManager] = LazyModelManager.new()
-    actions: ApplicationRoundActions = LazyModelAttribute.new()
-    validators: ApplicationRoundValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ApplicationRoundActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ApplicationRoundValidator] = LazyModelAttribute.new()
 
     applications: OneToManyRelatedManager[Application, ApplicationQuerySet]
 

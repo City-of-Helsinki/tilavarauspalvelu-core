@@ -13,6 +13,7 @@ from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
     from easy_thumbnails.files import ThumbnailerImageFieldFile
+    from lazy_managers import LazyAttribute
 
     from tilavarauspalvelu.models import ReservationUnit
 
@@ -42,8 +43,8 @@ class ReservationUnitImage(models.Model):
     small_url: str = models.URLField(max_length=255, default="", blank=True)
 
     objects: ClassVar[ReservationUnitImageManager] = LazyModelManager.new()
-    actions: ReservationUnitImageActions = LazyModelAttribute.new()
-    validators: ReservationUnitImageValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ReservationUnitImageActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ReservationUnitImageValidator] = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservation_unit_image"

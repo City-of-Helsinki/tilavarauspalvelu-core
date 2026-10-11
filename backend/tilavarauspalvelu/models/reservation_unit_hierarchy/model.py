@@ -12,6 +12,8 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ReservationUnit
 
     from .actions import ReservationUnitHierarchyActions
@@ -44,8 +46,8 @@ class ReservationUnitHierarchy(models.Model):
     related_reservation_unit_ids: list[int] = ArrayField(base_field=models.IntegerField())
 
     objects: ClassVar[ReservationUnitHierarchyManager] = LazyModelManager.new()
-    actions: ReservationUnitHierarchyActions = LazyModelAttribute.new()
-    validators: ReservationUnitHierarchyValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[ReservationUnitHierarchyActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[ReservationUnitHierarchyValidator] = LazyModelAttribute.new()
 
     class Meta:
         managed = False

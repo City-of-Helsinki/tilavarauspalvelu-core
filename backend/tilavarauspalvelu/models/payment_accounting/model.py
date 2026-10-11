@@ -10,6 +10,8 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 from tilavarauspalvelu.validators import is_numeric, validate_accounting_project
 
 if TYPE_CHECKING:
+    from lazy_managers import LazyAttribute
+
     from tilavarauspalvelu.models import ReservationUnit, Unit
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
@@ -72,8 +74,8 @@ class PaymentAccounting(models.Model):
     )
 
     objects: ClassVar[PaymentAccountingManager] = LazyModelManager.new()
-    actions: PaymentAccountingActions = LazyModelAttribute.new()
-    validators: PaymentAccountingValidator = LazyModelAttribute.new()
+    actions: LazyAttribute[PaymentAccountingActions] = LazyModelAttribute.new()
+    validators: LazyAttribute[PaymentAccountingValidator] = LazyModelAttribute.new()
 
     units: OneToManyRelatedManager[Unit, UnitQuerySet]
     reservation_units: OneToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet]
