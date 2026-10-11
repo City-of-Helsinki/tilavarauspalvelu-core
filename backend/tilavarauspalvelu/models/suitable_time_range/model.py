@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
@@ -11,8 +12,6 @@ from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Priority, We
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
-    import datetime
-
     from tilavarauspalvelu.models import ApplicationSection
 
     from .actions import SuitableTimeRangeActions
@@ -87,8 +86,14 @@ class SuitableTimeRange(models.Model):
                 ),
                 then=models.Value(value=True),
             ),
+            # An end time of midnight means the end of the day.
             default=models.Exists(
                 AllocatedTimeSlot.objects.filter(
+                    (
+                        models.Q(begin_time__lt=models.OuterRef("end_time"))
+                        | models.lookups.Exact(models.OuterRef("end_time"), datetime.time())
+                    ),
+                    (models.Q(end_time__gt=models.OuterRef("begin_time")) | models.Q(end_time=datetime.time())),
                     day_of_the_week=models.OuterRef("day_of_the_week"),
                     reservation_unit_option__application_section=models.OuterRef("application_section"),
                 )
@@ -103,10 +108,17 @@ class SuitableTimeRange(models.Model):
 
         from tilavarauspalvelu.models import AllocatedTimeSlot
 
-        return AllocatedTimeSlot.objects.filter(
+        allocations = AllocatedTimeSlot.objects.filter(
+            models.Q(end_time__gt=self.begin_time) | models.Q(end_time=datetime.time()),
             day_of_the_week=self.day_of_the_week,
             reservation_unit_option__application_section=self.application_section,
-        ).exists()
+        )
+
+        # An end time of midnight means the end of the day.
+        if self.end_time != datetime.time():
+            allocations = allocations.filter(begin_time__lt=self.end_time)
+
+        return allocations.exists()
 
     @lookup_property
     def day_of_the_week_number() -> int:
