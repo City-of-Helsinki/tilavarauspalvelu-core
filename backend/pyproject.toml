@@ -17,13 +17,13 @@ requires-poetry = ">=2.0"
 Django = "5.2.18"
 django-auditlog = "3.4.1"
 django-cors-headers = "4.9.0"
-django-environment-config = { version = "0.2.3", extras = ["db"] }
+django-environment-config = { version = "0.2.4", extras = ["db"] }
 django-filter = "26.2"
 django-health-check = "4.8.0"
 django-helusers = "1.1.0"
 django-jinja = "2.11.0"
-django-lazy-managers = "0.0.1"
-django-lookup-property = "0.2.2"
+django-lazy-managers = "0.1.0"
+django-lookup-property = "0.3.0"
 django-modeltranslation = "0.20.6"
 django-mptt = "0.18.0"
 django-nh3 = "0.3.1"
@@ -53,14 +53,14 @@ django-csp = "4.0"
 
 [tool.poetry.group.admin.dependencies]
 # Dependencies related to the admin panel or other "administrative" tasks.
-django-admin-data-views = "0.4.3"
+django-admin-data-views = "0.4.4"
 django-admin-extra-buttons = "2.2.1"
 django-admin-rangefilter = "0.15.0"
 django-admin-sortable2 = "2.3.1"
 django-extensions = "4.1"
 django-import-export = "4.4.1"
 django-more-admin-filters = "1.15"
-django-subforms = "0.4.1"
+django-subforms = "0.4.2"
 django-tinymce = "5.0.0"
 
 [tool.poetry.group.celery.dependencies]
