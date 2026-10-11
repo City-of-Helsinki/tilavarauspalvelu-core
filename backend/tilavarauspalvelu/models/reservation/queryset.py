@@ -19,6 +19,7 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationStatistic, ReservationUnit, Unit
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from tilavarauspalvelu.tasks import delete_pindora_reservation_task
@@ -433,10 +434,13 @@ class ReservationManager(SerializableModelManagerMixin, ModelManager[Reservation
     def create_missing_statistics(self, *, limit: int, batch_size: int) -> None:
         """
         Create missing statistics for at most `limit` reservations that don't have any.
-        Each batch is saved in its own transaction, so a failed batch does not lose the others.
+        Each batch is saved in its own transaction. A failed batch is logged, and the next batch is still run.
         """
         missing_statistics = self.all().filter(reservation_statistic__isnull=True).order_by("pk")
         reservation_pks = list(missing_statistics.values_list("pk", flat=True)[:limit])
 
         for batch in itertools.batched(reservation_pks, batch_size, strict=False):
-            self.model.objects.filter(pk__in=batch).upsert_statistics()
+            try:
+                self.model.objects.filter(pk__in=batch).upsert_statistics()
+            except IntegrityError as error:
+                SentryLogger.log_exception(error, details="Failed to create missing reservation statistics.")
