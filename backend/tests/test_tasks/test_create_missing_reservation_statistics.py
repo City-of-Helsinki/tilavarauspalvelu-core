@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import pytest
+from dateutil.relativedelta import relativedelta
 
 from tilavarauspalvelu.models import Reservation, ReservationStatistic
 from tilavarauspalvelu.tasks import create_missing_reservation_statistics_task
+from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory
 
@@ -42,3 +44,18 @@ def test_create_missing_reservation_statistics__limit_and_batches():
     reservation_pks = list(ReservationStatistic.objects.order_by("reservation").values_list("reservation", flat=True))
 
     assert reservation_pks == [reservation_1.pk, reservation_2.pk, reservation_3.pk, reservation_4.pk]
+
+
+@pytest.mark.django_db
+def test_create_missing_reservation_statistics__skip_reservations_past_retention(settings):
+    settings.REMOVE_RESERVATION_STATS_OLDER_THAN_YEARS = 5
+
+    created_at = local_datetime() - relativedelta(years=5, days=1)
+    ReservationFactory.create(created_at=created_at)
+    reservation = ReservationFactory.create()
+
+    Reservation.objects.create_missing_statistics(limit=10, batch_size=10)
+
+    reservation_pks = list(ReservationStatistic.objects.values_list("reservation", flat=True))
+
+    assert reservation_pks == [reservation.pk]

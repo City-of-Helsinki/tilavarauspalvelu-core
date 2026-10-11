@@ -22,6 +22,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationStatistic, ReservationUnit, Unit
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models.reservation_statistic.queryset import statistics_retention_cutoff
 from tilavarauspalvelu.tasks import delete_pindora_reservation_task
 from utils.date_utils import local_datetime
 from utils.db import Now
@@ -436,7 +437,16 @@ class ReservationManager(SerializableModelManagerMixin, ModelManager[Reservation
         Create missing statistics for at most `limit` reservations that don't have any.
         Each batch is saved in its own transaction. A failed batch is logged, and the next batch is still run.
         """
-        missing_statistics = self.all().filter(reservation_statistic__isnull=True).order_by("pk")
+        # Statistics for older reservations are pruned as expired. Creating them again would only get them pruned again.
+        retention_cutoff = statistics_retention_cutoff()
+
+        missing_statistics = (
+            self
+            .all()
+            .filter(reservation_statistic__isnull=True)
+            .exclude(created_at__lte=retention_cutoff)
+            .order_by("pk")
+        )
         reservation_pks = list(missing_statistics.values_list("pk", flat=True)[:limit])
 
         for batch in itertools.batched(reservation_pks, batch_size, strict=False):
