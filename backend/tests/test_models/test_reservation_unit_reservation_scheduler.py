@@ -91,3 +91,88 @@ def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_
     }
 
     assert possible_start_times == expected
+
+
+@pytest.mark.django_db
+def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_start_times__span_ends_at_midnight():
+    reservation_unit = ReservationUnitFactory.create(
+        origin_hauki_resource=OriginHaukiResourceFactory.create(),
+        reservation_start_interval=ReservationStartInterval.INTERVAL_60_MINUTES,
+        min_reservation_duration=datetime.timedelta(hours=1),
+    )
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_get_dt(month=1, day=1, hour=20),
+        end_datetime=_get_dt(month=1, day=2, hour=0),
+    )
+
+    possible_start_times = reservation_unit.actions.get_possible_start_times(on_date=_get_date(month=1, day=1))
+
+    assert possible_start_times == {
+        datetime.time(20, 0),
+        datetime.time(21, 0),
+        datetime.time(22, 0),
+        datetime.time(23, 0),
+    }
+
+
+@pytest.mark.django_db
+def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_start_times__whole_day():
+    reservation_unit = ReservationUnitFactory.create(
+        origin_hauki_resource=OriginHaukiResourceFactory.create(),
+        reservation_start_interval=ReservationStartInterval.INTERVAL_60_MINUTES,
+        min_reservation_duration=datetime.timedelta(hours=24),
+        reservation_block_whole_day=True,
+    )
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_get_dt(month=1, day=1, hour=0),
+        end_datetime=_get_dt(month=1, day=2, hour=0),
+    )
+
+    possible_start_times = reservation_unit.actions.get_possible_start_times(on_date=_get_date(month=1, day=1))
+
+    assert possible_start_times == {datetime.time(0, 0)}
+
+
+@pytest.mark.django_db
+def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_start_times__over_dst_change():
+    reservation_unit = ReservationUnitFactory.create(
+        origin_hauki_resource=OriginHaukiResourceFactory.create(),
+        reservation_start_interval=ReservationStartInterval.INTERVAL_60_MINUTES,
+        min_reservation_duration=datetime.timedelta(hours=3),
+    )
+    # The clocks move from 03:00 to 04:00 on this night, so the span is 4 real hours long.
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=datetime.datetime(2026, 3, 29, 1, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime.datetime(2026, 3, 29, 6, tzinfo=DEFAULT_TIMEZONE),
+    )
+
+    possible_start_times = reservation_unit.actions.get_possible_start_times(on_date=datetime.date(2026, 3, 29))
+
+    assert possible_start_times == {datetime.time(1, 0), datetime.time(2, 0)}
+
+
+@pytest.mark.django_db
+def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_start_times__skipped_hour():
+    reservation_unit = ReservationUnitFactory.create(
+        origin_hauki_resource=OriginHaukiResourceFactory.create(),
+        reservation_start_interval=ReservationStartInterval.INTERVAL_60_MINUTES,
+        min_reservation_duration=datetime.timedelta(hours=1),
+    )
+    # The clocks move from 03:00 to 04:00 on this night, so 03:00 does not exist.
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=datetime.datetime(2026, 3, 29, 1, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime.datetime(2026, 3, 29, 6, tzinfo=DEFAULT_TIMEZONE),
+    )
+
+    possible_start_times = reservation_unit.actions.get_possible_start_times(on_date=datetime.date(2026, 3, 29))
+
+    assert possible_start_times == {
+        datetime.time(1, 0),
+        datetime.time(2, 0),
+        datetime.time(4, 0),
+        datetime.time(5, 0),
+    }
