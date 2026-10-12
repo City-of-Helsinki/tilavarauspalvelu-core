@@ -35,9 +35,13 @@ class TprekUnitData:
     def from_response_json(cls, response_json: dict[str, Any]) -> TprekUnitData:
         try:
             modified_time = response_json.get("modified_time")
-            tprek_last_modified = datetime.datetime.fromisoformat(modified_time).replace(tzinfo=DEFAULT_TIMEZONE)
+            tprek_last_modified = datetime.datetime.fromisoformat(modified_time)
         except (TypeError, ValueError):
             tprek_last_modified = None
+
+        # TPREK sends the time without an offset, in local time.
+        if tprek_last_modified is not None and tprek_last_modified.tzinfo is None:
+            tprek_last_modified = tprek_last_modified.replace(tzinfo=DEFAULT_TIMEZONE)
 
         return cls(
             tprek_id=str(response_json.get("id")),

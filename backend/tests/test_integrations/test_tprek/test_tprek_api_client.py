@@ -45,6 +45,19 @@ def test_TprekAPIClient__get_unit():
     assert location_data.coordinates.y == 78.123456
 
 
+@patch_method(
+    TprekAPIClient.get,
+    return_value=ResponseMock(
+        status_code=200,
+        json_data={**SINGLE_TPREK_UNIT_JSON, "modified_time": "2023-05-10T05:09:00+00:00"},
+    ),
+)
+def test_TprekAPIClient__get_unit__modified_time_with_offset():
+    unit_data, _ = TprekAPIClient.get_unit(unit_tprek_id="999")
+
+    assert unit_data.tprek_last_modified == local_datetime(2023, 5, 10, 8, 9, 0)
+
+
 @patch_method(TprekAPIClient.get)
 @patch_method(TprekAPIClient.response_json, return_value=None)
 def test_TprekAPIClient__nonexistent_unit():

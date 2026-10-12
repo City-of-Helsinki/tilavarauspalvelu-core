@@ -110,6 +110,24 @@ def test_TprekUnitImporter__update_unit_data_from_tprek__saved_last_modified_is_
     assert unit.name == "Original name"
 
 
+@patch_method(
+    TprekAPIClient.get,
+    return_value=ResponseMock(status_code=200, json_data={**SINGLE_TPREK_UNIT_JSON, "modified_time": None}),
+)
+@patch_method(TprekUnitHaukiResourceIdImporter.import_hauki_resources_for_units)
+def test_TprekUnitImporter__update_unit_data_from_tprek__tprek_last_modified_missing__update():
+    modified = datetime.datetime.fromisoformat(SINGLE_TPREK_UNIT_JSON["modified_time"]).replace(tzinfo=DEFAULT_TIMEZONE)
+    unit = UnitFactory.create(name="Original name", tprek_id="999", tprek_last_modified=modified)
+
+    importer = TprekUnitImporter()
+    importer.update_unit_from_tprek([unit])
+
+    assert importer.updated_units_count == 1
+
+    unit.refresh_from_db()
+    assert unit.name == "Test Unit"
+
+
 @patch_method(TprekAPIClient.get, return_value=ResponseMock(status_code=200, json_data=SINGLE_TPREK_UNIT_JSON))
 @patch_method(TprekUnitHaukiResourceIdImporter.import_hauki_resources_for_units)
 def test_TprekUnitImporter__update_unit_data_from_tprek__saved_last_modified_is_the_same__force_update():
