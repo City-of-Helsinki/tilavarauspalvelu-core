@@ -4,19 +4,9 @@ import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { relayStylePagination } from "@apollo/client/utilities";
 import type { FieldPolicy } from "@apollo/client";
 import { enchancedFetch, errorLink } from "@ui/modules/apollo/helpers";
+import { keyArgsWithoutPaging } from "@ui/modules/apollo/pagination";
 import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
 import { buildGraphQLUrl } from "@ui/modules/urlBuilder";
-
-const PAGING_ARGS = new Set(["first", "last", "after", "before"]);
-
-/* Store a separate list for each set of filters and ordering.
- * The default keyArgs of relayStylePagination is false, so all searches share one list.
- * Then a new search with cache-first returns the results of the previous search.
- */
-function keyArgsWithoutPaging(args: Record<string, unknown> | null): string[] | false {
-  const keys = Object.keys(args ?? {}).filter((key) => !PAGING_ARGS.has(key));
-  return keys.length > 0 ? keys : false;
-}
 
 /* The backend can't tell if a next page exists. It filters by reservability after paging,
  * so hasNextPage and totalCount are not reliable.

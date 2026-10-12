@@ -1,21 +1,24 @@
-import { useMemo } from "react";
 import { gql } from "@apollo/client";
-import { startOfDay } from "date-fns";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { useHandlingDataQuery, ReservationStateChoice } from "@gql/gql-types";
+import type { HandlingDataQueryVariables } from "@gql/gql-types";
 /* eslint-disable-next-line import/no-cycle */
 import { useSession } from "@/hooks";
+
+/// Use the same variables for the server query, the cache write and the hook, so the cache keys match.
+export function getHandlingDataVariables(): HandlingDataQueryVariables {
+  return {
+    beginDate: formatApiDate(new Date()) ?? "",
+    state: ReservationStateChoice.RequiresHandling,
+  };
+}
 
 export function useHandling() {
   const { isAuthenticated } = useSession();
 
-  const today = useMemo(() => startOfDay(new Date()), []);
   const { data, refetch } = useHandlingDataQuery({
     skip: !isAuthenticated,
-    variables: {
-      beginDate: formatApiDate(today) ?? "",
-      state: ReservationStateChoice.RequiresHandling,
-    },
+    variables: getHandlingDataVariables(),
   });
 
   const handlingCount: number = data?.reservations?.edges?.length ?? 0;

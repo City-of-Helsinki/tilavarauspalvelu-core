@@ -8,12 +8,10 @@ import type { Router } from "next/router";
 import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apollo/helpers";
 import "ui/src/styles/global.scss";
 import { initialiseLogWrite } from "@ui/modules/browserHelpers";
-import { formatApiDate } from "ui/src/modules/date-utils";
 import {
   BannerNotificationTarget,
   CurrentUserDocument,
   HandlingDataDocument,
-  ReservationStateChoice,
   ShowNotificationsListDocument,
 } from "@gql/gql-types";
 import type {
@@ -27,6 +25,7 @@ import type {
 import { PageWrapper } from "@/components/PageWrapper";
 import { EnvContextProvider } from "@/context/EnvContext";
 import { ModalContextProvider } from "@/context/ModalContext";
+import { getHandlingDataVariables } from "@/hooks/useHandling";
 import { createClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import type { StaffEnvConfig } from "@/modules/serverUtils";
@@ -65,6 +64,7 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
     apolloClient.writeQuery({
       query: HandlingDataDocument,
       data: handlingData,
+      variables: getHandlingDataVariables(),
     });
   }
   if (notificationsData) {
@@ -123,10 +123,7 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
     // Need to fetch all data required by the Navigation component otherwise it flashes
     const handlingPromise = client.query<HandlingDataQuery, HandlingDataQueryVariables>({
       query: HandlingDataDocument,
-      variables: {
-        beginDate: formatApiDate(new Date()) ?? "",
-        state: ReservationStateChoice.RequiresHandling,
-      },
+      variables: getHandlingDataVariables(),
     });
 
     const notificationPromise = client.query<ShowNotificationsListQuery, ShowNotificationsListQueryVariables>({
