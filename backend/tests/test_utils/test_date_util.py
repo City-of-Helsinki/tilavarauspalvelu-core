@@ -15,6 +15,7 @@ from utils.date_utils import (
     get_periods_between,
     local_date,
     local_datetime,
+    local_datetime_exists,
     local_datetime_max,
     local_datetime_min,
     local_time,
@@ -98,6 +99,21 @@ def test_date_utils__local_time_min():
 
 def test_date_utils__local_time_max():
     assert local_time_max() == datetime.time.max.replace(tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
+
+
+# The clocks move from 03:00 to 04:00 on 2026-03-29, and from 04:00 back to 03:00 on 2026-10-25.
+@pytest.mark.parametrize(
+    ("value", "exists"),
+    [
+        (datetime.datetime(2026, 3, 29, 2, 30, tzinfo=DEFAULT_TIMEZONE), True),
+        (datetime.datetime(2026, 3, 29, 3, 30, tzinfo=DEFAULT_TIMEZONE), False),
+        (datetime.datetime(2026, 3, 29, 4, 0, tzinfo=DEFAULT_TIMEZONE), True),
+        (datetime.datetime(2026, 10, 25, 3, 30, tzinfo=DEFAULT_TIMEZONE, fold=0), True),
+        (datetime.datetime(2026, 10, 25, 3, 30, tzinfo=DEFAULT_TIMEZONE, fold=1), True),
+    ],
+)
+def test_date_utils__local_datetime_exists(value, exists):
+    assert local_datetime_exists(value) is exists
 
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
