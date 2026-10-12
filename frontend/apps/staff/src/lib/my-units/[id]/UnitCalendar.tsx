@@ -5,10 +5,11 @@ import type { TFunction } from "next-i18next";
 import { addMinutes, differenceInMinutes, isToday, setHours, setMinutes, startOfDay } from "date-fns";
 import { IconClock } from "hds-react";
 import { useSearchParams } from "next/navigation";
-import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
 import { isCellOverlappingSpan } from "@ui/components/calendar/utils";
 import type { TimeSpanType } from "@ui/components/calendar/utils";
+import { Popover } from "@ui/components/Popover";
+import type { PopoverTriggerProps } from "@ui/components/Popover";
 import type { CalendarEvent } from "ui/src/components/calendar/Calendar";
 import { useWindowHeight } from "ui/src/hooks";
 import { breakpoints } from "ui/src/modules/const";
@@ -372,10 +373,11 @@ function getEventTitle({ reservation: { title, event }, t }: { reservation: Cale
   return title;
 }
 
-function EventTriggerButton({ name }: { name: string }): React.ReactElement {
+function EventTriggerButton({ name, ...triggerProps }: { name: string } & PopoverTriggerProps): React.ReactElement {
   const { t } = useTranslation();
   return (
     <button
+      {...triggerProps}
       type="button"
       aria-label={t("myUnits:Calendar.popUpLabel", { name })}
       style={{
@@ -429,10 +431,13 @@ function Event({
         >
           <p>{timeRange}</p>
           <p>{title}</p>
-          {/* NOTE don't set position on Popup it breaks responsiveness */}
-          <Popup trigger={<EventTriggerButton name={`${timeRange} ${title ?? ""}`} />}>
+          <Popover
+            renderTrigger={(triggerProps) => (
+              <EventTriggerButton {...triggerProps} name={`${timeRange} ${title ?? ""}`} />
+            )}
+          >
             {reservation && <ReservationPopupContent reservation={reservation} />}
-          </Popup>
+          </Popover>
         </EventContent>
       </div>
       <PostBuffer event={event} hourPercent={hourPercent} right={right} />
