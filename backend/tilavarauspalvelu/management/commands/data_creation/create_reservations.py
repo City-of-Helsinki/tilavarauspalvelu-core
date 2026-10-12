@@ -859,10 +859,10 @@ def _create_reservations_for_series(
             tzinfo=DEFAULT_TIMEZONE,
         )
 
-        buffer_time_before = series.reservation_unit.actions.get_actual_before_buffer(series.begin_time)
-        buffer_time_after = series.reservation_unit.actions.get_actual_before_buffer(series.end_time)
-
         for begin, end in periods:
+            buffer_time_before = series.reservation_unit.actions.get_actual_before_buffer(begin)
+            buffer_time_after = series.reservation_unit.actions.get_actual_after_buffer(end)
+
             reservation = (
                 ReservationBuilder()
                 .for_user(series.user)

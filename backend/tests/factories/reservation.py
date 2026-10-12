@@ -102,9 +102,17 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         """Create a Reservation for a ReservationUnit with its buffer times."""
         kwargs.setdefault("state", ReservationStateChoice.CREATED)
 
+        buffer_time_before = reservation_unit.buffer_time_before
+        buffer_time_after = reservation_unit.buffer_time_after
+
+        # Whole-day buffers depend on the reservation times, like when a reservation is created through the API.
+        if reservation_unit.reservation_block_whole_day and "begins_at" in kwargs and "ends_at" in kwargs:
+            buffer_time_before = reservation_unit.actions.get_actual_before_buffer(kwargs["begins_at"])
+            buffer_time_after = reservation_unit.actions.get_actual_after_buffer(kwargs["ends_at"])
+
         return cls.create(
-            buffer_time_before=reservation_unit.buffer_time_before,
-            buffer_time_after=reservation_unit.buffer_time_after,
+            buffer_time_before=buffer_time_before,
+            buffer_time_after=buffer_time_after,
             reservation_unit=reservation_unit,
             **kwargs,
         )
