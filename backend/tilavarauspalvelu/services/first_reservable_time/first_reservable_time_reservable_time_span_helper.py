@@ -10,6 +10,7 @@ from tilavarauspalvelu.integrations.opening_hours.time_span_element_utils import
     override_reservable_with_closed_time_spans,
 )
 from tilavarauspalvelu.services.first_reservable_time.utils import ReservableTimeOutput
+from utils.date_utils import DEFAULT_TIMEZONE, local_start_of_day
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
@@ -210,7 +211,8 @@ class ReservableTimeSpanFirstReservableTimeHelper:
         ---
 
         For the start time to be valid, it must be at an interval that is valid for the ReservationUnit starting
-        from the beginning of the ReservableTimeSpan.
+        from the beginning of the ReservableTimeSpan. On the days after the first day of the ReservableTimeSpan,
+        the intervals start from local midnight, like in the start time check of a new reservation.
 
         Examples:
         1.
@@ -227,7 +229,13 @@ class ReservableTimeSpanFirstReservableTimeHelper:
 
         time_span.round_start_time_to_next_minute()
 
-        difference: datetime.timedelta = time_span.start_datetime - self.reservable_time_span.start_datetime
+        start_datetime = time_span.start_datetime.astimezone(DEFAULT_TIMEZONE)
+        start_of_day = local_start_of_day(start_datetime)
+        intervals_begin_at = max(self.reservable_time_span.start_datetime, start_of_day)
+        local_intervals_begin_at = intervals_begin_at.astimezone(DEFAULT_TIMEZONE)
+
+        # Both times are local, so the difference is on the wall clock, like the intervals of the start time check.
+        difference: datetime.timedelta = start_datetime - local_intervals_begin_at
         difference_minutes = difference.total_seconds() / 60
 
         minutes_past_interval = math.ceil(difference_minutes % interval_minutes)
@@ -238,7 +246,7 @@ class ReservableTimeSpanFirstReservableTimeHelper:
         # interval_minutes and minutes_past_interval to the start time.
         # e.g. interval=30, overflow_minutes=15, start_time += (30-15 = 15) minutes
         minutes_to_next_interval = datetime.timedelta(minutes=interval_minutes - minutes_past_interval)
-        time_span.start_datetime += minutes_to_next_interval
+        time_span.start_datetime = start_datetime + minutes_to_next_interval
 
     def _can_reservation_fit_inside_time_span(self, time_span: TimeSpanElement) -> bool:
         """
