@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import type { FC } from "react";
 import { appWithTranslation } from "next-i18next";
 import { ApolloProvider } from "@apollo/client";
@@ -44,7 +44,8 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
   }
 
   // NOTE incorrectly typed (apiBaseUrl can be undefined during build)
-  const apolloClient = createClient(apiBaseUrl ?? "");
+  // Keep one client, otherwise every render drops the cache and fetches all active queries again
+  const [apolloClient] = useState(() => createClient(apiBaseUrl ?? ""));
 
   // Manual rehydration of currentUser (otherwise we have flashes of unauthenticated state)
   // DO NOT use useEffect / async here
