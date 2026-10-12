@@ -17,6 +17,7 @@ const HDS_COOKIE_CONSENT_TARGET = "hds-core/lib/components/cookie-consent/cookie
 
 /** @type {import('next').NextConfig} */
 const config = {
+  agentRules: false,
   reactStrictMode: true,
   // NOTE default worker count uses os.cpus() which ignores container CPU limits
   // and spawns too many workers (OOM in memory limited containers)
