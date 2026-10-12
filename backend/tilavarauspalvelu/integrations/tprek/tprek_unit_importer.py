@@ -52,6 +52,7 @@ class TprekUnitImporter:
             if (
                 force_update
                 or unit.tprek_last_modified is None
+                or tprek_unit_data.tprek_last_modified is None
                 or unit.tprek_last_modified < tprek_unit_data.tprek_last_modified
             ):
                 self._update_unit(unit, tprek_unit_data, tprek_location_data)
