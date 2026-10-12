@@ -23,6 +23,7 @@ from tilavarauspalvelu.integrations.keyless_entry.typing import (
     PindoraSeasonalBookingResponse,
 )
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.typing import PindoraValidityInfoData
 from utils.date_utils import local_datetime
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationSeriesFactory, UserFactory
@@ -261,6 +262,38 @@ def test_seasonal_booking_access_code_changed__get_context__instance__inactive(e
         context = get_context_for_seasonal_booking_access_code_changed(section, language="en")
 
     assert context == expected
+
+
+@pytest.mark.django_db
+@freeze_time("2023-12-20 12:00:00+02:00")
+@patch_method(PindoraService.get_access_code)
+def test_seasonal_booking_access_code_changed__get_context__instance__access_code_begins_on_previous_day(
+    email_reservation,
+):
+    section = email_reservation.actions.get_application_section()
+    section.actions.get_reservations().update(access_type=AccessType.ACCESS_CODE)
+
+    # The Monday reservation begins at midnight, and its access code is valid from 10 minutes before.
+    email_reservation.begins_at = local_datetime(2024, 1, 1, 0)
+    email_reservation.ends_at = local_datetime(2024, 1, 1, 1)
+    email_reservation.save()
+
+    PindoraService.get_access_code.return_value = pindora_seasonal_booking_info(
+        access_code_validity=[
+            PindoraValidityInfoData(
+                reservation_id=email_reservation.id,
+                reservation_series_id=email_reservation.reservation_series.id,
+                access_code_begins_at=local_datetime(2023, 12, 31, 23, 50),
+                access_code_ends_at=local_datetime(2024, 1, 1, 1, 5),
+            ),
+        ],
+    )
+
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_booking_access_code_changed(section, language="en")
+
+    validity_periods = [allocation["access_code_validity_period"] for allocation in context["allocations"]]
+    assert validity_periods == ["23:50-1:05"]
 
 
 # RENDER TEXT ##########################################################################################################
