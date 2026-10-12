@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import type { TFunction } from "next-i18next";
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { BannerNotificationStatusLabel } from "ui/src/components/statuses";
 import { formatDate, formatTime } from "ui/src/modules/date-utils";
@@ -112,16 +112,22 @@ function NotificationsTable({
   );
 }
 
+const DEFAULT_SORT = "state";
+
+/// Use the same variables for the server and the client query, so the first render has the same order.
+function getListVariables(sort: string): BannerNotificationsListQueryVariables {
+  return {
+    first: GQL_MAX_RESULTS_PER_QUERY,
+    orderBy: transformSortString(sort),
+  };
+}
+
 /// @brief this is the listing page for all notifications.
 function Notifications({ notifications: notificationsOriginal }: PageProps) {
-  const [sort, setSort] = useState<string>("state");
-  const orderBy = transformSortString(sort);
+  const [sort, setSort] = useState<string>(DEFAULT_SORT);
 
   const { data, loading, previousData, fetchMore } = useBannerNotificationsListQuery({
-    variables: {
-      first: GQL_MAX_RESULTS_PER_QUERY,
-      orderBy,
-    },
+    variables: getListVariables(sort),
     fetchPolicy: "cache-and-network",
   });
 
@@ -204,18 +210,6 @@ function transformSortString(sort: string | null): BannerNotificationOrderingCho
 
 type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 export default function ApplicationRoundRouted(props: PageProps): React.ReactElement {
-  // Manually cache SSR query so we get proper pagination and sorting
-  // while still maintaining full initial page loads
-  // useEffect causes the page to redraw, so we pass the data to the Page component also
-  const apolloClient = useApolloClient();
-  useEffect(() => {
-    apolloClient.writeQuery({
-      query: BannerNotificationsListDocument,
-      data: {
-        notifications: props.notifications,
-      },
-    });
-  }, [apolloClient, props]);
   return (
     <AuthorizationChecker permission={UserPermissionChoice.CanManageNotifications}>
       <Notifications {...props} />
@@ -228,6 +222,7 @@ export async function getServerSideProps({ locale, req }: GetServerSidePropsCont
   const apolloClient = createClient(apiBaseUrl, req);
   const notifications = await apolloClient.query<BannerNotificationsListQuery, BannerNotificationsListQueryVariables>({
     query: BannerNotificationsListDocument,
+    variables: getListVariables(DEFAULT_SORT),
   });
   return {
     props: {
