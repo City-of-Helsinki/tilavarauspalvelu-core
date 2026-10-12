@@ -46,7 +46,7 @@ const config: IGraphQLConfig = {
   projects: {
     ui: {
       schema,
-      documents: "packages/ui/**/!(*.d|gql-types).{ts,tsx}",
+      documents: "packages/ui/**/!(*.d|gql-types|*.test).{ts,tsx}",
       extensions: {
         codegen: {
           config: gqlConfig,
@@ -60,7 +60,7 @@ const config: IGraphQLConfig = {
     },
     staff: {
       schema,
-      documents: "apps/staff/**/!(*.d|gql-types).{ts,tsx}",
+      documents: "apps/staff/**/!(*.d|gql-types|*.test).{ts,tsx}",
       extensions: {
         codegen: {
           config: gqlConfig,
@@ -74,7 +74,7 @@ const config: IGraphQLConfig = {
     },
     customer: {
       schema,
-      documents: "apps/customer/**/!(*.d|gql-types).{ts,tsx}",
+      documents: "apps/customer/**/!(*.d|gql-types|*.test).{ts,tsx}",
       extensions: {
         codegen: {
           config: gqlConfig,
