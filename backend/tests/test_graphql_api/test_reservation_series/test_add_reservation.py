@@ -106,7 +106,7 @@ def test_reservation_series__add_reservation__begin_after_end(graphql):
     response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot end before it begins"]
+    assert response.field_error_messages() == ["Reservation must end after it begins"]
 
     assert series.reservations.count() == 9
 

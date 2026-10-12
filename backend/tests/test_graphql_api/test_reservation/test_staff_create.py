@@ -179,7 +179,20 @@ def test_reservation__staff_create__end_before_begin(graphql):
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot end before it begins"]
+    assert response.field_error_messages() == ["Reservation must end after it begins"]
+
+
+def test_reservation__staff_create__end_same_as_begin(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+
+    graphql.login_with_superuser()
+    data = get_staff_create_data(reservation_unit)
+    data["endsAt"] = data["beginsAt"]
+    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation must end after it begins"]
+    assert Reservation.objects.exists() is False
 
 
 def test_reservation__staff_create__begin_date_in_the_past(graphql):
