@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from tilavarauspalvelu.typing import EmailAttachment
+from utils.date_utils import end_time_as_timedelta, time_as_timedelta
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import TimeSlot
@@ -86,7 +87,15 @@ def validate_reservable_times_overlap(timeslots: list[TimeSlot]) -> None:
             other_begin = other_timeslot["begin"]
             other_end = other_timeslot["end"]
 
-            if (begin == other_begin and end == other_end) or (begin < other_end <= end or end > other_begin >= begin):
+            begin_delta = time_as_timedelta(begin)
+            other_begin_delta = time_as_timedelta(other_begin)
+            # An end time of 00:00 is the end of the day.
+            end_delta = end_time_as_timedelta(end)
+            other_end_delta = end_time_as_timedelta(other_end)
+
+            begins_before_other_ends = begin_delta < other_end_delta
+            other_begins_before_end = other_begin_delta < end_delta
+            if begins_before_other_ends and other_begins_before_end:
                 msg = (
                     f"Timeslot {i} ({begin.isoformat()} - {end.isoformat()}) overlaps with "
                     f"timeslot {j} ({other_begin.isoformat()} - {other_end.isoformat()})."

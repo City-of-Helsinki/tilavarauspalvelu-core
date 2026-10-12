@@ -152,6 +152,32 @@ def test_validate_reservable_times_begin_end(timeslots, errors):
                 ],
                 errors=["Timeslot 1 (10:00:00 - 18:00:00) overlaps with timeslot 2 (15:00:00 - 00:00:00)."],
             ),
+            "overlap_inside_timeslot_ending_at_midnight": TimeslotParams(
+                timeslots=[
+                    TimeSlot(
+                        begin=datetime.time(hour=20, minute=0),
+                        end=datetime.time(hour=0, minute=0),
+                    ),
+                    TimeSlot(
+                        begin=datetime.time(hour=21, minute=0),
+                        end=datetime.time(hour=22, minute=0),
+                    ),
+                ],
+                errors=["Timeslot 1 (20:00:00 - 00:00:00) overlaps with timeslot 2 (21:00:00 - 22:00:00)."],
+            ),
+            "overlap_both_end_time_on_midnight": TimeslotParams(
+                timeslots=[
+                    TimeSlot(
+                        begin=datetime.time(hour=20, minute=0),
+                        end=datetime.time(hour=0, minute=0),
+                    ),
+                    TimeSlot(
+                        begin=datetime.time(hour=22, minute=0),
+                        end=datetime.time(hour=0, minute=0),
+                    ),
+                ],
+                errors=["Timeslot 1 (20:00:00 - 00:00:00) overlaps with timeslot 2 (22:00:00 - 00:00:00)."],
+            ),
             "same_timeslots": TimeslotParams(
                 timeslots=[
                     TimeSlot(
