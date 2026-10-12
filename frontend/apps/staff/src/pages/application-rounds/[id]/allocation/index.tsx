@@ -173,8 +173,7 @@ function ApplicationRoundAllocation({
     // skip if the reservation unit is not selected (it is required)
     skip: queryVariables.reservationUnit === 0,
     pollInterval: ALLOCATION_POLL_INTERVAL_MS,
-    // NOTE required otherwise this returns stale data when filters change
-    // there is an issue with the caches (sometimes returns incorrect data, not stale but incorrect)
+    // Always fetch, because other staff users allocate at the same time
     fetchPolicy: "network-only",
     variables: queryVariables,
     onError: () => {
@@ -217,8 +216,7 @@ function ApplicationRoundAllocation({
       unit: [unitFilter],
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
     },
-    // NOTE returns incorrectly filtered data if we enable cache
-    fetchPolicy: "no-cache",
+    fetchPolicy: "cache-and-network",
   });
 
   // NOTE totalCount is fine, but we need to query the things we want to count otherwise it's off by a mile.
