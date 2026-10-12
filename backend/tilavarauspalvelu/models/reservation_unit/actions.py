@@ -29,8 +29,10 @@ from tilavarauspalvelu.tasks import (
 )
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
+    datetime_difference,
     local_date,
     local_datetime,
+    local_datetime_exists,
     local_datetime_max,
     local_datetime_min,
     local_end_of_day,
@@ -280,12 +282,17 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             if start_datetime.date() < on_date:
                 start_datetime = local_start_of_day(on_date)
 
+            # A reservation can end at midnight at the end of the day.
             if end_datetime.date() > on_date:
-                end_datetime = local_end_of_day(on_date)
+                next_date = on_date + datetime.timedelta(days=1)
+                end_datetime = local_start_of_day(next_date)
 
             while start_datetime < end_datetime:
+                time_left = datetime_difference(start_datetime=start_datetime, end_datetime=end_datetime)
+                start_exists = local_datetime_exists(start_datetime)
+
                 # Don't include times at the end timespans that are too small
-                if end_datetime - start_datetime >= min_duration:
+                if start_exists and time_left >= min_duration:
                     possible_start_times.add(start_datetime.time())
 
                 start_datetime += interval_timedelta

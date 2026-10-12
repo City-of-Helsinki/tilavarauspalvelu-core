@@ -21,6 +21,7 @@ __all__ = [
     "local_date",
     "local_date_string",
     "local_datetime",
+    "local_datetime_exists",
     "local_datetime_max",
     "local_datetime_min",
     "local_datetime_string",
@@ -143,6 +144,18 @@ def local_end_of_day(_date: datetime.date | datetime.datetime | None = None, /) 
     if _date is None:
         _date = local_date()
     return datetime.datetime.combine(_date, datetime.time.max, tzinfo=DEFAULT_TIMEZONE)
+
+
+def local_datetime_exists(_datetime: datetime.datetime, /) -> bool:
+    """
+    Check that the given datetime in the local timezone exists on the wall clock.
+    The spring daylight saving time change skips the hour from 03:00 to 04:00.
+    """
+    datetime_utc = _datetime.astimezone(datetime.UTC)
+    round_trip = datetime_utc.astimezone(DEFAULT_TIMEZONE)
+    wall_clock = _datetime.replace(tzinfo=None)
+    round_trip_wall_clock = round_trip.replace(tzinfo=None)
+    return wall_clock == round_trip_wall_clock
 
 
 def local_iso_format(_datetime: datetime.datetime, /) -> str:
