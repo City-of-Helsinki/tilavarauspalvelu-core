@@ -20,6 +20,7 @@ const { i18n } = i18nconfig;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  agentRules: false,
   reactStrictMode: true,
   // NOTE default worker count uses os.cpus() which ignores container CPU limits
   // and spawns too many workers (OOM in memory limited containers)
