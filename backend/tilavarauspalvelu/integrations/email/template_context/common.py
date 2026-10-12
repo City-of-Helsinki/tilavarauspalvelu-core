@@ -362,8 +362,19 @@ def params_for_access_code_section(*, section: ApplicationSection) -> dict[str, 
 
     allocations_using_access_codes: defaultdict[int, dict[Weekday, dict[str, str]]] = defaultdict(dict)
 
+    # The access code can begin on the previous day, so take the weekday from the reservation itself.
+    section_reservations = section.actions.get_reservations()
+    reservation_begin_pairs = section_reservations.values_list("pk", "begins_at")
+    reservation_begins: dict[int, datetime.datetime] = dict(reservation_begin_pairs)
+
     for validity in response.access_code_validity:
-        weekday = Weekday.from_week_day(validity.access_code_begins_at.weekday())
+        begins_at = reservation_begins.get(validity.reservation_id)
+        if begins_at is None:
+            continue
+
+        local_begins_at = begins_at.astimezone(DEFAULT_TIMEZONE)
+        begin_weekday = local_begins_at.weekday()
+        weekday = Weekday.from_week_day(begin_weekday)
 
         allocation = all_allocations[validity.reservation_series_id].get(weekday)
         if allocation is None:
