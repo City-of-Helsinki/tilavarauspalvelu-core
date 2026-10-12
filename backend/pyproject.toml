@@ -42,6 +42,7 @@ Pillow = "12.3.0"
 psycopg2 = "2.9.13"
 python-dateutil = "2.9.0.post0"
 redis = { version = "6.4.0", extras = ["hiredis"] }
+requests = "2.34.2"
 sentry-sdk = "2.71.0"
 social-auth-app-django = "5.7.0"
 stamina = "26.1.0"
@@ -83,6 +84,7 @@ pytest-cov = "7.1.0"
 pytest-django = "4.14.0"
 pytest-split = "0.11.0"
 pytest-xdist = "3.8.0"
+responses = "0.26.3"
 
 [tool.poetry.group.lint.dependencies]
 # Dependencies only required for linting.
