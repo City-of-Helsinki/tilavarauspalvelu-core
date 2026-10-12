@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<form id="keycloak-redirect-form" method="post" action="{{ action_url }}">
+    {% csrf_token %}
+    {% for key, value in params.items %}
+    <input type="hidden" name="{{ key }}" value="{{ value }}">
+    {% endfor %}
+    <noscript>
+        <button type="submit">Helsinki Login</button>
+    </noscript>
+</form>
+<script>
+    document.getElementById("keycloak-redirect-form").submit();
+</script>
+</body>
+</html>
