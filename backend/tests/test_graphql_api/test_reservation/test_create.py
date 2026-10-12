@@ -1074,6 +1074,96 @@ def test_reservation__create__reservation_block_whole_day__back_to_back_whole_da
     assert reservation.state == ReservationStateChoice.CREATED
 
 
+# The clocks move from 03:00 to 04:00 on the night of 2026-03-29, so that day has 23 hours.
+@freezegun.freeze_time(local_datetime(2026, 3, 27, 12))
+def test_reservation__create__reservation_block_whole_day__buffers_on_daylight_saving_time_change_day(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        reservation_block_whole_day=True,
+    )
+
+    graphql.login_with_regular_user()
+
+    input_data = {
+        "beginsAt": local_datetime(2026, 3, 29, 10).isoformat(),
+        "endsAt": local_datetime(2026, 3, 29, 12).isoformat(),
+        "reservationUnit": reservation_unit.pk,
+    }
+
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+    assert response.has_errors is False, response.errors
+
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+
+    assert reservation.buffer_time_before == datetime.timedelta(hours=9)
+    assert reservation.buffer_time_after == datetime.timedelta(hours=12)
+
+
+@freezegun.freeze_time(local_datetime(2026, 3, 27, 12))
+def test_reservation__create__reservation_block_whole_day__back_to_back__before_daylight_saving_time_change_day(
+    graphql,
+):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        reservation_block_whole_day=True,
+    )
+
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2026, 3, 29, 10),
+        ends_at=local_datetime(2026, 3, 29, 12),
+        state=ReservationStateChoice.CONFIRMED,
+    )
+    ReservationUnitHierarchy.refresh()
+
+    graphql.login_with_regular_user()
+
+    input_data = {
+        "beginsAt": local_datetime(2026, 3, 28).isoformat(),
+        "endsAt": local_datetime(2026, 3, 29).isoformat(),
+        "reservationUnit": reservation_unit.pk,
+    }
+
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+    assert response.has_errors is False, response.errors
+
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    assert reservation.begins_at == local_datetime(2026, 3, 28)
+    assert reservation.ends_at == local_datetime(2026, 3, 29)
+    assert reservation.buffer_time_before == datetime.timedelta()
+    assert reservation.buffer_time_after == datetime.timedelta()
+
+
+@freezegun.freeze_time(local_datetime(2026, 3, 27, 12))
+def test_reservation__create__reservation_block_whole_day__back_to_back__on_daylight_saving_time_change_day(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        reservation_block_whole_day=True,
+    )
+
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2026, 3, 28),
+        ends_at=local_datetime(2026, 3, 29),
+        state=ReservationStateChoice.CONFIRMED,
+    )
+    ReservationUnitHierarchy.refresh()
+
+    graphql.login_with_regular_user()
+
+    input_data = {
+        "beginsAt": local_datetime(2026, 3, 29, 10).isoformat(),
+        "endsAt": local_datetime(2026, 3, 29, 12).isoformat(),
+        "reservationUnit": reservation_unit.pk,
+    }
+
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+    assert response.has_errors is False, response.errors
+
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    assert reservation.begins_at == local_datetime(2026, 3, 29, 10)
+    assert reservation.ends_at == local_datetime(2026, 3, 29, 12)
+    assert reservation.buffer_time_before == datetime.timedelta(hours=9)
+    assert reservation.buffer_time_after == datetime.timedelta(hours=12)
+
+
 @freezegun.freeze_time("2021-01-01 12:00")
 @pytest.mark.parametrize(
     ("new_reservation_begin_delta", "error_message"),

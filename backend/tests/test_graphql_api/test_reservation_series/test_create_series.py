@@ -637,6 +637,33 @@ def test_reservation_series__create_series__block_whole_day(graphql):
     assert reservations[0].buffer_time_after == datetime.timedelta(hours=12)
 
 
+def test_reservation_series__create_series__block_whole_day__over_daylight_saving_time_change(graphql):
+    reservation_unit = ReservationUnitFactory.create(reservation_block_whole_day=True)
+    user = graphql.login_with_superuser()
+
+    # The clocks move from 03:00 to 04:00 on the night of 2026-03-29, so that day has 23 hours.
+    data = get_minimal_series_data(
+        reservation_unit,
+        user,
+        weekdays=[Weekday.SUNDAY.value],
+        beginDate=datetime.date(2026, 3, 22).isoformat(),
+        endDate=datetime.date(2026, 3, 29).isoformat(),
+    )
+    response = graphql(CREATE_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation_series = ReservationSeries.objects.get(pk=response.first_query_object["pk"])
+    reservations = list(reservation_series.reservations.order_by("begins_at").all())
+    assert len(reservations) == 2
+
+    assert reservations[0].buffer_time_before == datetime.timedelta(hours=10)
+    assert reservations[0].buffer_time_after == datetime.timedelta(hours=12)
+
+    assert reservations[1].buffer_time_before == datetime.timedelta(hours=9)
+    assert reservations[1].buffer_time_after == datetime.timedelta(hours=12)
+
+
 @patch_method(PindoraService.create_access_code)
 def test_reservation_series__create_series__access_type_access_code(graphql):
     reservation_unit = ReservationUnitFactory.create(access_types__access_type=AccessType.ACCESS_CODE)

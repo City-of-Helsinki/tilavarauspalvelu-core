@@ -37,7 +37,6 @@ from utils.date_utils import (
     local_datetime_min,
     local_end_of_day,
     local_start_of_day,
-    time_as_timedelta,
 )
 from utils.external_service.errors import ExternalServiceError
 
@@ -163,7 +162,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
 
     def get_actual_before_buffer(
         self,
-        reservation_begin: datetime.datetime | datetime.time,
+        reservation_begin: datetime.datetime,
         override: datetime.timedelta | None = None,
     ) -> datetime.timedelta:
         """
@@ -176,14 +175,16 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         but the override can not be used for reservation units that block the whole day.
         """
         if self.reservation_unit.reservation_block_whole_day:
-            return time_as_timedelta(reservation_begin)
+            start_of_day = local_start_of_day(reservation_begin)
+            return datetime_difference(start_datetime=start_of_day, end_datetime=reservation_begin)
+
         if override is not None:
             return override
         return self.reservation_unit.buffer_time_before
 
     def get_actual_after_buffer(
         self,
-        reservation_end: datetime.datetime | datetime.time,
+        reservation_end: datetime.datetime,
         override: datetime.timedelta | None = None,
     ) -> datetime.timedelta:
         """
@@ -197,10 +198,15 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         but the override can not be used for reservation units that block the whole day.
         """
         if self.reservation_unit.reservation_block_whole_day:
-            delta = time_as_timedelta(reservation_end)
-            if delta == datetime.timedelta():  # midnight
-                return delta
-            return datetime.timedelta(hours=24) - delta
+            start_of_day = local_start_of_day(reservation_end)
+            local_reservation_end = reservation_end.astimezone(DEFAULT_TIMEZONE)
+            if local_reservation_end == start_of_day:
+                return datetime.timedelta()
+
+            next_date = start_of_day.date() + datetime.timedelta(days=1)
+            start_of_next_day = local_start_of_day(next_date)
+            return datetime_difference(start_datetime=reservation_end, end_datetime=start_of_next_day)
+
         if override is not None:
             return override
         return self.reservation_unit.buffer_time_after
