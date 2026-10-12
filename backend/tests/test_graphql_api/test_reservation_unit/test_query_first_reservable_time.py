@@ -2365,6 +2365,51 @@ def test__reservation_unit__first_reservable_time__extra_long_interval(graphql, 
     assert is_closed(response) is False
 
 
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__extra_long_interval__after_midnight(graphql, reservation_unit):
+    """
+    Make sure that on the days after the first day of the Reservable Time Span,
+    the intervals start from local midnight, like in the start time check of a new reservation.
+
+    ┌────────────────────────────────────────────────────┐
+    │ █ = Reservation                                    │
+    │ ░ = Not reservable                                 │
+    │ ▁ = Reservable                                     │
+    │ ═ = Valid reservation times due to interval        │
+    ├────────────────────────────────────────────────────┤
+    │ reservation_unit                                   │
+    │   0   2   4   6   8   10  12  14  16  18  20  22   │
+    │ 6 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░████████ │
+    │ 7 ██▁▁▁▁▁▁░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │
+    │      ═  ═                                          │
+    └────────────────────────────────────────────────────┘
+    """
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_90_MINUTES.value
+    reservation_unit.save()
+
+    # 6th Jan 20:00 - 7th Jan 04:00 (8h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(day=6, hour=20),
+        end_datetime=_datetime(day=7, hour=4),
+    )
+
+    # 6th Jan 20:00 - 7th Jan 00:30 (4.5h)
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
+        begins_at=_datetime(day=6, hour=20),
+        ends_at=_datetime(day=7, hour=0, minute=30),
+    )
+
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    response = graphql(reservation_units_reservable_query())
+    assert response.has_errors is False, response
+    assert frt(response) == dt(day=7, hour=1, minute=30)
+    assert is_closed(response) is False
+
+
 ########################################################################################################################
 
 
@@ -3082,3 +3127,4 @@ def test__reservation_unit__first_reservable_time__access_type__frt_after_filter
     assert response.has_errors is False, response
     assert frt(response) == dt(day=12)
     assert frt_access_type(response) == AccessType.PHYSICAL_KEY
+
