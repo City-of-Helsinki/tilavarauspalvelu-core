@@ -12,6 +12,7 @@ from utils.date_utils import (
     DEFAULT_TIMEZONE,
     combine,
     datetime_difference,
+    datetime_range_as_string,
     get_periods_between,
     local_date,
     local_datetime,
@@ -308,3 +309,30 @@ def test_date_utils__get_periods_between__end_time_same_as_start_time():
     msg = "End time cannot be at or before start time if on the same day."
     with pytest.raises(ValueError, match=exact(msg)):
         list(get_periods_between(start_date, end_date, start_time, end_time, tzinfo=DEFAULT_TIMEZONE))
+
+
+def test_date_utils__datetime_range_as_string():
+    start_datetime = local_datetime(2026, 10, 24, 20, 0)
+    end_datetime = local_datetime(2026, 10, 24, 22, 0)
+
+    result = datetime_range_as_string(start_datetime=start_datetime, end_datetime=end_datetime)
+
+    assert result == "2026-10-24 20:00-22:00"
+
+
+def test_date_utils__datetime_range_as_string__ends_at_midnight():
+    start_datetime = local_datetime(2026, 10, 24, 22, 0)
+    end_datetime = local_datetime(2026, 10, 25, 0, 0)
+
+    result = datetime_range_as_string(start_datetime=start_datetime, end_datetime=end_datetime)
+
+    assert result == "2026-10-24 22:00-24:00"
+
+
+def test_date_utils__datetime_range_as_string__ends_on_another_day():
+    start_datetime = local_datetime(2026, 10, 24, 22, 0)
+    end_datetime = local_datetime(2026, 10, 25, 2, 0)
+
+    result = datetime_range_as_string(start_datetime=start_datetime, end_datetime=end_datetime)
+
+    assert result == "2026-10-24 22:00-2026-10-25 02:00"

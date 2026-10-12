@@ -394,7 +394,7 @@ def datetime_range_as_string(*, start_datetime: datetime.datetime, end_datetime:
         end_str = "max"
     elif end_date == start_date:
         end_str = end_datetime.strftime("%H:%M")
-    elif end_date == start_date + datetime.timedelta(days=1) and end_date == datetime.time.min:
+    elif end_date == start_date + datetime.timedelta(days=1) and end_datetime.time() == datetime.time.min:
         end_str = "24:00"
     else:
         end_str = end_datetime.strftime(strformat)
