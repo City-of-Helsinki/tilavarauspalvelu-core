@@ -24,7 +24,7 @@ from tilavarauspalvelu.models import Reservation, ReservationStatistic, Reservat
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from tilavarauspalvelu.models.reservation_statistic.queryset import statistics_retention_cutoff
 from tilavarauspalvelu.tasks import delete_pindora_reservation_task
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, utc_datetime
 from utils.db import Now
 from utils.mixins import SerializableModelManagerMixin
 
@@ -366,7 +366,7 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
 
     def unfinished(self) -> Self:
         """Reservations that have not completed checkout in time."""
-        now = local_datetime()
+        now = utc_datetime()
 
         max_checkout_time = datetime.timedelta(minutes=settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES)
         draft_expires_at = now - max_checkout_time

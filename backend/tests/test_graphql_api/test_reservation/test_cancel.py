@@ -6,6 +6,7 @@ from decimal import Decimal
 
 import pytest
 from django.test import override_settings
+from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -157,6 +158,27 @@ def test_reservation__cancel__fails_when_cancellation_time_is_over(graphql):
     response = graphql(CANCEL_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation time cannot be changed because the cancellation period has expired.",
+    ]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+
+
+# 23.5 real hours before the reservation, but 24.5 hours on the wall clock.
+@freeze_time("2026-03-28 11:30:00+02:00")
+def test_reservation__cancel__fails_when_cancellation_time_is_over__over_daylight_saving_time_change(graphql):
+    reservation = ReservationFactory.create_for_cancellation(
+        begins_at=local_datetime(2026, 3, 29, 12),
+        ends_at=local_datetime(2026, 3, 29, 13),
+        reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(hours=24),
+    )
+
+    graphql.login_with_superuser()
+    data = get_cancel_data(reservation)
+    response = graphql(CANCEL_MUTATION, input_data=data)
+
     assert response.field_error_messages() == [
         "Reservation time cannot be changed because the cancellation period has expired.",
     ]

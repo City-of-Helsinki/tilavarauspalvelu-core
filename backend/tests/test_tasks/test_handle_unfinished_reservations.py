@@ -74,6 +74,23 @@ def test_handle_unfinished_reservations__direct__free__do_not_delete_too_early(s
     assert Reservation.objects.exists() is True
 
 
+# Five minutes after the clocks moved from 03:00 to 04:00 local time.
+@freeze_time("2026-03-29 01:05:00+00:00")
+def test_handle_unfinished_reservations__direct__free__do_not_delete_too_early__after_daylight_saving_time_change(
+    settings,
+):
+    settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
+
+    ReservationFactory.create(
+        created_at=local_datetime() - datetime.timedelta(minutes=1),
+        state=ReservationStateChoice.CREATED,
+    )
+
+    handle_unfinished_reservations_task()
+
+    assert Reservation.objects.exists() is True
+
+
 @patch_method(PindoraClient.delete_reservation)
 def test_handle_unfinished_reservations__direct__free__delete_from_pindora(settings):
     settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
