@@ -53,9 +53,9 @@ function pluck(patterns, outputFile) {
 // No, since the project doesn't use those and they are not included in our query generation either.
 //
 // NOTE these patterns are same as graphql.config.ts
-const common_patterns = ["packages/ui/**/!(*.d|gql-types).{ts,tsx}"];
-const admin_patterns = ["apps/staff/**/!(*.d|gql-types).{ts,tsx}", ...common_patterns];
-const customer_patterns = ["apps/customer/**/!(*.d|gql-types).{ts,tsx}", ...common_patterns];
+const common_patterns = ["packages/ui/**/!(*.d|gql-types|*.test).{ts,tsx}"];
+const admin_patterns = ["apps/staff/**/!(*.d|gql-types|*.test).{ts,tsx}", ...common_patterns];
+const customer_patterns = ["apps/customer/**/!(*.d|gql-types|*.test).{ts,tsx}", ...common_patterns];
 
 mkdirSync(OUTPUT_DIR, { recursive: true });
 
