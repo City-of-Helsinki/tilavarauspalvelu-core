@@ -106,7 +106,6 @@ function transformOrderBy(orderBy: string | null): ApplicationSectionOrderingCho
   }
 }
 
-/// NOTE might have some cache issues (because it collides with the other sections query)
 export const APPLICATION_SECTIONS_QUERY = gql`
   query ApplicationSections(
     $applicationRound: Int!
