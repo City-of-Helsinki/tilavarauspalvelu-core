@@ -11,7 +11,7 @@ from django.urls import reverse
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.verkkokauppa.order.types import WebShopOrderStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.models import PaymentOrder, Reservation
+from tilavarauspalvelu.models import PaymentOrder, Reservation, ReservationStatistic
 from utils.date_utils import local_datetime
 
 from tests.factories import (
@@ -96,3 +96,39 @@ def test_reservation_admin__deny_with_refund__future_invoice_is_cancelled(api_cl
     assert payment_order.status == OrderStatus.CANCELLED
 
     assert VerkkokauppaAPIClient.cancel_order.call_count == 1
+
+
+# ── Deny without refund ──
+
+
+def test_reservation_admin__deny_without_refund__updates_statistics(
+    api_client, settings, django_capture_on_commit_callbacks
+):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    user = UserFactory.create_superuser()
+    api_client.force_login(user)
+
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create(
+            state=ReservationStateChoice.CONFIRMED,
+            begins_at=local_datetime() + datetime.timedelta(days=7),
+            ends_at=local_datetime() + datetime.timedelta(days=7, hours=1),
+        )
+    deny_reason = ReservationDenyReasonFactory.create()
+
+    url = reverse("admin:tilavarauspalvelu_reservation_changelist")
+    data = {
+        "action": "deny_reservations_without_refund",
+        helpers.ACTION_CHECKBOX_NAME: [reservation.pk],
+        "confirmed": "true",
+        "deny_reason": deny_reason.pk,
+    }
+    with django_capture_on_commit_callbacks(execute=True):
+        response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 302
+
+    statistic = ReservationStatistic.objects.get(reservation=reservation)
+    assert statistic.state == ReservationStateChoice.DENIED
+    assert statistic.deny_reason == deny_reason.pk

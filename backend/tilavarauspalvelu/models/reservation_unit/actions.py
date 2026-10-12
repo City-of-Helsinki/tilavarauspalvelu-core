@@ -23,6 +23,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import OriginHaukiResource, PaymentProduct, Reservation, ReservationUnit
 from tilavarauspalvelu.tasks import (
+    create_statistics_for_reservations_task,
     notify_reservation_on_access_type_change_task,
     refresh_reservation_unit_accounting_task,
 )
@@ -484,6 +485,9 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         updated_reservations = list(qs.order_by("pk").values_list("pk", flat=True))
 
         qs.update(access_type=models.F("new_access_type"))
+
+        if settings.SAVE_RESERVATION_STATISTICS:
+            create_statistics_for_reservations_task.delay_on_commit(reservation_pks=updated_reservations)
 
         # Send emails to reservations that have changed their access type
         notify_reservation_on_access_type_change_task.delay_on_commit(reservation_pks=updated_reservations)
