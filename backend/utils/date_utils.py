@@ -53,6 +53,8 @@ __all__ = [
 ]
 
 
+# Python compares, adds and subtracts two datetimes in the same zone on the wall clock. This is wrong across
+# a daylight saving time change, so do these in UTC, e.g. with 'utc_datetime' or 'datetime_difference'.
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
@@ -394,7 +396,6 @@ def time_difference(_from: datetime.time, _to: datetime.time, /) -> datetime.tim
 
 def datetime_difference(*, start_datetime: datetime.datetime, end_datetime: datetime.datetime) -> datetime.timedelta:
     """Elapsed time between two datetimes. This is correct across a daylight saving time change."""
-    # Python subtracts datetimes with the same time zone by wall clock time, so subtract in UTC.
     return end_datetime.astimezone(datetime.UTC) - start_datetime.astimezone(datetime.UTC)
 
 

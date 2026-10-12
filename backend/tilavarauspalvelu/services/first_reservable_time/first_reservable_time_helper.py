@@ -385,7 +385,7 @@ class FirstReservableTimeHelper:
     def _cache_results(self) -> None:
         """Save the calculated FRT results to the cache."""
         cached_data: dict[str, dict[str, Any]] = {}
-        new_valid_until = self.now + datetime.timedelta(minutes=2)
+        new_valid_until = self.now.astimezone(datetime.UTC) + datetime.timedelta(minutes=2)
 
         for pk, frt in self.first_reservable_times.items():
             is_closed = self.reservation_unit_closed_statuses[pk]

@@ -179,7 +179,7 @@ class ReservationUnitValidator:
 
         now = local_datetime()
         cancel_period = cancel_rule.can_be_cancelled_time_before or datetime.timedelta()
-        last_cancellable_moment = begin - cancel_period
+        last_cancellable_moment = begin.astimezone(datetime.UTC) - cancel_period
 
         if now > last_cancellable_moment:
             msg = "Reservation time cannot be changed because the cancellation period has expired."

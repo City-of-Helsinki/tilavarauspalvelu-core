@@ -12,7 +12,7 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType
 from utils.auditlog_util import AuditLogger
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import utc_datetime
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
@@ -108,7 +108,7 @@ class PaymentOrder(models.Model):
     @property
     def expires_at(self) -> datetime.datetime:
         expiry_time = datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
-        return self.created_at.astimezone(DEFAULT_TIMEZONE) + expiry_time
+        return self.created_at.astimezone(datetime.UTC) + expiry_time
 
     @property
     def is_handled_payment(self) -> bool:
@@ -116,10 +116,12 @@ class PaymentOrder(models.Model):
 
     @property
     def is_overdue_handled_payment(self) -> bool:
-        return (
-            self.handled_payment_due_by is not None
-            and self.handled_payment_due_by.astimezone(DEFAULT_TIMEZONE) < local_datetime()
-        )
+        if self.handled_payment_due_by is None:
+            return False
+
+        due_by = self.handled_payment_due_by.astimezone(datetime.UTC)
+        now = utc_datetime()
+        return due_by < now
 
 
 AuditLogger.register(PaymentOrder)

@@ -155,6 +155,30 @@ def test_reservation__approve__paid__in_webshop__close_to_begin_date(graphql):
     assert handled_payment_due_by == local_datetime(2024, 1, 2, 11)
 
 
+@freeze_time(local_datetime(2026, 3, 28, 12))
+def test_reservation__approve__paid__in_webshop__close_to_begin_date__over_daylight_saving_time_change(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
+
+    # The clocks move from 03:00 to 04:00 on this night.
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2026, 3, 29, 4),
+        ends_at=local_datetime(2026, 3, 29, 5),
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation, price="10.59")
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    payment_order = reservation.payment_order
+    handled_payment_due_by = payment_order.handled_payment_due_by.astimezone(DEFAULT_TIMEZONE)
+    assert handled_payment_due_by == local_datetime(2026, 3, 29, 2)
+
+
 @patch_method(EmailService.send_reservation_confirmed_email)
 @patch_method(EmailService.send_reservation_created_staff_notification_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))

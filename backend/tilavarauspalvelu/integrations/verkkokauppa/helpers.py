@@ -18,7 +18,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.types import (
     WebShopOrderStatus,
 )
 from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, localized_short_weekday
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, localized_short_weekday, utc_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation, ReservationUnit
@@ -78,6 +78,10 @@ def get_verkkokauppa_order_params(
     preferred_language = reservation.user.get_preferred_language()
     reservation_unit_name = getattr(reservation_unit, f"name_{preferred_language}", reservation_unit.name)
     unit_name = getattr(reservation_unit.unit, f"name_{preferred_language}", reservation_unit.unit.name)
+
+    order_expiration = datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
+    last_valid_purchase_datetime = (utc_datetime() + order_expiration).astimezone(DEFAULT_TIMEZONE)
+
     items = [
         OrderItemParams(
             product_id=reservation_unit.payment_product.id,
@@ -131,9 +135,7 @@ def get_verkkokauppa_order_params(
             email=reservation.user.email,
             phone="",
         ),
-        last_valid_purchase_datetime=(
-            local_datetime() + datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
-        ),
+        last_valid_purchase_datetime=last_valid_purchase_datetime,
     )
 
 

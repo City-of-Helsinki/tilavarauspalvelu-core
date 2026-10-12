@@ -9,7 +9,7 @@ from query_optimizer import MultiField
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType
 from tilavarauspalvelu.models import PaymentOrder
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import datetime_difference, utc_datetime
 
 from .permissions import PaymentOrderPermission
 
@@ -63,7 +63,8 @@ class PaymentOrderNode(DjangoNode):
         if root.status not in OrderStatus.can_start_payment_statuses:
             return None
 
-        if root.expires_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        now = utc_datetime()
+        if root.expires_at <= now:
             return None
 
         return root.checkout_url or None
@@ -75,7 +76,8 @@ class PaymentOrderNode(DjangoNode):
         if root.status not in OrderStatus.can_start_payment_statuses:
             return None
 
-        time_left = root.expires_at.astimezone(DEFAULT_TIMEZONE) - local_datetime()
+        now = utc_datetime()
+        time_left = datetime_difference(start_datetime=now, end_datetime=root.expires_at)
 
         if time_left <= datetime.timedelta():
             return None

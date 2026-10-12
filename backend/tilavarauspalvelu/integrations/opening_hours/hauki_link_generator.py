@@ -8,7 +8,7 @@ from urllib.parse import quote_plus, urlencode
 
 from django.conf import settings
 
-from utils.date_utils import local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:
     import uuid
@@ -44,13 +44,15 @@ def generate_hauki_link(
 
     now = local_datetime()
     hauki_expire_time_minutes = 30
+    valid_until_utc = now.astimezone(datetime.UTC) + datetime.timedelta(minutes=hauki_expire_time_minutes)
+    valid_until = valid_until_utc.astimezone(DEFAULT_TIMEZONE)
 
     get_parameters_dict = {
         "hsa_source": settings.HAUKI_ORIGIN_ID,
         "hsa_username": user_email,
         "hsa_organization": organization_id,
         "hsa_created_at": now.isoformat(),
-        "hsa_valid_until": (now + datetime.timedelta(minutes=hauki_expire_time_minutes)).isoformat(),
+        "hsa_valid_until": valid_until.isoformat(),
         "hsa_resource": f"{settings.HAUKI_ORIGIN_ID}:{reservation_unit_uuid}",
         "hsa_has_organization_rights": "true",
     }

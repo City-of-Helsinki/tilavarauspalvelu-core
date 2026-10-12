@@ -726,8 +726,12 @@ class PindoraService:
         end = validity["end"]
         access_code_valid_minutes_before = validity["access_code_valid_minutes_before"]
         access_code_valid_minutes_after = validity["access_code_valid_minutes_after"]
-        access_code_begins_at = begin - datetime.timedelta(minutes=access_code_valid_minutes_before)
-        access_code_ends_at = end + datetime.timedelta(minutes=access_code_valid_minutes_after)
+        begin_utc = begin.astimezone(datetime.UTC)
+        end_utc = end.astimezone(datetime.UTC)
+        access_code_begins_at_utc = begin_utc - datetime.timedelta(minutes=access_code_valid_minutes_before)
+        access_code_ends_at_utc = end_utc + datetime.timedelta(minutes=access_code_valid_minutes_after)
+        access_code_begins_at = access_code_begins_at_utc.astimezone(DEFAULT_TIMEZONE)
+        access_code_ends_at = access_code_ends_at_utc.astimezone(DEFAULT_TIMEZONE)
 
         return PindoraAccessCodePeriod(
             access_code_begins_at=access_code_begins_at,

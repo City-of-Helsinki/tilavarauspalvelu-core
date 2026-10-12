@@ -18,7 +18,7 @@ from tilavarauspalvelu.enums import (
     TermsOfUseTypeChoices,
 )
 from utils.auditlog_util import AuditLogger
-from utils.date_utils import local_datetime
+from utils.date_utils import local_datetime, utc_datetime
 from utils.db import Now
 from utils.fields.model import TextChoicesField
 
@@ -302,7 +302,7 @@ class ApplicationRound(models.Model):
     def _(self) -> ApplicationRoundReservationCreationStatusChoice:
         from tilavarauspalvelu.models import ReservationSeries
 
-        now = local_datetime()
+        now = utc_datetime()
         timeout = datetime.timedelta(minutes=settings.APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES)
 
         if self.handled_at is None:
