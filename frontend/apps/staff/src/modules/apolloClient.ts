@@ -7,6 +7,7 @@ import { relayStylePagination } from "@apollo/client/utilities";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import type { ApolloLink, NormalizedCacheObject } from "@apollo/client";
 import { enchancedFetch, errorLink } from "@ui/modules/apollo/helpers";
+import { keyArgsWithoutPaging } from "@ui/modules/apollo/pagination";
 import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
 import { buildGraphQLUrl } from "@ui/modules/urlBuilder";
 
@@ -44,14 +45,14 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
       typePolicies: {
         Query: {
           fields: {
-            reservationUnits: relayStylePagination(),
-            units: relayStylePagination(),
-            reservations: relayStylePagination(["onlyWithHandlingPermission"]),
-            applications: relayStylePagination(),
-            applicationSections: relayStylePagination(),
-            allocatedTimeSlots: relayStylePagination(),
-            bannerNotifications: relayStylePagination(["target"]),
-            rejectedOccurrences: relayStylePagination(),
+            reservationUnits: relayStylePagination(keyArgsWithoutPaging),
+            units: relayStylePagination(keyArgsWithoutPaging),
+            reservations: relayStylePagination(keyArgsWithoutPaging),
+            applications: relayStylePagination(keyArgsWithoutPaging),
+            applicationSections: relayStylePagination(keyArgsWithoutPaging),
+            allocatedTimeSlots: relayStylePagination(keyArgsWithoutPaging),
+            bannerNotifications: relayStylePagination(keyArgsWithoutPaging),
+            rejectedOccurrences: relayStylePagination(keyArgsWithoutPaging),
           },
         },
       },
