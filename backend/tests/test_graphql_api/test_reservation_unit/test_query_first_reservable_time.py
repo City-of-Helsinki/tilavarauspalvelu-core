@@ -3128,3 +3128,30 @@ def test__reservation_unit__first_reservable_time__access_type__frt_after_filter
     assert frt(response) == dt(day=12)
     assert frt_access_type(response) == AccessType.PHYSICAL_KEY
 
+
+def test__reservation_unit__first_reservable_time__access_type__frt_at_local_midnight(graphql, reservation_unit):
+    # Reservations open at local midnight, which is still the previous day in UTC.
+    reservation_unit.reservation_begins_at = _datetime(day=10)
+    reservation_unit.save()
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(day=8),
+        end_datetime=_datetime(day=12),
+    )
+
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=_date(day=1),
+    )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.ACCESS_CODE,
+        begin_date=_date(day=10),
+    )
+
+    response = graphql(reservation_units_reservable_query_access_type(reservable_date_start=_date(day=1).isoformat()))
+    assert response.has_errors is False, response
+    assert frt(response) == dt(day=10)
+    assert frt_access_type(response) == AccessType.ACCESS_CODE
