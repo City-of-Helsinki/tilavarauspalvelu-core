@@ -53,19 +53,17 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
   // -> render the component without currentUser
   // -> run useEffect
   // -> redraw component with currentUser
-  if (currentUser) {
-    apolloClient.writeQuery({
-      query: CurrentUserDocument,
-      data: {
-        currentUser,
-      },
-    });
-  }
+  apolloClient.writeQuery({
+    query: CurrentUserDocument,
+    data: {
+      currentUser,
+    },
+  });
   if (handlingData) {
     apolloClient.writeQuery({
       query: HandlingDataDocument,
       data: handlingData,
-      variables: getHandlingDataVariables(),
+      variables: props.handlingVariables,
     });
   }
   if (notificationsData) {
@@ -100,6 +98,7 @@ function formatUrlPath(router: Router): string {
 type AppOwnProps = {
   currentUser: CurrentUserQuery["currentUser"];
   handlingData: HandlingDataQuery | null;
+  handlingVariables: HandlingDataQueryVariables | null;
   notificationsData: ShowNotificationsListQuery | null;
   envConfig: StaffEnvConfig;
 };
@@ -122,9 +121,10 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
     });
 
     // Need to fetch all data required by the Navigation component otherwise it flashes
+    const handlingVariables = getHandlingDataVariables();
     const handlingPromise = client.query<HandlingDataQuery, HandlingDataQueryVariables>({
       query: HandlingDataDocument,
-      variables: getHandlingDataVariables(),
+      variables: handlingVariables,
     });
 
     const notificationPromise = client.query<ShowNotificationsListQuery, ShowNotificationsListQueryVariables>({
@@ -150,6 +150,7 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
       envConfig: commonProps,
       currentUser: currentUserData.currentUser,
       handlingData,
+      handlingVariables,
       notificationsData: notificationsData,
     };
   } catch (err) {
@@ -157,7 +158,14 @@ MyApp.getInitialProps = async (context: AppContext): Promise<AppOwnProps & AppIn
     logGraphQLError(error);
   }
 
-  return { ...ctx, envConfig: commonProps, currentUser: null, handlingData: null, notificationsData: null };
+  return {
+    ...ctx,
+    envConfig: commonProps,
+    currentUser: null,
+    handlingData: null,
+    notificationsData: null,
+    handlingVariables: null,
+  };
 };
 
 // NOTE inferred type problem so casting to FC
