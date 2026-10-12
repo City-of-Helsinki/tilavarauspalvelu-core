@@ -57,8 +57,8 @@ class ReservationUnitValidator:
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NOT_DIRECT_BOOKABLE)
 
     def validate_begin_before_end(self, begin: datetime.datetime, end: datetime.datetime) -> None:
-        if begin > end:
-            msg = "Reservation cannot end before it begins"
+        if begin >= end:
+            msg = "Reservation must end after it begins"
             raise ValidationError(msg, code=error_codes.RESERVATION_DURATION_INVALID)
 
     def validate_duration_is_allowed(self, duration: datetime.timedelta) -> None:
