@@ -915,6 +915,7 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     # --- Tunnistamo / Social Auth -----------------------------------------------------------------------------------
 
     TUNNISTAMO_BASE_URL = "https://fake.test.tunnistamo.com"
+    SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = "https://fake.test.tunnistamo.com"
     SOCIAL_AUTH_TUNNISTAMO_SECRET = "SOCIAL_AUTH_TUNNISTAMO_SECRET"  # noqa: S105 # nosec # NOSONAR
     SOCIAL_AUTH_TUNNISTAMO_KEY = "SOCIAL_AUTH_TUNNISTAMO_KEY"
 
