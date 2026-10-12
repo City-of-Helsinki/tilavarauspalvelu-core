@@ -149,9 +149,7 @@ class ApplicationRound(models.Model):
                 violation_error_message="Application round must be handled before it can be sent",
             ),
             models.CheckConstraint(
-                condition=(
-                    models.Q(handled_at=None) | models.Q(application_period_ends_at__date__lt=models.F("handled_at"))
-                ),
+                condition=(models.Q(handled_at=None) | models.Q(application_period_ends_at__lt=models.F("handled_at"))),
                 name="handling_after_application_period_end",
                 violation_error_message="Application round can only be handled after its application round has ended",
             ),
