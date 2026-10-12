@@ -15,7 +15,7 @@ from social_django.strategy import DjangoStrategy
 from config.auth import ProxyTunnistamoOIDCAuthBackend
 from tilavarauspalvelu.integrations.helauth.clients import KeyCloakClient
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, utc_datetime
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceRequestError
 
@@ -97,7 +97,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
             return None
 
         leeway = 10
-        cutoff = local_datetime() - datetime.timedelta(seconds=leeway)
+        cutoff = utc_datetime() - datetime.timedelta(seconds=leeway)
         profile_access_token: str | None = session.get("profile_access_token")
         profile_access_token_expires_at: datetime.datetime | None = session.get("profile_access_token_expires_at")
 
@@ -122,7 +122,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
             return None
 
         leeway = 10
-        cutoff = local_datetime() - datetime.timedelta(seconds=leeway)
+        cutoff = utc_datetime() - datetime.timedelta(seconds=leeway)
         profile_refresh_token: str | None = session.get("profile_refresh_token")
         profile_refresh_token_expires_at: datetime.datetime | None = session.get("profile_refresh_token_expires_at")
 
@@ -161,7 +161,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
             SentryLogger.log_message(msg, details=details, level="warning")
             return None
 
-        now = local_datetime()
+        now = utc_datetime()
         session["profile_access_token"] = response["access_token"]
         session["profile_access_token_expires_at"] = now + datetime.timedelta(seconds=response["expires_in"])
         session["profile_refresh_token"] = response["refresh_token"]

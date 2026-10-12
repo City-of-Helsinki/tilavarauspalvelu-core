@@ -10,7 +10,7 @@ from social_django.strategy import DjangoStrategy
 
 from config.auth import ProxyTunnistamoOIDCAuthBackend
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, utc_datetime
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 
 if TYPE_CHECKING:
@@ -40,7 +40,7 @@ class KeyCloakClient(BaseExternalServiceClient):
             return None
 
         leeway = 60
-        cutoff = local_datetime() - datetime.timedelta(seconds=leeway)
+        cutoff = utc_datetime() - datetime.timedelta(seconds=leeway)
         keycloak_access_token: str | None = session.get("keycloak_access_token")
         keycloak_access_token_expires_at: datetime.datetime | None = session.get("keycloak_access_token_expires_at")
 
@@ -92,7 +92,7 @@ class KeyCloakClient(BaseExternalServiceClient):
 
             return None
 
-        now = local_datetime()
+        now = utc_datetime()
         session["keycloak_access_token"] = response["access_token"]
         session["keycloak_access_token_expires_at"] = now + datetime.timedelta(seconds=response["expires_in"])
 

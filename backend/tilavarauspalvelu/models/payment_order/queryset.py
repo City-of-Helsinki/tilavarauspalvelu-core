@@ -12,7 +12,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelO
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.models import PaymentOrder
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
-from utils.date_utils import local_datetime
+from utils.date_utils import local_datetime, utc_datetime
 
 __all__ = [
     "PaymentOrderManager",
@@ -22,7 +22,7 @@ __all__ = [
 
 class PaymentOrderQuerySet(ModelQuerySet[PaymentOrder]):
     def expired_direct_payments(self) -> Self:
-        now = local_datetime()
+        now = utc_datetime()
         expiration = datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
         expires_at = now - expiration
 
@@ -33,7 +33,7 @@ class PaymentOrderQuerySet(ModelQuerySet[PaymentOrder]):
         )
 
     def expired_handled_payments(self) -> Self:
-        now = local_datetime()
+        now = utc_datetime()
         expiration = datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
         expires_at = now - expiration
 
