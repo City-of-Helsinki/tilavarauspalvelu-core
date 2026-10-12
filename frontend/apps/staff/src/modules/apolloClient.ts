@@ -40,6 +40,10 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
       query: {
         fetchPolicy: isServer ? "no-cache" : "cache-first",
       },
+      // The client lives for the whole session, so fetch on mount to not show old data from an earlier page
+      watchQuery: {
+        fetchPolicy: "cache-and-network",
+      },
     },
     cache: new InMemoryCache({
       typePolicies: {

@@ -70,7 +70,8 @@ function MyApp<T>(props: AppProps<T> & AppOwnProps): React.ReactElement {
   const { i18n } = useTranslation();
   const { hasUserAcceptedStatistics: statisticsAccepted, recheck } = useHasUserAcceptedStatistics();
 
-  const client = createApolloClient(apiBaseUrl ?? "", undefined);
+  // Keep one client, otherwise every render drops the cache and fetches all active queries again
+  const [client] = useState(() => createApolloClient(apiBaseUrl ?? ""));
   const language = getLocalizationLang(i18n.language);
 
   const enableMatomo = isMatomoEnabled && statisticsAccepted;
