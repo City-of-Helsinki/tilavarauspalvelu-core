@@ -308,9 +308,6 @@ importers:
       react-use:
         specifier: ^17.6.1
         version: 17.6.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      reactjs-popup:
-        specifier: ^2.0.6
-        version: 2.0.6(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       roarr:
         specifier: ^7.21.7
         version: 7.21.7
@@ -4946,15 +4943,8 @@ packages:
     resolution: {integrity: sha512-E8LUcbtBWt20bbl2YoHfx4ZDBdxVTfOKtCZn9cDSJ4l6/nuoApcpIBcj47t2wZoVX8g2ZHuMHbiShgCR1T5Sog==}
     engines: {node: '>=0.10.0'}
 
-  reactjs-popup@2.0.6:
-    resolution: {integrity: sha512-A+tt+x9wdgZiZjv0e2WzYLD3IfFwJALaRaqwrCSXGjo0iQdsry/EtBEbQXRSmQs7cHmOi5eytCiSlOm8k4C+dg==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      react: '>=16'
-      react-dom: '>=16'
-
-  readdirp@5.0.0:
-    resolution: {integrity: sha512-9u/XQ1pvrQtYyMpZe7DXKv2p5CNvyVwzUB6uhLAnQwHMSgKMBR62lc7AHljaeteeHXn11XTAaLLUVZYVZyuRBQ==}
+  readdirp@5.1.1:
+    resolution: {integrity: sha512-Kko+Y5XQ6fM+Ce3dq3m9YGxnacYZYl9cA1wZjaF3Vbry2L3i1qVg8+CAgNPsXRArPMUMCaOR7oa9Nqntc43JKA==}
     engines: {node: '>= 20.19.0'}
 
   redent@3.0.0:
@@ -8469,7 +8459,7 @@ snapshots:
 
   chokidar@5.0.0:
     dependencies:
-      readdirp: 5.0.0
+      readdirp: 5.1.1
 
   chrome-trace-event@1.0.4: {}
 
@@ -10018,12 +10008,7 @@ snapshots:
 
   react@19.3.0: {}
 
-  reactjs-popup@2.0.6(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
-    dependencies:
-      react: 19.3.0
-      react-dom: 19.3.0(react@19.3.0)
-
-  readdirp@5.0.0: {}
+  readdirp@5.1.1: {}
 
   redent@3.0.0:
     dependencies:

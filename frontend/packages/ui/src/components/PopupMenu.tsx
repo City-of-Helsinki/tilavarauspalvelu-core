@@ -1,21 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import React from "react";
 import { useTranslation } from "next-i18next";
-import { FocusTrap } from "focus-trap-react";
 import { IconMenuDots } from "hds-react";
 import styled from "styled-components";
 import { Flex, toggleButtonCss } from "../styled";
+import { Popover } from "./Popover";
 
-const Container = styled.div`
-  position: relative;
-`;
-
-const Popup = styled(Flex).attrs({ $gap: "none" })`
+const Menu = styled(Flex).attrs({ $gap: "none" })`
   background-color: white;
   padding: 0;
-  position: absolute;
-  right: 0;
-  z-index: var(--tilavaraus-stack-popup-menu);
 
   border: 1px solid var(--color-black-50);
   :not(:has(> button:disabled)) {
@@ -44,13 +36,6 @@ const ListButton = styled.button`
   }
 `;
 
-/* required to allow clicking the button to close it */
-const Overlay = styled.div`
-  position: absolute;
-  z-index: var(--tilavaraus-stack-popup-menu-overlay);
-  inset: 0;
-`;
-
 const ToggleButton = styled.button`
   ${toggleButtonCss}
 `;
@@ -67,110 +52,44 @@ interface PopupMenuProps {
   className?: string;
 }
 
-// This is relative to the button, but that causes few other issues
-// - the popup is forced to open on the left side so using it on the left of a page would cause an overflow
-// - the popup will expand containers the buttons are inside of (like <table>, not the cell)
 export function PopupMenu({ items, style, className }: PopupMenuProps): React.ReactElement {
-  const buttonRef = useRef<HTMLDivElement>(null);
-  const firstMenuItemRef = useRef<HTMLButtonElement>(null);
-
   const { t } = useTranslation();
-
-  useEffect(() => {
-    if (firstMenuItemRef.current) {
-      firstMenuItemRef.current.focus();
-    }
-  });
-
-  const [isOpen, setIsOpen] = useState(false);
-  const [containerDiv, setContainerDiv] = useState<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (buttonRef.current) {
-      setContainerDiv(buttonRef.current);
-    }
-  }, []);
-
-  const openPopup = () => {
-    setIsOpen(true);
-    document.addEventListener("click", closePopup);
-  };
-
-  const closePopup = () => {
-    setIsOpen(false);
-    document.removeEventListener("click", closePopup);
-  };
 
   const disabled = items.every((i) => i.disabled); // returns `true` for an empty array
 
   return (
-    <Container ref={buttonRef} style={style} className={className}>
-      <ToggleButton
-        onClick={(e) => {
-          e.stopPropagation();
-          openPopup();
-        }}
-        disabled={disabled}
-        type="button"
-        aria-label={isOpen ? t("common:close") : t("common:show")}
+    <div style={style} className={className}>
+      <Popover
+        align="end"
+        renderTrigger={(triggerProps, isOpen) => (
+          <ToggleButton
+            {...triggerProps}
+            disabled={disabled}
+            type="button"
+            aria-label={isOpen ? t("common:close") : t("common:show")}
+          >
+            <IconMenuDots />
+          </ToggleButton>
+        )}
       >
-        <IconMenuDots />
-      </ToggleButton>
-      {isOpen
-        ? createPortal(
-            <PopupContent items={items} closePopup={closePopup} firstMenuItemRef={firstMenuItemRef} />,
-            containerDiv ?? document.body
-          )
-        : null}
-    </Container>
-  );
-}
-
-function PopupContent({
-  items,
-  closePopup,
-  firstMenuItemRef,
-}: {
-  items: PopupMenuProps["items"];
-  closePopup: () => void;
-  firstMenuItemRef: React.RefObject<HTMLButtonElement | null>;
-}) {
-  const canBeTrapped = items.some((i) => !i.disabled);
-  return (
-    <>
-      <Overlay
-        onKeyUp={closePopup}
-        onClick={(e) => {
-          e.stopPropagation();
-          closePopup();
-        }}
-        role="button"
-        tabIndex={-1}
-      />
-      <FocusTrap focusTrapOptions={{ allowOutsideClick: true }} active={canBeTrapped}>
-        <Popup>
-          {items.map((i, index) => (
-            <ListButton
-              key={i.name}
-              ref={index === 0 ? firstMenuItemRef : undefined}
-              type="button"
-              disabled={i.disabled}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") {
-                  closePopup();
-                }
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                closePopup();
-                i.onClick(e);
-              }}
-            >
-              {i.name}
-            </ListButton>
-          ))}
-        </Popup>
-      </FocusTrap>
-    </>
+        {(close) => (
+          <Menu>
+            {items.map((i) => (
+              <ListButton
+                key={i.name}
+                type="button"
+                disabled={i.disabled}
+                onClick={(e) => {
+                  close();
+                  i.onClick(e);
+                }}
+              >
+                {i.name}
+              </ListButton>
+            ))}
+          </Menu>
+        )}
+      </Popover>
+    </div>
   );
 }
