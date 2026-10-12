@@ -87,7 +87,6 @@ export const BannerNotificationsList = ({ target, displayAmount = 2 }: BannerNot
     variables: {
       target,
     },
-    fetchPolicy: "cache-first",
   });
   const notificationsTarget = data?.bannerNotifications;
   const notificationsAll = data?.bannerNotificationsAll;
