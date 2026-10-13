@@ -6,6 +6,7 @@ from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.integrations.verkkokauppa.merchants.exceptions import GetMerchantError
 from tilavarauspalvelu.integrations.verkkokauppa.merchants.types import CreateMerchantParams, UpdateMerchantParams
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
@@ -116,7 +117,7 @@ class PaymentMerchantForm(forms.ModelForm):
 
 
 @admin.register(PaymentMerchant)
-class PaymentMerchantAdmin(admin.ModelAdmin):
+class PaymentMerchantAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Form
     form = PaymentMerchantForm
     readonly_fields = ["id"]
