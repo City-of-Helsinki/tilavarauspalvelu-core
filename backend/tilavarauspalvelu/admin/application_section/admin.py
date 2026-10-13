@@ -53,6 +53,7 @@ class ReservationUnitOptionInline(admin.TabularInline):
     model = ReservationUnitOption
     form = ReservationUnitOptionInlineAdminForm
     extra = 0
+    autocomplete_fields = ["reservation_unit"]
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet:
         return super().get_queryset(request).select_related("reservation_unit__unit")

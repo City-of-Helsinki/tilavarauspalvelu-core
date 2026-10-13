@@ -764,16 +764,6 @@ msgid "Reservation purpose"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_series/form.py
-msgid "Reservation unit"
-msgstr ""
-
-#: tilavarauspalvelu/admin/application_section/form.py
-msgid "Reservation unit for to this option."
-msgstr ""
-
-#: tilavarauspalvelu/admin/application_section/form.py
 msgid "Preferred order"
 msgstr ""
 
@@ -786,6 +776,12 @@ msgid "Locked"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_series/form.py
+msgid "Reservation unit"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
 msgid "Preferred order of the reservation unit option."
 msgstr ""
 
@@ -795,6 +791,10 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
 msgid "Locked reservation unit options can no longer receive allocations."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Reservation unit for to this option."
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
