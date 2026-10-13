@@ -13,6 +13,7 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, Weekday
+from utils.auditlog_util import AuditLogger
 from utils.db import SubqueryArray
 from utils.fields.model import TextChoicesField
 
@@ -199,3 +200,6 @@ class ReservationSeries(models.Model):
         if len(access_types) == 1:
             return AccessTypeWithMultivalued(access_types[0])
         return AccessTypeWithMultivalued.MULTIVALUED
+
+
+AuditLogger.register(ReservationSeries)

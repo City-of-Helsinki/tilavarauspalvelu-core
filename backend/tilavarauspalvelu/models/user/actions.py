@@ -130,6 +130,7 @@ class UserActions:
         )
 
         LogEntry.objects.get_for_objects(reservations).delete()
+        LogEntry.objects.get_for_objects(reservation_series).delete()
 
     def anonymize_user_applications(self) -> None:
         application_sections = ApplicationSection.objects.filter(application__user=self.user)
