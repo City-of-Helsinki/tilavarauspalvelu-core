@@ -8,6 +8,7 @@ from lookup_property import L
 from more_admin_filters.filters import MultiSelectRelatedOnlyDropdownFilter
 from rangefilter.filters import DateRangeFilterBuilder
 
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.models import ReservationUnitAccessType
 
 if TYPE_CHECKING:
@@ -20,7 +21,7 @@ class ReservationUnitFilter(MultiSelectRelatedOnlyDropdownFilter):
 
 
 @admin.register(ReservationUnitAccessType)
-class ReservationUnitAccessTypeAdmin(admin.ModelAdmin):
+class ReservationUnitAccessTypeAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # List
     list_display = [
         "id",
