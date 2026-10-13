@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING, Any
 from django.conf import settings
 from django.utils.functional import classproperty
 from graphene_django_extensions.utils import get_nested
-from requests import HTTPError
 from rest_framework.status import HTTP_200_OK
+from social_core.exceptions import SocialAuthBaseException
 from social_django.models import DjangoStorage
 from social_django.strategy import DjangoStrategy
 
@@ -142,22 +142,34 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
                 # can only be used to fetch new access and refresh tokens for Helsinki profile for the same audience.
                 response: RefreshResponse = cls.oidc_backend.refresh_token(token=profile_refresh_token)
                 access_token = response["access_token"]
-            except HTTPError as error:
+            except SocialAuthBaseException as error:
                 #
                 # Last resort, try keycloak refresh
                 access_token = KeyCloakClient.refresh_token(user=user, session=session)
                 if access_token is None:
                     msg = "Unable to refresh Helsinki profile token"
-                    details = {"user": user.pk, "error": error.response.text}
+                    details = {
+                        "user": user.pk,
+                        "code": error.code,
+                        "provider_code": error.provider_code,
+                        "status_code": error.status_code,
+                        "detail": error.detail,
+                    }
                     SentryLogger.log_message(msg, details=details, level="warning")
                     return None
 
         try:
             # Fetch new profile tokens.
             response: TokenResponse = cls.oidc_backend.get_token_for_profile(access_token=access_token)
-        except HTTPError as error:
+        except SocialAuthBaseException as error:
             msg = "Unable to get Helsinki profile token"
-            details = {"user": user.pk, "error": error.response.text}
+            details = {
+                "user": user.pk,
+                "code": error.code,
+                "provider_code": error.provider_code,
+                "status_code": error.status_code,
+                "detail": error.detail,
+            }
             SentryLogger.log_message(msg, details=details, level="warning")
             return None
 
