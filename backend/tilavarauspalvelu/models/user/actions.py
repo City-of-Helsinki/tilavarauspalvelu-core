@@ -151,6 +151,7 @@ class UserActions:
         )
 
         LogEntry.objects.get_for_objects(application_sections).delete()
+        LogEntry.objects.get_for_objects(applications).delete()
 
     def can_anonymize(self) -> UserAnonymizationInfo:
         month_ago = local_datetime() - relativedelta(months=1)

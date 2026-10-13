@@ -16,6 +16,7 @@ from tilavarauspalvelu.admin.application.filters import (
 )
 from tilavarauspalvelu.admin.application.form import ApplicationAdminForm
 from tilavarauspalvelu.admin.application_section.admin import ApplicationSectionInline
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.enums import ApplicationStatusChoice
 from tilavarauspalvelu.models import Application
 
@@ -27,7 +28,7 @@ if TYPE_CHECKING:
 
 
 @admin.register(Application)
-class ApplicationAdmin(admin.ModelAdmin):
+class ApplicationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Functions
     actions = ["reset_applications"]
     search_fields = [

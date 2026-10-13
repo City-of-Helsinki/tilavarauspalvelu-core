@@ -89,8 +89,11 @@ def test_anonymization__application():
     )
     application = ApplicationFactory.create(user=mr_anonymous)
     app_section = ApplicationSectionFactory.create(application=application)
+    other_application = ApplicationFactory.create()
 
+    LogEntry.objects.log_create(application, force_log=True, action=LogEntry.Action.CREATE)
     LogEntry.objects.log_create(app_section, force_log=True, action=LogEntry.Action.CREATE)
+    LogEntry.objects.log_create(other_application, force_log=True, action=LogEntry.Action.CREATE)
 
     mr_anonymous.actions.anonymize_user_applications()
     app_section.refresh_from_db()
@@ -126,7 +129,9 @@ def test_anonymization__application():
     assert application.organisation_city != ANONYMIZED
 
     # Audit log entries contain the original personal data
+    assert LogEntry.objects.get_for_object(application).count() == 0
     assert LogEntry.objects.get_for_object(app_section).count() == 0
+    assert LogEntry.objects.get_for_object(other_application).count() == 1
 
 
 def test_anonymization__reservation():
