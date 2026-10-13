@@ -114,7 +114,7 @@ class ReservationSeriesAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
             super()
             .get_queryset(request)
             .select_related(
-                "reservation_unit",
+                "reservation_unit__unit",
                 "allocated_time_slot",
                 "user",
                 "age_group",
