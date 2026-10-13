@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from rangefilter.filters import DateRangeFilterBuilder
 
 from tilavarauspalvelu.admin.log_entry.filters import LogEntryResourceTypeFilter
+from tilavarauspalvelu.admin.log_entry.paginator import LogEntryPaginator
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
@@ -24,6 +25,7 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
     # Both features query all log entries on every page load. Use the date range filter for dates.
     date_hierarchy = None
     show_full_result_count = False
+    paginator = LogEntryPaginator
     list_select_related = ["content_type", "actor"]
     list_display = [
         "created",
