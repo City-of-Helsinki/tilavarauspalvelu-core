@@ -11,6 +11,7 @@ from django_nh3.models import Nh3CharField
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.constants import COORDINATE_SYSTEM_ID
+from utils.auditlog_util import AuditLogger
 
 if TYPE_CHECKING:
     import datetime
@@ -158,3 +159,6 @@ class Unit(models.Model):
     @property
     def lon(self) -> float | None:
         return self.coordinates.x if self.coordinates else None
+
+
+AuditLogger.register(Unit)
