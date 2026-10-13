@@ -10,6 +10,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TabbedTranslationAdmin
 
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitImporter
 from tilavarauspalvelu.models import Unit, UnitGroup
@@ -36,7 +37,7 @@ class UnitGroupInlineAdmin(admin.TabularInline):
 
 
 @admin.register(Unit)
-class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
+class UnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
     # Functions
     actions = ["update_from_tprek"]
     search_fields = [
