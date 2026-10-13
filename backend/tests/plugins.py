@@ -157,7 +157,15 @@ def recreate_stale_test_database(config: pytest.Config) -> None:
     Recreate a reused test database with migrations if the model or migration files
     have changed since it was last created, e.g., after switching branches.
     """
-    if not config.option.reuse_db or config.option.create_db or config.cache is None:
+    if not config.option.reuse_db or config.cache is None:
+        return
+
+    if config.option.create_db:
+        # A database recreated with '--nomigrations' must not keep the hash of the old migrated database.
+        # A new hash is saved only after a successful setup with migrations.
+        cache_key = get_schema_hash_cache_key(config)
+        if cache_key is not None:
+            config.cache.set(cache_key, None)
         return
 
     schema_hash = get_schema_hash()
