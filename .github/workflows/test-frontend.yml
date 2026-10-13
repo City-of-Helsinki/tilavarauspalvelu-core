@@ -145,6 +145,33 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+  test-ui-package:
+    name: Shared ui package unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache-dependency-path: frontend/pnpm-lock.yaml
+          cache: "pnpm"
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Test shared ui package
+        working-directory: frontend
+        run: |
+          pnpm codegen:ui
+          pnpm --filter=ui test
+
   sonarcloud-staff:
     needs: test-staff-ui
     name: "SonarCloud scan (staff)"
