@@ -9,7 +9,7 @@ from django.db import models
 from tilavarauspalvelu.enums import AccessType, ApplicationStatusChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Application, User
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_end_of_day
+from utils.date_utils import local_datetime, local_end_of_day, utc_datetime
 
 from .attachements import get_reservation_ical_attachment
 from .find_language import get_application_email_language, get_reservation_email_language, get_series_email_language
@@ -56,7 +56,8 @@ class EmailService:
         if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
             return
 
-        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        now = utc_datetime()
+        if reservation.ends_at <= now:
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -89,7 +90,8 @@ class EmailService:
         if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
             return
 
-        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        now = utc_datetime()
+        if reservation.ends_at <= now:
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -150,7 +152,8 @@ class EmailService:
         if reservation.state != ReservationStateChoice.CONFIRMED:
             return
 
-        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        now = utc_datetime()
+        if reservation.ends_at <= now:
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -245,7 +248,8 @@ class EmailService:
         if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
             return
 
-        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        now = utc_datetime()
+        if reservation.ends_at <= now:
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -273,7 +277,8 @@ class EmailService:
         if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
             return
 
-        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        now = utc_datetime()
+        if reservation.ends_at <= now:
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -351,7 +356,8 @@ class EmailService:
         if reservation.type not in ReservationTypeChoice.types_created_by_the_reservee:
             return
 
-        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        now = utc_datetime()
+        if reservation.ends_at <= now:
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -663,7 +669,8 @@ class EmailService:
         if reservation.type != ReservationTypeChoice.SEASONAL:
             return
 
-        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        now = utc_datetime()
+        if reservation.ends_at <= now:
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
@@ -723,7 +730,8 @@ class EmailService:
         if reservation.type != ReservationTypeChoice.SEASONAL:
             return
 
-        if reservation.ends_at.astimezone(DEFAULT_TIMEZONE) <= local_datetime():
+        now = utc_datetime()
+        if reservation.ends_at <= now:
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)

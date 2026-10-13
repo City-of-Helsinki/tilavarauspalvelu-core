@@ -33,10 +33,10 @@ from utils.date_utils import (
     local_date,
     local_datetime,
     local_datetime_exists,
-    local_datetime_max,
-    local_datetime_min,
     local_end_of_day,
     local_start_of_day,
+    utc_datetime_max,
+    utc_datetime_min,
 )
 from utils.external_service.errors import ExternalServiceError
 
@@ -438,13 +438,13 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         return ReservationStartInterval(self.reservation_unit.reservation_start_interval).as_number
 
     def is_reservable_at(self, moment: datetime.datetime) -> bool:
-        moment = moment.astimezone(DEFAULT_TIMEZONE)
+        moment = moment.astimezone(datetime.UTC)
 
-        reservation_begins = self.reservation_unit.reservation_begins_at or local_datetime_min()
-        reservation_begins = reservation_begins.astimezone(DEFAULT_TIMEZONE)
+        reservation_begins = self.reservation_unit.reservation_begins_at or utc_datetime_min()
+        reservation_begins = reservation_begins.astimezone(datetime.UTC)
 
-        reservation_ends = self.reservation_unit.reservation_ends_at or local_datetime_max()
-        reservation_ends = reservation_ends.astimezone(DEFAULT_TIMEZONE)
+        reservation_ends = self.reservation_unit.reservation_ends_at or utc_datetime_max()
+        reservation_ends = reservation_ends.astimezone(datetime.UTC)
 
         if reservation_begins == reservation_ends:
             return False

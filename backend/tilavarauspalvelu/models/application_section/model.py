@@ -13,7 +13,7 @@ from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
 from utils.auditlog_util import AuditLogger
-from utils.date_utils import local_datetime
+from utils.date_utils import utc_datetime
 from utils.db import Now, SubqueryCount
 from utils.fields.model import TextChoicesField
 from utils.mixins import SerializableModelMixin
@@ -189,7 +189,8 @@ class ApplicationSection(SerializableModelMixin, models.Model):
 
     @status.override
     def _(self) -> ApplicationSectionStatusChoice:
-        if self.application.application_round.application_period_ends_at > local_datetime():
+        now = utc_datetime()
+        if self.application.application_round.application_period_ends_at > now:
             return ApplicationSectionStatusChoice.UNALLOCATED
 
         reservation_unit_options = list(

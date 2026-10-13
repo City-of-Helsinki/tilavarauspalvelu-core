@@ -296,6 +296,44 @@ def test_reservation__create__reservation_unit_reservation_in_the_past_or_future
         assert reservation.state == ReservationStateChoice.CREATED
 
 
+# The clocks move from 04:00 back to 03:00 at 01:00 UTC on 2026-10-25, so the hour from 03:00 to 04:00 occurs twice.
+@freezegun.freeze_time("2026-10-24 12:00:00+03:00")
+def test_reservation__create__reservation_unit_reservation_ends_in_the_repeated_hour(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        reservation_ends_at=datetime.datetime.fromisoformat("2026-10-25T03:20:00+02:00"),
+    )
+
+    graphql.login_with_superuser()
+    input_data = {
+        "beginsAt": "2026-10-25T03:30:00+03:00",
+        "endsAt": "2026-10-25T04:30:00+02:00",
+        "reservationUnit": reservation_unit.pk,
+    }
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    assert reservation.begins_at == datetime.datetime.fromisoformat("2026-10-25T03:30:00+03:00")
+    assert reservation.ends_at == datetime.datetime.fromisoformat("2026-10-25T04:30:00+02:00")
+
+
+@freezegun.freeze_time("2026-10-25 01:10:00+00:00")
+def test_reservation__create__begin_in_the_past_in_the_repeated_hour(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now()
+
+    graphql.login_with_superuser()
+    input_data = {
+        "beginsAt": "2026-10-25T03:30:00+03:00",
+        "endsAt": "2026-10-25T04:30:00+02:00",
+        "reservationUnit": reservation_unit.pk,
+    }
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+
+    assert response.field_error_messages() == ["Reservation cannot begin in the past."]
+    assert Reservation.objects.exists() is False
+
+
 class PublishTimeParams(NamedTuple):
     publish_begins_delta: int = 0
     publish_ends_delta: int = 0

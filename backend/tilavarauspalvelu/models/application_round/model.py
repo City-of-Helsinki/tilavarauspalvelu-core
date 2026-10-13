@@ -18,7 +18,7 @@ from tilavarauspalvelu.enums import (
     TermsOfUseTypeChoices,
 )
 from utils.auditlog_util import AuditLogger
-from utils.date_utils import local_datetime, utc_datetime
+from utils.date_utils import utc_datetime
 from utils.db import Now
 from utils.fields.model import TextChoicesField
 
@@ -185,7 +185,7 @@ class ApplicationRound(models.Model):
 
     @status.override
     def _(self) -> ApplicationRoundStatusChoice:
-        now = local_datetime()
+        now = utc_datetime()
         if self.sent_at is not None:
             return ApplicationRoundStatusChoice.RESULTS_SENT
         if self.handled_at is not None:

@@ -187,6 +187,24 @@ def test_reservation__cancel__fails_when_cancellation_time_is_over__over_dayligh
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
 
+# The clocks move from 04:00 back to 03:00 at 01:00 UTC on 2026-10-25, so the hour from 03:00 to 04:00 occurs twice.
+@freeze_time("2026-10-25 01:10:00+00:00")
+def test_reservation__cancel__fails_when_reservation_is_ongoing__in_the_repeated_hour(graphql):
+    reservation = ReservationFactory.create_for_cancellation(
+        begins_at=datetime.datetime.fromisoformat("2026-10-25T03:30:00+03:00"),
+        ends_at=datetime.datetime.fromisoformat("2026-10-25T04:30:00+02:00"),
+    )
+
+    graphql.login_with_superuser()
+    data = get_cancel_data(reservation)
+    response = graphql(CANCEL_MUTATION, input_data=data)
+
+    assert response.field_error_messages() == ["Past or ongoing reservations cannot be modified"]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+
+
 def test_reservation__cancel__fails_when_reservation_in_the_past(graphql):
     now = local_datetime()
     reservation = ReservationFactory.create_for_cancellation(
