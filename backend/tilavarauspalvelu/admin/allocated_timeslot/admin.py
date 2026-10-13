@@ -14,6 +14,7 @@ from tilavarauspalvelu.admin.allocated_timeslot.filters import (
     DayOfTheWeekFilter,
 )
 from tilavarauspalvelu.admin.allocated_timeslot.form import AllocatedTimeSlotAdminForm
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.models import AllocatedTimeSlot
 
 if TYPE_CHECKING:
@@ -23,7 +24,7 @@ if TYPE_CHECKING:
 
 
 @admin.register(AllocatedTimeSlot)
-class AllocatedTimeSlotAdmin(admin.ModelAdmin):
+class AllocatedTimeSlotAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Functions
     search_fields = [
         "day_of_the_week",
