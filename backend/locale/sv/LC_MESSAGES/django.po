@@ -19,6 +19,31 @@ msgstr ""
 msgid "Swedish"
 msgstr ""
 
+#: templates/admin/auditlog/logentry/pagination.html
+#: templates/admin/auditlog/logentry/search_form.html
+msgid "Show all"
+msgstr ""
+
+#: templates/admin/auditlog/logentry/pagination.html
+msgid "Save"
+msgstr ""
+
+#: templates/admin/auditlog/logentry/search_form.html
+msgid "Search"
+msgstr ""
+
+#: templates/admin/auditlog/logentry/search_form.html
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/auditlog/logentry/search_form.html
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr ""
+
 #: templates/admin/deny_reservation_confirmation.html
 #: templates/admin/reset_allocation_confirmation.html
 #: templates/email/email_tester.html
@@ -899,6 +924,12 @@ msgid "Search by username, email, first name or last name"
 msgstr ""
 
 #: tilavarauspalvelu/admin/log_entry/admin.py
+msgid ""
+"Search by object name or actor name. A number finds the log entries of the "
+"object with that ID."
+msgstr ""
+
+#: tilavarauspalvelu/admin/log_entry/admin.py
 msgid "Changes"
 msgstr ""
 
@@ -915,6 +946,10 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/log_entry/admin.py
 msgid "Resource"
+msgstr ""
+
+#: tilavarauspalvelu/admin/log_entry/filters.py
+msgid "Resource Type"
 msgstr ""
 
 #: tilavarauspalvelu/admin/log_entry/mixins.py
@@ -944,6 +979,12 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
 msgid "Reservable Time Spans updated."
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid ""
+"The merchant could not be loaded from the Merchant API. You cannot save "
+"changes to this merchant."
 msgstr ""
 
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
