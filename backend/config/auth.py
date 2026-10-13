@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 from django.conf import settings
 from helusers.auth import HelusersModelBackend
 from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
+from social_core.backends.open_id_connect import OpenIdConnectAuth
 
 from tilavarauspalvelu.models import User
 from utils.utils import update_query_params
@@ -48,6 +49,11 @@ class ProxyTunnistamoOIDCAuthBackend(TunnistamoOIDCAuth):
             params["kc_idp_hint"] = login_method_hint
 
         return params
+
+    def get_remote_jwks_keys(self, uri: str | None = None) -> list[dict[str, Any]]:
+        # Skips `helusers.tunnistamo_oidc.TunnistamoOIDCAuth.get_remote_jwks_keys`, which does not accept
+        # the `uri` argument from social-auth-core. Its default for keys without `alg` is also in social-auth-core.
+        return OpenIdConnectAuth.get_remote_jwks_keys(self, uri)
 
     def get_end_session_url(self, request: WSGIRequest, id_token: str) -> str | None:
         url = self.oidc_config().get("end_session_endpoint")
