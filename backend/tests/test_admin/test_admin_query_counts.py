@@ -14,6 +14,8 @@ from tests.factories import (
     ReservationUnitAccessTypeFactory,
     ReservationUnitFactory,
     ReservationUnitOptionFactory,
+    ReservationUnitPricingFactory,
+    TaxPercentageFactory,
     UserFactory,
 )
 
@@ -104,5 +106,35 @@ def test_admin_query_counts__reservation_unit_option_list__same_for_more_options
         reservation_unit=ReservationUnitFactory.create(),
         application_section=ApplicationSectionFactory.create(),
     )
+
+    assert count_queries(api_client, url) == query_count
+
+
+def test_admin_query_counts__reservation_unit_pricing_list__same_for_more_pricings(api_client):
+    user = UserFactory.create_superuser()
+    api_client.force_login(user)
+
+    ReservationUnitPricingFactory.create(tax_percentage=TaxPercentageFactory.create())
+    url = reverse("admin:tilavarauspalvelu_reservationunitpricing_changelist")
+    query_count = count_queries(api_client, url)
+
+    ReservationUnitPricingFactory.create(tax_percentage=TaxPercentageFactory.create())
+    ReservationUnitPricingFactory.create(tax_percentage=TaxPercentageFactory.create())
+
+    assert count_queries(api_client, url) == query_count
+
+
+# ── Change pages ──
+
+
+def test_admin_query_counts__reservation_unit_pricing_change__same_for_more_reservation_units(api_client):
+    user = UserFactory.create_superuser()
+    api_client.force_login(user)
+
+    pricing = ReservationUnitPricingFactory.create(tax_percentage=TaxPercentageFactory.create())
+    url = reverse("admin:tilavarauspalvelu_reservationunitpricing_change", args=[pricing.pk])
+    query_count = count_queries(api_client, url)
+
+    ReservationUnitFactory.create_batch(3)
 
     assert count_queries(api_client, url) == query_count
