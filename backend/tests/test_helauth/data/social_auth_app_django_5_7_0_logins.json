@@ -1,0 +1,107 @@
+{
+  "versions": {
+    "social-auth-app-django": "5.7.0",
+    "social-auth-core": "4.8.5",
+    "django-helusers": "1.1.0"
+  },
+  "users": [
+    {
+      "model": "tilavarauspalvelu.user",
+      "pk": 1,
+      "fields": {
+        "password": "!macD12uAx5Nga1WzeGrYWhy0SsOFamjclF6M83Ox",
+        "last_login": "2026-10-12T07:09:43.732Z",
+        "is_superuser": false,
+        "username": "u-n4pjuurpbrfxvhkvbq7uvdt3ee",
+        "first_name": "Matti",
+        "last_name": "Meikäläinen",
+        "email": "customer@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2026-10-12T07:09:43.709Z",
+        "uuid": "6f1e9a52-2f0c-4b7a-9d55-0c3f4a8e7b21",
+        "department_name": null,
+        "last_api_use": null,
+        "tvp_uuid": "aa1e6908-f2eb-4024-875d-ad8df990890f",
+        "preferred_language": "fi",
+        "date_of_birth": "2009-05-06",
+        "profile_id": "fake-profile-id",
+        "reservation_notification": "ONLY_HANDLING_REQUIRED",
+        "sent_email_about_deactivating_permissions": false,
+        "sent_email_about_anonymization": false,
+        "groups": [],
+        "user_permissions": [],
+        "ad_groups": []
+      }
+    },
+    {
+      "model": "tilavarauspalvelu.user",
+      "pk": 2,
+      "fields": {
+        "password": "",
+        "last_login": "2026-10-12T07:09:43.805Z",
+        "is_superuser": false,
+        "username": "u-bogwypt2ifhs5dazlzwsvh2loa",
+        "first_name": "Maija",
+        "last_name": "Virtanen",
+        "email": "staff.member@hel.fi",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2026-10-12T07:09:43.734Z",
+        "uuid": "0b8d6c3e-7a41-4f2e-8c19-5e6d2a9f4b70",
+        "department_name": null,
+        "last_api_use": null,
+        "tvp_uuid": "ce620ff6-d3fc-4b88-99d4-5ed1843539ab",
+        "preferred_language": "fi",
+        "date_of_birth": "1989-05-01",
+        "profile_id": "",
+        "reservation_notification": "ONLY_HANDLING_REQUIRED",
+        "sent_email_about_deactivating_permissions": false,
+        "sent_email_about_anonymization": false,
+        "groups": [],
+        "user_permissions": [],
+        "ad_groups": []
+      }
+    }
+  ],
+  "social_auths": [
+    {
+      "model": "social_django.usersocialauth",
+      "pk": 1,
+      "fields": {
+        "user": 1,
+        "provider": "tunnistamo",
+        "uid": "6f1e9a52-2f0c-4b7a-9d55-0c3f4a8e7b21",
+        "extra_data": {
+          "id": "6f1e9a52-2f0c-4b7a-9d55-0c3f4a8e7b21",
+          "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImZha2Uta2V5Y2xvYWstc2lnbmluZy1rZXkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2Zha2UudGVzdC50dW5uaXN0YW1vLmNvbS9hdXRoL3JlYWxtcy9oZWxzaW5raS10dW5uaXN0dXMiLCJzdWIiOiI2ZjFlOWE1Mi0yZjBjLTRiN2EtOWQ1NS0wYzNmNGE4ZTdiMjEiLCJhdWQiOiJTT0NJQUxfQVVUSF9UVU5OSVNUQU1PX0tFWSIsImF6cCI6IlNPQ0lBTF9BVVRIX1RVTk5JU1RBTU9fS0VZIiwidHlwIjoiSUQiLCJqdGkiOiIxN2M2YzNjYS0zYjE0LTQ1YjQtYjRjNS1jZDdiMGE0NWJlMjkiLCJleHAiOjE3OTE3ODkyODMsImlhdCI6MTc5MTc4ODk4MywiYXV0aF90aW1lIjoxNzkxNzg4OTgzLCJub25jZSI6ImVKWEw2Mmc1SU5GZTNwczZKSTg0QTVWZVNLcXd4WGFnNjdRemoySVdibnJPWGp3M2hjYUljQThHeklaTmtxRm0iLCJzaWQiOiIwZGI3ZmZjYy03NmEzLTQ2YWQtYWVkNi0yYTYzNmNhYjdhNDQiLCJlbWFpbCI6ImN1c3RvbWVyQGV4YW1wbGUuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImdpdmVuX25hbWUiOiJNYXR0aSIsImZhbWlseV9uYW1lIjoiTWVpa1x1MDBlNGxcdTAwZTRpbmVuIiwibmFtZSI6Ik1hdHRpIE1laWtcdTAwZTRsXHUwMGU0aW5lbiIsImFtciI6WyJzdW9taV9maSJdLCJsb2EiOiJzdWJzdGFudGlhbCIsImFkX2dyb3VwcyI6W119.ksDY2UBmKygkGjIgj0Yv56sZEJnVGhiJD9QlXR6BO3fiMXo1GlBYp4ZeGo68MLfI_3Wy6t2GzBb3egKepc4kWAAbXio1LLDnj2u5iTXD8H9DbHESF3KLhwlG9O1TEx5wkIjtR0jqbI8IBjPQg_eM4P0ObJtRr-dM7MwCgAG36l8fQdu1g1ckX8jAK7-xJSv8fq9MnqIDsgwsGpsyvNJ9cSL6OfqFjZaD6wtw72GBDyOXqCfFRCStubfOhir2aZHMC9RkOalF1hUV-a7BVbQRK25nhRX3OOQ_z8oyxj8rxUUXTjZ5-AhsQCc7Txx1tqXxuFMNiuN6TmSNv5jIKkA7xg",
+          "auth_time": 1791788983,
+          "token_type": "Bearer",
+          "access_token": "fake-keycloak-access-token",
+          "refresh_token": "fake-keycloak-refresh-token"
+        },
+        "created": "2026-10-12T07:09:43.715Z",
+        "modified": "2026-10-12T07:09:43.716Z"
+      }
+    },
+    {
+      "model": "social_django.usersocialauth",
+      "pk": 2,
+      "fields": {
+        "user": 2,
+        "provider": "tunnistamo",
+        "uid": "0b8d6c3e-7a41-4f2e-8c19-5e6d2a9f4b70",
+        "extra_data": {
+          "id": "0b8d6c3e-7a41-4f2e-8c19-5e6d2a9f4b70",
+          "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImZha2Uta2V5Y2xvYWstc2lnbmluZy1rZXkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2Zha2UudGVzdC50dW5uaXN0YW1vLmNvbS9hdXRoL3JlYWxtcy9oZWxzaW5raS10dW5uaXN0dXMiLCJzdWIiOiIwYjhkNmMzZS03YTQxLTRmMmUtOGMxOS01ZTZkMmE5ZjRiNzAiLCJhdWQiOiJTT0NJQUxfQVVUSF9UVU5OSVNUQU1PX0tFWSIsImF6cCI6IlNPQ0lBTF9BVVRIX1RVTk5JU1RBTU9fS0VZIiwidHlwIjoiSUQiLCJqdGkiOiIxODE1Zjc4NS00MzQ2LTRhZTMtYWY3MS00ZWJlY2E4N2E4YTQiLCJleHAiOjE3OTE3ODkyODMsImlhdCI6MTc5MTc4ODk4MywiYXV0aF90aW1lIjoxNzkxNzg4OTgzLCJub25jZSI6ImQ4YXpjcHdYUlEwT0Y3WlMxWG40dm9SdmEzV2ZhSUFkRkk3Z2o1akwzOWFqVk5SMFJudWRnNGFxaVJMS0x4eDkiLCJzaWQiOiI0Y2ZlZTU1OS1lMGI0LTQ5MDYtODI1Zi03MGYxOTE1YmUyOTciLCJlbWFpbCI6InN0YWZmLm1lbWJlckBoZWwuZmkiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZ2l2ZW5fbmFtZSI6Ik1haWphIiwiZmFtaWx5X25hbWUiOiJWaXJ0YW5lbiIsIm5hbWUiOiJNYWlqYSBWaXJ0YW5lbiIsImFtciI6WyJoZWxzaW5raWFkIl0sImxvYSI6ImxvdyIsImFkX2dyb3VwcyI6W119.rwq1coSA-hap-NNAnhtsN09fg5ucAoaW2PhPGV0j3N_EW8olX-jCbcgoaNmFfCHOs0UBbbdBZKZLBCQ8tvGLxzPUWfJt3SfX2yXv5oU1QUBQZqTflFUulxGxJm2CSfeyUjlVA4Hu_GrsT2Akzq50UQT8WHDKCYt3He_G_0XC-EViaVOFPF0guPgb2YSFPwXHixSlgCr8_CRzdb2UbciP4pknhYMUGNK4cOTvHBEoKYTCEhmHawJRfKftZgo3ivRk1PAgJ4ydqAgZ96i5TuVPUR3Or3te820pAGFvrCfXgbc_k9Ym1fhOA7jlZWsxPtw9O3RQbXqO4E04bJPVVLkGVA",
+          "auth_time": 1791788983,
+          "token_type": "Bearer",
+          "access_token": "fake-keycloak-access-token",
+          "refresh_token": "fake-keycloak-refresh-token"
+        },
+        "created": "2026-10-12T07:09:43.800Z",
+        "modified": "2026-10-12T07:09:43.801Z"
+      }
+    }
+  ]
+}
