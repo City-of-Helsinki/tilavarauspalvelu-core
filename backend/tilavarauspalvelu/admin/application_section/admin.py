@@ -18,6 +18,7 @@ from tilavarauspalvelu.admin.application_section.form import (
     ApplicationSectionAdminForm,
     ReservationUnitOptionInlineAdminForm,
 )
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.admin.suitable_time_range.admin import SuitableTimeRangeInline
 from tilavarauspalvelu.models import ApplicationSection, ReservationUnitOption
 from utils.utils import comma_sep_str
@@ -58,7 +59,7 @@ class ReservationUnitOptionInline(admin.TabularInline):
 
 
 @admin.register(ApplicationSection)
-class ApplicationSectionAdmin(admin.ModelAdmin):
+class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Functions
     search_fields = [
         "name",
