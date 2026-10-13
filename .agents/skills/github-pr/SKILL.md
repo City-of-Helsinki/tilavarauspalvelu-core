@@ -26,7 +26,7 @@ Put a URL in single quotes:
 
 ```bash
 .agents/skills/github-pr/github-pr 99
-.agents/skills/github-pr/github-pr 'https://github.com/City-of-Helsinki/tilavarauspalvelu-core/pull/99'
+.agents/skills/github-pr/github-pr 'https://github.com/City-of-Helsinki/tilavarauspalvelu/pull/99'
 ```
 
 The script validates the number. It prints the pull request with three lists of comments:
