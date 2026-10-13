@@ -34,10 +34,8 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
         "user_url",
     ]
     search_fields = [
-        "timestamp",
         "object_repr",
         "object_id",
-        "changes",
         "actor__first_name",
         "actor__last_name",
         "actor__username",
@@ -47,7 +45,7 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
             "timestamp",
             DateRangeFilterBuilder(
                 title=_("Created at"),
-                default_start=local_datetime() - relativedelta(years=2),  # Default value in field (not applied on load)
+                default_start=local_datetime() - relativedelta(months=3),
             ),
         ),
         "action",
