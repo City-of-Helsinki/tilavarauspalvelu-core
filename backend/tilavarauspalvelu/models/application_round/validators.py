@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 from rest_framework.exceptions import ValidationError
 
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import utc_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationRound
@@ -21,9 +21,9 @@ class ApplicationRoundValidator:
     application_round: ApplicationRound
 
     def validate_open_for_applications(self) -> None:
-        begin = self.application_round.application_period_begins_at.astimezone(DEFAULT_TIMEZONE)
-        end = self.application_round.application_period_ends_at.astimezone(DEFAULT_TIMEZONE)
-        now = local_datetime()
+        begin = self.application_round.application_period_begins_at
+        end = self.application_round.application_period_ends_at
+        now = utc_datetime()
 
         if begin < now <= end:
             return
