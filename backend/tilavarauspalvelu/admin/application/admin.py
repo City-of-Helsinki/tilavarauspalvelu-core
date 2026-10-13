@@ -2,8 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from admin_extra_buttons.decorators import button
+from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin import helpers
+from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
@@ -159,6 +162,11 @@ class ApplicationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
         "user",
         "application_round",
     ]
+
+    @button(label=_("Open in staff UI"), change_form=True)
+    def open_in_staff_ui(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+        url_base = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
+        return HttpResponseRedirect(f"{url_base}/kasittely/applications/{pk}")
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet:
         return (

@@ -173,6 +173,8 @@ msgid "Allocated end time."
 msgstr ""
 
 #: tilavarauspalvelu/admin/app_list.py
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+#: tilavarauspalvelu/admin/user/admin.py
 #, fuzzy
 #| msgctxt "ICAL"
 #| msgid "Reservation for %(name)s"
@@ -253,6 +255,12 @@ msgstr ""
 #: tilavarauspalvelu/admin/application/admin.py
 #: tilavarauspalvelu/admin/application_round/admin.py
 msgid "Notes"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Open in staff UI"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application/admin.py
@@ -2189,6 +2197,20 @@ msgstr ""
 #: tilavarauspalvelu/admin/user/admin.py
 msgid "Permissions"
 msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+#, fuzzy
+#| msgctxt "ICAL"
+#| msgid "Reservation for %(name)s"
+msgid "Reservation series"
+msgstr "Bokning för %(name)s"
+
+#: tilavarauspalvelu/admin/user/admin.py
+#, fuzzy
+#| msgctxt "Email"
+#| msgid "My applications"
+msgid "Applications"
+msgstr "Egna ansökningar"
 
 #: tilavarauspalvelu/api/gdpr/views.py
 msgid "User has upcoming or too recent reservations."
