@@ -3,13 +3,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from auditlog.admin import LogEntryAdmin as OriginalLogEntryAdmin
-from auditlog.filters import ResourceTypeFilter
 from auditlog.models import LogEntry
 from dateutil.relativedelta import relativedelta
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from rangefilter.filters import DateRangeFilterBuilder
 
+from tilavarauspalvelu.admin.log_entry.filters import LogEntryResourceTypeFilter
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
@@ -21,7 +21,9 @@ admin.site.unregister(LogEntry)
 
 @admin.register(LogEntry)
 class LogEntryAdmin(OriginalLogEntryAdmin):
-    date_hierarchy = "timestamp"
+    # Both features query all log entries on every page load. Use the date range filter for dates.
+    date_hierarchy = None
+    show_full_result_count = False
     list_select_related = ["content_type", "actor"]
     list_display = [
         "created",
@@ -49,7 +51,7 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
             ),
         ),
         "action",
-        ResourceTypeFilter,
+        LogEntryResourceTypeFilter,
     ]
     readonly_fields = [
         "created",
