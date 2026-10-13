@@ -185,13 +185,17 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
                 for delta in range((today - instance.begin_date).days)
             }
 
+            now_utc = now.astimezone(datetime.UTC)
+
             # If new reservation would already have started, don't create it.
-            if datetime.datetime.combine(today, instance.begin_time, tzinfo=DEFAULT_TIMEZONE) <= now:
+            todays_begin = datetime.datetime.combine(today, instance.begin_time, tzinfo=DEFAULT_TIMEZONE)
+            todays_begin_utc = todays_begin.astimezone(datetime.UTC)
+            if todays_begin_utc <= now_utc:
                 skip_dates.add(today)
 
             # If series already has a reservation that is ongoing or in the past, don't create new one for today.
             todays_reservation: Reservation | None = instance.reservations.filter(begins_at__date=today).first()
-            if todays_reservation is not None and todays_reservation.begins_at.astimezone(DEFAULT_TIMEZONE) <= now:
+            if todays_reservation is not None and todays_reservation.begins_at <= now_utc:
                 skip_dates.add(today)
 
         slots = instance.actions.pre_calculate_slots(

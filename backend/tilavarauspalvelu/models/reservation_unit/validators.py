@@ -10,7 +10,7 @@ from rest_framework.exceptions import ValidationError
 from tilavarauspalvelu.enums import ReservationKind, ReservationTypeChoice, ReservationUnitPublishingState
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import local_datetime, local_start_of_day
+from utils.date_utils import local_datetime, local_start_of_day, utc_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Collection
@@ -57,7 +57,9 @@ class ReservationUnitValidator:
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NOT_DIRECT_BOOKABLE)
 
     def validate_begin_before_end(self, begin: datetime.datetime, end: datetime.datetime) -> None:
-        if begin >= end:
+        begin_utc = begin.astimezone(datetime.UTC)
+        end_utc = end.astimezone(datetime.UTC)
+        if begin_utc >= end_utc:
             msg = "Reservation must end after it begins"
             raise ValidationError(msg, code=error_codes.RESERVATION_DURATION_INVALID)
 
@@ -82,7 +84,8 @@ class ReservationUnitValidator:
             raise ValidationError(msg, code=error_codes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL)
 
     def validate_reservation_begin_time(self, begin: datetime.datetime) -> None:
-        if begin < local_datetime():
+        now = utc_datetime()
+        if begin < now:
             msg = "Reservation cannot begin in the past."
             raise ValidationError(msg, code=error_codes.RESERVATION_BEGIN_IN_PAST)
 

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Self
 from django.db.models import Q
 
 from tilavarauspalvelu.enums import UserRoleChoice
-from utils.date_utils import local_datetime
+from utils.date_utils import utc_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Container, Iterable
@@ -258,10 +258,11 @@ class PermissionResolver:
             return False
         if self.user.is_superuser:
             return True
+        now = utc_datetime()
         if (
             not reserver_needs_role
             and self.user == application.user
-            and local_datetime() < application.application_round.application_period_ends_at
+            and now < application.application_round.application_period_ends_at
         ):
             return True
 
