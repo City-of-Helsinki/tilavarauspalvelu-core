@@ -1,15 +1,15 @@
 # Copy the Docker base images from AWS Public ECR to the GitHub Container Registry.
 # Builds pull the base images from GHCR, so they don't hit the ECR rate limits for anonymous pulls.
 # To update a base image, change the tags here and the "FROM" line in the Dockerfile.
+# Then run this workflow manually on the pull request branch, so that its builds find the new image:
+#   gh workflow run mirror-base-images.yml --ref <branch>
+# Pull requests don't run this workflow, so they can't overwrite the base images used on main.
 name: "Mirror base images"
 
 on:
   push:
     branches:
       - main
-    paths:
-      - ".github/workflows/mirror-base-images.yml"
-  pull_request:
     paths:
       - ".github/workflows/mirror-base-images.yml"
   workflow_dispatch:
