@@ -10,6 +10,7 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import lookup_property
 
 from tilavarauspalvelu.enums import AccessType
+from utils.auditlog_util import AuditLogger
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
@@ -85,3 +86,6 @@ class ReservationUnitAccessType(models.Model):
         if access_type is None:
             return datetime.date.max
         return access_type.begin_date
+
+
+AuditLogger.register(ReservationUnitAccessType)
