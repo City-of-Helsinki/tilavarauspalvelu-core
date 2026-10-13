@@ -7,6 +7,10 @@ import? 'local.just'
 help:
     @just --list
 
+# Install dependencies
+install:
+    @pnpm install
+
 # Remove node_modules directories
 clean:
     @npkill
@@ -18,6 +22,18 @@ dev:
 # Build all apps
 build:
     @pnpm -r run build
+
+# Run all apps in production mode. Run build first.
+start:
+    @pnpm -r --parallel run start
+
+# List outdated dependencies
+outdated:
+    @-pnpm -r outdated
+
+# Update a dependency in all packages. Add @latest for a major version.
+update package:
+    @pnpm up -r {{ package }}
 
 # Run linter and type check
 lint:
@@ -50,6 +66,10 @@ format-staged *files:
 # Run tests
 test:
     @pnpm -r run test
+
+# Run tests in watch mode for one package: customer, staff or ui
+test-watch package:
+    @pnpm --filter {{ package }} run test:watch
 
 # Run tests with coverage
 test-coverage:
