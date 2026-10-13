@@ -380,6 +380,7 @@ class Common(Environment):
     # read the request from the pipeline arguments, which social-auth-core does not pass, so we use our own copies.
     SOCIAL_AUTH_TUNNISTAMO_PIPELINE = (
         "social_core.pipeline.social_auth.social_details",
+        "social_core.pipeline.social_auth.social_names",
         "social_core.pipeline.social_auth.social_uid",
         "helusers.pipeline.ensure_uid_is_uuid",
         "helusers.pipeline.ensure_uuid_match",
