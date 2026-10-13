@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from rangefilter.filters import DateRangeFilterBuilder
 
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.models import PaymentOrder, ReservationUnit
 
 if TYPE_CHECKING:
@@ -73,7 +74,7 @@ class ReservationUnitFilter(admin.SimpleListFilter):
 
 
 @admin.register(PaymentOrder)
-class PaymentOrderAdmin(admin.ModelAdmin):
+class PaymentOrderAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Functions
     search_fields = [
         # 'id' handled separately in `get_search_results()`
