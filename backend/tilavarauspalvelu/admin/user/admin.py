@@ -2,8 +2,13 @@ from __future__ import annotations
 
 import datetime
 from typing import TYPE_CHECKING
+from urllib.parse import urlencode
 
+from admin_extra_buttons.decorators import button
+from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django.contrib import admin
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import LoginMethod
@@ -63,7 +68,7 @@ class UnitRoleInlineAdmin(admin.TabularInline):
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     # Functions
     actions = ["anonymize_user_data"]
     search_fields = [
@@ -213,6 +218,24 @@ class UserAdmin(admin.ModelAdmin):
         UnitRoleInlineAdmin,
     ]
     filter_horizontal = ["groups"]
+
+    @button(label=_("Reservations"), change_form=True)
+    def show_reservations(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+        changelist_url = reverse("admin:tilavarauspalvelu_reservation_changelist")
+        query_string = urlencode({"user__id__exact": pk})
+        return HttpResponseRedirect(f"{changelist_url}?{query_string}")
+
+    @button(label=_("Reservation series"), change_form=True)
+    def show_reservation_series(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+        changelist_url = reverse("admin:tilavarauspalvelu_reservationseries_changelist")
+        query_string = urlencode({"user__id__exact": pk})
+        return HttpResponseRedirect(f"{changelist_url}?{query_string}")
+
+    @button(label=_("Applications"), change_form=True)
+    def show_applications(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+        changelist_url = reverse("admin:tilavarauspalvelu_application_changelist")
+        query_string = urlencode({"user__id__exact": pk})
+        return HttpResponseRedirect(f"{changelist_url}?{query_string}")
 
     @admin.action
     def anonymize_user_data(self, request: WSGIRequest, queryset: models.QuerySet) -> None:

@@ -1,9 +1,14 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
+from urllib.parse import urlencode
 
+from admin_extra_buttons.decorators import button
 from adminsortable2.admin import SortableAdminMixin
+from django.conf import settings
 from django.contrib import admin, messages
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 from modeltranslation.admin import TabbedTranslationAdmin
@@ -221,6 +226,19 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
     @admin.display(description=_("Current access type"), ordering=L("current_access_type"))
     def current_access_type(self, obj: ReservationUnit) -> AccessType | None:
         return obj.current_access_type  # type: ignore[return-value]
+
+    @button(label=_("Reservations"), change_form=True)
+    def show_reservations(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+        changelist_url = reverse("admin:tilavarauspalvelu_reservation_changelist")
+        # The reservation unit filter of the reservation list uses this parameter.
+        query_string = urlencode({"reservation_unit__id__in": pk})
+        return HttpResponseRedirect(f"{changelist_url}?{query_string}")
+
+    @button(label=_("Open in staff UI"), change_form=True)
+    def open_in_staff_ui(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+        unit_pk = ReservationUnit.objects.values_list("unit", flat=True).get(pk=pk)
+        url_base = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
+        return HttpResponseRedirect(f"{url_base}/kasittely/units/{unit_pk}/reservation-units/{pk}")
 
     def formfield_for_manytomany(
         self,
