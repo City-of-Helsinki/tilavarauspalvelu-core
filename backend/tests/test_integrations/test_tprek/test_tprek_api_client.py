@@ -22,8 +22,8 @@ def test_TprekAPIClient__get_unit():
     assert unit_data.name_fi == "Test Unit"
     assert unit_data.name_en is None
     assert unit_data.name_sv == "Test Unit Swedish"
-    assert unit_data.description == "this is a description"
-    assert unit_data.short_description == "this is a short description"
+    assert unit_data.description_fi == "this is a description"
+    assert unit_data.short_description_fi == "this is a short description"
     assert unit_data.web_page == "https://www.example.fi"
     assert unit_data.email == "email@example.fi"
     assert unit_data.phone == "+358 1 234 45678, +358 9 876 54321"

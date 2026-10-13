@@ -2090,6 +2090,12 @@ msgid "TPRek"
 msgstr ""
 
 #: tilavarauspalvelu/admin/unit/admin.py
+msgid ""
+"When the unit has a TPRek ID, the fields that come from TPRek cannot be "
+"changed here. Change them in TPRek instead."
+msgstr ""
+
+#: tilavarauspalvelu/admin/unit/admin.py
 msgid "Hauki"
 msgstr ""
 
