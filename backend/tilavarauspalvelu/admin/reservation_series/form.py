@@ -7,6 +7,7 @@ from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
+from tilavarauspalvelu.enums import Weekday
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation, ReservationSeries
 from utils.external_service.errors import ExternalServiceError
@@ -15,11 +16,11 @@ from utils.external_service.errors import ExternalServiceError
 class ReservationSeriesAdminForm(forms.ModelForm):
     instance: ReservationSeries
 
-    weekdays = forms.CharField(
+    weekdays = forms.MultipleChoiceField(
+        choices=Weekday.choices,
+        widget=forms.CheckboxSelectMultiple,
         label=_("Weekdays"),
-        help_text=_(
-            "Comma separated list of weekday integers (0-6) on which reservations exists on this reservation series"
-        ),
+        help_text=_("Weekdays on which reservations exist in this reservation series"),
     )
 
     pindora_response = forms.CharField(

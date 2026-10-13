@@ -1446,9 +1446,7 @@ msgid "Weekdays"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_series/form.py
-msgid ""
-"Comma separated list of weekday integers (0-6) on which reservations exists "
-"on this reservation series"
+msgid "Weekdays on which reservations exist in this reservation series"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_series/form.py
