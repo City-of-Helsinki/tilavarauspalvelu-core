@@ -1,6 +1,8 @@
 mod be 'backend/justfile'
 mod fe 'frontend/justfile'
 
+import? 'local.just'
+
 # List all available commands
 help:
     @just --list

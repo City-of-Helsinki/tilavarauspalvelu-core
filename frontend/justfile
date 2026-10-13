@@ -1,6 +1,8 @@
 # Make binaries from node_modules available to recipes
 export PATH := module_directory() + "/node_modules/.bin:" + env("PATH")
 
+import? 'local.just'
+
 # List all available commands
 help:
     @just --list
