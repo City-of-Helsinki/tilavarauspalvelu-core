@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django import forms
 from django.contrib import admin
@@ -11,6 +11,9 @@ from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import PaymentOrder, Reservation
 from utils.external_service.errors import ExternalServiceError
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class ReservationAdminForm(forms.ModelForm):
@@ -166,3 +169,6 @@ class PaymentOrderInline(admin.TabularInline):
         "price_total",
     ]
     readonly_fields = fields
+
+    def has_add_permission(self, request: WSGIRequest, obj: Reservation | None = None) -> bool:
+        return False
