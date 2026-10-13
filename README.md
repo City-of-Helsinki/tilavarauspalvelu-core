@@ -124,45 +124,42 @@ just generate
 nvm use
 ```
 
-2. Install pnpm if not installed through OS package manager.
+2. Enable corepack. Node includes corepack, but it is not enabled by default.
+Corepack installs the pnpm version set in `frontend/package.json`.
 
 ```sh
-npm install -g pnpm
+corepack enable
 ```
 
 3. Install dependencies.
 
 ```sh
-cd frontend
-pnpm i
+just fe install
 ```
 
 4. Add pre-commit hooks
 
 ```sh
 # IMPORTANT run in the repo root
-pnpm husky frontend/.husky
+pnpx husky frontend/.husky
 ```
 
 5. Copy `.env.example` to `.env.local`.
 
 ```sh
-cp frontend/apps/customer/.env.example frontend/apps/customer/.env.local
-cp frontend/apps/staff/.env.example frontend/apps/staff/.env.local
+just setup
 ```
 
 6. Run codegen
 
 ```sh
-cd frontend
-pnpm codegen
+just fe codegen
 ```
 
 7. Start the frontend.
 
 ```sh
-cd frontend
-pnpm dev
+just fe dev
 ```
 
 You should now be able to open the customer frontend at `localhost:3000` and the staff frontend at `localhost:3001/kasittely`.
@@ -471,30 +468,27 @@ Uses the schema file `tilavaraus.graphql` in the repo root and crawls the fronte
 
 Update GraphQL schema and types for all apps.
 ```sh
-cd frontend
-pnpm codegen
+just fe codegen
 ```
 
 Run in [watch mode](https://the-guild.dev/graphql/codegen/docs/getting-started/development-workflow#watch-mode) for all apps.
 ```sh
-cd frontend
-pnpm codegen:watch
+just fe codegen-watch
 ```
 
 Watch mode has some issues with changes in `packages/ui` not propagated to the `apps`.
 Also when switching branches it might hit an unrecoverable error.
-In those cases running `pnpm codegen` first fixes the issue.
+In those cases running `just fe codegen` first fixes the issue.
 
 Can be run for individual apps with
 
 ```sh
-cd frontend
 # customer ui
-pnpm codegen:customer
-# saff ui
-pnpm codegen:staff
+just fe codegen-customer
+# staff ui
+just fe codegen-staff
 # common ui package
-pnpm codegen:ui
+just fe codegen-ui
 ```
 
 ### Linting
@@ -515,49 +509,46 @@ CI runs all lints. The husky hooks run them locally:
 - post-checkout runs `pnpm install` and codegen after a branch checkout.
 
 Run oxlint and the type check.
-``` sh
-cd frontend
-pnpm lint
+```sh
+just fe lint
 # automatic fixing
-pnpm lint:fix
+just fe lint-fix
 ```
 
 Run oxfmt on all files.
 ```sh
-cd frontend
-pnpm format
+just fe format
+# check only
+just fe format-check
 ```
 
 Run stylelint.
 ```sh
-cd frontend
-pnpm lint:css
+just fe lint-css
 ```
 
 ### Testing
 
-Tests are ran using `vitest`.
+Tests are run using `vitest`.
 
-Locally tests run in [watch mode](https://vitest.dev/guide/cli.html#vitest-watch) by default. Watch mode doesn't work
-properly with monorepo so it has to be run per package / app.
-
+Run all tests once.
 ```sh
-cd frontend
-# customer
-cd apps/customer
-pnpm test
-# staff
-cd apps/staff
-pnpm test
-# common
-cd packages/ui
-pnpm test
+just fe test
 ```
 
-Disabling watch mode allows running all tests.
+Run tests in [watch mode](https://vitest.dev/guide/cli.html#vitest-watch). Watch mode runs one package at a time.
 ```sh
-cd frontend
-CI=true pnpm test
+# customer
+just fe test-watch customer
+# staff
+just fe test-watch staff
+# common
+just fe test-watch ui
+```
+
+Run all tests with coverage.
+```sh
+just fe test-coverage
 ```
 
 ### Updating dependencies
@@ -569,17 +560,15 @@ Frontend dependencies are managed using `pnpm` monorepo. [dependabot] will norma
 
 For manual update of packages. You can check outdated packages with
 ```sh
-cd frontend
-pnpm outdated -r
+just fe outdated
 ```
 
 To update a specific package.
 ```sh
-cd frontend
 # minor version
-pnpm up -r {package_name}
+just fe update {package_name}
 # major version
-pnpm up -r {package_name}@latest
+just fe update {package_name}@latest
 ```
 
 ### Translations
@@ -592,13 +581,16 @@ Translations are loaded using `next-i18next` that automatically picks the correc
 
 ### Scripts
 
-All available top level scripts are listed in the root `package.json`. Most of them use `pnpm -r` to run
-the same command in all packages. They can be run with `pnpm {command}`.
+All frontend commands are in `frontend/justfile`. List them with
+```sh
+just fe help
+```
 
-Top level commands run in all packages that contain that command. The output goes to standard output.
-Normally this is what you want. But if you have 100 lint errors in both apps, the errors are mixed together.
+Most of them use `pnpm -r` to run the same script in all packages that contain that script.
+The output goes to standard output. Normally this is what you want.
+But if you have 100 lint errors in both apps, the errors are mixed together.
 
-In these cases you can run the package command directly with the `--filter` flag. `{package_name}` is the subpath e.g. `staff` for `apps/staff`.
+In these cases you can run the package script directly with the `--filter` flag. `{package_name}` is the subpath e.g. `staff` for `apps/staff`.
 ```sh
 cd frontend
 # only that package
@@ -611,24 +603,21 @@ pnpm --filter {package_name}... run {command}
 
 Pluck graphql queries from frontend code as `graphql` files per app and store them in `/gql-pluck-output/`.
 ```sh
-cd frontend
-pnpm gql-pluck
+just fe gql-pluck
 ```
 
 Interactive tool to remove package caches `node_modules`. Useful if other commands are not working (broken dependencies).
 ```sh
-cd frontend
-pnpm clean
+just fe clean
 ```
 
 Build and start the app in production mode. Useful for testing the production build locally.
 ```sh
-cd frontend
-pnpm build
-pnpm start
+just fe build
+just fe start
 ```
 
-Production builds `pnpm build` breaks local caches. If restarting development server doesn't work then
+Production builds `just fe build` breaks local caches. If restarting development server doesn't work then
 ```sh
 cd frontend
 rm -rf apps/customer/.next apps/staff/.next
@@ -638,14 +627,14 @@ rm -rf apps/customer/.next apps/staff/.next
 
 If the command should be run inside a package.
 
-- Add the command to all needed `package.json` of the individual packages.
-- Add `pnpm -r run $cmd` to `/package.json`
-- Run the command `pnpm $cmd`
+- Add the script to all needed `package.json` of the individual packages.
+- Add a recipe that runs `pnpm -r run $cmd` to `frontend/justfile`
+- Run the command `just fe $cmd`
 
 If only needed on the root package.
 
-- Add the `$cmd` directly to `/package.json`
-- Run the command `pnpm $cmd`
+- Add the `$cmd` recipe directly to `frontend/justfile`
+- Run the command `just fe $cmd`
 
 ### Common Issues
 
@@ -656,7 +645,7 @@ If the query is done on the server side (i.e. in `getServerSideProps`) you won't
 #### Getting 404 on valid page load
 
 Probably an SSR error. These are not visible in the browser.
-Check the console logs in the terminal where `pnpm dev` is running.
+Check the console logs in the terminal where `just fe dev` is running.
 
 #### Max complexity error on graphql query
 
