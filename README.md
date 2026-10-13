@@ -499,29 +499,22 @@ pnpm codegen:ui
 
 ### Linting
 
-Linting is done with four different tools:
+Linting is done with three different tools:
 
-- [tsc] for typechecking using the typescript compiler
-- [oxlint] as a general linter
-- [prettier] for formatting
+- [oxlint] as a general linter. It also does the type check.
+- [oxfmt] for formatting
 - [stylelint] for CSS linting
 
-[tsc]: https://www.typescriptlang.org/
 [oxlint]: https://oxc.rs/docs/guide/usage/linter.html
-[prettier]: https://prettier.io/
+[oxfmt]: https://oxc.rs/docs/guide/usage/formatter.html
 [stylelint]: https://stylelint.io/
 
-All lints are ran on CI and if you enable pre-commit hooks they are ran locally to modified files.
+CI runs all lints. The husky hooks run them locally:
 
-Typecheck all packages.
-```sh
-cd frontend
-pnpm tsc:check
-# if you need to remove caches
-pnpm tsc:clean
-```
+- pre-commit lints all files, because the type check needs the whole project. Then it fixes and formats only the staged files.
+- post-checkout runs `pnpm install` and codegen after a branch checkout.
 
-Run oxlint.
+Run oxlint and the type check.
 ``` sh
 cd frontend
 pnpm lint
@@ -529,7 +522,7 @@ pnpm lint
 pnpm lint:fix
 ```
 
-Run prettier on all files.
+Run oxfmt on all files.
 ```sh
 cd frontend
 pnpm format

@@ -13,9 +13,7 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "test": "SKIP_ENV_VALIDATION=true TZ=Europe/Helsinki vitest run",
-    "test:coverage": "CI=true pnpm test --coverage",
-    "tsc:check": "tsc --noEmit --project tsconfig.json",
-    "tsc:clean": "tsc --build --clean"
+    "test:coverage": "CI=true pnpm test --coverage"
   },
   "dependencies": {
     "@apollo/client": "^3.14.0",
