@@ -16,6 +16,7 @@ from tilavarauspalvelu.enums import (
     MunicipalityChoice,
     ReserveeType,
 )
+from utils.auditlog_util import AuditLogger
 from utils.db import Now
 from utils.fields.model import TextChoicesField
 from utils.mixins import SerializableModelMixin
@@ -303,3 +304,6 @@ class Application(SerializableModelMixin, models.Model):
         # The setter is used by ApplicationQuerySet to pre-evaluate units for multiple Applications.
         # Should not be used by anything else!
         self._units_for_permissions = value
+
+
+AuditLogger.register(Application)
