@@ -15,7 +15,7 @@ Effort: S is less than half a day. M is one or two days. L is more.
 
 ## Order
 
-1. PR 1. Run `ui` tests in CI and fix tooling.
+1. PR 1. Run `ui` tests in CI and fix tooling. Done on branch `frontend-tooling-fixes`.
 2. PR 2. Customer payment flow.
 3. PR 3. Staff reservation handling.
 4. PR 4. Personal data in Sentry.
@@ -29,37 +29,38 @@ Effort: S is less than half a day. M is one or two days. L is more.
 
 Do this first. It protects PR 5.
 
-Base this PR on the `remove-turborepo` branch. It replaces turbo with `pnpm -r`. Cherry-pick these commits on top:
+Status: done on branch `frontend-tooling-fixes`, not pushed yet. Review it, then push and open the PR.
+
+The branch starts from `remove-turborepo`, which replaces turbo with `pnpm -r`. These commits are cherry-picked on top:
 
 - `a25437c2e` from `fix-pin-pnpm-when-using-just-codegen`. It makes the root `just codegen` call the frontend recipe.
 - `48078c31f` ("Remove nextjs generating AGENT.md"). It sets `agentRules: false` in both `next.config.ts` files.
 
-The item notes below describe the state on `remove-turborepo`, not on `main`.
-
-- [ ] CI does not run the `packages/ui` tests (10 files, 291 tests). CI runs `pnpm --filter=staff... test:coverage`. `packages/ui/package.json` has no `test:coverage` script, so pnpm skips it. Add the script.
-- [ ] Add a test run with `TZ=UTC`. Five date tests in `ui` fail in UTC today. See PR 5.
-- [ ] Remove the `tsc` commands. `lint` already type checks with `--type-check`.
-  - The `justfile` recipes `tsc-check` and `tsc-clean`.
-  - The staff scripts `tsc:check` and `tsc:clean` in `apps/staff/package.json`.
-  - The `pnpm tsc:check` and `pnpm tsc:clean` lines in `README.md:533-535`. They are still there on `remove-turborepo`.
-- [ ] Remove the browser test commands. Their targets do not exist. CI and the docs do not use them.
-  - The `justfile` recipes `test-browser-ci` and `dev-test`. They call `customer` scripts that do not exist.
-  - The root `package.json` scripts `test:browser:ci` and `dev:test`. They use `apps/ui`, which does not exist.
-- [ ] `justfile`. `format-staged` calls prettier and `packages/prettier-config`. Neither exists. The project uses oxfmt. Use `oxfmt --no-error-on-unmatched-pattern`, like the `format:staged` script.
-- [ ] Stray `apps/customer/CLAUDE.md`. It contains only `@AGENTS.md`, and that file does not exist. Next.js generated it. It is not in git, because `.gitignore:50` ignores `CLAUDE.md`. The `48078c31f` cherry-pick stops Next.js from making new ones. Delete the existing local copy by hand once. Each developer with an old checkout must do the same.
+- [x] **The `ui` tests do not run in CI.** CI runs `pnpm --filter=staff... test:coverage`. `packages/ui` has no `test:coverage` script, so pnpm skips it. Fix: a new CI job `test-ui-package` runs `pnpm --filter=ui test`. A coverage script would need a coverage provider in `ui`, and nothing uploads `ui` coverage.
+- [x] **Remove the `tsc` commands.** `lint` already type checks with `--type-check`.
+  - The `justfile` recipes `tsc-check` and `tsc-clean` are removed.
+  - The staff scripts `tsc:check` and `tsc:clean` are removed.
+  - The README linting section is updated. It now lists oxlint, oxfmt and stylelint, and the hooks.
+  - The `justfile` recipes `lint` and `lint-fix` now pass `--type-check`, like `pnpm lint`. Before, `just lint` did not type check.
+- [x] **Remove the browser test commands.** Their targets do not exist. CI and the docs do not use them.
+  - The `justfile` recipes `test-browser-ci` and `dev-test` are removed.
+  - The root `package.json` scripts `test:browser:ci` and `dev:test` are removed.
+- [x] **`just format-staged` used prettier.** It now uses `oxfmt --no-error-on-unmatched-pattern`.
+- [x] **`pnpm codegen` needed GNU parallel.** It is not always installed, and the post-checkout hook calls this script. The script now uses a pnpm script regex: `pnpm run "/^codegen:(staff|customer|ui)$/"`. It still runs the three projects in parallel. The README no longer mentions GNU parallel.
+- [ ] **Stray `apps/customer/CLAUDE.md`.** It contains only `@AGENTS.md`, and that file does not exist. Next.js generated it. It is not in git, because `.gitignore:50` ignores `CLAUDE.md`. The `48078c31f` cherry-pick stops Next.js from making new ones. Delete the existing local copy by hand once. Each developer with an old checkout must do the same.
 
 ### Husky hooks
 
-- [ ] **`.husky/pre-commit` changes files you did not stage.** It runs `pnpm lint:fix` on the whole frontend. The full scan is necessary, because `lint` does the type check, and the type check needs the whole project. But `--fix` on the whole codebase is not necessary.
-  - Run `pnpm lint` (no `--fix`) on the whole frontend, for the type check.
-  - Run the fix and the format only on the staged files. The `just lint-staged` recipe and the `format:staged` script already do this.
-  - Remove `npx lint-staged`. There is no lint-staged dependency or config, so npx downloads it at commit time and it does nothing.
+- [x] **`.husky/pre-commit` changed files that were not staged.** It ran `pnpm lint:fix` on the whole frontend. The full scan is necessary, because `lint` does the type check, and the type check needs the whole project. But `--fix` on the whole codebase is not necessary.
+  - The hook now runs `pnpm lint` (no `--fix`) on the whole frontend, then `pnpm exec lint-staged`.
+  - `frontend/.lintstagedrc` runs `oxlint --fix --type-aware` and `pnpm format:staged` on the staged files. lint-staged keeps unstaged changes out of the commit.
+  - Before, the hook ran `npx lint-staged`, but lint-staged was not a dependency. So npx downloaded an unpinned version at each commit, outside the lockfile and `minimumReleaseAge`. It is now a dev dependency (`^17.6.0`).
   - Seen on 2026-10-12. In a new worktree with no generated types, `lint:fix` failed. It also removed needed `as unknown as` and `as never` casts in 13 files. One of them was a source file: it dropped `Omit<MemoT, "pk">` in `apps/staff/src/hooks/useStaffReservationMutation.ts`.
-- [ ] **Add `.husky/post-checkout` to run `pnpm install` and then codegen.** Without the generated types, lint fails and `--fix` makes wrong edits, as described above. After a branch switch, the types can also be out of date. `git worktree add` also runs post-checkout, so a new worktree gets `node_modules` and the types before its first commit.
-  - Run only on a branch checkout. Git gives the hook `$3 = 1` for a branch checkout and `$3 = 0` for a file checkout.
-  - Always run `pnpm install` first. A new worktree has no `node_modules`. pnpm commands already check for a stale lockfile, so when nothing changed, the install is fast.
-  - Then run codegen. It reads the committed `tilavaraus.graphql` (`graphql.config.ts:42`), so it does not need a running backend.
-  - The hook runs from the repo root. `.husky/pre-commit` does `cd frontend` first, so do the same here.
+- [x] **New `.husky/post-checkout` runs `pnpm install` and then `pnpm codegen`.** Without the generated types, lint fails and `--fix` makes wrong edits, as described above. After a branch switch, the types can also be out of date. `git worktree add` also runs post-checkout, so a new worktree gets `node_modules` and the types before its first commit.
+  - It runs only on a branch checkout. Git gives the hook `$3 = 1` for a branch checkout and `$3 = 0` for a file checkout.
+  - The install takes less than one second when nothing changed. Codegen takes about 16 seconds, so each branch switch takes about that long.
+  - Codegen reads the committed `tilavaraus.graphql` (`graphql.config.ts:42`), so it does not need a running backend.
+- [ ] **Hooks in worktrees.** On the review machine, `core.hooksPath` is the absolute path `/workspace/frontend/.husky/_`. So all worktrees run the hooks of the branch that is checked out in the main checkout. The new hooks take effect there only after this PR is merged or checked out. Check how husky is installed for other developers. There is no `prepare` script.
 
 ## PR 2. Customer payment flow (high, mostly S)
 
@@ -100,6 +101,7 @@ Do this after the Sentry branch merges. It touches the Dockerfile.
   - Customer pages render round and pricing dates during SSR this way.
 - [ ] Neither `Dockerfile` nor `Dockerfile.final` sets `TZ`. `node:24-slim` defaults to UTC. Check what the OpenShift pods use. If it is UTC, this bug is live.
 - [ ] Choose one model. Parse date-only values as local midnight, or use `TZDate` and `formatInTimeZone` everywhere. Set `TZ=Europe/Helsinki` in the runtime image.
+- [ ] Add a CI test run with `TZ=UTC`. All `test` scripts set `TZ=Europe/Helsinki`, so CI cannot see this bug today. Five date tests in `ui` fail in UTC. Add the run in this PR, after the fix. Added earlier, it would make CI fail until this PR lands. It can be a second step in the `test-ui-package` job from PR 1.
 - [ ] **`formatTimeRange` drops a 00:00 end time.** `packages/ui/src/modules/date-utils/formatting.ts:224`. "20:00 to 00:00" shows as "20:00". Remove the workaround in `apps/customer/.../ReservationUnitMoreDetails.tsx:205`.
 - [ ] **`timeForInput("15:30")` returns the current time.** `conversion.ts:110-123`. `new Date("15:30")` does not throw, so the HH:mm branch never runs.
 - [ ] **`parseStringTimeStruct("abc:30")` gives 00:30.** `construction.ts:146-158`. The tests assert this, so update them too.
