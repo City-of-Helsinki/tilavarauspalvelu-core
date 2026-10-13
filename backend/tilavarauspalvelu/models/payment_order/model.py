@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType
+from utils.auditlog_util import AuditLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.fields.model import TextChoicesField
 
@@ -119,3 +120,6 @@ class PaymentOrder(models.Model):
             self.handled_payment_due_by is not None
             and self.handled_payment_due_by.astimezone(DEFAULT_TIMEZONE) < local_datetime()
         )
+
+
+AuditLogger.register(PaymentOrder)
