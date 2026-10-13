@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.validators import is_numeric, validate_accounting_project
+from utils.auditlog_util import AuditLogger
 
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
@@ -121,3 +122,6 @@ class PaymentAccounting(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+AuditLogger.register(PaymentAccounting)
