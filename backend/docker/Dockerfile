@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/python:3.13-slim-trixie AS base
+FROM ghcr.io/city-of-helsinki/tilavarauspalvelu-core-base:python-3.13-slim-trixie AS base
 
 # Make sure we build as the root user.
 USER root
