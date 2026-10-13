@@ -7,7 +7,8 @@
         display: flex;
         align-items: center;
     }
-    .app-version {
+    .app-version,
+    .app-environment {
         padding: 2px 8px;
         border-radius: 4px;
         background: var(--selected-bg);
@@ -15,10 +16,24 @@
         font-family: monospace;
         font-size: 0.75rem;
     }
+    .app-environment {
+        margin-left: 8px;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+    .app-environment-production {
+        background: #b01e1e;
+        color: #ffffff;
+    }
+    .app-environment-staging {
+        background: #c46200;
+        color: #ffffff;
+    }
 </style>
 {% endblock %}
 
 {% block branding %}
 <h1 id="site-name"><a href="{% url 'admin:index' %}">Varaamo Django admin</a></h1>
 <span class="app-version">{{ version }}</span>
+<span class="app-environment app-environment-{{ environment_name }}">{{ environment_name }}</span>
 {% endblock %}

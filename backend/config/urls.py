@@ -41,6 +41,7 @@ admin.site.each_context = lambda request: (
     original_each_context(request)
     | {
         "version": settings.APP_VERSION,
+        "environment_name": settings.ENVIRONMENT_NAME,
         # The helauth variables need to be added, since we subclass `helusers.tunnistamo_oidc.TunnistamoOIDCAuth`
         # with `config.auth.ProxyTunnistamoOIDCAuthBackend` for optimizing request user fetching.
         # `helusers.admin_site.AdminSite.each_context` refers to the original backend by
