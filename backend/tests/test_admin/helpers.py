@@ -4,10 +4,14 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
+from django.db import connection
 from django.template.response import TemplateResponse
+from django.test.utils import CaptureQueriesContext
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+
+    from django.test import Client
 
     from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.typing import WSGIRequest
@@ -65,3 +69,15 @@ def required_reservation_unit_form_data(reservation_unit: ReservationUnit) -> di
         **management_form_data("application_round_time_slots"),
         **management_form_data("access_types"),
     }
+
+
+def count_queries(client: Client, url: str) -> int:
+    """Count the queries of a GET request to the given admin page."""
+    # The first request fills caches, such as the content type cache, so it runs more queries.
+    client.get(url)
+
+    with CaptureQueriesContext(connection) as context:
+        response = client.get(url)
+
+    assert response.status_code == 200, url
+    return len(context.captured_queries)
