@@ -107,15 +107,3 @@ updates:
       python-dependencies:
         patterns:
           - "*"
-
-  # Update Docker dependencies
-  - package-ecosystem: "docker"
-    directory: "/backend/docker/"
-    schedule:
-      interval: "daily"
-    pull-request-branch-name:
-      separator: "-"
-    groups:
-      docker-dependencies:
-        patterns:
-          - "*"

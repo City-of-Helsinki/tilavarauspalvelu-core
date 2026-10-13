@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/node:24-slim AS base
+FROM ghcr.io/city-of-helsinki/tilavarauspalvelu-core-base:node-24-slim AS base
 
 # Generates a trimmed down version of the package list for installer
 # doesn't invalidate layer cache if the result from turbo prune stays the same.
