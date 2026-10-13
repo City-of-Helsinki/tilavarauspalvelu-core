@@ -9,6 +9,7 @@ from django.urls import reverse
 
 from tests.factories import (
     ApplicationSectionFactory,
+    OriginHaukiResourceFactory,
     PaymentOrderFactory,
     ReservationFactory,
     ReservationUnitAccessTypeFactory,
@@ -137,6 +138,20 @@ def test_admin_query_counts__space_list__same_for_more_spaces(api_client):
 
     SpaceFactory.create(parent=SpaceFactory.create())
     SpaceFactory.create(parent=SpaceFactory.create())
+
+    assert count_queries(api_client, url) == query_count
+
+
+def test_admin_query_counts__origin_hauki_resource_list__same_for_more_resources(api_client):
+    user = UserFactory.create_superuser()
+    api_client.force_login(user)
+
+    ReservationUnitFactory.create(origin_hauki_resource=OriginHaukiResourceFactory.create())
+    url = reverse("admin:tilavarauspalvelu_originhaukiresource_changelist")
+    query_count = count_queries(api_client, url)
+
+    ReservationUnitFactory.create(origin_hauki_resource=OriginHaukiResourceFactory.create())
+    ReservationUnitFactory.create(origin_hauki_resource=OriginHaukiResourceFactory.create())
 
     assert count_queries(api_client, url) == query_count
 
