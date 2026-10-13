@@ -10,7 +10,7 @@ from django.urls import reverse
 
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.models import EmailMessage, Reservation
+from tilavarauspalvelu.models import EmailMessage, PaymentOrder, Reservation
 from utils.date_utils import local_datetime
 
 from tests import factories
@@ -57,9 +57,12 @@ def test_django_admin_site__pages_load__model_admins(create_all_models):
     client.force_login(user)
 
     email_message = EmailMessage.objects.first()
+    payment_order = PaymentOrder.objects.first()
     page_status = {
         "/admin/tilavarauspalvelu/emailmessage/add/": HTTPStatus.FORBIDDEN,
         f"/admin/tilavarauspalvelu/emailmessage/{email_message.pk}/delete/": HTTPStatus.FORBIDDEN,
+        "/admin/tilavarauspalvelu/paymentorder/add/": HTTPStatus.FORBIDDEN,
+        f"/admin/tilavarauspalvelu/paymentorder/{payment_order.pk}/delete/": HTTPStatus.FORBIDDEN,
     }
 
     # Loop over all models that are registered to the admin site
