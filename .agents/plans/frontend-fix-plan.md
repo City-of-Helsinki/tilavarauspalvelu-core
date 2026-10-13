@@ -29,17 +29,24 @@ Effort: S is less than half a day. M is one or two days. L is more.
 
 Do this first. It protects PR 5.
 
-Base this PR on the `remove-turborepo` branch. It replaces turbo with `pnpm -r`. Cherry-pick `fix-pin-pnpm-when-using-just-codegen` (one commit, `a25437c2e`) on top. It makes the root `just codegen` call the frontend recipe.
+Base this PR on the `remove-turborepo` branch. It replaces turbo with `pnpm -r`. Cherry-pick these commits on top:
+
+- `a25437c2e` from `fix-pin-pnpm-when-using-just-codegen`. It makes the root `just codegen` call the frontend recipe.
+- `48078c31f` ("Remove nextjs generating AGENT.md"). It sets `agentRules: false` in both `next.config.ts` files.
 
 The item notes below describe the state on `remove-turborepo`, not on `main`.
 
 - [ ] CI does not run the `packages/ui` tests (10 files, 291 tests). CI runs `pnpm --filter=staff... test:coverage`. `packages/ui/package.json` has no `test:coverage` script, so pnpm skips it. Add the script.
 - [ ] Add a test run with `TZ=UTC`. Five date tests in `ui` fail in UTC today. See PR 5.
-- [ ] `justfile`. `tsc-check` and `tsc-clean` run `pnpm -r run tsc:check`. Only staff has the script, so customer and `ui` are skipped. `lint` already type checks with `--type-check`. Remove the two recipes, or add the scripts to customer and `ui`.
+- [ ] Remove the `tsc` commands. `lint` already type checks with `--type-check`.
+  - The `justfile` recipes `tsc-check` and `tsc-clean`.
+  - The staff scripts `tsc:check` and `tsc:clean` in `apps/staff/package.json`.
+  - The `pnpm tsc:check` and `pnpm tsc:clean` lines in `README.md:533-535`. They are still there on `remove-turborepo`.
+- [ ] Remove the browser test commands. Their targets do not exist. CI and the docs do not use them.
+  - The `justfile` recipes `test-browser-ci` and `dev-test`. They call `customer` scripts that do not exist.
+  - The root `package.json` scripts `test:browser:ci` and `dev:test`. They use `apps/ui`, which does not exist.
 - [ ] `justfile`. `format-staged` calls prettier and `packages/prettier-config`. Neither exists. The project uses oxfmt. Use `oxfmt --no-error-on-unmatched-pattern`, like the `format:staged` script.
-- [ ] `justfile`. `test-browser-ci` and `dev-test` call `customer` scripts that do not exist.
-- [ ] Root `package.json`. `test:browser:ci` and `dev:test` use `apps/ui`, which does not exist.
-- [ ] `apps/customer/CLAUDE.md` contains only `@AGENTS.md`. That file does not exist. Agent docs need user approval before an edit.
+- [ ] Stray `apps/customer/CLAUDE.md`. It contains only `@AGENTS.md`, and that file does not exist. Next.js generated it. It is not in git, because `.gitignore:50` ignores `CLAUDE.md`. The `48078c31f` cherry-pick stops Next.js from making new ones. Delete the existing local copy by hand once. Each developer with an old checkout must do the same.
 
 ### Husky hooks
 
@@ -48,10 +55,10 @@ The item notes below describe the state on `remove-turborepo`, not on `main`.
   - Run the fix and the format only on the staged files. The `just lint-staged` recipe and the `format:staged` script already do this.
   - Remove `npx lint-staged`. There is no lint-staged dependency or config, so npx downloads it at commit time and it does nothing.
   - Seen on 2026-10-12. In a new worktree with no generated types, `lint:fix` failed. It also removed needed `as unknown as` and `as never` casts in 13 files. One of them was a source file: it dropped `Omit<MemoT, "pk">` in `apps/staff/src/hooks/useStaffReservationMutation.ts`.
-- [ ] **Add `.husky/post-checkout` to run codegen.** Without the generated types, lint fails and `--fix` makes wrong edits, as described above. `git worktree add` also runs post-checkout, so a new worktree gets the types before its first commit.
+- [ ] **Add `.husky/post-checkout` to run `pnpm install` and then codegen.** Without the generated types, lint fails and `--fix` makes wrong edits, as described above. After a branch switch, the types can also be out of date. `git worktree add` also runs post-checkout, so a new worktree gets `node_modules` and the types before its first commit.
   - Run only on a branch checkout. Git gives the hook `$3 = 1` for a branch checkout and `$3 = 0` for a file checkout.
-  - Codegen reads the committed `tilavaraus.graphql` (`graphql.config.ts:42`), so it does not need a running backend.
-  - Codegen needs `node_modules`. A new worktree has none. Run `pnpm install --frozen-lockfile` first, or skip codegen with a clear message.
+  - Always run `pnpm install` first. A new worktree has no `node_modules`. pnpm commands already check for a stale lockfile, so when nothing changed, the install is fast.
+  - Then run codegen. It reads the committed `tilavaraus.graphql` (`graphql.config.ts:42`), so it does not need a running backend.
   - The hook runs from the repo root. `.husky/pre-commit` does `cd frontend` first, so do the same here.
 
 ## PR 2. Customer payment flow (high, mostly S)
