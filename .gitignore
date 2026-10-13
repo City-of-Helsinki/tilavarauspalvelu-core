@@ -73,3 +73,6 @@ coverage.xml
 # celery
 backend/broker*
 backend/control*
+
+# local just commands
+**/local.just
