@@ -132,10 +132,13 @@ class UserActions:
         LogEntry.objects.get_for_objects(reservations).delete()
 
     def anonymize_user_applications(self) -> None:
-        ApplicationSection.objects.filter(application__user=self.user).update(
+        application_sections = ApplicationSection.objects.filter(application__user=self.user)
+        applications = Application.objects.filter(user=self.user)
+
+        application_sections.update(
             name=SENSITIVE_APPLICATION,
         )
-        Application.objects.filter(user=self.user).update(
+        applications.update(
             additional_information=SENSITIVE_APPLICATION,
             working_memo=SENSITIVE_APPLICATION,
             contact_person_first_name=self.user.first_name,
@@ -146,6 +149,8 @@ class UserActions:
             billing_post_code="99999",
             billing_city=ANONYMIZED,
         )
+
+        LogEntry.objects.get_for_objects(application_sections).delete()
 
     def can_anonymize(self) -> UserAnonymizationInfo:
         month_ago = local_datetime() - relativedelta(months=1)
