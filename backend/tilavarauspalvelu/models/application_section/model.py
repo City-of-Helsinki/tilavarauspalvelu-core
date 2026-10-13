@@ -12,6 +12,7 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
+from utils.auditlog_util import AuditLogger
 from utils.date_utils import local_datetime
 from utils.db import Now, SubqueryCount
 from utils.fields.model import TextChoicesField
@@ -325,3 +326,6 @@ class ApplicationSection(SerializableModelMixin, models.Model):
             .filter(L(is_access_code_is_active_correct=False))
             .exists()
         )
+
+
+AuditLogger.register(ApplicationSection)
