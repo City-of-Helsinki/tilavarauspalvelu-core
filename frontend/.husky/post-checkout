@@ -1,0 +1,6 @@
+# Run only on a branch checkout ($3 is 1), not on a file checkout
+[ "$3" = "1" ] || exit 0
+cd frontend
+# Lint and the type check need node_modules and the generated GraphQL types
+pnpm install --frozen-lockfile
+pnpm codegen

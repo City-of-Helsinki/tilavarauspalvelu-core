@@ -24,7 +24,7 @@
     "codegen:staff": "graphql-codegen --project staff",
     "codegen:customer": "graphql-codegen --project customer",
     "codegen:ui": "graphql-codegen --project ui",
-    "codegen": "parallel pnpm ::: codegen:staff codegen:customer codegen:ui",
+    "codegen": "pnpm run \"/^codegen:(staff|customer|ui)$/\"",
     "codegen:watch": "pnpm codegen:staff --watch & pnpm codegen:customer --watch & pnpm codegen:ui --watch"
   },
   "devDependencies": {

@@ -74,9 +74,6 @@ see the [backend](#backend) section.
   - Ubuntu: https://docs.docker.com/engine/install/ubuntu/
   - Mac: https://docs.docker.com/desktop/setup/install/mac-install/
   - Windows: https://docs.docker.com/desktop/setup/install/windows-install/
-- GNU parallel (for running codegen without watch mode)
-  - Ubuntu: `sudo apt-get install parallel`
-  - Mac: `brew install parallel`
 - Node version manager
   - Ubuntu: https://github.com/nvm-sh/nvm
   - Mac: `brew install nvm`
@@ -156,15 +153,9 @@ cp frontend/apps/staff/.env.example frontend/apps/staff/.env.local
 
 6. Run codegen
 
-For non Windows users using GNU parallel
 ```sh
 cd frontend
 pnpm codegen
-```
-
-Without GNU parallel (e.g. Windows users)
-```sh
-just codegen
 ```
 
 7. Start the frontend.
@@ -478,15 +469,10 @@ Codegen needs to be run if either the backend schema or any frontend GQL query c
 
 Uses the schema file `tilavaraus.graphql` in the repo root and crawls the frontend code for `gql` tagged strings. Then generates Typescript types for them.
 
-Update GraphQL schema and types. Uses GNU parallel to update all apps.
+Update GraphQL schema and types for all apps.
 ```sh
 cd frontend
 pnpm codegen
-```
-
-Without GNU parallel (e.g. on Windows)
-```sh
-just codegen
 ```
 
 Run in [watch mode](https://the-guild.dev/graphql/codegen/docs/getting-started/development-workflow#watch-mode) for all apps.
