@@ -70,7 +70,7 @@ class ReservationUnitFilter(admin.SimpleListFilter):
         value: str | None = self.value()
         if value is None:
             return queryset
-        return queryset.filter(reservation__reservation_unit__pk=value).distinct()
+        return queryset.filter(reservation__reservation_unit__pk=value)
 
 
 @admin.register(PaymentOrder)
@@ -131,7 +131,7 @@ class PaymentOrderAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     ]
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet:
-        return super().get_queryset(request).select_related("reservation")
+        return super().get_queryset(request).select_related("reservation__reservation_unit__unit")
 
     def reservation_unit(self, obj: PaymentOrder) -> str:
         return obj.reservation.reservation_unit if obj.reservation else ""
