@@ -7,7 +7,13 @@ from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
-from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory, UserFactory
+from tests.factories import (
+    PaymentOrderFactory,
+    ReservationFactory,
+    ReservationUnitAccessTypeFactory,
+    ReservationUnitFactory,
+    UserFactory,
+)
 
 if TYPE_CHECKING:
     from django.test import Client
@@ -59,5 +65,19 @@ def test_admin_query_counts__payment_order_list__same_for_more_payment_orders(ap
 
     PaymentOrderFactory.create(reservation=ReservationFactory.create(reservation_unit=ReservationUnitFactory.create()))
     PaymentOrderFactory.create(reservation=ReservationFactory.create(reservation_unit=ReservationUnitFactory.create()))
+
+    assert count_queries(api_client, url) == query_count
+
+
+def test_admin_query_counts__reservation_unit_access_type_list__same_for_more_access_types(api_client):
+    user = UserFactory.create_superuser()
+    api_client.force_login(user)
+
+    ReservationUnitAccessTypeFactory.create(reservation_unit=ReservationUnitFactory.create())
+    url = reverse("admin:tilavarauspalvelu_reservationunitaccesstype_changelist")
+    query_count = count_queries(api_client, url)
+
+    ReservationUnitAccessTypeFactory.create(reservation_unit=ReservationUnitFactory.create())
+    ReservationUnitAccessTypeFactory.create(reservation_unit=ReservationUnitFactory.create())
 
     assert count_queries(api_client, url) == query_count
