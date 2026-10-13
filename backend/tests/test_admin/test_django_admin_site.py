@@ -15,6 +15,7 @@ from utils.date_utils import local_datetime
 
 from tests import factories
 from tests.helpers import ResponseMock, patch_method
+from tests.test_admin.helpers import count_queries
 from tests.test_integrations.test_verkkokauppa.test_merchant_requests import get_merchant_response
 
 if TYPE_CHECKING:
@@ -30,6 +31,10 @@ pytestmark = [
 
 @pytest.fixture
 def create_all_models():
+    create_one_of_each_model()
+
+
+def create_one_of_each_model() -> None:
     """Create a model instance for each factory in tests.factories."""
     for factory_name in factories.__all__:
         model_factory: GenericDjangoModelFactory = getattr(factories, factory_name)
@@ -140,3 +145,38 @@ def test_django_admin_site__pages_load__data_views():
             admin_url = reverse(f"admin:{url_pattern.name}")
 
             assert client.get(admin_url).status_code == 200, admin_url
+
+
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=200, json_data=get_merchant_response),
+)
+@pytest.mark.slow
+def test_django_admin_site__query_counts__same_for_more_objects(create_all_models):
+    user = factories.UserFactory.create_superuser()
+    client = Client()
+    client.force_login(user)
+
+    admin_urls: list[str] = []
+    for model in admin.site._registry:
+        # Only test models from tilavarauspalvelu app
+        if model._meta.app_label != "tilavarauspalvelu":
+            continue
+
+        url_prefix = f"admin:{model._meta.app_label}_{model._meta.model_name}"
+        first_object = model.objects.order_by("pk").first()
+        changelist_url = reverse(f"{url_prefix}_changelist")
+        change_url = reverse(f"{url_prefix}_change", args=[first_object.pk])
+        admin_urls.extend([changelist_url, change_url])
+
+    query_counts = {admin_url: count_queries(client, admin_url) for admin_url in admin_urls}
+
+    create_one_of_each_model()
+
+    changed_query_counts = {}
+    for admin_url in admin_urls:
+        query_count = count_queries(client, admin_url)
+        if query_count != query_counts[admin_url]:
+            changed_query_counts[admin_url] = (query_counts[admin_url], query_count)
+
+    assert changed_query_counts == {}
