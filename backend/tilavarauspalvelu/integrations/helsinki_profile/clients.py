@@ -7,13 +7,12 @@ from typing import TYPE_CHECKING, Any
 from django.conf import settings
 from django.utils.functional import classproperty
 from graphene_django_extensions.utils import get_nested
-from requests import HTTPError
 from rest_framework.status import HTTP_200_OK
+from social_core.exceptions import SocialAuthBaseException
 from social_django.models import DjangoStorage
 from social_django.strategy import DjangoStrategy
 
 from config.auth import ProxyTunnistamoOIDCAuthBackend
-from tilavarauspalvelu.exceptions import MissingValueError
 from tilavarauspalvelu.integrations.helauth.clients import KeyCloakClient
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, utc_datetime
@@ -145,28 +144,34 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
                 # The OAuth backend types the response as a plain dict.
                 refresh_response: RefreshResponse = cls.oidc_backend.refresh_token(token=profile_refresh_token)  # type: ignore[assignment]
                 access_token = refresh_response["access_token"]
-            except HTTPError as error:
+            except SocialAuthBaseException as error:
                 #
                 # Last resort, try keycloak refresh
                 access_token = KeyCloakClient.refresh_token(user=user, session=session)
                 if access_token is None:
-                    if error.response is None:
-                        msg = "An HTTP error from 'raise_for_status' always has a response."
-                        raise MissingValueError(msg) from error
                     msg = "Unable to refresh Helsinki profile token"
-                    details = {"user": user.pk, "error": error.response.text}
+                    details = {
+                        "user": user.pk,
+                        "code": error.code,
+                        "provider_code": error.provider_code,
+                        "status_code": error.status_code,
+                        "detail": error.detail,
+                    }
                     SentryLogger.log_message(msg, details=details, level="warning")
                     return None
 
         try:
             # Fetch new profile tokens.
             response: TokenResponse = cls.oidc_backend.get_token_for_profile(access_token=access_token)
-        except HTTPError as error:
-            if error.response is None:
-                msg = "An HTTP error from 'raise_for_status' always has a response."
-                raise MissingValueError(msg) from error
+        except SocialAuthBaseException as error:
             msg = "Unable to get Helsinki profile token"
-            details = {"user": user.pk, "error": error.response.text}
+            details = {
+                "user": user.pk,
+                "code": error.code,
+                "provider_code": error.provider_code,
+                "status_code": error.status_code,
+                "detail": error.detail,
+            }
             SentryLogger.log_message(msg, details=details, level="warning")
             return None
 
