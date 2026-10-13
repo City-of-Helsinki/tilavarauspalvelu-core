@@ -126,12 +126,37 @@ ADMIN_APP_GROUPS: list[AdminAppGroup] = [
 ]
 
 
+# Names for the models and views whose apps have no Finnish translations.
+TRANSLATED_MODEL_NAMES: dict[str, Promise] = {
+    "helusers.ADGroup": _("AD groups"),
+    "helusers.ADGroupMapping": _("AD group mappings"),
+    "admin-data-views.email_templates": _("Email templates"),
+    "admin-data-views.email_template_tester": _("Email template testing"),
+    "django_celery_beat.PeriodicTask": _("Periodic tasks"),
+    "django_celery_beat.CrontabSchedule": _("Crontab schedules"),
+    "django_celery_beat.IntervalSchedule": _("Interval schedules"),
+    "django_celery_beat.ClockedSchedule": _("Clocked schedules"),
+    "django_celery_beat.SolarSchedule": _("Solar schedules"),
+    "django_celery_results.TaskResult": _("Task results"),
+    "django_celery_results.GroupResult": _("Group results"),
+    "resilient_logger.ResilientLogEntry": _("Resilient log entries"),
+    "social_django.UserSocialAuth": _("User social auths"),
+    "social_django.Association": _("Associations"),
+    "social_django.Nonce": _("Nonces"),
+}
+
+
 def group_admin_app_list(app_list: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Group the models on the admin index page and in the sidebar by topic instead of by Django app."""
     models_by_label: dict[str, dict[str, Any]] = {}
     for app in app_list:
         for model in app["models"]:
-            models_by_label[f"{app['app_label']}.{model['object_name']}"] = model
+            label = f"{app['app_label']}.{model['object_name']}"
+            translated_name = TRANSLATED_MODEL_NAMES.get(label)
+            if translated_name is None:
+                models_by_label[label] = model
+            else:
+                models_by_label[label] = {**model, "name": translated_name}
 
     grouped_app_list: list[dict[str, Any]] = []
     for group in ADMIN_APP_GROUPS:

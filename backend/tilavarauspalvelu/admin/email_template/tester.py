@@ -110,7 +110,7 @@ def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpRespon
 
     context = {
         **admin.site.each_context(request),
-        "title": "Email Template Testing",
+        "title": _("Email template testing"),
         "base_site_template": "admin/base_site.html",  # See: 'helusers.admin_site.AdminSite.each_context'
         "app_view_name": admin_data_settings.NAME,  # For breadcrumbs
         "form": tester_form,

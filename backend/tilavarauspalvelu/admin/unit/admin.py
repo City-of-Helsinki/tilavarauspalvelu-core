@@ -9,6 +9,7 @@ from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 from modeltranslation.admin import TabbedTranslationAdmin
 
 from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
@@ -186,17 +187,24 @@ class UnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, ExtraButtonsMi
         except Exception as err:  # noqa: BLE001
             details = f"Tried to import units from TPREK: '{units.values_list('pk', flat=True)}'"
             SentryLogger.log_exception(err, details=details)
-            self.message_user(request, f"Error while importing units from TPREK: {err}", level=messages.ERROR)
+            message = _("Could not import the units from TPREK. The error was reported to Sentry.")
+            self.message_user(request, message, level=messages.ERROR)
         else:
             if not tprek_unit_importer.updated_units_count:
-                self.message_user(request, "No units were updated.", level=messages.WARNING)
+                self.message_user(request, _("No units were updated."), level=messages.WARNING)
             else:
-                msg = f"Updated {tprek_unit_importer.updated_units_count} units."
-                not_updated_count = len(queryset) - tprek_unit_importer.updated_units_count
+                updated_count = tprek_unit_importer.updated_units_count
+                msg = ngettext("Updated %(count)s unit.", "Updated %(count)s units.", updated_count) % {
+                    "count": updated_count,
+                }
+                not_updated_count = len(queryset) - updated_count
                 if not_updated_count:
-                    msg += f" Skipped {not_updated_count} units."
+                    skipped_msg = ngettext("Skipped %(count)s unit.", "Skipped %(count)s units.", not_updated_count) % {
+                        "count": not_updated_count,
+                    }
+                    msg = f"{msg} {skipped_msg}"
                 self.message_user(request, msg, level=messages.SUCCESS)
 
-    @button(label="Update from TPREK", change_form=True)
+    @button(label=_("Update from TPREK"), change_form=True)
     def update_from_tprek_button(self, request: WSGIRequest, pk: int) -> None:
         self.update_from_tprek(request, Unit.objects.filter(pk=pk))

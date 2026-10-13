@@ -92,9 +92,30 @@ msgstr "Ei, vie minut takaisin"
 msgid "Reset allocations"
 msgstr "Nollaa allokoinnit"
 
+#: templates/email/email_tester.html tilavarauspalvelu/admin/app_list.py
+#: tilavarauspalvelu/admin/email_template/tester.py
+msgid "Email template testing"
+msgstr "Sähköpostipohjien testaus"
+
 #: templates/email/email_tester.html
-msgid "Email Template Testing"
-msgstr "Email-pohjan testaus"
+msgid "Switch email template"
+msgstr "Vaihda sähköpostipohja"
+
+#: templates/email/email_tester.html
+msgid "Preview with example data"
+msgstr "Esikatsele esimerkkitiedoilla"
+
+#: templates/email/email_tester.html
+msgid "Fill the form with reservation unit data"
+msgstr "Täytä lomake varausyksikön tiedoilla"
+
+#: templates/email/email_tester.html
+msgid "Email template test form"
+msgstr "Sähköpostipohjan testilomake"
+
+#: templates/email/email_tester.html
+msgid "Send test emails"
+msgstr "Lähetä testisähköpostit"
 
 #: tilavarauspalvelu/admin/allocated_timeslot/admin.py
 msgid ""
@@ -208,6 +229,63 @@ msgstr "Sisällöt ja sähköpostit"
 #: tilavarauspalvelu/admin/app_list.py
 msgid "System"
 msgstr "Järjestelmä"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "AD groups"
+msgstr "AD-ryhmät"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "AD group mappings"
+msgstr "AD-ryhmien liitokset"
+
+#: tilavarauspalvelu/admin/app_list.py
+#: tilavarauspalvelu/admin/email_template/view.py
+msgid "Email templates"
+msgstr "Sähköpostipohjat"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Periodic tasks"
+msgstr "Ajastetut tehtävät"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Crontab schedules"
+msgstr "Crontab-ajastukset"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Interval schedules"
+msgstr "Toistuvat ajastukset"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Clocked schedules"
+msgstr "Kertaluonteiset ajastukset"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Solar schedules"
+msgstr "Aurinkoon perustuvat ajastukset"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Task results"
+msgstr "Tehtävien tulokset"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Group results"
+msgstr "Tehtäväryhmien tulokset"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Resilient log entries"
+msgstr "Lähetettävät lokimerkinnät"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "User social auths"
+msgstr "Käyttäjien kirjautumistavat"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Associations"
+msgstr "OpenID-yhteydet"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Nonces"
+msgstr "OpenID-kertatunnisteet"
 
 #: tilavarauspalvelu/admin/app_list.py tilavarauspalvelu/enums.py
 msgid "Other"
@@ -541,6 +619,22 @@ msgstr "Aika"
 #: tilavarauspalvelu/admin/application_round/admin.py
 msgid "Criteria"
 msgstr "Kriteeri"
+
+#: tilavarauspalvelu/admin/application_round/admin.py
+msgid "Export applications to CSV"
+msgstr "Vie hakemukset CSV-tiedostoon"
+
+#: tilavarauspalvelu/admin/application_round/admin.py
+msgid "Could not export the applications. The error was reported to Sentry."
+msgstr "Hakemusten vienti epäonnistui. Virhe raportoitiin Sentryyn."
+
+#: tilavarauspalvelu/admin/application_round/admin.py
+msgid "Export results to CSV"
+msgstr "Vie tulokset CSV-tiedostoon"
+
+#: tilavarauspalvelu/admin/application_round/admin.py
+msgid "Could not export the results. The error was reported to Sentry."
+msgstr "Tulosten vienti epäonnistui. Virhe raportoitiin Sentryyn."
 
 #: tilavarauspalvelu/admin/application_round/admin.py
 msgid "Reset application round"
@@ -994,6 +1088,14 @@ msgstr "Liitteet"
 msgid "Test email '%(email_type)s' successfully sent."
 msgstr "Testisähköposti %(email_type)s' lähetetty onnistuneesti."
 
+#: tilavarauspalvelu/admin/email_template/view.py
+msgid "Template"
+msgstr "Pohja"
+
+#: tilavarauspalvelu/admin/email_template/view.py
+msgid "Text"
+msgstr "Teksti"
+
 #: tilavarauspalvelu/admin/general_role/admin.py
 msgid "Search by username, email, first name or last name"
 msgstr "Etsi käyttäjänimellä, sähköpostilla, etu- tai sukunimellä"
@@ -1061,8 +1163,16 @@ msgstr ""
 "Aukioloajat haetaan kaksi vuotta eteenpäin."
 
 #: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
+msgid "Update all reservable time spans"
+msgstr "Päivitä kaikki varattavat aikavälit"
+
+#: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
 msgid "Reservable Time Spans updated."
 msgstr "Varattavat aikavälit päivitetty."
+
+#: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
+msgid "Update reservable time spans"
+msgstr "Päivitä varattavat aikavälit"
 
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid ""
@@ -1208,6 +1318,10 @@ msgstr ""
 #: tilavarauspalvelu/admin/payment_order/admin.py
 msgid "processed at"
 msgstr "käsitelty alkaen"
+
+#: tilavarauspalvelu/admin/rejected_occurrence/admin.py
+msgid "Search by rejection reason or reservation series' name"
+msgstr "Hae hylkäyksen syyn tai toistuvan varauksen nimen perusteella"
 
 #: tilavarauspalvelu/admin/reservation/admin.py
 msgid ""
@@ -1713,6 +1827,15 @@ msgstr "Julkaisun tila"
 msgid "Reservation state"
 msgstr "Varattavuuden tila"
 
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Export selected reservation units to CSV"
+msgstr "Vie valitut varausyksiköt CSV-tiedostoon"
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid ""
+"Could not export the reservation units. The error was reported to Sentry."
+msgstr "Varausyksiköiden vienti epäonnistui. Virhe raportoitiin Sentryyn."
+
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Access type begin date"
 msgstr "Kulkutavan alkamispäivä"
@@ -2153,9 +2276,21 @@ msgstr ""
 "Hinnoitteluehdot vaaditaan suoravaraamiseen jos varaaja voi hakea "
 "maksuttomuutta"
 
+#: tilavarauspalvelu/admin/reservation_unit_option/admin.py
+msgid ""
+"Search by reservation unit, unit, application section, user's first or last "
+"name or email"
+msgstr ""
+"Hae varausyksikön, toimipisteen, hakemuksen osan tai käyttäjän etunimen, "
+"sukunimen tai sähköpostiosoitteen perusteella"
+
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"
 msgstr "Etsi nimellä tai toimipisteen nimellä"
+
+#: tilavarauspalvelu/admin/terms_of_use/admin.py
+msgid "Show PDF"
+msgstr "Näytä PDF"
 
 #: tilavarauspalvelu/admin/unit/admin.py
 msgid "Search by name or TPREK ID"
@@ -2188,6 +2323,34 @@ msgstr "Käyttöoikeustiedot"
 #: tilavarauspalvelu/admin/unit/admin.py
 msgid "Location"
 msgstr "Sijainti"
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid ""
+"Could not import the units from TPREK. The error was reported to Sentry."
+msgstr ""
+"Toimipisteiden tuonti TPRekistä epäonnistui. Virhe raportoitiin Sentryyn."
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid "No units were updated."
+msgstr "Yhtään toimipistettä ei päivitetty."
+
+#: tilavarauspalvelu/admin/unit/admin.py
+#, python-format
+msgid "Updated %(count)s unit."
+msgid_plural "Updated %(count)s units."
+msgstr[0] "Päivitettiin %(count)s toimipiste."
+msgstr[1] "Päivitettiin %(count)s toimipistettä."
+
+#: tilavarauspalvelu/admin/unit/admin.py
+#, python-format
+msgid "Skipped %(count)s unit."
+msgid_plural "Skipped %(count)s units."
+msgstr[0] "Ohitettiin %(count)s toimipiste."
+msgstr[1] "Ohitettiin %(count)s toimipistettä."
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid "Update from TPREK"
+msgstr "Päivitä TPRekistä"
 
 #: tilavarauspalvelu/admin/unit/form.py
 msgid ""
@@ -2254,6 +2417,10 @@ msgstr ""
 msgid "Search by name"
 msgstr "Etsi nimellä"
 
+#: tilavarauspalvelu/admin/unit_group/admin.py
+msgid "Number of units"
+msgstr "Toimipisteiden määrä"
+
 #: tilavarauspalvelu/admin/unit_role/admin.py
 msgid ""
 "Search by user's username, email, first name, last name, unit or unit group"
@@ -2284,6 +2451,78 @@ msgstr "Toistuvat varaukset"
 #: tilavarauspalvelu/admin/user/admin.py
 msgid "Applications"
 msgstr "Hakemukset"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Statistics UUID"
+msgstr "Tilastojen UUID"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "GDPR UUID"
+msgstr "GDPR-UUID"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Issuer (iss)"
+msgstr "Myöntäjä (iss)"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Audience (aud)"
+msgstr "Vastaanottaja (aud)"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "JWT ID (jti)"
+msgstr "JWT-tunniste (jti)"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Token type (typ)"
+msgstr "Tunnisteen tyyppi (typ)"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Expires (exp)"
+msgstr "Vanhenee (exp)"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Issued at (iat)"
+msgstr "Myönnetty (iat)"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Auth time (auth_time)"
+msgstr "Tunnistautumisaika (auth_time)"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Nonce (nonce)"
+msgstr "Kertatunniste (nonce)"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Access token hash (at_hash)"
+msgstr "Pääsytunnisteen tiiviste (at_hash)"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Preferred username (preferred_username)"
+msgstr "Ensisijainen käyttäjätunnus (preferred_username)"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Email verified (email_verified)"
+msgstr "Sähköposti vahvistettu (email_verified)"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Authorized party (azp)"
+msgstr "Valtuutettu osapuoli (azp)"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Session identifier (sid)"
+msgstr "Istunnon tunniste (sid)"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Session state (session_state)"
+msgstr "Istunnon tila (session_state)"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Authentication methods reference (amr)"
+msgstr "Tunnistautumistavat (amr)"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Level of assurance (loa)"
+msgstr "Varmuustaso (loa)"
 
 #: tilavarauspalvelu/api/gdpr/views.py
 msgid "User has upcoming or too recent reservations."

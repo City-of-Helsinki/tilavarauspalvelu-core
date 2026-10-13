@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.models import RejectedOccurrence
 
@@ -24,7 +25,7 @@ class RejectedOccurrenceAdmin(admin.ModelAdmin):
         "rejection_reason",
         "reservation_series__name",
     ]
-    search_help_text = "Search by rejection reason or reservation series' name"
+    search_help_text = _("Search by rejection reason or reservation series' name")
 
     # List
     list_display = [
