@@ -12,8 +12,8 @@ usage() {
 }
 [[ $# -eq 2 ]] || usage
 
-repo="City-of-Helsinki/tilavarauspalvelu-core"
-runs_url='https://github\.com/City-of-Helsinki/tilavarauspalvelu-core/actions/runs'
+repo="City-of-Helsinki/tilavarauspalvelu"
+runs_url='https://github\.com/City-of-Helsinki/tilavarauspalvelu/actions/runs'
 
 case "$1" in
   run)
