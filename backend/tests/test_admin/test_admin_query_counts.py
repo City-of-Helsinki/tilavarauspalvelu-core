@@ -127,6 +127,20 @@ def test_admin_query_counts__reservation_unit_pricing_list__same_for_more_pricin
     assert count_queries(api_client, url) == query_count
 
 
+def test_admin_query_counts__space_list__same_for_more_spaces(api_client):
+    user = UserFactory.create_superuser()
+    api_client.force_login(user)
+
+    SpaceFactory.create(parent=SpaceFactory.create())
+    url = reverse("admin:tilavarauspalvelu_space_changelist")
+    query_count = count_queries(api_client, url)
+
+    SpaceFactory.create(parent=SpaceFactory.create())
+    SpaceFactory.create(parent=SpaceFactory.create())
+
+    assert count_queries(api_client, url) == query_count
+
+
 # ── Change pages ──
 
 
@@ -175,6 +189,19 @@ def test_admin_query_counts__resource_change__same_for_more_spaces(api_client):
 
     resource = ResourceFactory.create()
     url = reverse("admin:tilavarauspalvelu_resource_change", args=[resource.pk])
+    query_count = count_queries(api_client, url)
+
+    SpaceFactory.create_batch(3)
+
+    assert count_queries(api_client, url) == query_count
+
+
+def test_admin_query_counts__space_change__same_for_more_spaces(api_client):
+    user = UserFactory.create_superuser()
+    api_client.force_login(user)
+
+    space = SpaceFactory.create(parent=SpaceFactory.create())
+    url = reverse("admin:tilavarauspalvelu_space_change", args=[space.pk])
     query_count = count_queries(api_client, url)
 
     SpaceFactory.create_batch(3)
