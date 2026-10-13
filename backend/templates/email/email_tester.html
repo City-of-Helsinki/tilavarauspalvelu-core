@@ -10,35 +10,35 @@
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
     &rsaquo; <a href="{% url 'admin:admin-data-index-view' %}">{{ app_view_name }}</a>
-    &rsaquo; {% translate 'Email Template Testing' %}
+    &rsaquo; {% translate 'Email template testing' %}
 </div>
 {% endblock %}
 
 {% block content %}
-<h1 id="site-name">Email Template Testing</h1>
+<h1 id="site-name">{% translate 'Email template testing' %}</h1>
 
 <div style="display: flex; flex-direction: column; flex-wrap: wrap; justify-content: flex-end; gap: 10px 10px">
 
     <form method="get" novalidate id="test_email_template_select_form">
-        <h2>Switch email template</h2>
+        <h2>{% translate 'Switch email template' %}</h2>
         <table>{{ template_switcher_form.as_table }}</table>
     </form>
 
-    <h2>Preview with example data</h2>
+    <h2>{% translate 'Preview with example data' %}</h2>
     <p>HTML: {{ links_html | safe }}</p>
     <p>TEXT: {{ links_text | safe }}</p>
     <hr>
 
     <form method="get" novalidate id="test_email_reservation_unit_select_form">
-        <h2>Fill form with Reservation Unit data</h2>
+        <h2>{% translate 'Fill the form with reservation unit data' %}</h2>
         <table>{{ reservation_unit_form.as_table }}</table>
     </form>
 
     <form method="post" novalidate>
-        <h2>Email template test form</h2>
+        <h2>{% translate 'Email template test form' %}</h2>
         {% csrf_token %}
         <table>{{ form.as_table }}</table>
-        <button>Send Test Emails</button>
+        <button>{% translate 'Send test emails' %}</button>
     </form>
 
     <script>

@@ -113,12 +113,12 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     def linked_reservation_units(self, obj: OriginHaukiResource) -> str:
         return ", ".join(reservation_unit.name_fi for reservation_unit in obj.reservation_units.all())
 
-    @button(label="Update All Reservable Time Spans", change_list=True)
+    @button(label=_("Update all reservable time spans"), change_list=True)
     def update_all_hauki_resources_reservable_time_spans(self, request: WSGIRequest) -> None:
         HaukiResourceHashUpdater().run(force_refetch=True)
         self.message_user(request, _("Reservable Time Spans updated."))
 
-    @button(label="Update Reservable Time Spans", change_form=True)
+    @button(label=_("Update reservable time spans"), change_form=True)
     def update_single_hauki_resource_reservable_times_pans(self, request: WSGIRequest, pk: int) -> None:
         HaukiResourceHashUpdater([pk]).run(force_refetch=True)
         self.message_user(request, _("Reservable Time Spans updated."))

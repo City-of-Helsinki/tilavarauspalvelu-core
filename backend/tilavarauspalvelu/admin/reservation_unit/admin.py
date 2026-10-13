@@ -282,13 +282,14 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
 
         return queryset, may_have_duplicates
 
-    @admin.action(description="Export selected reservation units to CSV")
+    @admin.action(description=_("Export selected reservation units to CSV"))
     def export_to_csv(self, request: WSGIRequest, queryset: ReservationUnitQuerySet) -> FileResponse | None:
         try:
             exporter = ReservationUnitExporter(queryset=queryset)
             response = exporter.to_file_response()
         except Exception as error:  # noqa: BLE001
-            self.message_user(request, f"Error while exporting results: {error}", level=messages.ERROR)
+            message = _("Could not export the reservation units. The error was reported to Sentry.")
+            self.message_user(request, message, level=messages.ERROR)
             SentryLogger.log_exception(error, "Error while exporting ReservationUnits")
             return None
 

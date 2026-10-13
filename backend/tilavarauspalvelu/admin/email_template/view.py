@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 from admin_data_views.typing import TableContext
 from admin_data_views.utils import render_with_table_view
 from django.http import HttpResponse
+from django.utils.translation import gettext
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_preview_links, get_tester_link
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
@@ -34,11 +35,11 @@ def email_templates_admin_list_view(request: WSGIRequest, **kwargs: Any) -> Tabl
         tester_links.append(tester_link)
 
     return TableContext(
-        title="Email templates",
+        title=gettext("Email templates"),
         table={
-            "Template": tester_links,
+            gettext("Template"): tester_links,
             "HTML": links_html,
-            "Text": links_text,
+            gettext("Text"): links_text,
         },
     )
 

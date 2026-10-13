@@ -243,39 +243,39 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         for user in queryset.all():
             user.actions.anonymize()
 
-    @admin.display(description="Statistics UUID")
+    @admin.display(description=_("Statistics UUID"))
     def statistics_uuid(self, user: User) -> str:
         return user.tvp_uuid
 
-    @admin.display(description="GDPR UUID")
+    @admin.display(description=_("GDPR UUID"))
     def gdpr_uuid(self, user: User) -> str:
         return user.uuid
 
-    @admin.display(description="Issuer (iss)")
+    @admin.display(description=_("Issuer (iss)"))
     def issuer(self, user: User) -> str:
         if user.id_token is None:
             return "-"
         return user.id_token.iss
 
-    @admin.display(description="Audience (aud)")
+    @admin.display(description=_("Audience (aud)"))
     def audience(self, user: User) -> str:
         if user.id_token is None:
             return "-"
         return user.id_token.aud
 
-    @admin.display(description="JWT ID (jti)")
+    @admin.display(description=_("JWT ID (jti)"))
     def jwt_id(self, user: User) -> str:
         if user.id_token is None:
             return "-"
         return user.id_token.jti
 
-    @admin.display(description="Token type (typ)")
+    @admin.display(description=_("Token type (typ)"))
     def token_type(self, user: User) -> str:
         if user.id_token is None:
             return "-"
         return user.id_token.typ
 
-    @admin.display(description="Expires (exp)")
+    @admin.display(description=_("Expires (exp)"))
     def expires(self, user: User) -> str:
         if user.id_token is None:
             return "-"
@@ -283,67 +283,67 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         expired = expires < local_datetime()
         return expires.isoformat() + (" (expired)" if expired else " (valid)")
 
-    @admin.display(description="Issued at (iat)")
+    @admin.display(description=_("Issued at (iat)"))
     def issued_at(self, user: User) -> str:
         if user.id_token is None:
             return "-"
         return datetime.datetime.fromtimestamp(user.id_token.iat).astimezone(DEFAULT_TIMEZONE).isoformat()
 
-    @admin.display(description="Auth time (auth_time)")
+    @admin.display(description=_("Auth time (auth_time)"))
     def auth_time(self, user: User) -> str:
         if user.id_token is None:
             return "-"
         return datetime.datetime.fromtimestamp(user.id_token.auth_time).astimezone(DEFAULT_TIMEZONE).isoformat()
 
-    @admin.display(description="Nonce (nonce)")
+    @admin.display(description=_("Nonce (nonce)"))
     def nonce(self, user: User) -> str:
         if user.id_token is None:
             return "-"
         return user.id_token.nonce
 
-    @admin.display(description="Access token hash (at_hash)")
+    @admin.display(description=_("Access token hash (at_hash)"))
     def access_token_hash(self, user: User) -> str:
         if user.id_token is None:
             return "-"
         return user.id_token.at_hash
 
-    @admin.display(description="Preferred username (preferred_username)")
+    @admin.display(description=_("Preferred username (preferred_username)"))
     def preferred_username(self, user: User) -> str:
         if user.id_token is None:
             return "-"
         return user.id_token.preferred_username
 
-    @admin.display(description="Email verified (email_verified)")
+    @admin.display(description=_("Email verified (email_verified)"))
     def email_verified(self, user: User) -> str:
         if user.id_token is None:
             return "-"
         return str(user.id_token.email_verified)
 
-    @admin.display(description="Authorized party (azp)")
+    @admin.display(description=_("Authorized party (azp)"))
     def authorized_party(self, user: User) -> str:
         if user.id_token is None:
             return "-"
         return user.id_token.azp
 
-    @admin.display(description="Session identifier (sid)")
+    @admin.display(description=_("Session identifier (sid)"))
     def session_identifier(self, user: User) -> str:
         if user.id_token is None:
             return "-"
         return user.id_token.sid
 
-    @admin.display(description="Session state (session_state)")
+    @admin.display(description=_("Session state (session_state)"))
     def session_state(self, user: User) -> str:
         if user.id_token is None:
             return "-"
         return user.id_token.session_state
 
-    @admin.display(description="Authentication methods reference (amr)")
+    @admin.display(description=_("Authentication methods reference (amr)"))
     def authentication_methods_reference(self, user: User) -> str:
         if user.id_token is None:
             return "-"
         return str(user.id_token.amr)
 
-    @admin.display(description="Level of assurance (loa)")
+    @admin.display(description=_("Level of assurance (loa)"))
     def level_of_assurance(self, user: User) -> str:
         if user.id_token is None:
             return "-"

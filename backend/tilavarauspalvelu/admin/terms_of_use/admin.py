@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.forms import ModelForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 from tinymce.widgets import TinyMCE
 
@@ -48,7 +49,7 @@ class TermsOfUseAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, Translati
     # Form
     form = TermsOfUseAdminForm
 
-    @button(label="Show PDF", change_form=True, visible=lambda self: self.original.id == "booking")
+    @button(label=_("Show PDF"), change_form=True, visible=lambda self: self.original.id == "booking")
     def show_pdf(self, request: WSGIRequest) -> HttpResponseRedirect:
         url = reverse("terms_of_use_pdf") + "?as_attachment=False"
         return HttpResponseRedirect(url)
