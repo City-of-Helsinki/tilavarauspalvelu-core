@@ -1,0 +1,418 @@
+#!/usr/bin/env bash
+# Watch a pull request and exit when it has news for the agent: a check failed, the required
+# checks passed, someone commented or reviewed, or the branch started to conflict.
+#
+# Usage: watch-pr start|wait|stop <number or URL>
+#   start  Start a watch from now. Only news after this wakes the agent.
+#   wait   Poll until there is news. Exit 0 with the news, or exit 3 when the watch ended.
+#   stop   Stop the watch.
+set -euo pipefail
+
+usage() {
+  echo "Usage: watch-pr start|wait|stop <number or URL>, e.g. watch-pr wait 99" >&2
+  exit 2
+}
+[[ $# -eq 2 ]] || usage
+
+owner="City-of-Helsinki"
+name="tilavarauspalvelu-core"
+repo="$owner/$name"
+
+command="$1"
+if [[ "$2" =~ ^([0-9]+)$ ]]; then
+  number="${BASH_REMATCH[1]}"
+elif [[ "$2" =~ ^https://github\.com/City-of-Helsinki/tilavarauspalvelu-core/pull/([0-9]+)([/?#].*)?$ ]]; then
+  number="${BASH_REMATCH[1]}"
+else
+  echo "Not a pull request number or URL: $2" >&2
+  usage
+fi
+
+# Seconds between passes. Checks take minutes, so a faster pass mostly spends the rate limit.
+SWEEP_SECONDS=120
+# Reads in a row that failed for a reason other than a rate limit before the watch ends.
+READ_FAILURE_LIMIT=8
+# Wakes in a row that bring only comments. This stops a bot and the agent from replying forever.
+WAKE_LIMIT=10
+# The fingerprint does not see edits to comments inside review threads, so read them anyway this often.
+REREAD_SECONDS=1800
+# Pause while GraphQL has fewer points left than this, so the user's other work has quota.
+QUOTA_FLOOR=500
+# The agent puts this in every comment it posts. Comments with it never wake the agent.
+MARKER="<!-- watch-pr:agent -->"
+
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/watch-pr"
+state_file="$state_dir/$owner-$name-$number.json"
+
+now_iso() { date -u +%Y-%m-%dT%H:%M:%SZ; }
+log() { echo "$(now_iso) $*" >&2; }
+
+save_state() {
+  local tmp
+  tmp="$(mktemp "$state_dir/.state.XXXXXX")"
+  printf '%s\n' "$1" > "$tmp"
+  mv "$tmp" "$state_file"
+}
+
+# Exit status 2 means GitHub rate limited the call.
+graphql() {
+  local out
+  if out="$(gh api graphql "$@" 2>&1)"; then
+    printf '%s' "$out"
+    return 0
+  fi
+  log "GraphQL read failed: $out"
+  if grep -qi "rate limit" <<< "$out"; then return 2; fi
+  return 1
+}
+
+# What a watch needs to notice, for 1 GraphQL point. "status" moves when the state,
+# mergeability, head commit, or check counts by state move. "remarks" moves on a new comment,
+# review, or review thread, and when a comment or review is edited.
+read_fingerprint() {
+  local edits="totalCount nodes { lastEditedAt }"
+  local counts="checkRunCountsByState { state count } statusContextCountsByState { state count }"
+  local raw
+  raw="$(graphql -F owner="$owner" -F name="$name" -F number="$number" -f query="
+    query(\$owner: String!, \$name: String!, \$number: Int!) {
+      rateLimit { remaining resetAt }
+      viewer { login }
+      repository(owner: \$owner, name: \$name) {
+        pullRequest(number: \$number) {
+          state mergeable headRefOid
+          comments(first: 100, orderBy: { field: UPDATED_AT, direction: DESC }) { $edits }
+          reviews(last: 100) { $edits }
+          reviewThreads { totalCount }
+          commits(last: 1) { nodes { commit { statusCheckRollup { contexts { $counts } } } } }
+        }
+      }
+    }")" || return
+  jq -c '
+    def newest: [.nodes[]?.lastEditedAt // empty] | max // "";
+    def counts: [(. // [])[] | select(.count > 0) | "\(.state):\(.count)"] | sort | join(",");
+    .data as $data
+    | $data.repository.pullRequest as $pr
+    | ($pr.commits.nodes[0].commit.statusCheckRollup.contexts // {}) as $contexts
+    | {
+        viewer: $data.viewer.login,
+        remaining: $data.rateLimit.remaining,
+        resetAt: $data.rateLimit.resetAt,
+        state: $pr.state,
+        status: [$pr.state, ($pr.mergeable // ""), $pr.headRefOid,
+          ($contexts.checkRunCountsByState | counts), ($contexts.statusContextCountsByState | counts)] | join(" "),
+        remarks: [$pr.comments.totalCount, ($pr.comments | newest), $pr.reviews.totalCount,
+          ($pr.reviews | newest), $pr.reviewThreads.totalCount] | map(tostring) | join(" ")
+      }' <<< "$raw"
+}
+
+# State, mergeability, head commit, and every check on the head commit, for 1 GraphQL point.
+read_detail() {
+  local raw
+  # shellcheck disable=SC2016  # The $ names are GraphQL variables.
+  raw="$(graphql -F owner="$owner" -F name="$name" -F number="$number" -f query='
+    query($owner: String!, $name: String!, $number: Int!) {
+      repository(owner: $owner, name: $name) {
+        pullRequest(number: $number) {
+          state mergeable headRefOid baseRefName
+          commits(last: 1) { nodes { commit { statusCheckRollup { contexts(first: 100) { nodes {
+            __typename
+            ... on CheckRun { name status conclusion detailsUrl isRequired(pullRequestNumber: $number) }
+            ... on StatusContext { context state targetUrl isRequired(pullRequestNumber: $number) }
+          } } } } } }
+        }
+      }
+    }')" || return
+  jq -c '
+    .data.repository.pullRequest as $pr
+    | {
+        state: $pr.state,
+        mergeable: $pr.mergeable,
+        headSha: $pr.headRefOid,
+        baseRef: $pr.baseRefName,
+        checks: [($pr.commits.nodes[0].commit.statusCheckRollup.contexts.nodes // [])[]
+          | if .__typename == "CheckRun" then {
+              name,
+              url: .detailsUrl,
+              required: .isRequired,
+              result: (.conclusion // .status),
+              status: (if .status != "COMPLETED" then "pending"
+                elif .conclusion | IN("FAILURE", "CANCELLED", "TIMED_OUT", "ACTION_REQUIRED", "STARTUP_FAILURE") then "failed"
+                else "passed" end)
+            } else {
+              name: .context,
+              url: .targetUrl,
+              required: .isRequired,
+              result: .state,
+              status: (if .state | IN("PENDING", "EXPECTED") then "pending"
+                elif .state | IN("FAILURE", "ERROR") then "failed"
+                else "passed" end)
+            } end]
+      }' <<< "$raw"
+}
+
+# Every comment, review comment, and review, through REST. REST has its own quota,
+# so this read does not spend GraphQL points. "at" is the last edit, so an edit is news.
+read_remarks() {
+  local issue_comments review_comments reviews
+  issue_comments="$(gh api "repos/$repo/issues/$number/comments?per_page=100" --paginate \
+    --jq '.[] | {id: "ic\(.id)", author: (.user.login // "ghost"), path: null, body: (.body // ""),
+      at: .updated_at, url: .html_url, state: null}')" || return 1
+  review_comments="$(gh api "repos/$repo/pulls/$number/comments?per_page=100" --paginate \
+    --jq '.[] | {id: "rc\(.id)", author: (.user.login // "ghost"),
+      path: "\(.path):\(.line // .original_line // "")", body: (.body // ""),
+      at: .updated_at, url: .html_url, state: null}')" || return 1
+  # A review with no body and state COMMENTED only holds review comments, which are listed above.
+  reviews="$(gh api "repos/$repo/pulls/$number/reviews?per_page=100" --paginate \
+    --jq '.[] | select(.state != "PENDING") | select((.body // "") != "" or .state != "COMMENTED")
+      | {id: "rv\(.id)", author: (.user.login // "ghost"), path: null, body: (.body // ""),
+      at: .submitted_at, url: .html_url, state: .state}')" || return 1
+  printf '%s\n%s\n%s\n' "$issue_comments" "$review_comments" "$reviews" | jq -cs 'sort_by(.at)'
+}
+
+# Compares the pull request with what the agent was last told. Each check is reported as soon
+# as it fails. "Passed" is reported once the required checks all passed, or all checks when
+# none is required. A remark counts unless it has the agent marker. Remarks is null when they
+# were not read, and the remark watermark then stays where it is.
+evaluate() {
+  jq -cn --argjson watch "$1" --argjson detail "$2" --argjson remarks "$3" \
+    --arg marker "$MARKER" --argjson limit "$WAKE_LIMIT" '
+    def has($list; $item): $list | any(.[]; . == $item);
+    ($detail.headSha != $watch.headSha) as $moved
+    | (if $moved then [] else $watch.failedChecks end) as $failedBefore
+    | (if $moved then false else $watch.passed end) as $passedBefore
+    | (if $moved then [] else $watch.passedChecks end) as $passedChecksBefore
+    # An empty list keeps the last state. GitHub can answer with one while checks are created.
+    | (if ($detail.checks | length) == 0 then
+        {failedChecks: $failedBefore, passed: $passedBefore, passedChecks: $passedChecksBefore, changes: []}
+      else
+        ($detail.checks | map(select(.status == "failed"))) as $failed
+        | ($failed | map(select(has($failedBefore; .name) | not))) as $newlyFailed
+        | ($detail.checks | map(select(.required))) as $required
+        | (if ($required | length) > 0 then $required else $detail.checks end) as $gate
+        | ($gate | all(.status == "passed")) as $passedNow
+        | ($gate | map(.name)) as $gateNames
+        # A required check created and finished between two passes is never seen pending.
+        | (($required | length) > 0 and ($gateNames | any(has($passedChecksBefore; .) | not))) as $gateGrew
+        | {
+            # A check that runs again leaves the list, so a rerun that fails again is reported.
+            failedChecks: ($failed | map(.name)),
+            passed: $passedNow,
+            passedChecks: (if $passedNow then $gateNames else [] end),
+            changes: (
+              (if ($newlyFailed | length) > 0 then [{kind: "checks-failed", failed: $newlyFailed}] else [] end)
+              + (if $passedNow and (($passedBefore | not) or $gateGrew)
+                then [{kind: "checks-passed", count: ($gate | length), required: (($required | length) > 0)}]
+                else [] end)
+            )
+          }
+      end) as $checks
+    # GitHub times are per second, so remarks at the watermark time are told apart by ID.
+    | (($remarks // []) | map(
+        select(.at > $watch.remarksThrough or (.at == $watch.remarksThrough and (has($watch.remarkIds; .id) | not)))
+        | select(.body | contains($marker) | not)
+        | .you = (.author == $watch.viewer)
+      )) as $fresh
+    | ([$watch.remarksThrough] + ($fresh | map(.at)) | max) as $latest
+    | (if $latest == $watch.remarksThrough then $watch.remarkIds else [] end
+      + ($fresh | map(select(.at == $latest) | .id))) as $remarkIds
+    | (if $detail.mergeable == "CONFLICTING" and ($watch.conflicting | not) then [{kind: "conflicting"}] else [] end) as $conflict
+    # UNKNOWN means GitHub is still computing after a push. Only a clean answer clears a conflict.
+    | (if $detail.mergeable == "UNKNOWN" then $watch.conflicting else $detail.mergeable == "CONFLICTING" end) as $conflicting
+    | ($checks.changes + (if ($fresh | length) > 0 then [{kind: "remarks", remarks: $fresh}] else [] end) + $conflict) as $changes
+    | (($changes | length) > 0 and ($changes | all(.kind == "remarks"))) as $commentsOnly
+    | ($moved or (($changes | length) > 0 and ($commentsOnly | not))) as $progress
+    | ((if $progress then 0 else $watch.wakes end) + (if $commentsOnly then 1 else 0 end)) as $wakes
+    | {
+        changes: $changes,
+        exhausted: ($commentsOnly and $wakes >= $limit),
+        next: ($watch + {
+          headSha: $detail.headSha,
+          failedChecks: $checks.failedChecks,
+          passed: $checks.passed,
+          passedChecks: $checks.passedChecks,
+          remarksThrough: $latest,
+          remarkIds: $remarkIds,
+          conflicting: $conflicting,
+          wakes: $wakes
+        })
+      }'
+}
+
+# The text the agent reads when it wakes.
+message() {
+  jq -rn --argjson report "$1" --argjson detail "$2" --arg url "https://github.com/$repo/pull/$number" \
+    --arg number "$number" --argjson limit "$WAKE_LIMIT" '
+    def snippet: gsub("(?s)<!--.*?-->"; " ") | gsub("\\s+"; " ") | sub("^ "; "") | sub(" $"; "")
+      | if length <= 200 then . else .[0:197] + "..." end;
+    def listed(line): (.[0:10] | map(line)) + (if length > 10 then ["  - and \(length - 10) more"] else [] end);
+    " on \($detail.headSha[0:7])" as $commit
+    | [
+        "Update on pull request #\($number) (\($url)):",
+        ($report.changes[] | if .kind == "checks-failed" then
+            "- Checks failed\($commit):",
+            (.failed | listed("  - \(.name)\(if .result == "FAILURE" then "" else " (\(.result | ascii_downcase))" end) \(.url // "")"))[]
+          elif .kind == "checks-passed" then
+            "- All \(.count) \(if .required then "required " else "" end)check\(if .count == 1 then "" else "s" end) passed\($commit)."
+          elif .kind == "remarks" then
+            "- \(.remarks | length) new comment\(if (.remarks | length) == 1 then "" else "s" end) or review\(if (.remarks | length) == 1 then "" else "s" end):",
+            (.remarks | listed(
+              (.body | snippet) as $body
+              | "  - \(.author)\(if .you then " (you)" else "" end)\(if .path then " on \(.path)" else "" end): \(if $body == "" then (.state // "reviewed") else "\"\($body)\"" end) \(.url)"
+            ))[]
+          else
+            "- The branch now conflicts with \($detail.baseRef)."
+          end),
+        "",
+        if $report.exhausted then
+          "Watching stopped after \($limit) comment-only updates in a row. Run watch-pr start to watch again."
+        else
+          "Handle each item. Then run watch-pr wait again."
+        end
+      ] | join("\n")'
+}
+
+end_watch() {
+  rm -f "$state_file"
+  echo "$1"
+  exit 3
+}
+
+# Sleeps until the rate limit resets, plus a margin for clock skew.
+sleep_until() {
+  local seconds=$(( $(date -d "$1" +%s) - $(date +%s) + 10 ))
+  (( seconds > 0 )) && sleep "$seconds"
+  return 0
+}
+
+# One pass: exits the script when there is news or the watch ended, and returns otherwise.
+pass() {
+  local watch fingerprint="null" detail remarks="null" now status
+  [[ -f "$state_file" ]] || { echo "The watch on pull request #$number was stopped."; exit 3; }
+  watch="$(cat "$state_file")"
+  now="$(date +%s)"
+
+  # A fingerprint that fails for another reason than a rate limit falls back to a full read,
+  # which counts toward giving up.
+  if fingerprint="$(read_fingerprint)"; then
+    local remaining reset_at
+    remaining="$(jq -r .remaining <<< "$fingerprint")"
+    reset_at="$(jq -r .resetAt <<< "$fingerprint")"
+    if (( remaining < QUOTA_FLOOR )); then
+      log "Only $remaining GraphQL points left. Pausing until $reset_at."
+      sleep_until "$reset_at"
+      return 0
+    fi
+  else
+    status=$?
+    if (( status == 2 )); then
+      log "Rate limited. Skipping this pass."
+      return 0
+    fi
+    fingerprint="null"
+  fi
+
+  # The detail is read when anything moved or a check is still running, since check counts by
+  # state cannot tell which check finished. Remarks are read only when they moved.
+  local plan
+  plan="$(jq -cn --argjson last "$(jq -c .lastRead <<< "$watch")" --argjson fp "$fingerprint" \
+    --argjson now "$now" --argjson reread "$REREAD_SECONDS" '
+    if $last == null or $fp == null then {detail: true, remarks: true}
+    else
+      ($last.remarks != $fp.remarks or ($last.remarksComplete | not) or $now - $last.at >= $reread) as $remarks
+      | {detail: ($remarks or $last.status != $fp.status or $last.inFlight), remarks: $remarks}
+    end')"
+  [[ "$(jq -r .detail <<< "$plan")" == "true" ]] || return 0
+  local read_remarks_now
+  read_remarks_now="$(jq -r .remarks <<< "$plan")"
+
+  status=0
+  detail="$(read_detail)" || status=$?
+  if (( status == 2 )); then
+    log "Rate limited. Skipping this pass."
+    return 0
+  fi
+  if (( status != 0 )) || [[ "$(jq -r .state <<< "$detail")" == "null" ]]; then
+    local failures
+    failures="$(jq -r '.failures + 1' <<< "$watch")"
+    if (( failures >= READ_FAILURE_LIMIT )); then
+      end_watch "Stopped watching pull request #$number because reading it failed $READ_FAILURE_LIMIT times in a row. Check it yourself, and run watch-pr start to watch it again."
+    fi
+    save_state "$(jq -c --argjson failures "$failures" '.failures = $failures | .lastRead = null' <<< "$watch")"
+    return 0
+  fi
+  if [[ "$read_remarks_now" == "true" ]]; then
+    # An incomplete read must not move the watermark, so it reports nothing and is read again.
+    remarks="$(read_remarks)" || remarks="null"
+  fi
+
+  case "$(jq -r .state <<< "$detail")" in
+    MERGED) end_watch "Pull request #$number was merged. The watch ended." ;;
+    CLOSED) end_watch "Pull request #$number was closed. The watch ended. Run watch-pr start if it reopens." ;;
+  esac
+
+  local last_read
+  last_read="$(jq -cn --argjson last "$(jq -c .lastRead <<< "$watch")" --argjson fp "$fingerprint" \
+    --argjson detail "$detail" --argjson remarks "$remarks" --argjson now "$now" --argjson read "$read_remarks_now" '{
+      at: (if $read or $last == null then $now else $last.at end),
+      status: $fp.status,
+      remarks: $fp.remarks,
+      inFlight: ($detail.mergeable == "UNKNOWN" or ($detail.checks | any(.status == "pending"))),
+      remarksComplete: (if $read then $remarks != null else ($last.remarksComplete // false) end)
+    }')"
+
+  local report next
+  report="$(evaluate "$watch" "$detail" "$remarks")"
+  next="$(jq -c --argjson lastRead "$last_read" '.next + {failures: 0, lastRead: $lastRead}' <<< "$report")"
+  if [[ "$(jq -r '.changes | length' <<< "$report")" == "0" ]]; then
+    save_state "$next"
+    return 0
+  fi
+  if [[ "$(jq -r .exhausted <<< "$report")" == "true" ]]; then
+    end_watch "$(message "$report" "$detail")"
+  fi
+  save_state "$next"
+  message "$report" "$detail"
+  exit 0
+}
+
+case "$command" in
+  start)
+    mkdir -p "$state_dir"
+    if [[ -f "$state_file" ]]; then
+      echo "Already watching pull request #$number as $(jq -r .viewer "$state_file")."
+      exit 0
+    fi
+    fingerprint="$(read_fingerprint)" || { echo "Could not read pull request #$number." >&2; exit 1; }
+    state="$(jq -r .state <<< "$fingerprint")"
+    if [[ "$state" != "OPEN" ]]; then
+      echo "Pull request #$number is $state, not open." >&2
+      exit 1
+    fi
+    viewer="$(jq -r .viewer <<< "$fingerprint")"
+    # The first pass sees no head commit, so it reports checks that already failed or passed.
+    # Remarks count from now.
+    save_state "$(jq -cn --arg viewer "$viewer" --arg now "$(now_iso)" '{
+      viewer: $viewer, startedAt: $now, headSha: null, failedChecks: [], passed: false,
+      passedChecks: [], remarksThrough: $now, remarkIds: [], conflicting: false, wakes: 0,
+      failures: 0, lastRead: null
+    }')"
+    echo "Watching pull request #$number as $viewer."
+    ;;
+  wait)
+    [[ -f "$state_file" ]] || { echo "Not watching pull request #$number. Run watch-pr start first." >&2; exit 2; }
+    # One wait per pull request, so two processes do not report the same news.
+    exec 9> "$state_file.lock"
+    flock -n 9 || { echo "Another watch-pr wait already runs for pull request #$number." >&2; exit 2; }
+    while true; do
+      pass
+      sleep "$SWEEP_SECONDS"
+    done
+    ;;
+  stop)
+    rm -f "$state_file" "$state_file.lock"
+    echo "Stopped watching pull request #$number."
+    ;;
+  *)
+    usage
+    ;;
+esac
