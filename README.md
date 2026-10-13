@@ -14,7 +14,7 @@
 [Security Rating]: https://sonarcloud.io/api/project_badges/measure?project=City-of-Helsinki_tilavarauspalvelu-core&metric=security_rating
 [Coverage Link]: https://sonarcloud.io/summary/new_code?id=City-of-Helsinki_tilavarauspalvelu-core
 [Coverage]: https://sonarcloud.io/api/project_badges/measure?project=City-of-Helsinki_tilavarauspalvelu-core&metric=coverage
-[License Link]: https://github.com/City-of-Helsinki/tilavarauspalvelu-core/blob/main/LICENSE
+[License Link]: https://github.com/City-of-Helsinki/tilavarauspalvelu/blob/main/LICENSE
 [License]: https://img.shields.io/badge/license-MIT-blue.svg
 
 This repository contains the new space and resource [reservation platform] for City of Helsinki,
