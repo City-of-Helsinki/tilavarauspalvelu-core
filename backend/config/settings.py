@@ -399,6 +399,10 @@ class Common(Environment):
         "tilavarauspalvelu.integrations.helauth.pipeline.update_roles_from_ad_groups",
     )
 
+    # Read by the 'social_django.0020_backfill_id_keys' migration, which knows only the built-in backends.
+    # Without this, the next login of each existing user goes through a legacy identifier check.
+    SOCIAL_AUTH_OLD_ID_KEYS = {"tunnistamo": "sub"}
+
     @classproperty
     def OIDC_AUTH(cls) -> dict[str, Any]:
         # See 'oidc_auth/settings.py'
