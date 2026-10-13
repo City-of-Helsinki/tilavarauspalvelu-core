@@ -87,7 +87,8 @@ oc-login env:
     # Reuse a saved context for this server if its token is still valid
     cluster=$(echo "${server#https://}" | tr . -)
     context=$(oc config get-contexts -o name | grep -F "/${cluster}/" | head -n 1 || true)
-    if [ -n "${context}" ] && oc --context="${context}" whoami >/dev/null 2>&1; then
+    context_server=$(oc --context="${context}" whoami --show-server 2>/dev/null || true)
+    if [ -n "${context}" ] && [ "${context_server}" = "${server}" ] && oc --context="${context}" whoami >/dev/null 2>&1; then
         oc config use-context "${context}" >/dev/null
     else
         oc login --web --server="${server}"
