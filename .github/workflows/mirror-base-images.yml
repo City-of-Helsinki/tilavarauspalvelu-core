@@ -32,6 +32,8 @@ jobs:
 
     strategy:
       fail-fast: false
+      # Copy one image at a time, so we don't hit the ECR limit for requests per second.
+      max-parallel: 1
       matrix:
         include:
           - source: "public.ecr.aws/docker/library/node:24-slim"
@@ -51,5 +53,12 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     # Copies the multi-arch manifest from registry to registry without pulling the layers to the runner.
+    # Only copy the platforms we use. Each platform adds requests to ECR, and ECR limits requests per second.
+    # "linux/amd64" is for CI and OpenShift. "linux/arm64" is for local builds on Apple Silicon.
     - name: "Copy image"
-      run: docker buildx imagetools create --tag ${{ env.TARGET }}:${{ matrix.tag }} ${{ matrix.source }}
+      run: >-
+        docker buildx imagetools create
+        --platform linux/amd64
+        --platform linux/arm64
+        --tag ${{ env.TARGET }}:${{ matrix.tag }}
+        ${{ matrix.source }}
