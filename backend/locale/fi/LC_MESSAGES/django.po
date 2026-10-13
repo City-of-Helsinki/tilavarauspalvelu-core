@@ -175,6 +175,8 @@ msgid "Allocated end time."
 msgstr "Allokoitu lopetusaika"
 
 #: tilavarauspalvelu/admin/app_list.py
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+#: tilavarauspalvelu/admin/user/admin.py
 msgid "Reservations"
 msgstr "Varaukset"
 
@@ -250,6 +252,12 @@ msgstr "Laskutusosoite"
 #: tilavarauspalvelu/admin/application_round/admin.py
 msgid "Notes"
 msgstr "Huomiot"
+
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Open in staff UI"
+msgstr "Avaa käsittelynäkymässä"
 
 #: tilavarauspalvelu/admin/application/admin.py
 msgid "Reset application allocations"
@@ -2268,6 +2276,14 @@ msgstr "ID token sisältö"
 #: tilavarauspalvelu/admin/user/admin.py
 msgid "Permissions"
 msgstr "Oikeudet"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Reservation series"
+msgstr "Toistuvat varaukset"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Applications"
+msgstr "Hakemukset"
 
 #: tilavarauspalvelu/api/gdpr/views.py
 msgid "User has upcoming or too recent reservations."
