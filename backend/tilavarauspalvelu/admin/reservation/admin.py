@@ -7,7 +7,6 @@ from django.contrib.admin import helpers
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
-from more_admin_filters import MultiSelectFilter
 from rangefilter.filters import DateRangeFilterBuilder
 
 from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
@@ -19,6 +18,7 @@ from utils.date_utils import local_date, local_datetime
 
 from .filters import (
     AccessCodeGeneratedFilter,
+    ChoicesMultiSelectFilter,
     PaidReservationListFilter,
     ReservationSeriesListFilter,
     ReservationUnitFilter,
@@ -74,8 +74,8 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     list_filter = [
         ("created_at", DateRangeFilterBuilder(title=_("Created at"))),
         ("begins_at", DateRangeFilterBuilder(title=_("Begin time"))),
-        ("type", MultiSelectFilter),
-        ("state", MultiSelectFilter),
+        ("type", ChoicesMultiSelectFilter),
+        ("state", ChoicesMultiSelectFilter),
         ReservationSeriesListFilter,
         PaidReservationListFilter,
         ("reservation_unit__unit", UnitFilter),
@@ -200,7 +200,7 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
             super()
             .get_queryset(request)
             .annotate(access_code_should_be_active=L("access_code_should_be_active"))
-            .select_related("reservation_unit")
+            .select_related("reservation_unit__unit")
         )
 
     def get_search_results(
