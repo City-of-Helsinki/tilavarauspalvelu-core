@@ -17,6 +17,7 @@ from tests.factories import (
     ReservationUnitOptionFactory,
     ReservationUnitPricingFactory,
     ResourceFactory,
+    SpaceFactory,
     TaxPercentageFactory,
     UserFactory,
 )
@@ -164,5 +165,18 @@ def test_admin_query_counts__reservation_unit_change__same_for_more_spaces_and_r
     query_count = count_queries(api_client, url)
 
     ResourceFactory.create_batch(3)
+
+    assert count_queries(api_client, url) == query_count
+
+
+def test_admin_query_counts__resource_change__same_for_more_spaces(api_client):
+    user = UserFactory.create_superuser()
+    api_client.force_login(user)
+
+    resource = ResourceFactory.create()
+    url = reverse("admin:tilavarauspalvelu_resource_change", args=[resource.pk])
+    query_count = count_queries(api_client, url)
+
+    SpaceFactory.create_batch(3)
 
     assert count_queries(api_client, url) == query_count
