@@ -19,7 +19,7 @@ Effort: S is less than half a day. M is one or two days. L is more.
 2. PR 2. Customer payment flow.
 3. PR 3. Staff reservation handling.
 4. PR 4. Personal data in Sentry.
-5. PR 5. Date and time model. Do this after the Sentry branch, because it touches the Dockerfile.
+5. PR 5. Date and time model. The frontend pods run in UTC (confirmed for dev and test), so this bug is live. Do the `ENV TZ` fix first. It only needs the Sentry branch and `remove-turborepo` merged, because both change the Dockerfile.
 6. PR 6. Accessibility.
 7. PR 7. Customer login flow.
 8. PR 8. Small fixes and dead code.
@@ -92,15 +92,27 @@ The branch starts from `remove-turborepo`, which replaces turbo with `pnpm -r`. 
 
 ## PR 5. Date and time model (high, M)
 
-Do this after the Sentry branch merges. It touches the Dockerfile.
+Do this after the Sentry branch and `remove-turborepo` merge. Both change `frontend/Dockerfile`.
 
-- [ ] **Date-only API values are one day off outside Helsinki.** `packages/ui/src/modules/date-utils/conversion.ts:27-29`. `parseApiDate` makes Helsinki midnight (commit 489f97260). The consumers then work in local time: `formatDate`, `formatApiDate`, `setTimeOnDate` and `getDate`. In a UTC runtime:
-  - `fromApiDateTime("2023-12-25", "15:30")` returns Dec 24 15:30.
-  - `formatDate(parseApiDate("2023-12-25"))` prints "24.12.2023".
-  - The staff series edit page builds mutation times this way. See `apps/staff/src/pages/reservations/[id]/series/index.tsx:71-76` and `apps/staff/src/modules/reservation.ts:221`.
-  - Customer pages render round and pricing dates during SSR this way.
-- [ ] Neither `Dockerfile` nor `Dockerfile.final` sets `TZ`. `node:24-slim` defaults to UTC. Check what the OpenShift pods use. If it is UTC, this bug is live.
-- [ ] Choose one model. Parse date-only values as local midnight, or use `TZDate` and `formatInTimeZone` everywhere. Set `TZ=Europe/Helsinki` in the runtime image.
+- [ ] **Date-only API values are one day off outside Helsinki.** `packages/ui/src/modules/date-utils/conversion.ts:27-29`. `parseApiDate` makes the instant of Helsinki midnight (commit `489f97260`, 2026-03-12, released since `v1.59`). For example, "2023-12-25" becomes `2023-12-24T22:00Z`. The consumers then use date-fns in the local time zone of the process: `formatDate`, `formatApiDate`, `setTimeOnDate` and `getDate`.
+  - Result, checked in Node with date-fns-tz and date-fns:
+
+    | Process `TZ` | `formatDate(parseApiDate("2023-12-25"))` | `fromApiDateTime("2023-12-25", "15:30")` |
+    |---|---|---|
+    | `Europe/Helsinki` | 25.12.2023 | 2023-12-25 15:30 Helsinki |
+    | `UTC` | 24.12.2023 | 2023-12-24 15:30 UTC |
+    | not set, `/etc/localtime` is `Etc/UTC` | 24.12.2023 | 2023-12-24 15:30 UTC |
+
+  - The staff series edit page builds mutation times this way. See `apps/staff/src/pages/reservations/[id]/series/index.tsx:71-76` and `apps/staff/src/modules/reservation.ts:221`. This code runs in the browser, so it depends on the time zone of the browser, not of the pods.
+- [ ] **The frontend pods run in UTC. Confirmed for dev and test.** On 2026-10-13, the dev and test clusters had no `TZ` set. Staging and production are not checked, but they are assumed to be the same. Check them with `oc exec <customer-pod> -- printenv TZ` and `oc exec <customer-pod> -- node -e "console.log(Intl.DateTimeFormat().resolvedOptions().timeZone)"`.
+  - Cause: neither `Dockerfile` nor `Dockerfile.final` sets `TZ`. The runner stage is `node:24-slim` (Debian), where `/etc/localtime` points to `Etc/UTC`. No file in this repo sets `TZ` for the frontend at runtime. The only settings are `TZ=Europe/Helsinki` in the three `test` scripts. That is why the tests pass. The release pipelines (`apps/*/azure-pipelines-release.yml`) extend templates in the separate Azure DevOps repo `tilavarauspalvelu-pipelines`, so the pod env vars are set outside this repo.
+  - The backend is not affected. Django sets the process `TZ` from `TIME_ZONE = "Europe/Helsinki"` (`backend/config/settings.py:329`). Node has no such setting.
+  - Effect 1. The server HTML shows date-only values one day early. This affects 19 SSR pages that do date work, for example application round, pricing and reservation dates. In the pages router, all components on those pages render in Node first. React 19 renders the page again in the browser when text does not match. For users in Finland, the wrong date then shows only as a short flash, and each page load logs a hydration error. Users without JavaScript and crawlers keep the wrong date. React does not fix attributes that do not match, so a date in an attribute stays wrong. This was not checked.
+  - Effect 2. `getServerSideProps` computes "today" with `formatApiDate(new Date())` in `apps/customer/src/pages/reservation-unit/[id]/index.tsx:479` and `apps/customer/src/pages/reservations/[id]/edit.tsx:142`. Between 00:00 and 02:00 or 03:00 Helsinki time, this gives yesterday. The query then asks for one more past day. This is harmless.
+  - This has been live since `v1.59` (March 2026). To see how much it shows, search Sentry for hydration errors on customer pages with dates, for example React error #418 or "Hydration failed".
+  - Fix: add `ENV TZ=Europe/Helsinki` to the runner stage of `frontend/Dockerfile`. Official Node builds include full time zone data, so the image does not need the `tzdata` package. This fixes the server side in all environments and matches the backend. It does not depend on the model choice below, so it can go first as a small separate PR.
+  - If the pipeline templates or the Platta config set `TZ` later, they override the image. Check that they do not set it to UTC.
+- [ ] **Choose one date model.** The `TZ` fix does not help browsers outside Finland, and the UTC test run below needs this. Parse date-only values as local midnight, or use `TZDate` and `formatInTimeZone` everywhere.
 - [ ] Add a CI test run with `TZ=UTC`. All `test` scripts set `TZ=Europe/Helsinki`, so CI cannot see this bug today. Five date tests in `ui` fail in UTC. Add the run in this PR, after the fix. Added earlier, it would make CI fail until this PR lands. It can be a second step in the `test-ui-package` job from PR 1.
 - [ ] **`formatTimeRange` drops a 00:00 end time.** `packages/ui/src/modules/date-utils/formatting.ts:224`. "20:00 to 00:00" shows as "20:00". Remove the workaround in `apps/customer/.../ReservationUnitMoreDetails.tsx:205`.
 - [ ] **`timeForInput("15:30")` returns the current time.** `conversion.ts:110-123`. `new Date("15:30")` does not throw, so the HH:mm branch never runs.
