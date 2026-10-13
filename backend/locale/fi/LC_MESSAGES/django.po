@@ -1494,12 +1494,8 @@ msgid "Weekdays"
 msgstr "Viikonpäivät"
 
 #: tilavarauspalvelu/admin/reservation_series/form.py
-msgid ""
-"Comma separated list of weekday integers (0-6) on which reservations exists "
-"on this reservation series"
-msgstr ""
-"Pilkuin eroteltu lista viikonpäiviä (0-6) jolloin varauksia on olemassa "
-"tässä toistuvassa varauksessa"
+msgid "Weekdays on which reservations exist in this reservation series"
+msgstr "Viikonpäivät, joina tässä toistuvassa varauksessa on varauksia"
 
 #: tilavarauspalvelu/admin/reservation_series/form.py
 #: tilavarauspalvelu/admin/reservation_unit_access_type/admin.py
