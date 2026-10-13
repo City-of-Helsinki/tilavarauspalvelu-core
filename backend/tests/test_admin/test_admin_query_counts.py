@@ -1,30 +1,17 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import pytest
-from django.db import connection
-from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
 from tests.factories import (
-    ApplicationSectionFactory,
     OriginHaukiResourceFactory,
     PaymentOrderFactory,
     ReservationFactory,
-    ReservationUnitAccessTypeFactory,
     ReservationUnitFactory,
-    ReservationUnitImageFactory,
-    ReservationUnitOptionFactory,
-    ReservationUnitPricingFactory,
-    ResourceFactory,
     SpaceFactory,
-    TaxPercentageFactory,
     UserFactory,
 )
-
-if TYPE_CHECKING:
-    from django.test import Client
+from tests.test_admin.helpers import count_queries
 
 # Applied to all tests
 pytestmark = [
@@ -32,35 +19,7 @@ pytestmark = [
 ]
 
 
-# ── Helpers ──
-
-
-def count_queries(client: Client, url: str) -> int:
-    # The first request fills caches, such as the content type cache, so it runs more queries.
-    client.get(url)
-
-    with CaptureQueriesContext(connection) as context:
-        response = client.get(url)
-
-    assert response.status_code == 200
-    return len(context.captured_queries)
-
-
 # ── List pages ──
-
-
-def test_admin_query_counts__reservation_list__same_for_more_reservations(api_client):
-    user = UserFactory.create_superuser()
-    api_client.force_login(user)
-
-    ReservationFactory.create(reservation_unit=ReservationUnitFactory.create())
-    url = reverse("admin:tilavarauspalvelu_reservation_changelist")
-    query_count = count_queries(api_client, url)
-
-    ReservationFactory.create_batch(3, reservation_unit=ReservationUnitFactory.create())
-    ReservationFactory.create(reservation_unit=ReservationUnitFactory.create())
-
-    assert count_queries(api_client, url) == query_count
 
 
 def test_admin_query_counts__payment_order_list__same_for_more_payment_orders(api_client):
@@ -73,57 +32,6 @@ def test_admin_query_counts__payment_order_list__same_for_more_payment_orders(ap
 
     PaymentOrderFactory.create(reservation=ReservationFactory.create(reservation_unit=ReservationUnitFactory.create()))
     PaymentOrderFactory.create(reservation=ReservationFactory.create(reservation_unit=ReservationUnitFactory.create()))
-
-    assert count_queries(api_client, url) == query_count
-
-
-def test_admin_query_counts__reservation_unit_access_type_list__same_for_more_access_types(api_client):
-    user = UserFactory.create_superuser()
-    api_client.force_login(user)
-
-    ReservationUnitAccessTypeFactory.create(reservation_unit=ReservationUnitFactory.create())
-    url = reverse("admin:tilavarauspalvelu_reservationunitaccesstype_changelist")
-    query_count = count_queries(api_client, url)
-
-    ReservationUnitAccessTypeFactory.create(reservation_unit=ReservationUnitFactory.create())
-    ReservationUnitAccessTypeFactory.create(reservation_unit=ReservationUnitFactory.create())
-
-    assert count_queries(api_client, url) == query_count
-
-
-def test_admin_query_counts__reservation_unit_option_list__same_for_more_options(api_client):
-    user = UserFactory.create_superuser()
-    api_client.force_login(user)
-
-    ReservationUnitOptionFactory.create(
-        reservation_unit=ReservationUnitFactory.create(),
-        application_section=ApplicationSectionFactory.create(),
-    )
-    url = reverse("admin:tilavarauspalvelu_reservationunitoption_changelist")
-    query_count = count_queries(api_client, url)
-
-    ReservationUnitOptionFactory.create(
-        reservation_unit=ReservationUnitFactory.create(),
-        application_section=ApplicationSectionFactory.create(),
-    )
-    ReservationUnitOptionFactory.create(
-        reservation_unit=ReservationUnitFactory.create(),
-        application_section=ApplicationSectionFactory.create(),
-    )
-
-    assert count_queries(api_client, url) == query_count
-
-
-def test_admin_query_counts__reservation_unit_pricing_list__same_for_more_pricings(api_client):
-    user = UserFactory.create_superuser()
-    api_client.force_login(user)
-
-    ReservationUnitPricingFactory.create(tax_percentage=TaxPercentageFactory.create())
-    url = reverse("admin:tilavarauspalvelu_reservationunitpricing_changelist")
-    query_count = count_queries(api_client, url)
-
-    ReservationUnitPricingFactory.create(tax_percentage=TaxPercentageFactory.create())
-    ReservationUnitPricingFactory.create(tax_percentage=TaxPercentageFactory.create())
 
     assert count_queries(api_client, url) == query_count
 
@@ -152,73 +60,5 @@ def test_admin_query_counts__origin_hauki_resource_list__same_for_more_resources
 
     ReservationUnitFactory.create(origin_hauki_resource=OriginHaukiResourceFactory.create())
     ReservationUnitFactory.create(origin_hauki_resource=OriginHaukiResourceFactory.create())
-
-    assert count_queries(api_client, url) == query_count
-
-
-# ── Change pages ──
-
-
-def test_admin_query_counts__reservation_unit_pricing_change__same_for_more_reservation_units(api_client):
-    user = UserFactory.create_superuser()
-    api_client.force_login(user)
-
-    pricing = ReservationUnitPricingFactory.create(tax_percentage=TaxPercentageFactory.create())
-    url = reverse("admin:tilavarauspalvelu_reservationunitpricing_change", args=[pricing.pk])
-    query_count = count_queries(api_client, url)
-
-    ReservationUnitFactory.create_batch(3)
-
-    assert count_queries(api_client, url) == query_count
-
-
-def test_admin_query_counts__reservation_unit_image_change__same_for_more_reservation_units(api_client):
-    user = UserFactory.create_superuser()
-    api_client.force_login(user)
-
-    image = ReservationUnitImageFactory.create(reservation_unit=ReservationUnitFactory.create())
-    url = reverse("admin:tilavarauspalvelu_reservationunitimage_change", args=[image.pk])
-    query_count = count_queries(api_client, url)
-
-    ReservationUnitFactory.create_batch(3)
-
-    assert count_queries(api_client, url) == query_count
-
-
-def test_admin_query_counts__reservation_unit_change__same_for_more_spaces_and_resources(api_client):
-    user = UserFactory.create_superuser()
-    api_client.force_login(user)
-
-    reservation_unit = ReservationUnitFactory.create()
-    url = reverse("admin:tilavarauspalvelu_reservationunit_change", args=[reservation_unit.pk])
-    query_count = count_queries(api_client, url)
-
-    ResourceFactory.create_batch(3)
-
-    assert count_queries(api_client, url) == query_count
-
-
-def test_admin_query_counts__resource_change__same_for_more_spaces(api_client):
-    user = UserFactory.create_superuser()
-    api_client.force_login(user)
-
-    resource = ResourceFactory.create()
-    url = reverse("admin:tilavarauspalvelu_resource_change", args=[resource.pk])
-    query_count = count_queries(api_client, url)
-
-    SpaceFactory.create_batch(3)
-
-    assert count_queries(api_client, url) == query_count
-
-
-def test_admin_query_counts__space_change__same_for_more_spaces(api_client):
-    user = UserFactory.create_superuser()
-    api_client.force_login(user)
-
-    space = SpaceFactory.create(parent=SpaceFactory.create())
-    url = reverse("admin:tilavarauspalvelu_space_change", args=[space.pk])
-    query_count = count_queries(api_client, url)
-
-    SpaceFactory.create_batch(3)
 
     assert count_queries(api_client, url) == query_count
