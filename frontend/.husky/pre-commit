@@ -1,3 +1,4 @@
 cd frontend
-pnpm lint:fix
-npx lint-staged
+# The type check needs the whole project, so lint all files but fix only the staged ones
+pnpm lint
+pnpm exec lint-staged
