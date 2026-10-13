@@ -68,5 +68,6 @@ class ReservationUnitOptionAdmin(admin.ModelAdmin):
             .select_related(
                 "application_section__application__user",
                 "application_section__application__application_round",
+                "reservation_unit__unit",
             )
         )

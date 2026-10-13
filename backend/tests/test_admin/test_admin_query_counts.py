@@ -8,10 +8,12 @@ from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
 from tests.factories import (
+    ApplicationSectionFactory,
     PaymentOrderFactory,
     ReservationFactory,
     ReservationUnitAccessTypeFactory,
     ReservationUnitFactory,
+    ReservationUnitOptionFactory,
     UserFactory,
 )
 
@@ -79,5 +81,28 @@ def test_admin_query_counts__reservation_unit_access_type_list__same_for_more_ac
 
     ReservationUnitAccessTypeFactory.create(reservation_unit=ReservationUnitFactory.create())
     ReservationUnitAccessTypeFactory.create(reservation_unit=ReservationUnitFactory.create())
+
+    assert count_queries(api_client, url) == query_count
+
+
+def test_admin_query_counts__reservation_unit_option_list__same_for_more_options(api_client):
+    user = UserFactory.create_superuser()
+    api_client.force_login(user)
+
+    ReservationUnitOptionFactory.create(
+        reservation_unit=ReservationUnitFactory.create(),
+        application_section=ApplicationSectionFactory.create(),
+    )
+    url = reverse("admin:tilavarauspalvelu_reservationunitoption_changelist")
+    query_count = count_queries(api_client, url)
+
+    ReservationUnitOptionFactory.create(
+        reservation_unit=ReservationUnitFactory.create(),
+        application_section=ApplicationSectionFactory.create(),
+    )
+    ReservationUnitOptionFactory.create(
+        reservation_unit=ReservationUnitFactory.create(),
+        application_section=ApplicationSectionFactory.create(),
+    )
 
     assert count_queries(api_client, url) == query_count
