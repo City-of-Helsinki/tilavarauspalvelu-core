@@ -13,8 +13,6 @@ from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
 from utils.decimal_utils import round_decimal
 
 if TYPE_CHECKING:
-    from django.db import models
-
     from tilavarauspalvelu.typing import WSGIRequest
 
 
@@ -56,6 +54,7 @@ class ReservationUnitPricingAdmin(TVPAuditlogHistoryAdminMixin, TabbedTranslatio
         ("reservation_unit", ReservationUnitFilter),
     ]
     list_select_related = ["reservation_unit__unit", "tax_percentage"]
+    autocomplete_fields = ["reservation_unit"]
     ordering = ["-begins"]
 
     # Form
@@ -75,12 +74,6 @@ class ReservationUnitPricingAdmin(TVPAuditlogHistoryAdminMixin, TabbedTranslatio
         "lowest_price_net",
         "highest_price_net",
     ]
-
-    def formfield_for_foreignkey(self, db_field: models.ForeignKey, request: WSGIRequest, **kwargs: Any) -> Any:
-        # The option label includes the unit name, so fetch the units in the same query.
-        if db_field.name == "reservation_unit":
-            kwargs["queryset"] = ReservationUnit.objects.select_related("unit")
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def lowest_price_net(self, obj: ReservationUnitPricing) -> str:
         return f"{round_decimal(obj.lowest_price_net, 2)} €"

@@ -8,17 +8,11 @@ from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.models import ApplicationSection, ReservationUnit, ReservationUnitOption, SuitableTimeRange
+from tilavarauspalvelu.models import ApplicationSection, ReservationUnitOption, SuitableTimeRange
 from utils.external_service.errors import ExternalServiceError
 
 
 class ReservationUnitOptionInlineAdminForm(forms.ModelForm):
-    reservation_unit = forms.ModelChoiceField(
-        ReservationUnit.objects.select_related("unit"),
-        label=_("Reservation unit"),
-        help_text=_("Reservation unit for to this option."),
-    )
-
     class Meta:
         model = ReservationUnitOption
         fields = [

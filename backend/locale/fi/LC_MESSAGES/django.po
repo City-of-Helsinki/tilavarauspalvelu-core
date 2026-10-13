@@ -776,16 +776,6 @@ msgid "Reservation purpose"
 msgstr "Varaustarkoitukset"
 
 #: tilavarauspalvelu/admin/application_section/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_series/form.py
-msgid "Reservation unit"
-msgstr "Varausyksikkö"
-
-#: tilavarauspalvelu/admin/application_section/form.py
-msgid "Reservation unit for to this option."
-msgstr "Varausyksikkö tälle vaihtoehdolle."
-
-#: tilavarauspalvelu/admin/application_section/form.py
 msgid "Preferred order"
 msgstr "Suosittu järjestys"
 
@@ -796,6 +786,12 @@ msgstr "Hylätty"
 #: tilavarauspalvelu/admin/application_section/form.py
 msgid "Locked"
 msgstr "Lukittu"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_series/form.py
+msgid "Reservation unit"
+msgstr "Varausyksikkö"
 
 #: tilavarauspalvelu/admin/application_section/form.py
 msgid "Preferred order of the reservation unit option."
@@ -809,6 +805,10 @@ msgstr ""
 #: tilavarauspalvelu/admin/application_section/form.py
 msgid "Locked reservation unit options can no longer receive allocations."
 msgstr "Lukitut varausyksikkövaihtoehdot eivät voi enää saada allokaatioita."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Reservation unit for to this option."
+msgstr "Varausyksikkö tälle vaihtoehdolle."
 
 #: tilavarauspalvelu/admin/application_section/form.py
 msgid "Fulfilled"
