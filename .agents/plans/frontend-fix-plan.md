@@ -29,13 +29,30 @@ Effort: S is less than half a day. M is one or two days. L is more.
 
 Do this first. It protects PR 5.
 
+Base this PR on the `remove-turborepo` branch. It replaces turbo with `pnpm -r`. Cherry-pick `fix-pin-pnpm-when-using-just-codegen` (one commit, `a25437c2e`) on top. It makes the root `just codegen` call the frontend recipe.
+
+The item notes below describe the state on `remove-turborepo`, not on `main`.
+
 - [ ] CI does not run the `packages/ui` tests (10 files, 291 tests). CI runs `pnpm --filter=staff... test:coverage`. `packages/ui/package.json` has no `test:coverage` script, so pnpm skips it. Add the script.
 - [ ] Add a test run with `TZ=UTC`. Five date tests in `ui` fail in UTC today. See PR 5.
-- [ ] `justfile`. `tsc-check` and `tsc-clean` call turbo tasks that are not in `turbo.json`.
-- [ ] `justfile`. `format-staged` calls prettier and `packages/prettier-config`. Neither exists. The project uses oxfmt.
+- [ ] `justfile`. `tsc-check` and `tsc-clean` run `pnpm -r run tsc:check`. Only staff has the script, so customer and `ui` are skipped. `lint` already type checks with `--type-check`. Remove the two recipes, or add the scripts to customer and `ui`.
+- [ ] `justfile`. `format-staged` calls prettier and `packages/prettier-config`. Neither exists. The project uses oxfmt. Use `oxfmt --no-error-on-unmatched-pattern`, like the `format:staged` script.
 - [ ] `justfile`. `test-browser-ci` and `dev-test` call `customer` scripts that do not exist.
 - [ ] Root `package.json`. `test:browser:ci` and `dev:test` use `apps/ui`, which does not exist.
 - [ ] `apps/customer/CLAUDE.md` contains only `@AGENTS.md`. That file does not exist. Agent docs need user approval before an edit.
+
+### Husky hooks
+
+- [ ] **`.husky/pre-commit` changes files you did not stage.** It runs `pnpm lint:fix` on the whole frontend. The full scan is necessary, because `lint` does the type check, and the type check needs the whole project. But `--fix` on the whole codebase is not necessary.
+  - Run `pnpm lint` (no `--fix`) on the whole frontend, for the type check.
+  - Run the fix and the format only on the staged files. The `just lint-staged` recipe and the `format:staged` script already do this.
+  - Remove `npx lint-staged`. There is no lint-staged dependency or config, so npx downloads it at commit time and it does nothing.
+  - Seen on 2026-10-12. In a new worktree with no generated types, `lint:fix` failed. It also removed needed `as unknown as` and `as never` casts in 13 files. One of them was a source file: it dropped `Omit<MemoT, "pk">` in `apps/staff/src/hooks/useStaffReservationMutation.ts`.
+- [ ] **Add `.husky/post-checkout` to run codegen.** Without the generated types, lint fails and `--fix` makes wrong edits, as described above. `git worktree add` also runs post-checkout, so a new worktree gets the types before its first commit.
+  - Run only on a branch checkout. Git gives the hook `$3 = 1` for a branch checkout and `$3 = 0` for a file checkout.
+  - Codegen reads the committed `tilavaraus.graphql` (`graphql.config.ts:42`), so it does not need a running backend.
+  - Codegen needs `node_modules`. A new worktree has none. Run `pnpm install --frozen-lockfile` first, or skip codegen with a clear message.
+  - The hook runs from the repo root. `.husky/pre-commit` does `cd frontend` first, so do the same here.
 
 ## PR 2. Customer payment flow (high, mostly S)
 
@@ -156,8 +173,5 @@ Do this after the Sentry branch merges. It touches the Dockerfile.
 - Receipt link: `${receiptUrl}&lang=` expects `receiptUrl` to already contain a query string.
 - `ButtonLikeLink` has `role="button"` on links that navigate.
 - The customer `pages/reservations/index.tsx:79` shows "not authenticated" while the user loads.
-- `.husky/pre-commit`:
-  - It runs `pnpm lint:fix` on the whole frontend, which can change files you did not stage.
-  - It runs `npx lint-staged`, but there is no lint-staged dependency or config.
 - The apps have 9 `react-hooks/exhaustive-deps` disables and 9 `set-state-in-effect` disables. A short pass can find more effect bugs.
 - Two `eventStyleGetter` files have a TODO to merge them.
