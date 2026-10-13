@@ -23,8 +23,8 @@ class TprekUnitData:
     name_fi: str | None
     name_en: str | None
     name_sv: str | None
-    description: str
-    short_description: str
+    description_fi: str
+    short_description_fi: str
     web_page: str
     email: str
     phone: str
@@ -45,8 +45,8 @@ class TprekUnitData:
             name_fi=response_json.get("name_fi"),
             name_en=response_json.get("name_en"),
             name_sv=response_json.get("name_sv"),
-            description=response_json.get("desc_fi", ""),
-            short_description=response_json.get("short_desc_fi", ""),
+            description_fi=response_json.get("desc_fi", ""),
+            short_description_fi=response_json.get("short_desc_fi", ""),
             web_page=response_json.get("www_fi", ""),
             email=response_json.get("email", ""),
             phone=response_json.get("phone", ""),

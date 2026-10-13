@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import TYPE_CHECKING
 
 from admin_extra_buttons.decorators import button
@@ -12,6 +13,7 @@ from modeltranslation.admin import TabbedTranslationAdmin
 
 from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.integrations.tprek.tprek_api_client import TprekLocationData, TprekUnitData
 from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitImporter
 from tilavarauspalvelu.models import Unit, UnitGroup
 
@@ -21,6 +23,16 @@ if TYPE_CHECKING:
     from django.db.models import QuerySet
 
     from tilavarauspalvelu.typing import WSGIRequest
+
+
+# The TPREK import overwrites these fields, so a change by hand would not last.
+# The TPREK ID stays editable, so that staff can fix a wrong ID.
+TPREK_FIELDS = [
+    field.name
+    for tprek_data_class in (TprekUnitData, TprekLocationData)
+    for field in dataclasses.fields(tprek_data_class)
+    if field.name != "tprek_id"
+]
 
 
 class UnitGroupInlineAdmin(admin.TabularInline):
@@ -85,6 +97,10 @@ class UnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, ExtraButtonsMi
         [
             _("TPRek"),
             {
+                "description": _(
+                    "When the unit has a TPRek ID, the fields that come from TPRek cannot be changed here. "
+                    "Change them in TPRek instead."
+                ),
                 "fields": [
                     "tprek_id",
                     "tprek_department_id",
@@ -135,6 +151,12 @@ class UnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, ExtraButtonsMi
     inlines = [
         UnitGroupInlineAdmin,
     ]
+
+    def get_readonly_fields(self, request: WSGIRequest, obj: Unit | None = None) -> list[str]:
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if obj is not None and obj.tprek_id:
+            readonly_fields += self.replace_orig_field(TPREK_FIELDS)
+        return readonly_fields
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet[Unit]:
         return (
