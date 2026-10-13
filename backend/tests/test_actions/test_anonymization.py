@@ -152,6 +152,9 @@ def test_anonymization__reservation():
         reservation_series__description="bar",
     )
 
+    LogEntry.objects.log_create(reservation, force_log=True, action=LogEntry.Action.CREATE)
+    LogEntry.objects.log_create(reservation.reservation_series, force_log=True, action=LogEntry.Action.CREATE)
+
     mr_anonymous.actions.anonymize_user_reservations()
     reservation.refresh_from_db()
 
@@ -177,6 +180,7 @@ def test_anonymization__reservation():
 
     # Check that auditlog entries are removed also
     assert LogEntry.objects.get_for_object(reservation).count() == 0
+    assert LogEntry.objects.get_for_object(reservation.reservation_series).count() == 0
 
 
 @freeze_time("2024-01-01")
