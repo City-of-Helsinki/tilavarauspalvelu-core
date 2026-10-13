@@ -7,14 +7,6 @@ import? 'local.just'
 help:
     @just --list
 
-# Run browser tests in CI mode
-test-browser-ci:
-    @cd apps/customer && pnpm run test:browser:ci
-
-# Run dev server for tests
-dev-test:
-    @cd apps/customer && pnpm run dev:test
-
 # Remove node_modules directories
 clean:
     @npkill
@@ -27,13 +19,13 @@ dev:
 build:
     @pnpm -r run build
 
-# Run linter
+# Run linter and type check
 lint:
-    @oxlint --type-aware
+    @oxlint --type-aware --type-check
 
-# Run linter and fix issues
+# Run linter and type check, and fix issues
 lint-fix:
-    @oxlint --fix --type-aware
+    @oxlint --fix --type-aware --type-check
 
 # Run CSS linter
 lint-css:
@@ -53,7 +45,7 @@ format-check:
 
 # Format given files
 format-staged *files:
-    @prettier --ignore-path "./.prettierignore" --write --experimental-cli --config-path "./packages/prettier-config/prettier.mjs" {{ files }}
+    @oxfmt --no-error-on-unmatched-pattern {{ files }}
 
 # Run tests
 test:
@@ -62,14 +54,6 @@ test:
 # Run tests with coverage
 test-coverage:
     @pnpm -r run test:coverage
-
-# Run type checks
-tsc-check:
-    @pnpm -r run tsc:check
-
-# Clean type check output
-tsc-clean:
-    @pnpm -r run tsc:clean
 
 # Pluck GraphQL queries from source files
 gql-pluck:
