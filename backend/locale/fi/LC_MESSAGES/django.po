@@ -2158,6 +2158,14 @@ msgid "TPRek"
 msgstr "Toimipaikkarekisteri"
 
 #: tilavarauspalvelu/admin/unit/admin.py
+msgid ""
+"When the unit has a TPRek ID, the fields that come from TPRek cannot be "
+"changed here. Change them in TPRek instead."
+msgstr ""
+"Kun toimipisteellä on TPRek-tunniste, TPRekistä tulevia kenttiä ei voi "
+"muuttaa täällä. Muuta ne TPRekissä."
+
+#: tilavarauspalvelu/admin/unit/admin.py
 msgid "Hauki"
 msgstr "Hauki"
 
