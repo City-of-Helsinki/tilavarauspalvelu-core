@@ -12,6 +12,7 @@ from lookup_property import L
 from modeltranslation.admin import TabbedTranslationAdmin
 
 from tilavarauspalvelu.admin.application_round.form import ApplicationRoundAdminForm
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ApplicationRound
@@ -25,7 +26,7 @@ if TYPE_CHECKING:
 
 
 @admin.register(ApplicationRound)
-class ApplicationRoundAdmin(ExtraButtonsMixin, TabbedTranslationAdmin):
+class ApplicationRoundAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
     # Functions
     actions = ["reset_application_rounds"]
 
