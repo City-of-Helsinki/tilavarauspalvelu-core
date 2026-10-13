@@ -16,6 +16,8 @@ from utils.date_utils import local_datetime
 if TYPE_CHECKING:
     from django.db import models
 
+    from tilavarauspalvelu.typing import WSGIRequest
+
 
 admin.site.unregister(LogEntry)
 
@@ -37,11 +39,13 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
     ]
     search_fields = [
         "object_repr",
-        "object_id",
         "actor__first_name",
         "actor__last_name",
         "actor__username",
     ]
+    search_help_text = _(
+        "Search by object name or actor name. A number finds the log entries of the object with that ID."
+    )
     list_filter = [
         (
             "timestamp",
@@ -81,3 +85,17 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
         self.request = request
         cutoff_date = local_datetime() - relativedelta(years=2)  # Don't show records older than 2 years
         return super().get_queryset(request=request).filter(timestamp__gte=cutoff_date)
+
+    def get_search_results(
+        self,
+        request: WSGIRequest,
+        queryset: models.QuerySet[LogEntry],
+        search_term: str,
+    ) -> tuple[models.QuerySet[LogEntry], bool]:
+        # Search ids with the index on 'object_id'. The text search casts ids to text, which reads every row.
+        search_term = search_term.strip()
+        if search_term.isdecimal():
+            object_id = int(search_term)
+            return queryset.filter(object_id=object_id), False
+
+        return super().get_search_results(request, queryset, search_term)

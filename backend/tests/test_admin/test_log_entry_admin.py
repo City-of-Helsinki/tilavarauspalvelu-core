@@ -140,3 +140,42 @@ def test_log_entry_admin__result_count__limited_above_limit(api_client):
     change_list = response.context["cl"]
     assert change_list.result_count == LOG_ENTRY_COUNT_LIMIT
     assert get_result_count_text(response) == f'{LOG_ENTRY_COUNT_LIMIT}+ log entries (<a href="?">Show all</a>)'
+
+
+# ── Search ──
+
+
+def test_log_entry_admin__search__number_finds_exact_object_id(api_client):
+    user = UserFactory.create_superuser()
+    api_client.force_login(user)
+
+    unit = UnitFactory.create(pk=12)
+    other_unit = UnitFactory.create(pk=123)
+    unit_log_entry = create_log_entry(unit)
+    create_log_entry(other_unit)
+
+    url = reverse("admin:auditlog_logentry_changelist")
+    response = api_client.get(url, data={"q": "12"})
+
+    assert response.status_code == 200
+
+    result_list = list(response.context["cl"].result_list)
+    assert result_list == [unit_log_entry]
+
+
+def test_log_entry_admin__search__text_finds_object_name(api_client):
+    user = UserFactory.create_superuser()
+    api_client.force_login(user)
+
+    unit = UnitFactory.create(name="Kallio library")
+    other_unit = UnitFactory.create(name="Oodi")
+    unit_log_entry = create_log_entry(unit)
+    create_log_entry(other_unit)
+
+    url = reverse("admin:auditlog_logentry_changelist")
+    response = api_client.get(url, data={"q": "kallio"})
+
+    assert response.status_code == 200
+
+    result_list = list(response.context["cl"].result_list)
+    assert result_list == [unit_log_entry]
