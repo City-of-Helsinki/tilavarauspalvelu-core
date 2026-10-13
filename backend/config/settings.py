@@ -12,7 +12,6 @@ from csp.constants import NONE, SELF, UNSAFE_INLINE
 from django.utils.translation import gettext_lazy as _
 from env_config import Environment, values
 from env_config.decorators import classproperty
-from helusers.defaults import SOCIAL_AUTH_PIPELINE
 
 # The file and each mixin are optional. Other import errors would hide a broken local_settings, so raise them.
 try:
@@ -381,8 +380,20 @@ class Common(Environment):
         env_name="TUNNISTAMO_INACTIVE_USER_URL",
         default="/deactivated-account",
     )
+    # Based on 'helusers.defaults.SOCIAL_AUTH_PIPELINE'. Its 'store_end_session_url' and 'fetch_api_tokens' steps
+    # read the request from the pipeline arguments, which social-auth-core does not pass, so we use our own copies.
     SOCIAL_AUTH_TUNNISTAMO_PIPELINE = (
-        *SOCIAL_AUTH_PIPELINE,
+        "social_core.pipeline.social_auth.social_details",
+        "social_core.pipeline.social_auth.social_uid",
+        "helusers.pipeline.ensure_uid_is_uuid",
+        "helusers.pipeline.ensure_uuid_match",
+        "helusers.pipeline.get_username",
+        "social_core.pipeline.social_auth.social_user",
+        "helusers.pipeline.create_or_update_user",
+        "social_core.pipeline.social_auth.associate_user",
+        "social_core.pipeline.social_auth.load_extra_data",
+        "tilavarauspalvelu.integrations.helauth.pipeline.store_end_session_url",
+        "tilavarauspalvelu.integrations.helauth.pipeline.fetch_api_tokens",
         "tilavarauspalvelu.integrations.helauth.pipeline.fetch_additional_info_for_user_from_helsinki_profile",
         "tilavarauspalvelu.integrations.helauth.pipeline.migrate_user_from_tunnistamo_to_keycloak",
         "tilavarauspalvelu.integrations.helauth.pipeline.update_roles_from_ad_groups",
