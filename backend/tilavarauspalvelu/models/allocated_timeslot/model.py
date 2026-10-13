@@ -10,6 +10,7 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import Weekday
+from utils.auditlog_util import AuditLogger
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
@@ -100,3 +101,6 @@ class AllocatedTimeSlot(models.Model):
             default=models.Value(8),
             output_field=models.IntegerField(),
         )
+
+
+AuditLogger.register(AllocatedTimeSlot)
