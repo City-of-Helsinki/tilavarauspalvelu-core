@@ -11,6 +11,7 @@ from django.urls import include, path, re_path, reverse
 from graphene_django_extensions import FileUploadGraphQLView
 from health_check.views import HealthCheckView
 
+from tilavarauspalvelu.admin.app_list import group_admin_app_list
 from tilavarauspalvelu.api.gdpr.views import TilavarauspalveluGDPRAPIView
 from tilavarauspalvelu.api.rest.views import (
     csrf_view,
@@ -50,6 +51,15 @@ admin.site.each_context = lambda request: (
         "helsinki_login_url": reverse("helusers:auth_login"),
         "helsinki_logout_url": reverse("helusers:auth_logout"),
     }
+)
+
+# Group the models on the admin index page and in the sidebar by topic.
+# The app pages, such as '/admin/tilavarauspalvelu/', keep the default list.
+original_get_app_list = admin.site.get_app_list
+admin.site.get_app_list = lambda request, app_label=None: (
+    group_admin_app_list(original_get_app_list(request))
+    if app_label is None
+    else original_get_app_list(request, app_label)
 )
 
 

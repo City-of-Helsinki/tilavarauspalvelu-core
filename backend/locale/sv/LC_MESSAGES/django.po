@@ -172,6 +172,49 @@ msgstr ""
 msgid "Allocated end time."
 msgstr ""
 
+#: tilavarauspalvelu/admin/app_list.py
+#, fuzzy
+#| msgctxt "ICAL"
+#| msgid "Reservation for %(name)s"
+msgid "Reservations"
+msgstr "Bokning för %(name)s"
+
+#: tilavarauspalvelu/admin/app_list.py
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Reservation units"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Units and spaces"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+#, fuzzy
+#| msgctxt "Email"
+#| msgid "Seasonal Booking"
+msgid "Seasonal bookings"
+msgstr "Säsongsbokning"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Payments"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Users and permissions"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Content and emails"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "System"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py tilavarauspalvelu/enums.py
+msgid "Other"
+msgstr ""
+
 #: tilavarauspalvelu/admin/application/admin.py
 #: tilavarauspalvelu/admin/log_entry/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
@@ -521,10 +564,6 @@ msgstr ""
 #: tilavarauspalvelu/admin/application_round/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Name (Swedish)"
-msgstr ""
-
-#: tilavarauspalvelu/admin/application_round/form.py
-msgid "Reservation units"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_round/form.py
@@ -2696,10 +2735,6 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgid "Helsinki"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgid "Other"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
