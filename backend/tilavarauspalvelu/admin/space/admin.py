@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
@@ -29,7 +29,13 @@ class SpaceInline(admin.StackedInline):
     show_change_link = True
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
-        return super().get_queryset(request).select_related("unit", "parent")
+        return super().get_queryset(request).select_related("unit", "parent__unit")
+
+    def formfield_for_foreignkey(self, db_field: models.ForeignKey, request: WSGIRequest, **kwargs: Any) -> Any:
+        # The option label includes the unit name, so fetch the units in the same query.
+        if db_field.name == "parent":
+            kwargs["queryset"] = Space.objects.select_related("unit")
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 @admin.register(Space)
@@ -63,7 +69,13 @@ class SpaceAdmin(TranslationAdmin, MPTTModelAdmin):
     ]
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
-        return super().get_queryset(request).select_related("unit", "parent")
+        return super().get_queryset(request).select_related("unit", "parent__unit")
+
+    def formfield_for_foreignkey(self, db_field: models.ForeignKey, request: WSGIRequest, **kwargs: Any) -> Any:
+        # The option label includes the unit name, so fetch the units in the same query.
+        if db_field.name == "parent":
+            kwargs["queryset"] = Space.objects.select_related("unit")
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def has_delete_permission(self, request: WSGIRequest, obj: Space | None = None) -> bool:
         if obj is not None and obj.reservation_units.exists():
