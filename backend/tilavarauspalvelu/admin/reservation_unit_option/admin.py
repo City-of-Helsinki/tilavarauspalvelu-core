@@ -29,7 +29,7 @@ class ReservationUnitOptionAdmin(admin.ModelAdmin):
         "application_section__application__user__last_name",
         "application_section__application__user__email",
     ]
-    search_help_text = "Search by reservation unit, unit, application section, user's first or last name or email"
+    search_help_text = _("Search by reservation unit, unit, application section, user's first or last name or email")
 
     # List
     list_display = [

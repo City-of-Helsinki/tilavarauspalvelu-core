@@ -46,6 +46,6 @@ class UnitGroupAdmin(TranslationAdmin):
             )
         )
 
-    @admin.display(description="Number of units", ordering="number_of_units")
+    @admin.display(description=_("Number of units"), ordering="number_of_units")
     def number_of_units(self, obj: UnitGroup) -> str:
         return getattr(obj, "number_of_units", -1)

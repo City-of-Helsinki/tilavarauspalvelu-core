@@ -105,25 +105,27 @@ class ApplicationRoundAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, Tab
     def status(self, obj: ApplicationRound) -> str:
         return obj.status
 
-    @button(label="Export applications to CSV", change_form=True)
+    @button(label=_("Export applications to CSV"), change_form=True)
     def export_applications_to_csv(self, request: WSGIRequest, pk: int) -> FileResponse | None:
         try:
             exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=pk)
             response = exporter.to_file_response()
         except Exception as error:  # noqa: BLE001
-            self.message_user(request, f"Error while exporting applications: {error}", level=messages.ERROR)
+            message = _("Could not export the applications. The error was reported to Sentry.")
+            self.message_user(request, message, level=messages.ERROR)
             SentryLogger.log_exception(error, "Error while exporting ApplicationRound applications")
             return None
 
         return response
 
-    @button(label="Export results to CSV", change_form=True)
+    @button(label=_("Export results to CSV"), change_form=True)
     def export_results_to_csv(self, request: WSGIRequest, pk: int) -> FileResponse | None:
         try:
             exporter = ApplicationRoundResultCSVExporter(application_round_id=pk)
             response = exporter.to_file_response()
         except Exception as error:  # noqa: BLE001
-            self.message_user(request, f"Error while exporting results: {error}", level=messages.ERROR)
+            message = _("Could not export the results. The error was reported to Sentry.")
+            self.message_user(request, message, level=messages.ERROR)
             SentryLogger.log_exception(error, "Error while exporting ApplicationRound results")
             return None
 
