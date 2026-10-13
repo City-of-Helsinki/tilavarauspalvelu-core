@@ -9,11 +9,11 @@ usage() {
 }
 [[ $# -eq 1 ]] || usage
 
-repo="City-of-Helsinki/tilavarauspalvelu-core"
+repo="City-of-Helsinki/tilavarauspalvelu"
 
 if [[ "$1" =~ ^([0-9]+)$ ]]; then
   number="${BASH_REMATCH[1]}"
-elif [[ "$1" =~ ^https://github\.com/City-of-Helsinki/tilavarauspalvelu-core/pull/([0-9]+)([/?#].*)?$ ]]; then
+elif [[ "$1" =~ ^https://github\.com/City-of-Helsinki/tilavarauspalvelu/pull/([0-9]+)([/?#].*)?$ ]]; then
   number="${BASH_REMATCH[1]}"
 else
   echo "Not a pull request number or URL: $1" >&2
