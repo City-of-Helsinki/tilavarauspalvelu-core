@@ -187,6 +187,12 @@ class FakeKeycloak:
     nonce: str | None = None
     authorization_code: str = "fake-authorization-code"
 
+    refresh_failure_status_code: int | None = None
+    """When set, the token endpoint rejects refresh tokens with this HTTP status."""
+
+    refresh_failure_error: str = "invalid_grant"
+    """OAuth error code in the body of a rejected refresh."""
+
     issuer: str = f"{settings.SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT}/auth/realms/helsinki-tunnistus"
 
     @property
@@ -252,6 +258,9 @@ class FakeKeycloak:
                 return 200, {}, json.dumps(self.user_tokens())
 
             case "refresh_token":
+                if self.refresh_failure_status_code is not None:
+                    error = {"error": self.refresh_failure_error}
+                    return self.refresh_failure_status_code, {}, json.dumps(error)
                 return 200, {}, json.dumps(self.user_tokens())
 
             case "urn:ietf:params:oauth:grant-type:uma-ticket":
