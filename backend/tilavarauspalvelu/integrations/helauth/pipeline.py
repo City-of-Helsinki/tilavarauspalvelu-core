@@ -71,7 +71,13 @@ def fetch_api_tokens(**kwargs: Unpack[PipelineArgs]) -> None:
 
     url = f"{settings.TUNNISTAMO_BASE_URL}/api-tokens/"
     headers = {"Authorization": f"Bearer {social.extra_data['access_token']}"}
-    api_tokens_response = requests.post(url, headers=headers, timeout=5)
+    try:
+        api_tokens_response = requests.post(url, headers=headers, timeout=5)
+    except requests.RequestException as error:
+        msg = "Login: Unable to get API tokens"
+        SentryLogger.log_exception(error, msg)
+        return
+
     if api_tokens_response.status_code != 200:  # noqa: PLR2004
         msg = "Login: Unable to get API tokens"
         SentryLogger.log_message(msg, details={"status_code": api_tokens_response.status_code}, level="error")
