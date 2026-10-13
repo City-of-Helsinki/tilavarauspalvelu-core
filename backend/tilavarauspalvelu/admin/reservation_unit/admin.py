@@ -14,7 +14,7 @@ from tilavarauspalvelu.admin.reservation_unit_image.admin import ReservationUnit
 from tilavarauspalvelu.enums import AccessType, ReservationKind
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.models import ReservationUnit, Resource, Space
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 
 from .form import ReservationUnitAccessTypeInline, ReservationUnitAdminForm, ReservationUnitPricingInline
@@ -221,6 +221,19 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
     @admin.display(description=_("Current access type"), ordering=L("current_access_type"))
     def current_access_type(self, obj: ReservationUnit) -> AccessType | None:
         return obj.current_access_type  # type: ignore[return-value]
+
+    def formfield_for_manytomany(
+        self,
+        db_field: models.ManyToManyField,
+        request: WSGIRequest,
+        **kwargs: Any,
+    ) -> Any:
+        # The option labels include the unit name, so fetch the units in the same query.
+        if db_field.name == "spaces":
+            kwargs["queryset"] = Space.objects.select_related("unit")
+        if db_field.name == "resources":
+            kwargs["queryset"] = Resource.objects.select_related("space__unit")
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet[ReservationUnit]:
         return (
