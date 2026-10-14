@@ -116,6 +116,69 @@ def test_reservation_ical(api_client, settings):
     assert str(event["GEO"].to_ical()) == "3.4;1.2"
 
 
+@override_settings(EMAIL_VARAAMO_EXT_LINK="https://fake.varaamo.hel.fi")
+@pytest.mark.parametrize("language", ["sv", "en"])
+def test_reservation_ical__description_links_to_user_language(api_client, language):
+    user = UserFactory.create(preferred_language=language)
+
+    api_client.force_authenticate(user=user)
+
+    unit = UnitFactory.create(
+        name="Caisa",
+        name_sv="Caisa",
+        name_en="Caisa",
+        address_street="Street",
+        address_zip="12345",
+        address_city="City",
+    )
+    reservation_unit = ReservationUnitFactory.create(name="Aitio", name_sv="Aitio", name_en="Aitio", unit=unit)
+    reservation = ReservationFactory.create(
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 14),
+        user=user,
+    )
+
+    base_url = reverse("reservation_calendar", kwargs={"pk": reservation.pk})
+    hash_sig = ical_hmac_signature(f"reservation-{reservation.pk}")
+    url = f"{base_url}?hash={hash_sig}"
+
+    response = api_client.get(url)
+
+    assert response.status_code == 200, response.content
+
+    content = io.BytesIO(b"".join(response.streaming_content)).read()
+    calendar = Calendar.from_ical(content)
+
+    description = (
+        "<!DOCTYPE html>"
+        f"<html lang='{language}'>"
+        "<body>"
+        "<h3>"
+        "Booking details"
+        "</h3>"
+        "<p>"
+        "Aitio, Caisa, Street, 12345 City"
+        "</p>"
+        "<p>"
+        "From: 01.01.2024 at 12:00"
+        "</p>"
+        "<p>"
+        "To: 01.01.2024 at 14:00"
+        "</p>"
+        "<p>"
+        "Manage your booking at Varaamo. You can check the details of your booking and "
+        "Varaamo's terms of contract and cancellation on the "
+        f"<a href='https://fake.varaamo.hel.fi/{language}/reservations'>'My bookings'</a> page."
+        "</p>"
+        "</body>"
+        "</html>"
+    )
+
+    event = calendar.subcomponents[1]
+    assert str(event["DESCRIPTION"]) == description
+
+
 def test_reservation_ical__without_hash(api_client):
     user = UserFactory.create()
 
