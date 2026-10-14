@@ -211,10 +211,6 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             return override
         return self.reservation_unit.buffer_time_after
 
-    def get_max_persons(self) -> int | None:
-        # Sum of max persons for all spaces because group can be divided to different spaces
-        return sum(space.max_persons or 0 for space in self.reservation_unit.spaces.all()) or None
-
     def has_overlapping_reservations(
         self,
         start_datetime: datetime.datetime,
