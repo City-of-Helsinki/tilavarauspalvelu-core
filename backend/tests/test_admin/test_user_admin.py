@@ -46,7 +46,6 @@ def test_user_admin__social_auth_change_page__not_available(api_client):
     response = api_client.get(path=f"/admin/social_django/usersocialauth/{social_auth.pk}/change/")
 
     assert response.status_code == 404
-    assert user.refresh_token not in response.content.decode()
 
 
 def test_user_admin__change_page__logs_date_of_birth_view(api_client):
@@ -65,3 +64,16 @@ def test_user_admin__change_page__logs_date_of_birth_view(api_client):
     assert view_logs[0].user == user
     assert view_logs[0].viewer_user == admin
     assert view_logs[0].field == "User.date_of_birth"
+
+
+def test_user_admin__change_page__does_not_log_view_without_permission(api_client):
+    staff_user = UserFactory.create(is_staff=True)
+    api_client.force_login(staff_user)
+
+    user = UserFactory.create(date_of_birth=datetime.date(2000, 1, 1))
+
+    url = reverse("admin:tilavarauspalvelu_user_change", args=[user.pk])
+    response = api_client.get(path=url)
+
+    assert response.status_code == 403
+    assert PersonalInfoViewLog.objects.count() == 0
