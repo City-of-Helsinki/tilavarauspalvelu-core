@@ -6,11 +6,18 @@ import pytest
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraClientError
 from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraAccessCodeModifyResponse
 from utils.date_utils import local_datetime
 
-from tests.factories import ApplicationSectionFactory, ReservationFactory, ReservationSeriesFactory, UserFactory
-from tests.helpers import ResponseMock, patch_method
+from tests.factories import (
+    ApplicationSectionFactory,
+    ReservationFactory,
+    ReservationSeriesFactory,
+    UnitFactory,
+    UserFactory,
+)
+from tests.helpers import ResponseMock, exact, patch_method
 from tests.test_integrations.test_keyless_entry.helpers import (
     default_reservation_response,
     default_reservation_series_response,
@@ -290,3 +297,13 @@ def test_create_access_code__seasonal_booking(settings):
 
     assert patch.call_args.kwargs["method"] == "post"
     assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/seasonal-booking"
+
+
+def test_create_access_code__invalid_target():
+    unit = UnitFactory.build(name="foo")
+
+    msg = "Invalid create target: foo"
+    with patch_method(PindoraClient.request) as patch, pytest.raises(PindoraClientError, match=exact(msg)):
+        PindoraService.create_access_code(obj=unit)
+
+    assert patch.call_count == 0

@@ -292,6 +292,31 @@ def test_pindora_client__reschedule_reservation__errors(status_code, exception, 
         PindoraClient.reschedule_reservation(reservation)
 
 
+def test_pindora_client__reschedule_reservation__missing_key():
+    reservation = ReservationFactory.build()
+
+    data = default_access_code_modify_response()
+    data.pop("access_code_generated_at")
+
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
+
+    msg = "Missing key in reservation response from Pindora: 'access_code_generated_at'"
+    with patch, pytest.raises(PindoraAPIError, match=exact(msg)):
+        PindoraClient.reschedule_reservation(reservation)
+
+
+def test_pindora_client__reschedule_reservation__invalid_data():
+    reservation = ReservationFactory.build()
+
+    data = default_access_code_modify_response(access_code_generated_at="not-a-date")
+
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
+
+    msg = "Invalid value in reservation response from Pindora: Invalid isoformat string: 'not-a-date'"
+    with patch, pytest.raises(PindoraAPIError, match=exact(msg)):
+        PindoraClient.reschedule_reservation(reservation)
+
+
 def test_pindora_client__delete_reservation(settings):
     reservation = ReservationFactory.build()
 
