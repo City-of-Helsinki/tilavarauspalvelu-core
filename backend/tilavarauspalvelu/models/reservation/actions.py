@@ -50,18 +50,6 @@ __all__ = [
 class ReservationActions:
     reservation: Reservation
 
-    def get_actual_before_buffer(self) -> datetime.timedelta:
-        buffer_time_before: datetime.timedelta = self.reservation.buffer_time_before or datetime.timedelta()
-        reservation_unit = self.reservation.reservation_unit
-        before = reservation_unit.actions.get_actual_before_buffer(self.reservation.begins_at)
-        return max(before, buffer_time_before)
-
-    def get_actual_after_buffer(self) -> datetime.timedelta:
-        buffer_time_after: datetime.timedelta = self.reservation.buffer_time_after or datetime.timedelta()
-        reservation_unit = self.reservation.reservation_unit
-        after = reservation_unit.actions.get_actual_after_buffer(self.reservation.ends_at)
-        return max(after, buffer_time_after)
-
     def to_ical(self) -> bytes:
         language = self.reservation.user.get_preferred_language()
 
