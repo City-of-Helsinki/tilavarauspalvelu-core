@@ -44,6 +44,9 @@ pytestmark = [
     pytest.mark.django_db,
 ]
 
+# ── Helpers ──
+
+
 reservation_units_reservable_query = partial(
     reservation_units_query,
     fields="isClosed firstReservableDatetime",
@@ -230,6 +233,14 @@ class AR_ReservableParams(NamedTuple):
     result: ReservableNode | str | None = None
 
 
+class BufferParams(NamedTuple):
+    buffer_time_before: datetime.timedelta
+    buffer_time_after: datetime.timedelta
+    first_reservable_time: str
+    first_reservation_buffer_time_after: datetime.timedelta = datetime.timedelta()
+    second_reservation_buffer_time_before: datetime.timedelta = datetime.timedelta()
+
+
 def apply_reservation_unit_override_settings(
     reservation_unit: ReservationUnit,
     settings: ReservationUnitOverrides,
@@ -240,7 +251,7 @@ def apply_reservation_unit_override_settings(
     reservation_unit.save()
 
 
-########################################################################################################################
+# ── Filters ──
 
 
 @freezegun.freeze_time(NOW)
@@ -250,9 +261,6 @@ def test__reservation_unit__first_reservable_time__no_results_time_spans_dont_ex
 
     assert response.has_errors is False, response
     assert response.node(0) == {"isClosed": True, "firstReservableDatetime": None}
-
-
-########################################################################################################################
 
 
 @pytest.mark.parametrize(
@@ -304,9 +312,6 @@ def test__reservation_unit__first_reservable_time__filters__invalid_values(graph
 
     assert response.has_errors is True, response
     assert response.error_message() == result
-
-
-########################################################################################################################
 
 
 @pytest.mark.parametrize(
@@ -390,9 +395,6 @@ def test__reservation_unit__first_reservable_time__filters__too_strict_causes_no
     assert response.has_errors is False, response
     assert frt(response) is None
     assert is_closed(response) is result.is_closed
-
-
-########################################################################################################################
 
 
 @pytest.mark.parametrize(
@@ -516,9 +518,6 @@ def test__reservation_unit__first_reservable_time__filters__should_not_exclude_t
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=13)
     assert is_closed(response) is False
-
-
-########################################################################################################################
 
 
 @pytest.mark.parametrize(
@@ -669,9 +668,6 @@ def test__reservation_unit__first_reservable_time__filters__simple(graphql, rese
     assert is_closed(response) is result.is_closed
 
 
-########################################################################################################################
-
-
 @pytest.mark.parametrize(
     **parametrize_helper({
         "Same day timespans | Time Start is after first time span": ReservableParams(
@@ -748,9 +744,6 @@ def test__reservation_unit__first_reservable_time__filters__multiple_time_spans_
     assert response.has_errors is False, response
     assert frt(response) == result.first_reservable_datetime
     assert is_closed(response) is result.is_closed
-
-
-########################################################################################################################
 
 
 @pytest.mark.parametrize(
@@ -831,7 +824,7 @@ def test__reservation_unit__first_reservable_time__filters__multiple_days_long_t
     assert is_closed(response) is result.is_closed
 
 
-########################################################################################################################
+# ── Reservation unit settings ──
 
 
 @pytest.mark.parametrize(
@@ -967,9 +960,6 @@ def test__reservation_unit__first_reservable_time__reservation_unit_settings(
     assert is_closed(response) is result.is_closed
 
 
-########################################################################################################################
-
-
 @pytest.mark.parametrize(
     **parametrize_helper({
         "Advanced | Min duration is longer than Max duration allowed by reservation unit": RU_ReservableParams(
@@ -1100,7 +1090,41 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
     assert is_closed(response) is result.is_closed
 
 
-########################################################################################################################
+@pytest.mark.parametrize(
+    ("max_reservation_duration", "first_reservable_time"),
+    [
+        (datetime.timedelta(minutes=200), None),
+        (datetime.timedelta(minutes=240), dt(hour=10)),
+    ],
+)
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__max_duration_is_rounded_down_to_the_interval(
+    graphql, reservation_unit, max_reservation_duration, first_reservable_time
+):
+    """
+    The maximum duration is rounded down to a multiple of the start interval.
+    With a 120 minute interval, a maximum of 200 minutes is 120 minutes, which is less than the 140 minute minimum.
+    """
+    reservation_unit.min_reservation_duration = datetime.timedelta(minutes=140)
+    reservation_unit.max_reservation_duration = max_reservation_duration
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_120_MINUTES.value
+    reservation_unit.save()
+
+    # 1st Jan 10:00 - 20:00 (10h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=10),
+        end_datetime=_datetime(hour=20),
+    )
+
+    response = graphql(reservation_units_reservable_query())
+
+    assert response.has_errors is False, response
+    assert frt(response) == first_reservable_time
+    assert is_closed(response) is False
+
+
+# ── Application rounds ──
 
 
 @pytest.mark.parametrize(
@@ -1279,9 +1303,6 @@ def test__reservation_unit__first_reservable_time__application_rounds(
     assert is_closed(response) is result.is_closed
 
 
-########################################################################################################################
-
-
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__filters__application_rounds__start_date_at_round_last_day(
     graphql, reservation_unit
@@ -1338,7 +1359,7 @@ def test__reservation_unit__first_reservable_time__filters__application_rounds__
     assert is_closed(response) is False
 
 
-########################################################################################################################
+# ── Reservations ──
 
 
 @freezegun.freeze_time(NOW)
@@ -1379,9 +1400,6 @@ def test__reservation_unit__first_reservable_time__reservations__own_reservation
     assert response.has_errors is False, response
     assert frt(response) is None
     assert is_closed(response) is False
-
-
-########################################################################################################################
 
 
 @freezegun.freeze_time(NOW)
@@ -1426,9 +1444,6 @@ def test__reservation_unit__first_reservable_time__reservations__unrelated_reser
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=10)
     assert is_closed(response) is False
-
-
-########################################################################################################################
 
 
 @freezegun.freeze_time(NOW)
@@ -1485,9 +1500,6 @@ def test__reservation_unit__first_reservable_time__reservations__dont_include_ca
     assert is_closed(response) is False
 
 
-########################################################################################################################
-
-
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__reservations__date_filters_on_same_day_as_reservation(
     graphql, reservation_unit
@@ -1536,9 +1548,6 @@ def test__reservation_unit__first_reservable_time__reservations__date_filters_on
     assert response.has_errors is False, response
     assert frt(response) is None
     assert is_closed(response) is False
-
-
-########################################################################################################################
 
 
 @freezegun.freeze_time(NOW)
@@ -1591,9 +1600,6 @@ def test__reservation_unit__first_reservable_time__reservations__filter_start_ti
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=15, minute=30)
     assert is_closed(response) is False
-
-
-########################################################################################################################
 
 
 @freezegun.freeze_time(NOW)
@@ -1656,9 +1662,6 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     assert is_closed(response, node=1) is False
 
 
-########################################################################################################################
-
-
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__reservations__in_common_hierarchy__by_resource(
     graphql, reservation_unit
@@ -1717,9 +1720,6 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     assert response.node(1)["pk"] == reservation_unit_2.pk
     assert frt(response, node=1) is None
     assert is_closed(response, node=1) is False
-
-
-########################################################################################################################
 
 
 @freezegun.freeze_time(NOW)
@@ -1786,9 +1786,6 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     assert response.node(1)["pk"] == reservation_unit_2.pk
     assert frt(response, node=1) is None
     assert is_closed(response, node=1) is False
-
-
-########################################################################################################################
 
 
 @freezegun.freeze_time(NOW)
@@ -1860,7 +1857,7 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
     assert is_closed(response, node=1) is False
 
 
-########################################################################################################################
+# ── Buffers ──
 
 
 @freezegun.freeze_time(NOW)
@@ -1900,7 +1897,239 @@ def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_tim
     assert is_closed(response) is False
 
 
-########################################################################################################################
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_time_to_reservation(
+    graphql, reservation_unit
+):
+    """
+    A reservation unit buffer can go over closed time, but not over a reservation on the other side of it.
+
+    ┌──────────────────────────────────────────────┐
+    │ █ = Reservation                              │
+    │ ░ = Not reservable                           │
+    │ ▁ = Reservable                               │
+    │ ═ = First reservable time                    │
+    │ ─ = Reservation Unit Buffer                  │
+    │ One character is 15 minutes in below graph   │
+    ├──────────────────────────────────────────────┤
+    │ 0   1   2   3   4   5   6   7   8   9   10   │
+    │ ░░░░░░░░▁▁▁▁░░░░████░░░░▁▁▁▁░░░░▁▁▁▁░░░░░░░░ │
+    │                         ────────══────────   │
+    └──────────────────────────────────────────────┘
+    """
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
+    reservation_unit.buffer_time_before = datetime.timedelta(minutes=120)
+    reservation_unit.buffer_time_after = datetime.timedelta(minutes=120)
+    reservation_unit.save()
+
+    for start_hour, end_hour in ((2, 3), (6, 7), (8, 9)):
+        ReservableTimeSpanFactory.create(
+            resource=reservation_unit.origin_hauki_resource,
+            start_datetime=_datetime(hour=start_hour),
+            end_datetime=_datetime(hour=end_hour),
+        )
+
+    # 1st Jan 04:00 - 05:00 (1h)
+    ReservationFactory.create(
+        reservation_unit=reservation_unit,
+        begins_at=_datetime(hour=4),
+        ends_at=_datetime(hour=5),
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=datetime.timedelta(),
+        state=ReservationStateChoice.CONFIRMED,
+    )
+
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    response = graphql(reservation_units_reservable_query())
+
+    assert response.has_errors is False, response
+    assert frt(response) == dt(hour=8)
+    assert is_closed(response) is False
+
+
+@pytest.mark.parametrize(
+    **parametrize_helper(
+        # ┌─────────────────────────────────────────────┐
+        # │ █ = Reservation                             │
+        # │ ▄ = Reservation Buffer                      │
+        # │ ░ = Not reservable                          │
+        # │ ▁ = Reservable                              │
+        # │ ═ = First reservable time                   │
+        # │ ─ = Reservation Unit Buffer                 │
+        # │ One character is 15 minutes in below graphs │
+        # └─────────────────────────────────────────────┘
+        {
+            # ┌──────────────────────────────────────────────┐
+            # │ 0   1   2   3   4   5   6   7   8   9   10   │
+            # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+            # │         ══                                   │
+            "ReservationUnit -0+0": BufferParams(
+                buffer_time_before=datetime.timedelta(),
+                buffer_time_after=datetime.timedelta(),
+                first_reservable_time=dt(hour=2),
+            ),
+            # ┌──────────────────────────────────────────────┐
+            # │ 0   1   2   3   4   5   6   7   8   9   10   │
+            # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+            # │         ──══                                 │
+            "ReservationUnit -30+0": BufferParams(
+                buffer_time_before=datetime.timedelta(minutes=30),
+                buffer_time_after=datetime.timedelta(),
+                first_reservable_time=dt(hour=2, minute=30),
+            ),
+            # ┌──────────────────────────────────────────────┐
+            # │ 0   1   2   3   4   5   6   7   8   9   10   │
+            # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+            # │                     ────────══               │
+            "ReservationUnit -120+0": BufferParams(
+                buffer_time_before=datetime.timedelta(minutes=120),
+                buffer_time_after=datetime.timedelta(),
+                first_reservable_time=dt(hour=7),
+            ),
+            # ┌──────────────────────────────────────────────┐
+            # │ 0   1   2   3   4   5   6   7   8   9   10   │
+            # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+            # │         ══──                                 │
+            "ReservationUnit -0+30": BufferParams(
+                buffer_time_before=datetime.timedelta(),
+                buffer_time_after=datetime.timedelta(minutes=30),
+                first_reservable_time=dt(hour=2),
+            ),
+            # ┌──────────────────────────────────────────────┐
+            # │ 0   1   2   3   4   5   6   7   8   9   10   │
+            # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+            # │                     ══────────               │
+            "ReservationUnit -0+120": BufferParams(
+                buffer_time_before=datetime.timedelta(),
+                buffer_time_after=datetime.timedelta(minutes=120),
+                first_reservable_time=dt(hour=5),
+            ),
+            # ┌──────────────────────────────────────────────┐
+            # │ 0   1   2   3   4   5   6   7   8   9   10   │
+            # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+            # │         ──══──                               │
+            "ReservationUnit -30+30": BufferParams(
+                buffer_time_before=datetime.timedelta(minutes=30),
+                buffer_time_after=datetime.timedelta(minutes=30),
+                first_reservable_time=dt(hour=2, minute=30),
+            ),
+            # ┌──────────────────────────────────────────────┐
+            # │ 0   1   2   3   4   5   6   7   8   9   10   │
+            # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+            # │                     ────══────               │
+            "ReservationUnit -60+60": BufferParams(
+                buffer_time_before=datetime.timedelta(minutes=60),
+                buffer_time_after=datetime.timedelta(minutes=60),
+                first_reservable_time=dt(hour=6),
+            ),
+            # ┌──────────────────────────────────────────────┐
+            # │ 0   1   2   3   4   5   6   7   8   9   10   │
+            # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+            # │                     ──══──────               │
+            "ReservationUnit -30+90": BufferParams(
+                buffer_time_before=datetime.timedelta(minutes=30),
+                buffer_time_after=datetime.timedelta(minutes=90),
+                first_reservable_time=dt(hour=5, minute=30),
+            ),
+            # ┌──────────────────────────────────────────────┐
+            # │ 0   1   2   3   4   5   6   7   8   9   10   │
+            # │ ░░░░████▁▁▁▁▁▁▄▄████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+            # │         ──══                                 │
+            "ReservationUnit -30+0 | Reservation -0+0, -30+0": BufferParams(
+                buffer_time_before=datetime.timedelta(minutes=30),
+                buffer_time_after=datetime.timedelta(),
+                first_reservable_time=dt(hour=2, minute=30),
+                second_reservation_buffer_time_before=datetime.timedelta(minutes=30),
+            ),
+            # ┌──────────────────────────────────────────────┐
+            # │ 0   1   2   3   4   5   6   7   8   9   10   │
+            # │ ░░░░████▁▁▄▄▄▄▄▄████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+            # │                     ──══                     │
+            "ReservationUnit -30+0 | Reservation -0+0, -90+0": BufferParams(
+                buffer_time_before=datetime.timedelta(minutes=30),
+                buffer_time_after=datetime.timedelta(),
+                first_reservable_time=dt(hour=5, minute=30),
+                second_reservation_buffer_time_before=datetime.timedelta(minutes=90),
+            ),
+            # ┌──────────────────────────────────────────────┐
+            # │ 0   1   2   3   4   5   6   7   8   9   10   │
+            # │ ░░░░████▁▁▁▁▄▄▄▄████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+            # │                     ────══                   │
+            "ReservationUnit -60+0 | Reservation -0+0, -60+0": BufferParams(
+                buffer_time_before=datetime.timedelta(minutes=60),
+                buffer_time_after=datetime.timedelta(),
+                first_reservable_time=dt(hour=6),
+                second_reservation_buffer_time_before=datetime.timedelta(minutes=60),
+            ),
+            # ┌──────────────────────────────────────────────┐
+            # │ 0   1   2   3   4   5   6   7   8   9   10   │
+            # │ ░░░░████▄▄▄▄▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+            # │         ────══                               │
+            "ReservationUnit -60+0 | Reservation -0+60, -0+0": BufferParams(
+                buffer_time_before=datetime.timedelta(minutes=60),
+                buffer_time_after=datetime.timedelta(),
+                first_reservable_time=dt(hour=3),
+                first_reservation_buffer_time_after=datetime.timedelta(minutes=60),
+            ),
+        }
+    )
+)
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__buffers__reservation_unit_and_reservation_buffers(
+    graphql,
+    reservation_unit,
+    buffer_time_before,
+    buffer_time_after,
+    first_reservable_time,
+    first_reservation_buffer_time_after,
+    second_reservation_buffer_time_before,
+):
+    """
+    The buffers of the reservation unit and the buffers of the reservations both shorten the reservable time.
+
+    Reservations exist at 01-02 and 04-05. The reservable time span is at 02-09.
+    """
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
+    reservation_unit.buffer_time_before = buffer_time_before
+    reservation_unit.buffer_time_after = buffer_time_after
+    reservation_unit.save()
+
+    # 1st Jan 02:00 - 09:00 (7h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=2),
+        end_datetime=_datetime(hour=9),
+    )
+
+    # 1st Jan 01:00 - 02:00 (1h)
+    ReservationFactory.create(
+        reservation_unit=reservation_unit,
+        begins_at=_datetime(hour=1),
+        ends_at=_datetime(hour=2),
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=first_reservation_buffer_time_after,
+        state=ReservationStateChoice.CONFIRMED,
+    )
+    # 1st Jan 04:00 - 05:00 (1h)
+    ReservationFactory.create(
+        reservation_unit=reservation_unit,
+        begins_at=_datetime(hour=4),
+        ends_at=_datetime(hour=5),
+        buffer_time_before=second_reservation_buffer_time_before,
+        buffer_time_after=datetime.timedelta(),
+        state=ReservationStateChoice.CONFIRMED,
+    )
+
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    response = graphql(reservation_units_reservable_query())
+
+    assert response.has_errors is False, response
+    assert frt(response) == first_reservable_time
+    assert is_closed(response) is False
 
 
 @pytest.mark.parametrize(
@@ -2002,9 +2231,6 @@ def test__reservation_unit__first_reservable_time__buffers__different_length_buf
     assert is_closed(response, node=1) is False
 
 
-########################################################################################################################
-
-
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__buffers__start_and_end_same_time_different_after_buffers(
     graphql, reservation_unit
@@ -2087,9 +2313,6 @@ def test__reservation_unit__first_reservable_time__buffers__start_and_end_same_t
     assert response.node(2)["pk"] == reservation_unit_60.pk
     assert frt(response, node=2) == dt(hour=12, minute=30)
     assert is_closed(response, node=2) is False
-
-
-########################################################################################################################
 
 
 @freezegun.freeze_time(NOW)
@@ -2182,9 +2405,6 @@ def test__reservation_unit__first_reservable_time__buffers__different_before_buf
     assert is_closed(response, node=2) is False
 
 
-########################################################################################################################
-
-
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__buffers__different_before_buffers__before_closed_time(
     graphql, reservation_unit
@@ -2267,7 +2487,157 @@ def test__reservation_unit__first_reservable_time__buffers__different_before_buf
     assert is_closed(response, node=2) is False
 
 
-########################################################################################################################
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__blocked_type_reservation_can_overlap_with_buffer(
+    graphql, reservation_unit
+):
+    """
+    Make sure that:
+    - Buffers from new reservations can overlap with the BLOCKED-Type Reservation
+    - BLOCKED-Type Reservation buffers are ignored even if they are set
+    - BLOCKED-Type Reservations still block new reservations that overlap with them
+
+    ┌────────────────────────────────────────────────────┐
+    │ █ = BLOCKED-Type Reservation                       │
+    │ ░ = Not reservable                                 │
+    │ ▁ = Reservable                                     │
+    │ ═ = First reservable time                          │
+    │ ─ = Reservation Unit Buffer                        │
+    ├────────────────────────────────────────────────────┤
+    │ reservation_unit                                   │
+    │   0   2   4   6   8   10  12  14  16  18  20  22   │
+    │ 1 ░░░░░░░░░░░░░░░░░░░░▁▁▁▁████▁▁▁▁░░░░░░░░░░░░░░░░ │
+    │                     ──══──                         │
+    │                       ──══──                       │
+    │                             ──══──                 │
+    └────────────────────────────────────────────────────┘
+    """
+    reservation_unit.min_reservation_duration = datetime.timedelta(minutes=60)
+    reservation_unit.buffer_time_before = datetime.timedelta(minutes=60)
+    reservation_unit.buffer_time_after = datetime.timedelta(minutes=60)
+    reservation_unit.save()
+
+    # 1st Jan 10:00 - 16:00 (6h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=10),
+        end_datetime=_datetime(hour=16),
+    )
+
+    # 1st Jan 12:00 - 14:00 (2h)
+    ReservationFactory.create(
+        reservation_unit=reservation_unit,
+        begins_at=_datetime(hour=12),
+        ends_at=_datetime(hour=14),
+        buffer_time_before=datetime.timedelta(minutes=300),  # This buffer should be completely ignored
+        buffer_time_after=datetime.timedelta(minutes=300),  # This buffer should be completely ignored
+        type=ReservationTypeChoice.BLOCKED,
+        state=ReservationStateChoice.CONFIRMED,
+    )
+
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    # Buffer does not overlap with BLOCKED reservation at all
+    response = graphql(reservation_units_reservable_query(reservable_time_start=datetime.time(hour=10).isoformat()))
+    assert response.has_errors is False, response
+    assert frt(response) == dt(hour=10)
+    assert is_closed(response) is False
+
+    # Buffer overlaps with BLOCKED reservation from the end, which should be allowed
+    response = graphql(reservation_units_reservable_query(reservable_time_start=datetime.time(hour=11).isoformat()))
+    assert response.has_errors is False, response
+    assert frt(response) == dt(hour=11)
+    assert is_closed(response) is False
+
+    # Buffer overlaps with BLOCKED reservation from the start, which should be allowed
+    response = graphql(reservation_units_reservable_query(reservable_time_start=datetime.time(hour=12).isoformat()))
+    assert response.has_errors is False, response
+    assert frt(response) == dt(hour=14)
+    assert is_closed(response) is False
+
+
+@freezegun.freeze_time(datetime.datetime(NEXT_YEAR, 1, 1, hour=8, tzinfo=DEFAULT_TIMEZONE))
+def test__reservation_unit__first_reservable_time__duration_exactly_min_but_buffers_overlap(graphql, reservation_unit):
+    """
+    This is a regression test for a bug that was found during manual testing.
+
+    Tests a case where the algorithm for finding the first reservable time exited too
+    early when shortening reservable time spans based on reservations.
+
+    This happened when the reservable time duration was exactly the minimum duration after
+    processing a reservation, which caused the shortening to stop, but subsequent checks would
+    still determine the reservable time span to be _just_ long enough to fit the minimum duration.
+
+    In reality, the shortening should have continued until the reservable time was
+    _actually_ shorter than the minimum duration, since there could be a reservation
+    that could shorten it still, like in this example case.
+
+    ┌────────────────────────────────────────────────────┐
+    │ █ = Reservation                                    │
+    │ ▄ = Reservation Buffer                             │
+    │ ░ = Not reservable                                 │
+    │ ▁ = Reservable                                     │
+    │ ═ = First reservable time                          │
+    │ ─ = Reservation Unit Buffer                        │
+    ├────────────────────────────────────────────────────┤
+    │   ...       17  18  19  20  21  22             ... │
+    │ 1 ░░░░░░░░░░████▁▁████▁▄████▄▄▁▁░░░░░░░░░░░░░░░░░░ │
+    │                              ─═─                   │
+    └────────────────────────────────────────────────────┘
+    """
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_15_MINUTES.value
+    reservation_unit.buffer_time_before = datetime.timedelta(minutes=15)
+    reservation_unit.buffer_time_after = datetime.timedelta(minutes=15)
+    reservation_unit.save()
+
+    # 1st Jan 17:00 - 22:00 (5h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=17),
+        end_datetime=_datetime(hour=22),
+    )
+
+    # 1st Jan 17:00-18:00 (1h) | Buffer: none
+    ReservationFactory.create(
+        begins_at=_datetime(hour=17),
+        ends_at=_datetime(hour=18),
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=datetime.timedelta(),
+        reservation_unit=reservation_unit,
+        state=ReservationStateChoice.CREATED,
+    )
+
+    # 1st Jan 18:30-19:30 (1h) | Buffer: none
+    ReservationFactory.create(
+        begins_at=_datetime(hour=18, minute=30),
+        ends_at=_datetime(hour=19, minute=30),
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=datetime.timedelta(),
+        reservation_unit=reservation_unit,
+        state=ReservationStateChoice.CREATED,
+    )
+
+    # 1st Jan 20:00-21:00 (1h) | Buffer: 19:45-21:30
+    ReservationFactory.create(
+        begins_at=_datetime(hour=20),
+        ends_at=_datetime(hour=21),
+        buffer_time_before=datetime.timedelta(minutes=15),
+        buffer_time_after=datetime.timedelta(minutes=30),
+        reservation_unit=reservation_unit,
+        state=ReservationStateChoice.CREATED,
+    )
+
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    response = graphql(reservation_units_reservable_query())
+    assert response.has_errors is False, response
+    assert is_closed(response) is False
+    assert frt(response) == dt(hour=21, minute=30)
+
+
+# ── Start intervals ──
 
 
 @freezegun.freeze_time(datetime.datetime(NEXT_YEAR, 1, 1, 10, microsecond=1).astimezone(DEFAULT_TIMEZONE))
@@ -2297,9 +2667,6 @@ def test__reservation_unit__first_reservable_time__round_current_time_to_the_nex
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=10, minute=15)
     assert is_closed(response) is False
-
-
-########################################################################################################################
 
 
 @freezegun.freeze_time(NOW)
@@ -2410,6 +2777,58 @@ def test__reservation_unit__first_reservable_time__extra_long_interval__after_mi
     assert is_closed(response) is False
 
 
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__interval_longer_than_min_duration_is_the_min_duration(
+    graphql, reservation_unit
+):
+    """
+    A reservation must be at least as long as the start interval, even if the minimum duration is shorter.
+
+    ┌────────────────────────────────────────────────────┐
+    │ █ = Reservation                                    │
+    │ ░ = Not reservable                                 │
+    │ ▁ = Reservable                                     │
+    │ ═ = First reservable time                          │
+    ├────────────────────────────────────────────────────┤
+    │   0   2   4   6   8   10  12  14  16  18  20  22   │
+    │ 1 ░░░░░░▁▁██▁▁▁▁▁▁▁▁░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │
+    │           ════                                     │
+    └────────────────────────────────────────────────────┘
+    """
+    reservation_unit.min_reservation_duration = datetime.timedelta(minutes=15)
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_120_MINUTES.value
+    reservation_unit.save()
+
+    # 1st Jan 03:00 - 09:00 (6h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=3),
+        end_datetime=_datetime(hour=9),
+    )
+
+    # 1st Jan 04:00 - 05:00 (1h)
+    ReservationFactory.create(
+        reservation_unit=reservation_unit,
+        begins_at=_datetime(hour=4),
+        ends_at=_datetime(hour=5),
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=datetime.timedelta(),
+        state=ReservationStateChoice.CONFIRMED,
+    )
+
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    response = graphql(reservation_units_reservable_query())
+
+    assert response.has_errors is False, response
+    assert frt(response) == dt(hour=5)
+    assert is_closed(response) is False
+
+
+# ── Daylight saving time ──
+
+
 # The clocks move from 03:00 to 04:00 on the night of 2026-03-29.
 @freezegun.freeze_time(local_datetime(2026, 3, 1, 12))
 def test__reservation_unit__first_reservable_time__duration_over_spring_daylight_saving_time_change(
@@ -2452,163 +2871,7 @@ def test__reservation_unit__first_reservable_time__duration_over_autumn_daylight
     assert frt(response) == dt(year=2026, month=10, day=25)
 
 
-########################################################################################################################
-
-
-@freezegun.freeze_time(NOW)
-def test__reservation_unit__first_reservable_time__blocked_type_reservation_can_overlap_with_buffer(
-    graphql, reservation_unit
-):
-    """
-    Make sure that:
-    - Buffers from new reservations can overlap with the BLOCKED-Type Reservation
-    - BLOCKED-Type Reservation buffers are ignored even if they are set
-    - BLOCKED-Type Reservations still block new reservations that overlap with them
-
-    ┌────────────────────────────────────────────────────┐
-    │ █ = BLOCKED-Type Reservation                       │
-    │ ░ = Not reservable                                 │
-    │ ▁ = Reservable                                     │
-    │ ═ = First reservable time                          │
-    │ ─ = Reservation Unit Buffer                        │
-    ├────────────────────────────────────────────────────┤
-    │ reservation_unit                                   │
-    │   0   2   4   6   8   10  12  14  16  18  20  22   │
-    │ 1 ░░░░░░░░░░░░░░░░░░░░▁▁▁▁████▁▁▁▁░░░░░░░░░░░░░░░░ │
-    │                     ──══──                         │
-    │                       ──══──                       │
-    │                             ──══──                 │
-    └────────────────────────────────────────────────────┘
-    """
-    reservation_unit.min_reservation_duration = datetime.timedelta(minutes=60)
-    reservation_unit.buffer_time_before = datetime.timedelta(minutes=60)
-    reservation_unit.buffer_time_after = datetime.timedelta(minutes=60)
-    reservation_unit.save()
-
-    # 1st Jan 10:00 - 16:00 (6h)
-    ReservableTimeSpanFactory.create(
-        resource=reservation_unit.origin_hauki_resource,
-        start_datetime=_datetime(hour=10),
-        end_datetime=_datetime(hour=16),
-    )
-
-    # 1st Jan 12:00 - 14:00 (2h)
-    ReservationFactory.create(
-        reservation_unit=reservation_unit,
-        begins_at=_datetime(hour=12),
-        ends_at=_datetime(hour=14),
-        buffer_time_before=datetime.timedelta(minutes=300),  # This buffer should be completely ignored
-        buffer_time_after=datetime.timedelta(minutes=300),  # This buffer should be completely ignored
-        type=ReservationTypeChoice.BLOCKED,
-        state=ReservationStateChoice.CONFIRMED,
-    )
-
-    ReservationUnitHierarchy.refresh()
-    AffectingTimeSpan.refresh()
-
-    # Buffer does not overlap with BLOCKED reservation at all
-    response = graphql(reservation_units_reservable_query(reservable_time_start=datetime.time(hour=10).isoformat()))
-    assert response.has_errors is False, response
-    assert frt(response) == dt(hour=10)
-    assert is_closed(response) is False
-
-    # Buffer overlaps with BLOCKED reservation from the end, which should be allowed
-    response = graphql(reservation_units_reservable_query(reservable_time_start=datetime.time(hour=11).isoformat()))
-    assert response.has_errors is False, response
-    assert frt(response) == dt(hour=11)
-    assert is_closed(response) is False
-
-    # Buffer overlaps with BLOCKED reservation from the start, which should be allowed
-    response = graphql(reservation_units_reservable_query(reservable_time_start=datetime.time(hour=12).isoformat()))
-    assert response.has_errors is False, response
-    assert frt(response) == dt(hour=14)
-    assert is_closed(response) is False
-
-
-########################################################################################################################
-
-
-@freezegun.freeze_time(datetime.datetime(NEXT_YEAR, 1, 1, hour=8, tzinfo=DEFAULT_TIMEZONE))
-def test__reservation_unit__first_reservable_time__duration_exactly_min_but_buffers_overlap(graphql, reservation_unit):
-    """
-    This is a regression test for a bug that was found during manual testing.
-
-    Tests a case where the algorithm for finding the first reservable time exited too
-    early when shortening reservable time spans based on reservations.
-
-    This happened when the reservable time duration was exactly the minimum duration after
-    processing a reservation, which caused the shortening to stop, but subsequent checks would
-    still determine the reservable time span to be _just_ long enough to fit the minimum duration.
-
-    In reality, the shortening should have continued until the reservable time was
-    _actually_ shorter than the minimum duration, since there could be a reservation
-    that could shorten it still, like in this example case.
-
-    ┌────────────────────────────────────────────────────┐
-    │ █ = Reservation                                    │
-    │ ▄ = Reservation Buffer                             │
-    │ ░ = Not reservable                                 │
-    │ ▁ = Reservable                                     │
-    │ ═ = First reservable time                          │
-    │ ─ = Reservation Unit Buffer                        │
-    ├────────────────────────────────────────────────────┤
-    │   ...       17  18  19  20  21  22             ... │
-    │ 1 ░░░░░░░░░░████▁▁████▁▄████▄▄▁▁░░░░░░░░░░░░░░░░░░ │
-    │                              ─═─                   │
-    └────────────────────────────────────────────────────┘
-    """
-    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_15_MINUTES.value
-    reservation_unit.buffer_time_before = datetime.timedelta(minutes=15)
-    reservation_unit.buffer_time_after = datetime.timedelta(minutes=15)
-    reservation_unit.save()
-
-    # 1st Jan 17:00 - 22:00 (5h)
-    ReservableTimeSpanFactory.create(
-        resource=reservation_unit.origin_hauki_resource,
-        start_datetime=_datetime(hour=17),
-        end_datetime=_datetime(hour=22),
-    )
-
-    # 1st Jan 17:00-18:00 (1h) | Buffer: none
-    ReservationFactory.create(
-        begins_at=_datetime(hour=17),
-        ends_at=_datetime(hour=18),
-        buffer_time_before=datetime.timedelta(),
-        buffer_time_after=datetime.timedelta(),
-        reservation_unit=reservation_unit,
-        state=ReservationStateChoice.CREATED,
-    )
-
-    # 1st Jan 18:30-19:30 (1h) | Buffer: none
-    ReservationFactory.create(
-        begins_at=_datetime(hour=18, minute=30),
-        ends_at=_datetime(hour=19, minute=30),
-        buffer_time_before=datetime.timedelta(),
-        buffer_time_after=datetime.timedelta(),
-        reservation_unit=reservation_unit,
-        state=ReservationStateChoice.CREATED,
-    )
-
-    # 1st Jan 20:00-21:00 (1h) | Buffer: 19:45-21:30
-    ReservationFactory.create(
-        begins_at=_datetime(hour=20),
-        ends_at=_datetime(hour=21),
-        buffer_time_before=datetime.timedelta(minutes=15),
-        buffer_time_after=datetime.timedelta(minutes=30),
-        reservation_unit=reservation_unit,
-        state=ReservationStateChoice.CREATED,
-    )
-
-    ReservationUnitHierarchy.refresh()
-    AffectingTimeSpan.refresh()
-
-    response = graphql(reservation_units_reservable_query())
-    assert response.has_errors is False, response
-    assert is_closed(response) is False
-    assert frt(response) == dt(hour=21, minute=30)
-
-
-########################################################################################################################
+# ── Pagination and cache ──
 
 
 @freezegun.freeze_time(NOW)
@@ -2656,9 +2919,6 @@ def test__reservation_unit__first_reservable_time__no_bug_in_pagination_from_hau
     assert is_closed(response) is False
 
 
-########################################################################################################################
-
-
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__remove_not_reservable(graphql, reservation_unit):
     """
@@ -2689,9 +2949,6 @@ def test__reservation_unit__first_reservable_time__remove_not_reservable(graphql
     assert len(response) == 1
     assert frt(response) == dt(hour=10)
     assert is_closed(response) is False
-
-
-########################################################################################################################
 
 
 @freezegun.freeze_time(NOW)
@@ -2753,9 +3010,6 @@ def test__reservation_unit__first_reservable_time__previous_page_cached(graphql,
     assert "OFFSET 1" in response_2.queries[1]
 
 
-########################################################################################################################
-
-
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__previous_page_not_cached(graphql, reservation_unit):
     """
@@ -2802,9 +3056,6 @@ def test__reservation_unit__first_reservable_time__previous_page_not_cached(grap
     response.assert_query_count(9)
     # We also cannot skip previous pages due to missing cached results.
     assert "OFFSET 1" not in response.queries[1]
-
-
-########################################################################################################################
 
 
 @freezegun.freeze_time(NOW)
@@ -2864,9 +3115,6 @@ def test__reservation_unit__first_reservable_time__different_filters_dont_share_
     response_2.assert_query_count(9)
 
 
-########################################################################################################################
-
-
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__different_text_search_languages_dont_share_cache(
     graphql, reservation_unit
@@ -2914,9 +3162,6 @@ def test__reservation_unit__first_reservable_time__different_text_search_languag
     assert response_2.node(0)["pk"] == reservation_unit_2.pk
     assert frt(response_2) == dt(hour=10)
     assert is_closed(response_2) is False
-
-
-########################################################################################################################
 
 
 @freezegun.freeze_time(NOW)
@@ -2967,9 +3212,6 @@ def test__reservation_unit__first_reservable_time__use_cached_results(graphql, r
     #  2) Count reservation units for response
     #  3) Fetch reservation units for response
     response_2.assert_query_count(3)
-
-
-########################################################################################################################
 
 
 @freezegun.freeze_time(NOW)
@@ -3025,9 +3267,6 @@ def test__reservation_unit__first_reservable_time__use_cached_results__not_first
     #  2) Count reservation units for response
     #  3) Fetch reservation units for response
     response_3.assert_query_count(3)
-
-
-########################################################################################################################
 
 
 @freezegun.freeze_time(NOW)
@@ -3095,7 +3334,7 @@ def test__reservation_unit__first_reservable_time__cached_results_not_valid_anym
     response.assert_query_count(9)
 
 
-########################################################################################################################
+# ── Access type ──
 
 
 @freezegun.freeze_time(NOW)
