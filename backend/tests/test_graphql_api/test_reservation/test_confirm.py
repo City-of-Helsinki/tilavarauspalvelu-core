@@ -241,6 +241,28 @@ def test_reservation__confirm__fails_if_any_required_field_are_missing(graphql):
     assert reservation.state == ReservationStateChoice.CREATED
 
 
+def test_reservation__confirm__fails_if_reservee_type_is_missing(graphql):
+    reservation = ReservationFactory.create_for_confirmation(
+        reservation_unit__reservation_form=ReservationFormType.RESERVEE_INFO_FORM.value,
+        reservee_first_name="John",
+        reservee_last_name="Doe",
+        reservee_email="foo@email.com",
+        reservee_phone="12345890",
+        description="Description",
+        reservee_type=None,
+    )
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Value for required field 'reservee_type' is missing."]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CREATED
+
+
 @patch_method(VerkkokauppaAPIClient.create_order)
 def test_reservation__confirm__does_not_create_order_when_handling_is_required(graphql):
     reservation = ReservationFactory.create_for_confirmation(
