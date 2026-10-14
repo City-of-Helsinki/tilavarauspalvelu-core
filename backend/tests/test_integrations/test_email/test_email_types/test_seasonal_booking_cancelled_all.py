@@ -202,7 +202,7 @@ def test_seasonal_booking_cancelled_all__send_email(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_seasonal_booking_cancelled_all__send_email__last_reservation_denied(outbox):
+def test_seasonal_booking_cancelled_all__send_email__sent_when_last_reservation_is_denied(outbox):
     application = ApplicationFactory.create_in_status_results_sent(user__email="user@email.com")
     application_section = application.application_sections.first()
 

@@ -8,6 +8,7 @@ import pytest
 from django.conf import settings
 
 from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
+from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.integrations.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
@@ -209,20 +210,22 @@ def test__HaukiResourceHashUpdater__process_single_hauki_resource__hash_updated_
 
 
 @freezegun.freeze_time("2020-01-01")
-@patch_method(HaukiAPIClient._get_resources)
 @patch_method(HaukiAPIClient.get)
 @patch_method(SentryLogger.log_exception)
 def test__HaukiResourceHashUpdater__failing_resource_does_not_stop_other_resources():
     failing_resource = OriginHaukiResourceFactory.create(id=998, opening_hours_hash="OLD", latest_fetched_date=None)
     working_resource = OriginHaukiResourceFactory.create(id=999, opening_hours_hash="OLD", latest_fetched_date=None)
 
-    HaukiAPIClient._get_resources.return_value = {
-        "results": [
-            {"id": 998, "date_periods_hash": "UPDATED"},
-            {"id": 999, "date_periods_hash": "UPDATED"},
-        ]
-    }
     HaukiAPIClient.get.side_effect = [
+        ResponseMock(
+            status_code=200,
+            json_data={
+                "results": [
+                    {"id": 998, "date_periods_hash": "UPDATED"},
+                    {"id": 999, "date_periods_hash": "UPDATED"},
+                ],
+            },
+        ),
         ResponseMock(status_code=404, json_data={"detail": "Not found."}),
         ResponseMock(
             status_code=200,
@@ -242,4 +245,9 @@ def test__HaukiResourceHashUpdater__failing_resource_does_not_stop_other_resourc
     assert working_resource.latest_fetched_date == datetime.date(2021, 12, 31)
 
     assert hash_updater.resources_updated == [working_resource]
+
     assert SentryLogger.log_exception.call_count == 1
+    error = SentryLogger.log_exception.call_args.args[0]
+    assert isinstance(error, HaukiAPIError)
+    assert str(error) == "Hauki API returned status 404 for opening hours of '998'."
+    assert SentryLogger.log_exception.call_args.kwargs == {"details": "Hauki resource: 998"}
