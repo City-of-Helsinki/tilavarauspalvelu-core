@@ -497,6 +497,13 @@ source_pkgs = [
 [tool.coverage.report]
 omit = [
     "*migrations*",
+    # Dev and CI tooling, not run in production.
+    # Keep in sync with 'sonar.coverage.exclusions' in 'sonar-project.properties'.
+    "*/config/hooks/*",
+    "*/management/commands/defragment_frontend_queries.py",
+    "*/management/commands/update_graphql_schema.py",
+    # Only imported for type checking.
+    "*/integrations/helauth/typing.py",
 ]
 exclude_also = [
     "if TYPE_CHECKING:",
