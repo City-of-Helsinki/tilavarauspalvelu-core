@@ -31,7 +31,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import 
 from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservation
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_datetime
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -220,8 +220,7 @@ class ReservationActions:
             msg = "Reservation unit has no pricing information"
             raise ReservationPriceCalculationError(msg)
 
-        # Subtract in UTC, so that the duration is correct across a daylight saving time change.
-        duration = end_datetime.astimezone(datetime.UTC) - begin_datetime.astimezone(datetime.UTC)
+        duration = datetime_difference(start_datetime=begin_datetime, end_datetime=end_datetime)
         return pricing.actions.calculate_reservation_price(duration, subsidised=subsidised)
 
     def get_application_section(self) -> ApplicationSection | None:
