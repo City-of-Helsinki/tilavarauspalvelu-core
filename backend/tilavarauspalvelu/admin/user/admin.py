@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from http import HTTPStatus
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urlencode
 
@@ -248,16 +249,19 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         form_url: str = "",
         extra_context: dict[str, Any] | None = None,
     ) -> HttpResponse:
+        response = super().change_view(request, object_id, form_url, extra_context)
+
         # The change page shows the date of birth, so log the view like the GraphQL API does.
+        # Log only after the permission check above, so that a denied request is not logged as a view.
         user = self.get_object(request, unquote(object_id))
-        if request.method == "GET" and user is not None:
+        if request.method == "GET" and response.status_code == HTTPStatus.OK and user is not None:
             save_personal_info_view_log_task.delay(
                 user_id=user.pk,
                 viewer_user_id=request.user.pk,
                 field="User.date_of_birth",
             )
 
-        return super().change_view(request, object_id, form_url, extra_context)
+        return response
 
     @admin.action
     def anonymize_user_data(self, request: WSGIRequest, queryset: models.QuerySet) -> None:
