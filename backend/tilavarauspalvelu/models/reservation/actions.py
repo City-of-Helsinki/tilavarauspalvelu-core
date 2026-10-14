@@ -261,7 +261,7 @@ class ReservationActions:
             required_fields += [
                 "reservee_organisation_name",
             ]
-        elif reservee_type in ReserveeType.COMPANY:
+        elif reservee_type == ReserveeType.COMPANY:
             required_fields += [
                 "reservee_organisation_name",
                 "reservee_identifier",
