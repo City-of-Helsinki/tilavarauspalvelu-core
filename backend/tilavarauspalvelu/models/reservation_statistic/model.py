@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.enums import MunicipalityChoice, ReservationCancelReasonChoice, ReserveeType
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -145,8 +145,7 @@ class ReservationStatistic(models.Model):
         by_profile_user = bool(reservation.user.profile_id)
         begin = reservation.begins_at.astimezone(DEFAULT_TIMEZONE)
         end = reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
-        # Subtract in UTC, so that the duration is correct across a daylight saving time change.
-        duration = end.astimezone(datetime.UTC) - begin.astimezone(datetime.UTC)
+        duration = datetime_difference(start_datetime=begin, end_datetime=end)
 
         # Don't care about existing statistics, we can use `bulk_create` with `update_conflicts=True`
         # to upsert the statistic based on which reservation it belongs to.

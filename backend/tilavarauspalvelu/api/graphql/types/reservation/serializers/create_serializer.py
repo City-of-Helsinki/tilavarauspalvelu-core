@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 from typing import TYPE_CHECKING
 
 from django.conf import settings
@@ -16,7 +15,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnit
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -52,8 +51,7 @@ class ReservationCreateSerializer(NestingModelSerializer):
         reservation_unit = data["reservation_unit"]
         begins_at = data["begins_at"].astimezone(DEFAULT_TIMEZONE)
         ends_at = data["ends_at"].astimezone(DEFAULT_TIMEZONE)
-        # Subtract in UTC, so that the duration is correct across a daylight saving time change.
-        duration = ends_at.astimezone(datetime.UTC) - begins_at.astimezone(datetime.UTC)
+        duration = datetime_difference(start_datetime=begins_at, end_datetime=ends_at)
 
         # Endpoint requires users to be logged in
         user: User = self.context["request"].user

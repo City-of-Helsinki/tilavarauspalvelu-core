@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import datetime
-
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError
@@ -12,7 +10,7 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.typing import ReservationAdjustTimeData, error_codes
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference
 from utils.external_service.errors import ExternalServiceError
 
 
@@ -53,8 +51,7 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
 
         begins_at = data["begins_at"].astimezone(DEFAULT_TIMEZONE)
         ends_at = data["ends_at"].astimezone(DEFAULT_TIMEZONE)
-        # Subtract in UTC, so that the duration is correct across a daylight saving time change.
-        duration = ends_at.astimezone(datetime.UTC) - begins_at.astimezone(datetime.UTC)
+        duration = datetime_difference(start_datetime=begins_at, end_datetime=ends_at)
 
         current_begin = self.instance.begins_at.astimezone(DEFAULT_TIMEZONE)
 

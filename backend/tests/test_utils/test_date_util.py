@@ -12,6 +12,7 @@ from graphene_django_extensions.testing import parametrize_helper
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
     combine,
+    datetime_difference,
     get_periods_between,
     local_date,
     local_datetime,
@@ -148,6 +149,15 @@ def test_date_utils__combine():
     msg = "Time must not be timezone-aware."
     with pytest.raises(ValueError, match=re.escape(msg)):
         combine(date, time_aware, astimezone=datetime.UTC)
+
+
+def test_date_utils__datetime_difference__across_daylight_saving_time_change():
+    start_datetime = datetime.datetime(2026, 10, 25, 1, 0, tzinfo=DEFAULT_TIMEZONE)
+    end_datetime = datetime.datetime(2026, 10, 25, 7, 0, tzinfo=DEFAULT_TIMEZONE)
+
+    difference = datetime_difference(start_datetime=start_datetime, end_datetime=end_datetime)
+
+    assert difference == datetime.timedelta(hours=7)
 
 
 class Params(NamedTuple):

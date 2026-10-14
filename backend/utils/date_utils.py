@@ -392,6 +392,12 @@ def time_difference(_from: datetime.time, _to: datetime.time, /) -> datetime.tim
     return end_time_as_timedelta(_to) - time_as_timedelta(_from)
 
 
+def datetime_difference(*, start_datetime: datetime.datetime, end_datetime: datetime.datetime) -> datetime.timedelta:
+    """Elapsed time between two datetimes. This is correct across a daylight saving time change."""
+    # Python subtracts datetimes with the same time zone by wall clock time, so subtract in UTC.
+    return end_datetime.astimezone(datetime.UTC) - start_datetime.astimezone(datetime.UTC)
+
+
 class TimeSlot(TypedDict):
     begin_time: datetime.time
     end_time: datetime.time
