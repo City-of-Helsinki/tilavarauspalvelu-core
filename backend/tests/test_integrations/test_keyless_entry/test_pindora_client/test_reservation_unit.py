@@ -48,6 +48,19 @@ def test_pindora_client__get_reservation_unit(settings):
     assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation-unit/{reservation_unit.ext_uuid}"
 
 
+def test_pindora_client__get_reservation_unit__uses_cached_response():
+    reservation_unit = ReservationUnitFactory.build()
+
+    data = default_reservation_unit_response()
+
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
+        first_response = PindoraClient.get_reservation_unit(reservation_unit)
+        second_response = PindoraClient.get_reservation_unit(reservation_unit)
+
+    assert patch.call_count == 1
+    assert second_response == first_response
+
+
 def test_pindora_client__get_reservation_unit__missing_api_key(settings):
     settings.PINDORA_API_KEY = ""
 
