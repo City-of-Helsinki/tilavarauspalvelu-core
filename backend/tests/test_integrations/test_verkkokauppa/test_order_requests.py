@@ -10,6 +10,7 @@ import pytest
 from requests import Timeout
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.integrations.verkkokauppa.exceptions import VerkkokauppaConfigurationError
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import (
     CancelOrderError,
     CreateOrderError,
@@ -190,6 +191,8 @@ get_order_response: dict[str, Any] = {
 }
 
 get_order_404_response: dict[str, Any] = {"errors": [{"code": "order-not-found", "message": "Order not found"}]}
+
+bad_request_response: dict[str, Any] = {"errors": [{"code": "bad-request", "message": "Bad request"}]}
 
 cancel_order_response: dict[str, Any] = {
     "order": {
@@ -439,6 +442,30 @@ def test_verkkokauppa__get_order__returns_none_when_order_is_missing():
 
 @patch_method(
     VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=400, json_data=bad_request_response),
+)
+def test_verkkokauppa__get_order__raises_exception_if_status_code_is_not_200():
+    order_uuid = uuid.UUID(get_order_response["orderId"])
+
+    msg = "Order retrieval failed: [{'code': 'bad-request', 'message': 'Bad request'}]"
+    with pytest.raises(GetOrderError, match=exact(msg)):
+        VerkkokauppaAPIClient.get_order(order_uuid=order_uuid)
+
+
+@patch_method(VerkkokauppaAPIClient.request)
+def test_verkkokauppa__get_order__raises_exception_if_api_key_is_missing(settings):
+    settings.VERKKOKAUPPA_API_KEY = ""
+    order_uuid = uuid.UUID(get_order_response["orderId"])
+
+    msg = "One or more Verkkokauppa setting is missing. Check environment variables with VERKKOKAUPPA_* prefix"
+    with pytest.raises(VerkkokauppaConfigurationError, match=exact(msg)):
+        VerkkokauppaAPIClient.get_order(order_uuid=order_uuid)
+
+    assert VerkkokauppaAPIClient.request.call_count == 0
+
+
+@patch_method(
+    VerkkokauppaAPIClient.request,
     return_value=ResponseMock(status_code=200, json_data=cancel_order_response),
 )
 def test_verkkokauppa__cancel_order__makes_valid_request(settings):
@@ -483,3 +510,16 @@ def test_verkkokauppa__cancel_order__raises_exception_on_500_status():
     assert str(ex.value) == err_msg
     assert SentryLogger.log_message.call_count == 1
     assert SentryLogger.log_exception.call_count == 1
+
+
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=400, json_data=bad_request_response),
+)
+def test_verkkokauppa__cancel_order__raises_exception_if_status_code_is_not_200():
+    order_uuid = uuid.UUID(cancel_order_response["order"]["orderId"])
+    user_uuid = cancel_order_response["order"]["user"]
+
+    msg = "Order cancellation failed: [{'code': 'bad-request', 'message': 'Bad request'}]"
+    with pytest.raises(CancelOrderError, match=exact(msg)):
+        VerkkokauppaAPIClient.cancel_order(order_uuid=order_uuid, user_uuid=user_uuid)

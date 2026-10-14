@@ -10,7 +10,11 @@ from django.conf import settings
 from requests import Timeout
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError, RefundPaymentError
+from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import (
+    GetPaymentError,
+    GetRefundStatusError,
+    RefundPaymentError,
+)
 from tilavarauspalvelu.integrations.verkkokauppa.payment.types import (
     Payment,
     Refund,
@@ -50,6 +54,8 @@ get_payment_404_response: dict[str, Any] = {
         },
     ],
 }
+
+bad_request_response: dict[str, Any] = {"errors": [{"code": "bad-request", "message": "Bad request"}]}
 
 
 @patch_method(
@@ -125,6 +131,32 @@ def test_verkkokauppa__get_payment__raises_exception_on_timeout():
         VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
 
 
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=400, json_data=bad_request_response),
+)
+def test_verkkokauppa__get_payment__raises_exception_if_status_code_is_not_200():
+    order_uuid = uuid.UUID(get_payment_response["orderId"])
+
+    msg = "Payment retrieval failed: [{'code': 'bad-request', 'message': 'Bad request'}]"
+    with pytest.raises(GetPaymentError, match=exact(msg)):
+        VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
+
+
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=503, json_data=get_payment_404_response),
+)
+@patch_method(SentryLogger.log_message)
+def test_verkkokauppa__get_payment__raises_exception_if_status_is_503_with_missing_payment_error_code():
+    order_uuid = uuid.UUID(get_payment_response["orderId"])
+
+    with pytest.raises(GetPaymentError, match=exact("Payment retrieval failed")):
+        VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
+
+    assert SentryLogger.log_message.call_count == 1
+
+
 refund_status_response: dict[str, Any] = {
     "refundPaymentId": "ea0f16e8-14d7-4510-b83f-1a29494756f0_at_20230329-073612",
     "refundTransactionId": "61b2d842-ce04-11ed-9991-c7842594818f",
@@ -153,6 +185,53 @@ def test_verkkokauppa__get_refund_status__returns_status():
     refund_status = VerkkokauppaAPIClient.get_refund_status(order_uuid=order_uuid)
     expected = RefundStatusResult.from_json(refund_status_response)
     assert refund_status == expected
+
+
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(
+        status_code=500,  # This is correct, see `VerkkokauppaAPIClient.handle_500_error`
+        json_data={
+            "errors": [
+                {
+                    "code": "failed-to-get-refund-payment-for-order",
+                    "message": "Failed to get refund payment for order",
+                },
+            ],
+        },
+    ),
+)
+def test_verkkokauppa__get_refund_status__returns_none_when_refund_payment_is_missing():
+    order_uuid = uuid.UUID(refund_status_response["orderId"])
+
+    refund_status = VerkkokauppaAPIClient.get_refund_status(order_uuid=order_uuid)
+    assert refund_status is None
+
+
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=400, json_data=bad_request_response),
+)
+def test_verkkokauppa__get_refund_status__raises_exception_if_status_code_is_not_200():
+    order_uuid = uuid.UUID(refund_status_response["orderId"])
+
+    msg = "Payment refund status retrieval failed: [{'code': 'bad-request', 'message': 'Bad request'}]"
+    with pytest.raises(GetRefundStatusError, match=exact(msg)):
+        VerkkokauppaAPIClient.get_refund_status(order_uuid=order_uuid)
+
+
+@patch_method(VerkkokauppaAPIClient.request)
+@patch_method(SentryLogger.log_exception)
+def test_verkkokauppa__get_refund_status__raises_exception_if_key_is_missing():
+    response = refund_status_response.copy()
+    order_uuid = uuid.UUID(response.pop("orderId"))
+    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=200, json_data=response)
+
+    msg = "Payment refund status retrieval failed: Could not parse refund status: 'orderId'"
+    with pytest.raises(GetRefundStatusError, match=exact(msg)):
+        VerkkokauppaAPIClient.get_refund_status(order_uuid=order_uuid)
+
+    assert SentryLogger.log_exception.call_count == 1
 
 
 refund_response: dict[str, Any] = {
@@ -201,6 +280,21 @@ def test_verkkokauppa__refund_order__raises_exception_on_non_200_status_code():
     assert str(err.value) == msg
     assert SentryLogger.log_message.call_count == 1
     assert SentryLogger.log_exception.call_count == 1
+
+
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=400, json_data=bad_request_response),
+)
+@patch_method(SentryLogger.log_message)
+def test_verkkokauppa__refund_order__raises_exception_on_client_error_status_code():
+    order_uuid = uuid.UUID(refund_response["refunds"][0]["orderId"])
+
+    msg = "Payment refund failed: problem with upstream service"
+    with pytest.raises(RefundPaymentError, match=exact(msg)):
+        VerkkokauppaAPIClient.refund_order(order_uuid=order_uuid)
+
+    assert SentryLogger.log_message.call_count == 1
 
 
 @patch_method(SentryLogger.log_message)
