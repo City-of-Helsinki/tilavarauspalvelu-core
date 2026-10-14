@@ -80,7 +80,8 @@ def _find_missing_translations(
 
             known.add(key)
 
-            if not entry.msgstr:
+            is_translated = all(entry.msgstr_plural.values()) if entry.msgid_plural else bool(entry.msgstr)
+            if not is_translated:
                 missing[key].missing_languages.add(prev_translation.lang)
             if entry not in prev_translation.contents:
                 missing[key].not_included_previous.add(prev_translation.lang)
