@@ -13,6 +13,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.merchants.exceptions import (
     CreateMerchantError,
     GetMerchantError,
     ParseMerchantError,
+    ParseMerchantInfoError,
     UpdateMerchantError,
 )
 from tilavarauspalvelu.integrations.verkkokauppa.merchants.types import Merchant, MerchantInfo
@@ -256,7 +257,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
                 raise GetMerchantError(msg)
 
             return MerchantInfo.from_json(response_json)
-        except (RequestException, ExternalServiceError, ParseMerchantError) as err:
+        except (RequestException, ExternalServiceError, ParseMerchantInfoError) as err:
             msg = f"{action_fail}: {err!s}"
             raise GetMerchantError(msg) from err
 
