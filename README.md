@@ -36,6 +36,11 @@ For more detailed information, please refer to the [Tilavarauspalvelu page in Co
   - [Requirements](#requirements)
   - [Setup backend](#setup-backend)
   - [Setup frontend](#setup-frontend)
+- [Docker](#docker)
+  - [Addresses](#addresses)
+  - [Backend settings](#backend-settings)
+  - [Frontend settings](#frontend-settings)
+  - [Development setup](#development-setup)
 - [Backend](#backend)
   - [Tech Stack](#tech-stack)
   - [Integrations](#integrations)
@@ -87,13 +92,14 @@ see the [backend](#backend) section.
 
 ### Setup backend
 
-1. Copy `backend/.env.example` to `backend/.env`.
+1. Create the env files for Docker. This makes `backend/.env.docker` from `backend/.env.example`.
 
 ```sh
-cp backend/.env.example backend/.env
+just stack env
 ```
 
-2. Build and run backend with Docker.
+2. Build and run backend with Docker. The command stays in the foreground with the logs.
+See [Docker](#docker) for the other ways to run the services.
 
 ```sh
 just run
@@ -163,6 +169,91 @@ just fe dev
 ```
 
 You should now be able to open the customer frontend at `localhost:3000` and the staff frontend at `localhost:3001/kasittely`.
+
+## Docker
+
+The Docker Compose setups run the full service: the database, Redis,
+the backend, the Celery worker and scheduler, the customer UI and the staff UI.
+
+| Setup | File | Use |
+|-------|------|-----|
+| Development | `docker-compose.yml` in the repository root | Run the local source code. The code reloads when a file changes. |
+
+The commands are in [`stack.just`](stack.just). Run `just stack` to see them.
+
+### Addresses
+
+| Service | Address |
+|---------|---------|
+| Customer UI | http://localhost:3000 |
+| Staff UI | http://localhost:3001/kasittely |
+| Backend | http://localhost:8000 |
+| Database | `127.0.0.1:5555` |
+| Redis | `127.0.0.1:6379` |
+
+The setups use the same ports. Run only one of them at a time.
+
+### Backend settings
+
+The backend uses the `Docker` settings environment. This environment reads its settings only from a `.env` file.
+It does not read container environment variables. The setups mount `backend/.env.docker` as `/tvp/.env`.
+`just stack env` makes `backend/.env.docker` from `backend/.env.example` without the database and Redis addresses.
+Then the `Docker` settings environment uses its own defaults, which point to the `db` and `redis` containers.
+Add the secrets you need, for example `TUNNISTAMO_ADMIN_SECRET` for login. To make the file again, remove it and run `just stack env`.
+
+### Frontend settings
+
+In the development setup, the frontends read `apps/<app>/.env.local` from the source code mount, as `next dev` does on the host.
+`just stack env` runs `just setup`, which makes these files from the examples if they do not exist.
+A variable in the container environment has priority over the same variable in a `.env` file.
+
+### Development setup
+
+The development setup has two profiles. Without a profile, only the database and Redis start.
+
+| Profile | Services |
+|---------|----------|
+| `backend` | The backend, the Celery worker and the Celery scheduler |
+| `frontend` | The customer UI and the staff UI. Needs the `backend` profile. |
+
+```sh
+just stack up             # The backend and the frontends
+just stack up-backend     # The backend only. Run the frontends on the host with "just fe dev".
+just stack services       # The database and Redis only. Run the backend on the host.
+```
+
+`up` and `up-backend` build the images and stay in the foreground with the logs. Stop them with Ctrl+C.
+The other commands, for example `just stack down -v`, give their extra arguments to `docker compose`.
+For a command that has no recipe, use `just stack compose`.
+
+- The backend mounts `backend/` as `/tvp`. Django runserver reloads the code when a file changes.
+- The frontends mount `frontend/`. `next dev` reloads the code when a file changes.
+- Compose watch rebuilds the backend, the worker and the scheduler when `pyproject.toml` or `poetry.lock` changes.
+  Compose watch skips the files in `backend/.dockerignore`, which lists the Dockerfile. After a change to the Dockerfile, run `just stack build`.
+- Compose watch restarts the backend, the worker and the scheduler when `backend/.env.docker` changes. This needs Docker Compose 2.32 or later.
+- Celery does not reload code. After a change to task code, run `just stack restart worker scheduler`.
+- The `frontend-install` service installs the frontend dependencies and generates the GraphQL types. Then it stops.
+  After a change to `pnpm-lock.yaml` or `tilavaraus.graphql`, run `just stack install`.
+- The containers keep their own `node_modules` and `.next` in volumes. The packages on the host can be for another platform.
+- `backend/local_settings.py` applies, because the backend mounts the full `backend/` directory.
+- The backend and the frontends run as the host user, so the files that they create in the source code belong to you.
+  Examples are new migrations, the generated GraphQL types and `next-env.d.ts`.
+  The `just stack` commands set `HOST_UID` and `HOST_GID` from `id`. With a plain `docker compose` command, set them yourself.
+  Otherwise the user is `1000:1000`. For a root shell in the backend, run `just stack exec --user root backend bash`.
+
+A plain `docker compose` command in the repository root sees only the services of the active profiles.
+Without a profile, that is the database and Redis. The `just stack` commands use both profiles.
+To choose the profiles, set `COMPOSE_PROFILES`, for example `COMPOSE_PROFILES=backend just stack up`
+or `COMPOSE_PROFILES=backend,frontend docker compose up`.
+
+To add test data, run `just stack manage create_test_data`.
+
+#### Network
+
+The frontends use one backend URL for the server side rendering and for the browser.
+So `http://localhost:8000` must be the backend both on the host and in the frontend containers.
+The frontends share the network namespace of the `frontend-net` service. That service publishes the frontend ports
+and forwards `localhost:8000` to the backend container.
 
 ## Backend
 
