@@ -1,0 +1,180 @@
+# Development setup. Runs the backend and the frontends from the local source code.
+# Django runserver and "next dev" reload the code when a file changes.
+# Start it with "docker compose up --watch" to also rebuild the backend image when its dependencies change.
+# See README.md in this directory.
+
+name: varaamo-dev
+
+x-backend: &backend
+  build:
+    context: ../backend
+    dockerfile: docker/Dockerfile
+    args:
+      DEPS: main,admin,celery,test,lint
+      # Keep the virtualenv out of /tvp, because the source code mount hides /tvp.
+      VENV_ROOT: /venv
+  image: varaamo-dev-backend
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  environment:
+    DJANGO_SETTINGS_ENVIRONMENT: Docker
+  volumes:
+    - ../backend:/tvp
+    - type: bind
+      source: ./backend.env
+      target: /tvp/.env
+      read_only: true
+      bind:
+        create_host_path: false
+    - media:/media
+
+# The frontends read their settings from apps/<app>/.env.local in the source code mount.
+x-frontend: &frontend
+  build:
+    context: .
+    dockerfile_inline: |
+      FROM ghcr.io/city-of-helsinki/tilavarauspalvelu-core-base:node-24-slim
+      RUN npm install -g corepack@latest && corepack enable
+      ENV COREPACK_HOME=/corepack COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+  image: varaamo-dev-frontend
+  working_dir: /app
+  volumes:
+    - ../frontend:/app
+    - ../tilavaraus.graphql:/tilavaraus.graphql:ro
+    # Keep the dependencies and build output of the container apart from the host.
+    # The host can have packages for another platform, for example macOS.
+    - node-modules:/app/node_modules
+    - node-modules-customer:/app/apps/customer/node_modules
+    - node-modules-staff:/app/apps/staff/node_modules
+    - node-modules-ui:/app/packages/ui/node_modules
+    - node-modules-tsconfig:/app/packages/tsconfig/node_modules
+    - next-customer:/app/apps/customer/.next
+    - next-staff:/app/apps/staff/.next
+    - corepack:/corepack
+
+services:
+
+  db:
+    image: "postgis/postgis:17-3.5-alpine"
+    platform: linux/amd64
+    environment:
+      POSTGRES_USER: tvp
+      POSTGRES_PASSWORD: tvp
+      POSTGRES_DB: tvp
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "tvp"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  redis:
+    image: "redis:7-alpine"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # The backend and the frontends share the network namespace of this container.
+  # Then "localhost:8000" is the backend both in the browser and in the frontend server.
+  net:
+    image: "public.ecr.aws/docker/library/busybox:1.37"
+    command: ["tail", "-f", "/dev/null"]
+    init: true
+    ports:
+      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:3001:3001"
+
+  backend:
+    <<: *backend
+    network_mode: service:net
+    # The scripts in the source code mount are not executable. Run them with bash.
+    entrypoint: ["bash", "/tvp/docker/entrypoint_dev.sh"]
+    # Healthy after the migrations are done and the server runs.
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/monitoring/liveness/')"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    develop:
+      watch:
+        # Settings load only when the process starts. Restart to read a changed backend.env.
+        - action: restart
+          path: ./backend.env
+        - action: rebuild
+          path: ../backend/pyproject.toml
+        - action: rebuild
+          path: ../backend/poetry.lock
+        - action: rebuild
+          path: ../backend/docker/Dockerfile
+
+  # Celery does not reload code. Restart the worker and the scheduler after a change to task code.
+  worker:
+    <<: *backend
+    depends_on:
+      backend:
+        condition: service_healthy
+    entrypoint: ["bash", "/tvp/docker/worker.sh"]
+    develop:
+      watch:
+        - action: restart
+          path: ./backend.env
+
+  scheduler:
+    <<: *backend
+    depends_on:
+      backend:
+        condition: service_healthy
+    entrypoint: ["bash", "/tvp/docker/scheduler.sh"]
+    develop:
+      watch:
+        - action: restart
+          path: ./backend.env
+
+  # Installs the frontend dependencies and generates the GraphQL types, then stops.
+  # Run it again after a change to pnpm-lock.yaml or tilavaraus.graphql.
+  frontend-install:
+    <<: *frontend
+    environment:
+      # Prevents prompts from pnpm.
+      CI: "true"
+    command:
+      - sh
+      - -c
+      - >-
+        pnpm install --frozen-lockfile --ignore-scripts
+        && pnpm codegen
+
+  customer:
+    <<: *frontend
+    network_mode: service:net
+    depends_on:
+      frontend-install:
+        condition: service_completed_successfully
+    command: ["pnpm", "--filter", "customer", "run", "dev", "--hostname", "0.0.0.0"]
+
+  staff:
+    <<: *frontend
+    network_mode: service:net
+    depends_on:
+      frontend-install:
+        condition: service_completed_successfully
+    command: ["pnpm", "--filter", "staff", "run", "dev", "--hostname", "0.0.0.0"]
+
+volumes:
+  postgres:
+  media:
+  node-modules:
+  node-modules-customer:
+  node-modules-staff:
+  node-modules-ui:
+  node-modules-tsconfig:
+  next-customer:
+  next-staff:
+  corepack:

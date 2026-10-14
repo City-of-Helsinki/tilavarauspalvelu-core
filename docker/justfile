@@ -1,0 +1,45 @@
+# List the commands for the Docker Compose setups
+[private]
+default:
+    @just --justfile {{ source_file() }} --list
+
+# Create the env files if they do not exist. backend.env is backend/.env.example with the Docker settings.
+env:
+    #!/usr/bin/env sh
+    set -eu
+    just --justfile ../justfile setup
+    [ -f backend.env ] && exit 0
+    keys='DATABASE_URL|REDIS_URL|HAUKI_SECRET|VERKKOKAUPPA_API_KEY'
+    grep -v -E "^#?($keys)=" ../backend/.env.example > backend.env
+    cat >> backend.env <<'EOF'
+
+    # Docker Compose settings. Added by "just stack env".
+    DATABASE_URL=postgis://tvp:tvp@db/tvp
+    REDIS_URL=redis://redis:6379/0
+    # The "Docker" settings environment has no default for these.
+    HAUKI_SECRET=
+    VERKKOKAUPPA_API_KEY=
+    EOF
+    echo "--------------------------------------------------------------------------------"
+    echo "Created docker/backend.env. Add the secrets you need."
+    echo "TUNNISTAMO_ADMIN_SECRET is mandatory for login."
+
+# Start the development setup with local source code and file watchers
+dev-up: env
+    docker compose --file compose.dev.yml up --build --watch
+
+# Run a docker compose command for the development setup, for example "restart backend"
+dev +args:
+    docker compose --file compose.dev.yml {{ args }}
+
+# Stop the development setup. Keeps the data.
+dev-stop:
+    @docker compose --file compose.dev.yml down
+
+# Run a Django management command in the development setup
+dev-manage *args:
+    @docker compose --file compose.dev.yml exec backend python manage.py {{ args }}
+
+# Install the frontend dependencies and generate the GraphQL types in the development setup
+dev-install:
+    @docker compose --file compose.dev.yml run --rm frontend-install

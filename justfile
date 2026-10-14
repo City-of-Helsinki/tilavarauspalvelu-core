@@ -1,5 +1,6 @@
 mod be 'backend/justfile'
 mod fe 'frontend/justfile'
+mod stack 'docker/justfile'
 
 import? 'local.just'
 
@@ -10,6 +11,8 @@ help:
     @just --list be
     @echo -e "\n[Frontend] \033[0;31m(just fe <recipe>)\033[0m"
     @just --list fe
+    @echo -e "\n[Docker setups with backend and frontend] \033[0;31m(just stack <recipe>)\033[0m"
+    @just --list stack
 
 # Setup environment variables
 setup:
