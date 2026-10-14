@@ -339,7 +339,10 @@ def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online(gr
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.parametrize("status", [OrderStatus.CANCELLED, OrderStatus.EXPIRED])
-def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online__price_zero(graphql, status):
+def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online__price_zero__order_removed__not_cancelled(
+    graphql,
+    status,
+):
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     reservation = ReservationFactory.create(
