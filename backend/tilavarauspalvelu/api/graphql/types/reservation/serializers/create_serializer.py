@@ -149,7 +149,8 @@ class ReservationCreateSerializer(NestingModelSerializer):
                 reservation_unit,
                 reservation.user,
             )
-            if user_reservations.count() > reservation_unit.max_reservations_per_user:
+            user_reservation_count = user_reservations.count()
+            if user_reservation_count > reservation_unit.max_reservations_per_user:
                 reservation.delete()
                 msg = "Maximum number of active reservations for this reservation unit exceeded."
                 raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED)

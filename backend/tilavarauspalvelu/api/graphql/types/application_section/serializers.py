@@ -63,6 +63,7 @@ class ApplicationSectionSerializer(NestingModelSerializer):
 
         # Using serializer as a sub-serializer, and trying to reuse the same object.
         if "pk" in data and not self.instance:
+            # The parent is the list serializer of the sections. Its parent is the application serializer.
             parent_application = self.parent.parent.instance if self.parent is not None else None
             self.instance = ApplicationSection.objects.filter(pk=data["pk"], application=parent_application).first()
             if self.instance is None:
