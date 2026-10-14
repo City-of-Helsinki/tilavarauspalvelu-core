@@ -6,6 +6,7 @@ import pytest
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraClientError
 from tilavarauspalvelu.typing import (
     PindoraReservationInfoData,
     PindoraSectionInfoData,
@@ -14,8 +15,8 @@ from tilavarauspalvelu.typing import (
 )
 from utils.date_utils import local_datetime
 
-from tests.factories import ApplicationSectionFactory, ReservationFactory, ReservationSeriesFactory
-from tests.helpers import ResponseMock, patch_method
+from tests.factories import ApplicationSectionFactory, ReservationFactory, ReservationSeriesFactory, UnitFactory
+from tests.helpers import ResponseMock, exact, patch_method
 from tests.test_integrations.test_keyless_entry.helpers import (
     default_reservation_response,
     default_reservation_series_response,
@@ -150,6 +151,37 @@ def test_get_access_code__reservation__in_series__pick_correct_reservation():
         access_code_begins_at=reservation_2.begins_at - datetime.timedelta(minutes=10),
         access_code_ends_at=reservation_2.ends_at + datetime.timedelta(minutes=5),
     )
+
+
+def test_get_access_code__reservation__in_series__not_valid_for_reservation():
+    series = ReservationSeriesFactory.create()
+    reservation = ReservationFactory.create(
+        reservation_series=series,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    data = default_reservation_series_response(
+        reservation_unit_id=str(series.reservation_unit.ext_uuid),
+        reservation_unit_code_validity=[
+            {
+                "begin": local_datetime(2024, 1, 2, 12).isoformat(),
+                "end": local_datetime(2024, 1, 2, 13).isoformat(),
+                "access_code_valid_minutes_before": 10,
+                "access_code_valid_minutes_after": 5,
+            },
+        ],
+    )
+
+    msg = "Access code is not valid for this reservation"
+    with (
+        patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)),
+        pytest.raises(PindoraAPIError, match=exact(msg)),
+    ):
+        PindoraService.get_access_code(obj=reservation)
 
 
 def test_get_access_code__reservation__in_series__in_seasonal_booking():
@@ -401,3 +433,13 @@ def test_get_access_code__seasonal_booking():
             )
         ],
     )
+
+
+def test_get_access_code__invalid_target():
+    unit = UnitFactory.build(name="foo")
+
+    msg = "Invalid target: foo"
+    with patch_method(PindoraClient.request) as patch, pytest.raises(PindoraClientError, match=exact(msg)):
+        PindoraService.get_access_code(obj=unit)
+
+    assert patch.call_count == 0

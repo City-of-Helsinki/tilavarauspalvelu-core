@@ -9,8 +9,9 @@ import pytest
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraConflictError
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraConflictError
 from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraAccessCodeModifyResponse
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime
 
 from tests.factories import ApplicationSectionFactory, ReservationFactory, ReservationSeriesFactory, UserFactory
@@ -664,6 +665,43 @@ def test_create_missing_access_codes__seasonal_booking__reschedule_if_exists__de
     assert PindoraClient.activate_seasonal_booking_access_code.call_count == 0
     assert PindoraClient.deactivate_seasonal_booking_access_code.call_count == 1
     assert PindoraClient.deactivate_seasonal_booking_access_code.call_args.args == (section,)
+
+    reservation.refresh_from_db()
+    assert reservation.access_code_generated_at is None
+    assert reservation.access_code_is_active is False
+
+    assert EmailService.send_seasonal_booking_access_type_changed_email.call_count == 0
+
+
+@patch_method(PindoraClient.create_seasonal_booking, side_effect=PindoraAPIError("error"))
+@patch_method(EmailService.send_seasonal_booking_access_type_changed_email)
+@patch_method(SentryLogger.log_exception)
+@freezegun.freeze_time(local_datetime(2024, 1, 1))
+def test_create_missing_access_codes__seasonal_booking__pindora_error():
+    user = UserFactory.create()
+    section = ApplicationSectionFactory.create(
+        application__user=user,
+    )
+    series = ReservationSeriesFactory.create(
+        allocated_time_slot__reservation_unit_option__application_section=section,
+    )
+    reservation = ReservationFactory.create(
+        user=user,
+        reservation_unit=series.reservation_unit,
+        reservation_series=series,
+        begins_at=local_datetime(2024, 1, 1, 12),
+        ends_at=local_datetime(2024, 1, 1, 13),
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_code_is_active=False,
+        access_code_generated_at=None,
+    )
+
+    PindoraService.create_missing_access_codes()
+
+    assert PindoraClient.create_seasonal_booking.call_count == 1
+    assert SentryLogger.log_exception.call_count == 1
 
     reservation.refresh_from_db()
     assert reservation.access_code_generated_at is None
