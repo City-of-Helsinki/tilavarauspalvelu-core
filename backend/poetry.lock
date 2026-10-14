@@ -1161,39 +1161,39 @@ django = ">=4.2"
 
 [[package]]
 name = "django"
-version = "5.2.18"
+version = "6.0.9"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 optional = false
-python-versions = ">=3.10"
+python-versions = ">=3.12"
 groups = ["main", "admin", "celery", "lint"]
 files = [
-    {file = "django-5.2.18-py3-none-any.whl", hash = "sha256:92ed81d500be6408ecd704d7bd1366c534f30427bffcc63c5fefb129561aec7c"},
-    {file = "django-5.2.18.tar.gz", hash = "sha256:461c5dd06d2ea16bd5ca37d3f46e4def1d6b0fe7588c6f4e2119517bb0af8b2d"},
+    {file = "django-6.0.9-py3-none-any.whl", hash = "sha256:5c6473d05bbea9c43359cc36701b5deec3c925f5311963786e1346544c1a68c0"},
+    {file = "django-6.0.9.tar.gz", hash = "sha256:8ce037c971f421cfb47d38c097ca233a8f6dd42d9e9501a37e02dd7d08c5cb3f"},
 ]
 
 [package.dependencies]
-asgiref = ">=3.8.1"
-sqlparse = ">=0.3.1"
+asgiref = ">=3.9.1"
+sqlparse = ">=0.5.0"
 tzdata = {version = "*", markers = "sys_platform == \"win32\""}
 
 [package.extras]
-argon2 = ["argon2-cffi (>=19.1.0)"]
-bcrypt = ["bcrypt"]
+argon2 = ["argon2-cffi (>=23.1.0)"]
+bcrypt = ["bcrypt (>=4.1.1)"]
 
 [[package]]
 name = "django-admin-data-views"
-version = "0.4.3"
+version = "0.4.4"
 description = "Add custom data views to django admin panel."
 optional = false
-python-versions = "<4,>=3.10"
+python-versions = ">=3.12"
 groups = ["admin"]
 files = [
-    {file = "django_admin_data_views-0.4.3-py3-none-any.whl", hash = "sha256:661b4d58161d283eee1d131013db3e83a499084724f48fd0cd5bd9315b768e38"},
-    {file = "django_admin_data_views-0.4.3.tar.gz", hash = "sha256:bd287a5d874febd8b544f83b47d0846fbf7b3e00a7f6633912630053c7ae4298"},
+    {file = "django_admin_data_views-0.4.4-py3-none-any.whl", hash = "sha256:1c9ee15be40e2ca27c2b45d0e739196758932b1acf81fabc51a18bc80ae9ec5b"},
+    {file = "django_admin_data_views-0.4.4.tar.gz", hash = "sha256:2577a1632f6f3a85e2452fb52512bd256950b5b76fd7a7aa3729d252008bf6dc"},
 ]
 
 [package.dependencies]
-Django = ">=4.2"
+django = ">=5.2.17"
 django-settings-holder = ">=0.2.0"
 
 [[package]]
@@ -1330,20 +1330,20 @@ typing = ["django-stubs[compatible-mypy]", "jinja2 (>=2.9.6)", "mypy", "pytest",
 
 [[package]]
 name = "django-environment-config"
-version = "0.2.3"
+version = "0.2.4"
 description = "Configure django settings for multiple environments."
 optional = false
-python-versions = "<4,>=3.10"
+python-versions = ">=3.12"
 groups = ["main"]
 files = [
-    {file = "django_environment_config-0.2.3-py3-none-any.whl", hash = "sha256:401eb6670a4316e4e7c87623d847040bbe35d58321404a61c4d6ddfc44aa7ce0"},
-    {file = "django_environment_config-0.2.3.tar.gz", hash = "sha256:17d8b338686045a73cb6a7a4784ba88e892bccfd1e8cf9bef6d3a59a68514fc6"},
+    {file = "django_environment_config-0.2.4-py3-none-any.whl", hash = "sha256:03fc118cb54acd4d0bca01a5402c74a5ca245f8ed486d7225942595d42e5723c"},
+    {file = "django_environment_config-0.2.4.tar.gz", hash = "sha256:d9b695f29f251c9ea875b8a1c0721de00dc6c9f8214b023fcf9608d5582699da"},
 ]
 
 [package.dependencies]
 dj-database-url = {version = ">=2.3.0", optional = true, markers = "extra == \"db\""}
-Django = ">=4.2"
-python-dotenv = ">=1.1.1"
+django = ">=5.2.17"
+python-dotenv = ">=1.2.4"
 
 [package.extras]
 cache = ["django-cache-url (>=3.4.5)"]
@@ -1411,22 +1411,27 @@ threadmill = ["threadmill[redis] (>=0.7.3)"]
 
 [[package]]
 name = "django-helusers"
-version = "1.1.0"
+version = "1.3.0"
 description = "Django app for the user infrastructure of the City of Helsinki"
 optional = false
-python-versions = "*"
+python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "django_helusers-1.1.0-py3-none-any.whl", hash = "sha256:5d6c4d0db11db633a031cfdcef6e754fb26c167d3e179d77882c2edecca60830"},
-    {file = "django_helusers-1.1.0.tar.gz", hash = "sha256:73ef1c9f3050cbb3a4f3a35264f26807f60a00b66eef31d8b07cd1ffd61de965"},
+    {file = "django_helusers-1.3.0-py3-none-any.whl", hash = "sha256:c10c63ee4287259d0c4a7d167f660799287bea19309b68a3ca6aa08f1025b999"},
+    {file = "django_helusers-1.3.0.tar.gz", hash = "sha256:2f741d6ac588f871fe464c684a3f91caa7b1e79687dccb02385973648e8ac61d"},
 ]
 
 [package.dependencies]
 cachetools = ">=3.0.0"
+cryptography = "*"
 deprecation = ">=2"
-Django = ">=4.2"
-python-jose = "*"
+django = ">=5.2"
+pyjwt = ">=2"
 requests = "*"
+
+[package.extras]
+all = ["coverage", "django-allauth", "djangorestframework", "pytest", "pytest-cov", "pytest-django", "pytest-mock", "responses", "social-auth-app-django"]
+test = ["coverage", "django-allauth", "djangorestframework", "pytest", "pytest-cov", "pytest-django", "pytest-mock", "responses", "social-auth-app-django"]
 
 [[package]]
 name = "django-import-export"
@@ -1492,33 +1497,33 @@ tests = ["coverage"]
 
 [[package]]
 name = "django-lazy-managers"
-version = "0.0.1"
+version = "0.1.0"
 description = "Lazy model managers for Django"
 optional = false
-python-versions = "<4,>=3.11"
+python-versions = ">=3.12"
 groups = ["main"]
 files = [
-    {file = "django_lazy_managers-0.0.1-py3-none-any.whl", hash = "sha256:43faccaf72b7eabc96687e3f07d4c26b992048728e3643969b8cdda78f3ea31e"},
-    {file = "django_lazy_managers-0.0.1.tar.gz", hash = "sha256:984a88fbe9cb66b5f491f4d8101c0247fc1b1e4ba8451be352f78412afc55211"},
+    {file = "django_lazy_managers-0.1.0-py3-none-any.whl", hash = "sha256:b7c309de5c94d5506a1041ba7056434060efeaeccf179449438ce6179d56fcc5"},
+    {file = "django_lazy_managers-0.1.0.tar.gz", hash = "sha256:f8d3eedb609fb31fb874a52a8ef836dc8f68e6f790a6423f72c0291776dd6c3a"},
 ]
 
 [package.dependencies]
-Django = ">=4.2"
+django = ">=5.2.17"
 
 [[package]]
 name = "django-lookup-property"
-version = "0.2.2"
+version = "0.3.0"
 description = "Django model properties that are also lookup expressions."
 optional = false
-python-versions = "<4,>=3.11"
+python-versions = ">=3.12"
 groups = ["main"]
 files = [
-    {file = "django_lookup_property-0.2.2-py3-none-any.whl", hash = "sha256:0d79e639a588abe3322825af8cf44991f80943bd9affb4ff00017c3ca5e8ae75"},
-    {file = "django_lookup_property-0.2.2.tar.gz", hash = "sha256:c979ecb01f3c1435ca55665c6de7fe70a891db980bd6c5ad40d8a7b7ba7d29aa"},
+    {file = "django_lookup_property-0.3.0-py3-none-any.whl", hash = "sha256:7b66b120e36cf36f6a9989fc5961c866b78cbfdb7b618f928114534dacf821d9"},
+    {file = "django_lookup_property-0.3.0.tar.gz", hash = "sha256:67d2f9709c26457092ee7fd1221f76c78ac74ffd2f4c54d9d9a68d180a8f1dc1"},
 ]
 
 [package.dependencies]
-Django = ">=5.0"
+django = ">=5.2.17"
 
 [[package]]
 name = "django-modeltranslation"
@@ -1687,18 +1692,18 @@ typing-extensions = "*"
 
 [[package]]
 name = "django-subforms"
-version = "0.4.1"
+version = "0.4.2"
 description = "Wrap django forms as fields and fields as dynamic arrays."
 optional = false
-python-versions = "<4,>=3.11"
+python-versions = ">=3.12"
 groups = ["admin"]
 files = [
-    {file = "django_subforms-0.4.1-py3-none-any.whl", hash = "sha256:8f36a0e7f093fd65c40098f6de79e57fdea1b922995fcb8845b2e88e8c077492"},
-    {file = "django_subforms-0.4.1.tar.gz", hash = "sha256:7eda9bb0f150f9148e016b8268bb46df87b9941d8c8e5922cbb76352d5b9866d"},
+    {file = "django_subforms-0.4.2-py3-none-any.whl", hash = "sha256:c6006e3e4892ce34b528d6b87ecf6c043ef8d3808fced94f8e2585b6b55edc65"},
+    {file = "django_subforms-0.4.2.tar.gz", hash = "sha256:c779822d288469a9ecd9c586f06cc8d526d2f5242d0c9f3056960a7607b175f5"},
 ]
 
 [package.dependencies]
-Django = ">=4.2"
+django = ">=5.2"
 
 [[package]]
 name = "django-timezone-field"
@@ -1732,14 +1737,14 @@ django = ">=4.2"
 
 [[package]]
 name = "djangorestframework"
-version = "3.18.1"
+version = "3.18.3"
 description = "Web APIs for Django, made easy."
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "djangorestframework-3.18.1-py3-none-any.whl", hash = "sha256:f1409d698967aaf82d5d98d76b549c8fba8bd92ebd0d83d24454508f72168dc2"},
-    {file = "djangorestframework-3.18.1.tar.gz", hash = "sha256:605d79fa2ec2f02905492e5ea13d903c2d842d0b4c915a57f7bf02ab9f3c91dd"},
+    {file = "djangorestframework-3.18.3-py3-none-any.whl", hash = "sha256:8544bb674846731b1e3c9b309236ee1dc412905a0aa725be2ec193ca950a7d12"},
+    {file = "djangorestframework-3.18.3.tar.gz", hash = "sha256:446a9b352e7eff630421ab3f2328bd2401b109a9470afa4a31189994911ed030"},
 ]
 
 [package.dependencies]
@@ -1803,25 +1808,6 @@ pillow = "*"
 
 [package.extras]
 svg = ["reportlab", "svglib"]
-
-[[package]]
-name = "ecdsa"
-version = "0.19.2"
-description = "ECDSA cryptographic signature library (pure python)"
-optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.6"
-groups = ["main"]
-files = [
-    {file = "ecdsa-0.19.2-py2.py3-none-any.whl", hash = "sha256:840f5dc5e375c68f36c1a7a5b9caad28f95daa65185c9253c0c08dd952bb7399"},
-    {file = "ecdsa-0.19.2.tar.gz", hash = "sha256:62635b0ac1ca2e027f82122b5b81cb706edc38cd91c63dda28e4f3455a2bf930"},
-]
-
-[package.dependencies]
-six = ">=1.9.0"
-
-[package.extras]
-gmpy = ["gmpy"]
-gmpy2 = ["gmpy2"]
 
 [[package]]
 name = "elastic-transport"
@@ -1904,14 +1890,14 @@ doc = ["Sphinx", "sphinx-rtd-theme", "sphinxcontrib-spelling"]
 
 [[package]]
 name = "faker"
-version = "40.41.0"
+version = "40.43.0"
 description = "Faker is a Python package that generates fake data for you."
 optional = false
 python-versions = ">=3.10"
 groups = ["test"]
 files = [
-    {file = "faker-40.41.0-py3-none-any.whl", hash = "sha256:35a7f66282990698c20c3e6dd57180900206b760c2f777112c085cc217e7de92"},
-    {file = "faker-40.41.0.tar.gz", hash = "sha256:5383e4ebba7061491530ae5952a33dcf8f161a250c89717fa0ac856602dcfaf3"},
+    {file = "faker-40.43.0-py3-none-any.whl", hash = "sha256:9dd7c0ddfaf30c842b05502d3cf641c135e0120a3a19047008ba8525b72953ed"},
+    {file = "faker-40.43.0.tar.gz", hash = "sha256:02fae4327c03a4a6315e1b428a3878f435bfc276c93435ea349b95c0c9372361"},
 ]
 
 [package.dependencies]
@@ -2477,39 +2463,40 @@ drafts = ["pycryptodome"]
 
 [[package]]
 name = "kombu"
-version = "5.6.2"
+version = "5.7.0a1"
 description = "Messaging library for Python."
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["celery"]
 files = [
-    {file = "kombu-5.6.2-py3-none-any.whl", hash = "sha256:efcfc559da324d41d61ca311b0c64965ea35b4c55cc04ee36e55386145dace93"},
-    {file = "kombu-5.6.2.tar.gz", hash = "sha256:8060497058066c6f5aed7c26d7cd0d3b574990b09de842a8c5aaed0b92cc5a55"},
+    {file = "kombu-5.7.0a1-py3-none-any.whl", hash = "sha256:8299500a4e11768f7bcf459bcc69f6cad4f840cfe843f419836afbd8c1a2aa81"},
+    {file = "kombu-5.7.0a1.tar.gz", hash = "sha256:71246143c5fbd408e0902817a0047fcc36a205126cbf9ffa4b527a601f5de02c"},
 ]
 
 [package.dependencies]
-amqp = ">=5.1.1,<6.0.0"
-packaging = "*"
-redis = {version = ">=4.5.2,!=4.5.5,!=5.0.2,<6.5", optional = true, markers = "extra == \"redis\""}
-tzdata = ">=2025.2"
+amqp = ">=5.4.0,<6.0.0"
+packaging = {version = "26.3", optional = true, markers = "extra == \"redis\""}
+redis = {version = ">=6.1.0,<9.0.0", optional = true, markers = "extra == \"redis\""}
+tzdata = ">=2026.2"
 vine = "5.1.0"
 
 [package.extras]
-azureservicebus = ["azure-servicebus (>=7.10.0)"]
-azurestoragequeues = ["azure-identity (>=1.12.0)", "azure-storage-queue (>=12.6.0)"]
+azureservicebus = ["azure-servicebus (==7.14.3)"]
+azurestoragequeues = ["azure-identity (==1.25.3)", "azure-storage-queue (==12.17.0)"]
 confluentkafka = ["confluent-kafka (>=2.2.0)"]
 consul = ["python-consul2 (==0.1.5)"]
-gcpubsub = ["google-cloud-monitoring (>=2.16.0)", "google-cloud-pubsub (>=2.18.4)", "grpcio (==1.75.1)", "protobuf (==6.32.1)"]
+gcpubsub = ["google-cloud-monitoring (==2.31.0)", "google-cloud-pubsub (==2.40.0)", "grpcio (==1.83.1)", "protobuf (==6.33.6)"]
 librabbitmq = ["librabbitmq (>=2.0.0) ; python_version < \"3.11\""]
-mongodb = ["pymongo (==4.15.3)"]
-msgpack = ["msgpack (==1.1.2)"]
+mongodb = ["pymongo (==4.18.0)"]
+msgpack = ["msgpack (==1.2.2)"]
+pgmq = ["pgmq (>=1.1.0)"]
 pyro = ["pyro4 (==4.82)"]
 qpid = ["qpid-python (==1.36.0.post1)", "qpid-tools (==1.36.0.post1)"]
-redis = ["redis (>=4.5.2,!=4.5.5,!=5.0.2,<6.5)"]
+redis = ["packaging (==26.3)", "redis (>=6.1.0,<9.0.0)"]
 slmq = ["softlayer_messaging (>=1.0.3)"]
 sqlalchemy = ["sqlalchemy (>=1.4.48,<2.1)"]
 sqs = ["boto3 (>=1.26.143)", "pycurl (>=7.43.0.5) ; sys_platform != \"win32\" and platform_python_implementation == \"CPython\"", "urllib3 (>=1.26.16)"]
-yaml = ["PyYAML (>=3.10)"]
+yaml = ["PyYAML (==6.0.3)"]
 zookeeper = ["kazoo (>=2.8.0)"]
 
 [[package]]
@@ -3775,18 +3762,6 @@ files = [
 ]
 
 [[package]]
-name = "pyasn1"
-version = "0.6.4"
-description = "Pure-Python implementation of ASN.1 types and DER/BER/CER codecs (X.208)"
-optional = false
-python-versions = ">=3.8"
-groups = ["main"]
-files = [
-    {file = "pyasn1-0.6.4-py3-none-any.whl", hash = "sha256:deda9277cfd454080ec40b207fb6df82206a3a2688735233cdcd8d3d565f088b"},
-    {file = "pyasn1-0.6.4.tar.gz", hash = "sha256:9c447d8431c947fe4c8febc4ed9e760bc29011a5b01e5c74b67025bd9fb8ce81"},
-]
-
-[[package]]
 name = "pycparser"
 version = "3.0"
 description = "C parser in Python"
@@ -3964,23 +3939,24 @@ crypto = ["cryptography (>=3.4.0)"]
 
 [[package]]
 name = "pypdf"
-version = "6.19.0"
+version = "6.20.0"
 description = "A pure-python PDF library capable of splitting, merging, cropping, and transforming PDF files"
 optional = false
 python-versions = ">=3.9"
 groups = ["main", "test"]
 files = [
-    {file = "pypdf-6.19.0-py3-none-any.whl", hash = "sha256:7e5d6e730e7dae87d560a2cee218b852f6498c8be61966f3cd02ead971e48d14"},
-    {file = "pypdf-6.19.0.tar.gz", hash = "sha256:bbc43aca292369ccc6cbc8a921991ecf2538a3587ab5a116eff06c321d647155"},
+    {file = "pypdf-6.20.0-py3-none-any.whl", hash = "sha256:f003fc2014814d264fe7dd3f9d435c158e23e1a85a2233f87a0a2d6d21c914ad"},
+    {file = "pypdf-6.20.0.tar.gz", hash = "sha256:72b1e897fef7f5bbed7f2a93881a4861d98dbf25ae39981c8a023583239edbda"},
 ]
 
 [package.extras]
+brotli = ["brotli (>=1.2.0)"]
 crypto = ["cryptography (>3.0)"]
 cryptodome = ["PyCryptodome"]
 dev = ["flit", "pip-tools", "pre-commit", "pytest-cov", "pytest-socket", "pytest-timeout", "pytest-xdist", "wheel"]
 docs = ["myst_parser", "sphinx", "sphinx_rtd_theme"]
 fonts = ["fonttools"]
-full = ["Pillow (>=8.0.0)", "arabic-reshaper", "cryptography (>3.0)", "fonttools", "python-bidi"]
+full = ["Pillow (>=8.0.0)", "arabic-reshaper", "brotli (>=1.2.0)", "cryptography (>3.0)", "fonttools", "python-bidi"]
 image = ["Pillow (>=8.0.0)"]
 rtl-text = ["arabic-reshaper", "python-bidi"]
 
@@ -4281,29 +4257,6 @@ files = [
 cli = ["click (>=5.0)"]
 
 [[package]]
-name = "python-jose"
-version = "3.5.0"
-description = "JOSE implementation in Python"
-optional = false
-python-versions = ">=3.9"
-groups = ["main"]
-files = [
-    {file = "python_jose-3.5.0-py2.py3-none-any.whl", hash = "sha256:abd1202f23d34dfad2c3d28cb8617b90acf34132c7afd60abd0b0b7d3cb55771"},
-    {file = "python_jose-3.5.0.tar.gz", hash = "sha256:fb4eaa44dbeb1c26dcc69e4bd7ec54a1cb8dd64d3b4d81ef08d90ff453f2b01b"},
-]
-
-[package.dependencies]
-ecdsa = "!=0.15"
-pyasn1 = ">=0.5.0"
-rsa = ">=4.0,!=4.1.1,!=4.4,<5.0"
-
-[package.extras]
-cryptography = ["cryptography (>=3.4.0)"]
-pycrypto = ["pycrypto (>=2.6.0,<2.7.0)"]
-pycryptodome = ["pycryptodome (>=3.3.1,<4.0.0)"]
-test = ["pytest", "pytest-cov"]
-
-[[package]]
 name = "python3-openid"
 version = "3.2.0"
 description = "OpenID support for modern servers and consumers."
@@ -4407,23 +4360,26 @@ files = [
 
 [[package]]
 name = "redis"
-version = "6.4.0"
+version = "8.1.0"
 description = "Python client for Redis database and key-value store"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["main", "celery"]
 files = [
-    {file = "redis-6.4.0-py3-none-any.whl", hash = "sha256:f0544fa9604264e9464cdf4814e7d4830f74b165d52f2a330a760a88dd248b7f"},
-    {file = "redis-6.4.0.tar.gz", hash = "sha256:b01bc7282b8444e28ec36b261df5375183bb47a07eb9c603f284e89cbc5ef010"},
+    {file = "redis-8.1.0-py3-none-any.whl", hash = "sha256:a4fe1aac3d3b3cc791d4b3d5931c5a956045dc951ee74d1c913ee3ac4d2ee9fb"},
+    {file = "redis-8.1.0.tar.gz", hash = "sha256:6e1a19beef9225c83efd689c7e6b7da2d5215b1f42cd13b7fc3714d0a09c7b25"},
 ]
 
 [package.dependencies]
 hiredis = {version = ">=3.2.0", optional = true, markers = "extra == \"hiredis\""}
 
 [package.extras]
+circuit-breaker = ["pybreaker (>=1.4.0)"]
 hiredis = ["hiredis (>=3.2.0)"]
-jwt = ["pyjwt (>=2.9.0)"]
+jwt = ["pyjwt (>=2.13.0)"]
 ocsp = ["cryptography (>=36.0.1)", "pyopenssl (>=20.0.1)", "requests (>=2.31.0)"]
+otel = ["opentelemetry-api (>=1.39.1)", "opentelemetry-exporter-otlp-proto-http (>=1.39.1)", "opentelemetry-sdk (>=1.39.1)"]
+xxhash = ["xxhash (>=3.6.0,<3.7.0)"]
 
 [[package]]
 name = "reportlab"
@@ -4489,46 +4445,31 @@ requests = ">=2.0.0"
 rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
 
 [[package]]
-name = "rsa"
-version = "4.9.1"
-description = "Pure-Python RSA implementation"
-optional = false
-python-versions = "<4,>=3.6"
-groups = ["main"]
-files = [
-    {file = "rsa-4.9.1-py3-none-any.whl", hash = "sha256:68635866661c6836b8d39430f97a996acbd61bfa49406748ea243539fe239762"},
-    {file = "rsa-4.9.1.tar.gz", hash = "sha256:e7bdbfdb5497da4c07dfd35530e1a902659db6ff241e39d9953cad06ebd0ae75"},
-]
-
-[package.dependencies]
-pyasn1 = ">=0.1.3"
-
-[[package]]
 name = "ruff"
-version = "0.16.10"
+version = "0.17.0"
 description = "An extremely fast Python linter and code formatter, written in Rust."
 optional = false
 python-versions = ">=3.7"
 groups = ["lint"]
 files = [
-    {file = "ruff-0.16.10-py3-none-linux_armv6l.whl", hash = "sha256:488b0fe3f3574210e5cf80d9f59b9e3ab17a127a8155de3f307b392589cfb511"},
-    {file = "ruff-0.16.10-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:e748ff95c934c4e978783b8e687bc174e7bd84e8ad24e3243e1ecfcda5e0282d"},
-    {file = "ruff-0.16.10-py3-none-macosx_11_0_arm64.whl", hash = "sha256:3031a4a2e8e7b8a46f70be45f198c35a11ece509a94b80334d8d397a33c67550"},
-    {file = "ruff-0.16.10-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:494401c86df4c4c25f69b9419605d944467ee98c42fb6ad405ef4fa40b8fb67d"},
-    {file = "ruff-0.16.10-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:d203abc0ff2b773ee33d00ab8df0bb67046fbc7c07b119332f08b9b345cf8221"},
-    {file = "ruff-0.16.10-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:bd83d1235a5258d318477bc5b576303974cbdef5df0c01a1bff14efcc23bd12a"},
-    {file = "ruff-0.16.10-py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:bc2610fb269fa56dd8a68669ae470fa6272902668c0fc2ebc3aa112b2633d5b8"},
-    {file = "ruff-0.16.10-py3-none-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:3e70175e29cc94c26ea296c80e470180b744b7419026898e58f520c6ab32578e"},
-    {file = "ruff-0.16.10-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f33f43a864a8483eebd160e713336c8bab02c934feaff0a33cf5ccb41546d09a"},
-    {file = "ruff-0.16.10-py3-none-manylinux_2_31_riscv64.whl", hash = "sha256:1dfc6f0088149fb6a362c1c446bcbb3fd2157b3852fe2fa68409276eab9ad9b3"},
-    {file = "ruff-0.16.10-py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:6553498afc35f580f036030795810b9e6bcea31604b0fd9e8d352795473042e3"},
-    {file = "ruff-0.16.10-py3-none-musllinux_1_2_armv7l.whl", hash = "sha256:a3b8471dea115d37f123882be852bed13403746d3a76c11de4a19ec5f9ff5a03"},
-    {file = "ruff-0.16.10-py3-none-musllinux_1_2_i686.whl", hash = "sha256:92e59a70bcbd9d3a5483656da906ec28edfdacfce00afd99edb8b4e9d15644be"},
-    {file = "ruff-0.16.10-py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:7ae7375f803b5520dc9f546bed7e3a0acb70b91812e9bb4b19927de22f25b77d"},
-    {file = "ruff-0.16.10-py3-none-win32.whl", hash = "sha256:2a12e01cb9156c10c466f63b46eaae5ecea28dfbd21b5836353ae498e7d1349a"},
-    {file = "ruff-0.16.10-py3-none-win_amd64.whl", hash = "sha256:97f2015c92aa97105b0eab19eb5d224884399281cfc5da86a92db4ab5e7fb2ca"},
-    {file = "ruff-0.16.10-py3-none-win_arm64.whl", hash = "sha256:25a65fe998c4e6861ec079ada5826a2fc605e6cbccbe9dcd7fac1f54e791621b"},
-    {file = "ruff-0.16.10.tar.gz", hash = "sha256:eff4728c4eaae93f0955cd264d24b2ab348e74bf59986ccf282ba6dc16b3b017"},
+    {file = "ruff-0.17.0-py3-none-linux_armv6l.whl", hash = "sha256:0e271826af9a20d18c6cfae8c51e82959167c24859686ddd3eb9a7f0842ce81e"},
+    {file = "ruff-0.17.0-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:5f0ca4a40f81403689c04f12966e22f44e329ae362072d8f1587b7bda87f603b"},
+    {file = "ruff-0.17.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:cbf7149e0927dc3295d5d64679a4765576eef71b00782b2ae969ef82274d6bb9"},
+    {file = "ruff-0.17.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:13ee90156522998c3037059d8f66885c8adeeaf7643bdce2caceee196ecd23e0"},
+    {file = "ruff-0.17.0-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:3d8e4a002a94cd9d0dc48b51dc69d807a172b5b9bf2b668e656424dc5b55ead1"},
+    {file = "ruff-0.17.0-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:c0b8a60c06a218c337e1161638d34757f83449243e2db161483ddf948e53ad14"},
+    {file = "ruff-0.17.0-py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:a330178bdffc4205dbf3bda11d93e059e388fd6546f8cdd304501a9160363c0d"},
+    {file = "ruff-0.17.0-py3-none-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:7bb08489e234876fa2da67ae3ea938e9a2156da80293e0e4365abd6973d98329"},
+    {file = "ruff-0.17.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:bc73e7c133e82d55b5f15897b2a442d72c0cb4a0c886c46801ce3c247150b60c"},
+    {file = "ruff-0.17.0-py3-none-manylinux_2_31_riscv64.whl", hash = "sha256:db4f74c533403ab70fe4007873f6ae0c9f94a8b03158cf48d78788e47cdbe399"},
+    {file = "ruff-0.17.0-py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:3d8cc360e666d1914e47b0777c6906d70cf18891a55532bd0a16844195d70859"},
+    {file = "ruff-0.17.0-py3-none-musllinux_1_2_armv7l.whl", hash = "sha256:d66de796b726c4801e05fa99a2a8d7a780e107be222486c304ab61765561e866"},
+    {file = "ruff-0.17.0-py3-none-musllinux_1_2_i686.whl", hash = "sha256:c3f268baf004aea944f040623327119527ea231af15f7fb7890e82cea0679589"},
+    {file = "ruff-0.17.0-py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:864b6c1acb6b0bccf94b5a3938a1531fd09aaca5e5659a2e7bf0f3cf2a685540"},
+    {file = "ruff-0.17.0-py3-none-win32.whl", hash = "sha256:5e50aa5b84decd9fe5b0bb0e6f71c3b592f1767ed09faa4b7207d933961e35cd"},
+    {file = "ruff-0.17.0-py3-none-win_amd64.whl", hash = "sha256:8ab76bcda86dfd28e13776cb5de3c7bcdcf1ae3d37ed761113d1a5a415dc134c"},
+    {file = "ruff-0.17.0-py3-none-win_arm64.whl", hash = "sha256:c154c73ff43f9854395e24cac507af13078962e53d2b511605058d22af1fdb88"},
+    {file = "ruff-0.17.0.tar.gz", hash = "sha256:5cd03240d8208a557c2a9655a5cb07ebe36aa6bb35065f97d48c1f6adef5a322"},
 ]
 
 [[package]]
@@ -4609,49 +4550,50 @@ files = [
 
 [[package]]
 name = "social-auth-app-django"
-version = "5.7.0"
+version = "7.1.0"
 description = "Python Social Authentication, Django integration."
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "social_auth_app_django-5.7.0-py3-none-any.whl", hash = "sha256:492b6f64e1e9fa5ed62b24bc19bde31c235fd4eb7fbd5c310e999e752b8f699a"},
-    {file = "social_auth_app_django-5.7.0.tar.gz", hash = "sha256:c0cc118d1bb935dbf02acb8a57fabd7b07694452fce755a5956282c69f019c79"},
+    {file = "social_auth_app_django-7.1.0-py3-none-any.whl", hash = "sha256:a6e51eb905c81da15548b156315690f608867d68552daadcdb5aa180500f8ff4"},
+    {file = "social_auth_app_django-7.1.0.tar.gz", hash = "sha256:77058a2717d537899d9fe92039e06f9567d9cf5574f6bcb1345649d2fd670b09"},
 ]
 
 [package.dependencies]
-Django = ">=5.1"
-social-auth-core = ">=4.8.3,<4.9.0"
+asgiref = ">=3.8.1"
+Django = ">=5.2"
+social-auth-core = ">=6.1.0,<7.0.0"
 
 [package.extras]
-dev = ["coverage (>=3.6)", "django-stubs (==5.2.8)", "django-stubs-ext (==5.2.8)", "mypy (==1.19.1)", "pre-commit", "pyright (==1.1.407)", "tox"]
+dev = ["coverage (>=3.6)", "django-stubs (==6.0.9)", "django-stubs-ext (==6.0.9)", "mypy (==2.4.0)", "pre-commit", "pyright (==1.1.414)", "tox"]
 
 [[package]]
 name = "social-auth-core"
-version = "4.8.5"
+version = "6.1.1"
 description = "Python social authentication made simple."
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "social_auth_core-4.8.5-py3-none-any.whl", hash = "sha256:2591c2ce71127ad410e7ca9581bd88658031fdf7b209e05be5920d0bcc1c005a"},
-    {file = "social_auth_core-4.8.5.tar.gz", hash = "sha256:fd10d44bff681a128d127f665f203c496658d5bbfc993ad1b5bbaed589eab573"},
+    {file = "social_auth_core-6.1.1-py3-none-any.whl", hash = "sha256:f5ab36e843c7ea20bce96ecab95e716ab1c8afe85d3d3c322446246aaffadd13"},
+    {file = "social_auth_core-6.1.1.tar.gz", hash = "sha256:674c285e75b04aaaf438fbbb6b2376b343f7b932d5dce1726e61cd23b17b6cff"},
 ]
 
 [package.dependencies]
+cryptography = ">=46.0.7"
 defusedxml = ">=0.7.1"
 oauthlib = ">=3.3.1"
-PyJWT = {version = ">=2.11.0", extras = ["crypto"]}
+PyJWT = {version = ">=2.13.0", extras = ["crypto"]}
 python3-openid = ">=3.2.0"
-requests = ">=2.32.5"
+requests = ">=2.34.0"
 requests-oauthlib = ">=2.0.0"
 
 [package.extras]
 all = ["social-auth-core[azuread]", "social-auth-core[google-onetap]", "social-auth-core[saml]", "social-auth-core[shopify]"]
 allpy3 = ["social-auth-core[all]"]
-azuread = ["cryptography (>=42.0.8)"]
-dev = ["coverage (==7.13.4)", "flake8 (==7.3.0)", "google-auth-stubs (==0.3.0)", "mypy (==1.19.1)", "pyright (==1.1.408)", "pytest (==9.0.2)", "pytest-cov (==7.0.0)", "pytest-github-actions-annotate-failures (==0.3.0)", "pytest-profiling (==1.8.1)", "pytest-xdist (==3.8.0)", "responses (==0.25.8)", "ty (==0.0.15)", "types-defusedxml (==0.7.0.20250822)", "types-oauthlib (==3.3.0.20250822)", "types-requests (==2.32.4.20260107)", "types-requests-oauthlib (==2.0.0.20250809)"]
-google-onetap = ["google-auth (>=2.40.0,<2.49)"]
+dev = ["coverage (==7.16.2)", "flake8 (==7.4.1)", "mypy (==2.4.0)", "pyright (==1.1.414)", "pytest (==9.1.1)", "pytest-cov (==7.1.0)", "pytest-github-actions-annotate-failures (==0.4.2)", "pytest-profiling (==1.8.1)", "pytest-xdist (==3.8.0)", "responses (==0.26.3)", "ty (==0.0.86)", "types-defusedxml (==0.7.0.20260504)", "types-lxml (==2026.2.16)", "types-oauthlib (==3.3.0.20260724)", "types-requests (==2.33.0.20261006)", "types-requests-oauthlib (==2.0.0.20261006)"]
+google-onetap = ["google-auth (>=2.40.0,<2.62)"]
 saml = ["python3-saml (>=1.16.0)"]
 shopify = ["ShopifyAPI"]
 
@@ -4977,14 +4919,14 @@ brotli = ["brotli"]
 
 [[package]]
 name = "xhtml2pdf"
-version = "0.2.21"
+version = "0.2.23"
 description = "PDF generator using HTML and CSS"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "xhtml2pdf-0.2.21-py3-none-any.whl", hash = "sha256:b63c72b23afe5e09811e4f1873332c4736ef1a849498c403fe8cf89fdb3fff42"},
-    {file = "xhtml2pdf-0.2.21.tar.gz", hash = "sha256:c9b61611b9334040e27762fcdd3e8b98febf4b10cd916e108dfaf763d820907d"},
+    {file = "xhtml2pdf-0.2.23-py3-none-any.whl", hash = "sha256:7796455397e046139dcbb0c5f44ee2c1573510a5e4f850e34460f5bbfa709056"},
+    {file = "xhtml2pdf-0.2.23.tar.gz", hash = "sha256:2664aa5894e16e25c865091cdc2cb05deedea95653cf66717b0a68fe25dcbcea"},
 ]
 
 [package.dependencies]
@@ -4995,13 +4937,13 @@ pyHanko = ">=0.12.1"
 pyhanko-certvalidator = ">=0.19.5"
 pypdf = ">=3.1.0"
 python-bidi = ">=0.5.0"
-reportlab = ">=4.0.4,<6"
+reportlab = ">=4.4.9,<6"
 svglib = ">=1.2.1"
 
 [package.extras]
 browsertest = ["numpy (>=1.24)", "selenium (>=4.15)", "tomli (>=2.0.1) ; python_version < \"3.11\""]
 docs = ["sphinx (>=6)", "sphinx-rtd-theme (>=0.5.0)", "sphinx_reredirects (>=0.1.3)"]
-pycairo = ["reportlab[pycairo] (>=4.0.4,<6)"]
+pycairo = ["reportlab[pycairo] (>=4.4.9,<6)"]
 release = ["build", "twine"]
 renderpm = ["xhtml2pdf[pycairo]"]
 test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"]
@@ -5162,4 +5104,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "028d15f05583b326b405c018f52d99b29e07f4d999ccba66801728097bf091dd"
+content-hash = "a803ec895649c9d48899372648bfb9f0a0f6a54531ca9f9c1406d85a60666c3a"
