@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { ApolloError, gql, useApolloClient } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isSameDay } from "date-fns";
 import { Button, ButtonSize, Notification } from "hds-react";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useRouter } from "next/router";
 import { getSeriesOverlapErrors } from "@ui/modules/apollo/helpers";
 import { ControlledDateInput, TimeInput } from "ui/src/components/form";

@@ -1,5 +1,5 @@
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
+import { useTranslation } from "next-i18next/pages";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { H4 } from "ui/src/styled";

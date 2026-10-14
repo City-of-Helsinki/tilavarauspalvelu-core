@@ -1,4 +1,3 @@
-import type { TFunction } from "next-i18next";
 /* eslint-disable import/no-cycle */
 /**
  * Display formatting functions, with i18n.t and/or date-fns format
@@ -6,6 +5,7 @@ import type { TFunction } from "next-i18next";
 import { format, isBefore, isSameDay } from "date-fns";
 import { enGB, fi, sv } from "date-fns/locale";
 import type { Locale, Day } from "date-fns";
+import type { TFunction } from "next-i18next/pages";
 import {
   dateToMinutes,
   isValidDate,

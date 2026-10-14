@@ -1,4 +1,4 @@
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import { ReservationListButton } from "@/components/ReservationListButton";
 import { ReservationList } from "@/components/ReservationsList";
 import type { NewReservationListItem } from "@/components/ReservationsList";

@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react";
-import { useTranslation } from "next-i18next";
 import { ApolloError, gql } from "@apollo/client";
 import { IconGroup } from "hds-react";
 import { trim } from "lodash-es";
+import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { PopupMenu } from "ui/src/components/PopupMenu";

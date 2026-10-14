@@ -1,9 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonVariant, Dialog } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { useDisplayError } from "ui/src/hooks";
 import { ResourceLocationType, useCreateResourceMutation } from "@gql/gql-types";
 import type { ResourceCreateMutationInput, NewResourceUnitFieldsFragment } from "@gql/gql-types";

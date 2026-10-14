@@ -1,7 +1,7 @@
 import React from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconPlus } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import type { OptionsListT } from "ui/src/modules/search";
 import { ButtonContainer } from "ui/src/styled";

@@ -1,9 +1,9 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import { IconArrowRight } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import Image from "next/image";
 import styled from "styled-components";
+import type { TFunction } from "next-i18next/pages";
 import { breakpoints } from "../modules/const";
 import { Flex, H1 } from "../styled";
 import { IconButton } from "./IconButton";

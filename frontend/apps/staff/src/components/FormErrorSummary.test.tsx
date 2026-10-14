@@ -12,7 +12,7 @@ function makeErrors(fields: Record<string, string>): FieldErrors {
   return errors;
 }
 
-vi.mock("next-i18next", () => ({
+vi.mock("next-i18next/pages", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),

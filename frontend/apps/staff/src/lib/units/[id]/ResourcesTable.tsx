@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import { gql } from "@apollo/client";
 import { trim } from "lodash-es";
+import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
+import type { TFunction } from "next-i18next/pages";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { PopupMenu } from "ui/src/components/PopupMenu";
 import { successToast } from "ui/src/components/toast";

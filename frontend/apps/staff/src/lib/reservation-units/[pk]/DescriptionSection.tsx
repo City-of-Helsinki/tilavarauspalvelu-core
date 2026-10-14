@@ -1,7 +1,7 @@
 import React from "react";
 import { Controller } from "react-hook-form";
 import type { UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import dynamic from "next/dynamic";
 import { ControlledSelect } from "ui/src/components/form";
 import { filterNonNullable } from "ui/src/modules/helpers";

@@ -2,7 +2,7 @@ import React from "react";
 import { useController } from "react-hook-form";
 import type { Control } from "react-hook-form";
 import { useMedia } from "react-use";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import { ControlledRadioGroup } from "ui/src/components/form";
 import { breakpoints } from "ui/src/modules/const";
 import { getTranslatedError } from "@/modules/helpers";

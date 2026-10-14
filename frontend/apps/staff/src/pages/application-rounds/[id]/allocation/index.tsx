@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Tabs } from "hds-react";
 import { uniqBy } from "lodash-es";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { useVisibilityChange } from "@ui/hooks";

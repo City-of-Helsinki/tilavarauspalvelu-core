@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { gql } from "@apollo/client";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useRouter } from "next/router";
 import { ignoreMaybeArray } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useMedia } from "react-use";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { isBefore } from "date-fns";
 import {
@@ -19,6 +18,7 @@ import {
   Table,
   Tooltip,
 } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import styled from "styled-components";

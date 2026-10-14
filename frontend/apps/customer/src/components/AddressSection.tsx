@@ -1,7 +1,7 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconLinkExternal } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { IconButton } from "ui/src/components";

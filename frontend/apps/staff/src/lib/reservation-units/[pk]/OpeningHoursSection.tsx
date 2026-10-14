@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { IconLinkExternal } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { isBrowser } from "ui/src/modules/helpers";
 import { AutoGrid } from "ui/src/styled";

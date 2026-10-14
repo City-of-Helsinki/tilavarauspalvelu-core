@@ -1,6 +1,6 @@
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";

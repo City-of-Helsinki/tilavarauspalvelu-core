@@ -1,6 +1,6 @@
 import React from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { ControlledTextInput } from "@ui/components/form/ControlledTextInput";
 import { Flex, fontMedium, H4 } from "ui/src/styled";

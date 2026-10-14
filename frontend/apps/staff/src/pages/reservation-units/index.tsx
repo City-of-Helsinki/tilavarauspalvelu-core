@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import { useToastIfQueryParam } from "ui/src/hooks";
 import { H1, HR } from "ui/src/styled";

@@ -1,8 +1,8 @@
 import React from "react";
 import { useController } from "react-hook-form";
 import type { FieldValues, UseControllerProps, UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { Checkbox } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { ControlledSelect, ControlledCheckbox, DateTimeInput } from "ui/src/components/form";
 import { sort } from "ui/src/modules/helpers";

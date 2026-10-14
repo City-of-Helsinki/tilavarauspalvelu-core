@@ -1,4 +1,4 @@
-import type { TFunction } from "next-i18next";
+import type { TFunction } from "next-i18next/pages";
 import type { LocalizationLanguages } from "../urlBuilder";
 
 export type TimeStruct = {

@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocalStorage } from "react-use";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import type { NotificationType } from "hds-react";
 import { BannerNotificationLevel, useShowNotificationsListQuery } from "../../gql/gql-types";

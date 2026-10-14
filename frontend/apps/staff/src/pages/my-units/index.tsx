@@ -1,7 +1,7 @@
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { H1 } from "ui/src/styled";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
 import { Filters, UnitsDataLoader } from "@/components/units";

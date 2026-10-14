@@ -8,7 +8,7 @@ import { AllocatedTimeSlotsDocument } from "@gql/gql-types";
 import type { AllocatedSectionsTableElementFragment } from "@gql/gql-types";
 import { TimeSlotDataLoader } from "./AllocatedSectionDataLoader";
 
-vi.mock("next-i18next", () => ({
+vi.mock("next-i18next/pages", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { Sanitize } from "ui/src/components/Sanitize";
 import type { ReservationPageQuery } from "@gql/gql-types";

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonSize, IconAlertCircleFill, IconRefresh, Tooltip } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled, { css } from "styled-components";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { successToast } from "ui/src/components/toast";

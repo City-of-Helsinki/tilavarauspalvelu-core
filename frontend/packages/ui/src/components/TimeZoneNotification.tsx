@@ -1,5 +1,5 @@
-import { useTranslation } from "next-i18next";
 import { Notification } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { EXPECTED_TIMEZONE } from "../modules/const";
 import { ClientOnly } from "./ClientOnly";
 

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addYears } from "date-fns";
 import { StepState } from "hds-react";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { H1 } from "ui/src/styled";

@@ -1,8 +1,8 @@
 import React from "react";
 import { useMedia } from "react-use";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconArrowRight, IconEuroSign, IconGroup, IconHome } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { Card } from "ui/src/components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { breakpoints } from "ui/src/modules/const";

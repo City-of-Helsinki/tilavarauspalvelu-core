@@ -1,8 +1,8 @@
 import React from "react";
 import { useController } from "react-hook-form";
 import type { UseControllerProps, FieldValues } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { TimeInput } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { filterEmpty } from "ui/src/modules/helpers";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {

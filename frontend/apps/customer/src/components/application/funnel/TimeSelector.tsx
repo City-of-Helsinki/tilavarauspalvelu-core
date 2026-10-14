@@ -1,8 +1,8 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, Notification, NotificationSize } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { ApplicationTimeSelector, isCellEqual } from "ui/src/components/ApplicationTimeSelector";
 import type { Cell, CellState } from "ui/src/components/ApplicationTimeSelector";
 import { ErrorText } from "ui/src/components/ErrorText";

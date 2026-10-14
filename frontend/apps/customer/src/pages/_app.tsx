@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import type { FC } from "react";
-import { appWithTranslation, useTranslation } from "next-i18next";
 import { ApolloProvider } from "@apollo/client";
 import { CookieBanner, CookieConsentContextProvider } from "hds-react";
+import { appWithTranslation, useTranslation } from "next-i18next/pages";
 import App from "next/app";
 import type { AppContext, AppInitialProps, AppProps } from "next/app";
 import { initialiseLogWrite } from "@ui/modules/browserHelpers";

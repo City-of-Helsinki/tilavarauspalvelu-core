@@ -1,5 +1,4 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import {
   IconGroup,
@@ -13,6 +12,7 @@ import {
   IconHome,
   IconLock,
 } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { Card } from "ui/src/components/Card";
 import type { CardInfoItem } from "ui/src/components/Card";

@@ -1,8 +1,8 @@
 import React from "react";
 import { useFieldArray } from "react-hook-form";
 import type { UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, IconPlus, IconTrash } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { ControlledDateInput, ControlledSelect } from "ui/src/components/form";
 import { StatusLabel } from "ui/src/components/StatusLabel";

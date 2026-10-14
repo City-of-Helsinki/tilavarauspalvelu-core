@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, IconArrowRight, IconCross, IconPen, LoadingSpinner } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
+import type { TFunction } from "next-i18next/pages";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";
 import { Card } from "ui/src/components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";

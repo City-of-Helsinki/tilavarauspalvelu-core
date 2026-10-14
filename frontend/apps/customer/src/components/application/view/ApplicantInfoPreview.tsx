@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import { ReserveeType } from "@gql/gql-types";
 import type { ApplicantFieldsFragment } from "@gql/gql-types";
 import { ApplicationInfoContainer, InfoItem, InfoItemContainer } from "@/styled/application";

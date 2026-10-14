@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { useTranslation } from "next-i18next";
 import { ApolloError, gql } from "@apollo/client";
 import { isBefore } from "date-fns";
 import { Button, ButtonVariant, Dialog, RadioButton, Select, SelectionGroup, TextArea } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";

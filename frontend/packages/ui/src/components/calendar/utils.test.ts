@@ -9,7 +9,7 @@ const tfunction = (str: string, options: { count: number }) => {
   return options?.count ? `${options.count} ${countStr}` : str;
 };
 
-vi.mock("next-i18next", () => ({
+vi.mock("next-i18next/pages", () => ({
   i18n: {
     t: (str: string, options: { count: number }) => tfunction(str, options),
   },

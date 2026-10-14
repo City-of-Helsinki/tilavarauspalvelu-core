@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
+import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import type { ReadonlyURLSearchParams } from "next/navigation";
 import { ShowAllContainer } from "ui/src/components";

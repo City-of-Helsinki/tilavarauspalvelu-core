@@ -1,8 +1,8 @@
 import React from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, Dialog, IconArrowLeft, LoadingSpinner } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { ButtonLikeLink } from "@ui/components/ButtonLikeLink";

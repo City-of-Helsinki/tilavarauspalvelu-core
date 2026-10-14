@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ScrollToTop } from "./ScrollToTop";
 
-vi.mock("next-i18next", () => ({
+vi.mock("next-i18next/pages", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),

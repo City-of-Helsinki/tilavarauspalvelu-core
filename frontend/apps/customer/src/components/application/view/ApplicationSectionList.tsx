@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { Tooltip } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { ApplicationSectionStatusLabel } from "ui/src/components/statuses";
 import { WEEKDAYS } from "ui/src/modules/const";
 import { formatDurationRange, formatDate, parseApiDate, setSundayFirst } from "ui/src/modules/date-utils";

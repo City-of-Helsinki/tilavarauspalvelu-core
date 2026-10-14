@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
-import { useTranslation } from "next-i18next";
 import { addDays, addMinutes, startOfDay } from "date-fns";
+import { useTranslation } from "next-i18next/pages";
 import { errorToast } from "ui/src/components/toast";
 import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { isValidDate, formatApiDate, timeToMinutes } from "ui/src/modules/date-utils";

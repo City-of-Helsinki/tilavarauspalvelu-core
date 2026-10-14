@@ -1,8 +1,8 @@
 import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";
 import { Flex, H1, P } from "ui/src/styled";
 import { UserPermissionChoice } from "@gql/gql-types";

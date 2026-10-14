@@ -1,6 +1,6 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import { ControlledCheckbox, ControlledSelect } from "ui/src/components/form";
 import { MunicipalityChoice } from "@gql/gql-types";
 import { FormSubHeading } from "@/styled/application";

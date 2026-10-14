@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import { addMinutes, differenceInMinutes, isToday, setHours, setMinutes, startOfDay } from "date-fns";
 import { IconClock } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import styled, { css } from "styled-components";
+import type { TFunction } from "next-i18next/pages";
 import { isCellOverlappingSpan } from "@ui/components/calendar/utils";
 import type { TimeSpanType } from "@ui/components/calendar/utils";
 import { Popover } from "@ui/components/Popover";

@@ -4,7 +4,7 @@
 // NOTE this doesn't hot reload and the page has to be reloaded twice to get new translations
 const reloadOnPrerender = process.env.NODE_ENV === "development";
 
-/** @type {import('next-i18next').UserConfig} */
+/** @type {import('next-i18next/pages').UserConfig} */
 module.exports = {
   debug: false,
   i18n: {

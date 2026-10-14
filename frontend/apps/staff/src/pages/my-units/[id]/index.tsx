@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { addMinutes } from "date-fns";
 import { Button, ButtonSize, ButtonVariant, Tabs } from "hds-react";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { logGraphQLError, logGraphQLQuery, transformQueryError } from "@ui/modules/apollo/helpers";

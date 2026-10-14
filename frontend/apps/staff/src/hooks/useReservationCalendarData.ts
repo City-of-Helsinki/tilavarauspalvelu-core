@@ -1,4 +1,4 @@
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import { errorToast } from "ui/src/components/toast";
 import { formatApiDate } from "ui/src/modules/date-utils";
 import { createNodeId } from "ui/src/modules/helpers";

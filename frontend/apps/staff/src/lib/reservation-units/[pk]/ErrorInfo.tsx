@@ -1,6 +1,6 @@
 import React from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import { ErrorListBox } from "ui/src/components/ErrorListBox";
 import { getTranslatedError } from "@/modules/helpers";
 import type { ReservationUnitEditFormValues } from "./form";

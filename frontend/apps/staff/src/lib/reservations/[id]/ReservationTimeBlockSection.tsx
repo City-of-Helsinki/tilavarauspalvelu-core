@@ -1,8 +1,8 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import type { Ref } from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { add, startOfISOWeek } from "date-fns";
+import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { getEventBuffers } from "@ui/components/calendar/utils";

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconAngleDown, IconAngleUp, IconLinkExternal, IconSize, RadioButton } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import Link from "next/link";
 import styled, { css } from "styled-components";
 import type { ApolloQueryResult } from "@apollo/client";

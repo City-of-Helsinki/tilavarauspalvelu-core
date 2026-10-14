@@ -1,6 +1,6 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import { ControlledCheckbox } from "ui/src/components/form";
 import { ApplicationFormTextInput } from "@/components/application/funnel/ApplicationFormTextInput";
 import { FormSubHeading } from "@/styled/application";

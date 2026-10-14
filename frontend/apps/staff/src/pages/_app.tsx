@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import type { FC } from "react";
-import { appWithTranslation } from "next-i18next";
 import { ApolloProvider } from "@apollo/client";
+import { appWithTranslation } from "next-i18next/pages";
 import App from "next/app";
 import type { AppContext, AppInitialProps, AppProps } from "next/app";
 import type { Router } from "next/router";

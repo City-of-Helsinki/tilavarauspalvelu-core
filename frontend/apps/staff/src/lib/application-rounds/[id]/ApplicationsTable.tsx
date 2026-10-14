@@ -1,9 +1,9 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconLinkExternal, IconSize } from "hds-react";
 import { memoize, orderBy, uniqBy } from "lodash-es";
+import { useTranslation } from "next-i18next/pages";
+import type { TFunction } from "next-i18next/pages";
 import { ApplicationStatusLabel } from "ui/src/components/statuses";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import type { ApplicationsTableElementFragment, ApplicationStatusChoice } from "@gql/gql-types";

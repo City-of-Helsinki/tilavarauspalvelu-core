@@ -1,6 +1,6 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import { ControlledTextInput } from "@ui/components/form/ControlledTextInput";
 import type { ApplicationPage3FormValues } from "./form";
 

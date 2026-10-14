@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { Button, ButtonSize } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { signIn } from "ui/src/modules/browserHelpers";
 import { getLocalizationLang } from "ui/src/modules/helpers";
 import { useSession } from "@/hooks";

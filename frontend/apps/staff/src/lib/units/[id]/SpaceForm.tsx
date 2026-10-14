@@ -1,7 +1,7 @@
 import React from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { TextInput } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { z } from "zod";
 import { ControlledTextInput } from "@ui/components/form/ControlledTextInput";

@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { IconMenuDots } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { Flex, toggleButtonCss } from "../styled";
 import { Popover } from "./Popover";

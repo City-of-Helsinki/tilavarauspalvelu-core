@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonVariant } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import { errorToast, successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";

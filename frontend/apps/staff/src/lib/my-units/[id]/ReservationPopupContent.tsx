@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import Link from "next/link";
 import styled from "styled-components";
 import { dateToMinutes, formatTimeRange, parseValidDateObject } from "ui/src/modules/date-utils";

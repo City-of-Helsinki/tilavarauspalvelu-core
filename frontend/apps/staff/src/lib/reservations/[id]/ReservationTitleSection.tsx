@@ -1,7 +1,7 @@
 import React, { forwardRef } from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconSize } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { ReservationStatusLabel, OrderStatusLabel } from "ui/src/components/statuses";
 import { formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
 import { Flex, TitleSection, H1 } from "ui/src/styled";

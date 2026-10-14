@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { IconArrowRight, IconSignout, IconSize } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { IconButton } from "ui/src/components";
 import { signOut } from "ui/src/modules/browserHelpers";
 import { Flex } from "ui/src/styled";

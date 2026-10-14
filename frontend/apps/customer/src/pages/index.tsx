@@ -1,8 +1,8 @@
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { filterNonNullable } from "@ui/modules/helpers";
 import { IntendedUseOrderingChoices, UnitOrderingChoices, FrontPageDocument } from "@gql/gql-types";
 import type { FrontPageQuery, FrontPageQueryVariables } from "@gql/gql-types";

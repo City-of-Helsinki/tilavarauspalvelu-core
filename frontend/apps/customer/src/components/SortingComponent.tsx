@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { IconSize, IconSortAscending, IconSortDescending, Select } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import type { Option } from "hds-react";

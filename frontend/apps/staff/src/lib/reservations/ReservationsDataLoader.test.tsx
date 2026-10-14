@@ -9,7 +9,7 @@ import { ReservationListDocument, ReservationStateChoice } from "@gql/gql-types"
 import type { ReservationTableElementFragment } from "@gql/gql-types";
 import { ReservationsDataLoader } from "./ReservationsDataLoader";
 
-vi.mock("next-i18next", () => ({
+vi.mock("next-i18next/pages", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),

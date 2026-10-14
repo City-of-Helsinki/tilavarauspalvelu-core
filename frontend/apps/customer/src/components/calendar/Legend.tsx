@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import styled, { css } from "styled-components";
 import type { RuleSet } from "styled-components";
 import { unavailableBackgroundSVG } from "@ui/components/calendar/utils";

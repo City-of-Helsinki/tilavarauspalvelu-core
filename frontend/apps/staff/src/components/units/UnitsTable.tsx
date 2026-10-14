@@ -1,7 +1,7 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { memoize } from "lodash-es";
+import { useTranslation } from "next-i18next/pages";
 import type { TFunction } from "i18next";
 import type { UnitTableElementFragment } from "@gql/gql-types";
 import { CustomTable } from "@/components/Table";

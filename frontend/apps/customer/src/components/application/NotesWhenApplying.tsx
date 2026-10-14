@@ -1,4 +1,4 @@
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { Sanitize } from "ui/src/components/Sanitize";
 import { breakpoints } from "ui/src/modules/const";

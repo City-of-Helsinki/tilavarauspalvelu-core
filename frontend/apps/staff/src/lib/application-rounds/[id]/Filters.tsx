@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import type { ReadonlyURLSearchParams } from "next/navigation";
 import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";

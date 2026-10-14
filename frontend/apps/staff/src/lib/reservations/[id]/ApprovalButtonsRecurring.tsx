@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
-import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import type { ReservationSeriesNode } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { DenyDialogSeries } from "@/components/DenyDialog";

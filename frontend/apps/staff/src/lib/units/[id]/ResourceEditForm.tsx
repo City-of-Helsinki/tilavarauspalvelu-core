@@ -1,6 +1,6 @@
 import { Controller } from "react-hook-form";
 import type { UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import { ControlledTextInput } from "@ui/components/form/ControlledTextInput";
 import { getTranslatedError } from "@/modules/helpers";
 import { EditorColumns } from "./modules/resourceEditor";

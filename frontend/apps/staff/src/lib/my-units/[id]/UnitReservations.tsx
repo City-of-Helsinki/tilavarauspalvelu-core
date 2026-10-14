@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { useTranslation } from "next-i18next";
 import { startOfDay } from "date-fns";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";

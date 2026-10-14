@@ -1,5 +1,5 @@
 import type { FieldError } from "react-hook-form";
-import type { TFunction } from "next-i18next";
+import type { TFunction } from "next-i18next/pages";
 import { ReserveeType } from "../../../gql/gql-types";
 import type { ReservationFormFieldsFragment, ReservationFormType } from "../../../gql/gql-types";
 import { filterEmpty } from "../../modules/helpers";

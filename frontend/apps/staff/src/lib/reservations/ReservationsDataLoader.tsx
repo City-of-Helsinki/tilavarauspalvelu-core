@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
+import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import type { ReadonlyURLSearchParams } from "next/navigation";
 import { errorToast } from "ui/src/components/toast";

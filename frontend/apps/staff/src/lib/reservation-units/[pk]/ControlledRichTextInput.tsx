@@ -2,7 +2,7 @@ import React from "react";
 import type { HTMLAttributes } from "react";
 import { useController } from "react-hook-form";
 import type { Control } from "react-hook-form";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import dynamic from "next/dynamic";
 import { getTranslatedError } from "@/modules/helpers";
 import type { ReservationUnitEditFormValues } from "./form";

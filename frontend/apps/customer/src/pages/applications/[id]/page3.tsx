@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from "hds-react";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useRouter } from "next/router";
 import { useDisplayError } from "ui/src/hooks";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";

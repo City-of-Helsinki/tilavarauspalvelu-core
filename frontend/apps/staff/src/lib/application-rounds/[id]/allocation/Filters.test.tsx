@@ -14,7 +14,7 @@ vi.mock("@/hooks/useSetSearchParams", () => ({ useSetSearchParams: mockUseSetSea
 const { mockUseFilterOptions } = vi.hoisted(() => ({ mockUseFilterOptions: vi.fn() }));
 vi.mock("@/hooks/useFilterOptions", () => ({ useFilterOptions: mockUseFilterOptions }));
 
-vi.mock("next-i18next", () => ({
+vi.mock("next-i18next/pages", () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 

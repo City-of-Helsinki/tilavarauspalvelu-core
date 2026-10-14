@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import type { SubmitHandler, UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { Button } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { ControlledDateInput } from "ui/src/components/form";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
