@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 
 import freezegun
 import pytest
+from django.db.models.signals import post_save
 from freezegun import freeze_time
 from graphene_django_extensions.testing import parametrize_helper
 
@@ -508,21 +509,22 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
     assert Reservation.objects.count() == 2
 
 
-@patch_method(HelsinkiProfileClient.request, return_value=ResponseMock(status_code=500, json_data={}))
-def test_reservation__create__max_reservations_per_user__other_reservation_created_at_the_same_time(graphql, settings):
-    settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
-
+def test_reservation__create__max_reservations_per_user__other_reservation_created_at_the_same_time(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
-    user = UserFactory.create_profile_user()
-    graphql.force_login(user)
+    user = graphql.login_with_regular_user()
 
     begin = next_hour(plus_hours=1)
     end = begin + datetime.timedelta(hours=1)
 
     other_reservation: Reservation | None = None
 
-    def create_other_reservation(*args: Any, **kwargs: Any) -> str:
+    # The new reservation is saved after validation and before the second max reservations check.
+    # Saving the other reservation here makes it look as if another request saved it at the same moment.
+    def create_other_reservation(instance: Reservation, created: bool, **kwargs: Any) -> None:
         nonlocal other_reservation
+        if not created or instance.begins_at != begin:
+            return
+
         other_reservation = ReservationFactory.create(
             begins_at=begin + datetime.timedelta(hours=1),
             ends_at=end + datetime.timedelta(hours=1),
@@ -530,12 +532,14 @@ def test_reservation__create__max_reservations_per_user__other_reservation_creat
             reservation_unit=reservation_unit,
             user=user,
         )
-        return "foo"
 
     data = get_create_data(reservation_unit, begins_at=begin, ends_at=end)
 
-    with patch_method(HelsinkiProfileClient.get_token, side_effect=create_other_reservation):
+    post_save.connect(create_other_reservation, sender=Reservation)
+    try:
         response = graphql(CREATE_MUTATION, input_data=data)
+    finally:
+        post_save.disconnect(create_other_reservation, sender=Reservation)
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == [
@@ -1063,6 +1067,11 @@ def test_reservation__create__reservation_block_whole_day__back_to_back_whole_da
 
     response = graphql(CREATE_MUTATION, input_data=input_data)
     assert response.has_errors is False, response.errors
+
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    assert reservation.begins_at == datetime.datetime(2021, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.ends_at == datetime.datetime(2021, 1, 3, hour=0, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.state == ReservationStateChoice.CREATED
 
 
 @freezegun.freeze_time("2021-01-01 12:00")

@@ -107,11 +107,8 @@ def test_reservation_series__cancel_section_series__update_statistics(graphql, s
     future_statistics = ReservationStatistic.objects.filter(begin__gt=local_datetime())
     past_statistics = ReservationStatistic.objects.filter(begin__lte=local_datetime())
 
-    assert future_statistics.count() == 5
-    assert all(statistic.state == ReservationStateChoice.CANCELLED for statistic in future_statistics)
-
-    assert past_statistics.count() == 4
-    assert all(statistic.state != ReservationStateChoice.CANCELLED for statistic in past_statistics)
+    assert [statistic.state for statistic in future_statistics] == [ReservationStateChoice.CANCELLED] * 5
+    assert [statistic.state for statistic in past_statistics] == [ReservationStateChoice.CONFIRMED] * 4
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))

@@ -61,7 +61,7 @@ def test_reservation_series__add_reservation__last_reservation_denied(graphql):
     graphql.login_with_superuser()
     response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, input_data=data)
 
-    assert response.has_errors is False
+    assert response.has_errors is False, response
 
     reservation: Reservation = series.reservations.order_by("pk").last()
     assert reservation.state == ReservationStateChoice.CONFIRMED
