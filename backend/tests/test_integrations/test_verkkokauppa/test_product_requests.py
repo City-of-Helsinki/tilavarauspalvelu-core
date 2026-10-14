@@ -20,7 +20,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, exact, patch_method
 
 create_product_params = CreateProductParams(
     namespace="test-namespace",
@@ -66,6 +66,8 @@ create_or_update_accounting_response = {
     "mainLedgerAccount": "555555",
     "balanceProfitCenter": "666666",
 }
+
+bad_request_response = {"errors": [{"code": "bad-request", "message": "Bad request"}]}
 
 
 @patch_method(VerkkokauppaAPIClient.request)
@@ -116,6 +118,16 @@ def test__create_product__raises_exception_if_status_code_is_not_201():
     assert SentryLogger.log_message.call_count == 1
 
 
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=400, json_data=bad_request_response),
+)
+def test__create_product__raises_exception_on_client_error_status_code():
+    msg = "Product creation failed: [{'code': 'bad-request', 'message': 'Bad request'}]"
+    with pytest.raises(CreateProductError, match=exact(msg)):
+        VerkkokauppaAPIClient.create_product(params=create_product_params)
+
+
 @patch_method(VerkkokauppaAPIClient.request, side_effect=Timeout())
 def test__create_product__raises_exception_on_timeout():
     with pytest.raises(CreateProductError):
@@ -161,6 +173,19 @@ def test__create_or_update_accounting__raises_exception_if_status_code_is_not_20
         )
 
     assert SentryLogger.log_message.call_count == 1
+
+
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=400, json_data=bad_request_response),
+)
+def test__create_or_update_accounting__raises_exception_on_client_error_status_code():
+    msg = "Creating or updating accounting failed: [{'code': 'bad-request', 'message': 'Bad request'}]"
+    with pytest.raises(CreateOrUpdateAccountingError, match=exact(msg)):
+        VerkkokauppaAPIClient.create_or_update_accounting(
+            product_uuid=uuid.UUID("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5"),
+            params=create_or_update_account_params,
+        )
 
 
 @patch_method(VerkkokauppaAPIClient.request, side_effect=Timeout())

@@ -5,9 +5,14 @@ from typing import Any
 
 import pytest
 from django.conf import settings
+from requests import Timeout
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.integrations.verkkokauppa.merchants.exceptions import CreateMerchantError, UpdateMerchantError
+from tilavarauspalvelu.integrations.verkkokauppa.merchants.exceptions import (
+    CreateMerchantError,
+    GetMerchantError,
+    UpdateMerchantError,
+)
 from tilavarauspalvelu.integrations.verkkokauppa.merchants.types import (
     CreateMerchantParams,
     Merchant,
@@ -16,7 +21,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.merchants.types import (
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, exact, patch_method
 
 create_merchant_params: CreateMerchantParams = CreateMerchantParams(
     name="Test Merchant",
@@ -93,6 +98,8 @@ get_merchant_response: dict[str, Any] = {
     "merchantShopId": "test-shop-id",
 }
 
+bad_request_response: dict[str, Any] = {"errors": [{"code": "bad-request", "message": "Bad request"}]}
+
 
 @patch_method(VerkkokauppaAPIClient.request)
 def test__create_merchant__makes_valid_request_returns_merchant():
@@ -138,6 +145,16 @@ def test__create_merchant__raises_exception_if_status_code_is_not_201():
         VerkkokauppaAPIClient.create_merchant(params=create_merchant_params)
 
     assert SentryLogger.log_message.call_count == 1
+
+
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=400, json_data=bad_request_response),
+)
+def test__create_merchant__raises_exception_on_client_error_status_code():
+    msg = "Merchant creation failed: [{'code': 'bad-request', 'message': 'Bad request'}]"
+    with pytest.raises(CreateMerchantError, match=exact(msg)):
+        VerkkokauppaAPIClient.create_merchant(params=create_merchant_params)
 
 
 @patch_method(VerkkokauppaAPIClient.request)
@@ -201,6 +218,19 @@ def test__update_merchant__raises_exception_if_status_code_is_not_200():
     assert SentryLogger.log_message.call_count == 1
 
 
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=400, json_data=bad_request_response),
+)
+def test__update_merchant__raises_exception_on_client_error_status_code():
+    msg = "Merchant update failed: [{'code': 'bad-request', 'message': 'Bad request'}]"
+    with pytest.raises(UpdateMerchantError, match=exact(msg)):
+        VerkkokauppaAPIClient.update_merchant(
+            merchant_uuid=uuid.UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
+            params=update_merchant_params,
+        )
+
+
 @patch_method(VerkkokauppaAPIClient.request)
 def test__update_merchant__raises_exception_if_status_code_is_404():
     VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=404, json_data={})
@@ -233,3 +263,23 @@ def test__get_merchant__returns_none():
 
     merchant = VerkkokauppaAPIClient.get_merchant(merchant_uuid=uuid.UUID("0312c2f7-3ed6-409e-84e3-ae21196e685d"))
     assert merchant is None
+
+
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=400, json_data=bad_request_response),
+)
+def test__get_merchant__raises_exception_if_status_code_is_not_200():
+    msg = (
+        "Fetching merchant 0312c2f7-3ed6-409e-84e3-ae21196e685d failed: "
+        "[{'code': 'bad-request', 'message': 'Bad request'}]"
+    )
+    with pytest.raises(GetMerchantError, match=exact(msg)):
+        VerkkokauppaAPIClient.get_merchant(merchant_uuid=uuid.UUID("0312c2f7-3ed6-409e-84e3-ae21196e685d"))
+
+
+@patch_method(VerkkokauppaAPIClient.request, side_effect=Timeout("Read timed out"))
+def test__get_merchant__raises_exception_on_timeout():
+    msg = "Fetching merchant 0312c2f7-3ed6-409e-84e3-ae21196e685d failed: Read timed out"
+    with pytest.raises(GetMerchantError, match=exact(msg)):
+        VerkkokauppaAPIClient.get_merchant(merchant_uuid=uuid.UUID("0312c2f7-3ed6-409e-84e3-ae21196e685d"))
