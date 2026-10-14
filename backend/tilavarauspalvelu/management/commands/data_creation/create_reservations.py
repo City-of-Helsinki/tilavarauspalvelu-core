@@ -29,6 +29,7 @@ from tilavarauspalvelu.models import (
 )
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
+    datetime_difference,
     get_date_range,
     get_periods_between,
     local_date,
@@ -862,6 +863,8 @@ def _create_reservations_for_series(
         for begin, end in periods:
             buffer_time_before = series.reservation_unit.actions.get_actual_before_buffer(begin)
             buffer_time_after = series.reservation_unit.actions.get_actual_after_buffer(end)
+            duration = datetime_difference(start_datetime=begin, end_datetime=end)
+            price = pricing.actions.calculate_reservation_price(duration=duration)
 
             reservation = (
                 ReservationBuilder()
@@ -884,7 +887,7 @@ def _create_reservations_for_series(
                     confirmed_at=local_datetime(),
                     created_at=local_datetime(),
                     #
-                    price=pricing.actions.calculate_reservation_price(duration=end - begin),
+                    price=price,
                     non_subsidised_price=pricing.highest_price,
                     unit_price=pricing.highest_price,
                     tax_percentage_value=pricing.tax_percentage.value,
