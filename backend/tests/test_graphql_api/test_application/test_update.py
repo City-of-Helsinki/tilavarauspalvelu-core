@@ -52,6 +52,7 @@ def test_update_application__applicant__resets_sent_at(graphql):
     assert response.has_errors is False, response
 
     application = Application.objects.get(pk=application.pk)
+    assert application.additional_information == "bar"
     assert application.sent_at is None
 
 
