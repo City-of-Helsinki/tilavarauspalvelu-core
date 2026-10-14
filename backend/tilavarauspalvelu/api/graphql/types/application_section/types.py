@@ -178,7 +178,7 @@ class ApplicationSectionNode(DjangoNode):
         has_perms = user.permissions.can_manage_application(root.application, reserver_needs_role=True)
 
         # Sections can be reached through other nodes that don't filter them by owner, e.g. allocated time slots.
-        if not has_perms and user != root.application.user:
+        if not has_perms and user.pk != root.application.user_id:
             return None
 
         # Don't show Pindora info without permissions if the application round results haven't been sent yet
