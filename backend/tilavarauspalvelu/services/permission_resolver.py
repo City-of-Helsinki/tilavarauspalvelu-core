@@ -35,11 +35,16 @@ class PermissionResolver:
     ...     ...
     """
 
+    user: AnyUser
+
     def __get__(self, instance: AnyUser | None, owner: type[User]) -> Self:
         if instance is None:
             return self
-        self.user = instance
-        return self
+
+        # A new resolver for each access, so that two users never share one resolver.
+        resolver = type(self)()
+        resolver.user = instance
+        return resolver
 
     # Base checks
 
