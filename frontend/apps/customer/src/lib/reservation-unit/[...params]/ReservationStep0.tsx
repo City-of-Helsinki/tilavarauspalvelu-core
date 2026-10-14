@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useForm, FormProvider, useWatch } from "react-hook-form";
 import type { UseFormReturn, FieldValues } from "react-hook-form";
-import { Trans, useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonVariant, IconArrowRight, IconCross, LoadingSpinner } from "hds-react";
+import { Trans, useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { ErrorListBox } from "@ui/components/ErrorListBox";

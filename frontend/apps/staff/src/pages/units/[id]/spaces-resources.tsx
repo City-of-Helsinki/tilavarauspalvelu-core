@@ -1,9 +1,9 @@
 import React, { createRef } from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonVariant, IconPlusCircleFill } from "hds-react";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import styled from "styled-components";
 import { errorToast } from "ui/src/components/toast";
 import { createNodeId, toNumber, ignoreMaybeArray } from "ui/src/modules/helpers";

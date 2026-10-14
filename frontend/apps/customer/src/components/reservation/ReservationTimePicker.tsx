@@ -1,9 +1,9 @@
 import React, { Children, cloneElement, useEffect, useMemo, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useMedia } from "react-use";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { addMinutes, differenceInMinutes } from "date-fns";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { getEventBuffers } from "@ui/components/calendar/utils";
 import { Calendar } from "ui/src/components/calendar/Calendar";

@@ -1,14 +1,14 @@
 import React, { useRef } from "react";
 import type { ReactNode } from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, IconArrowRedo, IconCross, LoadingSpinner, Tag } from "hds-react";
 import { isEqual, trim } from "lodash-es";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import styled from "styled-components";
 import type { ApolloQueryResult } from "@apollo/client";
+import type { TFunction } from "next-i18next/pages";
 import { logError } from "@ui/modules/errors";
 import { ApplicationTimePreview } from "ui/src/components/ApplicationTimePreview";
 import { ApplicationStatusLabel } from "ui/src/components/statuses";

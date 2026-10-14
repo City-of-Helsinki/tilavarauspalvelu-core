@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { ApolloError, gql } from "@apollo/client";
 import { IconCalendarEvent, IconClock, IconLocation, IconTrash } from "hds-react";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { Card } from "ui/src/components";

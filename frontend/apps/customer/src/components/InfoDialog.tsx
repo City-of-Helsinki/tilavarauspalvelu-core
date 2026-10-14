@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, Dialog, IconInfoCircleFill } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { Sanitize } from "ui/src/components/Sanitize";
 
 type Props = {

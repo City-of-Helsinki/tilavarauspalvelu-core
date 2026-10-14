@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import {
   Button,
@@ -14,6 +13,7 @@ import {
 import { getName as getCountryName, registerLocale as registerCountryLocale } from "i18n-iso-countries";
 import countriesJson from "i18n-iso-countries/langs/fi.json";
 import { trim } from "lodash-es";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { getApiErrors } from "@ui/modules/apollo/helpers";
 import { breakpoints } from "@ui/modules/const";

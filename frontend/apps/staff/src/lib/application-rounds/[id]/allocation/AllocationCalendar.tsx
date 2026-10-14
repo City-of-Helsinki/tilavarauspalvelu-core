@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useTranslation } from "next-i18next";
 import { IconCheck, IconCross } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled, { css } from "styled-components";
 import { logError } from "@ui/modules/errors";
 import { breakpoints, WEEKDAYS } from "ui/src/modules/const";

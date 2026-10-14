@@ -1,8 +1,8 @@
 import React, { Fragment } from "react";
 import { Controller, useFieldArray } from "react-hook-form";
 import type { UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, Checkbox, IconMinus, IconPlus } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled, { css } from "styled-components";
 import { logError } from "@ui/modules/errors";
 import { IconButton } from "ui/src/components";

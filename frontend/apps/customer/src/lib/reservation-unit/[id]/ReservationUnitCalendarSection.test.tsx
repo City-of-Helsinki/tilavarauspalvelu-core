@@ -6,7 +6,7 @@ import type { ReservationQuotaReachedFragment, ReservationUnitPageQuery } from "
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { ReservationUnitCalendarSection, isReservationQuotaReached } from "./ReservationUnitCalendarSection";
 
-vi.mock("next-i18next", () => ({
+vi.mock("next-i18next/pages", () => ({
   useTranslation: vi.fn(() => ({
     t: vi.fn((key, opts) => (opts?.title ? `${key}: ${opts.title}` : key)),
     i18n: { language: "fi" },

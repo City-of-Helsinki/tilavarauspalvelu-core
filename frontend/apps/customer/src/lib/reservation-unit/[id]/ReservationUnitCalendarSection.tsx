@@ -1,8 +1,8 @@
 import React from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Notification } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { Flex, H4 } from "ui/src/styled";
 import type { ReservationQuotaReachedFragment, ReservationUnitNode, ReservationUnitPageQuery } from "@gql/gql-types";

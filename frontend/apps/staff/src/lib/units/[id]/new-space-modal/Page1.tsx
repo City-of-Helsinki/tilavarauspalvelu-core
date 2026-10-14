@@ -1,8 +1,8 @@
 import React from "react";
 import { Controller } from "react-hook-form";
 import type { UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, Dialog, IconArrowRight } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { H4 } from "ui/src/styled";
 import type { UnitPageQuery } from "@gql/gql-types";
 import { DialogActionsButtons } from "@/styled";

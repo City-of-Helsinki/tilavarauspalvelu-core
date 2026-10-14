@@ -1,8 +1,8 @@
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { Link, LinkSize } from "hds-react";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { H1, HR } from "ui/src/styled";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";

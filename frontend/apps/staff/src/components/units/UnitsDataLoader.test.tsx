@@ -9,7 +9,7 @@ import { UnitListDocument } from "@gql/gql-types";
 import type { UnitTableElementFragment } from "@gql/gql-types";
 import { UnitsDataLoader } from "./UnitsDataLoader";
 
-vi.mock("next-i18next", () => ({
+vi.mock("next-i18next/pages", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),

@@ -1,9 +1,9 @@
 import React from "react";
 import type { ReactElement } from "react";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { ShowAllContainer } from "@ui/components";
 import { ReservationFormGeneralSection, ReservationFormReserveeSection } from "@ui/components/reservation-form";

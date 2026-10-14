@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { AllocatedSectionsTableElementFragment } from "@gql/gql-types";
 import { AllocatedSectionsTable } from "./AllocatedSectionsTable";
 
-vi.mock("next-i18next", () => ({
+vi.mock("next-i18next/pages", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),

@@ -1,9 +1,9 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconClock, IconGroup, IconEuroSign, IconHome, IconSize, IconLock, Tooltip } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
+import type { TFunction } from "next-i18next/pages";
 import { Sanitize } from "@ui/components/Sanitize";
 import { breakpoints } from "ui/src/modules/const";
 import { formatDateRange, formatDateTime, formatDuration, formatDate } from "ui/src/modules/date-utils";

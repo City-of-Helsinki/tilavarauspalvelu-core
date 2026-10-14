@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { StepState } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import type { ReadonlyDeep } from "ui/src/modules/helpers";
 import type { ApplicationFormFragment } from "@gql/gql-types";

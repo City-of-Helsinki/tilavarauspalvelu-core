@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonVariant, LoadingSpinner, Notification, TextInput } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import styled from "styled-components";

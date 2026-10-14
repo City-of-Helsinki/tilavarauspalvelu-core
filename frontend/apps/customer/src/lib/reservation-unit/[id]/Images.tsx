@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
-import { useTranslation } from "next-i18next";
 import { Dialog } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";
 import { getImageSource } from "ui/src/modules/helpers";

@@ -1,7 +1,7 @@
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import styled from "styled-components";
 import { H2 } from "ui/src/styled";
 import { KorosHeading, Heading } from "@/components/KorosHeading";

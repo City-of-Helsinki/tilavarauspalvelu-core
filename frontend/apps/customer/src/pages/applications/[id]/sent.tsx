@@ -1,9 +1,9 @@
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconAngleRight } from "hds-react";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import styled from "styled-components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";

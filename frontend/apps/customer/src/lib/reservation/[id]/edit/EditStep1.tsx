@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonVariant, IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import ErrorComponent from "next/error";
 import { useRouter } from "next/router";
 import styled from "styled-components";

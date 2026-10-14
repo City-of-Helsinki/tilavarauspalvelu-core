@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { startOfDay } from "date-fns/startOfDay";
 import { Button, ButtonSize, ButtonVariant, Checkbox, DateInput, TextInput } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { ConfirmationDialog } from "ui/src/components/ConfirmationDialog";
 import { ControlledNumberInput, ControlledSelect } from "ui/src/components/form";
 import { formatDate, formatDateRange, parseApiDate } from "ui/src/modules/date-utils";

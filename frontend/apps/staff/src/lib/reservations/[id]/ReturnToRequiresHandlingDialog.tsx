@@ -1,8 +1,8 @@
 import React from "react";
 import type { RefObject } from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonVariant, Dialog, IconInfoCircle } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";
 import { useRequireHandlingMutation } from "@gql/gql-types";

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import type { HTMLAttributes } from "react";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import styled, { css } from "styled-components";
+import type { TFunction } from "next-i18next/pages";
 import type { RuleSet } from "styled-components";
 import type { Weekday } from "../../gql/gql-types";
 import { isTouchDevice } from "../modules/browserHelpers";

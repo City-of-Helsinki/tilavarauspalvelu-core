@@ -1,10 +1,10 @@
 import React from "react";
 import { createPortal } from "react-dom";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Notification, NotificationSize } from "hds-react";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import {
   createNodeId,

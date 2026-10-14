@@ -4,7 +4,7 @@ import type { GetServerSidePropsContext } from "next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Sentry from "@sentry/nextjs";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useRouter } from "next/router";
 import { useDisplayError } from "ui/src/hooks";
 import { createNodeId, ignoreMaybeArray, toNumber } from "ui/src/modules/helpers";

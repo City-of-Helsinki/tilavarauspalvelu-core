@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { formatDurationRange, formatDateTime, parseValidDateObject } from "ui/src/modules/date-utils";
 import { getLocalizationLang } from "ui/src/modules/helpers";

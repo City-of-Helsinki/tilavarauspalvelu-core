@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
-import { useTranslation } from "next-i18next";
 import { Notification } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { ButtonLikeLink } from "@ui/components/ButtonLikeLink";
 import { formatters as getFormatters } from "@ui/index";

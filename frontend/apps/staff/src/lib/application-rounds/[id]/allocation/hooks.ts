@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useTranslation } from "next-i18next";
 import { ApolloError, gql } from "@apollo/client";
+import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import type { ApolloQueryResult } from "@apollo/client";
 import { logError } from "@ui/modules/errors";

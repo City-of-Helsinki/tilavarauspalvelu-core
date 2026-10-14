@@ -11,7 +11,7 @@ import { RejectedOccurrencesDocument } from "@gql/gql-types";
 import type { RejectedOccurrencesTableElementFragment } from "@gql/gql-types";
 import { RejectedOccurrencesDataLoader } from "./RejectedOccurrencesDataLoader";
 
-vi.mock("next-i18next", () => ({
+vi.mock("next-i18next/pages", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),

@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation } from "react-use";
-import { useTranslation } from "next-i18next";
 import { Header, IconLinkExternal, IconSignout, IconStar, IconUser, LogoSize, TitleStyleType } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { Logo } from "ui/src/components/Logo";

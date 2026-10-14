@@ -1,8 +1,8 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { ButtonVariant, IconArrowRight, IconCross, IconEuroSign, IconLock } from "hds-react";
 import { trim } from "lodash-es";
+import { useTranslation } from "next-i18next/pages";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { Card } from "ui/src/components/Card";
 import { ReservationStatusLabel, OrderStatusLabel } from "ui/src/components/statuses";

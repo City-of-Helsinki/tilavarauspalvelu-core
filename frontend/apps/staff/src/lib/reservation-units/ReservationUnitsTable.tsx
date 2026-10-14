@@ -1,10 +1,10 @@
 import React from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconInfoCircle, IconLinkExternal, IconSize } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
+import type { TFunction } from "next-i18next/pages";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import {
   ReservationUnitPublishingStatusLabel,

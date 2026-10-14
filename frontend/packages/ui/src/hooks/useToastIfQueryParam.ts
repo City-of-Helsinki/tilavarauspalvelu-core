@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import { toast } from "../components/toast";
 

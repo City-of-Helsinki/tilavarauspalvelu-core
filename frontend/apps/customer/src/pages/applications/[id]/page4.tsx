@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant, IconArrowLeft, LoadingSpinner } from "hds-react";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";

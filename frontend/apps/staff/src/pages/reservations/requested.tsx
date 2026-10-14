@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useSearchParams } from "next/navigation";
 import { formatDate } from "ui/src/modules/date-utils";
 import { H1, HR } from "ui/src/styled";

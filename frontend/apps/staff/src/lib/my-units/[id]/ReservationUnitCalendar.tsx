@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import { gql } from "@apollo/client";
 import { addDays, addHours, addMinutes, endOfISOWeek, startOfDay, startOfISOWeek } from "date-fns";
 import { get } from "lodash-es";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
+import type { TFunction } from "next-i18next/pages";
 import { getBuffersFromEvents, isCellOverlappingSpan } from "@ui/components/calendar/utils";
 import type { ReservationEventType, TimeSpanType } from "@ui/components/calendar/utils";
 import type { ReservableTimeSpanType } from "ui/gql/gql-types";

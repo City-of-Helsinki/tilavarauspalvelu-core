@@ -7,7 +7,7 @@ import type { ReservationUnitMoreDetailsFragment } from "@gql/gql-types";
 import { getFuturePricing, getPriceString } from "@/modules/reservationUnit";
 import { ReservationUnitMoreDetails } from "./ReservationUnitMoreDetails";
 
-vi.mock("next-i18next", async (importOriginal) => ({
+vi.mock("next-i18next/pages", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   useTranslation: () => ({
     t: (str: string, args: unknown) => `${str}${args ? " " + JSON.stringify(args) : ""}`,

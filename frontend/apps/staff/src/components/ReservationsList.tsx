@@ -1,8 +1,8 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { startOfDay } from "date-fns";
 import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { StatusLabel } from "ui/src/components/StatusLabel";
 import { formatDate } from "ui/src/modules/date-utils";

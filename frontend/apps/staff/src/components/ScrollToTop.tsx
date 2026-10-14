@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useTranslation } from "next-i18next";
 import { IconAngleUp } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { focusStyles } from "ui/src/styled";
 

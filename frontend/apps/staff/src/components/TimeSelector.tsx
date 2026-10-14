@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import { ApplicationTimeSelector } from "ui/src/components/ApplicationTimeSelector";
 import type { Cell } from "ui/src/components/ApplicationTimeSelector";
 import { WEEKDAYS } from "ui/src/modules/const";

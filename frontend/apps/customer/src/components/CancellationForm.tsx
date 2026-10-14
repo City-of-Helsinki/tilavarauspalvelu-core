@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { Button, ButtonVariant, IconCross, LoadingSpinner } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";
 import { ControlledSelect } from "ui/src/components/form";

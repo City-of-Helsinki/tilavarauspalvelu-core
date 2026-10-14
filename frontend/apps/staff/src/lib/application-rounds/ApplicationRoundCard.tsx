@@ -1,7 +1,7 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconArrowRight, IconCalendar, IconSize } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { Card } from "ui/src/components";
 import { ApplicationRoundStatusLabel } from "ui/src/components/statuses";

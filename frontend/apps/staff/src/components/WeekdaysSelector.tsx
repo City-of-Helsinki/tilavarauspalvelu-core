@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { WEEKDAYS_SORTED } from "ui/src/modules/const";
 import { Flex } from "ui/src/styled";

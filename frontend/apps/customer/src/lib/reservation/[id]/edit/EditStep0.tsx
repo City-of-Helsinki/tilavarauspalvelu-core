@@ -1,9 +1,9 @@
 import React from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
 import { Button, ButtonVariant, IconArrowRight, IconCross } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import ErrorComponent from "next/error";
 import styled from "styled-components";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";

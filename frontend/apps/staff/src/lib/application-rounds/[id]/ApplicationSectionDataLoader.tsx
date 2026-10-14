@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
+import { useTranslation } from "next-i18next/pages";
 import { errorToast } from "ui/src/components/toast";
 import { filterEmptyArray, filterNonNullable } from "ui/src/modules/helpers";
 import { CenterSpinner } from "ui/src/styled";

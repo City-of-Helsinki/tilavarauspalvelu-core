@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { Card } from "@ui/components";
 import { formatters as getFormatters } from "@ui/index";

@@ -1,7 +1,7 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconLocation } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { Flex, H1, fontMedium } from "ui/src/styled";
 import type { UnitSubpageHeadFragment } from "@gql/gql-types";

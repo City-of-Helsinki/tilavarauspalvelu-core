@@ -1,5 +1,5 @@
-import type { TFunction } from "next-i18next";
 import { describe, expect, it } from "vitest";
+import type { TFunction } from "next-i18next/pages";
 import {
   parseValidDateObject,
   formatTime,

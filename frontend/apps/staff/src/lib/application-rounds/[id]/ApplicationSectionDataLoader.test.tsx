@@ -8,7 +8,7 @@ import { ApplicationSectionsDocument } from "@gql/gql-types";
 import type { ApplicationSectionTableElementFragment } from "@gql/gql-types";
 import { ApplicationSectionDataLoader } from "./ApplicationSectionDataLoader";
 
-vi.mock("next-i18next", () => ({
+vi.mock("next-i18next/pages", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),

@@ -1,10 +1,10 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconLinkExternal, IconSize, Tooltip } from "hds-react";
 import { memoize } from "lodash-es";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
+import type { TFunction } from "next-i18next/pages";
 import { convertWeekday } from "ui/src/modules/conversion";
 import { timeToMinutes, formatTimeRange } from "ui/src/modules/date-utils";
 import type { AllocatedSectionsTableElementFragment } from "@gql/gql-types";

@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { IconLock } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { StatusLabel } from "../StatusLabel";
 
 export function AccessCodeStatusLabel(): React.ReactElement {

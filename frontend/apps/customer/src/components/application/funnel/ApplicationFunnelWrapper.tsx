@@ -1,7 +1,7 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
+import type { TFunction } from "next-i18next/pages";
 import { breakpoints } from "ui/src/modules/const";
 import type { ReadonlyDeep } from "ui/src/modules/helpers";
 import { H2, HR } from "ui/src/styled";

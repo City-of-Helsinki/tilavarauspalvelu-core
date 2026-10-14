@@ -1,10 +1,10 @@
 import React from "react";
 import { Controller, useWatch } from "react-hook-form";
 import type { Control, UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { addDays, startOfDay } from "date-fns";
 import { IconAlertCircleFill, RadioButton } from "hds-react";
 import { capitalize } from "lodash-es";
+import { useTranslation } from "next-i18next/pages";
 import dynamic from "next/dynamic";
 import styled from "styled-components";
 import {

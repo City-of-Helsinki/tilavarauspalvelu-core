@@ -1,6 +1,6 @@
 import React from "react";
 import type { CSSProperties } from "react";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { charCount } from "@ui/modules/helpers";
 import { fontBold } from "@ui/styled";

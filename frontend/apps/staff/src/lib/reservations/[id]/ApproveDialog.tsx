@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonVariant, Checkbox, Dialog, Notification, NumberInput, TextArea } from "hds-react";
 import { trim } from "lodash-es";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import { successToast } from "ui/src/components/toast";
 import { useDisplayError } from "ui/src/hooks";

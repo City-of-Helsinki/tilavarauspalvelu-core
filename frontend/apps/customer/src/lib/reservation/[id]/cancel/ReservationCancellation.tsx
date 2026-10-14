@@ -1,7 +1,7 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconClock, IconLocation } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import styled, { css } from "styled-components";
 import { getLocalizationLang, getTranslation } from "@ui/modules/helpers";

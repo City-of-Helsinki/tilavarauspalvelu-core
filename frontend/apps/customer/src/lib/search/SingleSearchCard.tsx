@@ -1,8 +1,8 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { isToday, isTomorrow, isValid } from "date-fns";
 import { IconArrowRight, IconEuroSign, IconGroup, IconHome, IconLock, IconSize } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import { Card, Tag } from "ui/src/components/";
 import { ButtonLikeLink } from "ui/src/components/ButtonLikeLink";

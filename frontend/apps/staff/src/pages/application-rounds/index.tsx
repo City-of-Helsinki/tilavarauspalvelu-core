@@ -1,10 +1,10 @@
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Accordion } from "hds-react";
 import { orderBy } from "lodash-es";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import styled from "styled-components";
 import { formatDate, parseValidDateObject } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";

@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
 import type { ApolloQueryResult } from "@apollo/client";
 import { formatDuration, timeToMinutes } from "ui/src/modules/date-utils";

@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import type { ApprovalButtonsFragment } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/components/ButtonLikeLink";
 import { DenyDialog } from "@/components/DenyDialog";

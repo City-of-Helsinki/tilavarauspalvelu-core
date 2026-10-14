@@ -1,7 +1,7 @@
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { Checkbox, Tooltip } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { Flex } from "ui/src/styled";
 
 type BufferControllerProps = {

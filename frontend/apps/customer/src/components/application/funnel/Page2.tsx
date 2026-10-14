@@ -1,7 +1,7 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant, IconArrowLeft, IconArrowRight } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import { filterNonNullable, getLocalizationLang, getTranslation } from "ui/src/modules/helpers";
 import { ButtonContainer } from "ui/src/styled";

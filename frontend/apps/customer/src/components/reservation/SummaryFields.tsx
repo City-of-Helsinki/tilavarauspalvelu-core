@@ -1,5 +1,5 @@
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
+import { useTranslation } from "next-i18next/pages";
+import type { TFunction } from "next-i18next/pages";
 import {
   getReservationFormReserveeFields,
   formContainsField,

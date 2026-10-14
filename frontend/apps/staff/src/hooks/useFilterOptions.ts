@@ -1,7 +1,7 @@
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import { gql } from "@apollo/client";
+import { useTranslation } from "next-i18next/pages";
 import type { InteropApolloQueryResult } from "@apollo/client";
+import type { TFunction } from "next-i18next/pages";
 import { filterNonNullable, sortAgeGroups } from "ui/src/modules/helpers";
 import {
   FilterOptionsDocument,

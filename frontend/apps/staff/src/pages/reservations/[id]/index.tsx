@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import type { ApolloQueryResult } from "@apollo/client";
 import { createNodeId, ignoreMaybeArray, isPriceFree, toNumber } from "ui/src/modules/helpers";
 import { ButtonContainer } from "ui/src/styled";

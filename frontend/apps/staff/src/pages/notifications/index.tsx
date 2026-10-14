@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import type { GetServerSidePropsContext } from "next";
-import { useTranslation } from "next-i18next";
-import type { TFunction } from "next-i18next";
 import { gql } from "@apollo/client";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next/pages";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
+import type { TFunction } from "next-i18next/pages";
 import { BannerNotificationStatusLabel } from "ui/src/components/statuses";
 import { formatDate, formatTime } from "ui/src/modules/date-utils";
 import { filterNonNullable } from "ui/src/modules/helpers";

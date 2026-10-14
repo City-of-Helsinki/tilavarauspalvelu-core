@@ -9,7 +9,7 @@ import { ReservationUnitOrderingChoices, SearchReservationUnitsDocument } from "
 import type { ReservationUnitTableElementFragment } from "@gql/gql-types";
 import { ReservationUnitsDataReader } from "./ReservationUnitsDataLoader";
 
-vi.mock("next-i18next", () => ({
+vi.mock("next-i18next/pages", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),

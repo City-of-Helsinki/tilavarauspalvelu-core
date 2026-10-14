@@ -1,7 +1,7 @@
 import React from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { useTranslation } from "next-i18next";
 import { TextInput } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { ControlledSelect } from "ui/src/components/form";
 import { filterNonNullable } from "ui/src/modules/helpers";
 import { AutoGrid, FullRow } from "ui/src/styled";

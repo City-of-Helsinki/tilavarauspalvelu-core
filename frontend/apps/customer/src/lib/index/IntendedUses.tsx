@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 import { useMedia } from "react-use";
-import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { IconArrowRight, IconSize } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import Link from "next/link";
 import styled from "styled-components";
 import { ShowAllContainer } from "ui/src/components";

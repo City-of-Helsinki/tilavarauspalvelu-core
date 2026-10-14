@@ -4,7 +4,7 @@ import type { GetServerSidePropsContext } from "next";
 import { gql } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uniq } from "lodash-es";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { useRouter } from "next/router";
 import { useDisplayError } from "ui/src/hooks";
 import { parseApiDate } from "ui/src/modules/date-utils";

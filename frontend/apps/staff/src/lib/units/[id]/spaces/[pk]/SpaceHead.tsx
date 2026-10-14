@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "next-i18next";
 import { IconGroup, IconLocation } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import Link from "next/link";
 import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";

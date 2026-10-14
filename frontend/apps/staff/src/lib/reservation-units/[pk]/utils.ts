@@ -1,5 +1,5 @@
 // For these fields only Fi has tooltips
-import type { TFunction } from "next-i18next";
+import type { TFunction } from "next-i18next/pages";
 
 export const getTranslatedTooltipTex = (t: TFunction, fieldName: string) => {
   if (fieldName === "reservationCancelledInstructionsFi") {

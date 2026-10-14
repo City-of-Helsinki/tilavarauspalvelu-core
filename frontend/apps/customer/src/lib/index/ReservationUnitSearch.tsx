@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useTranslation } from "next-i18next";
 import { IconSearch, TextInput } from "hds-react";
+import { useTranslation } from "next-i18next/pages";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { breakpoints } from "ui/src/modules/const";
