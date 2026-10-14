@@ -4,11 +4,18 @@ import datetime
 from collections import defaultdict
 
 import pytest
+from dateutil.relativedelta import relativedelta
 
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
-from tilavarauspalvelu.models import AffectingTimeSpan, Reservation, ReservationUnit, ReservationUnitHierarchy
-from utils.date_utils import DEFAULT_TIMEZONE, local_date
+from tilavarauspalvelu.models import (
+    AffectingTimeSpan,
+    Reservation,
+    ReservationStatistic,
+    ReservationUnit,
+    ReservationUnitHierarchy,
+)
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, ResourceFactory, SpaceFactory, UnitFactory
 
@@ -321,3 +328,41 @@ def test__get_affecting_reservations__resources_and_spaces():
         reservation_unit_8.pk,
         [],
     )
+
+
+# ── create_missing_statistics ──
+
+
+def test_reservation__create_missing_statistics__limit_and_batches():
+    reservation_1 = ReservationFactory.create()
+    reservation_2 = ReservationFactory.create()
+    reservation_3 = ReservationFactory.create()
+    reservation_4 = ReservationFactory.create()
+
+    Reservation.objects.filter(pk=reservation_1.pk).upsert_statistics()
+
+    Reservation.objects.create_missing_statistics(limit=2, batch_size=1)
+
+    reservation_pks = list(ReservationStatistic.objects.order_by("reservation").values_list("reservation", flat=True))
+
+    assert reservation_pks == [reservation_1.pk, reservation_2.pk, reservation_3.pk]
+
+    Reservation.objects.create_missing_statistics(limit=2, batch_size=1)
+
+    reservation_pks = list(ReservationStatistic.objects.order_by("reservation").values_list("reservation", flat=True))
+
+    assert reservation_pks == [reservation_1.pk, reservation_2.pk, reservation_3.pk, reservation_4.pk]
+
+
+def test_reservation__create_missing_statistics__skip_reservations_past_retention(settings):
+    settings.REMOVE_RESERVATION_STATS_OLDER_THAN_YEARS = 5
+
+    created_at = local_datetime() - relativedelta(years=5, days=1)
+    ReservationFactory.create(created_at=created_at)
+    reservation = ReservationFactory.create()
+
+    Reservation.objects.create_missing_statistics(limit=10, batch_size=10)
+
+    reservation_pks = list(ReservationStatistic.objects.values_list("reservation", flat=True))
+
+    assert reservation_pks == [reservation.pk]
