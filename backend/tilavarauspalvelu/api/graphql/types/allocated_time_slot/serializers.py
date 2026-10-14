@@ -139,7 +139,7 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
             raise ValidationError(msg, code=error_codes.ALLOCATION_APPLIED_RESERVATIONS_PER_WEEK_EXCEEDED)
 
     @staticmethod
-    def validate_times_are_multiples_of_15_minutes(begin_time: datetime.time, end_time: datetime.time) -> None:
+    def validate_times_are_multiples_of_15_minutes(*, begin_time: datetime.time, end_time: datetime.time) -> None:
         is_valid_begin_time = begin_time.minute % 15 == 0 and begin_time.second == 0 and begin_time.microsecond == 0
         is_valid_end_time = end_time.minute % 15 == 0 and end_time.second == 0 and end_time.microsecond == 0
 
