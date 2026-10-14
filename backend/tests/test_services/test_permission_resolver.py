@@ -22,6 +22,20 @@ pytestmark = [
 ]
 
 
+# ── Resolver per user ──
+
+
+def test_permission_resolver__resolver_stays_bound_to_its_user():
+    superuser = UserFactory.create_superuser()
+    regular_user = UserFactory.create()
+
+    superuser_permissions = superuser.permissions
+    regular_user_permissions = regular_user.permissions
+
+    assert superuser_permissions.can_manage_notifications() is True
+    assert regular_user_permissions.can_manage_notifications() is False
+
+
 # ── No permissions ──
 
 
