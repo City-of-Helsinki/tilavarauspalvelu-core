@@ -19,7 +19,7 @@ pytestmark = [
 # ── Reset application allocations ──
 
 
-def test_application_admin__reset_applications__in_allocation(api_client):
+def test_application_admin__reset_applications__deletes_allocations(api_client):
     admin = UserFactory.create_superuser()
     api_client.force_login(admin)
 

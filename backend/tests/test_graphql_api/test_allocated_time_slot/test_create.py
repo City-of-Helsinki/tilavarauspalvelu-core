@@ -232,9 +232,6 @@ def test_allocated_time_slot__create__approve_duration_shorter_than_section_mini
 
 
 def test_allocated_time_slot__create__approve_times_at_15_minute_steps(graphql):
-    # given:
-    # - There is an allocatable reservation unit option for a reservation unit with a 15 minute start interval
-    # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
@@ -242,14 +239,14 @@ def test_allocated_time_slot__create__approve_times_at_15_minute_steps(graphql):
     option.reservation_unit.save()
     graphql.login_with_superuser()
 
-    # when:
-    # - The user tries to make an allocation that begins and ends at a quarter past the hour
     input_data = allocation_create_data(option, begin_time=datetime.time(10, 15), end_time=datetime.time(11, 30))
     response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
-    # then:
-    # - The allocation is successful
     assert response.has_errors is False, response
+
+    slot = AllocatedTimeSlot.objects.get(reservation_unit_option=option)
+    assert slot.begin_time == datetime.time(10, 15)
+    assert slot.end_time == datetime.time(11, 30)
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -273,13 +270,11 @@ def test_allocated_time_slot__create__approve_times_not_multiple_of_15_minutes(g
     assert response.field_error_messages() == [
         "Allocation begin and end times must be multiples of 15 minutes.",
     ]
+    assert option.allocated_time_slots.count() == 0
 
 
 @pytest.mark.parametrize("force", [True, False])
 def test_allocated_time_slot__create__approve_begin_time_not_matching_start_interval(graphql, force):
-    # given:
-    # - There is an allocatable reservation unit option for a reservation unit with a 30 minute start interval
-    # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
@@ -287,8 +282,6 @@ def test_allocated_time_slot__create__approve_begin_time_not_matching_start_inte
     option.reservation_unit.save()
     graphql.login_with_superuser()
 
-    # when:
-    # - The user tries to make an allocation that begins at a quarter past the hour
     input_data = allocation_create_data(
         option,
         begin_time=datetime.time(10, 15),
@@ -297,11 +290,13 @@ def test_allocated_time_slot__create__approve_begin_time_not_matching_start_inte
     )
     response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
-    # then:
-    # - The response complains about the begin time not matching the start interval, even if forced
     assert response.field_error_messages() == [
         "Allocation begin time does not match the allowed start interval of the reservation unit.",
     ]
+    assert option.allocated_time_slots.count() == 0
+
+
+# ── Events per week ──
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -428,6 +423,7 @@ def test_allocated_time_slot__create__allocation_ends_at_midnight__outside_of_su
     assert response.field_error_messages() == [
         "Given time slot does not fit within applicants suitable time ranges.",
     ]
+    assert option.allocated_time_slots.count() == 0
 
 
 def test_allocated_time_slot__create__approved_time_falls_on_two_separated_wished_times(graphql):
@@ -627,6 +623,7 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation__ends_
             "with a related reservation unit or resource."
         ),
     ]
+    assert option.allocated_time_slots.count() == 0
 
 
 def test_allocated_time_slot__create__overlapping_with_another_allocation__sections_share_a_date(graphql):
@@ -658,6 +655,7 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation__secti
             "with a related reservation unit or resource."
         ),
     ]
+    assert option.allocated_time_slots.count() == 0
 
 
 def test_allocated_time_slot__create__overlapping_with_another_allocation_for_different_reservation_unit(graphql):

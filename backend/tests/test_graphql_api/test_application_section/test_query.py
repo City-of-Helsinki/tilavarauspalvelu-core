@@ -398,6 +398,7 @@ def test_application_section__query__pindora_info__through_allocation__viewer_in
 
     assert response.has_errors is False, response.errors
 
+    assert len(response.edges) == 1
     assert response.node(0)["reservationUnitOption"]["applicationSection"]["pindoraInfo"] is None
 
 
