@@ -458,4 +458,8 @@ class ReservationManager(SerializableModelManagerMixin, ModelManager[Reservation
             try:
                 self.model.objects.filter(pk__in=batch).upsert_statistics()
             except IntegrityError as error:
-                SentryLogger.log_exception(error, details="Failed to create missing reservation statistics.")
+                SentryLogger.log_exception(
+                    error,
+                    details="Failed to create missing reservation statistics.",
+                    reservation_pks=list(batch),
+                )
