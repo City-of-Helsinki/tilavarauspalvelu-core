@@ -49,9 +49,9 @@ class ReservableTimeSpanFirstReservableTimeHelper:
         if not normalised_time_spans:
             return ReservableTimeOutput(is_closed=True, first_reservable_time=None)
 
-        # If we know the reservation unit is open, we can exit early if reservation unit
-        # max duration is shorter than given minimum duration (we will never find a slot).
-        if not self.parent.is_reservation_unit_closed and self.parent.is_reservation_unit_max_duration_too_short:
+        # The reservation unit is open here. If its maximum duration is shorter than
+        # the minimum duration, no reservation fits in any time span.
+        if self.parent.is_reservation_unit_max_duration_too_short:
             return ReservableTimeOutput(is_closed=False, first_reservable_time=None)
 
         # Next, remove all soft-closed time spans from the reservable time span.
