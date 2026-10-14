@@ -21,6 +21,9 @@ pytestmark = [
 ]
 
 
+# ── Create ──
+
+
 def test_reservation_unit__create(graphql):
     unit = UnitFactory.create()
     graphql.login_with_superuser()
@@ -38,6 +41,9 @@ def test_reservation_unit__create(graphql):
     reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
     assert reservation_unit.is_draft is True
     assert reservation_unit.unit == unit
+
+
+# ── Spaces and resources of other units ──
 
 
 def test_reservation_unit__create__unit_admin__space_of_other_unit(graphql):
@@ -70,6 +76,9 @@ def test_reservation_unit__create__unit_admin__resource_of_other_unit(graphql):
     ]
 
     assert ReservationUnit.objects.exists() is False
+
+
+# ── Hauki ──
 
 
 @patch_method(HaukiAPIClient.get_resource, return_value=HaukiAPIResource(id=123))
@@ -149,6 +158,9 @@ def test_reservation_unit__create__send_to_hauki__failed(graphql, settings):
     assert reservation_unit.origin_hauki_resource is None  # Unit doesn't have origin hauki resource
 
 
+# ── Fields ──
+
+
 def test_reservation_unit__create__empty_name(graphql):
     unit = UnitFactory.create()
     graphql.login_with_superuser()
@@ -198,6 +210,9 @@ def test_reservation_unit__create__instructions(graphql):
     assert reservation_unit.reservation_cancelled_instructions_fi == "Cancelled instructions fi"
     assert reservation_unit.reservation_cancelled_instructions_sv == "Cancelled instructions sv"
     assert reservation_unit.reservation_cancelled_instructions_en == "Cancelled instructions en"
+
+
+# ── Non-draft ──
 
 
 def test_reservation_unit__create__non_draft(graphql):
@@ -334,7 +349,7 @@ def test_reservation_unit__create__non_draft__reservation_kind_defaults_to_direc
     assert reservation_unit.reservation_kind == ReservationKind.DIRECT_AND_SEASON
 
 
-# Min/Max Reservation Duration #########################################################################################
+# ── Min and max reservation duration ──
 
 
 def test_reservation_unit__create__min_max_reservation_duration__valid(graphql):
@@ -390,7 +405,7 @@ def test_reservation_unit__create__min_max_reservation_duration__not_multiple_of
     assert ReservationUnit.objects.count() == 0
 
 
-# Timeslots ############################################################################################################
+# ── Timeslots ──
 
 
 def test_reservation_unit__create__with_timeslots(graphql):
@@ -640,6 +655,9 @@ def test_reservation_unit__create__with_timeslots__closed_has_reservable_times(g
     assert response.field_error_messages("applicationRoundTimeSlots") == [
         "Closed timeslots cannot have reservable times.",
     ]
+
+
+# ── Reservation block whole day ──
 
 
 def test_reservation_unit__create__reservation_block_whole_day(graphql):

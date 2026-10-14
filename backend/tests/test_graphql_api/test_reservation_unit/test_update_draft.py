@@ -34,6 +34,9 @@ def setUpTestData():
     AuditLogger.register(ReservationUnit)
 
 
+# ── Fields ──
+
+
 def test_reservation_unit__update__name(graphql):
     graphql.login_with_superuser()
 
@@ -168,6 +171,9 @@ def test_reservation_unit__update__errors_with_empty_name(graphql):
     assert reservation_unit.name_fi != ""
 
 
+# ── Unit ──
+
+
 def test_reservation_unit__update__unit_admin__move_to_other_unit(graphql):
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     original_unit = reservation_unit.unit
@@ -206,10 +212,17 @@ def test_reservation_unit__update__unit_admin__same_unit(graphql):
     admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
     graphql.force_login(admin)
 
-    data = get_draft_update_input_data(reservation_unit, unit=reservation_unit.unit.pk)
+    data = get_draft_update_input_data(reservation_unit, unit=reservation_unit.unit.pk, nameFi="foo")
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
+
+    updated_reservation_unit = ReservationUnit.objects.get(pk=reservation_unit.pk)
+    assert updated_reservation_unit.name_fi == "foo"
+    assert updated_reservation_unit.unit == reservation_unit.unit
+
+
+# ── Spaces and resources ──
 
 
 def test_reservation_unit__update__unit_admin__space_of_own_unit(graphql):
@@ -307,6 +320,9 @@ def test_reservation_unit__update__unit_admin__resource_without_space(graphql):
 
     reservation_unit = ReservationUnit.objects.get(pk=reservation_unit.pk)
     assert list(reservation_unit.resources.all()) == []
+
+
+# ── Publish ──
 
 
 def test_reservation_unit__update__publish(graphql):
