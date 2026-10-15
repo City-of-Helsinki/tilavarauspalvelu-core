@@ -33,7 +33,7 @@
     "@graphql-codegen/typescript-react-apollo": "^5.0.0",
     "@graphql-tools/graphql-tag-pluck": "^8.3.39",
     "@parcel/watcher": "^2.6.0",
-    "glob": "^13.0.0",
+    "glob": "^13.0.6",
     "graphql-config": "^5.1.7",
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
