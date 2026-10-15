@@ -76,7 +76,7 @@ class ReservationCancellationSerializer(NestingModelSerializer[Reservation, Rese
 
     def update(self, instance: Reservation, validated_data: ReservationCancellationData) -> Reservation:
         with transaction.atomic():
-            instance = super().update(instance=instance, validated_data=validated_data)
+            super().update(instance=instance, validated_data=validated_data)
 
             if instance.access_type == AccessType.ACCESS_CODE:
                 with (
