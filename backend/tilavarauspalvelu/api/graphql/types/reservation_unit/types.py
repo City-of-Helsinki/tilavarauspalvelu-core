@@ -368,6 +368,9 @@ class ReservationUnitNode(DjangoNode[ReservationUnit, AnyUser]):
         if root.origin_hauki_resource is None:
             return None
 
+        if info.context.user.is_anonymous:
+            return None
+
         return generate_hauki_link(
             reservation_unit_uuid=root.ext_uuid,
             user_email=info.context.user.email,
