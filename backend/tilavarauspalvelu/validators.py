@@ -37,9 +37,9 @@ class TimeSlotSerializer(serializers.Serializer):
 def validate_reservable_times(input_data: list[dict[str, Any]]) -> None:
     serializer = TimeSlotSerializer(data=input_data, many=True)
     if not serializer.is_valid():
-        raise ValidationError(serializer._errors)
+        raise ValidationError(serializer.errors)
 
-    errors: list[str] = []
+    errors: list[list[ValidationError]] = []
     timeslots: list[TimeSlot] = serializer.validated_data
 
     try:

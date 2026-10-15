@@ -74,7 +74,7 @@ class CreateOrUpdateAccountingParams:
     product_invoicing: ProductInvoicingParams
 
     def to_json(self) -> dict[str, Any]:
-        json = {
+        json: dict[str, Any] = {
             "vatCode": self.vat_code,
             "companyCode": self.company_code,
             "mainLedgerAccount": self.main_ledger_account,

@@ -20,6 +20,8 @@ from tilavarauspalvelu.tasks import save_personal_info_view_log_task
 from utils.date_utils import DEFAULT_TIMEZONE, utc_datetime
 
 if TYPE_CHECKING:
+    import uuid
+
     from django.db import models
     from django.http import HttpResponse
 
@@ -270,11 +272,11 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
             user.actions.anonymize()
 
     @admin.display(description=_("Statistics UUID"))
-    def statistics_uuid(self, user: User) -> str:
+    def statistics_uuid(self, user: User) -> uuid.UUID:
         return user.tvp_uuid
 
     @admin.display(description=_("GDPR UUID"))
-    def gdpr_uuid(self, user: User) -> str:
+    def gdpr_uuid(self, user: User) -> uuid.UUID:
         return user.uuid
 
     @admin.display(description=_("Issuer (iss)"))

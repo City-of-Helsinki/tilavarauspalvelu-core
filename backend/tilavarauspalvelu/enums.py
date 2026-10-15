@@ -746,7 +746,7 @@ class ReservationCancelReasonChoice(models.TextChoices):
         """These reasons are selectable by the user"""
         values = list(cls)
         values.remove(cls.NOT_PAID)
-        return values  # type: ignore[return-type]
+        return values  # type: ignore[return-value]
 
 
 class ReservationKind(models.TextChoices):

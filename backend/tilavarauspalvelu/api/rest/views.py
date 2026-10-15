@@ -389,13 +389,13 @@ def reservable_time_spans_export(request: WSGIRequest) -> HttpResponse:
 def append_payment_method_to_checkout_url(checkout_url: str, request: WSGIRequest) -> str:
     # Append "/paymentmethod" to the checkout URL path to skip entering customer information in the checkout process.
     parsed_url = urlparse(checkout_url)
-    parsed_url = parsed_url._replace(path=f"{parsed_url.path.removesuffix('/')}/paymentmethod").geturl()
+    payment_method_url = parsed_url._replace(path=f"{parsed_url.path.removesuffix('/')}/paymentmethod").geturl()
 
     # Update the query parameters to include the language from the request, keep existing query params as-is.
     if (request_lang := request.GET.get("lang")) is not None:
-        return update_query_params(url=parsed_url, lang=request_lang)
+        return update_query_params(url=payment_method_url, lang=request_lang)
 
-    return parsed_url
+    return payment_method_url
 
 
 @require_GET

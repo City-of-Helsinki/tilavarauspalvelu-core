@@ -31,7 +31,7 @@ def reservation_unit() -> ReservationUnit:
         opening_hours_hash="test_hash",
         latest_fetched_date="2021-05-03",
     )
-    return ReservationUnitFactory(origin_hauki_resource=origin_hauki_resource)
+    return ReservationUnitFactory.create(origin_hauki_resource=origin_hauki_resource)
 
 
 def _get_date(*, day: int = 1, hour: int = 0, tzinfo: ZoneInfo | None = None):

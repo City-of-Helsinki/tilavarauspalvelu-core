@@ -36,6 +36,8 @@ from tests.factories import (
 from .helpers import reservation_units_query
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from graphene_django_extensions.testing.client import GQLResponse
 
 
@@ -101,7 +103,7 @@ NOW = _datetime()
 
 
 @pytest.fixture(autouse=True)
-def _clear_cache() -> None:
+def _clear_cache() -> Generator[None]:
     # Cache needs to be cleared between tests so that
     # FRT calculations don't reuse results between runs.
     try:
@@ -138,7 +140,7 @@ def create_child_for_reservation_unit(reservation_unit: ReservationUnit) -> Rese
         parent_space = SpaceFactory.create()
         reservation_unit.spaces.set([parent_space])
     reservation_unit.name = "Parent ReservationUnit"
-    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES
     reservation_unit.unit = parent_space.unit
     reservation_unit.save()
 
@@ -1193,7 +1195,7 @@ def test__reservation_unit__first_reservable_time__max_duration_is_rounded_down_
     """
     reservation_unit.min_reservation_duration = datetime.timedelta(minutes=140)
     reservation_unit.max_reservation_duration = max_reservation_duration
-    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_120_MINUTES.value
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_120_MINUTES
     reservation_unit.save()
 
     # 1st Jan 10:00 - 20:00 (10h)
@@ -1571,7 +1573,7 @@ def test__reservation_unit__first_reservable_time__reservations__only_reservatio
     │ 1 ░░░░░░░░░░░░░░░░░░░░████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
-    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES
     reservation_unit.save()
 
     # 1st Jan 10:00 - 20:00 (10h)
@@ -1673,7 +1675,7 @@ def test__reservation_unit__first_reservable_time__reservations__filter_start_ti
     │ 1 ░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁▁▁▁▁███▁▁▁▁▁▁▁▁▁▁░░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
-    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES
     reservation_unit.save()
 
     # 1st Jan 08:00 - 20:30 (12h 30min)
@@ -2040,7 +2042,7 @@ def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_tim
     │                     ──═──                          │
     └────────────────────────────────────────────────────┘
     """
-    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES
     reservation_unit.buffer_time_before = datetime.timedelta(minutes=60)
     reservation_unit.buffer_time_after = datetime.timedelta(minutes=60)
     reservation_unit.min_reservation_duration = datetime.timedelta(minutes=30)
@@ -2080,7 +2082,7 @@ def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_tim
     │                         ────────══────────   │
     └──────────────────────────────────────────────┘
     """
-    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES
     reservation_unit.buffer_time_before = datetime.timedelta(minutes=120)
     reservation_unit.buffer_time_after = datetime.timedelta(minutes=120)
     reservation_unit.save()
@@ -2254,7 +2256,7 @@ def test__reservation_unit__first_reservable_time__buffers__reservation_unit_and
 
     Reservations exist at 01-02 and 04-05. The reservable time span is at 02-09.
     """
-    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES
     reservation_unit.buffer_time_before = buffer_time_before
     reservation_unit.buffer_time_after = buffer_time_after
     reservation_unit.save()
@@ -2752,7 +2754,7 @@ def test__reservation_unit__first_reservable_time__duration_exactly_min_but_buff
     │                              ─═─                   │
     └────────────────────────────────────────────────────┘
     """
-    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_15_MINUTES.value
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_15_MINUTES
     reservation_unit.buffer_time_before = datetime.timedelta(minutes=15)
     reservation_unit.buffer_time_after = datetime.timedelta(minutes=15)
     reservation_unit.save()
@@ -2856,7 +2858,7 @@ def test__reservation_unit__first_reservable_time__extra_long_interval(graphql, 
     └────────────────────────────────────────────────────┘
     """
     reservation_unit.min_reservation_duration = datetime.timedelta(minutes=60)
-    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_120_MINUTES.value
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_120_MINUTES
     reservation_unit.save()
 
     # 1st Jan 9:00 - 19:00 (8h)
@@ -2917,7 +2919,7 @@ def test__reservation_unit__first_reservable_time__extra_long_interval__after_mi
     │      ═  ═                                          │
     └────────────────────────────────────────────────────┘
     """
-    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_90_MINUTES.value
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_90_MINUTES
     reservation_unit.save()
 
     # 6th Jan 20:00 - 7th Jan 04:00 (8h)
@@ -2962,7 +2964,7 @@ def test__reservation_unit__first_reservable_time__interval_longer_than_min_dura
     └────────────────────────────────────────────────────┘
     """
     reservation_unit.min_reservation_duration = datetime.timedelta(minutes=15)
-    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_120_MINUTES.value
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_120_MINUTES
     reservation_unit.save()
 
     # 1st Jan 03:00 - 09:00 (6h)
