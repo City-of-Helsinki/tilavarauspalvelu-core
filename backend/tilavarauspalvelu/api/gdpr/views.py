@@ -17,7 +17,7 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ProfileUser
 
 if TYPE_CHECKING:
-    from promise import Promise
+    from django_stubs_ext import StrPromise
     from rest_framework.request import Request
 
 
@@ -86,7 +86,7 @@ class TilavarauspalveluGDPRAPIView(GDPRAPIView):
         return profile
 
     @staticmethod
-    def get_error_message(*, code: str, message: Promise) -> dict[str, Any]:
+    def get_error_message(*, code: str, message: StrPromise) -> dict[str, Any]:
         with override("en"):
             message_en = str(message)
         with override("fi"):
