@@ -215,7 +215,8 @@ class ReservationActions:
             msg = "Reservation has no reservation unit"
             raise ReservationPriceCalculationError(msg)
 
-        pricing = reservation_unit.actions.get_active_pricing(by_date=begin_datetime.date())
+        begin_date = begin_datetime.astimezone(DEFAULT_TIMEZONE).date()
+        pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
         if pricing is None:
             msg = "Reservation unit has no pricing information"
             raise ReservationPriceCalculationError(msg)
