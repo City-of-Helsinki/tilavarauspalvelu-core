@@ -51,7 +51,7 @@ class BaseExportRow:
         return json.loads(json.dumps(data, default=str))
 
 
-class BaseCSVExporter(ABC):
+class BaseCSVExporter[TModel: models.Model](ABC):
     """Base class for CSV exporters."""
 
     def __init__(
@@ -128,7 +128,7 @@ class BaseCSVExporter(ABC):
 
     @property
     @abstractmethod
-    def queryset(self) -> models.QuerySet:
+    def queryset(self) -> models.QuerySet[TModel]:
         """Return the queryset used to fetch the data for the CSV file."""
 
     @abstractmethod
@@ -136,5 +136,5 @@ class BaseCSVExporter(ABC):
         """Return the header rows for the CSV file."""
 
     @abstractmethod
-    def get_data_rows(self, instance: models.Model) -> Iterable[BaseExportRow]:
+    def get_data_rows(self, instance: TModel) -> Iterable[BaseExportRow]:
         """Process and return the data rows for the CSV file."""

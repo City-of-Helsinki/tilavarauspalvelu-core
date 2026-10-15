@@ -17,11 +17,11 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
     ReservationStartInterval,
 )
-from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.models import ReservationUnit, Space
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime_string, local_timedelta_string
 
-from tests.factories import ReservationUnitFactory
+from tests.factories import ReservationUnitFactory, SpaceFactory
 
 from .helpers import Missing, MissingParams, mock_csv_writer
 
@@ -288,3 +288,32 @@ def test_reservation_unit_export__query_count_does_not_grow_with_reservation_uni
         ReservationUnitExporter().write_csv()
 
     assert len(four_reservation_units.captured_queries) == len(one_reservation_unit.captured_queries)
+
+
+def test_reservation_unit_export__missing_description_translation_is_exported_as_empty_value():
+    ReservationUnitFactory.create(description_sv=None)
+
+    exporter = ReservationUnitExporter()
+    with mock_csv_writer() as mock_writer:
+        exporter.write_csv()
+
+    writes = mock_writer.get_writes()
+    assert len(writes) == 2, writes
+    assert writes[1][writes[0].index("Description_sv")] == ""
+
+
+def test_reservation_unit_export__related_names_fall_back_to_other_languages():
+    english_only_space = SpaceFactory.create()
+    nameless_space = SpaceFactory.create()
+    Space.objects.filter(pk=english_only_space.pk).update(name_fi=None, name_en="Hall", name_sv=None)
+    Space.objects.filter(pk=nameless_space.pk).update(name_fi=None, name_en=None, name_sv=None)
+
+    ReservationUnitFactory.create(spaces=[english_only_space, nameless_space])
+
+    exporter = ReservationUnitExporter()
+    with mock_csv_writer() as mock_writer:
+        exporter.write_csv()
+
+    writes = mock_writer.get_writes()
+    assert len(writes) == 2, writes
+    assert writes[1][writes[0].index("Spaces")] == "Hall"

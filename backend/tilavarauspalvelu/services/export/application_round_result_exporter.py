@@ -50,7 +50,7 @@ class ApplicationSectionExportRow(BaseExportRow):
     price: str = ""  # empty by design, the column will be manually filled after export
 
 
-class ApplicationRoundResultCSVExporter(BaseCSVExporter):
+class ApplicationRoundResultCSVExporter(BaseCSVExporter[ApplicationSection]):
     """Exports a CSV file containing application section data from an application round."""
 
     def __init__(self, application_round_id: int) -> None:
