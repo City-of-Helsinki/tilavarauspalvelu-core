@@ -342,14 +342,14 @@ def update_reservation_unit_pricings_tax_percentage_task(
         level="info",
     )
 
-    change_date = datetime.date.fromisoformat(change_date)
+    parsed_change_date = datetime.date.fromisoformat(change_date)
     current_tax_percentage, _ = TaxPercentage.objects.get_or_create(value=Decimal(current_tax))
     future_tax_percentage, _ = TaxPercentage.objects.get_or_create(value=Decimal(future_tax))
 
     ReservationUnitPricing.actions.add_new_pricings_for_tax_percentage(
         future_tax_percentage=future_tax_percentage,
         current_tax_percentage=current_tax_percentage,
-        change_date=change_date,
+        change_date=parsed_change_date,
         ignored_company_codes=ignored_company_codes,
     )
 
