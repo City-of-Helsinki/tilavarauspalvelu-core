@@ -16,7 +16,10 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.models import AgeGroup, ReservationPurpose
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from django.db.models import QuerySet
+    from django_stubs_ext import StrOrPromise
 
     from tilavarauspalvelu.typing import WSGIRequest
 
@@ -25,7 +28,7 @@ class ApplicationRoundStatusFilter(admin.SimpleListFilter):
     title = _("Application round status")
     parameter_name = "round_status"
 
-    def lookups(self, *args: Any) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> Iterable[tuple[str, StrOrPromise]]:
         return ApplicationRoundStatusChoice.choices
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
@@ -39,7 +42,7 @@ class ApplicationStatusFilter(admin.SimpleListFilter):
     title = _("Application status")
     parameter_name = "application_status"
 
-    def lookups(self, *args: Any) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> Iterable[tuple[str, StrOrPromise]]:
         return ApplicationStatusChoice.choices
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
@@ -53,7 +56,7 @@ class ApplicationSectionStatusFilter(admin.SimpleListFilter):
     title = _("Application section status")
     parameter_name = "section_status"
 
-    def lookups(self, *args: Any) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> Iterable[tuple[str, StrOrPromise]]:
         return ApplicationSectionStatusChoice.choices
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
@@ -67,7 +70,7 @@ class AgeGroupFilter(admin.SimpleListFilter):
     title = _("Age group")
     parameter_name = "age_group"
 
-    def lookups(self, *args: Any) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> Iterable[tuple[Any, StrOrPromise]]:
         return AgeGroup.objects.annotate(
             repr=models.Case(
                 models.When(maximum=None, then=Concat("minimum", models.Value("+"), output_field=models.CharField())),
@@ -87,7 +90,7 @@ class ReservationPurposeFilter(admin.SimpleListFilter):
     title = _("Reservation purpose")
     parameter_name = "purpose"
 
-    def lookups(self, *args: Any) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> Iterable[tuple[Any, StrOrPromise]]:
         return ReservationPurpose.objects.values_list("id", "name")
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:

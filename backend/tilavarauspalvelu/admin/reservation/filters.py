@@ -11,7 +11,10 @@ from more_admin_filters.filters import MultiSelectFilter, MultiSelectRelatedDrop
 from tilavarauspalvelu.models import Reservation, ReservationUnit, Unit
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from django.db.models import Field, QuerySet
+    from django_stubs_ext import StrOrPromise
 
     from tilavarauspalvelu.typing import WSGIRequest
 
@@ -30,7 +33,7 @@ class ReservationSeriesListFilter(admin.SimpleListFilter):
     title = _("reservation series")
     parameter_name = "reservation_series"
 
-    def lookups(self, *args: Any) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> Iterable[tuple[str, StrOrPromise]]:
         return [
             ("1", _("Yes")),
             ("0", _("No")),
@@ -48,7 +51,7 @@ class PaidReservationListFilter(admin.SimpleListFilter):
     title = _("Paid reservation")
     parameter_name = "paid_reservation"
 
-    def lookups(self, *args: Any) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> Iterable[tuple[str, StrOrPromise]]:
         return [
             ("1", _("Yes")),
             ("0", _("No")),
@@ -112,7 +115,7 @@ class AccessCodeGeneratedFilter(admin.SimpleListFilter):
     title = _("door code generated")
     parameter_name = "access_code_generated"
 
-    def lookups(self, *args: Any) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> Iterable[tuple[str, StrOrPromise]]:
         return [
             ("1", _("Yes")),
             ("0", _("No")),
