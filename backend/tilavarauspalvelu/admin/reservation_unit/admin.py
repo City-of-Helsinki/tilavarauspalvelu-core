@@ -25,10 +25,13 @@ from tilavarauspalvelu.services.export import ReservationUnitExporter
 from .form import ReservationUnitAccessTypeInline, ReservationUnitAdminForm, ReservationUnitPricingInline
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from django import forms
     from django.db import models
     from django.db.models import QuerySet
     from django.http import FileResponse
+    from django_stubs_ext import StrOrPromise
 
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
     from tilavarauspalvelu.typing import WSGIRequest
@@ -38,7 +41,7 @@ class CurrentAccessTypeFilter(admin.SimpleListFilter):
     title = _("Current access type")
     parameter_name = "current_access_type"
 
-    def lookups(self, *args: Any) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> Iterable[tuple[str, StrOrPromise]]:
         return AccessType.choices
 
     def queryset(self, request: WSGIRequest, queryset: ReservationUnitQuerySet) -> QuerySet:
@@ -84,7 +87,7 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
     # Form
     form = ReservationUnitAdminForm
     fieldsets = [
-        [
+        (
             _("Basic information"),
             {
                 "fields": [
@@ -110,8 +113,8 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
                     "current_access_type",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Reservation restrictions"),
             {
                 "fields": [
@@ -132,8 +135,8 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
                     "max_reservations_per_user",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Relations"),
             {
                 "fields": [
@@ -143,8 +146,8 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
                     "intended_uses",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Payment"),
             {
                 "fields": [
@@ -154,8 +157,8 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
                     "can_apply_free_of_charge",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Terms of use"),
             {
                 "fields": [
@@ -166,8 +169,8 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
                     "notes_when_applying",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Instructions"),
             {
                 "fields": [
@@ -176,23 +179,23 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
                     "reservation_cancelled_instructions",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Pindora information"),
             {
                 "fields": [
                     "pindora_response",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Search terms"),
             {
                 "fields": [
                     "search_terms",
                 ],
             },
-        ],
+        ),
     ]
     filter_horizontal = [
         "spaces",
