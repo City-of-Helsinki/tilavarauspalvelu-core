@@ -138,6 +138,11 @@ module = ["helusers.*"]
 follow_untyped_imports = true
 ignore_errors = true
 
+[[tool.mypy.overrides]]
+# The stub types the managers and querysets more loosely than Django does.
+module = ["tilavarauspalvelu.models._base"]
+ignore_errors = true
+
 [tool.django-stubs]
 django_settings_module = "config.settings"
 # The settings are attributes of `env_config` classes, so the plugin cannot find them in the settings module.
