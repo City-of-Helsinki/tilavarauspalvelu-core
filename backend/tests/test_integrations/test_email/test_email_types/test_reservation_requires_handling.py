@@ -11,7 +11,7 @@ from django.test import override_settings
 from freezegun import freeze_time
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
-from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_requires_handling
@@ -425,6 +425,27 @@ def test_reservation_requires_handling__send_email(outbox):
 def test_reservation_requires_handling__send_email__wrong_state(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
+        reservee_email="reservee@email.com",
+        user__email="user@email.com",
+        reservation_unit__name="foo",
+        reservation_unit__pricings__lowest_price=0,
+        reservation_unit__pricings__highest_price=0,
+        begins_at=local_datetime(2024, 1, 1, 20, 0),
+        ends_at=local_datetime(2024, 1, 1, 22, 0),
+    )
+
+    EmailService.send_reservation_requires_handling_email(reservation)
+
+    assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_reservation_requires_handling__send_email__behalf_reservation(outbox):
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        type=ReservationTypeChoice.BEHALF,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",

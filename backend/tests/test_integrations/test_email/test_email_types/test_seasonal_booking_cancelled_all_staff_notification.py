@@ -18,10 +18,11 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_seasonal_booking_cancelled_all_staff_notification,
 )
 from tilavarauspalvelu.integrations.email.typing import EmailType
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
 
 from tests.factories import ApplicationFactory, ReservationUnitFactory, UserFactory
-from tests.helpers import TranslationsFromPOFiles
+from tests.helpers import TranslationsFromPOFiles, patch_method
 from tests.test_graphql_api.test_reservation_series.helpers import create_reservation_series
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
@@ -334,3 +335,91 @@ def test_seasonal_booking_cancelled_all_staff_notification__send_email__sent_whe
 
     assert outbox[0].subject == "The customer has canceled the seasonal booking"
     assert sorted(outbox[0].bcc) == ["admin@email.com"]
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_seasonal_booking_cancelled_all_staff_notification__send_email__wrong_status(outbox):
+    application = ApplicationFactory.create_in_status_handled(user__email="user@email.com")
+    application_section = application.application_sections.first()
+
+    reservation_unit = ReservationUnitFactory.create()
+
+    UserFactory.create_with_unit_role(
+        units=[reservation_unit.unit],
+        email="admin@email.com",
+        reservation_notification=ReservationNotification.ALL,
+        preferred_language="en",
+    )
+
+    create_reservation_series(
+        user=application.user,
+        reservation_unit=reservation_unit,
+        allocated_time_slot__reservation_unit_option__reservation_unit=reservation_unit,
+        allocated_time_slot__reservation_unit_option__application_section=application_section,
+        reservations__state=ReservationStateChoice.CANCELLED,
+        reservations__cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
+    )
+
+    EmailService.send_seasonal_booking_cancelled_all_staff_notification_email(application_section=application_section)
+
+    assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_seasonal_booking_cancelled_all_staff_notification__send_email__no_cancelled_reservations(outbox):
+    application = ApplicationFactory.create_in_status_results_sent(user__email="user@email.com")
+    application_section = application.application_sections.first()
+
+    reservation_unit = ReservationUnitFactory.create()
+
+    UserFactory.create_with_unit_role(
+        units=[reservation_unit.unit],
+        email="admin@email.com",
+        reservation_notification=ReservationNotification.ALL,
+        preferred_language="en",
+    )
+
+    create_reservation_series(
+        user=application.user,
+        reservation_unit=reservation_unit,
+        allocated_time_slot__reservation_unit_option__reservation_unit=reservation_unit,
+        allocated_time_slot__reservation_unit_option__application_section=application_section,
+    )
+
+    EmailService.send_seasonal_booking_cancelled_all_staff_notification_email(application_section=application_section)
+
+    assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
+@patch_method(SentryLogger.log_message)
+def test_seasonal_booking_cancelled_all_staff_notification__send_email__no_recipients(outbox):
+    application = ApplicationFactory.create_in_status_results_sent(user__email="user@email.com")
+    application_section = application.application_sections.first()
+
+    reservation_unit = ReservationUnitFactory.create()
+
+    create_reservation_series(
+        user=application.user,
+        reservation_unit=reservation_unit,
+        allocated_time_slot__reservation_unit_option__reservation_unit=reservation_unit,
+        allocated_time_slot__reservation_unit_option__application_section=application_section,
+        reservations__state=ReservationStateChoice.CANCELLED,
+        reservations__cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
+    )
+
+    EmailService.send_seasonal_booking_cancelled_all_staff_notification_email(application_section=application_section)
+
+    assert len(outbox) == 0
+
+    assert SentryLogger.log_message.call_count == 1
+    assert (
+        SentryLogger.log_message.call_args.args[0]
+        == "No recipients for the 'seasonal booking cancelled all staff notification' email"
+    )

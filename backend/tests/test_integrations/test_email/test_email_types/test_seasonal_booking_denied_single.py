@@ -15,10 +15,11 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_seasonal_booking_denied_single
 from tilavarauspalvelu.integrations.email.typing import EmailType
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory
-from tests.helpers import TranslationsFromPOFiles
+from tests.helpers import TranslationsFromPOFiles, patch_method
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
@@ -206,3 +207,105 @@ def test_seasonal_booking_denied_single__send_email(outbox):
 
     assert outbox[0].subject == "The space reservation included in your seasonal booking has been cancelled"
     assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_seasonal_booking_denied_single__send_email__from_reservation_denied(outbox):
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.DENIED,
+        type=ReservationTypeChoice.SEASONAL,
+        reservee_email="reservee@email.com",
+        user__email="user@email.com",
+        reservation_unit__name="foo",
+        begins_at=local_datetime(2024, 1, 1, 20, 0),
+        ends_at=local_datetime(2024, 1, 1, 22, 0),
+    )
+
+    EmailService.send_reservation_denied_email(reservation)
+
+    assert len(outbox) == 1
+
+    assert outbox[0].subject == "The space reservation included in your seasonal booking has been cancelled"
+    assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_seasonal_booking_denied_single__send_email__wrong_state(outbox):
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.SEASONAL,
+        reservee_email="reservee@email.com",
+        user__email="user@email.com",
+        reservation_unit__name="foo",
+        begins_at=local_datetime(2024, 1, 1, 20, 0),
+        ends_at=local_datetime(2024, 1, 1, 22, 0),
+    )
+
+    EmailService.send_seasonal_booking_denied_single_email(reservation)
+
+    assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_seasonal_booking_denied_single__send_email__normal_reservation(outbox):
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.DENIED,
+        type=ReservationTypeChoice.NORMAL,
+        reservee_email="reservee@email.com",
+        user__email="user@email.com",
+        reservation_unit__name="foo",
+        begins_at=local_datetime(2024, 1, 1, 20, 0),
+        ends_at=local_datetime(2024, 1, 1, 22, 0),
+    )
+
+    EmailService.send_seasonal_booking_denied_single_email(reservation)
+
+    assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-02")
+def test_seasonal_booking_denied_single__send_email__reservation_in_the_past(outbox):
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.DENIED,
+        type=ReservationTypeChoice.SEASONAL,
+        reservee_email="reservee@email.com",
+        user__email="user@email.com",
+        reservation_unit__name="foo",
+        begins_at=local_datetime(2024, 1, 1, 20, 0),
+        ends_at=local_datetime(2024, 1, 1, 22, 0),
+    )
+
+    EmailService.send_seasonal_booking_denied_single_email(reservation)
+
+    assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
+@patch_method(SentryLogger.log_message)
+def test_seasonal_booking_denied_single__send_email__no_recipients(outbox):
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.DENIED,
+        type=ReservationTypeChoice.SEASONAL,
+        reservee_email="",
+        user__email="",
+        reservation_unit__name="foo",
+        begins_at=local_datetime(2024, 1, 1, 20, 0),
+        ends_at=local_datetime(2024, 1, 1, 22, 0),
+    )
+
+    EmailService.send_seasonal_booking_denied_single_email(reservation)
+
+    assert len(outbox) == 0
+
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'seasonal booking deny single' email"

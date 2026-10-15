@@ -601,6 +601,29 @@ def test_seasonal_booking_access_type_changed__send_email(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
+def test_seasonal_booking_access_type_changed__send_email__results_not_sent(outbox):
+    user = UserFactory.create(email="user@email.com")
+    application = ApplicationFactory.create_in_status_handled(
+        user=user,
+        contact_person_email="contact@email.com",
+    )
+    reservation_series = create_reservation_series(
+        user=user,
+        reservations__type=ReservationTypeChoice.SEASONAL,
+        allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+        allocated_time_slot__reservation_unit_option__application_section__application=application,
+    )
+
+    section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
+
+    EmailService.send_seasonal_booking_access_type_changed_email(section)
+
+    assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_seasonal_booking_access_type_changed__send_email__no_reservations(outbox):
     user = UserFactory.create(email="user@email.com")
     application = ApplicationFactory.create(

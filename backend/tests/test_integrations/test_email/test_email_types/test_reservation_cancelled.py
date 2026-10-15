@@ -332,6 +332,22 @@ def test_reservation_cancelled__send_email__wrong_state(outbox):
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
+def test_reservation_cancelled__send_email__no_cancel_reason(outbox):
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.CANCELLED,
+        reservee_email="reservee@email.com",
+        user__email="user@email.com",
+        reservation_unit__name="foo",
+        cancel_reason=None,
+    )
+
+    EmailService.send_reservation_cancelled_email(reservation)
+
+    assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
 @patch_method(SentryLogger.log_message)
 def test_reservation_cancelled__send_email__no_recipients(outbox):
     reservation = ReservationFactory.create(

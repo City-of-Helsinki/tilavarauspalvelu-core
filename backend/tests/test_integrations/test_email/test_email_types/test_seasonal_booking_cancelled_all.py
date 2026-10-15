@@ -15,9 +15,10 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_seasonal_booking_cancelled_all
 from tilavarauspalvelu.integrations.email.typing import EmailType
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 
 from tests.factories import ApplicationFactory
-from tests.helpers import TranslationsFromPOFiles
+from tests.helpers import TranslationsFromPOFiles, patch_method
 from tests.test_graphql_api.test_reservation_series.helpers import create_reservation_series
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
@@ -251,3 +252,28 @@ def test_seasonal_booking_cancelled_all__send_email__no_reservations(outbox):
     EmailService.send_seasonal_booking_cancelled_all_email(application_section=application_section)
 
     assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
+@patch_method(SentryLogger.log_message)
+def test_seasonal_booking_cancelled_all__send_email__no_recipients(outbox):
+    application = ApplicationFactory.create_in_status_results_sent(
+        user__email="",
+        contact_person_email=None,
+    )
+    application_section = application.application_sections.first()
+
+    create_reservation_series(
+        user=application_section.application.user,
+        allocated_time_slot__reservation_unit_option__application_section=application_section,
+        reservations__cancel_reason=ReservationCancelReasonChoice.CHANGE_OF_PLANS,
+    )
+
+    EmailService.send_seasonal_booking_cancelled_all_email(application_section=application_section)
+
+    assert len(outbox) == 0
+
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args[0] == "No recipients for the 'seasonal booking cancelled all' email"
