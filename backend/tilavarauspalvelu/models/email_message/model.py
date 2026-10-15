@@ -30,22 +30,22 @@ __all__ = [
 class EmailMessage(models.Model):
     """Stores an email message that could not be sent at the time of creation."""
 
-    subject: str = models.TextField()
-    recipients: list[str] = ArrayField(base_field=models.EmailField())
+    subject: str = models.TextField()  # type: ignore[assignment]
+    recipients: list[str] = ArrayField(base_field=models.EmailField())  # type: ignore[assignment]
 
-    text_content: str = models.TextField()
-    html_content: str = models.TextField()
+    text_content: str = models.TextField()  # type: ignore[assignment]
+    html_content: str = models.TextField()  # type: ignore[assignment]
 
-    attachments: list[EmailAttachment] = ArrayField(
+    attachments: list[EmailAttachment] = ArrayField(  # type: ignore[assignment]
         base_field=HStoreField(),
         blank=True,
         default=list,
         validators=[validate_email_attachments],
     )
 
-    valid_until: datetime.datetime = models.DateTimeField(db_index=True)
+    valid_until: datetime.datetime = models.DateTimeField(db_index=True)  # type: ignore[assignment]
 
-    created_at: datetime.datetime = models.DateTimeField(blank=True, default=local_datetime, db_index=True)
+    created_at: datetime.datetime = models.DateTimeField(blank=True, default=local_datetime, db_index=True)  # type: ignore[assignment]
 
     objects: ClassVar[EmailMessageManager] = LazyModelManager.new()
     actions: LazyAttribute[EmailMessageActions] = LazyModelAttribute.new()

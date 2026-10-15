@@ -30,15 +30,15 @@ __all__ = [
 
 
 class TermsOfUse(models.Model):
-    id: str = models.CharField(primary_key=True, max_length=100)
-    name: str | None = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
+    id: str = models.CharField(primary_key=True, max_length=100)  # type: ignore[assignment]
+    name: str | None = models.CharField(max_length=255, null=True, blank=True)  # type: ignore[assignment]  # noqa: DJ001
 
-    text: str = Nh3TextField(
+    text: str = Nh3TextField(  # type: ignore[assignment]
         allowed_tags=settings.NH3_ALLOWED_TAGS,
         allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
 
-    terms_type: TermsOfUseTypeChoices = TextChoicesField(
+    terms_type: TermsOfUseTypeChoices = TextChoicesField(  # type: ignore[assignment]
         enum=TermsOfUseTypeChoices,
         default=TermsOfUseTypeChoices.GENERIC,
         blank=False,

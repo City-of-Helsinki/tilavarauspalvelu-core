@@ -23,15 +23,15 @@ __all__ = [
 
 
 class PersonalInfoViewLog(models.Model):
-    field: str = models.CharField(max_length=255, null=False, blank=False, editable=False)
+    field: str = models.CharField(max_length=255, null=False, blank=False, editable=False)  # type: ignore[assignment]
 
-    viewer_username: str = models.CharField(max_length=255)
-    viewer_user_email: str = models.CharField(max_length=255, default="", blank=True)
-    viewer_user_full_name: str = models.CharField(max_length=255, default="", blank=True)
+    viewer_username: str = models.CharField(max_length=255)  # type: ignore[assignment]
+    viewer_user_email: str = models.CharField(max_length=255, default="", blank=True)  # type: ignore[assignment]
+    viewer_user_full_name: str = models.CharField(max_length=255, default="", blank=True)  # type: ignore[assignment]
 
-    access_time: datetime.datetime = models.DateTimeField(auto_now=True, editable=False)
+    access_time: datetime.datetime = models.DateTimeField(auto_now=True, editable=False)  # type: ignore[assignment]
 
-    user: User | None = models.ForeignKey(
+    user: User | None = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.User",
         related_name="personal_info_view_logs",
         on_delete=models.SET_NULL,
@@ -39,7 +39,7 @@ class PersonalInfoViewLog(models.Model):
         null=True,
         editable=False,
     )
-    viewer_user: User | None = models.ForeignKey(
+    viewer_user: User | None = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.User",
         related_name="as_viewer_personal_info_view_logs",
         on_delete=models.SET_NULL,

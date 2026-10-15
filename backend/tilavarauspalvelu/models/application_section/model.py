@@ -48,31 +48,31 @@ class ApplicationSection(SerializableModelMixin, models.Model):
     and suitable time ranges that can be used fulfill the slot request included in it.
     """
 
-    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
+    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # type: ignore[assignment]  # ID for external systems
 
-    name: str = models.CharField(max_length=100)
-    num_persons: int = models.PositiveIntegerField()
-    reservations_begin_date: datetime.date = models.DateField()
-    reservations_end_date: datetime.date = models.DateField()
+    name: str = models.CharField(max_length=100)  # type: ignore[assignment]
+    num_persons: int = models.PositiveIntegerField()  # type: ignore[assignment]
+    reservations_begin_date: datetime.date = models.DateField()  # type: ignore[assignment]
+    reservations_end_date: datetime.date = models.DateField()  # type: ignore[assignment]
 
     # Slot request
-    reservation_min_duration: datetime.timedelta = models.DurationField()
-    reservation_max_duration: datetime.timedelta = models.DurationField()
-    applied_reservations_per_week: int = models.PositiveIntegerField()
+    reservation_min_duration: datetime.timedelta = models.DurationField()  # type: ignore[assignment]
+    reservation_max_duration: datetime.timedelta = models.DurationField()  # type: ignore[assignment]
+    applied_reservations_per_week: int = models.PositiveIntegerField()  # type: ignore[assignment]
 
-    application: Application = models.ForeignKey(
+    application: Application = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.Application",
         related_name="application_sections",
         on_delete=models.CASCADE,
     )
-    purpose: ReservationPurpose | None = models.ForeignKey(
+    purpose: ReservationPurpose | None = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationPurpose",
         related_name="application_sections",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
-    age_group: AgeGroup | None = models.ForeignKey(
+    age_group: AgeGroup | None = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.AgeGroup",
         related_name="application_sections",
         on_delete=models.SET_NULL,

@@ -29,13 +29,13 @@ __all__ = [
 
 
 class ReservationUnitAccessType(models.Model):
-    reservation_unit: ReservationUnit = models.ForeignKey(
+    reservation_unit: ReservationUnit = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationUnit",
         related_name="access_types",
         on_delete=models.CASCADE,
     )
-    access_type: AccessType = TextChoicesField(enum=AccessType, default=AccessType.UNRESTRICTED)
-    begin_date: datetime.date = models.DateField()
+    access_type: AccessType = TextChoicesField(enum=AccessType, default=AccessType.UNRESTRICTED)  # type: ignore[assignment]
+    begin_date: datetime.date = models.DateField()  # type: ignore[assignment]
 
     objects: ClassVar[ReservationUnitAccessTypeManager] = LazyModelManager.new()
     actions: LazyAttribute[ReservationUnitAccessTypeActions] = LazyModelAttribute.new()

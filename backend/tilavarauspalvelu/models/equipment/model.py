@@ -23,9 +23,9 @@ __all__ = [
 
 
 class Equipment(models.Model):
-    name: str = models.CharField(max_length=200)
+    name: str = models.CharField(max_length=200)  # type: ignore[assignment]
 
-    category: EquipmentCategory = models.ForeignKey(
+    category: EquipmentCategory = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.EquipmentCategory",
         related_name="equipment",
         on_delete=models.CASCADE,

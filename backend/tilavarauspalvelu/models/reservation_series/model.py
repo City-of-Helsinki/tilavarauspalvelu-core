@@ -47,42 +47,42 @@ __all__ = [
 class ReservationSeries(models.Model):
     """Defines a series of reservations that are created using given recurrence rules."""
 
-    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
-    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
+    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # type: ignore[assignment]  # ID for external systems
+    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)  # type: ignore[assignment]
 
-    name: str = models.CharField(max_length=255, blank=True, default="")
-    description: str = models.CharField(max_length=500, blank=True, default="")
+    name: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    description: str = models.CharField(max_length=500, blank=True, default="")  # type: ignore[assignment]
 
-    begin_date: datetime.date = models.DateField()
-    begin_time: datetime.time = models.TimeField()
-    end_date: datetime.date = models.DateField()
-    end_time: datetime.time = models.TimeField()
+    begin_date: datetime.date = models.DateField()  # type: ignore[assignment]
+    begin_time: datetime.time = models.TimeField()  # type: ignore[assignment]
+    end_date: datetime.date = models.DateField()  # type: ignore[assignment]
+    end_time: datetime.time = models.TimeField()  # type: ignore[assignment]
 
-    recurrence_in_days: int | None = models.PositiveIntegerField(null=True, blank=True)
+    recurrence_in_days: int | None = models.PositiveIntegerField(null=True, blank=True)  # type: ignore[assignment]
 
-    weekdays: list[Weekday] = ArrayField(TextChoicesField(enum=Weekday), size=7, default=list)
+    weekdays: list[Weekday] = ArrayField(TextChoicesField(enum=Weekday), size=7, default=list)  # type: ignore[assignment]
 
     # Relations
 
-    reservation_unit: ReservationUnit = models.ForeignKey(
+    reservation_unit: ReservationUnit = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationUnit",
         related_name="reservation_series",
         on_delete=models.PROTECT,
     )
-    user: User = models.ForeignKey(
+    user: User = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.User",
         related_name="reservation_series",
         on_delete=models.PROTECT,
     )
 
-    allocated_time_slot: AllocatedTimeSlot | None = models.OneToOneField(
+    allocated_time_slot: AllocatedTimeSlot | None = models.OneToOneField(  # type: ignore[assignment]
         "tilavarauspalvelu.AllocatedTimeSlot",
         related_name="reservation_series",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
-    age_group: AgeGroup | None = models.ForeignKey(
+    age_group: AgeGroup | None = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.AgeGroup",
         related_name="reservation_series",
         on_delete=models.SET_NULL,

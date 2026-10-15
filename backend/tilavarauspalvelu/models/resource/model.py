@@ -27,14 +27,14 @@ __all__ = [
 
 
 class Resource(models.Model):
-    name: str = models.CharField(max_length=255)
+    name: str = models.CharField(max_length=255)  # type: ignore[assignment]
 
-    location_type: ResourceLocationType = TextChoicesField(
+    location_type: ResourceLocationType = TextChoicesField(  # type: ignore[assignment]
         enum=ResourceLocationType,
         default=ResourceLocationType.FIXED,
     )
 
-    space: Space | None = models.ForeignKey(
+    space: Space | None = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.Space",
         related_name="resources",
         on_delete=models.SET_NULL,
