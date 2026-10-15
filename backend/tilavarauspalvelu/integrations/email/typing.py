@@ -375,6 +375,52 @@ class SeasonalBookingRescheduledSingleContext(TypedDict, total=False):
     application_section_id: int | None
 
 
+# Shared context parameters
+
+
+class BaseInfoParams(TypedDict):
+    reservation_unit_name: str
+    unit_name: str
+    unit_location: str
+    begin_datetime: datetime.datetime
+    end_datetime: datetime.datetime
+
+
+class PriceInfoParams(TypedDict):
+    price: Decimal
+    tax_percentage: Decimal
+    reservation_id: int
+
+
+class PriceRangeInfoParams(TypedDict):
+    price: Decimal
+    subsidised_price: Decimal
+    applying_for_free_of_charge: bool
+    tax_percentage: Decimal
+    reservation_id: int
+
+
+class AccessCodeParams(TypedDict):
+    access_code: str
+    access_code_is_used: bool
+    access_code_validity_period: str
+
+
+class AccessCodeSectionParams(TypedDict):
+    access_code: str
+    access_code_is_used: bool
+    allocations: list[dict[str, Any]]
+
+
+class AccessCodeSectionPlainParams(TypedDict):
+    access_code: str
+    access_code_is_used: bool
+
+
+class AccessTypeChangeSectionParams(TypedDict):
+    reservation_units: list[dict[str, Any]]
+
+
 # Email template types
 
 
