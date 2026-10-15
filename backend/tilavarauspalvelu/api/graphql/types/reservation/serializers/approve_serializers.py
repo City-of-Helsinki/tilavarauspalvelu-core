@@ -124,7 +124,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
         if settings.PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED:
             self.create_payment_order_if_required(validated_data)
 
-        instance = super().update(instance=instance, validated_data=validated_data)
+        super().update(instance=instance, validated_data=validated_data)
 
         if instance.access_type == AccessType.ACCESS_CODE:
             # Allow activation in Pindora to fail, will be handled by a background task.

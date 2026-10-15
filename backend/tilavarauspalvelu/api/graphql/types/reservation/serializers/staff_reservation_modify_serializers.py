@@ -140,7 +140,7 @@ class StaffReservationModifySerializer(NestingModelSerializer):
         # If reservation was changed to or from blocked, change access code active state in Pindora.
         changed_with_blocked = type_before != type_after and ReservationTypeChoice.BLOCKED in {type_before, type_after}
 
-        instance = super().update(instance=instance, validated_data=validated_data)
+        super().update(instance=instance, validated_data=validated_data)
 
         if instance.access_type == AccessType.ACCESS_CODE and changed_with_blocked:
             # Allow mutation to succeed even if Pindora request fails.
