@@ -105,6 +105,30 @@ def test_calculate_full_price__duration_over_daylight_saving_time_change():
     assert price == Decimal("70.00000000000000000000000001")
 
 
+def test_calculate_full_price__uses_pricing_of_local_begin_date_for_utc_datetimes():
+    reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitPricingFactory.create(
+        reservation_unit=reservation_unit,
+        begins=datetime.date(2026, 1, 1),
+        price_unit=PriceUnit.FIXED,
+        highest_price=Decimal(10),
+    )
+    ReservationUnitPricingFactory.create(
+        reservation_unit=reservation_unit,
+        begins=datetime.date(2027, 1, 15),
+        price_unit=PriceUnit.FIXED,
+        highest_price=Decimal(50),
+    )
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
+
+    begin = datetime.datetime(2027, 1, 15, 1, 0, tzinfo=DEFAULT_TIMEZONE).astimezone(datetime.UTC)
+    end = begin + datetime.timedelta(hours=1)
+
+    price = reservation.actions.calculate_full_price(begin_datetime=begin, end_datetime=end)
+
+    assert price == Decimal(50)
+
+
 def test_get_active_pricing__future_has_same_tax_percentage():
     day_1 = local_datetime()
     day_2 = day_1 + datetime.timedelta(days=1)
