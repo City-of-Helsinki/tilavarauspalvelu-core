@@ -112,6 +112,9 @@ class ApplicationRound(models.Model):
     notes_when_applying_sv: str | None
     notes_when_applying_en: str | None
 
+    # Cache for the 'units_for_permissions' property. This is not set until the property is read or set.
+    _units_for_permissions: list[Unit]
+
     class Meta:
         db_table = "application_round"
         base_manager_name = "objects"

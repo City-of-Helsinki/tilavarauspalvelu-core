@@ -50,7 +50,11 @@ class AllocatedTimeSlot(models.Model):
     actions: LazyAttribute[AllocatedTimeSlotActions] = LazyModelAttribute.new()
     validators: LazyAttribute[AllocatedTimeSlotValidator] = LazyModelAttribute.new()
 
-    reservation_series: ReservationSeries | None  # Can be missing
+    reservation_series: ReservationSeries
+    """
+    Can be missing. Reading a missing value raises 'ReservationSeries.DoesNotExist'.
+    Check with 'hasattr' first.
+    """
 
     class Meta:
         db_table = "allocated_time_slot"

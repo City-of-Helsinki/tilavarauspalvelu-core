@@ -317,7 +317,12 @@ class ReservationUnit(models.Model):
     actions: LazyAttribute[ReservationUnitActions] = LazyModelAttribute.new()
     validators: LazyAttribute[ReservationUnitValidator] = LazyModelAttribute.new()
 
-    reservation_unit_hierarchy: ReservationUnitHierarchy | None  # Can be missing
+    reservation_unit_hierarchy: ReservationUnitHierarchy
+    """
+    Can be missing. Reading a missing value raises 'ReservationUnitHierarchy.DoesNotExist'.
+    Check with 'hasattr' first.
+    """
+
     pricings: OneToManyRelatedManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]
     reservation_unit_options: OneToManyRelatedManager[ReservationUnitOption, ReservationUnitOptionQuerySet]
     images: OneToManyRelatedManager[ReservationUnitImage, ReservationUnitImageQuerySet]
