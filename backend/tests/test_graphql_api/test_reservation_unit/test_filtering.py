@@ -627,6 +627,16 @@ def test_reservation_unit__filter__only_with_manage_permission__unit_admin(graph
     assert response.node(0) == {"pk": reservation_unit_1.pk}
 
 
+def test_reservation_unit__filter__only_with_manage_permission__anonymous(graphql):
+    ReservationUnitFactory.create()
+
+    query = reservation_units_query(onlyWithManagePermission=True)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 0
+
+
 # Reservation state
 
 
