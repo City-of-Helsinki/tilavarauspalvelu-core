@@ -72,7 +72,7 @@ class ReservationUnitFilterSetMixin:
 
         user: AnyUser = self.request.user
         if user.is_anonymous:
-            raise qs.none()
+            return qs.none()
         if user.is_superuser:
             return qs
 
