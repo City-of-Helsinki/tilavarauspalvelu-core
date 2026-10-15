@@ -549,13 +549,13 @@ class RejectionReadinessChoice(models.TextChoices):
 
 
 class CalendarProperty(StrEnum):
-    VERSION = "VERSION"  # type: str
+    VERSION = "VERSION"  # Value type: str
     """
     REQUIRED. Version of the iCalendar specification required to interpret the iCalendar object.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.7.4
     """
 
-    PRODID = "PRODID"  # type: str
+    PRODID = "PRODID"  # Value type: str
     """
     REQUIRED. The identifier for the product that created the iCalendar object.
     See: https://en.wikipedia.org/wiki/Formal_Public_Identifier
@@ -564,55 +564,55 @@ class CalendarProperty(StrEnum):
 
 
 class EventProperty(StrEnum):
-    UID = "UID"  # type: str
+    UID = "UID"  # Value type: str
     """
     The unique identifier for the calendar event.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.4.7
     """
 
-    DTSTAMP = "DTSTAMP"  # type: datetime.datetime
+    DTSTAMP = "DTSTAMP"  # Value type: datetime.datetime
     """
     The date and time that the calendar event was created.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.7.2
     """
 
-    DTSTART = "DTSTART"  # type: datetime.datetime
+    DTSTART = "DTSTART"  # Value type: datetime.datetime
     """
     The date and time that the calendar event begins.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.2.4
     """
 
-    DTEND = "DTEND"  # type: datetime.datetime
+    DTEND = "DTEND"  # Value type: datetime.datetime
     """
     The date and time that the calendar event ends.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.2.2
     """
 
-    SUMMARY = "SUMMARY"  # type: str
+    SUMMARY = "SUMMARY"  # Value type: str
     """
     A short summary or subject for the event.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.12
     """
 
-    DESCRIPTION = "DESCRIPTION"  # type: str
+    DESCRIPTION = "DESCRIPTION"  # Value type: str
     """
     A more complete description for the event than that provided by "SUMMARY".
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.5
     """
 
-    LOCATION = "LOCATION"  # type: str
+    LOCATION = "LOCATION"  # Value type: str
     """
     The intended venue for the event.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.7
     """
 
-    GEO = "GEO"  # type: tuple[float, float]
+    GEO = "GEO"  # Value type: tuple[float, float]
     """
     Global position for the activity specified by a event.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.6
     """
 
-    X_ALT_DESC = "X-ALT-DESC"  # type: str
+    X_ALT_DESC = "X-ALT-DESC"  # Value type: str
     """
     A more complete description for the event than that provided by "SUMMARY".
     Required for Outlook calendars to display HTML descriptions properly.
@@ -621,7 +621,7 @@ class EventProperty(StrEnum):
 
 
 class TimezoneProperty(StrEnum):
-    TZID = "TZID"  # type: str
+    TZID = "TZID"  # Value type: str
     """
     The timezone identifier for the time zone of the event.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.2.19
@@ -629,26 +629,26 @@ class TimezoneProperty(StrEnum):
 
 
 class TimezoneRuleProperty(StrEnum):
-    DTSTART = "DTSTART"  # type: int
+    DTSTART = "DTSTART"  # Value type: int
     """
     Date and time after which this timezone rule is in effect.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.2.4
     """
 
-    RRULE = "RRULE"  # type: str
+    RRULE = "RRULE"  # Value type: str
     """
     Recurrence for the timezone change described by this rule.
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.5.3
     """
 
-    TZOFFSETFROM = "TZOFFSETFROM"  # type: str
+    TZOFFSETFROM = "TZOFFSETFROM"  # Value type: str
     """
     In which timezone offset (e.g. +0200) the event should be considered in
     before moving to this rule (e.g. from standard to daylight savings time).
     https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.3.3
     """
 
-    TZOFFSETTO = "TZOFFSETTO"  # type: str
+    TZOFFSETTO = "TZOFFSETTO"  # Value type: str
     """
     To which timezone offset (e.g. +0300) the event should be converted to
     when moving to this rule (e.g. from standard to daylight savings time).
