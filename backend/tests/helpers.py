@@ -128,7 +128,7 @@ class TranslationsFromPOFiles:
 
     translations: dict[Lang, polib.POFile]
     language_options: tuple[Lang, ...] = ("fi", "sv", "en")
-    default_language: Lang = settings.LANGUAGE_CODE
+    default_language: Lang = settings.LANGUAGE_CODE  # type: ignore[assignment]
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
         # Load translations to the clas only once

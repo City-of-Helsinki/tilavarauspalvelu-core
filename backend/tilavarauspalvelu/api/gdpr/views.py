@@ -64,6 +64,9 @@ class GDPRScopesAndLOAPermission(BasePermission):
         return False
 
     def has_object_permission(self, request: Request, view: TilavarauspalveluGDPRAPIView, obj: ProfileUser) -> bool:
+        if request.user.is_anonymous:
+            return False
+
         if request.user == obj.user:
             return True
 

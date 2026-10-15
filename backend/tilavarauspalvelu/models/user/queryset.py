@@ -4,11 +4,10 @@ import datetime
 from typing import Self, TypeVar
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.auth.models import UserManager as DjangoUserManager
 from django.db import models
 
-from tilavarauspalvelu.models import GeneralRole, UnitRole
+from tilavarauspalvelu.models import GeneralRole, UnitRole, User
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from tilavarauspalvelu.models.user.actions import ANONYMIZED_FIRST_NAME, ANONYMIZED_LAST_NAME
 from utils.date_utils import local_date
@@ -122,4 +121,4 @@ class UserManager(DjangoUserManager, ModelManager[User, UserQuerySet]):
     use_in_migrations = True
 
 
-class ProfileUserManager(SerializableModelManagerMixin, ModelManager[User, UserQuerySet]): ...
+class ProfileUserManager(SerializableModelManagerMixin, UserManager): ...

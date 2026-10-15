@@ -5,13 +5,13 @@ from decimal import Decimal
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, NotRequired, Protocol, TypedDict, overload
 
-from django.contrib.auth.models import AnonymousUser
 from django.db import models
 from rest_framework.exceptions import ValidationError
 
 if TYPE_CHECKING:
     import datetime
 
+    from django.contrib.auth.models import AnonymousUser as DjangoAnonymousUser
     from django.contrib.sessions.backends.cache import SessionStore
     from query_optimizer.typing import GQLInfo as OptimizerGQLInfo  # noqa: TID251
     from query_optimizer.typing import UserHintedWSGIRequest
@@ -34,6 +34,12 @@ if TYPE_CHECKING:
         ReservationUnit,
         User,
     )
+    from tilavarauspalvelu.services.permission_resolver import PermissionResolver
+
+    class AnonymousUser(DjangoAnonymousUser):
+        # The user model module sets this attribute on the Django class at import time.
+        permissions: PermissionResolver
+
 
 __all__ = [
     "AffectedTimeSpan",
