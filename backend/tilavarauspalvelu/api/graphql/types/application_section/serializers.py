@@ -142,7 +142,7 @@ class ApplicationSectionSerializer(NestingModelSerializer):
         option_errors: list[str] = []
 
         # Fetch current ordering for existing event reservation units
-        current_ordering: dict[str, int] = {}
+        current_ordering: dict[int, int] = {}
         if self.instance is not None:
             current_ordering = {
                 option["pk"]: option["preferred_order"]

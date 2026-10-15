@@ -20,7 +20,7 @@ class ImmutableModelAdmin(admin.ModelAdmin):
     def has_change_permission(self, request: WSGIRequest, obj: models.Model | None = None) -> bool:
         return False
 
-    def has_delete_permission(self, request: WSGIRequest, obj: models.Model = None) -> bool:
+    def has_delete_permission(self, request: WSGIRequest, obj: models.Model | None = None) -> bool:
         return False
 
     def get_urls(self) -> list[URLPattern]:

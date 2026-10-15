@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from tilavarauspalvelu.models import OriginHaukiResource, ReservableTimeSpan
+from tilavarauspalvelu.models import ReservableTimeSpan
 
 from ._base import ForeignKeyFactory, GenericDjangoModelFactory
 
@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-class ReservableTimeSpanFactory(GenericDjangoModelFactory[OriginHaukiResource]):
+class ReservableTimeSpanFactory(GenericDjangoModelFactory[ReservableTimeSpan]):
     class Meta:
         model = ReservableTimeSpan
 

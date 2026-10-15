@@ -144,7 +144,7 @@ class PaymentOrderAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     def has_delete_permission(self, request: WSGIRequest, obj: PaymentOrder | None = None) -> bool:
         return False
 
-    def reservation_unit(self, obj: PaymentOrder) -> str:
+    def reservation_unit(self, obj: PaymentOrder) -> ReservationUnit | str:
         return obj.reservation.reservation_unit if obj.reservation else ""
 
     def get_search_results(

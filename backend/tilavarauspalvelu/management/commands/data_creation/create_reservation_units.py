@@ -77,6 +77,8 @@ from .utils import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from django.db import models
 
     from tilavarauspalvelu.models import (
@@ -1797,8 +1799,8 @@ def _get_base_reservation_unit_builder(
     *,
     reservation_unit_type: ReservationUnitType,
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
-    cancellation_rules: list[ReservationUnitCancellationRule] = (None,),
-    hauki_resources: list[OriginHaukiResource] = (None,),
+    cancellation_rules: Sequence[ReservationUnitCancellationRule | None] = (None,),
+    hauki_resources: Sequence[OriginHaukiResource | None] = (None,),
 ) -> ReservationUnitBuilder:
     return ReservationUnitBuilder().set(  # type: ignore[return-value]
         origin_hauki_resource=random.choice(hauki_resources),

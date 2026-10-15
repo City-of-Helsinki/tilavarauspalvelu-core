@@ -276,7 +276,7 @@ def _(_: NowTT, state: State) -> ast.Call:
     return ast_function("now", ["datetime", "datetime"], **kwargs)
 
 
-def text_search[TQuerySet](
+def text_search[TQuerySet: models.QuerySet](
     qs: TQuerySet,
     fields: Collection[str],
     text: str,
