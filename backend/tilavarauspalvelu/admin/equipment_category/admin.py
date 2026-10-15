@@ -24,7 +24,7 @@ class EquipmentCategoryAdmin(SortableAdminMixin, TranslationAdmin):
     ordering = ["rank"]
 
     @admin.display(ordering="number_of_equipment")
-    def number_of_equipment(self, obj: EquipmentCategory) -> str:
+    def number_of_equipment(self, obj: EquipmentCategory) -> int:
         return getattr(obj, "number_of_equipment", -1)
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:

@@ -226,8 +226,8 @@ class TranslationsFromPOFiles:
     def get_language_from_request(self, request: HttpRequest, check_path: bool = False):  # noqa: FBT002
         return trans_real.get_language_from_request(request, check_path)
 
-    def get_language_from_path(self, request: HttpRequest) -> None:
-        return trans_real.get_language_from_path(request)
+    def get_language_from_path(self, path: str) -> str | None:
+        return trans_real.get_language_from_path(path)
 
     def get_supported_language_variant(self, lang_code: Lang, strict: bool = False) -> str:  # noqa: FBT002
         if "fi" in lang_code:

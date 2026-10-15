@@ -29,6 +29,8 @@ from utils.db import Now
 from utils.mixins import SerializableModelManagerMixin
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from tilavarauspalvelu.models import ApplicationRound, ApplicationSection
     from tilavarauspalvelu.typing import AnyUser
 
@@ -187,7 +189,7 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
     def unconfirmed(self) -> Self:
         return self.exclude(state=ReservationStateChoice.CONFIRMED)
 
-    def affecting_reservations(self, units: list[int] = (), reservation_units: list[int] = ()) -> Self:
+    def affecting_reservations(self, units: Sequence[int] = (), reservation_units: Sequence[int] = ()) -> Self:
         """Filter reservations that affect other reservations in the given units and/or reservation units."""
         qs = ReservationUnit.objects.all()
         if units:

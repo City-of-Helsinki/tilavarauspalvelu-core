@@ -120,7 +120,7 @@ class TprekUnitHaukiResourceIdImporter:
             page_size=50000,
         )
 
-        hauki_resource_id_map: dict[str, str | int] = {}
+        hauki_resource_id_map: dict[str, str] = {}
 
         # For each Hauki resource, find the origin with data_source=tprek and add the origin id to the map
         for hauki_resource in hauki_resources:

@@ -262,14 +262,14 @@ class ReservableTimeSpanFirstReservableTimeHelper:
             return False
 
         # Validate duration with front buffers
-        buffer_front_minutes = 0
+        buffer_front_minutes = 0.0
         if reservation_unit.buffer_time_before:
             buffer_front_minutes = reservation_unit.buffer_time_before.total_seconds() / 60
             if time_span.front_buffered_duration_minutes < (buffer_front_minutes + minimum_duration_minutes):
                 return False
 
         # Validate duration with back buffers
-        buffer_back_minutes = 0
+        buffer_back_minutes = 0.0
         if reservation_unit.buffer_time_after:
             buffer_back_minutes = reservation_unit.buffer_time_after.total_seconds() / 60
             if time_span.back_buffered_duration_minutes < (minimum_duration_minutes + buffer_back_minutes):

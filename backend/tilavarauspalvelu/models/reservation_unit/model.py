@@ -580,10 +580,10 @@ class ReservationUnit(models.Model):
 
     @lookup_property
     def is_visible() -> bool:
-        return (  # type: ignore[return-value]
+        return (
             (
                 # Always visible
-                models.Q(publish_begins_at__isnull=True)  #
+                models.Q(publish_begins_at__isnull=True)  # type: ignore[return-value]
                 & models.Q(publish_ends_at__isnull=True)
             )
             | (
