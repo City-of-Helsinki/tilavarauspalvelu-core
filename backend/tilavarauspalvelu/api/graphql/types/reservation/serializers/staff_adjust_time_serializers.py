@@ -73,7 +73,7 @@ class StaffReservationAdjustTimeSerializer(NestingModelSerializer):
         )
 
         had_access_code = instance.access_type == AccessType.ACCESS_CODE
-        instance: Reservation = super().update(instance=instance, validated_data=validated_data)
+        super().update(instance=instance, validated_data=validated_data)
         has_access_codes = instance.access_type == AccessType.ACCESS_CODE
 
         if instance.actions.overlapping_reservations().exists():

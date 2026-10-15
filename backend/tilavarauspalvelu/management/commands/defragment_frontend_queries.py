@@ -98,8 +98,6 @@ def separate_fragments_and_nodes(node: DocumentNode) -> FragmentsAndOperations:
     for definition in node.definitions:
         match definition:
             case OperationDefinitionNode():
-                definition: OperationDefinitionNode
-
                 if not isinstance(definition.name, NameNode):
                     msg = "Operations must have a name"
                     raise TypeError(msg)
@@ -113,8 +111,6 @@ def separate_fragments_and_nodes(node: DocumentNode) -> FragmentsAndOperations:
                 data.operations[name] = definition
 
             case FragmentDefinitionNode():
-                definition: FragmentDefinitionNode
-
                 if not isinstance(definition.name, NameNode):
                     msg = "Fragments must have a name"
                     raise TypeError(msg)
@@ -136,18 +132,15 @@ def separate_fragments_and_nodes(node: DocumentNode) -> FragmentsAndOperations:
 def replace_fragments(node: Node, *, fragments: dict[str, FragmentDefinitionNode], parent: Node | None = None) -> None:
     match node:
         case OperationDefinitionNode():
-            node: OperationDefinitionNode
             for selection in node.selection_set.selections:
                 replace_fragments(selection, fragments=fragments, parent=node)
 
         case FieldNode():
-            node: FieldNode
             if node.selection_set is not None:
                 for selection in node.selection_set.selections:
                     replace_fragments(selection, fragments=fragments, parent=node)
 
         case FragmentSpreadNode():
-            node: FragmentSpreadNode
             fragment = fragments.get(node.name.value)
             if fragment is None:
                 msg = f"Fragment '{node.name.value}' not found"
@@ -176,15 +169,12 @@ def replace_fragments(node: Node, *, fragments: dict[str, FragmentDefinitionNode
 def combine_duplicate_fields(node: Node) -> None:
     match node:
         case OperationDefinitionNode():
-            node: OperationDefinitionNode
-
             deduplicate_fields(node)
 
             for selection in node.selection_set.selections:
                 combine_duplicate_fields(selection)
 
         case FieldNode():
-            node: FieldNode
             if node.selection_set is not None:
                 deduplicate_fields(node)
 

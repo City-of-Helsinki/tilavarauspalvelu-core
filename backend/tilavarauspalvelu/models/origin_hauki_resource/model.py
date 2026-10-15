@@ -35,7 +35,7 @@ class OriginHaukiResource(models.Model):
     # Hauki API hash for opening hours, which is used to determine if the opening hours have changed
     opening_hours_hash: str = models.CharField(max_length=64, blank=True)
     # Latest date fetched from Hauki opening hours API (NOT when the data was last updated)
-    latest_fetched_date: datetime.datetime.date | None = models.DateField(null=True, blank=True)
+    latest_fetched_date: datetime.date | None = models.DateField(null=True, blank=True)
 
     objects: ClassVar[OriginHaukiResourceManager] = LazyModelManager.new()
     actions: LazyAttribute[OriginHaukiResourceActions] = LazyModelAttribute.new()

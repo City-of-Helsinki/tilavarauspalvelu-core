@@ -25,14 +25,14 @@ class TimezoneAwareDateField(forms.DateField):
         super().__init__(**kwargs)
 
     def to_python(self, value: datetime.date | datetime.datetime | str | None) -> datetime.datetime | None:
-        value: datetime.date | None = super().to_python(value)
+        date = super().to_python(value)
 
-        if value is None:
-            return value
+        if date is None:
+            return None
 
         if self.use_end_of_day:
-            return local_end_of_day(value)
-        return local_start_of_day(value)
+            return local_end_of_day(date)
+        return local_start_of_day(date)
 
 
 class TextChoicesFieldMixin:
