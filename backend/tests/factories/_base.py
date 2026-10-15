@@ -141,7 +141,7 @@ class _CustomFactoryWrapper:
         return self.factory
 
 
-class _PostFactory[T](PostGeneration):
+class _PostFactory(PostGeneration):
     def __init__(self, factory: FactoryType) -> None:
         super().__init__(function=self.generate)
         self.field_name: str = ""
@@ -154,7 +154,7 @@ class _PostFactory[T](PostGeneration):
     def get_factory(self) -> BaseFactory:
         return self.factory_wrapper.get()
 
-    def generate(self, instance: Model, create: bool, values: Iterable[T] | None, **kwargs: Any) -> None:
+    def generate(self, instance: Model, create: bool, values: Iterable[Any] | None, **kwargs: Any) -> None:
         raise NotImplementedError
 
 
@@ -415,10 +415,10 @@ class ValidatedGenericFactory[T](GenericFactory[T]):
             raise GenericFactoryValidationError(msg)
 
 
-class GenericListFactory[T](_PostFactory[T]):
+class GenericListFactory(_PostFactory):
     """Field factory for generating a list of values using another GenericFactory."""
 
-    def generate(self, instance: Any, create: bool, values: Iterable[T] | None, **kwargs: Any) -> None:
+    def generate(self, instance: Any, create: bool, values: Iterable[Any] | None, **kwargs: Any) -> None:
         if values is None:
             factory = self.get_factory()
             item = factory.create(**kwargs) if create else factory.build(**kwargs)
@@ -472,7 +472,7 @@ class ModelFactoryBuilder[TModel: Model]:
 # --- Related factories --------------------------------------------------------------------------------------------
 
 
-class ForeignKeyFactory[TModel: Model](SubFactory):
+class ForeignKeyFactory(SubFactory):
     """
     Factory for forward 'many-to-one' (foreign key) related fields.
 
@@ -498,7 +498,7 @@ class ForeignKeyFactory[TModel: Model](SubFactory):
             return False
         return self.owner._meta.model._meta.get_field(self.name).null
 
-    def evaluate(self, instance: Resolver, step: BuildStep, extra: dict[str, Any]) -> TModel | None:
+    def evaluate(self, instance: Resolver, step: BuildStep, extra: dict[str, Any]) -> Model | None:
         if not extra and self.null:
             return None
         return super().evaluate(instance, step, extra)
@@ -511,30 +511,30 @@ Basically the same as a SubFactory, but allows the related value to be 'None'.
 """
 
 
-class ReverseOneToOneFactory[TModel: Model](_PostFactory[TModel]):
+class ReverseOneToOneFactory(_PostFactory):
     """
     Factory for reverse 'one-to-one' related fields.
     If given the related model, or 'factory style arguments' (related__field=value),
     the related object is created and linked to the current instance.
     """
 
-    def generate(self, instance: Model, create: bool, models: Iterable[TModel] | None, **kwargs: Any) -> None:
-        if not models and kwargs:
+    def generate(self, instance: Model, create: bool, values: Iterable[Model] | None, **kwargs: Any) -> None:
+        if not values and kwargs:
             factory = self.get_factory()
             field_name = instance._meta.get_field(self.field_name).remote_field.name
             kwargs.setdefault(field_name, instance)
             factory.create(**kwargs) if create else factory.build(**kwargs)
 
 
-class ReverseForeignKeyFactory[TModel: Model](_PostFactory[TModel]):
+class ReverseForeignKeyFactory(_PostFactory):
     """
     Factory for reverse foreign keys (one-to-many).
     If given the related model, or "factory style arguments" (related__field=value),
     a single related object is created and linked to the current instance.
     """
 
-    def generate(self, instance: Model, create: bool, models: Iterable[TModel] | None, **kwargs: Any) -> None:
-        if not models and kwargs:
+    def generate(self, instance: Model, create: bool, values: Iterable[Model] | None, **kwargs: Any) -> None:
+        if not values and kwargs:
             factory = self.get_factory()
             manager = getattr(instance, self.field_name)
             try:
@@ -555,17 +555,17 @@ class ReverseForeignKeyFactory[TModel: Model](_PostFactory[TModel]):
             factory.create(**kwargs) if create else factory.build(**kwargs)
 
 
-class ManyToManyFactory[TModel: Model](_PostFactory[TModel]):
+class ManyToManyFactory(_PostFactory):
     """
     Factory for forward/reverse many-to-many related fields.
     If given the related model, or "factory style arguments" (related__field=value),
     a single related object is created and linked to the current instance.
     """
 
-    def generate(self, instance: Model, create: bool, models: Iterable[TModel] | None, **kwargs: Any) -> None:
-        if models:
+    def generate(self, instance: Model, create: bool, values: Iterable[Model] | None, **kwargs: Any) -> None:
+        if values:
             if create:
-                for model in models or []:
+                for model in values or []:
                     getattr(instance, self.field_name).add(model)
 
         elif kwargs:
