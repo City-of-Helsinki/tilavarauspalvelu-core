@@ -19,11 +19,11 @@ The script needs this setup. If a call fails because of it, stop and tell the us
 - The 1Password vault has an "API Credential" item. `username` is the Atlassian email. `credential` is an API token from https://id.atlassian.com/manage-profile/security/api-tokens.
 - The user's shell profile sets these variables:
 
-| Variable                | Default        | Meaning                                               |
-|-------------------------|----------------|-------------------------------------------------------|
-| `JIRA_ISSUE_OP_ACCOUNT` | none, required | 1Password account, for example `vincit.1password.eu`. |
-| `JIRA_ISSUE_OP_VAULT`   | `Private`      | Vault that has the item.                              |
-| `JIRA_ISSUE_OP_ITEM`    | `Jira API key` | Name of the item.                                     |
+| Variable                | Meaning                                               |
+|-------------------------|-------------------------------------------------------|
+| `JIRA_ISSUE_OP_ACCOUNT` | 1Password account, for example `vincit.1password.eu`. |
+| `JIRA_ISSUE_OP_VAULT`   | Vault that has the item, for example `Private`.       |
+| `JIRA_ISSUE_OP_ITEM`    | Name of the item, for example `Jira API key`.         |
 
 Never print the credentials or call `op` for them yourself. Use only the script.
 

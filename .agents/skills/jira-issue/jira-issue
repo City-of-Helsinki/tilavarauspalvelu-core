@@ -26,9 +26,9 @@ else
 fi
 
 : "${JIRA_ISSUE_OP_ACCOUNT:?Set JIRA_ISSUE_OP_ACCOUNT to your 1Password account, e.g. vincit.1password.eu}"
-vault="${JIRA_ISSUE_OP_VAULT:-Private}"
-item="${JIRA_ISSUE_OP_ITEM:-Jira API key}"
-ref="op://$vault/$item"
+: "${JIRA_ISSUE_OP_VAULT:?Set JIRA_ISSUE_OP_VAULT to the 1Password vault that has the item, e.g. Private}"
+: "${JIRA_ISSUE_OP_ITEM:?Set JIRA_ISSUE_OP_ITEM to the name of the 1Password item, e.g. Jira API key}"
+ref="op://$JIRA_ISSUE_OP_VAULT/$JIRA_ISSUE_OP_ITEM"
 
 user="$(op read --account "$JIRA_ISSUE_OP_ACCOUNT" "$ref/username")"
 token="$(op read --account "$JIRA_ISSUE_OP_ACCOUNT" "$ref/credential")"
