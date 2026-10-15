@@ -162,7 +162,7 @@ def _create_normal_reservations(
         min_interval_hours = max(int(max_buffer.total_seconds() / 3600), 1 if busy else 5)
         max_interval_hours = max(min_interval_hours + 1, 3 if busy else 10)
 
-        pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
+        pricing = next(iter(reservation_unit.pricings.all()), None)
         assert pricing is not None, "Reservation unit must have at least one pricing"
 
         payment_type = PaymentType(pricing.payment_type)
@@ -467,7 +467,7 @@ def _create_full_day_reservations(
         if reservation_unit.require_reservation_handling:
             handled_at = local_datetime()
 
-        pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
+        pricing = next(iter(reservation_unit.pricings.all()), None)
         assert pricing is not None, "Reservation unit must have at least one pricing"
 
         for reservation_date in get_date_range(start_date, number=14):
@@ -579,7 +579,7 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
     reservation_date = local_date()
 
     for reservation_unit in space_reservation_units:
-        pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
+        pricing = next(iter(reservation_unit.pricings.all()), None)
         assert pricing is not None, "Reservation unit must have at least one pricing"
 
         begin_time = datetime.time(hour=random.randint(8, 12))
@@ -615,7 +615,7 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
         reservation_date += datetime.timedelta(days=1)
 
     for reservation_unit in resource_reservation_units:
-        pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
+        pricing = next(iter(reservation_unit.pricings.all()), None)
         assert pricing is not None, "Reservation unit must have at least one pricing"
 
         begin_time = datetime.time(hour=random.randint(8, 12))

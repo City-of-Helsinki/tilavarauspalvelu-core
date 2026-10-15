@@ -140,8 +140,8 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
             try:
                 # Use the profile refresh token to fetch a 'special' access token from Keycloak that
                 # can only be used to fetch new access and refresh tokens for Helsinki profile for the same audience.
-                response: RefreshResponse = cls.oidc_backend.refresh_token(token=profile_refresh_token)
-                access_token = response["access_token"]
+                refresh_response: RefreshResponse = cls.oidc_backend.refresh_token(token=profile_refresh_token)
+                access_token = refresh_response["access_token"]
             except HTTPError as error:
                 #
                 # Last resort, try keycloak refresh

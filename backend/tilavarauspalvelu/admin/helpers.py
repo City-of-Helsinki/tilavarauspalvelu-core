@@ -6,7 +6,7 @@ from django.contrib import admin
 
 if TYPE_CHECKING:
     from django.db import models
-    from django.urls import path
+    from django.urls import URLPattern
 
     from tilavarauspalvelu.typing import WSGIRequest
 
@@ -23,7 +23,7 @@ class ImmutableModelAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request: WSGIRequest, obj: models.Model = None) -> bool:
         return False
 
-    def get_urls(self) -> list[path]:
+    def get_urls(self) -> list[URLPattern]:
         urls = super().get_urls()
         urls.pop(1)  # Remove the /add/ view URL
         urls.pop(2)  # Remove the /delete/ view URL

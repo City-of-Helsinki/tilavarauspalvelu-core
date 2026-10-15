@@ -144,7 +144,7 @@ class ApplicationSectionSerializer(NestingModelSerializer):
         # Fetch current ordering for existing event reservation units
         current_ordering: dict[str, int] = {}
         if self.instance is not None:
-            current_ordering: dict[str, int] = {
+            current_ordering = {
                 option["pk"]: option["preferred_order"]
                 for option in ReservationUnitOption.objects.filter(application_section=self.instance).values(
                     "preferred_order", "pk"
