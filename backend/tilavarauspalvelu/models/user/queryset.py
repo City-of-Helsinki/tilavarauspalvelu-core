@@ -4,10 +4,10 @@ import datetime
 from typing import Self
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.auth.models import UserManager as DjangoUserManager
 from django.db import models
 
+from tilavarauspalvelu.models import User
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from tilavarauspalvelu.models.user.actions import ANONYMIZED_FIRST_NAME, ANONYMIZED_LAST_NAME
 from utils.date_utils import local_date
