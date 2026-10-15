@@ -95,25 +95,34 @@ oc-status env: (oc-select env)
             | @tsv' \
         | column -t -s $'\t'
 
-# Follow the core (API) logs for an env
-oc-logs-core env: (oc-select env)
-    @oc logs -l deploymentconfig=tilavarauspalvelu-core --prefix --tail=100 -f
+# Follow the logs of an app (core, worker, scheduler, customer-ui, staff-ui) for an env
+oc-logs app env: (oc-select env)
+    #!/usr/bin/env bash
+    set -euo pipefail
 
-# Follow the core worker (Celery) logs for an env
-oc-logs-worker env: (oc-select env)
-    @oc logs -l deploymentconfig=tilavarauspalvelu-core-worker --prefix --tail=100 -f
+    case "{{ app }}" in
+        core)
+            deploymentconfig="tilavarauspalvelu-core"
+            ;;
+        worker)
+            deploymentconfig="tilavarauspalvelu-core-worker"
+            ;;
+        scheduler)
+            deploymentconfig="tilavarauspalvelu-core-scheduler"
+            ;;
+        customer-ui)
+            deploymentconfig="tilavarauspalvelu-customer-ui"
+            ;;
+        staff-ui)
+            deploymentconfig="tilavarauspalvelu-staff-ui"
+            ;;
+        *)
+            echo "Unknown app '{{ app }}'. Use core, worker, scheduler, customer-ui or staff-ui." >&2
+            exit 1
+            ;;
+    esac
 
-# Follow the core scheduler (Celery beat) logs for an env
-oc-logs-scheduler env: (oc-select env)
-    @oc logs -l deploymentconfig=tilavarauspalvelu-core-scheduler --prefix --tail=100 -f
-
-# Follow the customer UI logs for an env
-oc-logs-customer-ui env: (oc-select env)
-    @oc logs -l deploymentconfig=tilavarauspalvelu-customer-ui --prefix --tail=100 -f
-
-# Follow the staff UI logs for an env
-oc-logs-staff-ui env: (oc-select env)
-    @oc logs -l deploymentconfig=tilavarauspalvelu-staff-ui --prefix --tail=100 -f
+    oc logs -l deploymentconfig="${deploymentconfig}" --prefix --tail=100 -f
 
 # Log in to Azure DevOps in the City of Helsinki tenant
 az-login:
