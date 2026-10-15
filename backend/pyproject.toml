@@ -94,6 +94,55 @@ django-stubs = { version = "6.1.2", extras = ["compatible-mypy"] }
 [project.entry-points.pytest11]
 tilavarauspalvelu = "tests.plugins"
 
+[tool.mypy]
+plugins = [
+    "mypy_django_plugin.main",
+]
+exclude = [
+    "/migrations/",
+]
+
+[[tool.mypy.overrides]]
+# These packages have no type hints or stubs.
+module = [
+    "adminsortable2.*",
+    "admin_data_views.*",
+    "auditlog.*",
+    "celery.*",
+    "dateutil.*",
+    "django_celery_beat.*",
+    "django_celery_results.*",
+    "django_filters.*",
+    "django_jinja.*",
+    "django_redis.*",
+    "easy_thumbnails.*",
+    "graphene.*",
+    "graphene_django.*",
+    "health_check.*",
+    "helsinki_gdpr.*",
+    "import_export.*",
+    "kombu.*",
+    "more_admin_filters.*",
+    "mptt.*",
+    "polib.*",
+    "rangefilter.*",
+    "resilient_logger.*",
+    "tinymce.*",
+    "xhtml2pdf.*",
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# Read the source so that the plugin can see the fields of `User`, which subclasses a model from here.
+module = ["helusers.*"]
+follow_untyped_imports = true
+ignore_errors = true
+
+[tool.django-stubs]
+django_settings_module = "config.settings"
+# The settings are attributes of `env_config` classes, so the plugin cannot find them in the settings module.
+strict_settings = false
+
 [tool.ruff]
 fix = true
 line-length = 120
