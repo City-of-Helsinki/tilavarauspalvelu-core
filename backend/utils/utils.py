@@ -27,9 +27,7 @@ if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
     from pathlib import Path
 
-    from django.http import HttpRequest
-
-    from tilavarauspalvelu.typing import AnyUser, Lang, TextSearchLang
+    from tilavarauspalvelu.typing import AnyUser, Lang, TextSearchLang, WSGIRequest
 
 __all__ = [
     "comma_sep_str",
@@ -135,7 +133,7 @@ class with_indices[T]:  # noqa: N801
         self.item_deleted = True
 
 
-def get_text_search_language(request: HttpRequest) -> TextSearchLang:
+def get_text_search_language(request: WSGIRequest) -> TextSearchLang:
     """
     Get appropriate text search language for the given request.
     Use preferred language if user is authenticated, otherwise use the language from the request.
@@ -144,7 +142,7 @@ def get_text_search_language(request: HttpRequest) -> TextSearchLang:
     return "swedish" if lang_code == "sv" else "english" if lang_code == "en" else "finnish"
 
 
-def get_request_language(request: HttpRequest) -> Lang:
+def get_request_language(request: WSGIRequest) -> Lang:
     referer = request.META.get("HTTP_REFERER")
     user: AnyUser = request.user
 
