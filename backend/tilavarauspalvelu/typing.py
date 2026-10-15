@@ -50,7 +50,12 @@ __all__ = [
 ]
 
 
-class permission(classmethod): ...  # noqa: N801
+if TYPE_CHECKING:
+    # The type checker treats only 'classmethod' itself as a class method decorator, not its subclasses.
+    permission = classmethod
+else:
+
+    class permission(classmethod): ...  # noqa: N801
 
 
 type AnyUser = User | AnonymousUser
