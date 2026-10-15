@@ -36,9 +36,9 @@ __all__ = [
 ]
 
 
-def validation_error_as_response[R, **P](func: Callable[P, R]) -> Callable[P, R]:
+def validation_error_as_response[R, **P](func: Callable[P, R]) -> Callable[P, R | JsonResponse]:
     @wraps(func)
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R | JsonResponse:
         try:
             return func(*args, **kwargs)
 
@@ -64,7 +64,7 @@ def is_valid_url(url: str) -> bool:
     return True
 
 
-def redirect_back_on_error[R, **P](func: Callable[P, R]) -> Callable[P, R]:
+def redirect_back_on_error[R, **P](func: Callable[P, R]) -> Callable[P, R | JsonResponse | HttpResponseRedirect]:
     """
     Error handler for endpoints that do redirects to other services.
     Cannot simply return an error response, since these endpoints will not be called with 'fetch' in the frontend.
@@ -73,7 +73,7 @@ def redirect_back_on_error[R, **P](func: Callable[P, R]) -> Callable[P, R]:
     """
 
     @wraps(func)
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R | JsonResponse | HttpResponseRedirect:
         redirect_on_error: str | None = None
 
         # If the first positional argument is the request object, try to get the 'redirect_on_error' parameter.
