@@ -111,7 +111,7 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
 
     # Form
     fieldsets = [
-        [
+        (
             _("Basic information"),
             {
                 "fields": [
@@ -121,8 +121,8 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
                     "last_name",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Settings"),
             {
                 "fields": [
@@ -132,8 +132,8 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
                     "groups",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Additional information"),
             {
                 "fields": [
@@ -147,8 +147,8 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
                     "is_internal_user",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("ID token info"),
             {
                 "fields": [
@@ -170,8 +170,8 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
                     "level_of_assurance",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Permissions"),
             {
                 "fields": [
@@ -182,7 +182,7 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
                     "ad_groups",
                 ],
             },
-        ],
+        ),
     ]
     readonly_fields = [
         "last_login",

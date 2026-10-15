@@ -90,7 +90,7 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Form
     form = ApplicationSectionAdminForm
     fieldsets = [
-        [
+        (
             _("Basic information"),
             {
                 "fields": [
@@ -104,8 +104,8 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "purpose",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Time"),
             {
                 "fields": [
@@ -116,8 +116,8 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "applied_reservations_per_week",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Pindora information"),
             {
                 "fields": [
@@ -125,7 +125,7 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "pindora_response",
                 ],
             },
-        ],
+        ),
     ]
     readonly_fields = [
         "id",
