@@ -415,4 +415,4 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
                 response.status_code = 404
                 return
 
-        raise super().handle_500_error(response)
+        super().handle_500_error(response)
