@@ -13,6 +13,8 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Application, GeneralRole, Reservation, ReservationSeries, UnitRole, User
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from tilavarauspalvelu.typing import WSGIRequest
 
     from .typing import PipelineArgs
@@ -39,7 +41,7 @@ def fetch_additional_info_for_user_from_helsinki_profile(**kwargs: Unpack[Pipeli
 
 
 @contextlib.contextmanager
-def use_request_user(request: WSGIRequest, user: User) -> None:
+def use_request_user(request: WSGIRequest, user: User) -> Generator[None]:
     """
     Use the provided user as the request user for the duration of the context.
     This is needed during login, since the request user is still anonymous.
