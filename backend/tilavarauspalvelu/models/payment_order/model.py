@@ -18,6 +18,7 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     import uuid
 
+    from django.utils.functional import Promise
     from lazy_managers import LazyAttribute
 
     from tilavarauspalvelu.models import Reservation
@@ -90,7 +91,7 @@ class PaymentOrder(models.Model):
         super().save(*args, **kwargs)
 
     def clean(self) -> None:
-        validation_errors = {}
+        validation_errors: dict[str, list[Promise]] = {}
 
         failsafe_price_net = self.price_net or Decimal("0.0")
         failsafe_price_vat = self.price_vat or Decimal("0.0")
