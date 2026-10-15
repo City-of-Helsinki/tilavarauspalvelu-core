@@ -387,6 +387,20 @@ def test_seasonal_booking_rescheduled_series__send_email(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
+def test_seasonal_booking_rescheduled_series__send_email__series_not_from_application(outbox):
+    series = create_reservation_series(
+        user__email="user@email.com",
+        reservations__type=ReservationTypeChoice.SEASONAL,
+    )
+
+    EmailService.send_seasonal_booking_rescheduled_series_email(series)
+
+    assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_seasonal_booking_rescheduled_series__send_email__no_reservations(outbox):
     user = UserFactory.create(email="user@email.com")
     application = ApplicationFactory.create(
