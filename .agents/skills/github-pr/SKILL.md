@@ -29,8 +29,9 @@ Put a URL in single quotes:
 .agents/skills/github-pr/github-pr 'https://github.com/City-of-Helsinki/tilavarauspalvelu-core/pull/99'
 ```
 
-The script validates the number. It prints the pull request with two lists of comments:
+The script validates the number. It prints the pull request with three lists of comments:
 
+- `reviews` are review summaries. A URL with `#pullrequestreview-<id>` points to the review with that `id`.
 - `review_comments` are tied to a file and a line. A URL with `#discussion_r<id>` points to the review comment with that `id`.
 - `comments` are general comments on the pull request.
 

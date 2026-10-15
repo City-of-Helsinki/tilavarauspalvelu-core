@@ -24,6 +24,11 @@ pr="$(gh pr view "$number" --repo "$repo" \
   --json number,title,state,author,baseRefName,headRefName,url,isDraft,body \
   --jq '{number, title, state, author: .author.login, source_branch: .headRefName, target_branch: .baseRefName, web_url: .url, draft: .isDraft, description: .body}')"
 
+# Review summaries. Skip empty bodies, which only group line-specific review comments.
+reviews="$(gh api "repos/$repo/pulls/$number/reviews" --paginate \
+  --jq '.[] | select(.body != "") | {id, author: .user.login, at: .submitted_at, state, body}' \
+  | jq --slurp .)"
+
 # Line-specific review comments.
 review_comments="$(gh api "repos/$repo/pulls/$number/comments" --paginate \
   --jq '.[] | {id, author: .user.login, at: .created_at, file: .path, line: (.line // .original_line), in_reply_to: .in_reply_to_id, body}' \
@@ -34,5 +39,5 @@ comments="$(gh api "repos/$repo/issues/$number/comments" --paginate \
   --jq '.[] | {author: .user.login, at: .created_at, body}' \
   | jq --slurp .)"
 
-jq --slurp '.[0] + {review_comments: .[1], comments: .[2]}' \
-  <(printf '%s' "$pr") <(printf '%s' "$review_comments") <(printf '%s' "$comments")
+jq --slurp '.[0] + {reviews: .[1], review_comments: .[2], comments: .[3]}' \
+  <(printf '%s' "$pr") <(printf '%s' "$reviews") <(printf '%s' "$review_comments") <(printf '%s' "$comments")
