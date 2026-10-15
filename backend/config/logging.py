@@ -22,7 +22,7 @@ class TVPFormatter(logging.Formatter):
             if user is not None:
                 extra["user_id"] = "Anonymous" if getattr(user, "is_anonymous", False) else user.id
 
-        self._style._defaults = extra
+        self._style._defaults = extra  # type: ignore[attr-defined]
         return super().format(record)
 
     def get_dotpath(self, record: logging.LogRecord) -> str:

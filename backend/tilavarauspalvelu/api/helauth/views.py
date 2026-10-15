@@ -54,7 +54,7 @@ def logout_view(request: WSGIRequest) -> HttpResponseRedirect:
 
     redirect_to = request.POST.get("redirect_to")
     if redirect_to is None:
-        redirect_to = request.build_absolute_uri(settings.LOGOUT_REDIRECT_URL)
+        redirect_to = request.build_absolute_uri(settings.LOGOUT_REDIRECT_URL)  # type: ignore[arg-type]
 
     # Added in `helusers.pipeline.store_end_session_url`
     end_session_url: str | None = request.session.get("social_auth_end_session_url")
