@@ -37,6 +37,8 @@ from tilavarauspalvelu.typing import ReservationDetails
 from utils.date_utils import local_end_of_day, local_start_of_day
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from tilavarauspalvelu.models import ApplicationRound
 
 
@@ -166,7 +168,7 @@ class ApplicationRoundActions:
             create_statistics_for_reservations_task.delay(reservation_pks=list(reservation_pks))
 
     def _get_series_override_closed_time_spans(
-        self, allocations: list[AllocatedTimeSlot]
+        self, allocations: Iterable[AllocatedTimeSlot]
     ) -> dict[int, list[TimeSpanElement]]:
         """
         Find all closed opening hours for all reservation units where allocations were made.
