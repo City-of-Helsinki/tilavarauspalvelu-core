@@ -49,6 +49,9 @@ const Img = styled(Image)`
     max-width: ${`${IMAGE_WIDTH}px`};
     width: auto;
   }
+  /* stylelint-disable-next-line property-no-vendor-prefix -- Safari doesn't support user-select */
+  -webkit-user-select: none;
+  user-select: none;
 `;
 
 const TextContent = styled.div`
@@ -133,6 +136,7 @@ export function ErrorContainer({
         width={IMAGE_WIDTH}
         height={IMAGE_HEIGHT}
         aria-hidden="true"
+        onMouseDown={(evt) => evt.preventDefault()}
       />
       <TextContent>
         {children || statusCodeText({ statusCode, title, body, t })}
