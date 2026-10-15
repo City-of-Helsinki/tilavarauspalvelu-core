@@ -7,6 +7,7 @@
     "dev": "ROARR_LOG=true next dev -p 3001 --turbopack",
     "build": "SKIP_ENV_VALIDATION=true next build",
     "start": "next start -p 3001",
+    "clean:cache": "rm -rf .next",
     "lint": "oxlint --type-aware --type-check",
     "lint:fix": "oxlint --type-aware --type-check --fix",
     "lint:css": "stylelint './src/**/*.tsx'",

@@ -7,7 +7,7 @@
   "main": "index.js",
   "scripts": {
     "preinstall": "sh ./scripts/enforce-pm.sh",
-    "clean": "npkill",
+    "clean:deps": "npkill",
     "dev": "pnpm -r --parallel run dev",
     "build": "pnpm -r run build",
     "lint": "oxlint --type-aware --type-check",

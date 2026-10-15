@@ -12,8 +12,12 @@ install:
     @pnpm install
 
 # Remove node_modules directories
-clean:
+clean-deps:
     @npkill
+
+# Remove cache (.next) directories
+clean-cache:
+    @pnpm -r run clean:cache
 
 # Run all apps in development mode
 dev:
