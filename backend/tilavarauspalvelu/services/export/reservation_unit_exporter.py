@@ -32,25 +32,25 @@ __all__ = [
 class ReservationUnitExportRow(BaseExportRow):
     reservation_unit_id: str | int = ""
     name: str = ""
-    name_fi: str = ""
-    name_en: str = ""
-    name_sv: str = ""
+    name_fi: str | None = ""
+    name_en: str | None = ""
+    name_sv: str | None = ""
     description: str = ""
     description_fi: str = ""
     description_en: str = ""
     description_sv: str = ""
     type: str = ""
-    notes_when_applying: str = ""
-    notes_when_applying_fi: str = ""
-    notes_when_applying_en: str = ""
-    notes_when_applying_sv: str = ""
+    notes_when_applying: str | None = ""
+    notes_when_applying_fi: str | None = ""
+    notes_when_applying_en: str | None = ""
+    notes_when_applying_sv: str | None = ""
     service_specific_terms: str = ""
     tprek_id: str = ""
     unit: str = ""
     contact_information: str = ""
     is_this_in_draft_state: str | bool = ""
-    publish_begins_at: str = ""
-    publish_ends_at: str = ""
+    publish_begins_at: str | None = ""
+    publish_ends_at: str | None = ""
     spaces: str = ""
     resources: str = ""
     payment_terms: str = ""
@@ -62,8 +62,8 @@ class ReservationUnitExportRow(BaseExportRow):
     highest_price: str = ""
     tax_percentage: str = ""
     material_price_description: str = ""
-    reservation_begins_at: str = ""
-    reservation_ends_at: str = ""
+    reservation_begins_at: str | None = ""
+    reservation_ends_at: str | None = ""
     reservation_form: str = ""
     require_a_handling: str | bool = ""
     authentication: str = ""
@@ -71,36 +71,36 @@ class ReservationUnitExportRow(BaseExportRow):
     access_type: str = ""
     payment_type: str = ""
     can_apply_free_of_charge: str | bool = ""
-    additional_instructions_for_pending_reservation_fi: str = ""
-    additional_instructions_for_pending_reservation_sv: str = ""
-    additional_instructions_for_pending_reservation_en: str = ""
-    additional_instructions_for_confirmed_reservation_fi: str = ""
-    additional_instructions_for_confirmed_reservation_sv: str = ""
-    additional_instructions_for_confirmed_reservation_en: str = ""
-    additional_instructions_for_cancelled_reservations_fi: str = ""
-    additional_instructions_for_cancelled_reservations_sv: str = ""
-    additional_instructions_for_cancelled_reservations_en: str = ""
-    maximum_reservation_duration: str | int = ""
-    minimum_reservation_duration: str | int = ""
-    maximum_number_of_persons: str | int = ""
-    minimum_number_of_persons: str | int = ""
-    surface_area: str | int = ""
-    buffer_time_before_reservation: str | int = ""
-    buffer_time_after_reservation: str | int = ""
-    hauki_resource_id: str | int = ""
-    reservation_start_interval: str | int = ""
-    maximum_number_of_days_before_reservations_can_be_made: str | int = ""
-    minimum_days_before_reservations_can_be_made: str | int = ""
-    maximum_number_of_active_reservations_per_user: str | int = ""
+    additional_instructions_for_pending_reservation_fi: str | None = ""
+    additional_instructions_for_pending_reservation_sv: str | None = ""
+    additional_instructions_for_pending_reservation_en: str | None = ""
+    additional_instructions_for_confirmed_reservation_fi: str | None = ""
+    additional_instructions_for_confirmed_reservation_sv: str | None = ""
+    additional_instructions_for_confirmed_reservation_en: str | None = ""
+    additional_instructions_for_cancelled_reservations_fi: str | None = ""
+    additional_instructions_for_cancelled_reservations_sv: str | None = ""
+    additional_instructions_for_cancelled_reservations_en: str | None = ""
+    maximum_reservation_duration: str | int | None = ""
+    minimum_reservation_duration: str | int | None = ""
+    maximum_number_of_persons: str | int | None = ""
+    minimum_number_of_persons: str | int | None = ""
+    surface_area: str | int | None = ""
+    buffer_time_before_reservation: str | int | None = ""
+    buffer_time_after_reservation: str | int | None = ""
+    hauki_resource_id: str | int | None = ""
+    reservation_start_interval: str | int | None = ""
+    maximum_number_of_days_before_reservations_can_be_made: str | int | None = ""
+    minimum_days_before_reservations_can_be_made: str | int | None = ""
+    maximum_number_of_active_reservations_per_user: str | int | None = ""
     is_reservation_unit_archived: str | bool = ""
     intended_uses: str = ""
     equipments: str = ""
     state: str = ""
     reservation_state: str = ""
-    updated_at: str = ""
+    updated_at: str | None = ""
 
 
-class ReservationUnitExporter(BaseCSVExporter):
+class ReservationUnitExporter(BaseCSVExporter[ReservationUnit]):
     """Exports reservation units to a CSV file."""
 
     def __init__(
@@ -113,7 +113,7 @@ class ReservationUnitExporter(BaseCSVExporter):
         super().__init__(datetime_format=datetime_format)
 
     @property
-    def queryset(self) -> models.QuerySet:
+    def queryset(self) -> ReservationUnitQuerySet:
         return (
             self._queryset
             .select_related(
@@ -242,7 +242,7 @@ class ReservationUnitExporter(BaseCSVExporter):
         ]
 
     def get_data_rows(self, instance: ReservationUnit) -> Iterable[ReservationUnitExportRow]:
-        pricing: ReservationUnitPricing = next(iter(instance.pricings.all()), None)
+        pricing: ReservationUnitPricing | None = next(iter(instance.pricings.all()), None)
         start_interval = ReservationStartInterval(instance.reservation_start_interval)
         payment_type = getattr(pricing, "payment_type", None)
         access_type = instance.current_access_type
@@ -254,9 +254,9 @@ class ReservationUnitExporter(BaseCSVExporter):
                 name_en=instance.name_en,
                 name_sv=instance.name_sv,
                 description=instance.description.replace("\n", " "),
-                description_fi=instance.description_fi.replace("\n", " "),
-                description_en=instance.description_en.replace("\n", " "),
-                description_sv=instance.description_sv.replace("\n", " "),
+                description_fi=(instance.description_fi or "").replace("\n", " "),
+                description_en=(instance.description_en or "").replace("\n", " "),
+                description_sv=(instance.description_sv or "").replace("\n", " "),
                 type=getattr(instance.reservation_unit_type, "name", ""),
                 notes_when_applying=instance.notes_when_applying,
                 notes_when_applying_fi=instance.notes_when_applying_fi,
@@ -269,8 +269,8 @@ class ReservationUnitExporter(BaseCSVExporter):
                 is_this_in_draft_state=instance.is_draft,
                 publish_begins_at=self.format_datetime(instance.publish_begins_at),
                 publish_ends_at=self.format_datetime(instance.publish_ends_at),
-                spaces=", ".join(space.name_fi for space in instance.spaces.all()),
-                resources=", ".join(resource.name_fi for resource in instance.resources.all()),
+                spaces=", ".join(space.name_fi for space in instance.spaces.all() if space.name_fi),
+                resources=", ".join(resource.name_fi for resource in instance.resources.all() if resource.name_fi),
                 payment_terms=getattr(instance.payment_terms, "name", ""),
                 cancellation_terms=getattr(instance.cancellation_terms, "name", ""),
                 pricing_terms=getattr(instance.pricing_terms, "name", ""),
@@ -311,8 +311,10 @@ class ReservationUnitExporter(BaseCSVExporter):
                 minimum_days_before_reservations_can_be_made=instance.reservations_min_days_before,
                 maximum_number_of_active_reservations_per_user=instance.max_reservations_per_user,
                 is_reservation_unit_archived=instance.is_archived,
-                intended_uses=", ".join(intended_use.name_fi for intended_use in instance.intended_uses.all()),
-                equipments=", ".join(equipment.name_fi for equipment in instance.equipments.all()),
+                intended_uses=", ".join(
+                    intended_use.name_fi for intended_use in instance.intended_uses.all() if intended_use.name_fi
+                ),
+                equipments=", ".join(equipment.name_fi for equipment in instance.equipments.all() if equipment.name_fi),
                 state=instance.publishing_state,
                 reservation_state=instance.reservation_state,
                 updated_at=self.format_datetime(instance.updated_at),
