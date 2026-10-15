@@ -32,7 +32,7 @@ class ReservationSeriesAdminForm(forms.ModelForm):
 
     class Meta:
         model = ReservationSeries
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         labels = {
             "ext_uuid": _("External UUID"),
             "name": _("Name"),

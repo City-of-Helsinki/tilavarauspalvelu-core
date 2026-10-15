@@ -44,7 +44,7 @@ class ApplicationRoundAdminForm(forms.ModelForm):
 
     class Meta:
         model = ApplicationRound
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         widgets = {
             "criteria": TinyMCE(),
             "notes_when_applying": TinyMCE(),
