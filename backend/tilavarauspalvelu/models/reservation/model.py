@@ -56,106 +56,106 @@ __all__ = [
 
 class Reservation(SerializableModelMixin, models.Model):
     # Basic information
-    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
-    name: str = models.CharField(max_length=255, blank=True, default="")
-    description: str = models.CharField(max_length=255, blank=True, default="")
-    num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
-    state: ReservationStateChoice = TextChoicesField(
+    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # type: ignore[assignment]  # ID for external systems
+    name: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    description: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)  # type: ignore[assignment]
+    state: ReservationStateChoice = TextChoicesField(  # type: ignore[assignment]
         enum=ReservationStateChoice,
         default=ReservationStateChoice.CREATED,
         db_index=True,
     )
-    type: ReservationTypeChoice | None = TextChoicesField(
+    type: ReservationTypeChoice | None = TextChoicesField(  # type: ignore[assignment]
         enum=ReservationTypeChoice,
         default=ReservationTypeChoice.NORMAL,
         null=True,
         blank=False,
     )
-    municipality: MunicipalityChoice | None = TextChoicesField(
+    municipality: MunicipalityChoice | None = TextChoicesField(  # type: ignore[assignment]
         enum=MunicipalityChoice,
         null=True,
         blank=True,
     )
-    handling_details: str = Nh3TextField(blank=True, default="")
-    working_memo: str = Nh3TextField(blank=True, default="")
+    handling_details: str = Nh3TextField(blank=True, default="")  # type: ignore[assignment]
+    working_memo: str = Nh3TextField(blank=True, default="")  # type: ignore[assignment]
 
     # Cancellation information
-    cancel_details: str = Nh3TextField(blank=True, default="")
-    cancel_reason: ReservationCancelReasonChoice | None = TextChoicesField(
+    cancel_details: str = Nh3TextField(blank=True, default="")  # type: ignore[assignment]
+    cancel_reason: ReservationCancelReasonChoice | None = TextChoicesField(  # type: ignore[assignment]
         enum=ReservationCancelReasonChoice,
         null=True,
         blank=True,
     )
 
     # Time information
-    begins_at: datetime.datetime = models.DateTimeField(db_index=True)
-    ends_at: datetime.datetime = models.DateTimeField(db_index=True)
-    buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
-    buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
-    handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    confirmed_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    created_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=timezone.now)  # noqa: TID251
+    begins_at: datetime.datetime = models.DateTimeField(db_index=True)  # type: ignore[assignment]
+    ends_at: datetime.datetime = models.DateTimeField(db_index=True)  # type: ignore[assignment]
+    buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)  # type: ignore[assignment]
+    buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)  # type: ignore[assignment]
+    handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)  # type: ignore[assignment]
+    confirmed_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)  # type: ignore[assignment]
+    created_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=timezone.now)  # type: ignore[assignment]  # noqa: TID251
 
     # Access information
-    access_type: AccessType = TextChoicesField(enum=AccessType, default=AccessType.UNRESTRICTED)
-    access_code_generated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    access_code_is_active: bool = models.BooleanField(default=False)
+    access_type: AccessType = TextChoicesField(enum=AccessType, default=AccessType.UNRESTRICTED)  # type: ignore[assignment]
+    access_code_generated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)  # type: ignore[assignment]
+    access_code_is_active: bool = models.BooleanField(default=False)  # type: ignore[assignment]
 
     # Pricing details
-    price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    non_subsidised_price: Decimal = models.DecimalField(max_digits=20, decimal_places=2, default=0)
-    unit_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    tax_percentage_value: Decimal = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # type: ignore[assignment]
+    non_subsidised_price: Decimal = models.DecimalField(max_digits=20, decimal_places=2, default=0)  # type: ignore[assignment]
+    unit_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # type: ignore[assignment]
+    tax_percentage_value: Decimal = models.DecimalField(max_digits=5, decimal_places=2, default=0)  # type: ignore[assignment]
 
     # Free of charge information
-    applying_for_free_of_charge: bool = models.BooleanField(default=False, blank=True)
-    free_of_charge_reason: str | None = Nh3TextField(null=True, blank=True)
+    applying_for_free_of_charge: bool = models.BooleanField(default=False, blank=True)  # type: ignore[assignment]
+    free_of_charge_reason: str | None = Nh3TextField(null=True, blank=True)  # type: ignore[assignment]
 
     # Reservee information
-    reservee_identifier: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_first_name: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_last_name: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_email: str | None = models.EmailField(null=True, blank=True)  # noqa: DJ001
-    reservee_phone: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_organisation_name: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_used_ad_login: bool = models.BooleanField(default=False, blank=True)
-    reservee_type: ReserveeType | None = TextChoicesField(enum=ReserveeType, null=True, blank=True)
+    reservee_identifier: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    reservee_first_name: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    reservee_last_name: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    reservee_email: str | None = models.EmailField(null=True, blank=True)  # type: ignore[assignment]  # noqa: DJ001
+    reservee_phone: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    reservee_organisation_name: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    reservee_used_ad_login: bool = models.BooleanField(default=False, blank=True)  # type: ignore[assignment]
+    reservee_type: ReserveeType | None = TextChoicesField(enum=ReserveeType, null=True, blank=True)  # type: ignore[assignment]
 
     # Relations
-    reservation_unit: ReservationUnit = models.ForeignKey(
+    reservation_unit: ReservationUnit = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationUnit",
         related_name="reservations",
         on_delete=models.PROTECT,
     )
-    user: User = models.ForeignKey(
+    user: User = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.User",
         related_name="reservations",
         on_delete=models.PROTECT,
     )
 
-    reservation_series: ReservationSeries | None = models.ForeignKey(
+    reservation_series: ReservationSeries | None = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationSeries",
         related_name="reservations",
         on_delete=models.PROTECT,
         blank=True,
         null=True,
     )
-    deny_reason: ReservationDenyReason | None = models.ForeignKey(
+    deny_reason: ReservationDenyReason | None = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationDenyReason",
         related_name="reservations",
         on_delete=models.PROTECT,
         blank=True,
         null=True,
     )
-    purpose: ReservationPurpose | None = models.ForeignKey(
+    purpose: ReservationPurpose | None = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationPurpose",
         related_name="reservations",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
-    age_group: AgeGroup | None = models.ForeignKey(
+    age_group: AgeGroup | None = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.AgeGroup",
         related_name="reservations",
         on_delete=models.SET_NULL,

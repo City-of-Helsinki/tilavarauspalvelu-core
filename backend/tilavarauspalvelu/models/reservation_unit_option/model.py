@@ -24,16 +24,16 @@ __all__ = [
 
 
 class ReservationUnitOption(models.Model):
-    preferred_order: int = models.PositiveIntegerField()
-    is_rejected: bool = models.BooleanField(default=False, blank=True)
-    is_locked: bool = models.BooleanField(default=False, blank=True)
+    preferred_order: int = models.PositiveIntegerField()  # type: ignore[assignment]
+    is_rejected: bool = models.BooleanField(default=False, blank=True)  # type: ignore[assignment]
+    is_locked: bool = models.BooleanField(default=False, blank=True)  # type: ignore[assignment]
 
-    application_section: ApplicationSection = models.ForeignKey(
+    application_section: ApplicationSection = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ApplicationSection",
         related_name="reservation_unit_options",
         on_delete=models.CASCADE,
     )
-    reservation_unit: ReservationUnit = models.ForeignKey(
+    reservation_unit: ReservationUnit = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationUnit",
         related_name="reservation_unit_options",
         on_delete=models.PROTECT,

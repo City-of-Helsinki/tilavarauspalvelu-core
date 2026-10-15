@@ -36,14 +36,14 @@ class ReservationUnitHierarchy(models.Model):
       3) The space hierarchy is changed.
     """
 
-    reservation_unit: ReservationUnit = models.OneToOneField(
+    reservation_unit: ReservationUnit = models.OneToOneField(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationUnit",
         related_name="reservation_unit_hierarchy",
         on_delete=models.DO_NOTHING,
         primary_key=True,
         db_column="reservation_unit_id",
     )
-    related_reservation_unit_ids: list[int] = ArrayField(base_field=models.IntegerField())
+    related_reservation_unit_ids: list[int] = ArrayField(base_field=models.IntegerField())  # type: ignore[assignment]
 
     objects: ClassVar[ReservationUnitHierarchyManager] = LazyModelManager.new()
     actions: LazyAttribute[ReservationUnitHierarchyActions] = LazyModelAttribute.new()

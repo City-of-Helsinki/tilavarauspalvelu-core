@@ -23,15 +23,15 @@ if TYPE_CHECKING:
 
 
 class ApplicationRoundTimeSlot(models.Model):
-    reservation_unit: ReservationUnit = models.ForeignKey(
+    reservation_unit: ReservationUnit = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationUnit",
         related_name="application_round_time_slots",
         on_delete=models.CASCADE,
     )
 
-    weekday: Weekday = TextChoicesField(enum=Weekday)
-    is_closed: bool = models.BooleanField(default=False)
-    reservable_times: list[TimeSlotDB] = ArrayField(
+    weekday: Weekday = TextChoicesField(enum=Weekday)  # type: ignore[assignment]
+    is_closed: bool = models.BooleanField(default=False)  # type: ignore[assignment]
+    reservable_times: list[TimeSlotDB] = ArrayField(  # type: ignore[assignment]
         base_field=HStoreField(),
         blank=True,
         default=list,
