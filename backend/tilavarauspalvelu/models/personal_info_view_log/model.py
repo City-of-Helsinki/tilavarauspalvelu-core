@@ -7,11 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
-    import datetime
-
     from lazy_managers import LazyAttribute
-
-    from tilavarauspalvelu.models import User
 
     from .actions import PersonalInfoViewLogActions
     from .queryset import PersonalInfoViewLogManager
@@ -23,15 +19,15 @@ __all__ = [
 
 
 class PersonalInfoViewLog(models.Model):
-    field: str = models.CharField(max_length=255, null=False, blank=False, editable=False)
+    field = models.CharField(max_length=255, null=False, blank=False, editable=False)
 
-    viewer_username: str = models.CharField(max_length=255)
-    viewer_user_email: str = models.CharField(max_length=255, default="", blank=True)
-    viewer_user_full_name: str = models.CharField(max_length=255, default="", blank=True)
+    viewer_username = models.CharField(max_length=255)
+    viewer_user_email = models.CharField(max_length=255, default="", blank=True)
+    viewer_user_full_name = models.CharField(max_length=255, default="", blank=True)
 
-    access_time: datetime.datetime = models.DateTimeField(auto_now=True, editable=False)
+    access_time = models.DateTimeField(auto_now=True, editable=False)
 
-    user: User | None = models.ForeignKey(
+    user = models.ForeignKey(
         "tilavarauspalvelu.User",
         related_name="personal_info_view_logs",
         on_delete=models.SET_NULL,
@@ -39,7 +35,7 @@ class PersonalInfoViewLog(models.Model):
         null=True,
         editable=False,
     )
-    viewer_user: User | None = models.ForeignKey(
+    viewer_user = models.ForeignKey(
         "tilavarauspalvelu.User",
         related_name="as_viewer_personal_info_view_logs",
         on_delete=models.SET_NULL,

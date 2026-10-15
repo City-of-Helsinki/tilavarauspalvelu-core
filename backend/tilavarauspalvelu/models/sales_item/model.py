@@ -13,7 +13,7 @@ from utils.auditlog_util import AuditLogger
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import PriceComponent, ReservationPriceLine, TaxLevel
+    from tilavarauspalvelu.models import PriceComponent, ReservationPriceLine
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.price_component.queryset import PriceComponentQuerySet
     from tilavarauspalvelu.models.reservation_price_line.queryset import ReservationPriceLineQuerySet
@@ -33,19 +33,19 @@ class SalesItem(models.Model):
     The accounting fields that depend on the place come from the payment accounting.
     """
 
-    name: str = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255, unique=True)
 
     # Custom validation comes from requirements in SAP.
     # Only invoicing needs the material, so a sales item that is only paid in the web shop can leave it empty.
-    material: str = models.CharField(
+    material = models.CharField(
         max_length=8,
         blank=True,
         default="",
         validators=[MinLengthValidator(8), is_numeric],
     )
-    main_ledger_account: str = models.CharField(max_length=6, validators=[is_numeric])
+    main_ledger_account = models.CharField(max_length=6, validators=[is_numeric])
 
-    tax_level: TaxLevel = models.ForeignKey(
+    tax_level = models.ForeignKey(
         "tilavarauspalvelu.TaxLevel",
         related_name="sales_items",
         on_delete=models.PROTECT,
