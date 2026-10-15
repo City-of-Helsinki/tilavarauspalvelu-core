@@ -496,7 +496,7 @@ source_pkgs = [
 
 [tool.coverage.report]
 omit = [
-    "*migrations*",
+    "*/migrations/*",
     # Dev and CI tooling, not run in production.
     # Keep in sync with 'sonar.coverage.exclusions' in 'sonar-project.properties'.
     "*/config/hooks/*",
