@@ -4,7 +4,9 @@ import uuid
 from typing import TYPE_CHECKING, ClassVar
 
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.contrib.postgres.fields.array import ArrayField, IndexTransform
+
+# django-stubs does not declare 'IndexTransform'.
+from django.contrib.postgres.fields.array import ArrayField, IndexTransform  # type: ignore[attr-defined]
 from django.db import models
 from django.db.models import Exists
 from django.db.models.functions import Coalesce
