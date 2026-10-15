@@ -13,8 +13,6 @@ from utils.db import Now
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
-    import datetime
-
     from lazy_managers import LazyAttribute
 
     from .actions import BannerNotificationActions
@@ -28,17 +26,17 @@ __all__ = [
 
 
 class BannerNotification(models.Model):
-    name: str = models.CharField(max_length=100, unique=True)
-    message: str = Nh3CharField(
+    name = models.CharField(max_length=100, unique=True)
+    message = Nh3CharField(
         max_length=1_000,
         blank=True,
         default="",
     )
-    draft: bool = models.BooleanField(default=True)
-    level: BannerNotificationLevel = TextChoicesField(enum=BannerNotificationLevel)
-    target: BannerNotificationTarget = TextChoicesField(enum=BannerNotificationTarget)
-    active_from: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
-    active_until: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
+    draft = models.BooleanField(default=True)
+    level: BannerNotificationLevel = TextChoicesField(enum=BannerNotificationLevel)  # type: ignore[assignment]
+    target: BannerNotificationTarget = TextChoicesField(enum=BannerNotificationTarget)  # type: ignore[assignment]
+    active_from = models.DateTimeField(null=True, blank=True, default=None)
+    active_until = models.DateTimeField(null=True, blank=True, default=None)
 
     # Translated field hints
     message_fi: str | None

@@ -29,12 +29,12 @@ __all__ = [
 
 
 class TermsOfUse(models.Model):
-    id: str = models.CharField(primary_key=True, max_length=100)
-    name: str | None = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
+    id = models.CharField(primary_key=True, max_length=100)
+    name = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
 
-    text: str = Nh3TextField()
+    text = Nh3TextField()
 
-    terms_type: TermsOfUseTypeChoices = TextChoicesField(
+    terms_type: TermsOfUseTypeChoices = TextChoicesField(  # type: ignore[assignment]
         enum=TermsOfUseTypeChoices,
         default=TermsOfUseTypeChoices.GENERIC,
         blank=False,
