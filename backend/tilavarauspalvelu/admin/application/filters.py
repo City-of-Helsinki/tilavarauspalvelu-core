@@ -11,7 +11,10 @@ from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationSta
 from tilavarauspalvelu.models import ApplicationRound
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from django.db.models import QuerySet
+    from django_stubs_ext import StrOrPromise
 
     from tilavarauspalvelu.typing import WSGIRequest
 
@@ -20,7 +23,7 @@ class ApplicationRoundFilter(admin.SimpleListFilter):
     title = _("Application Round")
     parameter_name = "application_round"
 
-    def lookups(self, *args: Any) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> Iterable[tuple[str, StrOrPromise]]:
         return ApplicationRound.objects.filter(
             Q(sent_at__isnull=True) | Q(handled_at__isnull=True),
         ).values_list("id", "name")
@@ -36,7 +39,7 @@ class ApplicationRoundStatusFilter(admin.SimpleListFilter):
     title = _("Application round status")
     parameter_name = "round_status"
 
-    def lookups(self, *args: Any) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> Iterable[tuple[str, StrOrPromise]]:
         return ApplicationRoundStatusChoice.choices
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
@@ -50,7 +53,7 @@ class ApplicationStatusFilter(admin.SimpleListFilter):
     title = _("Application status")
     parameter_name = "application_status"
 
-    def lookups(self, *args: Any) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> Iterable[tuple[str, StrOrPromise]]:
         return ApplicationStatusChoice.choices
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:

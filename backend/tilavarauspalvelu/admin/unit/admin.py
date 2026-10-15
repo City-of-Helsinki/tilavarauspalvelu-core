@@ -81,7 +81,7 @@ class UnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, ExtraButtonsMi
         models.URLField: {"assume_scheme": "https"},
     }
     fieldsets = [
-        [
+        (
             _("Basic information"),
             {
                 "fields": [
@@ -94,8 +94,8 @@ class UnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, ExtraButtonsMi
                     "search_terms",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("TPRek"),
             {
                 "description": _(
@@ -108,16 +108,16 @@ class UnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, ExtraButtonsMi
                     "tprek_last_modified",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Hauki"),
             {
                 "fields": [
                     "origin_hauki_resource",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Payment information"),
             {
                 "fields": [
@@ -125,16 +125,16 @@ class UnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, ExtraButtonsMi
                     "payment_accounting",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Permission information"),
             {
                 "fields": [
                     "allow_permissions_from_ad_groups",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Location"),
             {
                 "fields": [
@@ -144,7 +144,7 @@ class UnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, ExtraButtonsMi
                     "coordinates",
                 ],
             },
-        ],
+        ),
     ]
     readonly_fields = [
         "tprek_last_modified",

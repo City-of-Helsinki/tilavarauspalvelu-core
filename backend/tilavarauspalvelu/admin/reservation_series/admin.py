@@ -57,7 +57,7 @@ class ReservationSeriesAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Form
     form = ReservationSeriesAdminForm
     fieldsets = [
-        [
+        (
             _("Basic information"),
             {
                 "fields": [
@@ -71,8 +71,8 @@ class ReservationSeriesAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "allocated_time_slot",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Time"),
             {
                 "fields": [
@@ -84,8 +84,8 @@ class ReservationSeriesAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "recurrence_in_days",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Pindora information"),
             {
                 "fields": [
@@ -95,7 +95,7 @@ class ReservationSeriesAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "pindora_response",
                 ],
             },
-        ],
+        ),
     ]
     readonly_fields = [
         "ext_uuid",
