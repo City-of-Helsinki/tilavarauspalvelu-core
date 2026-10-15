@@ -7,7 +7,7 @@ import time
 import uuid
 from decimal import Decimal
 from functools import wraps
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.core.cache import cache
@@ -78,7 +78,7 @@ __all__ = [
 ]
 
 
-def singleton_task[**P](task: Task) -> Task:
+def singleton_task(task: Task) -> Task:
     """
     Lock task execution to a single concurrent instance per task arguments based on a lock set in cache.
     Must be added on top of the `@app.task` decorator!
@@ -89,7 +89,7 @@ def singleton_task[**P](task: Task) -> Task:
     task_signature = inspect.signature(task_func)
 
     @wraps(task_func)
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> None:
+    def wrapper(*args: Any, **kwargs: Any) -> None:
         lock_timeout = 300  # 5 mins
         timeout_leeway = 3  # Some leeway for cache operations
 
