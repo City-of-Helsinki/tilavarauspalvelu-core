@@ -77,18 +77,19 @@ def parse_queries(document: str) -> str:
     print("Separating fragments and operations...")
     data = separate_fragments_and_nodes(node)
 
-    for operation in data.operations.values():
-        print(f"Defragmenting operation '{operation.name.value}'...")
+    for name, operation in data.operations.items():
+        print(f"Defragmenting operation '{name}'...")
         replace_fragments(operation, fragments=data.fragments)
 
-        print(f"Combining duplicate fields in operation '{operation.name.value}'...")
+        print(f"Combining duplicate fields in operation '{name}'...")
         combine_duplicate_fields(operation)
 
-    def predicate(op: OperationDefinitionNode) -> tuple[int, str]:
-        return OPERATION_VALUE_MAP[op.operation], op.name.value
+    def predicate(item: tuple[str, OperationDefinitionNode]) -> tuple[int, str]:
+        name, operation = item
+        return OPERATION_VALUE_MAP[operation.operation], name
 
     print("Printing queries to text...")
-    operations = (print_ast(operation) for operation in sorted(data.operations.values(), key=predicate))
+    operations = (print_ast(operation) for _, operation in sorted(data.operations.items(), key=predicate))
     return "\n\n".join(operation for operation in operations)
 
 
