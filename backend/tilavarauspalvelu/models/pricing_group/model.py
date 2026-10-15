@@ -11,7 +11,7 @@ from utils.auditlog_util import AuditLogger
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import PriceComponent, ReservationUnitPricingGroup, UnitGroup
+    from tilavarauspalvelu.models import PriceComponent, ReservationUnitPricingGroup
     from tilavarauspalvelu.models._base import OneToManyRelatedManager
     from tilavarauspalvelu.models.price_component.queryset import PriceComponentQuerySet
     from tilavarauspalvelu.models.reservation_unit_pricing_group.queryset import ReservationUnitPricingGroupQuerySet
@@ -27,11 +27,11 @@ __all__ = [
 
 
 class PricingGroup(models.Model):
-    name: str = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
 
     # A group with a unit group is shared between reservation units.
     # A group without one is the own pricing of the reservation unit that uses it.
-    unit_group: UnitGroup | None = models.ForeignKey(
+    unit_group = models.ForeignKey(
         "tilavarauspalvelu.UnitGroup",
         related_name="pricing_groups",
         on_delete=models.PROTECT,

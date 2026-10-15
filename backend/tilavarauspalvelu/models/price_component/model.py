@@ -13,12 +13,7 @@ from utils.auditlog_util import AuditLogger
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
-    import datetime
-    from decimal import Decimal
-
     from lazy_managers import LazyAttribute
-
-    from tilavarauspalvelu.models import PriceOption, PricingGroup, SalesItem, TaxLevel
 
     from .actions import PriceComponentActions
     from .queryset import PriceComponentManager
@@ -31,18 +26,18 @@ __all__ = [
 
 
 class PriceComponent(models.Model):
-    pricing_group: PricingGroup = models.ForeignKey(
+    pricing_group = models.ForeignKey(
         "tilavarauspalvelu.PricingGroup",
         related_name="components",
         on_delete=models.CASCADE,
     )
     kind: PriceComponentKind = TextChoicesField(enum=PriceComponentKind, default=PriceComponentKind.BASE)
 
-    valid_from: datetime.date = models.DateField()
-    valid_until: datetime.date | None = models.DateField(null=True, blank=True)  # Exclusive
+    valid_from = models.DateField()
+    valid_until = models.DateField(null=True, blank=True)  # Exclusive
 
     # Null means that the component applies to every price option.
-    price_option: PriceOption | None = models.ForeignKey(
+    price_option = models.ForeignKey(
         "tilavarauspalvelu.PriceOption",
         related_name="price_components",
         on_delete=models.PROTECT,
@@ -51,24 +46,24 @@ class PriceComponent(models.Model):
     )
 
     # Gross amount, VAT included
-    amount: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
     price_unit: PriceUnit = TextChoicesField(enum=PriceUnit)
 
-    can_apply_for_discount: bool = models.BooleanField(default=False)
+    can_apply_for_discount = models.BooleanField(default=False)
 
-    material_price_description: str = Nh3CharField(
+    material_price_description = Nh3CharField(
         blank=True,
         default="",
         max_length=1000,  # Double of the limit of 500 chars in order to accommodate HTML tags
     )
 
-    tax_level: TaxLevel = models.ForeignKey(
+    tax_level = models.ForeignKey(
         "tilavarauspalvelu.TaxLevel",
         related_name="price_components",
         on_delete=models.PROTECT,
     )
     # The SAP material of the price, when it is paid online. A price that is paid on site is not in SAP.
-    sales_item: SalesItem | None = models.ForeignKey(
+    sales_item = models.ForeignKey(
         "tilavarauspalvelu.SalesItem",
         related_name="price_components",
         on_delete=models.PROTECT,

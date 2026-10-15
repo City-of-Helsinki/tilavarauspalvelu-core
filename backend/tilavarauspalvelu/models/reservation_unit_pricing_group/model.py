@@ -9,11 +9,7 @@ from lazy_managers import LazyModelAttribute, LazyModelManager
 from utils.auditlog_util import AuditLogger
 
 if TYPE_CHECKING:
-    import datetime
-
     from lazy_managers import LazyAttribute
-
-    from tilavarauspalvelu.models import PricingGroup, ReservationUnit
 
     from .actions import ReservationUnitPricingGroupActions
     from .queryset import ReservationUnitPricingGroupManager
@@ -28,17 +24,17 @@ __all__ = [
 class ReservationUnitPricingGroup(models.Model):
     """The pricing group that a reservation unit uses from the `begins` date onward."""
 
-    reservation_unit: ReservationUnit = models.ForeignKey(
+    reservation_unit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
         related_name="reservation_unit_pricing_groups",
         on_delete=models.CASCADE,
     )
-    pricing_group: PricingGroup = models.ForeignKey(
+    pricing_group = models.ForeignKey(
         "tilavarauspalvelu.PricingGroup",
         related_name="reservation_unit_pricing_groups",
         on_delete=models.PROTECT,
     )
-    begins: datetime.date = models.DateField()
+    begins = models.DateField()
 
     objects: ClassVar[ReservationUnitPricingGroupManager] = LazyModelManager.new()
     actions: LazyAttribute[ReservationUnitPricingGroupActions] = LazyModelAttribute.new()

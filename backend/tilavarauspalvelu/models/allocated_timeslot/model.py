@@ -17,7 +17,7 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import ReservationSeries, ReservationUnitOption
+    from tilavarauspalvelu.models import ReservationSeries
 
     from .actions import AllocatedTimeSlotActions
     from .queryset import AllocatedTimeSlotManager
@@ -36,11 +36,11 @@ class AllocatedTimeSlot(models.Model):
     Will be converted to reservations when the application round has been allocated.
     """
 
-    day_of_the_week: Weekday = TextChoicesField(enum=Weekday)
-    begin_time: datetime.time = models.TimeField()
-    end_time: datetime.time = models.TimeField()
+    day_of_the_week: Weekday = TextChoicesField(enum=Weekday)  # type: ignore[assignment]
+    begin_time = models.TimeField()
+    end_time = models.TimeField()
 
-    reservation_unit_option: ReservationUnitOption = models.ForeignKey(
+    reservation_unit_option = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnitOption",
         related_name="allocated_time_slots",
         on_delete=models.CASCADE,

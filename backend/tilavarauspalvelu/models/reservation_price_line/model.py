@@ -16,8 +16,6 @@ from utils.fields.model import TextChoicesField
 if TYPE_CHECKING:
     from lazy_managers import LazyAttribute
 
-    from tilavarauspalvelu.models import PaymentProduct, PriceComponent, Reservation, SalesItem, TaxLevel
-
     from .actions import ReservationPriceLineActions
     from .queryset import ReservationPriceLineManager
     from .validators import ReservationPriceLineValidator
@@ -34,12 +32,12 @@ class ReservationPriceLine(models.Model):
     The values are copies, so a later change to the price component or the tax rate does not change the line.
     """
 
-    reservation: Reservation = models.ForeignKey(
+    reservation = models.ForeignKey(
         "tilavarauspalvelu.Reservation",
         related_name="price_lines",
         on_delete=models.CASCADE,
     )
-    price_component: PriceComponent | None = models.ForeignKey(
+    price_component = models.ForeignKey(
         "tilavarauspalvelu.PriceComponent",
         related_name="price_lines",
         on_delete=models.SET_NULL,
@@ -47,29 +45,29 @@ class ReservationPriceLine(models.Model):
         blank=True,
     )
 
-    description: str = models.CharField(max_length=255, blank=True, default="")
-    material_price_description: str = Nh3CharField(
+    description = models.CharField(max_length=255, blank=True, default="")
+    material_price_description = Nh3CharField(
         blank=True,
         default="",
         max_length=1000,
     )
 
     # Minutes in a part of a day can give a fraction, so four decimals keep `quantity * unit_amount` close to `amount`.
-    quantity: Decimal = models.DecimalField(max_digits=12, decimal_places=4)
+    quantity = models.DecimalField(max_digits=12, decimal_places=4)
     price_unit: PriceUnit = TextChoicesField(enum=PriceUnit)
 
     # Gross amounts, VAT included
-    unit_amount: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
-    amount_before_adjustment: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
-    adjustment_percentage: Decimal = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal(0))
-    amount: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
+    unit_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount_before_adjustment = models.DecimalField(max_digits=10, decimal_places=2)
+    adjustment_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal(0))
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     # Set by the handler. If set, this is the final amount of the line.
-    override_amount: Decimal | None = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    override_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     # A line without a price component, such as a price set by the handler, can be without a sales item.
     # With a sales item, the tax level of the line is the tax level of the sales item.
-    sales_item: SalesItem | None = models.ForeignKey(
+    sales_item = models.ForeignKey(
         "tilavarauspalvelu.SalesItem",
         related_name="reservation_price_lines",
         on_delete=models.PROTECT,
@@ -77,15 +75,15 @@ class ReservationPriceLine(models.Model):
         blank=True,
     )
 
-    tax_level: TaxLevel = models.ForeignKey(
+    tax_level = models.ForeignKey(
         "tilavarauspalvelu.TaxLevel",
         related_name="reservation_price_lines",
         on_delete=models.PROTECT,
     )
-    tax_percentage: Decimal = models.DecimalField(max_digits=5, decimal_places=2)
-    vat_code: str = models.CharField(max_length=2, blank=True, default="")
+    tax_percentage = models.DecimalField(max_digits=5, decimal_places=2)
+    vat_code = models.CharField(max_length=2, blank=True, default="")
 
-    payment_product: PaymentProduct | None = models.ForeignKey(
+    payment_product = models.ForeignKey(
         "tilavarauspalvelu.PaymentProduct",
         related_name="reservation_price_lines",
         on_delete=models.PROTECT,
