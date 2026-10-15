@@ -167,9 +167,24 @@ class Reservation(SerializableModelMixin, models.Model):
     actions: LazyAttribute[ReservationActions] = LazyModelAttribute.new()
     validators: LazyAttribute[ReservationValidator] = LazyModelAttribute.new()
 
-    payment_order: PaymentOrder | None  # Can be missing
-    reservation_statistic: ReservationStatistic | None  # Can be missing
-    affecting_time_span: AffectingTimeSpan | None  # Can be missing
+    payment_order: PaymentOrder
+    """
+    Can be missing. Reading a missing value raises 'PaymentOrder.DoesNotExist'.
+    Check with 'hasattr' first.
+    """
+    reservation_statistic: ReservationStatistic
+    """
+    Can be missing. Reading a missing value raises 'ReservationStatistic.DoesNotExist'.
+    Check with 'hasattr' first.
+    """
+    affecting_time_span: AffectingTimeSpan
+    """
+    Can be missing. Reading a missing value raises 'AffectingTimeSpan.DoesNotExist'.
+    Check with 'hasattr' first.
+    """
+
+    # Cache for the 'units_for_permissions' property. This is not set until the property is read or set.
+    _units_for_permissions: list[Unit]
 
     class Meta:
         db_table = "reservation"
