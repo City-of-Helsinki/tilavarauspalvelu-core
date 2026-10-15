@@ -103,6 +103,9 @@ class Application(SerializableModelMixin, models.Model):
 
     application_sections: OneToManyRelatedManager[ApplicationSection, ApplicationSectionQuerySet]
 
+    # Cache for the 'units_for_permissions' property. This is not set until the property is read or set.
+    _units_for_permissions: list[Unit]
+
     class Meta:
         db_table = "application"
         base_manager_name = "objects"
