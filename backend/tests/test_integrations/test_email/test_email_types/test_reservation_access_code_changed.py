@@ -10,7 +10,7 @@ from django.test import override_settings
 from freezegun import freeze_time
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
-from tilavarauspalvelu.enums import AccessType
+from tilavarauspalvelu.enums import AccessType, ReservationTypeChoice, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_access_code_changed
@@ -19,8 +19,9 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime
 
-from tests.factories import ReservationFactory
+from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationFactory, UserFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
+from tests.test_graphql_api.test_reservation_series.helpers import create_reservation_series
 from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
@@ -341,6 +342,25 @@ def test_reservation_access_code_changed__send_email__wrong_access_type(outbox):
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01 12:00:00+02:00")
+def test_reservation_access_code_changed__send_email__behalf_reservation(outbox):
+    reservation = ReservationFactory.create(
+        type=ReservationTypeChoice.BEHALF,
+        reservee_email="reservee@email.com",
+        user__email="user@email.com",
+        reservation_unit__name="foo",
+        begins_at=local_datetime(2024, 1, 1, 20, 0),
+        ends_at=local_datetime(2024, 1, 1, 22, 0),
+        access_type=AccessType.ACCESS_CODE,
+    )
+
+    EmailService.send_reservation_access_code_changed_email(reservation)
+
+    assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(SentryLogger.log_message)
 def test_reservation_access_code_changed__send_email__no_recipients(outbox):
     reservation = ReservationFactory.create(
@@ -365,6 +385,54 @@ def test_reservation_access_code_changed__send_email__no_recipients(outbox):
 @freeze_time("2024-01-02")
 def test_reservation_access_code_changed__send_email__reservation_in_the_past(outbox):
     reservation = ReservationFactory.create(
+        reservee_email="reservee@email.com",
+        user__email="user@email.com",
+        reservation_unit__name="foo",
+        begins_at=local_datetime(2024, 1, 1, 20, 0),
+        ends_at=local_datetime(2024, 1, 1, 22, 0),
+        access_type=AccessType.ACCESS_CODE,
+    )
+
+    EmailService.send_reservation_access_code_changed_email(reservation)
+
+    assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_reservation_access_code_changed__send_email__seasonal_reservation(outbox):
+    user = UserFactory.create(email="user@email.com")
+    application_round = ApplicationRoundFactory.create_in_status_results_sent()
+    application = ApplicationFactory.create(
+        user=user,
+        contact_person_email="contact@email.com",
+        sent_at=local_datetime(),
+        application_round=application_round,
+    )
+    reservation_series = create_reservation_series(
+        user=user,
+        reservations__type=ReservationTypeChoice.SEASONAL,
+        reservations__reservee_email="reservee@email.com",
+        allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+        allocated_time_slot__reservation_unit_option__application_section__application=application,
+    )
+    reservation = reservation_series.reservations.first()
+
+    EmailService.send_reservation_access_code_changed_email(reservation)
+
+    assert len(outbox) == 1
+
+    assert outbox[0].subject == "The door code of your booking has changed"
+    assert sorted(outbox[0].bcc) == ["contact@email.com", "user@email.com"]
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_reservation_access_code_changed__send_email__seasonal_reservation_without_application_section(outbox):
+    reservation = ReservationFactory.create(
+        type=ReservationTypeChoice.SEASONAL,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",
