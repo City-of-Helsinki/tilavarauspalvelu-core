@@ -319,7 +319,12 @@ class ReservationUnit(models.Model):
     # so that the mutation output can tell the staff UI to show a warning.
     hauki_export_failed: bool = False
 
-    reservation_unit_hierarchy: ReservationUnitHierarchy | None  # Can be missing
+    reservation_unit_hierarchy: ReservationUnitHierarchy
+    """
+    Can be missing. Reading a missing value raises 'ReservationUnitHierarchy.DoesNotExist'.
+    Check with 'hasattr' first.
+    """
+
     pricings: OneToManyRelatedManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]
     reservation_unit_pricing_groups: OneToManyRelatedManager[
         ReservationUnitPricingGroup, ReservationUnitPricingGroupQuerySet
