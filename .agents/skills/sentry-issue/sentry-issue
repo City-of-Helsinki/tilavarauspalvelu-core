@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Fetch a Sentry issue with one of its events from the Sentry REST API.
+# The event is the one in the URL, or the latest event if the URL has none.
+# The token is read from 1Password.
+# Usage: sentry-issue <issue ID or URL>, e.g. sentry-issue 153768154
+set -euo pipefail
+
+usage() {
+  echo "Usage: sentry-issue <issue ID or URL>, e.g. sentry-issue 153768154" >&2
+  exit 2
+}
+[[ $# -eq 1 ]] || usage
+
+org="city-of-helsinki"
+base_url="https://sentry.io/api/0/organizations/$org"
+issue_path='issues/([0-9]+)/?(events/([0-9a-f]{32})/?)?([?#].*)?'
+
+if [[ "$1" =~ ^([0-9]+)$ ]]; then
+  issue_id="${BASH_REMATCH[1]}"
+  event_id="latest"
+elif [[ "$1" =~ ^https://$org\.sentry\.io/$issue_path$ ]] \
+  || [[ "$1" =~ ^https://sentry\.io/organizations/$org/$issue_path$ ]]; then
+  issue_id="${BASH_REMATCH[1]}"
+  event_id="${BASH_REMATCH[3]:-latest}"
+else
+  echo "Not a Sentry issue ID or URL: $1" >&2
+  usage
+fi
+
+: "${SENTRY_ISSUE_OP_ACCOUNT:?Set SENTRY_ISSUE_OP_ACCOUNT to your 1Password account, e.g. vincit.1password.eu}"
+: "${SENTRY_ISSUE_OP_VAULT:?Set SENTRY_ISSUE_OP_VAULT to the 1Password vault that has the item, e.g. Private}"
+: "${SENTRY_ISSUE_OP_ITEM:?Set SENTRY_ISSUE_OP_ITEM to the name of the 1Password item, e.g. Sentry API PAT}"
+
+token="$(op read --account "$SENTRY_ISSUE_OP_ACCOUNT" "op://$SENTRY_ISSUE_OP_VAULT/$SENTRY_ISSUE_OP_ITEM/credential")"
+
+# Escape backslashes and double quotes for the quoted value in the curl config.
+token="${token//\\/\\\\}"
+token="${token//\"/\\\"}"
+
+api() {
+  # Pass the token through stdin so it does not show up in the process list.
+  printf 'header = "Authorization: Bearer %s"\n' "$token" \
+    | curl --silent --show-error --fail-with-body --config - "$base_url/$1"
+}
+
+issue="$(api "issues/$issue_id/")"
+event="$(api "issues/$issue_id/events/$event_id/")"
+
+jq --slurp '.[0] as $issue | .[1] as $event | {
+  id: $issue.id,
+  short_id: $issue.shortId,
+  url: $issue.permalink,
+  title: $issue.title,
+  culprit: $issue.culprit,
+  level: $issue.level,
+  status: $issue.status,
+  substatus: $issue.substatus,
+  project: $issue.project.slug,
+  assignee: $issue.assignedTo.name,
+  first_seen: $issue.firstSeen,
+  last_seen: $issue.lastSeen,
+  event_count: $issue.count,
+  user_count: $issue.userCount,
+  event: {
+    id: $event.eventID,
+    at: $event.dateCreated,
+    message: $event.message,
+    tags: ([$event.tags[] | {(.key): .value}] | add),
+    request: ([$event.entries[] | select(.type == "request") | .data | {method, url}] | first),
+    # Frames are oldest first. Only in-app frames have code context.
+    exceptions: [$event.entries[] | select(.type == "exception") | .data.values[] | {
+      type,
+      value,
+      module,
+      frames: [.stacktrace.frames[]? | {
+        file: (.filename // .absPath),
+        function,
+        line: .lineNo,
+        in_app: .inApp,
+        context: (if .inApp then [.context[]? | "\(.[0]): \(.[1])"] else null end)
+      }]
+    }],
+    breadcrumbs: ([$event.entries[] | select(.type == "breadcrumbs") | .data.values[]
+      | {at: .timestamp, category, level, message}] | .[-20:])
+  }
+}' <(printf '%s' "$issue") <(printf '%s' "$event")
