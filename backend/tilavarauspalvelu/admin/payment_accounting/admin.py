@@ -75,7 +75,7 @@ class PaymentAccountingAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Form
     form = PaymentAccountingForm
     fieldsets = [
-        [
+        (
             None,
             {
                 "fields": [
@@ -89,8 +89,8 @@ class PaymentAccountingAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "balance_profit_center",
                 ],
             },
-        ],
-        [
+        ),
+        (
             "Product invoicing",
             {
                 "description": "Used when the reservation is paid by invoice. Fill all fields or none.",
@@ -101,5 +101,5 @@ class PaymentAccountingAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "product_invoicing_order_type",
                 ],
             },
-        ],
+        ),
     ]

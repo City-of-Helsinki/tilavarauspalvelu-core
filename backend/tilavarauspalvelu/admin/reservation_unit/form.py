@@ -133,10 +133,10 @@ class PricingGroupOfReservationUnitInline(admin.TabularInline):
     """The pricing groups that the reservation unit uses. The prices are edited on the page of the pricing group."""
 
     model = ReservationUnitPricingGroup
-    fields = [
+    fields = (
         "pricing_group_link",
         "begins",
-    ]
+    )
     readonly_fields = fields
     ordering = ["begins"]
     extra = 0

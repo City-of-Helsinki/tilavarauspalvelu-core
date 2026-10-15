@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from auditlog.models import LogEntry
 from django.contrib import admin
@@ -9,7 +9,10 @@ from django.db.models import Exists, OuterRef
 from django.utils.translation import gettext_lazy as _
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from django.db.models import QuerySet
+    from django_stubs_ext import StrOrPromise
 
     from tilavarauspalvelu.typing import WSGIRequest
 
@@ -22,7 +25,7 @@ class LogEntryResourceTypeFilter(admin.SimpleListFilter):
         self,
         request: WSGIRequest,
         model_admin: admin.ModelAdmin,  # noqa: ARG002
-    ) -> list[tuple[int, str]]:
+    ) -> Iterable[tuple[Any, StrOrPromise]]:
         # Check the few content types against the 'content_type_id' index.
         # Selecting distinct content types from the log entries scans the whole log entry table.
         log_entries = LogEntry.objects.filter(content_type=OuterRef("pk"))

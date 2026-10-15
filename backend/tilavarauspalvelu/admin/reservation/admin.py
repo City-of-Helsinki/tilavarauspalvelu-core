@@ -93,7 +93,7 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Form
     form = ReservationAdminForm
     fieldsets = [
-        [
+        (
             _("Basic information"),
             {
                 "fields": [
@@ -110,8 +110,8 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "reservation_unit",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Time"),
             {
                 "fields": [
@@ -124,8 +124,8 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "created_at",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Price"),
             {
                 "fields": [
@@ -137,8 +137,8 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "free_of_charge_reason",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Reservee information"),
             {
                 "fields": [
@@ -152,8 +152,8 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "reservee_type",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Pindora information"),
             {
                 "fields": [
@@ -164,8 +164,8 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "pindora_response",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Additional information"),
             {
                 "fields": [
@@ -178,7 +178,7 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
                     "age_group",
                 ],
             },
-        ],
+        ),
     ]
     readonly_fields = [
         "id",
