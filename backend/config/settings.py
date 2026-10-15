@@ -21,7 +21,7 @@ except ImportError as error:
     if error.name != "local_settings":
         raise
 
-    class AutomatedTestMixin: ...
+    class AutomatedTestMixin: ...  # type: ignore[no-redef]
 
 
 try:
@@ -30,7 +30,7 @@ except ImportError as error:
     if error.name != "local_settings":
         raise
 
-    class DockerMixin: ...
+    class DockerMixin: ...  # type: ignore[no-redef]
 
 
 try:
@@ -39,7 +39,7 @@ except ImportError as error:
     if error.name != "local_settings":
         raise
 
-    class LocalMixin: ...
+    class LocalMixin: ...  # type: ignore[no-redef]
 
 
 class Common(Environment):
@@ -123,8 +123,8 @@ class Common(Environment):
 
     # --- Versioning settings ----------------------------------------------------------------------------------------
 
-    SOURCE_BRANCH_NAME: str = values.StringValue(default="")
-    SOURCE_VERSION: str = values.StringValue(default="")
+    SOURCE_BRANCH_NAME: str = values.StringValue(default="")  # type: ignore[assignment]
+    SOURCE_VERSION: str = values.StringValue(default="")  # type: ignore[assignment]
 
     @classproperty
     def APP_VERSION(cls) -> str:
@@ -554,13 +554,13 @@ class Common(Environment):
 
     # --- Sentry -----------------------------------------------------------------------------------------------------
 
-    SENTRY_ENABLED: bool = values.BooleanValue(default=False)
-    SENTRY_DSN: str = values.StringValue(default="")
-    SENTRY_ENVIRONMENT: str = values.StringValue(default="local")
-    SENTRY_PROFILE_SESSION_SAMPLE_RATE: float | None = values.FloatValue(default=None)
-    SENTRY_RELEASE: str | None = values.StringValue(default=None)
-    SENTRY_TRACES_SAMPLE_RATE: float | None = values.FloatValue(default=None)
-    SENTRY_TRACES_IGNORE_PATHS: list[str] = values.ListValue(
+    SENTRY_ENABLED: bool = values.BooleanValue(default=False)  # type: ignore[assignment]
+    SENTRY_DSN: str = values.StringValue(default="")  # type: ignore[assignment]
+    SENTRY_ENVIRONMENT: str = values.StringValue(default="local")  # type: ignore[assignment]
+    SENTRY_PROFILE_SESSION_SAMPLE_RATE: float | None = values.FloatValue(default=None)  # type: ignore[assignment]
+    SENTRY_RELEASE: str | None = values.StringValue(default=None)  # type: ignore[assignment]
+    SENTRY_TRACES_SAMPLE_RATE: float | None = values.FloatValue(default=None)  # type: ignore[assignment]
+    SENTRY_TRACES_IGNORE_PATHS: list[str] = values.ListValue(  # type: ignore[assignment]
         default=[
             "/healthz",
             "/readiness",
@@ -1079,14 +1079,14 @@ class Platta(Common, use_environ=True):
 
     # --- Sentry -----------------------------------------------------------------------------------------------------
 
-    SENTRY_ENABLED: bool = values.BooleanValue(default=True)
+    SENTRY_ENABLED: bool = values.BooleanValue(default=True)  # type: ignore[assignment]
 
     # --- Redis settings ---------------------------------------------------------------------------------------------
 
     REDIS_URL = ""  # Not used in Platta environments
-    REDIS_SENTINEL_SERVICE: str = values.StringValue()
-    REDIS_MASTER: str = values.StringValue()
-    REDIS_PASSWORD: str = values.StringValue()
+    REDIS_SENTINEL_SERVICE: str = values.StringValue()  # type: ignore[assignment]
+    REDIS_MASTER: str = values.StringValue()  # type: ignore[assignment]
+    REDIS_PASSWORD: str = values.StringValue()  # type: ignore[assignment]
 
     DJANGO_REDIS_CONNECTION_FACTORY = "django_redis.pool.SentinelConnectionFactory"
 
