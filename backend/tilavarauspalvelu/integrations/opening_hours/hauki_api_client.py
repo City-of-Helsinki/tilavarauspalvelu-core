@@ -210,6 +210,10 @@ class HaukiAPIClient(BaseExternalServiceClient):
 
         # Get the data from Hauki API
         response = cls.get(url=url, params=query_params)
+        if response.status_code != HTTP_200_OK:
+            msg = f"Hauki API returned status {response.status_code} for date periods of '{hauki_resource_id}'."
+            raise HaukiAPIError(msg)
+
         return cls.response_json(response)
 
     ##################
