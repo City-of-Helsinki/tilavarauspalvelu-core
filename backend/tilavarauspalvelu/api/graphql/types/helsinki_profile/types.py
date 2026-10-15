@@ -8,11 +8,11 @@ from query_optimizer.selections import get_field_selections
 
 from tilavarauspalvelu.enums import LoginMethod
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.helsinki_profile.exceptions import HelsinkiProfileError
 from tilavarauspalvelu.integrations.helsinki_profile.typing import UserProfileInfo
 from tilavarauspalvelu.models import Application, Reservation
 from tilavarauspalvelu.tasks import save_personal_info_view_log_task
 from tilavarauspalvelu.typing import error_codes
-from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     import datetime
@@ -94,7 +94,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
                 session=info.context.session,
                 fields=fields,
             )
-        except ExternalServiceError as e:
+        except HelsinkiProfileError as e:
             if type(e.extra_data) is list and len(e.extra_data):
                 profile_error = e.extra_data[0]
                 msg = profile_error.get("message", "Unknown Helsinki Profile error")
