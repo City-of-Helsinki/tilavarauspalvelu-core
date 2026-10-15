@@ -159,7 +159,9 @@ class PindoraService:
         """Create access code in Pindora through the correct Pindora API endpoint according to the object's type."""
         match obj:
             case ApplicationSection():
-                response = PindoraClient.create_seasonal_booking(obj, is_active=is_active)
+                response: PindoraAccessCodeModifyResponse = PindoraClient.create_seasonal_booking(
+                    obj, is_active=is_active
+                )
                 obj.actions.get_reservations().requires_active_access_code().update(
                     access_code_generated_at=response["access_code_generated_at"],
                     access_code_is_active=response["access_code_is_active"],
@@ -647,7 +649,9 @@ class PindoraService:
         # This doubles as a way to ensure that the access code is correctly active or inactive in Pindora.
         if reservation.access_code_generated_at is None:
             try:
-                response = PindoraClient.create_reservation(reservation=reservation, is_active=should_be_active)
+                response: PindoraAccessCodeModifyResponse = PindoraClient.create_reservation(
+                    reservation=reservation, is_active=should_be_active
+                )
             except PindoraConflictError:
                 response = PindoraClient.reschedule_reservation(reservation=reservation, is_active=should_be_active)
         else:
