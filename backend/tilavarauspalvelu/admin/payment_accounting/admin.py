@@ -14,7 +14,7 @@ __all__ = [
 class PaymentAccountingForm(forms.ModelForm):
     class Meta:
         model = PaymentAccounting
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         # Labels are intentionally left untranslated (TILA-3425)
         labels = {
             "name": "Accounting name",

@@ -31,7 +31,7 @@ class ReservationUnitAccessTypeForm(forms.ModelForm):
 
     class Meta:
         model = ReservationUnitAccessType
-        fields = []  # Use fields from Inline
+        fields: list[str] = []  # Use fields from Inline
         labels = {
             "access_type": _("Access type"),
             "begin_date": _("Access type begin date"),
@@ -133,7 +133,7 @@ class ReservationUnitPricingForm(forms.ModelForm):
 
     class Meta:
         model = ReservationUnitPricing
-        fields = []  # Use fields from Inline
+        fields: list[str] = []  # Use fields from Inline
         widgets = {
             "material_price_description": TinyMCE(mce_attrs={"height": "250px"}),
         }
@@ -211,7 +211,7 @@ class ReservationUnitAdminForm(forms.ModelForm):
 
     class Meta:
         model = ReservationUnit
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         widgets = {
             "description": TinyMCE(),
             "notes_when_applying": TinyMCE(),

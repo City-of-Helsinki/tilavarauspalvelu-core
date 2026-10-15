@@ -693,10 +693,10 @@ class EmptyDefaults:
     SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
     ALLOWED_HOSTS = ["*"]
 
-    CORS_ALLOWED_ORIGINS = []
-    CSRF_TRUSTED_ORIGINS = []
+    CORS_ALLOWED_ORIGINS: list[str] = []
+    CSRF_TRUSTED_ORIGINS: list[str] = []
 
-    DATABASES = {}
+    DATABASES: dict[str, Any] = {}
     REDIS_URL = ""
 
     STATIC_ROOT = Common.BASE_DIR / "staticroot"

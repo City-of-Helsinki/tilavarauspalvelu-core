@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 class TprekUnitImporter:
     def __init__(self) -> None:
         self.updated_units_count = 0
-        self.units_for_hauki_import = []
+        self.units_for_hauki_import: list[Unit] = []
 
     def update_unit_from_tprek(self, units: list[Unit] | QuerySet[Unit], *, force_update: bool = False) -> None:
         """

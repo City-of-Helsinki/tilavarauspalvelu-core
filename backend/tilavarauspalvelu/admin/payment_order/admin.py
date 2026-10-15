@@ -26,7 +26,7 @@ __all__ = [
 class PaymentOrderForm(forms.ModelForm):
     class Meta:
         model = PaymentOrder
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         labels = {
             "reservation": _("Reservation"),
             "remote_id": _("Remote order ID"),
