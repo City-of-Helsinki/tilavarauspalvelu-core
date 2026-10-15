@@ -111,7 +111,9 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         return getattr(obj, "reservable_time_spans_count", -1)
 
     def linked_reservation_units(self, obj: OriginHaukiResource) -> str:
-        return ", ".join(reservation_unit.name_fi for reservation_unit in obj.reservation_units.all())
+        return ", ".join(
+            reservation_unit.name_fi for reservation_unit in obj.reservation_units.all() if reservation_unit.name_fi
+        )
 
     @button(label=_("Update all reservable time spans"), change_list=True)
     def update_all_hauki_resources_reservable_time_spans(self, request: WSGIRequest) -> None:
@@ -124,6 +126,6 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         self.message_user(request, _("Reservable Time Spans updated."))
 
     def update_reservable_time_spans_action(self, request, queryset: QuerySet[OriginHaukiResource]) -> None:
-        ids: list[int] = queryset.values_list("id", flat=True)
+        ids = list(queryset.values_list("id", flat=True))
         HaukiResourceHashUpdater(ids).run(force_refetch=True)
         self.message_user(request, _("Reservable Time Spans updated."))
