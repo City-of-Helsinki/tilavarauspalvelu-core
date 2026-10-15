@@ -6,7 +6,7 @@
 set -euo pipefail
 
 command="$(jq -r '.tool_input.command // empty')"
-root="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+root="$(git rev-parse --show-toplevel)"
 
 safe_arg="('[^']*'|[A-Za-z0-9_.:/=-]+)"
 
