@@ -148,7 +148,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
                 access_token = KeyCloakClient.refresh_token(user=user, session=session)
                 if access_token is None:
                     msg = "Unable to refresh Helsinki profile token"
-                    details = {"user": user.pk, "error": error.response.text}
+                    details = {"user": user.pk, "error": error.response.text if error.response is not None else ""}
                     SentryLogger.log_message(msg, details=details, level="warning")
                     return None
 
@@ -157,7 +157,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
             response: TokenResponse = cls.oidc_backend.get_token_for_profile(access_token=access_token)
         except HTTPError as error:
             msg = "Unable to get Helsinki profile token"
-            details = {"user": user.pk, "error": error.response.text}
+            details = {"user": user.pk, "error": error.response.text if error.response is not None else ""}
             SentryLogger.log_message(msg, details=details, level="warning")
             return None
 

@@ -86,7 +86,7 @@ class KeyCloakClient(BaseExternalServiceClient):
                     session["keycloak_refresh_token_expired"] = True
 
             except Exception:  # noqa: BLE001
-                details = {"user": user.pk, "error": error.response.text}
+                details = {"user": user.pk, "error": error.response.text if error.response is not None else ""}
                 msg = "Unable to refresh keycloak token"
                 SentryLogger.log_message(msg, details=details, level="error")
 
