@@ -7,7 +7,7 @@ from tilavarauspalvelu.models import ReservableTimeSpan
 
 class ReservableTimeSpanInline(admin.TabularInline):
     model = ReservableTimeSpan
-    fields = ["time_span_str"]
+    fields = ("time_span_str",)
     readonly_fields = fields
     can_delete = False
     extra = 0

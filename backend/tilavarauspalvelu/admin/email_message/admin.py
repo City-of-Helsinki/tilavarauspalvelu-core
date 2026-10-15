@@ -26,7 +26,7 @@ class EmailMessageAdmin(admin.ModelAdmin):
 
     # Form
     fieldsets = [
-        [
+        (
             _("Basic information"),
             {
                 "fields": [
@@ -36,8 +36,8 @@ class EmailMessageAdmin(admin.ModelAdmin):
                     "created_at",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Content"),
             {
                 "fields": [
@@ -45,15 +45,15 @@ class EmailMessageAdmin(admin.ModelAdmin):
                     "html_content",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Attachments"),
             {
                 "fields": [
                     "attachments",
                 ],
             },
-        ],
+        ),
     ]
 
     def has_add_permission(self, request: WSGIRequest) -> bool:

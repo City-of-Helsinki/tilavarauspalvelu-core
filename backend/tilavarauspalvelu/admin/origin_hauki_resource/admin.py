@@ -33,7 +33,7 @@ __all__ = [
 
 class ReservationUnitInline(admin.TabularInline):
     model = ReservationUnit
-    fields = ["id", "reservation_unit_link"]
+    fields = ("id", "reservation_unit_link")
     readonly_fields = fields
     can_delete = False
     extra = 0
