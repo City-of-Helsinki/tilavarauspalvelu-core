@@ -40,7 +40,7 @@ class AffectingTimeSpan(models.Model):
     to query things like "Give me all time spans that affect reservation units X, Y, and Z".
     """
 
-    reservation: Reservation = models.OneToOneField(
+    reservation: Reservation = models.OneToOneField(  # type: ignore[assignment]
         "tilavarauspalvelu.Reservation",
         related_name="affecting_time_span",
         on_delete=models.DO_NOTHING,
@@ -48,12 +48,12 @@ class AffectingTimeSpan(models.Model):
         db_column="reservation_id",
     )
 
-    affected_reservation_unit_ids: list[int] = ArrayField(base_field=models.IntegerField())
-    buffered_start_datetime: datetime.datetime = models.DateTimeField()
-    buffered_end_datetime: datetime.datetime = models.DateTimeField()
-    is_blocking: bool = models.BooleanField()
-    buffer_time_before: datetime.timedelta = models.DurationField()
-    buffer_time_after: datetime.timedelta = models.DurationField()
+    affected_reservation_unit_ids: list[int] = ArrayField(base_field=models.IntegerField())  # type: ignore[assignment]
+    buffered_start_datetime: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
+    buffered_end_datetime: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
+    is_blocking: bool = models.BooleanField()  # type: ignore[assignment]
+    buffer_time_before: datetime.timedelta = models.DurationField()  # type: ignore[assignment]
+    buffer_time_after: datetime.timedelta = models.DurationField()  # type: ignore[assignment]
 
     objects: ClassVar[AffectingTimeSpanManager] = LazyModelManager.new()
     actions: LazyAttribute[AffectingTimeSpanActions] = LazyModelAttribute.new()

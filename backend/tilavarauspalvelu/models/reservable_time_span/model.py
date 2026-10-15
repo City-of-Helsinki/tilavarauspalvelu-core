@@ -29,13 +29,13 @@ __all__ = [
 class ReservableTimeSpan(models.Model):
     """A time period on which a ReservationUnit is reservable."""
 
-    resource: OriginHaukiResource = models.ForeignKey(
+    resource: OriginHaukiResource = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.OriginHaukiResource",
         related_name="reservable_time_spans",
         on_delete=models.CASCADE,
     )
-    start_datetime: datetime.datetime = models.DateTimeField(null=False, blank=False)
-    end_datetime: datetime.datetime = models.DateTimeField(null=False, blank=False)
+    start_datetime: datetime.datetime = models.DateTimeField(null=False, blank=False)  # type: ignore[assignment]
+    end_datetime: datetime.datetime = models.DateTimeField(null=False, blank=False)  # type: ignore[assignment]
 
     objects: ClassVar[ReservableTimeSpanManager] = LazyModelManager.new()
     actions: LazyAttribute[ReservableTimeSpanActions] = LazyModelAttribute.new()
