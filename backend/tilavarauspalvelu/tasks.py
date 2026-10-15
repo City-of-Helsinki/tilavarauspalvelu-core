@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import datetime
+import inspect
+import json
 import time
 import uuid
 from decimal import Decimal
@@ -84,6 +86,7 @@ def singleton_task[**P](task: Task) -> Task:
     See: https://docs.celeryq.dev/en/stable/tutorials/task-cookbook.html#ensuring-a-task-is-only-executed-one-at-a-time
     """
     task_func = task.run
+    task_signature = inspect.signature(task_func)
 
     @wraps(task_func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> None:
@@ -91,8 +94,13 @@ def singleton_task[**P](task: Task) -> Task:
         timeout_leeway = 3  # Some leeway for cache operations
 
         timeout_at = time.monotonic() + lock_timeout - timeout_leeway
-        arguments = [str(arg) for arg in args] + [f"{key}={value}" for key, value in sorted(kwargs.items())]
-        lock_id = ":".join([task.name, *arguments])
+
+        # Bind to the signature so that positional and keyword arguments get the same lock.
+        # JSON keeps the boundaries between the arguments unambiguous.
+        bound_arguments = task_signature.bind(*args, **kwargs)
+        bound_arguments.apply_defaults()
+        arguments = json.dumps(bound_arguments.arguments, separators=(",", ":"), default=str)
+        lock_id = f"{task.name}:{arguments}"
 
         # Assuming the operation here is atomic, or at least close enough to be safe.
         has_lock = cache.add(lock_id, 1, lock_timeout)
