@@ -203,12 +203,13 @@ def _create_intended_uses() -> list[IntendedUse]:
 
 @with_logs
 def _create_tax_percentages() -> dict[Percentage, TaxPercentage]:
+    percentages: list[Percentage] = ["0", "10", "14", "24", "25.5"]
     tax_percentages: list[TaxPercentage] = [
         TaxPercentageFactory.build(value=Decimal(percentage))  #
-        for percentage in ("0", "10", "14", "24", "25.5")
+        for percentage in percentages
     ]
     tax_percentages = TaxPercentage.objects.bulk_create(tax_percentages)
-    return {str(tax.value): tax for tax in tax_percentages}  # type: ignore[return-value]
+    return dict(zip(percentages, tax_percentages, strict=True))
 
 
 @with_logs
