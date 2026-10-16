@@ -124,7 +124,7 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
         # Create both the reservation series and the reservations in a transaction.
         # This way if we get, e.g., overlapping reservations, the whole operation is rolled back.
         with transaction.atomic():
-            instance = super().update(instance, validated_data)
+            super().update(instance, validated_data)
             reservations = self.recreate_reservations(
                 instance,
                 buffer_time_before=buffer_time_before,

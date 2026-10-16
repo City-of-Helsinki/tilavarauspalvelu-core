@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from django.core import validators
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 
 from tilavarauspalvelu.models import ReservationUnitImage
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class ReservationUnitImageCreateSerializer(NestingModelSerializer):
@@ -52,19 +57,19 @@ class ReservationUnitImageFieldSerializer(NestingModelSerializer):
         if not obj.image:
             return None
 
-        request = self.context.get("request")
+        request: WSGIRequest = self.context["request"]
         return request.build_absolute_uri(obj.small_url)
 
     def get_medium_url(self, obj: ReservationUnitImage) -> str | None:
         if not obj.image:
             return None
 
-        request = self.context.get("request")
+        request: WSGIRequest = self.context["request"]
         return request.build_absolute_uri(obj.medium_url)
 
     def get_large_url(self, obj: ReservationUnitImage) -> str | None:
         if not obj.image:
             return None
 
-        request = self.context.get("request")
+        request: WSGIRequest = self.context["request"]
         return request.build_absolute_uri(obj.large_url)

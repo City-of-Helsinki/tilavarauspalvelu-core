@@ -51,9 +51,9 @@ class ApplicationFilterSet(ModelFilterSet):
 
     @staticmethod
     def filter_by_text_search(qs: ApplicationQuerySet, name: str, value: str) -> models.QuerySet:
-        fields = ("id", "application_sections_ids", "application_sections_names", "applicant")
+        fields = ("id", "application_sections_ids", "application_sections_names", "applicant_name")
         qs = qs.alias(
-            applicant=L("applicant"),
+            applicant_name=L("applicant"),
             application_sections_ids=ArrayAgg("application_sections__id"),
             application_sections_names=ArrayAgg("application_sections__name"),
         )
