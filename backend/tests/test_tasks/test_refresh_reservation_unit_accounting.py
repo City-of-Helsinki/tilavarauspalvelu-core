@@ -108,6 +108,18 @@ def test_refresh_reservation_unit_accounting__api_not_called_when_product_mappin
     assert VerkkokauppaAPIClient.create_or_update_accounting.called is False
 
 
+@patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
+def test_refresh_reservation_unit_accounting__api_not_called_when_product_mapping_does_not_exist():
+    reservation_unit = ReservationUnitFactory.create(
+        payment_product=None,
+        payment_accounting=PaymentAccountingFactory.create(),
+    )
+
+    refresh_reservation_unit_accounting_task(reservation_unit.pk)
+
+    assert VerkkokauppaAPIClient.create_or_update_accounting.called is False
+
+
 @override_settings(UPDATE_PRODUCT_MAPPING=True)
 @patch_method(VerkkokauppaAPIClient.create_product, return_value=mock_create_product())
 @patch_method(VerkkokauppaAPIClient.create_or_update_accounting, side_effect=CreateOrUpdateAccountingError("test"))

@@ -7,9 +7,11 @@ import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import PriceUnit
+from tilavarauspalvelu.exceptions import ReservationPriceCalculationError
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, ReservationUnitPricingFactory
+from tests.helpers import exact
 
 # Applied to all tests
 pytestmark = [
@@ -110,6 +112,16 @@ def test_calculate_full_price__uses_pricing_of_local_begin_date_for_utc_datetime
     price = reservation.actions.calculate_full_price(begin_datetime=begin, end_datetime=end)
 
     assert price == Decimal(50)
+
+
+def test_calculate_full_price__no_active_pricing():
+    reservation = ReservationFactory.create(reservation_unit__pricings__begins=datetime.date(2030, 1, 1))
+
+    begin = datetime.datetime(2026, 10, 25, 1, 0, tzinfo=DEFAULT_TIMEZONE)
+    end = datetime.datetime(2026, 10, 25, 2, 0, tzinfo=DEFAULT_TIMEZONE)
+
+    with pytest.raises(ReservationPriceCalculationError, match=exact("Reservation unit has no pricing information")):
+        reservation.actions.calculate_full_price(begin_datetime=begin, end_datetime=end)
 
 
 def test_get_active_pricing__future_has_same_tax_percentage():

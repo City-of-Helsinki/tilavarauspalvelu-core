@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, NamedTuple
 
 import pytest
+from django.contrib.auth.models import AnonymousUser
 
 from tilavarauspalvelu.enums import MunicipalityChoice, ReservationNotification
 from tilavarauspalvelu.integrations.helauth.pipeline import (
@@ -34,10 +34,7 @@ pytestmark = [
 ]
 
 
-class ErrorParams(NamedTuple):
-    token: str | None
-    profile_response: dict[str, Any]
-    error_message: str
+# ── Update user from profile ──
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
@@ -140,6 +137,56 @@ def test_update_user_from_profile__has_profile_id__missing_date_of_birth():
     assert user.date_of_birth == datetime.date(2001, 1, 1)
 
 
+@patch_method(HelsinkiProfileClient.get_token, return_value="foo")
+@patch_method(HelsinkiProfileClient.request)
+def test_update_user_from_profile__has_profile_id_and_date_of_birth__not_overwritten():
+    user = UserFactory.create(profile_id="foo", date_of_birth=datetime.date(1990, 2, 3))
+
+    profile_data = MyProfileDataFactory.create_basic(
+        id="bar",
+        verifiedPersonalInformation__nationalIdentificationNumber="010101A1234",
+    )
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+
+    request = mock_request(user)
+    update_user_from_profile(request)
+
+    user.refresh_from_db()
+    assert user.profile_id == "foo"
+    assert user.date_of_birth == datetime.date(1990, 2, 3)
+
+    session_call = request.session.mock_calls[0].args
+    assert session_call[0] == "reservation_prefill_info"
+
+
+@patch_method(HelsinkiProfileClient.get_token, return_value="foo")
+@patch_method(HelsinkiProfileClient.request)
+def test_update_user_from_profile__profile_missing_id_and_birthday():
+    user = UserFactory.create(profile_id="", date_of_birth=None)
+
+    profile_data = MyProfileDataFactory.create_basic(
+        id=None,
+        verifiedPersonalInformation=None,
+    )
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+
+    update_user_from_profile(mock_request(user))
+
+    user.refresh_from_db()
+    assert user.profile_id == ""
+    assert user.date_of_birth is None
+
+
+@patch_method(HelsinkiProfileClient.request)
+def test_update_user_from_profile__anonymous_user():
+    request = mock_request(AnonymousUser())
+
+    update_user_from_profile(request)
+
+    assert HelsinkiProfileClient.request.call_count == 0
+    assert request.session.mock_calls == []
+
+
 @patch_method(HelsinkiProfileClient.get_token, return_value=None)
 @patch_method(HelsinkiProfileClient.request, return_value=ResponseMock(json_data={}))
 @patch_method(SentryLogger.log_message)
@@ -172,6 +219,9 @@ def test_update_user_from_profile_logs_to_sentry_if_raises():
     assert SentryLogger.log_exception.call_count == 1
 
 
+# ── SSN to date ──
+
+
 @pytest.mark.parametrize(
     ("id_number", "expected"),
     [
@@ -196,6 +246,9 @@ def test_update_user_from_profile_logs_to_sentry_if_raises():
 )
 def test_ssn_to_date(id_number, expected):
     assert ssn_to_date(id_number) == expected
+
+
+# ── Migrate from Tunnistamo to Keycloak ──
 
 
 def test_migrate_from_tunnistamo_to_keycloak():

@@ -211,10 +211,6 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             return override
         return self.reservation_unit.buffer_time_after
 
-    def get_max_persons(self) -> int | None:
-        # Sum of max persons for all spaces because group can be divided to different spaces
-        return sum(space.max_persons or 0 for space in self.reservation_unit.spaces.all()) or None
-
     def has_overlapping_reservations(
         self,
         start_datetime: datetime.datetime,
@@ -374,7 +370,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
 
         # Has PAID active or future pricings
         active_pricing = self.reservation_unit.actions.get_active_pricing()
-        if active_pricing.highest_price > 0:
+        if active_pricing is not None and active_pricing.highest_price > 0:
             return True
         return self.reservation_unit.pricings.filter(highest_price__gt=0, begins__gt=local_date()).exists()
 

@@ -10,7 +10,7 @@ from django.test import override_settings
 from freezegun import freeze_time
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
-from tilavarauspalvelu.enums import AccessType
+from tilavarauspalvelu.enums import AccessType, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_rescheduled
@@ -404,6 +404,24 @@ def test_reservation_rescheduled__send_email__no_recipients(outbox):
 @freeze_time("2024-01-02")
 def test_reservation_rescheduled__send_email__reservation_in_the_past(outbox):
     reservation = ReservationFactory.create(
+        reservee_email="reservee@email.com",
+        user__email="user@email.com",
+        reservation_unit__name="foo",
+        begins_at=local_datetime(2024, 1, 1, 20, 0),
+        ends_at=local_datetime(2024, 1, 1, 22, 0),
+    )
+
+    EmailService.send_reservation_rescheduled_email(reservation)
+
+    assert len(outbox) == 0
+
+
+@pytest.mark.django_db
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_reservation_rescheduled__send_email__behalf_reservation(outbox):
+    reservation = ReservationFactory.create(
+        type=ReservationTypeChoice.BEHALF,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_unit__name="foo",

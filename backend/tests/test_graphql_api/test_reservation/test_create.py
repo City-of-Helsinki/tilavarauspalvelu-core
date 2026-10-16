@@ -266,6 +266,24 @@ class ReservationTimeParams(NamedTuple):
         "Reservation begins in the future": ReservationTimeParams(reservation_begins_delta=10, is_error=True),
         "Reservation ended in the past": ReservationTimeParams(reservation_ends_delta=-10, is_error=True),
         "Reservation ends in the future": ReservationTimeParams(reservation_ends_delta=10),
+        "Reservation begins and ends at the same time": ReservationTimeParams(
+            reservation_begins_delta=-10,
+            reservation_ends_delta=-10,
+            is_error=True,
+        ),
+        "Reservation paused in the past, resumed in the past": ReservationTimeParams(
+            reservation_begins_delta=-5,
+            reservation_ends_delta=-10,
+        ),
+        "Reservation paused in the past, resumes in the future": ReservationTimeParams(
+            reservation_begins_delta=10,
+            reservation_ends_delta=-10,
+            is_error=True,
+        ),
+        "Reservation pauses in the future": ReservationTimeParams(
+            reservation_begins_delta=20,
+            reservation_ends_delta=10,
+        ),
     })
 )
 def test_reservation__create__reservation_unit_reservation_in_the_past_or_future(
@@ -838,6 +856,37 @@ def test_reservation__create__duration_is_not_multiple_of_interval(graphql):
     assert response.field_error_messages() == [
         "Reservation duration is not a multiple of the start interval of 15 minutes."
     ]
+
+
+def test_reservation__create__duration_is_zero(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now()
+
+    begin = next_hour(plus_hours=1)
+
+    graphql.login_with_superuser()
+    input_data = get_create_data(reservation_unit, begins_at=begin, ends_at=begin)
+
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+
+    assert response.field_error_messages() == ["Reservation must end after it begins"]
+    assert Reservation.objects.exists() is False
+
+
+def test_reservation__create__begin_time_is_not_on_start_interval(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now()
+
+    begin = next_hour(plus_hours=1, plus_minutes=5)
+    end = begin + datetime.timedelta(hours=1)
+
+    graphql.login_with_superuser()
+    input_data = get_create_data(reservation_unit, begins_at=begin, ends_at=end)
+
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+
+    assert response.field_error_messages() == [
+        "Reservation start time does not match the reservation unit's allowed start interval."
+    ]
+    assert Reservation.objects.exists() is False
 
 
 @pytest.mark.parametrize("arm", [ProfileLoginAMR.SUOMI_FI, ProfileLoginAMR.HELTUNNISTUSSUOMIFI])

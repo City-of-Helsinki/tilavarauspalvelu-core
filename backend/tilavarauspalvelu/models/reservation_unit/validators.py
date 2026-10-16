@@ -166,14 +166,6 @@ class ReservationUnitValidator:
             msg = "Reservation unit is missing payment product"
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_PAYMENT_PRODUCT)
 
-    def validate_has_payment_accounting(self) -> None:
-        if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
-            return
-
-        if not self.reservation_unit.actions.get_accounting():
-            msg = "Reservation unit is missing payment accounting"
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_PAYMENT_ACCOUNTING)
-
     def validate_cancellation_rule(self, begin: datetime.datetime) -> None:
         cancel_rule = self.reservation_unit.cancellation_rule
         if cancel_rule is None:
@@ -203,8 +195,3 @@ class ReservationUnitValidator:
         if reservation_type not in ReservationTypeChoice.types_that_staff_can_create:
             msg = "Staff users are not allowed to create reservations of this type."
             raise ValidationError(msg, code=error_codes.RESERVATION_TYPE_NOT_ALLOWED)
-
-    def validate_has_access_type(self) -> None:
-        if not self.reservation_unit.access_types.exists():
-            msg = "Reservation unit does not have an access type defined."
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_HAS_NO_ACCESS_TYPE)

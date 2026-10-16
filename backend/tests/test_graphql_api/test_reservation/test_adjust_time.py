@@ -162,6 +162,26 @@ def test_reservation__adjust_time__change_would_make_unit_reservation_unit_paid(
     ]
 
 
+def test_reservation__adjust_time__no_active_pricing_in_new_time(graphql):
+    reservation = ReservationFactory.create_for_time_adjustment(
+        reservation_unit__pricings__begins=local_date() + datetime.timedelta(days=365),
+    )
+    reservation_begin = reservation.begins_at
+
+    data = get_adjust_data(reservation)
+
+    graphql.login_with_superuser()
+    response = graphql(ADJUST_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation cannot be rescheduled since it has no active pricing.",
+    ]
+
+    reservation.refresh_from_db()
+    assert reservation.begins_at == reservation_begin
+
+
 def test_reservation__adjust_time__reservation_unit_not_reservable_in_new_time(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         reservation_unit__reservation_begins_at=local_datetime() + datetime.timedelta(days=1),

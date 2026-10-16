@@ -4,14 +4,17 @@ from typing import Any, NamedTuple
 
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
+from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.enums import (
     AccessType,
+    PaymentType,
     ReservationFormType,
     ReservationStateChoice,
     ReservationTypeChoice,
     ReserveeType,
 )
+from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory
 
@@ -309,3 +312,69 @@ def test_reservation__reservation_form__age_group_form(reservee_type):
         required_fields.update(["reservee_organisation_name", "reservee_identifier"])
 
     assert set(reservation.actions.get_required_fields(reservee_type=reservee_type)) == required_fields
+
+
+def test_reservation__reservation_form__reservee_type_from_reservation():
+    reservation = ReservationFactory.build(
+        reservee_type=ReserveeType.COMPANY,
+        reservation_unit__reservation_form=ReservationFormType.RESERVEE_INFO_FORM.value,
+    )
+    required_fields = {
+        "reservee_first_name",
+        "reservee_last_name",
+        "reservee_email",
+        "reservee_phone",
+        "reservee_organisation_name",
+        "reservee_identifier",
+        "description",
+        "reservee_type",
+    }
+    assert set(reservation.actions.get_required_fields()) == required_fields
+
+
+# ── Email reservee name ──
+
+
+def test_reservation__email_reservee_name__individual():
+    reservation = ReservationFactory.build(
+        reservee_type=ReserveeType.INDIVIDUAL,
+        reservee_first_name="John",
+        reservee_last_name="Doe",
+        reservee_organisation_name="Org",
+    )
+    assert reservation.actions.get_email_reservee_name() == "John Doe"
+
+
+@pytest.mark.parametrize("reservee_type", [ReserveeType.COMPANY, ReserveeType.NONPROFIT])
+def test_reservation__email_reservee_name__organisation(reservee_type):
+    reservation = ReservationFactory.build(
+        reservee_type=reservee_type,
+        reservee_first_name="John",
+        reservee_last_name="Doe",
+        reservee_organisation_name="Org",
+    )
+    assert reservation.actions.get_email_reservee_name() == "Org"
+
+
+# ── Payment order creation ──
+
+
+def test_reservation__create_payment_order_paid_online__on_site_payment_type():
+    reservation = ReservationFactory.build()
+
+    with pytest.raises(ValidationError) as error:
+        reservation.actions.create_payment_order_paid_online(payment_type=PaymentType.ON_SITE)
+
+    assert error.value.detail == [f"Payment type {PaymentType.ON_SITE!r} cannot be paid online"]
+
+
+def test_reservation__create_payment_order_pending_after_handling__on_site_payment_type():
+    reservation = ReservationFactory.build()
+
+    with pytest.raises(ValidationError) as error:
+        reservation.actions.create_payment_order_pending_after_handling(
+            payment_type=PaymentType.ON_SITE,
+            handled_payment_due_by=local_datetime(),
+        )
+
+    assert error.value.detail == [f"Payment type {PaymentType.ON_SITE!r} cannot have a pending payment order"]

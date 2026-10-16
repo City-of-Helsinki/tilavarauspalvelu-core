@@ -8,7 +8,7 @@ from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.models import ReservationUnit
 
-from tests.factories import ReservationUnitFactory
+from tests.factories import EquipmentFactory, IntendedUseFactory, ReservationUnitFactory, ResourceFactory, SpaceFactory
 
 from .helpers import reservation_units_query
 
@@ -332,6 +332,83 @@ def test_reservation_unit__filter__by_text_search__unauthenticated_user(graphql)
     ReservationUnit.objects.update_search_vectors()
 
     query = reservation_units_query(text_search="kuvaus")
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+# ── Search vector updates ──
+
+
+def test_reservation_unit__filter__by_text_search__unit_name_changed(graphql, settings):
+    settings.UPDATE_SEARCH_VECTORS = True
+
+    reservation_unit = ReservationUnitFactory.create()
+
+    unit = reservation_unit.unit
+    unit.name = "Zyxquar"
+    unit.name_fi = "Zyxquar"
+    unit.save()
+
+    query = reservation_units_query(text_search="zyxquar")
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+def test_reservation_unit__filter__by_text_search__space_added(graphql, settings):
+    settings.UPDATE_SEARCH_VECTORS = True
+
+    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit.spaces.add(SpaceFactory.create(name="Zyxquar"))
+
+    query = reservation_units_query(text_search="zyxquar")
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+def test_reservation_unit__filter__by_text_search__resource_added(graphql, settings):
+    settings.UPDATE_SEARCH_VECTORS = True
+
+    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit.resources.add(ResourceFactory.create(name="Zyxquar"))
+
+    query = reservation_units_query(text_search="zyxquar")
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+def test_reservation_unit__filter__by_text_search__intended_use_added(graphql, settings):
+    settings.UPDATE_SEARCH_VECTORS = True
+
+    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit.intended_uses.add(IntendedUseFactory.create(name="Zyxquar"))
+
+    query = reservation_units_query(text_search="zyxquar")
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+def test_reservation_unit__filter__by_text_search__equipment_added(graphql, settings):
+    settings.UPDATE_SEARCH_VECTORS = True
+
+    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit.equipments.add(EquipmentFactory.create(name="Zyxquar"))
+
+    query = reservation_units_query(text_search="zyxquar")
     response = graphql(query)
 
     assert response.has_errors is False, response
