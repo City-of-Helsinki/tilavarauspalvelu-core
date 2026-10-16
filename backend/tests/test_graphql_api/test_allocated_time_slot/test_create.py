@@ -335,6 +335,37 @@ def test_allocated_time_slot__create__approve_begin_time_not_matching_start_inte
 
 
 @pytest.mark.parametrize("force", [True, False])
+@pytest.mark.parametrize(
+    ("begin_time", "end_time"),
+    [
+        (datetime.time(12, 0), datetime.time(10, 0)),
+        (datetime.time(22, 0), datetime.time(0, 30)),
+    ],
+)
+def test_allocated_time_slot__create__approve_begin_time_after_end_time(graphql, force, begin_time, end_time):
+    # given:
+    # - There is an allocatable reservation unit option
+    # - A superuser is using the system
+    application = ApplicationFactory.create_application_ready_for_allocation()
+    section = application.application_sections.first()
+    option = section.reservation_unit_options.first()
+    graphql.login_with_superuser()
+
+    # when:
+    # - The user tries to make an allocation that ends before it begins on the same day
+    input_data = allocation_create_data(option, begin_time=begin_time, end_time=end_time, force=force)
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
+
+    # then:
+    # - The response complains about the times being invalid, even if forced
+    # - No allocation is made
+    assert response.field_error_messages() == [
+        "Allocation begin time must be before its end time.",
+    ]
+    assert AllocatedTimeSlot.objects.count() == 0
+
+
+@pytest.mark.parametrize("force", [True, False])
 def test_allocated_time_slot__create__approve_more_than_events_per_week(graphql, force):
     # given:
     # - There is an allocatable reservation unit option

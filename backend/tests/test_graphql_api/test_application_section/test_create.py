@@ -200,6 +200,45 @@ def test_application_section__create__suitable_time_range_not_multiple_of_15(gra
     ]
 
 
+@pytest.mark.parametrize(
+    ("begin_time", "end_time"),
+    [
+        (datetime.time(12, 0), datetime.time(10, 0)),
+        (datetime.time(20, 0), datetime.time(0, 30)),
+    ],
+)
+def test_application_section__create__suitable_time_range_begin_time_after_end_time(graphql, begin_time, end_time):
+    application = ApplicationFactory.create_in_status_draft_no_sections()
+    graphql.force_login(application.user)
+
+    data = get_application_section_create_data(application=application)
+    data["suitableTimeRanges"][0]["beginTime"] = begin_time.isoformat()
+    data["suitableTimeRanges"][0]["endTime"] = end_time.isoformat()
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.field_error_messages("suitableTimeRanges.0.nonFieldErrors") == [
+        "Suitable time range begin time must be before its end time.",
+    ]
+    assert ApplicationSection.objects.exists() is False
+
+
+def test_application_section__create__suitable_time_range_ends_at_midnight(graphql):
+    application = ApplicationFactory.create_in_status_draft_no_sections()
+    graphql.force_login(application.user)
+
+    data = get_application_section_create_data(application=application)
+    data["suitableTimeRanges"][0]["beginTime"] = datetime.time(20, 0).isoformat()
+    data["suitableTimeRanges"][0]["endTime"] = datetime.time(0, 0).isoformat()
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response
+
+    section = ApplicationSection.objects.get()
+    time_range = section.suitable_time_ranges.get()
+    assert time_range.begin_time == datetime.time(20, 0)
+    assert time_range.end_time == datetime.time(0, 0)
+
+
 def test_application_section__create__two_reservation_unit_options_with_same_preferred_order(graphql):
     # given:
     # - There is draft application in an open application round
