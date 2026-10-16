@@ -45,6 +45,9 @@ class Common(Environment):
 
     # --- Basic settings ---------------------------------------------------------------------------------------------
 
+    # Each environment sets its own value.
+    DEBUG: bool
+
     WSGI_APPLICATION = "config.wsgi.application"
     ROOT_URLCONF = "config.urls"
     AUTH_USER_MODEL = "tilavarauspalvelu.User"
@@ -189,8 +192,8 @@ class Common(Environment):
 
     # --- Static file settings ---------------------------------------------------------------------------------------
 
-    STATIC_ROOT = values.PathValue(default="staticroot")
-    MEDIA_ROOT = values.PathValue(default="media")
+    STATIC_ROOT: Path = values.PathValue(default="staticroot")  # type: ignore[assignment]
+    MEDIA_ROOT: Path = values.PathValue(default="media")  # type: ignore[assignment]
 
     STATIC_URL = values.StringValue(default="/static/")
     MEDIA_URL = values.StringValue(default="/media/")
@@ -723,8 +726,8 @@ class Local(Common, overrides_from=LocalMixin):
 
     # --- Static file settings ---------------------------------------------------------------------------------------
 
-    STATIC_ROOT = values.PathValue(default="staticroot", create_if_missing=True)
-    MEDIA_ROOT = values.PathValue(default="media", create_if_missing=True)
+    STATIC_ROOT: Path = values.PathValue(default="staticroot", create_if_missing=True)  # type: ignore[assignment]
+    MEDIA_ROOT: Path = values.PathValue(default="media", create_if_missing=True)  # type: ignore[assignment]
 
     # --- Logging settings -------------------------------------------------------------------------------------------
 
@@ -815,8 +818,8 @@ class Docker(Common, overrides_from=DockerMixin):
     CORS_ALLOWED_ORIGINS = values.ListValue(default=[])
     CSRF_TRUSTED_ORIGINS = values.ListValue(default=[])
 
-    STATIC_ROOT = "/srv/static"
-    MEDIA_ROOT = "/media"
+    STATIC_ROOT = Path("/srv/static")
+    MEDIA_ROOT = Path("/media")
 
     DATABASES = values.DatabaseURLValue(default="postgis://tvp:tvp@db/tvp")
 
@@ -995,8 +998,8 @@ class Build(EmptyDefaults, Common, use_environ=True):
 
     DEBUG = True
 
-    STATIC_ROOT = "/srv/static"
-    MEDIA_ROOT = "/media"
+    STATIC_ROOT = Path("/srv/static")
+    MEDIA_ROOT = Path("/media")
 
 
 class CI(EmptyDefaults, Common, use_environ=True):
