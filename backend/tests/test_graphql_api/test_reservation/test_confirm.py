@@ -400,6 +400,27 @@ def test_reservation__confirm__does_not_save_when_api_call_fails(graphql):
     assert PaymentOrder.objects.count() == 0
 
 
+@patch_method(VerkkokauppaAPIClient.create_order)
+def test_reservation__confirm__saves_empty_receipt_url_when_order_has_none(graphql):
+    reservation = ReservationFactory.create_for_confirmation(
+        reservation_unit__payment_type=PaymentType.ONLINE,
+        user__preferred_language="fi",
+    )
+
+    order = OrderFactory.create(receipt_url=None)
+    VerkkokauppaAPIClient.create_order.return_value = order
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    payment_order = PaymentOrder.objects.get()
+    assert payment_order.checkout_url == order.checkout_url
+    assert payment_order.receipt_url == ""
+
+
 def test_reservation__confirm__default_payment_type__on_site(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_type=PaymentType.ON_SITE,

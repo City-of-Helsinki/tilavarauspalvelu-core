@@ -111,12 +111,18 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
                 msg = f"{action_fail}: {response_json.get('errors')}"
                 raise CreateOrderError(msg)
 
-            return Order.from_json(response_json)
+            order = Order.from_json(response_json)
 
         except (RequestException, ExternalServiceError, ParseOrderError) as err:
             SentryLogger.log_exception(err, details=f"{action_fail}.", order_params=order_params)
             msg = f"{action_fail}: {err!s}"
             raise CreateOrderError(msg) from err
+
+        if order.checkout_url is None:
+            msg = f"{action_fail}: Order has no checkout URL"
+            raise CreateOrderError(msg)
+
+        return order
 
     @classmethod
     def cancel_order(cls, *, order_uuid: uuid.UUID, user_uuid: uuid.UUID) -> Order | None:

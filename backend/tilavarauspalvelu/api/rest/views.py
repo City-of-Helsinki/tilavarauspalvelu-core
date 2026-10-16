@@ -464,7 +464,7 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
 
     payment_order.remote_id = verkkokauppa_order.order_id
     payment_order.checkout_url = verkkokauppa_order.checkout_url
-    payment_order.receipt_url = verkkokauppa_order.receipt_url
+    payment_order.receipt_url = verkkokauppa_order.receipt_url or ""
     payment_order.created_at = local_datetime()
     payment_order.save(update_fields=["remote_id", "checkout_url", "receipt_url", "created_at"])
 

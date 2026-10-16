@@ -336,6 +336,17 @@ def test_verkkokauppa__create_order__raises_exception_if_logger_in_checkout_url_
     assert SentryLogger.log_exception.call_count == 2
 
 
+@patch_method(VerkkokauppaAPIClient.request)
+def test_verkkokauppa__create_order__raises_exception_if_logged_in_checkout_url_is_null():
+    return_value = create_order_response.copy()
+    return_value["loggedInCheckoutUrl"] = None
+
+    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=201, json_data=return_value)
+
+    with pytest.raises(CreateOrderError, match=exact("Order creation failed: Order has no checkout URL")):
+        VerkkokauppaAPIClient.create_order(order_params=create_order_params)
+
+
 @patch_method(VerkkokauppaAPIClient.request, side_effect=Timeout())
 @patch_method(SentryLogger.log_exception)
 def test_verkkokauppa__create_order__raises_exception_on_timeout():
