@@ -123,3 +123,21 @@ def test__TimeSpanElement__copy():
     assert copied == time_span
     assert copied.buffer_time_before == datetime.timedelta(minutes=15)
     assert copied.buffer_time_after == datetime.timedelta(minutes=30)
+
+
+# The clocks move from 04:00 back to 03:00 on the night of 2026-10-25, so the hour from 03:00 to 04:00 occurs twice.
+def test__TimeSpanElement__overlaps_with__in_the_repeated_hour_of_a_daylight_saving_time_change():
+    time_span_in_first_hour = TimeSpanElement(
+        start_datetime=datetime.datetime(2026, 10, 25, 3, 0, tzinfo=DEFAULT_TIMEZONE, fold=0),
+        end_datetime=datetime.datetime(2026, 10, 25, 3, 50, tzinfo=DEFAULT_TIMEZONE, fold=0),
+        is_reservable=False,
+    )
+    time_span_in_second_hour = TimeSpanElement(
+        start_datetime=datetime.datetime(2026, 10, 25, 3, 10, tzinfo=DEFAULT_TIMEZONE, fold=1),
+        end_datetime=datetime.datetime(2026, 10, 25, 3, 20, tzinfo=DEFAULT_TIMEZONE, fold=1),
+        is_reservable=True,
+    )
+
+    assert time_span_in_first_hour.overlaps_with(time_span_in_second_hour) is False
+    assert time_span_in_second_hour.overlaps_with(time_span_in_first_hour) is False
+    assert time_span_in_first_hour.duration_minutes == 50

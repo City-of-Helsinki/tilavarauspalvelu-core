@@ -199,7 +199,7 @@ class ReservableTimeSpanFirstReservableTimeHelper:
             self._move_time_span_to_next_valid_start_time(reservable_time_span)
 
             if self._can_reservation_fit_inside_time_span(reservable_time_span):
-                return reservable_time_span.start_datetime
+                return reservable_time_span.start_datetime.astimezone(DEFAULT_TIMEZONE)
 
         return None
 

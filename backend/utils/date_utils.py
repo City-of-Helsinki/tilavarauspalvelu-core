@@ -382,22 +382,26 @@ def datetime_range_as_string(*, start_datetime: datetime.datetime, end_datetime:
     """Format a datetime range to a human readable string."""
     strformat = "%Y-%m-%d %H:%M"
 
-    start_datetime = start_datetime.astimezone(DEFAULT_TIMEZONE)
-    end_datetime = end_datetime.astimezone(DEFAULT_TIMEZONE)
+    # Check the max date before the conversion, since the maximum datetime in UTC overflows in the local timezone.
+    is_end_max = end_datetime.date() == datetime.date.max
 
+    start_datetime = start_datetime.astimezone(DEFAULT_TIMEZONE)
     start_date = start_datetime.date()
-    end_date = end_datetime.date()
 
     start_str = "min" if start_date == datetime.date.min else start_datetime.strftime(strformat)
 
-    if end_date == datetime.date.max:
+    if is_end_max:
         end_str = "max"
-    elif end_date == start_date:
-        end_str = end_datetime.strftime("%H:%M")
-    elif end_date == start_date + datetime.timedelta(days=1) and end_datetime.time() == datetime.time.min:
-        end_str = "24:00"
     else:
-        end_str = end_datetime.strftime(strformat)
+        end_datetime = end_datetime.astimezone(DEFAULT_TIMEZONE)
+        end_date = end_datetime.date()
+
+        if end_date == start_date:
+            end_str = end_datetime.strftime("%H:%M")
+        elif end_date == start_date + datetime.timedelta(days=1) and end_datetime.time() == datetime.time.min:
+            end_str = "24:00"
+        else:
+            end_str = end_datetime.strftime(strformat)
 
     return f"{start_str}-{end_str}"
 

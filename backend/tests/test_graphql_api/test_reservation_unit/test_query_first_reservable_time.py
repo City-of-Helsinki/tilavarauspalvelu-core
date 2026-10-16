@@ -2410,6 +2410,48 @@ def test__reservation_unit__first_reservable_time__extra_long_interval__after_mi
     assert is_closed(response) is False
 
 
+# The clocks move from 03:00 to 04:00 on the night of 2026-03-29.
+@freezegun.freeze_time(local_datetime(2026, 3, 1, 12))
+def test__reservation_unit__first_reservable_time__duration_over_spring_daylight_saving_time_change(
+    graphql,
+    reservation_unit,
+):
+    reservation_unit.min_reservation_duration = datetime.timedelta(hours=4)
+    reservation_unit.save()
+
+    # 29th Mar 01:00 - 05:00 is 3 real hours long.
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=local_datetime(2026, 3, 29, 1),
+        end_datetime=local_datetime(2026, 3, 29, 5),
+    )
+
+    response = graphql(reservation_units_reservable_query())
+    assert response.has_errors is False, response
+    assert frt(response) is None
+
+
+# The clocks move from 04:00 back to 03:00 on the night of 2026-10-25.
+@freezegun.freeze_time(local_datetime(2026, 10, 1, 12))
+def test__reservation_unit__first_reservable_time__duration_over_autumn_daylight_saving_time_change(
+    graphql,
+    reservation_unit,
+):
+    reservation_unit.min_reservation_duration = datetime.timedelta(hours=5)
+    reservation_unit.save()
+
+    # 25th Oct 00:00 - 04:00 is 5 real hours long.
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=local_datetime(2026, 10, 25, 0),
+        end_datetime=local_datetime(2026, 10, 25, 4),
+    )
+
+    response = graphql(reservation_units_reservable_query())
+    assert response.has_errors is False, response
+    assert frt(response) == dt(year=2026, month=10, day=25)
+
+
 ########################################################################################################################
 
 
