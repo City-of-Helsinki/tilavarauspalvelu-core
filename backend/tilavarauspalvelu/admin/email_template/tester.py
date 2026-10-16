@@ -11,7 +11,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
-from tilavarauspalvelu.enums import Language
 from tilavarauspalvelu.integrations.email.sending import send_emails_in_batches_task
 from tilavarauspalvelu.integrations.email.typing import EmailData, EmailType
 from tilavarauspalvelu.models import ReservationUnit
@@ -99,7 +98,7 @@ def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpRespon
         tester_form = EmailTesterForm.from_reservation_unit(
             email_type=email_template_type,
             instance=reservation_unit,
-            language=Language.FI.value,
+            language="fi",
         )
         tester_form.initial["send_to"] = request.user.email or ""
         reservation_unit_form.initial["reservation_unit"] = reservation_unit.pk
@@ -108,7 +107,7 @@ def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpRespon
         tester_form = EmailTesterForm(email_type=email_template_type)
         tester_form.initial["send_to"] = request.user.email or ""
 
-    context = {
+    response_context: dict[str, Any] = {
         **admin.site.each_context(request),
         "title": _("Email template testing"),
         "base_site_template": "admin/base_site.html",  # See: 'helusers.admin_site.AdminSite.each_context'
@@ -121,4 +120,4 @@ def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpRespon
         "media": tester_form.media,
     }
 
-    return TemplateResponse(request, "email/email_tester.html", context=context)
+    return TemplateResponse(request, "email/email_tester.html", context=response_context)
