@@ -12,9 +12,11 @@ from utils.date_utils import (
     DEFAULT_TIMEZONE,
     combine,
     datetime_difference,
+    datetime_range_as_string,
     get_periods_between,
     local_date,
     local_datetime,
+    local_datetime_exists,
     local_datetime_max,
     local_datetime_min,
     local_time,
@@ -98,6 +100,21 @@ def test_date_utils__local_time_min():
 
 def test_date_utils__local_time_max():
     assert local_time_max() == datetime.time.max.replace(tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
+
+
+# The clocks move from 03:00 to 04:00 on 2026-03-29, and from 04:00 back to 03:00 on 2026-10-25.
+@pytest.mark.parametrize(
+    ("value", "exists"),
+    [
+        (datetime.datetime(2026, 3, 29, 2, 30, tzinfo=DEFAULT_TIMEZONE), True),
+        (datetime.datetime(2026, 3, 29, 3, 30, tzinfo=DEFAULT_TIMEZONE), False),
+        (datetime.datetime(2026, 3, 29, 4, 0, tzinfo=DEFAULT_TIMEZONE), True),
+        (datetime.datetime(2026, 10, 25, 3, 30, tzinfo=DEFAULT_TIMEZONE, fold=0), True),
+        (datetime.datetime(2026, 10, 25, 3, 30, tzinfo=DEFAULT_TIMEZONE, fold=1), True),
+    ],
+)
+def test_date_utils__local_datetime_exists(value, exists):
+    assert local_datetime_exists(value) is exists
 
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
@@ -292,3 +309,36 @@ def test_date_utils__get_periods_between__end_time_same_as_start_time():
     msg = "End time cannot be at or before start time if on the same day."
     with pytest.raises(ValueError, match=exact(msg)):
         list(get_periods_between(start_date, end_date, start_time, end_time, tzinfo=DEFAULT_TIMEZONE))
+
+
+def test_date_utils__datetime_range_as_string():
+    start_datetime = local_datetime(2026, 10, 24, 20, 0)
+    end_datetime = local_datetime(2026, 10, 24, 22, 0)
+
+    result = datetime_range_as_string(start_datetime=start_datetime, end_datetime=end_datetime)
+
+    assert result == "2026-10-24 20:00-22:00"
+
+
+def test_date_utils__datetime_range_as_string__ends_at_midnight():
+    start_datetime = local_datetime(2026, 10, 24, 22, 0)
+    end_datetime = local_datetime(2026, 10, 25, 0, 0)
+
+    result = datetime_range_as_string(start_datetime=start_datetime, end_datetime=end_datetime)
+
+    assert result == "2026-10-24 22:00-24:00"
+
+
+def test_date_utils__datetime_range_as_string__ends_on_another_day():
+    start_datetime = local_datetime(2026, 10, 24, 22, 0)
+    end_datetime = local_datetime(2026, 10, 25, 2, 0)
+
+    result = datetime_range_as_string(start_datetime=start_datetime, end_datetime=end_datetime)
+
+    assert result == "2026-10-24 22:00-2026-10-25 02:00"
+
+
+def test_date_utils__datetime_range_as_string__min_and_max():
+    result = datetime_range_as_string(start_datetime=utc_datetime_min(), end_datetime=utc_datetime_max())
+
+    assert result == "min-max"

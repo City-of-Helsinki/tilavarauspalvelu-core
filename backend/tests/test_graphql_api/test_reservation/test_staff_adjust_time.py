@@ -105,7 +105,24 @@ def test_reservation__staff_adjust_time__end_before_begin(graphql):
     response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Reservation cannot end before it begins"]
+    assert response.field_error_messages() == ["Reservation must end after it begins"]
+
+
+def test_reservation__staff_adjust_time__end_same_as_begin(graphql):
+    reservation = ReservationFactory.create_for_time_adjustment()
+    original_ends_at = reservation.ends_at
+
+    begin = next_hour(plus_hours=1)
+
+    graphql.login_with_superuser()
+    data = get_staff_adjust_data(reservation, begins_at=begin, ends_at=begin)
+    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation must end after it begins"]
+
+    reservation.refresh_from_db()
+    assert reservation.ends_at == original_ends_at
 
 
 def test_reservation__staff_adjust_time__begin_date_in_the_past(graphql):

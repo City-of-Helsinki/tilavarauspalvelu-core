@@ -105,6 +105,21 @@ def test_order__query__expires_in_minutes_keeps_updating_based_on_current_time(g
     assert response_4.first_query_object["expiresInMinutes"] is None
 
 
+# The clocks move from 04:00 back to 03:00 local time at 01:00 UTC on this night.
+@pytest.mark.parametrize("now", ["2026-10-25T00:58:00Z", "2026-10-25T01:05:00Z"])
+def test_order__query__expires_in_minutes__over_daylight_saving_time_change(graphql, now):
+    with freezegun.freeze_time(now):
+        order = get_order()
+
+        graphql.login_with_superuser()
+        query = order_query(order_uuid=order.remote_id)
+        response = graphql(query)
+
+    assert response.has_errors is False
+    assert response.first_query_object["checkoutUrl"] == order.checkout_url
+    assert response.first_query_object["expiresInMinutes"] == 5
+
+
 @freezegun.freeze_time("2021-01-01T12:00:00Z")
 def test_order__query__reservation_is_deleted__nothing_returned(graphql):
     order = get_order()

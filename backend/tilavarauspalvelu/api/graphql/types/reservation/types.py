@@ -25,7 +25,7 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation, ReservationUnit, ReservationUnitPricing, User
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import utc_datetime
 from utils.db import SubqueryArray
 from utils.utils import ical_hmac_signature
 
@@ -310,8 +310,8 @@ class ReservationNode(DjangoNode):
             return None
 
         # No need to show Pindora info after 24 hours have passed since it ended
-        now = local_datetime()
-        cutoff = root.ends_at.astimezone(DEFAULT_TIMEZONE) + datetime.timedelta(hours=24)
+        cutoff = root.ends_at.astimezone(datetime.UTC) + datetime.timedelta(hours=24)
+        now = utc_datetime()
         if now > cutoff:
             return None
 

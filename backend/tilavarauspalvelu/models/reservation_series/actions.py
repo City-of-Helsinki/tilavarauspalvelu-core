@@ -196,14 +196,13 @@ class ReservationSeriesActions:
         reservations: list[Reservation] = []
 
         for period in periods:
+            # Whole-day buffers depend on the date, since a daylight saving time change makes a day shorter or longer.
             if reservation_unit.reservation_block_whole_day:
-                reservation_details.setdefault(
-                    "buffer_time_before",
-                    reservation_unit.actions.get_actual_before_buffer(period["begin"]),
+                reservation_details["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(
+                    period["begin"]
                 )
-                reservation_details.setdefault(
-                    "buffer_time_after",
-                    reservation_unit.actions.get_actual_after_buffer(period["end"]),
+                reservation_details["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(
+                    period["end"]
                 )
 
             access_type = access_type_map.get(period["begin"].date(), AccessType.UNRESTRICTED)

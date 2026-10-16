@@ -29,13 +29,14 @@ from tilavarauspalvelu.tasks import (
 )
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
+    datetime_difference,
     local_date,
     local_datetime,
-    local_datetime_max,
-    local_datetime_min,
+    local_datetime_exists,
     local_end_of_day,
     local_start_of_day,
-    time_as_timedelta,
+    utc_datetime_max,
+    utc_datetime_min,
 )
 from utils.external_service.errors import ExternalServiceError
 
@@ -161,7 +162,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
 
     def get_actual_before_buffer(
         self,
-        reservation_begin: datetime.datetime | datetime.time,
+        reservation_begin: datetime.datetime,
         override: datetime.timedelta | None = None,
     ) -> datetime.timedelta:
         """
@@ -174,14 +175,16 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         but the override can not be used for reservation units that block the whole day.
         """
         if self.reservation_unit.reservation_block_whole_day:
-            return time_as_timedelta(reservation_begin)
+            start_of_day = local_start_of_day(reservation_begin)
+            return datetime_difference(start_datetime=start_of_day, end_datetime=reservation_begin)
+
         if override is not None:
             return override
         return self.reservation_unit.buffer_time_before
 
     def get_actual_after_buffer(
         self,
-        reservation_end: datetime.datetime | datetime.time,
+        reservation_end: datetime.datetime,
         override: datetime.timedelta | None = None,
     ) -> datetime.timedelta:
         """
@@ -195,10 +198,15 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         but the override can not be used for reservation units that block the whole day.
         """
         if self.reservation_unit.reservation_block_whole_day:
-            delta = time_as_timedelta(reservation_end)
-            if delta == datetime.timedelta():  # midnight
-                return delta
-            return datetime.timedelta(hours=24) - delta
+            start_of_day = local_start_of_day(reservation_end)
+            local_reservation_end = reservation_end.astimezone(DEFAULT_TIMEZONE)
+            if local_reservation_end == start_of_day:
+                return datetime.timedelta()
+
+            next_date = start_of_day.date() + datetime.timedelta(days=1)
+            start_of_next_day = local_start_of_day(next_date)
+            return datetime_difference(start_datetime=reservation_end, end_datetime=start_of_next_day)
+
         if override is not None:
             return override
         return self.reservation_unit.buffer_time_after
@@ -280,12 +288,17 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             if start_datetime.date() < on_date:
                 start_datetime = local_start_of_day(on_date)
 
+            # A reservation can end at midnight at the end of the day.
             if end_datetime.date() > on_date:
-                end_datetime = local_end_of_day(on_date)
+                next_date = on_date + datetime.timedelta(days=1)
+                end_datetime = local_start_of_day(next_date)
 
             while start_datetime < end_datetime:
+                time_left = datetime_difference(start_datetime=start_datetime, end_datetime=end_datetime)
+                start_exists = local_datetime_exists(start_datetime)
+
                 # Don't include times at the end timespans that are too small
-                if end_datetime - start_datetime >= min_duration:
+                if start_exists and time_left >= min_duration:
                     possible_start_times.add(start_datetime.time())
 
                 start_datetime += interval_timedelta
@@ -425,13 +438,13 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         return ReservationStartInterval(self.reservation_unit.reservation_start_interval).as_number
 
     def is_reservable_at(self, moment: datetime.datetime) -> bool:
-        moment = moment.astimezone(DEFAULT_TIMEZONE)
+        moment = moment.astimezone(datetime.UTC)
 
-        reservation_begins = self.reservation_unit.reservation_begins_at or local_datetime_min()
-        reservation_begins = reservation_begins.astimezone(DEFAULT_TIMEZONE)
+        reservation_begins = self.reservation_unit.reservation_begins_at or utc_datetime_min()
+        reservation_begins = reservation_begins.astimezone(datetime.UTC)
 
-        reservation_ends = self.reservation_unit.reservation_ends_at or local_datetime_max()
-        reservation_ends = reservation_ends.astimezone(DEFAULT_TIMEZONE)
+        reservation_ends = self.reservation_unit.reservation_ends_at or utc_datetime_max()
+        reservation_ends = reservation_ends.astimezone(datetime.UTC)
 
         if reservation_begins == reservation_ends:
             return False

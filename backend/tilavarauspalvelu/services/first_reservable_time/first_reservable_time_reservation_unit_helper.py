@@ -10,7 +10,7 @@ from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_rese
     ReservableTimeSpanFirstReservableTimeHelper,
 )
 from tilavarauspalvelu.services.first_reservable_time.utils import ReservableTimeOutput
-from utils.date_utils import local_datetime_max, local_datetime_min, local_start_of_day
+from utils.date_utils import DEFAULT_TIMEZONE, local_start_of_day, utc_datetime_max, utc_datetime_min
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.enums import AccessType
@@ -161,7 +161,7 @@ class ReservationUnitFirstReservableTimeHelper:
         if is_closed or first_reservable_time is None:
             access_type_date = self.parent.filter_date_start
         else:
-            access_type_date = first_reservable_time.date()
+            access_type_date = first_reservable_time.astimezone(DEFAULT_TIMEZONE).date()
 
         # Find the access type active at the first reservable time (These are sorted in reverse order in the QuerySet)
         for access_type in self.reservation_unit.access_types.all():
@@ -185,7 +185,7 @@ class ReservationUnitFirstReservableTimeHelper:
         if self.reservation_unit.reservation_begins_at:
             reservation_unit_closed_time_spans.append(
                 TimeSpanElement(
-                    start_datetime=local_datetime_min(),
+                    start_datetime=utc_datetime_min(),
                     end_datetime=self.reservation_unit.reservation_begins_at,
                     is_reservable=False,
                 )
@@ -194,7 +194,7 @@ class ReservationUnitFirstReservableTimeHelper:
             reservation_unit_closed_time_spans.append(
                 TimeSpanElement(
                     start_datetime=self.reservation_unit.reservation_ends_at,
-                    end_datetime=local_datetime_max(),
+                    end_datetime=utc_datetime_max(),
                     is_reservable=False,
                 )
             )
@@ -203,7 +203,7 @@ class ReservationUnitFirstReservableTimeHelper:
             reservation_unit_closed_time_spans.append(
                 TimeSpanElement(
                     start_datetime=self.reservation_unit.publish_ends_at,
-                    end_datetime=local_datetime_max(),
+                    end_datetime=utc_datetime_max(),
                     is_reservable=False,
                 )
             )
@@ -238,7 +238,7 @@ class ReservationUnitFirstReservableTimeHelper:
             # Minimum days before is calculated from the start of the day
             reservation_unit_closed_time_spans.append(
                 TimeSpanElement(
-                    start_datetime=local_datetime_min(),
+                    start_datetime=utc_datetime_min(),
                     end_datetime=(
                         local_start_of_day(now)
                         + datetime.timedelta(days=self.reservation_unit.reservations_min_days_before)
@@ -250,7 +250,7 @@ class ReservationUnitFirstReservableTimeHelper:
             reservation_unit_closed_time_spans.append(
                 TimeSpanElement(
                     start_datetime=now + datetime.timedelta(days=self.reservation_unit.reservations_max_days_before),
-                    end_datetime=local_datetime_max(),
+                    end_datetime=utc_datetime_max(),
                     is_reservable=False,
                 )
             )

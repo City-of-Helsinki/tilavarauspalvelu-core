@@ -23,10 +23,10 @@ from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_rese
 from utils.date_utils import (
     end_time_as_timedelta,
     local_datetime,
-    local_datetime_max,
-    local_datetime_min,
     local_start_of_day,
     time_as_timedelta,
+    utc_datetime_max,
+    utc_datetime_min,
 )
 
 if TYPE_CHECKING:
@@ -192,13 +192,13 @@ class FirstReservableTimeHelper:
         ##########################
 
         if filter_date_start < today:
-            msg = "'reservable_date_start' must be not be in the past."
+            msg = "'reservable_date_start' must not be in the past."
             raise FirstReservableTimeError(msg)
         if filter_date_end < today:
-            msg = "'reservable_date_end' must be not be in the past."
+            msg = "'reservable_date_end' must not be in the past."
             raise FirstReservableTimeError(msg)
         if filter_date_end > two_years_from_now:
-            msg = "'reservable_date_end' must be not be more than two years in the future."
+            msg = "'reservable_date_end' must not be more than two years in the future."
             raise FirstReservableTimeError(msg)
         if filter_date_start > filter_date_end:
             msg = "'reservable_date_start' must be before 'reservable_date_end'."
@@ -385,7 +385,7 @@ class FirstReservableTimeHelper:
     def _cache_results(self) -> None:
         """Save the calculated FRT results to the cache."""
         cached_data: dict[str, dict[str, Any]] = {}
-        new_valid_until = self.now + datetime.timedelta(minutes=2)
+        new_valid_until = self.now.astimezone(datetime.UTC) + datetime.timedelta(minutes=2)
 
         for pk, frt in self.first_reservable_times.items():
             is_closed = self.reservation_unit_closed_statuses[pk]
@@ -489,13 +489,13 @@ class FirstReservableTimeHelper:
         """
         return [
             TimeSpanElement(
-                start_datetime=local_datetime_min(),
+                start_datetime=utc_datetime_min(),
                 end_datetime=max(local_start_of_day(self.filter_date_start), self.now),
                 is_reservable=False,
             ),
             TimeSpanElement(
                 start_datetime=local_start_of_day(self.filter_date_end) + datetime.timedelta(days=1),
-                end_datetime=local_datetime_max(),
+                end_datetime=utc_datetime_max(),
                 is_reservable=False,
             ),
         ]

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
@@ -14,8 +15,6 @@ from utils.auditlog_util import AuditLogger
 from utils.fields.model import TextChoicesField
 
 if TYPE_CHECKING:
-    import datetime
-
     from lazy_managers import LazyAttribute
 
     from tilavarauspalvelu.models import ReservationSeries, ReservationUnitOption
@@ -62,11 +61,9 @@ class AllocatedTimeSlot(models.Model):
         constraints = [
             models.CheckConstraint(
                 condition=(
-                    models.Q(begin_time__lt=models.F("end_time"))  # begin before end
-                    | (
-                        models.Q(end_time__hour=0)  # end at midnight, but start not
-                        & ~models.Q(begin_time__hour=0)
-                    )
+                    models.Q(begin_time__lt=models.F("end_time"))
+                    # 00:00 as an end time is the end of the day.
+                    | models.Q(end_time=datetime.time(0))
                 ),
                 name="begin_time_before_end_time_allocated",
                 violation_error_message=_("Begin time must be before end time."),

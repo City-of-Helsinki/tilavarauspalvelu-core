@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import pytest
+from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
+from utils.date_utils import local_datetime
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationUnitFactory, UserFactory
 from tests.factories.application import ApplicationBuilder
@@ -27,6 +29,27 @@ def test_application_round__set_handled(graphql):
         response = graphql(SET_HANDLED_MUTATION, input_data={"pk": application_round.pk})
 
     assert mock.call_count == 1
+
+    assert response.has_errors is False, response.errors
+
+    application_round.refresh_from_db()
+    assert application_round.status == ApplicationRoundStatusChoice.HANDLED
+
+
+# The application period ends between 00:00 and 03:00 local time, when the UTC date is still the previous day.
+@freeze_time(local_datetime(2026, 10, 12, 2))
+def test_application_round__set_handled__on_the_night_the_application_period_ends(graphql):
+    application_round = ApplicationRoundFactory.create_in_status_in_allocation(
+        application_period_ends_at=local_datetime(2026, 10, 12, 1),
+    )
+    assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
+
+    ApplicationFactory.create_in_status_handled(application_round=application_round)
+
+    graphql.login_with_superuser()
+
+    with disable_reservation_generation():
+        response = graphql(SET_HANDLED_MUTATION, input_data={"pk": application_round.pk})
 
     assert response.has_errors is False, response.errors
 

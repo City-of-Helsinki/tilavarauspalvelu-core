@@ -17,7 +17,7 @@ from social_django.models import UserSocialAuth
 from tilavarauspalvelu.enums import LoginMethod
 from tilavarauspalvelu.models import GeneralRole, UnitRole, User
 from tilavarauspalvelu.tasks import save_personal_info_view_log_task
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, utc_datetime
 
 if TYPE_CHECKING:
     from django.db import models
@@ -306,7 +306,8 @@ class UserAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         if user.id_token is None:
             return "-"
         expires = datetime.datetime.fromtimestamp(user.id_token.exp).astimezone(DEFAULT_TIMEZONE)
-        expired = expires < local_datetime()
+        now = utc_datetime()
+        expired = expires < now
         return expires.isoformat() + (" (expired)" if expired else " (valid)")
 
     @admin.display(description=_("Issued at (iat)"))

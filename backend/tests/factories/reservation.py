@@ -19,7 +19,7 @@ from tilavarauspalvelu.enums import (
     ReserveeType,
 )
 from tilavarauspalvelu.models import Reservation
-from utils.date_utils import local_datetime, local_start_of_day, next_hour, utc_datetime
+from utils.date_utils import datetime_difference, local_datetime, local_start_of_day, next_hour, utc_datetime
 from utils.decimal_utils import round_decimal
 
 from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseOneToOneFactory
@@ -102,9 +102,17 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         """Create a Reservation for a ReservationUnit with its buffer times."""
         kwargs.setdefault("state", ReservationStateChoice.CREATED)
 
+        buffer_time_before = reservation_unit.buffer_time_before
+        buffer_time_after = reservation_unit.buffer_time_after
+
+        # Whole-day buffers depend on the reservation times, like when a reservation is created through the API.
+        if reservation_unit.reservation_block_whole_day and "begins_at" in kwargs and "ends_at" in kwargs:
+            buffer_time_before = reservation_unit.actions.get_actual_before_buffer(kwargs["begins_at"])
+            buffer_time_after = reservation_unit.actions.get_actual_after_buffer(kwargs["ends_at"])
+
         return cls.create(
-            buffer_time_before=reservation_unit.buffer_time_before,
-            buffer_time_after=reservation_unit.buffer_time_after,
+            buffer_time_before=buffer_time_before,
+            buffer_time_after=buffer_time_after,
             reservation_unit=reservation_unit,
             **kwargs,
         )
@@ -458,8 +466,9 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
         )
 
         if pricing is not None:
+            duration = datetime_difference(start_datetime=begins_at, end_datetime=ends_at)
             self.set(
-                price=round_decimal(pricing.actions.calculate_reservation_price(duration=ends_at - begins_at), 2),
+                price=round_decimal(pricing.actions.calculate_reservation_price(duration=duration), 2),
                 non_subsidised_price=pricing.highest_price,
                 unit_price=pricing.lowest_price if subsidised else pricing.highest_price,
                 tax_percentage_value=pricing.tax_percentage.value,
@@ -485,8 +494,9 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
             msg = "reservation unit must have active pricing for the given date"
             raise ValueError(msg)
 
+        duration = datetime_difference(start_datetime=begins_at, end_datetime=ends_at)
         self.set(
-            price=round_decimal(pricing.actions.calculate_reservation_price(duration=ends_at - begins_at), 2),
+            price=round_decimal(pricing.actions.calculate_reservation_price(duration=duration), 2),
             non_subsidised_price=pricing.highest_price,
             unit_price=pricing.lowest_price,
             tax_percentage_value=pricing.tax_percentage.value,

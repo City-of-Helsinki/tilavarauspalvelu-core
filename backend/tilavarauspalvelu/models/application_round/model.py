@@ -18,7 +18,7 @@ from tilavarauspalvelu.enums import (
     TermsOfUseTypeChoices,
 )
 from utils.auditlog_util import AuditLogger
-from utils.date_utils import local_datetime
+from utils.date_utils import utc_datetime
 from utils.db import Now
 from utils.fields.model import TextChoicesField
 
@@ -149,9 +149,7 @@ class ApplicationRound(models.Model):
                 violation_error_message="Application round must be handled before it can be sent",
             ),
             models.CheckConstraint(
-                condition=(
-                    models.Q(handled_at=None) | models.Q(application_period_ends_at__date__lt=models.F("handled_at"))
-                ),
+                condition=(models.Q(handled_at=None) | models.Q(application_period_ends_at__lt=models.F("handled_at"))),
                 name="handling_after_application_period_end",
                 violation_error_message="Application round can only be handled after its application round has ended",
             ),
@@ -185,7 +183,7 @@ class ApplicationRound(models.Model):
 
     @status.override
     def _(self) -> ApplicationRoundStatusChoice:
-        now = local_datetime()
+        now = utc_datetime()
         if self.sent_at is not None:
             return ApplicationRoundStatusChoice.RESULTS_SENT
         if self.handled_at is not None:
@@ -302,7 +300,7 @@ class ApplicationRound(models.Model):
     def _(self) -> ApplicationRoundReservationCreationStatusChoice:
         from tilavarauspalvelu.models import ReservationSeries
 
-        now = local_datetime()
+        now = utc_datetime()
         timeout = datetime.timedelta(minutes=settings.APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES)
 
         if self.handled_at is None:

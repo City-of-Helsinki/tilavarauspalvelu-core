@@ -341,7 +341,8 @@ def get_connection_node(field_node: FieldNode) -> FieldNode:
     return node
 
 
-counter = itertools.count()
+# Start above the ids that the database sequences give during a test run, so that these ids do not collide with them.
+counter = itertools.count(start=1_000_000)
 chars = string.ascii_letters + string.digits
 
 

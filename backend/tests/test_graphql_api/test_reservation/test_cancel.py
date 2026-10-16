@@ -6,6 +6,7 @@ from decimal import Decimal
 
 import pytest
 from django.test import override_settings
+from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -160,6 +161,45 @@ def test_reservation__cancel__fails_when_cancellation_time_is_over(graphql):
     assert response.field_error_messages() == [
         "Reservation time cannot be changed because the cancellation period has expired.",
     ]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+
+
+# 23.5 real hours before the reservation, but 24.5 hours on the wall clock.
+@freeze_time("2026-03-28 11:30:00+02:00")
+def test_reservation__cancel__fails_when_cancellation_time_is_over__over_daylight_saving_time_change(graphql):
+    reservation = ReservationFactory.create_for_cancellation(
+        begins_at=local_datetime(2026, 3, 29, 12),
+        ends_at=local_datetime(2026, 3, 29, 13),
+        reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(hours=24),
+    )
+
+    graphql.login_with_superuser()
+    data = get_cancel_data(reservation)
+    response = graphql(CANCEL_MUTATION, input_data=data)
+
+    assert response.field_error_messages() == [
+        "Reservation time cannot be changed because the cancellation period has expired.",
+    ]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+
+
+# The clocks move from 04:00 back to 03:00 at 01:00 UTC on 2026-10-25, so the hour from 03:00 to 04:00 occurs twice.
+@freeze_time("2026-10-25 01:10:00+00:00")
+def test_reservation__cancel__fails_when_reservation_is_ongoing__in_the_repeated_hour(graphql):
+    reservation = ReservationFactory.create_for_cancellation(
+        begins_at=datetime.datetime.fromisoformat("2026-10-25T03:30:00+03:00"),
+        ends_at=datetime.datetime.fromisoformat("2026-10-25T04:30:00+02:00"),
+    )
+
+    graphql.login_with_superuser()
+    data = get_cancel_data(reservation)
+    response = graphql(CANCEL_MUTATION, input_data=data)
+
+    assert response.field_error_messages() == ["Past or ongoing reservations cannot be modified"]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED

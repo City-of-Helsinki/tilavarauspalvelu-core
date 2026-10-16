@@ -21,6 +21,7 @@ __all__ = [
     "local_date",
     "local_date_string",
     "local_datetime",
+    "local_datetime_exists",
     "local_datetime_max",
     "local_datetime_min",
     "local_datetime_string",
@@ -53,6 +54,8 @@ __all__ = [
 ]
 
 
+# Python compares, adds and subtracts two datetimes in the same zone on the wall clock. This is wrong across
+# a daylight saving time change, so do these in UTC, e.g. with 'utc_datetime' or 'datetime_difference'.
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
@@ -141,6 +144,18 @@ def local_end_of_day(_date: datetime.date | datetime.datetime | None = None, /) 
     if _date is None:
         _date = local_date()
     return datetime.datetime.combine(_date, datetime.time.max, tzinfo=DEFAULT_TIMEZONE)
+
+
+def local_datetime_exists(_datetime: datetime.datetime, /) -> bool:
+    """
+    Check that the given datetime in the local timezone exists on the wall clock.
+    The spring daylight saving time change skips the hour from 03:00 to 04:00.
+    """
+    datetime_utc = _datetime.astimezone(datetime.UTC)
+    round_trip = datetime_utc.astimezone(DEFAULT_TIMEZONE)
+    wall_clock = _datetime.replace(tzinfo=None)
+    round_trip_wall_clock = round_trip.replace(tzinfo=None)
+    return wall_clock == round_trip_wall_clock
 
 
 def local_iso_format(_datetime: datetime.datetime, /) -> str:
@@ -367,22 +382,26 @@ def datetime_range_as_string(*, start_datetime: datetime.datetime, end_datetime:
     """Format a datetime range to a human readable string."""
     strformat = "%Y-%m-%d %H:%M"
 
-    start_datetime = start_datetime.astimezone(DEFAULT_TIMEZONE)
-    end_datetime = end_datetime.astimezone(DEFAULT_TIMEZONE)
+    # Check the max date before the conversion, since the maximum datetime in UTC overflows in the local timezone.
+    is_end_max = end_datetime.date() == datetime.date.max
 
+    start_datetime = start_datetime.astimezone(DEFAULT_TIMEZONE)
     start_date = start_datetime.date()
-    end_date = end_datetime.date()
 
     start_str = "min" if start_date == datetime.date.min else start_datetime.strftime(strformat)
 
-    if end_date == datetime.date.max:
+    if is_end_max:
         end_str = "max"
-    elif end_date == start_date:
-        end_str = end_datetime.strftime("%H:%M")
-    elif end_date == start_date + datetime.timedelta(days=1) and end_date == datetime.time.min:
-        end_str = "24:00"
     else:
-        end_str = end_datetime.strftime(strformat)
+        end_datetime = end_datetime.astimezone(DEFAULT_TIMEZONE)
+        end_date = end_datetime.date()
+
+        if end_date == start_date:
+            end_str = end_datetime.strftime("%H:%M")
+        elif end_date == start_date + datetime.timedelta(days=1) and end_datetime.time() == datetime.time.min:
+            end_str = "24:00"
+        else:
+            end_str = end_datetime.strftime(strformat)
 
     return f"{start_str}-{end_str}"
 
@@ -394,7 +413,6 @@ def time_difference(_from: datetime.time, _to: datetime.time, /) -> datetime.tim
 
 def datetime_difference(*, start_datetime: datetime.datetime, end_datetime: datetime.datetime) -> datetime.timedelta:
     """Elapsed time between two datetimes. This is correct across a daylight saving time change."""
-    # Python subtracts datetimes with the same time zone by wall clock time, so subtract in UTC.
     return end_datetime.astimezone(datetime.UTC) - start_datetime.astimezone(datetime.UTC)
 
 

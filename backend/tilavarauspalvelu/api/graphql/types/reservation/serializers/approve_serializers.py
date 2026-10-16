@@ -16,7 +16,7 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFo
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -102,13 +102,15 @@ class ReservationApproveSerializer(NestingModelSerializer):
         # Tax percentage needs to be updated in case it has changed since the reservation was created
         data["tax_percentage_value"] = pricing.tax_percentage.value
 
-        three_days_from_now = local_datetime() + datetime.timedelta(days=3)
-        one_hour_before_begin = begin - datetime.timedelta(hours=1)
+        now = local_datetime()
+        three_days_from_now = now + datetime.timedelta(days=3)
+        one_hour_before_begin = begin.astimezone(datetime.UTC) - datetime.timedelta(hours=1)
+        time_until_begin = datetime_difference(start_datetime=now, end_datetime=begin)
         data["handled_payment_due_by"] = min(three_days_from_now, one_hour_before_begin)
 
         # Use on-site payment if the reservation is going to begin soon,
         # even if the current pricing payment type is not on-site.
-        if begin - local_datetime() < datetime.timedelta(hours=2):
+        if time_until_begin < datetime.timedelta(hours=2):
             data["payment_type"] = PaymentType.ON_SITE
             return data
 

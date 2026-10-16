@@ -40,14 +40,14 @@ class OriginHaukiResourceActions:
         ohr.latest_fetched_date = None  # Set to None, to clarify that all future data is missing
         ohr.save()
 
-        cutoff_date = local_date()  # All ReservableTimeSpans that start after this date will be deleted.
+        cutoff = local_start_of_day()  # All ReservableTimeSpans that start after this time will be deleted.
 
         # Old time spans are not deleted, as they are kept for archival purposes.
-        ohr.reservable_time_spans.filter(start_datetime__gte=cutoff_date).delete()
+        ohr.reservable_time_spans.filter(start_datetime__gte=cutoff).delete()
 
-        # If the cutoff_date is during a ReservableTimeSpan, end it at the cutoff date.
-        # This way we can keep past data intact, and have the new data start from the cutoff date.
-        ohr.reservable_time_spans.filter(end_datetime__gte=cutoff_date).update(end_datetime=local_start_of_day())
+        # If the cutoff is during a ReservableTimeSpan, end it at the cutoff.
+        # This way we can keep past data intact, and have the new data start from the cutoff.
+        ohr.reservable_time_spans.filter(end_datetime__gte=cutoff).update(end_datetime=cutoff)
 
     def should_update_opening_hours(self, new_date_periods_hash: str) -> bool:
         """Return True if the opening hours should be updated from Hauki API."""

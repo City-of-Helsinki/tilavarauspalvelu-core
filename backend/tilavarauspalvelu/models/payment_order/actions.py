@@ -76,7 +76,9 @@ class PaymentOrderActions:
         is_handled_payment_overdue = self.payment_order.is_overdue_handled_payment
         is_invoiced = webshop_payment.payment_gateway == WebShopPaymentGateway.INVOICE
         webshop_payment_expiration_minutes = datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
-        webshop_payment_expires_at = webshop_payment.timestamp + webshop_payment_expiration_minutes
+        webshop_payment_expires_at = (
+            webshop_payment.timestamp.astimezone(datetime.UTC) + webshop_payment_expiration_minutes
+        )
         webshop_payment_expired = webshop_payment_expires_at <= local_datetime()
 
         if webshop_payment.status == WebShopPaymentStatus.PAID_ONLINE:

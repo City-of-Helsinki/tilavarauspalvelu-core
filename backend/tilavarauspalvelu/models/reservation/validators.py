@@ -8,7 +8,7 @@ from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_start_of_day
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_start_of_day, utc_datetime
 from utils.utils import comma_sep_str
 
 if TYPE_CHECKING:
@@ -76,7 +76,8 @@ class ReservationValidator:
             raise ValidationError(msg, code=error_codes.ORDER_REFUND_NOT_ALLOWED)
 
     def validate_reservation_not_past_or_ongoing(self) -> None:
-        if self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE) < local_datetime():
+        now = utc_datetime()
+        if self.reservation.begins_at < now:
             msg = "Past or ongoing reservations cannot be modified"
             raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
@@ -128,10 +129,8 @@ class ReservationValidator:
             msg = "Reservation cannot be denied based on its state"
             raise ValidationError(msg, code=error_codes.RESERVATION_DENYING_NOT_ALLOWED)
 
-        now = local_datetime()
-        end = self.reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
-
-        if self.reservation.state == ReservationStateChoice.CONFIRMED.value and end < now:
+        now = utc_datetime()
+        if self.reservation.state == ReservationStateChoice.CONFIRMED.value and self.reservation.ends_at < now:
             msg = "Reservation cannot be denied after it has ended."
             raise ValidationError(msg, code=error_codes.RESERVATION_DENYING_NOT_ALLOWED)
 
@@ -206,10 +205,8 @@ class ReservationValidator:
             raise ValidationError(msg, code=error_codes.RESERVATION_ACCESS_CODE_CHANGE_NOT_ALLOWED)
 
     def validate_reservation_has_not_ended(self) -> None:
-        now = local_datetime()
-        end = self.reservation.ends_at.astimezone(DEFAULT_TIMEZONE)
-
-        if end <= now:
+        now = utc_datetime()
+        if self.reservation.ends_at <= now:
             msg = "Reservation has already ended."
             raise ValidationError(msg, code=error_codes.RESERVATION_HAS_ENDED)
 
