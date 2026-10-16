@@ -317,6 +317,7 @@
     "react/prefer-es6-class": "error",
     "react/preserve-manual-memoization": "off",
     "react/react-in-jsx-scope": "off",
+    "react/purity": "off",
     "react/refs": "error",
     "react/rules-of-hooks": "error",
     "react/self-closing-comp": "error",
