@@ -192,13 +192,13 @@ class FirstReservableTimeHelper:
         ##########################
 
         if filter_date_start < today:
-            msg = "'reservable_date_start' must be not be in the past."
+            msg = "'reservable_date_start' must not be in the past."
             raise FirstReservableTimeError(msg)
         if filter_date_end < today:
-            msg = "'reservable_date_end' must be not be in the past."
+            msg = "'reservable_date_end' must not be in the past."
             raise FirstReservableTimeError(msg)
         if filter_date_end > two_years_from_now:
-            msg = "'reservable_date_end' must be not be more than two years in the future."
+            msg = "'reservable_date_end' must not be more than two years in the future."
             raise FirstReservableTimeError(msg)
         if filter_date_start > filter_date_end:
             msg = "'reservable_date_start' must be before 'reservable_date_end'."
