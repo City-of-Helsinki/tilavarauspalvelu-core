@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import uuid
 
 import pytest
 from freezegun import freeze_time
@@ -16,15 +17,31 @@ from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from tests.factories import ReservationFactory, ReservationSeriesFactory, ReservationUnitFactory
 from tests.helpers import patch_method
 
+# ── Helpers ──
+
+
+def pindora_reservation_response(*, access_code_is_active: bool) -> PindoraReservationResponse:
+    return PindoraReservationResponse(
+        reservation_unit_id=uuid.UUID("3f9c5ad4-1a0e-4d2c-9a57-2a3c8a1b4e6f"),
+        access_code="13245#",
+        access_code_keypad_url="https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto",
+        access_code_phone_number="+358407089833",
+        access_code_sms_number="+358407089834",
+        access_code_sms_message="a13245",
+        access_code_valid_minutes_before=0,
+        access_code_valid_minutes_after=0,
+        access_code_generated_at=datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        access_code_is_active=access_code_is_active,
+        begin=datetime.datetime(2023, 1, 2, 12, tzinfo=DEFAULT_TIMEZONE),
+        end=datetime.datetime(2023, 1, 2, 13, tzinfo=DEFAULT_TIMEZONE),
+    )
+
 
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
 @patch_method(
     PindoraClient.create_reservation,
-    return_value=PindoraReservationResponse(
-        access_code_generated_at=datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE),
-        access_code_is_active=True,
-    ),
+    return_value=pindora_reservation_response(access_code_is_active=True),
 )
 @patch_method(EmailService.send_reservation_access_type_changed_email)
 def test_create_missing_pindora_reservations__create_missing():
@@ -55,10 +72,7 @@ def test_create_missing_pindora_reservations__create_missing():
 @freeze_time("2023-01-01")
 @patch_method(
     PindoraClient.create_reservation,
-    return_value=PindoraReservationResponse(
-        access_code_generated_at=datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE),
-        access_code_is_active=False,
-    ),
+    return_value=pindora_reservation_response(access_code_is_active=False),
 )
 def test_create_missing_pindora_reservations__blocked():
     now = local_datetime()
@@ -112,10 +126,7 @@ def test_create_missing_pindora_reservations__in_the_past():
 @freeze_time("2023-01-01")
 @patch_method(
     PindoraClient.create_reservation,
-    return_value=PindoraReservationResponse(
-        access_code_generated_at=datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE),
-        access_code_is_active=True,
-    ),
+    return_value=pindora_reservation_response(access_code_is_active=True),
 )
 @patch_method(EmailService.send_reservation_access_type_changed_email)
 def test_create_missing_pindora_reservations__ongoing():
@@ -221,10 +232,7 @@ def test_create_missing_pindora_reservations__already_generated():
 @freeze_time("2023-01-01")
 @patch_method(
     PindoraClient.create_reservation,
-    return_value=PindoraReservationResponse(
-        access_code_generated_at=datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE),
-        access_code_is_active=False,
-    ),
+    return_value=pindora_reservation_response(access_code_is_active=False),
 )
 def test_create_missing_pindora_reservations__multiple():
     now = local_datetime()

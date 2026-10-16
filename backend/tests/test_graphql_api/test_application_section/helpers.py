@@ -76,6 +76,9 @@ def get_application_section_create_data(application: Application) -> dict[str, A
 
 
 def get_application_section_update_data(application_section: ApplicationSection) -> dict[str, Any]:
+    assert application_section.purpose is not None
+    assert application_section.age_group is not None
+
     # Create required entities
     reservation_unit = ReservationUnitFactory.create(
         application_rounds=[application_section.application.application_round],

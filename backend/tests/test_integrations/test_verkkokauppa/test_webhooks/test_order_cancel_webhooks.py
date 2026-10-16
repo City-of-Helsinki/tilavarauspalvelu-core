@@ -23,7 +23,7 @@ pytestmark = [
 ]
 
 
-def _create_mock_order(order_id: uuid.UUID, status: WebShopOrderStatus = "") -> Order:
+def _create_mock_order(order_id: uuid.UUID, status: str = "") -> Order:
     return Order(
         order_id=order_id,
         namespace="tilanvaraus",
