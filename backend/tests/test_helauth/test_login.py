@@ -38,7 +38,7 @@ def start_social_login(client: Client) -> dict[str, str]:
     response = client.get(url, data={"next": "/reservations"})
     assert response.status_code == 302, response
 
-    redirect_url = urllib.parse.urlparse(response.url)
+    redirect_url = urllib.parse.urlparse(response["Location"])
     return dict(urllib.parse.parse_qsl(redirect_url.query))
 
 

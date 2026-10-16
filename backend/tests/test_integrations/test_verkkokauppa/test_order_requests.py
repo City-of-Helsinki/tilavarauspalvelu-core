@@ -29,7 +29,7 @@ from tests.helpers import ResponseMock, exact, patch_method
 
 create_order_params: CreateOrderParams = CreateOrderParams(
     namespace="test-namespace",
-    user="test-user",
+    user=uuid.UUID("657d6cfc-f048-11ec-b6f9-0ed952b261b2"),
     language="fi",
     price_net=Decimal("100.0"),
     price_vat=Decimal("24.0"),

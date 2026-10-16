@@ -73,6 +73,8 @@ class ReservationSeriesFactory(GenericDjangoModelFactory[ReservationSeries]):
 
         reservations: list[Reservation] = []
 
+        assert series.recurrence_in_days is not None
+
         weekday: Weekday
         for weekday in weekdays:
             delta: int = weekday.as_weekday_number - series.begin_date.weekday()
