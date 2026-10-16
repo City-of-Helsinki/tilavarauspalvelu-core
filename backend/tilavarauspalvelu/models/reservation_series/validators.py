@@ -29,6 +29,11 @@ class ReservationSeriesValidator:
             msg = "Reservation series must have at least one reservation"
             raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_NO_RESERVATION)
 
+    def validate_has_recurrence_interval(self) -> None:
+        if self.series.recurrence_in_days is None:
+            msg = "Reservation series has no recurrence interval."
+            raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_INVALID_RECURRENCE_IN_DAYS)
+
     @classmethod
     def validate_series_time_slots(
         cls,

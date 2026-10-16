@@ -505,6 +505,25 @@ def test_reservation_series__reschedule_series__invalid_start_interval(graphql):
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
+def test_reservation_series__reschedule_series__no_recurrence_interval(graphql):
+    reservation_series = create_reservation_series()
+    reservation_series.recurrence_in_days = None
+    reservation_series.save(update_fields=["recurrence_in_days"])
+
+    data = get_minimal_reschedule_data(reservation_series, beginTime="08:00:00")
+
+    graphql.login_with_superuser()
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation series has no recurrence interval."]
+
+    reservations = list(reservation_series.reservations.all())
+    assert len(reservations) == 9
+    assert all(reservation.begins_at.astimezone(DEFAULT_TIMEZONE).hour == 10 for reservation in reservations)
+
+
+@freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
 def test_reservation_series__reschedule_series__overlapping_reservations(graphql):
     reservation_series = create_reservation_series()
 
