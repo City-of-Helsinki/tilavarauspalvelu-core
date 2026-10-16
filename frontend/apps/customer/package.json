@@ -40,7 +40,7 @@
     "react-transition-group": "^4.4.5",
     "react-use": "^17.6.1",
     "roarr": "^7.21.7",
-    "styled-components": "6.1.19",
+    "styled-components": "6.5.3",
     "tsconfig": "workspace:*",
     "typescript-cookie": "^1.0.6",
     "ui": "workspace:*",
