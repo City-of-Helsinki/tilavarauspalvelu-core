@@ -516,6 +516,28 @@ def test_reservation__approve__no_pricing(graphql):
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation__approve__pricing_has_no_payment_type(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_in_webshop(pricings__payment_type=None)
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 10, 12),
+        ends_at=local_datetime(2024, 1, 10, 13),
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation, price="10.59")
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Pricing has no payment type defined"]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+
+
+@freeze_time(local_datetime(2024, 1, 1, 12))
 def test_reservation__approve__no_payment_product_if_paid_online(graphql):
     reservation_unit = ReservationUnitFactory.create(
         pricings__lowest_price=Decimal("10.00"),
