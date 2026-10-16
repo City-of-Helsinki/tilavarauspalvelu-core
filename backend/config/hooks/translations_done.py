@@ -106,7 +106,7 @@ def _get_current_translations() -> list[TranslationData]:
     return [
         TranslationData(
             lang=lang,
-            path=(path := str(locale_path / lang / "LC_MESSAGES" / "django.po")),
+            path=(path := str(Path(locale_path) / lang / "LC_MESSAGES" / "django.po")),
             contents=polib.pofile(path),
         )
         for locale_path in settings.LOCALE_PATHS

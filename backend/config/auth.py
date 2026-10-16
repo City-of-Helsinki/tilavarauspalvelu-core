@@ -64,19 +64,19 @@ class ProxyTunnistamoOIDCAuthBackend(TunnistamoOIDCAuth):
 
     def get_token_for_profile(self, access_token: str) -> TokenResponse:
         url = self.access_token_url()
-        request_args = {
-            "method": "POST",
-            "headers": {
+        response = self.request(
+            url,
+            method="POST",
+            headers={
                 **self.auth_headers(),
                 "Authorization": f"Bearer {access_token}",
             },
-            "data": {
+            data={
                 "audience": settings.OPEN_CITY_PROFILE_SCOPE,
                 "grant_type": "urn:ietf:params:oauth:grant-type:uma-ticket",
                 "permission": "#access",
             },
-        }
-        response = self.request(url, **request_args)
+        )
         return response.json()
 
     def request_access_token(self, *args: Any, **kwargs: Any) -> Any:
