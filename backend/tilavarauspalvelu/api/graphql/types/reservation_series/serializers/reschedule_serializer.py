@@ -79,6 +79,8 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
         }
 
     def validate(self, data: ReservationSeriesRescheduleData) -> ReservationSeriesRescheduleData:
+        self.instance.validators.validate_has_recurrence_interval()
+
         begin_date: datetime.date = self.get_or_default("begin_date", data)
         begin_time: datetime.time = self.get_or_default("begin_time", data)
         end_date: datetime.date = self.get_or_default("end_date", data)
