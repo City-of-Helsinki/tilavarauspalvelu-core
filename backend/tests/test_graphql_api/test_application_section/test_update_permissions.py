@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.models import ApplicationSection
-
 from tests.factories import ApplicationSectionFactory, UserFactory
 from tests.test_graphql_api.test_application_section.helpers import UPDATE_MUTATION, get_application_section_update_data
 
@@ -27,32 +25,11 @@ def test_application_section__update__perms__application_owner(graphql):
 
     # then:
     # - The response contains no errors
-    # - The database contains the created application section
+    # - The application section has been updated
     assert response.has_errors is False, response
 
-    application_sections: list[ApplicationSection] = list(ApplicationSection.objects.all())
-    assert len(application_sections) == 1
-
-
-def test_application_section__update__perms__superuser(graphql):
-    # given:
-    # - There is an unallocated application section in a draft application in an open application round
-    # - A superuser is using the system
-    application_section = ApplicationSectionFactory.create_in_status_unallocated()
-    graphql.login_with_superuser()
-
-    # when:
-    # - User tries to update the application section
-    data = get_application_section_update_data(application_section=application_section)
-    response = graphql(UPDATE_MUTATION, input_data=data)
-
-    # then:
-    # - The response contains no errors
-    # - The database contains the created application section
-    assert response.has_errors is False, response
-
-    application_sections: list[ApplicationSection] = list(ApplicationSection.objects.all())
-    assert len(application_sections) == 1
+    application_section.refresh_from_db()
+    assert application_section.name == data["name"]
 
 
 def test_application_section__update__perms__regular_user(graphql):
@@ -87,8 +64,8 @@ def test_application_section__update__perms__general_admin(graphql):
 
     # then:
     # - The response contains no errors
-    # - The database contains the created application section
+    # - The application section has been updated
     assert response.has_errors is False, response
 
-    application_sections: list[ApplicationSection] = list(ApplicationSection.objects.all())
-    assert len(application_sections) == 1
+    application_section.refresh_from_db()
+    assert application_section.name == data["name"]

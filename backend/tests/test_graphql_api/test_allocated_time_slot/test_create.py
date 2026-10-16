@@ -10,7 +10,7 @@ from tilavarauspalvelu.enums import (
     ReservationStartInterval,
     Weekday,
 )
-from tilavarauspalvelu.models import ReservationUnitHierarchy
+from tilavarauspalvelu.models import AllocatedTimeSlot, ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
@@ -29,6 +29,9 @@ from .helpers import CREATE_ALLOCATION, allocation_create_data
 pytestmark = [
     pytest.mark.django_db,
 ]
+
+
+# ── Create ──
 
 
 def test_allocated_time_slot__create(graphql):
@@ -50,8 +53,14 @@ def test_allocated_time_slot__create(graphql):
 
     # then:
     # - There are no errors in the response
+    # - The allocated time slot was created with the given values
     # - The application sections' status is now HANDLED
     assert response.has_errors is False, response
+
+    slot = AllocatedTimeSlot.objects.get(reservation_unit_option=option)
+    assert slot.day_of_the_week == Weekday.MONDAY
+    assert slot.begin_time == datetime.time(10, 0)
+    assert slot.end_time == datetime.time(12, 0)
 
     section.refresh_from_db()
     assert section.status == ApplicationSectionStatusChoice.HANDLED
@@ -84,10 +93,15 @@ def test_allocated_time_slot__create__still_in_allocation_if_applied_not_fulfill
 
 
 @pytest.mark.parametrize(
-    "missing_key",
-    ["dayOfTheWeek", "beginTime", "endTime", "reservationUnitOption"],
+    ("missing_key", "required_type"),
+    [
+        ("dayOfTheWeek", "Weekday!"),
+        ("beginTime", "Time!"),
+        ("endTime", "Time!"),
+        ("reservationUnitOption", "Int!"),
+    ],
 )
-def test_allocated_time_slot__create__incomplete_data(graphql, missing_key):
+def test_allocated_time_slot__create__incomplete_data(graphql, missing_key, required_type):
     # given:
     # - There is an allocatable reservation unit option
     # - A superuser is using the system
@@ -103,8 +117,22 @@ def test_allocated_time_slot__create__incomplete_data(graphql, missing_key):
     response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
-    # - There are errors in the response (the actual error is not that important)
+    # - The response complains about the missing input field
     assert response.has_errors is True, response
+
+    given_value = {
+        "dayOfTheWeek": "MONDAY",
+        "beginTime": "10:00:00",
+        "endTime": "12:00:00",
+        "reservationUnitOption": option.pk,
+        "force": False,
+    }
+    given_value.pop(missing_key)
+    assert response.error_message() == (
+        f"Variable '$input' got invalid value {given_value}; "
+        f"Field '{missing_key}' of required type '{required_type}' was not provided."
+    )
+    assert option.allocated_time_slots.count() == 0
 
 
 def test_allocated_time_slot__create__application_not_yet_in_allocation(graphql):
@@ -179,6 +207,9 @@ def test_allocated_time_slot__create__application_not_in_allocation_anymore__REJ
     assert response.field_error_messages() == ["Cannot allocate to application section in status: 'REJECTED'"]
 
 
+# ── Duration and start times ──
+
+
 @pytest.mark.parametrize("force", [True, False])
 def test_allocated_time_slot__create__approve_duration_longer_than_section_maximum(graphql, force):
     # given:
@@ -199,6 +230,8 @@ def test_allocated_time_slot__create__approve_duration_longer_than_section_maxim
     # - If force=False -> The response complains about the duration being too long
     # - If force=True -> The allocation is successful
     assert response.has_errors is (not force)
+    assert option.allocated_time_slots.count() == (1 if force else 0)
+
     if not force:
         assert response.field_error_messages() == [
             "Allocation duration too long. Maximum allowed is 02:00:00 while given duration is 02:30:00."
@@ -225,6 +258,8 @@ def test_allocated_time_slot__create__approve_duration_shorter_than_section_mini
     # - If force=False -> The response complains about the duration being too short
     # - If force=True -> The allocation is successful
     assert response.has_errors is (not force)
+    assert option.allocated_time_slots.count() == (1 if force else 0)
+
     if not force:
         assert response.field_error_messages() == [
             "Allocation duration too short. Minimum allowed is 01:00:00 while given duration is 00:30:00."
@@ -232,9 +267,6 @@ def test_allocated_time_slot__create__approve_duration_shorter_than_section_mini
 
 
 def test_allocated_time_slot__create__approve_times_at_15_minute_steps(graphql):
-    # given:
-    # - There is an allocatable reservation unit option for a reservation unit with a 15 minute start interval
-    # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
@@ -242,14 +274,14 @@ def test_allocated_time_slot__create__approve_times_at_15_minute_steps(graphql):
     option.reservation_unit.save()
     graphql.login_with_superuser()
 
-    # when:
-    # - The user tries to make an allocation that begins and ends at a quarter past the hour
     input_data = allocation_create_data(option, begin_time=datetime.time(10, 15), end_time=datetime.time(11, 30))
     response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
-    # then:
-    # - The allocation is successful
     assert response.has_errors is False, response
+
+    slot = AllocatedTimeSlot.objects.get(reservation_unit_option=option)
+    assert slot.begin_time == datetime.time(10, 15)
+    assert slot.end_time == datetime.time(11, 30)
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -273,13 +305,11 @@ def test_allocated_time_slot__create__approve_times_not_multiple_of_15_minutes(g
     assert response.field_error_messages() == [
         "Allocation begin and end times must be multiples of 15 minutes.",
     ]
+    assert option.allocated_time_slots.count() == 0
 
 
 @pytest.mark.parametrize("force", [True, False])
 def test_allocated_time_slot__create__approve_begin_time_not_matching_start_interval(graphql, force):
-    # given:
-    # - There is an allocatable reservation unit option for a reservation unit with a 30 minute start interval
-    # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
@@ -287,8 +317,6 @@ def test_allocated_time_slot__create__approve_begin_time_not_matching_start_inte
     option.reservation_unit.save()
     graphql.login_with_superuser()
 
-    # when:
-    # - The user tries to make an allocation that begins at a quarter past the hour
     input_data = allocation_create_data(
         option,
         begin_time=datetime.time(10, 15),
@@ -297,11 +325,13 @@ def test_allocated_time_slot__create__approve_begin_time_not_matching_start_inte
     )
     response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
-    # then:
-    # - The response complains about the begin time not matching the start interval, even if forced
     assert response.field_error_messages() == [
         "Allocation begin time does not match the allowed start interval of the reservation unit.",
     ]
+    assert option.allocated_time_slots.count() == 0
+
+
+# ── Events per week ──
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -335,6 +365,9 @@ def test_allocated_time_slot__create__approve_more_than_events_per_week(graphql,
     ]
 
 
+# ── Suitable time ranges ──
+
+
 @pytest.mark.parametrize("force", [True, False])
 def test_allocated_time_slot__create__approve_outside_of_suitable_time_ranges(graphql, force):
     # given:
@@ -360,6 +393,8 @@ def test_allocated_time_slot__create__approve_outside_of_suitable_time_ranges(gr
     # - If force=False -> The response complains about the duration being invalid
     # - If force=True -> The allocation is successful
     assert response.has_errors is (not force)
+    assert option.allocated_time_slots.count() == (1 if force else 0)
+
     if not force:
         assert response.field_error_messages() == [
             "Given time slot does not fit within applicants suitable time ranges.",
@@ -395,6 +430,7 @@ def test_allocated_time_slot__create__approved_time_falls_on_two_back_to_back_su
     # then:
     # - The allocation is successful
     assert response.has_errors is False, response
+    assert option.allocated_time_slots.count() == 1
 
 
 def test_allocated_time_slot__create__suitable_time_range_ends_at_midnight(graphql):
@@ -414,6 +450,7 @@ def test_allocated_time_slot__create__suitable_time_range_ends_at_midnight(graph
     response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     assert response.has_errors is False, response
+    assert option.allocated_time_slots.count() == 1
 
 
 def test_allocated_time_slot__create__allocation_ends_at_midnight__outside_of_suitable_time_ranges(graphql):
@@ -428,6 +465,7 @@ def test_allocated_time_slot__create__allocation_ends_at_midnight__outside_of_su
     assert response.field_error_messages() == [
         "Given time slot does not fit within applicants suitable time ranges.",
     ]
+    assert option.allocated_time_slots.count() == 0
 
 
 def test_allocated_time_slot__create__approved_time_falls_on_two_separated_wished_times(graphql):
@@ -461,6 +499,9 @@ def test_allocated_time_slot__create__approved_time_falls_on_two_separated_wishe
     assert response.field_error_messages() == [
         "Given time slot does not fit within applicants suitable time ranges.",
     ]
+
+
+# ── Reservation unit option state ──
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -506,15 +547,18 @@ def test_allocated_time_slot__create__reservation_unit_locked(graphql, force):
 
     # when:
     # - The user tries to make an allocation for a reservation unit option,
-    #   but the reservation unit is rejected.
+    #   but the reservation unit option is locked.
     input_data = allocation_create_data(option, force=force)
     response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
     # then:
-    # - The response complains about the reservation unit not being included.
+    # - The response complains about the reservation unit option being locked.
     assert response.field_error_messages() == [
         "This reservation unit option has been locked.",
     ]
+
+
+# ── Same day and overlapping allocations ──
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -627,6 +671,7 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation__ends_
             "with a related reservation unit or resource."
         ),
     ]
+    assert option.allocated_time_slots.count() == 0
 
 
 def test_allocated_time_slot__create__overlapping_with_another_allocation__sections_share_a_date(graphql):
@@ -658,6 +703,7 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation__secti
             "with a related reservation unit or resource."
         ),
     ]
+    assert option.allocated_time_slots.count() == 0
 
 
 def test_allocated_time_slot__create__overlapping_with_another_allocation_for_different_reservation_unit(graphql):
@@ -679,6 +725,7 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation_for_di
     # then:
     # - The allocation is successful
     assert response.has_errors is False, response
+    assert option.allocated_time_slots.count() == 1
 
 
 @pytest.mark.parametrize("force", [True, False])

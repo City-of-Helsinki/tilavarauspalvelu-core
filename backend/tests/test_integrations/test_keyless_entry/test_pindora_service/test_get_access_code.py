@@ -137,7 +137,7 @@ def test_get_access_code__reservation__in_series__pick_correct_reservation():
     )
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
-        response = PindoraService.get_access_code(obj=reservation_1)
+        response = PindoraService.get_access_code(obj=reservation_2)
 
     assert response == PindoraReservationInfoData(
         access_code="13245#",
@@ -147,8 +147,8 @@ def test_get_access_code__reservation__in_series__pick_correct_reservation():
         access_code_phone_number="+358407089833",
         access_code_sms_number="+358407089834",
         access_code_sms_message="a13245",
-        access_code_begins_at=reservation_1.begins_at - datetime.timedelta(minutes=10),
-        access_code_ends_at=reservation_1.ends_at + datetime.timedelta(minutes=5),
+        access_code_begins_at=reservation_2.begins_at - datetime.timedelta(minutes=10),
+        access_code_ends_at=reservation_2.ends_at + datetime.timedelta(minutes=5),
     )
 
 

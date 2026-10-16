@@ -22,6 +22,9 @@ pytestmark = [
 ]
 
 
+# ── Update ──
+
+
 def test_application_section__update(graphql):
     # given:
     # - There is an unallocated application section in a draft application in an open application round
@@ -63,6 +66,9 @@ def test_application_section__update(graphql):
     assert section.status == ApplicationSectionStatusChoice.UNALLOCATED
 
 
+# ── Application sent at ──
+
+
 def test_application_section__update__resets_application_sent_at(graphql):
     application_section = ApplicationSectionFactory.create_in_status_unallocated(application__sent_at=local_datetime())
 
@@ -92,6 +98,9 @@ def test_application_section__update__staff__does_not_reset_application_sent_at(
     assert application.sent_at == sent_at
 
 
+# ── Application round ──
+
+
 def test_application_section__update__application_round_not_open(graphql):
     application_section = ApplicationSectionFactory.create_in_status_in_allocation()
     original_name = application_section.name
@@ -106,6 +115,9 @@ def test_application_section__update__application_round_not_open(graphql):
 
     application_section = ApplicationSection.objects.get(pk=application_section.pk)
     assert application_section.name == original_name
+
+
+# ── Objects of other applications and sections ──
 
 
 def test_application_section__update__move_to_another_application(graphql):
@@ -164,6 +176,9 @@ def test_application_section__update__suitable_time_range_of_another_section(gra
 
     other_time_range = SuitableTimeRange.objects.get(pk=other_time_range.pk)
     assert other_time_range.application_section.pk == other_section.pk
+
+
+# ── Validation ──
 
 
 def test_application_section__update__smaller_max_duration_than_min_duration(graphql):

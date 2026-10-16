@@ -20,7 +20,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.payment.types import (
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import ResponseMock, exact, patch_method
 
 get_payment_response: dict[str, Any] = {
     "paymentId": "08c2d282-eb98-3271-a3fc-81fe200f129b_at_20211115-122645",
@@ -96,7 +96,7 @@ def test_verkkokauppa__get_payment__raises_exception_if_key_is_missing():
     order_uuid = uuid.UUID(response.pop("orderId"))
     VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=200, json_data=response)
 
-    with pytest.raises(GetPaymentError):
+    with pytest.raises(GetPaymentError, match=exact("Payment retrieval failed")):
         VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
 
     assert SentryLogger.log_exception.call_count == 1
@@ -112,7 +112,7 @@ def test_verkkokauppa__get_payment__raises_exception_if_value_is_invalid():
 
     VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=200, json_data=response)
 
-    with pytest.raises(GetPaymentError):
+    with pytest.raises(GetPaymentError, match=exact("Payment retrieval failed")):
         VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
 
     assert SentryLogger.log_exception.call_count == 1
@@ -121,7 +121,7 @@ def test_verkkokauppa__get_payment__raises_exception_if_value_is_invalid():
 @patch_method(VerkkokauppaAPIClient.request, side_effect=Timeout())
 def test_verkkokauppa__get_payment__raises_exception_on_timeout():
     order_uuid = uuid.UUID(get_payment_response["orderId"])
-    with pytest.raises(GetPaymentError):
+    with pytest.raises(GetPaymentError, match=exact("Payment retrieval failed")):
         VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
 
 

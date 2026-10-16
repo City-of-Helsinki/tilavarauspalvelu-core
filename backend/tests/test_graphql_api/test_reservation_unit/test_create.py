@@ -21,6 +21,9 @@ pytestmark = [
 ]
 
 
+# ── Create ──
+
+
 def test_reservation_unit__create(graphql):
     unit = UnitFactory.create()
     graphql.login_with_superuser()
@@ -38,6 +41,9 @@ def test_reservation_unit__create(graphql):
     reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
     assert reservation_unit.is_draft is True
     assert reservation_unit.unit == unit
+
+
+# ── Spaces and resources of other units ──
 
 
 def test_reservation_unit__create__unit_admin__space_of_other_unit(graphql):
@@ -70,6 +76,9 @@ def test_reservation_unit__create__unit_admin__resource_of_other_unit(graphql):
     ]
 
     assert ReservationUnit.objects.exists() is False
+
+
+# ── Hauki ──
 
 
 @patch_method(HaukiAPIClient.get_resource, return_value=HaukiAPIResource(id=123))
@@ -149,6 +158,9 @@ def test_reservation_unit__create__send_to_hauki__failed(graphql, settings):
     assert reservation_unit.origin_hauki_resource is None  # Unit doesn't have origin hauki resource
 
 
+# ── Fields ──
+
+
 def test_reservation_unit__create__empty_name(graphql):
     unit = UnitFactory.create()
     graphql.login_with_superuser()
@@ -200,6 +212,9 @@ def test_reservation_unit__create__instructions(graphql):
     assert reservation_unit.reservation_cancelled_instructions_en == "Cancelled instructions en"
 
 
+# ── Non-draft ──
+
+
 def test_reservation_unit__create__non_draft(graphql):
     data = get_create_non_draft_input_data()
 
@@ -211,66 +226,34 @@ def test_reservation_unit__create__non_draft(graphql):
     assert ReservationUnit.objects.filter(pk=response.first_query_object["pk"]).exists()
 
 
-def test_reservation_unit__create__non_draft__empty_name_translation(graphql):
+@pytest.mark.parametrize("field", ["nameEn", "descriptionEn"])
+@pytest.mark.parametrize("value", ["", None], ids=["empty", "missing"])
+def test_reservation_unit__create__non_draft__translation_not_given(graphql, field, value):
     data = get_create_non_draft_input_data()
-    data["nameEn"] = ""
+    if value is None:
+        del data[field]
+    else:
+        data[field] = value
 
     graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message().startswith("Mutation was unsuccessful.")
     assert response.field_error_messages() == [
-        "Not draft state reservation units must have a translations. Missing translation for nameEn.",
+        f"Not draft state reservation units must have a translations. Missing translation for {field}.",
     ]
     assert ReservationUnit.objects.count() == 0
 
 
-def test_reservation_unit__create__non_draft__missing_name_translation(graphql):
+@pytest.mark.parametrize("value", [[], None], ids=["empty", "missing"])
+def test_reservation_unit__create__non_draft__no_spaces_and_no_resources(graphql, value):
     data = get_create_non_draft_input_data()
-    del data["nameEn"]
-
-    graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.error_message().startswith("Mutation was unsuccessful.")
-    assert response.field_error_messages() == [
-        "Not draft state reservation units must have a translations. Missing translation for nameEn.",
-    ]
-    assert ReservationUnit.objects.count() == 0
-
-
-def test_reservation_unit__create__non_draft__empty_description_translation(graphql):
-    data = get_create_non_draft_input_data()
-    data["descriptionEn"] = ""
-
-    graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.error_message().startswith("Mutation was unsuccessful.")
-    assert response.field_error_messages() == [
-        "Not draft state reservation units must have a translations. Missing translation for descriptionEn.",
-    ]
-    assert ReservationUnit.objects.count() == 0
-
-
-def test_reservation_unit__create__non_draft__missing_description_translation(graphql):
-    data = get_create_non_draft_input_data()
-    del data["descriptionEn"]
-
-    graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.error_message().startswith("Mutation was unsuccessful.")
-    assert response.field_error_messages() == [
-        "Not draft state reservation units must have a translations. Missing translation for descriptionEn.",
-    ]
-    assert ReservationUnit.objects.count() == 0
-
-
-def test_reservation_unit__create__non_draft__empty_spaces_and_missing_resources(graphql):
-    data = get_create_non_draft_input_data()
-    data["resources"] = []
-    data["spaces"] = []
+    if value is None:
+        del data["resources"]
+        del data["spaces"]
+    else:
+        data["resources"] = value
+        data["spaces"] = value
 
     graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
@@ -278,21 +261,6 @@ def test_reservation_unit__create__non_draft__empty_spaces_and_missing_resources
     assert response.error_message().startswith("Mutation was unsuccessful.")
     assert response.field_error_messages() == [
         "Not draft state reservation unit must have one or more space or resource defined",
-    ]
-    assert ReservationUnit.objects.count() == 0
-
-
-def test_reservation_unit__create__non_draft__missing_spaces_and_missing_resources(graphql):
-    data = get_create_non_draft_input_data()
-    del data["resources"]
-    del data["spaces"]
-
-    graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.error_message().startswith("Mutation was unsuccessful.")
-    assert response.field_error_messages() == [
-        "Not draft state reservation unit must have one or more space or resource defined"
     ]
     assert ReservationUnit.objects.count() == 0
 
@@ -334,7 +302,7 @@ def test_reservation_unit__create__non_draft__reservation_kind_defaults_to_direc
     assert reservation_unit.reservation_kind == ReservationKind.DIRECT_AND_SEASON
 
 
-# Min/Max Reservation Duration #########################################################################################
+# ── Min and max reservation duration ──
 
 
 def test_reservation_unit__create__min_max_reservation_duration__valid(graphql):
@@ -390,7 +358,7 @@ def test_reservation_unit__create__min_max_reservation_duration__not_multiple_of
     assert ReservationUnit.objects.count() == 0
 
 
-# Timeslots ############################################################################################################
+# ── Timeslots ──
 
 
 def test_reservation_unit__create__with_timeslots(graphql):
@@ -460,7 +428,10 @@ def test_reservation_unit__create__with_timeslots__weekday_required(graphql):
     # then:
     # - The response contains no errors about requiring weekday
     assert response.has_errors is True, response
-    assert "Field 'weekday' of required" in response.error_message()
+    assert response.error_message() == (
+        "Variable '$input' got invalid value {'reservableTimes': [{...}]} at 'input.applicationRoundTimeSlots[0]'; "
+        "Field 'weekday' of required type 'Weekday!' was not provided."
+    )
 
 
 def test_reservation_unit__create__with_timeslots__begin_before_end(graphql):
@@ -640,6 +611,9 @@ def test_reservation_unit__create__with_timeslots__closed_has_reservable_times(g
     assert response.field_error_messages("applicationRoundTimeSlots") == [
         "Closed timeslots cannot have reservable times.",
     ]
+
+
+# ── Reservation block whole day ──
 
 
 def test_reservation_unit__create__reservation_block_whole_day(graphql):

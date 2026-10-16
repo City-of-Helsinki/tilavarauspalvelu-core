@@ -28,7 +28,7 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit_export_multiple():
+def test_reservation_unit_export__multiple():
     # given:
     # - There are two "complete"/"full" reservation units in the system
     reservation_units = ReservationUnitFactory.create_batch(
@@ -212,7 +212,7 @@ def test_reservation_unit_export_multiple():
         },
     ),
 )
-def test_reservation_unit_export_missing_relations(column_value_mapping, missing):
+def test_reservation_unit_export__missing_relations(column_value_mapping, missing):
     # given:
     # - There is one reservation unit with the given missing data in the system
     data = {
@@ -249,7 +249,7 @@ def test_reservation_unit_export_missing_relations(column_value_mapping, missing
         assert writes[1][index] == expected_value
 
 
-def test_reservation_unit_export_subset():
+def test_reservation_unit_export__subset():
     # given:
     # - There are 5 reservation units in the system
     ReservationUnitFactory.create_batch(5)

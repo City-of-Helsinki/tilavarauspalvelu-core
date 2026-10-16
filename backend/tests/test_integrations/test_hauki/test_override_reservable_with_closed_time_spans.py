@@ -12,7 +12,7 @@ from tests.test_integrations.test_hauki.test_reservable_time_spans_client import
 )
 
 
-def test__override_reservable_with_closed_time_spans():
+def test__override_reservable_with_closed_time_spans__mixed_overlaps():
     reservable_time_spans, closed_time_spans = _get_reservable_and_closed_time_spans()
 
     normalised_time_spans = override_reservable_with_closed_time_spans(reservable_time_spans, closed_time_spans)

@@ -84,7 +84,11 @@ def test_application_round_results_export__no_suitable_time_ranges(graphql):
     )
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
-    assert exporter.write_csv()
+    with mock_csv_writer() as mock_writer:
+        exporter.write_csv()
+
+    writes = mock_writer.get_writes()
+    assert len(writes) == 1  # Just the header
 
 
 def test_application_round_results_export__application_status_is_expired(graphql):

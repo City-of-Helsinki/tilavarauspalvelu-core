@@ -39,6 +39,8 @@ def test_reservation_unit__update_pricings__tax_percentage__no_future_pricing():
     future_pricing = future_pricings.first()
     assert future_pricing.is_activated_on_begins is True
     assert future_pricing.tax_percentage.value == FUTURE_TAX
+
+    active_pricing = ReservationUnitPricing.objects.get(pk=active_pricing.pk)
     assert active_pricing.tax_percentage.value == CURRENT_TAX  # Active pricing should not be changed
 
     assert SentryLogger.log_message.call_count == 1

@@ -75,7 +75,7 @@ def test_reservation_series__order__by_unit_name(graphql, field):
     assert response.node(1) == {"pk": reservation_series_2.pk}
 
 
-def test_reservation_series__order__by_crated(graphql):
+def test_reservation_series__order__by_created(graphql):
     with freezegun.freeze_time("2023-01-02T12:00:00Z") as frozen_time:
         reservation_series_1 = ReservationSeriesFactory.create()
         frozen_time.move_to("2023-01-03T12:00:00Z")

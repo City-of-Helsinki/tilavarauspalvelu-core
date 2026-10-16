@@ -14,7 +14,7 @@ pytestmark = [
 
 def test_application__cancel__regular_user(graphql):
     # given:
-    # - There is a draft application in an open application round with a single application event
+    # - There is a draft application in an open application round with a single application section
     # - A regular user is using the system
     application = ApplicationFactory.create_in_status_draft()
     graphql.login_with_regular_user()
@@ -30,7 +30,7 @@ def test_application__cancel__regular_user(graphql):
 
 def test_application__cancel__regular_user__own_application(graphql):
     # given:
-    # - There is a draft application in an open application round with a single application event
+    # - There is a draft application in an open application round with a single application section
     # - The owner of the application is using the system
     application = ApplicationFactory.create_in_status_draft()
     graphql.force_login(application.user)
@@ -41,7 +41,7 @@ def test_application__cancel__regular_user__own_application(graphql):
 
     # then:
     # - The response contains no errors
-    # - The application has a send date
+    # - The application is cancelled
     assert response.has_errors is False, response
     application.refresh_from_db()
     assert application.cancelled_at is not None
@@ -63,10 +63,10 @@ def test_application__cancel__regular_user__own_application__application_period_
     assert response.error_message() == "No permission to update."
 
 
-def test_application__cancel__general_user(graphql):
+def test_application__cancel__general_admin(graphql):
     # given:
-    # - There is a draft application in an open application round with a single application event
-    # - The owner of the application is using the system
+    # - There is a draft application in an open application round with a single application section
+    # - A general admin is using the system
     application = ApplicationFactory.create_in_status_draft()
     admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
@@ -77,13 +77,13 @@ def test_application__cancel__general_user(graphql):
 
     # then:
     # - The response contains no errors
-    # - The application has a send date
+    # - The application is cancelled
     assert response.has_errors is False, response
     application.refresh_from_db()
     assert application.cancelled_at is not None
 
 
-def test_application__update__unit_admin(graphql):
+def test_application__cancel__unit_admin(graphql):
     # given:
     # - There is a draft application in an open application round
     # - A unit admin is using the system
@@ -101,4 +101,7 @@ def test_application__update__unit_admin(graphql):
 
     # then:
     # - The response contains no errors
+    # - The application is cancelled
     assert response.has_errors is False, response
+    application.refresh_from_db()
+    assert application.cancelled_at is not None

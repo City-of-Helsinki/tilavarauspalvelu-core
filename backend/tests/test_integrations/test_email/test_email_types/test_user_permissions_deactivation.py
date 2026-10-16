@@ -150,7 +150,7 @@ def test_user_permissions_deactivation__render__html():
 @freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
 def test_user_permissions_deactivation__send_email(outbox):
-    UserFactory.create_superuser(
+    user = UserFactory.create_superuser(
         email="user@email.com",
         preferred_language=Language.EN.value,
         last_login=local_datetime() - datetime.timedelta(days=20),
@@ -162,6 +162,9 @@ def test_user_permissions_deactivation__send_email(outbox):
 
     assert outbox[0].subject == "Your staff access to Varaamo is expiring"
     assert sorted(outbox[0].bcc) == ["user@email.com"]
+
+    user.refresh_from_db()
+    assert user.sent_email_about_deactivating_permissions is True
 
 
 @pytest.mark.django_db

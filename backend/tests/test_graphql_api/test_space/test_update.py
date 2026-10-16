@@ -14,6 +14,9 @@ pytestmark = [
 ]
 
 
+# ── Update ──
+
+
 def test_update_space(graphql):
     # given:
     # - There is a space
@@ -31,6 +34,9 @@ def test_update_space(graphql):
     assert response.has_errors is False, response
     space.refresh_from_db()
     assert space.name_fi == "bar"
+
+
+# ── Moving to another unit or parent ──
 
 
 def test_update_space__unit_admin_cannot_move_space_to_other_unit(graphql):
@@ -91,6 +97,9 @@ def test_update_space__unit_admin_cannot_move_space_under_space_of_other_unit(gr
 
     space = Space.objects.get(pk=space.pk)
     assert space.parent is None
+
+
+# ── Name ──
 
 
 @pytest.mark.parametrize("name", ["", " "])

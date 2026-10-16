@@ -52,7 +52,7 @@ def test_application__order__by_applicant(graphql):
     graphql.login_with_superuser()
 
     # when:
-    # - User tries to search for applications ordered by applicant pk ascending
+    # - User tries to search for applications ordered by applicant ascending
     response = graphql(applications_query(order_by="applicantAsc"))
 
     # then:
@@ -62,7 +62,7 @@ def test_application__order__by_applicant(graphql):
     assert response.node(1) == {"pk": application_2.pk}
 
     # when:
-    # - User tries to search for applications ordered by applicant pk ascending
+    # - User tries to search for applications ordered by applicant descending
     response = graphql(applications_query(order_by="applicantDesc"))
 
     # then:
@@ -74,7 +74,7 @@ def test_application__order__by_applicant(graphql):
 
 def test_application__order__by_applicant_type(graphql):
     # given:
-    # - There are four applications in the system with different applicant types
+    # - There are three applications in the system with different applicant types
     # - A superuser is using the system
     application_1 = ApplicationFactory.create_in_status_draft(applicant_type=ReserveeType.NONPROFIT)
     application_2 = ApplicationFactory.create_in_status_draft(applicant_type=ReserveeType.INDIVIDUAL)

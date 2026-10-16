@@ -6,11 +6,10 @@ from decimal import Decimal
 
 import pytest
 from django.urls import reverse
-from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.models.reservation.actions import ReservationActions
 from utils.date_utils import next_hour
 from utils.utils import get_query_params, update_query_params
 
@@ -337,7 +336,7 @@ def test_redirect_to_verkkokauppa__reservation_unit_has_no_active_pricing(api_cl
     }
 
 
-@patch_method(ReservationActions.create_order_in_verkkokauppa, side_effect=ValidationError("Error"))
+@patch_method(VerkkokauppaAPIClient.create_order, side_effect=CreateOrderError("Error"))
 def test_redirect_to_verkkokauppa__verkkokauppa_order_creation_failed(api_client, settings):
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
 

@@ -19,14 +19,21 @@ pytestmark = [
 
 def test_application__create(graphql):
     application_round = ApplicationRoundFactory.create_in_status_open()
-    graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
+    user = graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
     input_data = get_application_create_data(application_round)
     response = graphql(CREATE_MUTATION, input_data=input_data)
 
     assert response.has_errors is False, response
 
-    assert Application.objects.count() == 1
+    application = Application.objects.get()
+    assert application.user == user
+    assert application.application_round == application_round
+    assert application.applicant_type == input_data["applicantType"]
+    assert application.organisation_name == input_data["organisationName"]
+    assert application.contact_person_email == input_data["contactPersonEmail"]
+    assert application.billing_city == input_data["billingCity"]
+    assert application.municipality == input_data["municipality"]
 
 
 def test_application__create__with_application_sections(graphql):
@@ -62,6 +69,8 @@ def test_application__create__with_application_sections__too_many(graphql, setti
         "Cannot create more than 0 application sections in one application",
     ]
 
+    assert Application.objects.count() == 0
+
 
 @freezegun.freeze_time(local_datetime(2024, 1, 1))
 def test_application__create__is_under_age(graphql):
@@ -91,6 +100,7 @@ def test_application__create__is_ad_user(graphql, email):
     response = graphql(CREATE_MUTATION, input_data=input_data)
 
     assert response.has_errors is False, response
+    assert Application.objects.count() == 1
 
 
 def test_application__create__is_ad_user__not_internal_user(graphql):
@@ -125,6 +135,7 @@ def test_application__create__is_ad_user__not_internal_user__is_superuser(graphq
     response = graphql(CREATE_MUTATION, input_data=input_data)
 
     assert response.has_errors is False, response
+    assert Application.objects.count() == 1
 
 
 def test_application__create__sent_at(graphql):

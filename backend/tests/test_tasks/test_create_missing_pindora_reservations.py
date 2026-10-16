@@ -95,8 +95,8 @@ def test_create_missing_pindora_reservations__in_the_past():
         access_type=AccessType.ACCESS_CODE,
         access_code_generated_at=None,
         access_code_is_active=False,
-        begins_at=now - datetime.timedelta(days=1),
-        ends_at=now - datetime.timedelta(days=1, hours=1),
+        begins_at=now - datetime.timedelta(days=1, hours=1),
+        ends_at=now - datetime.timedelta(days=1),
     )
 
     create_missing_pindora_reservations_task()
@@ -231,7 +231,7 @@ def test_create_missing_pindora_reservations__multiple():
 
     reservation_unit = ReservationUnitFactory.create(name="foo")
 
-    ReservationFactory.create_for_reservation_unit(
+    reservation_1 = ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -242,7 +242,7 @@ def test_create_missing_pindora_reservations__multiple():
         ends_at=now + datetime.timedelta(days=1, hours=1),
     )
 
-    ReservationFactory.create_for_reservation_unit(
+    reservation_2 = ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -256,6 +256,11 @@ def test_create_missing_pindora_reservations__multiple():
     create_missing_pindora_reservations_task()
 
     assert PindoraClient.create_reservation.call_count == 2
+
+    reservation_1.refresh_from_db()
+    reservation_2.refresh_from_db()
+    assert reservation_1.access_code_generated_at == datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation_2.access_code_generated_at == datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE)
 
 
 @pytest.mark.django_db

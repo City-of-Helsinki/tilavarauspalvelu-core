@@ -75,3 +75,7 @@ def test_banner_notification__update__notification_manager(graphql):
     )
 
     assert response.has_errors is False
+
+    notification.refresh_from_db()
+    assert notification.name == "1"
+    assert notification.message == "2"

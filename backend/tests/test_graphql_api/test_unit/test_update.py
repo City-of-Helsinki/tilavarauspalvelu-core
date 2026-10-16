@@ -12,7 +12,7 @@ pytestmark = [
 ]
 
 
-def test_units__query(graphql):
+def test_units__update(graphql):
     unit = UnitFactory.create()
     graphql.login_with_superuser()
 

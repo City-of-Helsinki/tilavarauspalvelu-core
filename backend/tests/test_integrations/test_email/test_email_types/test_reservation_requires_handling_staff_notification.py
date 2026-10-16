@@ -274,7 +274,7 @@ def test_reservation_requires_handling_staff_notification__send_email__wrong_sta
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-def test_reservation_requires_handling_staff_notification__send_email__multiple_recipients(outbox):
+def test_reservation_requires_handling_staff_notification__send_email__multiple_languages(outbox):
     unit = UnitFactory.create(name="foo", name_en="foo")
 
     UserFactory.create_with_unit_role(

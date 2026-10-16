@@ -220,60 +220,12 @@ def test_user_actions__update_unit_roles_from_ad_groups__add_new_unit():
     assert unit_roles_units[1] == unit_2
 
 
-def test_user_actions__update_unit_roles_from_ad_groups__add_new_unit__multiple():
-    unit_1 = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
-    unit_2 = UnitFactory.create(tprek_id="456", allow_permissions_from_ad_groups=True)
-    unit_3 = UnitFactory.create(tprek_id="789", allow_permissions_from_ad_groups=True)
-    ad_group_1 = ADGroupFactory.create(name="oodi__varaamo__handler__123")
-    ad_group_2 = ADGroupFactory.create(name="oodi__varaamo__handler__456")
-    ad_group_3 = ADGroupFactory.create(name="oodi__varaamo__handler__789")
-    user = UserFactory.create(ad_groups=[ad_group_1, ad_group_2, ad_group_3])
-
-    role = UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, units=[unit_1], is_from_ad_group=True)
-
-    user.actions.update_unit_roles_from_ad_groups()
-
-    unit_roles = list(user.unit_roles.all())
-    assert len(unit_roles) == 1
-    assert unit_roles[0] == role
-
-    unit_roles_units = list(unit_roles[0].units.order_by("tprek_id").all())
-    assert len(unit_roles_units) == 3
-    assert unit_roles_units[0] == unit_1
-    assert unit_roles_units[1] == unit_2
-    assert unit_roles_units[2] == unit_3
-
-
 def test_user_actions__update_unit_roles_from_ad_groups__remove_existing_unit():
     unit_1 = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     unit_2 = UnitFactory.create(tprek_id="456", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__123")
 
     role = UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, units=[unit_1, unit_2], is_from_ad_group=True)
-
-    user.actions.update_unit_roles_from_ad_groups()
-
-    unit_roles = list(user.unit_roles.all())
-    assert len(unit_roles) == 1
-    assert unit_roles[0] == role
-
-    unit_roles_units = list(unit_roles[0].units.order_by("tprek_id").all())
-    assert len(unit_roles_units) == 1
-    assert unit_roles_units[0] == unit_1
-
-
-def test_user_actions__update_unit_roles_from_ad_groups__remove_existing_unit__multiple():
-    unit_1 = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
-    unit_2 = UnitFactory.create(tprek_id="456", allow_permissions_from_ad_groups=True)
-    unit_3 = UnitFactory.create(tprek_id="789", allow_permissions_from_ad_groups=True)
-    user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__123")
-
-    role = UnitRoleFactory.create(
-        user=user,
-        role=UserRoleChoice.HANDLER,
-        units=[unit_1, unit_2, unit_3],
-        is_from_ad_group=True,
-    )
 
     user.actions.update_unit_roles_from_ad_groups()
 

@@ -15,6 +15,8 @@ from tilavarauspalvelu.integrations.verkkokauppa.merchants.types import (
     UpdateMerchantParams,
 )
 
+from tests.helpers import exact
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -134,7 +136,7 @@ def test_verkkokauppa__merchant_types__merchant__from_json__empty_configurations
 def test_verkkokauppa__merchant_types__merchant__from_json__missing_field():
     response = mutation_merchant_response.copy()
     response.pop("merchantId")
-    with pytest.raises(ParseMerchantError):
+    with pytest.raises(ParseMerchantError, match=exact("Could not parse merchant: 'merchantId'")):
         Merchant.from_json(response)
 
 

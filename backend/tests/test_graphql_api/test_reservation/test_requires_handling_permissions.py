@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.enums import UserRoleChoice
+from tilavarauspalvelu.enums import ReservationStateChoice, UserRoleChoice
 
 from tests.factories import ReservationFactory
 
@@ -23,6 +23,9 @@ def test_reservation__requires_handling__allowed(graphql, role):
 
     assert response.has_errors is False, response.errors
 
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+
 
 def test_reservation__requires_handling__allowed__own(graphql):
     # Reservers are allowed to set handling required for their own reservations.
@@ -33,6 +36,9 @@ def test_reservation__requires_handling__allowed__own(graphql):
     response = graphql(REQUIRE_HANDLING_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
 
 def test_reservation__requires_handling__not_allowed(graphql):

@@ -17,7 +17,7 @@ pytestmark = [
 ]
 
 
-def test_deactivate_access_code__reservation():
+def test_deactivate_access_code__reservation(settings):
     reservation = ReservationFactory.create(
         reservation_unit__ext_uuid=uuid.uuid4(),
         reservation_series=None,
@@ -30,14 +30,17 @@ def test_deactivate_access_code__reservation():
         access_code_generated_at=local_datetime(),
     )
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraService.deactivate_access_code(obj=reservation)
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is False
 
+    assert patch.call_args.kwargs["method"] == "put"
+    assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation/deactivate/{reservation.ext_uuid}"
 
-def test_deactivate_access_code__reservation__in_series():
+
+def test_deactivate_access_code__reservation__in_series(settings):
     series = ReservationSeriesFactory.create()
     reservation_1 = ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -73,7 +76,7 @@ def test_deactivate_access_code__reservation__in_series():
         access_code_generated_at=local_datetime(),
     )
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraService.deactivate_access_code(obj=reservation_1)
 
     reservation_1.refresh_from_db()
@@ -85,8 +88,13 @@ def test_deactivate_access_code__reservation__in_series():
     reservation_3.refresh_from_db()
     assert reservation_3.access_code_is_active is True
 
+    assert patch.call_args.kwargs["method"] == "put"
+    assert (
+        patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation-series/deactivate/{series.ext_uuid}"
+    )
 
-def test_deactivate_access_code__reservation__in_series__in_seasonal_booking():
+
+def test_deactivate_access_code__reservation__in_series__in_seasonal_booking(settings):
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -131,7 +139,7 @@ def test_deactivate_access_code__reservation__in_series__in_seasonal_booking():
         access_code_generated_at=local_datetime(),
     )
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraService.deactivate_access_code(obj=reservation_1)
 
     reservation_1.refresh_from_db()
@@ -143,8 +151,11 @@ def test_deactivate_access_code__reservation__in_series__in_seasonal_booking():
     reservation_3.refresh_from_db()
     assert reservation_3.access_code_is_active is True
 
+    assert patch.call_args.kwargs["method"] == "put"
+    assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/seasonal-booking/deactivate/{section.ext_uuid}"
 
-def test_deactivate_access_code__series():
+
+def test_deactivate_access_code__series(settings):
     series = ReservationSeriesFactory.create()
     reservation_1 = ReservationFactory.create(
         reservation_unit=series.reservation_unit,
@@ -180,7 +191,7 @@ def test_deactivate_access_code__series():
         access_code_generated_at=local_datetime(),
     )
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraService.deactivate_access_code(obj=series)
 
     reservation_1.refresh_from_db()
@@ -192,8 +203,13 @@ def test_deactivate_access_code__series():
     reservation_3.refresh_from_db()
     assert reservation_3.access_code_is_active is True
 
+    assert patch.call_args.kwargs["method"] == "put"
+    assert (
+        patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/reservation-series/deactivate/{series.ext_uuid}"
+    )
 
-def test_deactivate_access_code__series__in_seasonal_booking():
+
+def test_deactivate_access_code__series__in_seasonal_booking(settings):
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -238,7 +254,7 @@ def test_deactivate_access_code__series__in_seasonal_booking():
         access_code_generated_at=local_datetime(),
     )
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraService.deactivate_access_code(obj=series)
 
     reservation_1.refresh_from_db()
@@ -250,8 +266,11 @@ def test_deactivate_access_code__series__in_seasonal_booking():
     reservation_3.refresh_from_db()
     assert reservation_3.access_code_is_active is True
 
+    assert patch.call_args.kwargs["method"] == "put"
+    assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/seasonal-booking/deactivate/{section.ext_uuid}"
 
-def test_deactivate_access_code__seasonal_booking():
+
+def test_deactivate_access_code__seasonal_booking(settings):
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -296,7 +315,7 @@ def test_deactivate_access_code__seasonal_booking():
         access_code_generated_at=local_datetime(),
     )
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraService.deactivate_access_code(obj=section)
 
     reservation_1.refresh_from_db()
@@ -307,3 +326,6 @@ def test_deactivate_access_code__seasonal_booking():
 
     reservation_3.refresh_from_db()
     assert reservation_3.access_code_is_active is True
+
+    assert patch.call_args.kwargs["method"] == "put"
+    assert patch.call_args.kwargs["url"] == f"{settings.PINDORA_API_URL}/seasonal-booking/deactivate/{section.ext_uuid}"

@@ -339,7 +339,10 @@ def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online(gr
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
 @pytest.mark.parametrize("status", [OrderStatus.CANCELLED, OrderStatus.EXPIRED])
-def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online__price_zero(graphql, status):
+def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online__price_zero__order_removed__not_cancelled(
+    graphql,
+    status,
+):
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     reservation = ReservationFactory.create(
@@ -544,7 +547,7 @@ def test_reservation__approve__price_missing(graphql):
     input_data.pop("price")
     response = graphql(APPROVE_MUTATION, input_data=input_data)
 
-    assert response.has_errors is True
+    assert response.has_schema_errors is True, response
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
@@ -563,7 +566,7 @@ def test_reservation__approve__handling_details_missing(graphql):
     input_data.pop("handlingDetails")
     response = graphql(APPROVE_MUTATION, input_data=input_data)
 
-    assert response.has_errors is True
+    assert response.has_schema_errors is True, response
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING

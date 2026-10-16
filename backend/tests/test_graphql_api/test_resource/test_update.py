@@ -15,6 +15,9 @@ pytestmark = [
 ]
 
 
+# ── Update ──
+
+
 def test_resource__update(graphql):
     resource = ResourceFactory.create()
     space = SpaceFactory.create(unit=resource.space.unit)
@@ -38,6 +41,9 @@ def test_resource__update(graphql):
     assert resource.name_sv == "c"
     assert resource.space.pk == space.pk
     assert resource.location_type == ResourceLocationType.FIXED.value
+
+
+# ── Moving to another space ──
 
 
 def test_resource__update__unit_admin__move_to_space_of_same_unit(graphql):
@@ -95,6 +101,9 @@ def test_resource__update__superuser__move_to_space_of_other_unit(graphql):
 
     resource = Resource.objects.get(pk=resource.pk)
     assert resource.space == original_space
+
+
+# ── Fields and location ──
 
 
 def test_resource__update__remove_translations(graphql):

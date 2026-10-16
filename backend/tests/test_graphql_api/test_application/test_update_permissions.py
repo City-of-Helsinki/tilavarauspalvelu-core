@@ -51,6 +51,9 @@ def test_application__update__regular_user__own_application(graphql):
     # - The response contains no errors
     assert response.has_errors is False, response
 
+    application.refresh_from_db()
+    assert application.additional_information == "bar"
+
 
 def test_application__update__regular_user__own_application__application_period_over(graphql):
     # given:
@@ -90,6 +93,9 @@ def test_application__update__general_admin(graphql):
     # - The response contains no errors
     assert response.has_errors is False, response
 
+    application.refresh_from_db()
+    assert application.additional_information == "bar"
+
 
 def test_application__update__unit_admin(graphql):
     # given:
@@ -114,3 +120,6 @@ def test_application__update__unit_admin(graphql):
     # then:
     # - The response contains no errors
     assert response.has_errors is False, response
+
+    application.refresh_from_db()
+    assert application.additional_information == "bar"

@@ -4,11 +4,18 @@ import datetime
 from collections import defaultdict
 
 import pytest
+from dateutil.relativedelta import relativedelta
 
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
-from tilavarauspalvelu.models import AffectingTimeSpan, Reservation, ReservationUnit, ReservationUnitHierarchy
-from utils.date_utils import DEFAULT_TIMEZONE, local_date
+from tilavarauspalvelu.models import (
+    AffectingTimeSpan,
+    Reservation,
+    ReservationStatistic,
+    ReservationUnit,
+    ReservationUnitHierarchy,
+)
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, ResourceFactory, SpaceFactory, UnitFactory
 
@@ -70,7 +77,7 @@ def _validate_time_spans(
     assert all_closed_time_spans.get(reservation_unit_id) == closed_time_spans
 
 
-def test__get_affecting_reservations__only_resources():
+def test_affecting_time_span__closed_time_spans__only_resources():
     # Resource 1 <- ReservationUnit 1, 2
     # Resource 2 <- ReservationUnit 3, 4
     # Resource 3 <- ReservationUnit 5
@@ -105,7 +112,7 @@ def test__get_affecting_reservations__only_resources():
     _validate_time_spans(all_closed_time_spans, reservation_unit_5.pk, [])
 
 
-def test__get_affecting_reservations__only_spaces():
+def test_affecting_time_span__closed_time_spans__only_spaces():
     # Space 1                    <- ReservationUnit 1, 8
     # ├── Space 1.1              <- ReservationUnit 2
     # │   ├── Space 1.1.1        <- ReservationUnit 4
@@ -223,7 +230,7 @@ def test__get_affecting_reservations__only_spaces():
     )
 
 
-def test__get_affecting_reservations__resources_and_spaces():
+def test_affecting_time_span__closed_time_spans__resources_and_spaces():
     # Space 1             <- ReservationUnit 5
     # ├── Space 1.1       <- ReservationUnit 1, 3
     # │   └── Space 1.1.1 <- ReservationUnit 4
@@ -321,3 +328,41 @@ def test__get_affecting_reservations__resources_and_spaces():
         reservation_unit_8.pk,
         [],
     )
+
+
+# ── create_missing_statistics ──
+
+
+def test_reservation__create_missing_statistics__limit_and_batches():
+    reservation_1 = ReservationFactory.create()
+    reservation_2 = ReservationFactory.create()
+    reservation_3 = ReservationFactory.create()
+    reservation_4 = ReservationFactory.create()
+
+    Reservation.objects.filter(pk=reservation_1.pk).upsert_statistics()
+
+    Reservation.objects.create_missing_statistics(limit=2, batch_size=1)
+
+    reservation_pks = list(ReservationStatistic.objects.order_by("reservation").values_list("reservation", flat=True))
+
+    assert reservation_pks == [reservation_1.pk, reservation_2.pk, reservation_3.pk]
+
+    Reservation.objects.create_missing_statistics(limit=2, batch_size=1)
+
+    reservation_pks = list(ReservationStatistic.objects.order_by("reservation").values_list("reservation", flat=True))
+
+    assert reservation_pks == [reservation_1.pk, reservation_2.pk, reservation_3.pk, reservation_4.pk]
+
+
+def test_reservation__create_missing_statistics__skip_reservations_past_retention(settings):
+    settings.REMOVE_RESERVATION_STATS_OLDER_THAN_YEARS = 5
+
+    created_at = local_datetime() - relativedelta(years=5, days=1)
+    ReservationFactory.create(created_at=created_at)
+    reservation = ReservationFactory.create()
+
+    Reservation.objects.create_missing_statistics(limit=10, batch_size=10)
+
+    reservation_pks = list(ReservationStatistic.objects.values_list("reservation", flat=True))
+
+    assert reservation_pks == [reservation.pk]

@@ -19,11 +19,6 @@ class TimeslotParams(NamedTuple):
     errors: Collection[str] = ()
 
 
-class TimeslotsParams(NamedTuple):
-    timeslots: list[TimeSlot]
-    errors: Collection[str] = ()
-
-
 @pytest.mark.parametrize(
     **parametrize_helper(
         {
@@ -90,12 +85,15 @@ def test_validate_reservable_times_begin_end(timeslots, errors):
             assert error_messages == errors
         else:
             pytest.fail(f"Unexpected ValidationError raised: '{error_messages}'")
+    else:
+        if errors:
+            pytest.fail("ValidationError not raised.")
 
 
 @pytest.mark.parametrize(
     **parametrize_helper(
         {
-            "separate": TimeslotsParams(
+            "separate": TimeslotParams(
                 timeslots=[
                     TimeSlot(
                         begin=datetime.time(hour=10, minute=0),
@@ -107,7 +105,7 @@ def test_validate_reservable_times_begin_end(timeslots, errors):
                     ),
                 ],
             ),
-            "back_to_back": TimeslotsParams(
+            "back_to_back": TimeslotParams(
                 timeslots=[
                     TimeSlot(
                         begin=datetime.time(hour=10, minute=0),
@@ -119,7 +117,7 @@ def test_validate_reservable_times_begin_end(timeslots, errors):
                     ),
                 ],
             ),
-            "overlap": TimeslotsParams(
+            "overlap": TimeslotParams(
                 timeslots=[
                     TimeSlot(begin=datetime.time(hour=10, minute=0), end=datetime.time(hour=12, minute=0)),
                     TimeSlot(
@@ -129,7 +127,7 @@ def test_validate_reservable_times_begin_end(timeslots, errors):
                 ],
                 errors=["Timeslot 1 (10:00:00 - 12:00:00) overlaps with timeslot 2 (11:00:00 - 16:00:00)."],
             ),
-            "one_end_time_on_midnight": TimeslotsParams(
+            "one_end_time_on_midnight": TimeslotParams(
                 timeslots=[
                     TimeSlot(
                         begin=datetime.time(hour=10, minute=0),
@@ -141,7 +139,7 @@ def test_validate_reservable_times_begin_end(timeslots, errors):
                     ),
                 ],
             ),
-            "overlap_one_end_time_on_midnight": TimeslotsParams(
+            "overlap_one_end_time_on_midnight": TimeslotParams(
                 timeslots=[
                     TimeSlot(
                         begin=datetime.time(hour=10, minute=0),
@@ -154,7 +152,7 @@ def test_validate_reservable_times_begin_end(timeslots, errors):
                 ],
                 errors=["Timeslot 1 (10:00:00 - 18:00:00) overlaps with timeslot 2 (15:00:00 - 00:00:00)."],
             ),
-            "same_timeslots": TimeslotsParams(
+            "same_timeslots": TimeslotParams(
                 timeslots=[
                     TimeSlot(
                         begin=datetime.time(hour=10, minute=0),
@@ -167,7 +165,7 @@ def test_validate_reservable_times_begin_end(timeslots, errors):
                 ],
                 errors=["Timeslot 1 (10:00:00 - 12:00:00) overlaps with timeslot 2 (10:00:00 - 12:00:00)."],
             ),
-            "same_timeslots_one_on_midnight": TimeslotsParams(
+            "same_timeslots_one_on_midnight": TimeslotParams(
                 timeslots=[
                     TimeSlot(
                         begin=datetime.time(hour=15, minute=0),

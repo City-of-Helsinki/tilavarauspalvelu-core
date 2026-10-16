@@ -58,32 +58,15 @@ def test_calculate_reservation_price__pricing_is_calculated_per_15_min_with_pric
     assert price == pricing.lowest_price * Decimal("1.25")
 
 
-def test_calculate_reservation_price__pricing_is_fixed_with_pricing_unit_more_than_half_day():
-    begin = local_datetime()
-    end = begin + datetime.timedelta(hours=14)
-
+@pytest.mark.parametrize("duration", [datetime.timedelta(hours=14), datetime.timedelta(days=1)])
+def test_calculate_reservation_price__pricing_is_fixed_when_duration_is_longer_than_pricing_unit(duration):
     pricing = ReservationUnitPricingFactory.create(
         price_unit=PriceUnit.PER_HALF_DAY,
         lowest_price=Decimal("100.0"),
         highest_price=Decimal("100.0"),
     )
 
-    price = pricing.actions.calculate_reservation_price(duration=end - begin)
-
-    assert price == pricing.lowest_price
-
-
-def test_calculate_reservation_price__pricing_is_fixed_even_when_duration_is_double_the_pricing_unit():
-    begin = local_datetime()
-    end = begin + datetime.timedelta(days=1)
-
-    pricing = ReservationUnitPricingFactory.create(
-        price_unit=PriceUnit.PER_HALF_DAY,
-        lowest_price=Decimal("100.0"),
-        highest_price=Decimal("100.0"),
-    )
-
-    price = pricing.actions.calculate_reservation_price(duration=end - begin)
+    price = pricing.actions.calculate_reservation_price(duration=duration)
 
     assert price == pricing.lowest_price
 
@@ -149,10 +132,10 @@ def test_get_active_pricing__future_has_same_tax_percentage():
     )
 
     pricing = reservation_unit.actions.get_active_pricing(by_date=day_1.date())
-    assert pricing.tax_percentage.value == pricing_1.tax_percentage.value
+    assert pricing.pk == pricing_1.pk
 
     pricing = reservation_unit.actions.get_active_pricing(by_date=day_2.date())
-    assert pricing.tax_percentage.value == pricing_2.tax_percentage.value
+    assert pricing.pk == pricing_2.pk
 
 
 def test_get_active_pricing__is_activated_on_begins():

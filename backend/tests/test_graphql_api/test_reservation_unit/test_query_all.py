@@ -13,14 +13,18 @@ pytestmark = [
 
 
 def test_reservation_unit_all__no_pagination_limit(graphql):
-    graphene_settings.RELAY_CONNECTION_MAX_LIMIT = 1
-
     ReservationUnitFactory.create_batch(2)
     ReservationUnitFactory.create(is_archived=True)  # Should not be returned
 
     graphql.login_with_superuser()
     query = reservation_units_all_query(fields="pk nameFi nameEn nameSv")
-    response = graphql(query)
+
+    original_max_limit = graphene_settings.RELAY_CONNECTION_MAX_LIMIT
+    graphene_settings.RELAY_CONNECTION_MAX_LIMIT = 1
+    try:
+        response = graphql(query)
+    finally:
+        graphene_settings.RELAY_CONNECTION_MAX_LIMIT = original_max_limit
 
     assert response.has_errors is False, response.errors
     assert len(response.first_query_object) == 2

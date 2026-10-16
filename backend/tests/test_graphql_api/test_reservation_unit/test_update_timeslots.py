@@ -148,7 +148,10 @@ def test_reservation_unit__update__timeslots__weekday_required(graphql):
     # then:
     # - The response contains no errors about requiring weekday
     assert response.has_errors is True, response
-    assert "Field 'weekday' of required" in response.error_message()
+    assert response.error_message() == (
+        "Variable '$input' got invalid value {'reservableTimes': [{...}]} at 'input.applicationRoundTimeSlots[0]'; "
+        "Field 'weekday' of required type 'Weekday!' was not provided."
+    )
 
 
 def test_reservation_unit__update__timeslots__begin_before_end(graphql):

@@ -58,7 +58,7 @@ def test__tprek_unit_hauki_resource_importer__multiple_pages():
 
 
 @patch_method(HaukiAPIClient.get, side_effect=[ResponseMock(status_code=200, json_data=SECOND_RET_VAL)])
-def test__tprek_unit_hauki_resource_importer__all_resources_not_found():
+def test__tprek_unit_hauki_resource_importer__some_resources_not_found():
     unit_1 = UnitFactory.create(tprek_id=1)
     unit_2 = UnitFactory.create(tprek_id=2)
 

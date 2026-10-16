@@ -149,7 +149,7 @@ def test_reservation_unit__filter__by_equipment__multiple__none_match(graphql):
     assert len(response.edges) == 0, response
 
 
-def test_reservation_unit__filtering__by_unit(graphql):
+def test_reservation_unit__filter__by_unit(graphql):
     reservation_unit = ReservationUnitFactory.create(unit=UnitFactory.create())
     ReservationUnitFactory.create(unit=UnitFactory.create())
 
@@ -175,7 +175,7 @@ def test_reservation_unit__filter__by_unit__multiple(graphql):
     assert response.node(1) == {"pk": reservation_unit_2.pk}
 
 
-def test_reservation_unit__filtering__by_unit_group(graphql):
+def test_reservation_unit__filter__by_unit_group(graphql):
     unit_group = UnitGroupFactory.create()
     reservation_unit = ReservationUnitFactory.create(unit__unit_groups=[unit_group])
     ReservationUnitFactory.create()
