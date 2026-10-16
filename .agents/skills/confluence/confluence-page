@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# Fetch a Confluence page with its child pages and all its footer comments.
+# Usage: confluence-page <page ID or URL>, e.g. confluence-page 887029864
+set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
+
+usage() {
+  echo "Usage: confluence-page <page ID or URL>, e.g. confluence-page 887029864" >&2
+  exit 2
+}
+[[ $# -eq 1 ]] || usage
+
+if [[ "$1" =~ ^([0-9]+)$ ]]; then
+  id="${BASH_REMATCH[1]}"
+elif [[ "$1" =~ ^$host/wiki/spaces/[^/?#]+/pages/([0-9]+)([/?#].*)?$ ]]; then
+  id="${BASH_REMATCH[1]}"
+elif [[ "$1" =~ ^$host/wiki/[^?#]*\?(.*\&)?pageId=([0-9]+)([\&#].*)?$ ]]; then
+  id="${BASH_REMATCH[2]}"
+else
+  echo "Not a Confluence page ID or URL: $1" >&2
+  usage
+fi
+
+load_credentials
+
+page="$(api "rest/api/content/$id?expand=body.storage,version,space,ancestors,history")"
+children="$(api_all_v2 "api/v2/pages/$id/children?limit=250")"
+
+# Comments come in pages. Fetch all of them, with replies.
+comments="[]"
+while :; do
+  start="$(jq length <<<"$comments")"
+  batch="$(api "rest/api/content/$id/child/comment?expand=body.storage,history&depth=all&limit=100&start=$start")"
+  [[ "$(jq '.results | length' <<<"$batch")" -gt 0 ]] || break
+  comments="$(jq --slurp '.[0] + .[1].results' <(printf '%s' "$comments") <(printf '%s' "$batch"))"
+  [[ "$(jq '._links.next // empty' <<<"$batch")" ]] || break
+done
+
+jq --slurp --arg base "$base_url" '.[0] as $page | .[1] as $children | .[2] as $comments | $page | {
+  id,
+  url: "\($base)\(._links.webui)",
+  title,
+  space: .space.key,
+  ancestors: [.ancestors[] | {id, title}],
+  children: [$children | sort_by(.childPosition // 0) | .[] | {id, title}],
+  author: .history.createdBy.displayName,
+  created: .history.createdDate,
+  updated: .version.when,
+  updated_by: .version.by.displayName,
+  version: .version.number,
+  body: .body.storage.value,
+  comments: [$comments[] | {author: .history.createdBy.displayName, at: .history.createdDate, body: .body.storage.value}]
+}' <(printf '%s' "$page") <(printf '%s' "$children") <(printf '%s' "$comments")

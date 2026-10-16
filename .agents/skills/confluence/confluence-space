@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# List all Confluence spaces, or print the page tree of one space.
+# Usage: confluence-space [space key or URL], e.g. confluence-space KAN
+set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
+
+usage() {
+  echo "Usage: confluence-space [space key or URL], e.g. confluence-space KAN" >&2
+  exit 2
+}
+[[ $# -le 1 ]] || usage
+
+key_pattern='~?[A-Za-z0-9_]+'
+
+if [[ $# -eq 0 ]]; then
+  key=""
+elif [[ "$1" =~ ^($key_pattern)$ ]]; then
+  key="${BASH_REMATCH[1]}"
+elif [[ "$1" =~ ^$host/wiki/spaces/($key_pattern)([/?#].*)?$ ]]; then
+  key="${BASH_REMATCH[1]}"
+else
+  echo "Not a Confluence space key or URL: $1" >&2
+  usage
+fi
+
+load_credentials
+
+if [[ -z "$key" ]]; then
+  api_all_v2 "api/v2/spaces?limit=250&status=current" \
+    | jq -r 'sort_by(.key) | .[] | "\(.key)  \(.name)"'
+  exit 0
+fi
+
+space_id="$(api "api/v2/spaces?keys=$key" | jq -r '.results[0].id // empty')"
+[[ -n "$space_id" ]] || { echo "Space not found: $key" >&2; exit 1; }
+
+# Print one line per page as "<id>  <title>", indented by depth.
+# Pages with a parent outside the list are roots.
+api_all_v2 "api/v2/spaces/$space_id/pages?limit=250&status=current" | jq -r '
+  . as $all
+  | (map(.id)) as $ids
+  | def indent($d): [range($d) | "  "] | join("");
+    def tree($parent; $d):
+      $all | map(select(.parentId == $parent)) | sort_by(.position // 0) | .[]
+      | (indent($d) + .id + "  " + .title), tree(.id; $d + 1);
+  $all | map(select(.parentId as $p | $ids | index($p) | not)) | sort_by(.position // 0) | .[]
+  | (.id + "  " + .title), tree(.id; 1)
+'

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Full-text search for Confluence pages, optionally in one space.
+# Usage: confluence-search <text> [space key], e.g. confluence-search 'varaamo' KAN
+set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
+
+usage() {
+  echo "Usage: confluence-search <text> [space key], e.g. confluence-search 'varaamo' KAN" >&2
+  exit 2
+}
+[[ $# -eq 1 || $# -eq 2 ]] || usage
+[[ -n "$1" ]] || usage
+[[ $# -eq 1 || "$2" =~ ^~?[A-Za-z0-9_]+$ ]] || usage
+
+load_credentials
+
+# Escape backslashes and double quotes for the quoted value in CQL.
+text="${1//\\/\\\\}"
+text="${text//\"/\\\"}"
+cql="type = page AND text ~ \"$text\""
+[[ $# -eq 1 ]] || cql="$cql AND space = \"$2\""
+
+query="$(jq -rn --arg cql "$cql" '$cql | @uri')"
+api "rest/api/search?cql=$query&limit=50" | jq --arg base "$base_url" '[.results[] | {
+  id: .content.id,
+  title: .content.title,
+  space: .resultGlobalContainer.title,
+  url: "\($base)\(.url)",
+  updated: .lastModified,
+  excerpt: (.excerpt | gsub("@@@(end)?hl@@@"; ""))
+}]'
