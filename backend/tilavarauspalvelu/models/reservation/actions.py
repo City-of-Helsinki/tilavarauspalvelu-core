@@ -31,7 +31,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import 
 from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservation
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_datetime
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -215,12 +215,13 @@ class ReservationActions:
             msg = "Reservation has no reservation unit"
             raise ReservationPriceCalculationError(msg)
 
-        pricing = reservation_unit.actions.get_active_pricing(by_date=begin_datetime.date())
+        begin_date = begin_datetime.astimezone(DEFAULT_TIMEZONE).date()
+        pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
         if pricing is None:
             msg = "Reservation unit has no pricing information"
             raise ReservationPriceCalculationError(msg)
 
-        duration = end_datetime - begin_datetime
+        duration = datetime_difference(start_datetime=begin_datetime, end_datetime=end_datetime)
         return pricing.actions.calculate_reservation_price(duration, subsidised=subsidised)
 
     def get_application_section(self) -> ApplicationSection | None:
@@ -367,7 +368,7 @@ class ReservationActions:
 
         invoicing_date: datetime.date | None = None
         if self.should_offer_invoicing():
-            invoicing_date = self.reservation.begins_at.date()
+            invoicing_date = self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
 
         order_params = get_verkkokauppa_order_params(self.reservation, invoicing_date=invoicing_date)
 
@@ -408,7 +409,8 @@ class ReservationActions:
 
         reservation_unit: ReservationUnit = self.reservation.reservation_unit
 
-        pricing = reservation_unit.actions.get_active_pricing(by_date=self.reservation.begins_at.date())
+        begin_date = self.reservation.begins_at.astimezone(DEFAULT_TIMEZONE).date()
+        pricing = reservation_unit.actions.get_active_pricing(by_date=begin_date)
         if pricing is None:
             return False
 

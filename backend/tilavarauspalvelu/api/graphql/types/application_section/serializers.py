@@ -4,7 +4,7 @@ import operator
 from typing import TYPE_CHECKING, Any, TypedDict
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from graphene_django_extensions.serializers import NotProvided
@@ -25,6 +25,8 @@ from utils.utils import comma_sep_str
 
 if TYPE_CHECKING:
     import datetime
+
+    from tilavarauspalvelu.typing import AnyUser
 
 
 __all__ = [
@@ -61,7 +63,30 @@ class ApplicationSectionSerializer(NestingModelSerializer):
 
         # Using serializer as a sub-serializer, and trying to reuse the same object.
         if "pk" in data and not self.instance:
-            self.instance = ApplicationSection.objects.get(pk=data["pk"])
+            # The parent is the list serializer of the sections. Its parent is the application serializer.
+            parent_application = self.parent.parent.instance if self.parent is not None else None
+            self.instance = ApplicationSection.objects.filter(pk=data["pk"], application=parent_application).first()
+            if self.instance is None:
+                msg = f"Application section {data['pk']} does not belong to this application."
+                raise ValidationError(msg)
+
+        application: Application | None = data.get("application")
+        if self.instance is not None and application is not None and application.pk != self.instance.application_id:
+            msg = "Application section cannot be moved to another application."
+            raise ValidationError(msg)
+
+        if application is None and self.instance is not None:
+            application = self.instance.application
+
+        # Sections created through an application are validated by the application serializer.
+        if application is not None:
+            application.application_round.validators.validate_open_for_applications()
+
+            if self.instance is None:
+                section_count = application.application_sections.count() + 1
+                Application.validators.validate_not_too_many_sections(section_count)
+
+        self.validate_nested_items_belong_to_section(data, errors)
 
         if "reservation_unit_options" in data:
             self.validate_option_preferred_ordering(data["reservation_unit_options"], errors)
@@ -72,6 +97,44 @@ class ApplicationSectionSerializer(NestingModelSerializer):
             raise ValidationError(errors)
 
         return data
+
+    def create(self, validated_data: dict[str, Any]) -> ApplicationSection:
+        user: AnyUser = self.context["request"].user
+
+        with transaction.atomic():
+            instance = super().create(validated_data)
+            instance.application.actions.reset_sent_at_if_changed_by_applicant(user=user)
+
+        return instance
+
+    def update(self, instance: ApplicationSection, validated_data: dict[str, Any]) -> ApplicationSection:
+        user: AnyUser = self.context["request"].user
+
+        with transaction.atomic():
+            instance = super().update(instance, validated_data)
+            instance.application.actions.reset_sent_at_if_changed_by_applicant(user=user)
+
+        return instance
+
+    def validate_nested_items_belong_to_section(self, data: dict[str, Any], errors: list[str]) -> None:
+        option_pks = {option["pk"] for option in data.get("reservation_unit_options", []) if "pk" in option}
+        time_range_pks = {time_range["pk"] for time_range in data.get("suitable_time_ranges", []) if "pk" in time_range}
+
+        own_option_pks: set[int] = set()
+        own_time_range_pks: set[int] = set()
+        if self.instance is not None:
+            own_option_pks = set(self.instance.reservation_unit_options.values_list("pk", flat=True))
+            own_time_range_pks = set(self.instance.suitable_time_ranges.values_list("pk", flat=True))
+
+        other_option_pks = sorted(option_pks - own_option_pks)
+        errors.extend(
+            f"Reservation unit option {pk} does not belong to this application section." for pk in other_option_pks
+        )
+
+        other_time_range_pks = sorted(time_range_pks - own_time_range_pks)
+        errors.extend(
+            f"Suitable time range {pk} does not belong to this application section." for pk in other_time_range_pks
+        )
 
     def validate_option_preferred_ordering(self, data: list[dict[str, Any]], errors: list[str]) -> None:
         from tilavarauspalvelu.models import ReservationUnitOption

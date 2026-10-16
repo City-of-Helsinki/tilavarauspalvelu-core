@@ -116,11 +116,12 @@ def test_reservation_series__update_series__skip_reservations(graphql):
     assert reservation_2.name == "bar"
 
 
-def test_reservation_series__update_series__update_statistics(graphql, settings):
+def test_reservation_series__update_series__update_statistics(graphql, settings, django_capture_on_commit_callbacks):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reservation_series = ReservationSeriesFactory.create()
-    reservation = ReservationFactory.create(num_persons=1, reservation_series=reservation_series)
+    with django_capture_on_commit_callbacks(execute=True):
+        reservation = ReservationFactory.create(num_persons=1, reservation_series=reservation_series)
 
     stat: ReservationStatistic | None = ReservationStatistic.objects.filter(reservation=reservation).first()
     assert stat is not None
@@ -134,7 +135,8 @@ def test_reservation_series__update_series__update_statistics(graphql, settings)
     }
 
     graphql.login_with_superuser()
-    response = graphql(UPDATE_SERIES_MUTATION, input_data=data)
+    with django_capture_on_commit_callbacks(execute=True):
+        response = graphql(UPDATE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is False
 

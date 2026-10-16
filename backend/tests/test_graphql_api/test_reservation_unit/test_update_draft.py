@@ -2,12 +2,25 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.enums import AccessType, AuthenticationType, ReservationFormType, TermsOfUseTypeChoices
+from tilavarauspalvelu.enums import (
+    AccessType,
+    AuthenticationType,
+    ReservationFormType,
+    ResourceLocationType,
+    TermsOfUseTypeChoices,
+)
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.typing import error_codes
 from utils.auditlog_util import AuditLogger
 
-from tests.factories import ReservationUnitFactory, TermsOfUseFactory
+from tests.factories import (
+    ReservationUnitFactory,
+    ResourceFactory,
+    SpaceFactory,
+    TermsOfUseFactory,
+    UnitFactory,
+    UserFactory,
+)
 
 from .helpers import UPDATE_MUTATION, get_draft_update_input_data
 
@@ -153,6 +166,147 @@ def test_reservation_unit__update__errors_with_empty_name(graphql):
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.name_fi != ""
+
+
+def test_reservation_unit__update__unit_admin__move_to_other_unit(graphql):
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+    original_unit = reservation_unit.unit
+    other_unit = UnitFactory.create()
+    admin = UserFactory.create_with_unit_role(units=[original_unit])
+    graphql.force_login(admin)
+
+    data = get_draft_update_input_data(reservation_unit, unit=other_unit.pk)
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("unit") == ["Reservation unit cannot be moved to another unit."]
+
+    reservation_unit = ReservationUnit.objects.get(pk=reservation_unit.pk)
+    assert reservation_unit.unit == original_unit
+
+
+def test_reservation_unit__update__superuser__move_to_other_unit(graphql):
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+    original_unit = reservation_unit.unit
+    other_unit = UnitFactory.create()
+    graphql.login_with_superuser()
+
+    data = get_draft_update_input_data(reservation_unit, unit=other_unit.pk)
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("unit") == ["Reservation unit cannot be moved to another unit."]
+
+    reservation_unit = ReservationUnit.objects.get(pk=reservation_unit.pk)
+    assert reservation_unit.unit == original_unit
+
+
+def test_reservation_unit__update__unit_admin__same_unit(graphql):
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+    admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
+    graphql.force_login(admin)
+
+    data = get_draft_update_input_data(reservation_unit, unit=reservation_unit.unit.pk)
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+
+def test_reservation_unit__update__unit_admin__space_of_own_unit(graphql):
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+    own_space = SpaceFactory.create(unit=reservation_unit.unit)
+    admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
+    graphql.force_login(admin)
+
+    data = get_draft_update_input_data(reservation_unit, spaces=[own_space.pk])
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation_unit = ReservationUnit.objects.get(pk=reservation_unit.pk)
+    assert list(reservation_unit.spaces.all()) == [own_space]
+
+
+def test_reservation_unit__update__unit_admin__space_of_other_unit(graphql):
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+    other_space = SpaceFactory.create()
+    admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
+    graphql.force_login(admin)
+
+    data = get_draft_update_input_data(reservation_unit, spaces=[other_space.pk])
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("spaces") == ["Reservation unit can only have spaces of its own unit."]
+
+    reservation_unit = ReservationUnit.objects.get(pk=reservation_unit.pk)
+    assert list(reservation_unit.spaces.all()) == []
+
+
+def test_reservation_unit__update__superuser__space_of_other_unit(graphql):
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+    other_space = SpaceFactory.create()
+    graphql.login_with_superuser()
+
+    data = get_draft_update_input_data(reservation_unit, spaces=[other_space.pk])
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("spaces") == ["Reservation unit can only have spaces of its own unit."]
+
+    reservation_unit = ReservationUnit.objects.get(pk=reservation_unit.pk)
+    assert list(reservation_unit.spaces.all()) == []
+
+
+def test_reservation_unit__update__keeps_existing_space_of_other_unit(graphql):
+    other_space = SpaceFactory.create()
+    reservation_unit = ReservationUnitFactory.create(is_draft=True, spaces=[other_space])
+    admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
+    graphql.force_login(admin)
+
+    data = get_draft_update_input_data(reservation_unit, spaces=[other_space.pk])
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation_unit = ReservationUnit.objects.get(pk=reservation_unit.pk)
+    assert list(reservation_unit.spaces.all()) == [other_space]
+
+
+def test_reservation_unit__update__unit_admin__resource_of_other_unit(graphql):
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+    other_resource = ResourceFactory.create()
+    admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
+    graphql.force_login(admin)
+
+    data = get_draft_update_input_data(reservation_unit, resources=[other_resource.pk])
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("resources") == [
+        "Reservation unit can only have resources in spaces of its own unit."
+    ]
+
+    reservation_unit = ReservationUnit.objects.get(pk=reservation_unit.pk)
+    assert list(reservation_unit.resources.all()) == []
+
+
+def test_reservation_unit__update__unit_admin__resource_without_space(graphql):
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+    resource = ResourceFactory.create(space=None, location_type=ResourceLocationType.MOVABLE)
+    admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
+    graphql.force_login(admin)
+
+    data = get_draft_update_input_data(reservation_unit, resources=[resource.pk])
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("resources") == [
+        "Reservation unit can only have resources in spaces of its own unit."
+    ]
+
+    reservation_unit = ReservationUnit.objects.get(pk=reservation_unit.pk)
+    assert list(reservation_unit.resources.all()) == []
 
 
 def test_reservation_unit__update__publish(graphql):

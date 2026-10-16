@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import datetime
+import inspect
+import json
 import time
 import uuid
 from decimal import Decimal
@@ -12,7 +14,7 @@ from django.core.cache import cache
 from django.db import transaction
 
 from config.celery import app
-from tilavarauspalvelu.enums import ReservationTypeChoice
+from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.management.commands.data_creation.create_robot_test_data import create_robot_test_data
 from tilavarauspalvelu.models import (
@@ -78,12 +80,13 @@ __all__ = [
 
 def singleton_task[**P](task: Task) -> Task:
     """
-    Lock task execution to a single concurrent instance based on a lock set in cache.
+    Lock task execution to a single concurrent instance per task arguments based on a lock set in cache.
     Must be added on top of the `@app.task` decorator!
 
     See: https://docs.celeryq.dev/en/stable/tutorials/task-cookbook.html#ensuring-a-task-is-only-executed-one-at-a-time
     """
     task_func = task.run
+    task_signature = inspect.signature(task_func)
 
     @wraps(task_func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> None:
@@ -91,7 +94,13 @@ def singleton_task[**P](task: Task) -> Task:
         timeout_leeway = 3  # Some leeway for cache operations
 
         timeout_at = time.monotonic() + lock_timeout - timeout_leeway
-        lock_id: str = task.name
+
+        # Bind to the signature so that positional and keyword arguments get the same lock.
+        # JSON keeps the boundaries between the arguments unambiguous.
+        bound_arguments = task_signature.bind(*args, **kwargs)
+        bound_arguments.apply_defaults()
+        arguments = json.dumps(bound_arguments.arguments, separators=(",", ":"), default=str)
+        lock_id = f"{task.name}:{arguments}"
 
         # Assuming the operation here is atomic, or at least close enough to be safe.
         has_lock = cache.add(lock_id, 1, lock_timeout)
@@ -605,6 +614,8 @@ def notify_reservation_on_access_type_change_task(reservation_pks: list[int]) ->
             pk__in=reservation_pks,
             # Still only send email for reservations that are ongoing or in the future
             ends_at__gt=now,
+            # Other reservations get the access information when they are confirmed
+            state=ReservationStateChoice.CONFIRMED,
         )
         .exclude(type=ReservationTypeChoice.SEASONAL)
     )
@@ -617,6 +628,9 @@ def notify_reservation_on_access_type_change_task(reservation_pks: list[int]) ->
             reservation_unit_options__allocated_time_slots__reservation_series__reservations__in=reservation_pks,
             # Still only send email for sections that have reservations that are ongoing or in the future
             reservation_unit_options__allocated_time_slots__reservation_series__reservations__ends_at__gt=now,
+            reservation_unit_options__allocated_time_slots__reservation_series__reservations__state=(
+                ReservationStateChoice.CONFIRMED
+            ),
         )
         .distinct()
         .select_related("application")

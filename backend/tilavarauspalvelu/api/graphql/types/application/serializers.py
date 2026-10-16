@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import operator
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any
 
+from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import IntegerPrimaryKeyField
 from rest_framework import serializers
@@ -20,7 +22,7 @@ from utils.fields.serializer import CurrentUserDefaultNullable
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationRound, ApplicationSection, User
-    from tilavarauspalvelu.typing import ErrorList
+    from tilavarauspalvelu.typing import AnyUser, ErrorList
 
 __all__ = [
     "ApplicationCancelSerializer",
@@ -126,9 +128,13 @@ class ApplicationUpdateSerializer(ApplicationCreateSerializer):
         return data
 
     def update(self, instance: Application, validated_data: dict[str, Any]) -> Application:
-        # If a sent application is updated, it needs to be sent and validated again
-        instance.sent_at = None
-        return super().update(instance, validated_data)
+        user: AnyUser = self.context["request"].user
+
+        with transaction.atomic():
+            instance = super().update(instance, validated_data)
+            instance.actions.reset_sent_at_if_changed_by_applicant(user=user)
+
+        return instance
 
 
 class ApplicationWorkingMemoSerializer(NestingModelSerializer):
@@ -207,6 +213,17 @@ class ApplicationSendSerializer(NestingModelSerializer):
                 error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_RESERVATION_UNIT_OPTIONS_MISSING)
                 errors.append(error)
 
+            options_outside_round = section.reservation_unit_options.exclude(
+                reservation_unit__in=self.instance.application_round.reservation_units.all()
+            ).order_by("reservation_unit_id")
+            for option in options_outside_round:
+                msg = (
+                    f"Application section {section.pk} has reservation unit {option.reservation_unit_id} "
+                    "that is not in the application round."
+                )
+                code = error_codes.APPLICATION_SECTION_RESERVATION_UNIT_NOT_IN_APPLICATION_ROUND
+                errors.append(ValidationError(msg, code=code))
+
     def validate_suitable_time_ranges(self, section: ApplicationSection, errors: ErrorList) -> None:
         time_ranges = section.suitable_time_ranges.all()
 
@@ -224,7 +241,8 @@ class ApplicationSendSerializer(NestingModelSerializer):
             time_slots[weekday].append(timeslot)
 
         for weekday in list(time_slots):
-            time_slots[weekday] = merge_time_slots(time_slots[weekday])
+            ordered_time_slots = sorted(time_slots[weekday], key=operator.itemgetter("begin_time"))
+            time_slots[weekday] = merge_time_slots(ordered_time_slots)
 
         # Check that each weekday has a contiguous time range long enough for an allocation.
         for weekday, timeslots in time_slots.items():

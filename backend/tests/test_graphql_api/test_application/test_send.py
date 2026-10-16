@@ -9,7 +9,13 @@ from tilavarauspalvelu.enums import Priority, ReserveeType, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
 from utils.date_utils import local_datetime, local_start_of_day, local_time
 
-from tests.factories import ApplicationFactory, SuitableTimeRangeFactory, UserFactory
+from tests.factories import (
+    ApplicationFactory,
+    ReservationUnitFactory,
+    ReservationUnitOptionFactory,
+    SuitableTimeRangeFactory,
+    UserFactory,
+)
 from tests.helpers import patch_method
 
 from .helpers import SEND_MUTATION
@@ -135,6 +141,29 @@ def test_send_application__no_reservation_unit_options(graphql):
     ]
 
 
+def test_send_application__reservation_unit_not_in_application_round(graphql):
+    application = ApplicationFactory.create_application_ready_for_sending()
+    section = application.application_sections.first()
+
+    other_reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitOptionFactory.create(
+        application_section=section,
+        reservation_unit=other_reservation_unit,
+        preferred_order=2,
+    )
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+
+    assert response.has_errors is True
+    assert response.field_error_messages() == [
+        (
+            f"Application section {section.pk} has reservation unit {other_reservation_unit.pk} "
+            "that is not in the application round."
+        ),
+    ]
+
+
 def test_send_application__section_empty_name(graphql):
     application = ApplicationFactory.create_application_ready_for_sending(application_sections__name="")
     section = application.application_sections.first()
@@ -200,6 +229,33 @@ def test_send_application__section_suitable_time_range__combined_are_long_enough
         begin_time=local_time(11, 0),
         end_time=local_time(12, 0),
     )
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+
+    assert response.has_errors is False, response.errors
+
+
+@pytest.mark.parametrize("created_in_order", [True, False])
+def test_send_application__section_suitable_time_range__combined_end_at_midnight(graphql, created_in_order):
+    application = ApplicationFactory.create_application_ready_for_sending(
+        application_sections__reservation_min_duration=datetime.timedelta(hours=3),
+        application_sections__reservation_max_duration=datetime.timedelta(hours=3),
+        application_sections__suitable_time_ranges=[],
+    )
+    section = application.application_sections.first()
+
+    time_ranges = [(datetime.time(20, 0), datetime.time(22, 0)), (datetime.time(22, 0), datetime.time(0, 0))]
+    if not created_in_order:
+        time_ranges.reverse()
+
+    for begin_time, end_time in time_ranges:
+        SuitableTimeRangeFactory.create(
+            application_section=section,
+            day_of_the_week=Weekday.MONDAY,
+            begin_time=begin_time,
+            end_time=end_time,
+        )
 
     graphql.login_with_superuser()
     response = graphql(SEND_MUTATION, input_data={"pk": application.pk})

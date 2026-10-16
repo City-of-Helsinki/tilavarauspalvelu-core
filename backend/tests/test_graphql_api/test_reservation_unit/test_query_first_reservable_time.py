@@ -18,7 +18,7 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnitHierarchy
+from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnit, ReservationUnitHierarchy
 from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import CachedReservableTime
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
@@ -38,7 +38,6 @@ from .helpers import reservation_units_query
 if TYPE_CHECKING:
     from graphene_django_extensions.testing.client import GQLResponse
 
-    from tilavarauspalvelu.models import ReservationUnit
 
 # Applied to all tests
 pytestmark = [
@@ -441,6 +440,12 @@ def test__reservation_unit__first_reservable_time__filters__too_strict_causes_no
             filters=ReservableFilters(
                 time_start=datetime.time(hour=13),
                 time_end=datetime.time(hour=14),
+            ),
+        ),
+        "Basic | Start & End Time | End at Midnight": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=13),
+                time_end=datetime.time(),
             ),
         ),
         "Basic | Only reservable_minimum_duration_minutes| Shorter than time span": ReservableParams(
@@ -1787,6 +1792,78 @@ def test__reservation_unit__first_reservable_time__reservations__in_common_hiera
 
 
 @freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__reservations__in_common_hierarchy__block_whole_day(
+    graphql, reservation_unit
+):
+    """
+    A reservation unit that blocks the whole day cannot be reserved on a day that has a reservation
+    in a reservation unit in the same hierarchy. A reservation that ends at midnight does not block the next day.
+
+    ┌────────────────────────────────────────────────────┐
+    │ █ = Reservation                                    │
+    │ ░ = Not reservable                                 │
+    │ ▁ = Reservable                                     │
+    ├────────────────────────────────────────────────────┤
+    │ reservation_unit (blocks whole day)                │
+    │   0   2   4   6   8   10  12  14  16  18  20  22   │
+    │ 1 ░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+    │ 2 ░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+    │ 3 ░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+    ├────────────────────────────────────────────────────┤
+    │ reservation_unit_2                                 │
+    │   0   2   4   6   8   10  12  14  16  18  20  22   │
+    │ 1 ░░░░░░░░░░░░░░░░▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+    │ 2 ░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁████████ │
+    │ 3 ░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+    └────────────────────────────────────────────────────┘
+    """
+    reservation_unit_2: ReservationUnit = ReservationUnitFactory.create(
+        spaces=[SpaceFactory.create()],
+        origin_hauki_resource=reservation_unit.origin_hauki_resource,
+    )
+    reservation_unit.unit = reservation_unit_2.unit
+    reservation_unit.spaces.set(reservation_unit_2.spaces.all())
+    reservation_unit.reservation_block_whole_day = True
+    reservation_unit.save()
+
+    for day in (1, 2, 3):
+        ReservableTimeSpanFactory.create(
+            resource=reservation_unit.origin_hauki_resource,
+            start_datetime=_datetime(day=day, hour=8),
+            end_datetime=_datetime(day=day, hour=20),
+        )
+
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit_2,
+        begins_at=_datetime(day=1, hour=10),
+        ends_at=_datetime(day=1, hour=12),
+    )
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit_2,
+        begins_at=_datetime(day=2, hour=20),
+        ends_at=_datetime(day=3, hour=0),
+    )
+
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
+
+    assert response.has_errors is False, response
+
+    assert response.node(0)["pk"] == reservation_unit.pk
+    assert frt(response, node=0) == dt(day=3, hour=8)
+    assert is_closed(response, node=0) is False
+
+    assert response.node(1)["pk"] == reservation_unit_2.pk
+    assert frt(response, node=1) == dt(day=1, hour=8)
+    assert is_closed(response, node=1) is False
+
+
+########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_time(graphql, reservation_unit):
     """
     ReservationUnits before and after buffers should not affect reservability when the buffer is in a closed time span.
@@ -2698,6 +2775,58 @@ def test__reservation_unit__first_reservable_time__different_filters_dont_share_
 
     # We couldn't use the cached results, so make database queries as usual.
     response_2.assert_query_count(9)
+
+
+########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__different_text_search_languages_dont_share_cache(
+    graphql, reservation_unit
+):
+    reservation_unit.name_fi = "Sauna"
+    reservation_unit.name_en = "Cottage"
+    reservation_unit.save()
+
+    reservation_unit_2 = ReservationUnitFactory.create(
+        name_fi="Mökki",
+        name_en="Sauna",
+        origin_hauki_resource=reservation_unit.origin_hauki_resource,
+    )
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=10),
+        end_datetime=_datetime(hour=12),
+    )
+
+    ReservationUnit.objects.update_search_vectors()
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    query = reservation_units_reservable_query(
+        fields="pk isClosed firstReservableDatetime",
+        text_search="sauna",
+        order_by="nameFiAsc",
+        first=1,
+    )
+
+    graphql.login_with_superuser(preferred_language="fi")
+    response_1 = graphql(query)
+    assert response_1.has_errors is False, response_1
+
+    assert len(response_1) == 1
+    assert response_1.node(0)["pk"] == reservation_unit.pk
+    assert frt(response_1) == dt(hour=10)
+
+    graphql.login_with_superuser(username="english_admin", preferred_language="en")
+    response_2 = graphql(query)
+    assert response_2.has_errors is False, response_2
+
+    assert len(response_2) == 1
+    assert response_2.node(0)["pk"] == reservation_unit_2.pk
+    assert frt(response_2) == dt(hour=10)
+    assert is_closed(response_2) is False
 
 
 ########################################################################################################################

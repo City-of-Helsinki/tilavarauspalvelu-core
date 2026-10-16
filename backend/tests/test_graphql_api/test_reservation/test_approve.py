@@ -1,19 +1,22 @@
 from __future__ import annotations
 
+import uuid
 from decimal import Decimal
 
 import pytest
 from freezegun import freeze_time
+from rest_framework.status import HTTP_204_NO_CONTENT
 
 from tilavarauspalvelu.enums import AccessType, OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.models import PaymentOrder, Reservation
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
-from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
-from tests.helpers import patch_method
+from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationSeriesFactory, ReservationUnitFactory
+from tests.helpers import ResponseMock, patch_method
 
 from .helpers import APPROVE_MUTATION, get_approve_data
 
@@ -185,6 +188,8 @@ def test_reservation__approve__paid__in_webshop__paid_on_site_since_begin_too_cl
     assert payment_order.status == OrderStatus.PAID_MANUALLY
 
 
+@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_reservation_requires_payment_email)
 @freeze_time(local_datetime(2024, 1, 1, 12))
 def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_same_price(graphql):
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
@@ -204,6 +209,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_
         price_net=Decimal("8.44"),
         price_vat=Decimal("2.15"),
         price_total=Decimal("10.59"),
+        handled_payment_due_by=local_datetime(2023, 12, 30, 12),
     )
 
     graphql.login_with_superuser()
@@ -221,9 +227,45 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__with_
     assert hasattr(reservation, "payment_order")
     assert reservation.payment_order == payment_order
 
+    assert EmailService.send_reservation_confirmed_email.call_count == 1
+    assert EmailService.send_reservation_requires_payment_email.call_count == 0
+
 
 @freeze_time(local_datetime(2024, 1, 1, 12))
-def test_reservation__approve__paid__in_webshop__has_payment__paid_online__different_price(graphql):
+def test_reservation__approve__paid__in_webshop__has_payment__paid_online__refund_in_progress(graphql):
+    reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 2, 12),
+        ends_at=local_datetime(2024, 1, 2, 13),
+    )
+
+    PaymentOrderFactory.create(
+        reservation=reservation,
+        payment_type=PaymentType.ONLINE,
+        status=OrderStatus.PAID,
+        refund_id=uuid.uuid4(),
+        price_net=Decimal("8.44"),
+        price_vat=Decimal("2.15"),
+        price_total=Decimal("10.59"),
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation, price="10.59")
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation has a payment order with a refund in progress."]
+
+    reservation = Reservation.objects.get(pk=reservation.pk)
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+
+
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.parametrize("price", ["10.59", "0"])
+def test_reservation__approve__paid__in_webshop__has_payment__paid_online__different_price(graphql, price):
     reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
 
     reservation = ReservationFactory.create(
@@ -243,7 +285,7 @@ def test_reservation__approve__paid__in_webshop__has_payment__paid_online__diffe
     )
 
     graphql.login_with_superuser()
-    data = get_approve_data(reservation, price="10.59")
+    data = get_approve_data(reservation, price=price)
     response = graphql(APPROVE_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
@@ -293,6 +335,44 @@ def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online(gr
     assert new_payment_order.price_net == Decimal("8.44")
     assert new_payment_order.price_vat == Decimal("2.15")
     assert new_payment_order.price_total == Decimal("10.59")
+
+
+@freeze_time(local_datetime(2024, 1, 1, 12))
+@pytest.mark.parametrize("status", [OrderStatus.CANCELLED, OrderStatus.EXPIRED])
+def test_reservation__approve__paid__in_webshop__has_payment__not_paid_online__price_zero(graphql, status):
+    reservation_unit = ReservationUnitFactory.create_paid_in_webshop()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=reservation_unit,
+        begins_at=local_datetime(2024, 1, 5, 12),
+        ends_at=local_datetime(2024, 1, 5, 13),
+    )
+
+    PaymentOrderFactory.create(
+        reservation=reservation,
+        payment_type=PaymentType.ONLINE,
+        status=status,
+        price_net=Decimal("10.0"),
+        price_vat=Decimal("2.0"),
+        price_total=Decimal("12.0"),
+        handled_payment_due_by=local_datetime(2024, 1, 2, 12),
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation, price="0")
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    assert PaymentOrder.objects.filter(reservation=reservation).exists() is False
+
+    with freeze_time(local_datetime(2024, 1, 3, 12)):
+        Reservation.objects.cancel_handled_with_payment_overdue()
+
+    reservation = Reservation.objects.get(pk=reservation.pk)
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+    assert reservation.price == Decimal(0)
 
 
 @patch_method(PindoraService.activate_access_code)
@@ -354,6 +434,39 @@ def test_reservation__approve__pindora_api__call_fails(graphql):
     assert PindoraService.create_access_code.called is False
 
     assert SentryLogger.log_exception.called is True
+
+
+@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_reservation_created_staff_notification_email)
+def test_reservation__approve__pindora_api__series__access_code_not_generated(graphql):
+    reservation_unit = ReservationUnitFactory.create_free(
+        access_types__access_type=AccessType.ACCESS_CODE,
+    )
+    series = ReservationSeriesFactory.create(reservation_unit=reservation_unit)
+
+    reservation = ReservationFactory.create(
+        reservation_unit=reservation_unit,
+        reservation_series=series,
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        access_type=AccessType.ACCESS_CODE,
+        access_code_is_active=False,
+        access_code_generated_at=None,
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
+        response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.get(pk=reservation.pk)
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+    assert reservation.access_code_is_active is False
+
+    assert EmailService.send_reservation_confirmed_email.called is True
+    assert EmailService.send_reservation_created_staff_notification_email.called is True
 
 
 @freeze_time(local_datetime(2024, 1, 1, 12))

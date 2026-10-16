@@ -1,19 +1,18 @@
 from __future__ import annotations
 
-from itertools import chain
 from typing import TYPE_CHECKING
 
 import graphene
 from graphene import ObjectType
 from graphene_django_extensions import DjangoNode
 from query_optimizer import ManuallyOptimizedField
-from query_optimizer.optimizer import QueryOptimizer
 
 from tilavarauspalvelu.enums import UserPermissionChoice
-from tilavarauspalvelu.models import GeneralRole, Unit, UnitGroup, UnitRole
+from tilavarauspalvelu.models import GeneralRole, UnitRole
 
 if TYPE_CHECKING:
     from django.db import models
+    from query_optimizer.optimizer import QueryOptimizer
 
     from tilavarauspalvelu.typing import AnyUser, GQLInfo
 
@@ -25,8 +24,8 @@ __all__ = [
 
 
 class GeneralRoleNode(DjangoNode):
-    permissions = graphene.List(
-        graphene.NonNull(graphene.Enum.from_enum(UserPermissionChoice)),
+    permissions = ManuallyOptimizedField(
+        graphene.List(graphene.NonNull(graphene.Enum.from_enum(UserPermissionChoice))),
         required=True,
     )
 
@@ -42,10 +41,12 @@ class GeneralRoleNode(DjangoNode):
         ]
 
     def resolve_permissions(root: GeneralRole, info: GQLInfo) -> list[UserPermissionChoice]:
-        user: AnyUser = info.context.user
-        if user.is_anonymous or not user.is_active:
-            return []
-        return user.active_general_permissions
+        return sorted(root.role.permissions)
+
+    @staticmethod
+    def optimize_permissions(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        optimizer.only_fields.append("role")
+        return queryset
 
 
 class UnitRoleNode(DjangoNode):
@@ -68,40 +69,11 @@ class UnitRoleNode(DjangoNode):
         ]
 
     def resolve_permissions(root: UnitRole, info: GQLInfo) -> list[UserPermissionChoice]:
-        user: AnyUser = info.context.user
-        if user.is_anonymous or not user.is_active:
-            return []
-
-        # If user has this role in any of their active unit or unit group roles, return permissions for the role
-        if root.role in chain(*user.active_unit_roles.values(), *user.active_unit_group_roles.values()):
-            return sorted(root.role.permissions)
-
-        return []
+        return sorted(root.role.permissions)
 
     @staticmethod
     def optimize_permissions(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
-        unit_optimizer = optimizer.get_or_set_child_optimizer(
-            name="units",
-            optimizer=QueryOptimizer(
-                Unit,
-                optimizer.info,
-                name="units",
-                parent=optimizer,
-            ),
-            set_as="prefetch_related",
-        )
-        unit_optimizer.only_fields.append("pk")
-        unit_group_optimizer = optimizer.get_or_set_child_optimizer(
-            name="unit_groups",
-            optimizer=QueryOptimizer(
-                UnitGroup,
-                optimizer.info,
-                name="unit_groups",
-                parent=optimizer,
-            ),
-            set_as="prefetch_related",
-        )
-        unit_group_optimizer.only_fields.append("pk")
+        optimizer.only_fields.append("role")
         return queryset
 
 

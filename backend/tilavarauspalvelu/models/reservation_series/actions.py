@@ -11,7 +11,7 @@ from tilavarauspalvelu.enums import AccessType, RejectionReadinessChoice, Weekda
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.models import ApplicationSection, RejectedOccurrence, Reservation
 from tilavarauspalvelu.typing import ReservationPeriod
-from utils.date_utils import DEFAULT_TIMEZONE, get_periods_between, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, end_time_as_timedelta, get_periods_between, local_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
@@ -61,7 +61,8 @@ class ReservationSeriesActions:
 
         # Times are saved in finnish time.
         begin_datetime = datetime.datetime.combine(begin_date, begin_time, tzinfo=DEFAULT_TIMEZONE)
-        end_datetime = datetime.datetime.combine(end_date, end_time, tzinfo=DEFAULT_TIMEZONE)
+        end_datetime = datetime.datetime.combine(end_date, datetime.time(), tzinfo=DEFAULT_TIMEZONE)
+        end_datetime += end_time_as_timedelta(end_time)
 
         reservation_unit = self.reservation_series.reservation_unit
 
@@ -170,7 +171,8 @@ class ReservationSeriesActions:
 
         # Times are saved in finnish time.
         start = datetime.datetime.combine(begin_date, begin_time, tzinfo=DEFAULT_TIMEZONE)
-        end = datetime.datetime.combine(end_date, end_time, tzinfo=DEFAULT_TIMEZONE)
+        end = datetime.datetime.combine(end_date, datetime.time(), tzinfo=DEFAULT_TIMEZONE)
+        end += end_time_as_timedelta(end_time)
 
         timespans: ReservableTimeSpanQuerySet = hauki_resource.reservable_time_spans.all()  # type: ignore[assignment]
         timespans = timespans.overlapping_with_period(start=start, end=end)

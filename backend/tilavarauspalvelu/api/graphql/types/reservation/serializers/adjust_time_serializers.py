@@ -10,7 +10,7 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.typing import ReservationAdjustTimeData, error_codes
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference
 from utils.external_service.errors import ExternalServiceError
 
 
@@ -51,6 +51,7 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
 
         begins_at = data["begins_at"].astimezone(DEFAULT_TIMEZONE)
         ends_at = data["ends_at"].astimezone(DEFAULT_TIMEZONE)
+        duration = datetime_difference(start_datetime=begins_at, end_datetime=ends_at)
 
         current_begin = self.instance.begins_at.astimezone(DEFAULT_TIMEZONE)
 
@@ -60,7 +61,7 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
         reservation_unit.validators.validate_reservation_unit_is_published()
         reservation_unit.validators.validate_reservation_unit_is_reservable_at(begin=begins_at)
         reservation_unit.validators.validate_begin_before_end(begin=begins_at, end=ends_at)
-        reservation_unit.validators.validate_duration_is_allowed(duration=ends_at - begins_at)
+        reservation_unit.validators.validate_duration_is_allowed(duration=duration)
         reservation_unit.validators.validate_reservation_days_before(begin=begins_at)
         reservation_unit.validators.validate_reservation_unit_is_open(begin=begins_at, end=ends_at)
         reservation_unit.validators.validate_not_rescheduled_to_paid_date(begin=begins_at)

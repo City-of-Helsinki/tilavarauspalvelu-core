@@ -46,5 +46,5 @@ class ApplicationSectionActions:
             ),
         )
 
-    def get_last_reservation(self) -> Reservation | None:
-        return self.get_reservations().last()
+    def get_last_cancelled_reservation(self) -> Reservation | None:
+        return self.get_reservations().filter(cancel_reason__isnull=False).last()

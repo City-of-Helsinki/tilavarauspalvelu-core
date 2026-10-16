@@ -24,7 +24,7 @@ from tilavarauspalvelu.models import Reservation, ReservationStatistic, Reservat
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from tilavarauspalvelu.models.reservation_statistic.queryset import statistics_retention_cutoff
 from tilavarauspalvelu.tasks import delete_pindora_reservation_task
-from utils.date_utils import local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.db import Now
 from utils.mixins import SerializableModelManagerMixin
 
@@ -127,13 +127,14 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
         All reservations that are going to occur in the given reservation unit
         that overlap with a period, even partially.
         """
+        # Whole-day buffers depend on the local time of day.
+        if buffer_time_before is None:
+            buffer_time_before = reservation_unit.actions.get_actual_before_buffer(begin.astimezone(DEFAULT_TIMEZONE))
+        if buffer_time_after is None:
+            buffer_time_after = reservation_unit.actions.get_actual_after_buffer(end.astimezone(DEFAULT_TIMEZONE))
+
         begin = begin.astimezone(datetime.UTC)
         end = end.astimezone(datetime.UTC)
-
-        if buffer_time_before is None:
-            buffer_time_before = reservation_unit.actions.get_actual_before_buffer(begin)
-        if buffer_time_after is None:
-            buffer_time_after = reservation_unit.actions.get_actual_after_buffer(end)
 
         qs = (
             self
@@ -254,8 +255,9 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
         """
         self.update(
             access_code_is_active=models.Case(
+                # A reservation without a generated access code cannot be active. See 'no_access_code_but_active'.
                 models.When(
-                    L(access_code_should_be_active=True),
+                    L(access_code_should_be_active=True) & models.Q(access_code_generated_at__isnull=False),
                     then=models.Value(True),  # noqa: FBT003
                 ),
                 default=models.Value(False),  # noqa: FBT003
@@ -402,17 +404,20 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
 class ReservationManager(SerializableModelManagerMixin, ModelManager[Reservation, ReservationQuerySet]):
     def delete_unfinished(self) -> None:
         """Delete any reservations that have not completed checkout in time. Handle required integrations."""
-        qs = self.all().unfinished()
+        with transaction.atomic():
+            # Lock the rows, so that a checkout that completes at the same time is not deleted.
+            qs = self.all().unfinished().select_for_update(of=("self",))
+            reservations: list[Reservation] = list(qs)
 
-        reservation: Reservation
-        for reservation in qs:
+            pks = [reservation.pk for reservation in reservations]
+            self.filter(pk__in=pks).delete()
+
+        for reservation in reservations:
             if reservation.access_code_generated_at is not None:
                 try:
-                    PindoraClient.delete_reservation(reservation=reservation)
+                    PindoraClient.delete_reservation(reservation=reservation.ext_uuid)
                 except Exception:  # noqa: BLE001
                     delete_pindora_reservation_task.delay(str(reservation.ext_uuid))
-
-            reservation.delete()
 
     def cancel_handled_with_payment_overdue(self) -> None:
         """Cancel all unpaid handled reservations that were not paid on time. Handle required integrations."""
@@ -453,4 +458,8 @@ class ReservationManager(SerializableModelManagerMixin, ModelManager[Reservation
             try:
                 self.model.objects.filter(pk__in=batch).upsert_statistics()
             except IntegrityError as error:
-                SentryLogger.log_exception(error, details="Failed to create missing reservation statistics.")
+                SentryLogger.log_exception(
+                    error,
+                    details="Failed to create missing reservation statistics.",
+                    reservation_pks=list(batch),
+                )

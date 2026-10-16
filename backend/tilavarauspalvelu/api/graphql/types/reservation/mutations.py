@@ -157,10 +157,8 @@ class ReservationDeleteTentativeMutation(DeleteMutation):
                 msg = "Reservation which is paid cannot be deleted."
                 raise ValidationError(msg, code=error_codes.ORDER_CANCELLATION_NOT_ALLOWED)
 
-            if payment_order.status not in OrderStatus.can_be_cancelled_statuses:
-                return
-
-            payment_order.actions.cancel_together_with_verkkokauppa(cancel_on_error=True)
+            if payment_order.status in OrderStatus.can_be_cancelled_statuses:
+                payment_order.actions.cancel_together_with_verkkokauppa(cancel_on_error=True)
 
         # Try Pindora delete, but if it fails, retry in background
         if reservation.access_type == AccessType.ACCESS_CODE:

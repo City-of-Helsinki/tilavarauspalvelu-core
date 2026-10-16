@@ -3,10 +3,10 @@ from __future__ import annotations
 import pytest
 
 from tilavarauspalvelu.enums import Priority, Weekday
-from tilavarauspalvelu.models import ApplicationSection, SuitableTimeRange
+from tilavarauspalvelu.models import Application, ApplicationSection, SuitableTimeRange
 from utils.date_utils import local_date, local_time
 
-from tests.factories import ApplicationFactory, ApplicationRoundFactory
+from tests.factories import ApplicationFactory, ApplicationRoundFactory, ApplicationSectionFactory
 
 from .helpers import UPDATE_MUTATION
 
@@ -37,6 +37,40 @@ def test_update_application__single_field(graphql):
     assert response.has_errors is False, response
     application.refresh_from_db()
     assert application.additional_information == "bar"
+
+
+def test_update_application__applicant__resets_sent_at(graphql):
+    application = ApplicationFactory.create_in_status_received()
+    graphql.force_login(application.user)
+
+    input_data = {
+        "pk": application.pk,
+        "additionalInformation": "bar",
+    }
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response
+
+    application = Application.objects.get(pk=application.pk)
+    assert application.sent_at is None
+
+
+def test_update_application__staff__does_not_reset_sent_at(graphql):
+    application = ApplicationFactory.create_in_status_received()
+    sent_at = application.sent_at
+    graphql.login_with_superuser()
+
+    input_data = {
+        "pk": application.pk,
+        "additionalInformation": "bar",
+    }
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response
+
+    application = Application.objects.get(pk=application.pk)
+    assert application.additional_information == "bar"
+    assert application.sent_at == sent_at
 
 
 def test_update_application__application_sections__replace(graphql):
@@ -128,6 +162,28 @@ def test_update_application__application_sections__not_deleted_if_not_given(grap
 
     suitable = section.suitable_time_ranges.first()
     assert suitable.pk == old_range_pk
+
+
+def test_update_application__application_sections__section_of_another_application(graphql):
+    application = ApplicationFactory.create_in_status_draft()
+    other_section = ApplicationSectionFactory.create_in_status_unallocated()
+    other_application_pk = other_section.application.pk
+
+    graphql.force_login(application.user)
+
+    input_data = {
+        "pk": application.pk,
+        "applicationSections": [{"pk": other_section.pk}],
+    }
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationSections.0.nonFieldErrors") == [
+        f"Application section {other_section.pk} does not belong to this application.",
+    ]
+
+    other_section = ApplicationSection.objects.get(pk=other_section.pk)
+    assert other_section.application.pk == other_application_pk
 
 
 def test_update_application__application_sections__too_many(graphql, settings):

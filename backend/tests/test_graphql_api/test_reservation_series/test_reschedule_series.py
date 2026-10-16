@@ -464,7 +464,7 @@ def test_reservation_series__reschedule_series__end_time_before_begin_time__same
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == [
-        "Begin time cannot be after end time if on the same day.",
+        "Begin time cannot be after end time.",
     ]
 
 
@@ -483,8 +483,10 @@ def test_reservation_series__reschedule_series__end_time_before_begin_time__diff
     graphql.login_with_superuser()
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
-    # It's enough to check that the mutation was successful, unlike the tests above.
-    assert response.has_errors is False
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Begin time cannot be after end time.",
+    ]
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday

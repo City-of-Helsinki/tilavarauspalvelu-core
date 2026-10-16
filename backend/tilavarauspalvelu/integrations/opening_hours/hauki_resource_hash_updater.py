@@ -8,7 +8,9 @@ from django.db import transaction
 from tilavarauspalvelu.exceptions import ReservableTimeSpanClientNothingToDoError, ReservableTimeSpanClientValueError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import OriginHaukiResource
+from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIResource
@@ -41,7 +43,10 @@ class HaukiResourceHashUpdater:
             return
 
         for resource in fetched_hauki_resources:
-            self._process_single_hauki_resource(resource, force_refetch=force_refetch)
+            try:
+                self._process_single_hauki_resource(resource, force_refetch=force_refetch)
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Hauki resource: {resource['id']}")
 
         self._log_results()
 

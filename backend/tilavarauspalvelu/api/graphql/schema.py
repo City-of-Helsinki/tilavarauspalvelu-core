@@ -204,7 +204,6 @@ class Query(graphene.ObjectType):
     order = Field(PaymentOrderNode, order_uuid=graphene.String(required=True))
     #
     # User
-    user = UserNode.Node()
     current_user = UserNode.Field()
     check_permissions = Field(
         PermissionCheckerType,

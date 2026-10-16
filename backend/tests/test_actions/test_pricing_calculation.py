@@ -7,9 +7,9 @@ import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import PriceUnit
-from utils.date_utils import local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
-from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory, ReservationUnitPricingFactory
 
 # Applied to all tests
 pytestmark = [
@@ -86,6 +86,47 @@ def test_calculate_reservation_price__pricing_is_fixed_even_when_duration_is_dou
     price = pricing.actions.calculate_reservation_price(duration=end - begin)
 
     assert price == pricing.lowest_price
+
+
+def test_calculate_full_price__duration_over_daylight_saving_time_change():
+    reservation_unit = ReservationUnitFactory.create(
+        pricings__price_unit=PriceUnit.PER_HOUR,
+        pricings__lowest_price=Decimal(5),
+        pricings__highest_price=Decimal(10),
+    )
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
+
+    begin = datetime.datetime(2026, 10, 25, 1, 0, tzinfo=DEFAULT_TIMEZONE)
+    end = datetime.datetime(2026, 10, 25, 7, 0, tzinfo=DEFAULT_TIMEZONE)
+
+    price = reservation.actions.calculate_full_price(begin_datetime=begin, end_datetime=end)
+
+    # 7 hours at 10 per hour. The price per minute (10 / 60) is rounded, so the result has a small remainder.
+    assert price == Decimal("70.00000000000000000000000001")
+
+
+def test_calculate_full_price__uses_pricing_of_local_begin_date_for_utc_datetimes():
+    reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitPricingFactory.create(
+        reservation_unit=reservation_unit,
+        begins=datetime.date(2026, 1, 1),
+        price_unit=PriceUnit.FIXED,
+        highest_price=Decimal(10),
+    )
+    ReservationUnitPricingFactory.create(
+        reservation_unit=reservation_unit,
+        begins=datetime.date(2027, 1, 15),
+        price_unit=PriceUnit.FIXED,
+        highest_price=Decimal(50),
+    )
+    reservation = ReservationFactory.create(reservation_unit=reservation_unit)
+
+    begin = datetime.datetime(2027, 1, 15, 1, 0, tzinfo=DEFAULT_TIMEZONE).astimezone(datetime.UTC)
+    end = begin + datetime.timedelta(hours=1)
+
+    price = reservation.actions.calculate_full_price(begin_datetime=begin, end_datetime=end)
+
+    assert price == Decimal(50)
 
 
 def test_get_active_pricing__future_has_same_tax_percentage():

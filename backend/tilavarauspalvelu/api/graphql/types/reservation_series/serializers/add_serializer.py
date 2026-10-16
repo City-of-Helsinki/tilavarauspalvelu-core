@@ -99,7 +99,7 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         reservation.id = None
 
         reservation.begins_at = validated_data["begins_at"]
-        reservation.ends_at = validated_data["begins_at"]
+        reservation.ends_at = validated_data["ends_at"]
         reservation.buffer_time_before = validated_data["buffer_time_before"]
         reservation.buffer_time_after = validated_data["buffer_time_after"]
         reservation.access_type = validated_data["access_type"]
@@ -114,6 +114,8 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         reservation.confirmed_at = now
         reservation.handling_details = ""
         reservation.cancel_details = ""
+        reservation.cancel_reason = None
+        reservation.deny_reason = None
 
         reservation.save()
 

@@ -16,7 +16,11 @@ from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixi
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation, ReservationDenyReason
-from tilavarauspalvelu.tasks import cancel_payment_order_for_invoice_task, refund_payment_order_for_webshop_task
+from tilavarauspalvelu.tasks import (
+    cancel_payment_order_for_invoice_task,
+    create_statistics_for_reservations_task,
+    refund_payment_order_for_webshop_task,
+)
 from utils.date_utils import local_date, local_datetime
 
 from .filters import (
@@ -259,7 +263,7 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
             price__gt=0,
             payment_order__isnull=False,
             payment_order__status=OrderStatus.PAID_BY_INVOICE,
-            begins_at__date__lte=local_date(),
+            begins_at__date__gte=local_date(),
         ).count()
 
         deny_reasons = ReservationDenyReason.objects.all().order_by("reason")
@@ -285,14 +289,20 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
 
     def _deny_reservations_action_set_denied(self, request: WSGIRequest, queryset: QuerySet[Reservation]) -> None:
         deny_reason = request.POST.get("deny_reason")
-        queryset.filter(
+        deniable_reservations = queryset.filter(
             state__in=ReservationStateChoice.states_that_can_change_to_deny,
             ends_at__gte=local_datetime(),
-        ).update(
+        )
+        # Read before the update, since denied reservations no longer match the queryset.
+        denied_reservation_pks = list(deniable_reservations.values_list("pk", flat=True))
+        deniable_reservations.update(
             state=ReservationStateChoice.DENIED,
             handled_at=local_datetime(),
             deny_reason=deny_reason,
         )
+
+        if settings.SAVE_RESERVATION_STATISTICS:
+            create_statistics_for_reservations_task.delay_on_commit(reservation_pks=denied_reservation_pks)
 
         msg = _("Selected reservations have been denied.")
         self.message_user(request, msg, level=messages.INFO)
@@ -353,7 +363,7 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
             price__gt=0,
             payment_order__isnull=False,
             payment_order__status=OrderStatus.PAID_BY_INVOICE,
-            begins_at__date__lte=local_date(),
+            begins_at__date__gte=local_date(),
         )
         for reservation in cancel_queryset:
             payment_order = reservation.payment_order

@@ -8,7 +8,7 @@ from lookup_property import L
 from tilavarauspalvelu.enums import AccessCodeState, AccessType
 from tilavarauspalvelu.models import AllocatedTimeSlot, ReservationUnit
 from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
-from utils.date_utils import merge_time_slots
+from utils.date_utils import end_time_as_timedelta, merge_time_slots, time_as_timedelta
 
 if TYPE_CHECKING:
     import datetime
@@ -75,8 +75,8 @@ class AllocatedTimeSlotQuerySet(ModelQuerySet[AllocatedTimeSlot]):
             self
             .filter(
                 day_of_the_week=day_of_the_week,
-                reservation_unit_option__application_section__reservations_begin_date__lt=end_date,
-                reservation_unit_option__application_section__reservations_end_date__gt=begin_date,
+                reservation_unit_option__application_section__reservations_begin_date__lte=end_date,
+                reservation_unit_option__application_section__reservations_end_date__gte=begin_date,
                 reservation_unit_option__reservation_unit__in=(
                     reservation_unit_option.reservation_unit.actions.reservation_units_with_common_hierarchy
                 ),
@@ -88,7 +88,12 @@ class AllocatedTimeSlotQuerySet(ModelQuerySet[AllocatedTimeSlot]):
 
         # If the allocated period overlaps with any of the merged periods,
         # it cannot be allocated. Otherwise, it can be allocated.
-        return any(slot["end_time"] > begin_time and slot["begin_time"] < end_time for slot in merged)
+        begin = time_as_timedelta(begin_time)
+        end = end_time_as_timedelta(end_time)
+        return any(
+            end_time_as_timedelta(slot["end_time"]) > begin and time_as_timedelta(slot["begin_time"]) < end
+            for slot in merged
+        )
 
     def affecting_allocations(self, reservation_unit: int, begin_date: datetime.date, end_date: datetime.date) -> Self:
         return (

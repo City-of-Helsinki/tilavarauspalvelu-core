@@ -15,7 +15,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnit
 from tilavarauspalvelu.typing import error_codes
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -51,6 +51,7 @@ class ReservationCreateSerializer(NestingModelSerializer):
         reservation_unit = data["reservation_unit"]
         begins_at = data["begins_at"].astimezone(DEFAULT_TIMEZONE)
         ends_at = data["ends_at"].astimezone(DEFAULT_TIMEZONE)
+        duration = datetime_difference(start_datetime=begins_at, end_datetime=ends_at)
 
         # Endpoint requires users to be logged in
         user: User = self.context["request"].user
@@ -63,7 +64,7 @@ class ReservationCreateSerializer(NestingModelSerializer):
         reservation_unit.validators.validate_user_is_adult_if_required(user=user)
         reservation_unit.validators.validate_user_has_not_exceeded_max_reservations(user=user)
         reservation_unit.validators.validate_begin_before_end(begin=begins_at, end=ends_at)
-        reservation_unit.validators.validate_duration_is_allowed(duration=ends_at - begins_at)
+        reservation_unit.validators.validate_duration_is_allowed(duration=duration)
         reservation_unit.validators.validate_reservation_days_before(begin=begins_at)
         reservation_unit.validators.validate_reservation_unit_is_open(begin=begins_at, end=ends_at)
         reservation_unit.validators.validate_not_in_open_application_round(begin=begins_at.date(), end=ends_at.date())
@@ -87,7 +88,7 @@ class ReservationCreateSerializer(NestingModelSerializer):
         data["user"] = user
         data["reservee_used_ad_login"] = getattr(user.id_token, "is_ad_login", False)
 
-        data["price"] = pricing.actions.calculate_reservation_price(duration=ends_at - begins_at)
+        data["price"] = pricing.actions.calculate_reservation_price(duration=duration)
         data["unit_price"] = pricing.highest_price
         data["tax_percentage_value"] = pricing.tax_percentage.value
         data["non_subsidised_price"] = data["price"]
@@ -140,6 +141,19 @@ class ReservationCreateSerializer(NestingModelSerializer):
             reservation.delete()
             msg = "Overlapping reservations were created at the same time."
             raise ValidationError(msg, code=error_codes.OVERLAPPING_RESERVATIONS)
+
+        # Check the maximum number of reservations again for the same reason.
+        reservation_unit = reservation.reservation_unit
+        if reservation_unit.max_reservations_per_user is not None:
+            user_reservations = Reservation.objects.all().filter_for_user_num_active_reservations(
+                reservation_unit,
+                reservation.user,
+            )
+            user_reservation_count = user_reservations.count()
+            if user_reservation_count > reservation_unit.max_reservations_per_user:
+                reservation.delete()
+                msg = "Maximum number of active reservations for this reservation unit exceeded."
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MAX_NUMBER_OF_RESERVATIONS_EXCEEDED)
 
         # Pindora request must succeed, otherwise the reservation is removed.
         # Do this after the second overlapping reservation check, so that we don't need to

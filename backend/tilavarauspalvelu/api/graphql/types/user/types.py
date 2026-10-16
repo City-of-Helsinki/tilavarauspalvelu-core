@@ -64,9 +64,14 @@ class UserNode(DjangoNode):
         permission_classes = [UserPermission]
 
     def resolve_general_roles(root: User, info: GQLInfo) -> GeneralRoleQuerySet:
+        # Only the user can see their own roles and permissions.
+        if root != info.context.user:
+            return root.general_roles.none()
         return root.general_roles.filter(is_role_active=True)
 
     def resolve_unit_roles(root: User, info: GQLInfo) -> UnitRoleQuerySet:
+        if root != info.context.user:
+            return root.unit_roles.none()
         return root.unit_roles.filter(is_role_active=True)
 
     def resolve_reservation_notification(root: User, info: GQLInfo) -> str | None:

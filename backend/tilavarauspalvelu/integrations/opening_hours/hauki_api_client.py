@@ -4,6 +4,7 @@ import itertools
 from typing import TYPE_CHECKING, Any, NotRequired, TypedDict, Unpack
 
 from django.conf import settings
+from rest_framework.status import HTTP_200_OK
 
 from tilavarauspalvelu.exceptions import HaukiAPIError, HaukiConfigurationError
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
@@ -176,6 +177,10 @@ class HaukiAPIClient(BaseExternalServiceClient):
 
         # Get the data from Hauki API
         response = cls.get(url=url, params=query_params)
+        if response.status_code != HTTP_200_OK:
+            msg = f"Hauki API returned status {response.status_code} for opening hours of '{hauki_resource_id}'."
+            raise HaukiAPIError(msg)
+
         response_json: HaukiAPIOpeningHoursResponse = cls.response_json(response)
 
         if response_json["count"] == 0:

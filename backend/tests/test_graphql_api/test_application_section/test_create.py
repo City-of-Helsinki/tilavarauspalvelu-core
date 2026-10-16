@@ -5,7 +5,7 @@ import datetime
 import pytest
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice
-from tilavarauspalvelu.models import ApplicationSection
+from tilavarauspalvelu.models import Application, ApplicationSection
 
 from tests.factories import ApplicationFactory
 from tests.test_graphql_api.test_application_section.helpers import CREATE_MUTATION, get_application_section_create_data
@@ -55,6 +55,63 @@ def test_application_section__create(graphql):
     assert section.reservation_unit_options.count() == 1
 
     assert section.status == ApplicationSectionStatusChoice.UNALLOCATED
+
+
+def test_application_section__create__resets_application_sent_at(graphql):
+    application = ApplicationFactory.create_in_status_received()
+    graphql.force_login(application.user)
+
+    data = get_application_section_create_data(application=application)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response
+
+    application = Application.objects.get(pk=application.pk)
+    assert application.sent_at is None
+
+
+def test_application_section__create__staff__does_not_reset_application_sent_at(graphql):
+    application = ApplicationFactory.create_in_status_received()
+    sent_at = application.sent_at
+    graphql.login_with_superuser()
+
+    data = get_application_section_create_data(application=application)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response
+
+    application = Application.objects.get(pk=application.pk)
+    assert application.sent_at == sent_at
+
+
+def test_application_section__create__too_many_sections(graphql, settings):
+    settings.MAXIMUM_SECTIONS_PER_APPLICATION = 1
+
+    application = ApplicationFactory.create_in_status_draft()
+    graphql.force_login(application.user)
+
+    data = get_application_section_create_data(application=application)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Cannot create more than 1 application sections in one application",
+    ]
+
+    assert ApplicationSection.objects.filter(application=application).count() == 1
+
+
+def test_application_section__create__application_round_not_open(graphql):
+    application = ApplicationFactory.create_in_status_in_allocation_no_sections()
+    graphql.login_with_superuser()
+
+    data = get_application_section_create_data(application=application)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Application round is not open for applications"]
+
+    assert ApplicationSection.objects.filter(application=application).exists() is False
 
 
 def test_application_section__create__smaller_max_duration_than_min_duration(graphql):

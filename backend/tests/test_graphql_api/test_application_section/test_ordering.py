@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from tests.factories import ApplicationFactory, ApplicationSectionFactory, ReservationUnitOptionFactory
+from tests.factories import ApplicationFactory, ApplicationSectionFactory
 from tests.test_graphql_api.test_application_section.helpers import sections_query
 
 # Applied to all tests
@@ -280,46 +280,37 @@ def test_application_section__order__by_preferred_unit_name(graphql, lang, order
     order = list(reversed(order)) if direction == "desc" else order
 
     sections = {
-        0: ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None),
-        1: ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None),
-        2: ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None),
-        3: ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None),
+        0: ApplicationSectionFactory.create_in_status_unallocated(
+            reservation_unit_options__preferred_order=0,
+            reservation_unit_options__reservation_unit__unit__name="A",
+            reservation_unit_options__reservation_unit__unit__name_fi="A",
+            reservation_unit_options__reservation_unit__unit__name_sv="A",
+            reservation_unit_options__reservation_unit__unit__name_en="B",
+        ),
+        1: ApplicationSectionFactory.create_in_status_unallocated(
+            reservation_unit_options__preferred_order=0,
+            reservation_unit_options__reservation_unit__unit__name="B",
+            reservation_unit_options__reservation_unit__unit__name_fi="B",
+            reservation_unit_options__reservation_unit__unit__name_sv="B",
+            reservation_unit_options__reservation_unit__unit__name_en="A",
+        ),
+        # Shouldn't be counted, since preferred order not 0
+        2: ApplicationSectionFactory.create_in_status_unallocated(
+            reservation_unit_options__preferred_order=1,
+            reservation_unit_options__reservation_unit__unit__name="C",
+            reservation_unit_options__reservation_unit__unit__name_fi="C",
+            reservation_unit_options__reservation_unit__unit__name_sv="X",
+            reservation_unit_options__reservation_unit__unit__name_en="A",
+        ),
+        # Shouldn't be counted, since preferred order not 0
+        3: ApplicationSectionFactory.create_in_status_unallocated(
+            reservation_unit_options__preferred_order=1,
+            reservation_unit_options__reservation_unit__unit__name="A",
+            reservation_unit_options__reservation_unit__unit__name_fi="A",
+            reservation_unit_options__reservation_unit__unit__name_sv="X",
+            reservation_unit_options__reservation_unit__unit__name_en="X",
+        ),
     }
-
-    ReservationUnitOptionFactory.create(
-        application_section=sections[0],
-        preferred_order=0,
-        reservation_unit__unit__name="A",
-        reservation_unit__unit__name_fi="A",
-        reservation_unit__unit__name_sv="A",
-        reservation_unit__unit__name_en="B",
-    )
-    ReservationUnitOptionFactory.create(
-        application_section=sections[1],
-        preferred_order=0,
-        reservation_unit__unit__name="B",
-        reservation_unit__unit__name_fi="B",
-        reservation_unit__unit__name_sv="B",
-        reservation_unit__unit__name_en="A",
-    )
-    # Shouldn't be counted, since preferred order not 0
-    ReservationUnitOptionFactory.create(
-        application_section=sections[2],
-        preferred_order=1,
-        reservation_unit__unit__name="C",
-        reservation_unit__unit__name_fi="C",
-        reservation_unit__unit__name_sv="X",
-        reservation_unit__unit__name_en="A",
-    )
-    # Shouldn't be counted, since preferred order not 0
-    ReservationUnitOptionFactory.create(
-        application_section=sections[3],
-        preferred_order=1,
-        reservation_unit__unit__name="A",
-        reservation_unit__unit__name_fi="A",
-        reservation_unit__unit__name_sv="X",
-        reservation_unit__unit__name_en="X",
-    )
 
     graphql.login_with_superuser()
 

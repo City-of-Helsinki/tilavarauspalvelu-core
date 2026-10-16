@@ -397,6 +397,39 @@ def test_allocated_time_slot__create__approved_time_falls_on_two_back_to_back_su
     assert response.has_errors is False, response
 
 
+def test_allocated_time_slot__create__suitable_time_range_ends_at_midnight(graphql):
+    application = ApplicationFactory.create_application_ready_for_allocation(times_slots_to_create=0)
+    section = application.application_sections.first()
+    option = section.reservation_unit_options.first()
+    graphql.login_with_superuser()
+
+    SuitableTimeRangeFactory.create(
+        application_section=section,
+        day_of_the_week=Weekday.MONDAY,
+        begin_time=datetime.time(18, 0),
+        end_time=datetime.time(0, 0),
+    )
+
+    input_data = allocation_create_data(option, begin_time=datetime.time(21, 0), end_time=datetime.time(23, 0))
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
+
+    assert response.has_errors is False, response
+
+
+def test_allocated_time_slot__create__allocation_ends_at_midnight__outside_of_suitable_time_ranges(graphql):
+    application = ApplicationFactory.create_application_ready_for_allocation()
+    section = application.application_sections.first()
+    option = section.reservation_unit_options.first()
+    graphql.login_with_superuser()
+
+    input_data = allocation_create_data(option, begin_time=datetime.time(22, 0), end_time=datetime.time(0, 0))
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
+
+    assert response.field_error_messages() == [
+        "Given time slot does not fit within applicants suitable time ranges.",
+    ]
+
+
 def test_allocated_time_slot__create__approved_time_falls_on_two_separated_wished_times(graphql):
     # given:
     # - There is an allocatable reservation unit option
@@ -547,6 +580,78 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation_for_sa
 
     # then:
     # - The response complains about the there being another allocation already.
+    assert response.field_error_messages() == [
+        (
+            "Given time slot has already been allocated for another application section "
+            "with a related reservation unit or resource."
+        ),
+    ]
+
+
+@pytest.mark.parametrize(
+    ("existing_begin_time", "existing_end_time", "new_begin_time", "new_end_time"),
+    [
+        (datetime.time(20, 0), datetime.time(0, 0), datetime.time(21, 0), datetime.time(22, 0)),
+        (datetime.time(21, 0), datetime.time(22, 0), datetime.time(20, 0), datetime.time(0, 0)),
+    ],
+)
+def test_allocated_time_slot__create__overlapping_with_another_allocation__ends_at_midnight(
+    graphql,
+    existing_begin_time,
+    existing_end_time,
+    new_begin_time,
+    new_end_time,
+):
+    reservation_unit = ReservationUnitFactory.create(spaces=[SpaceFactory.create()])
+    application = ApplicationFactory.create_application_ready_for_allocation(reservation_unit=reservation_unit)
+    option = application.application_sections.first().reservation_unit_options.first()
+
+    other_application = ApplicationFactory.create_application_ready_for_allocation(reservation_unit=reservation_unit)
+    other_option = other_application.application_sections.first().reservation_unit_options.first()
+    AllocatedTimeSlotFactory.create(
+        reservation_unit_option=other_option,
+        day_of_the_week=Weekday.MONDAY,
+        begin_time=existing_begin_time,
+        end_time=existing_end_time,
+    )
+    ReservationUnitHierarchy.refresh()
+
+    graphql.login_with_superuser()
+
+    input_data = allocation_create_data(option, begin_time=new_begin_time, end_time=new_end_time, force=True)
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
+
+    assert response.field_error_messages() == [
+        (
+            "Given time slot has already been allocated for another application section "
+            "with a related reservation unit or resource."
+        ),
+    ]
+
+
+def test_allocated_time_slot__create__overlapping_with_another_allocation__sections_share_a_date(graphql):
+    shared_monday = datetime.date(2030, 1, 7)
+    reservation_unit = ReservationUnitFactory.create(spaces=[SpaceFactory.create()])
+    application = ApplicationFactory.create_application_ready_for_allocation(
+        reservation_unit=reservation_unit,
+        begin_date=shared_monday,
+        end_date=shared_monday + datetime.timedelta(days=7),
+    )
+    option = application.application_sections.first().reservation_unit_options.first()
+
+    ApplicationFactory.create_application_ready_for_allocation(
+        reservation_unit=reservation_unit,
+        begin_date=shared_monday - datetime.timedelta(days=7),
+        end_date=shared_monday,
+        pre_allocated=True,
+    )
+    ReservationUnitHierarchy.refresh()
+
+    graphql.login_with_superuser()
+
+    input_data = allocation_create_data(option)
+    response = graphql(CREATE_ALLOCATION, input_data=input_data)
+
     assert response.field_error_messages() == [
         (
             "Given time slot has already been allocated for another application section "

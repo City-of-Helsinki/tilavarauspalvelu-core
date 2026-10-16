@@ -127,7 +127,18 @@ class PaymentOrderActions:
             return
 
         reservation = self.payment_order.reservation
-        if reservation is None:
+        will_not_happen = {ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED}
+        if reservation is None or reservation.state in will_not_happen:
+            msg = (
+                "Verkkokauppa: Order was paid, but its reservation does not exist or will not happen. "
+                "Refund it manually."
+            )
+            details = {
+                "payment_order": self.payment_order.pk,
+                "remote_id": str(self.payment_order.remote_id),
+                "reservation": reservation.pk if reservation is not None else None,
+            }
+            SentryLogger.log_message(msg, details=details, level="error")
             return
 
         previous_state = reservation.state

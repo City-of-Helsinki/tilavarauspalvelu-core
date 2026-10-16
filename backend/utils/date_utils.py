@@ -345,6 +345,13 @@ def time_as_timedelta(_input: datetime.datetime | datetime.time, /) -> datetime.
     )
 
 
+def end_time_as_timedelta(_input: datetime.time, /) -> datetime.timedelta:
+    """Convert an end time to timedelta as measured from the start of the day. Midnight is the end of the day."""
+    if _input == datetime.time():
+        return datetime.timedelta(hours=24)
+    return time_as_timedelta(_input)
+
+
 def timedelta_as_time(_input: datetime.timedelta, /) -> datetime.time:
     """Convert timedelta to time as measured form the start of the day."""
     time_seconds = _input.total_seconds()
@@ -382,9 +389,13 @@ def datetime_range_as_string(*, start_datetime: datetime.datetime, end_datetime:
 
 def time_difference(_from: datetime.time, _to: datetime.time, /) -> datetime.timedelta:
     """Difference between two times as a timedelta."""
-    if _to == datetime.time():  # if end is at midnight
-        return datetime.timedelta(hours=24) - time_as_timedelta(_from)
-    return time_as_timedelta(_to) - time_as_timedelta(_from)
+    return end_time_as_timedelta(_to) - time_as_timedelta(_from)
+
+
+def datetime_difference(*, start_datetime: datetime.datetime, end_datetime: datetime.datetime) -> datetime.timedelta:
+    """Elapsed time between two datetimes. This is correct across a daylight saving time change."""
+    # Python subtracts datetimes with the same time zone by wall clock time, so subtract in UTC.
+    return end_datetime.astimezone(datetime.UTC) - start_datetime.astimezone(datetime.UTC)
 
 
 class TimeSlot(TypedDict):
@@ -396,6 +407,7 @@ def merge_time_slots(time_slots: list[TimeSlot]) -> list[TimeSlot]:
     """
     Merge time slots that overlap or touch each other.
     Time slots should be in chronological order, and on the same day.
+    An end time of 00:00 is the end of the day.
     """
     merged_slots = time_slots[:1]
 
@@ -403,8 +415,8 @@ def merge_time_slots(time_slots: list[TimeSlot]) -> list[TimeSlot]:
     for period in time_slots[1:]:
         last_period = merged_slots[-1]
         # If time periods overlap, or are next to each other -> merge them and continue.
-        if last_period["end_time"] >= period["begin_time"]:
-            last_period["end_time"] = max(period["end_time"], last_period["end_time"])
+        if end_time_as_timedelta(last_period["end_time"]) >= time_as_timedelta(period["begin_time"]):
+            last_period["end_time"] = max(period["end_time"], last_period["end_time"], key=end_time_as_timedelta)
             continue
 
         # Otherwise the periods are not contiguous -> append the period and continue.
