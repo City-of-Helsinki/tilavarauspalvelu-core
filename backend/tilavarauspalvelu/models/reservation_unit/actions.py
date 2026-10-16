@@ -507,7 +507,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         if self.requires_product_mapping_update():
             params = CreateProductParams(
                 namespace=settings.VERKKOKAUPPA_NAMESPACE,
-                namespace_entity_id=self.reservation_unit.pk,
+                namespace_entity_id=str(self.reservation_unit.pk),
                 merchant_id=str(payment_merchant.id),
             )
             api_product = VerkkokauppaAPIClient.create_product(params=params)
