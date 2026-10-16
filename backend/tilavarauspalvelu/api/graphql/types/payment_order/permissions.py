@@ -25,9 +25,13 @@ class PaymentOrderPermission(BasePermission):
     def has_node_permission(cls, instance: PaymentOrder, user: AnyUser, filters: GraphQLFilterInfo) -> bool:
         if not user.is_authenticated:
             return False
-        if instance.reservation.user == user:
+
+        reservation = instance.reservation
+        if reservation is None:
+            return False
+        if reservation.user == user:
             return True
-        return user.permissions.can_view_reservation(instance.reservation)
+        return user.permissions.can_view_reservation(reservation)
 
     @classmethod
     def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
