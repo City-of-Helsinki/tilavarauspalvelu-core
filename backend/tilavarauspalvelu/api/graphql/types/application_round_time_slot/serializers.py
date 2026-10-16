@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING
 
 from graphene_django_extensions import NestingModelSerializer
 
@@ -10,6 +10,9 @@ from tilavarauspalvelu.validators import (
     validate_reservable_times_begin_end,
     validate_reservable_times_overlap,
 )
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import TimeSlot
 
 
 class ApplicationRoundTimeSlotSerializer(NestingModelSerializer):
@@ -29,7 +32,7 @@ class ApplicationRoundTimeSlotSerializer(NestingModelSerializer):
         }
 
     @staticmethod
-    def validate_reservable_times(timeslots: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def validate_reservable_times(timeslots: list[TimeSlot]) -> list[TimeSlot]:
         validate_reservable_times_begin_end(timeslots)
         validate_reservable_times_overlap(timeslots)
         return timeslots

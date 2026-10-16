@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from query_optimizer.validators import PaginationArgs
 
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
-    from tilavarauspalvelu.typing import AnyUser
+    from tilavarauspalvelu.typing import AnyUser, WSGIRequest
 
 __all__ = [
     "ReservationUnitAllFilterSet",
@@ -46,6 +46,8 @@ __all__ = [
 
 
 class ReservationUnitFilterSetMixin:
+    request: WSGIRequest
+
     def get_only_with_permission(self, qs: ReservationUnitQuerySet, name: str, value: bool) -> QuerySet:
         """Returns reservation units where the user has any kind of permissions in its unit"""
         if not value:
@@ -317,7 +319,7 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
 
     @staticmethod
     def filter_by_access_type(qs: ReservationUnitQuerySet, name: str, value: dict[str, Any]) -> models.QuerySet:
-        allowed_access_types: list[str] = value.get("access_type")
+        allowed_access_types: list[str] | None = value.get("access_type")
         if not allowed_access_types:
             return qs
 
