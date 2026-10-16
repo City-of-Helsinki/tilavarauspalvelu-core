@@ -219,6 +219,10 @@ class ApplicationSectionSerializer(NestingModelSerializer):
                 .first()
             )
 
+        # The application round field reports the error, if the round does not exist.
+        if reservation_period is None:
+            return
+
         if reservation_period["reservation_period_begin_date"] > reservations_begin_date:
             msg = "Reservations begin date cannot be before the application round's reservation period begin date."
             errors.append(msg)
