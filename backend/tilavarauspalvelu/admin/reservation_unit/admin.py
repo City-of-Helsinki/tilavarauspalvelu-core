@@ -303,4 +303,4 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
 
         # Update ReservableTimeSpans for HaukiResource when ReservationUnit is saved
         if obj.origin_hauki_resource_id:
-            HaukiResourceHashUpdater(hauki_resource_ids=[obj.origin_hauki_resource.id]).run(force_refetch=True)
+            HaukiResourceHashUpdater(hauki_resource_ids=[obj.origin_hauki_resource_id]).run(force_refetch=True)
