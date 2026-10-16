@@ -113,7 +113,7 @@ def get_verkkokauppa_order_params(
                 ),
                 OrderItemMetaParams(
                     key="reservationNumber",
-                    value=reservation.pk,
+                    value=str(reservation.pk),
                     label=get_meta_label("reservationNumber", reservation),
                     visible_in_checkout=True,
                     ordinal="2",
