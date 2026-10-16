@@ -74,6 +74,8 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
                 street_address=None,
                 postal_code=None,
                 city=None,
+                country_code=None,
+                additional_address=None,
                 municipality_code=None,
                 municipality_name=None,
                 login_method=LoginMethod.OTHER if id_token is None else LoginMethod.AD,
