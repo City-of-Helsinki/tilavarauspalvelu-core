@@ -56,11 +56,11 @@ def use_request_user(request: WSGIRequest, user: User) -> Generator[None]:
 
 @SentryLogger.log_if_raises("Login: Failed to update user from profile")
 def update_user_from_profile(request: WSGIRequest, *, user: User | None = None) -> None:
-    user = user or request.user
-    if user.is_anonymous:
+    login_user = user or request.user
+    if login_user.is_anonymous:
         return
 
-    with use_request_user(request=request, user=user):
+    with use_request_user(request=request, user=login_user):
         after_login_additional_info = HelsinkiProfileClient.get_after_login_additional_info(
             user=request.user, session=request.session
         )
@@ -68,26 +68,30 @@ def update_user_from_profile(request: WSGIRequest, *, user: User | None = None) 
     if after_login_additional_info is None:
         SentryLogger.log_message(
             "Helsinki profile: Could not fetch JWT from Tunnistamo.",
-            details={"user_id": str(user.pk)},
+            details={"user_id": str(login_user.pk)},
         )
         return
 
     # Update the user only if it's missing profile info
-    if not user.profile_id or not user.date_of_birth:
+    if not login_user.profile_id or not login_user.date_of_birth:
         if after_login_additional_info["id"] is not None:
-            user.profile_id = after_login_additional_info["id"]
+            login_user.profile_id = after_login_additional_info["id"]
         if after_login_additional_info["birthday"] is not None:
-            user.date_of_birth = after_login_additional_info["birthday"]
-        user.save()
+            login_user.date_of_birth = after_login_additional_info["birthday"]
+        login_user.save()
 
     # In case the user HelsinkiProfile authentication has expired, the profile info can not be fetched
     # from during the reservation creation. In that case, we need to store the profile info in the session
     # so that it can be used later when creating the reservation.
     # Extract only the prefill info from the response and store it in the session
-    request.session["reservation_prefill_info"] = ReservationPrefillInfo(**{
-        k: after_login_additional_info[k]  # type: ignore[literal-required]
-        for k in list(ReservationPrefillInfo.__annotations__)
-    })
+    request.session["reservation_prefill_info"] = ReservationPrefillInfo(
+        reservee_first_name=after_login_additional_info["reservee_first_name"],
+        reservee_last_name=after_login_additional_info["reservee_last_name"],
+        reservee_email=after_login_additional_info["reservee_email"],
+        reservee_phone=after_login_additional_info["reservee_phone"],
+        reservee_address_zip=after_login_additional_info["reservee_address_zip"],
+        municipality=after_login_additional_info["municipality"],
+    )
 
 
 def migrate_user_from_tunnistamo_to_keycloak(**kwargs: Unpack[PipelineArgs]) -> dict[str, Any]:
