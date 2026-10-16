@@ -58,7 +58,7 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
         # to fetch units and unit groups for the permission checks when the queryset is evaluated,
         # and 'joins' them to the correct model instances in python.
 
-        items = list(self._result_cache)
+        items = list(self._result_cache or [])
         if not items:
             return
 

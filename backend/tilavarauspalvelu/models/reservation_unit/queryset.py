@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from itertools import islice
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Any, Self
 
 from django.contrib.postgres.search import SearchVector
 from django.db import connections, models
@@ -33,7 +33,7 @@ __all__ = [
 type ReservationUnitPK = int
 
 
-def _get_vector_translation_fallback(obj: models.Model, lang: str) -> str:
+def _get_vector_translation_fallback(obj: models.Model | None, lang: str) -> str:
     return getattr(obj, f"name_{lang}", "") or getattr(obj, "name_fi", "")
 
 
@@ -49,7 +49,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
         show_only_reservable: bool = False,
         pagination_args: PaginationArgs | None = None,
         cache_key: str = "",
-    ) -> Self:
+    ) -> ReservationUnitQuerySet:
         """Annotate the queryset with `first_reservable_time` and `is_closed` for each reservation unit."""
         helper = FirstReservableTimeHelper(
             reservation_unit_queryset=self,
@@ -66,7 +66,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
         return helper.get_annotated_queryset()
 
     @property
-    def affected_reservation_unit_ids(self) -> models.QuerySet[dict[str, int]]:
+    def affected_reservation_unit_ids(self) -> models.QuerySet[ReservationUnit, dict[str, Any]]:
         """
         Get a "values" queryset of reservation unit ids that affect a given reservation unit in the queryset.
         This can be used in two ways:
@@ -86,7 +86,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
             .distinct()
         )
 
-    def reservation_units_with_common_hierarchy(self) -> Self:
+    def reservation_units_with_common_hierarchy(self) -> ReservationUnitQuerySet:
         """
         Get a new queryset of reservation units that share a common hierarchy
         with any reservation unit in the original queryset.
