@@ -156,7 +156,6 @@ class ReservationUnitPricingFormSet(BaseInlineFormSet):
         if not is_draft and reservation_kind.allows_direct:
             payment_terms = parent_data.get("payment_terms")
 
-            form: ReservationUnitPricingForm
             for form in self.forms:
                 cleaned_data: dict[str, Any] | None = form.cleaned_data
                 if not cleaned_data:
