@@ -163,6 +163,14 @@ def save_personal_info_view_log_task(user_id: int, viewer_user_id: int, field: s
     if user == viewer_user:
         return
 
+    # The viewer can be deleted before the task runs. The log cannot name the viewer then.
+    if viewer_user is None:
+        SentryLogger.log_message(
+            message="Personal info view was not logged, since the viewer user does not exist.",
+            details={"user_id": user_id, "viewer_user_id": viewer_user_id, "field": field},
+        )
+        return
+
     PersonalInfoViewLog.objects.create(
         user=user,
         viewer_user=viewer_user,
