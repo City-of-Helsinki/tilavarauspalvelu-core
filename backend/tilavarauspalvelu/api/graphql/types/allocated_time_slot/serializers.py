@@ -45,6 +45,10 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
         self.validate_reservation_unit_option_available(
             option=data["reservation_unit_option"],
         )
+        AllocatedTimeSlot.validators.validate_begin_time_before_end_time(
+            begin_time=data["begin_time"],
+            end_time=data["end_time"],
+        )
         self.validate_overlapping_allocations(
             section=section,
             day_of_the_week=data["day_of_the_week"],
