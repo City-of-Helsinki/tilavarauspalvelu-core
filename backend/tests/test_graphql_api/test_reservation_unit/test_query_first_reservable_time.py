@@ -269,13 +269,13 @@ def test__reservation_unit__first_reservable_time__no_results_time_spans_dont_ex
             filters=ReservableFilters(
                 date_start=(NOW - datetime.timedelta(days=1)).date(),
             ),
-            result="'reservable_date_start' must be not be in the past.",
+            result="'reservable_date_start' must not be in the past.",
         ),
         "Date End is in the past": ReservableParams(
             filters=ReservableFilters(
                 date_end=(NOW - datetime.timedelta(days=1)).date(),
             ),
-            result="'reservable_date_end' must be not be in the past.",
+            result="'reservable_date_end' must not be in the past.",
         ),
         "Date End is before Date Start": ReservableParams(
             filters=ReservableFilters(
@@ -288,7 +288,7 @@ def test__reservation_unit__first_reservable_time__no_results_time_spans_dont_ex
             filters=ReservableFilters(
                 date_end=_date() + datetime.timedelta(days=732),
             ),
-            result="'reservable_date_end' must be not be more than two years in the future.",
+            result="'reservable_date_end' must not be more than two years in the future.",
         ),
         "Time Start and End filters exact start time": ReservableParams(
             filters=ReservableFilters(
