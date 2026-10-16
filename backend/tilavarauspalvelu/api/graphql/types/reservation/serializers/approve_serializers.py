@@ -114,6 +114,8 @@ class ReservationApproveSerializer(NestingModelSerializer):
             data["payment_type"] = PaymentType.ON_SITE
             return data
 
+        pricing.validators.validate_has_payment_type()
+
         if pricing.payment_type != PaymentType.ON_SITE:
             reservation_unit.validators.validate_has_payment_product()
 
