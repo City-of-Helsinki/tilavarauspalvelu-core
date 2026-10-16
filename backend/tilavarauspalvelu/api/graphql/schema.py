@@ -229,7 +229,7 @@ class Query(graphene.ObjectType):
     banner_notifications = BannerNotificationNode.Connection()
     unit_groups = UnitGroupNode.Connection()
 
-    def resolve_current_user(root: None, info: GQLInfo, **kwargs: Any) -> User | None:
+    def resolve_current_user(root: object, info: GQLInfo, **kwargs: Any) -> User | None:
         if not info.context.user.is_active:
             logout(info.context)
             return None
@@ -240,12 +240,12 @@ class Query(graphene.ObjectType):
         HelsinkiProfileClient.ensure_token_valid(user=info.context.user, session=info.context.session)
         return optimize_single(User.objects.all(), info, max_complexity=15, pk=info.context.user.pk)
 
-    def resolve_profile_data(root: None, info: GQLInfo, **kwargs: Any) -> UserProfileInfo:
+    def resolve_profile_data(root: object, info: GQLInfo, **kwargs: Any) -> UserProfileInfo:
         reservation_pk: int | None = kwargs.get("reservation_pk")
         application_pk: int | None = kwargs.get("application_pk")
         return HelsinkiProfileDataNode.get_data(info, application_pk=application_pk, reservation_pk=reservation_pk)
 
-    def resolve_order(root: None, info: GQLInfo, *, order_uuid: str, **kwargs: Any) -> PaymentOrder | None:
+    def resolve_order(root: object, info: GQLInfo, *, order_uuid: str, **kwargs: Any) -> PaymentOrder | None:
         queryset = optimize(PaymentOrder.objects.filter(remote_id=order_uuid, reservation__isnull=False), info)
         order = next(iter(queryset), None)  # Avoids adding additional ordering.
         if order is None:
@@ -256,7 +256,7 @@ class Query(graphene.ObjectType):
             return order
         return None
 
-    def resolve_check_permissions(root: None, info: GQLInfo, **kwargs: Any) -> dict[str, bool]:
+    def resolve_check_permissions(root: object, info: GQLInfo, **kwargs: Any) -> dict[str, bool]:
         return PermissionCheckerType.run(
             user=info.context.user,
             permission=UserPermissionChoice(kwargs["permission"]),
@@ -264,7 +264,7 @@ class Query(graphene.ObjectType):
             require_all=kwargs.get("require_all", False),
         )
 
-    def resolve_banner_notifications(root: None, info: GQLInfo, **kwargs: Any) -> models.QuerySet[BannerNotification]:
+    def resolve_banner_notifications(root: object, info: GQLInfo, **kwargs: Any) -> models.QuerySet[BannerNotification]:
         user: AnyUser = info.context.user
         if user.permissions.can_manage_notifications():
             return BannerNotification.objects.all()
@@ -273,7 +273,7 @@ class Query(graphene.ObjectType):
         return BannerNotification.objects.none()
 
     def resolve_affecting_allocated_time_slots(
-        root: None,
+        root: object,
         info: GQLInfo,
         reservation_unit: int,
         begin_date: datetime.date,
@@ -282,7 +282,7 @@ class Query(graphene.ObjectType):
         return AllocatedTimeSlot.objects.all().affecting_allocations(reservation_unit, begin_date, end_date)
 
     def resolve_affecting_reservations(
-        root: None,
+        root: object,
         info: GQLInfo,
         for_units: list[int],
         for_reservation_units: list[int],
@@ -290,7 +290,7 @@ class Query(graphene.ObjectType):
     ) -> models.QuerySet:
         return Reservation.objects.all().affecting_reservations(for_units, for_reservation_units)
 
-    def resolve_reservation_cancel_reasons(root: None, info: GQLInfo, **kwargs: Any) -> list[CancelReasonDict]:
+    def resolve_reservation_cancel_reasons(root: object, info: GQLInfo, **kwargs: Any) -> list[CancelReasonDict]:
         return [
             CancelReasonDict(
                 value=reason.value,
