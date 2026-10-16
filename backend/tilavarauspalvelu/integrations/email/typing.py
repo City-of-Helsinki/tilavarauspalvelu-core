@@ -96,7 +96,7 @@ class EmailData:
         """Helper method to build an EmailData object with the given context and email type."""
         return cls(
             recipients=list(recipients),
-            subject=context["title"],
+            subject=str(context["title"]),
             text_content=render_text(email_type=email_type, context=context),
             html_content=render_html(email_type=email_type, context=context),
             valid_until=valid_until.astimezone(DEFAULT_TIMEZONE),

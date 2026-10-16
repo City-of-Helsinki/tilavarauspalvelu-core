@@ -45,7 +45,7 @@ class TprekUnitImporter:
 
             tprek_unit_data, tprek_location_data = TprekAPIClient.get_unit(unit_tprek_id=unit.tprek_id)
 
-            if tprek_unit_data is None:
+            if tprek_unit_data is None or tprek_location_data is None:
                 SentryLogger.log_message(message=f"Unit {unit.pk=} {unit.tprek_id=} not found in TPREK API.")
                 continue
 
