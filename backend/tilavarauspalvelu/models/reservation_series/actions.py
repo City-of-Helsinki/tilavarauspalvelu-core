@@ -5,12 +5,13 @@ import datetime
 from typing import TYPE_CHECKING, Literal
 
 from lookup_property import L
+from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.dataclasses import ReservationSeriesCalculationResults
 from tilavarauspalvelu.enums import AccessType, RejectionReadinessChoice, Weekday
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.models import ApplicationSection, RejectedOccurrence, Reservation
-from tilavarauspalvelu.typing import ReservationPeriod
+from tilavarauspalvelu.typing import ReservationPeriod, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, end_time_as_timedelta, get_periods_between, local_datetime
 
 if TYPE_CHECKING:
@@ -54,6 +55,11 @@ class ReservationSeriesActions:
         :param buffer_time_after: Used buffer time after the reservation.
         :param ignore_reservations: Reservations to ignore when calculating slots, e.g., for rescheduling.
         """
+        recurrence_in_days = self.reservation_series.recurrence_in_days
+        if recurrence_in_days is None:
+            msg = "Reservation series has no recurrence interval."
+            raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_INVALID_RECURRENCE_IN_DAYS)
+
         begin_date = self.reservation_series.begin_date
         end_date = self.reservation_series.end_date
         begin_time = self.reservation_series.begin_time
@@ -101,7 +107,7 @@ class ReservationSeriesActions:
                 end_date=end_date,
                 start_time=begin_time,
                 end_time=end_time,
-                interval=self.reservation_series.recurrence_in_days,
+                interval=recurrence_in_days,
                 tzinfo=DEFAULT_TIMEZONE,
             )
             for begin, end in periods:
