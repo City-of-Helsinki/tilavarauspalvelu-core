@@ -165,7 +165,8 @@ def _create_normal_reservations(
         pricing = next(iter(reservation_unit.pricings.all()), None)
         assert pricing is not None, "Reservation unit must have at least one pricing"
 
-        payment_type = PaymentType(pricing.payment_type)
+        assert pricing.payment_type is not None, "Reservation unit pricing must have a payment type"
+        payment_type = pricing.payment_type
 
         reservation_state: ReservationStateChoice = ReservationStateChoice.CONFIRMED
         handled_at: datetime.datetime | None = None
@@ -847,6 +848,8 @@ def _create_reservations_for_series(
 
     reservations: list[Reservation] = []
     occurrences: list[RejectedOccurrence] = []
+
+    assert series.recurrence_in_days is not None, "Reservation series must have a recurrence interval"
 
     for weekday in weekdays:
         begin_date = next_date_matching_weekday(series.begin_date, weekday)
