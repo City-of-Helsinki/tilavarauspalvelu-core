@@ -336,3 +336,9 @@ def test_date_utils__datetime_range_as_string__ends_on_another_day():
     result = datetime_range_as_string(start_datetime=start_datetime, end_datetime=end_datetime)
 
     assert result == "2026-10-24 22:00-2026-10-25 02:00"
+
+
+def test_date_utils__datetime_range_as_string__min_and_max():
+    result = datetime_range_as_string(start_datetime=utc_datetime_min(), end_datetime=utc_datetime_max())
+
+    assert result == "min-max"
