@@ -5,7 +5,7 @@ import enum
 import operator
 from enum import StrEnum
 from inspect import cleandoc
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from django.db import models
 from django.utils.functional import classproperty
@@ -13,6 +13,9 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 
 from tilavarauspalvelu.typing import permission
+
+if TYPE_CHECKING:
+    from django_stubs_ext import StrPromise
 
 __all__ = [
     "AccessType",
@@ -290,7 +293,12 @@ class UserRoleChoice(models.TextChoices):
 # There is the disadvantage that we don't get autocomplete of permissions like this,
 # but we also don't duplicate permissions from the roles above. This should be fine,
 # as the enum is not really used in our code but meant for the frontend.
-UserPermissionChoice = models.TextChoices("UserPermissionChoice", UserRoleChoice.permission_choices())
+if TYPE_CHECKING:
+    # The type checker cannot read the members of an enum that is built at runtime.
+    class UserPermissionChoice(models.TextChoices): ...
+
+else:
+    UserPermissionChoice = models.TextChoices("UserPermissionChoice", UserRoleChoice.permission_choices())
 
 
 class HaukiResourceState(models.TextChoices):
@@ -903,7 +911,7 @@ class Weekday(models.TextChoices):
                 raise ValueError(msg)
 
     @classmethod
-    def from_week_day(cls, weekday: Literal[0, 1, 2, 3, 4, 5, 6]) -> Weekday:
+    def from_week_day(cls, weekday: int) -> Weekday:
         """Weekday number, starting from 0."""
         match weekday:
             case 0:
@@ -1213,9 +1221,13 @@ class AccessTypeWithMultivalued(models.TextChoices):
     MULTIVALUED = "MULTIVALUED", pgettext_lazy("AccessType", "multi-valued")
 
     @classproperty
-    def model_choices(cls) -> list[tuple[str, str]]:
+    def model_choices(cls) -> list[tuple[str, StrPromise]]:
         """Don't allow 'MULTIVALUED' to be set to models."""
-        return [(value, label) for value, label in cls.choices if value != cls.MULTIVALUED.value]
+        return [
+            (value, label)
+            for value, label in AccessTypeWithMultivalued.choices
+            if value != AccessTypeWithMultivalued.MULTIVALUED.value
+        ]
 
 
 class AccessCodeState(models.TextChoices):
