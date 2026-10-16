@@ -83,10 +83,14 @@ class User(AbstractUser):
     as_viewer_personal_info_view_logs: OneToManyRelatedManager[PersonalInfoViewLog, PersonalInfoViewLogQuerySet]
     social_auth: OneToManyRelatedManager[UserSocialAuth, QuerySet[UserSocialAuth]]
 
-    # Caches for the 'active_*_roles' properties. These are not set until the property is read.
+    # Caches for the 'active_*_roles' and 'active_*_permissions' properties.
+    # These are not set until the property is read.
     _general_roles: list[UserRoleChoice]
     _unit_roles: dict[int, list[UserRoleChoice]]
     _unit_group_roles: dict[int, list[UserRoleChoice]]
+    _general_permissions: list[UserPermissionChoice]
+    _unit_permissions: dict[int, list[UserPermissionChoice]]
+    _unit_group_permissions: dict[int, list[UserPermissionChoice]]
 
     class Meta:
         db_table = "user"
