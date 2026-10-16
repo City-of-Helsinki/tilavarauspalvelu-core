@@ -3,6 +3,7 @@ from __future__ import annotations
 from django import forms
 from django.contrib import admin
 
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.models import PaymentAccounting
 
 __all__ = [
@@ -33,7 +34,7 @@ class PaymentAccountingForm(forms.ModelForm):
 
 
 @admin.register(PaymentAccounting)
-class PaymentAccountingAdmin(admin.ModelAdmin):
+class PaymentAccountingAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Form
     form = PaymentAccountingForm
     fieldsets = [

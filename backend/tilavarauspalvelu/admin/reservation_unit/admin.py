@@ -1,9 +1,14 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
+from urllib.parse import urlencode
 
+from admin_extra_buttons.decorators import button
 from adminsortable2.admin import SortableAdminMixin
+from django.conf import settings
 from django.contrib import admin, messages
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 from modeltranslation.admin import TabbedTranslationAdmin
@@ -14,7 +19,7 @@ from tilavarauspalvelu.admin.reservation_unit_image.admin import ReservationUnit
 from tilavarauspalvelu.enums import AccessType, ReservationKind
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.models import ReservationUnit, Resource, Space
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 
 from .form import ReservationUnitAccessTypeInline, ReservationUnitAdminForm, ReservationUnitPricingInline
@@ -222,6 +227,32 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
     def current_access_type(self, obj: ReservationUnit) -> AccessType | None:
         return obj.current_access_type  # type: ignore[return-value]
 
+    @button(label=_("Reservations"), change_form=True)
+    def show_reservations(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+        changelist_url = reverse("admin:tilavarauspalvelu_reservation_changelist")
+        # The reservation unit filter of the reservation list uses this parameter.
+        query_string = urlencode({"reservation_unit__id__in": pk})
+        return HttpResponseRedirect(f"{changelist_url}?{query_string}")
+
+    @button(label=_("Open in staff UI"), change_form=True)
+    def open_in_staff_ui(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+        unit_pk = ReservationUnit.objects.values_list("unit", flat=True).get(pk=pk)
+        url_base = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
+        return HttpResponseRedirect(f"{url_base}/kasittely/units/{unit_pk}/reservation-units/{pk}")
+
+    def formfield_for_manytomany(
+        self,
+        db_field: models.ManyToManyField,
+        request: WSGIRequest,
+        **kwargs: Any,
+    ) -> Any:
+        # The option labels include the unit name, so fetch the units in the same query.
+        if db_field.name == "spaces":
+            kwargs["queryset"] = Space.objects.select_related("unit")
+        if db_field.name == "resources":
+            kwargs["queryset"] = Resource.objects.select_related("space__unit")
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
+
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet[ReservationUnit]:
         return (
             super()
@@ -251,13 +282,14 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
 
         return queryset, may_have_duplicates
 
-    @admin.action(description="Export selected reservation units to CSV")
+    @admin.action(description=_("Export selected reservation units to CSV"))
     def export_to_csv(self, request: WSGIRequest, queryset: ReservationUnitQuerySet) -> FileResponse | None:
         try:
             exporter = ReservationUnitExporter(queryset=queryset)
             response = exporter.to_file_response()
         except Exception as error:  # noqa: BLE001
-            self.message_user(request, f"Error while exporting results: {error}", level=messages.ERROR)
+            message = _("Could not export the reservation units. The error was reported to Sentry.")
+            self.message_user(request, message, level=messages.ERROR)
             SentryLogger.log_exception(error, "Error while exporting ReservationUnits")
             return None
 

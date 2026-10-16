@@ -3,18 +3,21 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from django.contrib import admin
+from django.db.models import Exists, OuterRef
 from django.utils.translation import gettext_lazy as _
-from more_admin_filters.filters import MultiSelectRelatedDropdownFilter, MultiSelectRelatedOnlyFilter
+from more_admin_filters.filters import MultiSelectFilter, MultiSelectRelatedDropdownFilter, MultiSelectRelatedOnlyFilter
+
+from tilavarauspalvelu.models import Reservation, ReservationUnit, Unit
 
 if TYPE_CHECKING:
-    from django.db.models import QuerySet
+    from django.db.models import Field, QuerySet
 
-    from tilavarauspalvelu.models import Reservation
     from tilavarauspalvelu.typing import WSGIRequest
 
 
 __all__ = [
     "AccessCodeGeneratedFilter",
+    "ChoicesMultiSelectFilter",
     "PaidReservationListFilter",
     "ReservationSeriesListFilter",
     "ReservationUnitFilter",
@@ -58,14 +61,50 @@ class PaidReservationListFilter(admin.SimpleListFilter):
         return queryset
 
 
+class ChoicesMultiSelectFilter(MultiSelectFilter):
+    def __init__(
+        self,
+        field: Field,
+        request: WSGIRequest,
+        params: dict[str, Any],
+        model: type[Reservation],
+        model_admin: admin.ModelAdmin,
+        field_path: str,
+    ) -> None:
+        super().__init__(field, request, params, model, model_admin, field_path)
+        # Take the options from the field choices. Selecting the distinct values reads the whole table.
+        self.lookup_choices = sorted(value for value, _label in field.flatchoices)
+
+
 class UnitFilter(MultiSelectRelatedDropdownFilter, MultiSelectRelatedOnlyFilter):
-    def field_admin_ordering(self, *args: Any, **kwargs: Any) -> list[str]:
-        return ["name"]
+    def field_choices(
+        self,
+        field: Any,  # noqa: ARG002
+        request: WSGIRequest,
+        model_admin: admin.ModelAdmin,  # noqa: ARG002
+    ) -> list[tuple[int, str]]:
+        # Check each unit with the index on 'reservation_unit_id'.
+        # Selecting the distinct units from the reservations reads the whole table.
+        reservations = Reservation.objects.filter(reservation_unit__unit=OuterRef("pk"))
+        units = Unit.objects.filter(Exists(reservations)).order_by("name")
+        return [(unit.pk, str(unit)) for unit in units]
 
 
 class ReservationUnitFilter(MultiSelectRelatedDropdownFilter, MultiSelectRelatedOnlyFilter):
-    def field_admin_ordering(self, *args: Any, **kwargs: Any) -> list[str]:
-        return ["unit__name", "name"]
+    def field_choices(
+        self,
+        field: Any,  # noqa: ARG002
+        request: WSGIRequest,
+        model_admin: admin.ModelAdmin,  # noqa: ARG002
+    ) -> list[tuple[int, str]]:
+        # Check each reservation unit with the index on 'reservation_unit_id'.
+        # Selecting the distinct reservation units from the reservations reads the whole table.
+        # The option label includes the unit name, so fetch the units in the same query.
+        reservations = Reservation.objects.filter(reservation_unit=OuterRef("pk"))
+        reservation_units = (
+            ReservationUnit.objects.filter(Exists(reservations)).select_related("unit").order_by("unit__name", "name")
+        )
+        return [(reservation_unit.pk, str(reservation_unit)) for reservation_unit in reservation_units]
 
 
 class AccessCodeGeneratedFilter(admin.SimpleListFilter):

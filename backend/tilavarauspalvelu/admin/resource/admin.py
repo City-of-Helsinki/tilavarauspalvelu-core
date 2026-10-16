@@ -20,6 +20,8 @@ class ResourceAdmin(TranslationAdmin):
         "location_type",
     ]
     list_filter = ["location_type"]
+    list_select_related = ["space__unit"]
+    autocomplete_fields = ["space"]
 
     def has_delete_permission(self, request: WSGIRequest, obj: Resource | None = None) -> bool:
         if obj is not None and obj.reservation_units.exists():

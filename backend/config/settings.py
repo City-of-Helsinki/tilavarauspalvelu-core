@@ -48,6 +48,8 @@ class Common(Environment):
     WSGI_APPLICATION = "config.wsgi.application"
     ROOT_URLCONF = "config.urls"
     AUTH_USER_MODEL = "tilavarauspalvelu.User"
+    # Shown in the Django admin header, so that staff can tell the environments apart.
+    ENVIRONMENT_NAME = "local"
     DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
     SECRET_KEY = values.StringValue()
     ALLOWED_HOSTS = values.ListValue()
@@ -1160,21 +1162,25 @@ class Development(Platta, use_environ=True):
     """Settings for the Development environment on Platta."""
 
     DEBUG = True
+    ENVIRONMENT_NAME = "development"
 
 
 class Testing(Platta, use_environ=True):
     """Settings for the Testing environment on Platta."""
 
     DEBUG = True
+    ENVIRONMENT_NAME = "testing"
 
 
 class Staging(Platta, use_environ=True):
     """Settings for the Staging environment on Platta."""
 
     DEBUG = False
+    ENVIRONMENT_NAME = "staging"
 
 
 class Production(Platta, use_environ=True):
     """Settings for the Production environment on Platta."""
 
     DEBUG = False
+    ENVIRONMENT_NAME = "production"

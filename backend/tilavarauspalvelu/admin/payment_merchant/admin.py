@@ -1,19 +1,30 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils.translation import gettext_lazy as _
 
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.merchants.exceptions import GetMerchantError
 from tilavarauspalvelu.integrations.verkkokauppa.merchants.types import CreateMerchantParams, UpdateMerchantParams
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import PaymentMerchant
 
+if TYPE_CHECKING:
+    from django.http import HttpResponse
+
+    from tilavarauspalvelu.typing import WSGIRequest
+
 __all__ = [
     "PaymentMerchantAdmin",
 ]
+
+MERCHANT_INFO_MISSING_MESSAGE = _(
+    "The merchant could not be loaded from the Merchant API. You cannot save changes to this merchant."
+)
 
 
 class PaymentMerchantForm(forms.ModelForm):
@@ -62,27 +73,49 @@ class PaymentMerchantForm(forms.ModelForm):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
+        self.merchant_info_missing = False
+
         instance: PaymentMerchant | None = kwargs.get("instance")
-        if instance and instance.id:
+        if instance is None or instance.id is None:
+            return
+
+        # Hide paytrail_merchant_id field when editing an existing merchant
+        self.fields["paytrail_merchant_id"].required = False
+        self.fields["paytrail_merchant_id"].widget.input_type = "hidden"
+
+        try:
             merchant_info = VerkkokauppaAPIClient.get_merchant(merchant_uuid=instance.id)
+        except GetMerchantError as error:
+            SentryLogger.log_exception(error, details=f"Could not load merchant '{instance.id}' for the admin")
+            merchant_info = None
+        else:
             if merchant_info is None:
-                msg = f"Merchant info for {instance.id!s} not found from Merchant API"
-                raise GetMerchantError(msg)
+                SentryLogger.log_message(f"Merchant '{instance.id}' not found from the Merchant API", level="warning")
 
-            self.fields["shop_id"].initial = merchant_info.shop_id
-            self.fields["name"].initial = merchant_info.name
-            self.fields["street"].initial = merchant_info.street
-            self.fields["zip"].initial = merchant_info.zip
-            self.fields["city"].initial = merchant_info.city
-            self.fields["email"].initial = merchant_info.email
-            self.fields["phone"].initial = merchant_info.phone
-            self.fields["url"].initial = merchant_info.url
-            self.fields["tos_url"].initial = merchant_info.tos_url
-            self.fields["business_id"].initial = merchant_info.business_id
+        # Saving would send empty values to the Merchant API, so disable the fields and block saving.
+        if merchant_info is None:
+            self.merchant_info_missing = True
+            for field in self.fields.values():
+                field.disabled = True
+                field.required = False
+            return
 
-            # Hide paytrail_merchant_id field when editing an existing merchant
-            self.fields["paytrail_merchant_id"].required = False
-            self.fields["paytrail_merchant_id"].widget.input_type = "hidden"
+        self.fields["shop_id"].initial = merchant_info.shop_id
+        self.fields["name"].initial = merchant_info.name
+        self.fields["street"].initial = merchant_info.street
+        self.fields["zip"].initial = merchant_info.zip
+        self.fields["city"].initial = merchant_info.city
+        self.fields["email"].initial = merchant_info.email
+        self.fields["phone"].initial = merchant_info.phone
+        self.fields["url"].initial = merchant_info.url
+        self.fields["tos_url"].initial = merchant_info.tos_url
+        self.fields["business_id"].initial = merchant_info.business_id
+
+    def clean(self) -> dict[str, Any]:
+        cleaned_data = super().clean()
+        if self.merchant_info_missing:
+            raise forms.ValidationError(MERCHANT_INFO_MISSING_MESSAGE)
+        return cleaned_data
 
     def save(self, commit: bool = True) -> PaymentMerchant:  # noqa: FBT001 FBT002
         instance: PaymentMerchant | None = self.instance
@@ -116,7 +149,22 @@ class PaymentMerchantForm(forms.ModelForm):
 
 
 @admin.register(PaymentMerchant)
-class PaymentMerchantAdmin(admin.ModelAdmin):
+class PaymentMerchantAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Form
     form = PaymentMerchantForm
     readonly_fields = ["id"]
+
+    def render_change_form(
+        self,
+        request: WSGIRequest,
+        context: dict[str, Any],
+        add: bool = False,  # noqa: FBT001 FBT002
+        change: bool = False,  # noqa: FBT001 FBT002
+        form_url: str = "",
+        obj: PaymentMerchant | None = None,
+    ) -> HttpResponse:
+        form: PaymentMerchantForm = context["adminform"].form
+        if form.merchant_info_missing and request.method == "GET":
+            self.message_user(request, MERCHANT_INFO_MISSING_MESSAGE, level=messages.WARNING)
+
+        return super().render_change_form(request, context, add=add, change=change, form_url=form_url, obj=obj)

@@ -3,17 +3,20 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from auditlog.admin import LogEntryAdmin as OriginalLogEntryAdmin
-from auditlog.filters import ResourceTypeFilter
 from auditlog.models import LogEntry
 from dateutil.relativedelta import relativedelta
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from rangefilter.filters import DateRangeFilterBuilder
 
+from tilavarauspalvelu.admin.log_entry.filters import LogEntryResourceTypeFilter
+from tilavarauspalvelu.admin.log_entry.paginator import LogEntryPaginator
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from django.db import models
+
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 admin.site.unregister(LogEntry)
@@ -21,7 +24,10 @@ admin.site.unregister(LogEntry)
 
 @admin.register(LogEntry)
 class LogEntryAdmin(OriginalLogEntryAdmin):
-    date_hierarchy = "timestamp"
+    # Both features query all log entries on every page load. Use the date range filter for dates.
+    date_hierarchy = None
+    show_full_result_count = False
+    paginator = LogEntryPaginator
     list_select_related = ["content_type", "actor"]
     list_display = [
         "created",
@@ -32,24 +38,24 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
         "user_url",
     ]
     search_fields = [
-        "timestamp",
         "object_repr",
-        "object_id",
-        "changes",
         "actor__first_name",
         "actor__last_name",
         "actor__username",
     ]
+    search_help_text = _(
+        "Search by object name or actor name. A number finds the log entries of the object with that ID."
+    )
     list_filter = [
         (
             "timestamp",
             DateRangeFilterBuilder(
                 title=_("Created at"),
-                default_start=local_datetime() - relativedelta(years=2),  # Default value in field (not applied on load)
+                default_start=local_datetime() - relativedelta(months=3),
             ),
         ),
         "action",
-        ResourceTypeFilter,
+        LogEntryResourceTypeFilter,
     ]
     readonly_fields = [
         "created",
@@ -79,3 +85,17 @@ class LogEntryAdmin(OriginalLogEntryAdmin):
         self.request = request
         cutoff_date = local_datetime() - relativedelta(years=2)  # Don't show records older than 2 years
         return super().get_queryset(request=request).filter(timestamp__gte=cutoff_date)
+
+    def get_search_results(
+        self,
+        request: WSGIRequest,
+        queryset: models.QuerySet[LogEntry],
+        search_term: str,
+    ) -> tuple[models.QuerySet[LogEntry], bool]:
+        # Search ids with the index on 'object_id'. The text search casts ids to text, which reads every row.
+        search_term = search_term.strip()
+        if search_term.isdecimal():
+            object_id = int(search_term)
+            return queryset.filter(object_id=object_id), False
+
+        return super().get_search_results(request, queryset, search_term)

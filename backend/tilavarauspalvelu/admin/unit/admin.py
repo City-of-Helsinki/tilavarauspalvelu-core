@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import TYPE_CHECKING
 
 from admin_extra_buttons.decorators import button
@@ -8,9 +9,12 @@ from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 from modeltranslation.admin import TabbedTranslationAdmin
 
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.integrations.tprek.tprek_api_client import TprekLocationData, TprekUnitData
 from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitImporter
 from tilavarauspalvelu.models import Unit, UnitGroup
 
@@ -20,6 +24,16 @@ if TYPE_CHECKING:
     from django.db.models import QuerySet
 
     from tilavarauspalvelu.typing import WSGIRequest
+
+
+# The TPREK import overwrites these fields, so a change by hand would not last.
+# The TPREK ID stays editable, so that staff can fix a wrong ID.
+TPREK_FIELDS = [
+    field.name
+    for tprek_data_class in (TprekUnitData, TprekLocationData)
+    for field in dataclasses.fields(tprek_data_class)
+    if field.name != "tprek_id"
+]
 
 
 class UnitGroupInlineAdmin(admin.TabularInline):
@@ -36,7 +50,7 @@ class UnitGroupInlineAdmin(admin.TabularInline):
 
 
 @admin.register(Unit)
-class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
+class UnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
     # Functions
     actions = ["update_from_tprek"]
     search_fields = [
@@ -84,6 +98,10 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
         [
             _("TPRek"),
             {
+                "description": _(
+                    "When the unit has a TPRek ID, the fields that come from TPRek cannot be changed here. "
+                    "Change them in TPRek instead."
+                ),
                 "fields": [
                     "tprek_id",
                     "tprek_department_id",
@@ -135,6 +153,12 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
         UnitGroupInlineAdmin,
     ]
 
+    def get_readonly_fields(self, request: WSGIRequest, obj: Unit | None = None) -> list[str]:
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if obj is not None and obj.tprek_id:
+            readonly_fields += self.replace_orig_field(TPREK_FIELDS)
+        return readonly_fields
+
     def get_queryset(self, request: WSGIRequest) -> QuerySet[Unit]:
         return (
             super()
@@ -163,17 +187,24 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
         except Exception as err:  # noqa: BLE001
             details = f"Tried to import units from TPREK: '{units.values_list('pk', flat=True)}'"
             SentryLogger.log_exception(err, details=details)
-            self.message_user(request, f"Error while importing units from TPREK: {err}", level=messages.ERROR)
+            message = _("Could not import the units from TPREK. The error was reported to Sentry.")
+            self.message_user(request, message, level=messages.ERROR)
         else:
             if not tprek_unit_importer.updated_units_count:
-                self.message_user(request, "No units were updated.", level=messages.WARNING)
+                self.message_user(request, _("No units were updated."), level=messages.WARNING)
             else:
-                msg = f"Updated {tprek_unit_importer.updated_units_count} units."
-                not_updated_count = len(queryset) - tprek_unit_importer.updated_units_count
+                updated_count = tprek_unit_importer.updated_units_count
+                msg = ngettext("Updated %(count)s unit.", "Updated %(count)s units.", updated_count) % {
+                    "count": updated_count,
+                }
+                not_updated_count = len(queryset) - updated_count
                 if not_updated_count:
-                    msg += f" Skipped {not_updated_count} units."
+                    skipped_msg = ngettext("Skipped %(count)s unit.", "Skipped %(count)s units.", not_updated_count) % {
+                        "count": not_updated_count,
+                    }
+                    msg = f"{msg} {skipped_msg}"
                 self.message_user(request, msg, level=messages.SUCCESS)
 
-    @button(label="Update from TPREK", change_form=True)
+    @button(label=_("Update from TPREK"), change_form=True)
     def update_from_tprek_button(self, request: WSGIRequest, pk: int) -> None:
         self.update_from_tprek(request, Unit.objects.filter(pk=pk))

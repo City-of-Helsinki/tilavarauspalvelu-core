@@ -18,6 +18,7 @@ from tilavarauspalvelu.admin.application_section.form import (
     ApplicationSectionAdminForm,
     ReservationUnitOptionInlineAdminForm,
 )
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.admin.suitable_time_range.admin import SuitableTimeRangeInline
 from tilavarauspalvelu.models import ApplicationSection, ReservationUnitOption
 from utils.utils import comma_sep_str
@@ -52,13 +53,14 @@ class ReservationUnitOptionInline(admin.TabularInline):
     model = ReservationUnitOption
     form = ReservationUnitOptionInlineAdminForm
     extra = 0
+    autocomplete_fields = ["reservation_unit"]
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet:
         return super().get_queryset(request).select_related("reservation_unit__unit")
 
 
 @admin.register(ApplicationSection)
-class ApplicationSectionAdmin(admin.ModelAdmin):
+class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Functions
     search_fields = [
         "name",

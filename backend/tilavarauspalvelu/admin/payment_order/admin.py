@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from rangefilter.filters import DateRangeFilterBuilder
 
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.models import PaymentOrder, ReservationUnit
 
 if TYPE_CHECKING:
@@ -69,11 +70,11 @@ class ReservationUnitFilter(admin.SimpleListFilter):
         value: str | None = self.value()
         if value is None:
             return queryset
-        return queryset.filter(reservation__reservation_unit__pk=value).distinct()
+        return queryset.filter(reservation__reservation_unit__pk=value)
 
 
 @admin.register(PaymentOrder)
-class PaymentOrderAdmin(admin.ModelAdmin):
+class PaymentOrderAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Functions
     search_fields = [
         # 'id' handled separately in `get_search_results()`
@@ -130,7 +131,18 @@ class PaymentOrderAdmin(admin.ModelAdmin):
     ]
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet:
-        return super().get_queryset(request).select_related("reservation")
+        return super().get_queryset(request).select_related("reservation__reservation_unit__unit")
+
+    # The payment flow and the Verkkokauppa webhooks keep payment orders in sync with Verkkokauppa.
+    # A change by hand would make the states differ, so the admin only shows payment orders.
+    def has_add_permission(self, request: WSGIRequest) -> bool:
+        return False
+
+    def has_change_permission(self, request: WSGIRequest, obj: PaymentOrder | None = None) -> bool:
+        return False
+
+    def has_delete_permission(self, request: WSGIRequest, obj: PaymentOrder | None = None) -> bool:
+        return False
 
     def reservation_unit(self, obj: PaymentOrder) -> str:
         return obj.reservation.reservation_unit if obj.reservation else ""

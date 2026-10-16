@@ -6,7 +6,7 @@ from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django import forms
 from django.contrib import admin
-from django.db.models import Count
+from django.db.models import OuterRef
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -14,7 +14,8 @@ from django.utils.translation import gettext_lazy as _
 from tilavarauspalvelu.admin.reservable_time_span.admin import ReservableTimeSpanInline
 from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from tilavarauspalvelu.models import OriginHaukiResource, ReservationUnit
+from tilavarauspalvelu.models import OriginHaukiResource, ReservableTimeSpan, ReservationUnit
+from utils.db import SubqueryCount
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -92,12 +93,13 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         return (
             super()
             .get_queryset(request)
-            .annotate(reservable_time_spans_count=Count("reservable_time_spans"))
-            .prefetch_related(
-                "reservation_units",
-                "reservation_units__unit",
-                "reservable_time_spans",
+            .annotate(
+                # Count only the time spans of the resources on the page.
+                reservable_time_spans_count=SubqueryCount(
+                    ReservableTimeSpan.objects.filter(resource=OuterRef("pk")).values("id"),
+                ),
             )
+            .prefetch_related("reservation_units")
         )
 
     def get_readonly_fields(self, request: WSGIRequest, obj: OriginHaukiResource | None = None) -> list[str]:
@@ -109,14 +111,14 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         return getattr(obj, "reservable_time_spans_count", -1)
 
     def linked_reservation_units(self, obj: OriginHaukiResource) -> str:
-        return ", ".join(obj.reservation_units.values_list("name_fi", flat=True))
+        return ", ".join(reservation_unit.name_fi for reservation_unit in obj.reservation_units.all())
 
-    @button(label="Update All Reservable Time Spans", change_list=True)
+    @button(label=_("Update all reservable time spans"), change_list=True)
     def update_all_hauki_resources_reservable_time_spans(self, request: WSGIRequest) -> None:
         HaukiResourceHashUpdater().run(force_refetch=True)
         self.message_user(request, _("Reservable Time Spans updated."))
 
-    @button(label="Update Reservable Time Spans", change_form=True)
+    @button(label=_("Update reservable time spans"), change_form=True)
     def update_single_hauki_resource_reservable_times_pans(self, request: WSGIRequest, pk: int) -> None:
         HaukiResourceHashUpdater([pk]).run(force_refetch=True)
         self.message_user(request, _("Reservable Time Spans updated."))

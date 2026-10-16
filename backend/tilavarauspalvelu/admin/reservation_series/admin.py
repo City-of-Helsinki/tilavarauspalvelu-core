@@ -7,6 +7,7 @@ from django.contrib.admin import EmptyFieldListFilter
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
+from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
 from tilavarauspalvelu.models import ReservationSeries
 
 from .filters import ShouldHaveActiveAccessCodeFilter
@@ -24,7 +25,7 @@ __all__ = [
 
 
 @admin.register(ReservationSeries)
-class ReservationSeriesAdmin(admin.ModelAdmin):
+class ReservationSeriesAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     # Functions
     search_fields = [
         "name",
@@ -113,7 +114,7 @@ class ReservationSeriesAdmin(admin.ModelAdmin):
             super()
             .get_queryset(request)
             .select_related(
-                "reservation_unit",
+                "reservation_unit__unit",
                 "allocated_time_slot",
                 "user",
                 "age_group",

@@ -19,6 +19,31 @@ msgstr ""
 msgid "Swedish"
 msgstr ""
 
+#: templates/admin/auditlog/logentry/pagination.html
+#: templates/admin/auditlog/logentry/search_form.html
+msgid "Show all"
+msgstr ""
+
+#: templates/admin/auditlog/logentry/pagination.html
+msgid "Save"
+msgstr ""
+
+#: templates/admin/auditlog/logentry/search_form.html
+msgid "Search"
+msgstr ""
+
+#: templates/admin/auditlog/logentry/search_form.html
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/auditlog/logentry/search_form.html
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr ""
+
 #: templates/admin/deny_reservation_confirmation.html
 #: templates/admin/reset_allocation_confirmation.html
 #: templates/email/email_tester.html
@@ -67,8 +92,29 @@ msgstr ""
 msgid "Reset allocations"
 msgstr ""
 
+#: templates/email/email_tester.html tilavarauspalvelu/admin/app_list.py
+#: tilavarauspalvelu/admin/email_template/tester.py
+msgid "Email template testing"
+msgstr ""
+
 #: templates/email/email_tester.html
-msgid "Email Template Testing"
+msgid "Switch email template"
+msgstr ""
+
+#: templates/email/email_tester.html
+msgid "Preview with example data"
+msgstr ""
+
+#: templates/email/email_tester.html
+msgid "Fill the form with reservation unit data"
+msgstr ""
+
+#: templates/email/email_tester.html
+msgid "Email template test form"
+msgstr ""
+
+#: templates/email/email_tester.html
+msgid "Send test emails"
 msgstr ""
 
 #: tilavarauspalvelu/admin/allocated_timeslot/admin.py
@@ -147,6 +193,114 @@ msgstr ""
 msgid "Allocated end time."
 msgstr ""
 
+#: tilavarauspalvelu/admin/app_list.py
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+#: tilavarauspalvelu/admin/user/admin.py
+#, fuzzy
+#| msgctxt "ICAL"
+#| msgid "Reservation for %(name)s"
+msgid "Reservations"
+msgstr "Bokning för %(name)s"
+
+#: tilavarauspalvelu/admin/app_list.py
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Reservation units"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Units and spaces"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+#, fuzzy
+#| msgctxt "Email"
+#| msgid "Seasonal Booking"
+msgid "Seasonal bookings"
+msgstr "Säsongsbokning"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Payments"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Users and permissions"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Content and emails"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "System"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "AD groups"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "AD group mappings"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+#: tilavarauspalvelu/admin/email_template/view.py
+msgid "Email templates"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Periodic tasks"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Crontab schedules"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Interval schedules"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Clocked schedules"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Solar schedules"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Task results"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Group results"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+#, fuzzy
+#| msgctxt "ICAL"
+#| msgid "Reservation for %(name)s"
+msgid "Resilient log entries"
+msgstr "Bokning för %(name)s"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "User social auths"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py
+#, fuzzy
+#| msgctxt "Email"
+#| msgid "My applications"
+msgid "Associations"
+msgstr "Egna ansökningar"
+
+#: tilavarauspalvelu/admin/app_list.py
+msgid "Nonces"
+msgstr ""
+
+#: tilavarauspalvelu/admin/app_list.py tilavarauspalvelu/enums.py
+msgid "Other"
+msgstr ""
+
 #: tilavarauspalvelu/admin/application/admin.py
 #: tilavarauspalvelu/admin/log_entry/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
@@ -185,6 +339,12 @@ msgstr ""
 #: tilavarauspalvelu/admin/application/admin.py
 #: tilavarauspalvelu/admin/application_round/admin.py
 msgid "Notes"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Open in staff UI"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application/admin.py
@@ -466,6 +626,25 @@ msgid "Criteria"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_round/admin.py
+#, fuzzy
+#| msgctxt "Email"
+#| msgid "My applications"
+msgid "Export applications to CSV"
+msgstr "Egna ansökningar"
+
+#: tilavarauspalvelu/admin/application_round/admin.py
+msgid "Could not export the applications. The error was reported to Sentry."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/admin.py
+msgid "Export results to CSV"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/admin.py
+msgid "Could not export the results. The error was reported to Sentry."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/admin.py
 msgid "Reset application round"
 msgstr ""
 
@@ -496,10 +675,6 @@ msgstr ""
 #: tilavarauspalvelu/admin/application_round/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Name (Swedish)"
-msgstr ""
-
-#: tilavarauspalvelu/admin/application_round/form.py
-msgid "Reservation units"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_round/form.py
@@ -692,16 +867,6 @@ msgid "Reservation purpose"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_series/form.py
-msgid "Reservation unit"
-msgstr ""
-
-#: tilavarauspalvelu/admin/application_section/form.py
-msgid "Reservation unit for to this option."
-msgstr ""
-
-#: tilavarauspalvelu/admin/application_section/form.py
 msgid "Preferred order"
 msgstr ""
 
@@ -714,6 +879,12 @@ msgid "Locked"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_series/form.py
+msgid "Reservation unit"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
 msgid "Preferred order of the reservation unit option."
 msgstr ""
 
@@ -723,6 +894,10 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
 msgid "Locked reservation unit options can no longer receive allocations."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Reservation unit for to this option."
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
@@ -894,8 +1069,22 @@ msgstr ""
 msgid "Test email '%(email_type)s' successfully sent."
 msgstr ""
 
+#: tilavarauspalvelu/admin/email_template/view.py
+msgid "Template"
+msgstr ""
+
+#: tilavarauspalvelu/admin/email_template/view.py
+msgid "Text"
+msgstr ""
+
 #: tilavarauspalvelu/admin/general_role/admin.py
 msgid "Search by username, email, first name or last name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/log_entry/admin.py
+msgid ""
+"Search by object name or actor name. A number finds the log entries of the "
+"object with that ID."
 msgstr ""
 
 #: tilavarauspalvelu/admin/log_entry/admin.py
@@ -915,6 +1104,10 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/log_entry/admin.py
 msgid "Resource"
+msgstr ""
+
+#: tilavarauspalvelu/admin/log_entry/filters.py
+msgid "Resource Type"
 msgstr ""
 
 #: tilavarauspalvelu/admin/log_entry/mixins.py
@@ -943,7 +1136,21 @@ msgid ""
 msgstr ""
 
 #: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
+msgid "Update all reservable time spans"
+msgstr ""
+
+#: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
 msgid "Reservable Time Spans updated."
+msgstr ""
+
+#: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
+msgid "Update reservable time spans"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid ""
+"The merchant could not be loaded from the Merchant API. You cannot save "
+"changes to this merchant."
 msgstr ""
 
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
@@ -1079,6 +1286,10 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
 msgid "processed at"
+msgstr ""
+
+#: tilavarauspalvelu/admin/rejected_occurrence/admin.py
+msgid "Search by rejection reason or reservation series' name"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/admin.py
@@ -1575,6 +1786,15 @@ msgstr ""
 msgid "Reservation state"
 msgstr ""
 
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Export selected reservation units to CSV"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid ""
+"Could not export the reservation units. The error was reported to Sentry."
+msgstr ""
+
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Access type begin date"
 msgstr ""
@@ -1997,8 +2217,18 @@ msgid ""
 "free of charge"
 msgstr ""
 
+#: tilavarauspalvelu/admin/reservation_unit_option/admin.py
+msgid ""
+"Search by reservation unit, unit, application section, user's first or last "
+"name or email"
+msgstr ""
+
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/terms_of_use/admin.py
+msgid "Show PDF"
 msgstr ""
 
 #: tilavarauspalvelu/admin/unit/admin.py
@@ -2007,6 +2237,12 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/unit/admin.py
 msgid "TPRek"
+msgstr ""
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid ""
+"When the unit has a TPRek ID, the fields that come from TPRek cannot be "
+"changed here. Change them in TPRek instead."
 msgstr ""
 
 #: tilavarauspalvelu/admin/unit/admin.py
@@ -2023,6 +2259,33 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/unit/admin.py
 msgid "Location"
+msgstr ""
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid ""
+"Could not import the units from TPREK. The error was reported to Sentry."
+msgstr ""
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid "No units were updated."
+msgstr ""
+
+#: tilavarauspalvelu/admin/unit/admin.py
+#, python-format
+msgid "Updated %(count)s unit."
+msgid_plural "Updated %(count)s units."
+msgstr[0] ""
+msgstr[1] ""
+
+#: tilavarauspalvelu/admin/unit/admin.py
+#, python-format
+msgid "Skipped %(count)s unit."
+msgid_plural "Skipped %(count)s units."
+msgstr[0] ""
+msgstr[1] ""
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid "Update from TPREK"
 msgstr ""
 
 #: tilavarauspalvelu/admin/unit/form.py
@@ -2083,6 +2346,10 @@ msgstr ""
 msgid "Search by name"
 msgstr ""
 
+#: tilavarauspalvelu/admin/unit_group/admin.py
+msgid "Number of units"
+msgstr ""
+
 #: tilavarauspalvelu/admin/unit_role/admin.py
 msgid ""
 "Search by user's username, email, first name, last name, unit or unit group"
@@ -2102,6 +2369,92 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/user/admin.py
 msgid "Permissions"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+#, fuzzy
+#| msgctxt "ICAL"
+#| msgid "Reservation for %(name)s"
+msgid "Reservation series"
+msgstr "Bokning för %(name)s"
+
+#: tilavarauspalvelu/admin/user/admin.py
+#, fuzzy
+#| msgctxt "Email"
+#| msgid "My applications"
+msgid "Applications"
+msgstr "Egna ansökningar"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Statistics UUID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "GDPR UUID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Issuer (iss)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Audience (aud)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "JWT ID (jti)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Token type (typ)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Expires (exp)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Issued at (iat)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Auth time (auth_time)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Nonce (nonce)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Access token hash (at_hash)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Preferred username (preferred_username)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Email verified (email_verified)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Authorized party (azp)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Session identifier (sid)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Session state (session_state)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Authentication methods reference (amr)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Level of assurance (loa)"
 msgstr ""
 
 #: tilavarauspalvelu/api/gdpr/views.py
@@ -2655,10 +3008,6 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgid "Helsinki"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgid "Other"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py

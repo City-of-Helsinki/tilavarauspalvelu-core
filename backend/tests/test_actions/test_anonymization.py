@@ -89,6 +89,11 @@ def test_anonymization__application():
     )
     application = ApplicationFactory.create(user=mr_anonymous)
     app_section = ApplicationSectionFactory.create(application=application)
+    other_application = ApplicationFactory.create()
+
+    LogEntry.objects.log_create(application, force_log=True, action=LogEntry.Action.CREATE)
+    LogEntry.objects.log_create(app_section, force_log=True, action=LogEntry.Action.CREATE)
+    LogEntry.objects.log_create(other_application, force_log=True, action=LogEntry.Action.CREATE)
 
     mr_anonymous.actions.anonymize_user_applications()
     app_section.refresh_from_db()
@@ -123,6 +128,11 @@ def test_anonymization__application():
     assert application.organisation_street_address != ANONYMIZED
     assert application.organisation_city != ANONYMIZED
 
+    # Audit log entries contain the original personal data
+    assert LogEntry.objects.get_for_object(application).count() == 0
+    assert LogEntry.objects.get_for_object(app_section).count() == 0
+    assert LogEntry.objects.get_for_object(other_application).count() == 1
+
 
 def test_anonymization__reservation():
     mr_anonymous = UserFactory.create_superuser(
@@ -141,6 +151,9 @@ def test_anonymization__reservation():
         reservation_series__name="foo",
         reservation_series__description="bar",
     )
+
+    LogEntry.objects.log_create(reservation, force_log=True, action=LogEntry.Action.CREATE)
+    LogEntry.objects.log_create(reservation.reservation_series, force_log=True, action=LogEntry.Action.CREATE)
 
     mr_anonymous.actions.anonymize_user_reservations()
     reservation.refresh_from_db()
@@ -167,6 +180,7 @@ def test_anonymization__reservation():
 
     # Check that auditlog entries are removed also
     assert LogEntry.objects.get_for_object(reservation).count() == 0
+    assert LogEntry.objects.get_for_object(reservation.reservation_series).count() == 0
 
 
 @freeze_time("2024-01-01")

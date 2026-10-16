@@ -22,6 +22,8 @@ class ReservationUnitImageAdmin(admin.ModelAdmin):
     list_filter = [
         "image_type",
     ]
+    list_select_related = ["reservation_unit__unit"]
+    autocomplete_fields = ["reservation_unit"]
 
     # Form
     formfield_overrides = {

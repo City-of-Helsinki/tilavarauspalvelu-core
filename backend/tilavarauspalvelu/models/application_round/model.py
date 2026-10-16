@@ -17,6 +17,7 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
     TermsOfUseTypeChoices,
 )
+from utils.auditlog_util import AuditLogger
 from utils.date_utils import local_datetime
 from utils.db import Now
 from utils.fields.model import TextChoicesField
@@ -334,3 +335,6 @@ class ApplicationRound(models.Model):
         # The setter is used by ApplicationRoundQuerySet to pre-evaluate units for multiple ApplicationRounds.
         # Should not be used by anything else!
         self._units_for_permissions = value
+
+
+AuditLogger.register(ApplicationRound)

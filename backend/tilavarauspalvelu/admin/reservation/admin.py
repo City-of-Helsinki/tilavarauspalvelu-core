@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from admin_extra_buttons.decorators import button
+from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin import helpers
+from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
-from more_admin_filters import MultiSelectFilter
 from rangefilter.filters import DateRangeFilterBuilder
 
 from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixin
@@ -19,6 +21,7 @@ from utils.date_utils import local_date, local_datetime
 
 from .filters import (
     AccessCodeGeneratedFilter,
+    ChoicesMultiSelectFilter,
     PaidReservationListFilter,
     ReservationSeriesListFilter,
     ReservationUnitFilter,
@@ -74,8 +77,8 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     list_filter = [
         ("created_at", DateRangeFilterBuilder(title=_("Created at"))),
         ("begins_at", DateRangeFilterBuilder(title=_("Begin time"))),
-        ("type", MultiSelectFilter),
-        ("state", MultiSelectFilter),
+        ("type", ChoicesMultiSelectFilter),
+        ("state", ChoicesMultiSelectFilter),
         ReservationSeriesListFilter,
         PaidReservationListFilter,
         ("reservation_unit__unit", UnitFilter),
@@ -195,12 +198,17 @@ class ReservationAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     ]
     inlines = [PaymentOrderInline]
 
+    @button(label=_("Open in staff UI"), change_form=True)
+    def open_in_staff_ui(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
+        url_base = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
+        return HttpResponseRedirect(f"{url_base}/kasittely/reservations/{pk}")
+
     def get_queryset(self, request: WSGIRequest) -> QuerySet[Reservation]:
         return (
             super()
             .get_queryset(request)
             .annotate(access_code_should_be_active=L("access_code_should_be_active"))
-            .select_related("reservation_unit")
+            .select_related("reservation_unit__unit")
         )
 
     def get_search_results(
