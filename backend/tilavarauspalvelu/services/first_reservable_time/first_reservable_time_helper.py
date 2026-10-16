@@ -23,10 +23,10 @@ from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_rese
 from utils.date_utils import (
     end_time_as_timedelta,
     local_datetime,
-    local_datetime_max,
-    local_datetime_min,
     local_start_of_day,
     time_as_timedelta,
+    utc_datetime_max,
+    utc_datetime_min,
 )
 
 if TYPE_CHECKING:
@@ -489,13 +489,13 @@ class FirstReservableTimeHelper:
         """
         return [
             TimeSpanElement(
-                start_datetime=local_datetime_min(),
+                start_datetime=utc_datetime_min(),
                 end_datetime=max(local_start_of_day(self.filter_date_start), self.now),
                 is_reservable=False,
             ),
             TimeSpanElement(
                 start_datetime=local_start_of_day(self.filter_date_end) + datetime.timedelta(days=1),
-                end_datetime=local_datetime_max(),
+                end_datetime=utc_datetime_max(),
                 is_reservable=False,
             ),
         ]

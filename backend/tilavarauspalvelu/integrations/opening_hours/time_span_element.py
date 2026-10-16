@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from tilavarauspalvelu.enums import HaukiResourceState
 from tilavarauspalvelu.exceptions import TimeSpanElementError
@@ -21,6 +21,13 @@ class TimeSpanElement:
     is_reservable: bool
     buffer_time_after: datetime.timedelta = field(default_factory=datetime.timedelta)
     buffer_time_before: datetime.timedelta = field(default_factory=datetime.timedelta)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        # Store the times in UTC. Python compares and subtracts two times in the Helsinki zone on the wall clock,
+        # which is wrong across a daylight saving time change and in the repeated hour after it.
+        if name in {"start_datetime", "end_datetime"}:
+            value = value.astimezone(datetime.UTC)
+        super().__setattr__(name, value)
 
     def __repr__(self) -> str:
         reservable_str = "Reservable" if self.is_reservable else "Closed"
@@ -313,7 +320,6 @@ class TimeSpanElement:
         >>> time_span.get_dates_range()
         [datetime.date(2021, 1, 1), datetime.date(2021, 1, 2), datetime.date(2021, 1, 3)]
         """
-        return [
-            self.buffered_start_datetime.date() + datetime.timedelta(i)
-            for i in range(int((self.buffered_end_datetime.date() - self.buffered_start_datetime.date()).days) + 1)
-        ]
+        start_date = self.buffered_start_datetime.astimezone(DEFAULT_TIMEZONE).date()
+        end_date = self.buffered_end_datetime.astimezone(DEFAULT_TIMEZONE).date()
+        return [start_date + datetime.timedelta(i) for i in range(int((end_date - start_date).days) + 1)]
