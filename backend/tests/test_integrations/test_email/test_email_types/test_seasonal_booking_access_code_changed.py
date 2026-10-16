@@ -162,14 +162,14 @@ LANGUAGE_CONTEXT = {
 def test_seasonal_booking_access_code_changed__get_context(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
-    params = {
-        "application_id": 0,
-        "application_section_id": 0,
-        "access_code_is_used": True,
-        "language": lang,
-    }
     with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_booking_access_code_changed(**get_mock_params(**params))
+        params = get_mock_params(
+            application_id=0,
+            application_section_id=0,
+            access_code_is_used=True,
+            language=lang,
+        )
+        context = get_context_for_seasonal_booking_access_code_changed(**params)
 
     assert context == expected
 
@@ -179,14 +179,14 @@ def test_seasonal_booking_access_code_changed__get_context(lang: Lang):
 def test_seasonal_booking_access_code_changed__get_context__get_mock_data(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
-    params = {
-        "application_id": 0,
-        "application_section_id": 0,
-        "access_code_is_used": True,
-        "language": lang,
-    }
     with TranslationsFromPOFiles():
-        context = get_mock_data(email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_CHANGED, **params)
+        context = get_mock_data(
+            email_type=EmailType.SEASONAL_BOOKING_ACCESS_CODE_CHANGED,
+            application_id=0,
+            application_section_id=0,
+            access_code_is_used=True,
+            language=lang,
+        )
 
     assert context == expected
 

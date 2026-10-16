@@ -9,9 +9,8 @@ from typing import TYPE_CHECKING, Any, Literal, Self, Union, get_origin, get_typ
 
 import faker
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.db.models import Model
+from django.db.models import Model, OneToOneRel
 from factory import Factory, FactoryError, Faker, PostGeneration, SubFactory
-from factory.base import BaseFactory
 from factory.django import DjangoModelFactory
 from factory.utils import import_object
 
@@ -22,6 +21,7 @@ from .providers import CUSTOM_PROVIDERS
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
+    from factory.base import BaseFactory
     from factory.builder import BuildStep, Resolver
 
     from ._typing import ENProviders, FactoryType, FIProviders, SVProviders
@@ -114,9 +114,9 @@ class FakerEN(BaseFaker):
 class _CustomFactoryWrapper:
     def __init__(self, factory_: FactoryType) -> None:
         self.factory: type[BaseFactory] | None = None
-        self.callable: Callable[..., type[BaseFactory]] | None = None
+        self.callable: Callable[[], type[BaseFactory]] | None = None
 
-        if isinstance(factory_, type) and issubclass(factory_, BaseFactory):
+        if isinstance(factory_, type):
             self.factory = factory_
             return
 
@@ -135,8 +135,9 @@ class _CustomFactoryWrapper:
 
         self.callable = lambda: import_object(*factory_.rsplit(".", 1))
 
-    def get(self) -> FactoryType:
+    def get(self) -> type[BaseFactory]:
         if self.factory is None:
+            assert self.callable is not None
             self.factory = self.callable()
         return self.factory
 
@@ -151,7 +152,7 @@ class _PostFactory(PostGeneration):
         """Set the name of the field in the factory this is in."""
         self.field_name = name
 
-    def get_factory(self) -> BaseFactory:
+    def get_factory(self) -> type[BaseFactory]:
         return self.factory_wrapper.get()
 
     def generate(self, instance: Model, create: bool, values: Iterable[Any] | None, **kwargs: Any) -> None:
@@ -521,8 +522,9 @@ class ReverseOneToOneFactory(_PostFactory):
     def generate(self, instance: Model, create: bool, values: Iterable[Model] | None, **kwargs: Any) -> None:
         if not values and kwargs:
             factory = self.get_factory()
-            field_name = instance._meta.get_field(self.field_name).remote_field.name
-            kwargs.setdefault(field_name, instance)
+            field = instance._meta.get_field(self.field_name)
+            assert isinstance(field, OneToOneRel)
+            kwargs.setdefault(field.remote_field.name, instance)
             factory.create(**kwargs) if create else factory.build(**kwargs)
 
 
