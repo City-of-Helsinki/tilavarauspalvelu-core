@@ -140,10 +140,11 @@ class ApplicationRoundActions:
             for series in reservation_series:
                 reservation_details = self._get_reservation_series_details(series)
 
-                hauki_resource_id = getattr(series.reservation_unit.origin_hauki_resource, "id", None)
+                hauki_resource = series.reservation_unit.origin_hauki_resource
+                closed_hours = closed_time_spans.get(hauki_resource.id, []) if hauki_resource is not None else []
                 slots = series.actions.pre_calculate_slots(
                     check_start_interval=True,
-                    closed_hours=closed_time_spans.get(hauki_resource_id, []),
+                    closed_hours=closed_hours,
                 )
 
                 reservations = series.actions.bulk_create_reservation_for_periods(
