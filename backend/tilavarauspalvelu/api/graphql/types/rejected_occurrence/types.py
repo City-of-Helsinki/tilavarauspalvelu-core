@@ -3,12 +3,13 @@ from __future__ import annotations
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import RejectedOccurrence
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import RejectedOccurrenceFilterSet
 from .permissions import RejectedOccurrencePermission
 
 
-class RejectedOccurrenceNode(DjangoNode):
+class RejectedOccurrenceNode(DjangoNode[RejectedOccurrence, AnyUser]):
     class Meta:
         model = RejectedOccurrence
         fields = [

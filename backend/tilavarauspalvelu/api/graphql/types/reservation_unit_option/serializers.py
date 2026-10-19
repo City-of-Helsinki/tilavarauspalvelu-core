@@ -6,7 +6,7 @@ from rest_framework.exceptions import ValidationError
 from tilavarauspalvelu.models import ReservationUnitOption
 
 
-class ReservationUnitOptionApplicantSerializer(NestingModelSerializer):
+class ReservationUnitOptionApplicantSerializer(NestingModelSerializer[ReservationUnitOption]):
     class Meta:
         model = ReservationUnitOption
         fields = [
@@ -16,7 +16,7 @@ class ReservationUnitOptionApplicantSerializer(NestingModelSerializer):
         ]
 
 
-class ReservationUnitOptionHandlerSerializer(NestingModelSerializer):
+class ReservationUnitOptionHandlerSerializer(NestingModelSerializer[ReservationUnitOption]):
     instance: ReservationUnitOption
 
     class Meta:

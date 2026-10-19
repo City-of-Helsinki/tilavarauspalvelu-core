@@ -3,6 +3,7 @@ from __future__ import annotations
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import Sport
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import SportFilterSet
 from .permissions import SportPermission
@@ -12,7 +13,7 @@ __all__ = [
 ]
 
 
-class SportNode(DjangoNode):
+class SportNode(DjangoNode[Sport, AnyUser]):
     class Meta:
         model = Sport
         fields = [

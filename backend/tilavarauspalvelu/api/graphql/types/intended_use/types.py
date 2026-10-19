@@ -9,6 +9,7 @@ from graphene_django_extensions import DjangoNode
 from query_optimizer import AnnotatedField
 
 from tilavarauspalvelu.models import IntendedUse
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import IntendedUseFilterSet
 from .permissions import IntendedUsePermission
@@ -21,7 +22,7 @@ __all__ = [
 ]
 
 
-class IntendedUseNode(DjangoNode):
+class IntendedUseNode(DjangoNode[IntendedUse, AnyUser]):
     image_url = AnnotatedField(graphene.String, expression=models.F("image"))
     small_url = AnnotatedField(graphene.String, expression=models.F("image"))
 

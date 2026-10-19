@@ -5,12 +5,13 @@ from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.enums import ResourceLocationType
 from tilavarauspalvelu.models import Resource
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import ResourceFilterSet
 from .permissions import ResourcePermission
 
 
-class ResourceNode(DjangoNode):
+class ResourceNode(DjangoNode[Resource, AnyUser]):
     location_type = graphene.Field(
         graphene.Enum.from_enum(ResourceLocationType),
         required=True,

@@ -3,18 +3,18 @@ from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import StrEnum, auto
-from typing import TYPE_CHECKING, Any, Literal, NamedTuple, NotRequired, Protocol, TypedDict
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, NotRequired, Protocol, TypedDict, overload
 
 from django.contrib.auth.models import AnonymousUser
-from django.core.handlers import wsgi
 from django.db import models
-from graphql import GraphQLResolveInfo
 from rest_framework.exceptions import ValidationError
 
 if TYPE_CHECKING:
     import datetime
 
     from django.contrib.sessions.backends.cache import SessionStore
+    from query_optimizer.typing import GQLInfo as OptimizerGQLInfo  # noqa: TID251
+    from query_optimizer.typing import UserHintedWSGIRequest
 
     from tilavarauspalvelu.enums import (
         AccessType,
@@ -41,7 +41,6 @@ __all__ = [
     "AnyUser",
     "EmailContext",
     "ErrorList",
-    "GQLInfo",
     "HTTPMethod",
     "Lang",
     "M2MAction",
@@ -51,7 +50,6 @@ __all__ = [
     "TimeSlotDB",
     "TimeSpan",
     "UserAnonymizationInfo",
-    "WSGIRequest",
     "error_codes",
     "permission",
 ]
@@ -110,13 +108,13 @@ class TimeSlotDB(TypedDict):
     end: str  # datetime.time
 
 
-class WSGIRequest(wsgi.WSGIRequest):  # noqa: TID251
-    user: AnyUser
-    session: SessionStore
+if TYPE_CHECKING:
+    # Importing the query optimizer at runtime needs configured Django settings.
 
+    class WSGIRequest(UserHintedWSGIRequest[AnyUser]):
+        session: SessionStore
 
-class GQLInfo(GraphQLResolveInfo):
-    context = WSGIRequest
+    type GQLInfo = OptimizerGQLInfo[AnyUser]
 
 
 class QueryInfo(TypedDict):
@@ -129,7 +127,12 @@ class QueryInfo(TypedDict):
 class SessionMapping(Protocol):
     def __setitem__(self, key: str, value: Any) -> None: ...
 
-    def get(self, key: str, default: Any = None) -> Any: ...
+    # Overloads, so that both the Django session and a dict match this protocol.
+    @overload
+    def get(self, key: str) -> Any: ...
+
+    @overload
+    def get(self, key: str, default: Any) -> Any: ...
 
 
 class EmailAttachment(TypedDict):

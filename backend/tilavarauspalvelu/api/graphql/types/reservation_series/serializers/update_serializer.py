@@ -19,7 +19,7 @@ __all__ = [
 ]
 
 
-class ReservationSeriesReservationUpdateSerializer(NestingModelSerializer):
+class ReservationSeriesReservationUpdateSerializer(NestingModelSerializer[Reservation]):
     class Meta:
         model = Reservation
         fields = [
@@ -47,7 +47,7 @@ class ReservationSeriesReservationUpdateSerializer(NestingModelSerializer):
         extra_kwargs = {field: {"required": False} for field in fields}
 
 
-class ReservationSeriesUpdateSerializer(NestingModelSerializer):
+class ReservationSeriesUpdateSerializer(NestingModelSerializer[ReservationSeries]):
     """Update reservation series and its reservation data."""
 
     instance: ReservationSeries

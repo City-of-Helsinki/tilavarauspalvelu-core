@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.permissions import BasePermission
 
+from tilavarauspalvelu.models import PaymentOrder
+from tilavarauspalvelu.typing import AnyUser
+
 if TYPE_CHECKING:
     from query_optimizer.typing import GraphQLFilterInfo
-
-    from tilavarauspalvelu.models import PaymentOrder
-    from tilavarauspalvelu.typing import AnyUser
 
 
 __all__ = [
@@ -16,7 +16,7 @@ __all__ = [
 ]
 
 
-class PaymentOrderPermission(BasePermission):
+class PaymentOrderPermission(BasePermission[PaymentOrder, AnyUser]):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return user.is_authenticated

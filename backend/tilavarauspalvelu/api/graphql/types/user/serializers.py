@@ -10,7 +10,7 @@ __all__ = [
 ]
 
 
-class CurrentUserUpdateSerializer(NestingModelSerializer):
+class CurrentUserUpdateSerializer(NestingModelSerializer[User]):
     class Meta:
         model = User
         fields = [
@@ -24,7 +24,7 @@ class CurrentUserUpdateSerializer(NestingModelSerializer):
         }
 
 
-class UserStaffUpdateSerializer(NestingModelSerializer):
+class UserStaffUpdateSerializer(NestingModelSerializer[User]):
     class Meta:
         model = User
         fields = [

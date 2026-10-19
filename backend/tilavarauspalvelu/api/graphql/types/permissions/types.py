@@ -9,12 +9,13 @@ from query_optimizer import ManuallyOptimizedField
 
 from tilavarauspalvelu.enums import UserPermissionChoice
 from tilavarauspalvelu.models import GeneralRole, UnitRole
+from tilavarauspalvelu.typing import AnyUser
 
 if TYPE_CHECKING:
     from django.db import models
     from query_optimizer.optimizer import QueryOptimizer
 
-    from tilavarauspalvelu.typing import AnyUser, GQLInfo
+    from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
     "GeneralRoleNode",
@@ -23,7 +24,7 @@ __all__ = [
 ]
 
 
-class GeneralRoleNode(DjangoNode):
+class GeneralRoleNode(DjangoNode[GeneralRole, AnyUser]):
     permissions = ManuallyOptimizedField(
         graphene.List(graphene.NonNull(graphene.Enum.from_enum(UserPermissionChoice))),
         required=True,
@@ -49,7 +50,7 @@ class GeneralRoleNode(DjangoNode):
         return queryset
 
 
-class UnitRoleNode(DjangoNode):
+class UnitRoleNode(DjangoNode[UnitRole, AnyUser]):
     permissions = ManuallyOptimizedField(
         graphene.List(graphene.NonNull(graphene.Enum.from_enum(UserPermissionChoice))),
         required=True,

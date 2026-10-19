@@ -1,16 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import Unit
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import UnitAllFilterSet, UnitFilterSet
 from .permissions import UnitAllPermission, UnitPermission
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "UnitNode",
@@ -22,7 +18,7 @@ def private_field_check(user: AnyUser, unit: Unit) -> bool | None:
     return True if result else None
 
 
-class UnitNode(DjangoNode):
+class UnitNode(DjangoNode[Unit, AnyUser]):
     class Meta:
         model = Unit
         fields = [
@@ -50,7 +46,7 @@ class UnitNode(DjangoNode):
         max_complexity = 12
 
 
-class UnitAllNode(DjangoNode):
+class UnitAllNode(DjangoNode[Unit, AnyUser]):
     """This Node should be kept to the bare minimum and never expose any relations to avoid performance issues."""
 
     class Meta:

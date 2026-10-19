@@ -3,6 +3,7 @@ from __future__ import annotations
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import ReservationUnitAccessType
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import ReservationUnitAccessTypeFilterSet
 from .permissions import ReservationUnitAccessTypePermission
@@ -12,7 +13,7 @@ __all__ = [
 ]
 
 
-class ReservationUnitAccessTypeNode(DjangoNode):
+class ReservationUnitAccessTypeNode(DjangoNode[ReservationUnitAccessType, AnyUser]):
     class Meta:
         model = ReservationUnitAccessType
         fields = [

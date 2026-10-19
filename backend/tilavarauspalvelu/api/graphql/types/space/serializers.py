@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-class SpaceSerializer(NestingModelSerializer):
+class SpaceSerializer(NestingModelSerializer[Space]):
     instance: Space | None
 
     class Meta:

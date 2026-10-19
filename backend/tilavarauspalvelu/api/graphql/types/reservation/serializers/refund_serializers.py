@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-class ReservationRefundSerializer(NestingModelSerializer):
+class ReservationRefundSerializer(NestingModelSerializer[Reservation]):
     instance: Reservation
 
     pk = IntegerField(required=True)

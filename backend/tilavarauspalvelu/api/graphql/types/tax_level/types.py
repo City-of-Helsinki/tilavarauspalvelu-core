@@ -6,6 +6,7 @@ from lookup_property import L
 from query_optimizer import AnnotatedField
 
 from tilavarauspalvelu.models import TaxLevel
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import TaxLevelFilterSet
 from .permissions import TaxLevelPermission
@@ -15,7 +16,7 @@ __all__ = [
 ]
 
 
-class TaxLevelNode(DjangoNode):
+class TaxLevelNode(DjangoNode[TaxLevel, AnyUser]):
     current_percentage = AnnotatedField(graphene.Decimal, expression=L("current_percentage"))
 
     class Meta:
