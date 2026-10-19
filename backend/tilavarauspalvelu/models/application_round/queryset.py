@@ -60,7 +60,7 @@ class ApplicationRoundQuerySet(ModelQuerySet[ApplicationRound]):
         )
 
         for item in items:
-            item.units_for_permissions = [unit for unit in units if item.pk in unit.application_round_ids]
+            item.units_for_permissions = [unit for unit in units if item.pk in unit.application_round_ids]  # type: ignore[attr-defined]
 
 
 class ApplicationRoundManager(TranslatedModelManager[ApplicationRound, ApplicationRoundQuerySet]): ...

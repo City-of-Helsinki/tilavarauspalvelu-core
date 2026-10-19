@@ -201,7 +201,7 @@ class ApplicationSection(SerializableModelMixin, models.Model):
                 ),
             ).all()
         )
-        total_allocations = sum(option.num_of_allocations for option in reservation_unit_options)
+        total_allocations = sum(option.num_of_allocations for option in reservation_unit_options)  # type: ignore[attr-defined]
         all_locked_or_rejected = all(option.is_locked or option.is_rejected for option in reservation_unit_options)
 
         if total_allocations >= self.applied_reservations_per_week:

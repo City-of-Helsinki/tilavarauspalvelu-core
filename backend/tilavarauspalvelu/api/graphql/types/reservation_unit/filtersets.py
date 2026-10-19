@@ -207,7 +207,7 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
             # A term with no lexemes, such as the stop word "the" or a lone backslash, becomes an empty query.
             # An empty query matches nothing, so let such a term match every row.
             query_node_count = models.Func(search_query, function="numnode", output_field=models.IntegerField())
-            has_no_lexemes = Exact(query_node_count, 0)
+            has_no_lexemes = models.Q(Exact(query_node_count, 0))
 
             match language:
                 case "finnish":

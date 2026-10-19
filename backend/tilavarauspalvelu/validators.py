@@ -110,15 +110,16 @@ def validate_reservable_times_overlap(timeslots: list[TimeSlot]) -> None:
 INPUT_FORMATS = formats.get_format_lazy("TIME_INPUT_FORMATS")
 
 
-def validate_string_time(value: str) -> datetime.time:
+def validate_string_time(value: str) -> None:
     if not value:
         raise ValidationError(_("This field is required."), code="required")
 
     for input_format in INPUT_FORMATS:
         try:
-            return datetime.datetime.strptime(value, input_format).time()  # noqa: DTZ007
+            datetime.datetime.strptime(value, input_format)  # noqa: DTZ007
         except (ValueError, TypeError):
             continue
+        return
 
     raise ValidationError(_("Enter a valid time."), code="invalid")
 

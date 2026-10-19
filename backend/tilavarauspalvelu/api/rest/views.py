@@ -600,7 +600,8 @@ def robot_email_cache(request: WSGIRequest) -> HttpResponse:
     subject_filter = request.GET.get("subject", "")
     recipient_filter = request.GET.get("recipient", "")
     cache_key_template = f"{settings.ROBOT_EMAIL_CACHE_KEY}:*:{subject_filter}*:{recipient_filter}*"
-    robot_email_data = cache.get_many(cache.keys(cache_key_template))
+    # `keys` comes from django-redis.
+    robot_email_data = cache.get_many(cache.keys(cache_key_template))  # type: ignore[attr-defined]
 
     return JsonResponse(
         sorted(robot_email_data.values(), key=operator.itemgetter("timestamp"), reverse=True),

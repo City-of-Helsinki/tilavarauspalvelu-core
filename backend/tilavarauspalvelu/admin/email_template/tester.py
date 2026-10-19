@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from admin_data_views.settings import admin_data_settings
 from django import forms
@@ -46,7 +46,8 @@ class ReservationUnitSelectForm(forms.Form):
             (runit.pk, f"{runit.name} - {safe_getattr(runit, 'unit.name')}")
             for runit in ReservationUnit.objects.select_related("unit").order_by("name_fi")
         ]
-        self.fields["reservation_unit"].choices = runit_choices
+        reservation_unit_field = cast("forms.ChoiceField", self.fields["reservation_unit"])
+        reservation_unit_field.choices = runit_choices
 
 
 def email_tester_admin_redirect_view(request: WSGIRequest, email_type: str | None = None) -> HttpResponseRedirect:

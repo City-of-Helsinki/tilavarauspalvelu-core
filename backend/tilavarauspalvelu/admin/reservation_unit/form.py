@@ -101,7 +101,7 @@ class ReservationUnitAccessTypeFormSet(BaseInlineFormSet):
 
     def _should_delete_form(self, form: ReservationUnitAccessTypeForm) -> bool:
         # Required so errors from `validate_deletion` are not ignored.
-        return (not form.errors) and super()._should_delete_form(form)
+        return (not form.errors) and super()._should_delete_form(form)  # type: ignore[misc]
 
 
 class ReservationUnitAccessTypeInline(admin.TabularInline):

@@ -161,4 +161,4 @@ class ApplicationSectionAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
 
     @admin.display(ordering=L("application__status"))
     def application_status(self, obj: ApplicationSection) -> str:
-        return obj.application_status
+        return obj.application_status  # type: ignore[attr-defined]

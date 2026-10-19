@@ -83,7 +83,7 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
         )
 
         for item in items:
-            item.units_for_permissions = [unit for unit in units if item.pk in unit.reservation_ids]
+            item.units_for_permissions = [unit for unit in units if item.pk in unit.reservation_ids]  # type: ignore[attr-defined]
 
     def with_buffered_begin_and_end(self) -> Self:
         """Annotate the queryset with buffered begin and end times."""
