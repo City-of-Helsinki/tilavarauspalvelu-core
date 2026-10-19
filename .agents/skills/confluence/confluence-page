@@ -31,7 +31,7 @@ children="$(api_all_v2 "api/v2/pages/$id/children?limit=250")"
 comments="[]"
 while :; do
   start="$(jq length <<<"$comments")"
-  batch="$(api "rest/api/content/$id/child/comment?expand=body.storage,history&depth=all&limit=100&start=$start")"
+  batch="$(api "rest/api/content/$id/child/comment?expand=body.storage,history&depth=all&location=footer&limit=100&start=$start")"
   [[ "$(jq '.results | length' <<<"$batch")" -gt 0 ]] || break
   comments="$(jq --slurp '.[0] + .[1].results' <(printf '%s' "$comments") <(printf '%s' "$batch"))"
   [[ "$(jq '._links.next // empty' <<<"$batch")" ]] || break
