@@ -5,6 +5,7 @@ from typing import Any, Literal, Self
 from django.db import models
 from django.db.models import QuerySet
 from django.db.models.manager import BaseManager
+from modeltranslation.manager import MultilingualManager
 from mptt.managers import TreeManager
 from mptt.querysets import TreeQuerySet
 
@@ -17,7 +18,9 @@ __all__ = [
     "ModelTreeManager",
     "ModelTreeQuerySet",
     "OneToManyRelatedManager",
+    "TranslatedModelManager",
     "TranslatedModelQuerySet",
+    "TranslatedModelTreeManager",
 ]
 
 
@@ -101,6 +104,13 @@ class ModelManager(BaseManager):
         return id(self)
 
 
+class TranslatedModelManager(MultilingualManager, ModelManager):
+    """
+    Manager class for models with translated fields.
+    modeltranslation replaces any other manager class at runtime with a class that type checkers cannot find.
+    """
+
+
 # Related managers
 
 
@@ -159,3 +169,7 @@ class ModelTreeManager(TreeManager):
     def __hash__(self) -> int:
         # Copied from 'BaseManager.__hash__'
         return id(self)
+
+
+class TranslatedModelTreeManager(MultilingualManager, ModelTreeManager):
+    """Same as `TranslatedModelManager`, but for MPTT models."""

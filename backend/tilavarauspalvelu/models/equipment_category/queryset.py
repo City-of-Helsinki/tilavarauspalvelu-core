@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TypeVar
 
 from tilavarauspalvelu.models import EquipmentCategory
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models._base import ModelQuerySet, TranslatedModelManager
 
 __all__ = [
     "EquipmentCategoryManager",
@@ -18,4 +18,4 @@ _TRow_co = TypeVar("_TRow_co", covariant=True, default=EquipmentCategory)
 class EquipmentCategoryQuerySet(ModelQuerySet[_TModel_co, _TRow_co]): ...
 
 
-class EquipmentCategoryManager(ModelManager[EquipmentCategory, EquipmentCategoryQuerySet]): ...
+class EquipmentCategoryManager(TranslatedModelManager[EquipmentCategory, EquipmentCategoryQuerySet]): ...

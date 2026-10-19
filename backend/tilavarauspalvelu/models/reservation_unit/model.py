@@ -314,6 +314,8 @@ class ReservationUnit(models.Model):
     reservation_cancelled_instructions_en: str | None
 
     objects: ClassVar[ReservationUnitManager] = LazyModelManager.new()
+    # modeltranslation replaces `ReservationUnitManager` at runtime, so the mypy plugin cannot find its type.
+    _default_manager: ClassVar[ReservationUnitManager]
     actions: LazyAttribute[ReservationUnitActions] = LazyModelAttribute.new()
     validators: LazyAttribute[ReservationUnitValidator] = LazyModelAttribute.new()
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TypeVar
 
 from tilavarauspalvelu.models import Space
-from tilavarauspalvelu.models._base import ModelTreeManager, ModelTreeQuerySet
+from tilavarauspalvelu.models._base import ModelTreeQuerySet, TranslatedModelTreeManager
 
 __all__ = [
     "SpaceManager",
@@ -18,4 +18,4 @@ _TRow_co = TypeVar("_TRow_co", covariant=True, default=Space)
 class SpaceQuerySet(ModelTreeQuerySet[_TModel_co, _TRow_co]): ...
 
 
-class SpaceManager(ModelTreeManager[Space, SpaceQuerySet]): ...
+class SpaceManager(TranslatedModelTreeManager[Space, SpaceQuerySet]): ...

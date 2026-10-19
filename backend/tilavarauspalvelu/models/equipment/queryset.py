@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TypeVar
 
 from tilavarauspalvelu.models import Equipment
-from tilavarauspalvelu.models._base import ModelManager, TranslatedModelQuerySet
+from tilavarauspalvelu.models._base import TranslatedModelManager, TranslatedModelQuerySet
 
 __all__ = [
     "EquipmentManager",
@@ -18,4 +18,4 @@ _TRow_co = TypeVar("_TRow_co", covariant=True, default=Equipment)
 class EquipmentQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]): ...
 
 
-class EquipmentManager(ModelManager[Equipment, EquipmentQuerySet]): ...
+class EquipmentManager(TranslatedModelManager[Equipment, EquipmentQuerySet]): ...
