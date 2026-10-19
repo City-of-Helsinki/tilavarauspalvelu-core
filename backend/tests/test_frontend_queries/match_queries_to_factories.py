@@ -299,7 +299,7 @@ def get_factory_arguments(
             return {lookup: value}
 
         if isinstance(model_field, RelatedField | ForeignObjectRel):
-            model = model_field.related_model  # type: ignore[assignment]
+            model = model_field.related_model
 
     assert selection_node.selection_set is not None
 

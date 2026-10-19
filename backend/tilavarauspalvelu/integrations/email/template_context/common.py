@@ -557,8 +557,8 @@ def _initialize_allocations_map(section: ApplicationSection) -> AllocationsMap:
 
     series: ReservationSeries
     for series in section.actions.get_reservation_series():
-        begin_time = local_time_string(series.begin_time)  # type: ignore[arg-type]
-        end_time = local_time_string(series.end_time)  # type: ignore[arg-type]
+        begin_time = local_time_string(series.begin_time)
+        end_time = local_time_string(series.end_time)
 
         reservation = series.reservations.last()
         reservation_unit = series.reservation_unit
@@ -568,7 +568,7 @@ def _initialize_allocations_map(section: ApplicationSection) -> AllocationsMap:
                 "time_value": f"{begin_time}-{end_time}",
                 "access_code_validity_period": "",  # Can be filled in later if access codes are used
                 "series_url": get_staff_reservations_ext_link(reservation_id=reservation.pk),
-                "unit_name": reservation_unit.unit.name,  # type: ignore[union-attr]
+                "unit_name": reservation_unit.unit.name,
                 "unit_location": reservation_unit.unit.address,
                 "reservation_unit_name": reservation_unit.name,
             }

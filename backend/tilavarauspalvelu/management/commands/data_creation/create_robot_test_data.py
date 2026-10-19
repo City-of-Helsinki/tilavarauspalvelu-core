@@ -2329,7 +2329,7 @@ def create_reservation_units() -> None:
         begin_date=local_date(2025, 6, 12),
         access_type=AccessType.UNRESTRICTED,
     )
-    for weekday in Weekday:  # type: ignore[attr-defined]
+    for weekday in Weekday:
         ApplicationRoundTimeSlot.objects.create(
             reservation_unit=_kausivarausyksikko_malmi,
             weekday=weekday,
@@ -2448,7 +2448,7 @@ def create_reservation_units() -> None:
         begin_date=local_date(2025, 6, 12),
         access_type=AccessType.UNRESTRICTED,
     )
-    for weekday in Weekday:  # type: ignore[attr-defined]
+    for weekday in Weekday:
         ApplicationRoundTimeSlot.objects.create(
             reservation_unit=_kausivarausyksikko_keskusta,
             weekday=weekday,
