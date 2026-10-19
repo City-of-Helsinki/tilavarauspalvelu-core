@@ -1183,7 +1183,7 @@ def _create_reservation_units_in_space_hierarchies(
         name_sv="Rumstavshierarki",
     )
 
-    reservation_unit_base: ReservationUnitBuilder = _get_base_reservation_unit_builder(  # type: ignore[assignment]
+    reservation_unit_base: ReservationUnitBuilder = _get_base_reservation_unit_builder(
         reservation_unit_type=reservation_unit_type,
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,
@@ -1565,7 +1565,7 @@ def _create_reservation_units_in_resource_hierarchies(
     reservation_unit_access_types: list[ReservationUnitAccessType] = []
     images: list[ReservationUnitImage] = []
 
-    reservation_unit_base: ReservationUnitBuilder = _get_base_reservation_unit_builder(  # type: ignore[assignment]
+    reservation_unit_base: ReservationUnitBuilder = _get_base_reservation_unit_builder(
         reservation_unit_type=reservation_unit_type,
         terms_of_use=terms_of_use,
         cancellation_rules=cancellation_rules,
@@ -1802,7 +1802,7 @@ def _get_base_reservation_unit_builder(
     cancellation_rules: Sequence[ReservationUnitCancellationRule | None] = (None,),
     hauki_resources: Sequence[OriginHaukiResource | None] = (None,),
 ) -> ReservationUnitBuilder:
-    return ReservationUnitBuilder().set(  # type: ignore[return-value]
+    return ReservationUnitBuilder().set(
         origin_hauki_resource=random.choice(hauki_resources),
         reservations_min_days_before=0,
         reservations_max_days_before=14,

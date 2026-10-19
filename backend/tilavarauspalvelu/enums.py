@@ -399,7 +399,7 @@ class ReservationStateChoice(models.TextChoices):
 
     @classproperty
     def states_going_to_occur(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CREATED.value,
             ReservationStateChoice.CONFIRMED.value,
             ReservationStateChoice.WAITING_FOR_PAYMENT.value,
@@ -408,14 +408,14 @@ class ReservationStateChoice(models.TextChoices):
 
     @classproperty
     def states_that_can_change_to_handling(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CONFIRMED.value,
             ReservationStateChoice.DENIED.value,
         ]
 
     @classproperty
     def states_that_can_change_to_deny(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.REQUIRES_HANDLING.value,
             ReservationStateChoice.CONFIRMED.value,
         ]
@@ -423,51 +423,51 @@ class ReservationStateChoice(models.TextChoices):
     @classproperty
     def states_that_can_be_deleted(cls) -> list[str]:
         # "Alustava varaus" / "tentative reservation"
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CREATED.value,
             ReservationStateChoice.WAITING_FOR_PAYMENT.value,
         ]
 
     @classproperty
     def states_that_can_be_edited_by_staff(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CONFIRMED.value,
         ]
 
     @classproperty
     def states_that_can_be_rescheduled(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CONFIRMED.value,
         ]
 
     @classproperty
     def states_that_can_be_approved(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.REQUIRES_HANDLING.value,
         ]
 
     @classproperty
     def states_that_can_be_cancelled(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CONFIRMED.value,
         ]
 
     @classproperty
     def states_that_can_be_refunded(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CANCELLED.value,
             ReservationStateChoice.DENIED.value,
         ]
 
     @classproperty
     def states_that_can_change_access_code(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CONFIRMED.value,
         ]
 
     @classproperty
     def doesnt_block_anonymization(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationStateChoice.CANCELLED.value,
             ReservationStateChoice.DENIED.value,
         ]
@@ -489,35 +489,35 @@ class ReservationTypeChoice(models.TextChoices):
 
     @classproperty
     def types_that_can_be_rescheduled(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationTypeChoice.NORMAL.value,
             ReservationTypeChoice.BEHALF.value,
         ]
 
     @classproperty
     def should_not_anonymize(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationTypeChoice.BLOCKED.value,
             ReservationTypeChoice.STAFF.value,
         ]
 
     @classproperty
     def types_that_can_be_cancelled(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationTypeChoice.NORMAL.value,
             ReservationTypeChoice.SEASONAL.value,
         ]
 
     @classproperty
     def types_created_by_the_reservee(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationTypeChoice.NORMAL.value,
             ReservationTypeChoice.SEASONAL.value,
         ]
 
     @classproperty
     def types_that_staff_can_create(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationTypeChoice.BLOCKED.value,
             ReservationTypeChoice.STAFF.value,
             ReservationTypeChoice.BEHALF.value,
@@ -526,7 +526,7 @@ class ReservationTypeChoice(models.TextChoices):
 
     @classproperty
     def types_that_can_change_access_code(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ReservationTypeChoice.NORMAL.value,
             ReservationTypeChoice.BEHALF.value,
             ReservationTypeChoice.STAFF.value,
@@ -675,7 +675,7 @@ class ReservationUnitPublishingState(models.TextChoices):
 
     @classproperty
     def states_that_are_visible(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             cls.PUBLISHED.value,
             cls.SCHEDULED_HIDING.value,
         ]
@@ -764,14 +764,14 @@ class ReservationKind(models.TextChoices):
 
     @classproperty
     def allows_direct(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             cls.DIRECT.value,
             cls.DIRECT_AND_SEASON.value,
         ]
 
     @classproperty
     def allows_season(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             cls.SEASON.value,
             cls.DIRECT_AND_SEASON.value,
         ]
@@ -1107,7 +1107,7 @@ class ApplicationStatusChoice(models.TextChoices):
 
     @classproperty
     def blocks_anonymization(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             ApplicationStatusChoice.RECEIVED.value,
             ApplicationStatusChoice.IN_ALLOCATION.value,
             ApplicationStatusChoice.HANDLED.value,
@@ -1160,14 +1160,14 @@ class BannerNotificationTarget(models.TextChoices):
 
     @classproperty
     def for_staff(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             cls.STAFF.value,
             cls.ALL.value,
         ]
 
     @classproperty
     def for_customers(cls) -> list[str]:
-        return [  # type: ignore[return-type]
+        return [
             cls.USER.value,
             cls.ALL.value,
         ]

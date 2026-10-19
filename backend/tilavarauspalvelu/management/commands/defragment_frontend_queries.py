@@ -213,4 +213,4 @@ def deduplicate_fields(node: OperationDefinitionNode | FieldNode) -> None:
         selections = chain(current_field.selection_set.selections, field.selection_set.selections)
         current_field.selection_set.selections = tuple(selections)
 
-    node.selection_set.selections = tuple(field_map.values())  # type: ignore[assignment]
+    node.selection_set.selections = tuple(field_map.values())

@@ -289,7 +289,7 @@ class ReservationUnitManager(ModelManager[ReservationUnit, ReservationUnitQueryS
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
             return NotImplemented
-        return self._constructor_args == other._constructor_args  # type: ignore[attr-defined]
+        return self._constructor_args == other._constructor_args
 
     # Copied from 'BaseManager.__hash__'
     def __hash__(self) -> int:

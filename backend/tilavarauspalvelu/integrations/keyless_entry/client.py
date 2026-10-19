@@ -161,7 +161,7 @@ class PindoraReservationUnitClient(BasePindoraClient):
             action="fetching reservation unit",
         )
 
-        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
+        data: dict[str, Any] = cls.response_json(response)
         parsed_data = cls._parse_reservation_unit_response(data)
         cls._cache_reservation_unit_response(data=data, ext_uuid=reservation_unit_uuid)
         return parsed_data
@@ -259,7 +259,7 @@ class PindoraReservationClient(BasePindoraClient):
             action="fetching reservation",
         )
 
-        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
+        data: dict[str, Any] = cls.response_json(response)
         parsed_data = cls._parse_reservation_response(data)
         cls._cache_reservation_response(parsed_data, ext_uuid=reservation_uuid)
         return parsed_data
@@ -289,7 +289,7 @@ class PindoraReservationClient(BasePindoraClient):
             action="creating reservation",
         )
 
-        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
+        data: dict[str, Any] = cls.response_json(response)
         parsed_data = cls._parse_reservation_response(data)
         cls._cache_reservation_response(parsed_data, ext_uuid=reservation.ext_uuid)
         return parsed_data
@@ -324,7 +324,7 @@ class PindoraReservationClient(BasePindoraClient):
 
         cls._clear_cached_reservation_response(ext_uuid=reservation.ext_uuid)
 
-        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
+        data: dict[str, Any] = cls.response_json(response)
         return cls._parse_access_code_modify_response(data)
 
     @classmethod
@@ -347,7 +347,7 @@ class PindoraReservationClient(BasePindoraClient):
 
         cls._clear_cached_reservation_response(ext_uuid=reservation_uuid)
 
-        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
+        data: dict[str, Any] = cls.response_json(response)
         return cls._parse_access_code_modify_response(data)
 
     @classmethod
@@ -596,7 +596,7 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
             action="fetching seasonal booking",
         )
 
-        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
+        data: dict[str, Any] = cls.response_json(response)
         parsed_data = cls._parse_seasonal_booking_response(data)
         cls._cache_seasonal_booking_response(parsed_data, ext_uuid=section_uuid)
         return parsed_data
@@ -641,7 +641,7 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
             action="creating seasonal booking",
         )
 
-        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
+        data: dict[str, Any] = cls.response_json(response)
         parsed_data = cls._parse_seasonal_booking_response(data)
         cls._cache_seasonal_booking_response(parsed_data, ext_uuid=section.ext_uuid)
         return parsed_data
@@ -683,7 +683,7 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
 
         cls._clear_cached_seasonal_booking_response(ext_uuid=section.ext_uuid)
 
-        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
+        data: dict[str, Any] = cls.response_json(response)
         return cls._parse_access_code_modify_response(data)
 
     @classmethod
@@ -709,7 +709,7 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
 
         cls._clear_cached_seasonal_booking_response(ext_uuid=section_uuid)
 
-        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
+        data: dict[str, Any] = cls.response_json(response)
         return cls._parse_access_code_modify_response(data)
 
     @classmethod
@@ -973,7 +973,7 @@ class PindoraReservationSeriesClient(BasePindoraClient):
             action="fetching reservation series",
         )
 
-        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
+        data: dict[str, Any] = cls.response_json(response)
         parsed_data = cls._parse_reservation_series_response(data)
         cls._cache_reservation_series_response(parsed_data, ext_uuid=series_uuid)
         return parsed_data
@@ -1013,7 +1013,7 @@ class PindoraReservationSeriesClient(BasePindoraClient):
             action="creating reservation series",
         )
 
-        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
+        data: dict[str, Any] = cls.response_json(response)
         parsed_data = cls._parse_reservation_series_response(data)
         cls._cache_reservation_series_response(parsed_data, ext_uuid=series.ext_uuid)
         return parsed_data
@@ -1049,7 +1049,7 @@ class PindoraReservationSeriesClient(BasePindoraClient):
 
         cls._clear_cached_reservation_series_response(ext_uuid=series.ext_uuid)
 
-        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
+        data: dict[str, Any] = cls.response_json(response)
         return cls._parse_access_code_modify_response(data)
 
     @classmethod
@@ -1075,7 +1075,7 @@ class PindoraReservationSeriesClient(BasePindoraClient):
 
         cls._clear_cached_reservation_series_response(ext_uuid=series_uuid)
 
-        data: dict[str, Any] = cls.response_json(response)  # type: ignore[assignment]
+        data: dict[str, Any] = cls.response_json(response)
         return cls._parse_access_code_modify_response(data)
 
     @classmethod

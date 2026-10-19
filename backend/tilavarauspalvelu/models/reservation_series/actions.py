@@ -180,7 +180,7 @@ class ReservationSeriesActions:
         end = datetime.datetime.combine(end_date, datetime.time(), tzinfo=DEFAULT_TIMEZONE)
         end += end_time_as_timedelta(end_time)
 
-        timespans: ReservableTimeSpanQuerySet = hauki_resource.reservable_time_spans.all()  # type: ignore[assignment]
+        timespans: ReservableTimeSpanQuerySet = hauki_resource.reservable_time_spans.all()
         timespans = timespans.overlapping_with_period(start=start, end=end)
 
         return [timespan.as_time_span_element() for timespan in timespans]

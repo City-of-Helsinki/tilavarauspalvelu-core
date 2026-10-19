@@ -196,7 +196,7 @@ class ReservationSeries(models.Model):
 
     @access_type.override
     def _(self) -> AccessTypeWithMultivalued:
-        access_types: list[AccessType] = self.used_access_types  # type: ignore[attr-defined]
+        access_types: list[AccessType] = self.used_access_types
         if len(access_types) == 0:
             return AccessTypeWithMultivalued.UNRESTRICTED
         if len(access_types) == 1:
