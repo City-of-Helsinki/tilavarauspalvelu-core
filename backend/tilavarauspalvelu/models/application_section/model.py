@@ -5,7 +5,7 @@ import uuid
 from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
-from django.db.models import Exists, OrderBy
+from django.db.models import Exists
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
@@ -131,7 +131,7 @@ class ApplicationSection(SerializableModelMixin, models.Model):
         suitable = (
             self.suitable_time_ranges
             .distinct()
-            .order_by(OrderBy(L("day_of_the_week_number")))
+            .order_by(L("day_of_the_week_number").order_by())
             .values_list("day_of_the_week", flat=True)
         )
         return [Weekday(day) for day in suitable]
