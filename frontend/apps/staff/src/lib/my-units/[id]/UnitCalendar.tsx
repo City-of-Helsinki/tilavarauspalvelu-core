@@ -223,7 +223,6 @@ type CellProps = {
   cols: number;
   reservationUnitPk: number;
   date: Date;
-  onComplete: () => void;
   hasPermission: boolean;
   reservableTimeSpans: TimeSpanType[];
 };
@@ -493,7 +492,6 @@ function scrollCalendarToCurrentTime(ref: React.RefObject<HTMLDivElement | null>
 interface UnitCalendarProps {
   date: Date;
   resources: Resource[];
-  refetch: () => void;
   canCreateReservations?: boolean;
   isLoading: boolean;
 }
@@ -501,7 +499,6 @@ interface UnitCalendarProps {
 export function UnitCalendar({
   date,
   resources,
-  refetch,
   canCreateReservations = false,
   isLoading,
 }: UnitCalendarProps): React.ReactElement {
@@ -551,7 +548,6 @@ export function UnitCalendar({
                 date={startDate}
                 reservationUnitPk={row.pk}
                 hasPermission={canCreateReservations}
-                onComplete={refetch}
                 reservableTimeSpans={row.reservableTimeSpans}
               />
               <Events events={row.events} styleGetter={eventStyleGetter(row.pk)} />

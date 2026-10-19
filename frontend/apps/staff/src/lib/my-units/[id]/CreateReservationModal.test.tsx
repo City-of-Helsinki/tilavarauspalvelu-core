@@ -217,6 +217,8 @@ describe("CreateReservationModal", () => {
     const expectedBeginsAt = fromUIDateTimeUnsafe(dateStr, startTimeStr).toISOString();
     const expectedEndsAt = fromUIDateTimeUnsafe(dateStr, "11:00").toISOString();
 
+    const refetchMock = reservationUnitMock();
+    const refetchResult = vi.fn(() => refetchMock.result);
     const mocks = [
       reservationUnitMock(),
       {
@@ -236,6 +238,8 @@ describe("CreateReservationModal", () => {
         },
         result: { data: { createStaffReservation: { pk: 1 } } },
       },
+      // The calendars are refetched after the mutation. In this test the only active query is the reservation unit.
+      { ...refetchMock, result: refetchResult },
     ];
     const { onClose } = renderModal(mocks);
     await screen.findByText("myUnits:ReservationDialog.title");
@@ -247,6 +251,7 @@ describe("CreateReservationModal", () => {
       expect(mockSuccessToast).toHaveBeenCalledWith({ text: "myUnits:ReservationDialog.saveSuccess" })
     );
     expect(onClose).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(refetchResult).toHaveBeenCalledTimes(1));
   });
 
   it("shows an error toast and does not close when the mutation fails", async () => {

@@ -106,7 +106,10 @@ export function CreateReservationModal({
       enableBufferTimeAfter: false,
     },
   });
-  const [create] = useCreateStaffReservationMutation();
+  const [create] = useCreateStaffReservationMutation({
+    // Refetch the calendar of the open tab so that it shows the new reservation
+    refetchQueries: "active",
+  });
   const createStaffReservation = (input: ReservationStaffCreateMutationInput) => create({ variables: { input } });
   const displayError = useDisplayError();
   const onSubmit = async (values: FormValueType) => {

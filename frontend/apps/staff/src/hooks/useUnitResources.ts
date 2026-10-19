@@ -44,7 +44,7 @@ export function useUnitResources({
 }: UseUnitResourcesProps) {
   const { t } = useTranslation();
 
-  const { data, previousData, loading, refetch } = useReservationUnitsByUnitQuery({
+  const { data, previousData, loading } = useReservationUnitsByUnitQuery({
     skip: Number(unitPk) <= 0,
     variables: {
       id: createNodeId("UnitNode", unitPk),
@@ -90,7 +90,7 @@ export function useUnitResources({
     };
   });
 
-  return { loading, refetch, resources };
+  return { loading, resources };
 }
 
 function doesReservationAffectReservationUnit(reservation: ReservationType, reservationUnitPk: number) {
