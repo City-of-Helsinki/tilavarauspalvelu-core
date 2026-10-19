@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from graphene_django_extensions import CreateMutation, DeleteMutation
-from graphene_django_extensions.typing import AnyUser
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.models import AllocatedTimeSlot
+from tilavarauspalvelu.typing import AnyUser
 
 from .permissions import AllocatedTimeSlotPermission
 from .serializers import AllocatedTimeSlotCreateSerializer
