@@ -7,7 +7,7 @@ import { relayStylePagination } from "@apollo/client/utilities";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import type { ApolloLink, NormalizedCacheObject } from "@apollo/client";
 import { enchancedFetch, errorLink } from "@ui/modules/apollo/helpers";
-import { keyArgsWithoutPaging } from "@ui/modules/apollo/pagination";
+import { keepLoadedPages, keyArgsWithoutPaging } from "@ui/modules/apollo/pagination";
 import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
 import { buildGraphQLUrl } from "@ui/modules/urlBuilder";
 
@@ -49,14 +49,15 @@ export function createClient(hostUrl: string, req?: IncomingMessage): ApolloClie
       typePolicies: {
         Query: {
           fields: {
-            reservationUnits: relayStylePagination(keyArgsWithoutPaging),
-            units: relayStylePagination(keyArgsWithoutPaging),
-            reservations: relayStylePagination(keyArgsWithoutPaging),
-            applications: relayStylePagination(keyArgsWithoutPaging),
+            reservationUnits: keepLoadedPages(relayStylePagination(keyArgsWithoutPaging)),
+            units: keepLoadedPages(relayStylePagination(keyArgsWithoutPaging)),
+            reservations: keepLoadedPages(relayStylePagination(keyArgsWithoutPaging)),
+            applications: keepLoadedPages(relayStylePagination(keyArgsWithoutPaging)),
+            // The allocation page polls this field to see the allocations of other staff users, so refetch all pages
             applicationSections: relayStylePagination(keyArgsWithoutPaging),
-            allocatedTimeSlots: relayStylePagination(keyArgsWithoutPaging),
-            bannerNotifications: relayStylePagination(keyArgsWithoutPaging),
-            rejectedOccurrences: relayStylePagination(keyArgsWithoutPaging),
+            allocatedTimeSlots: keepLoadedPages(relayStylePagination(keyArgsWithoutPaging)),
+            bannerNotifications: keepLoadedPages(relayStylePagination(keyArgsWithoutPaging)),
+            rejectedOccurrences: keepLoadedPages(relayStylePagination(keyArgsWithoutPaging)),
           },
         },
       },
