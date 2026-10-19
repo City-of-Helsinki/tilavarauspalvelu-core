@@ -50,7 +50,7 @@ function UnitReservationsInner({
 
   const date = currentDate && isValidDate(currentDate) ? currentDate : new Date();
 
-  const { loading, resources, refetch } = useUnitResources({
+  const { loading, resources } = useUnitResources({
     begin: date,
     unitPk,
     reservationUnitOptions,
@@ -62,7 +62,6 @@ function UnitReservationsInner({
       <UnitCalendar
         date={date}
         resources={resources}
-        refetch={refetch}
         isLoading={loading}
         canCreateReservations={canCreateReservations}
       />
