@@ -5,7 +5,6 @@ from decimal import Decimal
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, NotRequired, Protocol, TypedDict
 
-from django.contrib.auth.models import AnonymousUser
 from django.core.handlers import wsgi
 from django.db import models
 from graphql import GraphQLResolveInfo
@@ -14,6 +13,7 @@ from rest_framework.exceptions import ValidationError
 if TYPE_CHECKING:
     import datetime
 
+    from django.contrib.auth.models import AnonymousUser as DjangoAnonymousUser
     from django.contrib.sessions.backends.cache import SessionStore
 
     from tilavarauspalvelu.enums import (
@@ -27,6 +27,12 @@ if TYPE_CHECKING:
         Weekday,
     )
     from tilavarauspalvelu.models import AgeGroup, ReservationDenyReason, ReservationPurpose, ReservationUnit, User
+    from tilavarauspalvelu.services.permission_resolver import PermissionResolver
+
+    class AnonymousUser(DjangoAnonymousUser):
+        # The user model module sets this attribute on the Django class at import time.
+        permissions: PermissionResolver
+
 
 __all__ = [
     "AffectedTimeSpan",
