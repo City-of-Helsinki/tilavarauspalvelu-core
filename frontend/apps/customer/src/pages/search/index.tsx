@@ -81,12 +81,12 @@ function SearchSingle({ options }: Readonly<Props>): React.ReactElement {
     <>
       <Breadcrumb routes={routes} />
       <H1 $noMargin>{t("search:single.heading")}</H1>
+      <SingleSearchForm options={options} isLoading={isLoading} />
       {error ? (
         <Notification size={NotificationSize.Small} type="alert">
-          {t("searchResultList:error")}
+          {t("errors:search")}
         </Notification>
       ) : null}
-      <SingleSearchForm options={options} isLoading={isLoading} />
       <Flex as="section" ref={content}>
         <ListWithPagination
           items={filterNonNullable(reservationUnits).map((ru) => (
