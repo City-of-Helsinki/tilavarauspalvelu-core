@@ -7,6 +7,7 @@ from lookup_property import L
 
 from tilavarauspalvelu.enums import ApplicationStatusChoice
 from tilavarauspalvelu.models import AllocatedTimeSlot
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import AllocatedTimeSlotFilterSet
 from .permissions import AllocatedTimeSlotPermission
@@ -21,7 +22,7 @@ __all__ = [
 ]
 
 
-class AllocatedTimeSlotNode(DjangoNode):
+class AllocatedTimeSlotNode(DjangoNode[AllocatedTimeSlot, AnyUser]):
     class Meta:
         model = AllocatedTimeSlot
         fields = [

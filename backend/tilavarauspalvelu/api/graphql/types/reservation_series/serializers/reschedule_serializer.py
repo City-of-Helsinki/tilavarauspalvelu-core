@@ -16,21 +16,20 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import ReservationSeries, ReservationStatistic
 from tilavarauspalvelu.tasks import create_statistics_for_reservations_task
-from tilavarauspalvelu.typing import ReservationDetails, error_codes
+from tilavarauspalvelu.typing import ReservationDetails, ReservationSeriesRescheduleData, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.errors import external_service_errors_as_validation_errors
 from utils.fields.serializer import input_only_field
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation
-    from tilavarauspalvelu.typing import ReservationSeriesRescheduleData
 
 __all__ = [
     "ReservationSeriesRescheduleSerializer",
 ]
 
 
-class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
+class ReservationSeriesRescheduleSerializer(NestingModelSerializer[ReservationSeries, ReservationSeriesRescheduleData]):
     """Reschedule reservation series."""
 
     instance: ReservationSeries

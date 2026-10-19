@@ -14,7 +14,7 @@ from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import ExternalServiceError
 
 
-class StaffReservationAdjustTimeSerializer(NestingModelSerializer):
+class StaffReservationAdjustTimeSerializer(NestingModelSerializer[Reservation, StaffReservationAdjustTimeData]):
     instance: Reservation
 
     pk = IntegerField(required=True)

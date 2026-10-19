@@ -3,6 +3,7 @@ from __future__ import annotations
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import EquipmentCategory
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import EquipmentCategoryFilterSet
 from .permissions import EquipmentCategoryPermission
@@ -12,7 +13,7 @@ __all__ = [
 ]
 
 
-class EquipmentCategoryNode(DjangoNode):
+class EquipmentCategoryNode(DjangoNode[EquipmentCategory, AnyUser]):
     class Meta:
         model = EquipmentCategory
         fields = [

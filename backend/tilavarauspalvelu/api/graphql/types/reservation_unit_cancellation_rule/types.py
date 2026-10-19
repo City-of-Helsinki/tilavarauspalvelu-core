@@ -3,6 +3,7 @@ from __future__ import annotations
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import ReservationUnitCancellationRule
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import ReservationUnitCancellationRuleFilterSet
 from .permissions import ReservationUnitCancellationRulePermission
@@ -12,7 +13,7 @@ __all__ = [
 ]
 
 
-class ReservationUnitCancellationRuleNode(DjangoNode):
+class ReservationUnitCancellationRuleNode(DjangoNode[ReservationUnitCancellationRule, AnyUser]):
     class Meta:
         model = ReservationUnitCancellationRule
         fields = [

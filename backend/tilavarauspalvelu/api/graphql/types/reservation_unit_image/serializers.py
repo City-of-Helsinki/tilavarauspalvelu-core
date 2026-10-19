@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import WSGIRequest
 
 
-class ReservationUnitImageCreateSerializer(NestingModelSerializer):
+class ReservationUnitImageCreateSerializer(NestingModelSerializer[ReservationUnitImage]):
     image = serializers.ImageField(
         write_only=True,
         validators=[validators.validate_image_file_extension],
@@ -28,7 +28,7 @@ class ReservationUnitImageCreateSerializer(NestingModelSerializer):
         ]
 
 
-class ReservationUnitImageUpdateSerializer(NestingModelSerializer):
+class ReservationUnitImageUpdateSerializer(NestingModelSerializer[ReservationUnitImage]):
     class Meta:
         model = ReservationUnitImage
         fields = [
@@ -37,7 +37,7 @@ class ReservationUnitImageUpdateSerializer(NestingModelSerializer):
         ]
 
 
-class ReservationUnitImageFieldSerializer(NestingModelSerializer):
+class ReservationUnitImageFieldSerializer(NestingModelSerializer[ReservationUnitImage]):
     image_url = serializers.ImageField(source="image", use_url=True)
     medium_url = serializers.SerializerMethodField()
     small_url = serializers.SerializerMethodField()

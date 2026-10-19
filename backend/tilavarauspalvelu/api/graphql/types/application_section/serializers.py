@@ -34,7 +34,7 @@ __all__ = [
 ]
 
 
-class ApplicationSectionSerializer(NestingModelSerializer):
+class ApplicationSectionSerializer(NestingModelSerializer[ApplicationSection]):
     instance: ApplicationSection | None
 
     reservation_unit_options = ReservationUnitOptionApplicantSerializer(many=True)
@@ -238,7 +238,7 @@ class ApplicationSectionForApplicationSerializer(ApplicationSectionSerializer):
         fields = [item for item in ApplicationSectionSerializer.Meta.fields if item != "application"]
 
 
-class RejectAllSectionOptionsSerializer(NestingModelSerializer):
+class RejectAllSectionOptionsSerializer(NestingModelSerializer[ApplicationSection]):
     instance: ApplicationSection
 
     class Meta:
@@ -263,7 +263,7 @@ class RejectAllSectionOptionsSerializer(NestingModelSerializer):
         return self.instance
 
 
-class RestoreAllSectionOptionsSerializer(NestingModelSerializer):
+class RestoreAllSectionOptionsSerializer(NestingModelSerializer[ApplicationSection]):
     instance: ApplicationSection
 
     class Meta:
@@ -282,7 +282,7 @@ class CancellationOutput(TypedDict):
     actual_cancellations: int
 
 
-class ApplicationSectionReservationCancellationInputSerializer(NestingModelSerializer):
+class ApplicationSectionReservationCancellationInputSerializer(NestingModelSerializer[ApplicationSection]):
     instance: ApplicationSection
 
     cancel_reason = EnumFriendlyChoiceField(
@@ -354,7 +354,7 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
         return data
 
 
-class ApplicationSectionReservationCancellationOutputSerializer(NestingModelSerializer):
+class ApplicationSectionReservationCancellationOutputSerializer(NestingModelSerializer[ApplicationSection]):
     future = serializers.IntegerField(required=True)
     cancelled = serializers.IntegerField(required=True)
 

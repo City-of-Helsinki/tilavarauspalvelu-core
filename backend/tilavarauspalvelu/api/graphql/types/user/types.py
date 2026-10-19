@@ -12,6 +12,7 @@ from query_optimizer import AnnotatedField, MultiField
 from tilavarauspalvelu.enums import ReservationNotification
 from tilavarauspalvelu.models import User
 from tilavarauspalvelu.tasks import save_personal_info_view_log_task
+from tilavarauspalvelu.typing import AnyUser
 
 from .permissions import UserPermission
 
@@ -47,7 +48,7 @@ _FIELDS = [
 ]
 
 
-class UserNode(DjangoNode):
+class UserNode(DjangoNode[User, AnyUser]):
     name = AnnotatedField(
         graphene.String,
         expression=Trim(Concat("first_name", Value(" "), "last_name")),

@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-class UnitUpdateSerializer(NestingModelSerializer):
+class UnitUpdateSerializer(NestingModelSerializer[Unit]):
     class Meta:
         model = Unit
         fields = [
