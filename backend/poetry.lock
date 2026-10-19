@@ -1732,14 +1732,14 @@ django = ">=4.2"
 
 [[package]]
 name = "djangorestframework"
-version = "3.18.2"
+version = "3.18.3"
 description = "Web APIs for Django, made easy."
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "djangorestframework-3.18.2-py3-none-any.whl", hash = "sha256:a92d6a4e128a2550bd2fe2e02008a9e47fe52c180e130bb438f5ba70ee933a3f"},
-    {file = "djangorestframework-3.18.2.tar.gz", hash = "sha256:8249bad7715eb37274ce5820fc5d9fd786b7579806589565f52a71c02b35f54b"},
+    {file = "djangorestframework-3.18.3-py3-none-any.whl", hash = "sha256:8544bb674846731b1e3c9b309236ee1dc412905a0aa725be2ec193ca950a7d12"},
+    {file = "djangorestframework-3.18.3.tar.gz", hash = "sha256:446a9b352e7eff630421ab3f2328bd2401b109a9470afa4a31189994911ed030"},
 ]
 
 [package.dependencies]
@@ -2137,44 +2137,49 @@ test = ["coveralls", "django-filter (>=22.1)", "djangorestframework (>=3.6.3)", 
 
 [[package]]
 name = "graphene-django-extensions"
-version = "0.4.9"
+version = "0.5.0"
 description = "Extensions for graphene-django"
 optional = false
-python-versions = "<4,>=3.10"
+python-versions = ">=3.12"
 groups = ["main"]
 files = [
-    {file = "graphene_django_extensions-0.4.9-py3-none-any.whl", hash = "sha256:859dbcc8c6e24c6b7c928df70f2a7af61f36d2291169338979b7dd36f07ae10c"},
-    {file = "graphene_django_extensions-0.4.9.tar.gz", hash = "sha256:d39284f150c40682128f6187e60a81a9debfb434c9472e49dcac78deaabc6b0f"},
+    {file = "graphene_django_extensions-0.5.0-py3-none-any.whl", hash = "sha256:e8ffe6dd33bc3430ce5a9910e23594699b8a1d94c041d29181c71bb50006b10f"},
+    {file = "graphene_django_extensions-0.5.0.tar.gz", hash = "sha256:23fd14caffa3408b3cfdbe3564b955b766a333e4bfc18588be29f7264d9f36c2"},
 ]
 
 [package.dependencies]
-Django = ">=4.2"
-django-filter = ">=23.5"
+django = ">=5.2.18"
+django-filter = ">=26.2"
 django-settings-holder = ">=0.1.2"
-djangorestframework = ">=3.14.0"
+djangorestframework = ">=3.18.3"
 graphene-django = ">=3.0.0"
-graphene-django-query-optimizer = ">=0.10.3"
+graphene-django-query-optimizer = ">=0.11.0"
+typing-extensions = ">=4.16.0"
 
 [package.extras]
-files = ["pillow (>=10.2.0)"]
-translation = ["django-modeltranslation (>=0.18.13)"]
+files = ["pillow (>=12.3.0)"]
+translation = ["django-modeltranslation (>=0.20.6)"]
 
 [[package]]
 name = "graphene-django-query-optimizer"
-version = "0.10.16"
+version = "0.11.0"
 description = "Automatically optimize SQL queries in Graphene-Django schemas."
 optional = false
-python-versions = "<4,>=3.11"
+python-versions = ">=3.12"
 groups = ["main"]
 files = [
-    {file = "graphene_django_query_optimizer-0.10.16-py3-none-any.whl", hash = "sha256:f89ee9b02a5c8ceeb4baed82b3f5fac605c6c0d0cb22138afa08712016f36711"},
-    {file = "graphene_django_query_optimizer-0.10.16.tar.gz", hash = "sha256:fc9c81d94627fa7f0e26de632276583de47b1e46510892ec7f3d45e35c862e92"},
+    {file = "graphene_django_query_optimizer-0.11.0-py3-none-any.whl", hash = "sha256:ef9d3685630f5a84577b75fb1cd9ae1f1547fe2e700ebcc2b07d825692217758"},
+    {file = "graphene_django_query_optimizer-0.11.0.tar.gz", hash = "sha256:aec095e119f86d00b3914dfce17c3c61b66b026b8fd4efc3d26e33d4625d7e68"},
 ]
 
 [package.dependencies]
-Django = ">=5.2.17"
-django-settings-holder = ">=0.1.2"
-graphene-django = ">=3.0.0"
+django = ">=5.2.18"
+django-settings-holder = ">=0.3.1"
+graphene = ">=3.4.3"
+graphene-django = ">=3.2.3"
+graphql-core = ">=3.2.13"
+graphql-relay = ">=3.2.0"
+typing-extensions = ">=4.16.0"
 
 [[package]]
 name = "graphql-core"
@@ -5159,4 +5164,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "76b343cb6361d5adad574c20c8c82b73f00e560c059e3b0ffa3d12130b780dc0"
+content-hash = "d5332c1f1aaf091d59892935263049fa8ca5c4eb3b142206302cb1a25ed9d913"
