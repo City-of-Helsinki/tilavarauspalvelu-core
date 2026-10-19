@@ -666,7 +666,7 @@ class PindoraService:
 
     @classmethod
     def _sync_series_or_seasonal_booking_access_code(cls, obj: ReservationSeries | ApplicationSection) -> None:
-        should_be_active: bool = obj.should_have_active_access_code  # type: ignore[attr-defined]
+        should_be_active: bool = obj.should_have_active_access_code
 
         try:
             # Reschedule first, so that if there are any reservations that didn't have an access code before,
