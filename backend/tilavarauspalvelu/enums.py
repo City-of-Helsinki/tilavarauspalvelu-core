@@ -5,7 +5,7 @@ import enum
 import operator
 from enum import StrEnum
 from inspect import cleandoc
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING
 
 from django.db import models
 from django.utils.functional import classproperty
@@ -889,7 +889,7 @@ class Weekday(models.TextChoices):
     SUNDAY = "SUNDAY", _("Sunday")
 
     @classmethod
-    def from_iso_week_day(cls, weekday: Literal[1, 2, 3, 4, 5, 6, 7]) -> Weekday:
+    def from_iso_week_day(cls, weekday: int) -> Weekday:
         """ISO weekday number, starting from 1."""
         match weekday:
             case 1:
