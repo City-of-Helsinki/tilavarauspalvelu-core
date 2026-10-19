@@ -24,7 +24,7 @@ class ReservableTimeSpanFactory(GenericDjangoModelFactory[ReservableTimeSpan]):
     end_datetime = None  # datetime.datetime
 
     @classmethod
-    def create(
+    def create(  # type: ignore[override]
         cls,
         start_datetime: datetime.datetime,
         end_datetime: datetime.datetime,
@@ -35,7 +35,7 @@ class ReservableTimeSpanFactory(GenericDjangoModelFactory[ReservableTimeSpan]):
         return super().create(**kwargs)
 
     @classmethod
-    def build(
+    def build(  # type: ignore[override]
         cls,
         start_datetime: datetime.datetime,
         end_datetime: datetime.datetime,
