@@ -1,64 +1,37 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, test, expect, describe } from "vitest";
 import { DateRangePicker } from "./DateRangePicker";
 import type { DateRangePickerProps } from "./DateRangePicker";
 
 const defaultProps: DateRangePickerProps = {
-  endDate: null,
+  endDate: "",
   onChangeEndDate: vi.fn(),
   onChangeStartDate: vi.fn(),
-  startDate: null,
+  startDate: "",
 };
 
 const renderComponent = (props?: Partial<DateRangePickerProps>) =>
   render(<DateRangePicker {...defaultProps} {...props} />);
 
 describe("DateRangePicker", () => {
-  test("should show error start date must be before end date", async () => {
-    const view = renderComponent();
+  test("should pass the typed date to the parent", async () => {
+    const onChangeStartDate = vi.fn();
+    const view = renderComponent({ onChangeStartDate });
     const user = userEvent.setup();
 
-    const startDateText = view.getByText(/labelStartDate/i);
-    expect(startDateText).toBeInTheDocument();
-
-    const startDateInput = view.getByLabelText(/labelStartDate/);
-    expect(startDateInput).toBeInTheDocument();
-
-    await user.type(startDateInput, "23.6.2021");
+    const startDateInput = view.getByRole("textbox", { name: /labelStartDate/ });
+    await user.type(startDateInput, "23.6.2027");
     await user.tab();
 
-    const endDateInput = view.getByRole("textbox", {
-      name: /labelEndDate/i,
-    });
-    await user.type(endDateInput, "22.6.2021");
-    await user.tab();
-
-    expect(view.getByText(/errors.endDateBeforeStartDate/)).toBeInTheDocument();
-
-    await user.clear(endDateInput);
-    await user.type(endDateInput, "24.6.2021");
-    await user.tab();
-
-    expect(view.queryByText(/errors.endDateBeforeStartDate/)).not.toBeInTheDocument();
+    expect(onChangeStartDate).toHaveBeenLastCalledWith("23.6.2027", expect.anything());
   });
 
-  test("should show formatting error", async () => {
-    const view = renderComponent();
-    const user = userEvent.setup();
+  test("should show the errors", () => {
+    const view = renderComponent({ errors: { begin: "start error", end: "end error" } });
 
-    const startDateInput = view.getByRole("textbox", {
-      name: /labelStartDate/,
-    });
-    await user.type(startDateInput, "23..2021");
-    await user.tab();
-
-    expect(view.queryByText(/errors.dateInvalid/)).toBeInTheDocument();
-
-    // Error should disappear
-    await user.clear(startDateInput);
-    await user.tab();
-    expect(screen.queryByText(/errors.dateInvalid/)).not.toBeInTheDocument();
+    expect(view.getByText("start error")).toBeInTheDocument();
+    expect(view.getByText("end error")).toBeInTheDocument();
   });
 });

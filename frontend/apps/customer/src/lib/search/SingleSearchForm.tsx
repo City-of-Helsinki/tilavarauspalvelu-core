@@ -1,17 +1,19 @@
 import React from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, useWatch, Controller } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
-import { addYears, startOfDay } from "date-fns";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { addYears, isBefore, startOfDay } from "date-fns";
 import { Checkbox, TextInput } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
+import { z } from "zod";
 import type { ReadonlyURLSearchParams } from "next/navigation";
 import { ShowAllContainer } from "ui/src/components";
 import { ControlledNumberInput, TimeRangePicker } from "ui/src/components/form";
 import { ControlledSelect } from "ui/src/components/form/ControlledSelect";
 import { SearchButton, SearchButtonContainer } from "ui/src/components/SearchButton";
-import { formatDate, parseUIDate } from "ui/src/modules/date-utils";
+import { formatDate, parseUIDate, timeToMinutes } from "ui/src/modules/date-utils";
 import { ignoreMaybeArray, mapParamToInteger, toNumber } from "ui/src/modules/helpers";
 import type { OptionsListT } from "ui/src/modules/search";
 import { Flex } from "ui/src/styled";
@@ -27,21 +29,72 @@ const StyledCheckBox = styled(Checkbox)`
   grid-column: -2 / span 1;
 `;
 
-type SearchFormValues = {
-  intendedUses: number[];
-  units: number[];
-  equipments: number[];
-  reservationUnitTypes: number[];
-  accessTypes: string[];
-  timeBegin: string | null;
-  timeEnd: string | null;
-  startDate: string | null;
-  endDate: string | null;
-  duration: number | null;
-  personsAllowed: number | null;
-  showOnlyReservable: boolean;
-  textSearch: string;
-};
+function getDateLimits() {
+  const today = startOfDay(new Date());
+  return { min: today, max: addYears(today, 2) };
+}
+
+// Returns a translation key if the date is not valid
+function checkDate(value: string): string | null {
+  const date = parseUIDate(value);
+  const { min, max } = getDateLimits();
+  if (date == null) {
+    return "dateSelector:errors.dateInvalid";
+  }
+  if (date < min) {
+    return "dateSelector:errors.dateIsTooSmall";
+  }
+  if (date > max) {
+    return "dateSelector:errors.dateIsTooBig";
+  }
+  return null;
+}
+
+const SearchFormSchema = z
+  .object({
+    intendedUses: z.array(z.number()),
+    units: z.array(z.number()),
+    equipments: z.array(z.number()),
+    reservationUnitTypes: z.array(z.number()),
+    accessTypes: z.array(z.string()),
+    timeBegin: z.string().nullable(),
+    timeEnd: z.string().nullable(),
+    startDate: z.string().nullable(),
+    endDate: z.string().nullable(),
+    duration: z.number().nullable(),
+    personsAllowed: z.number().nullable(),
+    showOnlyReservable: z.boolean(),
+    textSearch: z.string(),
+  })
+  .superRefine((val, ctx) => {
+    // The message is not displayed. TimeRangePicker shows its own error.
+    if (val.timeBegin && val.timeEnd && timeToMinutes(val.timeBegin) >= timeToMinutes(val.timeEnd)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["timeEnd"],
+        message: "searchForm:beginTimeIsBeforeEndTime",
+      });
+    }
+    const startDateError = val.startDate ? checkDate(val.startDate) : null;
+    if (startDateError != null) {
+      ctx.addIssue({ code: "custom", path: ["startDate"], message: startDateError });
+    }
+    const endDateError = val.endDate ? checkDate(val.endDate) : null;
+    if (endDateError != null) {
+      ctx.addIssue({ code: "custom", path: ["endDate"], message: endDateError });
+    }
+    const startDate = parseUIDate(val.startDate ?? "");
+    const endDate = parseUIDate(val.endDate ?? "");
+    if (startDate != null && endDate != null && isBefore(endDate, startDate)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["endDate"],
+        message: "dateSelector:errors.endDateBeforeStartDate",
+      });
+    }
+  });
+
+type SearchFormValues = z.infer<typeof SearchFormSchema>;
 
 function mapQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   const dur = toNumber(params.get("duration"));
@@ -100,8 +153,32 @@ export function SingleSearchForm({
   const formValues = mapQueryToForm(searchValues);
   const form = useForm<SearchFormValues>({
     values: formValues,
+    resolver: zodResolver(SearchFormSchema),
   });
-  const { handleSubmit, setValue, getValues, control, register } = form;
+  const {
+    handleSubmit,
+    setValue,
+    trigger,
+    control,
+    register,
+    formState: { errors },
+  } = form;
+  const [startDate, endDate] = useWatch({ control, name: ["startDate", "endDate"] });
+  const dateLimits = getDateLimits();
+
+  const translateDateError = (message: string | undefined): string | undefined =>
+    message != null
+      ? t(message, {
+          minDate: formatDate(dateLimits.min),
+          maxDate: formatDate(dateLimits.max),
+        })
+      : undefined;
+
+  const handleDateChange = async (name: "startDate" | "endDate", value: string) => {
+    setValue(name, value !== "" ? value : null);
+    // validate both, because the end date is compared to the start date
+    await trigger(["startDate", "endDate"]);
+  };
 
   const durationOptions = getDurationOptions(t);
   const accessTypeOptions = Object.values(AccessType).map((value) => ({
@@ -205,15 +282,19 @@ export function SingleSearchForm({
               begin: t("common:beginLabel"),
               end: t("common:endLabel"),
             }}
-            startDate={parseUIDate(getValues("startDate") ?? "")}
-            endDate={parseUIDate(getValues("endDate") ?? "")}
-            onChangeStartDate={(date: Date | null) => setValue("startDate", date != null ? formatDate(date) : null)}
-            onChangeEndDate={(date: Date | null) => setValue("endDate", date != null ? formatDate(date) : null)}
+            startDate={startDate ?? ""}
+            endDate={endDate ?? ""}
+            onChangeStartDate={(date) => handleDateChange("startDate", date)}
+            onChangeEndDate={(date) => handleDateChange("endDate", date)}
+            errors={{
+              begin: translateDateError(errors.startDate?.message),
+              end: translateDateError(errors.endDate?.message),
+            }}
             limits={{
-              startMinDate: startOfDay(new Date()),
-              startMaxDate: addYears(new Date(), 2),
-              endMinDate: startOfDay(new Date()),
-              endMaxDate: addYears(new Date(), 2),
+              startMinDate: dateLimits.min,
+              startMaxDate: dateLimits.max,
+              endMinDate: dateLimits.min,
+              endMaxDate: dateLimits.max,
             }}
           />
         </SingleLabelInputGroup>
