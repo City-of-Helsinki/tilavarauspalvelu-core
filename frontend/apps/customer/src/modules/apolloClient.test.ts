@@ -123,6 +123,23 @@ describe("reservationUnits cache policy", () => {
     expect(data?.reservationUnits.pageInfo.hasNextPage).toBe(false);
   });
 
+  test("shows only the new first page when it is the end of the list", () => {
+    const { cache } = createApolloClient("http://localhost");
+    cache.writeQuery({ query: QUERY, variables: { textSearch: "a", first: 3 }, data: createPage(0, 3, true) });
+    cache.writeQuery({
+      query: QUERY,
+      variables: { textSearch: "a", first: 3, after: "cursor-2" },
+      data: createPage(3, 3, true),
+    });
+
+    // The list now has only the first two items, so the page is not full
+    cache.writeQuery({ query: QUERY, variables: { textSearch: "a", first: 3 }, data: createPage(0, 2, true) });
+
+    const data = cache.readQuery<QueryData>({ query: QUERY, variables: { textSearch: "a", first: 3 } });
+    expect(data?.reservationUnits.edges.map((edge) => edge.node.pk)).toEqual([0, 1]);
+    expect(data?.reservationUnits.pageInfo.hasNextPage).toBe(false);
+  });
+
   test("shows only the new first page when the first page has changed", () => {
     const { cache } = createApolloClient("http://localhost");
     cache.writeQuery({ query: QUERY, variables: { textSearch: "a", first: 2 }, data: createPage(0, 2, true) });
