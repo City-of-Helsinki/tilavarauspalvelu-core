@@ -109,7 +109,7 @@ class User(AbstractUser):
         return f"{self.first_name} {self.last_name}".strip()
 
     def get_preferred_language(self) -> Literal["fi", "sv", "en"]:
-        return self.preferred_language or settings.LANGUAGE_CODE
+        return self.preferred_language or settings.LANGUAGE_CODE  # type: ignore[return-value]
 
     @property
     def active_general_roles(self) -> list[UserRoleChoice]:

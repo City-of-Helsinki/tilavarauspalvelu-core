@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from django import forms
     from django.db import models
 
+    from tilavarauspalvelu.models import User
     from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
@@ -71,7 +72,8 @@ class GeneralRoleAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
         )
 
     def save_model(self, request: WSGIRequest, obj: GeneralRole, form: forms.ModelForm, change: bool) -> None:  # noqa: FBT001
-        obj.assigner = request.user
+        # The admin site only lets logged in staff users in.
+        obj.assigner = cast("User", request.user)
         return super().save_model(request, obj, form, change)
 
     @admin.display(ordering="user__email")
