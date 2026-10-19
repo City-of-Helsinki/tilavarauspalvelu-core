@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TypeVar
 
 from tilavarauspalvelu.models import TermsOfUse
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models._base import ModelQuerySet, TranslatedModelManager
 
 __all__ = [
     "TermsOfUseManager",
@@ -18,4 +18,4 @@ _TRow_co = TypeVar("_TRow_co", covariant=True, default=TermsOfUse)
 class TermsOfUseQuerySet(ModelQuerySet[_TModel_co, _TRow_co]): ...
 
 
-class TermsOfUseManager(ModelManager[TermsOfUse, TermsOfUseQuerySet]): ...
+class TermsOfUseManager(TranslatedModelManager[TermsOfUse, TermsOfUseQuerySet]): ...
