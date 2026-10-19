@@ -97,4 +97,15 @@ describe("SingleSearchForm", () => {
     expect(mockedHandleSearch).not.toHaveBeenCalled();
     expect(view.getByText(/dateSelector:errors.endDateBeforeStartDate/)).toBeInTheDocument();
   });
+
+  test("should only allow positive integers in persons allowed", async () => {
+    const { view, submit } = renderAndSubmit("personsAllowed=1");
+    const user = userEvent.setup();
+    const input = view.getByRole("spinbutton", { name: "searchForm:labels.personsAllowed" });
+    await user.clear(input);
+    await user.type(input, "-2.5e3");
+    expect(input).toHaveValue(253);
+    await submit();
+    expect(mockedHandleSearch).toHaveBeenCalledWith(expect.objectContaining({ personsAllowed: 253 }), true);
+  });
 });
