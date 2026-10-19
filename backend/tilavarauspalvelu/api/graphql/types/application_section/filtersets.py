@@ -140,8 +140,8 @@ class ApplicationSectionFilterSet(ModelFilterSet):
 
     @staticmethod
     def order_by_has_allocations(qs: ApplicationSectionQuerySet, desc: bool) -> QuerySet:
-        return qs.order_by(models.OrderBy(L(allocations__gt=0), descending=desc))
+        return qs.order_by(L(allocations__gt=0).order_by(descending=desc))
 
     @staticmethod
     def order_by_allocations(qs: ApplicationSectionQuerySet, desc: bool) -> QuerySet:
-        return qs.order_by(models.OrderBy(L("allocations"), descending=desc))
+        return qs.order_by(L("allocations").order_by(descending=desc))
