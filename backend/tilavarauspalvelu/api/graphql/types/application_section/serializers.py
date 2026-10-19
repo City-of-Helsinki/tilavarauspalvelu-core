@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db import models, transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
-from graphene_django_extensions.serializers import NotProvided
+from graphene_django_extensions.serializers import NotProvidedType
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -190,10 +190,10 @@ class ApplicationSectionSerializer(NestingModelSerializer[ApplicationSection]):
         reservations_begin_date: datetime.date = self.get_or_default("reservations_begin_date", data)
         reservations_end_date: datetime.date = self.get_or_default("reservations_end_date", data)
 
-        application: Application | NotProvided = self.get_or_default("application", data)
+        application: Application | NotProvidedType = self.get_or_default("application", data)
 
         # Creating/updating application with application section
-        if application is NotProvided:
+        if isinstance(application, NotProvidedType):
             parent_serializer = self.parent.parent
             application_round = parent_serializer.get_or_default("application_round", parent_serializer.initial_data)
             if isinstance(application_round, ApplicationRound):
