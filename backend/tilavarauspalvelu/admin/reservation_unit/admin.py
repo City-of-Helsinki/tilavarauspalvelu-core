@@ -228,7 +228,7 @@ class ReservationUnitAdmin(TVPAuditlogHistoryAdminMixin, SortableAdminMixin, Tab
 
     @admin.display(description=_("Current access type"), ordering=L("current_access_type"))
     def current_access_type(self, obj: ReservationUnit) -> AccessType | None:
-        return obj.current_access_type  # type: ignore[return-value]
+        return obj.current_access_type
 
     @button(label=_("Reservations"), change_form=True)
     def show_reservations(self, request: WSGIRequest, pk: str) -> HttpResponseRedirect:
