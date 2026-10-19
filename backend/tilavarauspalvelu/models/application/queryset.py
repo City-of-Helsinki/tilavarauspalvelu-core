@@ -106,7 +106,7 @@ class ApplicationQuerySet(ModelQuerySet[_TModel_co, _TRow_co]):
         )
 
         for item in items:
-            item.units_for_permissions = [unit for unit in units if item.pk in unit.application_ids]
+            item.units_for_permissions = [unit for unit in units if item.pk in unit.application_ids]  # type: ignore[attr-defined]
 
     def should_send_in_allocation_email(self) -> Self:
         """Get all applications that need the "application in allocation" notification to be sent."""

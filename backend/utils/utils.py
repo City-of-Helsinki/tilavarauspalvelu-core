@@ -10,7 +10,7 @@ import re
 import unicodedata
 import urllib.parse
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from django.conf import settings
 from django.core.cache import cache
@@ -26,6 +26,8 @@ from utils.date_utils import local_datetime
 if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
     from pathlib import Path
+
+    from rest_framework.exceptions import ErrorDetail
 
     from tilavarauspalvelu.typing import AnyUser, Lang, TextSearchLang, WSGIRequest
 
@@ -280,7 +282,8 @@ def get_jwt_payload(json_web_token: str) -> dict[str, Any]:
 
 def to_django_validation_error(error: ValidationError) -> DjangoValidationError:
     """Given a django-rest-framework ValidationError, return a Django ValidationError."""
-    return DjangoValidationError(message=str(error.detail[0]), code=error.detail[0].code)
+    details = cast("list[ErrorDetail]", error.detail)
+    return DjangoValidationError(message=str(details[0]), code=details[0].code)
 
 
 def to_drf_validation_error(error: DjangoValidationError) -> ValidationError:

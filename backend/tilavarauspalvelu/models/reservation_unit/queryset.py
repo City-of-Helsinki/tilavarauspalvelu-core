@@ -84,7 +84,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]):
         >>> qs.annotate(affected=SubqueryArray(sq.affected_reservation_unit_ids, agg_field="ids", distinct=True))
         """
         return (
-            self
+            self  # type: ignore[return-value]
             .annotate(ids=ArrayUnnest("reservation_unit_hierarchy__related_reservation_unit_ids"))
             .values("ids")
             .distinct()
@@ -107,10 +107,10 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[_TModel_co, _TRow_co]):
         """A `QuerySet.iterator()` that calls the given hook for each chunk of results before yielding them."""
         chunked_fetch = not connections[self.db].settings_dict.get("DISABLE_SERVER_SIDE_CURSORS")
         iterable = self._iterable_class(self, chunked_fetch=chunked_fetch, chunk_size=chunk_size)
-        iterator = iter(iterable)
+        iterator = iter(iterable)  # type: ignore[call-overload]
 
         while results := list(islice(iterator, chunk_size)):
-            prefetch_related_objects(results, *self._prefetch_related_lookups)
+            prefetch_related_objects(results, *self._prefetch_related_lookups)  # type: ignore[attr-defined]
             hook(results)
             yield from results
 

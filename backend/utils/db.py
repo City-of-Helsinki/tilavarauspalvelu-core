@@ -128,7 +128,7 @@ class SubqueryArray(models.Subquery):
     """
 
     template = "(SELECT ARRAY_AGG(%(distinct)s%(agg_field)s) FROM (%(subquery)s) %(alias)s)"
-    output_field = ArrayField(base_field=models.IntegerField())
+    output_field: models.Field = ArrayField(base_field=models.IntegerField())
 
     def __init__(
         self,
