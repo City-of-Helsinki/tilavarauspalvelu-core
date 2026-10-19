@@ -336,6 +336,7 @@ export function SingleSearchForm({
           label={t("searchForm:labels.personsAllowed")}
           control={control}
           min={1}
+          integerOnly
         />
         <ControlledSelect
           name="intendedUses"

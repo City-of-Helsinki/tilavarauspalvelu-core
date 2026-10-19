@@ -10,6 +10,8 @@ interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   id?: string;
   min?: number;
   max?: number;
+  // block the keys that type a non-integer, and the minus sign if min is not negative
+  integerOnly?: boolean;
   required?: boolean;
   label: string;
   tooltipText?: string;
@@ -27,6 +29,7 @@ export function ControlledNumberInput<T extends FieldValues>({
   name,
   min,
   max,
+  integerOnly,
   required,
   label,
   helperText,
@@ -47,11 +50,25 @@ export function ControlledNumberInput<T extends FieldValues>({
     afterChange?.(val);
   };
 
+  const handleKeyDown = (evt: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!integerOnly) {
+      return;
+    }
+    const blockedKeys = [".", ",", "e", "E", "+"];
+    if (min != null && min >= 0) {
+      blockedKeys.push("-");
+    }
+    if (blockedKeys.includes(evt.key)) {
+      evt.preventDefault();
+    }
+  };
+
   // NOTE controller is needed otherwise the values default to 0 instead of null
   return (
     <NumberInput
       value={value ?? ""}
       onChange={handleChange}
+      onKeyDown={handleKeyDown}
       required={required}
       id={id ?? name}
       label={label}
