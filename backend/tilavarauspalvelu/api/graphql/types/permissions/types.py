@@ -90,7 +90,7 @@ class PermissionCheckerType(ObjectType):
         require_all: bool = False,
     ) -> dict[str, bool]:
         # Anonymous or inactive users have no permissions
-        if user.permissions.is_user_anonymous_or_inactive():
+        if user.is_anonymous or not user.is_active:
             return {"has_permission": False}
 
         # Superusers have all permissions

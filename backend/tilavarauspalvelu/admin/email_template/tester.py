@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 
 from tilavarauspalvelu.integrations.email.sending import send_emails_in_batches_task
 from tilavarauspalvelu.integrations.email.typing import EmailData, EmailType
@@ -61,6 +61,9 @@ def email_tester_admin_redirect_view(request: WSGIRequest, email_type: str | Non
 
 
 def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpResponse:
+    if request.user.is_anonymous:
+        return HttpResponse("Login required", HTTP_401_UNAUTHORIZED)
+
     new_email_type = request.GET.get("email_type", None)
     if new_email_type is not None:
         return email_tester_admin_redirect_view(request=request, email_type=new_email_type)
