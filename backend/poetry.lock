@@ -1694,23 +1694,24 @@ python-dateutil = ">=2.7"
 
 [[package]]
 name = "graphene"
-version = "3.4"
+version = "3.4.3"
 description = "GraphQL Framework for Python"
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "graphene-3.4-py2.py3-none-any.whl", hash = "sha256:28bf359b802cdb808130a5521135d4c88a262564598cfdc91628d2c172b99dce"},
-    {file = "graphene-3.4.tar.gz", hash = "sha256:65e5ec84c5b7fb4fc41518acfbafb62ebb393d3982fbba00cd5393e431a80b97"},
+    {file = "graphene-3.4.3-py2.py3-none-any.whl", hash = "sha256:820db6289754c181007a150db1f7fff544b94142b556d12e3ebc777a7bf36c71"},
+    {file = "graphene-3.4.3.tar.gz", hash = "sha256:2a3786948ce75fe7e078443d37f609cbe5bb36ad8d6b828740ad3b95ed1a0aaa"},
 ]
 
 [package.dependencies]
 graphql-core = ">=3.1,<3.3"
 graphql-relay = ">=3.1,<3.3"
+python-dateutil = ">=2.7.0,<3"
 typing-extensions = ">=4.7.1,<5"
 
 [package.extras]
-dev = ["coveralls (>=3.3,<5)", "pytest (>=8,<9)", "pytest-asyncio (>=0.16,<2)", "pytest-benchmark (>=4,<5)", "pytest-cov (>=5,<6)", "pytest-mock (>=3,<4)", "ruff (==0.5.0)"]
+dev = ["coveralls (>=3.3,<5)", "mypy (>=1.10,<2)", "pytest (>=8,<9)", "pytest-asyncio (>=0.16,<2)", "pytest-benchmark (>=4,<5)", "pytest-cov (>=5,<6)", "pytest-mock (>=3,<4)", "ruff (==0.5.0)", "types-python-dateutil (>=2.8.1,<3)"]
 test = ["coveralls (>=3.3,<5)", "pytest (>=8,<9)", "pytest-asyncio (>=0.16,<2)", "pytest-benchmark (>=4,<5)", "pytest-cov (>=5,<6)", "pytest-mock (>=3,<4)"]
 
 [[package]]
@@ -1740,44 +1741,49 @@ test = ["coveralls", "django-filter (>=22.1)", "djangorestframework (>=3.6.3)", 
 
 [[package]]
 name = "graphene-django-extensions"
-version = "0.4.9"
+version = "0.5.1"
 description = "Extensions for graphene-django"
 optional = false
-python-versions = "<4,>=3.10"
+python-versions = ">=3.12"
 groups = ["main"]
 files = [
-    {file = "graphene_django_extensions-0.4.9-py3-none-any.whl", hash = "sha256:859dbcc8c6e24c6b7c928df70f2a7af61f36d2291169338979b7dd36f07ae10c"},
-    {file = "graphene_django_extensions-0.4.9.tar.gz", hash = "sha256:d39284f150c40682128f6187e60a81a9debfb434c9472e49dcac78deaabc6b0f"},
+    {file = "graphene_django_extensions-0.5.1-py3-none-any.whl", hash = "sha256:b4f035c0fb126e8417177edd1a1844db37ac61614fb5c62d5523c16297771ae4"},
+    {file = "graphene_django_extensions-0.5.1.tar.gz", hash = "sha256:4587c3f484e55ba002198cce746325dc9953ad28810050a5f99b5d8ec2f76c61"},
 ]
 
 [package.dependencies]
-Django = ">=4.2"
-django-filter = ">=23.5"
+django = ">=5.2.18"
+django-filter = ">=26.2"
 django-settings-holder = ">=0.1.2"
-djangorestframework = ">=3.14.0"
+djangorestframework = ">=3.18.3"
 graphene-django = ">=3.0.0"
-graphene-django-query-optimizer = ">=0.10.3"
+graphene-django-query-optimizer = ">=0.11.1"
+typing-extensions = ">=4.16.0"
 
 [package.extras]
-files = ["pillow (>=10.2.0)"]
-translation = ["django-modeltranslation (>=0.18.13)"]
+files = ["pillow (>=12.3.0)"]
+translation = ["django-modeltranslation (>=0.20.6)"]
 
 [[package]]
 name = "graphene-django-query-optimizer"
-version = "0.10.16"
+version = "0.11.1"
 description = "Automatically optimize SQL queries in Graphene-Django schemas."
 optional = false
-python-versions = "<4,>=3.11"
+python-versions = ">=3.12"
 groups = ["main"]
 files = [
-    {file = "graphene_django_query_optimizer-0.10.16-py3-none-any.whl", hash = "sha256:f89ee9b02a5c8ceeb4baed82b3f5fac605c6c0d0cb22138afa08712016f36711"},
-    {file = "graphene_django_query_optimizer-0.10.16.tar.gz", hash = "sha256:fc9c81d94627fa7f0e26de632276583de47b1e46510892ec7f3d45e35c862e92"},
+    {file = "graphene_django_query_optimizer-0.11.1-py3-none-any.whl", hash = "sha256:c3c8188fbd8f53f5355a54ccebe052100f097ad4c0e21c5b9afcf1292832a720"},
+    {file = "graphene_django_query_optimizer-0.11.1.tar.gz", hash = "sha256:c1bd6439cfcf63405a456c0982752d203eb0cb3feaee7cd35af4dd4479d2357d"},
 ]
 
 [package.dependencies]
-Django = ">=5.2.17"
-django-settings-holder = ">=0.1.2"
-graphene-django = ">=3.0.0"
+django = ">=5.2.18"
+django-settings-holder = ">=0.3.1"
+graphene = ">=3.4.3"
+graphene-django = ">=3.2.3"
+graphql-core = ">=3.2.13"
+graphql-relay = ">=3.2.0"
+typing-extensions = ">=4.16.0"
 
 [[package]]
 name = "graphql-core"
@@ -3316,18 +3322,18 @@ cron-schedule = ["croniter"]
 
 [[package]]
 name = "python-dateutil"
-version = "4.0.0"
+version = "2.9.0.post0"
 description = "Extensions to the standard Python datetime module"
 optional = false
-python-versions = ">=3.11"
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 groups = ["main", "celery", "test"]
 files = [
-    {file = "python_dateutil-4.0.0-py3-none-any.whl", hash = "sha256:a5e246f79eb80475e691bf93862cead98decd8a498cf53ba0516fcdc0f50dc1c"},
-    {file = "python_dateutil-4.0.0.tar.gz", hash = "sha256:d7295ff14fdc0f92f662100bfb6c551d160ca090f2939f1ec5b9794265c03f06"},
+    {file = "python-dateutil-2.9.0.post0.tar.gz", hash = "sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3"},
+    {file = "python_dateutil-2.9.0.post0-py2.py3-none-any.whl", hash = "sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"},
 ]
 
 [package.dependencies]
-tzdata = "*"
+six = ">=1.5"
 
 [[package]]
 name = "python-discovery"
@@ -3680,7 +3686,7 @@ version = "1.17.0"
 description = "Python 2 and 3 compatibility utilities"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
-groups = ["main"]
+groups = ["main", "celery", "test"]
 files = [
     {file = "six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"},
     {file = "six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81"},
@@ -3890,7 +3896,7 @@ files = [
     {file = "tzdata-2026.5-py2.py3-none-any.whl", hash = "sha256:b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac"},
     {file = "tzdata-2026.5.tar.gz", hash = "sha256:8cc73c0a0bfca7dbfa59235d60b2eff82231dee33f53d206db1acd9173cfc0a7"},
 ]
-markers = {admin = "sys_platform == \"win32\"", lint = "sys_platform == \"win32\""}
+markers = {admin = "sys_platform == \"win32\"", lint = "sys_platform == \"win32\"", test = "platform_system == \"Windows\""}
 
 [[package]]
 name = "tzlocal"
@@ -4076,4 +4082,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "ea2daff3ff015cfb108a5652793250309bc734274f4474c7252508dbc2947a62"
+content-hash = "c8e4bf25472438185403d1d607749a14156873dbcdee7e6eac2fd31debd8260b"
