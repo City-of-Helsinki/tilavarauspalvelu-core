@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import pytest
@@ -8,6 +9,9 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 from config.sentry import sentry_before_send_transaction, sentry_traces_sampler
 from config.settings import Common, Docker, Platta
+
+if TYPE_CHECKING:
+    from sentry_sdk.types import Event
 
 
 def test_sentry_traces_sampler_respects_parent_sampling_decision() -> None:
@@ -41,7 +45,7 @@ def test_sentry_traces_sampler_excludes_health_checks(path: str) -> None:
 
 
 def test_sentry_before_send_transaction_copies_allowlisted_headers_to_trace_data() -> None:
-    event = {
+    event: Event = {
         "request": {
             "headers": {
                 "Accept-Language": "fi",
