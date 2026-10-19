@@ -13,7 +13,7 @@ __all__ = [
 ]
 
 
-class PriceComponentInputSerializer(NestingModelSerializer):
+class PriceComponentInputSerializer(NestingModelSerializer[PriceComponent]):
     """
     One component in a batch of changes. A component with a `pk` updates a saved component.
     Its fields that are left out keep their saved values. A component without a `pk` is new.

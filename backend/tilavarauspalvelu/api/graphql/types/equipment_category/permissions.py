@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from graphene_django_extensions.permissions import BasePermission
 
-if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import AnyUser
+from tilavarauspalvelu.models import EquipmentCategory
+from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "EquipmentCategoryPermission",
 ]
 
 
-class EquipmentCategoryPermission(BasePermission):
+class EquipmentCategoryPermission(BasePermission[EquipmentCategory, AnyUser]):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return True

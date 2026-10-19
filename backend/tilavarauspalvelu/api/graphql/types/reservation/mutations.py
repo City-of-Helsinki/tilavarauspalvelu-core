@@ -13,7 +13,7 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFo
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.tasks import delete_pindora_reservation_task
-from tilavarauspalvelu.typing import error_codes
+from tilavarauspalvelu.typing import AnyUser, error_codes
 
 from .permissions import (
     ReservationCommentPermission,
@@ -44,7 +44,6 @@ from .serializers.staff_repair_access_code_serializers import StaffRepairReserva
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import PaymentOrder
-    from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "ReservationAdjustTimeMutation",
@@ -66,19 +65,19 @@ __all__ = [
 ]
 
 
-class ReservationCreateMutation(CreateMutation):
+class ReservationCreateMutation(CreateMutation[Reservation, AnyUser]):
     class Meta:
         serializer_class = ReservationCreateSerializer
         permission_classes = [ReservationPermission]
 
 
-class ReservationUpdateMutation(UpdateMutation):
+class ReservationUpdateMutation(UpdateMutation[Reservation, AnyUser]):
     class Meta:
         serializer_class = ReservationUpdateSerializer
         permission_classes = [ReservationPermission]
 
 
-class ReservationConfirmMutation(UpdateMutation):
+class ReservationConfirmMutation(UpdateMutation[Reservation, AnyUser]):
     order = graphene.Field(PaymentOrderNode)
 
     class Meta:
@@ -92,49 +91,49 @@ class ReservationConfirmMutation(UpdateMutation):
         return output
 
 
-class ReservationCancellationMutation(UpdateMutation):
+class ReservationCancellationMutation(UpdateMutation[Reservation, AnyUser]):
     class Meta:
         serializer_class = ReservationCancellationSerializer
         permission_classes = [ReservationPermission]
 
 
-class ReservationDenyMutation(UpdateMutation):
+class ReservationDenyMutation(UpdateMutation[Reservation, AnyUser]):
     class Meta:
         serializer_class = ReservationDenySerializer
         permission_classes = [ReservationHandlingPermission]
 
 
-class ReservationRefundMutation(UpdateMutation):
+class ReservationRefundMutation(UpdateMutation[Reservation, AnyUser]):
     class Meta:
         serializer_class = ReservationRefundSerializer
         permission_classes = [ReservationRefundPermission]
 
 
-class ReservationApproveMutation(UpdateMutation):
+class ReservationApproveMutation(UpdateMutation[Reservation, AnyUser]):
     class Meta:
         serializer_class = ReservationApproveSerializer
         permission_classes = [ReservationHandlingPermission]
 
 
-class ReservationRequiresHandlingMutation(UpdateMutation):
+class ReservationRequiresHandlingMutation(UpdateMutation[Reservation, AnyUser]):
     class Meta:
         serializer_class = ReservationRequiresHandlingSerializer
         permission_classes = [ReservationHandlingPermission]
 
 
-class ReservationWorkingMemoMutation(UpdateMutation):
+class ReservationWorkingMemoMutation(UpdateMutation[Reservation, AnyUser]):
     class Meta:
         serializer_class = ReservationWorkingMemoSerializer
         permission_classes = [ReservationCommentPermission]
 
 
-class ReservationAdjustTimeMutation(UpdateMutation):
+class ReservationAdjustTimeMutation(UpdateMutation[Reservation, AnyUser]):
     class Meta:
         serializer_class = ReservationAdjustTimeSerializer
         permission_classes = [ReservationPermission]
 
 
-class ReservationDeleteTentativeMutation(DeleteMutation):
+class ReservationDeleteTentativeMutation(DeleteMutation[Reservation, AnyUser]):
     """Used only for deleting a reservation before it is confirmed."""
 
     class Meta:
@@ -173,31 +172,31 @@ class ReservationDeleteTentativeMutation(DeleteMutation):
 # Staff mutations
 
 
-class ReservationStaffCreateMutation(CreateMutation):
+class ReservationStaffCreateMutation(CreateMutation[Reservation, AnyUser]):
     class Meta:
         serializer_class = ReservationStaffCreateSerializer
         permission_classes = [ReservationStaffCreatePermission]
 
 
-class ReservationStaffAdjustTimeMutation(UpdateMutation):
+class ReservationStaffAdjustTimeMutation(UpdateMutation[Reservation, AnyUser]):
     class Meta:
         serializer_class = StaffReservationAdjustTimeSerializer
         permission_classes = [StaffAdjustTimePermission]
 
 
-class ReservationStaffModifyMutation(UpdateMutation):
+class ReservationStaffModifyMutation(UpdateMutation[Reservation, AnyUser]):
     class Meta:
         serializer_class = StaffReservationModifySerializer
         permission_classes = [StaffReservationModifyPermission]
 
 
-class ReservationStaffChangeAccessCodeMutation(UpdateMutation):
+class ReservationStaffChangeAccessCodeMutation(UpdateMutation[Reservation, AnyUser]):
     class Meta:
         serializer_class = StaffChangeReservationAccessCodeSerializer
         permission_classes = [StaffReservationModifyPermission]
 
 
-class ReservationStaffRepairAccessCodeMutation(UpdateMutation):
+class ReservationStaffRepairAccessCodeMutation(UpdateMutation[Reservation, AnyUser]):
     class Meta:
         serializer_class = StaffRepairReservationAccessCodeSerializer
         permission_classes = [StaffReservationModifyPermission]

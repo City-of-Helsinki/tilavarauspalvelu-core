@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from graphene_django_extensions.permissions import BasePermission
 
-if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import AnyUser
+from tilavarauspalvelu.models import Equipment
+from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "EquipmentPermission",
 ]
 
 
-class EquipmentPermission(BasePermission):
+class EquipmentPermission(BasePermission[Equipment, AnyUser]):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return True
@@ -22,7 +22,7 @@ class EquipmentPermission(BasePermission):
         return user.permissions.can_manage_reservation_related_data()
 
 
-class EquipmentAllPermission(BasePermission):
+class EquipmentAllPermission(BasePermission[Equipment, AnyUser]):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return True

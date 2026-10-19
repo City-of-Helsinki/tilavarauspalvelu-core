@@ -21,20 +21,18 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose, ReservationUnit
 from tilavarauspalvelu.services.pricing.price_lines import build_price_lines, save_reservation_price_lines
-from tilavarauspalvelu.typing import error_codes
+from tilavarauspalvelu.typing import StaffCreateReservationData, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
     from tilavarauspalvelu.services.pricing.price_lines import PriceLines
-    from tilavarauspalvelu.typing import StaffCreateReservationData
 
 
-class ReservationStaffCreateSerializer(NestingModelSerializer):
+class ReservationStaffCreateSerializer(NestingModelSerializer[Reservation, StaffCreateReservationData]):
     """Create a reservation as a staff user."""
 
-    instance: None
     price_lines: PriceLines
 
     pk = IntegerField(read_only=True)

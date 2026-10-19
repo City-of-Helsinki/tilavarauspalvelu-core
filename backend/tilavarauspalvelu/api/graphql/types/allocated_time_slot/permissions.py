@@ -6,25 +6,24 @@ from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
 
 from tilavarauspalvelu.enums import ApplicationStatusChoice
-from tilavarauspalvelu.models import ReservationUnitOption
-from tilavarauspalvelu.typing import error_codes
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.models import AllocatedTimeSlot
-    from tilavarauspalvelu.typing import AnyUser
+from tilavarauspalvelu.models import AllocatedTimeSlot, ReservationUnitOption
+from tilavarauspalvelu.typing import AnyUser, error_codes
 
 __all__ = [
     "AllocatedTimeSlotPermission",
 ]
 
+if TYPE_CHECKING:
+    from query_optimizer.typing import GraphQLFilterInfo
 
-class AllocatedTimeSlotPermission(BasePermission):
+
+class AllocatedTimeSlotPermission(BasePermission[AllocatedTimeSlot, AnyUser]):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return user.is_authenticated
 
     @classmethod
-    def has_node_permission(cls, instance: AllocatedTimeSlot, user: AnyUser, filters: dict[str, Any]) -> bool:
+    def has_node_permission(cls, instance: AllocatedTimeSlot, user: AnyUser, filters: GraphQLFilterInfo) -> bool:
         application = instance.reservation_unit_option.application_section.application
         if application.user == user and application.status == ApplicationStatusChoice.RESULTS_SENT:
             return True

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import ReservationUpdateData
 
 
-class ReservationUpdateSerializer(NestingModelSerializer):
+class ReservationUpdateSerializer(NestingModelSerializer[Reservation]):
     """Update reservation from form fields specific to the reservation unit."""
 
     instance: Reservation

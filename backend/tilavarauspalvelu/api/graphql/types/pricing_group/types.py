@@ -3,6 +3,7 @@ from __future__ import annotations
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import PricingGroup
+from tilavarauspalvelu.typing import AnyUser
 
 from .permissions import PricingGroupPermission
 
@@ -11,7 +12,7 @@ __all__ = [
 ]
 
 
-class PricingGroupNode(DjangoNode):
+class PricingGroupNode(DjangoNode[PricingGroup, AnyUser]):
     class Meta:
         model = PricingGroup
         fields = [
