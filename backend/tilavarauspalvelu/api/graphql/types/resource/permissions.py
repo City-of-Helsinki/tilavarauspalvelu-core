@@ -1,21 +1,18 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from graphene_django_extensions.permissions import BasePermission
 
-from tilavarauspalvelu.models import Space
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Resource
-    from tilavarauspalvelu.typing import AnyUser
+from tilavarauspalvelu.models import Resource, Space
+from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "ResourcePermission",
 ]
 
 
-class ResourcePermission(BasePermission):
+class ResourcePermission(BasePermission[Resource, AnyUser]):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return True

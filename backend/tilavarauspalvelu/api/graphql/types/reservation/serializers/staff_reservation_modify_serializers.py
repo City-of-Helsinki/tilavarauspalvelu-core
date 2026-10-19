@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework.fields import IntegerField
@@ -16,13 +14,11 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose
+from tilavarauspalvelu.typing import StaffReservationData
 from utils.external_service.errors import ExternalServiceError
 
-if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import StaffReservationData
 
-
-class StaffReservationModifySerializer(NestingModelSerializer):
+class StaffReservationModifySerializer(NestingModelSerializer[Reservation, StaffReservationData]):
     instance: Reservation
 
     pk = IntegerField(required=True)

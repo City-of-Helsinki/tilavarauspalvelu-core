@@ -12,12 +12,12 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ReservationSeries
+from tilavarauspalvelu.typing import ReservationSeriesAddData
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation
-    from tilavarauspalvelu.typing import ReservationSeriesAddData
 
 
 __all__ = [
@@ -25,7 +25,7 @@ __all__ = [
 ]
 
 
-class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
+class ReservationSeriesAddReservationSerializer(NestingModelSerializer[ReservationSeries, ReservationSeriesAddData]):
     """Add a reservation to a reservation series."""
 
     instance: ReservationSeries

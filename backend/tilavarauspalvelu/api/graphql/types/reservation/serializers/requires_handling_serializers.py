@@ -30,7 +30,7 @@ class ReservationHandlingData(TypedDict):
     state: NotRequired[ReservationStateChoice]
 
 
-class ReservationRequiresHandlingSerializer(NestingModelSerializer):
+class ReservationRequiresHandlingSerializer(NestingModelSerializer[Reservation]):
     """Return a reservation to handling."""
 
     instance: Reservation

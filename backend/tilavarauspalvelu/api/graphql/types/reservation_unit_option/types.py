@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import ReservationUnitOption
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import ReservationUnitOptionFilterSet
 from .permissions import ReservationUnitOptionPermission
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import GQLInfo
 
 
-class ReservationUnitOptionNode(DjangoNode):
+class ReservationUnitOptionNode(DjangoNode[ReservationUnitOption, AnyUser]):
     class Meta:
         model = ReservationUnitOption
         fields = [

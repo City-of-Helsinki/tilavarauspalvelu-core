@@ -28,7 +28,7 @@ __all__ = [
 ]
 
 
-class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
+class ReservationSeriesDenyInputSerializer(NestingModelSerializer[ReservationSeries]):
     instance: ReservationSeries
 
     deny_reason = serializers.IntegerField(required=True)
@@ -98,7 +98,7 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
         return instance
 
 
-class ReservationSeriesDenyOutputSerializer(NestingModelSerializer):
+class ReservationSeriesDenyOutputSerializer(NestingModelSerializer[ReservationSeries]):
     denied = serializers.IntegerField(required=True)
     future = serializers.IntegerField(required=True)
 

@@ -9,6 +9,7 @@ from query_optimizer import MultiField
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType
 from tilavarauspalvelu.models import PaymentOrder
+from tilavarauspalvelu.typing import AnyUser
 from utils.date_utils import datetime_difference, utc_datetime
 
 from .permissions import PaymentOrderPermission
@@ -24,7 +25,7 @@ __all__ = [
 ]
 
 
-class PaymentOrderNode(DjangoNode):
+class PaymentOrderNode(DjangoNode[PaymentOrder, AnyUser]):
     order_uuid = MultiField(graphene.UUID, fields=["remote_id"])
     refund_uuid = MultiField(graphene.UUID, fields=["refund_id"])
 

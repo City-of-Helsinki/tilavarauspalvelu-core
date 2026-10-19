@@ -14,7 +14,7 @@ from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference
 from utils.external_service.errors import ExternalServiceError
 
 
-class ReservationAdjustTimeSerializer(NestingModelSerializer):
+class ReservationAdjustTimeSerializer(NestingModelSerializer[Reservation, ReservationAdjustTimeData]):
     """Adjust the time of a reservation."""
 
     instance: Reservation

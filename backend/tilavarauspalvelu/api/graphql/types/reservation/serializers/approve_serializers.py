@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
 
 from django.conf import settings
 from graphene_django_extensions import NestingModelSerializer
@@ -15,19 +14,16 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
-from tilavarauspalvelu.typing import error_codes
+from tilavarauspalvelu.typing import ReservationApproveData, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_datetime
 from utils.external_service.errors import ExternalServiceError
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import ReservationApproveData
 
 __all__ = [
     "ReservationApproveSerializer",
 ]
 
 
-class ReservationApproveSerializer(NestingModelSerializer):
+class ReservationApproveSerializer(NestingModelSerializer[Reservation, ReservationApproveData]):
     """Approve a reservation during handling."""
 
     instance: Reservation

@@ -10,6 +10,7 @@ from query_optimizer import AnnotatedField
 
 from tilavarauspalvelu.enums import ApplicationRoundReservationCreationStatusChoice, ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import Application, ApplicationRound, ReservationUnit
+from tilavarauspalvelu.typing import AnyUser
 from utils.db import SubqueryCount
 
 from .filtersets import ApplicationRoundFilterSet
@@ -17,10 +18,10 @@ from .permissions import ApplicationRoundPermission
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models.application_round.queryset import ApplicationRoundQuerySet
-    from tilavarauspalvelu.typing import Any, AnyUser, GQLInfo
+    from tilavarauspalvelu.typing import Any, GQLInfo
 
 
-class ApplicationRoundNode(DjangoNode):
+class ApplicationRoundNode(DjangoNode[ApplicationRound, AnyUser]):
     status = AnnotatedField(
         graphene.Enum.from_enum(ApplicationRoundStatusChoice),
         expression=L("status"),

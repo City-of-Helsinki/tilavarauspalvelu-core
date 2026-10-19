@@ -15,7 +15,7 @@ from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNod
 from tilavarauspalvelu.enums import AccessType, ReservationUnitPublishingState, ReservationUnitReservationState
 from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
 from tilavarauspalvelu.models import OriginHaukiResource, PaymentMerchant, Reservation, ReservationUnit, Unit
-from tilavarauspalvelu.typing import error_codes
+from tilavarauspalvelu.typing import AnyUser, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.db import SubqueryCount
 
@@ -43,7 +43,7 @@ class ReservableTimeSpanType(graphene.ObjectType):
     end_datetime = graphene.DateTime(required=True)
 
 
-class ReservationUnitNode(DjangoNode):
+class ReservationUnitNode(DjangoNode[ReservationUnit, AnyUser]):
     publishing_state = AnnotatedField(
         graphene.Enum.from_enum(ReservationUnitPublishingState),
         expression=L("publishing_state"),
@@ -346,7 +346,7 @@ class ReservationUnitNode(DjangoNode):
         return getattr(root, "num_active_user_reservations", 0)
 
 
-class ReservationUnitAllNode(DjangoNode):
+class ReservationUnitAllNode(DjangoNode[ReservationUnit, AnyUser]):
     """This Node should be kept to the bare minimum and never expose any relations to avoid performance issues."""
 
     class Meta:

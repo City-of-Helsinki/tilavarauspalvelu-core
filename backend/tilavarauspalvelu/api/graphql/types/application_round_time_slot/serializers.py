@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import TimeSlot
 
 
-class ApplicationRoundTimeSlotSerializer(NestingModelSerializer):
+class ApplicationRoundTimeSlotSerializer(NestingModelSerializer[ApplicationRoundTimeSlot]):
     reservable_times = TimeSlotSerializer(many=True, required=False)
 
     class Meta:

@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-class SuitableTimeRangeSerializer(NestingModelSerializer):
+class SuitableTimeRangeSerializer(NestingModelSerializer[SuitableTimeRange]):
     class Meta:
         model = SuitableTimeRange
         fields = [

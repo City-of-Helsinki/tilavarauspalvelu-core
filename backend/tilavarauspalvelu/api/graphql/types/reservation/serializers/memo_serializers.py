@@ -6,7 +6,7 @@ from rest_framework.fields import CharField, IntegerField
 from tilavarauspalvelu.models import Reservation
 
 
-class ReservationWorkingMemoSerializer(NestingModelSerializer):
+class ReservationWorkingMemoSerializer(NestingModelSerializer[Reservation]):
     """Update the working memo of a reservation."""
 
     pk = IntegerField(required=True)

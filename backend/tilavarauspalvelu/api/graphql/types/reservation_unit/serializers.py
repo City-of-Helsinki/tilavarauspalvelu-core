@@ -38,7 +38,7 @@ __all__ = [
 ]
 
 
-class ReservationUnitSerializer(NestingModelSerializer):
+class ReservationUnitSerializer(NestingModelSerializer[ReservationUnit]):
     instance: ReservationUnit | None
 
     images = ReservationUnitImageFieldSerializer(many=True, required=False)
@@ -482,7 +482,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
         reservation_unit.actions.update_access_types_for_reservations()
 
 
-class ReservationUnitArchiveSerializer(NestingModelSerializer):
+class ReservationUnitArchiveSerializer(NestingModelSerializer[ReservationUnit]):
     instance: ReservationUnit
 
     class Meta:

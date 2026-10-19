@@ -3,12 +3,13 @@ from __future__ import annotations
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import Equipment
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import EquipmentAllFilterSet, EquipmentFilterSet
 from .permissions import EquipmentAllPermission, EquipmentPermission
 
 
-class EquipmentNode(DjangoNode):
+class EquipmentNode(DjangoNode[Equipment, AnyUser]):
     class Meta:
         model = Equipment
         fields = [
@@ -20,7 +21,7 @@ class EquipmentNode(DjangoNode):
         permission_classes = [EquipmentPermission]
 
 
-class EquipmentAllNode(DjangoNode):
+class EquipmentAllNode(DjangoNode[Equipment, AnyUser]):
     """This Node should be kept to the bare minimum and never expose any relations to avoid performance issues."""
 
     class Meta:
