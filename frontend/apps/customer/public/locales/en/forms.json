@@ -2,6 +2,7 @@
   "invalidEmail": "Email must be in right format (including @ symbol)",
   "Required": "{{fieldName}} is required",
   "minNumPersons": "Number of participants must be minimum {{minValue}} persons",
+  "integerNumPersons": "Number of participants must be a whole number",
   "maxNumPersons": "Number of participants can be maximum {{maxValue}} persons",
   "tooSmall": "{{fieldName}} is too small.",
   "tooLarge": "{{fieldName}} is too large.",

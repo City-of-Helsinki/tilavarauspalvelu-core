@@ -2,6 +2,7 @@
   "invalidEmail": "E-postaddress måste vara i korrekt format (inklusive @-symbol)",
   "Required": "{{fieldName}} är obligatorisk",
   "minNumPersons": "Antalet deltagare kan vara minimum {{minValue}} personer",
+  "integerNumPersons": "Antalet deltagare måste vara ett heltal",
   "maxNumPersons": "Antalet deltagare kan vara maximalt {{maxValue}} personer",
   "tooSmall": "{{fieldName}} är för liten.",
   "tooLarge": "{{fieldName}} är för stor.",

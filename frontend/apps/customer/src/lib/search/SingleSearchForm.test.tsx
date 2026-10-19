@@ -108,4 +108,16 @@ describe("SingleSearchForm", () => {
     await submit();
     expect(mockedHandleSearch).toHaveBeenCalledWith(expect.objectContaining({ personsAllowed: 253 }), true);
   });
+
+  test.each([
+    ["0", "forms:minNumPersons"],
+    ["-2", "forms:minNumPersons"],
+    ["2.5", "forms:integerNumPersons"],
+  ])("should not search if persons allowed is %s", async (value, error) => {
+    // a URL or a pasted value is not blocked by the key handler
+    const { view, submit } = renderAndSubmit(`personsAllowed=${value}`);
+    await submit();
+    expect(mockedHandleSearch).not.toHaveBeenCalled();
+    expect(view.getByText(new RegExp(error))).toBeInTheDocument();
+  });
 });
