@@ -62,7 +62,11 @@ const SearchFormSchema = z
     startDate: z.string().nullable(),
     endDate: z.string().nullable(),
     duration: z.number().nullable(),
-    personsAllowed: z.number().nullable(),
+    personsAllowed: z
+      .number()
+      .int({ error: "forms:integerNumPersons" })
+      .min(1, { error: "forms:minNumPersons" })
+      .nullable(),
     showOnlyReservable: z.boolean(),
     textSearch: z.string(),
   })
@@ -222,7 +226,7 @@ export function SingleSearchForm({
     formValues.timeEnd ||
     formValues.duration ||
     formValues.units.length > 0 ||
-    formValues.personsAllowed ||
+    formValues.personsAllowed != null ||
     formValues.intendedUses.length > 0 ||
     formValues.equipments.length > 0 ||
     formValues.accessTypes.length > 0
@@ -337,6 +341,9 @@ export function SingleSearchForm({
           control={control}
           min={1}
           integerOnly
+          errorText={
+            errors.personsAllowed?.message != null ? t(errors.personsAllowed.message, { minValue: 1 }) : undefined
+          }
         />
         <ControlledSelect
           name="intendedUses"

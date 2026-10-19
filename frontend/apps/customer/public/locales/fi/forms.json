@@ -2,6 +2,7 @@
   "invalidEmail": "Sähköpostin tulee olla oikeassa muodossa (sisältäen @-merkin)",
   "Required": "{{fieldName}} on pakollinen",
   "minNumPersons": "Osallistujamäärän tulee olla vähintään {{minValue}} henkilöä",
+  "integerNumPersons": "Osallistujamäärän tulee olla kokonaisluku",
   "maxNumPersons": "Osallistujamäärä voi olla enintään {{maxValue}} henkilöä",
   "tooSmall": "{{fieldName}} on liian pieni.",
   "tooLarge": "{{fieldName}} on liian suuri.",
