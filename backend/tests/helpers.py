@@ -93,7 +93,7 @@ class patch_method:
 
     def __init__(self, method: Callable, return_value: Any = None, side_effect: Any = None) -> None:
         # Get the full path to the method, e.g., 'module.submodule.Class.method'
-        method_path = method.__module__ + "." + method.__qualname__  # type: ignore[attr-defined]
+        method_path = method.__module__ + "." + method.__qualname__
         self.patch = mock.patch(method_path, return_value=return_value, side_effect=side_effect)
 
     def __call__[**P, T](self, func: Callable[P, T]) -> Callable[P, T]:
