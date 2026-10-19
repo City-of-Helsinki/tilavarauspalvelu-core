@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from tilavarauspalvelu.models import ReservationUnitType
-from tilavarauspalvelu.models._base import ModelManager, TranslatedModelQuerySet
+from tilavarauspalvelu.models._base import TranslatedModelManager, TranslatedModelQuerySet
 
 __all__ = [
     "ReservationUnitTypeManager",
@@ -12,4 +12,4 @@ __all__ = [
 class ReservationUnitTypeQuerySet(TranslatedModelQuerySet[ReservationUnitType]): ...
 
 
-class ReservationUnitTypeManager(ModelManager[ReservationUnitType, ReservationUnitTypeQuerySet]): ...
+class ReservationUnitTypeManager(TranslatedModelManager[ReservationUnitType, ReservationUnitTypeQuerySet]): ...

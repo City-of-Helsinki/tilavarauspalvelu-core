@@ -123,7 +123,6 @@ module = [
     "import_export.*",
     "kombu.*",
     "more_admin_filters.*",
-    "mptt.*",
     "polib.*",
     "rangefilter.*",
     "resilient_logger.*",
@@ -135,6 +134,12 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 # Read the source so that the plugin can see the fields of `User`, which subclasses a model from here.
 module = ["helusers.*"]
+follow_untyped_imports = true
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+# Read the source so that the plugin sees `Space`, which subclasses a model from here, as a model.
+module = ["mptt.*"]
 follow_untyped_imports = true
 ignore_errors = true
 

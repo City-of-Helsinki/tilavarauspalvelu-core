@@ -277,6 +277,8 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
         )
 
 
+# Historical models in migrations use this manager, and modeltranslation does not register them.
+# So this manager cannot be a `TranslatedModelManager`.
 class ReservationUnitManager(ModelManager[ReservationUnit, ReservationUnitQuerySet]):
     use_in_migrations = True
 

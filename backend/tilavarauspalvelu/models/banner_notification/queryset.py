@@ -6,7 +6,7 @@ from lookup_property import L
 
 from tilavarauspalvelu.enums import BannerNotificationTarget
 from tilavarauspalvelu.models import BannerNotification
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models._base import ModelQuerySet, TranslatedModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import AnyUser
@@ -55,4 +55,4 @@ class BannerNotificationQuerySet(ModelQuerySet[BannerNotification]):
         return self.order_by(L("banner_target_sort_order").order_by(descending=desc))
 
 
-class BannerNotificationManager(ModelManager[BannerNotification, BannerNotificationQuerySet]): ...
+class BannerNotificationManager(TranslatedModelManager[BannerNotification, BannerNotificationQuerySet]): ...

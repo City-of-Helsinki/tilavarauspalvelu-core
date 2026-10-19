@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models.functions import RowNumber
 
 from tilavarauspalvelu.models import ReservationUnitPricing
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models._base import ModelQuerySet, TranslatedModelManager
 from utils.date_utils import local_date
 
 if TYPE_CHECKING:
@@ -90,4 +90,4 @@ class ReservationUnitPricingQuerySet(ModelQuerySet[ReservationUnitPricing]):
         )
 
 
-class ReservationUnitPricingManager(ModelManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]): ...
+class ReservationUnitPricingManager(TranslatedModelManager[ReservationUnitPricing, ReservationUnitPricingQuerySet]): ...
