@@ -22,7 +22,7 @@ load_credentials() {
 api() {
   # Pass credentials through stdin so they do not show up in the process list.
   printf 'user = "%s"\n' "$credentials" \
-    | curl --silent --show-error --fail-with-body --config - "$base_url/$1"
+    | curl --silent --show-error --fail-with-body --max-time 30 --config - "$base_url/$1"
 }
 
 # Fetch all pages of a v2 list endpoint. Print the merged results array.
