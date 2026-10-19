@@ -21,6 +21,8 @@ type Connection = {
  * all edges with the first page, so after navigating back only the first page is visible.
  * If the first page has the same nodes in the same order as the cached list, keep the cached pages after it.
  * If not, the list has changed, so show only the new first page.
+ * The wrapped policy sets hasNextPage of the new first page. If it is not true, the list ends there,
+ * so the cached pages are old and are not kept.
  * Don't use for lists that are polled to see changes made by other users, because the later pages are not refetched.
  */
 export function keepLoadedPages(policy: FieldPolicy): FieldPolicy {
@@ -36,7 +38,7 @@ export function keepLoadedPages(policy: FieldPolicy): FieldPolicy {
       if (!isFirstPage || merged == null || incomingEdges.length === 0) {
         return merged;
       }
-      if (existingEdges.length <= incomingEdges.length) {
+      if (existingEdges.length <= incomingEdges.length || merged.pageInfo?.hasNextPage !== true) {
         return merged;
       }
       const isSameFirstPage = incomingEdges.every((edge, i) => {
