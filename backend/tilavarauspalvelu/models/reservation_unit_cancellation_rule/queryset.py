@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TypeVar
 
 from tilavarauspalvelu.models import ReservationUnitCancellationRule
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models._base import ModelQuerySet, TranslatedModelManager
 
 __all__ = [
     "ReservationUnitCancellationRuleManager",
@@ -21,5 +21,5 @@ class ReservationUnitCancellationRuleQuerySet(ModelQuerySet[_TModel_co, _TRow_co
 
 
 class ReservationUnitCancellationRuleManager(
-    ModelManager[ReservationUnitCancellationRule, ReservationUnitCancellationRuleQuerySet],
+    TranslatedModelManager[ReservationUnitCancellationRule, ReservationUnitCancellationRuleQuerySet],
 ): ...
