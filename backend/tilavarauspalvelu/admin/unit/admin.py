@@ -39,7 +39,7 @@ TPREK_FIELDS = [
 class UnitGroupInlineAdmin(admin.TabularInline):
     model = UnitGroup.units.through
     fk_name = "unit"
-    fields = ["unitgroup"]
+    fields = ("unitgroup",)
     readonly_fields = fields
 
     def has_add_permission(self, request, obj=None) -> bool:
