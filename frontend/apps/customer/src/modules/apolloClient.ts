@@ -4,7 +4,7 @@ import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { relayStylePagination } from "@apollo/client/utilities";
 import type { FieldPolicy } from "@apollo/client";
 import { enchancedFetch, errorLink } from "@ui/modules/apollo/helpers";
-import { keyArgsWithoutPaging } from "@ui/modules/apollo/pagination";
+import { keepLoadedPages, keyArgsWithoutPaging } from "@ui/modules/apollo/pagination";
 import { SentryContextLink } from "@ui/modules/apollo/sentryLink";
 import { buildGraphQLUrl } from "@ui/modules/urlBuilder";
 
@@ -68,7 +68,7 @@ export function createApolloClient(hostUrl: string, ctx?: GetServerSidePropsCont
       typePolicies: {
         Query: {
           fields: {
-            reservationUnits: reservationUnitPagination(),
+            reservationUnits: keepLoadedPages(reservationUnitPagination()),
           },
         },
       },

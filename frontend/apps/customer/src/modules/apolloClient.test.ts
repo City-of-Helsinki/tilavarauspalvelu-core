@@ -104,4 +104,38 @@ describe("reservationUnits cache policy", () => {
     const short = cache.readQuery<QueryData>({ query: QUERY, variables: { textSearch: "a", first: 2 } });
     expect(short?.reservationUnits.pageInfo.hasNextPage).toBe(false);
   });
+
+  test("keeps the loaded pages when the same first page is fetched again", () => {
+    const { cache } = createApolloClient("http://localhost");
+    cache.writeQuery({ query: QUERY, variables: { textSearch: "a", first: 2 }, data: createPage(0, 2, true) });
+    cache.writeQuery({
+      query: QUERY,
+      variables: { textSearch: "a", first: 2, after: "cursor-1" },
+      data: createPage(2, 1, false),
+    });
+
+    // The first page is fetched again on mount, for example after navigating back to the search
+    cache.writeQuery({ query: QUERY, variables: { textSearch: "a", first: 2 }, data: createPage(0, 2, true) });
+
+    const data = cache.readQuery<QueryData>({ query: QUERY, variables: { textSearch: "a", first: 2 } });
+    expect(data?.reservationUnits.edges.map((edge) => edge.node.pk)).toEqual([0, 1, 2]);
+    expect(data?.reservationUnits.pageInfo.endCursor).toBe("cursor-2");
+    expect(data?.reservationUnits.pageInfo.hasNextPage).toBe(false);
+  });
+
+  test("shows only the new first page when the first page has changed", () => {
+    const { cache } = createApolloClient("http://localhost");
+    cache.writeQuery({ query: QUERY, variables: { textSearch: "a", first: 2 }, data: createPage(0, 2, true) });
+    cache.writeQuery({
+      query: QUERY,
+      variables: { textSearch: "a", first: 2, after: "cursor-1" },
+      data: createPage(2, 2, true),
+    });
+
+    cache.writeQuery({ query: QUERY, variables: { textSearch: "a", first: 2 }, data: createPage(1, 2, true) });
+
+    const data = cache.readQuery<QueryData>({ query: QUERY, variables: { textSearch: "a", first: 2 } });
+    expect(data?.reservationUnits.edges.map((edge) => edge.node.pk)).toEqual([1, 2]);
+    expect(data?.reservationUnits.pageInfo.endCursor).toBe("cursor-2");
+  });
 });
