@@ -4,7 +4,7 @@ from __future__ import annotations
 import os
 import zoneinfo
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import dj_database_url
 from corsheaders.defaults import default_headers
@@ -1018,20 +1018,21 @@ def sentry_traces_sampler(sampling_context: SamplingContext) -> float:
 
     from django.conf import settings
 
+    # The Sentry settings exist only in the `Platta` configurations, and mypy loads another one.
     path = sampling_context.get("wsgi_environ", {}).get("PATH_INFO", "")
-    if path in settings.SENTRY_TRACES_IGNORE_PATHS:
+    if path in settings.SENTRY_TRACES_IGNORE_PATHS:  # type: ignore[misc]
         return 0.0
 
-    return settings.SENTRY_TRACES_SAMPLE_RATE or 0.0
+    return settings.SENTRY_TRACES_SAMPLE_RATE or 0.0  # type: ignore[misc]
 
 
 def sentry_before_send_transaction(event: Event, _hint: Hint) -> Event:
     # The trace view shows span data, not the request headers of the transaction event.
     # Copy only allowlisted headers, so cookies, CSRF tokens and IP addresses stay out.
     allowed_header_names = ("Accept-Language", "Content-Type", "Origin", "User-Agent")
-    request_headers = event.get("request", {}).get("headers", {})
+    request_headers = cast("dict[str, str]", event.get("request", {}).get("headers", {}))
     trace_context = event.setdefault("contexts", {}).setdefault("trace", {})
-    trace_data = trace_context.setdefault("data", {})
+    trace_data = cast("dict[str, object]", trace_context.setdefault("data", {}))
 
     for header_name in allowed_header_names:
         header_value = request_headers.get(header_name)

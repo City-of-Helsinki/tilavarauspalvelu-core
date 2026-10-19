@@ -54,7 +54,7 @@ class ProxyTunnistamoOIDCAuthBackend(TunnistamoOIDCAuth):
 
         params = {
             "id_token_hint": id_token,
-            "post_logout_redirect_uri": request.build_absolute_uri(settings.LOGOUT_REDIRECT_URL),
+            "post_logout_redirect_uri": request.build_absolute_uri(settings.LOGOUT_REDIRECT_URL),  # type: ignore[arg-type]
         }
 
         with suppress(Exception):
