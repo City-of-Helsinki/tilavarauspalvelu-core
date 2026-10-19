@@ -3,6 +3,7 @@ from __future__ import annotations
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import ParticipantGender
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import ParticipantGenderFilterSet
 from .permissions import ParticipantGenderPermission
@@ -12,7 +13,7 @@ __all__ = [
 ]
 
 
-class ParticipantGenderNode(DjangoNode):
+class ParticipantGenderNode(DjangoNode[ParticipantGender, AnyUser]):
     class Meta:
         model = ParticipantGender
         fields = [

@@ -7,11 +7,12 @@ from lookup_property import L
 from query_optimizer import AnnotatedField
 
 from tilavarauspalvelu.models import SuitableTimeRange
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import SuitableTimeRangeFilterSet
 
 
-class SuitableTimeRangeNode(DjangoNode):
+class SuitableTimeRangeNode(DjangoNode[SuitableTimeRange, AnyUser]):
     fulfilled = AnnotatedField(graphene.Boolean, expression=L("fulfilled"), required=True)
 
     class Meta:

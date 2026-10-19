@@ -14,13 +14,13 @@ __all__ = [
 ]
 
 
-class AllocatedTimeSlotCreateMutation(CreateMutation):
+class AllocatedTimeSlotCreateMutation(CreateMutation[AllocatedTimeSlot, AnyUser]):
     class Meta:
         serializer_class = AllocatedTimeSlotCreateSerializer
         permission_classes = [AllocatedTimeSlotPermission]
 
 
-class AllocatedTimeSlotDeleteMutation(DeleteMutation):
+class AllocatedTimeSlotDeleteMutation(DeleteMutation[AllocatedTimeSlot, AnyUser]):
     class Meta:
         model = AllocatedTimeSlot
         permission_classes = [AllocatedTimeSlotPermission]

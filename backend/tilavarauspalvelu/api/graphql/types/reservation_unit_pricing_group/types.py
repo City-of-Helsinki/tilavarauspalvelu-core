@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import ReservationUnitPricingGroup
+from tilavarauspalvelu.typing import AnyUser
 
 if TYPE_CHECKING:
     from django.db import models
@@ -17,7 +18,7 @@ __all__ = [
 ]
 
 
-class ReservationUnitPricingGroupNode(DjangoNode):
+class ReservationUnitPricingGroupNode(DjangoNode[ReservationUnitPricingGroup, AnyUser]):
     class Meta:
         model = ReservationUnitPricingGroup
         fields = [

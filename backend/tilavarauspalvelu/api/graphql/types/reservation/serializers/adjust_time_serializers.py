@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.services.pricing.price_lines import PriceLines
 
 
-class ReservationAdjustTimeSerializer(NestingModelSerializer):
+class ReservationAdjustTimeSerializer(NestingModelSerializer[Reservation, ReservationAdjustTimeData]):
     """Adjust the time of a reservation."""
 
     instance: Reservation

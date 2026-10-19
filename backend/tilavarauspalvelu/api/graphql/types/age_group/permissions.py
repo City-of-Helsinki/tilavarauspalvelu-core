@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from graphene_django_extensions.permissions import BasePermission
 
-if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import AnyUser
+from tilavarauspalvelu.models import AgeGroup
+from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "AgeGroupPermission",
 ]
 
 
-class AgeGroupPermission(BasePermission):
+class AgeGroupPermission(BasePermission[AgeGroup, AnyUser]):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return True

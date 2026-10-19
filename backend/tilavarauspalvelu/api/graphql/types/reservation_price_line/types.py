@@ -7,6 +7,7 @@ from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.enums import PaymentType, PriceUnit
 from tilavarauspalvelu.models import ReservationPriceLine
+from tilavarauspalvelu.typing import AnyUser
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -20,7 +21,7 @@ __all__ = [
 ]
 
 
-class ReservationPriceLineNode(DjangoNode):
+class ReservationPriceLineNode(DjangoNode[ReservationPriceLine, AnyUser]):
     material_price_description_fi = graphene.String(required=True)
     material_price_description_en = graphene.String(required=True)
     material_price_description_sv = graphene.String(required=True)

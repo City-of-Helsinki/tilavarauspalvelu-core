@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-class EquipmentSerializer(NestingModelSerializer):
+class EquipmentSerializer(NestingModelSerializer[Equipment]):
     class Meta:
         model = Equipment
         fields = [

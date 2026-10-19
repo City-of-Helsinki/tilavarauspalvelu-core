@@ -5,6 +5,7 @@ from graphene_django_extensions import DjangoNode
 from graphene_django_extensions.fields.graphql import TypedDictListField
 
 from tilavarauspalvelu.models import ApplicationRoundTimeSlot
+from tilavarauspalvelu.typing import AnyUser
 
 from .permissions import ApplicationRoundTimeSlotPermission
 
@@ -18,7 +19,7 @@ class TimeSlot(TypedDict):
     end: datetime.time
 
 
-class ApplicationRoundTimeSlotNode(DjangoNode):
+class ApplicationRoundTimeSlotNode(DjangoNode[ApplicationRoundTimeSlot, AnyUser]):
     reservable_times = TypedDictListField(TimeSlot, required=True)
 
     class Meta:

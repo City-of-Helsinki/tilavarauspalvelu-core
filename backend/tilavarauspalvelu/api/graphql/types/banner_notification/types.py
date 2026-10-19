@@ -8,6 +8,7 @@ from graphene_django_extensions.permissions import restricted_field
 
 from tilavarauspalvelu.enums import BannerNotificationState
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import BannerNotificationFilterSet
 from .permissions import BannerNotificationPermission
@@ -20,7 +21,7 @@ __all__ = [
 ]
 
 
-class BannerNotificationNode(DjangoNode):
+class BannerNotificationNode(DjangoNode[BannerNotification, AnyUser]):
     state = graphene.Field(graphene.Enum.from_enum(BannerNotificationState), required=True)
 
     class Meta:
