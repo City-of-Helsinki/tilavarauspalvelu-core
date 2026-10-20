@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { EconnRefusedError, GraphQLFetchError } from "./modules/errors";
-import { buildGraphQLUrl } from "./modules/urlBuilder";
+import { buildGraphQLUrl, getClientOrigin } from "./modules/urlBuilder";
 
 /// Check if the request is a page request
 /// @param url - URL
@@ -20,6 +20,20 @@ export function isPageRequest(url: URL, basePath = ""): boolean {
   return true;
 }
 
+/// Returns the request url with the origin that the client used.
+/// Use it for urls that go back to the browser, for example redirects.
+/// req.url has the address that the server listens on, for example "http://0.0.0.0:3000" in a container.
+/// Internal rewrites can use req.url.
+/// @param req - NextRequest
+export function getClientUrl(req: NextRequest): URL {
+  const url = new URL(req.url);
+  const origin = getClientOrigin(req.headers, url.protocol.replace(/:$/, ""));
+  if (origin == null) {
+    return url;
+  }
+  return new URL(`${url.pathname}${url.search}`, origin);
+}
+
 /// check if csrftoken is missing and construct redirect url for it
 /// if we should redirect then construct the backend url with (original) req url as the return address
 /// @param req The request processed in the middleware
@@ -32,7 +46,7 @@ export function redirectCsrfToken(req: NextRequest, apiBaseUrl: string): URL | u
     return undefined;
   }
 
-  const requestUrl = new URL(req.url);
+  const requestUrl = getClientUrl(req);
   const csrfUrl = `${apiBaseUrl}/csrf/`;
   const redirectUrl = new URL(csrfUrl);
 
@@ -81,11 +95,8 @@ export async function gqlQueryFetch(req: NextRequest, query: GqlQuery, apiUrl: s
     newHeaders.append("Cookie", `sessionid=${sessionid.value}`);
   }
 
-  const proto = headers.get("x-forwarded-proto") ?? "http";
-  const hostname = headers.get("x-forwarded-host") ?? headers.get("host") ?? "";
-  const requestUrl = new URL(req.url).pathname;
-  const referer = `${proto}://${hostname}${requestUrl}`;
-  newHeaders.append("Referer", referer);
+  const clientUrl = getClientUrl(req);
+  newHeaders.append("Referer", `${clientUrl.origin}${clientUrl.pathname}`);
   // Forward the browser values, so backend logs and traces don't show the Node.js fetch defaults
   const userAgent = headers.get("user-agent");
   if (userAgent != null) {
