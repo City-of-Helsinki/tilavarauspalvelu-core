@@ -543,6 +543,23 @@ class Common(Environment):
         ],
     }
 
+    # --- Sentry -----------------------------------------------------------------------------------------------------
+
+    SENTRY_DSN: str = values.StringValue(default="")
+    SENTRY_ENVIRONMENT: str = values.StringValue(default="local")
+    SENTRY_PROFILE_SESSION_SAMPLE_RATE: float | None = values.FloatValue(default=None)
+    SENTRY_RELEASE: str | None = values.StringValue(default=None)
+    SENTRY_TRACES_SAMPLE_RATE: float | None = values.FloatValue(default=None)
+    SENTRY_TRACES_IGNORE_PATHS: list[str] = values.ListValue(
+        default=[
+            "/healthz",
+            "/readiness",
+            "/monitoring/liveness/",
+            "/monitoring/readiness/",
+            "/monitoring/system-status/",
+        ]
+    )
+
     # --- Misc settings ----------------------------------------------------------------------------------------------
 
     RESERVATION_UNIT_IMAGES_ROOT = "reservation_unit_images"
@@ -636,6 +653,22 @@ class Common(Environment):
         "*": {"style"},
     }
     NH3_ALLOWED_URL_SCHEMES = {"http", "https", "mailto"}
+
+    # ----------------------------------------------------------------------------------------------------------------
+
+    @classmethod
+    def post_setup(cls) -> None:
+        if not cls.SENTRY_DSN:
+            return
+
+        from config.sentry import init_sentry
+
+        init_sentry(
+            dsn=cls.SENTRY_DSN,
+            environment=cls.SENTRY_ENVIRONMENT,
+            release=cls.SENTRY_RELEASE,
+            profile_session_sample_rate=cls.SENTRY_PROFILE_SESSION_SAMPLE_RATE,
+        )
 
 
 class EmptyDefaults:
@@ -789,6 +822,8 @@ class Local(Common, overrides_from=LocalMixin):
 
     @classmethod
     def post_setup(cls) -> None:
+        super().post_setup()
+
         # Validate Verkkokauppa settings
         if cls.MOCK_VERKKOKAUPPA_API_ENABLED:
             assert cls.MOCK_VERKKOKAUPPA_FRONTEND_URL, "Mock Verkkokauppa frontend URL is required"
@@ -1022,23 +1057,6 @@ class Platta(Common, use_environ=True):
 
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-    # --- Sentry -----------------------------------------------------------------------------------------------------
-
-    SENTRY_DSN: str = values.StringValue(default="")
-    SENTRY_ENVIRONMENT: str = values.StringValue(default="local")
-    SENTRY_PROFILE_SESSION_SAMPLE_RATE: float | None = values.FloatValue(default=None)
-    SENTRY_RELEASE: str | None = values.StringValue(default=None)
-    SENTRY_TRACES_SAMPLE_RATE: float | None = values.FloatValue(default=None)
-    SENTRY_TRACES_IGNORE_PATHS: list[str] = values.ListValue(
-        default=[
-            "/healthz",
-            "/readiness",
-            "/monitoring/liveness/",
-            "/monitoring/readiness/",
-            "/monitoring/system-status/",
-        ]
-    )
-
     # --- Redis settings ---------------------------------------------------------------------------------------------
 
     REDIS_URL = ""  # Not used in Platta environments
@@ -1083,22 +1101,6 @@ class Platta(Common, use_environ=True):
                 "password": cls.REDIS_PASSWORD,
             },
         }
-
-    # ----------------------------------------------------------------------------------------------------------------
-
-    @classmethod
-    def post_setup(cls) -> None:
-        if not cls.SENTRY_DSN:
-            return
-
-        from config.sentry import init_sentry
-
-        init_sentry(
-            dsn=cls.SENTRY_DSN,
-            environment=cls.SENTRY_ENVIRONMENT,
-            release=cls.SENTRY_RELEASE,
-            profile_session_sample_rate=cls.SENTRY_PROFILE_SESSION_SAMPLE_RATE,
-        )
 
 
 class MidHook(EmptyDefaults, Platta, use_environ=True):

@@ -7,7 +7,7 @@ from django.test import override_settings
 from sentry_sdk.integrations.django import DjangoIntegration
 
 from config.sentry import sentry_before_send_transaction, sentry_traces_sampler
-from config.settings import Platta
+from config.settings import Docker, Platta
 
 
 def test_sentry_traces_sampler_respects_parent_sampling_decision() -> None:
@@ -72,16 +72,17 @@ def test_sentry_before_send_transaction_accepts_event_without_request() -> None:
     assert result == {"transaction": "celery-task", "contexts": {"trace": {"data": {}}}}
 
 
-def test_sentry_post_setup_initializes_sdk_with_configured_options() -> None:
+@pytest.mark.parametrize("environment", [Docker, Platta])
+def test_sentry_post_setup_initializes_sdk_with_configured_options(environment: type[Docker | Platta]) -> None:
     with (
-        patch.object(Platta, "SENTRY_DSN", "https://public@example.ingest.sentry.io/1"),
-        patch.object(Platta, "SENTRY_ENVIRONMENT", "testing"),
-        patch.object(Platta, "SENTRY_RELEASE", "release-123"),
-        patch.object(Platta, "SENTRY_TRACES_SAMPLE_RATE", 0.25),
-        patch.object(Platta, "SENTRY_PROFILE_SESSION_SAMPLE_RATE", 0.1),
+        patch.object(environment, "SENTRY_DSN", "https://public@example.ingest.sentry.io/1"),
+        patch.object(environment, "SENTRY_ENVIRONMENT", "testing"),
+        patch.object(environment, "SENTRY_RELEASE", "release-123"),
+        patch.object(environment, "SENTRY_TRACES_SAMPLE_RATE", 0.25),
+        patch.object(environment, "SENTRY_PROFILE_SESSION_SAMPLE_RATE", 0.1),
         patch("sentry_sdk.init") as sentry_init,
     ):
-        Platta.post_setup()
+        environment.post_setup()
 
     sentry_init.assert_called_once()
     options = sentry_init.call_args.kwargs
@@ -96,8 +97,9 @@ def test_sentry_post_setup_initializes_sdk_with_configured_options() -> None:
     assert isinstance(options["integrations"][0], DjangoIntegration)
 
 
-def test_sentry_post_setup_skips_sdk_initialization_without_dsn() -> None:
-    with patch.object(Platta, "SENTRY_DSN", ""), patch("sentry_sdk.init") as sentry_init:
-        Platta.post_setup()
+@pytest.mark.parametrize("environment", [Docker, Platta])
+def test_sentry_post_setup_skips_sdk_initialization_without_dsn(environment: type[Docker | Platta]) -> None:
+    with patch.object(environment, "SENTRY_DSN", ""), patch("sentry_sdk.init") as sentry_init:
+        environment.post_setup()
 
     sentry_init.assert_not_called()
