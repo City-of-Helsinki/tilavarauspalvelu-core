@@ -137,6 +137,24 @@ describe("Application Page2", () => {
   });
 });
 
+// Tuesday in the mocked language (Finnish)
+const TUESDAY = "tiistai";
+
+function tuesdayCell(view: ReturnType<typeof render>, begin: string) {
+  return view.getByLabelText(new RegExp(`^${TUESDAY}, ${begin}–`));
+}
+
+// Selects the 15 minute cells from the given one down, so the whole range is 15 minutes * (steps + 1).
+async function sweepDown(
+  user: ReturnType<typeof userEvent.setup>,
+  view: ReturnType<typeof render>,
+  begin: string,
+  steps: number
+) {
+  tuesdayCell(view, begin).focus();
+  await user.keyboard(`{Shift>}${"{ArrowDown}".repeat(steps)}{/Shift}`);
+}
+
 // errors require form context so have to test on this level
 describe("Application page2 validation errors", () => {
   test("no error messages by default", () => {
@@ -148,8 +166,7 @@ describe("Application page2 validation errors", () => {
   test("error message should be shown if times are not long enough", async () => {
     const user = userEvent.setup();
     const view = customRender({ page: "page1" });
-    const select = view.getByTestId("time-selector__button--TUESDAY-14");
-    await user.click(select);
+    await user.click(tuesdayCell(view, "14:00"));
     expect(view.getByText("application:validation.calendar.title")).toBeInTheDocument();
     expect(
       view.getByText(
@@ -164,33 +181,28 @@ describe("Application page2 validation errors", () => {
   test("error message should disappear if times are long enough", async () => {
     const user = userEvent.setup();
     const view = customRender({ page: "page1" });
-    const select = view.getByTestId("time-selector__button--TUESDAY-14");
-    await user.click(select);
+    await user.click(tuesdayCell(view, "14:00"));
     expect(view.queryAllByText(/application:validation/)).toHaveLength(2);
-    const select2 = view.getByTestId("time-selector__button--TUESDAY-15");
-    await user.click(select2);
+    // 14:00 to 16:00 is two hours
+    await sweepDown(user, view, "14:15", 6);
     expect(view.queryAllByText(/application:validation/)).toHaveLength(0);
   });
 
   test("two disjointed time ranges are too short", async () => {
     const user = userEvent.setup();
     const view = customRender({ page: "page1" });
-    const select = view.getByTestId("time-selector__button--TUESDAY-14");
-    await user.click(select);
-    const select2 = view.getByTestId("time-selector__button--TUESDAY-16");
-    await user.click(select2);
+    await user.click(tuesdayCell(view, "14:00"));
+    await user.click(tuesdayCell(view, "16:00"));
     expect(view.queryAllByText(/application:validation/)).toHaveLength(2);
   });
 
   test("submit button should be disabled if there are errors", async () => {
     const user = userEvent.setup();
     const view = customRender({ page: "page1" });
-    const select = view.getByTestId("time-selector__button--TUESDAY-14");
-    await user.click(select);
+    await user.click(tuesdayCell(view, "14:00"));
     expect(view.queryAllByText(/application:validation/)).toHaveLength(2);
     expect(view.getByRole("button", { name: "common:next" })).toBeDisabled();
-    const select2 = view.getByTestId("time-selector__button--TUESDAY-15");
-    await user.click(select2);
+    await sweepDown(user, view, "14:15", 6);
     expect(view.queryAllByText(/application:validation/)).toHaveLength(0);
     expect(view.getByRole("button", { name: "common:next" })).not.toBeDisabled();
   });

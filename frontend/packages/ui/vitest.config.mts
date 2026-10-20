@@ -9,7 +9,8 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.ts"],
     coverage: {
       reporter: ["clover", "json", "lcov", "text"],
-      include: ["src/**/*"],
+      // Only code: istanbul tries to parse anything else, such as the screen reader checklists, as JavaScript.
+      include: ["src/**/*.{ts,tsx}"],
       provider: "istanbul",
     },
   },
