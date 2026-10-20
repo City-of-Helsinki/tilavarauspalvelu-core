@@ -67,6 +67,27 @@
       "primary": "Preferred time slots",
       "secondary": "Other request",
       "open": "Reservable"
+    },
+    "skipToForm": "Skip to the form for adding times",
+    "announcements": {
+      "painted": "Added",
+      "erased": "Removed"
+    },
+    "form": {
+      "legend": "Add times with a form",
+      "priorityNote": "New times use the type of booking request selected above.",
+      "day": "Day",
+      "from": "From",
+      "to": "To",
+      "add": "Add time",
+      "listLabel": "Selected times",
+      "empty": "No times selected.",
+      "remove": "Remove",
+      "removeTime": "Remove {{time}}",
+      "errors": {
+        "endAfterStart": "The end time must be after the start time.",
+        "outsideReservable": "The time is outside the times when the space can be booked."
+      }
     }
   },
   "Page2": {
