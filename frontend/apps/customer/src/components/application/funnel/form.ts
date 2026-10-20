@@ -1,6 +1,5 @@
 import { startOfDay } from "date-fns";
 import { z } from "zod";
-import { CELL_STATES } from "ui/src/components/ApplicationTimeSelector";
 import { parseApiDate, parseUIDate, timeToMinutes, formatApiDate, formatDate } from "ui/src/modules/date-utils";
 import { filterNonNullable, formatWhitespace } from "ui/src/modules/helpers";
 import type { ReadonlyDeep } from "ui/src/modules/helpers";
@@ -98,7 +97,7 @@ const ApplicationSectionPage2Schema = z
     minDuration: z.number().min(1, { message: "Required" }),
     name: z.string().min(1, { message: "Required" }).max(100),
     reservationUnitPk: z.number(),
-    priority: z.enum(CELL_STATES),
+    priority: z.enum(Priority),
     // NOTE: not sent or modified here, but required for validation
     appliedReservationsPerWeek: z.number({ error: "Required" }).min(1, { error: "gte_1" }).max(7, { error: "lte_7" }),
   })
@@ -155,7 +154,7 @@ function convertApplicationSectionPage2(section: ReadonlyDeep<SectionTypePage2>)
     minDuration: section.reservationMinDuration,
     appliedReservationsPerWeek,
     reservationUnitPk,
-    priority: "primary",
+    priority: Priority.Primary,
   };
 }
 

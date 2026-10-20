@@ -1,60 +1,69 @@
 import React from "react";
 import { useTranslation } from "next-i18next/pages";
-import { ApplicationTimeSelector } from "ui/src/components/ApplicationTimeSelector";
-import type { Cell } from "ui/src/components/ApplicationTimeSelector";
-import { WEEKDAYS } from "ui/src/modules/const";
-import { convertWeekday, transformWeekday } from "ui/src/modules/conversion";
+import { WeeklyPatternLegend } from "@ui/components/WeeklyPatternCalendar/styles";
+import { WeeklyPatternCalendar } from "@ui/components/WeeklyPatternCalendar/WeeklyPatternCalendar";
 import { filterNonNullable } from "ui/src/modules/helpers";
+import {
+  priorityKey,
+  SUITABLE_TIME_STEP_MINUTES,
+  SUITABLE_TIME_VISIBLE_HOURS,
+  toAvailability,
+  toPattern,
+} from "ui/src/modules/suitableTimes";
+import type { SuitableTimeData } from "ui/src/modules/suitableTimes";
 import { Priority } from "@gql/gql-types";
 import type { ApplicationAdminQuery } from "@gql/gql-types";
 
 type ApplicationType = NonNullable<ApplicationAdminQuery["application"]>;
 type ApplicationSectionType = NonNullable<ApplicationType["applicationSections"]>[0];
-type SuitableTimeRangeType = NonNullable<ApplicationSectionType["suitableTimeRanges"]>[0];
 type TimeSelectorProps = {
   applicationSection: ApplicationSectionType;
+  /** Id of the element that lists the same times as text. */
+  alternativeId: string;
 };
 
-function timeRangeToCell(timeRanges: SuitableTimeRangeType[]): Cell[][] {
-  const firstSlotStart = 7;
-  const lastSlotStart = 23;
+/**
+ * Read-only view of the times the applicant asked for.
+ * A cell is open when at least one of the requested reservation units can be booked then.
+ */
+export function TimeSelector({ applicationSection, alternativeId }: TimeSelectorProps): React.ReactElement {
+  const { t, i18n } = useTranslation();
 
-  const cells: Cell[][] = [];
+  const availability = toAvailability(
+    filterNonNullable(applicationSection.reservationUnitOptions).flatMap((option) =>
+      filterNonNullable(option.reservationUnit.applicationRoundTimeSlots)
+    )
+  );
+  const value = toPattern(filterNonNullable(applicationSection.suitableTimeRanges));
 
-  for (const weekdayNumber of WEEKDAYS) {
-    const day: Cell[] = [];
-    for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
-      day.push({
-        hour: i,
-        weekday: transformWeekday(weekdayNumber),
-        state: "none",
-        openState: "open",
-      });
-    }
-    cells.push(day);
-  }
-
-  for (const timeRange of timeRanges) {
-    const { dayOfTheWeek, beginTime, endTime, priority } = timeRange;
-    const hourBegin = Number(beginTime.slice(0, 2)) - firstSlotStart;
-    const hourEnd = (Number(endTime.slice(0, 2)) || 24) - firstSlotStart;
-
-    const day = convertWeekday(dayOfTheWeek);
-    for (let h = hourBegin; h < hourEnd; h += 1) {
-      const cell = cells[day]?.[h];
-      if (cell) {
-        cell.state = priority === Priority.Primary ? "primary" : "secondary";
-      }
-    }
-  }
-
-  return cells;
-}
-
-export function TimeSelector({ applicationSection }: TimeSelectorProps): React.ReactElement {
-  const { t } = useTranslation();
-  const schedules = filterNonNullable(applicationSection.suitableTimeRanges);
-  const cells = timeRangeToCell(schedules);
-
-  return <ApplicationTimeSelector cells={cells} aria-label={t("application:TimeSelector.calendarLabel")} />;
+  return (
+    <div>
+      <WeeklyPatternCalendar<SuitableTimeData>
+        readOnly
+        value={value}
+        step={SUITABLE_TIME_STEP_MINUTES}
+        availability={availability}
+        visibleHours={SUITABLE_TIME_VISIBLE_HOURS}
+        locale={i18n.language}
+        getStateLabel={(cell) =>
+          t(
+            `application:TimeSelector.legend.${
+              cell.data ? priorityKey(cell.data.priority) : cell.availability === "open" ? "open" : "unavailable"
+            }`
+          )
+        }
+        getCellAppearance={({ priority }) => (priority === Priority.Primary ? "primary" : "secondary")}
+        alternative={{ id: alternativeId, label: t("application:TimeSelector.skipToList") }}
+        aria-label={t("application:TimeSelector.calendarLabel")}
+      />
+      <WeeklyPatternLegend
+        items={[
+          { state: "primary", label: t("application:TimeSelector.legend.primary") },
+          { state: "secondary", label: t("application:TimeSelector.legend.secondary") },
+          { state: "open", label: t("application:TimeSelector.legend.open") },
+          { state: "closed", label: t("application:TimeSelector.legend.unavailable") },
+        ]}
+      />
+    </div>
+  );
 }

@@ -214,7 +214,7 @@ describe("page 2 conversions", () => {
           minDuration: 7200,
           appliedReservationsPerWeek: 1,
           reservationUnitPk: 1,
-          priority: "primary",
+          priority: Priority.Primary,
         },
       ],
     });
@@ -247,7 +247,7 @@ describe("page 2 conversions", () => {
           name: "foobar",
           minDuration: 3600,
           reservationUnitPk: 1,
-          priority: "primary" as const,
+          priority: Priority.Primary,
           appliedReservationsPerWeek: 1,
           suitableTimeRanges: [
             {

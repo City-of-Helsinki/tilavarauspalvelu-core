@@ -67,6 +67,27 @@
       "primary": "Ensisijainen toive",
       "secondary": "Muu toive",
       "open": "Varattavissa"
+    },
+    "skipToForm": "Siirry lomakkeeseen, jolla voit lisätä aikoja",
+    "announcements": {
+      "painted": "Lisätty",
+      "erased": "Poistettu"
+    },
+    "form": {
+      "legend": "Lisää aikoja lomakkeella",
+      "priorityNote": "Uudet ajat saavat yllä valitun toiveen tyypin.",
+      "day": "Päivä",
+      "from": "Alkaa",
+      "to": "Päättyy",
+      "add": "Lisää aika",
+      "listLabel": "Valitut ajat",
+      "empty": "Ei valittuja aikoja.",
+      "remove": "Poista",
+      "removeTime": "Poista {{time}}",
+      "errors": {
+        "endAfterStart": "Päättymisajan täytyy olla alkamisajan jälkeen.",
+        "outsideReservable": "Aika on varattavissa olevien aikojen ulkopuolella."
+      }
     }
   },
   "Page2": {
