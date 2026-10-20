@@ -1,6 +1,11 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { vi, afterEach } from "vitest";
+import { vi, afterEach, expect } from "vitest";
+// vitest-axe only exports the matchers as a namespace
+// oxlint-disable-next-line import/no-namespace
+import * as axeMatchers from "vitest-axe/matchers";
+
+expect.extend(axeMatchers);
 
 // react-dom tests can't automatically cleanup without vitest globals
 afterEach(() => {

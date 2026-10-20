@@ -544,6 +544,9 @@ importers:
       vitest:
         specifier: ^5.0.5
         version: 5.0.5(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(@vitest/coverage-istanbul@5.0.5)(happy-dom@21.0.4)(vite@7.3.7(@types/node@24.19.2)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
+      vitest-axe:
+        specifier: ^0.1.0
+        version: 0.1.0(vitest@5.0.5)
 
 packages:
 
@@ -3319,6 +3322,10 @@ packages:
     resolution: {integrity: sha512-zJAaP9zxTcvTHRlejau3ZOY4V7SRpiByf3/dxx2uyKxxor19tpmpV2QRsTKikckwhaPmr2dVpxxMr7jOCYVp5g==}
     engines: {node: '>=6.0.0'}
 
+  axe-core@4.14.0:
+    resolution: {integrity: sha512-9WTZxEjsZ7b13TH8JPmbV2z8CHbl80/2hm3XPEG4JgNdQLK81IBRXmSxHfMAOkSqQeRxT/0dwNDz2GOm3zzpcQ==}
+    engines: {node: '>=4'}
+
   balanced-match@4.0.4:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
@@ -5551,6 +5558,11 @@ packages:
         optional: true
       yaml:
         optional: true
+
+  vitest-axe@0.1.0:
+    resolution: {integrity: sha512-jvtXxeQPg8R/2ANTY8QicA5pvvdRP4F0FsVUAHANJ46YCDASie/cuhlSzu0DGcLmZvGBSBNsNuK3HqfaeknyvA==}
+    peerDependencies:
+      vitest: '>=0.16.0'
 
   vitest@5.0.5:
     resolution: {integrity: sha512-cPODOMF8YnkiiYtDdHo6n4wWmBrOBBbOIYH2d33M4l3CdNn72h+qMmO6uXffUN6A5AZFXNND/d+krS9mgkXRfg==}
@@ -8277,6 +8289,8 @@ snapshots:
 
   await-to-js@3.0.0: {}
 
+  axe-core@4.14.0: {}
+
   balanced-match@4.0.4: {}
 
   baseline-browser-mapping@2.11.23: {}
@@ -10535,6 +10549,16 @@ snapshots:
       sass: 1.105.0
       terser: 5.51.2
       yaml: 2.9.1
+
+  vitest-axe@0.1.0(vitest@5.0.5):
+    dependencies:
+      aria-query: 5.3.2
+      axe-core: 4.14.0
+      chalk: 5.6.2
+      dom-accessibility-api: 0.5.16
+      lodash-es: 4.18.1
+      redent: 3.0.0
+      vitest: 5.0.5(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(@vitest/coverage-istanbul@5.0.5)(happy-dom@21.0.4)(vite@7.3.7(@types/node@24.19.2)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
 
   vitest@5.0.5(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(@vitest/coverage-istanbul@5.0.5)(happy-dom@21.0.4)(vite@7.3.7(@types/node@24.19.2)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1)):
     dependencies:
