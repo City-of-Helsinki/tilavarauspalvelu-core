@@ -14,23 +14,30 @@ from env_config import Environment, values
 from env_config.decorators import classproperty
 from helusers.defaults import SOCIAL_AUTH_PIPELINE
 
+# The file and each mixin are optional. Other import errors would hide a broken local_settings, so raise them.
 try:
     from local_settings import AutomatedTestMixin
-except ImportError:
+except ImportError as error:
+    if error.name != "local_settings":
+        raise
 
     class AutomatedTestMixin: ...
 
 
 try:
     from local_settings import DockerMixin
-except ImportError:
+except ImportError as error:
+    if error.name != "local_settings":
+        raise
 
     class DockerMixin: ...
 
 
 try:
     from local_settings import LocalMixin
-except ImportError:
+except ImportError as error:
+    if error.name != "local_settings":
+        raise
 
     class LocalMixin: ...
 
