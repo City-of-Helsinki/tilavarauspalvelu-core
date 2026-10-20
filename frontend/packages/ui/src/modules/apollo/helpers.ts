@@ -11,7 +11,8 @@ import type { GraphQLFormattedError, DocumentNode } from "graphql";
 import { RESERVEE_PI_FIELDS } from "@ui/components/reservation-form/utils";
 import { toast } from "../../components/toast";
 import { CsrfTokenNotFound } from "../errors";
-import { getLocalizationLang, ignoreMaybeArray, isBrowser } from "../helpers";
+import { getLocalizationLang, isBrowser } from "../helpers";
+import { getClientOrigin } from "../urlBuilder";
 import type { LocalizationLanguages } from "../urlBuilder";
 
 type ErrorCode = string;
@@ -353,13 +354,10 @@ export function enchancedFetch(req?: IncomingMessage) {
       headers.append("Cookie", `csrftoken=${csrfToken}`);
       // Django fails with 403 if there is no referer (only on Kubernetes)
       const requestUrl = req.url ?? "";
-      const hostname = ignoreMaybeArray(req.headers["x-forwarded-host"] ?? req.headers.host) ?? "";
-      // NOTE 'proto' is not exactly correct
-      // For our case this is sufficent because we are always behind a gateway,
-      // but technically there is a case where we are not behind a gateway and not localhost
-      // so the proto would be https and no x-forwarded-proto set
-      const proto = ignoreMaybeArray(req.headers["x-forwarded-proto"]) ?? "http";
-      headers.append("Referer", `${proto}://${hostname}${requestUrl}`);
+      // A TLS socket has "encrypted" set to true.
+      const isEncrypted = req.socket != null && "encrypted" in req.socket && req.socket.encrypted === true;
+      const requestProtocol = isEncrypted ? "https" : "http";
+      headers.append("Referer", `${getClientOrigin(req.headers, requestProtocol) ?? ""}${requestUrl}`);
       // Forward the browser values, so backend logs and traces don't show the Node.js fetch defaults
       const userAgent = req.headers["user-agent"];
       if (userAgent != null) {

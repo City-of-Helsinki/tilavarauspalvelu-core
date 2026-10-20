@@ -1,3 +1,5 @@
+import type { IncomingHttpHeaders } from "node:http";
+
 export type UserTypeChoice = "customer" | "admin";
 export type LocalizationLanguages = "fi" | "sv" | "en";
 
@@ -11,6 +13,30 @@ export function buildGraphQLUrl(apiUrl: string) {
 /// Works both in the browser and on the server (including middleware)
 export function removeTrailingSlash(url: string): string {
   return url.endsWith("/") ? url.slice(0, -1) : url;
+}
+
+/// Returns the first value of a request header. Proxies can send a comma separated list.
+function getFirstHeaderValue(headers: Headers | IncomingHttpHeaders, name: string): string | null {
+  const value = headers instanceof Headers ? headers.get(name) : headers[name];
+  const first = (Array.isArray(value) ? value[0] : value)?.split(",")[0]?.trim();
+  return first || null;
+}
+
+/// Returns the origin that the client used for the request, for example "https://varaamo.hel.fi".
+/// Only for the server. In the browser use window.location.
+/// The request url on the server has the address that the server listens on, for example "http://0.0.0.0:3000".
+/// A gateway sets the x-forwarded headers. Without a gateway, the Host header has the host that the client used.
+/// @param headers - request headers in the proxy (Headers) or in getServerSideProps (IncomingHttpHeaders)
+/// @param requestProtocol - protocol of the connection to this server, "http" or "https"
+/// @returns origin or null if the request has no host header
+export function getClientOrigin(headers: Headers | IncomingHttpHeaders, requestProtocol?: string): string | null {
+  const host = getFirstHeaderValue(headers, "x-forwarded-host") ?? getFirstHeaderValue(headers, "host");
+  if (host == null) {
+    return null;
+  }
+  // Without a gateway, the client connects to this server, so the protocol of that connection is correct.
+  const proto = getFirstHeaderValue(headers, "x-forwarded-proto") ?? requestProtocol ?? "http";
+  return `${proto}://${host}`;
 }
 
 function buildAuthUrl(apiUrl: string) {

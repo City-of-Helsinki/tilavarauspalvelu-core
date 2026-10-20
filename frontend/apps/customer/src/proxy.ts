@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import z from "zod";
 import type { NextRequest } from "next/server";
 import { logError } from "@ui/modules/errors";
-import { gqlQueryFetch, isPageRequest, redirectCsrfToken } from "ui/src/middlewareHelpers";
+import { getClientUrl, gqlQueryFetch, isPageRequest, redirectCsrfToken } from "ui/src/middlewareHelpers";
 import type { GqlQuery } from "ui/src/middlewareHelpers";
 import { createNodeId, getLocalizationLang } from "ui/src/modules/helpers";
 import { getSignInUrl, removeTrailingSlash } from "ui/src/modules/urlBuilder";
@@ -205,21 +205,13 @@ async function maybeSaveUserLanguage(req: NextRequest, user: User | null): Promi
 /// @param user - user id or null if not logged in
 /// @returns Promise<string | undefined> - the redirect url or null if no redirect is needed
 function getRedirectProtectedRoute(req: NextRequest, user: User | null): string | null {
-  const { headers } = req;
-
   if (user == null) {
-    // on the server we are behind a gateway so get the forwarded headers
-    // localhost has no headers
-    const currentUrl = req.url;
-    const url = new URL(currentUrl);
-    const protocol = headers.get("x-forwarded-proto") ?? "http";
-    const host = headers.get("x-forwarded-host") ?? url.host;
-    const origin = `${protocol}://${host}`;
+    const url = getClientUrl(req);
     return getSignInUrl({
       apiBaseUrl: API_BASE_URL,
       callBackUrl: `${url.pathname}${url.search}`,
       language: getLocalizationLang(getLocalizationFromUrl(url)),
-      originOverride: origin,
+      originOverride: url.origin,
       client: "customer",
     });
   }
@@ -334,7 +326,10 @@ async function handleRequest(req: NextRequest) {
 
       if (data.reservation.state === ReservationStateChoice.Created) {
         const { resUnitPk } = data.reservation;
-        const redirectUrl = new URL(`${langPrefix}${getReservationInProgressPath(resUnitPk, reservationPk)}`, req.url);
+        const redirectUrl = new URL(
+          `${langPrefix}${getReservationInProgressPath(resUnitPk, reservationPk)}`,
+          getClientUrl(req)
+        );
         return NextResponse.redirect(redirectUrl);
       }
       // Because we use url rewrite for Seasonal we have to allow both here (and do per page SSR checks instead)
@@ -350,7 +345,7 @@ async function handleRequest(req: NextRequest) {
     if (AUTHENTICATED_ROUTES.some((route) => doesUrlMatch(req.url, route))) {
       const redirect = getRedirectProtectedRoute(req, user);
       if (redirect) {
-        return NextResponse.redirect(new URL(redirect, req.url));
+        return NextResponse.redirect(new URL(redirect, getClientUrl(req)));
       }
     }
 
