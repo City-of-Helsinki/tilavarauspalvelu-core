@@ -6,7 +6,8 @@ import pytest
 from django.test import override_settings
 from sentry_sdk.integrations.django import DjangoIntegration
 
-from config.settings import Platta, sentry_before_send_transaction, sentry_traces_sampler
+from config.sentry import sentry_before_send_transaction, sentry_traces_sampler
+from config.settings import Platta
 
 
 def test_sentry_traces_sampler_respects_parent_sampling_decision() -> None:
