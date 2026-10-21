@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 
+from tilavarauspalvelu.exceptions import EmailTypeNotFoundError
 from tilavarauspalvelu.integrations.email.sending import send_emails_in_batches_task
 from tilavarauspalvelu.integrations.email.typing import EmailData, EmailType
 from tilavarauspalvelu.models import ReservationUnit
@@ -71,7 +72,7 @@ def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpRespon
 
     try:
         email_template_type = EmailType.get(email_type)
-    except ValueError:
+    except EmailTypeNotFoundError:
         return HttpResponse(f"Invalid email type: {email_type}", HTTP_400_BAD_REQUEST)
 
     reservation_unit_pk: str | None = request.GET.get("reservation_unit", None)
