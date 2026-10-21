@@ -105,7 +105,7 @@ export const WeeklyPatternRoot = styled.div`
   overflow-x: auto;
   height: 500px;
 
-  /* 
+  /*
     The shared table has fixed layout and an explicit colgroup, which keeps every weekday column the same width.
     Keeps every day column at least as wide as the original per-cell min-width.
     The container's overflow-x: auto scrolls instead of squeezing columns too thin.
