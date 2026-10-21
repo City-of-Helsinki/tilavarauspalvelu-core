@@ -4,6 +4,7 @@ import { gridTableStyles } from "../CalendarGrid/styles";
 
 export const DatedWeekRoot = styled.div`
   --border-color: var(--color-black-50);
+
   /* Also the minimum target size (WCAG 2.5.8) for a cell. */
   --step-height: 24px;
   --time-column-width: 56px;
@@ -63,6 +64,7 @@ export const GridScroller = styled.div`
   position: relative;
   overflow: auto;
   max-height: 70vh;
+
   /* Keeps a focused cell out from under the sticky header (WCAG 2.4.11). */
   scroll-padding-top: 3rem;
   ${gridTableStyles};
