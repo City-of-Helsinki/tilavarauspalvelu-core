@@ -1,11 +1,11 @@
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
-import { Link, LinkSize } from "hds-react";
 import { useTranslation } from "next-i18next/pages";
 import { serverSideTranslations } from "next-i18next/pages/serverSideTranslations";
 import { H1, HR } from "ui/src/styled";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { AuthorizationChecker } from "@/components/AuthorizationChecker";
+import { ExternalLink } from "@/components/ExternalLink";
 import { Filters, UnitsDataLoader } from "@/components/units";
 
 function Units(): React.ReactElement {
@@ -16,10 +16,8 @@ function Units(): React.ReactElement {
       <div>
         <H1 $marginTop="l">{t("navigation:units")}</H1>
         <p>
-          {t("units:description")}
-          <Link size={LinkSize.Medium} href={t("units:descriptionLinkHref")} openInNewTab external>
-            {t("units:descriptionLinkLabel")}
-          </Link>
+          {t("units:description")}{" "}
+          <ExternalLink href={t("units:descriptionLinkHref")}>{t("units:descriptionLinkLabel")}</ExternalLink>
         </p>
       </div>
       <Filters />
