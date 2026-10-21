@@ -28,7 +28,6 @@ import type { ReservableMap, RoundPeriod } from "./reservable";
 
 // TimeSlots change the Calendar view. How many intervals are shown i.e. every half an hour, every hour
 // we use every hour only => 2
-export const SLOTS_EVERY_HOUR = 2;
 
 /// @param opts subset of ReservationUnitNode
 /// @param t translation function

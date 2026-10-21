@@ -98,5 +98,26 @@
     "noTimes": "Inga lediga tider",
     "gotoCalendar": "Se alla lediga tider",
     "nextAvailableTime": "Visa följande"
+  },
+  "toolbar": "Kalenderns kontroller",
+  "list": "Visa bokningar som en lista",
+  "skipToList": "Hoppa till listan över bokningar",
+  "skipToForm": "Hoppa till bokningsformuläret",
+  "emptyList": "Inga bokningar under den här tiden.",
+  "free": "Ledig",
+  "closed": "Kan inte bokas",
+  "opensInNewTab": "öppnas i en ny flik",
+  "cannotReserveHere": "Den här tiden kan inte bokas.",
+  "draft": {
+    "hint": "Din bokning. Flytta den genom att trycka på Enter.",
+    "grabbed": "Flyttar. Piltangenterna flyttar, Skift med upp eller ned ändrar längden, Enter bekräftar och Escape avbryter.",
+    "moved": "Bokningen flyttades",
+    "cancelled": "Flytten avbröts",
+    "slotSelected": "Vald tid",
+    "controls": "Flytta din bokning",
+    "earlier": "Tidigare",
+    "later": "Senare",
+    "shorter": "Kortare",
+    "longer": "Längre"
   }
 }

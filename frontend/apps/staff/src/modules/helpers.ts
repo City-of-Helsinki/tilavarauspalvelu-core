@@ -114,12 +114,19 @@ export function combineAffectingReservations<T extends AffectedReservations>(
     return [];
   }
 
-  // NOTE we could use a regular concat here (we only have single reservationUnit here)
   const affectingReservations = filterNonNullable(data.affectingReservations).filter((y) =>
     isAffecting(y, reservationUnitPk)
   );
   const reservationSet = [...filterNonNullable(data?.reservationUnit?.reservations), ...affectingReservations];
-  return filterNonNullable(reservationSet);
+  // A reservation unit affects itself, so its own reservations are in both lists.
+  const seen = new Set<string>();
+  return filterNonNullable(reservationSet).filter(({ id }) => {
+    if (seen.has(id)) {
+      return false;
+    }
+    seen.add(id);
+    return true;
+  });
 }
 
 export const APPLICANT_NAME_FRAGMENT = gql`

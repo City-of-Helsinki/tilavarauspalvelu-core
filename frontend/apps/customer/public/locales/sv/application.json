@@ -67,6 +67,27 @@
       "primary": "Prioriterat önskemål",
       "secondary": "Alternativt önskemål",
       "open": "Kan reserveras"
+    },
+    "skipToForm": "Hoppa till formuläret för att lägga till tider",
+    "announcements": {
+      "painted": "Tillagd",
+      "erased": "Borttagen"
+    },
+    "form": {
+      "legend": "Lägg till tider med ett formulär",
+      "priorityNote": "Nya tider får den typ av önskemål som valts ovan.",
+      "day": "Dag",
+      "from": "Från",
+      "to": "Till",
+      "add": "Lägg till tid",
+      "listLabel": "Valda tider",
+      "empty": "Inga valda tider.",
+      "remove": "Ta bort",
+      "removeTime": "Ta bort {{time}}",
+      "errors": {
+        "endAfterStart": "Sluttiden måste vara efter starttiden.",
+        "outsideReservable": "Tiden är utanför de tider då utrymmet kan bokas."
+      }
     }
   },
   "Page2": {

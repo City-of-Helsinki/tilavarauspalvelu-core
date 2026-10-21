@@ -1,13 +1,15 @@
-import React, { forwardRef, useEffect, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import type { Ref } from "react";
 import { gql } from "@apollo/client";
 import { add, startOfISOWeek } from "date-fns";
 import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
+import type { CalendarEventBuffer } from "@ui/components/calendar/types";
 import { getEventBuffers } from "@ui/components/calendar/utils";
-import { Calendar as CommonCalendar } from "ui/src/components/calendar/Calendar";
-import { Toolbar, ToolbarBtn } from "ui/src/components/calendar/Toolbar";
+import { DatedWeekCalendar } from "@ui/components/DatedWeekCalendar/DatedWeekCalendar";
+import { ToolbarButton } from "@ui/components/DatedWeekCalendar/styles";
+import type { DatedEvent, DatedWeekView } from "@ui/components/DatedWeekCalendar/types";
 import { filterNonNullable, toNumber } from "ui/src/modules/helpers";
 import { ReservationStateChoice, ReservationTypeChoice, UserPermissionChoice } from "@gql/gql-types";
 import type { TimeBlockSectionFragment } from "@gql/gql-types";
@@ -17,23 +19,17 @@ import { ReservationSeriesView } from "@/components/ReservationSeriesView";
 import { VisibleIfPermission } from "@/components/VisibleIfPermission";
 import { useModal } from "@/context/ModalContext";
 import { useReservationCalendarData, useReservationSeries } from "@/hooks";
+import { useCalendarLabels } from "@/hooks/useCalendarLabels";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
-import type { CalendarEventType, EventType } from "@/modules/reservation";
+import type { CalendarEventType } from "@/modules/reservation";
 import { isPossibleToEdit } from "@/modules/reservationModificationRules";
 import { Accordion } from "@/styled";
 import { eventStyleGetter, legend } from "./eventStyleGetter";
 
 const Container = styled.div`
-  .rbc-calendar {
-    display: grid;
-  }
-
-  .rbc-event-label {
-    font-weight: 700;
-  }
+  display: grid;
+  gap: var(--spacing-s);
 `;
-
-type WeekOptions = "day" | "week" | "month";
 
 type CalendarProps = {
   reservation: TimeBlockSectionFragment;
@@ -42,26 +38,41 @@ type CalendarProps = {
   events: CalendarEventType[];
 };
 
-const isInsideCalendarRange = (x: { start: Date; end: Date }) => x.end.getHours() > 6;
+type TimeBlockData = { calendarEvent: CalendarEventType | CalendarEventBuffer };
+
+const CALENDAR_STEP_MINUTES = 30;
+
+const isBuffer = (item: CalendarEventType | CalendarEventBuffer) => item.event?.state === "BUFFER";
+
+const reservationPkOf = (item: CalendarEventType | CalendarEventBuffer) =>
+  item.event != null && "pk" in item.event ? item.event.pk : undefined;
+
+function toDatedEvent(item: CalendarEventType | CalendarEventBuffer, index: number): DatedEvent<TimeBlockData> {
+  const title = "title" in item && item.title ? item.title : "";
+  return {
+    id: `${isBuffer(item) ? "buffer" : "reservation"}-${reservationPkOf(item) ?? index}-${item.start.getTime()}`,
+    title,
+    start: item.start,
+    end: item.end,
+    data: { calendarEvent: item },
+  };
+}
 
 /// @param reservation the current reservation to show in calendar
 /// @param selected (for recurring only) different styling
 /// @param focusDate date to show in the calendar
 const Calendar = forwardRef(function Calendar(
-  { reservation, refetch, focusDate, events: eventsAll }: CalendarProps,
+  { reservation, refetch, focusDate, events }: CalendarProps,
   ref: Ref<HTMLDivElement>
 ): React.ReactElement {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { setModalContent } = useModal();
-  const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
+  const [view, setView] = useState<DatedWeekView>("week");
+  const labels = useCalendarLabels(view);
 
   const searchParams = useSearchParams();
   const selected = toNumber(searchParams.get("selected"));
-  const selectedEvent = eventsAll.find((e) => e.event?.pk === selected);
-
-  // Because the calendar is fixed to 6 - 24 interval anything outside it causes rendering artefacts.
-
-  const events = eventsAll.filter((evt) => isInsideCalendarRange(evt));
+  const selectedEvent = events.find((e) => e.event?.pk === selected);
 
   const handleEditAccept = () => {
     refetch();
@@ -80,33 +91,51 @@ const Calendar = forwardRef(function Calendar(
   const eventBuffers = getEventBuffers(
     filterNonNullable(events.map((e) => e.event).filter((e) => e?.type !== ReservationTypeChoice.Blocked))
   );
+  const datedEvents = useMemo(
+    () => [...events, ...eventBuffers].map((item, index) => toDatedEvent(item, index)),
+    // eventBuffers is derived from events
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [events]
+  );
+
+  const getStyle = eventStyleGetter(reservation, selectedEvent?.event);
+
+  const getEventLabel = ({ data, title }: DatedEvent<TimeBlockData>) => {
+    const { calendarEvent } = data;
+    if (isBuffer(calendarEvent)) {
+      return t("reservationCalendar:buffer");
+    }
+    const state = calendarEvent.event?.state ? t(`reservation:state.${calendarEvent.event.state}`) : "";
+    const isSelected = selected != null && reservationPkOf(calendarEvent) === selected;
+    return [state ? `${state}: ${title}` : title, isSelected ? t("reservationCalendar:selected") : null]
+      .filter(Boolean)
+      .join(", ");
+  };
 
   return (
     <Container ref={ref}>
-      <CommonCalendar<EventType>
-        events={[...events, ...eventBuffers]}
-        toolbarComponent={(props) => (
-          <Toolbar {...props}>
-            {isAllowedToModify && (
-              // NOTE don't use HDS buttons in the toolbar, breaks mobile layout
-              <VisibleIfPermission reservation={reservation} permission={UserPermissionChoice.CanManageReservations}>
-                <ToolbarBtn onClick={handleEditTimeClick}>{t("reservation:EditTimeModal.acceptBtn")}</ToolbarBtn>
-              </VisibleIfPermission>
-            )}
-          </Toolbar>
-        )}
-        showToolbar
-        begin={focusDate}
-        eventStyleGetter={eventStyleGetter(reservation, selectedEvent?.event)}
-        onNavigate={(d: Date) => {
-          refetch(d);
-        }}
-        viewType={calendarViewType}
-        onView={(n) => {
-          if (n === "day" || n === "week" || n === "month") {
-            setCalendarViewType(n);
-          }
-        }}
+      <DatedWeekCalendar<TimeBlockData>
+        aria-label={t("reservation:calendar")}
+        date={focusDate}
+        onNavigate={(d) => refetch(d)}
+        view={view}
+        onViewChange={setView}
+        events={datedEvents}
+        step={CALENDAR_STEP_MINUTES}
+        locale={i18n.language}
+        labels={labels}
+        getEventLabel={getEventLabel}
+        getEventProps={(item) => ({ style: getStyle(item.data.calendarEvent as CalendarEventType).style })}
+        toolbarExtra={
+          isAllowedToModify ? (
+            // NOTE don't use HDS buttons in the toolbar, breaks mobile layout
+            <VisibleIfPermission reservation={reservation} permission={UserPermissionChoice.CanManageReservations}>
+              <ToolbarButton type="button" onClick={handleEditTimeClick}>
+                {t("reservation:EditTimeModal.acceptBtn")}
+              </ToolbarButton>
+            </VisibleIfPermission>
+          ) : null
+        }
       />
       <LegendsWrapper>
         {legend.map((l) => (

@@ -1,4 +1,4 @@
-import type { CalendarEvent } from "ui/src/components/calendar/Calendar";
+import type { CalendarEvent } from "@ui/components/calendar/types";
 import { ReservationStateChoice, ReservationTypeChoice } from "@gql/gql-types";
 import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
 import {

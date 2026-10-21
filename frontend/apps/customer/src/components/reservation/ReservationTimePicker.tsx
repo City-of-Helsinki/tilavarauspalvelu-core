@@ -1,21 +1,24 @@
-import React, { Children, cloneElement, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { useMedia } from "react-use";
 import { gql } from "@apollo/client";
 import { addMinutes, differenceInMinutes } from "date-fns";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
+import type { CalendarEvent, CalendarEventBuffer } from "@ui/components/calendar/types";
 import { getEventBuffers } from "@ui/components/calendar/utils";
-import { Calendar } from "ui/src/components/calendar/Calendar";
-import type {
-  CalendarEvent,
-  CalendarEventBuffer,
-  SlotClickProps,
-  SlotProps,
-} from "ui/src/components/calendar/Calendar";
-import { Toolbar } from "ui/src/components/calendar/Toolbar";
+import { DatedWeekCalendar } from "@ui/components/DatedWeekCalendar/DatedWeekCalendar";
+import type { DatedEvent, DatedRange, DatedWeekView } from "@ui/components/DatedWeekCalendar/types";
 import { breakpoints, RELATED_RESERVATION_STATES } from "ui/src/modules/const";
-import { formatApiDate, formatDate, formatDuration, formatTime, parseUIDate } from "ui/src/modules/date-utils";
+import {
+  dateToMinutes,
+  formatApiDate,
+  formatDate,
+  formatDuration,
+  formatTime,
+  formatTimeRange,
+  parseUIDate,
+} from "ui/src/modules/date-utils";
 import { filterNonNullable, getLocalizationLang } from "ui/src/modules/helpers";
 import { ReservationTypeChoice, useListReservationsQuery } from "@gql/gql-types";
 import type {
@@ -26,29 +29,35 @@ import type {
 import { Legend } from "@/components/calendar/Legend";
 import { useCurrentUser } from "@/hooks";
 import { eventStyleGetter } from "@/modules/eventStyleGetter";
-import { getBoundCheckedReservation, getSlotPropGetter, isRangeReservable } from "@/modules/reservable";
+import { getBoundCheckedReservation, getIsSlotReservable, isRangeReservable } from "@/modules/reservable";
 import type { ReservableMap } from "@/modules/reservable";
-import {
-  SLOTS_EVERY_HOUR,
-  convertFormToFocustimeSlot,
-  getDurationOptions,
-  getNewReservation,
-} from "@/modules/reservation";
+import { convertFormToFocustimeSlot, getDurationOptions, getNewReservation } from "@/modules/reservation";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
 
-type WeekOptions = "day" | "week" | "month";
+const DRAFT_ID = "draft";
+const CALENDAR_STEP_MINUTES = 30;
+const CONTROLS_ID = "reservation-time-controls";
 
-// NOTE necessary for mobile touch events
-function TouchCellWrapper({
-  children,
-  value,
-  onSelectSlot,
-}: // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO Calendar prop typing
-any): React.ReactElement {
-  return cloneElement(Children.only(children), {
-    onTouchEnd: () => onSelectSlot({ action: "click", slots: [value] }),
-  });
+type PickerData = { source: CalendarEvent<ReservationNode> | CalendarEventBuffer };
+
+const stateOf = ({ source }: PickerData) => source.event?.state as string | undefined;
+
+// Buffers are built from reservations so they carry a pk, but they are typed as only a state.
+const reservationOf = ({ source }: PickerData): ReservationNode | null =>
+  source.event != null && "pk" in source.event ? source.event : null;
+
+function toDatedEvent(source: PickerData["source"], index: number): DatedEvent<PickerData> {
+  const state = source.event?.state as string | undefined;
+  const kind = state === "INITIAL" ? "draft" : state === "BUFFER" ? "buffer" : "reservation";
+  const pk = reservationOf({ source })?.pk;
+  return {
+    id: kind === "draft" ? DRAFT_ID : `${kind}-${pk ?? index}-${source.start.getTime()}`,
+    title: "title" in source && source.title ? source.title : "",
+    start: source.start,
+    end: source.end,
+    data: { source },
+  };
 }
 
 const CalendarFooter = styled.div`
@@ -76,13 +85,13 @@ export type ReservationTimePickerProps = Readonly<{
   startingTimeOptions: Array<{ value: string; label: string }>;
 }>;
 
-function useSlotPropGetter({
+function useIsSlotReservable({
   reservableTimes,
   reservationUnit,
-}: Pick<ReservationTimePickerProps, "reservableTimes" | "reservationUnit">): (date: Date) => SlotProps {
+}: Pick<ReservationTimePickerProps, "reservableTimes" | "reservationUnit">): (date: Date) => boolean {
   const activeApplicationRounds = reservationUnit.applicationRounds;
   return useMemo(() => {
-    return getSlotPropGetter({
+    return getIsSlotReservable({
       reservableTimes,
       activeApplicationRounds,
       reservationBeginsAt: reservationUnit.reservationBeginsAt
@@ -117,11 +126,12 @@ function useCalendarEventChange({
     let focusEvent = null;
     if (shouldDisplayFocusSlot) {
       const { durationMinutes: diff, start, end } = focusSlot;
+      const timeRange = formatTimeRange(dateToMinutes(start), dateToMinutes(end), true);
       focusEvent = {
         beginsAt: start,
         endsAt: end,
         state: "INITIAL",
-        durationString: diff >= 90 ? `(${formatDuration(t, { minutes: diff })})` : "",
+        durationString: `${timeRange} (${formatDuration(t, { minutes: diff })})`,
       };
     }
 
@@ -174,7 +184,7 @@ export function ReservationTimePicker({
   blockingReservations,
 }: ReservationTimePickerProps): React.ReactElement {
   const { t, i18n } = useTranslation();
-  const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
+  const [calendarViewType, setCalendarViewType] = useState<DatedWeekView>("week");
   const { watch, setValue } = reservationForm;
   const activeApplicationRounds = reservationUnit.applicationRounds;
   const locale = getLocalizationLang(i18n.language);
@@ -202,16 +212,18 @@ export function ReservationTimePicker({
     focusSlot,
     blockingReservations,
   });
-  const slotPropGetter = useSlotPropGetter({
+  const isSlotReservable = useIsSlotReservable({
     reservableTimes,
     reservationUnit,
   });
+
+  const isOpen = useMemo(() => (range: DatedRange) => isSlotReservable(range.start), [isSlotReservable]);
 
   const { currentUser } = useCurrentUser();
 
   const durationOptions = getDurationOptions(reservationUnit, t);
 
-  const handleCalendarEventChange = ({ start, end }: CalendarEvent<ReservationNode>): boolean => {
+  const handleCalendarEventChange = ({ start, end }: DatedRange): boolean => {
     if (isReservationQuotaReached) {
       return false;
     }
@@ -261,8 +273,7 @@ export function ReservationTimePicker({
     return true;
   };
 
-  const handleSlotClick = (props: SlotClickProps): boolean => {
-    const { start, end } = props;
+  const handleSlotClick = ({ start, end }: DatedRange): boolean => {
     if (isReservationQuotaReached) {
       return false;
     }
@@ -337,43 +348,86 @@ export function ReservationTimePicker({
 
   const areControlsVisible = watch("isControlsVisible");
 
+  const ownReservationPks = filterNonNullable(userReservations.map((n) => n?.pk));
+  const datedEvents = useMemo(() => calendarEvents.map((item, index) => toDatedEvent(item, index)), [calendarEvents]);
+
+  const getEventLabel = (item: DatedEvent<PickerData>) => {
+    const state = stateOf(item.data);
+    const reservation = reservationOf(item.data);
+    if (state === "INITIAL") {
+      return t("reservationCalendar:legend.initial");
+    }
+    if (state === "BUFFER") {
+      return t("reservationCalendar:legend.buffer");
+    }
+    if (reservation?.pk != null && ownReservationPks.includes(reservation.pk)) {
+      return t("reservationCalendar:legend.initial");
+    }
+    if (state === "CANCELLED") {
+      return t("reservationCalendar:legend.cancelledLabel");
+    }
+    return reservation?.isBlocked ? t("reservationCalendar:legend.unavailable") : t("reservationCalendar:legend.busy");
+  };
+
+  const refuseUnless = (isAccepted: boolean) => (isAccepted ? null : t("reservationCalendar:cannotReserveHere"));
+
+  const viewName = (calendarViewType === "day" ? t("common:day") : t("common:week")).toLowerCase();
+  const draftLabels = {
+    hint: t("reservationCalendar:draft.hint"),
+    grabbed: t("reservationCalendar:draft.grabbed"),
+    moved: t("reservationCalendar:draft.moved"),
+    cancelled: t("reservationCalendar:draft.cancelled"),
+    slotSelected: t("reservationCalendar:draft.slotSelected"),
+    controls: t("reservationCalendar:draft.controls"),
+    earlier: t("reservationCalendar:draft.earlier"),
+    later: t("reservationCalendar:draft.later"),
+    shorter: t("reservationCalendar:draft.shorter"),
+    longer: t("reservationCalendar:draft.longer"),
+  };
+
+  const labels = {
+    toolbar: t("reservationCalendar:toolbar"),
+    previous: t("reservationCalendar:showPrevious", { view: viewName }),
+    next: t("reservationCalendar:showNext", { view: viewName }),
+    today: t("common:today"),
+    day: t("common:day"),
+    week: t("common:week"),
+    list: t("reservationCalendar:list"),
+    skipToList: t("reservationCalendar:skipToList"),
+    emptyList: t("reservationCalendar:emptyList"),
+    free: t("reservationCalendar:free"),
+    closed: t("reservationCalendar:closed"),
+    opensInNewTab: t("reservationCalendar:opensInNewTab"),
+    draft: draftLabels,
+  };
+
   return (
     <>
-      <div aria-hidden>
-        <Calendar<ReservationNode>
-          events={calendarEvents}
-          begin={focusDate}
-          onNavigate={(d: Date) => setValue("date", formatDate(d))}
-          eventStyleGetter={(event) =>
-            eventStyleGetter(event, filterNonNullable(userReservations?.map((n) => n?.pk)), !isReservationQuotaReached)
-          }
-          slotPropGetter={slotPropGetter}
-          viewType={calendarViewType}
-          onView={(n) => {
-            if (n === "month" || n === "week" || n === "day") {
-              setCalendarViewType(n);
-            }
-          }}
-          showToolbar
-          reservable={!isReservationQuotaReached}
-          toolbarComponent={Toolbar}
-          dateCellWrapperComponent={TouchCellWrapper}
-          resizable={!isReservationQuotaReached}
-          draggable
-          onSelectSlot={handleSlotClick}
-          onEventDrop={handleCalendarEventChange}
-          onEventResize={handleCalendarEventChange}
-          onSelecting={handleCalendarEventChange}
-          draggableAccessor={({ event }) => event?.state?.toString() === "INITIAL"}
-          resizableAccessor={({ event }) => event?.state?.toString() === "INITIAL"}
-          step={30}
-          timeslots={SLOTS_EVERY_HOUR}
-          culture={locale}
-          aria-hidden
-          longPressThreshold={100}
-        />
-      </div>
-      <CalendarFooter aria-live="polite" aria-expanded={areControlsVisible}>
+      <DatedWeekCalendar<PickerData>
+        aria-label={t("reservationCalendar:selectTime")}
+        date={focusDate}
+        onNavigate={(d) => setValue("date", formatDate(d))}
+        view={calendarViewType}
+        onViewChange={setCalendarViewType}
+        events={datedEvents}
+        step={CALENDAR_STEP_MINUTES}
+        locale={locale}
+        isOpen={isOpen}
+        draftId={focusSlot.isReservable ? DRAFT_ID : undefined}
+        onSelectSlot={isReservationQuotaReached ? undefined : (range) => refuseUnless(handleSlotClick(range))}
+        onMoveDraft={isReservationQuotaReached ? undefined : (range) => refuseUnless(handleCalendarEventChange(range))}
+        alternative={{ id: CONTROLS_ID, label: t("reservationCalendar:skipToForm") }}
+        getEventLabel={getEventLabel}
+        getEventProps={({ data: { source } }) => ({
+          style: eventStyleGetter(
+            source as CalendarEvent<ReservationNode>,
+            ownReservationPks,
+            !isReservationQuotaReached
+          ).style,
+        })}
+        labels={labels}
+      />
+      <CalendarFooter id={CONTROLS_ID} tabIndex={-1} aria-live="polite" aria-expanded={areControlsVisible}>
         <ReservationCalendarControls
           {...controlProps}
           reservationUnit={reservationUnit}

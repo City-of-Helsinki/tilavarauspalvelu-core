@@ -50,23 +50,14 @@ vi.mock("@/components/ReservationSeriesView", () => ({
   ),
 }));
 
-vi.mock("ui/src/components/calendar/Calendar", () => ({
-  Calendar: (props: { toolbarComponent?: (p: unknown) => React.ReactNode; onNavigate?: (d: Date) => void }) => (
+vi.mock("@ui/components/DatedWeekCalendar/DatedWeekCalendar", () => ({
+  DatedWeekCalendar: (props: { toolbarExtra?: React.ReactNode; onNavigate?: (d: Date) => void }) => (
     <div data-testid="mock-calendar">
-      {props.toolbarComponent?.({})}
+      {props.toolbarExtra}
       <button type="button" data-testid="mock-navigate" onClick={() => props.onNavigate?.(addDays(new Date(), 90))}>
         navigate
       </button>
     </div>
-  ),
-}));
-
-vi.mock("ui/src/components/calendar/Toolbar", () => ({
-  Toolbar: ({ children }: { children?: React.ReactNode }) => <div data-testid="mock-toolbar">{children}</div>,
-  ToolbarBtn: ({ onClick, children }: { onClick?: () => void; children?: React.ReactNode }) => (
-    <button type="button" data-testid="mock-edit-time-button" onClick={onClick}>
-      {children}
-    </button>
   ),
 }));
 
@@ -145,7 +136,7 @@ describe("TimeBlockSection", () => {
     render(<TimeBlockSection reservation={createReservation()} onReservationUpdated={onReservationUpdated} />);
     const user = userEvent.setup();
 
-    await user.click(screen.getByTestId("mock-edit-time-button"));
+    await user.click(screen.getByRole("button", { name: "reservation:EditTimeModal.acceptBtn", hidden: true }));
 
     expect(mockSetModalContent).toHaveBeenCalledTimes(1);
     const dialog = mockSetModalContent.mock.calls[0]?.[0] as React.ReactElement<{
@@ -166,21 +157,27 @@ describe("TimeBlockSection", () => {
     });
     render(<TimeBlockSection reservation={reservation} onReservationUpdated={vi.fn()} />);
 
-    expect(screen.queryByTestId("mock-edit-time-button")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "reservation:EditTimeModal.acceptBtn", hidden: true })
+    ).not.toBeInTheDocument();
   });
 
   it("hides the edit-time button when the reservation state disallows editing", () => {
     const reservation = createReservation({ state: ReservationStateChoice.Cancelled });
     render(<TimeBlockSection reservation={reservation} onReservationUpdated={vi.fn()} />);
 
-    expect(screen.queryByTestId("mock-edit-time-button")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "reservation:EditTimeModal.acceptBtn", hidden: true })
+    ).not.toBeInTheDocument();
   });
 
   it("hides the edit-time button when the user lacks permission", () => {
     mockUseSession.mockReturnValue({ user: createUser({ isSuperuser: false, pk: 99 }) });
     render(<TimeBlockSection reservation={createReservation()} onReservationUpdated={vi.fn()} />);
 
-    expect(screen.queryByTestId("mock-edit-time-button")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "reservation:EditTimeModal.acceptBtn", hidden: true })
+    ).not.toBeInTheDocument();
   });
 
   it("notifies the parent but doesn't force a calendar refetch when navigating to a different focus date", async () => {

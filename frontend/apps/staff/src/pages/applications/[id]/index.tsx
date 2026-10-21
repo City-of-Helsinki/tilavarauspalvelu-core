@@ -268,12 +268,6 @@ const TimeSection = styled.div`
   @media (min-width: ${breakpoints.l}) {
     grid-template-columns: minmax(0, max-content) min-content;
   }
-
-  /* force legend to next row after calendar */
-
-  > :nth-child(2) {
-    grid-row: 2;
-  }
 `;
 
 interface DataType extends ReservationUnitOptionFieldsFragment {
@@ -398,6 +392,7 @@ function ApplicationSectionDetails({
   const maxDuration = section.reservationMaxDuration;
   const duration = appEventDuration(minDuration, maxDuration, t);
   const hash = section.pk?.toString() ?? "";
+  const previewId = `requested-times-${section.pk ?? "unknown"}`;
   const heading = `${application.pk ?? "-"}-${section.pk ?? "-"} ${section.name}`;
 
   const beginDate = parseValidDateObject(section.reservationsBeginDate);
@@ -430,8 +425,10 @@ function ApplicationSectionDetails({
           <ReservationUnitOptionsSection section={section} refetch={refetch} applicationStatus={application.status} />
           <H4 as="h3">{t("applicationSection:requestedTimes")}</H4>
           <TimeSection>
-            <TimeSelector applicationSection={section} />
-            <ApplicationTimePreview schedules={section.suitableTimeRanges} />
+            <TimeSelector applicationSection={section} alternativeId={previewId} />
+            <div id={previewId}>
+              <ApplicationTimePreview schedules={section.suitableTimeRanges} />
+            </div>
           </TimeSection>
         </Flex>
       </Accordion>

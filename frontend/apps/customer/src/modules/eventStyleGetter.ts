@@ -1,4 +1,4 @@
-import type { CalendarEvent } from "ui/src/components/calendar/Calendar";
+import type { CalendarEvent } from "@ui/components/calendar/types";
 import type { ReservationNode } from "@gql/gql-types";
 
 type ReservationStateWithInitial = string;
@@ -7,15 +7,13 @@ export const eventStyleGetter = (
   { event }: CalendarEvent<ReservationNode>,
   ownReservations: number[],
   draggable = true
-): { style: React.CSSProperties; className?: string } => {
+): { style: React.CSSProperties; isMovable: boolean; isBuffer: boolean; isBlocked: boolean } => {
   const style = {
-    borderRadius: "0px",
-    opacity: "0.8",
     color: "var(--color-white)",
     display: "block",
-    borderColor: "transparent",
   } as Record<string, string>;
-  let className = "";
+  let isMovable = false;
+  let isBuffer = false;
 
   const eventPk = event?.pk;
   const isOwn =
@@ -30,21 +28,21 @@ export const eventStyleGetter = (
     case "INITIAL":
       style.backgroundColor = "var(--tilavaraus-event-initial-color)";
       style.color = "var(--color-black)";
-      style.border = "2px dashed var(--tilavaraus-event-initial-border)";
-      className = draggable ? "rbc-event-movable" : "";
+      style.borderInline = "2px dashed var(--tilavaraus-event-initial-border)";
+      isMovable = draggable;
       break;
     case "OWN":
       style.backgroundColor = "var(--tilavaraus-event-initial-color)";
       style.color = "var(--color-black)";
-      style.border = "2px solid var(--tilavaraus-event-initial-border)";
+      style.borderInline = "2px solid var(--tilavaraus-event-initial-border)";
       break;
     case "BUFFER":
       style.backgroundColor = "var(--color-black-5)";
-      className = "rbc-event-buffer";
+      isBuffer = true;
       break;
     default:
       style.backgroundColor = "var(--tilavaraus-event-reservation-color)";
-      style.border = "2px solid var(--tilavaraus-event-reservation-border)";
+      style.borderInline = "2px solid var(--tilavaraus-event-reservation-border)";
       style.color = "var(--color-black)";
   }
 
@@ -53,11 +51,12 @@ export const eventStyleGetter = (
     style.backgroundColor = "var(--color-black-5)";
     style.border = "1px solid var(--color-black-30)";
     style.borderLeft = "2px solid var(--color-black-30)";
-    className = "rbc-timeslot-inactive";
   }
 
   return {
     style,
-    className,
+    isMovable,
+    isBuffer,
+    isBlocked: Boolean(event?.isBlocked),
   };
 };

@@ -3,6 +3,7 @@ module.exports = {
   customSyntax: "postcss-styled-syntax",
   rules: {
     "media-feature-range-notation": "prefix",
+    "color-function-notation": ["modern"],
     // temp rules after upgrade
     "nesting-selector-no-missing-scoping-root": null,
     "no-empty-source": null,
@@ -12,8 +13,8 @@ module.exports = {
     "declaration-empty-line-before": null,
     "rule-empty-line-before": null,
     "at-rule-empty-line-before": null,
-    "color-function-notation": null,
     "selector-class-pattern": null,
+
     // end temp rules after upgrade
     /*
     "csstools/value-no-unknown-custom-properties": [
