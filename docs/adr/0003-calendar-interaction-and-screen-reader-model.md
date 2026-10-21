@@ -58,9 +58,9 @@ The Dated Week can be read only, or the consumer can let the user place and move
 - The draft cell is described by a hidden hint on how to move it. The grid is read only (`aria-readonly`) only when nothing can be chosen.
 - An `alternative` skip link leads to the equal form for the same task.
 - Whether a cell is open can be given as a list of ranges (`openRanges`) or as a function (`isOpen`) for rules that are not a list of ranges, such as the earliest and latest day a unit can be reserved.
+- Pointer drag and resize of the Draft Reservation, which the old calendar had. Clicking a cell and the four buttons do the same things. Add it only if mouse users miss it.
 
 ## Not built yet
 
-- Pointer drag and resize of the Draft Reservation, which the old calendar had. Clicking a cell and the four buttons do the same things. Add it only if mouse users miss it.
 - Touch long press. It clashes with VoiceOver and TalkBack gestures, so the buttons are the touch way.
 - Playwright checks for focus, zoom, contrast and target size.
