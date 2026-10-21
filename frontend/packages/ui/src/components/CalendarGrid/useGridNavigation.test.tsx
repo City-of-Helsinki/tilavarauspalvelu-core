@@ -6,8 +6,16 @@ import { useGridNavigation } from "./useGridNavigation";
 
 const columns = ["mon", "tue", "wed"] as const;
 
-function Grid({ firstIndex = 2, endIndex = 6 }: { firstIndex?: number; endIndex?: number }) {
-  const grid = useGridNavigation({ columns, firstIndex, endIndex, rowsPerHour: 2 });
+function Grid({
+  firstIndex = 2,
+  endIndex = 6,
+  timeAxis,
+}: {
+  firstIndex?: number;
+  endIndex?: number;
+  timeAxis?: "vertical" | "horizontal";
+}) {
+  const grid = useGridNavigation({ columns, firstIndex, endIndex, rowsPerHour: 2, timeAxis });
   const rows = Array.from({ length: endIndex - firstIndex }, (_, offset) => firstIndex + offset);
   return (
     <table>
@@ -95,5 +103,37 @@ describe("useGridNavigation", () => {
     cell("mon-2").focus();
     await user.keyboard("a{Enter}");
     expect(cell("mon-2")).toHaveFocus();
+  });
+});
+
+describe("useGridNavigation with time along the row", () => {
+  test("Left and Right move through time and Up and Down between the columns", async () => {
+    const user = userEvent.setup();
+    render(<Grid timeAxis="horizontal" />);
+    cell("tue-3").focus();
+    await user.keyboard("{ArrowRight}");
+    expect(cell("tue-4")).toHaveFocus();
+    await user.keyboard("{ArrowLeft}{ArrowLeft}");
+    expect(cell("tue-2")).toHaveFocus();
+    await user.keyboard("{ArrowLeft}");
+    expect(cell("tue-2")).toHaveFocus();
+    await user.keyboard("{ArrowDown}");
+    expect(cell("wed-2")).toHaveFocus();
+    await user.keyboard("{ArrowDown}{ArrowUp}{ArrowUp}{ArrowUp}");
+    expect(cell("mon-2")).toHaveFocus();
+  });
+
+  test("Page keys still jump an hour of time and Home and End go to the first and last time", async () => {
+    const user = userEvent.setup();
+    render(<Grid timeAxis="horizontal" />);
+    cell("tue-2").focus();
+    await user.keyboard("{PageDown}");
+    expect(cell("tue-4")).toHaveFocus();
+    await user.keyboard("{PageUp}");
+    expect(cell("tue-2")).toHaveFocus();
+    await user.keyboard("{End}");
+    expect(cell("tue-5")).toHaveFocus();
+    await user.keyboard("{Home}");
+    expect(cell("tue-2")).toHaveFocus();
   });
 });
