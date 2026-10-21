@@ -45,6 +45,8 @@ The Dated Week uses the same grid model. Only the slot cells are gridcells. An e
 - Events are cut at midnight into one segment per day. Rows are wall-clock minutes in Europe/Helsinki. The repeated hour on the day the clocks go back is not given extra rows.
 - The Dated Week has its own toolbar, with a slot for extra buttons. The shown range is announced when it changes. The equal alternative is a text list of the events in the shown range, with a skip link to it.
 - Arrow keys stop at the first and last shown day. They do not change the week.
+- An event can lead somewhere, always in a new tab. Enter or Space on a cell opens the only linked event in it. With several linked events Enter opens the text list and moves focus to the first one, where every linked event is a real link. A cell and a list link that open a new tab say so in their name.
+- The grid is marked busy while its events load.
 
 ## Not built yet
 
