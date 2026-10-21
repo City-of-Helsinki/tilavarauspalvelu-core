@@ -108,9 +108,9 @@ const reservationsByUnitResponse: CalendarReservationFragment[] = [
   // backend returns days unsorted but our mondays are first
   // we could also randomize the array so blocking times are neither at the start nor the end
   .sort((x, y) => x.begin.getTime() - y.begin.getTime())
-  .map((x) => ({
+  .map((x, index) => ({
     __typename: "ReservationNode",
-    id: createNodeId("ReservationNode", 1),
+    id: createNodeId("ReservationNode", index + 1),
     beginsAt: x.begin.toUTCString(),
     endsAt: x.end.toUTCString(),
     bufferTimeBefore: 0,
@@ -118,7 +118,7 @@ const reservationsByUnitResponse: CalendarReservationFragment[] = [
     accessType: AccessType.Unrestricted,
     name: "Test reservation",
     reserveeName: "Test reservee",
-    pk: 1,
+    pk: index + 1,
     state: ReservationStateChoice.Confirmed,
     user: null,
     type: ReservationTypeChoice.Normal,
