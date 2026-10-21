@@ -1,18 +1,13 @@
 import styled from "styled-components";
-import { unavailableBackgroundSVG } from "@ui/components/calendar/utils";
 import { fontBold, fontMedium } from "@ui/styled";
-import { visuallyHidden } from "../WeeklyPatternCalendar/styles";
-
-export { LiveRegion, SkipLink } from "../WeeklyPatternCalendar/styles";
-
-export const HiddenText = styled.span`
-  ${visuallyHidden};
-`;
+import { gridTableStyles } from "../CalendarGrid/styles";
 
 export const DatedWeekRoot = styled.div`
   --border-color: var(--color-black-50);
   /* Also the minimum target size (WCAG 2.5.8) for a cell. */
   --step-height: 24px;
+  --time-column-width: 56px;
+  --closed-pattern-height: calc(var(--step-height) / 2);
   --lane-gap: 2px;
 
   display: grid;
@@ -70,29 +65,10 @@ export const GridScroller = styled.div`
   max-height: 70vh;
   /* Keeps a focused cell out from under the sticky header (WCAG 2.4.11). */
   scroll-padding-top: 3rem;
+  ${gridTableStyles};
 
   table {
-    border-collapse: separate;
-    border-spacing: 0;
-    table-layout: fixed;
-    width: 100%;
     min-width: calc(56px + var(--days) * 110px);
-  }
-
-  colgroup col:first-child {
-    width: 56px;
-  }
-
-  thead th,
-  thead td {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    padding: var(--spacing-2-xs) var(--spacing-xs);
-
-    background: var(--color-white);
-    ${fontBold};
-    text-align: center;
   }
 
   thead td {
@@ -112,29 +88,12 @@ export const GridScroller = styled.div`
   }
 
   tbody td {
-    position: relative;
-    box-sizing: border-box;
-    height: var(--step-height);
     padding: 0;
-    border-inline: 1px solid var(--border-color);
-    background: var(--color-white);
     font-size: var(--fontsize-body-s);
     line-height: 1.1;
 
     &[data-hour-start] {
       border-top: 1px solid var(--border-color);
-    }
-
-    &[data-availability="closed"] {
-      background-color: var(--color-black-5);
-      background-image: ${unavailableBackgroundSVG};
-      background-size: auto calc(var(--step-height) / 2);
-    }
-
-    &:focus-visible {
-      z-index: 1;
-      outline: 3px solid var(--color-focus-outline);
-      outline-offset: -3px;
     }
   }
 
