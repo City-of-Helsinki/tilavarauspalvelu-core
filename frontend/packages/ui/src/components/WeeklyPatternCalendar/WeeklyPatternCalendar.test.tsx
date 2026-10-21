@@ -98,6 +98,19 @@ describe("WeeklyPatternCalendar", () => {
     expect(cell(/^Monday, 08:30–09:00, primary$/)).toHaveAttribute("aria-selected", "true");
   });
 
+  test("every cell of a long run has its own accessible name", () => {
+    render(<Harness initial={[{ weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 600, data: primary }]} />);
+    const names = screen
+      .getAllByRole("gridcell", { name: /^Monday, .*primary$/ })
+      .map((element) => element.getAttribute("aria-label"));
+    expect(names).toEqual([
+      "Monday, 08:00–10:00, primary",
+      "Monday, 08:30–09:00, primary",
+      "Monday, 09:00–09:30, primary",
+      "Monday, 09:30–10:00, primary",
+    ]);
+  });
+
   test("a different brush paints over an existing run instead of erasing it", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
