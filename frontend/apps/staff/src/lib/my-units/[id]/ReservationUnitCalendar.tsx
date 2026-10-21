@@ -1,15 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { gql } from "@apollo/client";
-import { addDays, addHours, addMinutes, endOfISOWeek, startOfDay, startOfISOWeek } from "date-fns";
-import { get } from "lodash-es";
+import { addDays, endOfISOWeek, startOfISOWeek } from "date-fns";
 import { useTranslation } from "next-i18next/pages";
-import styled from "styled-components";
 import type { TFunction } from "next-i18next/pages";
-import { getBuffersFromEvents, isCellOverlappingSpan } from "@ui/components/calendar/utils";
-import type { ReservationEventType, TimeSpanType } from "@ui/components/calendar/utils";
-import type { ReservableTimeSpanType } from "ui/gql/gql-types";
-import { Calendar as CommonCalendar } from "ui/src/components/calendar/Calendar";
-import type { SlotProps } from "ui/src/components/calendar/Calendar";
+import { getEventBuffers } from "@ui/components/calendar/utils";
+import { DatedWeekCalendar } from "@ui/components/DatedWeekCalendar/DatedWeekCalendar";
+import type { DatedEvent, DatedOpenRange, DatedWeekView } from "@ui/components/DatedWeekCalendar/types";
 import { errorToast } from "ui/src/components/toast";
 import { RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import { formatApiDate } from "ui/src/modules/date-utils";
@@ -18,7 +14,8 @@ import { ReservationTypeChoice, useReservationUnitCalendarQuery, UserPermissionC
 import type { ReservationUnitCalendarQuery } from "@gql/gql-types";
 import { Legend, LegendsWrapper } from "@/components/Legend";
 import { useSession } from "@/hooks";
-import { EVENT_BUFFER, HDS_CLOCK_ICON_SVG, NOT_RESERVABLE } from "@/modules/calendarStyling";
+import { useCalendarLabels } from "@/hooks/useCalendarLabels";
+import { EVENT_BUFFER } from "@/modules/calendarStyling";
 import { combineAffectingReservations, getReserveeName } from "@/modules/helpers";
 import { hasPermission } from "@/modules/permissionHelper";
 import { getReservationUrl } from "@/modules/urls";
@@ -26,15 +23,15 @@ import { eventStyleGetter, legend } from "./eventStyleGetter";
 
 type Props = {
   begin: string;
+  onNavigate: (date: Date) => void;
   reservationUnitPk: number;
   unitPk: number;
 };
 
-const Container = styled.div`
-  .rbc-event-label {
-    font-weight: 700;
-  }
-`;
+// The reservation is null for buffer time, which belongs to a reservation but is not one.
+type UnitCalendarData = { reservation: ReservationType | null };
+
+const CALENDAR_STEP_MINUTES = 30;
 
 type ReservationUnitType = NonNullable<ReservationUnitCalendarQuery["reservationUnit"]>;
 type ReservationType = NonNullable<NonNullable<ReservationUnitType["reservations"]>[0]>;
@@ -70,61 +67,10 @@ function constructEventTitle(res: ReservationType, resUnitPk: number, t: TFuncti
   return reservee;
 }
 
-function useSlotPropGetter(
-  reservableTimeSpans: ReservableTimeSpanType[],
-  events: ReservationEventType[]
-): (date: Readonly<Date>) => SlotProps {
-  const reservableTimeSpanDates: TimeSpanType[] = reservableTimeSpans?.map((rts) => ({
-    start: new Date(rts.startDatetime),
-    end: new Date(rts.endDatetime),
-  }));
-
-  const bufferTimeSpans = getBuffersFromEvents(events);
-
-  return (cellStart: Readonly<Date>): SlotProps => {
-    const isPast = cellStart < new Date();
-    if (isPast) return { style: NOT_RESERVABLE.style };
-
-    // Calendar cells are 30min slots
-    const cellEnd = addMinutes(cellStart, 30);
-
-    // Cell is buffer, if it overlaps with any buffer time span
-    const buffer = bufferTimeSpans.find((span) => isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end));
-    if (buffer) {
-      // Show clock icon only for the first and last buffer cell
-      const beginOfDay = addHours(startOfDay(cellStart), 6);
-      const beginOfBuffer = buffer.start > beginOfDay ? buffer.start : beginOfDay;
-
-      const isFirstOrLastBufferCell =
-        cellStart.getTime() === beginOfBuffer.getTime() || //
-        cellEnd.getTime() === buffer.end.getTime();
-
-      if (isFirstOrLastBufferCell) {
-        return {
-          style: {
-            ...EVENT_BUFFER.style,
-            backgroundImage: HDS_CLOCK_ICON_SVG,
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-            backgroundSize: "16px",
-          },
-        };
-      }
-      return { style: EVENT_BUFFER.style };
-    }
-
-    // Cell is closed, if it doesn't overlap with any reservable time span
-    const isClosed = !reservableTimeSpanDates.some((span) =>
-      isCellOverlappingSpan(cellStart, cellEnd, span.start, span.end)
-    );
-    if (isClosed) return { style: NOT_RESERVABLE.style };
-
-    return {};
-  };
-}
-
-export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Props): React.ReactElement {
-  const { t } = useTranslation();
+export function ReservationUnitCalendar({ begin, onNavigate, reservationUnitPk, unitPk }: Props): React.ReactElement {
+  const { t, i18n } = useTranslation();
+  const [view, setView] = useState<DatedWeekView>("week");
+  const labels = useCalendarLabels(view);
   const { user } = useSession();
 
   const hasViewAccess = hasPermission(user, UserPermissionChoice.CanViewReservations, unitPk);
@@ -158,38 +104,77 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
 
   const reservations = combineAffectingReservations(data, reservationUnitPk);
 
-  const events = reservations.map((reservation) => {
-    const isBlocked = reservation.type === ReservationTypeChoice.Blocked;
-    const title = !isBlocked
-      ? constructEventTitle(reservation, reservationUnitPk, t)
-      : t("myUnits:Calendar.legend.closed");
-    return {
-      title,
-      event: reservation,
-      start: new Date(get(reservation, "beginsAt")),
-      end: new Date(get(reservation, "endsAt")),
-    };
-  });
+  const events = useMemo(() => {
+    const items: Array<DatedEvent<UnitCalendarData>> = reservations.map((reservation) => ({
+      id: reservation.id,
+      title:
+        reservation.type === ReservationTypeChoice.Blocked
+          ? t("myUnits:Calendar.legend.closed")
+          : (constructEventTitle(reservation, reservationUnitPk, t) ?? ""),
+      start: new Date(reservation.beginsAt),
+      end: new Date(reservation.endsAt),
+      data: { reservation },
+    }));
+    const buffers = getEventBuffers([...reservations]).map((buffer, index) => ({
+      id: `buffer-${index}-${buffer.start.getTime()}`,
+      title: "",
+      start: buffer.start,
+      end: buffer.end,
+      data: { reservation: null },
+    }));
+    return [...items, ...buffers];
+    // reservations is rebuilt from data on every render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, reservationUnitPk, t]);
 
-  const slotPropGetter = useSlotPropGetter(
-    filterNonNullable(data?.reservationUnit?.reservableTimeSpans),
-    filterNonNullable(reservations)
-  );
+  // Time that has passed can't be reserved, so only the part of a reservable time span after now is open.
+  const openRanges = useMemo((): DatedOpenRange[] | undefined => {
+    if (data?.reservationUnit == null) {
+      return undefined;
+    }
+    const now = new Date();
+    return filterNonNullable(data.reservationUnit.reservableTimeSpans)
+      .map((span) => ({
+        start: new Date(Math.max(new Date(span.startDatetime).getTime(), now.getTime())),
+        end: new Date(span.endDatetime),
+      }))
+      .filter((span) => span.end > span.start);
+  }, [data]);
+
+  const getEventLabel = ({ title, data: { reservation } }: DatedEvent<UnitCalendarData>) =>
+    reservation == null ? t("reservationCalendar:buffer") : `${t(`reservation:state.${reservation.state}`)}: ${title}`;
+
+  const getEventHref = ({ data: { reservation } }: DatedEvent<UnitCalendarData>) =>
+    hasViewAccess && reservation != null ? getReservationUrl(reservation.pk, true) : undefined;
 
   return (
-    <Container>
-      <CommonCalendar
+    <>
+      <DatedWeekCalendar<UnitCalendarData>
+        aria-label={t("reservation:calendar")}
+        date={beginDate}
+        onNavigate={onNavigate}
+        view={view}
+        onViewChange={setView}
         events={events}
-        slotPropGetter={slotPropGetter}
-        begin={startOfISOWeek(beginDate)}
-        eventStyleGetter={eventStyleGetter(reservationUnitPk)}
+        openRanges={openRanges}
+        step={CALENDAR_STEP_MINUTES}
+        locale={i18n.language}
+        labels={labels}
         isLoading={isLoading}
-        onSelectEvent={(e) => {
-          if (hasViewAccess) {
-            window.open(getReservationUrl(e.event?.pk, true), "_blank");
-          }
-        }}
-        underlineEvents
+        getEventLabel={getEventLabel}
+        getEventHref={getEventHref}
+        getEventProps={(item) =>
+          item.data.reservation == null
+            ? { style: EVENT_BUFFER.style }
+            : {
+                style: eventStyleGetter(reservationUnitPk)({
+                  title: item.title,
+                  start: item.start,
+                  end: item.end,
+                  event: item.data.reservation,
+                }).style,
+              }
+        }
       />
       <LegendsWrapper>
         {legend
@@ -198,7 +183,7 @@ export function ReservationUnitCalendar({ begin, reservationUnitPk, unitPk }: Pr
             <Legend key={l.label} style={l.style} label={t(l.label)} />
           ))}
       </LegendsWrapper>
-    </Container>
+    </>
   );
 }
 
