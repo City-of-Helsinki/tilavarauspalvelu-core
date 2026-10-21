@@ -87,10 +87,9 @@ function WeeklyPatternTable<TData extends CalendarData>(
 
   // The first cell of a run names the whole run. The cells after it name only themselves.
   const getCellLabel = (cell: WeeklyPatternCellInfo<TData>) => {
-    const [begin, end] =
-      cell.runEndMinutes !== cell.endMinutes
-        ? [cell.runBeginMinutes, cell.runEndMinutes]
-        : [cell.beginMinutes, cell.endMinutes];
+    const [begin, end] = cell.isRunStart
+      ? [cell.runBeginMinutes, cell.runEndMinutes]
+      : [cell.beginMinutes, cell.endMinutes];
     return `${longNames[cell.weekday]}, ${formatRange(begin, end)}, ${getStateLabel(cell)}`;
   };
 
