@@ -273,7 +273,30 @@ def test_helsinki_profile_data__query__profile_request_has_errors(graphql):
     response = graphql(query)
 
     assert HelsinkiProfileClient.request.call_count == 1
-    assert response.error_message() == 'Helsinki profile: Response contains errors. [{"message": "foo"}]'
+    assert response.error_message() == "Helsinki profile request failed."
+    assert response.errors[0]["extensions"]["code"] == error_codes.UPSTREAM_CALL_FAILED
+
+    assert SentryLogger.log_message.call_count == 1
+
+
+@patch_method(HelsinkiProfileClient.get_token, return_value="token")
+@patch_method(HelsinkiProfileClient.request)
+@patch_method(SentryLogger.log_message)
+def test_helsinki_profile_data__query__profile_request_permission_denied(graphql):
+    user = UserFactory.create_profile_user()
+    application = ApplicationFactory.create(user=user)
+
+    HelsinkiProfileClient.request.return_value = ResponseMock(
+        json_data={"errors": [{"message": "foo", "extensions": {"code": "PERMISSION_DENIED_ERROR"}}]},
+    )
+
+    graphql.login_with_superuser()
+    query = profile_query(application_pk=application.pk)
+    response = graphql(query)
+
+    assert HelsinkiProfileClient.request.call_count == 1
+    assert response.error_message() == "No permission to view the Helsinki profile data."
+    assert response.errors[0]["extensions"]["code"] == error_codes.HELSINKI_PROFILE_PERMISSION_DENIED
 
     assert SentryLogger.log_message.call_count == 1
 
@@ -293,6 +316,7 @@ def test_helsinki_profile_data__query__profile_request_fails(graphql):
 
     assert HelsinkiProfileClient.request.call_count == 1
     assert response.error_message() == "Helsinki profile request failed."
+    assert response.errors[0]["extensions"]["code"] == error_codes.UPSTREAM_CALL_FAILED
 
     assert SentryLogger.log_message.call_count == 1
 
