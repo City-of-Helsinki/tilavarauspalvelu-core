@@ -14,7 +14,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import type { CSSProperties, ForwardedRef, KeyboardEvent, ReactElement, Ref } from "react";
+import type { CSSProperties, ForwardedRef, KeyboardEvent, PointerEvent, ReactElement, Ref } from "react";
 import { MINUTES_PER_DAY, assertValidStep } from "../WeeklyPatternCalendar/engine";
 import type { CalendarData } from "../WeeklyPatternCalendar/types";
 import {
@@ -39,7 +39,10 @@ import {
   HiddenText,
   ListAlternative,
   LiveRegion,
+  NowDot,
+  NowLine,
   RangeTitle,
+  ResizeHandle,
   SkipLink,
   Toolbar,
   ToolbarButton,
@@ -101,6 +104,12 @@ function DatedWeekTable<TData extends CalendarData>(
 
   // The draft is previewed at its new place while it is being moved. The consumer owns the saved value.
   const [moving, setMoving] = useState<DatedRange | null>(null);
+  // Mirrors `moving` so a pointerup handler, bound once per drag, can read the latest preview instead of a stale one.
+  const movingRef = useRef<DatedRange | null>(null);
+  const updateMoving = (next: DatedRange | null) => {
+    movingRef.current = next;
+    setMoving(next);
+  };
   const shownEvents = useMemo(
     () =>
       moving && draftId != null ? events.map((item) => (item.id === draftId ? { ...item, ...moving } : item)) : events,
@@ -108,7 +117,15 @@ function DatedWeekTable<TData extends CalendarData>(
   );
   const segmentsByDay = useMemo(() => segmentEvents(shownEvents, days), [shownEvents, days]);
   const open = useMemo(() => openRangesByDay(openRanges, days), [openRanges, days]);
-  const todayKey = dayKeyOf(toWallClock(new Date()));
+
+  // Ticks once every 5 minutes, so the current time line keeps up without redrawing the grid more than that.
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 300_000);
+    return () => clearInterval(id);
+  }, []);
+  const wallNow = toWallClock(now);
+  const todayKey = dayKeyOf(wallNow);
 
   const longDay = useMemo(
     () => new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }),
@@ -122,6 +139,12 @@ function DatedWeekTable<TData extends CalendarData>(
   const hours = resolveVisibleHours(visibleHours, open, [...segmentsByDay.values()].flat(), step);
   const firstIndex = hours.beginMinutes / step;
   const endIndex = hours.endMinutes / step;
+
+  // Shown only while today is one of the visible days and the current time falls inside the visible hours.
+  const nowMinutes = minutesOfDay(wallNow);
+  const nowRowIndex = Math.floor(nowMinutes / step);
+  const showNowLine = dayKeys.includes(todayKey) && nowRowIndex >= firstIndex && nowRowIndex < endIndex;
+  const nowOffsetPercent = ((nowMinutes - nowRowIndex * step) / step) * 100;
 
   const [listOpen, setListOpen] = useState(false);
   const listRef = useRef<HTMLDetailsElement>(null);
@@ -204,9 +227,93 @@ function DatedWeekTable<TData extends CalendarData>(
     if (!dayKeys.includes(dayKey)) {
       return;
     }
-    setMoving(next);
+    updateMoving(next);
     announce(describeRange(next));
     pendingCellFocus.current = { dayKey, index: Math.floor(minutesOfDay(start) / step) };
+  };
+
+  // Set while a pointer drag is in progress. `base` is the range it started from, read back at pointerup to
+  // tell a drag that actually moved something from a plain click, which leaves the draft grabbed rather than
+  // committing a no-op. `durationMs` keeps a move the same length as the pointer crosses cells.
+  const dragInfoRef = useRef<{ mode: "move" | "resize"; base: DatedRange; durationMs: number } | null>(null);
+  const [dragMode, setDragMode] = useState<"move" | "resize" | null>(null);
+
+  // The window listeners must be the same functions every render to be removable, but should still call the
+  // latest commitDraft and updateMoving. Boxing the real logic in a ref gets both.
+  const endDragRef = useRef<(commit: boolean) => void>(() => {});
+  endDragRef.current = (commit) => {
+    const info = dragInfoRef.current;
+    dragInfoRef.current = null;
+    setDragMode(null);
+    if (!commit) {
+      // A pointercancel, e.g. a touch turning into a scroll, snaps the draft straight back.
+      updateMoving(null);
+      return;
+    }
+    const result = movingRef.current;
+    if (!info || !result) {
+      return;
+    }
+    const unchanged =
+      result.start.getTime() === info.base.start.getTime() && result.end.getTime() === info.base.end.getTime();
+    // A press and release without crossing into another cell is a click, not a move: it leaves the draft grabbed.
+    if (unchanged) {
+      return;
+    }
+    if (commitDraft(result)) {
+      updateMoving(null);
+    }
+  };
+  const stableFinishDrag = useRef(() => endDragRef.current(true)).current;
+  const stableCancelDrag = useRef(() => endDragRef.current(false)).current;
+
+  const removeDragListeners = useCallback(() => {
+    window.removeEventListener("pointerup", stableFinishDrag);
+    window.removeEventListener("pointercancel", stableCancelDrag);
+  }, [stableFinishDrag, stableCancelDrag]);
+
+  const cancelDrag = () => {
+    removeDragListeners();
+    dragInfoRef.current = null;
+    setDragMode(null);
+  };
+
+  // In case the calendar unmounts mid-drag, e.g. the user navigates away with the pointer still down.
+  useEffect(() => removeDragListeners, [removeDragListeners]);
+
+  // Starts a mouse or touch drag of the draft: dragging its body moves it, dragging the handle at its foot
+  // resizes it, always keeping its start, as the Shorter and Longer buttons do.
+  const beginDrag = (mode: "move" | "resize") => (event: PointerEvent<HTMLSpanElement>) => {
+    if (!canMove || !draftEvent) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    const base = movingRef.current ?? { start: draftEvent.start, end: draftEvent.end };
+    dragInfoRef.current = { mode, base, durationMs: base.end.getTime() - base.start.getTime() };
+    setDragMode(mode);
+    updateMoving(base);
+    if (mode === "move") {
+      announce(draftLabels?.grabbed ?? "");
+    }
+    window.addEventListener("pointerup", stableFinishDrag);
+    window.addEventListener("pointercancel", stableCancelDrag);
+  };
+
+  // Follows the pointer as it crosses cells while a drag is active. Resizing never moves the start.
+  const dragOverCell = (dayKey: string, index: number) => {
+    const info = dragInfoRef.current;
+    const base = movingRef.current;
+    if (!info || !base) {
+      return;
+    }
+    const cell = cellRange(dayKey, index, step);
+    if (info.mode === "move") {
+      updateMoving({ start: cell.start, end: new Date(cell.start.getTime() + info.durationMs) });
+    } else {
+      const shortest = shiftRange({ start: base.start, end: base.start }, { minutes: step }).start;
+      updateMoving({ start: base.start, end: cell.end < shortest ? shortest : cell.end });
+    }
   };
 
   // Keyboard move mode, as in ADR 0003. The arrows move, Shift and the arrows resize, Enter confirms, Escape cancels.
@@ -218,14 +325,15 @@ function DatedWeekTable<TData extends CalendarData>(
     switch (event.key) {
       case "Escape":
         event.preventDefault();
-        setMoving(null);
+        cancelDrag();
+        updateMoving(null);
         announce(draftLabels?.cancelled ?? "");
         return true;
       case "Enter":
       case " ":
         event.preventDefault();
         if (commitDraft(moving)) {
-          setMoving(null);
+          updateMoving(null);
         }
         return true;
       case "ArrowUp":
@@ -249,7 +357,7 @@ function DatedWeekTable<TData extends CalendarData>(
 
   const handleActivate = (dayKey: string, index: number) => {
     if (canMove && draftEvent && segmentsAt(dayKey, index).some((segment) => segment.event.id === draftId)) {
-      setMoving({ start: draftEvent.start, end: draftEvent.end });
+      updateMoving({ start: draftEvent.start, end: draftEvent.end });
       announce(draftLabels?.grabbed ?? "");
       return;
     }
@@ -319,7 +427,7 @@ function DatedWeekTable<TData extends CalendarData>(
   );
 
   return (
-    <DatedWeekRoot className={className} id={id}>
+    <DatedWeekRoot className={className} id={id} data-dragging={dragMode ?? undefined}>
       {alternative && <SkipLink href={`#${alternative.id}`}>{alternative.label}</SkipLink>}
       <SkipLink href={`#${listId}`}>{labels.skipToList}</SkipLink>
       <Toolbar role="toolbar" aria-label={labels.toolbar}>
@@ -372,7 +480,8 @@ function DatedWeekTable<TData extends CalendarData>(
           onBlur={(event) => {
             // Moving between cells also blurs the old one. Only leaving the grid cancels a move.
             if (!event.currentTarget.contains(event.relatedTarget)) {
-              setMoving(null);
+              cancelDrag();
+              updateMoving(null);
             }
           }}
         >
@@ -432,16 +541,20 @@ function DatedWeekTable<TData extends CalendarData>(
                       key={dayKey}
                       role="gridcell"
                       {...grid.cellBehaviour(dayKey, row.index)}
+                      onPointerEnter={() => dragOverCell(dayKey, row.index)}
                       aria-label={`${longDay.format(keyToDate(dayKey))}, ${formatRange(begin, end)}, ${state}`}
                       aria-disabled={isOpen ? undefined : true}
                       aria-describedby={isDraft ? hintId : undefined}
                       data-availability={isOpen ? "open" : "closed"}
                       data-hour-start={row.beginMinutes % 60 === 0 ? "" : undefined}
+                      data-run-start={begin === row.beginMinutes ? "" : undefined}
+                      data-run-end={end === row.endMinutes ? "" : undefined}
                     >
                       {segments.map((segment) => {
                         const extra = getEventProps?.(segment.event);
                         const startsHere = segment.beginMinutes >= row.beginMinutes;
                         const endsHere = segment.endMinutes <= row.endMinutes;
+                        const isDraggableDraft = canMove && segment.event.id === draftId;
                         return (
                           <EventStripe
                             key={segment.event.id}
@@ -454,11 +567,31 @@ function DatedWeekTable<TData extends CalendarData>(
                             data-moving={moving && segment.event.id === draftId ? "" : undefined}
                             data-segment-start={startsHere ? "" : undefined}
                             data-segment-end={endsHere ? "" : undefined}
+                            data-testid={isDraggableDraft ? "dated-week-calendar__draft" : undefined}
+                            onPointerDown={isDraggableDraft ? beginDrag("move") : undefined}
+                            // Stops the browser's native text-selection drag from fighting the move gesture.
+                            onMouseDown={isDraggableDraft ? (event) => event.preventDefault() : undefined}
                           >
                             {startsHere ? segment.event.title : null}
+                            {isDraggableDraft && endsHere && (
+                              <ResizeHandle
+                                data-testid="dated-week-calendar__resize-handle"
+                                onPointerDown={beginDrag("resize")}
+                                onMouseDown={(event) => event.preventDefault()}
+                              />
+                            )}
                           </EventStripe>
                         );
                       })}
+                      {showNowLine && row.index === nowRowIndex && (
+                        <NowLine
+                          aria-hidden
+                          data-testid="dated-week-calendar__now-line"
+                          style={{ top: `${nowOffsetPercent}%` }}
+                        >
+                          {dayKey === dayKeys[0] && <NowDot data-testid="dated-week-calendar__now-dot" />}
+                        </NowLine>
+                      )}
                     </td>
                   );
                 })}

@@ -376,6 +376,22 @@ export function ReservationTimePicker({
     longer: t("reservationCalendar:draft.longer"),
   };
 
+  const labels = {
+    toolbar: t("reservationCalendar:toolbar"),
+    previous: t("reservationCalendar:showPrevious", { view: viewName }),
+    next: t("reservationCalendar:showNext", { view: viewName }),
+    today: t("common:today"),
+    day: t("common:day"),
+    week: t("common:week"),
+    list: t("reservationCalendar:list"),
+    skipToList: t("reservationCalendar:skipToList"),
+    emptyList: t("reservationCalendar:emptyList"),
+    free: t("reservationCalendar:free"),
+    closed: t("reservationCalendar:closed"),
+    opensInNewTab: t("reservationCalendar:opensInNewTab"),
+    draft: draftLabels,
+  };
+
   return (
     <>
       <DatedWeekCalendar<PickerData>
@@ -396,21 +412,7 @@ export function ReservationTimePicker({
         getEventProps={({ data: { source } }) =>
           eventStyleGetter(source as CalendarEvent<ReservationNode>, ownReservationPks, !isReservationQuotaReached)
         }
-        labels={{
-          toolbar: t("reservationCalendar:toolbar"),
-          previous: t("reservationCalendar:showPrevious", { view: viewName }),
-          next: t("reservationCalendar:showNext", { view: viewName }),
-          today: t("common:today"),
-          day: t("common:day"),
-          week: t("common:week"),
-          list: t("reservationCalendar:list"),
-          skipToList: t("reservationCalendar:skipToList"),
-          emptyList: t("reservationCalendar:emptyList"),
-          free: t("reservationCalendar:free"),
-          closed: t("reservationCalendar:closed"),
-          opensInNewTab: t("reservationCalendar:opensInNewTab"),
-          draft: draftLabels,
-        }}
+        labels={labels}
       />
       <CalendarFooter id={CONTROLS_ID} tabIndex={-1} aria-live="polite" aria-expanded={areControlsVisible}>
         <ReservationCalendarControls
