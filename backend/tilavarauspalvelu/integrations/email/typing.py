@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Self, TypedDict
 from django.utils.functional import classproperty
 from django.utils.translation import pgettext_lazy
 
+from tilavarauspalvelu.exceptions import EmailTypeNotFoundError
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from .rendering import render_html, render_text
@@ -456,7 +457,13 @@ class EmailType(_EmailTypeOptions):
 
     @classmethod
     def get(cls, value: str, /) -> EmailTemplateType:
-        return getattr(cls, value.upper())
+        email_type_value = value.lower()
+        for option in cls.options:
+            if option.value == email_type_value:
+                return option
+
+        msg = f"Email type '{value}' does not exist."
+        raise EmailTypeNotFoundError(msg)
 
     @classmethod
     def choices(cls) -> list:
