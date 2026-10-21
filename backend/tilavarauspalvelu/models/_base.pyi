@@ -210,7 +210,6 @@ class OneToManyRelatedManager(ModelManager[_TModel, _TQuerySet]):
 class ManyToManyRelatedManager(ModelManager[_TModel, _TQuerySet]):
     through: type[Model]
 
-    # Unlike `objects`, related managers are read from model instances.
     def __get__(self, instance: Any, owner: Any = None) -> Self: ...
     def add(
         self,
