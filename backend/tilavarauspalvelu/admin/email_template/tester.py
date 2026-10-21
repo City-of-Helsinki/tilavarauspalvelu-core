@@ -70,7 +70,7 @@ def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpRespon
     try:
         email_template_type = EmailType.get(email_type)
     except EmailTypeNotFoundError:
-        return HttpResponse(f"Invalid email type: {email_type}", HTTP_400_BAD_REQUEST)
+        return HttpResponse(f"Invalid email type: {email_type}", status=HTTP_400_BAD_REQUEST)
 
     reservation_unit_pk: str | None = request.GET.get("reservation_unit", None)
 
