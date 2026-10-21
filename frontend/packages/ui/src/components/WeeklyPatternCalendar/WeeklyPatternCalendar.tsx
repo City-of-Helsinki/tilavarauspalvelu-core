@@ -10,7 +10,8 @@ import type { ForwardedRef, ReactElement, Ref } from "react";
 import { WEEKDAYS_SORTED } from "@ui/modules/const";
 import { formatTimeRange, minutesToHoursString } from "@ui/modules/date-utils";
 import type { Weekday } from "../../../gql/gql-types";
-import { LiveRegion, SkipLink, WeeklyPatternRoot } from "./styles";
+import { LiveRegion, SkipLink } from "../CalendarGrid/styles";
+import { WeeklyPatternRoot } from "./styles";
 import type { CalendarData, WeeklyPatternCalendarProps, WeeklyPatternCellInfo, WeeklyPatternHandle } from "./types";
 import { useWeeklyPatternCalendar } from "./useWeeklyPatternCalendar";
 

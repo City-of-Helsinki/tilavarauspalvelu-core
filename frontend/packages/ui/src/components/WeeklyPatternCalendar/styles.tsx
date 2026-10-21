@@ -2,22 +2,11 @@ import React from "react";
 import styled, { css } from "styled-components";
 import { unavailableBackgroundSVG } from "@ui/components/calendar/utils";
 import { fontBold } from "@ui/styled";
+import { gridTableStyles } from "../CalendarGrid/styles";
 import type { CellAppearance } from "./types";
 
 export type LegendState = CellAppearance | "open" | "closed";
 export type LegendItem = { state: LegendState; label: string; current?: boolean };
-
-export const visuallyHidden = css`
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
-`;
 
 const arrow = css`
   content: "";
@@ -108,39 +97,15 @@ const eventBackground = (appearance: CellAppearance) => css`
   }
 `;
 
-export const SkipLink = styled.a`
-  ${visuallyHidden};
-
-  &:focus {
-    position: static;
-    width: auto;
-    height: auto;
-    margin: 0 0 var(--spacing-xs);
-    overflow: visible;
-    clip-path: none;
-    white-space: normal;
-  }
-`;
-
-export const LiveRegion = styled.div`
-  ${visuallyHidden};
-`;
-
 export const WeeklyPatternRoot = styled.div`
   --border-color: var(--color-black-50);
+  ${gridTableStyles};
 
   position: relative;
   overflow-x: auto;
   height: 500px;
   table {
-    border-collapse: separate;
-    border-spacing: 0;
-
-    /* fixed layout + an explicit colgroup keeps every weekday column the same width,
-       regardless of how long its header text is or how row spans fall in the time gutter. */
-    table-layout: fixed;
-    width: 100%;
-
+    /* The shared table has fixed layout and an explicit colgroup, which keeps every weekday column the same width. */
     /* Keeps every day column at least as wide as the original per-cell min-width.
        The container's overflow-x: auto scrolls instead of squeezing columns too thin. */
     min-width: calc(30px + 7 * 110px);
@@ -148,24 +113,14 @@ export const WeeklyPatternRoot = styled.div`
     touch-action: manipulation;
 
     --step-height: 12px;
-    --event-gap: 4px;
-  }
-
-  colgroup col:first-child {
     /* Just wide enough for a time label like "14". The other columns split the rest evenly. */
-    width: 30px;
+    --time-column-width: 30px;
+    --event-gap: 4px;
   }
 
   thead th,
   thead td {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background: var(--color-white);
-    ${fontBold};
     font-size: var(--fontsize-body-m);
-    text-align: center;
-    padding: var(--spacing-2-xs) var(--spacing-xs);
     border-bottom: 1px solid var(--border-color);
   }
 
@@ -183,13 +138,8 @@ export const WeeklyPatternRoot = styled.div`
   }
 
   tbody td {
-    position: relative;
-    box-sizing: border-box;
     padding: 0 var(--spacing-2-xs) 0 0;
-    border-inline: 1px solid var(--border-color);
-    background: var(--color-white);
     width: calc((100% - 30px) / 7);
-    height: var(--step-height);
     cursor: pointer;
     text-align: right;
     font-size: 10px;
@@ -208,9 +158,6 @@ export const WeeklyPatternRoot = styled.div`
     }
 
     &[data-availability="closed"] {
-      background-image: ${unavailableBackgroundSVG};
-      background-size: auto var(--step-height);
-      background-color: var(--color-black-5);
       background-repeat: repeat;
       cursor: default;
     }
@@ -244,12 +191,6 @@ export const WeeklyPatternRoot = styled.div`
 
     &[data-appearance="secondary"][data-run-start] {
       ${secondaryIndicator};
-    }
-
-    &:focus-visible {
-      outline: 3px solid var(--color-focus-outline);
-      outline-offset: -3px;
-      z-index: 1;
     }
   }
 
