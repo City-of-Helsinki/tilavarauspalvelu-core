@@ -552,6 +552,7 @@ class Common(Environment):
 
     # --- Sentry -----------------------------------------------------------------------------------------------------
 
+    SENTRY_ENABLED: bool = values.BooleanValue(default=False)
     SENTRY_DSN: str = values.StringValue(default="")
     SENTRY_ENVIRONMENT: str = values.StringValue(default="local")
     SENTRY_PROFILE_SESSION_SAMPLE_RATE: float | None = values.FloatValue(default=None)
@@ -665,7 +666,7 @@ class Common(Environment):
 
     @classmethod
     def post_setup(cls) -> None:
-        if not cls.SENTRY_DSN:
+        if not cls.SENTRY_ENABLED or not cls.SENTRY_DSN:
             return
 
         from config.sentry import init_sentry
@@ -1063,6 +1064,10 @@ class Platta(Common, use_environ=True):
     # --- Email settings ---------------------------------------------------------------------------------------------
 
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+    # --- Sentry -----------------------------------------------------------------------------------------------------
+
+    SENTRY_ENABLED: bool = values.BooleanValue(default=True)
 
     # --- Redis settings ---------------------------------------------------------------------------------------------
 
