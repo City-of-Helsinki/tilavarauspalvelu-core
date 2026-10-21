@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.utils.translation import gettext
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_preview_links, get_tester_link
+from tilavarauspalvelu.exceptions import EmailTypeNotFoundError
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.typing import EmailType
 
@@ -47,7 +48,7 @@ def email_templates_admin_list_view(request: WSGIRequest, **kwargs: Any) -> Tabl
 def email_type_admin_view(request: WSGIRequest, email_type: str) -> HttpResponse:
     try:
         email_template_type = EmailType.get(email_type)
-    except ValueError:
+    except EmailTypeNotFoundError:
         return HttpResponse("Invalid email type")
 
     as_html = request.GET.get("text", "false").lower() not in {"true", "1", "t"}
