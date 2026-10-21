@@ -12,12 +12,24 @@ type Options = {
   rowsPerHour: number;
   /** Called for Enter and Space on a cell. */
   onActivate?: (dayKey: string, index: number) => void;
+  /** Called for a click or tap on a cell. */
+  onCellClick?: (dayKey: string, index: number) => void;
+  /** Sees every key first. Return true when it handled the key, so the grid doesn't. */
+  onKeyOverride?: (event: KeyboardEvent<HTMLTableCellElement>) => boolean;
 };
 
 const addressKey = (dayKey: string, index: number) => `${dayKey}:${index}`;
 
 // Roving tabindex and arrow key navigation for the grid, as in the ARIA Authoring Practices grid pattern.
-export function useDatedWeekCalendar({ dayKeys, firstIndex, endIndex, rowsPerHour, onActivate }: Options) {
+export function useDatedWeekCalendar({
+  dayKeys,
+  firstIndex,
+  endIndex,
+  rowsPerHour,
+  onActivate,
+  onCellClick,
+  onKeyOverride,
+}: Options) {
   const [active, setActive] = useState<CellAddress | null>(null);
   const cellElements = useRef(new Map<string, HTMLTableCellElement>());
 
@@ -52,6 +64,9 @@ export function useDatedWeekCalendar({ dayKeys, firstIndex, endIndex, rowsPerHou
   const clampRow = (row: number) => Math.min(Math.max(row, firstIndex), endIndex - 1);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTableCellElement>, dayKey: string, index: number) => {
+    if (onKeyOverride?.(event)) {
+      return;
+    }
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
       return;
     }
@@ -109,7 +124,8 @@ export function useDatedWeekCalendar({ dayKeys, firstIndex, endIndex, rowsPerHou
     tabIndex: activeAddress?.dayKey === dayKey && activeAddress.index === index ? 0 : -1,
     onFocus: () => setActive({ dayKey, index }),
     onKeyDown: (event: KeyboardEvent<HTMLTableCellElement>) => handleKeyDown(event, dayKey, index),
+    onClick: () => onCellClick?.(dayKey, index),
   });
 
-  return { cellBehaviour, focus };
+  return { cellBehaviour, focus, focusCell };
 }

@@ -1,8 +1,13 @@
 import styled from "styled-components";
 import { unavailableBackgroundSVG } from "@ui/components/calendar/utils";
-import { fontMedium } from "@ui/styled";
+import { fontBold, fontMedium } from "@ui/styled";
+import { visuallyHidden } from "../WeeklyPatternCalendar/styles";
 
-export { SkipLink } from "../WeeklyPatternCalendar/styles";
+export { LiveRegion, SkipLink } from "../WeeklyPatternCalendar/styles";
+
+export const HiddenText = styled.span`
+  ${visuallyHidden};
+`;
 
 export const DatedWeekRoot = styled.div`
   --border-color: var(--color-black-50);
@@ -81,7 +86,7 @@ export const GridScroller = styled.div`
     padding: var(--spacing-2-xs) var(--spacing-xs);
     border-bottom: 1px solid var(--border-color);
     background: var(--color-white);
-    ${fontMedium};
+    ${fontBold};
     text-align: center;
   }
 
@@ -96,7 +101,7 @@ export const GridScroller = styled.div`
 
   tbody th {
     padding: 0 var(--spacing-xs);
-    font-weight: normal;
+    ${fontBold};
     text-align: center;
     white-space: nowrap;
   }
