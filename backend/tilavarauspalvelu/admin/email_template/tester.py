@@ -64,7 +64,7 @@ def email_tester_admin_redirect_view(request: WSGIRequest, email_type: str | Non
 
 def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpResponse:
     if request.user.is_anonymous:
-        return HttpResponse("Login required", HTTP_401_UNAUTHORIZED)
+        return HttpResponse("Login required", status=HTTP_401_UNAUTHORIZED)
 
     new_email_type = request.GET.get("email_type", None)
     if new_email_type is not None:
@@ -73,7 +73,7 @@ def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpRespon
     try:
         email_template_type = EmailType.get(email_type)
     except EmailTypeNotFoundError:
-        return HttpResponse(f"Invalid email type: {email_type}", HTTP_400_BAD_REQUEST)
+        return HttpResponse(f"Invalid email type: {email_type}", status=HTTP_400_BAD_REQUEST)
 
     reservation_unit_pk: str | None = request.GET.get("reservation_unit", None)
 
