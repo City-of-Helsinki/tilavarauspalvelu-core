@@ -40,7 +40,6 @@ __all__ = [
     "AnyUser",
     "EmailContext",
     "ErrorList",
-    "GQLInfo",
     "HTTPMethod",
     "Lang",
     "M2MAction",
@@ -50,7 +49,6 @@ __all__ = [
     "TimeSlotDB",
     "TimeSpan",
     "UserAnonymizationInfo",
-    "WSGIRequest",
     "error_codes",
     "permission",
 ]
