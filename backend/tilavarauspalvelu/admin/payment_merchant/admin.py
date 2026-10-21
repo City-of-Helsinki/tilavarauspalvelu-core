@@ -121,28 +121,35 @@ class PaymentMerchantForm(forms.ModelForm):
         instance: PaymentMerchant | None = self.instance
 
         if instance:
-            merchant_data = {
-                "name": self.cleaned_data.get("name", ""),
-                "street": self.cleaned_data.get("street", ""),
-                "zip": self.cleaned_data.get("zip", ""),
-                "city": self.cleaned_data.get("city", ""),
-                "email": self.cleaned_data.get("email", ""),
-                "phone": self.cleaned_data.get("phone", ""),
-                "url": self.cleaned_data.get("url", ""),
-                "tos_url": self.cleaned_data.get("tos_url", ""),
-                "business_id": self.cleaned_data.get("business_id", ""),
-                "shop_id": self.cleaned_data.get("shop_id", ""),
-            }
-
             if instance.id is None:
                 create_params = CreateMerchantParams(
-                    **merchant_data,
+                    name=self.cleaned_data.get("name", ""),
+                    street=self.cleaned_data.get("street", ""),
+                    zip=self.cleaned_data.get("zip", ""),
+                    city=self.cleaned_data.get("city", ""),
+                    email=self.cleaned_data.get("email", ""),
+                    phone=self.cleaned_data.get("phone", ""),
+                    url=self.cleaned_data.get("url", ""),
+                    tos_url=self.cleaned_data.get("tos_url", ""),
+                    business_id=self.cleaned_data.get("business_id", ""),
+                    shop_id=self.cleaned_data.get("shop_id", ""),
                     paytrail_merchant_id=self.cleaned_data.get("shop_id", ""),
                 )
                 created_merchant = VerkkokauppaAPIClient.create_merchant(params=create_params)
                 instance.id = created_merchant.id
             else:
-                update_params = UpdateMerchantParams(**merchant_data)
+                update_params = UpdateMerchantParams(
+                    name=self.cleaned_data.get("name", ""),
+                    street=self.cleaned_data.get("street", ""),
+                    zip=self.cleaned_data.get("zip", ""),
+                    city=self.cleaned_data.get("city", ""),
+                    email=self.cleaned_data.get("email", ""),
+                    phone=self.cleaned_data.get("phone", ""),
+                    url=self.cleaned_data.get("url", ""),
+                    tos_url=self.cleaned_data.get("tos_url", ""),
+                    business_id=self.cleaned_data.get("business_id", ""),
+                    shop_id=self.cleaned_data.get("shop_id", ""),
+                )
                 VerkkokauppaAPIClient.update_merchant(merchant_uuid=instance.id, params=update_params)
 
         return super().save(commit=commit)
