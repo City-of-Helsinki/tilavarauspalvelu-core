@@ -15,6 +15,7 @@ import React, {
   useState,
 } from "react";
 import type { CSSProperties, ForwardedRef, KeyboardEvent, PointerEvent, ReactElement, Ref } from "react";
+import { HiddenText, LiveRegion, SkipLink } from "../CalendarGrid/styles";
 import { MINUTES_PER_DAY, assertValidStep } from "../WeeklyPatternCalendar/engine";
 import type { CalendarData } from "../WeeklyPatternCalendar/types";
 import {
@@ -36,14 +37,11 @@ import {
   DatedWeekRoot,
   EventStripe,
   GridScroller,
-  HiddenText,
   ListAlternative,
-  LiveRegion,
   NowDot,
   NowLine,
   RangeTitle,
   ResizeHandle,
-  SkipLink,
   Toolbar,
   ToolbarButton,
   ToolbarGroup,
