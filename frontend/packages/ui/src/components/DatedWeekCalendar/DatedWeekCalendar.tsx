@@ -59,6 +59,25 @@ const formatRange = (beginMinutes: number, endMinutes: number) =>
 // A yyyy-MM-dd key as a UTC date, so formatting it with timeZone "UTC" never shifts the day.
 const keyToDate = (dayKey: string) => new Date(`${dayKey}T00:00:00Z`);
 
+// A single cell only has room for the title's first word, not the duration after it. A taller draft puts its
+// duration, the trailing "(…)", on a line of its own.
+function stripeTitle(title: string, fitsOneCell: boolean, isDraft: boolean) {
+  if (fitsOneCell) {
+    return title.split(" ")[0];
+  }
+  const durationAt = title.lastIndexOf(" (");
+  if (!isDraft || durationAt === -1) {
+    return title;
+  }
+  return (
+    <>
+      {title.slice(0, durationAt)}
+      <br />
+      {title.slice(durationAt + 1)}
+    </>
+  );
+}
+
 function DatedWeekTable<TData extends CalendarData>(
   props: DatedWeekCalendarProps<TData>,
   ref: ForwardedRef<DatedWeekHandle>
@@ -572,7 +591,9 @@ function DatedWeekTable<TData extends CalendarData>(
                             // Stops the browser's native text-selection drag from fighting the move gesture.
                             onMouseDown={isDraggableDraft ? (event) => event.preventDefault() : undefined}
                           >
-                            {startsHere ? segment.event.title : null}
+                            {startsHere
+                              ? stripeTitle(segment.event.title, endsHere, segment.event.id === draftId)
+                              : null}
                             {isDraggableDraft && endsHere && (
                               <ResizeHandle
                                 data-testid="dated-week-calendar__resize-handle"

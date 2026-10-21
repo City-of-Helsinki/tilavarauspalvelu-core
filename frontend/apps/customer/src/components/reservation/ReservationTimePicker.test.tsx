@@ -3,7 +3,8 @@ import { useForm, useWatch } from "react-hook-form";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { formatDate, formatTime } from "ui/src/modules/date-utils";
+import type { TFunction } from "next-i18next/pages";
+import { dateToMinutes, formatDate, formatDuration, formatTime, formatTimeRange } from "ui/src/modules/date-utils";
 import type { BlockingReservationFieldsFragment, ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
 import { createMockReservableTimes, createMockReservationUnit } from "@test/reservation-unit.mocks";
@@ -69,7 +70,7 @@ vi.mock("../calendar/ReservationCalendarControls", () => ({
 
 type MockCalendarProps = {
   view?: string;
-  events?: Array<{ id: string }>;
+  events?: Array<{ id: string; title: string }>;
   draftId?: string;
   isOpen?: (range: { start: Date; end: Date }) => boolean;
   onSelectSlot?: (range: { start: Date; end: Date }) => string | null;
@@ -93,6 +94,7 @@ vi.mock("@ui/components/DatedWeekCalendar/DatedWeekCalendar", () => ({
         data-can-move={String(props.onMoveDraft != null)}
         data-alternative={props.alternative?.id}
         data-event-ids={props.events?.map((e) => e.id).join(",")}
+        data-draft-title={props.events?.find((e) => e.id === props.draftId)?.title}
       >
         <button
           type="button"
@@ -279,6 +281,26 @@ describe("ReservationTimePicker", () => {
     render(<Wrapper />);
     expect(screen.getByTestId("mock-calendar")).toHaveAttribute("data-draft-id", "draft");
     expect(screen.getByTestId("mock-calendar").dataset.eventIds).toContain("draft");
+  });
+
+  it("labels the draft with its time range, always followed by the duration", () => {
+    mockConvertFormToFocustimeSlot.mockReturnValue({
+      isReservable: true,
+      start: new Date("2024-01-01T09:00:00"),
+      end: new Date("2024-01-01T11:30:00"),
+      durationMinutes: 150,
+    });
+    render(<Wrapper />);
+
+    // The test's useTranslation mock echoes the key and its arguments instead of real text.
+    const t = ((str: string, args?: unknown) => `${str}${args ? " " + JSON.stringify(args) : ""}`) as TFunction;
+    const timeRange = formatTimeRange(
+      dateToMinutes(new Date("2024-01-01T09:00:00")),
+      dateToMinutes(new Date("2024-01-01T11:30:00")),
+      true
+    );
+    const expected = `${timeRange} (${formatDuration(t, { minutes: 150 })})`;
+    expect(screen.getByTestId("mock-calendar")).toHaveAttribute("data-draft-title", expected);
   });
 
   it("leads to the reservation form from a skip link", () => {

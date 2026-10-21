@@ -126,7 +126,7 @@ export const GridScroller = styled.div`
     font-size: var(--fontsize-body-s);
     line-height: 1.1;
 
-    &[data-hour-start] {
+    &[data-hour-start]:not(:has([data-draft])) {
       border-top: 1px solid var(--border-color);
     }
 
@@ -156,7 +156,7 @@ export const EventStripe = styled.span`
   left: calc(var(--lane) / var(--lanes) * 100% + var(--lane-gap));
   width: calc(100% / var(--lanes) - 2 * var(--lane-gap));
   box-sizing: border-box;
-  overflow: hidden;
+  font-size: var(--fontsize-body-s);
   padding: 2px var(--spacing-3-xs, 2px) 0;
   border-inline: 2px dashed var(--color-bus);
   background: var(--color-bus-light, var(--color-black-10));
@@ -168,6 +168,7 @@ export const EventStripe = styled.span`
     border-top-left-radius: var(--spacing-2-xs);
     border-top-right-radius: var(--spacing-2-xs);
     border-top: 1px dashed var(--color-bus);
+    z-index: 2;
   }
 
   &[data-segment-end] {
