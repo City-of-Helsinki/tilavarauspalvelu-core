@@ -14,6 +14,9 @@ pytestmark = [
 NEVER_ANY_OPENING_HOURS_NOTE = "OriginHaukiResources with this specific hash never have any opening hours."
 
 
+# ── Opening hours hash help text ──
+
+
 def test_origin_hauki_resource_admin__never_any_opening_hours_note__shown_once(api_client):
     user = UserFactory.create_superuser()
     api_client.force_login(user)
