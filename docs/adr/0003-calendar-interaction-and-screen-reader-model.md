@@ -35,9 +35,20 @@ each variant only has the props that mean something in it.
   chooses one cell.
 - Every change is announced in the live region. The consumer gives the words for chosen and cleared.
 
+## Dated Week events
+
+The Dated Week uses the same grid model. Only the slot cells are gridcells. An event is drawn as decorative stripes inside the cells it covers, so there is one focus model and no focusable overlay.
+
+- A cell is named "{date}, {time range}, {state}". A cell with one event that begins in it is named after the whole event. Other cells name only themselves.
+- Overlapping events are drawn side by side. The label of a cell lists every event in it, so nothing needs to be opened to read it.
+- The consumer gives the translated description of an event with `getEventLabel`, including whether it is selected. A visual outline alone is not enough.
+- Events are cut at midnight into one segment per day. Rows are wall-clock minutes in Europe/Helsinki. The repeated hour on the day the clocks go back is not given extra rows.
+- The Dated Week has its own toolbar, with a slot for extra buttons. The shown range is announced when it changes. The equal alternative is a text list of the events in the shown range, with a skip link to it.
+- Arrow keys stop at the first and last shown day. They do not change the week.
+
 ## Not built yet
 
-These belong to the Dated Week.
+These belong to the Dated Week. The read-only Dated Week is built. Selecting slots and the Draft Reservation are not.
 
 - The move mode for a Draft Reservation. Enter grabs it, arrows move it, Shift and arrows resize it, Enter confirms and Escape cancels.
 - On touch, tap only for painting. Explicit Move and Resize buttons for the Draft Reservation. Long press clashes with VoiceOver and TalkBack gestures.
