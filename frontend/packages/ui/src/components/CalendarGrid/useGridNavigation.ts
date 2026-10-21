@@ -10,6 +10,12 @@ type Options<TColumn extends string> = {
   firstIndex: number;
   endIndex: number;
   rowsPerHour: number;
+  /**
+   * Which way time runs. With "vertical" (the default) rows are times and the arrows Up and Down move through time.
+   * With "horizontal" the cells of a column are laid out along a row, so Left and Right move through time and
+   * Up and Down move between the columns. Page, Home and End always move through time.
+   */
+  timeAxis?: "vertical" | "horizontal";
   /** The cell that holds the tab stop before anything has been focused. Defaults to the first shown cell. */
   defaultActive?: () => GridAddress<TColumn> | null;
 };
@@ -25,6 +31,7 @@ export function useGridNavigation<TColumn extends string>({
   firstIndex,
   endIndex,
   rowsPerHour,
+  timeAxis = "vertical",
   defaultActive,
 }: Options<TColumn>) {
   const [active, setActive] = useState<GridAddress<TColumn> | null>(null);
@@ -62,15 +69,20 @@ export function useGridNavigation<TColumn extends string>({
   const targetFor = (key: string, column: TColumn, index: number): GridAddress<TColumn> | null => {
     const sideways = (offset: number) =>
       columns[Math.min(Math.max(columns.indexOf(column) + offset, 0), columns.length - 1)] ?? column;
+    const earlier = { column, index: clampRow(index - 1) };
+    const later = { column, index: clampRow(index + 1) };
+    const before = { column: sideways(-1), index };
+    const after = { column: sideways(1), index };
+    const vertical = timeAxis === "vertical";
     switch (key) {
       case "ArrowDown":
-        return { column, index: clampRow(index + 1) };
+        return vertical ? later : after;
       case "ArrowUp":
-        return { column, index: clampRow(index - 1) };
+        return vertical ? earlier : before;
       case "ArrowRight":
-        return { column: sideways(1), index };
+        return vertical ? after : later;
       case "ArrowLeft":
-        return { column: sideways(-1), index };
+        return vertical ? before : earlier;
       case "PageDown":
         return { column, index: clampRow(index + rowsPerHour) };
       case "PageUp":
