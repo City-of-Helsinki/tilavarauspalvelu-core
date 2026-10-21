@@ -4,7 +4,7 @@
 // the row, cell and header roles are spelled out.
 // oxlint-disable jsx-a11y/no-noninteractive-element-to-interactive-role, jsx-a11y/no-redundant-roles, jsx-a11y/no-interactive-element-to-noninteractive-role
 
-import React, { forwardRef, useId, useImperativeHandle, useMemo } from "react";
+import React, { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from "react";
 import type { CSSProperties, ForwardedRef, ReactElement, Ref } from "react";
 import { assertValidStep } from "../WeeklyPatternCalendar/engine";
 import type { CalendarData } from "../WeeklyPatternCalendar/types";
@@ -58,6 +58,8 @@ function DatedWeekTable<TData extends CalendarData>(
     labels,
     getEventLabel,
     getEventProps,
+    getEventHref,
+    isLoading,
     toolbarExtra,
     className,
     id,
@@ -79,7 +81,43 @@ function DatedWeekTable<TData extends CalendarData>(
   const firstIndex = hours.beginMinutes / step;
   const endIndex = hours.endMinutes / step;
 
-  const grid = useDatedWeekCalendar({ dayKeys, firstIndex, endIndex, rowsPerHour: 60 / step });
+  const [listOpen, setListOpen] = useState(false);
+  const listRef = useRef<HTMLDetailsElement>(null);
+  const pendingFocus = useRef<string | null>(null);
+
+  // Enter on a cell opens its only linked event. With several, they are reached as links in the text list.
+  const handleActivate = (dayKey: string, index: number) => {
+    const segments = segmentsInCell(segmentsByDay.get(dayKey) ?? [], index * step, (index + 1) * step);
+    const linked = segments.filter((segment) => getEventHref?.(segment.event) != null);
+    const [first] = linked;
+    if (!first) {
+      return;
+    }
+    const href = getEventHref?.(first.event);
+    if (linked.length === 1 && href != null) {
+      window.open(href, "_blank", "noopener,noreferrer");
+      return;
+    }
+    pendingFocus.current = `${first.event.id}:${dayKey}`;
+    setListOpen(true);
+  };
+
+  // The list is not focusable while closed, so focus moves once it has opened.
+  useEffect(() => {
+    const key = pendingFocus.current;
+    if (listOpen && key != null) {
+      pendingFocus.current = null;
+      listRef.current?.querySelector<HTMLElement>(`[data-list-key="${CSS.escape(key)}"]`)?.focus();
+    }
+  });
+
+  const grid = useDatedWeekCalendar({
+    dayKeys,
+    firstIndex,
+    endIndex,
+    rowsPerHour: 60 / step,
+    onActivate: handleActivate,
+  });
   useImperativeHandle(ref, () => ({ focus: grid.focus }), [grid.focus]);
 
   const longDay = useMemo(
@@ -110,6 +148,7 @@ function DatedWeekTable<TData extends CalendarData>(
       .sort((a, b) => a.beginMinutes - b.beginMinutes)
       .map((segment) => ({
         key: `${segment.event.id}:${segment.dayKey}`,
+        href: getEventHref?.(segment.event),
         text: `${longDay.format(keyToDate(segment.dayKey))}, ${formatRange(segment.beginMinutes, segment.endMinutes)}: ${getEventLabel(segment.event)}`,
       }))
   );
@@ -143,7 +182,7 @@ function DatedWeekTable<TData extends CalendarData>(
         {toolbarExtra}
       </Toolbar>
       <GridScroller style={{ "--days": days.length } as CSSProperties}>
-        <table role="grid" aria-readonly="true" aria-label={ariaLabel}>
+        <table role="grid" aria-readonly="true" aria-busy={isLoading || undefined} aria-label={ariaLabel}>
           <colgroup>
             <col />
             {dayKeys.map((dayKey) => (
@@ -186,9 +225,11 @@ function DatedWeekTable<TData extends CalendarData>(
                     only && only.beginMinutes >= row.beginMinutes
                       ? [only.beginMinutes, only.endMinutes]
                       : [row.beginMinutes, row.endMinutes];
+                  const opensTab = only != null && getEventHref?.(only.event) != null;
                   const state =
                     segments.length > 0
-                      ? segments.map((segment) => getEventLabel(segment.event)).join("; ")
+                      ? segments.map((segment) => getEventLabel(segment.event)).join("; ") +
+                        (opensTab ? `, ${labels.opensInNewTab}` : "")
                       : isOpen
                         ? labels.free
                         : labels.closed;
@@ -229,12 +270,26 @@ function DatedWeekTable<TData extends CalendarData>(
           </tbody>
         </table>
       </GridScroller>
-      <ListAlternative id={listId} tabIndex={-1}>
+      <ListAlternative
+        id={listId}
+        ref={listRef}
+        tabIndex={-1}
+        open={listOpen}
+        onToggle={(event) => setListOpen(event.currentTarget.open)}
+      >
         <summary>{labels.list}</summary>
         {listItems.length > 0 ? (
           <ul>
             {listItems.map((item) => (
-              <li key={item.key}>{item.text}</li>
+              <li key={item.key}>
+                {item.href != null ? (
+                  <a href={item.href} target="_blank" rel="noopener noreferrer" data-list-key={item.key}>
+                    {item.text}, {labels.opensInNewTab}
+                  </a>
+                ) : (
+                  item.text
+                )}
+              </li>
             ))}
           </ul>
         ) : (

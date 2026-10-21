@@ -28,6 +28,7 @@ const labels = {
   emptyList: "Nothing in this week",
   free: "free",
   closed: "closed",
+  opensInNewTab: "opens in a new tab",
 };
 
 function renderCalendar(overrides: Partial<DatedWeekCalendarProps<Data>> = {}) {
@@ -50,6 +51,14 @@ function renderCalendar(overrides: Partial<DatedWeekCalendarProps<Data>> = {}) {
 
 // Looked up by label because role queries recompute the accessible name of every cell, which is slow in a full grid.
 const cell = (name: RegExp) => screen.getByLabelText(name);
+
+function listElement(): HTMLDetailsElement {
+  const list = screen.getByText("Show as a list").closest("details");
+  if (!list) {
+    throw new Error("The list alternative is missing");
+  }
+  return list;
+}
 
 describe("DatedWeekCalendar", () => {
   test("is a read-only grid with a column header for each day of the week", () => {
@@ -180,6 +189,97 @@ describe("DatedWeekCalendar", () => {
         event("b", "Maintenance", "2026-10-21T10:00:00+03:00", "2026-10-21T10:30:00+03:00", "Blocked"),
       ],
     });
+    expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe("DatedWeekCalendar event links", () => {
+  const two = [
+    event("a", "Band practice", "2026-10-21T09:00:00+03:00", "2026-10-21T11:00:00+03:00"),
+    event("b", "Maintenance", "2026-10-21T10:00:00+03:00", "2026-10-21T10:30:00+03:00", "Blocked"),
+  ];
+  const getEventHref = (item: DatedEvent<Data>) => `/reservations/${item.id}`;
+
+  test("events with a link are links in the text list that say they open a new tab", () => {
+    renderCalendar({ getEventHref });
+    const link = screen.getByRole("link", { name: /Band practice/ });
+    expect(link).toHaveAttribute("href", "/reservations/a");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+    expect(link).toHaveAccessibleName(
+      "Wednesday 21 October, 09:00–11:00: Confirmed: Band practice, opens in a new tab"
+    );
+  });
+
+  test("events without a link stay plain text", () => {
+    renderCalendar({ getEventHref: (item) => (item.id === "a" ? "/reservations/a" : undefined), events: two });
+    expect(screen.getAllByRole("link", { name: /opens in a new tab/ })).toHaveLength(1);
+    expect(screen.getByText(/Blocked: Maintenance/, { selector: "li" })).toBeInTheDocument();
+  });
+
+  test("a cell with one linked event says it opens a new tab", () => {
+    renderCalendar({ getEventHref });
+    expect(
+      cell(/^Wednesday 21 October, 09:00–11:00, Confirmed: Band practice, opens in a new tab$/)
+    ).toBeInTheDocument();
+    expect(cell(/^Wednesday 21 October, 11:00–11:30, free$/)).toBeInTheDocument();
+  });
+
+  test("Enter and Space on a cell with one linked event open it in a new tab", async () => {
+    const open = vi.spyOn(window, "open").mockReturnValue(null);
+    const user = userEvent.setup();
+    renderCalendar({ getEventHref });
+    cell(/^Wednesday 21 October, 09:00–11:00/).focus();
+    await user.keyboard("{Enter}");
+    expect(open).toHaveBeenLastCalledWith("/reservations/a", "_blank", "noopener,noreferrer");
+    await user.keyboard(" ");
+    expect(open).toHaveBeenCalledTimes(2);
+    open.mockRestore();
+  });
+
+  test("Enter on a cell without a linked event does nothing", async () => {
+    const open = vi.spyOn(window, "open").mockReturnValue(null);
+    const user = userEvent.setup();
+    renderCalendar({ getEventHref });
+    cell(/^Wednesday 21 October, 11:00–11:30, free$/).focus();
+    await user.keyboard("{Enter}");
+    expect(open).not.toHaveBeenCalled();
+    open.mockRestore();
+  });
+
+  test("Enter on a cell with several linked events moves focus to the first of them in the list", async () => {
+    const open = vi.spyOn(window, "open").mockReturnValue(null);
+    const user = userEvent.setup();
+    renderCalendar({ getEventHref, events: two });
+    const list = listElement();
+    expect(list.open).toBe(false);
+
+    cell(/^Wednesday 21 October, 10:00–10:30/).focus();
+    await user.keyboard("{Enter}");
+
+    expect(open).not.toHaveBeenCalled();
+    expect(list.open).toBe(true);
+    expect(screen.getByRole("link", { name: /Band practice/ })).toHaveFocus();
+    open.mockRestore();
+  });
+
+  test("the list can still be opened and closed by hand", async () => {
+    const user = userEvent.setup();
+    renderCalendar({ getEventHref });
+    const list = listElement();
+    await user.click(screen.getByText("Show as a list"));
+    expect(list.open).toBe(true);
+    await user.click(screen.getByText("Show as a list"));
+    expect(list.open).toBe(false);
+  });
+
+  test("a loading calendar is marked busy", () => {
+    renderCalendar({ isLoading: true });
+    expect(screen.getByRole("grid")).toHaveAttribute("aria-busy", "true");
+  });
+
+  test("a calendar with links has no axe violations", async () => {
+    const { container } = renderCalendar({ getEventHref, events: two });
     expect(await axe(container)).toHaveNoViolations();
   });
 });
