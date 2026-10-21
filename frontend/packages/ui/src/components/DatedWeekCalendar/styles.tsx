@@ -151,7 +151,7 @@ export const EventStripe = styled.span`
   left: calc(var(--lane) / var(--lanes) * 100% + var(--lane-gap));
   width: calc(100% / var(--lanes) - 2 * var(--lane-gap));
   box-sizing: border-box;
-  overflow: hidden;
+  font-size: 12px;
   padding: 2px var(--spacing-3-xs, 2px) 0;
   border-inline: 2px dashed var(--color-bus);
   background: var(--color-bus-light, var(--color-black-10));
