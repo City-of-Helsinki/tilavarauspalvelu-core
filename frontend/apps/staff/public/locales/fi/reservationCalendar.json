@@ -1,8 +1,16 @@
 {
   "showCurrentDay": "Näytä tämä päivä",
-  "showPrevious": "Naytä edellinen {{view}}",
-  "showNext": "Naytä seuraava {{view}}",
+  "showPrevious": "Näytä edellinen {{view}}",
+  "showNext": "Näytä seuraava {{view}}",
   "showView": "Näytä {{view}}näkymä",
   "reserverInfo": "Varaajan tiedot",
-  "reservationInfo": "Varauksen tiedot"
+  "reservationInfo": "Varauksen tiedot",
+  "toolbar": "Kalenterin ohjaimet",
+  "list": "Näytä varaukset luettelona",
+  "skipToList": "Siirry varausluetteloon",
+  "emptyList": "Ei varauksia tällä aikavälillä.",
+  "free": "Vapaa",
+  "closed": "Suljettu",
+  "buffer": "Puskuriaika",
+  "selected": "valittu"
 }
