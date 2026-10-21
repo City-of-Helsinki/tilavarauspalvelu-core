@@ -104,15 +104,19 @@ export const WeeklyPatternRoot = styled.div`
   position: relative;
   overflow-x: auto;
   height: 500px;
+
+  /* 
+    The shared table has fixed layout and an explicit colgroup, which keeps every weekday column the same width.
+    Keeps every day column at least as wide as the original per-cell min-width.
+    The container's overflow-x: auto scrolls instead of squeezing columns too thin.
+  */
   table {
-    /* The shared table has fixed layout and an explicit colgroup, which keeps every weekday column the same width. */
-    /* Keeps every day column at least as wide as the original per-cell min-width.
-       The container's overflow-x: auto scrolls instead of squeezing columns too thin. */
     min-width: calc(30px + 7 * 110px);
     user-select: none;
     touch-action: manipulation;
 
     --step-height: 12px;
+
     /* Just wide enough for a time label like "14". The other columns split the rest evenly. */
     --time-column-width: 30px;
     --event-gap: 4px;
@@ -165,7 +169,7 @@ export const WeeklyPatternRoot = styled.div`
     &[data-appearance="primary"] {
       ${eventBackground("primary")};
       text-align: right;
-      border-top: 1px solid rgba(from var(--color-white) rgb, 0.1);
+      border-top: 1px solid rgb(var(--color-white), 0.1);
     }
 
     &[data-appearance="secondary"] {
