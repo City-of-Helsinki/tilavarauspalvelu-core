@@ -34,7 +34,7 @@ const StyledTable = styled(Table)<TableWrapperProps>`
       padding: var(--spacing-xs);
       position: sticky;
       top: 0;
-      box-shadow: 0 2px 2px -1px rgb(0, 0, 0, 0.4);
+      box-shadow: 0 2px 2px -1px rgb(0 0 0 / 0.4);
     }
     td {
       padding: var(--spacing-xs);
