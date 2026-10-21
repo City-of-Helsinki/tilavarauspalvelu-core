@@ -13,7 +13,7 @@ import { ReservationTimePicker } from "./ReservationTimePicker";
 const {
   mockGetBoundCheckedReservation,
   mockIsRangeReservable,
-  mockGetSlotPropGetter,
+  mockGetIsSlotReservable,
   mockConvertFormToFocustimeSlot,
   mockGetDurationOptions,
   mockGetNewReservation,
@@ -24,7 +24,7 @@ const {
 } = vi.hoisted(() => ({
   mockGetBoundCheckedReservation: vi.fn(),
   mockIsRangeReservable: vi.fn(),
-  mockGetSlotPropGetter: vi.fn(),
+  mockGetIsSlotReservable: vi.fn(),
   mockConvertFormToFocustimeSlot: vi.fn(),
   mockGetDurationOptions: vi.fn(),
   mockGetNewReservation: vi.fn(),
@@ -38,7 +38,7 @@ vi.mock("@/modules/reservable", async (importOriginal) => ({
   ...(await importOriginal()),
   getBoundCheckedReservation: (...args: unknown[]) => mockGetBoundCheckedReservation(...args),
   isRangeReservable: (...args: unknown[]) => mockIsRangeReservable(...args),
-  getSlotPropGetter: (...args: unknown[]) => mockGetSlotPropGetter(...args),
+  getIsSlotReservable: (...args: unknown[]) => mockGetIsSlotReservable(...args),
 }));
 
 vi.mock("@/modules/reservation", async (importOriginal) => ({
@@ -171,7 +171,7 @@ beforeEach(() => {
     end: new Date("2024-01-01T11:00:00"),
   });
   mockIsRangeReservable.mockReturnValue(true);
-  mockGetSlotPropGetter.mockReturnValue(() => ({}));
+  mockGetIsSlotReservable.mockReturnValue(() => true);
   mockConvertFormToFocustimeSlot.mockReturnValue({ isReservable: false });
   mockGetDurationOptions.mockReturnValue([]);
   mockGetNewReservation.mockReturnValue({ begin: new Date("2024-03-05T09:30:00") });
@@ -308,13 +308,13 @@ describe("ReservationTimePicker", () => {
     expect(screen.getByTestId("mock-calendar")).toHaveAttribute("data-alternative", "reservation-time-controls");
   });
 
-  it("treats a slot as open unless the slot getter marks it inactive", () => {
-    mockGetSlotPropGetter.mockReturnValue(() => ({ className: "rbc-timeslot-inactive" }));
+  it("treats a slot as open only when the slot is reservable", () => {
+    mockGetIsSlotReservable.mockReturnValue(() => false);
     const { unmount } = render(<Wrapper />);
     expect(screen.getByTestId("rtp-open")).toHaveTextContent("false");
     unmount();
 
-    mockGetSlotPropGetter.mockReturnValue(() => ({}));
+    mockGetIsSlotReservable.mockReturnValue(() => true);
     render(<Wrapper />);
     expect(screen.getByTestId("rtp-open")).toHaveTextContent("true");
   });

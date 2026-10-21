@@ -5,10 +5,10 @@ import { gql } from "@apollo/client";
 import { addMinutes, differenceInMinutes } from "date-fns";
 import { useTranslation } from "next-i18next/pages";
 import styled from "styled-components";
+import type { CalendarEvent, CalendarEventBuffer } from "@ui/components/calendar/types";
 import { getEventBuffers } from "@ui/components/calendar/utils";
 import { DatedWeekCalendar } from "@ui/components/DatedWeekCalendar/DatedWeekCalendar";
 import type { DatedEvent, DatedRange, DatedWeekView } from "@ui/components/DatedWeekCalendar/types";
-import type { CalendarEvent, CalendarEventBuffer, SlotProps } from "ui/src/components/calendar/Calendar";
 import { breakpoints, RELATED_RESERVATION_STATES } from "ui/src/modules/const";
 import {
   dateToMinutes,
@@ -29,7 +29,7 @@ import type {
 import { Legend } from "@/components/calendar/Legend";
 import { useCurrentUser } from "@/hooks";
 import { eventStyleGetter } from "@/modules/eventStyleGetter";
-import { getBoundCheckedReservation, getSlotPropGetter, isRangeReservable } from "@/modules/reservable";
+import { getBoundCheckedReservation, getIsSlotReservable, isRangeReservable } from "@/modules/reservable";
 import type { ReservableMap } from "@/modules/reservable";
 import { convertFormToFocustimeSlot, getDurationOptions, getNewReservation } from "@/modules/reservation";
 import type { PendingReservationFormType } from "@/modules/schemas/reservationUnit";
@@ -85,13 +85,13 @@ export type ReservationTimePickerProps = Readonly<{
   startingTimeOptions: Array<{ value: string; label: string }>;
 }>;
 
-function useSlotPropGetter({
+function useIsSlotReservable({
   reservableTimes,
   reservationUnit,
-}: Pick<ReservationTimePickerProps, "reservableTimes" | "reservationUnit">): (date: Date) => SlotProps {
+}: Pick<ReservationTimePickerProps, "reservableTimes" | "reservationUnit">): (date: Date) => boolean {
   const activeApplicationRounds = reservationUnit.applicationRounds;
   return useMemo(() => {
-    return getSlotPropGetter({
+    return getIsSlotReservable({
       reservableTimes,
       activeApplicationRounds,
       reservationBeginsAt: reservationUnit.reservationBeginsAt
@@ -212,12 +212,12 @@ export function ReservationTimePicker({
     focusSlot,
     blockingReservations,
   });
-  const slotPropGetter = useSlotPropGetter({
+  const isSlotReservable = useIsSlotReservable({
     reservableTimes,
     reservationUnit,
   });
 
-  const isOpen = useMemo(() => (range: DatedRange) => slotPropGetter(range.start).className == null, [slotPropGetter]);
+  const isOpen = useMemo(() => (range: DatedRange) => isSlotReservable(range.start), [isSlotReservable]);
 
   const { currentUser } = useCurrentUser();
 
@@ -418,9 +418,13 @@ export function ReservationTimePicker({
         onMoveDraft={isReservationQuotaReached ? undefined : (range) => refuseUnless(handleCalendarEventChange(range))}
         alternative={{ id: CONTROLS_ID, label: t("reservationCalendar:skipToForm") }}
         getEventLabel={getEventLabel}
-        getEventProps={({ data: { source } }) =>
-          eventStyleGetter(source as CalendarEvent<ReservationNode>, ownReservationPks, !isReservationQuotaReached)
-        }
+        getEventProps={({ data: { source } }) => ({
+          style: eventStyleGetter(
+            source as CalendarEvent<ReservationNode>,
+            ownReservationPks,
+            !isReservationQuotaReached
+          ).style,
+        })}
         labels={labels}
       />
       <CalendarFooter id={CONTROLS_ID} tabIndex={-1} aria-live="polite" aria-expanded={areControlsVisible}>
