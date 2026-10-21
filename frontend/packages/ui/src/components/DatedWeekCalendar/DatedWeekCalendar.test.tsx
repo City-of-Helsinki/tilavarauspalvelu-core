@@ -29,6 +29,18 @@ const labels = {
   free: "free",
   closed: "closed",
   opensInNewTab: "opens in a new tab",
+  draft: {
+    hint: "Your reservation. Press Enter to move it.",
+    grabbed: "Moving",
+    moved: "Moved to",
+    cancelled: "Move cancelled",
+    slotSelected: "Selected",
+    controls: "Move your reservation",
+    earlier: "Earlier",
+    later: "Later",
+    shorter: "Shorter",
+    longer: "Longer",
+  },
 };
 
 function renderCalendar(overrides: Partial<DatedWeekCalendarProps<Data>> = {}) {
@@ -278,8 +290,166 @@ describe("DatedWeekCalendar event links", () => {
     expect(screen.getByRole("grid")).toHaveAttribute("aria-busy", "true");
   });
 
+  test("a skip link leads to the equal form when there is one", () => {
+    renderCalendar({ alternative: { id: "form", label: "Skip to the form" } });
+    expect(screen.getByRole("link", { name: "Skip to the form" })).toHaveAttribute("href", "#form");
+    expect(screen.getAllByRole("link", { name: /^Skip to/ })).toHaveLength(2);
+  });
+
   test("a calendar with links has no axe violations", async () => {
     const { container } = renderCalendar({ getEventHref, events: two });
+    expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+describe("DatedWeekCalendar choosing and moving", () => {
+  const draft = event("draft", "Your reservation", "2026-10-21T10:00:00+03:00", "2026-10-21T11:00:00+03:00", "Draft");
+  const range = (start: string, end: string) => ({ start: new Date(start), end: new Date(end) });
+
+  function renderInteractive(overrides: Partial<DatedWeekCalendarProps<Data>> = {}) {
+    const onSelectSlot = vi.fn<(r: { start: Date; end: Date }) => string | null>(() => null);
+    const onMoveDraft = vi.fn<(r: { start: Date; end: Date }) => string | null>(() => null);
+    const view = renderCalendar({ events: [draft], draftId: "draft", onSelectSlot, onMoveDraft, ...overrides });
+    return { ...view, onSelectSlot, onMoveDraft };
+  }
+
+  const log = () => screen.getByRole("log");
+
+  test("a grid where cells can be chosen is not read only", () => {
+    renderInteractive();
+    expect(screen.getByRole("grid")).not.toHaveAttribute("aria-readonly");
+  });
+
+  test("clicking a free open cell asks to choose it and announces the time", async () => {
+    const user = userEvent.setup();
+    const { onSelectSlot } = renderInteractive();
+    await user.click(cell(/^Wednesday 21 October, 08:30–09:00, free$/));
+    expect(onSelectSlot).toHaveBeenCalledWith(range("2026-10-21T08:30:00+03:00", "2026-10-21T09:00:00+03:00"));
+    expect(log()).toHaveTextContent("Selected: Wednesday 21 October, 08:30–09:00");
+  });
+
+  test("Enter and Space on a free open cell choose it too", async () => {
+    const user = userEvent.setup();
+    const { onSelectSlot } = renderInteractive();
+    cell(/^Thursday 22 October, 09:00–09:30, free$/).focus();
+    await user.keyboard("{Enter} ");
+    expect(onSelectSlot).toHaveBeenCalledTimes(2);
+  });
+
+  test("a refused choice announces the reason instead", async () => {
+    const user = userEvent.setup();
+    renderInteractive({ onSelectSlot: () => "Too soon" });
+    await user.click(cell(/^Wednesday 21 October, 08:30–09:00, free$/));
+    expect(log()).toHaveTextContent("Too soon");
+    expect(log()).not.toHaveTextContent("Selected");
+  });
+
+  test("closed cells can't be chosen", async () => {
+    const user = userEvent.setup();
+    const { onSelectSlot } = renderInteractive({
+      isOpen: ({ start }) => start.getTime() >= new Date("2026-10-21T09:00:00+03:00").getTime(),
+    });
+    await user.click(cell(/^Wednesday 21 October, 08:30–09:00, closed$/));
+    expect(onSelectSlot).not.toHaveBeenCalled();
+    expect(cell(/^Wednesday 21 October, 09:00–09:30, free$/)).not.toHaveAttribute("aria-disabled");
+  });
+
+  test("clicking an event with a link opens it", async () => {
+    const open = vi.spyOn(window, "open").mockReturnValue(null);
+    const user = userEvent.setup();
+    renderInteractive({
+      events: [draft, event("a", "Band", "2026-10-22T09:00:00+03:00", "2026-10-22T10:00:00+03:00")],
+      getEventHref: (item) => (item.id === "a" ? "/r/a" : undefined),
+    });
+    await user.click(cell(/^Thursday 22 October, 09:00–10:00/));
+    expect(open).toHaveBeenCalledWith("/r/a", "_blank", "noopener,noreferrer");
+    open.mockRestore();
+  });
+
+  test("the draft cell is described by how to move it", () => {
+    renderInteractive();
+    expect(cell(/^Wednesday 21 October, 10:00–11:00, Draft: Your reservation$/)).toHaveAccessibleDescription(
+      "Your reservation. Press Enter to move it."
+    );
+    expect(cell(/^Wednesday 21 October, 08:00–08:30, free$/)).not.toHaveAccessibleDescription();
+  });
+
+  test("Enter on the draft grabs it, arrows move a preview and Enter confirms", async () => {
+    const user = userEvent.setup();
+    const { onMoveDraft, onSelectSlot } = renderInteractive();
+    cell(/^Wednesday 21 October, 10:00–11:00/).focus();
+    await user.keyboard("{Enter}");
+    expect(log()).toHaveTextContent("Moving");
+    expect(onSelectSlot).not.toHaveBeenCalled();
+
+    await user.keyboard("{ArrowDown}");
+    expect(log()).toHaveTextContent("Wednesday 21 October, 10:30–11:30");
+    expect(cell(/^Wednesday 21 October, 10:30–11:30, Draft: Your reservation$/)).toHaveFocus();
+    expect(onMoveDraft).not.toHaveBeenCalled();
+
+    await user.keyboard("{ArrowRight}{Enter}");
+    expect(onMoveDraft).toHaveBeenCalledWith(range("2026-10-22T10:30:00+03:00", "2026-10-22T11:30:00+03:00"));
+    expect(log()).toHaveTextContent("Moved to: Thursday 22 October, 10:30–11:30");
+  });
+
+  test("Shift and the arrows change the length", async () => {
+    const user = userEvent.setup();
+    const { onMoveDraft } = renderInteractive();
+    cell(/^Wednesday 21 October, 10:00–11:00/).focus();
+    await user.keyboard("{Enter}{Shift>}{ArrowDown}{/Shift}{Enter}");
+    expect(onMoveDraft).toHaveBeenCalledWith(range("2026-10-21T10:00:00+03:00", "2026-10-21T11:30:00+03:00"));
+  });
+
+  test("Escape cancels the move and the draft goes back", async () => {
+    const user = userEvent.setup();
+    const { onMoveDraft } = renderInteractive();
+    cell(/^Wednesday 21 October, 10:00–11:00/).focus();
+    await user.keyboard("{Enter}{ArrowDown}{Escape}");
+    expect(onMoveDraft).not.toHaveBeenCalled();
+    expect(log()).toHaveTextContent("Move cancelled");
+    expect(cell(/^Wednesday 21 October, 10:00–11:00, Draft: Your reservation$/)).toBeInTheDocument();
+  });
+
+  test("a refused move says why and stays in move mode", async () => {
+    const user = userEvent.setup();
+    renderInteractive({ onMoveDraft: vi.fn(() => "Already booked") });
+    cell(/^Wednesday 21 October, 10:00–11:00/).focus();
+    await user.keyboard("{Enter}{ArrowDown}{Enter}");
+    expect(log()).toHaveTextContent("Already booked");
+    expect(cell(/^Wednesday 21 October, 10:30–11:30, Draft: Your reservation$/)).toBeInTheDocument();
+  });
+
+  test("leaving the grid cancels a move", async () => {
+    const user = userEvent.setup();
+    renderInteractive();
+    cell(/^Wednesday 21 October, 10:00–11:00/).focus();
+    await user.keyboard("{Enter}{ArrowDown}");
+    await user.click(screen.getByRole("button", { name: "Today" }));
+    expect(cell(/^Wednesday 21 October, 10:00–11:00, Draft: Your reservation$/)).toBeInTheDocument();
+  });
+
+  test("buttons move and resize the draft without any dragging or move mode", async () => {
+    const user = userEvent.setup();
+    const { onMoveDraft } = renderInteractive();
+    const group = screen.getByRole("group", { name: "Move your reservation" });
+    await user.click(within(group).getByRole("button", { name: "Later" }));
+    expect(onMoveDraft).toHaveBeenLastCalledWith(range("2026-10-21T10:30:00+03:00", "2026-10-21T11:30:00+03:00"));
+    await user.click(within(group).getByRole("button", { name: "Earlier" }));
+    expect(onMoveDraft).toHaveBeenLastCalledWith(range("2026-10-21T09:30:00+03:00", "2026-10-21T10:30:00+03:00"));
+    await user.click(within(group).getByRole("button", { name: "Longer" }));
+    expect(onMoveDraft).toHaveBeenLastCalledWith(range("2026-10-21T10:00:00+03:00", "2026-10-21T11:30:00+03:00"));
+    await user.click(within(group).getByRole("button", { name: "Shorter" }));
+    expect(onMoveDraft).toHaveBeenLastCalledWith(range("2026-10-21T10:00:00+03:00", "2026-10-21T10:30:00+03:00"));
+    expect(log()).toHaveTextContent("Moved to");
+  });
+
+  test("there are no move buttons without a way to move the draft", () => {
+    renderInteractive({ onMoveDraft: undefined });
+    expect(screen.queryByRole("group", { name: "Move your reservation" })).not.toBeInTheDocument();
+  });
+
+  test("an interactive grid has no axe violations", async () => {
+    const { container } = renderInteractive();
     expect(await axe(container)).toHaveNoViolations();
   });
 });

@@ -4,17 +4,30 @@
 // the row, cell and header roles are spelled out.
 // oxlint-disable jsx-a11y/no-noninteractive-element-to-interactive-role, jsx-a11y/no-redundant-roles, jsx-a11y/no-interactive-element-to-noninteractive-role
 
-import React, { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from "react";
-import type { CSSProperties, ForwardedRef, ReactElement, Ref } from "react";
-import { assertValidStep } from "../WeeklyPatternCalendar/engine";
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import type { CSSProperties, ForwardedRef, KeyboardEvent, ReactElement, Ref } from "react";
+import { MINUTES_PER_DAY, assertValidStep } from "../WeeklyPatternCalendar/engine";
 import type { CalendarData } from "../WeeklyPatternCalendar/types";
 import {
+  cellRange,
   dayKeyOf,
   isCellOpen,
+  minutesOfDay,
   openRangesByDay,
+  resizeRange,
   resolveVisibleHours,
   segmentEvents,
   segmentsInCell,
+  shiftRange,
   stepDate,
   toWallClock,
   visibleDays,
@@ -23,14 +36,16 @@ import {
   DatedWeekRoot,
   EventStripe,
   GridScroller,
+  HiddenText,
   ListAlternative,
+  LiveRegion,
   RangeTitle,
   SkipLink,
   Toolbar,
   ToolbarButton,
   ToolbarGroup,
 } from "./styles";
-import type { DatedWeekCalendarProps, DatedWeekHandle } from "./types";
+import type { DatedRange, DatedWeekCalendarProps, DatedWeekHandle } from "./types";
 import { useDatedWeekCalendar } from "./useDatedWeekCalendar";
 
 const pad = (value: number) => value.toString().padStart(2, "0");
@@ -59,7 +74,12 @@ function DatedWeekTable<TData extends CalendarData>(
     getEventLabel,
     getEventProps,
     getEventHref,
+    isOpen: isOpenProp,
+    onSelectSlot,
+    draftId,
+    onMoveDraft,
     isLoading,
+    alternative,
     toolbarExtra,
     className,
     id,
@@ -71,11 +91,33 @@ function DatedWeekTable<TData extends CalendarData>(
   }
 
   const listId = useId();
+  const hintId = `${listId}-hint`;
   const days = useMemo(() => visibleDays(date, view), [date, view]);
   const dayKeys = days.map((day) => dayKeyOf(day));
-  const segmentsByDay = useMemo(() => segmentEvents(events, days), [events, days]);
+  const draftEvent = draftId != null ? events.find((item) => item.id === draftId) : undefined;
+  const canMove = draftEvent != null && onMoveDraft != null;
+  const interactive = onSelectSlot != null || canMove;
+  const draftLabels = labels.draft;
+
+  // The draft is previewed at its new place while it is being moved. The consumer owns the saved value.
+  const [moving, setMoving] = useState<DatedRange | null>(null);
+  const shownEvents = useMemo(
+    () =>
+      moving && draftId != null ? events.map((item) => (item.id === draftId ? { ...item, ...moving } : item)) : events,
+    [events, draftId, moving]
+  );
+  const segmentsByDay = useMemo(() => segmentEvents(shownEvents, days), [shownEvents, days]);
   const open = useMemo(() => openRangesByDay(openRanges, days), [openRanges, days]);
   const todayKey = dayKeyOf(toWallClock(new Date()));
+
+  const longDay = useMemo(
+    () => new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }),
+    [locale]
+  );
+  const shortDay = useMemo(
+    () => new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "numeric", timeZone: "UTC" }),
+    [locale]
+  );
 
   const hours = resolveVisibleHours(visibleHours, open, [...segmentsByDay.values()].flat(), step);
   const firstIndex = hours.beginMinutes / step;
@@ -83,30 +125,150 @@ function DatedWeekTable<TData extends CalendarData>(
 
   const [listOpen, setListOpen] = useState(false);
   const listRef = useRef<HTMLDetailsElement>(null);
-  const pendingFocus = useRef<string | null>(null);
+  const pendingListFocus = useRef<string | null>(null);
+  const pendingCellFocus = useRef<{ dayKey: string; index: number } | null>(null);
+  const [message, setMessage] = useState({ text: "", count: 0 });
 
-  // Enter on a cell opens its only linked event. With several, they are reached as links in the text list.
-  const handleActivate = (dayKey: string, index: number) => {
-    const segments = segmentsInCell(segmentsByDay.get(dayKey) ?? [], index * step, (index + 1) * step);
-    const linked = segments.filter((segment) => getEventHref?.(segment.event) != null);
+  // Alternating a trailing no-break space makes a repeated message announce again.
+  const announce = useCallback((text: string) => {
+    setMessage((previous) => ({ text, count: previous.count + 1 }));
+  }, []);
+
+  const describeRange = (range: DatedRange) => {
+    const start = toWallClock(range.start);
+    const end = toWallClock(range.end);
+    const endMinutes = dayKeyOf(end) === dayKeyOf(start) ? minutesOfDay(end) : MINUTES_PER_DAY;
+    return `${longDay.format(keyToDate(dayKeyOf(start)))}, ${formatRange(minutesOfDay(start), endMinutes)}`;
+  };
+
+  const openCells = useMemo(() => {
+    if (!isOpenProp) {
+      return null;
+    }
+    const cells = new Map<string, boolean>();
+    for (const dayKey of dayKeys) {
+      for (let index = firstIndex; index < endIndex; index++) {
+        cells.set(`${dayKey}:${index}`, isOpenProp(cellRange(dayKey, index, step)));
+      }
+    }
+    return cells;
+    // dayKeys is a new array on every render, its content is what matters
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpenProp, dayKeys.join(","), firstIndex, endIndex, step]);
+
+  const cellIsOpen = (dayKey: string, index: number) =>
+    openCells
+      ? (openCells.get(`${dayKey}:${index}`) ?? false)
+      : isCellOpen(open, dayKey, index * step, (index + 1) * step);
+
+  const segmentsAt = (dayKey: string, index: number) =>
+    segmentsInCell(segmentsByDay.get(dayKey) ?? [], index * step, (index + 1) * step);
+
+  // An event with a link opens it when it is the only one in the cell. With several, they are reached as links in the list.
+  const openLinked = (dayKey: string, index: number): boolean => {
+    const linked = segmentsAt(dayKey, index).filter((segment) => getEventHref?.(segment.event) != null);
     const [first] = linked;
     if (!first) {
-      return;
+      return false;
     }
     const href = getEventHref?.(first.event);
     if (linked.length === 1 && href != null) {
       window.open(href, "_blank", "noopener,noreferrer");
+      return true;
+    }
+    pendingListFocus.current = `${first.event.id}:${dayKey}`;
+    setListOpen(true);
+    return true;
+  };
+
+  const selectSlot = (dayKey: string, index: number) => {
+    if (!onSelectSlot || !cellIsOpen(dayKey, index)) {
       return;
     }
-    pendingFocus.current = `${first.event.id}:${dayKey}`;
-    setListOpen(true);
+    const range = cellRange(dayKey, index, step);
+    const reason = onSelectSlot(range);
+    announce(reason ?? `${draftLabels?.slotSelected ?? ""}: ${describeRange(range)}`);
+  };
+
+  // Asks the consumer to accept a new time for the draft. A reason to refuse is announced.
+  const commitDraft = (range: DatedRange): boolean => {
+    const reason = onMoveDraft?.(range) ?? null;
+    announce(reason ?? `${draftLabels?.moved ?? ""}: ${describeRange(range)}`);
+    return reason == null;
+  };
+
+  const previewDraft = (next: DatedRange) => {
+    const start = toWallClock(next.start);
+    const dayKey = dayKeyOf(start);
+    // A move stays inside the shown days. Use the toolbar to change the week first.
+    if (!dayKeys.includes(dayKey)) {
+      return;
+    }
+    setMoving(next);
+    announce(describeRange(next));
+    pendingCellFocus.current = { dayKey, index: Math.floor(minutesOfDay(start) / step) };
+  };
+
+  // Keyboard move mode, as in ADR 0003. The arrows move, Shift and the arrows resize, Enter confirms, Escape cancels.
+  const handleMoveKey = (event: KeyboardEvent<HTMLTableCellElement>): boolean => {
+    if (!moving || event.altKey || event.ctrlKey || event.metaKey) {
+      return false;
+    }
+    const sign = event.key === "ArrowDown" || event.key === "ArrowRight" ? 1 : -1;
+    switch (event.key) {
+      case "Escape":
+        event.preventDefault();
+        setMoving(null);
+        announce(draftLabels?.cancelled ?? "");
+        return true;
+      case "Enter":
+      case " ":
+        event.preventDefault();
+        if (commitDraft(moving)) {
+          setMoving(null);
+        }
+        return true;
+      case "ArrowUp":
+      case "ArrowDown":
+        event.preventDefault();
+        previewDraft(
+          event.shiftKey ? resizeRange(moving, sign * step, step) : shiftRange(moving, { minutes: sign * step })
+        );
+        return true;
+      case "ArrowLeft":
+      case "ArrowRight":
+        event.preventDefault();
+        if (!event.shiftKey) {
+          previewDraft(shiftRange(moving, { days: sign }));
+        }
+        return true;
+      default:
+        return false;
+    }
+  };
+
+  const handleActivate = (dayKey: string, index: number) => {
+    if (canMove && draftEvent && segmentsAt(dayKey, index).some((segment) => segment.event.id === draftId)) {
+      setMoving({ start: draftEvent.start, end: draftEvent.end });
+      announce(draftLabels?.grabbed ?? "");
+      return;
+    }
+    if (!openLinked(dayKey, index)) {
+      selectSlot(dayKey, index);
+    }
+  };
+
+  const handleCellClick = (dayKey: string, index: number) => {
+    if (!openLinked(dayKey, index)) {
+      selectSlot(dayKey, index);
+    }
   };
 
   // The list is not focusable while closed, so focus moves once it has opened.
   useEffect(() => {
-    const key = pendingFocus.current;
+    const key = pendingListFocus.current;
     if (listOpen && key != null) {
-      pendingFocus.current = null;
+      pendingListFocus.current = null;
       listRef.current?.querySelector<HTMLElement>(`[data-list-key="${CSS.escape(key)}"]`)?.focus();
     }
   });
@@ -117,17 +279,20 @@ function DatedWeekTable<TData extends CalendarData>(
     endIndex,
     rowsPerHour: 60 / step,
     onActivate: handleActivate,
+    onCellClick: handleCellClick,
+    onKeyOverride: handleMoveKey,
+  });
+
+  // The grid shows the preview on the next render, so the cell can only be focused after it.
+  useEffect(() => {
+    const target = pendingCellFocus.current;
+    if (target) {
+      pendingCellFocus.current = null;
+      grid.focusCell(target);
+    }
   });
   useImperativeHandle(ref, () => ({ focus: grid.focus }), [grid.focus]);
 
-  const longDay = useMemo(
-    () => new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }),
-    [locale]
-  );
-  const shortDay = useMemo(
-    () => new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "numeric", timeZone: "UTC" }),
-    [locale]
-  );
   const rangeTitle = useMemo(() => {
     const formatter = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" });
     const first = keyToDate(dayKeys[0] ?? todayKey);
@@ -155,6 +320,7 @@ function DatedWeekTable<TData extends CalendarData>(
 
   return (
     <DatedWeekRoot className={className} id={id}>
+      {alternative && <SkipLink href={`#${alternative.id}`}>{alternative.label}</SkipLink>}
       <SkipLink href={`#${listId}`}>{labels.skipToList}</SkipLink>
       <Toolbar role="toolbar" aria-label={labels.toolbar}>
         <ToolbarGroup>
@@ -181,8 +347,35 @@ function DatedWeekTable<TData extends CalendarData>(
         </ToolbarGroup>
         {toolbarExtra}
       </Toolbar>
+      {canMove && draftLabels && draftEvent && (
+        <ToolbarGroup role="group" aria-label={draftLabels.controls}>
+          <ToolbarButton type="button" onClick={() => commitDraft(shiftRange(draftEvent, { minutes: -step }))}>
+            {draftLabels.earlier}
+          </ToolbarButton>
+          <ToolbarButton type="button" onClick={() => commitDraft(shiftRange(draftEvent, { minutes: step }))}>
+            {draftLabels.later}
+          </ToolbarButton>
+          <ToolbarButton type="button" onClick={() => commitDraft(resizeRange(draftEvent, -step, step))}>
+            {draftLabels.shorter}
+          </ToolbarButton>
+          <ToolbarButton type="button" onClick={() => commitDraft(resizeRange(draftEvent, step, step))}>
+            {draftLabels.longer}
+          </ToolbarButton>
+        </ToolbarGroup>
+      )}
       <GridScroller style={{ "--days": days.length } as CSSProperties}>
-        <table role="grid" aria-readonly="true" aria-busy={isLoading || undefined} aria-label={ariaLabel}>
+        <table
+          role="grid"
+          aria-readonly={interactive ? undefined : true}
+          aria-busy={isLoading || undefined}
+          aria-label={ariaLabel}
+          onBlur={(event) => {
+            // Moving between cells also blurs the old one. Only leaving the grid cancels a move.
+            if (!event.currentTarget.contains(event.relatedTarget)) {
+              setMoving(null);
+            }
+          }}
+        >
           <colgroup>
             <col />
             {dayKeys.map((dayKey) => (
@@ -218,7 +411,8 @@ function DatedWeekTable<TData extends CalendarData>(
                 )}
                 {dayKeys.map((dayKey) => {
                   const segments = segmentsInCell(segmentsByDay.get(dayKey) ?? [], row.beginMinutes, row.endMinutes);
-                  const isOpen = isCellOpen(open, dayKey, row.beginMinutes, row.endMinutes);
+                  const isOpen = cellIsOpen(dayKey, row.index);
+                  const isDraft = canMove && segments.some((segment) => segment.event.id === draftId);
                   // A cell with one event that begins in it is named after the whole event, as a run is in the Weekly Pattern.
                   const only = segments.length === 1 ? segments[0] : undefined;
                   const [begin, end] =
@@ -240,6 +434,7 @@ function DatedWeekTable<TData extends CalendarData>(
                       {...grid.cellBehaviour(dayKey, row.index)}
                       aria-label={`${longDay.format(keyToDate(dayKey))}, ${formatRange(begin, end)}, ${state}`}
                       aria-disabled={isOpen ? undefined : true}
+                      aria-describedby={isDraft ? hintId : undefined}
                       data-availability={isOpen ? "open" : "closed"}
                       data-hour-start={row.beginMinutes % 60 === 0 ? "" : undefined}
                     >
@@ -255,6 +450,8 @@ function DatedWeekTable<TData extends CalendarData>(
                             style={
                               { ...extra?.style, "--lane": segment.lane, "--lanes": segment.lanes } as CSSProperties
                             }
+                            data-draft={segment.event.id === draftId ? "" : undefined}
+                            data-moving={moving && segment.event.id === draftId ? "" : undefined}
                             data-segment-start={startsHere ? "" : undefined}
                             data-segment-end={endsHere ? "" : undefined}
                           >
@@ -296,6 +493,10 @@ function DatedWeekTable<TData extends CalendarData>(
           <p>{labels.emptyList}</p>
         )}
       </ListAlternative>
+      {canMove && <HiddenText id={hintId}>{draftLabels?.hint}</HiddenText>}
+      <LiveRegion role="log" aria-atomic="true">
+        {message.count % 2 === 0 ? message.text : `${message.text} `}
+      </LiveRegion>
     </DatedWeekRoot>
   );
 }

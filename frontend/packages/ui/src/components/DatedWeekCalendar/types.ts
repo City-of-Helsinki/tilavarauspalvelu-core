@@ -15,6 +15,9 @@ export type DatedEvent<TData extends CalendarData> = {
 /** A stretch of time when the cells are open. Everything is open when no ranges are given. */
 export type DatedOpenRange = { start: Date; end: Date };
 
+/** A stretch of real time, e.g. a cell or a Draft Reservation. */
+export type DatedRange = { start: Date; end: Date };
+
 export type DatedVisibleHours = { beginMinutes: number; endMinutes: number };
 
 export type DatedCellInfo<TData extends CalendarData> = {
@@ -54,6 +57,27 @@ export type DatedWeekLabels = {
   closed: string;
   /** Said after an event that opens a new tab, e.g. "opens in a new tab". */
   opensInNewTab: string;
+  draft?: DatedDraftLabels;
+};
+
+/** Words for moving the Draft Reservation and placing it. Needed when `onSelectSlot` or `onMoveDraft` is given. */
+export type DatedDraftLabels = {
+  /** Describes a draft cell, e.g. "Your reservation. Press Enter to move it." */
+  hint: string;
+  /** Said when move mode starts: how the keys work. */
+  grabbed: string;
+  /** Said with the new time after a move is confirmed. */
+  moved: string;
+  /** Said when a move is cancelled. */
+  cancelled: string;
+  /** Said with the time after a slot is chosen. */
+  slotSelected: string;
+  /** Name of the group of buttons that move the draft. */
+  controls: string;
+  earlier: string;
+  later: string;
+  shorter: string;
+  longer: string;
 };
 
 export type DatedWeekCalendarProps<TData extends CalendarData> = {
@@ -82,8 +106,27 @@ export type DatedWeekCalendarProps<TData extends CalendarData> = {
    * on a cell opens the link of its only event. With several linked events Enter moves focus to them in the list.
    */
   getEventHref?: (event: DatedEvent<TData>) => string | undefined;
+  /**
+   * Whether a cell can be chosen. Replaces `openRanges` when given, for rules that are not a list of ranges.
+   * Closed cells can't be chosen and are marked unavailable.
+   */
+  isOpen?: (range: DatedRange) => boolean;
+  /**
+   * Called when a free open cell is chosen by click, tap, Enter or Space. Return a reason to refuse, which is
+   * announced, or null to accept. Without it cells can't be chosen and the grid is read only.
+   */
+  onSelectSlot?: (range: DatedRange) => string | null;
+  /** The event the user can move. Needs `onMoveDraft`. */
+  draftId?: string;
+  /**
+   * Called with the draft's new time when a move is confirmed or a move button is pressed. Return a reason to
+   * refuse, which is announced, or null to accept. Without it the draft can't be moved.
+   */
+  onMoveDraft?: (range: DatedRange) => string | null;
   /** Marks the grid busy while its events are being fetched. */
   isLoading?: boolean;
+  /** The equal form for the same task. A skip link to it is shown before the grid. */
+  alternative?: { id: string; label: string };
   /** Extra toolbar content, e.g. a button that edits the shown reservation. */
   toolbarExtra?: ReactNode;
 
