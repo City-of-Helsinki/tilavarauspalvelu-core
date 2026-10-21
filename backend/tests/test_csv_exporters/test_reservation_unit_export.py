@@ -266,20 +266,14 @@ def test_reservation_unit_export__subset():
     assert len(writes) == 4, writes
 
 
-def test_reservation_unit_export__missing_translations():
-    # given:
-    # - There is one reservation unit with missing translations in itself and in its space
+def test_reservation_unit_export__missing_translations_are_exported_as_empty_values():
     reservation_unit = ReservationUnitFactory.create(description_sv=None, spaces__name="Space")
     reservation_unit.spaces.update(name_fi=None)
 
-    # when:
-    # - The exporter is run for all reservation units
     exporter = ReservationUnitExporter()
     with mock_csv_writer() as mock_writer:
         exporter.write_csv()
 
-    # then:
-    # - the missing translations are exported as empty values
     writes = mock_writer.get_writes()
     assert len(writes) == 2, writes
     assert writes[1][writes[0].index("Description_sv")] == ""
