@@ -10,7 +10,15 @@ import { DatedWeekCalendar } from "@ui/components/DatedWeekCalendar/DatedWeekCal
 import type { DatedEvent, DatedRange, DatedWeekView } from "@ui/components/DatedWeekCalendar/types";
 import type { CalendarEvent, CalendarEventBuffer, SlotProps } from "ui/src/components/calendar/Calendar";
 import { breakpoints, RELATED_RESERVATION_STATES } from "ui/src/modules/const";
-import { formatApiDate, formatDate, formatDuration, formatTime, parseUIDate } from "ui/src/modules/date-utils";
+import {
+  dateToMinutes,
+  formatApiDate,
+  formatDate,
+  formatDuration,
+  formatTime,
+  formatTimeRange,
+  parseUIDate,
+} from "ui/src/modules/date-utils";
 import { filterNonNullable, getLocalizationLang } from "ui/src/modules/helpers";
 import { ReservationTypeChoice, useListReservationsQuery } from "@gql/gql-types";
 import type {
@@ -118,11 +126,12 @@ function useCalendarEventChange({
     let focusEvent = null;
     if (shouldDisplayFocusSlot) {
       const { durationMinutes: diff, start, end } = focusSlot;
+      const timeRange = formatTimeRange(dateToMinutes(start), dateToMinutes(end), true);
       focusEvent = {
         beginsAt: start,
         endsAt: end,
         state: "INITIAL",
-        durationString: diff >= 90 ? `(${formatDuration(t, { minutes: diff })})` : "",
+        durationString: `${timeRange} (${formatDuration(t, { minutes: diff })})`,
       };
     }
 
