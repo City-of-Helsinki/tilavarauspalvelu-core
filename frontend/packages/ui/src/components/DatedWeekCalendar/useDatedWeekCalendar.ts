@@ -10,12 +10,14 @@ type Options = {
   firstIndex: number;
   endIndex: number;
   rowsPerHour: number;
+  /** Called for Enter and Space on a cell. */
+  onActivate?: (dayKey: string, index: number) => void;
 };
 
 const addressKey = (dayKey: string, index: number) => `${dayKey}:${index}`;
 
 // Roving tabindex and arrow key navigation for the grid, as in the ARIA Authoring Practices grid pattern.
-export function useDatedWeekCalendar({ dayKeys, firstIndex, endIndex, rowsPerHour }: Options) {
+export function useDatedWeekCalendar({ dayKeys, firstIndex, endIndex, rowsPerHour, onActivate }: Options) {
   const [active, setActive] = useState<CellAddress | null>(null);
   const cellElements = useRef(new Map<string, HTMLTableCellElement>());
 
@@ -83,6 +85,11 @@ export function useDatedWeekCalendar({ dayKeys, firstIndex, endIndex, rowsPerHou
       case "End":
         target = { dayKey, index: endIndex - 1 };
         break;
+      case "Enter":
+      case " ":
+        event.preventDefault();
+        onActivate?.(dayKey, index);
+        return;
       default:
         return;
     }

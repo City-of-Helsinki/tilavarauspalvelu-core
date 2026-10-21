@@ -12,5 +12,6 @@
   "free": "Vapaa",
   "closed": "Suljettu",
   "buffer": "Puskuriaika",
-  "selected": "valittu"
+  "selected": "valittu",
+  "opensInNewTab": "avautuu uuteen välilehteen"
 }

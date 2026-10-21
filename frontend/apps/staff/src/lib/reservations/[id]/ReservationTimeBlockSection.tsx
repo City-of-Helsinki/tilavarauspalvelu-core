@@ -19,6 +19,7 @@ import { ReservationSeriesView } from "@/components/ReservationSeriesView";
 import { VisibleIfPermission } from "@/components/VisibleIfPermission";
 import { useModal } from "@/context/ModalContext";
 import { useReservationCalendarData, useReservationSeries } from "@/hooks";
+import { useCalendarLabels } from "@/hooks/useCalendarLabels";
 import { useSetSearchParams } from "@/hooks/useSetSearchParams";
 import type { CalendarEventType } from "@/modules/reservation";
 import { isPossibleToEdit } from "@/modules/reservationModificationRules";
@@ -67,6 +68,7 @@ const Calendar = forwardRef(function Calendar(
   const { t, i18n } = useTranslation();
   const { setModalContent } = useModal();
   const [view, setView] = useState<DatedWeekView>("week");
+  const labels = useCalendarLabels(view);
 
   const searchParams = useSearchParams();
   const selected = toNumber(searchParams.get("selected"));
@@ -110,8 +112,6 @@ const Calendar = forwardRef(function Calendar(
       .join(", ");
   };
 
-  const dayOrWeek = view === "day" ? t("common:day").toLowerCase() : t("common:week").toLowerCase();
-
   return (
     <Container ref={ref}>
       <DatedWeekCalendar<TimeBlockData>
@@ -123,19 +123,7 @@ const Calendar = forwardRef(function Calendar(
         events={datedEvents}
         step={CALENDAR_STEP_MINUTES}
         locale={i18n.language}
-        labels={{
-          toolbar: t("reservationCalendar:toolbar"),
-          previous: t("reservationCalendar:showPrevious", { view: dayOrWeek }),
-          next: t("reservationCalendar:showNext", { view: dayOrWeek }),
-          today: t("common:today"),
-          day: t("common:day"),
-          week: t("common:week"),
-          list: t("reservationCalendar:list"),
-          skipToList: t("reservationCalendar:skipToList"),
-          emptyList: t("reservationCalendar:emptyList"),
-          free: t("reservationCalendar:free"),
-          closed: t("reservationCalendar:closed"),
-        }}
+        labels={labels}
         getEventLabel={getEventLabel}
         getEventProps={(item) => ({ style: getStyle(item.data.calendarEvent as CalendarEventType).style })}
         toolbarExtra={

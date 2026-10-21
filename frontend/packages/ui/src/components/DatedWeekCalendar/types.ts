@@ -52,6 +52,8 @@ export type DatedWeekLabels = {
   free: string;
   /** Cell state word for a closed cell without events. */
   closed: string;
+  /** Said after an event that opens a new tab, e.g. "opens in a new tab". */
+  opensInNewTab: string;
 };
 
 export type DatedWeekCalendarProps<TData extends CalendarData> = {
@@ -75,6 +77,13 @@ export type DatedWeekCalendarProps<TData extends CalendarData> = {
   /** Translated description of one event for screen readers, e.g. "Confirmed reservation: Meeting". */
   getEventLabel: (event: DatedEvent<TData>) => string;
   getEventProps?: (event: DatedEvent<TData>) => DatedEventProps;
+  /**
+   * Where an event leads, opened in a new tab. Events with a link are links in the text list, and Enter or Space
+   * on a cell opens the link of its only event. With several linked events Enter moves focus to them in the list.
+   */
+  getEventHref?: (event: DatedEvent<TData>) => string | undefined;
+  /** Marks the grid busy while its events are being fetched. */
+  isLoading?: boolean;
   /** Extra toolbar content, e.g. a button that edits the shown reservation. */
   toolbarExtra?: ReactNode;
 
