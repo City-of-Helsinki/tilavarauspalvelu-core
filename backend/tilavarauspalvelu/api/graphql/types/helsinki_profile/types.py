@@ -100,10 +100,12 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         except HelsinkiProfileError as e:
             if type(e.extra_data) is list and len(e.extra_data):
                 profile_error = e.extra_data[0]
-                msg = profile_error.get("message", "Unknown Helsinki Profile error")
                 if profile_error.get("extensions", {}).get("code") == "PERMISSION_DENIED_ERROR":
+                    msg = "No permission to view the Helsinki profile data."
                     raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_PERMISSION_DENIED) from e
-            raise
+
+            msg = "Helsinki profile request failed."
+            raise GQLCodeError(msg, code=error_codes.UPSTREAM_CALL_FAILED) from e
 
         except ExternalServiceRequestError as e:
             msg = "Helsinki profile request failed."
