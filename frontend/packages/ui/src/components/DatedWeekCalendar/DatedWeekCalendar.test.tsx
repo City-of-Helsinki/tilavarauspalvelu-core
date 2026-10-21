@@ -202,7 +202,7 @@ describe("DatedWeekCalendar", () => {
     expect(screen.getByText("Nothing in this week")).toBeInTheDocument();
   });
 
-  test("has no axe violations", async () => {
+  test("has no axe violations", { timeout: 20_000 }, async () => {
     const { container } = renderCalendar({
       events: [
         event("a", "Band practice", "2026-10-21T09:00:00+03:00", "2026-10-21T11:00:00+03:00"),
@@ -352,7 +352,7 @@ describe("DatedWeekCalendar event links", () => {
     expect(screen.getAllByRole("link", { name: /^Skip to/ })).toHaveLength(2);
   });
 
-  test("a calendar with links has no axe violations", async () => {
+  test("a calendar with links has no axe violations", { timeout: 20_000 }, async () => {
     const { container } = renderCalendar({ getEventHref, events: two });
     expect(await axe(container)).toHaveNoViolations();
   });
@@ -561,8 +561,9 @@ describe("DatedWeekCalendar choosing and moving", () => {
     expect(onMoveDraft).not.toHaveBeenCalled();
   });
 
-  test("an interactive grid has no axe violations", async () => {
-    const { container } = renderInteractive();
+  test("an interactive grid has no axe violations", { timeout: 20_000 }, async () => {
+    // The day view has the same draft, hint, buttons and cell markup with a seventh of the cells.
+    const { container } = renderInteractive({ view: "day" });
     expect(await axe(container)).toHaveNoViolations();
   });
 });

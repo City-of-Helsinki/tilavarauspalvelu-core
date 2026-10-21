@@ -10,6 +10,7 @@ import React, {
   useEffect,
   useId,
   useImperativeHandle,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -203,7 +204,7 @@ function DatedWeekTable<TData extends CalendarData>(
   };
 
   const selectSlot = (dayKey: string, index: number) => {
-    if (!onSelectSlot || !cellIsOpen(dayKey, index)) {
+    if (!onSelectSlot || !cellIsOpen(dayKey, index) || segmentsAt(dayKey, index).length > 0) {
       return;
     }
     const range = cellRange(dayKey, index, step);
@@ -239,29 +240,31 @@ function DatedWeekTable<TData extends CalendarData>(
   // The window listeners must be the same functions every render to be removable, but should still call the
   // latest commitDraft and updateMoving. Boxing the real logic in a ref gets both.
   const endDragRef = useRef<(commit: boolean) => void>(() => {});
-  endDragRef.current = (commit) => {
-    const info = dragInfoRef.current;
-    dragInfoRef.current = null;
-    setDragMode(null);
-    if (!commit) {
-      // A pointercancel, e.g. a touch turning into a scroll, snaps the draft straight back.
-      updateMoving(null);
-      return;
-    }
-    const result = movingRef.current;
-    if (!info || !result) {
-      return;
-    }
-    const unchanged =
-      result.start.getTime() === info.base.start.getTime() && result.end.getTime() === info.base.end.getTime();
-    // A press and release without crossing into another cell is a click, not a move: it leaves the draft grabbed.
-    if (unchanged) {
-      return;
-    }
-    if (commitDraft(result)) {
-      updateMoving(null);
-    }
-  };
+  useLayoutEffect(() => {
+    endDragRef.current = (commit) => {
+      const info = dragInfoRef.current;
+      dragInfoRef.current = null;
+      setDragMode(null);
+      if (!commit) {
+        // A pointercancel, e.g. a touch turning into a scroll, snaps the draft straight back.
+        updateMoving(null);
+        return;
+      }
+      const result = movingRef.current;
+      if (!info || !result) {
+        return;
+      }
+      const unchanged =
+        result.start.getTime() === info.base.start.getTime() && result.end.getTime() === info.base.end.getTime();
+      // A press and release without crossing into another cell is a click, not a move: it leaves the draft grabbed.
+      if (unchanged) {
+        return;
+      }
+      if (commitDraft(result)) {
+        updateMoving(null);
+      }
+    };
+  });
   const stableFinishDrag = useRef(() => endDragRef.current(true)).current;
   const stableCancelDrag = useRef(() => endDragRef.current(false)).current;
 
