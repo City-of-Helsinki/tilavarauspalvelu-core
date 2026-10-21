@@ -13,6 +13,7 @@ from tilavarauspalvelu.integrations.helsinki_profile.typing import UserProfileIn
 from tilavarauspalvelu.models import Application, Reservation
 from tilavarauspalvelu.tasks import save_personal_info_view_log_task
 from tilavarauspalvelu.typing import error_codes
+from utils.external_service.errors import ExternalServiceRequestError
 
 if TYPE_CHECKING:
     import datetime
@@ -103,6 +104,10 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
                 if profile_error.get("extensions", {}).get("code") == "PERMISSION_DENIED_ERROR":
                     raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_PERMISSION_DENIED) from e
             raise
+
+        except ExternalServiceRequestError as e:
+            msg = "Helsinki profile request failed."
+            raise GQLCodeError(msg, code=error_codes.UPSTREAM_CALL_FAILED) from e
 
         if info.context.session.get("keycloak_refresh_token_expired", False):
             msg = "Keycloak refresh token is expired. Please log out and back in again."

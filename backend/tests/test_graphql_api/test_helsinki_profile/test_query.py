@@ -290,7 +290,7 @@ def test_helsinki_profile_data__query__profile_request_fails(graphql):
     response = graphql(query)
 
     assert HelsinkiProfileClient.request.call_count == 1
-    assert response.error_message() == ("POST request to HELSINKI PROFILE (http://example.com) failed with status 500.")
+    assert response.error_message() == "Helsinki profile request failed."
 
     assert SentryLogger.log_message.call_count == 1
 
