@@ -1,7 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
 import { unavailableBackgroundSVG } from "@ui/components/calendar/utils";
-import { fontMedium } from "@ui/styled";
+import { fontBold } from "@ui/styled";
 import type { CellAppearance } from "./types";
 
 export type LegendState = CellAppearance | "open" | "closed";
@@ -23,7 +23,7 @@ const arrow = css`
   content: "";
   position: absolute;
   left: 8px;
-  top: 5px;
+  top: 3px;
   width: 0;
   height: 0;
   border-left: 5px solid transparent;
@@ -162,7 +162,7 @@ export const WeeklyPatternRoot = styled.div`
     top: 0;
     z-index: 2;
     background: var(--color-white);
-    ${fontMedium};
+    ${fontBold};
     font-size: var(--fontsize-body-m);
     text-align: center;
     padding: var(--spacing-2-xs) var(--spacing-xs);
@@ -175,25 +175,23 @@ export const WeeklyPatternRoot = styled.div`
   }
 
   tbody th {
-    ${fontMedium};
+    ${fontBold};
     font-size: var(--fontsize-body-m);
-    font-weight: normal;
     text-align: center;
     vertical-align: middle;
-    padding: 0 var(--spacing-xs);
     white-space: nowrap;
   }
 
   tbody td {
     position: relative;
     box-sizing: border-box;
-    padding: 0;
+    padding: 0 var(--spacing-2-xs) 0 0;
     border-inline: 1px solid var(--border-color);
     background: var(--color-white);
-    width: 110px;
+    width: calc((100% - 30px) / 7);
     height: var(--step-height);
     cursor: pointer;
-    text-align: center;
+    text-align: right;
     font-size: 10px;
     line-height: 0.9;
     color: transparent;
@@ -202,8 +200,11 @@ export const WeeklyPatternRoot = styled.div`
       background 0.1s ease-in-out,
       box-shadow 0.1s ease-in-out;
 
-    &[data-hour-start]:not([data-appearance="primary"], [data-appearance="secondary"]) {
-      border-top: 1px solid var(--border-color);
+    &:not([data-appearance="primary"], [data-appearance="secondary"]) {
+      border-top: 1px solid var(--color-black-10);
+      &[data-hour-start] {
+        border-top: 1px solid var(--border-color);
+      }
     }
 
     &[data-availability="closed"] {
@@ -212,15 +213,12 @@ export const WeeklyPatternRoot = styled.div`
       background-color: var(--color-black-5);
       background-repeat: repeat;
       cursor: default;
-      border: none;
-      border-inline: none;
-
-      --border-color: transparent;
     }
 
     &[data-appearance="primary"] {
       ${eventBackground("primary")};
       text-align: right;
+      border-top: 1px solid rgba(from var(--color-white) rgb, 0.1);
     }
 
     &[data-appearance="secondary"] {
@@ -266,7 +264,7 @@ export const WeeklyPatternRoot = styled.div`
 
   table:not([aria-readonly]) tbody td:not([data-availability="closed"], [data-appearance]):hover {
     color: var(--color-black-30);
-    background: var(--color-black-10);
+    background: var(--color-black-5);
   }
 `;
 
