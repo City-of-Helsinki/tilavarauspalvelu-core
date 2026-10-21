@@ -14,8 +14,8 @@
   "selectTime": "Valitse aika",
   "loginInfo": "Kirjaudu sisään varataksesi.",
   "showCurrentDay": "Näytä tämä päivä",
-  "showPrevious": "Naytä edellinen {{view}}",
-  "showNext": "Naytä seuraava {{view}}",
+  "showPrevious": "Näytä edellinen {{view}}",
+  "showNext": "Näytä seuraava {{view}}",
   "showView": "Näytä {{view}}näkymä",
   "initialReservation": "Alustava varaus",
   "makeReservation": "Varaa",
@@ -96,5 +96,26 @@
     "noTimes": "Ei vapaita {{duration}} aikoja",
     "gotoCalendar": "Katso kaikki vapaat ajat",
     "nextAvailableTime": "Näytä seuraava"
+  },
+  "toolbar": "Kalenterin ohjaimet",
+  "list": "Näytä varaukset luettelona",
+  "skipToList": "Siirry varausluetteloon",
+  "skipToForm": "Siirry varauslomakkeeseen",
+  "emptyList": "Ei varauksia tällä aikavälillä.",
+  "free": "Vapaa",
+  "closed": "Ei varattavissa",
+  "opensInNewTab": "avautuu uuteen välilehteen",
+  "cannotReserveHere": "Aikaa ei voi varata tähän kohtaan.",
+  "draft": {
+    "hint": "Varauksesi. Siirrä painamalla Enter.",
+    "grabbed": "Siirretään. Nuolinäppäimet siirtävät, vaihto ja ylös tai alas muuttaa kestoa, Enter vahvistaa ja Escape peruu.",
+    "moved": "Varaus siirretty",
+    "cancelled": "Siirto peruttu",
+    "slotSelected": "Valittu aika",
+    "controls": "Siirrä varaustasi",
+    "earlier": "Aiemmin",
+    "later": "Myöhemmin",
+    "shorter": "Lyhyempi",
+    "longer": "Pidempi"
   }
 }

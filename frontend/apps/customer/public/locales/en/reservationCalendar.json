@@ -98,5 +98,26 @@
     "noTimes": "No available times",
     "gotoCalendar": "See all available times",
     "nextAvailableTime": "Show next"
+  },
+  "toolbar": "Calendar controls",
+  "list": "Show reservations as a list",
+  "skipToList": "Skip to the list of reservations",
+  "skipToForm": "Skip to the reservation form",
+  "emptyList": "No reservations in this time range.",
+  "free": "Free",
+  "closed": "Not reservable",
+  "opensInNewTab": "opens in a new tab",
+  "cannotReserveHere": "This time can't be reserved.",
+  "draft": {
+    "hint": "Your reservation. Press Enter to move it.",
+    "grabbed": "Moving. The arrow keys move, Shift with up or down changes the length, Enter confirms and Escape cancels.",
+    "moved": "Reservation moved",
+    "cancelled": "Move cancelled",
+    "slotSelected": "Selected time",
+    "controls": "Move your reservation",
+    "earlier": "Earlier",
+    "later": "Later",
+    "shorter": "Shorter",
+    "longer": "Longer"
   }
 }
