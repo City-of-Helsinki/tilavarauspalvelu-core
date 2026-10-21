@@ -7,7 +7,7 @@ from django.test import override_settings
 from sentry_sdk.integrations.django import DjangoIntegration
 
 from config.sentry import sentry_before_send_transaction, sentry_traces_sampler
-from config.settings import Docker, Platta
+from config.settings import Common, Docker, Platta
 
 
 def test_sentry_traces_sampler_respects_parent_sampling_decision() -> None:
@@ -75,6 +75,7 @@ def test_sentry_before_send_transaction_accepts_event_without_request() -> None:
 @pytest.mark.parametrize("environment", [Docker, Platta])
 def test_sentry_post_setup_initializes_sdk_with_configured_options(environment: type[Docker | Platta]) -> None:
     with (
+        patch.object(environment, "SENTRY_ENABLED", new=True),
         patch.object(environment, "SENTRY_DSN", "https://public@example.ingest.sentry.io/1"),
         patch.object(environment, "SENTRY_ENVIRONMENT", "testing"),
         patch.object(environment, "SENTRY_RELEASE", "release-123"),
@@ -99,7 +100,28 @@ def test_sentry_post_setup_initializes_sdk_with_configured_options(environment: 
 
 @pytest.mark.parametrize("environment", [Docker, Platta])
 def test_sentry_post_setup_skips_sdk_initialization_without_dsn(environment: type[Docker | Platta]) -> None:
-    with patch.object(environment, "SENTRY_DSN", ""), patch("sentry_sdk.init") as sentry_init:
+    with (
+        patch.object(environment, "SENTRY_ENABLED", new=True),
+        patch.object(environment, "SENTRY_DSN", ""),
+        patch("sentry_sdk.init") as sentry_init,
+    ):
         environment.post_setup()
 
     sentry_init.assert_not_called()
+
+
+@pytest.mark.parametrize("environment", [Docker, Platta])
+def test_sentry_post_setup_skips_sdk_initialization_when_disabled(environment: type[Docker | Platta]) -> None:
+    with (
+        patch.object(environment, "SENTRY_ENABLED", new=False),
+        patch.object(environment, "SENTRY_DSN", "https://public@example.ingest.sentry.io/1"),
+        patch("sentry_sdk.init") as sentry_init,
+    ):
+        environment.post_setup()
+
+    sentry_init.assert_not_called()
+
+
+def test_sentry_is_enabled_by_default_only_in_platta_environments() -> None:
+    assert Common.SENTRY_ENABLED is False
+    assert Platta.SENTRY_ENABLED is True
