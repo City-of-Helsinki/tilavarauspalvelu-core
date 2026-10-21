@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from itertools import islice
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Any, Protocol, Self
 
 from django.contrib.postgres.search import SearchVector
 from django.db import connections, models
@@ -23,6 +23,11 @@ if TYPE_CHECKING:
 
     from tilavarauspalvelu.enums import AccessType
 
+    class _TranslatedName(Protocol):
+        name_fi: str | None
+        name_en: str | None
+        name_sv: str | None
+
 
 __all__ = [
     "ReservationUnitManager",
@@ -33,8 +38,19 @@ __all__ = [
 type ReservationUnitPK = int
 
 
-def _get_vector_translation_fallback(obj: models.Model | None, lang: str) -> str:
-    return getattr(obj, f"name_{lang}", "") or getattr(obj, "name_fi", "")
+def _get_vector_translation_fallback(obj: _TranslatedName | None, lang: str) -> str:
+    if obj is None:
+        return ""
+
+    match lang:
+        case "en":
+            name = obj.name_en
+        case "sv":
+            name = obj.name_sv
+        case _:
+            name = obj.name_fi
+
+    return name or obj.name_fi or ""
 
 
 class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
