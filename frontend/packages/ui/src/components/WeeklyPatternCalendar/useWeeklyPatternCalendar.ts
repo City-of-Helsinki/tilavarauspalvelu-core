@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { FocusEvent, KeyboardEvent, MouseEvent, PointerEvent } from "react";
 import { WEEKDAYS_SORTED } from "@ui/modules/const";
 import { Weekday } from "../../../gql/gql-types";
+import { useGridNavigation } from "../CalendarGrid/useGridNavigation";
+import type { GridAddress } from "../CalendarGrid/useGridNavigation";
 import {
   assertValidStep,
   groupAvailability,
@@ -44,7 +46,6 @@ export type WeeklyPatternOptions<TData extends CalendarData> = Pick<
   describeSpan: (weekday: Weekday, beginMinutes: number, endMinutes: number) => string;
 };
 
-type CellAddress = { weekday: Weekday; index: number };
 // A pointer drag: the cell it started on, the cell the pointer is over now, and whether it paints or erases.
 type Gesture<TData> = { weekday: Weekday; anchor: number; current: number; mode: PaintMode<TData> };
 // A Shift+Arrow keyboard sweep on one weekday. The mode is fixed when the sweep starts.
@@ -57,8 +58,6 @@ export type GridRow = {
   /** Set on the rows that start an hour (or every row when the step is an hour or more). */
   headerRowSpan: number | null;
 };
-
-const addressKey = (weekday: Weekday, index: number) => `${weekday}:${index}`;
 
 export function useWeeklyPatternCalendar<TData extends CalendarData>({
   value,
@@ -89,12 +88,10 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     isRangeOpen(rangesByDay[weekday], index * step, (index + 1) * step);
 
   const [gesture, setGesture] = useState<Gesture<TData> | null>(null);
-  const [active, setActive] = useState<CellAddress | null>(null);
   const [message, setMessage] = useState({ text: "", count: 0 });
   const gestureRef = useRef<Gesture<TData> | null>(null);
   const sweepRef = useRef<Sweep<TData> | null>(null);
   const pointerTypeRef = useRef("mouse");
-  const cellElements = useRef(new Map<string, HTMLTableCellElement>());
 
   // Live-region text. Alternating a trailing no-break space makes a repeated message announce again.
   const announce = useCallback((text: string) => {
@@ -114,19 +111,20 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       )
     : baseGrid;
 
-  const defaultActive = (): CellAddress | null => {
+  // The tab stop starts on the first open cell, so the grid isn't entered through a closed one.
+  const defaultActive = (): GridAddress<Weekday> | null => {
     for (let index = firstIndex; index < endIndex; index++) {
       for (const weekday of days) {
         if (isOpen(weekday, index)) {
-          return { weekday, index };
+          return { column: weekday, index };
         }
       }
     }
-    return hours ? { weekday: days[0] ?? Weekday.Monday, index: firstIndex } : null;
+    return hours ? { column: days[0] ?? Weekday.Monday, index: firstIndex } : null;
   };
-  const activeAddress = active && active.index >= firstIndex && active.index < endIndex ? active : defaultActive();
+  const navigation = useGridNavigation<Weekday>({ columns: days, firstIndex, endIndex, rowsPerHour, defaultActive });
 
-  // The window pointer listeners and the imperative `focus()` are set up once, so they read the
+  // The window pointer listeners are set up once, so they read the
   // latest props through this ref. Written in an effect because React Compiler forbids ref writes in render.
   const latest = useRef({
     baseGrid,
@@ -137,7 +135,6 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     isValidSelection,
     announcements,
     describeSpan,
-    activeAddress,
   });
   useEffect(() => {
     latest.current = {
@@ -149,7 +146,6 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       isValidSelection,
       announcements,
       describeSpan,
-      activeAddress,
     };
   });
 
@@ -190,18 +186,6 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     },
     [announce]
   );
-
-  const focusCell = (address: CellAddress) => {
-    cellElements.current.get(addressKey(address.weekday, address.index))?.focus();
-  };
-
-  // Exposed through the ref handle so react-hook-form's field.ref can focus the grid.
-  const focus = useCallback(() => {
-    const address = latest.current.activeAddress;
-    if (address) {
-      cellElements.current.get(addressKey(address.weekday, address.index))?.focus();
-    }
-  }, []);
 
   const endGesture = useCallback(
     (shouldCommit: boolean) => {
@@ -278,50 +262,21 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     commit(weekday, from, to, running.mode, running.anchor);
   };
 
-  const clampRow = (row: number) => Math.min(Math.max(row, firstIndex), endIndex - 1);
-
   const handleKeyDown = (event: KeyboardEvent<HTMLTableCellElement>, weekday: Weekday, index: number) => {
     if (event.altKey || event.ctrlKey || event.metaKey) {
       return;
     }
 
-    const dayPosition = days.indexOf(weekday);
-    const sideways = (offset: number) => days[Math.min(Math.max(dayPosition + offset, 0), days.length - 1)] ?? weekday;
+    if (event.key === " " || event.key === "Enter") {
+      event.preventDefault();
+      sweepRef.current = null;
+      toggleCell(weekday, index);
+      return;
+    }
 
-    let target: CellAddress;
-    switch (event.key) {
-      case "ArrowDown":
-        target = { weekday, index: clampRow(index + 1) };
-        break;
-      case "ArrowUp":
-        target = { weekday, index: clampRow(index - 1) };
-        break;
-      case "ArrowRight":
-        target = { weekday: sideways(1), index };
-        break;
-      case "ArrowLeft":
-        target = { weekday: sideways(-1), index };
-        break;
-      case "PageDown":
-        target = { weekday, index: clampRow(index + rowsPerHour) };
-        break;
-      case "PageUp":
-        target = { weekday, index: clampRow(index - rowsPerHour) };
-        break;
-      case "Home":
-        target = { weekday, index: firstIndex };
-        break;
-      case "End":
-        target = { weekday, index: endIndex - 1 };
-        break;
-      case " ":
-      case "Enter":
-        event.preventDefault();
-        sweepRef.current = null;
-        toggleCell(weekday, index);
-        return;
-      default:
-        return;
+    const target = navigation.targetFor(event.key, weekday, index);
+    if (!target) {
+      return;
     }
 
     event.preventDefault();
@@ -330,7 +285,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     } else {
       sweepRef.current = null;
     }
-    focusCell(target);
+    navigation.focusCell(target);
   };
 
   // Touch is handled as a plain tap on click, and non-primary mouse buttons are ignored.
@@ -402,17 +357,9 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
   };
 
   const cellBehaviour = (weekday: Weekday, index: number) => ({
-    ref: (element: HTMLTableCellElement | null) => {
-      const key = addressKey(weekday, index);
-      if (element) {
-        cellElements.current.set(key, element);
-      } else {
-        cellElements.current.delete(key);
-      }
-    },
-    // Roving tabindex: only the active cell is in the tab order.
-    tabIndex: !disabled && activeAddress?.weekday === weekday && activeAddress.index === index ? 0 : -1,
-    onFocus: () => setActive({ weekday, index }),
+    ...navigation.cellProps(weekday, index),
+    // A disabled grid has no tab stop.
+    tabIndex: disabled ? -1 : navigation.cellProps(weekday, index).tabIndex,
     onKeyDown: (event: KeyboardEvent<HTMLTableCellElement>) => handleKeyDown(event, weekday, index),
     onPointerDown: (event: PointerEvent<HTMLTableCellElement>) => handlePointerDown(event, weekday, index),
     onPointerEnter: () => extendGesture(weekday, index),
@@ -443,5 +390,5 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
 
   const liveMessage = message.count % 2 === 0 ? message.text : `${message.text} `;
 
-  return { days, rows, cellInfo, cellBehaviour, tableHandlers, focus, liveMessage };
+  return { days, rows, cellInfo, cellBehaviour, tableHandlers, focus: navigation.focus, liveMessage };
 }
