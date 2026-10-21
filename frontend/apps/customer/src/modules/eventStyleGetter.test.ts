@@ -30,29 +30,35 @@ function createCalendarEvent({
 describe("eventStyleGetter", () => {
   test("styles initial events and marks them draggable when allowed", () => {
     expect(eventStyleGetter(createCalendarEvent({ state: "INITIAL" }), [], true)).toEqual({
-      className: "rbc-event-movable",
+      isMovable: true,
+      isBuffer: false,
+      isBlocked: false,
       style: expect.objectContaining({
         backgroundColor: "var(--tilavaraus-event-initial-color)",
         color: "var(--color-black)",
-        border: "2px dashed var(--tilavaraus-event-initial-border)",
+        borderInline: "2px dashed var(--tilavaraus-event-initial-border)",
       }),
     });
   });
 
   test("styles own reservations differently from other confirmed reservations", () => {
     expect(eventStyleGetter(createCalendarEvent({ pk: 11 }), [11], true)).toEqual({
-      className: "",
+      isMovable: false,
+      isBuffer: false,
+      isBlocked: false,
       style: expect.objectContaining({
         backgroundColor: "var(--tilavaraus-event-initial-color)",
         color: "var(--color-black)",
-        border: "2px solid var(--tilavaraus-event-initial-border)",
+        borderInline: "2px solid var(--tilavaraus-event-initial-border)",
       }),
     });
   });
 
   test("styles buffer reservations with the buffer class", () => {
     expect(eventStyleGetter(createCalendarEvent({ state: "BUFFER" }), [1], true)).toEqual({
-      className: "rbc-event-buffer",
+      isMovable: false,
+      isBuffer: true,
+      isBlocked: false,
       style: expect.objectContaining({
         backgroundColor: "var(--color-black-5)",
       }),
@@ -61,11 +67,13 @@ describe("eventStyleGetter", () => {
 
   test("uses reservation styling for other reservation states", () => {
     expect(eventStyleGetter(createCalendarEvent({ state: ReservationStateChoice.Confirmed }), [], false)).toEqual({
-      className: "",
+      isMovable: false,
+      isBuffer: false,
+      isBlocked: false,
       style: expect.objectContaining({
         backgroundColor: "var(--tilavaraus-event-reservation-color)",
         color: "var(--color-black)",
-        border: "2px solid var(--tilavaraus-event-reservation-border)",
+        borderInline: "2px solid var(--tilavaraus-event-reservation-border)",
       }),
     });
   });
@@ -81,7 +89,9 @@ describe("eventStyleGetter", () => {
         true
       )
     ).toEqual({
-      className: "rbc-timeslot-inactive",
+      isMovable: true,
+      isBuffer: false,
+      isBlocked: true,
       style: expect.objectContaining({
         backgroundColor: "var(--color-black-5)",
         color: "transparent",
