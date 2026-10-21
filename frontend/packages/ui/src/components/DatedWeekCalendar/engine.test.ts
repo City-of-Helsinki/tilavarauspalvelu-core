@@ -1,5 +1,15 @@
 import { describe, expect, test } from "vitest";
-import { dayKeyOf, openRangesByDay, resolveVisibleHours, segmentEvents, stepDate, visibleDays } from "./engine";
+import {
+  cellRange,
+  dayKeyOf,
+  openRangesByDay,
+  resizeRange,
+  resolveVisibleHours,
+  segmentEvents,
+  shiftRange,
+  stepDate,
+  visibleDays,
+} from "./engine";
 import type { DatedEvent } from "./types";
 
 // 2026-10-21 is a Wednesday. The clocks go back on Sunday 2026-10-25.
@@ -131,5 +141,55 @@ describe("resolveVisibleHours", () => {
       beginMinutes: 60,
       endMinutes: 1020,
     });
+  });
+});
+
+describe("cellRange", () => {
+  test("is the real time of a cell in Helsinki", () => {
+    expect(cellRange("2026-10-21", 20, 30)).toEqual({
+      start: new Date("2026-10-21T10:00:00+03:00"),
+      end: new Date("2026-10-21T10:30:00+03:00"),
+    });
+  });
+
+  test("follows the clock after the clocks go back", () => {
+    expect(cellRange("2026-10-25", 20, 30).start).toEqual(new Date("2026-10-25T10:00:00+02:00"));
+  });
+});
+
+describe("shiftRange", () => {
+  const range = {
+    start: new Date("2026-10-23T10:00:00+03:00"),
+    end: new Date("2026-10-23T11:30:00+03:00"),
+  };
+
+  test("moves by minutes", () => {
+    expect(shiftRange(range, { minutes: 30 })).toEqual({
+      start: new Date("2026-10-23T10:30:00+03:00"),
+      end: new Date("2026-10-23T12:00:00+03:00"),
+    });
+  });
+
+  test("moves by days and keeps the clock time across the change to winter time", () => {
+    // 10:00 on Friday 23 October is UTC+3. Two days later the clocks have gone back, so 10:00 is UTC+2.
+    expect(shiftRange(range, { days: 2 })).toEqual({
+      start: new Date("2026-10-25T10:00:00+02:00"),
+      end: new Date("2026-10-25T11:30:00+02:00"),
+    });
+  });
+});
+
+describe("resizeRange", () => {
+  const range = {
+    start: new Date("2026-10-21T10:00:00+03:00"),
+    end: new Date("2026-10-21T11:00:00+03:00"),
+  };
+
+  test("moves only the end", () => {
+    expect(resizeRange(range, 30, 30)).toEqual({ start: range.start, end: new Date("2026-10-21T11:30:00+03:00") });
+  });
+
+  test("never makes the range shorter than the minimum", () => {
+    expect(resizeRange(range, -90, 30)).toEqual({ start: range.start, end: new Date("2026-10-21T10:30:00+03:00") });
   });
 });

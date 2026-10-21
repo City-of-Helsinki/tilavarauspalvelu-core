@@ -1,10 +1,10 @@
 import { addDays, format, startOfDay, startOfISOWeek } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
+import { fromZonedTime, toZonedTime } from "date-fns-tz";
 import { EXPECTED_TIMEZONE } from "@ui/modules/const";
 import { MINUTES_PER_DAY, isRangeOpen, mergeRanges, snapOutward } from "../WeeklyPatternCalendar/engine";
 import type { Range } from "../WeeklyPatternCalendar/engine";
 import type { CalendarData } from "../WeeklyPatternCalendar/types";
-import type { DatedEvent, DatedOpenRange, DatedVisibleHours, DatedWeekView } from "./types";
+import type { DatedEvent, DatedOpenRange, DatedRange, DatedVisibleHours, DatedWeekView } from "./types";
 
 // Everything below works on "wall-clock" dates: a Date whose local fields read as Europe/Helsinki time.
 // That way a day is always midnight to midnight, whatever time zone the browser is in.
@@ -177,4 +177,38 @@ export function segmentsInCell<TData extends CalendarData>(
   endMinutes: number
 ): Array<EventSegment<TData>> {
   return segments.filter((segment) => segment.beginMinutes < endMinutes && segment.endMinutes > beginMinutes);
+}
+
+// A wall-clock moment as the real Date it is in Europe/Helsinki. Built from the clock fields so that
+// moving by days or minutes follows the clock on the days the clocks change.
+function fromWallClock(year: number, month: number, day: number, minutes: number): Date {
+  return fromZonedTime(new Date(year, month, day, 0, minutes), EXPECTED_TIMEZONE);
+}
+
+/** The real time of the cell at `index` (counted in steps from midnight) on a yyyy-MM-dd day. */
+export function cellRange(dayKey: string, index: number, step: number): DatedRange {
+  const [year = 0, month = 1, day = 1] = dayKey.split("-").map(Number);
+  return {
+    start: fromWallClock(year, month - 1, day, index * step),
+    end: fromWallClock(year, month - 1, day, (index + 1) * step),
+  };
+}
+
+/** Moves a range by whole days and minutes of Helsinki wall-clock time. */
+export function shiftRange(
+  range: DatedRange,
+  { days = 0, minutes = 0 }: { days?: number; minutes?: number }
+): DatedRange {
+  const move = (date: Date) => {
+    const wall = toWallClock(date);
+    return fromWallClock(wall.getFullYear(), wall.getMonth(), wall.getDate() + days, minutesOfDay(wall) + minutes);
+  };
+  return { start: move(range.start), end: move(range.end) };
+}
+
+/** Moves the end of a range, keeping it at least `minimum` minutes long. */
+export function resizeRange(range: DatedRange, minutes: number, minimum: number): DatedRange {
+  const end = shiftRange({ start: range.end, end: range.end }, { minutes }).start;
+  const shortest = shiftRange({ start: range.start, end: range.start }, { minutes: minimum }).start;
+  return { start: range.start, end: end < shortest ? shortest : end };
 }

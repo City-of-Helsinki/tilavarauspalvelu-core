@@ -29,10 +29,19 @@ The Dated Week uses the same grid model. Only the slot cells are gridcells. An e
 - An event can lead somewhere, always in a new tab. Enter or Space on a cell opens the only linked event in it. With several linked events Enter opens the text list and moves focus to the first one, where every linked event is a real link. A cell and a list link that open a new tab say so in their name.
 - The grid is marked busy while its events load.
 
+## Choosing a time and moving the Draft Reservation
+
+The Dated Week can be read only, or the consumer can let the user place and move a Draft Reservation. The consumer owns the saved value and every rule. The Calendar only asks, and a reason to refuse is announced in the live region.
+
+- Click, tap, Enter or Space on a free open cell asks `onSelectSlot` to use that cell. A cell with a linked event opens the link first.
+- Enter or Space on a cell of the draft starts keyboard move mode. Up and Down move it by a step, Left and Right by a day, Shift with Up or Down change its length, Enter asks `onMoveDraft` to accept it, Escape cancels. Leaving the grid cancels. The grid shows a local preview and keeps focus on the cell where the draft starts. A move stays inside the shown days.
+- The buttons Earlier, Later, Shorter and Longer change the draft by one step each. They need no move mode, no dragging and no keyboard, so they are the single pointer alternative for 2.5.7 on touch and for pointer users. The first plan was Move and Resize mode buttons. Four direct buttons are simpler.
+- The draft cell is described by a hidden hint on how to move it. The grid is read only (`aria-readonly`) only when nothing can be chosen.
+- An `alternative` skip link leads to the equal form for the same task.
+- Whether a cell is open can be given as a list of ranges (`openRanges`) or as a function (`isOpen`) for rules that are not a list of ranges, such as the earliest and latest day a unit can be reserved.
+
 ## Not built yet
 
-These belong to the Dated Week. The read-only Dated Week is built. Selecting slots and the Draft Reservation are not.
-
-- The move mode for a Draft Reservation. Enter grabs it, arrows move it, Shift and arrows resize it, Enter confirms and Escape cancels.
-- On touch, tap only for painting. Explicit Move and Resize buttons for the Draft Reservation. Long press clashes with VoiceOver and TalkBack gestures.
-- The Calendar keeps a local preview while a move or resize is in progress. The consumer owns the saved value and the validation.
+- Pointer drag and resize of the Draft Reservation, which the old calendar had. Clicking a cell and the four buttons do the same things. Add it only if mouse users miss it.
+- Touch long press. It clashes with VoiceOver and TalkBack gestures, so the buttons are the touch way.
+- Playwright checks for focus, zoom, contrast and target size.
