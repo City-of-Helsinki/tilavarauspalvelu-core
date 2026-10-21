@@ -1,7 +1,7 @@
 import React from "react";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { axe } from "vitest-axe";
 import { DatedWeekCalendar } from "./DatedWeekCalendar";
 import type { DatedEvent, DatedWeekCalendarProps } from "./types";
@@ -70,6 +70,14 @@ function listElement(): HTMLDetailsElement {
     throw new Error("The list alternative is missing");
   }
   return list;
+}
+
+// Narrows an optional value without an `as` or `!` assertion, matching listElement() above.
+function required<T>(value: T | undefined, message: string): T {
+  if (value === undefined) {
+    throw new Error(message);
+  }
+  return value;
 }
 
 describe("DatedWeekCalendar", () => {
@@ -205,6 +213,54 @@ describe("DatedWeekCalendar", () => {
   });
 });
 
+describe("DatedWeekCalendar current time line", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const nowLines = () => screen.queryAllByTestId("dated-week-calendar__now-line");
+
+  test("is drawn through every day column when today is in the shown week, at the current time", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-21T09:15:00+03:00"));
+    renderCalendar();
+    const lines = nowLines();
+    expect(lines).toHaveLength(7);
+    expect(lines[0]).toHaveStyle({ top: "50%" });
+  });
+
+  test("only the leftmost line carries the dot", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-21T09:15:00+03:00"));
+    renderCalendar();
+    expect(screen.getAllByTestId("dated-week-calendar__now-dot")).toHaveLength(1);
+    expect(
+      within(required(nowLines()[0], "No now-line found")).getByTestId("dated-week-calendar__now-dot")
+    ).toBeInTheDocument();
+  });
+
+  test("is hidden when today is outside the shown range", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-21T09:15:00+03:00"));
+    renderCalendar({ date: new Date("2026-11-04T10:00:00+02:00") });
+    expect(nowLines()).toHaveLength(0);
+  });
+
+  test("is hidden when the current time is outside the visible hours", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-21T23:15:00+03:00"));
+    renderCalendar();
+    expect(nowLines()).toHaveLength(0);
+  });
+
+  test("is hidden in the day view when the shown day is not today", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-21T09:15:00+03:00"));
+    renderCalendar({ view: "day", date: new Date("2026-10-22T10:00:00+03:00") });
+    expect(nowLines()).toHaveLength(0);
+  });
+});
+
 describe("DatedWeekCalendar event links", () => {
   const two = [
     event("a", "Band practice", "2026-10-21T09:00:00+03:00", "2026-10-21T11:00:00+03:00"),
@@ -314,6 +370,9 @@ describe("DatedWeekCalendar choosing and moving", () => {
   }
 
   const log = () => screen.getByRole("log");
+
+  // The draft's body is split into one segment per row it spans; any of them can be grabbed.
+  const draftHandle = () => required(screen.getAllByTestId("dated-week-calendar__draft")[0], "The draft is missing");
 
   test("a grid where cells can be chosen is not read only", () => {
     renderInteractive();
@@ -446,6 +505,60 @@ describe("DatedWeekCalendar choosing and moving", () => {
   test("there are no move buttons without a way to move the draft", () => {
     renderInteractive({ onMoveDraft: undefined });
     expect(screen.queryByRole("group", { name: "Move your reservation" })).not.toBeInTheDocument();
+  });
+
+  test("dragging the draft to another cell moves it, keeping its length, and commits on release", () => {
+    const { onMoveDraft } = renderInteractive();
+    fireEvent.pointerDown(draftHandle());
+    expect(log()).toHaveTextContent("Moving");
+
+    fireEvent.pointerEnter(cell(/^Wednesday 21 October, 09:00–09:30/));
+    expect(cell(/^Wednesday 21 October, 09:00–10:00, Draft: Your reservation$/)).toBeInTheDocument();
+    expect(onMoveDraft).not.toHaveBeenCalled();
+
+    fireEvent.pointerUp(window);
+    expect(onMoveDraft).toHaveBeenCalledWith(range("2026-10-21T09:00:00+03:00", "2026-10-21T10:00:00+03:00"));
+    expect(log()).toHaveTextContent("Moved to: Wednesday 21 October, 09:00–10:00");
+  });
+
+  test("dragging across days moves the draft to the day under the pointer", () => {
+    const { onMoveDraft } = renderInteractive();
+    fireEvent.pointerDown(draftHandle());
+    fireEvent.pointerEnter(cell(/^Thursday 22 October, 10:00–10:30/));
+    fireEvent.pointerUp(window);
+    expect(onMoveDraft).toHaveBeenCalledWith(range("2026-10-22T10:00:00+03:00", "2026-10-22T11:00:00+03:00"));
+  });
+
+  test("pressing and releasing the draft without crossing a cell leaves it grabbed, like a click", () => {
+    const { onMoveDraft } = renderInteractive();
+    fireEvent.pointerDown(draftHandle());
+    fireEvent.pointerUp(window);
+    expect(onMoveDraft).not.toHaveBeenCalled();
+    expect(cell(/^Wednesday 21 October, 10:00–11:00, Draft: Your reservation$/)).toBeInTheDocument();
+  });
+
+  test("dragging the resize handle changes the draft's end, keeping its start, and commits on release", () => {
+    const { onMoveDraft } = renderInteractive();
+    fireEvent.pointerDown(screen.getByTestId("dated-week-calendar__resize-handle"));
+    fireEvent.pointerEnter(cell(/^Wednesday 21 October, 11:30–12:00/));
+    fireEvent.pointerUp(window);
+    expect(onMoveDraft).toHaveBeenCalledWith(range("2026-10-21T10:00:00+03:00", "2026-10-21T12:00:00+03:00"));
+  });
+
+  test("the resize handle can't shrink the draft below one step", () => {
+    const { onMoveDraft } = renderInteractive();
+    fireEvent.pointerDown(screen.getByTestId("dated-week-calendar__resize-handle"));
+    fireEvent.pointerEnter(cell(/^Wednesday 21 October, 08:00–08:30/));
+    fireEvent.pointerUp(window);
+    expect(onMoveDraft).toHaveBeenCalledWith(range("2026-10-21T10:00:00+03:00", "2026-10-21T10:30:00+03:00"));
+  });
+
+  test("a pointercancel cancels a drag without committing anything", () => {
+    const { onMoveDraft } = renderInteractive();
+    fireEvent.pointerDown(draftHandle());
+    fireEvent.pointerEnter(cell(/^Wednesday 21 October, 09:00–09:30/));
+    fireEvent.pointerCancel(window);
+    expect(onMoveDraft).not.toHaveBeenCalled();
   });
 
   test("an interactive grid has no axe violations", async () => {

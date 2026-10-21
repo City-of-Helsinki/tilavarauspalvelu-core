@@ -9,11 +9,8 @@ export const eventStyleGetter = (
   draggable = true
 ): { style: React.CSSProperties; className?: string } => {
   const style = {
-    borderRadius: "0px",
-    opacity: "0.8",
     color: "var(--color-white)",
     display: "block",
-    borderColor: "transparent",
   } as Record<string, string>;
   let className = "";
 
@@ -30,13 +27,13 @@ export const eventStyleGetter = (
     case "INITIAL":
       style.backgroundColor = "var(--tilavaraus-event-initial-color)";
       style.color = "var(--color-black)";
-      style.border = "2px dashed var(--tilavaraus-event-initial-border)";
+      style.borderInline = "2px dashed var(--tilavaraus-event-initial-border)";
       className = draggable ? "rbc-event-movable" : "";
       break;
     case "OWN":
       style.backgroundColor = "var(--tilavaraus-event-initial-color)";
       style.color = "var(--color-black)";
-      style.border = "2px solid var(--tilavaraus-event-initial-border)";
+      style.borderInline = "2px solid var(--tilavaraus-event-initial-border)";
       break;
     case "BUFFER":
       style.backgroundColor = "var(--color-black-5)";
@@ -44,7 +41,7 @@ export const eventStyleGetter = (
       break;
     default:
       style.backgroundColor = "var(--tilavaraus-event-reservation-color)";
-      style.border = "2px solid var(--tilavaraus-event-reservation-border)";
+      style.borderInline = "2px solid var(--tilavaraus-event-reservation-border)";
       style.color = "var(--color-black)";
   }
 

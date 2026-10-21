@@ -17,6 +17,11 @@ export const DatedWeekRoot = styled.div`
 
   display: grid;
   gap: var(--spacing-xs);
+
+  /* Stops the drag from also selecting the text of the cells the pointer crosses. */
+  &[data-dragging] {
+    user-select: none;
+  }
 `;
 
 export const Toolbar = styled.div`
@@ -84,7 +89,7 @@ export const GridScroller = styled.div`
     top: 0;
     z-index: 2;
     padding: var(--spacing-2-xs) var(--spacing-xs);
-    border-bottom: 1px solid var(--border-color);
+
     background: var(--color-white);
     ${fontBold};
     text-align: center;
@@ -123,7 +128,7 @@ export const GridScroller = styled.div`
     &[data-availability="closed"] {
       background-color: var(--color-black-5);
       background-image: ${unavailableBackgroundSVG};
-      background-size: auto var(--step-height);
+      background-size: auto calc(var(--step-height) / 2);
     }
 
     &:focus-visible {
@@ -148,23 +153,68 @@ export const EventStripe = styled.span`
   box-sizing: border-box;
   overflow: hidden;
   padding: 2px var(--spacing-3-xs, 2px) 0;
-  border-inline: 2px solid var(--color-black-90);
+  border-inline: 2px dashed var(--color-bus);
   background: var(--color-bus-light, var(--color-black-10));
   color: var(--color-black-90);
   text-align: left;
   pointer-events: none;
 
   &[data-segment-start] {
-    border-top: 2px solid var(--color-black-90);
     border-top-left-radius: var(--spacing-2-xs);
     border-top-right-radius: var(--spacing-2-xs);
+    border-top: 1px dashed var(--color-bus);
   }
 
   &[data-segment-end] {
-    border-bottom: 2px solid var(--color-black-90);
+    border-bottom: 1px dashed var(--color-bus);
     border-bottom-left-radius: var(--spacing-2-xs);
     border-bottom-right-radius: var(--spacing-2-xs);
   }
+
+  /* Only the draft can be dragged. Every other event stays decorative and lets clicks fall through to its cell. */
+  &[data-draft] {
+    pointer-events: auto;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  &[data-moving] {
+    cursor: grabbing;
+  }
+`;
+
+// Resizes the draft from its foot, the way the Shorter and Longer buttons do. Its own pointerdown stops the
+// drag from also being read as a move of the whole event.
+export const ResizeHandle = styled.span`
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 7px;
+  cursor: ns-resize;
+  touch-action: none;
+`;
+
+// The current time, drawn over the cells of its row. One is rendered per day column, so together they
+// cross the whole grid. Only the leftmost carries the dot, which marks the start of the line.
+export const NowLine = styled.span`
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-bus);
+  pointer-events: none;
+`;
+
+export const NowDot = styled.span`
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-bus);
+  transform: translate(-50%, -50%);
 `;
 
 export const ListAlternative = styled.details`
