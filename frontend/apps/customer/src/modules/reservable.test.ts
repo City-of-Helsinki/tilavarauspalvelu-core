@@ -10,7 +10,7 @@ import {
   getBoundCheckedReservation,
   getMaxReservationDuration,
   getMinReservationDuration,
-  getSlotPropGetter,
+  getIsSlotReservable,
   isRangeReservable,
   isStartTimeValid,
 } from "./reservable";
@@ -704,7 +704,7 @@ describe("isRangeReservable", () => {
   });
 });
 
-describe("getSlotPropGetter", () => {
+describe("getIsSlotReservable", () => {
   function createGetter({
     customValidation,
     reservableTimes = createMockReservableTimes(),
@@ -712,7 +712,7 @@ describe("getSlotPropGetter", () => {
     customValidation?: (date: Date) => boolean;
     reservableTimes?: ReservableMap;
   } = {}) {
-    return getSlotPropGetter({
+    return getIsSlotReservable({
       reservableTimes,
       activeApplicationRounds: [],
       reservationsMinDaysBefore: 0,
@@ -721,23 +721,19 @@ describe("getSlotPropGetter", () => {
     });
   }
 
-  test("returns empty props for a reservable slot", () => {
+  test("is true for a reservable slot", () => {
     const date = addHours(startOfDay(addDays(new Date(), 1)), 10);
-    expect(createGetter()(date)).toEqual({});
+    expect(createGetter()(date)).toBe(true);
   });
 
-  test("returns inactive class when slot is not reservable", () => {
+  test("is false when the slot is not reservable", () => {
     const date = addHours(startOfDay(addDays(new Date(), 40)), 10);
-    expect(createGetter()(date)).toEqual({
-      className: "rbc-timeslot-inactive",
-    });
+    expect(createGetter()(date)).toBe(false);
   });
 
-  test("returns inactive class when custom validation fails", () => {
+  test("is false when custom validation fails", () => {
     const date = addHours(startOfDay(addDays(new Date(), 1)), 10);
-    expect(createGetter({ customValidation: () => false })(date)).toEqual({
-      className: "rbc-timeslot-inactive",
-    });
+    expect(createGetter({ customValidation: () => false })(date)).toBe(false);
   });
 });
 

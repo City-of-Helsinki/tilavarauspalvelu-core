@@ -19,7 +19,6 @@ import {
   addMilliseconds,
   differenceInMinutes,
 } from "date-fns";
-import type { SlotProps } from "ui/src/components/calendar/Calendar";
 import { getIntervalMinutes } from "ui/src/modules/conversion";
 import { formatApiDateUnsafe, parseApiDate } from "ui/src/modules/date-utils";
 import { dayMax, dayMin } from "ui/src/modules/helpers";
@@ -457,7 +456,7 @@ type PropGetterProps = {
   reservationBeginsAt?: Date;
   reservationEndsAt?: Date;
 };
-export const getSlotPropGetter =
+export const getIsSlotReservable =
   ({
     reservableTimes,
     activeApplicationRounds,
@@ -467,26 +466,16 @@ export const getSlotPropGetter =
     reservationsMaxDaysBefore,
     customValidation,
   }: PropGetterProps) =>
-  (date: Date): SlotProps => {
-    if (
-      areSlotsReservable(
-        [date],
-        reservableTimes,
-        reservationsMinDaysBefore,
-        reservationsMaxDaysBefore,
-        reservationBeginsAt,
-        reservationEndsAt,
-        activeApplicationRounds
-      ) &&
-      (customValidation ? customValidation(date) : true)
-    ) {
-      return {};
-    }
-
-    return {
-      className: "rbc-timeslot-inactive",
-    };
-  };
+  (date: Date): boolean =>
+    areSlotsReservable(
+      [date],
+      reservableTimes,
+      reservationsMinDaysBefore,
+      reservationsMaxDaysBefore,
+      reservationBeginsAt,
+      reservationEndsAt,
+      activeApplicationRounds
+    ) && (customValidation ? customValidation(date) : true);
 
 /// Clamp the user selected start time and duration to the nearest interval
 export function getBoundCheckedReservation({

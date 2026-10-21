@@ -5,11 +5,11 @@ import { add, startOfISOWeek } from "date-fns";
 import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
 import styled from "styled-components";
-import type { CalendarEventBuffer } from "@ui/components/calendar/Calendar";
+import type { CalendarEventBuffer } from "@ui/components/calendar/types";
 import { getEventBuffers } from "@ui/components/calendar/utils";
 import { DatedWeekCalendar } from "@ui/components/DatedWeekCalendar/DatedWeekCalendar";
+import { ToolbarButton } from "@ui/components/DatedWeekCalendar/styles";
 import type { DatedEvent, DatedWeekView } from "@ui/components/DatedWeekCalendar/types";
-import { ToolbarBtn } from "ui/src/components/calendar/Toolbar";
 import { filterNonNullable, toNumber } from "ui/src/modules/helpers";
 import { ReservationStateChoice, ReservationTypeChoice, UserPermissionChoice } from "@gql/gql-types";
 import type { TimeBlockSectionFragment } from "@gql/gql-types";
@@ -130,7 +130,9 @@ const Calendar = forwardRef(function Calendar(
           isAllowedToModify ? (
             // NOTE don't use HDS buttons in the toolbar, breaks mobile layout
             <VisibleIfPermission reservation={reservation} permission={UserPermissionChoice.CanManageReservations}>
-              <ToolbarBtn onClick={handleEditTimeClick}>{t("reservation:EditTimeModal.acceptBtn")}</ToolbarBtn>
+              <ToolbarButton type="button" onClick={handleEditTimeClick}>
+                {t("reservation:EditTimeModal.acceptBtn")}
+              </ToolbarButton>
             </VisibleIfPermission>
           ) : null
         }
