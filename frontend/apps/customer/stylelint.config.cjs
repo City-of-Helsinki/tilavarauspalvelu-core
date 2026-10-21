@@ -4,6 +4,7 @@ module.exports = {
   ignore: ["hooks"],
   rules: {
     "media-feature-range-notation": "prefix",
+    "color-function-notation": ["modern"],
     // temp rules after upgrade
     "nesting-selector-no-missing-scoping-root": null,
     "no-empty-source": null,
@@ -13,7 +14,6 @@ module.exports = {
     "declaration-empty-line-before": null,
     "rule-empty-line-before": null,
     "at-rule-empty-line-before": null,
-    "color-function-notation": null,
     "selector-class-pattern": null,
     "comment-empty-line-before": null,
     "custom-property-empty-line-before": null,
