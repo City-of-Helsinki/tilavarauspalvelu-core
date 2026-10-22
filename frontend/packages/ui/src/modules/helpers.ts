@@ -412,10 +412,9 @@ export function cleanHtmlContent(html: string): string {
 
 export function charCount(value: string, maxLength = 0) {
   const pureString = stripHtml(cleanHtmlContent(value));
-  const amount = pureString.length;
   return {
-    amount,
-    tooLong: maxLength > 0 && length > maxLength,
+    amount: pureString.length,
+    tooLong: maxLength > 0 && pureString.length > maxLength,
   };
 }
 
