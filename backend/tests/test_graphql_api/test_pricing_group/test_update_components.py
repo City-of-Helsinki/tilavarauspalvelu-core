@@ -102,7 +102,7 @@ def test_pricing_group__update_components__delete_future_component(graphql):
 
     input_data = {
         "pk": pricing_group.pk,
-        "components": [component_input(active, validUntil=None)],
+        "components": [{"pk": active.pk, "validUntil": None}],
         "deletedComponents": [future.pk],
     }
     response = graphql(UPDATE_COMPONENTS_MUTATION, input_data=input_data)
@@ -112,6 +112,44 @@ def test_pricing_group__update_components__delete_future_component(graphql):
     components = list(PriceComponent.objects.filter(pricing_group=pricing_group))
     assert components == [active]
     assert components[0].valid_until is None
+
+
+def test_pricing_group__update_components__left_out_fields_keep_saved_values(graphql):
+    today = local_date()
+    change_date = today + datetime.timedelta(days=10)
+
+    pricing_group = PricingGroupFactory.create()
+    active = PriceComponentFactory.create(
+        pricing_group=pricing_group,
+        valid_from=today - datetime.timedelta(days=10),
+        amount=Decimal(10),
+        payment_type=PaymentType.ON_SITE,
+        can_apply_for_discount=True,
+    )
+
+    graphql.login_with_superuser()
+
+    input_data = {
+        "pk": pricing_group.pk,
+        "components": [
+            {"pk": active.pk, "validUntil": change_date.isoformat()},
+            {
+                "validFrom": change_date.isoformat(),
+                "amount": "20.00",
+                "priceUnit": PriceUnit.PER_HOUR,
+                "paymentType": PaymentType.ON_SITE,
+            },
+        ],
+    }
+    response = graphql(UPDATE_COMPONENTS_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response
+
+    active = PriceComponent.objects.get(pk=active.pk)
+    assert active.valid_until == change_date
+    assert active.amount == Decimal(10)
+    assert active.payment_type == PaymentType.ON_SITE
+    assert active.can_apply_for_discount is True
 
 
 # ── Edit rules ──
@@ -234,7 +272,7 @@ def test_pricing_group__update_components__required_fields(graphql):
     assert response.field_errors == [
         {
             "field": "components.0.nonFieldErrors",
-            "message": "Price component is missing required fields: valid_from, amount, price_unit.",
+            "message": "New price component is missing required fields: valid_from, amount, price_unit.",
             "code": error_codes.REQUIRED_FIELD_MISSING,
         },
     ]

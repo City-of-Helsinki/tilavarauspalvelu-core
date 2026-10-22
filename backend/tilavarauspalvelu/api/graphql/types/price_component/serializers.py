@@ -20,8 +20,8 @@ __all__ = [
 
 class PriceComponentInputSerializer(NestingModelSerializer):
     """
-    One component in a batch of changes. A component with a `pk` replaces the saved component as a whole,
-    so every field must be given, also the ones that do not change.
+    One component in a batch of changes. A component with a `pk` updates a saved component.
+    Its fields that are left out keep their saved values. A component without a `pk` is new.
     """
 
     class Meta:
@@ -40,9 +40,12 @@ class PriceComponentInputSerializer(NestingModelSerializer):
         ]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        if data.get("pk") is not None:
+            return data
+
         missing_fields = [field for field in ("valid_from", "amount", "price_unit") if field not in data]
         if missing_fields:
-            msg = f"Price component is missing required fields: {', '.join(missing_fields)}."
+            msg = f"New price component is missing required fields: {', '.join(missing_fields)}."
             raise ValidationError(msg, code=error_codes.REQUIRED_FIELD_MISSING)
         return data
 

@@ -39,25 +39,61 @@ class PricingGroupComponentsSerializer(NestingModelSerializer):
         component_data: list[dict[str, Any]] = validated_data.pop("components", [])
         deleted_component_pks: list[int] = validated_data.pop("deleted_components", [])
 
-        components = [
-            PriceComponent(
-                pk=data.get("pk"),
-                pricing_group=instance,
-                kind=PriceComponentKind.BASE,
-                valid_from=data["valid_from"],
-                valid_until=data.get("valid_until"),
-                price_option=data.get("price_option"),
-                amount=data["amount"],
-                price_unit=data["price_unit"],
-                accounting=data.get("accounting"),
-                can_apply_for_discount=data.get("can_apply_for_discount", False),
-                material_price_description_fi=data.get("material_price_description_fi", ""),
-                material_price_description_en=data.get("material_price_description_en", ""),
-                material_price_description_sv=data.get("material_price_description_sv", ""),
-                payment_type=data.get("payment_type"),
-            )
-            for data in component_data
-        ]
+        saved_components = {
+            component.pk: component for component in PriceComponent.objects.filter(pricing_group=instance)
+        }
+
+        components: list[PriceComponent] = []
+        for data in component_data:
+            saved_component = saved_components.get(data.get("pk"))
+
+            # A field that is left out of an update keeps its saved value.
+            if saved_component is not None:
+                component = PriceComponent(
+                    pk=saved_component.pk,
+                    pricing_group=instance,
+                    kind=saved_component.kind,
+                    valid_from=data.get("valid_from", saved_component.valid_from),
+                    valid_until=data.get("valid_until", saved_component.valid_until),
+                    price_option=data.get("price_option", saved_component.price_option),
+                    amount=data.get("amount", saved_component.amount),
+                    price_unit=data.get("price_unit", saved_component.price_unit),
+                    accounting=data.get("accounting", saved_component.accounting),
+                    can_apply_for_discount=data.get("can_apply_for_discount", saved_component.can_apply_for_discount),
+                    material_price_description_fi=data.get(
+                        "material_price_description_fi",
+                        saved_component.material_price_description_fi,
+                    ),
+                    material_price_description_en=data.get(
+                        "material_price_description_en",
+                        saved_component.material_price_description_en,
+                    ),
+                    material_price_description_sv=data.get(
+                        "material_price_description_sv",
+                        saved_component.material_price_description_sv,
+                    ),
+                    payment_type=data.get("payment_type", saved_component.payment_type),
+                )
+
+            else:
+                component = PriceComponent(
+                    pk=data.get("pk"),
+                    pricing_group=instance,
+                    kind=PriceComponentKind.BASE,
+                    valid_from=data.get("valid_from"),
+                    valid_until=data.get("valid_until"),
+                    price_option=data.get("price_option"),
+                    amount=data.get("amount"),
+                    price_unit=data.get("price_unit"),
+                    accounting=data.get("accounting"),
+                    can_apply_for_discount=data.get("can_apply_for_discount", False),
+                    material_price_description_fi=data.get("material_price_description_fi", ""),
+                    material_price_description_en=data.get("material_price_description_en", ""),
+                    material_price_description_sv=data.get("material_price_description_sv", ""),
+                    payment_type=data.get("payment_type"),
+                )
+
+            components.append(component)
 
         save_price_component_changes(
             pricing_group=instance,
