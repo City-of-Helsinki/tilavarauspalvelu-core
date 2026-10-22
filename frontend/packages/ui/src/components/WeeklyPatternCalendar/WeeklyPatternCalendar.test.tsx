@@ -127,10 +127,10 @@ describe("WeeklyPatternCalendar", () => {
     ]);
   });
 
-  test("a refused selection is announced with its reason and does not change the value", async () => {
+  test("a refused paint is announced with its reason and does not change the value", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
-    render(<Harness onChange={onChange} isValidSelection={() => "Too short"} />);
+    render(<Harness onChange={onChange} isValidPaint={() => "Too short"} />);
 
     cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30/).focus();
     await user.keyboard("{Enter}");
