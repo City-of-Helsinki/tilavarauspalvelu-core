@@ -29,15 +29,7 @@ import type {
 
 export type WeeklyPatternOptions<TData extends CalendarData> = Pick<
   WeeklyPatternCalendarProps<TData>,
-  | "value"
-  | "onBlur"
-  | "step"
-  | "availability"
-  | "visibleHours"
-  | "brush"
-  | "isDataEqual"
-  | "isValidSelection"
-  | "disabled"
+  "value" | "onBlur" | "step" | "availability" | "visibleHours" | "brush" | "isDataEqual" | "isValidPaint" | "disabled"
 > & {
   onChange: (value: WeeklyPatternValue<TData>) => void;
   readOnly?: boolean;
@@ -68,7 +60,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
   visibleHours,
   brush,
   isDataEqual = shallowEqual,
-  isValidSelection,
+  isValidPaint,
   readOnly = false,
   disabled = false,
   announcements,
@@ -132,7 +124,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
     step,
     isDataEqual,
     isOpen,
-    isValidSelection,
+    isValidPaint,
     announcements,
     describeSpan,
   });
@@ -143,7 +135,7 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       step,
       isDataEqual,
       isOpen,
-      isValidSelection,
+      isValidPaint,
       announcements,
       describeSpan,
     };
@@ -173,8 +165,8 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       }
       const beginMinutes = Math.min(spanFrom, from, to) * current.step;
       const endMinutes = (Math.max(spanFrom, from, to) + 1) * current.step;
-      if (mode.kind === "paint" && current.isValidSelection) {
-        const reason = current.isValidSelection({ weekday, beginMinutes, endMinutes, data: mode.data });
+      if (mode.kind === "paint" && current.isValidPaint) {
+        const reason = current.isValidPaint({ weekday, beginMinutes, endMinutes, data: mode.data });
         if (reason) {
           announce(reason);
           return;
