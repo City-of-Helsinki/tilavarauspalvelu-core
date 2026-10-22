@@ -13,8 +13,27 @@ The first cell of a painted run is named after the whole run. The other cells na
 - Arrow keys move focus. Page Up and Page Down move one hour. Home and End go to the first and last row.
 - Enter or Space paints or erases the cell. Shift and Arrow Up or Down extend a sweep. The mode of a sweep is fixed when it starts.
 - A polite live region says what changed.
-- A consumer can refuse a paint with `isValidSelection`. The Calendar says the reason and does not change the value.
+- A consumer can refuse a paint with `isValidPaint`. The Calendar says the reason and does not change the value.
+  The prop refuses a paint, not a Selection, so it is not called `isValidSelection`.
 - A cell outside the Reservable Times cannot be painted. It can be erased.
+
+## Choosing a Selection in the Weekly Pattern
+
+The Weekly Pattern has a third mode beside editable and read only. In it the consumer owns a Selection, which is one
+span on one weekday. The staff allocation view uses it. The mode is a third props variant, as the other two are, so
+each variant only has the props that mean something in it.
+
+- The grid never changes `value` in this mode. The painted value stays the layer the consumer draws, such as Demand.
+  A Selection and a painted cell can therefore live in the same cell.
+- `aria-selected` marks only the Selection in this mode. In the other two modes it still marks a painted cell, because
+  there the paint is the choice the user made.
+- Enter or Space chooses the focused cell alone and replaces any Selection. Escape clears it. Plain arrow keys move
+  focus and keep the Selection.
+- Shift with Arrow Up or Down moves the end of the Selection that focus is on. The other end stays. So the Selection
+  can grow and shrink. A paint sweep can only grow, which is why this is a separate model with an anchor.
+- A pointer press, drag and release chooses a span on the weekday it started on. A press alone chooses one cell. A tap
+  chooses one cell.
+- Every change is announced in the live region. The consumer gives the words for chosen and cleared.
 
 ## Dated Week events
 
