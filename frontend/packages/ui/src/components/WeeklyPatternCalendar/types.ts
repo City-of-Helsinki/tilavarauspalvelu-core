@@ -98,6 +98,12 @@ export type WeeklyPatternCalendarProps<TData extends CalendarData> = (EditablePr
 
   /** BCP 47 tag used for weekday names. */
   locale: string;
+  /**
+   * How a weekday name is shown in the column header. Short is for a narrow day column, where a long name such as
+   * "keskiviikko" does not fit. The header keeps the long name as its accessible name either way, so a screen
+   * reader hears the same words, and so does a cell label.
+   */
+  weekdayNameStyle?: "long" | "short";
   /** Translated state word for a cell, e.g. "Closed", "Free", "Primary". */
   getStateLabel: (cell: WeeklyPatternCellInfo<TData>) => string;
   getCellAppearance?: (data: TData) => CellAppearance | undefined;
