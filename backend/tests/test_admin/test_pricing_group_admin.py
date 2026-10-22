@@ -87,7 +87,10 @@ def test_pricing_group_admin__overlapping_components_are_rejected(api_client):
     assert errors == [
         {
             "code": "",
-            "message": "Pricing group has more than one price from 2026-02-01 onward.",
+            "message": (
+                "Pricing group has more than one price from 2026-02-01 onward. "
+                "Price components: new from 2026-01-01, new from 2026-02-01."
+            ),
         },
     ]
     assert not PricingGroup.objects.exists()

@@ -136,7 +136,7 @@ def _check_date_range(
     if not offered_options and len(components_for_all_options) > 1:
         error = CoverageError(
             code=error_codes.PRICING_GROUP_COVERAGE_OVERLAP,
-            message=f"Pricing group has more than one price {range_text}.",
+            message=f"Pricing group has more than one price {range_text}. {_describe(components_for_all_options)}",
             components=components_for_all_options,
             begin=begin,
             end=end,
@@ -152,7 +152,10 @@ def _check_date_range(
         if len(matching_components) > 1:
             error = CoverageError(
                 code=error_codes.PRICING_GROUP_COVERAGE_OVERLAP,
-                message=f"Pricing group has more than one price for option '{option.name}' {range_text}.",
+                message=(
+                    f"Pricing group has more than one price for option '{option.name}' {range_text}. "
+                    f"{_describe(matching_components)}"
+                ),
                 components=matching_components,
                 begin=begin,
                 end=end,
@@ -164,7 +167,7 @@ def _check_date_range(
     if len(payment_types) > 1:
         error = CoverageError(
             code=error_codes.PRICING_GROUP_PAYMENT_TYPE_CONFLICT,
-            message=f"All paid prices must have the same payment type {range_text}.",
+            message=f"All paid prices must have the same payment type {range_text}. {_describe(paid_components)}",
             components=paid_components,
             begin=begin,
             end=end,
@@ -178,3 +181,11 @@ def _format_date_range(*, begin: datetime.date, end: datetime.date | None) -> st
     if end is None:
         return f"from {begin.isoformat()} onward"
     return f"from {begin.isoformat()} until {end.isoformat()}"
+
+
+def _describe(components: list[PriceComponent]) -> str:
+    names = [
+        str(component.pk) if component.pk is not None else f"new from {component.valid_from.isoformat()}"
+        for component in components
+    ]
+    return f"Price components: {', '.join(names)}."

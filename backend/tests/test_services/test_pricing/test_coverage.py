@@ -156,11 +156,25 @@ def test_coverage__overlap_without_options():
     assert errors == [
         CoverageError(
             code=error_codes.PRICING_GROUP_COVERAGE_OVERLAP,
-            message="Pricing group has more than one price from 2026-02-01 until 2026-03-01.",
+            message=(
+                "Pricing group has more than one price from 2026-02-01 until 2026-03-01. "
+                "Price components: new from 2026-01-01, new from 2026-02-01."
+            ),
             components=[first, second],
             begin=FEB_1,
             end=MAR_1,
         ),
+    ]
+
+
+def test_coverage__overlap_names_saved_components():
+    first = PriceComponentFactory.create(valid_from=JAN_1, valid_until=None)
+    second = PriceComponentFactory.create(pricing_group=first.pricing_group, valid_from=FEB_1, valid_until=None)
+
+    errors = check_pricing_group_coverage(components=[first, second], reservation_unit_begin_dates=[])
+
+    assert [error.message for error in errors] == [
+        f"Pricing group has more than one price from 2026-02-01 onward. Price components: {first.pk}, {second.pk}.",
     ]
 
 
@@ -177,7 +191,10 @@ def test_coverage__overlap_for_one_option():
     assert errors == [
         CoverageError(
             code=error_codes.PRICING_GROUP_COVERAGE_OVERLAP,
-            message="Pricing group has more than one price for option 'Adults' from 2026-02-01 onward.",
+            message=(
+                "Pricing group has more than one price for option 'Adults' from 2026-02-01 onward. "
+                "Price components: new from 2026-01-01, new from 2026-02-01."
+            ),
             components=[first, second],
             begin=FEB_1,
             end=None,
@@ -198,7 +215,10 @@ def test_coverage__component_for_all_options_overlaps_an_option():
     assert errors == [
         CoverageError(
             code=error_codes.PRICING_GROUP_COVERAGE_OVERLAP,
-            message="Pricing group has more than one price for option 'Adults' from 2026-01-01 onward.",
+            message=(
+                "Pricing group has more than one price for option 'Adults' from 2026-01-01 onward. "
+                "Price components: new from 2026-01-01, new from 2026-01-01."
+            ),
             components=[for_adults, for_all],
             begin=JAN_1,
             end=None,
@@ -233,7 +253,10 @@ def test_coverage__paid_components_with_different_payment_types():
     assert errors == [
         CoverageError(
             code=error_codes.PRICING_GROUP_PAYMENT_TYPE_CONFLICT,
-            message="All paid prices must have the same payment type from 2026-01-01 onward.",
+            message=(
+                "All paid prices must have the same payment type from 2026-01-01 onward. "
+                "Price components: new from 2026-01-01, new from 2026-01-01."
+            ),
             components=[online, on_site],
             begin=JAN_1,
             end=None,
