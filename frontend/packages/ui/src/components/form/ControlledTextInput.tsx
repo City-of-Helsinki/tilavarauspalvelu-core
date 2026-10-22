@@ -48,7 +48,6 @@ export function ControlledTextInput<T extends FieldValues>({
   errorText,
   style,
   invalid,
-  ...rest
 }: ControllerProps<T>) {
   const {
     field: { value, onChange },
@@ -70,9 +69,7 @@ export function ControlledTextInput<T extends FieldValues>({
         invalid={invalid}
         tooltip={tooltipText != null && tooltipText !== "" ? <Tooltip>{tooltipText}</Tooltip> : undefined}
       />
-      {max ? (
-        <CharacterCounter value={value} maxLength={max} style={characterCounterStyle(!!tooltipText)} {...rest} />
-      ) : null}
+      {max ? <CharacterCounter value={value} maxLength={max} style={characterCounterStyle(!!tooltipText)} /> : null}
     </TextInputWrapper>
   );
 }
