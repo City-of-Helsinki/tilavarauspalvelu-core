@@ -61,6 +61,7 @@ function UnitReservationsInner({
     <>
       <UnitCalendar
         date={date}
+        unitPk={unitPk}
         resources={resources}
         isLoading={loading}
         canCreateReservations={canCreateReservations}
