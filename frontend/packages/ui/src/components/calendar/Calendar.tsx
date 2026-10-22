@@ -8,7 +8,7 @@ import { enGB } from "date-fns/locale/en-GB";
 import { fi } from "date-fns/locale/fi";
 import { sv } from "date-fns/locale/sv";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { unavailableBackgroundSVG } from "@ui/components/calendar/utils";
 import { dateToMinutes, formatTimeRange } from "@ui/modules/date-utils";
 import type { LocalizationLanguages } from "@ui/modules/urlBuilder";
@@ -80,14 +80,16 @@ type Props<T> = {
   isLoading?: boolean;
 };
 
-const StyledCalendar = styled(BigCalendar)<{
+type CalendarStyleProps = {
   overflowBreakpoint: string;
   step: number;
   timeslots: number;
   $isDraggable: boolean;
   $underlineEvents?: boolean;
   $isLoading?: boolean;
-}>`
+};
+
+const styles = css<CalendarStyleProps>`
   /* responsivity breaks when inside a grid */
   max-width: calc(100vw - 2 * var(--spacing-s));
 
@@ -509,7 +511,13 @@ const StyledCalendar = styled(BigCalendar)<{
   }
 `;
 
-const StyledCalendarDND = styled(withDragAndDrop(StyledCalendar))``;
+const StyledCalendar = styled(BigCalendar)<CalendarStyleProps>`
+  ${styles}
+`;
+
+const StyledCalendarDND = styled(withDragAndDrop(BigCalendar))<CalendarStyleProps>`
+  ${styles}
+`;
 
 const locales = {
   fi,
