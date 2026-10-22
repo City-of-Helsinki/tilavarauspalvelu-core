@@ -1,0 +1,172 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from django.db import transaction
+from rest_framework.exceptions import ErrorDetail, ValidationError
+
+from tilavarauspalvelu.models import PriceComponent
+from tilavarauspalvelu.typing import error_codes
+from utils.date_utils import local_date
+
+from .coverage import check_pricing_group_coverage
+
+if TYPE_CHECKING:
+    import datetime
+    from collections.abc import Collection
+
+    from tilavarauspalvelu.models import PricingGroup
+
+__all__ = [
+    "save_price_component_changes",
+]
+
+
+def save_price_component_changes(
+    *,
+    pricing_group: PricingGroup,
+    components: Collection[PriceComponent],
+    deleted_component_pks: Collection[int],
+) -> None:
+    """
+    Save a batch of changes to the components of a pricing group.
+
+    The batch is merged with the saved components of the group, and the result must have full coverage.
+    Past components cannot change. Active components can only get a new `valid_until` in the future.
+    Future components can change freely. New components must begin in the future,
+    unless the group has no saved components yet.
+
+    :param pricing_group: The pricing group to change.
+    :param components: Changed components (with a pk) and new components (without a pk). Not saved yet.
+    :param deleted_component_pks: Primary keys of the components to delete.
+    :raises ValidationError: If an edit rule, a constraint or the coverage check fails. Nothing is saved then.
+    """
+    today = local_date()
+
+    saved_components = {
+        component.pk: component
+        for component in PriceComponent.objects.filter(pricing_group=pricing_group).select_related("price_option")
+    }
+
+    changed_components = [component for component in components if component.pk is not None]
+    new_components = [component for component in components if component.pk is None]
+
+    for component in changed_components:
+        saved_component = saved_components.get(component.pk)
+        if saved_component is None:
+            msg = f"Price component {component.pk} does not belong to this pricing group."
+            raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_NOT_IN_PRICING_GROUP)
+
+        _validate_change(saved_component=saved_component, changed_component=component, today=today)
+
+        component.pricing_group = pricing_group
+        component.validate_constraints()
+        component.validators.validate_option_belongs_to_pricing_group_unit_group()
+        if component.price_option_id != saved_component.price_option_id:
+            component.validators.validate_option_is_active()
+
+    for component in new_components:
+        if saved_components and component.valid_from <= today:
+            msg = f"New price component must begin after today, not on {component.valid_from.isoformat()}."
+            raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_VALID_FROM_NOT_IN_FUTURE)
+
+        component.pricing_group = pricing_group
+        component.validate_constraints()
+        component.validators.validate_option_belongs_to_pricing_group_unit_group()
+        component.validators.validate_option_is_active()
+
+    for pk in deleted_component_pks:
+        saved_component = saved_components.get(pk)
+        if saved_component is None:
+            msg = f"Price component {pk} does not belong to this pricing group."
+            raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_NOT_IN_PRICING_GROUP)
+
+        _validate_delete(saved_component=saved_component, today=today)
+
+    deleted_pks = set(deleted_component_pks)
+    merged_components = {pk: component for pk, component in saved_components.items() if pk not in deleted_pks}
+    for component in changed_components:
+        merged_components[component.pk] = component
+
+    reservation_unit_begin_dates = pricing_group.reservation_units.values_list("begins", flat=True)
+    coverage_errors = check_pricing_group_coverage(
+        components=[*merged_components.values(), *new_components],
+        reservation_unit_begin_dates=list(reservation_unit_begin_dates),
+    )
+    if coverage_errors:
+        details = [ErrorDetail(error.message, code=error.code) for error in coverage_errors]
+        raise ValidationError(details)
+
+    with transaction.atomic():
+        PriceComponent.objects.filter(pk__in=deleted_component_pks).delete()
+        for component in changed_components:
+            component.save()
+        PriceComponent.objects.bulk_create(new_components)
+
+
+# Internals
+
+
+def _validate_change(
+    *,
+    saved_component: PriceComponent,
+    changed_component: PriceComponent,
+    today: datetime.date,
+) -> None:
+    is_past = saved_component.valid_until is not None and saved_component.valid_until <= today
+    is_active = not is_past and saved_component.valid_from <= today
+
+    if is_past:
+        if _has_changes(saved_component=saved_component, changed_component=changed_component):
+            msg = f"Price component {saved_component.pk} is in the past and cannot be changed."
+            raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_PAST_CHANGED)
+        return
+
+    if is_active:
+        if _has_changes_other_than_valid_until(saved_component=saved_component, changed_component=changed_component):
+            msg = f"Price component {saved_component.pk} is active. Only its end date can be changed."
+            raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_ACTIVE_CHANGED)
+
+        valid_until = changed_component.valid_until
+        if valid_until != saved_component.valid_until and valid_until is not None and valid_until <= today:
+            msg = f"End date of price component {saved_component.pk} must be after today."
+            raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_VALID_UNTIL_NOT_IN_FUTURE)
+        return
+
+    if changed_component.valid_from <= today:
+        msg = f"Price component {saved_component.pk} must begin after today."
+        raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_VALID_FROM_NOT_IN_FUTURE)
+
+
+def _validate_delete(*, saved_component: PriceComponent, today: datetime.date) -> None:
+    is_past = saved_component.valid_until is not None and saved_component.valid_until <= today
+    if is_past:
+        msg = f"Price component {saved_component.pk} is in the past and cannot be deleted."
+        raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_PAST_DELETED)
+
+    is_active = saved_component.valid_from <= today
+    if is_active:
+        msg = f"Price component {saved_component.pk} is active and cannot be deleted."
+        raise ValidationError(msg, code=error_codes.PRICE_COMPONENT_ACTIVE_DELETED)
+
+
+def _has_changes(*, saved_component: PriceComponent, changed_component: PriceComponent) -> bool:
+    return saved_component.valid_until != changed_component.valid_until or _has_changes_other_than_valid_until(
+        saved_component=saved_component, changed_component=changed_component
+    )
+
+
+def _has_changes_other_than_valid_until(*, saved_component: PriceComponent, changed_component: PriceComponent) -> bool:
+    return (
+        saved_component.kind != changed_component.kind
+        or saved_component.valid_from != changed_component.valid_from
+        or saved_component.price_option_id != changed_component.price_option_id
+        or saved_component.amount != changed_component.amount
+        or saved_component.price_unit != changed_component.price_unit
+        or saved_component.accounting_id != changed_component.accounting_id
+        or saved_component.can_apply_for_discount != changed_component.can_apply_for_discount
+        or saved_component.material_price_description_fi != changed_component.material_price_description_fi
+        or saved_component.material_price_description_en != changed_component.material_price_description_en
+        or saved_component.material_price_description_sv != changed_component.material_price_description_sv
+        or saved_component.payment_type != changed_component.payment_type
+    )
