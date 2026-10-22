@@ -84,7 +84,14 @@ def fetch_api_tokens(**kwargs: Unpack[PipelineArgs]) -> None:
         SentryLogger.log_message(msg, details={"status_code": api_tokens_response.status_code}, level="error")
         return
 
-    request.session["api_tokens"] = api_tokens_response.json()
+    try:
+        api_tokens = api_tokens_response.json()
+    except requests.JSONDecodeError as error:
+        msg = "Login: Unable to get API tokens"
+        SentryLogger.log_exception(error, msg)
+        return
+
+    request.session["api_tokens"] = api_tokens
 
 
 def fetch_additional_info_for_user_from_helsinki_profile(**kwargs: Unpack[PipelineArgs]) -> dict[str, Any]:
