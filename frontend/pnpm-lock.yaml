@@ -5,36 +5,36 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  ajv@<8.18.0: 8.18.0
-  baseline-browser-mapping@<2.11.0: 2.11.23
-  brace-expansion@<1.1.13: 1.1.13
-  brace-expansion@>=2.0.0 <2.0.3: 2.0.3
-  brace-expansion@>=3.0.0 <5.0.9: 5.0.12
-  browserslist@<4.28.7: 4.28.9
-  colord@<2.9.4: 2.10.0
-  cookie@<0.7.0: 0.7.0
-  diff@>=4.0.0 <4.0.4: 4.0.4
-  fast-uri@<3.1.8: 3.1.8
-  flatted@<=3.4.1: 3.4.2
-  immutable@<3.8.3: 3.8.3
-  immutable@>=5.0.0 <5.1.8: 5.1.9
-  js-cookie@<=3.0.5: 3.0.7
-  js-yaml@<4.3.2: 4.3.2
-  lodash@<=4.17.22: 4.18.1
-  lodash-es@<4.18.1: 4.18.1
-  minimatch@<3.1.4: 3.1.4
-  minimatch@>=9.0.0 <9.0.7: 9.0.7
-  minimatch@>=10.0.0 <10.2.3: 10.2.3
-  nanoid@<3.3.19: 3.3.19
-  '@opentelemetry/core@<2.8.0': 2.11.0
-  picomatch@<2.3.2: 2.3.2
-  picomatch@>=4.0.0 <4.0.4: 4.0.4
-  postcss@<8.5.23: 8.5.28
-  postcss-selector-parser@<7.1.3: 7.1.6
-  rollup@<4.59.0: 4.59.0
-  shell-quote@<1.8.5: 1.10.0
-  vite@<7.3.5: 7.3.5
-  yaml@>=2.0.0 <2.8.3: 2.8.3
+  ajv@<8.18.0: ^8.18.0
+  baseline-browser-mapping@<2.11.0: ^2.11.23
+  brace-expansion@<1.1.13: ^1.1.13
+  brace-expansion@>=2.0.0 <2.0.3: ^2.0.3
+  brace-expansion@>=3.0.0 <5.0.9: ^5.0.12
+  browserslist@<4.28.7: ^4.28.9
+  colord@<2.9.4: ^2.10.0
+  cookie@<0.7.0: ^0.7.0
+  diff@>=4.0.0 <4.0.4: ^4.0.4
+  fast-uri@<3.1.8: ^3.1.8
+  flatted@<=3.4.1: ^3.4.2
+  immutable@<3.8.3: ^3.8.3
+  immutable@>=5.0.0 <5.1.8: ^5.1.9
+  js-cookie@<=3.0.5: ^3.0.7
+  js-yaml@<4.3.2: ^4.3.2
+  lodash@<=4.17.22: ^4.18.1
+  lodash-es@<4.18.1: ^4.18.1
+  minimatch@<3.1.4: ^3.1.4
+  minimatch@>=9.0.0 <9.0.7: ^9.0.7
+  minimatch@>=10.0.0 <10.2.3: ^10.2.3
+  nanoid@<3.3.19: ^3.3.19
+  '@opentelemetry/core@<2.8.0': ^2.11.0
+  picomatch@<2.3.2: ^2.3.2
+  picomatch@>=4.0.0 <4.0.4: ^4.0.4
+  postcss@<8.5.23: ^8.5.28
+  postcss-selector-parser@<7.1.3: ^7.1.6
+  rollup@<4.59.0: ^4.59.0
+  shell-quote@<1.8.5: ^1.10.0
+  vite@<7.3.5: ^7.3.5
+  yaml@>=2.0.0 <2.8.3: ^2.8.3
 
 importers:
 
@@ -102,7 +102,7 @@ importers:
         version: 10.56.0
       '@sentry/nextjs':
         specifier: ^10.56.0
-        version: 10.56.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.7.1(@opentelemetry/api@1.9.1))(next@16.3.8(@babel/core@8.0.5)(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react@19.3.0)(webpack@5.107.2(postcss@8.5.28))
+        version: 10.56.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.7.1(@opentelemetry/api@1.9.1))(next@16.3.8(@babel/core@8.0.5)(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react@19.3.0)(webpack@5.107.2(postcss@8.5.29))
       date-fns:
         specifier: ^4.4.0
         version: 4.4.0
@@ -117,7 +117,7 @@ importers:
         version: 6.0.5
       hds-react:
         specifier: ^6.0.5
-        version: 6.0.5(@types/react@19.3.0)(graphql-ws@6.3.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.28)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 6.0.5(@types/react@19.3.0)(graphql-ws@6.3.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       i18next:
         specifier: ^26.4.2
         version: 26.4.2(typescript@7.0.2)
@@ -205,7 +205,7 @@ importers:
         version: 4.4.12(@types/react@19.3.0)
       '@vitejs/plugin-react':
         specifier: ^5.2.0
-        version: 5.2.0(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3))
+        version: 5.2.0(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
       '@vitest/coverage-istanbul':
         specifier: ^4.1.11
         version: 4.1.11(vitest@4.1.11)
@@ -214,7 +214,7 @@ importers:
         version: 20.10.1
       postcss-styled-syntax:
         specifier: ^0.7.3
-        version: 0.7.3(postcss@8.5.28)
+        version: 0.7.3(postcss@8.5.29)
       stylelint:
         specifier: ^17.16.0
         version: 17.16.0(typescript@7.0.2)
@@ -229,13 +229,13 @@ importers:
         version: 7.0.2
       vite:
         specifier: ^7.3.6
-        version: 7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3)
+        version: 7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1)
       vite-tsconfig-paths:
         specifier: ^6.1.1
-        version: 6.1.1(typescript@7.0.2)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3))
+        version: 6.1.1(typescript@7.0.2)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3))
+        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
 
   apps/staff:
     dependencies:
@@ -244,13 +244,13 @@ importers:
         version: 3.14.1(@types/react@19.3.0)(graphql-ws@6.3.0(graphql@16.14.1)(ws@8.22.0))(graphql@16.14.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@hookform/resolvers':
         specifier: 5.9.1
-        version: 5.9.1(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv@8.18.0)(react-hook-form@7.89.0(@types/react@19.3.0)(react@19.3.0))(yup@1.7.1)(zod@4.6.5)
+        version: 5.9.1(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv@8.20.0)(react-hook-form@7.89.0(@types/react@19.3.0)(react@19.3.0))(yup@1.7.1)(zod@4.6.5)
       '@sentry/core':
         specifier: ^10.56.0
         version: 10.56.0
       '@sentry/nextjs':
         specifier: ^10.56.0
-        version: 10.56.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.7.1(@opentelemetry/api@1.9.1))(next@16.3.8(@babel/core@8.0.5)(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react@19.3.0)(webpack@5.107.2(postcss@8.5.28))
+        version: 10.56.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.7.1(@opentelemetry/api@1.9.1))(next@16.3.8(@babel/core@8.0.5)(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react@19.3.0)(webpack@5.107.2(postcss@8.5.29))
       apollo-upload-client:
         specifier: 18.0.1
         version: 18.0.1(@apollo/client@3.14.1(@types/react@19.3.0)(graphql-ws@6.3.0(graphql@16.14.1)(ws@8.22.0))(graphql@16.14.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(graphql@16.14.1)
@@ -268,7 +268,7 @@ importers:
         version: 6.0.5
       hds-react:
         specifier: ^6.0.5
-        version: 6.0.5(@types/react@19.3.0)(graphql-ws@6.3.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.28)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 6.0.5(@types/react@19.3.0)(graphql-ws@6.3.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       i18n-iso-countries:
         specifier: ^7.14.0
         version: 7.14.0
@@ -362,7 +362,7 @@ importers:
         version: 2.16.1
       '@vitejs/plugin-react':
         specifier: ^5.2.0
-        version: 5.2.0(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3))
+        version: 5.2.0(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
       '@vitest/coverage-istanbul':
         specifier: ^4.1.11
         version: 4.1.11(vitest@4.1.11)
@@ -371,7 +371,7 @@ importers:
         version: 20.10.1
       postcss-styled-syntax:
         specifier: ^0.7.3
-        version: 0.7.3(postcss@8.5.28)
+        version: 0.7.3(postcss@8.5.29)
       stylelint:
         specifier: ^17.16.0
         version: 17.16.0(typescript@7.0.2)
@@ -386,13 +386,13 @@ importers:
         version: 7.0.2
       vite:
         specifier: ^7.3.6
-        version: 7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3)
+        version: 7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1)
       vite-tsconfig-paths:
         specifier: ^6.1.1
-        version: 6.1.1(typescript@7.0.2)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3))
+        version: 6.1.1(typescript@7.0.2)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3))
+        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
 
   packages/tsconfig:
     devDependencies:
@@ -422,7 +422,7 @@ importers:
         version: 16.14.1
       hds-react:
         specifier: ^6.0.5
-        version: 6.0.5(@types/react@19.3.0)(graphql-ws@6.3.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.28)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 6.0.5(@types/react@19.3.0)(graphql-ws@6.3.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       i18next:
         specifier: ^26.4.2
         version: 26.4.2(typescript@7.0.2)
@@ -471,7 +471,7 @@ importers:
         version: 20.10.1(@jest/environment@30.4.1)(@jest/fake-timers@30.4.1)(@jest/types@30.4.1)(jest-mock@30.4.1)(jest-util@30.4.1)
       '@sentry/nextjs':
         specifier: ^10.56.0
-        version: 10.56.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.7.1(@opentelemetry/api@1.9.1))(next@16.3.8(@babel/core@8.0.5)(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react@19.3.0)(webpack@5.107.2(postcss@8.5.28))
+        version: 10.56.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.7.1(@opentelemetry/api@1.9.1))(next@16.3.8(@babel/core@8.0.5)(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react@19.3.0)(webpack@5.107.2(postcss@8.5.29))
       '@testing-library/dom':
         specifier: ^10.4.2
         version: 10.4.2
@@ -504,7 +504,7 @@ importers:
         version: 2.16.1
       '@vitejs/plugin-react':
         specifier: ^5.2.0
-        version: 5.2.0(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3))
+        version: 5.2.0(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
       happy-dom:
         specifier: ^20.10.1
         version: 20.10.1
@@ -516,7 +516,7 @@ importers:
         version: 16.3.1(@types/react@19.3.0)(i18next@26.4.2(typescript@7.0.2))(next@16.3.8(@babel/core@8.0.5)(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react-i18next@17.0.16(i18next@26.4.2(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(react@19.3.0)
       postcss-styled-syntax:
         specifier: ^0.7.3
-        version: 0.7.3(postcss@8.5.28)
+        version: 0.7.3(postcss@8.5.29)
       stylelint:
         specifier: ^17.16.0
         version: 17.16.0(typescript@7.0.2)
@@ -534,13 +534,13 @@ importers:
         version: 1.0.6
       vite:
         specifier: ^7.3.6
-        version: 7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3)
+        version: 7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1)
       vite-tsconfig-paths:
         specifier: ^6.1.1
-        version: 6.1.1(typescript@7.0.2)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3))
+        version: 6.1.1(typescript@7.0.2)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3))
+        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
 
 packages:
 
@@ -763,19 +763,19 @@ packages:
     resolution: {integrity: sha512-JpjNBJFA+4OnAHKRK4AMp8xrYyLhI9XapOeBlP2PhRU/IylSw+1ep3BFNTksBJnrTS3KT6kqKNVfpzLLwZUW5Q==}
     engines: {node: '>=20.19.0'}
     peerDependencies:
-      postcss-selector-parser: 7.1.6
+      postcss-selector-parser: ^7.1.6
 
   '@csstools/selector-specificity@2.2.0':
     resolution: {integrity: sha512-+OJ9konv95ClSTOJCmMZqpd5+YGsB2S+x6w3E1oaM8UuR5j8nTNHYSz8c9BEPGDOCMQYIEEGlVPj/VY64iTbGw==}
     engines: {node: ^14 || ^16 || >=18}
     peerDependencies:
-      postcss-selector-parser: 7.1.6
+      postcss-selector-parser: ^7.1.6
 
   '@csstools/selector-specificity@6.0.1':
     resolution: {integrity: sha512-MBuqFIIvqk4S593MGAskTkPpEUUzZNvGzh8mMxEwl3oHwjQlXmqHEDxNbN3Y0Tsh+xjmem4GZjeg7I0qkwBivg==}
     engines: {node: '>=20.19.0'}
     peerDependencies:
-      postcss-selector-parser: 7.1.6
+      postcss-selector-parser: ^7.1.6
 
   '@emnapi/runtime@1.11.3':
     resolution: {integrity: sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA==}
@@ -1346,7 +1346,7 @@ packages:
       '@standard-schema/spec': ^1.0.0
       '@typeschema/main': '>=0.13.7'
       '@vinejs/vine': ^2.0.0 || ^3.0.0 || ^4.0.0
-      ajv: 8.18.0
+      ajv: ^8.18.0
       ajv-errors: ^3.0.0
       ajv-formats: ^2.1.1
       arktype: ^2.0.0
@@ -2301,7 +2301,7 @@ packages:
     resolution: {integrity: sha512-+tNWdlWKbpB3WgBN7ijjYkq9X5uhjmcvyjEght4NmH5fAU++zfQzAJ6wumLS+dNcvwEZhKx2Z+skY8m7v0wGSA==}
     engines: {node: '>=16.0.0 || 14 >= 14.17'}
     peerDependencies:
-      rollup: 4.59.0
+      rollup: ^4.59.0
     peerDependenciesMeta:
       rollup:
         optional: true
@@ -2310,7 +2310,7 @@ packages:
     resolution: {integrity: sha512-MfPp06CjRLfXQ3wY0R8vJDYBy/MvVcc9OulEfR0B8Iv9ko+GCNaRZ+EpJYFl27LhKsZK0o420sYCRHCjfCgeUg==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
-      rollup: 4.59.0
+      rollup: ^4.59.0
     peerDependenciesMeta:
       rollup:
         optional: true
@@ -2690,7 +2690,7 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
-      '@opentelemetry/core': 2.11.0
+      '@opentelemetry/core': ^2.11.0
       '@opentelemetry/exporter-trace-otlp-http': '>=0.57.0 <1'
       '@opentelemetry/instrumentation': '>=0.57.1 <1'
       '@opentelemetry/sdk-trace-base': ^1.30.1 || ^2.1.0
@@ -2718,7 +2718,7 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
-      '@opentelemetry/core': 2.11.0
+      '@opentelemetry/core': ^2.11.0
       '@opentelemetry/sdk-trace-base': ^1.30.1 || ^2.1.0
       '@opentelemetry/semantic-conventions': ^1.39.0
 
@@ -3049,7 +3049,7 @@ packages:
     resolution: {integrity: sha512-YmKkfhOAi3wsB1PhJq5Scj3GXMn3WvtQ/JC0xoopuHoXSdmtdStOpFrYaT1kie2YgFBcIe64ROzMYRjCrYOdYw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
-      vite: 7.3.5
+      vite: ^7.3.5
 
   '@vitest/coverage-istanbul@4.1.11':
     resolution: {integrity: sha512-pK9LJtOS534bmUwdwLpGD9qL52DeqVWSInrXFMNqrvWLbbAhuIPAlRup3UbsjFOMqCC/p3MmmX7uXV7ZTkcFfQ==}
@@ -3063,7 +3063,7 @@ packages:
     resolution: {integrity: sha512-2XJVD55d1o5AZous5CCGKS74g/riOj9odEt2bQpCVZeblHyHdnMeFl4jl0XjU21stf4mbjUkew2eXQZt65g5CQ==}
     peerDependencies:
       msw: ^2.4.9
-      vite: 7.3.5
+      vite: ^7.3.5
     peerDependenciesMeta:
       msw:
         optional: true
@@ -3214,7 +3214,7 @@ packages:
   ajv-formats@3.0.1:
     resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
     peerDependencies:
-      ajv: 8.18.0
+      ajv: ^8.18.0
     peerDependenciesMeta:
       ajv:
         optional: true
@@ -3222,7 +3222,7 @@ packages:
   ajv-keywords@5.1.0:
     resolution: {integrity: sha512-YCS/JNFAUyr5vAuhk1DWm1CBxRHW9LbJ2ozWeemrIqpbsqKjHVxYPyi5GC0rjZIT5JxJ3virVTS8wk4i/Z+krw==}
     peerDependencies:
-      ajv: 8.18.0
+      ajv: ^8.18.0
 
   ajv@8.18.0:
     resolution: {integrity: sha512-PlXPeEWMXMZ7sPYOHqmDyCJzcfNrUr3fGNKtezX14ykXOEIvyK81d+qydx89KY5O71FKMPaQ2vBfBFI5NHR63A==}
@@ -3839,7 +3839,7 @@ packages:
     resolution: {integrity: sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
-      picomatch: 4.0.4
+      picomatch: ^4.0.4
     peerDependenciesMeta:
       picomatch:
         optional: true
@@ -4083,7 +4083,7 @@ packages:
     resolution: {integrity: sha512-OFaaPTop9UElK6NN/o99b/N+7+ZqQIYcYFM1OKtSw/yHLwHidoIRDbOsQqnGjSEpiTgNWLZjxhcSlwzNMdqiQg==}
     engines: {node: ^24}
     peerDependencies:
-      postcss: 8.5.28
+      postcss: ^8.5.28
       react: ^19.0.0
       react-dom: ^19.0.0
 
@@ -4757,13 +4757,13 @@ packages:
     resolution: {integrity: sha512-EwMkYchxiDiKUhlJGzWsD9b2zvq/r2SSubcRrgP+jujMXFzqvANLt16lJANC+5uZ6hjI7lpRmI6O8JIl+8l1KA==}
     engines: {node: ^12 || ^14 || >=16}
     peerDependencies:
-      postcss: 8.5.28
+      postcss: ^8.5.28
 
   postcss-safe-parser@7.1.0:
     resolution: {integrity: sha512-1WzZxRLaAFwEh6Do+zyGpjWV3nGJNxxhuh7Ubu/q1ICImMgZJnLwhoaEpRbG4pJppp2Y1ncL9ffA2f+LhrefQg==}
     engines: {node: '>=18.0'}
     peerDependencies:
-      postcss: 8.5.28
+      postcss: ^8.5.28
 
   postcss-selector-parser@7.1.6:
     resolution: {integrity: sha512-7qASPzhKF2l2KLboRZux8CCTRMdGiV08vWmyKzPz22qZ7ZjQBOeY7rNzNoCLSUiftJ7HUq0GERHmxw/t0dCdMw==}
@@ -4773,7 +4773,7 @@ packages:
     resolution: {integrity: sha512-F6PSmNJKnOk1E5BWNqp6lEg3qlVYexKPf9C5eoBflPxNyS29goTATFVU7vUi0WWMmpAK+Pf2yHuUdjKXL2bOTg==}
     engines: {node: '>=14.17'}
     peerDependencies:
-      postcss: 8.5.28
+      postcss: ^8.5.28
 
   postcss-value-parser@4.2.0:
     resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}
@@ -5504,7 +5504,7 @@ packages:
     resolution: {integrity: sha512-pJ2sYawQS0R/WI928Gj5GlPhTGzbMelq0+4INtSYNDV9ErKJcX6xjGWkoG/VnB3dpUm00zALaqkrUD77pO5TDQ==}
     hasBin: true
     peerDependencies:
-      browserslist: 4.28.9
+      browserslist: ^4.28.9
 
   upper-case-first@2.0.2:
     resolution: {integrity: sha512-514ppYHBaKwfJRK/pNC6c/OxfGa0obSnAl106u97Ed0I625Nin96KAjttZF6ZL3e1XLtphxnqrOi9iWgm+u+bg==}
@@ -5544,7 +5544,7 @@ packages:
   vite-tsconfig-paths@6.1.1:
     resolution: {integrity: sha512-2cihq7zliibCCZ8P9cKJrQBkfgdvcFkOOc3Y02o3GWUDLgqjWsZudaoiuOwO/gzTzy17cS5F7ZPo4bsnS4DGkg==}
     peerDependencies:
-      vite: 7.3.5
+      vite: ^7.3.5
 
   vite@7.3.6:
     resolution: {integrity: sha512-4XP60spRGjSZFf1qYH+dJIkK2znL3zQfl9KkOV9MkkRR/3Dls0dxaBsQPTloEc5BLXWPL9vsOxopxyKoMmDueg==}
@@ -5561,7 +5561,7 @@ packages:
       sugarss: ^5.0.0
       terser: ^5.16.0
       tsx: ^4.8.1
-      yaml: 2.8.3
+      yaml: ^2.8.3
     peerDependenciesMeta:
       '@types/node':
         optional: true
@@ -5602,7 +5602,7 @@ packages:
       '@vitest/ui': 4.1.11
       happy-dom: '*'
       jsdom: '*'
-      vite: 7.3.5
+      vite: ^7.3.5
     peerDependenciesMeta:
       '@edge-runtime/vm':
         optional: true
@@ -6829,17 +6829,6 @@ snapshots:
     dependencies:
       react-hook-form: 7.89.0(@types/react@19.3.0)(react@19.3.0)
 
-  '@hookform/resolvers@5.9.1(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv@8.18.0)(react-hook-form@7.89.0(@types/react@19.3.0)(react@19.3.0))(yup@1.7.1)(zod@4.6.5)':
-    dependencies:
-      '@standard-schema/utils': 0.3.0
-      react-hook-form: 7.89.0(@types/react@19.3.0)(react@19.3.0)
-    optionalDependencies:
-      '@sinclair/typebox': 0.34.52
-      '@standard-schema/spec': 1.1.0
-      ajv: 8.18.0
-      yup: 1.7.1
-      zod: 4.6.5
-
   '@hookform/resolvers@5.9.1(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv@8.20.0)(react-hook-form@7.89.0(@types/react@19.3.0)(react@19.3.0))(yup@1.7.1)(zod@4.6.5)':
     dependencies:
       '@standard-schema/utils': 0.3.0
@@ -7749,7 +7738,7 @@ snapshots:
 
   '@sentry/core@10.56.0': {}
 
-  '@sentry/nextjs@10.56.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.7.1(@opentelemetry/api@1.9.1))(next@16.3.8(@babel/core@8.0.5)(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react@19.3.0)(webpack@5.107.2(postcss@8.5.28))':
+  '@sentry/nextjs@10.56.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.7.1(@opentelemetry/api@1.9.1))(next@16.3.8(@babel/core@8.0.5)(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0))(react@19.3.0)(webpack@5.107.2(postcss@8.5.29))':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/semantic-conventions': 1.41.1
@@ -7761,7 +7750,7 @@ snapshots:
       '@sentry/opentelemetry': 10.56.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.7.1(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.41.1)
       '@sentry/react': 10.56.0(react@19.3.0)
       '@sentry/vercel-edge': 10.56.0
-      '@sentry/webpack-plugin': 5.3.0(webpack@5.107.2(postcss@8.5.28))
+      '@sentry/webpack-plugin': 5.3.0(webpack@5.107.2(postcss@8.5.29))
       next: 16.3.8(@babel/core@8.0.5)(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.105.0)
       rollup: 4.61.1
       stacktrace-parser: 0.1.11
@@ -7822,10 +7811,10 @@ snapshots:
       '@opentelemetry/resources': 2.7.1(@opentelemetry/api@1.9.1)
       '@sentry/core': 10.56.0
 
-  '@sentry/webpack-plugin@5.3.0(webpack@5.107.2(postcss@8.5.28))':
+  '@sentry/webpack-plugin@5.3.0(webpack@5.107.2(postcss@8.5.29))':
     dependencies:
       '@sentry/bundler-plugin-core': 5.3.0
-      webpack: 5.107.2(postcss@8.5.28)
+      webpack: 5.107.2(postcss@8.5.29)
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -8079,7 +8068,7 @@ snapshots:
   '@typescript/typescript-win32-x64@7.0.2':
     optional: true
 
-  '@vitejs/plugin-react@5.2.0(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3))':
+  '@vitejs/plugin-react@5.2.0(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))':
     dependencies:
       '@babel/core': 7.29.7
       '@babel/plugin-transform-react-jsx-self': 7.29.7(@babel/core@7.29.7)
@@ -8087,7 +8076,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-rc.3
       '@types/babel__core': 7.20.5
       react-refresh: 0.18.0
-      vite: 7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3)
+      vite: 7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -8103,7 +8092,7 @@ snapshots:
       magicast: 0.5.5
       obug: 2.2.1
       tinyrainbow: 3.1.1
-      vitest: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3))
+      vitest: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
     transitivePeerDependencies:
       - supports-color
 
@@ -8116,13 +8105,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.1
 
-  '@vitest/mocker@4.1.11(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3))':
+  '@vitest/mocker@4.1.11(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))':
     dependencies:
       '@vitest/spy': 4.1.11
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3)
+      vite: 7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1)
 
   '@vitest/pretty-format@4.1.11':
     dependencies:
@@ -9147,7 +9136,7 @@ snapshots:
 
   hds-design-tokens@6.0.5: {}
 
-  hds-react@6.0.5(@types/react@19.3.0)(graphql-ws@6.3.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.28)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
+  hds-react@6.0.5(@types/react@19.3.0)(graphql-ws@6.3.0(graphql@16.14.1)(ws@8.22.0))(postcss@8.5.29)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
     dependencies:
       '@apollo/client': 3.14.1(@types/react@19.3.0)(graphql-ws@6.3.0(graphql@16.14.1)(ws@8.22.0))(graphql@16.14.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@babel/runtime': 7.29.7
@@ -9168,8 +9157,8 @@ snapshots:
       kashe: 1.2.0
       lodash: 4.18.1
       oidc-client-ts: 2.5.0
-      postcss: 8.5.28
-      postcss-nesting: 10.2.0(postcss@8.5.28)
+      postcss: 8.5.29
+      postcss-nesting: 10.2.0(postcss@8.5.29)
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
       react-hook-form: 7.89.0(@types/react@19.3.0)(react@19.3.0)
@@ -9362,7 +9351,7 @@ snapshots:
       chalk: 4.1.2
       graceful-fs: 4.2.11
       jest-util: 30.4.1
-      picomatch: 4.0.4
+      picomatch: 4.0.7
       pretty-format: 30.4.1
       slash: 3.0.0
       stack-utils: 2.0.6
@@ -9382,7 +9371,7 @@ snapshots:
       chalk: 4.1.2
       ci-info: 4.4.0
       graceful-fs: 4.2.11
-      picomatch: 4.0.4
+      picomatch: 4.0.7
 
   jest-worker@27.5.1:
     dependencies:
@@ -9834,10 +9823,10 @@ snapshots:
 
   picomatch@4.0.7: {}
 
-  postcss-nesting@10.2.0(postcss@8.5.28):
+  postcss-nesting@10.2.0(postcss@8.5.29):
     dependencies:
       '@csstools/selector-specificity': 2.2.0(postcss-selector-parser@7.1.6)
-      postcss: 8.5.28
+      postcss: 8.5.29
       postcss-selector-parser: 7.1.6
 
   postcss-safe-parser@7.1.0(postcss@8.5.29):
@@ -9849,9 +9838,9 @@ snapshots:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
 
-  postcss-styled-syntax@0.7.3(postcss@8.5.28):
+  postcss-styled-syntax@0.7.3(postcss@8.5.29):
     dependencies:
-      postcss: 8.5.28
+      postcss: 8.5.29
       typescript: 6.0.3
 
   postcss-value-parser@4.2.0: {}
@@ -10522,15 +10511,15 @@ snapshots:
 
   tapable@2.3.3: {}
 
-  terser-webpack-plugin@5.6.1(postcss@8.5.28)(webpack@5.107.2(postcss@8.5.28)):
+  terser-webpack-plugin@5.6.1(postcss@8.5.29)(webpack@5.107.2(postcss@8.5.29)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
       schema-utils: 4.5.0
       terser: 5.51.2
-      webpack: 5.107.2(postcss@8.5.28)
+      webpack: 5.107.2(postcss@8.5.29)
     optionalDependencies:
-      postcss: 8.5.28
+      postcss: 8.5.29
 
   terser@5.51.2:
     dependencies:
@@ -10695,17 +10684,17 @@ snapshots:
   verkit@0.5.0:
     optional: true
 
-  vite-tsconfig-paths@6.1.1(typescript@7.0.2)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3)):
+  vite-tsconfig-paths@6.1.1(typescript@7.0.2)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1)):
     dependencies:
       debug: 4.4.3
       globrex: 0.1.2
       tsconfck: 3.1.6(typescript@7.0.2)
-      vite: 7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3)
+      vite: 7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3):
+  vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1):
     dependencies:
       esbuild: 0.28.2
       fdir: 6.5.0(picomatch@4.0.4)
@@ -10719,12 +10708,12 @@ snapshots:
       jiti: 2.7.0
       sass: 1.105.0
       terser: 5.51.2
-      yaml: 2.8.3
+      yaml: 2.9.1
 
-  vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3)):
+  vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.6.4)(@vitest/coverage-istanbul@4.1.11)(happy-dom@20.10.1)(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1)):
     dependencies:
       '@vitest/expect': 4.1.11
-      '@vitest/mocker': 4.1.11(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3))
+      '@vitest/mocker': 4.1.11(vite@7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
       '@vitest/pretty-format': 4.1.11
       '@vitest/runner': 4.1.11
       '@vitest/snapshot': 4.1.11
@@ -10741,7 +10730,7 @@ snapshots:
       tinyexec: 1.3.0
       tinyglobby: 0.2.17
       tinyrainbow: 3.1.1
-      vite: 7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.8.3)
+      vite: 7.3.6(@types/node@26.6.4)(jiti@2.7.0)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
@@ -10765,7 +10754,7 @@ snapshots:
 
   webpack-sources@3.6.0: {}
 
-  webpack@5.107.2(postcss@8.5.28):
+  webpack@5.107.2(postcss@8.5.29):
     dependencies:
       '@types/estree': 1.0.9
       '@types/json-schema': 7.0.15
@@ -10787,7 +10776,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.5.0
       tapable: 2.3.3
-      terser-webpack-plugin: 5.6.1(postcss@8.5.28)(webpack@5.107.2(postcss@8.5.28))
+      terser-webpack-plugin: 5.6.1(postcss@8.5.29)(webpack@5.107.2(postcss@8.5.29))
       watchpack: 2.5.2
       webpack-sources: 3.6.0
     transitivePeerDependencies:
