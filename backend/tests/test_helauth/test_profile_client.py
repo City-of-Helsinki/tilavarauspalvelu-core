@@ -29,7 +29,7 @@ from tests.factories.helsinki_profile import (
 )
 from tests.helpers import ResponseMock, exact, patch_method
 
-from .helpers import UMA_TICKET_GRANT, TokenRequest
+from .helpers import UMA_TICKET_GRANT, ErrorResponse, TokenRequest
 
 pytestmark = [
     pytest.mark.django_db,
@@ -458,9 +458,9 @@ def test_helsinki_profile_client__get_token__refresh_with_profile_refresh_token(
 def test_helsinki_profile_client__get_token__profile_refresh_token_rejected__use_keycloak_refresh_token(keycloak):
     user = UserFactory.create_profile_user()
     keycloak_refresh_token = user.current_social_auth.extra_data["refresh_token"]
-    keycloak.refresh_error_responses["session-profile-refresh-token"] = ResponseMock(
-        json_data={"error": "invalid_grant"},
+    keycloak.refresh_error_responses["session-profile-refresh-token"] = ErrorResponse(
         status_code=400,
+        error="invalid_grant",
     )
     session = {
         "profile_refresh_token": "session-profile-refresh-token",
@@ -483,15 +483,11 @@ def test_helsinki_profile_client__get_token__profile_refresh_token_rejected__use
 def test_helsinki_profile_client__get_token__profile_and_keycloak_refresh_tokens_rejected(keycloak):
     user = UserFactory.create_profile_user()
     keycloak_refresh_token = user.current_social_auth.extra_data["refresh_token"]
-    keycloak.refresh_error_responses["session-profile-refresh-token"] = ResponseMock(
-        json_data={"error": "invalid_grant"},
-        text="Profile refresh token expired",
+    keycloak.refresh_error_responses["session-profile-refresh-token"] = ErrorResponse(
         status_code=400,
+        error="invalid_grant",
     )
-    keycloak.refresh_error_responses[keycloak_refresh_token] = ResponseMock(
-        json_data={"error": "invalid_grant"},
-        status_code=400,
-    )
+    keycloak.refresh_error_responses[keycloak_refresh_token] = ErrorResponse(status_code=400, error="invalid_grant")
     session = {
         "profile_refresh_token": "session-profile-refresh-token",
         "profile_refresh_token_expires_at": local_datetime() + datetime.timedelta(minutes=5),
@@ -509,7 +505,13 @@ def test_helsinki_profile_client__get_token__profile_and_keycloak_refresh_tokens
 
     SentryLogger.log_message.assert_called_once_with(
         "Unable to refresh Helsinki profile token",
-        details={"user": user.pk, "error": "Profile refresh token expired"},
+        details={
+            "user": user.pk,
+            "code": "reauthentication_required",
+            "provider_code": "invalid_grant",
+            "status_code": 400,
+            "detail": "",
+        },
         level="warning",
     )
 
@@ -547,7 +549,7 @@ def test_helsinki_profile_client__get_token__no_profile_refresh_token__no_keyclo
 @patch_method(SentryLogger.log_message)
 def test_helsinki_profile_client__get_token__profile_token_request_rejected(keycloak):
     user = UserFactory.create_profile_user()
-    keycloak.profile_token_error_response = ResponseMock(text="Access denied", status_code=403)
+    keycloak.profile_token_error_response = ErrorResponse(status_code=403, text="Access denied")
     session = {
         "keycloak_access_token": "session-keycloak-access-token",
         "keycloak_access_token_expires_at": local_datetime() + datetime.timedelta(minutes=5),
@@ -563,7 +565,7 @@ def test_helsinki_profile_client__get_token__profile_token_request_rejected(keyc
 
     SentryLogger.log_message.assert_called_once_with(
         "Unable to get Helsinki profile token",
-        details={"user": user.pk, "error": "Access denied"},
+        details={"user": user.pk, "code": "http_error", "provider_code": None, "status_code": 403, "detail": ""},
         level="warning",
     )
 
