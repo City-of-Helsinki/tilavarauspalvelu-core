@@ -25,7 +25,6 @@ class PriceComponentNode(DjangoNode):
             "price_option",
             "amount",
             "price_unit",
-            "accounting",
             "can_apply_for_discount",
             "material_price_description",
             "payment_type",
