@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { Weekday } from "../../../gql/gql-types";
 
 export type CalendarData = Record<string, unknown>;
@@ -102,6 +102,11 @@ export type WeeklyPatternCalendarProps<TData extends CalendarData> = (EditablePr
   getStateLabel: (cell: WeeklyPatternCellInfo<TData>) => string;
   getCellAppearance?: (data: TData) => CellAppearance | undefined;
   getCellProps?: (cell: WeeklyPatternCellInfo<TData>) => WeeklyPatternCellProps;
+  /**
+   * Replaces what a cell shows. The default shows the hour, and where a painted run begins and ends. The cell's
+   * accessible name comes from `getStateLabel`, so this changes only what is on screen.
+   */
+  renderCellContent?: (cell: WeeklyPatternCellInfo<TData>) => ReactNode;
   /** The equal form for the same task. A skip link to it is shown before the grid. */
   alternative: { id: string; label: string };
 

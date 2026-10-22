@@ -127,6 +127,23 @@ describe("WeeklyPatternCalendar", () => {
     expect(empty).toHaveAttribute("aria-selected", "false");
   });
 
+  test("a custom renderer decides what a cell shows", () => {
+    render(
+      <Harness
+        initial={[{ weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 540, data: primary }]}
+        renderCellContent={(info) => (info.painted ? <span>{info.data?.priority}</span> : null)}
+      />
+    );
+    expect(cell(/^Monday, 08:00–09:00, primary$/)).toHaveTextContent("primary");
+    expect(cell(/^Monday, 09:00–09:30, free$/)).toBeEmptyDOMElement();
+  });
+
+  test("without a custom renderer a cell shows its hour, and a painted run its range", () => {
+    render(<Harness initial={[{ weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 540, data: primary }]} />);
+    expect(cell(/^Monday, 08:30–09:00, primary$/)).toHaveTextContent("8:00–9:00");
+    expect(cell(/^Monday, 09:00–09:30, free$/)).toHaveTextContent("9:00");
+  });
+
   test("a different brush paints over an existing run instead of erasing it", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
