@@ -8,6 +8,7 @@ import requests
 from django.conf import settings
 from django.db import models
 from django.db.models.functions import Concat
+from rest_framework.status import HTTP_200_OK
 
 from tilavarauspalvelu.dataclasses import IDToken
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
@@ -78,7 +79,7 @@ def fetch_api_tokens(**kwargs: Unpack[PipelineArgs]) -> None:
         SentryLogger.log_exception(error, msg)
         return
 
-    if api_tokens_response.status_code != 200:  # noqa: PLR2004
+    if api_tokens_response.status_code != HTTP_200_OK:
         msg = "Login: Unable to get API tokens"
         SentryLogger.log_message(msg, details={"status_code": api_tokens_response.status_code}, level="error")
         return
