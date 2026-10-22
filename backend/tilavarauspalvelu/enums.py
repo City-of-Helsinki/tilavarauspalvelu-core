@@ -855,6 +855,10 @@ class PriceUnit(models.TextChoices):
                 raise ValueError(msg)
 
 
+class PriceComponentKind(models.TextChoices):
+    BASE = "BASE", pgettext_lazy("PriceComponentKind", "Base")
+
+
 class PricingStatus(models.TextChoices):
     PRICING_STATUS_PAST = "past", pgettext_lazy("PricingStatus", "past")
     PRICING_STATUS_ACTIVE = "active", pgettext_lazy("PricingStatus", "active")
