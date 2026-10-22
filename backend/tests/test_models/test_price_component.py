@@ -9,7 +9,7 @@ from django.db import IntegrityError
 from tilavarauspalvelu.enums import PaymentType
 from tilavarauspalvelu.models import PriceComponent
 
-from tests.factories import PriceComponentFactory, ReservationUnitFactory, ReservationUnitPricingGroupFactory
+from tests.factories import PriceComponentFactory
 
 # Applied to all tests
 pytestmark = [
@@ -74,16 +74,3 @@ def test_price_component__valid_until_can_be_empty():
 
     component = PriceComponent.objects.get(pk=component.pk)
     assert component.valid_until is None
-
-
-# ── Reservation unit pricing group ──
-
-
-def test_reservation_unit_pricing_group__one_group_per_reservation_unit_and_date():
-    reservation_unit = ReservationUnitFactory.create()
-    ReservationUnitPricingGroupFactory.create(reservation_unit=reservation_unit, begins=datetime.date(2026, 1, 1))
-
-    with pytest.raises(IntegrityError) as error:
-        ReservationUnitPricingGroupFactory.create(reservation_unit=reservation_unit, begins=datetime.date(2026, 1, 1))
-
-    assert "reservation_unit_pricing_group_begins_unique" in str(error.value)

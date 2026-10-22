@@ -19,6 +19,9 @@ pytestmark = [
 ]
 
 
+# ── Helpers ──
+
+
 def component_form_data(index: int, *, valid_from: str, valid_until: str = "") -> dict[str, Any]:
     return {
         f"components-{index}-kind": PriceComponentKind.BASE.value,
@@ -39,6 +42,9 @@ def group_form_data() -> dict[str, Any]:
         "name_en": "Prices",
         "name_sv": "Priser",
     }
+
+
+# ── Save ──
 
 
 def test_pricing_group_admin__create_with_component_and_reservation_unit(api_client):
@@ -65,6 +71,9 @@ def test_pricing_group_admin__create_with_component_and_reservation_unit(api_cli
     rows = list(ReservationUnitPricingGroup.objects.filter(pricing_group=pricing_group))
     assert len(rows) == 1
     assert rows[0].reservation_unit == reservation_unit
+
+
+# ── Validation ──
 
 
 def test_pricing_group_admin__overlapping_components_are_rejected(api_client):

@@ -27,6 +27,9 @@ pytestmark = [
 ]
 
 
+# ── Helpers ──
+
+
 def component_input(component: PriceComponent, **overrides) -> dict:
     data = {
         "pk": component.pk,
@@ -42,6 +45,15 @@ def component_input(component: PriceComponent, **overrides) -> dict:
     }
     data.update(overrides)
     return data
+
+
+def new_component_input() -> dict:
+    return {
+        "validFrom": local_date().isoformat(),
+        "amount": "10.00",
+        "priceUnit": PriceUnit.PER_HOUR,
+        "paymentType": PaymentType.ONLINE,
+    }
 
 
 # ── Price change ──
@@ -201,6 +213,9 @@ def test_pricing_group__update_components__active_component_amount_cannot_change
     response = graphql(UPDATE_COMPONENTS_MUTATION, input_data=input_data)
 
     assert response.has_errors is True, response
+    assert response.field_error_messages() == [
+        f"Price component {active.pk} is active. Only its end date can be changed.",
+    ]
     assert response.field_error_codes() == [error_codes.PRICE_COMPONENT_ACTIVE_CHANGED]
 
     assert PriceComponent.objects.get(pk=active.pk).amount == Decimal(10)
@@ -281,15 +296,6 @@ def test_pricing_group__update_components__required_fields(graphql):
 
 
 # ── Permissions ──
-
-
-def new_component_input() -> dict:
-    return {
-        "validFrom": local_date().isoformat(),
-        "amount": "10.00",
-        "priceUnit": PriceUnit.PER_HOUR,
-        "paymentType": PaymentType.ONLINE,
-    }
 
 
 def test_pricing_group__update_components__anonymous_user(graphql):

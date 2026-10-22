@@ -33,6 +33,9 @@ MAR_1 = datetime.date(2026, 3, 1)
 APR_1 = datetime.date(2026, 4, 1)
 
 
+# ── Helpers ──
+
+
 @pytest.fixture
 def freeze_today():
     with freeze_time("2026-02-15T12:00:00+02:00"):

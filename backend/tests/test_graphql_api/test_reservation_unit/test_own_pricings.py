@@ -26,6 +26,9 @@ pytestmark = [
 ]
 
 
+# ── Helpers ──
+
+
 def own_pricing_input(*, begins: datetime.date, amount: str, pk: int | None = None) -> dict:
     data = {
         "begins": begins.isoformat(),
@@ -37,6 +40,9 @@ def own_pricing_input(*, begins: datetime.date, amount: str, pk: int | None = No
     if pk is not None:
         data["pk"] = pk
     return data
+
+
+# ── Create ──
 
 
 def test_reservation_unit__own_pricings__create(graphql):
@@ -62,6 +68,9 @@ def test_reservation_unit__own_pricings__create(graphql):
     assert components[0].valid_until is None
     assert components[0].amount == Decimal(10)
     assert components[0].can_apply_for_discount is True
+
+
+# ── Update ──
 
 
 def test_reservation_unit__own_pricings__first_pricing_can_begin_in_the_past(graphql):
@@ -155,6 +164,9 @@ def test_reservation_unit__own_pricings__remove_future_pricing(graphql):
     components = list(PriceComponent.objects.filter(pricing_group=pricing_group))
     assert components == [active]
     assert components[0].valid_until is None
+
+
+# ── Pricing group rules ──
 
 
 def test_reservation_unit__own_pricings__shared_group_is_rejected(graphql):
