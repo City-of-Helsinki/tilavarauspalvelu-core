@@ -845,7 +845,7 @@ class PriceUnit(models.TextChoices):
             case PriceUnit.PER_HOUR:
                 return 60
             case PriceUnit.PER_HALF_DAY:
-                return 120
+                return 720
             case PriceUnit.PER_DAY:
                 return 1440
             case PriceUnit.PER_WEEK:
