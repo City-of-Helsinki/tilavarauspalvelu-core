@@ -104,7 +104,7 @@
     "eslint/no-prototype-builtins": "error",
     "eslint/no-redeclare": "error",
     "eslint/no-regex-spaces": "error",
-    "eslint/no-restricted-globals": "error",
+    "eslint/no-restricted-globals": ["error", "event", "length", "name", "location"],
     "eslint/no-restricted-imports": "error",
     "eslint/no-return-assign": "error",
     "eslint/no-script-url": "error",
