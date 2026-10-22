@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: "Fast forwarding"
-        uses: MrThearMan/prff@v1
+        uses: MrThearMan/prff@9a178be62c1917a66de423e2dc1342a98578a952 # v1
 
       - name: "Trigger additional pipelines for bots"
         # Only run if one of the defined bots is the pull request author.
