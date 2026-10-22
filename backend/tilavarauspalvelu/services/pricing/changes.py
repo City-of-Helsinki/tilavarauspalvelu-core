@@ -46,10 +46,10 @@ def save_price_component_changes(
 
         today = local_date()
 
-        saved_components = {
-            component.pk: component
-            for component in PriceComponent.objects.filter(pricing_group=pricing_group).select_related("price_option")
-        }
+        saved_component_queryset = PriceComponent.objects.filter(pricing_group=pricing_group).select_related(
+            "price_option"
+        )
+        saved_components = {component.pk: component for component in saved_component_queryset}
 
         changed_components = [component for component in components if component.pk is not None]
         new_components = [component for component in components if component.pk is None]
@@ -91,10 +91,11 @@ def save_price_component_changes(
         for component in changed_components:
             merged_components[component.pk] = component
 
-        reservation_unit_begin_dates = pricing_group.reservation_units.values_list("begins", flat=True)
+        reservation_unit_begin_dates = list(pricing_group.reservation_units.values_list("begins", flat=True))
+        all_components = [*merged_components.values(), *new_components]
         coverage_errors = check_pricing_group_coverage(
-            components=[*merged_components.values(), *new_components],
-            reservation_unit_begin_dates=list(reservation_unit_begin_dates),
+            components=all_components,
+            reservation_unit_begin_dates=reservation_unit_begin_dates,
         )
         if coverage_errors:
             details = [ErrorDetail(error.message, code=error.code) for error in coverage_errors]

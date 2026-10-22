@@ -130,11 +130,14 @@ def calculate_price(
         )
         lines.append(line)
 
+    total = sum((line.amount for line in lines), start=Decimal(0))
+    can_apply_for_discount = any(line.component.can_apply_for_discount for line in lines)
+
     return PriceCalculation(
         lines=lines,
-        total=sum((line.amount for line in lines), start=Decimal(0)),
+        total=total,
         payment_type=start_component.payment_type,
-        can_apply_for_discount=any(line.component.can_apply_for_discount for line in lines),
+        can_apply_for_discount=can_apply_for_discount,
     )
 
 

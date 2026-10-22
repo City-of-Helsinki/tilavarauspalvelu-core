@@ -135,9 +135,10 @@ def _own_pricing_group(*, reservation_unit: ReservationUnit, today: datetime.dat
         return None
 
     pricing_group = current_and_future_rows[0].pricing_group
-    reservation_unit_ids = ReservationUnitPricingGroup.objects.filter(pricing_group=pricing_group).values_list(
-        "reservation_unit_id",
-        flat=True,
+    reservation_unit_ids = list(
+        ReservationUnitPricingGroup.objects.filter(pricing_group=pricing_group).values_list(
+            "reservation_unit_id", flat=True
+        )
     )
-    pricing_group.validators.validate_own_group_has_one_reservation_unit(list(reservation_unit_ids))
+    pricing_group.validators.validate_own_group_has_one_reservation_unit(reservation_unit_ids)
     return pricing_group

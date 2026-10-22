@@ -39,9 +39,8 @@ class PricingGroupComponentsSerializer(NestingModelSerializer):
         component_data: list[dict[str, Any]] = validated_data.pop("components", [])
         deleted_component_pks: list[int] = validated_data.pop("deleted_components", [])
 
-        saved_components = {
-            component.pk: component for component in PriceComponent.objects.filter(pricing_group=instance)
-        }
+        saved_component_queryset = PriceComponent.objects.filter(pricing_group=instance)
+        saved_components = {component.pk: component for component in saved_component_queryset}
 
         components: list[PriceComponent] = []
         for data in component_data:
