@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from "next-i18next/pages";
-import Link from "next/link";
 import styled from "styled-components";
 import { dateToMinutes, formatTimeRange, parseValidDateObject } from "ui/src/modules/date-utils";
 import { Flex } from "ui/src/styled";
@@ -8,35 +7,26 @@ import { UserPermissionChoice } from "@gql/gql-types";
 import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { VisibleIfPermission } from "@/components/VisibleIfPermission";
 import { getReserveeName, truncate } from "@/modules/helpers";
-import { getReservationUrl } from "@/modules/urls";
-import { CELL_BORDER } from "./utils";
 
-const MAX_POPOVER_COMMENT_LENGTH = 140;
-const POPOVER_MAX_WIDTH = 300;
+const MAX_MEMO_LENGTH = 140;
 
-const PopupContent = styled.div`
-  border: ${CELL_BORDER};
+const Content = styled.div`
+  border: 1px solid var(--color-black-20);
   border-radius: 4px;
   padding: var(--spacing-xs);
-  background-color: white;
+  background-color: var(--color-white);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
   font-size: var(--fontsize-body-s);
-  max-width: ${POPOVER_MAX_WIDTH}px;
 `;
 
-const Heading = styled.div``;
-const Reservee = styled.div`
-  a {
-    color: black;
-  }
-`;
 const WorkingMemo = styled.div`
   background-color: var(--color-black-5);
   padding: var(--spacing-xs);
   border-radius: 4px;
-  max-width: ${POPOVER_MAX_WIDTH - 20}px;
 `;
 
-export function ReservationPopupContent({
+/** A purely visual summary of a reservation, shown in a tooltip. The link to the reservation is the event itself. */
+export function ReservationTooltipContent({
   reservation,
 }: {
   reservation: ReservationUnitReservationsFragment;
@@ -45,28 +35,17 @@ export function ReservationPopupContent({
 
   const startMins = dateToMinutes(parseValidDateObject(reservation.beginsAt));
   const endMins = dateToMinutes(parseValidDateObject(reservation.endsAt));
-  const eventName = getReserveeName(reservation, t, 22) || "-";
   return (
-    <PopupContent>
+    <Content>
       <Flex $gap="xs">
-        <Heading>
+        <div>
           {formatTimeRange(startMins, endMins)} / {reservation.reservationUnit?.nameFi ?? "-"}
-        </Heading>
+        </div>
         <VisibleIfPermission reservation={reservation} permission={UserPermissionChoice.CanViewReservations}>
-          <Reservee>
-            {reservation.pk ? (
-              <Link target="_blank" href={getReservationUrl(reservation.pk)}>
-                {eventName}
-              </Link>
-            ) : (
-              <span>{eventName}</span>
-            )}
-          </Reservee>
-          {reservation.workingMemo && (
-            <WorkingMemo>{truncate(reservation.workingMemo, MAX_POPOVER_COMMENT_LENGTH)}</WorkingMemo>
-          )}
+          <div>{getReserveeName(reservation, t, 22) || "-"}</div>
+          {reservation.workingMemo && <WorkingMemo>{truncate(reservation.workingMemo, MAX_MEMO_LENGTH)}</WorkingMemo>}
         </VisibleIfPermission>
       </Flex>
-    </PopupContent>
+    </Content>
   );
 }

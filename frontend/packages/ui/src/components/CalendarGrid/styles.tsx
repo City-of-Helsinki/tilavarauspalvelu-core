@@ -83,7 +83,7 @@ export const gridTableStyles = css`
     &[data-availability="closed"] {
       background-color: var(--color-black-5);
       background-image: ${unavailableBackgroundSVG};
-      background-size: auto var(--closed-pattern-height, var(--step-height));
+      background-size: auto calc(var(--step-height) / 2);
     }
 
     &:focus-visible {
