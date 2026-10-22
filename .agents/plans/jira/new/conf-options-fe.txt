@@ -1,0 +1,6 @@
+Price optionien hallinta staff UI:ssa. Toteutus seuraa TILA-4447:n suunnitelmaa. Sivu voi olla osa pricing group -sivuja tai oma sivunsa.
+
+h3. Toteutus
+* Listaa käyttäjän unit groupien price optionit.
+* Optionin luonti ja muokkaus: nimi ja kuvaus (käännetty).
+* Optionin poisto käytöstä (is_active).

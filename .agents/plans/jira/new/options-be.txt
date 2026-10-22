@@ -1,0 +1,22 @@
+Hakija valitsee kausivarauksen hakemuksen osiolle (application section) price optionin, esim. "Aikuiset" tai "Juniorit". Tässä vaiheessa tarvitaan vain valinta. Hinnat lasketaan myöhemmin, kun jaetuista vuoroista tehdään varauksia (TILA-4549).
+
+h3. Taustaa
+* Price option on asiakkaan valitsema vaihtoehto. Yksi unit group omistaa sen. Vain jaetut pricing groupit (joilla on unit group) voivat käyttää optioneita.
+* Pricing groupin tarjoamat optionit tulevat sen BASE-komponenteista: option on tarjolla päivänä, jos sille on aktiivinen BASE-komponentti.
+* Mallit ovat valmiina (TILA-4544). Jaetut pricing groupit, komponentit ja optionit luodaan Django adminissa, kunnes konfiguraattori on valmis.
+* Ensimmäinen käyttäjä on maauimaloiden kausivarauskierros.
+
+h3. Toteutus
+* ApplicationSection.price_option → PriceOption (nullable).
+* GraphQL: hakukierroksen tarjoamat price optionit. Ne ovat ne optionit, joita kierroksen varausyksiköiden pricing groupit tarjoavat koko kierroksen varauskauden ajan.
+* Hakemuksen mutationit ottavat price optionin jokaiselle osiolle. Option on pakollinen, jos kierros tarjoaa optioneita, ja sen pitää olla yksi tarjotuista.
+* GraphQL: hakemuksen osion valittu price option staff UI:ta varten.
+* Kierroksen tarkistus: kaikkien kierroksen varausyksiköiden pricing groupien pitää tarjota sama joukko optioneita kierroksen varauskauden jokaisena päivänä. Ryhmät voivat olla eri, esim. eri hintakategoriat.
+** Tarkistus tehdään, kun kierros luodaan ja kun siihen lisätään varausyksikkö.
+** Pricing groupin vaihto tai BASE-komponenttien muutos kierroksen varauskaudella ei saa poistaa optionia avoimelta kierrokselta.
+* Vanha API toimii kuten ennen (non-breaking).
+
+h3. Valmis, kun
+* Hakija voi tallentaa price optionin jokaiselle osiolle.
+* Kierrosta ei voi luoda varausyksiköillä, joiden pricing groupit tarjoavat eri optionit.
+* Staff UI voi lukea osion valitun optionin.

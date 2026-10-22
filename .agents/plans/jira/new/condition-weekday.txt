@@ -1,0 +1,18 @@
+Viikonpäivän ehto price componenteille: weekdays. TILA-4544 lisää kentät tietokantaan, mutta validointi hylkää ne, kunnes ehto on toteutettu tässä tiketissä.
+
+h3. Taustaa
+* Pricing groupissa on price componentteja. Varauksen hinta on täsmäävien komponenttien summa.
+* Jokaiseen varauksen osaan täsmää tasan yksi BASE-komponentti jokaista price optionia kohden. Kattavuuden validointi (coverage) tarkistaa tämän.
+* Laskenta jakaa varauksen osiin keskiyöllä, ja jokainen osa täsmää oman viikonpäivänsä komponentteihin.
+* Esimerkki: Pysäköintialue: arkipäivien ja viikonlopun hinnat.
+* Aikataulu: tiimi päättää, mitä ehtoja maauimaloiden hinnat tarvitsevat ennen kuin niistä tehdään varauksia.
+
+h3. Toteutus
+* Laskenta tukee ehtoa.
+* Validointi ja kattavuuden tarkistus hyväksyvät ehdon.
+* Pricing groupin batch API ja hinnan query hyväksyvät ehdon.
+* Henkilökunta asettaa ehdon Django adminissa, kunnes konfiguraattori tukee sitä.
+
+h3. Valmis, kun
+* Perjantaista lauantaihin menevä varaus saa perjantailta arkihinnan ja lauantailta viikonlopun hinnan.
+* Testit kattavat ehdon rajat.

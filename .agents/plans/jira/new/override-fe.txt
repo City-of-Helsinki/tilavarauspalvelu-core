@@ -1,0 +1,10 @@
+Toteutetaan staff UI:hin käsittelijän hinnan ylikirjoitus hintariveittäin. Toteutus seuraa suunnitelmaa (UX/UI-tiketti).
+
+h3. Toteutus
+* Näytä varauksen hintarivit käsittelynäkymässä.
+* Anna käsittelijän asettaa overrideAmount jokaiselle riville hyväksynnän yhteydessä (approve mutation, BE-tiketti).
+* "Maksuton" toiminto asettaa kaikki rivit nollaan.
+* Päivitä GraphQL-queryt, fragmentit ja testien mockit.
+
+h3. Julkaisu
+* Julkaistaan samassa julkaisussa kuin TILA-4545.

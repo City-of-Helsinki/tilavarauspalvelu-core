@@ -1,0 +1,18 @@
+Toistuvan päivämäärän ehto price componenteille: dates_begin ja dates_end (kuukausi ja päivä). TILA-4544 lisää kentät tietokantaan, mutta validointi hylkää ne, kunnes ehto on toteutettu tässä tiketissä.
+
+h3. Taustaa
+* Pricing groupissa on price componentteja. Varauksen hinta on täsmäävien komponenttien summa.
+* Jokaiseen varauksen osaan täsmää tasan yksi BASE-komponentti jokaista price optionia kohden. Kattavuuden validointi (coverage) tarkistaa tämän.
+* Väli toistuu joka vuosi ja voi mennä vuodenvaihteen yli. Laskenta jakaa varauksen osiin näinä päivinä.
+* Esimerkki: Lämmityskausi 15.12.–15.3.
+* Aikataulu: tiimi päättää, mitä ehtoja maauimaloiden hinnat tarvitsevat ennen kuin niistä tehdään varauksia.
+
+h3. Toteutus
+* Laskenta tukee ehtoa.
+* Validointi ja kattavuuden tarkistus hyväksyvät ehdon.
+* Pricing groupin batch API ja hinnan query hyväksyvät ehdon.
+* Henkilökunta asettaa ehdon Django adminissa, kunnes konfiguraattori tukee sitä.
+
+h3. Valmis, kun
+* Varaukset 14.12. ja 16.12. saavat eri hinnat.
+* Testit kattavat ehdon rajat.

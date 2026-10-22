@@ -1,0 +1,20 @@
+Muokataan varausyksikön nykyinen hinnoittelulomake staff UI:ssa käyttämään uutta hinnoittelun tietomallia (TILA-4544). Lomake säilyy rakenteeltaan samana: nykyinen hinta ja yksi tuleva hinta. Backend tallentaa ne varausyksikön omaan pricing groupiin BASE-komponentteina.
+
+Toteutus seuraa TILA-4546:n suunnitelmaa. Tämä julkaistaan samassa julkaisussa kuin TILA-4545, jotta kahta tietomallia ei tarvitse tukea yhtä aikaa.
+
+h3. Muutokset
+* Poista alin hinta (lowestPrice). Varausyksiköllä on yksi hinta. Käsittelijä voi tehdä varauksesta maksuttoman.
+* Poista verottomat hinnat (net price -kentät).
+* Siirrä "voi hakea maksuttomuutta" varausyksiköltä jokaiseen hintaan, jotta sen muutoksen voi ajastaa.
+* Säilytä jokaisessa hinnassa payment type ja material price description.
+* Käytä reservation unit mutationin uutta inputia (TILA-4544) vanhan pricings-inputin tilalla.
+* Näytä backendin kattavuusvirheet (coverage). Ne voivat koskea hintaa, jota käyttäjä ei muuttanut.
+* Päivitä GraphQL-queryt, fragmentit ja testien mockit.
+
+h3. Ei tässä tiketissä
+* Verotason select ja "is activated on begins" -checkboxin poisto: TILA-4543.
+* Valinta "oma hinnoittelu" tai "jaettu pricing group": jaettujen pricing groupien tiketti.
+
+h3. Valmis, kun
+* Henkilökunta voi luoda ja muokata nykyistä ja tulevaa hintaa kuten ennenkin.
+* Lomake noudattaa TILA-4546:n suunnitelmaa.

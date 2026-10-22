@@ -1,0 +1,14 @@
+Suunnitellaan asiakassovelluksen yksittäisvarausputkeen hinnat uudessa hinnoittelun tietomallissa, kun varausyksiköllä on yksi hinta (yksi BASE-komponentti). Tämä on nykyinen tilanne kaikissa varausyksiköissä. Suunnitelma ohjaa tikettejä TILA-4576, TILA-4577 ja TILA-4578. Useampi hintarivi ja vaihteleva hinta ovat tiketissä "UX/UI: Useampi hintarivi ja vaihteleva hinta asiakassovelluksessa".
+
+h3. Taustaa
+* Asiakassovellus laskee hinnat nyt itse ja näyttää esim. "10 € – 20 €" alimman ja ylimmän hinnan perusteella. Alin hinta poistuu uudessa mallissa.
+* Uudessa mallissa backend laskee hinnan. Varauksen hinta on hintariveinä. Tässä vaiheessa jokaisella varauksella on yksi hintarivi.
+* Yksittäisvarausputkessa ei vielä valita price optionia.
+
+h3. Suunniteltavat asiat
+* Hinta hakukorteissa, listoissa ja varausyksikön sivulla: kiinteä hinta yksikköineen tai "maksuton".
+* Varausputki: valitun ajan hinta.
+* "Hae maksuttomuutta" -kentät näkyvät, jos varauksen hinnoittelu sallii sen. Tieto voi muuttua ajan mukaan, joten se riippuu valitusta ajasta.
+* Material price description, esim. myöhemmin maksettavat materiaalit.
+* Varauksen muokkaus: hinta muuttuu, kun aika muuttuu. Näytä uusi hinta ennen vahvistusta.
+* "Omat varaukset" ja varauksen tiedot: hinta ja ALV. Myös maksuilmoitus.

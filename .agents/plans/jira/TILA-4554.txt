@@ -1,0 +1,8 @@
+Asiakkaan "omat kausivaraukset" -näkymä näyttää hinnat varausten hintariveistä. Toteutus seuraa TILA-4553:n suunnitelmaa.
+
+h3. Toteutus
+* Hae sarjan hinta ja varausten hintarivit GraphQL:stä (TILA-4549).
+* Näytä sarjan kokonaishinta ja valittu price option.
+* Näytä yksittäisen varauksen hinta ja hintarivit, jos rivejä on enemmän kuin yksi.
+* Näytä material price descriptionit.
+* Päivitä GraphQL-queryt, fragmentit ja testien mockit.

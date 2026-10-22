@@ -1,0 +1,13 @@
+Asiakassovellus näyttää varausyksikön hinnan backendin hintayhteenvedosta (TILA-4551) eikä laske sitä itse.
+
+h3. Taustaa
+* Asiakassovellus laskee hinnat nyt itse highestPrice-, lowestPrice- ja priceUnit-kentistä. Uudessa mallissa hinta voi riippua price optionista ja ehdoista, joten vain backend voi laskea sen.
+* Hintayhteenveto kertoo halvimman BASE-hinnan ja sen yksikön, ja vaihteleeko hinta. Maksuton varausyksikkö palauttaa "maksuton".
+
+h3. Toteutus
+* Käytä hintayhteenvetoa hakukorteissa, listoissa (esim. related units) ja varausyksikön sivulla.
+* Näytä "alkaen X €/h", jos hinta vaihtelee.
+* Toteutus seuraa TILA-4548:n suunnitelmaa.
+
+h3. Julkaisu
+* Julkaistaan samassa julkaisussa kuin TILA-4545.

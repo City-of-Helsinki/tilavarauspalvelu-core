@@ -1,0 +1,12 @@
+Jaetun pricing groupin muokkaussivu staff UI:ssa. Toteutus seuraa TILA-4447:n suunnitelmaa.
+
+h3. Taustaa
+* Komponenttityypit: BASE (vuokra), SURCHARGE (lisämaksu €) ja ADJUSTMENT (prosenttimuutos). Jokaisella on valid_from ja valid_until, valinnainen price option ja valinnaiset ehdot.
+* Muokkaussäännöt: tulevia komponentteja voi muokata ja poistaa. Aktiivisesta komponentista voi muuttaa vain valid_until-päivän tulevaan päivään. Menneet eivät muutu.
+* Backend tallentaa muutokset eränä ja validoi koko ryhmän. Virheet voivat koskea komponentteja, joita käyttäjä ei muuttanut.
+
+h3. Toteutus
+* Komponenttien lisäys, muokkaus ja poisto kaikille tyypeille ja ehdoille, joita backend tukee.
+* "Muuta hintoja päivästä X" -toiminto: sulkee aktiiviset komponentit ja kopioi ne uusiksi komponenteiksi uudella päivällä.
+* Tallenna muutokset yhtenä eränä (TILA-4544:n batch mutation).
+* Näytä koko ryhmän validointivirheet.

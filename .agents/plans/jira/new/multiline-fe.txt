@@ -1,0 +1,15 @@
+Asiakassovellus tukee useampaa hintariviä ja vaihtelevaa hintaa. Tämä jatkaa tikettejä TILA-4576, TILA-4577 ja TILA-4578, jotka kattavat tilanteen, jossa varausyksiköllä on yksi hinta. Toteutus seuraa TILA-4603:n suunnitelmaa.
+
+h3. Taustaa
+* Lisämaksut (SURCHARGE, TILA-4556) tekevät varaukselle useamman hintarivin. Ehdot tekevät hinnasta vaihtelevan.
+* Tämä tiketti pitää olla tuotannossa ennen kuin ensimmäiset lisämaksut tai ehdot otetaan käyttöön.
+
+h3. Toteutus
+* Hakukortit ja listat: näytä "alkaen X €/h", jos hintayhteenveto kertoo, että hinta vaihtelee.
+* Varausyksikön sivu:
+** Näytetään jossain mitä hintoja on mahdollista millä ehdoilla.
+** Näytetään kalenterista valittaessa mitä hintoja käytettäisiin valintaan.
+* Varausputki ja varauksen muokkaus: näytä hintarivit ja niiden summa.
+* "Omat varaukset", varauksen tiedot ja maksuilmoitus: näytä hintarivit ja niiden summa.
+* Näytä, jos käsittelijä on muuttanut rivin hintaa.
+* Päivitä GraphQL-queryt, fragmentit ja testien mockit.

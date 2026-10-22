@@ -1,0 +1,18 @@
+Ennakkoajan ehto price componenteille: min_lead_time ja max_lead_time. TILA-4544 lisää kentät tietokantaan, mutta validointi hylkää ne, kunnes ehto on toteutettu tässä tiketissä.
+
+h3. Taustaa
+* Pricing groupissa on price componentteja. Varauksen hinta on täsmäävien komponenttien summa.
+* Jokaiseen varauksen osaan täsmää tasan yksi BASE-komponentti jokaista price optionia kohden. Kattavuuden validointi (coverage) tarkistaa tämän.
+* Aika varauksen luonnista sen alkuun. Ehto koskee koko varausta.
+* Esimerkki: Ei hinnastossa. Esim. ennakkovarausalennus tai viime hetken hinta.
+* Aikataulu: tiimi päättää, mitä ehtoja maauimaloiden hinnat tarvitsevat ennen kuin niistä tehdään varauksia.
+
+h3. Toteutus
+* Laskenta tukee ehtoa.
+* Validointi ja kattavuuden tarkistus hyväksyvät ehdon.
+* Pricing groupin batch API ja hinnan query hyväksyvät ehdon.
+* Henkilökunta asettaa ehdon Django adminissa, kunnes konfiguraattori tukee sitä.
+
+h3. Valmis, kun
+* 30 päivää ja 1 päivä etukäteen tehdyt varaukset saavat eri hinnat.
+* Testit kattavat ehdon rajat.

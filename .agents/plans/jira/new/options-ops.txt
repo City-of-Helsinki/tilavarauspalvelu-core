@@ -1,0 +1,17 @@
+Asetetaan maauimaloiden jaetut pricing groupit ja price optionit Django adminissa ennen maauimaloiden kausivarauskierroksen luontia.
+
+h3. Taustaa
+* Maauimaloiden kausivarauskierros on ensimmäinen, jossa hakija valitsee price optionin.
+* Konfiguraattoria ei vielä ole, joten asetukset tehdään Django adminissa.
+* Kierroksen kaikkien varausyksiköiden pricing groupien pitää tarjota sama joukko optioneita, muuten kierrosta ei voi luoda.
+
+h3. Tehtävät
+* Sovi PO:n kanssa maauimaloiden price optionit (nimet ja kuvaukset) ja hinnat.
+* Luo unit group maauimaloille, jos sitä ei ole.
+* Luo price optionit unit groupille.
+* Luo jaetut pricing groupit ja niiden BASE-komponentit jokaiselle optionille.
+* Liitä maauimaloiden varausyksiköt pricing groupeihin (ReservationUnitPricingGroup).
+* Tarkista, että kierroksen luonti onnistuu.
+
+h3. Huomio
+* Jos tämä tehdään ennen TILA-4545:tä, TILA-4545:n migraatio ohittaa nämä varausyksiköt, koska niillä on jo pricing group. Niiden yksittäisvarausten hinta tulee vanhasta mallista TILA-4545:een asti.

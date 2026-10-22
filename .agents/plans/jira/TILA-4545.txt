@@ -1,0 +1,39 @@
+Migratoidaan vanhat ReservationUnitPricing-hinnat uuteen tietomalliin (TILA-4544) ja otetaan uusi malli käyttöön kaikkialla, missä hintaa luetaan. Tämä julkaistaan samassa julkaisussa frontendin muutosten kanssa, jotta kahta tietomallia ei tarvitse tukea yhtä aikaa.
+
+h3. Data migration
+Jokaiselle varausyksikölle, jolla on pricingejä ja jolla ei vielä ole pricing groupia:
+* Luo yksi oma PricingGroup (ei unit groupia), nimetty varausyksikön mukaan.
+* Luo yksi ReservationUnitPricingGroup ensimmäisen pricingin päivällä.
+* Jokaisesta pricingistä yksi BASE-komponentti:
+** valid_from = begins, valid_until = saman varausyksikön seuraavan pricingin begins (viimeisellä null)
+** price_option = null, amount = highest_price, sama price_unit, tax_level, payment_type ja material_price_description
+** can_apply_for_discount = True, jos varausyksiköllä on can_apply_free_of_charge=True ja highest_price > 0
+** accounting = null
+* ReservationUnitPricing jää tauluksi, poisto TILA-4558:ssa.
+* Varausyksikkö, jolla on jo pricing group, ohitetaan. Esim. maauimaloiden varausyksiköt voidaan liittää jaettuihin pricing groupeihin Django adminissa ennen tätä migraatiota.
+
+h3. Data migration: hintarivit
+* Jokaiselle olemassa olevalle varaukselle yksi hintarivi sen nykyisistä hintakentistä. Jos price on pienempi kuin non_subsidised_price, rivi saa override_amount = price.
+* Varauksia on noin 600 000. Tee migraatio erissä.
+
+h3. Käyttöönotto
+* Korvaa kaikki get_active_pricing-kutsut uudella laskennalla: reservation create, confirm, approve, reschedule, staff modify, payment view ja reservation unit validators.
+* Ei-luonnos-varausyksiköllä pitää olla pricing group, joka alkaa tänään tai aiemmin. Muuten se ei ole varattavissa. Ilmainen tarkoittaa BASE-komponenttia, jonka amount = 0.
+* "Can apply free of charge" luetaan varaukseen täsmäävistä BASE-komponenteista, ei varausyksiköltä. ReservationUnit.can_apply_free_of_charge ei enää vaikuta mihinkään. Sen poisto tehdään TILA-4558:ssa.
+* Varauksen luonti ja muutos (create, confirm, reschedule, staff modify) tallentavat hintarivit (TILA-4551).
+* Vanha API jää tämän julkaisun jälkeen käyttämättömäksi. Sen poisto tehdään TILA-4558:ssa.
+
+h3. Ennen julkaisua
+* Mittaa molempien migraatioiden kesto tuotantodatan kopiolla. Tarkista OpenShiftin deployn migraatiovaiheen timeout ja nosta sitä tarvittaessa, tai sovi julkaisu toimistoajan ulkopuolelle.
+* Vie tuotantodatan kopiosta kaikkien varausyksiköiden aktiiviset ja tulevat hinnat ennen migraatiota. Vertaa niitä migraation jälkeen uuden laskennan antamiin hintoihin.
+
+h3. Julkaisun jälkeen
+* Toista hintojen vertailu tuotannossa.
+* Tarkista otos varausyksiköitä staff UI:ssa ja customer UI:ssa.
+
+h3. Valmis, kun
+* Jokaisella ei-luonnos-varausyksiköllä on pricing group.
+* Jokaisella olemassa olevalla varauksella on hintarivit, ja niiden summa on varauksen hinta.
+* Yksikään hinta ei eroa vanhasta, tai jokainen ero on selitetty ja korjattu.
+* Kaikki olemassa olevat hintatestit menevät läpi uudella laskennalla.
+* Migraatio on reversible, tai tiketti kertoo miksi ei.

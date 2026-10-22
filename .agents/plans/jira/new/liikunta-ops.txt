@@ -1,0 +1,14 @@
+Asetetaan liikunnan jaetut pricing groupit ja price optionit liikuntapaikkojen hinnaston (1.6.2026 alkaen) mukaan.
+
+h3. Taustaa
+* Hinnastossa on viisi hintakategoriaa. Jokaisessa on tuntihinnat kolmelle asiakasryhmälle ja tapahtumahinnat neljälle tapahtumaryhmälle, aikuisille ja junioreille, 6 h tai yli ja alle 6 h.
+* Tapahtumahinnat tarvitsevat kokonaiskeston ehdon.
+
+h3. Tehtävät
+* Luo price optionit hinnaston mukaan liikunnan unit groupille (TILA-4559).
+* Luo yksi jaettu pricing group jokaiselle hintakategorialle, tunti- ja tapahtumahintoineen.
+* Siirrä jokainen liikunnan varausyksikkö hintakategoriansa ryhmään sovitusta päivästä alkaen.
+* Tarkista otos hinnoista esikatselulla.
+
+h3. Valmis, kun
+* Varaamon hinnat vastaavat hinnastoa.

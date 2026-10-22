@@ -1,0 +1,7 @@
+SAP:n ALV-koodi on nyt payment accountingilla, ja ALV-prosentti tulee pricingilta. Mikään ei tarkista, että ne vastaavat toisiaan. Verkkokauppa saa ALV-koodin product accountingin kautta ja prosentin tilauksen kautta. Kun molemmat tulevat samalta tax level raten riviltä, ne eivät voi olla ristiriidassa Varaamossa.
+
+* Lisää vat_code TaxLevelRate-malliin. Se on sisäinen tieto: vain Django admin näyttää sen.
+* Data migration: täytä se niistä accountingeista, jotka käyttävät kutakin prosenttia, TILA-4569:ssä vahvistetun taulukon mukaan. Jos kahdella saman prosentin accountingilla on eri ALV-koodi, migraatio pysähtyy ja listaa ne.
+* refresh_reservation_unit_accounting lähettää verotason nykyisen prosentin ALV-koodin.
+* Poista vat_code PaymentAccounting-mallista, sen administa ja API:sta.
+* Testit: verkkokauppaan lähetetyssä product accountingissa on nykyisen prosentin ALV-koodi.

@@ -1,0 +1,18 @@
+Verkkokaupan tuotteet accountingin ja verotason mukaan, ja yksi tilausrivi jokaista hintariviä kohden.
+
+h3. Taustaa
+* Varaamolla on nyt yksi verkkokaupan tuote varausyksikköä kohden, ja tilauksessa on yksi tilausrivi.
+* Varauksen hintariveillä (TILA-4551) voi olla eri ALV ja accounting. Verkkokauppa pitää yhden accountingin per tuote.
+* Tuotteen ID on UUID3(UUID3(namespace, namespaceEntityId), merchantId). Yksi tuote kuuluu siis tasan yhteen yhdistelmään varausyksikkö, accounting, verotaso ja merchant.
+
+h3. Toteutus
+* PaymentProduct-malliin kentät reservation_unit, accounting ja tax_level. Unique (reservation_unit, accounting, tax_level, merchant). Erillistä linkkitaulua ei tarvita, koska verkkokauppa muodostaa tuotteen ID:n samoista arvoista.
+* Migraatio: jokainen olemassa oleva tuote saa varausyksikön, joka viittaa siihen ReservationUnit.payment_product-kentällä, sen varausyksikön (tai toimipisteen) accountingin ja sen aktiivisen pricingin verotason.
+* namespaceEntityId on "<varausyksikön pk>" varausyksikön omalle accountingille ja oletusverotasolle. Näin olemassa olevien tuotteiden ID:t eivät muutu. Muut yhdistelmät käyttävät muotoa "<varausyksikön pk>:<accounting pk>:<verotason pk>".
+* Luo tuotteet ja niiden accountingit, kun varausyksikkö tai sen hinnoittelu muuttuu. Product accounting lähettää verotason nykyisen prosentin ALV-koodin (TILA-4570).
+* Jokainen hintarivi käyttää accountinginsa ja verotasonsa tuotetta. Merchantin vaihto tekee uuden tuotteen. Vanha rivi jää vanhoja tilauksia ja palautuksia varten.
+* Tilauksessa on yksi tilausrivi jokaista hintariviä kohden, jonka lopullinen summa on positiivinen. Palautus toimii tilausriveittäin.
+
+h3. Valmis, kun
+* Varaus, jolla on kahden ALV-prosentin rivit, maksetaan kahdella tuotteella testiverkkokaupassa, ja palautus toimii.
+* Olemassa olevien tuotteiden ID:t eivät muutu.

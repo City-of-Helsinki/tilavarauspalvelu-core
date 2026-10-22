@@ -1,0 +1,7 @@
+Staff UI näyttää kausivarausten hinnat, kun jaetuista vuoroista on tehty varauksia (reservation series). Toteutus seuraa TILA-4552:n suunnitelmaa.
+
+h3. Toteutus
+* Hae sarjan hinta ja varausten hintarivit GraphQL:stä (TILA-4549).
+* Näytä sarjan kokonaishinta ja valittu price option sarjan näkymässä.
+* Näytä yksittäisen varauksen hinta ja hintarivit sarjan varausten listassa ja varauksen näkymässä.
+* Päivitä GraphQL-queryt, fragmentit ja testien mockit.

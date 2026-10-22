@@ -1,0 +1,16 @@
+Asiakassovellus näyttää varausyksikön hinnan backendin hintayhteenvedosta ([TILA-4551]) eikä laske sitä itse. Tämä tiketti kattaa nykyisen tilanteen, jossa varausyksiköllä on yksi hinta (yksi BASE-komponentti). Vaihtelevat hinnat ovat tiketissä "FE: Useampi hintarivi ja vaihteleva hinta asiakassovelluksessa".
+
+h3. Taustaa
+
+* Asiakassovellus laskee hinnat nyt itse highestPrice-, lowestPrice- ja priceUnit-kentistä. Uudessa mallissa hinta voi riippua price optionista ja ehdoista, joten vain backend voi laskea sen.
+* Hintayhteenveto kertoo halvimman BASE-hinnan ja sen yksikön, ja vaihteleeko hinta. Maksuton varausyksikkö palauttaa "maksuton".
+
+h3. Toteutus
+
+* Käytä hintayhteenvetoa hakukorteissa, listoissa ja varausyksikön sivulla.
+* Näytä kiinteä hinta yksikköineen tai "maksuton".
+* Toteutus seuraa [TILA-4548]:n suunnitelmaa.
+
+h3. Julkaisu
+
+* Julkaistaan samassa julkaisussa kuin [TILA-4545].

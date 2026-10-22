@@ -1,0 +1,5 @@
+Staff UI näyttää hakemuksen osion valitun price optionin. Toteutus seuraa suunnitelmaa (UX/UI-tiketti).
+
+h3. Toteutus
+* Näytä valittu price option hakemuksen osion sivuilla ja hakemuksen tiedoissa.
+* Päivitä GraphQL-queryt, fragmentit ja testien mockit.

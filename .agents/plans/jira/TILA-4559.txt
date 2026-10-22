@@ -1,0 +1,13 @@
+Luodaan liikunnalle unit group, jonka alla ovat kaikki toimipisteet, jotka käyttävät liikunnan jaettua hinnastoa.
+
+h3. Taustaa
+* Jaetut pricing groupit ja price optionit kuuluvat unit groupille. Unit group antaa myös oikeudet UnitRole.unit_groups-kentän kautta.
+* Unit groupia ei välttämättä ole vielä tuotannossa.
+
+h3. Tehtävät
+* Tarkista, onko tuotannossa liikunnan unit group.
+* Jos ei ole, luo se ja lisää siihen liikunnan toimipisteet.
+* Anna liikunnan hinnoittelusta vastaaville rooli unit groupiin.
+
+h3. Valmis, kun
+* Liikunnan henkilökunta näkee unit groupin hinnoittelun näkymissä.

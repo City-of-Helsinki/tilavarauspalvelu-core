@@ -1,0 +1,12 @@
+Suunnitellaan price optionin valinta kausivarauksen hakulomakkeelle ja valitun optionin näyttäminen staff UI:n hakemuksen osion sivuilla.
+
+h3. Taustaa
+* Price option on asiakkaan itse valitsema vaihtoehto, esim. "Aikuiset" tai "Juniorit, seniorit ja erityisryhmät". Valintaa ei tarkisteta automaattisesti.
+* Hakija valitsee yhden optionin jokaiselle hakemuksen osiolle. Optionit tulevat hakukierrokselta.
+* Hintoja ei näytetä tässä vaiheessa. Ne lasketaan, kun jaetuista vuoroista tehdään varauksia.
+* Ensimmäinen käyttäjä on maauimaloiden kausivarauskierros.
+
+h3. Suunniteltavat asiat
+* Optionin valinta hakulomakkeella, osiokohtaisesti, nimen ja kuvauksen kanssa.
+* Valitun optionin näyttäminen hakemuksen yhteenvedossa.
+* Valitun optionin näyttäminen staff UI:n hakemuksen osion sivuilla.

@@ -1,0 +1,11 @@
+Suunnitellaan staff UI:hin kausivarausten hinnat, kun jaetuista vuoroista on tehty varauksia (reservation series). Jakovaiheessa hintoja ei näytetä.
+
+h3. Taustaa
+* Hakija valitsee hakemuksen osiolle price optionin, esim. "Aikuiset". Kun jaetuista vuoroista tehdään varauksia, jokainen varaus saa hinnan valitun optionin mukaan (TILA-4549).
+* Varauksen hinta on hintariveinä, esim. vuokra ja lisämaksu. Yksinkertaisissa tapauksissa rivejä on yksi.
+
+h3. Suunniteltavat asiat
+* Suunnitelma kattaa myös useamman hintarivin, koska kausivarauksiin voi tulla lisämaksuja (SURCHARGE).
+* Sarjan kokonaishinta ja valittu price option sarjan näkymässä.
+* Yksittäisen varauksen hinta ja hintarivit sarjan varausten listassa ja varauksen näkymässä.
+* Miten käsittelijän ylikirjoitus (TILA-4574) näkyy sarjan varauksissa.

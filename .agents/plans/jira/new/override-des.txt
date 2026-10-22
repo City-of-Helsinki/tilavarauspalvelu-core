@@ -1,0 +1,12 @@
+Suunnitellaan staff UI:hin käsittelijän hinnan ylikirjoitus hintariveittäin.
+
+h3. Taustaa
+* Varauksen hinta koostuu hintariveistä, esim. vuokra ja valvontamaksu. Yksinkertaisissa tapauksissa rivejä on yksi.
+* Käsittelijä voi nyt vain tehdä varauksesta maksuttoman.
+* Uudessa mallissa käsittelijä voi asettaa jokaiselle riville lopullisen summan: tehdä osan maksuttomaksi tai korjata väärän hinnan.
+
+h3. Suunniteltavat asiat
+* Hintarivien näyttäminen varauksen käsittelynäkymässä.
+* Rivikohtainen summan muuttaminen hyväksynnän yhteydessä.
+* "Maksuton" toiminto koko varaukselle säilyy.
+* Mistä näkee, että hintaa on muutettu, ja mikä alkuperäinen hinta oli.

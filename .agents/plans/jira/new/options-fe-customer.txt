@@ -1,0 +1,8 @@
+Hakija valitsee price optionin jokaiselle kausivarauksen hakemuksen osiolle. Toteutus seuraa suunnitelmaa (UX/UI-tiketti).
+
+h3. Toteutus
+* Hae hakukierroksen tarjoamat price optionit GraphQL:stä.
+* Näytä optionin valinta jokaiselle hakemuksen osiolle, nimen ja kuvauksen kanssa. Valinta on pakollinen, jos kierros tarjoaa optioneita.
+* Lähetä valittu option hakemuksen mutationissa.
+* Näytä valittu option hakemuksen yhteenvedossa ja lähetetyn hakemuksen tiedoissa.
+* Päivitä GraphQL-queryt, fragmentit ja testien mockit.
