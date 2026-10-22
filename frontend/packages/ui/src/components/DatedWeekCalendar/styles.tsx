@@ -158,23 +158,25 @@ export const ResizeHandle = styled.span`
 
 // The current time, drawn over the cells of its row. One is rendered per day column, so together they
 // cross the whole grid. Only the leftmost carries the dot, which marks the start of the line.
-export const NowLine = styled.span`
+export const NowIndicator = styled.span`
   position: absolute;
-  left: 0;
-  right: 0;
-  height: 3px;
+  z-index: 2;
   background: var(--color-bus);
   pointer-events: none;
 `;
 
-export const NowDot = styled.span`
-  position: absolute;
+export const NowLine = styled(NowIndicator)`
+  left: 0;
+  right: 0;
+  height: 2px;
+`;
+
+export const NowDot = styled(NowIndicator)`
   top: 50%;
   left: 0;
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--color-bus);
   transform: translate(-50%, -50%);
 `;
 
