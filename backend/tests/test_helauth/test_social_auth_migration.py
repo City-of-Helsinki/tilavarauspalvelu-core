@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from pytest_django.fixtures import SettingsWrapper
     from responses import RequestsMock
 
-    from .helpers import FakeKeycloakServer
+    from .helpers import FakeKeycloak
 
 pytestmark = [
     pytest.mark.django_db(transaction=True),
@@ -105,7 +105,7 @@ def test_social_auth_migration__backfills_sub_as_identifier_key_for_tunnistamo_a
 
 @pytest.mark.usefixtures("database_from_social_auth_5_7_0")
 def test_social_auth_migration__customer_logs_in_to_the_same_user_and_association(
-    keycloak_server: FakeKeycloakServer,
+    keycloak: FakeKeycloak,
     requests_mock: RequestsMock,
     settings: SettingsWrapper,
 ):
@@ -122,7 +122,7 @@ def test_social_auth_migration__customer_logs_in_to_the_same_user_and_associatio
 
     response = browse(client, method="GET", url="/helauth/login/?ui=customer&lang=fi")
     customer = keycloak_user_for(customer_row, amr=["suomi_fi"])
-    callback_url = keycloak_server.log_in(authorization_url=response["Location"], user=customer)
+    callback_url = keycloak.log_in(authorization_url=response["Location"], user=customer)
     browse(client, method="GET", url=callback_url)
 
     logged_in_user = auth.get_user(client)
@@ -134,7 +134,7 @@ def test_social_auth_migration__customer_logs_in_to_the_same_user_and_associatio
 
 @pytest.mark.usefixtures("database_from_social_auth_5_7_0")
 def test_social_auth_migration__staff_member_logs_in_to_the_same_user_and_association(
-    keycloak_server: FakeKeycloakServer,
+    keycloak: FakeKeycloak,
 ):
     migrate_to_latest()
 
@@ -144,7 +144,7 @@ def test_social_auth_migration__staff_member_logs_in_to_the_same_user_and_associ
 
     response = browse(client, method="GET", url="/helauth/login/?next=/admin/")
     staff_member = keycloak_user_for(staff_member_row, amr=["helsinkiad"])
-    callback_url = keycloak_server.log_in(authorization_url=response["Location"], user=staff_member)
+    callback_url = keycloak.log_in(authorization_url=response["Location"], user=staff_member)
     response = browse(client, method="GET", url=callback_url)
 
     assert response.status_code == 200
