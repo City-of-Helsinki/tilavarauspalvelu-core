@@ -13,7 +13,8 @@ The first cell of a painted run is named after the whole run. The other cells na
 - Arrow keys move focus. Page Up and Page Down move one hour. Home and End go to the first and last row.
 - Enter or Space paints or erases the cell. Shift and Arrow Up or Down extend a sweep. The mode of a sweep is fixed when it starts.
 - A polite live region says what changed.
-- A consumer can refuse a paint with `isValidSelection`. The Calendar says the reason and does not change the value.
+- A consumer can refuse a paint with `isValidPaint`. The Calendar says the reason and does not change the value.
+  The prop refuses a paint, not a Selection, so it is not called `isValidSelection`.
 - A cell outside the Reservable Times cannot be painted. It can be erased.
 
 ## Not built yet

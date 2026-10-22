@@ -88,7 +88,7 @@ export type WeeklyPatternCalendarProps<TData extends CalendarData> = (EditablePr
   /** Defaults to a shallow comparison of the data objects. */
   isDataEqual?: (a: TData, b: TData) => boolean;
   /** Return a reason to refuse a paint. The reason is announced to screen readers. */
-  isValidSelection?: (span: WeeklyPatternSpan<TData>) => string | null;
+  isValidPaint?: (span: WeeklyPatternSpan<TData>) => string | null;
 
   /** BCP 47 tag used for weekday names. */
   locale: string;
