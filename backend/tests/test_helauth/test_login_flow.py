@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from pytest_django.fixtures import SettingsWrapper
     from responses import RequestsMock
 
-    from .helpers import FakeKeycloakServer
+    from .helpers import FakeKeycloak
 
 pytestmark = [
     pytest.mark.django_db,
@@ -59,7 +59,7 @@ def mock_helsinki_profile(requests_mock: RequestsMock, *, profile_id: str) -> No
 # ── Customer login ──────────────────────────────────────────────────────────────────────────────────────────────────
 
 
-def test_login_flow__customer__starts_login_on_keycloak(keycloak_server: FakeKeycloakServer, settings: SettingsWrapper):
+def test_login_flow__customer__starts_login_on_keycloak(keycloak: FakeKeycloak, settings: SettingsWrapper):
     settings.SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS = [FRONTEND_HOST]
     client = Client(enforce_csrf_checks=True)
 
@@ -70,7 +70,7 @@ def test_login_flow__customer__starts_login_on_keycloak(keycloak_server: FakeKey
 
     authorization_url = urlsplit(response["Location"])
     assert f"{authorization_url.scheme}://{authorization_url.netloc}{authorization_url.path}" == (
-        keycloak_server.authorization_endpoint
+        keycloak.authorization_endpoint
     )
 
     query = dict(parse_qsl(authorization_url.query))
@@ -87,7 +87,7 @@ def test_login_flow__customer__starts_login_on_keycloak(keycloak_server: FakeKey
 
 
 def test_login_flow__customer__logs_in_and_returns_to_frontend(
-    keycloak_server: FakeKeycloakServer,
+    keycloak: FakeKeycloak,
     requests_mock: RequestsMock,
     settings: SettingsWrapper,
 ):
@@ -97,7 +97,7 @@ def test_login_flow__customer__logs_in_and_returns_to_frontend(
 
     next_url = f"https://{FRONTEND_HOST}/reservations"
     response = browse(client, method="GET", url=f"/helauth/login/?next={next_url}&ui=customer&lang=fi")
-    callback_url = keycloak_server.log_in(authorization_url=response["Location"], user=CUSTOMER)
+    callback_url = keycloak.log_in(authorization_url=response["Location"], user=CUSTOMER)
     response = browse(client, method="GET", url=callback_url)
 
     assert response.status_code == 302
@@ -113,14 +113,12 @@ def test_login_flow__customer__logs_in_and_returns_to_frontend(
     assert logged_in_user.pk == user.pk
 
 
-def test_login_flow__customer__rejects_callback_with_wrong_state(
-    keycloak_server: FakeKeycloakServer, settings: SettingsWrapper
-):
+def test_login_flow__customer__rejects_callback_with_wrong_state(keycloak: FakeKeycloak, settings: SettingsWrapper):
     settings.SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS = [FRONTEND_HOST]
     client = Client(enforce_csrf_checks=True)
 
     response = browse(client, method="GET", url="/helauth/login/?ui=customer&lang=fi")
-    callback_url = keycloak_server.log_in(authorization_url=response["Location"], user=CUSTOMER)
+    callback_url = keycloak.log_in(authorization_url=response["Location"], user=CUSTOMER)
     forged_callback_url = callback_url.replace("state=", "state=forged")
     browse(client, method="GET", url=forged_callback_url)
 
@@ -133,7 +131,7 @@ def test_login_flow__customer__rejects_callback_with_wrong_state(
 # ── Admin login ─────────────────────────────────────────────────────────────────────────────────────────────────────
 
 
-def test_login_flow__admin__helsinki_login_button_starts_login_on_keycloak(keycloak_server: FakeKeycloakServer):
+def test_login_flow__admin__helsinki_login_button_starts_login_on_keycloak(keycloak: FakeKeycloak):
     client = Client(enforce_csrf_checks=True)
 
     login_page = client.get("/admin/login/?next=/admin/")
@@ -146,7 +144,7 @@ def test_login_flow__admin__helsinki_login_button_starts_login_on_keycloak(keycl
 
     authorization_url = urlsplit(response["Location"])
     assert f"{authorization_url.scheme}://{authorization_url.netloc}{authorization_url.path}" == (
-        keycloak_server.authorization_endpoint
+        keycloak.authorization_endpoint
     )
 
     query = dict(parse_qsl(authorization_url.query))
@@ -160,14 +158,14 @@ def test_login_flow__admin__helsinki_login_button_starts_login_on_keycloak(keycl
     }
 
 
-def test_login_flow__admin__staff_member_logs_in_to_admin(keycloak_server: FakeKeycloakServer):
+def test_login_flow__admin__staff_member_logs_in_to_admin(keycloak: FakeKeycloak):
     UserFactory.create(uuid=STAFF_MEMBER.sub, email=STAFF_MEMBER.email, is_staff=True)
     client = Client(enforce_csrf_checks=True)
 
     login_page = client.get("/admin/login/?next=/admin/")
     button = find_helsinki_login_button(login_page.content.decode())
     response = browse(client, method=button.method, url=button.action, data=button.data)
-    callback_url = keycloak_server.log_in(authorization_url=response["Location"], user=STAFF_MEMBER)
+    callback_url = keycloak.log_in(authorization_url=response["Location"], user=STAFF_MEMBER)
     response = browse(client, method="GET", url=callback_url)
 
     assert response.status_code == 200
@@ -181,7 +179,7 @@ def test_login_flow__admin__staff_member_logs_in_to_admin(keycloak_server: FakeK
 
 
 def test_login_flow__logout__ends_keycloak_session(
-    keycloak_server: FakeKeycloakServer,
+    keycloak: FakeKeycloak,
     requests_mock: RequestsMock,
     settings: SettingsWrapper,
 ):
@@ -190,7 +188,7 @@ def test_login_flow__logout__ends_keycloak_session(
     client = Client(enforce_csrf_checks=True)
 
     response = browse(client, method="GET", url="/helauth/login/?ui=customer&lang=fi")
-    callback_url = keycloak_server.log_in(authorization_url=response["Location"], user=CUSTOMER)
+    callback_url = keycloak.log_in(authorization_url=response["Location"], user=CUSTOMER)
     browse(client, method="GET", url=callback_url)
 
     client.get("/csrf/")
@@ -204,7 +202,7 @@ def test_login_flow__logout__ends_keycloak_session(
 
     end_session_url = urlsplit(response["Location"])
     assert f"{end_session_url.scheme}://{end_session_url.netloc}{end_session_url.path}" == (
-        keycloak_server.end_session_endpoint
+        keycloak.end_session_endpoint
     )
 
     query = dict(parse_qsl(end_session_url.query))

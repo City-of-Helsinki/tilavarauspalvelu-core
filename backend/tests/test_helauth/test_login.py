@@ -19,10 +19,12 @@ from tests.factories import UnitFactory, UserFactory
 from tests.factories.helsinki_profile import MyProfileDataFactory
 from tests.helpers import ResponseMock, patch_method
 
-from .helpers import OIDC_CONFIG, OIDC_ENDPOINT, UMA_TICKET_GRANT, TokenRequest
+from .helpers import UMA_TICKET_GRANT, KeycloakUser, TokenRequest, find_auto_submit_form
 
 if TYPE_CHECKING:
     from django.test import Client
+
+    from .helpers import FakeKeycloak
 
 pytestmark = [
     pytest.mark.django_db,
@@ -32,57 +34,52 @@ pytestmark = [
 # ── Helpers ──
 
 
-def start_social_login(client: Client) -> dict[str, str]:
-    """Start the social login and return the query parameters of the redirect to the Keycloak login page."""
+END_SESSION_ENDPOINT = "https://tunnistus.example.com/auth/realms/helsinki-tunnistus/protocol/openid-connect/logout"
+
+
+def start_social_login(client: Client, **data: str) -> str:
+    """Start the social login and return the URL of the Keycloak login page."""
     url = reverse("social:begin", kwargs={"backend": "tunnistamo"})
-    response = client.get(url, data={"next": "/reservations"})
+    response = client.post(url, data={"next": "/reservations", **data})
     assert response.status_code == 302, response
-
-    redirect_url = urllib.parse.urlparse(response.url)
-    return dict(urllib.parse.parse_qsl(redirect_url.query))
+    return response.url
 
 
-def complete_social_login(client: Client, *, state: str) -> Any:
-    """Return to the service from the Keycloak login page with an authorization code."""
-    url = reverse("social:complete", kwargs={"backend": "tunnistamo"})
-    return client.get(url, data={"code": "login-code", "state": state})
+def complete_social_login(client: Client, keycloak: FakeKeycloak, *, user: KeycloakUser) -> Any:
+    """Log in on the Keycloak login page, and return to the service with an authorization code."""
+    authorization_url = start_social_login(client)
+    callback_url = keycloak.log_in(authorization_url=authorization_url, user=user)
+    return client.get(callback_url)
 
 
-def id_token_claims(
+def keycloak_user(
     *,
-    nonce: str,
     amr: ADLoginAMR | ProfileLoginAMR,
     email: str = "user@example.com",
     ad_groups: list[str] | None = None,
-    issued_at: datetime.datetime | None = None,
-) -> dict[str, Any]:
-    now = local_datetime()
-    issued_at = issued_at or now
-    return {
-        "iss": OIDC_ENDPOINT,
-        "sub": str(uuid.uuid4()),
-        "aud": "SOCIAL_AUTH_TUNNISTAMO_KEY",
-        "jti": uuid.uuid4().hex,
-        "typ": "ID",
-        "exp": int((now + datetime.timedelta(minutes=5)).timestamp()),
-        "iat": int(issued_at.timestamp()),
-        "auth_time": int(now.timestamp()),
-        "nonce": nonce,
-        "email": email,
-        "given_name": "Example",
-        "family_name": "User",
-        "ad_groups": ad_groups or [],
-        "amr": [amr.value],
-        "loa": "substantial",
-    }
+) -> KeycloakUser:
+    return KeycloakUser(
+        sub=str(uuid.uuid4()),
+        email=email,
+        given_name="Example",
+        family_name="User",
+        amr=[amr.value],
+        loa="substantial",
+        ad_groups=ad_groups or [],
+    )
 
 
-def build_end_session_url(*, id_token: str, post_logout_redirect_uri: str) -> str:
+def build_end_session_url(
+    *,
+    id_token: str,
+    post_logout_redirect_uri: str,
+    endpoint: str = END_SESSION_ENDPOINT,
+) -> str:
     query = urllib.parse.urlencode({
         "id_token_hint": id_token,
         "post_logout_redirect_uri": post_logout_redirect_uri,
     })
-    return f"{OIDC_CONFIG['end_session_endpoint']}?{query}"
+    return f"{endpoint}?{query}"
 
 
 def message_texts(response: Any) -> list[str]:
@@ -93,27 +90,37 @@ def message_texts(response: Any) -> list[str]:
 # ── Login view ──
 
 
-def test_login_view__redirect_to_social_login(client):
+def test_login_view__auto_submit_form_starts_social_login(client):
     url = reverse("helusers:auth_login")
     response = client.get(url, data={"next": "http://localhost:3000/reservations", "lang": "sv", "ui": "customer"})
 
-    assert response.status_code == 302
+    assert response.status_code == 200
 
-    redirect_url = urllib.parse.urlparse(response.url)
-    assert redirect_url.path == "/pysocial/login/tunnistamo/"
-    assert dict(urllib.parse.parse_qsl(redirect_url.query)) == {
+    form = find_auto_submit_form(response)
+    assert form is not None
+    assert form.method == "POST"
+    assert form.action == "/pysocial/login/tunnistamo/"
+
+    form.data.pop("csrfmiddlewaretoken")
+    assert form.data == {
         "next": "http://localhost:3000/reservations",
         "ui_locales": "sv",
         "kc_idp_hint": "suomi_fi",
     }
 
 
-def test_login_view__redirect_to_social_login__no_customer_login(client):
+def test_login_view__auto_submit_form_starts_social_login__no_customer_login(client):
     url = reverse("helusers:auth_login")
     response = client.get(url, data={"ui": "admin"})
 
-    assert response.status_code == 302
-    assert response.url == "/pysocial/login/tunnistamo/"
+    assert response.status_code == 200
+
+    form = find_auto_submit_form(response)
+    assert form is not None
+    assert form.action == "/pysocial/login/tunnistamo/"
+
+    form.data.pop("csrfmiddlewaretoken")
+    assert form.data == {}
 
 
 def test_login_view__logs_out_current_user(client):
@@ -123,7 +130,7 @@ def test_login_view__logs_out_current_user(client):
     url = reverse("helusers:auth_login")
     response = client.get(url)
 
-    assert response.status_code == 302
+    assert response.status_code == 200
     assert "_auth_user_id" not in client.session
 
 
@@ -131,13 +138,10 @@ def test_login_view__logs_out_current_user(client):
 
 
 def test_social_login__redirect_to_keycloak(client, keycloak):
-    url = reverse("social:begin", kwargs={"backend": "tunnistamo"})
-    response = client.get(url, data={"ui_locales": "sv", "kc_idp_hint": "suomi_fi"})
+    authorization_url = start_social_login(client, ui_locales="sv", kc_idp_hint="suomi_fi")
 
-    assert response.status_code == 302
-
-    redirect_url = urllib.parse.urlparse(response.url)
-    assert redirect_url._replace(query="").geturl() == OIDC_CONFIG["authorization_endpoint"]
+    redirect_url = urllib.parse.urlparse(authorization_url)
+    assert redirect_url._replace(query="").geturl() == keycloak.authorization_endpoint
 
     params = dict(urllib.parse.parse_qsl(redirect_url.query))
     nonce = params.pop("nonce")
@@ -154,8 +158,9 @@ def test_social_login__redirect_to_keycloak(client, keycloak):
 
 
 def test_social_login__redirect_to_keycloak__no_language_or_identity_provider(client, keycloak):
-    params = start_social_login(client)
+    authorization_url = start_social_login(client)
 
+    params = dict(urllib.parse.parse_qsl(urllib.parse.urlparse(authorization_url).query))
     assert "ui_locales" not in params
     assert "kc_idp_hint" not in params
 
@@ -168,15 +173,13 @@ def test_social_login__profile_login(client, keycloak):
     )
     HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
-    params = start_social_login(client)
-    keycloak.id_token_claims = id_token_claims(nonce=params["nonce"], amr=ProfileLoginAMR.SUOMI_FI)
-
-    response = complete_social_login(client, state=params["state"])
+    keycloak_user_data = keycloak_user(amr=ProfileLoginAMR.SUOMI_FI)
+    response = complete_social_login(client, keycloak, user=keycloak_user_data)
 
     assert response.status_code == 302
     assert response.url == "/reservations"
 
-    user = User.objects.get(uuid=keycloak.id_token_claims["sub"])
+    user = User.objects.get(uuid=keycloak_user_data.sub)
     assert user.email == "user@example.com"
     assert user.profile_id == "profile-id"
     assert user.date_of_birth == datetime.date(2001, 1, 1)
@@ -185,7 +188,7 @@ def test_social_login__profile_login(client, keycloak):
     assert social_auth.extra_data["refresh_token"] == "refreshed-refresh-token"
 
     assert keycloak.token_requests == [
-        TokenRequest(grant_type="authorization_code", token="login-code"),
+        TokenRequest(grant_type="authorization_code", token="fake-authorization-code"),
         TokenRequest(grant_type="refresh_token", token="login-refresh-token"),
         TokenRequest(grant_type=UMA_TICKET_GRANT, token="refreshed-access-token"),
     ]
@@ -194,8 +197,9 @@ def test_social_login__profile_login(client, keycloak):
     assert session["_auth_user_id"] == str(user.pk)
     assert session["profile_access_token"] == "profile-access-token"
     assert session["social_auth_end_session_url"] == build_end_session_url(
-        id_token=keycloak.id_token,
+        id_token=keycloak.issued_id_tokens[0],
         post_logout_redirect_uri="http://testserver/admin/login/",
+        endpoint=keycloak.end_session_endpoint,
     )
     assert session["reservation_prefill_info"] == {
         "municipality": "HELSINKI",
@@ -217,20 +221,17 @@ def test_social_login__ad_login(client, keycloak):
     )
     unit = UnitFactory.create(tprek_id="1234", allow_permissions_from_ad_groups=True)
 
-    params = start_social_login(client)
-    keycloak.id_token_claims = id_token_claims(
-        nonce=params["nonce"],
+    keycloak_user_data = keycloak_user(
         amr=ADLoginAMR.HELSINKIAZUREAD,
         email="user@hel.fi",
         ad_groups=["unit__varaamo__handler__1234"],
     )
-
-    response = complete_social_login(client, state=params["state"])
+    response = complete_social_login(client, keycloak, user=keycloak_user_data)
 
     assert response.status_code == 302
     assert response.url == "/reservations"
 
-    user = User.objects.get(uuid=keycloak.id_token_claims["sub"])
+    user = User.objects.get(uuid=keycloak_user_data.sub)
     assert user.is_staff is True
 
     old_user.refresh_from_db()
@@ -243,42 +244,33 @@ def test_social_login__ad_login(client, keycloak):
 
     assert HelsinkiProfileClient.request.call_count == 0
     assert keycloak.token_requests == [
-        TokenRequest(grant_type="authorization_code", token="login-code"),
+        TokenRequest(grant_type="authorization_code", token="fake-authorization-code"),
     ]
 
 
 def test_social_login__id_token_issued_in_the_future(client, keycloak):
-    params = start_social_login(client)
-    keycloak.id_token_claims = id_token_claims(
-        nonce=params["nonce"],
-        amr=ADLoginAMR.HELSINKIAZUREAD,
-        issued_at=local_datetime() + datetime.timedelta(minutes=1),
-    )
+    keycloak.clock_skew = datetime.timedelta(minutes=1)
 
-    response = complete_social_login(client, state=params["state"])
+    keycloak_user_data = keycloak_user(amr=ADLoginAMR.HELSINKIAZUREAD)
+    response = complete_social_login(client, keycloak, user=keycloak_user_data)
 
     assert response.status_code == 302
     assert response.url == "/admin/"
     assert "_auth_user_id" not in client.session
-    assert User.objects.filter(uuid=keycloak.id_token_claims["sub"]).exists() is False
+    assert User.objects.filter(uuid=keycloak_user_data.sub).exists() is False
 
 
 def test_social_login__id_token_issued_in_the_future__skip_iat_claim_validation(client, keycloak, settings):
     settings.UNSAFE_SKIP_IAT_CLAIM_VALIDATION = True
+    keycloak.clock_skew = datetime.timedelta(minutes=1)
 
-    params = start_social_login(client)
-    keycloak.id_token_claims = id_token_claims(
-        nonce=params["nonce"],
-        amr=ADLoginAMR.HELSINKIAZUREAD,
-        issued_at=local_datetime() + datetime.timedelta(minutes=1),
-    )
-
-    response = complete_social_login(client, state=params["state"])
+    keycloak_user_data = keycloak_user(amr=ADLoginAMR.HELSINKIAZUREAD)
+    response = complete_social_login(client, keycloak, user=keycloak_user_data)
 
     assert response.status_code == 302
     assert response.url == "/reservations"
 
-    user = User.objects.get(uuid=keycloak.id_token_claims["sub"])
+    user = User.objects.get(uuid=keycloak_user_data.sub)
     assert client.session["_auth_user_id"] == str(user.pk)
 
 
@@ -290,7 +282,7 @@ def test_logout_view__redirect_to_end_session_url(client):
     client.force_login(user)
 
     session = client.session
-    session["social_auth_end_session_url"] = f"{OIDC_CONFIG['end_session_endpoint']}?id_token_hint=foo"
+    session["social_auth_end_session_url"] = f"{END_SESSION_ENDPOINT}?id_token_hint=foo"
     session.save()
 
     url = reverse("helusers:auth_logout")
@@ -309,7 +301,7 @@ def test_logout_view__redirect_to_end_session_url__given_redirect_url(client):
     client.force_login(user)
 
     session = client.session
-    session["social_auth_end_session_url"] = f"{OIDC_CONFIG['end_session_endpoint']}?id_token_hint=foo"
+    session["social_auth_end_session_url"] = f"{END_SESSION_ENDPOINT}?id_token_hint=foo"
     session.save()
 
     url = reverse("helusers:auth_logout")
