@@ -208,6 +208,31 @@ describe("ResourceDayCalendar", () => {
     expect(screen.queryByTestId("resource-day-calendar__tooltip")).not.toBeInTheDocument();
   });
 
+  test("hovering or moving focus renders only the rows involved", async () => {
+    const user = userEvent.setup();
+    const getEventLabel = vi.fn((item: DatedEvent<Data>) => item.title);
+    const withEvent = (id: string): ResourceDayResource<Data> => ({
+      id,
+      title: `Room ${id}`,
+      events: [event(`e${id}`, `Event ${id}`, "2026-10-21T09:00:00+03:00", "2026-10-21T10:00:00+03:00")],
+    });
+    renderCalendar({
+      resources: [withEvent("1"), withEvent("2"), withEvent("3")],
+      getEventLabel,
+      renderEventTooltip: (item) => <p>{item.title}</p>,
+    });
+    const labelledEvents = () => new Set(getEventLabel.mock.calls.map(([item]) => item.title));
+
+    cell(/^Room 1, 08:00–08:30/).focus();
+    getEventLabel.mockClear();
+    await user.hover(cell(/^Room 2, 09:00–10:00/));
+    expect(getEventLabel).not.toHaveBeenCalled();
+
+    // The tab stop leaves row 1 and arrives in row 2. Row 3 is left alone.
+    await user.keyboard("{ArrowDown}");
+    expect(labelledEvents()).toEqual(new Set(["Event 1", "Event 2"]));
+  });
+
   test("marks the grid busy while loading", () => {
     renderCalendar({ isLoading: true });
     expect(screen.getByRole("grid")).toHaveAttribute("aria-busy", "true");

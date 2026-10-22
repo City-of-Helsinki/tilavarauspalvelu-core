@@ -17,6 +17,8 @@ Every existing calendar is replaced by one Calendar in `packages/ui`. These are 
 
 1. The Weekly Pattern for Suitable Time Ranges, in the customer funnel and the staff application view. This is done in one change. `ApplicationTimeSelector` is deleted.
 2. The dated Reservation calendars in both apps.
+3. The unit-list timeline in the staff application view.
+4. The staff allocation calendar.
 
 The shared conversions between API data and the Weekly Pattern live in `packages/ui/src/modules/suitableTimes.ts`.
 
@@ -24,5 +26,9 @@ The staff application view is read only. A cell is open when at least one reques
 
 ## TODO
 
-- Replace the staff unit timeline (`apps/staff/src/lib/my-units/[id]/UnitCalendar.tsx`). Add a layout with resources as rows and days as columns.
-- Keep cell re-renders cheap, for example with a memoised cell, so hover and drag do not render the whole grid.
+- Fix calendar controls, to look correct.
+- Check which views already have an alternative listing of events, or an alternative way to enter a time, and don't 
+  show the generic ListAlternative and/or the generic time entry form.
+- Replace the staff allocation calendar (`apps/staff/src/lib/application-rounds/[id]/allocation/AllocationCalendar.
+tsx`). 
+- Keep the Dated Week drag path cheap. The Resource Day calendar already renders only the rows that changed (a memoised row, a tooltip that owns its state, stable navigation callbacks), so hover and focus no longer render the whole grid. The Dated Week calendar still renders every cell for each cell the pointer crosses while dragging the draft, because the preview lives in state at the top of the component. Its grid is small (about 250 cells), so measure before changing it. If dragging lags, memoise a column or cell the same way and pass the preview down as a primitive.
