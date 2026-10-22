@@ -8,6 +8,7 @@ from django.urls import reverse
 
 from tilavarauspalvelu.enums import PaymentType, PriceComponentKind, PriceUnit
 from tilavarauspalvelu.models import PriceComponent, PricingGroup, ReservationUnitPricingGroup
+from tilavarauspalvelu.typing import error_codes
 
 from tests.factories import ReservationUnitFactory, UserFactory
 from tests.test_admin.helpers import collect_admin_form_errors, management_form_data
@@ -117,6 +118,37 @@ def test_pricing_group_admin__reservation_unit_before_components_is_rejected(api
             "message": (
                 "A reservation unit uses the pricing group from 2026-01-01, but its prices begin on 2026-02-01."
             ),
+        },
+    ]
+    assert not PricingGroup.objects.exists()
+
+
+def test_pricing_group_admin__own_group_with_two_reservation_units_is_rejected(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+    first = ReservationUnitFactory.create()
+    second = ReservationUnitFactory.create()
+
+    url = reverse("admin:tilavarauspalvelu_pricinggroup_add")
+    data = {
+        **group_form_data(),
+        **component_form_data(0, valid_from="2026-01-01"),
+        "reservation_units-0-reservation_unit": first.pk,
+        "reservation_units-0-begins": "2026-01-01",
+        "reservation_units-1-reservation_unit": second.pk,
+        "reservation_units-1-begins": "2026-01-01",
+        **management_form_data("components", total_forms=1),
+        **management_form_data("reservation_units", total_forms=2),
+    }
+
+    errors: list[dict[str, Any]] = []
+    with collect_admin_form_errors(errors):
+        response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 200
+    assert errors == [
+        {
+            "code": error_codes.PRICING_GROUP_OWN_GROUP_HAS_MANY_RESERVATION_UNITS,
+            "message": "A pricing group without a unit group can be used by only one reservation unit.",
         },
     ]
     assert not PricingGroup.objects.exists()

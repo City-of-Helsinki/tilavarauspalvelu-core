@@ -114,7 +114,8 @@ def _own_pricing_group(*, reservation_unit: ReservationUnit, today: datetime.dat
     """
     Find the own pricing group from the active and future pricing group rows of the reservation unit.
 
-    :raises ValidationError: If any of these rows uses a shared pricing group.
+    :raises ValidationError: If any of these rows uses a shared pricing group,
+                             or if another reservation unit also uses the own pricing group.
     """
     rows = list(
         ReservationUnitPricingGroup.objects
@@ -133,4 +134,10 @@ def _own_pricing_group(*, reservation_unit: ReservationUnit, today: datetime.dat
     if not current_and_future_rows:
         return None
 
-    return current_and_future_rows[0].pricing_group
+    pricing_group = current_and_future_rows[0].pricing_group
+    reservation_unit_ids = ReservationUnitPricingGroup.objects.filter(pricing_group=pricing_group).values_list(
+        "reservation_unit_id",
+        flat=True,
+    )
+    pricing_group.validators.validate_own_group_has_one_reservation_unit(list(reservation_unit_ids))
+    return pricing_group

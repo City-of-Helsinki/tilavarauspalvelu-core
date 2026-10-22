@@ -181,3 +181,28 @@ def test_reservation_unit__own_pricings__shared_group_is_rejected(graphql):
     assert response.field_error_codes() == [error_codes.RESERVATION_UNIT_USES_SHARED_PRICING_GROUP]
 
     assert PriceComponent.objects.filter(pricing_group=pricing_group).count() == 1
+
+
+def test_reservation_unit__own_pricings__own_group_used_by_another_reservation_unit(graphql):
+    today = local_date()
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+    pricing_group = PricingGroupFactory.create(unit_group=None)
+    ReservationUnitPricingGroupFactory.create(
+        reservation_unit=reservation_unit, pricing_group=pricing_group, begins=today
+    )
+    ReservationUnitPricingGroupFactory.create(pricing_group=pricing_group, begins=today)
+    PriceComponentFactory.create(pricing_group=pricing_group, valid_from=today)
+
+    graphql.login_with_superuser()
+
+    future_date = today + datetime.timedelta(days=10)
+    input_data = {"pk": reservation_unit.pk, "ownPricings": [own_pricing_input(begins=future_date, amount="20.00")]}
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_messages() == [
+        "A pricing group without a unit group can be used by only one reservation unit.",
+    ]
+    assert response.field_error_codes() == [error_codes.PRICING_GROUP_OWN_GROUP_HAS_MANY_RESERVATION_UNITS]
+
+    assert PriceComponent.objects.filter(pricing_group=pricing_group).count() == 1

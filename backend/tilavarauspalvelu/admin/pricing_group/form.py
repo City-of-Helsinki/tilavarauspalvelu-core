@@ -12,6 +12,7 @@ from tinymce.widgets import TinyMCE
 
 from tilavarauspalvelu.models import PriceComponent, PricingGroup, ReservationUnitPricingGroup
 from tilavarauspalvelu.services.pricing.coverage import check_pricing_group_coverage
+from utils.utils import only_django_validation_errors
 
 if TYPE_CHECKING:
     import datetime
@@ -68,7 +69,7 @@ class PriceComponentFormSet(BaseInlineFormSet):
             raise ValidationError([error.message for error in errors])
 
     def _reservation_unit_begin_dates(self) -> list[datetime.date]:
-        reservation_unit_formset = ReservationUnitPricingGroupFormSet(
+        reservation_unit_formset = ReservationUnitPricingGroupDataFormSet(
             data=self.data,
             instance=self.instance,
             prefix=RESERVATION_UNITS_PREFIX,
@@ -102,7 +103,24 @@ class PriceComponentInline(TranslationStackedInline):
     extra = 0
 
 
-ReservationUnitPricingGroupFormSet = inlineformset_factory(
+class ReservationUnitPricingGroupFormSet(BaseInlineFormSet):
+    instance: PricingGroup
+
+    def clean(self) -> None:
+        super().clean()
+        if any(self.errors):
+            return
+
+        reservation_unit_ids = [
+            form.cleaned_data["reservation_unit"].pk
+            for form in self.forms
+            if form.cleaned_data and not self._should_delete_form(form)
+        ]
+        with only_django_validation_errors():
+            self.instance.validators.validate_own_group_has_one_reservation_unit(reservation_unit_ids)
+
+
+ReservationUnitPricingGroupDataFormSet = inlineformset_factory(
     parent_model=PricingGroup,
     model=ReservationUnitPricingGroup,
     fields=["reservation_unit", "begins"],
@@ -116,5 +134,6 @@ class ReservationUnitPricingGroupInline(admin.TabularInline):
         "reservation_unit",
         "begins",
     ]
+    formset = ReservationUnitPricingGroupFormSet
     autocomplete_fields = ["reservation_unit"]
     extra = 0
