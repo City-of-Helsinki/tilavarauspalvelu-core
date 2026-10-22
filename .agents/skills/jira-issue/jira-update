@@ -1,0 +1,221 @@
+#!/usr/bin/env bash
+# Update the summary, description, labels or links of a Jira issue through the Jira Cloud REST API.
+# Usage: jira-update <key or URL> <options>, e.g. jira-update TILA-123 --add-label backend
+set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
+
+usage() {
+  cat >&2 <<'EOF'
+Usage: jira-update <key or URL> <options>, e.g. jira-update TILA-123 --add-label backend
+Give at least one change. Options marked with * can be repeated.
+  --summary <text>            Replace the summary (the title). One line.
+  --description-file <path>   Replace the description with the file contents (Jira wiki markup).
+  --add-label <label>       * Add a label: backend, frontend, operations, infra or design.
+  --remove-label <label>    * Remove a label.
+  --blocks <key>            * Add a link: this issue blocks <key>.
+  --blocked-by <key>        * Add a link: this issue is blocked by <key>.
+  --relates <key>           * Add a link: this issue relates to <key>.
+  --remove-link <key>       * Remove every link between this issue and <key>.
+  --dry-run                   Print the requests and send nothing.
+EOF
+  exit 2
+}
+[[ $# -ge 2 ]] || usage
+
+key="$(parse_key "$1")"
+shift
+
+new_summary=""
+description_file=""
+add_labels=()
+remove_labels=()
+blocks=()
+blocked_by=()
+relates=()
+remove_links=()
+dry_run=false
+
+while [[ $# -gt 0 ]]; do
+  option="$1"
+  if [[ "$option" == "--dry-run" ]]; then
+    dry_run=true
+    shift
+    continue
+  fi
+  [[ $# -ge 2 ]] || { echo "Missing value for $option" >&2; usage; }
+  value="$2"
+  shift 2
+  case "$option" in
+    --summary)
+      [[ -z "$new_summary" ]] || { echo "Give --summary only once." >&2; usage; }
+      [[ -n "${value//[[:space:]]/}" ]] || { echo "The summary is empty." >&2; exit 2; }
+      [[ "$value" != *$'\n'* ]] || { echo "The summary must be one line." >&2; exit 2; }
+      new_summary="$value"
+      ;;
+    --description-file)
+      [[ -z "$description_file" ]] || { echo "Give --description-file only once." >&2; usage; }
+      check_description_file "$value"
+      description_file="$value"
+      ;;
+    --add-label | --remove-label)
+      check_label "$value"
+      if [[ "$option" == "--add-label" ]]; then add_labels+=("$value"); else remove_labels+=("$value"); fi
+      ;;
+    --blocks | --blocked-by | --relates | --remove-link)
+      other="$(parse_key "$value")"
+      [[ "$other" != "$key" ]] || { echo "Cannot link $key to itself." >&2; exit 2; }
+      case "$option" in
+        --blocks) blocks+=("$other") ;;
+        --blocked-by) blocked_by+=("$other") ;;
+        --relates) relates+=("$other") ;;
+        --remove-link) remove_links+=("$other") ;;
+      esac
+      ;;
+    *)
+      echo "Unknown option: $option" >&2
+      usage
+      ;;
+  esac
+done
+
+for label in "${add_labels[@]}"; do
+  ! contains "$label" "${remove_labels[@]}" \
+    || { echo "Label $label is both added and removed." >&2; exit 2; }
+done
+for other in "${remove_links[@]}"; do
+  ! contains "$other" "${blocks[@]}" "${blocked_by[@]}" "${relates[@]}" \
+    || { echo "Link to $other is both added and removed." >&2; exit 2; }
+done
+
+if [[ -z "$new_summary" && -z "$description_file" ]] \
+  && (( ${#add_labels[@]} + ${#remove_labels[@]} + ${#blocks[@]} + ${#blocked_by[@]} + ${#relates[@]} + ${#remove_links[@]} == 0 )); then
+  echo "Nothing to change." >&2
+  usage
+fi
+
+load_credentials
+
+# The current summary, labels and links decide what to skip and which link IDs to remove.
+issue="$(api "rest/api/2/issue/$key?fields=summary,labels,issuelinks")"
+
+# Each request is "<method><sep><path><sep><body><sep><summary>".
+# The separator is not whitespace, so `read` keeps an empty body as an empty field.
+sep=$'\x1f'
+requests=()
+skipped=()
+
+# Summary, description and labels go in one edit request. The REST API v2 stores the description as wiki markup.
+edit_summary=()
+if [[ -n "$new_summary" ]] && [[ "$(jq --raw-output '.fields.summary' <<<"$issue")" == "$new_summary" ]]; then
+  skipped+=("The summary of $key is already as requested.")
+  new_summary=""
+fi
+labels_to_add=()
+labels_to_remove=()
+for label in "${add_labels[@]}"; do
+  if jq --exit-status --arg l "$label" '.fields.labels | index($l)' <<<"$issue" >/dev/null; then
+    skipped+=("Label $label is already on $key.")
+  elif ! contains "$label" "${labels_to_add[@]}"; then
+    labels_to_add+=("$label")
+    edit_summary+=("Added label $label.")
+  fi
+done
+for label in "${remove_labels[@]}"; do
+  if ! jq --exit-status --arg l "$label" '.fields.labels | index($l)' <<<"$issue" >/dev/null; then
+    skipped+=("Label $label is not on $key.")
+  elif ! contains "$label" "${labels_to_remove[@]}"; then
+    labels_to_remove+=("$label")
+    edit_summary+=("Removed label $label.")
+  fi
+done
+[[ -z "$description_file" ]] || edit_summary=("Replaced the description." "${edit_summary[@]}")
+[[ -z "$new_summary" ]] || edit_summary=("Changed the summary to \"$new_summary\"." "${edit_summary[@]}")
+
+if (( ${#edit_summary[@]} > 0 )); then
+  body="$(
+    jq --null-input --compact-output \
+      --arg summary "$new_summary" \
+      --arg has_description "$([[ -n "$description_file" ]] && echo true || echo false)" \
+      --rawfile description "${description_file:-/dev/null}" \
+      --argjson add "$(jq --null-input --compact-output '$ARGS.positional' --args "${labels_to_add[@]}")" \
+      --argjson remove "$(jq --null-input --compact-output '$ARGS.positional' --args "${labels_to_remove[@]}")" \
+      '{}
+      | if $summary != "" then .fields.summary = $summary else . end
+      | if $has_description == "true" then .fields.description = $description else . end
+      | ([$add[] | {add: .}] + [$remove[] | {remove: .}]) as $ops
+      | if ($ops | length) > 0 then .update.labels = $ops else . end'
+  )"
+  summary="$(printf '%s ' "${edit_summary[@]}")"
+  requests+=("PUT${sep}rest/api/2/issue/$key$sep$body$sep${summary% }")
+fi
+
+# Remove links before adding new ones.
+for other in "${remove_links[@]}"; do
+  found="$(
+    jq --raw-output --arg k "$key" --arg o "$other" '
+      .fields.issuelinks[]
+      | select(.inwardIssue.key == $o or .outwardIssue.key == $o)
+      | if .outwardIssue then "\(.id)\t\($k) \(.type.outward) \($o)"
+        else "\(.id)\t\($o) \(.type.outward) \($k)" end' <<<"$issue"
+  )"
+  if [[ -z "$found" ]]; then
+    skipped+=("No link between $key and $other.")
+    continue
+  fi
+  while IFS=$'\t' read -r id text; do
+    requests+=("DELETE${sep}rest/api/2/issueLink/$id$sep${sep}Removed link: $text.")
+  done <<<"$found"
+done
+
+# Add a link request unless the link exists. `exists` selects the existing link in this issue.
+# See make_link in lib.sh for the link direction.
+add_link() {
+  local option="$1" other="$2" exists="$3" request
+  make_link "$option" "$key" "$other"
+  if jq --exit-status --arg t "$link_type" --arg o "$other" "[.fields.issuelinks[] | select(.type.name == \$t) | select($exists)] | length > 0" <<<"$issue" >/dev/null; then
+    skipped+=("Link already exists: $link_text.")
+    return
+  fi
+  # Skip duplicates in the arguments.
+  for request in "${requests[@]}"; do
+    [[ "$request" == *"$sep$link_body$sep"* ]] && return
+  done
+  requests+=("POST${sep}rest/api/2/issueLink$sep$link_body${sep}Added link: $link_text.")
+}
+for other in "${blocks[@]}"; do
+  add_link --blocks "$other" '.outwardIssue.key == $o'
+done
+for other in "${blocked_by[@]}"; do
+  add_link --blocked-by "$other" '.inwardIssue.key == $o'
+done
+for other in "${relates[@]}"; do
+  add_link --relates "$other" '.outwardIssue.key == $o or .inwardIssue.key == $o'
+done
+
+if [[ "$dry_run" == true ]]; then
+  echo "Dry run for $key. Nothing is sent."
+  for request in "${requests[@]}"; do
+    IFS="$sep" read -r method path body summary <<<"$request"
+    echo
+    echo "$method $base_url/$path"
+    [[ -z "$body" ]] || jq . <<<"$body"
+    echo "Change: $summary"
+  done
+  for line in "${skipped[@]}"; do echo "Skipped: $line"; done
+  (( ${#requests[@]} > 0 )) || echo "Nothing to change."
+  exit 0
+fi
+
+for line in "${skipped[@]}"; do echo "Skipped: $line"; done
+if (( ${#requests[@]} == 0 )); then
+  echo "Nothing to change on $key."
+  exit 0
+fi
+# Print each change after its request succeeds, so a failure shows what is already done.
+echo "Changes to $key ($base_url/browse/$key):"
+for request in "${requests[@]}"; do
+  IFS="$sep" read -r method path body summary <<<"$request"
+  send "$method" "$path" "$body" >/dev/null
+  echo "- $summary"
+done
