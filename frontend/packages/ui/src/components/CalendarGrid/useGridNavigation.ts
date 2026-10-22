@@ -96,19 +96,26 @@ export function useGridNavigation<TColumn extends string>({
     }
   };
 
+  /** Stable, so a memoised row can hold on to them. */
+  const registerCell = useCallback((column: TColumn, index: number, element: HTMLTableCellElement | null) => {
+    const key = addressKey(column, index);
+    if (element) {
+      cellElements.current.set(key, element);
+    } else {
+      cellElements.current.delete(key);
+    }
+  }, []);
+
+  const markActive = useCallback((column: TColumn, index: number) => {
+    setActive((previous) => (previous?.column === column && previous.index === index ? previous : { column, index }));
+  }, []);
+
   /** The ref, tab stop and focus tracking every cell needs. */
   const cellProps = (column: TColumn, index: number) => ({
-    ref: (element: HTMLTableCellElement | null) => {
-      const key = addressKey(column, index);
-      if (element) {
-        cellElements.current.set(key, element);
-      } else {
-        cellElements.current.delete(key);
-      }
-    },
+    ref: (element: HTMLTableCellElement | null) => registerCell(column, index, element),
     tabIndex: activeAddress?.column === column && activeAddress.index === index ? 0 : -1,
-    onFocus: () => setActive({ column, index }),
+    onFocus: () => markActive(column, index),
   });
 
-  return { activeAddress, cellProps, targetFor, focus, focusCell };
+  return { activeAddress, cellProps, registerCell, markActive, targetFor, focus, focusCell };
 }

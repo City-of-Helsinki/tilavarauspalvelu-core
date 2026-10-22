@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useRef } from "react";
 import type { KeyboardEvent } from "react";
 import { useGridNavigation } from "../CalendarGrid/useGridNavigation";
 
@@ -12,6 +13,10 @@ type Options = {
   onActivate?: (resourceId: string, index: number) => void;
 };
 
+/**
+ * Everything it returns except `activeAddress` keeps its identity between renders, so a memoised row only
+ * renders again when its own data or its own tab stop changes.
+ */
 export function useResourceDayCalendar({ resourceIds, firstIndex, endIndex, rowsPerHour, onActivate }: Options) {
   const navigation = useGridNavigation({
     columns: resourceIds,
@@ -37,11 +42,28 @@ export function useResourceDayCalendar({ resourceIds, firstIndex, endIndex, rows
     }
   };
 
-  const cellBehaviour = (resourceId: string, index: number) => ({
-    ...navigation.cellProps(resourceId, index),
-    onKeyDown: (event: KeyboardEvent<HTMLTableCellElement>) => handleKeyDown(event, resourceId, index),
-    onClick: () => onActivate?.(resourceId, index),
+  // The handlers below are only called from events, so they can read the latest closures through a ref.
+  const latest = useRef({ handleKeyDown, onActivate });
+  useEffect(() => {
+    latest.current = { handleKeyDown, onActivate };
   });
 
-  return { cellBehaviour, focus: navigation.focus };
+  const onCellKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLTableCellElement>, resourceId: string, index: number) =>
+      latest.current.handleKeyDown(event, resourceId, index),
+    []
+  );
+  const onCellClick = useCallback(
+    (resourceId: string, index: number) => latest.current.onActivate?.(resourceId, index),
+    []
+  );
+
+  return {
+    activeAddress: navigation.activeAddress,
+    registerCell: navigation.registerCell,
+    onCellFocus: navigation.markActive,
+    onCellKeyDown,
+    onCellClick,
+    focus: navigation.focus,
+  };
 }

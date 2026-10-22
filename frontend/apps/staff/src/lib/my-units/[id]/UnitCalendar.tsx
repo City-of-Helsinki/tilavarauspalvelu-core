@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { startOfDay } from "date-fns";
 import { useTranslation } from "next-i18next/pages";
 import { useSearchParams } from "next/navigation";
@@ -107,28 +107,52 @@ export function UnitCalendar({
     [resources, t]
   );
 
-  const labels: ResourceDayLabels = {
-    list: t("reservationCalendar:list"),
-    skipToList: t("reservationCalendar:skipToList"),
-    emptyList: t("reservationCalendar:emptyList"),
-    free: t("reservationCalendar:free"),
-    closed: t("reservationCalendar:closed"),
-    opensInNewTab: t("reservationCalendar:opensInNewTab"),
-    draftResource: t("reservationCalendar:draftResource"),
-  };
+  // ResourceDayCalendar renders only the rows that changed, which needs these to keep their identity.
+  const labels = useMemo(
+    (): ResourceDayLabels => ({
+      list: t("reservationCalendar:list"),
+      skipToList: t("reservationCalendar:skipToList"),
+      emptyList: t("reservationCalendar:emptyList"),
+      free: t("reservationCalendar:free"),
+      closed: t("reservationCalendar:closed"),
+      opensInNewTab: t("reservationCalendar:opensInNewTab"),
+      draftResource: t("reservationCalendar:draftResource"),
+    }),
+    [t]
+  );
 
   // A reservation on an overlapping unit also blocks this row. Screen readers are told whose it is.
-  const getEventLabel = ({ title, data: { reservation, resourcePk } }: DatedEvent<UnitCalendarData>) => {
-    if (reservation == null) {
-      return t("reservationCalendar:buffer");
-    }
-    const label = `${t(`reservation:state.${reservation.state}`)}: ${title}`;
-    const owner = reservation.reservationUnit;
-    return owner?.pk !== resourcePk && owner?.nameFi ? `${label} (${owner.nameFi})` : label;
-  };
+  const getEventLabel = useCallback(
+    ({ title, data: { reservation, resourcePk } }: DatedEvent<UnitCalendarData>) => {
+      if (reservation == null) {
+        return t("reservationCalendar:buffer");
+      }
+      const label = `${t(`reservation:state.${reservation.state}`)}: ${title}`;
+      const owner = reservation.reservationUnit;
+      return owner?.pk !== resourcePk && owner?.nameFi ? `${label} (${owner.nameFi})` : label;
+    },
+    [t]
+  );
 
-  const getEventHref = ({ data: { reservation } }: DatedEvent<UnitCalendarData>) =>
-    hasViewAccess && reservation != null ? getReservationUrl(reservation.pk, true) : undefined;
+  const getEventHref = useCallback(
+    ({ data: { reservation } }: DatedEvent<UnitCalendarData>) =>
+      hasViewAccess && reservation != null ? getReservationUrl(reservation.pk, true) : undefined,
+    [hasViewAccess]
+  );
+
+  const getEventProps = useCallback(
+    ({ data: { reservation, resourcePk }, title, start, end }: DatedEvent<UnitCalendarData>) =>
+      reservation == null
+        ? { style: EVENT_BUFFER.style }
+        : { style: eventStyleGetter(resourcePk)({ title, start, end, event: reservation }).style },
+    []
+  );
+
+  const renderEventTooltip = useCallback(
+    ({ data: { reservation } }: DatedEvent<UnitCalendarData>) =>
+      reservation != null ? <ReservationTooltipContent reservation={reservation} /> : null,
+    []
+  );
 
   const handleSelectSlot = (resourceId: string, range: { start: Date }): null => {
     const offset = minutesOfDay(toWallClock(range.start)) / STEP_MINUTES;
@@ -151,21 +175,8 @@ export function UnitCalendar({
       isLoading={isLoading}
       getEventLabel={getEventLabel}
       getEventHref={getEventHref}
-      renderEventTooltip={({ data: { reservation } }) =>
-        reservation != null ? <ReservationTooltipContent reservation={reservation} /> : null
-      }
-      getEventProps={({ data: { reservation, resourcePk }, title, start, end }) =>
-        reservation == null
-          ? { style: EVENT_BUFFER.style }
-          : {
-              style: eventStyleGetter(resourcePk)({
-                title,
-                start,
-                end,
-                event: reservation,
-              }).style,
-            }
-      }
+      renderEventTooltip={renderEventTooltip}
+      getEventProps={getEventProps}
       onSelectSlot={canCreateReservations ? handleSelectSlot : undefined}
     />
   );
