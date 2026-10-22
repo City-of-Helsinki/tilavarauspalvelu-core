@@ -361,6 +361,48 @@ def test_reservation__confirm__does_not_save_when_api_call_fails(graphql):
     assert PaymentOrder.objects.count() == 0
 
 
+@patch_method(VerkkokauppaAPIClient.create_order)
+def test_reservation__confirm__does_not_save_when_order_has_no_checkout_url(graphql):
+    reservation = ReservationFactory.create_for_confirmation(
+        reservation_unit__pricings__payment_type=PaymentType.ONLINE,
+        user__preferred_language="fi",
+    )
+
+    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create(checkout_url=None)
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Upstream service call failed. Unable to confirm the reservation."]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CREATED
+    assert PaymentOrder.objects.count() == 0
+
+
+@patch_method(VerkkokauppaAPIClient.create_order)
+def test_reservation__confirm__saves_empty_receipt_url_when_order_has_none(graphql):
+    reservation = ReservationFactory.create_for_confirmation(
+        reservation_unit__pricings__payment_type=PaymentType.ONLINE,
+        user__preferred_language="fi",
+    )
+
+    order = OrderFactory.create(receipt_url=None)
+    VerkkokauppaAPIClient.create_order.return_value = order
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    payment_order = PaymentOrder.objects.get()
+    assert payment_order.checkout_url == order.checkout_url
+    assert payment_order.receipt_url == ""
+
+
 def test_reservation__confirm__default_payment_type__on_site(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__pricings__payment_type=PaymentType.ON_SITE,

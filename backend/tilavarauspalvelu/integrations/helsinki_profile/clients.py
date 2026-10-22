@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import json
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from django.conf import settings
 from django.utils.functional import classproperty
@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from requests import Response
 
     from tilavarauspalvelu.integrations.helauth.typing import RefreshResponse, TokenResponse
+    from tilavarauspalvelu.models import User
     from tilavarauspalvelu.typing import AnyUser, SessionMapping
 
     from .typing import AfterLoginAdditionalInfo, ProfileData, ReservationPrefillInfo, UserProfileInfo
@@ -65,7 +66,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
     def get_user_profile_info(
         cls,
         *,
-        user: AnyUser,
+        user: User,
         request_user: AnyUser,
         session: SessionMapping,
         fields: list[str],
@@ -140,15 +141,16 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
             try:
                 # Use the profile refresh token to fetch a 'special' access token from Keycloak that
                 # can only be used to fetch new access and refresh tokens for Helsinki profile for the same audience.
-                response: RefreshResponse = cls.oidc_backend.refresh_token(token=profile_refresh_token)
-                access_token = response["access_token"]
+                # The OAuth backend types the response as a plain dict.
+                refresh_response = cast("RefreshResponse", cls.oidc_backend.refresh_token(token=profile_refresh_token))
+                access_token = refresh_response["access_token"]
             except HTTPError as error:
                 #
                 # Last resort, try keycloak refresh
                 access_token = KeyCloakClient.refresh_token(user=user, session=session)
                 if access_token is None:
                     msg = "Unable to refresh Helsinki profile token"
-                    details = {"user": user.pk, "error": error.response.text}
+                    details = {"user": user.pk, "error": error.response.text if error.response is not None else ""}
                     SentryLogger.log_message(msg, details=details, level="warning")
                     return None
 
@@ -157,7 +159,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
             response: TokenResponse = cls.oidc_backend.get_token_for_profile(access_token=access_token)
         except HTTPError as error:
             msg = "Unable to get Helsinki profile token"
-            details = {"user": user.pk, "error": error.response.text}
+            details = {"user": user.pk, "error": error.response.text if error.response is not None else ""}
             SentryLogger.log_message(msg, details=details, level="warning")
             return None
 

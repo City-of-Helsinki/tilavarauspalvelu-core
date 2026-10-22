@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from tilavarauspalvelu.models import Space
-from tilavarauspalvelu.models._base import ModelTreeManager, ModelTreeQuerySet
+from tilavarauspalvelu.models._base import ModelTreeQuerySet, TranslatedModelTreeManager
 
 __all__ = [
     "SpaceManager",
@@ -12,4 +12,4 @@ __all__ = [
 class SpaceQuerySet(ModelTreeQuerySet[Space]): ...
 
 
-class SpaceManager(ModelTreeManager[Space, SpaceQuerySet]): ...
+class SpaceManager(TranslatedModelTreeManager[Space, SpaceQuerySet]): ...

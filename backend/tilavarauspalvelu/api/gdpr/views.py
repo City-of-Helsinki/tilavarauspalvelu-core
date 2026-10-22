@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from django.conf import settings
 from django.db import transaction
@@ -17,23 +17,28 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ProfileUser
 
 if TYPE_CHECKING:
-    from promise import Promise
+    from django_stubs_ext import StrPromise
+    from helusers.authz import UserAuthorization
     from rest_framework.request import Request
+    from rest_framework.views import APIView
 
 
 class GDPRScopesAndLOAPermission(BasePermission):
     # Reimplement `helsinki_gdpr.views.GDPRScopesPermission` to add better logging for permission errors.
 
-    def has_permission(self, request: Request, view: TilavarauspalveluGDPRAPIView) -> bool:
+    def has_permission(self, request: Request, view: APIView) -> bool:
         request_method = str(request.method)
         authenticated = bool(request.user and request.user.is_authenticated)
         if not authenticated:
             SentryLogger.log_message(f"GDPR API {request_method} request not authenticated.")
             return False
 
+        # The view authenticates with 'ApiTokenAuthentication' from helusers, which sets this object.
+        auth = cast("UserAuthorization", request.auth)
+
         # Ensure request is made with by a strongly authenticated user,
         # following best practices set by the City of Helsinki.
-        loa = request.auth.data.get("loa", "").lower()
+        loa = auth.data.get("loa", "").lower()
         allowed_loa = ["substantial", "high"]
         has_correct_loa = loa in allowed_loa
 
@@ -42,11 +47,11 @@ class GDPRScopesAndLOAPermission(BasePermission):
             "allowed_loa": allowed_loa,
             "required_query_scope": settings.GDPR_API_QUERY_SCOPE,
             "required_delete_scope": settings.GDPR_API_DELETE_SCOPE,
-            "auth_claims": request.auth.data,
+            "auth_claims": auth.data,
         }
 
         if request.method == "GET":
-            has_query_scope = request.auth.has_api_scopes(settings.GDPR_API_QUERY_SCOPE)
+            has_query_scope = auth.has_api_scopes(settings.GDPR_API_QUERY_SCOPE)
             if has_query_scope and has_correct_loa:
                 return True
 
@@ -54,7 +59,7 @@ class GDPRScopesAndLOAPermission(BasePermission):
             return False
 
         if request.method == "DELETE":
-            has_delete_scope = request.auth.has_api_scopes(settings.GDPR_API_DELETE_SCOPE)
+            has_delete_scope = auth.has_api_scopes(settings.GDPR_API_DELETE_SCOPE)
             if has_delete_scope and has_correct_loa:
                 return True
 
@@ -63,7 +68,10 @@ class GDPRScopesAndLOAPermission(BasePermission):
 
         return False
 
-    def has_object_permission(self, request: Request, view: TilavarauspalveluGDPRAPIView, obj: ProfileUser) -> bool:
+    def has_object_permission(self, request: Request, view: APIView, obj: ProfileUser) -> bool:
+        if request.user.is_anonymous:
+            return False
+
         if request.user == obj.user:
             return True
 
@@ -86,7 +94,7 @@ class TilavarauspalveluGDPRAPIView(GDPRAPIView):
         return profile
 
     @staticmethod
-    def get_error_message(*, code: str, message: Promise) -> dict[str, Any]:
+    def get_error_message(*, code: str, message: StrPromise) -> dict[str, Any]:
         with override("en"):
             message_en = str(message)
         with override("fi"):

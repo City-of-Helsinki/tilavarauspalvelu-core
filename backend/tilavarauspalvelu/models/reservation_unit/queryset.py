@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from itertools import islice
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Any, Protocol, Self
 
 from django.contrib.postgres.search import SearchVector
 from django.db import connections, models
@@ -23,6 +23,11 @@ if TYPE_CHECKING:
 
     from tilavarauspalvelu.enums import AccessType
 
+    class _TranslatedName(Protocol):
+        name_fi: str | None
+        name_en: str | None
+        name_sv: str | None
+
 
 __all__ = [
     "ReservationUnitManager",
@@ -33,8 +38,19 @@ __all__ = [
 type ReservationUnitPK = int
 
 
-def _get_vector_translation_fallback(obj: models.Model, lang: str) -> str:
-    return getattr(obj, f"name_{lang}", "") or getattr(obj, "name_fi", "")
+def _get_vector_translation_fallback(obj: _TranslatedName | None, lang: str) -> str:
+    if obj is None:
+        return ""
+
+    match lang:
+        case "en":
+            name = obj.name_en
+        case "sv":
+            name = obj.name_sv
+        case _:
+            name = obj.name_fi
+
+    return name or obj.name_fi or ""
 
 
 class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
@@ -49,7 +65,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
         show_only_reservable: bool = False,
         pagination_args: PaginationArgs | None = None,
         cache_key: str = "",
-    ) -> Self:
+    ) -> ReservationUnitQuerySet:
         """Annotate the queryset with `first_reservable_time` and `is_closed` for each reservation unit."""
         helper = FirstReservableTimeHelper(
             reservation_unit_queryset=self,
@@ -66,7 +82,7 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
         return helper.get_annotated_queryset()
 
     @property
-    def affected_reservation_unit_ids(self) -> models.QuerySet[dict[str, int]]:
+    def affected_reservation_unit_ids(self) -> models.QuerySet[ReservationUnit, dict[str, Any]]:
         """
         Get a "values" queryset of reservation unit ids that affect a given reservation unit in the queryset.
         This can be used in two ways:
@@ -80,13 +96,13 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
         >>> qs.annotate(affected=SubqueryArray(sq.affected_reservation_unit_ids, agg_field="ids", distinct=True))
         """
         return (
-            self
+            self  # type: ignore[return-value]
             .annotate(ids=ArrayUnnest("reservation_unit_hierarchy__related_reservation_unit_ids"))
             .values("ids")
             .distinct()
         )
 
-    def reservation_units_with_common_hierarchy(self) -> Self:
+    def reservation_units_with_common_hierarchy(self) -> ReservationUnitQuerySet:
         """
         Get a new queryset of reservation units that share a common hierarchy
         with any reservation unit in the original queryset.
@@ -103,10 +119,10 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
         """A `QuerySet.iterator()` that calls the given hook for each chunk of results before yielding them."""
         chunked_fetch = not connections[self.db].settings_dict.get("DISABLE_SERVER_SIDE_CURSORS")
         iterable = self._iterable_class(self, chunked_fetch=chunked_fetch, chunk_size=chunk_size)
-        iterator = iter(iterable)
+        iterator = iter(iterable)  # type: ignore[call-overload]
 
         while results := list(islice(iterator, chunk_size)):
-            prefetch_related_objects(results, *self._prefetch_related_lookups)
+            prefetch_related_objects(results, *self._prefetch_related_lookups)  # type: ignore[attr-defined]
             hook(results)
             yield from results
 
@@ -277,6 +293,8 @@ class ReservationUnitQuerySet(TranslatedModelQuerySet[ReservationUnit]):
         )
 
 
+# Historical models in migrations use this manager, and modeltranslation does not register them.
+# So this manager cannot be a `TranslatedModelManager`.
 class ReservationUnitManager(ModelManager[ReservationUnit, ReservationUnitQuerySet]):
     use_in_migrations = True
 
@@ -289,7 +307,7 @@ class ReservationUnitManager(ModelManager[ReservationUnit, ReservationUnitQueryS
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
             return NotImplemented
-        return self._constructor_args == other._constructor_args  # type: ignore[attr-defined]
+        return self._constructor_args == other._constructor_args
 
     # Copied from 'BaseManager.__hash__'
     def __hash__(self) -> int:

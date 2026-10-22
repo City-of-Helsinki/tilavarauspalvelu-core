@@ -31,19 +31,19 @@ __all__ = [
 
 
 class ReservationUnitPricing(models.Model):
-    begins: datetime.date = models.DateField()
-    price_unit: PriceUnit = TextChoicesField(enum=PriceUnit, default=PriceUnit.PER_HOUR)
+    begins: datetime.date = models.DateField()  # type: ignore[assignment]
+    price_unit: PriceUnit = TextChoicesField(enum=PriceUnit, default=PriceUnit.PER_HOUR)  # type: ignore[assignment]
 
-    payment_type: PaymentType | None = TextChoicesField(enum=PaymentType, null=True, blank=True)
+    payment_type: PaymentType | None = TextChoicesField(enum=PaymentType, null=True, blank=True)  # type: ignore[assignment]
 
     # True: This pricing is used for reservations that are created after the begins date
     # False: This pricing is used for reservations that start after the begins date
     is_activated_on_begins = models.BooleanField(default=False)
 
-    lowest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    highest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    lowest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # type: ignore[assignment]
+    highest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # type: ignore[assignment]
 
-    material_price_description: str = Nh3CharField(
+    material_price_description: str = Nh3CharField(  # type: ignore[assignment]
         blank=True,
         default="",
         max_length=1000,  # Double of the limit of 500 chars in order to accommodate HTML tags
@@ -51,14 +51,14 @@ class ReservationUnitPricing(models.Model):
         allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
 
-    tax_percentage: TaxPercentage = models.ForeignKey(
+    tax_percentage: TaxPercentage = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.TaxPercentage",
         related_name="reservation_unit_pricings",
         on_delete=models.PROTECT,
         limit_choices_to=models.Q(is_enabled=True),
     )
 
-    reservation_unit: ReservationUnit = models.ForeignKey(
+    reservation_unit: ReservationUnit = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationUnit",
         related_name="pricings",
         on_delete=models.CASCADE,

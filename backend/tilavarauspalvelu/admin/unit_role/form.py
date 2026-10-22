@@ -13,7 +13,7 @@ __all__ = [
 class UnitRoleAdminForm(forms.ModelForm):
     class Meta:
         model = UnitRole
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
 
     role = forms.ChoiceField(
         # Exclude NOTIFICATION_MANAGER from the role choices in the admin form

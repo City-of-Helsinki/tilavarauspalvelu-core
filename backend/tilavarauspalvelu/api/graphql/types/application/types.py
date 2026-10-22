@@ -13,6 +13,7 @@ from tilavarauspalvelu.api.graphql.types.application_section.types import Applic
 from tilavarauspalvelu.api.graphql.types.user.types import ApplicantNode
 from tilavarauspalvelu.enums import ApplicationStatusChoice, UserRoleChoice
 from tilavarauspalvelu.models import Application, ApplicationRound, User
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import ApplicationFilterSet
 from .permissions import ApplicationPermission
@@ -28,7 +29,7 @@ __all__ = [
 ]
 
 
-class ApplicationNode(DjangoNode):
+class ApplicationNode(DjangoNode[Application, AnyUser]):
     status = AnnotatedField(graphene.Enum.from_enum(ApplicationStatusChoice), expression=L("status"), required=True)
 
     application_sections = ApplicationSectionNode.ListField()

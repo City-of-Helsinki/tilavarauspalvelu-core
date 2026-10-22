@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Self
 
-from django.db import models
-
+from tilavarauspalvelu.models import EmailMessage
+from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
 from utils.date_utils import local_datetime
 
 __all__ = [
@@ -12,12 +12,9 @@ __all__ = [
 ]
 
 
-class EmailMessageQuerySet(models.QuerySet):
+class EmailMessageQuerySet(ModelQuerySet[EmailMessage]):
     def expired(self) -> Self:
         return self.filter(valid_until__lt=local_datetime())
 
 
-class EmailMessageManager(models.Manager.from_queryset(EmailMessageQuerySet)):
-    # For typing.
-    def all(self) -> EmailMessageQuerySet:
-        return super().all()
+class EmailMessageManager(ModelManager[EmailMessage, EmailMessageQuerySet]): ...

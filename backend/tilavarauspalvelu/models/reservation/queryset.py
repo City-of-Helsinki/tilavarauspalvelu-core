@@ -29,6 +29,8 @@ from utils.db import Now
 from utils.mixins import SerializableModelManagerMixin
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from tilavarauspalvelu.models import ApplicationRound, ApplicationSection
     from tilavarauspalvelu.typing import AnyUser
 
@@ -56,7 +58,7 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
         # to fetch units and unit groups for the permission checks when the queryset is evaluated,
         # and 'joins' them to the correct model instances in python.
 
-        items = list(self._result_cache)
+        items = list(self._result_cache or [])
         if not items:
             return
 
@@ -81,7 +83,7 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
         )
 
         for item in items:
-            item.units_for_permissions = [unit for unit in units if item.pk in unit.reservation_ids]
+            item.units_for_permissions = [unit for unit in units if item.pk in unit.reservation_ids]  # type: ignore[attr-defined]
 
     def with_buffered_begin_and_end(self) -> Self:
         """Annotate the queryset with buffered begin and end times."""
@@ -187,7 +189,7 @@ class ReservationQuerySet(ModelQuerySet[Reservation]):
     def unconfirmed(self) -> Self:
         return self.exclude(state=ReservationStateChoice.CONFIRMED)
 
-    def affecting_reservations(self, units: list[int] = (), reservation_units: list[int] = ()) -> Self:
+    def affecting_reservations(self, units: Sequence[int] = (), reservation_units: Sequence[int] = ()) -> Self:
         """Filter reservations that affect other reservations in the given units and/or reservation units."""
         qs = ReservationUnit.objects.all()
         if units:

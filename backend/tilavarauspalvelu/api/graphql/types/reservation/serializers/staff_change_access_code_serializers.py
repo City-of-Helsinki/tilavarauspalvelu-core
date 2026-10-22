@@ -19,7 +19,7 @@ __all__ = [
 ]
 
 
-class StaffChangeReservationAccessCodeSerializer(NestingModelSerializer):
+class StaffChangeReservationAccessCodeSerializer(NestingModelSerializer[Reservation]):
     """Change the access code of a reservation."""
 
     instance: Reservation

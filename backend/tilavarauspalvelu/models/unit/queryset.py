@@ -5,7 +5,7 @@ from typing import Literal, Self
 from django.db import models
 
 from tilavarauspalvelu.models import Reservation, ReservationUnit, Unit, UnitGroup
-from tilavarauspalvelu.models._base import ModelManager, TranslatedModelQuerySet
+from tilavarauspalvelu.models._base import TranslatedModelManager, TranslatedModelQuerySet
 from utils.db import SubqueryCount
 
 __all__ = [
@@ -43,4 +43,4 @@ class UnitQuerySet(TranslatedModelQuerySet[Unit]):
         ).order_by(models.OrderBy(models.F("reservation_count"), descending=desc))
 
 
-class UnitManager(ModelManager[Unit, UnitQuerySet]): ...
+class UnitManager(TranslatedModelManager[Unit, UnitQuerySet]): ...

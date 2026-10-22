@@ -128,7 +128,7 @@ class SubqueryArray(models.Subquery):
     """
 
     template = "(SELECT ARRAY_AGG(%(distinct)s%(agg_field)s) FROM (%(subquery)s) %(alias)s)"
-    output_field = ArrayField(base_field=models.IntegerField())
+    output_field: models.Field = ArrayField(base_field=models.IntegerField())
 
     def __init__(
         self,
@@ -276,7 +276,7 @@ def _(_: NowTT, state: State) -> ast.Call:
     return ast_function("now", ["datetime", "datetime"], **kwargs)
 
 
-def text_search[TQuerySet](
+def text_search[TQuerySet: models.QuerySet](
     qs: TQuerySet,
     fields: Collection[str],
     text: str,

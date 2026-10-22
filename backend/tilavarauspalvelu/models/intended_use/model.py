@@ -27,11 +27,11 @@ __all__ = [
 
 
 class IntendedUse(models.Model):
-    rank: int = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
+    rank: int = models.PositiveIntegerField(default=0, db_index=True)  # type: ignore[assignment]  # Used for ordering
 
-    name: str = models.CharField(max_length=200)
+    name: str = models.CharField(max_length=200)  # type: ignore[assignment]
 
-    image: ThumbnailerImageFieldFile | None = ThumbnailerImageField(
+    image: ThumbnailerImageFieldFile | None = ThumbnailerImageField(  # type: ignore[assignment]
         upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT, null=True, blank=True
     )
 

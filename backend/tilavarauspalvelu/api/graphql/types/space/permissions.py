@@ -1,23 +1,19 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
 
-from tilavarauspalvelu.models import Unit
-from tilavarauspalvelu.typing import error_codes
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Space
-    from tilavarauspalvelu.typing import AnyUser
+from tilavarauspalvelu.models import Space, Unit
+from tilavarauspalvelu.typing import AnyUser, error_codes
 
 __all__ = [
     "SpacePermission",
 ]
 
 
-class SpacePermission(BasePermission):
+class SpacePermission(BasePermission[Space, AnyUser]):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return True

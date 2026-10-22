@@ -1,16 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
 
-from tilavarauspalvelu.models import Application
-from tilavarauspalvelu.typing import error_codes
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationSection
-    from tilavarauspalvelu.typing import AnyUser
+from tilavarauspalvelu.models import Application, ApplicationSection
+from tilavarauspalvelu.typing import AnyUser, error_codes
 
 __all__ = [
     "ApplicationSectionPermission",
@@ -18,7 +14,7 @@ __all__ = [
 ]
 
 
-class ApplicationSectionPermission(BasePermission):
+class ApplicationSectionPermission(BasePermission[ApplicationSection, AnyUser]):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return user.is_authenticated
@@ -51,7 +47,7 @@ class ApplicationSectionPermission(BasePermission):
         return application
 
 
-class UpdateAllSectionOptionsPermission(BasePermission):
+class UpdateAllSectionOptionsPermission(BasePermission[ApplicationSection, AnyUser]):
     @classmethod
     def has_update_permission(cls, instance: ApplicationSection, user: AnyUser, input_data: dict[str, Any]) -> bool:
         if user.is_anonymous:
@@ -68,7 +64,7 @@ class UpdateAllSectionOptionsPermission(BasePermission):
         return user.permissions.can_manage_applications_for_units(units)
 
 
-class ApplicationSectionReservationCancellationPermission(BasePermission):
+class ApplicationSectionReservationCancellationPermission(BasePermission[ApplicationSection, AnyUser]):
     @classmethod
     def has_update_permission(cls, instance: ApplicationSection, user: AnyUser, input_data: dict[str, Any]) -> bool:
         return user == instance.application.user

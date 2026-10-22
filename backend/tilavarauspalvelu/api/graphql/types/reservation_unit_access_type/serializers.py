@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-class ReservationUnitAccessTypeSerializer(NestingModelSerializer):
+class ReservationUnitAccessTypeSerializer(NestingModelSerializer[ReservationUnitAccessType]):
     class Meta:
         model = ReservationUnitAccessType
         fields = [

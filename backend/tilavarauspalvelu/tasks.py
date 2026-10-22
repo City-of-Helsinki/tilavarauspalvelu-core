@@ -7,7 +7,7 @@ import time
 import uuid
 from decimal import Decimal
 from functools import wraps
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.core.cache import cache
@@ -78,7 +78,7 @@ __all__ = [
 ]
 
 
-def singleton_task[**P](task: Task) -> Task:
+def singleton_task(task: Task) -> Task:
     """
     Lock task execution to a single concurrent instance per task arguments based on a lock set in cache.
     Must be added on top of the `@app.task` decorator!
@@ -89,7 +89,7 @@ def singleton_task[**P](task: Task) -> Task:
     task_signature = inspect.signature(task_func)
 
     @wraps(task_func)
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> None:
+    def wrapper(*args: Any, **kwargs: Any) -> None:
         lock_timeout = 300  # 5 mins
         timeout_leeway = 3  # Some leeway for cache operations
 
@@ -161,6 +161,14 @@ def save_personal_info_view_log_task(user_id: int, viewer_user_id: int, field: s
 
     # Do not log own views.
     if user == viewer_user:
+        return
+
+    # The viewer can be deleted before the task runs. The log cannot name the viewer then.
+    if viewer_user is None:
+        SentryLogger.log_message(
+            message="Personal info view was not logged, since the viewer user does not exist.",
+            details={"user_id": user_id, "viewer_user_id": viewer_user_id, "field": field},
+        )
         return
 
     PersonalInfoViewLog.objects.create(
@@ -342,14 +350,14 @@ def update_reservation_unit_pricings_tax_percentage_task(
         level="info",
     )
 
-    change_date = datetime.date.fromisoformat(change_date)
+    parsed_change_date = datetime.date.fromisoformat(change_date)
     current_tax_percentage, _ = TaxPercentage.objects.get_or_create(value=Decimal(current_tax))
     future_tax_percentage, _ = TaxPercentage.objects.get_or_create(value=Decimal(future_tax))
 
     ReservationUnitPricing.actions.add_new_pricings_for_tax_percentage(
         future_tax_percentage=future_tax_percentage,
         current_tax_percentage=current_tax_percentage,
-        change_date=change_date,
+        change_date=parsed_change_date,
         ignored_company_codes=ignored_company_codes,
     )
 

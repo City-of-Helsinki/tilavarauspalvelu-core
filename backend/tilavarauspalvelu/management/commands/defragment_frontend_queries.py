@@ -77,18 +77,19 @@ def parse_queries(document: str) -> str:
     print("Separating fragments and operations...")
     data = separate_fragments_and_nodes(node)
 
-    for operation in data.operations.values():
-        print(f"Defragmenting operation '{operation.name.value}'...")
+    for name, operation in data.operations.items():
+        print(f"Defragmenting operation '{name}'...")
         replace_fragments(operation, fragments=data.fragments)
 
-        print(f"Combining duplicate fields in operation '{operation.name.value}'...")
+        print(f"Combining duplicate fields in operation '{name}'...")
         combine_duplicate_fields(operation)
 
-    def predicate(op: OperationDefinitionNode) -> tuple[int, str]:
-        return OPERATION_VALUE_MAP[op.operation], op.name.value
+    def predicate(item: tuple[str, OperationDefinitionNode]) -> tuple[int, str]:
+        name, operation = item
+        return OPERATION_VALUE_MAP[operation.operation], name
 
     print("Printing queries to text...")
-    operations = (print_ast(operation) for operation in sorted(data.operations.values(), key=predicate))
+    operations = (print_ast(operation) for _, operation in sorted(data.operations.items(), key=predicate))
     return "\n\n".join(operation for operation in operations)
 
 
@@ -98,8 +99,6 @@ def separate_fragments_and_nodes(node: DocumentNode) -> FragmentsAndOperations:
     for definition in node.definitions:
         match definition:
             case OperationDefinitionNode():
-                definition: OperationDefinitionNode
-
                 if not isinstance(definition.name, NameNode):
                     msg = "Operations must have a name"
                     raise TypeError(msg)
@@ -113,8 +112,6 @@ def separate_fragments_and_nodes(node: DocumentNode) -> FragmentsAndOperations:
                 data.operations[name] = definition
 
             case FragmentDefinitionNode():
-                definition: FragmentDefinitionNode
-
                 if not isinstance(definition.name, NameNode):
                     msg = "Fragments must have a name"
                     raise TypeError(msg)
@@ -136,18 +133,15 @@ def separate_fragments_and_nodes(node: DocumentNode) -> FragmentsAndOperations:
 def replace_fragments(node: Node, *, fragments: dict[str, FragmentDefinitionNode], parent: Node | None = None) -> None:
     match node:
         case OperationDefinitionNode():
-            node: OperationDefinitionNode
             for selection in node.selection_set.selections:
                 replace_fragments(selection, fragments=fragments, parent=node)
 
         case FieldNode():
-            node: FieldNode
             if node.selection_set is not None:
                 for selection in node.selection_set.selections:
                     replace_fragments(selection, fragments=fragments, parent=node)
 
         case FragmentSpreadNode():
-            node: FragmentSpreadNode
             fragment = fragments.get(node.name.value)
             if fragment is None:
                 msg = f"Fragment '{node.name.value}' not found"
@@ -176,15 +170,12 @@ def replace_fragments(node: Node, *, fragments: dict[str, FragmentDefinitionNode
 def combine_duplicate_fields(node: Node) -> None:
     match node:
         case OperationDefinitionNode():
-            node: OperationDefinitionNode
-
             deduplicate_fields(node)
 
             for selection in node.selection_set.selections:
                 combine_duplicate_fields(selection)
 
         case FieldNode():
-            node: FieldNode
             if node.selection_set is not None:
                 deduplicate_fields(node)
 
@@ -222,4 +213,4 @@ def deduplicate_fields(node: OperationDefinitionNode | FieldNode) -> None:
         selections = chain(current_field.selection_set.selections, field.selection_set.selections)
         current_field.selection_set.selections = tuple(selections)
 
-    node.selection_set.selections = tuple(field_map.values())  # type: ignore[assignment]
+    node.selection_set.selections = tuple(field_map.values())

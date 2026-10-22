@@ -336,6 +336,35 @@ def test_redirect_to_verkkokauppa__reservation_unit_has_no_active_pricing(api_cl
     }
 
 
+@patch_method(VerkkokauppaAPIClient.create_order)
+def test_redirect_to_verkkokauppa__verkkokauppa_order_has_no_checkout_url(api_client, settings):
+    settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]
+
+    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create(checkout_url=None)
+
+    reservation = ReservationFactory.create_with_pending_payment()
+    remote_id_before = reservation.payment_order.remote_id
+    checkout_url_before = reservation.payment_order.checkout_url
+
+    url = reverse("verkkokauppa_pending_reservation", kwargs={"pk": reservation.pk})
+    url = update_query_params(url, redirect_on_error="https://fake.varaamo.hel.fi")
+
+    api_client.force_login(reservation.user)
+    response = api_client.get(url)
+
+    query_params = get_query_params(response.url)
+
+    assert response.status_code == 302
+    assert query_params == {
+        "error_message": "Payment for reservation could not be created in verkkokauppa",
+        "error_code": "RESERVATION_PAYMENT_CREATION_FAILED",
+    }
+
+    reservation.payment_order.refresh_from_db()
+    assert reservation.payment_order.remote_id == remote_id_before
+    assert reservation.payment_order.checkout_url == checkout_url_before
+
+
 @patch_method(VerkkokauppaAPIClient.create_order, side_effect=CreateOrderError("Error"))
 def test_redirect_to_verkkokauppa__verkkokauppa_order_creation_failed(api_client, settings):
     settings.CORS_ALLOWED_ORIGINS = ["https://fake.varaamo.hel.fi"]

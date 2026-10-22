@@ -27,19 +27,19 @@ __all__ = [
 
 
 class Space(MPTTModel):
-    name: str = models.CharField(max_length=255)
-    surface_area: int | None = models.IntegerField(blank=True, null=True)
-    max_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
-    code: str = models.CharField(max_length=255, db_index=True, blank=True, default="")
+    name: str = models.CharField(max_length=255)  # type: ignore[assignment]
+    surface_area: int | None = models.IntegerField(blank=True, null=True)  # type: ignore[assignment]
+    max_persons: int | None = models.PositiveIntegerField(null=True, blank=True)  # type: ignore[assignment]
+    code: str = models.CharField(max_length=255, db_index=True, blank=True, default="")  # type: ignore[assignment]
 
-    parent: Space | None = TreeForeignKey(
+    parent: Space | None = TreeForeignKey(  # type: ignore[assignment]
         "self",
         related_name="children",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
-    unit: Unit = models.ForeignKey(
+    unit: Unit = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.Unit",
         related_name="spaces",
         on_delete=models.PROTECT,

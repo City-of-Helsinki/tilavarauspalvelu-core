@@ -48,14 +48,14 @@ class ApplicationRound(models.Model):
     as well as the reservation units that can be applied for, and for what purposes.
     """
 
-    name: str = models.CharField(max_length=255)
-    criteria: str = Nh3TextField(
+    name: str = models.CharField(max_length=255)  # type: ignore[assignment]
+    criteria: str = Nh3TextField(  # type: ignore[assignment]
         blank=True,
         default="",
         allowed_tags=settings.NH3_ALLOWED_TAGS,
         allowed_attributes=settings.NH3_ALLOWED_ATTRIBUTES,
     )
-    notes_when_applying: str = Nh3TextField(
+    notes_when_applying: str = Nh3TextField(  # type: ignore[assignment]
         blank=True,
         default="",
         allowed_tags=settings.NH3_ALLOWED_TAGS,
@@ -63,30 +63,30 @@ class ApplicationRound(models.Model):
     )
 
     # Period when the application round accepts applications
-    application_period_begins_at: datetime.datetime = models.DateTimeField()
-    application_period_ends_at: datetime.datetime = models.DateTimeField()
+    application_period_begins_at: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
+    application_period_ends_at: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
 
     # Period where the reservations from the application round's applications will be allocated to
-    reservation_period_begin_date: datetime.date = models.DateField()
-    reservation_period_end_date: datetime.date = models.DateField()
+    reservation_period_begin_date: datetime.date = models.DateField()  # type: ignore[assignment]
+    reservation_period_end_date: datetime.date = models.DateField()  # type: ignore[assignment]
 
     # When the application round is visible to the public
-    public_display_begins_at: datetime.datetime = models.DateTimeField()
-    public_display_ends_at: datetime.datetime = models.DateTimeField()
+    public_display_begins_at: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
+    public_display_ends_at: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
 
-    handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)  # type: ignore[assignment]
+    sent_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)  # type: ignore[assignment]
 
-    reservation_units: ManyToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet] = models.ManyToManyField(
+    reservation_units: ManyToManyRelatedManager[ReservationUnit, ReservationUnitQuerySet] = models.ManyToManyField(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationUnit",
         related_name="application_rounds",
         limit_choices_to=models.Q(reservation_kind__in=ReservationKind.allows_season),
     )
-    purposes: ManyToManyRelatedManager[ReservationPurpose, ReservationPurposeQuerySet] = models.ManyToManyField(
+    purposes: ManyToManyRelatedManager[ReservationPurpose, ReservationPurposeQuerySet] = models.ManyToManyField(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationPurpose",
         related_name="application_rounds",
     )
-    terms_of_use: TermsOfUse | None = models.ForeignKey(
+    terms_of_use: TermsOfUse | None = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.TermsOfUse",
         related_name="application_rounds",
         on_delete=models.SET_NULL,
@@ -111,6 +111,9 @@ class ApplicationRound(models.Model):
     notes_when_applying_fi: str | None
     notes_when_applying_sv: str | None
     notes_when_applying_en: str | None
+
+    # Cache for the 'units_for_permissions' property. This is not set until the property is read or set.
+    _units_for_permissions: list[Unit]
 
     class Meta:
         db_table = "application_round"

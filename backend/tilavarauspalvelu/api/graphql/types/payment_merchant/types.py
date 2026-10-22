@@ -4,13 +4,14 @@ import graphene
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import PaymentMerchant
+from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "PaymentMerchantNode",
 ]
 
 
-class PaymentMerchantNode(DjangoNode):
+class PaymentMerchantNode(DjangoNode[PaymentMerchant, AnyUser]):
     pk = graphene.UUID(required=True)
 
     class Meta:

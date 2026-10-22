@@ -5,21 +5,19 @@ from typing import TYPE_CHECKING, Any
 from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
 
-from tilavarauspalvelu.models import ReservationUnit
-from tilavarauspalvelu.typing import error_codes
+from tilavarauspalvelu.models import ReservationSeries, ReservationUnit
+from tilavarauspalvelu.typing import AnyUser, error_codes
 
 if TYPE_CHECKING:
     from query_optimizer.typing import GraphQLFilterInfo
 
-    from tilavarauspalvelu.models import ReservationSeries
-    from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "ReservationSeriesPermission",
 ]
 
 
-class ReservationSeriesPermission(BasePermission):
+class ReservationSeriesPermission(BasePermission[ReservationSeries, AnyUser]):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return user.is_authenticated

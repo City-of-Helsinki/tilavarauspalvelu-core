@@ -6,11 +6,13 @@ import graphene
 from django.db.models import Value
 from django.db.models.functions import Concat, Trim
 from graphene_django_extensions import DjangoNode
+from graphene_django_extensions.permissions import BasePermission
 from query_optimizer import AnnotatedField, MultiField
 
 from tilavarauspalvelu.enums import ReservationNotification
 from tilavarauspalvelu.models import User
 from tilavarauspalvelu.tasks import save_personal_info_view_log_task
+from tilavarauspalvelu.typing import AnyUser
 
 from .permissions import UserPermission
 
@@ -46,7 +48,7 @@ _FIELDS = [
 ]
 
 
-class UserNode(DjangoNode):
+class UserNode(DjangoNode[User, AnyUser]):
     name = AnnotatedField(
         graphene.String,
         expression=Trim(Concat("first_name", Value(" "), "last_name")),
@@ -108,4 +110,4 @@ class ApplicantNode(UserNode):
         skip_registry = True
         # No need to check permissions, since permissions for the
         # `ApplicationNode` are enough to access the `ApplicantNode`.
-        permission_classes = []
+        permission_classes: list[type[BasePermission]] = []

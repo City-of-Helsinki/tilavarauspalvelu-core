@@ -389,13 +389,13 @@ def reservable_time_spans_export(request: WSGIRequest) -> HttpResponse:
 def append_payment_method_to_checkout_url(checkout_url: str, request: WSGIRequest) -> str:
     # Append "/paymentmethod" to the checkout URL path to skip entering customer information in the checkout process.
     parsed_url = urlparse(checkout_url)
-    parsed_url = parsed_url._replace(path=f"{parsed_url.path.removesuffix('/')}/paymentmethod").geturl()
+    payment_method_url = parsed_url._replace(path=f"{parsed_url.path.removesuffix('/')}/paymentmethod").geturl()
 
     # Update the query parameters to include the language from the request, keep existing query params as-is.
     if (request_lang := request.GET.get("lang")) is not None:
-        return update_query_params(url=parsed_url, lang=request_lang)
+        return update_query_params(url=payment_method_url, lang=request_lang)
 
-    return parsed_url
+    return payment_method_url
 
 
 @require_GET
@@ -459,9 +459,13 @@ def redirect_to_verkkokauppa_for_pending_reservations(request: WSGIRequest, pk: 
         msg = "Payment for reservation could not be created in verkkokauppa"
         raise ValidationError(msg, code="RESERVATION_PAYMENT_CREATION_FAILED") from error
 
+    if verkkokauppa_order.checkout_url is None:
+        msg = "Payment for reservation could not be created in verkkokauppa"
+        raise ValidationError(msg, code="RESERVATION_PAYMENT_CREATION_FAILED")
+
     payment_order.remote_id = verkkokauppa_order.order_id
     payment_order.checkout_url = verkkokauppa_order.checkout_url
-    payment_order.receipt_url = verkkokauppa_order.receipt_url
+    payment_order.receipt_url = verkkokauppa_order.receipt_url or ""
     payment_order.created_at = local_datetime()
     payment_order.save(update_fields=["remote_id", "checkout_url", "receipt_url", "created_at"])
 
@@ -596,7 +600,8 @@ def robot_email_cache(request: WSGIRequest) -> HttpResponse:
     subject_filter = request.GET.get("subject", "")
     recipient_filter = request.GET.get("recipient", "")
     cache_key_template = f"{settings.ROBOT_EMAIL_CACHE_KEY}:*:{subject_filter}*:{recipient_filter}*"
-    robot_email_data = cache.get_many(cache.keys(cache_key_template))
+    # `keys` comes from django-redis.
+    robot_email_data = cache.get_many(cache.keys(cache_key_template))  # type: ignore[attr-defined]
 
     return JsonResponse(
         sorted(robot_email_data.values(), key=operator.itemgetter("timestamp"), reverse=True),

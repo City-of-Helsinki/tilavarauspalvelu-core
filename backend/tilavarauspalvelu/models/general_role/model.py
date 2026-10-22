@@ -28,10 +28,10 @@ __all__ = [
 
 
 class GeneralRole(models.Model):
-    user: User = models.ForeignKey("tilavarauspalvelu.User", related_name="general_roles", on_delete=models.CASCADE)
-    role: UserRoleChoice = TextChoicesField(enum=UserRoleChoice)
+    user: User = models.ForeignKey("tilavarauspalvelu.User", related_name="general_roles", on_delete=models.CASCADE)  # type: ignore[assignment]
+    role: UserRoleChoice = TextChoicesField(enum=UserRoleChoice)  # type: ignore[assignment]
 
-    assigner: User | None = models.ForeignKey(
+    assigner: User | None = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.User",
         related_name="assigned_general_roles",
         on_delete=models.SET_NULL,
@@ -39,10 +39,10 @@ class GeneralRole(models.Model):
         null=True,
     )
 
-    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
-    updated_at: datetime.datetime = models.DateTimeField(auto_now=True)
+    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)  # type: ignore[assignment]
+    updated_at: datetime.datetime = models.DateTimeField(auto_now=True)  # type: ignore[assignment]
 
-    is_role_active: bool = models.BooleanField(default=True)
+    is_role_active: bool = models.BooleanField(default=True)  # type: ignore[assignment]
 
     objects: ClassVar[GeneralRoleManager] = LazyModelManager.new()
     actions: LazyAttribute[GeneralRoleActions] = LazyModelAttribute.new()

@@ -35,8 +35,8 @@ class PaymentMerchant(models.Model):
     https://checkout-test-api.test.hel.ninja/v1/merchant/docs/swagger-ui/
     """
 
-    id: uuid.UUID = models.UUIDField(primary_key=True)
-    name: str = models.CharField(max_length=128)
+    id: uuid.UUID = models.UUIDField(primary_key=True)  # type: ignore[assignment]
+    name: str = models.CharField(max_length=128)  # type: ignore[assignment]
 
     objects: ClassVar[PaymentMerchantManager] = LazyModelManager.new()
     actions: LazyAttribute[PaymentMerchantActions] = LazyModelAttribute.new()

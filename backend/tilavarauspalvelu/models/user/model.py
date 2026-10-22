@@ -22,6 +22,7 @@ from utils.utils import get_jwt_payload
 if TYPE_CHECKING:
     import datetime
 
+    from django.db.models import QuerySet
     from lazy_managers import LazyAttribute
     from social_django.models import UserSocialAuth
 
@@ -55,12 +56,12 @@ __all__ = [
 
 
 class User(AbstractUser):
-    tvp_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    preferred_language: Language = TextChoicesField(enum=Language, default=Language.FI, blank=True)
-    date_of_birth: datetime.date | None = models.DateField(null=True, blank=True)
-    profile_id: str = models.CharField(max_length=255, blank=True, default="")
+    tvp_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # type: ignore[assignment]
+    preferred_language: Language = TextChoicesField(enum=Language, default=Language.FI, blank=True)  # type: ignore[assignment]
+    date_of_birth: datetime.date | None = models.DateField(null=True, blank=True)  # type: ignore[assignment]
+    profile_id: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
 
-    reservation_notification: ReservationNotification = TextChoicesField(
+    reservation_notification: ReservationNotification = TextChoicesField(  # type: ignore[assignment]
         enum=ReservationNotification,
         default=ReservationNotification.ONLY_HANDLING_REQUIRED,
     )
@@ -75,11 +76,23 @@ class User(AbstractUser):
 
     applications: OneToManyRelatedManager[Application, ApplicationQuerySet]
     reservations: OneToManyRelatedManager[Reservation, ReservationQuerySet]
+    general_roles: OneToManyRelatedManager[GeneralRole, GeneralRoleQuerySet]
+    unit_roles: OneToManyRelatedManager[UnitRole, UnitRoleQuerySet]
     assigned_unit_roles: OneToManyRelatedManager[UnitRole, UnitRoleQuerySet]
     assigned_general_roles: OneToManyRelatedManager[GeneralRole, GeneralRoleQuerySet]
     reservation_series: OneToManyRelatedManager[ReservationSeries, ReservationSeriesQuerySet]
     personal_info_view_logs: OneToManyRelatedManager[PersonalInfoViewLog, PersonalInfoViewLogQuerySet]
     as_viewer_personal_info_view_logs: OneToManyRelatedManager[PersonalInfoViewLog, PersonalInfoViewLogQuerySet]
+    social_auth: OneToManyRelatedManager[UserSocialAuth, QuerySet[UserSocialAuth]]
+
+    # Caches for the 'active_*_roles' and 'active_*_permissions' properties.
+    # These are not set until the property is read.
+    _general_roles: list[UserRoleChoice]
+    _unit_roles: dict[int, list[UserRoleChoice]]
+    _unit_group_roles: dict[int, list[UserRoleChoice]]
+    _general_permissions: list[UserPermissionChoice]
+    _unit_permissions: dict[int, list[UserPermissionChoice]]
+    _unit_group_permissions: dict[int, list[UserPermissionChoice]]
 
     class Meta:
         db_table = "user"
@@ -98,7 +111,7 @@ class User(AbstractUser):
         return f"{self.first_name} {self.last_name}".strip()
 
     def get_preferred_language(self) -> Literal["fi", "sv", "en"]:
-        return self.preferred_language or settings.LANGUAGE_CODE
+        return self.preferred_language or settings.LANGUAGE_CODE  # type: ignore[return-value]
 
     @property
     def active_general_roles(self) -> list[UserRoleChoice]:
@@ -254,7 +267,7 @@ class User(AbstractUser):
 
 
 # Set the permissions descriptor to the AnonymousUser class
-AnonymousUser.permissions = PermissionResolver()
+AnonymousUser.permissions = PermissionResolver()  # type: ignore[attr-defined]
 
 
 class ProfileUser(SerializableModelMixin, User):

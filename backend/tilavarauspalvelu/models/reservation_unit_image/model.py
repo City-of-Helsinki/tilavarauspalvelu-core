@@ -27,20 +27,20 @@ __all__ = [
 
 
 class ReservationUnitImage(models.Model):
-    reservation_unit: ReservationUnit = models.ForeignKey(
+    reservation_unit: ReservationUnit = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationUnit",
         related_name="images",
         on_delete=models.CASCADE,
     )
 
-    image: ThumbnailerImageFieldFile | None = ThumbnailerImageField(
+    image: ThumbnailerImageFieldFile | None = ThumbnailerImageField(  # type: ignore[assignment]
         upload_to=settings.RESERVATION_UNIT_IMAGES_ROOT, null=True, blank=True
     )
-    image_type: ReservationUnitImageType = TextChoicesField(enum=ReservationUnitImageType)
+    image_type: ReservationUnitImageType = TextChoicesField(enum=ReservationUnitImageType)  # type: ignore[assignment]
 
-    large_url: str = models.URLField(max_length=255, default="", blank=True)
-    medium_url: str = models.URLField(max_length=255, default="", blank=True)
-    small_url: str = models.URLField(max_length=255, default="", blank=True)
+    large_url: str = models.URLField(max_length=255, default="", blank=True)  # type: ignore[assignment]
+    medium_url: str = models.URLField(max_length=255, default="", blank=True)  # type: ignore[assignment]
+    small_url: str = models.URLField(max_length=255, default="", blank=True)  # type: ignore[assignment]
 
     objects: ClassVar[ReservationUnitImageManager] = LazyModelManager.new()
     actions: LazyAttribute[ReservationUnitImageActions] = LazyModelAttribute.new()

@@ -7,7 +7,7 @@ from django.db import models
 from django.db.models.functions import Coalesce
 
 from tilavarauspalvelu.models import ApplicationRound, Unit
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models._base import ModelQuerySet, TranslatedModelManager
 
 __all__ = [
     "ApplicationRoundManager",
@@ -35,7 +35,7 @@ class ApplicationRoundQuerySet(ModelQuerySet[ApplicationRound]):
         # to fetch units and unit groups for the permission checks when the queryset is evaluated,
         # and 'joins' them to the correct model instances in python.
 
-        items = list(self._result_cache)
+        items = list(self._result_cache or [])
         if not items:
             return
 
@@ -60,7 +60,7 @@ class ApplicationRoundQuerySet(ModelQuerySet[ApplicationRound]):
         )
 
         for item in items:
-            item.units_for_permissions = [unit for unit in units if item.pk in unit.application_round_ids]
+            item.units_for_permissions = [unit for unit in units if item.pk in unit.application_round_ids]  # type: ignore[attr-defined]
 
 
-class ApplicationRoundManager(ModelManager[ApplicationRound, ApplicationRoundQuerySet]): ...
+class ApplicationRoundManager(TranslatedModelManager[ApplicationRound, ApplicationRoundQuerySet]): ...

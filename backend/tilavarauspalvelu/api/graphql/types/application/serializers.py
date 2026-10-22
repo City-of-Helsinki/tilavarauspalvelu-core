@@ -35,10 +35,8 @@ __all__ = [
 ]
 
 
-class ApplicationCreateSerializer(NestingModelSerializer):
-    instance: None
-
-    user = serializers.HiddenField(default=CurrentUserDefaultNullable())
+class ApplicationCreateSerializer(NestingModelSerializer[Application]):
+    user: serializers.Field = serializers.HiddenField(default=CurrentUserDefaultNullable())
 
     application_sections = ApplicationSectionForApplicationSerializer(required=False, many=True)
 
@@ -131,13 +129,13 @@ class ApplicationUpdateSerializer(ApplicationCreateSerializer):
         user: AnyUser = self.context["request"].user
 
         with transaction.atomic():
-            instance = super().update(instance, validated_data)
+            super().update(instance, validated_data)
             instance.actions.reset_sent_at_if_changed_by_applicant(user=user)
 
         return instance
 
 
-class ApplicationWorkingMemoSerializer(NestingModelSerializer):
+class ApplicationWorkingMemoSerializer(NestingModelSerializer[Application]):
     instance: Application
 
     class Meta:
@@ -148,7 +146,7 @@ class ApplicationWorkingMemoSerializer(NestingModelSerializer):
         ]
 
 
-class ApplicationSendSerializer(NestingModelSerializer):
+class ApplicationSendSerializer(NestingModelSerializer[Application]):
     instance: Application
 
     class Meta:
@@ -401,7 +399,7 @@ class ApplicationSendSerializer(NestingModelSerializer):
         return self.instance
 
 
-class ApplicationCancelSerializer(NestingModelSerializer):
+class ApplicationCancelSerializer(NestingModelSerializer[Application]):
     instance: Application
 
     class Meta:
@@ -429,7 +427,7 @@ class ApplicationCancelSerializer(NestingModelSerializer):
         return self.instance
 
 
-class RejectAllApplicationOptionsSerializer(NestingModelSerializer):
+class RejectAllApplicationOptionsSerializer(NestingModelSerializer[Application]):
     instance: Application
 
     class Meta:
@@ -454,7 +452,7 @@ class RejectAllApplicationOptionsSerializer(NestingModelSerializer):
         return self.instance
 
 
-class RestoreAllApplicationOptionsSerializer(NestingModelSerializer):
+class RestoreAllApplicationOptionsSerializer(NestingModelSerializer[Application]):
     instance: Application
 
     class Meta:

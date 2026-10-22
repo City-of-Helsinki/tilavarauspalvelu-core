@@ -45,7 +45,7 @@ class ApplicationRoundAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, Tab
     # Form
     form = ApplicationRoundAdminForm
     fieldsets = [
-        [
+        (
             _("Basic information"),
             {
                 "fields": [
@@ -57,8 +57,8 @@ class ApplicationRoundAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, Tab
                     "purposes",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Time"),
             {
                 "fields": [
@@ -72,19 +72,19 @@ class ApplicationRoundAdmin(TVPAuditlogHistoryAdminMixin, ExtraButtonsMixin, Tab
                     "sent_at",
                 ],
             },
-        ],
-        [
+        ),
+        (
             _("Criteria"),
             {
                 "fields": ["criteria"],
             },
-        ],
-        [
+        ),
+        (
             _("Notes"),
             {
                 "fields": ["notes_when_applying"],
             },
-        ],
+        ),
     ]
     readonly_fields = ["id"]
     filter_horizontal = [

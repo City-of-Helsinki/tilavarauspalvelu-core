@@ -28,7 +28,7 @@ __all__ = [
 ]
 
 
-class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
+class ReservationSeriesDenyInputSerializer(NestingModelSerializer[ReservationSeries]):
     instance: ReservationSeries
 
     deny_reason = serializers.IntegerField(required=True)
@@ -56,7 +56,7 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
     def update(self, instance: ReservationSeries, validated_data: dict[str, Any]) -> ReservationSeries:
         now = local_datetime()
 
-        reservations: ReservationQuerySet = instance.reservations.filter(  # type: ignore[attr-defined]
+        reservations: ReservationQuerySet = instance.reservations.filter(
             begins_at__gt=now,
             state__in=ReservationStateChoice.states_that_can_change_to_deny,
         )
@@ -98,7 +98,7 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
         return instance
 
 
-class ReservationSeriesDenyOutputSerializer(NestingModelSerializer):
+class ReservationSeriesDenyOutputSerializer(NestingModelSerializer[ReservationSeries]):
     denied = serializers.IntegerField(required=True)
     future = serializers.IntegerField(required=True)
 

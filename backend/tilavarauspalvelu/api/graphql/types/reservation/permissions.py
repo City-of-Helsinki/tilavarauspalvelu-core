@@ -1,16 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
 
-from tilavarauspalvelu.models import ReservationUnit
-from tilavarauspalvelu.typing import error_codes
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Reservation
-    from tilavarauspalvelu.typing import AnyUser
+from tilavarauspalvelu.models import Reservation, ReservationUnit
+from tilavarauspalvelu.typing import AnyUser, error_codes
 
 __all__ = [
     "ReservationCommentPermission",
@@ -23,7 +19,7 @@ __all__ = [
 ]
 
 
-class ReservationPermission(BasePermission):
+class ReservationPermission(BasePermission[Reservation, AnyUser]):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return True
@@ -41,7 +37,7 @@ class ReservationPermission(BasePermission):
         return user.permissions.can_manage_reservation(instance)
 
 
-class ReservationHandlingPermission(BasePermission):
+class ReservationHandlingPermission(BasePermission[Reservation, AnyUser]):
     @classmethod
     def has_update_permission(cls, instance: Reservation, user: AnyUser, input_data: dict[str, Any]) -> bool:
         return user.permissions.can_manage_reservation(
@@ -51,13 +47,13 @@ class ReservationHandlingPermission(BasePermission):
         )
 
 
-class ReservationRefundPermission(BasePermission):
+class ReservationRefundPermission(BasePermission[Reservation, AnyUser]):
     @classmethod
     def has_update_permission(cls, instance: Reservation, user: AnyUser, input_data: dict[str, Any]) -> bool:
         return user.permissions.can_manage_reservation(instance, reserver_needs_role=True)
 
 
-class StaffAdjustTimePermission(BasePermission):
+class StaffAdjustTimePermission(BasePermission[Reservation, AnyUser]):
     @classmethod
     def has_update_permission(cls, instance: Reservation, user: AnyUser, input_data: dict[str, Any]) -> bool:
         return user.permissions.can_manage_reservation(
@@ -67,7 +63,7 @@ class StaffAdjustTimePermission(BasePermission):
         )
 
 
-class StaffReservationModifyPermission(BasePermission):
+class StaffReservationModifyPermission(BasePermission[Reservation, AnyUser]):
     @classmethod
     def has_update_permission(cls, instance: Reservation, user: AnyUser, input_data: dict[str, Any]) -> bool:
         return user.permissions.can_manage_reservation(
@@ -77,13 +73,13 @@ class StaffReservationModifyPermission(BasePermission):
         )
 
 
-class ReservationCommentPermission(BasePermission):
+class ReservationCommentPermission(BasePermission[Reservation, AnyUser]):
     @classmethod
     def has_update_permission(cls, instance: Reservation, user: AnyUser, input_data: dict[str, Any]) -> bool:
         return user.permissions.can_view_reservation(instance, reserver_needs_role=True)
 
 
-class ReservationStaffCreatePermission(BasePermission):
+class ReservationStaffCreatePermission(BasePermission[Reservation, AnyUser]):
     @classmethod
     def has_create_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
         reservation_unit = cls._get_reservation_unit(input_data)

@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 class TprekUnitImporter:
     def __init__(self) -> None:
         self.updated_units_count = 0
-        self.units_for_hauki_import = []
+        self.units_for_hauki_import: list[Unit] = []
 
     def update_unit_from_tprek(self, units: list[Unit] | QuerySet[Unit], *, force_update: bool = False) -> None:
         """
@@ -45,7 +45,7 @@ class TprekUnitImporter:
 
             tprek_unit_data, tprek_location_data = TprekAPIClient.get_unit(unit_tprek_id=unit.tprek_id)
 
-            if tprek_unit_data is None:
+            if tprek_unit_data is None or tprek_location_data is None:
                 SentryLogger.log_message(message=f"Unit {unit.pk=} {unit.tprek_id=} not found in TPREK API.")
                 continue
 
@@ -120,7 +120,7 @@ class TprekUnitHaukiResourceIdImporter:
             page_size=50000,
         )
 
-        hauki_resource_id_map: dict[str, str | int] = {}
+        hauki_resource_id_map: dict[str, str] = {}
 
         # For each Hauki resource, find the origin with data_source=tprek and add the origin id to the map
         for hauki_resource in hauki_resources:

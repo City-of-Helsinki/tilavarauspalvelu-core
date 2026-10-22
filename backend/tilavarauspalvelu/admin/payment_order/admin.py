@@ -12,8 +12,11 @@ from tilavarauspalvelu.admin.log_entry.mixins import TVPAuditlogHistoryAdminMixi
 from tilavarauspalvelu.models import PaymentOrder, ReservationUnit
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from django.db import models
     from django.db.models import QuerySet
+    from django_stubs_ext import StrOrPromise
 
     from tilavarauspalvelu.models.payment_order.queryset import PaymentOrderQuerySet
     from tilavarauspalvelu.typing import WSGIRequest
@@ -26,7 +29,7 @@ __all__ = [
 class PaymentOrderForm(forms.ModelForm):
     class Meta:
         model = PaymentOrder
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         labels = {
             "reservation": _("Reservation"),
             "remote_id": _("Remote order ID"),
@@ -57,7 +60,7 @@ class ReservationUnitFilter(admin.SimpleListFilter):
     title = _("reservation unit")
     parameter_name = "reservation_unit"
 
-    def lookups(self, *args: Any) -> list[tuple[int, str]]:
+    def lookups(self, *args: Any) -> Iterable[tuple[Any, StrOrPromise]]:
         return (
             ReservationUnit.objects
             .filter(pricings__lowest_price__gt=0)
@@ -144,7 +147,7 @@ class PaymentOrderAdmin(TVPAuditlogHistoryAdminMixin, admin.ModelAdmin):
     def has_delete_permission(self, request: WSGIRequest, obj: PaymentOrder | None = None) -> bool:
         return False
 
-    def reservation_unit(self, obj: PaymentOrder) -> str:
+    def reservation_unit(self, obj: PaymentOrder) -> ReservationUnit | str:
         return obj.reservation.reservation_unit if obj.reservation else ""
 
     def get_search_results(

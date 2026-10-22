@@ -5,7 +5,7 @@ import uuid
 from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
-from django.db.models import Exists, OrderBy
+from django.db.models import Exists
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 from lazy_managers import LazyModelAttribute, LazyModelManager
@@ -48,31 +48,31 @@ class ApplicationSection(SerializableModelMixin, models.Model):
     and suitable time ranges that can be used fulfill the slot request included in it.
     """
 
-    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
+    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # type: ignore[assignment]  # ID for external systems
 
-    name: str = models.CharField(max_length=100)
-    num_persons: int = models.PositiveIntegerField()
-    reservations_begin_date: datetime.date = models.DateField()
-    reservations_end_date: datetime.date = models.DateField()
+    name: str = models.CharField(max_length=100)  # type: ignore[assignment]
+    num_persons: int = models.PositiveIntegerField()  # type: ignore[assignment]
+    reservations_begin_date: datetime.date = models.DateField()  # type: ignore[assignment]
+    reservations_end_date: datetime.date = models.DateField()  # type: ignore[assignment]
 
     # Slot request
-    reservation_min_duration: datetime.timedelta = models.DurationField()
-    reservation_max_duration: datetime.timedelta = models.DurationField()
-    applied_reservations_per_week: int = models.PositiveIntegerField()
+    reservation_min_duration: datetime.timedelta = models.DurationField()  # type: ignore[assignment]
+    reservation_max_duration: datetime.timedelta = models.DurationField()  # type: ignore[assignment]
+    applied_reservations_per_week: int = models.PositiveIntegerField()  # type: ignore[assignment]
 
-    application: Application = models.ForeignKey(
+    application: Application = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.Application",
         related_name="application_sections",
         on_delete=models.CASCADE,
     )
-    purpose: ReservationPurpose | None = models.ForeignKey(
+    purpose: ReservationPurpose | None = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationPurpose",
         related_name="application_sections",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
-    age_group: AgeGroup | None = models.ForeignKey(
+    age_group: AgeGroup | None = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.AgeGroup",
         related_name="application_sections",
         on_delete=models.SET_NULL,
@@ -137,7 +137,7 @@ class ApplicationSection(SerializableModelMixin, models.Model):
         suitable = (
             self.suitable_time_ranges
             .distinct()
-            .order_by(OrderBy(L("day_of_the_week_number")))
+            .order_by(L("day_of_the_week_number").order_by())
             .values_list("day_of_the_week", flat=True)
         )
         return [Weekday(day) for day in suitable]
@@ -201,7 +201,7 @@ class ApplicationSection(SerializableModelMixin, models.Model):
                 ),
             ).all()
         )
-        total_allocations = sum(option.num_of_allocations for option in reservation_unit_options)
+        total_allocations = sum(option.num_of_allocations for option in reservation_unit_options)  # type: ignore[attr-defined]
         all_locked_or_rejected = all(option.is_locked or option.is_rejected for option in reservation_unit_options)
 
         if total_allocations >= self.applied_reservations_per_week:

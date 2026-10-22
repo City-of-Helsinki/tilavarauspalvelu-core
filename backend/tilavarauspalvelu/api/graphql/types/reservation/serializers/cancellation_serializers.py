@@ -18,20 +18,19 @@ from tilavarauspalvelu.tasks import (
     cancel_payment_order_without_webshop_payment_task,
     refund_payment_order_for_webshop_task,
 )
-from tilavarauspalvelu.typing import error_codes
+from tilavarauspalvelu.typing import ReservationCancellationData, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import external_service_errors_as_validation_errors
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import PaymentOrder
-    from tilavarauspalvelu.typing import ReservationCancellationData
 
 __all__ = [
     "ReservationCancellationSerializer",
 ]
 
 
-class ReservationCancellationSerializer(NestingModelSerializer):
+class ReservationCancellationSerializer(NestingModelSerializer[Reservation, ReservationCancellationData]):
     """Cancel a reservation."""
 
     instance: Reservation
@@ -77,7 +76,7 @@ class ReservationCancellationSerializer(NestingModelSerializer):
 
     def update(self, instance: Reservation, validated_data: ReservationCancellationData) -> Reservation:
         with transaction.atomic():
-            instance = super().update(instance=instance, validated_data=validated_data)
+            super().update(instance=instance, validated_data=validated_data)
 
             if instance.access_type == AccessType.ACCESS_CODE:
                 with (

@@ -36,11 +36,11 @@ class AllocatedTimeSlot(models.Model):
     Will be converted to reservations when the application round has been allocated.
     """
 
-    day_of_the_week: Weekday = TextChoicesField(enum=Weekday)
-    begin_time: datetime.time = models.TimeField()
-    end_time: datetime.time = models.TimeField()
+    day_of_the_week: Weekday = TextChoicesField(enum=Weekday)  # type: ignore[assignment]
+    begin_time: datetime.time = models.TimeField()  # type: ignore[assignment]
+    end_time: datetime.time = models.TimeField()  # type: ignore[assignment]
 
-    reservation_unit_option: ReservationUnitOption = models.ForeignKey(
+    reservation_unit_option: ReservationUnitOption = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationUnitOption",
         related_name="allocated_time_slots",
         on_delete=models.CASCADE,
@@ -50,7 +50,11 @@ class AllocatedTimeSlot(models.Model):
     actions: LazyAttribute[AllocatedTimeSlotActions] = LazyModelAttribute.new()
     validators: LazyAttribute[AllocatedTimeSlotValidator] = LazyModelAttribute.new()
 
-    reservation_series: ReservationSeries | None  # Can be missing
+    reservation_series: ReservationSeries
+    """
+    Can be missing. Reading a missing value raises 'ReservationSeries.DoesNotExist'.
+    Check with 'hasattr' first.
+    """
 
     class Meta:
         db_table = "allocated_time_slot"

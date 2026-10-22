@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
 
 from django.conf import settings
 from graphene_django_extensions import NestingModelSerializer
@@ -15,19 +14,16 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
-from tilavarauspalvelu.typing import error_codes
+from tilavarauspalvelu.typing import ReservationApproveData, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, datetime_difference, local_datetime
 from utils.external_service.errors import ExternalServiceError
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import ReservationApproveData
 
 __all__ = [
     "ReservationApproveSerializer",
 ]
 
 
-class ReservationApproveSerializer(NestingModelSerializer):
+class ReservationApproveSerializer(NestingModelSerializer[Reservation, ReservationApproveData]):
     """Approve a reservation during handling."""
 
     instance: Reservation
@@ -114,6 +110,8 @@ class ReservationApproveSerializer(NestingModelSerializer):
             data["payment_type"] = PaymentType.ON_SITE
             return data
 
+        pricing.validators.validate_has_payment_type()
+
         if pricing.payment_type != PaymentType.ON_SITE:
             reservation_unit.validators.validate_has_payment_product()
 
@@ -124,7 +122,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
         if settings.PAYMENT_ORDERS_FOR_HANDLED_RESERVATIONS_ENABLED:
             self.create_payment_order_if_required(validated_data)
 
-        instance = super().update(instance=instance, validated_data=validated_data)
+        super().update(instance=instance, validated_data=validated_data)
 
         if instance.access_type == AccessType.ACCESS_CODE:
             # Allow activation in Pindora to fail, will be handled by a background task.

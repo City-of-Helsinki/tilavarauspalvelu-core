@@ -72,9 +72,9 @@ def local_datetime(
     microsecond: int = 0,
 ) -> datetime.datetime:
     """Get datetime in the local timezone. Without arguments, the current datetime is returned."""
-    if all((year, month, day)):
+    if year is not None and month is not None and day is not None:
         return datetime.datetime(year, month, day, hour, minute, second, microsecond, tzinfo=DEFAULT_TIMEZONE)
-    if any((year, month, day)):
+    if year is not None or month is not None or day is not None:
         msg = "'year', 'month' and 'day' must be given together"
         raise ValueError(msg)
     return datetime.datetime.now(tz=DEFAULT_TIMEZONE)
@@ -243,9 +243,9 @@ def utc_datetime(
     microsecond: int = 0,
 ) -> datetime.datetime:
     """Get datetime in UTC. Without arguments, the current datetime is returned."""
-    if all((year, month, day)):
+    if year is not None and month is not None and day is not None:
         return datetime.datetime(year, month, day, hour, minute, second, microsecond, tzinfo=datetime.UTC)
-    if any((year, month, day)):
+    if year is not None or month is not None or day is not None:
         msg = "'year', 'month' and 'day' must be given together"
         raise ValueError(msg)
     return datetime.datetime.now(tz=datetime.UTC)

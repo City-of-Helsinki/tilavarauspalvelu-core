@@ -21,7 +21,7 @@ from tilavarauspalvelu.enums import ReservationFormType
 from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnit, ReservationUnitHierarchy
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Generator, Iterable, Sequence, Sized
+    from collections.abc import Callable, Collection, Generator, Iterable, Sequence
     from decimal import Decimal
 
     from tilavarauspalvelu.enums import (
@@ -159,7 +159,7 @@ class SetName(StrEnum):
 
 def get_combinations[T](
     *,
-    iterables: Iterable[Sized[Any]],
+    iterables: Iterable[Collection[Any]],
     output_type: type[T],
     limit: int = 300,
     multiplier: int = 1,
@@ -213,7 +213,7 @@ class StartIntervalInfo:
 @dataclasses.dataclass(slots=True, frozen=True)
 class CancelInfo:
     name: str
-    value: list[ReservationUnitCancellationRule | None]
+    value: Sequence[ReservationUnitCancellationRule | None]
 
 
 @dataclasses.dataclass(slots=True, frozen=True)

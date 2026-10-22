@@ -18,19 +18,16 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose, ReservationUnit
-from tilavarauspalvelu.typing import error_codes
+from tilavarauspalvelu.typing import StaffCreateReservationData, error_codes
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
-    from tilavarauspalvelu.typing import StaffCreateReservationData
 
 
-class ReservationStaffCreateSerializer(NestingModelSerializer):
+class ReservationStaffCreateSerializer(NestingModelSerializer[Reservation, StaffCreateReservationData]):
     """Create a reservation as a staff user."""
-
-    instance: None
 
     pk = IntegerField(read_only=True)
     reservation_unit = IntegerPrimaryKeyField(queryset=ReservationUnit.objects, required=True, write_only=True)
@@ -111,8 +108,8 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
         }
 
     def validate(self, data: StaffCreateReservationData) -> StaffCreateReservationData:
-        begins_at = data.get("begins_at").astimezone(DEFAULT_TIMEZONE)
-        ends_at = data.get("ends_at").astimezone(DEFAULT_TIMEZONE)
+        begins_at = data["begins_at"].astimezone(DEFAULT_TIMEZONE)
+        ends_at = data["ends_at"].astimezone(DEFAULT_TIMEZONE)
 
         # Endpoint requires user to be logged in
         user: User = self.context["request"].user
@@ -122,13 +119,13 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
             data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begins_at)
             data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(ends_at)
 
-        reservation_type = data.get("type")
+        reservation_type = data["type"]
         reservation_unit.validators.validate_can_create_reservation_type(reservation_type=reservation_type)
 
         # For blocking reservations, buffer times can overlap existing reservations.
         if reservation_type == ReservationTypeChoice.BLOCKED:
-            buffer_time_before = datetime.timedelta()
-            buffer_time_after = datetime.timedelta()
+            buffer_time_before: datetime.timedelta | None = datetime.timedelta()
+            buffer_time_after: datetime.timedelta | None = datetime.timedelta()
         else:
             buffer_time_before = data.get("buffer_time_before")
             buffer_time_after = data.get("buffer_time_after")

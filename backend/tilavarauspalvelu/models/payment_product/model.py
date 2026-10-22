@@ -26,9 +26,9 @@ __all__ = [
 
 
 class PaymentProduct(models.Model):
-    id: uuid.UUID = models.UUIDField(primary_key=True)
+    id: uuid.UUID = models.UUIDField(primary_key=True)  # type: ignore[assignment]
 
-    merchant: PaymentMerchant | None = models.ForeignKey(
+    merchant: PaymentMerchant | None = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.PaymentMerchant",
         related_name="products",
         on_delete=models.PROTECT,

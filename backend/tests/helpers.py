@@ -113,8 +113,8 @@ class patch_method:
         exc_type: type[BaseException] | None,
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
-    ) -> bool | None:
-        return self.patch.__exit__(exc_type, exc_val, exc_tb)
+    ) -> None:
+        self.patch.__exit__(exc_type, exc_val, exc_tb)
 
 
 class TranslationsFromPOFiles:
@@ -128,7 +128,7 @@ class TranslationsFromPOFiles:
 
     translations: dict[Lang, polib.POFile]
     language_options: tuple[Lang, ...] = ("fi", "sv", "en")
-    default_language: Lang = settings.LANGUAGE_CODE
+    default_language: Lang = settings.LANGUAGE_CODE  # type: ignore[assignment]
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Any:
         # Load translations to the clas only once
@@ -226,8 +226,8 @@ class TranslationsFromPOFiles:
     def get_language_from_request(self, request: HttpRequest, check_path: bool = False):  # noqa: FBT002
         return trans_real.get_language_from_request(request, check_path)
 
-    def get_language_from_path(self, request: HttpRequest) -> None:
-        return trans_real.get_language_from_path(request)
+    def get_language_from_path(self, path: str) -> str | None:
+        return trans_real.get_language_from_path(path)
 
     def get_supported_language_variant(self, lang_code: Lang, strict: bool = False) -> str:  # noqa: FBT002
         if "fi" in lang_code:

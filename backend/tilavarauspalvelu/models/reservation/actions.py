@@ -304,6 +304,10 @@ class ReservationActions:
 
         verkkokauppa_order = self.create_order_in_verkkokauppa()
 
+        if verkkokauppa_order.checkout_url is None:
+            msg = "Upstream service call failed. Unable to confirm the reservation."
+            raise ValidationError(msg, code=error_codes.UPSTREAM_CALL_FAILED)
+
         return PaymentOrder.objects.create(
             payment_type=payment_type,
             status=OrderStatus.DRAFT,
@@ -315,7 +319,7 @@ class ReservationActions:
             reservation_user_uuid=self.reservation.user.uuid,
             remote_id=verkkokauppa_order.order_id,
             checkout_url=verkkokauppa_order.checkout_url,
-            receipt_url=verkkokauppa_order.receipt_url,
+            receipt_url=verkkokauppa_order.receipt_url or "",
         )
 
     def create_payment_order_paid_on_site(self) -> PaymentOrder:

@@ -80,7 +80,7 @@ class ApplicationAdminForm(forms.ModelForm):
 
     class Meta:
         model = Application
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         labels = {
             "applicant_type": _("Applicant type"),
             "application_round": _("Application round"),

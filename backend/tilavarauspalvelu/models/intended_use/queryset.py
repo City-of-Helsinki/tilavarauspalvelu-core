@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from tilavarauspalvelu.models import IntendedUse
-from tilavarauspalvelu.models._base import ModelManager, TranslatedModelQuerySet
+from tilavarauspalvelu.models._base import TranslatedModelManager, TranslatedModelQuerySet
 
 __all__ = [
     "IntendedUseManager",
@@ -12,4 +12,4 @@ __all__ = [
 class IntendedUseQuerySet(TranslatedModelQuerySet[IntendedUse]): ...
 
 
-class IntendedUseManager(ModelManager[IntendedUse, IntendedUseQuerySet]): ...
+class IntendedUseManager(TranslatedModelManager[IntendedUse, IntendedUseQuerySet]): ...

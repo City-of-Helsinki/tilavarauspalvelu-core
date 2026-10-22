@@ -30,7 +30,7 @@ class ReservationAdminForm(forms.ModelForm):
 
     class Meta:
         model = Reservation
-        fields = []  # Use fields from ModelAdmin
+        fields: list[str] = []  # Use fields from ModelAdmin
         labels = {
             #
             "ext_uuid": _("External UUID"),
@@ -162,12 +162,12 @@ class PaymentOrderInline(admin.TabularInline):
     extra = 0
     show_change_link = True
     can_delete = False
-    fields = [
+    fields = (
         "id",
         "payment_type",
         "status",
         "price_total",
-    ]
+    )
     readonly_fields = fields
 
     def has_add_permission(self, request: WSGIRequest, obj: Reservation | None = None) -> bool:

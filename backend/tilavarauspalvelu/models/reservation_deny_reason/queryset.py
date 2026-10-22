@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from tilavarauspalvelu.models import ReservationDenyReason
-from tilavarauspalvelu.models._base import ModelManager, ModelQuerySet
+from tilavarauspalvelu.models._base import ModelQuerySet, TranslatedModelManager
 
 __all__ = [
     "ReservationDenyReasonManager",
@@ -12,4 +12,4 @@ __all__ = [
 class ReservationDenyReasonQuerySet(ModelQuerySet[ReservationDenyReason]): ...
 
 
-class ReservationDenyReasonManager(ModelManager[ReservationDenyReason, ReservationDenyReasonQuerySet]): ...
+class ReservationDenyReasonManager(TranslatedModelManager[ReservationDenyReason, ReservationDenyReasonQuerySet]): ...

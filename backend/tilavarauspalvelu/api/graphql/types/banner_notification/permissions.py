@@ -5,23 +5,25 @@ from typing import TYPE_CHECKING, Any
 from graphene_django_extensions.permissions import BasePermission
 
 from tilavarauspalvelu.enums import BannerNotificationTarget
+from tilavarauspalvelu.models.banner_notification.model import BannerNotification
+from tilavarauspalvelu.typing import AnyUser
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models.banner_notification.model import BannerNotification
-    from tilavarauspalvelu.typing import AnyUser
+    from query_optimizer.typing import GraphQLFilterInfo
+
 
 __all__ = [
     "BannerNotificationPermission",
 ]
 
 
-class BannerNotificationPermission(BasePermission):
+class BannerNotificationPermission(BasePermission[BannerNotification, AnyUser]):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
         return True
 
     @classmethod
-    def has_node_permission(cls, instance: BannerNotification, user: AnyUser, filters: dict[str, Any]) -> bool:
+    def has_node_permission(cls, instance: BannerNotification, user: AnyUser, filters: GraphQLFilterInfo) -> bool:
         if user.permissions.can_manage_notifications():
             return True
 

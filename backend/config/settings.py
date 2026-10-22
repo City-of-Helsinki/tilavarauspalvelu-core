@@ -4,7 +4,7 @@ from __future__ import annotations
 import os
 import zoneinfo
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import dj_database_url
 from corsheaders.defaults import default_headers
@@ -21,21 +21,21 @@ try:
     from local_settings import AutomatedTestMixin
 except ImportError:
 
-    class AutomatedTestMixin: ...
+    class AutomatedTestMixin: ...  # type: ignore[no-redef]
 
 
 try:
     from local_settings import DockerMixin
 except ImportError:
 
-    class DockerMixin: ...
+    class DockerMixin: ...  # type: ignore[no-redef]
 
 
 try:
     from local_settings import LocalMixin
 except ImportError:
 
-    class LocalMixin: ...
+    class LocalMixin: ...  # type: ignore[no-redef]
 
 
 class Common(Environment):
@@ -44,6 +44,9 @@ class Common(Environment):
     BASE_DIR = Path(__file__).resolve().parent.parent
 
     # --- Basic settings ---------------------------------------------------------------------------------------------
+
+    # Each environment sets its own value.
+    DEBUG: bool
 
     WSGI_APPLICATION = "config.wsgi.application"
     ROOT_URLCONF = "config.urls"
@@ -119,8 +122,8 @@ class Common(Environment):
 
     # --- Versioning settings ----------------------------------------------------------------------------------------
 
-    SOURCE_BRANCH_NAME: str = values.StringValue(default="")
-    SOURCE_VERSION: str = values.StringValue(default="")
+    SOURCE_BRANCH_NAME: str = values.StringValue(default="")  # type: ignore[assignment]
+    SOURCE_VERSION: str = values.StringValue(default="")  # type: ignore[assignment]
 
     @classproperty
     def APP_VERSION(cls) -> str:
@@ -189,8 +192,8 @@ class Common(Environment):
 
     # --- Static file settings ---------------------------------------------------------------------------------------
 
-    STATIC_ROOT = values.PathValue(default="staticroot")
-    MEDIA_ROOT = values.PathValue(default="media")
+    STATIC_ROOT: Path = values.PathValue(default="staticroot")  # type: ignore[assignment]
+    MEDIA_ROOT: Path = values.PathValue(default="media")  # type: ignore[assignment]
 
     STATIC_URL = values.StringValue(default="/static/")
     MEDIA_URL = values.StringValue(default="/media/")
@@ -653,10 +656,10 @@ class EmptyDefaults:
     SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
     ALLOWED_HOSTS = ["*"]
 
-    CORS_ALLOWED_ORIGINS = []
-    CSRF_TRUSTED_ORIGINS = []
+    CORS_ALLOWED_ORIGINS: list[str] = []
+    CSRF_TRUSTED_ORIGINS: list[str] = []
 
-    DATABASES = {}
+    DATABASES: dict[str, Any] = {}
     REDIS_URL = ""
 
     STATIC_ROOT = Common.BASE_DIR / "staticroot"
@@ -723,8 +726,8 @@ class Local(Common, overrides_from=LocalMixin):
 
     # --- Static file settings ---------------------------------------------------------------------------------------
 
-    STATIC_ROOT = values.PathValue(default="staticroot", create_if_missing=True)
-    MEDIA_ROOT = values.PathValue(default="media", create_if_missing=True)
+    STATIC_ROOT: Path = values.PathValue(default="staticroot", create_if_missing=True)  # type: ignore[assignment]
+    MEDIA_ROOT: Path = values.PathValue(default="media", create_if_missing=True)  # type: ignore[assignment]
 
     # --- Logging settings -------------------------------------------------------------------------------------------
 
@@ -815,8 +818,8 @@ class Docker(Common, overrides_from=DockerMixin):
     CORS_ALLOWED_ORIGINS = values.ListValue(default=[])
     CSRF_TRUSTED_ORIGINS = values.ListValue(default=[])
 
-    STATIC_ROOT = "/srv/static"
-    MEDIA_ROOT = "/media"
+    STATIC_ROOT = Path("/srv/static")
+    MEDIA_ROOT = Path("/media")
 
     DATABASES = values.DatabaseURLValue(default="postgis://tvp:tvp@db/tvp")
 
@@ -995,8 +998,8 @@ class Build(EmptyDefaults, Common, use_environ=True):
 
     DEBUG = True
 
-    STATIC_ROOT = "/srv/static"
-    MEDIA_ROOT = "/media"
+    STATIC_ROOT = Path("/srv/static")
+    MEDIA_ROOT = Path("/media")
 
 
 class CI(EmptyDefaults, Common, use_environ=True):
@@ -1015,20 +1018,21 @@ def sentry_traces_sampler(sampling_context: SamplingContext) -> float:
 
     from django.conf import settings
 
+    # The Sentry settings exist only in the `Platta` configurations, and mypy loads another one.
     path = sampling_context.get("wsgi_environ", {}).get("PATH_INFO", "")
-    if path in settings.SENTRY_TRACES_IGNORE_PATHS:
+    if path in settings.SENTRY_TRACES_IGNORE_PATHS:  # type: ignore[misc]
         return 0.0
 
-    return settings.SENTRY_TRACES_SAMPLE_RATE or 0.0
+    return settings.SENTRY_TRACES_SAMPLE_RATE or 0.0  # type: ignore[misc]
 
 
 def sentry_before_send_transaction(event: Event, _hint: Hint) -> Event:
     # The trace view shows span data, not the request headers of the transaction event.
     # Copy only allowlisted headers, so cookies, CSRF tokens and IP addresses stay out.
     allowed_header_names = ("Accept-Language", "Content-Type", "Origin", "User-Agent")
-    request_headers = event.get("request", {}).get("headers", {})
+    request_headers = cast("dict[str, str]", event.get("request", {}).get("headers", {}))
     trace_context = event.setdefault("contexts", {}).setdefault("trace", {})
-    trace_data = trace_context.setdefault("data", {})
+    trace_data = cast("dict[str, object]", trace_context.setdefault("data", {}))
 
     for header_name in allowed_header_names:
         header_value = request_headers.get(header_name)
@@ -1057,12 +1061,12 @@ class Platta(Common, use_environ=True):
 
     # --- Sentry -----------------------------------------------------------------------------------------------------
 
-    SENTRY_DSN: str = values.StringValue(default="")
-    SENTRY_ENVIRONMENT: str = values.StringValue(default="local")
-    SENTRY_PROFILE_SESSION_SAMPLE_RATE: float | None = values.FloatValue(default=None)
-    SENTRY_RELEASE: str | None = values.StringValue(default=None)
-    SENTRY_TRACES_SAMPLE_RATE: float | None = values.FloatValue(default=None)
-    SENTRY_TRACES_IGNORE_PATHS: list[str] = values.ListValue(
+    SENTRY_DSN: str = values.StringValue(default="")  # type: ignore[assignment]
+    SENTRY_ENVIRONMENT: str = values.StringValue(default="local")  # type: ignore[assignment]
+    SENTRY_PROFILE_SESSION_SAMPLE_RATE: float | None = values.FloatValue(default=None)  # type: ignore[assignment]
+    SENTRY_RELEASE: str | None = values.StringValue(default=None)  # type: ignore[assignment]
+    SENTRY_TRACES_SAMPLE_RATE: float | None = values.FloatValue(default=None)  # type: ignore[assignment]
+    SENTRY_TRACES_IGNORE_PATHS: list[str] = values.ListValue(  # type: ignore[assignment]
         default=[
             "/healthz",
             "/readiness",
@@ -1075,9 +1079,9 @@ class Platta(Common, use_environ=True):
     # --- Redis settings ---------------------------------------------------------------------------------------------
 
     REDIS_URL = ""  # Not used in Platta environments
-    REDIS_SENTINEL_SERVICE: str = values.StringValue()
-    REDIS_MASTER: str = values.StringValue()
-    REDIS_PASSWORD: str = values.StringValue()
+    REDIS_SENTINEL_SERVICE: str = values.StringValue()  # type: ignore[assignment]
+    REDIS_MASTER: str = values.StringValue()  # type: ignore[assignment]
+    REDIS_PASSWORD: str = values.StringValue()  # type: ignore[assignment]
 
     DJANGO_REDIS_CONNECTION_FACTORY = "django_redis.pool.SentinelConnectionFactory"
 

@@ -28,12 +28,12 @@ __all__ = [
 
 
 class RejectedOccurrence(models.Model):
-    begin_datetime: datetime.datetime = models.DateTimeField()
-    end_datetime: datetime.datetime = models.DateTimeField()
-    rejection_reason: RejectionReadinessChoice = TextChoicesField(enum=RejectionReadinessChoice)
-    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
+    begin_datetime: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
+    end_datetime: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
+    rejection_reason: RejectionReadinessChoice = TextChoicesField(enum=RejectionReadinessChoice)  # type: ignore[assignment]
+    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)  # type: ignore[assignment]
 
-    reservation_series: ReservationSeries = models.ForeignKey(
+    reservation_series: ReservationSeries = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ReservationSeries",
         related_name="rejected_occurrences",
         on_delete=models.CASCADE,

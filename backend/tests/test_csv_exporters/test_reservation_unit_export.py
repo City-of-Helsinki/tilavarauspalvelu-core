@@ -264,3 +264,17 @@ def test_reservation_unit_export__subset():
     # - the writes contain only 3 rows (+header)
     writes = mock_writer.get_writes()
     assert len(writes) == 4, writes
+
+
+def test_reservation_unit_export__missing_translations_are_exported_as_empty_values():
+    reservation_unit = ReservationUnitFactory.create(description_sv=None, spaces__name="Space")
+    reservation_unit.spaces.update(name_fi=None)
+
+    exporter = ReservationUnitExporter()
+    with mock_csv_writer() as mock_writer:
+        exporter.write_csv()
+
+    writes = mock_writer.get_writes()
+    assert len(writes) == 2, writes
+    assert writes[1][writes[0].index("Description_sv")] == ""
+    assert writes[1][writes[0].index("Spaces")] == ""

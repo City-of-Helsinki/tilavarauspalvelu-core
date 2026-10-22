@@ -36,80 +36,80 @@ class ReservationStatistic(models.Model):
 
     # Copied from Reservation
 
-    num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
-    state: str = models.CharField(max_length=255)
-    reservation_type: str | None = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
+    num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)  # type: ignore[assignment]
+    state: str = models.CharField(max_length=255)  # type: ignore[assignment]
+    reservation_type: str | None = models.CharField(max_length=255, null=True, blank=True)  # type: ignore[assignment]  # noqa: DJ001
 
-    begin: datetime.datetime = models.DateTimeField()
-    end: datetime.datetime = models.DateTimeField()
-    buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
-    buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
-    reservation_handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    reservation_confirmed_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    reservation_created_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=timezone.now)  # noqa: TID251
+    begin: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
+    end: datetime.datetime = models.DateTimeField()  # type: ignore[assignment]
+    buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)  # type: ignore[assignment]
+    buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)  # type: ignore[assignment]
+    reservation_handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)  # type: ignore[assignment]
+    reservation_confirmed_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)  # type: ignore[assignment]
+    reservation_created_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=timezone.now)  # type: ignore[assignment]  # noqa: TID251
 
-    price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    price_net: Decimal = models.DecimalField(max_digits=20, decimal_places=6, default=0)
-    non_subsidised_price: Decimal = models.DecimalField(max_digits=20, decimal_places=2, default=0)
-    non_subsidised_price_net: Decimal = models.DecimalField(max_digits=20, decimal_places=6, default=0)
-    tax_percentage_value: Decimal = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # type: ignore[assignment]
+    price_net: Decimal = models.DecimalField(max_digits=20, decimal_places=6, default=0)  # type: ignore[assignment]
+    non_subsidised_price: Decimal = models.DecimalField(max_digits=20, decimal_places=2, default=0)  # type: ignore[assignment]
+    non_subsidised_price_net: Decimal = models.DecimalField(max_digits=20, decimal_places=6, default=0)  # type: ignore[assignment]
+    tax_percentage_value: Decimal = models.DecimalField(max_digits=5, decimal_places=2, default=0)  # type: ignore[assignment]
 
-    applying_for_free_of_charge: bool = models.BooleanField(default=False, blank=True)
+    applying_for_free_of_charge: bool = models.BooleanField(default=False, blank=True)  # type: ignore[assignment]
 
-    reservee_id: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_organisation_name: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_is_unregistered_association: bool = models.BooleanField(null=True, default=False, blank=True)
-    reservee_language: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_type: str | None = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
+    reservee_id: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    reservee_organisation_name: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    reservee_is_unregistered_association: bool = models.BooleanField(null=True, default=False, blank=True)  # type: ignore[assignment]
+    reservee_language: str = models.CharField(max_length=255, blank=True, default="")  # type: ignore[assignment]
+    reservee_type: str | None = models.CharField(max_length=255, null=True, blank=True)  # type: ignore[assignment]  # noqa: DJ001
 
     # Access type information
 
-    access_type: str = models.CharField(max_length=255)
-    access_code_generated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    access_type: str = models.CharField(max_length=255)  # type: ignore[assignment]
+    access_code_generated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)  # type: ignore[assignment]
 
     # Static copies of values from other related models
 
-    primary_reservation_unit: int | None = models.BigIntegerField(null=True, blank=True)
-    primary_reservation_unit_name: str = models.CharField(max_length=255)
-    primary_unit_tprek_id: str | None = models.CharField(max_length=255, null=True, blank=True)  # noqa: DJ001
-    primary_unit_name: str = models.CharField(max_length=255)
+    primary_reservation_unit: int | None = models.BigIntegerField(null=True, blank=True)  # type: ignore[assignment]
+    primary_reservation_unit_name: str = models.CharField(max_length=255)  # type: ignore[assignment]
+    primary_unit_tprek_id: str | None = models.CharField(max_length=255, null=True, blank=True)  # type: ignore[assignment]  # noqa: DJ001
+    primary_unit_name: str = models.CharField(max_length=255)  # type: ignore[assignment]
 
-    deny_reason: int | None = models.BigIntegerField(null=True, blank=True)
-    deny_reason_text: str = models.CharField(max_length=255)
+    deny_reason: int | None = models.BigIntegerField(null=True, blank=True)  # type: ignore[assignment]
+    deny_reason_text: str = models.CharField(max_length=255)  # type: ignore[assignment]
 
-    cancel_reason: int | None = models.BigIntegerField(null=True, blank=True)
-    cancel_reason_text: str = models.CharField(max_length=255)
+    cancel_reason: int | None = models.BigIntegerField(null=True, blank=True)  # type: ignore[assignment]
+    cancel_reason_text: str = models.CharField(max_length=255)  # type: ignore[assignment]
 
-    purpose: int | None = models.BigIntegerField(null=True, blank=True)
-    purpose_name: str = models.CharField(max_length=255, default="", blank=True)
+    purpose: int | None = models.BigIntegerField(null=True, blank=True)  # type: ignore[assignment]
+    purpose_name: str = models.CharField(max_length=255, default="", blank=True)  # type: ignore[assignment]
 
-    home_city: int | None = models.BigIntegerField(null=True, blank=True)
-    home_city_name: str = models.CharField(max_length=255, default="", blank=True)
-    home_city_municipality_code: str = models.CharField(max_length=255, default="")
+    home_city: int | None = models.BigIntegerField(null=True, blank=True)  # type: ignore[assignment]
+    home_city_name: str = models.CharField(max_length=255, default="", blank=True)  # type: ignore[assignment]
+    home_city_municipality_code: str = models.CharField(max_length=255, default="")  # type: ignore[assignment]
 
-    age_group: int | None = models.BigIntegerField(null=True, blank=True)
-    age_group_name: str = models.CharField(max_length=255, default="", blank=True)
+    age_group: int | None = models.BigIntegerField(null=True, blank=True)  # type: ignore[assignment]
+    age_group_name: str = models.CharField(max_length=255, default="", blank=True)  # type: ignore[assignment]
 
     # Removed from series model
-    ability_group: int | None = models.BigIntegerField(null=True, blank=True)
-    ability_group_name: str = models.CharField(max_length=255, default="", blank=True)
+    ability_group: int | None = models.BigIntegerField(null=True, blank=True)  # type: ignore[assignment]
+    ability_group_name: str = models.CharField(max_length=255, default="", blank=True)  # type: ignore[assignment]
 
     # Reservation statistics specific
 
-    updated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, auto_now=True)
-    priority: int | None = models.IntegerField(null=True, blank=True)
-    priority_name: str = models.CharField(max_length=255, default="", blank=True)
-    duration_minutes: int = models.IntegerField()
-    is_subsidised: bool = models.BooleanField(default=False)
-    is_recurring: bool = models.BooleanField(default=False)
-    recurrence_begin_date: datetime.date | None = models.DateField(null=True, blank=True)
-    recurrence_end_date: datetime.date | None = models.DateField(null=True, blank=True)
-    recurrence_uuid: str = models.CharField(max_length=255, default="", blank=True)
-    reservation_uuid: str = models.CharField(max_length=255, default="", blank=True)
-    reservee_uuid: str = models.CharField(max_length=255, default="", blank=True)
-    reservee_used_ad_login: bool = models.BooleanField(default=False, blank=True)
-    is_applied: bool = models.BooleanField(default=False, blank=True)
+    updated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, auto_now=True)  # type: ignore[assignment]
+    priority: int | None = models.IntegerField(null=True, blank=True)  # type: ignore[assignment]
+    priority_name: str = models.CharField(max_length=255, default="", blank=True)  # type: ignore[assignment]
+    duration_minutes: int = models.IntegerField()  # type: ignore[assignment]
+    is_subsidised: bool = models.BooleanField(default=False)  # type: ignore[assignment]
+    is_recurring: bool = models.BooleanField(default=False)  # type: ignore[assignment]
+    recurrence_begin_date: datetime.date | None = models.DateField(null=True, blank=True)  # type: ignore[assignment]
+    recurrence_end_date: datetime.date | None = models.DateField(null=True, blank=True)  # type: ignore[assignment]
+    recurrence_uuid: str = models.CharField(max_length=255, default="", blank=True)  # type: ignore[assignment]
+    reservation_uuid: str = models.CharField(max_length=255, default="", blank=True)  # type: ignore[assignment]
+    reservee_uuid: str = models.CharField(max_length=255, default="", blank=True)  # type: ignore[assignment]
+    reservee_used_ad_login: bool = models.BooleanField(default=False, blank=True)  # type: ignore[assignment]
+    is_applied: bool = models.BooleanField(default=False, blank=True)  # type: ignore[assignment]
     """Is the reservation done through application process."""
 
     objects: ClassVar[ReservationStatisticManager] = LazyModelManager.new()

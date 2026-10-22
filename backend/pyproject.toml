@@ -29,11 +29,11 @@ django-mptt = "0.18.0"
 django-nh3 = "0.3.1"
 django-redis = "7.0.0"
 django-resilient-logger = "3.1.0"
-djangorestframework = "3.18.1"
+djangorestframework = "3.18.3"
 easy-thumbnails = "2.10.1"
 graphene-django = "3.2.3"
-graphene-django-extensions = "0.4.9"
-graphene-django-query-optimizer = "0.10.16"
+graphene-django-extensions = "0.5.0"
+graphene-django-query-optimizer = "0.11.0"
 helsinki-profile-gdpr-api = "1.1.0"
 html2text = "2025.4.15"
 icalendar = "7.3.0"
@@ -93,6 +93,65 @@ django-stubs = { version = "6.1.2", extras = ["compatible-mypy"] }
 
 [project.entry-points.pytest11]
 tilavarauspalvelu = "tests.plugins"
+
+[tool.mypy]
+plugins = [
+    "mypy_django_plugin.main",
+]
+exclude = [
+    "/migrations/",
+]
+
+[[tool.mypy.overrides]]
+# These packages have no type hints or stubs.
+module = [
+    "adminsortable2.*",
+    "admin_data_views.*",
+    "auditlog.*",
+    "celery.*",
+    "dateutil.*",
+    "django_celery_beat.*",
+    "django_celery_results.*",
+    "django_filters.*",
+    "django_jinja.*",
+    "django_redis.*",
+    "easy_thumbnails.*",
+    "graphene.*",
+    "graphene_django.*",
+    "health_check.*",
+    "helsinki_gdpr.*",
+    "import_export.*",
+    "kombu.*",
+    "more_admin_filters.*",
+    "polib.*",
+    "rangefilter.*",
+    "resilient_logger.*",
+    "tinymce.*",
+    "xhtml2pdf.*",
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# Read the source so that the plugin can see the fields of `User`, which subclasses a model from here.
+module = ["helusers.*"]
+follow_untyped_imports = true
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+# Read the source so that the plugin sees `Space`, which subclasses a model from here, as a model.
+module = ["mptt.*"]
+follow_untyped_imports = true
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+# The stub types the managers and querysets more loosely than Django does.
+module = ["tilavarauspalvelu.models._base"]
+ignore_errors = true
+
+[tool.django-stubs]
+django_settings_module = "config.settings"
+# The settings are attributes of `env_config` classes, so the plugin cannot find them in the settings module.
+strict_settings = false
 
 [tool.ruff]
 fix = true
@@ -402,6 +461,8 @@ exempt-modules = [
 
 "graphene_django_extensions.typing.GQLInfo".msg = "Use `tilavarauspalvelu.typing.GQLInfo` instead."
 "query_optimizer.typing.GQLInfo".msg = "Use `tilavarauspalvelu.typing.GQLInfo` instead."
+"graphene_django_extensions.typing.AnyUser".msg = "Use `tilavarauspalvelu.typing.AnyUser` instead."
+"query_optimizer.typing.AnyUser".msg = "Use `tilavarauspalvelu.typing.AnyUser` instead."
 
 "django.contrib.auth.get_user_model".msg = "Use `tilavarauspalvelu.models.User` instead."
 

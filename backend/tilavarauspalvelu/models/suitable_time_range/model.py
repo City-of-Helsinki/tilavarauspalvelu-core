@@ -29,12 +29,12 @@ __all__ = [
 class SuitableTimeRange(models.Model):
     """Represent a time range that the applicant has marked as suitable for their application section."""
 
-    priority: Priority = TextChoicesField(enum=Priority)
-    day_of_the_week: Weekday = TextChoicesField(enum=Weekday)
-    begin_time: datetime.time = models.TimeField()
-    end_time: datetime.time = models.TimeField()
+    priority: Priority = TextChoicesField(enum=Priority)  # type: ignore[assignment]
+    day_of_the_week: Weekday = TextChoicesField(enum=Weekday)  # type: ignore[assignment]
+    begin_time: datetime.time = models.TimeField()  # type: ignore[assignment]
+    end_time: datetime.time = models.TimeField()  # type: ignore[assignment]
 
-    application_section: ApplicationSection = models.ForeignKey(
+    application_section: ApplicationSection = models.ForeignKey(  # type: ignore[assignment]
         "tilavarauspalvelu.ApplicationSection",
         related_name="suitable_time_ranges",
         on_delete=models.CASCADE,

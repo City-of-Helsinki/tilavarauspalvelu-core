@@ -11,6 +11,10 @@ class ApplicationRoundResetError(Exception):
     """Error when resetting application round"""
 
 
+class EmailTypeNotFoundError(Exception):
+    """Error when an email type with the given value does not exist"""
+
+
 class FirstReservableTimeError(Exception):
     """Error when calculating first reservable time"""
 
