@@ -38,7 +38,7 @@ helsinki-profile-gdpr-api = "1.1.0"
 html2text = "2025.4.15"
 icalendar = "7.3.0"
 mjml-python = "1.4.2"
-Pillow = "12.3.0"
+Pillow = "13.0.0"
 psycopg2 = "2.9.13"
 python-dateutil = "2.9.0.post0"
 redis = { version = "6.4.0", extras = ["hiredis"] }
