@@ -1,0 +1,17 @@
+Selvitetään verkkokaupan tiimin kanssa, miten Varaamo voi lähettää useamman tilausrivin samassa tilauksessa, eri tuotteilla ja eri tiliöinnillä.
+
+h3. Taustaa
+* Varaamolla on nyt yksi verkkokaupan tuote (product) varausyksikköä kohden, ja tilauksessa on yksi tilausrivi.
+* Uudessa hinnoittelussa varauksella voi olla useampi hintarivi, joilla on eri ALV ja eri accounting. Verkkokauppa pitää yhden accountingin (ja ALV-koodin) per tuote, joten eri accountingit tarvitsevat eri tuotteet.
+* Tuotteen ID muodostetaan verkkokaupan koodissa näin: UUID3(UUID3(namespace, namespaceEntityId), merchantId). Varaamo käyttäisi uusille tuotteille namespaceEntityId-arvoa muodossa "<varausyksikkö>:<accounting>:<verotaso>".
+* Verkkokauppa tekee meille tukea tilauksille (subscriptions), jota kausivaraukset tarvitsevat.
+
+h3. Kysymykset verkkokaupan tiimille
+* Voiko yhdellä varausyksiköllä (namespaceEntityId) olla useampi tuote, kun entity ID on merkkijono kuten "123:4:5"?
+* Voiko yhdessä tilauksessa olla useampi tilausrivi eri tuotteilla ja eri ALV-prosenteilla?
+* Toimiiko palautus (refund) tilausriveittäin?
+* Ovatko product accountingin activeFrom ja nextEntity käytössä ja tuettuja ajastettuun accountingin muutokseen?
+* Miten tilaukset (subscriptions) toimivat kausivarauksissa, ja miten ne liittyvät useaan tilausriviin?
+
+h3. Valmis, kun
+* Vastaukset on kirjattu tähän tikettiin ja linkitetty verkkokaupan BE-tiketteihin.

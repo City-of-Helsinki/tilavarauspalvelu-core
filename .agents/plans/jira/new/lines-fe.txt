@@ -1,0 +1,10 @@
+Asiakkaan varauksen tiedot ("omat varaukset") näyttävät hinnan varauksen hintariveistä (TILA-4551). Tämä tiketti kattaa nykyisen tilanteen, jossa varauksella on yksi hintarivi.
+
+h3. Toteutus
+* Näytä varauksen hinta ja ALV hintariveistä varauksen tiedoissa ja maksuilmoituksessa (PaymentNotification).
+* Näytä varauksen kokonaishinta sen hintariveistä. Jos rivejä on enemmän kuin yksi, listaa ne yksinkertaisena tekstinä. Näin myöhemmin tuleva lisärivi ei katoa näkyvistä. Parempi esitystapa tulee tiketissä "FE: Useampi hintarivi ja vaihteleva hinta asiakassovelluksessa".
+* Näytä material price descriptionit.
+* Toteutus seuraa TILA-4548:n suunnitelmaa.
+
+h3. Julkaisu
+* Julkaistaan samassa julkaisussa kuin TILA-4545.

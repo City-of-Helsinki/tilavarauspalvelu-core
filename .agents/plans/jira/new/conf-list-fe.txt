@@ -1,0 +1,6 @@
+Jaettujen pricing groupien listasivu staff UI:ssa. Toteutus seuraa TILA-4447:n suunnitelmaa.
+
+h3. Toteutus
+* Listaa jaetut pricing groupit, joita käyttäjä voi nähdä, unit groupin mukaan.
+* Näytä jokaisesta ryhmästä nimi, unit group ja varausyksiköiden määrä.
+* Linkki ryhmän näkymäsivulle ja uuden ryhmän luontiin.

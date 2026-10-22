@@ -1,0 +1,35 @@
+Muutetaan veroprosentti verotasoksi (tax level). Henkilökunta valitsee hinnoittelulle verotason, esim. "Liikunta" tai "Yleinen", ei prosenttia. Tason prosentti voi muuttua ajan myötä ilman, että hinnoitteluja muutetaan.
+
+h3. Ennen toteutusta
+* Tuotanto: listaa kaikki TaxPercentage-rivit (is_enabled) ja kuinka moni mennyt, aktiivinen ja tuleva pricing käyttää kutakin.
+* Tuotanto: listaa is_activated_on_begins-ketjut (vanha % → uusi % päivämääränä, sama hinta). Tarkista, että jokainen ketju vastaa yhtä verotasoa.
+* Tuotanto: listaa pricingit, jotka eivät kuulu mihinkään ketjuun, ja päätä miten ne käsitellään.
+* PO: sovi verotasojen nimet ja mitkä prosentit kuuluvat mihinkin tasoon.
+
+h3. Backend
+* Mallit TaxLevel (name, translated) ja TaxLevelRate (tax_level, begins, percentage). Unique (tax_level, begins).
+* Helper: verotason prosentti annettuna päivänä.
+* ReservationUnitPricing.tax_level korvaa tax_percentage-kentän.
+* Data migration: luo tasot ja niiden prosenttihistoria tuotannon tarkistuksen perusteella, PO:n kanssa sovituilla nimillä. Aseta tax_level jokaiselle pricingille.
+* Data migration: poista pricingit, jotka muuttivat vain ALV:n (is_activated_on_begins=True ja sama hinta kuin edellisessä).
+* ALV myyntipäivän mukaan: approve serializer ja maksun view käyttävät verotason prosenttia sinä päivänä. Varaus ilman verkkokaupan tilausta käyttää varauksen tekopäivän prosenttia.
+* Poista is_activated_on_begins API:sta ja sitä käyttävästä logiikasta (past_or_active, active). Sarake jää, poisto TILA-4558:ssa.
+* Poista task update_reservation_unit_pricings_tax_percentage ja action add_new_pricings_for_tax_percentage.
+* GraphQL: taxLevels-query taxPercentages-queryn tilalle. Pricing palauttaa taxLevel-kentän ja sen nykyisen prosentin.
+* Django admin verotasoille ja prosenteille. TaxPercentage-taulu jää, mutta sen admin ja API poistetaan. Taulun poisto TILA-4558:ssa.
+* Päivitä muu TaxPercentagea käyttävä koodi: reservation_unit_exporter.py, data creation -komennot ja robottitestien data.
+* Testit: prosentti päivän mukaan, ALV-muutos varauksen ja maksun välissä, ALV-muutos varauksen ja hyväksynnän välissä, migraation ketjut.
+
+h3. Frontend
+* Staff UI:n hinnoittelulomake: verotason select veroprosentin selectin tilalle. Näytä vain tasot.
+* Staff UI:n hinnoittelulomake: poista "is activated on begins" -checkbox.
+* Staff UI:n hinnoittelulomake: laske nettohinnat valitun tason nykyisellä prosentilla.
+* Customer UI: lue ALV-prosentti pricingin verotasosta.
+* Päivitä GraphQL-queryt, fragmentit ja testien mockit.
+
+h3. Julkaisu
+* Aja migraatio tuotantodatan kopiolla ja vertaa kaikkien aktiivisten ja tulevien pricingien ALV ennen ja jälkeen.
+* Tiedote henkilökunnalle: veroprosentin valinta on nyt verotason valinta.
+
+h3. Ei tässä tiketissä
+* vat_code-kentän siirto: TILA-4570.

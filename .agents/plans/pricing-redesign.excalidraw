@@ -1,0 +1,3295 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw-jetbrains-plugin",
+  "elements": [
+    {
+      "type": "rectangle",
+      "id": "box-PricingGroup",
+      "x": -15,
+      "y": -137.5,
+      "width": 340,
+      "height": 120.0,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0001",
+      "roundness": null,
+      "seed": 577090038,
+      "version": 39,
+      "versionNonce": 541874185,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-PricingGroup"
+        },
+        {
+          "id": "arrow-ReservationUnitPricingGroup-PricingGroup",
+          "type": "arrow"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PriceComponent-PricingGroup"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PricingGroup-UnitGroup"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 39
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-PricingGroup",
+      "x": 102.19999999999999,
+      "y": -117.5,
+      "width": 105.60000000000001,
+      "height": 80.0,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0002",
+      "roundness": null,
+      "seed": 1095513149,
+      "version": 56,
+      "versionNonce": 2022676065,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 8,
+      "text": "PricingGroup\n\nname\nunit_group?",
+      "originalText": "PricingGroup\n\nname\nunit_group?",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-PricingGroup",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 56
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "box-PriceList",
+      "x": 880,
+      "y": 100,
+      "width": 340,
+      "height": 115,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0003",
+      "roundness": null,
+      "seed": 2127877500,
+      "version": 5,
+      "versionNonce": 346887061,
+      "isDeleted": true,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-PriceList"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PriceComponent-PriceList"
+        },
+        {
+          "id": "arrow-PriceList-PricingGroup",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 5
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-PriceList",
+      "x": 1010.4,
+      "y": 127.5,
+      "width": 79.2,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0004",
+      "roundness": null,
+      "seed": 2028277858,
+      "version": 4,
+      "versionNonce": 520531481,
+      "isDeleted": true,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 8,
+      "text": "PriceList\n\nbegins",
+      "originalText": "PriceList\n\nbegins",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-PriceList",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 4
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "box-PriceComponent",
+      "x": 1332.8571428571427,
+      "y": 397.1428571428571,
+      "width": 340,
+      "height": 540.0,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0005",
+      "roundness": null,
+      "seed": 901749038,
+      "version": 15,
+      "versionNonce": 172723945,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-PriceComponent"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PriceComponent-PriceOption"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PriceComponent-TaxLevel"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PriceComponent-PaymentAccounting"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationPriceLine-PriceComponent"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PriceComponent-PricingGroup"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 15
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-PriceComponent",
+      "x": 1384.0571428571427,
+      "y": 417.1428571428571,
+      "width": 237.60000000000002,
+      "height": 500.0,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0006",
+      "roundness": null,
+      "seed": 2095328387,
+      "version": 13,
+      "versionNonce": 355273138,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 8,
+      "text": "PriceComponent\n\nkind\nvalid_from\nvalid_until?\nprice_option?\namount\nprice_unit?\ntax_level?\naccounting?\nis_adjustable\ncan_apply_for_discount\nmaterial_price_description?\npayment_type?\nweekdays?\ntime_begins?\ntime_ends?\ndates_begin?\ndates_end?\nelapsed_from?\nelapsed_to?\nmin_total_duration?\nmax_total_duration?\nmin_lead_time?\nmax_lead_time?",
+      "originalText": "PriceComponent\n\nkind\nvalid_from\nvalid_until?\nprice_option?\namount\nprice_unit?\ntax_level?\naccounting?\nis_adjustable\ncan_apply_for_discount\nmaterial_price_description?\npayment_type?\nweekdays?\ntime_begins?\ntime_ends?\ndates_begin?\ndates_end?\nelapsed_from?\nelapsed_to?\nmin_total_duration?\nmax_total_duration?\nmin_lead_time?\nmax_lead_time?",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-PriceComponent",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 13
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "box-ReservationUnitPricingGroup",
+      "x": 0,
+      "y": 150,
+      "width": 340,
+      "height": 115,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0007",
+      "roundness": null,
+      "seed": 1674216078,
+      "version": 6,
+      "versionNonce": 1451322669,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-ReservationUnitPricingGroup"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationUnitPricingGroup-ReservationUnit"
+        },
+        {
+          "id": "arrow-ReservationUnitPricingGroup-PricingGroup",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1792399036757,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 6
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-ReservationUnitPricingGroup",
+      "x": 51.19999999999999,
+      "y": 177.5,
+      "width": 237.60000000000002,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0008",
+      "roundness": null,
+      "seed": 9045415,
+      "version": 5,
+      "versionNonce": 826078042,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 8,
+      "text": "ReservationUnitPricingGroup\n\nbegins",
+      "originalText": "ReservationUnitPricingGroup\n\nbegins",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-ReservationUnitPricingGroup",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 5
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "box-ReservationPriceLine",
+      "x": 880,
+      "y": 700,
+      "width": 340,
+      "height": 280.0,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0009",
+      "roundness": null,
+      "seed": 1143881028,
+      "version": 11,
+      "versionNonce": 1849194657,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-ReservationPriceLine"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationPriceLine-Reservation"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationPriceLine-PriceComponent"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationPriceLine-PaymentAccounting"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationPriceLine-PaymentProduct"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 11
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-ReservationPriceLine",
+      "x": 944.4,
+      "y": 720.0,
+      "width": 211.20000000000002,
+      "height": 240.0,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0010",
+      "roundness": null,
+      "seed": 439062304,
+      "version": 9,
+      "versionNonce": 115102369,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 8,
+      "text": "ReservationPriceLine\n\ndescription\nquantity\nprice_unit\nunit_amount\namount_before_adjustment\nadjustment_percentage\namount\noverride_amount?\ntax_percentage\nvat_code",
+      "originalText": "ReservationPriceLine\n\ndescription\nquantity\nprice_unit\nunit_amount\namount_before_adjustment\nadjustment_percentage\namount\noverride_amount?\ntax_percentage\nvat_code",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-ReservationPriceLine",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 9
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "box-PriceOption",
+      "x": 1320,
+      "y": 150,
+      "width": 340,
+      "height": 160.0,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0011",
+      "roundness": null,
+      "seed": 131383005,
+      "version": 13,
+      "versionNonce": 753560073,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-PriceOption"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PriceComponent-PriceOption"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-Reservation-PriceOption"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ApplicationSection-PriceOption"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PriceOption-UnitGroup"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 13
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-PriceOption",
+      "x": 1441.6,
+      "y": 170.0,
+      "width": 96.80000000000001,
+      "height": 120.0,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0012",
+      "roundness": null,
+      "seed": 109289146,
+      "version": 28,
+      "versionNonce": 1980344059,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 8,
+      "text": "PriceOption\n\nname\ndescription\nis_active\nunit_group",
+      "originalText": "PriceOption\n\nname\ndescription\nis_active\nunit_group",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-PriceOption",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 28
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "box-ApplicationSection",
+      "x": 1320,
+      "y": -50,
+      "width": 340,
+      "height": 115,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0013",
+      "roundness": null,
+      "seed": 1637259728,
+      "version": 8,
+      "versionNonce": 1883902826,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-ApplicationSection"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ApplicationSection-PriceOption"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 8
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-ApplicationSection",
+      "x": 1410.8,
+      "y": -22.5,
+      "width": 158.4,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0014",
+      "roundness": null,
+      "seed": 1812976886,
+      "version": 8,
+      "versionNonce": 1480949672,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 8,
+      "text": "ApplicationSection\n\n+ price_option",
+      "originalText": "ApplicationSection\n\n+ price_option",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-ApplicationSection",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 8
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "box-ReservationUnit",
+      "x": 0,
+      "y": 400,
+      "width": 340,
+      "height": 140.0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0015",
+      "roundness": null,
+      "seed": 952158462,
+      "version": 10,
+      "versionNonce": 1997328357,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-ReservationUnit"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-Reservation-ReservationUnit"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationUnit-Unit"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationUnit-PaymentAccounting"
+        },
+        {
+          "id": "arrow-ReservationUnitPricingGroup-ReservationUnit",
+          "type": "arrow"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationUnitPricing-ReservationUnit"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PaymentProduct-ReservationUnit"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 10
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-ReservationUnit",
+      "x": 27.0,
+      "y": 420.0,
+      "width": 286.0,
+      "height": 100.0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0016",
+      "roundness": null,
+      "seed": 2129497365,
+      "version": 7,
+      "versionNonce": 129884233,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 20,
+      "fontFamily": 8,
+      "text": "ReservationUnit\n\n- payment_product\n- can_apply_free_of_charge",
+      "originalText": "ReservationUnit\n\n- payment_product\n- can_apply_free_of_charge",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-ReservationUnit",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 7
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "box-Reservation",
+      "x": 880,
+      "y": 0,
+      "width": 340,
+      "height": 180,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0017",
+      "roundness": null,
+      "seed": 1484771969,
+      "version": 8,
+      "versionNonce": 1549436651,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-Reservation"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationPriceLine-Reservation"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-Reservation-ReservationUnit"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-Reservation-PriceOption"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 8
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-Reservation",
+      "x": 931.2,
+      "y": 20,
+      "width": 237.60000000000002,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0018",
+      "roundness": null,
+      "seed": 939657386,
+      "version": 8,
+      "versionNonce": 312832717,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 8,
+      "text": "Reservation\n\n+ price_option\nprice\nnon_subsidised_price\n- tax_percentage_value\n- unit_price",
+      "originalText": "Reservation\n\n+ price_option\nprice\nnon_subsidised_price\n- tax_percentage_value\n- unit_price",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-Reservation",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 8
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "box-TaxLevel",
+      "x": 1760,
+      "y": 950,
+      "width": 340,
+      "height": 115,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0019",
+      "roundness": null,
+      "seed": 1244602539,
+      "version": 9,
+      "versionNonce": 1658799186,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-TaxLevel"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PriceComponent-TaxLevel"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-TaxLevelRate-TaxLevel"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PaymentProduct-TaxLevel"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 9
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-TaxLevel",
+      "x": 1894.8,
+      "y": 977.5,
+      "width": 70.4,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0020",
+      "roundness": null,
+      "seed": 1787479227,
+      "version": 7,
+      "versionNonce": 101820208,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 8,
+      "text": "TaxLevel\n\nname",
+      "originalText": "TaxLevel\n\nname",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-TaxLevel",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 7
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "box-TaxLevelRate",
+      "x": 1760,
+      "y": 550,
+      "width": 340,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0021",
+      "roundness": null,
+      "seed": 798461320,
+      "version": 7,
+      "versionNonce": 810678671,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-TaxLevelRate"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-TaxLevelRate-TaxLevel"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 7
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-TaxLevelRate",
+      "x": 1846.4,
+      "y": 570,
+      "width": 167.20000000000002,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0022",
+      "roundness": null,
+      "seed": 519218417,
+      "version": 7,
+      "versionNonce": 1130695759,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 8,
+      "text": "TaxLevelRate\n\nbegins\npercentage\nvat_code (internal)",
+      "originalText": "TaxLevelRate\n\nbegins\npercentage\nvat_code (internal)",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-TaxLevelRate",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 7
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "box-PaymentAccounting",
+      "x": 440,
+      "y": 600,
+      "width": 340,
+      "height": 115,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0025",
+      "roundness": null,
+      "seed": 2144743703,
+      "version": 9,
+      "versionNonce": 377958592,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-PaymentAccounting"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PriceComponent-PaymentAccounting"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationUnit-PaymentAccounting"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-Unit-PaymentAccounting"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationPriceLine-PaymentAccounting"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PaymentProduct-PaymentAccounting"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 9
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-PaymentAccounting",
+      "x": 535.2,
+      "y": 627.5,
+      "width": 149.60000000000002,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0026",
+      "roundness": null,
+      "seed": 148287320,
+      "version": 6,
+      "versionNonce": 604555654,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 8,
+      "text": "PaymentAccounting\n\n- vat_code",
+      "originalText": "PaymentAccounting\n\n- vat_code",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-PaymentAccounting",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 6
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "box-Unit",
+      "x": 0,
+      "y": 750,
+      "width": 340,
+      "height": 90,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0027",
+      "roundness": null,
+      "seed": 1042560228,
+      "version": 10,
+      "versionNonce": 1744467508,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-Unit"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationUnit-Unit"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-Unit-PaymentAccounting"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-Unit-PaymentMerchant"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-UnitGroup-Unit"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 10
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-Unit",
+      "x": 148,
+      "y": 782.5,
+      "width": 44,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0028",
+      "roundness": null,
+      "seed": 1779465078,
+      "version": 10,
+      "versionNonce": 1844834445,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 20,
+      "fontFamily": 8,
+      "text": "Unit",
+      "originalText": "Unit",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-Unit",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 10
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "box-PaymentProduct",
+      "x": 440,
+      "y": 950,
+      "width": 340,
+      "height": 140,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0029",
+      "roundness": null,
+      "seed": 1576784850,
+      "version": 12,
+      "versionNonce": 1381619901,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-PaymentProduct"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PaymentProduct-PaymentMerchant"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationPriceLine-PaymentProduct"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PaymentProduct-ReservationUnit"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PaymentProduct-PaymentAccounting"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PaymentProduct-TaxLevel"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 12
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-PaymentProduct",
+      "x": 530.8,
+      "y": 970,
+      "width": 158.4,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0030",
+      "roundness": null,
+      "seed": 371375482,
+      "version": 8,
+      "versionNonce": 1757201196,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 8,
+      "text": "PaymentProduct\n\n+ reservation_unit\n+ accounting\n+ tax_level",
+      "originalText": "PaymentProduct\n\n+ reservation_unit\n+ accounting\n+ tax_level",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-PaymentProduct",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 8
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "box-PaymentMerchant",
+      "x": 0,
+      "y": 1000,
+      "width": 340,
+      "height": 90,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0031",
+      "roundness": null,
+      "seed": 463561238,
+      "version": 8,
+      "versionNonce": 1213689212,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-PaymentMerchant"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-Unit-PaymentMerchant"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PaymentProduct-PaymentMerchant"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 8
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-PaymentMerchant",
+      "x": 87.5,
+      "y": 1032.5,
+      "width": 165,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0032",
+      "roundness": null,
+      "seed": 1689017786,
+      "version": 9,
+      "versionNonce": 591333835,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 20,
+      "fontFamily": 8,
+      "text": "PaymentMerchant",
+      "originalText": "PaymentMerchant",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-PaymentMerchant",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 9
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-PriceList-PricingGroup",
+      "x": 875.0000000000001,
+      "y": 187.93377240922857,
+      "width": 105.00000000000011,
+      "height": 20.471517831932715,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0033",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 2103217661,
+      "version": 88,
+      "versionNonce": 1913119069,
+      "isDeleted": true,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -105.00000000000011,
+          20.471517831932715
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-PriceList",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PricingGroup",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 88
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-PriceComponent-PriceList",
+      "x": 1344.8917820050779,
+      "y": 542.1428571428572,
+      "width": 247.13275280439757,
+      "height": 322.1428571428572,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0034",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 2015714665,
+      "version": 12,
+      "versionNonce": 1748669566,
+      "isDeleted": true,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -247.13275280439757,
+          -322.1428571428572
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-PriceComponent",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PriceList",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 12
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-PriceComponent-PriceOption",
+      "x": 1494.7689711285452,
+      "y": 392.14501837053535,
+      "width": 2.26903469406534,
+      "height": 77.1471795982136,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0035",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1325123799,
+      "version": 17,
+      "versionNonce": 281889638,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1792405766428,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -2.26903469406534,
+          -77.1471795982136
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-PriceComponent",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PriceOption",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 17
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-PriceComponent-TaxLevel",
+      "x": 1676.767540207831,
+      "y": 805.7186169047349,
+      "width": 177.16046747820678,
+      "height": 141.16548955412316,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0036",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 731644239,
+      "version": 18,
+      "versionNonce": 36351029,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          177.16046747820678,
+          141.16548955412316
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-PriceComponent",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-TaxLevel",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 18
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-PriceComponent-PaymentAccounting",
+      "x": 1327.857434431636,
+      "y": 665.2528602918617,
+      "width": 542.8577260061293,
+      "height": 5.862863440866249,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0037",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 974688456,
+      "version": 17,
+      "versionNonce": 1698855225,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1792405766428,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -542.8577260061293,
+          -5.862863440866249
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-PriceComponent",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PaymentAccounting",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 17
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-ReservationUnitPricingGroup-PricingGroup",
+      "x": 166.7108900449125,
+      "y": 145.00691085333744,
+      "width": 8.290201142456567,
+      "height": 157.5138217066749,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0038",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 856916274,
+      "version": 78,
+      "versionNonce": 684844717,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1792405650468,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -8.290201142456567,
+          -157.5138217066749
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-ReservationUnitPricingGroup",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PricingGroup",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 78
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-ReservationUnitPricingGroup-ReservationUnit",
+      "x": 170.0,
+      "y": 270.0,
+      "width": 0.0,
+      "height": 125.0,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0039",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1737120420,
+      "version": 43,
+      "versionNonce": 814178840,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1792399042688,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          125.0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-ReservationUnitPricingGroup",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-ReservationUnit",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 43
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-ReservationPriceLine-Reservation",
+      "x": 1050.0,
+      "y": 695.0,
+      "width": 0.0,
+      "height": 510.0,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0040",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1517300987,
+      "version": 15,
+      "versionNonce": 407950190,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          -510.0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-ReservationPriceLine",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-Reservation",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 15
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-ReservationPriceLine-PriceComponent",
+      "x": 1224.6712704725453,
+      "y": 773.3273699458108,
+      "width": 103.51460191205206,
+      "height": 39.51188274876449,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0041",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1156546540,
+      "version": 17,
+      "versionNonce": 533556220,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1792405766428,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          103.51460191205206,
+          -39.51188274876449
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-ReservationPriceLine",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PriceComponent",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 17
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-Reservation-ReservationUnit",
+      "x": 875.409688232319,
+      "y": 165.3912709905895,
+      "width": 538.7141133067433,
+      "height": 232.6265489279119,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0042",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1647934408,
+      "version": 15,
+      "versionNonce": 1800324408,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -538.7141133067433,
+          232.6265489279119
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-Reservation",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-ReservationUnit",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 15
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-Reservation-PriceOption",
+      "x": 1224.7646289000663,
+      "y": 145.60692737729383,
+      "width": 90.47074219986735,
+      "height": 28.786145245412342,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0043",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 882552465,
+      "version": 15,
+      "versionNonce": 2120549894,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          90.47074219986735,
+          28.786145245412342
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-Reservation",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PriceOption",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 15
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-ApplicationSection-PriceOption",
+      "x": 1490.0,
+      "y": 70.0,
+      "width": 0.0,
+      "height": 75.0,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0044",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 241047739,
+      "version": 15,
+      "versionNonce": 2105384418,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          75.0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-ApplicationSection",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PriceOption",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 15
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-TaxLevelRate-TaxLevel",
+      "x": 1930.0,
+      "y": 695.0,
+      "width": 0.0,
+      "height": 250.0,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0045",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1566529389,
+      "version": 15,
+      "versionNonce": 393071125,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          250.0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-TaxLevelRate",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-TaxLevel",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 15
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-ReservationUnit-Unit",
+      "x": 170.0,
+      "y": 545.0,
+      "width": 0.0,
+      "height": 200.0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0050",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 120151619,
+      "version": 15,
+      "versionNonce": 213667364,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          200.0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-ReservationUnit",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-Unit",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 15
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-ReservationUnit-PaymentAccounting",
+      "x": 338.8664375154023,
+      "y": 541.9601296230408,
+      "width": 131.6004583025287,
+      "height": 56.079740753918486,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0051",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 761116572,
+      "version": 15,
+      "versionNonce": 383130947,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          131.6004583025287,
+          56.079740753918486
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-ReservationUnit",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PaymentAccounting",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 15
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-Unit-PaymentAccounting",
+      "x": 318.77239989017517,
+      "y": 748.5086250343203,
+      "width": 116.45520021964967,
+      "height": 36.39225006864058,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0052",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 393425037,
+      "version": 15,
+      "versionNonce": 371016600,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          116.45520021964967,
+          -36.39225006864058
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-Unit",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PaymentAccounting",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 15
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-Unit-PaymentMerchant",
+      "x": 170.0,
+      "y": 845.0,
+      "width": 0.0,
+      "height": 150.0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0053",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 139410903,
+      "version": 15,
+      "versionNonce": 872598605,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          150.0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-Unit",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PaymentMerchant",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 15
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-PaymentProduct-PaymentMerchant",
+      "x": 435.00805127571374,
+      "y": 1029.9427243593345,
+      "width": 90.01610255142748,
+      "height": 5.114551281330932,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0054",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 357487891,
+      "version": 15,
+      "versionNonce": 1982664703,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -90.01610255142748,
+          5.114551281330932
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-PaymentProduct",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PaymentMerchant",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null,
+      "customData": {
+        "agentVersion": 15
+      }
+    },
+    {
+      "type": "text",
+      "id": "legend",
+      "x": 932.5,
+      "y": 1163.75,
+      "width": 564,
+      "height": 375.0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "a0055",
+      "roundness": null,
+      "seed": 1945614991,
+      "version": 29,
+      "versionNonce": 1961901383,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 20,
+      "fontFamily": 8,
+      "text": "Pricing redesign\n\n- Green: new. \n- Black: existing.\n- Red: removed.\n- Crow's foot: the 'many' side.\n- Bar: the 'one' side.\n- Crow's foot at both ends: many-to-many.\n- Dashed: nullable.\n- '?' after a field: nullable.\n- '+' added field.\n- '-' removed field.\n\nNot drawn:\n- ReservationUnit -> PaymentMerchant (optional)",
+      "originalText": "Pricing redesign\n\n- Green: new. \n- Black: existing.\n- Red: removed.\n- Crow's foot: the 'many' side.\n- Bar: the 'one' side.\n- Crow's foot at both ends: many-to-many.\n- Dashed: nullable.\n- '?' after a field: nullable.\n- '+' added field.\n- '-' removed field.\n\nNot drawn:\n- ReservationUnit -> PaymentMerchant (optional)",
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "customData": {
+        "agentVersion": 29
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-ReservationPriceLine-PaymentAccounting",
+      "x": 875.3815159129472,
+      "y": 767.5730151229837,
+      "width": 122.13289483959306,
+      "height": 50.65739388233112,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b90056",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 261282612,
+      "version": 11,
+      "versionNonce": 508256154,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 11
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -122.13289483959306,
+          -50.65739388233112
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-ReservationPriceLine",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PaymentAccounting",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-ReservationPriceLine-PaymentProduct",
+      "x": 875.3722652189716,
+      "y": 911.438618774057,
+      "width": 90.74453043794324,
+      "height": 37.12276245188605,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b90057",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1694490299,
+      "version": 11,
+      "versionNonce": 287930729,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 11
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -90.74453043794324,
+          37.12276245188605
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-ReservationPriceLine",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PaymentProduct",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "type": "rectangle",
+      "id": "box-ReservationUnitPricing",
+      "x": -440,
+      "y": 650,
+      "width": 340,
+      "height": 160,
+      "angle": 0,
+      "strokeColor": "#e03131",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b90058",
+      "roundness": null,
+      "seed": 1361283773,
+      "version": 7,
+      "versionNonce": 115487118,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-ReservationUnitPricing"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationUnitPricing-ReservationUnit"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationUnitPricing-TaxPercentage"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 7
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-ReservationUnitPricing",
+      "x": -375.6,
+      "y": 670,
+      "width": 211.2,
+      "height": 120,
+      "angle": 0,
+      "strokeColor": "#e03131",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b90059",
+      "roundness": null,
+      "seed": 14888617,
+      "version": 5,
+      "versionNonce": 119288380,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 5
+      },
+      "fontSize": 16,
+      "fontFamily": 8,
+      "text": "ReservationUnitPricing\n\nbegins\nlowest_price\nhighest_price\nis_activated_on_begins",
+      "originalText": "ReservationUnitPricing\n\nbegins\nlowest_price\nhighest_price\nis_activated_on_begins",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-ReservationUnitPricing",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle",
+      "id": "box-TaxPercentage",
+      "x": -440,
+      "y": 900,
+      "width": 340,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#e03131",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b90060",
+      "roundness": null,
+      "seed": 264774194,
+      "version": 6,
+      "versionNonce": 75065931,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-TaxPercentage"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-ReservationUnitPricing-TaxPercentage"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 6
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-TaxPercentage",
+      "x": -332.4,
+      "y": 920,
+      "width": 124.8,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#e03131",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b90061",
+      "roundness": null,
+      "seed": 459829835,
+      "version": 5,
+      "versionNonce": 1577908532,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 5
+      },
+      "fontSize": 16,
+      "fontFamily": 8,
+      "text": "TaxPercentage\n\nvalue",
+      "originalText": "TaxPercentage\n\nvalue",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-TaxPercentage",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-ReservationUnitPricing-ReservationUnit",
+      "x": -130.31075197431304,
+      "y": 647.4563534393668,
+      "width": 177.544580871703,
+      "height": 104.91270687873362,
+      "angle": 0,
+      "strokeColor": "#e03131",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b90062",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 262786293,
+      "version": 11,
+      "versionNonce": 546729543,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 11
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          177.544580871703,
+          -104.91270687873362
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-ReservationUnitPricing",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-ReservationUnit",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-ReservationUnitPricing-TaxPercentage",
+      "x": -270.0,
+      "y": 815.0,
+      "width": 0.0,
+      "height": 80.0,
+      "angle": 0,
+      "strokeColor": "#e03131",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b90063",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 367650042,
+      "version": 11,
+      "versionNonce": 1376646619,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 11
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          80.0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-ReservationUnitPricing",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-TaxPercentage",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-PaymentProduct-ReservationUnit",
+      "x": 550.8765247622279,
+      "y": 946.0956559527848,
+      "width": 321.7530495244557,
+      "height": 402.1913119055696,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b91",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1291917303,
+      "version": 9,
+      "versionNonce": 1793625811,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1792406364212,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -321.7530495244557,
+          -402.1913119055696
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-PaymentProduct",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-ReservationUnit",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "customData": {
+        "agentVersion": 9
+      },
+      "lastCommittedPoint": null
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-PaymentProduct-PaymentAccounting",
+      "x": 610.0,
+      "y": 945.0,
+      "width": 0.0,
+      "height": 225.0,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b92",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1781927608,
+      "version": 9,
+      "versionNonce": 1880879923,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1792406364212,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          -225.0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-PaymentProduct",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PaymentAccounting",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "customData": {
+        "agentVersion": 9
+      },
+      "lastCommittedPoint": null
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-PaymentProduct-TaxLevel",
+      "x": 784.9997758271752,
+      "y": 1018.3428051531517,
+      "width": 970.0004483456496,
+      "height": 9.185610306303488,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b93",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 474027673,
+      "version": 9,
+      "versionNonce": 374352707,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1792406364212,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          970.0004483456496,
+          -9.185610306303488
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-PaymentProduct",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-TaxLevel",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "customData": {
+        "agentVersion": 9
+      },
+      "lastCommittedPoint": null
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-PriceComponent-PricingGroup",
+      "x": 1328.480625155746,
+      "y": 570.8060687466166,
+      "width": 1060.499790907587,
+      "height": 585.888199269295,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b1999870",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1188239821,
+      "version": 7,
+      "versionNonce": 2084595534,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -1060.499790907587,
+          -585.888199269295
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-PriceComponent",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-PricingGroup",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false,
+      "customData": {
+        "agentVersion": 7
+      }
+    },
+    {
+      "type": "rectangle",
+      "id": "box-UnitGroup",
+      "x": -455,
+      "y": 362.5,
+      "width": 340,
+      "height": 65.0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b2425043",
+      "roundness": null,
+      "seed": 469989860,
+      "version": 7,
+      "versionNonce": 296132540,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "text-UnitGroup"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PricingGroup-UnitGroup"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-UnitGroup-Unit"
+        },
+        {
+          "type": "arrow",
+          "id": "arrow-PriceOption-UnitGroup"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 7
+      }
+    },
+    {
+      "type": "text",
+      "id": "text-UnitGroup",
+      "x": -334.5,
+      "y": 382.5,
+      "width": 99.00000000000001,
+      "height": 25.0,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b4593236",
+      "roundness": null,
+      "seed": 2086122038,
+      "version": 4,
+      "versionNonce": 491983887,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 4
+      },
+      "fontSize": 20,
+      "fontFamily": 8,
+      "text": "UnitGroup",
+      "originalText": "UnitGroup",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box-UnitGroup",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-PricingGroup-UnitGroup",
+      "x": 95.71953388909235,
+      "y": -13.840863096809402,
+      "width": 347.04753338665034,
+      "height": 372.68172619361883,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b4007587",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 507460365,
+      "version": 5,
+      "versionNonce": 811289,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 5
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -347.04753338665034,
+          372.68172619361883
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-PricingGroup",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-UnitGroup",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-UnitGroup-Unit",
+      "x": -244.2760456328253,
+      "y": 430.8012785645492,
+      "width": 359.3333412656506,
+      "height": 315.8974428709016,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b8017092",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1305428054,
+      "version": 5,
+      "versionNonce": 1726257415,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 5
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          359.3333412656506,
+          315.8974428709016
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-UnitGroup",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-Unit",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_many",
+      "elbowed": false
+    },
+    {
+      "type": "arrow",
+      "id": "arrow-PriceOption-UnitGroup",
+      "x": 1315.021463852158,
+      "y": 246.26561040247546,
+      "width": 1425.0429277043158,
+      "height": 132.4687791950491,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b8574022",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 377129285,
+      "version": 3,
+      "versionNonce": 2026809407,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "customData": {
+        "agentVersion": 3
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -1425.0429277043158,
+          132.4687791950491
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box-PriceOption",
+        "focus": 0,
+        "gap": 5
+      },
+      "endBinding": {
+        "elementId": "box-UnitGroup",
+        "focus": 0,
+        "gap": 5
+      },
+      "startArrowhead": "crowfoot_many",
+      "endArrowhead": "crowfoot_one",
+      "elbowed": false
+    }
+  ],
+  "appState": {
+    "gridSize": 20,
+    "gridStep": 5,
+    "gridModeEnabled": false,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

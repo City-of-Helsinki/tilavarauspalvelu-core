@@ -1,0 +1,31 @@
+Backend yksittäisvarausputken hintariveille ja asiakkaan hinnoille uudessa hinnoittelun tietomallissa (TILA-4544). Tämä tiketti lisää mallin ja API:t, mutta ei vielä ota niitä käyttöön varauksissa. Käyttöönotto tehdään TILA-4545:ssä. Muutokset eivät riko vanhaa API:a (non-breaking).
+
+h3. Taustaa
+* Varauksella on nyt yksi hinta ja yksi ALV-prosentti. Uudessa mallissa hinta voi koostua useasta osasta, joilla on eri ALV ja accounting (esim. vuokra ja valvontamaksu).
+* Hintarivi (price line) on yksi rivi varauksen hinnasta. Se on kopio käytetyistä arvoista, ei linkki. Myöhemmät hintamuutokset eivät muuta sitä.
+* Asiakassovellus laskee hinnat nyt itse. Uudessa mallissa vain backend voi laskea hinnan, joten frontend tarvitsee hinnat API:sta.
+
+h3. Hintarivit
+* Malli ReservationPriceLine:
+** reservation, price_component (nullable, SET_NULL), description (translated)
+** quantity, price_unit, unit_amount
+** amount_before_adjustment, adjustment_percentage, amount
+** override_amount (nullable, käsittelijän ylikirjoitus, oma tiketti)
+** tax_percentage, vat_code, accounting, payment_product (nullable)
+* Funktio, joka tekee hintarivit varaukselle hinnan laskennan (TILA-4544) tuloksesta: yksi rivi jokaista BASE- tai SURCHARGE-komponenttia kohden. Rivin accounting tulee komponentilta, sitten varausyksiköltä, sitten toimipisteeltä.
+* Reservation.price on rivien lopullisten summien summa. Reservation.non_subsidised_price on summa ilman ylikirjoituksia.
+* Kun verkkokaupan tilaus tehdään, tax_percentage ja vat_code asetetaan uudelleen sen päivän prosentista (TILA-4543:n sääntö). Summat eivät muutu, koska ne sisältävät ALV:n.
+* Verkkokaupan tilauksella on edelleen yksi tilausrivi, jonka summa on varauksen hinta.
+* Varauksen GraphQL-node palauttaa hintarivit.
+
+h3. Hinnat asiakkaalle
+* GraphQL-query hinnalle: varausyksikkö, price option (valinnainen), alku ja loppu. Palauttaa hintarivit (summa, ALV, kuvaus), kokonaishinnan, voiko maksuttomuutta hakea, payment typen ja material price descriptionit. Käyttää samaa laskentaa kuin varauksen luonti.
+* Varausyksikön kenttä hintayhteenvedolle hakukorteille ja listoille: halvin BASE-hinta ja sen yksikkö, ja vaihteleeko hinta. Maksuton varausyksikkö palauttaa "maksuton".
+
+h3. Testidata
+* Data creation -komennot tekevät hintarivit varauksille, jotta frontend voi testata niitä paikallisesti.
+
+h3. Valmis, kun
+* Hinnan query antaa saman hinnan kuin hintarivit, jotka tehdään samalla syötteellä.
+* Varauksen hintarivit ja hintayhteenveto näkyvät GraphQL:ssä testidatalla.
+* Vanha API toimii kuten ennen.

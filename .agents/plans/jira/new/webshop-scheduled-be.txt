@@ -1,0 +1,13 @@
+Ajastettu accountingin muutos verkkokaupassa, kun verotason ALV-prosentti muuttuu.
+
+h3. Taustaa
+* Verkkokaupan product accountingissa on ALV-koodi. Kun verotasolle lisätään uusi prosentti (TaxLevelRate), ALV-koodi voi muuttua tiettynä päivänä.
+* Verkkokaupan product accountingissa on kentät activeFrom ja nextEntity ajastettua muutosta varten. Varaamo ei käytä niitä vielä.
+* Tämä tiketti tarvitaan vain, jos SAP saa uuden ALV-koodin, kun prosentti muuttuu (TILA-4569). Jos vanha koodi alkaa tarkoittaa uutta prosenttia, tätä ei tarvita.
+
+h3. Toteutus
+* Kun uusi TaxLevelRate lisätään, task lähettää nextEntity-tiedon activeFrom = rate.begins jokaiselle tuotteelle, joka käyttää tätä verotasoa.
+* Lokita tuotteet, joiden päivitys epäonnistuu.
+
+h3. Valmis, kun
+* Ajastetun prosenttimuutoksen jälkeen verkkokauppa käyttää uutta ALV-koodia muutospäivästä alkaen ilman käsin tehtävää työtä.

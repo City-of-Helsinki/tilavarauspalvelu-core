@@ -1,0 +1,18 @@
+SURCHARGE-komponentit: summa (€), joka lisätään vuokraan. TILA-4544 lisää komponenttityypin tietokantaan, mutta validointi hylkää sen, kunnes se on toteutettu tässä tiketissä. ADJUSTMENT-komponentit ja jokainen ehto ovat omia tikettejään.
+
+h3. Taustaa
+* Pricing groupissa on price componentteja. Varauksen hinta on täsmäävien komponenttien summa.
+* BASE-komponentti on vuokra (€). Jokaiseen varauksen osaan täsmää tasan yksi BASE-komponentti jokaista price optionia kohden.
+* Esimerkki: koulujen liikuntasalien iltavalvontamaksu lisätään tuntivuokraan.
+
+h3. Toteutus
+* Validointi hyväksyy kind=SURCHARGE.
+* SURCHARGE voi olla päällekkäin muiden komponenttien kanssa. Laskenta lisää jokaiseen varauksen osaan kaikki täsmäävät SURCHARGE-komponentit.
+* Jokainen SURCHARGE saa oman hintarivinsä, omalla ALV:llä ja accountingilla.
+* is_adjustable kertoo, muuttavatko ADJUSTMENT-komponentit sitä. Henkilökunta valitsee sen.
+* Pricing groupin batch API ja hinnan query hyväksyvät SURCHARGE-komponentit.
+* Henkilökunta lisää SURCHARGE-komponentit Django adminissa, kunnes konfiguraattori tukee niitä.
+
+h3. Valmis, kun
+* Varauksella, johon täsmää SURCHARGE, on kaksi hintariviä: vuokra ja lisämaksu.
+* Kaksi täsmäävää SURCHARGE-komponenttia lisätään molemmat.

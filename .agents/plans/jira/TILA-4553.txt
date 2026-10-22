@@ -1,0 +1,11 @@
+Suunnitellaan hinnat asiakkaan "omat kausivaraukset" -näkymään.
+
+h3. Taustaa
+* Hakija valitsee hakemuksen osiolle price optionin, esim. "Aikuiset". Kun jaetuista vuoroista tehdään varauksia, jokainen varaus saa hinnan valitun optionin mukaan (TILA-4549).
+* Varauksen hinta on hintariveinä, esim. vuokra ja lisämaksu. Yksinkertaisissa tapauksissa rivejä on yksi.
+
+h3. Suunniteltavat asiat
+* Suunnitelma kattaa myös useamman hintarivin, koska kausivarauksiin voi tulla lisämaksuja (SURCHARGE).
+* Sarjan kokonaishinta ja valittu price option.
+* Yksittäisen varauksen hinta ja hintarivit.
+* Material price descriptionit, esim. myöhemmin maksettavat materiaalit.

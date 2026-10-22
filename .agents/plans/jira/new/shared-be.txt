@@ -1,0 +1,20 @@
+Backend jaetun hinnoittelun konfiguraattorille: jaettujen pricing groupien ja price optionien hallinta, oikeudet, varausyksikön pricing groupin ajastus ja hinnan esikatselu.
+
+h3. Taustaa
+* Pricing group, jolla on unit group, on jaettu. Sitä voi käyttää moni varausyksikkö. Mallit ovat valmiina (TILA-4544), ja jaetut ryhmät on tähän asti luotu Django adminissa.
+* Unit group linkittää toimipisteitä ja antaa oikeudet UnitRole.unit_groups-kentän kautta.
+* Price option kuuluu unit groupille. Vain jaetut pricing groupit voivat käyttää optioneita.
+
+h3. Toteutus
+* Oikeudet: käyttäjä voi luoda ja muokata jaettua pricing groupia ja price optionia, jos hänellä on rooli sen unit groupissa.
+* GraphQL: lista jaetuista pricing groupeista, joita käyttäjä voi nähdä, ja yksittäisen ryhmän tiedot komponentteineen.
+* Mutationit jaetun pricing groupin luontiin, nimen muutokseen ja poistoon.
+* Mutationit price optionien luontiin ja muokkaukseen (is_active optionin poistamiseen käytöstä).
+* Query: jaetut pricing groupit, joita varausyksikkö voi käyttää: ryhmät, joiden unit group sisältää varausyksikön toimipisteen.
+* Mutation varausyksikön pricing groupin ajastukseen (ReservationUnitPricingGroup, begins). Vaihto omasta hinnoittelusta jaettuun ja takaisin.
+* Hinnan esikatselu: pricing group, tallentamaton muutoserä (sama muoto kuin TILA-4544:n batch mutationissa), price option, päivä ja aikaväli. Palauttaa hintarivit, jotka varaus saisi, ja kattavuusvirheet.
+
+h3. Valmis, kun
+* Käyttäjä näkee ja muokkaa vain oman unit groupinsa jaettuja ryhmiä ja optioneita.
+* Varausyksikön voi siirtää jaettuun ryhmään tulevasta päivästä alkaen.
+* Esikatselu tyhjällä muutoserällä antaa saman hinnan kuin hinnan query.

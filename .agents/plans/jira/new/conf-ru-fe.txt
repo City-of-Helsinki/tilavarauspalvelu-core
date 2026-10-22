@@ -1,0 +1,6 @@
+Varausyksikön sivulle valinta "oma hinnoittelu" tai "jaettu pricing group". Toteutus seuraa TILA-4447:n suunnitelmaa.
+
+h3. Toteutus
+* Valinta varausyksikön hinnoitteluosioon: oma hinnoittelu (TILA-4572:n lomake) tai jaettu pricing group.
+* Jaettu ryhmä: valinta niistä ryhmistä, joita varausyksikkö voi käyttää, ja alkupäivä.
+* Näytä varausyksikön aktiivinen ja ajastettu pricing group.

@@ -1,0 +1,14 @@
+Varausputki ja varauksen muokkaus käyttävät backendin hinnan queryä (TILA-4551) eivätkä laske hintaa itse. Tämä tiketti kattaa nykyisen tilanteen, jossa varauksella on yksi hintarivi.
+
+h3. Taustaa
+* Hinnan query ottaa varausyksikön, price optionin (valinnainen), alun ja lopun. Se palauttaa hintarivit, kokonaishinnan, voiko maksuttomuutta hakea, payment typen ja material price descriptionit.
+
+h3. Toteutus
+* Näytä valitun ajan hinta queryn tuloksesta varausputkessa ja varauksen muokkauksessa.
+* Näytä "hae maksuttomuutta" -kentät vain, jos query sallii sen. Nyt tieto tulee varausyksiköltä.
+* Näytä material price descriptionit queryn tuloksesta.
+* Näytä kokonaishinta hinnan querystä. Jos rivejä on enemmän kuin yksi, listaa ne yksinkertaisena tekstinä. Näin myöhemmin tuleva lisärivi ei katoa näkyvistä. Parempi esitystapa tulee tiketissä "FE: Useampi hintarivi ja vaihteleva hinta asiakassovelluksessa".
+* Toteutus seuraa TILA-4548:n suunnitelmaa.
+
+h3. Julkaisu
+* Julkaistaan samassa julkaisussa kuin TILA-4545.

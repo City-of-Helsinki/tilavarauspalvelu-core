@@ -1,0 +1,18 @@
+Käsittelijä voi ylikirjoittaa varauksen hinnan hintariveittäin. Nyt käsittelijä voi vain tehdä varauksesta maksuttoman. Ylikirjoitus rivikohtaisesti sallii myös osittaisen maksuttomuuden ja hinnan korjaamisen.
+
+h3. Taustaa
+* Varauksen hinta on hintariveinä (TILA-4551). Jokaisella rivillä on override_amount (nullable).
+* Jos override_amount on asetettu, se on rivin lopullinen summa. Se käytetään ADJUSTMENT-komponenttien jälkeen.
+* Reservation.price on rivien lopullisten summien summa. Reservation.non_subsidised_price on summa ilman ylikirjoituksia.
+
+h3. Toteutus
+* Approve mutation ottaa overrideAmount-arvon jokaiselle hintariville.
+* Nykyinen "maksuton" toiminto asettaa jokaisen rivin overrideAmount = 0.
+* Validointi: overrideAmount ei voi olla negatiivinen.
+* Verkkokaupan tilaus käyttää ylikirjoitettuja summia.
+* Vanha API toimii kuten ennen (non-breaking). Käyttöönotto TILA-4545:n kanssa.
+
+h3. Valmis, kun
+* Käsittelijä voi asettaa yhden rivin nollaan ja pitää toisen maksullisena.
+* Käsittelijä voi korjata rivin hinnan ylös- tai alaspäin.
+* Verkkokaupan tilaus käyttää ylikirjoitettuja summia.

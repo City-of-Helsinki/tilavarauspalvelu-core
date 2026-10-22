@@ -1,0 +1,15 @@
+Suunnitellaan asiakassovellukseen useampi hintarivi ja vaihteleva hinta. Tämä jatkaa TILA-4548:aa, joka kattaa tilanteen, jossa varausyksiköllä on yksi hinta.
+
+h3. Taustaa
+* Varauksen hinta on hintariveinä. Lisämaksut (SURCHARGE, TILA-4556) tekevät varaukselle useamman rivin, esim. vuokra ja valvontamaksu.
+* Ehdot (esim. viikonpäivä, kellonaika, kokonaiskesto) tekevät hinnasta vaihtelevan: sama varausyksikkö voi maksaa eri verran eri aikaan.
+* Käsittelijä voi muuttaa yksittäisen rivin hintaa (TILA-4573).
+* Tämä suunnitelma pitää olla valmis ennen kuin ensimmäiset lisämaksut tai ehdot otetaan käyttöön.
+
+h3. Suunniteltavat asiat
+* Hakukortit ja listat: "alkaen X €/h", jos hinta vaihtelee.
+* Varausyksikön sivu: mitä hintoja on mahdollista millä ehdoilla.
+* Kalenterista valittaessa: mitä hintoja valintaan käytettäisiin.
+* Varausputki: useampi hintarivi ja niiden summa.
+* "Omat varaukset", varauksen tiedot ja maksuilmoitus: useampi hintarivi ja niiden summa.
+* Miten asiakas näkee, että käsittelijä on muuttanut rivin hintaa.

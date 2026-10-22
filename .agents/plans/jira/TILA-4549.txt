@@ -1,0 +1,17 @@
+Backend kausivarausten hinnoille. Kun jaetut vuorot muutetaan varauksiksi (reservation series), varaukset käyttävät hakemuksen osiossa valittua price optionia ja saavat hintarivit.
+
+h3. Taustaa
+* Hakija valitsee hakemuksen osiolle (application section) price optionin, esim. "Aikuiset". Valinta tallennetaan jo hakuvaiheessa (price option -tiketti).
+* Hintoja ei tarvita jakovaiheessa. Ne tarvitaan, kun jaetuista vuoroista tehdään varauksia.
+* Hinta lasketaan samalla laskennalla kuin yksittäisvarauksissa (TILA-4544), ja varauksille tehdään hintarivit (TILA-4551).
+
+h3. Toteutus
+* Reservation series -varausten luonti käyttää hakemuksen osion price optionia ja tallentaa sen varaukselle (Reservation.price_option).
+* Jokaiselle varaukselle tehdään hintarivit. Reservation.price on rivien summa.
+* Jos price optionia ei ole tarjolla varauksen päivänä, varausta ei tehdä hinnalla, vaan käsittelijä saa virheen.
+* Reservation seriesin GraphQL-node palauttaa sarjan hinnan ja sen varausten hintarivit staff UI:ta ja "omat kausivaraukset" -näkymää varten.
+* Verkkokaupan tilauksella on edelleen yksi tilausrivi. Useampi tilausrivi on verkkokauppatiketissä.
+
+h3. Valmis, kun
+* Jaetuista vuoroista tehdyillä varauksilla on oikea price option ja hintarivit.
+* Sarjan hinta ja hintarivit näkyvät GraphQL:ssä.

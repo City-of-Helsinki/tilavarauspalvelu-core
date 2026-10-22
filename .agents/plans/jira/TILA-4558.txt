@@ -1,0 +1,9 @@
+Hinnoittelun uudistuksen jälkeen vanhoja malleja ja kenttiä ei enää lueta eikä kirjoiteta. Poistetaan ne ja tarkistetaan tuotannosta, ettei mikään enää riipu niistä.
+
+* TaxPercentage-malli ja -taulu (TILA-4543 jättää sen, jotta migraatio on reversible).
+* ReservationUnitPricing.tax_percentage ja is_activated_on_begins.
+* Vanha hinnoittelun API: pricings-kentät ja -input, taxPercentage-kentät, lowestPrice ja highestPrice, ReservationUnit.can_apply_free_of_charge. TILA-4545:n jälkeen mikään ei käytä niitä.
+* ReservationUnitPricing-malli ja ReservationUnit.can_apply_free_of_charge-sarake.
+* Reservation.tax_percentage_value ja Reservation.unit_price, kun mikään ei enää lue niitä. ReservationStatistic kopioi tax_percentage_value-arvon: täytä se hintariveistä tai pidä se.
+* Lisää kohtia tähän, kun myöhemmät hinnoittelutiketit valmistuvat.
+* Ennen julkaisua: tarkista tuotannosta, ettei mikään rivi viittaa poistettavaan dataan.

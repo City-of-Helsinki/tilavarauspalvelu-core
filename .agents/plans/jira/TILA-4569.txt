@@ -1,0 +1,12 @@
+Jokaisella Varaamon payment accountingilla on SAP:n ALV-koodi (vat_code), esim. "44". Verkkokauppa saa ALV-koodin product accountingin kautta ja ALV-prosentin tilauksen kautta. Varaamo haluaa tallentaa yhden ALV-koodin ALV-prosenttia kohden (TILA-4570), jotta koodi ja prosentti tulevat samasta paikasta eivätkä voi olla ristiriidassa. Sitä ennen pitää tietää, miten SAP käyttää koodia.
+
+h3. Selvitettävät asiat
+* Mitä ALV-koodeja tuotannossa käytetään kullekin ALV-prosentille. Kehittäjä voi listata nämä tietokannasta: accountingit, niiden ALV-koodit ja niitä käyttävien pricingien ALV-prosentit.
+* Taloushallinnolta: mikä SAP:n ALV-koodi kuuluu kullekin käytössä olevalle ALV-prosentille (esim. 0 %, 13,5 % ja 25,5 %).
+* Riippuuko ALV-koodi vain ALV-prosentista? Vai riippuuko se myös jostain muusta, esim. company codesta tai myynnin tyypistä? Jos riippuu, yksi koodi prosenttia kohden ei riitä, ja TILA-4570 pitää muuttaa.
+* Kun ALV-prosentti muuttuu lain mukaan, saako SAP uuden ALV-koodin? Vai alkaako vanha koodi tarkoittaa uutta prosenttia?
+* Vaatiiko SAP, että tuotteen ALV-koodi vastaa tilausrivin ALV-prosenttia? Mitä tapahtuu, jos ne eroavat?
+
+h3. Valmis, kun
+* Vahvistettu taulukko ALV-prosentti → SAP:n ALV-koodi on kirjattu tähän tikettiin.
+* Vastaukset yllä oleviin kysymyksiin on kirjattu tähän tikettiin ja linkitetty TILA-4570:een.

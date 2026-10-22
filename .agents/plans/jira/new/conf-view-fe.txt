@@ -1,0 +1,6 @@
+Yksittäisen jaetun pricing groupin näkymäsivu staff UI:ssa. Toteutus seuraa TILA-4447:n suunnitelmaa.
+
+h3. Toteutus
+* Näytä ryhmän nimi, unit group ja varausyksiköt, jotka käyttävät sitä (myös ajastetut).
+* Näytä komponentit price optioneittain: aktiiviset, tulevat ja menneet.
+* Linkki muokkaussivulle, jos käyttäjällä on oikeus.

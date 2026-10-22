@@ -1,0 +1,72 @@
+Uusi hinnoittelun tietomalli ja sen backend-logiikka. Tämä tiketti lisää mallit, validoinnin, API:n ja hinnan laskennan, mutta ei vielä ota niitä käyttöön varauksissa. Käyttöönotto ja datan migraatio tehdään TILA-4545:ssä samassa julkaisussa frontendin kanssa, jotta kahta tietomallia ei tarvitse tukea yhtä aikaa.
+
+h3. Suhde TILA-4543:een
+Tämä tiketti ei odota TILA-4543:a. PriceComponent.tax_level viittaa TILA-4543:n TaxLevel-malliin. Jos TaxLevel ei ole vielä valmis, tee mallit ilman tax_level-kenttää ja lisää kenttä ja sen check constraintit, kun TILA-4543:n mallit on mergetty. Hinnan laskenta ja API tarvitsevat kentän ennen kuin tiketti on valmis.
+
+h3. Käsitteet
+* *Pricing group*: nimetty joukko hintoja. Varausyksikkö viittaa yhteen pricing groupiin kerrallaan. Jos pricing groupilla on unit group, se on jaettu. Jos ei ole, se on varausyksikön oma.
+* *Price component*: yksi päivätty hintasääntö pricing groupissa. Varauksen hinta on täsmäävien komponenttien summa.
+* *Price option*: asiakkaan valitsema vaihtoehto, esim. "Aikuiset". Yksi unit group omistaa sen.
+
+h3. Mallit
+* PricingGroup: name (translated), unit_group → UnitGroup (nullable).
+* ReservationUnitPricingGroup: reservation_unit, pricing_group, begins. Unique (reservation_unit, begins). Aktiivinen pricing group on rivi, jonka begins on viimeisin varauksen alkupäivänä tai ennen sitä.
+* PriceOption: name, description (translated), is_active, unit_group → UnitGroup.
+* PriceComponent:
+** pricing_group, kind (BASE / SURCHARGE / ADJUSTMENT), valid_from, valid_until (nullable, exclusive)
+** price_option → PriceOption (nullable, null = kaikki vaihtoehdot)
+** amount (€ BASE- ja SURCHARGE-komponenteille, % ADJUSTMENT-komponenteille)
+** price_unit, tax_level, accounting (nullable), is_adjustable, can_apply_for_discount, material_price_description (translated), payment_type (nullable)
+** Ehdot, kaikki nullable: weekdays, time_begins, time_ends, dates_begin, dates_end (kuukausi ja päivä), elapsed_from, elapsed_to, min_total_duration, max_total_duration, min_lead_time, max_lead_time
+
+h3. Check constraintit (PriceComponent)
+||Kenttä||BASE||SURCHARGE||ADJUSTMENT||
+|price_unit|pakollinen|pakollinen|null|
+|tax_level|pakollinen|pakollinen|null|
+|accounting|valinnainen|valinnainen|null|
+|is_adjustable|true|henkilökunta valitsee|false|
+|can_apply_for_discount|henkilökunta valitsee|false|false|
+|material_price_description|valinnainen|valinnainen|tyhjä|
+|payment_type|pakollinen jos amount > 0|null|null|
+* valid_from < valid_until, time_begins < time_ends, ja sama muille väleille.
+* price_unit on FIXED, jos kokonaiskeston ehto on asetettu.
+* Komponentti voi käyttää price optionia vain, jos optionin unit group on sama kuin pricing groupin.
+* Validointi hylkää SURCHARGE- ja ADJUSTMENT-tyypit ja kaikki ehdot, kunnes niiden tiketit on tehty. Kaikki sarakkeet ovat silti mukana tässä migraatiossa.
+
+h3. Kattavuuden validointi (coverage)
+Validointi tarkistaa pricing groupin kaikki BASE-komponentit jokaisen muutoksen jälkeen. Price option on tarjolla päivänä, jos sille on aktiivinen BASE-komponentti. BASE-komponentti ilman optionia koskee kaikkia tarjolla olevia optioneita.
+* Pricing groupin aikaisimmasta valid_from-päivästä eteenpäin, ilman loppua, jokaisena päivänä on vähintään yksi tarjolla oleva option. Viimeisillä BASE-komponenteilla ei siis ole valid_until-päivää.
+* Jokaisena päivänä, jolloin option on tarjolla, sen BASE-komponentit kattavat kaikki muut akselit tasan kerran: viikonpäivät, kellonaika, toistuvat päivämäärät, kulunut aika, kokonaiskesto ja ennakkoaika. Myös ajat, jolloin varausyksikkö on suljettu.
+* Kaikilla samana päivänä aktiivisilla maksullisilla BASE-komponenteilla on sama payment_type.
+* Menetelmä: komponenttien rajat jakavat jokaisen akselin väleihin. Välit muodostavat ruudukon, ja jokaisen ruudun pitää täsmätä tasan yhteen BASE-komponenttiin jokaista tarjolla olevaa optionia kohden.
+* ReservationUnitPricingGroup: pricing groupilla on kattavuus rivin begins-päivästä alkaen.
+* Virheet kertovat komponentit ja päivät tai ajat, joita ne koskevat.
+
+h3. API
+* GraphQL mutation, joka ottaa pricing groupin ID:n ja listan muutettuja, uusia ja poistettuja komponentteja. Backend yhdistää ne tietokannan muihin komponentteihin ja validoi lopputuloksen. Virheet voivat koskea komponentteja, joita käyttäjä ei muuttanut.
+* Muokkaussäännöt: tulevia komponentteja voi muokata ja poistaa. Aktiivisesta komponentista voi muuttaa vain valid_until-päivän, ja vain tulevaan päivään. Menneet komponentit eivät muutu.
+* Reservation unit mutationiin uusi input yksinkertaiselle tilalle, vanhan pricings-inputin rinnalle: jokainen pricing on yksi BASE-komponentti ilman optionia ja ehtoja varausyksikön omassa pricing groupissa. valid_until tulee seuraavan pricingin valid_from-päivästä. Input hyväksytään vain, jos varausyksikkö käyttää omaa pricing groupia, jossa on vain BASE-komponentteja ilman optionia ja ehtoja.
+* GraphQL-queryt pricing groupeille ja komponenteille.
+
+h3. Hinnan laskenta
+Syötteet: varausyksikkö, price option (nullable), alku, loppu ja luontiaika.
+# Hae aktiivinen pricing group varauksen alkupäivän mukaan.
+# Valitse komponentit, joiden price_option on null tai valittu option.
+# Valitse komponentit, joiden koko varausta koskevat ehdot täsmäävät: kokonaiskesto ja ennakkoaika.
+# Jaa varaus osiin keskiyöllä, valid_from- ja valid_until-päivinä ja jokaisen ehdon rajalla.
+# Jokaiselle osalle etsi täsmäävä BASE-komponentti. Jos sitä ei ole, varaus ei ole sallittu.
+# Laske osat yhteen komponenteittain. FIXED-komponentti lasketaan kerran. Muut yksiköt laskevat täsmäävien osien keston. Kokonaiskesto pyöristetään ylöspäin seuraavaan 15 minuuttiin. Päivän tai pidemmät yksiköt laskevat jokaisen alkaneen yksikön.
+* Tämä tiketti tukee vain BASE-komponentteja ilman ehtoja sekä FIXED- ja aikayksiköitä.
+* Varauksen payment_type on varauksen alkuun täsmäävän BASE-komponentin payment_type.
+* Varauksen käyttäjä voi hakea alennusta, jos jokin täsmäävä BASE-komponentti sallii sen (can_apply_for_discount).
+* Laskentaa ei vielä käytetä varauksissa. Käyttöönotto TILA-4545:ssä.
+
+h3. Testidata
+* Päivitä data creation -komennot ja robottitestien data: pricing groupit (omat ja jaetut), BASE-komponentit, price optionit ja hintarivit varauksille. Näin frontend voi tehdä työtä uusia API:ita vasten paikallisesti ennen kuin datan migraatio (TILA-4545) on tuotannossa.
+* Vanha API ja vanhat mallit pysyvät. Muutokset eivät riko mitään (non-breaking).
+
+h3. Testit
+* Jokainen check constraint.
+* Kattavuus: aukot ajassa, aukot päivämäärissä, päällekkäisyydet, ristiriitaiset payment_typet.
+* Batch mutation: hinnanmuutos tulevasta päivästä yhdellä kutsulla, ja muutokset menneisiin tai aktiivisiin hintoihin hylätään.
+* Laskenta: hintamuutoksen päivän yli menevä varaus saa kahden hinnan oikean yhdistelmän.

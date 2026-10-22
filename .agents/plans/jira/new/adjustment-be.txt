@@ -1,0 +1,22 @@
+ADJUSTMENT-komponentit: prosenttimuutos hintaan, esim. kesäalennus −20 % tai lisämaksu +10 %. TILA-4544 lisää komponenttityypin tietokantaan, mutta validointi hylkää sen, kunnes se on toteutettu tässä tiketissä.
+
+h3. Taustaa
+* Pricing groupissa on price componentteja. Varauksen hinta on täsmäävien komponenttien summa.
+* ADJUSTMENT-komponentilla ei ole omaa ALV:tä, accountingia eikä omaa hintariviä. Se muuttaa niitä hintarivejä, joihin se kohdistuu.
+* Aikataulu: tiimi päättää, mitä komponenttityyppejä maauimaloiden hinnat tarvitsevat ennen kuin niistä tehdään varauksia.
+
+h3. Toteutus
+* Validointi hyväksyy kind=ADJUSTMENT. amount on prosentti ja voi olla negatiivinen.
+* Laskenta jokaiselle varauksen osalle:
+*# Laske yhteen BASE ja täsmäävät SURCHARGE-komponentit, joilla is_adjustable=true.
+*# Laske yhteen täsmäävien ADJUSTMENT-komponenttien prosentit. Summa ei voi olla alle −100 %. Käytä sitä kohdan 1 summaan.
+*# Lisää täsmäävät SURCHARGE-komponentit, joilla is_adjustable=false.
+* Adjustment näkyy hintarivillä kentissä amount_before_adjustment, adjustment_percentage ja amount. Erillistä riviä ei tehdä, koska yksi adjustment voi koskea rivejä, joilla on eri ALV.
+* Käsittelijän ylikirjoitus (TILA-4573) käytetään adjustmentin jälkeen.
+* Pricing groupin batch API ja hinnan query hyväksyvät ADJUSTMENT-komponentit.
+* Henkilökunta lisää ne Django adminissa, kunnes konfiguraattori tukee niitä.
+
+h3. Valmis, kun
+* −20 % ja +10 % samassa osassa antaa −10 %.
+* SURCHARGE, jolla is_adjustable=false, ei muutu.
+* Adjustment ei koskaan tee rivistä negatiivista.

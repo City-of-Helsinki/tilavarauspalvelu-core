@@ -1,0 +1,11 @@
+Poistetaan hintojen laskenta asiakassovelluksesta, kun kaikki näkymät käyttävät backendin hintoja.
+
+h3. Toteutus
+* Poista getPriceString, getReservationUnitPrice, getPrice, getActivePricing, getFuturePricing ja muut pricing-kenttiä lukevat apufunktiot tiedostosta apps/customer/src/modules/reservationUnit.ts, sekä niiden testit.
+* Poista pricing-kentät asiakassovelluksen queryistä ja fragmenteista.
+
+h3. Valmis, kun
+* Mikään asiakassovelluksen koodi ei lue lowestPrice-, highestPrice- tai pricings-kenttiä.
+
+h3. Julkaisu
+* Julkaistaan samassa julkaisussa kuin TILA-4545.

@@ -1,0 +1,13 @@
+Tarkistetaan, että yksittäisvarausputki toimii uudella hinnoittelun tietomallilla TILA-4545:n julkaisun jälkeen.
+
+h3. Tarkistettavat asiat
+* Maksuton varaus, maksullinen varaus verkkokaupassa ja laskulla maksettava varaus.
+* Käsiteltävä varaus: hakee maksuttomuutta, käsittelijä hyväksyy maksuttomana, osittain maksuttomana ja korjatulla hinnalla.
+* Varauksen ajan muutos asiakkaan ja käsittelijän toimesta: hinta lasketaan uudelleen.
+* Peruutus ja palautus.
+* Hintarivit näkyvät asiakkaan varauksen tiedoissa ja staff UI:ssa.
+* Hakukorttien ja varausyksikön sivun hinnat vastaavat vanhoja hintoja.
+* Varausyksikkö, jonka hinta muuttuu tulevana päivänä: hintamuutoksen päivän yli menevä varaus.
+
+h3. Valmis, kun
+* Kaikki kohdat on tarkistettu testiympäristössä ja tuotannossa, ja löydetyt virheet on kirjattu tiketeiksi.

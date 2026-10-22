@@ -1,0 +1,8 @@
+Hinnan esikatselu jaetun pricing groupin muokkaussivulla. Toteutus seuraa TILA-4447:n suunnitelmaa.
+
+h3. Taustaa
+* Validointi ei löydä kaikkia virheitä, esim. saman lisämaksun kahteen kertaan. Esikatselu näyttää hinnan ennen tallennusta.
+
+h3. Toteutus
+* Käyttäjä valitsee price optionin, päivän ja aikavälin ja näkee hintarivit, jotka varaus saisi.
+* Esikatselu käyttää muokkaussivun tallentamattomia muutoksia.
