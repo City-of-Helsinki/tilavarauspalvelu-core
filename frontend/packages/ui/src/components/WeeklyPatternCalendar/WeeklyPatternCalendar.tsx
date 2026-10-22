@@ -97,7 +97,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
   // A run's first cell shows where it starts, its last where it ends, the rest a connector.
   // A run of two cells or fewer shows the whole range once, on its last cell.
   const getCellContent = (cell: WeeklyPatternCellInfo<TData>): string | null => {
-    if (!cell.selected) {
+    if (!cell.painted) {
       return minutesToHoursString(cell.beginMinutes, true);
     }
     if (cell.runEndMinutes - cell.runBeginMinutes <= 2 * step) {

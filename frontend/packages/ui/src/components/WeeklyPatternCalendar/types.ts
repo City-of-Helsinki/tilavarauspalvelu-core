@@ -25,6 +25,12 @@ export type CellAppearance = "primary" | "secondary";
 
 export type WeeklyPatternCellInfo<TData extends CalendarData> = WeekdayInterval & {
   data: TData | undefined;
+  /** The cell holds a value, so it is part of a painted run. */
+  painted: boolean;
+  /**
+   * What `aria-selected` reports. The same as `painted` while painting is the user's own choice. A mode where the
+   * consumer owns a separate selection reports that instead, so a drawn cell is not announced as selected.
+   */
   selected: boolean;
   isRunStart: boolean;
   isRunEnd: boolean;

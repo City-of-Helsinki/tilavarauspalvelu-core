@@ -334,12 +334,16 @@ export function useWeeklyPatternCalendar<TData extends CalendarData>({
       runEndMinutes = (end + 1) * step;
     }
 
+    const painted = data !== undefined;
+
     return {
       weekday,
       beginMinutes: index * step,
       endMinutes: (index + 1) * step,
       data,
-      selected: data !== undefined,
+      painted,
+      // Painting is the user's choice in this mode, so it is what `aria-selected` reports.
+      selected: painted,
       isRunStart,
       isRunEnd,
       runBeginMinutes,
