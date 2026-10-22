@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import datetime
 import json
 import time
 import uuid
@@ -12,10 +13,6 @@ from urllib.parse import parse_qsl, urlencode, urlsplit
 import jwt
 from cryptography.hazmat.primitives.asymmetric import rsa
 from django.conf import settings
-from requests import HTTPError
-
-from tests.helpers import ResponseMock
-from tests.test_gdpr_api.helpers import RSA
 
 if TYPE_CHECKING:
     from django.http import HttpResponse
@@ -27,124 +24,10 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import WSGIRequest
 
 
-OIDC_ENDPOINT = "https://tunnistus.example.com/auth/realms/helsinki-tunnistus"
-
-OIDC_CONFIG = {
-    "issuer": OIDC_ENDPOINT,
-    "authorization_endpoint": f"{OIDC_ENDPOINT}/protocol/openid-connect/auth",
-    "token_endpoint": f"{OIDC_ENDPOINT}/protocol/openid-connect/token",
-    "userinfo_endpoint": f"{OIDC_ENDPOINT}/protocol/openid-connect/userinfo",
-    "jwks_uri": f"{OIDC_ENDPOINT}/protocol/openid-connect/certs",
-    "end_session_endpoint": f"{OIDC_ENDPOINT}/protocol/openid-connect/logout",
-}
-
-UMA_TICKET_GRANT = "urn:ietf:params:oauth:grant-type:uma-ticket"
-
-
 def mock_request(user: User) -> WSGIRequest:
     request = MagicMock()
     request.user = user
     return request
-
-
-class TokenRequest(NamedTuple):
-    grant_type: str
-    token: str
-    """The refresh token, the bearer access token, or the authorization code that the request sent."""
-
-
-@dataclasses.dataclass
-class FakeKeycloak:
-    """Answers the HTTP requests that the Tunnistamo OIDC backend sends to Keycloak."""
-
-    id_token_claims: dict[str, Any] = dataclasses.field(default_factory=dict)
-
-    refresh_error_responses: dict[str, ResponseMock | MagicMock] = dataclasses.field(default_factory=dict)
-    """Keycloak rejects these refresh tokens with the given response."""
-
-    profile_token_error_response: ResponseMock | None = None
-    """If set, Keycloak rejects all Helsinki profile token requests with this response."""
-
-    token_requests: list[TokenRequest] = dataclasses.field(default_factory=list)
-
-    @property
-    def id_token(self) -> str:
-        return jwt.encode(self.id_token_claims, key=RSA.private_key_pem, algorithm=RSA.algorithm)
-
-    def request(self, url: str, **kwargs: Any) -> ResponseMock:
-        if url == f"{OIDC_ENDPOINT}/.well-known/openid-configuration":
-            return ResponseMock(json_data=OIDC_CONFIG)
-
-        if url == OIDC_CONFIG["jwks_uri"]:
-            return ResponseMock(text=json.dumps({"keys": [RSA.public_key]}))
-
-        if url == OIDC_CONFIG["userinfo_endpoint"]:
-            return ResponseMock(
-                json_data={
-                    "sub": self.id_token_claims["sub"],
-                    "email": self.id_token_claims["email"],
-                    "given_name": self.id_token_claims["given_name"],
-                    "family_name": self.id_token_claims["family_name"],
-                }
-            )
-
-        if url == OIDC_CONFIG["token_endpoint"]:
-            return self.token_response(data=kwargs["data"], headers=kwargs["headers"])
-
-        msg = f"Unexpected request to '{url}'"
-        raise AssertionError(msg)
-
-    def token_response(self, *, data: dict[str, str], headers: dict[str, str]) -> ResponseMock:
-        grant_type = data["grant_type"]
-
-        if grant_type == "authorization_code":
-            self.token_requests.append(TokenRequest(grant_type=grant_type, token=data["code"]))
-            return ResponseMock(
-                json_data={
-                    "access_token": "login-access-token",
-                    "id_token": self.id_token,
-                    "refresh_token": "login-refresh-token",
-                    "token_type": "bearer",
-                    "expires_in": 300,
-                }
-            )
-
-        if grant_type == "refresh_token":
-            refresh_token = data["refresh_token"]
-            self.token_requests.append(TokenRequest(grant_type=grant_type, token=refresh_token))
-
-            error_response = self.refresh_error_responses.get(refresh_token)
-            if error_response is not None:
-                raise HTTPError(response=error_response)
-
-            return ResponseMock(
-                json_data={
-                    "access_token": "refreshed-access-token",
-                    "id_token": self.id_token,
-                    "refresh_token": "refreshed-refresh-token",
-                    "token_type": "bearer",
-                    "expires_in": 300,
-                }
-            )
-
-        if grant_type == UMA_TICKET_GRANT:
-            access_token = headers["Authorization"].removeprefix("Bearer ")
-            self.token_requests.append(TokenRequest(grant_type=grant_type, token=access_token))
-
-            if self.profile_token_error_response is not None:
-                raise HTTPError(response=self.profile_token_error_response)
-
-            return ResponseMock(
-                json_data={
-                    "access_token": "profile-access-token",
-                    "refresh_token": "profile-refresh-token",
-                    "expires_in": 300,
-                    "refresh_expires_in": 1800,
-                }
-            )
-
-        msg = f"Unexpected grant type '{grant_type}'"
-        raise AssertionError(msg)
 
 
 # ── Browser ─────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -281,6 +164,8 @@ class PageParser(HTMLParser):
 KEYCLOAK_SIGNING_KEY = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 KEYCLOAK_SIGNING_KEY_ID = "fake-keycloak-signing-key"
 
+UMA_TICKET_GRANT = "urn:ietf:params:oauth:grant-type:uma-ticket"
+
 
 @dataclasses.dataclass(frozen=True, slots=True)
 class KeycloakUser:
@@ -293,8 +178,29 @@ class KeycloakUser:
     ad_groups: list[str] = dataclasses.field(default_factory=list)
 
 
+class TokenRequest(NamedTuple):
+    grant_type: str
+    token: str
+    """The authorization code, the refresh token, or the bearer access token that the request sent."""
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class ErrorResponse:
+    status_code: int
+    error: str | None = None
+    """OAuth error code in a JSON body."""
+    text: str = ""
+    """Body of a response that has no OAuth error code."""
+
+    @property
+    def body(self) -> str:
+        if self.error is not None:
+            return json.dumps({"error": self.error})
+        return self.text
+
+
 @dataclasses.dataclass(slots=True)
-class FakeKeycloakServer:
+class FakeKeycloak:
     """
     Fake of the Helsinki Keycloak server.
     Answers the HTTP requests the backend sends to Keycloak, and signs ID tokens with a test key.
@@ -305,11 +211,17 @@ class FakeKeycloakServer:
     nonce: str | None = None
     authorization_code: str = "fake-authorization-code"
 
-    refresh_failure_status_code: int | None = None
-    """When set, the token endpoint rejects refresh tokens with this HTTP status."""
+    clock_skew: datetime.timedelta = datetime.timedelta()
+    """Keycloak's clock is this much ahead of the backend's clock when it issues ID tokens."""
 
-    refresh_failure_error: str = "invalid_grant"
-    """OAuth error code in the body of a rejected refresh."""
+    refresh_error_responses: dict[str, ErrorResponse] = dataclasses.field(default_factory=dict)
+    """Keycloak rejects these refresh tokens with the given response."""
+
+    profile_token_error_response: ErrorResponse | None = None
+    """If set, Keycloak rejects all Helsinki profile token requests with this response."""
+
+    token_requests: list[TokenRequest] = dataclasses.field(default_factory=list)
+    issued_id_tokens: list[str] = dataclasses.field(default_factory=list)
 
     issuer: str = f"{settings.SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT}/auth/realms/helsinki-tunnistus"
 
@@ -368,23 +280,35 @@ class FakeKeycloakServer:
     def token_endpoint_response(self, request: PreparedRequest) -> tuple[int, dict[str, str], str]:
         body = request.body.decode() if isinstance(request.body, bytes) else request.body or ""
         params = dict(parse_qsl(body))
+        grant_type = params.get("grant_type", "")
 
-        match params.get("grant_type"):
+        match grant_type:
             case "authorization_code":
-                if params.get("code") != self.authorization_code:
+                self.token_requests.append(TokenRequest(grant_type=grant_type, token=params["code"]))
+                if params["code"] != self.authorization_code:
                     return 400, {}, json.dumps({"error": "invalid_grant"})
-                return 200, {}, json.dumps(self.user_tokens())
+                if self.user is None:
+                    msg = "No user has logged in to Keycloak."
+                    raise AssertionError(msg)
+                return 200, {}, json.dumps(self.user_tokens(prefix="login"))
 
             case "refresh_token":
-                if self.refresh_failure_status_code is not None:
-                    error = {"error": self.refresh_failure_error}
-                    return self.refresh_failure_status_code, {}, json.dumps(error)
-                return 200, {}, json.dumps(self.user_tokens())
+                refresh_token = params["refresh_token"]
+                self.token_requests.append(TokenRequest(grant_type=grant_type, token=refresh_token))
+                error_response = self.refresh_error_responses.get(refresh_token)
+                if error_response is not None:
+                    return error_response.status_code, {}, error_response.body
+                return 200, {}, json.dumps(self.user_tokens(prefix="refreshed"))
 
             case "urn:ietf:params:oauth:grant-type:uma-ticket":
+                access_token = request.headers["Authorization"].removeprefix("Bearer ")
+                self.token_requests.append(TokenRequest(grant_type=grant_type, token=access_token))
+                if self.profile_token_error_response is not None:
+                    error_response = self.profile_token_error_response
+                    return error_response.status_code, {}, error_response.body
                 profile_tokens = {
-                    "access_token": "fake-profile-access-token",
-                    "refresh_token": "fake-profile-refresh-token",
+                    "access_token": "profile-access-token",
+                    "refresh_token": "profile-refresh-token",
                     "token_type": "Bearer",
                     "expires_in": 300,
                     "refresh_expires_in": 1800,
@@ -406,15 +330,27 @@ class FakeKeycloakServer:
         }
         return 200, {}, json.dumps(userinfo)
 
-    def user_tokens(self) -> dict[str, Any]:
-        if self.user is None:
-            msg = "No user has logged in to Keycloak."
-            raise AssertionError(msg)
+    def user_tokens(self, *, prefix: str) -> dict[str, Any]:
+        id_token = jwt.encode(
+            self.id_token_claims(),
+            KEYCLOAK_SIGNING_KEY,
+            algorithm="RS256",
+            headers={"kid": KEYCLOAK_SIGNING_KEY_ID},
+        )
+        self.issued_id_tokens.append(id_token)
+        return {
+            "access_token": f"{prefix}-access-token",
+            "refresh_token": f"{prefix}-refresh-token",
+            "id_token": id_token,
+            "token_type": "Bearer",
+            "expires_in": 300,
+            "refresh_expires_in": 1800,
+        }
 
-        now = int(time.time())
-        id_token_claims = {
+    def id_token_claims(self) -> dict[str, Any]:
+        now = int(time.time() + self.clock_skew.total_seconds())
+        claims: dict[str, Any] = {
             "iss": self.issuer,
-            "sub": self.user.sub,
             "aud": settings.SOCIAL_AUTH_TUNNISTAMO_KEY,
             "azp": settings.SOCIAL_AUTH_TUNNISTAMO_KEY,
             "typ": "ID",
@@ -422,8 +358,18 @@ class FakeKeycloakServer:
             "exp": now + 300,
             "iat": now,
             "auth_time": now,
-            "nonce": self.nonce,
             "sid": str(uuid.uuid4()),
+        }
+        if self.nonce is not None:
+            claims["nonce"] = self.nonce
+
+        # Refresh tests do not log in a user first. The backend does not check the 'sub' claim on refresh.
+        if self.user is None:
+            claims["sub"] = str(uuid.uuid4())
+            return claims
+
+        return claims | {
+            "sub": self.user.sub,
             "email": self.user.email,
             "email_verified": True,
             "given_name": self.user.given_name,
@@ -432,18 +378,4 @@ class FakeKeycloakServer:
             "amr": self.user.amr,
             "loa": self.user.loa,
             "ad_groups": self.user.ad_groups,
-        }
-        id_token = jwt.encode(
-            id_token_claims,
-            KEYCLOAK_SIGNING_KEY,
-            algorithm="RS256",
-            headers={"kid": KEYCLOAK_SIGNING_KEY_ID},
-        )
-        return {
-            "access_token": "fake-keycloak-access-token",
-            "refresh_token": "fake-keycloak-refresh-token",
-            "id_token": id_token,
-            "token_type": "Bearer",
-            "expires_in": 300,
-            "refresh_expires_in": 1800,
         }
