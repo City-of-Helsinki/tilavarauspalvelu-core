@@ -126,7 +126,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
   // The time being painted isn't validated until the paint ends, so a run on its way to a valid length isn't flagged
   // at its first cell. Every other run, also on the same day, keeps its error.
   const runErrorOf = (cell: WeeklyPatternCellInfo<TData>) =>
-    cell.selected && !grid.isPaintPending(cell.weekday, cell.beginMinutes / step)
+    cell.painted && !grid.isPaintPending(cell.weekday, cell.beginMinutes / step)
       ? (getRunError?.(cell, grid.dayRuns(cell.weekday)) ?? null)
       : null;
 
@@ -198,7 +198,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
   // A run's first cell shows where it starts, its last where it ends, the rest a connector.
   // A run of two cells or fewer shows the whole range once, on its last cell.
   const getCellContent = (cell: WeeklyPatternCellInfo<TData>): React.ReactNode => {
-    if (!cell.selected) {
+    if (!cell.painted) {
       return minutesToHoursString(cell.beginMinutes, true);
     }
     // The visible label of a run. A real element rather than generated content, so the end time can be styled on its
