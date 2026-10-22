@@ -38,9 +38,8 @@ const SubAccordion = styled(EditAccordion)`
   }
 `;
 
-export function CommunicationSection({ form }: { form: UseFormReturn<ReservationUnitEditFormValues> }) {
+export function CommunicationSection({ form: { control } }: { form: UseFormReturn<ReservationUnitEditFormValues> }) {
   const { t } = useTranslation();
-  const { control } = form;
 
   // NOTE no required fields
   return (
