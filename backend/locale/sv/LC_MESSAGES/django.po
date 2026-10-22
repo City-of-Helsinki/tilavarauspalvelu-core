@@ -1288,6 +1288,12 @@ msgstr ""
 msgid "processed at"
 msgstr ""
 
+#: tilavarauspalvelu/admin/price_option/admin.py
+#: tilavarauspalvelu/admin/pricing_group/admin.py
+#: tilavarauspalvelu/admin/unit_group/admin.py
+msgid "Search by name"
+msgstr ""
+
 #: tilavarauspalvelu/admin/rejected_occurrence/admin.py
 msgid "Search by rejection reason or reservation series' name"
 msgstr ""
@@ -2343,10 +2349,6 @@ msgid ""
 msgstr ""
 
 #: tilavarauspalvelu/admin/unit_group/admin.py
-msgid "Search by name"
-msgstr ""
-
-#: tilavarauspalvelu/admin/unit_group/admin.py
 msgid "Number of units"
 msgstr ""
 
@@ -2931,6 +2933,11 @@ msgstr ""
 #: tilavarauspalvelu/enums.py
 msgctxt "PriceUnit"
 msgid "fixed"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PriceComponentKind"
+msgid "Base"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
@@ -4018,6 +4025,30 @@ msgstr ""
 msgid "personal info view logs"
 msgstr ""
 
+#: tilavarauspalvelu/models/price_component/model.py
+msgid "price component"
+msgstr ""
+
+#: tilavarauspalvelu/models/price_component/model.py
+msgid "price components"
+msgstr ""
+
+#: tilavarauspalvelu/models/price_option/model.py
+msgid "price option"
+msgstr ""
+
+#: tilavarauspalvelu/models/price_option/model.py
+msgid "price options"
+msgstr ""
+
+#: tilavarauspalvelu/models/pricing_group/model.py
+msgid "pricing group"
+msgstr ""
+
+#: tilavarauspalvelu/models/pricing_group/model.py
+msgid "pricing groups"
+msgstr ""
+
 #: tilavarauspalvelu/models/rejected_occurrence/model.py
 msgid "rejected occurrence"
 msgstr ""
@@ -4177,6 +4208,14 @@ msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit_pricing/model.py
 msgid "reservation unit pricings"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit_pricing_group/model.py
+msgid "reservation unit pricing group"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit_pricing_group/model.py
+msgid "reservation unit pricing groups"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit_type/model.py
