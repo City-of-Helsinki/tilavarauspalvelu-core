@@ -10,12 +10,12 @@ from graphene_django_extensions.testing import build_query
 
 from tests.factories import ApplicationFactory, UserFactory
 
-from .helpers import KeycloakUser, browse, find_helsinki_login_button
+from .helpers import ErrorResponse, KeycloakUser, browse, find_helsinki_login_button
 
 if TYPE_CHECKING:
     from django.http import HttpResponse
 
-    from .helpers import FakeKeycloakServer
+    from .helpers import FakeKeycloak
 
 pytestmark = [
     pytest.mark.django_db,
@@ -35,14 +35,14 @@ STAFF_MEMBER = KeycloakUser(
 )
 
 
-def log_in_staff_member(keycloak_server: FakeKeycloakServer) -> Client:
+def log_in_staff_member(keycloak: FakeKeycloak) -> Client:
     UserFactory.create_superuser(uuid=STAFF_MEMBER.sub, email=STAFF_MEMBER.email)
     client = Client(enforce_csrf_checks=True)
 
     login_page = client.get("/admin/login/?next=/admin/")
     button = find_helsinki_login_button(login_page.content.decode())
     response = browse(client, method=button.method, url=button.action, data=button.data)
-    callback_url = keycloak_server.log_in(authorization_url=response["Location"], user=STAFF_MEMBER)
+    callback_url = keycloak.log_in(authorization_url=response["Location"], user=STAFF_MEMBER)
     browse(client, method="GET", url=callback_url)
 
     return client
@@ -65,11 +65,10 @@ def query_applicant_profile(client: Client) -> HttpResponse:
 
 
 def test_token_refresh__keycloak_rejects_refresh_token__frontend_is_told_to_log_in_again(
-    keycloak_server: FakeKeycloakServer,
+    keycloak: FakeKeycloak,
 ):
-    client = log_in_staff_member(keycloak_server)
-    keycloak_server.refresh_failure_status_code = 400
-    keycloak_server.refresh_failure_error = "invalid_grant"
+    client = log_in_staff_member(keycloak)
+    keycloak.refresh_error_responses["login-refresh-token"] = ErrorResponse(status_code=400, error="invalid_grant")
 
     response = query_applicant_profile(client)
 
@@ -85,10 +84,12 @@ def test_token_refresh__keycloak_rejects_refresh_token__frontend_is_told_to_log_
     ]
 
 
-def test_token_refresh__keycloak_is_unavailable__profile_token_is_invalid(keycloak_server: FakeKeycloakServer):
-    client = log_in_staff_member(keycloak_server)
-    keycloak_server.refresh_failure_status_code = 503
-    keycloak_server.refresh_failure_error = "temporarily_unavailable"
+def test_token_refresh__keycloak_is_unavailable__profile_token_is_invalid(keycloak: FakeKeycloak):
+    client = log_in_staff_member(keycloak)
+    keycloak.refresh_error_responses["login-refresh-token"] = ErrorResponse(
+        status_code=503,
+        error="temporarily_unavailable",
+    )
 
     response = query_applicant_profile(client)
 
