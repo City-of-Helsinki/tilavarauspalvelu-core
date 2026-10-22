@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import (
         Application,
         ApplicationRound,
+        PricingGroup,
         Reservation,
         ReservationSeries,
         ReservationUnit,
@@ -319,6 +320,38 @@ class PermissionResolver:
         if self.user.is_superuser:
             return True
         return self.has_general_role(role_choices=UserRoleChoice.can_manage_notifications())
+
+    def can_manage_pricing_group(self, pricing_group: PricingGroup) -> bool:
+        """
+        A shared pricing group is managed through its unit group.
+        A reservation unit's own pricing group is managed through the units of the reservation units that use it.
+        """
+        if self.is_user_anonymous_or_inactive():
+            return False
+        if self.user.is_superuser:
+            return True
+
+        role_choices = UserRoleChoice.can_manage_reservation_units()
+        if self.has_general_role(role_choices=role_choices):
+            return True
+
+        if pricing_group.unit_group_id is not None:
+            roles = self.user.active_unit_group_roles.get(pricing_group.unit_group_id, [])
+            return any(role in role_choices for role in roles)
+
+        from tilavarauspalvelu.models import Unit
+
+        units = (
+            Unit.objects
+            .filter(reservation_units__pricing_groups__pricing_group=pricing_group)
+            .prefetch_related("unit_groups")
+            .distinct()
+        )
+        return self.has_role_for_units_or_their_unit_groups(
+            units=units,
+            role_choices=role_choices,
+            require_all=True,
+        )
 
     def can_manage_reservation(
         self,

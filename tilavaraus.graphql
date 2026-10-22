@@ -370,6 +370,14 @@ type Query {
     """Ordering"""
     orderBy: [TaxPercentageOrderingChoices]
   ): TaxPercentageNodeConnection
+  pricingGroup(
+    """The ID of the object"""
+    id: ID!
+  ): PricingGroupNode
+  priceOption(
+    """The ID of the object"""
+    id: ID!
+  ): PriceOptionNode
   intendedUses(
     first: Int
     last: Int
@@ -887,6 +895,7 @@ type ReservationUnitNode implements Node {
   ): [ReservationUnitAccessTypeNode!]!
   images: [ReservationUnitImageNode!]!
   pricings: [ReservationUnitPricingNode!]!
+  pricingGroups: [ReservationUnitPricingGroupNode!]!
 
   """The ID of the object"""
   id: ID!
@@ -2376,6 +2385,69 @@ type TaxPercentageNode implements Node {
   pk: Int
 }
 
+type ReservationUnitPricingGroupNode implements Node {
+  reservationUnit: ReservationUnitNode!
+  pricingGroup: PricingGroupNode!
+  begins: Date!
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+type PricingGroupNode implements Node {
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  unitGroup: UnitGroupNode
+  components: [PriceComponentNode!]!
+  reservationUnits: [ReservationUnitPricingGroupNode!]!
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+type PriceComponentNode implements Node {
+  pricingGroup: PricingGroupNode!
+  kind: PriceComponentKind!
+  validFrom: Date!
+  validUntil: Date
+  priceOption: PriceOptionNode
+  amount: Decimal!
+  priceUnit: PriceUnit!
+  canApplyForDiscount: Boolean!
+  materialPriceDescriptionFi: String
+  materialPriceDescriptionEn: String
+  materialPriceDescriptionSv: String
+  paymentType: PaymentType
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+"""An enumeration."""
+enum PriceComponentKind {
+  """Base"""
+  BASE
+}
+
+type PriceOptionNode implements Node {
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  isActive: Boolean!
+  unitGroup: UnitGroupNode!
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
 type ReservableTimeSpanType {
   startDatetime: DateTime!
   endDatetime: DateTime!
@@ -3121,6 +3193,7 @@ type Mutation {
   createReservationUnitImage(input: ReservationUnitImageCreateMutationInput!): ReservationUnitImageCreateMutationPayload
   updateReservationUnitImage(input: ReservationUnitImageUpdateMutationInput!): ReservationUnitImageUpdateMutationPayload
   deleteReservationUnitImage(input: ReservationUnitImageDeleteMutationInput!): ReservationUnitImageDeleteMutationPayload
+  updatePricingGroupComponents(input: PricingGroupComponentsUpdateMutationInput!): PricingGroupComponentsUpdateMutationPayload
   createIntendedUse(input: IntendedUseCreateMutationInput!): IntendedUseCreateMutationPayload
   updateIntendedUse(input: IntendedUseUpdateMutationInput!): IntendedUseUpdateMutationPayload
   createReservation(input: ReservationCreateMutationInput!): ReservationCreateMutationPayload
@@ -4169,6 +4242,33 @@ type ReservationUnitImageDeleteMutationPayload {
 
 input ReservationUnitImageDeleteMutationInput {
   pk: ID!
+}
+
+type PricingGroupComponentsUpdateMutationPayload {
+  pk: Int
+  components: [PriceComponentNode]
+}
+
+input PricingGroupComponentsUpdateMutationInput {
+  pk: Int!
+  components: [UpdatePriceComponentInputSerializerInput]
+  deletedComponents: [Int]
+}
+
+input UpdatePriceComponentInputSerializerInput {
+  pk: Int
+  validFrom: Date
+  validUntil: Date
+  priceOption: Int
+  amount: Decimal
+  priceUnit: PriceUnit
+  accounting: Int
+  canApplyForDiscount: Boolean
+  materialPriceDescription: String
+  materialPriceDescriptionFi: String
+  materialPriceDescriptionEn: String
+  materialPriceDescriptionSv: String
+  paymentType: PaymentType
 }
 
 type IntendedUseCreateMutationPayload {
