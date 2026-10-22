@@ -55,6 +55,18 @@ describe("WeeklyPatternCalendar", () => {
     expect(cell(/^Wednesday, 08:00–08:30, closed$/)).toHaveAttribute("aria-disabled", "true");
   });
 
+  test("short weekday names are shown, and the header keeps the long name as its accessible name", () => {
+    render(<Harness weekdayNameStyle="short" />);
+    const header = screen.getByRole("columnheader", { name: "Wednesday" });
+    expect(header).toHaveTextContent("Wed");
+    expect(cell(/^Wednesday, 08:00–08:30, closed$/)).toBeInTheDocument();
+  });
+
+  test("long weekday names are shown without the prop", () => {
+    render(<Harness />);
+    expect(screen.getByRole("columnheader", { name: "Wednesday" })).toHaveTextContent("Wednesday");
+  });
+
   test("only one cell is in the tab order", () => {
     render(<Harness />);
     const tabbable = screen.getAllByRole("gridcell").filter((element) => element.getAttribute("tabindex") === "0");
