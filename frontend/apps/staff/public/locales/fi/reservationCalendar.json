@@ -13,5 +13,6 @@
   "closed": "Suljettu",
   "buffer": "Puskuriaika",
   "selected": "valittu",
-  "opensInNewTab": "avautuu uuteen välilehteen"
+  "opensInNewTab": "avautuu uuteen välilehteen",
+  "draftResource": "luonnos"
 }
