@@ -19,30 +19,28 @@ import type { CSSProperties, ForwardedRef, ReactElement, Ref } from "react";
 import { LiveRegion, SkipLink } from "../CalendarGrid/styles";
 import {
   cellRange,
-  dayKeyOf,
   isCellOpen,
+  segmentsInCell,
+  dayKeyOf,
   minutesOfDay,
   openRangesByDay,
   resolveVisibleHours,
   segmentEvents,
-  segmentsInCell,
   toWallClock,
   visibleDays,
 } from "../DatedWeekCalendar/engine";
-import type { EventSegment } from "../DatedWeekCalendar/engine";
 import { assertValidStep } from "../WeeklyPatternCalendar/engine";
 import type { CalendarData } from "../WeeklyPatternCalendar/types";
-import { EventStripe, GridScroller, ListAlternative, NowDot, NowLine, ResourceDayRoot } from "./styles";
+import { formatClock, formatRange } from "./format";
+import { ResourceDayRow } from "./Row";
+import type { Column } from "./Row";
+import { GridScroller, ListAlternative, NowDot, ResourceDayRoot } from "./styles";
 import { TooltipLayer } from "./TooltipLayer";
 import type { TooltipController } from "./TooltipLayer";
 import type { ResourceDayCalendarProps, ResourceDayHandle } from "./types";
 import { useResourceDayCalendar } from "./useResourceDayCalendar";
 
-const pad = (value: number) => value.toString().padStart(2, "0");
-const formatClock = (minutes: number) => `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`;
-const formatRange = (beginMinutes: number, endMinutes: number) =>
-  `${formatClock(beginMinutes)}–${formatClock(endMinutes)}`;
-
+const NO_SEGMENTS: never[] = [];
 const WHOLE_DAY = { beginMinutes: 0, endMinutes: 24 * 60 };
 // The hour the view starts at when it is not today, so the night isn't what greets the user.
 const MORNING_HOUR = 7;
@@ -73,7 +71,9 @@ function ResourceDayTable<TData extends CalendarData>(
   }
 
   const listId = useId();
-  const days = useMemo(() => visibleDays(date, "day"), [date]);
+  // Keyed on the time, since a caller may hand over a new Date for the same day on every render.
+  const dateMs = date.getTime();
+  const days = useMemo(() => visibleDays(new Date(dateMs), "day"), [dateMs]);
   const dayKey = dayKeyOf(days[0] ?? toWallClock(date));
   const resourceIds = resources.map((resource) => resource.id);
 
@@ -185,54 +185,37 @@ function ResourceDayTable<TData extends CalendarData>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dayKey]);
 
-  const columns: Array<{ index: number; beginMinutes: number; endMinutes: number }> = [];
-  for (let index = firstIndex; index < endIndex; index++) {
-    const beginMinutes = index * step;
-    columns.push({ index, beginMinutes, endMinutes: beginMinutes + step });
-  }
-  const hourHeaders: Array<{ hour: number; colSpan: number }> = [];
-  for (let index = firstIndex; index < endIndex;) {
-    const hour = Math.floor((index * step) / 60);
-    const colSpan = Math.min(endIndex, ((hour + 1) * 60) / step) - index;
-    hourHeaders.push({ hour, colSpan });
-    index += colSpan;
-  }
+  const columns = useMemo(() => {
+    const result: Column[] = [];
+    for (let index = firstIndex; index < endIndex; index++) {
+      result.push({ index, beginMinutes: index * step, endMinutes: (index + 1) * step });
+    }
+    return result;
+  }, [firstIndex, endIndex, step]);
+  const hourHeaders = useMemo(() => {
+    const result: Array<{ hour: number; colSpan: number }> = [];
+    for (let index = firstIndex; index < endIndex;) {
+      const hour = Math.floor((index * step) / 60);
+      const colSpan = Math.min(endIndex, ((hour + 1) * 60) / step) - index;
+      result.push({ hour, colSpan });
+      index += colSpan;
+    }
+    return result;
+  }, [firstIndex, endIndex, step]);
 
-  const listItems = resources.flatMap((resource) =>
-    [...(segmentsByResource.get(resource.id) ?? [])]
-      .sort((a, b) => a.beginMinutes - b.beginMinutes)
-      .map((segment) => ({
-        key: `${resource.id}:${segment.event.id}`,
-        href: getEventHref?.(segment.event),
-        text: `${resource.title}, ${formatRange(segment.beginMinutes, segment.endMinutes)}: ${getEventLabel(segment.event)}`,
-      }))
+  const listItems = useMemo(
+    () =>
+      resources.flatMap((resource) =>
+        [...(segmentsByResource.get(resource.id) ?? [])]
+          .sort((a, b) => a.beginMinutes - b.beginMinutes)
+          .map((segment) => ({
+            key: `${resource.id}:${segment.event.id}`,
+            href: getEventHref?.(segment.event),
+            text: `${resource.title}, ${formatRange(segment.beginMinutes, segment.endMinutes)}: ${getEventLabel(segment.event)}`,
+          }))
+      ),
+    [resources, segmentsByResource, getEventHref, getEventLabel]
   );
-
-  const stripeFor = (segment: EventSegment<TData>, cellBegin: number) => {
-    const extra = getEventProps?.(segment.event);
-    const begin = Math.max(segment.beginMinutes, hours.beginMinutes);
-    const end = Math.min(segment.endMinutes, hours.endMinutes);
-    return (
-      <EventStripe
-        key={segment.event.id}
-        aria-hidden
-        {...extra}
-        style={
-          {
-            ...extra?.style,
-            "--lane": segment.lane,
-            "--lanes": segment.lanes,
-            left: `${((begin - cellBegin) / step) * 100}%`,
-            width: `${((end - begin) / step) * 100}%`,
-          } as CSSProperties
-        }
-        data-continues-before={segment.beginMinutes < hours.beginMinutes ? "" : undefined}
-        data-continues-after={segment.endMinutes > hours.endMinutes ? "" : undefined}
-      >
-        {segment.event.title}
-      </EventStripe>
-    );
-  };
 
   return (
     <ResourceDayRoot className={className} id={id}>
@@ -280,72 +263,29 @@ function ResourceDayTable<TData extends CalendarData>(
           </thead>
           <tbody>
             {resources.map((resource) => (
-              <tr key={resource.id} role="row">
-                <th
-                  role="rowheader"
-                  scope="row"
-                  title={resource.title}
-                  aria-label={resource.isDraft ? `${resource.title}, ${labels.draftResource}` : resource.title}
-                  data-draft={resource.isDraft ? "" : undefined}
-                >
-                  {resource.title}
-                </th>
-                {columns.map((column) => {
-                  const segments = segmentsAt(resource.id, column.index);
-                  const isOpen = cellIsOpen(resource.id, column.index);
-                  // A cell with one event that begins in it is named after the whole event.
-                  const only = segments.length === 1 ? segments[0] : undefined;
-                  const [begin, end] =
-                    only && only.beginMinutes >= column.beginMinutes
-                      ? [only.beginMinutes, only.endMinutes]
-                      : [column.beginMinutes, column.endMinutes];
-                  const opensTab = only != null && getEventHref?.(only.event) != null;
-                  const state =
-                    segments.length > 0
-                      ? segments.map((segment) => getEventLabel(segment.event)).join("; ") +
-                        (opensTab ? `, ${labels.opensInNewTab}` : "")
-                      : isOpen
-                        ? labels.free
-                        : labels.closed;
-                  // A stripe is drawn where its event begins, or at the first shown cell when it began earlier.
-                  const startingHere = segments.filter(
-                    (segment) =>
-                      (segment.beginMinutes >= column.beginMinutes && segment.beginMinutes < column.endMinutes) ||
-                      (column.index === firstIndex && segment.beginMinutes < column.beginMinutes)
-                  );
-                  return (
-                    <td
-                      key={column.index}
-                      role="gridcell"
-                      {...grid.cellBehaviour(resource.id, column.index)}
-                      aria-label={`${resource.title}, ${formatRange(begin, end)}, ${state}`}
-                      aria-disabled={isOpen ? undefined : true}
-                      data-testid={`resource-day-calendar__cell-${resource.id}-${column.index}`}
-                      data-availability={isOpen ? "open" : "closed"}
-                      data-hour-start={column.beginMinutes % 60 === 0 ? "" : undefined}
-                      onMouseEnter={
-                        renderEventTooltip && segments.length > 0
-                          ? (event) =>
-                              tooltipRef.current?.show(
-                                segments.map((segment) => segment.event),
-                                event.currentTarget.getBoundingClientRect()
-                              )
-                          : undefined
-                      }
-                      onMouseLeave={renderEventTooltip ? () => tooltipRef.current?.hide() : undefined}
-                    >
-                      {startingHere.map((segment) => stripeFor(segment, column.beginMinutes))}
-                      {showNowLine && column.index === nowIndex && (
-                        <NowLine
-                          aria-hidden
-                          data-testid="resource-day-calendar__now-line"
-                          style={{ left: `${nowOffsetPercent}%` }}
-                        />
-                      )}
-                    </td>
-                  );
-                })}
-              </tr>
+              <ResourceDayRow<TData>
+                key={resource.id}
+                resource={resource}
+                segments={segmentsByResource.get(resource.id) ?? NO_SEGMENTS}
+                open={openByResource.get(resource.id) ?? null}
+                dayKey={dayKey}
+                columns={columns}
+                step={step}
+                shownBegin={hours.beginMinutes}
+                shownEnd={hours.endMinutes}
+                activeIndex={grid.activeAddress?.column === resource.id ? grid.activeAddress.index : null}
+                nowIndex={showNowLine ? nowIndex : null}
+                nowOffsetPercent={showNowLine ? nowOffsetPercent : 0}
+                labels={labels}
+                getEventLabel={getEventLabel}
+                getEventProps={getEventProps}
+                getEventHref={getEventHref}
+                tooltipRef={renderEventTooltip ? tooltipRef : undefined}
+                registerCell={grid.registerCell}
+                onCellFocus={grid.onCellFocus}
+                onCellKeyDown={grid.onCellKeyDown}
+                onCellClick={grid.onCellClick}
+              />
             ))}
           </tbody>
         </table>
