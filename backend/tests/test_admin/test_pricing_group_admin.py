@@ -10,7 +10,7 @@ from tilavarauspalvelu.enums import PaymentType, PriceComponentKind, PriceUnit
 from tilavarauspalvelu.models import PriceComponent, PricingGroup, ReservationUnitPricingGroup
 from tilavarauspalvelu.typing import error_codes
 
-from tests.factories import ReservationUnitFactory, UserFactory
+from tests.factories import PriceOptionFactory, ReservationUnitFactory, UnitGroupFactory, UserFactory
 from tests.test_admin.helpers import collect_admin_form_errors, management_form_data
 
 # Applied to all tests
@@ -149,6 +149,35 @@ def test_pricing_group_admin__own_group_with_two_reservation_units_is_rejected(a
         {
             "code": error_codes.PRICING_GROUP_OWN_GROUP_HAS_MANY_RESERVATION_UNITS,
             "message": "A pricing group without a unit group can be used by only one reservation unit.",
+        },
+    ]
+    assert not PricingGroup.objects.exists()
+
+
+def test_pricing_group_admin__inactive_option_is_rejected(api_client):
+    api_client.force_login(UserFactory.create_superuser())
+    unit_group = UnitGroupFactory.create()
+    option = PriceOptionFactory.create(unit_group=unit_group, is_active=False)
+
+    url = reverse("admin:tilavarauspalvelu_pricinggroup_add")
+    data = {
+        **group_form_data(),
+        "unit_group": unit_group.pk,
+        **component_form_data(0, valid_from="2026-01-01"),
+        "components-0-price_option": option.pk,
+        **management_form_data("components", total_forms=1),
+        **management_form_data("reservation_units", total_forms=0),
+    }
+
+    errors: list[dict[str, Any]] = []
+    with collect_admin_form_errors(errors):
+        response = api_client.post(path=url, data=data)
+
+    assert response.status_code == 200
+    assert errors == [
+        {
+            "code": error_codes.PRICE_COMPONENT_OPTION_INACTIVE,
+            "message": "Price option is not active.",
         },
     ]
     assert not PricingGroup.objects.exists()

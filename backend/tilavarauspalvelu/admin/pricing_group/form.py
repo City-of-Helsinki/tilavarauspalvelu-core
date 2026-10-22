@@ -7,7 +7,6 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from modeltranslation.admin import TranslationStackedInline
-from rest_framework.exceptions import ValidationError as SerializerValidationError
 from tinymce.widgets import TinyMCE
 
 from tilavarauspalvelu.models import PriceComponent, PricingGroup, ReservationUnitPricingGroup
@@ -54,10 +53,11 @@ class PriceComponentFormSet(BaseInlineFormSet):
                 continue
 
             component = form.instance
-            try:
+            with only_django_validation_errors():
                 component.validators.validate_option_belongs_to_pricing_group_unit_group()
-            except SerializerValidationError as error:
-                raise ValidationError(str(error.detail[0])) from error
+                if component.pk is None or "price_option" in form.changed_data:
+                    component.validators.validate_option_is_active()
+
             components.append(component)
 
         reservation_unit_begin_dates = self._reservation_unit_begin_dates()
