@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+# Create a Jira issue with labels and links through the Jira Cloud REST API.
+# Usage: jira-create --summary <text> <options>, e.g. jira-create --summary 'Fix login' --parent TILA-123
+set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
+
+usage() {
+  cat >&2 <<'EOF'
+Usage: jira-create --summary <text> <options>, e.g. jira-create --summary 'Fix login' --parent TILA-123
+Options marked with * can be repeated.
+  --summary <text>              The summary of the issue. Required.
+  --type <name>                 The issue type. Default: Task.
+  --parent <key>                The parent issue, usually an epic.
+  --project <key>               The project key. Default: TILA.
+  --description-file <path>     The description from the file contents (Jira wiki markup).
+  --label <label>             * Add a label: backend, frontend, operations, infra or design.
+  --blocks <key>              * Add a link: the new issue blocks <key>.
+  --blocked-by <key>          * Add a link: the new issue is blocked by <key>.
+  --relates <key>             * Add a link: the new issue relates to <key>.
+  --dry-run                     Print the requests and send nothing.
+EOF
+  exit 2
+}
+[[ $# -ge 1 ]] || usage
+
+summary=""
+issue_type="Task"
+parent=""
+project="TILA"
+description_file=""
+labels=()
+link_options=()
+link_keys=()
+dry_run=false
+
+while [[ $# -gt 0 ]]; do
+  option="$1"
+  if [[ "$option" == "--dry-run" ]]; then
+    dry_run=true
+    shift
+    continue
+  fi
+  [[ $# -ge 2 ]] || { echo "Missing value for $option" >&2; usage; }
+  value="$2"
+  shift 2
+  case "$option" in
+    --summary)
+      [[ -z "$summary" ]] || { echo "Give --summary only once." >&2; usage; }
+      summary="$value"
+      ;;
+    --type)
+      issue_type="$value"
+      ;;
+    --parent)
+      parent="$(parse_key "$value")"
+      ;;
+    --project)
+      [[ "$value" =~ ^[A-Z][A-Z0-9]*$ ]] || { echo "Not a Jira project key: $value" >&2; usage; }
+      project="$value"
+      ;;
+    --description-file)
+      [[ -z "$description_file" ]] || { echo "Give --description-file only once." >&2; usage; }
+      check_description_file "$value"
+      description_file="$value"
+      ;;
+    --label)
+      check_label "$value"
+      contains "$value" "${labels[@]}" || labels+=("$value")
+      ;;
+    --blocks | --blocked-by | --relates)
+      link_options+=("$option")
+      link_keys+=("$(parse_key "$value")")
+      ;;
+    *)
+      echo "Unknown option: $option" >&2
+      usage
+      ;;
+  esac
+done
+
+summary="$(sed -E 's/^[[:space:]]+|[[:space:]]+$//g' <<<"$summary")"
+[[ -n "$summary" ]] || { echo "Give a summary with --summary." >&2; usage; }
+[[ "$summary" != *$'\n'* ]] || { echo "The summary must be one line." >&2; exit 2; }
+(( ${#summary} <= 255 )) || { echo "The summary is longer than 255 characters." >&2; exit 2; }
+
+load_credentials
+
+# Check the issue type against the types that the project allows.
+types="$(api "rest/api/2/issue/createmeta/$project/issuetypes?maxResults=200")"
+type_names=()
+while IFS= read -r name; do type_names+=("$name"); done < <(jq --raw-output '(.issueTypes // .values)[].name' <<<"$types")
+contains "$issue_type" "${type_names[@]}" \
+  || { echo "Not an issue type in $project: $issue_type. Use one of: $(printf '%s, ' "${type_names[@]}" | sed 's/, $//')" >&2; exit 2; }
+
+# The REST API v2 stores the description as wiki markup.
+body="$(
+  jq --null-input --compact-output \
+    --arg project "$project" --arg type "$issue_type" --arg summary "$summary" --arg parent "$parent" \
+    --arg has_description "$([[ -n "$description_file" ]] && echo true || echo false)" \
+    --rawfile description "${description_file:-/dev/null}" \
+    --argjson labels "$(jq --null-input --compact-output '$ARGS.positional' --args "${labels[@]}")" \
+    '{fields: {project: {key: $project}, issuetype: {name: $type}, summary: $summary}}
+    | if $parent != "" then .fields.parent = {key: $parent} else . end
+    | if $has_description == "true" then .fields.description = $description else . end
+    | if ($labels | length) > 0 then .fields.labels = $labels else . end'
+)"
+
+# Build the link requests for the issue `key`. Skip duplicates in the arguments.
+build_links() {
+  local key="$1" i request duplicate
+  link_requests=()
+  link_texts=()
+  for i in "${!link_options[@]}"; do
+    make_link "${link_options[$i]}" "$key" "${link_keys[$i]}"
+    duplicate=false
+    for request in "${link_requests[@]}"; do
+      [[ "$request" != "$link_body" ]] || duplicate=true
+    done
+    [[ "$duplicate" == false ]] || continue
+    link_requests+=("$link_body")
+    link_texts+=("$link_text")
+  done
+}
+
+if [[ "$dry_run" == true ]]; then
+  echo "Dry run. Nothing is sent. NEW-ISSUE stands for the key of the new issue."
+  echo
+  echo "POST $base_url/rest/api/2/issue"
+  jq . <<<"$body"
+  build_links NEW-ISSUE
+  for i in "${!link_requests[@]}"; do
+    echo
+    echo "POST $base_url/rest/api/2/issueLink"
+    jq . <<<"${link_requests[$i]}"
+    echo "Change: Added link: ${link_texts[$i]}."
+  done
+  exit 0
+fi
+
+created="$(send POST rest/api/2/issue "$body")"
+key="$(jq --raw-output '.key' <<<"$created")"
+echo "Created $key ($base_url/browse/$key)."
+
+# Print each link after its request succeeds, so a failure shows what is already done.
+build_links "$key"
+for i in "${!link_requests[@]}"; do
+  send POST rest/api/2/issueLink "${link_requests[$i]}" >/dev/null
+  echo "- Added link: ${link_texts[$i]}."
+done
