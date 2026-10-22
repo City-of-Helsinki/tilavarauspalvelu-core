@@ -16,6 +16,8 @@ from .origin_hauki_resource.admin import OriginHaukiResourceAdmin
 from .payment_accounting.admin import PaymentAccountingAdmin
 from .payment_merchant.admin import PaymentMerchantAdmin
 from .payment_order.admin import PaymentOrderAdmin
+from .price_option.admin import PriceOptionAdmin
+from .pricing_group.admin import PricingGroupAdmin
 from .rejected_occurrence.admin import RejectedOccurrenceAdmin
 from .reservation.admin import ReservationAdmin
 from .reservation_deny_reason.admin import ReservationDenyReasonAdmin
@@ -55,6 +57,8 @@ __all__ = [
     "PaymentAccountingAdmin",
     "PaymentMerchantAdmin",
     "PaymentOrderAdmin",
+    "PriceOptionAdmin",
+    "PricingGroupAdmin",
     "RejectedOccurrenceAdmin",
     "ReservationAdmin",
     "ReservationDenyReasonAdmin",
