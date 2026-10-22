@@ -158,6 +158,76 @@ def test_calculate_price__can_apply_for_discount():
     assert result.can_apply_for_discount is True
 
 
+# ── Price units ──
+
+
+def test_calculate_price__per_15_minutes():
+    row = create_pricing_group_row()
+    PriceComponentFactory.create(
+        pricing_group=row.pricing_group,
+        valid_from=JAN_1,
+        amount=Decimal(5),
+        price_unit=PriceUnit.PER_15_MINS,
+    )
+
+    result = calculate_price(
+        reservation_unit=row.reservation_unit,
+        price_option=None,
+        begin=local_datetime(2026, 2, 1, 10),
+        end=local_datetime(2026, 2, 1, 11),
+    )
+
+    assert result.lines[0].quantity == Decimal(4)
+    assert result.total == Decimal("20.00")
+
+
+@pytest.mark.parametrize(
+    ("end_hour", "expected_quantity"),
+    [
+        (20, Decimal(1)),
+        (21, Decimal(2)),
+    ],
+)
+def test_calculate_price__per_half_day_counts_started_12_hour_units(end_hour, expected_quantity):
+    row = create_pricing_group_row()
+    PriceComponentFactory.create(
+        pricing_group=row.pricing_group,
+        valid_from=JAN_1,
+        amount=Decimal(50),
+        price_unit=PriceUnit.PER_HALF_DAY,
+    )
+
+    result = calculate_price(
+        reservation_unit=row.reservation_unit,
+        price_option=None,
+        begin=local_datetime(2026, 2, 1, 8),
+        end=local_datetime(2026, 2, 1, end_hour),
+    )
+
+    assert result.lines[0].quantity == expected_quantity
+    assert result.total == Decimal(50) * expected_quantity
+
+
+def test_calculate_price__per_week():
+    row = create_pricing_group_row()
+    PriceComponentFactory.create(
+        pricing_group=row.pricing_group,
+        valid_from=JAN_1,
+        amount=Decimal(300),
+        price_unit=PriceUnit.PER_WEEK,
+    )
+
+    result = calculate_price(
+        reservation_unit=row.reservation_unit,
+        price_option=None,
+        begin=local_datetime(2026, 2, 1, 10),
+        end=local_datetime(2026, 2, 3, 10),
+    )
+
+    assert result.lines[0].quantity == Decimal(1)
+    assert result.total == Decimal("300.00")
+
+
 # ── Price change ──
 
 
