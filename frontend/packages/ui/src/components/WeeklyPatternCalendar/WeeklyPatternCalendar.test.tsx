@@ -110,6 +110,22 @@ describe("WeeklyPatternCalendar", () => {
     ]);
   });
 
+  test("a cell says whether it is painted, apart from what aria-selected reports", () => {
+    render(
+      <Harness
+        initial={[{ weekday: Weekday.Monday, beginMinutes: 480, endMinutes: 510, data: primary }]}
+        getCellProps={(info) => ({ "data-test-painted": info.painted })}
+      />
+    );
+    const painted = cell(/^common:weekdayLongEnum.MONDAY, 08:00–08:30, primary$/);
+    expect(painted).toHaveAttribute("data-test-painted", "true");
+    expect(painted).toHaveAttribute("aria-selected", "true");
+
+    const empty = cell(/^common:weekdayLongEnum.MONDAY, 08:30–09:00, free$/);
+    expect(empty).toHaveAttribute("data-test-painted", "false");
+    expect(empty).toHaveAttribute("aria-selected", "false");
+  });
+
   test("a different brush paints over an existing run instead of erasing it", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
