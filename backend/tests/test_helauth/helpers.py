@@ -35,6 +35,7 @@ def mock_request(user: User) -> WSGIRequest:
 
 REDIRECT_STATUS_CODES = {301, 302, 303, 307, 308}
 METHOD_PRESERVING_REDIRECT_STATUS_CODES = {307, 308}
+MAX_BROWSER_STEPS = 10
 
 
 def browse(
@@ -51,7 +52,7 @@ def browse(
     """
     response = send_request(client, method=method, url=url, data=data)
 
-    while True:
+    for _ in range(MAX_BROWSER_STEPS):
         if response.status_code in REDIRECT_STATUS_CODES:
             location = response["Location"]
             target = urlsplit(location)
@@ -75,6 +76,9 @@ def browse(
             url=auto_submit_form.action,
             data=auto_submit_form.data,
         )
+
+    msg = f"Browser did not reach a final page in {MAX_BROWSER_STEPS} steps."
+    raise AssertionError(msg)
 
 
 def send_request(
