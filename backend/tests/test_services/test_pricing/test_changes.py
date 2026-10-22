@@ -4,7 +4,6 @@ import datetime
 from decimal import Decimal
 
 import pytest
-from django.core.exceptions import ValidationError as DjangoValidationError
 from freezegun import freeze_time
 from rest_framework.exceptions import ErrorDetail, ValidationError
 
@@ -246,11 +245,14 @@ def test_save_price_component_changes__model_constraints_are_checked():
     pricing_group = PricingGroupFactory.create()
     new = PriceComponentFactory.build(pricing_group=pricing_group, valid_from=JAN_1, payment_type=None)
 
-    with pytest.raises(DjangoValidationError) as error:
+    with pytest.raises(ValidationError) as error:
         save_price_component_changes(pricing_group=pricing_group, components=[new], deleted_component_pks=[])
 
-    assert error.value.messages == [
-        "Payment type is required for a paid component and not allowed for a free one.",
+    assert error_details(error.value) == [
+        ErrorDetail(
+            "Payment type is required for a paid component and not allowed for a free one.",
+            code=error_codes.PRICE_COMPONENT_PAYMENT_TYPE_INVALID,
+        ),
     ]
     assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
 

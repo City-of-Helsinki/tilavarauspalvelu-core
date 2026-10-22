@@ -9,6 +9,7 @@ from django_nh3.models import Nh3CharField
 from lazy_managers import LazyModelAttribute, LazyModelManager
 
 from tilavarauspalvelu.enums import PaymentType, PriceComponentKind, PriceUnit
+from tilavarauspalvelu.typing import error_codes
 from utils.auditlog_util import AuditLogger
 from utils.fields.model import TextChoicesField
 
@@ -94,6 +95,7 @@ class PriceComponent(models.Model):
                 name="price_component_amount_not_negative",
                 condition=models.Q(amount__gte=0),
                 violation_error_message="Amount cannot be negative.",
+                violation_error_code=error_codes.PRICE_COMPONENT_AMOUNT_NEGATIVE,
             ),
             models.CheckConstraint(
                 name="price_component_payment_type_only_when_paid",
@@ -101,11 +103,13 @@ class PriceComponent(models.Model):
                     models.Q(amount__gt=0, payment_type__isnull=False) | models.Q(amount=0, payment_type__isnull=True)
                 ),
                 violation_error_message="Payment type is required for a paid component and not allowed for a free one.",
+                violation_error_code=error_codes.PRICE_COMPONENT_PAYMENT_TYPE_INVALID,
             ),
             models.CheckConstraint(
                 name="price_component_valid_from_before_valid_until",
                 condition=models.Q(valid_until__isnull=True) | models.Q(valid_from__lt=models.F("valid_until")),
                 violation_error_message="Valid from must be before valid until.",
+                violation_error_code=error_codes.PRICE_COMPONENT_VALID_UNTIL_NOT_AFTER_VALID_FROM,
             ),
         ]
 

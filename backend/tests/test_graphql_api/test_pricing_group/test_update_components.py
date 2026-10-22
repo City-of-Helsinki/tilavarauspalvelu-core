@@ -192,6 +192,33 @@ def test_pricing_group__update_components__coverage_errors_are_returned(graphql)
     assert PriceComponent.objects.get(pk=active.pk).valid_until is None
 
 
+def test_pricing_group__update_components__constraint_errors_have_codes(graphql):
+    pricing_group = PricingGroupFactory.create()
+
+    graphql.login_with_superuser()
+
+    input_data = {
+        "pk": pricing_group.pk,
+        "components": [
+            {
+                "validFrom": local_date().isoformat(),
+                "amount": "10.00",
+                "priceUnit": PriceUnit.PER_HOUR,
+                "paymentType": None,
+            },
+        ],
+    }
+    response = graphql(UPDATE_COMPONENTS_MUTATION, input_data=input_data)
+
+    assert response.has_errors is True, response
+    assert response.field_error_messages() == [
+        "Payment type is required for a paid component and not allowed for a free one.",
+    ]
+    assert response.field_error_codes() == [error_codes.PRICE_COMPONENT_PAYMENT_TYPE_INVALID]
+
+    assert not PriceComponent.objects.filter(pricing_group=pricing_group).exists()
+
+
 def test_pricing_group__update_components__required_fields(graphql):
     pricing_group = PricingGroupFactory.create()
 
