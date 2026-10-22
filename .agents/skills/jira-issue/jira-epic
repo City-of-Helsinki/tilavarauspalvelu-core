@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# List all child issues of a Jira epic from the Jira Cloud REST API.
+# Usage: jira-epic <key or URL> [--with-description], e.g. jira-epic TILA-123
+set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
+
+usage() {
+  echo "Usage: jira-epic <key or URL> [--with-description], e.g. jira-epic TILA-123" >&2
+  exit 2
+}
+[[ $# -ge 1 && $# -le 2 ]] || usage
+
+with_description=false
+if [[ $# -eq 2 ]]; then
+  [[ "$2" == "--with-description" ]] || { echo "Unknown option: $2" >&2; usage; }
+  with_description=true
+fi
+
+key="$(parse_key "$1")"
+
+load_credentials
+
+# The old `rest/api/2/search` is removed from Jira Cloud. `search/jql` pages with `nextPageToken`.
+# The API v2 version returns the description as wiki markup, the same as `jira-issue`.
+fields="summary,status,issuetype,assignee,labels,issuelinks"
+[[ "$with_description" == false ]] || fields="$fields,description"
+jql="$(jq --raw-output --null-input --arg k "$key" '"parent = \($k) ORDER BY key ASC" | @uri')"
+
+issues="[]"
+page_token=""
+while :; do
+  path="rest/api/2/search/jql?jql=$jql&fields=$fields&maxResults=100"
+  [[ -z "$page_token" ]] || path="$path&nextPageToken=$(jq --raw-output --null-input --arg t "$page_token" '$t | @uri')"
+  page="$(api "$path")"
+  issues="$(jq --slurp '.[0] + .[1].issues' <(printf '%s' "$issues") <(printf '%s' "$page"))"
+  page_token="$(jq --raw-output '.nextPageToken // empty' <<<"$page")"
+  [[ "$(jq '.isLast' <<<"$page")" != true && -n "$page_token" ]] || break
+done
+
+# A link in an issue has either `outwardIssue` or `inwardIssue`, the other issue.
+# Its direction verb is `type.outward` or `type.inward`, read from this issue to the other issue.
+jq --arg base "$base_url" --argjson with_description "$with_description" '
+  sort_by(.key | split("-") | [.[0], (.[1] | tonumber)])
+  | map(
+      {
+        key,
+        url: "\($base)/browse/\(.key)",
+        summary: .fields.summary,
+        type: .fields.issuetype.name,
+        status: .fields.status.name,
+        assignee: .fields.assignee.displayName,
+        labels: .fields.labels,
+        links: [
+          .fields.issuelinks[]?
+          | if .outwardIssue then {type: .type.name, direction: .type.outward, key: .outwardIssue.key}
+            else {type: .type.name, direction: .type.inward, key: .inwardIssue.key} end
+        ]
+      }
+      + (if $with_description then {description: .fields.description} else {} end)
+    )' <<<"$issues"

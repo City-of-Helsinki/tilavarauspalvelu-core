@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Fetch a Jira issue with all its comments from the Jira Cloud REST API.
-# Credentials are read from 1Password.
 # Usage: jira-issue <key or URL>, e.g. jira-issue TILA-123
 set -euo pipefail
+
+source "$(dirname "$0")/lib.sh"
 
 usage() {
   echo "Usage: jira-issue <key or URL>, e.g. jira-issue TILA-123" >&2
@@ -10,39 +11,9 @@ usage() {
 }
 [[ $# -eq 1 ]] || usage
 
-base_url="https://helsinkisolutionoffice.atlassian.net"
-host='https://helsinkisolutionoffice\.atlassian\.net'
-key_pattern='[A-Z][A-Z0-9]*-[0-9]+'
+key="$(parse_key "$1")"
 
-if [[ "$1" =~ ^($key_pattern)$ ]]; then
-  key="${BASH_REMATCH[1]}"
-elif [[ "$1" =~ ^$host/browse/($key_pattern)([?#].*)?$ ]]; then
-  key="${BASH_REMATCH[1]}"
-elif [[ "$1" =~ ^$host/[^?#]*\?(.*\&)?selectedIssue=($key_pattern)([\&#].*)?$ ]]; then
-  key="${BASH_REMATCH[2]}"
-else
-  echo "Not a Jira issue key or URL: $1" >&2
-  usage
-fi
-
-: "${JIRA_ISSUE_OP_ACCOUNT:?Set JIRA_ISSUE_OP_ACCOUNT to your 1Password account, e.g. vincit.1password.eu}"
-: "${JIRA_ISSUE_OP_VAULT:?Set JIRA_ISSUE_OP_VAULT to the 1Password vault that has the item, e.g. Private}"
-: "${JIRA_ISSUE_OP_ITEM:?Set JIRA_ISSUE_OP_ITEM to the name of the 1Password item, e.g. Jira API key}"
-ref="op://$JIRA_ISSUE_OP_VAULT/$JIRA_ISSUE_OP_ITEM"
-
-user="$(op read --account "$JIRA_ISSUE_OP_ACCOUNT" "$ref/username")"
-token="$(op read --account "$JIRA_ISSUE_OP_ACCOUNT" "$ref/credential")"
-
-# Escape backslashes and double quotes for the quoted value in the curl config.
-credentials="$user:$token"
-credentials="${credentials//\\/\\\\}"
-credentials="${credentials//\"/\\\"}"
-
-api() {
-  # Pass credentials through stdin so they do not show up in the process list.
-  printf 'user = "%s"\n' "$credentials" \
-    | curl --silent --show-error --fail-with-body --config - "$base_url/$1"
-}
+load_credentials
 
 fields="summary,status,issuetype,priority,assignee,reporter,labels,parent,created,updated,description,comment"
 issue="$(api "rest/api/2/issue/$key?fields=$fields")"
