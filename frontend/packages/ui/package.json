@@ -64,7 +64,7 @@
     "typescript-cookie": "^1.0.6",
     "vite": "^7.3.7",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.12"
   },
   "peerDependencies": {
     "@apollo/client": "^3.13.1",
