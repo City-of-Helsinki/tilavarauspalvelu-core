@@ -78,6 +78,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
     getCellAppearance,
     getCellProps,
     getRunError,
+    renderCellContent,
     alternative,
     className,
     style,
@@ -197,7 +198,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
 
   // A run's first cell shows where it starts, its last where it ends, the rest a connector.
   // A run of two cells or fewer shows the whole range once, on its last cell.
-  const getCellContent = (cell: WeeklyPatternCellInfo<TData>): React.ReactNode => {
+  const getDefaultCellContent = (cell: WeeklyPatternCellInfo<TData>): React.ReactNode => {
     if (!cell.painted) {
       return minutesToHoursString(cell.beginMinutes, true);
     }
@@ -340,7 +341,7 @@ function WeeklyPatternTable<TData extends CalendarData>(
                         data-block-end={cell.isBlockEnd ? "" : undefined}
                         data-invalid={runErrorOf(cell) ? "" : undefined}
                       >
-                        {getCellContent(cell)}
+                        {(renderCellContent ?? getDefaultCellContent)(cell)}
                       </td>
                     );
                   })}
