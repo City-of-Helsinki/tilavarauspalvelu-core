@@ -97,25 +97,38 @@ const eventBackground = (appearance: CellAppearance) => css`
   }
 `;
 
+/**
+ * The grid's own box. A view that needs another size sets one of these custom properties on an ancestor, or
+ * through the calendar's `style` prop:
+ *
+ * - `--weekly-pattern-height`, the height of the box. `auto` drops the inner vertical scroll and lets the page
+ *   carry the whole grid.
+ * - `--weekly-pattern-day-min-width`, how narrow a weekday column may get before the box scrolls sideways.
+ * - `--weekly-pattern-step-height`, the height of one row.
+ *
+ * The defaults are the sizes the application funnel and the staff application view already use, so a view that
+ * passes nothing looks the same as before.
+ */
 export const WeeklyPatternRoot = styled.div`
   --border-color: var(--color-black-50);
   ${gridTableStyles};
 
   position: relative;
   overflow-x: auto;
-  height: 500px;
+  height: var(--weekly-pattern-height, 500px);
 
-  /* 
+  /*
     The shared table has fixed layout and an explicit colgroup, which keeps every weekday column the same width.
     Keeps every day column at least as wide as the original per-cell min-width.
     The container's overflow-x: auto scrolls instead of squeezing columns too thin.
   */
   table {
-    min-width: calc(30px + 7 * 110px);
+    min-width: calc(var(--time-column-width) + 7 * var(--weekly-pattern-day-min-width, 110px));
     user-select: none;
     touch-action: manipulation;
 
-    --step-height: 12px;
+    /* The shared table styles read --step-height, so the override arrives through it. */
+    --step-height: var(--weekly-pattern-step-height, 12px);
 
     /* Just wide enough for a time label like "14". The other columns split the rest evenly. */
     --time-column-width: 30px;
@@ -143,7 +156,7 @@ export const WeeklyPatternRoot = styled.div`
 
   tbody td {
     padding: 0 var(--spacing-2-xs) 0 0;
-    width: calc((100% - 30px) / 7);
+    width: calc((100% - var(--time-column-width)) / 7);
     cursor: pointer;
     text-align: right;
     font-size: 10px;
