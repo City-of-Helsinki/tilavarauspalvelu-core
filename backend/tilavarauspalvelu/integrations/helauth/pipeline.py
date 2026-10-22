@@ -1,21 +1,16 @@
 from __future__ import annotations
 
 import contextlib
-import datetime
 from typing import TYPE_CHECKING, Any, Unpack
 
-import requests
-from django.conf import settings
 from django.db import models
 from django.db.models.functions import Concat
-from rest_framework.status import HTTP_200_OK
 
 from tilavarauspalvelu.dataclasses import IDToken
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.helsinki_profile.typing import ReservationPrefillInfo
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Application, GeneralRole, Reservation, ReservationSeries, UnitRole, User
-from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import WSGIRequest
@@ -44,54 +39,6 @@ def store_end_session_url(**kwargs: Unpack[PipelineArgs]) -> None:
 
     request.session["social_auth_end_session_url"] = end_session_url
     request.session["social_auth_id_token"] = response["id_token"]
-
-
-def fetch_api_tokens(**kwargs: Unpack[PipelineArgs]) -> None:
-    """Copy of 'helusers.pipeline.fetch_api_tokens' that reads the request from the strategy."""
-    user = kwargs["user"]
-    backend = kwargs["backend"]
-    response = kwargs["response"]
-    social = kwargs.get("social")
-    request = kwargs["strategy"].request
-
-    if user is None or not user.is_authenticated or social is None or request is None:
-        return
-
-    scopes = set(backend.get_scope())
-    api_scopes = {scope for scope in scopes if scope.startswith("https://")}
-    tunnistamo_scopes = scopes - api_scopes
-
-    expires_at = local_datetime() + datetime.timedelta(seconds=response["expires_in"])
-    request.session["access_token_scope"] = list(tunnistamo_scopes)
-    request.session["access_token"] = response["access_token"]
-    request.session["access_token_expires_at"] = expires_at
-    request.session["access_token_expires_at_ts"] = int(expires_at.timestamp()) * 1000
-
-    if not api_scopes:
-        return
-
-    url = f"{settings.TUNNISTAMO_BASE_URL}/api-tokens/"
-    headers = {"Authorization": f"Bearer {social.extra_data['access_token']}"}
-    try:
-        api_tokens_response = requests.post(url, headers=headers, timeout=5)
-    except requests.RequestException as error:
-        msg = "Login: Unable to get API tokens"
-        SentryLogger.log_exception(error, msg)
-        return
-
-    if api_tokens_response.status_code != HTTP_200_OK:
-        msg = "Login: Unable to get API tokens"
-        SentryLogger.log_message(msg, details={"status_code": api_tokens_response.status_code}, level="error")
-        return
-
-    try:
-        api_tokens = api_tokens_response.json()
-    except requests.JSONDecodeError as error:
-        msg = "Login: Unable to get API tokens"
-        SentryLogger.log_exception(error, msg)
-        return
-
-    request.session["api_tokens"] = api_tokens
 
 
 def fetch_additional_info_for_user_from_helsinki_profile(**kwargs: Unpack[PipelineArgs]) -> dict[str, Any]:
