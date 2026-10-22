@@ -30,10 +30,11 @@ import {
   visibleDays,
 } from "../DatedWeekCalendar/engine";
 import type { EventSegment } from "../DatedWeekCalendar/engine";
-import type { DatedEvent } from "../DatedWeekCalendar/types";
 import { assertValidStep } from "../WeeklyPatternCalendar/engine";
 import type { CalendarData } from "../WeeklyPatternCalendar/types";
-import { EventStripe, EventTooltip, GridScroller, ListAlternative, NowDot, NowLine, ResourceDayRoot } from "./styles";
+import { EventStripe, GridScroller, ListAlternative, NowDot, NowLine, ResourceDayRoot } from "./styles";
+import { TooltipLayer } from "./TooltipLayer";
+import type { TooltipController } from "./TooltipLayer";
 import type { ResourceDayCalendarProps, ResourceDayHandle } from "./types";
 import { useResourceDayCalendar } from "./useResourceDayCalendar";
 
@@ -104,16 +105,8 @@ function ResourceDayTable<TData extends CalendarData>(
   const nowOffsetPercent = ((nowMinutes - nowIndex * step) / step) * 100;
   const nowHourOffsetPercent = ((nowMinutes - Math.floor(nowMinutes / 60) * 60) / 60) * 100;
 
-  const [tooltip, setTooltip] = useState<{ events: Array<DatedEvent<TData>>; rect: DOMRect } | null>(null);
-  useEffect(() => {
-    if (!tooltip) {
-      return;
-    }
-    // WCAG 1.4.13: content shown on hover can be dismissed without moving the pointer.
-    const dismiss = (event: globalThis.KeyboardEvent) => event.key === "Escape" && setTooltip(null);
-    window.addEventListener("keydown", dismiss);
-    return () => window.removeEventListener("keydown", dismiss);
-  }, [tooltip]);
+  // The tooltip owns its state, so hovering never renders the grid.
+  const tooltipRef = useRef<TooltipController<TData> | null>(null);
 
   const [listOpen, setListOpen] = useState(false);
   const listRef = useRef<HTMLDetailsElement>(null);
@@ -333,13 +326,13 @@ function ResourceDayTable<TData extends CalendarData>(
                       onMouseEnter={
                         renderEventTooltip && segments.length > 0
                           ? (event) =>
-                              setTooltip({
-                                events: segments.map((segment) => segment.event),
-                                rect: event.currentTarget.getBoundingClientRect(),
-                              })
+                              tooltipRef.current?.show(
+                                segments.map((segment) => segment.event),
+                                event.currentTarget.getBoundingClientRect()
+                              )
                           : undefined
                       }
-                      onMouseLeave={renderEventTooltip ? () => setTooltip(null) : undefined}
+                      onMouseLeave={renderEventTooltip ? () => tooltipRef.current?.hide() : undefined}
                     >
                       {startingHere.map((segment) => stripeFor(segment, column.beginMinutes))}
                       {showNowLine && column.index === nowIndex && (
@@ -383,23 +376,7 @@ function ResourceDayTable<TData extends CalendarData>(
           <p>{labels.emptyList}</p>
         )}
       </ListAlternative>
-      {tooltip && renderEventTooltip && (
-        <EventTooltip
-          aria-hidden
-          data-testid="resource-day-calendar__tooltip"
-          style={{
-            left: Math.min(tooltip.rect.left, Math.max(window.innerWidth - 316, 0)),
-            // Flips above the cell in the lower part of the window, where there is no room below.
-            ...(tooltip.rect.bottom > window.innerHeight * 0.6
-              ? { bottom: window.innerHeight - tooltip.rect.top + 4 }
-              : { top: tooltip.rect.bottom + 4 }),
-          }}
-        >
-          {tooltip.events.map((item) => (
-            <React.Fragment key={item.id}>{renderEventTooltip(item)}</React.Fragment>
-          ))}
-        </EventTooltip>
-      )}
+      {renderEventTooltip && <TooltipLayer controllerRef={tooltipRef} render={renderEventTooltip} />}
       <LiveRegion role="log" aria-atomic="true">
         {message.count % 2 === 0 ? message.text : `${message.text} `}
       </LiveRegion>
