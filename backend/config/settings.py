@@ -380,8 +380,9 @@ class Common(Environment):
         env_name="TUNNISTAMO_INACTIVE_USER_URL",
         default="/deactivated-account",
     )
-    # Based on 'helusers.defaults.SOCIAL_AUTH_PIPELINE'. Its 'store_end_session_url' and 'fetch_api_tokens' steps
-    # read the request from the pipeline arguments, which social-auth-core does not pass, so we use our own copies.
+    # Based on 'helusers.defaults.SOCIAL_AUTH_PIPELINE'. Its 'store_end_session_url' step reads the request from
+    # the pipeline arguments, which social-auth-core does not pass, so we use our own copy.
+    # Its 'fetch_api_tokens' step is left out, because nothing reads the session values that it sets.
     SOCIAL_AUTH_TUNNISTAMO_PIPELINE = (
         "social_core.pipeline.social_auth.social_details",
         "social_core.pipeline.social_auth.social_names",
@@ -394,7 +395,6 @@ class Common(Environment):
         "social_core.pipeline.social_auth.associate_user",
         "social_core.pipeline.social_auth.load_extra_data",
         "tilavarauspalvelu.integrations.helauth.pipeline.store_end_session_url",
-        "tilavarauspalvelu.integrations.helauth.pipeline.fetch_api_tokens",
         "tilavarauspalvelu.integrations.helauth.pipeline.fetch_additional_info_for_user_from_helsinki_profile",
         "tilavarauspalvelu.integrations.helauth.pipeline.migrate_user_from_tunnistamo_to_keycloak",
         "tilavarauspalvelu.integrations.helauth.pipeline.update_roles_from_ad_groups",
