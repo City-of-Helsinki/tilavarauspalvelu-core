@@ -38,9 +38,9 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
     "npkill": "^0.12.2",
-    "oxfmt": "^0.72.0",
-    "oxlint": "^1.87.0",
-    "oxlint-tsgolint": "^7.0.2003",
+    "oxfmt": "^0.73.0",
+    "oxlint": "^1.88.0",
+    "oxlint-tsgolint": "^7.0.2004",
     "ts-node": "^10.9.2"
   },
   "engines": {
