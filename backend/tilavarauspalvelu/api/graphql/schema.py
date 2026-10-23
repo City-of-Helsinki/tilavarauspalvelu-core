@@ -5,15 +5,18 @@ from typing import TYPE_CHECKING, Any
 import graphene
 from django.contrib.auth import logout
 from graphene import Field
-from graphene_django_extensions.errors import GQLNotFoundError
+from graphene_django_extensions.errors import GQLCodeError, GQLNotFoundError
 from query_optimizer import DjangoListField, optimize_single
 from query_optimizer.compiler import optimize
 
 from tilavarauspalvelu.enums import ReservationCancelReasonChoice, UserPermissionChoice
+from tilavarauspalvelu.exceptions import PriceCalculationError
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
-from tilavarauspalvelu.models import AllocatedTimeSlot, PaymentOrder, Reservation, User
+from tilavarauspalvelu.models import AllocatedTimeSlot, PaymentOrder, PriceOption, Reservation, ReservationUnit, User
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
+from tilavarauspalvelu.services.pricing.price_lines import build_price_lines
 from tilavarauspalvelu.translation import translated
+from tilavarauspalvelu.typing import error_codes
 
 from .mutations import (
     AllocatedTimeSlotCreateMutation,
@@ -105,6 +108,7 @@ from .queries import (
     ReservationCancelReasonType,
     ReservationDenyReasonNode,
     ReservationNode,
+    ReservationPriceType,
     ReservationPurposeNode,
     ReservationSeriesNode,
     ReservationUnitAllNode,
@@ -129,6 +133,7 @@ if TYPE_CHECKING:
     from django.db import models
 
     from tilavarauspalvelu.integrations.helsinki_profile.typing import UserProfileInfo
+    from tilavarauspalvelu.services.pricing.price_lines import PriceLines
     from tilavarauspalvelu.typing import AnyUser, GQLInfo
 
 
@@ -198,6 +203,14 @@ class Query(graphene.ObjectType):
             description="Reservations should contain at least one these reservation units.",
         ),
     )
+    reservation_price = Field(
+        ReservationPriceType,
+        reservation_unit=graphene.Int(required=True),
+        price_option=graphene.Int(),
+        begins_at=graphene.DateTime(required=True),
+        ends_at=graphene.DateTime(required=True),
+        description="Calculate the price lines that a reservation with the given input would get.",
+    )
     reservation_series = ReservationSeriesNode.Node()
     paged_reservation_series = ReservationSeriesNode.Connection()
     rejected_occurrence = RejectedOccurrenceNode.Node()
@@ -260,6 +273,41 @@ class Query(graphene.ObjectType):
         if PaymentOrderPermission.has_node_permission(order, info.context.user, {}):
             return order
         return None
+
+    def resolve_reservation_price(
+        root: None,
+        info: GQLInfo,
+        *,
+        reservation_unit: int,
+        begins_at: datetime.datetime,
+        ends_at: datetime.datetime,
+        price_option: int | None = None,
+    ) -> PriceLines:
+        reservation_unit_instance = ReservationUnit.objects.filter(pk=reservation_unit).first()
+        if reservation_unit_instance is None:
+            msg = f"Reservation unit with pk {reservation_unit} does not exist."
+            raise GQLNotFoundError(msg)
+
+        price_option_instance: PriceOption | None = None
+        if price_option is not None:
+            price_option_instance = PriceOption.objects.filter(pk=price_option).first()
+            if price_option_instance is None:
+                msg = f"Price option with pk {price_option} does not exist."
+                raise GQLNotFoundError(msg)
+
+            if not price_option_instance.is_active:
+                msg = "Price option is not active."
+                raise GQLCodeError(msg, code=error_codes.PRICE_OPTION_INACTIVE)
+
+        try:
+            return build_price_lines(
+                reservation_unit=reservation_unit_instance,
+                price_option=price_option_instance,
+                begin=begins_at,
+                end=ends_at,
+            )
+        except PriceCalculationError as error:
+            raise GQLCodeError(str(error), code=error_codes.PRICE_CALCULATION_FAILED) from error
 
     def resolve_check_permissions(root: None, info: GQLInfo, **kwargs: Any) -> dict[str, bool]:
         return PermissionCheckerType.run(
