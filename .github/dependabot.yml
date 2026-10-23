@@ -91,6 +91,7 @@ updates:
       testing:
         patterns:
           - "vitest*"
+          - "@vitest*"
           - "@happy-dom*"
           - "@testing-library*"
           - "@vitejs-*"
