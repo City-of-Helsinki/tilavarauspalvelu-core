@@ -27,6 +27,10 @@ class PDFRenderingError(Exception):
     """Error when rendering PDF"""
 
 
+class PriceCalculationError(Exception):
+    """Error when a price cannot be calculated for a reservation"""
+
+
 class ReservableTimeSpanClientError(Exception):
     """Error in reservable time span client"""
 
